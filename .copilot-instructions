@@ -1,0 +1,18 @@
+# Project: Humanity LLC - QR Public Profile System
+
+## Before generating any code:
+
+1. Read the following documents in this exact order:
+   - docs/constitution.md (for principles that cannot be violated)
+   - docs/technical-standards-v1.md (for cryptographic and format requirements)
+   - docs/mvp-spec.md (for the immediate implementation scope)
+
+2. Follow the MVP spec strictly. Do not add features from human-verification-spec.md until explicitly asked.
+
+3. All APIs must match the spec exactly (endpoints, request/response shapes).
+
+4. Use Ed25519 for signatures. Use SQLite for MVP. Use service worker for offline caching.
+
+5. Error messages must be user-friendly but not leak internal details.
+
+6. Generate one file at a time. Ask for confirmation before large batches.
