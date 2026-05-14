@@ -4,7 +4,7 @@ compatibility_date = "2026-05-14"
 compatibility_flags = ["nodejs_compat"]
 
 [assets]
-directory = "./dist"   # ← THIS is your build output directory
+directory = "/"   # ← THIS is your build output directory
 
 [observability]
 enabled = true
