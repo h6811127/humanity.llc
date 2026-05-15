@@ -7,6 +7,7 @@ This folder implements the Humanity Commons **resolver v0.5 MVP** in slices.
 1. **Contract library** — profile IDs, `hc://resolve/{id}` helpers, `handle` / `manifesto_line` / `public_key` validation (`lib/`).
 2. **SQLite + health** — schema per Tech Spec §3.2, `GET /.well-known/hc/v0.5/health` per §4.7 (`schema.sql`, `lib/db.js`, `server.js`).
 3. **Create profile** — `POST /.well-known/hc/v0.5/profiles` per §4.2; revocation secret per §3.4 (SHA-256 stored, plaintext only in 201 response); rate limit per §9 (`lib/post-profiles.js`).
+4. **Resolve + QR** — `GET /profile/:profileId` (JSON vs HTML per §4.3–§4.4), `GET /qr/:profile_id.png` per §4.5 with payload `hc://resolve/{id}`; `Cache-Control` / `X-Resolver-Version` per spec (`lib/get-profile.js`, `lib/get-qr.js`, `lib/html.js`).
 
 Authoritative docs:
 

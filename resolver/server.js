@@ -4,6 +4,8 @@ const express = require('express');
 const rateLimit = require('express-rate-limit');
 const { openDatabase } = require('./lib/db');
 const { postProfilesHandler } = require('./lib/post-profiles');
+const { getProfileHandler } = require('./lib/get-profile');
+const { getQrPngHandler } = require('./lib/get-qr');
 
 /** Tech Spec v0.5 §4.1 base path (no trailing slash here). */
 const BASE_PATH = '/.well-known/hc/v0.5';
@@ -62,6 +64,12 @@ function createApp(db) {
 
   // Tech Spec v0.5 §4.2 — POST /profiles
   v05.post('/profiles', postProfilesHandler(db, publicBaseUrl));
+
+  // Tech Spec v0.5 §4.3–§4.4 — GET /profile/:profileId (JSON vs HTML)
+  v05.get('/profile/:profileId', getProfileHandler(db));
+
+  // Tech Spec v0.5 §4.5 — GET /qr/:profile_id.png
+  v05.get('/qr/:filename', getQrPngHandler(db));
 
   app.use(BASE_PATH, v05);
   return app;
