@@ -6,6 +6,7 @@ const { openDatabase } = require('./lib/db');
 const { postProfilesHandler } = require('./lib/post-profiles');
 const { getProfileHandler } = require('./lib/get-profile');
 const { getQrPngHandler } = require('./lib/get-qr');
+const { postRevokeHandler } = require('./lib/post-revoke');
 
 /** Tech Spec v0.5 §4.1 base path (no trailing slash here). */
 const BASE_PATH = '/.well-known/hc/v0.5';
@@ -70,6 +71,9 @@ function createApp(db) {
 
   // Tech Spec v0.5 §4.5 — GET /qr/:profile_id.png
   v05.get('/qr/:filename', getQrPngHandler(db));
+
+  // Tech Spec v0.5 §4.6 — POST /revoke
+  v05.post('/revoke', postRevokeHandler(db));
 
   app.use(BASE_PATH, v05);
   return app;

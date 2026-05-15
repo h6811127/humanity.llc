@@ -8,6 +8,7 @@ This folder implements the Humanity Commons **resolver v0.5 MVP** in slices.
 2. **SQLite + health** — schema per Tech Spec §3.2, `GET /.well-known/hc/v0.5/health` per §4.7 (`schema.sql`, `lib/db.js`, `server.js`).
 3. **Create profile** — `POST /.well-known/hc/v0.5/profiles` per §4.2; revocation secret per §3.4 (SHA-256 stored, plaintext only in 201 response); rate limit per §9 (`lib/post-profiles.js`).
 4. **Resolve + QR** — `GET /profile/:profileId` (JSON vs HTML per §4.3–§4.4), `GET /qr/:profile_id.png` per §4.5 with payload `hc://resolve/{id}`; `Cache-Control` / `X-Resolver-Version` per spec (`lib/get-profile.js`, `lib/get-qr.js`, `lib/html.js`).
+5. **Revoke** — `POST /revoke` per §4.6 (timing-safe secret check vs §3.4 hash); §8.1 message on wrong secret (`lib/post-revoke.js`).
 
 Authoritative docs:
 
@@ -37,6 +38,14 @@ curl -sS -X POST http://127.0.0.1:3000/.well-known/hc/v0.5/profiles \
 ```
 
 Use a real base58-encoded 32-byte Ed25519 public key (see contract tests / `bs58.encode(crypto.randomBytes(32))` in dev).
+
+Revoke (Tech Spec §4.6):
+
+```bash
+curl -sS -X POST http://127.0.0.1:3000/.well-known/hc/v0.5/revoke \
+  -H "Content-Type: application/json" \
+  -d '{"profile_id":"<id>","revocation_secret":"<secret from create response>"}'
+```
 
 ## HTTP server (Tech Spec §4.1, §4.7)
 
