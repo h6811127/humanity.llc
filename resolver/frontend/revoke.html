@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Revoke profile — Humanity Commons</title>
+  <link rel="stylesheet" href="/frontend/style.css">
+</head>
+<body class="page">
+  <main class="narrow">
+    <p class="crumb"><a href="/frontend/index.html">Home</a></p>
+    <h1>Revoke profile</h1>
+    <p class="lede">Submit the profile ID and the revocation secret you saved at creation.</p>
+
+    <form id="revoke-form">
+      <div class="field">
+        <label for="profile_id">Profile ID</label>
+        <input type="text" id="profile_id" name="profile_id" required autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="revocation_secret">Revocation secret</label>
+        <input type="text" id="revocation_secret" name="revocation_secret" required autocomplete="off" />
+      </div>
+      <p id="revoke-error" class="error hidden" role="alert"></p>
+      <p id="revoke-success" class="success hidden" role="status"></p>
+      <button type="submit">Revoke</button>
+    </form>
+  </main>
+  <script type="module" src="/frontend/revoke.js"></script>
+</body>
+</html>

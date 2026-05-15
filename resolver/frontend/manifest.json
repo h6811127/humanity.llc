@@ -1,0 +1,9 @@
+{
+  "name": "Humanity Commons Resolver",
+  "short_name": "HC Resolver",
+  "description": "Humanity Commons public profiles (v0.5 MVP)",
+  "start_url": "/frontend/index.html",
+  "display": "browser",
+  "background_color": "#ffffff",
+  "theme_color": "#db1b43"
+}
