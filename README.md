@@ -35,15 +35,32 @@ npm run dev
 
 ## Deploy
 
+### Local (from your laptop)
+
 ```bash
 npm run deploy
 ```
 
-`predeploy` checks that `wrangler.toml` has a real D1 `database_id`. If you still see Cloudflare **error 10021** (`binding DB of type d1 must have a valid database_id`), you have not set the database UUID anywhere Wrangler can read it.
+`predeploy` runs `scripts/apply-d1-database-id.mjs`, then Wrangler deploys. Either commit a real D1 UUID in `wrangler.toml` or export `D1_DATABASE_ID` before this command.
 
-**Option A — commit the ID (simplest):** paste the UUID from `wrangler d1 create` / `wrangler d1 list` into `wrangler.toml`, commit, push.
+### Cloudflare Workers Builds (GitHub / GitLab)
 
-**Option B — Git-connected Workers / CI:** in the Cloudflare dashboard, open the Worker (or Pages) build settings and add a plain-text (or secret) environment variable **`D1_DATABASE_ID`** with your D1 database UUID. Set the install/deploy command to use **`npm run deploy`** so the `predeploy` hook runs; a plain `npx wrangler deploy` alone will not inject the variable.
+Workers Builds uses a **two-step** pipeline: optional **Build command**, then **Deploy command**. The deploy step defaults to **`npx wrangler deploy`**, which **does not run npm** — so npm **`predeploy` never runs** and `wrangler.toml` keeps the placeholder `database_id` unless you fix it below. That is why you still see validation failures (commonly **[code: 10021]** and a message about `binding DB` / `database_id`). If you see a different numeric code, copy the **full** log line; Cloudflare’s published upload error table centers on **10021** for binding validation.
+
+Do **one** of the following:
+
+1. **Commit the real D1 UUID** in `wrangler.toml` (replace `REPLACE_WITH_wrangler_d1_create_output`), push to `main`. No dashboard env vars required; default `npx wrangler deploy` works.
+
+2. **Keep the placeholder in git** and inject at build time (good for forks):
+   - Dashboard → Worker → **Settings → Builds → Build variables and secrets** → add **`D1_DATABASE_ID`** = your D1 database UUID (from `wrangler d1 list` or the DB’s Overview page).
+   - **Build command** (Settings → Builds): set to  
+     `npm run cf:inject-d1`  
+     or prepend that to your existing build command (e.g. `npm run cf:inject-d1 && npm run build`). Dependency install (`npm ci`) runs before this in Workers Builds; the script rewrites `wrangler.toml` on disk before the deploy step reads it.
+   - Leave **Deploy command** as the default `npx wrangler deploy`, **or** set it to  
+     `npm run cf:inject-d1 && npx wrangler deploy`  
+     if you do not use a separate build command.
+
+3. **Use npm deploy on the deploy step** (only if build secrets are visible to the deploy command in your account — if unsure, prefer option 2): set **Deploy command** to **`npm run deploy`** so `predeploy` runs. You still need **`D1_DATABASE_ID`** available in that step.
 
 Custom domains and `workers_dev` are configured in `wrangler.toml` under `[[routes]]`. Rename `name` in `wrangler.toml` if you rename the Worker script.
 

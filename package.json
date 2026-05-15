@@ -9,6 +9,7 @@
     "dev": "wrangler dev",
     "predeploy": "node scripts/apply-d1-database-id.mjs",
     "deploy": "wrangler deploy",
+    "cf:inject-d1": "node scripts/apply-d1-database-id.mjs",
     "cf-typegen": "wrangler types",
     "db:migrate:local": "wrangler d1 migrations apply humanity-commons --local",
     "db:migrate:remote": "wrangler d1 migrations apply humanity-commons --remote"
