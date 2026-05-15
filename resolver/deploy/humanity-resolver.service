@@ -1,0 +1,22 @@
+# systemd unit (Tech Spec v0.5 §11.3).
+# Install: `sudo cp deploy/humanity-resolver.service /etc/systemd/system/`
+#           `sudo systemctl daemon-reload && sudo systemctl enable --now humanity-resolver`
+#
+# Set WorkingDirectory to the directory that contains `server.js` (this `resolver/` folder).
+# If you cloned only `resolver/`, use `/opt/resolver`. Monorepo example: `/opt/humanity.llc/resolver`.
+
+[Unit]
+Description=Humanity Commons Resolver
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/opt/resolver
+EnvironmentFile=/opt/resolver/.env
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

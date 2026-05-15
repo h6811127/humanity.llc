@@ -12,6 +12,7 @@ This folder implements the Humanity Commons **resolver v0.5 MVP** in slices.
 6. **Access log** — append-only file log per §8.2: ISO timestamp, method, path (no query string), status, IPv4 last octet zeroed (`lib/request-log.js`, `LOG_FILE` / `LOG_ENABLED` in `.env.example`).
 7. **Frontend + offline** — §5.1 static tree at site root (`/create.html`, `/revoke.html`, …); §5.2–§5.3 forms + profile asset links + SW registration; §6.1 **libsodium.js** (CDN) + base58 + `localStorage` / `sessionStorage` per §6.1–§6.2; §5.4 + §7 service worker (`frontend/sw.js`).
 8. **Rate limit (T-11)** — §9 `express-rate-limit` (default 100 / 60s, health excluded); §10.1 T-11 covered in `test/rate-limit.test.js` (`createApp` accepts optional `rateLimit` overrides for fast assertions).
+9. **Deployment (§11)** — example **systemd** + **Nginx** under `deploy/`; `.env.example` aligned with §11.2 (plus §8.2 logging / governance URLs); README deployment steps for Ubuntu + SQLite + TLS.
 
 Authoritative docs:
 
@@ -72,6 +73,23 @@ curl -sS http://127.0.0.1:3000/.well-known/hc/v0.5/health
 Production default DB path in the spec is `/var/data/profiles.sqlite` (§3.1); override with `DATABASE_PATH` in `.env`.
 
 Access logging (§8.2): by default writes to `resolver/data/access.log` (gitignored). Override with `LOG_FILE`, or set `LOG_ENABLED=0` to turn logging off.
+
+## Deployment — production (Tech Spec §11, §13)
+
+Templates live in **`deploy/`**:
+
+- **`deploy/nginx-resolver.example.conf`** — HTTPS redirect, HSTS, reverse proxy to Node (§9).
+- **`deploy/humanity-resolver.service`** — systemd unit per §11.3 (`WorkingDirectory` must be the folder containing `server.js`).
+
+**Outline (Ubuntu; adapt paths if this repo lives under a monorepo):**
+
+1. Install Node 20+ (§11.1).
+2. Copy or clone this `resolver/` tree to e.g. `/opt/resolver` and run `npm install --omit=dev` (or `npm install` if you run tests on the server).
+3. **`mkdir -p /var/data`** and apply schema: `npm run init-db` with `DATABASE_PATH=/var/data/profiles.sqlite` in `.env`, or `sqlite3 /var/data/profiles.sqlite < schema.sql` from the `resolver/` directory.
+4. If using **`LOG_FILE`** under `/var/log/…`, create that directory and ensure the service user can write (e.g. `www-data`).
+5. Copy **`.env.example`** → `.env`, set **`PUBLIC_BASE_URL=https://resolver.humanity.llc`**, production **`DATABASE_PATH`** / **`LOG_FILE`** (see comments in `.env.example`).
+6. Install **Nginx** site from `deploy/nginx-resolver.example.conf`, then **Certbot** `certbot --nginx -d resolver.humanity.llc` (§11.1).
+7. Install **systemd** unit from `deploy/humanity-resolver.service`, adjust **`WorkingDirectory`**, then `systemctl enable --now humanity-resolver`.
 
 ## Tests
 
