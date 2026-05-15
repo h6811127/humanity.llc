@@ -1,6 +1,9 @@
 {
   "name": "humanity-llc",
   "private": true,
+  "engines": {
+    "node": ">=20.18.1"
+  },
   "description": "Humanity.llc landing + Humanity Commons (v0.5) on one Cloudflare Worker",
   "scripts": {
     "dev": "wrangler dev",
@@ -14,8 +17,8 @@
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250523.0",
+    "@cloudflare/workers-types": "^4.20260515.1",
     "typescript": "^5.7.3",
-    "wrangler": "~4.44.0"
+    "wrangler": "~4.86.0"
   }
 }

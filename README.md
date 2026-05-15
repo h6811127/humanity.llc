@@ -4,7 +4,7 @@ One **Cloudflare Worker** serves the marketing landing page, the **Humanity Comm
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js **20.18.1+** (Wrangler’s dependencies expect this minimum; Cloudflare’s build image often ships Node 22)
 - A Cloudflare account
 
 ## One-time setup
