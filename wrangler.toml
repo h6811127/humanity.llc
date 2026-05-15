@@ -10,6 +10,25 @@ main = "src/index.ts"
 compatibility_date = "2026-05-14"
 compatibility_flags = ["nodejs_compat"]
 
+# Preview URL: https://humanityllc.<subdomain>.workers.dev
+workers_dev = true
+
+# Production hostnames for this Worker (landing + Commons UI + v0.5 API).
+# Custom Domains: TLS and routing are managed by Cloudflare; no manual DNS records.
+# If you prefer to attach hostnames only in the dashboard, remove these [[routes]]
+# blocks so `wrangler deploy` does not replace dashboard triggers.
+[[routes]]
+pattern = "humanity.llc"
+custom_domain = true
+
+[[routes]]
+pattern = "www.humanity.llc"
+custom_domain = true
+
+[[routes]]
+pattern = "resolver.humanity.llc"
+custom_domain = true
+
 [assets]
 directory = "public"
 binding = "ASSETS"
