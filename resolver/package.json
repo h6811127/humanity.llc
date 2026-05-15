@@ -1,0 +1,17 @@
+{
+  "name": "@humanity-commons/resolver-contract",
+  "version": "0.5.0",
+  "private": true,
+  "description": "v0.5 contract: profile IDs, hc:// QR payloads, handle/manifesto/public_key validation",
+  "type": "commonjs",
+  "main": "lib/index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test test/"
+  },
+  "dependencies": {
+    "bs58": "^6.0.0"
+  }
+}
