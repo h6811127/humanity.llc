@@ -1,6 +1,6 @@
 # Single Worker: marketing site + Humanity Commons API (Tech Spec v0.5) + D1.
 # 1) npm install
-# 2) npx wrangler d1 create humanity-commons  →  paste database_id below
+# 2) npx wrangler d1 create humanity-commons  →  paste database_id below (or set D1_DATABASE_ID in CI; see README)
 # 3) npx wrangler d1 migrations apply humanity-commons --local
 # 4) npx wrangler d1 migrations apply humanity-commons --remote
 # 5) npm run deploy

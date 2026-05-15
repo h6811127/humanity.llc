@@ -14,7 +14,7 @@ npm install
 npx wrangler d1 create humanity-commons
 ```
 
-Copy the printed `database_id` into `wrangler.toml` (replace `REPLACE_WITH_wrangler_d1_create_output`).
+Copy the printed `database_id` into `wrangler.toml` (replace `REPLACE_WITH_wrangler_d1_create_output`), **or** leave the placeholder and set a Workers Builds / CI variable `D1_DATABASE_ID` to that UUID (see **Deploy** below).
 
 Apply migrations locally and remotely:
 
@@ -39,7 +39,13 @@ npm run dev
 npm run deploy
 ```
 
-Attach your zone / routes in the Cloudflare dashboard as usual for the `humanityllc` worker (or rename `name` in `wrangler.toml`).
+`predeploy` checks that `wrangler.toml` has a real D1 `database_id`. If you still see Cloudflare **error 10021** (`binding DB of type d1 must have a valid database_id`), you have not set the database UUID anywhere Wrangler can read it.
+
+**Option A — commit the ID (simplest):** paste the UUID from `wrangler d1 create` / `wrangler d1 list` into `wrangler.toml`, commit, push.
+
+**Option B — Git-connected Workers / CI:** in the Cloudflare dashboard, open the Worker (or Pages) build settings and add a plain-text (or secret) environment variable **`D1_DATABASE_ID`** with your D1 database UUID. Set the install/deploy command to use **`npm run deploy`** so the `predeploy` hook runs; a plain `npx wrangler deploy` alone will not inject the variable.
+
+Custom domains and `workers_dev` are configured in `wrangler.toml` under `[[routes]]`. Rename `name` in `wrangler.toml` if you rename the Worker script.
 
 ## Repo layout
 
