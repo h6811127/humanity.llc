@@ -6,6 +6,7 @@ This folder implements the Humanity Commons **resolver v0.5 MVP** in slices.
 
 1. **Contract library** — profile IDs, `hc://resolve/{id}` helpers, `handle` / `manifesto_line` / `public_key` validation (`lib/`).
 2. **SQLite + health** — schema per Tech Spec §3.2, `GET /.well-known/hc/v0.5/health` per §4.7 (`schema.sql`, `lib/db.js`, `server.js`).
+3. **Create profile** — `POST /.well-known/hc/v0.5/profiles` per §4.2; revocation secret per §3.4 (SHA-256 stored, plaintext only in 201 response); rate limit per §9 (`lib/post-profiles.js`).
 
 Authoritative docs:
 
@@ -25,6 +26,16 @@ const {
   parseQrPayload,
 } = require('./lib/index');
 ```
+
+Create profile (Tech Spec §10.2):
+
+```bash
+curl -sS -X POST http://127.0.0.1:3000/.well-known/hc/v0.5/profiles \
+  -H "Content-Type: application/json" \
+  -d '{"handle":"testuser","manifesto_line":"Testing","public_key":"<base58-32-byte-ed25519-pk>"}'
+```
+
+Use a real base58-encoded 32-byte Ed25519 public key (see contract tests / `bs58.encode(crypto.randomBytes(32))` in dev).
 
 ## HTTP server (Tech Spec §4.1, §4.7)
 

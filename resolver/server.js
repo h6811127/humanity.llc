@@ -1,10 +1,21 @@
 require('dotenv').config();
 const path = require('path');
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const { openDatabase } = require('./lib/db');
+const { postProfilesHandler } = require('./lib/post-profiles');
 
 /** Tech Spec v0.5 §4.1 base path (no trailing slash here). */
 const BASE_PATH = '/.well-known/hc/v0.5';
+
+function publicBaseUrl(req) {
+  if (process.env.PUBLIC_BASE_URL) {
+    return String(process.env.PUBLIC_BASE_URL).replace(/\/$/, '');
+  }
+  const proto = req.get('x-forwarded-proto') || req.protocol;
+  const host = req.get('x-forwarded-host') || req.get('host');
+  return `${proto}://${host}`;
+}
 
 /**
  * @param {import('better-sqlite3').Database} db
@@ -16,11 +27,23 @@ function createApp(db) {
 
   const v05 = express.Router();
 
-  // Tech Spec v0.5 §4.7 — GET /health (relative to §4.1 base URL)
+  v05.use(express.json({ limit: '32kb' }));
+
+  // Tech Spec v0.5 §9 — 100 req / IP / 60s; health excluded (same pattern as §10.1 T-11).
+  const limiter = rateLimit({
+    windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS) || 60_000,
+    max: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: (req) => req.method === 'GET' && req.path === '/health',
+  });
+  v05.use(limiter);
+
+  // Tech Spec v0.5 §4.7 — GET /health
   v05.get('/health', (_req, res) => {
+    res.set('X-Resolver-Version', '0.5');
     try {
       db.prepare('SELECT 1').get();
-      res.set('X-Resolver-Version', '0.5');
       res.json({
         status: 'ok',
         version: '0.5',
@@ -28,7 +51,7 @@ function createApp(db) {
         database: 'connected',
       });
     } catch {
-      res.status(500).set('X-Resolver-Version', '0.5').json({
+      res.status(500).json({
         status: 'error',
         version: '0.5',
         uptime: Math.floor(process.uptime()),
@@ -36,6 +59,9 @@ function createApp(db) {
       });
     }
   });
+
+  // Tech Spec v0.5 §4.2 — POST /profiles
+  v05.post('/profiles', postProfilesHandler(db, publicBaseUrl));
 
   app.use(BASE_PATH, v05);
   return app;
