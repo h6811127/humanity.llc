@@ -2,16 +2,25 @@
   "name": "@humanity-commons/resolver-contract",
   "version": "0.5.0",
   "private": true,
-  "description": "v0.5 contract: profile IDs, hc:// QR payloads, handle/manifesto/public_key validation",
+  "description": "Humanity Commons resolver v0.5 — contract validation + HTTP API (incremental)",
   "type": "commonjs",
   "main": "lib/index.js",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "init-db": "node scripts/init-db.js",
     "test": "node --test test/"
   },
   "dependencies": {
-    "bs58": "^6.0.0"
+    "better-sqlite3": "^11.7.0",
+    "bs58": "^6.0.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0"
   }
 }

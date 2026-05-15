@@ -1,11 +1,16 @@
-# Resolver v0.5 — contract package
+# Resolver v0.5 (MVP slices)
 
-This folder holds the **first implementation chunk**: shared rules for profile IDs, `hc://` QR payloads, and validation of `handle`, `manifesto_line`, and Ed25519 `public_key` (base58).
+This folder implements the Humanity Commons **resolver v0.5 MVP** in slices.
+
+**Implemented so far**
+
+1. **Contract library** — profile IDs, `hc://resolve/{id}` helpers, `handle` / `manifesto_line` / `public_key` validation (`lib/`).
+2. **SQLite + health** — schema per Tech Spec §3.2, `GET /.well-known/hc/v0.5/health` per §4.7 (`schema.sql`, `lib/db.js`, `server.js`).
 
 Authoritative docs:
 
 - `docs/Technical Standards v0.5.md` — §2–3 (QR + profile id), §4.1–4.3 (Ed25519 + base58), §5.4–5.5 (handles)
-- `docs/Tech Spec v0.5 🏁.md` — §3–4, Appendix A (reserved handles)
+- `docs/Tech Spec v0.5 🏁.md` — §3 (database), §4 (API, including §4.7 health), Appendix A (reserved handles)
 
 ## Usage
 
@@ -20,6 +25,24 @@ const {
   parseQrPayload,
 } = require('./lib/index');
 ```
+
+## HTTP server (Tech Spec §4.1, §4.7)
+
+```bash
+cd resolver
+cp .env.example .env   # optional
+npm install
+npm run init-db        # creates DB file and applies schema.sql
+npm start              # default http://127.0.0.1:3000
+```
+
+Smoke check (matches Tech Spec §10.2 style):
+
+```bash
+curl -sS http://127.0.0.1:3000/.well-known/hc/v0.5/health
+```
+
+Production default DB path in the spec is `/var/data/profiles.sqlite` (§3.1); override with `DATABASE_PATH` in `.env`.
 
 ## Tests
 
