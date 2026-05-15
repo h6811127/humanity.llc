@@ -7,6 +7,7 @@ const { postProfilesHandler } = require('./lib/post-profiles');
 const { getProfileHandler } = require('./lib/get-profile');
 const { getQrPngHandler } = require('./lib/get-qr');
 const { postRevokeHandler } = require('./lib/post-revoke');
+const { requestLogMiddleware } = require('./lib/request-log');
 
 /** Tech Spec v0.5 §4.1 base path (no trailing slash here). */
 const BASE_PATH = '/.well-known/hc/v0.5';
@@ -31,6 +32,9 @@ function createApp(db) {
   const v05 = express.Router();
 
   v05.use(express.json({ limit: '32kb' }));
+
+  // Tech Spec v0.5 §8.2 — access log (after body parse so POST routes are still logged; before rate limit).
+  v05.use(requestLogMiddleware);
 
   // Tech Spec v0.5 §9 — 100 req / IP / 60s; health excluded (same pattern as §10.1 T-11).
   const limiter = rateLimit({

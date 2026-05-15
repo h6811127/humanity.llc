@@ -9,6 +9,7 @@ This folder implements the Humanity Commons **resolver v0.5 MVP** in slices.
 3. **Create profile** — `POST /.well-known/hc/v0.5/profiles` per §4.2; revocation secret per §3.4 (SHA-256 stored, plaintext only in 201 response); rate limit per §9 (`lib/post-profiles.js`).
 4. **Resolve + QR** — `GET /profile/:profileId` (JSON vs HTML per §4.3–§4.4), `GET /qr/:profile_id.png` per §4.5 with payload `hc://resolve/{id}`; `Cache-Control` / `X-Resolver-Version` per spec (`lib/get-profile.js`, `lib/get-qr.js`, `lib/html.js`).
 5. **Revoke** — `POST /revoke` per §4.6 (timing-safe secret check vs §3.4 hash); §8.1 message on wrong secret (`lib/post-revoke.js`).
+6. **Access log** — append-only file log per §8.2: ISO timestamp, method, path (no query string), status, IPv4 last octet zeroed (`lib/request-log.js`, `LOG_FILE` / `LOG_ENABLED` in `.env.example`).
 
 Authoritative docs:
 
@@ -64,6 +65,8 @@ curl -sS http://127.0.0.1:3000/.well-known/hc/v0.5/health
 ```
 
 Production default DB path in the spec is `/var/data/profiles.sqlite` (§3.1); override with `DATABASE_PATH` in `.env`.
+
+Access logging (§8.2): by default writes to `resolver/data/access.log` (gitignored). Override with `LOG_FILE`, or set `LOG_ENABLED=0` to turn logging off.
 
 ## Tests
 
