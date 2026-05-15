@@ -1,9 +1,0 @@
-name = "my-empire"
-main = "src/worker.ts"
-compatibility_date = "2026-05-14"
-
-# For serving static assets alongside your Worker
-assets = { directory = "./assets" }
-
-[observability]
-enabled = true

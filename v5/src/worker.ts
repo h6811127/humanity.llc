@@ -1,3 +1,7 @@
+export interface Env {
+  ASSETS: Fetcher;
+}
+
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     // Your empire's logic starts here

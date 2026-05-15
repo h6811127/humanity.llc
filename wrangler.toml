@@ -1,0 +1,10 @@
+# Deploy from repository root (Cloudflare Git integration default).
+# Static files live in v5/assets; Worker entry is v5/src/worker.ts.
+name = "humanity-llc"
+main = "v5/src/worker.ts"
+compatibility_date = "2026-05-14"
+
+assets = { directory = "v5/assets" }
+
+[observability]
+enabled = true
