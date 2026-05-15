@@ -3,11 +3,11 @@
 ## Before generating any code:
 
 1. Read the following documents in this exact order:
-   - docs/constitution.md (for principles that cannot be violated)
-   - docs/technical-standards-v1.md (for cryptographic and format requirements)
-   - docs/mvp-spec.md (for the immediate implementation scope)
+   - docs/🧠 Organizing Documents/ 📜 Constitution.md (for principles that cannot be violated)
+   - /docs/Technical Standards v0.5.md (for cryptographic and format requirements)
+   - /docs/Tech Spec v0.5 🏁.md (for the immediate implementation scope)
 
-2. Follow the MVP spec strictly. Do not add features from human-verification-spec.md until explicitly asked.
+2. Follow the MVP spec strictly. Do not add features from Human Verification v1.0.md until explicitly asked.
 
 3. All APIs must match the spec exactly (endpoints, request/response shapes).
 
