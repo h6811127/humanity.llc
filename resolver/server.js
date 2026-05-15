@@ -24,9 +24,10 @@ function publicBaseUrl(req) {
 
 /**
  * @param {import('better-sqlite3').Database} db
+ * @param {{ rateLimit?: { max?: number; windowMs?: number } }} [options] — overrides for tests (Tech Spec §10.1 T-11).
  * @returns {import('express').Express}
  */
-function createApp(db) {
+function createApp(db, options = {}) {
   const app = express();
   app.set('trust proxy', 1);
 
@@ -37,10 +38,18 @@ function createApp(db) {
   // Tech Spec v0.5 §8.2 — access log (after body parse so POST routes are still logged; before rate limit).
   v05.use(requestLogMiddleware);
 
+  const rl = options.rateLimit || {};
+  const windowMs =
+    rl.windowMs !== undefined
+      ? Number(rl.windowMs)
+      : Number(process.env.RATE_LIMIT_WINDOW_MS) || 60_000;
+  const max =
+    rl.max !== undefined ? Number(rl.max) : Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 100;
+
   // Tech Spec v0.5 §9 — 100 req / IP / 60s; health excluded (same pattern as §10.1 T-11).
   const limiter = rateLimit({
-    windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS) || 60_000,
-    max: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+    windowMs,
+    max,
     standardHeaders: true,
     legacyHeaders: false,
     skip: (req) => req.method === 'GET' && req.path === '/health',

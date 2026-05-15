@@ -12,7 +12,7 @@ const MSG = {
   handleFormat:
     'Handle must be 3-32 characters: lowercase letters, numbers, underscore. Must start with a letter.',
   handleReserved: 'This handle is reserved. Please choose another.',
-  manifestoEmpty: 'Manifesto line must be 1–280 characters of plain text.',
+  manifestoEmpty: 'Manifesto line must be 1-280 characters of plain text.',
   manifestoLong: 'Manifesto line cannot exceed 280 characters.',
   publicKey:
     'public_key must be a valid Ed25519 public key in base58 (32 bytes when decoded; typically ~44 characters).',

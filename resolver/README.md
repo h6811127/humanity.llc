@@ -11,6 +11,7 @@ This folder implements the Humanity Commons **resolver v0.5 MVP** in slices.
 5. **Revoke** — `POST /revoke` per §4.6 (timing-safe secret check vs §3.4 hash); §8.1 message on wrong secret (`lib/post-revoke.js`).
 6. **Access log** — append-only file log per §8.2: ISO timestamp, method, path (no query string), status, IPv4 last octet zeroed (`lib/request-log.js`, `LOG_FILE` / `LOG_ENABLED` in `.env.example`).
 7. **Frontend + offline** — §5.1 static tree at site root (`/create.html`, `/revoke.html`, …); §5.2–§5.3 forms + profile asset links + SW registration; §6.1 **libsodium.js** (CDN) + base58 + `localStorage` / `sessionStorage` per §6.1–§6.2; §5.4 + §7 service worker (`frontend/sw.js`).
+8. **Rate limit (T-11)** — §9 `express-rate-limit` (default 100 / 60s, health excluded); §10.1 T-11 covered in `test/rate-limit.test.js` (`createApp` accepts optional `rateLimit` overrides for fast assertions).
 
 Authoritative docs:
 
