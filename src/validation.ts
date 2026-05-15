@@ -1,6 +1,8 @@
-const bs58 = require('bs58').default;
+import bs58Import from 'bs58';
 
-const HANDLE_REGEX = /^[a-z][a-z0-9_]{2,31}$/;
+const bs58 = (bs58Import as { default?: typeof bs58Import }).default ?? bs58Import;
+
+export const HANDLE_REGEX = /^[a-z][a-z0-9_]{2,31}$/;
 
 const RESERVED = new Set(
   [
@@ -38,21 +40,20 @@ const RESERVED = new Set(
 
 const BASE58_PROFILE_ID = /^[1-9A-HJ-NP-Za-km-z]{20}$/;
 
-function isValidHandle(handle) {
-  if (!HANDLE_REGEX.test(handle)) return false;
-  return !RESERVED.has(handle.toLowerCase());
-}
-
-/** @returns {'format' | 'reserved' | null} */
-function handleIssue(handle) {
+export function handleIssue(handle: unknown): 'format' | 'reserved' | null {
   if (typeof handle !== 'string') return 'format';
   if (!HANDLE_REGEX.test(handle)) return 'format';
   if (RESERVED.has(handle.toLowerCase())) return 'reserved';
   return null;
 }
 
-/** @returns {'empty' | 'too_long' | null} */
-function manifestoIssue(raw) {
+export function sanitizeManifesto(line: unknown): string {
+  if (typeof line !== 'string') return '';
+  const stripped = line.replace(/<[^>]*>/g, '').replace(/[<>]/g, '');
+  return stripped.trim().slice(0, 280);
+}
+
+export function manifestoIssue(raw: unknown): 'empty' | 'too_long' | null {
   if (typeof raw !== 'string') return 'empty';
   if (raw.length > 280) return 'too_long';
   const t = raw.trim();
@@ -63,21 +64,8 @@ function manifestoIssue(raw) {
   return null;
 }
 
-function sanitizeManifesto(line) {
-  if (typeof line !== 'string') return '';
-  const stripped = line.replace(/<[^>]*>/g, '').replace(/[<>]/g, '');
-  return stripped.trim().slice(0, 280);
-}
-
-function isValidManifesto(line) {
-  return manifestoIssue(line) === null;
-}
-
-/** Ed25519 public key: 32 bytes, base58-encoded (typically ~43–44 chars). */
-function isValidPublicKeyBase58(publicKey) {
-  if (typeof publicKey !== 'string' || publicKey.length < 40 || publicKey.length > 48) {
-    return false;
-  }
+export function isValidPublicKeyBase58(publicKey: unknown): boolean {
+  if (typeof publicKey !== 'string' || publicKey.length < 40 || publicKey.length > 48) return false;
   try {
     const buf = bs58.decode(publicKey);
     return buf.length === 32;
@@ -86,18 +74,10 @@ function isValidPublicKeyBase58(publicKey) {
   }
 }
 
-function isValidProfileId(id) {
+export function isValidProfileId(id: unknown): boolean {
   return typeof id === 'string' && BASE58_PROFILE_ID.test(id);
 }
 
-module.exports = {
-  HANDLE_REGEX,
-  RESERVED,
-  isValidHandle,
-  handleIssue,
-  manifestoIssue,
-  sanitizeManifesto,
-  isValidManifesto,
-  isValidPublicKeyBase58,
-  isValidProfileId,
-};
+export function encodeBase58(bytes: Uint8Array): string {
+  return bs58.encode(bytes);
+}

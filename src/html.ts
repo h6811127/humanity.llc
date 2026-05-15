@@ -1,4 +1,4 @@
-function escapeHtml(s) {
+export function escapeHtml(s: unknown): string {
   return String(s)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -7,7 +7,7 @@ function escapeHtml(s) {
     .replace(/'/g, '&#39;');
 }
 
-function formatMemberSince(ts) {
+function formatMemberSince(ts: number): string {
   try {
     return new Date(ts * 1000).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -19,16 +19,27 @@ function formatMemberSince(ts) {
   }
 }
 
-function profilePageHtml(profile, { constitutionLink, governanceLink, servedAtIso }) {
+export type ProfileView = {
+  handle: string;
+  manifesto_line: string;
+  badge?: { type: string; label: string };
+  created_at: number;
+  revoked: boolean;
+};
+
+export function profilePageHtml(
+  profile: ProfileView,
+  opts: { constitutionLink: string; governanceLink: string; servedAtIso: string }
+): string {
   const handle = escapeHtml(profile.handle);
   const manifesto = escapeHtml(profile.manifesto_line);
-  const badgeLabel = escapeHtml(profile.badge?.label || 'Early Builder');
-  const badgeType = escapeHtml(profile.badge?.type || 'early_builder');
+  const badgeLabel = escapeHtml(profile.badge?.label ?? 'Early Builder');
+  const badgeType = escapeHtml(profile.badge?.type ?? 'early_builder');
   const memberSince = formatMemberSince(profile.created_at);
   const revoked = Boolean(profile.revoked);
-  const cLink = escapeHtml(constitutionLink);
-  const gLink = escapeHtml(governanceLink);
-  const asOf = escapeHtml(servedAtIso || new Date().toISOString());
+  const cLink = escapeHtml(opts.constitutionLink);
+  const gLink = escapeHtml(opts.governanceLink);
+  const asOf = escapeHtml(opts.servedAtIso);
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -36,8 +47,8 @@ function profilePageHtml(profile, { constitutionLink, governanceLink, servedAtIs
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Profile: @${handle} — Humanity Commons</title>
-  <link rel="stylesheet" href="/frontend/style.css">
-  <link rel="manifest" href="/frontend/manifest.json">
+  <link rel="stylesheet" href="/commons/style.css">
+  <link rel="manifest" href="/commons/manifest.json">
 </head>
 <body data-server-as-of="${asOf}">
   <div id="offline-banner" class="offline-banner hidden" role="status"></div>
@@ -51,11 +62,7 @@ function profilePageHtml(profile, { constitutionLink, governanceLink, servedAtIs
     </div>
     <div class="metadata">
       <p>Member since: ${memberSince}</p>
-      ${
-        revoked
-          ? '<p class="revoked-notice">⛔ This profile has been revoked</p>'
-          : ''
-      }
+      ${revoked ? '<p class="revoked-notice">⛔ This profile has been revoked</p>' : ''}
     </div>
   </main>
   <footer class="site-footer">
@@ -65,7 +72,7 @@ function profilePageHtml(profile, { constitutionLink, governanceLink, servedAtIs
       <a href="${gLink}">Governance</a>
     </nav>
   </footer>
-  <script src="/frontend/app.js"></script>
+  <script src="/commons/app.js"></script>
   <script>
     (function () {
       if ('serviceWorker' in navigator) {
@@ -86,5 +93,3 @@ function profilePageHtml(profile, { constitutionLink, governanceLink, servedAtIs
 </body>
 </html>`;
 }
-
-module.exports = { profilePageHtml, escapeHtml };

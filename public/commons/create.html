@@ -4,15 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create profile — Humanity Commons</title>
-  <link rel="stylesheet" href="/frontend/style.css">
+  <link rel="stylesheet" href="/commons/style.css">
 </head>
 <body class="page">
   <main class="narrow">
-    <p class="crumb"><a href="/frontend/index.html">Home</a></p>
+    <p class="crumb"><a href="/">Humanity.llc</a> · <a href="/commons/index.html">Commons</a></p>
     <h1>Create profile</h1>
 
     <div id="key-warning" class="callout callout-warn">
-      <p><strong>Warning:</strong> Your private key is stored only in this browser. If you clear your cache, lose your device, or switch browsers, you will lose the ability to revoke this profile. Download your revocation secret (below) as a backup. A full key backup system is coming in a future version.</p>
+      <p><strong>Warning:</strong> Your Ed25519 private key is used only on this device to derive your public key for this request; it is not sent to the server and is <strong>not</strong> saved in this browser. MVP revocation uses the <strong>revocation secret</strong> below—download and store it safely. Signature-based flows and key backup may come in a future version.</p>
     </div>
 
     <form id="create-form">
@@ -26,9 +26,9 @@
         <textarea id="manifesto" name="manifesto" maxlength="280" rows="3" required></textarea>
         <small><span id="char-count">0</span> / 280 characters</small>
       </div>
-  <div id="keypair-status" class="callout hidden">
-    <p>✓ Keypair generated locally. Your private key never leaves this device.</p>
-  </div>
+      <div id="keypair-status" class="callout hidden">
+        <p>✓ Keypair generated locally. Your private key never leaves this device.</p>
+      </div>
       <p id="form-error" class="error hidden" role="alert"></p>
       <button type="submit" id="submit-btn">Create profile</button>
     </form>
@@ -49,6 +49,6 @@
     </div>
   </main>
 
-  <script type="module" src="/frontend/create.js"></script>
+  <script type="module" src="/commons/create.js"></script>
 </body>
 </html>

@@ -35,12 +35,6 @@ form.addEventListener('submit', async (e) => {
 
     keypairStatus.classList.remove('hidden');
 
-    try {
-      localStorage.setItem('hc_ed25519_secret_b58', bs58.encode(secretKey));
-    } catch {
-      /* quota or private mode */
-    }
-
     const res = await fetch(`${API_BASE}/profiles`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },

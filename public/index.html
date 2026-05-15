@@ -6,12 +6,25 @@
     <title>Humanity.llc — a quiet infrastructure for trust</title>
     <meta name="description" content="We are building portable trust, earned reputation, and consent-based governance. No crypto. No hype. Just a quiet experiment.">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .site-nav {
+            max-width: 640px;
+            margin: 0 auto 1.5rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #EEEEEE;
+            font-size: 0.95rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem 1rem;
         }
-
+        .site-nav a {
+            color: #DB1B43;
+            text-decoration: none;
+            border-bottom: 1px solid #DB1B43;
+        }
+        .site-nav a:hover { opacity: 0.75; }
+        .site-nav .muted { color: #888; border: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #FFFFFF;
             color: #111111;
@@ -19,25 +32,9 @@
             line-height: 1.5;
             padding: 2rem 1rem;
         }
-
-        .container {
-            max-width: 640px;
-            margin: 0 auto;
-            padding: 2rem 0;
-        }
-
-        h1 {
-            font-size: 3rem;
-            font-weight: 500;
-            letter-spacing: -0.02em;
-            margin-bottom: 1.5rem;
-            color: #111111;
-        }
-
-        .accent {
-            color: #DB1B43;
-        }
-
+        .container { max-width: 640px; margin: 0 auto; padding: 2rem 0; }
+        h1 { font-size: 3rem; font-weight: 500; letter-spacing: -0.02em; margin-bottom: 1.5rem; color: #111111; }
+        .accent { color: #DB1B43; }
         .tagline {
             font-size: 1.25rem;
             color: #111111;
@@ -46,12 +43,7 @@
             padding-left: 1rem;
             font-weight: 400;
         }
-
-        p {
-            margin-bottom: 1rem;
-            color: #111111;
-        }
-
+        p { margin-bottom: 1rem; color: #111111; }
         .card {
             background: #F8F8F8;
             border-radius: 16px;
@@ -59,7 +51,6 @@
             margin: 1.5rem 0;
             border: 1px solid #EEEEEE;
         }
-
         .card-title {
             font-size: 0.75rem;
             text-transform: uppercase;
@@ -68,47 +59,37 @@
             margin-bottom: 0.75rem;
             font-weight: 500;
         }
-
-        a {
-            color: #DB1B43;
-            text-decoration: none;
-            border-bottom: 1px solid #DB1B43;
-            transition: opacity 0.2s ease;
+        a { color: #DB1B43; text-decoration: none; border-bottom: 1px solid #DB1B43; transition: opacity 0.2s ease; }
+        a:hover { opacity: 0.7; }
+        hr { margin: 2rem 0; border: 0; height: 1px; background: #EEEEEE; }
+        .footer { margin-top: 3rem; font-size: 0.8rem; color: #888888; border-top: 1px solid #EEEEEE; padding-top: 2rem; }
+        .cta-commons {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0.55rem 1rem;
+            background: #DB1B43;
+            color: #fff !important;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
         }
-
-        a:hover {
-            opacity: 0.7;
-        }
-
-        hr {
-            margin: 2rem 0;
-            border: 0;
-            height: 1px;
-            background: #EEEEEE;
-        }
-
-        .footer {
-            margin-top: 3rem;
-            font-size: 0.8rem;
-            color: #888888;
-            border-top: 1px solid #EEEEEE;
-            padding-top: 2rem;
-        }
-
         @media (max-width: 600px) {
-            h1 {
-                font-size: 2.25rem;
-            }
-            .container {
-                padding: 1rem 0;
-            }
+            h1 { font-size: 2.25rem; }
+            .container { padding: 1rem 0; }
         }
     </style>
 </head>
 <body>
+    <nav class="site-nav" aria-label="Site">
+        <a href="/"><strong>Humanity.llc</strong></a>
+        <span class="muted">·</span>
+        <a href="/commons/">Humanity Commons</a>
+        <span class="muted">·</span>
+        <a href="/.well-known/hc/v0.5/health">API health</a>
+    </nav>
+
     <div class="container">
         <h1>Humanity.<span class="accent">llc</span></h1>
-    <img src="./DB1B43_qr.png" alt="Red High Resolution Image" style="position: absolute; top: 0; right: 0; max-width: 100px; height: auto;">
         <div class="tagline">
             Portable trust.<br>
             Earned reputation.<br>
@@ -120,16 +101,11 @@
         <p>The idea is simple: your reputation should travel with you, not stay locked inside a single platform. Trust should be earned in public, not claimed in private. And the people using a system should help decide how it runs.</p>
 
         <div class="card">
-            <div class="card-title">Commons (beta)</div>
-            <p>Create a public profile and QR on our resolver — handle, one-line manifesto, no phone or email.</p>
+            <div class="card-title">Humanity Commons</div>
+            <p>Public profiles and QR codes live <strong>on this same site</strong> — no separate resolver host required. Create a handle and a one-line manifesto; keys stay in your browser.</p>
             <p style="margin-top: 1rem;">
-                <a href="https://resolver.humanity.llc/frontend/create.html">Create a profile</a>
-                ·
-                <a href="https://resolver.humanity.llc/frontend/revoke.html">Revoke</a>
-                ·
-                <a href="https://resolver.humanity.llc/.well-known/hc/v0.5/health">Resolver status</a>
+                <a class="cta-commons" href="/commons/">Open Commons</a>
             </p>
-            <p style="font-size: 0.85rem; color: #666; margin-top: 0.75rem;">If these links fail, point <code>resolver.humanity.llc</code> DNS (or a Cloudflare Tunnel) at the Node app in <code>resolver/</code>. See <code>resolver/README.md</code>.</p>
         </div>
 
         <div class="card">
@@ -156,11 +132,15 @@
         <hr>
 
         <p style="font-size: 0.9rem; color: #666;">No crypto. No token. No hype. Just a quiet experiment in what comes next.</p>
-   <div class="footer">
+        <div class="footer">
             <span class="accent">Humanity.llc</span> — a consent-based trust network
         </div>
     </div>
 
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(function () {});
+      }
+    </script>
 </body>
-
 </html>

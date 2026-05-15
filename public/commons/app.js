@@ -1,6 +1,5 @@
 /**
  * Shared client utilities (profile page registers SW from inline script).
- * Reserved for future shared behavior.
  */
 (function () {
   if (typeof window === 'undefined') return;

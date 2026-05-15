@@ -2,15 +2,16 @@ const STATIC_CACHE = 'hc-static-v0.5';
 const PROFILES_CACHE = 'hc-profiles-v0.5';
 
 const STATIC_ASSETS = [
-  '/frontend/index.html',
-  '/frontend/create.html',
-  '/frontend/revoke.html',
-  '/frontend/offline.html',
-  '/frontend/style.css',
-  '/frontend/app.js',
-  '/frontend/create.js',
-  '/frontend/revoke.js',
-  '/frontend/manifest.json',
+  '/commons/index.html',
+  '/commons/create.html',
+  '/commons/revoke.html',
+  '/commons/offline.html',
+  '/commons/style.css',
+  '/commons/app.js',
+  '/commons/create.js',
+  '/commons/revoke.js',
+  '/commons/manifest.json',
+  '/index.html',
 ];
 
 self.addEventListener('install', (event) => {

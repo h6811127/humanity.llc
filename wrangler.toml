@@ -1,10 +1,29 @@
-# Deploy from repository root (Cloudflare Git integration default).
-# Static files live in v5/assets; Worker entry is v5/src/worker.ts.
-name = "humanityllc"
-main = "v5/src/worker.ts"
-compatibility_date = "2026-05-14"
+# Single Worker: marketing site + Humanity Commons API (Tech Spec v0.5) + D1.
+# 1) npm install
+# 2) npx wrangler d1 create humanity-commons  →  paste database_id below
+# 3) npx wrangler d1 migrations apply humanity-commons --local
+# 4) npx wrangler d1 migrations apply humanity-commons --remote
+# 5) npm run deploy
 
-assets = { directory = "v5/assets" }
+name = "humanityllc"
+main = "src/index.ts"
+compatibility_date = "2026-05-14"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "public"
+binding = "ASSETS"
+run_worker_first = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "humanity-commons"
+database_id = "REPLACE_WITH_wrangler_d1_create_output"
+migrations_dir = "migrations"
+
+[vars]
+CONSTITUTION_LINK = "https://humanity.llc/constitution"
+GOVERNANCE_LINK = "https://humanity.llc/governance"
 
 [observability]
 enabled = true
