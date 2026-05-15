@@ -1,0 +1,8 @@
+{
+  "name": "Humanity Commons Resolver",
+  "short_name": "HC Resolver",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#111111"
+}

@@ -1,0 +1,217 @@
+/* Tech Spec v0.5 §5 — vanilla UI (readable defaults) */
+:root {
+  --text: #111;
+  --muted: #555;
+  --border: #e5e5e5;
+  --accent: #1a5f4a;
+  --warn-bg: #fff8e6;
+  --warn-border: #e6c200;
+  --err: #b00020;
+  --ok: #0d5c2e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body.page {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  color: var(--text);
+  background: #fafafa;
+}
+
+main.narrow {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+h3 {
+  font-size: 1.15rem;
+}
+
+.lede {
+  font-size: 1.05rem;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.crumb {
+  font-size: 0.9rem;
+}
+
+.crumb a {
+  color: var(--accent);
+}
+
+a {
+  color: var(--accent);
+}
+
+.link-list {
+  padding-left: 1.25rem;
+}
+
+.field {
+  margin-bottom: 1.25rem;
+}
+
+.field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.field small {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.callout {
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.25rem;
+}
+
+.callout-warn {
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.error {
+  color: var(--err);
+  font-size: 0.95rem;
+}
+
+.success {
+  color: var(--ok);
+  font-size: 0.95rem;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+button {
+  font: inherit;
+  padding: 0.45rem 0.85rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: #fff;
+  cursor: pointer;
+}
+
+button[type='submit'] {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.secret-block {
+  display: block;
+  word-break: break-all;
+  font-size: 0.85rem;
+  margin: 0.5rem 0;
+}
+
+/* Server-rendered profile (§5.3) */
+.profile-main {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+.profile-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.badge {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background: #e8f5f0;
+  color: var(--accent);
+}
+
+.manifesto {
+  font-size: 1.1rem;
+  margin: 1.25rem 0;
+}
+
+.metadata {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.revoked-notice {
+  color: var(--err);
+  font-weight: 600;
+}
+
+.site-footer {
+  max-width: 40rem;
+  margin: 2rem auto 0;
+  padding: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.site-footer nav {
+  margin-top: 0.5rem;
+}
+
+.offline-banner {
+  background: #fff3cd;
+  color: #664d03;
+  padding: 0.6rem 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.offline-banner.hidden {
+  display: none;
+}
+
+code {
+  font-size: 0.9em;
+}

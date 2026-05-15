@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Revoke profile — Humanity Commons</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="manifest" href="/manifest.json">
+</head>
+<body class="page">
+  <main class="narrow">
+    <p class="crumb"><a href="/index.html">Home</a></p>
+    <h1>Revoke profile</h1>
+    <p class="muted">Tech Spec v0.5 §4.6 — submit the revocation secret you saved at profile creation.</p>
+
+    <form id="revoke-form">
+      <div class="field">
+        <label for="profile_id">Profile ID</label>
+        <input type="text" id="profile_id" name="profile_id" required autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="revocation_secret">Revocation secret</label>
+        <textarea id="revocation_secret" name="revocation_secret" rows="3" required></textarea>
+      </div>
+      <p id="form-error" class="error hidden" role="alert"></p>
+      <p id="form-success" class="success hidden" role="status"></p>
+      <button type="submit" id="submit-btn">Revoke</button>
+    </form>
+  </main>
+  <script type="module" src="/revoke.js"></script>
+</body>
+</html>

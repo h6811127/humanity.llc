@@ -1,4 +1,5 @@
 require('dotenv').config();
+const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const rateLimit = require('express-rate-limit');
@@ -80,6 +81,20 @@ function createApp(db) {
   v05.post('/revoke', postRevokeHandler(db));
 
   app.use(BASE_PATH, v05);
+
+  // Tech Spec v0.5 §5.1 — static frontend at site root (/create.html, /style.css, …)
+  const frontendDir = path.join(__dirname, 'frontend');
+  app.get('/sw.js', (req, res, next) => {
+    const swPath = path.join(frontendDir, 'sw.js');
+    if (!fs.existsSync(swPath)) return next();
+    res.setHeader('Service-Worker-Allowed', '/');
+    res.type('application/javascript');
+    res.sendFile(swPath);
+  });
+  if (fs.existsSync(frontendDir)) {
+    app.use(express.static(frontendDir));
+  }
+
   return app;
 }
 

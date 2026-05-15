@@ -45,6 +45,8 @@ function profilePageHtml(profile, { constitutionLink, governanceLink, servedAtIs
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Profile: @${handle} — Humanity Commons</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="manifest" href="/manifest.json">
 </head>
 <body data-server-as-of="${asOf}">
   <div id="offline-banner" class="offline-banner hidden" role="status"></div>
@@ -72,8 +74,12 @@ function profilePageHtml(profile, { constitutionLink, governanceLink, servedAtIs
       <a href="${gLink}">Governance</a>
     </nav>
   </footer>
+  <script src="/app.js"></script>
   <script>
     (function () {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(function () {});
+      }
       function setOfflineBanner() {
         var el = document.getElementById('offline-banner');
         if (!el || navigator.onLine) return;
