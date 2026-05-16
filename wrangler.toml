@@ -1,5 +1,8 @@
 # Deploy from repository root (Cloudflare Git integration default).
 # Static files live in v5/assets; Worker entry is v5/src/worker.ts.
+#
+# If humanity.llc is apex-only (marketing + resolver on one Nginx origin), do NOT
+# route the apex hostname to this Worker — use resolver/deploy/nginx-apex-*.conf instead.
 name = "humanityllc"
 main = "v5/src/worker.ts"
 compatibility_date = "2026-05-14"

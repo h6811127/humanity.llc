@@ -78,10 +78,35 @@ Access logging (§8.2): by default writes to `resolver/data/access.log` (gitigno
 
 Templates live in **`deploy/`**:
 
-- **`deploy/nginx-resolver.example.conf`** — HTTPS redirect, HSTS, reverse proxy to Node (§9).
+- **`deploy/nginx-apex-server-blocks.example.conf`** — **recommended:** one hostname `humanity.llc` for marketing (`v5/assets`) + resolver (API + `/create.html`, …).
+- **`deploy/nginx-apex.example.conf`** — location blocks only (merge into your apex `server`).
+- **`deploy/sync-marketing-static.sh`** — rsync `v5/assets/` → `/var/www/humanity`.
+- **`deploy/nginx-resolver.example.conf`** — optional subdomain-only resolver (`resolver.humanity.llc`).
 - **`deploy/humanity-resolver.service`** — systemd unit per §11.3 (`WorkingDirectory` must be the folder containing `server.js`).
 
-**Outline (Ubuntu; adapt paths if this repo lives under a monorepo):**
+### Apex only — everything on `https://humanity.llc`
+
+Yes, this is possible. Users only see **`humanity.llc`**; you run **one origin** (VPS or Cloudflare Tunnel → Nginx on that machine):
+
+| URL | Served by |
+|-----|-----------|
+| `/` | Marketing static (`v5/assets/index.html`) |
+| `/create.html`, `/revoke.html`, … | Node resolver (proxied) |
+| `/.well-known/hc/v0.5/…` | Node resolver (proxied) |
+
+**Important:** Point **`humanity.llc` DNS** at that origin (tunnel or server). Do **not** leave the apex on a Cloudflare Worker/Pages project that only has `v5/assets` and no resolver — that is what caused Worker **1101** when resolver paths hit the wrong app.
+
+1. Install Node 20+, copy `resolver/` to e.g. `/opt/resolver`, `npm install --omit=dev`, init DB, **`.env`** with **`PUBLIC_BASE_URL=https://humanity.llc`**.
+2. `systemctl enable --now humanity-resolver` (unit from `deploy/humanity-resolver.service`).
+3. `sudo ./deploy/sync-marketing-static.sh /var/www/humanity` (from repo root, or pass your web root).
+4. Enable Nginx from **`deploy/nginx-apex-server-blocks.example.conf`**, then **`certbot --nginx -d humanity.llc`** (add `www` if you use it).
+5. Cloudflare Tunnel (if used): public hostname **`humanity.llc`** → `https://localhost:443` (or your Nginx port). Users never type `*.cfargotunnel.com`.
+
+Marketing home is **`/`**; resolver tools stay at **`/create.html`** etc. The resolver’s own `frontend/index.html` is not mounted at `/` on apex (only one homepage). Link “Create profile” from the marketing page to `/create.html`.
+
+### Subdomain resolver (optional)
+
+**Outline (Ubuntu; `resolver.humanity.llc` only):**
 
 1. Install Node 20+ (§11.1).
 2. Copy or clone this `resolver/` tree to e.g. `/opt/resolver` and run `npm install --omit=dev` (or `npm install` if you run tests on the server).
