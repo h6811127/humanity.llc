@@ -15,6 +15,7 @@ The core social object is the **Humanity Card**:
 - A public profile card owned by a human.
 - A signed QR credential that resolves to that card.
 - A visible verification state.
+- A freshness signal such as latest accepted vouch recency when available.
 - A public badge trail showing how the person entered the commons.
 - A revocation mechanism controlled by the owner.
 - A print-ready physical artifact that can be purchased through the Humanity Storefront and fulfilled through Printify Fulfillment Middleware.
@@ -66,7 +67,8 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 | HC-US-11 | As a scanner, I want to verify that the card payload and resolver response are signed. |
 | HC-US-12 | As a scanner, I want to know what data, if any, is being logged when I scan. |
 | HC-US-13 | As a scanner, I want cached cards to clearly show that they may be stale. |
-| HC-US-14 | As a scanner, I want to request deeper access only through explicit consent flows. |
+| HC-US-14 | As a scanner, I want to know that a printed QR resolves to a card but does not prove the holder is the card owner. |
+| HC-US-15 | As a scanner, I want to request deeper access only through explicit consent flows. |
 
 ### 3.3 Voucher
 
@@ -105,87 +107,91 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 
 | ID | Requirement | Priority |
 |---|---|---|
-| HC-FR-09 | Public card MUST display handle, manifesto line, verification badge, card status, member-since date, QR code, and public badges. | P0 |
+| HC-FR-09 | Public card MUST display handle, manifesto line, verification badge, latest accepted vouch recency when available, card status, member-since date, QR code, and public badges. | P0 |
 | HC-FR-10 | Public card MUST display constitution and governance links. | P0 |
 | HC-FR-11 | Public card MUST display "No phone, no ads, no follower count" positioning or equivalent privacy copy. | P0 |
 | HC-FR-12 | Public card MUST expose a machine-readable JSON representation. | P0 |
 | HC-FR-13 | Public card MUST expose a human-readable HTML representation through content negotiation. | P0 |
 | HC-FR-14 | Public card MUST not display private or semi-public data by default. | P0 |
-| HC-FR-15 | Public card SHOULD include visual design suitable for screenshots and sharing. | P1 |
+| HC-FR-15 | Public card and printed-item scan pages MUST warn that possession of a printed QR artifact does not prove card ownership or identity. | P0 |
+| HC-FR-16 | Public card SHOULD include visual design suitable for screenshots and sharing. | P1 |
 
 ### 4.3 Verification State
 
 | ID | Requirement | Priority |
 |---|---|---|
-| HC-FR-16 | Card MUST display verification level: unverified, registered, verified human, steward, revoked, or suspended. | P0 |
-| HC-FR-17 | Card MUST explain how verification was achieved: device proof, vouches, ceremony, or steward action. | P0 |
-| HC-FR-18 | Card MUST display a public badge trail with issuer, issuance time, and signature reference. | P0 |
-| HC-FR-19 | System MUST support founding badges such as `founding_human` and `early_builder`. | P0 |
-| HC-FR-20 | Founding badges MUST be governed by issuance rules, not arbitrary UI decoration. | P0 |
+| HC-FR-17 | Card MUST display verification level: unverified, registered, verified human, steward, revoked, or suspended. | P0 |
+| HC-FR-18 | Card MUST explain how verification was achieved: device proof, vouches, ceremony, or steward action. | P0 |
+| HC-FR-19 | Card MUST display a public badge trail with issuer, issuance time, and signature reference. | P0 |
+| HC-FR-20 | Card MUST display latest accepted vouch recency when active accepted vouches exist. | P0 |
+| HC-FR-21 | System MUST support founding badges such as `founding_human` and `early_builder`. | P0 |
+| HC-FR-22 | Founding badges MUST be governed by issuance rules, not arbitrary UI decoration. | P0 |
 
 ### 4.4 Vouching
 
 | ID | Requirement | Priority |
 |---|---|---|
-| HC-FR-21 | Verified humans MUST be able to vouch for other humans. | P0 |
-| HC-FR-22 | Vouches MUST be signed by the voucher's private key. | P0 |
-| HC-FR-23 | Vouches MUST include voucher profile ID, vouchee profile ID, timestamp, method, and statement. | P0 |
-| HC-FR-24 | Vouches MUST be rate-limited and quota-limited per Human Verification v1.0. | P0 |
-| HC-FR-25 | Vouch counts MUST be visible on the card without exposing private notes. | P0 |
-| HC-FR-26 | Revoked or suspended voucher status MUST invalidate dependent vouches according to verification rules. | P0 |
+| HC-FR-23 | Verified humans MUST be able to vouch for other humans. | P0 |
+| HC-FR-24 | Vouches MUST be signed by the voucher's private key. | P0 |
+| HC-FR-25 | Vouches MUST include voucher profile ID, vouchee profile ID, timestamp, method, and statement. | P0 |
+| HC-FR-26 | Vouches MUST be rate-limited and quota-limited per Human Verification v1.0. | P0 |
+| HC-FR-27 | Vouch counts and latest accepted vouch recency MUST be visible on the card without exposing private notes. | P0 |
+| HC-FR-28 | Revoked or suspended voucher status MUST invalidate dependent vouches according to verification rules. | P0 |
 
 ### 4.5 QR Credential
 
 | ID | Requirement | Priority |
 |---|---|---|
-| HC-FR-27 | QR payload MUST be short enough for reliable printing and scanning. | P0 |
-| HC-FR-28 | QR payload MUST include or reference a signed credential. | P0 |
-| HC-FR-29 | QR credential MUST include profile ID, resolver hint, epoch, issued_at, expires_at, and signature. | P0 |
-| HC-FR-30 | QR codes MUST be regenerated when epoch changes or key material rotates. | P0 |
-| HC-FR-31 | Printed QR codes MUST resolve to a status page after expiration or revocation, not silently fail. | P0 |
-| HC-FR-32 | QR PNG/SVG/PDF outputs MUST be generated at print-safe resolution. | P0 |
+| HC-FR-29 | QR payload MUST be short enough for reliable printing and scanning. | P0 |
+| HC-FR-30 | QR payload MUST include or reference a signed credential. | P0 |
+| HC-FR-31 | QR credential MUST include profile ID, resolver hint, epoch, scope, issued_at, expires_at, and signature. | P0 |
+| HC-FR-32 | QR codes MUST be regenerated when epoch changes or key material rotates. | P0 |
+| HC-FR-33 | Each personalized printed item MUST receive a unique item-scoped QR credential so stolen/lost items can be revoked individually. | P0 |
+| HC-FR-34 | Printed QR codes MUST resolve to a status page after expiration or revocation, not silently fail. | P0 |
+| HC-FR-35 | QR PNG/SVG/PDF outputs MUST be generated at print-safe resolution. | P0 |
 
 ### 4.6 Physical Artifact Ordering
 
 | ID | Requirement | Priority |
 |---|---|---|
-| HC-FR-33 | Card owner MUST be able to order physical artifacts containing their signed QR code. | P0 |
-| HC-FR-34 | System MUST support at minimum stickers and flat cards for v1.0. | P0 |
-| HC-FR-35 | Apparel and bags SHOULD be supported if Printify product templates are validated. | P1 |
-| HC-FR-36 | Physical artifact ordering MUST be mediated through Storefront, Shopify checkout, and Printify Fulfillment Middleware. | P0 |
-| HC-FR-37 | Print orders MUST not give Printify access to private keys or verification secrets. | P0 |
-| HC-FR-38 | Print files MUST use a signed QR artifact generated by Humanity systems. | P0 |
-| HC-FR-39 | Card owner MUST approve final preview before order submission. | P0 |
-| HC-FR-40 | Physical order status MUST be trackable inside Humanity without exposing scan data. | P0 |
+| HC-FR-36 | Card owner MUST be able to order physical artifacts containing their signed QR code. | P0 |
+| HC-FR-37 | System MUST support at minimum stickers and flat cards for v1.0. | P0 |
+| HC-FR-38 | Apparel and bags SHOULD be supported if Printify product templates are validated. | P1 |
+| HC-FR-39 | Physical artifact ordering MUST be mediated through Storefront, Shopify checkout, and Printify Fulfillment Middleware. | P0 |
+| HC-FR-40 | Print orders MUST not give Printify access to private keys or verification secrets. | P0 |
+| HC-FR-41 | Print files MUST use a signed item-scoped QR credential generated by Humanity systems. | P0 |
+| HC-FR-42 | Card owner MUST approve final preview before order submission. | P0 |
+| HC-FR-43 | Physical order status MUST be trackable inside Humanity without exposing scan data. | P0 |
 
 ### 4.7 Revocation
 
 | ID | Requirement | Priority |
 |---|---|---|
-| HC-FR-41 | Card owner MUST be able to revoke the active card using device-held key material or exported recovery credentials. | P0 |
-| HC-FR-42 | Revocation MUST mark resolver responses as `410 Gone` for public card resolution. | P0 |
-| HC-FR-43 | Revocation MUST mark printed QR artifacts as revoked in the resolver status response. | P0 |
-| HC-FR-44 | Revocation MUST not attempt to recall already shipped physical products. | P0 |
-| HC-FR-45 | Revocation page MUST explain that physical artifacts may still exist but will resolve as revoked. | P0 |
+| HC-FR-44 | Card owner MUST be able to revoke the active card using device-held key material or exported recovery credentials. | P0 |
+| HC-FR-45 | Card owner MUST be able to revoke an individual printed-item QR without revoking sibling printed-item QR credentials. | P0 |
+| HC-FR-46 | Revocation MUST mark resolver responses as `410 Gone` for public card resolution. | P0 |
+| HC-FR-47 | Revocation MUST mark printed QR artifacts as revoked in the resolver status response. | P0 |
+| HC-FR-48 | Revocation MUST not attempt to recall already shipped physical products. | P0 |
+| HC-FR-49 | Revocation page MUST explain that physical artifacts may still exist but will resolve as revoked. | P0 |
 
 ### 4.8 Export and Portability
 
 | ID | Requirement | Priority |
 |---|---|---|
-| HC-FR-46 | User MUST be able to export profile document, public badges, signed vouches, QR credential history, resolver list, and encrypted private key backup. | P0 |
-| HC-FR-47 | Export MUST be downloadable within 24 hours. | P0 |
-| HC-FR-48 | Export MUST include a manifest signature. | P0 |
-| HC-FR-49 | Export MUST include print artifact metadata but MUST NOT include third-party payment secrets. | P0 |
+| HC-FR-50 | User MUST be able to export profile document, public badges, signed vouches, QR credential history, resolver list, and encrypted private key backup. | P0 |
+| HC-FR-51 | Export MUST be downloadable within 24 hours. | P0 |
+| HC-FR-52 | Export MUST include a manifest signature. | P0 |
+| HC-FR-53 | Export MUST include print artifact metadata but MUST NOT include third-party payment secrets. | P0 |
 
 ### 4.9 Privacy and Logging
 
 | ID | Requirement | Priority |
 |---|---|---|
-| HC-FR-50 | System MUST NOT collect scan analytics by default. | P0 |
-| HC-FR-51 | Resolver access logs MUST anonymize IP addresses. | P0 |
-| HC-FR-52 | Printify Fulfillment Middleware MUST store shipping data only as long as required for fulfillment, support, tax, fraud, and legal obligations. | P0 |
-| HC-FR-53 | Printify Fulfillment Middleware MUST not share profile-private data with Printify. | P0 |
-| HC-FR-54 | Scanner logging, if ever enabled, MUST require explicit scanner and card-owner consent. | P1 |
+| HC-FR-54 | System MUST NOT collect scan analytics by default. | P0 |
+| HC-FR-55 | Resolver access logs MUST anonymize IP addresses. | P0 |
+| HC-FR-56 | Printify Fulfillment Middleware MUST store shipping data only as long as required for fulfillment, support, tax, fraud, and legal obligations. | P0 |
+| HC-FR-57 | Printify Fulfillment Middleware MUST not share profile-private data with Printify. | P0 |
+| HC-FR-58 | Scanner logging, if ever enabled, MUST require explicit scanner and card-owner consent. | P1 |
 
 ---
 
@@ -337,7 +343,9 @@ Card owner opens Storefront product page
   |
 System verifies active card/QR status
   |
-System renders signed QR artwork and artifact preview
+System issues unique printed-item QR credential
+  |
+System renders signed item QR artwork and artifact preview
   |
 Artifact intent attaches to cart line
   |
@@ -445,6 +453,7 @@ Printify Fulfillment Middleware details are specified in `Printify Fulfillment M
 | `method` | enum | Yes | `none`, `registered`, `device_proof`, `vouch`, `ceremony`, `steward`. |
 | `verified_at` | datetime | No | When current level was achieved. |
 | `vouch_count` | integer | Yes | Count of active valid vouches. |
+| `latest_accepted_vouch_at` | datetime | No | Most recent active accepted vouch timestamp. |
 | `badge_id` | string | No | Current primary verification badge. |
 
 ### 9.3 Badge Record
@@ -466,6 +475,7 @@ Printify Fulfillment Middleware details are specified in `Printify Fulfillment M
 | `qr_id` | string | Yes | Stable ID for this QR artifact. |
 | `profile_id` | string | Yes | Card profile ID. |
 | `epoch` | integer | Yes | QR epoch number. |
+| `scope` | enum | Yes | `card` or `print_artifact`. |
 | `resolver_hint` | string | Yes | Primary resolver base URL or domain hint. |
 | `issued_at` | datetime | Yes | Creation time. |
 | `expires_at` | datetime | Yes | Expiration time. |
@@ -524,6 +534,7 @@ Printify Fulfillment Middleware details are specified in `Printify Fulfillment M
 - User can view HTML and JSON card representations.
 - User can scan a QR code and see an active card.
 - User can see verification status and badge trail.
+- User can see latest accepted vouch recency when active accepted vouches exist.
 - User can vouch for another human if eligible.
 - User can revoke active card resolution.
 - User can export identity bundle.
@@ -540,10 +551,12 @@ Printify Fulfillment Middleware details are specified in `Printify Fulfillment M
 - Webhook endpoint authenticates or verifies Printify callbacks according to the middleware spec.
 - Public card data is separated from Shopify/print order PII.
 - Revoked cards return revoked status for old printed QR codes.
+- Revoked printed-item QR credentials do not revoke other printed-item QR credentials for the same card.
 
 ### 12.3 Physical Artifact Complete
 
 - Print-ready QR artwork passes scanner tests at expected printed sizes.
+- Personalized physical items receive unique QR credentials per item.
 - User sees and approves proof before order submission.
 - Order creation is idempotent.
 - Printify order status is mapped to Humanity order status.
@@ -572,6 +585,7 @@ Printify Fulfillment Middleware details are specified in `Printify Fulfillment M
 |---|---|---|---|
 | Looks like link-in-bio | Medium | High | Center card, proof, badge trail, vouching, and physical artifact ritual instead of links. |
 | Printed QR persists after revocation | High | Medium | Printed QR resolves to revoked status; UI explains physical persistence before ordering. |
+| Stolen sticker is treated as identity proof | Medium | High | Scan page warns that possession does not prove card ownership or identity; each item QR is individually revocable. |
 | Printify dependency outage | Medium | Medium | Queue orders, show clear status, keep identity system independent from fulfillment. |
 | User loses private key | Medium | High | Encrypted export bundle and recovery credentials. |
 | Vouching collusion | Medium | High | Quotas, cooldowns, public audit trail, revocable vouches. |

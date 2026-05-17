@@ -15,6 +15,7 @@ flowchart TD
   qrCredential --> publicScan["Public QR Scan"]
   qrCredential --> storefront["Storefront Personalized Product"]
   storefront --> artifactIntent["Artifact Intent And Preview"]
+  artifactIntent --> itemQR["Unique Printed-Item QR"]
   artifactIntent --> shopifyCheckout["Shopify Checkout"]
   shopifyCheckout --> paidWebhook["Paid Shopify Webhook"]
   paidWebhook --> commerceLink["Humanity Commerce Order Link"]
@@ -49,7 +50,7 @@ Hardening finding: card creation is rebuild-ready if the first slice uses only p
 | Scan HTTPS fallback QR | Scanner browser | None required | Malformed URL, unknown profile, unknown QR | No scan analytics by default. |
 | Validate profile and QR IDs | Resolver API | Access log with anonymized IP only | Invalid ID, QR not linked to card | QR payload must not contain order/PII data. |
 | Resolve status | Resolver API | Card status, QR status | Revoked, suspended, expired, unknown | Public data only. |
-| Render HTML/JSON | Resolver/API frontend | None required beyond cache | Stale cached card | UI must show stale/offline state. |
+| Render HTML/JSON | Resolver/API frontend | None required beyond cache | Stale cached card | UI must show stale/offline state and bearer warning for printed-item QR. |
 
 Hardening finding: QR resolution must be implemented before print artifacts. The printed object is only safe if old QR codes keep resolving to current status.
 
@@ -76,7 +77,8 @@ Hardening finding: the first rebuild can support registered/unverified state fir
 | Open product page | Storefront | None required | Product disabled, unsupported template | No Printify browsing. |
 | Check card/QR status | Storefront API / Resolver | None or short-lived validation event | Revoked, suspended, expired | Storefront gets public card/QR status only. |
 | Generate preview | Printify Fulfillment Middleware renderer | Print artifact draft | QR scan QA failed, template invalid | Printify not called until artifact passes local validation/upload point. |
-| Create artifact intent | Storefront API | `artifact_intent` | Intent expired, duplicate, invalid personalization state | Intent contains no private keys or verification secrets. |
+| Create artifact intent | Storefront API | `artifact_intent` with planned item QR IDs | Intent expired, duplicate, invalid personalization state | Intent contains no private keys or verification secrets. |
+| Issue item QR credentials | QR service | Item-scoped QR credential per physical item | QR signing/validation failure | Each printed item is independently revocable; no scan analytics. |
 | Attach to Shopify checkout | Storefront/Shopify | Shopify cart line metadata | Metadata dropped, checkout abandoned | Metadata must contain only intent IDs and product refs. |
 | Payment succeeds | Shopify | Shopify order | Payment failed, canceled, refunded | Payment PII stays in Shopify/protected commerce records. |
 | Paid webhook consumed | Humanity webhook consumer | `commerce_order_link` | Webhook spoofed, duplicate, out of order | Webhook authenticated and idempotent. |
@@ -94,6 +96,7 @@ Hardening finding: the riskiest handoff is artifact intent metadata surviving Sh
 | Owner signs revocation | Client | Revocation statement | Key unavailable, recovery unavailable | Private key stays local. |
 | Resolver verifies revocation | Resolver API | Card/QR status update | Invalid signature, replay nonce | No reason required. |
 | QR scans after revocation | Resolver/API frontend | None required | Cache stale | Status page must clearly show revoked. |
+| Sibling item QR remains active | Resolver/API frontend | None required | Wrong QR scope revoked | Item revocation must not revoke sibling stickers/cards. |
 | New orders blocked | Storefront/Middleware | Blocked order attempt if logged | Attempt to reorder revoked QR | No physical recall promise. |
 
 Hardening finding: revocation must not be described as recalling physical artifacts. It invalidates resolution and future ordering, not the existence of the printed object.
@@ -109,7 +112,7 @@ Hardening finding: revocation must not be described as recalling physical artifa
 | Shopify -> Humanity | Paid/canceled/refunded order webhooks, order/line references, shipping/payment status needed for fulfillment | Raw payment processor secrets beyond Shopify's normal order abstractions |
 | Humanity -> Printify | Artwork, approved product/variant refs, shipping/contact fields required for fulfillment | Private keys, verification secrets, vouch graph, private profile data, scan analytics |
 | Printify -> Humanity | Order status, production state, tracking, provider issue details | Identity authority, verification status, badge issuance |
-| Resolver -> Scanner | Public card, public verification summary, QR status | Private profile layers, order IDs, shipping/payment data |
+| Resolver -> Scanner | Public card, public verification summary, latest accepted vouch recency, QR status, bearer warning | Private profile layers, order IDs, shipping/payment data, identity proof from possession |
 
 ---
 
@@ -123,6 +126,7 @@ Hardening finding: revocation must not be described as recalling physical artifa
 | QR scan | Revoked card | Show revoked status page. |
 | QR scan | Suspended card | Show suspension status with public process reference. |
 | QR scan | Cached stale card | Show stale/offline banner. |
+| QR scan | Printed item held by someone else | Warn that the QR resolves to a card but does not prove the holder is the card owner. |
 | Verification | Vouch quota exceeded | Block vouch and explain quota. |
 | Verification | Voucher too new | Block vouch and explain waiting period. |
 | Verification | Revoked voucher | Remove from active count. |
@@ -144,7 +148,7 @@ The docs are implementation-ready only if the rebuild starts with the narrow ver
 
 1. Signed public Humanity Card.
 2. HTTPS QR resolution and revoked status page.
-3. One personalized sticker/card artifact intent.
+3. One personalized sticker/card artifact intent with unique printed-item QR.
 4. Shopify checkout handoff with artifact-intent metadata.
 5. Paid-order webhook to commerce order link.
 6. Printify Fulfillment Middleware order submission with idempotency and manual production approval.

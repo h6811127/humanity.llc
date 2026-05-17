@@ -28,7 +28,7 @@ QR Public Profile v1.0 is not a link-in-bio system. It is the public resolution 
 |---|---|
 | Public by consent | Only the public card layer is visible to unauthenticated scanners. |
 | Signed by default | QR credentials and card documents are signed. |
-| Revocation visible | Revoked cards and artifacts resolve to clear revoked status. |
+| Revocation visible | Revoked cards and individual printed-item QR credentials resolve to clear revoked status. |
 | Print-safe | QR payloads and artwork are designed for physical use. |
 | Offline-aware | Cached cards are allowed only with stale-state disclosure. |
 | No scan surveillance | Scan analytics are disabled by default. |
@@ -44,9 +44,9 @@ QR Public Profile v1.0 is not a link-in-bio system. It is the public resolution 
 |---|---|
 | QR-US-01 | As a card owner, I want a QR credential that resolves to my Humanity Card. |
 | QR-US-02 | As a card owner, I want to print or wear a QR without giving up revocation control. |
-| QR-US-03 | As a card owner, I want QR-bearing products to use my current active QR credential. |
-| QR-US-04 | As a card owner, I want old printed QR codes to show revoked or expired status when appropriate. |
-| QR-US-05 | As a card owner, I want QR-bearing artifacts to resolve to current card status. |
+| QR-US-03 | As a card owner, I want each personalized printed item to receive its own QR credential. |
+| QR-US-04 | As a card owner, I want to revoke a stolen printed item without revoking every sticker or card I own. |
+| QR-US-05 | As a card owner, I want QR-bearing artifacts to resolve to current card status while keeping each physical item individually revocable. |
 
 ### 3.2 Scanner
 
@@ -56,6 +56,7 @@ QR Public Profile v1.0 is not a link-in-bio system. It is the public resolution 
 | QR-US-07 | As a scanner, I want to see the public Humanity Card without installing an app. |
 | QR-US-08 | As a scanner, I want to know whether I am viewing cached or current data. |
 | QR-US-09 | As a scanner, I want clear status for revoked, suspended, expired, or unknown QR credentials. |
+| QR-US-10 | As a scanner, I want to know that a printed QR resolves to a card but does not prove the person holding it is the card owner. |
 
 ### 3.3 Operator
 
@@ -79,64 +80,68 @@ QR Public Profile v1.0 is not a link-in-bio system. It is the public resolution 
 | QR-FR-03 | QR credential MUST be signed with the card owner's key or authorized recovery/rotation key. | P0 |
 | QR-FR-04 | QR ID MUST be opaque and not encode personal data. | P0 |
 | QR-FR-05 | QR payload MUST be short enough for reliable print scanning. | P0 |
+| QR-FR-06 | Personalized printed items MUST receive unique item-scoped QR credentials so individual stolen/lost items can be revoked. | P0 |
 
 ### 4.2 URI and Fallback Resolution
 
 | ID | Requirement | Priority |
 |---|---|---|
-| QR-FR-06 | Canonical custom URI MUST be `hc://card/{profile_id}?q={qr_id}` for app/native clients. | P0 |
-| QR-FR-07 | HTTPS fallback MUST be supported for phone cameras: `https://humanity.llc/c/{profile_id}?q={qr_id}`. | P0 |
-| QR-FR-08 | Printed artifacts MUST use HTTPS fallback for phone-camera compatibility. | P0 |
-| QR-FR-09 | Resolver MUST reject malformed QR payloads and unknown QR IDs. | P0 |
+| QR-FR-07 | Canonical custom URI MUST be `hc://card/{profile_id}?q={qr_id}` for app/native clients. | P0 |
+| QR-FR-08 | HTTPS fallback MUST be supported for phone cameras: `https://humanity.llc/c/{profile_id}?q={qr_id}`. | P0 |
+| QR-FR-09 | Printed artifacts MUST use HTTPS fallback for phone-camera compatibility. | P0 |
+| QR-FR-10 | Resolver MUST reject malformed QR payloads and unknown QR IDs. | P0 |
 
 ### 4.3 Public Card Resolution
 
 | ID | Requirement | Priority |
 |---|---|---|
-| QR-FR-10 | QR resolution MUST return a public Humanity Card view for active cards. | P0 |
-| QR-FR-11 | Resolution MUST support HTML for browsers and JSON for clients. | P0 |
-| QR-FR-12 | Public card view MUST include verification status and badge trail. | P0 |
-| QR-FR-13 | Public card view MUST not expose private or semi-public profile layers. | P0 |
-| QR-FR-14 | Public card view MUST link to constitution, governance, and technical standards. | P0 |
+| QR-FR-11 | QR resolution MUST return a public Humanity Card view for active cards. | P0 |
+| QR-FR-12 | Resolution MUST support HTML for browsers and JSON for clients. | P0 |
+| QR-FR-13 | Public card view MUST include verification status, latest accepted vouch recency when available, and badge trail. | P0 |
+| QR-FR-14 | Public card view MUST not expose private or semi-public profile layers. | P0 |
+| QR-FR-15 | Public card view MUST link to constitution, governance, and technical standards. | P0 |
+| QR-FR-16 | Public scan UI for printed-item QR credentials MUST state that the QR resolves to a Humanity Card but does not prove the person holding the item is the card owner. | P0 |
 
 ### 4.4 Printing
 
 | ID | Requirement | Priority |
 |---|---|---|
-| QR-FR-15 | QR PNG/SVG/PDF outputs MUST be generated at print-safe resolution. | P0 |
-| QR-FR-16 | QR artwork MUST preserve quiet zone and minimum physical size. | P0 |
-| QR-FR-17 | QR artwork MUST pass scan QA before Printify order submission. | P0 |
-| QR-FR-18 | QR-bearing storefront products MUST use active QR credentials only. | P0 |
-| QR-FR-19 | Revoked, suspended, or expired QR credentials MUST block new print orders. | P0 |
+| QR-FR-17 | QR PNG/SVG/PDF outputs MUST be generated at print-safe resolution. | P0 |
+| QR-FR-18 | QR artwork MUST preserve quiet zone and minimum physical size. | P0 |
+| QR-FR-19 | QR artwork MUST pass scan QA before Printify order submission. | P0 |
+| QR-FR-20 | QR-bearing storefront products MUST use active card/source QR credentials only. | P0 |
+| QR-FR-21 | Revoked, suspended, or expired QR credentials MUST block new print orders. | P0 |
+| QR-FR-22 | Print artwork for multi-quantity personalized orders MUST contain a distinct QR credential per physical item unless the user explicitly chooses a batch QR policy. | P0 |
 
 ### 4.5 Revocation and Expiration
 
 | ID | Requirement | Priority |
 |---|---|---|
-| QR-FR-20 | Owner MUST be able to revoke active QR credentials. | P0 |
-| QR-FR-21 | Revoked QR credentials MUST resolve to revoked status, not 404. | P0 |
-| QR-FR-22 | Expired QR credentials MUST resolve to expired/replaced status. | P0 |
-| QR-FR-23 | Revocation MUST not attempt to physically recall shipped artifacts. | P0 |
-| QR-FR-24 | Public copy MUST explain that printed QR artifacts may still exist after revocation. | P0 |
+| QR-FR-23 | Owner MUST be able to revoke active QR credentials. | P0 |
+| QR-FR-24 | Revoked QR credentials MUST resolve to revoked status, not 404. | P0 |
+| QR-FR-25 | Expired QR credentials MUST resolve to expired/replaced status. | P0 |
+| QR-FR-26 | Revocation MUST not attempt to physically recall shipped artifacts. | P0 |
+| QR-FR-27 | Revoking one printed-item QR MUST NOT revoke sibling printed-item QR credentials for the same profile unless the user revokes the entire card or source QR. | P0 |
+| QR-FR-28 | Public copy MUST explain that printed QR artifacts may still exist after revocation. | P0 |
 
 ### 4.6 Offline and Cache Behavior
 
 | ID | Requirement | Priority |
 |---|---|---|
-| QR-FR-25 | Clients MUST NOT cache active card views for offline use unless the cached UI clearly shows stale/offline state. | P0 |
-| QR-FR-26 | Cached views MUST show offline/stale status. | P0 |
-| QR-FR-27 | Clients MUST attempt refresh when connectivity returns. | P0 |
-| QR-FR-28 | Revoked/suspended status MUST use short cache lifetimes. | P0 |
-| QR-FR-29 | Cached active cards MUST NOT claim current validity while offline. | P0 |
+| QR-FR-29 | Clients MUST NOT cache active card views for offline use unless the cached UI clearly shows stale/offline state. | P0 |
+| QR-FR-30 | Cached views MUST show offline/stale status. | P0 |
+| QR-FR-31 | Clients MUST attempt refresh when connectivity returns. | P0 |
+| QR-FR-32 | Revoked/suspended status MUST use short cache lifetimes. | P0 |
+| QR-FR-33 | Cached active cards MUST NOT claim current validity while offline. | P0 |
 
 ### 4.7 Privacy and Transparency
 
 | ID | Requirement | Priority |
 |---|---|---|
-| QR-FR-30 | Resolver MUST NOT collect scan analytics by default. | P0 |
-| QR-FR-31 | Resolver access logs MUST anonymize IP addresses. | P0 |
-| QR-FR-32 | Scanner-visible page MUST disclose if any logging is active. | P0 |
-| QR-FR-33 | Any future scan logging MUST require explicit consent policy. | P1 |
+| QR-FR-34 | Resolver MUST NOT collect scan analytics by default. | P0 |
+| QR-FR-35 | Resolver access logs MUST anonymize IP addresses. | P0 |
+| QR-FR-36 | Scanner-visible page MUST disclose if any logging is active. | P0 |
+| QR-FR-37 | Any future scan logging MUST require explicit consent policy. | P1 |
 
 ---
 
@@ -202,7 +207,9 @@ Card owner selects product in Storefront
   |
 System checks active QR credential
   |
-System renders print-safe QR artwork
+System issues unique printed-item QR credential
+  |
+System renders print-safe QR artwork for that item
   |
 Artifact intent is attached to Shopify checkout
   |
@@ -218,7 +225,7 @@ START
   |
 Owner signs revocation
   |
-Resolver marks card or QR revoked
+Resolver marks card QR or printed-item QR revoked
   |
 Future scans of old printed QR show revoked status
   |
@@ -261,7 +268,8 @@ Public JSON response MUST follow the Humanity Card v1.0 model:
     "level": 2,
     "label": "Verified Human",
     "method": "vouch",
-    "vouch_count": 3
+    "vouch_count": 3,
+    "latest_accepted_vouch_at": "2026-05-13T17:00:00Z"
   },
   "badges": [],
   "qr": {
@@ -288,6 +296,8 @@ Public JSON response MUST follow the Humanity Card v1.0 model:
 | `qr_id` | string | Yes | Opaque QR credential ID. |
 | `profile_id` | string | Yes | Linked Humanity Card. |
 | `epoch` | integer | Yes | Credential epoch. |
+| `scope` | enum | Yes | `card` or `print_artifact`. |
+| `print_artifact_id` | string | No | Internal print artifact ID for item-scoped QR credentials. |
 | `resolver_hint` | string | Yes | Primary resolver base URL. |
 | `issued_at` | datetime | Yes | Issuance time. |
 | `expires_at` | datetime | Yes | Expiration time. |
@@ -301,7 +311,7 @@ Public JSON response MUST follow the Humanity Card v1.0 model:
 |---|---|---|---|
 | `binding_id` | string | Yes | Binding ID. |
 | `qr_id` | string | Yes | QR credential. |
-| `artifact_id` | string | No | Artifact design/proof ID. |
+| `print_artifact_id` | string | No | Internal print artifact design/proof ID. |
 | `print_order_id` | string | No | Internal print order reference. |
 | `status` | enum | Yes | `draft`, `proofed`, `ordered`, `fulfilled`, `revoked_qr`. |
 
@@ -317,6 +327,7 @@ Public JSON response MUST follow the Humanity Card v1.0 model:
 | QR-SEC-04 | Printed artifact QR codes MUST resolve through Humanity-controlled status checks. |
 | QR-SEC-05 | Resolver MUST not collect scan analytics by default. |
 | QR-SEC-06 | Offline cache MUST label stale data. |
+| QR-SEC-07 | Unique printed-item QR credentials MUST NOT be used for scan analytics, location tracking, public serial pages, or bearer identity claims. |
 
 ---
 
@@ -341,8 +352,11 @@ Public JSON response MUST follow the Humanity Card v1.0 model:
 - Active QR renders public Humanity Card.
 - Revoked QR renders revoked status.
 - Suspended card renders suspension status.
+- Printed-item QR scans warn that holding the physical item does not prove identity.
 - Printed QR artwork passes scan QA.
 - Storefront can generate artifact intent from active QR.
+- Each personalized printed item can receive a unique item-scoped QR credential.
+- Revoking one printed-item QR leaves other item QR credentials for the same profile active.
 - Resolver collects no scan analytics by default.
 
 ### 11.2 Offline Complete
@@ -371,6 +385,7 @@ Public JSON response MUST follow the Humanity Card v1.0 model:
 | Risk | Probability | Impact | Mitigation |
 |---|---|---|---|
 | Printed QR remains in world after revocation | High | Medium | Revoked status page and clear purchase warning. |
+| Stolen sticker is used for impersonation | Medium | High | Item-scoped QR revocation and scan-page warning that possession does not prove identity. |
 | QR feels like link-in-bio | Medium | High | Center signed card, verification, badge trail, and revocable physical artifacts. |
 | Offline cache shows stale active card | Medium | Medium | Strong stale banner and refresh on reconnect. |
 | Phone cameras do not support custom scheme | High | High | Use HTTPS fallback for printed artifacts. |
@@ -383,6 +398,7 @@ Public JSON response MUST follow the Humanity Card v1.0 model:
 | Term | Definition |
 |---|---|
 | **QR Credential** | Signed resolver object referenced by a QR code. |
+| **Printed-Item QR** | Item-scoped QR credential printed on one physical artifact and individually revocable. |
 | **HTTPS Fallback** | Web URL used for normal phone camera scanning. |
 | **Humanity Card** | Signed public profile card resolved by QR. |
 | **Artifact Binding** | Link between QR credential and internal print order metadata. |

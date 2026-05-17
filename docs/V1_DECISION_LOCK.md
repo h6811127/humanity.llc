@@ -20,7 +20,10 @@
 | Baseline registration | Launch registration uses rate limits plus signed invite or waitlist controls. Proof-of-work is deferred until abuse pressure justifies it. | Human Verification | Avoid spending early implementation time on proof-of-work UX. |
 | Government ID | Humanity v1.0 does not collect or store government ID. Ceremonies rely on steward attestations. | Human Verification | Do not design ID upload, review, or retention workflows. |
 | QR print payload | Printed artifacts use HTTPS fallback URLs for phone-camera compatibility. Custom `hc://` remains canonical for app/native clients. | QR Public Profile, Technical Standards | Print artwork should encode `https://humanity.llc/c/{profile_id}?q={qr_id}`. |
+| Printed item QR scope | Personalized physical items use unique item-scoped QR credentials by default. | QR Public Profile, Storefront, Printify Fulfillment Middleware | A stolen/lost sticker can be revoked without revoking every physical item tied to the same profile. |
 | QR revocation | Revoked/expired/suspended printed QR codes resolve to explicit status pages, not silent failures. | QR Public Profile, Humanity Card, Technical Standards | Build status pages before physical artifact launch. |
+| Bearer warning | A printed QR resolves to a Humanity Card but does not prove the person holding it is the card owner. | Humanity Card, QR Public Profile, Human Verification | Scan/card UI must include this warning before physical artifact launch. |
+| Vouch freshness | Public card and scan views show latest accepted vouch recency when active accepted vouches exist. | Human Verification, Humanity Card | Treat recency as a trust signal, not proof of identity. |
 | Fulfillment timing | Printify fulfillment order is created only after Shopify payment confirmation and internal artifact/order validation. | Storefront, Printify Fulfillment Middleware | Webhook handling and idempotency are core launch work. |
 | Production approval | Printify orders use manual production approval by default unless a later operational policy explicitly enables auto-approval. | Printify Fulfillment Middleware | First implementation should keep a human/operator gate before production. |
 | Scan analytics | Resolver and artifact scans collect no analytics by default. | QR Public Profile, Humanity Card, Technical Standards | Do not add analytics SDKs, scan counters, or location tracking to scan flows. |
@@ -73,6 +76,8 @@
 1. Private keys never leave user-controlled device/export contexts.
 2. Shopify and Printify never receive verification secrets, private profile data, vouch-private notes, or scanner analytics.
 3. Buying something never makes someone verified.
-4. Artifact authenticity is separate from card activity and human verification.
-5. Revoked printed QR codes still resolve, but resolve to revoked status.
-6. Every paid Printify order is idempotent and traceable to a Shopify paid order plus Humanity artifact intent.
+4. Physical artifact status is separate from card activity and human verification.
+5. Holding a printed QR artifact does not prove identity or card ownership.
+6. Revoked printed QR codes still resolve, but resolve to revoked status.
+7. Revoking one printed-item QR does not revoke sibling printed-item QR credentials unless the card or source QR is revoked.
+8. Every paid Printify order is idempotent and traceable to a Shopify paid order plus Humanity artifact intent.

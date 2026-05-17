@@ -30,11 +30,13 @@
 | Print QR artifact and imply it proves the wearer is verified. | High | High | Copy says artifacts do not grant verification. | Physical artifact design must avoid stale/mutable verification labels. |
 | Replay or forge vouch payloads. | Medium | High | Ed25519 signatures and canonical payloads. | Payload type/nonce requirements must be enforced everywhere. |
 | Use someone else's QR on merchandise. | Medium | Medium | Personalization requires active QR and owner context. | Need authorization check tying `profile_id` to buyer/session before artifact intent. |
+| Steal or copy someone's printed sticker and present it as proof of identity. | Medium | High | Scan page resolves current card status. | Printed-item QR must be individually revocable and scan page must warn that possession does not prove identity. |
 | Continue using revoked printed QR. | High | Medium | Revoked status page. | Scanner UI must be unmistakable. |
 
 ### Required Hardening
 
 - Add explicit artifact-intent authorization: only the card owner or authorized session can create personalized artifacts for a `profile_id`.
+- Add unique item-scoped QR credentials for personalized physical items.
 - Add signed payload `type` and nonce to every vouch, QR rotation, revocation, and badge record.
 - Add vouch abuse audit hooks without publicizing private social graph details.
 - Avoid printing "Verified Human" as static text on artifacts in V1.
@@ -93,6 +95,7 @@
 | Scanner Question | If Unclear | Required UI Answer |
 |---|---|---|
 | Is this person verified? | Artifact may be mistaken for verification. | Show current card verification state separately from product ownership or purchase. |
+| Is the holder the card owner? | Stolen/copied sticker may be accepted as identity proof. | Say "This QR resolves to this Humanity Card. It does not prove the person holding it is the card owner." |
 | Is this status current? | Stale cache can mislead. | Show stale/offline banner and last refreshed time. |
 | What does revoked mean? | User assumes the person is banned or fake. | Explain "owner revoked this card/QR" vs suspension. |
 | What data was logged? | Trust loss. | Show no scan analytics by default. |
@@ -100,9 +103,10 @@
 
 ### Required Hardening
 
-- Public scan page needs two visually separate blocks:
+- Public scan page needs three visually separate blocks:
   1. Card status.
   2. Human verification status.
+  3. Printed-item QR status and bearer warning, when applicable.
 - Revoked and suspended pages must look intentionally designed, not like errors.
 - Public copy must say "Scan result is current; printed artifact may be old."
 
@@ -115,7 +119,7 @@
 | Problem | Why It Hurts | Required Fix |
 |---|---|---|
 | Duplicate model names across specs. | Engineers implement incompatible shapes. | Use `V1_IMPLEMENTATION_CONTRACTS.md` as build source. |
-| Print artifact and print order naming confusion. | Artwork proofs and provider refs get mixed. | Enforce distinct print artifact and fulfillment order definitions. |
+| Print artifact, printed-item QR, and print order naming confusion. | Artwork proofs, item QR revocation, and provider refs get mixed. | Enforce distinct print artifact, item QR, and fulfillment order definitions. |
 | Verification level vs state ambiguity. | UI and auth checks drift. | Use both: numeric `level` for compatibility, string `state` for logic. |
 | Shopify as source of truth vs Humanity as identity source. | Data ownership bugs. | Shopify owns commerce; Humanity owns identity/artifact semantics. |
 | Printify order status mapping incomplete. | Support timelines inconsistent. | Normalize provider statuses into internal statuses. |
@@ -152,7 +156,7 @@
 The V1 concept is strong, but the rebuild should not begin as a broad "build all docs" project. It should begin as a narrow, instrumented, test-heavy vertical slice that proves the riskiest boundary:
 
 ```text
-Signed card -> HTTPS QR -> artifact intent -> Shopify paid webhook -> Printify order -> revoked QR status
+Signed card -> HTTPS QR -> artifact intent -> unique item QR -> Shopify paid webhook -> Printify order -> revoked item QR status
 ```
 
 Do not expand to device proof, marketplace behavior, public directories, transfer UI, or large catalogs until that loop survives real samples, duplicate webhooks, revocation, and support-state testing.

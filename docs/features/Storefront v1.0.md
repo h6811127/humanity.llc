@@ -115,7 +115,7 @@ That is possible but would distract from the harder and more unique work: identi
 | SF-US-08 | As a card owner, I want products that reflect my verification status without letting commerce fake verification. |
 | SF-US-09 | As a card owner, I want to preview personalized products before ordering. |
 | SF-US-10 | As a card owner, I want to understand whether a personalized product contains my QR credential. |
-| SF-US-11 | As a card owner, I want old revoked QR artifacts to be clearly marked before I reorder. |
+| SF-US-11 | As a card owner, I want each personalized physical item to have its own QR so I can revoke a stolen sticker/card without revoking all my items. |
 
 ### 4.3 Operator
 
@@ -269,26 +269,27 @@ V1 target:
 | SF-FR-15 | User MUST acknowledge printed QR persistence before buying QR-bearing products. | P0 |
 | SF-FR-16 | Storefront MUST block personalization with revoked, suspended, or expired QR credentials. | P0 |
 | SF-FR-17 | Personalization state MUST be represented as an artifact intent before checkout. | P0 |
+| SF-FR-18 | Multi-quantity personalized products MUST allocate unique planned item QR IDs per physical item unless a disclosed batch QR policy is selected. | P0 |
 
 ### 7.4 Cart and Checkout
 
 | ID | Requirement | Priority |
 |---|---|---|
-| SF-FR-18 | Storefront MUST support adding general and personalized products to cart. | P0 |
-| SF-FR-19 | Checkout MUST happen through Shopify or Shopify-compatible headless checkout. | P0 |
-| SF-FR-20 | User MUST not be sent to Printify checkout. | P0 |
-| SF-FR-21 | Payment success MUST trigger internal order/artifact processing. | P0 |
-| SF-FR-22 | Payment failure MUST not create Printify fulfillment orders. | P0 |
-| SF-FR-23 | Order confirmation page MUST live on or return to humanity.llc. | P0 |
+| SF-FR-19 | Storefront MUST support adding general and personalized products to cart. | P0 |
+| SF-FR-20 | Checkout MUST happen through Shopify or Shopify-compatible headless checkout. | P0 |
+| SF-FR-21 | User MUST not be sent to Printify checkout. | P0 |
+| SF-FR-22 | Payment success MUST trigger internal order/artifact processing. | P0 |
+| SF-FR-23 | Payment failure MUST not create Printify fulfillment orders. | P0 |
+| SF-FR-24 | Order confirmation page MUST live on or return to humanity.llc. | P0 |
 
 ### 7.5 Fulfillment
 
 | ID | Requirement | Priority |
 |---|---|---|
-| SF-FR-24 | Printify fulfillment MUST be mediated through Printify Fulfillment Middleware. | P0 |
-| SF-FR-25 | Printify order IDs MUST be stored as provider references, not public canonical IDs. | P0 |
-| SF-FR-26 | Fulfillment errors MUST sync back to Humanity order status. | P0 |
-| SF-FR-27 | Tracking links MUST be shown when available. | P0 |
+| SF-FR-25 | Printify fulfillment MUST be mediated through Printify Fulfillment Middleware. | P0 |
+| SF-FR-26 | Printify order IDs MUST be stored as provider references, not public canonical IDs. | P0 |
+| SF-FR-27 | Fulfillment errors MUST sync back to Humanity order status. | P0 |
+| SF-FR-28 | Tracking links MUST be shown when available. | P0 |
 
 ---
 
@@ -459,10 +460,11 @@ END
 |---|---|---|---|
 | `artifact_intent_id` | string | Yes | Pre-checkout artifact intent. |
 | `profile_id` | string | No | Card owner for personalized products. |
-| `qr_id` | string | No | QR credential used. |
+| `source_qr_id` | string | No | Active card/source QR credential authorizing personalization. |
 | `product_id` | string | Yes | Humanity product. |
 | `shopify_variant_id` | string | Yes | Shopify variant. |
 | `preview_url` | string | No | Proof preview. |
+| `planned_item_qr_ids` | array | No | Unique QR IDs planned for personalized physical items. |
 | `status` | enum | Yes | `draft`, `proofed`, `attached_to_cart`, `expired`, `converted`. |
 
 ### 11.4 Commerce Order Link
@@ -489,6 +491,7 @@ END
 | SF-SEC-04 | Personalized product purchase MUST not leak private key or private profile layer data. |
 | SF-SEC-05 | Shopify webhooks MUST be authenticated. |
 | SF-SEC-06 | Checkout metadata MUST not include secrets. |
+| SF-SEC-07 | Unique item QR IDs MUST not be presented as proof that the holder is the card owner. |
 
 ---
 
@@ -520,6 +523,7 @@ END
 ### 14.2 Personalization Complete
 
 - Active card owner can generate preview for QR-bearing product.
+- Personalized physical quantities produce unique planned item QR IDs.
 - Revoked/suspended/expired QR blocks purchase.
 - User approves proof before checkout.
 - Artifact intent survives checkout handoff.

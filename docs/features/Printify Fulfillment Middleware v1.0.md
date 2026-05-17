@@ -31,6 +31,7 @@ The middleware is therefore an adapter, policy engine, rendering pipeline, and f
 |---|---|
 | Physical virality | Let card owners order beautiful QR artifacts that make Humanity visible in the real world. |
 | Identity integrity | Ensure every printed QR points to a signed, revocable Humanity Card. |
+| Item-level revocation | Ensure each personalized physical item can be revoked without revoking every other item owned by the same card owner. |
 | Privacy preservation | Share only fulfillment-required data with Printify. |
 | Provider abstraction | Keep Humanity product, order, and artifact concepts independent from Printify internals. |
 | Operational safety | Avoid accidental auto-production, duplicate orders, invalid artwork, and uncontrolled publishing. |
@@ -216,74 +217,75 @@ Minimum scopes for a single Humanity-managed Printify shop:
 
 | ID | Requirement | Priority |
 |---|---|---|
-| PM-FR-07 | Middleware MUST generate print-ready artwork from a signed QR credential. | P0 |
+| PM-FR-07 | Middleware MUST generate print-ready artwork from signed item-scoped QR credentials for personalized physical items. | P0 |
 | PM-FR-08 | Artwork MUST include only active QR credentials unless generating historical proofs for admin review. | P0 |
 | PM-FR-09 | Artwork MUST include card owner handle only if the owner explicitly chooses that template. | P0 |
 | PM-FR-10 | Artwork MUST be rendered at product-specific resolution and dimensions. | P0 |
 | PM-FR-11 | Artwork MUST preserve QR scan reliability after expected print scaling. | P0 |
 | PM-FR-12 | Generated artwork MUST be content-addressed or hash-addressed internally. | P0 |
 | PM-FR-13 | Middleware MUST upload artwork to Printify using `/v1/uploads/images.json`. | P0 |
+| PM-FR-14 | Multi-quantity personalized orders MUST generate distinct artwork/QR pairs per physical item unless a disclosed batch QR policy is explicitly selected. | P0 |
 
 ### 7.3 Proofing and Consent
 
 | ID | Requirement | Priority |
 |---|---|---|
-| PM-FR-14 | User MUST see a preview/proof before payment and order submission. | P0 |
-| PM-FR-15 | User MUST acknowledge printed QR persistence before first physical order. | P0 |
-| PM-FR-16 | User MUST approve product, variant, quantity, print preview, printed QR persistence warning, and Shopify checkout handoff before payment. | P0 |
-| PM-FR-17 | Middleware MUST block ordering if the QR credential is revoked, expired, or suspended. | P0 |
-| PM-FR-18 | Middleware MUST block ordering if artwork scan validation fails. | P0 |
+| PM-FR-15 | User MUST see a preview/proof before payment and order submission. | P0 |
+| PM-FR-16 | User MUST acknowledge printed QR persistence and bearer-limit warning before first physical order. | P0 |
+| PM-FR-17 | User MUST approve product, variant, quantity, print preview, printed QR persistence warning, and Shopify checkout handoff before payment. | P0 |
+| PM-FR-18 | Middleware MUST block ordering if the source QR credential is revoked, expired, or suspended. | P0 |
+| PM-FR-19 | Middleware MUST block ordering if artwork scan validation fails. | P0 |
 
 ### 7.4 Fulfillment Estimates
 
 | ID | Requirement | Priority |
 |---|---|---|
-| PM-FR-19 | Middleware MUST calculate fulfillment estimates before checkout for personalized products using Printify shipping endpoints or cached shipping profiles. | P0 |
-| PM-FR-20 | Shopify remains the customer-facing authority for final checkout total, tax, payment, and order confirmation. | P0 |
-| PM-FR-21 | Fulfillment estimate MUST expire after a short TTL. | P0 |
-| PM-FR-22 | Fulfillment estimate MUST be recomputed if destination country/region, variant, quantity, or shipping method changes. | P0 |
+| PM-FR-20 | Middleware MUST calculate fulfillment estimates before checkout for personalized products using Printify shipping endpoints or cached shipping profiles. | P0 |
+| PM-FR-21 | Shopify remains the customer-facing authority for final checkout total, tax, payment, and order confirmation. | P0 |
+| PM-FR-22 | Fulfillment estimate MUST expire after a short TTL. | P0 |
+| PM-FR-23 | Fulfillment estimate MUST be recomputed if destination country/region, variant, quantity, or shipping method changes. | P0 |
 
 ### 7.5 Order Submission
 
 | ID | Requirement | Priority |
 |---|---|---|
-| PM-FR-23 | Middleware MUST receive paid Shopify order events before creating Printify orders. | P0 |
-| PM-FR-24 | Middleware MUST use idempotency keys to prevent duplicate Printify orders. | P0 |
-| PM-FR-25 | Middleware MUST submit orders to `/v1/shops/{shop_id}/orders.json` or `/orders/express.json` only after Shopify payment succeeds. | P0 |
-| PM-FR-26 | Middleware MUST use manual production approval unless operational policy explicitly enables auto-approval. | P0 |
-| PM-FR-27 | Middleware MUST call `/send_to_production.json` only after internal order state permits production. | P0 |
-| PM-FR-28 | Middleware MUST store Printify `order_id`, line item IDs, product IDs, variant IDs, and status. | P0 |
+| PM-FR-24 | Middleware MUST receive paid Shopify order events before creating Printify orders. | P0 |
+| PM-FR-25 | Middleware MUST use idempotency keys to prevent duplicate Printify orders. | P0 |
+| PM-FR-26 | Middleware MUST submit orders to `/v1/shops/{shop_id}/orders.json` or `/orders/express.json` only after Shopify payment succeeds. | P0 |
+| PM-FR-27 | Middleware MUST use manual production approval unless operational policy explicitly enables auto-approval. | P0 |
+| PM-FR-28 | Middleware MUST call `/send_to_production.json` only after internal order state permits production. | P0 |
+| PM-FR-29 | Middleware MUST store Printify `order_id`, line item IDs, product IDs, variant IDs, item QR IDs, and status. | P0 |
 
 ### 7.6 Order Status and Webhooks
 
 | ID | Requirement | Priority |
 |---|---|---|
-| PM-FR-29 | Middleware MUST register Printify webhooks for relevant order/product events. | P0 |
-| PM-FR-30 | Webhook receiver MUST authenticate or verify incoming events according to Printify's supported mechanism and internal allowlist controls. | P0 |
-| PM-FR-31 | Middleware MUST map Printify statuses to Humanity order statuses. | P0 |
-| PM-FR-32 | Middleware MUST reconcile periodically by polling Printify orders when webhooks are missed. | P0 |
-| PM-FR-33 | Middleware MUST expose tracking links when Printify returns shipment data. | P0 |
-| PM-FR-34 | Middleware MUST notify users of `on_hold`, `has_issues`, `source_check_failed`, `unfulfillable`, and `canceled` states. | P0 |
+| PM-FR-30 | Middleware MUST register Printify webhooks for relevant order/product events. | P0 |
+| PM-FR-31 | Webhook receiver MUST authenticate or verify incoming events according to Printify's supported mechanism and internal allowlist controls. | P0 |
+| PM-FR-32 | Middleware MUST map Printify statuses to Humanity order statuses. | P0 |
+| PM-FR-33 | Middleware MUST reconcile periodically by polling Printify orders when webhooks are missed. | P0 |
+| PM-FR-34 | Middleware MUST expose tracking links when Printify returns shipment data. | P0 |
+| PM-FR-35 | Middleware MUST notify users of `on_hold`, `has_issues`, `source_check_failed`, `unfulfillable`, and `canceled` states. | P0 |
 
 ### 7.7 Cancellation and Failure
 
 | ID | Requirement | Priority |
 |---|---|---|
-| PM-FR-35 | Middleware MUST allow cancellation only while Printify state permits cancellation. | P0 |
-| PM-FR-36 | Middleware MUST avoid promising cancellation after production begins. | P0 |
-| PM-FR-37 | Middleware MUST keep failed orders attached to the card owner for support. | P0 |
-| PM-FR-38 | Middleware MUST support refund workflow handoff to the payment processor and support tooling. | P1 |
+| PM-FR-36 | Middleware MUST allow cancellation only while Printify state permits cancellation. | P0 |
+| PM-FR-37 | Middleware MUST avoid promising cancellation after production begins. | P0 |
+| PM-FR-38 | Middleware MUST keep failed orders attached to the card owner for support. | P0 |
+| PM-FR-39 | Middleware MUST support refund workflow handoff to the payment processor and support tooling. | P1 |
 
 ### 7.8 Privacy and Data Separation
 
 | ID | Requirement | Priority |
 |---|---|---|
-| PM-FR-39 | Public card tables MUST NOT store shipping addresses. | P0 |
-| PM-FR-40 | Print order PII MUST live in a separate order domain with stricter access controls. | P0 |
-| PM-FR-41 | Middleware MUST send Printify only the address and contact fields required for fulfillment. | P0 |
-| PM-FR-42 | Middleware MUST NOT send verification method details to Printify. | P0 |
-| PM-FR-43 | Middleware MUST NOT send vouch graph data to Printify. | P0 |
-| PM-FR-44 | Middleware MUST NOT send private profile layers to Printify. | P0 |
+| PM-FR-40 | Public card tables MUST NOT store shipping addresses. | P0 |
+| PM-FR-41 | Print order PII MUST live in a separate order domain with stricter access controls. | P0 |
+| PM-FR-42 | Middleware MUST send Printify only the address and contact fields required for fulfillment. | P0 |
+| PM-FR-43 | Middleware MUST NOT send verification method details to Printify. | P0 |
+| PM-FR-44 | Middleware MUST NOT send vouch graph data to Printify. | P0 |
+| PM-FR-45 | Middleware MUST NOT send private profile layers to Printify. | P0 |
 
 ---
 
@@ -387,7 +389,9 @@ Card owner chooses product template
   |
 System checks card status and QR credential status
   |
-Renderer creates print file with signed QR
+QR service issues one item-scoped QR credential per physical item
+  |
+Renderer creates print file with signed item QR
   |
 System validates dimensions and QR scanability
   |
@@ -490,6 +494,7 @@ Request:
 {
   "profile_id": "HcProfileId",
   "qr_id": "qr_123",
+  "quantity": 1,
   "template_id": "hc-sticker-square-v1",
   "variant_id": "2x2-white",
   "artwork_options": {
@@ -504,6 +509,7 @@ Response:
 ```json
 {
   "artifact_id": "pa_123",
+  "item_qr_id": "qr_item_123",
   "status": "proofed",
   "preview_url": "https://humanity.llc/print/previews/pa_123",
   "qr_scan_status": "passed",
@@ -661,7 +667,8 @@ Behavior:
 |---|---|---|---|
 | `artifact_id` | string | Yes | Internal artifact ID. |
 | `profile_id` | string | Yes | Card owner profile ID. |
-| `qr_id` | string | Yes | QR credential used. |
+| `qr_id` | string | Yes | Item-scoped QR credential used. |
+| `source_qr_id` | string | No | Card/source QR credential used to authorize personalization. |
 | `template_id` | string | Yes | Humanity catalog template. |
 | `variant_id` | string | Yes | Humanity variant ID. |
 | `printify_upload_id` | string | No | Printify image upload ID. |
@@ -788,6 +795,7 @@ draft
 | PM-SEC-12 | Middleware MUST not log full shipping addresses in plain text. |
 | PM-SEC-13 | Revoked/suspended QR credentials MUST block new print orders. |
 | PM-SEC-14 | Middleware MUST preserve audit trails for financial and support actions. |
+| PM-SEC-15 | Unique printed-item QR credentials MUST not be reused as scan analytics, location tracking, or proof that the holder is the card owner. |
 
 ---
 
@@ -838,6 +846,7 @@ draft
 
 - Approved Humanity catalog returns at least one sticker and one card template.
 - Middleware generates print-ready QR artwork from active signed QR credentials.
+- Middleware generates unique QR artwork per personalized physical item.
 - QR artwork passes automated and manual scan tests.
 - Middleware uploads artwork to Printify.
 - Middleware calculates shipping quotes.
@@ -846,6 +855,7 @@ draft
 - Middleware receives and processes Printify webhooks.
 - User can view order status and tracking when available.
 - Revoked or expired QR credentials block new orders.
+- Revoking one printed-item QR leaves sibling printed-item QR credentials active.
 
 ### 17.2 Security Complete
 

@@ -34,7 +34,7 @@ Deferred from the first slice:
 | Identifier | Format | Owner | Public? | Notes |
 |---|---|---|---|---|
 | `profile_id` | 24 base58 chars | Resolver/Card service | Yes | Opaque; no user metadata. |
-| `qr_id` | `qr_` + opaque random/ULID | Resolver/Card service | Yes | Referenced by QR payload. |
+| `qr_id` | `qr_` + opaque random/ULID | Resolver/Card service | Yes | Referenced by QR payload. Personalized physical items receive unique QR IDs so each item can be revoked independently. |
 | `artifact_intent_id` | `ai_` + opaque random/ULID | Storefront API | No | Pre-checkout preview/proof record. |
 | `print_artifact_id` | `pa_` + opaque random/ULID | Printify Fulfillment Middleware | No | Generated artwork/proof ID. |
 | `commerce_order_id` | `co_` + opaque random/ULID | Commerce webhook service | No | Internal Shopify order link. |
@@ -135,6 +135,7 @@ Allowed `status`: `active`, `revoked`, `suspended`, `expired`.
   "label": "Registered",
   "method": "registered",
   "vouch_count": 0,
+  "latest_accepted_vouch_at": null,
   "credential_ids": [],
   "updated_at": "2026-05-16T17:00:00Z",
   "signature": {}
@@ -152,6 +153,8 @@ Allowed `method`: `none`, `registered`, `vouch`, `ceremony`, `device_proof`, `st
   "qr_id": "qr_123",
   "profile_id": "base58-profile-id",
   "epoch": 1,
+  "scope": "card",
+  "print_artifact_id": null,
   "resolver_hint": "https://humanity.llc",
   "issued_at": "2026-05-16T17:00:00Z",
   "expires_at": "2026-06-15T17:00:00Z",
@@ -163,15 +166,21 @@ Allowed `method`: `none`, `registered`, `vouch`, `ceremony`, `device_proof`, `st
 
 Allowed `status`: `active`, `revoked`, `expired`, `replaced`.
 
+Allowed `scope`: `card`, `print_artifact`.
+
+For personalized physical products, each printed item MUST receive a distinct `qr_id` with `scope: "print_artifact"` even when multiple items are ordered together. All item QR credentials MAY resolve to the same `profile_id`, but each item QR MUST be individually revocable. Card-level revocation or suspension still overrides every linked QR credential.
+
 ### Artifact Intent
 
 ```json
 {
   "artifact_intent_id": "ai_123",
   "profile_id": "base58-profile-id",
-  "qr_id": "qr_123",
+  "source_qr_id": "qr_123",
+  "planned_item_qr_ids": ["qr_item_1"],
   "product_id": "prod_sticker_square",
   "shopify_variant_id": "gid://shopify/ProductVariant/123",
+  "quantity": 1,
   "preview_url": "https://humanity.llc/print/previews/ai_123",
   "status": "proofed",
   "expires_at": "2026-05-16T18:00:00Z"
@@ -202,7 +211,7 @@ Allowed `status`: `paid`, `processing`, `fulfilled`, `partially_fulfilled`, `can
 {
   "order_id": "po_123",
   "profile_id": "base58-profile-id",
-  "print_artifact_id": "pa_123",
+  "print_artifact_ids": ["pa_123"],
   "commerce_order_id": "co_123",
   "shopify_order_id": "gid://shopify/Order/123",
   "printify_order_id": null,
@@ -301,10 +310,11 @@ has_issues -> submitted
 |---|---|---|---|
 | `card.created` | Resolver | Verification, QR service | `profile_id`, `public_key`, `created_at` |
 | `qr.issued` | QR service | Resolver, Storefront | `qr_id`, `profile_id`, `epoch`, `status` |
+| `print_qr.issued` | QR service | Storefront, Printify Fulfillment Middleware | `qr_id`, `profile_id`, `print_artifact_id`, `status` |
 | `card.revoked` | Resolver | Storefront, Printify Fulfillment Middleware | `profile_id`, `revoked_at`, `reason` |
 | `vouch.created` | Verification | Card service | `vouch_id`, `voucher_profile_id`, `vouchee_profile_id` |
 | `verification.updated` | Verification | Resolver/Card service | `profile_id`, `state`, `credential_ids` |
-| `artifact_intent.created` | Storefront | Shopify adapter | `artifact_intent_id`, `product_id`, `qr_id` |
+| `artifact_intent.created` | Storefront | Shopify adapter | `artifact_intent_id`, `product_id`, `source_qr_id`, `planned_item_qr_ids` |
 | `shopify.order_paid` | Shopify webhook consumer | Commerce, Printify Fulfillment Middleware | `shopify_order_id`, `commerce_order_id`, `artifact_intent_ids` |
 | `print_order.submitted` | Printify Fulfillment Middleware | Order timeline | `print_order_id`, `printify_order_id` |
 | `print_order.updated` | Printify webhook/reconciler | Order timeline | `print_order_id`, `status` |
@@ -336,6 +346,7 @@ has_issues -> submitted
 | `CARD_INVALID_SIGNATURE` | Resolver | Card payload signature invalid. | Reject; do not store. |
 | `HANDLE_TAKEN` | Resolver | Handle already exists. | Return conflict. |
 | `QR_REVOKED` | QR/Storefront | QR credential revoked. | Block new print orders; render revoked page. |
+| `PRINT_QR_REVOKED` | QR/Storefront | Specific printed item QR credential revoked. | Render revoked item QR status while leaving other item QR credentials active. |
 | `QR_EXPIRED` | QR/Storefront | QR credential expired. | Block new print orders; request rotation. |
 | `CARD_SUSPENDED` | Resolver/Storefront | Governance suspension active. | Block new print orders; render suspended page. |
 | `VOUCH_QUOTA_EXCEEDED` | Verification | Voucher exceeded quota. | Block vouch. |
@@ -361,13 +372,17 @@ has_issues -> submitted
 - `GET /c/{profile_id}?q={qr_id}` renders active public card.
 - Revoked card renders revoked status and returns machine-readable revoked state.
 - Suspended card renders suspended status.
+- Public scan page warns that the QR resolves to a Humanity Card but does not prove the person holding the item is the card owner.
 - QR payload contains no private profile fields, order IDs, shipping fields, email, or phone.
+- Personalized physical items in the same order receive distinct `qr_id` values.
+- Revoking one printed item QR does not revoke other printed item QR credentials for the same profile.
 - Active card cache shows stale/offline banner when offline.
 
 ### Verification
 
 - Registered/unverified card shows no unique-human claim.
 - Three valid vouches upgrade state to `verified_human`.
+- Verification summary shows `latest_accepted_vouch_at` when at least one accepted vouch exists.
 - Voucher with exceeded quota is rejected.
 - Voucher issued before 90-day wait is rejected.
 - Revoked voucher no longer counts.
@@ -381,6 +396,7 @@ has_issues -> submitted
 - Personalized product requires active QR credential.
 - Revoked/suspended/expired QR blocks personalization.
 - Artifact intent attaches to Shopify cart/checkout metadata.
+- Artifact intent tracks unique planned item QR IDs for personalized physical quantities.
 - Paid Shopify webhook creates exactly one commerce order link.
 - Duplicate paid webhook does not duplicate a Printify order.
 - Missing artifact intent metadata holds order for review.

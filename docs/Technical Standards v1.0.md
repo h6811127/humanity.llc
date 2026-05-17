@@ -39,6 +39,7 @@ Any resolver, client, scanner, Printify Fulfillment Middleware, or verification 
 | **Profile ID** | Opaque identifier for a Humanity Card. |
 | **Resolver** | Service that resolves profile IDs and QR credentials. |
 | **QR Credential** | Signed credential encoded in or referenced by a QR code. |
+| **Printed-Item QR** | Item-scoped QR credential printed on one physical artifact and individually revocable. |
 | **Verification Record** | Public or semi-public evidence contributing to verification status. |
 | **Badge** | Signed public claim shown on a card. |
 | **Vouch** | Signed statement by one verified human for another. |
@@ -211,7 +212,8 @@ A public Humanity Card JSON document MUST include:
     "label": "Registered",
     "method": "registered",
     "verified_at": "2026-05-16T17:00:00Z",
-    "vouch_count": 0
+    "vouch_count": 0,
+    "latest_accepted_vouch_at": null
   },
   "badges": [],
   "qr": {
@@ -357,6 +359,8 @@ QR payloads MUST be:
 - Verifiable by clients.
 - Free of personal data beyond opaque IDs and resolver hints.
 
+Personalized printed artifacts MUST use item-scoped QR credentials. A card owner ordering multiple personalized physical items receives distinct `qr_id` values per item unless a product explicitly uses a disclosed batch QR policy. All item-scoped QR credentials resolve to the same public card, but each item QR can be revoked independently.
+
 ### 8.2 URI Scheme
 
 The canonical v1 URI scheme is:
@@ -382,6 +386,8 @@ The QR payload references a resolver-stored QR credential:
   "qr_id": "qr_123",
   "profile_id": "base58-profile-id",
   "epoch": 1,
+  "scope": "print_artifact",
+  "print_artifact_id": "pa_123",
   "resolver_hint": "https://humanity.llc",
   "issued_at": "2026-05-16T17:00:00Z",
   "expires_at": "2026-06-15T17:00:00Z",
@@ -406,6 +412,8 @@ Printed QR codes MUST resolve even after expiration or revocation. They MUST dis
 - Unknown or invalid.
 
 Printed QR codes MUST NOT encode shipping address, order ID, email, phone, or private profile data.
+
+Printed-item QR scan pages MUST state that the QR resolves to a Humanity Card but does not prove the person holding the physical item is the card owner or verified human.
 
 ### 8.5 QR Output Requirements
 
@@ -514,6 +522,7 @@ After revocation:
 - New print orders are blocked.
 - Existing physical artifacts are not recalled.
 - Printed QR codes resolve to revoked status.
+- Item-scoped printed QR revocation invalidates only that printed item QR unless the card or source credential is also revoked.
 
 ---
 
@@ -573,6 +582,8 @@ Print artifacts MUST include only owner-approved fields from this allowed set:
 - Humanity wordmark.
 - Short public phrase approved by the owner.
 
+Print artifacts MAY include a static warning or short URL copy, but mutable verification labels such as "Verified Human" MUST NOT be printed directly on v1.0 artifacts.
+
 Print artifacts MUST NOT include:
 
 - Private keys.
@@ -587,6 +598,7 @@ Print artifacts MUST NOT include:
 Printify Fulfillment Middleware MUST:
 
 - Generate print-ready QR artwork.
+- Generate or consume a unique item-scoped QR credential for each personalized physical item.
 - Verify active QR status before order submission.
 - Validate scanability before order submission.
 - Store print order PII separately from public profile data.
@@ -649,6 +661,7 @@ A v1.0 implementation is compliant if it passes tests for:
 - Vouch signature verification.
 - Export manifest verification.
 - Print artifact QR scanability.
+- Individual printed-item QR revocation.
 - Printify Fulfillment Middleware order idempotency.
 
 ---

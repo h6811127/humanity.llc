@@ -18,7 +18,7 @@ The goal is sybil resistance and portable human trust, not surveillance. V1 shou
 - A card may be registered but unverified.
 - A card may be verified through vouches, ceremony, or accepted device proof.
 - A card may be suspended or revoked.
-- A product may be authentic without proving the wearer is verified.
+- A product may resolve to a real Humanity Card without proving the holder is the card owner or verified.
 - Buying or owning an artifact does not make someone verified.
 
 ---
@@ -63,15 +63,16 @@ The goal is sybil resistance and portable human trust, not surveillance. V1 shou
 |---|---|
 | HV-US-09 | As a scanner, I want to understand whether a Humanity Card is unverified, registered, verified, steward, revoked, or suspended. |
 | HV-US-10 | As a scanner, I want to inspect public evidence for the badge without seeing private identity documents. |
-| HV-US-11 | As a scanner, I want to know that a shirt, sticker, or card artifact does not itself prove the wearer is verified. |
+| HV-US-11 | As a scanner, I want to know that a shirt, sticker, or card artifact does not itself prove the holder is the card owner or verified. |
+| HV-US-12 | As a scanner, I want to see when the card was last accepted by a voucher so I can judge freshness without seeing private notes. |
 
 ### 3.4 Steward / Operator
 
 | ID | Story |
 |---|---|
-| HV-US-12 | As a steward, I want to prevent sybil attacks without excluding people who lack modern devices or official documents. |
-| HV-US-13 | As a trust and safety steward, I want suspension or revocation to require documented cause and appeal rights. |
-| HV-US-14 | As an operator, I want verification credentials to integrate with Humanity Card status and QR resolution. |
+| HV-US-13 | As a steward, I want to prevent sybil attacks without excluding people who lack modern devices or official documents. |
+| HV-US-14 | As a trust and safety steward, I want suspension or revocation to require documented cause and appeal rights. |
+| HV-US-15 | As an operator, I want verification credentials to integrate with Humanity Card status and QR resolution. |
 
 ---
 
@@ -137,26 +138,27 @@ The goal is sybil resistance and portable human trust, not surveillance. V1 shou
 | HV-FR-29 | Verification badge MUST include method summary where public: vouch, ceremony, device proof, or steward. | P0 |
 | HV-FR-30 | Public badge trail MUST include issuer, timestamp, credential ID, and signature reference. | P0 |
 | HV-FR-31 | Revoked or suspended cards MUST not continue showing active verified badges. | P0 |
+| HV-FR-32 | Verification summary MUST expose `latest_accepted_vouch_at` when active accepted vouches exist. | P0 |
 
 ### 4.7 Commerce and Artifact Boundary
 
 | ID | Requirement | Priority |
 |---|---|---|
-| HV-FR-32 | Buying a product MUST NOT grant or imply verification. | P0 |
-| HV-FR-33 | Owning a physical artifact MUST NOT grant or imply verification. | P0 |
-| HV-FR-34 | Product copy MUST distinguish "authentic artifact" from "verified human." | P0 |
-| HV-FR-35 | Personalized QR artifacts MUST NOT print mutable verification state in v1.0; scans resolve current verification state dynamically. | P0 |
-| HV-FR-36 | Printed verification state MUST be treated as stale after production and QR scans MUST resolve current status. | P0 |
+| HV-FR-33 | Buying a product MUST NOT grant or imply verification. | P0 |
+| HV-FR-34 | Owning or holding a physical artifact MUST NOT grant or imply verification or card ownership. | P0 |
+| HV-FR-35 | Product and scan copy MUST distinguish "resolves to this Humanity Card" from "the holder is this human." | P0 |
+| HV-FR-36 | Personalized QR artifacts MUST NOT print mutable verification state in v1.0; scans resolve current verification state dynamically. | P0 |
+| HV-FR-37 | Printed verification state MUST be treated as stale after production and QR scans MUST resolve current status. | P0 |
 
 ### 4.8 Revocation and Suspension
 
 | ID | Requirement | Priority |
 |---|---|---|
-| HV-FR-37 | Verification credentials MUST support revocation. | P0 |
-| HV-FR-38 | Revoked or suspended vouchers MUST stop counting toward downstream verification when rules require it. | P0 |
-| HV-FR-39 | Suspension MUST require documented cause, public status, and appeal path. | P0 |
-| HV-FR-40 | Shadow suspension MUST NOT exist. | P0 |
-| HV-FR-41 | Re-verification after revocation MUST follow governance-defined appeal or waiting period. | P1 |
+| HV-FR-38 | Verification credentials MUST support revocation. | P0 |
+| HV-FR-39 | Revoked or suspended vouchers MUST stop counting toward downstream verification when rules require it. | P0 |
+| HV-FR-40 | Suspension MUST require documented cause, public status, and appeal path. | P0 |
+| HV-FR-41 | Shadow suspension MUST NOT exist. | P0 |
+| HV-FR-42 | Re-verification after revocation MUST follow governance-defined appeal or waiting period. | P1 |
 
 ---
 
@@ -301,6 +303,7 @@ END
 | `state` | enum | Yes | Public verification state. |
 | `method` | enum | No | Primary accepted verification method. |
 | `vouch_count` | integer | No | Count of active accepted vouches. |
+| `latest_accepted_vouch_at` | datetime | No | Most recent active accepted vouch timestamp, used as a public freshness signal. |
 | `credential_ids` | array | Yes | Active public credential references. |
 | `updated_at` | datetime | Yes | Summary update time. |
 | `signature` | object | Yes | System or resolver signature. |
@@ -357,9 +360,10 @@ END
 - Threshold vouches upgrade card to `verified_human`.
 - Ceremony credentials can upgrade card to `verified_human`.
 - Public card shows verification summary and badge trail.
+- Public card shows latest accepted vouch recency when active accepted vouches exist.
 - Revocation/suspension overrides verified display.
 - Storefront purchases do not affect verification state.
-- Product and scan pages distinguish purchased artifacts from verified human status.
+- Product and scan pages distinguish purchased artifacts from verified human status and card ownership.
 
 ### 11.2 Governance Ready
 
@@ -387,6 +391,7 @@ END
 | Risk | Probability | Impact | Mitigation |
 |---|---|---|---|
 | Users think merch equals verification | Medium | High | Product copy and scan pages explicitly separate purchases from verification. |
+| Users think holding a sticker proves identity | Medium | High | Scan page says the QR resolves to a card but does not prove the holder is the card owner. |
 | Social vouch collusion | Medium | High | Quotas, waiting periods, auditability, revocation. |
 | Device proof excludes users | Medium | High | Keep vouching and ceremonies as first-class paths. |
 | Steward capture | Medium | High | Governance controls, transparency, term limits if adopted. |
@@ -403,7 +408,7 @@ END
 | **Steward** | Verified human with ratified operational/governance authority. |
 | **Vouch** | Signed attestation from one verified human for another. |
 | **Ceremony** | In-person verification event signed by stewards. |
-| **Authentic Artifact** | Humanity-produced object; does not itself verify the human who holds it. |
+| **Authentic Artifact** | Humanity-produced object; does not itself verify the human who holds it or prove they own the resolved card. |
 
 ---
 
