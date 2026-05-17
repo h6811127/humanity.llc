@@ -70,6 +70,20 @@ Hardening finding: the first rebuild can support registered/unverified state fir
 
 ---
 
+## Flow 3A: Live Control Proof
+
+| Step | Owner | Persisted Record | Failure State | Privacy Boundary |
+|---|---|---|---|---|
+| Scanner requests proof | Scanner browser / Resolver API | Live control challenge | Card revoked/suspended, challenge creation rate limited | Scanner gets no private card-owner data. |
+| Owner opens challenge | Owner device | None required before signing | Challenge expired, wrong card, owner declines | Owner sees what they are signing. |
+| Owner signs challenge | Owner device | Signed challenge response | Key unavailable, invalid signature | Private key never leaves owner device. |
+| Resolver verifies response | Resolver API | Challenge status and short-lived proof result | Replay, expired challenge, invalid signature | Proof is session-scoped and short-lived. |
+| Scanner sees result | Scanner browser | None beyond challenge session | Expired/failed proof | UI says recent key control only, not legal identity or unique humanity. |
+
+Hardening finding: live control proof is the clearest upgrade beyond static QR, but it must be visually separate from card status, human trust status, and artifact status. It must not grant verification, issue a badge, or imply legal identity.
+
+---
+
 ## Flow 4: Personalized Artifact Purchase
 
 | Step | Owner | Persisted Record | Failure State | Privacy Boundary |
@@ -148,9 +162,10 @@ The docs are implementation-ready only if the rebuild starts with the narrow ver
 
 1. Signed public Humanity Card.
 2. HTTPS QR resolution and revoked status page.
-3. One personalized sticker/card artifact intent with unique printed-item QR.
-4. Shopify checkout handoff with artifact-intent metadata.
-5. Paid-order webhook to commerce order link.
-6. Printify Fulfillment Middleware order submission with idempotency and manual production approval.
+3. Product trust UI that separates card status, human trust status, artifact status, and live control proof status.
+4. One personalized sticker/card artifact intent with unique printed-item QR.
+5. Shopify checkout handoff with artifact-intent metadata.
+6. Paid-order webhook to commerce order link.
+7. Printify Fulfillment Middleware order submission with idempotency and manual production approval.
 
 Everything else should be modeled but not allowed to expand the first implementation slice.

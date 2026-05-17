@@ -1,6 +1,7 @@
 **Version:** 1.0
 **Status:** Draft for Collective Ratification
 **Constitution Reference:** Humanity Commons Constitution (Articles I, II, III, VI)
+**Product Trust Reference:** V1 Product Trust Model
 **Dependencies:** Humanity Card v1.0, Printify Fulfillment Middleware v1.0
 **Commerce Dependency:** Headless Shopify
 **Fulfillment Dependency:** Printify
@@ -34,6 +35,8 @@ The store sells:
 - Limited drops tied to founding moments, verification cohorts, gatherings, or governance milestones.
 
 The store MUST NOT imply that buying an item makes someone verified. Verification status comes from Humanity Card and Human Verification systems, not commerce.
+
+Storefront copy MUST NOT claim that a product provides legal identity, KYC, age verification, background checks, bot-proof status, or guaranteed unique humanity. Products may help people carry or display a pointer to their current Humanity Card status.
 
 ---
 
@@ -270,6 +273,7 @@ V1 target:
 | SF-FR-16 | Storefront MUST block personalization with revoked, suspended, or expired QR credentials. | P0 |
 | SF-FR-17 | Personalization state MUST be represented as an artifact intent before checkout. | P0 |
 | SF-FR-18 | Multi-quantity personalized products MUST allocate unique planned item QR IDs per physical item unless a disclosed batch QR policy is selected. | P0 |
+| SF-FR-18A | Product copy MUST say that buying or holding a QR-bearing artifact does not prove verification, card ownership, or legal identity. | P0 |
 
 ### 7.4 Cart and Checkout
 
@@ -503,6 +507,7 @@ END
 | SF-GOV-02 | Limited drops using governance or verification language MUST be approved. |
 | SF-GOV-03 | Product copy MUST not imply paid verification. |
 | SF-GOV-04 | Products using Humanity marks MUST follow approved templates. |
+| SF-GOV-05 | Product copy MUST follow the V1 Product Trust Model forbidden claims list. |
 
 ---
 

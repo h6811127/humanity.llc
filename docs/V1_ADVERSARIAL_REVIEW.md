@@ -10,10 +10,11 @@
 | Severity | Finding | Required Action |
 |---|---|---|
 | Critical | Shopify artifact-intent metadata is a single point of failure for personalized fulfillment. | Validate with an integration spike before building broad Storefront features. |
-| Critical | "Verified Human" can overclaim if vouching is socially weak. | Treat verification copy as a product/security surface; test comprehension before launch. |
+| Critical | "Verified Human" can overclaim if vouching is socially weak. | Use `Vouched Human` for launch copy unless stronger language passes comprehension testing. |
 | High | Physical QR revocation is easy to misunderstand. | Show warnings before purchase and explicit status pages after revocation. |
 | High | Duplicate webhooks/retries can create duplicate Printify orders. | Idempotency must be built before live orders. |
 | High | Print QA failure after payment creates refunds/support pain. | Perform QR scan QA before checkout and again before Printify submission. |
+| Medium | Live control proof can be misunderstood as legal identity or unique-human proof. | Label it as recent key-control evidence only and keep it separate from verification state. |
 | Medium | Bootstrap governance keys are undefined. | Define temporary signer authority and sunset criteria before launch. |
 | Medium | Support tooling is under-specified for failed/on-hold/refunded orders. | Add operator views or at least internal lookup contracts before launch. |
 
@@ -100,6 +101,8 @@
 | What does revoked mean? | User assumes the person is banned or fake. | Explain "owner revoked this card/QR" vs suspension. |
 | What data was logged? | Trust loss. | Show no scan analytics by default. |
 | Why does a printed card say one thing but scan says another? | Printed mutable status becomes misleading. | Do not print mutable verification state in V1. |
+| Did the nearby person prove control of this card? | Static QR may be overtrusted. | Offer live control proof, or state that live proof is not available. |
+| Does live control proof mean legal identity? | Key control may be overclaimed. | Say "Control proven moments ago. This does not prove legal identity." |
 
 ### Required Hardening
 
@@ -109,6 +112,7 @@
   3. Printed-item QR status and bearer warning, when applicable.
 - Revoked and suspended pages must look intentionally designed, not like errors.
 - Public copy must say "Scan result is current; printed artifact may be old."
+- Live control proof must be visually separate from card status, human trust status, and printed-item QR status.
 
 ---
 
@@ -139,15 +143,16 @@
 
 1. What is the first physical product that proves the whole loop without overbuilding the store?
 2. What exact phrase replaces "verified human" if early vouching feels too weak?
-3. Who has authority to issue founding badges before governance exists?
-4. Who can suspend a card on day one, and what proof must be public?
-5. What happens when Shopify payment succeeds but Humanity refuses fulfillment?
-6. What refund/reprint promise is made for misprints, revoked QR, and provider failures?
-7. How will a scanner distinguish "authentic object" from "verified person" in 3 seconds?
-8. What data must customer support see, and what data must it never see?
-9. What launch scope still feels like V1 if we remove device proof, transfer UI, native checkout, marketplace, and search?
-10. What are the first five things someone malicious will do to make the product look fake?
-11. What will you refuse to build even if users ask for it because it weakens trust?
+3. Is live control proof in v1.0, private alpha, or v1.1?
+4. Who has authority to issue founding badges before governance exists?
+5. Who can suspend a card on day one, and what proof must be public?
+6. What happens when Shopify payment succeeds but Humanity refuses fulfillment?
+7. What refund/reprint promise is made for misprints, revoked QR, and provider failures?
+8. How will a scanner distinguish "authentic object" from "verified person" in 3 seconds?
+9. What data must customer support see, and what data must it never see?
+10. What launch scope still feels like V1 if we remove device proof, transfer UI, native checkout, marketplace, and search?
+11. What are the first five things someone malicious will do to make the product look fake?
+12. What will you refuse to build even if users ask for it because it weakens trust?
 
 ---
 
@@ -156,7 +161,7 @@
 The V1 concept is strong, but the rebuild should not begin as a broad "build all docs" project. It should begin as a narrow, instrumented, test-heavy vertical slice that proves the riskiest boundary:
 
 ```text
-Signed card -> HTTPS QR -> artifact intent -> unique item QR -> Shopify paid webhook -> Printify order -> revoked item QR status
+Signed card -> HTTPS QR -> trust-state UI -> artifact intent -> unique item QR -> Shopify paid webhook -> Printify order -> revoked item QR status
 ```
 
 Do not expand to device proof, marketplace behavior, public directories, transfer UI, or large catalogs until that loop survives real samples, duplicate webhooks, revocation, and support-state testing.

@@ -12,10 +12,11 @@ The first rebuild slice MUST implement:
 1. Signed public Humanity Card creation.
 2. HTTPS QR resolution.
 3. Revoked/suspended/expired status pages.
-4. One personalized sticker/card artifact intent.
-5. Shopify checkout handoff with artifact-intent metadata.
-6. Paid Shopify webhook ingestion.
-7. Printify Fulfillment Middleware order creation after payment.
+4. Product trust UI that separates card status, human trust status, artifact status, and claim limitations.
+5. One personalized sticker/card artifact intent.
+6. Shopify checkout handoff with artifact-intent metadata.
+7. Paid Shopify webhook ingestion.
+8. Printify Fulfillment Middleware order creation after payment.
 
 Deferred from the first slice:
 
@@ -26,6 +27,10 @@ Deferred from the first slice:
 - Native checkout.
 - Apparel/bag personalized products.
 - Multi-merchant Printify OAuth.
+
+Optional but high-leverage for v1.1 or a strong private alpha:
+
+- Live control proof challenge and response flow.
 
 ---
 
@@ -57,6 +62,8 @@ Deferred from the first slice:
 | `GET /.well-known/hc/v1/qr/{qr_id}` | GET | None | Returns QR credential metadata. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/qr` | POST | Owner signature | Creates/rotates QR credential. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/revoke` | POST | Owner/recovery signature | Revokes card or QR credential. |
+| `POST /.well-known/hc/v1/cards/{profile_id}/live-control/challenges` | POST | Scanner session | Creates short-lived live control challenge. |
+| `POST /.well-known/hc/v1/cards/{profile_id}/live-control/responses` | POST | Owner signature | Submits signed live control challenge response. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/export` | POST | Owner auth/signature | Requests export bundle. |
 
 ### Public Shortcut Routes
@@ -170,6 +177,41 @@ Allowed `scope`: `card`, `print_artifact`.
 
 For personalized physical products, each printed item MUST receive a distinct `qr_id` with `scope: "print_artifact"` even when multiple items are ordered together. All item QR credentials MAY resolve to the same `profile_id`, but each item QR MUST be individually revocable. Card-level revocation or suspension still overrides every linked QR credential.
 
+### Live Control Challenge
+
+```json
+{
+  "challenge_id": "lc_123",
+  "type": "live_control_challenge",
+  "version": "1.0",
+  "profile_id": "base58-profile-id",
+  "qr_id": "qr_123",
+  "nonce": "base58-random-nonce",
+  "verifier_session_id": "vs_123",
+  "issued_at": "2026-05-16T17:00:00Z",
+  "expires_at": "2026-05-16T17:01:00Z",
+  "status": "pending"
+}
+```
+
+Allowed `status`: `pending`, `signed`, `expired`, `canceled`.
+
+### Live Control Response
+
+```json
+{
+  "type": "live_control_response",
+  "version": "1.0",
+  "challenge_id": "lc_123",
+  "profile_id": "base58-profile-id",
+  "qr_id": "qr_123",
+  "signed_at": "2026-05-16T17:00:20Z",
+  "signature": {}
+}
+```
+
+Live control proof is valid only for the challenge session and display window. It MUST NOT mutate verification state, issue a badge, or mark an artifact as owned by the person physically present.
+
 ### Artifact Intent
 
 ```json
@@ -268,6 +310,15 @@ attached_to_cart -> expired
 attached_to_cart -> blocked
 ```
 
+### Live Control Challenge
+
+```text
+pending -> signed
+pending -> expired
+pending -> canceled
+signed -> expired
+```
+
 ### Commerce Order
 
 ```text
@@ -311,6 +362,8 @@ has_issues -> submitted
 | `card.created` | Resolver | Verification, QR service | `profile_id`, `public_key`, `created_at` |
 | `qr.issued` | QR service | Resolver, Storefront | `qr_id`, `profile_id`, `epoch`, `status` |
 | `print_qr.issued` | QR service | Storefront, Printify Fulfillment Middleware | `qr_id`, `profile_id`, `print_artifact_id`, `status` |
+| `live_control.challenge_created` | Resolver | Scanner session, owner client | `challenge_id`, `profile_id`, `expires_at` |
+| `live_control.proven` | Resolver | Scanner session | `challenge_id`, `profile_id`, `signed_at` |
 | `card.revoked` | Resolver | Storefront, Printify Fulfillment Middleware | `profile_id`, `revoked_at`, `reason` |
 | `vouch.created` | Verification | Card service | `vouch_id`, `voucher_profile_id`, `vouchee_profile_id` |
 | `verification.updated` | Verification | Resolver/Card service | `profile_id`, `state`, `credential_ids` |
@@ -355,6 +408,8 @@ has_issues -> submitted
 | `CHECKOUT_METADATA_MISSING` | Commerce | Shopify order lacks artifact intent refs. | Hold for operator review; do not submit Printify order. |
 | `LIMITED_DROP_SOLD_OUT` | Storefront | No inventory remains. | Do not fulfill; trigger refund/support path. |
 | `PRINT_QR_SCAN_FAILED` | Printify Fulfillment Middleware | QR artwork failed QA. | Block order submission. |
+| `LIVE_CONTROL_EXPIRED` | Resolver | Live control challenge expired. | Show that live control was not proven; leave card state unchanged. |
+| `LIVE_CONTROL_INVALID_SIGNATURE` | Resolver | Challenge response signature invalid. | Reject response; do not display success. |
 | `PRINTIFY_RATE_LIMITED` | Printify Fulfillment Middleware | Provider returned 429. | Retry with backoff; no duplicate order. |
 | `PRINTIFY_INVALID_ADDRESS` | Printify Fulfillment Middleware | Address rejected. | User-correctable fulfillment issue. |
 | `PRINTIFY_SOURCE_CHECK_FAILED` | Printify Fulfillment Middleware | Artwork/source issue. | Operator actionable state. |
@@ -373,21 +428,32 @@ has_issues -> submitted
 - Revoked card renders revoked status and returns machine-readable revoked state.
 - Suspended card renders suspended status.
 - Public scan page warns that the QR resolves to a Humanity Card but does not prove the person holding the item is the card owner.
+- Public scan page separates card status, human trust status, printed-item QR status, and live control proof status.
 - QR payload contains no private profile fields, order IDs, shipping fields, email, or phone.
 - Personalized physical items in the same order receive distinct `qr_id` values.
 - Revoking one printed item QR does not revoke other printed item QR credentials for the same profile.
 - Active card cache shows stale/offline banner when offline.
+- Live control challenge response with valid owner signature shows recent control proof and does not mutate verification state.
+- Expired or invalid live control challenge shows control not proven and leaves card state unchanged.
 
 ### Verification
 
 - Registered/unverified card shows no unique-human claim.
 - Three valid vouches upgrade state to `verified_human`.
+- Vouch-based public UI labels the state as `Vouched Human` unless launch copy explicitly opts into stronger wording after testing.
 - Verification summary shows `latest_accepted_vouch_at` when at least one accepted vouch exists.
 - Voucher with exceeded quota is rejected.
 - Voucher issued before 90-day wait is rejected.
 - Revoked voucher no longer counts.
 - Storefront purchase does not change verification state.
 - Product and scan pages distinguish purchased artifacts from verified human status.
+
+### Product Trust Demo
+
+- A non-technical tester can create a card, scan it, understand `Registered`, view or receive vouches, request live control proof, revoke a printed-item QR, and scan the revoked QR in under two minutes with facilitator help.
+- Tester can correctly answer that buying merch does not verify someone.
+- Tester can correctly answer that holding a sticker does not prove card ownership.
+- Tester can correctly answer that live control proof means recent key control, not legal identity.
 
 ### Storefront and Shopify
 

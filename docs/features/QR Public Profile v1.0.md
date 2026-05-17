@@ -2,6 +2,7 @@
 **Status:** Draft for Collective Ratification
 **Constitution Reference:** Humanity Commons Constitution (Articles I-VII)
 **Technical Standards Reference:** Technical Standards v1.0
+**Product Trust Reference:** V1 Product Trust Model
 **Dependencies:** Humanity Card v1.0, Human Verification v1.0
 
 ---
@@ -17,6 +18,7 @@ In earlier prototypes, the QR system was treated as a small public profile resol
 - Is the resolver response signed?
 - What public information did the card owner choose to show?
 - What verification state or badge trail is visible?
+- Has the nearby card owner recently proven live control of the card key, if requested?
 
 QR Public Profile v1.0 is not a link-in-bio system. It is the public resolution layer for signed, revocable proof objects.
 
@@ -57,6 +59,7 @@ QR Public Profile v1.0 is not a link-in-bio system. It is the public resolution 
 | QR-US-08 | As a scanner, I want to know whether I am viewing cached or current data. |
 | QR-US-09 | As a scanner, I want clear status for revoked, suspended, expired, or unknown QR credentials. |
 | QR-US-10 | As a scanner, I want to know that a printed QR resolves to a card but does not prove the person holding it is the card owner. |
+| QR-US-10A | As a scanner, I want to ask the card owner to prove live control when static QR evidence is not enough. |
 
 ### 3.3 Operator
 
@@ -101,6 +104,15 @@ QR Public Profile v1.0 is not a link-in-bio system. It is the public resolution 
 | QR-FR-14 | Public card view MUST not expose private or semi-public profile layers. | P0 |
 | QR-FR-15 | Public card view MUST link to constitution, governance, and technical standards. | P0 |
 | QR-FR-16 | Public scan UI for printed-item QR credentials MUST state that the QR resolves to a Humanity Card but does not prove the person holding the item is the card owner. | P0 |
+
+### 4.3A Live Control Proof Display
+
+| ID | Requirement | Priority |
+|---|---|---|
+| QR-FR-16A | Public card and printed-item scan pages SHOULD expose an `Ask owner to prove control` action when the owner can complete a live challenge. | P1 |
+| QR-FR-16B | Live control proof MUST be displayed separately from card status, human trust status, and artifact status. | P1 |
+| QR-FR-16C | Live control proof MUST expire visibly and must not become a persistent badge. | P1 |
+| QR-FR-16D | Live control copy MUST say that control proof does not prove legal identity or unique humanity. | P1 |
 
 ### 4.4 Printing
 
@@ -232,6 +244,24 @@ Future scans of old printed QR show revoked status
 END
 ```
 
+### 6.5 Prove Live Control From Scan Page
+
+```text
+START
+  |
+Scanner opens QR scan page
+  |
+Scanner taps Ask owner to prove control
+  |
+Resolver creates short-lived challenge
+  |
+Owner signs challenge from key-holding device
+  |
+Scanner page shows recent proof or expired/failed state
+  |
+END
+```
+
 ---
 
 ## 7. API Specifications
@@ -246,6 +276,8 @@ END
 | `GET /.well-known/hc/v1/qr/{qr_id}` | GET | Resolve QR credential metadata. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/qr` | POST | Rotate/create QR credential. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/revoke` | POST | Revoke card or QR credential. |
+| `POST /.well-known/hc/v1/cards/{profile_id}/live-control/challenges` | POST | Create live control challenge for scanner session. |
+| `POST /.well-known/hc/v1/cards/{profile_id}/live-control/responses` | POST | Submit owner-signed challenge response. |
 
 ### 7.2 Public Shortcut Routes
 
@@ -266,7 +298,7 @@ Public JSON response MUST follow the Humanity Card v1.0 model:
   "status": "active",
   "verification": {
     "level": 2,
-    "label": "Verified Human",
+    "label": "Vouched Human",
     "method": "vouch",
     "vouch_count": 3,
     "latest_accepted_vouch_at": "2026-05-13T17:00:00Z"
@@ -328,6 +360,7 @@ Public JSON response MUST follow the Humanity Card v1.0 model:
 | QR-SEC-05 | Resolver MUST not collect scan analytics by default. |
 | QR-SEC-06 | Offline cache MUST label stale data. |
 | QR-SEC-07 | Unique printed-item QR credentials MUST NOT be used for scan analytics, location tracking, public serial pages, or bearer identity claims. |
+| QR-SEC-08 | Live control proof MUST be short-lived and MUST NOT be presented as legal identity, human uniqueness, or artifact ownership. |
 
 ---
 
@@ -353,6 +386,7 @@ Public JSON response MUST follow the Humanity Card v1.0 model:
 - Revoked QR renders revoked status.
 - Suspended card renders suspension status.
 - Printed-item QR scans warn that holding the physical item does not prove identity.
+- Scan page can display live control proof as recent key-control evidence, or clearly marks the feature as deferred.
 - Printed QR artwork passes scan QA.
 - Storefront can generate artifact intent from active QR.
 - Each personalized printed item can receive a unique item-scoped QR credential.
@@ -377,6 +411,7 @@ Public JSON response MUST follow the Humanity Card v1.0 model:
 - QR codes that directly encode private profile layers.
 - Shopify or Printify-controlled QR identity.
 - Blockchain/NFT QR ownership.
+- Treating live control proof as a permanent credential.
 
 ---
 

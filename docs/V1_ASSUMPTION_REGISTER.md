@@ -31,6 +31,8 @@
 | A-010 | A single Humanity-controlled Printify merchant account is sufficient for launch operations. | Ops | High for launch | Verified as the simpler launch model because Printify supports personal access tokens for a merchant account and OAuth can be deferred. Must still confirm account, scopes, shop ID, production approval workflow, and support ownership. | OAuth/multi-merchant scope moves earlier or provider choice changes. |
 | A-011 | No-scan-analytics default is compatible with product goals and operational needs. | Product/Governance | Product decision, not externally verifiable | Verified against the trust thesis and Constitution. Operationally, rely on order/support events and resolver health, not scan analytics. If scan metrics become desired, they require a separate consent model. | Need consent model before launch, or analytics must remain excluded. |
 | A-012 | Card and item QR revocation can be represented as resolver status without physically recalling artifacts. | Product/Support | High conceptually, needs copy test | Technically sound because printed QR resolves through Humanity status. Must validate user comprehension with warning/support copy. | Physical artifacts create false expectations or support disputes. |
+| A-012A | `Vouched Human` is clearer and more trustworthy than `Verified Human` for early vouch-based status. | Product/Design | Unverified, Medium risk | Copy test `Registered`, `Vouched Human`, `Founding Human`, `Steward`, `Revoked By Owner`, and `Suspended Under Public Rules` with target users. | If users find `Vouched Human` weak or confusing, revise labels before launch rather than overclaiming. |
+| A-012B | Live control proof materially improves in-person trust without being confused for legal identity. | Product/Security | Unverified, Medium risk | Prototype scanner challenge and owner signature flow; test whether users understand "recent key control" vs identity verification. | Defer public live proof UI or strengthen copy if users treat it as legal identity. |
 
 ---
 
@@ -68,7 +70,8 @@
 3. **Physical QR quality:** if Printify output does not scan reliably, the physical artifact loop becomes embarrassing and support-heavy.
 4. **Verification language:** if "verified human" overclaims what vouching proves, trust will degrade immediately.
 5. **Bearer confusion:** if scanners treat possession of a sticker as proof of identity, the trust model fails socially.
-6. **Operational support:** if on-hold, failed, duplicate, and refunded orders lack clear internal states, launch will become support-driven chaos.
+6. **Live control confusion:** if users treat live control proof as legal identity or human uniqueness, a trust upgrade becomes another overclaim.
+7. **Operational support:** if on-hold, failed, duplicate, and refunded orders lack clear internal states, launch will become support-driven chaos.
 
 ---
 
@@ -78,8 +81,9 @@
 |---|---|---|
 | Shopify metadata spike | 1-2 days | Paid webhook includes enough cart/line metadata to recover `artifact_intent_id`. |
 | Printify QR sample spike | 2-5 days plus shipping time | Generated unique QR artwork can be uploaded, ordered, printed, and scanned on physical sample. |
-| Copy comprehension test | 1 day | Users distinguish "printed item resolves to a card" from "holder is the verified human" after reading product/card/scan pages. |
+| Copy comprehension test | 1 day | Users distinguish "printed item resolves to a card" from "holder is the vouched human/card owner" after reading product/card/scan pages. |
 | Revocation UX test | 1 day | Users understand that item QR revocation changes one scan result but does not recall physical items or revoke sibling stickers/cards. |
+| Live control proof comprehension test | 1 day | Users understand that live control proves recent card-key control, not legal identity, vouching, or unique humanity. |
 | Webhook/idempotency harness | 1-2 days | Duplicate Shopify/Printify webhooks do not duplicate fulfillment or corrupt state. |
 
 ---

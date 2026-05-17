@@ -106,6 +106,7 @@ The market wedge is not "identity SaaS for everyone." The wedge is a trusted, me
 - Humanity Card.
 - Public QR resolver.
 - Vouching.
+- Live control proof for contexts where static QR is not enough.
 - Revocation and suspension status pages.
 - Export bundle.
 - One personalized sticker/card flow.
@@ -621,8 +622,10 @@ Recommended policies:
 - Card creation completion rate.
 - Revocation comprehension.
 - Vouch comprehension.
+- Live control proof comprehension.
 - Copy test pass rate for "buying does not verify."
 - Copy test pass rate for "holding sticker does not prove identity."
+- Copy test pass rate for "control proof is recent key control, not legal identity."
 
 ### Product Metrics
 
@@ -697,5 +700,6 @@ Immediate work:
 3. Define member classes in draft.
 4. Track revenue and costs transparently from the first paid order.
 5. Run a founding cohort that can ratify the constitution after using the product.
+6. Publish the product trust model so members can govern what the system claims.
 
 The enterprise becomes real when members have something working to govern.

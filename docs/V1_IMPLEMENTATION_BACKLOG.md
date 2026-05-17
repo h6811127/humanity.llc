@@ -10,7 +10,7 @@
 Do not begin broad product buildout until the riskiest vertical slice is proven:
 
 ```text
-Signed card -> HTTPS QR -> revoked status -> artifact intent -> unique printed-item QR -> Shopify paid webhook -> Printify order
+Signed card -> HTTPS QR -> trust-state UI -> revoked status -> artifact intent -> unique printed-item QR -> Shopify paid webhook -> Printify order
 ```
 
 This backlog assumes one engineer working 5-6 hours per day with Cursor as the primary development partner.
@@ -77,10 +77,28 @@ These are not engineering tasks. They are short owner decisions needed to preven
 - Product-page sentence explaining that buying merch does not grant verification.
 - Revocation warning shown before physical orders.
 - Bearer warning shown on scan pages: "This QR resolves to this Humanity Card. It does not prove the person holding this item is the card owner."
+- Forbidden claims list for v1 public copy: no legal identity, KYC, age verification, bot-proof identity, background check, or merch-based status language.
 
 **Exit criteria:**
 
 - Copy is approved for card, scan, product, checkout, and revoked pages.
+- Copy passes the V1 Product Trust Model comprehension gates before public launch.
+
+### D-004A: Decide Live Control Proof Scope
+
+**Recommendation:** Treat live control proof as the first major trust upgrade after static QR/card resolution. Build it for private alpha if time allows; otherwise show the affordance as "coming soon" only in internal demos, not public UI.
+
+**Decision needed:**
+
+- Whether live control proof is in v1.0, private alpha, or v1.1.
+- Challenge UX: scanner-generated QR, short phrase, or both.
+- Challenge expiry and success display window.
+- Whether recovery/rotation keys may sign challenges.
+- Exact success copy: "Control proven moments ago. This does not prove legal identity."
+
+**Exit criteria:**
+
+- Live control proof is either implemented with tests or explicitly deferred from public launch copy.
 
 ### D-005: Publish Support And Revenue Policy
 
@@ -284,6 +302,24 @@ Goal: launch the identity core without commerce.
 - New print artifact intents are blocked for revoked/suspended/expired QR.
 - Revoking a printed-item QR does not revoke sibling printed-item QR credentials.
 
+### R-004: Live Control Proof
+
+**Build:**
+
+- Short-lived challenge creation from public card and printed-item scan pages.
+- Owner challenge review screen on the key-holding device.
+- Signed challenge response verification.
+- Scanner-side success, expired, and failed states.
+- Clear limitation copy separating live control from legal identity, vouching, and artifact ownership.
+
+**Exit criteria:**
+
+- Valid owner signature shows recent control proof for 2-5 minutes.
+- Expired challenge cannot be reused.
+- Invalid signature does not display success.
+- Live control proof does not mutate verification state or issue a badge.
+- Public scan UI keeps live control proof visually separate from card status, human trust status, and printed-item QR status.
+
 ---
 
 ## Phase 4: Verification And Badges
@@ -460,7 +496,21 @@ Goal: make the vertical slice credible for a founding cohort.
 - Users understand `Registered` vs `Vouched Human`.
 - Users understand buying merchandise does not grant verification.
 - Users understand holding a sticker/card does not prove they are the card owner.
+- Users understand live control proof means recent key control, not legal identity or unique humanity.
 - Users understand item QR revocation changes that one scan result, not physical recall or sibling item QR credentials.
+- Users understand owner revocation and governance suspension are different states.
+
+### H-002A: Two-Minute Trust Loop Demo
+
+**Must verify:**
+
+- A tester can create a signed card.
+- A tester can scan the QR and understand the card status.
+- A tester can view or receive vouches and understand `Vouched Human`.
+- A tester can request live control proof, or the product clearly marks live control proof as deferred.
+- A tester can revoke a printed-item QR.
+- A tester can scan the revoked QR and understand that the physical object still exists but no longer resolves as active.
+- A tester can see that sibling printed-item QR credentials remain active.
 
 ### H-003: Physical QA
 
@@ -479,6 +529,7 @@ Goal: make the vertical slice credible for a founding cohort.
 - Manual production approval process is documented.
 - Data retention policy for print order PII is published.
 - Bootstrap governance key fingerprints and sunset criteria are public.
+- Forbidden claims list is published internally for launch copy review.
 
 ---
 
@@ -502,6 +553,8 @@ Includes:
 
 - One personalized sticker/card purchase path.
 - Unique QR per personalized physical item.
+- Product trust UI separating card, human trust, artifact, and live control states.
+- Live control proof if scoped into private alpha.
 - Shopify paid webhook ingestion.
 - Printify order creation.
 - Manual production approval.
@@ -515,6 +568,7 @@ Includes:
 - Hardened provider integrations.
 - Reconciliation and support states.
 - Copy testing.
+- V1 Product Trust Model comprehension gates.
 - PII separation and retention policy.
 - Bootstrap governance keys.
 - Founding cohort launch.
@@ -543,7 +597,7 @@ Includes:
 
 1. Finish Shopify webhook fixture and metadata decision.
 3. Build signed card creation and public card route.
-4. Build initial HTTPS QR route, bearer warning, and revoked status page.
+4. Build initial HTTPS QR route, trust-state UI blocks, bearer warning, and revoked status page.
 5. Decide whether architecture stays Shopify + Printify or needs adjustment.
 
 ---
@@ -560,3 +614,4 @@ Includes:
 - Full multi-operator resolver network.
 - Broad product catalog polish.
 - Public claims stronger than the verification model can support.
+- Public live control proof claims unless the challenge flow is actually implemented.

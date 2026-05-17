@@ -2,6 +2,7 @@
 **Status:** Draft for Collective Ratification
 **Constitution Reference:** Humanity Commons Constitution (Articles I-VII)
 **Technical Standards Reference:** Technical Standards v1.0
+**Product Trust Reference:** V1 Product Trust Model
 **Dependencies:** Human Verification v1.0, QR Public Profile v1.0, Storefront v1.0, Printify Fulfillment Middleware v1.0
 
 ---
@@ -18,6 +19,7 @@ The core social object is the **Humanity Card**:
 - A freshness signal such as latest accepted vouch recency when available.
 - A public badge trail showing how the person entered the commons.
 - A revocation mechanism controlled by the owner.
+- A live control proof path for situations where a scanner needs recent evidence that the person nearby controls the card key.
 - A print-ready physical artifact that can be purchased through the Humanity Storefront and fulfilled through Printify Fulfillment Middleware.
 
 The product promise is:
@@ -57,34 +59,36 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 | HC-US-06 | As a card owner, I want to order physical stickers, cards, or apparel containing my signed QR code. |
 | HC-US-07 | As a card owner, I want clear warnings before any printed artifact is produced because a printed QR can outlive my current web session. |
 | HC-US-08 | As a card owner, I want to regenerate print artifacts after rotating keys or revoking a previous QR epoch. |
+| HC-US-09 | As a card owner, I want to prove live control of my card key without exposing private identity data. |
 
 ### 3.2 Scanner
 
 | ID | Story |
 |---|---|
-| HC-US-09 | As a scanner, I want a scanned QR code to resolve quickly to the public Humanity Card. |
-| HC-US-10 | As a scanner, I want to see whether the card is active, revoked, suspended, unverified, vouched, device-verified, or steward-level. |
-| HC-US-11 | As a scanner, I want to verify that the card payload and resolver response are signed. |
-| HC-US-12 | As a scanner, I want to know what data, if any, is being logged when I scan. |
-| HC-US-13 | As a scanner, I want cached cards to clearly show that they may be stale. |
-| HC-US-14 | As a scanner, I want to know that a printed QR resolves to a card but does not prove the holder is the card owner. |
-| HC-US-15 | As a scanner, I want to request deeper access only through explicit consent flows. |
+| HC-US-10 | As a scanner, I want a scanned QR code to resolve quickly to the public Humanity Card. |
+| HC-US-11 | As a scanner, I want to see whether the card is active, revoked, suspended, unverified, vouched, device-verified, or steward-level. |
+| HC-US-12 | As a scanner, I want to verify that the card payload and resolver response are signed. |
+| HC-US-13 | As a scanner, I want to know what data, if any, is being logged when I scan. |
+| HC-US-14 | As a scanner, I want cached cards to clearly show that they may be stale. |
+| HC-US-15 | As a scanner, I want to know that a printed QR resolves to a card but does not prove the holder is the card owner. |
+| HC-US-16 | As a scanner, I want to ask the nearby card owner to prove live control of the card key. |
+| HC-US-17 | As a scanner, I want to request deeper access only through explicit consent flows. |
 
 ### 3.3 Voucher
 
 | ID | Story |
 |---|---|
-| HC-US-15 | As a verified human, I want to vouch for someone I know personally. |
-| HC-US-16 | As a voucher, I want vouching to be meaningful, limited, and revocable if fraud or harm is discovered. |
-| HC-US-17 | As a voucher, I want my public vouch trail to show that I participated in building the commons. |
+| HC-US-18 | As a verified human, I want to vouch for someone I know personally. |
+| HC-US-19 | As a voucher, I want vouching to be meaningful, limited, and revocable if fraud or harm is discovered. |
+| HC-US-20 | As a voucher, I want my public vouch trail to show that I participated in building the commons. |
 
 ### 3.4 Collective / Operators
 
 | ID | Story |
 |---|---|
-| HC-US-18 | As an operator, I want resolver and Printify Fulfillment Middleware events to be auditable without exposing unnecessary personal data. |
-| HC-US-19 | As a trust and safety steward, I want suspension to require documented cause, visible status, and appeal rights. |
-| HC-US-20 | As the collective, I want physical merchandise to spread the system without weakening revocation, privacy, or identity claims. |
+| HC-US-21 | As an operator, I want resolver and Printify Fulfillment Middleware events to be auditable without exposing unnecessary personal data. |
+| HC-US-22 | As a trust and safety steward, I want suspension to require documented cause, visible status, and appeal rights. |
+| HC-US-23 | As the collective, I want physical merchandise to spread the system without weakening revocation, privacy, or identity claims. |
 
 ---
 
@@ -126,6 +130,7 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 | HC-FR-20 | Card MUST display latest accepted vouch recency when active accepted vouches exist. | P0 |
 | HC-FR-21 | System MUST support founding badges such as `founding_human` and `early_builder`. | P0 |
 | HC-FR-22 | Founding badges MUST be governed by issuance rules, not arbitrary UI decoration. | P0 |
+| HC-FR-22A | Public launch UI SHOULD label vouch-based level 2 cards as `Vouched Human` unless copy testing and governance approve stronger wording. | P0 |
 
 ### 4.4 Vouching
 
@@ -149,6 +154,15 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 | HC-FR-33 | Each personalized printed item MUST receive a unique item-scoped QR credential so stolen/lost items can be revoked individually. | P0 |
 | HC-FR-34 | Printed QR codes MUST resolve to a status page after expiration or revocation, not silently fail. | P0 |
 | HC-FR-35 | QR PNG/SVG/PDF outputs MUST be generated at print-safe resolution. | P0 |
+
+### 4.5A Live Control Proof
+
+| ID | Requirement | Priority |
+|---|---|---|
+| HC-FR-35A | Scanner MUST be able to request a short-lived live control challenge from a public card or printed-item scan page. | P1 |
+| HC-FR-35B | Card owner MUST be able to sign the challenge using active card key material or an accepted recovery/rotation key. | P1 |
+| HC-FR-35C | Successful proof MUST be displayed as recent evidence only, not as permanent verification, legal identity, or artifact ownership. | P1 |
+| HC-FR-35D | Failed or expired proof MUST leave the card status unchanged and explain that live control was not proven. | P1 |
 
 ### 4.6 Physical Artifact Ordering
 
@@ -211,6 +225,8 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 | HC-NFR-10 | Hash algorithm | SHA-256 minimum; stronger hashes allowed for non-protocol internals |
 | HC-NFR-11 | Export generation | < 24 hours |
 | HC-NFR-12 | Accessibility | WCAG 2.2 AA for public card and ordering flow |
+| HC-NFR-13 | Live control challenge expiry | 30-120 seconds |
+| HC-NFR-14 | Live control success display | 2-5 minutes maximum |
 
 ---
 
@@ -307,7 +323,7 @@ Voucher signs vouch statement
   |
 Verification service stores vouch record
   |
-If threshold reached, profile becomes Verified Human
+If threshold reached, profile becomes Vouched Human in public UI
   |
 Card badge updates
   |
@@ -384,6 +400,24 @@ Print order history remains visible but new orders are blocked
 END
 ```
 
+### 7.6 Prove Live Control
+
+```text
+START
+  |
+Scanner opens card or printed-item QR page
+  |
+Scanner requests live control challenge
+  |
+Owner opens challenge on key-holding device
+  |
+Owner reviews and signs challenge
+  |
+Scanner sees recent control proof or failure
+  |
+END
+```
+
 ---
 
 ## 8. API Specifications
@@ -396,6 +430,8 @@ END
 | `/.well-known/hc/v1/cards/{profile_id}` | GET | Resolve card as JSON or HTML |
 | `/.well-known/hc/v1/cards/{profile_id}/qr` | GET | Retrieve QR artifact metadata |
 | `/.well-known/hc/v1/cards/{profile_id}/revoke` | POST | Revoke card using signed statement |
+| `/.well-known/hc/v1/cards/{profile_id}/live-control/challenges` | POST | Create a short-lived live control challenge |
+| `/.well-known/hc/v1/cards/{profile_id}/live-control/responses` | POST | Submit signed live control challenge response |
 | `/.well-known/hc/v1/cards/{profile_id}/export` | POST | Request export bundle |
 | `/.well-known/hc/v1/cards/{profile_id}/status` | GET | Retrieve active/revoked/suspended/expired status |
 
@@ -510,6 +546,7 @@ Printify Fulfillment Middleware details are specified in `Printify Fulfillment M
 | HC-SEC-08 | Suspensions MUST be signed by authorized governance keys. |
 | HC-SEC-09 | Revocation MUST be visible and machine-readable. |
 | HC-SEC-10 | QR artwork MUST include only public resolver data and signed credentials. |
+| HC-SEC-11 | Live control proof MUST be short-lived, single-use, and labeled as key-control evidence only. |
 
 ---
 
@@ -535,6 +572,7 @@ Printify Fulfillment Middleware details are specified in `Printify Fulfillment M
 - User can scan a QR code and see an active card.
 - User can see verification status and badge trail.
 - User can see latest accepted vouch recency when active accepted vouches exist.
+- Scanner can request live control proof, or the UI explicitly labels live control proof as deferred.
 - User can vouch for another human if eligible.
 - User can revoke active card resolution.
 - User can export identity bundle.
@@ -576,6 +614,7 @@ Printify Fulfillment Middleware details are specified in `Printify Fulfillment M
 - Rich media profile pages.
 - Anonymous Humanity Cards.
 - Any claims of legal identity verification.
+- Treating live control proof as proof of legal identity or unique humanity.
 
 ---
 

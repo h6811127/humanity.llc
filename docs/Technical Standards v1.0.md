@@ -17,6 +17,7 @@ It covers:
 - Profile IDs.
 - Ed25519 keypairs and signatures.
 - QR credentials.
+- Live control proof challenges.
 - Resolver API behavior.
 - Verification status and badge records.
 - Revocation and suspension.
@@ -183,6 +184,7 @@ Signatures are REQUIRED for:
 - Card updates.
 - QR credential issuance.
 - QR rotation.
+- Live control proof challenge responses.
 - Revocation.
 - Vouches.
 - Badge issuance.
@@ -425,6 +427,62 @@ For print artifacts:
 - Minimum physical QR size MUST be defined per artifact template.
 - QR MUST pass scan QA before order submission.
 
+### 8.6 Live Control Proof
+
+Live control proof is an optional v1.1-compatible trust upgrade that proves recent control of the active Humanity Card key. It is not legal identity verification, human uniqueness proof, or a vouch.
+
+The recommended flow is:
+
+```text
+Scanner opens card
+  -> scanner requests challenge
+  -> owner reviews challenge on key-holding device
+  -> owner signs challenge
+  -> scanner sees recent control proof
+```
+
+Live control challenges MUST include:
+
+| Field | Requirement |
+|---|---|
+| `challenge_id` | Opaque unique ID. |
+| `type` | `live_control_challenge`. |
+| `version` | Protocol version string. |
+| `profile_id` | Subject Humanity Card profile ID. |
+| `qr_id` | QR credential ID when challenge originated from a QR scan. |
+| `nonce` | Cryptographically random challenge nonce. |
+| `issued_at` | Challenge creation time. |
+| `expires_at` | 30-120 seconds after creation. |
+| `verifier_session_id` | Opaque session reference for the scanner page. |
+
+Challenge responses MUST be signed by the card owner's active key or an accepted recovery/rotation key.
+
+```json
+{
+  "type": "live_control_response",
+  "version": "1.0",
+  "challenge_id": "lc_123",
+  "profile_id": "base58-profile-id",
+  "qr_id": "qr_123",
+  "signed_at": "2026-05-16T17:00:00Z",
+  "signature": {
+    "alg": "Ed25519",
+    "public_key": "base58-ed25519-public-key",
+    "signature": "base58-signature",
+    "signed_at": "2026-05-16T17:00:00Z",
+    "canonicalization": "JCS"
+  }
+}
+```
+
+Live control proof MUST be:
+
+- Single-use.
+- Short-lived.
+- Displayed as recent evidence only.
+- Separated from vouch, verification, and artifact ownership states in the UI.
+- Labeled with a plain-language limitation such as: "Control proven moments ago. This does not prove legal identity."
+
 ---
 
 ## 9. Resolver API
@@ -439,6 +497,8 @@ For print artifacts:
 | `GET /.well-known/hc/v1/cards/{profile_id}/status` | GET | Resolve card status. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/revoke` | POST | Submit signed revocation. |
 | `GET /.well-known/hc/v1/qr/{qr_id}` | GET | Retrieve QR credential metadata. |
+| `POST /.well-known/hc/v1/cards/{profile_id}/live-control/challenges` | POST | Create short-lived live control challenge. |
+| `POST /.well-known/hc/v1/cards/{profile_id}/live-control/responses` | POST | Submit signed live control challenge response. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/export` | POST | Request export bundle. |
 
 ### 9.2 Headers
@@ -675,6 +735,7 @@ Implementations MUST consider:
 - Signature confusion between payload types.
 - QR credential expiration.
 - Revoked printed artifacts.
+- Confusing live control proof with legal identity or human uniqueness.
 - Vouch collusion.
 - Resolver impersonation.
 - Webhook spoofing.

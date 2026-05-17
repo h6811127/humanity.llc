@@ -2,6 +2,7 @@
 **Status:** Draft for Collective Ratification
 **Constitution Reference:** Humanity Commons Constitution (Articles I, III, VI)
 **Technical Standards Reference:** Technical Standards v1.0
+**Product Trust Reference:** V1 Product Trust Model
 **Dependencies:** Humanity Card v1.0, QR Public Profile v1.0
 **Related Features:** Storefront v1.0, Printify Fulfillment Middleware v1.0
 
@@ -17,6 +18,7 @@ The goal is sybil resistance and portable human trust, not surveillance. V1 shou
 
 - A card may be registered but unverified.
 - A card may be verified through vouches, ceremony, or accepted device proof.
+- Public launch UI should prefer `Vouched Human` for vouch-based verification unless stronger language passes copy testing.
 - A card may be suspended or revoked.
 - A product may resolve to a real Humanity Card without proving the holder is the card owner or verified.
 - Buying or owning an artifact does not make someone verified.
@@ -88,6 +90,7 @@ The goal is sybil resistance and portable human trust, not surveillance. V1 shou
 | HV-FR-04 | `verified_human` means the card has accepted vouch, ceremony, or device proof credentials. | P0 |
 | HV-FR-05 | `steward` means verified human plus ratified steward authority. | P0 |
 | HV-FR-06 | `revoked` and `suspended` MUST override positive verification display. | P0 |
+| HV-FR-06A | Public UI SHOULD display vouch-based `verified_human` as `Vouched Human` in v1 launch copy. | P0 |
 
 ### 4.2 Baseline Registration
 
@@ -149,6 +152,7 @@ The goal is sybil resistance and portable human trust, not surveillance. V1 shou
 | HV-FR-35 | Product and scan copy MUST distinguish "resolves to this Humanity Card" from "the holder is this human." | P0 |
 | HV-FR-36 | Personalized QR artifacts MUST NOT print mutable verification state in v1.0; scans resolve current verification state dynamically. | P0 |
 | HV-FR-37 | Printed verification state MUST be treated as stale after production and QR scans MUST resolve current status. | P0 |
+| HV-FR-37A | Live control proof MUST NOT grant verification or count as a vouch; it proves only recent key control. | P0 |
 
 ### 4.8 Revocation and Suspension
 
@@ -335,6 +339,7 @@ END
 | HV-SEC-06 | Shopify, Printify, and payment processors MUST NOT receive verification secrets. |
 | HV-SEC-07 | Public artifact authenticity MUST be separate from human verification state. |
 | HV-SEC-08 | Suspended/revoked state MUST override cached verified display after refresh. |
+| HV-SEC-09 | Public copy MUST NOT claim legal identity, KYC, age verification, bot-proof identity, background checks, or guaranteed uniqueness. |
 
 ---
 
@@ -358,6 +363,7 @@ END
 - Card can show registered/unverified state.
 - Verified humans can issue signed vouches.
 - Threshold vouches upgrade card to `verified_human`.
+- Vouch-based public UI labels the state as `Vouched Human` unless stronger wording passes comprehension testing.
 - Ceremony credentials can upgrade card to `verified_human`.
 - Public card shows verification summary and badge trail.
 - Public card shows latest accepted vouch recency when active accepted vouches exist.
@@ -383,6 +389,7 @@ END
 - Legal identity verification.
 - Securities, equity, or cap table claims.
 - Blockchain/NFT personhood credentials.
+- Treating live control proof as verification or a vouch.
 
 ---
 

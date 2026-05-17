@@ -17,7 +17,7 @@ Humanity Commons is a signed, revocable public card for real people and democrat
 
 Humanity Commons is a public proof-of-personhood card you control.
 
-Create a signed Humanity Card, share it with a QR code, receive vouches from real people, and carry it into the world through physical cards or stickers. Your card can be revoked, exported, and verified without a phone number, government ID, follower count, ad network, or surveillance profile.
+Create a signed Humanity Card, share it with a QR code, receive vouches from real people, prove live control when needed, and carry it into the world through physical cards or stickers. Your card can be revoked, exported, and vouched for without a phone number, government ID, follower count, ad network, or surveillance profile.
 
 This is not a social network. It is a commons for human trust.
 
@@ -36,6 +36,7 @@ The first version is intentionally simple:
 - A signed public card.
 - A QR code that resolves to that card.
 - Vouches from real people.
+- Optional live control proof for moments when a scanner needs recent evidence that the nearby person controls the card key.
 - Clear active, revoked, suspended, expired, and unknown states.
 - Physical stickers/cards that point back to the current card state.
 - No scan analytics by default.
@@ -74,6 +75,8 @@ Humanity Commons is not:
 - A way to buy verification.
 - A claim that holding a sticker proves who you are.
 - A surveillance analytics product.
+- KYC, age verification, employment eligibility, or legal identity proof.
+- Bot-proof or fraud-proof identity.
 
 ### What Physical Stickers And Cards Mean
 
@@ -84,6 +87,21 @@ Website and scan pages should say:
 > This QR resolves to a Humanity Card. It does not prove the person holding this item is the card owner.
 
 Higher-trust contexts eventually require live proof of control, not just a static printed QR.
+
+### Public Labels
+
+Launch copy should prefer labels that reveal the trust mechanism:
+
+| Internal/Protocol Concept | Public Launch Label |
+|---|---|
+| Baseline card exists | Registered |
+| Vouch threshold reached | Vouched Human |
+| Founder/bootstrap credential | Founding Human or Early Builder |
+| Steward authority | Steward |
+| Owner revocation | Revoked By Owner |
+| Governance action | Suspended Under Public Rules |
+
+The phrase **Verified Human** should be avoided in primary launch UI unless it appears next to mechanism copy such as "by vouches" or "by ceremony" and passes comprehension testing.
 
 ---
 
@@ -232,6 +250,13 @@ A static printed QR can be stolen, copied, photographed, or stuck somewhere misl
 
 - The person can control the card's private key or authenticated device at that moment.
 
+**What it does not prove:**
+
+- Legal identity.
+- Global uniqueness.
+- Age, KYC, employment eligibility, or background check status.
+- That holding a printed artifact proves ownership.
+
 **Possible mechanisms:**
 
 - Signed nonce challenge.
@@ -246,6 +271,10 @@ A static printed QR can be stolen, copied, photographed, or stuck somewhere misl
 - Member voting.
 - Sensitive ceremony attendance.
 - High-trust steward actions.
+
+**Required success copy:**
+
+> Control proven moments ago. This means the card key signed a fresh challenge. It does not prove legal identity.
 
 #### Level 3: Ceremony Or Steward Proof
 
@@ -262,7 +291,7 @@ A static printed QR can be stolen, copied, photographed, or stuck somewhere misl
 
 ### V1 Decision
 
-V1 should ship Level 0 and Level 1 clearly, and design toward Level 2 without blocking launch.
+V1 should ship Level 0 and Level 1 clearly. Live owner proof should be built for private alpha if it does not delay the core card/QR/revocation loop; otherwise it should remain a clearly documented v1.1 feature, not a public promise.
 
 V1 scan pages must include the bearer warning:
 
@@ -326,9 +355,27 @@ The campaign is not "download our app." It is:
 - Create cards.
 - Test scan flows.
 - Give/receive vouches.
+- Test live control proof if included in the private alpha.
 - Order or test physical artifacts.
 - Review copy comprehension.
 - Ratify initial constitution after using the product.
+
+### Founding Trust Bootstrap
+
+The first trust network cannot pretend to have emerged from mature member governance. It needs a visible bootstrap rule.
+
+Recommended public rule:
+
+- Start with 10-25 founding humans or bootstrap stewards selected through named founder/operator authority.
+- Label this as temporary bootstrap authority.
+- Publish who can issue founding credentials, what those credentials mean, and when authority sunsets or is reviewed.
+- Do not sell founding credentials or verification.
+- Allow founding humans to vouch only after accepting public vouching rules.
+- Keep the 90-day vouching delay for newly vouched humans unless a public bootstrap exception is explicitly documented.
+
+Suggested copy:
+
+> Humanity Commons is founder-built today. Founding credentials are issued under temporary bootstrap rules so the first trust network can exist. These powers are public, limited, and subject to transition once members can govern the system.
 
 ### Public Roadmap Reveal
 
@@ -352,6 +399,7 @@ Secondary CTAs:
 
 - Review the constitution.
 - Review the technical standards.
+- Review the product trust model.
 - Apply to be a bootstrap steward.
 - Host a founding ceremony.
 - Bring Humanity Commons to your cooperative/community.
@@ -831,6 +879,7 @@ Members should:
 - Human verification status.
 - Latest accepted vouch.
 - Printed-item QR status.
+- Live control proof status when requested.
 - Bearer warning.
 - No scan analytics by default.
 
@@ -896,6 +945,19 @@ Members should:
 - Verification records.
 - Revocation.
 - Export.
+
+#### `/trust`
+
+**Purpose:** Explain what each trust level proves and does not prove.
+
+**Content:**
+
+- Static artifact pointer.
+- Current card resolution.
+- Vouched Human.
+- Live control proof.
+- Steward or ceremony proof.
+- Forbidden claims and limitations.
 
 #### `/membership`
 
@@ -970,3 +1032,5 @@ Members should:
 8. Publish initial finance policy, including founder compensation and conflict-of-interest policy, before taking paid orders.
 9. Publish membership page before claiming member governance.
 10. Put the roadmap on the website with honest status labels.
+11. Publish the product trust model and forbidden claims list before launch.
+12. Run copy comprehension tests for `Registered`, `Vouched Human`, printed QR bearer warnings, revoked/suspended states, and live control proof.
