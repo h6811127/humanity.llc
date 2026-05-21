@@ -321,6 +321,23 @@ a {
   margin: 0 0 8px 14px;
 }
 
+.group-intro {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--grey);
+  margin: 0 0 10px 14px;
+  padding-right: 8px;
+}
+
+.phase {
+  display: inline-block;
+  min-width: 1.1em;
+  margin-right: 4px;
+  font-weight: 700;
+  color: var(--red);
+  font-variant-numeric: tabular-nums;
+}
+
 .list {
   list-style: none;
   border-radius: var(--radius);

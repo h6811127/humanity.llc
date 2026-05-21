@@ -9,16 +9,16 @@
     <title>humanity.llc</title>
     <meta
       name="description"
-      content="A signed public card for real humans. No phone. No ID. No ads. No tracking."
+      content="humanity.llc is building member-governed trust infrastructure: signed cards, a live QR resolver, vouches, and revocation—no phone, no ID, no scan analytics."
     />
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=7" />
+    <link rel="stylesheet" href="/styles.css?v=9" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
-      content="Prove you're real without becoming a data product."
+      content="Trust infrastructure you can inspect—starting with a revocable card and live resolver."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://humanity.llc" />
@@ -35,9 +35,12 @@
 
       <main class="screen">
         <section class="hero">
-          <p class="hero-eyebrow">A public card for real humans</p>
-          <h1>Trust without<br />the surveillance.</h1>
-          <p class="hero-line">No phone. No ID. No ads. No tracking.</p>
+          <p class="hero-eyebrow">Trust infrastructure · in development</p>
+          <h1>Minimum trust.<br />Clear limits.</h1>
+          <p class="hero-line">
+            A signed public card and live QR resolver—so scans show current status,
+            not a static profile. No phone. No ID. No ads. No tracking.
+          </p>
         </section>
 
         <section class="pass" id="card" aria-label="Card preview">
@@ -52,7 +55,7 @@
             <div class="pass-body">
               <div class="pass-main">
                 <p class="pass-name">river.founding</p>
-                <p class="pass-manifesto">Human trust without surveillance.</p>
+                <p class="pass-manifesto">Portable trust under published rules.</p>
                 <p class="pass-since">Member since 2026</p>
                 <ul class="pass-trust" aria-label="Trust at a glance">
                   <li class="trust-on">Vouched human</li>
@@ -70,103 +73,227 @@
               </div>
             </div>
             <p class="pass-foot">
-              Holding a printed QR does not prove identity or ownership.
+              Scan shows current status. It does not prove the nearby person owns this
+              card.
             </p>
           </div>
         </section>
 
         <nav class="dock" aria-label="Quick actions">
           <a class="dock-btn dock-btn-primary" href="mailto:info@humanity.llc?subject=Founding%20cohort"
-            >Join founding cohort</a
+            >Request founding cohort</a
           >
         </nav>
 
-        <section class="group">
-          <h2 class="group-label">Promise</h2>
+        <section class="group" id="wedge">
+          <h2 class="group-label">The wedge</h2>
           <div class="feature">
-            <p class="feature-lead">A signed card. A real vouch. A right to revoke.</p>
+            <p class="feature-lead">Objects point at a resolver—not a bio link.</p>
             <p class="feature-sub">
-              Prove enough for the moment—without surrendering more than the moment requires.
+              Stickers and cards spread curiosity. The product is the scan: signed
+              card state, revocation, vouches, and optional live control—readable in
+              seconds, honest about limits.
             </p>
           </div>
         </section>
 
-        <section class="group" id="why">
-          <h2 class="group-label">Why</h2>
+        <section class="group" id="dependency">
+          <h2 class="group-label">What creates dependency</h2>
+          <p class="group-intro">
+            Merch alone is printing. Dependency starts when people and systems must
+            ask the resolver for current truth.
+          </p>
           <ul class="list">
             <li>
-              <span class="list-title">Not another profile link</span>
-              <span class="list-sub">Signed, revocable trust—not a bio page</span>
+              <span class="list-title">Live resolver</span>
+              <span class="list-sub"
+                >Every QR resolves to active, revoked, suspended, or unknown—not a 404</span
+              >
             </li>
             <li>
-              <span class="list-title">Not platform-owned identity</span>
-              <span class="list-sub">Your keys. Your card. Export and leave.</span>
+              <span class="list-title">Per-item revocation</span>
+              <span class="list-sub"
+                >Revoke one stolen sticker QR; other credentials can stay active</span
+              >
             </li>
             <li>
-              <span class="list-title">QR always shows live status</span>
-              <span class="list-sub">Active, revoked, or suspended—on every scan</span>
+              <span class="list-title">Signed public card</span>
+              <span class="list-sub"
+                >Keys on your device; export and revoke; not platform-owned</span
+              >
+            </li>
+            <li>
+              <span class="list-title">Vouch graph</span>
+              <span class="list-sub"
+                >Accountable social attestations under published rules—not follower counts</span
+              >
+            </li>
+            <li>
+              <span class="list-title">Live control</span>
+              <span class="list-sub"
+                >Optional proof you control the card key now—not legal ID</span
+              >
+            </li>
+            <li>
+              <span class="list-title">Machine-readable status</span>
+              <span class="list-sub"
+                >Apps and communities can check JSON status—not just a web page</span
+              >
             </li>
           </ul>
         </section>
 
-        <section class="group" id="about">
-          <h2 class="group-label">How</h2>
+        <section class="group" id="plan">
+          <h2 class="group-label">Build plan</h2>
+          <p class="group-intro">Order from the repo. Each phase unlocks the next.</p>
           <ul class="list">
             <li>
-              <span class="list-title">Create</span>
-              <span class="list-sub">Signed card generated on your device</span>
+              <span class="list-title"><span class="phase">A</span> Resolver + card</span>
+              <span class="list-sub"
+                >Create card, HTTPS scan page, vouch display, revocation—founding cohort tests it</span
+              >
             </li>
             <li>
-              <span class="list-title">Vouch</span>
-              <span class="list-sub">Humans attest under published rules</span>
+              <span class="list-title"><span class="phase">B</span> Curiosity drop</span>
+              <span class="list-sub"
+                >One sticker SKU; strangers scan; measure scan → create card</span
+              >
             </li>
             <li>
-              <span class="list-title">Scan</span>
-              <span class="list-sub">See what it proves—and what it does not</span>
+              <span class="list-title"><span class="phase">C</span> Belonging</span>
+              <span class="list-sub"
+                >Closed founding artifacts; personalized item QR; vouches that mean something</span
+              >
+            </li>
+            <li>
+              <span class="list-title"><span class="phase">D</span> Commons Pass</span>
+              <span class="list-sub"
+                >Community membership passes, check-in, stamps—same resolver grammar</span
+              >
+            </li>
+            <li>
+              <span class="list-title"><span class="phase">→</span> Governance</span>
+              <span class="list-sub"
+                >Public rules, member control of rights-affecting changes, federated operators</span
+              >
+            </li>
+          </ul>
+        </section>
+
+        <section class="group" id="empire">
+          <h2 class="group-label">Where this goes</h2>
+          <p class="group-intro">
+            Long-term: trust infrastructure communities can govern—not another
+            surveillance identity platform.
+          </p>
+          <ul class="list">
+            <li>
+              <span class="list-title">Open standards</span>
+              <span class="list-sub"
+                >Public card format, QR credentials, resolver API—portable across hosts</span
+              >
+            </li>
+            <li>
+              <span class="list-title">Commons Pass</span>
+              <span class="list-sub"
+                >Orgs issue membership without phone numbers or scan analytics</span
+              >
+            </li>
+            <li>
+              <span class="list-title">Member governance</span>
+              <span class="list-sub"
+                >Users and workers set rules for suspension, vouch policy, and surplus</span
+              >
+            </li>
+            <li>
+              <span class="list-title">Federated resolvers</span>
+              <span class="list-sub"
+                >Multiple operators, one trust grammar—no single company owns identity</span
+              >
             </li>
           </ul>
         </section>
 
         <section class="group">
+          <h2 class="group-label">Primitive</h2>
+          <ul class="list">
+            <li>
+              <span class="list-title">Humanity Card</span>
+              <span class="list-sub"
+                >Signed public profile + handle + manifesto you control</span
+              >
+            </li>
+            <li>
+              <span class="list-title">QR credential</span>
+              <span class="list-sub"
+                >Short HTTPS payload; print-safe; unique per physical item when needed</span
+              >
+            </li>
+            <li>
+              <span class="list-title">Scan page</span>
+              <span class="list-sub"
+                >Card status, human trust, artifact status, and what scan does not prove</span
+              >
+            </li>
+            <li>
+              <span class="list-title">Commerce path</span>
+              <span class="list-sub"
+                >Shopify checkout + Printify fulfillment—only after resolver QA passes</span
+              >
+            </li>
+          </ul>
+        </section>
+
+        <section class="group" id="limits">
           <h2 class="group-label">Limits</h2>
           <ul class="list">
             <li class="list-row">
-              <span class="list-title">Not legal ID or KYC</span>
+              <span class="list-title">Not legal ID, KYC, or employment verification</span>
             </li>
             <li class="list-row">
-              <span class="list-title">Sticker ≠ holder is the owner</span>
+              <span class="list-title">Not proof the person holding a QR is the owner</span>
             </li>
             <li class="list-row">
-              <span class="list-title">Revocable by you, anytime</span>
+              <span class="list-title">Not bot-proof or “verified forever”</span>
+            </li>
+            <li class="list-row">
+              <span class="list-title">Buying merch does not grant vouched status</span>
+            </li>
+            <li class="list-row">
+              <span class="list-title">No scan analytics by default</span>
             </li>
           </ul>
         </section>
 
         <section class="group">
-          <h2 class="group-label">Build</h2>
+          <h2 class="group-label">Today</h2>
           <ul class="list">
             <li>
-              <span class="list-title"><span class="status-dot live"></span> Site live</span>
-              <span class="list-sub">You are here</span>
+              <span class="list-title"><span class="status-dot live"></span> This site</span>
+              <span class="list-sub">Plan and specifications published</span>
             </li>
             <li>
-              <span class="list-title"><span class="status-dot wait"></span> Card + resolver</span>
-              <span class="list-sub">In development</span>
+              <span class="list-title"><span class="status-dot wait"></span> Resolver + card</span>
+              <span class="list-sub">Phase A—in active development</span>
             </li>
             <li>
-              <span class="list-title"><span class="status-dot wait"></span> Founding sticker</span>
-              <span class="list-sub">Walking QR, one story</span>
+              <span class="list-title"><span class="status-dot wait"></span> Founding cohort</span>
+              <span class="list-sub">Recruiting testers for the first trust loop</span>
+            </li>
+            <li>
+              <span class="list-title"><span class="status-dot wait"></span> Sticker drop</span>
+              <span class="list-sub">After Phase A proves the scan moment</span>
             </li>
           </ul>
         </section>
 
-        <section class="group" id="founding">
+        <section class="group" id="now">
           <h2 class="group-label">Now</h2>
           <ul class="list">
             <li class="list-row list-action">
               <a href="mailto:info@humanity.llc?subject=Founding%20cohort">
-                <span class="list-title">Request founding access</span>
-                <span class="list-sub">Test cards, scans, and vouches</span>
+                <span class="list-title">Request founding cohort</span>
+                <span class="list-sub">Test cards, scans, vouches, and copy</span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </a>
             </li>
@@ -176,7 +303,9 @@
                 rel="noopener noreferrer"
               >
                 <span class="list-title">Docs on GitHub</span>
-                <span class="list-sub">Trust model, specs, roadmap</span>
+                <span class="list-sub"
+                  >Trust model, merch-led plan, specs, assumptions</span
+                >
                 <span class="list-chevron" aria-hidden="true">›</span>
               </a>
             </li>
