@@ -83,11 +83,19 @@ a {
   gap: 22px;
 }
 
+.hero-eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--red);
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+}
+
 .hero h1 {
-  font-size: clamp(32px, 8vw, 40px);
+  font-size: clamp(30px, 8vw, 38px);
   font-weight: 700;
   letter-spacing: -0.04em;
-  line-height: 1.05;
+  line-height: 1.08;
   color: var(--black);
 }
 
@@ -204,13 +212,13 @@ a {
   content: "● ";
 }
 
-/* Tight QR frame — bottom-right, minimal black inset */
+/* QR — bottom-right, tight rounded frame on white */
 .pass-qr {
   flex-shrink: 0;
   line-height: 0;
-  padding: 5px;
-  background: var(--black);
+  border: 1px solid var(--grey);
   border-radius: 12px;
+  overflow: hidden;
 }
 
 .pass-qr img {
@@ -228,17 +236,16 @@ a {
   padding-top: 10px;
 }
 
-/* Actions */
+/* Primary action */
 .dock {
-  display: flex;
-  gap: 10px;
+  display: block;
 }
 
 .dock-btn {
-  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
   min-height: 50px;
   padding: 14px 18px;
   font-size: 16px;
@@ -255,10 +262,53 @@ a {
 }
 
 .dock-btn-primary {
-  flex: 1.4;
   background: var(--red);
   border-color: var(--red);
   color: var(--white);
+}
+
+/* Promise feature cell */
+.feature {
+  padding: 16px 16px 16px 18px;
+  background: var(--white);
+  border: 1px solid var(--grey);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--red);
+}
+
+.feature-lead {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
+  color: var(--black);
+  margin-bottom: 6px;
+}
+
+.feature-sub {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--grey);
+  line-height: 1.4;
+}
+
+/* Build status dots inline */
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: 0.05em;
+}
+
+.status-dot.live {
+  background: var(--red);
+}
+
+.status-dot.wait {
+  border: 1.5px solid var(--grey);
+  background: transparent;
 }
 
 /* iOS grouped lists — solid, no blur (low bandwidth / old phones) */
