@@ -11,12 +11,13 @@
       name="description"
       content="Humanity Commons is a signed public card for real humans. Vouched by people, revocable by you, readable without surveillance—no phone, no ID, no ads, no tracking."
     />
-    <meta name="theme-color" content="#08090c" />
+    <meta name="theme-color" content="#F6F3ED" />
+    <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles.css" />
@@ -60,38 +61,24 @@
       </a>
     </header>
 
+    <nav class="mobile-nav shell" aria-label="On this page">
+      <a href="#how">How it works</a>
+      <a href="#trust">Trust</a>
+      <a href="#founding">Founding</a>
+    </nav>
+
     <main>
       <section class="hero shell">
         <div class="hero-grid">
-          <div class="hero-copy reveal">
+          <div class="hero-intro">
             <p class="kicker">Signed card · live QR · revocable</p>
             <h1>
               A public card<br />
               for <em>real humans</em>
             </h1>
-            <p class="lede">
-              Prove enough for the situation—without phone numbers, government ID,
-              ads, or scan analytics. The QR is the door; current status is the point.
-            </p>
-            <div class="manifesto-chips" aria-label="Core promises">
-              <span>No phone</span>
-              <span>No ID</span>
-              <span>No ads</span>
-              <span>No tracking</span>
-            </div>
-            <div class="actions">
-              <a class="btn btn-primary" href="mailto:info@humanity.llc?subject=Founding%20cohort">
-                Request founding access
-              </a>
-              <a class="btn btn-quiet" href="#how">See how it works</a>
-            </div>
-            <p class="fine">
-              Not legal ID. Not KYC. Not pay-to-verify. A sticker does not prove who is
-              holding it.
-            </p>
           </div>
 
-          <div class="hero-stage reveal" style="--reveal-delay: 120ms">
+          <div class="hero-stage">
             <div class="card-scene" id="card-scene">
               <article class="trust-card" aria-label="Example Humanity Card scan preview">
                 <header class="trust-card-head">
@@ -143,6 +130,29 @@
               <p class="card-caption">Mobile scan preview — illustrative</p>
             </div>
           </div>
+
+          <div class="hero-body">
+            <p class="lede">
+              Prove enough for the situation—without phone numbers, government ID,
+              ads, or scan analytics. The QR is the door; current status is the point.
+            </p>
+            <div class="manifesto-chips" aria-label="Core promises">
+              <span>No phone</span>
+              <span>No ID</span>
+              <span>No ads</span>
+              <span>No tracking</span>
+            </div>
+            <div class="actions">
+              <a class="btn btn-primary" href="mailto:info@humanity.llc?subject=Founding%20cohort">
+                Request founding access
+              </a>
+              <a class="btn btn-quiet" href="#how">See how it works</a>
+            </div>
+            <p class="fine">
+              Not legal ID. Not KYC. Not pay-to-verify. A sticker does not prove who is
+              holding it.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -158,7 +168,7 @@
       </div>
 
       <section class="section shell" id="how">
-        <div class="section-head reveal">
+        <div class="section-head reveal-scroll">
           <p class="section-label">How it works</p>
           <h2>The trust loop, not another profile link</h2>
           <p class="section-lede">
@@ -166,7 +176,7 @@
             revocable trust object that always resolves to current status.
           </p>
         </div>
-        <ol class="steps reveal">
+        <ol class="steps reveal-scroll">
           <li class="step">
             <span class="step-num">01</span>
             <h3>Create a signed card</h3>
@@ -195,7 +205,7 @@
       </section>
 
       <section class="section section-contrast shell" id="trust">
-        <div class="trust-split reveal">
+        <div class="trust-split reveal-scroll">
           <div class="trust-col trust-col-for">
             <p class="section-label">What it can show</p>
             <ul class="trust-list">
@@ -217,7 +227,7 @@
             </ul>
           </div>
         </div>
-        <blockquote class="trust-quote reveal">
+        <blockquote class="trust-quote reveal-scroll">
           <p>
             This card is signed, current, revocable, socially vouched where shown, and
             able to prove live control when needed.
@@ -226,11 +236,11 @@
       </section>
 
       <section class="section shell">
-        <div class="section-head reveal">
+        <div class="section-head reveal-scroll">
           <p class="section-label">Who it’s for first</p>
           <h2>Communities that already feel the cost</h2>
         </div>
-        <ul class="audience reveal">
+        <ul class="audience reveal-scroll">
           <li>Founding meetups &amp; events</li>
           <li>Cooperatives &amp; mutual aid</li>
           <li>Unions &amp; worker orgs</li>
@@ -241,7 +251,7 @@
       </section>
 
       <section class="section shell">
-        <div class="bento reveal">
+        <div class="bento reveal-scroll">
           <article class="bento-cell bento-wide">
             <p class="section-label">Commons Pass</p>
             <h3>Community membership without surveillance platforms</h3>
@@ -271,11 +281,11 @@
       </section>
 
       <section class="section shell status-section">
-        <div class="section-head reveal">
+        <div class="section-head reveal-scroll">
           <p class="section-label">Build status</p>
           <h2>What exists right now</h2>
         </div>
-        <ul class="status-list reveal">
+        <ul class="status-list reveal-scroll">
           <li>
             <span class="dot dot-live" aria-hidden="true"></span>
             <div>
@@ -301,7 +311,7 @@
       </section>
 
       <section class="founding shell" id="founding">
-        <div class="founding-inner reveal">
+        <div class="founding-inner reveal-scroll">
           <p class="section-label">Founding cohort</p>
           <h2>Help test whether the trust loop is real</h2>
           <p>
