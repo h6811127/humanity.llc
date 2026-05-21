@@ -3,16 +3,18 @@
    * Card interaction (cross-browser):
    * - Flip: only #pass-flip-btn click (native button; iOS Safari, Chrome Android,
    *   Firefox mobile, Samsung Internet, desktop). Do not flip on pointerup/touchend.
-   * - Tilt: drag on #pass-tilt-surface while front is visible; pointer + touchmove.
+   * - Tilt: drag on #pass-tilt-surface while front is visible; transform on
+   *   #pass-tilt-wrap only — #pass-flip / .pass-inner handle 3D flip only.
    * - Links inside tilt surface do not start tilt; back-face links are outside tilt.
-   * Manual test: tap "Tap to flip" flips; drag card face tilts; double-tap button
-   * respects flip cooldown; back-face policy link opens without flipping.
+   * Manual test: tap "Tap to flip" flips on phone; drag card face tilts; reduced-motion
+   * still flips instantly; back-face policy link opens without flipping.
    */
   var scene = document.getElementById("pass-scene");
+  var tiltWrap = document.getElementById("pass-tilt-wrap");
   var flip = document.getElementById("pass-flip");
   var flipBtn = document.getElementById("pass-flip-btn");
   var tiltSurface = document.getElementById("pass-tilt-surface");
-  if (!scene || !flip || !flipBtn || !tiltSurface) return;
+  if (!scene || !tiltWrap || !flip || !flipBtn || !tiltSurface) return;
 
   var inner = flip.querySelector(".pass-inner");
   var front = flip.querySelector(".pass-front");
@@ -22,9 +24,13 @@
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var coarsePointer = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
+  if (reduceMotion) {
+    flip.classList.add("reduce-motion");
+  }
+
   var maxY = 12;
   var maxX = 10;
-  var flipDurationMs = 550;
+  var flipDurationMs = reduceMotion ? 0 : 550;
 
   var isFlipped = false;
   var isDragging = false;
@@ -34,7 +40,7 @@
 
   function setTilt(x, y) {
     if (!tiltEnabled || isFlipped || flip.classList.contains("is-flipping")) return;
-    flip.style.transform =
+    tiltWrap.style.transform =
       "rotateY(" + x * maxY + "deg) rotateX(" + -y * maxX + "deg) translateZ(0)";
     scene.classList.add("is-tilted");
   }
@@ -45,7 +51,7 @@
     isDragging = false;
     activePointerId = null;
     if (!isFlipped) {
-      flip.style.transform = coarsePointer || reduceMotion ? "none" : "";
+      tiltWrap.style.transform = coarsePointer || reduceMotion ? "none" : "";
     }
   }
 
@@ -56,16 +62,20 @@
     setTilt(x, y);
   }
 
+  function finishFlipTransition() {
+    flip.classList.remove("is-flipping");
+    tiltEnabled = !isFlipped;
+  }
+
   function toggleFlip() {
-    if (reduceMotion) return;
     var now = Date.now();
-    if (now - lastFlipAt < flipDurationMs) return;
+    if (!reduceMotion && now - lastFlipAt < flipDurationMs) return;
     lastFlipAt = now;
 
     resetTilt();
     flip.classList.add("is-flipping");
     tiltEnabled = false;
-    flip.style.transform = "";
+    tiltWrap.style.transform = "";
 
     isFlipped = !isFlipped;
     flip.classList.toggle("is-flipped", isFlipped);
@@ -73,10 +83,11 @@
     back.setAttribute("aria-hidden", isFlipped ? "false" : "true");
     flipBtn.textContent = isFlipped ? "Tap to show front" : "Tap to flip";
 
-    window.setTimeout(function () {
-      flip.classList.remove("is-flipping");
-      tiltEnabled = !isFlipped;
-    }, flipDurationMs);
+    if (reduceMotion) {
+      finishFlipTransition();
+    } else {
+      window.setTimeout(finishFlipTransition, flipDurationMs);
+    }
   }
 
   function isLinkTarget(el) {

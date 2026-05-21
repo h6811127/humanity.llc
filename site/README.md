@@ -11,7 +11,7 @@ npm run pages:dev
 
 Open the URL Wrangler prints (usually `http://localhost:8788`).
 
-**Pass card (mobile Safari):** no idle spin on touch devices; drag to tilt; tap to flip front/back; release returns to neutral. Policy links under **Limits** and on the card back.
+**Pass card (iPhone Safari + Android Chrome):** tilt lives on `.pass-tilt-wrap`; flip is `.is-flipped` on `#pass-flip` / `.pass-inner` only (coarse-pointer CSS must not flatten `.pass-flip`). No idle spin on touch; drag face to tilt; tap **Tap to flip** for front/back; 44px flip button. Hard-refresh after deploy (`styles.css?v=15`, `main.js?v=1`). Reduced-motion: instant flip, button stays visible.
 
 ## Deploy on Cloudflare Pages
 

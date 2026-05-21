@@ -106,9 +106,10 @@ a {
   color: var(--grey);
 }
 
-/* Pass card — flip, tilt (touch + desktop), idle only on fine pointer */
+/* Pass card — tilt on .pass-tilt-wrap; 3D flip on .pass-inner only */
 .pass-scene {
   perspective: 900px;
+  -webkit-perspective: 900px;
   width: 100%;
   touch-action: pan-y;
 }
@@ -117,20 +118,27 @@ a {
   touch-action: none;
 }
 
-.pass-flip {
-  position: relative;
+.pass-tilt-wrap {
   width: 100%;
   transform: rotateY(-5deg) rotateX(4deg);
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
   transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
   animation: pass-idle 7s ease-in-out infinite;
 }
 
-.pass-scene.is-tilted .pass-flip,
-.pass-flip.is-flipping,
-.pass-flip.is-flipped {
+.pass-scene.is-tilted .pass-tilt-wrap,
+.pass-tilt-wrap:has(.pass-flip.is-flipping),
+.pass-tilt-wrap:has(.pass-flip.is-flipped) {
   animation: none;
+}
+
+.pass-flip {
+  position: relative;
+  width: 100%;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
 }
 
 .pass-inner {
@@ -138,11 +146,17 @@ a {
   width: 100%;
   min-height: 220px;
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
   transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .pass-flip.is-flipped .pass-inner {
   transform: rotateY(180deg);
+}
+
+.pass-flip.reduce-motion .pass-inner,
+.pass-flip.is-flipping.reduce-motion .pass-inner {
+  transition: none;
 }
 
 .pass-face {
@@ -156,12 +170,15 @@ a {
     0 16px 40px rgba(0, 0, 0, 0.08);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .pass-back {
   position: absolute;
   inset: 0;
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) translateZ(0);
+  -webkit-transform: rotateY(180deg) translateZ(0);
 }
 
 @keyframes pass-idle {
@@ -182,7 +199,8 @@ a {
   display: block;
   width: 100%;
   margin-top: 10px;
-  padding: 10px 16px;
+  min-height: 44px;
+  padding: 12px 16px;
   font-family: inherit;
   font-size: 12px;
   font-weight: 600;
@@ -525,28 +543,24 @@ a {
 }
 
 @media (hover: none) and (pointer: coarse) {
-  .pass-flip {
-    animation: none !important;
-    transform: none !important;
-  }
-
-  .pass-scene.is-tilted .pass-flip {
+  .pass-tilt-wrap {
+    animation: none;
     transform: none;
   }
 }
 
 @media (min-width: 720px) and (hover: hover) and (pointer: fine) {
-  .pass-flip {
+  .pass-tilt-wrap {
     animation: none;
     transform: rotateY(-6deg) rotateX(3deg);
   }
 
-  .pass-scene:hover .pass-flip,
-  .pass-scene.is-tilted .pass-flip {
+  .pass-scene:hover .pass-tilt-wrap,
+  .pass-scene.is-tilted .pass-tilt-wrap {
     animation: none;
   }
 
-  .pass-scene:hover .pass-flip:not(.is-flipped) {
+  .pass-scene:hover .pass-tilt-wrap:has(.pass-flip:not(.is-flipped)) {
     transform: rotateY(0deg) rotateX(0deg);
   }
 }
@@ -556,14 +570,12 @@ a {
     opacity: 1;
   }
 
-  .pass-flip,
-  .pass-inner {
-    animation: none !important;
-    transform: none !important;
-    transition: none;
+  .pass-tilt-wrap {
+    animation: none;
+    transform: none;
   }
 
-  .pass-flip-btn {
-    display: none;
+  .pass-inner {
+    transition: none;
   }
 }
