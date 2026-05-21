@@ -14,6 +14,7 @@
   var maxY = 12;
   var maxX = 10;
   var tapThreshold = 10;
+  var tapMaxMs = 300;
   var flipDurationMs = 550;
 
   var isFlipped = false;
@@ -23,6 +24,8 @@
   var startY = 0;
   var moved = false;
   var activePointerId = null;
+  var pressAt = 0;
+  var releaseHandled = false;
   var lastFlipAt = 0;
 
   function setTilt(x, y) {
@@ -81,16 +84,29 @@
     startX = clientX;
     startY = clientY;
     moved = false;
+    releaseHandled = false;
+    pressAt = Date.now();
     isTouching = true;
     activePointerId = pointerId;
     scene.classList.add("is-touching");
     tiltFromClient(clientX, clientY);
   }
 
+  function isTap() {
+    return !moved && Date.now() - pressAt <= tapMaxMs;
+  }
+
+  function shouldFlipOnRelease(pointerType) {
+    return (
+      isTap() &&
+      (pointerType === "touch" || pointerType === "pen" || coarsePointer)
+    );
+  }
+
   function onRelease(pointerType) {
-    if (!moved && (pointerType === "touch" || pointerType === "pen" || coarsePointer)) {
-      toggleFlip();
-    }
+    if (releaseHandled) return;
+    releaseHandled = true;
+    if (shouldFlipOnRelease(pointerType)) toggleFlip();
     resetTilt();
   }
 
@@ -98,14 +114,22 @@
     return el && el.closest && el.closest("a");
   }
 
+  function targetFromTouchEnd(e) {
+    var t = e.changedTouches && e.changedTouches[0];
+    if (!t) return e.target;
+    return document.elementFromPoint(t.clientX, t.clientY) || e.target;
+  }
+
   scene.addEventListener(
     "pointerdown",
     function (e) {
       if (e.button !== 0 || isLinkTarget(e.target)) return;
-      try {
-        scene.setPointerCapture(e.pointerId);
-      } catch (_err) {
-        /* ignore */
+      if (e.pointerType === "mouse" && !coarsePointer) {
+        try {
+          scene.setPointerCapture(e.pointerId);
+        } catch (_err) {
+          /* ignore */
+        }
       }
       onPress(e.clientX, e.clientY, e.pointerId);
     },
@@ -124,17 +148,31 @@
   );
 
   function endPointer(e) {
+    if (!isTouching) return;
     if (isLinkTarget(e.target)) {
+      releaseHandled = true;
       resetTilt();
       return;
     }
     if (activePointerId !== null && e.pointerId !== activePointerId) return;
-    try {
-      scene.releasePointerCapture(e.pointerId);
-    } catch (_err) {
-      /* ignore */
+    if (e.pointerType === "mouse" && !coarsePointer) {
+      try {
+        scene.releasePointerCapture(e.pointerId);
+      } catch (_err) {
+        /* ignore */
+      }
     }
     onRelease(e.pointerType);
+  }
+
+  function endTouch(e) {
+    if (!isTouching) return;
+    if (isLinkTarget(targetFromTouchEnd(e))) {
+      releaseHandled = true;
+      resetTilt();
+      return;
+    }
+    onRelease("touch");
   }
 
   scene.addEventListener("pointerup", endPointer);
@@ -156,10 +194,13 @@
     { passive: true }
   );
 
+  scene.addEventListener("touchend", endTouch, { passive: true });
+
   scene.addEventListener(
     "touchcancel",
     function () {
-      resetTilt();
+      if (!isTouching) return;
+      onRelease("touch");
     },
     { passive: true }
   );
