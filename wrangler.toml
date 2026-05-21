@@ -11,7 +11,7 @@
 #
 # CLI: npm run pages:deploy
 
-name = "humanity-llc"
+name = "humanityllc"
 compatibility_date = "2024-08-01"
 pages_build_output_dir = "site"
 
