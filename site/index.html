@@ -9,16 +9,16 @@
     <title>humanity.llc</title>
     <meta
       name="description"
-      content="humanity.llc is building member-governed trust infrastructure: signed cards, a live QR resolver, vouches, and revocation—no phone, no ID, no scan analytics."
+      content="humanity.llc is building member-governed trust infrastructure: signed cards, a live QR resolver, vouches, and revocation. No phone, no ID, no scan analytics."
     />
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=13" />
+    <link rel="stylesheet" href="/styles.css?v=14" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
-      content="Trust infrastructure you can inspect—starting with a revocable card and live resolver."
+      content="Trust infrastructure you can inspect, starting with a revocable card and live resolver."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://humanity.llc" />
@@ -38,7 +38,7 @@
           <p class="hero-eyebrow">Public launch · in development</p>
           <h1>Minimum trust.<br />Clear limits.</h1>
           <p class="hero-line">
-            A signed public card and live QR resolver—so scans show current status,
+            A signed public card and live QR resolver, so scans show current status,
             not a static profile. No phone. No ID. No ads. No tracking.
           </p>
         </section>
@@ -48,6 +48,7 @@
             <div class="pass-flip" id="pass-flip">
               <div class="pass-inner">
                 <div class="pass-face pass-front">
+                  <div class="pass-tilt-surface" id="pass-tilt-surface">
                   <div class="pass-head">
                     <div class="pass-brand">
                       <span class="pass-dot" aria-hidden="true"></span>
@@ -79,7 +80,7 @@
                     Scan shows current status. It does not prove the nearby person owns this
                     card.
                   </p>
-                  <p class="pass-tap-hint">Tap to flip</p>
+                  </div>
                 </div>
                 <div class="pass-face pass-back" aria-hidden="true">
                   <div class="pass-head">
@@ -100,6 +101,14 @@
                 </div>
               </div>
             </div>
+            <button
+              type="button"
+              class="pass-flip-btn"
+              id="pass-flip-btn"
+              aria-label="Flip card"
+            >
+              Tap to flip
+            </button>
           </div>
         </section>
 
@@ -115,10 +124,10 @@
         <section class="group" id="wedge">
           <h2 class="group-label">The wedge</h2>
           <div class="feature">
-            <p class="feature-lead">Objects point at a resolver—not a bio link.</p>
+            <p class="feature-lead">Objects point at a resolver, not a bio link.</p>
             <p class="feature-sub">
               Stickers and cards spread curiosity. The product is the scan: signed
-              card state, revocation, vouches, and optional live control—readable in
+              card state, revocation, vouches, and optional live control, readable in
               seconds, honest about limits.
             </p>
           </div>
@@ -134,7 +143,7 @@
             <li>
               <span class="list-title">Live resolver</span>
               <span class="list-sub"
-                >Every QR resolves to active, revoked, suspended, or unknown—not a 404</span
+                >Every QR resolves to active, revoked, suspended, or unknown, not a 404</span
               >
             </li>
             <li>
@@ -152,19 +161,19 @@
             <li>
               <span class="list-title">Vouch graph</span>
               <span class="list-sub"
-                >Accountable social attestations under published rules—not follower counts</span
+                >Accountable social attestations under published rules, not follower counts</span
               >
             </li>
             <li>
               <span class="list-title">Live control</span>
               <span class="list-sub"
-                >Optional proof you control the card key now—not legal ID</span
+                >Optional proof you control the card key now, not legal ID</span
               >
             </li>
             <li>
               <span class="list-title">Machine-readable status</span>
               <span class="list-sub"
-                >Apps and communities can check JSON status—not just a web page</span
+                >Apps and communities can check JSON status, not just a web page</span
               >
             </li>
           </ul>
@@ -177,7 +186,7 @@
             <li>
               <span class="list-title"><span class="phase">A</span> Resolver + card</span>
               <span class="list-sub"
-                >Create card, HTTPS scan page, vouch display, revocation—open when it works</span
+                >Create card, HTTPS scan page, vouch display, revocation, open when it works</span
               >
             </li>
             <li>
@@ -195,7 +204,7 @@
             <li>
               <span class="list-title"><span class="phase">D</span> Commons Pass</span>
               <span class="list-sub"
-                >Community membership passes, check-in, stamps—same resolver grammar</span
+                >Community membership passes, check-in, stamps, same resolver grammar</span
               >
             </li>
             <li>
@@ -210,14 +219,14 @@
         <section class="group" id="empire">
           <h2 class="group-label">Where this goes</h2>
           <p class="group-intro">
-            Long-term: trust infrastructure communities can govern—not another
+            Long-term: trust infrastructure communities can govern, not another
             surveillance identity platform.
           </p>
           <ul class="list">
             <li>
               <span class="list-title">Open standards</span>
               <span class="list-sub"
-                >Public card format, QR credentials, resolver API—portable across hosts</span
+                >Public card format, QR credentials, resolver API, portable across hosts</span
               >
             </li>
             <li>
@@ -235,7 +244,7 @@
             <li>
               <span class="list-title">Federated resolvers</span>
               <span class="list-sub"
-                >Multiple operators, one trust grammar—no single company owns identity</span
+                >Multiple operators, one trust grammar, no single company owns identity</span
               >
             </li>
           </ul>
@@ -265,7 +274,7 @@
             <li>
               <span class="list-title">Commerce path</span>
               <span class="list-sub"
-                >Shopify checkout + Printify fulfillment—only after resolver QA passes</span
+                >Shopify checkout + Printify fulfillment, only after resolver QA passes</span
               >
             </li>
           </ul>
@@ -292,7 +301,7 @@
             <li class="list-row list-action">
               <a href="/data-policy.html">
                 <span class="list-title">Operator data policy</span>
-                <span class="list-sub">What the resolver stores—and what it does not</span>
+                <span class="list-sub">What the resolver stores, and what it does not</span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </a>
             </li>
@@ -318,11 +327,11 @@
             </li>
             <li>
               <span class="list-title"><span class="status-dot wait"></span> Resolver + card</span>
-              <span class="list-sub">Phase A—in active development</span>
+              <span class="list-sub">Phase A, in active development</span>
             </li>
             <li>
               <span class="list-title"><span class="status-dot wait"></span> Create a card</span>
-              <span class="list-sub">Opens to anyone—no invite list</span>
+              <span class="list-sub">Opens to anyone, no invite list</span>
             </li>
             <li>
               <span class="list-title"><span class="status-dot wait"></span> Sticker drop</span>

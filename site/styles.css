@@ -174,14 +174,32 @@ a {
   }
 }
 
-.pass-tap-hint {
-  margin-top: 8px;
-  font-size: 10px;
+.pass-tilt-surface {
+  width: 100%;
+}
+
+.pass-flip-btn {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--grey);
   text-align: center;
+  background: transparent;
+  border: 1px dashed var(--grey);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pass-flip-btn:active {
+  opacity: 0.7;
 }
 
 .pass-back-list {
@@ -545,7 +563,7 @@ a {
     transition: none;
   }
 
-  .pass-tap-hint {
+  .pass-flip-btn {
     display: none;
   }
 }

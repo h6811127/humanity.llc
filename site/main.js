@@ -1,7 +1,18 @@
 (function () {
+  /**
+   * Card interaction (cross-browser):
+   * - Flip: only #pass-flip-btn click (native button; iOS Safari, Chrome Android,
+   *   Firefox mobile, Samsung Internet, desktop). Do not flip on pointerup/touchend.
+   * - Tilt: drag on #pass-tilt-surface while front is visible; pointer + touchmove.
+   * - Links inside tilt surface do not start tilt; back-face links are outside tilt.
+   * Manual test: tap "Tap to flip" flips; drag card face tilts; double-tap button
+   * respects flip cooldown; back-face policy link opens without flipping.
+   */
   var scene = document.getElementById("pass-scene");
   var flip = document.getElementById("pass-flip");
-  if (!scene || !flip) return;
+  var flipBtn = document.getElementById("pass-flip-btn");
+  var tiltSurface = document.getElementById("pass-tilt-surface");
+  if (!scene || !flip || !flipBtn || !tiltSurface) return;
 
   var inner = flip.querySelector(".pass-inner");
   var front = flip.querySelector(".pass-front");
@@ -13,19 +24,12 @@
 
   var maxY = 12;
   var maxX = 10;
-  var tapThreshold = 10;
-  var tapMaxMs = 300;
   var flipDurationMs = 550;
 
   var isFlipped = false;
-  var isTouching = false;
+  var isDragging = false;
   var tiltEnabled = true;
-  var startX = 0;
-  var startY = 0;
-  var moved = false;
   var activePointerId = null;
-  var pressAt = 0;
-  var releaseHandled = false;
   var lastFlipAt = 0;
 
   function setTilt(x, y) {
@@ -38,7 +42,7 @@
   function resetTilt() {
     scene.classList.remove("is-tilted");
     scene.classList.remove("is-touching");
-    isTouching = false;
+    isDragging = false;
     activePointerId = null;
     if (!isFlipped) {
       flip.style.transform = coarsePointer || reduceMotion ? "none" : "";
@@ -52,18 +56,13 @@
     setTilt(x, y);
   }
 
-  function noteMove(clientX, clientY) {
-    if (Math.abs(clientX - startX) > tapThreshold || Math.abs(clientY - startY) > tapThreshold) {
-      moved = true;
-    }
-  }
-
   function toggleFlip() {
     if (reduceMotion) return;
     var now = Date.now();
     if (now - lastFlipAt < flipDurationMs) return;
     lastFlipAt = now;
 
+    resetTilt();
     flip.classList.add("is-flipping");
     tiltEnabled = false;
     flip.style.transform = "";
@@ -72,6 +71,7 @@
     flip.classList.toggle("is-flipped", isFlipped);
     front.setAttribute("aria-hidden", isFlipped ? "true" : "false");
     back.setAttribute("aria-hidden", isFlipped ? "false" : "true");
+    flipBtn.textContent = isFlipped ? "Tap to show front" : "Tap to flip";
 
     window.setTimeout(function () {
       flip.classList.remove("is-flipping");
@@ -79,135 +79,101 @@
     }, flipDurationMs);
   }
 
-  function onPress(clientX, clientY, pointerId) {
-    if (flip.classList.contains("is-flipping")) return;
-    startX = clientX;
-    startY = clientY;
-    moved = false;
-    releaseHandled = false;
-    pressAt = Date.now();
-    isTouching = true;
+  function isLinkTarget(el) {
+    return el && el.closest && el.closest("a");
+  }
+
+  function onTiltPress(clientX, clientY, pointerId) {
+    if (isFlipped || flip.classList.contains("is-flipping")) return;
+    isDragging = true;
     activePointerId = pointerId;
     scene.classList.add("is-touching");
     tiltFromClient(clientX, clientY);
   }
 
-  function isTap() {
-    return !moved && Date.now() - pressAt <= tapMaxMs;
+  function onTiltMove(clientX, clientY) {
+    if (!isDragging) return;
+    tiltFromClient(clientX, clientY);
   }
 
-  function shouldFlipOnRelease(pointerType) {
-    return (
-      isTap() &&
-      (pointerType === "touch" || pointerType === "pen" || coarsePointer)
-    );
-  }
-
-  function onRelease(pointerType) {
-    if (releaseHandled) return;
-    releaseHandled = true;
-    if (shouldFlipOnRelease(pointerType)) toggleFlip();
+  function onTiltRelease() {
+    if (!isDragging) return;
     resetTilt();
   }
 
-  function isLinkTarget(el) {
-    return el && el.closest && el.closest("a");
-  }
+  flipBtn.addEventListener("click", function () {
+    toggleFlip();
+  });
 
-  function targetFromTouchEnd(e) {
-    var t = e.changedTouches && e.changedTouches[0];
-    if (!t) return e.target;
-    return document.elementFromPoint(t.clientX, t.clientY) || e.target;
-  }
-
-  scene.addEventListener(
+  tiltSurface.addEventListener(
     "pointerdown",
     function (e) {
       if (e.button !== 0 || isLinkTarget(e.target)) return;
       if (e.pointerType === "mouse" && !coarsePointer) {
         try {
-          scene.setPointerCapture(e.pointerId);
+          tiltSurface.setPointerCapture(e.pointerId);
         } catch (_err) {
           /* ignore */
         }
       }
-      onPress(e.clientX, e.clientY, e.pointerId);
+      onTiltPress(e.clientX, e.clientY, e.pointerId);
     },
     { passive: true }
   );
 
-  scene.addEventListener(
+  tiltSurface.addEventListener(
     "pointermove",
     function (e) {
+      if (!isDragging) return;
       if (activePointerId !== null && e.pointerId !== activePointerId) return;
-      if (!isTouching && e.pointerType !== "mouse") return;
-      noteMove(e.clientX, e.clientY);
-      tiltFromClient(e.clientX, e.clientY);
+      onTiltMove(e.clientX, e.clientY);
     },
     { passive: true }
   );
 
   function endPointer(e) {
-    if (!isTouching) return;
-    if (isLinkTarget(e.target)) {
-      releaseHandled = true;
-      resetTilt();
-      return;
-    }
+    if (!isDragging) return;
     if (activePointerId !== null && e.pointerId !== activePointerId) return;
     if (e.pointerType === "mouse" && !coarsePointer) {
       try {
-        scene.releasePointerCapture(e.pointerId);
+        tiltSurface.releasePointerCapture(e.pointerId);
       } catch (_err) {
         /* ignore */
       }
     }
-    onRelease(e.pointerType);
+    onTiltRelease();
   }
 
-  function endTouch(e) {
-    if (!isTouching) return;
-    if (isLinkTarget(targetFromTouchEnd(e))) {
-      releaseHandled = true;
-      resetTilt();
-      return;
-    }
-    onRelease("touch");
-  }
+  tiltSurface.addEventListener("pointerup", endPointer);
+  tiltSurface.addEventListener("pointercancel", endPointer);
 
-  scene.addEventListener("pointerup", endPointer);
-  scene.addEventListener("pointercancel", endPointer);
-
-  scene.addEventListener("pointerleave", function (e) {
-    if (e.pointerType === "mouse" && !isTouching) resetTilt();
+  tiltSurface.addEventListener("pointerleave", function (e) {
+    if (e.pointerType === "mouse" && isDragging) onTiltRelease();
   });
 
-  /* iOS backup: pointermove may not fire until capture; touchmove supplements tilt only */
-  scene.addEventListener(
+  tiltSurface.addEventListener(
     "touchmove",
     function (e) {
-      if (!isTouching || e.touches.length !== 1) return;
+      if (!isDragging || e.touches.length !== 1) return;
       var t = e.touches[0];
-      noteMove(t.clientX, t.clientY);
-      tiltFromClient(t.clientX, t.clientY);
+      onTiltMove(t.clientX, t.clientY);
     },
     { passive: true }
   );
 
-  scene.addEventListener("touchend", endTouch, { passive: true });
+  tiltSurface.addEventListener(
+    "touchend",
+    function () {
+      onTiltRelease();
+    },
+    { passive: true }
+  );
 
-  scene.addEventListener(
+  tiltSurface.addEventListener(
     "touchcancel",
     function () {
-      if (!isTouching) return;
-      onRelease("touch");
+      onTiltRelease();
     },
     { passive: true }
   );
-
-  /* Fine-pointer desktop: click without drag flips */
-  scene.addEventListener("click", function (e) {
-    if (coarsePointer || reduceMotion || isLinkTarget(e.target)) return;
-    if (!moved) toggleFlip();
-  });
 })();
