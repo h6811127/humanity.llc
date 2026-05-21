@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#000000" />
     <meta name="color-scheme" content="dark" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=3" />
+    <link rel="stylesheet" href="/styles.css?v=4" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -25,218 +25,109 @@
     <meta property="og:image" content="https://humanity.llc/assets/red_qr_transparent_bg.png" />
   </head>
   <body>
-    <div class="shell">
-      <header class="menubar">
-        <div class="menubar-left">
-          <img
-            class="menubar-mark"
-            src="/assets/red_qr_transparent_bg.png"
-            width="18"
-            height="18"
-            alt=""
-          />
-          <span class="menubar-title">humanity.llc</span>
+    <div class="device">
+      <header class="status-bar">
+        <time class="status-time" id="clock"></time>
+        <div class="island">
+          <img src="/assets/red_qr_transparent_bg.png" width="14" height="14" alt="" />
+          <span>humanity.llc</span>
         </div>
-        <nav class="menubar-menu" aria-label="Menu">
-          <a href="#card">card</a>
-          <a href="#how">how</a>
-          <a href="#trust">trust</a>
-          <a href="#founding">founding</a>
-          <a href="mailto:info@humanity.llc">mail</a>
-        </nav>
-        <time class="menubar-clock" id="clock" aria-hidden="true"></time>
+        <div class="status-icons" aria-hidden="true">
+          <span class="sig"></span>
+          <span class="bat"></span>
+        </div>
       </header>
 
-      <main class="desktop">
-        <section class="boot" aria-label="Introduction">
-          <p class="boot-line"><span class="prompt">›</span> signed card · live qr · revocable</p>
-          <h1 class="boot-head">a public card for real humans</h1>
-          <p class="boot-sub">
-            prove enough without phone, government id, ads, or scan analytics.
-          </p>
+      <main class="screen">
+        <section class="hero">
+          <h1>Real humans.<br />Real trust.</h1>
+          <p class="hero-line">No phone. No ID. No ads. No tracking.</p>
         </section>
 
-        <section class="window" id="card" aria-labelledby="win-card-title">
-          <div class="win-chrome">
-            <div class="win-controls" aria-hidden="true">
-              <span class="ctl ctl-close"></span>
-              <span class="ctl ctl-min"></span>
-              <span class="ctl ctl-max"></span>
+        <section class="pass" id="card" aria-label="Card preview">
+          <div class="pass-inner">
+            <div class="pass-head">
+              <div class="pass-brand">
+                <span class="pass-dot" aria-hidden="true"></span>
+                <span>humanity.llc</span>
+              </div>
+              <span class="pass-badge">Active</span>
             </div>
-            <span class="win-title" id="win-card-title">card.scan — river.founding</span>
-          </div>
-          <div class="win-body card-panel">
-            <dl class="card-status">
-              <div class="row">
-                <dt>card</dt>
-                <dd><span class="tag tag-on">active</span></dd>
-              </div>
-              <div class="row">
-                <dt>vouch</dt>
-                <dd><span class="tag tag-on">human</span></dd>
-              </div>
-              <div class="row">
-                <dt>control</dt>
-                <dd><span class="tag">proven</span></dd>
-              </div>
-              <div class="row">
-                <dt>qr</dt>
-                <dd><span class="tag">active</span></dd>
-              </div>
-            </dl>
-            <div class="card-qr">
+            <p class="pass-name">river.founding</p>
+            <div class="pass-qr">
               <img
                 src="/assets/red_qr_transparent_bg.png"
-                width="160"
-                height="160"
-                alt="QR resolves to current card status"
+                width="148"
+                height="148"
+                alt="QR code"
               />
             </div>
-            <p class="card-warn">
-              static qr does not prove the holder owns this card.
-            </p>
+            <div class="pass-signals">
+              <span class="signal signal-on">Vouched</span>
+              <span class="signal">Control</span>
+              <span class="signal">QR live</span>
+            </div>
+            <p class="pass-foot">Scan shows status — not who is holding it.</p>
           </div>
         </section>
 
-        <section class="window window-narrow" aria-labelledby="win-sys-title">
-          <div class="win-chrome">
-            <div class="win-controls" aria-hidden="true">
-              <span class="ctl ctl-close"></span>
-              <span class="ctl ctl-min"></span>
-              <span class="ctl ctl-max"></span>
-            </div>
-            <span class="win-title" id="win-sys-title">system.manifest</span>
-          </div>
-          <div class="win-body">
-            <ul class="manifest">
-              <li><span class="mark">■</span> no phone</li>
-              <li><span class="mark">■</span> no id</li>
-              <li><span class="mark">■</span> no ads</li>
-              <li><span class="mark">■</span> no tracking</li>
-            </ul>
-            <p class="manifest-note">
-              not legal id · not kyc · not pay-to-verify
-            </p>
-            <p class="actions">
-              <a class="cmd cmd-primary" href="mailto:info@humanity.llc?subject=Founding%20cohort"
-                >request founding access</a
-              >
-              <a class="cmd" href="#how">read how</a>
-            </p>
-          </div>
+        <nav class="dock" aria-label="Quick actions">
+          <a class="dock-btn dock-btn-primary" href="mailto:info@humanity.llc?subject=Founding%20cohort"
+            >Join founding</a
+          >
+          <a class="dock-btn" href="#about">About</a>
+        </nav>
+
+        <section class="group" id="about">
+          <h2 class="group-label">How</h2>
+          <ul class="list">
+            <li>
+              <span class="list-title">Create</span>
+              <span class="list-sub">Signed card on your device</span>
+            </li>
+            <li>
+              <span class="list-title">Vouch</span>
+              <span class="list-sub">Trust from real people</span>
+            </li>
+            <li>
+              <span class="list-title">Scan</span>
+              <span class="list-sub">Live status every time</span>
+            </li>
+          </ul>
         </section>
 
-        <section class="window" id="how" aria-labelledby="win-how-title">
-          <div class="win-chrome">
-            <div class="win-controls" aria-hidden="true">
-              <span class="ctl ctl-close"></span>
-              <span class="ctl ctl-min"></span>
-              <span class="ctl ctl-max"></span>
-            </div>
-            <span class="win-title" id="win-how-title">how.txt</span>
-          </div>
-          <div class="win-body prose">
-            <p>
-              a qr profile points to content. a humanity card is signed, revocable, and
-              resolves to current status on scan.
-            </p>
-            <ol class="steps">
-              <li>
-                <span class="step-id">01</span>
-                <strong>create</strong> — keys on your device. export. revoke.
-              </li>
-              <li>
-                <span class="step-id">02</span>
-                <strong>vouch</strong> — accountable humans under published rules.
-              </li>
-              <li>
-                <span class="step-id">03</span>
-                <strong>scan</strong> — live status: active, revoked, suspended, unknown.
-              </li>
-            </ol>
-          </div>
+        <section class="group">
+          <h2 class="group-label">Limits</h2>
+          <ul class="list">
+            <li class="list-row">
+              <span class="list-title">Not legal ID or KYC</span>
+            </li>
+            <li class="list-row">
+              <span class="list-title">Revocable by you</span>
+            </li>
+          </ul>
         </section>
 
-        <section class="window window-split" id="trust" aria-labelledby="win-trust-title">
-          <div class="win-chrome">
-            <div class="win-controls" aria-hidden="true">
-              <span class="ctl ctl-close"></span>
-              <span class="ctl ctl-min"></span>
-              <span class="ctl ctl-max"></span>
-            </div>
-            <span class="win-title" id="win-trust-title">trust.limits</span>
-          </div>
-          <div class="win-body split">
-            <div>
-              <h2 class="pane-label">proves</h2>
-              <ul class="lines">
-                <li>signed public card</li>
-                <li>current qr status</li>
-                <li>vouched human (rules)</li>
-                <li>live control (when shown)</li>
-                <li>revocation visible</li>
-              </ul>
-            </div>
-            <div>
-              <h2 class="pane-label">does not</h2>
-              <ul class="lines lines-dim">
-                <li>legal identity / kyc</li>
-                <li>holder = owner</li>
-                <li>bot-proof humanity</li>
-                <li>scan analytics</li>
-                <li>platform-owned id</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <section class="window window-narrow" aria-labelledby="win-build-title">
-          <div class="win-chrome">
-            <div class="win-controls" aria-hidden="true">
-              <span class="ctl ctl-close"></span>
-              <span class="ctl ctl-min"></span>
-              <span class="ctl ctl-max"></span>
-            </div>
-            <span class="win-title" id="win-build-title">build.log</span>
-          </div>
-          <div class="win-body log">
-            <p><span class="log-on">●</span> humanity.llc — online</p>
-            <p><span class="log-wait">○</span> card + resolver — building</p>
-            <p><span class="log-off">○</span> founding sticker — queued</p>
-          </div>
-        </section>
-
-        <section class="window" id="founding" aria-labelledby="win-found-title">
-          <div class="win-chrome">
-            <div class="win-controls" aria-hidden="true">
-              <span class="ctl ctl-close"></span>
-              <span class="ctl ctl-min"></span>
-              <span class="ctl ctl-max"></span>
-            </div>
-            <span class="win-title" id="win-found-title">founding.cohort</span>
-          </div>
-          <div class="win-body prose">
-            <p>
-              small group to create cards, scan, vouch, test live control, and catch confusing
-              copy before launch.
-            </p>
-            <p class="actions">
-              <a class="cmd cmd-primary" href="mailto:info@humanity.llc?subject=Founding%20cohort"
-                >apply</a
-              >
-              <a class="cmd" href="mailto:info@humanity.llc?subject=Founding%20sticker"
-                >sticker drop</a
-              >
-            </p>
-          </div>
+        <section class="group" id="founding">
+          <h2 class="group-label">Now</h2>
+          <ul class="list">
+            <li class="list-row list-action">
+              <a href="mailto:info@humanity.llc?subject=Founding%20cohort">
+                <span class="list-title">Founding cohort</span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="mailto:info@humanity.llc">
+                <span class="list-title">info@humanity.llc</span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
         </section>
       </main>
 
-      <footer class="taskbar">
-        <span class="taskbar-item taskbar-active">humanity.llc</span>
-        <span class="taskbar-item">no phone · no id · no ads · no tracking</span>
-        <a class="taskbar-item taskbar-mail" href="mailto:info@humanity.llc">info@humanity.llc</a>
-      </footer>
+      <footer class="home-indicator" aria-hidden="true"></footer>
     </div>
 
     <script>
@@ -244,8 +135,10 @@
         var el = document.getElementById("clock");
         if (!el) return;
         function tick() {
-          var d = new Date();
-          el.textContent = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+          el.textContent = new Date().toLocaleTimeString([], {
+            hour: "numeric",
+            minute: "2-digit",
+          });
         }
         tick();
         setInterval(tick, 30000);
