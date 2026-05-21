@@ -3,266 +3,132 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Humanity Commons — scan the sticker, see the experiment</title>
+    <title>humanity.llc</title>
     <meta
       name="description"
-      content="A signed, revocable trust card and founding sticker — honest about what it proves. No phone. No ID. No scan analytics."
+      content="A signed, revocable card on a sticker. Scan for live status—no phone, no ID, no scan analytics."
     />
-    <meta name="theme-color" content="#DB1B43" />
+    <meta name="theme-color" content="#0c0c0c" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles.css" />
-    <meta property="og:title" content="Humanity Commons" />
+    <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
-      content="Walking ads for honest trust — live status, no surveillance, no verification in the mail."
+      content="Signed public card on a sticker. Scan for current status."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://humanity.llc" />
+    <meta property="og:image" content="https://humanity.llc/assets/red_qr_transparent_bg.png" />
   </head>
   <body>
-    <header class="site-header">
-      <div class="wrap">
-        <a class="logo" href="/">
-          <span class="logo-mark" aria-hidden="true">H</span>
-          Humanity Commons
-        </a>
-        <a class="nav-cta" href="#drop">Join the drop</a>
-      </div>
+    <header class="header">
+      <a class="brand" href="/">
+        <img
+          class="brand-qr"
+          src="/assets/red_qr_transparent_bg.png"
+          width="36"
+          height="36"
+          alt=""
+        />
+        <span class="brand-name">humanity.llc</span>
+      </a>
+      <a class="header-link" href="mailto:info@humanity.llc">info@humanity.llc</a>
     </header>
 
     <main>
       <section class="hero">
-        <div class="wrap hero-grid">
+        <div class="hero-visual">
+          <img
+            class="hero-qr"
+            src="/assets/red_qr_transparent_bg.png"
+            width="280"
+            height="280"
+            alt="QR code for humanity.llc"
+          />
+        </div>
+        <div class="hero-copy">
+          <p class="kicker">Signed card · live QR · revocable</p>
+          <h1>Scan it.<br />Read the limits.<br />Decide.</h1>
+          <p class="lede">
+            We’re building a public card you control—on a sticker, in your browser,
+            without phone numbers, government ID, or scan analytics. The QR is the
+            door; current status is the point.
+          </p>
+          <div class="actions">
+            <a class="btn" href="mailto:info@humanity.llc?subject=Founding%20sticker">Sticker drop</a>
+            <a class="btn btn-quiet" href="mailto:info@humanity.llc?subject=Early%20access">Early access</a>
+          </div>
+          <p class="fine">
+            Buying merch never vouches you. A sticker does not prove who is holding it.
+          </p>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="status-heading">
+        <h2 id="status-heading">What exists right now</h2>
+        <ul class="status-list">
+          <li>
+            <span class="dot dot-live" aria-hidden="true"></span>
+            <div>
+              <strong>This site</strong>
+              <span>humanity.llc — what we’re building and how to reach us.</span>
+            </div>
+          </li>
+          <li>
+            <span class="dot dot-build" aria-hidden="true"></span>
+            <div>
+              <strong>Card + resolver</strong>
+              <span>In build: signed card, HTTPS QR, revocation, honest scan page.</span>
+            </div>
+          </li>
+          <li>
+            <span class="dot dot-next" aria-hidden="true"></span>
+            <div>
+              <strong>Founding sticker</strong>
+              <span>Next: one physical SKU, one story—walking QR, not verification in the mail.</span>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <section class="panel panel-grid" aria-labelledby="principles-heading">
+        <h2 id="principles-heading">Principles</h2>
+        <dl class="principles">
           <div>
-            <span class="eyebrow">Founding drop · Tier 0</span>
-            <h1>Scan the sticker.<br />See the experiment.</h1>
-            <p class="hero-lead">
-              A physical QR that resolves to a live, signed Humanity Card — honest
-              about what it proves and what it doesn't.
-            </p>
-            <div class="chips" role="list">
-              <span class="chip" role="listitem">No phone</span>
-              <span class="chip" role="listitem">No ID</span>
-              <span class="chip" role="listitem">No ads</span>
-              <span class="chip" role="listitem">No scan analytics</span>
-            </div>
-            <div class="hero-actions">
-              <a class="btn btn-primary" href="#drop">Get the founding sticker</a>
-              <a class="btn btn-secondary" href="#create">Create a free card</a>
-            </div>
-            <p class="hero-note">
-              <strong>Buying a sticker does not verify you.</strong> Status comes
-              from signed cards and real vouches — not checkout.
-            </p>
+            <dt>No surveillance default</dt>
+            <dd>Public QR flows don’t ship scan analytics.</dd>
           </div>
-
-          <aside class="card-preview" aria-label="Example scan result">
-            <div class="card-preview-header">
-              <span>Scan result · example</span>
-              <strong>@founding.human</strong>
-            </div>
-            <div class="status-row">
-              <span class="status-pill active">Card active</span>
-              <span class="status-pill neutral">Registered</span>
-              <span class="status-pill neutral">Scan analytics off</span>
-            </div>
-            <div class="qr-block">
-              <div class="qr-placeholder" role="img" aria-label="QR code placeholder"></div>
-            </div>
-            <p class="card-warning">
-              This QR resolves to a Humanity Card. It does <em>not</em> prove the
-              person holding this item owns the card. Always scan for current status.
-            </p>
-          </aside>
-        </div>
+          <div>
+            <dt>Mechanism over hype</dt>
+            <dd>Labels say how trust was earned—not “verified forever.”</dd>
+          </div>
+          <div>
+            <dt>Portable & revocable</dt>
+            <dd>You export; you revoke; status stays current on scan.</dd>
+          </div>
+          <div>
+            <dt>Not legal ID</dt>
+            <dd>No KYC, no government ID, no pay-to-be-real.</dd>
+          </div>
+        </dl>
       </section>
 
-      <section id="how">
-        <div class="wrap">
-          <p class="section-label">How it works</p>
-          <h2>Curiosity first. Belonging when you earn it.</h2>
-          <p class="section-intro">
-            The sticker is a walking advertisement. The scan is the product — a
-            trust object you can inspect, not a platform profile.
-          </p>
-          <div class="steps">
-            <article class="step">
-              <p class="step-num">01</p>
-              <h3>See the object</h3>
-              <p>
-                A founding sticker on a laptop, bottle, or bag. Someone scans out
-                of curiosity.
-              </p>
-            </article>
-            <article class="step">
-              <p class="step-num">02</p>
-              <h3>Read the limits</h3>
-              <p>
-                Live card status, plain warnings, and what the scan does
-                <em>not</em> prove — before anyone asks you to trust them.
-              </p>
-            </article>
-            <article class="step">
-              <p class="step-num">03</p>
-              <h3>Join the graph</h3>
-              <p>
-                Create a card, join the founding cohort, and vouch only when it's
-                true. Merch points at trust; it doesn't buy it.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section id="proof">
-        <div class="wrap">
-          <p class="section-label">Two proofs</p>
-          <h2>Spread and depth, same brand</h2>
-          <p class="section-intro">
-            Tier 0 fills the funnel. Tier 1 makes it mean something beyond swag.
-          </p>
-          <div class="dual-proof">
-            <article class="proof-card">
-              <p class="tag">Tier 0 · Curiosity</p>
-              <h3>Proof of curiosity</h3>
-              <p>
-                Open founding sticker. Strangers scan, create a card, or join the
-                waitlist. No vouch implied on the vinyl.
-              </p>
-            </article>
-            <article class="proof-card">
-              <p class="tag">Tier 1 · Belonging</p>
-              <h3>Proof of belonging</h3>
-              <p>
-                Closed founding cohort. Vouches under public rules. Wear the QR
-                because your people can stand behind it.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section id="limits">
-        <div class="wrap">
-          <div class="limits-box">
-            <p class="section-label" style="color: #f5a0b0">What we do not claim</p>
-            <h2>Honest trust, not hype identity</h2>
-            <ul>
-              <li>Legal identity, KYC, or age verification</li>
-              <li>Proof that whoever wears the sticker owns the card</li>
-              <li>Verification because you bought merch</li>
-              <li>Bot-proof or fraud-proof humanity</li>
-              <li>A social network, follower graph, or hidden trust score</li>
-              <li>Scan analytics on public QR flows</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section id="faq">
-        <div class="wrap">
-          <p class="section-label">FAQ</p>
-          <h2>Questions we want you to ask</h2>
-          <div class="faq-list">
-            <details class="faq-item">
-              <summary>Isn't this just a QR profile?</summary>
-              <p>
-                A profile points at content. A Humanity Card is signed, revocable,
-                vouched where shown, and designed for live control proof when needed.
-                The QR is the doorway; the trust loop is the product.
-              </p>
-            </details>
-            <details class="faq-item">
-              <summary>Does buying the sticker make me verified?</summary>
-              <p>
-                No. Checkout funds the experiment and ships a pointer. Vouches come
-                from real people under published rules — never from a cart.
-              </p>
-            </details>
-            <details class="faq-item">
-              <summary>What if someone steals my sticker?</summary>
-              <p>
-                A sticker is not identity proof. Revoke that item's QR credential;
-                sibling credentials can stay active. Future scans show revoked status.
-              </p>
-            </details>
-            <details class="faq-item">
-              <summary>What does live control proof mean?</summary>
-              <p>
-                Recent evidence that the nearby person controls the card key — not
-                legal ID, not human uniqueness, not because they bought something.
-              </p>
-            </details>
-            <details class="faq-item">
-              <summary>Is this a crypto or government ID project?</summary>
-              <p>
-                Neither. No token. No government ID collection in v1. Founder-built
-                today, designed to become member-governed if the trust loop works.
-              </p>
-            </details>
-          </div>
-        </div>
-      </section>
-
-      <section class="cta-band" id="drop">
-        <div class="wrap">
-          <p class="section-label">Founding drop</p>
-          <h2>Walking ads for honest trust</h2>
-          <p>
-            Tier 0 opens first — one sticker, one story. Tier 1 belonging opens for
-            the founding cohort after the digital trust slice is real.
-          </p>
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="mailto:info@humanity.llc?subject=Founding%20sticker%20drop"
-              >Notify me at launch</a
-            >
-            <a class="btn btn-secondary" href="#create">Create a card</a>
-          </div>
-        </div>
-      </section>
-
-      <section id="create">
-        <div class="wrap" style="text-align: center; padding-bottom: 2rem">
-          <p class="section-label">Card creation</p>
-          <h2 style="max-width: none; margin-inline: auto">Create a Humanity Card</h2>
-          <p class="section-intro" style="margin-inline: auto">
-            Card creation is rolling out with the founding cohort. Get on the list
-            and we'll send the first invite wave.
-          </p>
-          <a
-            class="btn btn-primary"
-            href="mailto:info@humanity.llc?subject=Create%20a%20Humanity%20Card"
-            >Request early access</a
-          >
-        </div>
+      <section class="panel panel-closing">
+        <p class="closing-line">
+          Questions, pilots, or founding cohort —
+          <a href="mailto:info@humanity.llc">info@humanity.llc</a>
+        </p>
       </section>
     </main>
 
-    <footer class="site-footer">
-      <div class="wrap footer-grid">
-        <div>
-          <a class="logo" href="/" style="margin-bottom: 0.5rem">
-            <span class="logo-mark" aria-hidden="true">H</span>
-            Humanity Commons
-          </a>
-          <p style="margin-top: 0.5rem">
-            Founder-built · member-governed by design
-          </p>
-        </div>
-        <nav class="footer-links" aria-label="Footer">
-          <a href="mailto:info@humanity.llc">info@humanity.llc</a>
-          <a href="https://github.com" rel="noopener noreferrer">Docs (soon)</a>
-        </nav>
-      </div>
-      <p class="wrap" style="margin-top: 2rem; font-size: 0.8rem">
-        © <span id="y"></span> Humanity Commons LLC. Not legal identity. Not KYC. Not
-        a social network.
-      </p>
+    <footer class="footer">
+      <span>© <span id="y"></span> humanity.llc</span>
     </footer>
 
     <script>
