@@ -1,0 +1,21 @@
+# Humanity Commons reference resolver (hc/v1)
+# Local: npm run worker:dev  →  http://127.0.0.1:8787/.well-known/hc/v1/health
+#
+# Production routes attach this Worker to humanity.llc for API paths.
+# Static marketing site stays on Cloudflare Pages (../site).
+
+name = "humanity-llc-resolver"
+main = "src/index.ts"
+compatibility_date = "2024-08-01"
+
+[dev]
+port = 8787
+
+# Uncomment and set zone_id after first deploy (step 1.4).
+# [[routes]]
+# pattern = "humanity.llc/.well-known/hc/v1/*"
+# zone_name = "humanity.llc"
+#
+# [[routes]]
+# pattern = "humanity.llc/c/*"
+# zone_name = "humanity.llc"
