@@ -136,7 +136,7 @@ These are not engineering tasks. They are short owner decisions needed to preven
 
 ### D-007: Separate Product, Trust, And Movement Layers
 
-**Recommendation:** Keep the scan/card UI practical and fast. Put movement narrative, launch language, skeptic answers, and governance depth in supporting pages and founding cohort rituals.
+**Recommendation:** Keep the scan/card UI practical and fast. Put movement narrative, launch language, skeptic answers, and governance depth in supporting pages—not on the scan surface. See `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
 
 **Decision needed:**
 
@@ -516,7 +516,7 @@ Goal: complete one real paid order path safely.
 
 ## Phase 7: Launch Hardening
 
-Goal: make the vertical slice credible for a founding cohort.
+Goal: make the vertical slice credible for public launch.
 
 ### H-001: Security Review Checklist
 

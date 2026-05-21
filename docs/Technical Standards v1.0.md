@@ -29,6 +29,8 @@ It covers:
 
 Any resolver, client, scanner, Printify Fulfillment Middleware, or verification service claiming Humanity Commons v1.0 compatibility MUST conform to this standard.
 
+**Federation:** Multiple operators MAY implement this standard. See §9.6–9.7 and `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
+
 ---
 
 ## 2. Terminology
@@ -548,6 +550,59 @@ Resolvers MUST implement proper HTTP Accept parsing instead of substring-only ma
 | 422 | Semantically invalid signed payload. |
 | 429 | Rate limited. |
 | 500 | Resolver error. |
+
+### 9.6 Federated Operators
+
+Humanity Commons v1.0 is designed for **multiple resolver operators** implementing the same API. humanity.llc MAY run the reference operator; it MUST NOT be the only compatible implementation in the long-term architecture.
+
+#### 9.6.1 Operator identity
+
+Resolver HTTP responses SHOULD include:
+
+| Header | Description |
+|---|---|
+| `X-Resolver-Operator` | Stable operator identifier (e.g. `humanity.llc`, `union.example.org`). |
+| `X-Resolver-Version` | Protocol version (`1.0`). |
+
+JSON responses MAY include equivalent fields in a `resolver` object.
+
+#### 9.6.2 Operator requirements
+
+Operators claiming `/.well-known/hc/v1/` compatibility MUST:
+
+- Implement required endpoints in §9.1.
+- Publish operator name, abuse/legal process summary, and **data retention policy** (see `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` §5).
+- Default to **no scan analytics** unless a governance-approved consent model exists.
+- Never require government ID, phone, or email for card creation in the reference profile.
+- Keep commerce PII out of resolver storage.
+
+#### 9.6.3 Reference operator
+
+The humanity.llc reference operator is the default target for printed HTTPS fallback URLs in v1.0:
+
+```text
+https://humanity.llc/c/{profile_id}?q={qr_id}
+```
+
+Clients SHOULD support configurable resolver base URLs for portability and second-operator federation.
+
+#### 9.6.4 Cross-operator behavior (v1.0)
+
+v1.0 does NOT require automatic cross-operator vouch sync. Export bundles and documented card formats are the portability mechanism until federation sync is specified in a later version.
+
+### 9.7 Resolver Data Minimization
+
+Reference-operator normative limits (all operators SHOULD align):
+
+| Category | Policy |
+|---|---|
+| Card creation | No legal ID, phone, or email required. |
+| Private keys | MUST NOT be stored. |
+| Scan analytics | MUST NOT be collected by default. |
+| Access logs | MUST NOT exist by default; if enabled, requires published governance policy and retention cap. |
+| Commerce PII | MUST NOT be stored in resolver tables. |
+
+Suspension records MAY include public notice fields required for appeals.
 
 ---
 

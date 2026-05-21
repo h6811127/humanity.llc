@@ -3,6 +3,8 @@
 **Status:** Pre-build product contract  
 **Purpose:** Define what the v1 trust loop proves, what it does not prove, and how the product must explain those boundaries.
 
+**Resolver role and federation:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — the resolver serves signed public state; it is not legal identity infrastructure and should not collect scan analytics by default.
+
 ---
 
 ## V1 Product Promise

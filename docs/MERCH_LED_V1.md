@@ -3,6 +3,8 @@
 **Status:** Canonical wedge (v1 GTM)  
 **Purpose:** Lead with physical artifacts as viral distribution while pairing **proof of curiosity** (spread) with **proof of belonging** (retention). Commons Pass and organizer tooling follow once people already wear the object.
 
+**Architecture and launch gate:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — public card creation when Phase A ships; federated resolvers long-term; founding cohort is optional feedback only.
+
 ---
 
 ## Core Thesis
@@ -14,7 +16,7 @@ Two proofs, one loop:
 | Proof | Job | Optimizes for |
 |---|---|---|
 | **Curiosity** | Stranger sees artifact → scans → understands hook → creates or requests next step | Virality, scans, orders, word of mouth |
-| **Belonging** | Holder is in a bounded cohort → vouched / founding state → visible on scan → invites others who belong | Retention, trust graph, repeat wear, invites |
+| **Belonging** | Holder earns vouches / credentials under public rules → visible on scan → invites others | Retention, trust graph, repeat wear, invites |
 
 Curiosity fills the top of the funnel. Belonging makes the funnel mean something beyond merch.
 
@@ -33,7 +35,7 @@ Neither proof claims legal identity, KYC, or “holder = owner” from a static 
 - Beautiful, fast mobile pass/card page.
 - Current status (active, revoked, suspended, unknown).
 - Plain-language limits: static QR is a pointer, not proof the nearby person controls the card.
-- One clear next action: create a card, join the waitlist, or view the founding drop.
+- One clear next action: create a card or view the drop (no invite gate when Phase A is live).
 
 **What it does not prove:**
 
@@ -74,12 +76,12 @@ Neither proof claims legal identity, KYC, or “holder = owner” from a static 
 **Product surfaces:**
 
 - Humanity Card + vouch flow (`docs/features/Human Verification v1.0.md`).
-- Founding cohort playbook (`docs/FOUNDING_COHORT_PLAYBOOK.md`).
+- Optional early testers (`docs/FOUNDING_COHORT_PLAYBOOK.md`) for copy/ops—not a product gate.
 - Artifact copy and packaging that never print mutable “verified” text on the object.
 
 **Success signals:**
 
-- Founding cohort members vouch each other without founder nagging.
+- Users vouch each other without founder nagging.
 - Repeat wear after the first week (sticker stays on laptop/bottle).
 - Invites: “you should get one before the drop closes.”
 - At least one in-person ritual (event, dinner, office hours) where scans + vouches happen together.
@@ -92,9 +94,9 @@ Neither proof claims legal identity, KYC, or “holder = owner” from a static 
 Curiosity path (anyone)
   See artifact → scan QR → fast page + limits → create card OR join waitlist OR shop drop
 
-Belonging path (cohort)
-  Invited / accepted into founding window → personalize artifact (when ready) →
-  wear → get vouched at or after real contact → scan shows Vouched / Founding state →
+Belonging path (any card holder)
+  Create card (public) → personalize artifact when ready →
+  wear → get vouched at or after real contact → scan shows Vouched / credential state →
   invite next person
 
 Bridge
@@ -119,7 +121,7 @@ Prove the scan moment is worth a stranger’s attention:
 1. Signed Humanity Card create (browser-held keys).
 2. HTTPS QR resolver + trust-state UI (card, human trust, limitations).
 3. Revoked / suspended / unknown status pages.
-4. Founding cohort invite/waitlist (manual is fine).
+4. Optional waitlist for merch drops only—not for card creation gate.
 5. Vouch issuance + display (`Vouched Human` public label).
 6. Live control proof: private alpha minimum; public UI when copy-tested.
 
@@ -166,10 +168,10 @@ When the same room has many cards/stickers:
 - **Goal:** Volume, scans, narrative spread.
 - **Risk control:** No “verified human” on print; scan page carries all mutable trust state.
 
-### Tier 1 — Belonging (closed founding cohort)
+### Tier 1 — Belonging (personalized, not gated)
 
-- **Offer:** Personalized artifact for accepted founding humans only; limited window.
-- **Story:** “Founding humans” — accountable vouch graph, public rules, export and revoke rights.
+- **Offer:** Personalized artifact for card holders when print QA allows; may be time-limited drop, not invite-only access to the protocol.
+- **Story:** Vouched humans and credentials under public rules—export and revoke rights.
 - **Goal:** Trust graph, repeat wear, peer invites.
 - **Risk control:** 3-vouch threshold, quotas, 90-day vouch wait — per `docs/V1_DECISION_LOCK.md`.
 
@@ -177,8 +179,8 @@ When the same room has many cards/stickers:
 
 | | Curiosity drop | Belonging drop |
 |---|---|---|
-| Who | Anyone curious / waitlist | Accepted founding cohort |
-| Scan CTA | Create card · Join waitlist · Read trust model | See vouch state · Request vouch · Prove live control |
+| Who | Anyone curious | Card holders ready to personalize |
+| Scan CTA | Create card · Read trust model | See vouch state · Request vouch · Prove live control |
 | Artifact | Mass founding design | Personalized handle/QR where QA allows |
 | Revenue | Funds ops + production | Funds ops + signals commitment (not status) |
 
@@ -191,7 +193,7 @@ Required blocks, visually separated:
 1. **Status** — card/QR active, revoked, suspended, unknown.
 2. **Human trust** — `Registered` / `Vouched Human` / founding badges, or “not vouched” (no shame language; factual).
 3. **Curiosity CTA** — always visible for non-holders: create card, get the drop, read what this is.
-4. **Belonging CTA** — for holders: prove live control, export, revoke; for cohort: vouch request where policy allows.
+4. **Belonging CTA** — for holders: prove live control, export, revoke; vouch request where policy allows.
 5. **Limits** — bearer warning + what scan does not prove.
 
 Curiosity and belonging share one URL pattern; content adapts by resolver state, not by separate products.
@@ -209,8 +211,8 @@ Curiosity and belonging share one URL pattern; content adapts by resolver state,
 **V1 is working when:**
 
 - Curiosity: strangers scan and a meaningful % create a card or join waitlist without a founder present.
-- Belonging: ≥10 founding members vouch without prompting and can explain limits to a skeptic.
-- Bridge: at least one person moves from curiosity create → founding cohort → personalized artifact.
+- Belonging: ≥10 distinct users vouch without prompting and can explain limits to a skeptic.
+- Bridge: at least one person moves from curiosity create → vouch → personalized artifact.
 
 ---
 
@@ -220,7 +222,7 @@ Curiosity and belonging share one URL pattern; content adapts by resolver state,
 |---|---|---|
 | M-01 | First artifact | One sticker; add flat card after scan QA |
 | M-02 | Drop order | Phase A digital → Tier 0 curiosity drop → Tier 1 belonging personalize |
-| M-03 | Open vs closed Tier 0 | Open curiosity drop; closed Tier 1 with invite |
+| M-03 | Open vs closed Tier 0 | Open curiosity drop; Tier 1 personalized for card holders (no protocol invite gate) |
 | M-04 | Batch vs unique QR on Tier 0 | Batch QR acceptable for Tier 0; unique item QR for Tier 1 |
 | M-05 | Public labels | `Vouched Human` not `Verified Human` on UI and print |
 | M-06 | Live control | Private alpha in Phase A; public when comprehension test passes |
@@ -236,7 +238,8 @@ Curiosity and belonging share one URL pattern; content adapts by resolver state,
 | Implementation shapes | `docs/V1_IMPLEMENTATION_CONTRACTS.md`, `docs/V1_IMPLEMENTATION_BACKLOG.md` (reorder phases to match this doc) |
 | Copy and slogans | `docs/LAUNCH_LANGUAGE_KIT.md`, `docs/SKEPTIC_FAQ.md` |
 | Founding drop ops | `docs/FOUNDING_DROP_BRIEF.md` |
-| Founding cohort ops | `docs/FOUNDING_COHORT_PLAYBOOK.md` |
+| Optional early testers | `docs/FOUNDING_COHORT_PLAYBOOK.md` (non-gating) |
+| Protocol / federation | `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` |
 | Community pass (later) | `docs/COMMONS_PASS_V1_SPEC.md` |
 | Enterprise / governance (later) | `docs/COMMONS_ROADMAP.md`, `docs/PUBLIC_LAUNCH_AND_GOVERNANCE_PLAN.md` |
 
@@ -251,4 +254,4 @@ Make the strongest **honest** claims on the object and the scan page:
 - **Curiosity:** “Scan it — you’ll see what we actually prove.”
 - **Belonging:** “Signed, vouched where shown, revocable, live control when needed — not surveillance, not legal ID.”
 
-The empire grows when walking ads point at trust infrastructure people keep using after the sticker arrives.
+Institutional gravity grows when walking ads point at **federated** trust infrastructure people keep using after the sticker arrives—and when a second operator runs the same spec.

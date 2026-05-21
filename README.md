@@ -8,7 +8,9 @@ The Humanity Card remains the personal credential primitive: create a signed car
 
 This is not a social network, government ID system, KYC product, follower graph, crypto identity scheme, or surveillance analytics platform. It is a trust primitive designed to grow into member-governed digital infrastructure.
 
-The near-term market wedge is **merch-led distribution**: physical artifacts as walking advertisements that resolve to an honest trust object. That pairs **proof of curiosity** (strangers scan and create) with **proof of belonging** (founding cohort, vouches, repeat wear). Community passes and organizer check-in follow once people already wear the QR. See `docs/MERCH_LED_V1.md`.
+The near-term market wedge is **merch-led distribution**: physical artifacts as walking advertisements that resolve to an honest trust object. That pairs **proof of curiosity** (strangers scan and create) with **proof of belonging** (vouches, repeat wear, public rules). Community passes and organizer check-in follow once people already wear the QR. See `docs/MERCH_LED_V1.md`.
+
+**Strategic architecture:** open standards and **federated resolvers**—not a single identity honeypot, a private invite gate, or a public blockchain core. humanity.llc runs the reference operator first; institutional power comes from protocol adoption and member governance. See `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
 
 ---
 
@@ -93,10 +95,12 @@ The project should avoid broad public claims like legal identity, KYC, age verif
 V1 is designed around these boundaries:
 
 - Browser/device generates and holds Humanity Card private keys.
-- Humanity resolver stores public card, QR, status, vouch, badge, and revocation data.
-- Shopify owns checkout, payment, tax, refunds, customer emails, and commerce order records.
+- **Reference resolver** (humanity.llc) stores public card, QR, status, vouch, badge, and revocation data under a published **data-minimization policy**—no scan analytics by default, no legal ID in the core loop.
+- **Protocol is portable:** `docs/Technical Standards v1.0.md` defines behavior any compatible operator can implement; a **second operator** is a strategic milestone, not a distant fantasy.
+- Shopify owns checkout, payment, tax, refunds, customer emails, and commerce order records (firewalled from trust status).
 - Printify handles print-on-demand fulfillment behind Humanity-controlled middleware.
 - Printify and Shopify never receive private keys, verification secrets, vouch-private notes, private profile layers, or scan analytics.
+- **Blockchain is not the v1 trust core**; optional transparency anchoring may be revisited under governance later.
 
 The riskiest vertical slice is:
 
@@ -108,9 +112,13 @@ Signed card -> HTTPS QR -> trust-state UI -> artifact intent -> unique printed-i
 
 ## Documentation Map
 
-**V1 wedge (start here):**
+**Strategy (start here):**
 
-- `docs/MERCH_LED_V1.md` — curiosity + belonging, build order, founding drop tiers
+- `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — federated resolvers, public launch, privacy vs power, anti-honeypot rules
+
+**V1 wedge:**
+
+- `docs/MERCH_LED_V1.md` — curiosity + belonging, build order, drop tiers
 - `docs/FOUNDING_DROP_BRIEF.md` — Tier 0/1 launch checklist (fill brackets before print)
 - `docs/LAUNCH_LANGUAGE_KIT.md` — Tier 0/1 storefront, scan, email, social copy
 
@@ -148,7 +156,7 @@ Governance and enterprise direction:
 - `docs/COMMONS_ROADMAP.md`
 - `docs/MOVEMENT_NARRATIVE.md`
 - `docs/LAUNCH_LANGUAGE_KIT.md`
-- `docs/FOUNDING_COHORT_PLAYBOOK.md`
+- `docs/FOUNDING_COHORT_PLAYBOOK.md` — optional early testers (non-gating)
 - `docs/VISUAL_IDENTITY_PRINCIPLES.md`
 - `docs/SKEPTIC_FAQ.md`
 - `docs/🧠 Organizing Documents/📜 Constitution.md`
@@ -171,16 +179,17 @@ npm run deploy
 
 ## Current Status
 
-This repository is a planning and specification repo with a deployable landing page. The next practical work is to validate the riskiest provider assumptions and then build a narrow private alpha.
+This repository is a planning and specification repo with a deployable landing page. The next practical work is to build the **reference resolver** and open public card creation when it works.
 
-Recommended first steps (see `docs/MERCH_LED_V1.md`):
+Recommended first steps (see `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` and `docs/MERCH_LED_V1.md`):
 
-1. Lock founding drop tiers: open curiosity SKU vs closed belonging cohort; first artifact (sticker first).
-2. Build Phase A digital slice: card, HTTPS QR, trust-state UI, vouch display, revocation pages.
-3. Run founding cohort (10–25) until in-person scans and vouches work without overclaiming.
-4. Ship Tier 0 curiosity drop (one story, one SKU); measure scan→create and stranger orders.
-5. Ship Tier 1 personalized founding artifacts after Printify/Shopify spikes pass.
-6. Defer Commons Pass (community console, check-in, stamps) until Phase A–C metrics hit.
+1. Build Phase A: card, HTTPS QR, trust-state UI, vouch display, revocation pages—**no email/invite gate**.
+2. Publish operator data policy and Technical Standards alongside launch.
+3. **Public launch** card creation when stable; optionally recruit early testers (`docs/FOUNDING_COHORT_PLAYBOOK.md`) for copy/ops feedback only.
+4. Ship Tier 0 curiosity drop (one story, one SKU) after scan moment works; measure scan→create.
+5. Ship Tier 1 personalized artifacts after Printify/Shopify spikes pass.
+6. Plan **second resolver operator** (co-op, union, or aligned host) before claiming federation in marketing.
+7. Defer Commons Pass until Phase A–C metrics hit.
 
 ---
 
@@ -190,5 +199,5 @@ Humanity Commons should make the strongest honest claim, not the strongest possi
 
 > This card is signed, current, revocable, socially vouched where shown, and able to prove live control when needed.
 
-The first market proof is not technical. It is whether 25-100 people understand where they would use the card and invite others because the trust loop creates real value.
+The first market proof is not technical. It is whether strangers and communities **use the scan loop** (create card, scan, vouch, revoke) without being hand-held—and whether a second operator can adopt the same spec.
 

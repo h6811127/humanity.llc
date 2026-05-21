@@ -4,6 +4,8 @@
 **Scope:** `docs/🧊 v1.0 Features` and `docs/Technical Standards v1.0.md`  
 **Purpose:** Convert soft requirements into locked decisions, explicit deferrals, or owner decisions before implementation.
 
+**Strategic architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`
+
 ---
 
 ## Locked For V1
@@ -18,7 +20,7 @@
 | Verification paths | V1 verified-human status is earned through vouch threshold or ceremony credentials. Device proof is deferred until privacy/security review. | Human Verification, Technical Standards | Do not block rebuild on secure enclave / device proof integrations. |
 | Public trust labels | Public launch UI should use mechanism-revealing labels such as `Registered`, `Vouched Human`, `Steward`, `Revoked By Owner`, and `Suspended Under Public Rules`. | V1 Product Trust Model, Human Verification | Keep `verified_human` as an internal/protocol state where useful, but avoid broad public overclaims. |
 | Vouch threshold | `verified_human` requires 3 active vouches by default. New verified humans wait 90 days before vouching. Voucher quota is 5 active vouches per year. | Human Verification | Encode as governance constants, not hardcoded magic values. |
-| Baseline registration | Launch registration uses rate limits plus signed invite or waitlist controls. Proof-of-work is deferred until abuse pressure justifies it. | Human Verification | Avoid spending early implementation time on proof-of-work UX. |
+| Baseline registration | Launch registration uses rate limits and abuse controls. Invite/waitlist is optional for abuse spikes—not the default product gate. Proof-of-work is deferred until abuse pressure justifies it. | Human Verification, PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY | Public create when Phase A ships. |
 | Government ID | Humanity v1.0 does not collect or store government ID. Ceremonies rely on steward attestations. | Human Verification | Do not design ID upload, review, or retention workflows. |
 | QR print payload | Printed artifacts use HTTPS fallback URLs for phone-camera compatibility. Custom `hc://` remains canonical for app/native clients. | QR Public Profile, Technical Standards | Print artwork should encode `https://humanity.llc/c/{profile_id}?q={qr_id}`. |
 | Printed item QR scope | Personalized physical items use unique item-scoped QR credentials by default. | QR Public Profile, Storefront, Printify Fulfillment Middleware | A stolen/lost sticker can be revoked without revoking every physical item tied to the same profile. |
@@ -29,6 +31,10 @@
 | Fulfillment timing | Printify fulfillment order is created only after Shopify payment confirmation and internal artifact/order validation. | Storefront, Printify Fulfillment Middleware | Webhook handling and idempotency are core launch work. |
 | Production approval | Printify orders use manual production approval by default unless a later operational policy explicitly enables auto-approval. | Printify Fulfillment Middleware | First implementation should keep a human/operator gate before production. |
 | Scan analytics | Resolver and artifact scans collect no analytics by default. | QR Public Profile, Humanity Card, Technical Standards | Do not add analytics SDKs, scan counters, or location tracking to scan flows. |
+| Trust architecture | Federated resolvers + open standards (`hc/v1`); humanity.llc is reference operator, not permanent sole host. | PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY, Technical Standards §9.6 | Publish spec; plan second operator; include `X-Resolver-Operator` on responses. |
+| Public launch | Card creation opens to anyone when Phase A is stable—no founding cohort as product gate. | PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY, MERCH_LED_V1 | Optional early testers only; no email/invite required for create. |
+| Resolver data | Reference operator follows data-minimization table (no legal ID, no private keys, no scan analytics, commerce firewalled). | PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY §5, Technical Standards §9.7 | Publish operator retention policy at launch. |
+| Registration controls | Rate limits and abuse response—not invite-only cohort—as default gate for card creation. | PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY | Invite/waitlist MAY exist for abuse spikes only; must not be positioned as “membership to humanity.” |
 
 ---
 
@@ -42,7 +48,7 @@
 | Transfer UI | Artifact transfer functionality. | Legal/governance semantics are unresolved. | Transfer policy ratified. |
 | Public search/discovery | Public profile or verified-human directory. | Increases harassment, privacy, moderation, and scraping risk. | Separate discovery/privacy spec. |
 | Marketplace | Third-party seller marketplace. | Distracts from proof objects and first-party artifacts. | Storefront operations are stable. |
-| Blockchain/NFT ownership | Tokenized artifact ownership. | Conflicts with provenance-not-speculation positioning. | Separate governance/legal decision. |
+| Blockchain/NFT ownership | Tokenized artifact ownership or public-chain identity core. | Conflicts with pseudonymity, data minimization, and federation strategy. | Optional transparency anchoring only under governance review. |
 | Scan analytics | Any scan logging or analytics. | Violates trust unless consent model is explicit. | Governance-approved consent model. |
 | Apparel/bags | Apparel and bags for personalized QR artifacts. | Print area and QR scan reliability must be tested. | Template QA passes. |
 | Strong public identity claims | Legal identity, KYC, age verification, bot-proof, fraud-proof, background-checked, or guaranteed-unique claims. | V1 cannot honestly prove these. | Separate legal/privacy/security review and new product scope. |
@@ -89,3 +95,5 @@
 8. Every paid Printify order is idempotent and traceable to a Shopify paid order plus Humanity artifact intent.
 9. Live control proof proves only recent control of the card key.
 10. Vouch-based launch copy should say `Vouched Human` unless stronger language passes comprehension testing.
+11. The reference resolver is a minimal signed bulletin board—not a legal identity or scan surveillance system.
+12. Institutional growth targets federation (second operator) and open standards—not permanent single-operator capture.

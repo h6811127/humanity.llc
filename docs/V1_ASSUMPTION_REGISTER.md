@@ -3,6 +3,8 @@
 **Status:** Pre-rebuild hardening artifact  
 **Purpose:** Make hidden product, technical, legal, and operational assumptions explicit before implementation.
 
+**Strategic architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`
+
 ---
 
 ## Priority Scale
@@ -25,7 +27,7 @@
 | A-004 | Generated QR artwork remains scannable after Printify production constraints for chosen sticker/card sizes. | Design/Ops | Unverified, Medium risk | Not verifiable from API docs alone. Must order physical samples and scan-test across phones, lighting, distance, damage, and material finish. | Product template must change; apparel/bags stay deferred. |
 | A-005 | Public HTTPS QR fallback is acceptable as the printed QR target, even though the protocol also defines `hc://`. | Product/Engineering | High | Verified by platform reality: consumer phone cameras reliably handle HTTPS URLs; custom URI schemes are app-dependent. Still test on iOS/Android with `https://humanity.llc/c/{profile_id}?q={qr_id}`. | Printed QR UX becomes app-dependent and less viral. |
 | A-006 | Printify can support unique QR artwork per personalized physical item without making order creation impractical. | Engineering/Ops | High conceptually, Medium until sample order | Validate with a multi-quantity sample order that uploads distinct artwork/QR files per item or otherwise maps item QR IDs safely. | Use one QR per batch/order and disclose that revoking one stolen item revokes the batch. |
-| A-007 | Vouch-based verification can feel meaningful without legal identity, phone, email, or device proof in the first release. | Product/Governance | Unverified, Medium/High product risk | Cannot be verified technically. Validate with target users and a founding cohort. Recommended wording: avoid overclaiming "proof"; frame as "vouched human" until stronger governance exists. | The "verified human" claim may feel weak or confusing; launch copy must downshift to "vouched" or "founding member." |
+| A-007 | Vouch-based verification can feel meaningful without legal identity, phone, email, or device proof in the first release. | Product/Governance | Unverified, Medium/High product risk | Validate with public launch users and optional early testers. Recommended wording: avoid overclaiming "proof"; frame as "vouched human" until stronger governance exists. | The "verified human" claim may feel weak or confusing; launch copy must downshift to "vouched human." |
 | A-008 | Artifact ownership and human verification can be explained clearly enough that merch does not appear to buy status. | Product/Design | Unverified, Medium/High product risk | Must be tested with product page and card page copy. Recommended rule: every commerce surface explicitly says "buying merch does not mean verified human." | Store may undermine trust by seeming pay-to-play. |
 | A-009 | Scanner-visible warning can prevent people from treating a stolen sticker as proof of identity. | Product/Design | Unverified, Medium/High product risk | Copy test scan pages with the warning: "This QR resolves to this Humanity Card. It does not prove the person holding this item is the card owner." | Require live owner proof for higher-trust contexts sooner. |
 | A-010 | A single Humanity-controlled Printify merchant account is sufficient for launch operations. | Ops | High for launch | Verified as the simpler launch model because Printify supports personal access tokens for a merchant account and OAuth can be deferred. Must still confirm account, scopes, shop ID, production approval workflow, and support ownership. | OAuth/multi-merchant scope moves earlier or provider choice changes. |
@@ -33,6 +35,10 @@
 | A-012 | Card and item QR revocation can be represented as resolver status without physically recalling artifacts. | Product/Support | High conceptually, needs copy test | Technically sound because printed QR resolves through Humanity status. Must validate user comprehension with warning/support copy. | Physical artifacts create false expectations or support disputes. |
 | A-012A | `Vouched Human` is clearer and more trustworthy than `Verified Human` for early vouch-based status. | Product/Design | Unverified, Medium risk | Copy test `Registered`, `Vouched Human`, `Founding Human`, `Steward`, `Revoked By Owner`, and `Suspended Under Public Rules` with target users. | If users find `Vouched Human` weak or confusing, revise labels before launch rather than overclaiming. |
 | A-012B | Live control proof materially improves in-person trust without being confused for legal identity. | Product/Security | Unverified, Medium risk | Prototype scanner challenge and owner signature flow; test whether users understand "recent key control" vs identity verification. | Defer public live proof UI or strengthen copy if users treat it as legal identity. |
+| A-012C | A narrow beachhead such as events, meetups, or cooperative/member organizations will make the trust loop easier to understand than a generic identity launch. | Product/Growth | Unverified, High product risk | Run interviews and at least one pilot with an event, cooperative, club, or online community; pursue second-operator conversation. | Do not expand storefront or governance machinery until a real use case is found. |
+| A-012D | Users will invite others because vouching/live proof creates value, not just because they like the mission. | Growth | Unverified, High product risk | Track public launch vouch requests, repeated scans, stranger create rate, and whether users can name a real use case. | Reposition around a sharper job-to-be-done or pause growth work. |
+| A-012E | A minimal reference resolver plus published spec can grow institutional power without a public blockchain core. | Strategy/Engineering | Medium | Ship Phase A; document second-operator path; avoid positioning as crypto identity. | Reframe around federation or accept chain-based tradeoffs explicitly. |
+| A-012F | Public launch without cohort gate will not cause unmanageable abuse before rate limits and suspension policy exist. | Security/Ops | Unverified, Medium risk | Monitor create rate, impersonation reports, and support load first 30 days. | Temporary stricter rate limits—not permanent invite-only product gate. |
 
 ---
 
@@ -71,7 +77,9 @@
 4. **Verification language:** if "verified human" overclaims what vouching proves, trust will degrade immediately.
 5. **Bearer confusion:** if scanners treat possession of a sticker as proof of identity, the trust model fails socially.
 6. **Live control confusion:** if users treat live control proof as legal identity or human uniqueness, a trust upgrade becomes another overclaim.
-7. **Operational support:** if on-hold, failed, duplicate, and refunded orders lack clear internal states, launch will become support-driven chaos.
+7. **No urgent use case:** if users admire the idea but cannot name where they would use it, the product becomes a manifesto instead of a tool.
+8. **Weak growth loop:** if users do not invite others to vouch, scan, or pilot the card in a community, the network will not bootstrap.
+9. **Operational support:** if on-hold, failed, duplicate, and refunded orders lack clear internal states, launch will become support-driven chaos.
 
 ---
 
@@ -84,6 +92,8 @@
 | Copy comprehension test | 1 day | Users distinguish "printed item resolves to a card" from "holder is the vouched human/card owner" after reading product/card/scan pages. |
 | Revocation UX test | 1 day | Users understand that item QR revocation changes one scan result but does not recall physical items or revoke sibling stickers/cards. |
 | Live control proof comprehension test | 1 day | Users understand that live control proves recent card-key control, not legal identity, vouching, or unique humanity. |
+| Beachhead use-case test | 2-5 days | At least 5 target users and 1 potential community/event/org can name a concrete situation where they would use Humanity Cards. |
+| Founding growth-loop test | 30-60 days | Founding users invite others, request/give vouches, and scan cards without repeated founder prompting. |
 | Webhook/idempotency harness | 1-2 days | Duplicate Shopify/Printify webhooks do not duplicate fulfillment or corrupt state. |
 
 ---
@@ -96,7 +106,7 @@ These notes distinguish "API capability appears supported" from "safe for launch
 - Shopify checkout vs native: Shopify checkout avoids most first-party responsibility for payment security, checkout uptime, tax primitives, refund/admin basics, customer order emails, and fraud/risk tooling. AI can accelerate glue code, but not remove live payment, tax, refund, dispute, and support edge cases.
 - Printify custom artwork: Printify API documentation exposes image uploads and product/order APIs suitable for generated artwork workflows. This verifies feasibility in principle, but sample orders are still required because QR scan quality depends on product template, print provider, material, sizing, and placement.
 - Printify operations: API support does not prove webhook reliability, production timing, cancellation windows, or support burden. Those remain operational assumptions until tested with real orders.
-- Verification model: No external API can verify whether "vouched human" feels trustworthy. This remains a product/governance assumption that requires user research and founding cohort testing.
+- Verification model: No external API can verify whether "vouched human" feels trustworthy. This remains a product/governance assumption that requires user research and public launch / optional early tester feedback.
 
 ---
 
@@ -130,6 +140,8 @@ Conclusion: Shopify is still the correct default. Native checkout should remain 
 - I assumed vouching is acceptable as an early verification basis. If the audience expects stronger proof, "verified human" should be renamed or gated.
 - I assumed a physical product loop is worth the operational cost because it gives the system social visibility. If operations overwhelm the team, physical fulfillment should narrow to one product.
 - I assumed revocation-by-resolution is socially understandable. Some users may expect physical recall or replacement; support copy must be explicit.
+- I assumed events, cooperatives, and member organizations (including as second resolver operators) are better first markets than a generic consumer identity launch. If those communities do not feel urgency, the project needs a different wedge.
+- I assumed viral growth can come from vouching, live control proof, physical artifacts, and anti-platform narrative. If users like the politics but do not invite others, the growth model is weak.
 
 ---
 
@@ -138,7 +150,7 @@ Conclusion: Shopify is still the correct default. Native checkout should remain 
 | Question | Recommended Answer For V1 | Rationale |
 |---|---|---|
 | What exact product is first: sticker, flat card, or both? | Start with both one sticker and one flat card **if** Printify sample QA passes; otherwise launch only the strongest-scanning sticker. | Stickers prove real-world QR spread; flat cards prove the "membership/passport" metaphor. Do not start with apparel. |
-| What is the first trusted founding cohort, and who is allowed to vouch? | Founding cohort should be 10-25 personally known early builders/operators. Only `verified_human` founding accounts may vouch, and new verified humans wait 90 days before vouching. | Keeps the trust graph small enough to audit and explain. |
+| Who can create a card at launch, and who is allowed to vouch? | **Public launch:** anyone when Phase A is stable. Vouching per `V1_DECISION_LOCK` (3 vouch threshold, quotas, 90-day wait). Optional 10–25 early testers for ops/copy—not a protocol gate. | Federation strategy requires open create; abuse handled by rate limits, not permanent invite-only product. |
 | What exact words can the product use without overclaiming "verified human"? | Use `Registered`, `Vouched Human`, `Steward`, `Revoked`, and `Suspended` in early UI. Reserve `Verified Human` for docs/protocol or after copy testing. | "Vouched Human" is more honest for an early social-trust system. |
 | Who holds bootstrap governance keys before there is real governance? | Use 3-of-5 bootstrap signer keys held by named founder/operator/security roles, with public key fingerprints and a sunset rule after governance launch. | Suspension, badge issuance, and template approval need authority before formal governance exists. |
 | What is the public revenue/margin policy for store purchases? | Publish a simple policy: price covers production, shipping/tax where applicable, platform/payment fees, support/reprint reserve, and a transparent Humanity Commons operating margin. | Trust product plus merch revenue needs plain-language transparency. |
@@ -147,3 +159,5 @@ Conclusion: Shopify is still the correct default. Native checkout should remain 
 | What happens if a customer checks out, pays, and then the artifact intent fails conversion? | Order enters `held_for_review`; no Printify order is submitted. User gets either regenerated proof approval, equivalent replacement, or refund. | Prevents bad automatic fulfillment and duplicate orders. |
 | What happens if a card is suspended after payment but before Printify production approval? | Order enters `held_for_review`. Default: do not send Humanity-branded identity artifact to production while suspended; offer refund unless suspension is resolved quickly. | Avoids producing artifacts that undermine governance/safety rules. |
 | What is the minimum launch experience that still feels like V1 rather than a dressed-up QR profile? | Signed card, public HTTPS QR, visible status/badge trail, vouch or founding trust state, revocation page, and one physical QR artifact via Shopify/Printify. | The physical artifact plus current-status resolver is what makes it more than a profile page. |
+| What is the first beachhead market? | Start with founding events/meetups and adjacent cooperative/member organization pilots. | In-person scanning makes the trust loop easier to understand than a generic identity launch. |
+| What makes this more than a nice idea? | 25 people create cards, 10 participate in vouching, 5 name real use cases, and at least one community/event/org wants a pilot. | Market proof matters more than technical completion. |

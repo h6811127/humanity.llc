@@ -1,19 +1,21 @@
-# Founding Cohort Playbook
+# Founding Cohort Playbook (Optional Early Testers)
 
-**Status:** Strategic draft  
-**Purpose:** Define how the first 25-100 people should test Humanity Commons, create social proof, and expose trust-model confusion before public launch.
+**Status:** Supplemental — **non-gating**  
+**Purpose:** Define how a small volunteer group can stress-test copy, scans, vouches, and support **before or during public launch**.
 
-**Tier 1 belonging:** This cohort is the gate for the closed founding artifact drop. Tier 0 curiosity drop may run in parallel for outsiders — see `docs/MERCH_LED_V1.md`, `docs/FOUNDING_DROP_BRIEF.md`, and Tier 1 copy in `docs/LAUNCH_LANGUAGE_KIT.md`.
+**Superseded for architecture and launch gates by:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`
+
+**Important:** Card creation is **public** when Phase A ships. This playbook does **not** control who may use the resolver. Tier 1 personalized artifacts are for **card holders**, not “accepted cohort members only.” See `docs/MERCH_LED_V1.md`.
 
 ---
 
 ## Goal
 
-The founding cohort exists to answer one question:
+The optional early tester pool exists to answer one question:
 
 > Does the Humanity Card trust loop make sense to real people in real contexts?
 
-It is not a vanity waitlist, fake governance body, or paid status tier.
+It is not a vanity waitlist, fake governance body, paid status tier, or **invite gate** to the product.
 
 ---
 
@@ -221,7 +223,7 @@ Ask after every session:
 
 ## Graduation Criteria
 
-The founding cohort is working if:
+The early tester pool is working if:
 
 - People create cards.
 - People scan cards.

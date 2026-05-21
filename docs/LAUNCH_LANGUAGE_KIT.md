@@ -3,7 +3,9 @@
 **Status:** Strategic draft  
 **Purpose:** Provide repeatable public language for launch without overclaiming identity, verification, or governance.
 
-**Merch-led tiers:** Tier 0 = proof of curiosity (open drop). Tier 1 = proof of belonging (founding cohort). See `docs/MERCH_LED_V1.md` and operational checklist `docs/FOUNDING_DROP_BRIEF.md`.
+**Architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — public launch; federated resolvers.
+
+**Merch-led tiers:** Tier 0 = proof of curiosity (open drop). Tier 1 = proof of belonging (personalized for card holders—not a protocol invite gate). See `docs/MERCH_LED_V1.md` and `docs/FOUNDING_DROP_BRIEF.md`.
 
 ---
 
@@ -77,27 +79,25 @@ Draft:
 >
 > This is not government ID. It is not KYC. It is not a social network. It is a public trust primitive designed to become member-governed infrastructure if the first trust loop works.
 >
-> I am looking for a founding cohort of people willing to create cards, test vouching, scan each other, break the copy, and help decide whether this deserves to become a commons.
+> When the resolver ships, anyone can create a card—no invite list. If you want to help stress-test early, reach out; optional early testers break copy and test vouching before we scale marketing.
 
 ---
 
-## Founding Cohort Invite
+## Optional Early Tester Invite (Non-Gating)
+
+Use only for volunteers—not as a product gate. See `docs/FOUNDING_COHORT_PLAYBOOK.md`.
 
 Short:
 
-> I am inviting a small founding cohort to test Humanity Commons: a signed public card for real humans.
+> I'm looking for a small group to stress-test Humanity Commons before we scale public launch: create a card, scan, vouch, test live control, and tell us what's confusing.
 >
-> You will create a card, test QR scanning, try vouching, test live control proof, and help catch anything confusing before public launch.
->
-> This is not legal ID, not a social network, and not pay-to-verify. It is an experiment in human trust without surveillance.
+> This is not legal ID, not pay-to-verify, and not required to use the system when card creation is open.
 
 Long:
 
-> Humanity Commons is a public card you control. It lets you show a signed card, receive vouches from real people, prove live control when needed, and revoke old QR credentials.
+> Humanity Commons is a public card you control—signed, revocable, vouched under published rules. We're opening card creation to the world when Phase A is stable. Optional early testers help us catch copy and support issues first.
 >
-> The founding cohort exists to test whether the trust loop is real, understandable, and useful. Founding members will help test the card, vouching, printed QR warnings, live proof, export/revocation, and the first governance promises.
->
-> The goal is not to pretend we already have a finished democratic institution. The goal is to build something working that people can honestly govern.
+> The goal is not a fake democracy or exclusive club. The goal is working trust infrastructure on an open spec with federated operators over time.
 
 ---
 
@@ -225,7 +225,7 @@ Use for the **open** founding sticker/card: spread, scans, card creation. No vou
 
 ## Tier 1 — Belonging Drop Copy
 
-Use for **closed founding cohort** only: personalized artifact optional, vouch graph, repeat wear.
+Use for **card holders** ready to personalize (time-limited drop OK)—not for gating protocol access. Personalized artifact optional; vouch graph; repeat wear.
 
 ### One-liners
 
@@ -233,15 +233,15 @@ Use for **closed founding cohort** only: personalized artifact optional, vouch g
 - Founding humans — not platform inventory.
 - Belonging is signed, revocable, and inspectable.
 
-### Storefront hero (gated)
+### Storefront hero (personalized drop)
 
-**Headline:** Founding human line — invite only
+**Headline:** Personalize your artifact
 
-**Subheadline:** For the first cohort testing vouches, live control, and revocation. Your artifact points at a card you control; your status comes from people who know you, not from a cart.
+**Subheadline:** For card holders who want a wearable QR tied to **your** card. Status comes from vouches and credentials under public rules—not from checkout.
 
-**Primary CTA:** Redeem invite
+**Primary CTA:** Create card (if needed) · Personalize
 
-**Secondary CTA:** Read founding rules
+**Secondary CTA:** Read trust rules
 
 ### Product page — above the fold
 
@@ -249,7 +249,7 @@ Use for **closed founding cohort** only: personalized artifact optional, vouch g
 
 **Short description:**
 
-> For accepted founding cohort members. A wearable QR tied to **your** card — with public rules for vouching, quotas, and revocation. Still not legal ID. Still not proof the wearer owns the card without live control when it matters.
+> For Humanity Card holders. A wearable QR tied to **your** card — with public rules for vouching, quotas, and revocation. Still not legal ID. Still not proof the wearer owns the card without live control when it matters.
 
 **Bullets — what belonging means here:**
 
@@ -266,7 +266,7 @@ Use for **closed founding cohort** only: personalized artifact optional, vouch g
 
 **Required line:**
 
-> **Checkout does not vouch you.** Complete cohort onboarding and receive vouches from people who can stand behind the statement.
+> **Checkout does not vouch you.** Receive vouches from people who can stand behind the statement under published rules.
 
 ### Scan page — belonging state (holder)
 
@@ -315,11 +315,11 @@ Use for **closed founding cohort** only: personalized artifact optional, vouch g
 
 **Post — belonging**
 
-> Founding cohort is live: we're testing whether real humans can vouch for each other without surveillance, phone numbers, or government ID on day one.
+> Personalized drop is live for card holders: vouches under public rules—no surveillance, no phone, no government ID on day one.
 >
 > Wear the QR. Scan each other. Say what it doesn't prove.
 >
-> Not open yet for everyone — curiosity drop still is: `[Tier 0 link]`
+> No card yet? Create one or grab the curiosity drop: `[Tier 0 link]`
 
 ### Tier 1 — lines to avoid
 

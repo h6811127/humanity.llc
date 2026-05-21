@@ -3,15 +3,18 @@
 **Status:** Strategic draft  
 **Purpose:** Define how Humanity Commons can grow from a v1 trust product into a democratic, worker-and-member-governed digital enterprise.
 
+**Trust layer architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — federated resolvers and open standards are the path to institutional gravity; a single permanent operator or public blockchain core is not the plan.
+
 ---
 
 ## Executive Vision
 
 Humanity Commons should become public-interest digital infrastructure owned and governed by the people who build it, use it, and depend on it.
 
-The v1 product is a signed Humanity Card, QR resolver, vouch-based trust layer, and small physical artifact loop. The long-term enterprise is broader:
+The v1 product direction is Commons Pass: a mobile web membership pass for democratic communities, built on the Humanity Card credential primitive. The long-term enterprise is broader:
 
 - A member-governed identity and trust commons.
+- A community membership and credential infrastructure layer.
 - A cooperative digital commerce and fulfillment layer.
 - A network of local stewards, ceremonies, and mutual-aid workflows.
 - A worker-owned operating company or cooperative that builds and maintains the software.
@@ -80,43 +83,75 @@ At maturity, revenue, margins, compensation bands, reserves, grants, debt, and s
 
 Local groups should be able to operate ceremonies, events, and trust practices, but shared standards protect portability and user rights.
 
+### 8. Product First, Movement Close Behind
+
+The card must be useful before the movement can scale. The movement narrative should give people a reason to care, share, and govern, but the core scan page must remain practical and understandable.
+
 ---
 
 ## Enterprise Thesis
 
 Humanity Commons can become a sustainable enterprise because it combines four durable needs:
 
-1. **Portable human trust:** People need ways to signal personhood, membership, reputation, and affiliation outside centralized social networks.
-2. **Low-surveillance coordination:** Communities need tools that do not turn every interaction into analytics and ad inventory.
-3. **Physical-digital belonging:** Cards, stickers, event kits, and printed artifacts make the system socially visible and fundable.
-4. **Democratic infrastructure:** Cooperatives, unions, mutual-aid groups, communities, and local institutions need software they can trust politically, not just technically.
+1. **Portable community membership:** People need ways to carry belonging, roles, credentials, and participation across communities without platform lock-in.
+2. **Portable human trust:** People need ways to signal personhood, membership, reputation, and affiliation outside centralized social networks.
+3. **Low-surveillance coordination:** Communities need tools that do not turn every interaction into analytics and ad inventory.
+4. **Physical-digital belonging:** Passes, QR codes, cards, stickers, event kits, and printed artifacts make the system socially visible and fundable.
+5. **Democratic infrastructure:** Cooperatives, unions, mutual-aid groups, communities, and local institutions need software they can trust politically, not just technically.
 
-The market wedge is not "identity SaaS for everyone." The wedge is a trusted, member-owned proof and coordination layer for communities that already distrust extractive platforms.
+The market wedge is not "identity SaaS for everyone." The wedge is a trusted, member-owned membership and coordination layer for communities that already distrust extractive platforms.
+
+The first market proof should be narrow: one event, cooperative, club, or online community should use the card because it solves a concrete trust or membership problem—with **public card creation** and a path to a **second resolver operator**. The project should not present itself as venture-ready until a repeatable beachhead use case, buyer/funder, retention signal, and non-extractive growth loop exist.
+
+---
+
+## Market Wedge And Beachhead
+
+Humanity Commons should start where its values are a product advantage, not a distraction.
+
+Strong early adopter segments:
+
+- Events and meetups where people can scan, vouch, and prove live control in person.
+- Cooperatives and member organizations that need trust infrastructure without platform lock-in.
+- Mutual-aid and local community groups that need portable membership and consent boundaries.
+- Privacy/open-source communities that already distrust phone-number and ID-based verification.
+- Online communities under AI/bot pressure that need a humane alternative to surveillance verification.
+
+Recommended v1 beachhead:
+
+> Commons Pass for events and founding communities first; cooperative/member organization pilots second.
+
+Events make the trust loop legible. A person can show a pass, scan a QR, ask for live control, check in, and receive a signed event stamp in one interaction. That experience is easier to validate than an abstract identity platform.
 
 ---
 
 ## Product Evolution
 
-### Stage 1: Humanity Card And QR Trust Layer
+### Stage 1: Commons Pass And Humanity Card Trust Layer
 
-**Goal:** Prove that a person can create, share, revoke, and carry a signed public card without phone, email, government ID, follower counts, ads, or scan analytics.
+**Goal:** Prove that a community can issue mobile web passes, scan members, check people into events, issue stamps, and rely on Humanity Cards for live control without phone, email, government ID, follower counts, ads, or scan analytics.
 
 **Products:**
 
+- Commons Pass.
+- Community profile.
+- Member pass issuance.
 - Humanity Card.
 - Public QR resolver.
 - Vouching.
 - Live control proof for contexts where static QR is not enough.
+- Event check-in.
+- Signed community stamps.
 - Revocation and suspension status pages.
 - Export bundle.
-- One personalized sticker/card flow.
 
 **Enterprise value:**
 
 - Establishes the trust primitive.
+- Establishes a concrete community workflow.
 - Establishes the non-surveillance brand promise.
 - Creates first member cohort.
-- Creates small commerce revenue through physical artifacts.
+- Creates a path to community-funded revenue.
 
 ### Stage 2: Cooperative Storefront And Artifact Economy
 
@@ -125,7 +160,7 @@ The market wedge is not "identity SaaS for everyone." The wedge is a trusted, me
 **Products:**
 
 - Story-row storefront.
-- Personalized QR stickers/cards.
+- Personalized community passes, QR stickers/cards, and event artifacts.
 - Limited founding drops.
 - Event kits.
 - Governance-approved templates.
@@ -199,6 +234,8 @@ The market wedge is not "identity SaaS for everyone." The wedge is a trusted, me
 ## Business Model
 
 Revenue must be aligned with trust. The best revenue is paid voluntarily by people and organizations who want the commons to exist.
+
+Near-term revenue is not the same thing as venture proof. Artifact purchases, founding memberships, grants, and donations can fund the prototype, but venture-scale readiness requires evidence of repeatable demand, retention, and a buyer or funder who needs the product beyond its novelty.
 
 ### Near-Term Revenue
 
@@ -288,7 +325,7 @@ These should remain off-limits:
 
 ### Phase B: Steward Council And Member Ratification
 
-**When:** Founding cohort and early revenue exist.
+**When:** Public trust loop and early revenue exist.
 
 **Structure:**
 
@@ -450,6 +487,19 @@ The financing strategy should preserve democratic control.
 - Non-voting redeemable preferred shares if legally appropriate.
 - Revenue-based financing with caps.
 
+### Venture Capital Readiness
+
+Traditional venture capital may be structurally misaligned with a democratic, non-surveillance trust commons unless investors accept explicit limits on control, monetization, and user-rights governance.
+
+Do not pursue venture funding as the default path until there is evidence of:
+
+- A repeatable beachhead use case.
+- A clear buyer, funder, or recurring revenue path.
+- Retention beyond founding-cohort enthusiasm.
+- A growth loop that does not depend on paid ads or ideology alone.
+- A revenue model that does not monetize surveillance, status, or identity access.
+- A governance structure that protects protocol rights from capital control.
+
 ### Avoid Or Strictly Limit
 
 - Venture capital with control rights.
@@ -506,15 +556,18 @@ Recommended policies:
 
 **Milestones:**
 
+- Commons Pass.
+- Community creation.
 - Signed card.
 - QR resolver.
 - Revocation.
 - Vouching.
+- Event check-in.
+- Signed stamps.
 - Unique printed-item QR.
-- One physical product loop.
 - No scan analytics.
 
-**Success metric:** A founding cohort can create cards, vouch, scan, revoke, and order one physical artifact without confusing commerce for verification.
+**Success metric:** A founding community can issue passes, scan members, check people into an event, issue a stamp, and explain what the pass proves and does not prove.
 
 ### Horizon 2: Founding Commons
 
@@ -582,10 +635,11 @@ Recommended policies:
 
 ### Months 0-3: Prove The Product
 
-- Finish v1 private alpha.
+- Finish Commons Pass private alpha.
 - Validate Shopify and Printify.
-- Launch founding cohort.
+- Public launch card creation; optional early tester feedback.
 - Publish policies.
+- Publish movement narrative, launch language kit, skeptic FAQ, use cases, and visual identity principles.
 - Avoid overbuilding governance before there are real members.
 
 ### Months 3-6: Prove Trust And Revenue
@@ -635,6 +689,9 @@ Recommended policies:
 - Vouch completion.
 - Artifact proof approval.
 - Order success and support rate.
+- Percentage of users who can name a real use case for their card.
+- Percentage of founding users who invite another human without prompting.
+- Number of active pilots in events, cooperatives, clubs, or online communities.
 
 ### Governance Metrics
 
@@ -652,6 +709,17 @@ Recommended policies:
 - Worker compensation coverage.
 - Grant and donation diversity.
 - Revenue share from non-extractive sources.
+- Repeatable buyer/funder signal.
+- Retention after the novelty of the founding card wears off.
+
+### Market Validation Metrics
+
+- 25 people create cards in the first prototype window.
+- 10 people participate in vouching.
+- 5 people use or clearly want live control proof.
+- 5 people can name a real context where they would use the card.
+- At least one event, cooperative, club, or community wants to pilot it.
+- Users do not summarize the product as "just a QR profile."
 
 ---
 
@@ -687,6 +755,18 @@ The product could become harder to understand if every screen carries the full i
 
 **Response:** Let the product be simple. Put the politics into ownership, governance, transparency, and user rights.
 
+### No Urgent Use Case
+
+People may understand the idea but not know where they would actually use it.
+
+**Response:** Pick one beachhead context and test whether the card solves a concrete trust or membership problem there.
+
+### Weak Growth Loop
+
+The project may attract admiration but not repeated use or invitations.
+
+**Response:** Design around vouching, live control proof, public launch, and real-world scans. Measure stranger create rate, invitations, and repeated use—not just positive feedback.
+
 ---
 
 ## Next Step
@@ -699,7 +779,9 @@ Immediate work:
 2. Publish a one-page ownership transition promise.
 3. Define member classes in draft.
 4. Track revenue and costs transparently from the first paid order.
-5. Run a founding cohort that can ratify the constitution after using the product.
+5. Open public card creation; run optional early tester feedback; ratify constitution after real use.
 6. Publish the product trust model so members can govern what the system claims.
+7. Validate one beachhead use case before expanding the store or governance machinery.
+8. Keep the scan page practical while letting the movement live in supporting pages, artifacts, events, and cohort rituals.
 
 The enterprise becomes real when members have something working to govern.

@@ -3,11 +3,15 @@
 **Status:** Strategic draft  
 **Purpose:** Define the public narrative, governance transition promise, decision rights, live proof model, launch campaign, legal path, abuse policy, financial policy, membership model, and website information architecture for Humanity Commons.
 
+**Canonical architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` (federated resolvers, public launch, data minimization, no blockchain core). This doc covers governance narrative and campaign; where they conflict, the protocol strategy doc wins on architecture and launch gates.
+
 ---
 
 ## Positioning Sentence
 
-Humanity Commons is a signed, revocable public card for real people and democratic communities. It starts as a practical trust tool: create a card, get vouched for, scan a QR, revoke it when needed, and carry it into the world through stickers or cards. It is designed to grow into member-governed digital infrastructure, not another extractive identity platform.
+Humanity Commons is membership infrastructure for real people and democratic communities. It starts with Commons Pass: create a community, issue mobile web passes, scan QR codes, check people into events, issue signed stamps, and prove live control when needed. It is designed to grow into member-governed digital infrastructure, not another extractive identity platform.
+
+The first launch should not position Humanity Commons as universal identity infrastructure. It should position the product as a practical trust and membership tool for communities that already distrust surveillance platforms.
 
 ---
 
@@ -15,9 +19,9 @@ Humanity Commons is a signed, revocable public card for real people and democrat
 
 ### Website-Ready Short Version
 
-Humanity Commons is a public proof-of-personhood card you control.
+Humanity Commons is a membership pass for communities that refuse surveillance.
 
-Create a signed Humanity Card, share it with a QR code, receive vouches from real people, prove live control when needed, and carry it into the world through physical cards or stickers. Your card can be revoked, exported, and vouched for without a phone number, government ID, follower count, ad network, or surveillance profile.
+Create a community, invite members, issue mobile web passes, scan QR codes for current membership status, check people into events, and issue signed community stamps. Members can still carry a signed Humanity Card, receive vouches, and prove live control without a phone number, government ID, follower count, ad network, or surveillance profile.
 
 This is not a social network. It is a commons for human trust.
 
@@ -25,18 +29,21 @@ Today, Humanity Commons is founder-built. Over time, it is designed to become me
 
 ### Website-Ready Longer Version
 
-The internet is full of accounts, bots, followers, ratings, and opaque platform reputation. Humanity Commons starts from a different premise: a person should be able to carry a small, signed, revocable proof object that they control.
+The internet is full of accounts, bots, followers, ratings, and opaque platform reputation. Humanity Commons starts from a different premise: communities should be able to issue membership infrastructure they can trust, and people should be able to carry signed, revocable proof of belonging that they control.
 
-A Humanity Card says:
+A Commons Pass says:
 
-> I am a real human participating in an open, consent-based commons. Here is my signed card. You can scan it, inspect what it claims, and understand how I entered the trust network without trusting a social platform.
+> I belong to this community under these public rules. You can scan this pass, inspect current status, request live proof when needed, and understand what this does and does not prove without trusting a social platform.
 
 The first version is intentionally simple:
 
-- A signed public card.
-- A QR code that resolves to that card.
+- A signed public Humanity Card.
+- A community-issued Commons Pass.
+- A QR code that resolves to current pass/card status.
 - Vouches from real people.
 - Optional live control proof for moments when a scanner needs recent evidence that the nearby person controls the card key.
+- Event check-ins.
+- Signed community stamps.
 - Clear active, revoked, suspended, expired, and unknown states.
 - Physical stickers/cards that point back to the current card state.
 - No scan analytics by default.
@@ -46,11 +53,11 @@ Humanity Commons is also a political and economic experiment. The goal is not to
 
 ### Homepage Hero
 
-**Headline:** A public card for real humans.
+**Headline:** A membership pass for communities that refuse surveillance.
 
-**Subheadline:** Create a signed Humanity Card, get vouched for, share it by QR, and help build digital trust infrastructure owned by its members.
+**Subheadline:** Issue mobile web passes, scan QR codes, check members into events, and build digital trust infrastructure owned by its communities.
 
-**Primary CTA:** Create a Humanity Card
+**Primary CTA:** Create a Commons Pass
 
 **Secondary CTA:** Read the Commons Roadmap
 
@@ -63,6 +70,31 @@ Most online identity systems ask people to trade privacy, platform dependence, o
 - Revocation should be visible.
 - Public identity should be consent-based.
 - Communities should govern the infrastructure they depend on.
+
+### First Beachhead
+
+The first public launch should be built around a specific use context, not a generic "everyone needs identity" claim.
+
+**Launch posture:** **public card creation** when Phase A ships—no invite-only founding cohort as the product gate. See `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
+
+Recommended beachhead:
+
+> Events and meetup-style communities first; cooperative/member organization pilots second—with a path for the org to run a **compatible resolver** for its members.
+
+Why:
+
+- In-person scanning makes live control proof understandable.
+- Stickers and cards have a natural role.
+- Vouching can start with accountable humans who have met or know each other.
+- The demo is memorable: scan, inspect, request live proof, and understand what a printed QR does not prove.
+- A co-op or union as **second operator** proves federation early.
+
+Other promising launch contexts:
+
+- Cooperatives and member organizations.
+- Mutual-aid and local community groups.
+- Privacy/open-source communities.
+- Online communities facing AI/bot spam.
 
 ### What This Is Not
 
@@ -117,7 +149,7 @@ As the product reaches working milestones, governance moves to members, workers,
 
 ### What Is Founder-Controlled Now
 
-Until the founding cohort exists and the product has working v1 infrastructure, the founder controls:
+Until member governance triggers are met and the product has working v1 infrastructure, the founder controls:
 
 - Product scope.
 - Repository direction.
@@ -158,13 +190,14 @@ Members should eventually control or ratify:
 
 Governance should move from founder control to member/steward control when these triggers are met:
 
-1. The v1 trust loop works publicly: card, QR, vouching, revocation, export, and one physical artifact.
-2. At least 25 founding members have active cards.
-3. At least 10 members have completed vouching or founding credential flow.
-4. At least 3 bootstrap stewards are named and willing to sign public rules.
-5. The first transparency report is published.
-6. The first revenue and cost report is published after paid orders begin.
-7. A 14-day public comment period has been completed for the constitution and technical standards.
+1. The v1 trust loop works publicly: card, QR, vouching, revocation, export, and one physical artifact—with **open card creation** (not cohort-gated).
+2. At least 25 active cards from users outside the founder’s direct network (public launch metric).
+3. At least 10 completed vouch flows between distinct users (social trust is real, not founder-issued only).
+4. A published **second resolver operator** commitment or live second host running `hc/v1` (federation credibility).
+5. At least 3 bootstrap stewards are named and willing to sign public rules.
+6. The first transparency report is published.
+7. The first revenue and cost report is published after paid orders begin.
+8. A 14-day public comment period has been completed for the constitution and technical standards.
 
 ### Transition Promise Language
 
@@ -179,6 +212,8 @@ Governance should move from founder control to member/steward control when these
 | v1 product scope | Decides | Advises | Later co-decide | Advises after cohort | Advises | Advises |
 | Protocol standards | Drafts | Advises | Ratify if labor-impacting | Ratify rights-impacting changes | Ratify operational trust rules | Advises |
 | QR format and resolver behavior | Drafts | Advises | Advises | Ratify rights-impacting changes | Advises | Advises |
+| Federated operator policy | Drafts | Advises | Advises | Ratify rights-impacting changes | Advises | Co-decides for org-hosted resolvers |
+| Resolver data retention / scan logging | Drafts | Temporarily executes | Advises | Ratifies | Reviews | Advises |
 | Suspension rules | Drafts | Temporarily executes | Advises | Ratifies | Co-decides and executes | Advises |
 | Individual suspensions | Emergency only | Executes under policy | No | Appeal oversight | Executes/reviews | No |
 | Verification thresholds | Drafts | Advises | Advises | Ratifies | Co-decides | Advises |
@@ -285,7 +320,7 @@ A static printed QR can be stolen, copied, photographed, or stuck somewhere misl
 **Use cases:**
 
 - Vouch bootstrapping.
-- Founding cohort.
+- Steward-led ceremonies (optional).
 - Appeals.
 - Higher-trust credentials.
 
@@ -319,6 +354,10 @@ The campaign is not "download our app." It is:
 
 > Help build a human-owned trust commons before the next wave of identity infrastructure is captured by platforms, surveillance, or speculation.
 
+The campaign also needs a concrete product hook:
+
+> Prove you're real without becoming a data product.
+
 ### Campaign Name Options
 
 - "A Card For Real Humans"
@@ -326,6 +365,7 @@ The campaign is not "download our app." It is:
 - "Proof Without Platforms"
 - "The Internet Needs A Public Human Layer"
 - "Founder-Built, Member-Governed"
+- "No Phone. No ID. No Tracking."
 
 ### Launch Story
 
@@ -333,32 +373,31 @@ The campaign is not "download our app." It is:
 2. Existing identity systems tend to demand surveillance, legal ID, platform lock-in, or financial speculation.
 3. Humanity Commons starts small: a signed card, a QR, a vouch, and the right to revoke.
 4. Physical cards and stickers make the idea visible.
-5. The long-term goal is member-governed digital infrastructure.
-6. The public can join the founding cohort and help shape the commons.
+5. The long-term goal is member-governed, **federated** digital infrastructure.
+6. Anyone can create a card when the resolver ships; early testers optionally help shape copy and ops (see below).
 
-### Founding Cohort
+### Public Launch And Optional Early Testers
 
-**Recommended size:** 25-100 people.
+**Public launch:** Card creation opens to the world when Phase A is stable. No invite list is required to participate.
 
-**Who:**
+**Optional early tester pool** (formerly “founding cohort” in older drafts): 10–25 people who volunteer for intensive feedback before or during public launch. This is **not** a gate, paid status tier, or fake governance body. See `docs/FOUNDING_COHORT_PLAYBOOK.md`.
+
+**Who helps early (optional):**
 
 - Early builders.
-- Friends and trusted network.
 - Cooperative organizers.
-- privacy/open-source people.
-- artists/designers.
-- local community operators.
-- people willing to test vouching and revocation honestly.
+- Privacy/open-source people.
+- Local community operators.
+- People willing to test vouching and revocation honestly.
 
-**Responsibilities:**
+**What they do:**
 
 - Create cards.
 - Test scan flows.
 - Give/receive vouches.
-- Test live control proof if included in the private alpha.
-- Order or test physical artifacts.
+- Test live control proof if included.
 - Review copy comprehension.
-- Ratify initial constitution after using the product.
+- Comment on constitution and standards during open windows.
 
 ### Founding Trust Bootstrap
 
@@ -389,10 +428,13 @@ Suggested framing:
 
 Primary CTAs:
 
-- Create a Humanity Card.
-- Join the founding cohort.
+- Create a Humanity Card (when live).
+- Create a Commons Pass (when live).
+- Read the protocol and standards.
+- Bring Humanity Commons to an event or community.
+- Run a compatible resolver (second operator path).
 - Read the Commons Roadmap.
-- Order a founding sticker/card.
+- Order a sticker/card (optional merch).
 - Become a supporter.
 
 Secondary CTAs:
@@ -400,6 +442,8 @@ Secondary CTAs:
 - Review the constitution.
 - Review the technical standards.
 - Review the product trust model.
+- Read the movement narrative.
+- Read the skeptic FAQ.
 - Apply to be a bootstrap steward.
 - Host a founding ceremony.
 - Bring Humanity Commons to your cooperative/community.
@@ -415,7 +459,7 @@ Possible drops:
 - "No phone. No ads. No follower count." sticker.
 - Founding shirt or hoodie capsule.
 - Steward kit.
-- Founding cohort card pack.
+- Early supporter card pack (optional).
 - Event table kit.
 
 Founding clothing constraints:
@@ -443,6 +487,24 @@ Angles:
 - "A cooperative alternative to platform identity."
 - "Physical cards and stickers that resolve to live revocable trust states."
 - "Proof-of-personhood without government ID or crypto speculation."
+- "Prove you're real without becoming a data product."
+- "No phone, no ID, no ads, no tracking."
+
+### Viral Loops To Design For
+
+The product becomes shareable when the card is a simple status object with moral clarity.
+
+Primary loops:
+
+- Founding card loop: people create attractive cards and share screenshots.
+- Vouch loop: users invite trusted friends because vouching requires real humans.
+- Live proof loop: in-person scanning becomes memorable when someone asks for live control.
+- Physical artifact loop: stickers/cards spark scans in the real world.
+- AI backlash loop: people want a humane alternative to bot panic and surveillance verification.
+- Community adoption loop: one event, co-op, or group uses cards, then members carry them elsewhere.
+- Anti-platform narrative loop: "No phone. No ID. No ads. No tracking."
+
+Do not rely on ideological agreement alone. The card must be useful and legible in a concrete situation.
 
 ### Viral Governance Without Lying
 
@@ -454,7 +516,7 @@ Good:
 - Public constitution.
 - Public decision logs.
 - Open comment windows.
-- Founding cohort ceremonies.
+- Optional early tester scan circles / ceremonies.
 - Transparent revenue goals.
 - "Founder-built today, member-governed by design."
 
@@ -558,10 +620,19 @@ This is not legal advice. It is a planning map for discussion with counsel.
 1. Start with current entity for v1 build.
 2. Publish governance transition promise.
 3. Form bootstrap steward council.
-4. Run founding cohort.
+4. Public launch; optional early tester pool.
 5. Consult counsel on multi-stakeholder cooperative vs trust-owned LLC.
 6. Choose structure after real member/revenue data exists.
 7. Convert before governance claims outgrow the legal reality.
+
+### Federation And Operator Liability
+
+Resolvers are **operators**, not neutral physics. The public plan MUST include:
+
+- What the reference operator stores (see `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` §5).
+- How legal requests are handled.
+- How a second operator joins without forking the trust grammar.
+- That **blockchain is not** the v1 legitimacy story—open standards and plural hosts are.
 
 ---
 
@@ -774,13 +845,14 @@ A member has a Humanity Card and opts into the governance commons under publishe
 
 ### Membership Requirements
 
-For v1 founding membership:
+For v1 membership:
 
 - Active Humanity Card.
 - Agreement to constitution.
 - No requirement for phone, email, government ID, or purchase.
 - Acceptance of no-surveillance and no-pay-to-verify principles.
-- Optional founding contribution through labor, testing, governance, support, donation, or artifact purchase.
+- Optional contribution through labor, testing, governance, support, donation, or artifact purchase.
+- **No requirement** to join a private cohort before creating a card.
 
 ### Member Classes
 
@@ -810,13 +882,12 @@ Supports financially or socially without special verification privileges.
 2. Read public principles.
 3. Accept member agreement.
 4. Choose membership path.
-5. Join founding cohort or waitlist.
-6. Optionally request/receive vouches.
+5. Optionally request/receive vouches.
 7. Participate in first ratification or feedback cycle.
 
 ### Member Rights At Launch
 
-Founding members should have:
+Members should have:
 
 - Right to review constitution.
 - Right to comment on standards.
@@ -848,14 +919,14 @@ Members should:
 
 **Story:**
 
-- A public card for real humans.
-- Create, vouch, scan, revoke.
+- A membership pass for communities that refuse surveillance.
+- Create a community, issue passes, scan, check in, stamp.
 - Founder-built today, member-governed by design.
 
 **CTA:**
 
-- Create a Humanity Card.
-- Join founding cohort.
+- Create a Commons Pass.
+- Create a Humanity Card (when live).
 
 #### `/card`
 
@@ -942,9 +1013,11 @@ Members should:
 - QR format.
 - Signed payloads.
 - Resolver behavior.
+- Federated operators.
 - Verification records.
 - Revocation.
 - Export.
+- Operator data retention policy.
 
 #### `/trust`
 
@@ -959,6 +1032,43 @@ Members should:
 - Steward or ceremony proof.
 - Forbidden claims and limitations.
 
+#### `/movement`
+
+**Purpose:** Explain the values and cultural reason to join without overloading the card UI.
+
+**Content:**
+
+- What Humanity Commons is against.
+- What Humanity Commons is for.
+- Why now.
+- Who this is for first.
+- No phone, no ID, no ads, no tracking.
+
+#### `/use-cases`
+
+**Purpose:** Show concrete contexts where the card is useful.
+
+**Content:**
+
+- Events and meetups.
+- Cooperatives and member organizations.
+- Mutual-aid groups.
+- Online communities facing AI/bot pressure.
+- Creators and independent builders.
+
+#### `/faq`
+
+**Purpose:** Answer skeptical objections clearly.
+
+**Content:**
+
+- Is this just a QR profile?
+- Why not government ID?
+- Can vouching be gamed?
+- Is this a social credit system?
+- Who controls it now?
+- How does money work?
+
 #### `/membership`
 
 **Purpose:** Explain user vs member.
@@ -966,7 +1076,8 @@ Members should:
 **Content:**
 
 - Member classes.
-- Founding cohort.
+- Public launch (open card creation).
+- Optional early tester pool.
 - Rights and responsibilities.
 - How to join.
 
@@ -1009,14 +1120,15 @@ Members should:
 
 ### Homepage Section Order
 
-1. Hero: A public card for real humans.
-2. How it works: create, vouch, scan, revoke.
+1. Hero: A membership pass for communities that refuse surveillance.
+2. How it works: create a community, issue passes, scan, check in, stamp.
 3. What a scan proves and does not prove.
-4. Why this matters.
-5. Founding artifacts.
-6. Member-governed by design.
-7. Roadmap preview.
-8. Calls to action.
+4. Where to use it: founding events, communities, cooperatives, and member groups.
+5. Why this matters.
+6. Founding artifacts.
+7. Member-governed by design.
+8. Roadmap preview.
+9. Calls to action.
 
 ---
 
@@ -1027,10 +1139,13 @@ Members should:
 3. Convert decision rights matrix into a public governance table.
 4. Add scan-page copy to v1 UI requirements.
 5. Add live proof model as a technical design note.
-6. Create founding cohort launch page.
+6. Publish protocol federation strategy and operator data policy.
 7. Draft support pages for stolen stickers, false vouches, and appeals.
 8. Publish initial finance policy, including founder compensation and conflict-of-interest policy, before taking paid orders.
 9. Publish membership page before claiming member governance.
 10. Put the roadmap on the website with honest status labels.
 11. Publish the product trust model and forbidden claims list before launch.
 12. Run copy comprehension tests for `Registered`, `Vouched Human`, printed QR bearer warnings, revoked/suspended states, and live control proof.
+13. Pick one beachhead launch context and write website copy for that use case.
+14. Track whether founding users invite others without being prompted.
+15. Publish movement narrative, launch language kit, use-case pages, visual identity principles, and skeptic FAQ before broad public launch.

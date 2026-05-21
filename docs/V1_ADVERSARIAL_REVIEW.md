@@ -15,7 +15,11 @@
 | High | Duplicate webhooks/retries can create duplicate Printify orders. | Idempotency must be built before live orders. |
 | High | Print QA failure after payment creates refunds/support pain. | Perform QR scan QA before checkout and again before Printify submission. |
 | Medium | Live control proof can be misunderstood as legal identity or unique-human proof. | Label it as recent key-control evidence only and keep it separate from verification state. |
+| Medium | The product may be admired but not urgently used. | Pick a beachhead and validate real use cases before broad launch. |
+| Medium | Physical artifacts may become merch instead of a trust loop. | Launch one artifact tied to scanning, vouching, live proof, and revocation. |
 | Medium | Bootstrap governance keys are undefined. | Define temporary signer authority and sunset criteria before launch. |
+| High | Single-operator resolver becomes permanent honeypot and capture risk. | Publish federation strategy; ship open spec; milestone second operator per PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY. |
+| Medium | Public launch abuse without rate limits overwhelms ops. | Rate limits + suspension policy before broad marketing; avoid permanent invite-only gate. |
 | Medium | Support tooling is under-specified for failed/on-hold/refunded orders. | Add operator views or at least internal lookup contracts before launch. |
 
 ---
@@ -139,20 +143,45 @@
 
 ---
 
+## Perspective 6: Investor Or Growth Reviewer Looking For A Real Market
+
+### Market Failure Cases
+
+| Failure | Why It Hurts | Required Fix |
+|---|---|---|
+| Users call it "just a QR profile." | The trust primitive is not differentiated. | Center signed status, vouches, live control proof, and revocation in the first demo. |
+| People like the mission but cannot name a use case. | Admiration does not create retention or revenue. | Pick one beachhead: events/meetups first, cooperative/member organization pilots second. |
+| Founding users do not invite others. | The vouch network cannot bootstrap. | Track invitations, vouch requests, and repeated scans as product metrics. |
+| Artifacts are bought as merch only. | Commerce distracts from trust infrastructure. | Keep one artifact tied directly to the trust loop and delay catalog expansion. |
+| Organizations say "interesting" but do not pilot. | No buyer or institutional path exists. | Test concrete workflows: event check-in, member onboarding, consent-based directories, ceremony support. |
+| Venture capital expects surveillance-scale growth. | Capital can pressure the product away from its trust commitments. | Prefer grants, customer revenue, donations, member loans, recoverable grants, capped revenue-based financing, or non-voting capital unless terms preserve user rights. |
+
+### Required Hardening
+
+- Add market validation gates before public launch.
+- Write launch copy for a specific beachhead, not "identity for everyone."
+- Measure whether users invite others without founder prompting.
+- Treat "willing to pay for a sticker" as weaker evidence than repeated scans, vouches, and community pilots.
+- Do not pitch this as venture-ready until there is a repeatable use case, buyer/funder signal, retention, and a growth loop consistent with the trust model.
+
+---
+
 ## Questions You Were Not Asking But Should Be
 
 1. What is the first physical product that proves the whole loop without overbuilding the store?
 2. What exact phrase replaces "verified human" if early vouching feels too weak?
 3. Is live control proof in v1.0, private alpha, or v1.1?
-4. Who has authority to issue founding badges before governance exists?
-5. Who can suspend a card on day one, and what proof must be public?
-6. What happens when Shopify payment succeeds but Humanity refuses fulfillment?
-7. What refund/reprint promise is made for misprints, revoked QR, and provider failures?
-8. How will a scanner distinguish "authentic object" from "verified person" in 3 seconds?
-9. What data must customer support see, and what data must it never see?
-10. What launch scope still feels like V1 if we remove device proof, transfer UI, native checkout, marketplace, and search?
-11. What are the first five things someone malicious will do to make the product look fake?
-12. What will you refuse to build even if users ask for it because it weakens trust?
+4. What is the first beachhead use case: event, cooperative, online community, or something else?
+5. Who has authority to issue founding badges before governance exists?
+6. Who can suspend a card on day one, and what proof must be public?
+7. What happens when Shopify payment succeeds but Humanity refuses fulfillment?
+8. What refund/reprint promise is made for misprints, revoked QR, and provider failures?
+9. How will a scanner distinguish "authentic object" from "verified person" in 3 seconds?
+10. What data must customer support see, and what data must it never see?
+11. What launch scope still feels like V1 if we remove device proof, transfer UI, native checkout, marketplace, and search?
+12. What are the first five things someone malicious will do to make the product look fake?
+13. What will you refuse to build even if users ask for it because it weakens trust?
+14. What evidence would prove this is more than a compelling manifesto?
 
 ---
 

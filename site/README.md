@@ -1,6 +1,6 @@
 # Humanity Commons landing (Cloudflare Pages)
 
-Static merch-led landing page. Copy aligned with `docs/LAUNCH_LANGUAGE_KIT.md`, `docs/MOVEMENT_NARRATIVE.md`, and `docs/VISUAL_IDENTITY_PRINCIPLES.md` (brand accent `#DB1B43`).
+Static landing for humanity.llc. Copy aligned with `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` (public launch, federated resolvers). Visual: `docs/VISUAL_IDENTITY_PRINCIPLES.md` (brand accent `#DB1B43`).
 
 ## Local preview
 
@@ -38,6 +38,6 @@ npm run deploy
 |------|---------|
 | `index.html` | Landing page |
 | `styles.css` | Layout and visual system |
-| `main.js` | Scroll reveal + card tilt |
+| `main.js` | Pass card 3D tilt (touch + desktop) |
 | `_headers` | Security and cache headers |
 | `assets/red_qr_transparent_bg.png` | Favicon, brand mark, card preview |

@@ -1,7 +1,7 @@
 # Founding Drop Brief (Operational)
 
 **Status:** Working checklist — fill in bracketed fields before launch  
-**Canonical strategy:** `docs/MERCH_LED_V1.md`  
+**Canonical strategy:** `docs/MERCH_LED_V1.md`, `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  
 **Copy source:** `docs/LAUNCH_LANGUAGE_KIT.md` (Tier 0 / Tier 1 sections)
 
 ---
@@ -12,7 +12,7 @@
 |---|---|---|
 | **Codename** | `[e.g. Signal Sticker]` | `[e.g. Founding Human Line]` |
 | **Purpose** | Walking ads + scan→create | Cohort trust + personalized artifact |
-| **Who can buy** | Open / waitlist-approved | Founding cohort invite only |
+| **Who can buy** | Open / waitlist-approved | Active Humanity Card holders (personalization); not a protocol invite gate |
 | **Window** | `[start]` → `[end]` | `[start]` → `[end]` (after Tier 0 or overlap final week) |
 | **Quantity cap** | `[e.g. 500]` or unlimited | `[e.g. 100]` |
 | **SKU count** | 1 design | 1 design (+ personalization when QA ready) |
@@ -45,8 +45,8 @@ Check every box before taking money.
 
 ### Tier 1 (belonging)
 
-- [ ] Founding cohort roster finalized (`[N]` members, max 25–100)
-- [ ] Invite codes or allowlist wired to checkout
+- [ ] Card-creation flow live (public launch)
+- [ ] Checkout verifies active card / owner session for personalized SKUs
 - [ ] Vouch rules published (3 vouch threshold, quotas, 90-day wait)
 - [ ] Shopify metadata spike passed if personalized (`artifact_intent_id` on paid webhook)
 - [ ] Printify sample order passed if per-item unique QR
@@ -119,7 +119,7 @@ Check every box before taking money.
 
 ### Storefront
 
-- [ ] Invite-only checkout (code or customer tag)
+- [ ] Personalized SKU requires active card / owner session (not protocol invite list)
 - [ ] Hero: belonging headline (kit Tier 1)
 - [ ] Explicit: founding artifact ≠ legal ID ≠ platform account
 

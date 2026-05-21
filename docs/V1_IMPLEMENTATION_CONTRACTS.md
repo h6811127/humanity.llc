@@ -3,6 +3,8 @@
 **Status:** Pre-rebuild hardening artifact  
 **Purpose:** Extract buildable contracts from the v1.0 prose specs.
 
+**Operators:** humanity.llc implements the **reference resolver** first. Compatible third-party hosts MUST follow `docs/Technical Standards v1.0.md` §9.6–9.7 and `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
+
 ---
 
 ## Build Slice
@@ -55,7 +57,7 @@ Optional but high-leverage for v1.1 or a strong private alpha:
 
 | Endpoint | Method | Auth | Contract |
 |---|---|---|---|
-| `GET /.well-known/hc/v1/health` | GET | None | Returns resolver version and health. |
+| `GET /.well-known/hc/v1/health` | GET | None | Returns resolver version, health, and operator id. |
 | `POST /.well-known/hc/v1/cards` | POST | Signed payload | Creates signed public card document. |
 | `GET /.well-known/hc/v1/cards/{profile_id}` | GET | None | Returns HTML or JSON public card. |
 | `GET /.well-known/hc/v1/cards/{profile_id}/status` | GET | None | Returns machine-readable card status. |
