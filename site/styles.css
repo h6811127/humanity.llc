@@ -106,13 +106,41 @@ a {
   color: var(--grey);
 }
 
-/* Pass card — scan-page fields per docs (handle, manifesto, trust, status, warning) */
+/* Pass card — scan-page fields; 3D tilt + idle motion (touch + desktop) */
+.pass-scene {
+  perspective: 900px;
+  width: 100%;
+  touch-action: pan-y;
+}
+
 .pass-inner {
   background: var(--white);
   color: var(--black);
   border-radius: var(--radius-lg);
   padding: 18px;
   border: 1px solid var(--grey);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 16px 40px rgba(0, 0, 0, 0.08);
+  transform: rotateY(-5deg) rotateX(4deg);
+  transform-style: preserve-3d;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+  animation: pass-idle 7s ease-in-out infinite;
+}
+
+.pass-scene.is-tilted .pass-inner {
+  animation: none;
+}
+
+@keyframes pass-idle {
+  0%,
+  100% {
+    transform: rotateY(-5deg) rotateX(4deg) translateY(0);
+  }
+  50% {
+    transform: rotateY(3deg) rotateX(-2deg) translateY(-5px);
+  }
 }
 
 .pass-head {
@@ -413,8 +441,30 @@ a {
   }
 }
 
+@media (min-width: 720px) and (hover: hover) and (pointer: fine) {
+  .pass-inner {
+    animation: none;
+    transform: rotateY(-6deg) rotateX(3deg);
+  }
+
+  .pass-scene:hover .pass-inner,
+  .pass-scene.is-tilted .pass-inner {
+    animation: none;
+  }
+
+  .pass-scene:hover .pass-inner {
+    transform: rotateY(0deg) rotateX(0deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .dock-btn:active {
     opacity: 1;
+  }
+
+  .pass-inner {
+    animation: none !important;
+    transform: none !important;
+    transition: none;
   }
 }
