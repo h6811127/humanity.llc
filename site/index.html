@@ -6,30 +6,36 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
-    <title>humanity.llc</title>
+    <title>Humanity Commons — A public card for real humans</title>
     <meta
       name="description"
-      content="A signed, revocable card on a sticker. Scan for live status—no phone, no ID, no scan analytics."
+      content="Humanity Commons is a signed public card for real humans. Vouched by people, revocable by you, readable without surveillance—no phone, no ID, no ads, no tracking."
     />
-    <meta name="theme-color" content="#0c0c0c" />
+    <meta name="theme-color" content="#08090c" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles.css" />
-    <meta property="og:title" content="humanity.llc" />
+    <meta property="og:title" content="Humanity Commons" />
     <meta
       property="og:description"
-      content="Signed public card on a sticker. Scan for current status."
+      content="A signed card. A real vouch. A right to revoke. Human trust without platform surveillance."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://humanity.llc" />
     <meta property="og:image" content="https://humanity.llc/assets/red_qr_transparent_bg.png" />
   </head>
   <body>
+    <div class="ambient" aria-hidden="true">
+      <div class="orb orb-a"></div>
+      <div class="orb orb-b"></div>
+      <div class="grid-glow"></div>
+    </div>
+
     <header class="header shell">
       <a class="brand" href="/">
         <img
@@ -39,106 +45,294 @@
           height="36"
           alt=""
         />
-        <span class="brand-name">humanity.llc</span>
+        <span class="brand-text">
+          <span class="brand-name">Humanity Commons</span>
+          <span class="brand-domain">humanity.llc</span>
+        </span>
       </a>
-      <a class="header-link" href="mailto:info@humanity.llc">
-        <span class="header-link-short">Email</span>
-        <span class="header-link-full">info@humanity.llc</span>
+      <nav class="nav" aria-label="Primary">
+        <a href="#how">How it works</a>
+        <a href="#trust">Trust</a>
+        <a href="#founding">Founding</a>
+      </nav>
+      <a class="header-cta" href="mailto:info@humanity.llc?subject=Founding%20cohort">
+        Join early
       </a>
     </header>
 
-    <main class="shell">
-      <section class="hero">
-        <div class="hero-visual">
-          <img
-            class="hero-qr"
-            src="/assets/red_qr_transparent_bg.png"
-            width="280"
-            height="280"
-            alt="QR code for humanity.llc"
-          />
-        </div>
-        <div class="hero-copy">
-          <p class="kicker">Signed card · live QR · revocable</p>
-          <h1>Scan it.<br />Read the limits.<br />Decide.</h1>
-          <p class="lede">
-            We’re building a public card you control—on a sticker, in your browser,
-            without phone numbers, government ID, or scan analytics. The QR is the
-            door; current status is the point.
-          </p>
-          <div class="actions">
-            <a class="btn" href="mailto:info@humanity.llc?subject=Founding%20sticker">Sticker drop</a>
-            <a class="btn btn-quiet" href="mailto:info@humanity.llc?subject=Early%20access">Early access</a>
+    <main>
+      <section class="hero shell">
+        <div class="hero-grid">
+          <div class="hero-copy reveal">
+            <p class="kicker">Signed card · live QR · revocable</p>
+            <h1>
+              A public card<br />
+              for <em>real humans</em>
+            </h1>
+            <p class="lede">
+              Prove enough for the situation—without phone numbers, government ID,
+              ads, or scan analytics. The QR is the door; current status is the point.
+            </p>
+            <div class="manifesto-chips" aria-label="Core promises">
+              <span>No phone</span>
+              <span>No ID</span>
+              <span>No ads</span>
+              <span>No tracking</span>
+            </div>
+            <div class="actions">
+              <a class="btn btn-primary" href="mailto:info@humanity.llc?subject=Founding%20cohort">
+                Request founding access
+              </a>
+              <a class="btn btn-quiet" href="#how">See how it works</a>
+            </div>
+            <p class="fine">
+              Not legal ID. Not KYC. Not pay-to-verify. A sticker does not prove who is
+              holding it.
+            </p>
           </div>
-          <p class="fine">
-            Buying merch never vouches you. A sticker does not prove who is holding it.
-          </p>
+
+          <div class="hero-stage reveal" style="--reveal-delay: 120ms">
+            <div class="card-scene" id="card-scene">
+              <article class="trust-card" aria-label="Example Humanity Card scan preview">
+                <header class="trust-card-head">
+                  <span class="trust-card-brand">Humanity Commons</span>
+                  <span class="pill pill-active">
+                    <span class="pill-dot" aria-hidden="true"></span>
+                    Active Card
+                  </span>
+                </header>
+                <div class="trust-card-profile">
+                  <div class="avatar" aria-hidden="true">@</div>
+                  <div>
+                    <p class="handle">river.founding</p>
+                    <p class="manifesto">Human trust without surveillance.</p>
+                  </div>
+                </div>
+                <ul class="trust-pills">
+                  <li class="pill pill-vouched">
+                    <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+                      <path
+                        fill="currentColor"
+                        d="M6.2 9.4 3.4 6.6l.9-.9 1.9 1.9 4.5-4.5.9.9-5.4 5.4z"
+                      />
+                    </svg>
+                    Vouched Human
+                  </li>
+                  <li class="pill pill-control">
+                    <span class="pill-dot pill-dot-live" aria-hidden="true"></span>
+                    Control Proven
+                  </li>
+                  <li class="pill pill-qr">
+                    <span class="pill-dot pill-dot-live" aria-hidden="true"></span>
+                    QR Active
+                  </li>
+                </ul>
+                <div class="trust-card-qr-wrap">
+                  <img
+                    class="trust-card-qr"
+                    src="/assets/red_qr_transparent_bg.png"
+                    width="120"
+                    height="120"
+                    alt=""
+                  />
+                </div>
+                <p class="trust-card-warning">
+                  Holding a printed QR does not prove identity or ownership.
+                </p>
+              </article>
+              <p class="card-caption">Mobile scan preview — illustrative</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section class="panel" aria-labelledby="status-heading">
-        <h2 id="status-heading">What exists right now</h2>
-        <ul class="status-list">
+      <div class="ticker-wrap" aria-hidden="true">
+        <div class="ticker">
+          <span>No phone · No ID · No ads · No tracking · </span>
+          <span>A signed card · A real vouch · A right to revoke · </span>
+          <span>Human trust without platform surveillance · </span>
+          <span>No phone · No ID · No ads · No tracking · </span>
+          <span>A signed card · A real vouch · A right to revoke · </span>
+          <span>Human trust without platform surveillance · </span>
+        </div>
+      </div>
+
+      <section class="section shell" id="how">
+        <div class="section-head reveal">
+          <p class="section-label">How it works</p>
+          <h2>The trust loop, not another profile link</h2>
+          <p class="section-lede">
+            A generic QR profile points to content. A Humanity Card is a signed,
+            revocable trust object that always resolves to current status.
+          </p>
+        </div>
+        <ol class="steps reveal">
+          <li class="step">
+            <span class="step-num">01</span>
+            <h3>Create a signed card</h3>
+            <p>
+              Your keys stay on your device. The public card is inspectable, portable,
+              and yours to export or revoke.
+            </p>
+          </li>
+          <li class="step">
+            <span class="step-num">02</span>
+            <h3>Get vouched by real people</h3>
+            <p>
+              Accountable social trust under published rules—not follower counts, hidden
+              scores, or pay-to-be-real status.
+            </p>
+          </li>
+          <li class="step">
+            <span class="step-num">03</span>
+            <h3>Scan for live status</h3>
+            <p>
+              HTTPS QR resolves to what the card proves right now: active, revoked,
+              suspended, or unknown—with limits stated plainly.
+            </p>
+          </li>
+        </ol>
+      </section>
+
+      <section class="section section-contrast shell" id="trust">
+        <div class="trust-split reveal">
+          <div class="trust-col trust-col-for">
+            <p class="section-label">What it can show</p>
+            <ul class="trust-list">
+              <li>Signed public card data</li>
+              <li>Current QR and card status</li>
+              <li>Vouched Human under rules</li>
+              <li>Recent live control of the card key</li>
+              <li>Revocation and suspension states</li>
+            </ul>
+          </div>
+          <div class="trust-col trust-col-against">
+            <p class="section-label">What it does not claim</p>
+            <ul class="trust-list trust-list-muted">
+              <li>Legal identity or KYC</li>
+              <li>That the nearby person owns the card</li>
+              <li>Bot-proof or fraud-proof humanity</li>
+              <li>Silent scan analytics</li>
+              <li>Platform-owned identity</li>
+            </ul>
+          </div>
+        </div>
+        <blockquote class="trust-quote reveal">
+          <p>
+            This card is signed, current, revocable, socially vouched where shown, and
+            able to prove live control when needed.
+          </p>
+        </blockquote>
+      </section>
+
+      <section class="section shell">
+        <div class="section-head reveal">
+          <p class="section-label">Who it’s for first</p>
+          <h2>Communities that already feel the cost</h2>
+        </div>
+        <ul class="audience reveal">
+          <li>Founding meetups &amp; events</li>
+          <li>Cooperatives &amp; mutual aid</li>
+          <li>Unions &amp; worker orgs</li>
+          <li>Privacy &amp; open-source groups</li>
+          <li>Clubs tired of platform lock-in</li>
+          <li>Online spaces fighting bot spam</li>
+        </ul>
+      </section>
+
+      <section class="section shell">
+        <div class="bento reveal">
+          <article class="bento-cell bento-wide">
+            <p class="section-label">Commons Pass</p>
+            <h3>Community membership without surveillance platforms</h3>
+            <p>
+              After the personal card loop works: mobile web passes for communities—invite
+              members, scan QR for current status, check in to events, issue signed stamps.
+              No phone numbers. No ads. No scan analytics.
+            </p>
+          </article>
+          <article class="bento-cell">
+            <p class="section-label">Merch-led wedge</p>
+            <h3>Curiosity in the wild</h3>
+            <p>
+              A physical sticker as walking QR—strangers scan, read honest limits, and
+              decide. Belonging comes from vouches and founding cohort, not merch alone.
+            </p>
+          </article>
+          <article class="bento-cell">
+            <p class="section-label">Governance path</p>
+            <h3>Built to become commons</h3>
+            <p>
+              Founder-built first, with public rules and a founding cohort. If the trust
+              loop works, infrastructure moves toward member and worker governance.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section shell status-section">
+        <div class="section-head reveal">
+          <p class="section-label">Build status</p>
+          <h2>What exists right now</h2>
+        </div>
+        <ul class="status-list reveal">
           <li>
             <span class="dot dot-live" aria-hidden="true"></span>
             <div>
               <strong>This site</strong>
-              <span>humanity.llc — what we’re building and how to reach us.</span>
+              <span>humanity.llc — the story, principles, and how to reach us.</span>
             </div>
           </li>
           <li>
             <span class="dot dot-build" aria-hidden="true"></span>
             <div>
-              <strong>Card + resolver</strong>
+              <strong>Humanity Card + resolver</strong>
               <span>In build: signed card, HTTPS QR, revocation, honest scan page.</span>
             </div>
           </li>
           <li>
             <span class="dot dot-next" aria-hidden="true"></span>
             <div>
-              <strong>Founding sticker</strong>
-              <span>Next: one physical SKU, one story—walking QR, not verification in the mail.</span>
+              <strong>Founding sticker drop</strong>
+              <span>Next: one physical SKU, one story—a walking QR, not verification in the mail.</span>
             </div>
           </li>
         </ul>
       </section>
 
-      <section class="panel panel-grid" aria-labelledby="principles-heading">
-        <h2 id="principles-heading">Principles</h2>
-        <dl class="principles">
-          <div>
-            <dt>No surveillance default</dt>
-            <dd>Public QR flows don’t ship scan analytics.</dd>
+      <section class="founding shell" id="founding">
+        <div class="founding-inner reveal">
+          <p class="section-label">Founding cohort</p>
+          <h2>Help test whether the trust loop is real</h2>
+          <p>
+            We’re inviting a small group to create cards, scan each other, try vouching and
+            live control proof, and catch anything confusing before public launch. You’re
+            not buying verification—you’re stress-testing honest infrastructure.
+          </p>
+          <div class="actions actions-center">
+            <a class="btn btn-primary" href="mailto:info@humanity.llc?subject=Founding%20cohort">
+              Apply for founding cohort
+            </a>
+            <a class="btn btn-quiet" href="mailto:info@humanity.llc?subject=Founding%20sticker">
+              Sticker drop interest
+            </a>
           </div>
-          <div>
-            <dt>Mechanism over hype</dt>
-            <dd>Labels say how trust was earned—not “verified forever.”</dd>
-          </div>
-          <div>
-            <dt>Portable & revocable</dt>
-            <dd>You export; you revoke; status stays current on scan.</dd>
-          </div>
-          <div>
-            <dt>Not legal ID</dt>
-            <dd>No KYC, no government ID, no pay-to-be-real.</dd>
-          </div>
-        </dl>
-      </section>
-
-      <section class="panel panel-closing">
-        <p class="closing-line">
-          Questions, pilots, or founding cohort —
-          <a href="mailto:info@humanity.llc">info@humanity.llc</a>
-        </p>
+        </div>
       </section>
     </main>
 
     <footer class="footer shell">
-      <span>© <span id="y"></span> humanity.llc</span>
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="/assets/red_qr_transparent_bg.png" width="28" height="28" alt="" />
+          <span>Humanity Commons</span>
+        </div>
+        <p class="footer-tagline">Human trust should not require surveillance.</p>
+        <a class="footer-email" href="mailto:info@humanity.llc">info@humanity.llc</a>
+      </div>
+      <p class="footer-copy">© <span id="y"></span> humanity.llc — planning &amp; specification in progress.</p>
     </footer>
 
-    <script>
-      document.getElementById("y").textContent = new Date().getFullYear();
-    </script>
+    <script src="/main.js" defer></script>
   </body>
 </html>
