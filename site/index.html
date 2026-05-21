@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=11" />
+    <link rel="stylesheet" href="/styles.css?v=12" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -45,38 +45,60 @@
 
         <section class="pass" id="card" aria-label="Card preview">
           <div class="pass-scene" id="pass-scene">
-            <div class="pass-inner">
-            <div class="pass-head">
-              <div class="pass-brand">
-                <span class="pass-dot" aria-hidden="true"></span>
-                <span>humanity.llc</span>
+            <div class="pass-flip" id="pass-flip">
+              <div class="pass-inner">
+                <div class="pass-face pass-front">
+                  <div class="pass-head">
+                    <div class="pass-brand">
+                      <span class="pass-dot" aria-hidden="true"></span>
+                      <span>humanity.llc</span>
+                    </div>
+                    <span class="pass-badge">Active card</span>
+                  </div>
+                  <div class="pass-body">
+                    <div class="pass-main">
+                      <p class="pass-name">river.example</p>
+                      <p class="pass-manifesto">Portable trust under published rules.</p>
+                      <p class="pass-since">Card since 2026</p>
+                      <ul class="pass-trust" aria-label="Trust at a glance">
+                        <li class="trust-on">Vouched human</li>
+                        <li>Live control</li>
+                        <li>QR active</li>
+                      </ul>
+                    </div>
+                    <div class="pass-qr">
+                      <img
+                        src="/assets/red_qr_transparent_bg.png"
+                        width="96"
+                        height="96"
+                        alt="QR code"
+                      />
+                    </div>
+                  </div>
+                  <p class="pass-foot">
+                    Scan shows current status. It does not prove the nearby person owns this
+                    card.
+                  </p>
+                  <p class="pass-tap-hint">Tap to flip</p>
+                </div>
+                <div class="pass-face pass-back" aria-hidden="true">
+                  <div class="pass-head">
+                    <div class="pass-brand">
+                      <span class="pass-dot" aria-hidden="true"></span>
+                      <span>Resolver data</span>
+                    </div>
+                    <span class="pass-badge">Limits</span>
+                  </div>
+                  <ul class="pass-back-list">
+                    <li><strong>Stores:</strong> public card, keys, handle, status, signed vouches</li>
+                    <li><strong>Does not store:</strong> private keys, ID, phone, scan analytics</li>
+                    <li><strong>Logs:</strong> no scan logging by default</li>
+                  </ul>
+                  <p class="pass-foot">
+                    <a href="/data-policy.html">Full operator data policy</a>
+                  </p>
+                </div>
               </div>
-              <span class="pass-badge">Active card</span>
-            </div>
-            <div class="pass-body">
-              <div class="pass-main">
-                <p class="pass-name">river.example</p>
-                <p class="pass-manifesto">Portable trust under published rules.</p>
-                <p class="pass-since">Card since 2026</p>
-                <ul class="pass-trust" aria-label="Trust at a glance">
-                  <li class="trust-on">Vouched human</li>
-                  <li>Live control</li>
-                  <li>QR active</li>
-                </ul>
-              </div>
-              <div class="pass-qr">
-                <img
-                  src="/assets/red_qr_transparent_bg.png"
-                  width="96"
-                  height="96"
-                  alt="QR code"
-                />
-              </div>
-            </div>
-            <p class="pass-foot">
-              Scan shows current status. It does not prove the nearby person owns this
-              card.
-            </p>
             </div>
           </div>
         </section>
@@ -266,6 +288,23 @@
             </li>
             <li class="list-row">
               <span class="list-title">No scan analytics by default</span>
+            </li>
+            <li class="list-row list-action">
+              <a href="/data-policy.html">
+                <span class="list-title">Operator data policy</span>
+                <span class="list-sub">What the resolver stores—and what it does not</span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a
+                href="https://github.com/h6811127/humanity.llc/blob/main/docs/REFERENCE_OPERATOR_DATA_POLICY.md"
+                rel="noopener noreferrer"
+              >
+                <span class="list-title">Policy on GitHub</span>
+                <span class="list-sub">Canonical markdown in the repo</span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
             </li>
           </ul>
         </section>

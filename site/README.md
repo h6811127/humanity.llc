@@ -11,6 +11,8 @@ npm run pages:dev
 
 Open the URL Wrangler prints (usually `http://localhost:8788`).
 
+**Pass card (mobile Safari):** no idle spin on touch devices; drag to tilt; tap to flip front/back; release returns to neutral. Policy links under **Limits** and on the card back.
+
 ## Deploy on Cloudflare Pages
 
 ### Dashboard (Git-connected)
@@ -37,7 +39,8 @@ npm run deploy
 | File | Purpose |
 |------|---------|
 | `index.html` | Landing page |
+| `data-policy.html` | Mobile-friendly operator data policy summary |
 | `styles.css` | Layout and visual system |
-| `main.js` | Pass card 3D tilt (touch + desktop) |
+| `main.js` | Pass card tilt (touch + desktop), tap-to-flip |
 | `_headers` | Security and cache headers |
 | `assets/red_qr_transparent_bg.png` | Favicon, brand mark, card preview |

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Operator data policy · humanity.llc</title>
+    <meta
+      name="description"
+      content="What the humanity.llc reference resolver stores—and what it does not."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=12" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <img src="/assets/red_qr_transparent_bg.png" width="28" height="28" alt="" />
+          <span>humanity.llc</span>
+        </a>
+      </header>
+
+      <main class="screen">
+        <section class="hero">
+          <p class="hero-eyebrow">Reference operator</p>
+          <h1>Data policy</h1>
+          <p class="hero-line">
+            Minimize retention. Publish what we store. No scan analytics by default.
+          </p>
+        </section>
+
+        <section class="group">
+          <h2 class="group-label">May store</h2>
+          <ul class="list">
+            <li>
+              <span class="list-title">Public trust layer</span>
+              <span class="list-sub"
+                >Profile id, public key, handle, manifesto, signed card, QR credentials,
+                status flags</span
+              >
+            </li>
+            <li>
+              <span class="list-title">Vouches &amp; revocations</span>
+              <span class="list-sub"
+                >Signed vouches, verification summaries, revocation and suspension
+                records</span
+              >
+            </li>
+            <li>
+              <span class="list-title">Live control</span>
+              <span class="list-sub"
+                >Short-lived challenge records (minutes), not long-term history</span
+              >
+            </li>
+          </ul>
+        </section>
+
+        <section class="group">
+          <h2 class="group-label">Must not store</h2>
+          <ul class="list">
+            <li class="list-row">
+              <span class="list-title">Private keys or recovery secrets</span>
+            </li>
+            <li class="list-row">
+              <span class="list-title">Government ID or KYC artifacts</span>
+            </li>
+            <li class="list-row">
+              <span class="list-title">Phone or email required for card creation</span>
+            </li>
+            <li class="list-row">
+              <span class="list-title">Scan analytics or fingerprinting</span>
+            </li>
+            <li class="list-row">
+              <span class="list-title">Payment or shipping PII in the resolver DB</span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="group">
+          <h2 class="group-label">Access logs</h2>
+          <p class="group-intro">
+            Default: no scan logging. Any future minimal logs require governance approval
+            and published retention—not a silent product change.
+          </p>
+        </section>
+
+        <section class="group" id="now">
+          <h2 class="group-label">Full spec</h2>
+          <ul class="list">
+            <li class="list-row list-action">
+              <a
+                href="https://github.com/h6811127/humanity.llc/blob/main/docs/REFERENCE_OPERATOR_DATA_POLICY.md"
+                rel="noopener noreferrer"
+              >
+                <span class="list-title">REFERENCE_OPERATOR_DATA_POLICY.md</span>
+                <span class="list-sub">Canonical policy in the repo</span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/">
+                <span class="list-title">Back to landing</span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
