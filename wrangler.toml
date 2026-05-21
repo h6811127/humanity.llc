@@ -1,0 +1,7 @@
+# Cloudflare Pages — static site in /site
+# Dashboard: Build command (empty), Build output directory: site
+# Or deploy locally: npx wrangler pages deploy site --project-name=humanity-llc
+
+name = "humanity-llc"
+compatibility_date = "2024-08-01"
+pages_build_output_dir = "site"

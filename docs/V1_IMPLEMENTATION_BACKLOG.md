@@ -3,6 +3,8 @@
 **Status:** Build planning artifact  
 **Purpose:** Convert the v1.0 contracts, flow audit, decision lock, and assumption register into an execution backlog.
 
+**GTM order:** Follow phase sequencing in `docs/MERCH_LED_V1.md` (digital trust → curiosity drop → belonging drop → Commons Pass). Tasks below remain valid but may be re-prioritized to match that doc.
+
 ---
 
 ## Operating Rule
@@ -113,6 +115,44 @@ These are not engineering tasks. They are short owner decisions needed to preven
 **Exit criteria:**
 
 - Policies are ready before accepting real payment.
+
+### D-006: Choose First Beachhead Use Case
+
+**Recommendation:** Start with founding events/meetups and adjacent cooperative or member-organization pilots. Do not launch as generic identity infrastructure.
+
+**Decision needed:**
+
+- First use context: event/meetup, cooperative/member organization, privacy/open-source community, online anti-bot community, or another explicit segment.
+- Who the first 25-100 founding users are.
+- What real-world moment the demo is designed around.
+- Whether the first public story is "public card for real humans," "event trust card," "member card for democratic communities," or another sharper wedge.
+
+**Exit criteria:**
+
+- One beachhead is selected.
+- At least 5 target users can name a real context where they would use the card.
+- At least 1 event, community, club, cooperative, or organization agrees to a pilot conversation.
+- Launch copy is written for that beachhead, not for "everyone."
+
+### D-007: Separate Product, Trust, And Movement Layers
+
+**Recommendation:** Keep the scan/card UI practical and fast. Put movement narrative, launch language, skeptic answers, and governance depth in supporting pages and founding cohort rituals.
+
+**Decision needed:**
+
+- Which movement lines are approved for homepage and artifacts.
+- Which lines are allowed on the scan page.
+- Which claims are forbidden everywhere.
+- Which visual identity direction is used for the mobile Safari card.
+- Which skeptic FAQ answers are public at launch.
+
+**Exit criteria:**
+
+- Movement narrative is published.
+- Launch language kit is approved.
+- Skeptic FAQ is published.
+- Visual identity principles are approved.
+- The scan page does not become a political flyer or generic link profile.
 
 ---
 
@@ -512,6 +552,16 @@ Goal: make the vertical slice credible for a founding cohort.
 - A tester can scan the revoked QR and understand that the physical object still exists but no longer resolves as active.
 - A tester can see that sibling printed-item QR credentials remain active.
 
+### H-002B: Market Use-Case Validation
+
+**Must verify:**
+
+- Founding users can name a real situation where they would use their card.
+- At least one event, cooperative, club, online community, or member organization wants to pilot the card.
+- Users do not summarize the product as "just a QR profile."
+- Users invite at least some other humans because vouching or live proof creates value.
+- Positive feedback is not merely ideological agreement with the mission.
+
 ### H-003: Physical QA
 
 **Must verify:**
@@ -530,6 +580,18 @@ Goal: make the vertical slice credible for a founding cohort.
 - Data retention policy for print order PII is published.
 - Bootstrap governance key fingerprints and sunset criteria are public.
 - Forbidden claims list is published internally for launch copy review.
+
+### H-005: Growth Loop Readiness
+
+**Must verify:**
+
+- Founding card screenshots are attractive enough to share.
+- Vouch requests create a natural invitation loop.
+- Live control proof is memorable in an in-person demo.
+- Physical artifacts cause scans rather than only acting as merch.
+- The anti-platform line is simple enough to repeat: "No phone. No ID. No ads. No tracking."
+- The movement narrative gives people a reason to share without making the card UI harder to understand.
+- Skeptical users can defend the concept using the public FAQ.
 
 ---
 
@@ -572,6 +634,8 @@ Includes:
 - PII separation and retention policy.
 - Bootstrap governance keys.
 - Founding cohort launch.
+- Beachhead market validation.
+- One concrete pilot context.
 
 ### Conservative Support-Ready Launch: 16-20 Weeks
 
@@ -582,6 +646,7 @@ Includes:
 - More robust fulfillment edge cases.
 - Accessibility and performance pass.
 - More realistic incident/support playbooks.
+- Stronger evidence of retention and invitations beyond novelty.
 
 ---
 
@@ -590,8 +655,10 @@ Includes:
 ### Week 1
 
 1. Lock D-001 through D-005.
-2. Start S-001 Shopify metadata spike.
-3. Scaffold schemas, enums, fixtures, and signature harness.
+2. Lock D-006 beachhead use case.
+3. Lock D-007 product/trust/movement separation.
+4. Start S-001 Shopify metadata spike.
+5. Scaffold schemas, enums, fixtures, and signature harness.
 
 ### Week 2
 
@@ -615,3 +682,5 @@ Includes:
 - Broad product catalog polish.
 - Public claims stronger than the verification model can support.
 - Public live control proof claims unless the challenge flow is actually implemented.
+- Generic "identity for everyone" launch positioning.
+- Venture fundraising narrative before beachhead use, retention, and buyer/funder signals exist.

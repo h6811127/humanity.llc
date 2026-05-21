@@ -1,14 +1,24 @@
 # Humanity Commons
 
-Humanity Commons is a signed, revocable public card for real people and democratic communities.
+Humanity Commons is infrastructure for real people and democratic communities.
 
-The v1 product is intentionally small: create a Humanity Card, share it by QR, receive vouches from real people, prove live control when needed, revoke old QR credentials, and carry the card into the physical world through stickers or cards.
+The product direction is **Commons Pass**: a mobile web membership pass for communities that want trust, belonging, events, credentials, and governance without surveillance platforms.
+
+The Humanity Card remains the personal credential primitive: create a signed card, share it by QR, receive vouches from real people, prove live control when needed, and revoke old QR credentials.
 
 This is not a social network, government ID system, KYC product, follower graph, crypto identity scheme, or surveillance analytics platform. It is a trust primitive designed to grow into member-governed digital infrastructure.
+
+The near-term market wedge is **merch-led distribution**: physical artifacts as walking advertisements that resolve to an honest trust object. That pairs **proof of curiosity** (strangers scan and create) with **proof of belonging** (founding cohort, vouches, repeat wear). Community passes and organizer check-in follow once people already wear the QR. See `docs/MERCH_LED_V1.md`.
 
 ---
 
 ## Product Promise
+
+Commons Pass:
+
+> Create a community, invite members, issue mobile web passes, scan QR codes for current membership status, check people into events, and issue signed community stamps without phone numbers, ads, or scan analytics.
+
+Humanity Card:
 
 > Create a signed public Humanity Card, get vouched for by real people, prove live control when needed, and carry a QR that always resolves to current status.
 
@@ -26,7 +36,19 @@ See `docs/V1_PRODUCT_TRUST_MODEL.md` for the full trust model.
 
 ## V1 Scope
 
-The first implementation slice is:
+The Commons Pass first implementation slice is:
+
+1. Community creation.
+2. Member invitation.
+3. Mobile web pass issuance.
+4. HTTPS QR pass resolution.
+5. Active/revoked/suspended pass status.
+6. Event creation.
+7. Organizer check-in.
+8. Signed community stamp issuance.
+9. Live control integration where scoped.
+
+The Humanity Card foundational slice remains:
 
 1. Signed public Humanity Card creation.
 2. HTTPS QR resolution.
@@ -86,9 +108,22 @@ Signed card -> HTTPS QR -> trust-state UI -> artifact intent -> unique printed-i
 
 ## Documentation Map
 
+**V1 wedge (start here):**
+
+- `docs/MERCH_LED_V1.md` — curiosity + belonging, build order, founding drop tiers
+- `docs/FOUNDING_DROP_BRIEF.md` — Tier 0/1 launch checklist (fill brackets before print)
+- `docs/LAUNCH_LANGUAGE_KIT.md` — Tier 0/1 storefront, scan, email, social copy
+
 Core product and trust:
 
+- `docs/COMMONS_PASS_PRODUCT_STRATEGY.md`
+- `docs/COMMONS_PASS_V1_SPEC.md`
+- `docs/COMMONS_PASS_TECHNICAL_ARCHITECTURE.md`
+- `docs/COMMONS_PASS_SECURITY_AND_PRIVACY.md`
+- `docs/COMMONS_PASS_DESIGN_AND_UX.md`
 - `docs/V1_PRODUCT_TRUST_MODEL.md`
+- `docs/V1_MARKET_AND_GROWTH_STRATEGY.md`
+- `docs/V1_USE_CASES.md`
 - `docs/features/Humanity Card v1.0.md`
 - `docs/features/Human Verification v1.0.md`
 - `docs/features/QR Public Profile v1.0.md`
@@ -111,22 +146,38 @@ Governance and enterprise direction:
 
 - `docs/PUBLIC_LAUNCH_AND_GOVERNANCE_PLAN.md`
 - `docs/COMMONS_ROADMAP.md`
+- `docs/MOVEMENT_NARRATIVE.md`
+- `docs/LAUNCH_LANGUAGE_KIT.md`
+- `docs/FOUNDING_COHORT_PLAYBOOK.md`
+- `docs/VISUAL_IDENTITY_PRINCIPLES.md`
+- `docs/SKEPTIC_FAQ.md`
 - `docs/🧠 Organizing Documents/📜 Constitution.md`
 - `docs/Technical Standards v1.0.md`
 
 ---
 
+## Landing page (Cloudflare Pages)
+
+Static site in [`site/`](site/). Deploy with build output directory **`site`** (no build command). See [`site/README.md`](site/README.md).
+
+```bash
+npx wrangler pages deploy site --project-name=humanity-llc
+```
+
+---
+
 ## Current Status
 
-This repository is currently a planning and specification repo. The next practical work is to validate the riskiest provider assumptions and then build a narrow private alpha.
+This repository is a planning and specification repo with a deployable landing page. The next practical work is to validate the riskiest provider assumptions and then build a narrow private alpha.
 
-Recommended first steps:
+Recommended first steps (see `docs/MERCH_LED_V1.md`):
 
-1. Lock first artifact product, Shopify implementation style, bootstrap governance keys, launch labels, support/revenue policy, and live control proof scope.
-2. Run the Shopify artifact metadata spike.
-3. Run the Printify unique QR sample spike.
-4. Scaffold schemas, state machines, signatures, and fixtures from `docs/V1_IMPLEMENTATION_CONTRACTS.md`.
-5. Build the card, QR, revocation, and trust-state UI before broad storefront work.
+1. Lock founding drop tiers: open curiosity SKU vs closed belonging cohort; first artifact (sticker first).
+2. Build Phase A digital slice: card, HTTPS QR, trust-state UI, vouch display, revocation pages.
+3. Run founding cohort (10–25) until in-person scans and vouches work without overclaiming.
+4. Ship Tier 0 curiosity drop (one story, one SKU); measure scan→create and stranger orders.
+5. Ship Tier 1 personalized founding artifacts after Printify/Shopify spikes pass.
+6. Defer Commons Pass (community console, check-in, stamps) until Phase A–C metrics hit.
 
 ---
 
@@ -135,4 +186,6 @@ Recommended first steps:
 Humanity Commons should make the strongest honest claim, not the strongest possible claim:
 
 > This card is signed, current, revocable, socially vouched where shown, and able to prove live control when needed.
+
+The first market proof is not technical. It is whether 25-100 people understand where they would use the card and invite others because the trust loop creates real value.
 
