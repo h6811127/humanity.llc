@@ -1,0 +1,14 @@
+{
+  "name": "humanity-llc",
+  "private": true,
+  "description": "Humanity Commons static landing (Cloudflare Pages)",
+  "scripts": {
+    "build": "node -e \"require('fs').accessSync('site/index.html'); console.log('Static site ready: site/')\"",
+    "deploy": "wrangler pages deploy site --project-name=humanity-llc",
+    "pages:deploy": "wrangler pages deploy site --project-name=humanity-llc",
+    "pages:dev": "wrangler pages dev site"
+  },
+  "devDependencies": {
+    "wrangler": "^4.93.0"
+  }
+}

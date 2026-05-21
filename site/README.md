@@ -4,15 +4,32 @@ Static merch-led landing page. Copy aligned with `docs/LAUNCH_LANGUAGE_KIT.md` (
 
 ## Deploy on Cloudflare Pages
 
+### Fix: `wrangler deploy` failed
+
+If the build log shows `Executing user deploy command: npx wrangler deploy`, that is **wrong** for this repo. `wrangler deploy` targets Workers; this site is **Pages** static files in `site/`.
+
+**In Cloudflare → your project → Settings → Builds:**
+
+| Setting | Value |
+|---------|--------|
+| Build command | *(empty)* or `npm run build` |
+| Build output directory | **`site`** |
+| Deploy command | **Leave empty** |
+
+Do **not** use `npx wrangler deploy`. If a deploy command is required, use:
+
+```bash
+npm run deploy
+```
+
+which runs `wrangler pages deploy site`.
+
 ### Git-connected (recommended)
 
-1. Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** → Connect this repo.
-2. **Build settings:**
-   - Framework preset: **None**
-   - Build command: *(leave empty)*
-   - Build output directory: **`site`**
+1. Cloudflare dashboard → **Workers & Pages** → **Pages** → your project → **Settings** → **Builds**.
+2. Set build output directory to **`site`** and **clear** any custom deploy command.
 3. **Custom domain:** `humanity.llc` (or staging subdomain first).
-4. Deploy.
+4. Retry deployment.
 
 ### Wrangler CLI
 

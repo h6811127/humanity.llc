@@ -161,8 +161,11 @@ Governance and enterprise direction:
 Static site in [`site/`](site/). Deploy with build output directory **`site`** (no build command). See [`site/README.md`](site/README.md).
 
 ```bash
-npx wrangler pages deploy site --project-name=humanity-llc
+npm run deploy
+# or: npx wrangler pages deploy site --project-name=humanity-llc
 ```
+
+**Cloudflare dashboard:** build output directory = `site`, deploy command = *(empty)*. Do not use `npx wrangler deploy` (Workers).
 
 ---
 

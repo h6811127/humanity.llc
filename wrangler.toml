@@ -1,7 +1,21 @@
 # Cloudflare Pages — static site in /site
-# Dashboard: Build command (empty), Build output directory: site
-# Or deploy locally: npx wrangler pages deploy site --project-name=humanity-llc
+#
+# Git deploy (recommended):
+#   Build command:        npm run build   (or leave empty)
+#   Build output dir:     site
+#   Deploy command:       LEAVE EMPTY — do not use `npx wrangler deploy`
+#
+# If your project requires a deploy command, use:
+#   npm run deploy
+#   (runs `wrangler pages deploy`, not `wrangler deploy`)
+#
+# CLI: npm run pages:deploy
 
 name = "humanity-llc"
 compatibility_date = "2024-08-01"
 pages_build_output_dir = "site"
+
+# Fallback only if the dashboard still runs `wrangler deploy` (Workers CLI).
+# Prefer clearing that command and using build output directory `site` instead.
+[assets]
+directory = "./site"
