@@ -1,4 +1,4 @@
-/* humanity.llc — iOS-inspired shell. #DB1B43 · #000 · #fff · #b8b8b8 */
+/* humanity.llc — iOS grouped UI, light. #DB1B43 · #000 · #fff · #b8b8b8 */
 
 :root {
   --red: #db1b43;
@@ -7,7 +7,6 @@
   --grey: #b8b8b8;
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui,
     sans-serif;
-  --radius-sm: 12px;
   --radius: 20px;
   --radius-lg: 26px;
   --radius-pill: 100px;
@@ -24,17 +23,15 @@
 
 html {
   -webkit-text-size-adjust: 100%;
-  height: 100%;
 }
 
 body {
-  min-height: 100%;
   min-height: 100dvh;
   font-family: var(--font);
   font-size: 17px;
   line-height: 1.35;
-  color: var(--white);
-  background: var(--black);
+  color: var(--black);
+  background: var(--white);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -49,101 +46,49 @@ a {
   text-decoration: none;
 }
 
-.device {
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
+.page {
   max-width: 430px;
   margin: 0 auto;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
-  background: var(--black);
-}
-
-/* Status bar + Dynamic Island */
-.status-bar {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  padding: 8px var(--pad) 12px;
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-
-.status-time {
-  font-variant-numeric: tabular-nums;
-}
-
-.island {
-  grid-column: 2;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  background: var(--black);
-  border: 1px solid var(--grey);
-  border-radius: var(--radius-pill);
-  font-size: 13px;
-  font-weight: 600;
-  box-shadow: 0 0 0 1px var(--black);
-}
-
-.island img {
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
-}
-
-.status-icons {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 6px;
-}
-
-.sig,
-.bat {
-  display: block;
+  min-height: 100dvh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
   background: var(--white);
-  border-radius: 2px;
 }
 
-.sig {
-  width: 16px;
-  height: 10px;
+/* Header */
+.top {
+  padding: 14px var(--pad) 6px;
 }
 
-.bat {
-  width: 22px;
-  height: 10px;
-  border: 1px solid var(--white);
-  background: transparent;
-  position: relative;
+.top-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--black);
 }
 
-.bat::after {
-  content: "";
-  position: absolute;
-  inset: 2px 4px 2px 2px;
-  background: var(--white);
-  border-radius: 1px;
+.top-brand img {
+  width: 28px;
+  height: 28px;
 }
 
-/* Scrollable screen */
+/* Content */
 .screen {
-  flex: 1;
-  padding: 0 var(--pad) calc(28px + env(safe-area-inset-bottom));
+  padding: 0 var(--pad) 32px;
   display: flex;
   flex-direction: column;
   gap: 22px;
 }
 
-/* Hero */
 .hero h1 {
   font-size: clamp(32px, 8vw, 40px);
   font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 1.05;
+  color: var(--black);
 }
 
 .hero-line {
@@ -151,110 +96,139 @@ a {
   font-size: 15px;
   font-weight: 500;
   color: var(--grey);
-  letter-spacing: -0.01em;
 }
 
-/* Wallet pass */
-.pass {
-  width: 100%;
-}
-
+/* Pass card — scan-page fields per docs (handle, manifesto, trust, status, warning) */
 .pass-inner {
   background: var(--white);
   color: var(--black);
   border-radius: var(--radius-lg);
-  padding: 20px;
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+  padding: 18px;
+  border: 1px solid var(--grey);
 }
 
 .pass-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 14px;
 }
 
 .pass-brand {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--grey);
-  letter-spacing: -0.02em;
 }
 
 .pass-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--red);
-  box-shadow: 0 0 0 3px var(--white), 0 0 12px var(--red);
 }
 
 .pass-badge {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   color: var(--red);
-  padding: 5px 10px;
+  padding: 4px 9px;
   border: 1px solid var(--red);
   border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.pass-body {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.pass-main {
+  flex: 1;
+  min-width: 0;
 }
 
 .pass-name {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 700;
   letter-spacing: -0.03em;
-  margin-bottom: 18px;
+  line-height: 1.1;
+  margin-bottom: 4px;
 }
 
-.pass-qr {
+.pass-manifesto {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--black);
+  line-height: 1.35;
+  margin-bottom: 6px;
+}
+
+.pass-since {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--grey);
+  margin-bottom: 10px;
+}
+
+.pass-trust {
+  list-style: none;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pass-trust li {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--grey);
+  letter-spacing: 0.01em;
+}
+
+.pass-trust li::before {
+  content: "○ ";
+}
+
+.pass-trust .trust-on {
+  color: var(--red);
+}
+
+.pass-trust .trust-on::before {
+  content: "● ";
+}
+
+/* Tight QR frame — bottom-right, minimal black inset */
+.pass-qr {
+  flex-shrink: 0;
+  line-height: 0;
+  padding: 5px;
   background: var(--black);
-  border-radius: var(--radius);
-  margin-bottom: 16px;
+  border-radius: 12px;
 }
 
 .pass-qr img {
-  width: 148px;
-  height: 148px;
-}
-
-.pass-signals {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.signal {
-  font-size: 12px;
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: var(--radius-pill);
-  background: var(--black);
-  color: var(--white);
-}
-
-.signal-on {
-  background: var(--red);
-  color: var(--white);
+  width: 96px;
+  height: 96px;
+  display: block;
 }
 
 .pass-foot {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   color: var(--grey);
-  text-align: center;
   line-height: 1.4;
+  border-top: 1px solid var(--grey);
+  padding-top: 10px;
 }
 
-/* Dock actions */
+/* Actions */
 .dock {
   display: flex;
   gap: 10px;
@@ -272,14 +246,12 @@ a {
   letter-spacing: -0.02em;
   border-radius: var(--radius-pill);
   border: 1px solid var(--grey);
-  color: var(--white);
-  background: transparent;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  color: var(--black);
+  background: var(--white);
 }
 
 .dock-btn:active {
-  transform: scale(0.98);
-  opacity: 0.85;
+  opacity: 0.7;
 }
 
 .dock-btn-primary {
@@ -289,7 +261,7 @@ a {
   color: var(--white);
 }
 
-/* Glass grouped lists (iOS Settings) */
+/* iOS grouped lists — solid, no blur (low bandwidth / old phones) */
 .group-label {
   font-size: 13px;
   font-weight: 600;
@@ -303,15 +275,13 @@ a {
   list-style: none;
   border-radius: var(--radius);
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  -webkit-backdrop-filter: blur(24px);
-  backdrop-filter: blur(24px);
+  background: var(--white);
+  border: 1px solid var(--grey);
 }
 
 .list li {
   padding: 14px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--grey);
 }
 
 .list li:last-child {
@@ -323,6 +293,7 @@ a {
   font-size: 16px;
   font-weight: 600;
   letter-spacing: -0.02em;
+  color: var(--black);
 }
 
 .list-sub {
@@ -338,10 +309,20 @@ a {
 }
 
 .list-action a {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 4px 12px;
+}
+
+.list-action a .list-sub {
+  grid-column: 1;
+}
+
+.list-action a .list-chevron {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
 }
 
 .list-action .list-title {
@@ -355,52 +336,18 @@ a {
   color: var(--grey);
 }
 
-/* Home indicator */
-.home-indicator {
-  flex-shrink: 0;
-  height: calc(20px + env(safe-area-inset-bottom));
-  padding-bottom: env(safe-area-inset-bottom);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.home-indicator::before {
-  content: "";
-  width: 134px;
-  height: 5px;
-  background: var(--white);
-  border-radius: var(--radius-pill);
-  opacity: 0.35;
-}
-
-/* Desktop: centered phone canvas */
 @media (min-width: 500px) {
-  body {
-    background: var(--black);
-  }
-
-  .device {
-    margin-top: 24px;
-    margin-bottom: 24px;
-    min-height: auto;
+  .page {
+    margin-top: 16px;
+    margin-bottom: 16px;
     border: 1px solid var(--grey);
-    border-radius: 40px;
-    overflow: hidden;
-    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
-  }
-
-  .screen {
-    padding-bottom: 32px;
+    border-radius: 32px;
+    min-height: auto;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dock-btn {
-    transition: none;
-  }
-
   .dock-btn:active {
-    transform: none;
+    opacity: 1;
   }
 }

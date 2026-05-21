@@ -11,10 +11,10 @@
       name="description"
       content="A signed public card for real humans. No phone. No ID. No ads. No tracking."
     />
-    <meta name="theme-color" content="#000000" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=4" />
+    <link rel="stylesheet" href="/styles.css?v=6" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -25,17 +25,12 @@
     <meta property="og:image" content="https://humanity.llc/assets/red_qr_transparent_bg.png" />
   </head>
   <body>
-    <div class="device">
-      <header class="status-bar">
-        <time class="status-time" id="clock"></time>
-        <div class="island">
-          <img src="/assets/red_qr_transparent_bg.png" width="14" height="14" alt="" />
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <img src="/assets/red_qr_transparent_bg.png" width="28" height="28" alt="" />
           <span>humanity.llc</span>
-        </div>
-        <div class="status-icons" aria-hidden="true">
-          <span class="sig"></span>
-          <span class="bat"></span>
-        </div>
+        </a>
       </header>
 
       <main class="screen">
@@ -51,23 +46,31 @@
                 <span class="pass-dot" aria-hidden="true"></span>
                 <span>humanity.llc</span>
               </div>
-              <span class="pass-badge">Active</span>
+              <span class="pass-badge">Active card</span>
             </div>
-            <p class="pass-name">river.founding</p>
-            <div class="pass-qr">
-              <img
-                src="/assets/red_qr_transparent_bg.png"
-                width="148"
-                height="148"
-                alt="QR code"
-              />
+            <div class="pass-body">
+              <div class="pass-main">
+                <p class="pass-name">river.founding</p>
+                <p class="pass-manifesto">Human trust without surveillance.</p>
+                <p class="pass-since">Member since 2026</p>
+                <ul class="pass-trust" aria-label="Trust at a glance">
+                  <li class="trust-on">Vouched human</li>
+                  <li>Live control</li>
+                  <li>QR active</li>
+                </ul>
+              </div>
+              <div class="pass-qr">
+                <img
+                  src="/assets/red_qr_transparent_bg.png"
+                  width="96"
+                  height="96"
+                  alt="QR code"
+                />
+              </div>
             </div>
-            <div class="pass-signals">
-              <span class="signal signal-on">Vouched</span>
-              <span class="signal">Control</span>
-              <span class="signal">QR live</span>
-            </div>
-            <p class="pass-foot">Scan shows status — not who is holding it.</p>
+            <p class="pass-foot">
+              Holding a printed QR does not prove identity or ownership.
+            </p>
           </div>
         </section>
 
@@ -118,6 +121,16 @@
               </a>
             </li>
             <li class="list-row list-action">
+              <a
+                href="https://github.com/h6811127/humanity.llc"
+                rel="noopener noreferrer"
+              >
+                <span class="list-title">Docs on GitHub</span>
+                <span class="list-sub">Specs, trust model, roadmap</span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
               <a href="mailto:info@humanity.llc">
                 <span class="list-title">info@humanity.llc</span>
                 <span class="list-chevron" aria-hidden="true">›</span>
@@ -126,23 +139,6 @@
           </ul>
         </section>
       </main>
-
-      <footer class="home-indicator" aria-hidden="true"></footer>
     </div>
-
-    <script>
-      (function () {
-        var el = document.getElementById("clock");
-        if (!el) return;
-        function tick() {
-          el.textContent = new Date().toLocaleTimeString([], {
-            hour: "numeric",
-            minute: "2-digit",
-          });
-        }
-        tick();
-        setInterval(tick, 30000);
-      })();
-    </script>
   </body>
 </html>
