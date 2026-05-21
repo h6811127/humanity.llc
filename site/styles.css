@@ -162,12 +162,12 @@ a {
 .pass-face {
   background: var(--white);
   color: var(--black);
-  border-radius: var(--radius-lg);
-  padding: 18px;
-  border: 1px solid var(--grey);
+  border-radius: 16px;
+  padding: 16px 17px 15px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 16px 40px rgba(0, 0, 0, 0.08);
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 6px 22px rgba(0, 0, 0, 0.055);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   transform: translateZ(0);
@@ -224,11 +224,11 @@ a {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 12px;
-  font-size: 12px;
+  gap: 9px;
+  margin-bottom: 11px;
+  font-size: 11px;
   font-weight: 500;
-  line-height: 1.4;
+  line-height: 1.45;
   color: var(--black);
 }
 
@@ -249,15 +249,17 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .pass-brand {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
+  gap: 7px;
+  font-size: 10px;
   font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   color: var(--grey);
 }
 
@@ -269,11 +271,12 @@ a {
 }
 
 .pass-badge {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--red);
-  padding: 4px 9px;
+  padding: 3px 8px;
   border: 1px solid var(--red);
   border-radius: var(--radius-pill);
   white-space: nowrap;
@@ -283,8 +286,8 @@ a {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 14px;
+  margin-bottom: 11px;
 }
 
 .pass-main {
@@ -292,27 +295,37 @@ a {
   min-width: 0;
 }
 
+.pass-type {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--grey);
+  margin-bottom: 3px;
+}
+
 .pass-name {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  margin-bottom: 4px;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  margin-bottom: 5px;
 }
 
 .pass-manifesto {
   font-size: 13px;
-  font-weight: 500;
-  color: var(--black);
-  line-height: 1.35;
-  margin-bottom: 6px;
+  font-weight: 400;
+  color: var(--grey);
+  line-height: 1.4;
+  margin-bottom: 5px;
 }
 
 .pass-since {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
+  letter-spacing: 0.02em;
   color: var(--grey);
-  margin-bottom: 10px;
+  margin-bottom: 9px;
 }
 
 .pass-trust {
@@ -323,10 +336,11 @@ a {
 }
 
 .pass-trust li {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
   color: var(--grey);
-  letter-spacing: 0.01em;
 }
 
 .pass-trust li::before {
@@ -341,28 +355,29 @@ a {
   content: "● ";
 }
 
-/* QR — bottom-right, tight rounded frame on white */
+/* QR — tight neutral frame, no glow */
 .pass-qr {
   flex-shrink: 0;
   line-height: 0;
-  border: 1px solid var(--grey);
-  border-radius: 12px;
-  overflow: hidden;
+  padding: 5px;
+  background: var(--white);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
 }
 
 .pass-qr img {
-  width: 96px;
-  height: 96px;
+  width: 88px;
+  height: 88px;
   display: block;
 }
 
 .pass-foot {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   color: var(--grey);
-  line-height: 1.4;
-  border-top: 1px solid var(--grey);
-  padding-top: 10px;
+  line-height: 1.45;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 9px;
 }
 
 /* Primary action */
