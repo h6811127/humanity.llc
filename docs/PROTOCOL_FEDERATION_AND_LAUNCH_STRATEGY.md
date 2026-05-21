@@ -5,6 +5,8 @@
 
 **Read this first** when deciding product scope, launch posture, privacy boundaries, or long-term power strategy.
 
+**Product direction lock:** **Democratic infrastructure** (federated trust grammar + member governance)—not a platform empire or blockchain identity layer. Plain-language framing: `docs/DEMOCRATIC_INFRASTRUCTURE.md`.
+
 ---
 
 ## 1. Strategic Thesis
@@ -56,7 +58,7 @@ The resolver does **not** need legal name, government ID, phone number, or email
 - A **government identity** or KYC authority.
 - A **biometric** or “unique human on Earth” oracle.
 - A **scan surveillance** product (no default analytics).
-- A **blockchain** (unless an operator optionally anchors transparency—see §7).
+- A **blockchain identity layer** (see §7—out of scope for v1).
 
 ### 2.3 Identity model (honest language)
 
@@ -207,24 +209,24 @@ Stronger identity (KYC, phone verification) may exist **at an org’s edge** und
 
 ---
 
-## 7. Blockchain And Transparency Logs
+## 7. Blockchain And Ledgers (Out Of Scope)
 
-### 7.1 Default position (v1)
+### 7.1 v1 position
 
-- **No public blockchain** as the trust core.
-- Card creation, vouches, and revocation use **Ed25519 signatures** and resolver state—not chain gas or wallet identity.
+- **No public blockchain** as trust core, identity layer, or product story.
+- Card creation, vouches, and revocation use **Ed25519 signatures** and **operator resolver state**—not chain gas, wallets, or NFT “humanity.”
 
-**Rationale:** Public chains increase **permanent traceability** and wallet-based identity; they do not solve “live status at scan” better than a minimal resolver for this product.
+**Rationale:** This project targets **live status at scan**, data minimization, and **federated operators**—not permanent wallet graphs or immutable public ledgers.
 
-### 7.2 Optional future uses (non-core)
+### 7.2 Revisit policy
 
-If governance approves later:
+Do not treat “optional chain later” as a default roadmap item. Any transparency-log or anchoring idea requires:
 
-- **Transparency log** (append-only, auditable revocation/policy events)—CT-style, not NFT identity.
-- **Timestamp anchoring** for export or dispute resolution.
-- **Never** “buy verification on chain” or “NFT = human.”
+1. A concrete problem a minimal resolver cannot solve honestly.
+2. Governance ratification with published retention and correlation analysis.
+3. Explicit rejection of “verify human on chain” or NFT identity products.
 
-See `docs/V1_DECISION_LOCK.md` (blockchain deferred).
+Until then: **out of scope** (`docs/V1_DECISION_LOCK.md`), not a deferred v1 feature.
 
 ---
 
@@ -248,6 +250,8 @@ See `docs/PUBLIC_LAUNCH_AND_GOVERNANCE_PLAN.md` for narrative, transition trigge
 
 | Topic | Canonical doc |
 |---|---|
+| **Direction (infrastructure vs empire; why scan matters)** | `docs/DEMOCRATIC_INFRASTRUCTURE.md` |
+| **Build order and system diagram** | `docs/V1_0_ARCHITECTURE_ROADMAP.md` |
 | Trust levels, scan copy | `docs/V1_PRODUCT_TRUST_MODEL.md` |
 | API shapes | `docs/V1_IMPLEMENTATION_CONTRACTS.md`, `docs/Technical Standards v1.0.md` |
 | Merch wedge, phases | `docs/MERCH_LED_V1.md` |
@@ -268,7 +272,7 @@ When older copy says “join founding cohort to use the product” or implies a 
 3. **Open card creation** without email gate.
 4. Prove **stranger scan → create** before scaling merch or Commons Pass.
 5. Document path to **second operator** (friendly co-op or aligned host).
-6. Defer scan analytics, blockchain, and heavy governance UI until the trust loop is real.
+6. Keep scan analytics and blockchain **out of scope**; defer heavy governance UI until the trust loop is real.
 
 ---
 

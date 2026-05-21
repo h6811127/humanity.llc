@@ -1,82 +1,91 @@
 # Humanity Commons
 
-Humanity Commons is infrastructure for real people and democratic communities.
+**Democratic infrastructure** for real people and member-run communities: portable trust you can inspect, revoke, and export—without surveillance platforms, legal-ID pipelines, or a single company owning “who counts.”
 
-The product direction is **Commons Pass**: a mobile web membership pass for communities that want trust, belonging, events, credentials, and governance without surveillance platforms.
+The near-term build is the **Humanity Card** and a **live QR resolver** on `humanity.llc` (reference operator). **Commons Pass**—community membership, events, check-in, and signed stamps—comes after the card loop is proven. See `docs/DEMOCRATIC_INFRASTRUCTURE.md` for direction and `docs/V1_0_ARCHITECTURE_ROADMAP.md` for build order.
 
-The Humanity Card remains the personal credential primitive: create a signed card, share it by QR, receive vouches from real people, prove live control when needed, and revoke old QR credentials.
+Physical **merch** is distribution (curiosity → create card), not the product definition. See `docs/MERCH_LED_V1.md`.
 
-This is not a social network, government ID system, KYC product, follower graph, crypto identity scheme, or surveillance analytics platform. It is a trust primitive designed to grow into member-governed digital infrastructure.
-
-The near-term market wedge is **merch-led distribution**: physical artifacts as walking advertisements that resolve to an honest trust object. That pairs **proof of curiosity** (strangers scan and create) with **proof of belonging** (vouches, repeat wear, public rules). Community passes and organizer check-in follow once people already wear the QR. See `docs/MERCH_LED_V1.md`.
-
-**Strategic architecture:** open standards and **federated resolvers**—not a single identity honeypot, a private invite gate, or a public blockchain core. humanity.llc runs the reference operator first; institutional power comes from protocol adoption and member governance. See `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
+**Architecture:** open standards and **federated resolvers**—not a platform empire, not an invite-only gate, not blockchain identity. See `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
 
 ---
 
-## Product Promise
+## Why a revocable QR is not “just a profile link”
 
-Commons Pass:
+A profile link is static. Humanity Commons is built for **current truth at scan time**:
 
-> Create a community, invite members, issue mobile web passes, scan QR codes for current membership status, check people into events, and issue signed community stamps without phone numbers, ads, or scan analytics.
+- Signed public card data (inspectable, not “trust me bro”).
+- **Per-QR and per-card revocation** (stolen sticker, lost item, compromised key).
+- **Vouches** as accountable social trust—not follower counts or hidden scores.
+- **Live control proof** when a static QR is not enough (recent key control, in person).
+- Clear **what the scan does not prove** (no legal ID, no “holder owns this object” from QR alone).
 
-Humanity Card:
+Phase A MVP will look minimal on purpose (create → scan → revoke). If that is all we ever ship, the skeptics win. The roadmap adds vouches, live control, per-item printed QRs, Commons Pass for orgs, and federation. See `docs/DEMOCRATIC_INFRASTRUCTURE.md` §2.
 
-> Create a signed public Humanity Card, get vouched for by real people, prove live control when needed, and carry a QR that always resolves to current status.
+---
 
-V1 should be trustworthy because it is honest about what it proves:
+## What this is not
 
-- A static QR points to a card; it does not prove the holder owns the card.
-- A current scan shows card, QR, and trust status.
+- A social network or “democratic social empire” in one app
+- Government ID, KYC, or global “verified human” oracle
+- Surveillance analytics on scans
+- Cryptocurrency, NFT identity, or public-chain trust core
+- Phone-number or email **required** to exist on the protocol
+
+Cryptography here means **signatures and published rules**, not coins.
+
+---
+
+## Product promise (phased)
+
+**Humanity Card (Phase A–C):**
+
+> Create a signed public card, share it by QR, receive vouches from real people, prove live control when needed, revoke credentials you no longer trust—and read honest scan pages that say what is and is not proved.
+
+**Commons Pass (Phase D, on top of the card):**
+
+> Run a community with mobile web passes, event check-in, and signed stamps—without ads, scan analytics, or platform lock-in.
+
+V1 earns trust by being **honest about limits**:
+
+- A static QR on a sticker is only a pointer; it does not prove the holder owns the card.
+- A **current** scan shows card, QR, and trust status from the resolver.
 - Vouches show social attestations under published rules.
-- Live control proof shows recent control of the card key.
+- Live control shows recent key control when requested.
 - Revocation and suspension are visible states, not silent failures.
 
-See `docs/V1_PRODUCT_TRUST_MODEL.md` for the full trust model.
+See `docs/V1_PRODUCT_TRUST_MODEL.md`.
 
 ---
 
-## V1 Scope
+## V1 scope (summary)
 
-The Commons Pass first implementation slice is:
+**Phase A MVP** (build first):
 
-1. Community creation.
-2. Member invitation.
-3. Mobile web pass issuance.
-4. HTTPS QR pass resolution.
-5. Active/revoked/suspended pass status.
-6. Event creation.
-7. Organizer check-in.
-8. Signed community stamp issuance.
-9. Live control integration where scoped.
+1. Signed Humanity Card creation (browser-held keys).
+2. HTTPS QR resolution with **live** status.
+3. Trust-state scan UI (card, human trust, artifact/QR, limitations).
+4. Revoke card and item-scoped QR credentials.
+5. Stranger-tested create/scan/revoke loop.
 
-The Humanity Card foundational slice remains:
+**Then:** curiosity merch (Phase B), personalized artifacts (Phase C), **Commons Pass** (Phase D), **second operator** (Phase E).
 
-1. Signed public Humanity Card creation.
-2. HTTPS QR resolution.
-3. Trust-state UI separating card status, human trust status, artifact status, and live control proof.
-4. Revoked, suspended, expired, and unknown status pages.
-5. One personalized sticker/card artifact intent.
-6. Shopify checkout handoff with artifact-intent metadata.
-7. Paid Shopify webhook ingestion.
-8. Printify Fulfillment Middleware order creation after payment.
+**Explicitly out of scope for v1:**
 
-Deferred from the first slice:
-
-- Native checkout.
+- Native checkout (Shopify handoff when commerce ships).
 - Device-based unique-personhood proof.
 - Public search or verified-human directory.
 - Marketplace behavior.
 - Scan analytics.
-- Apparel or bags with personalized QR.
-- Multi-merchant Printify OAuth.
-- Blockchain/NFT ownership.
+- Blockchain, NFT, or ledger-based identity.
+
+Deferred details: `docs/V1_DECISION_LOCK.md`.
 
 ---
 
-## Trust Labels
+## Trust labels (public UI)
 
-Public launch UI should use mechanism-revealing labels:
+Mechanism-revealing labels, not hype:
 
 - `Registered`
 - `Vouched Human`
@@ -86,62 +95,67 @@ Public launch UI should use mechanism-revealing labels:
 - `Revoked By Owner`
 - `Suspended Under Public Rules`
 
-The project should avoid broad public claims like legal identity, KYC, age verification, bot-proof identity, fraud-proof identity, background checks, or guaranteed unique humanity.
+Avoid legal identity, KYC, age verification, bot-proof, or guaranteed-unique humanity claims.
 
 ---
 
-## Architecture Direction
+## Architecture direction
 
-V1 is designed around these boundaries:
+- Browser/device generates and holds Humanity Card **private keys**.
+- **Reference resolver** (`humanity.llc`) stores public card, QR, status, vouch, and revocation data under a published **data-minimization policy**—no scan analytics by default.
+- **Protocol is portable:** `docs/Technical Standards v1.0.md`; other operators implement the same API (federation).
+- Commerce (when live) stays in Shopify/Printify; **never** upgrades trust status from a purchase.
+- Trust core is **signed documents + resolver state**, not a public blockchain.
 
-- Browser/device generates and holds Humanity Card private keys.
-- **Reference resolver** (humanity.llc) stores public card, QR, status, vouch, badge, and revocation data under a published **data-minimization policy**—no scan analytics by default, no legal ID in the core loop.
-- **Protocol is portable:** `docs/Technical Standards v1.0.md` defines behavior any compatible operator can implement; a **second operator** is a strategic milestone, not a distant fantasy.
-- Shopify owns checkout, payment, tax, refunds, customer emails, and commerce order records (firewalled from trust status).
-- Printify handles print-on-demand fulfillment behind Humanity-controlled middleware.
-- Printify and Shopify never receive private keys, verification secrets, vouch-private notes, private profile layers, or scan analytics.
-- **Blockchain is not the v1 trust core**; optional transparency anchoring may be revisited under governance later.
-
-The riskiest vertical slice is:
+Riskiest vertical slice (post–Phase A):
 
 ```text
-Signed card -> HTTPS QR -> trust-state UI -> artifact intent -> unique printed-item QR -> Shopify paid webhook -> Printify order -> revoked item QR status
+Signed card → HTTPS QR → trust-state UI → artifact intent → per-item QR → paid order → print → revoke one item → scan shows revoked
 ```
 
 ---
 
-## Documentation Map
+## Documentation map
 
-**Strategy (start here):**
+**Direction and skeptics:**
 
-- `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — federated resolvers, public launch, privacy vs power, anti-honeypot rules
+- `docs/DEMOCRATIC_INFRASTRUCTURE.md` — **canonical direction** (infrastructure vs empire; why scan matters)
+- `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — federation, public launch, privacy boundaries
+- `docs/SKEPTIC_FAQ.md` — objections (QR profile, blockchain, honeypot, etc.)
 
-**V1 wedge:**
+**Implementation (build step by step):**
 
-- `docs/MERCH_LED_V1.md` — curiosity + belonging, build order, drop tiers
-- `docs/FOUNDING_DROP_BRIEF.md` — Tier 0/1 launch checklist (fill brackets before print)
-- `docs/LAUNCH_LANGUAGE_KIT.md` — Tier 0/1 storefront, scan, email, social copy
+- `docs/V1_0_ARCHITECTURE_ROADMAP.md` — **canonical build sequence** (M0–M10)
 
-Core product and trust:
+**V1 wedge and copy:**
 
-- `docs/COMMONS_PASS_PRODUCT_STRATEGY.md`
-- `docs/COMMONS_PASS_V1_SPEC.md`
-- `docs/COMMONS_PASS_TECHNICAL_ARCHITECTURE.md`
-- `docs/COMMONS_PASS_SECURITY_AND_PRIVACY.md`
-- `docs/COMMONS_PASS_DESIGN_AND_UX.md`
+- `docs/MERCH_LED_V1.md` — curiosity + belonging, phases
+- `docs/FOUNDING_DROP_BRIEF.md`, `docs/LAUNCH_LANGUAGE_KIT.md`
+
+**Trust and use cases:**
+
 - `docs/V1_PRODUCT_TRUST_MODEL.md`
-- `docs/V1_MARKET_AND_GROWTH_STRATEGY.md`
 - `docs/V1_USE_CASES.md`
+- `docs/V1_MARKET_AND_GROWTH_STRATEGY.md`
 - `docs/features/Humanity Card v1.0.md`
 - `docs/features/Human Verification v1.0.md`
 - `docs/features/QR Public Profile v1.0.md`
 
-Commerce and fulfillment:
+**Commons Pass (Phase D):**
+
+- `docs/commons/COMMONS_PASS_PRODUCT_STRATEGY.md`
+- `docs/commons/COMMONS_PASS_V1_SPEC.md`
+- `docs/commons/COMMONS_PASS_TECHNICAL_ARCHITECTURE.md`
+- `docs/commons/COMMONS_PASS_SECURITY_AND_PRIVACY.md`
+- `docs/commons/COMMONS_PASS_DESIGN_AND_UX.md`
+- `docs/commons/COMMONS_ROADMAP.md`
+
+**Commerce and fulfillment:**
 
 - `docs/features/Storefront v1.0.md`
 - `docs/features/Printify Fulfillment Middleware v1.0.md`
 
-Implementation planning:
+**Implementation planning:**
 
 - `docs/V1_DECISION_LOCK.md`
 - `docs/V1_IMPLEMENTATION_CONTRACTS.md`
@@ -150,15 +164,12 @@ Implementation planning:
 - `docs/V1_ASSUMPTION_REGISTER.md`
 - `docs/V1_ADVERSARIAL_REVIEW.md`
 
-Governance and enterprise direction:
+**Governance and narrative:**
 
 - `docs/PUBLIC_LAUNCH_AND_GOVERNANCE_PLAN.md`
-- `docs/COMMONS_ROADMAP.md`
 - `docs/MOVEMENT_NARRATIVE.md`
-- `docs/LAUNCH_LANGUAGE_KIT.md`
 - `docs/FOUNDING_COHORT_PLAYBOOK.md` — optional early testers (non-gating)
 - `docs/VISUAL_IDENTITY_PRINCIPLES.md`
-- `docs/SKEPTIC_FAQ.md`
 - `docs/🧠 Organizing Documents/📜 Constitution.md`
 - `docs/Technical Standards v1.0.md`
 
@@ -166,38 +177,28 @@ Governance and enterprise direction:
 
 ## Landing page (Cloudflare Pages)
 
-Static site in [`site/`](site/). Deploy with build output directory **`site`** (no build command). See [`site/README.md`](site/README.md).
+Static site in [`site/`](site/). Deploy with build output directory **`site`**.
 
 ```bash
 npm run deploy
-# or: npx wrangler pages deploy site --project-name=humanity-llc
 ```
 
-**Cloudflare dashboard:** build output directory = `site`, deploy command = *(empty)*. Do not use `npx wrangler deploy` (Workers).
+**Resolver (Worker):** `worker/` — `npm run worker:dev` for local health; production routes in roadmap step 1.4.
 
 ---
 
-## Current Status
+## Current status
 
-This repository is a planning and specification repo with a deployable landing page. The next practical work is to build the **reference resolver** and open public card creation when it works.
+Planning repo + deployable landing + Worker scaffold (M1 step 1.1). Next: **M1.2+** in `docs/V1_0_ARCHITECTURE_ROADMAP.md`.
 
-Recommended first steps (see `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` and `docs/MERCH_LED_V1.md`):
-
-1. Build Phase A: card, HTTPS QR, trust-state UI, vouch display, revocation pages—**no email/invite gate**.
-2. Publish operator data policy and Technical Standards alongside launch.
-3. **Public launch** card creation when stable; optionally recruit early testers (`docs/FOUNDING_COHORT_PLAYBOOK.md`) for copy/ops feedback only.
-4. Ship Tier 0 curiosity drop (one story, one SKU) after scan moment works; measure scan→create.
-5. Ship Tier 1 personalized artifacts after Printify/Shopify spikes pass.
-6. Plan **second resolver operator** (co-op, union, or aligned host) before claiming federation in marketing.
-7. Defer Commons Pass until Phase A–C metrics hit.
+**MVP** = Phase A through step **5.3**: open create, honest scan, revoke, stranger-tested.
 
 ---
 
-## Launch Principle
+## Launch principle
 
-Humanity Commons should make the strongest honest claim, not the strongest possible claim:
+Make the strongest **honest** claim:
 
-> This card is signed, current, revocable, socially vouched where shown, and able to prove live control when needed.
+> This card is signed, current, revocable, socially vouched where shown, and able to prove live control when needed—and the scan page says what that does *not* mean.
 
-The first market proof is not technical. It is whether strangers and communities **use the scan loop** (create card, scan, vouch, revoke) without being hand-held—and whether a second operator can adopt the same spec.
-
+Market proof is whether strangers and communities **use the loop** without hand-holding, and whether a **second operator** can adopt the same spec—not whether the first scan page looks flashy.

@@ -5,6 +5,8 @@
 
 **Resolver role and federation:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — the resolver serves signed public state; it is not legal identity infrastructure and should not collect scan analytics by default.
 
+**Why scans matter (not a static profile):** `docs/DEMOCRATIC_INFRASTRUCTURE.md` §2 — live status, revoke, vouches, live control, then Commons Pass.
+
 ---
 
 ## V1 Product Promise

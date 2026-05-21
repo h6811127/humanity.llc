@@ -48,7 +48,7 @@
 | Transfer UI | Artifact transfer functionality. | Legal/governance semantics are unresolved. | Transfer policy ratified. |
 | Public search/discovery | Public profile or verified-human directory. | Increases harassment, privacy, moderation, and scraping risk. | Separate discovery/privacy spec. |
 | Marketplace | Third-party seller marketplace. | Distracts from proof objects and first-party artifacts. | Storefront operations are stable. |
-| Blockchain/NFT ownership | Tokenized artifact ownership or public-chain identity core. | Conflicts with pseudonymity, data minimization, and federation strategy. | Optional transparency anchoring only under governance review. |
+| Blockchain / NFT / ledger identity | Tokenized ownership, public-chain identity core, or “verify on chain.” | Conflicts with democratic infrastructure, pseudonymity, data minimization, and federation; not a differentiator for live revoke at scan. | **Out of scope** unless governance approves a narrow, published non-identity use (see `PROTOCOL_FEDERATION` §7). |
 | Scan analytics | Any scan logging or analytics. | Violates trust unless consent model is explicit. | Governance-approved consent model. |
 | Apparel/bags | Apparel and bags for personalized QR artifacts. | Print area and QR scan reliability must be tested. | Template QA passes. |
 | Strong public identity claims | Legal identity, KYC, age verification, bot-proof, fraud-proof, background-checked, or guaranteed-unique claims. | V1 cannot honestly prove these. | Separate legal/privacy/security review and new product scope. |

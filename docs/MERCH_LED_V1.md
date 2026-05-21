@@ -138,15 +138,15 @@ Prove walking ads work:
 
 **Exit:** Orders from outside founder network; scan→create conversion tracked; at least one organic reshare.
 
-### Phase C — Belonging on the object (personalized founding line)
+### Phase C — Belonging on the object (personalized line)
 
-Connect artifact to cohort:
+Connect artifact to card holders (not a protocol invite gate):
 
-1. Founding drop only for cohort members (invite code or waitlist approval).
+1. Personalized drop for active Humanity Card holders when print QA allows.
 2. Personalized QR per item when provider QA supports it (`artifact_intent` → Shopify → Printify vertical slice).
-3. Scan shows founding/vouch state for holders; curious scanners still see curiosity CTA, not fake status.
+3. Scan shows vouch/founding state for holders; curious scanners still see curiosity CTA, not fake status.
 
-**Exit:** Founding artifact holders vouch and invite; stolen-QR revocation story tested once on paper.
+**Exit:** Holders vouch and invite; stolen-QR revocation tested on a real item.
 
 ### Phase D — Commons Pass (organizer upsell)
 
@@ -233,6 +233,7 @@ Curiosity and belonging share one URL pattern; content adapts by resolver state,
 
 | Topic | Canonical doc |
 |---|---|
+| **Implementation order and architecture** | `docs/V1_0_ARCHITECTURE_ROADMAP.md` |
 | Trust limits, labels | `docs/V1_PRODUCT_TRUST_MODEL.md` |
 | Shopify / Printify, spikes | `docs/V1_ASSUMPTION_REGISTER.md`, `docs/V1_DECISION_LOCK.md` |
 | Implementation shapes | `docs/V1_IMPLEMENTATION_CONTRACTS.md`, `docs/V1_IMPLEMENTATION_BACKLOG.md` (reorder phases to match this doc) |

@@ -3,7 +3,7 @@
 **Status:** Build planning artifact  
 **Purpose:** Convert the v1.0 contracts, flow audit, decision lock, and assumption register into an execution backlog.
 
-**GTM order:** Follow phase sequencing in `docs/MERCH_LED_V1.md` (digital trust → curiosity drop → belonging drop → Commons Pass). Tasks below remain valid but may be re-prioritized to match that doc.
+**Build order:** Follow `docs/V1_0_ARCHITECTURE_ROADMAP.md` (canonical milestones M0–M10 and master steps). **Direction:** `docs/DEMOCRATIC_INFRASTRUCTURE.md`. **GTM framing:** `docs/MERCH_LED_V1.md`. Task IDs below map to roadmap steps.
 
 ---
 
