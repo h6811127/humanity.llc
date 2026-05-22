@@ -1,18 +1,39 @@
-# Humanity Commons
+# humanity.llc · Humanity Commons
 
-**Democratic infrastructure** for real people and member-run communities: portable trust you can inspect, revoke, and export—without surveillance platforms, legal-ID pipelines, or a single company owning “who counts.”
+**Live links:** a physical object or public ID points at a URL; a scan returns **current state** from the resolver (active, revoked, suspended, unknown), not a frozen page.
 
-The near-term build is the **Humanity Card** and a **live QR resolver** on `humanity.llc` (reference operator). **Commons Pass**—community membership, events, check-in, and signed stamps—comes after the card loop is proven. See `docs/DEMOCRATIC_INFRASTRUCTURE.md` for direction and `docs/V1_0_ARCHITECTURE_ROADMAP.md` for build order.
+```text
+object or ID  →  scan (HTTPS QR)  →  live signed state
+```
 
-Physical **merch** is distribution (curiosity → create card), not the product definition. See `docs/MERCH_LED_V1.md`.
+**humanity.llc** is the reference operator and product surface for that primitive. **Humanity Commons** is the open protocol and democratic-infrastructure project around it: portable trust you can inspect, revoke, and export—without surveillance platforms, legal-ID pipelines, or one company owning “who counts.”
+
+You can aim to be **the link company** in that specific sense: not short redirects or link-in-bio, but **resolver-backed links whose meaning can change** (membership, trust, access, public claims, object status). Commons Pass (community membership, events, check-in, stamps) and federation sit on the same grammar once the scan loop is proven. See `docs/DEMOCRATIC_INFRASTRUCTURE.md` and `docs/V1_0_ARCHITECTURE_ROADMAP.md`.
+
+Physical **merch** is distribution (curiosity → create), not the product definition. See `docs/MERCH_LED_V1.md`.
 
 **Architecture:** open standards and **federated resolvers**—not a platform empire, not an invite-only gate, not blockchain identity. See `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
 
 ---
 
+## What ships first vs what Commons adds
+
+| Layer | What it is | Status |
+|-------|------------|--------|
+| **Live QR primitive** | QR/NFC URL → resolver → honest current status + limits copy | **Building now** (create live; public scan UI next) |
+| **Humanity Card** | Signed public identity document (`profile_id`, handle, manifesto, keys on device) | Phase A MVP |
+| **Vouches & live control** | Social trust and optional in-person key proof | After MVP core |
+| **Per-object / item QRs** | Revoke one sticker without killing the card | Phase B–C |
+| **Commons Pass** | Org membership, events, check-in on same API | Phase D |
+| **Federation** | Second operator, export, exit | Phase E |
+
+The landing page speaks in **objects** (stickers, plates, wristbands) because that is how people encounter QRs. The v1 implementation path is still **card + QR credential IDs** under `hc/v1`; broader object types and use-case catalogs are documented, not all built yet. See `docs/V1_USE_CASES.md` (revocable QR primitive + phased examples).
+
+---
+
 ## Why a revocable QR is not “just a profile link”
 
-A profile link is static. Humanity Commons is built for **current truth at scan time**:
+A profile link is static. This stack is built for **current truth at scan time**:
 
 - Signed public card data (inspectable, not “trust me bro”).
 - **Per-QR and per-card revocation** (stolen sticker, lost item, compromised key).
@@ -20,7 +41,7 @@ A profile link is static. Humanity Commons is built for **current truth at scan 
 - **Live control proof** when a static QR is not enough (recent key control, in person).
 - Clear **what the scan does not prove** (no legal ID, no “holder owns this object” from QR alone).
 
-Phase A MVP will look minimal on purpose (create → scan → revoke). If that is all we ever ship, the skeptics win. The roadmap adds vouches, live control, per-item printed QRs, Commons Pass for orgs, and federation. See `docs/DEMOCRATIC_INFRASTRUCTURE.md` §2.
+Phase A MVP will look minimal on purpose (create → scan → revoke). That is the honest floor, not the ceiling. See `docs/DEMOCRATIC_INFRASTRUCTURE.md` §2.
 
 ---
 
@@ -31,6 +52,7 @@ Phase A MVP will look minimal on purpose (create → scan → revoke). If that i
 - Surveillance analytics on scans
 - Cryptocurrency, NFT identity, or public-chain trust core
 - Phone-number or email **required** to exist on the protocol
+- A generic URL shortener or static link-in-bio product
 
 Cryptography here means **signatures and published rules**, not coins.
 
@@ -38,9 +60,9 @@ Cryptography here means **signatures and published rules**, not coins.
 
 ## Product promise (phased)
 
-**Humanity Card (Phase A–C):**
+**Live link / Humanity Card (Phase A–C):**
 
-> Create a signed public card, share it by QR, receive vouches from real people, prove live control when needed, revoke credentials you no longer trust—and read honest scan pages that say what is and is not proved.
+> Put a QR on something real or share a public ID; anyone who scans sees **current** signed status, honest limits, and revocation when you pull it back.
 
 **Commons Pass (Phase D, on top of the card):**
 
@@ -78,6 +100,7 @@ See `docs/V1_PRODUCT_TRUST_MODEL.md`.
 - Marketplace behavior.
 - Scan analytics.
 - Blockchain, NFT, or ledger-based identity.
+- Documenting or shipping every conceivable QR use case on day one.
 
 Deferred details: `docs/V1_DECISION_LOCK.md`.
 
@@ -135,7 +158,7 @@ Signed card → HTTPS QR → trust-state UI → artifact intent → per-item QR 
 **Trust and use cases:**
 
 - `docs/V1_PRODUCT_TRUST_MODEL.md`
-- `docs/V1_USE_CASES.md`
+- `docs/V1_USE_CASES.md` — primitive + phased examples (not all in v1 code)
 - `docs/V1_MARKET_AND_GROWTH_STRATEGY.md`
 - `docs/features/Humanity Card v1.0.md`
 - `docs/features/Human Verification v1.0.md`
@@ -175,23 +198,48 @@ Signed card → HTTPS QR → trust-state UI → artifact intent → per-item QR 
 
 ---
 
-## Landing page (Cloudflare Pages)
+## Repo layout
 
-Static site in [`site/`](site/). Deploy with build output directory **`site`**.
+| Path | Role |
+|------|------|
+| `site/` | Cloudflare Pages: landing, `/create/`, `/created/`, policy |
+| `worker/` | Cloudflare Worker + D1: `hc/v1` resolver API |
+| `docs/` | Protocol, roadmap, Commons Pass (later), trust model |
+
+---
+
+## Deploy
+
+**Pages (static site):** output directory **`site`**.
 
 ```bash
 npm run deploy
 ```
 
-**Resolver (Worker):** `worker/` — `npm run worker:dev` for local health; production routes in roadmap step 1.4.
+**Resolver (Worker):**
+
+```bash
+npm run worker:dev          # local :8787
+npm run worker:deploy
+npm run worker:migrate:remote
+npm run worker:test
+```
+
+Health: `GET /.well-known/hc/v1/health` · Create: `POST /.well-known/hc/v1/cards` · Public scan: `GET /c/{profile_id}?q={qr_id}` (M3, in progress).
 
 ---
 
 ## Current status
 
-Planning repo + deployable landing + Worker scaffold (M1 step 1.1). Next: **M1.2+** in `docs/V1_0_ARCHITECTURE_ROADMAP.md`.
+| Milestone | State |
+|-----------|--------|
+| M1 Foundation | Health, D1 schema, signature harness |
+| M2 Create card | API + `/create/` + `/created/` |
+| **M3 Scan** | **Next** — trust UI at `/c/…` |
+| M4 Revoke | After scan |
+| M5 Stranger-tested launch | After revoke |
 
-**MVP** = Phase A through step **5.3**: open create, honest scan, revoke, stranger-tested.
+**MVP** = Phase A through roadmap step **5.3** (honest create → scan → revoke). Commons Pass and federation are **not** required for that gate.
 
 ---
 
@@ -199,6 +247,6 @@ Planning repo + deployable landing + Worker scaffold (M1 step 1.1). Next: **M1.2
 
 Make the strongest **honest** claim:
 
-> This card is signed, current, revocable, socially vouched where shown, and able to prove live control when needed—and the scan page says what that does *not* mean.
+> Scan this link and see **current** signed status—revocable, inspectable, with clear limits on what it does not prove.
 
-Market proof is whether strangers and communities **use the loop** without hand-holding, and whether a **second operator** can adopt the same spec—not whether the first scan page looks flashy.
+Market proof is strangers using the loop without hand-holding, then a **second operator** on the same spec—not a laundry list of every QR idea on the homepage.
