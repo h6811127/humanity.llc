@@ -1,5 +1,4 @@
-# Cloudflare Pages — explicit routes (avoids SPA fallback serving index.html for /create)
-/create     /create.html     200
-/create/    /create.html     200
-/created    /created/index.html  200
-/created/   /created/index.html  200
+# Cloudflare Pages — use directory index files (same pattern as /created/).
+# Do not rewrite /create → create.html (Pages 308-strips .html and causes a redirect loop).
+
+/create  /create/  301
