@@ -1,0 +1,19 @@
+{
+  "badge_id": "badge_founding_001",
+  "badge_type": "founding_human",
+  "label": "Founding Human",
+  "issuer": "humanity.llc",
+  "issued_to": "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+  "nonce": "nonce_badge_001",
+  "issued_at": "2026-05-16T17:00:00.000Z",
+  "evidence_uri": "https://humanity.llc/badges/founding-human",
+  "type": "badge",
+  "version": "1.0",
+  "signature": {
+    "alg": "Ed25519",
+    "public_key": "AXBxsNjTx7KQXM5DJPFgKEFYZD6vt6TNDueNKrwyfPeT",
+    "signature": "32f8tVfkENi7uMX1s9Naa7Ly9t6kBDCP3CC7SsLqps3rrPXYsfK8SHy8ucerALbwBuEdjnRyjDwKTbpzFWNXzPbJ",
+    "signed_at": "2026-05-16T17:00:00.000Z",
+    "canonicalization": "JCS"
+  }
+}

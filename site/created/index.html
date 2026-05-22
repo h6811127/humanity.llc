@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Your card · humanity.llc</title>
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=18" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <img src="/assets/red_qr_transparent_bg.png" width="28" height="28" alt="" />
+          <span>humanity.llc</span>
+        </a>
+      </header>
+
+      <main class="screen" id="created-main">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Card created</p>
+          <h1 id="created-handle">—</h1>
+          <p class="hero-line" id="created-manifesto"></p>
+        </section>
+
+        <section class="group">
+          <h2 class="group-label">Scan URL</h2>
+          <p class="form-hint">
+            This QR points at your card. It does not prove the holder owns the card until
+            live control exists (M7).
+          </p>
+          <div class="qr-box">
+            <img id="qr-img" width="200" height="200" alt="QR code for your card" />
+          </div>
+          <p class="mono-link" id="scan-url"></p>
+          <button type="button" class="btn-secondary" id="copy-scan">Copy scan link</button>
+        </section>
+
+        <section class="group">
+          <h2 class="group-label">Resolver</h2>
+          <ul class="list">
+            <li>
+              <span class="list-title">Profile ID</span>
+              <span class="list-sub mono" id="profile-id"></span>
+            </li>
+            <li>
+              <span class="list-title">Status</span>
+              <span class="list-sub" id="card-status">Registered</span>
+            </li>
+          </ul>
+          <a class="btn-secondary block-link" id="card-json-link" href="#">View public card JSON</a>
+        </section>
+
+        <p class="form-warning" id="no-session" hidden>
+          Open this page right after creating a card, or bookmark your scan link. Profile
+          details are not stored in this browser.
+        </p>
+      </main>
+    </div>
+    <script type="module">
+      const params = new URLSearchParams(location.search);
+      const profileId = params.get("profile_id");
+      const raw = sessionStorage.getItem("hc_created");
+      const data = raw ? JSON.parse(raw) : null;
+
+      const api =
+        location.hostname === "localhost" || location.hostname === "127.0.0.1"
+          ? "http://127.0.0.1:8787"
+          : location.origin;
+
+      if (!data && !profileId) {
+        document.getElementById("no-session").hidden = false;
+      }
+
+      const scanUrl =
+        data?.scan_url ||
+        (profileId && params.get("qr_id")
+          ? `${location.origin}/c/${profileId}?q=${params.get("qr_id")}`
+          : null);
+
+      if (scanUrl) {
+        document.getElementById("scan-url").textContent = scanUrl;
+        document.getElementById("qr-img").src =
+          `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(scanUrl)}`;
+        document.getElementById("copy-scan").onclick = () =>
+          navigator.clipboard.writeText(scanUrl);
+      }
+
+      if (data?.handle) {
+        document.getElementById("created-handle").textContent = `@${data.handle}`;
+      }
+      const pid = data?.profile_id || profileId;
+      if (pid) {
+        document.getElementById("profile-id").textContent = pid;
+        document.getElementById("card-json-link").href =
+          `${api}/.well-known/hc/v1/cards/${pid}`;
+      }
+    </script>
+  </body>
+</html>

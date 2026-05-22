@@ -21,11 +21,7 @@ export {
   verifyBase58Signature,
   verifyCanonicalBytes,
 } from "./ed25519";
-export {
-  isSignatureBlock,
-  stripSignature,
-  type SignatureBlock,
-} from "./envelope";
+export { isSignatureBlock, stripSignature, type SignatureBlock } from "./envelope";
 export { NonceReplayGuard, extractNonce } from "./nonce";
 export {
   PAYLOAD_FIELD_RULES,

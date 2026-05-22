@@ -485,13 +485,13 @@ Follow these steps in order. Each step lists **exit criteria** and **spec refs**
 
 | Step | Action | Exit | Refs |
 |---|---|---|---|
-| 2.1 | Client keygen + card document builder | Key in memory only | `features/Humanity Card v1.0.md` |
-| 2.2 | `POST /.well-known/hc/v1/cards` with signature verify | 201 + profile_id | R-001 |
-| 2.3 | Handle uniqueness + validation | 409 on duplicate | Standards §4 |
-| 2.4 | Rate limit create by IP (no PII log if possible) | 429 when abused | PROTOCOL §5 |
-| 2.5 | `/create` page on domain | User creates card E2E | A.3 |
-| 2.6 | Issue initial QR credential on create | QR payload scans | R-002 |
-| 2.7 | Minimal owner dashboard: QR PNG/link | Owner can share | A.4 |
+| 2.1 | Client keygen + card document builder | Key in memory only | `features/Humanity Card v1.0.md` — **done** (`site/js/`) |
+| 2.2 | `POST /.well-known/hc/v1/cards` with signature verify | 201 + profile_id | R-001 — **done** |
+| 2.3 | Handle uniqueness + validation | 409 on duplicate | Standards §4 — **done** |
+| 2.4 | Rate limit create by IP (no PII log if possible) | 429 when abused | PROTOCOL §5 — **done** (`0002_rate_limits`) |
+| 2.5 | `/create` page on domain | User creates card E2E | A.3 — **done** (`site/create/`) |
+| 2.6 | Issue initial QR credential on create | QR payload scans | R-002 — **done** (POST bundles QR) |
+| 2.7 | Minimal owner dashboard: QR PNG/link | Owner can share | A.4 — **done** (`site/created/`) |
 
 ### Milestone M3 — Scan (the product moment)
 

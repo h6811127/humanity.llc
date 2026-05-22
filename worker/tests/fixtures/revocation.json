@@ -1,0 +1,17 @@
+{
+  "profile_id": "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+  "target_kind": "qr_credential",
+  "target_qr_id": "qr_test_item_002",
+  "reason": "owner_revoked",
+  "revoked_at": "2026-05-16T17:00:00.000Z",
+  "nonce": "nonce_revoke_001",
+  "type": "revocation",
+  "version": "1.0",
+  "signature": {
+    "alg": "Ed25519",
+    "public_key": "AXBxsNjTx7KQXM5DJPFgKEFYZD6vt6TNDueNKrwyfPeT",
+    "signature": "5rtWNHYoeEBUgjwYtrLt5GeL5ArVcWSXXVMDLaQuoALAcZvaiNdCsr3TUH7BHq8HmEhfFiAnPLbw4NGV36buxQZw",
+    "signed_at": "2026-05-16T17:00:00.000Z",
+    "canonicalization": "JCS"
+  }
+}

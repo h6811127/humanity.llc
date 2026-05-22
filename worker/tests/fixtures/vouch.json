@@ -1,0 +1,19 @@
+{
+  "vouch_id": "vouch_test_001",
+  "voucher_profile_id": "8Ym8nQ3pR5sU7wX9zA2bC4dE6",
+  "vouchee_profile_id": "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+  "nonce": "nonce_vouch_001",
+  "statement": "I attest this is a distinct human I know.",
+  "method": "in_person",
+  "created_at": "2026-05-16T17:00:00.000Z",
+  "revoked": false,
+  "type": "vouch",
+  "version": "1.0",
+  "signature": {
+    "alg": "Ed25519",
+    "public_key": "AXBxsNjTx7KQXM5DJPFgKEFYZD6vt6TNDueNKrwyfPeT",
+    "signature": "5V3peuFFGsSTiSMVRYKPAWZMJ4sZtEUwy8kANPv4W1kFUX3qM2Apxe7PYaC59PPVbwyQqzSs56SHHxq7QsUjrCQY",
+    "signed_at": "2026-05-16T17:00:00.000Z",
+    "canonicalization": "JCS"
+  }
+}

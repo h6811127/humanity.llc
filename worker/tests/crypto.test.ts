@@ -95,7 +95,7 @@ describe("verifySignedDocument failures", () => {
     expect(result.ok).toBe(false);
   });
 
-  it("rejects missing protocol version", async () => {
+  it("rejects wrong protocol version at sign time", async () => {
     const { privateKey, publicKeyBase58 } = await getTestKeypair();
     const unsigned = withProtocolFields(
       {
@@ -107,9 +107,9 @@ describe("verifySignedDocument failures", () => {
       PAYLOAD_TYPES.REVOCATION
     );
     (unsigned as { version?: string }).version = "0.9";
-    const signed = await signDocument(unsigned, { privateKey, publicKeyBase58 });
-    const result = await verifySignedDocument(signed);
-    expect(result.ok).toBe(false);
+    await expect(
+      signDocument(unsigned, { privateKey, publicKeyBase58 })
+    ).rejects.toThrow(/version/i);
   });
 });
 

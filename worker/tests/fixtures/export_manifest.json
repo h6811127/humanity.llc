@@ -1,0 +1,21 @@
+{
+  "profile_id": "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+  "manifest_id": "manifest_test_001",
+  "exported_at": "2026-05-16T17:00:00.000Z",
+  "nonce": "nonce_export_001",
+  "includes": [
+    "card",
+    "qr_credentials",
+    "vouches",
+    "badges"
+  ],
+  "type": "export_manifest",
+  "version": "1.0",
+  "signature": {
+    "alg": "Ed25519",
+    "public_key": "AXBxsNjTx7KQXM5DJPFgKEFYZD6vt6TNDueNKrwyfPeT",
+    "signature": "3puYzy6MgxQqv5KEiL7afHjjtDU9JaoekzcUqRBAY4M2PDWce7ZmFeDfkeSBWpnon5qJWDbRnFFLrNXgrWCPGaY5",
+    "signed_at": "2026-05-16T17:00:00.000Z",
+    "canonicalization": "JCS"
+  }
+}

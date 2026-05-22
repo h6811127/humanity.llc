@@ -1,0 +1,17 @@
+{
+  "profile_id": "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+  "cause_category": "policy_violation",
+  "public_notice": "Suspended under published bootstrap rules pending appeal.",
+  "appeal_deadline": "2026-06-16T17:00:00.000Z",
+  "suspended_at": "2026-05-16T17:00:00.000Z",
+  "nonce": "nonce_suspend_001",
+  "type": "suspension",
+  "version": "1.0",
+  "signature": {
+    "alg": "Ed25519",
+    "public_key": "AXBxsNjTx7KQXM5DJPFgKEFYZD6vt6TNDueNKrwyfPeT",
+    "signature": "3CPDjHo5xGWhX4fC5vyypzoQvfdvTFa675RbK1Y49DRohTLv7dU9fsYZuj2cP9YF8uLjRhxmNCgeS1aATymNSwMx",
+    "signed_at": "2026-05-16T17:00:00.000Z",
+    "canonicalization": "JCS"
+  }
+}

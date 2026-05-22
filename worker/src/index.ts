@@ -1,17 +1,22 @@
 /**
  * humanity.llc reference resolver — route dispatcher.
- * M1.1: health. M1.2: D1 schema + readiness on health.
+ * M1: health + D1. M2: create card + get card.
  */
 
 import { schemaReady } from "./db";
+import {
+  clientIp,
+  corsHeaders,
+  jsonResponse,
+  OPERATOR_ID,
+  PROTOCOL_VERSION,
+  withCors,
+} from "./http/resolver";
+import { handleGetCard, handlePostCards } from "./resolver/create-card";
 
 export interface Env {
-  /** Cloudflare D1 — cards, qr_credentials, verification_summaries, revocations */
   DB: D1Database;
 }
-
-const OPERATOR_ID = "humanity.llc";
-const PROTOCOL_VERSION = "1.0";
 
 export default {
   async fetch(
@@ -19,34 +24,44 @@ export default {
     env: Env,
     _ctx: ExecutionContext
   ): Promise<Response> {
-    const url = new URL(request.url);
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: corsHeaders(request),
+      });
+    }
 
-    if (
-      request.method === "GET" &&
-      url.pathname === "/.well-known/hc/v1/health"
-    ) {
+    const url = new URL(request.url);
+    const path = url.pathname;
+
+    if (path === "/.well-known/hc/v1/health" && request.method === "GET") {
       return healthResponse(env);
     }
 
-    return jsonResponse({ error: "not_found", path: url.pathname }, 404);
+    if (path === "/.well-known/hc/v1/cards" && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostCards(request, env.DB);
+      return withCors(request, res);
+    }
+
+    const cardMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)$/
+    );
+    if (cardMatch && request.method === "GET") {
+      if (!env.DB) {
+        return jsonResponse({ error: "database_unconfigured" }, 503);
+      }
+      return handleGetCard(env.DB, cardMatch[1]!, request);
+    }
+
+    return jsonResponse({ error: "not_found", path }, 404);
   },
 };
-
-function resolverHeaders(): HeadersInit {
-  return {
-    "Content-Type": "application/json; charset=utf-8",
-    "X-Resolver-Version": PROTOCOL_VERSION,
-    "X-Resolver-Operator": OPERATOR_ID,
-    "Cache-Control": "no-store",
-  };
-}
-
-function jsonResponse(body: unknown, status: number): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: resolverHeaders(),
-  });
-}
 
 async function healthResponse(env: Env): Promise<Response> {
   const body: {

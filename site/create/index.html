@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Create card · humanity.llc</title>
+    <meta
+      name="description"
+      content="Create a signed Humanity Card. Your private key stays in this browser session only."
+    />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=18" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <img src="/assets/red_qr_transparent_bg.png" width="28" height="28" alt="" />
+          <span>humanity.llc</span>
+        </a>
+      </header>
+
+      <main class="screen">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Phase A · create</p>
+          <h1>Create your card</h1>
+          <p class="hero-line">
+            Choose a public handle and one-line statement. Keys are generated and stay on
+            this device—they are never sent to the resolver.
+          </p>
+        </section>
+
+        <form id="create-form" class="form-card" autocomplete="off">
+          <label class="form-label" for="handle">Handle</label>
+          <input
+            class="form-input"
+            id="handle"
+            name="handle"
+            required
+            minlength="3"
+            maxlength="32"
+            pattern="[a-z][a-z0-9_]{2,31}"
+            placeholder="river_example"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+          />
+          <p class="form-hint">Lowercase letters, digits, underscores. 3–32 characters.</p>
+
+          <label class="form-label" for="manifesto">Manifesto line</label>
+          <textarea
+            class="form-input form-textarea"
+            id="manifesto"
+            name="manifesto"
+            required
+            maxlength="280"
+            rows="3"
+            placeholder="One public sentence about you or your work."
+          ></textarea>
+          <p class="form-hint">Plain text only, 280 characters max.</p>
+
+          <p class="form-warning">
+            If you close this tab without saving a backup, you cannot recover your private key.
+            Card creation does not verify legal identity.
+          </p>
+
+          <button type="submit" class="btn-primary" id="submit">Create signed card</button>
+          <p id="status" class="form-status" role="status"></p>
+        </form>
+      </main>
+    </div>
+    <script type="module" src="/js/create-card.mjs"></script>
+  </body>
+</html>

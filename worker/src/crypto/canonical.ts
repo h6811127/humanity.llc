@@ -1,6 +1,7 @@
 import canonicalize from "canonicalize";
 
-import { CANONICALIZATION, CRYPTO_ERROR, CryptoVerifyError } from "./errors";
+import { CANONICALIZATION } from "./constants";
+import { CRYPTO_ERROR, CryptoVerifyError } from "./errors";
 
 /**
  * RFC 8785 (JCS) canonical JSON string for signing.

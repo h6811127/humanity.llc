@@ -1,10 +1,11 @@
-import { base58btc } from "@scure/base";
+import { base58 } from "@scure/base";
 
-import { BASE58_ALPHABET, CRYPTO_ERROR, CryptoVerifyError } from "./errors";
+import { BASE58_ALPHABET } from "./constants";
+import { CRYPTO_ERROR, CryptoVerifyError } from "./errors";
 
 /** Encode bytes to base58 (Bitcoin alphabet). */
 export function encodeBase58(bytes: Uint8Array): string {
-  return base58btc.encode(bytes);
+  return base58.encode(bytes);
 }
 
 /** Decode base58 string; throws CryptoVerifyError on invalid characters. */
@@ -21,7 +22,7 @@ export function decodeBase58(str: string): Uint8Array {
     }
   }
   try {
-    return base58btc.decode(str);
+    return base58.decode(str);
   } catch {
     throw new CryptoVerifyError(CRYPTO_ERROR.INVALID_BASE58, "Base58 decode failed");
   }

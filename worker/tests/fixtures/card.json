@@ -1,0 +1,34 @@
+{
+  "profile_id": "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+  "public_key": "AXBxsNjTx7KQXM5DJPFgKEFYZD6vt6TNDueNKrwyfPeT",
+  "handle": "founding_builder",
+  "manifesto_line": "Building trust without platforms.",
+  "created_at": "2026-05-16T17:00:00.000Z",
+  "updated_at": "2026-05-16T17:00:00.000Z",
+  "status": "active",
+  "verification": {
+    "level": 1,
+    "label": "Registered",
+    "method": "registered",
+    "verified_at": "2026-05-16T17:00:00.000Z",
+    "vouch_count": 0,
+    "latest_accepted_vouch_at": null
+  },
+  "badges": [],
+  "qr": {
+    "active_qr_id": "qr_test_card_001",
+    "epoch": 1
+  },
+  "links": {
+    "standards": "https://humanity.llc/standards/v1"
+  },
+  "type": "humanity_card",
+  "version": "1.0",
+  "signature": {
+    "alg": "Ed25519",
+    "public_key": "AXBxsNjTx7KQXM5DJPFgKEFYZD6vt6TNDueNKrwyfPeT",
+    "signature": "3zCh1nptjxRt8S9V6GU3gc8DVddkyTcG8tjk2aBS1yDnoRckFqcGQhmsAYV8Wd2rk45Rr4BPgtTJgGJgVeLFkuzL",
+    "signed_at": "2026-05-16T17:00:00.000Z",
+    "canonicalization": "JCS"
+  }
+}

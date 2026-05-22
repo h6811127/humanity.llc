@@ -14,18 +14,17 @@ compatibility_date = "2024-08-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "humanity-resolver"
-database_id = "00000000-0000-4000-8000-000000000001"
+database_id = "f16391f9-613a-4506-9ad7-35d19178b8b6"
 migrations_dir = "migrations"
-preview_database_id = "00000000-0000-4000-8000-000000000002"
+preview_database_id = "f16391f9-613a-4506-9ad7-35d19178b8b6"
 
 [dev]
 port = 8787
 
-# Uncomment and set zone_id after first deploy (step 1.4).
-# [[routes]]
-# pattern = "humanity.llc/.well-known/hc/v1/*"
-# zone_name = "humanity.llc"
-#
-# [[routes]]
-# pattern = "humanity.llc/c/*"
-# zone_name = "humanity.llc"
+
+ [[routes]]
+ pattern = "humanity.llc/.well-known/hc/v1/*"
+ zone_id = "180ee38ceea795d281fb5a3bd51af533"
+ [[routes]]
+ pattern = "humanity.llc/c/*"
+ zone_id = "180ee38ceea795d281fb5a3bd51af533"

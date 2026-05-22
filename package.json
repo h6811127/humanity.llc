@@ -27,6 +27,9 @@
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4",
-    "wrangler": "^4.93.0"
+    "wrangler": "4.47.0"
+  },
+  "engines": {
+    "node": ">=20.18.1"
   }
 }
