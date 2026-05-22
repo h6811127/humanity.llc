@@ -9,6 +9,8 @@
 
 **Build phases:** `docs/V1_0_ARCHITECTURE_ROADMAP.md` — Phase A (digital trust) before commerce and Commons Pass.
 
+**Public landing:** `site/index.html` — “One use” (door plate + QR), “Same idea elsewhere” (mechanism bullets + NFC research mini-flow). Full catalog stays in this doc, not on the homepage scroll.
+
 ---
 
 ## Why a use case beats “just a card page”

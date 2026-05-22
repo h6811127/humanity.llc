@@ -415,10 +415,15 @@ a {
   border-radius: 8px;
 }
 
-.pass-qr img {
+.pass-qr img,
+.pass-qr-svg svg {
   width: 88px;
   height: 88px;
   display: block;
+}
+
+.pass-qr-svg {
+  line-height: 0;
 }
 
 .pass-foot {
@@ -494,6 +499,15 @@ a {
   width: 30px;
   height: 30px;
   border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.list-icon svg {
+  width: 17px;
+  height: 17px;
 }
 
 .list-icon-tone-red {

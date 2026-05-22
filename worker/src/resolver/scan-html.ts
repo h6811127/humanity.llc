@@ -1,10 +1,11 @@
 import type { ScanViewModel } from "./scan-state";
+import { scanListIcon, type ScanIconId } from "./scan-icons";
 import { SCAN_PASS_FLIP_JS } from "./scan-pass-flip";
 import { SCAN_PASS_CSS } from "./scan-pass-styles";
-import { scanQrDataUrl } from "./scan-qr";
+import { renderScanQrMarkup } from "./scan-qr";
 
 /** Response header — confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v3";
+export const SCAN_UI_VERSION = "pass-v4";
 
 /**
  * Public scan UI — flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -14,13 +15,12 @@ export async function renderScanPage(
   origin: string
 ): Promise<string> {
   const title = pageTitle(vm);
-  let qrImg = "";
+  let qrMarkup = "";
   if (vm.scanUrl) {
     try {
-      const dataUrl = await scanQrDataUrl(vm.scanUrl);
-      qrImg = `<img src="${dataUrl}" width="88" height="88" alt="QR for this card scan link" />`;
+      qrMarkup = await renderScanQrMarkup(vm.scanUrl);
     } catch {
-      qrImg = `<img src="${escapeHtml(origin)}/assets/red_qr_transparent_bg.png" width="88" height="88" alt="" />`;
+      qrMarkup = "";
     }
   }
 
@@ -41,14 +41,36 @@ export async function renderScanPage(
     ${renderTopHeader(origin)}
     <main class="screen scan-screen">
       <p class="section-kicker">Live resolver · scan time</p>
-      ${renderPassSection(vm, origin, qrImg)}
+      ${renderPassSection(vm, origin, qrMarkup)}
       ${renderTrustGroups(vm, origin)}
       ${renderFooter(vm, origin)}
     </main>
   </div>
   <script>${SCAN_PASS_FLIP_JS}</script>
+  ${renderQrFallbackScript(origin, vm.scanUrl)}
 </body>
 </html>`;
+}
+
+/** Client fallback — same encoder as /created/ (`qr-render.mjs`). Never use brand PNG. */
+function renderQrFallbackScript(
+  origin: string,
+  scanUrl: string | null
+): string {
+  if (!scanUrl) return "";
+  const mod = JSON.stringify(`${origin}/js/qr-render.mjs?v=2`);
+  return `<script type="module">
+import { renderQrToImage } from ${mod};
+var slot = document.getElementById("pass-qr-slot");
+if (slot && !slot.querySelector("svg") && slot.dataset.scanUrl) {
+  var img = document.createElement("img");
+  img.width = 88;
+  img.height = 88;
+  img.alt = "QR code for this card scan link";
+  slot.prepend(img);
+  renderQrToImage(img, slot.dataset.scanUrl).catch(function () {});
+}
+</script>`;
 }
 
 function renderTopHeader(origin: string): string {
@@ -63,10 +85,10 @@ function renderTopHeader(origin: string): string {
 function renderPassSection(
   vm: ScanViewModel,
   origin: string,
-  qrImg: string
+  qrMarkup: string
 ): string {
   const badgeClass = `pass-badge badge-${vm.primaryBadge.tone}`;
-  const frontBody = renderPassFront(vm, badgeClass, qrImg);
+  const frontBody = renderPassFront(vm, badgeClass, qrMarkup);
   const backBody = renderPassBack(origin);
 
   return `<section class="pass" aria-label="Humanity Card at scan time">
@@ -95,7 +117,7 @@ function renderPassSection(
 function renderPassFront(
   vm: ScanViewModel,
   badgeClass: string,
-  qrImg: string
+  qrMarkup: string
 ): string {
   const isError =
     vm.kind !== "active" &&
@@ -120,8 +142,11 @@ function renderPassFront(
   const manifesto = vm.manifestoLine
     ? `<p class="pass-manifesto">${escapeHtml(vm.manifestoLine)}</p>`
     : "";
-  const qrBlock = qrImg
-    ? `<div class="pass-qr">${qrImg}</div>`
+  const qrSlotAttr = vm.scanUrl
+    ? ` id="pass-qr-slot" data-scan-url="${escapeHtml(vm.scanUrl)}"`
+    : "";
+  const qrBlock = vm.scanUrl
+    ? `<div class="pass-qr"${qrSlotAttr}>${qrMarkup}</div>`
     : "";
   const scanUrlLine = vm.scanUrl
     ? `<p class="pass-scan-url mono">${escapeHtml(vm.scanUrl)}</p>`
@@ -251,6 +276,7 @@ function trustGroup(
 }
 
 function listRow(
+  icon: ScanIconId,
   tone: string,
   title: string,
   sub?: string
@@ -259,7 +285,7 @@ function listRow(
     ? `<span class="list-sub">${escapeHtml(sub)}</span>`
     : "";
   return `<li class="list-row">
-  <span class="list-icon list-icon-tone-${tone}" aria-hidden="true"></span>
+  ${scanListIcon(tone, icon)}
   <span class="list-content">
     <span class="list-title">${escapeHtml(title)}</span>
     ${subHtml}
@@ -268,13 +294,14 @@ function listRow(
 }
 
 function listActionRow(
+  icon: ScanIconId,
   tone: string,
   href: string,
   title: string
 ): string {
   return `<li class="list-row list-action">
   <a href="${escapeHtml(href)}">
-    <span class="list-icon list-icon-tone-${tone}" aria-hidden="true"></span>
+    ${scanListIcon(tone, icon)}
     <span class="list-content">
       <span class="list-title">${escapeHtml(title)}</span>
     </span>
@@ -287,7 +314,8 @@ function cardGroupRows(vm: ScanViewModel): string {
   const status = vm.cardStatus ? `Card ${vm.cardStatus}` : "Unknown";
   const rows = [
     listRow(
-      "red",
+      "status",
+      "green",
       status,
       vm.kind === "active"
         ? "Live public card fields at scan time"
@@ -295,13 +323,12 @@ function cardGroupRows(vm: ScanViewModel): string {
     ),
   ];
   if (vm.profileId) {
-    rows.push(
-      listRow("blue", "Profile ID", vm.profileId)
-    );
+    rows.push(listRow("profile", "blue", "Profile ID", vm.profileId));
   }
   rows.push(
     listRow(
-      "slate",
+      "people",
+      "orange",
       "Does not prove",
       "Legal identity or that the person holding this item owns the card"
     )
@@ -310,11 +337,10 @@ function cardGroupRows(vm: ScanViewModel): string {
 }
 
 function humanGroupRows(vm: ScanViewModel): string {
-  const rows = [
-    listRow("purple", vm.verificationLabel, humanSub(vm)),
-  ];
+  const rows = [listRow("people", "purple", vm.verificationLabel, humanSub(vm))];
   rows.push(
     listRow(
+      "ban",
       "slate",
       "Does not prove",
       "Employment eligibility, KYC, age, or a hidden trust score"
@@ -336,15 +362,16 @@ function qrGroupRows(vm: ScanViewModel): string {
     vm.qrScope === "print_artifact"
       ? "Printed item — revoke one artifact without killing the card"
       : "Card-scoped credential";
-  const rows = [listRow("green", status, scope)];
+  const rows = [listRow("qr", "green", status, scope)];
   if (vm.qrId) {
-    rows.push(listRow("blue", "Credential", vm.qrId));
+    rows.push(listRow("profile", "blue", "Credential", vm.qrId));
   }
   if (vm.scanUrl) {
-    rows.push(listRow("red", "Scan link", vm.scanUrl));
+    rows.push(listRow("link", "red", "Scan link", vm.scanUrl));
   }
   rows.push(
     listRow(
+      "warning",
       "orange",
       "Bearer warning",
       "This QR resolves to a Humanity Card. It does not prove the person holding this item is the card owner."
@@ -356,15 +383,17 @@ function qrGroupRows(vm: ScanViewModel): string {
 function liveControlGroupRows(vm: ScanViewModel): string {
   if (vm.liveControlAvailable) {
     return listRow(
+      "key",
       "green",
       "Control proven recently",
       "Card key signed a fresh challenge — not shown on every scan"
     );
   }
   return (
-    listRow("slate", "Not shown", "Optional in-person key proof (M7)") +
+    listRow("key", "slate", "Not shown", "Optional in-person key proof (M7)") +
     "\n" +
     listRow(
+      "shield",
       "slate",
       "Does not prove",
       "Legal identity, permanent ownership, or that earlier vouches were honest"
@@ -375,14 +404,25 @@ function liveControlGroupRows(vm: ScanViewModel): string {
 function limitationsGroupRows(vm: ScanViewModel, origin: string): string {
   return (
     listRow(
+      "ban",
       "orange",
       "Not government ID or KYC",
       "Scan shows resolver state only"
     ) +
     "\n" +
-    listRow("pink", "No scan analytics", "Reference operator default for this page") +
+    listRow(
+      "shield",
+      "pink",
+      "No scan analytics",
+      "Reference operator default for this page"
+    ) +
     "\n" +
-    listActionRow("blue", `${origin}/data-policy.html`, "Operator data policy")
+    listActionRow(
+      "database",
+      "blue",
+      `${origin}/data-policy.html`,
+      "Operator data policy"
+    )
   );
 }
 

@@ -225,7 +225,8 @@ npm run worker:migrate:remote
 npm run worker:test
 ```
 
-After deploy, scan responses include `X-HC-Scan-UI: pass-v2` and HTML with `pass-scene` (flippable card).  
+After deploy, scan responses include `X-HC-Scan-UI: pass-v4` and HTML with `pass-scene` (flippable card).  
+Scan UI contract: `docs/M3_SCAN_PAGE_UI.md` (card QR = same payload as `/created/`).  
 Pages-only deploy updates landing/create headers; **scan UI will not change until the Worker deploys.**
 
 Health: `GET /.well-known/hc/v1/health` · Create: `POST /.well-known/hc/v1/cards` · Public scan: `GET /c/{profile_id}?q={qr_id}`.

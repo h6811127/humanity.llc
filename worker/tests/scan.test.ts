@@ -103,8 +103,11 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("QR active");
     expect(html).toContain("Holding the object does not prove ownership");
     expect(html).toContain('class="pass-dot"');
-    expect(html).toContain("data:image");
-    expect(html).toContain(encodeURIComponent(PROFILE));
+    expect(html).toContain("pass-qr-slot");
+    expect(html).toContain(`q=${QR}`);
+    expect(html).toMatch(/<svg[^>]*viewBox="0 0 \d+ \d+"/);
+    expect(html).toContain("list-icon-tone-red");
+    expect(html).not.toContain('class="pass-qr"><img src="https://humanity.llc/assets/red_qr');
     expect(html).not.toContain("HUMAN TRUST");
   });
 

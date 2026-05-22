@@ -498,7 +498,7 @@ Follow these steps in order. Each step lists **exit criteria** and **spec refs**
 | Step | Action | Exit | Refs |
 |---|---|---|---|
 | 3.1 | `GET /c/{profile_id}?q={qr_id}` HTML template | Mobile-readable in 5s | R-002, trust model — **done** |
-| 3.2 | Trust blocks: card, human, artifact, limitations | Clear separation | §7 — **done** (`worker/src/resolver/scan-html.ts`) |
+| 3.2 | Trust blocks: card, human, artifact, limitations | Clear separation | §7 — **done** (`docs/M3_SCAN_PAGE_UI.md`, `worker/src/resolver/scan-html.ts`) |
 | 3.3 | Bearer warning on item-scoped QR | Visible above fold on mobile | Flow audit §2 |
 | 3.4 | `GET .../status` JSON | Matches HTML state | Standards §9 |
 | 3.5 | Unknown profile/QR pages | No blank 404 | R-002 |
