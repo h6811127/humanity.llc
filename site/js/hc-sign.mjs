@@ -76,10 +76,26 @@ export function withProtocolFields(payload, type) {
   return { ...payload, type, version: PROTOCOL_VERSION };
 }
 
-export function resolverApiBase() {
+/**
+ * Resolver origin only (no path). Avoids ?api=https://humanity.llc/create
+ * which would POST to /create/.well-known/... and Pages returns 405.
+ */
+export function resolverApiOrigin() {
   const params = new URLSearchParams(location.search);
-  const api = params.get("api");
-  if (api) return api.replace(/\/$/, "");
+  const apiParam = params.get("api");
+  if (apiParam) {
+    try {
+      const parsed = new URL(apiParam, location.href);
+      if (
+        parsed.hostname === "127.0.0.1" ||
+        parsed.hostname === "localhost"
+      ) {
+        return parsed.origin;
+      }
+    } catch {
+      /* ignore bad api= on production */
+    }
+  }
   if (
     location.hostname === "localhost" ||
     location.hostname === "127.0.0.1"
@@ -87,6 +103,22 @@ export function resolverApiBase() {
     return "http://127.0.0.1:8787";
   }
   return location.origin;
+}
+
+/** @deprecated use resolverApiOrigin — kept for existing imports */
+export function resolverApiBase() {
+  return resolverApiOrigin();
+}
+
+export function postCardsUrl() {
+  return new URL("/.well-known/hc/v1/cards", resolverApiOrigin()).href;
+}
+
+export function getCardJsonUrl(profileId) {
+  return new URL(
+    `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}`,
+    resolverApiOrigin()
+  ).href;
 }
 
 export function qrScanUrl(profileId, qrId, origin = "https://humanity.llc") {

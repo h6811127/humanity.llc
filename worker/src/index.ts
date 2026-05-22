@@ -1,18 +1,20 @@
 /**
  * humanity.llc reference resolver — route dispatcher.
- * M1: health + D1. M2: create card + get card.
+ * M1: health + D1. M2: create card. M3: scan trust UI.
  */
 
 import { schemaReady } from "./db";
 import {
   clientIp,
   corsHeaders,
+  htmlResponse,
   jsonResponse,
   OPERATOR_ID,
   PROTOCOL_VERSION,
   withCors,
 } from "./http/resolver";
 import { handleGetCard, handlePostCards } from "./resolver/create-card";
+import { handleGetScan } from "./resolver/scan";
 
 export interface Env {
   DB: D1Database;
@@ -57,6 +59,18 @@ export default {
         return jsonResponse({ error: "database_unconfigured" }, 503);
       }
       return handleGetCard(env.DB, cardMatch[1]!, request);
+    }
+
+    const scanMatch = path.match(/^\/c\/([^/]+)$/);
+    if (scanMatch && request.method === "GET") {
+      if (!env.DB) {
+        return htmlResponse(
+          "<!DOCTYPE html><html><body><p>Resolver database unavailable.</p></body></html>",
+          503,
+          { "Cache-Control": "no-store" }
+        );
+      }
+      return handleGetScan(request, env.DB, scanMatch[1]!);
     }
 
     return jsonResponse({ error: "not_found", path }, 404);

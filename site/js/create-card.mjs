@@ -4,7 +4,8 @@ import {
   generateProfileId,
   generateQrId,
   qrScanUrl,
-  resolverApiBase,
+  postCardsUrl,
+  resolverApiOrigin,
   signDocument,
   withProtocolFields,
 } from "./hc-sign.mjs";
@@ -30,10 +31,10 @@ form?.addEventListener("submit", async (e) => {
     const profileId = generateProfileId();
     const qrId = generateQrId();
     const now = new Date().toISOString();
-    const api = resolverApiBase();
+    const apiOrigin = resolverApiOrigin();
     const origin =
-      api.includes("127.0.0.1") || api.includes("localhost")
-        ? api
+      apiOrigin.includes("127.0.0.1") || apiOrigin.includes("localhost")
+        ? apiOrigin
         : "https://humanity.llc";
     const scanUrl = qrScanUrl(profileId, qrId, origin);
     const expiresAt = defaultQrExpiry(now);
@@ -90,7 +91,7 @@ form?.addEventListener("submit", async (e) => {
 
     setStatus("Submitting to resolver…");
 
-    const res = await fetch(`${api}/.well-known/hc/v1/cards`, {
+    const res = await fetch(postCardsUrl(), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ card, qr_credential }),
@@ -98,7 +99,9 @@ form?.addEventListener("submit", async (e) => {
 
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      throw new Error(data.message || data.error || `HTTP ${res.status}`);
+      throw new Error(
+      data.message || data.error || `HTTP ${res.status} (${postCardsUrl()})`
+    );
     }
 
     sessionStorage.setItem(

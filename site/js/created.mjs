@@ -1,4 +1,4 @@
-import { qrScanUrl, resolverApiBase } from "./hc-sign.mjs";
+import { getCardJsonUrl, qrScanUrl, resolverApiOrigin } from "./hc-sign.mjs";
 
 const params = new URLSearchParams(location.search);
 const profileIdParam = params.get("profile_id")?.trim() || null;
@@ -20,10 +20,10 @@ try {
   data = null;
 }
 
-const api = resolverApiBase();
+const apiOrigin = resolverApiOrigin();
 const scanOrigin =
-  api.includes("127.0.0.1") || api.includes("localhost")
-    ? api
+  apiOrigin.includes("127.0.0.1") || apiOrigin.includes("localhost")
+    ? apiOrigin
     : location.origin;
 
 const profileId = data?.profile_id || profileIdParam;
@@ -62,7 +62,7 @@ if (data?.manifesto_line) {
 
 if (profileId) {
   profileIdEl.textContent = profileId;
-  jsonLink.href = `${api}/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}`;
+  jsonLink.href = getCardJsonUrl(profileId);
   jsonLink.removeAttribute("aria-disabled");
 } else {
   jsonLink.href = "#";
