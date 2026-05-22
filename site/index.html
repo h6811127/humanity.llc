@@ -9,16 +9,16 @@
     <title>humanity.llc</title>
     <meta
       name="description"
-      content="humanity.llc is building member-governed trust infrastructure: signed cards, a live QR resolver, vouches, and revocation. No phone, no ID, no scan analytics."
+      content="Physical objects with programmable social state. Scan a sticker, card, or tag—see live active or revoked status. Optional, revocable, no scan tracking."
     />
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=17" />
+    <link rel="stylesheet" href="/styles.css?v=20" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
-      content="Trust infrastructure you can inspect, starting with a revocable card and live resolver."
+      content="Live public objects—not identity, not social media. Scan and see current state."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://humanity.llc" />
@@ -33,96 +33,86 @@
         </a>
       </header>
 
-      <main class="screen">
-        <section class="hero">
-          <p class="hero-eyebrow">Public launch · in development</p>
-          <h1>Minimum trust.<br />Clear limits.</h1>
+      <main class="screen screen-landing">
+        <section class="hero hero-tight">
+          <p class="hero-eyebrow">In development</p>
+          <h1>Live state<br />on real objects.</h1>
           <p class="hero-line">
-            A signed public card and live QR resolver, so scans show current status,
-            not a static profile. No phone. No ID. No ads. No tracking.
+            Not a bio link. A sticker, wristband, or card that resolves to
+            <strong>current</strong> status—active, revoked, unknown.
           </p>
         </section>
 
-        <section class="pass" id="card" aria-label="Card preview">
+        <section class="pass" id="card" aria-label="Resolver preview">
+          <p class="section-kicker">What you see when someone scans</p>
           <div class="pass-scene" id="pass-scene">
             <div class="pass-tilt-wrap" id="pass-tilt-wrap">
-            <div class="pass-flip" id="pass-flip">
-              <div class="pass-inner">
-                <div class="pass-face pass-front">
-                  <div class="pass-tilt-surface" id="pass-tilt-surface">
-                  <div class="pass-head">
-                    <div class="pass-brand">
-                      <span class="pass-dot" aria-hidden="true"></span>
-                      <span>humanity.llc</span>
-                    </div>
-                    <span class="pass-badge">Active card</span>
-                  </div>
-                  <div class="pass-body">
-                    <div class="pass-main">
-                      <p class="pass-type">Humanity Card</p>
-                      <p class="pass-name">river.example</p>
-                      <p class="pass-manifesto">Portable trust under published rules.</p>
-                      <p class="pass-since">Card since 2026</p>
-                      <ul class="pass-trust" aria-label="Trust at a glance">
-                        <li class="trust-on">Vouched human</li>
-                        <li>Live control</li>
-                        <li>QR active</li>
-                      </ul>
-                    </div>
-                    <div class="pass-qr">
-                      <img
-                        src="/assets/red_qr_transparent_bg.png"
-                        width="96"
-                        height="96"
-                        alt="QR code"
-                      />
-                    </div>
-                  </div>
-                  <p class="pass-foot">
-                    Scan shows current status. It does not prove the nearby person owns this
-                    card.
-                  </p>
-                  </div>
-                </div>
-                <div class="pass-face pass-back" aria-hidden="true">
-                  <div class="pass-back-accent" aria-hidden="true"></div>
-                  <div class="pass-back-inner">
-                    <div class="pass-head">
-                      <div class="pass-brand">
-                        <span class="pass-dot" aria-hidden="true"></span>
-                        <span>Resolver data</span>
+              <div class="pass-flip" id="pass-flip">
+                <div class="pass-inner">
+                  <div class="pass-face pass-front">
+                    <div class="pass-tilt-surface" id="pass-tilt-surface">
+                      <div class="pass-head">
+                        <div class="pass-brand">
+                          <span class="pass-dot" aria-hidden="true"></span>
+                          <span>humanity.llc</span>
+                        </div>
+                        <span class="pass-badge">Active</span>
                       </div>
-                      <span class="pass-badge">Limits</span>
+                      <div class="pass-body">
+                        <div class="pass-main">
+                          <p class="pass-type">Live object</p>
+                          <p class="pass-name">river.example</p>
+                          <p class="pass-manifesto">Open to collab this month.</p>
+                          <ul class="pass-trust" aria-label="Status at a glance">
+                            <li class="trust-on">Registered</li>
+                            <li>QR active</li>
+                          </ul>
+                        </div>
+                        <div class="pass-qr">
+                          <img
+                            src="/assets/red_qr_transparent_bg.png"
+                            width="96"
+                            height="96"
+                            alt=""
+                          />
+                        </div>
+                      </div>
+                      <p class="pass-foot">
+                        Scan shows live state. Holding the object does not prove ownership.
+                      </p>
                     </div>
-                    <ul class="pass-back-grid" aria-label="Operator data limits">
-                      <li>
-                        <span class="pass-back-label">Stores</span>
-                        <span class="pass-back-value"
-                          >public card, keys, handle, status, signed vouches</span
-                        >
-                      </li>
-                      <li>
-                        <span class="pass-back-label">Does not store</span>
-                        <span class="pass-back-value"
-                          >private keys, ID, phone, scan analytics</span
-                        >
-                      </li>
-                      <li>
-                        <span class="pass-back-label">Logs</span>
-                        <span class="pass-back-value">no scan logging by default</span>
-                      </li>
-                    </ul>
-                    <p class="pass-foot">
-                      <a href="/data-policy.html">Full operator data policy</a>
-                    </p>
-                    <div class="pass-back-wordmark" aria-hidden="true">
-                      <span class="pass-dot"></span>
-                      <span>humanity.llc</span>
+                  </div>
+                  <div class="pass-face pass-back" aria-hidden="true">
+                    <div class="pass-back-accent" aria-hidden="true"></div>
+                    <div class="pass-back-inner">
+                      <div class="pass-head">
+                        <div class="pass-brand">
+                          <span class="pass-dot" aria-hidden="true"></span>
+                          <span>Limits</span>
+                        </div>
+                        <span class="pass-badge">Optional</span>
+                      </div>
+                      <ul class="pass-back-grid" aria-label="Privacy posture">
+                        <li>
+                          <span class="pass-back-label">You choose</span>
+                          <span class="pass-back-value">what to put on objects</span>
+                        </li>
+                        <li>
+                          <span class="pass-back-label">Revocable</span>
+                          <span class="pass-back-value">per object, per item QR</span>
+                        </li>
+                        <li>
+                          <span class="pass-back-label">No default</span>
+                          <span class="pass-back-value">scan analytics or legal ID</span>
+                        </li>
+                      </ul>
+                      <p class="pass-foot">
+                        <a href="/data-policy.html">Operator data policy</a>
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
             </div>
             <button
               type="button"
@@ -135,250 +125,134 @@
           </div>
         </section>
 
-        <nav class="dock" aria-label="Quick actions">
+        <section class="example-flow" aria-label="Concrete example">
+          <h2 class="group-label">One use</h2>
+          <p class="group-intro short">
+            Sticker on a laptop at a meetup. Someone scans. The resolver opens—not a dead link.
+          </p>
+
+          <div class="flow-strip">
+            <div class="flow-step">
+              <div class="flow-object" aria-hidden="true">
+                <div class="flow-laptop">
+                  <span class="flow-sticker">
+                    <img src="/assets/red_qr_transparent_bg.png" width="28" height="28" alt="" />
+                  </span>
+                </div>
+              </div>
+              <p class="flow-label">Object</p>
+              <p class="flow-caption">Sticker, tag, wristband, flyer</p>
+            </div>
+
+            <div class="flow-arrow" aria-hidden="true">→</div>
+
+            <div class="flow-step">
+              <div class="flow-object flow-phone" aria-hidden="true">
+                <span class="flow-scan-line"></span>
+                <span class="flow-phone-notch"></span>
+              </div>
+              <p class="flow-label">Scan</p>
+              <p class="flow-caption">Any camera, no app</p>
+            </div>
+
+            <div class="flow-arrow" aria-hidden="true">→</div>
+
+            <div class="flow-step">
+              <div class="flow-object flow-state" aria-hidden="true">
+                <span class="flow-state-dot live"></span>
+                <span class="flow-state-text">Active</span>
+              </div>
+              <p class="flow-label">Live state</p>
+              <p class="flow-caption">Or revoked, suspended</p>
+            </div>
+          </div>
+
+          <p class="example-note">
+            Same object tomorrow can read <em>revoked</em>—without reprinting everything.
+          </p>
+        </section>
+
+        <section class="object-model" aria-label="How it works">
+          <h2 class="group-label">The model</h2>
+          <p class="group-intro short">
+            Not identity. Not crypto. Not social media. A <strong>live public object</strong>.
+          </p>
+          <ol class="model-ladder">
+            <li>
+              <span class="model-icon" aria-hidden="true">◇</span>
+              <span class="model-text"><strong>Physical thing</strong> in the world</span>
+            </li>
+            <li class="model-connector" aria-hidden="true"></li>
+            <li>
+              <span class="model-icon" aria-hidden="true">↯</span>
+              <span class="model-text"><strong>Resolver</strong> returns signed status</span>
+            </li>
+            <li class="model-connector" aria-hidden="true"></li>
+            <li>
+              <span class="model-icon model-icon-live" aria-hidden="true">●</span>
+              <span class="model-text"><strong>Live state</strong> you can read in seconds</span>
+            </li>
+          </ol>
+        </section>
+
+        <ul class="trust-pills" aria-label="Trust posture">
+          <li>Optional</li>
+          <li>Revocable</li>
+          <li>Scoped</li>
+          <li>No scan tracking</li>
+          <li>Not legal ID</li>
+        </ul>
+
+        <nav class="dock" aria-label="Actions">
+          <a class="dock-btn dock-btn-primary" href="/create/">Create a live object</a>
           <a
-            class="dock-btn dock-btn-primary"
+            class="dock-btn"
             href="https://github.com/h6811127/humanity.llc"
             rel="noopener noreferrer"
-            >Follow the build on GitHub</a
+            >Specs on GitHub</a
           >
         </nav>
 
-        <section class="group" id="wedge">
-          <h2 class="group-label">The wedge</h2>
-          <div class="feature">
-            <p class="feature-lead">Objects point at a resolver, not a bio link.</p>
-            <p class="feature-sub">
-              Stickers and cards spread curiosity. The product is the scan: signed
-              card state, revocation, vouches, and optional live control, readable in
-              seconds, honest about limits.
-            </p>
-          </div>
-        </section>
-
-        <section class="group" id="dependency">
-          <h2 class="group-label">What creates dependency</h2>
-          <p class="group-intro">
-            Merch alone is printing. Dependency starts when people and systems must
-            ask the resolver for current truth.
-          </p>
-          <ul class="list">
-            <li>
-              <span class="list-title">Live resolver</span>
-              <span class="list-sub"
-                >Every QR resolves to active, revoked, suspended, or unknown, not a 404</span
-              >
-            </li>
-            <li>
-              <span class="list-title">Per-item revocation</span>
-              <span class="list-sub"
-                >Revoke one stolen sticker QR; other credentials can stay active</span
-              >
-            </li>
-            <li>
-              <span class="list-title">Signed public card</span>
-              <span class="list-sub"
-                >Keys on your device; export and revoke; not platform-owned</span
-              >
-            </li>
-            <li>
-              <span class="list-title">Vouch graph</span>
-              <span class="list-sub"
-                >Accountable social attestations under published rules, not follower counts</span
-              >
-            </li>
-            <li>
-              <span class="list-title">Live control</span>
-              <span class="list-sub"
-                >Optional proof you control the card key now, not legal ID</span
-              >
-            </li>
-            <li>
-              <span class="list-title">Machine-readable status</span>
-              <span class="list-sub"
-                >Apps and communities can check JSON status, not just a web page</span
-              >
-            </li>
-          </ul>
-        </section>
-
-        <section class="group" id="plan">
-          <h2 class="group-label">Build plan</h2>
-          <p class="group-intro">Order from the repo. Each phase unlocks the next.</p>
-          <ul class="list">
-            <li>
-              <span class="list-title"><span class="phase">A</span> Resolver + card</span>
-              <span class="list-sub"
-                >Create card, HTTPS scan page, vouch display, revocation, open when it works</span
-              >
-            </li>
-            <li>
-              <span class="list-title"><span class="phase">B</span> Curiosity drop</span>
-              <span class="list-sub"
-                >One sticker SKU; strangers scan; measure scan → create card</span
-              >
-            </li>
-            <li>
-              <span class="list-title"><span class="phase">C</span> Belonging</span>
-              <span class="list-sub"
-                >Personalized item QR; vouches under published rules</span
-              >
-            </li>
-            <li>
-              <span class="list-title"><span class="phase">D</span> Commons Pass</span>
-              <span class="list-sub"
-                >Community membership passes, check-in, stamps, same resolver grammar</span
-              >
-            </li>
-            <li>
-              <span class="list-title"><span class="phase">→</span> Governance</span>
-              <span class="list-sub"
-                >Public rules, member control of rights-affecting changes, federated operators</span
-              >
-            </li>
-          </ul>
-        </section>
-
-        <section class="group" id="empire">
-          <h2 class="group-label">Where this goes</h2>
-          <p class="group-intro">
-            Long-term: trust infrastructure communities can govern, not another
-            surveillance identity platform.
-          </p>
-          <ul class="list">
-            <li>
-              <span class="list-title">Open standards</span>
-              <span class="list-sub"
-                >Public card format, QR credentials, resolver API, portable across hosts</span
-              >
-            </li>
-            <li>
-              <span class="list-title">Commons Pass</span>
-              <span class="list-sub"
-                >Orgs issue membership without phone numbers or scan analytics</span
-              >
-            </li>
-            <li>
-              <span class="list-title">Member governance</span>
-              <span class="list-sub"
-                >Users and workers set rules for suspension, vouch policy, and surplus</span
-              >
-            </li>
-            <li>
-              <span class="list-title">Federated resolvers</span>
-              <span class="list-sub"
-                >Multiple operators, one trust grammar, no single company owns identity</span
-              >
-            </li>
-          </ul>
-        </section>
-
-        <section class="group">
-          <h2 class="group-label">Primitive</h2>
-          <ul class="list">
-            <li>
-              <span class="list-title">Humanity Card</span>
-              <span class="list-sub"
-                >Signed public profile + handle + manifesto you control</span
-              >
-            </li>
-            <li>
-              <span class="list-title">QR credential</span>
-              <span class="list-sub"
-                >Short HTTPS payload; print-safe; unique per physical item when needed</span
-              >
-            </li>
-            <li>
-              <span class="list-title">Scan page</span>
-              <span class="list-sub"
-                >Card status, human trust, artifact status, and what scan does not prove</span
-              >
-            </li>
-            <li>
-              <span class="list-title">Commerce path</span>
-              <span class="list-sub"
-                >Shopify checkout + Printify fulfillment, only after resolver QA passes</span
-              >
-            </li>
-          </ul>
-        </section>
-
         <section class="group" id="limits">
-          <h2 class="group-label">Limits</h2>
-          <ul class="list">
+          <h2 class="group-label">Clear limits</h2>
+          <ul class="list list-compact">
             <li class="list-row">
-              <span class="list-title">Not legal ID, KYC, or employment verification</span>
+              <span class="list-title">Not proof the holder owns the object</span>
             </li>
             <li class="list-row">
-              <span class="list-title">Not proof the person holding a QR is the owner</span>
+              <span class="list-title">Not KYC, employment, or “verified forever”</span>
             </li>
             <li class="list-row">
-              <span class="list-title">Not bot-proof or “verified forever”</span>
+              <span class="list-title">Not mandatory identity or social scoring</span>
             </li>
             <li class="list-row">
-              <span class="list-title">Buying merch does not grant vouched status</span>
-            </li>
-            <li class="list-row">
-              <span class="list-title">No scan analytics by default</span>
+              <span class="list-title">Merch does not grant vouched status</span>
             </li>
             <li class="list-row list-action">
               <a href="/data-policy.html">
-                <span class="list-title">Operator data policy</span>
-                <span class="list-sub">What the resolver stores, and what it does not</span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li class="list-row list-action">
-              <a
-                href="https://github.com/h6811127/humanity.llc/blob/main/docs/REFERENCE_OPERATOR_DATA_POLICY.md"
-                rel="noopener noreferrer"
-              >
-                <span class="list-title">Policy on GitHub</span>
-                <span class="list-sub">Canonical markdown in the repo</span>
+                <span class="list-title">What the resolver stores</span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </a>
             </li>
           </ul>
         </section>
 
-        <section class="group">
-          <h2 class="group-label">Today</h2>
-          <ul class="list">
+        <section class="group group-muted">
+          <h2 class="group-label">Building now</h2>
+          <ul class="list list-compact">
             <li>
-              <span class="list-title"><span class="status-dot live"></span> This site</span>
-              <span class="list-sub">Plan and specifications published</span>
+              <span class="list-title"><span class="status-dot live"></span> Resolver API</span>
+              <span class="list-sub">Health + create card live</span>
             </li>
             <li>
-              <span class="list-title"><span class="status-dot wait"></span> Resolver + card</span>
-              <span class="list-sub">Phase A, in active development</span>
-            </li>
-            <li class="list-row list-action">
-              <a href="/create/">
-                <span class="list-title"><span class="status-dot live"></span> Create a card</span>
-                <span class="list-sub">Signed card + QR — keys stay on your device</span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li>
-              <span class="list-title"><span class="status-dot wait"></span> Sticker drop</span>
-              <span class="list-sub">Optional merch after the resolver ships</span>
+              <span class="list-title"><span class="status-dot wait"></span> Public scan page</span>
+              <span class="list-sub">Trust UI at <code>/c/…</code> next</span>
             </li>
           </ul>
         </section>
 
         <section class="group" id="now">
-          <h2 class="group-label">Now</h2>
           <ul class="list">
-            <li class="list-row list-action">
-              <a
-                href="https://github.com/h6811127/humanity.llc"
-                rel="noopener noreferrer"
-              >
-                <span class="list-title">Build on GitHub</span>
-                <span class="list-sub">Specs, trust model, implementation contracts</span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
             <li class="list-row list-action">
               <a href="mailto:info@humanity.llc">
                 <span class="list-title">info@humanity.llc</span>
