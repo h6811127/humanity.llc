@@ -9,7 +9,7 @@
 
 **Build phases:** `docs/V1_0_ARCHITECTURE_ROADMAP.md` — Phase A (digital trust) before commerce and Commons Pass.
 
-**Public landing:** `site/index.html` — “One use” (door plate + QR), “Same idea elsewhere” (mechanism bullets + NFC research mini-flow). Full catalog stays in this doc, not on the homepage scroll.
+**Public landing:** `site/index.html` — “One use” (door plate + QR), “Same idea elsewhere” (mechanism bullets + NFC diagram + Bluetooth mesh hint). Full catalog stays in this doc, not on the homepage scroll.
 
 ---
 
