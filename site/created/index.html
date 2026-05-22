@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Your card · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=18" />
+    <link rel="stylesheet" href="/styles.css?v=23" />
   </head>
   <body>
     <div class="page">
@@ -40,12 +40,22 @@
           <h2 class="group-label">Resolver</h2>
           <ul class="list">
             <li>
-              <span class="list-title">Profile ID</span>
-              <span class="list-sub mono" id="profile-id"></span>
+              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9h16"/><path d="M4 15h16"/><path d="M10 3 8 21"/><path d="M16 3l-2 18"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Profile ID</span>
+                <span class="list-sub mono" id="profile-id"></span>
+              </span>
             </li>
             <li>
-              <span class="list-title">Status</span>
-              <span class="list-sub" id="card-status">Registered</span>
+              <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Status</span>
+                <span class="list-sub" id="card-status">Registered</span>
+              </span>
             </li>
           </ul>
           <a class="btn-secondary block-link" id="card-json-link" href="#">View public card JSON</a>
