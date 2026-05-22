@@ -9,16 +9,16 @@
     <title>humanity.llc</title>
     <meta
       name="description"
-      content="Physical objects with programmable social state. Scan a sticker, card, or tag—see live active or revoked status. Optional, revocable, no scan tracking."
+      content="Physical objects with programmable social state. Scan a tag or card for live active or revoked status. Optional, revocable, no scan tracking."
     />
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=20" />
+    <link rel="stylesheet" href="/styles.css?v=22" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
-      content="Live public objects—not identity, not social media. Scan and see current state."
+      content="Live public objects. Not identity, not social media. Scan and see current state."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://humanity.llc" />
@@ -39,9 +39,15 @@
           <h1>Live state<br />on real objects.</h1>
           <p class="hero-line">
             Not a bio link. A sticker, wristband, or card that resolves to
-            <strong>current</strong> status—active, revoked, unknown.
+            <strong>current</strong> status: active, revoked, or unknown.
           </p>
         </section>
+
+        <p class="insight">
+          The internet normalized permanent URLs. Memberships, trust, ownership,
+          permissions, affiliations, and social legitimacy are
+          <strong>dynamic</strong>. Objects can reflect that.
+        </p>
 
         <section class="pass" id="card" aria-label="Resolver preview">
           <p class="section-kicker">What you see when someone scans</p>
@@ -62,7 +68,7 @@
                         <div class="pass-main">
                           <p class="pass-type">Live object</p>
                           <p class="pass-name">river.example</p>
-                          <p class="pass-manifesto">Open to collab this month.</p>
+                          <p class="pass-manifesto">Open studio · Thu–Sun</p>
                           <ul class="pass-trust" aria-label="Status at a glance">
                             <li class="trust-on">Registered</li>
                             <li>QR active</li>
@@ -128,20 +134,21 @@
         <section class="example-flow" aria-label="Concrete example">
           <h2 class="group-label">One use</h2>
           <p class="group-intro short">
-            Sticker on a laptop at a meetup. Someone scans. The resolver opens—not a dead link.
+            A status plate on a studio door. Someone scans for tonight’s hours, whether
+            the door is open, or when the run ends. The resolver answers. Not a dead link.
           </p>
 
           <div class="flow-strip">
             <div class="flow-step">
               <div class="flow-object" aria-hidden="true">
-                <div class="flow-laptop">
-                  <span class="flow-sticker">
+                <div class="flow-door">
+                  <span class="flow-plaque">
                     <img src="/assets/red_qr_transparent_bg.png" width="28" height="28" alt="" />
                   </span>
                 </div>
               </div>
               <p class="flow-label">Object</p>
-              <p class="flow-caption">Sticker, tag, wristband, flyer</p>
+              <p class="flow-caption">Plate, tag, wristband</p>
             </div>
 
             <div class="flow-arrow" aria-hidden="true">→</div>
@@ -160,15 +167,15 @@
             <div class="flow-step">
               <div class="flow-object flow-state" aria-hidden="true">
                 <span class="flow-state-dot live"></span>
-                <span class="flow-state-text">Active</span>
+                <span class="flow-state-text">Open</span>
               </div>
               <p class="flow-label">Live state</p>
-              <p class="flow-caption">Or revoked, suspended</p>
+              <p class="flow-caption">Or closed, revoked</p>
             </div>
           </div>
 
           <p class="example-note">
-            Same object tomorrow can read <em>revoked</em>—without reprinting everything.
+            Tomorrow the same plate can read <em>closed</em>. No reprint required.
           </p>
         </section>
 
@@ -235,6 +242,15 @@
               </a>
             </li>
           </ul>
+        </section>
+
+        <section class="research-tease" aria-label="Future surfaces">
+          <h2 class="group-label">Later surfaces</h2>
+          <p>
+            We are testing where live state feels natural: invitations that move,
+            worksites that expire, public projects with a current chapter, places
+            that change mood. More formats over time. Details when they are ready.
+          </p>
         </section>
 
         <section class="group group-muted">

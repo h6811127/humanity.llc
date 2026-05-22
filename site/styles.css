@@ -111,7 +111,7 @@ a {
   line-height: 1.4;
 }
 
-/* Concrete example — laptop sticker → scan → state */
+/* Concrete example — door plate → scan → state */
 .example-flow {
   margin-top: 4px;
 }
@@ -138,7 +138,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 8px;
+  margin: 0 auto 8px;
 }
 
 .flow-label {
@@ -163,14 +163,34 @@ a {
   color: var(--grey);
 }
 
-.flow-laptop {
-  width: 88px;
-  height: 56px;
-  border-radius: 8px 8px 4px 4px;
-  background: linear-gradient(145deg, #e8e8e8, #d0d0d0);
+.flow-door {
+  width: 72px;
+  height: 80px;
+  border-radius: 6px;
+  background: linear-gradient(160deg, #ececec, #d4d4d4);
   border: 1px solid rgba(0, 0, 0, 0.12);
   position: relative;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.flow-plaque {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  padding: 5px;
+  background: var(--white);
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  line-height: 0;
+}
+
+.flow-plaque img {
+  width: 28px;
+  height: 28px;
 }
 
 .flow-sticker {
@@ -337,10 +357,39 @@ a {
   font-family: ui-monospace, Menlo, monospace;
 }
 
-.dock {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.insight {
+  margin: 0;
+  padding: 16px 18px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--grey);
+  border-left: 3px solid var(--red);
+  background: rgba(219, 27, 67, 0.04);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.insight strong {
+  color: var(--black);
+  font-weight: 600;
+}
+
+.research-tease {
+  padding: 14px 16px 16px;
+  border-radius: var(--radius);
+  border: 1px dashed rgba(0, 0, 0, 0.12);
+  background: var(--white);
+}
+
+.research-tease .group-label {
+  margin-bottom: 6px;
+}
+
+.research-tease p {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--grey);
+  margin: 0;
+  padding: 0 2px;
 }
 
 .hero-eyebrow {
@@ -710,7 +759,10 @@ a {
 
 /* Primary action */
 .dock {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 4px 0;
 }
 
 .dock-btn {
