@@ -2,7 +2,7 @@
  * Browser signing helpers for Humanity Card create flow (mirrors worker/src/crypto).
  */
 import * as ed from "https://esm.sh/@noble/ed25519@2.3.0";
-import { base58btc } from "https://esm.sh/@scure/base@1.2.6?bundle";
+import { base58 } from "https://esm.sh/@scure/base@1.2.6";
 import canonicalize from "https://esm.sh/canonicalize@2.1.0";
 
 const PROTOCOL_VERSION = "1.0";
@@ -12,11 +12,11 @@ const BASE58 =
   "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 export function encodeBase58(bytes) {
-  return base58btc.encode(bytes);
+  return base58.encode(bytes);
 }
 
 export function decodeBase58(str) {
-  return base58btc.decode(str);
+  return base58.decode(str);
 }
 
 export async function generateKeypair() {
