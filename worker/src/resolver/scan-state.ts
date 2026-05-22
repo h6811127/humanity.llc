@@ -40,21 +40,37 @@ export interface ScanViewModel {
   showLiveControlBlock: boolean;
   liveControlAvailable: boolean;
   primaryBadge: { label: string; tone: StatusTone };
+  scanUrl: string | null;
   cacheControl: string;
+}
+
+/** Canonical HTTPS scan target for this request. */
+export function resolveScanUrl(
+  origin: string,
+  profileId: string | null,
+  qrId: string | null,
+  payload: string | null | undefined
+): string | null {
+  if (payload?.trim()) return payload.trim();
+  if (!profileId || !qrId) return null;
+  const base = origin.replace(/\/$/, "");
+  return `${base}/c/${encodeURIComponent(profileId)}?q=${encodeURIComponent(qrId)}`;
 }
 
 export function buildScanViewModel(
   profileId: string,
   qrId: string | null,
   ctx: ScanContext,
+  origin: string = "https://humanity.llc",
   now: Date = new Date()
 ): ScanViewModel {
   if (!qrId) {
-    return malformedView(profileId, null);
+    return malformedView(profileId, null, origin);
   }
 
   if (!ctx.card) {
-    return baseView({
+    return baseView(
+      {
       kind: "unknown_profile",
       profileId,
       qrId,
@@ -64,11 +80,14 @@ export function buildScanViewModel(
       showArtifactBlock: true,
       verificationLabel: "Unknown",
       verificationState: "unknown",
-    });
+      },
+      origin
+    );
   }
 
   if (!ctx.qr) {
-    return baseView({
+    return baseView(
+      {
       kind: "unknown_qr",
       profileId,
       qrId,
@@ -78,11 +97,14 @@ export function buildScanViewModel(
       showCardBlock: true,
       showHumanTrustBlock: true,
       showArtifactBlock: true,
-    });
+      },
+      origin
+    );
   }
 
   if (ctx.qr.profile_id !== profileId) {
-    return baseView({
+    return baseView(
+      {
       kind: "profile_qr_mismatch",
       profileId,
       qrId,
@@ -91,68 +113,74 @@ export function buildScanViewModel(
       showHumanTrustBlock: false,
       showArtifactBlock: true,
       verificationLabel: "Unknown",
-    });
+      },
+      origin
+    );
   }
 
   const card = ctx.card;
   const qr = ctx.qr;
 
   if (card.status === "revoked") {
-    return statusView("card_revoked", card, qr, ctx.verification, {
+    return statusView("card_revoked", card, qr, ctx.verification, origin, {
       label: "Card revoked",
       tone: "bad",
     });
   }
   if (card.status === "suspended") {
-    return statusView("card_suspended", card, qr, ctx.verification, {
+    return statusView("card_suspended", card, qr, ctx.verification, origin, {
       label: "Suspended",
       tone: "warn",
     });
   }
   if (card.status === "expired") {
-    return statusView("card_expired", card, qr, ctx.verification, {
+    return statusView("card_expired", card, qr, ctx.verification, origin, {
       label: "Card expired",
       tone: "warn",
     });
   }
   if (qr.status === "revoked") {
-    return statusView("qr_revoked", card, qr, ctx.verification, {
+    return statusView("qr_revoked", card, qr, ctx.verification, origin, {
       label: "QR revoked",
       tone: "bad",
     });
   }
   if (qr.status === "replaced") {
-    return statusView("qr_replaced", card, qr, ctx.verification, {
+    return statusView("qr_replaced", card, qr, ctx.verification, origin, {
       label: "QR replaced",
       tone: "warn",
     });
   }
   if (qr.status === "expired" || isQrPastExpiry(qr.expires_at, now)) {
-    return statusView("qr_expired", card, qr, ctx.verification, {
+    return statusView("qr_expired", card, qr, ctx.verification, origin, {
       label: "QR expired",
       tone: "warn",
     });
   }
 
-  return baseView({
-    kind: "active",
-    profileId,
-    qrId,
-    card,
-    qr,
-    verification: ctx.verification,
-    primaryBadge: { label: "Active", tone: "live" },
-    showCardBlock: true,
-    showHumanTrustBlock: true,
-    showArtifactBlock: true,
-  });
+  return baseView(
+    {
+      kind: "active",
+      profileId,
+      qrId,
+      card,
+      qr,
+      verification: ctx.verification,
+      primaryBadge: { label: "Active", tone: "live" },
+      showCardBlock: true,
+      showHumanTrustBlock: true,
+      showArtifactBlock: true,
+    },
+    origin
+  );
 }
 
 export function malformedScanView(
   profileId: string | null,
-  qrId: string | null
+  qrId: string | null,
+  origin: string = "https://humanity.llc"
 ): ScanViewModel {
-  return malformedView(profileId, qrId);
+  return malformedView(profileId, qrId, origin);
 }
 
 function statusView(
@@ -160,20 +188,24 @@ function statusView(
   card: ScanContext["card"] & object,
   qr: ScanContext["qr"] & object,
   verification: ScanContext["verification"],
+  origin: string,
   primaryBadge: { label: string; tone: StatusTone }
 ): ScanViewModel {
-  return baseView({
-    kind,
-    profileId: card.profile_id,
-    qrId: qr.qr_id,
-    card,
-    qr,
-    verification,
-    primaryBadge,
-    showCardBlock: true,
-    showHumanTrustBlock: true,
-    showArtifactBlock: true,
-  });
+  return baseView(
+    {
+      kind,
+      profileId: card.profile_id,
+      qrId: qr.qr_id,
+      card,
+      qr,
+      verification,
+      primaryBadge,
+      showCardBlock: true,
+      showHumanTrustBlock: true,
+      showArtifactBlock: true,
+    },
+    origin
+  );
 }
 
 function isQrPastExpiry(expiresAt: string | null, now: Date): boolean {
@@ -184,18 +216,22 @@ function isQrPastExpiry(expiresAt: string | null, now: Date): boolean {
 
 function malformedView(
   profileId: string | null,
-  qrId: string | null
+  qrId: string | null,
+  origin: string
 ): ScanViewModel {
-  return baseView({
-    kind: "malformed",
-    profileId,
-    qrId,
-    primaryBadge: { label: "Invalid link", tone: "neutral" },
-    showCardBlock: false,
-    showHumanTrustBlock: false,
-    showArtifactBlock: false,
-    verificationLabel: "Unknown",
-  });
+  return baseView(
+    {
+      kind: "malformed",
+      profileId,
+      qrId,
+      primaryBadge: { label: "Invalid link", tone: "neutral" },
+      showCardBlock: false,
+      showHumanTrustBlock: false,
+      showArtifactBlock: false,
+      verificationLabel: "Unknown",
+    },
+    origin
+  );
 }
 
 interface BaseViewInput {
@@ -213,7 +249,7 @@ interface BaseViewInput {
   showArtifactBlock: boolean;
 }
 
-function baseView(input: BaseViewInput): ScanViewModel {
+function baseView(input: BaseViewInput, origin: string): ScanViewModel {
   const card = input.card ?? null;
   const qr = input.qr ?? null;
   const verification = input.verification ?? null;
@@ -242,6 +278,7 @@ function baseView(input: BaseViewInput): ScanViewModel {
     showLiveControlBlock: isHealthy || input.kind.startsWith("qr_") || input.kind.startsWith("card_"),
     liveControlAvailable: false,
     primaryBadge: input.primaryBadge,
+    scanUrl: resolveScanUrl(origin, input.profileId, input.qrId, qr?.payload),
     cacheControl: isHealthy
       ? "public, max-age=300, stale-while-revalidate=60"
       : "public, max-age=60",

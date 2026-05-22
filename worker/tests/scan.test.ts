@@ -59,11 +59,16 @@ function summary(): VerificationSummaryRow {
 
 describe("buildScanViewModel", () => {
   it("active scan includes all trust blocks", () => {
-    const vm = buildScanViewModel(PROFILE, QR, {
-      card: card(),
-      qr: qr(),
-      verification: summary(),
-    });
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: summary(),
+      },
+      "https://humanity.llc"
+    );
     expect(vm.kind).toBe("active");
     expect(vm.showCardBlock).toBe(true);
     expect(vm.showHumanTrustBlock).toBe(true);
@@ -74,47 +79,68 @@ describe("buildScanViewModel", () => {
 });
 
 describe("renderScanPage M3.2 trust blocks", () => {
-  it("renders landing pass card with flip and shared styles", () => {
-    const vm = buildScanViewModel(PROFILE, QR, {
-      card: card(),
-      qr: qr(),
-      verification: summary(),
-    });
-    const html = renderScanPage(vm, "https://humanity.llc");
-    expect(html).toContain('href="https://humanity.llc/styles.css?v=25"');
+  it("renders landing pass card with flip and shared styles", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: summary(),
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).toContain("pass-scene");
     expect(html).toContain("pass-flip-btn");
-    expect(html).toContain("/js/pass-flip.js");
+    expect(html).toContain("pass-tilt-wrap");
+    expect(html).toContain("getElementById(\"pass-scene\")");
+    expect(html).not.toContain('class="block"');
+    expect(html).not.toContain("HUMAN TRUST");
     expect(html).toContain("Live object");
     expect(html).toContain("@river_example");
     expect(html).toContain("Card active");
     expect(html).toContain("QR active");
     expect(html).toContain("Holding the object does not prove ownership");
     expect(html).toContain('class="pass-dot"');
+    expect(html).toContain("data:image");
+    expect(html).toContain(encodeURIComponent(PROFILE));
     expect(html).not.toContain("HUMAN TRUST");
   });
 
-  it("puts M3.2 trust details on card back", () => {
-    const vm = buildScanViewModel(PROFILE, QR, {
-      card: card(),
-      qr: qr(),
-      verification: summary(),
-    });
-    const html = renderScanPage(vm, "https://humanity.llc");
-    expect(html).toContain("What this scan means");
-    expect(html).toContain("pass-back-grid");
+  it("puts spec trust blocks in iOS groups below the card", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: summary(),
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain("scan-trust-groups");
+    expect(html).toContain("Card status");
     expect(html).toContain("Human trust");
     expect(html).toContain("Live control");
-    expect(html).toContain("Bearer");
+    expect(html).toContain("Limitations");
+    expect(html).toContain("Does not prove");
+    expect(html).toContain('class="list"');
   });
 
-  it("uses print_artifact scope copy when applicable", () => {
-    const vm = buildScanViewModel(PROFILE, QR, {
-      card: card(),
-      qr: qr({ scope: "print_artifact", print_artifact_id: "art_001" }),
-      verification: summary(),
-    });
-    const html = renderScanPage(vm, "https://humanity.llc");
-    expect(html).toContain("printed item");
+  it("uses print_artifact scope copy when applicable", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr({ scope: "print_artifact", print_artifact_id: "art_001" }),
+        verification: summary(),
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain("Printed item");
   });
 });

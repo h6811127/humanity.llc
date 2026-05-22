@@ -216,16 +216,19 @@ Signed card → HTTPS QR → trust-state UI → artifact intent → per-item QR 
 npm run deploy
 ```
 
-**Resolver (Worker):**
+**Resolver (Worker)** — required for `/c/…` scan pages (not Pages):
 
 ```bash
 npm run worker:dev          # local :8787
-npm run worker:deploy
+npm run worker:deploy       # bundles pass-card CSS/JS, then wrangler deploy
 npm run worker:migrate:remote
 npm run worker:test
 ```
 
-Health: `GET /.well-known/hc/v1/health` · Create: `POST /.well-known/hc/v1/cards` · Public scan: `GET /c/{profile_id}?q={qr_id}` (M3, in progress).
+After deploy, scan responses include `X-HC-Scan-UI: pass-v2` and HTML with `pass-scene` (flippable card).  
+Pages-only deploy updates landing/create headers; **scan UI will not change until the Worker deploys.**
+
+Health: `GET /.well-known/hc/v1/health` · Create: `POST /.well-known/hc/v1/cards` · Public scan: `GET /c/{profile_id}?q={qr_id}`.
 
 ---
 
@@ -235,7 +238,7 @@ Health: `GET /.well-known/hc/v1/health` · Create: `POST /.well-known/hc/v1/card
 |-----------|--------|
 | M1 Foundation | Health, D1 schema, signature harness |
 | M2 Create card | API + `/create/` + `/created/` |
-| **M3 Scan** | **Next** — trust UI at `/c/…` |
+| **M3 Scan** | Pass-card UI at `/c/…` (deploy Worker to ship) |
 | M4 Revoke | After scan |
 | M5 Stranger-tested launch | After revoke |
 
