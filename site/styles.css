@@ -70,9 +70,10 @@ a {
   color: var(--black);
 }
 
-.top-brand img {
-  width: 28px;
-  height: 28px;
+.top-brand .pass-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
 }
 
 /* Content */
@@ -659,6 +660,30 @@ a {
   white-space: nowrap;
 }
 
+.pass-badge.badge-live {
+  background: var(--red);
+  color: var(--white);
+  border-color: var(--red);
+}
+
+.pass-badge.badge-warn {
+  background: #fff8e6;
+  color: #6b5a00;
+  border-color: #e6c200;
+}
+
+.pass-badge.badge-bad {
+  background: #fde8ec;
+  color: #8b1530;
+  border-color: #f5c2cb;
+}
+
+.pass-badge.badge-neutral {
+  background: var(--white);
+  color: var(--grey);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
 .pass-body {
   display: flex;
   align-items: flex-end;
@@ -755,6 +780,35 @@ a {
   line-height: 1.45;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
   padding-top: 9px;
+}
+
+/* Scan resolver page (Worker HTML) */
+.scan-page {
+  min-height: 100dvh;
+}
+
+.scan-screen {
+  gap: 16px;
+}
+
+.scan-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.scan-footer-link {
+  text-align: center;
+  font-size: 13px;
+  color: var(--grey);
+  text-decoration: none;
+}
+
+.dock-btn-secondary {
+  background: var(--white);
+  color: var(--black);
+  border: 1px solid rgba(0, 0, 0, 0.14);
 }
 
 /* Primary action */

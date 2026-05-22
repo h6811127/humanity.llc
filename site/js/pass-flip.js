@@ -1,13 +1,7 @@
 (function () {
   /**
-   * Card interaction (cross-browser):
-   * - Flip: only #pass-flip-btn click (native button; iOS Safari, Chrome Android,
-   *   Firefox mobile, Samsung Internet, desktop). Do not flip on pointerup/touchend.
-   * - Tilt: drag on #pass-tilt-surface while front is visible; transform on
-   *   #pass-tilt-wrap only — #pass-flip / .pass-inner handle 3D flip only.
-   * - Links inside tilt surface do not start tilt; back-face links are outside tilt.
-   * Manual test: tap "Tap to flip" flips on phone; drag card face tilts; reduced-motion
-   * still flips instantly; back-face policy link opens without flipping.
+   * Pass card flip + tilt (landing + scan pages).
+   * Flip: #pass-flip-btn only. Tilt: drag on #pass-tilt-surface while front visible.
    */
   var scene = document.getElementById("pass-scene");
   var tiltWrap = document.getElementById("pass-tilt-wrap");

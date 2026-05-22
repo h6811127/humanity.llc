@@ -11,7 +11,7 @@ npm run pages:dev
 
 Open the URL Wrangler prints (usually `http://localhost:8788`).
 
-**Pass card (iPhone Safari + Android Chrome):** tilt lives on `.pass-tilt-wrap`; flip is `.is-flipped` on `#pass-flip` / `.pass-inner` only (coarse-pointer CSS must not flatten `.pass-flip`). No idle spin on touch; drag face to tilt; tap **Tap to flip** for front/back; 44px flip button. Hard-refresh after deploy (`styles.css?v=16`, `main.js?v=1`). Reduced-motion: instant flip, button stays visible.
+**Pass card (iPhone Safari + Android Chrome):** tilt lives on `.pass-tilt-wrap`; flip is `.is-flipped` on `#pass-flip` / `.pass-inner` only (coarse-pointer CSS must not flatten `.pass-flip`). No idle spin on touch; drag face to tilt; tap **Tap to flip** for front/back; 44px flip button. Script: `js/pass-flip.js` (landing + scan). Hard-refresh after deploy (`styles.css?v=25`, `pass-flip.js?v=1`). Reduced-motion: instant flip, button stays visible.
 
 ## Deploy on Cloudflare Pages
 
@@ -44,7 +44,7 @@ npm run deploy
 | `js/create-card.mjs`, `js/hc-sign.mjs` | Browser signing + POST to resolver |
 | `data-policy.html` | Mobile-friendly operator data policy summary |
 | `styles.css` | Layout and visual system |
-| `main.js` | Pass card tilt (touch + desktop), tap-to-flip |
+| `js/pass-flip.js` | Pass card tilt (touch + desktop), tap-to-flip (landing + scan) |
 | `_headers` | Security and cache headers |
 | `_redirects` | `/create` → `/create/` (301; avoid `create.html` — Pages strips `.html` and loops) |
 | `assets/red_qr_transparent_bg.png` | Favicon, brand mark, card preview |

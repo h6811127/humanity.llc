@@ -74,24 +74,38 @@ describe("buildScanViewModel", () => {
 });
 
 describe("renderScanPage M3.2 trust blocks", () => {
-  it("renders five separated trust sections", () => {
+  it("renders landing pass card with flip and shared styles", () => {
     const vm = buildScanViewModel(PROFILE, QR, {
       card: card(),
       qr: qr(),
       verification: summary(),
     });
     const html = renderScanPage(vm, "https://humanity.llc");
-    expect(html).toContain("1 · Card status");
-    expect(html).toContain("2 · Human trust");
-    expect(html).toContain("3 · This QR credential");
-    expect(html).toContain("4 · Live control");
-    expect(html).toContain("5 · Limits");
-    expect(html).toContain("trust-boundary-proves");
-    expect(html).toContain("trust-boundary-not");
-    expect(html).toContain("Bearer warning");
-    expect(html).toContain("No scan analytics");
+    expect(html).toContain('href="https://humanity.llc/styles.css?v=25"');
+    expect(html).toContain("pass-scene");
+    expect(html).toContain("pass-flip-btn");
+    expect(html).toContain("/js/pass-flip.js");
+    expect(html).toContain("Live object");
     expect(html).toContain("@river_example");
-    expect(html).toContain("Registered");
+    expect(html).toContain("Card active");
+    expect(html).toContain("QR active");
+    expect(html).toContain("Holding the object does not prove ownership");
+    expect(html).toContain('class="pass-dot"');
+    expect(html).not.toContain("HUMAN TRUST");
+  });
+
+  it("puts M3.2 trust details on card back", () => {
+    const vm = buildScanViewModel(PROFILE, QR, {
+      card: card(),
+      qr: qr(),
+      verification: summary(),
+    });
+    const html = renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain("What this scan means");
+    expect(html).toContain("pass-back-grid");
+    expect(html).toContain("Human trust");
+    expect(html).toContain("Live control");
+    expect(html).toContain("Bearer");
   });
 
   it("uses print_artifact scope copy when applicable", () => {
@@ -101,7 +115,6 @@ describe("renderScanPage M3.2 trust blocks", () => {
       verification: summary(),
     });
     const html = renderScanPage(vm, "https://humanity.llc");
-    expect(html).toContain("Printed item");
-    expect(html).toContain("Printed-item QR");
+    expect(html).toContain("printed item");
   });
 });
