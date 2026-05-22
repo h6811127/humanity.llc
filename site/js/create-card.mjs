@@ -105,11 +105,15 @@ form?.addEventListener("submit", async (e) => {
       "hc_created",
       JSON.stringify({
         ...data,
+        manifesto_line: manifesto,
         private_key_warning: true,
       })
     );
 
-    location.href = `/created/?profile_id=${encodeURIComponent(profileId)}`;
+    const created = new URL("/created/", location.origin);
+    created.searchParams.set("profile_id", profileId);
+    created.searchParams.set("qr_id", qrId);
+    location.replace(created.href);
   } catch (err) {
     setStatus(err.message || String(err), true);
     submitBtn.disabled = false;
