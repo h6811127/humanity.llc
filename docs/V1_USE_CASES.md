@@ -5,6 +5,10 @@
 
 **Direction:** `docs/DEMOCRATIC_INFRASTRUCTURE.md` — scan must deliver live status, vouches, revoke, and (later) org tools—not “another link in bio.”
 
+**Trust boundaries:** `docs/V1_PRODUCT_TRUST_MODEL.md` — what scans prove and do not prove at each level.
+
+**Build phases:** `docs/V1_0_ARCHITECTURE_ROADMAP.md` — Phase A (digital trust) before commerce and Commons Pass.
+
 ---
 
 ## Why a use case beats “just a card page”
@@ -29,6 +33,82 @@ Every use case must answer:
 4. What does the card prove?
 5. What does it not prove?
 6. What would make the user come back?
+
+---
+
+## The Revocable QR Primitive (Cross-Cutting)
+
+### What it is
+
+A revocable HTTPS QR is **not just a link**. It is a **claim with current validity**: whoever scans gets what the resolver returns **now** (active, revoked, suspended, vouched, etc.), not a frozen file or cached profile.
+
+The web normalized **permanent URLs**. Memberships, trust, affiliations, permissions, public statements, and contact endpoints are **dynamic**. A revocable QR lets physical artifacts—stickers, cards, posters, badges, tools—point at **dynamic truth** instead of static HTML.
+
+That is the primitive Humanity Commons implements. **Global identity is not required** for the primitive to matter; scoped, revocable, mechanism-revealing trust is enough.
+
+### Product line (one sentence)
+
+> Physical artifacts point at current signed status, not a permanent file—so trust, membership, and public claims can change without pretending the world is static.
+
+### How it differs from “link in bio”
+
+| Generic QR / short link | Humanity revocable QR |
+|---|---|
+| Resolves to static page or redirect | Resolves to **current** card/QR status from the operator |
+| Revoking means broken link or manual takedown | **Revoked** is an explicit, honest state (not silent 404) |
+| Holder of printed QR often assumed = owner | **Bearer warning**: QR points at a card; holder may not control the key |
+| Platform owns the identity object | Card is **signed**, exportable, revocable by the key holder |
+| Often tracks clicks | **No scan analytics** by default (reference operator policy) |
+
+### Temporary or sensitive public claims
+
+Examples that fit the primitive when scoped honestly:
+
+- Protest or event coordination contact that should **expire or revoke** after the action.
+- Journalist tip line or mutual-aid contact on a poster (rotate QR without trusting old stickers forever).
+- Creator or campaign offering something **sensitive for a limited time**—revoke when the moment passes.
+- Signed public statement, manifesto, or correction that can be **superseded or revoked** without dead stickers implying it is still current.
+
+**What this proves:** The QR credential and card resolve to an intentional status at scan time; the owner (or governance) can end or suspend that pointer.
+
+**What it does not prove:** Anonymity suitable for whistleblower threat models (a public card is pseudonymous, not a dead drop). That the person holding the printed item controls the card key. Legal identity, safety, or eligibility.
+
+**Operator note:** High-risk contexts need explicit retention, abuse, and legal review—not only a revocable QR.
+
+### Examples by build phase
+
+Use this table to avoid building five products at once. Pilot conversations should name **one row** and one beachhead use case (below).
+
+| Example | Primary use cases (below) | Phase | Humanity capability |
+|---|---|---|---|
+| In-person “scan my card”; follow-up without platform accounts | UC1, UC5 | **A** — MVP | Create card, HTTPS QR, trust-state scan UI, revoke |
+| Revocable public handle / bio that stays live after job or project change | UC5 | **A** | Same; optional live control proof |
+| Temporary activist, mutual-aid, or event contact on posters | UC3, UC1 | **A** | Revoke/rotate QR; status pages; no “verified forever” on print |
+| Vouched portable reputation under community rules | UC2, UC4 | **A + M6** | Vouches, verification summary on scan |
+| Live control in a meeting (“prove you hold the key”) | UC1, UC4 | **A + M7** (optional) | Short-lived challenge; separate UI block |
+| Curiosity sticker → stranger creates card | UC1, MERCH_LED | **B** | Batch/card QR; store; no merch = vouched |
+| Creator merch authenticity; limited edition still “recognized” | UC5 | **C** | Per-item QR; artifact intent; revoke one sticker |
+| Revoke stolen badge; suspend abusive attendee | UC1, UC2 | **D** — Commons Pass | Org pass, check-in, suspension under public rules |
+| “Current member” for co-op, club, festival | UC2 | **D** | Community pass + scan, not static plastic |
+| Workshop completed / membership active / cert expired | UC2 | **D+** | Signed community stamps; explicit issuance rules |
+| Backstage, popup, volunteer, housing access | UC1, UC2 | **D+** | Pass permissions + live status; not v1 card alone |
+| Device, lab equipment, prototype “still official / maintained?” | — | **Future** | Object/credential layer; separate spec |
+| Educational credential on transcript QR | — | **Future / ceremony** | Steward-attested credentials; not launch-critical |
+
+**Phase key:** A = digital trust MVP (`V1_0_ARCHITECTURE_ROADMAP` M2–M5). B = curiosity drop merch. C = personalized artifact commerce. D = Commons Pass (`docs/commons/`).
+
+### Mapping ChatGPT-style buckets to beachheads
+
+| Bucket | V1 beachhead doc | Notes |
+|---|---|---|
+| Events, badges, in-person trust | Use Case 1 | Badge *permissions* need Commons Pass; card + revoke is Phase A |
+| Co-ops, clubs, festivals, organizing | Use Case 2 | “Current member” is Phase D; card + vouch is pilot wedge |
+| Mutual aid, local groups, temporary contact | Use Case 3 | Strong fit for revocable primitive without global ID |
+| Online communities, bot pressure | Use Case 4 | Vouch + live control; not bot-proof uniqueness |
+| Creators, merch, portable identity | Use Case 5 | Phase B/C for physical authenticity |
+| QR business cards, networking | UC5 / UC1 | Revoke after role change; rotate endpoints on card |
+| Public statements / manifests | UC3, UC5 | Signed card + revoke; corrections via new signed docs |
+| Whistleblower / maximal anonymity | Anti-use (see below) | Do not imply; different threat model |
 
 ---
 
@@ -243,6 +323,8 @@ For v1:
 
 Do not build separate product surfaces for all use cases at once. Use them to test positioning and pilot conversations.
 
+When evaluating a new pilot idea, ask: **which row in [Examples by build phase](#examples-by-build-phase)** does it need, and does Phase A already satisfy the trust loop?
+
 ---
 
 ## Anti-Use Cases
@@ -260,4 +342,11 @@ Do not position v1 for:
 - Public scoring/ranking of humans.
 
 These contexts would require separate legal, ethical, and technical review.
+
+Also do not position the revocable QR primitive alone as:
+
+- Whistleblower-grade anonymity (public resolver + card ≠ dead drop).
+- Law-enforcement or immigration identity checks.
+- Proof that the **holder** of a printed QR is the card owner (requires live control or separate workflow).
+- Universal “verified human” or bot-proof one-person-one-card claims.
 

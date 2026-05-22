@@ -1,10 +1,13 @@
 /**
  * humanity.llc reference resolver — route dispatcher.
- * Milestone M1: health (step 1.1 / 1.3). Card + scan routes follow roadmap §17.
+ * M1.1: health. M1.2: D1 schema + readiness on health.
  */
 
+import { schemaReady } from "./db";
+
 export interface Env {
-  // D1, secrets, etc. added in step 1.2+
+  /** Cloudflare D1 — cards, qr_credentials, verification_summaries, revocations */
+  DB: D1Database;
 }
 
 const OPERATOR_ID = "humanity.llc";
@@ -13,7 +16,7 @@ const PROTOCOL_VERSION = "1.0";
 export default {
   async fetch(
     request: Request,
-    _env: Env,
+    env: Env,
     _ctx: ExecutionContext
   ): Promise<Response> {
     const url = new URL(request.url);
@@ -22,7 +25,7 @@ export default {
       request.method === "GET" &&
       url.pathname === "/.well-known/hc/v1/health"
     ) {
-      return healthResponse();
+      return healthResponse(env);
     }
 
     return jsonResponse({ error: "not_found", path: url.pathname }, 404);
@@ -45,13 +48,37 @@ function jsonResponse(body: unknown, status: number): Response {
   });
 }
 
-function healthResponse(): Response {
-  return jsonResponse(
-    {
-      version: PROTOCOL_VERSION,
-      operator: OPERATOR_ID,
-      status: "ok",
-    },
-    200
-  );
+async function healthResponse(env: Env): Promise<Response> {
+  const body: {
+    version: string;
+    operator: string;
+    status: string;
+    database: string;
+  } = {
+    version: PROTOCOL_VERSION,
+    operator: OPERATOR_ID,
+    status: "ok",
+    database: "unknown",
+  };
+
+  if (!env.DB) {
+    body.database = "unconfigured";
+    body.status = "degraded";
+    return jsonResponse(body, 503);
+  }
+
+  try {
+    const ready = await schemaReady(env.DB);
+    body.database = ready ? "ok" : "schema_missing";
+    if (!ready) {
+      body.status = "degraded";
+      return jsonResponse(body, 503);
+    }
+  } catch {
+    body.database = "error";
+    body.status = "degraded";
+    return jsonResponse(body, 503);
+  }
+
+  return jsonResponse(body, 200);
 }

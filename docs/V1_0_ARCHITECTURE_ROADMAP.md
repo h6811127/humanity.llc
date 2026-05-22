@@ -476,10 +476,10 @@ Follow these steps in order. Each step lists **exit criteria** and **spec refs**
 | Step | Action | Exit | Refs |
 |---|---|---|---|
 | 1.1 | Create `worker/` (or `api/`) Wrangler project; bind routes | `wrangler dev` serves health | §19 — **done** (`worker/`, `npm run worker:dev`) |
-| 1.2 | D1 migrations: cards, qr_credentials, revocations, verification_summaries | Tables exist | `V1_IMPLEMENTATION_CONTRACTS` |
+| 1.2 | D1 migrations: cards, qr_credentials, revocations, verification_summaries | Tables exist | `V1_IMPLEMENTATION_CONTRACTS` — **done** (`worker/migrations/`) |
 | 1.3 | Implement `GET /.well-known/hc/v1/health` | JSON version + operator id | Standards §9 |
 | 1.4 | Deploy Worker to staging + production | Route reachable on domain | — |
-| 1.5 | Implement signature verify utility + tests (C-003) | Fixture vectors pass | Backlog C-003 |
+| 1.5 | Implement signature verify utility + tests (C-003) | Fixture vectors pass | Backlog C-003 — **done** (`worker/src/crypto/`, `npm run worker:test`) |
 
 ### Milestone M2 — Create card (MVP core)
 
