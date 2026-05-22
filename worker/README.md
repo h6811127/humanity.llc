@@ -95,6 +95,20 @@ Configure `[[routes]]` in `wrangler.toml` for `humanity.llc` before production t
 | 2.5 `/create/` page (Pages) | Done (`site/create/`) |
 | 2.6 Initial QR on create | Done (bundled in POST) |
 | 2.7 Owner view | Done (`site/created/`) |
+| 3.1 `GET /c/{profile_id}?q={qr_id}` HTML scan page | Done (`worker/src/resolver/scan*.ts`) |
+
+## Public scan (M3.1)
+
+```bash
+npm run worker:migrate:local
+npm run worker:dev
+```
+
+Open a scan URL from `/created/` or:
+
+`http://127.0.0.1:8787/c/{profile_id}?q={qr_id}`
+
+Returns mobile HTML with card, human trust, QR, and limits blocks (M3.2–3.7 extend JSON, cache tuning, and copy).
 
 ## Create card (M2)
 

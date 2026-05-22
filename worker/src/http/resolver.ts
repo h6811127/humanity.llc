@@ -70,3 +70,28 @@ export function clientIp(request: Request): string {
     "unknown"
   );
 }
+
+/** Origin for links in HTML (local dev vs production). */
+export function requestOrigin(request: Request): string {
+  const url = new URL(request.url);
+  if (url.hostname === "localhost" || url.hostname === "127.0.0.1") {
+    return url.origin;
+  }
+  return RESOLVER_ORIGIN;
+}
+
+export function htmlResponse(
+  body: string,
+  status: number,
+  extra?: HeadersInit
+): Response {
+  return new Response(body, {
+    status,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "X-Resolver-Version": PROTOCOL_VERSION,
+      "X-Resolver-Operator": OPERATOR_ID,
+      ...extra,
+    },
+  });
+}

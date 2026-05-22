@@ -149,6 +149,7 @@ Signed card → HTTPS QR → trust-state UI → artifact intent → per-item QR 
 **Implementation (build step by step):**
 
 - `docs/V1_0_ARCHITECTURE_ROADMAP.md` — **canonical build sequence** (M0–M10)
+- `docs/M3_1_SCAN_PAGE_DECISIONS.md` — M3.1 scan HTML + `/created/` URL/QR decisions
 
 **V1 wedge and copy:**
 
@@ -210,22 +211,28 @@ Signed card → HTTPS QR → trust-state UI → artifact intent → per-item QR 
 
 ## Deploy
 
-**Pages (static site):** output directory **`site`**.
+**Production via git push to `main`:**
+
+| Component | How it ships |
+|-----------|----------------|
+| **Pages** (`site/`) | Cloudflare Pages Git integration (output dir `site`) — see root `wrangler.toml` |
+| **Worker** (`worker/`) | GitHub Action [`.github/workflows/deploy-production.yml`](.github/workflows/deploy-production.yml) — tests, D1 migrate, `wrangler deploy` |
+
+One-time: add GitHub Actions secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. Full checklist: **`docs/DEPLOY_PRODUCTION.md`**.
+
+Pushing to a feature branch (e.g. `m3_scan`) updates nothing in prod until merged to **`main`**.
+
+**Manual / local:**
 
 ```bash
-npm run deploy
-```
-
-**Resolver (Worker):**
-
-```bash
-npm run worker:dev          # local :8787
-npm run worker:deploy
-npm run worker:migrate:remote
+npm run deploy                  # Pages only (CLI)
 npm run worker:test
+npm run worker:migrate:remote   # needs wrangler auth
+npm run worker:deploy
+npm run worker:dev              # local :8787
 ```
 
-Health: `GET /.well-known/hc/v1/health` · Create: `POST /.well-known/hc/v1/cards` · Public scan: `GET /c/{profile_id}?q={qr_id}` (M3, in progress).
+Health: `GET /.well-known/hc/v1/health` · Create: `POST /.well-known/hc/v1/cards` · Scan: `GET /c/{profile_id}?q={qr_id}`.
 
 ---
 
@@ -235,7 +242,7 @@ Health: `GET /.well-known/hc/v1/health` · Create: `POST /.well-known/hc/v1/card
 |-----------|--------|
 | M1 Foundation | Health, D1 schema, signature harness |
 | M2 Create card | API + `/create/` + `/created/` |
-| **M3 Scan** | **Next** — trust UI at `/c/…` |
+| **M3 Scan** | **3.1 done** — HTML at `/c/…`; 3.2–3.7 next |
 | M4 Revoke | After scan |
 | M5 Stranger-tested launch | After revoke |
 
