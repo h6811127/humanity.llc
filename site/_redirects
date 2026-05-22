@@ -1,0 +1,5 @@
+# Cloudflare Pages — explicit routes (avoids SPA fallback serving index.html for /create)
+/create     /create.html     200
+/create/    /create.html     200
+/created    /created/index.html  200
+/created/   /created/index.html  200

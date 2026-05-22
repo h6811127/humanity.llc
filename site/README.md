@@ -39,8 +39,27 @@ npm run deploy
 | File | Purpose |
 |------|---------|
 | `index.html` | Landing page |
+| `create.html` | Create card UI (`/create` and `/create/`) |
+| `create/index.html` | Same page (directory URL) |
+| `created/index.html` | Post-create QR + scan link |
+| `js/create-card.mjs`, `js/hc-sign.mjs` | Browser signing + POST to resolver |
 | `data-policy.html` | Mobile-friendly operator data policy summary |
 | `styles.css` | Layout and visual system |
 | `main.js` | Pass card tilt (touch + desktop), tap-to-flip |
 | `_headers` | Security and cache headers |
+| `_redirects` | Maps `/create` → `create.html` (stops SPA 404 → landing) |
 | `assets/red_qr_transparent_bg.png` | Favicon, brand mark, card preview |
+
+### After changing Pages files
+
+Git push must include `site/create.html`, `site/create/`, `site/created/`, and `site/js/`.  
+Worker deploy alone does **not** update `/create` (that is Pages).
+
+Verify production:
+
+```bash
+curl -sS https://humanity.llc/create.html | grep -o '<title>[^<]*</title>'
+# expect: Create card · humanity.llc
+```
+
+If you still see `humanity.llc` (landing), the Pages build is stale. In Cloudflare dashboard → Pages → your project → **Deployments**, confirm the latest commit includes those paths. If **Single Page Application** is enabled, disable it or keep `_redirects` as above.
