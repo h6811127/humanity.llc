@@ -186,6 +186,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
     const htmlRevoked = await renderScanPage(vmRevoked, "https://humanity.llc");
     expect(htmlRevoked).toContain("QR revoked");
     expect(htmlRevoked).toContain("Card active");
+    expect(htmlRevoked).toMatch(/class="trust-on"[^>]*>Card active/);
 
     const vmSibling = buildScanViewModel(
       PROFILE,

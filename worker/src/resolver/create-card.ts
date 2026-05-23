@@ -172,12 +172,33 @@ export async function handlePostCards(
   const createdAt =
     (card.created_at as string) ?? (card.updated_at as string) ?? new Date().toISOString();
 
+  const recoveryPublicKeyRaw = card.recovery_public_key;
+  let recoveryPublicKey: string | null = null;
+  if (recoveryPublicKeyRaw != null && recoveryPublicKeyRaw !== "") {
+    if (typeof recoveryPublicKeyRaw !== "string") {
+      return errorResponse(
+        "MALFORMED_REQUEST",
+        "recovery_public_key must be a base58 string.",
+        422
+      );
+    }
+    if (recoveryPublicKeyRaw === publicKey) {
+      return errorResponse(
+        "INVALID_RECOVERY_KEY",
+        "Recovery key must differ from the owner public key.",
+        422
+      );
+    }
+    recoveryPublicKey = recoveryPublicKeyRaw;
+  }
+
   try {
     await insertCardWithQr(
       db,
       {
         profileId,
         publicKey,
+        recoveryPublicKey,
         handle: handleNormalized,
         handleNormalized,
         manifestoLine,

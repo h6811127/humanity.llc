@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Your card · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=31" />
+    <link rel="stylesheet" href="/styles.css?v=34" />
   </head>
   <body>
     <div class="page">
@@ -32,6 +32,23 @@
           <button type="button" class="btn-secondary" id="copy-scan">Copy scan link</button>
         </section>
 
+        <section class="group recovery-reveal" id="recovery-reveal" hidden>
+          <h2 class="group-label">Save recovery key — once</h2>
+          <p class="group-intro short">
+            Store this somewhere safe (password manager, paper). If you lose this tab and skip
+            backup, it is the only way to revoke without creating a new card.
+          </p>
+          <p class="mono recovery-key-display" id="recovery-key-display"></p>
+          <button type="button" class="btn-secondary" id="copy-recovery-key">Copy recovery key</button>
+          <label class="revoke-confirm revoke-confirm-spaced">
+            <input type="checkbox" id="recovery-reveal-confirm" />
+            <span>I saved this recovery key</span>
+          </label>
+          <button type="button" class="btn-primary" id="recovery-reveal-dismiss" disabled>
+            Continue
+          </button>
+        </section>
+
         <section class="group">
           <h2 class="group-label">On resolver</h2>
           <ul class="list list-compact">
@@ -40,7 +57,16 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
               </span>
               <span class="list-content">
-                <span class="list-title">Status</span>
+                <span class="list-title">Card on resolver</span>
+                <span class="list-sub" id="resolver-card-status">Active</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-purple" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Verification</span>
                 <span class="list-sub" id="card-status">Registered</span>
               </span>
             </li>
@@ -125,7 +151,11 @@
             <div class="settings-panel settings-panel-action">
               <div id="backup-export-block" hidden>
                 <p class="form-hint">Available while this tab still has your key from create.</p>
-                <form id="export-backup-form" class="compact-form" autocomplete="off" novalidate>
+                <p class="form-hint">
+                Passphrase is never sent to humanity.llc. If you lose it, the backup file is
+                useless and we cannot reset it.
+              </p>
+              <form id="export-backup-form" class="compact-form" autocomplete="off" novalidate>
                   <label class="form-label" for="export-passphrase">New backup passphrase</label>
                   <input
                     class="form-input"
@@ -151,7 +181,23 @@
                 <p class="form-status" id="export-backup-status" hidden></p>
               </div>
 
-              <p class="form-hint backup-divider-label">Already have a backup?</p>
+              <p class="form-hint backup-divider-label">Lost this tab?</p>
+              <form id="import-recovery-form" class="compact-form" novalidate>
+                <label class="form-label" for="import-recovery-key">Recovery private key</label>
+                <textarea
+                  class="form-input form-textarea"
+                  id="import-recovery-key"
+                  name="recovery_key"
+                  rows="3"
+                  placeholder="Paste the recovery key you saved at create"
+                  autocomplete="off"
+                  required
+                ></textarea>
+                <button type="submit" class="btn-secondary">Unlock with recovery key</button>
+              </form>
+              <p class="form-status" id="import-recovery-status" hidden></p>
+
+              <p class="form-hint backup-divider-label">Have encrypted backup?</p>
               <form id="import-backup-form" class="compact-form" novalidate>
                 <label class="form-label" for="import-backup-file">Backup file</label>
                 <input
@@ -227,6 +273,6 @@
         </p>
       </main>
     </div>
-    <script type="module" src="/js/created.mjs?v=10"></script>
+    <script type="module" src="/js/created.mjs?v=11"></script>
   </body>
 </html>

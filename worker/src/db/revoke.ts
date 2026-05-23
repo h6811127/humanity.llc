@@ -2,6 +2,7 @@ import type { RevocationTargetKind } from "./types";
 
 export interface CardOwnerRow {
   public_key: string;
+  recovery_public_key: string | null;
   status: string;
 }
 
@@ -10,7 +11,9 @@ export async function getCardOwner(
   profileId: string
 ): Promise<CardOwnerRow | null> {
   return db
-    .prepare(`SELECT public_key, status FROM cards WHERE profile_id = ?`)
+    .prepare(
+      `SELECT public_key, recovery_public_key, status FROM cards WHERE profile_id = ?`
+    )
     .bind(profileId)
     .first<CardOwnerRow>();
 }

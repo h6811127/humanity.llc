@@ -30,10 +30,17 @@ export function initOwnerRevoke(ctx) {
 
   function keys() {
     const s = ctx.getSession();
-    const priv = s?.owner_private_key_b58;
-    const pub = s?.owner_public_key_b58;
-    if (typeof priv !== "string" || typeof pub !== "string") return null;
-    return { privateKeyBase58: priv, publicKeyBase58: pub };
+    const ownerPriv = s?.owner_private_key_b58;
+    const ownerPub = s?.owner_public_key_b58;
+    if (typeof ownerPriv === "string" && typeof ownerPub === "string") {
+      return { privateKeyBase58: ownerPriv, publicKeyBase58: ownerPub };
+    }
+    const recPriv = s?.recovery_private_key_b58;
+    const recPub = s?.recovery_public_key_b58;
+    if (typeof recPriv === "string" && typeof recPub === "string") {
+      return { privateKeyBase58: recPriv, publicKeyBase58: recPub };
+    }
+    return null;
   }
 
   function setRevokeStatus(msg, isError = false) {

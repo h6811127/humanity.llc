@@ -28,7 +28,15 @@ form?.addEventListener("submit", async (e) => {
   try {
     const handle = document.getElementById("handle").value;
     const manifesto = document.getElementById("manifesto").value;
+    const wantRecovery = document.getElementById("generate-recovery")?.checked ?? true;
     const { privateKey, publicKeyBase58 } = await generateKeypair();
+    let recoveryPrivateKey = null;
+    let recoveryPublicKeyBase58 = null;
+    if (wantRecovery) {
+      const recovery = await generateKeypair();
+      recoveryPrivateKey = recovery.privateKey;
+      recoveryPublicKeyBase58 = recovery.publicKeyBase58;
+    }
     const profileId = generateProfileId();
     const qrId = generateQrId();
     const now = new Date().toISOString();
@@ -40,8 +48,7 @@ form?.addEventListener("submit", async (e) => {
     const scanUrl = qrScanUrl(profileId, qrId, origin);
     const expiresAt = defaultQrExpiry(now);
 
-    const cardUnsigned = withProtocolFields(
-      {
+    const cardFields = {
         profile_id: profileId,
         public_key: publicKeyBase58,
         handle,
@@ -63,9 +70,12 @@ form?.addEventListener("submit", async (e) => {
           standards: "https://humanity.llc/standards/v1",
           data_policy: "https://humanity.llc/data-policy.html",
         },
-      },
-      "humanity_card"
-    );
+      };
+    if (recoveryPublicKeyBase58) {
+      cardFields.recovery_public_key = recoveryPublicKeyBase58;
+    }
+
+    const cardUnsigned = withProtocolFields(cardFields, "humanity_card");
 
     const qrUnsigned = withProtocolFields(
       {
@@ -112,6 +122,12 @@ form?.addEventListener("submit", async (e) => {
         manifesto_line: manifesto,
         owner_public_key_b58: publicKeyBase58,
         owner_private_key_b58: encodePrivateKeyBase58(privateKey),
+        ...(recoveryPublicKeyBase58
+          ? {
+              recovery_public_key_b58: recoveryPublicKeyBase58,
+              recovery_private_key_b58: encodePrivateKeyBase58(recoveryPrivateKey),
+            }
+          : {}),
         private_key_warning: true,
       })
     );

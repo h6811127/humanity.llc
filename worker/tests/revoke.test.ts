@@ -92,6 +92,7 @@ describe("handlePostRevoke", () => {
             if (sql.includes("FROM cards")) {
               return {
                 public_key: "WrongKeyWrongKeyWrongKeyWrongKeyWrongKey12",
+                recovery_public_key: null,
                 status: "active",
               };
             }
@@ -141,7 +142,7 @@ describe("handlePostRevoke", () => {
         bind: () => ({
           first: async () => {
             if (sql.includes("FROM cards")) {
-              return { public_key: publicKeyBase58, status: "active" };
+              return { public_key: publicKeyBase58, recovery_public_key: null, status: "active" };
             }
             if (sql.includes("FROM revocations")) return null;
             if (sql.includes("FROM qr_credentials")) {
@@ -174,5 +175,62 @@ describe("handlePostRevoke", () => {
     expect(json.target_kind).toBe("qr_credential");
     expect(json.target_qr_id).toBe(qrId);
     expect(batchCalls.length).toBe(1);
+  });
+
+  it("accepts valid QR revocation signed by recovery key", async () => {
+    const { handlePostRevoke } = await import("../src/resolver/revoke");
+    const owner = await getTestKeypair();
+    const recovery = await getTestKeypair();
+    const qrId = "qr_recovery_revoke_test";
+    const nonce = `nonce_recovery_${Date.now()}`;
+
+    const signed = await signDocument(
+      withProtocolFields(
+        {
+          profile_id: PROFILE,
+          target_kind: "qr_credential",
+          target_qr_id: qrId,
+          reason: "owner_revoked",
+          revoked_at: "2026-05-16T17:00:00.000Z",
+          nonce,
+        },
+        PAYLOAD_TYPES.REVOCATION
+      ),
+      { privateKey: recovery.privateKey, publicKeyBase58: recovery.publicKeyBase58 }
+    );
+
+    const db = {
+      prepare: (sql: string) => ({
+        bind: () => ({
+          first: async () => {
+            if (sql.includes("FROM cards")) {
+              return {
+                public_key: owner.publicKeyBase58,
+                recovery_public_key: recovery.publicKeyBase58,
+                status: "active",
+              };
+            }
+            if (sql.includes("FROM revocations")) return null;
+            if (sql.includes("FROM qr_credentials")) {
+              return { qr_id: qrId, profile_id: PROFILE, status: "active" };
+            }
+            return null;
+          },
+        }),
+      }),
+      batch: async () => [{ success: true }],
+    } as unknown as D1Database;
+
+    const res = await handlePostRevoke(
+      new Request(`https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/revoke`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ revocation: signed }),
+      }),
+      db,
+      PROFILE
+    );
+
+    expect(res.status).toBe(200);
   });
 });

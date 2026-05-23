@@ -1,6 +1,7 @@
 import { getCardJsonUrl, qrScanUrl, resolverApiOrigin } from "./hc-sign.mjs";
 import { initOwnerRevoke } from "./created-revoke.mjs";
 import { initKeyBackupUi } from "./key-backup-ui.mjs";
+import { initRecoveryKeyUi } from "./recovery-key-ui.mjs";
 
 const params = new URLSearchParams(location.search);
 const profileIdParam = params.get("profile_id")?.trim() || null;
@@ -49,6 +50,7 @@ const qrImg = document.getElementById("qr-img");
 const copyBtn = document.getElementById("copy-scan");
 const profileIdEl = document.getElementById("profile-id");
 const cardStatusEl = document.getElementById("card-status");
+const resolverCardStatusEl = document.getElementById("resolver-card-status");
 const jsonLink = document.getElementById("card-json-link");
 
 if (!profileId && !qrId && !data) {
@@ -78,8 +80,14 @@ if (profileId) {
 
 if (data?.verification?.label) {
   cardStatusEl.textContent = data.verification.label;
-} else if (data?.status) {
-  cardStatusEl.textContent = data.status;
+} else {
+  cardStatusEl.textContent = "Registered";
+}
+
+if (resolverCardStatusEl) {
+  const cardState = data?.status || "active";
+  resolverCardStatusEl.textContent =
+    cardState.charAt(0).toUpperCase() + cardState.slice(1);
 }
 
 if (scanUrl) {
@@ -118,5 +126,11 @@ if (profileId && qrId) {
       backup?.refreshExportVisibility();
       revoke?.refresh();
     },
+  });
+  initRecoveryKeyUi({
+    profileId,
+    getSession: loadSession,
+    setSession: saveSession,
+    onKeysUnlocked: () => revoke?.refresh(),
   });
 }

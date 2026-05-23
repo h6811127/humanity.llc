@@ -37,6 +37,7 @@ export async function getCardByProfileId(
 export interface InsertCardParams {
   profileId: string;
   publicKey: string;
+  recoveryPublicKey?: string | null;
   handle: string;
   handleNormalized: string;
   manifestoLine: string;
@@ -60,13 +61,14 @@ export async function insertCardWithQr(
     db
       .prepare(
         `INSERT INTO cards (
-          profile_id, public_key, handle, handle_normalized, manifesto_line,
+          profile_id, public_key, recovery_public_key, handle, handle_normalized, manifesto_line,
           status, card_document_json, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, 'active', ?, ?, ?)`
+        ) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)`
       )
       .bind(
         card.profileId,
         card.publicKey,
+        card.recoveryPublicKey ?? null,
         card.handle,
         card.handleNormalized,
         card.manifestoLine,

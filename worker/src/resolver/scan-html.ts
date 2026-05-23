@@ -290,7 +290,7 @@ function cardGroupRows(vm: ScanViewModel): string {
   const rows = [
     listRow(
       "status",
-      "green",
+      cardStatusIconTone(vm),
       status,
       vm.kind === "active"
         ? "Live public card fields at scan time"
@@ -304,7 +304,7 @@ function cardGroupRows(vm: ScanViewModel): string {
 }
 
 function humanGroupRows(vm: ScanViewModel): string {
-  return listRow("people", "purple", vm.verificationLabel, humanSub(vm));
+  return listRow("people", humanStatusIconTone(vm), vm.verificationLabel, humanSub(vm));
 }
 
 function humanSub(vm: ScanViewModel): string {
@@ -320,7 +320,7 @@ function qrGroupRows(vm: ScanViewModel): string {
     vm.qrScope === "print_artifact"
       ? "Printed item — revoke one artifact without killing the card"
       : "Card-scoped credential";
-  const rows = [listRow("qr", "green", status, scope)];
+  const rows = [listRow("qr", qrStatusIconTone(vm), status, scope)];
   if (vm.qrId) {
     rows.push(listRow("profile", "blue", "Credential", vm.qrId));
   }
@@ -379,17 +379,17 @@ function pillForCard(vm: ScanViewModel): string {
   const label = vm.cardStatus
     ? `Card ${formatCardStatus(vm.cardStatus)}`
     : "Card unknown";
-  const on = vm.kind === "active" ? "trust-on" : "";
+  const on = vm.cardStatus === "active" ? "trust-on" : "";
   return `<li class="${on}">${escapeHtml(label)}</li>`;
 }
 
 function pillForHuman(vm: ScanViewModel): string {
-  const on =
-    vm.kind === "active" && vm.verificationLabel === "Registered"
-      ? "trust-on"
-      : vm.vouchCount >= 3
-        ? "trust-on"
-        : "";
+  const cardOk = vm.cardStatus === "active";
+  const humanLive =
+    vm.verificationLabel === "Registered" ||
+    vm.verificationLabel === "Vouched Human" ||
+    vm.vouchCount >= 3;
+  const on = cardOk && humanLive ? "trust-on" : "";
   return `<li class="${on}">${escapeHtml(vm.verificationLabel)}</li>`;
 }
 
@@ -397,9 +397,31 @@ function pillForQr(vm: ScanViewModel): string {
   const label = vm.qrStatus
     ? `QR ${formatQrStatus(vm.qrStatus)}`
     : "QR unknown";
-  const on =
-    vm.kind === "active" && vm.qrStatus === "active" ? "trust-on" : "";
+  const on = vm.qrStatus === "active" ? "trust-on" : "";
   return `<li class="${on}">${escapeHtml(label)}</li>`;
+}
+
+function cardStatusIconTone(vm: ScanViewModel): string {
+  if (vm.cardStatus === "revoked" || vm.kind === "card_revoked") return "red";
+  if (vm.cardStatus === "suspended" || vm.kind === "card_suspended") return "orange";
+  if (vm.cardStatus === "expired" || vm.kind === "card_expired") return "orange";
+  if (vm.cardStatus === "active") return "green";
+  return "slate";
+}
+
+function qrStatusIconTone(vm: ScanViewModel): string {
+  if (vm.qrStatus === "revoked" || vm.kind === "qr_revoked") return "red";
+  if (vm.qrStatus === "expired" || vm.kind === "qr_expired") return "orange";
+  if (vm.qrStatus === "replaced" || vm.kind === "qr_replaced") return "orange";
+  if (vm.qrStatus === "active" && vm.kind === "active") return "green";
+  return "slate";
+}
+
+function humanStatusIconTone(vm: ScanViewModel): string {
+  if (vm.cardStatus !== "active") return "slate";
+  if (vm.vouchCount >= 3 || vm.verificationLabel === "Vouched Human") return "green";
+  if (vm.verificationLabel === "Registered") return "purple";
+  return "slate";
 }
 
 function renderFooter(vm: ScanViewModel, origin: string): string {

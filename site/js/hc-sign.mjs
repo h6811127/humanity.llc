@@ -64,6 +64,11 @@ export function decodePrivateKeyBase58(privateKeyBase58) {
   return decodeBase58(privateKeyBase58);
 }
 
+export async function publicKeyFromPrivateKeyBase58(privateKeyBase58) {
+  const privateKey = decodePrivateKeyBase58(privateKeyBase58);
+  return encodeBase58(await ed.getPublicKeyAsync(privateKey));
+}
+
 function requireFields(unsigned) {
   if (!unsigned.type || !unsigned.version) {
     throw new Error("Missing type or version on signed payload.");

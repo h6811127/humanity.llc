@@ -9,7 +9,7 @@
       content="Create a signed Humanity Card. Your private key stays in this browser session only."
     />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=25" />
+    <link rel="stylesheet" href="/styles.css?v=34" />
   </head>
   <body>
     <div class="page">
@@ -22,7 +22,7 @@
 
       <main class="screen">
         <section class="hero hero-compact">
-          <p class="hero-eyebrow">Phase A · create</p>
+          <p class="hero-eyebrow">Try it</p>
           <h1>Create your card</h1>
           <p class="hero-line">
             Choose a public handle and one-line statement. Keys are generated in this tab
@@ -31,7 +31,7 @@
           </p>
         </section>
 
-        <form id="create-form" class="form-card" method="dialog" action="#" autocomplete="off">
+        <form id="create-form" class="form-card" method="dialog" action="#" autocomplete="off" novalidate>
           <label class="form-label" for="handle">Handle</label>
           <input
             class="form-input"
@@ -60,10 +60,15 @@
           ></textarea>
           <p class="form-hint">Plain text only, 280 characters max.</p>
 
+          <label class="revoke-confirm create-recovery-opt">
+            <input type="checkbox" id="generate-recovery" name="generate_recovery" checked />
+            <span>Generate recovery key (recommended — save once on /created/)</span>
+          </label>
+
           <p class="form-warning">
-            After create, download an encrypted backup on /created/ if you may revoke from
-            another device later. Without backup or this tab, you cannot sign a revoke.
-            Card creation does not verify legal identity.
+            After create, save your <strong>recovery key</strong> and/or download an encrypted
+            backup on /created/. Without one of them, closing this tab means you cannot sign a
+            revoke. We cannot recover lost keys. Card creation does not verify legal identity.
           </p>
 
           <button type="submit" class="btn-primary" id="submit">Create signed card</button>
@@ -71,6 +76,6 @@
         </form>
       </main>
     </div>
-    <script type="module" src="/js/create-card.mjs?v=5"></script>
+    <script type="module" src="/js/create-card.mjs?v=6"></script>
   </body>
 </html>

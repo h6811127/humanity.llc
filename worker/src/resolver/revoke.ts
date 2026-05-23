@@ -84,13 +84,25 @@ export async function handlePostRevoke(
 
   const verify = await verifySignedDocument(doc, {
     expectedType: PAYLOAD_TYPES.REVOCATION,
-    expectedPublicKeyBase58: owner.public_key,
   });
 
   if (!verify.ok) {
     const status =
       verify.code === CRYPTO_ERROR.REPLAYED_NONCE ? 409 : 401;
     return errorResponse(verify.code, verify.message, status);
+  }
+
+  const signerKey = verify.signature.public_key;
+  const allowedKeys = [owner.public_key];
+  if (owner.recovery_public_key) {
+    allowedKeys.push(owner.recovery_public_key);
+  }
+  if (!allowedKeys.includes(signerKey)) {
+    return errorResponse(
+      CRYPTO_ERROR.INVALID_SIGNATURE,
+      "Revocation must be signed by the card owner or recovery key.",
+      401
+    );
   }
 
   const unsigned = verify.unsigned;
