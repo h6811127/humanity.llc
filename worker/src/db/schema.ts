@@ -7,6 +7,7 @@ export const TABLES = {
   qr_credentials: "qr_credentials",
   verification_summaries: "verification_summaries",
   revocations: "revocations",
+  vouches: "vouches",
 } as const;
 
 export const REQUIRED_TABLES = Object.values(TABLES);
