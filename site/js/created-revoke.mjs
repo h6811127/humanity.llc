@@ -1,9 +1,7 @@
 /**
- * Owner revoke controls on /created/ (M4.2 — browser-held key, session-only).
- * @see docs/M4_CREATED_REVOKE_UI.md
+ * Owner revoke controls on /created/ (M4.2 + M5.5 import).
  */
 import {
-  BEARER_WARNING,
   getCardStatusUrl,
   postRevokeUrl,
   signRevocation,
@@ -14,16 +12,15 @@ import {
  *   profileId: string,
  *   qrId: string,
  *   scanUrl: string | null,
- *   ownerPrivateKeyB58: string | null,
- *   ownerPublicKeyB58: string | null,
  *   getSession: () => Record<string, unknown> | null,
  *   setSession: (next: Record<string, unknown>) => void,
  *   showError: (msg: string) => void,
  * }} ctx
+ * @returns {{ refresh: () => void }}
  */
 export function initOwnerRevoke(ctx) {
   const section = document.getElementById("owner-controls");
-  if (!section) return;
+  if (!section) return { refresh: () => {} };
 
   const noKeyEl = document.getElementById("owner-no-key");
   const liveStatusEl = document.getElementById("owner-live-status");
@@ -36,25 +33,25 @@ export function initOwnerRevoke(ctx) {
   const revokeCardBtn = document.getElementById("revoke-card-btn");
   const revokeStatusEl = document.getElementById("revoke-status");
 
-  const hasKeys =
-    !!ctx.ownerPrivateKeyB58 && !!ctx.ownerPublicKeyB58;
+  function keys() {
+    const s = ctx.getSession();
+    const priv = s?.owner_private_key_b58;
+    const pub = s?.owner_public_key_b58;
+    if (typeof priv !== "string" || typeof pub !== "string") return null;
+    return { privateKeyBase58: priv, publicKeyBase58: pub };
+  }
 
   function setRevokeStatus(msg, isError = false) {
     if (!revokeStatusEl) return;
     revokeStatusEl.hidden = !msg;
     revokeStatusEl.textContent = msg;
-    revokeStatusEl.className = isError
-      ? "form-status error"
-      : "form-status";
+    revokeStatusEl.className = isError ? "form-status error" : "form-status";
   }
 
   function updateConfirmButtons() {
-    if (revokeQrBtn) {
-      revokeQrBtn.disabled = !confirmQr?.checked;
-    }
-    if (revokeCardBtn) {
-      revokeCardBtn.disabled = !confirmCard?.checked;
-    }
+    const k = keys();
+    if (revokeQrBtn) revokeQrBtn.disabled = !k || !confirmQr?.checked;
+    if (revokeCardBtn) revokeCardBtn.disabled = !k || !confirmCard?.checked;
   }
 
   function showRevokedUi(kind) {
@@ -71,6 +68,14 @@ export function initOwnerRevoke(ctx) {
       liveStatusEl.textContent =
         kind === "card" ? "Resolver: card revoked" : "Resolver: QR revoked";
     }
+  }
+
+  function refreshAccessUi() {
+    const k = keys();
+    if (noKeyEl) noKeyEl.hidden = !!k;
+    if (qrPanel) qrPanel.hidden = !k;
+    if (cardPanel) cardPanel.hidden = !k;
+    updateConfirmButtons();
   }
 
   async function refreshLiveStatus() {
@@ -98,9 +103,10 @@ export function initOwnerRevoke(ctx) {
   }
 
   async function postRevocation(targetKind) {
-    if (!hasKeys) {
-      showError(
-        "Signing key not available in this browser session. Create the card again on /create/ to revoke from this device."
+    const k = keys();
+    if (!k) {
+      ctx.showError(
+        "No signing key. Use the same browser session as create, or import an encrypted backup below."
       );
       return;
     }
@@ -115,8 +121,8 @@ export function initOwnerRevoke(ctx) {
         profileId: ctx.profileId,
         targetKind,
         targetQrId,
-        privateKeyBase58: ctx.ownerPrivateKeyB58,
-        publicKeyBase58: ctx.ownerPublicKeyB58,
+        privateKeyBase58: k.privateKeyBase58,
+        publicKeyBase58: k.publicKeyBase58,
       });
 
       setRevokeStatus("Submitting to resolver…");
@@ -143,11 +149,8 @@ export function initOwnerRevoke(ctx) {
 
       setRevokeStatus("");
       showRevokedUi(targetKind);
-
       if (ctx.scanUrl && targetKind === "qr_credential") {
-        setRevokeStatus(
-          `Done. Open your scan page to verify: ${ctx.scanUrl}`
-        );
+        setRevokeStatus(`Done. Verify on scan: ${ctx.scanUrl}`);
       }
       await refreshLiveStatus();
     } catch (err) {
@@ -158,39 +161,47 @@ export function initOwnerRevoke(ctx) {
 
   if (!ctx.profileId || !ctx.qrId) {
     section.hidden = true;
-    return;
+    return { refresh: () => {} };
   }
 
   section.hidden = false;
-
-  if (!hasKeys) {
-    noKeyEl.hidden = false;
-    if (qrPanel) qrPanel.hidden = true;
-    if (cardPanel) cardPanel.hidden = true;
-  } else {
-    noKeyEl.hidden = true;
-  }
 
   const session = ctx.getSession();
   if (session?.revoke_state?.target_kind) {
     showRevokedUi(session.revoke_state.target_kind);
   }
 
-  confirmQr?.addEventListener("change", updateConfirmButtons);
-  confirmCard?.addEventListener("change", updateConfirmButtons);
-  updateConfirmButtons();
+  refreshAccessUi();
 
-  revokeQrBtn?.addEventListener("click", () => {
-    if (!confirmQr?.checked) return;
-    postRevocation("qr_credential");
-  });
-
-  revokeCardBtn?.addEventListener("click", () => {
-    if (!confirmCard?.checked) return;
-    postRevocation("card");
-  });
+  if (!confirmQr?.dataset.bound) {
+    confirmQr.dataset.bound = "1";
+    confirmQr.addEventListener("change", updateConfirmButtons);
+  }
+  if (!confirmCard?.dataset.bound) {
+    confirmCard.dataset.bound = "1";
+    confirmCard.addEventListener("change", updateConfirmButtons);
+  }
+  if (!revokeQrBtn?.dataset.bound) {
+    revokeQrBtn.dataset.bound = "1";
+    revokeQrBtn.addEventListener("click", () => {
+      if (!confirmQr?.checked) return;
+      postRevocation("qr_credential");
+    });
+  }
+  if (!revokeCardBtn?.dataset.bound) {
+    revokeCardBtn.dataset.bound = "1";
+    revokeCardBtn.addEventListener("click", () => {
+      if (!confirmCard?.checked) return;
+      postRevocation("card");
+    });
+  }
 
   refreshLiveStatus();
-}
 
-export { BEARER_WARNING };
+  return {
+    refresh() {
+      refreshAccessUi();
+      refreshLiveStatus();
+    },
+  };
+}

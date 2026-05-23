@@ -159,6 +159,7 @@ Do these **in order**. Each step has an exit test before moving on.
 ## What we are **not** doing in this track
 
 - NFC / Bluetooth mesh implementation (landing hint only)
+- **Owner key export / recovery** (revoke from any device) — **M5.5** (`docs/M5_5_OWNER_KEY_PORTABILITY.md`)
 - Vouches (M6), live control (M7), merch (M8)
 - Commons Pass (M10+)
 

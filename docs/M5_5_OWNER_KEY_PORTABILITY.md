@@ -1,0 +1,164 @@
+# M5.5 — Owner key portability (revoke from any device)
+
+**Status:** Phase 1 in progress (export/import in repo)  
+**Blocks:** Revoke anytime / any device after create session ends  
+**Does not block:** M5 stranger tests, public create announce, or commerce milestones  
+
+**Related:** `docs/V1_0_ARCHITECTURE_ROADMAP.md` §M5.5, `docs/Technical Standards v1.0.md` §10.1 (recovery key), §12.1 (encrypted export), `docs/M4_CREATED_REVOKE_UI.md` (current session-only revoke)
+
+---
+
+## Problem (today)
+
+Phase A ships:
+
+- **Revoke API** — owner-signed `POST …/revoke` (M4.1).
+- **Revoke UI** — `/created/` signs in-browser **only while `sessionStorage` still holds the create key**.
+
+If the user closes the tab, switches devices, or clears site data, they **cannot sign a new revocation**. The card/QR may still be **active on the resolver** until someone with a key revokes it.
+
+**Revoked state is permanent** once applied; the gap is **access to the signing key**, not TTL on revoke.
+
+---
+
+## Product goal
+
+> A card owner can **revoke (and later: rotate QR, vouch, export)** from a **new browser or device** without creating a duplicate card.
+
+Two complementary paths (ship both; user may use one or both):
+
+| Path | User story | Standards alignment |
+|------|------------|---------------------|
+| **A. Encrypted key export / import** | “I saved a backup file at create; I import it on my laptop to revoke.” | Export bundle §12.1 — encrypted private key **if user opts in** |
+| **B. Recovery key** | “I lost my phone but I wrote down a recovery code; I can still revoke.” | Revocation §10.1 — **accepted recovery key**; live control §challenge |
+
+Neither path uploads plaintext private keys to the resolver.
+
+---
+
+## Threat model (export/import — Phase 1)
+
+### Assets
+
+- **Owner Ed25519 private key** — can sign revoke, future vouch/rotate.
+- **Encrypted backup file** — ciphertext + public metadata (`profile_id`, `public_key`, KDF salt, IV).
+- **Passphrase** — never stored by humanity.llc; user memory or password manager only.
+
+### Trust boundaries
+
+| Party | Trust |
+|-------|--------|
+| humanity.llc resolver | Sees signed revocations only; **never** receives passphrase or plaintext private key |
+| humanity.llc Pages | Runs client JS; must not log keys/passphrase; no upload of backup by default |
+| User device / browser | Holds session key; writes backup file to disk/downloads |
+| Attacker with backup file | Must guess passphrase (PBKDF2 310k iter + AES-GCM) |
+| Attacker with session only | Can revoke until session ends (same as Phase A) |
+
+### What export/import allows
+
+- Decrypt backup **client-side** → load key into `sessionStorage` → use existing revoke UI.
+- Revoke from **another device** after import on `/created/?profile_id=…&qr_id=…`.
+
+### What it does **not** allow (Phase 1)
+
+- humanity.llc staff recovering your passphrase or key.
+- Automatic iCloud/Drive upload (user must not treat backup like a normal doc without encryption awareness).
+- Recovery if **both** device key and backup/passphrase are lost.
+- Revoke without either session key **or** backup+passphrase.
+
+### Crypto (v1 backup file)
+
+- **KDF:** PBKDF2-SHA256, 310,000 iterations, random 16-byte salt.
+- **Cipher:** AES-256-GCM, random 12-byte IV.
+- **Encoding:** private key as base58 in plaintext inside AEAD; file format `humanity_card_key_backup` v1.0.
+
+### Residual risks (accepted for v1)
+
+- Weak passphrases → offline brute force on stolen file.
+- Malware on device reading file or clipboard.
+- User stores backup in synced folder without understanding exposure.
+- Phishing: “upload your backup to verify” (out of scope for product; educate in copy).
+
+### Recovery key (Phase 2 — not shipped yet)
+
+Separate threat model when **5.5.3–5.5.4** ship: one-time recovery code, recovery pubkey on card, no recovery private key on server.
+
+---
+
+## Milestone steps
+
+### 5.5.1 — Encrypted owner key export (opt-in at create)
+
+**UI:** `/create/` and `/created/` — “Save encrypted backup” with passphrase (or OS keychain where available).
+
+**Artifact:** Downloadable file (e.g. `humanity-card-backup.json` or `.hcbackup`) containing:
+
+- `profile_id`, `public_key`, encrypted private key blob, KDF params, protocol version.
+- **Not** uploaded to humanity.llc servers by default.
+
+**Exit:**
+
+- [x] `site/js/key-backup.mjs` + tests (`worker/tests/key-backup.test.ts`)
+- [x] Download UI on `/created/` when session has key
+- [ ] Copy warns: lose passphrase = lose backup; we cannot recover (in UI)
+- [ ] Deploy Pages and verify download on production
+
+### 5.5.2 — Import key on owner surface
+
+**UI:** `/created/` or new `/manage/` — “Import backup” → unlock → show same Owner controls (revoke QR / card).
+
+**Exit:**
+
+- [x] Import UI on `/created/` (`key-backup-ui.mjs`) unlocks owner controls
+- [ ] Import + revoke QR works on second device (manual test after deploy)
+- [x] Wrong passphrase fails clearly (`decryptBackup` error message)
+
+### 5.5.3 — Recovery key at create (optional)
+
+**UI:** At create, optional “Generate recovery key” — show once (QR + copy), user confirms they saved it.
+
+**Resolver:** Store only **recovery public key** on card row (migration) or in signed card document field; recovery revocations verified against recovery key per §10.1.
+
+**Exit:**
+
+- [ ] User can revoke with recovery-signed document if device key lost.
+- [ ] Device key alone cannot rotate recovery key without existing recovery or device key (document threat model in standards).
+
+### 5.5.4 — Wire recovery into revoke API
+
+**Worker:** `handlePostRevoke` accepts signatures from `cards.public_key` **or** registered recovery public key.
+
+**Exit:**
+
+- [ ] Fixture + test: revocation signed by recovery key updates status.
+- [ ] Invalid recovery signature → 401.
+
+### 5.5.5 — Copy, data policy, and threat model
+
+**Exit:**
+
+- [ ] `/create/`, `/created/`, data policy explain: session-only vs backup vs recovery.
+- [ ] No implication that humanity.llc can revoke on the user’s behalf.
+- [ ] Stranger test script updated: “lose tab without backup = cannot revoke from web UI.”
+
+---
+
+## Explicit non-goals (M5.5)
+
+- Cloud-synced keys or account email login (Phase A–C).
+- Operator-assisted “unlock my card” support backdoor.
+- Automatic key upload to D1.
+
+---
+
+## Suggested build order
+
+1. **5.5.1 + 5.5.2** (export/import) — unblocks most “second device” needs.  
+2. **5.5.3 + 5.5.4** (recovery key) — unblocks “lost device, have code”.  
+3. Align with **M10.2** full export bundle when federation/export milestone starts.
+
+---
+
+## Phase A exit criteria (unchanged)
+
+Stranger tests still pass with **session-only** revoke. M5.5 is the **first trust UX upgrade** after M5.3 announce, before or in parallel with M6 vouches (product priority TBD).

@@ -1465,6 +1465,22 @@ a {
   background: var(--red);
 }
 
+.key-panel {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: #fafafa;
+}
+
+.key-panel .form-label {
+  margin-top: 10px;
+}
+
+.key-panel .form-input {
+  margin-top: 4px;
+}
+
 .block-link {
   text-align: center;
   margin-top: 12px;

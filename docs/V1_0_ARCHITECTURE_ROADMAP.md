@@ -360,8 +360,9 @@ Complete before milestone A.1. Map to backlog D-001–D-006.
 
 ### A.4 Owner view
 
-- Minimal “my card” view: show QR, copy link, export public doc (full export later).
-- Warn on key loss.
+- Minimal “my card” view: show QR, copy link, revoke (session key) — **done** (`site/created/`).
+- Warn on key loss (session-only revoke today).
+- **Follow-up M5.5:** encrypted key export/import + optional recovery key so revoke works from any device (`docs/M5_5_OWNER_KEY_PORTABILITY.md`).
 
 ### A.5 Scan + resolve
 
@@ -522,6 +523,20 @@ Follow these steps in order. Each step lists **exit criteria** and **spec refs**
 | 5.2 | Run 3 stranger tests | Pass Phase A exit | §12 |
 | 5.3 | Announce public create (site + README) | — | — |
 
+### Milestone M5.5 — Owner key portability (follow-up; not Phase A gate)
+
+**Goal:** Revoke (and later rotate/vouch) from any device after create — not only the original browser tab.
+
+| Step | Action | Exit | Refs |
+|---|---|---|---|
+| 5.5.1 | Encrypted key export (opt-in) | Backup file; passphrase | Standards §12.1 |
+| 5.5.2 | Import backup on owner UI | Revoke from second device | `M5_5_OWNER_KEY_PORTABILITY.md` |
+| 5.5.3 | Optional recovery key at create | User saves code once | Standards §10.1 |
+| 5.5.4 | Revoke API accepts recovery sig | Tests + fixtures | `revoke.ts` |
+| 5.5.5 | Copy + policy + threat model | No false “we hold your key” | data policy |
+
+**Does not block M5.2 stranger tests.** Phase A MVP remains: create → scan → revoke **in create session**.
+
 ### Milestone M6 — Vouches (A.1)
 
 | Step | Action | Exit | Refs |
@@ -643,7 +658,8 @@ Keep **specs in `docs/`**; keep **implementations** in `worker/` and `site/`. Li
 
 **Suggested command for commerce:**
 
-> Do not start M8 until M5.3 passes. Do not start M9 until Shopify spike 9.1 passes.
+> Do not start M8 until M5.3 passes. Do not start M9 until Shopify spike 9.1 passes.  
+> **M5.5** (key export/recovery) is recommended **after M5.3** and before scaling stranger onboarding; it does not change Phase A exit criteria.
 
 This document should be updated when milestones ship: mark steps done in commit messages or a living `docs/V1_0_PROGRESS.md` if you add one later.
 

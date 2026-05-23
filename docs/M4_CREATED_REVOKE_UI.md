@@ -41,8 +41,11 @@
 
 ---
 
-## Not in scope (v1)
+## Not in scope (Phase A / M4)
 
-- Key export / recovery / second device revoke
 - QR rotation UI (M7)
 - Revoke from scan page (owner must use `/created/`)
+
+## Follow-up: revoke from any device (M5.5)
+
+Session-only keys are intentional for Phase A. **Encrypted export/import** and optional **recovery key** are specified in `docs/M5_5_OWNER_KEY_PORTABILITY.md` so owners can revoke after closing the tab or from another device.

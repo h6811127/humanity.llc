@@ -71,19 +71,75 @@
           </p>
         </section>
 
+        <section class="group" id="key-backup-section">
+          <h2 class="group-label">Owner key backup</h2>
+          <p class="form-hint">
+            Save an encrypted file to revoke from another device later. humanity.llc never
+            receives your passphrase or private key.
+          </p>
+
+          <div class="key-panel" id="key-export-panel" hidden>
+            <h3 class="revoke-title">Download encrypted backup</h3>
+            <label class="form-label" for="export-passphrase">Passphrase</label>
+            <input
+              class="form-input"
+              id="export-passphrase"
+              type="password"
+              autocomplete="new-password"
+              minlength="12"
+            />
+            <label class="form-label" for="export-passphrase-confirm">Confirm passphrase</label>
+            <input
+              class="form-input"
+              id="export-passphrase-confirm"
+              type="password"
+              autocomplete="new-password"
+              minlength="12"
+            />
+            <p class="form-hint">
+              Minimum 12 characters. If you lose the passphrase, the backup cannot be opened.
+            </p>
+            <button type="button" class="btn-secondary" id="export-backup-btn">
+              Download backup file
+            </button>
+            <p class="form-status" id="export-backup-status" hidden></p>
+          </div>
+
+          <div class="key-panel" id="key-import-panel">
+            <h3 class="revoke-title">Import backup (another device)</h3>
+            <label class="form-label" for="import-backup-file">Backup file</label>
+            <input
+              class="form-input"
+              id="import-backup-file"
+              type="file"
+              accept=".json,.hcbackup,application/json"
+            />
+            <label class="form-label" for="import-passphrase">Passphrase</label>
+            <input
+              class="form-input"
+              id="import-passphrase"
+              type="password"
+              autocomplete="current-password"
+              minlength="12"
+            />
+            <button type="button" class="btn-secondary" id="import-backup-btn">
+              Unlock owner controls
+            </button>
+            <p class="form-status" id="import-backup-status" hidden></p>
+          </div>
+        </section>
+
         <section class="group owner-controls" id="owner-controls" hidden>
           <h2 class="group-label">Owner controls</h2>
           <p class="form-hint">
-            Revocation updates what scanners see (usually within a minute). Your signing key
-            stays in this browser tab only; we never upload it.
+            Revocation updates what scanners see (usually within a minute). Only signed
+            requests are sent to the resolver.
           </p>
           <p class="owner-live-status" id="owner-live-status" aria-live="polite"></p>
           <p class="form-warning owner-revoked-banner" id="owner-revoked-banner" hidden></p>
           <p class="form-hint" id="owner-no-key" hidden>
-            Revoke needs the same browser session as create. Keys are not stored after you
-            close this tab. Create again on
-            <a href="/create/">/create/</a> to revoke from this device, or use a signed
-            revocation via API.
+            No signing key in this tab. Import an encrypted backup above, or create again on
+            <a href="/create/">/create/</a> in the same session.
           </p>
 
           <div class="revoke-panel" id="revoke-qr-panel">
@@ -127,6 +183,6 @@
         </p>
       </main>
     </div>
-    <script type="module" src="/js/created.mjs?v=6"></script>
+    <script type="module" src="/js/created.mjs?v=7"></script>
   </body>
 </html>

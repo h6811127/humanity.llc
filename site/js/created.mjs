@@ -1,5 +1,6 @@
 import { getCardJsonUrl, qrScanUrl, resolverApiOrigin } from "./hc-sign.mjs";
 import { initOwnerRevoke } from "./created-revoke.mjs";
+import { initKeyBackupUi } from "./key-backup-ui.mjs";
 
 const params = new URLSearchParams(location.search);
 const profileIdParam = params.get("profile_id")?.trim() || null;
@@ -111,14 +112,20 @@ if (bearerHint) {
 }
 
 if (profileId && qrId) {
-  initOwnerRevoke({
+  const revokeCtx = {
     profileId,
     qrId,
     scanUrl,
-    ownerPrivateKeyB58: data?.owner_private_key_b58 ?? null,
-    ownerPublicKeyB58: data?.owner_public_key_b58 ?? null,
     getSession: loadSession,
     setSession: saveSession,
     showError,
+  };
+  const revoke = initOwnerRevoke(revokeCtx);
+  initKeyBackupUi({
+    profileId,
+    getSession: loadSession,
+    setSession: saveSession,
+    showError,
+    onKeysUnlocked: () => revoke?.refresh(),
   });
 }
