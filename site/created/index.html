@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Your live object · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=38" />
+    <link rel="stylesheet" href="/styles.css?v=39" />
   </head>
   <body>
     <div class="page">
@@ -129,30 +129,34 @@
             </p>
 
             <div id="revoke-actions" hidden>
-              <p class="form-hint revoke-id-warning">
-                The QR code still contains its QR ID and profile ID in the URL. Revoking
-                changes live network status, not the physical sticker or photo.
-              </p>
-              <label class="revoke-confirm">
-                <input type="checkbox" id="confirm-revoke-qr" />
-                <span>I understand and want to revoke this scan QR only</span>
-              </label>
-              <button type="button" class="btn-danger" id="revoke-qr-btn" disabled>
-                Revoke this QR
-              </button>
+              <div id="revoke-qr-block">
+                <p class="form-hint revoke-id-warning">
+                  The QR code still contains its QR ID and profile ID in the URL. Revoking
+                  changes live network status, not the physical sticker or photo.
+                </p>
+                <label class="revoke-confirm">
+                  <input type="checkbox" id="confirm-revoke-qr" />
+                  <span>I understand and want to revoke this scan QR only</span>
+                </label>
+                <button type="button" class="btn-danger" id="revoke-qr-btn" disabled>
+                  Revoke this QR
+                </button>
+              </div>
 
-              <p class="form-hint revoke-id-warning revoke-confirm-spaced">
-                Card details will no longer be viewable on scan. All active QRs on this card
-                will stop resolving as active. Profile ID and QR IDs remain on anything already
-                printed or shared.
-              </p>
-              <label class="revoke-confirm revoke-confirm-spaced">
-                <input type="checkbox" id="confirm-revoke-card" />
-                <span>I understand and want to disable this card</span>
-              </label>
-              <button type="button" class="btn-danger btn-danger-solid" id="revoke-card-btn" disabled>
-                Disable card
-              </button>
+              <div id="revoke-card-block">
+                <p class="form-hint revoke-id-warning revoke-confirm-spaced">
+                  Card details will no longer be viewable on scan. All active QRs on this card
+                  will stop resolving as active. Profile ID and QR IDs remain on anything already
+                  printed or shared.
+                </p>
+                <label class="revoke-confirm revoke-confirm-spaced">
+                  <input type="checkbox" id="confirm-revoke-card" />
+                  <span>I understand and want to disable this card</span>
+                </label>
+                <button type="button" class="btn-danger btn-danger-solid" id="revoke-card-btn" disabled>
+                  Disable card
+                </button>
+              </div>
             </div>
             <p class="form-status" id="revoke-status" hidden></p>
           </div>
@@ -300,7 +304,12 @@
               </span>
               <span class="list-chevron" aria-hidden="true">›</span>
             </summary>
-            <div class="settings-panel">
+            <div class="settings-panel settings-panel-info-body">
+              <p class="settings-panel-lead">
+                Your <strong>card</strong> is the signed profile (one handle, one manifesto).
+                Each printed <strong>QR</strong> is its own credential (<code>qr_id</code>) on that
+                card — revoke one sticker without killing siblings.
+              </p>
               <ul class="list list-compact">
                 <li class="list-row">
                   <span class="list-content">
@@ -341,6 +350,6 @@
         </p>
       </main>
     </div>
-    <script type="module" src="/js/created.mjs?v=13"></script>
+    <script type="module" src="/js/created.mjs?v=14"></script>
   </body>
 </html>

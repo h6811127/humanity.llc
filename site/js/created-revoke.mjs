@@ -21,6 +21,8 @@ export function initOwnerRevoke(ctx) {
 
   const noKeyEl = document.getElementById("owner-no-key");
   const revokeActions = document.getElementById("revoke-actions");
+  const revokeQrBlock = document.getElementById("revoke-qr-block");
+  const revokeCardBlock = document.getElementById("revoke-card-block");
   const liveStatusEl = document.getElementById("owner-live-status");
   const revokedBannerEl = document.getElementById("owner-revoked-banner");
   const confirmQr = document.getElementById("confirm-revoke-qr");
@@ -63,9 +65,15 @@ export function initOwnerRevoke(ctx) {
       revokedBannerEl.textContent =
         kind === "card"
           ? "Card disabled. Scans may take up to a minute to update."
-          : "This QR is revoked. Open your scan link to confirm.";
+          : "This QR is revoked. You can still disable the whole card below.";
     }
-    if (revokeActions) revokeActions.hidden = true;
+    if (kind === "card") {
+      if (revokeActions) revokeActions.hidden = true;
+    } else if (kind === "qr_credential") {
+      if (revokeQrBlock) revokeQrBlock.hidden = true;
+      if (revokeCardBlock) revokeCardBlock.hidden = false;
+      if (revokeActions) revokeActions.hidden = false;
+    }
     if (liveStatusEl) {
       liveStatusEl.textContent =
         kind === "card" ? "Network: card disabled" : "Network: QR revoked";
@@ -142,6 +150,7 @@ export function initOwnerRevoke(ctx) {
 
       setRevokeStatus("");
       showRevokedUi(targetKind);
+      updateConfirmButtons();
       ctx.onRevoked?.(targetKind);
       await refreshLiveStatus();
     } catch (err) {

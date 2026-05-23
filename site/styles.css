@@ -196,6 +196,34 @@ a {
   color: var(--grey);
 }
 
+.flow-strip-compact {
+  padding: 14px 8px 12px;
+}
+
+.flow-strip-compact .flow-object {
+  height: 64px;
+}
+
+.flow-object-text {
+  padding: 0 4px;
+}
+
+.flow-payload {
+  display: block;
+  max-width: 72px;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--red);
+  word-break: break-all;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.qr-how-it-works {
+  margin-top: 0;
+}
+
 .flow-door {
   width: 72px;
   height: 80px;
@@ -1525,10 +1553,16 @@ a {
   padding: 12px 18px;
   font: inherit;
   font-weight: 600;
+  color: var(--black);
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: var(--radius-pill);
   background: var(--white);
   cursor: pointer;
+}
+
+button.btn-secondary,
+button.btn-danger {
+  -webkit-text-fill-color: currentColor;
 }
 
 .owner-controls {
@@ -1682,6 +1716,25 @@ a {
 
 .settings-disclosure-info .settings-panel {
   border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+.settings-panel-info-body {
+  padding-top: 16px;
+}
+
+.settings-panel-lead {
+  margin: 0 0 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--black);
+}
+
+.settings-panel-info-body .list {
+  margin-top: 4px;
+}
+
+.settings-panel-info-body .list-row:first-child {
+  padding-top: 4px;
 }
 
 .settings-panel-action {

@@ -9,12 +9,12 @@
     <title>What can a QR do? · humanity.llc</title>
     <meta
       name="description"
-      content="Design space for revocable QRs: physical pointers, distributed state, and programmable objects. Research, not the live product."
+      content="How Humanity QRs work, and design space for revocable physical pointers — membership, games, civic nodes, and more."
     />
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=36" />
+    <link rel="stylesheet" href="/styles.css?v=39" />
   </head>
   <body>
     <div class="page">
@@ -23,167 +23,214 @@
           <span class="pass-dot" aria-hidden="true"></span>
           <span>humanity.llc</span>
         </a>
+        <a class="top-create" href="/create/">Create</a>
       </header>
 
-      <main class="screen design-space-screen">
+      <main class="screen screen-landing">
         <section class="hero hero-compact">
-          <p class="hero-eyebrow">Research</p>
+          <p class="hero-eyebrow">Design space</p>
           <h1>What can a QR do?</h1>
           <p class="hero-line">
-            Not shipping yet. Ideas that follow once a QR is live state, not a frozen link.
+            Once a mark points at <strong>live network status</strong>, not a frozen URL, the
+            physical world becomes programmable.
+          </p>
+          <p class="hero-line hero-line-sub">
+            The live product today is create → scan → revoke. Everything below is research and
+            imagination built on that primitive.
+          </p>
+        </section>
+
+        <section class="group" aria-labelledby="card-qr-title">
+          <h2 class="group-label" id="card-qr-title">Card vs QR</h2>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h4"/><path d="M7 13h6"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Humanity Card</span>
+                <span class="list-sub"
+                  >One signed profile: handle, manifesto, verification. The container for trust
+                  state.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">QR credential</span>
+                <span class="list-sub"
+                  >One physical mark. Each sticker, wristband, or door plate gets its own
+                  <code>qr_id</code>. Revoke one without killing the card or sibling QRs.</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="example-flow qr-how-it-works" aria-label="How a scan works">
+          <h2 class="group-label">How the mark stores information</h2>
+          <p class="group-intro short">
+            The QR is not a database. It encodes a <strong>short URL</strong>. The camera decodes
+            the pattern; your phone opens the link; the network returns <strong>current</strong>
+            signed status.
+          </p>
+
+          <div class="flow-strip flow-strip-compact">
+            <div class="flow-step">
+              <div class="flow-object flow-object-text" aria-hidden="true">
+                <span class="flow-payload">humanity.llc/c/…?q=…</span>
+              </div>
+              <p class="flow-label">Encoded</p>
+              <p class="flow-caption">URL in the squares</p>
+            </div>
+            <div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">
+              <div class="flow-object" aria-hidden="true">
+                <img src="/assets/red_qr_transparent_bg.png" width="40" height="40" alt="" />
+              </div>
+              <p class="flow-label">Printed</p>
+              <p class="flow-caption">Ink on object</p>
+            </div>
+            <div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">
+              <div class="flow-object flow-phone" aria-hidden="true">
+                <span class="flow-scan-line"></span>
+                <span class="flow-phone-notch"></span>
+              </div>
+              <p class="flow-label">Camera</p>
+              <p class="flow-caption">Decodes URL</p>
+            </div>
+            <div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">
+              <div class="flow-object flow-state" aria-hidden="true">
+                <span class="flow-state-dot live"></span>
+                <span class="flow-state-text">Live</span>
+              </div>
+              <p class="flow-label">Network</p>
+              <p class="flow-caption">Status now</p>
+            </div>
+          </div>
+
+          <p class="example-note">
+            The squares never hold your manifesto or keys — only where to ask. Revoking changes
+            the answer, not the ink.
           </p>
         </section>
 
         <p class="insight">
-          Stop thinking of the QR as <strong>a link</strong>. Start thinking of it as:
+          Stop thinking of the QR as <strong>a link</strong>. Think of it as a persistent physical
+          pointer, a distributed state object, and a tiny public storage primitive — then the design
+          space opens.
         </p>
-        <ul class="design-reframe">
-          <li>a persistent physical pointer</li>
-          <li>a distributed state object</li>
-          <li>a low-cost offline artifact</li>
-          <li>a tiny public storage primitive</li>
-        </ul>
-        <p class="design-lead">Then the design space opens up.</p>
 
-        <section class="design-block">
-          <h2 class="design-heading">Living street infrastructure</h2>
-          <p class="design-intro">QRs around a city that evolve over time:</p>
-          <ul class="design-bullets">
-            <li>community message nodes</li>
-            <li>local histories</li>
-            <li>neighborhood memory objects</li>
-            <li>evolving art trails</li>
-            <li>“leave something for the next person” systems</li>
+        <section class="group" aria-labelledby="ideas-title">
+          <h2 class="group-label" id="ideas-title">Ideas on live QRs</h2>
+          <ul class="list">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Living street infrastructure</span>
+                <span class="list-sub"
+                  >Community message nodes, local histories, evolving art trails — a bench becomes
+                  an addressable social object.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-purple" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21 1.18.38 2.03 1.46 2.03 2.79"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Physical-world multiplayer</span>
+                <span class="list-sub"
+                  >Territory, scavenger hunts, faction wars — capture points and evolving lore
+                  across a city because state changes after placement.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m3 11 18-5v12L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Civic &amp; protest infrastructure</span>
+                <span class="list-sub"
+                  >Update meeting points, rotate safety copy, revoke misinformation — without
+                  reprinting flyers.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-pink" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Wearable legitimacy</span>
+                <span class="list-sub"
+                  >Patches and wristbands that resolve to affiliation, event access, or rotating
+                  pseudonyms.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2"/><path d="M12 12v.01"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Local economies</span>
+                <span class="list-sub"
+                  >Markets and co-ops: membership passes, vendor trust, mutual-aid routing without
+                  a giant app stack.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Physical software objects</span>
+                <span class="list-sub"
+                  >Stickers and clothing as deployable entities — printing becomes deployment;
+                  QRs are programmable references in the world.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Memory &amp; place</span>
+                <span class="list-sub"
+                  >Stories, audio, and timelines attached to real locations — a persistent memory
+                  address in reality.</span
+                >
+              </span>
+            </li>
           </ul>
-          <p class="design-kicker">A bench is no longer a bench. It becomes an addressable social object.</p>
         </section>
 
-        <section class="design-block">
-          <h2 class="design-heading">Physical-world multiplayer games</h2>
-          <p class="design-intro">One of the strongest directions. Examples:</p>
-          <ul class="design-bullets">
-            <li>territory control</li>
-            <li>faction wars</li>
-            <li>scavenger hunts</li>
-            <li>hidden economies</li>
-            <li>time-gated events</li>
-            <li>evolving ARGs</li>
-            <li>cooperative unlock systems</li>
-          </ul>
-          <p class="design-intro">
-            Because the QR can change state after placement, the world itself becomes mutable.
-          </p>
-          <ul class="design-bullets">
-            <li>capture points</li>
-            <li>temporary portals</li>
-            <li>secret memberships</li>
-            <li>faction-only objects</li>
-            <li>evolving lore</li>
-          </ul>
-          <p class="design-kicker">Across an entire city.</p>
-        </section>
-
-        <section class="design-block">
-          <h2 class="design-heading">Dynamic protest and political infrastructure</h2>
-          <p class="design-intro">Physical flyers usually die after distribution. With live QRs:</p>
-          <ul class="design-bullets">
-            <li>organizers can revoke misinformation</li>
-            <li>update meeting locations</li>
-            <li>rotate safety instructions</li>
-            <li>verify authenticity</li>
-            <li>prove legitimacy</li>
-          </ul>
-          <p class="design-kicker">
-            Without changing the printed material. A sticker becomes a living civic node.
-          </p>
-        </section>
-
-        <section class="design-block">
-          <h2 class="design-heading">Wearable social legitimacy</h2>
-          <p class="design-intro">Jackets, wristbands, patches, necklaces, business cards that resolve to:</p>
-          <ul class="design-bullets">
-            <li>affiliations</li>
-            <li>trust level</li>
-            <li>event access</li>
-            <li>community standing</li>
-            <li>temporary roles</li>
-            <li>rotating identities</li>
-          </ul>
-          <p class="design-intro">You could even make:</p>
-          <ul class="design-bullets">
-            <li>anonymous but vouched personas</li>
-            <li>temporary conference identities</li>
-            <li>rotating pseudonyms</li>
-          </ul>
-        </section>
-
-        <section class="design-block">
-          <h2 class="design-heading">Autonomous local economies</h2>
-          <p class="design-intro">A farmers market could use these as:</p>
-          <ul class="design-bullets">
-            <li>membership passes</li>
-            <li>trust verification</li>
-            <li>cooperative voting</li>
-            <li>local vendor credentials</li>
-            <li>mutual aid routing</li>
-            <li>event unlocks</li>
-          </ul>
-          <p class="design-kicker">Without a giant centralized app ecosystem.</p>
-        </section>
-
-        <section class="design-block">
-          <h2 class="design-heading">Physical AI agents</h2>
-          <p class="design-intro">Futuristic, but coherent. A QR could represent:</p>
-          <ul class="design-bullets">
-            <li>an AI identity</li>
-            <li>a robot or device state</li>
-            <li>a local agent</li>
-            <li>a memory node</li>
-            <li>a sensor object</li>
-          </ul>
-          <p class="design-kicker">
-            Scan a lamp post and interact with the AI attached to that physical location.
-          </p>
-        </section>
-
-        <section class="design-block">
-          <h2 class="design-heading">Memory architecture</h2>
-          <p class="design-intro">People leave stories, audio, memorials, journals, evolving timelines attached to real spaces.</p>
-          <p class="design-kicker">The object becomes a persistent memory address in reality.</p>
-        </section>
-
-        <section class="design-block">
-          <h2 class="design-heading">Physical software objects</h2>
-          <p class="design-intro">
-            Stickers, cards, posters, clothing, objects as deployable software entities.
-          </p>
-          <p class="design-kicker">Printing becomes deployment. Programmable physical references.</p>
-          <p class="design-intro design-intro-muted">
-            That is much bigger than QR code tooling.
-          </p>
-        </section>
+        <nav class="dock" aria-label="Actions">
+          <a class="dock-btn dock-btn-primary" href="/create/">Create a live object</a>
+          <a class="dock-btn" href="/">Back to landing</a>
+        </nav>
 
         <section class="group">
-          <ul class="list">
+          <ul class="list list-compact">
             <li class="list-row list-action">
               <a href="/research-directions.html">
-                <span class="list-icon list-icon-tone-slate" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M18 12h4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
                 </span>
                 <span class="list-content">
                   <span class="list-title">Research directions</span>
                   <span class="list-sub">NFC, mesh, Humanity node</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li class="list-row list-action">
-              <a href="/">
-                <span class="list-icon list-icon-tone-red" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Back to landing</span>
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </a>
