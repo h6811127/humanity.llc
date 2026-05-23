@@ -39,7 +39,7 @@ Do these **in order**. Each step has an exit test before moving on.
 - [ ] iPhone Safari: bearer visible on first screen after redeploy
 - [x] Copy matches: *This QR resolves to a Humanity Card. It does not prove the person holding this item is the card owner.*
 
-**Note:** Mobile layout hides long `pass-scan-url` under 430px so the banner + card foot stay in the first viewport.
+**Note:** Full Level 0 bearer copy appears **once** (`scan-bearer-banner`). Card foot and list rows use shorter lines only.
 
 ---
 

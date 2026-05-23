@@ -76,7 +76,7 @@ After changing `scan-pass.css` or `pass-flip.js`, run `npm run worker:bundle-sca
 | Live control | — | Group: not shown / proven (M7) |
 | Limitations | Back face summary | Group: not ID, no analytics, data policy link |
 
-Required bearer copy (printed-item scans) appears in **This QR** group and card foot.
+**Bearer (Level 0):** full canonical sentence **once** in `scan-bearer-banner` above the pass card (M3.3). Card foot is a short operational line only. Trust groups use scoped “does not prove” bullets without repeating the full sentence.
 
 ---
 

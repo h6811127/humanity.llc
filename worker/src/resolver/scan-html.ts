@@ -339,7 +339,7 @@ function cardGroupRows(vm: ScanViewModel): string {
       "people",
       "orange",
       "Does not prove",
-      "Legal identity or that the person holding this item owns the card"
+      "Government ID, KYC, age, or employment eligibility"
     )
   );
   return rows.join("\n");
@@ -378,14 +378,6 @@ function qrGroupRows(vm: ScanViewModel): string {
   if (vm.scanUrl) {
     rows.push(listRow("link", "red", "Scan link", vm.scanUrl));
   }
-  rows.push(
-    listRow(
-      "warning",
-      "orange",
-      "Bearer warning",
-      "This QR resolves to a Humanity Card. It does not prove the person holding this item is the card owner."
-    )
-  );
   return rows.join("\n");
 }
 
@@ -483,7 +475,7 @@ function renderFooter(vm: ScanViewModel, origin: string): string {
 }
 
 function bearerFoot(): string {
-  return BEARER_WARNING;
+  return "Live resolver state at scan time. See limits above.";
 }
 
 function scanLead(vm: ScanViewModel): string {

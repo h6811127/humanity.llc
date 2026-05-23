@@ -104,6 +104,9 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("QR active");
     expect(html).toContain("scan-bearer-banner");
     expect(html).toContain(BEARER_WARNING);
+    expect(html).toContain("Live resolver state at scan time");
+    const bearerCount = html.split(BEARER_WARNING).length - 1;
+    expect(bearerCount).toBe(1);
     expect(html).toContain('class="pass-dot"');
     expect(html).toContain("pass-qr-slot");
     expect(html).toContain(`q=${QR}`);

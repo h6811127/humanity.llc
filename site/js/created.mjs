@@ -1,4 +1,4 @@
-import { BEARER_WARNING, getCardJsonUrl, qrScanUrl, resolverApiOrigin } from "./hc-sign.mjs";
+import { getCardJsonUrl, qrScanUrl, resolverApiOrigin } from "./hc-sign.mjs";
 import { initOwnerRevoke } from "./created-revoke.mjs";
 
 const params = new URLSearchParams(location.search);
@@ -106,7 +106,8 @@ if (scanUrl) {
 
 const bearerHint = document.getElementById("created-bearer-hint");
 if (bearerHint) {
-  bearerHint.textContent = BEARER_WARNING;
+  bearerHint.textContent =
+    "This link is your live scan URL. It does not prove who holds a printed copy; the scan page states that clearly.";
 }
 
 if (profileId && qrId) {
