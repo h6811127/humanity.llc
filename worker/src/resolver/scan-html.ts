@@ -1,5 +1,6 @@
 import type { ScanViewModel } from "./scan-state";
 import { scanListIcon, type ScanIconId } from "./scan-icons";
+import { BEARER_WARNING } from "./trust-copy";
 import { SCAN_PASS_FLIP_JS } from "./scan-pass-flip";
 import { SCAN_PASS_CSS } from "./scan-pass-styles";
 import { renderScanQrMarkup } from "./scan-qr";
@@ -41,6 +42,7 @@ export async function renderScanPage(
     ${renderTopHeader(origin)}
     <main class="screen scan-screen">
       <p class="section-kicker">Live resolver · scan time</p>
+      ${renderBearerBanner()}
       ${renderPassSection(vm, origin, qrMarkup)}
       ${renderTrustGroups(vm, origin)}
       ${renderFooter(vm, origin)}
@@ -71,6 +73,13 @@ if (slot && !slot.querySelector("svg") && slot.dataset.scanUrl) {
   renderQrToImage(img, slot.dataset.scanUrl).catch(function () {});
 }
 </script>`;
+}
+
+/** M3.3 — bearer warning above the fold before the pass card. */
+function renderBearerBanner(): string {
+  return `<aside class="scan-bearer-banner" role="note" aria-label="Scan limits">
+  <p>${escapeHtml(BEARER_WARNING)}</p>
+</aside>`;
 }
 
 function renderTopHeader(origin: string): string {
@@ -474,7 +483,7 @@ function renderFooter(vm: ScanViewModel, origin: string): string {
 }
 
 function bearerFoot(): string {
-  return "Scan shows live state. Holding the object does not prove ownership.";
+  return BEARER_WARNING;
 }
 
 function scanLead(vm: ScanViewModel): string {

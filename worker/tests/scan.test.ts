@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { ScanContext } from "../src/db/scan";
 import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
 import { renderScanPage } from "../src/resolver/scan-html";
+import { BEARER_WARNING } from "../src/resolver/trust-copy";
 import { buildScanViewModel } from "../src/resolver/scan-state";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
@@ -101,7 +102,8 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("@river_example");
     expect(html).toContain("Card active");
     expect(html).toContain("QR active");
-    expect(html).toContain("Holding the object does not prove ownership");
+    expect(html).toContain("scan-bearer-banner");
+    expect(html).toContain(BEARER_WARNING);
     expect(html).toContain('class="pass-dot"');
     expect(html).toContain("pass-qr-slot");
     expect(html).toContain(`q=${QR}`);

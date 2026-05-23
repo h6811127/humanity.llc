@@ -19,6 +19,26 @@ export type ScanPageKind =
 
 export type StatusTone = "live" | "warn" | "bad" | "neutral";
 
+/** HTTP status for scan HTML + status JSON (Technical Standards §9.5). */
+export function httpStatusForScanKind(kind: ScanPageKind): number {
+  switch (kind) {
+    case "unknown_profile":
+    case "unknown_qr":
+      return 404;
+    case "malformed":
+    case "profile_qr_mismatch":
+      return 400;
+    case "card_revoked":
+      return 410;
+    default:
+      return 200;
+  }
+}
+
+export const CACHE_ACTIVE =
+  "public, max-age=300, stale-while-revalidate=3600";
+export const CACHE_INACTIVE = "public, max-age=60";
+
 export interface ScanViewModel {
   kind: ScanPageKind;
   profileId: string | null;
@@ -183,6 +203,62 @@ export function malformedScanView(
   return malformedView(profileId, qrId, origin);
 }
 
+/**
+ * Card-level scan status without ?q= (M3.4 status JSON, no QR artifact block).
+ */
+export function buildCardOnlyScanViewModel(
+  profileId: string,
+  card: ScanContext["card"],
+  verification: ScanContext["verification"],
+  origin: string = "https://humanity.llc"
+): ScanViewModel {
+  if (!card) {
+    return baseView(
+      {
+        kind: "unknown_profile",
+        profileId,
+        qrId: null,
+        primaryBadge: { label: "Unknown card", tone: "neutral" },
+        showCardBlock: true,
+        showHumanTrustBlock: false,
+        showArtifactBlock: false,
+        verificationLabel: "Unknown",
+        verificationState: "unknown",
+      },
+      origin
+    );
+  }
+
+  let kind: ScanPageKind = "active";
+  let badge = { label: "Active", tone: "live" as StatusTone };
+
+  if (card.status === "revoked") {
+    kind = "card_revoked";
+    badge = { label: "Card revoked", tone: "bad" };
+  } else if (card.status === "suspended") {
+    kind = "card_suspended";
+    badge = { label: "Suspended", tone: "warn" };
+  } else if (card.status === "expired") {
+    kind = "card_expired";
+    badge = { label: "Card expired", tone: "warn" };
+  }
+
+  return baseView(
+    {
+      kind,
+      profileId,
+      qrId: null,
+      card,
+      verification,
+      primaryBadge: badge,
+      showCardBlock: true,
+      showHumanTrustBlock: true,
+      showArtifactBlock: false,
+    },
+    origin
+  );
+}
+
 function statusView(
   kind: ScanPageKind,
   card: ScanContext["card"] & object,
@@ -279,8 +355,6 @@ function baseView(input: BaseViewInput, origin: string): ScanViewModel {
     liveControlAvailable: false,
     primaryBadge: input.primaryBadge,
     scanUrl: resolveScanUrl(origin, input.profileId, input.qrId, qr?.payload),
-    cacheControl: isHealthy
-      ? "public, max-age=300, stale-while-revalidate=60"
-      : "public, max-age=60",
+    cacheControl: isHealthy ? CACHE_ACTIVE : CACHE_INACTIVE,
   };
 }

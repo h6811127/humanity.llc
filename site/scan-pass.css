@@ -439,6 +439,33 @@ a {
   gap: 16px;
 }
 
+/* M3.3 — above-the-fold bearer (iPhone Safari first screen) */
+.scan-bearer-banner {
+  margin: 0 0 4px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(219, 27, 67, 0.06);
+  border: 1px solid rgba(219, 27, 67, 0.22);
+}
+
+.scan-bearer-banner p {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--black);
+  margin: 0;
+}
+
+@media (max-width: 430px) {
+  .scan-page .pass-scan-url {
+    display: none;
+  }
+
+  .scan-page .pass-foot {
+    font-size: 11px;
+  }
+}
+
 .pass-scan-url {
   margin: 6px 0 4px;
   font-size: 9px;

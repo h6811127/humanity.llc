@@ -8,6 +8,11 @@ import canonicalize from "https://esm.sh/canonicalize@2.1.0";
 const PROTOCOL_VERSION = "1.0";
 const SIGNATURE_ALG = "Ed25519";
 const CANONICALIZATION = "JCS";
+const PAYLOAD_TYPE_REVOCATION = "revocation";
+
+/** Level 0 bearer copy (V1_PRODUCT_TRUST_MODEL.md) — keep in sync with worker trust-copy.ts */
+export const BEARER_WARNING =
+  "This QR resolves to a Humanity Card. It does not prove the person holding this item is the card owner.";
 const BASE58 =
   "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
@@ -44,6 +49,19 @@ export function generateProfileId() {
 
 export function generateQrId() {
   return `qr_${randomBase58(16)}`;
+}
+
+/** Revocation nonce (Technical Standards §10.1). */
+export function generateRevocationNonce() {
+  return `nonce_${randomBase58(16)}`;
+}
+
+export function encodePrivateKeyBase58(privateKey) {
+  return encodeBase58(privateKey);
+}
+
+export function decodePrivateKeyBase58(privateKeyBase58) {
+  return decodeBase58(privateKeyBase58);
 }
 
 function requireFields(unsigned) {
@@ -114,6 +132,22 @@ export function postCardsUrl() {
   return new URL("/.well-known/hc/v1/cards", resolverApiOrigin()).href;
 }
 
+export function postRevokeUrl(profileId) {
+  return new URL(
+    `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/revoke`,
+    resolverApiOrigin()
+  ).href;
+}
+
+export function getCardStatusUrl(profileId, qrId = null) {
+  const url = new URL(
+    `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/status`,
+    resolverApiOrigin()
+  );
+  if (qrId) url.searchParams.set("q", qrId);
+  return url.href;
+}
+
 export function getCardJsonUrl(profileId) {
   return new URL(
     `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}`,
@@ -129,4 +163,32 @@ export function defaultQrExpiry(issuedAt) {
   const d = new Date(issuedAt);
   d.setUTCFullYear(d.getUTCFullYear() + 1);
   return d.toISOString();
+}
+
+/**
+ * Owner-signed revocation (POST /.well-known/hc/v1/cards/{profile_id}/revoke).
+ * @param {{ profileId: string, targetKind: 'card'|'qr_credential', targetQrId?: string|null, privateKeyBase58: string, publicKeyBase58: string }} opts
+ */
+export async function signRevocation({
+  profileId,
+  targetKind,
+  targetQrId = null,
+  privateKeyBase58,
+  publicKeyBase58,
+}) {
+  const privateKey = decodePrivateKeyBase58(privateKeyBase58);
+  const revokedAt = new Date().toISOString();
+  const payload = {
+    profile_id: profileId,
+    target_kind: targetKind,
+    reason: "owner_revoked",
+    revoked_at: revokedAt,
+    nonce: generateRevocationNonce(),
+  };
+  if (targetKind === "qr_credential") {
+    if (!targetQrId) throw new Error("target_qr_id required for QR revocation.");
+    payload.target_qr_id = targetQrId;
+  }
+  const unsigned = withProtocolFields(payload, PAYLOAD_TYPE_REVOCATION);
+  return signDocument(unsigned, privateKey, publicKeyBase58);
 }

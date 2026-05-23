@@ -76,11 +76,50 @@ npm run worker:migrate:remote
 
 ## Deploy (step 1.4+)
 
+### Cloudflare API token (local deploy)
+
+Wrangler reads **`CLOUDFLARE_API_TOKEN`** from your environment (not committed to git).
+
+1. Cloudflare Dashboard → **My Profile** → **API Tokens** → **Create Token**
+2. Use template **Edit Cloudflare Workers** (includes Worker deploy + D1)
+3. Export before deploy:
+
+```bash
+export CLOUDFLARE_API_TOKEN="your_token_here"
+npm run worker:deploy
+```
+
+Optional: copy `worker/.env.example` to **repo root** `.env` and load it (`set -a; source .env; set +a`) — keep `.env` in `.gitignore`.
+
+**Alternative:** `npx wrangler login` (browser OAuth) — no API token file needed for interactive deploys.
+
+**CI:** GitHub Actions uses repository secret `CLOUDFLARE_API_TOKEN` (see `.github/workflows/deploy-worker.yml`).
+
+### Deploy command
+
 ```bash
 npm run worker:deploy
 ```
 
 Configure `[[routes]]` in `wrangler.toml` for `humanity.llc` before production traffic.
+
+### Verify status JSON (M3.4)
+
+`malformed` means the **IDs in the URL** failed validation, not a bad API token. Use real values from `/created/` (not `{profile_id}` placeholders).
+
+- `profile_id`: 20–32 characters, base58 (no `0`, `O`, `I`, `l`)
+- `qr_id`: must start with `qr_` then base58
+
+```bash
+# Replace PROFILE and QR from your /created/ page or scan URL
+curl -s "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status?q=QR" | jq .
+```
+
+Card-only (no `?q=`):
+
+```bash
+curl -s "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status" | jq .scan.kind
+```
 
 ## Roadmap steps
 
@@ -106,8 +145,20 @@ npm run worker:dev
 - **Create UI:** https://humanity.llc/create/ (or Pages dev; API defaults to `http://127.0.0.1:8787` on localhost)
 - **POST** `/.well-known/hc/v1/cards` with `{ card, qr_credential }` signed documents
 - **GET** `/.well-known/hc/v1/cards/{profile_id}` — public card JSON
+- **GET** `/.well-known/hc/v1/cards/{profile_id}/status?q={qr_id}` — machine-readable scan state (M3.4)
+- **POST** `/.well-known/hc/v1/cards/{profile_id}/revoke` — owner-signed revocation (M4.1)
 
 After create, open `/created/` for scan link + QR image.
+
+### Revoke (M4.1)
+
+```bash
+# Body: { "revocation": <signed revocation document> }
+# Sign target_kind: "card" | "qr_credential", target_qr_id when revoking one QR
+curl -s -X POST "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/revoke" \
+  -H "Content-Type: application/json" \
+  -d '{"revocation":{...}}' | jq .
+```
 
 **Production:** run `npm run worker:migrate:remote` then `npm run worker:deploy`.
 

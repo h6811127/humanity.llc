@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Your card · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=25" />
+    <link rel="stylesheet" href="/styles.css?v=28" />
   </head>
   <body>
     <div class="page">
@@ -25,9 +25,9 @@
 
         <section class="group">
           <h2 class="group-label">Scan URL</h2>
-          <p class="form-hint">
-            This QR points at your card. It does not prove the holder owns the card until
-            live control exists (M7).
+          <p class="form-hint" id="created-bearer-hint">
+            This QR points at your live card on the resolver. It does not prove the person
+            holding a printed copy owns the card.
           </p>
           <div class="qr-box">
             <img id="qr-img" width="200" height="200" alt="" />
@@ -71,6 +71,54 @@
           </p>
         </section>
 
+        <section class="group owner-controls" id="owner-controls" hidden>
+          <h2 class="group-label">Owner controls</h2>
+          <p class="form-hint">
+            Revocation updates what scanners see (usually within a minute). Your signing key
+            stays in this browser tab only; we never upload it.
+          </p>
+          <p class="owner-live-status" id="owner-live-status" aria-live="polite"></p>
+          <p class="form-warning owner-revoked-banner" id="owner-revoked-banner" hidden></p>
+          <p class="form-hint" id="owner-no-key" hidden>
+            Revoke needs the same browser session as create. Keys are not stored after you
+            close this tab. Create again on
+            <a href="/create/">/create/</a> to revoke from this device, or use a signed
+            revocation via API.
+          </p>
+
+          <div class="revoke-panel" id="revoke-qr-panel">
+            <h3 class="revoke-title">Revoke this scan QR</h3>
+            <p class="form-hint">
+              Stops this QR from resolving as active. Use when a sticker or link was lost or
+              copied. Does not delete your card record.
+            </p>
+            <label class="revoke-confirm">
+              <input type="checkbox" id="confirm-revoke-qr" />
+              <span>I understand scans will show this QR as revoked.</span>
+            </label>
+            <button type="button" class="btn-danger" id="revoke-qr-btn" disabled>
+              Revoke this QR
+            </button>
+          </div>
+
+          <div class="revoke-panel revoke-panel-severe" id="revoke-card-panel">
+            <h3 class="revoke-title">Revoke entire card</h3>
+            <p class="form-hint">
+              Revokes the card and active QRs on the resolver. Public JSON returns 410. Use if
+              your signing key may be compromised.
+            </p>
+            <label class="revoke-confirm">
+              <input type="checkbox" id="confirm-revoke-card" />
+              <span>I understand this card will show as revoked everywhere.</span>
+            </label>
+            <button type="button" class="btn-danger btn-danger-solid" id="revoke-card-btn" disabled>
+              Revoke entire card
+            </button>
+          </div>
+
+          <p class="form-status" id="revoke-status" hidden></p>
+        </section>
+
         <p class="form-warning" id="created-error" hidden></p>
 
         <p class="form-warning" id="no-session" hidden>
@@ -79,6 +127,6 @@
         </p>
       </main>
     </div>
-    <script type="module" src="/js/created.mjs?v=4"></script>
+    <script type="module" src="/js/created.mjs?v=5"></script>
   </body>
 </html>

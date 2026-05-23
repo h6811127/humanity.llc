@@ -1,4 +1,5 @@
-import { getCardJsonUrl, qrScanUrl, resolverApiOrigin } from "./hc-sign.mjs";
+import { BEARER_WARNING, getCardJsonUrl, qrScanUrl, resolverApiOrigin } from "./hc-sign.mjs";
+import { initOwnerRevoke } from "./created-revoke.mjs";
 
 const params = new URLSearchParams(location.search);
 const profileIdParam = params.get("profile_id")?.trim() || null;
@@ -12,13 +13,20 @@ function showError(msg) {
   errorEl.textContent = msg;
 }
 
-let data = null;
-try {
-  const raw = sessionStorage.getItem("hc_created");
-  if (raw) data = JSON.parse(raw);
-} catch {
-  data = null;
+function loadSession() {
+  try {
+    const raw = sessionStorage.getItem("hc_created");
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
 }
+
+function saveSession(next) {
+  sessionStorage.setItem("hc_created", JSON.stringify(next));
+}
+
+let data = loadSession();
 
 const apiOrigin = resolverApiOrigin();
 const scanOrigin =
@@ -94,4 +102,22 @@ if (scanUrl) {
   copyBtn.disabled = true;
   scanUrlEl.textContent =
     "Scan link unavailable. Finish create on /create/ and wait for the redirect, or open a URL with profile_id and qr_id.";
+}
+
+const bearerHint = document.getElementById("created-bearer-hint");
+if (bearerHint) {
+  bearerHint.textContent = BEARER_WARNING;
+}
+
+if (profileId && qrId) {
+  initOwnerRevoke({
+    profileId,
+    qrId,
+    scanUrl,
+    ownerPrivateKeyB58: data?.owner_private_key_b58 ?? null,
+    ownerPublicKeyB58: data?.owner_public_key_b58 ?? null,
+    getSession: loadSession,
+    setSession: saveSession,
+    showError,
+  });
 }

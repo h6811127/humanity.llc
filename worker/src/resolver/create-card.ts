@@ -229,12 +229,23 @@ export async function handleGetCard(
   }
 
   const row = await db
-    .prepare(`SELECT card_document_json FROM cards WHERE profile_id = ?`)
+    .prepare(
+      `SELECT card_document_json, status FROM cards WHERE profile_id = ?`
+    )
     .bind(profileId)
-    .first<{ card_document_json: string }>();
+    .first<{ card_document_json: string; status: string }>();
 
   if (!row) {
     return errorResponse("NOT_FOUND", "Card not found.", 404);
+  }
+
+  if (row.status === "revoked") {
+    return errorResponse(
+      "CARD_REVOKED",
+      "This card has been revoked.",
+      410,
+      { "Cache-Control": "public, max-age=60" }
+    );
   }
 
   const accept = request.headers.get("Accept") ?? "";
@@ -245,7 +256,7 @@ export async function handleGetCard(
         status: 200,
         headers: {
           "Content-Type": "text/html; charset=utf-8",
-          "Cache-Control": "public, max-age=60",
+          "Cache-Control": "public, max-age=300, stale-while-revalidate=3600",
         },
       }
     );
@@ -255,7 +266,7 @@ export async function handleGetCard(
     status: 200,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "public, max-age=60",
+      "Cache-Control": "public, max-age=300, stale-while-revalidate=3600",
     },
   });
 }

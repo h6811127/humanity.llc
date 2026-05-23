@@ -1394,6 +1394,77 @@ a {
   cursor: pointer;
 }
 
+.owner-controls {
+  margin-top: 8px;
+}
+
+.owner-live-status {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 8px 0 12px;
+}
+
+.owner-revoked-banner {
+  margin-bottom: 12px;
+}
+
+.revoke-panel {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--white);
+}
+
+.revoke-panel-severe {
+  border-color: rgba(219, 27, 67, 0.35);
+  background: rgba(219, 27, 67, 0.04);
+}
+
+.revoke-title {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.revoke-confirm {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 12px 0;
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.revoke-confirm input {
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.btn-danger {
+  width: 100%;
+  margin-top: 4px;
+  padding: 14px 18px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--red);
+  background: var(--white);
+  border: 1px solid var(--red);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.btn-danger:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-danger-solid {
+  color: var(--white);
+  background: var(--red);
+}
+
 .block-link {
   text-align: center;
   margin-top: 12px;

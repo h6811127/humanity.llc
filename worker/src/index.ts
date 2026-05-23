@@ -14,7 +14,9 @@ import {
   withCors,
 } from "./http/resolver";
 import { handleGetCard, handlePostCards } from "./resolver/create-card";
+import { handlePostRevoke } from "./resolver/revoke";
 import { handleGetScan } from "./resolver/scan";
+import { handleGetScanStatus } from "./resolver/scan-status";
 
 export interface Env {
   DB: D1Database;
@@ -48,6 +50,30 @@ export default {
         );
       }
       const res = await handlePostCards(request, env.DB);
+      return withCors(request, res);
+    }
+
+    const statusMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/status$/
+    );
+    if (statusMatch && request.method === "GET") {
+      if (!env.DB) {
+        return jsonResponse({ error: "database_unconfigured" }, 503);
+      }
+      return handleGetScanStatus(request, env.DB, statusMatch[1]!);
+    }
+
+    const revokeMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/revoke$/
+    );
+    if (revokeMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostRevoke(request, env.DB, revokeMatch[1]!);
       return withCors(request, res);
     }
 

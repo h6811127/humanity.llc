@@ -80,6 +80,23 @@ Required bearer copy (printed-item scans) appears in **This QR** group and card 
 
 ---
 
+## Machine-readable status (M3.4)
+
+`GET /.well-known/hc/v1/cards/{profile_id}/status`
+
+| Query | Behavior |
+|-------|----------|
+| `?q={qr_id}` | Same trust state as `GET /c/{profile_id}?q={qr_id}` (`buildScanViewModel`) |
+| (none) | Card-level status only; no QR artifact fields |
+
+Implementation: `worker/src/resolver/scan-status.ts`. HTTP status codes match scan HTML (`404` unknown, `400` malformed/mismatch, `410` card revoked). `Cache-Control` matches the scan view model.
+
+```bash
+curl -s "https://humanity.llc/.well-known/hc/v1/cards/{profile_id}/status?q={qr_id}" | jq .scan.kind
+```
+
+---
+
 ## Deploy
 
 ```bash

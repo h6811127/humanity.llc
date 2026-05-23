@@ -5,6 +5,7 @@ import { renderScanPage, SCAN_UI_VERSION } from "./scan-html";
 import { scanQrDataUrl } from "./scan-qr";
 import {
   buildScanViewModel,
+  httpStatusForScanKind,
   malformedScanView,
   QR_ID_REGEX,
 } from "./scan-state";
@@ -46,16 +47,7 @@ export async function handleGetScan(
   const ctx = await loadScanContext(env, profileId, qrId);
   const vm = buildScanViewModel(profileId, qrId, ctx, origin);
 
-  const status =
-    vm.kind === "active"
-      ? 200
-      : vm.kind === "unknown_profile" || vm.kind === "unknown_qr"
-        ? 404
-        : vm.kind === "profile_qr_mismatch" || vm.kind === "malformed"
-          ? 400
-          : 200;
-
-  return htmlResponse(await renderScanPage(vm, origin), status, {
+  return htmlResponse(await renderScanPage(vm, origin), httpStatusForScanKind(vm.kind), {
     "Cache-Control": vm.cacheControl,
     "X-HC-Scan-UI": SCAN_UI_VERSION,
   });

@@ -1,5 +1,6 @@
 import {
   defaultQrExpiry,
+  encodePrivateKeyBase58,
   generateKeypair,
   generateProfileId,
   generateQrId,
@@ -109,6 +110,8 @@ form?.addEventListener("submit", async (e) => {
       JSON.stringify({
         ...data,
         manifesto_line: manifesto,
+        owner_public_key_b58: publicKeyBase58,
+        owner_private_key_b58: encodePrivateKeyBase58(privateKey),
         private_key_warning: true,
       })
     );
