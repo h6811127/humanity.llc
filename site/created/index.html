@@ -131,7 +131,7 @@
             <div id="revoke-actions" hidden>
               <p class="form-hint revoke-id-warning">
                 The QR code still contains its QR ID and profile ID in the URL. Revoking
-                changes live status on the resolver, not the physical sticker or photo.
+                changes live network status, not the physical sticker or photo.
               </p>
               <label class="revoke-confirm">
                 <input type="checkbox" id="confirm-revoke-qr" />
@@ -175,7 +175,7 @@
             <div class="settings-panel">
               <p>
                 Your card is controlled by a <strong>private signing key</strong> generated in this
-                browser. It never uploads to humanity.llc. The resolver only sees
+                browser. It never uploads to humanity.llc. The network only sees
                 <strong>signed</strong> actions (like revoke).
               </p>
               <ul class="settings-list">
@@ -289,13 +289,13 @@
             </div>
           </details>
 
-          <details class="settings-disclosure settings-disclosure-info" id="resolver-details">
+          <details class="settings-disclosure settings-disclosure-info" id="network-details">
             <summary class="settings-summary">
               <span class="list-icon list-icon-tone-green" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
               </span>
               <span class="settings-summary-text">
-                <span class="settings-summary-title">On resolver</span>
+                <span class="settings-summary-title">On network</span>
                 <span class="settings-summary-sub">Status · profile ID · JSON</span>
               </span>
               <span class="list-chevron" aria-hidden="true">›</span>
@@ -304,8 +304,8 @@
               <ul class="list list-compact">
                 <li class="list-row">
                   <span class="list-content">
-                    <span class="list-title">Card on resolver</span>
-                    <span class="list-sub" id="resolver-card-status">Active</span>
+                    <span class="list-title">Card on network</span>
+                    <span class="list-sub" id="network-card-status">Active</span>
                   </span>
                 </li>
                 <li class="list-row">
@@ -324,7 +324,7 @@
                   <a id="card-json-link" href="#" target="_blank" rel="noopener noreferrer">
                     <span class="list-content">
                       <span class="list-title">Public JSON</span>
-                      <span class="list-sub">Signed card on resolver</span>
+                      <span class="list-sub">Signed card on network</span>
                     </span>
                     <span class="list-chevron" aria-hidden="true">›</span>
                   </a>

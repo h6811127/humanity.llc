@@ -68,7 +68,7 @@ export function initOwnerRevoke(ctx) {
     if (revokeActions) revokeActions.hidden = true;
     if (liveStatusEl) {
       liveStatusEl.textContent =
-        kind === "card" ? "Resolver: card disabled" : "Resolver: QR revoked";
+        kind === "card" ? "Network: card disabled" : "Network: QR revoked";
     }
   }
 
@@ -81,24 +81,24 @@ export function initOwnerRevoke(ctx) {
 
   async function refreshLiveStatus() {
     if (!liveStatusEl || !ctx.profileId || !ctx.qrId) return;
-    liveStatusEl.textContent = "Checking resolver…";
+    liveStatusEl.textContent = "Checking network status…";
     try {
       const res = await fetch(getCardStatusUrl(ctx.profileId, ctx.qrId));
       const body = await res.json();
       const kind = body?.scan?.kind ?? "unknown";
       if (kind === "active") {
-        liveStatusEl.textContent = "Resolver: active";
+        liveStatusEl.textContent = "Network: active";
       } else if (kind === "qr_revoked") {
-        liveStatusEl.textContent = "Resolver: QR revoked";
+        liveStatusEl.textContent = "Network: QR revoked";
         showRevokedUi("qr_credential");
       } else if (kind === "card_revoked") {
-        liveStatusEl.textContent = "Resolver: card disabled";
+        liveStatusEl.textContent = "Network: card disabled";
         showRevokedUi("card");
       } else {
-        liveStatusEl.textContent = `Resolver: ${kind}`;
+        liveStatusEl.textContent = `Network: ${kind}`;
       }
     } catch {
-      liveStatusEl.textContent = "Could not reach resolver.";
+      liveStatusEl.textContent = "Could not reach the network.";
     }
   }
 

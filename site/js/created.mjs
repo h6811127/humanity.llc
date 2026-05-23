@@ -64,7 +64,7 @@ const copyBtn = document.getElementById("copy-scan");
 const openScanBtn = document.getElementById("open-scan");
 const profileIdEl = document.getElementById("profile-id");
 const cardStatusEl = document.getElementById("card-status");
-const resolverCardStatusEl = document.getElementById("resolver-card-status");
+const networkCardStatusEl = document.getElementById("network-card-status");
 const jsonLink = document.getElementById("card-json-link");
 const revokeDetails = document.getElementById("revoke-details");
 
@@ -99,9 +99,9 @@ if (data?.verification?.label) {
   cardStatusEl.textContent = "Registered";
 }
 
-if (resolverCardStatusEl) {
+if (networkCardStatusEl) {
   const cardState = data?.status || "active";
-  resolverCardStatusEl.textContent =
+  networkCardStatusEl.textContent =
     cardState.charAt(0).toUpperCase() + cardState.slice(1);
 }
 

@@ -41,7 +41,7 @@ export async function renderScanPage(
   <div class="page scan-page">
     ${renderTopHeader(origin)}
     <main class="screen scan-screen">
-      <p class="section-kicker">Live resolver · scan time</p>
+      <p class="section-kicker">Network status</p>
       ${renderPassSection(vm, origin, qrMarkup)}
       ${renderScanUrlControl(vm)}
       ${renderTrustGroups(vm, origin)}
@@ -225,7 +225,7 @@ function renderPassBack(origin: string): string {
     </div>
     <span class="pass-badge badge-neutral">Flip</span>
   </div>
-  <ul class="pass-back-grid" aria-label="Resolver facts">
+  <ul class="pass-back-grid" aria-label="Network facts">
     <li>
       <span class="pass-back-label">Live</span>
       <span class="pass-back-value">status from the operator, not a frozen page</span>
@@ -283,7 +283,7 @@ function renderTrustGroups(vm: ScanViewModel, origin: string): string {
     );
   }
 
-  return `<div class="scan-trust-groups" aria-label="Resolver status at scan time">
+  return `<div class="scan-trust-groups" aria-label="Network status at scan time">
 ${sections.join("\n")}
 </div>`;
 }
@@ -474,7 +474,7 @@ function renderFooter(vm: ScanViewModel, origin: string): string {
 function scanLead(vm: ScanViewModel): string {
   switch (vm.kind) {
     case "active":
-      return "Resolver returned current status for this card and QR.";
+      return "The network returned current status for this card and QR.";
     case "unknown_profile":
       return "No Humanity Card is registered for this link.";
     case "unknown_qr":
@@ -490,13 +490,13 @@ function scanLead(vm: ScanViewModel): string {
     case "card_expired":
       return "This card has expired.";
     case "qr_revoked":
-      return "Revoked by owner. Resolver status at scan time.";
+      return "Revoked by owner. Network status at scan time.";
     case "qr_expired":
       return "This QR credential has expired.";
     case "qr_replaced":
       return "This QR was replaced by a newer credential.";
     default:
-      return "Resolver status at scan time.";
+      return "Network status at scan time.";
   }
 }
 
