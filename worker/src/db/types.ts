@@ -45,6 +45,12 @@ export type VerificationMethod = (typeof VERIFICATION_METHODS)[number];
 export const REVOCATION_TARGET_KINDS = ["card", "qr_credential"] as const;
 export type RevocationTargetKind = (typeof REVOCATION_TARGET_KINDS)[number];
 
+export const VOUCH_METHODS = ["in_person"] as const;
+export type VouchMethod = (typeof VOUCH_METHODS)[number];
+
+export const VOUCH_STATUSES = ["active", "revoked"] as const;
+export type VouchStatus = (typeof VOUCH_STATUSES)[number];
+
 /** Default verification row created with a new card (M2). */
 export const DEFAULT_REGISTERED_SUMMARY = {
   state: "registered" as const,
@@ -110,4 +116,18 @@ export interface RevocationRow {
   appeal_deadline: string | null;
   issuer_public_key: string | null;
   created_at: string;
+}
+
+export interface VouchRow {
+  vouch_id: string;
+  voucher_profile_id: string;
+  vouchee_profile_id: string;
+  nonce: string;
+  statement: string;
+  method: VouchMethod;
+  status: VouchStatus;
+  signed_document_json: string;
+  issuer_public_key: string;
+  created_at: string;
+  revoked_at: string | null;
 }
