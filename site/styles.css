@@ -406,6 +406,111 @@ a {
   font-weight: 600;
 }
 
+.why-matters {
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--black);
+  padding: 16px 18px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(219, 27, 67, 0.22);
+  background: rgba(219, 27, 67, 0.05);
+}
+
+.qr-compare-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.qr-compare-col {
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.qr-compare-col-muted {
+  background: #f7f7f7;
+}
+
+.qr-compare-col-live {
+  background: var(--white);
+  border-color: rgba(219, 27, 67, 0.32);
+  box-shadow:
+    0 10px 32px rgba(219, 27, 67, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.qr-compare-heading {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--grey);
+  margin: 0 0 12px;
+}
+
+.qr-compare-col-live .qr-compare-heading {
+  color: var(--red);
+}
+
+.qr-compare-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--black);
+}
+
+.qr-compare-list li {
+  margin-bottom: 6px;
+}
+
+.qr-compare-list li:last-child {
+  margin-bottom: 0;
+}
+
+.qr-compare-cta {
+  display: flex;
+  margin-top: 14px;
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+
+.create-you-get {
+  list-style: none;
+  margin: -6px 0 0;
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #f9f9fb;
+}
+
+.create-you-get li {
+  position: relative;
+  padding-left: 22px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--black);
+  margin-bottom: 8px;
+}
+
+.create-you-get li:last-child {
+  margin-bottom: 0;
+}
+
+.create-you-get li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  transform: translateY(-50%);
+}
+
 /* Same idea elsewhere: mechanism list + tap / mesh carriers */
 .same-idea {
   margin-top: 4px;
@@ -1690,8 +1795,81 @@ a {
   line-height: 1.45;
 }
 
+.recovery-reveal-card {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(219, 27, 67, 0.35);
+  box-shadow:
+    0 12px 36px rgba(219, 27, 67, 0.12),
+    0 1px 4px rgba(0, 0, 0, 0.04);
+  background: var(--white);
+}
+
+.recovery-reveal-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px;
+  background: rgba(219, 27, 67, 0.1);
+  border-bottom: 1px solid rgba(219, 27, 67, 0.18);
+}
+
+.recovery-reveal-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--white);
+  color: var(--red);
+  border: 1px solid rgba(219, 27, 67, 0.25);
+}
+
+.recovery-reveal-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.recovery-reveal-heading {
+  flex: 1;
+  min-width: 0;
+}
+
+.recovery-reveal-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0;
+  color: var(--black);
+}
+
+.recovery-reveal-sub {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--grey);
+}
+
+.recovery-reveal-body {
+  padding: 16px 18px 18px;
+}
+
+.recovery-reveal-note {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--black);
+}
+
+.recovery-reveal-body .btn-secondary,
+.recovery-reveal-body .btn-primary {
+  width: 100%;
+}
+
 .recovery-key-display {
-  margin: 10px 0 12px;
+  margin: 0 0 12px;
   padding: 12px;
   font-size: 11px;
   line-height: 1.45;
@@ -1916,20 +2094,6 @@ a {
   font-size: 17px;
   line-height: 1.5;
   color: var(--black);
-}
-
-.created-what-now-more {
-  margin: 14px 0 0;
-  font-size: 15px;
-  line-height: 1.45;
-  color: var(--grey);
-}
-
-.created-what-now-more a {
-  font-weight: 600;
-  color: var(--red);
-  text-decoration: underline;
-  text-underline-offset: 2px;
 }
 
 #revoke-actions .btn-danger {

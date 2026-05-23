@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Your live object · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=37" />
+    <link rel="stylesheet" href="/styles.css?v=38" />
   </head>
   <body>
     <div class="page">
@@ -26,7 +26,7 @@
 
         <p class="created-primitive">
           This QR is not just a link. It resolves to <strong>current signed status</strong>
-          on the resolver: active, revoked, or disabled when someone scans.
+          on the network: active, revoked, or disabled when someone scans.
         </p>
 
         <section class="created-loop" aria-label="Try the loop">
@@ -69,7 +69,7 @@
             </a>
             <button type="button" class="btn-secondary" id="copy-scan">Copy scan link</button>
           </div>
-          <p class="mono-link mono-link-compact" id="scan-url"></p>
+          <p class="mono-link mono-link-compact" id="scan-url" hidden></p>
         </section>
 
         <section class="created-what-now" aria-labelledby="what-now-title">
@@ -78,27 +78,35 @@
             Print this QR. Put it on a notebook, sticker, card, door, flyer, wristband, or
             event pass. Scan it from another phone. Then revoke it and scan again.
           </p>
-          <p class="created-what-now-more">
-            <a href="/what-can-a-qr-do.html">What can a QR do?</a> — ideas for street games,
-            civic nodes, wearables, and more once your mark is live.
-          </p>
         </section>
 
-        <section class="group recovery-reveal" id="recovery-reveal" hidden>
-          <h2 class="group-label">Save recovery key (once)</h2>
-          <p class="group-intro short">
-            Store this somewhere safe (password manager, paper). If you lose this tab and skip
-            backup, it is the only way to revoke without creating a new card.
-          </p>
-          <p class="mono recovery-key-display" id="recovery-key-display"></p>
-          <button type="button" class="btn-secondary" id="copy-recovery-key">Copy recovery key</button>
-          <label class="revoke-confirm revoke-confirm-spaced">
-            <input type="checkbox" id="recovery-reveal-confirm" />
-            <span>I saved this recovery key</span>
-          </label>
-          <button type="button" class="btn-primary" id="recovery-reveal-dismiss" disabled>
-            Continue
-          </button>
+        <section class="recovery-reveal-card" id="recovery-reveal" hidden>
+          <div class="recovery-reveal-header">
+            <span class="recovery-reveal-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            </span>
+            <div class="recovery-reveal-heading">
+              <h2 class="recovery-reveal-title">Save your recovery key</h2>
+              <p class="recovery-reveal-sub">
+                One-time step. Store it in a password manager or on paper before you continue.
+              </p>
+            </div>
+          </div>
+          <div class="recovery-reveal-body">
+            <p class="recovery-reveal-note">
+              If you lose this tab and skip backup, this key is the only way to revoke without
+              creating a new card.
+            </p>
+            <p class="mono recovery-key-display" id="recovery-key-display"></p>
+            <button type="button" class="btn-secondary" id="copy-recovery-key">Copy recovery key</button>
+            <label class="revoke-confirm revoke-confirm-spaced">
+              <input type="checkbox" id="recovery-reveal-confirm" />
+              <span>I saved this recovery key</span>
+            </label>
+            <button type="button" class="btn-primary" id="recovery-reveal-dismiss" disabled>
+              Continue
+            </button>
+          </div>
         </section>
 
         <details class="settings-disclosure settings-disclosure-action" id="revoke-details">

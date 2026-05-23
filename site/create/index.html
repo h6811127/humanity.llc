@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Create card · humanity.llc</title>
+    <title>Create a live public card · humanity.llc</title>
     <meta
       name="description"
-      content="Create a signed Humanity Card. Your private key stays in this browser session only."
+      content="Create a QR-backed live object you can scan, verify, and revoke. Your private key stays in this browser session only."
     />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=36" />
+    <link rel="stylesheet" href="/styles.css?v=38" />
   </head>
   <body>
     <div class="page">
@@ -23,13 +23,23 @@
 
       <main class="screen">
         <section class="hero hero-compact">
-          <p class="hero-eyebrow">Try it</p>
-          <h1>Make a live object</h1>
+          <p class="hero-eyebrow">Create</p>
+          <h1>Create a live public card</h1>
           <p class="hero-line">
-            A QR that resolves to <strong>current</strong> signed status on the resolver,
-            not a frozen profile page. Keys stay in this browser tab until you back them up.
+            You&rsquo;ll get a <strong>QR-backed object</strong> that can be scanned, verified,
+            and revoked — not a frozen link that points forever.
+          </p>
+          <p class="hero-line hero-line-sub">
+            A handle, one public line, and a red QR ready to print. Keys stay in this tab until
+            you save a backup on the next screen.
           </p>
         </section>
+
+        <ul class="create-you-get" aria-label="What you get">
+          <li>Scan page with live active or revoked status</li>
+          <li>QR and link you can put on stickers, cards, or doors</li>
+          <li>Revoke from this browser when you are done testing</li>
+        </ul>
 
         <section class="create-demo-strip" aria-label="Demo">
           <a class="btn-secondary create-demo-link" href="/#card">See an example scan first</a>
@@ -78,7 +88,7 @@
             revoke. We cannot recover lost keys. Card creation does not verify legal identity.
           </p>
 
-          <button type="submit" class="btn-primary" id="submit">Create live object</button>
+          <button type="submit" class="btn-primary" id="submit">Create my live card</button>
           <p id="status" class="form-status" role="status"></p>
         </form>
       </main>

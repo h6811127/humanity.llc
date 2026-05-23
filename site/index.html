@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=36" />
+    <link rel="stylesheet" href="/styles.css?v=38" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -53,7 +53,39 @@
           <strong>dynamic</strong>. Objects can reflect that.
         </p>
 
-        <section class="pass" id="card" aria-label="Resolver preview">
+        <p class="why-matters">
+          Normal QR codes are permanent. Humanity live objects can be updated, revoked, or
+          limit what a physical object says after it&rsquo;s printed.
+        </p>
+
+        <section class="qr-compare" aria-labelledby="qr-compare-title">
+          <h2 class="group-label" id="qr-compare-title">Normal QR vs live object</h2>
+          <div class="qr-compare-grid">
+            <article class="qr-compare-col qr-compare-col-muted">
+              <h3 class="qr-compare-heading">Normal QR</h3>
+              <ul class="qr-compare-list">
+                <li>Prints once, points forever</li>
+                <li>Cannot be safely revoked</li>
+                <li>Stale when context changes</li>
+              </ul>
+            </article>
+            <article class="qr-compare-col qr-compare-col-live">
+              <h3 class="qr-compare-heading">Humanity live object</h3>
+              <ul class="qr-compare-list">
+                <li>Points to current state</li>
+                <li>Can be revoked</li>
+                <li>Can show limits at scan time</li>
+                <li>Can become membership, status, or proof</li>
+                <li>Can become physical infrastructure for a community</li>
+              </ul>
+              <a class="btn-secondary qr-compare-cta" href="/what-can-a-qr-do.html"
+                >What can a QR do?</a
+              >
+            </article>
+          </div>
+        </section>
+
+        <section class="pass" id="card" aria-label="Network status preview">
           <p class="section-kicker">What you see when someone scans</p>
           <div class="pass-scene" id="pass-scene">
             <div class="pass-tilt-wrap" id="pass-tilt-wrap">
@@ -140,7 +172,7 @@
           <h2 class="group-label">One use</h2>
           <p class="group-intro short">
             A status plate on a studio door. Someone scans for tonight’s hours, whether
-            the door is open, or when the run ends. The resolver answers. Not a dead link.
+            the door is open, or when the run ends. The network answers. Not a dead link.
           </p>
 
           <div class="flow-strip">
@@ -197,7 +229,7 @@
             <li class="model-connector" aria-hidden="true"></li>
             <li>
               <span class="model-icon" aria-hidden="true">↯</span>
-              <span class="model-text"><strong>Resolver</strong> returns signed status</span>
+              <span class="model-text"><strong>Network</strong> returns signed status</span>
             </li>
             <li class="model-connector" aria-hidden="true"></li>
             <li>
@@ -266,7 +298,7 @@
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
                 </span>
                 <span class="list-content">
-                  <span class="list-title">What the resolver stores</span>
+                  <span class="list-title">What the network stores</span>
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </a>
