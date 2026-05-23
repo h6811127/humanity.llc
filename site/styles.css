@@ -1918,6 +1918,20 @@ a {
   color: var(--black);
 }
 
+.created-what-now-more {
+  margin: 14px 0 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+.created-what-now-more a {
+  font-weight: 600;
+  color: var(--red);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 #revoke-actions .btn-danger {
   width: 100%;
 }
