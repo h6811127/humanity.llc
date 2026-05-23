@@ -181,7 +181,7 @@ describe("handlePostRevoke", () => {
     const { handlePostRevoke } = await import("../src/resolver/revoke");
     const owner = await getTestKeypair();
     const recovery = await getTestKeypair();
-    const qrId = "qr_recovery_revoke_test";
+    const qrId = "qr_7Xk9mP2nQ4rT6vW8yZ1aB3c";
     const nonce = `nonce_recovery_${Date.now()}`;
 
     const signed = await signDocument(

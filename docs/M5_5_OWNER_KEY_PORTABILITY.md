@@ -100,7 +100,7 @@ Separate threat model when **5.5.3–5.5.4** ship: one-time recovery code, recov
 
 - [x] `site/js/key-backup.mjs` + tests (`worker/tests/key-backup.test.ts`)
 - [x] Download UI on `/created/` when session has key
-- [ ] Copy warns: lose passphrase = lose backup; we cannot recover (in UI)
+- [x] Copy warns: lose passphrase = lose backup; we cannot recover (in UI)
 - [ ] Deploy Pages and verify download on production
 
 ### 5.5.2 — Import key on owner surface
@@ -115,14 +115,16 @@ Separate threat model when **5.5.3–5.5.4** ship: one-time recovery code, recov
 
 ### 5.5.3 — Recovery key at create (optional)
 
-**UI:** At create, optional “Generate recovery key” — show once (QR + copy), user confirms they saved it.
+**UI:** At create, optional “Generate recovery key” — show once (copy + confirm), user confirms they saved it.
 
-**Resolver:** Store only **recovery public key** on card row (migration) or in signed card document field; recovery revocations verified against recovery key per §10.1.
+**Resolver:** Store **recovery public key** on card row + in signed card document; recovery revocations verified per §10.1.
 
 **Exit:**
 
-- [ ] User can revoke with recovery-signed document if device key lost.
-- [ ] Device key alone cannot rotate recovery key without existing recovery or device key (document threat model in standards).
+- [x] Generate recovery key at create (default on) + one-time reveal on `/created/`
+- [x] Import recovery private key on `/created/` unlocks revoke
+- [x] Revoke API accepts recovery-signed document (`revoke.test.ts`)
+- [ ] Production: apply migration `0003_recovery_public_key.sql` + Worker deploy
 
 ### 5.5.4 — Wire recovery into revoke API
 
@@ -130,8 +132,8 @@ Separate threat model when **5.5.3–5.5.4** ship: one-time recovery code, recov
 
 **Exit:**
 
-- [ ] Fixture + test: revocation signed by recovery key updates status.
-- [ ] Invalid recovery signature → 401.
+- [x] Fixture + test: revocation signed by recovery key updates status.
+- [x] Invalid signing key → 401 (owner-only check extended to allowed keys).
 
 ### 5.5.5 — Copy, data policy, and threat model
 

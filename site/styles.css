@@ -1674,6 +1674,10 @@ a {
   margin-top: 14px;
 }
 
+#revoke-actions .btn-danger {
+  width: 100%;
+}
+
 .block-link {
   text-align: center;
   margin-top: 12px;
