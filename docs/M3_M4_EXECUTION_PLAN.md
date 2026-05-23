@@ -166,4 +166,4 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ## Current step
 
-**→ M4.2 manual test** — deploy Worker + Pages, run exit tests in `M4_CREATED_REVOKE_UI.md`. Then M5 stranger loop.
+**→ M5** — three stranger create/scan/revoke tests; landing “Building now” updated. Deploy Worker (`pass-v5` scan UI) + Pages.

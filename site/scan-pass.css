@@ -439,21 +439,118 @@ a {
   gap: 16px;
 }
 
-/* M3.3 — above-the-fold bearer (iPhone Safari first screen) */
-.scan-bearer-banner {
-  margin: 0 0 4px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: rgba(219, 27, 67, 0.06);
-  border: 1px solid rgba(219, 27, 67, 0.22);
-}
-
-.scan-bearer-banner p {
+/* M3.3 — one line above the card */
+.scan-bearer-line {
   font-size: 13px;
   font-weight: 500;
   line-height: 1.4;
+  color: var(--grey);
+  margin: 0 0 10px;
+}
+
+/* Settings-style limits disclosure (bottom of scan page) */
+.scan-limits-settings {
+  margin-top: 4px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #f7f7f7;
+  overflow: hidden;
+}
+
+.scan-limits-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  list-style: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.scan-limits-summary::-webkit-details-marker {
+  display: none;
+}
+
+.scan-limits-summary::marker {
+  content: "";
+}
+
+.scan-limits-summary .list-icon {
+  flex-shrink: 0;
+}
+
+.scan-limits-summary-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.scan-limits-summary-title {
+  font-size: 16px;
+  font-weight: 600;
   color: var(--black);
+}
+
+.scan-limits-summary-sub {
+  font-size: 13px;
+  color: var(--grey);
+  line-height: 1.35;
+}
+
+.scan-limits-summary .list-chevron {
+  flex-shrink: 0;
+  font-size: 20px;
+  color: var(--grey);
+  transition: transform 0.2s ease;
+}
+
+.scan-limits-settings[open] .list-chevron {
+  transform: rotate(90deg);
+}
+
+.scan-limits-panel {
+  padding: 0 14px 14px 52px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.scan-limits-lead {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--black);
+  margin: 12px 0 10px;
+}
+
+.scan-limits-list {
+  margin: 0 0 12px;
+  padding-left: 18px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--black);
+}
+
+.scan-limits-list li {
+  margin-bottom: 6px;
+}
+
+.scan-limits-meta {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--grey);
   margin: 0;
+}
+
+.scan-limits-meta a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.pass-foot-muted {
+  font-size: 10px;
+  color: var(--grey);
+  border-top: none;
+  padding-top: 4px;
 }
 
 @media (max-width: 430px) {

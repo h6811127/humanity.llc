@@ -6,7 +6,7 @@ import { SCAN_PASS_CSS } from "./scan-pass-styles";
 import { renderScanQrMarkup } from "./scan-qr";
 
 /** Response header — confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v4";
+export const SCAN_UI_VERSION = "pass-v5";
 
 /**
  * Public scan UI — flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -42,9 +42,9 @@ export async function renderScanPage(
     ${renderTopHeader(origin)}
     <main class="screen scan-screen">
       <p class="section-kicker">Live resolver · scan time</p>
-      ${renderBearerBanner()}
       ${renderPassSection(vm, origin, qrMarkup)}
       ${renderTrustGroups(vm, origin)}
+      ${renderLimitsSettings(origin)}
       ${renderFooter(vm, origin)}
     </main>
   </div>
@@ -75,11 +75,9 @@ if (slot && !slot.querySelector("svg") && slot.dataset.scanUrl) {
 </script>`;
 }
 
-/** M3.3 — bearer warning above the fold before the pass card. */
-function renderBearerBanner(): string {
-  return `<aside class="scan-bearer-banner" role="note" aria-label="Scan limits">
-  <p>${escapeHtml(BEARER_WARNING)}</p>
-</aside>`;
+/** M3.3 — one line above the card (full detail in limits settings below). */
+function renderBearerLine(): string {
+  return `<p class="scan-bearer-line" role="note">${escapeHtml(BEARER_WARNING)}</p>`;
 }
 
 function renderTopHeader(origin: string): string {
@@ -100,7 +98,8 @@ function renderPassSection(
   const frontBody = renderPassFront(vm, badgeClass, qrMarkup);
   const backBody = renderPassBack(origin);
 
-  return `<section class="pass" aria-label="Humanity Card at scan time">
+  return `${renderBearerLine()}
+<section class="pass" aria-label="Humanity Card at scan time">
   <div class="pass-scene" id="pass-scene">
     <div class="pass-tilt-wrap" id="pass-tilt-wrap">
       <div class="pass-flip" id="pass-flip">
@@ -143,8 +142,7 @@ function renderPassFront(
 </div>
 <p class="pass-type">Scan result</p>
 <h1 class="pass-name">${escapeHtml(vm.primaryBadge.label)}</h1>
-<p class="pass-manifesto">${escapeHtml(scanLead(vm))}</p>
-<p class="pass-foot">${escapeHtml(bearerFoot())}</p>`;
+<p class="pass-manifesto">${escapeHtml(scanLead(vm))}</p>`;
   }
 
   const handle = vm.handle ? `@${escapeHtml(vm.handle)}` : "Unknown card";
@@ -179,38 +177,31 @@ function renderPassFront(
   </div>
   ${qrBlock}
 </div>
-${scanUrlLine}
-<p class="pass-foot">${escapeHtml(bearerFoot())}</p>`;
+${scanUrlLine}`;
 }
 
-/** Back matches landing preview — short limits only (details live below the card). */
+/** Back — status hints only; limits live in settings row below the card. */
 function renderPassBack(origin: string): string {
   return `<div class="pass-back-accent" aria-hidden="true"></div>
 <div class="pass-back-inner">
   <div class="pass-head">
     <div class="pass-brand">
       <span class="pass-dot" aria-hidden="true"></span>
-      <span>Limits</span>
+      <span>At scan time</span>
     </div>
-    <span class="pass-badge badge-neutral">Optional</span>
+    <span class="pass-badge badge-neutral">Flip</span>
   </div>
-  <ul class="pass-back-grid" aria-label="Privacy posture">
+  <ul class="pass-back-grid" aria-label="Resolver facts">
     <li>
-      <span class="pass-back-label">Bearer</span>
-      <span class="pass-back-value">scan does not prove the holder owns this object</span>
-    </li>
-    <li>
-      <span class="pass-back-label">Not ID</span>
-      <span class="pass-back-value">not government ID, KYC, or employment verification</span>
+      <span class="pass-back-label">Live</span>
+      <span class="pass-back-value">status from the operator, not a frozen page</span>
     </li>
     <li>
       <span class="pass-back-label">Revocable</span>
-      <span class="pass-back-value">per object and per printed-item QR</span>
+      <span class="pass-back-value">per card and per printed-item QR</span>
     </li>
   </ul>
-  <p class="pass-foot">
-    <a href="${escapeHtml(origin)}/data-policy.html">Operator data policy</a>
-  </p>
+  <p class="pass-foot pass-foot-muted">Limits: open “What this scan does not prove” below.</p>
 </div>`;
 }
 
@@ -258,15 +249,7 @@ function renderTrustGroups(vm: ScanViewModel, origin: string): string {
     );
   }
 
-  sections.push(
-    trustGroup(
-      "Limitations",
-      limitationsGroupRows(vm, origin),
-      "limits"
-    )
-  );
-
-  return `<div class="scan-trust-groups" aria-label="What this scan means">
+  return `<div class="scan-trust-groups" aria-label="Resolver status at scan time">
 ${sections.join("\n")}
 </div>`;
 }
@@ -302,23 +285,6 @@ function listRow(
 </li>`;
 }
 
-function listActionRow(
-  icon: ScanIconId,
-  tone: string,
-  href: string,
-  title: string
-): string {
-  return `<li class="list-row list-action">
-  <a href="${escapeHtml(href)}">
-    ${scanListIcon(tone, icon)}
-    <span class="list-content">
-      <span class="list-title">${escapeHtml(title)}</span>
-    </span>
-    <span class="list-chevron" aria-hidden="true">›</span>
-  </a>
-</li>`;
-}
-
 function cardGroupRows(vm: ScanViewModel): string {
   const status = vm.cardStatus ? `Card ${vm.cardStatus}` : "Unknown";
   const rows = [
@@ -334,28 +300,11 @@ function cardGroupRows(vm: ScanViewModel): string {
   if (vm.profileId) {
     rows.push(listRow("profile", "blue", "Profile ID", vm.profileId));
   }
-  rows.push(
-    listRow(
-      "people",
-      "orange",
-      "Does not prove",
-      "Government ID, KYC, age, or employment eligibility"
-    )
-  );
   return rows.join("\n");
 }
 
 function humanGroupRows(vm: ScanViewModel): string {
-  const rows = [listRow("people", "purple", vm.verificationLabel, humanSub(vm))];
-  rows.push(
-    listRow(
-      "ban",
-      "slate",
-      "Does not prove",
-      "Employment eligibility, KYC, age, or a hidden trust score"
-    )
-  );
-  return rows.join("\n");
+  return listRow("people", "purple", vm.verificationLabel, humanSub(vm));
 }
 
 function humanSub(vm: ScanViewModel): string {
@@ -390,41 +339,36 @@ function liveControlGroupRows(vm: ScanViewModel): string {
       "Card key signed a fresh challenge — not shown on every scan"
     );
   }
-  return (
-    listRow("key", "slate", "Not shown", "Optional in-person key proof (M7)") +
-    "\n" +
-    listRow(
-      "shield",
-      "slate",
-      "Does not prove",
-      "Legal identity, permanent ownership, or that earlier vouches were honest"
-    )
+  return listRow(
+    "key",
+    "slate",
+    "Not shown",
+    "Optional in-person key proof (M7)"
   );
 }
 
-function limitationsGroupRows(vm: ScanViewModel, origin: string): string {
-  return (
-    listRow(
-      "ban",
-      "orange",
-      "Not government ID or KYC",
-      "Scan shows resolver state only"
-    ) +
-    "\n" +
-    listRow(
-      "shield",
-      "pink",
-      "No scan analytics",
-      "Reference operator default for this page"
-    ) +
-    "\n" +
-    listActionRow(
-      "database",
-      "blue",
-      `${origin}/data-policy.html`,
-      "Operator data policy"
-    )
-  );
+/** iOS-style settings row — all “does not prove” copy in one place. */
+function renderLimitsSettings(origin: string): string {
+  const policy = `${origin}/data-policy.html`;
+  return `<details class="scan-limits-settings">
+  <summary class="scan-limits-summary">
+    ${scanListIcon("orange", "shield")}
+    <span class="scan-limits-summary-text">
+      <span class="scan-limits-summary-title">What this scan does not prove</span>
+      <span class="scan-limits-summary-sub">Tap for ownership, ID, KYC, employment, and age</span>
+    </span>
+    <span class="list-chevron" aria-hidden="true">›</span>
+  </summary>
+  <div class="scan-limits-panel">
+    <ul class="scan-limits-list">
+      <li>Legal identity, government ID, KYC, or background checks</li>
+      <li>Employment eligibility, age verification, or a hidden trust score</li>
+      <li>That social vouches were honest or complete</li>
+      <li>Permanent ownership of a physical item (revocation can change state)</li>
+    </ul>
+    <p class="scan-limits-meta">No scan analytics on this page. <a href="${escapeHtml(policy)}">Operator data policy</a></p>
+  </div>
+</details>`;
 }
 
 function renderTrustPills(vm: ScanViewModel): string {
@@ -472,10 +416,6 @@ function renderFooter(vm: ScanViewModel, origin: string): string {
   ${createCta}
   ${jsonLink}
 </footer>`;
-}
-
-function bearerFoot(): string {
-  return "Live resolver state at scan time. See limits above.";
 }
 
 function scanLead(vm: ScanViewModel): string {

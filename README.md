@@ -20,7 +20,7 @@ Physical **merch** is distribution (curiosity → create), not the product defin
 
 | Layer | What it is | Status |
 |-------|------------|--------|
-| **Live QR primitive** | QR/NFC URL → resolver → honest current status + limits copy | **Building now** (create live; public scan UI next) |
+| **Live QR primitive** | QR/NFC URL → resolver → honest current status + limits copy | **Live** (create, scan, revoke); stranger tests next |
 | **Humanity Card** | Signed public identity document (`profile_id`, handle, manifesto, keys on device) | Phase A MVP |
 | **Vouches & live control** | Social trust and optional in-person key proof | After MVP core |
 | **Per-object / item QRs** | Revoke one sticker without killing the card | Phase B–C |

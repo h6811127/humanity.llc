@@ -102,11 +102,12 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("@river_example");
     expect(html).toContain("Card active");
     expect(html).toContain("QR active");
-    expect(html).toContain("scan-bearer-banner");
-    expect(html).toContain(BEARER_WARNING);
-    expect(html).toContain("Live resolver state at scan time");
+    expect(html).toContain("scan-bearer-line");
+    expect(html).toContain("scan-limits-settings");
+    expect(html).toContain("What this scan does not prove");
     const bearerCount = html.split(BEARER_WARNING).length - 1;
     expect(bearerCount).toBe(1);
+    expect(html).not.toContain("Does not prove");
     expect(html).toContain('class="pass-dot"');
     expect(html).toContain("pass-qr-slot");
     expect(html).toContain(`q=${QR}`);
@@ -132,8 +133,8 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("Card status");
     expect(html).toContain("Human trust");
     expect(html).toContain("Live control");
-    expect(html).toContain("Limitations");
-    expect(html).toContain("Does not prove");
+    expect(html).not.toContain("Limitations");
+    expect(html).toContain("scan-limits-settings");
     expect(html).toContain('class="list"');
   });
 
