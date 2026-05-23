@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Local economies · humanity.llc</title>
+    <meta
+      name="description"
+      content="Co-op and market passes — lightweight trust rails for vendors, members, and mutual-aid without a giant app stack."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=41" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Design space · local</p>
+          <h1>Local economies</h1>
+          <p class="hero-line">
+            Markets, co-ops, and mutual-aid get <strong>lightweight trust infrastructure</strong>
+            — scan to verify membership, need, or availability, not just visit a website.
+          </p>
+          <p class="hero-line hero-line-sub">Research, not shipping yet.</p>
+        </section>
+
+        <section class="idea-section" aria-labelledby="scale-title">
+          <h2 class="group-label" id="scale-title">Trust at human scale</h2>
+          <p class="group-intro short">
+            A QR on a vendor table, member card, food box, or bulletin board is a small live
+            coordination object — not a whole marketplace app.
+          </p>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2"/><path d="M12 12v.01"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Narrow questions</span>
+                <span class="list-sub"
+                  >Is this vendor approved? Is pickup still open? Is this need verified?</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Public status, not spreadsheets</span>
+                <span class="list-sub"
+                  >Replace paper badges, group-chat screenshots, and stale lists with one checkable
+                  object</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="idea-section" aria-labelledby="market-title">
+          <h2 class="group-label" id="market-title">Example · farmers market placard</h2>
+          <div class="scenario-grid" aria-label="Vendor placard lifecycle">
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Scan · active</p>
+              <ul class="scenario-card-list">
+                <li>Cedar Rapids Saturday Market</li>
+                <li>Vendor active · Booth B12</li>
+                <li>Verified by organizer</li>
+                <li>Accepts SNAP / cash / card</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">Vendor dropped out</p>
+              <ul class="scenario-card-list">
+                <li>Inactive today</li>
+                <li>Booth reassigned</li>
+                <li>Do not use for payment or pickup</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">Fake or revoked</p>
+              <ul class="scenario-card-list">
+                <li>Placard revoked</li>
+                <li>Not an approved stall</li>
+              </ul>
+            </article>
+          </div>
+          <p class="idea-footnote">
+            The sign stays the same. <strong>Trust state</strong> changes.
+          </p>
+        </section>
+
+        <section class="idea-section" aria-labelledby="coop-title">
+          <h2 class="group-label" id="coop-title">Example · co-op &amp; mutual aid</h2>
+          <div class="scenario-grid" aria-label="Member and supply routing">
+            <article class="scenario-card">
+              <p class="scenario-card-label">Member card</p>
+              <ul class="scenario-card-list">
+                <li>Member active · valid through June</li>
+                <li>Member pricing · voting access</li>
+                <li>No legal identity exposed</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">Supply bin</p>
+              <ul class="scenario-card-list">
+                <li>Diapers needed · verified by organizer</li>
+                <li>Food box claimed · driver assigned</li>
+                <li>Route updated 20m ago</li>
+              </ul>
+            </article>
+          </div>
+          <p class="idea-footnote">
+            Answers: <strong>Is this person part of this local economy now?</strong> Not who they
+            are everywhere forever.
+          </p>
+        </section>
+
+        <section class="idea-section" aria-labelledby="scan-title">
+          <h2 class="group-label" id="scan-title">What every scan shows first</h2>
+          <ul class="tag-chips" aria-label="Local economy fields">
+            <li>vendor / member status</li>
+            <li>pickup window</li>
+            <li>discount eligibility</li>
+            <li>payment types accepted</li>
+            <li>mutual-aid need: open</li>
+            <li>request fulfilled</li>
+            <li>organizer verified</li>
+            <li>revoked or expired</li>
+          </ul>
+          <p class="idea-footnote">A tiny trust and coordination layer.</p>
+        </section>
+
+        <section class="idea-callout" aria-labelledby="passes-title">
+          <div class="idea-callout-header">
+            <span class="list-icon list-icon-tone-green" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2"/><path d="M12 12v.01"/></svg>
+            </span>
+            <div>
+              <h2 class="idea-callout-title" id="passes-title">Co-op and market passes</h2>
+              <p class="idea-callout-sub">
+                Just enough infrastructure — trust, status, updates, and revoke without a bloated
+                platform.
+              </p>
+            </div>
+          </div>
+          <div class="idea-callout-body">
+            <p>
+              A local organizer issues live QR objects for members, vendors, booths, pickup points,
+              supply bins, and mutual-aid requests. Each resolves to
+              <strong>active, expired, fulfilled, or revoked</strong> — visible on the next scan.
+            </p>
+            <ul class="list list-compact">
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Organizer-verified, revocable</span>
+                  <span class="list-sub"
+                    >Fake stalls and lost member cards can be killed without reprinting every
+                    placard</span
+                  >
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Not a login honeypot</span>
+                  <span class="list-sub"
+                    >No identity warehouse · no scan analytics farm · coordination through physical
+                    objects people already use</span
+                  >
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Separate passes per role</span>
+                  <span class="list-sub"
+                    >Vendor placard ≠ member card ≠ supply-bin route — each object carries only the
+                    claim that matters there</span
+                  >
+                </span>
+              </li>
+            </ul>
+            <p class="idea-footnote">
+              A lightweight operating system for small local economies — not Amazon for farmers
+              markets.
+            </p>
+          </div>
+        </section>
+
+        <section class="qr-compare idea-compare" aria-labelledby="platform-title">
+          <h2 class="group-label" id="platform-title">Without becoming a giant platform</h2>
+          <div class="qr-compare-grid">
+            <article class="qr-compare-col qr-compare-col-muted">
+              <h3 class="qr-compare-heading">Usually</h3>
+              <ul class="qr-compare-list">
+                <li>Markets → Amazon</li>
+                <li>Co-ops → Facebook</li>
+                <li>Mutual aid → surveillance CRM</li>
+              </ul>
+            </article>
+            <article class="qr-compare-col qr-compare-col-live">
+              <h3 class="qr-compare-heading">Live object</h3>
+              <ul class="qr-compare-list">
+                <li>Is this active?</li>
+                <li>Is this trusted?</li>
+                <li>What happens next?</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <p class="insight">
+          QRs as <strong>lightweight trust rails</strong> for markets, co-ops, vendors, and
+          mutual-aid — coordinate economic trust at human scale. That is the magic.
+        </p>
+
+        <section class="group">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do.html">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">All QR ideas</span>
+                  <span class="list-sub">Back to the main list</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

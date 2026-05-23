@@ -2211,6 +2211,32 @@ button.btn-danger {
   padding-top: 0;
 }
 
+.guestbook-lines-poetic li {
+  font-style: normal;
+  font-weight: 500;
+}
+
+.guestbook-lines-poetic li::before {
+  content: "·";
+  font-weight: 700;
+}
+
+.guestbook-lines-update li::before {
+  content: "→";
+  color: var(--red);
+}
+
+.guestbook-lines-revoked {
+  border-color: rgba(219, 27, 67, 0.28);
+  background: rgba(219, 27, 67, 0.04);
+}
+
+.guestbook-lines-revoked li::before {
+  content: "!";
+  color: var(--red);
+  font-style: normal;
+}
+
 .tag-chips {
   display: flex;
   flex-wrap: wrap;
@@ -2242,6 +2268,115 @@ button.btn-danger {
 
 .idea-compare .idea-footnote {
   margin-top: 14px;
+}
+
+.scenario-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.scenario-card {
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: #f7f7f7;
+}
+
+.scenario-card-live {
+  background: var(--white);
+  border-color: rgba(219, 27, 67, 0.28);
+  box-shadow: 0 6px 20px rgba(219, 27, 67, 0.08);
+}
+
+.scenario-card-warn {
+  background: rgba(219, 27, 67, 0.05);
+  border-color: rgba(219, 27, 67, 0.35);
+}
+
+.scenario-card-label {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.scenario-card-live .scenario-card-label {
+  color: var(--red);
+}
+
+.scenario-card-warn .scenario-card-label {
+  color: var(--red);
+}
+
+.scenario-card-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.scenario-card-list li {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--black);
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.scenario-card-list li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.idea-callout {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(219, 27, 67, 0.35);
+  background: var(--white);
+  box-shadow: 0 8px 28px rgba(219, 27, 67, 0.1);
+}
+
+.idea-callout-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px;
+  background: rgba(219, 27, 67, 0.1);
+  border-bottom: 1px solid rgba(219, 27, 67, 0.18);
+}
+
+.idea-callout-header .list-icon {
+  margin-top: 2px;
+}
+
+.idea-callout-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.idea-callout-sub {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--grey);
+}
+
+.idea-callout-body {
+  padding: 16px 18px 18px;
+}
+
+.idea-callout-body > p:first-child {
+  margin: 0 0 14px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.idea-callout-body .list {
+  margin-bottom: 12px;
 }
 
 #revoke-actions .btn-danger {
