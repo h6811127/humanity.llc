@@ -1465,20 +1465,196 @@ a {
   background: var(--red);
 }
 
-.key-panel {
-  margin-top: 14px;
-  padding: 14px;
+/* Settings-style disclosure (scan page + /created/) */
+.settings-disclosure {
   border-radius: var(--radius);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  background: #fafafa;
+  overflow: hidden;
 }
 
-.key-panel .form-label {
+.settings-disclosure-info {
+  background: #f2f2f7;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.settings-disclosure-action {
+  background: var(--white);
+  border: 1px solid var(--grey);
+}
+
+.settings-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px 12px 12px;
+  list-style: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.settings-summary::-webkit-details-marker {
+  display: none;
+}
+
+.settings-summary::marker {
+  content: "";
+}
+
+.settings-summary .list-icon {
+  flex-shrink: 0;
+}
+
+.settings-summary .list-chevron {
+  flex-shrink: 0;
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--grey);
+  transition: transform 0.2s ease;
+}
+
+.settings-disclosure[open] .settings-summary .list-chevron {
+  transform: rotate(90deg);
+}
+
+.settings-summary-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-summary-title {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--black);
+}
+
+.settings-summary-sub {
+  font-size: 13px;
+  color: var(--grey);
+  line-height: 1.35;
+}
+
+.settings-panel {
+  padding: 0 14px 16px 14px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.settings-disclosure-info .settings-panel {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+.settings-panel-action {
+  margin: 0 10px 12px;
+  padding: 12px 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #f9f9fb;
+}
+
+.settings-panel-action > p:first-child,
+.settings-panel-action > .form-hint:first-child {
+  margin-top: 0;
+}
+
+.settings-panel > p:first-child {
+  margin-top: 12px;
+}
+
+.settings-list {
+  margin: 10px 0 0;
+  padding-left: 18px;
+}
+
+.settings-list li {
+  margin-bottom: 8px;
+}
+
+.created-owner-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-actions-label {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--grey);
+  margin: 2px 0 0 14px;
+}
+
+.created-screen {
+  gap: 14px;
+}
+
+.created-screen .list .list-sub.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+/* Humanity node concept (research page) */
+.node-figure {
+  margin: 14px 0 16px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: #f2f2f7;
+  box-shadow:
+    0 8px 28px rgba(0, 0, 0, 0.08),
+    0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.node-figure img {
+  width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+
+.node-figure-caption {
+  padding: 10px 14px 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--grey);
+  text-align: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.node-figure-caption code {
+  font-size: 12px;
+}
+
+.compact-form .form-label {
   margin-top: 10px;
 }
 
-.key-panel .form-input {
+.compact-form .form-input {
   margin-top: 4px;
+}
+
+.compact-form .btn-secondary,
+.compact-form .btn-danger {
+  margin-top: 12px;
+}
+
+.backup-divider-label {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  font-weight: 600;
+}
+
+.revoke-confirm-spaced {
+  margin-top: 14px;
+}
+
+#revoke-actions .btn-danger {
+  width: 100%;
 }
 
 .block-link {

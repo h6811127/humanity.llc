@@ -9,7 +9,7 @@
 
 **Build phases:** `docs/V1_0_ARCHITECTURE_ROADMAP.md` — Phase A (digital trust) before commerce and Commons Pass.
 
-**Public landing:** `site/index.html` — “One use” (door plate + QR), “Same idea elsewhere” (mechanism bullets + NFC diagram + Bluetooth mesh hint). Full catalog stays in this doc, not on the homepage scroll.
+**Public landing:** `site/index.html` — “One use” (door plate + QR), “Same idea elsewhere” (mechanism bullets). NFC/mesh diagrams and **Humanity node** vision live on `site/research-directions.html` (`docs/RESEARCH_DIRECTIONS_AND_NODES.md`). Full catalog stays in this doc, not on the homepage scroll.
 
 ---
 
@@ -111,6 +111,113 @@ Use this table to avoid building five products at once. Pilot conversations shou
 | QR business cards, networking | UC5 / UC1 | Revoke after role change; rotate endpoints on card |
 | Public statements / manifests | UC3, UC5 | Signed card + revoke; corrections via new signed docs |
 | Whistleblower / maximal anonymity | Anti-use (see below) | Do not imply; different threat model |
+
+### Strongest public framing (design space, not roadmap)
+
+> **Live public objects** — physical things that resolve to **current** signed status.
+
+Avoid leading with: social network, universal identity, crypto, or ideology. Those trigger the wrong comparisons. The node mockup reinforces **infrastructure you can point at on a wall**—that is unusually legible for a trust protocol.
+
+**Deeper layer:** infrastructure for **changing public truth attached to physical objects**. Every row below is the same question in a different costume: *Is this still valid? Who issued it? Can I trust this printed thing right now?*
+
+### Design space catalog (expanded)
+
+Not a build list. Use to test positioning, pilots, and what **not** to promise. Each item still needs the [Use-Case Rule](#use-case-rule) and a phase row before it becomes engineering work.
+
+#### Community / membership
+
+- Co-op membership cards · community passes · mutual-aid coordination
+- Art collectives · hacker/makerspaces · private clubs · volunteer credentials
+- Neighborhood associations · student orgs · temporary coalition networks
+- Tool libraries / “library of things” · housing co-op guest or sublet passes
+- Food co-op pickup windows · ride-share or carpool circles
+- Parent cooperatives · faith-community visitor passes · diaspora reunion networks
+- Worker centers · union halls (“meeting still on?” on a door plate)
+- Community land trust · garden plot assignments · shared kitchen/fridge rules boards
+
+#### Events
+
+- Revocable event wristbands · VIP passes · festival credentials · speaker badges
+- Staff / volunteer / backstage access (Commons Pass later; revoke wedge now)
+- Conference networking objects · meetup check-ins · temporary installations
+- Interactive exhibits · live venue occupancy or “doors open” status
+- Pop-up restaurant hours · farmers-market stall “here today” · workshop seat holds
+- Press / media credentials · afterparty bands · race or walk check-in *status* (not medical clearance)
+- Protest or march coordination contact that must **expire** when the action ends
+
+#### Public infrastructure
+
+- Public resolver **nodes** (see `RESEARCH_DIRECTIONS_AND_NODES.md`)
+- Community bulletin terminals · neighborhood status beacons
+- Local emergency or mutual-aid coordination objects (scoped, not 911 replacement)
+- Solar-powered trust endpoints · public NFC interaction points · mesh-aware objects
+- Embedded civic kiosks · park facility open/closed · trail or beach condition beacons
+- Cooling center / warming shelter “open tonight” · disaster supply point status
+- Transit disruption plaques (“this stop detour active”) · construction site public notices
+- “Is this public Wi‑Fi the one we operate?” (operator attestation only—not crypto panacea)
+
+#### Physical objects with state
+
+- Stickers that evolve · revocable posters/flyers · dynamic public signage
+- Live studio / open-hours plaques · temporary QR campaigns · installation art
+- Product authenticity tags · museum exhibit objects · community gardens
+- Shared workshop tools · bike-share or fleet component tags · rental equipment checkout
+- Building delivery hours · real estate open-house “still happening today”
+- Zines, books, or records with **live** colophon or tour dates on scan
+
+#### Trust / authenticity
+
+- Verified creator merch · anti-counterfeit physical goods · signed artifact provenance
+- Limited-run drops · local trust networks · revocable access tokens
+- Community-issued reputation · human vouch systems · temporary trust scopes
+- Repair-café or fix documentation pointers · open-hardware batch attestation
+- Artisan batch numbers · gallery provenance cards (not appraisal or insurance)
+
+#### Embedded / hardware
+
+- NFC wearables · solar public nodes · BLE mesh propagation
+- Offline verification appliances (cache **public** status; resolver still source when online)
+- Portable resolver terminals · public scanning appliances · physical trust anchors
+- Ambient local networking · shared edge infrastructure
+- Wallet cards · key fobs · conference badges · vehicle fleet dash plaques (org-scoped, not “driver ID”)
+
+#### Education / universities
+
+- Student org credentials · research lab access · temporary classroom/event passes
+- Campus installation projects · public research nodes · conference/demo infrastructure
+- Guest lecturer passes · makerspace tool **membership** (not safety certification)
+- Thesis defense door signs · department “office hours live” plaques
+- Identity-lite campus systems (explicitly **not** transcript or accreditation replacement)
+
+#### Creative / cultural
+
+- Interactive merch · community-owned media objects · dynamic album/book objects
+- Physical ARG systems · artifacts with evolving lore · zines with live updates
+- Public storytelling infrastructure · networked gallery objects
+- Band tour merch · bookstore author events · podcast “recording live” door tags
+- Street art with revocable artist statement or correction chain
+
+#### Work / coordination (lightweight, not HR)
+
+- Contractor “on site today” status board · pop-up office hours
+- Coworking day-pass objects · studio visitor lists without sharing personal numbers
+- Open-call for collaborators on a poster (revoke when filled)
+
+#### Questions every scan answers (coordination layer)
+
+- Who is active right now? · Is this still valid? · Who issued this?
+- Has this object changed state? · Is this event still happening?
+- Is this person still a member (under **our** rules)? · Can this object still be trusted?
+- Did this physical thing expire? · Was this QR batch revoked after a theft?
+
+#### Additional buckets (use with care)
+
+| Bucket | Example | Caveat |
+|---|---|---|
+| Healthcare-adjacent | Clinic “flu shot clinic open today” board | Not patient ID, triage, or eligibility |
+| Regulated goods | Spirits/wine batch tags | Jurisdiction + labeling law; often anti-use for v1 |
+| Financial | “This invoice QR is still unpaid” | Payments are a different product surface |
+| Law / immigration | Any “verified human” for borders | Explicit anti-use |
 
 ---
 

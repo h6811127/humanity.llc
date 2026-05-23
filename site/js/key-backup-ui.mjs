@@ -5,7 +5,9 @@ import {
   createEncryptedBackup,
   decryptBackup,
   downloadBackupFile,
+  importErrorMessage,
   MIN_PASSPHRASE_LENGTH,
+  normalizePassphrase,
   readBackupFile,
 } from "./key-backup.mjs";
 
@@ -15,19 +17,13 @@ import {
  *   getSession: () => Record<string, unknown> | null,
  *   setSession: (next: Record<string, unknown>) => void,
  *   onKeysUnlocked: () => void,
- *   showError: (msg: string) => void,
  * }} opts
  */
 export function initKeyBackupUi(opts) {
-  const exportPanel = document.getElementById("key-export-panel");
-  const importPanel = document.getElementById("key-import-panel");
-  const exportPass = document.getElementById("export-passphrase");
-  const exportPass2 = document.getElementById("export-passphrase-confirm");
-  const exportBtn = document.getElementById("export-backup-btn");
+  const exportBlock = document.getElementById("backup-export-block");
+  const exportForm = document.getElementById("export-backup-form");
   const exportStatus = document.getElementById("export-backup-status");
-  const importFile = document.getElementById("import-backup-file");
-  const importPass = document.getElementById("import-passphrase");
-  const importBtn = document.getElementById("import-backup-btn");
+  const importForm = document.getElementById("import-backup-form");
   const importStatus = document.getElementById("import-backup-status");
 
   function setStatus(el, msg, isError = false) {
@@ -47,31 +43,36 @@ export function initKeyBackupUi(opts) {
     };
   }
 
-  const keys = sessionKeys();
-  if (exportPanel) {
-    exportPanel.hidden = !keys;
-  }
-  if (importPanel) {
-    importPanel.hidden = false;
+  function refreshExportVisibility() {
+    if (exportBlock) exportBlock.hidden = !sessionKeys();
   }
 
-  exportBtn?.addEventListener("click", async () => {
+  refreshExportVisibility();
+
+  exportForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
     const k = sessionKeys();
     if (!k) {
-      opts.showError("No signing key in this session. Create a card first.");
+      setStatus(exportStatus, "Create a card in this tab first, then download a backup.", true);
       return;
     }
-    const p1 = exportPass?.value ?? "";
-    const p2 = exportPass2?.value ?? "";
+    const fd = new FormData(exportForm);
+    const p1 = normalizePassphrase(String(fd.get("passphrase") ?? ""));
+    const p2 = normalizePassphrase(String(fd.get("passphrase_confirm") ?? ""));
     if (p1.length < MIN_PASSPHRASE_LENGTH) {
-      setStatus(exportStatus, `Use at least ${MIN_PASSPHRASE_LENGTH} characters.`, true);
+      setStatus(
+        exportStatus,
+        `Use at least ${MIN_PASSPHRASE_LENGTH} characters for the backup passphrase.`,
+        true
+      );
       return;
     }
     if (p1 !== p2) {
       setStatus(exportStatus, "Passphrases do not match.", true);
       return;
     }
-    exportBtn.disabled = true;
+    const btn = exportForm.querySelector('button[type="submit"]');
+    if (btn) btn.disabled = true;
     setStatus(exportStatus, "Encrypting…");
     try {
       const backup = await createEncryptedBackup({
@@ -83,38 +84,45 @@ export function initKeyBackupUi(opts) {
       downloadBackupFile(backup);
       const session = opts.getSession() || {};
       opts.setSession({ ...session, key_backup_exported_at: new Date().toISOString() });
-      setStatus(
-        exportStatus,
-        "Downloaded. Store the file offline. We cannot reset your passphrase."
-      );
-      if (exportPass) exportPass.value = "";
-      if (exportPass2) exportPass2.value = "";
+      setStatus(exportStatus, "Downloaded. Store the file safely; we cannot reset your passphrase.");
+      exportForm.reset();
     } catch (err) {
-      setStatus(exportStatus, err.message || String(err), true);
+      setStatus(exportStatus, importErrorMessage(err), true);
     } finally {
-      exportBtn.disabled = false;
+      if (btn) btn.disabled = false;
     }
   });
 
-  importBtn?.addEventListener("click", async () => {
-    const file = importFile?.files?.[0];
+  importForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const fileInput = importForm.querySelector('input[type="file"]');
+    const file = fileInput?.files?.[0];
     if (!file) {
-      setStatus(importStatus, "Choose a backup file first.", true);
+      setStatus(importStatus, "Choose your .hcbackup.json file first.", true);
       return;
     }
-    const passphrase = importPass?.value ?? "";
+    const fd = new FormData(importForm);
+    const rawPass = fd.get("passphrase");
+    const passphrase = normalizePassphrase(
+      typeof rawPass === "string" ? rawPass : String(importForm.querySelector("#import-passphrase")?.value ?? "")
+    );
     if (passphrase.length < MIN_PASSPHRASE_LENGTH) {
-      setStatus(importStatus, `Enter your backup passphrase (${MIN_PASSPHRASE_LENGTH}+ chars).`, true);
+      setStatus(
+        importStatus,
+        importErrorMessage(new Error(`PASSPHRASE_TOO_SHORT:${passphrase.length}`)),
+        true
+      );
       return;
     }
-    importBtn.disabled = true;
-    setStatus(importStatus, "Decrypting…");
+    const btn = importForm.querySelector('button[type="submit"]');
+    if (btn) btn.disabled = true;
+    setStatus(importStatus, "Opening backup…");
     try {
       const backup = await readBackupFile(file);
       const unlocked = await decryptBackup(backup, passphrase);
       if (opts.profileId && unlocked.profileId !== opts.profileId) {
         throw new Error(
-          "This backup is for a different profile. Open /created/ with matching profile_id or import from the home create flow."
+          "This backup belongs to a different card. Use the /created/ link from the device that created it."
         );
       }
       const session = opts.getSession() || {
@@ -128,14 +136,17 @@ export function initKeyBackupUi(opts) {
         owner_private_key_b58: unlocked.privateKeyBase58,
         key_imported_at: new Date().toISOString(),
       });
-      setStatus(importStatus, "Backup unlocked. Owner controls are available below.");
-      if (importPass) importPass.value = "";
-      if (importFile) importFile.value = "";
+      setStatus(importStatus, "Unlocked. Revoke controls are available below.");
+      importForm.reset();
+      refreshExportVisibility();
       opts.onKeysUnlocked();
+      document.getElementById("revoke-details")?.setAttribute("open", "");
     } catch (err) {
-      setStatus(importStatus, err.message || String(err), true);
+      setStatus(importStatus, importErrorMessage(err), true);
     } finally {
-      importBtn.disabled = false;
+      if (btn) btn.disabled = false;
     }
   });
+
+  return { refreshExportVisibility };
 }

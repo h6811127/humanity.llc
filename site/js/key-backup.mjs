@@ -3,12 +3,19 @@
  * Crypto parity: worker/src/crypto/key-backup.ts (tests).
  * @see docs/M5_5_OWNER_KEY_PORTABILITY.md
  */
+import * as ed from "https://esm.sh/@noble/ed25519@2.3.0";
 import { decodeBase58, encodeBase58 } from "./hc-sign.mjs";
 
 export const BACKUP_TYPE = "humanity_card_key_backup";
 export const BACKUP_VERSION = "1.0";
 export const MIN_PASSPHRASE_LENGTH = 12;
 export const PBKDF2_ITERATIONS = 310_000;
+
+/** Trim + normalize (password managers / iOS sometimes add odd spaces). */
+export function normalizePassphrase(passphrase) {
+  if (typeof passphrase !== "string") return "";
+  return passphrase.normalize("NFKC").trim();
+}
 
 function bytesToB58(bytes) {
   return encodeBase58(bytes);
@@ -19,9 +26,26 @@ function b58ToBytes(str) {
 }
 
 function assertPassphrase(passphrase) {
-  if (typeof passphrase !== "string" || passphrase.length < MIN_PASSPHRASE_LENGTH) {
+  const p = normalizePassphrase(passphrase);
+  if (p.length < MIN_PASSPHRASE_LENGTH) {
     throw new Error(
-      `Passphrase must be at least ${MIN_PASSPHRASE_LENGTH} characters.`
+      `PASSPHRASE_TOO_SHORT:${p.length}`
+    );
+  }
+  return p;
+}
+
+async function verifyDecryptedKey(privateKeyBase58, expectedPublicKeyBase58) {
+  const privateKey = b58ToBytes(privateKeyBase58);
+  if (privateKey.length !== 32) {
+    throw new Error(
+      "This backup file does not contain a valid signing key. Re-download from /created/ after create."
+    );
+  }
+  const derivedPub = encodeBase58(await ed.getPublicKeyAsync(privateKey));
+  if (derivedPub !== expectedPublicKeyBase58) {
+    throw new Error(
+      "Backup opened but the key does not match this card. Check the file and profile link."
     );
   }
 }
@@ -58,14 +82,14 @@ export async function createEncryptedBackup({
   privateKeyBase58,
   passphrase,
 }) {
-  assertPassphrase(passphrase);
+  const pass = assertPassphrase(passphrase);
   if (!profileId || !publicKeyBase58 || !privateKeyBase58) {
     throw new Error("Missing profile or key material.");
   }
 
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const iv = crypto.getRandomValues(new Uint8Array(12));
-  const aesKey = await deriveAesKey(passphrase, salt);
+  const aesKey = await deriveAesKey(pass, salt);
   const plaintext = b58ToBytes(privateKeyBase58);
 
   const ciphertext = await crypto.subtle.encrypt(
@@ -114,12 +138,12 @@ function validateBackupShape(backup) {
  */
 export async function decryptBackup(backup, passphrase) {
   validateBackupShape(backup);
-  assertPassphrase(passphrase);
+  const pass = assertPassphrase(passphrase);
 
   const salt = b58ToBytes(backup.kdf.salt_b58);
   const iv = b58ToBytes(backup.cipher.iv_b58);
   const ciphertext = b58ToBytes(backup.cipher.ciphertext_b58);
-  const aesKey = await deriveAesKey(passphrase, salt);
+  const aesKey = await deriveAesKey(pass, salt);
 
   let plain;
   try {
@@ -129,19 +153,29 @@ export async function decryptBackup(backup, passphrase) {
       ciphertext
     );
   } catch {
-    throw new Error("Wrong passphrase or corrupted backup file.");
+    throw new Error(
+      "Wrong passphrase. Type it by hand or re-pick the saved entry in your password manager (iPhone Passwords / Android)."
+    );
   }
 
   const privateKeyBase58 = bytesToB58(new Uint8Array(plain));
-  if (backup.public_key && privateKeyBase58.length < 40) {
-    throw new Error("Decrypted key looks invalid.");
-  }
+  await verifyDecryptedKey(privateKeyBase58, backup.public_key);
 
   return {
     profileId: backup.profile_id,
     publicKeyBase58: backup.public_key,
     privateKeyBase58,
   };
+}
+
+/** User-facing message for import validation errors. */
+export function importErrorMessage(err) {
+  const msg = err?.message || String(err);
+  if (msg.startsWith("PASSPHRASE_TOO_SHORT:")) {
+    const n = msg.split(":")[1] || "0";
+    return `Passphrase is only ${n} characters (need ${MIN_PASSPHRASE_LENGTH}+). Tap the passphrase field and enter it manually if autofill left it empty.`;
+  }
+  return msg;
 }
 
 export function backupFilename(profileId) {
@@ -164,7 +198,7 @@ export function downloadBackupFile(backup) {
 }
 
 export async function readBackupFile(file) {
-  const text = await file.text();
+  const text = (await file.text()).replace(/^\uFEFF/, "").trim();
   let parsed;
   try {
     parsed = JSON.parse(text);

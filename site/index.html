@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=27" />
+    <link rel="stylesheet" href="/styles.css?v=32" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -273,7 +273,7 @@
           <h2 class="group-label">Same idea elsewhere</h2>
           <p class="group-intro short">
             One primitive: a physical thing points at <strong>current</strong> signed status, not a
-            permanent file. QR works on any camera today. Tap and local mesh are next.
+            permanent file. QR works on any camera today.
           </p>
           <ul class="list list-compact">
             <li class="list-row">
@@ -303,88 +303,19 @@
                 <span class="list-sub">Club or co-op asks for live membership state, not a static plastic claim</span>
               </span>
             </li>
+            <li class="list-row list-action">
+              <a href="/research-directions.html">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M18 12h4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Research directions</span>
+                  <span class="list-sub">NFC, mesh, and the Humanity node</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
           </ul>
-
-          <div class="idea-mini idea-mini-carriers" aria-label="Tap and mesh carriers">
-            <p class="idea-mini-eyebrow">Beyond the camera</p>
-
-            <div class="idea-tier">
-              <h3 class="idea-tier-label">NFC</h3>
-              <p class="idea-mini-intro">
-                Event wristband: tap the tag, same resolver answer. No camera framing.
-              </p>
-              <div class="flow-strip flow-strip-compact">
-                <div class="flow-step">
-                  <div class="flow-object" aria-hidden="true">
-                    <div class="flow-wristband">
-                      <span class="flow-nfc-tag">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 8.5a6 6 0 0 1 8 0"/><path d="M9 11.5a3 3 0 0 1 4 0"/><circle cx="11" cy="14" r="1" fill="currentColor" stroke="none"/></svg>
-                      </span>
-                    </div>
-                  </div>
-                  <p class="flow-label">Object</p>
-                  <p class="flow-caption">Wristband, badge</p>
-                </div>
-                <div class="flow-arrow" aria-hidden="true">→</div>
-                <div class="flow-step">
-                  <div class="flow-object flow-phone flow-phone-nfc" aria-hidden="true">
-                    <span class="flow-phone-notch"></span>
-                    <span class="flow-nfc-pulse" aria-hidden="true"></span>
-                  </div>
-                  <p class="flow-label">Tap</p>
-                  <p class="flow-caption">NFC</p>
-                </div>
-                <div class="flow-arrow" aria-hidden="true">→</div>
-                <div class="flow-step">
-                  <div class="flow-object flow-state" aria-hidden="true">
-                    <span class="flow-state-dot live"></span>
-                    <span class="flow-state-text">Valid</span>
-                  </div>
-                  <p class="flow-label">Live state</p>
-                  <p class="flow-caption">Or revoked</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="idea-tier idea-tier-mesh">
-              <h3 class="idea-tier-label">NFC + Bluetooth mesh</h3>
-              <p class="idea-mini-intro">
-                One tap can wake a tag, then phones and wearables relay the same signed status across
-                a room without every person hitting the resolver alone.
-              </p>
-              <div class="flow-mesh" aria-hidden="true">
-                <div class="flow-mesh-node flow-mesh-tag">
-                  <span class="flow-mesh-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8.5a6 6 0 0 1 8 0"/><path d="M9 11.5a3 3 0 0 1 4 0"/><circle cx="11" cy="14" r="1" fill="currentColor" stroke="none"/></svg>
-                  </span>
-                  <span class="flow-mesh-name">Tag</span>
-                </div>
-                <div class="flow-mesh-links">
-                  <span class="flow-mesh-line"></span>
-                  <span class="flow-mesh-line"></span>
-                  <span class="flow-mesh-line"></span>
-                </div>
-                <div class="flow-mesh-node flow-mesh-peer">
-                  <span class="flow-mesh-icon flow-mesh-icon-phone">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
-                  </span>
-                  <span class="flow-mesh-name">Peers</span>
-                </div>
-                <div class="flow-mesh-links">
-                  <span class="flow-mesh-line"></span>
-                  <span class="flow-mesh-line flow-mesh-line-up"></span>
-                </div>
-                <div class="flow-mesh-node flow-mesh-live">
-                  <span class="flow-mesh-dot live"></span>
-                  <span class="flow-mesh-name">Live state</span>
-                </div>
-              </div>
-              <p class="example-note idea-mini-note">
-                QR is live on any phone today. NFC opens the same card URL. Mesh spreads that truth
-                locally; the resolver stays the source when the network syncs.
-              </p>
-            </div>
-          </div>
         </section>
 
         <section class="group group-muted">

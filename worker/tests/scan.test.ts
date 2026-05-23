@@ -152,4 +152,51 @@ describe("renderScanPage M3.2 trust blocks", () => {
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).toContain("Printed item");
   });
+
+  it("renders card revoked state (M4.2)", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card({ status: "revoked" }),
+        qr: qr(),
+        verification: summary(),
+      },
+      "https://humanity.llc"
+    );
+    expect(vm.kind).toBe("card_revoked");
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain("Card revoked");
+    expect(html).toContain("This card was revoked");
+  });
+
+  it("renders QR revoked while card stays active (M4.2 / M4.3)", async () => {
+    const revokedQr = "qr_revoked_sibling_test";
+    const vmRevoked = buildScanViewModel(
+      PROFILE,
+      revokedQr,
+      {
+        card: card(),
+        qr: qr({ qr_id: revokedQr, status: "revoked" }),
+        verification: summary(),
+      },
+      "https://humanity.llc"
+    );
+    expect(vmRevoked.kind).toBe("qr_revoked");
+    const htmlRevoked = await renderScanPage(vmRevoked, "https://humanity.llc");
+    expect(htmlRevoked).toContain("QR revoked");
+    expect(htmlRevoked).toContain("Card active");
+
+    const vmSibling = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr({ status: "active" }),
+        verification: summary(),
+      },
+      "https://humanity.llc"
+    );
+    expect(vmSibling.kind).toBe("active");
+  });
 });

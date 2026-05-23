@@ -1,11 +1,7 @@
 /**
  * Owner revoke controls on /created/ (M4.2 + M5.5 import).
  */
-import {
-  getCardStatusUrl,
-  postRevokeUrl,
-  signRevocation,
-} from "./hc-sign.mjs";
+import { getCardStatusUrl, postRevokeUrl, signRevocation } from "./hc-sign.mjs";
 
 /**
  * @param {{
@@ -19,14 +15,13 @@ import {
  * @returns {{ refresh: () => void }}
  */
 export function initOwnerRevoke(ctx) {
-  const section = document.getElementById("owner-controls");
-  if (!section) return { refresh: () => {} };
+  const revokeDetails = document.getElementById("revoke-details");
+  if (!revokeDetails) return { refresh: () => {} };
 
   const noKeyEl = document.getElementById("owner-no-key");
+  const revokeActions = document.getElementById("revoke-actions");
   const liveStatusEl = document.getElementById("owner-live-status");
   const revokedBannerEl = document.getElementById("owner-revoked-banner");
-  const qrPanel = document.getElementById("revoke-qr-panel");
-  const cardPanel = document.getElementById("revoke-card-panel");
   const confirmQr = document.getElementById("confirm-revoke-qr");
   const confirmCard = document.getElementById("confirm-revoke-card");
   const revokeQrBtn = document.getElementById("revoke-qr-btn");
@@ -59,11 +54,10 @@ export function initOwnerRevoke(ctx) {
       revokedBannerEl.hidden = false;
       revokedBannerEl.textContent =
         kind === "card"
-          ? "This card is revoked. Scans and public JSON will show revoked state (may take up to a minute on the CDN)."
-          : "This scan QR is revoked. Your card may still be active; open the scan page to confirm.";
+          ? "Card revoked. Scans may take up to a minute to update."
+          : "This QR is revoked. Open your scan link to confirm.";
     }
-    if (qrPanel) qrPanel.hidden = true;
-    if (cardPanel) cardPanel.hidden = true;
+    if (revokeActions) revokeActions.hidden = true;
     if (liveStatusEl) {
       liveStatusEl.textContent =
         kind === "card" ? "Resolver: card revoked" : "Resolver: QR revoked";
@@ -73,8 +67,7 @@ export function initOwnerRevoke(ctx) {
   function refreshAccessUi() {
     const k = keys();
     if (noKeyEl) noKeyEl.hidden = !!k;
-    if (qrPanel) qrPanel.hidden = !k;
-    if (cardPanel) cardPanel.hidden = !k;
+    if (revokeActions) revokeActions.hidden = !k;
     updateConfirmButtons();
   }
 
@@ -86,33 +79,30 @@ export function initOwnerRevoke(ctx) {
       const body = await res.json();
       const kind = body?.scan?.kind ?? "unknown";
       if (kind === "active") {
-        liveStatusEl.textContent = "Resolver: card and this QR are active.";
+        liveStatusEl.textContent = "Resolver: active";
       } else if (kind === "qr_revoked") {
-        liveStatusEl.textContent = "Resolver: this QR is revoked.";
+        liveStatusEl.textContent = "Resolver: QR revoked";
         showRevokedUi("qr_credential");
       } else if (kind === "card_revoked") {
-        liveStatusEl.textContent = "Resolver: card is revoked.";
+        liveStatusEl.textContent = "Resolver: card revoked";
         showRevokedUi("card");
       } else {
         liveStatusEl.textContent = `Resolver: ${kind}`;
       }
     } catch {
-      liveStatusEl.textContent =
-        "Could not reach resolver status API. Revoke may still work if the Worker is up.";
+      liveStatusEl.textContent = "Could not reach resolver.";
     }
   }
 
   async function postRevocation(targetKind) {
     const k = keys();
     if (!k) {
-      ctx.showError(
-        "No signing key. Use the same browser session as create, or import an encrypted backup below."
-      );
+      ctx.showError("Unlock your backup above first.");
       return;
     }
 
     const targetQrId = targetKind === "qr_credential" ? ctx.qrId : null;
-    setRevokeStatus("Signing revocation…");
+    setRevokeStatus("Signing…");
     if (revokeQrBtn) revokeQrBtn.disabled = true;
     if (revokeCardBtn) revokeCardBtn.disabled = true;
 
@@ -125,7 +115,7 @@ export function initOwnerRevoke(ctx) {
         publicKeyBase58: k.publicKeyBase58,
       });
 
-      setRevokeStatus("Submitting to resolver…");
+      setRevokeStatus("Submitting…");
       const res = await fetch(postRevokeUrl(ctx.profileId), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -133,25 +123,17 @@ export function initOwnerRevoke(ctx) {
       });
       const payload = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(
-          payload.message || payload.error || `HTTP ${res.status}`
-        );
+        throw new Error(payload.message || payload.error || `HTTP ${res.status}`);
       }
 
       const session = ctx.getSession() || {};
       ctx.setSession({
         ...session,
-        revoke_state: {
-          target_kind: targetKind,
-          revoked_at: payload.revoked_at,
-        },
+        revoke_state: { target_kind: targetKind, revoked_at: payload.revoked_at },
       });
 
       setRevokeStatus("");
       showRevokedUi(targetKind);
-      if (ctx.scanUrl && targetKind === "qr_credential") {
-        setRevokeStatus(`Done. Verify on scan: ${ctx.scanUrl}`);
-      }
       await refreshLiveStatus();
     } catch (err) {
       setRevokeStatus(err.message || String(err), true);
@@ -160,11 +142,11 @@ export function initOwnerRevoke(ctx) {
   }
 
   if (!ctx.profileId || !ctx.qrId) {
-    section.hidden = true;
+    revokeDetails.hidden = true;
     return { refresh: () => {} };
   }
 
-  section.hidden = false;
+  revokeDetails.hidden = false;
 
   const session = ctx.getSession();
   if (session?.revoke_state?.target_kind) {

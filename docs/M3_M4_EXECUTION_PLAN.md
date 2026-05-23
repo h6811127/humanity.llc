@@ -56,9 +56,10 @@ Do these **in order**. Each step has an exit test before moving on.
 **Exit:**
 - [x] Implemented in repo (`worker/src/resolver/scan-status.ts`, route in `index.ts`)
 - [x] `curl` JSON for active card+QR matches scan `kind` and statuses
-- [ ] Unknown profile → 404 JSON
-- [ ] Card revoked → 410 JSON (Standards §9.5)
-- [ ] `Cache-Control` on response matches scan/HTML policy
+- [x] Unknown profile → 404 JSON (`scan-status.test.ts`)
+- [x] Card revoked → 410 JSON (Standards §9.5)
+- [x] QR revoked → 200 JSON with `kind: qr_revoked`
+- [x] `Cache-Control` on response matches scan/HTML policy (`CACHE_*` in tests)
 
 ---
 
@@ -126,16 +127,16 @@ Do these **in order**. Each step has an exit test before moving on.
 ### 4.2 — Revoked scan + JSON
 
 **Exit:**
-- [ ] Scan HTML shows revoked state (card / QR)
-- [ ] Status JSON `kind` matches HTML
+- [x] Scan HTML shows revoked state (card / QR) — `scan.test.ts`
+- [x] Status JSON `kind` matches HTML — `scan-status.test.ts`
 - [x] Card JSON `GET …/cards/{id}` → 410 when revoked (Standards §10.2)
 - [x] Owner revoke UI on `/created/` (`docs/M4_CREATED_REVOKE_UI.md`, `site/js/created-revoke.mjs`)
 
 ### 4.3 — Item-scoped revoke
 
 **Exit:**
-- [ ] Revoke one `print_artifact` QR; sibling QR on same card stays active
-- [ ] Scan of revoked item shows QR revoked; scan of sibling still active
+- [x] Revoke one QR; sibling QR on same card stays active (view-model tests)
+- [ ] End-to-end on production D1 with two QRs on one card
 
 ### 4.4 — Block intents on revoked QR (stub)
 
@@ -146,7 +147,7 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ## M5 — Launch gate (after M4)
 
-**Refs:** roadmap §12 Phase A exit criteria; `FOUNDING_COHORT_PLAYBOOK.md`
+**Refs:** roadmap §12 Phase A exit; **`docs/M5_STRANGER_TEST_RUNBOOK.md`** (step-by-step)
 
 - [ ] 3 people outside your network create cards unassisted
 - [ ] Each explains what scan proves / does not prove in one sentence
@@ -158,7 +159,7 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ## What we are **not** doing in this track
 
-- NFC / Bluetooth mesh implementation (landing hint only)
+- NFC / Bluetooth mesh implementation — research page only (`site/research-directions.html`)
 - **Owner key export / recovery** (revoke from any device) — **M5.5** (`docs/M5_5_OWNER_KEY_PORTABILITY.md`)
 - Vouches (M6), live control (M7), merch (M8)
 - Commons Pass (M10+)
@@ -167,4 +168,4 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ## Current step
 
-**→ M5** — three stranger create/scan/revoke tests; landing “Building now” updated. Deploy Worker (`pass-v5` scan UI) + Pages.
+**→ M5** — run `docs/M5_STRANGER_TEST_RUNBOOK.md` (three strangers). Code path for create → scan → revoke is in place; remaining gate is **human** validation.

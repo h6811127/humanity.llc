@@ -72,10 +72,8 @@ if (data?.manifesto_line) {
 if (profileId) {
   profileIdEl.textContent = profileId;
   jsonLink.href = getCardJsonUrl(profileId);
-  jsonLink.removeAttribute("aria-disabled");
 } else {
-  jsonLink.href = "#";
-  jsonLink.setAttribute("aria-disabled", "true");
+  jsonLink.removeAttribute("href");
 }
 
 if (data?.verification?.label) {
@@ -94,21 +92,12 @@ if (scanUrl) {
     await renderQrToImage(qrImg, scanUrl);
   } catch (err) {
     console.error(err);
-    qrImg.alt = "Could not generate QR in this browser";
-    showError(
-      "Scan link is ready, but QR image failed to render. Use Copy scan link below."
-    );
+    qrImg.alt = "Could not generate QR";
+    showError("Scan link is ready. Copy link below.");
   }
 } else {
   copyBtn.disabled = true;
-  scanUrlEl.textContent =
-    "Scan link unavailable. Finish create on /create/ and wait for the redirect, or open a URL with profile_id and qr_id.";
-}
-
-const bearerHint = document.getElementById("created-bearer-hint");
-if (bearerHint) {
-  bearerHint.textContent =
-    "This link is your live scan URL. It does not prove who holds a printed copy; the scan page states that clearly.";
+  scanUrlEl.textContent = "Scan link unavailable.";
 }
 
 if (profileId && qrId) {
@@ -121,11 +110,13 @@ if (profileId && qrId) {
     showError,
   };
   const revoke = initOwnerRevoke(revokeCtx);
-  initKeyBackupUi({
+  const backup = initKeyBackupUi({
     profileId,
     getSession: loadSession,
     setSession: saveSession,
-    showError,
-    onKeysUnlocked: () => revoke?.refresh(),
+    onKeysUnlocked: () => {
+      backup?.refreshExportVisibility();
+      revoke?.refresh();
+    },
   });
 }

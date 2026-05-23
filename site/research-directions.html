@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Research directions · humanity.llc</title>
+    <meta
+      name="description"
+      content="Future infrastructure layers: NFC, Bluetooth mesh, and the Humanity node — research, not shipping yet."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=33" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+      </header>
+
+      <main class="screen">
+        <section class="hero">
+          <p class="hero-eyebrow">Not shipping yet</p>
+          <h1>Research directions&nbsp;/ infrastructure layers</h1>
+          <p class="hero-line">
+            The live product today is <strong>QR → resolver</strong>. This page holds carrier
+            experiments and hardware we want to build—not promises on the current roadmap.
+          </p>
+        </section>
+
+        <p class="insight">
+          One primitive everywhere: a physical thing points at <strong>current</strong> signed
+          status. Different layers are just different ways to reach the same honest answer.
+        </p>
+
+        <section class="group">
+          <h2 class="group-label">Live today</h2>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">QR on any camera</span>
+                <span class="list-sub">Create, scan, revoke — no app required</span>
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="group same-idea" aria-label="Carrier layers">
+          <h2 class="group-label">Carrier layers (research)</h2>
+          <p class="group-intro short">
+            Same card URL and resolver semantics. NFC removes camera framing; mesh spreads signed
+            state locally before sync.
+          </p>
+
+          <div class="idea-mini idea-mini-carriers" aria-label="Tap and mesh carriers">
+            <p class="idea-mini-eyebrow">Beyond the camera</p>
+
+            <div class="idea-tier">
+              <h3 class="idea-tier-label">NFC</h3>
+              <p class="idea-mini-intro">
+                Event wristband: tap the tag, same resolver answer. No camera framing.
+              </p>
+              <div class="flow-strip flow-strip-compact">
+                <div class="flow-step">
+                  <div class="flow-object" aria-hidden="true">
+                    <div class="flow-wristband">
+                      <span class="flow-nfc-tag">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 8.5a6 6 0 0 1 8 0"/><path d="M9 11.5a3 3 0 0 1 4 0"/><circle cx="11" cy="14" r="1" fill="currentColor" stroke="none"/></svg>
+                      </span>
+                    </div>
+                  </div>
+                  <p class="flow-label">Object</p>
+                  <p class="flow-caption">Wristband, badge</p>
+                </div>
+                <div class="flow-arrow" aria-hidden="true">→</div>
+                <div class="flow-step">
+                  <div class="flow-object flow-phone flow-phone-nfc" aria-hidden="true">
+                    <span class="flow-phone-notch"></span>
+                    <span class="flow-nfc-pulse" aria-hidden="true"></span>
+                  </div>
+                  <p class="flow-label">Tap</p>
+                  <p class="flow-caption">NFC</p>
+                </div>
+                <div class="flow-arrow" aria-hidden="true">→</div>
+                <div class="flow-step">
+                  <div class="flow-object flow-state" aria-hidden="true">
+                    <span class="flow-state-dot live"></span>
+                    <span class="flow-state-text">Valid</span>
+                  </div>
+                  <p class="flow-label">Live state</p>
+                  <p class="flow-caption">Or revoked</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="idea-tier idea-tier-mesh">
+              <h3 class="idea-tier-label">NFC + Bluetooth mesh</h3>
+              <p class="idea-mini-intro">
+                One tap can wake a tag, then phones and wearables relay the same signed status across
+                a room without every person hitting the resolver alone.
+              </p>
+              <div class="flow-mesh" aria-hidden="true">
+                <div class="flow-mesh-node flow-mesh-tag">
+                  <span class="flow-mesh-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8.5a6 6 0 0 1 8 0"/><path d="M9 11.5a3 3 0 0 1 4 0"/><circle cx="11" cy="14" r="1" fill="currentColor" stroke="none"/></svg>
+                  </span>
+                  <span class="flow-mesh-name">Tag</span>
+                </div>
+                <div class="flow-mesh-links">
+                  <span class="flow-mesh-line"></span>
+                  <span class="flow-mesh-line"></span>
+                  <span class="flow-mesh-line"></span>
+                </div>
+                <div class="flow-mesh-node flow-mesh-peer">
+                  <span class="flow-mesh-icon flow-mesh-icon-phone">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+                  </span>
+                  <span class="flow-mesh-name">Peers</span>
+                </div>
+                <div class="flow-mesh-links">
+                  <span class="flow-mesh-line"></span>
+                  <span class="flow-mesh-line flow-mesh-line-up"></span>
+                </div>
+                <div class="flow-mesh-node flow-mesh-live">
+                  <span class="flow-mesh-dot live"></span>
+                  <span class="flow-mesh-name">Live state</span>
+                </div>
+              </div>
+              <p class="example-note idea-mini-note">
+                QR is live on any phone today. NFC opens the same card URL. Mesh spreads that truth
+                locally; the resolver stays the source when the network syncs.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="group">
+          <h2 class="group-label">The Humanity node</h2>
+          <p class="group-intro">
+            The ultimate object: a small computer in weatherproof metal, engraved with the same link
+            and QR as a sticker—but also able to <strong>tap</strong>, <strong>relay</strong>, and
+            <strong>uplink</strong> when the grid is thin.
+          </p>
+          <figure class="node-figure">
+            <img
+              src="/assets/humanity-node-001.png?v=2"
+              width="1600"
+              height="900"
+              alt="Public Node concept spec sheet: 150mm solar-powered enclosure, QR and NFC tap or scan, Pi 5 internals, LTE and mesh, IP66 weatherproof, live signed state UI mockup"
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption class="node-figure-caption">
+              Concept spec · public node — solar, NFC + QR, encrypted verifiable state, open
+              infrastructure. Not a shipping unit yet.
+            </figcaption>
+          </figure>
+          <ul class="list">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Raspberry Pi 5 (edge compute)</span>
+                <span class="list-sub"
+                  >Runs resolver client, mesh bridge, and local cache of signed status—not a second
+                  trust root</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-purple" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8.5a6 6 0 0 1 8 0"/><path d="M9 11.5a3 3 0 0 1 4 0"/><circle cx="11" cy="14" r="1" fill="currentColor" stroke="none"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">NFC front-end</span>
+                <span class="list-sub">NTAG or equivalent — tap opens the same <code>/c/…</code> URL</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">QR + engraved URL</span>
+                <span class="list-sub"
+                  >Laser-etched link on metal housing; camera path unchanged for strangers</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m4.93 19.07 1.41-1.41"/><path d="m17.66 6.34 1.41-1.41"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Solar + battery</span>
+                <span class="list-sub">Outdoor install without running conduit; sleep/wake duty cycle TBD</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Metal enclosure</span>
+                <span class="list-sub"
+                  >Machined or cast shell — the node is meant to be kept, mounted, or bolted in place</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="group">
+          <h2 class="group-label">Connectivity stack (later)</h2>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Cellular modem</span>
+                <span class="list-sub">LTE for resolver sync where Wi‑Fi never reaches</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Satellite backhaul (research)</span>
+                <span class="list-sub"
+                  >Starlink or similar when the node must stay honest off-grid—we have not picked
+                  hardware or cost model</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-pink" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Bluetooth mesh</span>
+                <span class="list-sub">Node as relay between tap and phones in a crowd</span>
+              </span>
+            </li>
+          </ul>
+          <p class="group-intro short">
+            Open questions: firmware update path, who operates the node, key custody on device, and
+            whether the node ever signs on behalf of the owner or only caches public resolver state.
+          </p>
+        </section>
+
+        <section class="group" id="now">
+          <h2 class="group-label">More</h2>
+          <ul class="list">
+            <li class="list-row list-action">
+              <a
+                href="https://github.com/h6811127/humanity.llc/blob/main/docs/RESEARCH_DIRECTIONS_AND_NODES.md"
+                rel="noopener noreferrer"
+              >
+                <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">RESEARCH_DIRECTIONS_AND_NODES.md</span>
+                  <span class="list-sub">Canonical notes in the repo</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/data-policy.html">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Operator data policy</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Back to landing</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

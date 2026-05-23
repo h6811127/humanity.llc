@@ -104,6 +104,19 @@ describe("scan status JSON (M3.4)", () => {
     expect(httpStatusForScanKind(vm.kind)).toBe(410);
   });
 
+  it("qr revoked returns 200 with qr_revoked kind (M4.2)", () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      { card: card(), qr: qr({ status: "revoked" }), verification: summary() },
+      "https://humanity.llc"
+    );
+    expect(vm.kind).toBe("qr_revoked");
+    expect(httpStatusForScanKind(vm.kind)).toBe(200);
+    const body = scanStatusBodyFromViewModel(vm);
+    expect(body.scan.qr?.status).toBe("revoked");
+  });
+
   it("malformed ids return 400", () => {
     const vm = malformedScanView("bad", QR, "https://humanity.llc");
     expect(vm.kind).toBe("malformed");

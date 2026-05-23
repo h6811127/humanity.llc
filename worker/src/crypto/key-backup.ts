@@ -8,6 +8,10 @@ export const BACKUP_VERSION = "1.0";
 export const MIN_PASSPHRASE_LENGTH = 12;
 export const PBKDF2_ITERATIONS = 310_000;
 
+export function normalizePassphrase(passphrase: string): string {
+  return passphrase.normalize("NFKC").trim();
+}
+
 export interface KeyBackupFile {
   type: string;
   version: string;
@@ -27,12 +31,12 @@ export interface KeyBackupFile {
   };
 }
 
-function assertPassphrase(passphrase: string): void {
-  if (passphrase.length < MIN_PASSPHRASE_LENGTH) {
-    throw new Error(
-      `Passphrase must be at least ${MIN_PASSPHRASE_LENGTH} characters.`
-    );
+function assertPassphrase(passphrase: string): string {
+  const p = normalizePassphrase(passphrase);
+  if (p.length < MIN_PASSPHRASE_LENGTH) {
+    throw new Error(`Passphrase must be at least ${MIN_PASSPHRASE_LENGTH} characters.`);
   }
+  return p;
 }
 
 async function deriveAesKey(
@@ -76,10 +80,10 @@ export async function createEncryptedBackup(params: {
   privateKeyBase58: string;
   passphrase: string;
 }): Promise<KeyBackupFile> {
-  assertPassphrase(params.passphrase);
+  const pass = assertPassphrase(params.passphrase);
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const iv = crypto.getRandomValues(new Uint8Array(12));
-  const aesKey = await deriveAesKey(params.passphrase, salt);
+  const aesKey = await deriveAesKey(pass, salt);
   const plaintext = decodeBase58(params.privateKeyBase58);
   const ciphertext = await crypto.subtle.encrypt(
     { name: "AES-GCM", iv },
@@ -115,11 +119,11 @@ export async function decryptBackup(
   privateKeyBase58: string;
 }> {
   validateBackupShape(backup);
-  assertPassphrase(passphrase);
+  const pass = assertPassphrase(passphrase);
   const salt = decodeBase58(backup.kdf.salt_b58);
   const iv = decodeBase58(backup.cipher.iv_b58);
   const ciphertext = decodeBase58(backup.cipher.ciphertext_b58);
-  const aesKey = await deriveAesKey(passphrase, salt);
+  const aesKey = await deriveAesKey(pass, salt);
   let plain: ArrayBuffer;
   try {
     plain = await crypto.subtle.decrypt(
