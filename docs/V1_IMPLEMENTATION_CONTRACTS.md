@@ -3,7 +3,7 @@
 **Status:** Pre-rebuild hardening artifact  
 **Purpose:** Extract buildable contracts from the v1.0 prose specs.
 
-**Operators:** humanity.llc implements the **reference resolver** first. Compatible third-party hosts MUST follow `docs/Technical Standards v1.0.md` §9.6–9.7 and `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
+**Operators:** humanity.llc implements the **reference network** first. Compatible third-party hosts MUST follow `docs/Technical Standards v1.0.md` §9.6–9.7 and `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
 
 ---
 
@@ -40,8 +40,8 @@ Optional but high-leverage for v1.1 or a strong private alpha:
 
 | Identifier | Format | Owner | Public? | Notes |
 |---|---|---|---|---|
-| `profile_id` | 24 base58 chars | Resolver/Card service | Yes | Opaque; no user metadata. |
-| `qr_id` | `qr_` + opaque random/ULID | Resolver/Card service | Yes | Referenced by QR payload. Personalized physical items receive unique QR IDs so each item can be revoked independently. |
+| `profile_id` | 24 base58 chars | Network/Card service | Yes | Opaque; no user metadata. |
+| `qr_id` | `qr_` + opaque random/ULID | Network/Card service | Yes | Referenced by QR payload. Personalized physical items receive unique QR IDs so each item can be revoked independently. |
 | `artifact_intent_id` | `ai_` + opaque random/ULID | Storefront API | No | Pre-checkout preview/proof record. |
 | `print_artifact_id` | `pa_` + opaque random/ULID | Printify Fulfillment Middleware | No | Generated artwork/proof ID. |
 | `commerce_order_id` | `co_` + opaque random/ULID | Commerce webhook service | No | Internal Shopify order link. |
@@ -53,11 +53,11 @@ Optional but high-leverage for v1.1 or a strong private alpha:
 
 ## API Contracts
 
-### Resolver API
+### Network API
 
 | Endpoint | Method | Auth | Contract |
 |---|---|---|---|
-| `GET /.well-known/hc/v1/health` | GET | None | Returns resolver version, health, and operator id. |
+| `GET /.well-known/hc/v1/health` | GET | None | Returns network version, health, and operator id. |
 | `POST /.well-known/hc/v1/cards` | POST | Signed payload | Creates signed public card document. |
 | `GET /.well-known/hc/v1/cards/{profile_id}` | GET | None | Returns HTML or JSON public card. |
 | `GET /.well-known/hc/v1/cards/{profile_id}/status` | GET | None | Returns machine-readable card status. |
@@ -361,14 +361,14 @@ has_issues -> submitted
 
 | Event | Producer | Consumer | Payload Must Include |
 |---|---|---|---|
-| `card.created` | Resolver | Verification, QR service | `profile_id`, `public_key`, `created_at` |
-| `qr.issued` | QR service | Resolver, Storefront | `qr_id`, `profile_id`, `epoch`, `status` |
+| `card.created` | Network | Verification, QR service | `profile_id`, `public_key`, `created_at` |
+| `qr.issued` | QR service | Network, Storefront | `qr_id`, `profile_id`, `epoch`, `status` |
 | `print_qr.issued` | QR service | Storefront, Printify Fulfillment Middleware | `qr_id`, `profile_id`, `print_artifact_id`, `status` |
-| `live_control.challenge_created` | Resolver | Scanner session, owner client | `challenge_id`, `profile_id`, `expires_at` |
-| `live_control.proven` | Resolver | Scanner session | `challenge_id`, `profile_id`, `signed_at` |
-| `card.revoked` | Resolver | Storefront, Printify Fulfillment Middleware | `profile_id`, `revoked_at`, `reason` |
+| `live_control.challenge_created` | Network | Scanner session, owner client | `challenge_id`, `profile_id`, `expires_at` |
+| `live_control.proven` | Network | Scanner session | `challenge_id`, `profile_id`, `signed_at` |
+| `card.revoked` | Network | Storefront, Printify Fulfillment Middleware | `profile_id`, `revoked_at`, `reason` |
 | `vouch.created` | Verification | Card service | `vouch_id`, `voucher_profile_id`, `vouchee_profile_id` |
-| `verification.updated` | Verification | Resolver/Card service | `profile_id`, `state`, `credential_ids` |
+| `verification.updated` | Verification | Network/Card service | `profile_id`, `state`, `credential_ids` |
 | `artifact_intent.created` | Storefront | Shopify adapter | `artifact_intent_id`, `product_id`, `source_qr_id`, `planned_item_qr_ids` |
 | `shopify.order_paid` | Shopify webhook consumer | Commerce, Printify Fulfillment Middleware | `shopify_order_id`, `commerce_order_id`, `artifact_intent_ids` |
 | `print_order.submitted` | Printify Fulfillment Middleware | Order timeline | `print_order_id`, `printify_order_id` |
@@ -398,20 +398,20 @@ has_issues -> submitted
 
 | Code | Domain | Meaning | Required Behavior |
 |---|---|---|---|
-| `CARD_INVALID_SIGNATURE` | Resolver | Card payload signature invalid. | Reject; do not store. |
-| `HANDLE_TAKEN` | Resolver | Handle already exists. | Return conflict. |
+| `CARD_INVALID_SIGNATURE` | Network | Card payload signature invalid. | Reject; do not store. |
+| `HANDLE_TAKEN` | Network | Handle already exists. | Return conflict. |
 | `QR_REVOKED` | QR/Storefront | QR credential revoked. | Block new print orders; render revoked page. |
 | `PRINT_QR_REVOKED` | QR/Storefront | Specific printed item QR credential revoked. | Render revoked item QR status while leaving other item QR credentials active. |
 | `QR_EXPIRED` | QR/Storefront | QR credential expired. | Block new print orders; request rotation. |
-| `CARD_SUSPENDED` | Resolver/Storefront | Governance suspension active. | Block new print orders; render suspended page. |
+| `CARD_SUSPENDED` | Network/Storefront | Governance suspension active. | Block new print orders; render suspended page. |
 | `VOUCH_QUOTA_EXCEEDED` | Verification | Voucher exceeded quota. | Block vouch. |
 | `VOUCHER_TOO_NEW` | Verification | Voucher within 90-day wait. | Block vouch. |
 | `ARTIFACT_INTENT_EXPIRED` | Storefront | Intent expired before checkout/webhook. | Regenerate preview; hold paid order if already paid. |
 | `CHECKOUT_METADATA_MISSING` | Commerce | Shopify order lacks artifact intent refs. | Hold for operator review; do not submit Printify order. |
 | `LIMITED_DROP_SOLD_OUT` | Storefront | No inventory remains. | Do not fulfill; trigger refund/support path. |
 | `PRINT_QR_SCAN_FAILED` | Printify Fulfillment Middleware | QR artwork failed QA. | Block order submission. |
-| `LIVE_CONTROL_EXPIRED` | Resolver | Live control challenge expired. | Show that live control was not proven; leave card state unchanged. |
-| `LIVE_CONTROL_INVALID_SIGNATURE` | Resolver | Challenge response signature invalid. | Reject response; do not display success. |
+| `LIVE_CONTROL_EXPIRED` | Network | Live control challenge expired. | Show that live control was not proven; leave card state unchanged. |
+| `LIVE_CONTROL_INVALID_SIGNATURE` | Network | Challenge response signature invalid. | Reject response; do not display success. |
 | `PRINTIFY_RATE_LIMITED` | Printify Fulfillment Middleware | Provider returned 429. | Retry with backoff; no duplicate order. |
 | `PRINTIFY_INVALID_ADDRESS` | Printify Fulfillment Middleware | Address rejected. | User-correctable fulfillment issue. |
 | `PRINTIFY_SOURCE_CHECK_FAILED` | Printify Fulfillment Middleware | Artwork/source issue. | Operator actionable state. |
@@ -425,7 +425,7 @@ has_issues -> submitted
 
 - Creating a card with a valid signature stores and resolves public JSON/HTML.
 - Creating a card with invalid canonicalization or invalid signature is rejected.
-- Private key is never sent to resolver, Shopify, or Printify middleware.
+- Private key is never sent to network, Shopify, or Printify middleware.
 - `GET /c/{profile_id}?q={qr_id}` renders active public card.
 - Revoked card renders revoked status and returns machine-readable revoked state.
 - Suspended card renders suspended status.

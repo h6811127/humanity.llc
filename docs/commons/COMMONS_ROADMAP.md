@@ -3,7 +3,7 @@
 **Status:** Strategic draft  
 **Purpose:** Define how Humanity Commons can grow from a v1 trust product into a democratic, worker-and-member-governed digital enterprise.
 
-**Trust layer architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — federated resolvers and open standards are the path to institutional gravity; a single permanent operator or public blockchain core is not the plan.
+**Trust layer architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — federated networks and open standards are the path to institutional gravity; a single permanent operator or public blockchain core is not the plan.
 
 ---
 
@@ -101,7 +101,7 @@ Humanity Commons can become a sustainable enterprise because it combines four du
 
 The market wedge is not "identity SaaS for everyone." The wedge is a trusted, member-owned membership and coordination layer for communities that already distrust extractive platforms.
 
-The first market proof should be narrow: one event, cooperative, club, or online community should use the card because it solves a concrete trust or membership problem—with **public card creation** and a path to a **second resolver operator**. The project should not present itself as venture-ready until a repeatable beachhead use case, buyer/funder, retention signal, and non-extractive growth loop exist.
+The first market proof should be narrow: one event, cooperative, club, or online community should use the card because it solves a concrete trust or membership problem—with **public card creation** and a path to a **second network operator**. The project should not present itself as venture-ready until a repeatable beachhead use case, buyer/funder, retention signal, and non-extractive growth loop exist.
 
 ---
 
@@ -137,7 +137,7 @@ Events make the trust loop legible. A person can show a pass, scan a QR, ask for
 - Community profile.
 - Member pass issuance.
 - Humanity Card.
-- Public QR resolver.
+- Public QR network.
 - Vouching.
 - Live control proof for contexts where static QR is not enough.
 - Event check-in.
@@ -202,7 +202,7 @@ Events make the trust loop legible. A person can show a pass, scan a QR, ask for
 - Event check-in without identity brokerage.
 - Mutual-aid matching with consent boundaries.
 - Local chapter tooling.
-- Federated resolver/operator support.
+- Federated network/operator support.
 
 **Enterprise value:**
 
@@ -216,7 +216,7 @@ Events make the trust loop legible. A person can show a pass, scan a QR, ask for
 
 **Products:**
 
-- Multi-operator resolver support.
+- Multi-operator network support.
 - Operator certification.
 - Standards ratification process.
 - Interoperable exports/imports.
@@ -559,7 +559,7 @@ Recommended policies:
 - Commons Pass.
 - Community creation.
 - Signed card.
-- QR resolver.
+- QR network.
 - Revocation.
 - Vouching.
 - Event check-in.
@@ -625,7 +625,7 @@ Recommended policies:
 - Cooperative/trust ownership.
 - Federation dues.
 - Local governance.
-- Multi-region resolver resilience.
+- Multi-region network resilience.
 
 **Success metric:** Humanity Commons can survive beyond one founder, one company, one server, or one jurisdiction.
 

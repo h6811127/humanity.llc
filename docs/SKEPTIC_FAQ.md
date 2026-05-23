@@ -16,7 +16,7 @@ People care when the scan answers **operational trust questions** under **publis
 
 | Question at the door | What helps |
 |----------------------|------------|
-| Is this printed QR still valid? | Live resolver status (active / revoked / suspended) |
+| Is this printed QR still valid? | Live network status (active / revoked / suspended) |
 | Is this person known in our network? | Vouches and credentials—not follower counts |
 | Is the person here holding the key *now*? | Live control proof (short-lived) |
 | Can we stop trusting this object tomorrow? | Owner revoke; per-sticker revoke |
@@ -281,7 +281,7 @@ The mitigation is to launch narrow, tell the truth, validate one beachhead, and 
 
 ---
 
-## Isn't The Resolver A Honeypot?
+## Isn't The Network A Honeypot?
 
 It can be if built like a surveillance identity company.
 
@@ -290,9 +290,9 @@ The reference design is intentionally **minimal**:
 - Pseudonymous `profile_id` and public key—not legal identity in the core loop.
 - No scan analytics by default.
 - Private keys stay on the user device.
-- Commerce PII stays in Shopify/Printify, not the resolver.
+- Commerce PII stays in Shopify/Printify, not the network.
 
-A resolver is still a **target** (subpoenas, breaches, vouch graphs). Mitigations:
+A network is still a **target** (subpoenas, breaches, vouch graphs). Mitigations:
 
 - Publish what is stored and for how long.
 - Federate operators so one company does not own all trust state forever.
@@ -306,7 +306,7 @@ See `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` §5.
 
 Not part of this project’s trust model.
 
-Public blockchains make many trust problems **more permanent and more traceable** (wallets, indexers, immutable graphs)—not less. Humanity Commons needs **live status at scan time** (revoked, suspended, active). That is a **resolver** job with **Ed25519-signed documents**, not chain gas or NFT identity.
+Public blockchains make many trust problems **more permanent and more traceable** (wallets, indexers, immutable graphs)—not less. Humanity Commons needs **live status at scan time** (revoked, suspended, active). That is a **network** job with **Ed25519-signed documents**, not chain gas or NFT identity.
 
 Ledger anchoring is **out of v1 scope** and not a default roadmap bet. If it is ever reconsidered, it needs a concrete governance-approved use case that a minimal operator cannot meet honestly—see `docs/V1_DECISION_LOCK.md`.
 
@@ -325,7 +325,7 @@ No.
 Power comes from **dependency and standards**, not from knowing everyone's legal name:
 
 - Communities check the same trust grammar at the door.
-- Multiple operators run compatible resolvers.
+- Multiple operators run compatible networks.
 - Members govern rights-affecting rules.
 - Commons Pass puts repeat use inside orgs.
 

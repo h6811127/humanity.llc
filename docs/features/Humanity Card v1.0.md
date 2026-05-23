@@ -26,7 +26,7 @@ The product promise is:
 
 > I am a real human participating in an open, consent-based commons. Here is my signed card. You can scan it, verify it, and know what it claims without trusting a social platform.
 
-Version 1.0 must feel like a passport stamp, membership card, and public proof object. The resolver, QR system, verification system, Storefront, Shopify checkout, and Printify integration are infrastructure behind that object.
+Version 1.0 must feel like a passport stamp, membership card, and public proof object. The network, QR system, verification system, Storefront, Shopify checkout, and Printify integration are infrastructure behind that object.
 
 ---
 
@@ -38,7 +38,7 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 | Visible proof | Verification state must be understandable at a glance and inspectable in detail. |
 | Portable trust | A card must be exportable and resolvable outside a single app UI. |
 | Revocable consent | Owners must be able to revoke public resolution and printed QR validity. |
-| No fake decentralization | If only one resolver exists at launch, the product must say so; protocol design still supports multiple resolvers. |
+| No fake decentralization | If only one network exists at launch, the product must say so; protocol design still supports multiple networks. |
 | No surveillance default | Scan analytics and tracking are disabled unless explicit consent rules are satisfied. |
 | Physical-digital bridge | Printing is a first-class system component, not an afterthought. |
 | Governance visible | Every card links to the constitution, technical standards, and governance process. |
@@ -67,7 +67,7 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 |---|---|
 | HC-US-10 | As a scanner, I want a scanned QR code to resolve quickly to the public Humanity Card. |
 | HC-US-11 | As a scanner, I want to see whether the card is active, revoked, suspended, unverified, vouched, device-verified, or steward-level. |
-| HC-US-12 | As a scanner, I want to verify that the card payload and resolver response are signed. |
+| HC-US-12 | As a scanner, I want to verify that the card payload and network response are signed. |
 | HC-US-13 | As a scanner, I want to know what data, if any, is being logged when I scan. |
 | HC-US-14 | As a scanner, I want cached cards to clearly show that they may be stale. |
 | HC-US-15 | As a scanner, I want to know that a printed QR resolves to a card but does not prove the holder is the card owner. |
@@ -86,7 +86,7 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 
 | ID | Story |
 |---|---|
-| HC-US-21 | As an operator, I want resolver and Printify Fulfillment Middleware events to be auditable without exposing unnecessary personal data. |
+| HC-US-21 | As an operator, I want network and Printify Fulfillment Middleware events to be auditable without exposing unnecessary personal data. |
 | HC-US-22 | As a trust and safety steward, I want suspension to require documented cause, visible status, and appeal rights. |
 | HC-US-23 | As the collective, I want physical merchandise to spread the system without weakening revocation, privacy, or identity claims. |
 
@@ -99,7 +99,7 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 | ID | Requirement | Priority |
 |---|---|---|
 | HC-FR-01 | System MUST generate an Ed25519 keypair on the user's device. | P0 |
-| HC-FR-02 | Private keys MUST NOT be transmitted to any Humanity resolver or Printify Fulfillment Middleware. | P0 |
+| HC-FR-02 | Private keys MUST NOT be transmitted to any Humanity network or Printify Fulfillment Middleware. | P0 |
 | HC-FR-03 | User MUST choose a unique handle matching protocol handle rules. | P0 |
 | HC-FR-04 | User MUST provide a manifesto line of 1-280 characters. | P0 |
 | HC-FR-05 | System MUST create a signed public profile document. | P0 |
@@ -149,7 +149,7 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 |---|---|---|
 | HC-FR-29 | QR payload MUST be short enough for reliable printing and scanning. | P0 |
 | HC-FR-30 | QR payload MUST include or reference a signed credential. | P0 |
-| HC-FR-31 | QR credential MUST include profile ID, resolver hint, epoch, scope, issued_at, expires_at, and signature. | P0 |
+| HC-FR-31 | QR credential MUST include profile ID, network hint, epoch, scope, issued_at, expires_at, and signature. | P0 |
 | HC-FR-32 | QR codes MUST be regenerated when epoch changes or key material rotates. | P0 |
 | HC-FR-33 | Each personalized printed item MUST receive a unique item-scoped QR credential so stolen/lost items can be revoked individually. | P0 |
 | HC-FR-34 | Printed QR codes MUST resolve to a status page after expiration or revocation, not silently fail. | P0 |
@@ -183,8 +183,8 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 |---|---|---|
 | HC-FR-44 | Card owner MUST be able to revoke the active card using device-held key material or exported recovery credentials. | P0 |
 | HC-FR-45 | Card owner MUST be able to revoke an individual printed-item QR without revoking sibling printed-item QR credentials. | P0 |
-| HC-FR-46 | Revocation MUST mark resolver responses as `410 Gone` for public card resolution. | P0 |
-| HC-FR-47 | Revocation MUST mark printed QR artifacts as revoked in the resolver status response. | P0 |
+| HC-FR-46 | Revocation MUST mark network responses as `410 Gone` for public card resolution. | P0 |
+| HC-FR-47 | Revocation MUST mark printed QR artifacts as revoked in the network status response. | P0 |
 | HC-FR-48 | Revocation MUST not attempt to recall already shipped physical products. | P0 |
 | HC-FR-49 | Revocation page MUST explain that physical artifacts may still exist but will resolve as revoked. | P0 |
 
@@ -192,7 +192,7 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 
 | ID | Requirement | Priority |
 |---|---|---|
-| HC-FR-50 | User MUST be able to export profile document, public badges, signed vouches, QR credential history, resolver list, and encrypted private key backup. | P0 |
+| HC-FR-50 | User MUST be able to export profile document, public badges, signed vouches, QR credential history, network operator list, and encrypted private key backup. | P0 |
 | HC-FR-51 | Export MUST be downloadable within 24 hours. | P0 |
 | HC-FR-52 | Export MUST include a manifest signature. | P0 |
 | HC-FR-53 | Export MUST include print artifact metadata but MUST NOT include third-party payment secrets. | P0 |
@@ -202,7 +202,7 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 | ID | Requirement | Priority |
 |---|---|---|
 | HC-FR-54 | System MUST NOT collect scan analytics by default. | P0 |
-| HC-FR-55 | Resolver access logs MUST anonymize IP addresses. | P0 |
+| HC-FR-55 | Network access logs MUST anonymize IP addresses. | P0 |
 | HC-FR-56 | Printify Fulfillment Middleware MUST store shipping data only as long as required for fulfillment, support, tax, fraud, and legal obligations. | P0 |
 | HC-FR-57 | Printify Fulfillment Middleware MUST not share profile-private data with Printify. | P0 |
 | HC-FR-58 | Scanner logging, if ever enabled, MUST require explicit scanner and card-owner consent. | P1 |
@@ -218,7 +218,7 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 | HC-NFR-03 | QR scan-to-render time | < 2s p95 on mobile LTE |
 | HC-NFR-04 | Static card shell size | < 150KB compressed |
 | HC-NFR-05 | QR payload length | <= 120 characters where possible |
-| HC-NFR-06 | Resolver availability | 99.5% during v1.0 launch period |
+| HC-NFR-06 | Network availability | 99.5% during v1.0 launch period |
 | HC-NFR-07 | Print order creation latency | < 10s p95 excluding payment provider redirects |
 | HC-NFR-08 | Print order webhook processing | < 60s from webhook receipt |
 | HC-NFR-09 | Signature algorithm | Ed25519 |
@@ -246,7 +246,7 @@ Humanity Web App
   - Verification/vouching UX
   - Print ordering UX
 
-Resolver API
+Network API
   - Stores public card documents
   - Resolves QR credentials
   - Returns HTML/JSON
@@ -278,8 +278,8 @@ Printify
 | Browser to Humanity | Private keys stay on device; signed payloads cross boundary. |
 | Humanity to Shopify | Cart line metadata, checkout/order references, and payment state cross boundary; private keys and verification secrets do not. |
 | Humanity to Printify | Only print artwork, product/order details, and shipping data required for fulfillment cross boundary. |
-| Scanner to Resolver | Scanner receives public data only; scan analytics disabled by default. |
-| Resolver to Verification | Resolver consumes signed public verification records; it does not invent status. |
+| Scanner to Network | Scanner receives public data only; scan analytics disabled by default. |
+| Network to Verification | Network consumes signed public verification records; it does not invent status. |
 | Printify webhook to Humanity | Webhook payloads are authenticated and mapped to internal order IDs. |
 
 ---
@@ -299,7 +299,7 @@ User chooses handle and manifesto
   |
 Client creates signed profile document
   |
-Resolver validates and stores public card
+Network validates and stores public card
   |
 Verification service assigns registered or unverified status
   |
@@ -337,9 +337,9 @@ START
   |
 Scanner scans physical QR
   |
-Resolver parses credential and profile ID
+Network parses credential and profile ID
   |
-Resolver checks revocation/suspension/expiration
+Network checks revocation/suspension/expiration
   |
 If active, card HTML renders
   |
@@ -389,9 +389,9 @@ Owner opens revoke flow
   |
 Client signs revocation statement
   |
-Resolver verifies signature
+Network verifies signature
   |
-Resolver marks card revoked
+Network marks card revoked
   |
 QR resolution returns 410 or revoked HTML status
   |
@@ -422,7 +422,7 @@ END
 
 ## 8. API Specifications
 
-### 8.1 Resolver API Summary
+### 8.1 Network API Summary
 
 | Endpoint | Method | Description |
 |---|---|---|
@@ -512,7 +512,7 @@ Printify Fulfillment Middleware details are specified in `Printify Fulfillment M
 | `profile_id` | string | Yes | Card profile ID. |
 | `epoch` | integer | Yes | QR epoch number. |
 | `scope` | enum | Yes | `card` or `print_artifact`. |
-| `resolver_hint` | string | Yes | Primary resolver base URL or domain hint. |
+| `resolver_hint` | string | Yes | Primary network base URL or domain hint. |
 | `issued_at` | datetime | Yes | Creation time. |
 | `expires_at` | datetime | Yes | Expiration time. |
 | `payload` | string | Yes | Encoded QR payload. |
@@ -538,14 +538,14 @@ Printify Fulfillment Middleware details are specified in `Printify Fulfillment M
 |---|---|
 | HC-SEC-01 | Private keys MUST remain on user devices or encrypted exports. |
 | HC-SEC-02 | Profile documents MUST be canonicalized before signing. |
-| HC-SEC-03 | Resolver MUST verify owner signatures before accepting profile creation, update, revocation, or QR rotation. |
+| HC-SEC-03 | Network MUST verify owner signatures before accepting profile creation, update, revocation, or QR rotation. |
 | HC-SEC-04 | Printify Fulfillment Middleware MUST NOT receive private keys. |
 | HC-SEC-05 | Printify Fulfillment Middleware MUST NOT expose Printify API tokens to clients. |
 | HC-SEC-06 | Commerce and print order PII MUST be separated from public card data. |
-| HC-SEC-07 | Resolver MUST avoid scan analytics by default. |
+| HC-SEC-07 | Network MUST avoid scan analytics by default. |
 | HC-SEC-08 | Suspensions MUST be signed by authorized governance keys. |
 | HC-SEC-09 | Revocation MUST be visible and machine-readable. |
-| HC-SEC-10 | QR artwork MUST include only public resolver data and signed credentials. |
+| HC-SEC-10 | QR artwork MUST include only public network data and signed credentials. |
 | HC-SEC-11 | Live control proof MUST be short-lived, single-use, and labeled as key-control evidence only. |
 
 ---
@@ -608,7 +608,7 @@ Printify Fulfillment Middleware details are specified in `Printify Fulfillment M
 - Follower counts.
 - Public profile search directory.
 - Messaging inbox.
-- Blockchain resolver.
+- Blockchain network.
 - Fully decentralized multi-operator production network.
 - Automated content moderation.
 - Rich media profile pages.
@@ -640,7 +640,7 @@ Printify Fulfillment Middleware details are specified in `Printify Fulfillment M
 | **Humanity Card** | Public signed identity card for a person in Humanity Commons. |
 | **Card Owner** | Person controlling the private key for a card. |
 | **QR Credential** | Signed object encoded in or referenced by a QR code. |
-| **Resolver** | Service that resolves card IDs and QR credentials to public card data. |
+| **Network** | Service that resolves card IDs and QR credentials to public card data. |
 | **Vouch** | Signed statement from one verified human about another human. |
 | **Badge Trail** | Public list of badges and issuance evidence on a card. |
 | **Print Artifact** | Physical object containing a Humanity QR code, such as sticker, card, shirt, or bag. |
@@ -666,6 +666,6 @@ Printify Fulfillment Middleware details are specified in `Printify Fulfillment M
 
 1. Finalize Technical Standards v1.0 canonical payload and signature format.
 2. Finalize Printify Fulfillment Middleware v1.0 templates and order lifecycle.
-3. Build reference resolver and card web app.
+3. Build reference network and card web app.
 4. Build verification/vouching service.
 5. Launch founding Humanity Card cohort.

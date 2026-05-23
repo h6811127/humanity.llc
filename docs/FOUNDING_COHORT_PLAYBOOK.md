@@ -5,7 +5,7 @@
 
 **Superseded for architecture and launch gates by:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`
 
-**Important:** Card creation is **public** when Phase A ships. This playbook does **not** control who may use the resolver. Tier 1 personalized artifacts are for **card holders**, not “accepted cohort members only.” See `docs/MERCH_LED_V1.md`.
+**Important:** Card creation is **public** when Phase A ships. This playbook does **not** control who may use the network. Tier 1 personalized artifacts are for **card holders**, not “accepted cohort members only.” See `docs/MERCH_LED_V1.md`.
 
 ---
 

@@ -3,7 +3,7 @@
 **Status:** Canonical wedge (v1 GTM)  
 **Purpose:** Lead with physical artifacts as viral distribution while pairing **proof of curiosity** (spread) with **proof of belonging** (retention). Commons Pass and organizer tooling follow once people already wear the object.
 
-**Architecture and launch gate:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — public card creation when Phase A ships; federated resolvers long-term; founding cohort is optional feedback only.
+**Architecture and launch gate:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — public card creation when Phase A ships; federated networks long-term; founding cohort is optional feedback only.
 
 ---
 
@@ -45,7 +45,7 @@ Neither proof claims legal identity, KYC, or “holder = owner” from a static 
 
 **Product surfaces:**
 
-- Public scan page (resolver).
+- Public scan page (network).
 - Founding drop / story-row storefront (`docs/features/Storefront v1.0.md`).
 - Shareable landing: “Get yours” / “Create yours.”
 
@@ -119,7 +119,7 @@ Build in this order. Do not start with Commons Pass console or event check-in.
 Prove the scan moment is worth a stranger’s attention:
 
 1. Signed Humanity Card create (browser-held keys).
-2. HTTPS QR resolver + trust-state UI (card, human trust, limitations).
+2. HTTPS QR network + trust-state UI (card, human trust, limitations).
 3. Revoked / suspended / unknown status pages.
 4. Optional waitlist for merch drops only—not for card creation gate.
 5. Vouch issuance + display (`Vouched Human` public label).
@@ -133,7 +133,7 @@ Prove walking ads work:
 
 1. One flagship artifact (sticker recommended first for scan QA; flat card second).
 2. Story-row storefront — one narrative, not a 50-SKU grid.
-3. Non-personalized or lightly personalized QR pointing at resolver (personalized per-item QR only after Printify spike passes — see `docs/V1_ASSUMPTION_REGISTER.md`).
+3. Non-personalized or lightly personalized QR pointing at network (personalized per-item QR only after Printify spike passes — see `docs/V1_ASSUMPTION_REGISTER.md`).
 4. Packaging / product page with bearer warning and “merch ≠ vouched” line.
 
 **Exit:** Orders from outside founder network; scan→create conversion tracked; at least one organic reshare.
@@ -196,7 +196,7 @@ Required blocks, visually separated:
 4. **Belonging CTA** — for holders: prove live control, export, revoke; vouch request where policy allows.
 5. **Limits** — bearer warning + what scan does not prove.
 
-Curiosity and belonging share one URL pattern; content adapts by resolver state, not by separate products.
+Curiosity and belonging share one URL pattern; content adapts by network status, not by separate products.
 
 ---
 

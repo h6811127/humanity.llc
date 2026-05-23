@@ -1,7 +1,7 @@
 # Protocol, Federation, And Public Launch Strategy
 
-**Status:** Canonical strategic architecture (supersedes implicit “founding cohort gate” and “solo resolver empire” readings across the repo)  
-**Purpose:** Define how Humanity Commons grows into member-governed trust infrastructure with institutional gravity—through **open standards and federated resolvers**, not a single identity honeypot, a private invite list, or a public blockchain core.
+**Status:** Canonical strategic architecture (supersedes implicit “founding cohort gate” and “solo single-operator empire” readings across the repo)  
+**Purpose:** Define how Humanity Commons grows into member-governed trust infrastructure with institutional gravity—through **open standards and federated networks**, not a single identity honeypot, a private invite list, or a public blockchain core.
 
 **Read this first** when deciding product scope, launch posture, privacy boundaries, or long-term power strategy.
 
@@ -22,9 +22,9 @@ That grammar is:
 **Power** (institutional adoption, standards gravity, political legitimacy) comes from:
 
 1. **Protocol lock-in** — public spec, portable formats, multiple implementations.
-2. **Federated operators** — many resolvers, one API; no single company owns “identity.”
+2. **Federated operators** — many networks, one API; no single company owns “identity.”
 3. **Member governance** — rights-affecting rules ratified by people who depend on the system.
-4. **Repeat dependency** — orgs, events, and tools check resolver status instead of platform login or legal ID.
+4. **Repeat dependency** — orgs, events, and tools check network status instead of platform login or legal ID.
 
 **Privacy** (anti-surveillance, anti-honeypot) comes from:
 
@@ -37,11 +37,11 @@ Empire and total untraceability **pull in opposite directions**. The project acc
 
 ---
 
-## 2. What A Resolver Is (And Is Not)
+## 2. What A Network Is (And Is Not)
 
-### 2.1 Resolver job
+### 2.1 Network job
 
-A **resolver** is a **signed bulletin board** for public trust state:
+A **network** is a **signed bulletin board** for public trust state:
 
 | Function | Mechanism |
 |---|---|
@@ -51,9 +51,9 @@ A **resolver** is a **signed bulletin board** for public trust state:
 | Vouches (when enabled) | Store and validate signed vouch credentials |
 | Live control (when enabled) | Issue challenge nonce; verify owner signature |
 
-The resolver does **not** need legal name, government ID, phone number, or email to perform these jobs.
+The network does **not** need legal name, government ID, phone number, or email to perform these jobs.
 
-### 2.2 Resolver is not
+### 2.2 Network is not
 
 - A **government identity** or KYC authority.
 - A **biometric** or “unique human on Earth” oracle.
@@ -73,7 +73,7 @@ Subpoenas, breaches, and graph analysis still hurt. The design goal is **minimiz
 
 ---
 
-## 3. Federated Resolvers + Open Standards
+## 3. Federated Networks + Open Standards
 
 ### 3.1 Architecture
 
@@ -86,7 +86,7 @@ Subpoenas, breaches, and graph analysis still hurt. The design goal is **minimiz
          ┌─────────────────────────┼─────────────────────────┐
          ▼                         ▼                         ▼
   humanity.llc              union.example.org          coop.example.org
-  (reference operator)      (member resolver)          (community resolver)
+  (reference operator)      (member network)          (community network)
          │                         │                         │
          └─────────────────────────┴─────────────────────────┘
                                    │
@@ -94,9 +94,9 @@ Subpoenas, breaches, and graph analysis still hurt. The design goal is **minimiz
                     (same trust UI, same limits copy)
 ```
 
-- **humanity.llc** runs the **reference resolver** and best reference client—not the only resolver forever.
+- **humanity.llc** runs the **reference network** and best reference client—not the only network forever.
 - **Second operator** (co-op, union, club, aligned host) is a **strategic milestone**, not a nice-to-have: it proves the system is a **protocol**, not a startup database.
-- **Commons Pass** communities may run **scoped resolver policy** for their members while using the same card grammar.
+- **Commons Pass** communities may run **scoped network policy** for their members while using the same card grammar.
 
 ### 3.2 Operator requirements
 
@@ -120,7 +120,7 @@ Responses SHOULD include `X-Resolver-Operator` (or equivalent in JSON body) so s
 
 Self-hosted cards (GitHub Pages, personal IPFS) reduce operator concentration but **fragment discovery and revocation UX**. Federation balances **plural operators** with **predictable scan behavior**.
 
-### 3.5 Why not “one resolver forever”
+### 3.5 Why not “one network forever”
 
 A single permanent operator becomes a **capture and subpoena honeypot** and blocks institutional trust (“another platform identity company”). Federation is the path to **legitimacy and scale**.
 
@@ -142,11 +142,11 @@ A single permanent operator becomes a **capture and subpoena honeypot** and bloc
 
 | Phase | Deliverable | Launch gate |
 |---|---|---|
-| **A** | Card + reference resolver + scan page + revocation (+ vouch display if ready) | **Open card creation** when stable |
+| **A** | Card + reference network + scan page + revocation (+ vouch display if ready) | **Open card creation** when stable |
 | **B** | Curiosity drop (optional merch) | After A proves scan moment |
 | **C** | Belonging (vouches, personalized item QR) | Public rules; not closed club |
 | **D** | Commons Pass | After A–C show repeat use |
-| **→** | Governance + more operators | Second resolver + member ratification milestones |
+| **→** | Governance + more operators | Second network + member ratification milestones |
 
 Merch remains **distribution**, not the product. See `docs/MERCH_LED_V1.md` (updated for public launch).
 
@@ -159,7 +159,7 @@ Merch remains **distribution**, not the product. See `docs/MERCH_LED_V1.md` (upd
 | Second operator announced | Protocol credibility |
 | Org runs membership on same grammar | Institutional wedge |
 
-Do **not** require “25–100 founding humans” before opening the resolver.
+Do **not** require “25–100 founding humans” before opening the network.
 
 ---
 
@@ -181,7 +181,7 @@ These are **normative** for the reference operator and **recommended** for all o
 - Government ID images or numbers.
 - Phone numbers or emails **required** for card creation.
 - Scan analytics (location trails, per-scan profiles, fingerprinting).
-- Payment/shipping PII in the resolver DB (commerce stays in Shopify/Printify boundary).
+- Payment/shipping PII in the network database (commerce stays in Shopify/Printify boundary).
 
 ### 5.3 Access logs
 
@@ -205,7 +205,7 @@ These are **normative** for the reference operator and **recommended** for all o
 | **Avoid honeypot** | Minimize retention; publish what you store; no pay-to-verify |
 | **Enable accountability** | Public suspension rules, appeals, steward review—not shadow scores |
 
-Stronger identity (KYC, phone verification) may exist **at an org’s edge** under **their** resolver policy—not as humanity.llc’s global default.
+Stronger identity (KYC, phone verification) may exist **at an org’s edge** under **their** network policy—not as humanity.llc’s global default.
 
 ---
 
@@ -214,7 +214,7 @@ Stronger identity (KYC, phone verification) may exist **at an org’s edge** und
 ### 7.1 v1 position
 
 - **No public blockchain** as trust core, identity layer, or product story.
-- Card creation, vouches, and revocation use **Ed25519 signatures** and **operator resolver state**—not chain gas, wallets, or NFT “humanity.”
+- Card creation, vouches, and revocation use **Ed25519 signatures** and **operator network status**—not chain gas, wallets, or NFT “humanity.”
 
 **Rationale:** This project targets **live status at scan**, data minimization, and **federated operators**—not permanent wallet graphs or immutable public ledgers.
 
@@ -222,7 +222,7 @@ Stronger identity (KYC, phone verification) may exist **at an org’s edge** und
 
 Do not treat “optional chain later” as a default roadmap item. Any transparency-log or anchoring idea requires:
 
-1. A concrete problem a minimal resolver cannot solve honestly.
+1. A concrete problem a minimal network cannot solve honestly.
 2. Governance ratification with published retention and correlation analysis.
 3. Explicit rejection of “verify human on chain” or NFT identity products.
 
@@ -261,13 +261,13 @@ See `docs/PUBLIC_LAUNCH_AND_GOVERNANCE_PLAN.md` for narrative, transition trigge
 | Optional early testers | `docs/FOUNDING_COHORT_PLAYBOOK.md` (non-gating) |
 | Assumptions | `docs/V1_ASSUMPTION_REGISTER.md` |
 
-When older copy says “join founding cohort to use the product” or implies a **single eternal resolver**, treat this document as authoritative.
+When older copy says “join founding cohort to use the product” or implies a **single eternal network**, treat this document as authoritative.
 
 ---
 
 ## 10. Implementation Priorities (Reference Operator)
 
-1. Ship **minimal reference resolver**: create card, resolve scan, revoke, honest limits UI.
+1. Ship **minimal reference network**: create card, resolve scan, revoke, honest limits UI.
 2. Publish **Technical Standards v1.0** and operator data policy alongside launch.
 3. **Open card creation** without email gate.
 4. Prove **stranger scan → create** before scaling merch or Commons Pass.
@@ -278,4 +278,4 @@ When older copy says “join founding cohort to use the product” or implies a 
 
 ## 11. One-Sentence Summary
 
-> Build the **HTTP of trust status**—open spec, federated hosts, member-governed rules, minimal data—launch **publicly** when the resolver works, and grow power through **dependency and standards**, not through a private cohort or a chain.
+> Build the **HTTP of trust status**—open spec, federated hosts, member-governed rules, minimal data—launch **publicly** when the network works, and grow power through **dependency and standards**, not through a private cohort or a chain.

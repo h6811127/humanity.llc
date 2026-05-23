@@ -48,7 +48,7 @@ Commons API
   - Stamp records
   - Policy enforcement
 
-Resolver / Public Web
+Network / Public Web
   - Mobile pass pages
   - Humanity Card pages
   - QR status pages

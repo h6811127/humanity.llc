@@ -233,7 +233,7 @@ Stewards verify distinct human presence
   |
 Stewards sign ceremony statements
   |
-Credential bundle syncs to resolver
+Credential bundle syncs to network
   |
 Card becomes verified_human if threshold is met
   |
@@ -310,7 +310,7 @@ END
 | `latest_accepted_vouch_at` | datetime | No | Most recent active accepted vouch timestamp, used as a public freshness signal. |
 | `credential_ids` | array | Yes | Active public credential references. |
 | `updated_at` | datetime | Yes | Summary update time. |
-| `signature` | object | Yes | System or resolver signature. |
+| `signature` | object | Yes | System or network signature. |
 
 ---
 
@@ -434,5 +434,5 @@ END
 
 1. Finalize vouch credential canonical payload.
 2. Define governance constants for thresholds and quotas.
-3. Implement verification summary in Humanity Card resolver.
+3. Implement verification summary in Humanity Card network.
 4. Add storefront copy checks separating artifacts from verification.

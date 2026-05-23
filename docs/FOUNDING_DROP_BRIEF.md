@@ -97,7 +97,7 @@ Check every box before taking money.
 - [ ] ≥`[50]` orders or ≥`[200]` scans (set your bar)
 - [ ] Scan→card-create ≥`[5]%` or ≥`[25]` cards from non-cohort emails
 - [ ] Zero “I thought I bought verification” support tickets unresolved
-- [ ] Phase A digital slice stable 7 days (no P0 resolver bugs)
+- [ ] Phase A digital slice stable 7 days (no P0 network bugs)
 
 ---
 
@@ -168,7 +168,7 @@ Pause sales and fix before continuing if:
 - Printed QR fails scan QA on >20% of random sample
 - Paid webhook duplicates fulfillment
 - Multiple users believe purchase = `Vouched Human`
-- Resolver shows wrong status >1% of scans in cohort test
+- Network shows wrong status >1% of scans in cohort test
 - Printify orders stuck >`[7]` days with no operator path
 
 ---
@@ -191,7 +191,7 @@ Pause sales and fix before continuing if:
 
 ## Day-of Launch Runbook (30 min)
 
-1. Resolver health check (active + revoked test URLs).
+1. Network health check (active + revoked test URLs).
 2. Place test order Tier 0 → confirm webhook → confirm no duplicate Printify job.
 3. Publish founder post + pin trust model link.
 4. Cohort on standby for first-hour scan questions.

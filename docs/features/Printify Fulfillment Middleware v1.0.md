@@ -302,7 +302,7 @@ Minimum scopes for a single Humanity-managed Printify shop:
 | PM-NFR-07 | Catalog sync frequency | Daily, plus manual refresh |
 | PM-NFR-08 | Printify API backoff | Exponential backoff on 429/5xx |
 | PM-NFR-09 | PII retention | Minimum needed for support/legal/tax/fraud, documented in retention policy |
-| PM-NFR-10 | Availability isolation | Resolver remains available if Printify is down |
+| PM-NFR-10 | Availability isolation | Network remains available if Printify is down |
 
 ---
 
@@ -895,11 +895,11 @@ draft
 |---|---|---|---|
 | Duplicate order submitted | Medium | High | Idempotency keys, payment-intent locking, reconcile before retry. |
 | Printed QR too small to scan | Medium | High | Template safe areas, automated QR scan QA, minimum physical QR size. |
-| Printify outage blocks ordering | Medium | Medium | Queue, clear user state, isolate resolver from Printify Fulfillment Middleware. |
+| Printify outage blocks ordering | Medium | Medium | Queue, clear user state, isolate network from Printify Fulfillment Middleware. |
 | Shipping PII leak | Low | High | Separate encrypted order domain, log redaction, access controls. |
 | Auto-approval sends bad orders to production | Medium | High | Manual approval by default and proof gates. |
 | Product template drift | Medium | Medium | Approved catalog snapshots and periodic validation. |
-| Revoked QR printed on merchandise | High over time | Medium | Resolver shows revoked status; block new orders using revoked credentials. |
+| Revoked QR printed on merchandise | High over time | Medium | Network shows revoked status; block new orders using revoked credentials. |
 | Provider rate limiting | Medium | Medium | Cache catalog, throttle writes, exponential backoff. |
 
 ---

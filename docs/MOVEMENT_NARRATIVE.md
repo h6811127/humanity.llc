@@ -3,7 +3,7 @@
 **Status:** Strategic draft  
 **Purpose:** Define the emotional and cultural layer of Humanity Commons without overloading the product UI or turning the card into "Linktree plus politics."
 
-**Architecture (factual):** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — open spec, federated resolvers, public card creation.
+**Architecture (factual):** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — open spec, federated networks, public card creation.
 
 **Direction (factual):** `docs/DEMOCRATIC_INFRASTRUCTURE.md` — infrastructure for member-run communities, not a platform empire or blockchain identity play.
 
@@ -211,7 +211,7 @@ Create a signed card, get vouched for, prove live control, and share a QR that r
 
 ### Three Minutes
 
-Humanity Commons is a practical trust tool and a governance experiment. It starts founder-built, with public rules and **open card creation** when the resolver ships. If the trust loop works, it moves toward **federated operators** and member/worker governance so the infrastructure is accountable to the people who use and build it.
+Humanity Commons is a practical trust tool and a governance experiment. It starts founder-built, with public rules and **open card creation** when the network ships. If the trust loop works, it moves toward **federated operators** and member/worker governance so the infrastructure is accountable to the people who use and build it.
 
 ---
 

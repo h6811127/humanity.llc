@@ -63,7 +63,7 @@ Any user may revoke their QR profile instantly, without explanation. Revocation 
 All technical standards governing QR format, resolution, and profile data must be publicly documented.
 
 **Section 3.2 – Source availability**  
-The reference implementation of the resolver and client software must be publicly available under an open source license.
+The reference implementation of the network and client software must be publicly available under an open source license.
 
 **Section 3.3 – No hidden logic**  
 No algorithm or automated decision system may determine who can see which profile content without documented, auditable rules.
@@ -73,7 +73,7 @@ No algorithm or automated decision system may determine who can see which profil
 ## Article IV – Resilience
 
 **Section 4.1 – No single point of control**  
-The resolver network must consist of at least three independent operators in any region where the system operates. No single organization may control resolution.
+The status network must consist of at least three independent operators in any region where the system operates. No single organization may control resolution.
 
 **Section 4.2 – Offline operation**  
 The system must function, in degraded mode, without continuous internet connectivity. Profile caches must enable offline viewing.
@@ -95,7 +95,7 @@ A profile may be suspended by collective action only under documented conditions
     
 - Systematic harassment using the QR feature
     
-- Distribution of illegal content as defined by the laws of the jurisdiction where the resolver operates (with appeal rights)
+- Distribution of illegal content as defined by the laws of the jurisdiction where the network operates (with appeal rights)
     
 
 Suspension requires:
@@ -121,7 +121,7 @@ Registration and profile creation must not require a phone number, email address
 Analytics, telemetry, and usage tracking must be disabled by default. If enabled by user choice, the scope and destination of data must be clearly disclosed.
 
 **Section 6.3 – Encryption**  
-Private keys must remain on user devices. The system may not store unencrypted private profile data on resolvers.
+Private keys must remain on user devices. The system may not store unencrypted private profile data on networks.
 
 ---
 
@@ -154,7 +154,7 @@ This constitution governs the technical and social rules of the Humanity Commons
 Users agree to these rules by participating. Enforcement is limited to suspension of profile resolution. The system has no authority over users' offline behavior.
 
 **Section 8.3 – Jurisdiction**  
-Resolvers operate within the laws of their physical locations. Users are responsible for their own legal compliance.
+Networks operate within the laws of their physical locations. Users are responsible for their own legal compliance.
 
 ---
 

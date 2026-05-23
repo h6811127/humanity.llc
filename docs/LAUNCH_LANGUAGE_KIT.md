@@ -3,7 +3,7 @@
 **Status:** Strategic draft  
 **Purpose:** Provide repeatable public language for launch without overclaiming identity, verification, or governance.
 
-**Architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — public launch; federated resolvers.
+**Architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — public launch; federated networks.
 
 **Merch-led tiers:** Tier 0 = proof of curiosity (open drop). Tier 1 = proof of belonging (personalized for card holders—not a protocol invite gate). See `docs/MERCH_LED_V1.md` and `docs/FOUNDING_DROP_BRIEF.md`.
 
@@ -79,7 +79,7 @@ Draft:
 >
 > This is not government ID. It is not KYC. It is not a social network. It is a public trust primitive designed to become member-governed infrastructure if the first trust loop works.
 >
-> When the resolver ships, anyone can create a card—no invite list. If you want to help stress-test early, reach out; optional early testers break copy and test vouching before we scale marketing.
+> When the network ships, anyone can create a card—no invite list. If you want to help stress-test early, reach out; optional early testers break copy and test vouching before we scale marketing.
 
 ---
 

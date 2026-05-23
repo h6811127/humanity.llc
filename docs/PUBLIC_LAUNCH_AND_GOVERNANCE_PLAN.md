@@ -3,7 +3,7 @@
 **Status:** Strategic draft  
 **Purpose:** Define the public narrative, governance transition promise, decision rights, live proof model, launch campaign, legal path, abuse policy, financial policy, membership model, and website information architecture for Humanity Commons.
 
-**Canonical architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` (federated resolvers, public launch, data minimization, no blockchain core). This doc covers governance narrative and campaign; where they conflict, the protocol strategy doc wins on architecture and launch gates.
+**Canonical architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` (federated networks, public launch, data minimization, no blockchain core). This doc covers governance narrative and campaign; where they conflict, the protocol strategy doc wins on architecture and launch gates.
 
 ---
 
@@ -79,7 +79,7 @@ The first public launch should be built around a specific use context, not a gen
 
 Recommended beachhead:
 
-> Events and meetup-style communities first; cooperative/member organization pilots second—with a path for the org to run a **compatible resolver** for its members.
+> Events and meetup-style communities first; cooperative/member organization pilots second—with a path for the org to run a **compatible network** for its members.
 
 Why:
 
@@ -193,7 +193,7 @@ Governance should move from founder control to member/steward control when these
 1. The v1 trust loop works publicly: card, QR, vouching, revocation, export, and one physical artifact—with **open card creation** (not cohort-gated).
 2. At least 25 active cards from users outside the founder’s direct network (public launch metric).
 3. At least 10 completed vouch flows between distinct users (social trust is real, not founder-issued only).
-4. A published **second resolver operator** commitment or live second host running `hc/v1` (federation credibility).
+4. A published **second network operator** commitment or live second host running `hc/v1` (federation credibility).
 5. At least 3 bootstrap stewards are named and willing to sign public rules.
 6. The first transparency report is published.
 7. The first revenue and cost report is published after paid orders begin.
@@ -211,9 +211,9 @@ Governance should move from founder control to member/steward control when these
 |---|---|---|---|---|---|---|
 | v1 product scope | Decides | Advises | Later co-decide | Advises after cohort | Advises | Advises |
 | Protocol standards | Drafts | Advises | Ratify if labor-impacting | Ratify rights-impacting changes | Ratify operational trust rules | Advises |
-| QR format and resolver behavior | Drafts | Advises | Advises | Ratify rights-impacting changes | Advises | Advises |
-| Federated operator policy | Drafts | Advises | Advises | Ratify rights-impacting changes | Advises | Co-decides for org-hosted resolvers |
-| Resolver data retention / scan logging | Drafts | Temporarily executes | Advises | Ratifies | Reviews | Advises |
+| QR format and network behavior | Drafts | Advises | Advises | Ratify rights-impacting changes | Advises | Advises |
+| Federated operator policy | Drafts | Advises | Advises | Ratify rights-impacting changes | Advises | Co-decides for org-hosted networks |
+| Network data retention / scan logging | Drafts | Temporarily executes | Advises | Ratifies | Reviews | Advises |
 | Suspension rules | Drafts | Temporarily executes | Advises | Ratifies | Co-decides and executes | Advises |
 | Individual suspensions | Emergency only | Executes under policy | No | Appeal oversight | Executes/reviews | No |
 | Verification thresholds | Drafts | Advises | Advises | Ratifies | Co-decides | Advises |
@@ -374,7 +374,7 @@ The campaign also needs a concrete product hook:
 3. Humanity Commons starts small: a signed card, a QR, a vouch, and the right to revoke.
 4. Physical cards and stickers make the idea visible.
 5. The long-term goal is member-governed, **federated** digital infrastructure.
-6. Anyone can create a card when the resolver ships; early testers optionally help shape copy and ops (see below).
+6. Anyone can create a card when the network ships; early testers optionally help shape copy and ops (see below).
 
 ### Public Launch And Optional Early Testers
 
@@ -432,7 +432,7 @@ Primary CTAs:
 - Create a Commons Pass (when live).
 - Read the protocol and standards.
 - Bring Humanity Commons to an event or community.
-- Run a compatible resolver (second operator path).
+- Run a compatible network (second operator path).
 - Read the Commons Roadmap.
 - Order a sticker/card (optional merch).
 - Become a supporter.
@@ -627,7 +627,7 @@ This is not legal advice. It is a planning map for discussion with counsel.
 
 ### Federation And Operator Liability
 
-Resolvers are **operators**, not neutral physics. The public plan MUST include:
+Networks are **operators**, not neutral physics. The public plan MUST include:
 
 - What the reference operator stores (see `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` §5).
 - How legal requests are handled.
@@ -708,7 +708,7 @@ Resolvers are **operators**, not neutral physics. The public plan MUST include:
 
 **Response:**
 
-- Resolver operates under jurisdictional law.
+- Network operates under jurisdictional law.
 - Suspension requires documented reason and appeal path where legally possible.
 - Preserve no more data than required.
 
@@ -1012,7 +1012,7 @@ Members should:
 
 - QR format.
 - Signed payloads.
-- Resolver behavior.
+- Network behavior.
 - Federated operators.
 - Verification records.
 - Revocation.

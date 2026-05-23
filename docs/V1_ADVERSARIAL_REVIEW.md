@@ -18,7 +18,7 @@
 | Medium | The product may be admired but not urgently used. | Pick a beachhead and validate real use cases before broad launch. |
 | Medium | Physical artifacts may become merch instead of a trust loop. | Launch one artifact tied to scanning, vouching, live proof, and revocation. |
 | Medium | Bootstrap governance keys are undefined. | Define temporary signer authority and sunset criteria before launch. |
-| High | Single-operator resolver becomes permanent honeypot and capture risk. | Publish federation strategy; ship open spec; milestone second operator per PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY. |
+| High | Single-operator network becomes permanent honeypot and capture risk. | Publish federation strategy; ship open spec; milestone second operator per PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY. |
 | Medium | Public launch abuse without rate limits overwhelms ops. | Rate limits + suspension policy before broad marketing; avoid permanent invite-only gate. |
 | Medium | Support tooling is under-specified for failed/on-hold/refunded orders. | Add operator views or at least internal lookup contracts before launch. |
 
@@ -78,7 +78,7 @@
 
 | Leak Path | Risk | Required Control |
 |---|---|---|
-| QR payload includes order or owner metadata. | Public QR leaks PII or commerce state. | QR payload contains only `profile_id`, `qr_id`, resolver URL. |
+| QR payload includes order or owner metadata. | Public QR leaks PII or commerce state. | QR payload contains only `profile_id`, `qr_id`, network URL. |
 | Shopify metadata includes secrets. | Commerce provider stores identity secrets. | Cart metadata includes only `artifact_intent_id` and product refs. |
 | Logs contain full shipping address. | Operator/log breach. | Redact logs; encrypt order PII. |
 | Export bundle includes payment/shipping secrets by default. | Identity export leaks order data. | Split identity export from order data export. |

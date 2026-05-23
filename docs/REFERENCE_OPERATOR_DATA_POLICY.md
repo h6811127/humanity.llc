@@ -1,11 +1,11 @@
 # Reference operator data policy
 
 **Status:** Draft · aligned with `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` §5  
-**Applies to:** The humanity.llc reference resolver (bootstrap operator). Other federated operators MUST publish their own policy.
+**Applies to:** The humanity.llc reference network (bootstrap operator). Other federated operators MUST publish their own policy.
 
 ## Purpose
 
-Minimize stored data so the resolver is not a surveillance honeypot. Publish what we keep so scanners and members can inspect limits.
+Minimize stored data so the network is not a surveillance honeypot. Publish what we keep so scanners and members can inspect limits.
 
 ## What we MAY store (public trust layer)
 
@@ -21,7 +21,7 @@ Minimize stored data so the resolver is not a surveillance honeypot. Publish wha
 - Government ID images, numbers, or KYC artifacts.
 - Phone numbers or emails **required** to create a card.
 - Scan analytics: per-scan trails, location history, device fingerprinting, or ad profiles.
-- Payment or shipping PII in the resolver database (commerce stays in Shopify / Printify).
+- Payment or shipping PII in the network database (commerce stays in Shopify / Printify).
 
 ## Access logs
 

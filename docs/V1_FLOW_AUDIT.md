@@ -3,7 +3,7 @@
 **Status:** Pre-rebuild hardening artifact  
 **Scope:** Humanity Card, QR Public Profile, Human Verification, Storefront, Printify Fulfillment Middleware
 
-**Resolver model:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — reference operator first; federated hosts; data minimization.
+**Network model:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — reference operator first; federated hosts; data minimization.
 
 ---
 
@@ -12,8 +12,8 @@
 ```mermaid
 flowchart TD
   userDevice["User Device"] --> cardCreate["Create Signed Humanity Card"]
-  cardCreate --> resolver["Resolver Stores Public Card"]
-  resolver --> qrCredential["Issue QR Credential"]
+  cardCreate --> network["Network Stores Public Card"]
+  network --> qrCredential["Issue QR Credential"]
   qrCredential --> publicScan["Public QR Scan"]
   qrCredential --> storefront["Storefront Personalized Product"]
   storefront --> artifactIntent["Artifact Intent And Preview"]
@@ -24,7 +24,7 @@ flowchart TD
   commerceLink --> printOrder["Printify Fulfillment Order"]
   printOrder --> printify["Printify Production And Shipment"]
   printify --> orderTimeline["Humanity Order Timeline"]
-  resolver --> revocation["Revocation Status"]
+  network --> revocation["Revocation Status"]
   revocation --> publicScan
 ```
 
@@ -36,12 +36,12 @@ flowchart TD
 |---|---|---|---|---|
 | Generate Ed25519 keypair | Browser/client | Private key local; public key in card payload | Key generation unavailable | Private key never leaves device. |
 | Enter handle and manifesto | Browser/client | Draft card payload | Invalid handle, reserved handle, invalid manifesto | No phone/email/government ID required. |
-| Sign card document | Browser/client | Signed public card document | Signature failure, canonicalization mismatch | Only public fields signed for resolver storage. |
-| Submit to resolver | Resolver API | Humanity Card record | Duplicate handle, malformed signature, rate limited | Resolver receives public card data only. |
+| Sign card document | Browser/client | Signed public card document | Signature failure, canonicalization mismatch | Only public fields signed for network storage. |
+| Submit to network | Network API | Humanity Card record | Duplicate handle, malformed signature, rate limited | Network receives public card data only. |
 | Assign registered/unverified state | Verification service | Verification summary | Abuse-control failure | Registration metadata separate from public card. |
-| Issue QR credential | Resolver/Card service | QR credential record | QR signing/validation failure | QR payload has opaque IDs only. |
+| Issue QR credential | Network/Card service | QR credential record | QR signing/validation failure | QR payload has opaque IDs only. |
 
-Hardening finding: card creation is rebuild-ready if the first slice uses only public fields, local signing, resolver validation, and registered/unverified state. Do not include private/semi-public profile layers in the first slice.
+Hardening finding: card creation is rebuild-ready if the first slice uses only public fields, local signing, network validation, and registered/unverified state. Do not include private/semi-public profile layers in the first slice.
 
 ---
 
@@ -50,9 +50,9 @@ Hardening finding: card creation is rebuild-ready if the first slice uses only p
 | Step | Owner | Persisted Record | Failure State | Privacy Boundary |
 |---|---|---|---|---|
 | Scan HTTPS fallback QR | Scanner browser | None required | Malformed URL, unknown profile, unknown QR | No scan analytics by default. |
-| Validate profile and QR IDs | Resolver API | Access log with anonymized IP only | Invalid ID, QR not linked to card | QR payload must not contain order/PII data. |
-| Resolve status | Resolver API | Card status, QR status | Revoked, suspended, expired, unknown | Public data only. |
-| Render HTML/JSON | Resolver/API frontend | None required beyond cache | Stale cached card | UI must show stale/offline state and bearer warning for printed-item QR. |
+| Validate profile and QR IDs | Network API | Access log with anonymized IP only | Invalid ID, QR not linked to card | QR payload must not contain order/PII data. |
+| Resolve status | Network API | Card status, QR status | Revoked, suspended, expired, unknown | Public data only. |
+| Render HTML/JSON | Network/API frontend | None required beyond cache | Stale cached card | UI must show stale/offline state and bearer warning for printed-item QR. |
 
 Hardening finding: QR resolution must be implemented before print artifacts. The printed object is only safe if old QR codes keep resolving to current status.
 
@@ -66,7 +66,7 @@ Hardening finding: QR resolution must be implemented before print artifacts. The
 | Open target card | Voucher | None required | Card revoked/suspended | Voucher sees public card data. |
 | Sign vouch | Voucher client | Vouch credential | Quota exceeded, waiting period not met | Private note encrypted or omitted. |
 | Aggregate verification | Verification service | Verification summary | Threshold not met, invalid signature | Public summary shows safe method/evidence only. |
-| Display badge/status | Humanity Card/Resolver | Public card view | Stale cached status | Revoked/suspended overrides verified display. |
+| Display badge/status | Humanity Card/Network | Public card view | Stale cached status | Revoked/suspended overrides verified display. |
 
 Hardening finding: the first rebuild can support registered/unverified state first, then signed vouches. Ceremony and device proof can remain modeled but not implemented in the first slice.
 
@@ -76,10 +76,10 @@ Hardening finding: the first rebuild can support registered/unverified state fir
 
 | Step | Owner | Persisted Record | Failure State | Privacy Boundary |
 |---|---|---|---|---|
-| Scanner requests proof | Scanner browser / Resolver API | Live control challenge | Card revoked/suspended, challenge creation rate limited | Scanner gets no private card-owner data. |
+| Scanner requests proof | Scanner browser / Network API | Live control challenge | Card revoked/suspended, challenge creation rate limited | Scanner gets no private card-owner data. |
 | Owner opens challenge | Owner device | None required before signing | Challenge expired, wrong card, owner declines | Owner sees what they are signing. |
 | Owner signs challenge | Owner device | Signed challenge response | Key unavailable, invalid signature | Private key never leaves owner device. |
-| Resolver verifies response | Resolver API | Challenge status and short-lived proof result | Replay, expired challenge, invalid signature | Proof is session-scoped and short-lived. |
+| Network verifies response | Network API | Challenge status and short-lived proof result | Replay, expired challenge, invalid signature | Proof is session-scoped and short-lived. |
 | Scanner sees result | Scanner browser | None beyond challenge session | Expired/failed proof | UI says recent key control only, not legal identity or unique humanity. |
 
 Hardening finding: live control proof is the clearest upgrade beyond static QR, but it must be visually separate from card status, human trust status, and artifact status. It must not grant verification, issue a badge, or imply legal identity.
@@ -91,7 +91,7 @@ Hardening finding: live control proof is the clearest upgrade beyond static QR, 
 | Step | Owner | Persisted Record | Failure State | Privacy Boundary |
 |---|---|---|---|---|
 | Open product page | Storefront | None required | Product disabled, unsupported template | No Printify browsing. |
-| Check card/QR status | Storefront API / Resolver | None or short-lived validation event | Revoked, suspended, expired | Storefront gets public card/QR status only. |
+| Check card/QR status | Storefront API / Network | None or short-lived validation event | Revoked, suspended, expired | Storefront gets public card/QR status only. |
 | Generate preview | Printify Fulfillment Middleware renderer | Print artifact draft | QR scan QA failed, template invalid | Printify not called until artifact passes local validation/upload point. |
 | Create artifact intent | Storefront API | `artifact_intent` with planned item QR IDs | Intent expired, duplicate, invalid personalization state | Intent contains no private keys or verification secrets. |
 | Issue item QR credentials | QR service | Item-scoped QR credential per physical item | QR signing/validation failure | Each printed item is independently revocable; no scan analytics. |
@@ -110,9 +110,9 @@ Hardening finding: the riskiest handoff is artifact intent metadata surviving Sh
 | Step | Owner | Persisted Record | Failure State | Privacy Boundary |
 |---|---|---|---|---|
 | Owner signs revocation | Client | Revocation statement | Key unavailable, recovery unavailable | Private key stays local. |
-| Resolver verifies revocation | Resolver API | Card/QR status update | Invalid signature, replay nonce | No reason required. |
-| QR scans after revocation | Resolver/API frontend | None required | Cache stale | Status page must clearly show revoked. |
-| Sibling item QR remains active | Resolver/API frontend | None required | Wrong QR scope revoked | Item revocation must not revoke sibling stickers/cards. |
+| Network verifies revocation | Network API | Card/QR status update | Invalid signature, replay nonce | No reason required. |
+| QR scans after revocation | Network/API frontend | None required | Cache stale | Status page must clearly show revoked. |
+| Sibling item QR remains active | Network/API frontend | None required | Wrong QR scope revoked | Item revocation must not revoke sibling stickers/cards. |
 | New orders blocked | Storefront/Middleware | Blocked order attempt if logged | Attempt to reorder revoked QR | No physical recall promise. |
 
 Hardening finding: revocation must not be described as recalling physical artifacts. It invalidates resolution and future ordering, not the existence of the printed object.
@@ -128,7 +128,7 @@ Hardening finding: revocation must not be described as recalling physical artifa
 | Shopify -> Humanity | Paid/canceled/refunded order webhooks, order/line references, shipping/payment status needed for fulfillment | Raw payment processor secrets beyond Shopify's normal order abstractions |
 | Humanity -> Printify | Artwork, approved product/variant refs, shipping/contact fields required for fulfillment | Private keys, verification secrets, vouch graph, private profile data, scan analytics |
 | Printify -> Humanity | Order status, production state, tracking, provider issue details | Identity authority, verification status, badge issuance |
-| Resolver -> Scanner | Public card, public verification summary, latest accepted vouch recency, QR status, bearer warning | Private profile layers, order IDs, shipping/payment data, identity proof from possession |
+| Network -> Scanner | Public card, public verification summary, latest accepted vouch recency, QR status, bearer warning | Private profile layers, order IDs, shipping/payment data, identity proof from possession |
 
 ---
 

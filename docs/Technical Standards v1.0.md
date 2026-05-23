@@ -18,7 +18,7 @@ It covers:
 - Ed25519 keypairs and signatures.
 - QR credentials.
 - Live control proof challenges.
-- Resolver API behavior.
+- Network API behavior.
 - Verification status and badge records.
 - Revocation and suspension.
 - Export bundles.
@@ -27,7 +27,7 @@ It covers:
 - Printify Fulfillment Middleware integration boundaries.
 - Security, privacy, and interoperability requirements.
 
-Any resolver, client, scanner, Printify Fulfillment Middleware, or verification service claiming Humanity Commons v1.0 compatibility MUST conform to this standard.
+Any network, client, scanner, Printify Fulfillment Middleware, or verification service claiming Humanity Commons v1.0 compatibility MUST conform to this standard.
 
 **Federation:** Multiple operators MAY implement this standard. See §9.6–9.7 and `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
 
@@ -40,7 +40,7 @@ Any resolver, client, scanner, Printify Fulfillment Middleware, or verification 
 | **Humanity Card** | Signed public profile object owned by a human. |
 | **Card Owner** | Human controlling the private key for a card. |
 | **Profile ID** | Opaque identifier for a Humanity Card. |
-| **Resolver** | Service that resolves profile IDs and QR credentials. |
+| **Network** | Service that resolves profile IDs and QR credentials. |
 | **QR Credential** | Signed credential encoded in or referenced by a QR code. |
 | **Printed-Item QR** | Item-scoped QR credential printed on one physical artifact and individually revocable. |
 | **Verification Record** | Public or semi-public evidence contributing to verification status. |
@@ -66,7 +66,7 @@ Fields that contain protocol version MUST use a string unless otherwise specifie
 
 ### 3.2 API Base
 
-Resolvers MUST expose v1.0 APIs under:
+Networks MUST expose v1.0 APIs under:
 
 ```text
 /.well-known/hc/v1/
@@ -78,7 +78,7 @@ When a breaking version is released:
 
 - v1.0 MUST remain supported for at least 12 months after any breaking successor is launched.
 - Deprecation MUST be announced at least 6 months before removal.
-- Resolver responses MUST include deprecation metadata during the transition.
+- Network responses MUST include deprecation metadata during the transition.
 
 ---
 
@@ -91,8 +91,8 @@ Profile IDs MUST be:
 - Opaque.
 - Non-semantic.
 - Generated with cryptographically secure randomness.
-- Unique within a resolver.
-- Portable across resolvers.
+- Unique within a network.
+- Portable across networks.
 - Free of user-identifying metadata.
 
 Profile IDs MUST NOT encode:
@@ -102,7 +102,7 @@ Profile IDs MUST NOT encode:
 - Timestamp.
 - Region.
 - Verification level.
-- Resolver hostname.
+- Network hostname.
 - Print order data.
 
 ### 4.2 Format
@@ -125,7 +125,7 @@ Excluded ambiguous characters:
 0 O I l
 ```
 
-Resolvers MUST accept profile IDs of 20-32 base58 characters for v1.0. New IDs MUST be 24 base58 characters.
+Networks MUST accept profile IDs of 20-32 base58 characters for v1.0. New IDs MUST be 24 base58 characters.
 
 ---
 
@@ -147,7 +147,7 @@ Required sizes:
 
 Public keys and signatures MUST be encoded as base58 strings in JSON documents.
 
-Private keys MUST NOT be transmitted to resolvers or Printify Fulfillment Middleware. If exported, private keys MUST be encrypted in the export bundle.
+Private keys MUST NOT be transmitted to networks or Printify Fulfillment Middleware. If exported, private keys MUST be encrypted in the export bundle.
 
 ### 5.3 Signature Envelope
 
@@ -252,7 +252,7 @@ Handles MUST:
 Reserved handles include:
 
 ```text
-admin administrator host resolver system test example support help info root api www
+admin administrator host network system test example support help info root api www
 hc humanity commons profile profiles card cards qr resolve revoked suspended null
 undefined false true 0 1 print orders shop verify verification governance constitution
 ```
@@ -266,7 +266,7 @@ Manifesto line MUST:
 - Not contain HTML markup.
 - Be UTF-8 encoded.
 
-Resolvers MUST reject or sanitize markup before storage. Clients MUST show exact final text before signing.
+Networks MUST reject or sanitize markup before storage. Clients MUST show exact final text before signing.
 
 ### 6.4 Status
 
@@ -359,9 +359,9 @@ QR payloads MUST be:
 
 - Short enough for reliable printing.
 - Stable enough for physical artifacts.
-- Revocable through resolver status.
+- Revocable through network status.
 - Verifiable by clients.
-- Free of personal data beyond opaque IDs and resolver hints.
+- Free of personal data beyond opaque IDs and network hints.
 
 Personalized printed artifacts MUST use item-scoped QR credentials. A card owner ordering multiple personalized physical items receives distinct `qr_id` values per item unless a product explicitly uses a disclosed batch QR policy. All item-scoped QR credentials resolve to the same public card, but each item QR can be revoked independently.
 
@@ -379,11 +379,11 @@ Printed artifacts MUST use this HTTPS fallback for consumer phone cameras:
 https://humanity.llc/c/{profile_id}?q={qr_id}
 ```
 
-Resolvers MUST support HTTPS fallback for consumer phone cameras.
+Networks MUST support HTTPS fallback for consumer phone cameras.
 
 ### 8.3 QR Credential Object
 
-The QR payload references a resolver-stored QR credential:
+The QR payload references a network-stored QR credential:
 
 ```json
 {
@@ -487,13 +487,13 @@ Live control proof MUST be:
 
 ---
 
-## 9. Resolver API
+## 9. Network API
 
 ### 9.1 Required Endpoints
 
 | Endpoint | Method | Description |
 |---|---|---|
-| `GET /.well-known/hc/v1/health` | GET | Resolver health. |
+| `GET /.well-known/hc/v1/health` | GET | Network health. |
 | `POST /.well-known/hc/v1/cards` | POST | Create card. |
 | `GET /.well-known/hc/v1/cards/{profile_id}` | GET | Resolve card JSON/HTML. |
 | `GET /.well-known/hc/v1/cards/{profile_id}/status` | GET | Resolve card status. |
@@ -505,7 +505,7 @@ Live control proof MUST be:
 
 ### 9.2 Headers
 
-Resolver responses MUST include:
+Network responses MUST include:
 
 | Header | Value |
 |---|---|
@@ -526,13 +526,13 @@ Resolver responses MUST include:
 
 ### 9.4 Content Negotiation
 
-Resolvers MUST support:
+Networks MUST support:
 
 - `Accept: application/json` for JSON.
 - `Accept: text/html` for HTML.
 - Browser default Accept headers for HTML.
 
-Resolvers MUST implement proper HTTP Accept parsing instead of substring-only matching.
+Networks MUST implement proper HTTP Accept parsing instead of substring-only matching.
 
 ### 9.5 Status Codes
 
@@ -549,22 +549,22 @@ Resolvers MUST implement proper HTTP Accept parsing instead of substring-only ma
 | 410 | Revoked card. |
 | 422 | Semantically invalid signed payload. |
 | 429 | Rate limited. |
-| 500 | Resolver error. |
+| 500 | Network error. |
 
 ### 9.6 Federated Operators
 
-Humanity Commons v1.0 is designed for **multiple resolver operators** implementing the same API. humanity.llc MAY run the reference operator; it MUST NOT be the only compatible implementation in the long-term architecture.
+Humanity Commons v1.0 is designed for **multiple network operators** implementing the same API. humanity.llc MAY run the reference operator; it MUST NOT be the only compatible implementation in the long-term architecture.
 
 #### 9.6.1 Operator identity
 
-Resolver HTTP responses SHOULD include:
+Network HTTP responses SHOULD include:
 
 | Header | Description |
 |---|---|
 | `X-Resolver-Operator` | Stable operator identifier (e.g. `humanity.llc`, `union.example.org`). |
 | `X-Resolver-Version` | Protocol version (`1.0`). |
 
-JSON responses MAY include equivalent fields in a `resolver` object.
+JSON responses MAY include equivalent fields in a `network` object.
 
 #### 9.6.2 Operator requirements
 
@@ -574,7 +574,7 @@ Operators claiming `/.well-known/hc/v1/` compatibility MUST:
 - Publish operator name, abuse/legal process summary, and **data retention policy** (see `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` §5).
 - Default to **no scan analytics** unless a governance-approved consent model exists.
 - Never require government ID, phone, or email for card creation in the reference profile.
-- Keep commerce PII out of resolver storage.
+- Keep commerce PII out of network storage.
 
 #### 9.6.3 Reference operator
 
@@ -584,13 +584,13 @@ The humanity.llc reference operator is the default target for printed HTTPS fall
 https://humanity.llc/c/{profile_id}?q={qr_id}
 ```
 
-Clients SHOULD support configurable resolver base URLs for portability and second-operator federation.
+Clients SHOULD support configurable network base URLs for portability and second-network-operator federation.
 
 #### 9.6.4 Cross-operator behavior (v1.0)
 
 v1.0 does NOT require automatic cross-operator vouch sync. Export bundles and documented card formats are the portability mechanism until federation sync is specified in a later version.
 
-### 9.7 Resolver Data Minimization
+### 9.7 Network Data Minimization
 
 Reference-operator normative limits (all operators SHOULD align):
 
@@ -600,7 +600,7 @@ Reference-operator normative limits (all operators SHOULD align):
 | Private keys | MUST NOT be stored. |
 | Scan analytics | MUST NOT be collected by default. |
 | Access logs | MUST NOT exist by default; if enabled, requires published governance policy and retention cap. |
-| Commerce PII | MUST NOT be stored in resolver tables. |
+| Commerce PII | MUST NOT be stored in network tables. |
 
 Suspension records MAY include public notice fields required for appeals.
 
@@ -668,7 +668,7 @@ Export bundle MUST include:
 - QR credential history.
 - Badge records.
 - Vouch records involving the profile.
-- Resolver list.
+- Network list.
 - Print artifact metadata.
 - Encrypted private key backup if user opts in.
 - Manifest file.
@@ -722,7 +722,7 @@ Printify Fulfillment Middleware MUST:
 
 ### 13.3 Printify Integration
 
-The Printify adapter MUST treat Printify as a fulfillment provider only. Printify is not an identity provider, resolver, verifier, badge issuer, or governance participant.
+The Printify adapter MUST treat Printify as a fulfillment provider only. Printify is not an identity provider, network, verifier, badge issuer, or governance participant.
 
 ---
 
@@ -733,7 +733,7 @@ The Printify adapter MUST treat Printify as a fulfillment provider only. Printif
 | Phone/email for card creation | MUST NOT be required. |
 | Government ID for card creation | MUST NOT be required. |
 | Scan analytics | Disabled by default. |
-| Resolver logs | IP anonymization required. |
+| Network logs | IP anonymization required. |
 | Print order PII | Separate encrypted order domain. |
 | Private keys | Device-only or encrypted export. |
 | Public card data | Explicit owner-selected data only. |
@@ -742,7 +742,7 @@ The Printify adapter MUST treat Printify as a fulfillment provider only. Printif
 
 ## 15. Rate Limits
 
-Resolvers MUST enforce:
+Networks MUST enforce:
 
 | Endpoint Class | Limit |
 |---|---|
@@ -792,7 +792,7 @@ Implementations MUST consider:
 - Revoked printed artifacts.
 - Confusing live control proof with legal identity or human uniqueness.
 - Vouch collusion.
-- Resolver impersonation.
+- Network impersonation.
 - Webhook spoofing.
 - Print order duplication.
 - Shipping PII leakage.
