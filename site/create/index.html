@@ -9,7 +9,7 @@
       content="Create a signed Humanity Card. Your private key stays in this browser session only."
     />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=34" />
+    <link rel="stylesheet" href="/styles.css?v=36" />
   </head>
   <body>
     <div class="page">
@@ -18,17 +18,24 @@
           <span class="pass-dot" aria-hidden="true"></span>
           <span>humanity.llc</span>
         </a>
+        <a class="top-create" href="/create/" aria-current="page">Create</a>
       </header>
 
       <main class="screen">
         <section class="hero hero-compact">
           <p class="hero-eyebrow">Try it</p>
-          <h1>Create your card</h1>
+          <h1>Make a live object</h1>
           <p class="hero-line">
-            Choose a public handle and one-line statement. Keys are generated in this tab
-            only (session storage) so you can revoke from /created/; they are never uploaded
-            to the resolver.
+            A QR that resolves to <strong>current</strong> signed status on the resolver,
+            not a frozen profile page. Keys stay in this browser tab until you back them up.
           </p>
+        </section>
+
+        <section class="create-demo-strip" aria-label="Demo">
+          <a class="btn-secondary create-demo-link" href="/#card">See an example scan first</a>
+          <button type="button" class="btn-secondary" id="create-demo-btn">
+            Create a sample card
+          </button>
         </section>
 
         <form id="create-form" class="form-card" method="dialog" action="#" autocomplete="off" novalidate>
@@ -46,9 +53,9 @@
             autocorrect="off"
             spellcheck="false"
           />
-          <p class="form-hint">Lowercase letters, digits, underscores. 3–32 characters.</p>
+          <p class="form-hint">Lowercase letters, digits, underscores. 3 to 32 characters.</p>
 
-          <label class="form-label" for="manifesto">Manifesto line</label>
+          <label class="form-label" for="manifesto">What should this card say?</label>
           <textarea
             class="form-input form-textarea"
             id="manifesto"
@@ -56,26 +63,26 @@
             required
             maxlength="280"
             rows="3"
-            placeholder="One public sentence about you or your work."
+            placeholder="One public sentence: studio hours, event, contact, or what you are sharing."
           ></textarea>
           <p class="form-hint">Plain text only, 280 characters max.</p>
 
           <label class="revoke-confirm create-recovery-opt">
             <input type="checkbox" id="generate-recovery" name="generate_recovery" checked />
-            <span>Generate recovery key (recommended — save once on /created/)</span>
+            <span>Generate recovery key (recommended; save once on the next screen)</span>
           </label>
 
           <p class="form-warning">
             After create, save your <strong>recovery key</strong> and/or download an encrypted
-            backup on /created/. Without one of them, closing this tab means you cannot sign a
+            backup. Without one of them, closing this tab means you cannot sign a
             revoke. We cannot recover lost keys. Card creation does not verify legal identity.
           </p>
 
-          <button type="submit" class="btn-primary" id="submit">Create signed card</button>
+          <button type="submit" class="btn-primary" id="submit">Create live object</button>
           <p id="status" class="form-status" role="status"></p>
         </form>
       </main>
     </div>
-    <script type="module" src="/js/create-card.mjs?v=6"></script>
+    <script type="module" src="/js/create-card.mjs?v=7"></script>
   </body>
 </html>

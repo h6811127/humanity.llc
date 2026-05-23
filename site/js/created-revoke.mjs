@@ -11,6 +11,7 @@ import { getCardStatusUrl, postRevokeUrl, signRevocation } from "./hc-sign.mjs";
  *   getSession: () => Record<string, unknown> | null,
  *   setSession: (next: Record<string, unknown>) => void,
  *   showError: (msg: string) => void,
+ *   onRevoked?: (kind: string) => void,
  * }} ctx
  * @returns {{ refresh: () => void }}
  */
@@ -141,6 +142,7 @@ export function initOwnerRevoke(ctx) {
 
       setRevokeStatus("");
       showRevokedUi(targetKind);
+      ctx.onRevoked?.(targetKind);
       await refreshLiveStatus();
     } catch (err) {
       setRevokeStatus(err.message || String(err), true);

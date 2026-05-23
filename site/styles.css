@@ -1705,6 +1705,151 @@ a {
   margin-top: 14px;
 }
 
+.create-demo-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.create-demo-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 50px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.created-screen {
+  gap: 24px;
+}
+
+.created-primitive {
+  margin: 0;
+  padding: 16px 18px;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--black);
+  background: rgba(219, 27, 67, 0.06);
+  border: 1px solid rgba(219, 27, 67, 0.2);
+  border-radius: var(--radius);
+}
+
+.created-primitive strong {
+  font-weight: 600;
+}
+
+.created-loop-title {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--grey);
+  margin: 0 0 14px 2px;
+}
+
+.created-loop-steps {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.created-loop-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 12px 11px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: #f7f7f7;
+}
+
+.created-loop-step.is-current {
+  border-color: var(--red);
+  background: rgba(219, 27, 67, 0.06);
+}
+
+.created-loop-step.is-done .created-loop-num {
+  background: var(--red);
+  color: var(--white);
+}
+
+.created-loop-num {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 50%;
+  border: 1px solid var(--red);
+  color: var(--red);
+  background: var(--white);
+}
+
+.created-loop-label {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: var(--black);
+}
+
+.created-qr-hero .group-label {
+  text-align: center;
+}
+
+.qr-box-hero {
+  margin: 8px 0 16px;
+}
+
+.created-scan-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.created-scan-actions .btn-primary,
+.created-scan-actions .btn-secondary {
+  width: 100%;
+  text-align: center;
+  justify-content: center;
+}
+
+.mono-link-compact {
+  font-size: 11px;
+  text-align: center;
+  color: var(--grey);
+  margin-top: 8px;
+}
+
+.created-what-now {
+  padding: 20px 18px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--white);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+}
+
+.created-what-now-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0 0 12px;
+}
+
+.created-what-now-body {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--black);
+}
+
 #revoke-actions .btn-danger {
   width: 100%;
 }

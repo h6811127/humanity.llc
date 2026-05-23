@@ -220,6 +220,13 @@ export async function handlePostCards(
     if (msg.includes("UNIQUE") || msg.includes("unique")) {
       return errorResponse("HANDLE_TAKEN", "Handle or profile already exists.", 409);
     }
+    if (msg.includes("recovery_public_key")) {
+      return errorResponse(
+        "RESOLVER_SCHEMA",
+        "Resolver database is missing the recovery key column. Apply D1 migration 0003_recovery_public_key.sql and redeploy.",
+        503
+      );
+    }
     return errorResponse("RESOLVER_ERROR", msg, 500);
   }
 
