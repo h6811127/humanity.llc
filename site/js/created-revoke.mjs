@@ -61,13 +61,13 @@ export function initOwnerRevoke(ctx) {
       revokedBannerEl.hidden = false;
       revokedBannerEl.textContent =
         kind === "card"
-          ? "Card revoked. Scans may take up to a minute to update."
+          ? "Card disabled. Scans may take up to a minute to update."
           : "This QR is revoked. Open your scan link to confirm.";
     }
     if (revokeActions) revokeActions.hidden = true;
     if (liveStatusEl) {
       liveStatusEl.textContent =
-        kind === "card" ? "Resolver: card revoked" : "Resolver: QR revoked";
+        kind === "card" ? "Resolver: card disabled" : "Resolver: QR revoked";
     }
   }
 
@@ -91,7 +91,7 @@ export function initOwnerRevoke(ctx) {
         liveStatusEl.textContent = "Resolver: QR revoked";
         showRevokedUi("qr_credential");
       } else if (kind === "card_revoked") {
-        liveStatusEl.textContent = "Resolver: card revoked";
+        liveStatusEl.textContent = "Resolver: card disabled";
         showRevokedUi("card");
       } else {
         liveStatusEl.textContent = `Resolver: ${kind}`;

@@ -553,11 +553,38 @@ a {
   padding-top: 4px;
 }
 
-@media (max-width: 430px) {
-  .scan-page .pass-scan-url {
-    display: none;
-  }
+.scan-show-link {
+  margin: -2px 0 6px;
+}
 
+.scan-show-link-summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 6px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--red);
+  cursor: pointer;
+  list-style: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.scan-show-link-summary::-webkit-details-marker {
+  display: none;
+}
+
+.scan-show-link-summary::marker {
+  content: "";
+}
+
+.scan-show-link .pass-scan-url {
+  margin-top: 8px;
+  font-size: 11px;
+  display: block;
+}
+
+@media (max-width: 430px) {
   .scan-page .pass-foot {
     font-size: 11px;
   }

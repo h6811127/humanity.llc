@@ -222,6 +222,24 @@ Founder/bootstrap authority must be labeled as bootstrap authority until member 
 
 ---
 
+## Owner lifecycle: Revoke QR vs Disable card
+
+**Canonical spec:** `docs/REVOKE_AND_LIFECYCLE_V1.md`
+
+Scanners must distinguish:
+
+| Action | Who | Typical scan headline (target UX) |
+|--------|-----|-----------------------------------|
+| **Revoke QR** | Owner | “This QR is no longer valid” — minimal by default |
+| **Disable card** | Owner | “This card has been disabled” — card details hidden by default |
+| **Suspend** | Governance | “Suspended under public rules” — public notice required |
+
+**Physical limit:** Printed QRs always contain `profile_id` and `qr_id` in the URL. Revoke/disable changes resolver state, not ink. Copy must warn owners.
+
+**Not v1:** Delete card, revoke-on-next-scan with encrypted QR payload, geofence/calendar/social revoke chains.
+
+---
+
 ## Public Label Policy
 
 ### Preferred V1 Labels
@@ -233,8 +251,9 @@ Founder/bootstrap authority must be labeled as bootstrap authority until member 
 | `verified_human` via vouch | Vouched Human | Preferred public label for launch. |
 | `verified_human` via ceremony | Ceremony-Vouched Human | Use only if a real ceremony process exists. |
 | `steward` | Steward | Must link to public authority rules. |
-| `revoked` | Revoked By Owner | Distinguish from suspension. |
-| `suspended` | Suspended Under Public Rules | Distinguish from owner revocation. |
+| `revoked` (QR credential) | QR no longer valid | Prefer over “Revoked By Owner” on item scans; see `REVOKE_AND_LIFECYCLE_V1.md`. |
+| `revoked` (whole card) | Disabled by owner | UI: **Disable card**; distinguish from QR revoke. |
+| `suspended` | Suspended Under Public Rules | Distinguish from owner disable. |
 
 ### Forbidden Or Restricted Claims
 

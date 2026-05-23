@@ -111,6 +111,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain('class="pass-dot"');
     expect(html).toContain("pass-qr-slot");
     expect(html).toContain(`q=${QR}`);
+    expect(html).toContain("Show link");
     expect(html).toMatch(/<svg[^>]*viewBox="0 0 \d+ \d+"/);
     expect(html).toContain("list-icon-tone-red");
     expect(html).not.toContain('class="pass-qr"><img src="https://humanity.llc/assets/red_qr');
@@ -153,7 +154,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("Printed item");
   });
 
-  it("renders card revoked state (M4.2)", async () => {
+  it("renders card disabled state (M4.5)", async () => {
     const vm = buildScanViewModel(
       PROFILE,
       QR,
@@ -165,12 +166,15 @@ describe("renderScanPage M3.2 trust blocks", () => {
       "https://humanity.llc"
     );
     expect(vm.kind).toBe("card_revoked");
+    expect(vm.minimalScan).toBe(true);
     const html = await renderScanPage(vm, "https://humanity.llc");
-    expect(html).toContain("Card revoked");
-    expect(html).toContain("This card was revoked");
+    expect(html).toContain("This card has been disabled");
+    expect(html).toContain("Show link");
+    expect(html).not.toContain("@river_example");
+    expect(html).not.toContain("Human trust");
   });
 
-  it("renders QR revoked while card stays active (M4.2 / M4.3)", async () => {
+  it("renders QR revoked minimal while card stays active (M4.5)", async () => {
     const revokedQr = "qr_revoked_sibling_test";
     const vmRevoked = buildScanViewModel(
       PROFILE,
@@ -183,10 +187,13 @@ describe("renderScanPage M3.2 trust blocks", () => {
       "https://humanity.llc"
     );
     expect(vmRevoked.kind).toBe("qr_revoked");
+    expect(vmRevoked.minimalScan).toBe(true);
     const htmlRevoked = await renderScanPage(vmRevoked, "https://humanity.llc");
-    expect(htmlRevoked).toContain("QR revoked");
-    expect(htmlRevoked).toContain("Card active");
-    expect(htmlRevoked).toMatch(/class="trust-on"[^>]*>Card active/);
+    expect(htmlRevoked).toContain("This QR is no longer valid");
+    expect(htmlRevoked).toContain("Show link");
+    expect(htmlRevoked).not.toContain("@river_example");
+    expect(htmlRevoked).not.toContain("Human trust");
+    expect(htmlRevoked).not.toContain('id="pass-flip-btn"');
 
     const vmSibling = buildScanViewModel(
       PROFILE,

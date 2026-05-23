@@ -73,6 +73,16 @@ Examples that fit the primitive when scoped honestly:
 
 **What this proves:** The QR credential and card resolve to an intentional status at scan time; the owner (or governance) can end or suspend that pointer.
 
+**Owner vocabulary (v1):** One action is not “revoke everything.” See `docs/REVOKE_AND_LIFECYCLE_V1.md`:
+
+| Action | Stranger sees (target UX) |
+|--------|---------------------------|
+| **Revoke QR** | “This QR is no longer valid” — minimal by default |
+| **Disable card** | “This card has been disabled” — card details hidden |
+| **Suspend** | “Suspended under public rules” — governance, not owner menu |
+
+Printed objects always keep `profile_id` and `qr_id` in the URL; lifecycle changes resolver truth, not ink.
+
 **What it does not prove:** Anonymity suitable for whistleblower threat models (a public card is pseudonymous, not a dead drop). That the person holding the printed item controls the card key. Legal identity, safety, or eligibility.
 
 **Operator note:** High-risk contexts need explicit retention, abuse, and legal review—not only a revocable QR.

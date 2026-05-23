@@ -39,6 +39,8 @@ The product is not “Linktree with a red QR.” The product is a **live trust o
 
 Revocation matters because **physical trust leaks**: stolen stickers, lost cards, breakups, expelled members, compromised keys. A profile link cannot say “this printed item is dead” without you trusting the platform forever. A resolver can.
 
+**Owner actions (distinct — not one “revoke” button):** **Revoke QR** (one pointer), **Disable card** (whole profile off), **Suspend** (governance only), and (future) **Delete**. Vocabulary, scan copy, and physical-ID warnings: `docs/REVOKE_AND_LIFECYCLE_V1.md`.
+
 ### Value stack (phased)
 
 | Layer | What the user gets | When |
@@ -91,6 +93,7 @@ Do not market the empire before the loop works. Do not apologize for the loop by
 |----------|------|
 | Isn’t this just a QR profile? | `docs/SKEPTIC_FAQ.md` § Isn’t This Just A QR Profile? |
 | What does each scan level prove? | `docs/V1_PRODUCT_TRUST_MODEL.md` |
+| Revoke QR vs Disable card / lifecycle | `docs/REVOKE_AND_LIFECYCLE_V1.md` |
 | Concrete situations | `docs/V1_USE_CASES.md` |
 | Build order | `docs/V1_0_ARCHITECTURE_ROADMAP.md` |
 | Federation and launch | `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` |

@@ -57,7 +57,11 @@ a {
 
 /* Header */
 .top {
-  padding: 14px var(--pad) 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px var(--pad) 8px;
 }
 
 .top-brand {
@@ -68,6 +72,28 @@ a {
   font-weight: 700;
   letter-spacing: -0.03em;
   color: var(--black);
+  min-width: 0;
+}
+
+.top-create {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--red);
+  border: 1px solid var(--red);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.top-create:active {
+  opacity: 0.72;
 }
 
 .top-brand .pass-dot {
@@ -1657,6 +1683,11 @@ a {
 
 .revoke-confirm-spaced {
   margin-top: 14px;
+}
+
+.revoke-id-warning {
+  margin: 0 0 12px;
+  line-height: 1.45;
 }
 
 .recovery-key-display {

@@ -43,6 +43,7 @@
 | `docs/Technical Standards v1.0.md` | Wire formats, crypto, resolver API contract |
 | `docs/V1_IMPLEMENTATION_CONTRACTS.md` | Endpoint and record shapes for builders |
 | `docs/V1_PRODUCT_TRUST_MODEL.md` | What scans prove and do not prove |
+| `docs/REVOKE_AND_LIFECYCLE_V1.md` | **Revoke QR vs Disable card**, scan privacy modes, lifecycle roadmap |
 | `docs/V1_FLOW_AUDIT.md` | Per-flow privacy and failure states |
 | `docs/V1_DECISION_LOCK.md` | Locked vs deferred product decisions |
 | `docs/V1_IMPLEMENTATION_BACKLOG.md` | Task IDs (R-001, SF-002, …) mapped to milestones below |
@@ -379,6 +380,15 @@ Complete before milestone A.1. Map to backlog D-001–D-006.
 
 - Owner-signed revoke for card and for `print_artifact` scoped `qr_id` (schema ready even before print).
 - Scan shows revoked; sibling item QRs unaffected when only one item revoked.
+- **Product spec:** `docs/REVOKE_AND_LIFECYCLE_V1.md` — Revoke QR vs Disable card, minimal scan pages, URL/profile-id honesty, planned `display_mode`.
+
+### A.7.1 Lifecycle UX follow-up (M4.5 — proposed)
+
+- Rename owner whole-card action UI to **Disable card**.
+- QR-revoked scan default: **This QR is no longer valid** (minimal; hide handle/manifesto).
+- Card-disabled scan default: **This card has been disabled** (minimal).
+- **Show link** for scan URL on mobile.
+- Optional `display_mode` on signed revocation (future protocol field).
 
 ### A.8 Landing integration
 

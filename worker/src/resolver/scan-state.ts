@@ -59,6 +59,7 @@ export interface ScanViewModel {
   showArtifactBlock: boolean;
   showLiveControlBlock: boolean;
   liveControlAvailable: boolean;
+  minimalScan: boolean;
   primaryBadge: { label: string; tone: StatusTone };
   scanUrl: string | null;
   cacheControl: string;
@@ -143,8 +144,14 @@ export function buildScanViewModel(
 
   if (card.status === "revoked") {
     return statusView("card_revoked", card, qr, ctx.verification, origin, {
-      label: "Card revoked",
+      label: "Disabled",
       tone: "bad",
+    }, {
+      minimalScan: true,
+      showCardBlock: false,
+      showHumanTrustBlock: false,
+      showArtifactBlock: false,
+      showLiveControlBlock: false,
     });
   }
   if (card.status === "suspended") {
@@ -161,8 +168,14 @@ export function buildScanViewModel(
   }
   if (qr.status === "revoked") {
     return statusView("qr_revoked", card, qr, ctx.verification, origin, {
-      label: "QR revoked",
+      label: "QR invalid",
       tone: "bad",
+    }, {
+      minimalScan: true,
+      showCardBlock: false,
+      showHumanTrustBlock: false,
+      showArtifactBlock: false,
+      showLiveControlBlock: false,
     });
   }
   if (qr.status === "replaced") {
@@ -190,6 +203,7 @@ export function buildScanViewModel(
       showCardBlock: true,
       showHumanTrustBlock: true,
       showArtifactBlock: true,
+      showLiveControlBlock: true,
     },
     origin
   );
@@ -231,11 +245,26 @@ export function buildCardOnlyScanViewModel(
 
   let kind: ScanPageKind = "active";
   let badge = { label: "Active", tone: "live" as StatusTone };
-
   if (card.status === "revoked") {
-    kind = "card_revoked";
-    badge = { label: "Card revoked", tone: "bad" };
-  } else if (card.status === "suspended") {
+    return baseView(
+      {
+        kind: "card_revoked",
+        profileId,
+        qrId: null,
+        card,
+        verification,
+        primaryBadge: { label: "Disabled", tone: "bad" },
+        showCardBlock: false,
+        showHumanTrustBlock: false,
+        showArtifactBlock: false,
+        showLiveControlBlock: false,
+        minimalScan: true,
+      },
+      origin
+    );
+  }
+
+  if (card.status === "suspended") {
     kind = "card_suspended";
     badge = { label: "Suspended", tone: "warn" };
   } else if (card.status === "expired") {
@@ -265,7 +294,17 @@ function statusView(
   qr: ScanContext["qr"] & object,
   verification: ScanContext["verification"],
   origin: string,
-  primaryBadge: { label: string; tone: StatusTone }
+  primaryBadge: { label: string; tone: StatusTone },
+  display?: Partial<
+    Pick<
+      ScanViewModel,
+      | "minimalScan"
+      | "showCardBlock"
+      | "showHumanTrustBlock"
+      | "showArtifactBlock"
+      | "showLiveControlBlock"
+    >
+  >
 ): ScanViewModel {
   return baseView(
     {
@@ -276,9 +315,11 @@ function statusView(
       qr,
       verification,
       primaryBadge,
-      showCardBlock: true,
-      showHumanTrustBlock: true,
-      showArtifactBlock: true,
+      showCardBlock: display?.showCardBlock ?? true,
+      showHumanTrustBlock: display?.showHumanTrustBlock ?? true,
+      showArtifactBlock: display?.showArtifactBlock ?? true,
+      showLiveControlBlock: display?.showLiveControlBlock ?? true,
+      minimalScan: display?.minimalScan ?? false,
     },
     origin
   );
@@ -323,6 +364,8 @@ interface BaseViewInput {
   showCardBlock: boolean;
   showHumanTrustBlock: boolean;
   showArtifactBlock: boolean;
+  showLiveControlBlock?: boolean;
+  minimalScan?: boolean;
 }
 
 function baseView(input: BaseViewInput, origin: string): ScanViewModel {
@@ -351,8 +394,11 @@ function baseView(input: BaseViewInput, origin: string): ScanViewModel {
     showCardBlock: input.showCardBlock,
     showHumanTrustBlock: input.showHumanTrustBlock,
     showArtifactBlock: input.showArtifactBlock,
-    showLiveControlBlock: isHealthy || input.kind.startsWith("qr_") || input.kind.startsWith("card_"),
+    showLiveControlBlock:
+      input.showLiveControlBlock ??
+      (isHealthy || input.kind.startsWith("qr_") || input.kind.startsWith("card_")),
     liveControlAvailable: false,
+    minimalScan: input.minimalScan ?? false,
     primaryBadge: input.primaryBadge,
     scanUrl: resolveScanUrl(origin, input.profileId, input.qrId, qr?.payload),
     cacheControl: isHealthy ? CACHE_ACTIVE : CACHE_INACTIVE,

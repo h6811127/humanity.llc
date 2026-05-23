@@ -157,10 +157,34 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ---
 
+## M4.5 — Lifecycle UX (proposed, after M5 stranger test)
+
+**Spec:** `docs/REVOKE_AND_LIFECYCLE_V1.md`
+
+### Scan pages
+
+- [ ] QR revoked → headline **This QR is no longer valid**; hide handle/manifesto by default
+- [ ] Card disabled → headline **This card has been disabled**; hide card details by default
+- [ ] **Show link** control for scan URL (active + revoked pages)
+
+### `/created/` owner copy
+
+- [ ] Rename “Revoke entire card” → **Disable card**
+- [ ] Confirm step warns: printed QRs still contain profile ID and QR ID
+- [ ] Revoke QR confirm: same physical-ID warning (QR ID always in URL)
+
+### Not in M4.5
+
+- Revoke-on-next-scan encrypted payload, opaque URLs, geofence/calendar/social revoke
+- Delete card, Suspend owner UI, `display_mode` on revocation JSON
+
+---
+
 ## What we are **not** doing in this track
 
 - NFC / Bluetooth mesh implementation — research page only (`site/research-directions.html`)
-- **Owner key export / recovery** (revoke from any device) — **M5.5** (`docs/M5_5_OWNER_KEY_PORTABILITY.md`)
+- **Owner key export / recovery** (revoke from any device) — **M5.5** (`docs/M5_5_OWNER_KEY_PORTABILITY.md`) — largely shipped; see doc for exit checks
+- **Lifecycle UX** (Disable card label, minimal revoke scans, Show link) — **M4.5** (`docs/REVOKE_AND_LIFECYCLE_V1.md`)
 - Vouches (M6), live control (M7), merch (M8)
 - Commons Pass (M10+)
 

@@ -2,7 +2,8 @@
 **Status:** Draft for Collective Ratification
 **Constitution Reference:** Humanity Commons Constitution (Articles I-VII)
 **Technical Standards Reference:** Technical Standards v1.0
-**Product Trust Reference:** V1 Product Trust Model
+**Product Trust Reference:** V1 Product Trust Model  
+**Lifecycle (Revoke QR / Disable card):** `docs/REVOKE_AND_LIFECYCLE_V1.md`
 **Dependencies:** Humanity Card v1.0, Human Verification v1.0
 
 ---

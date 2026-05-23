@@ -3,6 +3,7 @@
 **Status:** Implementation contract (Phase A)  
 **API:** `POST /.well-known/hc/v1/cards/{profile_id}/revoke` (`worker/src/resolver/revoke.ts`)  
 **Trust:** `docs/V1_PRODUCT_TRUST_MODEL.md` Level 0–1  
+**Product vocabulary & roadmap:** `docs/REVOKE_AND_LIFECYCLE_V1.md` (Revoke QR vs Disable card, privacy modes, planned UI)
 
 ---
 
@@ -10,10 +11,10 @@
 
 1. **Private key never leaves the browser** except as a signed `revocation` document POSTed to the resolver.
 2. **Session-only key storage** — at create, `create-card.mjs` stores `owner_private_key_b58` in `sessionStorage` (`hc_created`). Closing the tab clears it. No localStorage, no server upload.
-3. **Revoke requires the create session** — opening `/created/?profile_id=…&qr_id=…` without that session shows read-only copy; revoke buttons stay hidden.
+3. **Revoke requires signing material** — session key, encrypted backup import, or recovery key on `/created/` (`docs/M5_5_OWNER_KEY_PORTABILITY.md`). Opening `/created/?profile_id=…&qr_id=…` without any of these shows read-only copy; owner actions stay hidden.
 4. **Two owner actions** (per Standards §10 + item-scoped QR):
-   - **Revoke this scan QR** — `target_kind: qr_credential`, `target_qr_id` = card’s active QR.
-   - **Revoke entire card** — `target_kind: card` (also revokes active QRs in D1).
+   - **Revoke this scan QR** — `target_kind: qr_credential`, `target_qr_id` = credential id. UI label stays **Revoke this QR**.
+   - **Disable card** (API: `target_kind: card`) — UI today still says “Revoke entire card”; rename to **Disable card** per `REVOKE_AND_LIFECYCLE_V1.md`.
 5. **Confirm before submit** — checkbox + disabled button until checked (no accidental tap).
 6. **Live status** — on load, `GET …/status?q=` shows resolver truth; after revoke, user can open scan URL to verify.
 
@@ -49,3 +50,7 @@
 ## Follow-up: revoke from any device (M5.5)
 
 Session-only keys are intentional for Phase A. **Encrypted export/import** and optional **recovery key** are specified in `docs/M5_5_OWNER_KEY_PORTABILITY.md` so owners can revoke after closing the tab or from another device.
+
+## Follow-up: lifecycle UX (M4.5+)
+
+Minimal scan pages, **Disable card** labeling, **Show link**, scheduled expiry, and optional privacy modes are specified in `docs/REVOKE_AND_LIFECYCLE_V1.md` — not yet implemented in scan HTML or `/created/` copy.

@@ -6,7 +6,7 @@ import { SCAN_PASS_CSS } from "./scan-pass-styles";
 import { renderScanQrMarkup } from "./scan-qr";
 
 /** Response header — confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v5";
+export const SCAN_UI_VERSION = "pass-v6";
 
 /**
  * Public scan UI — flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -43,6 +43,7 @@ export async function renderScanPage(
     <main class="screen scan-screen">
       <p class="section-kicker">Live resolver · scan time</p>
       ${renderPassSection(vm, origin, qrMarkup)}
+      ${renderScanUrlControl(vm)}
       ${renderTrustGroups(vm, origin)}
       ${renderLimitsSettings(origin)}
       ${renderFooter(vm, origin)}
@@ -95,10 +96,23 @@ function renderPassSection(
   qrMarkup: string
 ): string {
   const badgeClass = `pass-badge badge-${vm.primaryBadge.tone}`;
-  const frontBody = renderPassFront(vm, badgeClass, qrMarkup);
+  const frontBody = vm.minimalScan
+    ? renderMinimalPassFront(vm, badgeClass)
+    : renderPassFront(vm, badgeClass, qrMarkup);
   const backBody = renderPassBack(origin);
+  const flipBtn = vm.minimalScan
+    ? ""
+    : `<button type="button" class="pass-flip-btn" id="pass-flip-btn" aria-label="Flip card">
+      Tap to flip
+    </button>`;
+  const bearer = vm.minimalScan ? "" : renderBearerLine();
+  const backFace = vm.minimalScan
+    ? ""
+    : `<div class="pass-face pass-back" aria-hidden="true">
+            ${backBody}
+          </div>`;
 
-  return `${renderBearerLine()}
+  return `${bearer}
 <section class="pass" aria-label="Humanity Card at scan time">
   <div class="pass-scene" id="pass-scene">
     <div class="pass-tilt-wrap" id="pass-tilt-wrap">
@@ -109,17 +123,41 @@ function renderPassSection(
               ${frontBody}
             </div>
           </div>
-          <div class="pass-face pass-back" aria-hidden="true">
-            ${backBody}
-          </div>
+          ${backFace}
         </div>
       </div>
     </div>
-    <button type="button" class="pass-flip-btn" id="pass-flip-btn" aria-label="Flip card">
-      Tap to flip
-    </button>
+    ${flipBtn}
   </div>
 </section>`;
+}
+
+function renderMinimalPassFront(
+  vm: ScanViewModel,
+  badgeClass: string
+): string {
+  const headline =
+    vm.kind === "qr_revoked"
+      ? "This QR is no longer valid"
+      : "This card has been disabled";
+  return `<div class="pass-head">
+  <div class="pass-brand">
+    <span class="pass-dot" aria-hidden="true"></span>
+    <span>humanity.llc</span>
+  </div>
+  <span class="${badgeClass}">${escapeHtml(vm.primaryBadge.label)}</span>
+</div>
+<p class="pass-type">Scan result</p>
+<h1 class="pass-name">${escapeHtml(headline)}</h1>
+<p class="pass-manifesto">${escapeHtml(scanLead(vm))}</p>`;
+}
+
+function renderScanUrlControl(vm: ScanViewModel): string {
+  if (!vm.scanUrl) return "";
+  return `<details class="scan-show-link">
+  <summary class="scan-show-link-summary">Show link</summary>
+  <p class="pass-scan-url mono">${escapeHtml(vm.scanUrl)}</p>
+</details>`;
 }
 
 function renderPassFront(
@@ -155,9 +193,6 @@ function renderPassFront(
   const qrBlock = vm.scanUrl
     ? `<div class="pass-qr"${qrSlotAttr}>${qrMarkup}</div>`
     : "";
-  const scanUrlLine = vm.scanUrl
-    ? `<p class="pass-scan-url mono">${escapeHtml(vm.scanUrl)}</p>`
-    : "";
 
   return `<div class="pass-head">
   <div class="pass-brand">
@@ -176,8 +211,7 @@ function renderPassFront(
     </ul>
   </div>
   ${qrBlock}
-</div>
-${scanUrlLine}`;
+</div>`;
 }
 
 /** Back — status hints only; limits live in settings row below the card. */
@@ -324,9 +358,6 @@ function qrGroupRows(vm: ScanViewModel): string {
   if (vm.qrId) {
     rows.push(listRow("profile", "blue", "Credential", vm.qrId));
   }
-  if (vm.scanUrl) {
-    rows.push(listRow("link", "red", "Scan link", vm.scanUrl));
-  }
   return rows.join("\n");
 }
 
@@ -453,13 +484,13 @@ function scanLead(vm: ScanViewModel): string {
     case "malformed":
       return "This scan link is missing a valid profile or QR id.";
     case "card_revoked":
-      return "This card was revoked. Printed QRs may still exist.";
+      return "Printed QRs may still exist. Card details are hidden.";
     case "card_suspended":
       return "This card is suspended under published rules.";
     case "card_expired":
       return "This card has expired.";
     case "qr_revoked":
-      return "This QR credential was revoked.";
+      return "Revoked by owner. Resolver status at scan time.";
     case "qr_expired":
       return "This QR credential has expired.";
     case "qr_replaced":
@@ -470,6 +501,11 @@ function scanLead(vm: ScanViewModel): string {
 }
 
 function pageTitle(vm: ScanViewModel): string {
+  if (vm.minimalScan) {
+    return vm.kind === "qr_revoked"
+      ? "QR no longer valid"
+      : "Card disabled";
+  }
   if (vm.handle) return `@${vm.handle}`;
   return vm.primaryBadge.label;
 }

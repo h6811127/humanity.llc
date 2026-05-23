@@ -158,6 +158,7 @@ Signed card → HTTPS QR → trust-state UI → artifact intent → per-item QR 
 **Trust and use cases:**
 
 - `docs/V1_PRODUCT_TRUST_MODEL.md`
+- `docs/REVOKE_AND_LIFECYCLE_V1.md` — **Revoke QR vs Disable card**, scan privacy, lifecycle roadmap
 - `docs/V1_USE_CASES.md` — primitive + phased examples (not all in v1 code)
 - `docs/V1_MARKET_AND_GROWTH_STRATEGY.md`
 - `docs/features/Humanity Card v1.0.md`

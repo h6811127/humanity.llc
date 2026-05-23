@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Your card · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=34" />
+    <link rel="stylesheet" href="/styles.css?v=35" />
   </head>
   <body>
     <div class="page">
@@ -232,7 +232,7 @@
               </span>
               <span class="settings-summary-text">
                 <span class="settings-summary-title">Revoke on resolver</span>
-                <span class="settings-summary-sub">Stops this QR or the whole card</span>
+                <span class="settings-summary-sub">Revoke this QR or disable the whole card</span>
               </span>
               <span class="list-chevron" aria-hidden="true">›</span>
             </summary>
@@ -245,20 +245,29 @@
             </p>
 
               <div id="revoke-actions" hidden>
+                <p class="form-hint revoke-id-warning">
+                  The QR code still contains its QR ID and profile ID in the URL. Revoking
+                  changes live status on the resolver, not the physical sticker or photo.
+                </p>
                 <label class="revoke-confirm">
                   <input type="checkbox" id="confirm-revoke-qr" />
-                  <span>Revoke this scan QR only</span>
+                  <span>I understand and want to revoke this scan QR only</span>
                 </label>
                 <button type="button" class="btn-danger" id="revoke-qr-btn" disabled>
                   Revoke this QR
                 </button>
 
+                <p class="form-hint revoke-id-warning revoke-confirm-spaced">
+                  Card details will no longer be viewable on scan. All active QRs on this card
+                  will stop resolving as active. Profile ID and QR IDs remain on anything already
+                  printed or shared.
+                </p>
                 <label class="revoke-confirm revoke-confirm-spaced">
                   <input type="checkbox" id="confirm-revoke-card" />
-                  <span>Revoke entire card (all active QRs)</span>
+                  <span>I understand and want to disable this card</span>
                 </label>
                 <button type="button" class="btn-danger btn-danger-solid" id="revoke-card-btn" disabled>
-                  Revoke entire card
+                  Disable card
                 </button>
               </div>
               <p class="form-status" id="revoke-status" hidden></p>
@@ -273,6 +282,6 @@
         </p>
       </main>
     </div>
-    <script type="module" src="/js/created.mjs?v=11"></script>
+    <script type="module" src="/js/created.mjs?v=12"></script>
   </body>
 </html>

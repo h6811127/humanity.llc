@@ -330,15 +330,19 @@ Goal: launch the identity core without commerce.
 
 ### R-003: Revocation And Suspension Status Pages
 
+**Product spec:** `docs/REVOKE_AND_LIFECYCLE_V1.md` — Revoke QR vs Disable card, minimal scan pages, owner warnings, planned privacy modes.
+
 **Build:**
 
-- Owner-signed revocation flow.
+- Owner-signed revocation flow (`target_kind: qr_credential` | `card`).
 - Governance-signed suspension placeholder flow using bootstrap keys.
 - Revoked, suspended, expired, unknown, and stale/offline UI states.
+- **M4.5 (planned):** QR-revoked minimal scan (“This QR is no longer valid”); card-disabled minimal scan; **Disable card** label on `/created/`; **Show link** for scan URL; owner confirm warnings about permanent IDs on printed QRs.
 
 **Exit criteria:**
 
 - Revoked QR resolves clearly instead of failing silently.
+- Card-disabled scan hides handle/manifesto by default (when M4.5 ships).
 - New print artifact intents are blocked for revoked/suspended/expired QR.
 - Revoking a printed-item QR does not revoke sibling printed-item QR credentials.
 
