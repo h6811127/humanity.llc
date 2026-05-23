@@ -8,9 +8,11 @@ import {
   activeVouchCountSince,
   activeVouchPairExists,
   getVerificationSummary,
+  getVouchById,
   getVouchCardOwner,
   insertVouch,
   recalculateVouchSummary,
+  revokeVouch,
   VOUCHER_ACTIVE_QUOTA_PER_YEAR,
   VOUCHER_WAIT_DAYS,
   vouchNonceUsed,
@@ -32,6 +34,15 @@ function parseVouchBody(body: unknown): Record<string, unknown> | null {
     return o;
   }
   return null;
+}
+
+function parseVouchRevokeBody(body: unknown): Record<string, unknown> | null {
+  if (!body || typeof body !== "object") return null;
+  const o = body as Record<string, unknown>;
+  if (o.revocation && typeof o.revocation === "object") {
+    return o.revocation as Record<string, unknown>;
+  }
+  return parseVouchBody(body);
 }
 
 function isVouchMethod(value: unknown): value is VouchMethod {
@@ -228,6 +239,127 @@ export async function handlePostVouch(
     if (msg.includes("UNIQUE") || msg.includes("unique")) {
       return errorResponse("VOUCH_ALREADY_EXISTS", "Vouch already recorded.", 409);
     }
+    return errorResponse("RESOLVER_ERROR", msg, 500);
+  }
+}
+
+/**
+ * POST /v1/verification/vouches/{vouch_id}/revoke
+ * Body: { "revocation": <signed vouch document with revoked: true> } (M6.4)
+ */
+export async function handlePostVouchRevoke(
+  request: Request,
+  db: D1Database,
+  pathVouchId: string
+): Promise<Response> {
+  if (!VOUCH_ID_REGEX.test(pathVouchId)) {
+    return errorResponse("INVALID_VOUCH_ID", "Invalid vouch_id.", 422);
+  }
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return errorResponse("MALFORMED_REQUEST", "Invalid JSON body.", 400);
+  }
+
+  const doc = parseVouchRevokeBody(body);
+  if (!doc) {
+    return errorResponse(
+      "MALFORMED_REQUEST",
+      "Body must include signed `revocation` vouch object.",
+      400
+    );
+  }
+
+  if (doc.vouch_id !== pathVouchId) {
+    return errorResponse(
+      "VOUCH_MISMATCH",
+      "Revocation vouch_id must match URL.",
+      422
+    );
+  }
+  if (doc.revoked !== true) {
+    return errorResponse(
+      "MALFORMED_REQUEST",
+      "Vouch revocation must set revoked to true.",
+      422
+    );
+  }
+
+  const existing = await getVouchById(db, pathVouchId);
+  if (!existing) {
+    return errorResponse("NOT_FOUND", "Vouch not found.", 404);
+  }
+  if (existing.status === "revoked") {
+    return errorResponse("ALREADY_REVOKED", "Vouch is already revoked.", 409);
+  }
+
+  const nonce = doc.nonce;
+  if (typeof nonce !== "string" || !nonce) {
+    return errorResponse("MALFORMED_REQUEST", "Vouch revocation must include nonce.", 422);
+  }
+  if (nonce === existing.nonce || (await vouchNonceUsed(db, nonce))) {
+    return errorResponse(CRYPTO_ERROR.REPLAYED_NONCE, "Vouch nonce already used.", 409);
+  }
+
+  if (
+    doc.voucher_profile_id !== existing.voucher_profile_id ||
+    doc.vouchee_profile_id !== existing.vouchee_profile_id
+  ) {
+    return errorResponse(
+      "VOUCH_MISMATCH",
+      "Revocation voucher and vouchee must match the active vouch.",
+      422
+    );
+  }
+
+  const verify = await verifySignedDocument(doc, {
+    expectedType: PAYLOAD_TYPES.VOUCH,
+    expectedPublicKeyBase58: existing.issuer_public_key,
+  });
+  if (!verify.ok) {
+    return errorResponse(verify.code, verify.message, 401);
+  }
+
+  const revokedAt =
+    typeof doc.revoked_at === "string" && doc.revoked_at
+      ? doc.revoked_at
+      : typeof doc.created_at === "string" && doc.created_at
+        ? doc.created_at
+        : new Date().toISOString();
+
+  try {
+    await revokeVouch(db, {
+      vouchId: pathVouchId,
+      revokedAt,
+      revocationNonce: nonce,
+      revocationDocumentJson: JSON.stringify(doc),
+    });
+    const updated = await recalculateVouchSummary(
+      db,
+      existing.vouchee_profile_id,
+      revokedAt
+    );
+    return jsonResponse(
+      {
+        vouch_id: pathVouchId,
+        voucher_profile_id: existing.voucher_profile_id,
+        vouchee_profile_id: existing.vouchee_profile_id,
+        status: "revoked",
+        revoked_at: revokedAt,
+        verification: {
+          state: updated.state,
+          label: updated.label,
+          method: updated.method,
+          vouch_count: updated.vouch_count,
+          latest_accepted_vouch_at: updated.latest_accepted_vouch_at,
+        },
+      },
+      200
+    );
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
     return errorResponse("RESOLVER_ERROR", msg, 500);
   }
 }

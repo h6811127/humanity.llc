@@ -27,6 +27,13 @@ export interface InsertVouchParams {
   createdAt: string;
 }
 
+export interface RevokeVouchParams {
+  vouchId: string;
+  revokedAt: string;
+  revocationNonce: string;
+  revocationDocumentJson: string;
+}
+
 export async function getVouchCardOwner(
   db: D1Database,
   profileId: string
@@ -60,8 +67,8 @@ export async function vouchNonceUsed(
   nonce: string
 ): Promise<boolean> {
   const row = await db
-    .prepare(`SELECT 1 FROM vouches WHERE nonce = ?`)
-    .bind(nonce)
+    .prepare(`SELECT 1 FROM vouches WHERE nonce = ? OR revocation_nonce = ?`)
+    .bind(nonce, nonce)
     .first();
   return !!row;
 }
@@ -100,6 +107,21 @@ export async function activeVouchCountSince(
   return row?.n ?? 0;
 }
 
+export async function getVouchById(
+  db: D1Database,
+  vouchId: string
+): Promise<VouchRow | null> {
+  return db
+    .prepare(
+      `SELECT vouch_id, voucher_profile_id, vouchee_profile_id, nonce, statement,
+              method, status, signed_document_json, revocation_document_json,
+              revocation_nonce, issuer_public_key, created_at, revoked_at
+       FROM vouches WHERE vouch_id = ?`
+    )
+    .bind(vouchId)
+    .first<VouchRow>();
+}
+
 export async function insertVouch(
   db: D1Database,
   params: InsertVouchParams
@@ -108,9 +130,9 @@ export async function insertVouch(
     .prepare(
       `INSERT INTO vouches (
         vouch_id, voucher_profile_id, vouchee_profile_id, nonce, statement,
-        method, status, signed_document_json, issuer_public_key, created_at,
-        revoked_at
-      ) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, NULL)`
+        method, status, signed_document_json, revocation_document_json,
+        revocation_nonce, issuer_public_key, created_at, revoked_at
+      ) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, NULL, NULL, ?, ?, NULL)`
     )
     .bind(
       params.vouchId,
@@ -126,6 +148,29 @@ export async function insertVouch(
     .run();
   if (!result.success) {
     throw new Error(result.error ?? "D1 insert vouch failed");
+  }
+}
+
+export async function revokeVouch(
+  db: D1Database,
+  params: RevokeVouchParams
+): Promise<void> {
+  const result = await db
+    .prepare(
+      `UPDATE vouches
+       SET status = 'revoked', revoked_at = ?, revocation_document_json = ?,
+           revocation_nonce = ?
+       WHERE vouch_id = ? AND status = 'active'`
+    )
+    .bind(
+      params.revokedAt,
+      params.revocationDocumentJson,
+      params.revocationNonce,
+      params.vouchId
+    )
+    .run();
+  if (!result.success) {
+    throw new Error(result.error ?? "D1 revoke vouch failed");
   }
 }
 
@@ -164,6 +209,14 @@ export async function recalculateVouchSummary(
     level = 2;
     label = "Vouched Human";
     method = "vouch";
+  } else if (
+    existing?.state === "verified_human" &&
+    existing.method !== "vouch"
+  ) {
+    state = existing.state;
+    level = existing.level;
+    label = existing.label;
+    method = existing.method;
   }
 
   const resultUpdate = await db

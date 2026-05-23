@@ -127,6 +127,8 @@ export interface VouchRow {
   method: VouchMethod;
   status: VouchStatus;
   signed_document_json: string;
+  revocation_document_json: string | null;
+  revocation_nonce: string | null;
   issuer_public_key: string;
   created_at: string;
   revoked_at: string | null;

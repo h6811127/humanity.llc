@@ -9,7 +9,7 @@ import {
   withProtocolFields,
 } from "../src/crypto";
 import type { CardStatus, VerificationSummaryRow, VouchRow } from "../src/db/types";
-import { handlePostVouch } from "../src/resolver/vouch";
+import { handlePostVouch, handlePostVouchRevoke } from "../src/resolver/vouch";
 
 const VOUCHEE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 
@@ -27,6 +27,7 @@ async function signedVouch(opts: {
   vouchId?: string;
   nonce?: string;
   createdAt?: string;
+  revoked?: boolean;
 }) {
   return signDocument(
     withProtocolFields(
@@ -38,7 +39,7 @@ async function signedVouch(opts: {
         statement: "I attest this is a distinct human I know.",
         method: "in_person",
         created_at: opts.createdAt ?? "2026-05-16T17:00:00.000Z",
-        revoked: false,
+        revoked: opts.revoked ?? false,
       },
       PAYLOAD_TYPES.VOUCH
     ),
@@ -88,7 +89,14 @@ class FakeVerificationDb {
               return (self.summaries.get(args[0] as string) ?? null) as T | null;
             }
             if (sql.includes("FROM vouches WHERE nonce")) {
-              return (self.vouches.some((v) => v.nonce === args[0]) ? { 1: 1 } : null) as T | null;
+              return (self.vouches.some(
+                (v) => v.nonce === args[0] || v.revocation_nonce === args[0]
+              )
+                ? { 1: 1 }
+                : null) as T | null;
+            }
+            if (sql.includes("FROM vouches WHERE vouch_id = ?")) {
+              return (self.vouches.find((v) => v.vouch_id === args[0]) ?? null) as T | null;
             }
             if (sql.includes("voucher_profile_id = ?") && sql.includes("vouchee_profile_id = ?")) {
               return (self.vouches.some(
@@ -146,10 +154,25 @@ class FakeVerificationDb {
                 method: method as "in_person",
                 status: "active",
                 signed_document_json,
+                revocation_document_json: null,
+                revocation_nonce: null,
                 issuer_public_key,
                 created_at,
                 revoked_at: null,
               });
+            }
+            if (sql.includes("UPDATE vouches")) {
+              const [revoked_at, revocation_document_json, revocation_nonce, vouch_id] =
+                args as string[];
+              const existing = self.vouches.find(
+                (v) => v.vouch_id === vouch_id && v.status === "active"
+              );
+              if (existing) {
+                existing.status = "revoked";
+                existing.revoked_at = revoked_at;
+                existing.revocation_document_json = revocation_document_json;
+                existing.revocation_nonce = revocation_nonce;
+              }
             }
             if (sql.includes("UPDATE verification_summaries")) {
               const [
@@ -203,6 +226,22 @@ async function post(db: FakeVerificationDb, vouch: Record<string, unknown>) {
       body: JSON.stringify({ vouch }),
     }),
     db as unknown as D1Database
+  );
+}
+
+async function postRevoke(
+  db: FakeVerificationDb,
+  vouchId: string,
+  revocation: Record<string, unknown>
+) {
+  return handlePostVouchRevoke(
+    new Request(`https://humanity.llc/v1/verification/vouches/${vouchId}/revoke`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ revocation }),
+    }),
+    db as unknown as D1Database,
+    vouchId
   );
 }
 
@@ -290,6 +329,68 @@ describe("handlePostVouch", () => {
     expect(res.status).toBe(403);
     expect((await res.json()) as { error: string }).toMatchObject({
       error: "VOUCHER_TOO_NEW",
+    });
+  });
+
+  it("revokes a voucher-signed vouch and removes it from the active count", async () => {
+    const db = new FakeVerificationDb();
+    const voucheeKeys = await keypair();
+    db.addCard(VOUCHEE, voucheeKeys.publicKeyBase58);
+    const voucherKeys: Awaited<ReturnType<typeof keypair>>[] = [];
+    const voucherIds: string[] = [];
+
+    for (let i = 0; i < 3; i++) {
+      const keys = await keypair();
+      const voucherProfileId = `8Ym8nQ3pR5sU7wX9zA2bC4d${i + 2}`;
+      voucherKeys.push(keys);
+      voucherIds.push(voucherProfileId);
+      db.addCard(voucherProfileId, keys.publicKeyBase58);
+      db.setSummary(voucherProfileId, {
+        state: "verified_human",
+        level: 2,
+        label: "Vouched Human",
+        method: "vouch",
+        updated_at: "2026-01-01T00:00:00.000Z",
+      });
+      const res = await post(
+        db,
+        await signedVouch({
+          voucherProfileId,
+          vouchId: `vouch_revoke_${i}`,
+          nonce: `nonce_revoke_create_${i}`,
+          createdAt: `2026-05-1${i}T17:00:00.000Z`,
+          ...keys,
+        })
+      );
+      expect(res.status).toBe(201);
+    }
+    expect(db.summaries.get(VOUCHEE)?.state).toBe("verified_human");
+
+    const res = await postRevoke(
+      db,
+      "vouch_revoke_2",
+      await signedVouch({
+        voucherProfileId: voucherIds[2]!,
+        vouchId: "vouch_revoke_2",
+        nonce: "nonce_revoke_signed_2",
+        createdAt: "2026-05-20T17:00:00.000Z",
+        revoked: true,
+        ...voucherKeys[2]!,
+      })
+    );
+
+    expect(res.status).toBe(200);
+    expect(db.vouches.find((v) => v.vouch_id === "vouch_revoke_2")).toMatchObject({
+      status: "revoked",
+      revoked_at: "2026-05-20T17:00:00.000Z",
+      revocation_nonce: "nonce_revoke_signed_2",
+    });
+    expect(db.summaries.get(VOUCHEE)).toMatchObject({
+      state: "registered",
+      label: "Registered",
+      method: "registered",
+      vouch_count: 2,
+      latest_accepted_vouch_at: "2026-05-11T17:00:00.000Z",
     });
   });
 });

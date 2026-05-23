@@ -15,6 +15,8 @@ CREATE TABLE vouches (
   status TEXT NOT NULL DEFAULT 'active'
     CHECK (status IN ('active', 'revoked')),
   signed_document_json TEXT NOT NULL,
+  revocation_document_json TEXT,
+  revocation_nonce TEXT,
   issuer_public_key TEXT NOT NULL,
   created_at TEXT NOT NULL,
   revoked_at TEXT,
@@ -22,6 +24,8 @@ CREATE TABLE vouches (
 );
 
 CREATE UNIQUE INDEX idx_vouches_nonce ON vouches (nonce);
+CREATE UNIQUE INDEX idx_vouches_revocation_nonce ON vouches (revocation_nonce)
+  WHERE revocation_nonce IS NOT NULL;
 CREATE INDEX idx_vouches_vouchee_status ON vouches (vouchee_profile_id, status);
 CREATE INDEX idx_vouches_voucher_created ON vouches (voucher_profile_id, created_at);
 

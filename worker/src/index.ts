@@ -17,7 +17,7 @@ import { handleGetCard, handlePostCards } from "./resolver/create-card";
 import { handlePostRevoke } from "./resolver/revoke";
 import { handleGetScan } from "./resolver/scan";
 import { handleGetScanStatus } from "./resolver/scan-status";
-import { handlePostVouch } from "./resolver/vouch";
+import { handlePostVouch, handlePostVouchRevoke } from "./resolver/vouch";
 
 export interface Env {
   DB: D1Database;
@@ -86,6 +86,24 @@ export default {
         );
       }
       const res = await handlePostVouch(request, env.DB);
+      return withCors(request, res);
+    }
+
+    const vouchRevokeMatch = path.match(
+      /^\/v1\/verification\/vouches\/([^/]+)\/revoke$/
+    );
+    if (vouchRevokeMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostVouchRevoke(
+        request,
+        env.DB,
+        vouchRevokeMatch[1]!
+      );
       return withCors(request, res);
     }
 
