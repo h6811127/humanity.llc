@@ -2231,6 +2231,19 @@ button.btn-danger {
   color: var(--black);
 }
 
+.tag-chips-neutral li {
+  border-color: rgba(0, 0, 0, 0.12);
+  background: #f7f7f7;
+}
+
+.idea-compare {
+  margin-top: 0;
+}
+
+.idea-compare .idea-footnote {
+  margin-top: 14px;
+}
+
 #revoke-actions .btn-danger {
   width: 100%;
 }
