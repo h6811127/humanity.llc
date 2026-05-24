@@ -11,6 +11,10 @@ npm run pages:dev
 
 Open the URL Wrangler prints (usually `http://localhost:8788`).
 
+Run `npm run worker:dev` on port **8787** before using `/create/` locally — the UI signs in the browser and POSTs to the resolver.
+
+**Pages preview URLs** (`*.pages.dev` after `npm run pages:deploy`) are static-only. Create/revoke/vouch calls use the production resolver at `https://humanity.llc` automatically. Override with `?api=http://127.0.0.1:8787` when testing against a local worker.
+
 **Pass card (iPhone Safari + Android Chrome):** tilt lives on `.pass-tilt-wrap`; flip is `.is-flipped` on `#pass-flip` / `.pass-inner` only (coarse-pointer CSS must not flatten `.pass-flip`). No idle spin on touch; drag face to tilt; tap **Tap to flip** for front/back; 44px flip button. Script: `js/pass-flip.js` (landing + scan). Hard-refresh after deploy (`styles.css?v=25`, `pass-flip.js?v=1`). Reduced-motion: instant flip, button stays visible.
 
 ## Deploy on Cloudflare Pages

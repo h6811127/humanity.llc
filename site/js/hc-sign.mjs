@@ -116,6 +116,17 @@ export function withProtocolFields(payload, type) {
   return { ...payload, type, version: PROTOCOL_VERSION };
 }
 
+const PRODUCTION_RESOLVER_ORIGIN = "https://humanity.llc";
+
+function isLocalDevHost(hostname) {
+  return hostname === "localhost" || hostname === "127.0.0.1";
+}
+
+/** Cloudflare Pages preview URLs serve static files only — API lives on humanity.llc. */
+function isPagesPreviewHost(hostname) {
+  return hostname.endsWith(".pages.dev");
+}
+
 /**
  * Resolver origin only (no path). Avoids ?api=https://humanity.llc/create
  * which would POST to /create/.well-known/... and Pages returns 405.
@@ -126,21 +137,26 @@ export function resolverApiOrigin() {
   if (apiParam) {
     try {
       const parsed = new URL(apiParam, location.href);
-      if (
-        parsed.hostname === "127.0.0.1" ||
-        parsed.hostname === "localhost"
-      ) {
+      if (isLocalDevHost(parsed.hostname)) {
+        return parsed.origin;
+      }
+      if (parsed.hostname === "humanity.llc") {
         return parsed.origin;
       }
     } catch {
-      /* ignore bad api= on production */
+      /* ignore bad api= */
     }
   }
-  if (
-    location.hostname === "localhost" ||
-    location.hostname === "127.0.0.1"
-  ) {
+
+  const { hostname } = location;
+  if (isLocalDevHost(hostname)) {
     return "http://127.0.0.1:8787";
+  }
+  if (hostname === "humanity.llc") {
+    return location.origin;
+  }
+  if (isPagesPreviewHost(hostname)) {
+    return PRODUCTION_RESOLVER_ORIGIN;
   }
   return location.origin;
 }

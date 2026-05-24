@@ -32,15 +32,25 @@ export function errorResponse(
   return jsonResponse({ error: code, message }, status, extra);
 }
 
-/** Allow Pages dev (different port) and production same-origin create flow. */
+function isAllowedCorsOrigin(origin: string): boolean {
+  try {
+    const { hostname } = new URL(origin);
+    return (
+      hostname === "humanity.llc" ||
+      hostname.endsWith(".humanity.llc") ||
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname.endsWith(".pages.dev")
+    );
+  } catch {
+    return false;
+  }
+}
+
+/** Allow Pages dev, Pages preview (*.pages.dev), and production same-origin create flow. */
 export function corsHeaders(request: Request): HeadersInit {
   const origin = request.headers.get("Origin");
-  if (!origin) return {};
-  const allowed =
-    origin.includes("humanity.llc") ||
-    origin.includes("localhost") ||
-    origin.includes("127.0.0.1");
-  if (!allowed) return {};
+  if (!origin || !isAllowedCorsOrigin(origin)) return {};
   const headers: Record<string, string> = {
     "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
