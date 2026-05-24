@@ -2064,26 +2064,360 @@ a {
   text-decoration: underline;
 }
 
+/* ——— Device hub (landing + wallet) ——— */
+.device-hub {
+  margin-top: 8px;
+}
+
+.device-hub-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0 0 6px;
+  padding: 0 4px;
+}
+
+.device-hub-lead {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--grey);
+  margin: 0 0 16px;
+  padding: 0 4px;
+}
+
+.device-hub-group {
+  margin-bottom: 20px;
+}
+
+.device-hub-group-label {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--grey);
+  margin: 0 0 8px;
+  padding-left: 14px;
+}
+
+.device-hub-empty {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--grey);
+  margin: 0 0 10px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: #f2f2f7;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.device-hub-empty a {
+  color: var(--black);
+  font-weight: 600;
+}
+
+.device-hub-footnote {
+  margin-top: 4px;
+}
+
+.device-hub .list-action a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.device-hub .list-action .list-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.device-hub .list-action .list-title {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.device-hub-disclosure {
+  margin-top: 4px;
+}
+
+.device-hub-search-float {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 78px);
+  width: 100%;
+  max-width: 430px;
+  padding: 0 16px;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.device-hub-search-float > * {
+  pointer-events: auto;
+}
+
+.device-hub-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.12),
+    0 1px 3px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.device-hub-search-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  color: var(--grey);
+}
+
+.device-hub-search-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.device-hub-search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 16px;
+  color: var(--black);
+  outline: none;
+}
+
+.device-hub-search-input::placeholder {
+  color: #8e8e93;
+}
+
+.device-hub-search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+.device-hub-search-hint {
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--grey);
+}
+
+.has-device-hub-search .screen-landing {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 140px);
+}
+
+.has-device-hub-search .screen-wallet {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 88px);
+}
+
+.has-device-hub-search:has(.screen-wallet) .device-hub-search-float {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+}
+
+/* ——— Status plate pilot visual ——— */
+.pilot-showcase {
+  margin-top: 8px;
+}
+
+.pilot-showcase-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0 0 8px;
+}
+
+.pilot-showcase-lead {
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--black);
+  margin: 0 0 16px;
+}
+
+.pilot-showcase-visual {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  min-height: 148px;
+  margin: 0 0 18px;
+  padding: 28px 24px 22px;
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, #f5f5f7 0%, #e8e8ed 55%, #dedee3 100%);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.pilot-showcase-visual::before {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: 0;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 4px 4px 0 0;
+}
+
+.pilot-showcase-door {
+  width: 88px;
+  height: 100px;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.pilot-showcase-door .flow-plaque {
+  width: 44px;
+  height: 44px;
+  padding: 6px;
+  bottom: 12px;
+}
+
+.pilot-showcase-door .flow-plaque img {
+  width: 32px;
+  height: 32px;
+}
+
+.pilot-showcase-actions {
+  margin-top: 0;
+}
+
+/* ——— Wallet page ——— */
+.screen-wallet {
+  gap: 14px;
+}
+
+.wallet-active-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: rgba(10, 132, 255, 0.08);
+  border: 1px solid rgba(10, 132, 255, 0.22);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--black);
+}
+
+.wallet-active-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #34c759;
+  flex-shrink: 0;
+}
+
+.wallet-save-inset {
+  padding: 14px;
+  border-radius: var(--radius);
+  background: #f2f2f7;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.wallet-save-field {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.wallet-save-btn {
+  width: 100%;
+}
+
+.wallet-card-list {
+  margin-bottom: 0;
+}
+
+.wallet-card-list .wallet-card-item {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--grey);
+}
+
+.wallet-card-list .wallet-card-item:last-child {
+  border-bottom: none;
+}
+
+.wallet-card-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px 12px 12px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.wallet-card-main:active {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.wallet-card-main .list-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.wallet-card-meta {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--grey);
+  margin-right: 2px;
+}
+
+.wallet-card-footer {
+  display: flex;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  background: #f9f9fb;
+}
+
+.wallet-card-footer-btn {
+  flex: 1;
+  min-height: 40px;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #007aff;
+  cursor: pointer;
+}
+
+.wallet-card-footer-btn:active {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.wallet-card-footer-btn.wallet-remove {
+  color: var(--red);
+  border-left: 1px solid rgba(0, 0, 0, 0.06);
+}
+
 .wallet-how-steps {
   margin: 0 0 12px;
   padding-left: 1.25rem;
   font-size: 15px;
   line-height: 1.45;
-  color: var(--black);
 }
 
 .wallet-how-steps li + li {
-  margin-top: 8px;
-}
-
-.wallet-row-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-left: auto;
-}
-
-.landing-your-cards {
   margin-top: 8px;
 }
 

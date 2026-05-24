@@ -42,7 +42,9 @@ npm run deploy
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Landing page (short loop + status plate pilot) |
+| `index.html` | Landing page (short loop + device hub + status plate pilot) |
+| `wallet/index.html` | Saved cards on this device (`hc_wallet` in localStorage) |
+| `js/card-wallet.mjs`, `js/landing-device-hub.mjs` | Wallet CRUD + landing hub injection / local search filter |
 | `case-study/index.html` | Recruiter walkthrough: create → scan → update → revoke → live control |
 | `data/showcase-status-plate.json` | Live public status-plate scan for homepage pilot |
 | `create/index.html` | Create card UI at `/create/` |
@@ -64,6 +66,10 @@ API_ORIGIN=https://humanity.llc npm run site:seed-showcase
 ```
 
 Writes `data/showcase-status-plate.json` with a live scan URL for the status-plate pilot block on the landing page.
+
+### Device hub and local search
+
+Landing **On this device** and `/wallet/` use grouped Settings-style lists. Saved cards from `localStorage` (`hc_wallet`) appear on the landing page when present. The floating search bar filters **this device only** (saved labels, shortcuts) — not the public resolver. Design notes: `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md`.
 
 ### After changing Pages files
 

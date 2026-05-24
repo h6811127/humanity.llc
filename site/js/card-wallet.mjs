@@ -48,11 +48,30 @@ function activateEntry(entry) {
   );
 }
 
+function searchHaystack(entry) {
+  return [
+    entry.label,
+    entry.handle,
+    entry.manifesto_line,
+    entry.profile_id,
+    entry.scan_url,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
 const listEl = document.getElementById("wallet-list");
 const emptyEl = document.getElementById("wallet-empty");
 const saveForm = document.getElementById("wallet-save-form");
+const saveGroup = document.getElementById("wallet-save-group");
 const saveStatus = document.getElementById("wallet-save-status");
 const saveLabel = document.getElementById("wallet-save-label");
+const searchInput = document.getElementById("device-hub-search");
+const activeBanner = document.getElementById("wallet-active-banner");
+const activeText = document.getElementById("wallet-active-text");
+
+let searchQuery = "";
 
 function setSaveStatus(msg, isError = false) {
   if (!saveStatus) return;
@@ -82,31 +101,66 @@ function entryFromSession(session, label) {
   };
 }
 
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function matchesSearch(entry) {
+  if (!searchQuery) return true;
+  return searchHaystack(entry).includes(searchQuery);
+}
+
 function renderList() {
   const entries = loadWallet();
   if (!listEl) return;
   listEl.innerHTML = "";
 
+  const visible = entries.filter(matchesSearch);
+
   if (entries.length === 0) {
-    if (emptyEl) emptyEl.hidden = false;
+    listEl.hidden = true;
+    if (emptyEl) {
+      emptyEl.hidden = false;
+      emptyEl.textContent = "";
+      emptyEl.innerHTML =
+        'No saved cards yet. <a href="/create/">Create one</a> or return after create while keys are still in this tab.';
+    }
     return;
   }
-  if (emptyEl) emptyEl.hidden = true;
 
-  for (const entry of entries) {
+  if (emptyEl) {
+    emptyEl.hidden = visible.length > 0;
+    if (visible.length === 0) {
+      emptyEl.hidden = false;
+      emptyEl.textContent = "No saved cards match your search.";
+    }
+  }
+
+  listEl.hidden = visible.length === 0;
+
+  for (const entry of visible) {
     const li = document.createElement("li");
-    li.className = "list-row wallet-row";
+    li.className = "wallet-card-item";
+    li.dataset.hubSearchable = searchHaystack(entry);
+    const sub = entry.manifesto_line || entry.handle || entry.profile_id;
+    const status = entry.status === "revoked" ? "Revoked" : "Active";
     li.innerHTML = `
-      <span class="list-icon list-icon-tone-trust" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      </span>
-      <span class="list-content">
-        <span class="list-title">${escapeHtml(entry.label)}</span>
-        <span class="list-sub mono">${escapeHtml(entry.profile_id)}</span>
-      </span>
-      <div class="wallet-row-actions">
-        <button type="button" class="btn-secondary wallet-activate" data-id="${escapeHtml(entry.id)}">Use keys</button>
-        <button type="button" class="btn-secondary wallet-remove" data-id="${escapeHtml(entry.id)}">Remove</button>
+      <button type="button" class="wallet-card-main wallet-activate" data-id="${escapeHtml(entry.id)}">
+        <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </span>
+        <span class="list-content">
+          <span class="list-title">${escapeHtml(entry.label)}</span>
+          <span class="list-sub">${escapeHtml(sub)}</span>
+        </span>
+        <span class="wallet-card-meta">${escapeHtml(status)}</span>
+        <span class="list-chevron" aria-hidden="true">›</span>
+      </button>
+      <div class="wallet-card-footer">
+        <button type="button" class="wallet-card-footer-btn wallet-remove" data-id="${escapeHtml(entry.id)}">Remove from device</button>
       </div>`;
     listEl.appendChild(li);
   }
@@ -129,20 +183,35 @@ function renderList() {
       const id = btn.getAttribute("data-id");
       saveWallet(loadWallet().filter((e) => e.id !== id));
       renderList();
+      updateActiveBanner();
     });
   });
 }
 
-function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+function updateActiveBanner() {
+  const session = loadActiveSession();
+  if (!activeBanner || !activeText) return;
+  if (!session?.profile_id || !session?.owner_private_key_b58) {
+    activeBanner.hidden = true;
+    return;
+  }
+  const label =
+    session.wallet_label ||
+    (session.handle ? `@${session.handle}` : session.profile_id.slice(0, 12));
+  activeBanner.hidden = false;
+  activeText.textContent = `Keys active in this tab: ${label}`;
+}
+
+if (searchInput) {
+  searchInput.addEventListener("input", () => {
+    searchQuery = searchInput.value.trim().toLowerCase();
+    renderList();
+  });
 }
 
 const session = loadActiveSession();
-if (saveForm && session?.owner_private_key_b58 && session?.profile_id) {
-  saveForm.hidden = false;
+if (saveForm && saveGroup && session?.owner_private_key_b58 && session?.profile_id) {
+  saveGroup.hidden = false;
   if (saveLabel) {
     saveLabel.placeholder = session.handle ? `@${session.handle}` : "Personal card";
   }
@@ -152,7 +221,7 @@ if (saveForm && session?.owner_private_key_b58 && session?.profile_id) {
     const entries = loadWallet();
     const duplicate = entries.some((x) => x.profile_id === session.profile_id);
     if (duplicate) {
-      setSaveStatus("This card is already saved. Remove the old entry first.", true);
+      setSaveStatus("Already saved. Remove the old entry first.", true);
       return;
     }
     entries.unshift(entryFromSession(session, label));
@@ -160,8 +229,7 @@ if (saveForm && session?.owner_private_key_b58 && session?.profile_id) {
     setSaveStatus("Saved on this device only.");
     renderList();
   });
-} else if (saveForm) {
-  saveForm.hidden = true;
 }
 
+updateActiveBanner();
 renderList();

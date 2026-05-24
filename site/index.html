@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=52" />
+    <link rel="stylesheet" href="/styles.css?v=53" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -24,7 +24,7 @@
     <meta property="og:url" content="https://humanity.llc" />
     <meta property="og:image" content="https://humanity.llc/assets/red_qr_transparent_bg.png" />
   </head>
-  <body>
+  <body class="has-device-hub-search">
     <div class="page">
       <header class="top">
         <a class="top-brand" href="/">
@@ -191,41 +191,67 @@
           </div>
         </section>
 
-        <section class="group landing-your-cards" aria-labelledby="your-cards-title">
-          <h2 class="group-label" id="your-cards-title">Your cards on this device</h2>
-          <p class="form-hint">
-            Already created one? Keys stay in this browser only — load a saved card, then vouch or
-            revoke from <a href="/created/">/created/</a>.
+        <section class="device-hub" id="device-hub" aria-labelledby="device-hub-title">
+          <h2 class="device-hub-title" id="device-hub-title">On this device</h2>
+          <p class="device-hub-lead">
+            Keys and saved cards stay in this browser. The operator never stores private keys.
           </p>
-          <ul class="list list-compact">
-            <li class="list-row">
-              <span class="list-icon list-icon-tone-trust" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              </span>
-              <span class="list-content">
-                <a class="list-title list-title-link" href="/wallet/">Saved cards</a>
-                <span class="list-sub">Store important cards locally, then load keys before opening someone’s scan link to vouch.</span>
-              </span>
-            </li>
-            <li class="list-row">
-              <span class="list-icon list-icon-tone-red" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
-              </span>
-              <span class="list-content">
-                <a class="list-title list-title-link" href="/created/">Revoke &amp; manage</a>
-                <span class="list-sub">Open your card after create or after activating a saved card — revoke, update, encrypted backup.</span>
-              </span>
-            </li>
-            <li class="list-row">
-              <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">Vouch for someone</span>
-                <span class="list-sub">Activate your card, open their scan URL, scroll to Vouch — only Vouched Humans (or stewards) can attest.</span>
-              </span>
-            </li>
-          </ul>
+
+          <div class="device-hub-group" id="device-hub-saved-group" hidden>
+            <p class="device-hub-group-label">Saved cards</p>
+            <ul class="list list-compact" id="device-hub-wallet-list"></ul>
+          </div>
+
+          <div class="device-hub-group">
+            <p class="device-hub-group-label">Shortcuts</p>
+            <ul class="list list-compact">
+              <li
+                class="list-row list-action"
+                data-hub-searchable="saved cards wallet store keys vouch"
+              >
+                <a href="/wallet/">
+                  <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Saved cards</span>
+                    <span class="list-sub">Store and load signing keys on this device</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </a>
+              </li>
+              <li
+                class="list-row list-action"
+                data-hub-searchable="revoke manage created update backup"
+              >
+                <a href="/created/">
+                  <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Revoke &amp; manage</span>
+                    <span class="list-sub">Update, revoke, encrypted backup</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </a>
+              </li>
+              <li
+                class="list-row list-action"
+                data-hub-searchable="vouch attest human scan link"
+              >
+                <a href="/wallet/">
+                  <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Vouch for someone</span>
+                    <span class="list-sub">Load your keys, then open their scan page</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </a>
+              </li>
+            </ul>
+          </div>
         </section>
 
         <section class="landing-framing" aria-labelledby="framing-title">
@@ -533,11 +559,29 @@
         </section>
       </main>
     </div>
+    <div class="device-hub-search-float" role="search">
+      <label class="device-hub-search">
+        <span class="device-hub-search-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </span>
+        <input
+          type="search"
+          id="device-hub-search"
+          class="device-hub-search-input"
+          placeholder="Search my artifacts and public cards"
+          autocomplete="off"
+          enterkeyhint="search"
+        />
+      </label>
+      <p class="device-hub-search-hint">This device only — not the public resolver</p>
+    </div>
+
     <nav class="dock dock-sticky" aria-label="Get started">
       <a class="dock-btn dock-btn-primary" href="/create/">Create a live object</a>
     </nav>
     <script src="/js/pass-flip.js?v=1" defer></script>
     <script src="/js/pass-demo-revoke.js?v=1" defer></script>
+    <script src="/js/landing-device-hub.mjs?v=1" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=1" type="module"></script>
   </body>
 </html>
