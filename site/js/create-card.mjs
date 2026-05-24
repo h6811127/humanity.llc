@@ -132,6 +132,7 @@ export async function runCreateCard(input) {
     pilotTemplate = "general",
     qrValidityDays = 365,
     organizer = { enabled: false },
+    sampleCard = false,
   } = input;
   const { privateKey, publicKeyBase58 } = await generateKeypair();
   let recoveryPrivateKey = null;
@@ -262,6 +263,7 @@ export async function runCreateCard(input) {
           }
         : {}),
       private_key_warning: true,
+      ...(sampleCard ? { sample_card: true } : {}),
     })
   );
 
@@ -271,7 +273,7 @@ export async function runCreateCard(input) {
   location.replace(created.href);
 }
 
-async function submitCreate(e) {
+async function submitCreate(e, opts = {}) {
   e?.preventDefault();
   if (submitBtn) submitBtn.disabled = true;
   if (demoBtn) demoBtn.disabled = true;
@@ -285,7 +287,15 @@ async function submitCreate(e) {
     const qrValidityDays = readQrValidityDays();
     const organizer = readOrganizerKeyConfig();
     setStatus("Submitting to resolver…");
-    await runCreateCard({ handle, manifesto, wantRecovery, pilotTemplate, qrValidityDays, organizer });
+    await runCreateCard({
+      handle,
+      manifesto,
+      wantRecovery,
+      pilotTemplate,
+      qrValidityDays,
+      organizer,
+      sampleCard: !!opts.sampleCard,
+    });
   } catch (err) {
     setStatus(err.message || String(err), true);
     if (submitBtn) submitBtn.disabled = false;
@@ -322,5 +332,5 @@ demoBtn?.addEventListener("click", async () => {
     manifestoEl.value =
       "Live object demo. Scan from another phone, then revoke this QR.";
   }
-  await submitCreate(new Event("submit"));
+  await submitCreate(new Event("submit"), { sampleCard: true });
 });

@@ -891,8 +891,8 @@ a {
 }
 
 .live-control-status-panel.is-waiting {
-  border-color: rgba(88, 86, 214, 0.22);
-  background: rgba(88, 86, 214, 0.06);
+  border-color: rgba(219, 27, 67, 0.22);
+  background: rgba(219, 27, 67, 0.06);
 }
 
 .live-control-status {

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Your live object · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=47" />
+    <link rel="stylesheet" href="/styles.css?v=48" />
   </head>
   <body>
     <div class="page">
@@ -24,13 +24,37 @@
           <p class="hero-line" id="created-manifesto"></p>
         </section>
 
+        <section
+          class="live-control-notification"
+          id="live-control-proof"
+          hidden
+          aria-live="polite"
+        >
+          <div class="live-control-notification-inner">
+            <span class="live-control-notification-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+            <div class="live-control-notification-body">
+              <p class="live-control-notification-title">Prove live control</p>
+              <p class="live-control-notification-copy" id="live-control-proof-lead">
+                Someone nearby scanned your QR and asked for live proof. Sign once from this
+                key-holding device — it does not reveal legal identity or create a badge.
+              </p>
+              <button type="button" class="btn-primary live-control-notification-btn" id="live-control-proof-btn">
+                Prove control now
+              </button>
+              <p class="form-status" id="live-control-proof-status" role="status"></p>
+            </div>
+          </div>
+        </section>
+
         <p class="created-primitive">
           This QR is not just a link. It resolves to <strong>current object state</strong> on the
           network — active, expired, revoked, or disabled — when someone scans. Printing deploys the
           object; you change its rules later.
         </p>
 
-        <section class="created-loop" aria-label="Try the loop">
+        <section class="created-loop" id="created-loop" aria-label="Try the loop" hidden>
           <h2 class="created-loop-title">Try the loop</h2>
           <ol class="created-loop-steps">
             <li class="created-loop-step is-current" data-step="live">
@@ -115,18 +139,6 @@
             <a href="/what-can-a-qr-do.html">What can a QR do?</a> — ideas for benches, games,
             civic nodes, and more once your mark is live.
           </p>
-        </section>
-
-        <section class="created-what-now" id="live-control-proof" hidden>
-          <h2 class="created-what-now-title">Prove live control</h2>
-          <p class="created-what-now-body">
-            Someone nearby scanned your QR and asked for live proof. Sign once from this
-            key-holding device — it does not reveal legal identity or create a badge.
-          </p>
-          <button type="button" class="btn-primary" id="live-control-proof-btn">
-            Prove control now
-          </button>
-          <p class="form-status" id="live-control-proof-status" role="status"></p>
         </section>
 
         <section class="recovery-reveal-card" id="organizer-reveal" hidden>
@@ -478,6 +490,6 @@
         </p>
       </main>
     </div>
-    <script type="module" src="/js/created.mjs?v=23"></script>
+    <script type="module" src="/js/created.mjs?v=24"></script>
   </body>
 </html>

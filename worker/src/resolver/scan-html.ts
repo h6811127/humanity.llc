@@ -10,7 +10,7 @@ import {
 import { renderScanQrMarkup } from "./scan-qr";
 
 /** Response header — confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v15";
+export const SCAN_UI_VERSION = "pass-v17";
 
 /**
  * Public scan UI — flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -449,7 +449,7 @@ function liveControlInteractiveRow(provenAt: string | null): string {
   <span class="list-content live-control-card-wrap">
     <div class="live-control-card" id="live-control-interactive"${interactiveHidden}>
       <div class="live-control-card-head">
-        ${scanListIcon("purple", "key")}
+        ${scanListIcon("red", "lock")}
         <div class="live-control-card-head-text">
           <span class="live-control-eyebrow">In-person check</span>
           <span class="live-control-title">Ask owner to prove control</span>
@@ -824,7 +824,7 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
         }
         startCountdown(
           result.body.expires_at,
-          "Waiting for the owner to tap Prove control on their key-holding device."
+          "Waiting for the owner to tap Prove control on their key-holding device. If nothing happens, ask them to refresh this tab."
         );
         poll(result.body.status_url);
       })
