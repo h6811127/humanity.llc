@@ -94,7 +94,7 @@ export function initRecoveryKeyUi(opts) {
         recovery_private_key_b58: raw,
         recovery_imported_at: new Date().toISOString(),
       });
-      setStatus("Recovery key unlocked. Revoke controls are available below.");
+      setStatus("Recovery key unlocked locally. Revoke controls are available below.");
       importForm.reset();
       opts.onKeysUnlocked();
       document.getElementById("revoke-details")?.setAttribute("open", "");
