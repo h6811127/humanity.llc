@@ -1,6 +1,6 @@
 # Organizer-signed revoke pilot (Phase A vertical #3)
 
-**Status:** Active pilot  
+**Status:** Shipped in repo (field-test checklist below)  
 **Parent:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`  
 **Prerequisite:** M5 stranger loop; `docs/REVOKE_AND_LIFECYCLE_V1.md`  
 **Research:** `site/what-can-a-qr-do/civic-protest-infrastructure/`, `site/what-can-a-qr-do/local-economies/`

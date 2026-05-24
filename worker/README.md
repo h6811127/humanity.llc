@@ -160,6 +160,19 @@ curl -s -X POST "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/revoke" \
   -d '{"revocation":{...}}' | jq .
 ```
 
+### Artifact intent gate (M4.4 stub)
+
+Pre-commerce stub: blocks revoked/suspended/expired card or QR before personalized merch (Phase C).
+
+```bash
+curl -s -X POST "https://humanity.llc/v1/store/artifact-intents" \
+  -H "Content-Type: application/json" \
+  -d '{"profile_id":"PROFILE","source_qr_id":"qr_..."}' | jq .
+```
+
+- Revoked QR → `403` `QR_REVOKED`
+- Active QR → `501` `ARTIFACT_INTENTS_NOT_IMPLEMENTED` (full intent creation not built yet)
+
 **Production:** run `npm run worker:migrate:remote` then `npm run worker:deploy`.
 
 ## Cryptography (1.5)
