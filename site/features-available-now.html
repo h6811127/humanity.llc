@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Features available now · humanity.llc</title>
+    <meta
+      name="description"
+      content="What ships today on humanity.llc: card creation, encrypted backups, revoke, live control, vouching, scan trust UI, and the design limits behind each."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=48" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen">
+        <section class="hero">
+          <p class="hero-eyebrow">Building now</p>
+          <h1>All features available now</h1>
+          <p class="hero-line">
+            A catalog of what is <strong>live on the reference operator</strong> today — with the
+            design decisions, safety boundaries, and limits that matter for reviewers, contributors,
+            and recruiters evaluating the work.
+          </p>
+        </section>
+
+        <p class="insight">
+          <strong>For recruiters:</strong> this is a production-shaped vertical slice on
+          <strong>Cloudflare Workers + D1 + Pages</strong> — Ed25519-signed writes, replay-protected
+          mutations, mechanism-visible scan UI, and <strong>78 automated Worker tests</strong>. Keys
+          stay client-side; the resolver stores public state only. Open specs and adversarial review
+          docs live in the GitHub repo.
+        </p>
+
+        <section class="group">
+          <h2 class="group-label">Quick map</h2>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title"><span class="phase">0</span> Card creation &amp; resolver</span>
+                <span class="list-sub"><span class="ship-badge ship-badge-live">Live</span></span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title"><span class="phase">0.5</span> Encrypted backups &amp; recovery keys</span>
+                <span class="list-sub"><span class="ship-badge ship-badge-live">Live</span></span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title"><span class="phase">1</span> Revoke</span>
+                <span class="list-sub"><span class="ship-badge ship-badge-live">Live</span></span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title"><span class="phase">2</span> Live control</span>
+                <span class="list-sub"><span class="ship-badge ship-badge-live">Live</span> alpha loop</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title"><span class="phase">3</span> Expanding card types</span>
+                <span class="list-sub"><span class="ship-badge ship-badge-partial">Partial</span> design + artifact intent API</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title"><span class="phase">4</span> Scan trust-state UI</span>
+                <span class="list-sub"><span class="ship-badge ship-badge-live">Live</span></span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title"><span class="phase">5</span> Human verification &amp; vouching</span>
+                <span class="list-sub"><span class="ship-badge ship-badge-partial">Partial</span> issuance live; revocation UI next</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title"><span class="phase">6</span> Organizer revoke</span>
+                <span class="list-sub"><span class="ship-badge ship-badge-live">Live</span></span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title"><span class="phase">7</span> Public APIs &amp; machine-readable state</span>
+                <span class="list-sub"><span class="ship-badge ship-badge-live">Live</span></span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title"><span class="phase">8</span> Artifact intent (print foundation)</span>
+                <span class="list-sub"><span class="ship-badge ship-badge-partial">Partial</span> API live; storefront path in progress</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title"><span class="phase">9</span> Security test harness</span>
+                <span class="list-sub"><span class="ship-badge ship-badge-live">Live</span> Vitest on Worker</span>
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- 0 -->
+        <section class="group" id="feature-0">
+          <h2 class="group-label"><span class="phase">0</span> Card creation &amp; basic resolver</h2>
+          <div class="feature">
+            <p class="feature-lead">Sign a card in the browser. Resolve it on scan.</p>
+            <p class="feature-sub">
+              <span class="ship-badge ship-badge-live">Live</span>
+              <a href="/create/">/create/</a> → Worker POST → D1 → HTTPS scan at
+              <code>/c/{profile_id}?q=…</code>
+            </p>
+          </div>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Why it matters</span>
+                <span class="list-sub"
+                  >Proves the core thesis: a printed QR is a <strong>live software endpoint</strong>, not
+                  a frozen link. No app install, no account gate for scanning — any camera can read
+                  current public state.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Design decisions</span>
+                <span class="list-sub"
+                  >Ed25519 keys generated in-browser; signed card + QR credential POSTed to
+                  <code>/.well-known/hc/v1/cards</code>. JCS canonicalization for cross-client
+                  parity. Profile and QR ids are base58 — stable in the printed URL forever; meaning
+                  changes via resolver status, not reprinting.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Safety · privacy · security</span>
+                <span class="list-sub"
+                  >Private signing keys never leave the owner device unless the user exports an
+                  encrypted backup. Resolver verifies signatures on ingest and stores only public
+                  documents and status flags — not a people trail.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Limits</span>
+                <span class="list-sub"
+                  >Session keys live in <code>sessionStorage</code> until backup/recovery is saved.
+                  Operator cannot reset your key. Printed URL exposes <code>profile_id</code> and
+                  <code>qr_id</code> (v1 privacy lock).</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Future directions</span>
+                <span class="list-sub"
+                  >Federated resolvers implementing the same <code>hc/v1</code> API; NFC/mesh carriers
+                  pointing at the same truth; optional multi-device sync without central key custody.</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- 0.5 -->
+        <section class="group" id="feature-0-5">
+          <h2 class="group-label"><span class="phase">0.5</span> Encrypted key backups &amp; recovery keys</h2>
+          <div class="feature">
+            <p class="feature-lead">Survive a closed tab without giving us your keys.</p>
+            <p class="feature-sub">
+              <span class="ship-badge ship-badge-live">Live</span> on <a href="/created/">/created/</a>
+              after create
+            </p>
+          </div>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Why it matters</span>
+                <span class="list-sub"
+                  >Browser-held keys are powerful and fragile. Without backup, losing the create tab
+                  means losing revoke and live-control ability — the sticker still scans, but the owner
+                  cannot mutate it.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Design decisions</span>
+                <span class="list-sub"
+                  >Encrypted backup export uses a user-chosen passphrase (client-side crypto; logic
+                  mirrored in Worker tests). Optional recovery key pair can sign revoke and live-control
+                  responses separately from the owner key — useful for “break glass” without daily use.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Safety · privacy · security</span>
+                <span class="list-sub"
+                  >Operator never receives plaintext private keys. Backup blobs are useless without the
+                  passphrase. Recovery key display is explicit — user must save it; we do not email or
+                  cloud-store secrets.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Limits</span>
+                <span class="list-sub"
+                  >No “forgot password” recovery from humanity.llc. Weak passphrases or lost backups
+                  are owner responsibility. Recovery key compromise equals signing power for that
+                  card.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Future directions</span>
+                <span class="list-sub"
+                  >Passkey-wrapped backups, hardware wallet integration, optional steward-assisted
+                  recovery ceremonies — always opt-in, never default key escrow.</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- 1 -->
+        <section class="group" id="feature-1">
+          <h2 class="group-label"><span class="phase">1</span> Revoke</h2>
+          <div class="feature">
+            <p class="feature-lead">Change the live answer without changing the ink.</p>
+            <p class="feature-sub">
+              <span class="ship-badge ship-badge-live">Live</span> owner revoke on
+              <a href="/created/">/created/</a>; per-QR and whole-card scope
+            </p>
+          </div>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Why it matters</span>
+                <span class="list-sub"
+                  >Stolen merch batches, lost stickers, ended events, compromised contacts — physical
+                  objects need a kill switch. Revoke is the proof that deployment was not permanent.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Design decisions</span>
+                <span class="list-sub"
+                  >Owner signs a typed revocation payload with a one-time nonce; resolver verifies
+                  Ed25519 signature and updates D1 status. Same HTTPS URL returns “revoked” on next
+                  scan. <strong>Per-QR scope:</strong> revoke one wristband while sibling credentials on
+                  the card stay active (<code>print_artifact</code> scope).</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Safety · privacy · security</span>
+                <span class="list-sub"
+                  >No operator password override. Replay protection on nonces. Revocation records are
+                  auditable public mutations — not hidden admin flags.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Limits</span>
+                <span class="list-sub"
+                  >Revoke is not key rotation on the sticker — the URL remains public. Does not prove
+                  who physically held the object. “Un-revoke” requires issuing new credentials, not
+                  toggling back silently.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Future directions</span>
+                <span class="list-sub"
+                  >Time-bound credentials, scheduled auto-expire, policy templates for events and
+                  retail runs.</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- 2 -->
+        <section class="group" id="feature-2">
+          <h2 class="group-label"><span class="phase">2</span> Live control</h2>
+          <div class="feature">
+            <p class="feature-lead">Prove someone with the key can respond right now.</p>
+            <p class="feature-sub">
+              <span class="ship-badge ship-badge-live">Live</span> alpha — scan page challenge +
+              owner sign on <a href="/created/">/created/</a>
+            </p>
+          </div>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Why it matters</span>
+                <span class="list-sub"
+                  >Revoke proves mutability; live control proves <strong>recent key possession</strong>
+                  in an in-person moment — separate from vouches, registration, or static “active”
+                  status. Useful for stranger tests and high-trust handoffs.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Design decisions</span>
+                <span class="list-sub"
+                  >Short-lived challenge (~120s). Scanner polls; owner signs on a key-holding device.
+                  Visually separate green/red block on scan — never mixed with human trust or card
+                  status. Success copy is explicit: does not prove legal identity or physical
+                  ownership. Proof does <strong>not</strong> mutate card, QR, or vouch state.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Safety · privacy · security</span>
+                <span class="list-sub"
+                  >Inactive or revoked QRs cannot create challenges. Signed responses use replay-safe
+                  payloads. No phone number, email, or account login required.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Limits</span>
+                <span class="list-sub"
+                  >Alpha: no persistent proof history, permissions, or access control. A stolen key
+                  can pass live control. Screenshot of success state is not prevented.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Future directions</span>
+                <span class="list-sub"
+                  >Ephemeral permissions, event handoff, wearable rules, clearer expired/failed UX
+                  (M7 step 2+). Still bounded: never a legal-ID substitute.</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- 3 -->
+        <section class="group" id="feature-3">
+          <h2 class="group-label"><span class="phase">3</span> Expanding card types</h2>
+          <div class="feature">
+            <p class="feature-lead">One primitive — many physical roles.</p>
+            <p class="feature-sub">
+              <span class="ship-badge ship-badge-partial">Partial</span> basic card live; status plate
+              copy live; lost-item relay is design research
+            </p>
+          </div>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Why it matters</span>
+                <span class="list-sub"
+                  >The product is not “a membership card.” The same signed object model powers a studio
+                  door plate, a festival wristband, a keys sticker, and a mutual-aid flyer — each with
+                  different scan copy and credential scope.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Design decisions</span>
+                <span class="list-sub"
+                  ><strong>Basic card</strong> — handle + manifesto line + verification summary.
+                  <strong>Status plate</strong> — manifesto as hours/open-closed signal (landing demo).
+                  <strong>Lost item relay</strong> — scan shows lost + relay contact without printing
+                  phone numbers (<a href="/what-can-a-qr-do/lost-item-relay/">design</a>).
+                  <strong>Print artifact</strong> — unique <code>qr_id</code> per physical unit via
+                  artifact intent.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Safety · privacy · security</span>
+                <span class="list-sub"
+                  >Relay patterns must not doxx owners. Per-item QR scope limits blast radius when one
+                  sticker is stolen. Template copy stays honest about what scan proves.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Limits</span>
+                <span class="list-sub"
+                  >Lost-item relay UI and contact routing not shipped. Storefront → Printify
+                  personalization path still in build. Card “type” is expressed through copy and scope,
+                  not a separate protocol version today.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Future directions</span>
+                <span class="list-sub"
+                  >Template library for organizers, commerce-backed unique QRs, city-game objects
+                  (<a href="/what-can-a-qr-do/physical-world-multiplayer/">research</a>).</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- 4 -->
+        <section class="group" id="feature-4">
+          <h2 class="group-label"><span class="phase">4</span> Scan trust-state UI</h2>
+          <div class="feature">
+            <p class="feature-lead">Mechanism-visible answers on every scan.</p>
+            <p class="feature-sub">
+              <span class="ship-badge ship-badge-live">Live</span> flippable pass card + grouped trust
+              blocks
+            </p>
+          </div>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Why it matters</span>
+                <span class="list-sub"
+                  >Trust products fail when limits are buried. Scan separates card status, human trust,
+                  QR credential scope, live control, and vouch issuance — plus one “what this does not
+                  prove” panel.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Design decisions</span>
+                <span class="list-sub"
+                  >iOS-style grouped lists; bearer warning on pass card; revoked/suspended overrides
+                  hide positive verification badges. Machine-readable twin at
+                  <code>GET …/cards/{id}/status</code> matches HTML truth.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Safety · privacy · security</span>
+                <span class="list-sub"
+                  ><strong>No scan analytics</strong> on the public page — resolver returns object
+                  state, not who scanned. Cache-Control: no-store on live scans.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Limits</span>
+                <span class="list-sub"
+                  >Scan UI is server-rendered; artifact-specific layouts are minimal in v1. Holding a
+                  printed QR still does not prove ownership.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Future directions</span>
+                <span class="list-sub"
+                  >Activity stream merge rules on scan, offline/stale banners, role-specific templates
+                  for maintainers vs game operators.</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- 5 -->
+        <section class="group" id="feature-5">
+          <h2 class="group-label"><span class="phase">5</span> Human verification &amp; vouching</h2>
+          <div class="feature">
+            <p class="feature-lead">Social attestation without legal ID.</p>
+            <p class="feature-sub">
+              <span class="ship-badge ship-badge-partial">Partial</span> scan truth + vouch issuance
+              live; vouch revocation UI next
+            </p>
+          </div>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Why it matters</span>
+                <span class="list-sub"
+                  >Communities need accountable human trust without KYC or buying merch. Three eligible
+                  vouchers can upgrade a card to <strong>Vouched Human</strong> — a public label backed
+                  by signed statements, not a government check.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Design decisions</span>
+                <span class="list-sub"
+                  >Public signed vouch documents; default 280-char statement template; private notes
+                  never POSTed (server rejects <code>private_note</code>). Abuse controls: 3-vouch
+                  threshold, 5 active vouches/voucher/year, 90-day wait after verification, one active
+                  vouch per pair. Scan shows count + recency, not a social graph.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Safety · privacy · security</span>
+                <span class="list-sub"
+                  >Nonce replay protection on vouch POST. Voucher must be verified human or steward.
+                  Collusion rings mitigated by quotas and operator-only cluster hooks (planned). Does
+                  not prove voucher honesty or global uniqueness.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Limits</span>
+                <span class="list-sub"
+                  >Registration alone never displays as human verification. Bootstrap requires founding
+                  stewards or verified humans to vouch first. Revoke-vouch UI not shipped yet.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Future directions</span>
+                <span class="list-sub"
+                  >Vouch revocation flow, steward review queue, ceremony credentials (separate path),
+                  cross-operator federation.</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- 6 -->
+        <section class="group" id="feature-6">
+          <h2 class="group-label"><span class="phase">6</span> Organizer revoke</h2>
+          <div class="feature">
+            <p class="feature-lead">Production kill switch without the owner’s daily key.</p>
+            <p class="feature-sub">
+              <span class="ship-badge ship-badge-live">Live</span>
+              <a href="/organizer-revoke/">/organizer-revoke/</a> + optional key at create
+            </p>
+          </div>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Why it matters</span>
+                <span class="list-sub"
+                  >Merch runs, festivals, and mutual-aid batches need an organizer who can disable bad
+                  prints without every volunteer holding owner keys.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Design decisions</span>
+                <span class="list-sub"
+                  >Separate organizer key pair registered at card create; signs revocations with
+                  <code>organizer_revoked</code> reason. Distinct from owner revoke — explicit handoff
+                  UI on <a href="/created/">/created/</a>.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Safety · privacy · security</span>
+                <span class="list-sub"
+                  >Organizer key is powerful — treat like a production secret. Same signature + nonce
+                  rules as owner revoke. Not DRM: URL remains scannable; status changes to revoked.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Limits</span>
+                <span class="list-sub"
+                  >No fine-grained ACL yet — organizer can revoke card or QR credentials they were
+                  registered for. Compromised organizer key requires owner action with owner/recovery
+                  key.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Future directions</span>
+                <span class="list-sub"
+                  >Scoped organizer permissions, time-bound organizer keys, audit log for batch
+                  operations.</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- 7 -->
+        <section class="group" id="feature-7">
+          <h2 class="group-label"><span class="phase">7</span> Public APIs &amp; machine-readable state</h2>
+          <div class="feature">
+            <p class="feature-lead">Same truth for humans and integrations.</p>
+            <p class="feature-sub">
+              <span class="ship-badge ship-badge-live">Live</span>
+              <code>/.well-known/hc/v1/*</code> + <code>/v1/verification/vouches</code>
+            </p>
+          </div>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Why it matters</span>
+                <span class="list-sub"
+                  >Alternate clients, CI, and reviewers can verify behavior without scraping HTML.
+                  Status JSON powers vouch eligibility checks and future storefront flows.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Design decisions</span>
+                <span class="list-sub"
+                  >Open protocol version 1.0; reference operator on Cloudflare. Writes require signed
+                  bodies; reads return public card JSON, scan status, health. CORS enabled for create
+                  flow from Pages.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Safety · privacy · security</span>
+                <span class="list-sub"
+                  >Public endpoints expose only public state. Error codes are typed (e.g.
+                  <code>VOUCH_QUOTA_EXCEEDED</code>, <code>REPLAYED_NONCE</code>) for safe client
+                  handling.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Limits</span>
+                <span class="list-sub"
+                  >No bulk graph export. Rate limits and auth for operator tools still evolving.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Future directions</span>
+                <span class="list-sub"
+                  >Webhooks for commerce, federated read replicas, signed activity stream ingestion
+                  APIs.</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- 8 -->
+        <section class="group" id="feature-8">
+          <h2 class="group-label"><span class="phase">8</span> Artifact intent (print foundation)</h2>
+          <div class="feature">
+            <p class="feature-lead">Unique QR per physical unit before checkout.</p>
+            <p class="feature-sub">
+              <span class="ship-badge ship-badge-partial">Partial</span> POST API live; Shopify →
+              Printify path in build
+            </p>
+          </div>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Why it matters</span>
+                <span class="list-sub"
+                  >Personalized stickers need a planned <code>qr_id</code> per item so one stolen unit
+                  can be revoked without killing the whole card. Bridges digital create → physical
+                  print.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Design decisions</span>
+                <span class="list-sub"
+                  >Artifact intent records planned credentials before payment; must survive Shopify
+                  checkout metadata. No private keys in intent payloads.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Safety · privacy · security</span>
+                <span class="list-sub"
+                  >Intent is pre-commit state — operator can hold orders if metadata is missing rather
+                  than auto-printing wrong QRs.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Limits</span>
+                <span class="list-sub"
+                  >End-to-end merch fulfillment not live for all users. Highest-risk handoff is
+                  checkout metadata survival (documented in flow audit).</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Future directions</span>
+                <span class="list-sub"
+                  >User-safe order timeline, Printify webhook reconciler, sample QA loop for launch
+                  templates.</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- 9 -->
+        <section class="group" id="feature-9">
+          <h2 class="group-label"><span class="phase">9</span> Security test harness</h2>
+          <div class="feature">
+            <p class="feature-lead">Documented threats backed by automated tests.</p>
+            <p class="feature-sub">
+              <span class="ship-badge ship-badge-live">Live</span> 78 Vitest cases across crypto,
+              revoke, vouch, live control, scan
+            </p>
+          </div>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Why it matters</span>
+                <span class="list-sub"
+                  >Recruiters and security reviewers should see boundaries enforced in CI — not only in
+                  markdown threat models.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Design decisions</span>
+                <span class="list-sub"
+                  >Shared crypto module for Worker + browser parity tests. Fake D1 layers for resolver
+                  handlers. Scan HTML regression tests for trust copy and live-control states.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Safety · privacy · security</span>
+                <span class="list-sub"
+                  >Covers replay nonces, signature mismatch, vouch quotas, live-control expiry,
+                  verification display overrides. Adversarial review doc in repo for open questions.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Limits</span>
+                <span class="list-sub"
+                  >No production penetration test report yet. Browser E2E for create flow is manual /
+                  stranger-test driven.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Future directions</span>
+                <span class="list-sub"
+                  >Playwright smoke path, fuzzing on canonicalization, operator abuse simulation
+                  fixtures.</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="group">
+          <h2 class="group-label">Not shipping yet (context)</h2>
+          <p class="group-intro short">
+            Important research directions that explain where the project goes — not promises on today’s
+            deploy.
+          </p>
+          <ul class="list">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/physical-world-multiplayer/">
+                <span class="list-icon list-icon-tone-purple" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M18 12h4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Activity streams &amp; city-scale play</span>
+                  <span class="list-sub">Multiple signed channels per object — not one social feed</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/research-directions.html">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">NFC, mesh, Humanity node</span>
+                  <span class="list-sub">Carrier research — same resolver semantics</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/architecture.html">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Architecture &amp; security depth</span>
+                  <span class="list-sub">Threat models, tradeoffs, assurance map</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        <section class="group">
+          <ul class="list">
+            <li class="list-row list-action">
+              <a href="/">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Back to landing</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/create/">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Create a live object</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

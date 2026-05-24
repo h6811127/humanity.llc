@@ -1642,6 +1642,90 @@ a {
   color: var(--white);
 }
 
+.ship-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 100px;
+  vertical-align: 0.08em;
+}
+
+.ship-badge-live {
+  background: rgba(52, 199, 89, 0.14);
+  color: #248a3d;
+}
+
+.ship-badge-partial {
+  background: rgba(255, 149, 0, 0.14);
+  color: #c93400;
+}
+
+.feature-sub .ship-badge {
+  margin-right: 6px;
+}
+
+.feature-sub a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.landing-vision {
+  margin: 28px 0 0;
+  padding: 22px 18px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: linear-gradient(180deg, rgba(0, 122, 255, 0.04) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+.landing-vision .section-kicker {
+  margin-bottom: 8px;
+}
+
+.landing-vision-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  margin: 0 0 12px;
+  color: var(--black);
+}
+
+.landing-vision-lead {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--black);
+  margin: 0 0 14px;
+}
+
+.landing-vision-lead strong {
+  font-weight: 600;
+}
+
+.landing-vision-list {
+  margin: 0 0 16px 18px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--black);
+}
+
+.landing-vision-list li {
+  margin-bottom: 6px;
+}
+
+.landing-vision-list li:last-child {
+  margin-bottom: 0;
+}
+
+.landing-vision-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 /* Promise feature cell */
 .feature {
   padding: 16px 16px 16px 18px;
