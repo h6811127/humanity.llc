@@ -247,6 +247,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("live-control-card-proven");
     expect(html).toContain('id="live-control-request-again"');
     expect(html).toContain("live-control-proven-ago");
+    expect(html).toContain('id="live-control-owner-view"');
     expect(html).toContain('id="live-control-interactive" hidden');
     expect(html).toContain('id="live-control-request"');
   });
@@ -264,6 +265,73 @@ describe("renderScanPage M3.2 trust blocks", () => {
     );
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).toContain("Printed item");
+  });
+
+  it("renders Vouched Human with vouch recency on scan (V-001)", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: {
+          ...summary(),
+          state: "verified_human",
+          level: 2,
+          label: "Vouched Human",
+          method: "vouch",
+          vouch_count: 3,
+          latest_accepted_vouch_at: "2026-05-21T12:00:00.000Z",
+        },
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain("Vouched Human");
+    expect(html).toContain("3 accepted vouches");
+    expect(html).toContain("latest");
+  });
+
+  it("shows vouch progress below threshold (V-001)", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: {
+          ...summary(),
+          vouch_count: 2,
+          latest_accepted_vouch_at: "2026-05-20T12:00:00.000Z",
+        },
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain("2 of 3 vouches accepted");
+    expect(html).not.toContain(">Vouched Human<");
+  });
+
+  it("overrides Vouched Human when verification is revoked (V-001)", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: {
+          ...summary(),
+          state: "revoked",
+          label: "Revoked",
+          vouch_count: 4,
+          latest_accepted_vouch_at: "2026-05-20T12:00:00.000Z",
+        },
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain("Verification revoked");
+    expect(html).not.toContain(">Vouched Human<");
   });
 
   it("renders card disabled state (M4.5)", async () => {

@@ -4,10 +4,13 @@ import { scanListIcon, type ScanIconId } from "./scan-icons";
 import { BEARER_WARNING } from "./trust-copy";
 import { SCAN_PASS_FLIP_JS } from "./scan-pass-flip";
 import { SCAN_PASS_CSS } from "./scan-pass-styles";
+import {
+  humanTrustDisplay,
+} from "./verification-display";
 import { renderScanQrMarkup } from "./scan-qr";
 
 /** Response header — confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v13";
+export const SCAN_UI_VERSION = "pass-v15";
 
 /**
  * Public scan UI — flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -409,14 +412,8 @@ function cardGroupRows(vm: ScanViewModel): string {
 }
 
 function humanGroupRows(vm: ScanViewModel): string {
-  return listRow("people", humanStatusIconTone(vm), vm.verificationLabel, humanSub(vm));
-}
-
-function humanSub(vm: ScanViewModel): string {
-  if (vm.vouchCount > 0) {
-    return `${vm.vouchCount} accepted vouch${vm.vouchCount === 1 ? "" : "es"} on this operator`;
-  }
-  return "Registered on this operator — baseline, not proof of humanity";
+  const display = humanTrustDisplay(vm);
+  return listRow("people", display.iconTone, display.label, display.subtitle);
 }
 
 function qrGroupRows(vm: ScanViewModel): string {
@@ -482,8 +479,25 @@ function liveControlInteractiveRow(provenAt: string | null): string {
       </div>
     </div>
     ${renderLiveControlSuccessPanel(provenAt ?? "", isProven)}
+    ${renderLiveControlOwnerView()}
   </span>
 </li>`;
+}
+
+function renderLiveControlOwnerView(): string {
+  return `<div class="live-control-card live-control-card-owner" id="live-control-owner-view" hidden>
+  <div class="live-control-card-head">
+    ${scanListIcon("blue", "key")}
+    <div class="live-control-card-head-text">
+      <span class="live-control-eyebrow">Your device</span>
+      <span class="live-control-title">Live control</span>
+    </div>
+  </div>
+  <p class="live-control-lead" id="live-control-owner-copy">
+    This section is for someone else scanning your QR. When they ask for live proof, open your card page to sign.
+  </p>
+  <a class="live-control-owner-btn" id="live-control-owner-created-link" href="#">Open your card</a>
+</div>`;
 }
 
 function renderLiveControlSuccessPanel(provenAt: string, visible: boolean): string {
@@ -551,9 +565,28 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
   var askAgainBtn = document.getElementById("live-control-request-again");
   var row = document.getElementById("live-control-row");
   var statusPanel = document.getElementById("live-control-status-panel");
+  var ownerView = document.getElementById("live-control-owner-view");
+  var ownerCopy = document.getElementById("live-control-owner-copy");
+  var ownerCreatedLink = document.getElementById("live-control-owner-created-link");
+  var profileId = ${JSON.stringify(vm.profileId)};
+  var qrId = ${JSON.stringify(vm.qrId)};
   var pollTimer = null;
   var countdownTimer = null;
   var relativeTimer = null;
+  function isOwnerBrowser() {
+    try {
+      var raw = sessionStorage.getItem("hc_created");
+      if (!raw) return false;
+      var session = JSON.parse(raw);
+      if (!session || session.profile_id !== profileId || session.qr_id !== qrId) {
+        return false;
+      }
+      return typeof session.owner_private_key_b58 === "string" ||
+        typeof session.recovery_private_key_b58 === "string";
+    } catch (e) {
+      return false;
+    }
+  }
   function formatProvenAt(iso) {
     try {
       var d = new Date(iso);
@@ -632,6 +665,29 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
     askAgainBtn.addEventListener("click", function () {
       resetForNewRequest();
     });
+  }
+  function applyOwnerBrowserLiveControl() {
+    if (!isOwnerBrowser()) return false;
+    stopRelativeTimer();
+    stopPolling();
+    stopCountdown();
+    if (interactive) interactive.hidden = true;
+    if (success) success.hidden = true;
+    if (ownerPanel) ownerPanel.hidden = true;
+    if (row) row.classList.remove("is-proven");
+    if (ownerView) ownerView.hidden = false;
+    if (ownerCreatedLink && profileId && qrId) {
+      ownerCreatedLink.href =
+        location.origin + "/created/?profile_id=" +
+        encodeURIComponent(profileId) + "&qr_id=" + encodeURIComponent(qrId);
+    }
+    if (ownerCopy) {
+      var proven = getProvenIso();
+      ownerCopy.textContent = proven
+        ? "Control proven from this device. The scanner should see success on their screen — you do not need to ask again here."
+        : "This section is for someone else scanning your QR. When they ask for live proof, open your card page to sign.";
+    }
+    return true;
   }
   function showOwnerPanel(url) {
     if (ownerPanel) ownerPanel.hidden = false;
@@ -741,6 +797,7 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
         setStatus("Could not check live proof.", false);
       });
   }
+  if (applyOwnerBrowserLiveControl()) return;
   wireAskAgain();
   var initialProven = getProvenIso();
   if (success && !success.hidden && initialProven) {
@@ -836,13 +893,9 @@ function pillForCard(vm: ScanViewModel): string {
 }
 
 function pillForHuman(vm: ScanViewModel): string {
-  const cardOk = vm.cardStatus === "active";
-  const humanLive =
-    vm.verificationLabel === "Registered" ||
-    vm.verificationLabel === "Vouched Human" ||
-    vm.vouchCount >= 3;
-  const on = cardOk && humanLive ? "trust-on" : "";
-  return `<li class="${on}">${escapeHtml(vm.verificationLabel)}</li>`;
+  const display = humanTrustDisplay(vm);
+  const on = display.pillActive ? "trust-on" : "";
+  return `<li class="${on}">${escapeHtml(display.label)}</li>`;
 }
 
 function pillForQr(vm: ScanViewModel): string {
@@ -866,13 +919,6 @@ function qrStatusIconTone(vm: ScanViewModel): string {
   if (vm.qrStatus === "expired" || vm.kind === "qr_expired") return "orange";
   if (vm.qrStatus === "replaced" || vm.kind === "qr_replaced") return "orange";
   if (vm.qrStatus === "active" && vm.kind === "active") return "green";
-  return "slate";
-}
-
-function humanStatusIconTone(vm: ScanViewModel): string {
-  if (vm.cardStatus !== "active") return "slate";
-  if (vm.vouchCount >= 3 || vm.verificationLabel === "Vouched Human") return "green";
-  if (vm.verificationLabel === "Registered") return "purple";
   return "slate";
 }
 

@@ -195,15 +195,10 @@ function initLiveControlProof() {
       }
       btn.textContent = "Control proven";
       status.textContent =
-        "Control proven moments ago. This does not prove legal identity.";
+        "Control proven moments ago. The scanner should update on their device. This does not prove legal identity.";
       if (pollTimer) {
         window.clearInterval(pollTimer);
         pollTimer = null;
-      }
-      if (activeReturnUrl) {
-        window.setTimeout(() => {
-          location.href = activeReturnUrl;
-        }, 800);
       }
     } catch (err) {
       btn.disabled = false;

@@ -79,7 +79,35 @@ describe("scan status JSON (M3.4)", () => {
     expect(body.scan.qr?.status).toBe("active");
     expect(body.scan.limits.bearer_warning).toBe(BEARER_WARNING);
     expect(body.scan.limits.scan_analytics).toBe(false);
+    expect(body.scan.verification.vouch_count).toBe(0);
     expect(httpStatusForScanKind(vm.kind)).toBe(200);
+  });
+
+  it("status JSON exposes vouch count and latest recency (V-001)", () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: {
+          ...summary(),
+          state: "verified_human",
+          label: "Vouched Human",
+          method: "vouch",
+          vouch_count: 3,
+          latest_accepted_vouch_at: "2026-05-21T12:00:00.000Z",
+        },
+      },
+      "https://humanity.llc"
+    );
+    const body = scanStatusBodyFromViewModel(vm);
+    expect(body.scan.verification.state).toBe("verified_human");
+    expect(body.scan.verification.label).toBe("Vouched Human");
+    expect(body.scan.verification.vouch_count).toBe(3);
+    expect(body.scan.verification.latest_accepted_vouch_at).toBe(
+      "2026-05-21T12:00:00.000Z"
+    );
   });
 
   it("unknown profile returns 404", () => {

@@ -266,9 +266,9 @@ Revoked/suspended card states must **override** positive verification on scan (a
 
 **Step 1 — Scan truth (V-001)**
 
-- [ ] Wire verification summary consistently on scan (state, label, count, recency).
-- [ ] Copy pass: **Vouched Human** vs registered; show progress below threshold.
-- [ ] Tests: revoked/suspended override; stale cache banner unchanged.
+- [x] Wire verification summary consistently on scan (state, label, count, recency).
+- [x] Copy pass: **Vouched Human** vs registered; show progress below threshold.
+- [x] Tests: revoked/suspended override; stale cache banner unchanged.
 
 **Step 2 — Vouch issuance UX (V-002)**
 
