@@ -69,6 +69,19 @@ function scanDbFor(challenge: Record<string, unknown> | null = null): D1Database
           if (sql.includes("FROM qr_credentials")) return qr();
           if (sql.includes("FROM verification_summaries")) return summary();
           if (sql.includes("FROM live_control_challenges")) {
+            if (sql.includes("ORDER BY proven_at DESC")) {
+              const [profile_id, qr_id, provenAfter] = params;
+              if (
+                challenge &&
+                challenge.status === "proven" &&
+                challenge.profile_id === profile_id &&
+                challenge.qr_id === qr_id &&
+                String(challenge.proven_at) > String(provenAfter)
+              ) {
+                return challenge;
+              }
+              return null;
+            }
             return params[0] === LIVE_CHALLENGE ? challenge : null;
           }
           return null;
@@ -198,7 +211,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("Human trust");
     expect(html).toContain("Live control");
     expect(html).toContain('id="live-control-request"');
-    expect(html).toContain("dock-btn-primary");
+    expect(html).toContain("live-control-cta");
     expect(html).not.toContain("Limitations");
     expect(html).toContain("scan-limits-settings");
     expect(html).toContain('class="list"');
@@ -230,7 +243,8 @@ describe("renderScanPage M3.2 trust blocks", () => {
 
     expect(res.status).toBe(200);
     expect(res.headers.get("Cache-Control")).toBe("no-store");
-    expect(html).toContain("Control proven recently");
+    expect(html).toContain("Control proven");
+    expect(html).toContain("live-control-card-proven");
     expect(html).not.toContain('id="live-control-request"');
   });
 

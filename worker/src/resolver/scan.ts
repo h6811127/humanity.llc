@@ -1,5 +1,5 @@
 import { loadScanContext } from "../db/scan";
-import { getLiveControlChallenge } from "../db/live-control";
+import { getLiveControlChallenge, getRecentLiveControlProof } from "../db/live-control";
 import { PROFILE_ID_REGEX } from "../crypto";
 import { htmlResponse, requestOrigin } from "../http/resolver";
 import { renderScanPage, SCAN_UI_VERSION } from "./scan-html";
@@ -53,14 +53,16 @@ export async function handleGetScan(
 
   const ctx = await loadScanContext(env, profileId, qrId);
   const vm = buildScanViewModel(profileId, qrId, ctx, origin);
+  const now = new Date();
   await applyLiveControlProofIfPresent(
     env,
     vm,
     profileId,
     qrId,
     liveChallengeId,
-    new Date()
+    now
   );
+  await applyRecentLiveControlProof(env, vm, profileId, qrId, now);
 
   return htmlResponse(await renderScanPage(vm, origin), httpStatusForScanKind(vm.kind), {
     "Cache-Control": vm.cacheControl,
@@ -98,6 +100,38 @@ async function applyLiveControlProofIfPresent(
     if (provenAt + LIVE_CONTROL_PROOF_DISPLAY_TTL_MS < now.getTime()) return;
 
     vm.liveControlAvailable = true;
+    vm.liveControlProvenAt = challenge.proven_at;
+  } catch (e) {
+    if (String(e).includes("live_control_challenges")) return;
+    throw e;
+  }
+}
+
+async function applyRecentLiveControlProof(
+  db: D1Database,
+  vm: ScanViewModel,
+  profileId: string,
+  qrId: string,
+  now: Date
+): Promise<void> {
+  if (vm.liveControlAvailable || vm.kind !== "active") return;
+
+  const provenAfter = new Date(
+    now.getTime() - LIVE_CONTROL_PROOF_DISPLAY_TTL_MS
+  ).toISOString();
+
+  try {
+    const challenge = await getRecentLiveControlProof(
+      db,
+      profileId,
+      qrId,
+      provenAfter
+    );
+    if (!challenge?.proven_at) return;
+
+    vm.cacheControl = CACHE_EPHEMERAL_PROOF;
+    vm.liveControlAvailable = true;
+    vm.liveControlProvenAt = challenge.proven_at;
   } catch (e) {
     if (String(e).includes("live_control_challenges")) return;
     throw e;

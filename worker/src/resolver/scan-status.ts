@@ -36,6 +36,7 @@ export interface ScanStatusBody {
       status: string | null;
       scope: string | null;
       epoch: number | null;
+      expires_at: string | null;
     } | null;
     verification: {
       state: string | null;
@@ -44,7 +45,7 @@ export interface ScanStatusBody {
       vouch_count: number;
       latest_accepted_vouch_at: string | null;
     };
-    live_control: { available: boolean };
+    live_control: { available: boolean; proven_at: string | null };
     limits: {
       bearer_warning: string;
       scan_analytics: false;
@@ -76,6 +77,7 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
             status: vm.qrStatus,
             scope: vm.qrScope,
             epoch: vm.qrEpoch,
+            expires_at: vm.qrExpiresAt,
           }
         : null,
       verification: {
@@ -85,7 +87,10 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
         vouch_count: vm.vouchCount,
         latest_accepted_vouch_at: vm.latestVouchAt,
       },
-      live_control: { available: vm.liveControlAvailable },
+      live_control: {
+        available: vm.liveControlAvailable,
+        proven_at: vm.liveControlProvenAt,
+      },
       limits: {
         bearer_warning: BEARER_WARNING,
         scan_analytics: false,

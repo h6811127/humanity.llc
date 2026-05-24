@@ -1,5 +1,6 @@
 import {
   getCardJsonUrl,
+  getCardStatusUrl,
   getPendingLiveControlChallengeUrl,
   postLiveControlResponseUrl,
   qrScanUrl,
@@ -296,17 +297,52 @@ if (networkCardStatusEl) {
     cardState.charAt(0).toUpperCase() + cardState.slice(1);
 }
 
+function formatNetworkExpiry(iso) {
+  try {
+    return new Date(iso).toLocaleString(undefined, {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+  } catch {
+    return iso;
+  }
+}
+
+function capitalizeStatus(value) {
+  if (!value || typeof value !== "string") return "—";
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+async function refreshNetworkStatus() {
+  if (!profileId || !qrId || !networkQrExpiresEl) return;
+  try {
+    const res = await fetch(getCardStatusUrl(profileId, qrId), { cache: "no-store" });
+    if (!res.ok) return;
+    const body = await res.json();
+    const cardStatus = body.scan?.card?.status;
+    const qrExpires = body.scan?.qr?.expires_at;
+    if (networkCardStatusEl && cardStatus) {
+      networkCardStatusEl.textContent = capitalizeStatus(cardStatus);
+    }
+    if (qrExpires) {
+      networkQrExpiresEl.textContent = formatNetworkExpiry(qrExpires);
+    } else if (body.scan?.qr) {
+      networkQrExpiresEl.textContent = "No expiry set";
+    }
+    if (data && qrExpires) {
+      const next = { ...data, qr_expires_at: qrExpires };
+      saveSession(next);
+      data = next;
+    }
+  } catch {
+    /* keep session copy if fetch fails */
+  }
+}
+
 if (networkQrExpiresEl) {
   const expiresAt = data?.qr_expires_at;
   if (expiresAt) {
-    try {
-      networkQrExpiresEl.textContent = new Date(expiresAt).toLocaleString(undefined, {
-        dateStyle: "medium",
-        timeStyle: "short",
-      });
-    } catch {
-      networkQrExpiresEl.textContent = expiresAt;
-    }
+    networkQrExpiresEl.textContent = formatNetworkExpiry(expiresAt);
   } else {
     networkQrExpiresEl.textContent = "—";
   }
@@ -365,6 +401,7 @@ if (scanUrl) {
 setLoopStep("live");
 
 if (profileId && qrId) {
+  void refreshNetworkStatus();
   const revokeCtx = {
     profileId,
     qrId,

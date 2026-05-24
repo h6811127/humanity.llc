@@ -7,7 +7,7 @@ import { SCAN_PASS_CSS } from "./scan-pass-styles";
 import { renderScanQrMarkup } from "./scan-qr";
 
 /** Response header — confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v10";
+export const SCAN_UI_VERSION = "pass-v11";
 
 /**
  * Public scan UI — flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -433,42 +433,11 @@ function qrGroupRows(vm: ScanViewModel): string {
 }
 
 function liveControlGroupRows(vm: ScanViewModel): string {
-  if (vm.liveControlAvailable) {
-    return listRow(
-      "key",
-      "green",
-      "Control proven recently",
-      "Card key signed a fresh challenge — not shown on every scan"
-    );
+  if (vm.liveControlAvailable && vm.liveControlProvenAt) {
+    return liveControlProvenRow(vm.liveControlProvenAt);
   }
   if (vm.kind === "active" && vm.profileId && vm.qrId) {
-    return `<li class="list-row">
-  ${scanListIcon("purple", "key")}
-  <span class="list-content">
-    <span class="list-title">Live control</span>
-    <span class="list-sub">Ask the owner to show they control this object right now.</span>
-    <button type="button" class="dock-btn dock-btn-primary" id="live-control-request">
-      Ask for live proof
-    </button>
-    <span class="list-sub" id="live-control-status" aria-live="polite">
-      Not proven yet.
-    </span>
-    <div class="live-control-owner-panel" id="live-control-owner-panel" hidden>
-      <p class="live-control-owner-lead">
-        Owner must prove on the device that <strong>created this card</strong> (e.g. your laptop).
-        Waiting here on the scanner until they sign.
-      </p>
-      <div class="live-control-owner-actions">
-        <a class="dock-btn dock-btn-secondary" id="live-control-owner-link" href="#" target="_blank" rel="noopener noreferrer">
-          Open owner proof
-        </a>
-        <button type="button" class="btn-secondary" id="live-control-copy-owner-link">
-          Copy owner link
-        </button>
-      </div>
-    </div>
-  </span>
-</li>`;
+    return liveControlInteractiveRow();
   }
   return listRow(
     "key",
@@ -476,6 +445,87 @@ function liveControlGroupRows(vm: ScanViewModel): string {
     "Not shown",
     "Optional in-person key proof (M7)"
   );
+}
+
+function liveControlProvenRow(provenAt: string): string {
+  return `<li class="list-row live-control-row is-proven" id="live-control-row">
+  <span class="list-content live-control-card-wrap">
+    ${renderLiveControlSuccessPanel(provenAt, true)}
+  </span>
+</li>`;
+}
+
+function liveControlInteractiveRow(): string {
+  return `<li class="list-row live-control-row" id="live-control-row">
+  <span class="list-content live-control-card-wrap">
+    <div class="live-control-card" id="live-control-interactive">
+      <div class="live-control-card-head">
+        ${scanListIcon("purple", "key")}
+        <div class="live-control-card-head-text">
+          <span class="live-control-eyebrow">In-person check</span>
+          <span class="live-control-title">Live control</span>
+        </div>
+      </div>
+      <p class="live-control-lead">
+        Ask the owner to prove they hold the signing key for this object — right now, on the spot.
+      </p>
+      <button type="button" class="live-control-cta" id="live-control-request">
+        Ask for live proof
+      </button>
+      <div class="live-control-status-panel" id="live-control-status-panel">
+        <p class="live-control-status" id="live-control-status" aria-live="polite">Ready when you are.</p>
+      </div>
+      <div class="live-control-owner-panel" id="live-control-owner-panel" hidden>
+        <p class="live-control-owner-lead">
+          Send this to the device that <strong>created the card</strong>. This page waits until they sign.
+        </p>
+        <div class="live-control-owner-actions">
+          <a class="live-control-owner-btn" id="live-control-owner-link" href="#" target="_blank" rel="noopener noreferrer">
+            Open on owner device
+          </a>
+          <button type="button" class="live-control-owner-btn live-control-owner-btn-muted" id="live-control-copy-owner-link">
+            Copy owner link
+          </button>
+        </div>
+      </div>
+    </div>
+    ${renderLiveControlSuccessPanel("", false)}
+  </span>
+</li>`;
+}
+
+function renderLiveControlSuccessPanel(provenAt: string, visible: boolean): string {
+  const hiddenAttr = visible ? "" : " hidden";
+  const provenLabel = provenAt
+    ? `Proven ${formatScanTimestamp(provenAt)}`
+    : "";
+  return `<div class="live-control-card live-control-card-proven" id="live-control-success"${hiddenAttr}>
+  <div class="live-control-card-head">
+    ${scanListIcon("green", "key")}
+    <div class="live-control-card-head-text">
+      <span class="live-control-eyebrow">Verified just now</span>
+      <span class="live-control-title">Control proven</span>
+    </div>
+  </div>
+  <p class="live-control-success-copy">
+    The owner signed with their key. This does not prove legal identity or physical ownership.
+  </p>
+  <p class="live-control-proven-at" id="live-control-proven-at">${escapeHtml(provenLabel)}</p>
+</div>`;
+}
+
+function formatScanTimestamp(iso: string): string {
+  const d = new Date(iso);
+  if (!Number.isFinite(d.getTime())) return iso;
+  return d.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
 }
 
 function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
@@ -491,7 +541,34 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
   var ownerPanel = document.getElementById("live-control-owner-panel");
   var ownerLink = document.getElementById("live-control-owner-link");
   var copyOwnerLink = document.getElementById("live-control-copy-owner-link");
+  var interactive = document.getElementById("live-control-interactive");
+  var success = document.getElementById("live-control-success");
+  var provenAtEl = document.getElementById("live-control-proven-at");
+  var row = document.getElementById("live-control-row");
+  var statusPanel = document.getElementById("live-control-status-panel");
   if (!btn || !status) return;
+  function formatProvenAt(iso) {
+    try {
+      var d = new Date(iso);
+      if (!Number.isFinite(d.getTime())) return "";
+      return d.toLocaleString(undefined, {
+        dateStyle: "medium",
+        timeStyle: "medium",
+      });
+    } catch (e) {
+      return "";
+    }
+  }
+  function showProvenSuccess(provenAt) {
+    stopPolling();
+    stopCountdown();
+    if (interactive) interactive.hidden = true;
+    if (success) success.hidden = false;
+    if (row) row.classList.add("is-proven");
+    if (provenAtEl && provenAt) {
+      provenAtEl.textContent = "Proven " + formatProvenAt(provenAt);
+    }
+  }
   function showOwnerPanel(url) {
     if (ownerPanel) ownerPanel.hidden = false;
     if (ownerLink) ownerLink.href = url;
@@ -510,8 +587,11 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
   }
   var pollTimer = null;
   var countdownTimer = null;
-  function setStatus(text) {
+  function setStatus(text, waiting) {
     status.textContent = text;
+    if (statusPanel) {
+      statusPanel.classList.toggle("is-waiting", !!waiting);
+    }
   }
   function stopPolling() {
     if (pollTimer) window.clearInterval(pollTimer);
@@ -533,12 +613,12 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
       var remaining = Date.parse(expiresAt) - Date.now();
       if (!Number.isFinite(remaining) || remaining <= 0) {
         stopCountdown();
-        setStatus("Control was not proven. The request expired.");
+        setStatus("Control was not proven. The request expired.", false);
         btn.disabled = false;
         btn.textContent = "Ask again";
         return;
       }
-      setStatus(prefix + " Expires in " + formatRemaining(remaining) + ".");
+      setStatus(prefix + " Expires in " + formatRemaining(remaining) + ".", true);
     }
     tick();
     countdownTimer = window.setInterval(tick, 1000);
@@ -550,17 +630,13 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
         .then(function (res) { return res.json(); })
         .then(function (body) {
           if (body.status === "proven") {
-            stopPolling();
-            stopCountdown();
-            btn.disabled = false;
-            btn.textContent = "Ask again";
-            setStatus("Control proven moments ago. This does not prove legal identity.");
+            showProvenSuccess(body.proven_at);
           } else if (body.status === "expired") {
             stopPolling();
             stopCountdown();
             btn.disabled = false;
             btn.textContent = "Ask again";
-            setStatus("Control was not proven. The request expired.");
+            setStatus("Control was not proven. The request expired.", false);
           }
         })
         .catch(function () {});
@@ -575,34 +651,33 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
     var params = new URLSearchParams(location.search);
     var id = params.get("live_challenge");
     if (!id) return;
-    setStatus("Checking live proof…");
+    setStatus("Checking live proof…", true);
     fetch(statusUrlForChallenge(id), { cache: "no-store" })
       .then(function (res) { return res.json(); })
       .then(function (body) {
         if (body.status === "proven") {
-          btn.textContent = "Ask again";
-          setStatus("Control proven moments ago. This does not prove legal identity.");
+          showProvenSuccess(body.proven_at);
         } else if (body.status === "expired") {
           btn.textContent = "Ask again";
-          setStatus("Control was not proven. The request expired.");
+          setStatus("Control was not proven. The request expired.", false);
         } else {
           if (body.expires_at) {
-            startCountdown(body.expires_at, "Waiting for live proof.");
+            startCountdown(body.expires_at, "Waiting for the owner to sign…");
           } else {
-            setStatus("Waiting for live proof…");
+            setStatus("Waiting for the owner to sign…", true);
           }
           if (body.owner_url) showOwnerPanel(body.owner_url);
           poll(statusUrlForChallenge(id));
         }
       })
       .catch(function () {
-        setStatus("Could not check live proof.");
+        setStatus("Could not check live proof.", false);
       });
   }
   btn.addEventListener("click", function () {
     btn.disabled = true;
     btn.textContent = "Waiting…";
-    setStatus("Creating a live proof request…");
+    setStatus("Creating a live proof request…", true);
     fetch(${JSON.stringify(challengeUrl)}, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -627,7 +702,7 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
         stopCountdown();
         btn.disabled = false;
         btn.textContent = "Ask for live proof";
-        setStatus(err.message || "Could not create live proof request.");
+        setStatus(err.message || "Could not create live proof request.", false);
       });
   });
   checkExistingProof();

@@ -59,6 +59,8 @@ export interface ScanViewModel {
   showArtifactBlock: boolean;
   showLiveControlBlock: boolean;
   liveControlAvailable: boolean;
+  liveControlProvenAt: string | null;
+  qrExpiresAt: string | null;
   minimalScan: boolean;
   primaryBadge: { label: string; tone: StatusTone };
   scanUrl: string | null;
@@ -404,6 +406,8 @@ function baseView(input: BaseViewInput, origin: string): ScanViewModel {
       input.showLiveControlBlock ??
       (isHealthy || input.kind.startsWith("qr_") || input.kind.startsWith("card_")),
     liveControlAvailable: false,
+    liveControlProvenAt: null,
+    qrExpiresAt: qr?.expires_at ?? null,
     minimalScan: input.minimalScan ?? false,
     primaryBadge: input.primaryBadge,
     scanUrl: resolveScanUrl(origin, input.profileId, input.qrId, qr?.payload),

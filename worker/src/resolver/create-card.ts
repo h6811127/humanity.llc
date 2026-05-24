@@ -292,6 +292,9 @@ export async function handlePostCards(
       handle: handleNormalized,
       qr_id: qr.qr_id,
       scan_url: expectedPayload,
+      qr_expires_at:
+        (typeof qr.expires_at === "string" && qr.expires_at) ||
+        defaultQrExpiry(qr.issued_at as string),
       card_url: `${RESOLVER_ORIGIN}/.well-known/hc/v1/cards/${profileId}`,
       status: "active",
       verification: {
