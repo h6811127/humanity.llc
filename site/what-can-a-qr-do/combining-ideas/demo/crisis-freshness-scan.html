@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Demo scan · crisis + freshness · humanity.llc</title>
+    <meta
+      name="description"
+      content="Static demo: wallet aid card scan with coalition resources and kitchen-signed food batch state."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=47" />
+  </head>
+  <body>
+    <div class="page scan-page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <p class="demo-scan-ribbon" role="note">Static demo · not a live resolver scan</p>
+
+      <main class="screen scan-screen">
+        <p class="demo-scan-lead" role="note">
+          Resource page updates as signed objects change — not a dossier of who scanned.
+        </p>
+        <p class="demo-scan-fake-url mono" aria-hidden="true">
+          demo · https://humanity.llc/c/aid_wallet_rdale?q=qr_aidcard_…
+        </p>
+
+        <section class="pass" aria-label="Demo scan card">
+          <p class="section-kicker">At scan time</p>
+          <div class="pass-scene pass-static-demo">
+            <div class="pass-tilt-wrap">
+              <div class="pass-tilt-surface">
+                <div class="pass-state pass-state-live">
+                  <div class="pass-head">
+                    <div class="pass-brand">
+                      <span class="pass-dot" aria-hidden="true"></span>
+                      <span>humanity.llc</span>
+                    </div>
+                    <span class="pass-badge badge-live">Active</span>
+                  </div>
+                  <div class="pass-body">
+                    <div class="pass-main">
+                      <p class="pass-type">Wallet aid card</p>
+                      <p class="pass-name">riverdale.aid.wallet</p>
+                      <p class="pass-manifesto">Tonight · pantries, fridges, crisis lines</p>
+                      <ul class="pass-trust" aria-label="Combined status at a glance">
+                        <li class="trust-on">Coalition card active</li>
+                        <li class="trust-on">Fridge streams live</li>
+                        <li class="trust-on">No scan analytics shown</li>
+                      </ul>
+                    </div>
+                    <div class="pass-qr">
+                      <img
+                        src="/assets/red_qr_transparent_bg.png"
+                        width="88"
+                        height="88"
+                        alt=""
+                      />
+                    </div>
+                  </div>
+                  <p class="pass-foot">
+                    The kitchen signs batch freshness; the coalition signs the resource list.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="streams-title">
+          <h2 class="group-label" id="streams-title">Signed streams for this scan</h2>
+          <div class="demo-stream-stack">
+            <article class="demo-stream" aria-labelledby="coal-title">
+              <div class="demo-stream-head">
+                <div>
+                  <h3 class="demo-stream-title" id="coal-title">Coalition resources</h3>
+                  <span class="demo-stream-role">Aid routing · org-signed</span>
+                </div>
+                <span class="demo-stream-pill">Aid</span>
+              </div>
+              <div class="demo-stream-body">
+                <ul>
+                  <li><strong>Open pantry</strong> · Elm Community Hall · Sat 10:00–14:00</li>
+                  <li><strong>Outdoor fridge</strong> · 4th &amp; Birch · stocked 17:20</li>
+                  <li>Crisis line — <strong>active</strong> · rotates weekly per coalition policy</li>
+                </ul>
+                <p class="demo-stream-signer">
+                  <strong>Signed by:</strong> Riverdale Mutual Aid Coalition (<span class="mono">coal_rma_7</span>)
+                </p>
+              </div>
+            </article>
+
+            <article class="demo-stream" aria-labelledby="kitchen-title">
+              <div class="demo-stream-head">
+                <div>
+                  <h3 class="demo-stream-title" id="kitchen-title">Prepared food · batches</h3>
+                  <span class="demo-stream-role">Kitchen-signed · per batch</span>
+                </div>
+                <span class="demo-stream-pill is-kitchen">Kitchen</span>
+              </div>
+              <div class="demo-stream-body">
+                <ul>
+                  <li>Veggie rice bowl — made 4:10 PM · <strong>expires 9:00 PM</strong></li>
+                  <li>Allergens: <strong>soy, sesame</strong> · no nuts in this batch</li>
+                  <li>Recall state: <strong>none</strong> · last kitchen check 6:02 PM</li>
+                </ul>
+                <p class="demo-stream-signer">
+                  <strong>Signed by:</strong> Elm Host Kitchen duty lead (<span class="mono">kit_elm_3</span>)
+                </p>
+              </div>
+            </article>
+
+            <article class="demo-stream" aria-labelledby="pub-title">
+              <div class="demo-stream-head">
+                <div>
+                  <h3 class="demo-stream-title" id="pub-title">Public read model</h3>
+                  <span class="demo-stream-role">What scanners should assume</span>
+                </div>
+                <span class="demo-stream-pill is-game">Info</span>
+              </div>
+              <div class="demo-stream-body">
+                <ul>
+                  <li>This page returns <strong>object state</strong>, not identity or location history</li>
+                  <li>Each stream can be revoked independently (bad batch vs. bad card series)</li>
+                </ul>
+                <p class="demo-stream-signer">
+                  <strong>Note:</strong> aligns with <a href="/data-policy.html">operator data policy</a> — demo copy only.
+                </p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <p class="idea-footnote">
+          Pattern: wallet aid card lists nearby pantry and fridge options; each food batch keeps
+          made, expires, allergen, and recall state in its own signer domain; the resource surface can
+          update without treating scans as a people trail.
+        </p>
+
+        <nav class="dock" aria-label="Next steps">
+          <a class="dock-btn dock-btn-primary" href="/what-can-a-qr-do/combining-ideas/"
+            >Demo pack home</a
+          >
+          <a class="dock-btn" href="/what-can-a-qr-do/crisis-resource-cards/">Crisis resource cards</a>
+        </nav>
+
+        <footer class="scan-footer">
+          <a class="scan-footer-link" href="/what-can-a-qr-do/food-freshness-tags/">Food freshness tags</a>
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>

@@ -2863,3 +2863,134 @@ button.btn-danger {
   font-size: 13px;
   word-break: break-all;
 }
+
+/* Static “combined scan” demos (Pages only — not Worker /c/…) */
+.demo-scan-ribbon {
+  margin: 0;
+  padding: 10px var(--pad);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #3d2a00;
+  background: linear-gradient(90deg, #ffe8a8 0%, #ffd27a 100%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.demo-scan-fake-url {
+  margin: 0 0 4px 2px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--red);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  word-break: break-all;
+}
+
+.demo-scan-lead {
+  margin: 0 0 2px 2px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--grey);
+}
+
+.demo-stream-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.demo-stream {
+  border-radius: var(--radius);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: var(--white);
+  overflow: hidden;
+}
+
+.demo-stream-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fafafa;
+}
+
+.demo-stream-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--black);
+}
+
+.demo-stream-role {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--grey);
+}
+
+.demo-stream-pill {
+  flex-shrink: 0;
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--white);
+  background: var(--red);
+}
+
+.demo-stream-pill.is-game {
+  background: #5856d6;
+}
+
+.demo-stream-pill.is-market {
+  background: #34c759;
+}
+
+.demo-stream-pill.is-kitchen {
+  background: #ff9500;
+}
+
+.demo-stream-pill.is-map {
+  background: #007aff;
+}
+
+.demo-stream-body {
+  padding: 12px 14px 14px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--black);
+}
+
+.demo-stream-body ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.demo-stream-body li {
+  margin-bottom: 6px;
+}
+
+.demo-stream-body li:last-child {
+  margin-bottom: 0;
+}
+
+.demo-stream-signer {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--grey);
+}
+
+.demo-stream-signer strong {
+  color: var(--black);
+  font-weight: 600;
+}
+
+.pass-scene.pass-static-demo .pass-tilt-wrap {
+  animation: none;
+  transform: none;
+}

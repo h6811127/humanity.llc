@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Demo scan · markets + menus + surplus · humanity.llc</title>
+    <meta
+      name="description"
+      content="Static demo: co-op day pass scan combining market stalls, a live food truck menu, and safe-to-take surplus."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=47" />
+  </head>
+  <body>
+    <div class="page scan-page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <p class="demo-scan-ribbon" role="note">Static demo · not a live resolver scan</p>
+
+      <main class="screen scan-screen">
+        <p class="demo-scan-lead" role="note">
+          Vendors update live menu and surplus tags; the market pass aggregates today’s stalls.
+        </p>
+        <p class="demo-scan-fake-url mono" aria-hidden="true">
+          demo · https://humanity.llc/c/coop_daypass_may24?q=qr_cooppass_…
+        </p>
+
+        <section class="pass" aria-label="Demo scan card">
+          <p class="section-kicker">At scan time</p>
+          <div class="pass-scene pass-static-demo">
+            <div class="pass-tilt-wrap">
+              <div class="pass-tilt-surface">
+                <div class="pass-state pass-state-live">
+                  <div class="pass-head">
+                    <div class="pass-brand">
+                      <span class="pass-dot" aria-hidden="true"></span>
+                      <span>humanity.llc</span>
+                    </div>
+                    <span class="pass-badge badge-live">Active</span>
+                  </div>
+                  <div class="pass-body">
+                    <div class="pass-main">
+                      <p class="pass-type">Co-op market day pass</p>
+                      <p class="pass-name">river.coop.saturday</p>
+                      <p class="pass-manifesto">Stalls open · menus live · surplus tagged</p>
+                      <ul class="pass-trust" aria-label="Combined status at a glance">
+                        <li class="trust-on">Pass valid today</li>
+                        <li class="trust-on">Vendor menus signed</li>
+                        <li class="trust-on">Surplus window open</li>
+                      </ul>
+                    </div>
+                    <div class="pass-qr">
+                      <img
+                        src="/assets/red_qr_transparent_bg.png"
+                        width="88"
+                        height="88"
+                        alt=""
+                      />
+                    </div>
+                  </div>
+                  <p class="pass-foot">
+                    One state object behind the pass can reference many vendor-signed feeds.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="streams-title">
+          <h2 class="group-label" id="streams-title">Signed streams for this scan</h2>
+          <div class="demo-stream-stack">
+            <article class="demo-stream" aria-labelledby="stalls-title">
+              <div class="demo-stream-head">
+                <div>
+                  <h3 class="demo-stream-title" id="stalls-title">Today’s market map</h3>
+                  <span class="demo-stream-role">Co-op floor · organizer-signed</span>
+                </div>
+                <span class="demo-stream-pill is-market">Market</span>
+              </div>
+              <div class="demo-stream-body">
+                <ul>
+                  <li>Rows A–C outdoors · row D under tent (rain plan)</li>
+                  <li><strong>22 vendors checked in</strong> · 3 no-shows marked</li>
+                  <li>Live music ends 8:30 PM · gate re-entry allowed with pass QR</li>
+                </ul>
+                <p class="demo-stream-signer">
+                  <strong>Signed by:</strong> River Food Co-op ops (<span class="mono">coop_rf_ops</span>)
+                </p>
+              </div>
+            </article>
+
+            <article class="demo-stream" aria-labelledby="menu-title">
+              <div class="demo-stream-head">
+                <div>
+                  <h3 class="demo-stream-title" id="menu-title">River City Tacos · menu</h3>
+                  <span class="demo-stream-role">Vendor-signed · tonight only</span>
+                </div>
+                <span class="demo-stream-pill">Menu</span>
+              </div>
+              <div class="demo-stream-body">
+                <ul>
+                  <li>Truck at <strong>lot B7</strong> · service until 10 PM</li>
+                  <li>Sold out: al pastor, hibiscus agua</li>
+                  <li>Allergen key on scan: <strong>gluten-free masa options</strong> flagged</li>
+                </ul>
+                <p class="demo-stream-signer">
+                  <strong>Signed by:</strong> River City Tacos window lead (<span class="mono">vendor_rct_2</span>)
+                </p>
+              </div>
+            </article>
+
+            <article class="demo-stream" aria-labelledby="surplus-title">
+              <div class="demo-stream-head">
+                <div>
+                  <h3 class="demo-stream-title" id="surplus-title">Prepared surplus · safe to take</h3>
+                  <span class="demo-stream-role">Kitchen / vendor surplus tag</span>
+                </div>
+                <span class="demo-stream-pill is-kitchen">Surplus</span>
+              </div>
+              <div class="demo-stream-body">
+                <ul>
+                  <li>Unsold pozole — <strong>safe to take until 8:15 PM</strong></li>
+                  <li>Contains pork · keep hot above 140°F / reheat to steaming</li>
+                  <li>If tag is revoked, tray is <strong>not</strong> offered — do not serve yourself</li>
+                </ul>
+                <p class="demo-stream-signer">
+                  <strong>Signed by:</strong> Co-op kitchen closing shift (<span class="mono">kit_coop_cl</span>)
+                </p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <p class="idea-footnote">
+          Pattern: co-op pass links to today’s stalls and live menus; prepared-food tags mark
+          safe-to-take surplus; the vendor updates one menu object instead of reprinting table tents,
+          while surplus stays a separate signed stream with its own expiry rules.
+        </p>
+
+        <nav class="dock" aria-label="Next steps">
+          <a class="dock-btn dock-btn-primary" href="/what-can-a-qr-do/combining-ideas/"
+            >Demo pack home</a
+          >
+          <a class="dock-btn" href="/what-can-a-qr-do/live-menus/">Live menus</a>
+        </nav>
+
+        <footer class="scan-footer">
+          <a class="scan-footer-link" href="/what-can-a-qr-do/local-economies/">Local economies</a>
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>
