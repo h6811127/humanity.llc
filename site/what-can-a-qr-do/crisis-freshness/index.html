@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Crisis cards + freshness · humanity.llc</title>
+    <meta
+      name="description"
+      content="A demo scan page where a wallet aid card routes to food resources while kitchens and hosts separately sign freshness and equipment state."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=46" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Demo scan · aid + food state</p>
+          <h1>Crisis cards + freshness</h1>
+          <p class="hero-line">
+            A wallet aid card can point to <strong>food tonight</strong> without pretending one
+            coalition signs every tray, batch, fridge, and kitchen claim behind it.
+          </p>
+          <p class="hero-line hero-line-sub">Research, not shipping yet.</p>
+        </section>
+
+        <section class="idea-section" aria-labelledby="scan-title">
+          <h2 class="group-label" id="scan-title">Demo scan · wallet aid card</h2>
+          <div class="scenario-grid" aria-label="Crisis and freshness scan states">
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Scan · food available tonight</p>
+              <ul class="scenario-card-list">
+                <li>Community pantry open until 8 PM</li>
+                <li>South fridge stocked at 5:20 PM</li>
+                <li>Veggie soup batch expires at 10 PM</li>
+                <li>Contains: wheat · no nuts reported</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">Scan · resource updated</p>
+              <ul class="scenario-card-list">
+                <li>Pantry moved to a new address</li>
+                <li>Same wallet card still works</li>
+                <li>Food batches keep their own signed freshness state</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">Scan · recall or outage</p>
+              <ul class="scenario-card-list">
+                <li>Soup batch recalled by host kitchen</li>
+                <li>Fridge temperature failed at 6:12 PM</li>
+                <li>Safe list removes affected food immediately</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="what-shows-title">
+          <h2 class="group-label" id="what-shows-title">What the scan page resolves first</h2>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Resource routing</span>
+                <span class="list-sub">Nearby pantry, fridge, warming center, and current pickup windows.</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M18 12h4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Batch freshness</span>
+                <span class="list-sub">Made time, expiry, allergens, recall state, and host-kitchen verification.</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">No tracking required</span>
+                <span class="list-sub">The resource page updates for every old card without building a dossier of who scanned.</span>
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="qr-compare idea-compare" aria-labelledby="authority-title">
+          <h2 class="group-label" id="authority-title">Who signs what</h2>
+          <div class="qr-compare-grid">
+            <article class="qr-compare-col qr-compare-col-live">
+              <h3 class="qr-compare-heading">Coalition</h3>
+              <ul class="qr-compare-list">
+                <li>Which resources are available tonight</li>
+                <li>Addresses, hours, and pickup windows</li>
+                <li>Which card series is still trusted</li>
+              </ul>
+            </article>
+            <article class="qr-compare-col qr-compare-col-live">
+              <h3 class="qr-compare-heading">Kitchen or pantry host</h3>
+              <ul class="qr-compare-list">
+                <li>Made and expires times</li>
+                <li>Allergen notes</li>
+                <li>Recall or discard instructions</li>
+              </ul>
+            </article>
+            <article class="qr-compare-col qr-compare-col-muted">
+              <h3 class="qr-compare-heading">Site maintainer</h3>
+              <ul class="qr-compare-list">
+                <li>Fridge working or down</li>
+                <li>Generator or cooler maintenance</li>
+                <li>Equipment warnings outrank “available food” copy</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="walkthrough-title">
+          <h2 class="group-label" id="walkthrough-title">What the combined loop enables</h2>
+          <div class="scenario-grid" aria-label="Crisis and freshness workflow">
+            <article class="scenario-card">
+              <p class="scenario-card-label">Resource card</p>
+              <ul class="scenario-card-list">
+                <li>One wallet card lists pantry and fridge options nearby</li>
+                <li>Coalition updates the live resource map in one place</li>
+                <li>Old cards in pockets stay useful</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">Batch tags</p>
+              <ul class="scenario-card-list">
+                <li>Each soup, tray, or produce box keeps a separate freshness object</li>
+                <li>Safe-to-take state can change without changing the aid card</li>
+                <li>Allergen and recall notes stay batch-specific</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Protection</p>
+              <ul class="scenario-card-list">
+                <li>Recall disappears unsafe food from the live list</li>
+                <li>Fridge outage can hide only the affected items</li>
+                <li>No scan history needed to keep people safer</li>
+              </ul>
+            </article>
+          </div>
+          <p class="idea-footnote">
+            Pair with <a href="/what-can-a-qr-do/crisis-resource-cards/">crisis resource cards</a>,
+            <a href="/what-can-a-qr-do/food-freshness-tags/">food freshness tags</a>, and
+            <a href="/what-can-a-qr-do/proof-of-maintenance/">proof of maintenance</a>.
+          </p>
+        </section>
+
+        <p class="insight">
+          The crisis card can route people to help, but the <strong>food authority stays with the
+          kitchen</strong> and the equipment authority stays with the host.
+        </p>
+
+        <section class="group">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/combining-ideas/">
+                <span class="list-icon list-icon-tone-gold" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Combining ideas</span>
+                  <span class="list-sub">Back to the combo overview</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

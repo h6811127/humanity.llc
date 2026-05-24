@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Markets + menus + surplus · humanity.llc</title>
+    <meta
+      name="description"
+      content="A demo scan page where a co-op pass links to active stalls, live menus, and safe-to-take prepared-food surplus without reprinting placards."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=46" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Demo scan · markets + food service</p>
+          <h1>Markets + menus + surplus</h1>
+          <p class="hero-line">
+            A co-op pass can hand off from <strong>today&rsquo;s stalls</strong> to
+            <strong>live menus</strong> to <strong>safe-to-take surplus</strong> while each signer
+            keeps authority over only the claim they own.
+          </p>
+          <p class="hero-line hero-line-sub">Research, not shipping yet.</p>
+        </section>
+
+        <section class="idea-section" aria-labelledby="scan-title">
+          <h2 class="group-label" id="scan-title">Demo scan · co-op market pass</h2>
+          <div class="scenario-grid" aria-label="Market, menu, and surplus scan states">
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Scan · market morning</p>
+              <ul class="scenario-card-list">
+                <li>North Hall market active today</li>
+                <li>Cedar Greens stall live at booth B12</li>
+                <li>Soup and bread menu current at 11:40 AM</li>
+                <li>Member pricing unlocked for active pass</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">Scan · after service</p>
+              <ul class="scenario-card-list">
+                <li>Prepared lentil bowls marked safe-to-take until 7 PM</li>
+                <li>Menu flips from lunch service to surplus pickup</li>
+                <li>Vendor updates one state object instead of reprinting signs</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">Scan · pause or revoke</p>
+              <ul class="scenario-card-list">
+                <li>Stall inactive today or menu object revoked</li>
+                <li>Unsafe batch disappears from surplus list</li>
+                <li>Do not use stale placard for pickup</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="what-shows-title">
+          <h2 class="group-label" id="what-shows-title">What the scan page resolves first</h2>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2"/><path d="M12 12v.01"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Market status</span>
+                <span class="list-sub">Which stalls are active, where they are, and whether the co-op pass is valid today.</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Menu state</span>
+                <span class="list-sub">Open or sold out, today&rsquo;s items, allergen notes, and whether service has ended.</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M18 12h4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Surplus freshness</span>
+                <span class="list-sub">Safe-to-take window, made time, expiry, allergens, and recall state for prepared food.</span>
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="qr-compare idea-compare" aria-labelledby="authority-title">
+          <h2 class="group-label" id="authority-title">Who signs what</h2>
+          <div class="qr-compare-grid">
+            <article class="qr-compare-col qr-compare-col-live">
+              <h3 class="qr-compare-heading">Organizer</h3>
+              <ul class="qr-compare-list">
+                <li>Market active today</li>
+                <li>Approved stall and booth assignment</li>
+                <li>Co-op pass or member access state</li>
+              </ul>
+            </article>
+            <article class="qr-compare-col qr-compare-col-live">
+              <h3 class="qr-compare-heading">Vendor</h3>
+              <ul class="qr-compare-list">
+                <li>Menu items and sold-out state</li>
+                <li>Service hours and moved location</li>
+                <li>Current order or pickup copy</li>
+              </ul>
+            </article>
+            <article class="qr-compare-col qr-compare-col-muted">
+              <h3 class="qr-compare-heading">Kitchen</h3>
+              <ul class="qr-compare-list">
+                <li>Safe-to-take surplus window</li>
+                <li>Made, expires, allergens</li>
+                <li>Recall or discard instructions</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="walkthrough-title">
+          <h2 class="group-label" id="walkthrough-title">What the combined loop enables</h2>
+          <div class="scenario-grid" aria-label="Market and surplus workflow">
+            <article class="scenario-card">
+              <p class="scenario-card-label">During service</p>
+              <ul class="scenario-card-list">
+                <li>Market pass confirms the stall is legitimate today</li>
+                <li>Live menu answers what is sold out before someone waits in line</li>
+                <li>Member pricing stays tied to the pass, not the menu object</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">After service</p>
+              <ul class="scenario-card-list">
+                <li>Unsold prepared food becomes freshness-tagged surplus</li>
+                <li>Pickup window appears on the same market flow</li>
+                <li>Safe-to-take copy can expire automatically later that night</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Keep claims clear</p>
+              <ul class="scenario-card-list">
+                <li>Organizer signs access and stall legitimacy</li>
+                <li>Vendor signs menu truth</li>
+                <li>Kitchen signs food safety</li>
+              </ul>
+            </article>
+          </div>
+          <p class="idea-footnote">
+            Pair with <a href="/what-can-a-qr-do/local-economies/">local economies</a>,
+            <a href="/what-can-a-qr-do/live-menus/">live menus</a>, and
+            <a href="/what-can-a-qr-do/food-freshness-tags/">food freshness tags</a>.
+          </p>
+        </section>
+
+        <p class="insight">
+          The pass can coordinate discovery and pickup, but <strong>freshness still belongs to the
+          kitchen</strong> and menu truth still belongs to the vendor.
+        </p>
+
+        <section class="group">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/combining-ideas/">
+                <span class="list-icon list-icon-tone-gold" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Combining ideas</span>
+                  <span class="list-sub">Back to the combo overview</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
