@@ -282,8 +282,8 @@ async function expireIfNeeded(
 }
 
 function challengeBody(challenge: LiveControlChallengeRow, request: Request) {
-  const origin = requestOrigin(request);
-  const ownerUrl = new URL(`${ownerPageOrigin(request)}/created/`);
+  const origin = liveControlApiOrigin(request);
+  const ownerUrl = new URL(`${ownerPageOrigin(origin)}/created/`);
   ownerUrl.searchParams.set("profile_id", challenge.profile_id);
   if (challenge.qr_id) ownerUrl.searchParams.set("qr_id", challenge.qr_id);
   ownerUrl.searchParams.set("live_challenge", challenge.challenge_id);
@@ -320,12 +320,30 @@ function challengeBody(challenge: LiveControlChallengeRow, request: Request) {
   };
 }
 
-function ownerPageOrigin(request: Request): string {
-  const url = new URL(request.url);
-  if (url.hostname === "localhost" || url.hostname === "127.0.0.1") {
-    return "http://localhost:8788";
+function liveControlApiOrigin(request: Request): string {
+  const originHeader = request.headers.get("Origin") ?? "";
+  if (isLocalOrigin(originHeader)) return originHeader;
+  const host = request.headers.get("Host") ?? "";
+  if (host.startsWith("localhost:") || host.startsWith("127.0.0.1:")) {
+    return `http://${host}`;
   }
   return requestOrigin(request);
+}
+
+function ownerPageOrigin(apiOrigin: string): string {
+  if (isLocalOrigin(apiOrigin)) {
+    return "http://localhost:8788";
+  }
+  return apiOrigin;
+}
+
+function isLocalOrigin(origin: string): boolean {
+  try {
+    const url = new URL(origin);
+    return url.hostname === "localhost" || url.hostname === "127.0.0.1";
+  } catch {
+    return false;
+  }
 }
 
 function liveControlUnavailableMessage(kind: ScanPageKind): string {

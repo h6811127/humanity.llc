@@ -469,7 +469,8 @@ function liveControlGroupRows(vm: ScanViewModel): string {
 
 function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
   if (vm.kind !== "active" || !vm.profileId || !vm.qrId) return "";
-  const challengeUrl = `${origin}/.well-known/hc/v1/cards/${encodeURIComponent(
+  const apiOrigin = liveControlApiOrigin(vm, origin);
+  const challengeUrl = `${apiOrigin}/.well-known/hc/v1/cards/${encodeURIComponent(
     vm.profileId
   )}/live-control/challenges`;
   return `<script>
@@ -534,6 +535,20 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
   });
 })();
 </script>`;
+}
+
+function liveControlApiOrigin(vm: ScanViewModel, fallback: string): string {
+  if (vm.scanUrl) {
+    try {
+      const url = new URL(vm.scanUrl);
+      if (url.hostname === "localhost" || url.hostname === "127.0.0.1") {
+        return url.origin;
+      }
+    } catch {
+      /* Use fallback below. */
+    }
+  }
+  return fallback;
 }
 
 /** iOS-style settings row — all “does not prove” copy in one place. */
