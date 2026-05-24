@@ -13,6 +13,7 @@ import {
   PROTOCOL_VERSION,
   withCors,
 } from "./http/resolver";
+import { handlePostArtifactIntent } from "./resolver/artifact-intents";
 import { handleGetCard, handlePostCards } from "./resolver/create-card";
 import { handlePostRevoke } from "./resolver/revoke";
 import { handleGetScan } from "./resolver/scan";
@@ -86,6 +87,17 @@ export default {
         );
       }
       const res = await handlePostVouch(request, env.DB);
+      return withCors(request, res);
+    }
+
+    if (path === "/v1/store/artifact-intents" && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostArtifactIntent(request, env.DB);
       return withCors(request, res);
     }
 
