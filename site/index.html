@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=55" />
+    <link rel="stylesheet" href="/styles.css?v=56" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -194,12 +194,27 @@
             Keys and saved cards stay in this browser. The operator never stores private keys.
           </p>
 
-          <div class="device-hub-group" id="device-hub-saved-group" hidden>
+          <div
+            class="device-hub-group"
+            id="device-hub-saved-group"
+            hidden
+            data-hub-group="saved"
+          >
             <p class="device-hub-group-label">Saved cards</p>
             <ul class="list list-compact" id="device-hub-wallet-list"></ul>
           </div>
 
-          <div class="device-hub-group">
+          <div
+            class="device-hub-group"
+            id="device-hub-pins-group"
+            hidden
+            data-hub-group="pins"
+          >
+            <p class="device-hub-group-label">Pinned public cards</p>
+            <ul class="list list-compact" id="device-hub-pins-list"></ul>
+          </div>
+
+          <div class="device-hub-group" data-hub-group="shortcuts">
             <p class="device-hub-group-label">Shortcuts</p>
             <ul class="list list-compact">
               <li
@@ -602,15 +617,15 @@
             </span>
             <span class="settings-summary-text">
               <span class="settings-summary-title">What this searches</span>
-              <span class="settings-summary-sub">Saved cards and shortcuts on this device</span>
+              <span class="settings-summary-sub">Saved cards, pins, and shortcuts</span>
             </span>
             <span class="list-chevron" aria-hidden="true">›</span>
           </summary>
           <div class="settings-panel settings-panel-info">
             <p class="form-hint">
-              Filters labels in <strong>On this device</strong> — cards you saved in
-              <a href="/wallet/">Saved cards</a> plus Revoke, Vouch, and Wallet shortcuts. Does not
-              search humanity.llc or other people&rsquo;s profiles.
+              Filters <strong>On this device</strong>: saved cards (with keys),
+              <a href="/wallet/">pinned scan links</a> you added, and shortcuts. Does not search the
+              public resolver or index other people&rsquo;s cards.
             </p>
           </div>
         </details>
@@ -622,7 +637,7 @@
     </nav>
     <script src="/js/pass-flip.js?v=1" defer></script>
     <script src="/js/pass-demo-revoke.js?v=1" defer></script>
-    <script src="/js/landing-device-hub.mjs?v=2" type="module"></script>
+    <script src="/js/landing-device-hub.mjs?v=3" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=1" type="module"></script>
   </body>
 </html>

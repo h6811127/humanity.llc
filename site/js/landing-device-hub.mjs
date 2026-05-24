@@ -1,12 +1,14 @@
 /**
- * Landing device hub (Phase 1): inject saved wallet rows + local search filter.
- * Search UI: bottom-left FAB expands to full bar + disclosures (see DEVICE_HUB_AND_LOCAL_SEARCH.md).
+ * Landing device hub: Phase 1–2 local search + wallet/pin injection.
  */
-const STORAGE_KEY = "hc_wallet";
+import { applyDeviceHubSearch } from "./device-hub-search.mjs";
+import { loadPins, pinHaystack } from "./device-pins.mjs";
+
+const WALLET_KEY = "hc_wallet";
 
 function loadWallet() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(WALLET_KEY);
     const parsed = raw ? JSON.parse(raw) : [];
     return Array.isArray(parsed) ? parsed : [];
   } catch {
@@ -21,7 +23,7 @@ function escapeHtml(s) {
     .replace(/>/g, "&gt;");
 }
 
-function haystack(entry) {
+function walletHaystack(entry) {
   return [entry.label, entry.handle, entry.manifesto_line, entry.profile_id]
     .filter(Boolean)
     .join(" ")
@@ -30,6 +32,8 @@ function haystack(entry) {
 
 const savedGroup = document.getElementById("device-hub-saved-group");
 const savedList = document.getElementById("device-hub-wallet-list");
+const pinsGroup = document.getElementById("device-hub-pins-group");
+const pinsList = document.getElementById("device-hub-pins-list");
 const searchInput = document.getElementById("device-hub-search");
 const searchRoot = document.getElementById("device-hub-search-root");
 const searchOpen = document.getElementById("device-hub-search-open");
@@ -52,8 +56,8 @@ function renderSavedRows() {
   for (const entry of entries) {
     const li = document.createElement("li");
     li.className = "list-row list-action";
-    li.dataset.hubSearchable = haystack(entry);
-    const sub = entry.manifesto_line || entry.handle || "Saved on this device";
+    li.dataset.hubSearchable = walletHaystack(entry);
+    const sub = entry.manifesto_line || entry.handle || "Signing keys on this device";
     li.innerHTML = `
       <a href="/wallet/">
         <span class="list-icon list-icon-tone-trust" aria-hidden="true">
@@ -69,41 +73,54 @@ function renderSavedRows() {
   }
 }
 
-function countVisibleMatches() {
-  const hub = document.getElementById("device-hub");
-  if (!hub) return 0;
-  return [...hub.querySelectorAll("[data-hub-searchable]")].filter((el) => !el.hidden).length;
+function renderPinRows() {
+  const pins = loadPins();
+  if (!pinsList || !pinsGroup) return;
+
+  pinsList.innerHTML = "";
+  if (pins.length === 0) {
+    pinsGroup.hidden = true;
+    return;
+  }
+
+  pinsGroup.hidden = false;
+  for (const pin of pins) {
+    const li = document.createElement("li");
+    li.className = "list-row list-action device-pin-row";
+    li.dataset.hubSearchable = pinHaystack(pin);
+    const sub = pin.qr_id
+      ? `${pin.profile_id.slice(0, 10)}… · opens scan`
+      : `${pin.profile_id.slice(0, 14)}… · card scan`;
+    li.innerHTML = `
+      <a href="${escapeHtml(pin.scan_url)}" target="_blank" rel="noopener noreferrer">
+        <span class="list-icon list-icon-tone-gold" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+        </span>
+        <span class="list-content">
+          <span class="list-title">${escapeHtml(pin.label)}</span>
+          <span class="list-sub">${escapeHtml(sub)}</span>
+        </span>
+        <span class="list-chevron list-chevron-external" aria-hidden="true">↗</span>
+      </a>`;
+    pinsList.appendChild(li);
+  }
 }
 
 function applySearchFilter() {
-  const q = (searchInput?.value || "").trim().toLowerCase();
-  const hub = document.getElementById("device-hub");
-  if (!hub) return;
-
-  hub.querySelectorAll("[data-hub-searchable]").forEach((el) => {
-    const text = (el.dataset.hubSearchable || "").toLowerCase();
-    const match = !q || text.includes(q);
-    el.hidden = !match;
-  });
-
-  if (savedGroup) {
-    const anySavedVisible =
-      q === "" ||
-      [...(savedList?.querySelectorAll("[data-hub-searchable]") || [])].some((el) => !el.hidden);
-    savedGroup.hidden = loadWallet().length === 0 || !anySavedVisible;
-  }
+  const q = searchInput?.value ?? "";
+  const { matchCount } = applyDeviceHubSearch(deviceHub, q);
 
   if (searchStatus) {
-    if (!q) {
+    const trimmed = q.trim();
+    if (!trimmed) {
       searchStatus.hidden = true;
       searchStatus.textContent = "";
     } else {
-      const n = countVisibleMatches();
       searchStatus.hidden = false;
       searchStatus.textContent =
-        n === 0
+        matchCount === 0
           ? "No matches on this device."
-          : `${n} match${n === 1 ? "" : "es"} in On this device`;
+          : `${matchCount} match${matchCount === 1 ? "" : "es"} on this device`;
     }
   }
 }
@@ -145,8 +162,17 @@ document.addEventListener("click", (e) => {
 });
 
 renderSavedRows();
+renderPinRows();
 applySearchFilter();
 
 if (searchInput) {
   searchInput.addEventListener("input", applySearchFilter);
 }
+
+window.addEventListener("storage", (e) => {
+  if (e.key === WALLET_KEY || e.key === "hc_device_pins") {
+    renderSavedRows();
+    renderPinRows();
+    applySearchFilter();
+  }
+});

@@ -69,7 +69,7 @@ Writes `data/showcase-status-plate.json` with a live scan URL for the status-pla
 
 ### Device hub and local search
 
-Landing **On this device** and `/wallet/` use grouped Settings-style lists. Saved cards from `localStorage` (`hc_wallet`) appear on the landing page when present. The floating search bar filters **this device only** (saved labels, shortcuts) — not the public resolver. Design notes: `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md`.
+Landing **On this device** and `/wallet/` use grouped Settings-style lists. **Phase 1:** `hc_wallet` (saved keys). **Phase 2:** `hc_device_pins` (pinned public scan links, no keys). Both appear on the landing page when present. Search filters **this device only** — not the public resolver. Design notes: `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md`.
 
 ### After changing Pages files
 

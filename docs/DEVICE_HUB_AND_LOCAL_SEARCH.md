@@ -1,13 +1,13 @@
 # Device hub and local search
 
-**Status:** Shipped (UI + wallet); search Phase 1 on wallet and landing  
+**Status:** Phase 1–2 shipped (UI + wallet + landing)  
 **Scope:** Browser-local personalization only — not resolver-wide discovery
 
 ---
 
 ## Product intent
 
-The landing page and `/wallet/` share an **“on this device”** hub: saved cards with signing keys, shortcuts to manage/revoke, and (later) user-pinned public scan links. This mirrors a Settings-style surface (grouped inset lists, chevron rows) without implying accounts, sync, or operator storage of private keys.
+The landing page and `/wallet/` share an **“on this device”** hub: saved cards with signing keys, **pinned public scan links**, and shortcuts to manage/revoke/vouch. This mirrors a Settings-style surface (grouped inset lists, chevron rows) without implying accounts, sync, or operator storage of private keys.
 
 **Not in scope:** searching the Humanity resolver, other people’s cards, or any server index. That would be a different product (directory, federation catalog) with privacy, abuse, and policy implications.
 
@@ -21,7 +21,7 @@ We kept the current landing funnel (hero create → pass demo → device hub →
 |----------|---------|
 | Full personalized landing (only your cards) | Too empty for first-time visitors |
 | No personalization | Returning users repeat `/wallet/` |
-| **Hybrid (chosen)** | Static shortcuts + **inject saved cards** from `localStorage` when present; floating search filters **only** what’s on the page |
+| **Hybrid (chosen)** | Static shortcuts + **inject saved cards + pins** from `localStorage` when present; floating search filters **only** what’s on the page |
 
 Returning users see their labels on the homepage; strangers still see the same story and CTAs.
 
@@ -29,18 +29,21 @@ Returning users see their labels on the homepage; strangers still see the same s
 
 ## Local search — difficulty and phases
 
-### Phase 1 (current)
+### Phase 1 (shipped)
 
 - **Data:** `hc_wallet` entries (label, handle, manifesto line, `profile_id`, `scan_url`).
 - **UI:** Client-side filter (case-insensitive substring) over device-hub rows and wallet list.
-- **Effort:** Low — no network, no new schema beyond wallet.
-- **Landing:** Bottom-left **search FAB** (hollow red outline, matches header **Create**). Tap expands a drawer: full search field, policy hint, **What this searches** disclosure, live match count / empty state. Filters **On this device** (saved cards injected from `hc_wallet` + shortcut rows). Escape or outside tap collapses; clearing query restores all rows.
-- **Wallet (`/wallet/`):** Always-visible centered search bar (same filter logic, no FAB).
+- **Landing:** Bottom-left **search FAB** → drawer with field, hint, disclosure, match count.
+- **Wallet:** Always-visible centered search bar.
 
-### Phase 2 (optional)
+### Phase 2 (shipped)
 
-- **`hc_device_pins`:** User-pasted scan URLs or profile IDs for **public** cards they care about (no private keys). Search includes pins; row opens scan link in new tab.
-- **Effort:** Medium — validation, dedupe, optional display name; still no server.
+- **Storage:** `hc_device_pins` in `localStorage`.
+- **Schema:** `{ id, label, profile_id, qr_id | null, scan_url, pinned_at }` — **no private keys**.
+- **Add pin:** On `/wallet/` — label + scan URL or profile ID. Parsed/validated in `site/js/device-pins.mjs` (base58 profile id, optional `qr_…`, dedupe by profile+qr).
+- **Open:** Row opens `scan_url` in a **new tab** (`rel=noopener`).
+- **Search:** Pins included in landing FAB search and wallet search (haystack: label, ids, url, “public pinned”).
+- **Landing:** Injected **Pinned public cards** group when pins exist; ↗ chevron indicates external scan.
 
 ### Phase 3 (optional)
 
@@ -55,9 +58,9 @@ Returning users see their labels on the homepage; strangers still see the same s
 
 ## Security and data policy
 
-- Wallet and pins stay in **browser storage**; operator never receives private keys.
+- Wallet and pins stay in **browser storage**; operator never receives private keys from pins.
 - Search runs entirely in the client over data the user already stored.
-- Showing saved cards on the landing page does not expose them to other sites (same-origin only).
+- Pins are bookmarks only; vouching still requires **saved cards with keys** loaded in the tab.
 
 ---
 
@@ -65,8 +68,10 @@ Returning users see their labels on the homepage; strangers still see the same s
 
 | Path | Role |
 |------|------|
-| `site/index.html` | Device hub section + floating search |
-| `site/js/landing-device-hub.mjs` | Inject wallet rows, FAB expand/collapse, Phase 1 filter + status |
-| `site/wallet/index.html` | Saved cards UI |
-| `site/js/card-wallet.mjs` | Wallet CRUD + search filter |
-| `site/styles.css` | `.device-hub-*`, `.pilot-showcase-*`, `.wallet-*` |
+| `site/index.html` | Device hub + search FAB |
+| `site/js/landing-device-hub.mjs` | Wallet + pin injection, FAB, search |
+| `site/js/device-pins.mjs` | Parse, validate, dedupe, `hc_device_pins` |
+| `site/js/device-hub-search.mjs` | Shared filter over `[data-hub-searchable]` |
+| `site/wallet/index.html` | Save keys + pin form + lists |
+| `site/js/card-wallet.mjs` | Wallet + pin CRUD + search |
+| `site/styles.css` | Device hub + pin row styles |

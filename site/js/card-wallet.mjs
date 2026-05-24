@@ -1,6 +1,14 @@
 /**
- * Device-local saved cards (keys stay in this browser only — never uploaded).
+ * Device-local saved cards (keys) + Phase 2 pinned public scan links.
  */
+import { applyDeviceHubSearch } from "./device-hub-search.mjs";
+import {
+  createPinEntry,
+  loadPins,
+  pinHaystack,
+  savePins,
+} from "./device-pins.mjs";
+
 const STORAGE_KEY = "hc_wallet";
 
 function loadWallet() {
@@ -48,6 +56,13 @@ function activateEntry(entry) {
   );
 }
 
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
 function searchHaystack(entry) {
   return [
     entry.label,
@@ -55,14 +70,18 @@ function searchHaystack(entry) {
     entry.manifesto_line,
     entry.profile_id,
     entry.scan_url,
+    "saved",
+    "keys",
   ]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
 }
 
+const hubEl = document.getElementById("wallet-device-hub");
 const listEl = document.getElementById("wallet-list");
 const emptyEl = document.getElementById("wallet-empty");
+const cardsGroup = document.getElementById("wallet-cards-group");
 const saveForm = document.getElementById("wallet-save-form");
 const saveGroup = document.getElementById("wallet-save-group");
 const saveStatus = document.getElementById("wallet-save-status");
@@ -71,13 +90,21 @@ const searchInput = document.getElementById("device-hub-search");
 const activeBanner = document.getElementById("wallet-active-banner");
 const activeText = document.getElementById("wallet-active-text");
 
+const pinForm = document.getElementById("pin-save-form");
+const pinLabel = document.getElementById("pin-save-label");
+const pinUrl = document.getElementById("pin-save-url");
+const pinStatus = document.getElementById("pin-save-status");
+const pinList = document.getElementById("pin-list");
+const pinsGroup = document.getElementById("wallet-pins-group");
+const pinsEmpty = document.getElementById("pins-empty");
+
 let searchQuery = "";
 
-function setSaveStatus(msg, isError = false) {
-  if (!saveStatus) return;
-  saveStatus.hidden = !msg;
-  saveStatus.textContent = msg;
-  saveStatus.className = isError ? "form-status error" : "form-status";
+function setStatus(el, msg, isError = false) {
+  if (!el) return;
+  el.hidden = !msg;
+  el.textContent = msg;
+  el.className = isError ? "form-status error" : "form-status";
 }
 
 function entryFromSession(session, label) {
@@ -101,16 +128,59 @@ function entryFromSession(session, label) {
   };
 }
 
-function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
+function renderPinList() {
+  const pins = loadPins();
+  if (!pinList || !pinsGroup) return;
+  pinList.innerHTML = "";
 
-function matchesSearch(entry) {
-  if (!searchQuery) return true;
-  return searchHaystack(entry).includes(searchQuery);
+  if (pins.length === 0) {
+    pinsGroup.hidden = true;
+    if (pinsEmpty) {
+      pinsEmpty.hidden = false;
+      pinsEmpty.textContent = "No pinned scans yet. Add a scan link above.";
+    }
+    return;
+  }
+
+  pinsGroup.hidden = false;
+  if (pinsEmpty) pinsEmpty.hidden = true;
+
+  for (const pin of pins) {
+    const li = document.createElement("li");
+    li.className = "wallet-card-item device-pin-item";
+    li.dataset.hubSearchable = pinHaystack(pin);
+    const sub = pin.qr_id ? "Opens live scan · new tab" : "Card-level scan · new tab";
+    li.innerHTML = `
+      <a
+        class="wallet-card-main wallet-pin-open"
+        href="${escapeHtml(pin.scan_url)}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span class="list-icon list-icon-tone-gold" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+        </span>
+        <span class="list-content">
+          <span class="list-title">${escapeHtml(pin.label)}</span>
+          <span class="list-sub">${escapeHtml(sub)}</span>
+        </span>
+        <span class="list-chevron list-chevron-external" aria-hidden="true">↗</span>
+      </a>
+      <div class="wallet-card-footer">
+        <button type="button" class="wallet-card-footer-btn wallet-pin-remove" data-id="${escapeHtml(pin.id)}">Remove pin</button>
+      </div>`;
+    pinList.appendChild(li);
+  }
+
+  pinList.querySelectorAll(".wallet-pin-remove").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const id = btn.getAttribute("data-id");
+      savePins(loadPins().filter((p) => p.id !== id));
+      renderPinList();
+      applyHubSearch();
+    });
+  });
 }
 
 function renderList() {
@@ -118,30 +188,20 @@ function renderList() {
   if (!listEl) return;
   listEl.innerHTML = "";
 
-  const visible = entries.filter(matchesSearch);
-
   if (entries.length === 0) {
     listEl.hidden = true;
     if (emptyEl) {
       emptyEl.hidden = false;
-      emptyEl.textContent = "";
       emptyEl.innerHTML =
         'No saved cards yet. <a href="/create/">Create one</a> or return after create while keys are still in this tab.';
     }
     return;
   }
 
-  if (emptyEl) {
-    emptyEl.hidden = visible.length > 0;
-    if (visible.length === 0) {
-      emptyEl.hidden = false;
-      emptyEl.textContent = "No saved cards match your search.";
-    }
-  }
+  if (emptyEl) emptyEl.hidden = true;
+  listEl.hidden = false;
 
-  listEl.hidden = visible.length === 0;
-
-  for (const entry of visible) {
+  for (const entry of entries) {
     const li = document.createElement("li");
     li.className = "wallet-card-item";
     li.dataset.hubSearchable = searchHaystack(entry);
@@ -184,8 +244,41 @@ function renderList() {
       saveWallet(loadWallet().filter((e) => e.id !== id));
       renderList();
       updateActiveBanner();
+      applyHubSearch();
     });
   });
+}
+
+function applyHubSearch() {
+  searchQuery = (searchInput?.value ?? "").trim().toLowerCase();
+  applyDeviceHubSearch(hubEl, searchQuery);
+
+  const pins = loadPins();
+  if (pinsEmpty && pins.length > 0) {
+    const anyPin = [...(pinList?.querySelectorAll("[data-hub-searchable]") || [])].some(
+      (el) => !el.hidden
+    );
+    if (searchQuery && !anyPin) {
+      pinsEmpty.hidden = false;
+      pinsEmpty.textContent = "No pinned cards match your search.";
+    } else {
+      pinsEmpty.hidden = true;
+    }
+  }
+
+  const entries = loadWallet();
+  if (emptyEl && entries.length > 0) {
+    const anyCard = [...(listEl?.querySelectorAll("[data-hub-searchable]") || [])].some(
+      (el) => !el.hidden
+    );
+    if (searchQuery && !anyCard) {
+      emptyEl.hidden = false;
+      emptyEl.textContent = "No saved cards match your search.";
+    } else {
+      emptyEl.hidden = true;
+    }
+    listEl.hidden = searchQuery ? !anyCard : false;
+  }
 }
 
 function updateActiveBanner() {
@@ -203,9 +296,27 @@ function updateActiveBanner() {
 }
 
 if (searchInput) {
-  searchInput.addEventListener("input", () => {
-    searchQuery = searchInput.value.trim().toLowerCase();
-    renderList();
+  searchInput.addEventListener("input", applyHubSearch);
+}
+
+if (pinForm) {
+  pinForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const label = pinLabel?.value ?? "";
+    const url = pinUrl?.value ?? "";
+    const created = createPinEntry(label, url, loadPins());
+    if ("error" in created) {
+      setStatus(pinStatus, created.error, true);
+      return;
+    }
+    const pins = loadPins();
+    pins.unshift(created);
+    savePins(pins);
+    if (pinUrl) pinUrl.value = "";
+    if (pinLabel) pinLabel.value = "";
+    setStatus(pinStatus, "Pinned on this device only.");
+    renderPinList();
+    applyHubSearch();
   });
 }
 
@@ -221,15 +332,20 @@ if (saveForm && saveGroup && session?.owner_private_key_b58 && session?.profile_
     const entries = loadWallet();
     const duplicate = entries.some((x) => x.profile_id === session.profile_id);
     if (duplicate) {
-      setSaveStatus("Already saved. Remove the old entry first.", true);
+      setStatus(saveStatus, "Already saved. Remove the old entry first.", true);
       return;
     }
     entries.unshift(entryFromSession(session, label));
     saveWallet(entries);
-    setSaveStatus("Saved on this device only.");
+    setStatus(saveStatus, "Saved on this device only.");
     renderList();
+    applyHubSearch();
   });
+} else if (saveGroup) {
+  saveGroup.hidden = true;
 }
 
 updateActiveBanner();
+renderPinList();
 renderList();
+applyHubSearch();

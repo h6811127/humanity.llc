@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Saved cards · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=53" />
+    <link rel="stylesheet" href="/styles.css?v=56" />
   </head>
   <body class="has-device-hub-search">
     <div class="page">
@@ -22,7 +22,8 @@
           <p class="hero-eyebrow">On this device</p>
           <h1>Saved cards</h1>
           <p class="hero-line">
-            Signing keys for cards you care about. Stored only in this browser — never uploaded.
+            Signing keys and pinned scan links for cards you care about — this device only, never
+            uploaded.
           </p>
         </section>
 
@@ -36,9 +37,51 @@
           <span class="wallet-active-text" id="wallet-active-text"></span>
         </div>
 
-        <section class="device-hub" aria-label="Saved cards">
-          <div class="device-hub-group" id="wallet-save-group" hidden>
-            <p class="device-hub-group-label">Add to this device</p>
+        <section class="device-hub" id="wallet-device-hub" aria-label="Saved cards">
+          <div class="device-hub-group" data-hub-group="pin-add">
+            <p class="device-hub-group-label">Pin a public card</p>
+            <form id="pin-save-form" class="wallet-save-inset" autocomplete="off" novalidate>
+              <label class="wallet-save-field">
+                <span class="form-label">Label</span>
+                <input
+                  class="form-input"
+                  id="pin-save-label"
+                  type="text"
+                  maxlength="48"
+                  placeholder="Studio door · River"
+                />
+              </label>
+              <label class="wallet-save-field">
+                <span class="form-label">Scan link or profile ID</span>
+                <input
+                  class="form-input"
+                  id="pin-save-url"
+                  type="text"
+                  inputmode="url"
+                  autocapitalize="off"
+                  spellcheck="false"
+                  placeholder="https://humanity.llc/c/…?q=qr_…"
+                />
+              </label>
+              <button type="submit" class="btn-secondary wallet-save-btn">Pin on this device</button>
+              <p id="pin-save-status" class="form-status" hidden role="status"></p>
+            </form>
+            <p class="form-hint device-pin-hint">
+              No private keys — bookmark a scan page you return to (vouch, check status). Paste a
+              full scan URL or profile ID.
+            </p>
+          </div>
+
+          <div class="device-hub-group" id="wallet-pins-group" data-hub-group="pins" hidden>
+            <p class="device-hub-group-label">Pinned public cards</p>
+            <p id="pins-empty" class="device-hub-empty" hidden>
+              No pinned scans yet. Add a scan link above.
+            </p>
+            <ul class="list list-compact wallet-pin-list" id="pin-list"></ul>
+          </div>
+
+          <div class="device-hub-group" id="wallet-save-group" hidden data-hub-group="save">
+            <p class="device-hub-group-label">Save signing keys</p>
             <form id="wallet-save-form" class="wallet-save-inset" autocomplete="off" novalidate>
               <label class="wallet-save-field">
                 <span class="form-label">Label</span>
@@ -55,7 +98,7 @@
             </form>
           </div>
 
-          <div class="device-hub-group">
+          <div class="device-hub-group" id="wallet-cards-group" data-hub-group="saved">
             <p class="device-hub-group-label">Saved cards</p>
             <p id="wallet-empty" class="device-hub-empty">
               No saved cards yet.
@@ -113,6 +156,6 @@
       <p class="device-hub-search-hint">This device only — not the public resolver</p>
     </div>
 
-    <script type="module" src="/js/card-wallet.mjs?v=2"></script>
+    <script type="module" src="/js/card-wallet.mjs?v=3"></script>
   </body>
 </html>

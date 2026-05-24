@@ -2539,6 +2539,31 @@ a {
   margin-top: 8px;
 }
 
+.device-pin-hint {
+  margin-top: 10px;
+}
+
+.wallet-pin-list .wallet-card-item {
+  padding: 0;
+}
+
+a.wallet-card-main,
+a.wallet-pin-open {
+  text-decoration: none;
+  color: inherit;
+}
+
+.list-chevron-external {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--grey);
+  flex-shrink: 0;
+}
+
+.device-pin-row a:active {
+  opacity: 0.85;
+}
+
 .hero-tight .landing-hero-actions {
   margin-top: 24px;
   max-width: 22em;
