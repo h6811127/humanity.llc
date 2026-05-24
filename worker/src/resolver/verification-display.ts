@@ -71,6 +71,15 @@ export function humanTrustDisplay(
   const count = vm.vouchCount;
   const latest = vm.latestVouchAt;
 
+  if (vm.cardStatus === "revoked" || vm.kind === "card_revoked") {
+    return {
+      label: "Disabled",
+      subtitle: "Human verification does not apply while the card is disabled.",
+      iconTone: "red",
+      pillActive: false,
+    };
+  }
+
   if (vm.cardStatus === "suspended" || state === "suspended") {
     return {
       label: "Suspended",

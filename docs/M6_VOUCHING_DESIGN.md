@@ -1,6 +1,6 @@
 # M6 — Vouching design
 
-**Status:** Step 1 (V-001) shipped in repo — verify on production; Steps 2–3 shipped; Step 4 abuse hooks shipped; production smoke pending
+**Status:** Step 1 (V-001) shipped in repo — production smoke runner shipped; production execution pending. Steps 2–4 shipped.
 **Canonical refs:** `docs/V1_PRODUCT_TRUST_MODEL.md` § Level 2, `docs/V1_ADVERSARIAL_REVIEW.md` § Perspective 1, `docs/features/Human Verification v1.0.md`, `docs/V1_IMPLEMENTATION_BACKLOG.md` (V-001, V-002)  
 **Product thesis:** Live control proves recent key possession. Vouching proves that other accountable humans attested this card belongs to a distinct person — under published rules, not under legal-ID assumptions.
 
@@ -263,6 +263,7 @@ Revoked/suspended card states must **override** positive verification on scan (a
 | Private note rejection | `handlePostVouch` |
 | Internal abuse flags | `worker/src/db/vouch-audit.ts`, `worker/tests/vouch-audit.test.ts` |
 | Steward review queue spec | `docs/M6_STEWARD_REVIEW_QUEUE.md` |
+| Production smoke runner | `worker/scripts/m6-vouch-smoke.ts`, `docs/M6_PRODUCTION_SMOKE.md` |
 
 ### Not yet built (recommended order)
 
@@ -272,7 +273,7 @@ Revoked/suspended card states must **override** positive verification on scan (a
 - [x] Copy pass: **Vouched Human** vs registered; show progress below threshold.
 - [x] Tests: revoked/suspended override; stale cache banner unchanged.
 - [x] Status JSON exposes `scan.human_trust` (same copy as scan HTML) for `/created/` and clients.
-- [ ] Production smoke: scan + status JSON for 0 / 2 / 3 vouches; revoked card overrides label.
+- [ ] Production smoke: scan + status JSON for 0 / 2 / 3 vouches; revoked card overrides label. Runner: `npm run worker:m6-vouch-smoke` (`docs/M6_PRODUCTION_SMOKE.md`).
 
 **Step 2 — Vouch issuance UX (V-002)**
 

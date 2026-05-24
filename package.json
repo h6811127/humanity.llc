@@ -13,6 +13,7 @@
     "worker:d1:create": "wrangler d1 create humanity-resolver --config worker/wrangler.toml",
     "worker:migrate:local": "wrangler d1 migrations apply humanity-resolver --local --config worker/wrangler.toml",
     "worker:migrate:remote": "wrangler d1 migrations apply humanity-resolver --remote --config worker/wrangler.toml",
+    "worker:m6-vouch-smoke": "tsx worker/scripts/m6-vouch-smoke.ts",
     "worker:fixtures": "tsx worker/scripts/generate-fixtures.ts",
     "worker:test": "vitest run",
     "worker:test:watch": "vitest",

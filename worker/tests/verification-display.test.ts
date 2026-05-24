@@ -175,6 +175,59 @@ describe("humanTrustDisplay (V-001)", () => {
     expect(d.pillActive).toBe(false);
   });
 
+  it("overrides positive badges when card is disabled", () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: {
+          profile_id: PROFILE,
+          public_key: "pk",
+          handle: "river_example",
+          handle_normalized: "river_example",
+          manifesto_line: "Open studio",
+          status: "revoked",
+          card_document_json: "{}",
+          created_at: "2026-05-16T17:00:00Z",
+          updated_at: "2026-05-16T17:00:00Z",
+        },
+        qr: {
+          qr_id: QR,
+          profile_id: PROFILE,
+          epoch: 1,
+          scope: "card",
+          print_artifact_id: null,
+          resolver_hint: "https://humanity.llc",
+          status: "active",
+          payload: `https://humanity.llc/c/${PROFILE}?q=${QR}`,
+          issued_at: "2026-05-16T17:00:00Z",
+          expires_at: "2027-05-16T17:00:00Z",
+          credential_document_json: "{}",
+          created_at: "2026-05-16T17:00:00Z",
+          updated_at: "2026-05-16T17:00:00Z",
+        },
+        verification: {
+          profile_id: PROFILE,
+          state: "verified_human",
+          level: 2,
+          label: "Vouched Human",
+          method: "vouch",
+          vouch_count: 4,
+          latest_accepted_vouch_at: "2026-05-20T12:00:00.000Z",
+          credential_ids_json: "[]",
+          summary_document_json: null,
+          updated_at: "2026-05-16T17:00:00Z",
+        },
+      },
+      "https://humanity.llc"
+    );
+    const d = humanTrustDisplay(vm);
+    expect(d.label).toBe("Disabled");
+    expect(d.subtitle).toContain("card is disabled");
+    expect(d.iconTone).toBe("red");
+    expect(d.pillActive).toBe(false);
+  });
+
   it("humanTrustListIcon uses slate people for Registered", () => {
     const d = humanTrustDisplay(activeVm());
     expect(humanTrustListIcon(d)).toEqual({ id: "people", tone: "slate" });

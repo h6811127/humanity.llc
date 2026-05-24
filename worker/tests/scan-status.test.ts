@@ -126,15 +126,29 @@ describe("scan status JSON (M3.4)", () => {
     expect(httpStatusForScanKind(vm.kind)).toBe(404);
   });
 
-  it("card revoked returns 410", () => {
+  it("card revoked returns 410 and overrides positive human trust", () => {
     const vm = buildScanViewModel(
       PROFILE,
       QR,
-      { card: card({ status: "revoked" }), qr: qr(), verification: summary() },
+      {
+        card: card({ status: "revoked" }),
+        qr: qr(),
+        verification: {
+          ...summary(),
+          state: "verified_human",
+          label: "Vouched Human",
+          method: "vouch",
+          vouch_count: 3,
+        },
+      },
       "https://humanity.llc"
     );
     expect(vm.kind).toBe("card_revoked");
     expect(httpStatusForScanKind(vm.kind)).toBe(410);
+    const body = scanStatusBodyFromViewModel(vm);
+    expect(body.scan.verification.label).toBe("Vouched Human");
+    expect(body.scan.human_trust.label).toBe("Disabled");
+    expect(body.scan.human_trust.pill_active).toBe(false);
   });
 
   it("qr revoked returns 200 with qr_revoked kind (M4.2)", () => {
