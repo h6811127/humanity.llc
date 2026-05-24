@@ -187,6 +187,9 @@ describe("live control proof alpha", () => {
     expect(json.status).toBe("pending");
     expect(json.challenge_id).toMatch(/^lc_/);
     expect(json.owner_url).toContain("live_challenge=");
+    expect(json.owner_url).toContain("profile_id=");
+    expect(json.owner_url).toContain("qr_id=");
+    expect(json.owner_url).toContain("return_url=");
   });
 
   it("does not create a challenge for a revoked QR", async () => {

@@ -41,12 +41,16 @@ export function corsHeaders(request: Request): HeadersInit {
     origin.includes("localhost") ||
     origin.includes("127.0.0.1");
   if (!allowed) return {};
-  return {
+  const headers: Record<string, string> = {
     "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Max-Age": "86400",
   };
+  if (request.headers.get("Access-Control-Request-Private-Network") === "true") {
+    headers["Access-Control-Allow-Private-Network"] = "true";
+  }
+  return headers;
 }
 
 export function withCors(request: Request, response: Response): Response {

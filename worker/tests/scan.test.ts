@@ -5,9 +5,11 @@ import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db
 import { renderScanPage } from "../src/resolver/scan-html";
 import { BEARER_WARNING } from "../src/resolver/trust-copy";
 import { buildScanViewModel } from "../src/resolver/scan-state";
+import { handleGetScan } from "../src/resolver/scan";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
-const QR = "qr_test_card_001";
+const QR = "qr_7Xk9mP2nQ4rT6vW8";
+const LIVE_CHALLENGE = "lc_7Xk9mP2nQ4rT6vW8";
 
 function card(overrides: Partial<CardRow> = {}): CardRow {
   return {
@@ -56,6 +58,24 @@ function summary(): VerificationSummaryRow {
     summary_document_json: null,
     updated_at: "2026-05-16T17:00:00Z",
   };
+}
+
+function scanDbFor(challenge: Record<string, unknown> | null = null): D1Database {
+  return {
+    prepare: (sql: string) => ({
+      bind: (...params: unknown[]) => ({
+        first: async () => {
+          if (sql.includes("FROM cards")) return card();
+          if (sql.includes("FROM qr_credentials")) return qr();
+          if (sql.includes("FROM verification_summaries")) return summary();
+          if (sql.includes("FROM live_control_challenges")) {
+            return params[0] === LIVE_CHALLENGE ? challenge : null;
+          }
+          return null;
+        },
+      }),
+    }),
+  } as unknown as D1Database;
 }
 
 describe("buildScanViewModel", () => {
@@ -177,9 +197,41 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("Card status");
     expect(html).toContain("Human trust");
     expect(html).toContain("Live control");
+    expect(html).toContain('id="live-control-request"');
+    expect(html).toContain("dock-btn-primary");
     expect(html).not.toContain("Limitations");
     expect(html).toContain("scan-limits-settings");
     expect(html).toContain('class="list"');
+  });
+
+  it("renders recent live proof when returning with a proven challenge", async () => {
+    const res = await handleGetScan(
+      new Request(
+        `https://humanity.llc/c/${PROFILE}?q=${QR}&live_challenge=${LIVE_CHALLENGE}`
+      ),
+      scanDbFor({
+        challenge_id: LIVE_CHALLENGE,
+        profile_id: PROFILE,
+        qr_id: QR,
+        nonce: "nonce",
+        verifier_session_id: "verifier",
+        status: "proven",
+        issued_at: new Date().toISOString(),
+        expires_at: new Date(Date.now() + 60_000).toISOString(),
+        proven_at: new Date().toISOString(),
+        signer_public_key: "pk",
+        response_document_json: "{}",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }),
+      PROFILE
+    );
+    const html = await res.text();
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Cache-Control")).toBe("no-store");
+    expect(html).toContain("Control proven recently");
+    expect(html).not.toContain('id="live-control-request"');
   });
 
   it("uses print_artifact scope copy when applicable", async () => {

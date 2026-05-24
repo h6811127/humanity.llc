@@ -447,7 +447,7 @@ function liveControlGroupRows(vm: ScanViewModel): string {
   <span class="list-content">
     <span class="list-title">Live control</span>
     <span class="list-sub">Ask the owner to show they control this object right now.</span>
-    <button type="button" class="dock-btn dock-btn-secondary" id="live-control-request">
+    <button type="button" class="dock-btn dock-btn-primary" id="live-control-request">
       Ask for live proof
     </button>
     <span class="list-sub" id="live-control-status" aria-live="polite">
@@ -483,12 +483,39 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
   var ownerLink = document.getElementById("live-control-owner-link");
   if (!btn || !status) return;
   var pollTimer = null;
+  var countdownTimer = null;
   function setStatus(text) {
     status.textContent = text;
   }
   function stopPolling() {
     if (pollTimer) window.clearInterval(pollTimer);
     pollTimer = null;
+  }
+  function stopCountdown() {
+    if (countdownTimer) window.clearInterval(countdownTimer);
+    countdownTimer = null;
+  }
+  function formatRemaining(ms) {
+    var total = Math.max(0, Math.ceil(ms / 1000));
+    var minutes = Math.floor(total / 60);
+    var seconds = String(total % 60).padStart(2, "0");
+    return minutes + ":" + seconds;
+  }
+  function startCountdown(expiresAt, prefix) {
+    stopCountdown();
+    function tick() {
+      var remaining = Date.parse(expiresAt) - Date.now();
+      if (!Number.isFinite(remaining) || remaining <= 0) {
+        stopCountdown();
+        setStatus("Control was not proven. The request expired.");
+        btn.disabled = false;
+        btn.textContent = "Ask again";
+        return;
+      }
+      setStatus(prefix + " Expires in " + formatRemaining(remaining) + ".");
+    }
+    tick();
+    countdownTimer = window.setInterval(tick, 1000);
   }
   function poll(url) {
     stopPolling();
@@ -498,11 +525,13 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
         .then(function (body) {
           if (body.status === "proven") {
             stopPolling();
+            stopCountdown();
             btn.disabled = false;
             btn.textContent = "Ask again";
             setStatus("Control proven moments ago. This does not prove legal identity.");
           } else if (body.status === "expired") {
             stopPolling();
+            stopCountdown();
             btn.disabled = false;
             btn.textContent = "Ask again";
             setStatus("Control was not proven. The request expired.");
@@ -531,7 +560,11 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
           btn.textContent = "Ask again";
           setStatus("Control was not proven. The request expired.");
         } else {
-          setStatus("Waiting for live proof…");
+          if (body.expires_at) {
+            startCountdown(body.expires_at, "Waiting for live proof.");
+          } else {
+            setStatus("Waiting for live proof…");
+          }
           poll(statusUrlForChallenge(id));
         }
       })
@@ -560,10 +593,14 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
         }
         var ownerHint = document.getElementById("live-control-owner-hint");
         if (ownerHint) ownerHint.hidden = false;
-        setStatus("Ask the owner to open the proof link on the device with the key.");
+        startCountdown(
+          result.body.expires_at,
+          "Ask the owner to open the proof link on the device with the key."
+        );
         poll(result.body.status_url);
       })
       .catch(function (err) {
+        stopCountdown();
         btn.disabled = false;
         btn.textContent = "Ask for live proof";
         setStatus(err.message || "Could not create live proof request.");
