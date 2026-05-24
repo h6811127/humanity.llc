@@ -124,10 +124,78 @@ a {
   color: var(--black);
 }
 
+.hero-tagline {
+  margin: 12px 0 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: var(--black);
+  max-width: 22em;
+}
+
 .hero-line-sub {
   font-size: 15px;
   color: var(--grey);
   margin-top: 10px;
+}
+
+.landing-framing {
+  padding: 18px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(219, 27, 67, 0.32);
+  background: var(--white);
+  box-shadow:
+    0 10px 32px rgba(219, 27, 67, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.landing-framing .section-kicker {
+  margin-bottom: 8px;
+}
+
+.landing-framing-title {
+  margin: 0 0 10px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--black);
+}
+
+.landing-framing-lead {
+  margin: 0 0 14px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--grey);
+}
+
+.landing-framing-lead strong {
+  font-weight: 600;
+  color: var(--black);
+}
+
+.landing-framing-list {
+  margin: 0 0 16px;
+  padding-left: 18px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--black);
+}
+
+.landing-framing-list li {
+  margin-bottom: 6px;
+}
+
+.landing-framing-list li:last-child {
+  margin-bottom: 0;
+}
+
+.landing-framing-cta {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  text-align: center;
 }
 
 .section-kicker {
