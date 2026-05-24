@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Markets + menus + surplus scan · humanity.llc</title>
+    <meta
+      name="description"
+      content="Demo scan page showing a co-op pass that links to today's stalls, live menus, and safe-to-take surplus."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=47" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Demo scan · markets + menus + surplus</p>
+          <h1>Co-op market pass</h1>
+          <p class="hero-line">
+            A member or visitor scans once for today&rsquo;s stalls, live menus, and prepared-food
+            surplus. Vendors update <strong>one live state object</strong> instead of reprinting.
+          </p>
+          <p class="hero-line hero-line-sub">Demo only — not a marketplace or ordering app.</p>
+        </section>
+
+        <section class="scan-demo-card scan-demo-card-live" aria-labelledby="scan-title">
+          <div class="scan-demo-head">
+            <div>
+              <p class="scan-demo-kicker">Live market scan</p>
+              <h2 class="scan-demo-title" id="scan-title">Saturday Co-op Pass</h2>
+            </div>
+            <span class="pass-badge badge-live">Open</span>
+          </div>
+          <div class="scan-demo-hero">
+            <div class="scan-demo-qr" aria-hidden="true">
+              <img src="/assets/red_qr_transparent_bg.png" width="74" height="74" alt="" />
+            </div>
+            <div>
+              <p class="scan-demo-status">18 active stalls, 4 live menus, 2 surplus tags</p>
+              <p class="scan-demo-substatus">Market organizer updated the pass at 1:06 PM</p>
+            </div>
+          </div>
+          <ul class="scan-demo-facts" aria-label="Current market scan">
+            <li><span>Member pass</span><strong>Active today</strong></li>
+            <li><span>Live menu</span><strong>3 items sold out</strong></li>
+            <li><span>Surplus</span><strong>Safe until 5 PM</strong></li>
+          </ul>
+        </section>
+
+        <section class="idea-section" aria-labelledby="today-title">
+          <h2 class="group-label" id="today-title">Today&rsquo;s state</h2>
+          <div class="scenario-grid" aria-label="Market menu and surplus states">
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Stall list</p>
+              <ul class="scenario-card-list">
+                <li>Honey, greens, bakery, repair table active</li>
+                <li>Booth B12 reassigned to River Farm</li>
+                <li>SNAP booth open until 3 PM</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">Live menu</p>
+              <ul class="scenario-card-list">
+                <li>Tamales sold out</li>
+                <li>Soup moved to surplus after service</li>
+                <li>Allergen notes still visible on scan</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">Surplus tag</p>
+              <ul class="scenario-card-list">
+                <li>Prepared food safe to take until 5 PM</li>
+                <li>Signed by vendor kitchen</li>
+                <li>Expires automatically after window closes</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="streams-title">
+          <h2 class="group-label" id="streams-title">Who signs what</h2>
+          <div class="authority-stack">
+            <article class="authority-stream authority-stream-live">
+              <p class="authority-label">Market stream</p>
+              <h3>Who is active today</h3>
+              <p>Stall approvals, booth moves, and member-pass status stay with the organizer.</p>
+              <span>Signed by: co-op market lead</span>
+            </article>
+            <article class="authority-stream">
+              <p class="authority-label">Menu stream</p>
+              <h3>What the vendor serves now</h3>
+              <p>Sold-out items, prices, and service windows update without a new placard.</p>
+              <span>Signed by: vendor</span>
+            </article>
+            <article class="authority-stream authority-stream-warn">
+              <p class="authority-label">Freshness stream</p>
+              <h3>Whether surplus is safe to take</h3>
+              <p>The kitchen signs expiry and allergens; the pass only points to that state.</p>
+              <span>Signed by: kitchen</span>
+            </article>
+          </div>
+        </section>
+
+        <section class="group">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/combining-ideas/">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Combining ideas</span>
+                  <span class="list-sub">Back to demo scan list</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

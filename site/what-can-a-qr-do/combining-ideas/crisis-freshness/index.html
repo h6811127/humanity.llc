@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Crisis + freshness scan · humanity.llc</title>
+    <meta
+      name="description"
+      content="Demo scan page showing an aid card that lists nearby food resources while kitchens sign freshness and recall state."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=47" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Demo scan · crisis cards + freshness</p>
+          <h1>Food nearby tonight</h1>
+          <p class="hero-line">
+            A wallet aid card can show nearby pantry and fridge options while each food batch keeps
+            its own <strong>made, expires, allergen, and recall state</strong>.
+          </p>
+          <p class="hero-line hero-line-sub">Demo only — no account, no scan tracking.</p>
+        </section>
+
+        <section class="scan-demo-card scan-demo-card-live" aria-labelledby="scan-title">
+          <div class="scan-demo-head">
+            <div>
+              <p class="scan-demo-kicker">Live resource scan</p>
+              <h2 class="scan-demo-title" id="scan-title">Near South Pantry Card</h2>
+            </div>
+            <span class="pass-badge badge-live">Current</span>
+          </div>
+          <div class="scan-demo-hero">
+            <div class="scan-demo-qr" aria-hidden="true">
+              <img src="/assets/red_qr_transparent_bg.png" width="74" height="74" alt="" />
+            </div>
+            <div>
+              <p class="scan-demo-status">3 open food options within walking distance</p>
+              <p class="scan-demo-substatus">Resource list updated 18 min ago</p>
+            </div>
+          </div>
+          <ul class="scan-demo-facts" aria-label="Available resources">
+            <li><span>Pantry</span><strong>Open until 7 PM</strong></li>
+            <li><span>Community fridge</span><strong>2 fresh batches</strong></li>
+            <li><span>Recall state</span><strong>No active recall</strong></li>
+          </ul>
+        </section>
+
+        <section class="idea-section" aria-labelledby="food-title">
+          <h2 class="group-label" id="food-title">Freshness cards</h2>
+          <div class="scenario-grid" aria-label="Nearby food batch states">
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Soup batch</p>
+              <ul class="scenario-card-list">
+                <li>Made today 10:20 AM</li>
+                <li>Safe to take until 6 PM</li>
+                <li>Contains: wheat, celery</li>
+                <li>Signed by St. Mark kitchen</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">Produce box</p>
+              <ul class="scenario-card-list">
+                <li>Placed today 12:45 PM</li>
+                <li>No prepared-food allergens</li>
+                <li>Signed by pantry volunteer lead</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">If recalled</p>
+              <ul class="scenario-card-list">
+                <li>Batch flips to do not consume</li>
+                <li>Resource card removes it from the safe list</li>
+                <li>Old printed labels show the new warning</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="streams-title">
+          <h2 class="group-label" id="streams-title">Who signs what</h2>
+          <div class="authority-stack">
+            <article class="authority-stream authority-stream-live">
+              <p class="authority-label">Aid resource stream</p>
+              <h3>Where help is available</h3>
+              <p>Open hours, address notes, and language access for nearby food options.</p>
+              <span>Signed by: mutual-aid coalition</span>
+            </article>
+            <article class="authority-stream">
+              <p class="authority-label">Freshness stream</p>
+              <h3>Whether this food is safe now</h3>
+              <p>Made time, expiry, allergens, and recall state stay attached to each batch.</p>
+              <span>Signed by: kitchen or pantry lead</span>
+            </article>
+            <article class="authority-stream authority-stream-warn">
+              <p class="authority-label">Privacy boundary</p>
+              <h3>Scanner remains anonymous</h3>
+              <p>The card answers the question without building a dossier of who needed food.</p>
+              <span>No account required</span>
+            </article>
+          </div>
+        </section>
+
+        <section class="group">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/combining-ideas/">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Combining ideas</span>
+                  <span class="list-sub">Back to demo scan list</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
