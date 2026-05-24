@@ -141,7 +141,7 @@ Do these **in order**. Each step has an exit test before moving on.
 ### 4.4 — Block intents on revoked QR (stub)
 
 **Exit:**
-- [ ] Revoked QR returns 403 on print intent endpoint (stub OK pre-commerce)
+- [x] Revoked QR returns 403 on print intent endpoint (stub OK pre-commerce) — `POST /v1/store/artifact-intents`
 
 ---
 
