@@ -49,6 +49,7 @@ Do not lead with cryptography, sessions, signatures, or protocol language. Those
 **Exit:**
 
 - [x] Active scan can create a short-lived challenge.
+- [x] Challenge expires at the standards upper bound (120 seconds) for alpha usability.
 - [x] Revoked/expired/replaced QR or inactive card cannot create a challenge.
 - [x] Owner/recovery key can sign the challenge from `/created/`.
 - [x] No-key state tells the owner to use the original created tab or unlock backup/recovery.

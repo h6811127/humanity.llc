@@ -26,7 +26,7 @@ import {
   randomBase58,
 } from "../id";
 
-const CHALLENGE_TTL_MS = 90_000;
+const CHALLENGE_TTL_MS = 120_000;
 const PROOF_DISPLAY_TTL_MS = 5 * 60_000;
 const CHALLENGE_ID_REGEX =
   /^lc_[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{12,40}$/;
