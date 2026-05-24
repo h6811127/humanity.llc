@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Markets + menus + surplus demo scan · humanity.llc</title>
+    <meta
+      name="description"
+      content="A demo scan page where a co-op pass links to today's stalls, live menus, and safe-to-take surplus without reprinting."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=47" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen scan-screen combo-scan-screen">
+        <p class="section-kicker">Demo scan · markets + menus + surplus</p>
+
+        <section class="pass combo-demo-pass" aria-labelledby="scan-title">
+          <div class="pass-face pass-front combo-demo-face">
+            <div class="pass-head">
+              <div class="pass-brand">
+                <span class="pass-dot" aria-hidden="true"></span>
+                <span>humanity.llc</span>
+              </div>
+              <span class="pass-badge badge-live">Open</span>
+            </div>
+            <div class="pass-body">
+              <div class="pass-main">
+                <p class="pass-type">Co-op market pass</p>
+                <h1 class="pass-name" id="scan-title">Saturday Market</h1>
+                <p class="pass-manifesto">
+                  Today&rsquo;s stalls, live menus, and surplus tags from signed vendor state.
+                </p>
+                <ul class="pass-trust" aria-label="Status at a glance">
+                  <li class="trust-on">Market active</li>
+                  <li class="trust-on">Menus live</li>
+                  <li class="trust-on">Surplus tagged</li>
+                </ul>
+              </div>
+              <div class="pass-qr">
+                <img src="/assets/red_qr_transparent_bg.png" width="88" height="88" alt="" />
+              </div>
+            </div>
+            <p class="pass-foot">
+              Demo only. Vendors update state once; printed passes and tags keep resolving.
+            </p>
+          </div>
+        </section>
+
+        <section class="scan-trust-groups" aria-label="Demo scan details">
+          <div>
+            <h2 class="group-label">Today at the market</h2>
+            <ul class="list list-compact">
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Active stalls</span>
+                  <span class="list-sub">18 vendors checked in · north lot moved indoors after rain</span>
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Live menus</span>
+                  <span class="list-sub">River Soup sold out of chili · dumplings safe until 8 PM</span>
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 12v8H4v-8"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Surplus shelf</span>
+                  <span class="list-sub">12 safe-to-take portions · tagged by kitchen · no recall active</span>
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 class="group-label">Signed streams</h2>
+            <div class="scenario-grid">
+              <article class="scenario-card scenario-card-live">
+                <p class="scenario-card-label">Market co-op</p>
+                <ul class="scenario-card-list">
+                  <li>Vendor roster</li>
+                  <li>Today&rsquo;s location</li>
+                  <li>Market open / closed</li>
+                </ul>
+              </article>
+              <article class="scenario-card">
+                <p class="scenario-card-label">Vendor</p>
+                <ul class="scenario-card-list">
+                  <li>Menu state</li>
+                  <li>Sold-out items</li>
+                  <li>Prepared-food surplus</li>
+                </ul>
+              </article>
+              <article class="scenario-card scenario-card-warn">
+                <p class="scenario-card-label">Boundary</p>
+                <ul class="scenario-card-list">
+                  <li>The pass lists vendors</li>
+                  <li>The vendor signs food state</li>
+                  <li>Expired surplus disappears</li>
+                </ul>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="idea-callout" aria-labelledby="state-title">
+          <div class="idea-callout-header">
+            <span class="list-icon list-icon-tone-green" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            </span>
+            <div>
+              <h2 class="idea-callout-title" id="state-title">Update one state object</h2>
+              <p class="idea-callout-sub">
+                The vendor changes the live menu once instead of reprinting passes, menus, and tags.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="group">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/combining-ideas/">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Combining ideas</span>
+                  <span class="list-sub">Back to all demo scans</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

@@ -2793,6 +2793,55 @@ button.btn-danger {
   padding-bottom: 0;
 }
 
+.combo-card-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.combo-card-link:active {
+  transform: translateY(1px);
+}
+
+.combo-card-action {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--red);
+}
+
+.combo-card-action::after {
+  content: "›";
+  margin-left: 6px;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.combo-scan-screen {
+  gap: 16px;
+}
+
+.scan-trust-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.combo-demo-pass {
+  margin: 0;
+}
+
+.combo-demo-face {
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
 .idea-callout {
   border-radius: var(--radius-lg);
   overflow: hidden;

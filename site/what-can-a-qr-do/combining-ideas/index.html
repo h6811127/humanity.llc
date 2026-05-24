@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Combining ideas · humanity.llc</title>
+    <meta
+      name="description"
+      content="Demo scan pages for live QR cards that combine games, maintenance, food freshness, crisis resources, markets, menus, and surplus while keeping authority clear."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=47" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Design space · combinations</p>
+          <h1>Combining ideas</h1>
+          <p class="hero-line">
+            The strong patterns stack: one QR can stay a simple scan while the card behind it pulls
+            from several <strong>signed, revocable streams</strong>.
+          </p>
+          <p class="hero-line hero-line-sub">
+            These are demo scan pages, not shipped product behavior. The point is the shape:
+            multiple streams, clear authority, no scan tracking by default.
+          </p>
+        </section>
+
+        <section class="idea-callout" aria-labelledby="stack-title">
+          <div class="idea-callout-header">
+            <span class="list-icon list-icon-tone-red" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg>
+            </span>
+            <div>
+              <h2 class="idea-callout-title" id="stack-title">One scan, several authorities</h2>
+              <p class="idea-callout-sub">
+                A card can show useful combined state without pretending one signer controls it all.
+              </p>
+            </div>
+          </div>
+          <div class="idea-callout-body">
+            <p>
+              The best combos keep the scanner experience simple and the trust model honest. The
+              game can reward discovery, but only the maintainer signs safety. The crisis card can
+              show food, but the kitchen signs freshness.
+            </p>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="demo-title">
+          <h2 class="group-label" id="demo-title">Demo scan pages</h2>
+          <div class="scenario-grid" aria-label="Combining ideas demo scans">
+            <a
+              class="scenario-card scenario-card-live combo-card-link"
+              href="/what-can-a-qr-do/combining-ideas/games-maintenance/"
+            >
+              <p class="scenario-card-label">Games + maintenance</p>
+              <ul class="scenario-card-list">
+                <li>Players find AED, filter, and trail-marker nodes</li>
+                <li>Maintainer-signed status stays separate from game points</li>
+                <li>Fix verified &rarr; local map unlocks the next route</li>
+              </ul>
+              <span class="combo-card-action">Open demo scan</span>
+            </a>
+
+            <a
+              class="scenario-card combo-card-link"
+              href="/what-can-a-qr-do/combining-ideas/crisis-freshness/"
+            >
+              <p class="scenario-card-label">Crisis cards + freshness</p>
+              <ul class="scenario-card-list">
+                <li>Wallet aid card lists nearby pantry and fridge options</li>
+                <li>Each food batch keeps made, expires, allergen, recall state</li>
+                <li>Resource page updates without tracking who scanned</li>
+              </ul>
+              <span class="combo-card-action">Open demo scan</span>
+            </a>
+
+            <a
+              class="scenario-card combo-card-link"
+              href="/what-can-a-qr-do/combining-ideas/markets-menus-surplus/"
+            >
+              <p class="scenario-card-label">Markets + menus + surplus</p>
+              <ul class="scenario-card-list">
+                <li>Co-op pass links to today&rsquo;s stalls and live menus</li>
+                <li>Prepared-food tags mark safe-to-take surplus</li>
+                <li>Vendor updates one state object instead of reprinting</li>
+              </ul>
+              <span class="combo-card-action">Open demo scan</span>
+            </a>
+          </div>
+        </section>
+
+        <section class="qr-compare idea-compare" aria-labelledby="authority-title">
+          <h2 class="group-label" id="authority-title">Authority boundary</h2>
+          <div class="qr-compare-grid">
+            <article class="qr-compare-col qr-compare-col-live">
+              <h3 class="qr-compare-heading">Good combo</h3>
+              <ul class="qr-compare-list">
+                <li>Separate signed streams</li>
+                <li>Plain labels for who signed what</li>
+                <li>Revocation per card, object, batch, or vendor state</li>
+              </ul>
+            </article>
+            <article class="qr-compare-col qr-compare-col-muted">
+              <h3 class="qr-compare-heading">Bad combo</h3>
+              <ul class="qr-compare-list">
+                <li>One page implies total authority</li>
+                <li>Game points blur safety status</li>
+                <li>Crisis resources become scan analytics</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="group">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do.html">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">All QR ideas</span>
+                  <span class="list-sub">Back to the main list</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

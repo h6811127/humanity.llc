@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Crisis cards + freshness demo scan · humanity.llc</title>
+    <meta
+      name="description"
+      content="A demo scan page where a wallet aid card shows nearby pantry and fridge options while kitchens sign food freshness."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=47" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen scan-screen combo-scan-screen">
+        <p class="section-kicker">Demo scan · crisis cards + freshness</p>
+
+        <section class="pass combo-demo-pass" aria-labelledby="scan-title">
+          <div class="pass-face pass-front combo-demo-face">
+            <div class="pass-head">
+              <div class="pass-brand">
+                <span class="pass-dot" aria-hidden="true"></span>
+                <span>humanity.llc</span>
+              </div>
+              <span class="pass-badge badge-live">Updated</span>
+            </div>
+            <div class="pass-body">
+              <div class="pass-main">
+                <p class="pass-type">Wallet aid card</p>
+                <h1 class="pass-name" id="scan-title">Food help nearby</h1>
+                <p class="pass-manifesto">
+                  Current pantry, community fridge, and prepared-food options.
+                </p>
+                <ul class="pass-trust" aria-label="Status at a glance">
+                  <li class="trust-on">Coalition signed</li>
+                  <li class="trust-on">Freshness signed</li>
+                  <li class="trust-on">No account needed</li>
+                </ul>
+              </div>
+              <div class="pass-qr">
+                <img src="/assets/red_qr_transparent_bg.png" width="88" height="88" alt="" />
+              </div>
+            </div>
+            <p class="pass-foot">
+              Demo only. Scan returns resources without requiring identity or scan analytics.
+            </p>
+          </div>
+        </section>
+
+        <section class="scan-trust-groups" aria-label="Demo scan details">
+          <div>
+            <h2 class="group-label">Options now</h2>
+            <ul class="list list-compact">
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Westside Pantry</span>
+                  <span class="list-sub">Open until 6 PM · ID not required · updated by Aid Coalition</span>
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16v16H4z"/><path d="M9 4v16"/><path d="M15 4v16"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Cedar Community Fridge</span>
+                  <span class="list-sub">Stocked 18 min ago · vegetarian meals available · 0.4 mi</span>
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Kitchen batch K-204</span>
+                  <span class="list-sub">Rice bowls · made 11:10 AM · take by 7 PM · contains sesame</span>
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 class="group-label">Signed streams</h2>
+            <div class="scenario-grid">
+              <article class="scenario-card scenario-card-live">
+                <p class="scenario-card-label">Aid coalition</p>
+                <ul class="scenario-card-list">
+                  <li>Resource list</li>
+                  <li>Hours and access notes</li>
+                  <li>Language copy</li>
+                </ul>
+              </article>
+              <article class="scenario-card">
+                <p class="scenario-card-label">Kitchen</p>
+                <ul class="scenario-card-list">
+                  <li>Made time</li>
+                  <li>Expires time</li>
+                  <li>Allergen and recall state</li>
+                </ul>
+              </article>
+              <article class="scenario-card scenario-card-warn">
+                <p class="scenario-card-label">Boundary</p>
+                <ul class="scenario-card-list">
+                  <li>The card points to food</li>
+                  <li>The kitchen signs freshness</li>
+                  <li>Recall hides unsafe batches</li>
+                </ul>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="idea-callout" aria-labelledby="privacy-title">
+          <div class="idea-callout-header">
+            <span class="list-icon list-icon-tone-red" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            <div>
+              <h2 class="idea-callout-title" id="privacy-title">No tracking as a feature</h2>
+              <p class="idea-callout-sub">
+                The resource page can update without building a dossier of who needed food.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="group">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/combining-ideas/">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Combining ideas</span>
+                  <span class="list-sub">Back to all demo scans</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
