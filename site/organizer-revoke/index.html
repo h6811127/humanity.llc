@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Organizer revoke · humanity.llc</title>
+    <meta
+      name="description"
+      content="Revoke a Humanity QR or disable a card using an organizer key registered at create time."
+    />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=47" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Organizer pilot</p>
+          <h1>Organizer revoke</h1>
+          <p class="hero-line">
+            For coalitions, events, or vendors: revoke a printed QR or disable a card when you hold
+            the <strong>organizer private key</strong> registered on that card at create time.
+          </p>
+        </section>
+
+        <form id="organizer-revoke-form" class="form-card" method="dialog" novalidate>
+          <label class="form-label" for="org-profile-id">Profile ID</label>
+          <input
+            class="form-input"
+            id="org-profile-id"
+            required
+            placeholder="From the card owner or scan URL"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+          />
+
+          <label class="form-label" for="org-qr-id">QR ID (for single-QR revoke)</label>
+          <input
+            class="form-input"
+            id="org-qr-id"
+            placeholder="qr_… — leave empty only when disabling whole card"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+          />
+          <p class="form-hint">
+            Disable card ignores QR ID. Revoke this QR requires the exact <code>qr_id</code> on the
+            printed link.
+          </p>
+
+          <label class="form-label" for="org-private-key">Organizer private key</label>
+          <textarea
+            class="form-input form-textarea"
+            id="org-private-key"
+            required
+            rows="3"
+            placeholder="Base58 private key — session only, never uploaded"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+          ></textarea>
+          <p class="form-hint">
+            Stored only in this tab while you submit. Same signing flow as owner revoke, with reason
+            <code>organizer_revoked</code>.
+          </p>
+
+          <p class="form-hint revoke-id-warning">
+            Printed QRs still contain profile and QR IDs in the URL. Revoking changes live network
+            status, not the physical object.
+          </p>
+
+          <label class="revoke-confirm">
+            <input type="checkbox" id="org-confirm-qr" />
+            <span>I understand — revoke this scan QR only</span>
+          </label>
+          <button type="button" class="btn-danger" id="org-revoke-qr-btn" disabled>
+            Revoke this QR (organizer)
+          </button>
+
+          <label class="revoke-confirm revoke-confirm-spaced">
+            <input type="checkbox" id="org-confirm-card" />
+            <span>I understand — disable the whole card</span>
+          </label>
+          <button type="button" class="btn-danger btn-danger-solid" id="org-revoke-card-btn" disabled>
+            Disable card (organizer)
+          </button>
+
+          <p id="org-revoke-status" class="form-status" hidden></p>
+        </form>
+
+        <p class="idea-footnote">
+          Card owners revoke on <a href="/created/">/created/</a>. Research:
+          <a href="/what-can-a-qr-do/civic-protest-infrastructure/">civic flyers</a>.
+        </p>
+      </main>
+    </div>
+    <script type="module" src="/js/organizer-revoke.mjs?v=1"></script>
+  </body>
+</html>

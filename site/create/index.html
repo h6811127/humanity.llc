@@ -139,6 +139,40 @@
             </p>
           </div>
 
+          <details class="create-organizer-opt" id="create-organizer-details">
+            <summary class="form-label create-organizer-summary">Organizer can revoke (optional)</summary>
+            <p class="form-hint">
+              Register a coalition or event key that may revoke this card&rsquo;s QR — without
+              owning the card. You keep the owner key; the organizer gets their own.
+            </p>
+            <label class="revoke-confirm">
+              <input type="checkbox" id="enable-organizer-revoke" />
+              <span>Register an organizer revoke key on this card</span>
+            </label>
+            <fieldset class="create-organizer-mode" id="organizer-key-fields" hidden>
+              <legend class="form-hint">Organizer key</legend>
+              <label class="revoke-confirm">
+                <input type="radio" name="organizer_key_mode" value="generate" checked />
+                <span>Generate a new organizer key (hand off private key after create)</span>
+              </label>
+              <label class="revoke-confirm">
+                <input type="radio" name="organizer_key_mode" value="paste" />
+                <span>Paste an existing organizer public key</span>
+              </label>
+              <label class="form-label" for="organizer-public-key">Organizer public key</label>
+              <input
+                class="form-input"
+                id="organizer-public-key"
+                name="organizer_public_key"
+                placeholder="Base58 public key"
+                autocapitalize="off"
+                autocorrect="off"
+                spellcheck="false"
+                disabled
+              />
+            </fieldset>
+          </details>
+
           <label class="form-label" for="qr-validity-days">This QR stays valid for</label>
           <select class="form-input" id="qr-validity-days" name="qr_validity_days">
             <option value="7">7 days (event, wristband)</option>
@@ -168,6 +202,6 @@
         </form>
       </main>
     </div>
-    <script type="module" src="/js/create-card.mjs?v=10"></script>
+    <script type="module" src="/js/create-card.mjs?v=11"></script>
   </body>
 </html>

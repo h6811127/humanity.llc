@@ -209,6 +209,6 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ## Current step
 
-**→ Revoke lifecycle** — M4.5 + M4.6 shipped in code; deploy Worker (`pass-v9`). Field-test revoke vs disable vs expiry with strangers. Vertical pilots: `docs/LOST_ITEM_RELAY_PILOT.md`, `docs/STATUS_PLATE_PILOT.md`.
+**→ Organizer-signed revoke pilot** — `docs/ORGANIZER_SIGNED_REVOKE_PILOT.md` (Phase A vertical #3). Apply D1 migration `0005`, deploy Worker, field-test coalition revoke. Revoke lifecycle M4.5–M4.6 shipped (`pass-v9`).
 
 M5 stranger gate: `docs/M5_STRANGER_TEST_RUNBOOK.md` (still required before merch / Commons Pass).

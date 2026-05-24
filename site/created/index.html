@@ -115,6 +115,24 @@
           </p>
         </section>
 
+        <section class="recovery-reveal-card" id="organizer-reveal" hidden>
+          <div class="recovery-reveal-header">
+            <span class="recovery-reveal-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </span>
+            <div class="recovery-reveal-heading">
+              <h2 class="recovery-reveal-title">Hand off organizer revoke key</h2>
+              <p class="recovery-reveal-sub">
+                Give this private key to your coalition once. They can kill a compromised flyer batch
+                at <a id="organizer-revoke-link-inline" href="/organizer-revoke/">/organizer-revoke/</a>
+                — not the owner revoke screen.
+              </p>
+            </div>
+          </div>
+          <p class="mono-link" id="organizer-key-display"></p>
+          <button type="button" class="btn-secondary" id="copy-organizer-key">Copy organizer key</button>
+        </section>
+
         <section class="recovery-reveal-card" id="recovery-reveal" hidden>
           <div class="recovery-reveal-header">
             <span class="recovery-reveal-icon" aria-hidden="true">
@@ -162,6 +180,11 @@
             <li>
               <strong>Expiry</strong> — time runs out on this credential only (set at create).
               Scan shows expired; you can still revoke early.
+            </li>
+            <li>
+              <strong>Organizer revoke</strong> — if you registered a coalition key at create, they
+              can revoke without your owner key at
+              <a id="organizer-revoke-link" href="/organizer-revoke/">organizer revoke</a>.
             </li>
           </ul>
           <p class="form-hint revoke-id-warning">
@@ -417,6 +440,6 @@
         </p>
       </main>
     </div>
-    <script type="module" src="/js/created.mjs?v=19"></script>
+    <script type="module" src="/js/created.mjs?v=20"></script>
   </body>
 </html>

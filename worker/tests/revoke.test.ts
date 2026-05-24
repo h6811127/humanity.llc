@@ -3,12 +3,21 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
+import * as ed from "@noble/ed25519";
+
+import { encodeBase58 } from "../src/crypto/base58";
 import {
   getTestKeypair,
   PAYLOAD_TYPES,
   signDocument,
   withProtocolFields,
 } from "../src/crypto";
+
+async function randomKeypair() {
+  const privateKey = ed.utils.randomPrivateKey();
+  const publicKey = await ed.getPublicKeyAsync(privateKey);
+  return { privateKey, publicKeyBase58: encodeBase58(publicKey) };
+}
 import { buildScanViewModel, CACHE_ACTIVE } from "../src/resolver/scan-state";
 import { httpStatusForScanKind } from "../src/resolver/scan-status";
 import type { CardRow, QrCredentialRow } from "../src/db/types";
@@ -93,6 +102,7 @@ describe("handlePostRevoke", () => {
               return {
                 public_key: "WrongKeyWrongKeyWrongKeyWrongKeyWrongKey12",
                 recovery_public_key: null,
+                issuer_public_key: null,
                 status: "active",
               };
             }
@@ -142,7 +152,12 @@ describe("handlePostRevoke", () => {
         bind: () => ({
           first: async () => {
             if (sql.includes("FROM cards")) {
-              return { public_key: publicKeyBase58, recovery_public_key: null, status: "active" };
+              return {
+                public_key: publicKeyBase58,
+                recovery_public_key: null,
+                issuer_public_key: null,
+                status: "active",
+              };
             }
             if (sql.includes("FROM revocations")) return null;
             if (sql.includes("FROM qr_credentials")) {
@@ -207,6 +222,7 @@ describe("handlePostRevoke", () => {
               return {
                 public_key: owner.publicKeyBase58,
                 recovery_public_key: recovery.publicKeyBase58,
+                issuer_public_key: null,
                 status: "active",
               };
             }
@@ -232,5 +248,119 @@ describe("handlePostRevoke", () => {
     );
 
     expect(res.status).toBe(200);
+  });
+
+  it("accepts organizer-signed QR revocation when issuer key registered", async () => {
+    const { handlePostRevoke } = await import("../src/resolver/revoke");
+    const owner = await getTestKeypair();
+    const organizer = await randomKeypair();
+    const qrId = "qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
+    const nonce = `nonce_org_${Date.now()}`;
+
+    const signed = await signDocument(
+      withProtocolFields(
+        {
+          profile_id: PROFILE,
+          target_kind: "qr_credential",
+          target_qr_id: qrId,
+          reason: "organizer_revoked",
+          revoked_at: "2026-05-16T17:00:00.000Z",
+          nonce,
+        },
+        PAYLOAD_TYPES.REVOCATION
+      ),
+      { privateKey: organizer.privateKey, publicKeyBase58: organizer.publicKeyBase58 }
+    );
+
+    const db = {
+      prepare: (sql: string) => ({
+        bind: () => ({
+          first: async () => {
+            if (sql.includes("FROM cards")) {
+              return {
+                public_key: owner.publicKeyBase58,
+                recovery_public_key: null,
+                issuer_public_key: organizer.publicKeyBase58,
+                status: "active",
+              };
+            }
+            if (sql.includes("FROM revocations")) return null;
+            if (sql.includes("FROM qr_credentials")) {
+              return { qr_id: qrId, profile_id: PROFILE, status: "active" };
+            }
+            return null;
+          },
+        }),
+      }),
+      batch: async () => [{ success: true }],
+    } as unknown as D1Database;
+
+    const res = await handlePostRevoke(
+      new Request(`https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/revoke`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ revocation: signed }),
+      }),
+      db,
+      PROFILE
+    );
+
+    expect(res.status).toBe(200);
+  });
+
+  it("rejects organizer reason when signed by owner key", async () => {
+    const { handlePostRevoke } = await import("../src/resolver/revoke");
+    const owner = await getTestKeypair();
+    const qrId = "qr_7Xk9mP2nQ4rT6vW8yZ1aB3c";
+    const nonce = `nonce_wrong_reason_${Date.now()}`;
+
+    const signed = await signDocument(
+      withProtocolFields(
+        {
+          profile_id: PROFILE,
+          target_kind: "qr_credential",
+          target_qr_id: qrId,
+          reason: "organizer_revoked",
+          revoked_at: "2026-05-16T17:00:00.000Z",
+          nonce,
+        },
+        PAYLOAD_TYPES.REVOCATION
+      ),
+      { privateKey: owner.privateKey, publicKeyBase58: owner.publicKeyBase58 }
+    );
+
+    const db = {
+      prepare: (sql: string) => ({
+        bind: () => ({
+          first: async () => {
+            if (sql.includes("FROM cards")) {
+              return {
+                public_key: owner.publicKeyBase58,
+                recovery_public_key: null,
+                issuer_public_key: "OtherOrganizerKeyOtherOrganizerKeyOther12",
+                status: "active",
+              };
+            }
+            if (sql.includes("FROM revocations")) return null;
+            if (sql.includes("FROM qr_credentials")) {
+              return { qr_id: qrId, profile_id: PROFILE, status: "active" };
+            }
+            return null;
+          },
+        }),
+      }),
+    } as unknown as D1Database;
+
+    const res = await handlePostRevoke(
+      new Request(`https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/revoke`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ revocation: signed }),
+      }),
+      db,
+      PROFILE
+    );
+
+    expect(res.status).toBe(422);
   });
 });

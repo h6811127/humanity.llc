@@ -34,7 +34,7 @@ Defer until a vertical pilot succeeds:
 
 Pick **one** for the first real-world pilot (5–10 printed QRs, watch where people stall: print, recovery key, finding revoke).
 
-**Current build focus:** Lost item relay — see `docs/LOST_ITEM_RELAY_PILOT.md`. Status plate pilot: `docs/STATUS_PLATE_PILOT.md`.
+**Current build focus:** Organizer-signed revoke — see `docs/ORGANIZER_SIGNED_REVOKE_PILOT.md`. Verticals #1–2: `docs/STATUS_PLATE_PILOT.md`, `docs/LOST_ITEM_RELAY_PILOT.md`.
 
 ---
 
@@ -78,7 +78,8 @@ Keep positioning layered; do not collapse into a single slogan:
 | Doc | Use |
 |-----|-----|
 | `docs/STATUS_PLATE_PILOT.md` | Vertical #1 pilot |
-| `docs/LOST_ITEM_RELAY_PILOT.md` | Vertical #2 pilot (current) |
+| `docs/LOST_ITEM_RELAY_PILOT.md` | Vertical #2 pilot |
+| `docs/ORGANIZER_SIGNED_REVOKE_PILOT.md` | Vertical #3 pilot (current) |
 | `docs/M5_STRANGER_TEST_RUNBOOK.md` | Phase A exit gate |
 | `docs/M5_5_OWNER_KEY_PORTABILITY.md` | If strangers fail “revoke later” |
 | `docs/V1_USE_CASES.md` | Full use-case catalog (phased) |

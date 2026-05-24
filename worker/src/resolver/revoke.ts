@@ -16,6 +16,23 @@ import type { RevocationTargetKind } from "../db/types";
 import { REVOCATION_TARGET_KINDS } from "../db/types";
 
 const OWNER_REASONS = new Set(["owner_revoked"]);
+const ORGANIZER_REASONS = new Set(["organizer_revoked"]);
+
+type RevokeSignerRole = "owner" | "organizer";
+
+function resolveRevokeSigner(
+  signerKey: string,
+  owner: { public_key: string; recovery_public_key: string | null; issuer_public_key: string | null }
+): RevokeSignerRole | null {
+  if (signerKey === owner.public_key) return "owner";
+  if (owner.recovery_public_key && signerKey === owner.recovery_public_key) {
+    return "owner";
+  }
+  if (owner.issuer_public_key && signerKey === owner.issuer_public_key) {
+    return "organizer";
+  }
+  return null;
+}
 
 function parseRevokeBody(body: unknown): Record<string, unknown> | null {
   if (!body || typeof body !== "object") return null;
@@ -93,14 +110,11 @@ export async function handlePostRevoke(
   }
 
   const signerKey = verify.signature.public_key;
-  const allowedKeys = [owner.public_key];
-  if (owner.recovery_public_key) {
-    allowedKeys.push(owner.recovery_public_key);
-  }
-  if (!allowedKeys.includes(signerKey)) {
+  const signerRole = resolveRevokeSigner(signerKey, owner);
+  if (!signerRole) {
     return errorResponse(
       CRYPTO_ERROR.INVALID_SIGNATURE,
-      "Revocation must be signed by the card owner or recovery key.",
+      "Revocation must be signed by the card owner, recovery key, or registered organizer key.",
       401
     );
   }
@@ -116,8 +130,19 @@ export async function handlePostRevoke(
   }
 
   const reason = unsigned.reason as string;
-  if (!OWNER_REASONS.has(reason)) {
-    return errorResponse("INVALID_REASON", "Unsupported revocation reason.", 422);
+  if (signerRole === "owner" && !OWNER_REASONS.has(reason)) {
+    return errorResponse(
+      "INVALID_REASON",
+      "Owner revocations must use reason owner_revoked.",
+      422
+    );
+  }
+  if (signerRole === "organizer" && !ORGANIZER_REASONS.has(reason)) {
+    return errorResponse(
+      "INVALID_REASON",
+      "Organizer revocations must use reason organizer_revoked.",
+      422
+    );
   }
 
   const targetKind = unsigned.target_kind;

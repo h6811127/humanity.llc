@@ -192,6 +192,26 @@ export async function handlePostCards(
     recoveryPublicKey = recoveryPublicKeyRaw;
   }
 
+  const issuerPublicKeyRaw = card.issuer_public_key;
+  let issuerPublicKey: string | null = null;
+  if (issuerPublicKeyRaw != null && issuerPublicKeyRaw !== "") {
+    if (typeof issuerPublicKeyRaw !== "string") {
+      return errorResponse(
+        "MALFORMED_REQUEST",
+        "issuer_public_key must be a base58 string.",
+        422
+      );
+    }
+    if (issuerPublicKeyRaw === publicKey || issuerPublicKeyRaw === recoveryPublicKey) {
+      return errorResponse(
+        "INVALID_ISSUER_KEY",
+        "Organizer key must differ from owner and recovery keys.",
+        422
+      );
+    }
+    issuerPublicKey = issuerPublicKeyRaw;
+  }
+
   try {
     await insertCardWithQr(
       db,
@@ -199,6 +219,7 @@ export async function handlePostCards(
         profileId,
         publicKey,
         recoveryPublicKey,
+        issuerPublicKey,
         handle: handleNormalized,
         handleNormalized,
         manifestoLine,
@@ -224,6 +245,13 @@ export async function handlePostCards(
       return errorResponse(
         "RESOLVER_SCHEMA",
         "Resolver database is missing the recovery key column. Apply D1 migration 0003_recovery_public_key.sql and redeploy.",
+        503
+      );
+    }
+    if (msg.includes("issuer_public_key")) {
+      return errorResponse(
+        "RESOLVER_SCHEMA",
+        "Resolver database is missing the organizer key column. Apply D1 migration 0005_issuer_public_key.sql and redeploy.",
         503
       );
     }

@@ -177,7 +177,7 @@ export function defaultQrExpiry(issuedAt) {
 
 /**
  * Owner-signed revocation (POST /.well-known/hc/v1/cards/{profile_id}/revoke).
- * @param {{ profileId: string, targetKind: 'card'|'qr_credential', targetQrId?: string|null, privateKeyBase58: string, publicKeyBase58: string }} opts
+ * @param {{ profileId: string, targetKind: 'card'|'qr_credential', targetQrId?: string|null, privateKeyBase58: string, publicKeyBase58: string, reason?: 'owner_revoked'|'organizer_revoked' }} opts
  */
 export async function signRevocation({
   profileId,
@@ -185,13 +185,14 @@ export async function signRevocation({
   targetQrId = null,
   privateKeyBase58,
   publicKeyBase58,
+  reason = "owner_revoked",
 }) {
   const privateKey = decodePrivateKeyBase58(privateKeyBase58);
   const revokedAt = new Date().toISOString();
   const payload = {
     profile_id: profileId,
     target_kind: targetKind,
-    reason: "owner_revoked",
+    reason,
     revoked_at: revokedAt,
     nonce: generateRevocationNonce(),
   };

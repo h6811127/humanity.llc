@@ -97,8 +97,23 @@ function buildManifestoLine() {
   return { manifesto, pilotTemplate: "general" };
 }
 
+function readOrganizerKeyConfig() {
+  const enabled = document.getElementById("enable-organizer-revoke")?.checked ?? false;
+  if (!enabled) return { enabled: false };
+
+  const mode = document.querySelector('input[name="organizer_key_mode"]:checked')?.value;
+  if (mode === "paste") {
+    const pasted = document.getElementById("organizer-public-key")?.value?.trim();
+    if (!pasted) {
+      throw new Error("Paste the organizer public key, or switch to generate a key.");
+    }
+    return { enabled: true, issuerPublicKey: pasted };
+  }
+  return { enabled: true, generate: true };
+}
+
 /**
- * @param {{ handle: string, manifesto: string, wantRecovery: boolean, pilotTemplate?: string }} input
+ * @param {{ handle: string, manifesto: string, wantRecovery: boolean, pilotTemplate?: string, qrValidityDays?: number, organizer?: ReturnType<typeof readOrganizerKeyConfig> }} input
  */
 function readQrValidityDays() {
   const raw = document.getElementById("qr-validity-days")?.value;
@@ -116,6 +131,7 @@ export async function runCreateCard(input) {
     wantRecovery,
     pilotTemplate = "general",
     qrValidityDays = 365,
+    organizer = { enabled: false },
   } = input;
   const { privateKey, publicKeyBase58 } = await generateKeypair();
   let recoveryPrivateKey = null;
@@ -124,6 +140,17 @@ export async function runCreateCard(input) {
     const recovery = await generateKeypair();
     recoveryPrivateKey = recovery.privateKey;
     recoveryPublicKeyBase58 = recovery.publicKeyBase58;
+  }
+  let organizerPrivateKey = null;
+  let organizerPublicKeyBase58 = null;
+  if (organizer.enabled) {
+    if (organizer.generate) {
+      const org = await generateKeypair();
+      organizerPrivateKey = org.privateKey;
+      organizerPublicKeyBase58 = org.publicKeyBase58;
+    } else {
+      organizerPublicKeyBase58 = organizer.issuerPublicKey;
+    }
   }
   const profileId = generateProfileId();
   const qrId = generateQrId();
@@ -162,6 +189,9 @@ export async function runCreateCard(input) {
   if (recoveryPublicKeyBase58) {
     cardFields.recovery_public_key = recoveryPublicKeyBase58;
   }
+  if (organizerPublicKeyBase58) {
+    cardFields.issuer_public_key = organizerPublicKeyBase58;
+  }
 
   const cardUnsigned = withProtocolFields(cardFields, "humanity_card");
 
@@ -198,6 +228,11 @@ export async function runCreateCard(input) {
         "Resolver database needs an update (recovery key column). Try again in a minute or contact support."
       );
     }
+    if (String(msg).includes("issuer_public_key")) {
+      throw new Error(
+        "Resolver database needs an update (organizer key column). Apply migration 0005 and redeploy."
+      );
+    }
     throw new Error(`${msg} (${postCardsUrl()})`);
   }
 
@@ -209,6 +244,15 @@ export async function runCreateCard(input) {
       pilot_template: pilotTemplate,
       qr_expires_at: expiresAt,
       qr_validity_days: qrValidityDays,
+      has_organizer_revoke: !!organizerPublicKeyBase58,
+      ...(organizerPrivateKey
+        ? {
+            organizer_private_key_b58: encodePrivateKeyBase58(organizerPrivateKey),
+            organizer_public_key_b58: organizerPublicKeyBase58,
+          }
+        : organizerPublicKeyBase58
+          ? { organizer_public_key_b58: organizerPublicKeyBase58 }
+          : {}),
       owner_public_key_b58: publicKeyBase58,
       owner_private_key_b58: encodePrivateKeyBase58(privateKey),
       ...(recoveryPublicKeyBase58
@@ -239,8 +283,9 @@ async function submitCreate(e) {
     if (!handle) throw new Error("Handle is required.");
     const { manifesto, pilotTemplate } = buildManifestoLine();
     const qrValidityDays = readQrValidityDays();
+    const organizer = readOrganizerKeyConfig();
     setStatus("Submitting to resolver…");
-    await runCreateCard({ handle, manifesto, wantRecovery, pilotTemplate, qrValidityDays });
+    await runCreateCard({ handle, manifesto, wantRecovery, pilotTemplate, qrValidityDays, organizer });
   } catch (err) {
     setStatus(err.message || String(err), true);
     if (submitBtn) submitBtn.disabled = false;
@@ -249,6 +294,24 @@ async function submitCreate(e) {
 }
 
 form?.addEventListener("submit", submitCreate);
+
+const enableOrganizerEl = document.getElementById("enable-organizer-revoke");
+const organizerFieldsEl = document.getElementById("organizer-key-fields");
+const organizerPublicKeyEl = document.getElementById("organizer-public-key");
+
+function syncOrganizerFieldsUi() {
+  const on = enableOrganizerEl?.checked ?? false;
+  if (organizerFieldsEl) organizerFieldsEl.hidden = !on;
+  const pasteMode =
+    document.querySelector('input[name="organizer_key_mode"][value="paste"]')?.checked ?? false;
+  if (organizerPublicKeyEl) organizerPublicKeyEl.disabled = !on || !pasteMode;
+}
+
+enableOrganizerEl?.addEventListener("change", syncOrganizerFieldsUi);
+document.querySelectorAll('input[name="organizer_key_mode"]').forEach((el) => {
+  el.addEventListener("change", syncOrganizerFieldsUi);
+});
+syncOrganizerFieldsUi();
 
 demoBtn?.addEventListener("click", async () => {
   const handleEl = document.getElementById("handle");

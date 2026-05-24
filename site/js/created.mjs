@@ -86,6 +86,37 @@ function applyPilotTemplateUi(session) {
   }
 }
 
+function applyOrganizerHandoffUi(session) {
+  const reveal = document.getElementById("organizer-reveal");
+  const keyEl = document.getElementById("organizer-key-display");
+  const copyBtn = document.getElementById("copy-organizer-key");
+  const link = document.getElementById("organizer-revoke-link");
+  const linkInline = document.getElementById("organizer-revoke-link-inline");
+
+  const orgUrl = new URL("/organizer-revoke/", location.origin);
+  if (profileId) orgUrl.searchParams.set("profile_id", profileId);
+  if (qrId) orgUrl.searchParams.set("qr_id", qrId);
+  const href = orgUrl.href;
+  if (link) link.href = href;
+  if (linkInline) linkInline.href = href;
+
+  const priv = session?.organizer_private_key_b58;
+  if (!priv || !reveal || !keyEl) return;
+  reveal.hidden = false;
+  keyEl.textContent = String(priv);
+  copyBtn?.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(String(priv));
+      if (copyBtn) copyBtn.textContent = "Copied";
+      setTimeout(() => {
+        copyBtn.textContent = "Copy organizer key";
+      }, 2000);
+    } catch {
+      copyBtn.textContent = "Select and copy manually";
+    }
+  });
+}
+
 if (!profileId && !qrId && !data) {
   noSessionEl.hidden = false;
 } else if (!profileId || !qrId) {
@@ -227,6 +258,7 @@ if (profileId && qrId) {
 
   const session = loadSession();
   applyPilotTemplateUi(session);
+  applyOrganizerHandoffUi(session);
   if (session?.revoke_state?.target_kind) {
     markLoopDone("revoke");
     setLoopStep("scan-again");
