@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Artifact intent (print foundation) · Features · humanity.llc</title>
+    <meta name="description" content="Unique QR per physical unit before checkout." />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=49" />
+  </head>
+  <body>
+    <div class="page feature-page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+      <main class="screen">
+        <section class="hero">
+          <p class="hero-eyebrow">Feature <span class="phase">8</span></p>
+          <h1>Artifact intent (print foundation)</h1>
+        </section>
+        <div class="feature">
+          <p class="feature-lead">Unique QR per physical unit before checkout.</p>
+          <p class="feature-sub"><span class="ship-badge ship-badge-partial">Partial</span> POST API live; Shopify → Printify path in build</p>
+        </div>
+        <section class="group feature-aspects">
+          <h2 class="group-label">About this feature</h2>
+          <div class="feature-aspect-stack"><details class="settings-disclosure settings-disclosure-info feature-aspect" open>
+  <summary class="settings-summary">
+    <span class="list-icon list-icon-tone-red" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></span>
+    <span class="settings-summary-text">
+      <span class="settings-summary-title">Why it matters</span>
+    </span>
+    <span class="list-chevron" aria-hidden="true">›</span>
+  </summary>
+  <div class="settings-panel settings-panel-info-body">
+    <p class="settings-panel-lead">Personalized stickers need a planned <code>qr_id</code> per item so one stolen unit can be revoked without killing the whole card. Bridges digital create → physical print.</p>
+  </div>
+</details>
+<details class="settings-disclosure settings-disclosure-info feature-aspect">
+  <summary class="settings-summary">
+    <span class="list-icon list-icon-tone-blue" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg></span>
+    <span class="settings-summary-text">
+      <span class="settings-summary-title">Design decisions</span>
+    </span>
+    <span class="list-chevron" aria-hidden="true">›</span>
+  </summary>
+  <div class="settings-panel settings-panel-info-body">
+    <p class="settings-panel-lead">Artifact intent records planned credentials before payment; must survive Shopify checkout metadata. No private keys in intent payloads.</p>
+  </div>
+</details>
+<details class="settings-disclosure settings-disclosure-info feature-aspect">
+  <summary class="settings-summary">
+    <span class="list-icon list-icon-tone-green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+    <span class="settings-summary-text">
+      <span class="settings-summary-title">Safety · privacy · security</span>
+    </span>
+    <span class="list-chevron" aria-hidden="true">›</span>
+  </summary>
+  <div class="settings-panel settings-panel-info-body">
+    <p class="settings-panel-lead">Intent is pre-commit state — operator can hold orders if metadata is missing rather than auto-printing wrong QRs.</p>
+  </div>
+</details>
+<details class="settings-disclosure settings-disclosure-info feature-aspect">
+  <summary class="settings-summary">
+    <span class="list-icon list-icon-tone-orange" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span>
+    <span class="settings-summary-text">
+      <span class="settings-summary-title">Limits</span>
+    </span>
+    <span class="list-chevron" aria-hidden="true">›</span>
+  </summary>
+  <div class="settings-panel settings-panel-info-body">
+    <p class="settings-panel-lead">End-to-end merch fulfillment not live for all users. Highest-risk handoff is checkout metadata survival (documented in flow audit).</p>
+  </div>
+</details>
+<details class="settings-disclosure settings-disclosure-info feature-aspect">
+  <summary class="settings-summary">
+    <span class="list-icon list-icon-tone-purple" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M18 12h4"/><path d="m19.07 4.93-2.83 2.83"/></svg></span>
+    <span class="settings-summary-text">
+      <span class="settings-summary-title">Future directions</span>
+    </span>
+    <span class="list-chevron" aria-hidden="true">›</span>
+  </summary>
+  <div class="settings-panel settings-panel-info-body">
+    <p class="settings-panel-lead">User-safe order timeline, Printify webhook reconciler, sample QA loop for launch templates.</p>
+  </div>
+</details></div>
+        </section>
+        <section class="group">
+  <div class="feature-nav">
+    <a href="/features/public-apis.html"><span class="feature-nav-label">Previous</span><span class="feature-nav-title"><span class="phase">7</span> Public APIs & machine-readable state</span></a>
+    <a href="/features/test-harness.html"><span class="feature-nav-label">Next</span><span class="feature-nav-title"><span class="phase">9</span> Security test harness</span></a>
+  </div>
+</section>
+      </main>
+    </div>
+  </body>
+</html>

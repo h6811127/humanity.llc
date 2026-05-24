@@ -235,12 +235,51 @@
             </span>
             <span class="settings-summary-text">
               <span class="settings-summary-title">Revoke this QR</span>
-              <span class="settings-summary-sub">Step 3 in the loop</span>
+              <span class="settings-summary-sub" id="revoke-summary-sub">Step 3 in the loop</span>
             </span>
             <span class="list-chevron" aria-hidden="true">›</span>
           </summary>
           <div class="settings-panel settings-panel-action">
-            <p class="owner-live-status" id="owner-live-status" aria-live="polite"></p>
+            <div class="owner-network-status" id="owner-network-status" aria-live="polite">
+              <p class="owner-network-status-kicker">Live scan answer</p>
+              <p class="owner-network-status-lead">
+                This is what anyone scanning your QR sees on the network <strong>right now</strong> —
+                fetched from the resolver, not guessed from this tab.
+              </p>
+              <ul class="list list-compact owner-network-status-rows">
+                <li class="list-row">
+                  <span class="list-icon list-icon-tone-green" id="owner-status-card-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Card</span>
+                    <span class="list-sub" id="owner-status-card">Checking…</span>
+                  </span>
+                </li>
+                <li class="list-row">
+                  <span class="list-icon list-icon-tone-green" id="owner-status-qr-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">This QR</span>
+                    <span class="list-sub" id="owner-status-qr">Checking…</span>
+                  </span>
+                </li>
+                <li class="list-row">
+                  <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Human trust</span>
+                    <span class="list-sub" id="owner-status-verification">Checking…</span>
+                  </span>
+                </li>
+              </ul>
+              <p class="owner-network-status-hint" id="owner-network-status-hint"></p>
+              <a class="owner-network-scan-link" id="owner-network-scan-link" href="#" target="_blank" rel="noopener noreferrer" hidden>
+                Open scan page (what others see)
+              </a>
+            </div>
             <p class="form-warning owner-revoked-banner" id="owner-revoked-banner" hidden></p>
             <p class="form-hint" id="owner-no-key">
               This page cannot sign until it has an owner or recovery key in this browser. Unlock a
@@ -490,6 +529,6 @@
         </p>
       </main>
     </div>
-    <script type="module" src="/js/created.mjs?v=24"></script>
+    <script type="module" src="/js/created.mjs?v=26"></script>
   </body>
 </html>
