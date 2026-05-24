@@ -30,15 +30,16 @@
             and revoked — not a frozen link that points forever.
           </p>
           <p class="hero-line hero-line-sub">
-            A handle, one public line, and a red QR ready to print. Keys stay in this tab until
-            you save a backup on the next screen.
+            A handle, one public line, and a red QR ready to print. Your signing key starts
+            session-only in this tab; save a recovery key or encrypted backup next if you want
+            to revoke later.
           </p>
         </section>
 
         <ul class="create-you-get" aria-label="What you get">
           <li>Scan page with live active or revoked status</li>
           <li>QR and link you can put on stickers, cards, or doors</li>
-          <li>Revoke from this browser when you are done testing</li>
+          <li>Revoke from this tab, a recovery key, or an encrypted backup you control</li>
         </ul>
 
         <section class="create-demo-strip" aria-label="Demo">
@@ -193,8 +194,9 @@
 
           <p class="form-warning">
             After create, save your <strong>recovery key</strong> and/or download an encrypted
-            backup. Without one of them, closing this tab means you cannot sign a
-            revoke. We cannot recover lost keys. Card creation does not verify legal identity.
+            backup. Without this tab, a recovery key, or backup + passphrase, you cannot sign a
+            revoke from the web UI. humanity.llc cannot recover lost keys or revoke on your behalf.
+            Card creation does not verify legal identity.
           </p>
 
           <button type="submit" class="btn-primary" id="submit">Create my live card</button>

@@ -28,6 +28,14 @@ Minimize stored data so the network is not a surveillance honeypot. Publish what
 - **Default:** no logging of scan requests.
 - If minimal access logs are ever required for abuse response, that MUST be a **governance-approved** policy with published retention—not a silent product default.
 
+## Key custody and recovery limits
+
+- Owner signing keys are generated client-side. During create, the owner key is session-only unless the user saves a recovery key or encrypted backup.
+- Encrypted backup files are created client-side. The backup passphrase MUST NOT be sent to or stored by the reference operator.
+- Recovery private keys are shown to the user once. The resolver may store the recovery public key, but MUST NOT store the recovery private key or seed.
+- The reference operator cannot recover lost passphrases, restore lost private keys, or revoke on a user's behalf. Revocation requires a valid owner, recovery, or registered organizer signature.
+- If a user closes the tab and loses both backup/passphrase and recovery key, they cannot revoke from the web UI without creating a new card.
+
 ## Commerce firewall
 
 - QR payloads MUST NOT embed order IDs, emails, or shipping fields.
