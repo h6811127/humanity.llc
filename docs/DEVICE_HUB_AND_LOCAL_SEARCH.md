@@ -32,9 +32,10 @@ Returning users see their labels on the homepage; strangers still see the same s
 ### Phase 1 (current)
 
 - **Data:** `hc_wallet` entries (label, handle, manifesto line, `profile_id`, `scan_url`).
-- **UI:** Floating search field; filters rows in the device hub and wallet list client-side (case-insensitive substring).
+- **UI:** Client-side filter (case-insensitive substring) over device-hub rows and wallet list.
 - **Effort:** Low — no network, no new schema beyond wallet.
-- **Landing:** Same component; also filters static shortcut rows by visible title/subtitle text.
+- **Landing:** Bottom-left **search FAB** (hollow red outline, matches header **Create**). Tap expands a drawer: full search field, policy hint, **What this searches** disclosure, live match count / empty state. Filters **On this device** (saved cards injected from `hc_wallet` + shortcut rows). Escape or outside tap collapses; clearing query restores all rows.
+- **Wallet (`/wallet/`):** Always-visible centered search bar (same filter logic, no FAB).
 
 ### Phase 2 (optional)
 
@@ -65,7 +66,7 @@ Returning users see their labels on the homepage; strangers still see the same s
 | Path | Role |
 |------|------|
 | `site/index.html` | Device hub section + floating search |
-| `site/js/landing-device-hub.mjs` | Inject wallet rows, filter hub |
+| `site/js/landing-device-hub.mjs` | Inject wallet rows, FAB expand/collapse, Phase 1 filter + status |
 | `site/wallet/index.html` | Saved cards UI |
 | `site/js/card-wallet.mjs` | Wallet CRUD + search filter |
 | `site/styles.css` | `.device-hub-*`, `.pilot-showcase-*`, `.wallet-*` |

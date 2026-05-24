@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=54" />
+    <link rel="stylesheet" href="/styles.css?v=55" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -556,21 +556,65 @@
         </section>
       </main>
     </div>
-    <div class="device-hub-search-float" role="search">
-      <label class="device-hub-search">
-        <span class="device-hub-search-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        </span>
-        <input
-          type="search"
-          id="device-hub-search"
-          class="device-hub-search-input"
-          placeholder="Search my artifacts and public cards"
-          autocomplete="off"
-          enterkeyhint="search"
-        />
-      </label>
-      <p class="device-hub-search-hint">This device only — not the public resolver</p>
+    <div
+      class="device-hub-search-float device-hub-search-float--landing"
+      id="device-hub-search-root"
+      role="search"
+    >
+      <button
+        type="button"
+        class="device-hub-search-fab"
+        id="device-hub-search-open"
+        aria-label="Search this device"
+        aria-expanded="false"
+        aria-controls="device-hub-search-drawer"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </button>
+      <div class="device-hub-search-drawer" id="device-hub-search-drawer" hidden>
+        <div class="device-hub-search device-hub-search--bar">
+          <span class="device-hub-search-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </span>
+          <input
+            type="search"
+            id="device-hub-search"
+            class="device-hub-search-input"
+            placeholder="Search my artifacts and public cards"
+            autocomplete="off"
+            enterkeyhint="search"
+          />
+          <button
+            type="button"
+            class="device-hub-search-close"
+            id="device-hub-search-close"
+            aria-label="Close search"
+          >
+            ×
+          </button>
+        </div>
+        <p class="device-hub-search-hint">This device only — not the public resolver</p>
+        <p class="device-hub-search-status" id="device-hub-search-status" hidden role="status"></p>
+        <details class="settings-disclosure settings-disclosure-info device-hub-search-disclosure">
+          <summary class="settings-summary">
+            <span class="list-icon list-icon-tone-red" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            </span>
+            <span class="settings-summary-text">
+              <span class="settings-summary-title">What this searches</span>
+              <span class="settings-summary-sub">Saved cards and shortcuts on this device</span>
+            </span>
+            <span class="list-chevron" aria-hidden="true">›</span>
+          </summary>
+          <div class="settings-panel settings-panel-info">
+            <p class="form-hint">
+              Filters labels in <strong>On this device</strong> — cards you saved in
+              <a href="/wallet/">Saved cards</a> plus Revoke, Vouch, and Wallet shortcuts. Does not
+              search humanity.llc or other people&rsquo;s profiles.
+            </p>
+          </div>
+        </details>
+      </div>
     </div>
 
     <nav class="dock dock-sticky" aria-label="Get started">
@@ -578,7 +622,7 @@
     </nav>
     <script src="/js/pass-flip.js?v=1" defer></script>
     <script src="/js/pass-demo-revoke.js?v=1" defer></script>
-    <script src="/js/landing-device-hub.mjs?v=1" type="module"></script>
+    <script src="/js/landing-device-hub.mjs?v=2" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=1" type="module"></script>
   </body>
 </html>

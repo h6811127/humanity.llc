@@ -1,5 +1,6 @@
 /**
- * Landing device hub: inject saved wallet rows + filter hub via local search only.
+ * Landing device hub (Phase 1): inject saved wallet rows + local search filter.
+ * Search UI: bottom-left FAB expands to full bar + disclosures (see DEVICE_HUB_AND_LOCAL_SEARCH.md).
  */
 const STORAGE_KEY = "hc_wallet";
 
@@ -30,6 +31,12 @@ function haystack(entry) {
 const savedGroup = document.getElementById("device-hub-saved-group");
 const savedList = document.getElementById("device-hub-wallet-list");
 const searchInput = document.getElementById("device-hub-search");
+const searchRoot = document.getElementById("device-hub-search-root");
+const searchOpen = document.getElementById("device-hub-search-open");
+const searchDrawer = document.getElementById("device-hub-search-drawer");
+const searchClose = document.getElementById("device-hub-search-close");
+const searchStatus = document.getElementById("device-hub-search-status");
+const deviceHub = document.getElementById("device-hub");
 
 function renderSavedRows() {
   const entries = loadWallet();
@@ -62,6 +69,12 @@ function renderSavedRows() {
   }
 }
 
+function countVisibleMatches() {
+  const hub = document.getElementById("device-hub");
+  if (!hub) return 0;
+  return [...hub.querySelectorAll("[data-hub-searchable]")].filter((el) => !el.hidden).length;
+}
+
 function applySearchFilter() {
   const q = (searchInput?.value || "").trim().toLowerCase();
   const hub = document.getElementById("device-hub");
@@ -79,7 +92,57 @@ function applySearchFilter() {
       [...(savedList?.querySelectorAll("[data-hub-searchable]") || [])].some((el) => !el.hidden);
     savedGroup.hidden = loadWallet().length === 0 || !anySavedVisible;
   }
+
+  if (searchStatus) {
+    if (!q) {
+      searchStatus.hidden = true;
+      searchStatus.textContent = "";
+    } else {
+      const n = countVisibleMatches();
+      searchStatus.hidden = false;
+      searchStatus.textContent =
+        n === 0
+          ? "No matches on this device."
+          : `${n} match${n === 1 ? "" : "es"} in On this device`;
+    }
+  }
 }
+
+function setSearchExpanded(open) {
+  if (!searchRoot || !searchOpen || !searchDrawer) return;
+  searchRoot.classList.toggle("is-expanded", open);
+  searchOpen.hidden = open;
+  searchOpen.setAttribute("aria-expanded", open ? "true" : "false");
+  searchDrawer.hidden = !open;
+  if (open) {
+    searchInput?.focus();
+    deviceHub?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  } else if (searchInput) {
+    searchInput.value = "";
+    applySearchFilter();
+  }
+}
+
+if (searchOpen) {
+  searchOpen.addEventListener("click", () => setSearchExpanded(true));
+}
+
+if (searchClose) {
+  searchClose.addEventListener("click", () => setSearchExpanded(false));
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && searchRoot?.classList.contains("is-expanded")) {
+    setSearchExpanded(false);
+  }
+});
+
+document.addEventListener("click", (e) => {
+  if (!searchRoot?.classList.contains("is-expanded")) return;
+  const target = e.target;
+  if (target instanceof Node && searchRoot.contains(target)) return;
+  setSearchExpanded(false);
+});
 
 renderSavedRows();
 applySearchFilter();
