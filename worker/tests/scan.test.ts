@@ -245,7 +245,10 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(res.headers.get("Cache-Control")).toBe("no-store");
     expect(html).toContain("Control proven");
     expect(html).toContain("live-control-card-proven");
-    expect(html).not.toContain('id="live-control-request"');
+    expect(html).toContain('id="live-control-request-again"');
+    expect(html).toContain("live-control-proven-ago");
+    expect(html).toContain('id="live-control-interactive" hidden');
+    expect(html).toContain('id="live-control-request"');
   });
 
   it("uses print_artifact scope copy when applicable", async () => {

@@ -7,7 +7,7 @@ import { SCAN_PASS_CSS } from "./scan-pass-styles";
 import { renderScanQrMarkup } from "./scan-qr";
 
 /** Response header — confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v11";
+export const SCAN_UI_VERSION = "pass-v13";
 
 /**
  * Public scan UI — flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -433,11 +433,8 @@ function qrGroupRows(vm: ScanViewModel): string {
 }
 
 function liveControlGroupRows(vm: ScanViewModel): string {
-  if (vm.liveControlAvailable && vm.liveControlProvenAt) {
-    return liveControlProvenRow(vm.liveControlProvenAt);
-  }
   if (vm.kind === "active" && vm.profileId && vm.qrId) {
-    return liveControlInteractiveRow();
+    return liveControlInteractiveRow(vm.liveControlProvenAt ?? null);
   }
   return listRow(
     "key",
@@ -447,23 +444,18 @@ function liveControlGroupRows(vm: ScanViewModel): string {
   );
 }
 
-function liveControlProvenRow(provenAt: string): string {
-  return `<li class="list-row live-control-row is-proven" id="live-control-row">
+function liveControlInteractiveRow(provenAt: string | null): string {
+  const isProven = !!provenAt;
+  const interactiveHidden = isProven ? " hidden" : "";
+  const rowClass = isProven ? " is-proven" : "";
+  return `<li class="list-row live-control-row${rowClass}" id="live-control-row">
   <span class="list-content live-control-card-wrap">
-    ${renderLiveControlSuccessPanel(provenAt, true)}
-  </span>
-</li>`;
-}
-
-function liveControlInteractiveRow(): string {
-  return `<li class="list-row live-control-row" id="live-control-row">
-  <span class="list-content live-control-card-wrap">
-    <div class="live-control-card" id="live-control-interactive">
+    <div class="live-control-card" id="live-control-interactive"${interactiveHidden}>
       <div class="live-control-card-head">
         ${scanListIcon("purple", "key")}
         <div class="live-control-card-head-text">
           <span class="live-control-eyebrow">In-person check</span>
-          <span class="live-control-title">Live control</span>
+          <span class="live-control-title">Ask owner to prove control</span>
         </div>
       </div>
       <p class="live-control-lead">
@@ -489,28 +481,38 @@ function liveControlInteractiveRow(): string {
         </div>
       </div>
     </div>
-    ${renderLiveControlSuccessPanel("", false)}
+    ${renderLiveControlSuccessPanel(provenAt ?? "", isProven)}
   </span>
 </li>`;
 }
 
 function renderLiveControlSuccessPanel(provenAt: string, visible: boolean): string {
   const hiddenAttr = visible ? "" : " hidden";
+  const provenIsoAttr = provenAt
+    ? ` data-proven-at="${escapeHtml(provenAt)}"`
+    : "";
   const provenLabel = provenAt
     ? `Proven ${formatScanTimestamp(provenAt)}`
     : "";
-  return `<div class="live-control-card live-control-card-proven" id="live-control-success"${hiddenAttr}>
+  const agoInitial = provenAt ? "Live control proven just now" : "";
+  return `<div class="live-control-card live-control-card-proven" id="live-control-success"${hiddenAttr}${provenIsoAttr}>
   <div class="live-control-card-head">
     ${scanListIcon("green", "key")}
     <div class="live-control-card-head-text">
-      <span class="live-control-eyebrow">Verified just now</span>
-      <span class="live-control-title">Control proven</span>
+      <span class="live-control-eyebrow">Live control</span>
+      <div class="live-control-title-row">
+        <span class="live-control-title">Control proven</span>
+        <span class="live-control-proven-ago" id="live-control-proven-ago"${provenIsoAttr}>${escapeHtml(agoInitial)}</span>
+      </div>
     </div>
   </div>
   <p class="live-control-success-copy">
     The owner signed with their key. This does not prove legal identity or physical ownership.
   </p>
   <p class="live-control-proven-at" id="live-control-proven-at">${escapeHtml(provenLabel)}</p>
+  <button type="button" class="live-control-cta-secondary" id="live-control-request-again">
+    Ask again
+  </button>
 </div>`;
 }
 
@@ -536,6 +538,7 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
   )}/live-control/challenges`;
   return `<script>
 (function () {
+  var PROOF_TTL_MS = 5 * 60 * 1000;
   var btn = document.getElementById("live-control-request");
   var status = document.getElementById("live-control-status");
   var ownerPanel = document.getElementById("live-control-owner-panel");
@@ -544,9 +547,13 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
   var interactive = document.getElementById("live-control-interactive");
   var success = document.getElementById("live-control-success");
   var provenAtEl = document.getElementById("live-control-proven-at");
+  var provenAgoEl = document.getElementById("live-control-proven-ago");
+  var askAgainBtn = document.getElementById("live-control-request-again");
   var row = document.getElementById("live-control-row");
   var statusPanel = document.getElementById("live-control-status-panel");
-  if (!btn || !status) return;
+  var pollTimer = null;
+  var countdownTimer = null;
+  var relativeTimer = null;
   function formatProvenAt(iso) {
     try {
       var d = new Date(iso);
@@ -559,6 +566,42 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
       return "";
     }
   }
+  function formatProvenAgo(elapsedMs) {
+    var sec = Math.max(0, Math.floor(elapsedMs / 1000));
+    if (sec < 1) return "Live control proven just now";
+    if (sec < 60) return "Live control proven " + sec + "s ago";
+    var min = Math.floor(sec / 60);
+    if (min < 60) return "Live control proven " + min + "m ago";
+    var hr = Math.floor(min / 60);
+    return "Live control proven " + hr + "h ago";
+  }
+  function stopRelativeTimer() {
+    if (relativeTimer) window.clearInterval(relativeTimer);
+    relativeTimer = null;
+  }
+  function startRelativeTimer(iso) {
+    if (!provenAgoEl || !iso) return;
+    stopRelativeTimer();
+    provenAgoEl.setAttribute("data-proven-at", iso);
+    if (success) success.setAttribute("data-proven-at", iso);
+    function tick() {
+      var elapsed = Date.now() - Date.parse(iso);
+      if (!Number.isFinite(elapsed) || elapsed < 0) return;
+      provenAgoEl.textContent = formatProvenAgo(elapsed);
+      if (elapsed >= PROOF_TTL_MS) stopRelativeTimer();
+    }
+    tick();
+    relativeTimer = window.setInterval(tick, 1000);
+  }
+  function getProvenIso() {
+    if (success && success.getAttribute("data-proven-at")) {
+      return success.getAttribute("data-proven-at");
+    }
+    if (provenAgoEl && provenAgoEl.getAttribute("data-proven-at")) {
+      return provenAgoEl.getAttribute("data-proven-at");
+    }
+    return null;
+  }
   function showProvenSuccess(provenAt) {
     stopPolling();
     stopCountdown();
@@ -568,6 +611,27 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
     if (provenAtEl && provenAt) {
       provenAtEl.textContent = "Proven " + formatProvenAt(provenAt);
     }
+    startRelativeTimer(provenAt);
+  }
+  function resetForNewRequest() {
+    stopRelativeTimer();
+    stopPolling();
+    stopCountdown();
+    if (interactive) interactive.hidden = false;
+    if (success) success.hidden = true;
+    if (row) row.classList.remove("is-proven");
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Ask for live proof";
+    }
+    if (status) setStatus("Ready when you are.", false);
+    if (ownerPanel) ownerPanel.hidden = true;
+  }
+  function wireAskAgain() {
+    if (!askAgainBtn) return;
+    askAgainBtn.addEventListener("click", function () {
+      resetForNewRequest();
+    });
   }
   function showOwnerPanel(url) {
     if (ownerPanel) ownerPanel.hidden = false;
@@ -585,9 +649,8 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
       };
     }
   }
-  var pollTimer = null;
-  var countdownTimer = null;
   function setStatus(text, waiting) {
+    if (!status) return;
     status.textContent = text;
     if (statusPanel) {
       statusPanel.classList.toggle("is-waiting", !!waiting);
@@ -614,8 +677,10 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
       if (!Number.isFinite(remaining) || remaining <= 0) {
         stopCountdown();
         setStatus("Control was not proven. The request expired.", false);
-        btn.disabled = false;
-        btn.textContent = "Ask again";
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "Ask for live proof";
+        }
         return;
       }
       setStatus(prefix + " Expires in " + formatRemaining(remaining) + ".", true);
@@ -634,8 +699,10 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
           } else if (body.status === "expired") {
             stopPolling();
             stopCountdown();
-            btn.disabled = false;
-            btn.textContent = "Ask again";
+            if (btn) {
+              btn.disabled = false;
+              btn.textContent = "Ask for live proof";
+            }
             setStatus("Control was not proven. The request expired.", false);
           }
         })
@@ -658,7 +725,7 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
         if (body.status === "proven") {
           showProvenSuccess(body.proven_at);
         } else if (body.status === "expired") {
-          btn.textContent = "Ask again";
+          if (btn) btn.textContent = "Ask for live proof";
           setStatus("Control was not proven. The request expired.", false);
         } else {
           if (body.expires_at) {
@@ -674,6 +741,12 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
         setStatus("Could not check live proof.", false);
       });
   }
+  wireAskAgain();
+  var initialProven = getProvenIso();
+  if (success && !success.hidden && initialProven) {
+    startRelativeTimer(initialProven);
+  }
+  if (!btn || !status) return;
   btn.addEventListener("click", function () {
     btn.disabled = true;
     btn.textContent = "Waiting…";

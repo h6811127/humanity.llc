@@ -931,6 +931,40 @@ a {
   color: #248a3d;
 }
 
+.live-control-title-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.live-control-proven-ago {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+  color: #248a3d;
+}
+
+.live-control-cta-secondary {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px 18px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: #248a3d;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(52, 199, 89, 0.4);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.live-control-cta-secondary:active {
+  opacity: 0.85;
+}
+
 .scan-footer-link {
   text-align: center;
   font-size: 13px;

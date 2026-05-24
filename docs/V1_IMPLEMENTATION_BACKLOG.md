@@ -388,6 +388,8 @@ Goal: make the card meaningful without overclaiming.
 
 ### V-002: Vouching
 
+**Design:** `docs/M6_VOUCHING_DESIGN.md`
+
 **Build:**
 
 - Signed vouch credential.
