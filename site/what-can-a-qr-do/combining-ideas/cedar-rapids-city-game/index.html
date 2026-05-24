@@ -9,7 +9,7 @@
     <title>Demo scan · Cedar Rapids city game · humanity.llc</title>
     <meta
       name="description"
-      content="Demo scan page for a Cedar Rapids city-scale game built from evolving objects, trust chains, revocable clues, and anonymous participation in shared urban memory."
+      content="Demo scan page for a Cedar Rapids city-scale coordination game where cooperation, trust chains, scarcity, and revocable clues change what physical objects reveal."
     />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
@@ -36,7 +36,7 @@
           </p>
           <p class="hero-line hero-line-sub">
             Research demo, not shipping behavior yet. No geo-tracking, movement analytics, social
-            heatmaps, or hidden engagement scoring.
+            heatmaps, or hidden engagement scoring. Cooperation should beat exploitation.
           </p>
         </section>
 
@@ -56,7 +56,7 @@
               <ul class="scenario-card-list">
                 <li>One object can unlock another in Czech Village</li>
                 <li>Some objects only appear after enough anonymous scans</li>
-                <li>Others require a nearby trusted object to vouch before they become visible</li>
+                <li>Others require a nearby trusted object, business, or steward to vouch first</li>
               </ul>
             </article>
             <article class="scenario-card scenario-card-warn">
@@ -70,14 +70,87 @@
           </div>
         </section>
 
+        <section class="idea-section" aria-labelledby="rules-title">
+          <h2 class="group-label" id="rules-title">Rule design · cooperation beats exploitation</h2>
+          <p class="group-intro short">
+            Use game theory so the strongest move is helping the city wake up together, not hiding
+            information or farming a private score.
+          </p>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Public goods mechanics</span>
+                <span class="list-sub">Some objects only wake after a shared threshold, like 20 anonymous scans unlocking the next clue for everyone.</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 7h10v10H7z"/><path d="M12 3v4"/><path d="M12 17v4"/><path d="M3 12h4"/><path d="M17 12h4"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Anti-hoarding rewards</span>
+                <span class="list-sub">The first finder gets a seed clue, but the object evolves only after several more people scan it, so sharing beats secrecy.</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-purple" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 12 11 14 15 10"/><path d="M20 12a8 8 0 1 1-4-6.93"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Trust and vouch mechanics</span>
+                <span class="list-sub">Deeper paths can require a vouch from a NewBo object, a local business, or a community steward without demanding legal identity.</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v6"/><path d="M12 15v6"/><path d="M5.64 5.64l4.24 4.24"/><path d="M14.12 14.12l4.24 4.24"/><path d="M3 12h6"/><path d="M15 12h6"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Prisoner&rsquo;s-dilemma choices</span>
+                <span class="list-sub">A player can reveal a clue privately now for a small win, or leave it hidden long enough for the group to unlock a better shared ending.</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="9"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Scarcity without surveillance</span>
+                <span class="list-sub">Use expiring clues, rotating QR states, and limits like 25 passes before sunset instead of tracking who went where.</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Sybil resistance</span>
+                <span class="list-sub">Rate limits, proof-of-control challenges, local physical codes, one-time signed tokens, business-issued vouches, and device-local limits curb scan spam without identity dossiers.</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-gold" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h6v6H4z"/><path d="M14 4h6v6h-6z"/><path d="M14 14h6v6h-6z"/><path d="M10 10l4-2"/><path d="M10 14l4 2"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Coordination games</span>
+                <span class="list-sub">Fragments from Czech Village, NewBo, and Greene Square can combine into the next state, rewarding city-scale coordination over solo optimization.</span>
+              </span>
+            </li>
+          </ul>
+        </section>
+
         <section class="idea-section" aria-labelledby="ticker-title">
           <h2 class="group-label" id="ticker-title">Live map flavor</h2>
           <ul class="guestbook-lines guestbook-lines-update" aria-label="Example live updates">
-            <li>Riverwalk lantern object opened for 48 hours</li>
-            <li>Czech Village cabinet woke after the first object hit quorum</li>
-            <li>Skywalk note rotated at noon with a new route whisper</li>
-            <li>Ellis flood marker hid the trail clue until sunset</li>
-            <li>Library witness card revoked a decoy drop</li>
+            <li>Riverwalk lantern hit 20 anonymous scans and woke the next clue</li>
+            <li>Czech Village cabinet evolved after the first finder shared it outward</li>
+            <li>Skywalk note stayed hidden long enough to unlock the better shared ending</li>
+            <li>Greene Square added the third fragment and completed the route lattice</li>
+            <li>Library witness card issued its final sunset pass and closed for the night</li>
           </ul>
         </section>
 
@@ -89,7 +162,8 @@
               <ul class="scenario-card-list">
                 <li>Object: River Lantern</li>
                 <li>Window: visible until Sunday, 20:00</li>
-                <li>Unlock state: first threshold met, Czech Village object now visible</li>
+                <li>Collective progress: 20 anonymous scans completed</li>
+                <li>Unlock state: Czech Village object now visible</li>
                 <li>Steward note: trail remains open</li>
               </ul>
             </article>
@@ -98,7 +172,8 @@
               <ul class="scenario-card-list">
                 <li>Base object card: public label, district, and expiration</li>
                 <li>Event stream: 48-hour window, rotating river message, revocation rule</li>
-                <li>Unlock stream: quorum reached, next object released in Czech Village</li>
+                <li>Public-goods stream: quorum reached, next object released in Czech Village</li>
+                <li>Anti-hoarding stream: first finder got the seed clue, but value increased by sharing</li>
                 <li>Steward stream: flood, cleanup, or closure note if real space changes</li>
               </ul>
             </article>
@@ -107,6 +182,7 @@
               <ul class="scenario-card-list">
                 <li>The threshold is anonymous and resets with the object</li>
                 <li>The scan exposes current state, not who helped unlock it</li>
+                <li>Device-local cooldowns and one-time tokens stop quorum spam</li>
                 <li>If stewards pause the site, the object disappears cleanly</li>
               </ul>
             </article>
@@ -121,8 +197,9 @@
               <ul class="scenario-card-list">
                 <li>Object: Hidden cabinet glyph</li>
                 <li>Visibility: unlocked by the riverwalk object</li>
+                <li>Access: vouched by a NewBo object and a neighborhood cafe</li>
                 <li>Current message: "Ask the mural what remembers winter"</li>
-                <li>Next step: wait for a trusted local vouch</li>
+                <li>Choice: reveal privately now or wait for the stronger shared ending</li>
               </ul>
             </article>
             <article class="scenario-card">
@@ -130,7 +207,8 @@
               <ul class="scenario-card-list">
                 <li>Base object card: cabinet, alley, and public label</li>
                 <li>Lore stream: rotating message, archive fragment, temporary event window</li>
-                <li>Trust stream: requires a vouch from the library witness object</li>
+                <li>Trust stream: requires a vouch from the library witness object or a local business</li>
+                <li>Choice stream: private reveal now versus delayed shared ending</li>
                 <li>Steward stream: repainting or closure can revoke the clue</li>
               </ul>
             </article>
@@ -139,6 +217,7 @@
               <ul class="scenario-card-list">
                 <li>No account is needed to read or contribute to the shared chain</li>
                 <li>Neighborhood-created lore can be signed without making social graphs</li>
+                <li>Vouches create legitimacy without creating legal identity</li>
                 <li>The object can go dark without preserving a behavioral archive</li>
               </ul>
             </article>
@@ -153,6 +232,7 @@
               <ul class="scenario-card-list">
                 <li>Object: Library witness seal</li>
                 <li>Trust state: actively vouching for the Czech Village cabinet</li>
+                <li>Scarcity state: 11 sunset passes remain</li>
                 <li>Next reveal: skywalk clue opens only while this seal is live</li>
                 <li>Event note: expires after tonight&rsquo;s poetry reading</li>
               </ul>
@@ -162,7 +242,9 @@
               <ul class="scenario-card-list">
                 <li>Base witness card: public institution, role, and open hours</li>
                 <li>Trust stream: which nearby objects it currently vouches for</li>
+                <li>Scarcity stream: 25 passes before sunset, then automatic dormancy</li>
                 <li>Event stream: temporary gathering, rain mode, and revocation note</li>
+                <li>Sybil-resistance stream: one-time signed tokens and device-local ceilings</li>
                 <li>Steward stream: building closure or staffing pause</li>
               </ul>
             </article>
@@ -172,6 +254,7 @@
                 <li>Neighborhood-created lore chains authored by residents</li>
                 <li>Revocable physical clues attached to posters, kiosks, or river markers</li>
                 <li>Weather-only objects that appear during flood watches or snowfall</li>
+                <li>Three-way fragment puzzles spanning NewBo, Czech Village, and Greene Square</li>
               </ul>
             </article>
           </div>
@@ -196,15 +279,17 @@
             </p>
             <p>
               The city game should feel like anonymous participation in shared urban memory, not
-              optimized behavioral telemetry. Public stewards can still publish closures, flood
+              optimized behavioral telemetry. Sybil resistance should come from local friction like
+              physical codes, one-time tokens, device-local ceilings, and business-issued vouches,
+              not from building player dossiers. Public stewards can still publish closures, flood
               warnings, or cleanup holds when real space takes priority.
             </p>
           </div>
         </section>
 
         <p class="insight">
-          The interesting city game is a network of temporary objects, local secrets, and trust
-          chains: programmable public space without a player dossier.
+          The best city game is a coordination game: trust, timing, scarcity, and cooperation
+          change what physical objects reveal without creating a player dossier.
         </p>
 
         <section class="group">
