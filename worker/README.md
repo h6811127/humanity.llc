@@ -160,6 +160,19 @@ curl -s -X POST "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/revoke" \
   -d '{"revocation":{...}}' | jq .
 ```
 
+### Manifesto / status line update
+
+Owner-signed post-create copy change (same QR, no reprint). Spec: `docs/MANIFESTO_STATUS_UPDATE.md`.
+
+```bash
+# Body: { "card": <signed humanity_card with new manifesto_line and newer updated_at> }
+curl -s -X POST "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/update" \
+  -H "Content-Type: application/json" \
+  -d '{"card":{...}}' | jq .
+```
+
+Owner UI: `/created/` → **Update public line**.
+
 ### Artifact intent gate (M4.4 stub)
 
 Pre-commerce stub: blocks revoked/suspended/expired card or QR before personalized merch (Phase C).

@@ -8,6 +8,7 @@ import {
   signLiveControlResponse,
 } from "./hc-sign.mjs";
 import { initOwnerRevoke } from "./created-revoke.mjs";
+import { initVoucherRevoke } from "./vouch-revoke.mjs";
 import { initKeyBackupUi } from "./key-backup-ui.mjs";
 import { initRecoveryKeyUi } from "./recovery-key-ui.mjs";
 import { initManifestoUpdate } from "./created-manifesto-update.mjs";
@@ -530,6 +531,11 @@ async function bootstrapOwnerTools() {
     },
   };
   const revoke = initOwnerRevoke(revokeCtx);
+  const voucherRevoke = initVoucherRevoke({
+    voucherProfileId: profileId,
+    getSession: loadSession,
+    setSession: saveSession,
+  });
   const liveControl = initLiveControlProof();
   const manifestoUpdate = initManifestoUpdate({
     profileId,
@@ -550,6 +556,7 @@ async function bootstrapOwnerTools() {
     onKeysUnlocked: () => {
       backup?.refreshExportVisibility();
       revoke?.refresh();
+      voucherRevoke?.refresh();
       liveControl?.refresh();
     },
   });
@@ -559,6 +566,7 @@ async function bootstrapOwnerTools() {
     setSession: saveSession,
     onKeysUnlocked: () => {
       revoke?.refresh();
+      voucherRevoke?.refresh();
       liveControl?.refresh();
     },
   });

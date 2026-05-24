@@ -11,6 +11,7 @@ const CANONICALIZATION = "JCS";
 const PAYLOAD_TYPE_REVOCATION = "revocation";
 const PAYLOAD_TYPE_LIVE_CONTROL_RESPONSE = "live_control_response";
 const PAYLOAD_TYPE_VOUCH = "vouch";
+const PAYLOAD_TYPE_VOUCH_REVOCATION = "vouch_revocation";
 
 /** Default public vouch statement (M6 copy kit — max 280 chars). */
 export const DEFAULT_VOUCH_STATEMENT =
@@ -203,6 +204,20 @@ export function postVouchUrl() {
   return new URL("/v1/verification/vouches", resolverApiOrigin()).href;
 }
 
+export function getVouchUrl(vouchId) {
+  return new URL(
+    `/v1/verification/vouches/${encodeURIComponent(vouchId)}`,
+    resolverApiOrigin()
+  ).href;
+}
+
+export function postVouchRevokeUrl(vouchId) {
+  return new URL(
+    `/v1/verification/vouches/${encodeURIComponent(vouchId)}/revoke`,
+    resolverApiOrigin()
+  ).href;
+}
+
 export function qrScanUrl(profileId, qrId, origin = "https://humanity.llc") {
   return `${origin}/c/${profileId}?q=${qrId}`;
 }
@@ -294,5 +309,29 @@ export async function signVouch({
     revoked: false,
   };
   const unsigned = withProtocolFields(payload, PAYLOAD_TYPE_VOUCH);
+  return signDocument(unsigned, privateKey, publicKeyBase58);
+}
+
+/**
+ * Voucher-signed vouch revocation (POST /v1/verification/vouches/{vouch_id}/revoke).
+ * @param {{ vouchId: string, voucherProfileId: string, voucheeProfileId: string, privateKeyBase58: string, publicKeyBase58: string }} opts
+ */
+export async function signVouchRevocation({
+  vouchId,
+  voucherProfileId,
+  voucheeProfileId,
+  privateKeyBase58,
+  publicKeyBase58,
+}) {
+  const privateKey = decodePrivateKeyBase58(privateKeyBase58);
+  const payload = {
+    vouch_id: vouchId,
+    voucher_profile_id: voucherProfileId,
+    vouchee_profile_id: voucheeProfileId,
+    nonce: generateRevocationNonce(),
+    revoked_at: new Date().toISOString(),
+    reason: "voucher_revoked",
+  };
+  const unsigned = withProtocolFields(payload, PAYLOAD_TYPE_VOUCH_REVOCATION);
   return signDocument(unsigned, privateKey, publicKeyBase58);
 }

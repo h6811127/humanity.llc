@@ -20,7 +20,7 @@ Physical **merch** is distribution (curiosity → create), not the product defin
 
 | Layer | What it is | Status |
 |-------|------------|--------|
-| **Live QR primitive** | QR/NFC URL → resolver → honest current status + limits copy | **Live** (create, scan, revoke in-session); **M5.5** key export/recovery next |
+| **Live QR primitive** | QR/NFC URL → resolver → honest current status + limits copy | **Live** (create, scan, revoke, manifesto update); **M5.5** key export/recovery |
 | **Humanity Card** | Signed public identity document (`profile_id`, handle, manifesto, keys on device) | Phase A MVP |
 | **Vouches & live control** | Social trust and optional in-person key proof | After MVP core |
 | **Per-object / item QRs** | Revoke one sticker without killing the card | Phase B–C |
@@ -247,7 +247,7 @@ Health: `GET /.well-known/hc/v1/health` · Create: `POST /.well-known/hc/v1/card
 
 **MVP** = Phase A through roadmap step **5.3** (honest create → scan → revoke). Commons Pass and federation are **not** required for that gate.
 
-**After M5:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` — one vertical on real objects (status plate, lost-item relay, organizer-signed revoke), not more design-space pages.
+**Current focus:** `docs/MANIFESTO_STATUS_UPDATE.md` — post-create status line / manifesto edits (status plate, lost-item relay). See `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`.
 
 ---
 

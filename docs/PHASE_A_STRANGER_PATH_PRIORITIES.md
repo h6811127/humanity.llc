@@ -34,7 +34,9 @@ Defer until a vertical pilot succeeds:
 
 Pick **one** for the first real-world pilot (5–10 printed QRs, watch where people stall: print, recovery key, finding revoke).
 
-**Current build focus:** Organizer-signed revoke — see `docs/ORGANIZER_SIGNED_REVOKE_PILOT.md`. Verticals #1–2: `docs/STATUS_PLATE_PILOT.md`, `docs/LOST_ITEM_RELAY_PILOT.md`.
+**Current build focus:** **Manifesto / status line updates** — `docs/MANIFESTO_STATUS_UPDATE.md` (same QR, live public copy). Enables status plate (#1) and lost-item relay (#2) without reprinting.
+
+Organizer revoke shipped: `docs/ORGANIZER_SIGNED_REVOKE_PILOT.md`.
 
 ---
 

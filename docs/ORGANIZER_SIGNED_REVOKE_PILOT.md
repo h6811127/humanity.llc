@@ -60,7 +60,7 @@ Revocation row stores `issuer_public_key` = signer's public key (audit).
 
 ## Not in this pilot
 
-- Signed **manifesto updates** (status changes without revoke) — future `card_update` document
+- Signed **manifesto updates** — owner-only via `POST …/update` (`docs/MANIFESTO_STATUS_UPDATE.md`); organizers cannot edit copy
 - Multi-organizer federation or rotation UI
 - Organizer revoke from `/created/` (use `/organizer-revoke/` only)
 

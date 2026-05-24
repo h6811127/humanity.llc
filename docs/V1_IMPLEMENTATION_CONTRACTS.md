@@ -64,6 +64,7 @@ Optional but high-leverage for v1.1 or a strong private alpha:
 | `GET /.well-known/hc/v1/qr/{qr_id}` | GET | None | Returns QR credential metadata. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/qr` | POST | Owner signature | Creates/rotates QR credential. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/revoke` | POST | Owner/recovery signature | Revokes card or QR credential. |
+| `POST /.well-known/hc/v1/cards/{profile_id}/update` | POST | Owner/recovery signature | Updates `manifesto_line` and signed card document; handle and keys immutable. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/live-control/challenges` | POST | Scanner session | Creates short-lived live control challenge. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/live-control/responses` | POST | Owner signature | Submits signed live control challenge response. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/export` | POST | Owner auth/signature | Requests export bundle. |

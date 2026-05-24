@@ -67,6 +67,12 @@ Score with `docs/M5_STRANGER_TEST_RUNBOOK.md`.
 
 ---
 
+## Return message updates
+
+Owner can change line 2 (return message) without reprinting — `docs/MANIFESTO_STATUS_UPDATE.md`, **Update public line** on `/created/`.
+
+---
+
 ## Ethics (read before field test)
 
 - **Do not** imply scan proves the holder is the owner.  

@@ -145,6 +145,18 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ---
 
+## M4.7 — Manifesto / status line updates
+
+**Spec:** `docs/MANIFESTO_STATUS_UPDATE.md`
+
+**Exit:**
+- [x] `POST /.well-known/hc/v1/cards/{profile_id}/update` — owner/recovery signed (`worker/src/resolver/update-card.ts`)
+- [x] `/created/` **Update public line** UI (`site/js/created-manifesto-update.mjs`)
+- [x] Status plate + lost-item relay field layouts; infer pilot from stored manifesto on return visit
+- [x] Scan HTML shows updated two-line copy (`update-card.test.ts`)
+
+---
+
 ## M5 — Launch gate (after M4)
 
 **Refs:** roadmap §12 Phase A exit; **`docs/M5_STRANGER_TEST_RUNBOOK.md`** (step-by-step)
@@ -209,6 +221,8 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ## Current step
 
-**→ Live control alpha step 1** — `docs/M7_LIVE_CONTROL_ALPHA.md`. Keep the first interaction simple: scanner asks for live proof, owner proves control from a key-holding device, scanner sees recent-control success.
+**→ Post-create manifesto / status line updates** — `docs/MANIFESTO_STATUS_UPDATE.md`. Same printed QR; owner-signed `POST …/cards/{profile_id}/update` changes public copy for status plates, lost-item relays, and general cards.
 
-M5 stranger gate remains required before merch / Commons Pass: `docs/M5_STRANGER_TEST_RUNBOOK.md`.
+**Shipped in repo (verify on production):** M7 live control Step 1 (`docs/M7_LIVE_CONTROL_ALPHA.md`), M4.4 artifact-intent gate, organizer revoke pilot.
+
+**Deferred (not blocking this track):** M5 stranger batch (`docs/M5_STRANGER_TEST_RUNBOOK.md`), M7 Step 2 polish.

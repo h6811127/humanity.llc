@@ -1,6 +1,6 @@
 # M7 — Live control alpha
 
-**Status:** Step 1 in progress  
+**Status:** Step 1 shipped (verify on production); Step 2 polish deferred  
 **Canonical refs:** `docs/Technical Standards v1.0.md` §8.6, `docs/V1_PRODUCT_TRUST_MODEL.md` § Live Control Proof Flow  
 **Product thesis:** Revocation proves the object is mutable. Live control proves the object is actively possessed.
 
