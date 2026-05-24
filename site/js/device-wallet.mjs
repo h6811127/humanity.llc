@@ -43,6 +43,21 @@ export function isWalletSaved(profileId) {
   return loadWallet().some((e) => e.profile_id === profileId);
 }
 
+/** Row subtitle — always show network handle + id so labels cannot lie. */
+export function walletEntrySubtitle(entry) {
+  const parts = [];
+  if (entry.handle) parts.push(`@${entry.handle}`);
+  else if (entry.profile_id) parts.push(entry.profile_id.slice(0, 14) + "…");
+  if (entry.profile_id && entry.handle) {
+    parts.push(entry.profile_id.slice(0, 10) + "…");
+  }
+  return parts.join(" · ") || "Saved card";
+}
+
+export function defaultWalletLabel(session) {
+  return session?.handle ? `@${session.handle}` : session?.profile_id?.slice(0, 12) || "Saved card";
+}
+
 /**
  * @param {Record<string, unknown>} session
  * @param {string} [label]
@@ -53,7 +68,20 @@ export function saveSessionToWallet(session, label = "") {
     return { error: "No signing keys in this tab." };
   }
   const entries = loadWallet();
-  if (entries.some((e) => e.profile_id === session.profile_id)) {
+  const idx = entries.findIndex((e) => e.profile_id === session.profile_id);
+  if (idx >= 0) {
+    const trimmed = label.trim();
+    if (trimmed) {
+      entries[idx] = {
+        ...entries[idx],
+        label: trimmed,
+        handle: session.handle ?? entries[idx].handle,
+        manifesto_line: session.manifesto_line ?? entries[idx].manifesto_line,
+        saved_at: new Date().toISOString(),
+      };
+      saveWallet(entries);
+      return { ok: true, updated: true };
+    }
     return { error: "Already saved on this device." };
   }
   entries.unshift(walletEntryFromSession(session, label));

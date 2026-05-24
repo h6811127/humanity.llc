@@ -9,9 +9,11 @@ import {
   savePins,
 } from "./device-pins.mjs";
 import {
+  defaultWalletLabel,
   loadWallet,
   saveSessionToWallet,
   saveWallet,
+  walletEntrySubtitle,
 } from "./device-wallet.mjs";
 
 function loadActiveSession() {
@@ -168,7 +170,7 @@ function renderList() {
     const li = document.createElement("li");
     li.className = "wallet-card-item";
     li.dataset.hubSearchable = searchHaystack(entry);
-    const sub = entry.manifesto_line || entry.handle || entry.profile_id;
+    const sub = walletEntrySubtitle(entry);
     const status = entry.status === "revoked" ? "Revoked" : "Active";
     li.innerHTML = `
       <button type="button" class="wallet-card-main wallet-activate" data-id="${escapeHtml(entry.id)}">
@@ -290,12 +292,15 @@ if (pinForm) {
   });
 }
 
+function prefillSaveLabel(session) {
+  if (!saveLabel || !session) return;
+  saveLabel.value = defaultWalletLabel(session);
+}
+
 const session = loadActiveSession();
 if (saveForm && saveGroup && session?.owner_private_key_b58 && session?.profile_id) {
   saveGroup.hidden = false;
-  if (saveLabel) {
-    saveLabel.placeholder = session.handle ? `@${session.handle}` : "Personal card";
-  }
+  prefillSaveLabel(session);
   saveForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const label = saveLabel?.value?.trim() || "";
@@ -304,7 +309,11 @@ if (saveForm && saveGroup && session?.owner_private_key_b58 && session?.profile_
       setStatus(saveStatus, result.error, true);
       return;
     }
-    setStatus(saveStatus, "Saved on this device only.");
+    setStatus(
+      saveStatus,
+      result.updated ? "Label updated." : "Saved on this device only."
+    );
+    prefillSaveLabel(session);
     renderList();
     applyHubSearch();
   });

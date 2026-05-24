@@ -1,4 +1,5 @@
 import {
+  defaultWalletLabel,
   isWalletSaved,
   saveSessionToWallet,
 } from "./device-wallet.mjs";
@@ -29,8 +30,11 @@ export function initCreatedDeviceSave(getSession) {
       return;
     }
     card.hidden = false;
-    if (labelInput && session.handle) {
-      labelInput.placeholder = `@${session.handle}`;
+    if (labelInput) {
+      labelInput.placeholder = "Label";
+      if (!labelInput.value.trim()) {
+        labelInput.value = defaultWalletLabel(session);
+      }
     }
     const saved = isWalletSaved(session.profile_id);
     if (saved && form && doneEl) {

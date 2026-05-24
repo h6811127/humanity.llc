@@ -103,13 +103,12 @@
             <div class="settings-panel settings-panel-info wallet-help-panel">
               <ul class="wallet-help-list">
                 <li><strong>Save</strong> copies keys from the create tab to this device.</li>
-                <li><strong>Use keys</strong> loads a card so you can vouch or revoke.</li>
-                <li><strong>Pin</strong> saves a scan link to reopen later (↗).</li>
+                <li><strong>Use keys</strong> loads that card&rsquo;s keys — check <strong>@handle</strong> under the title, not just the label you typed.</li>
+                <li><strong>Pin</strong> is only a scan bookmark (↗), no keys.</li>
               </ul>
               <p class="form-hint">
-                Recovery key ≠ save. Saved cards follow this browser — Safari and Chrome may sync
-                website data across your signed-in devices; we don&rsquo;t control that and it can
-                be incomplete.
+                Labels are yours; keys always match the <strong>@handle</strong> shown. Browser sync
+                (Safari/Chrome) may copy an old save with a wrong label, or only one of two cards.
               </p>
             </div>
           </details>
@@ -133,6 +132,6 @@
       </label>
     </div>
 
-    <script type="module" src="/js/card-wallet.mjs?v=5"></script>
+    <script type="module" src="/js/card-wallet.mjs?v=6"></script>
   </body>
 </html>

@@ -3,6 +3,7 @@
  */
 import { applyDeviceHubSearch } from "./device-hub-search.mjs";
 import { loadPins, pinHaystack } from "./device-pins.mjs";
+import { walletEntrySubtitle } from "./device-wallet.mjs";
 
 const WALLET_KEY = "hc_wallet";
 
@@ -57,7 +58,7 @@ function renderSavedRows() {
     const li = document.createElement("li");
     li.className = "list-row list-action";
     li.dataset.hubSearchable = walletHaystack(entry);
-    const sub = entry.manifesto_line || entry.handle || "Signing keys on this device";
+    const sub = walletEntrySubtitle(entry);
     li.innerHTML = `
       <a href="/wallet/">
         <span class="list-icon list-icon-tone-trust" aria-hidden="true">

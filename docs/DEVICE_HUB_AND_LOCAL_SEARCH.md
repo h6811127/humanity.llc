@@ -72,6 +72,8 @@ Returning users see their labels on the homepage; strangers still see the same s
 
 `localStorage` is **per browser profile**, not uploaded by humanity.llc. Some browsers (especially Safari within Apple’s ecosystem, and signed-in Chrome profiles in some setups) may **replicate website data** across devices. That behavior is **platform-controlled**, can be **incomplete** (e.g. two cards on phone, one on laptop), and is **not** a supported product feature. Prefer **Save on this device** per machine, **encrypted backup** (Phase 3), or recovery key — not relying on browser sync.
 
+**Wrong card after tap?** Usually the **label** does not match what you think you saved — keys are tied to `profile_id` and `@handle` at save time. A common pattern: save card A while the label field still says card B’s name; only that one entry syncs to another device. UI shows `@handle` + profile id under each title so you can verify before **Use keys**.
+
 ## Security and data policy
 
 - Wallet and pins stay in **browser storage**; operator never receives private keys from pins.

@@ -369,6 +369,14 @@ if (!profileId && !qrId && !data) {
   noSessionEl.hidden = false;
   noSessionEl.textContent =
     "Missing profile or QR in this link. Create a new card, or open the full URL from your create confirmation.";
+} else if (
+  profileIdParam &&
+  data?.profile_id &&
+  profileIdParam !== data.profile_id
+) {
+  noSessionEl.hidden = false;
+  noSessionEl.textContent =
+    "This link is for a different card than the keys in this tab. Open Saved cards and tap Use keys on the card you want.";
 }
 
 if (data?.handle) {
