@@ -970,6 +970,166 @@ a {
   background: rgba(0, 122, 255, 0.05);
 }
 
+/* V-002 — vouch issuance (scan page, client-revealed) */
+.vouch-card-wrap {
+  display: block;
+  width: 100%;
+  padding: 0 !important;
+}
+
+.list-row.vouch-row {
+  align-items: stretch;
+  padding: 0;
+  border-bottom: none;
+}
+
+.list-row.vouch-row .list-content {
+  width: 100%;
+}
+
+.vouch-card {
+  padding: 16px 16px 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #f7f7f9;
+}
+
+.vouch-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.vouch-card-head .list-icon {
+  margin-top: 2px;
+}
+
+.vouch-card-head-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.vouch-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.vouch-title {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--black);
+}
+
+.vouch-lead {
+  margin: 0 0 14px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--black);
+}
+
+.vouch-field-label {
+  display: block;
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--grey);
+}
+
+.vouch-statement {
+  display: block;
+  width: 100%;
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--black);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 14px;
+  background: var(--white);
+  resize: vertical;
+  min-height: 88px;
+}
+
+.vouch-confirm-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 0 14px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--black);
+  cursor: pointer;
+}
+
+.vouch-confirm-label input {
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.vouch-cta {
+  display: block;
+  width: 100%;
+  margin: 0 0 12px;
+  padding: 14px 18px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--white);
+  background: #248a3d;
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.vouch-cta:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.vouch-status-panel {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.vouch-status {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+.vouch-status[data-tone="error"] {
+  color: var(--red);
+}
+
+.vouch-status[data-tone="waiting"] {
+  color: var(--black);
+}
+
+.vouch-card-ineligible {
+  border-color: rgba(255, 149, 0, 0.35);
+  background: rgba(255, 149, 0, 0.06);
+}
+
+.vouch-card-success {
+  border-color: rgba(52, 199, 89, 0.35);
+  background: linear-gradient(
+    180deg,
+    rgba(52, 199, 89, 0.1) 0%,
+    rgba(52, 199, 89, 0.04) 100%
+  );
+  box-shadow: 0 0 0 1px rgba(52, 199, 89, 0.08);
+}
+
 .scan-footer-link {
   text-align: center;
   font-size: 13px;

@@ -55,6 +55,7 @@ export async function renderScanPage(
   </div>
   <script>${SCAN_PASS_FLIP_JS}</script>
   ${renderLiveControlScript(vm, origin)}
+  ${renderVouchIssuanceScript(vm, origin)}
   ${renderQrFallbackScript(origin, vm.scanUrl)}
 </body>
 </html>`;
@@ -357,6 +358,16 @@ function renderTrustGroups(vm: ScanViewModel, origin: string): string {
     );
   }
 
+  if (vm.kind === "active" && vm.profileId && vm.showHumanTrustBlock) {
+    sections.push(
+      trustGroup(
+        "Vouch",
+        vouchIssuanceGroupRows(vm),
+        "vouch"
+      )
+    );
+  }
+
   return `<div class="scan-trust-groups" aria-label="Network status at scan time">
 ${sections.join("\n")}
 </div>`;
@@ -413,7 +424,13 @@ function cardGroupRows(vm: ScanViewModel): string {
 
 function humanGroupRows(vm: ScanViewModel): string {
   const display = humanTrustDisplay(vm);
-  return listRow("people", display.iconTone, display.label, display.subtitle);
+  return `<li class="list-row" id="human-trust-row">
+  ${scanListIcon("people", display.iconTone)}
+  <span class="list-content">
+    <span class="list-title" id="human-trust-row-title">${escapeHtml(display.label)}</span>
+    <span class="list-sub" id="human-trust-row-sub">${escapeHtml(display.subtitle)}</span>
+  </span>
+</li>`;
 }
 
 function qrGroupRows(vm: ScanViewModel): string {
@@ -439,6 +456,80 @@ function liveControlGroupRows(vm: ScanViewModel): string {
     "Not shown",
     "Optional in-person key proof (M7)"
   );
+}
+
+function vouchIssuanceGroupRows(vm: ScanViewModel): string {
+  const profileId = vm.profileId ?? "";
+  return `<li class="list-row vouch-row" id="vouch-row" hidden data-vouchee-profile-id="${escapeHtml(profileId)}">
+  <span class="list-content vouch-card-wrap">
+    <div class="vouch-card" id="vouch-interactive" hidden>
+      <div class="vouch-card-head">
+        ${scanListIcon("green", "people")}
+        <div class="vouch-card-head-text">
+          <span class="vouch-eyebrow">Human attestation</span>
+          <span class="vouch-title">Vouch for this person</span>
+        </div>
+      </div>
+      <p class="vouch-lead">
+        Sign a public statement that this is a distinct human you know in person. This is not legal ID.
+      </p>
+      <label class="vouch-field-label" for="vouch-statement">Public statement</label>
+      <textarea class="vouch-statement" id="vouch-statement" maxlength="280" rows="4"></textarea>
+      <label class="vouch-confirm-label">
+        <input type="checkbox" id="vouch-confirm" />
+        <span>I understand this vouch is public, revocable, and does not prove legal identity.</span>
+      </label>
+      <button type="button" class="vouch-cta" id="vouch-submit">Submit vouch</button>
+      <div class="vouch-status-panel">
+        <p class="vouch-status" id="vouch-status" aria-live="polite"></p>
+      </div>
+    </div>
+    <div class="vouch-card vouch-card-ineligible" id="vouch-ineligible" hidden>
+      <div class="vouch-card-head">
+        ${scanListIcon("orange", "warning")}
+        <div class="vouch-card-head-text">
+          <span class="vouch-eyebrow">Not available yet</span>
+          <span class="vouch-title">Can't vouch from this device</span>
+        </div>
+      </div>
+      <p class="vouch-lead" id="vouch-ineligible-copy"></p>
+    </div>
+    <div class="vouch-card vouch-card-success" id="vouch-success" hidden>
+      <div class="vouch-card-head">
+        ${scanListIcon("green", "people")}
+        <div class="vouch-card-head-text">
+          <span class="vouch-eyebrow">Vouch recorded</span>
+          <span class="vouch-title">Thank you</span>
+        </div>
+      </div>
+      <p class="vouch-lead" id="vouch-success-copy">Your vouch was accepted.</p>
+    </div>
+  </span>
+</li>`;
+}
+
+function renderVouchIssuanceScript(vm: ScanViewModel, origin: string): string {
+  if (vm.kind !== "active" || !vm.profileId) return "";
+  const assetOrigin = pagesJsOrigin(origin);
+  const mod = JSON.stringify(`${assetOrigin}/js/vouch-issue.mjs?v=1`);
+  return `<script type="module" src=${mod}></script>`;
+}
+
+/** Local dev: scan HTML is on :8787, static JS on Pages :8788. */
+function pagesJsOrigin(origin: string): string {
+  try {
+    const url = new URL(origin);
+    if (
+      (url.hostname === "127.0.0.1" || url.hostname === "localhost") &&
+      url.port === "8787"
+    ) {
+      url.port = "8788";
+      return url.origin;
+    }
+  } catch {
+    /* use scan origin */
+  }
+  return origin;
 }
 
 function liveControlInteractiveRow(provenAt: string | null): string {

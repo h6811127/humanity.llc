@@ -10,6 +10,11 @@ const SIGNATURE_ALG = "Ed25519";
 const CANONICALIZATION = "JCS";
 const PAYLOAD_TYPE_REVOCATION = "revocation";
 const PAYLOAD_TYPE_LIVE_CONTROL_RESPONSE = "live_control_response";
+const PAYLOAD_TYPE_VOUCH = "vouch";
+
+/** Default public vouch statement (M6 copy kit — max 280 chars). */
+export const DEFAULT_VOUCH_STATEMENT =
+  "I attest this is a distinct human I know. This is not legal ID. My vouch is public and revocable.";
 
 /** Level 0 bearer copy (V1_PRODUCT_TRUST_MODEL.md) — keep in sync with worker trust-copy.ts */
 export const BEARER_WARNING =
@@ -55,6 +60,16 @@ export function generateQrId() {
 /** Revocation nonce (Technical Standards §10.1). */
 export function generateRevocationNonce() {
   return `nonce_${randomBase58(16)}`;
+}
+
+/** Vouch nonce — replay protection on POST. */
+export function generateVouchNonce() {
+  return `nonce_${randomBase58(16)}`;
+}
+
+/** Vouch document id (`vouch_` + base58). */
+export function generateVouchId() {
+  return `vouch_${randomBase58(16)}`;
 }
 
 export function encodePrivateKeyBase58(privateKey) {
@@ -177,6 +192,10 @@ export function getCardJsonUrl(profileId) {
   ).href;
 }
 
+export function postVouchUrl() {
+  return new URL("/v1/verification/vouches", resolverApiOrigin()).href;
+}
+
 export function qrScanUrl(profileId, qrId, origin = "https://humanity.llc") {
   return `${origin}/c/${profileId}?q=${qrId}`;
 }
@@ -240,5 +259,33 @@ export async function signLiveControlResponse({
     signed_at: new Date().toISOString(),
   };
   const unsigned = withProtocolFields(payload, PAYLOAD_TYPE_LIVE_CONTROL_RESPONSE);
+  return signDocument(unsigned, privateKey, publicKeyBase58);
+}
+
+/**
+ * Voucher-signed public vouch (POST /v1/verification/vouches).
+ * @param {{ voucherProfileId: string, voucheeProfileId: string, privateKeyBase58: string, publicKeyBase58: string, statement?: string, method?: string }} opts
+ */
+export async function signVouch({
+  voucherProfileId,
+  voucheeProfileId,
+  privateKeyBase58,
+  publicKeyBase58,
+  statement = DEFAULT_VOUCH_STATEMENT,
+  method = "in_person",
+}) {
+  const privateKey = decodePrivateKeyBase58(privateKeyBase58);
+  const createdAt = new Date().toISOString();
+  const payload = {
+    vouch_id: generateVouchId(),
+    voucher_profile_id: voucherProfileId,
+    vouchee_profile_id: voucheeProfileId,
+    nonce: generateVouchNonce(),
+    statement: statement.trim(),
+    method,
+    created_at: createdAt,
+    revoked: false,
+  };
+  const unsigned = withProtocolFields(payload, PAYLOAD_TYPE_VOUCH);
   return signDocument(unsigned, privateKey, publicKeyBase58);
 }

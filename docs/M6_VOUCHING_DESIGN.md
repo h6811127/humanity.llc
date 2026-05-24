@@ -272,9 +272,9 @@ Revoked/suspended card states must **override** positive verification on scan (a
 
 **Step 2 — Vouch issuance UX (V-002)**
 
-- [ ] Card client: “Vouch for this person” for eligible vouchers.
-- [ ] Sign + POST flow with default statement template.
-- [ ] Eligibility errors surfaced in plain language (quota, wait period, not verified).
+- [x] Card client: “Vouch for this person” for eligible vouchers.
+- [x] Sign + POST flow with default statement template.
+- [x] Eligibility errors surfaced in plain language (quota, wait period, not verified).
 
 **Step 3 — Vouch revocation**
 

@@ -212,6 +212,9 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("Live control");
     expect(html).toContain('id="live-control-request"');
     expect(html).toContain("live-control-cta");
+    expect(html).toContain('id="vouch-row"');
+    expect(html).toContain("Vouch for this person");
+    expect(html).toContain("vouch-issue.mjs");
     expect(html).not.toContain("Limitations");
     expect(html).toContain("scan-limits-settings");
     expect(html).toContain('class="list"');
