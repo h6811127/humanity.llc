@@ -27,7 +27,7 @@ curl -sS "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status?q=QR" | jq
 7. **No analytics** — confirm scan HTML has no third-party trackers (view source / Network tab once).
 8. **Key custody** — confirm the copy says: if you lose this tab without a recovery key or encrypted backup, you cannot revoke from the web UI; humanity.llc cannot recover or revoke for you.
 
-**Deploy check:** scan response header `X-HC-Scan-UI: pass-v5` on an active scan.
+**Deploy check:** scan response header `X-HC-Scan-UI: pass-v10` on an active scan.
 
 ---
 
