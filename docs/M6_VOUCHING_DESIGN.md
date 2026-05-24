@@ -1,6 +1,6 @@
 # M6 — Vouching design
 
-**Status:** Step 1 (V-001) shipped in repo — verify on production; Steps 2–3 shipped; Step 4 internal cluster flags shipped; steward review queue pending
+**Status:** Step 1 (V-001) shipped in repo — verify on production; Steps 2–3 shipped; Step 4 abuse hooks shipped; production smoke pending
 **Canonical refs:** `docs/V1_PRODUCT_TRUST_MODEL.md` § Level 2, `docs/V1_ADVERSARIAL_REVIEW.md` § Perspective 1, `docs/features/Human Verification v1.0.md`, `docs/V1_IMPLEMENTATION_BACKLOG.md` (V-001, V-002)  
 **Product thesis:** Live control proves recent key possession. Vouching proves that other accountable humans attested this card belongs to a distinct person — under published rules, not under legal-ID assumptions.
 
@@ -111,7 +111,7 @@ Design for hostile actors, not only happy-path founders.
 | 5 active vouches per voucher per year | **Enforced** (`VOUCHER_ACTIVE_QUOTA_PER_YEAR`) |
 | 90-day wait after voucher becomes verified | **Enforced** (`VOUCHER_WAIT_DAYS`) |
 | One active vouch per voucher→vouchee pair | **Unique index** |
-| Steward audit hooks for suspicious clusters | **Design now, build later** |
+| Steward audit hooks for suspicious clusters | **Internal flags + alpha review queue specified** |
 
 **Ring detection (operator-only, not public):**
 
@@ -262,6 +262,7 @@ Revoked/suspended card states must **override** positive verification on scan (a
 | Scan human trust row (basic) | `worker/src/resolver/scan-html.ts` |
 | Private note rejection | `handlePostVouch` |
 | Internal abuse flags | `worker/src/db/vouch-audit.ts`, `worker/tests/vouch-audit.test.ts` |
+| Steward review queue spec | `docs/M6_STEWARD_REVIEW_QUEUE.md` |
 
 ### Not yet built (recommended order)
 
@@ -299,7 +300,7 @@ Revoked/suspended card states must **override** positive verification on scan (a
 **Step 4 — Abuse hooks (operator-only)**
 
 - [x] Internal cluster flags (no public graph UI).
-- [ ] Steward review queue spec (can be spreadsheet + manual in alpha).
+- [x] Steward review queue spec (can be spreadsheet + manual in alpha).
 
 **Deferred**
 

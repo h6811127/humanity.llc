@@ -31,7 +31,7 @@
 | Attack | Likelihood | Impact | Current Defense | Gap |
 |---|---|---|---|---|
 | Create many registered cards. | High | Medium | Rate limits, invite/waitlist controls. | Abuse-control policy is not fully specified. |
-| Collusive vouch ring. | Medium | High | 3-vouch threshold, 5/year quota, 90-day wait. | Graph audit rules and steward response process need more detail. |
+| Collusive vouch ring. | Medium | High | 3-vouch threshold, 5/year quota, 90-day wait; internal flags and steward review queue. | Production smoke and real steward drills still pending. |
 | Print QR artifact and imply it proves the wearer is verified. | High | High | Copy says artifacts do not grant verification. | Physical artifact design must avoid stale/mutable verification labels. |
 | Replay or forge vouch payloads. | Medium | High | Ed25519 signatures and canonical payloads. | Payload type/nonce requirements must be enforced everywhere. |
 | Use someone else's QR on merchandise. | Medium | Medium | Personalization requires active QR and owner context. | Need authorization check tying `profile_id` to buyer/session before artifact intent. |
@@ -43,7 +43,7 @@
 - Add explicit artifact-intent authorization: only the card owner or authorized session can create personalized artifacts for a `profile_id`.
 - Add unique item-scoped QR credentials for personalized physical items.
 - Add signed payload `type` and nonce to every vouch, QR rotation, revocation, and badge record.
-- Add vouch abuse audit hooks without publicizing private social graph details.
+- Add vouch abuse audit hooks and steward review workflow without publicizing private social graph details.
 - Avoid printing "Verified Human" as static text on artifacts in V1.
 
 ---
