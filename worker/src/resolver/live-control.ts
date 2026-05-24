@@ -33,6 +33,7 @@ const CHALLENGE_ID_REGEX =
 
 interface CreateChallengeBody {
   qr_id?: unknown;
+  client_origin?: unknown;
 }
 
 interface SubmitResponseBody {
@@ -121,7 +122,8 @@ export async function handlePostLiveControlChallenge(
         created_at: issuedAt.toISOString(),
         updated_at: issuedAt.toISOString(),
       },
-      request
+      request,
+      localClientOrigin(body.client_origin)
     ),
     201
   );
@@ -281,8 +283,12 @@ async function expireIfNeeded(
   return { ...challenge, status: "expired", updated_at: updatedAt };
 }
 
-function challengeBody(challenge: LiveControlChallengeRow, request: Request) {
-  const origin = liveControlApiOrigin(request);
+function challengeBody(
+  challenge: LiveControlChallengeRow,
+  request: Request,
+  originOverride?: string | null
+) {
+  const origin = originOverride ?? liveControlApiOrigin(request);
   const ownerUrl = new URL(`${ownerPageOrigin(origin)}/created/`);
   ownerUrl.searchParams.set("profile_id", challenge.profile_id);
   if (challenge.qr_id) ownerUrl.searchParams.set("qr_id", challenge.qr_id);
@@ -344,6 +350,11 @@ function isLocalOrigin(origin: string): boolean {
   } catch {
     return false;
   }
+}
+
+function localClientOrigin(origin: unknown): string | null {
+  if (typeof origin !== "string") return null;
+  return isLocalOrigin(origin) ? origin : null;
 }
 
 function liveControlUnavailableMessage(kind: ScanPageKind): string {

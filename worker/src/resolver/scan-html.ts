@@ -515,7 +515,10 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
     fetch(${JSON.stringify(challengeUrl)}, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ qr_id: ${JSON.stringify(vm.qrId)} })
+      body: JSON.stringify({
+        qr_id: ${JSON.stringify(vm.qrId)},
+        client_origin: location.origin
+      })
     })
       .then(function (res) { return res.json().then(function (body) { return { ok: res.ok, body: body }; }); })
       .then(function (result) {
