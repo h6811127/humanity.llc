@@ -8,7 +8,7 @@ import { BEARER_WARNING } from "../src/resolver/trust-copy";
 import { buildScanViewModel } from "../src/resolver/scan-state";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
-const QR = "qr_test_card_001";
+const QR = "qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 
 function card(overrides: Partial<CardRow> = {}): CardRow {
   return {
@@ -340,7 +340,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(res.status).toBe(200);
     expect(res.headers.get("Cache-Control")).toBe("no-store");
     expect(html).toContain("Control proven recently");
-    expect(html).not.toContain("Ask for live proof");
+    expect(html).not.toContain('id="live-control-request"');
   });
 
   it("does not rehydrate stale live control proof after the freshness window", async () => {
