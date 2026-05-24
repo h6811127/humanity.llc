@@ -139,9 +139,9 @@ Separate threat model when **5.5.3–5.5.4** ship: one-time recovery code, recov
 
 **Exit:**
 
-- [ ] `/create/`, `/created/`, data policy explain: session-only vs backup vs recovery.
-- [ ] No implication that humanity.llc can revoke on the user’s behalf.
-- [ ] Stranger test script updated: “lose tab without backup = cannot revoke from web UI.”
+- [x] `/create/`, `/created/`, data policy explain: session-only vs backup vs recovery.
+- [x] No implication that humanity.llc can revoke on the user’s behalf.
+- [x] Stranger test script updated: “lose tab without backup = cannot revoke from web UI.”
 
 ---
 

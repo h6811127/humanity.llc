@@ -218,8 +218,8 @@
             <p class="owner-live-status" id="owner-live-status" aria-live="polite"></p>
             <p class="form-warning owner-revoked-banner" id="owner-revoked-banner" hidden></p>
             <p class="form-hint" id="owner-no-key">
-              Unlock a backup or recovery key below, or create again on
-              <a href="/create/">/create/</a>.
+              This page needs a signing key to revoke. Unlock a backup or recovery key below, or
+              create again on <a href="/create/">/create/</a>.
             </p>
 
             <div id="revoke-actions" hidden>
@@ -278,12 +278,20 @@
               </p>
               <ul class="settings-list">
                 <li>
-                  <strong>This browser tab</strong> keeps the key until you close it. Add to Home
-                  Screen does not save the key.
+                  <strong>Session-only:</strong> this browser tab keeps the owner key until you
+                  close it. Add to Home Screen does not save the key.
                 </li>
                 <li>
-                  <strong>Recovery key</strong> (shown once at create) or <strong>encrypted backup</strong>
-                  (below) lets you revoke from another device later.
+                  <strong>Recovery key:</strong> the one-time key shown at create can unlock revoke
+                  later if you saved it.
+                </li>
+                <li>
+                  <strong>Encrypted backup:</strong> the backup file plus its passphrase can restore
+                  the owner key on another device.
+                </li>
+                <li>
+                  humanity.llc cannot recover your passphrase, restore lost keys, or revoke on your
+                  behalf. The resolver accepts signed actions; it does not hold a support backdoor.
                 </li>
                 <li>
                   <strong>iPhone (Passwords)</strong> or <strong>Android (Google Password Manager)</strong>:

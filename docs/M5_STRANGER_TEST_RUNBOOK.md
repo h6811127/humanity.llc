@@ -25,6 +25,7 @@ curl -sS "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status?q=QR" | jq
 ```
 
 7. **No analytics** — confirm scan HTML has no third-party trackers (view source / Network tab once).
+8. **Key custody** — confirm the copy says: if you lose this tab without a recovery key or encrypted backup, you cannot revoke from the web UI; humanity.llc cannot recover or revoke for you.
 
 **Deploy check:** scan response header `X-HC-Scan-UI: pass-v5` on an active scan.
 
@@ -48,6 +49,7 @@ curl -sS "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status?q=QR" | jq
 > 2) What it **does not** prove  
 >  
 > Optional: revoke the QR from the “created” page and scan again.  
+> If you close the tab before saving a recovery key or encrypted backup, you will not be able to revoke from the web UI later.  
 > No account, no app — just Safari/Chrome.
 
 Do **not** send the data policy or research page unless they ask.
@@ -56,11 +58,11 @@ Do **not** send the data policy or research page unless they ask.
 
 ## Per-stranger scorecard
 
-| # | Name (optional) | Created unassisted? | Scan understandable &lt;30s? | One-sentence proves | One-sentence does not prove | Revoked + re-scan OK? | Notes |
-|---|-----------------|--------------------|-----------------------------|---------------------|----------------------------|------------------------|-------|
-| 1 | | ☐ | ☐ | | | ☐ | |
-| 2 | | | ☐ | | | ☐ | |
-| 3 | | | ☐ | | | ☐ | |
+| # | Name (optional) | Created unassisted? | Scan understandable &lt;30s? | One-sentence proves | One-sentence does not prove | Understands lost-tab backup rule? | Revoked + re-scan OK? | Notes |
+|---|-----------------|--------------------|-----------------------------|---------------------|----------------------------|----------------------------------|------------------------|-------|
+| 1 | | ☐ | ☐ | | | ☐ | ☐ | |
+| 2 | | | ☐ | | | ☐ | ☐ | |
+| 3 | | | ☐ | | | ☐ | ☐ | |
 
 **Pass line for M5:** all three rows checked for create + scan understanding; **at least one** completes revoke + re-scan; none think it proves legal ID or “holder owns the sticker” without reading limits.
 
