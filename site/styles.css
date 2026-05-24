@@ -1076,13 +1076,21 @@ a {
 }
 
 .pass-tilt-surface {
+  position: relative;
   width: 100%;
 }
 
-.pass-flip-btn {
+.pass-scene-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.pass-flip-btn,
+.pass-demo-revoke-btn {
   display: block;
   width: 100%;
-  margin-top: 10px;
   min-height: 44px;
   padding: 12px 16px;
   font-family: inherit;
@@ -1090,18 +1098,218 @@ a {
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--grey);
   text-align: center;
-  background: transparent;
-  border: 1px dashed var(--grey);
   border-radius: var(--radius-pill);
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  transition:
+    opacity 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.pass-flip-btn {
+  color: var(--grey);
+  background: transparent;
+  border: 1px dashed var(--grey);
 }
 
 .pass-flip-btn:active {
   opacity: 0.7;
+}
+
+.pass-demo-revoke-btn {
+  color: var(--red);
+  background: rgba(219, 27, 67, 0.06);
+  border: 1px solid rgba(219, 27, 67, 0.3);
+}
+
+.pass-demo-revoke-btn[aria-pressed="true"] {
+  color: var(--black);
+  background: var(--white);
+  border: 1px dashed rgba(0, 0, 0, 0.18);
+}
+
+.pass-demo-revoke-btn:active {
+  transform: scale(0.98);
+}
+
+.pass-state {
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.pass-state-revoked[hidden] {
+  display: none !important;
+}
+
+.pass-tilt-surface.is-demo-revoked .pass-state-live {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: scale(0.98);
+  pointer-events: none;
+}
+
+.pass-tilt-surface.is-demo-revoked .pass-state-revoked {
+  display: block !important;
+  animation: pass-revoke-in 0.45s ease forwards;
+}
+
+.pass-tilt-surface.is-revoking #pass-demo-qr {
+  animation: pass-qr-revoke-shake 0.52s ease;
+}
+
+.pass-tilt-surface.is-restoring .pass-state-revoked {
+  animation: pass-revoke-out 0.4s ease forwards;
+}
+
+.pass-dot-muted {
+  background: var(--grey);
+}
+
+.pass-revoke-headline {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin: 0 0 6px;
+  color: #6b5a00;
+}
+
+.pass-revoke-message {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--black);
+}
+
+.pass-revoke-message strong {
+  font-weight: 700;
+  color: var(--red);
+}
+
+.pass-scan-meter {
+  margin-top: 4px;
+}
+
+.pass-scan-meter-label {
+  display: block;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--grey);
+  margin-bottom: 6px;
+}
+
+.pass-scan-meter-track {
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.pass-scan-meter-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, #e6b800, var(--red));
+  transition: width 0.5s ease;
+}
+
+.pass-scan-meter-count {
+  display: block;
+  margin-top: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--grey);
+}
+
+.pass-qr-revoked {
+  opacity: 0.45;
+  filter: grayscale(0.35);
+  position: relative;
+}
+
+.pass-qr-revoked::after {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border: 2px solid rgba(219, 27, 67, 0.55);
+  border-radius: 4px;
+  pointer-events: none;
+  animation: pass-qr-revoke-strike 0.4s ease 0.2s both;
+}
+
+.pass-foot-demo {
+  font-style: italic;
+}
+
+@keyframes pass-revoke-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pass-revoke-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes pass-qr-revoke-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-4px) rotate(-1deg);
+  }
+  40% {
+    transform: translateX(4px) rotate(1deg);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+@keyframes pass-qr-revoke-strike {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pass-state,
+  .pass-tilt-surface.is-demo-revoked .pass-state-revoked,
+  .pass-tilt-surface.is-revoking #pass-demo-qr,
+  .pass-scan-meter-fill {
+    animation: none !important;
+    transition: none;
+  }
 }
 
 .pass-back .pass-foot {

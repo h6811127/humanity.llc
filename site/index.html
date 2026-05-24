@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=43" />
+    <link rel="stylesheet" href="/styles.css?v=45" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -50,43 +50,88 @@
         </section>
 
         <section class="pass" id="card" aria-label="Network status preview">
-          <p class="section-kicker">What you see when someone scans</p>
+          <p class="section-kicker">What someone sees when they scan</p>
           <div class="pass-scene" id="pass-scene">
             <div class="pass-tilt-wrap" id="pass-tilt-wrap">
               <div class="pass-flip" id="pass-flip">
                 <div class="pass-inner">
                   <div class="pass-face pass-front">
                     <div class="pass-tilt-surface" id="pass-tilt-surface">
-                      <div class="pass-head">
-                        <div class="pass-brand">
-                          <span class="pass-dot" aria-hidden="true"></span>
-                          <span>humanity.llc</span>
+                      <div class="pass-state pass-state-live" id="pass-demo-live">
+                        <div class="pass-head">
+                          <div class="pass-brand">
+                            <span class="pass-dot" aria-hidden="true"></span>
+                            <span>humanity.llc</span>
+                          </div>
+                          <span class="pass-badge badge-live" id="pass-demo-badge">Active</span>
                         </div>
-                        <span class="pass-badge badge-live">Active</span>
+                        <div class="pass-body">
+                          <div class="pass-main">
+                            <p class="pass-type">Live object</p>
+                            <p class="pass-name">river.example</p>
+                            <p class="pass-manifesto">Open studio · Thu–Sun</p>
+                            <ul class="pass-trust" aria-label="Status at a glance">
+                              <li class="trust-on">Card active</li>
+                              <li class="trust-on">Registered</li>
+                              <li class="trust-on">QR active</li>
+                            </ul>
+                          </div>
+                          <div class="pass-qr" id="pass-demo-qr">
+                            <img
+                              src="/assets/red_qr_transparent_bg.png"
+                              width="96"
+                              height="96"
+                              alt=""
+                            />
+                          </div>
+                        </div>
+                        <p class="pass-foot">
+                          Scan shows live state. Holding the object does not prove ownership.
+                        </p>
                       </div>
-                      <div class="pass-body">
-                        <div class="pass-main">
-                          <p class="pass-type">Live object</p>
-                          <p class="pass-name">river.example</p>
-                          <p class="pass-manifesto">Open studio · Thu–Sun</p>
-                          <ul class="pass-trust" aria-label="Status at a glance">
-                            <li class="trust-on">Card active</li>
-                            <li class="trust-on">Registered</li>
-                            <li class="trust-on">QR active</li>
-                          </ul>
+                      <div
+                        class="pass-state pass-state-revoked"
+                        id="pass-demo-revoked"
+                        hidden
+                        aria-hidden="true"
+                      >
+                        <div class="pass-head">
+                          <div class="pass-brand">
+                            <span class="pass-dot pass-dot-muted" aria-hidden="true"></span>
+                            <span>humanity.llc</span>
+                          </div>
+                          <span class="pass-badge badge-warn">Revoked</span>
                         </div>
-                        <div class="pass-qr">
-                          <img
-                            src="/assets/red_qr_transparent_bg.png"
-                            width="96"
-                            height="96"
-                            alt=""
-                          />
+                        <div class="pass-body">
+                          <div class="pass-main">
+                            <p class="pass-type">Network status</p>
+                            <p class="pass-revoke-headline">Revoked</p>
+                            <p class="pass-revoke-message">
+                              Until <strong>3 more scans</strong> are achieved.
+                            </p>
+                            <div class="pass-scan-meter" aria-hidden="true">
+                              <span class="pass-scan-meter-label">Scans toward restore</span>
+                              <div class="pass-scan-meter-track">
+                                <span class="pass-scan-meter-fill" id="pass-demo-meter"></span>
+                              </div>
+                              <span class="pass-scan-meter-count" id="pass-demo-meter-count"
+                                >0 / 3</span
+                              >
+                            </div>
+                          </div>
+                          <div class="pass-qr pass-qr-revoked">
+                            <img
+                              src="/assets/red_qr_transparent_bg.png"
+                              width="96"
+                              height="96"
+                              alt=""
+                            />
+                          </div>
                         </div>
+                        <p class="pass-foot pass-foot-demo">
+                          Demo only — playful copy, not live product behavior.
+                        </p>
                       </div>
-                      <p class="pass-foot">
-                        Scan shows live state. Holding the object does not prove ownership.
-                      </p>
                     </div>
                   </div>
                   <div class="pass-face pass-back" aria-hidden="true">
@@ -121,14 +166,24 @@
                 </div>
               </div>
             </div>
-            <button
-              type="button"
-              class="pass-flip-btn"
-              id="pass-flip-btn"
-              aria-label="Flip card"
-            >
-              Tap to flip
-            </button>
+            <div class="pass-scene-actions">
+              <button
+                type="button"
+                class="pass-flip-btn"
+                id="pass-flip-btn"
+                aria-label="Flip card"
+              >
+                Tap to flip
+              </button>
+              <button
+                type="button"
+                class="pass-demo-revoke-btn"
+                id="pass-demo-revoke-btn"
+                aria-pressed="false"
+              >
+                Revoke (demo)
+              </button>
+            </div>
           </div>
         </section>
 
@@ -393,5 +448,6 @@
       </main>
     </div>
     <script src="/js/pass-flip.js?v=1" defer></script>
+    <script src="/js/pass-demo-revoke.js?v=1" defer></script>
   </body>
 </html>
