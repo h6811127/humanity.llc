@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import type { ScanContext } from "../src/db/scan";
+import type { LiveControlChallengeRow } from "../src/db/live-control";
 import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
 import { renderScanPage } from "../src/resolver/scan-html";
+import { handleGetScan } from "../src/resolver/scan";
 import { BEARER_WARNING } from "../src/resolver/trust-copy";
 import { buildScanViewModel } from "../src/resolver/scan-state";
 
@@ -56,6 +57,37 @@ function summary(): VerificationSummaryRow {
     summary_document_json: null,
     updated_at: "2026-05-16T17:00:00Z",
   };
+}
+
+function dbFor(rows: {
+  card?: CardRow | null;
+  qr?: QrCredentialRow | null;
+  verification?: VerificationSummaryRow | null;
+  challenge?: LiveControlChallengeRow | null;
+}): D1Database {
+  return {
+    prepare: (sql: string) => ({
+      bind: (...params: unknown[]) => ({
+        first: async () => {
+          if (sql.includes("FROM cards")) {
+            return rows.card ?? null;
+          }
+          if (sql.includes("FROM qr_credentials")) {
+            return rows.qr ?? null;
+          }
+          if (sql.includes("FROM verification_summaries")) {
+            return rows.verification ?? summary();
+          }
+          if (sql.includes("FROM live_control_challenges")) {
+            return rows.challenge && rows.challenge.challenge_id === params[0]
+              ? rows.challenge
+              : null;
+          }
+          return null;
+        },
+      }),
+    }),
+  } as unknown as D1Database;
 }
 
 describe("buildScanViewModel", () => {
@@ -270,5 +302,83 @@ describe("renderScanPage M3.2 trust blocks", () => {
       "https://humanity.llc"
     );
     expect(vmSibling.kind).toBe("active");
+  });
+
+  it("renders recent live control proof when returning with a fresh challenge", async () => {
+    const challengeId = "lc_7Xk9mP2nQ4rT6vW8yZ";
+    const provenAt = new Date(Date.now() - 60_000).toISOString();
+    const db = dbFor({
+      card: card(),
+      qr: qr(),
+      verification: summary(),
+      challenge: {
+        challenge_id: challengeId,
+        profile_id: PROFILE,
+        qr_id: QR,
+        nonce: "nonce123",
+        verifier_session_id: "vs_123",
+        status: "proven",
+        issued_at: new Date(Date.now() - 90_000).toISOString(),
+        expires_at: new Date(Date.now() + 30_000).toISOString(),
+        proven_at: provenAt,
+        signer_public_key: "pk",
+        response_document_json: "{}",
+        created_at: provenAt,
+        updated_at: provenAt,
+      },
+    });
+
+    const res = await handleGetScan(
+      new Request(
+        `https://humanity.llc/c/${PROFILE}?q=${QR}&live_challenge=${challengeId}`
+      ),
+      db,
+      PROFILE
+    );
+    const html = await res.text();
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Cache-Control")).toBe("no-store");
+    expect(html).toContain("Control proven recently");
+    expect(html).not.toContain("Ask for live proof");
+  });
+
+  it("does not rehydrate stale live control proof after the freshness window", async () => {
+    const challengeId = "lc_8Xk9mP2nQ4rT6vW8yZ";
+    const provenAt = new Date(Date.now() - 6 * 60_000).toISOString();
+    const db = dbFor({
+      card: card(),
+      qr: qr(),
+      verification: summary(),
+      challenge: {
+        challenge_id: challengeId,
+        profile_id: PROFILE,
+        qr_id: QR,
+        nonce: "nonce456",
+        verifier_session_id: "vs_456",
+        status: "proven",
+        issued_at: new Date(Date.now() - 7 * 60_000).toISOString(),
+        expires_at: new Date(Date.now() - 5 * 60_000).toISOString(),
+        proven_at: provenAt,
+        signer_public_key: "pk",
+        response_document_json: "{}",
+        created_at: provenAt,
+        updated_at: provenAt,
+      },
+    });
+
+    const res = await handleGetScan(
+      new Request(
+        `https://humanity.llc/c/${PROFILE}?q=${QR}&live_challenge=${challengeId}`
+      ),
+      db,
+      PROFILE
+    );
+    const html = await res.text();
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Cache-Control")).toBe("no-store");
+    expect(html).toContain("Ask for live proof");
+    expect(html).not.toContain("Control proven recently");
   });
 });

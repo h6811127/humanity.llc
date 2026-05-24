@@ -1,8 +1,12 @@
 import { loadScanContext } from "../db/scan";
+import { getLiveControlChallenge } from "../db/live-control";
 import { PROFILE_ID_REGEX } from "../crypto";
 import { htmlResponse, requestOrigin } from "../http/resolver";
 import { renderScanPage, SCAN_UI_VERSION } from "./scan-html";
-import { scanQrDataUrl } from "./scan-qr";
+import {
+  isLiveControlProofFresh,
+  LIVE_CONTROL_CHALLENGE_ID_REGEX,
+} from "./live-control";
 import {
   buildScanViewModel,
   httpStatusForScanKind,
@@ -19,6 +23,7 @@ export async function handleGetScan(
   const url = new URL(request.url);
   const qrRaw = url.searchParams.get("q");
   const qrId = qrRaw?.trim() ?? null;
+  const liveChallengeId = url.searchParams.get("live_challenge")?.trim() ?? null;
 
   if (!PROFILE_ID_REGEX.test(profileId)) {
     const vm = malformedScanView(profileId, qrId, origin);
@@ -45,10 +50,49 @@ export async function handleGetScan(
   }
 
   const ctx = await loadScanContext(env, profileId, qrId);
-  const vm = buildScanViewModel(profileId, qrId, ctx, origin);
+  const vm = await applyLiveControlChallengeState(
+    env,
+    buildScanViewModel(profileId, qrId, ctx, origin),
+    profileId,
+    qrId,
+    liveChallengeId
+  );
+  const cacheControl = liveChallengeId ? "no-store" : vm.cacheControl;
 
   return htmlResponse(await renderScanPage(vm, origin), httpStatusForScanKind(vm.kind), {
-    "Cache-Control": vm.cacheControl,
+    "Cache-Control": cacheControl,
     "X-HC-Scan-UI": SCAN_UI_VERSION,
   });
+}
+
+async function applyLiveControlChallengeState(
+  db: D1Database,
+  vm: Awaited<ReturnType<typeof buildScanViewModel>>,
+  profileId: string,
+  qrId: string,
+  liveChallengeId: string | null
+) {
+  if (
+    vm.kind !== "active" ||
+    !liveChallengeId ||
+    !LIVE_CONTROL_CHALLENGE_ID_REGEX.test(liveChallengeId)
+  ) {
+    return vm;
+  }
+
+  const challenge = await getLiveControlChallenge(db, liveChallengeId);
+  if (
+    !challenge ||
+    challenge.profile_id !== profileId ||
+    challenge.qr_id !== qrId ||
+    challenge.status !== "proven" ||
+    !isLiveControlProofFresh(challenge.proven_at)
+  ) {
+    return vm;
+  }
+
+  return {
+    ...vm,
+    liveControlAvailable: true,
+  };
 }

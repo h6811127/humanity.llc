@@ -27,8 +27,8 @@ import {
 } from "../id";
 
 const CHALLENGE_TTL_MS = 120_000;
-const PROOF_DISPLAY_TTL_MS = 5 * 60_000;
-const CHALLENGE_ID_REGEX =
+export const PROOF_DISPLAY_TTL_MS = 5 * 60_000;
+export const LIVE_CONTROL_CHALLENGE_ID_REGEX =
   /^lc_[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{12,40}$/;
 
 interface CreateChallengeBody {
@@ -138,7 +138,7 @@ export async function handleGetLiveControlChallenge(
   if (!PROFILE_ID_REGEX.test(profileId)) {
     return errorResponse(CRYPTO_ERROR.INVALID_PROFILE_ID, "Invalid profile_id.", 422);
   }
-  if (!CHALLENGE_ID_REGEX.test(challengeId)) {
+  if (!LIVE_CONTROL_CHALLENGE_ID_REGEX.test(challengeId)) {
     return errorResponse("INVALID_CHALLENGE_ID", "Invalid challenge_id.", 422);
   }
 
@@ -190,7 +190,10 @@ export async function handlePostLiveControlResponse(
   }
 
   const challengeId = response.challenge_id;
-  if (typeof challengeId !== "string" || !CHALLENGE_ID_REGEX.test(challengeId)) {
+  if (
+    typeof challengeId !== "string" ||
+    !LIVE_CONTROL_CHALLENGE_ID_REGEX.test(challengeId)
+  ) {
     return errorResponse("INVALID_CHALLENGE_ID", "Invalid challenge_id.", 422);
   }
 
@@ -306,9 +309,7 @@ function challengeBody(
     )}/live-control/challenges/${encodeURIComponent(challenge.challenge_id)}`
   );
 
-  const proofExpiresAt = challenge.proven_at
-    ? new Date(Date.parse(challenge.proven_at) + PROOF_DISPLAY_TTL_MS).toISOString()
-    : null;
+  const proofExpiresAt = liveControlProofExpiresAt(challenge.proven_at);
 
   return {
     type: "live_control_challenge",
@@ -330,6 +331,22 @@ function challengeBody(
         ? "Control proven moments ago. This does not prove legal identity."
         : "Ask the card owner to prove live control.",
   };
+}
+
+export function liveControlProofExpiresAt(provenAt: string | null): string | null {
+  if (!provenAt) return null;
+  const provenAtMs = Date.parse(provenAt);
+  if (!Number.isFinite(provenAtMs)) return null;
+  return new Date(provenAtMs + PROOF_DISPLAY_TTL_MS).toISOString();
+}
+
+export function isLiveControlProofFresh(
+  provenAt: string | null,
+  now: Date = new Date()
+): boolean {
+  const expiresAt = liveControlProofExpiresAt(provenAt);
+  if (!expiresAt) return false;
+  return Date.parse(expiresAt) > now.getTime();
 }
 
 function liveControlApiOrigin(request: Request): string {

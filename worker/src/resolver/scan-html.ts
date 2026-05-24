@@ -490,17 +490,27 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
     if (pollTimer) window.clearInterval(pollTimer);
     pollTimer = null;
   }
+  function hasFreshProof(body) {
+    if (!body || body.status !== "proven" || !body.proof_expires_at) return false;
+    var expiresAt = Date.parse(body.proof_expires_at);
+    return Number.isFinite(expiresAt) && expiresAt > Date.now();
+  }
   function poll(url) {
     stopPolling();
     pollTimer = window.setInterval(function () {
       fetch(url, { cache: "no-store" })
         .then(function (res) { return res.json(); })
         .then(function (body) {
-          if (body.status === "proven") {
+          if (hasFreshProof(body)) {
             stopPolling();
             btn.disabled = false;
             btn.textContent = "Ask again";
             setStatus("Control proven moments ago. This does not prove legal identity.");
+          } else if (body.status === "proven") {
+            stopPolling();
+            btn.disabled = false;
+            btn.textContent = "Ask again";
+            setStatus("Control was not proven recently. The card may still be active.");
           } else if (body.status === "expired") {
             stopPolling();
             btn.disabled = false;
@@ -524,9 +534,12 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
     fetch(statusUrlForChallenge(id), { cache: "no-store" })
       .then(function (res) { return res.json(); })
       .then(function (body) {
-        if (body.status === "proven") {
+        if (hasFreshProof(body)) {
           btn.textContent = "Ask again";
           setStatus("Control proven moments ago. This does not prove legal identity.");
+        } else if (body.status === "proven") {
+          btn.textContent = "Ask again";
+          setStatus("Control was not proven recently. The card may still be active.");
         } else if (body.status === "expired") {
           btn.textContent = "Ask again";
           setStatus("Control was not proven. The request expired.");
