@@ -2825,7 +2825,7 @@ button.btn-danger {
   margin: 4px 0 0;
   font-size: 14px;
   line-height: 1.4;
-  color: var(--grey);
+  color: rgba(0, 0, 0, 0.72);
 }
 
 .idea-callout-body {
