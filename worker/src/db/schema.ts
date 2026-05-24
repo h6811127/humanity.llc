@@ -8,6 +8,7 @@ export const TABLES = {
   verification_summaries: "verification_summaries",
   revocations: "revocations",
   vouches: "vouches",
+  live_control_challenges: "live_control_challenges",
 } as const;
 
 export const REQUIRED_TABLES = Object.values(TABLES);
