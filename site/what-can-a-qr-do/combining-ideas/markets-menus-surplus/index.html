@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Markets + menus + surplus · combining ideas · humanity.llc</title>
+    <meta
+      name="description"
+      content="Demo scan page — a co-op pass linking to today's stalls, live menus, and surplus food tags, all updatable without reprinting."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=47" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Combining ideas · demo scan</p>
+          <h1>Markets + menus + surplus</h1>
+          <p class="hero-line">
+            A co-op pass links to today&rsquo;s stalls and live menus.
+            Prepared-food tags mark safe-to-take surplus.
+            <strong>Vendor updates one state object instead of reprinting.</strong>
+          </p>
+          <p class="hero-line hero-line-sub">
+            Demo scan — what a combined market page might show.
+          </p>
+        </section>
+
+        <section class="idea-callout" aria-labelledby="single-update-title">
+          <div class="idea-callout-header">
+            <span class="list-icon list-icon-tone-green" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2"/><path d="M12 12v.01"/></svg>
+            </span>
+            <div>
+              <h2 class="idea-callout-title" id="single-update-title">One update, every sticker</h2>
+              <p class="idea-callout-sub">
+                The vendor changes a state object once. Every QR on placards, menus,
+                and surplus tags reflects the update on next scan.
+              </p>
+            </div>
+          </div>
+          <div class="idea-callout-body">
+            <p>
+              The <strong>market organizer signs vendor presence</strong>; the
+              <strong>vendor signs the menu</strong>; the <strong>kitchen signs food
+              freshness</strong>. Three keys, three claims, one scan — each authority
+              speaks only about what it actually controls.
+            </p>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="demo-scan-title">
+          <h2 class="group-label" id="demo-scan-title">Demo scan · Saturday market</h2>
+          <p class="group-intro short">
+            A shopper scans the QR on a co-op member&rsquo;s market pass. The page shows
+            vendor status, today&rsquo;s menu, and available surplus — each from the right
+            signer.
+          </p>
+
+          <div class="scenario-grid" aria-label="Demo scan states for market pass">
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Market · signed by co-op organizer</p>
+              <ul class="scenario-card-list">
+                <li>Cedar Rapids Saturday Market</li>
+                <li>Vendor active · Booth B12</li>
+                <li>Member since March · verified by co-op</li>
+                <li>Accepts SNAP / cash / card</li>
+                <li>Open until 2 PM today</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Menu tonight · signed by vendor</p>
+              <ul class="scenario-card-list">
+                <li>River City Tacos</li>
+                <li>Birria tacos · available</li>
+                <li>Elote cups · <strong>sold out</strong></li>
+                <li>Horchata · available</li>
+                <li>Allergen key: dairy, gluten on scan</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Surplus · signed by kitchen</p>
+              <ul class="scenario-card-list">
+                <li>Unsold stew: safe-to-take until 8 PM</li>
+                <li>Prepared today 11 AM · expires 8 PM</li>
+                <li>Contains: wheat, dairy · no nuts</li>
+                <li>Donation pickup at booth or fridge B</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="lifecycle-title">
+          <h2 class="group-label" id="lifecycle-title">What changes over time</h2>
+          <div class="scenario-grid" aria-label="Market lifecycle">
+            <article class="scenario-card">
+              <p class="scenario-card-label">Vendor moves or sells out</p>
+              <ul class="scenario-card-list">
+                <li>Truck relocates to 4th &amp; Elm lot</li>
+                <li>Same printed QR on truck — scan shows new location</li>
+                <li>Menu marks three more items sold out</li>
+                <li>Vendor updates one state object, not reprinting</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">After service → surplus</p>
+              <ul class="scenario-card-list">
+                <li>Unsold stew becomes a freshness-tagged donation</li>
+                <li>Kitchen signs safe-to-take window</li>
+                <li>Local resource card can point people to it</li>
+                <li>Surplus tag expires, stew listing disappears</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">Fake or revoked</p>
+              <ul class="scenario-card-list">
+                <li>Not the official vendor placard</li>
+                <li>Organizer revokes the stall QR</li>
+                <li>Menu and surplus tags on this vendor go dark</li>
+                <li>Other vendors unaffected</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="streams-title">
+          <h2 class="group-label" id="streams-title">Three streams, one pass</h2>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2"/><path d="M12 12v.01"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Co-op organizer key</span>
+                <span class="list-sub"
+                  >Signs vendor presence, booth assignment, membership status —
+                  never signs food safety</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Vendor key</span>
+                <span class="list-sub"
+                  >Signs the menu: available, sold out, prices, allergen notes —
+                  updates without reprinting table tents</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M18 12h4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Kitchen key</span>
+                <span class="list-sub"
+                  >Signs freshness per batch: made, expires, allergens, recall —
+                  especially for surplus and donation tags</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="idea-section" aria-labelledby="fields-title">
+          <h2 class="group-label" id="fields-title">What the scan page shows</h2>
+          <ul class="tag-chips" aria-label="Combined market fields">
+            <li>vendor: active / inactive</li>
+            <li>booth assignment</li>
+            <li>payment types</li>
+            <li>menu: available items</li>
+            <li>menu: sold out</li>
+            <li>allergen notes</li>
+            <li>surplus: safe-to-take</li>
+            <li>surplus: expires at</li>
+            <li>batch recalled</li>
+            <li>co-op verified</li>
+            <li>member pricing</li>
+          </ul>
+        </section>
+
+        <section class="qr-compare idea-compare" aria-labelledby="compare-title">
+          <h2 class="group-label" id="compare-title">Not a marketplace app</h2>
+          <div class="qr-compare-grid">
+            <article class="qr-compare-col qr-compare-col-muted">
+              <h3 class="qr-compare-heading">Usually</h3>
+              <ul class="qr-compare-list">
+                <li>Markets → third-party app</li>
+                <li>Menus → static PDF or web page</li>
+                <li>Surplus → food-rescue platform</li>
+                <li>Each requires accounts and tracking</li>
+              </ul>
+            </article>
+            <article class="qr-compare-col qr-compare-col-live">
+              <h3 class="qr-compare-heading">This</h3>
+              <ul class="qr-compare-list">
+                <li>One scan, three signed streams</li>
+                <li>Vendor updates, shoppers see</li>
+                <li>Surplus becomes a tagged donation</li>
+                <li>No shared dossier across roles</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <p class="insight">
+          The co-op pass, the menu, and the surplus tag are <strong>three live objects from
+          three signers</strong> — visible on one scan, updatable without reprinting, and
+          revocable independently.
+        </p>
+
+        <section class="group">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/combining-ideas/">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Combining ideas</span>
+                  <span class="list-sub">Back to the combined patterns</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

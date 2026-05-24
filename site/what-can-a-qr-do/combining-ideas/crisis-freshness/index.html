@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Crisis cards + freshness · combining ideas · humanity.llc</title>
+    <meta
+      name="description"
+      content="Demo scan page — a wallet aid card that shows nearby pantry and fridge options, each with live freshness state from the kitchen that prepared the food."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=47" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Combining ideas · demo scan</p>
+          <h1>Crisis cards + freshness</h1>
+          <p class="hero-line">
+            A wallet aid card lists nearby pantry and fridge options.
+            Each food batch keeps <strong>made, expires, allergen, recall state</strong> —
+            signed by the kitchen, not the card issuer.
+          </p>
+          <p class="hero-line hero-line-sub">
+            Demo scan — what a combined resource page might show.
+          </p>
+        </section>
+
+        <section class="idea-callout" aria-labelledby="privacy-title">
+          <div class="idea-callout-header">
+            <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            <div>
+              <h2 class="idea-callout-title" id="privacy-title">Updates without tracking</h2>
+              <p class="idea-callout-sub">
+                The resource page updates when hotlines, hours, or food batches change —
+                without recording who scanned or when.
+              </p>
+            </div>
+          </div>
+          <div class="idea-callout-body">
+            <p>
+              The <strong>coalition signs the resource list</strong>; the <strong>kitchen signs
+              freshness</strong>. Both streams update independently. No scan analytics, no
+              identity required, no crisis population as a growth metric.
+            </p>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="demo-scan-title">
+          <h2 class="group-label" id="demo-scan-title">Demo scan · wallet aid card</h2>
+          <p class="group-intro short">
+            Someone scans the QR on a printed wallet card handed out at a shelter.
+            The page shows current resources <em>and</em> live food availability from
+            separate signers.
+          </p>
+
+          <div class="scenario-grid" aria-label="Demo scan states for crisis card">
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Resources · signed by mutual-aid coalition</p>
+              <ul class="scenario-card-list">
+                <li>Shelter bed line: open tonight — call by 8 PM</li>
+                <li>Food pantry: Sat 10–2 · Wed 4–7</li>
+                <li>Crisis line: active · 24/7</li>
+                <li>Walk-in clinic: Mon–Fri 9–5</li>
+                <li>Updated 2h ago by coalition</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Food tonight · signed by host kitchen</p>
+              <ul class="scenario-card-list">
+                <li>Community fridge: stocked 5:20 PM</li>
+                <li>Veggie soup batch: expires 10 PM</li>
+                <li>Contains: wheat · no nuts reported</li>
+                <li>Rice &amp; beans tray: expires 9 PM</li>
+                <li>Allergen-free · verified by kitchen</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="lifecycle-title">
+          <h2 class="group-label" id="lifecycle-title">What changes over time</h2>
+          <div class="scenario-grid" aria-label="Resource lifecycle">
+            <article class="scenario-card">
+              <p class="scenario-card-label">Pantry moved</p>
+              <ul class="scenario-card-list">
+                <li>Coalition updates hours and address</li>
+                <li>Every old wallet card shows the new site on next scan</li>
+                <li>Individual food tags keep batch-level safety</li>
+                <li>One wallet card, many live resource claims</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">Batch recalled</p>
+              <ul class="scenario-card-list">
+                <li>Kitchen signs recall on soup batch</li>
+                <li>Soup disappears from safe list instantly</li>
+                <li>Rice tray still shows safe — different batch</li>
+                <li>No scan history needed to protect people</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">Fridge out of service</p>
+              <ul class="scenario-card-list">
+                <li>Fridge maintainer signs: temperature check failed</li>
+                <li>All batches in that fridge flip to hold</li>
+                <li>Resource card still shows other pantry options</li>
+                <li>Kitchen signs food; maintainer signs equipment</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="streams-title">
+          <h2 class="group-label" id="streams-title">Three streams, one wallet card</h2>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Coalition key</span>
+                <span class="list-sub"
+                  >Signs shelter, pantry, clinic, and crisis-line listings —
+                  updates when hours or addresses change</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M18 12h4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Kitchen key</span>
+                <span class="list-sub"
+                  >Signs each food batch: made, expires, allergens, recall status —
+                  updates per-batch, not per-card</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Equipment maintainer key</span>
+                <span class="list-sub"
+                  >Signs fridge and generator status — separate from food safety,
+                  separate from resource routing</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="idea-section" aria-labelledby="fields-title">
+          <h2 class="group-label" id="fields-title">What the scan page shows</h2>
+          <ul class="tag-chips" aria-label="Combined card fields">
+            <li>shelter: open / full</li>
+            <li>pantry hours today</li>
+            <li>crisis line: active</li>
+            <li>food batch: made at</li>
+            <li>food batch: expires at</li>
+            <li>allergens per batch</li>
+            <li>recalled batch</li>
+            <li>fridge status</li>
+            <li>last updated</li>
+            <li>verified by coalition</li>
+            <li>verified by kitchen</li>
+          </ul>
+        </section>
+
+        <section class="qr-compare idea-compare" aria-labelledby="design-title">
+          <h2 class="group-label" id="design-title">What this refuses</h2>
+          <div class="qr-compare-grid">
+            <article class="qr-compare-col qr-compare-col-muted">
+              <h3 class="qr-compare-heading">Not this</h3>
+              <ul class="qr-compare-list">
+                <li>Crisis people as marketing assets</li>
+                <li>Scan analytics on a shelter card</li>
+                <li>KYC to read a hotline list</li>
+                <li>Platform tracking who asked for food</li>
+              </ul>
+            </article>
+            <article class="qr-compare-col qr-compare-col-live">
+              <h3 class="qr-compare-heading">This</h3>
+              <ul class="qr-compare-list">
+                <li>Coalition updates resources, kitchen updates food</li>
+                <li>No account to scan</li>
+                <li>Revocable series</li>
+                <li>Accurate help, not surveillance dressed as aid</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <p class="insight">
+          The crisis card shows <strong>food that exists tonight</strong> — and the kitchen that
+          made it is the one signing freshness, not the platform, not the card issuer.
+        </p>
+
+        <section class="group">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/combining-ideas/">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Combining ideas</span>
+                  <span class="list-sub">Back to the combined patterns</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

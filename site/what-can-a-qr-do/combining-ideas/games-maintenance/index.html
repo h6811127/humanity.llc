@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Games + maintenance · combining ideas · humanity.llc</title>
+    <meta
+      name="description"
+      content="Demo scan page — when a city game layer meets maintainer-signed safety status on the same physical QR node."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=47" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Combining ideas · demo scan</p>
+          <h1>Games + maintenance</h1>
+          <p class="hero-line">
+            Players find AED, filter, and trail-marker nodes in the city.
+            <strong>Maintainer-signed status stays separate from game points</strong> —
+            the game rewards discovery, but only the maintainer signs safety.
+          </p>
+          <p class="hero-line hero-line-sub">
+            Demo scan — what a combined node might show.
+          </p>
+        </section>
+
+        <section class="idea-callout" aria-labelledby="authority-title">
+          <div class="idea-callout-header">
+            <span class="list-icon list-icon-tone-red" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            <div>
+              <h2 class="idea-callout-title" id="authority-title">Authority stays clear</h2>
+              <p class="idea-callout-sub">
+                Two signed streams on one physical node — game state and safety state — from
+                different keys, shown together but never confused.
+              </p>
+            </div>
+          </div>
+          <div class="idea-callout-body">
+            <p>
+              The game can reward a player for <strong>finding</strong> an AED cabinet. But only the
+              building maintainer can sign that the device is inspected and in service. A single QR
+              sticker pulls from both streams; the scan page labels which authority is speaking.
+            </p>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="demo-scan-title">
+          <h2 class="group-label" id="demo-scan-title">Demo scan · trail AED node</h2>
+          <p class="group-intro short">
+            A player scans a QR on a defibrillator cabinet along a park trail. The page shows
+            game context <em>and</em> maintenance status, from separate signers.
+          </p>
+
+          <div class="scenario-grid" aria-label="Demo scan states for trail AED">
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Game layer · signed by game organizer</p>
+              <ul class="scenario-card-list">
+                <li>Checkpoint 3 of 7 · River Loop trail</li>
+                <li>Discovered by 28 players</li>
+                <li>Blue faction controls this node</li>
+                <li>Lore unlocked: "The old bridge keeper"</li>
+                <li>Next route unlocks after fix verified ↓</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Maintenance · signed by building ops</p>
+              <ul class="scenario-card-list">
+                <li>AED unit · Hallway B cabinet</li>
+                <li>Status: in service</li>
+                <li>Last inspected: May 18</li>
+                <li>Next due: August</li>
+                <li>Report issue → relay to maintenance</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="lifecycle-title">
+          <h2 class="group-label" id="lifecycle-title">What changes over time</h2>
+          <div class="scenario-grid" aria-label="Node lifecycle">
+            <article class="scenario-card">
+              <p class="scenario-card-label">Player reports issue</p>
+              <ul class="scenario-card-list">
+                <li>Player scans, sees "pad cover cracked"</li>
+                <li>Taps report → relay reaches building ops</li>
+                <li>Game awards lore for noticing the problem</li>
+                <li>No game points for declaring equipment safe</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">Maintainer pauses node</p>
+              <ul class="scenario-card-list">
+                <li>Maintenance signs: out of service</li>
+                <li>Game map marks node paused</li>
+                <li>Safety copy outranks game copy</li>
+                <li>Players cannot capture a paused node</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Fix verified → route unlocks</p>
+              <ul class="scenario-card-list">
+                <li>Maintainer signs: back in service</li>
+                <li>Game unlocks the next trail segment</li>
+                <li>Local map shows the new route</li>
+                <li>Repair history stays in maintenance log</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="streams-title">
+          <h2 class="group-label" id="streams-title">Two streams, one sticker</h2>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-purple" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21 1.18.38 2.03 1.46 2.03 2.79"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Game organizer key</span>
+                <span class="list-sub"
+                  >Signs faction state, lore, checkpoints, player discovery counts —
+                  never signs safety status</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Maintainer key</span>
+                <span class="list-sub"
+                  >Signs inspection dates, in/out of service, repair history —
+                  never signs game rewards</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">One QR sticker</span>
+                <span class="list-sub"
+                  >Resolves to a scan page that shows both streams, labeled by signer —
+                  revocable independently</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="idea-section" aria-labelledby="more-nodes-title">
+          <h2 class="group-label" id="more-nodes-title">Other combined nodes</h2>
+          <ul class="tag-chips" aria-label="Node types">
+            <li>water filter station</li>
+            <li>fire extinguisher</li>
+            <li>rain-garden drain</li>
+            <li>trail marker post</li>
+            <li>mural light fixture</li>
+            <li>bike-repair station</li>
+            <li>community generator</li>
+            <li>warming shelter sign</li>
+          </ul>
+          <p class="idea-footnote">
+            Every node that has real-world upkeep state can carry a game layer
+            without the game layer pretending to be a safety inspector.
+          </p>
+        </section>
+
+        <section class="qr-compare idea-compare" aria-labelledby="boundary-title">
+          <h2 class="group-label" id="boundary-title">The boundary</h2>
+          <div class="qr-compare-grid">
+            <article class="qr-compare-col qr-compare-col-muted">
+              <h3 class="qr-compare-heading">Game can</h3>
+              <ul class="qr-compare-list">
+                <li>Reward finding the node</li>
+                <li>Award lore for noticing problems</li>
+                <li>Unlock routes after verified repairs</li>
+                <li>Track faction control of areas</li>
+              </ul>
+            </article>
+            <article class="qr-compare-col qr-compare-col-live">
+              <h3 class="qr-compare-heading">Game cannot</h3>
+              <ul class="qr-compare-list">
+                <li>Declare equipment safe</li>
+                <li>Override a maintenance pause</li>
+                <li>Create urgency to drive engagement</li>
+                <li>Sign anything with the maintainer key</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <p class="insight">
+          Play helps people <strong>notice infrastructure worth caring for</strong> — but the
+          maintainer&rsquo;s signature is the only safety truth on the sticker.
+        </p>
+
+        <section class="group">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/combining-ideas/">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Combining ideas</span>
+                  <span class="list-sub">Back to the combined patterns</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
