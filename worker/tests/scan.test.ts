@@ -234,6 +234,36 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).not.toContain('id="live-control-request"');
   });
 
+  it("does not render stale live proof after the display window", async () => {
+    const res = await handleGetScan(
+      new Request(
+        `https://humanity.llc/c/${PROFILE}?q=${QR}&live_challenge=${LIVE_CHALLENGE}`
+      ),
+      scanDbFor({
+        challenge_id: LIVE_CHALLENGE,
+        profile_id: PROFILE,
+        qr_id: QR,
+        nonce: "nonce",
+        verifier_session_id: "verifier",
+        status: "proven",
+        issued_at: "2020-01-01T00:00:00.000Z",
+        expires_at: "2020-01-01T00:02:00.000Z",
+        proven_at: "2020-01-01T00:01:00.000Z",
+        signer_public_key: "pk",
+        response_document_json: "{}",
+        created_at: "2020-01-01T00:00:00.000Z",
+        updated_at: "2020-01-01T00:01:00.000Z",
+      }),
+      PROFILE
+    );
+    const html = await res.text();
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Cache-Control")).toBe("no-store");
+    expect(html).not.toContain("Control proven recently");
+    expect(html).toContain('id="live-control-request"');
+  });
+
   it("uses print_artifact scope copy when applicable", async () => {
     const vm = buildScanViewModel(
       PROFILE,
