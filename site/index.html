@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=57" />
+    <link rel="stylesheet" href="/styles.css?v=59" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -577,6 +577,45 @@
         </section>
       </main>
     </div>
+    <div class="landing-help-float" id="landing-help-root">
+      <button
+        type="button"
+        class="device-hub-search-fab landing-help-fab"
+        id="landing-help-open"
+        aria-label="Help and demos"
+        aria-expanded="false"
+        aria-controls="landing-help-drawer"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+      </button>
+      <div class="device-hub-search-drawer landing-help-drawer" id="landing-help-drawer" hidden>
+        <div class="landing-help-head">
+          <span class="landing-help-title">New here?</span>
+          <button
+            type="button"
+            class="device-hub-search-close"
+            id="landing-help-close"
+            aria-label="Close help"
+          >
+            ×
+          </button>
+        </div>
+        <ul class="landing-help-links">
+          <li><a href="/create/">Create a live object</a></li>
+          <li><a href="/case-study/">See the full loop</a></li>
+          <li><a href="#card">Try the pass demo</a></li>
+          <li><a href="/wallet/">Saved cards on this device</a></li>
+        </ul>
+        <p class="form-hint landing-help-hint">
+          After create, tap <strong>Save on this device</strong> on
+          <a href="/created/">/created/</a> so other tabs see your keys.
+        </p>
+        <button type="button" class="landing-help-dismiss" id="landing-help-dismiss">
+          Hide for this session
+        </button>
+      </div>
+    </div>
+
     <div
       class="device-hub-search-float device-hub-search-float--landing"
       id="device-hub-search-root"
@@ -643,6 +682,7 @@
     </nav>
     <script src="/js/pass-flip.js?v=1" defer></script>
     <script src="/js/pass-demo-revoke.js?v=1" defer></script>
+    <script src="/js/landing-help.mjs?v=1" type="module"></script>
     <script src="/js/landing-device-hub.mjs?v=3" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=1" type="module"></script>
   </body>

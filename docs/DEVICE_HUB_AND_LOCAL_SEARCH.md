@@ -45,10 +45,11 @@ Returning users see their labels on the homepage; strangers still see the same s
 - **Search:** Pins included in landing FAB search and wallet search (haystack: label, ids, url, “public pinned”).
 - **Landing:** Injected **Pinned public cards** group when pins exist; ↗ chevron indicates external scan.
 
-### Phase 3 (optional)
+### Phase 3 — “Complete device hub” (optional, not cryptocurrency)
 
-- **Encrypted backup import → wallet** (M5.5): restore entries into `hc_wallet` then searchable like Phase 1.
-- **Effort:** Medium — reuse existing backup decrypt path from `/created/`.
+- **Encrypted backup import → wallet** (M5.5): user chooses a passphrase, downloads a backup **file**, later imports on `/wallet/` or `/created/` → decrypted keys written to `hc_wallet`.
+- **Not** blockchain, tokens, or server-side key custody — same Ed25519 + AES-GCM backup already used under **Manage** on `/created/`.
+- **Effort:** Medium — reuse `key-backup.mjs` decrypt path; add wallet import UI + one row in search.
 
 ### Explicitly deferred
 
@@ -66,6 +67,10 @@ Returning users see their labels on the homepage; strangers still see the same s
 **Common confusion:** Create in tab B, switch to tab A (homepage or wallet) → no keys visible until you **Save on this device** in tab B (on `/created/` Now tab or wallet while keys still live in tab B). Copying the **recovery key** does not write to `hc_wallet`.
 
 **Pins (`hc_device_pins`)** are a third bucket: public scan bookmarks only — no signing keys.
+
+### Browser sync (Safari, Chrome, etc.)
+
+`localStorage` is **per browser profile**, not uploaded by humanity.llc. Some browsers (especially Safari within Apple’s ecosystem, and signed-in Chrome profiles in some setups) may **replicate website data** across devices. That behavior is **platform-controlled**, can be **incomplete** (e.g. two cards on phone, one on laptop), and is **not** a supported product feature. Prefer **Save on this device** per machine, **encrypted backup** (Phase 3), or recovery key — not relying on browser sync.
 
 ## Security and data policy
 
