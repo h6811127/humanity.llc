@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" data-combining-demo="crisis">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Demo scan · Crisis + freshness · humanity.llc</title>
+    <meta
+      name="description"
+      content="Research demo: wallet aid card combining crisis resource routes and kitchen-signed food batch freshness."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/scan-pass.css?v=1" />
+    <link rel="stylesheet" href="/combining-scan-demo.css?v=1" />
+  </head>
+  <body>
+    <div class="page scan-page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+      </header>
+
+      <main class="screen scan-screen">
+        <p class="combining-demo-ribbon" role="note">
+          <strong>Research demo</strong> — static page, no scan tracking.
+          <a href="/what-can-a-qr-do/combining-ideas/">All combining demos</a>
+        </p>
+
+        <p class="scan-bearer-line" role="note">
+          Resource page updates without logging who scanned.
+        </p>
+
+        <section class="pass" aria-label="Aid wallet card at scan time">
+          <div class="pass-scene" id="pass-scene">
+            <div class="pass-tilt-wrap" id="pass-tilt-wrap">
+              <div class="pass-flip" id="pass-flip">
+                <div class="pass-inner">
+                  <div class="pass-face pass-front">
+                    <div class="pass-tilt-surface" id="pass-tilt-surface">
+                      <div class="pass-head">
+                        <div class="pass-brand">
+                          <span class="pass-dot" aria-hidden="true"></span>
+                          <span>humanity.llc</span>
+                        </div>
+                        <span class="pass-badge badge-live">Current</span>
+                      </div>
+                      <div class="pass-body">
+                        <div class="pass-main">
+                          <p class="pass-type">Aid wallet card</p>
+                          <h1 class="pass-name">Westside pantry route</h1>
+                          <p class="pass-manifesto" id="demo-crisis-manifesto">
+                            Pantry + fridge streams · wallet card
+                          </p>
+                          <ul class="pass-trust" aria-label="Status at a glance">
+                            <li class="trust-on">3 sites open</li>
+                            <li class="trust-on">Batch OK</li>
+                            <li class="trust-on">No recall</li>
+                          </ul>
+                        </div>
+                        <div
+                          class="pass-qr"
+                          id="pass-qr-slot"
+                          data-scan-url="https://humanity.llc/demo/combining/crisis-freshness?q=aid_wallet_west"
+                        ></div>
+                      </div>
+                      <p class="pass-foot">
+                        Crisis network lists options; kitchen signs made, expires, allergen, recall.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="pass-face pass-back" aria-hidden="true">
+                    <div class="pass-back-accent" aria-hidden="true"></div>
+                    <div class="pass-back-inner">
+                      <div class="pass-head">
+                        <div class="pass-brand">
+                          <span class="pass-dot" aria-hidden="true"></span>
+                          <span>At scan time</span>
+                        </div>
+                        <span class="pass-badge badge-neutral">Flip</span>
+                      </div>
+                      <ul class="pass-back-grid" aria-label="Privacy posture">
+                        <li>
+                          <span class="pass-back-label">No scan log</span>
+                          <span class="pass-back-value">page refresh, not visitor ID</span>
+                        </li>
+                        <li>
+                          <span class="pass-back-label">Kitchen</span>
+                          <span class="pass-back-value">freshness &amp; recall only</span>
+                        </li>
+                        <li>
+                          <span class="pass-back-label">Aid network</span>
+                          <span class="pass-back-value">hours, routes, eligibility copy</span>
+                        </li>
+                      </ul>
+                      <p class="pass-foot pass-foot-muted">Limits below · demo only.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="pass-flip-btn" id="pass-flip-btn" aria-label="Flip card">
+              Tap to flip
+            </button>
+          </div>
+        </section>
+
+        <div
+          class="combining-demo-actions"
+          role="tablist"
+          aria-label="Switch stream focus"
+        >
+          <button
+            type="button"
+            class="combining-demo-btn is-active"
+            data-crisis-tab="pantry"
+            role="tab"
+            aria-selected="true"
+          >
+            Pantry route
+          </button>
+          <button
+            type="button"
+            class="combining-demo-btn"
+            data-crisis-tab="batch"
+            role="tab"
+            aria-selected="false"
+          >
+            Fridge batch
+          </button>
+        </div>
+        <p class="combining-demo-hint">
+          One wallet QR · two authorities. Switch tabs to highlight which signed stream drives the
+          detail below.
+        </p>
+
+        <div class="scan-trust-groups" aria-label="Signed streams at scan time">
+          <div id="demo-crisis-panel-pantry">
+            <section class="group scan-group scan-group-stream">
+              <h2 class="group-label">Crisis resources</h2>
+              <p class="scan-stream-signer">
+                Signed by <strong>Mutual aid network · resource coordinator</strong>
+              </p>
+              <ul class="list">
+                <li class="list-row is-highlight">
+                  <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Westside pantry · open until 7 PM</span>
+                    <span class="list-sub">0.4 mi · dry goods + produce · no ID required</span>
+                  </span>
+                </li>
+                <li class="list-row">
+                  <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Community fridge · 2nd &amp; Pine</span>
+                    <span class="list-sub">24/7 · see freshness stream for batches inside</span>
+                  </span>
+                </li>
+                <li class="list-row">
+                  <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Crisis line · updated today</span>
+                    <span class="list-sub">Hours and hotlines revocable without reprinting card</span>
+                  </span>
+                </li>
+              </ul>
+            </section>
+          </div>
+
+          <div id="demo-crisis-panel-batch" hidden>
+            <section class="group scan-group scan-group-stream">
+              <h2 class="group-label">Kitchen freshness</h2>
+              <p class="scan-stream-signer">Signed by <strong>Co-op kitchen · batch key</strong></p>
+              <ul class="list">
+                <li class="list-row is-highlight">
+                  <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M18 12h4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Batch B-12 · lentil soup</span>
+                    <span class="list-sub">Made May 22 · expires May 25 · contains celery</span>
+                  </span>
+                </li>
+                <li class="list-row">
+                  <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Recall state: none</span>
+                    <span class="list-sub">Kitchen can revoke batch without touching aid routes</span>
+                  </span>
+                </li>
+                <li class="list-row">
+                  <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Allergen list · signed object</span>
+                    <span class="list-sub">Crisis card displays · kitchen remains authority</span>
+                  </span>
+                </li>
+              </ul>
+            </section>
+          </div>
+
+          <section class="group scan-group scan-group-qr">
+            <h2 class="group-label">This QR</h2>
+            <p class="scan-stream-signer">Wallet card · <strong>composes streams at resolve</strong></p>
+            <ul class="list">
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">QR active · scope wallet_aid</span>
+                  <span class="list-sub">Page updates publicly · no per-scan identity log</span>
+                </span>
+              </li>
+            </ul>
+          </section>
+        </div>
+
+        <details class="scan-limits-settings">
+          <summary class="scan-limits-summary">
+            <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            <span class="scan-limits-summary-text">
+              <span class="scan-limits-summary-title">What this demo does not prove</span>
+              <span class="scan-limits-summary-sub">Not eligibility determination · not medical advice</span>
+            </span>
+            <span class="list-chevron" aria-hidden="true">›</span>
+          </summary>
+          <div class="scan-limits-panel">
+            <p class="scan-limits-lead">
+              Aid listings and food safety come from different signers. A recall on batch B-12 does
+              not require reissuing the wallet card QR.
+            </p>
+            <ul class="scan-limits-list">
+              <li>Crisis coordinator does not sign allergen or expiry fields</li>
+              <li>Kitchen does not sign hotline hours</li>
+            </ul>
+            <p class="scan-limits-meta"><a href="/data-policy.html">Operator data policy</a></p>
+          </div>
+        </details>
+
+        <nav class="combining-demo-nav group" aria-label="Related">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/crisis-resource-cards/">
+                <span class="list-content">
+                  <span class="list-title">Crisis resource cards walkthrough</span>
+                  <span class="list-sub">Wallet cards when hotlines change</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/food-freshness-tags/">
+                <span class="list-content">
+                  <span class="list-title">Food freshness tags</span>
+                  <span class="list-sub">Made, expires, recall per batch</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="/js/pass-flip.js?v=1" defer></script>
+    <script type="module" src="/js/combining-scan-demo.mjs?v=1"></script>
+  </body>
+</html>

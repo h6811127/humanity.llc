@@ -1,0 +1,106 @@
+/* Research demo scan pages — stacks multiple signed streams (combining ideas). */
+
+.combining-demo-ribbon {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  margin-bottom: 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(219, 27, 67, 0.25);
+  background: rgba(219, 27, 67, 0.06);
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--black);
+}
+
+.combining-demo-ribbon strong {
+  font-weight: 600;
+}
+
+.combining-demo-ribbon a {
+  color: var(--red);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.scan-stream-signer {
+  margin: 0 0 6px 14px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--grey);
+}
+
+.scan-stream-signer strong {
+  font-weight: 600;
+  color: var(--black);
+}
+
+.scan-group-stream .group-label {
+  margin-bottom: 4px;
+}
+
+.combining-demo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0 8px;
+}
+
+.combining-demo-btn {
+  appearance: none;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--black);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.combining-demo-btn:active {
+  transform: scale(0.98);
+}
+
+.combining-demo-btn.is-active {
+  border-color: var(--red);
+  color: var(--red);
+  background: rgba(219, 27, 67, 0.08);
+}
+
+.combining-demo-btn-primary {
+  border-color: var(--red);
+  background: var(--red);
+  color: var(--white);
+}
+
+.combining-demo-hint {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--grey);
+  margin: 0 0 6px;
+}
+
+.list-row.is-highlight .list-title {
+  color: var(--red);
+}
+
+.list-row.is-muted .list-title,
+.list-row.is-muted .list-sub {
+  color: var(--grey);
+}
+
+.pass-trust .trust-warn {
+  color: #ff9500;
+}
+
+.pass-trust .trust-warn::before {
+  content: "▲ ";
+}
+
+.combining-demo-nav {
+  margin-top: 8px;
+}

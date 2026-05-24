@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en" data-combining-demo="games">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Demo scan · Games + maintenance · humanity.llc</title>
+    <meta
+      name="description"
+      content="Research demo: trail-marker scan with separate game discovery and maintainer-signed safety streams."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/scan-pass.css?v=1" />
+    <link rel="stylesheet" href="/combining-scan-demo.css?v=1" />
+  </head>
+  <body>
+    <div class="page scan-page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+      </header>
+
+      <main class="screen scan-screen">
+        <p class="combining-demo-ribbon" role="note">
+          <strong>Research demo</strong> — static page, not live network.
+          <a href="/what-can-a-qr-do/combining-ideas/">All combining demos</a>
+        </p>
+
+        <p class="scan-bearer-line" role="note">
+          Scan shows live state. Holding the object does not prove ownership.
+        </p>
+
+        <section class="pass" aria-label="Trail node at scan time">
+          <div class="pass-scene" id="pass-scene">
+            <div class="pass-tilt-wrap" id="pass-tilt-wrap">
+              <div class="pass-flip" id="pass-flip">
+                <div class="pass-inner">
+                  <div class="pass-face pass-front">
+                    <div class="pass-tilt-surface" id="pass-tilt-surface">
+                      <div class="pass-head">
+                        <div class="pass-brand">
+                          <span class="pass-dot" aria-hidden="true"></span>
+                          <span>humanity.llc</span>
+                        </div>
+                        <span class="pass-badge badge-warn" id="demo-games-badge">Paused</span>
+                      </div>
+                      <div class="pass-body">
+                        <div class="pass-main">
+                          <p class="pass-type">Trail node · Checkpoint 4</p>
+                          <h1 class="pass-name">Filter box · North trail</h1>
+                          <p class="pass-manifesto" id="demo-games-manifesto">
+                            Awaiting maintainer sign-off
+                          </p>
+                          <ul class="pass-trust" id="demo-games-trust" aria-label="Status at a glance">
+                            <li class="trust-warn">Safety paused</li>
+                            <li>Route locked</li>
+                            <li class="trust-on">+10 report pts</li>
+                          </ul>
+                        </div>
+                        <div
+                          class="pass-qr"
+                          id="pass-qr-slot"
+                          data-scan-url="https://humanity.llc/demo/combining/games-maintenance?q=trail_node_4"
+                        ></div>
+                      </div>
+                      <p class="pass-foot">
+                        Game rewards discovery; maintainer signs whether equipment is safe.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="pass-face pass-back" aria-hidden="true">
+                    <div class="pass-back-accent" aria-hidden="true"></div>
+                    <div class="pass-back-inner">
+                      <div class="pass-head">
+                        <div class="pass-brand">
+                          <span class="pass-dot" aria-hidden="true"></span>
+                          <span>At scan time</span>
+                        </div>
+                        <span class="pass-badge badge-neutral">Flip</span>
+                      </div>
+                      <ul class="pass-back-grid" aria-label="Authority boundaries">
+                        <li>
+                          <span class="pass-back-label">Game org</span>
+                          <span class="pass-back-value">points, routes, discovery</span>
+                        </li>
+                        <li>
+                          <span class="pass-back-label">Maintainer</span>
+                          <span class="pass-back-value">in service, inspections</span>
+                        </li>
+                        <li>
+                          <span class="pass-back-label">No overlap</span>
+                          <span class="pass-back-value">players cannot sign safety OK</span>
+                        </li>
+                      </ul>
+                      <p class="pass-foot pass-foot-muted">Limits below · demo only.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="pass-flip-btn" id="pass-flip-btn" aria-label="Flip card">
+              Tap to flip
+            </button>
+          </div>
+        </section>
+
+        <div class="combining-demo-actions">
+          <button
+            type="button"
+            class="combining-demo-btn combining-demo-btn-primary"
+            id="demo-games-toggle"
+            aria-pressed="false"
+          >
+            Simulate maintainer fix
+          </button>
+        </div>
+        <p class="combining-demo-hint">
+          Fix verified → maintainer stream updates → game map unlocks the next route. Points never
+          declare equipment safe.
+        </p>
+
+        <div class="scan-trust-groups" aria-label="Signed streams at scan time">
+          <section class="group scan-group scan-group-stream scan-group-human">
+            <h2 class="group-label">Game discovery</h2>
+            <p class="scan-stream-signer">Signed by <strong>River City Trails · game org</strong></p>
+            <ul class="list">
+              <li class="list-row" id="demo-game-points">
+                <span class="list-icon list-icon-tone-purple" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21 1.18.38 2.03 1.46 2.03 2.79"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">+10 report credit</span>
+                  <span class="list-sub">Report submitted · not safety authority</span>
+                </span>
+              </li>
+              <li class="list-row is-muted" id="demo-game-route">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Route 5 · locked</span>
+                  <span class="list-sub">Complete fix verification to unlock</span>
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Node types on map</span>
+                  <span class="list-sub">AED · filter · trail marker — same scan pattern</span>
+                </span>
+              </li>
+            </ul>
+          </section>
+
+          <section class="group scan-group scan-group-stream scan-group-card">
+            <h2 class="group-label">Maintainer status</h2>
+            <p class="scan-stream-signer">Signed by <strong>Parks dept · maintainer key</strong></p>
+            <ul class="list">
+              <li class="list-row" id="demo-maint-status">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Out of service</span>
+                  <span class="list-sub">Pad expired · do not rely on game copy</span>
+                </span>
+              </li>
+              <li class="list-row is-muted" id="demo-maint-next">
+                <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Maintenance notified</span>
+                  <span class="list-sub">Only maintainer key can clear pause</span>
+                </span>
+              </li>
+            </ul>
+          </section>
+
+          <section class="group scan-group scan-group-qr">
+            <h2 class="group-label">This QR</h2>
+            <p class="scan-stream-signer">Card operator · <strong>revocable pointer</strong></p>
+            <ul class="list">
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">QR active · scope trail_marker</span>
+                  <span class="list-sub">One sticker · streams compose at resolve time</span>
+                </span>
+              </li>
+            </ul>
+          </section>
+        </div>
+
+        <details class="scan-limits-settings">
+          <summary class="scan-limits-summary">
+            <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            <span class="scan-limits-summary-text">
+              <span class="scan-limits-summary-title">What this demo does not prove</span>
+              <span class="scan-limits-summary-sub">Not identity · not legal safety certification</span>
+            </span>
+            <span class="list-chevron" aria-hidden="true">›</span>
+          </summary>
+          <div class="scan-limits-panel">
+            <p class="scan-limits-lead">
+              This page illustrates stream separation. A real deployment would verify Ed25519
+              signatures per stream before showing maintainer or kitchen state.
+            </p>
+            <ul class="scan-limits-list">
+              <li>Game points do not override maintainer out-of-service</li>
+              <li>No scan analytics on this demo</li>
+            </ul>
+            <p class="scan-limits-meta"><a href="/data-policy.html">Operator data policy</a></p>
+          </div>
+        </details>
+
+        <nav class="combining-demo-nav group" aria-label="Related">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/proof-of-maintenance/">
+                <span class="list-content">
+                  <span class="list-title">Proof of maintenance walkthrough</span>
+                  <span class="list-sub">AEDs, filters, signed check-ins</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/physical-world-multiplayer/">
+                <span class="list-content">
+                  <span class="list-title">Physical-world multiplayer</span>
+                  <span class="list-sub">City-scale play without gamifying risk</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="/js/pass-flip.js?v=1" defer></script>
+    <script type="module" src="/js/combining-scan-demo.mjs?v=1"></script>
+  </body>
+</html>

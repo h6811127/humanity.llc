@@ -2793,6 +2793,25 @@ button.btn-danger {
   padding-bottom: 0;
 }
 
+a.scenario-card-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+a.scenario-card-link:active {
+  border-color: rgba(219, 27, 67, 0.45);
+  box-shadow: 0 4px 16px rgba(219, 27, 67, 0.12);
+}
+
+.scenario-card-cta {
+  margin: 10px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--red);
+}
+
 .idea-callout {
   border-radius: var(--radius-lg);
   overflow: hidden;

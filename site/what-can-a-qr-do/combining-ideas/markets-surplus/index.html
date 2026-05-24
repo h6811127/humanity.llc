@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en" data-combining-demo="markets">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Demo scan · Markets + surplus · humanity.llc</title>
+    <meta
+      name="description"
+      content="Research demo: co-op day pass combining live stalls, vendor menus, and prep-kitchen surplus tags."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/scan-pass.css?v=1" />
+    <link rel="stylesheet" href="/combining-scan-demo.css?v=1" />
+  </head>
+  <body>
+    <div class="page scan-page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+      </header>
+
+      <main class="screen scan-screen">
+        <p class="combining-demo-ribbon" role="note">
+          <strong>Research demo</strong> — vendor updates state, not ink.
+          <a href="/what-can-a-qr-do/combining-ideas/">All combining demos</a>
+        </p>
+
+        <p class="scan-bearer-line" role="note">
+          Scan shows live state. Holding the pass does not prove membership payment.
+        </p>
+
+        <section class="pass" aria-label="Co-op day pass at scan time">
+          <div class="pass-scene" id="pass-scene">
+            <div class="pass-tilt-wrap" id="pass-tilt-wrap">
+              <div class="pass-flip" id="pass-flip">
+                <div class="pass-inner">
+                  <div class="pass-face pass-front">
+                    <div class="pass-tilt-surface" id="pass-tilt-surface">
+                      <div class="pass-head">
+                        <div class="pass-brand">
+                          <span class="pass-dot" aria-hidden="true"></span>
+                          <span>humanity.llc</span>
+                        </div>
+                        <span class="pass-badge badge-live" id="demo-markets-badge">Market live</span>
+                      </div>
+                      <div class="pass-body">
+                        <div class="pass-main">
+                          <p class="pass-type">Co-op day pass</p>
+                          <h1 class="pass-name">Saturday market · Lot B</h1>
+                          <p class="pass-manifesto" id="demo-markets-manifesto">
+                            Menus + surplus window open
+                          </p>
+                          <ul class="pass-trust" id="demo-markets-trust" aria-label="Status at a glance">
+                            <li class="trust-on">3 stalls open</li>
+                            <li class="trust-on">Surplus tagged</li>
+                            <li class="trust-on">Vendor menus</li>
+                          </ul>
+                        </div>
+                        <div
+                          class="pass-qr"
+                          id="pass-qr-slot"
+                          data-scan-url="https://humanity.llc/demo/combining/markets-surplus?q=coop_pass_sat"
+                        ></div>
+                      </div>
+                      <p class="pass-foot">
+                        Co-op board lists stalls; each vendor signs menus; prep kitchen signs surplus.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="pass-face pass-back" aria-hidden="true">
+                    <div class="pass-back-accent" aria-hidden="true"></div>
+                    <div class="pass-back-inner">
+                      <div class="pass-head">
+                        <div class="pass-brand">
+                          <span class="pass-dot" aria-hidden="true"></span>
+                          <span>At scan time</span>
+                        </div>
+                        <span class="pass-badge badge-neutral">Flip</span>
+                      </div>
+                      <ul class="pass-back-grid" aria-label="Vendor model">
+                        <li>
+                          <span class="pass-back-label">Co-op</span>
+                          <span class="pass-back-value">stalls, hours, layout</span>
+                        </li>
+                        <li>
+                          <span class="pass-back-label">Vendor</span>
+                          <span class="pass-back-value">menu, sold out, price</span>
+                        </li>
+                        <li>
+                          <span class="pass-back-label">Prep kitchen</span>
+                          <span class="pass-back-value">safe-to-take surplus only</span>
+                        </li>
+                      </ul>
+                      <p class="pass-foot pass-foot-muted">Limits below · demo only.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="pass-flip-btn" id="pass-flip-btn" aria-label="Flip card">
+              Tap to flip
+            </button>
+          </div>
+        </section>
+
+        <div class="combining-demo-actions">
+          <button
+            type="button"
+            class="combining-demo-btn combining-demo-btn-primary"
+            id="demo-markets-toggle"
+            aria-pressed="true"
+          >
+            Close surplus window
+          </button>
+        </div>
+        <p class="combining-demo-hint">
+          Prepared-food tags mark safe-to-take surplus. Toggle to see one state object update without
+          reprinting the pass.
+        </p>
+
+        <div class="scan-trust-groups" aria-label="Signed streams at scan time">
+          <section class="group scan-group scan-group-stream">
+            <h2 class="group-label">Market board</h2>
+            <p class="scan-stream-signer">Signed by <strong>Riverside co-op · market coordinator</strong></p>
+            <ul class="list">
+              <li class="list-row is-highlight">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Today · 9 AM – 2 PM · Lot B</span>
+                  <span class="list-sub">Stalls A1–A3, B2 open · map link in full product</span>
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Stall A2 · closed today</span>
+                  <span class="list-sub">Vendor stream still available for regular menu</span>
+                </span>
+              </li>
+            </ul>
+          </section>
+
+          <section class="group scan-group scan-group-stream">
+            <h2 class="group-label">Vendor menu · Stall A1</h2>
+            <p class="scan-stream-signer">Signed by <strong>Green Row Farm · vendor key</strong></p>
+            <ul class="list">
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Spring greens box · $12</span>
+                  <span class="list-sub">12 left · live menu object</span>
+                </span>
+              </li>
+              <li class="list-row is-muted">
+                <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Honey · sold out</span>
+                  <span class="list-sub">Updated 10:42 AM · no reprint</span>
+                </span>
+              </li>
+            </ul>
+          </section>
+
+          <section class="group scan-group scan-group-stream">
+            <h2 class="group-label">Prepared surplus</h2>
+            <p class="scan-stream-signer">Signed by <strong>Market prep kitchen</strong></p>
+            <ul class="list">
+              <li class="list-row is-highlight" id="demo-surplus-row">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M18 12h4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Veg chili · safe to take</span>
+                  <span class="list-sub">12 portions · expires 8 PM · prep kitchen signed</span>
+                </span>
+              </li>
+            </ul>
+          </section>
+
+          <section class="group scan-group scan-group-qr">
+            <h2 class="group-label">This QR</h2>
+            <p class="scan-stream-signer">Co-op pass · <strong>one scan composes streams</strong></p>
+            <ul class="list">
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">QR active · scope co_op_pass</span>
+                  <span class="list-sub">Vendor updates menu object · kitchen updates surplus</span>
+                </span>
+              </li>
+            </ul>
+          </section>
+        </div>
+
+        <details class="scan-limits-settings">
+          <summary class="scan-limits-summary">
+            <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            <span class="scan-limits-summary-text">
+              <span class="scan-limits-summary-title">What this demo does not prove</span>
+              <span class="scan-limits-summary-sub">Not payment receipt · not health inspection</span>
+            </span>
+            <span class="list-chevron" aria-hidden="true">›</span>
+          </summary>
+          <div class="scan-limits-panel">
+            <p class="scan-limits-lead">
+              Each stream has its own signer. Surplus safe-to-take is not the same authority as
+              stall layout or vendor pricing.
+            </p>
+            <ul class="scan-limits-list">
+              <li>Co-op does not sign individual menu sold-out lines</li>
+              <li>Vendor does not sign communal surplus portions</li>
+            </ul>
+            <p class="scan-limits-meta"><a href="/data-policy.html">Operator data policy</a></p>
+          </div>
+        </details>
+
+        <nav class="combining-demo-nav group" aria-label="Related">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/local-economies/">
+                <span class="list-content">
+                  <span class="list-title">Local economies walkthrough</span>
+                  <span class="list-sub">Co-op passes and mutual aid routing</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/live-menus/">
+                <span class="list-content">
+                  <span class="list-title">Live menus</span>
+                  <span class="list-sub">Sold-out without reprinting</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </main>
+    </div>
+    <script src="/js/pass-flip.js?v=1" defer></script>
+    <script type="module" src="/js/combining-scan-demo.mjs?v=1"></script>
+  </body>
+</html>
