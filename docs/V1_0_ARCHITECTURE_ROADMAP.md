@@ -558,6 +558,8 @@ Follow these steps in order. Each step lists **exit criteria** and **spec refs**
 
 ### Milestone M7 — Live control (optional)
 
+**Alpha plan:** `docs/M7_LIVE_CONTROL_ALPHA.md`
+
 | Step | Action | Exit | Refs |
 |---|---|---|---|
 | 7.1 | Challenge create + sign response | Scanner sees success window | R-004 |
