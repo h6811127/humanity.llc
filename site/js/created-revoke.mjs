@@ -89,6 +89,16 @@ export function initOwnerRevoke(ctx) {
 
   async function refreshLiveStatus() {
     if (!liveStatusEl || !ctx.profileId || !ctx.qrId) return;
+    const session = ctx.getSession();
+    const revokedKind = session?.revoke_state?.target_kind;
+    if (revokedKind === "qr_credential") {
+      liveStatusEl.textContent = "Network: QR revoked";
+      return;
+    }
+    if (revokedKind === "card") {
+      liveStatusEl.textContent = "Network: card disabled";
+      return;
+    }
     liveStatusEl.textContent = "Checking network status…";
     try {
       const res = await fetch(getCardStatusUrl(ctx.profileId, ctx.qrId));

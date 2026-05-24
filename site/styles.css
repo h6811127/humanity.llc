@@ -2241,6 +2241,49 @@ button.btn-danger {
   justify-content: center;
 }
 
+.created-print-tip {
+  margin-top: 12px;
+  padding: 0 2px;
+}
+
+.created-print-tip summary {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--grey);
+  cursor: pointer;
+  list-style: none;
+}
+
+.created-print-tip summary::-webkit-details-marker {
+  display: none;
+}
+
+.created-print-tip summary::after {
+  content: " ›";
+  color: var(--grey);
+}
+
+.created-print-tip[open] summary::after {
+  transform: rotate(90deg);
+  display: inline-block;
+}
+
+.created-print-steps {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+.created-print-steps li {
+  margin-bottom: 6px;
+}
+
+.created-print-steps li:last-child {
+  margin-bottom: 0;
+}
+
 .mono-link-compact {
   font-size: 11px;
   text-align: center;

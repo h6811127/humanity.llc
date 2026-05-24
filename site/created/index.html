@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Your live object · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=40" />
+    <link rel="stylesheet" href="/styles.css?v=44" />
   </head>
   <body>
     <div class="page">
@@ -67,16 +67,30 @@
             >
               Open scan page
             </a>
+            <button type="button" class="btn-secondary" id="download-qr" disabled>
+              Download QR image
+            </button>
             <button type="button" class="btn-secondary" id="copy-scan">Copy scan link</button>
           </div>
+          <details class="created-print-tip">
+            <summary>Print from your phone</summary>
+            <ol class="created-print-steps">
+              <li>Download the QR image above.</li>
+              <li>Open it in Photos or Files.</li>
+              <li>
+                Share → Print (iPhone) or ⋮ → Print (Android). For a sticker, use label paper or
+                tape the printout.
+              </li>
+            </ol>
+          </details>
           <p class="mono-link mono-link-compact" id="scan-url" hidden></p>
         </section>
 
         <section class="created-what-now" aria-labelledby="what-now-title">
           <h2 class="created-what-now-title" id="what-now-title">What to do now</h2>
           <p class="created-what-now-body">
-            Print this QR. Put it on a notebook, sticker, card, door, flyer, wristband, or
-            event pass. Scan it from another phone. Then revoke it and scan again.
+            Print the QR, scan it from another phone, then revoke it under
+            <strong>Revoke this QR</strong> and scan again to see live state change.
           </p>
           <p class="created-what-now-more">
             <a href="/what-can-a-qr-do.html">What can a QR do?</a> — ideas for benches, games,
@@ -354,6 +368,6 @@
         </p>
       </main>
     </div>
-    <script type="module" src="/js/created.mjs?v=14"></script>
+    <script type="module" src="/js/created.mjs?v=16"></script>
   </body>
 </html>

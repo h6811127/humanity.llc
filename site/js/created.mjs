@@ -61,6 +61,7 @@ const manifestoEl = document.getElementById("created-manifesto");
 const scanUrlEl = document.getElementById("scan-url");
 const qrImg = document.getElementById("qr-img");
 const copyBtn = document.getElementById("copy-scan");
+const downloadQrBtn = document.getElementById("download-qr");
 const openScanBtn = document.getElementById("open-scan");
 const profileIdEl = document.getElementById("profile-id");
 const cardStatusEl = document.getElementById("card-status");
@@ -123,8 +124,27 @@ if (scanUrl) {
   }
 
   try {
-    const { renderQrToImage } = await import("./qr-render.mjs");
+    const { renderQrToImage, downloadQrPng } = await import("./qr-render.mjs");
     await renderQrToImage(qrImg, scanUrl);
+    if (downloadQrBtn) {
+      downloadQrBtn.disabled = false;
+      const slug = data?.handle ? String(data.handle) : qrId?.slice(0, 8) || "scan";
+      downloadQrBtn.onclick = async () => {
+        const prev = downloadQrBtn.textContent;
+        downloadQrBtn.disabled = true;
+        try {
+          await downloadQrPng(scanUrl, `humanity-${slug}-qr.png`);
+          downloadQrBtn.textContent = "Downloaded";
+          setTimeout(() => {
+            downloadQrBtn.textContent = prev;
+          }, 2000);
+        } catch (err) {
+          showError(err.message || "Could not download QR image.");
+        } finally {
+          downloadQrBtn.disabled = false;
+        }
+      };
+    }
   } catch (err) {
     console.error(err);
     qrImg.alt = "Could not generate QR";
@@ -132,6 +152,7 @@ if (scanUrl) {
   }
 } else {
   copyBtn.disabled = true;
+  if (downloadQrBtn) downloadQrBtn.disabled = true;
   scanUrlEl.textContent = "Scan link unavailable.";
 }
 
