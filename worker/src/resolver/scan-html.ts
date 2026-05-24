@@ -7,7 +7,7 @@ import { SCAN_PASS_CSS } from "./scan-pass-styles";
 import { renderScanQrMarkup } from "./scan-qr";
 
 /** Response header — confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v9";
+export const SCAN_UI_VERSION = "pass-v10";
 
 /**
  * Public scan UI — flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -465,7 +465,8 @@ function renderLimitsSettings(origin: string): string {
       <li>Legal identity, government ID, KYC, or background checks</li>
       <li>Employment eligibility, age verification, or a hidden trust score</li>
       <li>That social vouches were honest or complete</li>
-      <li>Permanent ownership of a physical item (revocation can change state)</li>
+      <li>Permanent ownership of a physical item (lifecycle transitions can change state)</li>
+      <li>Who scanned, when, or where — this page returns object state, not a people trail</li>
     </ul>
     <p class="scan-limits-meta">No scan analytics on this page. <a href="${escapeHtml(policy)}">Operator data policy</a></p>
   </div>
@@ -562,15 +563,15 @@ function scanLead(vm: ScanViewModel): string {
     case "malformed":
       return "This scan link is missing a valid profile or QR id.";
     case "card_revoked":
-      return "Printed QRs may still exist. Card details are hidden.";
+      return "Object state: card disabled. Printed QRs still exist; card details are hidden.";
     case "card_suspended":
       return "This card is suspended under published rules.";
     case "card_expired":
       return "This card has expired.";
     case "qr_revoked":
-      return "Revoked by owner. Network status at scan time.";
+      return "Object state: this pointer is off. The sticker is unchanged; only live rules changed.";
     case "qr_expired":
-      return "Validity ended at scan time. The card may still be active for other QRs.";
+      return "Object state: validity ended. The card may still be active for other QRs.";
     case "qr_replaced":
       return "This QR was replaced by a newer credential.";
     default:

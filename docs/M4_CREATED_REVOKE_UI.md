@@ -53,9 +53,11 @@ Session-only keys are intentional for Phase A. **Encrypted export/import** and o
 
 ## Lifecycle UX (M4.5 + M4.6)
 
+**Product frame:** `/created/#revoke-rules` is titled **Object lifecycle** — revoke is one state transition, not “delete the QR.” See `docs/REVOKE_AND_LIFECYCLE_V1.md` § State transitions.
+
 | Feature | Status |
 |---------|--------|
-| Minimal scan (QR revoked, card disabled, QR expired) | Shipped — `pass-v9` |
+| Minimal scan (QR revoked, card disabled, QR expired) | Shipped — `pass-v10` |
 | **Show link** on scan pages | Shipped |
 | **Disable card** + **Revoke this QR** labels and ID warnings | Shipped |
 | **Revoke rules** explainer (`/created/#revoke-rules`) | Shipped |

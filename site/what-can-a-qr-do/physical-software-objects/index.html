@@ -37,12 +37,23 @@
           <p class="hero-line hero-line-sub">Research, not shipping yet.</p>
         </section>
 
+        <section class="idea-section" aria-labelledby="state-title">
+          <h2 class="group-label" id="state-title">State, not just revoke</h2>
+          <p class="group-intro short">
+            The product is <strong>programmable state transitions</strong> for physical objects.
+            Revoke is one transition (pointer off). Expiry, claimed, recovered, and replaced are
+            others. The resolver stores <strong>object state</strong> — not who scanned, when, or
+            where. Shipped today: active, expired, revoked, disabled; see
+            <code>docs/REVOKE_AND_LIFECYCLE_V1.md</code>.
+          </p>
+        </section>
+
         <section class="idea-section" aria-labelledby="deploy-title">
           <h2 class="group-label" id="deploy-title">Printing is deployment</h2>
           <p class="group-intro short">
             Software usually lives on servers, apps, and browsers. A printed QR places a small
-            <strong>software reference</strong> in the world — with status, permissions, revocation,
-            memory, affiliation, and routing that can change after the ink dries.
+            <strong>software reference</strong> in the world — with status, permissions, lifecycle
+            transitions, memory, affiliation, and routing that can change after the ink dries.
           </p>
           <ul class="tag-chips tag-chips-neutral" aria-label="Object capabilities">
             <li>status</li>

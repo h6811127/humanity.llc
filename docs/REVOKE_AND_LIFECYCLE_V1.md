@@ -10,9 +10,32 @@
 
 ## Core primitive
 
-A Humanity **QR credential** (`qr_id`) is a **signed capability pointer**: it resolves to **current** resolver state until an authorized key ends or suspends that state.
+A Humanity **QR credential** (`qr_id`) is a **signed capability pointer**: it resolves to **current** resolver state until an authorized key changes that state.
 
-**Owning the QR** means owning its **lifecycle** — scope (one QR vs whole card), **when** it stops (now, scheduled, on next scan), **what strangers see** after (minimal vs tombstone vs private), and **how** the owner acts (browser, backup, recovery key, shortcut — same API).
+**Owning the object** means owning its **lifecycle** — not only “delete this QR.” The interesting product is **programmable state transitions** for physical software objects. **Revoke is one transition** (pointer off). **Expiry** is another (time). Future transitions (claimed, recovered, after-next-scan, replaced) use the same primitive: **object state on the resolver**, not scan surveillance.
+
+**Design rule (privacy):** Store **minimal object state** (`status`, `expires_at`, optional counters/reasons) — not **who scanned, when, or where**. No default scan logs. See §State transitions.
+
+---
+
+## State transitions (product frame)
+
+| Transition | User-facing idea | Shipped? | Tracking required? |
+|------------|------------------|----------|-------------------|
+| **Active** | Default; scan shows live manifesto / pilot layout | ✓ | No |
+| **Expired** | Validity ended (`expires_at`) | ✓ (M4.6) | No |
+| **Revoke QR** | One pointer off; siblings may stay active | ✓ | No |
+| **Disable card** | Whole profile offline | ✓ | No |
+| **Organizer revoke** | Coalition key, `organizer_revoked` | ✓ (pilot) | No |
+| **After next scan** | One-time reveal then off | Research | Counter only, not identity |
+| **After N scans** | Limited tickets / clues | Research | Count only, not who |
+| **Claimed / recovered** | Lost-item story states | Research | Object flags, not scanner ID |
+| **Replaced / redirect** | New credential; old QR tombstone | Research | No |
+| **Location / velocity** | Mismatch or abuse | **Defer** | High — conflicts with no-scan-analytics |
+
+**UI vocabulary:** Prefer **lifecycle**, **state**, **transition** in explainers. Keep button labels **Revoke this QR** and **Disable card** (precise actions). Avoid implying the sticker is “deleted” — **the rules for this object changed**.
+
+**Not Humanity:** scan analytics, device trails, “recent scans,” or crisis-resource **collection** on the operator. Saving a resource belongs on the **scanner’s device** (future wallet / saved resources — see crisis research page).
 
 ---
 
@@ -289,3 +312,4 @@ Resolver stores on `revocations` row; scan HTML respects mode. **Not in v1 API y
 | 2026-05-23 | Initial spec from owner notes + Phase A/M5.5 implementation reality |
 | 2026-05-21 | Owner warning copy, delete scan headline, cross-links across doc set |
 | 2026-05-24 | M4.5 minimal scans + Show link shipped; M4.6 create validity + qr_expired minimal scan |
+| 2026-05-24 | State-transition framing: revoke as one lifecycle change; minimal object state vs scan logs |

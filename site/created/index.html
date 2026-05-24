@@ -25,8 +25,9 @@
         </section>
 
         <p class="created-primitive">
-          This QR is not just a link. It resolves to <strong>current signed status</strong>
-          on the network: active, revoked, or disabled when someone scans.
+          This QR is not just a link. It resolves to <strong>current object state</strong> on the
+          network — active, expired, revoked, or disabled — when someone scans. Printing deploys the
+          object; you change its rules later.
         </p>
 
         <section class="created-loop" aria-label="Try the loop">
@@ -163,33 +164,42 @@
         </section>
 
         <section class="created-revoke-rules" id="revoke-rules" aria-labelledby="revoke-rules-title">
-          <h2 class="created-revoke-rules-title" id="revoke-rules-title">Revoke rules</h2>
+          <h2 class="created-revoke-rules-title" id="revoke-rules-title">Object lifecycle</h2>
           <p class="created-revoke-rules-lead">
-            You own the <strong>lifecycle</strong> of this object — when a pointer stops, what
-            scope it affects, and what strangers see after.
+            Revoke is not “delete the sticker.” It is one <strong>state transition</strong> after
+            the object is in the world — same idea as expiry or (later) claimed or recovered.
+            Humanity stores <strong>object state</strong>, not who scanned.
           </p>
           <ul class="created-revoke-rules-list">
             <li>
-              <strong>Revoke this QR</strong> — one printed pointer stops (sticker, tag, one link).
-              Other QRs on the same card can stay active.
+              <strong>Active</strong> — scan shows live manifesto or pilot layout (status plate,
+              lost item, etc.).
             </li>
             <li>
-              <strong>Disable card</strong> — the whole profile goes offline; every active QR on
-              this card stops resolving as active.
+              <strong>Expiry</strong> — time runs out on this credential (set at create). Scan shows
+              expired; you can still revoke early.
             </li>
             <li>
-              <strong>Expiry</strong> — time runs out on this credential only (set at create).
-              Scan shows expired; you can still revoke early.
+              <strong>Revoke this QR</strong> — one pointer turns off. Other QRs on the same card
+              can stay active.
             </li>
             <li>
-              <strong>Organizer revoke</strong> — if you registered a coalition key at create, they
-              can revoke without your owner key at
-              <a id="organizer-revoke-link" href="/organizer-revoke/">organizer revoke</a>.
+              <strong>Disable card</strong> — whole profile offline; every active QR stops
+              resolving as active.
+            </li>
+            <li>
+              <strong>Organizer revoke</strong> — coalition key registered at create;
+              <a id="organizer-revoke-link" href="/organizer-revoke/">organizer revoke</a> without
+              your owner key.
             </li>
           </ul>
           <p class="form-hint revoke-id-warning">
-            Printed QRs always keep profile ID and QR ID in the URL. Revoke, disable, and expiry
-            change what the resolver returns — not the ink.
+            Printed QRs always keep profile ID and QR ID in the URL. Transitions change what the
+            resolver returns — not the ink.
+          </p>
+          <p class="form-hint">
+            Future transitions (after next scan, claimed, redirect) stay object-state-only — no
+            scan tracking on the operator.
           </p>
         </section>
 
