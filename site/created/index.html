@@ -107,8 +107,9 @@
         <section class="created-what-now" aria-labelledby="what-now-title">
           <h2 class="created-what-now-title" id="what-now-title">What to do now</h2>
           <p class="created-what-now-body" id="created-what-now-body">
-            Print the QR, scan it from another phone, then revoke it under
-            <strong>Revoke this QR</strong> and scan again to see live state change.
+            Before you close this tab, save your recovery key and/or download an encrypted backup.
+            Then print the QR, scan it from another phone, revoke it under
+            <strong>Revoke this QR</strong>, and scan again to see live state change.
           </p>
           <p class="created-what-now-more">
             <a href="/what-can-a-qr-do.html">What can a QR do?</a> — ideas for benches, games,
@@ -230,8 +231,9 @@
             <p class="owner-live-status" id="owner-live-status" aria-live="polite"></p>
             <p class="form-warning owner-revoked-banner" id="owner-revoked-banner" hidden></p>
             <p class="form-hint" id="owner-no-key">
-              Unlock a backup or recovery key below, or create again on
-              <a href="/create/">/create/</a>.
+              This page cannot sign until it has an owner or recovery key in this browser. Unlock a
+              saved backup or recovery key below, or create again on <a href="/create/">/create/</a>.
+              humanity.llc cannot revoke for you.
             </p>
 
             <div id="revoke-actions" hidden>
@@ -290,12 +292,13 @@
               </p>
               <ul class="settings-list">
                 <li>
-                  <strong>This browser tab</strong> keeps the key until you close it. Add to Home
-                  Screen does not save the key.
+                  <strong>This browser tab</strong> keeps the key until you close it or clear site
+                  data. Add to Home Screen does not save the key.
                 </li>
                 <li>
                   <strong>Recovery key</strong> (shown once at create) or <strong>encrypted backup</strong>
-                  (below) lets you revoke from another device later.
+                  (below) lets you unlock this page later from another device. humanity.llc does
+                  not hold either secret.
                 </li>
                 <li>
                   <strong>iPhone (Passwords)</strong> or <strong>Android (Google Password Manager)</strong>:
@@ -324,7 +327,10 @@
             </summary>
             <div class="settings-panel settings-panel-action">
               <div id="backup-export-block" hidden>
-                <p class="form-hint">Available while this tab still has your key from create.</p>
+                <p class="form-hint">
+                  Available only while this tab still has your owner key from create. The backup
+                  file downloads to your device; it is not uploaded to humanity.llc.
+                </p>
                 <p class="form-hint">
                   Passphrase is never sent to humanity.llc. If you lose it, the backup file is
                   useless and we cannot reset it.
@@ -458,10 +464,11 @@
         <p class="form-warning" id="created-error" hidden></p>
         <p class="form-warning" id="no-session" hidden>
           Open this page right after create, or use a link with both
-          <code>profile_id</code> and <code>qr_id</code>.
+          <code>profile_id</code> and <code>qr_id</code>. If this is a later visit, you will also
+          need a saved recovery key or encrypted backup before the web UI can sign revoke.
         </p>
       </main>
     </div>
-    <script type="module" src="/js/created.mjs?v=20"></script>
+    <script type="module" src="/js/created.mjs?v=21"></script>
   </body>
 </html>

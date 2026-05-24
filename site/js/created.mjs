@@ -115,7 +115,7 @@ function initLiveControlProof() {
     btn.disabled = !keys;
     if (!keys) {
       status.textContent =
-        "Open this proof link in the original created tab, or unlock a recovery key / encrypted backup in More options.";
+        "Open this proof link in the original created tab, or unlock a saved recovery key / encrypted backup in More options. humanity.llc cannot prove control for you.";
     } else if (!status.textContent) {
       status.textContent = "Ready to prove live control.";
     }
