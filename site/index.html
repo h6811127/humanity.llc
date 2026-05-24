@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=50" />
+    <link rel="stylesheet" href="/styles.css?v=52" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -47,6 +47,17 @@
             Normal QR codes are permanent. Humanity live objects can be updated, revoked, or
             limited after they&rsquo;re printed — no invite, no app, keys stay in your browser.
           </p>
+          <div class="landing-hero-actions" aria-label="Get started">
+            <a class="landing-hero-btn landing-hero-btn-primary" href="/create/"
+              >Create a live object</a
+            >
+            <p class="landing-hero-secondary">
+              Prefer to look first?
+              <a href="/case-study/">See the full loop</a>
+              <span class="landing-hero-sep" aria-hidden="true">·</span>
+              <a href="#status-plate-pilot">Try the status plate</a>
+            </p>
+          </div>
         </section>
 
         <section class="pass" id="card" aria-label="Network status preview">
@@ -175,20 +186,16 @@
               >
                 Revoke (demo)
               </button>
+              <a class="pass-scene-link-btn" href="/case-study/">See the full loop</a>
             </div>
           </div>
         </section>
 
-        <nav class="dock dock-early" aria-label="Actions">
-          <a class="dock-btn dock-btn-primary" href="/create/">Create a live object</a>
-          <a class="dock-btn" href="/case-study/">See the full loop</a>
-        </nav>
-
         <section class="group landing-your-cards" aria-labelledby="your-cards-title">
           <h2 class="group-label" id="your-cards-title">Your cards on this device</h2>
           <p class="form-hint">
-            Vouching and revoke need <strong>your</strong> signing keys in this browser. Keys never
-            leave your device — the operator only sees signed actions.
+            Already created one? Keys stay in this browser only — load a saved card, then vouch or
+            revoke from <a href="/created/">/created/</a>.
           </p>
           <ul class="list list-compact">
             <li class="list-row">
@@ -526,7 +533,7 @@
         </section>
       </main>
     </div>
-    <nav class="dock dock-sticky" aria-label="Create">
+    <nav class="dock dock-sticky" aria-label="Get started">
       <a class="dock-btn dock-btn-primary" href="/create/">Create a live object</a>
     </nav>
     <script src="/js/pass-flip.js?v=1" defer></script>

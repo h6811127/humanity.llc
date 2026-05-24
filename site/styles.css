@@ -1232,6 +1232,36 @@ a {
   transform: scale(0.98);
 }
 
+.pass-scene-link-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 16px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: center;
+  border-radius: var(--radius-pill);
+  color: var(--black);
+  background: var(--white);
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    opacity 0.15s ease,
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.pass-scene-link-btn:active {
+  opacity: 0.7;
+  transform: scale(0.98);
+}
+
 .pass-state {
   transition:
     opacity 0.35s ease,
@@ -2055,6 +2085,58 @@ a {
 
 .landing-your-cards {
   margin-top: 8px;
+}
+
+.landing-hero-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.landing-hero-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 50px;
+  padding: 14px 18px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+}
+
+.landing-hero-btn-primary {
+  background: var(--red);
+  border: 1px solid var(--red);
+  color: var(--white);
+}
+
+.landing-hero-btn-primary:active {
+  opacity: 0.85;
+}
+
+.landing-hero-secondary {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--grey);
+  text-align: center;
+}
+
+.landing-hero-secondary a {
+  color: var(--black);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.landing-hero-sep {
+  margin: 0 0.35em;
+  color: var(--grey);
+  font-weight: 400;
+  text-decoration: none;
 }
 
 .form-warning {
