@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Demo scan · games + maintenance · humanity.llc</title>
+    <meta
+      name="description"
+      content="Demo scan page showing how a game layer can reward discovery while only maintainers sign safety status."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=46" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Demo scan page · combo 1</p>
+          <h1>Games + maintenance</h1>
+          <p class="hero-line">
+            One scan can power neighborhood play while keeping safety authority separate from
+            points, quests, and map unlocks.
+          </p>
+        </section>
+
+        <section class="idea-section" aria-labelledby="scan-view-title">
+          <h2 class="group-label" id="scan-view-title">Scan view · trail node / AED hallway</h2>
+          <div class="scenario-grid" aria-label="Demo scan states">
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">What the scanner sees now</p>
+              <ul class="scenario-card-list">
+                <li>Node status: in service</li>
+                <li>Last maintainer check: today, 09:14</li>
+                <li>Nearby route: checkpoint 7 unlocked</li>
+                <li>Issue report path available</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">Game layer</p>
+              <ul class="scenario-card-list">
+                <li>Players find AED, filter, and trail-marker nodes</li>
+                <li>Discovery grants map points and lore fragments</li>
+                <li>No points awarded for declaring equipment safe</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">Safety boundary</p>
+              <ul class="scenario-card-list">
+                <li>Maintainer-signed status stays separate from game points</li>
+                <li>If signatures conflict, safety copy overrides game copy</li>
+                <li>Out-of-service state pauses route rewards automatically</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="streams-title">
+          <h2 class="group-label" id="streams-title">Signed streams behind this card</h2>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Maintainer stream</span>
+                <span class="list-sub">In service / out of service, last verified, repair notes</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-purple" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21 1.18.38 2.03 1.46 2.03 2.79"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Game stream</span>
+                <span class="list-sub">Routes, checkpoints, faction points, narrative unlocks</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Resolver rules</span>
+                <span class="list-sub">Fix verified → local map unlocks the next route</span>
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <p class="insight">
+          This pattern rewards discovery while preserving a hard line: only the maintainer signs
+          safety-critical truth.
+        </p>
+
+        <section class="group">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/combining-ideas/">
+                <span class="list-icon list-icon-tone-gold" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Combining demos</span>
+                  <span class="list-sub">Back to all combo scan pages</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

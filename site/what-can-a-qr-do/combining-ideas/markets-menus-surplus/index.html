@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Demo scan · markets + menus + surplus · humanity.llc</title>
+    <meta
+      name="description"
+      content="Demo scan page showing how a co-op pass can aggregate live stalls, menu state, and prepared-food surplus without reprints."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=46" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Demo scan page · combo 3</p>
+          <h1>Markets + menus + surplus</h1>
+          <p class="hero-line">
+            A co-op pass can route to today&rsquo;s market and current menu while prepared-food tags
+            signal safe-to-take surplus in real time.
+          </p>
+        </section>
+
+        <section class="idea-section" aria-labelledby="scan-view-title">
+          <h2 class="group-label" id="scan-view-title">Scan view · co-op pass</h2>
+          <div class="scenario-grid" aria-label="Demo market and surplus states">
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">What the scanner sees now</p>
+              <ul class="scenario-card-list">
+                <li>Today&rsquo;s active stalls: 14</li>
+                <li>River City Tacos menu: 3 items sold out</li>
+                <li>Prepared stew tray: safe-to-take until 8 PM</li>
+                <li>Last updates signed 17 minutes ago</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">Market/menu layer</p>
+              <ul class="scenario-card-list">
+                <li>Co-op pass links to today&rsquo;s stalls and live menus</li>
+                <li>Vendors toggle open, moved, sold out, and closed states</li>
+                <li>Customers scan one pass, not dozens of posters</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">Surplus safety layer</p>
+              <ul class="scenario-card-list">
+                <li>Prepared-food tags mark safe-to-take surplus</li>
+                <li>Expired or recalled trays switch to do-not-consume</li>
+                <li>Vendor updates one state object instead of reprinting</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="streams-title">
+          <h2 class="group-label" id="streams-title">Signed streams behind this card</h2>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Co-op stream</span>
+                <span class="list-sub">Who is vending today, where stalls are, and market-level notices</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M18 12h4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Kitchen stream</span>
+                <span class="list-sub">Freshness, expiry, allergens, and recall state for prepared surplus</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h4"/><path d="M7 13h6"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Vendor stream</span>
+                <span class="list-sub">Menu item availability and service-window validity per stall</span>
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <p class="insight">
+          This stack reduces print churn and stale information while preserving signer boundaries for
+          safety-critical food claims.
+        </p>
+
+        <section class="group">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/combining-ideas/">
+                <span class="list-icon list-icon-tone-gold" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Combining demos</span>
+                  <span class="list-sub">Back to all combo scan pages</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
