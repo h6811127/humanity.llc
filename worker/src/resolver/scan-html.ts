@@ -51,6 +51,7 @@ export async function renderScanPage(
     </main>
   </div>
   <script>${SCAN_PASS_FLIP_JS}</script>
+  ${renderLiveControlScript(vm, origin)}
   ${renderQrFallbackScript(origin, vm.scanUrl)}
 </body>
 </html>`;
@@ -440,12 +441,99 @@ function liveControlGroupRows(vm: ScanViewModel): string {
       "Card key signed a fresh challenge — not shown on every scan"
     );
   }
+  if (vm.kind === "active" && vm.profileId && vm.qrId) {
+    return `<li class="list-row">
+  ${scanListIcon("purple", "key")}
+  <span class="list-content">
+    <span class="list-title">Live control</span>
+    <span class="list-sub">Ask the owner to show they control this object right now.</span>
+    <button type="button" class="dock-btn dock-btn-secondary" id="live-control-request">
+      Ask for live proof
+    </button>
+    <span class="list-sub" id="live-control-status" aria-live="polite">
+      Not proven yet.
+    </span>
+    <a class="scan-footer-link" id="live-control-owner-link" href="#" hidden>
+      Open owner proof link
+    </a>
+  </span>
+</li>`;
+  }
   return listRow(
     "key",
     "slate",
     "Not shown",
     "Optional in-person key proof (M7)"
   );
+}
+
+function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
+  if (vm.kind !== "active" || !vm.profileId || !vm.qrId) return "";
+  const challengeUrl = `${origin}/.well-known/hc/v1/cards/${encodeURIComponent(
+    vm.profileId
+  )}/live-control/challenges`;
+  return `<script>
+(function () {
+  var btn = document.getElementById("live-control-request");
+  var status = document.getElementById("live-control-status");
+  var ownerLink = document.getElementById("live-control-owner-link");
+  if (!btn || !status) return;
+  var pollTimer = null;
+  function setStatus(text) {
+    status.textContent = text;
+  }
+  function stopPolling() {
+    if (pollTimer) window.clearInterval(pollTimer);
+    pollTimer = null;
+  }
+  function poll(url) {
+    stopPolling();
+    pollTimer = window.setInterval(function () {
+      fetch(url, { cache: "no-store" })
+        .then(function (res) { return res.json(); })
+        .then(function (body) {
+          if (body.status === "proven") {
+            stopPolling();
+            btn.disabled = false;
+            btn.textContent = "Ask again";
+            setStatus("Control proven moments ago. This does not prove legal identity.");
+          } else if (body.status === "expired") {
+            stopPolling();
+            btn.disabled = false;
+            btn.textContent = "Ask again";
+            setStatus("Control was not proven. The request expired.");
+          }
+        })
+        .catch(function () {});
+    }, 2000);
+  }
+  btn.addEventListener("click", function () {
+    btn.disabled = true;
+    btn.textContent = "Waiting…";
+    setStatus("Creating a live proof request…");
+    fetch(${JSON.stringify(challengeUrl)}, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ qr_id: ${JSON.stringify(vm.qrId)} })
+    })
+      .then(function (res) { return res.json().then(function (body) { return { ok: res.ok, body: body }; }); })
+      .then(function (result) {
+        if (!result.ok) throw new Error(result.body.message || result.body.error || "Could not create live proof request.");
+        if (ownerLink) {
+          ownerLink.hidden = false;
+          ownerLink.href = result.body.owner_url;
+        }
+        setStatus("Ask the owner to open the proof link on the device with the key.");
+        poll(result.body.status_url);
+      })
+      .catch(function (err) {
+        btn.disabled = false;
+        btn.textContent = "Ask for live proof";
+        setStatus(err.message || "Could not create live proof request.");
+      });
+  });
+})();
+</script>`;
 }
 
 /** iOS-style settings row — all “does not prove” copy in one place. */

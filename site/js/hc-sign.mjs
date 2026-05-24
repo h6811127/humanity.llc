@@ -9,6 +9,7 @@ const PROTOCOL_VERSION = "1.0";
 const SIGNATURE_ALG = "Ed25519";
 const CANONICALIZATION = "JCS";
 const PAYLOAD_TYPE_REVOCATION = "revocation";
+const PAYLOAD_TYPE_LIVE_CONTROL_RESPONSE = "live_control_response";
 
 /** Level 0 bearer copy (V1_PRODUCT_TRUST_MODEL.md) — keep in sync with worker trust-copy.ts */
 export const BEARER_WARNING =
@@ -144,6 +145,13 @@ export function postRevokeUrl(profileId) {
   ).href;
 }
 
+export function postLiveControlResponseUrl(profileId) {
+  return new URL(
+    `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/live-control/responses`,
+    resolverApiOrigin()
+  ).href;
+}
+
 export function getCardStatusUrl(profileId, qrId = null) {
   const url = new URL(
     `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/status`,
@@ -201,5 +209,27 @@ export async function signRevocation({
     payload.target_qr_id = targetQrId;
   }
   const unsigned = withProtocolFields(payload, PAYLOAD_TYPE_REVOCATION);
+  return signDocument(unsigned, privateKey, publicKeyBase58);
+}
+
+/**
+ * Owner/recovery-signed live control proof.
+ * @param {{ profileId: string, qrId: string, challengeId: string, privateKeyBase58: string, publicKeyBase58: string }} opts
+ */
+export async function signLiveControlResponse({
+  profileId,
+  qrId,
+  challengeId,
+  privateKeyBase58,
+  publicKeyBase58,
+}) {
+  const privateKey = decodePrivateKeyBase58(privateKeyBase58);
+  const payload = {
+    profile_id: profileId,
+    qr_id: qrId,
+    challenge_id: challengeId,
+    signed_at: new Date().toISOString(),
+  };
+  const unsigned = withProtocolFields(payload, PAYLOAD_TYPE_LIVE_CONTROL_RESPONSE);
   return signDocument(unsigned, privateKey, publicKeyBase58);
 }

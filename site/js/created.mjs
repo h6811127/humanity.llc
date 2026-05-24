@@ -1,4 +1,10 @@
-import { getCardJsonUrl, qrScanUrl, resolverApiOrigin } from "./hc-sign.mjs";
+import {
+  getCardJsonUrl,
+  postLiveControlResponseUrl,
+  qrScanUrl,
+  resolverApiOrigin,
+  signLiveControlResponse,
+} from "./hc-sign.mjs";
 import { initOwnerRevoke } from "./created-revoke.mjs";
 import { initKeyBackupUi } from "./key-backup-ui.mjs";
 import { initRecoveryKeyUi } from "./recovery-key-ui.mjs";
@@ -6,6 +12,7 @@ import { initRecoveryKeyUi } from "./recovery-key-ui.mjs";
 const params = new URLSearchParams(location.search);
 const profileIdParam = params.get("profile_id")?.trim() || null;
 const qrIdParam = params.get("qr_id")?.trim() || null;
+const liveChallengeParam = params.get("live_challenge")?.trim() || null;
 
 const errorEl = document.getElementById("created-error");
 const loopSteps = document.querySelectorAll(".created-loop-step");
@@ -75,6 +82,81 @@ const lostItemTipEl = document.getElementById("created-lost-item-tip");
 
 function revealOwnerActions() {
   if (ownerActionsEl) ownerActionsEl.hidden = false;
+}
+
+function currentSigningKeys() {
+  const session = loadSession();
+  const ownerPriv = session?.owner_private_key_b58;
+  const ownerPub = session?.owner_public_key_b58;
+  if (typeof ownerPriv === "string" && typeof ownerPub === "string") {
+    return { privateKeyBase58: ownerPriv, publicKeyBase58: ownerPub };
+  }
+  const recoveryPriv = session?.recovery_private_key_b58;
+  const recoveryPub = session?.recovery_public_key_b58;
+  if (typeof recoveryPriv === "string" && typeof recoveryPub === "string") {
+    return { privateKeyBase58: recoveryPriv, publicKeyBase58: recoveryPub };
+  }
+  return null;
+}
+
+function initLiveControlProof() {
+  const panel = document.getElementById("live-control-proof");
+  const btn = document.getElementById("live-control-proof-btn");
+  const status = document.getElementById("live-control-proof-status");
+  if (!panel || !btn || !status || !liveChallengeParam || !profileId || !qrId) {
+    return { refresh: () => {} };
+  }
+
+  panel.hidden = false;
+
+  function refresh() {
+    const keys = currentSigningKeys();
+    btn.disabled = !keys;
+    if (!keys) {
+      status.textContent =
+        "Unlock a recovery key or encrypted backup in More options before proving control.";
+    } else if (!status.textContent) {
+      status.textContent = "Ready to prove live control.";
+    }
+  }
+
+  btn.addEventListener("click", async () => {
+    const keys = currentSigningKeys();
+    if (!keys) {
+      refresh();
+      return;
+    }
+    btn.disabled = true;
+    status.textContent = "Signing live proof…";
+    try {
+      const response = await signLiveControlResponse({
+        profileId,
+        qrId,
+        challengeId: liveChallengeParam,
+        privateKeyBase58: keys.privateKeyBase58,
+        publicKeyBase58: keys.publicKeyBase58,
+      });
+      status.textContent = "Submitting proof…";
+      const res = await fetch(postLiveControlResponseUrl(profileId), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ response }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(body.message || body.error || `HTTP ${res.status}`);
+      }
+      btn.textContent = "Control proven";
+      status.textContent =
+        "Control proven moments ago. This does not prove legal identity.";
+    } catch (err) {
+      btn.disabled = false;
+      status.textContent = err.message || "Could not prove control.";
+    }
+  });
+
+  refresh();
+  return { refresh };
 }
 
 function applyPilotTemplateUi(session) {
@@ -240,6 +322,7 @@ if (profileId && qrId) {
     },
   };
   const revoke = initOwnerRevoke(revokeCtx);
+  const liveControl = initLiveControlProof();
   const backup = initKeyBackupUi({
     profileId,
     getSession: loadSession,
@@ -247,13 +330,17 @@ if (profileId && qrId) {
     onKeysUnlocked: () => {
       backup?.refreshExportVisibility();
       revoke?.refresh();
+      liveControl?.refresh();
     },
   });
   initRecoveryKeyUi({
     profileId,
     getSession: loadSession,
     setSession: saveSession,
-    onKeysUnlocked: () => revoke?.refresh(),
+    onKeysUnlocked: () => {
+      revoke?.refresh();
+      liveControl?.refresh();
+    },
   });
 
   const session = loadSession();
