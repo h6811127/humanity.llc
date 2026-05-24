@@ -1716,10 +1716,6 @@ a {
   border: 1px solid var(--grey);
 }
 
-.list-spaced-top {
-  margin-top: 14px;
-}
-
 .list li {
   display: flex;
   align-items: center;
