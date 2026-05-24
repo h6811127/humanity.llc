@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Saved cards · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=56" />
+    <link rel="stylesheet" href="/styles.css?v=57" />
   </head>
   <body class="has-device-hub-search">
     <div class="page">
@@ -26,6 +26,29 @@
             uploaded.
           </p>
         </section>
+
+        <div class="device-storage-explainer" aria-label="How saving works">
+          <p class="device-storage-explainer-title">Two places keys can live</p>
+          <ul class="device-storage-explainer-list">
+            <li>
+              <strong>This tab</strong> — right after create (<code>sessionStorage</code>). Gone if
+              you close the tab unless you saved or backed up.
+            </li>
+            <li>
+              <strong>This device</strong> — after you tap <strong>Save to this device</strong>
+              (<code>localStorage</code>). Any tab on this browser can load them from here.
+            </li>
+          </ul>
+          <p class="form-hint device-storage-explainer-foot">
+            Copying the recovery key is not the same as saving. Pins are bookmarks only (no keys).
+          </p>
+        </div>
+
+        <p class="form-warning device-tab-hint" id="wallet-tab-hint" hidden>
+          No signing keys in <strong>this tab</strong>. Go back to the tab where you finished
+          create and tap <strong>Save on this device</strong> on <a href="/created/">/created/</a>,
+          or use <strong>Use keys</strong> below if you already saved.
+        </p>
 
         <div
           class="wallet-active-banner"
@@ -81,7 +104,11 @@
           </div>
 
           <div class="device-hub-group" id="wallet-save-group" hidden data-hub-group="save">
-            <p class="device-hub-group-label">Save signing keys</p>
+            <p class="device-hub-group-label">Save signing keys (this tab → this device)</p>
+            <p class="form-hint">
+              Only visible while this tab still holds keys from a recent create. Switching tabs
+              without saving is why Saved cards looks empty.
+            </p>
             <form id="wallet-save-form" class="wallet-save-inset" autocomplete="off" novalidate>
               <label class="wallet-save-field">
                 <span class="form-label">Label</span>
@@ -156,6 +183,6 @@
       <p class="device-hub-search-hint">This device only — not the public resolver</p>
     </div>
 
-    <script type="module" src="/js/card-wallet.mjs?v=3"></script>
+    <script type="module" src="/js/card-wallet.mjs?v=4"></script>
   </body>
 </html>

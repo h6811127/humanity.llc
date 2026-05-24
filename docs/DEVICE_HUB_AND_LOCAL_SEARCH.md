@@ -56,11 +56,23 @@ Returning users see their labels on the homepage; strangers still see the same s
 
 ---
 
+## Two storage layers (why tabs matter)
+
+| Layer | API | Scope | Used for |
+|-------|-----|--------|----------|
+| **This tab** | `sessionStorage` (`hc_created`) | Single tab | Immediately after **Create** — signing, revoke, vouch in that tab |
+| **This device** | `localStorage` (`hc_wallet`) | Whole origin (all tabs) | **Saved cards** on `/wallet/`, homepage **On this device**, search |
+
+**Common confusion:** Create in tab B, switch to tab A (homepage or wallet) → no keys visible until you **Save on this device** in tab B (on `/created/` Now tab or wallet while keys still live in tab B). Copying the **recovery key** does not write to `hc_wallet`.
+
+**Pins (`hc_device_pins`)** are a third bucket: public scan bookmarks only — no signing keys.
+
 ## Security and data policy
 
 - Wallet and pins stay in **browser storage**; operator never receives private keys from pins.
 - Search runs entirely in the client over data the user already stored.
-- Pins are bookmarks only; vouching still requires **saved cards with keys** loaded in the tab.
+- Pins are bookmarks only; vouching still requires **saved cards with keys** loaded in the tab (save → **Use keys** → open vouchee scan).
+- Homepage **On this device** is device-local UI, not a server profile dashboard — your network profile ID is public on scan; private keys are not.
 
 ---
 
@@ -73,5 +85,7 @@ Returning users see their labels on the homepage; strangers still see the same s
 | `site/js/device-pins.mjs` | Parse, validate, dedupe, `hc_device_pins` |
 | `site/js/device-hub-search.mjs` | Shared filter over `[data-hub-searchable]` |
 | `site/wallet/index.html` | Save keys + pin form + lists |
+| `site/js/device-wallet.mjs` | `hc_wallet` save helpers |
+| `site/js/created-device-save.mjs` | Save-on-device block on `/created/` |
 | `site/js/card-wallet.mjs` | Wallet + pin CRUD + search |
 | `site/styles.css` | Device hub + pin row styles |

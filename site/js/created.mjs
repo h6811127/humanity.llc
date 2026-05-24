@@ -14,6 +14,7 @@ import { initRecoveryKeyUi } from "./recovery-key-ui.mjs";
 import { initManifestoUpdate } from "./created-manifesto-update.mjs";
 import { inferPilotTemplate } from "./manifesto-display.mjs";
 import { initCreatedTabs } from "./created-tabs.mjs";
+import { initCreatedDeviceSave } from "./created-device-save.mjs";
 
 const params = new URLSearchParams(location.search);
 const profileIdParam = params.get("profile_id")?.trim() || null;
@@ -600,6 +601,7 @@ async function bootstrapOwnerTools() {
       liveControl?.refresh();
     },
   });
+  const deviceSave = initCreatedDeviceSave(loadSession);
   initRecoveryKeyUi({
     profileId,
     getSession: loadSession,
@@ -608,8 +610,10 @@ async function bootstrapOwnerTools() {
       revoke?.refresh();
       voucherRevoke?.refresh();
       liveControl?.refresh();
+      deviceSave?.refresh();
     },
   });
+  window.addEventListener("hc-recovery-acknowledged", () => deviceSave?.refresh());
   void manifestoUpdate;
 
   const session = loadSession();

@@ -2081,8 +2081,83 @@ a {
   font-size: 14px;
   line-height: 1.45;
   color: var(--grey);
+  margin: 0 0 8px;
+  padding: 0 4px;
+}
+
+.device-hub-lead-sub {
   margin: 0 0 16px;
   padding: 0 4px;
+}
+
+.device-storage-explainer {
+  padding: 14px;
+  margin-bottom: 14px;
+  border-radius: var(--radius);
+  background: #f2f2f7;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.device-storage-explainer-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 10px;
+}
+
+.device-storage-explainer-list {
+  margin: 0 0 10px;
+  padding-left: 1.2rem;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.device-storage-explainer-list li + li {
+  margin-top: 8px;
+}
+
+.device-storage-explainer-foot {
+  margin: 0;
+}
+
+.device-tab-hint {
+  margin-bottom: 14px;
+}
+
+.device-save-card {
+  margin: 16px 0;
+  padding: 16px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(219, 27, 67, 0.28);
+  background: rgba(219, 27, 67, 0.04);
+}
+
+.device-save-title {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.device-save-lead {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--black);
+  margin: 0 0 14px;
+}
+
+.device-save-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.device-save-done {
+  font-size: 14px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.device-save-done a {
+  font-weight: 600;
 }
 
 .device-hub-group {

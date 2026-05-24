@@ -8,22 +8,11 @@ import {
   pinHaystack,
   savePins,
 } from "./device-pins.mjs";
-
-const STORAGE_KEY = "hc_wallet";
-
-function loadWallet() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveWallet(entries) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-}
+import {
+  loadWallet,
+  saveSessionToWallet,
+  saveWallet,
+} from "./device-wallet.mjs";
 
 function loadActiveSession() {
   try {
@@ -89,6 +78,7 @@ const saveLabel = document.getElementById("wallet-save-label");
 const searchInput = document.getElementById("device-hub-search");
 const activeBanner = document.getElementById("wallet-active-banner");
 const activeText = document.getElementById("wallet-active-text");
+const tabHint = document.getElementById("wallet-tab-hint");
 
 const pinForm = document.getElementById("pin-save-form");
 const pinLabel = document.getElementById("pin-save-label");
@@ -105,27 +95,6 @@ function setStatus(el, msg, isError = false) {
   el.hidden = !msg;
   el.textContent = msg;
   el.className = isError ? "form-status error" : "form-status";
-}
-
-function entryFromSession(session, label) {
-  return {
-    id: `${session.profile_id}_${Date.now()}`,
-    label: label.trim() || `@${session.handle || session.profile_id.slice(0, 8)}`,
-    saved_at: new Date().toISOString(),
-    profile_id: session.profile_id,
-    qr_id: session.qr_id,
-    handle: session.handle,
-    manifesto_line: session.manifesto_line,
-    scan_url: session.scan_url,
-    owner_public_key_b58: session.owner_public_key_b58,
-    owner_private_key_b58: session.owner_private_key_b58,
-    recovery_public_key_b58: session.recovery_public_key_b58,
-    recovery_private_key_b58: session.recovery_private_key_b58,
-    qr_expires_at: session.qr_expires_at,
-    status: session.status,
-    verification: session.verification,
-    issued_vouches: session.issued_vouches,
-  };
 }
 
 function renderPinList() {
@@ -283,8 +252,14 @@ function applyHubSearch() {
 
 function updateActiveBanner() {
   const session = loadActiveSession();
+  const hasKeys = !!(session?.profile_id && session?.owner_private_key_b58);
+
+  if (tabHint) {
+    tabHint.hidden = hasKeys;
+  }
+
   if (!activeBanner || !activeText) return;
-  if (!session?.profile_id || !session?.owner_private_key_b58) {
+  if (!hasKeys) {
     activeBanner.hidden = true;
     return;
   }
@@ -329,14 +304,11 @@ if (saveForm && saveGroup && session?.owner_private_key_b58 && session?.profile_
   saveForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const label = saveLabel?.value?.trim() || "";
-    const entries = loadWallet();
-    const duplicate = entries.some((x) => x.profile_id === session.profile_id);
-    if (duplicate) {
-      setStatus(saveStatus, "Already saved. Remove the old entry first.", true);
+    const result = saveSessionToWallet(session, label);
+    if ("error" in result) {
+      setStatus(saveStatus, result.error, true);
       return;
     }
-    entries.unshift(entryFromSession(session, label));
-    saveWallet(entries);
     setStatus(saveStatus, "Saved on this device only.");
     renderList();
     applyHubSearch();

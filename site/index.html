@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=56" />
+    <link rel="stylesheet" href="/styles.css?v=57" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -191,7 +191,13 @@
         <section class="device-hub" id="device-hub" aria-labelledby="device-hub-title">
           <h2 class="device-hub-title" id="device-hub-title">On this device</h2>
           <p class="device-hub-lead">
-            Keys and saved cards stay in this browser. The operator never stores private keys.
+            Personal to <strong>this browser</strong> — not your public profile on the network.
+            Saved cards and pins never upload; the operator never sees private keys.
+          </p>
+          <p class="form-hint device-hub-lead-sub">
+            Empty here? Finish create in one tab, tap <strong>Save on this device</strong> on
+            <a href="/created/">/created/</a>, then return. Each tab starts with its own keys until
+            you save.
           </p>
 
           <div
@@ -617,15 +623,15 @@
             </span>
             <span class="settings-summary-text">
               <span class="settings-summary-title">What this searches</span>
-              <span class="settings-summary-sub">Saved cards, pins, and shortcuts</span>
+              <span class="settings-summary-sub">This browser only — not the resolver</span>
             </span>
             <span class="list-chevron" aria-hidden="true">›</span>
           </summary>
           <div class="settings-panel settings-panel-info">
             <p class="form-hint">
               Filters <strong>On this device</strong>: saved cards (with keys),
-              <a href="/wallet/">pinned scan links</a> you added, and shortcuts. Does not search the
-              public resolver or index other people&rsquo;s cards.
+              <a href="/wallet/">pinned scan links</a>, and shortcuts. Does not search the public
+              resolver. Empty until you save from the create tab.
             </p>
           </div>
         </details>

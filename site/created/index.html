@@ -231,10 +231,44 @@
             </div>
           </section>
 
+          <section
+            class="device-save-card"
+            id="device-save-card"
+            hidden
+            aria-labelledby="device-save-title"
+          >
+            <h2 class="device-save-title" id="device-save-title">Save on this device</h2>
+            <p class="device-save-lead">
+              Signing keys are in <strong>this tab only</strong> right now. Other tabs (including
+              the homepage) cannot see them until you save here. Copying the recovery key does not
+              add them to Saved cards.
+            </p>
+            <form id="created-device-save-form" class="device-save-form" autocomplete="off" novalidate>
+              <label class="form-label" for="created-device-save-label">Label</label>
+              <input
+                class="form-input"
+                id="created-device-save-label"
+                type="text"
+                maxlength="48"
+                placeholder="Personal card"
+              />
+              <button type="submit" class="btn-secondary">Save to this device</button>
+              <p id="created-device-save-status" class="form-status" hidden role="status"></p>
+            </form>
+            <p class="device-save-done" id="created-device-save-done" hidden>
+              Saved. Find this card under <a href="/wallet/">Saved cards</a> and in
+              <strong>On this device</strong> on the homepage — search works there too.
+            </p>
+          </section>
+
           <section class="created-checklist" aria-labelledby="checklist-title">
             <h2 class="created-checklist-title" id="checklist-title">Next steps</h2>
             <ol class="created-checklist-steps">
-              <li>Save your recovery key above (or encrypted backup under <strong>Manage</strong>).</li>
+              <li>
+                <strong>Save on this device</strong> (above) so other tabs can load your keys — or
+                use encrypted backup under <strong>Manage</strong>.
+              </li>
+              <li>Save your recovery key above before you lose this tab.</li>
               <li>Print the QR and <strong>Open scan page</strong> from another phone.</li>
               <li>
                 Under <strong>Manage → Revoke this QR</strong>, pull trust back, then scan again to
@@ -249,7 +283,8 @@
           <p class="created-tab-lead">
             Update copy, revoke, or unlock keys. Same printed QR — you change resolver state, not
             the sticker.
-            <a href="/wallet/">Save this card on this device</a> to load keys later for vouching.
+            Use <strong>Save on this device</strong> on the Now tab (or
+            <a href="/wallet/">Saved cards</a> in the same tab) before switching tabs.
           </p>
 
           <details
@@ -639,12 +674,13 @@
 
         <p class="form-warning" id="created-error" hidden></p>
         <p class="form-warning" id="no-session" hidden>
-          Open this page right after create, or use a link with both
-          <code>profile_id</code> and <code>qr_id</code>. For a later visit, unlock a saved recovery
-          key or encrypted backup under <strong>Manage</strong>.
+          No signing keys in <strong>this tab</strong>. Finish create in the tab where you clicked
+          Create, then tap <strong>Save on this device</strong> there — or open
+          <a href="/wallet/">Saved cards</a> in that same tab. Later: recovery key or encrypted
+          backup under <strong>Manage</strong>.
         </p>
       </main>
     </div>
-    <script type="module" src="/js/created.mjs?v=31"></script>
+    <script type="module" src="/js/created.mjs?v=32"></script>
   </body>
 </html>

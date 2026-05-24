@@ -62,6 +62,7 @@ export function initRecoveryKeyUi(opts) {
     const s = opts.getSession() || {};
     opts.setSession({ ...s, recovery_key_acknowledged: true });
     if (revealEl) revealEl.hidden = true;
+    window.dispatchEvent(new CustomEvent("hc-recovery-acknowledged"));
   });
 
   importForm?.addEventListener("submit", async (e) => {
