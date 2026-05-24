@@ -43,6 +43,7 @@ npm run deploy
 | `created/index.html` | Post-create QR + scan link + owner revoke (session key) |
 | `js/create-card.mjs`, `js/hc-sign.mjs` | Browser signing + POST to resolver |
 | `data-policy.html` | Mobile-friendly operator data policy summary |
+| `architecture.html` | Sparse architecture map — keys, revoke, resolver, tradeoffs |
 | `research-directions.html` | NFC, mesh, and Humanity node — research / future infrastructure |
 | `styles.css` | Layout and visual system |
 | `js/pass-flip.js` | Pass card tilt (touch + desktop), tap-to-flip (landing + scan) |

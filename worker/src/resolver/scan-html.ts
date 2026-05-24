@@ -628,6 +628,7 @@ function liveControlApiOrigin(vm: ScanViewModel, fallback: string): string {
 /** iOS-style settings row — all “does not prove” copy in one place. */
 function renderLimitsSettings(origin: string): string {
   const policy = `${origin}/data-policy.html`;
+  const architecture = `${origin}/architecture.html`;
   return `<details class="scan-limits-settings">
   <summary class="scan-limits-summary">
     ${scanListIcon("orange", "shield")}
@@ -645,7 +646,7 @@ function renderLimitsSettings(origin: string): string {
       <li>Permanent ownership of a physical item (lifecycle transitions can change state)</li>
       <li>Who scanned, when, or where — this page returns object state, not a people trail</li>
     </ul>
-    <p class="scan-limits-meta">No scan analytics on this page. <a href="${escapeHtml(policy)}">Operator data policy</a></p>
+    <p class="scan-limits-meta">No scan analytics on this page. <a href="${escapeHtml(policy)}">Operator data policy</a> · <a href="${escapeHtml(architecture)}">Architecture</a></p>
   </div>
 </details>`;
 }

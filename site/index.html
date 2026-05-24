@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=45" />
+    <link rel="stylesheet" href="/styles.css?v=46" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -159,6 +159,7 @@
                         </li>
                       </ul>
                       <p class="pass-foot">
+                        <a href="/architecture.html">Architecture</a> ·
                         <a href="/data-policy.html">Operator data policy</a>
                       </p>
                     </div>
@@ -290,13 +291,54 @@
           </ol>
         </section>
 
-        <ul class="trust-pills" aria-label="Trust posture">
-          <li>Optional</li>
-          <li>Revocable</li>
-          <li>Scoped</li>
-          <li>No scan tracking</li>
-          <li>Not legal ID</li>
-        </ul>
+        <section class="trust-posture" aria-label="Trust posture">
+          <h2 class="group-label">Design choices</h2>
+          <p class="group-intro short">
+            These tags are engineering decisions, not marketing fluff.
+          </p>
+          <ul class="trust-posture-list">
+            <li>
+              <span class="trust-pill">Optional</span>
+              <p class="trust-posture-copy">
+                Scanning needs no account. Create a live object only when you want one — keys stay in
+                your browser, not on our servers.
+              </p>
+            </li>
+            <li>
+              <span class="trust-pill">Revocable</span>
+              <p class="trust-posture-copy">
+                Owner signs revoke with an Ed25519 key held locally; the resolver verifies the
+                signature and updates server-side status for that <code>qr_id</code>. The printed URL
+                stays — the live answer changes.
+              </p>
+            </li>
+            <li>
+              <span class="trust-pill">Scoped</span>
+              <p class="trust-posture-copy">
+                Each QR is its own credential on a card. Revoke one wristband or sticker without
+                killing sibling QRs on the same profile.
+              </p>
+            </li>
+            <li>
+              <span class="trust-pill">No scan tracking</span>
+              <p class="trust-posture-copy">
+                The resolver returns object state, not a trail of who scanned, when, or where. No scan
+                analytics by default.
+              </p>
+            </li>
+            <li>
+              <span class="trust-pill">Not legal ID</span>
+              <p class="trust-posture-copy">
+                Signed public status for communities — not government ID, KYC, employment proof, or a
+                hidden trust score.
+              </p>
+            </li>
+          </ul>
+          <p class="trust-posture-more">
+            <a href="/architecture.html">Architecture</a> · how keys, revoke, and resolver state fit
+            together.
+          </p>
+        </section>
 
         <nav class="dock" aria-label="Actions">
           <a class="dock-btn dock-btn-primary" href="/create/">Create a live object</a>
@@ -342,6 +384,18 @@
               <span class="list-content">
                 <span class="list-title">Merch does not grant vouched status</span>
               </span>
+            </li>
+            <li class="list-row list-action">
+              <a href="/architecture.html">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Architecture</span>
+                  <span class="list-sub">Keys, revoke path, resolver state, tradeoffs</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
             </li>
             <li class="list-row list-action">
               <a href="/data-policy.html">
