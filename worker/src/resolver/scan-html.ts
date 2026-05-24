@@ -553,9 +553,16 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
       });
   }
   btn.addEventListener("click", function () {
+    var ownerHint = document.getElementById("live-control-owner-hint");
     btn.disabled = true;
     btn.textContent = "Waiting…";
     setStatus("Creating a live proof request…");
+    stopPolling();
+    if (ownerLink) {
+      ownerLink.hidden = true;
+      ownerLink.href = "#";
+    }
+    if (ownerHint) ownerHint.hidden = true;
     fetch(${JSON.stringify(challengeUrl)}, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -571,7 +578,6 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
           ownerLink.hidden = false;
           ownerLink.href = result.body.owner_url;
         }
-        var ownerHint = document.getElementById("live-control-owner-hint");
         if (ownerHint) ownerHint.hidden = false;
         setStatus("Ask the owner to open the proof link on the device with the key.");
         poll(result.body.status_url);
