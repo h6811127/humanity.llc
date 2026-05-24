@@ -1,4 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { runInNewContext } from "node:vm";
+
+import { describe, expect, it, vi } from "vitest";
 
 import type { ScanContext } from "../src/db/scan";
 import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
@@ -76,6 +78,80 @@ function scanDbFor(challenge: Record<string, unknown> | null = null): D1Database
       }),
     }),
   } as unknown as D1Database;
+}
+
+function extractLiveControlScript(html: string): string {
+  const match = html.match(
+    /<script>\n\(function \(\) \{\n  var btn = document\.getElementById\("live-control-request"\);[\s\S]*?\n\}\)\(\);\n<\/script>/
+  );
+  expect(match).not.toBeNull();
+  return match![0].replace(/^<script>\n/, "").replace(/\n<\/script>$/, "");
+}
+
+async function runLiveControlScriptWithStatus(body: Record<string, unknown>) {
+  const vm = buildScanViewModel(
+    PROFILE,
+    QR,
+    {
+      card: card(),
+      qr: qr(),
+      verification: summary(),
+    },
+    "https://humanity.llc"
+  );
+  const html = await renderScanPage(vm, "https://humanity.llc");
+  const script = extractLiveControlScript(html);
+  type FakeElement = {
+    disabled?: boolean;
+    textContent?: string;
+    addEventListener?: ReturnType<typeof vi.fn>;
+    hidden?: boolean;
+    href?: string;
+  };
+  const elements: Record<string, FakeElement> = {
+    "live-control-request": {
+      disabled: false,
+      textContent: "Ask for live proof",
+      addEventListener: vi.fn(),
+    },
+    "live-control-status": { textContent: "Not proven yet." },
+    "live-control-owner-link": { hidden: true, href: "#" },
+  };
+  const fetchMock = vi.fn(async () => ({ json: async () => body }));
+  const setTimeoutMock = vi.fn(() => 1);
+
+  runInNewContext(script, {
+    Date,
+    Error,
+    Number,
+    URLSearchParams,
+    encodeURIComponent,
+    document: {
+      getElementById: (id: string) => elements[id] ?? null,
+    },
+    fetch: fetchMock,
+    location: {
+      origin: "https://humanity.llc",
+      search: `?q=${QR}&live_challenge=${LIVE_CHALLENGE}`,
+    },
+    window: {
+      clearInterval: vi.fn(),
+      clearTimeout: vi.fn(),
+      setInterval: vi.fn(() => 1),
+      setTimeout: setTimeoutMock,
+    },
+  });
+
+  await Promise.resolve();
+  await Promise.resolve();
+  await Promise.resolve();
+
+  return {
+    button: elements["live-control-request"],
+    fetchMock,
+    setTimeoutMock,
+    status: elements["live-control-status"],
+  };
 }
 
 describe("buildScanViewModel", () => {
@@ -232,6 +308,63 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(res.headers.get("Cache-Control")).toBe("no-store");
     expect(html).toContain("Control proven recently");
     expect(html).not.toContain('id="live-control-request"');
+  });
+
+  it("does not render stale live proof as recently proven", async () => {
+    const res = await handleGetScan(
+      new Request(
+        `https://humanity.llc/c/${PROFILE}?q=${QR}&live_challenge=${LIVE_CHALLENGE}`
+      ),
+      scanDbFor({
+        challenge_id: LIVE_CHALLENGE,
+        profile_id: PROFILE,
+        qr_id: QR,
+        nonce: "nonce",
+        verifier_session_id: "verifier",
+        status: "proven",
+        issued_at: new Date(Date.now() - 600_000).toISOString(),
+        expires_at: new Date(Date.now() - 540_000).toISOString(),
+        proven_at: new Date(Date.now() - 301_000).toISOString(),
+        signer_public_key: "pk",
+        response_document_json: "{}",
+        created_at: new Date(Date.now() - 600_000).toISOString(),
+        updated_at: new Date(Date.now() - 301_000).toISOString(),
+      }),
+      PROFILE
+    );
+    const html = await res.text();
+
+    expect(res.status).toBe(200);
+    expect(html).not.toContain("Control proven recently");
+    expect(html).toContain('id="live-control-request"');
+    expect(html).toContain("Not proven yet.");
+  });
+
+  it("does not let browser status checks revive stale live proof", async () => {
+    const result = await runLiveControlScriptWithStatus({
+      status: "proven",
+      proof_expires_at: new Date(Date.now() - 1_000).toISOString(),
+    });
+
+    expect(result.status.textContent).toBe(
+      "Live proof expired. Ask again to prove control now."
+    );
+    expect(result.button.textContent).toBe("Ask again");
+    expect(result.setTimeoutMock).not.toHaveBeenCalled();
+  });
+
+  it("clears browser live proof status when the proof display window ends", async () => {
+    const result = await runLiveControlScriptWithStatus({
+      status: "proven",
+      proof_expires_at: new Date(Date.now() + 60_000).toISOString(),
+    });
+
+    expect(result.status.textContent).toBe(
+      "Control proven moments ago. This does not prove legal identity."
+    );
+    expect(result.button.textContent).toBe("Ask again");
+    expect(result.setTimeoutMock).toHaveBeenCalledTimes(1);
+    expect(result.setTimeoutMock.mock.calls[0][1]).toBeGreaterThan(0);
   });
 
   it("uses print_artifact scope copy when applicable", async () => {
