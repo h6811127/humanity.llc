@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Games + maintenance scan demo · humanity.llc</title>
+    <meta
+      name="description"
+      content="Demo scan page for stacking game discovery with maintainer-signed maintenance status."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=46" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Demo scan page</p>
+          <h1>Games + maintenance</h1>
+          <p class="hero-line">
+            Players find AED, filter, and trail-marker nodes. Maintainer-signed status stays
+            separate from game points. Fix verified and signed, then the local map unlocks the next
+            route.
+          </p>
+          <p class="hero-line hero-line-sub">Research simulation, not a live production feature.</p>
+        </section>
+
+        <section class="idea-section" aria-labelledby="scan-title">
+          <h2 class="group-label" id="scan-title">Demo scan states</h2>
+          <div class="scenario-grid" aria-label="Games and maintenance scan states">
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Scan · node healthy</p>
+              <ul class="scenario-card-list">
+                <li>Node: trail AED #4</li>
+                <li>Maintainer status: in service</li>
+                <li>Last safety check: today 08:10</li>
+                <li>Game reward: +50 route points</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">Scan · issue reported</p>
+              <ul class="scenario-card-list">
+                <li>Community report: battery warning</li>
+                <li>Maintainer status: pending inspection</li>
+                <li>Game route paused at this node</li>
+                <li>Players redirected to nearest safe node</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Scan · fix verified</p>
+              <ul class="scenario-card-list">
+                <li>Maintainer status: restored in service</li>
+                <li>Signed at: today 12:42</li>
+                <li>Route gate opens checkpoint 5</li>
+                <li>Discovery badge issued to reporters</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="streams-title">
+          <h2 class="group-label" id="streams-title">Signed streams behind one scan</h2>
+          <ul class="tag-chips" aria-label="Games and maintenance streams">
+            <li>maintainer safety status</li>
+            <li>inspection timestamp</li>
+            <li>player discovery points</li>
+            <li>route unlock state</li>
+            <li>issue report relay</li>
+            <li>node location metadata</li>
+          </ul>
+        </section>
+
+        <section class="idea-section" aria-labelledby="boundary-title">
+          <h2 class="group-label" id="boundary-title">Authority boundary</h2>
+          <div class="qr-compare-grid">
+            <article class="qr-compare-col qr-compare-col-muted">
+              <h3 class="qr-compare-heading">Not this</h3>
+              <ul class="qr-compare-list">
+                <li>Players mark equipment safe</li>
+                <li>Points override out-of-service warnings</li>
+                <li>Game urgency hides safety warnings</li>
+              </ul>
+            </article>
+            <article class="qr-compare-col qr-compare-col-live">
+              <h3 class="qr-compare-heading">This</h3>
+              <ul class="qr-compare-list">
+                <li>Maintainers sign safety state</li>
+                <li>Game rewards only discovery and reporting</li>
+                <li>Route unlock depends on signed fixes</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="group">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/combining-ideas/">
+                <span class="list-icon list-icon-tone-purple" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Combining ideas</span>
+                  <span class="list-sub">Back to combo index</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
