@@ -524,65 +524,6 @@ a {
   background: var(--white);
 }
 
-.trust-posture {
-  margin-top: 4px;
-}
-
-.trust-posture-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.trust-posture-list li {
-  padding: 14px 16px;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background: #fafafa;
-}
-
-.trust-pill {
-  display: inline-block;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  padding: 6px 12px;
-  border-radius: var(--radius-pill);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  color: var(--black);
-  background: var(--white);
-  margin-bottom: 8px;
-}
-
-.trust-posture-copy {
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.45;
-  color: var(--black);
-}
-
-.trust-posture-copy code {
-  font-size: 13px;
-  font-family: ui-monospace, Menlo, monospace;
-}
-
-.trust-posture-more {
-  margin: 12px 2px 0;
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--grey);
-}
-
-.trust-posture-more a {
-  font-weight: 600;
-  color: var(--red);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
 .list-compact .list-row,
 .list-compact li {
   padding-top: 11px;
@@ -2660,6 +2601,11 @@ button.btn-danger {
   border: 1px solid rgba(0, 0, 0, 0.1);
   background: var(--white);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+}
+
+.live-control-proof-requested {
+  border-color: rgba(88, 86, 214, 0.35);
+  background: rgba(88, 86, 214, 0.06);
 }
 
 .created-what-now-title {

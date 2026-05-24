@@ -8,6 +8,7 @@ import {
 import { getCardOwner } from "../db/revoke";
 import { loadScanContext } from "../db/scan";
 import {
+  getLatestPendingLiveControlChallenge,
   getLiveControlChallenge,
   insertLiveControlChallenge,
   markLiveControlExpired,
@@ -148,6 +149,50 @@ export async function handleGetLiveControlChallenge(
   }
 
   const current = await expireIfNeeded(db, challenge);
+  return jsonResponse(challengeBody(current, request), 200, {
+    "Cache-Control": "no-store",
+  });
+}
+
+export async function handleGetPendingLiveControlChallenge(
+  request: Request,
+  db: D1Database,
+  profileId: string
+): Promise<Response> {
+  if (!PROFILE_ID_REGEX.test(profileId)) {
+    return errorResponse(CRYPTO_ERROR.INVALID_PROFILE_ID, "Invalid profile_id.", 422);
+  }
+
+  const url = new URL(request.url);
+  const qrId = url.searchParams.get("qr_id")?.trim() || null;
+  if (!qrId || !QR_ID_REGEX.test(qrId)) {
+    return errorResponse("INVALID_QR_ID", "Query must include valid qr_id.", 422);
+  }
+
+  const nowIso = new Date().toISOString();
+  const challenge = await getLatestPendingLiveControlChallenge(
+    db,
+    profileId,
+    qrId,
+    nowIso
+  );
+  if (!challenge) {
+    return errorResponse(
+      "CHALLENGE_NOT_FOUND",
+      "No pending live control request for this QR.",
+      404
+    );
+  }
+
+  const current = await expireIfNeeded(db, challenge);
+  if (current.status !== "pending") {
+    return errorResponse(
+      "CHALLENGE_NOT_FOUND",
+      "No pending live control request for this QR.",
+      404
+    );
+  }
+
   return jsonResponse(challengeBody(current, request), 200, {
     "Cache-Control": "no-store",
   });
@@ -324,6 +369,7 @@ function challengeBody(
     proven_at: challenge.proven_at,
     proof_expires_at: proofExpiresAt,
     owner_url: ownerUrl.href,
+    return_url: challenge.qr_id ? ownerUrl.searchParams.get("return_url") : null,
     status_url: statusUrl.href,
     message:
       challenge.status === "proven"

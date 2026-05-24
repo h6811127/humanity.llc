@@ -1,5 +1,6 @@
 import {
   getCardJsonUrl,
+  getPendingLiveControlChallengeUrl,
   postLiveControlResponseUrl,
   qrScanUrl,
   resolverApiOrigin,
@@ -104,26 +105,70 @@ function initLiveControlProof() {
   const panel = document.getElementById("live-control-proof");
   const btn = document.getElementById("live-control-proof-btn");
   const status = document.getElementById("live-control-proof-status");
-  if (!panel || !btn || !status || !liveChallengeParam || !profileId || !qrId) {
+  if (!panel || !btn || !status || !profileId || !qrId) {
     return { refresh: () => {} };
   }
 
-  panel.hidden = false;
+  let activeChallengeId = liveChallengeParam;
+  let activeReturnUrl = liveReturnUrlParam;
+  let pollTimer = null;
+
+  function revealPanel(fromPoll = false) {
+    panel.hidden = false;
+    if (fromPoll) {
+      panel.classList.add("live-control-proof-requested");
+    }
+    panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
 
   function refresh() {
     const keys = currentSigningKeys();
-    btn.disabled = !keys;
+    btn.disabled = !keys || !activeChallengeId;
     if (!keys) {
       status.textContent =
         "Open this proof link in the original created tab, or unlock a saved recovery key / encrypted backup in More options. humanity.llc cannot prove control for you.";
-    } else if (!status.textContent) {
+    } else if (!activeChallengeId) {
+      status.textContent =
+        "Keep this tab open while someone scans. If they ask for live proof, the sign button will appear here automatically.";
+    } else if (!status.textContent || status.textContent.startsWith("Keep this tab open")) {
       status.textContent = "Ready to prove live control.";
     }
   }
 
+  async function pollPendingChallenge() {
+    if (activeChallengeId) return;
+    const keys = currentSigningKeys();
+    if (!keys) return;
+    try {
+      const res = await fetch(getPendingLiveControlChallengeUrl(profileId, qrId), {
+        cache: "no-store",
+      });
+      if (res.status === 404) return;
+      if (!res.ok) return;
+      const body = await res.json();
+      if (body.status !== "pending" || !body.challenge_id) return;
+      activeChallengeId = body.challenge_id;
+      activeReturnUrl =
+        typeof body.return_url === "string" ? body.return_url : liveReturnUrlParam;
+      revealPanel(true);
+      status.textContent =
+        "Someone nearby is asking for live proof. Tap below to sign from this device.";
+      refresh();
+    } catch {
+      /* ignore transient poll errors */
+    }
+  }
+
+  if (liveChallengeParam) {
+    revealPanel(false);
+  } else {
+    pollPendingChallenge();
+    pollTimer = window.setInterval(pollPendingChallenge, 3000);
+  }
+
   btn.addEventListener("click", async () => {
     const keys = currentSigningKeys();
-    if (!keys) {
+    if (!keys || !activeChallengeId) {
       refresh();
       return;
     }
@@ -133,7 +178,7 @@ function initLiveControlProof() {
       const response = await signLiveControlResponse({
         profileId,
         qrId,
-        challengeId: liveChallengeParam,
+        challengeId: activeChallengeId,
         privateKeyBase58: keys.privateKeyBase58,
         publicKeyBase58: keys.publicKeyBase58,
       });
@@ -150,9 +195,13 @@ function initLiveControlProof() {
       btn.textContent = "Control proven";
       status.textContent =
         "Control proven moments ago. This does not prove legal identity.";
-      if (liveReturnUrlParam) {
+      if (pollTimer) {
+        window.clearInterval(pollTimer);
+        pollTimer = null;
+      }
+      if (activeReturnUrl) {
         window.setTimeout(() => {
-          location.href = liveReturnUrlParam;
+          location.href = activeReturnUrl;
         }, 800);
       }
     } catch (err) {
@@ -162,7 +211,12 @@ function initLiveControlProof() {
   });
 
   refresh();
-  return { refresh };
+  return {
+    refresh,
+    stopPolling() {
+      if (pollTimer) window.clearInterval(pollTimer);
+    },
+  };
 }
 
 function applyPilotTemplateUi(session) {

@@ -453,12 +453,20 @@ function liveControlGroupRows(vm: ScanViewModel): string {
     <span class="list-sub" id="live-control-status" aria-live="polite">
       Not proven yet.
     </span>
-    <a class="scan-footer-link" id="live-control-owner-link" href="#" hidden>
-      Open owner proof link
-    </a>
-    <span class="list-sub" id="live-control-owner-hint" hidden>
-      Open this on the owner device or original created tab.
-    </span>
+    <div class="live-control-owner-panel" id="live-control-owner-panel" hidden>
+      <p class="live-control-owner-lead">
+        Owner must prove on the device that <strong>created this card</strong> (e.g. your laptop).
+        Waiting here on the scanner until they sign.
+      </p>
+      <div class="live-control-owner-actions">
+        <a class="dock-btn dock-btn-secondary" id="live-control-owner-link" href="#" target="_blank" rel="noopener noreferrer">
+          Open owner proof
+        </a>
+        <button type="button" class="btn-secondary" id="live-control-copy-owner-link">
+          Copy owner link
+        </button>
+      </div>
+    </div>
   </span>
 </li>`;
   }
@@ -480,8 +488,26 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
 (function () {
   var btn = document.getElementById("live-control-request");
   var status = document.getElementById("live-control-status");
+  var ownerPanel = document.getElementById("live-control-owner-panel");
   var ownerLink = document.getElementById("live-control-owner-link");
+  var copyOwnerLink = document.getElementById("live-control-copy-owner-link");
   if (!btn || !status) return;
+  function showOwnerPanel(url) {
+    if (ownerPanel) ownerPanel.hidden = false;
+    if (ownerLink) ownerLink.href = url;
+    if (copyOwnerLink) {
+      copyOwnerLink.onclick = function () {
+        navigator.clipboard.writeText(url).then(function () {
+          copyOwnerLink.textContent = "Copied";
+          window.setTimeout(function () {
+            copyOwnerLink.textContent = "Copy owner link";
+          }, 2000);
+        }).catch(function () {
+          copyOwnerLink.textContent = "Copy failed — use Open link";
+        });
+      };
+    }
+  }
   var pollTimer = null;
   var countdownTimer = null;
   function setStatus(text) {
@@ -565,6 +591,7 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
           } else {
             setStatus("Waiting for live proof…");
           }
+          if (body.owner_url) showOwnerPanel(body.owner_url);
           poll(statusUrlForChallenge(id));
         }
       })
@@ -587,15 +614,12 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
       .then(function (res) { return res.json().then(function (body) { return { ok: res.ok, body: body }; }); })
       .then(function (result) {
         if (!result.ok) throw new Error(result.body.message || result.body.error || "Could not create live proof request.");
-        if (ownerLink) {
-          ownerLink.hidden = false;
-          ownerLink.href = result.body.owner_url;
+        if (result.body.owner_url) {
+          showOwnerPanel(result.body.owner_url);
         }
-        var ownerHint = document.getElementById("live-control-owner-hint");
-        if (ownerHint) ownerHint.hidden = false;
         startCountdown(
           result.body.expires_at,
-          "Ask the owner to open the proof link on the device with the key."
+          "Waiting for the owner to tap Prove control on their key-holding device."
         );
         poll(result.body.status_url);
       })

@@ -152,6 +152,15 @@ export function postLiveControlResponseUrl(profileId) {
   ).href;
 }
 
+export function getPendingLiveControlChallengeUrl(profileId, qrId) {
+  const url = new URL(
+    `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/live-control/challenges`,
+    resolverApiOrigin()
+  );
+  url.searchParams.set("qr_id", qrId);
+  return url.href;
+}
+
 export function getCardStatusUrl(profileId, qrId = null) {
   const url = new URL(
     `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/status`,

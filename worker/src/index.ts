@@ -17,6 +17,7 @@ import { handlePostArtifactIntent } from "./resolver/artifact-intents";
 import { handleGetCard, handlePostCards } from "./resolver/create-card";
 import {
   handleGetLiveControlChallenge,
+  handleGetPendingLiveControlChallenge,
   handlePostLiveControlChallenge,
   handlePostLiveControlResponse,
 } from "./resolver/live-control";
@@ -114,6 +115,21 @@ export default {
         );
       }
       const res = await handlePostLiveControlChallenge(
+        request,
+        env.DB,
+        liveChallengeMatch[1]!
+      );
+      return withCors(request, res);
+    }
+
+    if (liveChallengeMatch && request.method === "GET") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetPendingLiveControlChallenge(
         request,
         env.DB,
         liveChallengeMatch[1]!
