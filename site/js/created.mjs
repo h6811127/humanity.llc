@@ -13,6 +13,7 @@ const params = new URLSearchParams(location.search);
 const profileIdParam = params.get("profile_id")?.trim() || null;
 const qrIdParam = params.get("qr_id")?.trim() || null;
 const liveChallengeParam = params.get("live_challenge")?.trim() || null;
+const liveReturnUrlParam = params.get("return_url")?.trim() || null;
 
 const errorEl = document.getElementById("created-error");
 const loopSteps = document.querySelectorAll(".created-loop-step");
@@ -149,6 +150,11 @@ function initLiveControlProof() {
       btn.textContent = "Control proven";
       status.textContent =
         "Control proven moments ago. This does not prove legal identity.";
+      if (liveReturnUrlParam) {
+        window.setTimeout(() => {
+          location.href = liveReturnUrlParam;
+        }, 800);
+      }
     } catch (err) {
       btn.disabled = false;
       status.textContent = err.message || "Could not prove control.";

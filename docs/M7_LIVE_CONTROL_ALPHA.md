@@ -44,7 +44,8 @@ Do not lead with cryptography, sessions, signatures, or protocol language. Those
 3. Resolver creates a short-lived challenge.
 4. Scanner gets an owner proof link.
 5. Owner opens the link on a key-holding device or the original created tab and taps **Prove control now**.
-6. Scanner page updates to: **Control proven moments ago. This does not prove legal identity.**
+6. Owner returns to the scan URL with the challenge reference.
+7. Scanner page updates to: **Control proven moments ago. This does not prove legal identity.**
 
 **Exit:**
 
@@ -54,6 +55,7 @@ Do not lead with cryptography, sessions, signatures, or protocol language. Those
 - [x] Owner/recovery key can sign the challenge from `/created/`.
 - [x] No-key state tells the owner to use the original created tab or unlock backup/recovery.
 - [x] Scanner can poll challenge status and see recent-control success.
+- [x] Owner proof success can return to the scan page and rehydrate the proven state.
 - [x] Live control proof does not mutate card, QR, verification, or vouch state.
 
 ---

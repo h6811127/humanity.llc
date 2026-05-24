@@ -511,6 +511,34 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
         .catch(function () {});
     }, 2000);
   }
+  function statusUrlForChallenge(id) {
+    return ${JSON.stringify(apiOrigin)} + "/.well-known/hc/v1/cards/" +
+      encodeURIComponent(${JSON.stringify(vm.profileId)}) +
+      "/live-control/challenges/" + encodeURIComponent(id);
+  }
+  function checkExistingProof() {
+    var params = new URLSearchParams(location.search);
+    var id = params.get("live_challenge");
+    if (!id) return;
+    setStatus("Checking live proof…");
+    fetch(statusUrlForChallenge(id), { cache: "no-store" })
+      .then(function (res) { return res.json(); })
+      .then(function (body) {
+        if (body.status === "proven") {
+          btn.textContent = "Ask again";
+          setStatus("Control proven moments ago. This does not prove legal identity.");
+        } else if (body.status === "expired") {
+          btn.textContent = "Ask again";
+          setStatus("Control was not proven. The request expired.");
+        } else {
+          setStatus("Waiting for live proof…");
+          poll(statusUrlForChallenge(id));
+        }
+      })
+      .catch(function () {
+        setStatus("Could not check live proof.");
+      });
+  }
   btn.addEventListener("click", function () {
     btn.disabled = true;
     btn.textContent = "Waiting…";
@@ -541,6 +569,7 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
         setStatus(err.message || "Could not create live proof request.");
       });
   });
+  checkExistingProof();
 })();
 </script>`;
 }

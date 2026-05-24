@@ -293,6 +293,12 @@ function challengeBody(
   ownerUrl.searchParams.set("profile_id", challenge.profile_id);
   if (challenge.qr_id) ownerUrl.searchParams.set("qr_id", challenge.qr_id);
   ownerUrl.searchParams.set("live_challenge", challenge.challenge_id);
+  if (challenge.qr_id) {
+    const returnUrl = new URL(`${origin}/c/${challenge.profile_id}`);
+    returnUrl.searchParams.set("q", challenge.qr_id);
+    returnUrl.searchParams.set("live_challenge", challenge.challenge_id);
+    ownerUrl.searchParams.set("return_url", returnUrl.href);
+  }
 
   const statusUrl = new URL(
     `${origin}/.well-known/hc/v1/cards/${encodeURIComponent(
