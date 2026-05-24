@@ -17,6 +17,8 @@ The landing page and `/wallet/` share an **“on this device”** hub: saved car
 
 We kept the current landing funnel (hero create → pass demo → device hub → long-form content) and **enriched** it rather than replacing it with a full dashboard.
 
+**Landing story (shipped):** Hero one-liner (`landing-story-hook`), a **five-step progress strip** (Create → Revoke) with the next step highlighted from `hc_wallet` / `hc_device_pins`, **On this device** above the pass demo, and a floating **New here?** pill (hidden once wallet or pins exist) that mirrors the same steps.
+
 | Approach | Verdict |
 |----------|---------|
 | Full personalized landing (only your cards) | Too empty for first-time visitors |
@@ -87,8 +89,10 @@ Returning users see their labels on the homepage; strangers still see the same s
 
 | Path | Role |
 |------|------|
-| `site/index.html` | Device hub + search FAB |
+| `site/index.html` | Device hub + progress strip + search FAB + help pill |
 | `site/js/landing-device-hub.mjs` | Wallet + pin injection, FAB, search |
+| `site/js/landing-progress.mjs` | Progress strip next/done from local storage |
+| `site/js/landing-help.mjs` | Floating “New here?” for empty device storage |
 | `site/js/device-pins.mjs` | Parse, validate, dedupe, `hc_device_pins` |
 | `site/js/device-hub-search.mjs` | Shared filter over `[data-hub-searchable]` |
 | `site/wallet/index.html` | Save keys + pin form + lists |

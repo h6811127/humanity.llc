@@ -114,6 +114,10 @@ function refreshEmptyHint() {
   emptyHint.hidden = hasData;
 }
 
+function notifyHubChanged() {
+  window.dispatchEvent(new Event("hc-device-hub-changed"));
+}
+
 function applySearchFilter() {
   const q = searchInput?.value ?? "";
   const { matchCount } = applyDeviceHubSearch(deviceHub, q);
@@ -174,6 +178,7 @@ renderSavedRows();
 renderPinRows();
 applySearchFilter();
 refreshEmptyHint();
+notifyHubChanged();
 
 if (searchInput) {
   searchInput.addEventListener("input", applySearchFilter);
@@ -184,5 +189,6 @@ window.addEventListener("storage", (e) => {
     renderSavedRows();
     renderPinRows();
     applySearchFilter();
+    notifyHubChanged();
   }
 });

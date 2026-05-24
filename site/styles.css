@@ -124,6 +124,19 @@ a {
   color: var(--black);
 }
 
+.landing-story-hook {
+  margin: 14px 0 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--black);
+  max-width: 34em;
+}
+
+.landing-story-hook strong {
+  font-weight: 600;
+}
+
 .hero-tagline {
   margin: 12px 0 0;
   font-size: 17px;
@@ -2287,7 +2300,7 @@ a {
   font-weight: 600;
 }
 
-.landing-help-links {
+.landing-help-steps {
   list-style: none;
   margin: 0 0 10px;
   padding: 0;
@@ -2296,8 +2309,10 @@ a {
   gap: 6px;
 }
 
-.landing-help-links a {
-  display: block;
+.landing-help-steps a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 10px 12px;
   border-radius: 10px;
   font-size: 15px;
@@ -2307,8 +2322,38 @@ a {
   background: rgba(0, 0, 0, 0.04);
 }
 
-.landing-help-links a:active {
+.landing-help-steps a:active {
   background: rgba(0, 0, 0, 0.08);
+}
+
+.landing-help-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(219, 27, 67, 0.1);
+  color: var(--red);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.landing-help-more {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.landing-help-more a {
+  color: var(--red);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.landing-help-more a:active {
+  opacity: 0.72;
 }
 
 .landing-help-hint {
@@ -2425,6 +2470,20 @@ a {
 
 .landing-progress-label {
   letter-spacing: -0.02em;
+}
+
+.landing-progress-step.is-done a {
+  opacity: 0.65;
+}
+
+.landing-progress-step.is-next a {
+  border-color: rgba(219, 27, 67, 0.45);
+  box-shadow: 0 0 0 1px rgba(219, 27, 67, 0.12);
+}
+
+.landing-progress-step.is-next .landing-progress-num {
+  background: var(--red);
+  color: var(--white);
 }
 
 .device-hub-search-float--landing.is-expanded {

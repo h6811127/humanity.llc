@@ -60,6 +60,8 @@ window.addEventListener("storage", (e) => {
   if (e.key === "hc_wallet" || e.key === "hc_device_pins") refreshVisibility();
 });
 
+window.addEventListener("hc-device-hub-changed", refreshVisibility);
+
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && root?.classList.contains("is-expanded")) {
     setExpanded(false);

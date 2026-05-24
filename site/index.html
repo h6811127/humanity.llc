@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=60" />
+    <link rel="stylesheet" href="/styles.css?v=62" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -39,6 +39,10 @@
           <p class="hero-eyebrow">Try it</p>
           <h1>Live state<br />on real objects.</h1>
           <p class="hero-tagline">Print a QR once. Change its live state later.</p>
+          <p class="landing-story-hook">
+            Create in your browser, save keys on this device, print once — anyone who scans sees
+            <strong>live</strong> state you can revoke later. No account.
+          </p>
           <p class="hero-line">
             Not a bio link. A sticker, wristband, or card that resolves to
             <strong>current</strong> state: active, expired, revoked, or disabled.
@@ -58,7 +62,7 @@
         </section>
 
         <nav class="landing-progress" aria-label="Your path">
-          <p class="landing-progress-kicker">Your path</p>
+          <p class="landing-progress-kicker">Five steps · no account</p>
           <ol class="landing-progress-steps">
             <li class="landing-progress-step">
               <a href="/create/">
@@ -99,7 +103,8 @@
             Personal to <strong>this browser</strong> — not your profile on the network.
           </p>
           <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint">
-            Nothing here yet? Follow step 2 after create.
+            Nothing here yet? After create, use step <strong>Save</strong> on
+            <a href="/created/">/created/</a> — keys stay in this browser only.
           </p>
 
           <div
@@ -633,15 +638,26 @@
             ×
           </button>
         </div>
-        <ul class="landing-help-links">
-          <li><a href="/create/">Create a live object</a></li>
-          <li><a href="/case-study/">See the full loop</a></li>
-          <li><a href="#card">Try the pass demo</a></li>
-          <li><a href="/wallet/">Saved cards on this device</a></li>
-        </ul>
+        <ol class="landing-help-steps">
+          <li><a href="/create/"><span class="landing-help-step-num">1</span> Create</a></li>
+          <li>
+            <a href="/created/"
+              ><span class="landing-help-step-num">2</span> Save on this device</a
+            >
+          </li>
+          <li><a href="/created/"><span class="landing-help-step-num">3</span> Print QR</a></li>
+          <li><a href="#card"><span class="landing-help-step-num">4</span> Scan (demo)</a></li>
+          <li><a href="/created/"><span class="landing-help-step-num">5</span> Revoke</a></li>
+        </ol>
         <p class="form-hint landing-help-hint">
-          After create, tap <strong>Save on this device</strong> on
-          <a href="/created/">/created/</a> so other tabs see your keys.
+          Step 2 writes keys to this browser — not iCloud by default. Other tabs on this device
+          see them after save. Pin public scans from <a href="/wallet/">/wallet/</a> when you only
+          need a bookmark.
+        </p>
+        <p class="landing-help-more">
+          <a href="/case-study/">See the full loop</a>
+          ·
+          <a href="/wallet/">Saved cards</a>
         </p>
         <button type="button" class="landing-help-dismiss" id="landing-help-dismiss">
           Hide for this session
@@ -715,8 +731,9 @@
     </nav>
     <script src="/js/pass-flip.js?v=1" defer></script>
     <script src="/js/pass-demo-revoke.js?v=1" defer></script>
-    <script src="/js/landing-help.mjs?v=2" type="module"></script>
-    <script src="/js/landing-device-hub.mjs?v=4" type="module"></script>
+    <script src="/js/landing-progress.mjs?v=1" type="module"></script>
+    <script src="/js/landing-help.mjs?v=3" type="module"></script>
+    <script src="/js/landing-device-hub.mjs?v=5" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=1" type="module"></script>
   </body>
 </html>
