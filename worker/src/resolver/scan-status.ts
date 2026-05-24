@@ -12,6 +12,7 @@ import {
   httpStatusForScanKind,
   malformedScanView,
   QR_ID_REGEX,
+  type ScanPageKind,
   type ScanViewModel,
 } from "./scan-state";
 import { BEARER_WARNING } from "./trust-copy";
