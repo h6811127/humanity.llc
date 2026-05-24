@@ -42,6 +42,7 @@ const searchDrawer = document.getElementById("device-hub-search-drawer");
 const searchClose = document.getElementById("device-hub-search-close");
 const searchStatus = document.getElementById("device-hub-search-status");
 const deviceHub = document.getElementById("device-hub");
+const emptyHint = document.getElementById("device-hub-empty-hint");
 
 function renderSavedRows() {
   const entries = loadWallet();
@@ -107,9 +108,16 @@ function renderPinRows() {
   }
 }
 
+function refreshEmptyHint() {
+  if (!emptyHint) return;
+  const hasData = loadWallet().length > 0 || loadPins().length > 0;
+  emptyHint.hidden = hasData;
+}
+
 function applySearchFilter() {
   const q = searchInput?.value ?? "";
   const { matchCount } = applyDeviceHubSearch(deviceHub, q);
+  refreshEmptyHint();
 
   if (searchStatus) {
     const trimmed = q.trim();
@@ -165,6 +173,7 @@ document.addEventListener("click", (e) => {
 renderSavedRows();
 renderPinRows();
 applySearchFilter();
+refreshEmptyHint();
 
 if (searchInput) {
   searchInput.addEventListener("input", applySearchFilter);

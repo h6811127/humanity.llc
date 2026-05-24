@@ -30,9 +30,22 @@ function setExpanded(open) {
   openBtn.hidden = open;
 }
 
-if (sessionStorage.getItem(DISMISS_KEY) === "1" && !hasDeviceData()) {
-  root?.classList.add("is-dismissed");
+function refreshVisibility() {
+  if (!root) return;
+  if (hasDeviceData()) {
+    root.hidden = true;
+    setExpanded(false);
+    return;
+  }
+  root.hidden = false;
+  if (sessionStorage.getItem(DISMISS_KEY) === "1") {
+    root.classList.add("is-dismissed");
+  } else {
+    root.classList.remove("is-dismissed");
+  }
 }
+
+refreshVisibility();
 
 openBtn?.addEventListener("click", () => setExpanded(true));
 closeBtn?.addEventListener("click", () => setExpanded(false));
@@ -41,6 +54,10 @@ dismissBtn?.addEventListener("click", () => {
   sessionStorage.setItem(DISMISS_KEY, "1");
   if (root) root.classList.add("is-dismissed");
   setExpanded(false);
+});
+
+window.addEventListener("storage", (e) => {
+  if (e.key === "hc_wallet" || e.key === "hc_device_pins") refreshVisibility();
 });
 
 document.addEventListener("keydown", (e) => {
