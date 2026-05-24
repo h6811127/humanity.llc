@@ -283,7 +283,7 @@ async function expireIfNeeded(
 
 function challengeBody(challenge: LiveControlChallengeRow, request: Request) {
   const origin = requestOrigin(request);
-  const ownerUrl = new URL(`${origin}/created/`);
+  const ownerUrl = new URL(`${ownerPageOrigin(request)}/created/`);
   ownerUrl.searchParams.set("profile_id", challenge.profile_id);
   if (challenge.qr_id) ownerUrl.searchParams.set("qr_id", challenge.qr_id);
   ownerUrl.searchParams.set("live_challenge", challenge.challenge_id);
@@ -318,6 +318,14 @@ function challengeBody(challenge: LiveControlChallengeRow, request: Request) {
         ? "Control proven moments ago. This does not prove legal identity."
         : "Ask the card owner to prove live control.",
   };
+}
+
+function ownerPageOrigin(request: Request): string {
+  const url = new URL(request.url);
+  if (url.hostname === "localhost" || url.hostname === "127.0.0.1") {
+    return "http://localhost:8788";
+  }
+  return requestOrigin(request);
 }
 
 function liveControlUnavailableMessage(kind: ScanPageKind): string {
