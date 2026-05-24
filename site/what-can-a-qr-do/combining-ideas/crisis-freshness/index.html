@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Crisis cards + freshness · demo scan · humanity.llc</title>
+    <meta
+      name="description"
+      content="A wallet aid card with live pantry and community-fridge food batches — coalition signs the resource list, each kitchen signs its food. Demo scan."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=47" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Demo scan · crisis cards + freshness</p>
+          <h1>One wallet card, many kitchens</h1>
+          <p class="hero-line">
+            A pocket aid card from the Northside Aid Coalition. The
+            <strong>coalition</strong> signs the resource list. Each
+            <strong>kitchen or fridge host</strong> signs its own food batches.
+            Nobody owns the people who scan.
+          </p>
+          <p class="hero-line hero-line-sub">
+            Static preview. Not a live scan. Not a real coalition.
+          </p>
+        </section>
+
+        <section class="idea-section" aria-labelledby="scan-title">
+          <h2 class="group-label" id="scan-title">What a scan returns</h2>
+          <div class="scan-mock" aria-label="Demo scan view">
+            <div class="scan-mock-chrome">
+              <span class="scan-mock-chrome-dots" aria-hidden="true">
+                <span></span><span></span><span></span>
+              </span>
+              <span class="scan-mock-chrome-url">humanity.llc/c/aid-northside-22?q=qa-p3ke</span>
+              <span class="scan-mock-chrome-tag">demo</span>
+            </div>
+            <div class="scan-mock-body">
+              <div class="scan-mock-head">
+                <span class="scan-mock-pill">Active tonight</span>
+                <p class="scan-mock-title">Crisis Wallet Card · Northside</p>
+                <p class="scan-mock-sub">14 resources · updated 17 min ago</p>
+              </div>
+              <div class="scan-mock-streams">
+                <div class="scan-mock-stream" data-tone="primary">
+                  <div class="scan-mock-stream-head">
+                    <span class="scan-mock-stream-signer">Coalition · Northside Aid</span>
+                    <span class="scan-mock-stream-key">key 8f2c…d1</span>
+                  </div>
+                  <p class="scan-mock-stream-title">Resources tonight</p>
+                  <ul class="scan-mock-stream-list">
+                    <li>Shelter bed line<span class="scan-mock-stream-meta">open · 11 spots</span></li>
+                    <li>Food pantry · Pine St<span class="scan-mock-stream-meta">Sat 10–2</span></li>
+                    <li>Crisis hotline<span class="scan-mock-stream-meta">verified · 24/7</span></li>
+                    <li>Walk-in clinic<span class="scan-mock-stream-meta">closes 9 PM</span></li>
+                  </ul>
+                </div>
+                <div class="scan-mock-stream" data-tone="kitchen">
+                  <div class="scan-mock-stream-head">
+                    <span class="scan-mock-stream-signer">Kitchen · Pine St Community Fridge</span>
+                    <span class="scan-mock-stream-key">key 4d9a…cb</span>
+                  </div>
+                  <p class="scan-mock-stream-title">Stocked at 5:20 PM</p>
+                  <ul class="scan-mock-stream-list">
+                    <li>Veggie soup<span class="scan-mock-stream-meta">made 5:20 · exp 10 PM</span></li>
+                    <li>Bread loaves<span class="scan-mock-stream-meta">wheat · no nuts</span></li>
+                    <li>Yogurt cups<span class="scan-mock-stream-meta">dairy · exp tonight</span></li>
+                  </ul>
+                </div>
+                <div class="scan-mock-stream" data-tone="warn">
+                  <div class="scan-mock-stream-head">
+                    <span class="scan-mock-stream-signer">Recall · Coalition watch</span>
+                    <span class="scan-mock-stream-key">key 8f2c…d1</span>
+                  </div>
+                  <p class="scan-mock-stream-title">Active recalls in your area</p>
+                  <ul class="scan-mock-stream-list">
+                    <li>Almond cookies · batch #214<span class="scan-mock-stream-meta">do not eat</span></li>
+                  </ul>
+                </div>
+              </div>
+              <p class="scan-mock-boundary">
+                The coalition signs <strong>resource hours and addresses</strong>.
+                It does <strong>not</strong> sign the safety of an individual
+                food batch — only the kitchen that prepared it does.
+              </p>
+            </div>
+            <div class="scan-mock-footer">
+              <span>signed · 3 streams</span>
+              <span>no account · no scan log</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="authority-title">
+          <h2 class="group-label" id="authority-title">Who signs what</h2>
+          <div class="authority-stack">
+            <article class="authority-row" data-tone="primary">
+              <span class="authority-row-key">C</span>
+              <div class="authority-row-body">
+                <p class="authority-row-title">Northside Aid Coalition — issuer key</p>
+                <p class="authority-row-sub">
+                  Which resources exist tonight, hours, addresses, hotline
+                  verification, recall watch. Coalition rotates this key with
+                  its members.
+                </p>
+                <p class="authority-row-tag">aid-northside-22 · stream: resources</p>
+              </div>
+            </article>
+            <article class="authority-row" data-tone="kitchen">
+              <span class="authority-row-key">K</span>
+              <div class="authority-row-body">
+                <p class="authority-row-title">Pine St Community Fridge — host key</p>
+                <p class="authority-row-sub">
+                  Per-batch food state: made, expires, allergens, recall.
+                  Signs only its own fridge — no other site speaks for it.
+                </p>
+                <p class="authority-row-tag">aid-northside-22 · stream: food-batches</p>
+              </div>
+            </article>
+            <article class="authority-row">
+              <span class="authority-row-key">R</span>
+              <div class="authority-row-body">
+                <p class="authority-row-title">Resolver — humanity.llc</p>
+                <p class="authority-row-sub">
+                  Returns the current signed streams. Does <em>not</em> retain
+                  who scanned. No login required to read a hotline list.
+                </p>
+                <p class="authority-row-tag">aid-northside-22 · transport only</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="states-title">
+          <h2 class="group-label" id="states-title">Lifecycle</h2>
+          <div class="scenario-grid" aria-label="Crisis card with freshness lifecycle">
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Pantry moved</p>
+              <ul class="scenario-card-list">
+                <li>Coalition signs new address on the resource stream</li>
+                <li>Old printed wallet card still works · scan shows current site</li>
+                <li>No reprinting needed</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">Batch recalled</p>
+              <ul class="scenario-card-list">
+                <li>Kitchen revokes the soup batch credential</li>
+                <li>Recall row appears in the scan, signed by coalition</li>
+                <li>Wallet card and the rest of the fridge stay live</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">Card series compromised</p>
+              <ul class="scenario-card-list">
+                <li>Counterfeit cards detected · coalition revokes the series</li>
+                <li>Scan reads &ldquo;get a new card at desk&rdquo;</li>
+                <li>Food-batch streams continue under host keys</li>
+              </ul>
+            </article>
+          </div>
+          <p class="idea-footnote">
+            Stale info is harm. Live signed streams shift the failure mode
+            from &ldquo;wrong number on a card&rdquo; to &ldquo;wrong row revoked.&rdquo;
+          </p>
+        </section>
+
+        <section class="idea-callout" aria-labelledby="boundary-title">
+          <div class="idea-callout-header">
+            <span class="list-icon list-icon-tone-red" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            <div>
+              <h2 class="idea-callout-title" id="boundary-title">Boundaries by design</h2>
+              <p class="idea-callout-sub">
+                Functionality without extraction. No crisis CRM dressed as help.
+              </p>
+            </div>
+          </div>
+          <div class="idea-callout-body">
+            <ul class="list list-compact">
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">No scan-trail by default</span>
+                  <span class="list-sub"
+                    >Reading a hotline list never builds a dossier on the
+                    person reading it</span
+                  >
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Each kitchen owns its own freshness key</span>
+                  <span class="list-sub"
+                    >Coalition cannot quietly mark a fridge batch &ldquo;safe&rdquo;
+                    on a host&rsquo;s behalf</span
+                  >
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Save to device, not to platform</span>
+                  <span class="list-sub"
+                    >&ldquo;Save this resource&rdquo; stores on the scanner&rsquo;s
+                    phone — no &ldquo;who saved what&rdquo; feed</span
+                  >
+                </span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <p class="insight">
+          A card in someone&rsquo;s pocket stays useful when the
+          <strong>answer can change</strong> — and when no one had to become
+          the product to read it.
+        </p>
+
+        <section class="group">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/combining-ideas/">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">All combining-idea demos</span>
+                  <span class="list-sub">Games + maintenance · markets + menus + surplus</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/crisis-resource-cards/">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Crisis resource cards</span>
+                  <span class="list-sub">Single-authority walkthrough for the coalition stream</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/food-freshness-tags/">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M18 12h4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Food freshness tags</span>
+                  <span class="list-sub">Single-authority walkthrough for the kitchen stream</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

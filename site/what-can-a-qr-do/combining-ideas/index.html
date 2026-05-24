@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Combining ideas · humanity.llc</title>
+    <meta
+      name="description"
+      content="Stack signed streams behind one QR — games + maintenance, crisis cards + freshness, markets + menus + surplus. Walkthrough demo scans."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=47" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Design space · stacking</p>
+          <h1>Combining ideas</h1>
+          <p class="hero-line">
+            One QR can stay a simple scan while the card behind it pulls from
+            <strong>several signed, revocable streams</strong> — each with its own
+            authority.
+          </p>
+          <p class="hero-line hero-line-sub">
+            The strongest combos keep the boundary clear: the game can reward
+            discovery, but only the maintainer signs safety; the crisis card can
+            show food, but the kitchen signs freshness.
+          </p>
+        </section>
+
+        <section class="idea-callout" aria-labelledby="how-title">
+          <div class="idea-callout-header">
+            <span class="list-icon list-icon-tone-red" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+            </span>
+            <div>
+              <h2 class="idea-callout-title" id="how-title">How stacking works</h2>
+              <p class="idea-callout-sub">
+                The QR encodes a URL. The resolver returns one document
+                composed of many signed streams. Each stream has a known
+                signer and can be revoked on its own.
+              </p>
+            </div>
+          </div>
+          <div class="idea-callout-body">
+            <p>
+              A scan does <strong>not</strong> mean one party speaks for everything.
+              The maintainer signs maintenance. The kitchen signs freshness. The
+              game signs quest meta. The coalition signs the resource list. If a
+              stream goes stale or wrong, only that stream is revoked — the
+              object stays scannable.
+            </p>
+            <ul class="list list-compact">
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Authority is visible</span>
+                  <span class="list-sub"
+                    >Each stream shows who signed it and what their key can
+                    say — not a generic “verified” stamp</span
+                  >
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Revoke one stream, keep the rest</span>
+                  <span class="list-sub"
+                    >A recalled batch disappears from the food list without
+                    killing the wallet card</span
+                  >
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Safety copy outranks game copy</span>
+                  <span class="list-sub"
+                    >When a maintainer stream says out-of-service, no game
+                    overlay can paint it green</span
+                  >
+                </span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="combos-title">
+          <h2 class="group-label" id="combos-title">Demo scans</h2>
+          <p class="group-intro short">
+            Three stacks to walk through. Each link opens a static preview of
+            what one scan would show.
+          </p>
+          <div class="scenario-grid" aria-label="Combining-idea demo scans">
+            <a
+              class="scenario-card scenario-card-live scenario-card-link"
+              href="/what-can-a-qr-do/combining-ideas/games-maintenance/"
+            >
+              <p class="scenario-card-label">Games + maintenance</p>
+              <ul class="scenario-card-list">
+                <li>Players find AED, filter, and trail-marker nodes</li>
+                <li>Maintainer-signed status stays separate from game points</li>
+                <li>Fix verified → local map unlocks the next route</li>
+              </ul>
+              <p class="scenario-card-cta">Open demo scan ›</p>
+            </a>
+            <a
+              class="scenario-card scenario-card-link"
+              href="/what-can-a-qr-do/combining-ideas/crisis-freshness/"
+            >
+              <p class="scenario-card-label">Crisis cards + freshness</p>
+              <ul class="scenario-card-list">
+                <li>Wallet aid card lists nearby pantry and fridge options</li>
+                <li>Each food batch keeps made, expires, allergen, recall state</li>
+                <li>Resource page updates without tracking who scanned</li>
+              </ul>
+              <p class="scenario-card-cta">Open demo scan ›</p>
+            </a>
+            <a
+              class="scenario-card scenario-card-link"
+              href="/what-can-a-qr-do/combining-ideas/markets-menus/"
+            >
+              <p class="scenario-card-label">Markets + menus + surplus</p>
+              <ul class="scenario-card-list">
+                <li>Co-op pass links to today&rsquo;s stalls and live menus</li>
+                <li>Prepared-food tags mark safe-to-take surplus</li>
+                <li>Vendor updates one state object instead of reprinting</li>
+              </ul>
+              <p class="scenario-card-cta">Open demo scan ›</p>
+            </a>
+          </div>
+          <p class="idea-footnote">
+            These previews are static design space — not live scans. The live
+            product today is create → scan → revoke.
+          </p>
+        </section>
+
+        <section class="idea-section" aria-labelledby="boundary-title">
+          <h2 class="group-label" id="boundary-title">What makes a combo strong</h2>
+          <div class="qr-compare-grid">
+            <article class="qr-compare-col qr-compare-col-muted">
+              <h3 class="qr-compare-heading">Weak stacks</h3>
+              <ul class="qr-compare-list">
+                <li>One signer claims authority for everything on the page</li>
+                <li>Game copy and safety copy share a styling and tone</li>
+                <li>Vendor reprints a sticker every time anything changes</li>
+                <li>Revoke kills the object instead of one stream</li>
+                <li>Scan log retained “for analytics” by default</li>
+              </ul>
+            </article>
+            <article class="qr-compare-col qr-compare-col-live">
+              <h3 class="qr-compare-heading">Strong stacks</h3>
+              <ul class="qr-compare-list">
+                <li>Each stream names its signer and what it can attest</li>
+                <li>Safety stream visually outranks discovery stream</li>
+                <li>Vendor updates one state object — no reprinting</li>
+                <li>Revoke is per-stream; sibling streams keep working</li>
+                <li>No scan-trail retention; honest about limits</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <p class="insight">
+          A QR is a pointer. A <strong>stack of signed streams</strong> is what
+          makes one printed mark stay honestly useful as the world around it
+          changes.
+        </p>
+
+        <nav class="dock" aria-label="Actions">
+          <a class="dock-btn dock-btn-primary" href="/create/">Create a live object</a>
+          <a class="dock-btn" href="/what-can-a-qr-do.html">All QR ideas</a>
+        </nav>
+      </main>
+    </div>
+  </body>
+</html>

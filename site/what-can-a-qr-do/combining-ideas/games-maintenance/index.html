@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Games + maintenance · demo scan · humanity.llc</title>
+    <meta
+      name="description"
+      content="A hallway AED that is also a checkpoint in a city trail game — maintainer signs safety, game signs discovery. Demo scan."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=47" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Demo scan · games + maintenance</p>
+          <h1>One AED, two streams</h1>
+          <p class="hero-line">
+            A defibrillator in a public hallway. Library Facilities signs
+            <strong>is-it-safe-to-use</strong>. A city trail game signs
+            <strong>is-this-checkpoint-four</strong>. One QR resolves both,
+            without letting either authority speak over the other.
+          </p>
+          <p class="hero-line hero-line-sub">
+            Static preview. Not a live scan.
+          </p>
+        </section>
+
+        <section class="idea-section" aria-labelledby="scan-title">
+          <h2 class="group-label" id="scan-title">What a scan returns</h2>
+          <div class="scan-mock" aria-label="Demo scan view">
+            <div class="scan-mock-chrome">
+              <span class="scan-mock-chrome-dots" aria-hidden="true">
+                <span></span><span></span><span></span>
+              </span>
+              <span class="scan-mock-chrome-url">humanity.llc/c/aed-libb-04?q=qm-7t8x</span>
+              <span class="scan-mock-chrome-tag">demo</span>
+            </div>
+            <div class="scan-mock-body">
+              <div class="scan-mock-head">
+                <span class="scan-mock-pill">In service</span>
+                <p class="scan-mock-title">AED · West Hallway, City Library</p>
+                <p class="scan-mock-sub">Object QR · checked moments ago</p>
+              </div>
+              <div class="scan-mock-streams">
+                <div class="scan-mock-stream" data-tone="primary">
+                  <div class="scan-mock-stream-head">
+                    <span class="scan-mock-stream-signer">Maintainer · Library Facilities</span>
+                    <span class="scan-mock-stream-key">key 9c4a…b7</span>
+                  </div>
+                  <p class="scan-mock-stream-title">Safety status</p>
+                  <ul class="scan-mock-stream-list">
+                    <li>Status<span class="scan-mock-stream-meta">in service</span></li>
+                    <li>Pads<span class="scan-mock-stream-meta">OK · exp Feb 2027</span></li>
+                    <li>Last inspected<span class="scan-mock-stream-meta">May 12</span></li>
+                    <li>Next due<span class="scan-mock-stream-meta">Aug 14</span></li>
+                  </ul>
+                </div>
+                <div class="scan-mock-stream" data-tone="game">
+                  <div class="scan-mock-stream-head">
+                    <span class="scan-mock-stream-signer">Game · Trail Crew City</span>
+                    <span class="scan-mock-stream-key">key 1a7e…42</span>
+                  </div>
+                  <p class="scan-mock-stream-title">Checkpoint 4 of 6 · Hallways &amp; helpers</p>
+                  <ul class="scan-mock-stream-list">
+                    <li>Hint<span class="scan-mock-stream-meta">note pad-exp date</span></li>
+                    <li>Discovery points<span class="scan-mock-stream-meta">+10</span></li>
+                    <li>Next node<span class="scan-mock-stream-meta">N riverside</span></li>
+                  </ul>
+                </div>
+              </div>
+              <p class="scan-mock-boundary">
+                Game points <strong>cannot</strong> mark this AED safe. If
+                Facilities signs out-of-service, the entire checkpoint pauses
+                until a maintainer signs it back.
+              </p>
+            </div>
+            <div class="scan-mock-footer">
+              <span>signed · 2 streams</span>
+              <span>no scan log retained</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="authority-title">
+          <h2 class="group-label" id="authority-title">Who signs what</h2>
+          <div class="authority-stack">
+            <article class="authority-row" data-tone="primary">
+              <span class="authority-row-key">M</span>
+              <div class="authority-row-body">
+                <p class="authority-row-title">Library Facilities — maintainer key</p>
+                <p class="authority-row-sub">
+                  In/out of service · last inspection · next due · pad and
+                  battery dates. Out-of-service pauses dependent streams.
+                </p>
+                <p class="authority-row-tag">aed-libb-04 · stream: maintenance</p>
+              </div>
+            </article>
+            <article class="authority-row" data-tone="game">
+              <span class="authority-row-key">G</span>
+              <div class="authority-row-body">
+                <p class="authority-row-title">Trail Crew City — game key</p>
+                <p class="authority-row-sub">
+                  Checkpoint number, hints, point values, next-node pointer.
+                  Cannot mark equipment safe or unsafe.
+                </p>
+                <p class="authority-row-tag">aed-libb-04 · stream: game-meta</p>
+              </div>
+            </article>
+            <article class="authority-row">
+              <span class="authority-row-key">P</span>
+              <div class="authority-row-body">
+                <p class="authority-row-title">Player reports — relay only</p>
+                <p class="authority-row-sub">
+                  A &ldquo;report issue&rdquo; tap opens a relay to Facilities.
+                  Reports are <em>inputs</em>, not signed status. A maintainer
+                  reviews and signs.
+                </p>
+                <p class="authority-row-tag">aed-libb-04 · stream: report-relay</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="states-title">
+          <h2 class="group-label" id="states-title">Lifecycle</h2>
+          <div class="scenario-grid" aria-label="Stack lifecycle states">
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Player finds it</p>
+              <ul class="scenario-card-list">
+                <li>Scan adds checkpoint 4 to their map</li>
+                <li>Safety status reads &ldquo;in service&rdquo;</li>
+                <li>Hint teaches what good condition looks like</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">Player reports pad expired</p>
+              <ul class="scenario-card-list">
+                <li>Report stream opens · no points awarded</li>
+                <li>Maintainer pings, signs out-of-service</li>
+                <li>Map shows node paused, route alternates</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">Fix verified</p>
+              <ul class="scenario-card-list">
+                <li>Maintainer re-signs in-service</li>
+                <li>Game stream re-opens checkpoint</li>
+                <li>Player who reported gets &ldquo;fixed&rdquo; badge — no safety claim attached</li>
+              </ul>
+            </article>
+          </div>
+          <p class="idea-footnote">
+            The game can reward discovery. It cannot ever reward declaring
+            equipment safe.
+          </p>
+        </section>
+
+        <section class="idea-callout" aria-labelledby="rules-title">
+          <div class="idea-callout-header">
+            <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+            </span>
+            <div>
+              <h2 class="idea-callout-title" id="rules-title">Rendering rules</h2>
+              <p class="idea-callout-sub">
+                Visual hierarchy follows authority — not the other way around.
+              </p>
+            </div>
+          </div>
+          <div class="idea-callout-body">
+            <ul class="list list-compact">
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Safety stream renders first, always</span>
+                  <span class="list-sub"
+                    >Even if the game stream is the &ldquo;cool&rdquo; part of the scan</span
+                  >
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Stale safety stream silences game stream</span>
+                  <span class="list-sub"
+                    >If the maintainer key has not signed in N days, the
+                    checkpoint is collapsed to &ldquo;status unknown&rdquo;</span
+                  >
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">No scan log retained</span>
+                  <span class="list-sub"
+                    >Game points are scored on the player&rsquo;s device or
+                    game-org server, never &ldquo;who scanned where&rdquo; on the
+                    resolver</span
+                  >
+                </span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <p class="insight">
+          Public play helps people <strong>notice</strong> the boring
+          infrastructure. It must never become the safety authority.
+        </p>
+
+        <section class="group">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/combining-ideas/">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">All combining-idea demos</span>
+                  <span class="list-sub">Crisis + freshness · markets + menus + surplus</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/proof-of-maintenance/">
+                <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Proof of maintenance</span>
+                  <span class="list-sub">Single-authority walkthrough for the safety stream</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/physical-world-multiplayer/">
+                <span class="list-icon list-icon-tone-purple" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21 1.18.38 2.03 1.46 2.03 2.79"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Physical-world multiplayer</span>
+                  <span class="list-sub">Single-authority walkthrough for the game stream</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Markets + menus + surplus · demo scan · humanity.llc</title>
+    <meta
+      name="description"
+      content="A weekend co-op pass that links today's stalls, live menus, and prepared-food surplus tags — each vendor signs their own state. Demo scan."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=47" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Demo scan · markets + menus + surplus</p>
+          <h1>One pass, many vendors</h1>
+          <p class="hero-line">
+            A Saturday co-op pass for East River Market. The
+            <strong>co-op</strong> signs today&rsquo;s stall list. Each
+            <strong>vendor</strong> signs their own menu, sold-out items, and
+            surplus tags. No one reprints a sticker to change a price.
+          </p>
+          <p class="hero-line hero-line-sub">
+            Static preview. Not a live scan.
+          </p>
+        </section>
+
+        <section class="idea-section" aria-labelledby="scan-title">
+          <h2 class="group-label" id="scan-title">What a scan returns</h2>
+          <div class="scan-mock" aria-label="Demo scan view">
+            <div class="scan-mock-chrome">
+              <span class="scan-mock-chrome-dots" aria-hidden="true">
+                <span></span><span></span><span></span>
+              </span>
+              <span class="scan-mock-chrome-url">humanity.llc/c/coop-east-river?q=qm-r4hp</span>
+              <span class="scan-mock-chrome-tag">demo</span>
+            </div>
+            <div class="scan-mock-body">
+              <div class="scan-mock-head">
+                <span class="scan-mock-pill">Open today</span>
+                <p class="scan-mock-title">Saturday Co-op Pass · East River</p>
+                <p class="scan-mock-sub">9 stalls · 9 AM – 2 PM · cash &amp; SNAP</p>
+              </div>
+              <div class="scan-mock-streams">
+                <div class="scan-mock-stream" data-tone="primary">
+                  <div class="scan-mock-stream-head">
+                    <span class="scan-mock-stream-signer">Co-op · East River Market</span>
+                    <span class="scan-mock-stream-key">key 0a91…7c</span>
+                  </div>
+                  <p class="scan-mock-stream-title">Stalls today</p>
+                  <ul class="scan-mock-stream-list">
+                    <li>Anika&rsquo;s Tofu<span class="scan-mock-stream-meta">row B · 12</span></li>
+                    <li>Riverbend Bakery<span class="scan-mock-stream-meta">row A · 04</span></li>
+                    <li>Saturday Soup Truck<span class="scan-mock-stream-meta">corner · 18</span></li>
+                    <li>+ 6 more vendors<span class="scan-mock-stream-meta">tap to list</span></li>
+                  </ul>
+                </div>
+                <div class="scan-mock-stream">
+                  <div class="scan-mock-stream-head">
+                    <span class="scan-mock-stream-signer">Vendor · Anika&rsquo;s Tofu</span>
+                    <span class="scan-mock-stream-key">key b7e0…12</span>
+                  </div>
+                  <p class="scan-mock-stream-title">Live menu — row B · 12</p>
+                  <ul class="scan-mock-stream-list">
+                    <li>Regular block tofu<span class="scan-mock-stream-meta">$8 / lb</span></li>
+                    <li>Spicy chili tofu<span class="scan-mock-stream-meta">sold out</span></li>
+                    <li>Soy-free tempeh<span class="scan-mock-stream-meta">$9 · 4 left</span></li>
+                  </ul>
+                </div>
+                <div class="scan-mock-stream" data-tone="kitchen">
+                  <div class="scan-mock-stream-head">
+                    <span class="scan-mock-stream-signer">Kitchen · Saturday Soup Truck</span>
+                    <span class="scan-mock-stream-key">key 5e2c…aa</span>
+                  </div>
+                  <p class="scan-mock-stream-title">Surplus · free prepared food</p>
+                  <ul class="scan-mock-stream-list">
+                    <li>Lentil soup batch<span class="scan-mock-stream-meta">made 1:40 · safe → 7 PM</span></li>
+                    <li>Bread crusts<span class="scan-mock-stream-meta">contains wheat</span></li>
+                  </ul>
+                </div>
+              </div>
+              <p class="scan-mock-boundary">
+                The co-op signs <strong>who is here today</strong>. Vendors
+                sign their own menus. Kitchens sign their own freshness. One
+                state object per vendor — no reprinting.
+              </p>
+            </div>
+            <div class="scan-mock-footer">
+              <span>signed · 3 streams</span>
+              <span>vendor updates &lt; 1s</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="authority-title">
+          <h2 class="group-label" id="authority-title">Who signs what</h2>
+          <div class="authority-stack">
+            <article class="authority-row" data-tone="primary">
+              <span class="authority-row-key">M</span>
+              <div class="authority-row-body">
+                <p class="authority-row-title">East River Market — co-op key</p>
+                <p class="authority-row-sub">
+                  Today&rsquo;s open hours, the stall list, which vendor is at
+                  which row. Cannot edit a vendor&rsquo;s menu.
+                </p>
+                <p class="authority-row-tag">coop-east-river · stream: stalls-today</p>
+              </div>
+            </article>
+            <article class="authority-row">
+              <span class="authority-row-key">V</span>
+              <div class="authority-row-body">
+                <p class="authority-row-title">Vendor keys — one per stall</p>
+                <p class="authority-row-sub">
+                  Prices, sold-out flags, varietals, hours within service.
+                  Vendor revokes its own credential at end of day.
+                </p>
+                <p class="authority-row-tag">coop-east-river · stream: vendor-menu</p>
+              </div>
+            </article>
+            <article class="authority-row" data-tone="kitchen">
+              <span class="authority-row-key">K</span>
+              <div class="authority-row-body">
+                <p class="authority-row-title">Kitchen / prepared-food keys</p>
+                <p class="authority-row-sub">
+                  Made-at, expires-by, allergen list, recall — the freshness
+                  stream that makes surplus safe to take.
+                </p>
+                <p class="authority-row-tag">coop-east-river · stream: surplus-batches</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="states-title">
+          <h2 class="group-label" id="states-title">Lifecycle</h2>
+          <div class="scenario-grid" aria-label="Market lifecycle states">
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">9:02 AM — Open</p>
+              <ul class="scenario-card-list">
+                <li>Co-op signs &ldquo;open today&rdquo;</li>
+                <li>9 stalls active · vendors check in with their keys</li>
+                <li>Posters from last week still scan to today&rsquo;s pass</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">12:18 PM — Spicy sold out</p>
+              <ul class="scenario-card-list">
+                <li>Vendor flips the spicy chili row to sold-out · &lt; 1s</li>
+                <li>Co-op stream untouched · other vendors unchanged</li>
+                <li>No re-printed sign</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">1:40 PM — Surplus offered</p>
+              <ul class="scenario-card-list">
+                <li>Soup truck signs a fresh batch with 5h safety window</li>
+                <li>Shows up as &ldquo;safe to take · free&rdquo; on the pass scan</li>
+                <li>Kitchen revokes it at 7 PM with one signed update</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">2:05 PM — Closed</p>
+              <ul class="scenario-card-list">
+                <li>Co-op stream switches to &ldquo;closed · back next Saturday&rdquo;</li>
+                <li>Vendor streams self-expire</li>
+                <li>Scan still works — shows next service date</li>
+              </ul>
+            </article>
+          </div>
+          <p class="idea-footnote">
+            Vendors update one state object instead of reprinting. The pass
+            stays the same; the answer behind it changes.
+          </p>
+        </section>
+
+        <section class="idea-callout" aria-labelledby="rules-title">
+          <div class="idea-callout-header">
+            <span class="list-icon list-icon-tone-green" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2"/><path d="M12 12v.01"/></svg>
+            </span>
+            <div>
+              <h2 class="idea-callout-title" id="rules-title">Rendering rules</h2>
+              <p class="idea-callout-sub">
+                Each vendor is a peer, not a subtenant of the market.
+              </p>
+            </div>
+          </div>
+          <div class="idea-callout-body">
+            <ul class="list list-compact">
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">No platform fee on the scan</span>
+                  <span class="list-sub"
+                    >Resolver returns signed state. Commerce stays at the
+                    vendor&rsquo;s stall, on their terms</span
+                  >
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Freshness window is signed, not inferred</span>
+                  <span class="list-sub"
+                    >&ldquo;Safe to take&rdquo; comes from a kitchen key with an
+                    explicit expiry, not from time-since-post</span
+                  >
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Vendor exits with their key</span>
+                  <span class="list-sub"
+                    >A vendor that leaves the co-op keeps their menu key —
+                    portable to next operator, no lock-in</span
+                  >
+                </span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <p class="insight">
+          A printed pass becomes a <strong>shared surface</strong> for many
+          peers — each speaking only for themselves, all visible in one scan.
+        </p>
+
+        <section class="group">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/combining-ideas/">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">All combining-idea demos</span>
+                  <span class="list-sub">Games + maintenance · crisis + freshness</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/local-economies/">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2"/><path d="M12 12v.01"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Local economies</span>
+                  <span class="list-sub">Single-authority walkthrough for the co-op stream</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/live-menus/">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Live menus</span>
+                  <span class="list-sub">Single-authority walkthrough for the vendor stream</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
