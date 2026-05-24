@@ -9,7 +9,7 @@
       content="Create a QR-backed live object you can scan, verify, and revoke. Your private key stays in this browser session only."
     />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=39" />
+    <link rel="stylesheet" href="/styles.css?v=46" />
   </head>
   <body>
     <div class="page">
@@ -49,6 +49,18 @@
         </section>
 
         <form id="create-form" class="form-card" method="dialog" action="#" autocomplete="off" novalidate>
+          <fieldset class="create-templates" aria-label="Start from a template">
+            <legend class="form-label">Start from</legend>
+            <div class="create-template-row">
+              <button type="button" class="create-template-btn is-active" data-template="general">
+                General
+              </button>
+              <button type="button" class="create-template-btn" data-template="status_plate">
+                Status plate
+              </button>
+            </div>
+          </fieldset>
+
           <label class="form-label" for="handle">Handle</label>
           <input
             class="form-input"
@@ -65,17 +77,40 @@
           />
           <p class="form-hint">Lowercase letters, digits, underscores. 3 to 32 characters.</p>
 
-          <label class="form-label" for="manifesto">What should this card say?</label>
-          <textarea
-            class="form-input form-textarea"
-            id="manifesto"
-            name="manifesto"
-            required
-            maxlength="280"
-            rows="3"
-            placeholder="One public sentence: studio hours, event, contact, or what you are sharing."
-          ></textarea>
-          <p class="form-hint">Plain text only, 280 characters max.</p>
+          <div id="create-fields-general">
+            <label class="form-label" for="manifesto">What should this card say?</label>
+            <textarea
+              class="form-input form-textarea"
+              id="manifesto"
+              name="manifesto"
+              maxlength="280"
+              rows="3"
+              placeholder="One public sentence: studio hours, event, contact, or what you are sharing."
+            ></textarea>
+            <p class="form-hint">Plain text only, 280 characters max.</p>
+          </div>
+
+          <div id="create-fields-status-plate" hidden>
+            <label class="form-label" for="object-label">What is this plate on?</label>
+            <input
+              class="form-input"
+              id="object-label"
+              name="object_label"
+              maxlength="80"
+              placeholder="Studio door"
+            />
+            <p class="form-hint">Shown as the headline when someone scans.</p>
+            <label class="form-label" for="status-line">What should scanners see?</label>
+            <textarea
+              class="form-input form-textarea"
+              id="status-line"
+              name="status_line"
+              maxlength="199"
+              rows="2"
+              placeholder="Open · Thu–Sun until 9 PM"
+            ></textarea>
+            <p class="form-hint">Live status line — you can change it later by creating a new card or future updates.</p>
+          </div>
 
           <label class="revoke-confirm create-recovery-opt">
             <input type="checkbox" id="generate-recovery" name="generate_recovery" checked />
@@ -93,6 +128,6 @@
         </form>
       </main>
     </div>
-    <script type="module" src="/js/create-card.mjs?v=7"></script>
+    <script type="module" src="/js/create-card.mjs?v=8"></script>
   </body>
 </html>

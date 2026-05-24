@@ -15,6 +15,12 @@ const form = document.getElementById("create-form");
 const statusEl = document.getElementById("status");
 const submitBtn = document.getElementById("submit");
 const demoBtn = document.getElementById("create-demo-btn");
+const fieldsGeneral = document.getElementById("create-fields-general");
+const fieldsStatusPlate = document.getElementById("create-fields-status-plate");
+const manifestoEl = document.getElementById("manifesto");
+const templateBtns = document.querySelectorAll(".create-template-btn");
+
+let activeTemplate = "general";
 
 function setStatus(msg, isError = false) {
   if (!statusEl) return;
@@ -32,11 +38,50 @@ function randomDemoSuffix() {
   return Array.from(b, (x) => (x % 36).toString(36)).join("");
 }
 
+function setTemplate(template) {
+  activeTemplate = template;
+  templateBtns.forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.template === template);
+  });
+  const isPlate = template === "status_plate";
+  if (fieldsGeneral) fieldsGeneral.hidden = isPlate;
+  if (fieldsStatusPlate) fieldsStatusPlate.hidden = !isPlate;
+  if (manifestoEl) manifestoEl.required = !isPlate;
+  const objectLabel = document.getElementById("object-label");
+  const statusLine = document.getElementById("status-line");
+  if (objectLabel) objectLabel.required = isPlate;
+  if (statusLine) statusLine.required = isPlate;
+}
+
+templateBtns.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    if (btn.dataset.template) setTemplate(btn.dataset.template);
+  });
+});
+
+function buildManifestoLine() {
+  if (activeTemplate === "status_plate") {
+    const objectLabel = document.getElementById("object-label")?.value?.trim();
+    const statusLine = document.getElementById("status-line")?.value?.trim();
+    if (!objectLabel || !statusLine) {
+      throw new Error("Object name and status line are required for a status plate.");
+    }
+    const combined = `${objectLabel}\n${statusLine}`;
+    if (combined.length > 280) {
+      throw new Error("Combined object name and status line must be 280 characters or fewer.");
+    }
+    return { manifesto: combined, pilotTemplate: "status_plate" };
+  }
+  const manifesto = manifestoEl?.value?.trim();
+  if (!manifesto) throw new Error("Handle and public statement are required.");
+  return { manifesto, pilotTemplate: "general" };
+}
+
 /**
- * @param {{ handle: string, manifesto: string, wantRecovery: boolean }} input
+ * @param {{ handle: string, manifesto: string, wantRecovery: boolean, pilotTemplate?: string }} input
  */
 export async function runCreateCard(input) {
-  const { handle, manifesto, wantRecovery } = input;
+  const { handle, manifesto, wantRecovery, pilotTemplate = "general" } = input;
   const { privateKey, publicKeyBase58 } = await generateKeypair();
   let recoveryPrivateKey = null;
   let recoveryPublicKeyBase58 = null;
@@ -126,6 +171,7 @@ export async function runCreateCard(input) {
     JSON.stringify({
       ...data,
       manifesto_line: manifesto,
+      pilot_template: pilotTemplate,
       owner_public_key_b58: publicKeyBase58,
       owner_private_key_b58: encodePrivateKeyBase58(privateKey),
       ...(recoveryPublicKeyBase58
@@ -152,13 +198,11 @@ async function submitCreate(e) {
 
   try {
     const handle = document.getElementById("handle")?.value?.trim();
-    const manifesto = document.getElementById("manifesto")?.value?.trim();
     const wantRecovery = document.getElementById("generate-recovery")?.checked ?? true;
-    if (!handle || !manifesto) {
-      throw new Error("Handle and public statement are required.");
-    }
+    if (!handle) throw new Error("Handle is required.");
+    const { manifesto, pilotTemplate } = buildManifestoLine();
     setStatus("Submitting to resolver…");
-    await runCreateCard({ handle, manifesto, wantRecovery });
+    await runCreateCard({ handle, manifesto, wantRecovery, pilotTemplate });
   } catch (err) {
     setStatus(err.message || String(err), true);
     if (submitBtn) submitBtn.disabled = false;
@@ -170,8 +214,8 @@ form?.addEventListener("submit", submitCreate);
 
 demoBtn?.addEventListener("click", async () => {
   const handleEl = document.getElementById("handle");
-  const manifestoEl = document.getElementById("manifesto");
   const suffix = randomDemoSuffix();
+  setTemplate("general");
   if (handleEl) handleEl.value = `live_demo_${suffix}`;
   if (manifestoEl) {
     manifestoEl.value =

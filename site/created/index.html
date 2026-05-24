@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Your live object · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=44" />
+    <link rel="stylesheet" href="/styles.css?v=46" />
   </head>
   <body>
     <div class="page">
@@ -86,9 +86,17 @@
           <p class="mono-link mono-link-compact" id="scan-url" hidden></p>
         </section>
 
+        <section class="created-what-now" id="created-status-plate-tip" hidden>
+          <h2 class="created-what-now-title">Status plate pilot</h2>
+          <p class="created-what-now-body">
+            Print and mount on a door or wall. Scanners see your <strong>object name</strong> and
+            <strong>status line</strong> — not a generic profile page.
+          </p>
+        </section>
+
         <section class="created-what-now" aria-labelledby="what-now-title">
           <h2 class="created-what-now-title" id="what-now-title">What to do now</h2>
-          <p class="created-what-now-body">
+          <p class="created-what-now-body" id="created-what-now-body">
             Print the QR, scan it from another phone, then revoke it under
             <strong>Revoke this QR</strong> and scan again to see live state change.
           </p>
@@ -180,7 +188,7 @@
           </div>
         </details>
 
-        <div class="created-owner-actions">
+        <div class="created-owner-actions" id="created-owner-actions" hidden>
           <p class="settings-actions-label">More options</p>
 
           <details class="settings-disclosure settings-disclosure-info" id="key-help-details">
@@ -368,6 +376,6 @@
         </p>
       </main>
     </div>
-    <script type="module" src="/js/created.mjs?v=16"></script>
+    <script type="module" src="/js/created.mjs?v=17"></script>
   </body>
 </html>

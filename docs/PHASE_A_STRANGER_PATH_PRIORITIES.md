@@ -1,0 +1,84 @@
+# Phase A — Harden the stranger path (post-M5 priorities)
+
+**Status:** Active product direction  
+**Purpose:** Record what to build **after** the generic create → scan → revoke loop is proven, without expanding the design-space catalog faster than real deployments.
+
+**Prerequisite:** `docs/M5_STRANGER_TEST_RUNBOOK.md` — three strangers complete the loop unassisted.
+
+**Canonical loop (unchanged):** Create card → print QR → scan live status → revoke → re-scan revoked state. See `docs/M3_M4_EXECUTION_PLAN.md`.
+
+---
+
+## Operating rule
+
+**One vertical, end-to-end, on real objects** — not more hub pages.
+
+The site’s **What can a QR do?** walkthroughs (`site/what-can-a-qr-do/`) are **research and narrative**. They do not replace a single template strangers can print and use tomorrow on a door, sticker, or card.
+
+Defer until a vertical pilot succeeds:
+
+- Additional idea walkthrough pages without product support
+- Gamified restore logic (e.g. “3 scans to un-revoke”) on the resolver
+- NFC / mesh / Humanity node hardware
+- Full maintenance CMMS or marketplace features
+
+---
+
+## Priority verticals (highest ROI)
+
+| Priority | Vertical | Why |
+|----------|----------|-----|
+| **1** | **Status plate** (“open / closed / until …”) | Matches the landing demo (studio door, hours, run ends). Easiest story for strangers: one object, one question, one scan. |
+| **2** | **Lost-item relay** | Emotional and clear: return contact **without** printing a phone number; revoke when recovered or abused. Site research: `site/what-can-a-qr-do/lost-item-relay/`. |
+| **3** | **Organizer-signed revoke** | Unlocks civic flyers, vendor placards, market passes — anything where a **trusted issuer** must update or kill a printed QR. Requires signed updates/revokes, not open crowd vouch. Site research: `site/what-can-a-qr-do/civic-protest-infrastructure/`, `site/what-can-a-qr-do/local-economies/`. |
+
+Pick **one** for the first real-world pilot (5–10 printed QRs, watch where people stall: print, recovery key, finding revoke).
+
+**Current build focus:** Status plate — see `docs/STATUS_PLATE_PILOT.md`.
+
+---
+
+## Concrete product work (same primitive, sharper job)
+
+These tighten Phase A for the chosen vertical without a new “product tab”:
+
+| Area | Direction |
+|------|-----------|
+| **Create / scan copy** | Name the **object** (“Studio door”, “Keys tag”) on scan UI where helpful; keep “what this does not prove” visible. |
+| **Scan page** | Active vs revoked must read in &lt;30s for non-technical scanners (`docs/M3_SCAN_PAGE_UI.md`). |
+| **`/created/`** | Recovery gate stays; consider tucking **More options** until after first successful revoke in-session (`docs/M4_CREATED_REVOKE_UI.md`). |
+| **Print path** | Download QR PNG + phone print steps on `/created/` (shipped); validate strangers actually print before testing revoke in the wild. |
+| **Landing** | Physical software objects framing + demo revoke animation are **marketing only** — not resolver behavior. |
+
+---
+
+## Narrative stack (copy, not new surfaces)
+
+Keep positioning layered; do not collapse into a single slogan:
+
+| Layer | Message | Where |
+|-------|---------|--------|
+| Hook | Live state on real objects | Landing hero |
+| Mechanism | Print once · change or revoke later | Landing hero |
+| Category | Physical software objects | Landing framing + `site/what-can-a-qr-do/physical-software-objects/` |
+| Catalog | What else can a QR do? | `site/what-can-a-qr-do.html` |
+
+---
+
+## Success signal for a vertical pilot
+
+- Strangers answer **proves / does not prove** correctly without coaching (`docs/M5_STRANGER_TEST_RUNBOOK.md` scorecard).
+- At least one pilot user **prints**, **scans from a second device**, and **revokes** within a week without founder in the room.
+- Confusion notes drive **copy or one template field**, not three new idea pages.
+
+---
+
+## Related
+
+| Doc | Use |
+|-----|-----|
+| `docs/M5_STRANGER_TEST_RUNBOOK.md` | Phase A exit gate |
+| `docs/M5_5_OWNER_KEY_PORTABILITY.md` | If strangers fail “revoke later” |
+| `docs/V1_USE_CASES.md` | Full use-case catalog (phased) |
+| `docs/V1_0_ARCHITECTURE_ROADMAP.md` | Build order M0–M10 |
+| `docs/REVOKE_AND_LIFECYCLE_V1.md` | Revoke semantics |

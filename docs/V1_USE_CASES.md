@@ -11,6 +11,8 @@
 
 **Public landing:** `site/index.html` — “One use” (door plate + QR), “Same idea elsewhere” (mechanism bullets). NFC/mesh diagrams and **Humanity node** vision live on `site/research-directions.html` (`docs/RESEARCH_DIRECTIONS_AND_NODES.md`). Full catalog stays in this doc, not on the homepage scroll.
 
+**Post-M5 product focus:** After strangers pass the generic loop, pick **one** vertical to harden on real objects — `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` (status plate, lost-item relay, organizer-signed revoke). Do not expand the public idea hub faster than that pilot.
+
 ---
 
 ## Why a use case beats “just a card page”

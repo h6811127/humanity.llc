@@ -154,6 +154,7 @@ Do these **in order**. Each step has an exit test before moving on.
 - [ ] Revoke one QR; scan shows revoked within cache TTL
 - [ ] No scan analytics in production paths
 - [ ] Update landing “Building now” + short public announce
+- [ ] **Then:** one vertical pilot per `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`
 
 ---
 
@@ -192,4 +193,6 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ## Current step
 
-**→ M5** — run `docs/M5_STRANGER_TEST_RUNBOOK.md` (three strangers). Code path for create → scan → revoke is in place; remaining gate is **human** validation.
+**→ Status plate pilot** — `docs/STATUS_PLATE_PILOT.md` (vertical #1 after generic loop). Create template + two-line scan layout shipped; run 5–10 real plates and score with M5 scorecard.
+
+M5 stranger gate: `docs/M5_STRANGER_TEST_RUNBOOK.md` (still required before merch / Commons Pass).

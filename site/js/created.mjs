@@ -68,6 +68,18 @@ const cardStatusEl = document.getElementById("card-status");
 const networkCardStatusEl = document.getElementById("network-card-status");
 const jsonLink = document.getElementById("card-json-link");
 const revokeDetails = document.getElementById("revoke-details");
+const ownerActionsEl = document.getElementById("created-owner-actions");
+const statusPlateTipEl = document.getElementById("created-status-plate-tip");
+
+function revealOwnerActions() {
+  if (ownerActionsEl) ownerActionsEl.hidden = false;
+}
+
+function applyPilotTemplateUi(session) {
+  if (session?.pilot_template === "status_plate" && statusPlateTipEl) {
+    statusPlateTipEl.hidden = false;
+  }
+}
 
 if (!profileId && !qrId && !data) {
   noSessionEl.hidden = false;
@@ -169,6 +181,7 @@ if (profileId && qrId) {
     onRevoked(kind) {
       markLoopDone("revoke");
       setLoopStep("scan-again");
+      revealOwnerActions();
       if (openScanBtn && scanUrl) {
         openScanBtn.textContent = "Scan again (see revoked state)";
       }
@@ -192,8 +205,10 @@ if (profileId && qrId) {
   });
 
   const session = loadSession();
+  applyPilotTemplateUi(session);
   if (session?.revoke_state?.target_kind) {
     markLoopDone("revoke");
     setLoopStep("scan-again");
+    revealOwnerActions();
   }
 }

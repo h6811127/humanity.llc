@@ -1,4 +1,5 @@
 import type { ScanViewModel } from "./scan-state";
+import { splitManifestoDisplay } from "./manifesto-display";
 import { scanListIcon, type ScanIconId } from "./scan-icons";
 import { BEARER_WARNING } from "./trust-copy";
 import { SCAN_PASS_FLIP_JS } from "./scan-pass-flip";
@@ -6,7 +7,7 @@ import { SCAN_PASS_CSS } from "./scan-pass-styles";
 import { renderScanQrMarkup } from "./scan-qr";
 
 /** Response header — confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v6";
+export const SCAN_UI_VERSION = "pass-v7";
 
 /**
  * Public scan UI — flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -183,15 +184,47 @@ function renderPassFront(
 <p class="pass-manifesto">${escapeHtml(scanLead(vm))}</p>`;
   }
 
-  const handle = vm.handle ? `@${escapeHtml(vm.handle)}` : "Unknown card";
-  const manifesto = vm.manifestoLine
-    ? `<p class="pass-manifesto">${escapeHtml(vm.manifestoLine)}</p>`
+  const plate = splitManifestoDisplay(vm.manifestoLine);
+  const handleMuted = vm.handle
+    ? `<p class="pass-handle-muted">@${escapeHtml(vm.handle)}</p>`
     : "";
   const qrSlotAttr = vm.scanUrl
     ? ` id="pass-qr-slot" data-scan-url="${escapeHtml(vm.scanUrl)}"`
     : "";
   const qrBlock = vm.scanUrl
     ? `<div class="pass-qr"${qrSlotAttr}>${qrMarkup}</div>`
+    : "";
+
+  const passFoot = plate.isStatusPlate
+    ? "Scan shows current status for this place—not who owns the door."
+    : "Scan shows live state. Holding the object does not prove ownership.";
+
+  if (plate.isStatusPlate && plate.objectLabel && plate.statusLine) {
+    return `<div class="pass-head">
+  <div class="pass-brand">
+    <span class="pass-dot" aria-hidden="true"></span>
+    <span>humanity.llc</span>
+  </div>
+  <span class="${badgeClass}">${escapeHtml(vm.primaryBadge.label)}</span>
+</div>
+<div class="pass-body">
+  <div class="pass-main">
+    <p class="pass-type">Status plate</p>
+    <h1 class="pass-name">${escapeHtml(plate.objectLabel)}</h1>
+    <p class="pass-manifesto pass-manifesto-status">${escapeHtml(plate.statusLine)}</p>
+    ${handleMuted}
+    <ul class="pass-trust" aria-label="Status at a glance">
+      ${renderTrustPills(vm)}
+    </ul>
+  </div>
+  ${qrBlock}
+</div>
+<p class="pass-foot">${escapeHtml(passFoot)}</p>`;
+  }
+
+  const handle = vm.handle ? `@${escapeHtml(vm.handle)}` : "Unknown card";
+  const manifesto = vm.manifestoLine
+    ? `<p class="pass-manifesto">${escapeHtml(vm.manifestoLine)}</p>`
     : "";
 
   return `<div class="pass-head">
@@ -211,7 +244,8 @@ function renderPassFront(
     </ul>
   </div>
   ${qrBlock}
-</div>`;
+</div>
+<p class="pass-foot">${escapeHtml(passFoot)}</p>`;
 }
 
 /** Back — status hints only; limits live in settings row below the card. */
@@ -473,8 +507,13 @@ function renderFooter(vm: ScanViewModel, origin: string): string {
 
 function scanLead(vm: ScanViewModel): string {
   switch (vm.kind) {
-    case "active":
+    case "active": {
+      const plate = splitManifestoDisplay(vm.manifestoLine);
+      if (plate.isStatusPlate) {
+        return "Current status for this place on the network.";
+      }
       return "The network returned current status for this card and QR.";
+    }
     case "unknown_profile":
       return "No Humanity Card is registered for this link.";
     case "unknown_qr":

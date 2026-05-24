@@ -246,6 +246,8 @@ Health: `GET /.well-known/hc/v1/health` · Create: `POST /.well-known/hc/v1/card
 
 **MVP** = Phase A through roadmap step **5.3** (honest create → scan → revoke). Commons Pass and federation are **not** required for that gate.
 
+**After M5:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` — one vertical on real objects (status plate, lost-item relay, organizer-signed revoke), not more design-space pages.
+
 ---
 
 ## Launch principle

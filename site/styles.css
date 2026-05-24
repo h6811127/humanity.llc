@@ -621,6 +621,41 @@ a {
   text-align: center;
 }
 
+.create-templates {
+  border: none;
+  margin: 0 0 4px;
+  padding: 0;
+}
+
+.create-templates .form-label {
+  margin-bottom: 10px;
+}
+
+.create-template-row {
+  display: flex;
+  gap: 8px;
+}
+
+.create-template-btn {
+  flex: 1;
+  min-height: 44px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--grey);
+  background: #f7f7f7;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+}
+
+.create-template-btn.is-active {
+  color: var(--red);
+  background: rgba(219, 27, 67, 0.06);
+  border-color: rgba(219, 27, 67, 0.35);
+}
+
 .create-you-get {
   list-style: none;
   margin: -6px 0 0;
