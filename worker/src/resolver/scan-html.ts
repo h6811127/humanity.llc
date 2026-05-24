@@ -456,6 +456,9 @@ function liveControlGroupRows(vm: ScanViewModel): string {
     <a class="scan-footer-link" id="live-control-owner-link" href="#" hidden>
       Open owner proof link
     </a>
+    <span class="list-sub" id="live-control-owner-hint" hidden>
+      Open this on the owner device or original created tab.
+    </span>
   </span>
 </li>`;
   }
@@ -527,6 +530,8 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
           ownerLink.hidden = false;
           ownerLink.href = result.body.owner_url;
         }
+        var ownerHint = document.getElementById("live-control-owner-hint");
+        if (ownerHint) ownerHint.hidden = false;
         setStatus("Ask the owner to open the proof link on the device with the key.");
         poll(result.body.status_url);
       })

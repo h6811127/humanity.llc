@@ -114,7 +114,7 @@ function initLiveControlProof() {
     btn.disabled = !keys;
     if (!keys) {
       status.textContent =
-        "Unlock a recovery key or encrypted backup in More options before proving control.";
+        "Open this proof link in the original created tab, or unlock a recovery key / encrypted backup in More options.";
     } else if (!status.textContent) {
       status.textContent = "Ready to prove live control.";
     }
