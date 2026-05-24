@@ -84,7 +84,10 @@ export function initKeyBackupUi(opts) {
       downloadBackupFile(backup);
       const session = opts.getSession() || {};
       opts.setSession({ ...session, key_backup_exported_at: new Date().toISOString() });
-      setStatus(exportStatus, "Downloaded. Store the file safely; we cannot reset your passphrase.");
+      setStatus(
+        exportStatus,
+        "Downloaded. Store the file safely on your device; we cannot reset your passphrase or recover this backup."
+      );
       exportForm.reset();
     } catch (err) {
       setStatus(exportStatus, importErrorMessage(err), true);
@@ -136,7 +139,10 @@ export function initKeyBackupUi(opts) {
         owner_private_key_b58: unlocked.privateKeyBase58,
         key_imported_at: new Date().toISOString(),
       });
-      setStatus(importStatus, "Unlocked. Revoke controls are available below.");
+      setStatus(
+        importStatus,
+        "Unlocked locally. Revoke controls are available below."
+      );
       importForm.reset();
       refreshExportVisibility();
       opts.onKeysUnlocked();

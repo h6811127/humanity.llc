@@ -14,17 +14,18 @@ Run this yourself once (5 minutes):
 
 1. **Create** — `https://humanity.llc/create/` → land on `/created/`.
 2. **Scan** — open scan link on phone; confirm pass card + bearer line + “What this scan does not prove” at bottom.
-3. **Download backup** (optional) — encrypted backup on `/created/`; import on second device if you care about cross-device revoke.
-4. **Revoke QR** — on `/created/`, revoke **this QR only** (not whole card).
-5. **Re-scan** — scan link shows **QR revoked** within ~60s (cache TTL).
-6. **Status JSON** — replace `PROFILE` and `QR` below:
+3. **Save recovery and/or download backup** — on `/created/`, save the one-time recovery key and/or encrypted backup if you care about cross-device revoke.
+4. **Session-only check** (optional but recommended) — if you close the tab without recovery/backup, the web UI should no longer be able to sign revoke until you unlock one.
+5. **Revoke QR** — on `/created/`, revoke **this QR only** (not whole card).
+6. **Re-scan** — scan link shows **QR revoked** within ~60s (cache TTL).
+7. **Status JSON** — replace `PROFILE` and `QR` below:
 
 ```bash
 curl -sS "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status?q=QR" | jq '.scan.kind, .scan.qr.status'
 # After revoke: kind should be "qr_revoked", qr.status "revoked"
 ```
 
-7. **No analytics** — confirm scan HTML has no third-party trackers (view source / Network tab once).
+8. **No analytics** — confirm scan HTML has no third-party trackers (view source / Network tab once).
 
 **Deploy check:** scan response header `X-HC-Scan-UI: pass-v5` on an active scan.
 
@@ -93,6 +94,7 @@ Do **not** send the data policy or research page unless they ask.
 | Scan still “active” minutes after revoke | Worker deploy; wait cache max 60s inactive TTL |
 | Create fails | Check Worker logs, rate limits, D1 |
 | Bearer warning buried | Worker scan HTML deploy (`npm run worker:deploy`) |
+| Closed tab, no saved key | Expected by design; use the saved recovery key or encrypted backup, otherwise create again |
 | “Wrong passphrase” on backup import | Re-export; type passphrase manually; see `docs/M5_5_OWNER_KEY_PORTABILITY.md` |
 | Stranger confused | Shorten scan lead copy; watch them screen-share once, then reset count |
 
