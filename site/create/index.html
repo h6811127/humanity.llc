@@ -58,6 +58,9 @@
               <button type="button" class="create-template-btn" data-template="status_plate">
                 Status plate
               </button>
+              <button type="button" class="create-template-btn" data-template="lost_item_relay">
+                Lost item
+              </button>
             </div>
           </fieldset>
 
@@ -112,6 +115,30 @@
             <p class="form-hint">Live status line — you can change it later by creating a new card or future updates.</p>
           </div>
 
+          <div id="create-fields-lost-item" hidden>
+            <label class="form-label" for="relay-item">What is lost?</label>
+            <input
+              class="form-input"
+              id="relay-item"
+              name="relay_item"
+              maxlength="72"
+              placeholder="House keys"
+            />
+            <p class="form-hint">Shown as the headline when someone scans — not your phone number.</p>
+            <label class="form-label" for="relay-message">What should finders see?</label>
+            <textarea
+              class="form-input form-textarea"
+              id="relay-message"
+              name="relay_message"
+              maxlength="199"
+              rows="2"
+              placeholder="Lost — contact owner through relay (see scan page)"
+            ></textarea>
+            <p class="form-hint">
+              Return instructions only. Revoke when recovered or if the relay is abused.
+            </p>
+          </div>
+
           <label class="revoke-confirm create-recovery-opt">
             <input type="checkbox" id="generate-recovery" name="generate_recovery" checked />
             <span>Generate recovery key (recommended; save once on the next screen)</span>
@@ -128,6 +155,6 @@
         </form>
       </main>
     </div>
-    <script type="module" src="/js/create-card.mjs?v=8"></script>
+    <script type="module" src="/js/create-card.mjs?v=9"></script>
   </body>
 </html>

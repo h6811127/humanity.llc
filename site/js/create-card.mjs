@@ -17,6 +17,7 @@ const submitBtn = document.getElementById("submit");
 const demoBtn = document.getElementById("create-demo-btn");
 const fieldsGeneral = document.getElementById("create-fields-general");
 const fieldsStatusPlate = document.getElementById("create-fields-status-plate");
+const fieldsLostItem = document.getElementById("create-fields-lost-item");
 const manifestoEl = document.getElementById("manifesto");
 const templateBtns = document.querySelectorAll(".create-template-btn");
 
@@ -44,13 +45,20 @@ function setTemplate(template) {
     btn.classList.toggle("is-active", btn.dataset.template === template);
   });
   const isPlate = template === "status_plate";
-  if (fieldsGeneral) fieldsGeneral.hidden = isPlate;
+  const isRelay = template === "lost_item_relay";
+  const isPilot = isPlate || isRelay;
+  if (fieldsGeneral) fieldsGeneral.hidden = isPilot;
   if (fieldsStatusPlate) fieldsStatusPlate.hidden = !isPlate;
-  if (manifestoEl) manifestoEl.required = !isPlate;
+  if (fieldsLostItem) fieldsLostItem.hidden = !isRelay;
+  if (manifestoEl) manifestoEl.required = !isPilot;
   const objectLabel = document.getElementById("object-label");
   const statusLine = document.getElementById("status-line");
+  const relayItem = document.getElementById("relay-item");
+  const relayMessage = document.getElementById("relay-message");
   if (objectLabel) objectLabel.required = isPlate;
   if (statusLine) statusLine.required = isPlate;
+  if (relayItem) relayItem.required = isRelay;
+  if (relayMessage) relayMessage.required = isRelay;
 }
 
 templateBtns.forEach((btn) => {
@@ -71,6 +79,18 @@ function buildManifestoLine() {
       throw new Error("Combined object name and status line must be 280 characters or fewer.");
     }
     return { manifesto: combined, pilotTemplate: "status_plate" };
+  }
+  if (activeTemplate === "lost_item_relay") {
+    const item = document.getElementById("relay-item")?.value?.trim();
+    const message = document.getElementById("relay-message")?.value?.trim();
+    if (!item || !message) {
+      throw new Error("Item name and return message are required for a lost item relay.");
+    }
+    const combined = `[relay] ${item}\n${message}`;
+    if (combined.length > 280) {
+      throw new Error("Combined item name and return message must be 280 characters or fewer.");
+    }
+    return { manifesto: combined, pilotTemplate: "lost_item_relay" };
   }
   const manifesto = manifestoEl?.value?.trim();
   if (!manifesto) throw new Error("Handle and public statement are required.");

@@ -1,5 +1,5 @@
 import type { ScanViewModel } from "./scan-state";
-import { splitManifestoDisplay } from "./manifesto-display";
+import { parseManifestoDisplay } from "./manifesto-display";
 import { scanListIcon, type ScanIconId } from "./scan-icons";
 import { BEARER_WARNING } from "./trust-copy";
 import { SCAN_PASS_FLIP_JS } from "./scan-pass-flip";
@@ -7,7 +7,7 @@ import { SCAN_PASS_CSS } from "./scan-pass-styles";
 import { renderScanQrMarkup } from "./scan-qr";
 
 /** Response header — confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v7";
+export const SCAN_UI_VERSION = "pass-v8";
 
 /**
  * Public scan UI — flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -184,7 +184,7 @@ function renderPassFront(
 <p class="pass-manifesto">${escapeHtml(scanLead(vm))}</p>`;
   }
 
-  const plate = splitManifestoDisplay(vm.manifestoLine);
+  const display = parseManifestoDisplay(vm.manifestoLine);
   const handleMuted = vm.handle
     ? `<p class="pass-handle-muted">@${escapeHtml(vm.handle)}</p>`
     : "";
@@ -195,11 +195,9 @@ function renderPassFront(
     ? `<div class="pass-qr"${qrSlotAttr}>${qrMarkup}</div>`
     : "";
 
-  const passFoot = plate.isStatusPlate
-    ? "Scan shows current status for this place—not who owns the door."
-    : "Scan shows live state. Holding the object does not prove ownership.";
-
-  if (plate.isStatusPlate && plate.objectLabel && plate.statusLine) {
+  if (display.kind === "status_plate") {
+    const passFoot =
+      "Scan shows current status for this place—not who owns the door.";
     return `<div class="pass-head">
   <div class="pass-brand">
     <span class="pass-dot" aria-hidden="true"></span>
@@ -210,8 +208,8 @@ function renderPassFront(
 <div class="pass-body">
   <div class="pass-main">
     <p class="pass-type">Status plate</p>
-    <h1 class="pass-name">${escapeHtml(plate.objectLabel)}</h1>
-    <p class="pass-manifesto pass-manifesto-status">${escapeHtml(plate.statusLine)}</p>
+    <h1 class="pass-name">${escapeHtml(display.objectLabel)}</h1>
+    <p class="pass-manifesto pass-manifesto-status">${escapeHtml(display.statusLine)}</p>
     ${handleMuted}
     <ul class="pass-trust" aria-label="Status at a glance">
       ${renderTrustPills(vm)}
@@ -221,6 +219,34 @@ function renderPassFront(
 </div>
 <p class="pass-foot">${escapeHtml(passFoot)}</p>`;
   }
+
+  if (display.kind === "lost_item_relay") {
+    const passFoot =
+      "This scan does not prove who holds the item. It only shows whether the return relay is active.";
+    return `<div class="pass-head">
+  <div class="pass-brand">
+    <span class="pass-dot" aria-hidden="true"></span>
+    <span>humanity.llc</span>
+  </div>
+  <span class="${badgeClass}">${escapeHtml(vm.primaryBadge.label)}</span>
+</div>
+<div class="pass-body">
+  <div class="pass-main">
+    <p class="pass-type">Lost item relay</p>
+    <h1 class="pass-name">${escapeHtml(display.objectLabel)}</h1>
+    <p class="pass-manifesto pass-manifesto-status">${escapeHtml(display.statusLine)}</p>
+    ${handleMuted}
+    <ul class="pass-trust" aria-label="Status at a glance">
+      ${renderTrustPills(vm)}
+    </ul>
+  </div>
+  ${qrBlock}
+</div>
+<p class="pass-foot">${escapeHtml(passFoot)}</p>`;
+  }
+
+  const passFoot =
+    "Scan shows live state. Holding the object does not prove ownership.";
 
   const handle = vm.handle ? `@${escapeHtml(vm.handle)}` : "Unknown card";
   const manifesto = vm.manifestoLine
@@ -508,9 +534,12 @@ function renderFooter(vm: ScanViewModel, origin: string): string {
 function scanLead(vm: ScanViewModel): string {
   switch (vm.kind) {
     case "active": {
-      const plate = splitManifestoDisplay(vm.manifestoLine);
-      if (plate.isStatusPlate) {
+      const display = parseManifestoDisplay(vm.manifestoLine);
+      if (display.kind === "status_plate") {
         return "Current status for this place on the network.";
+      }
+      if (display.kind === "lost_item_relay") {
+        return "Return instructions for this item — relay active or revoked at scan time.";
       }
       return "The network returned current status for this card and QR.";
     }

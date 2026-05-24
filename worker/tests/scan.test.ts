@@ -80,6 +80,27 @@ describe("buildScanViewModel", () => {
 });
 
 describe("renderScanPage M3.2 trust blocks", () => {
+  it("renders lost-item relay manifesto layout", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card({
+          manifesto_line: "[relay] House keys\nLost — contact owner through relay",
+        }),
+        qr: qr(),
+        verification: summary(),
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain("Lost item relay");
+    expect(html).toContain("House keys");
+    expect(html).toContain("contact owner through relay");
+    expect(html).not.toContain("[relay]");
+    expect(html).toContain("does not prove who holds the item");
+  });
+
   it("renders status-plate manifesto as object label + status line", async () => {
     const vm = buildScanViewModel(
       PROFILE,

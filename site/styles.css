@@ -633,6 +633,7 @@ a {
 
 .create-template-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 

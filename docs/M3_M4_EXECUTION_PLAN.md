@@ -193,6 +193,6 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ## Current step
 
-**→ Status plate pilot** — `docs/STATUS_PLATE_PILOT.md` (vertical #1 after generic loop). Create template + two-line scan layout shipped; run 5–10 real plates and score with M5 scorecard.
+**→ Lost item relay pilot** — `docs/LOST_ITEM_RELAY_PILOT.md` (vertical #2). Create template + `[relay]` scan layout shipped; run 5–10 real tags and score with M5 scorecard. Status plate (#1): `docs/STATUS_PLATE_PILOT.md`.
 
 M5 stranger gate: `docs/M5_STRANGER_TEST_RUNBOOK.md` (still required before merch / Commons Pass).

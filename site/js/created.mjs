@@ -70,6 +70,7 @@ const jsonLink = document.getElementById("card-json-link");
 const revokeDetails = document.getElementById("revoke-details");
 const ownerActionsEl = document.getElementById("created-owner-actions");
 const statusPlateTipEl = document.getElementById("created-status-plate-tip");
+const lostItemTipEl = document.getElementById("created-lost-item-tip");
 
 function revealOwnerActions() {
   if (ownerActionsEl) ownerActionsEl.hidden = false;
@@ -78,6 +79,9 @@ function revealOwnerActions() {
 function applyPilotTemplateUi(session) {
   if (session?.pilot_template === "status_plate" && statusPlateTipEl) {
     statusPlateTipEl.hidden = false;
+  }
+  if (session?.pilot_template === "lost_item_relay" && lostItemTipEl) {
+    lostItemTipEl.hidden = false;
   }
 }
 

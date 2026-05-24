@@ -9,11 +9,11 @@
     <title>Crisis resource cards · humanity.llc</title>
     <meta
       name="description"
-      content="Pocket cards for shelters and aid — distribute once, update destinations when resources change."
+      content="Live wallet cards for aid resources — update when hotlines move, without harvesting identity from people in crisis."
     />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=43" />
+    <link rel="stylesheet" href="/styles.css?v=46" />
   </head>
   <body>
     <div class="page">
@@ -30,24 +30,86 @@
           <p class="hero-eyebrow">Design space · aid</p>
           <h1>Crisis resource cards</h1>
           <p class="hero-line">
-            Tiny printed cards for shelters, food pantries, recovery groups, immigrant aid, and
+            Pocket cards for shelters, food pantries, recovery groups, immigrant aid, and
             LGBTQ support. Hand them out once — the <strong>current resource list</strong> can change
             when phone numbers, hours, or locations shift.
           </p>
           <p class="hero-line hero-line-sub">Research, not shipping yet.</p>
         </section>
 
+        <section class="idea-callout" aria-labelledby="serve-title">
+          <div class="idea-callout-header">
+            <span class="list-icon list-icon-tone-red" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            <div>
+              <h2 class="idea-callout-title" id="serve-title">Serve without targeting</h2>
+              <p class="idea-callout-sub">
+                Ultimate functionality for people in crisis does not mean marketing at them,
+                profiling them, or turning their emergency into your growth story.
+              </p>
+            </div>
+          </div>
+          <div class="idea-callout-body">
+            <p>
+              The goal is <strong>accurate, revocable pointers</strong> controlled by the
+              organizations people already trust — not a platform that learns who scanned, when,
+              and where. Humanity is a resolver for <strong>signed public status</strong>, not a
+              crisis CRM, not legal ID, and not a surveillance funnel dressed as help.
+            </p>
+            <ul class="list list-compact">
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Coalition issues the card</span>
+                  <span class="list-sub"
+                    >A local mutual-aid network, clinic coalition, or tenant union signs updates —
+                    not humanity.llc “owning” vulnerable users</span
+                  >
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Scanner sees resources, not a dossier</span>
+                  <span class="list-sub"
+                    >No account required to read hotlines and hours · no “verified human” score ·
+                    no default scan analytics</span
+                  >
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">No extracting stories for the product</span>
+                  <span class="list-sub"
+                    >Do not use crisis populations in landing demos, ads, or founder threads as
+                    proof the tech “works”</span
+                  >
+                </span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
         <section class="idea-section" aria-labelledby="why-title">
-          <h2 class="group-label" id="why-title">Stale crisis info hurts</h2>
+          <h2 class="group-label" id="why-title">Why stale info is harm</h2>
           <ul class="list list-compact">
             <li class="list-row">
               <span class="list-icon list-icon-tone-red" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
               </span>
               <span class="list-content">
-                <span class="list-title">Printed lists go bad</span>
+                <span class="list-title">Wrong number on a wallet card</span>
                 <span class="list-sub"
-                  >A closed hotline on a wallet card is worse than no card</span
+                  >A closed shelter line at 2 AM is not a neutral mistake — it can burn the last
+                  phone credit someone has</span
                 >
               </span>
             </li>
@@ -56,13 +118,134 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
               </span>
               <span class="list-content">
-                <span class="list-title">One card, live answer</span>
+                <span class="list-title">Live answer, same card</span>
                 <span class="list-sub"
                   >Organizer updates network status — scan shows what is true today</span
                 >
               </span>
             </li>
           </ul>
+        </section>
+
+        <section class="idea-section" aria-labelledby="implications-title">
+          <h2 class="group-label" id="implications-title">Implications easy to miss</h2>
+          <p class="group-intro short">
+            Avoiding “we collect name and address” is necessary but not sufficient. Questions worth
+            forcing before any pilot:
+          </p>
+          <div class="scenario-grid" aria-label="Ethical risk scenarios">
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">Scan trails</p>
+              <ul class="scenario-card-list">
+                <li>Who scanned, when, from where — even without login</li>
+                <li>Employer or abuser infers help-seeking from timing</li>
+                <li>Resolver logs become a subpoena target</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">False authority</p>
+              <ul class="scenario-card-list">
+                <li>Card looks “official” because it is printed</li>
+                <li>People trust QR as government or clinic endorsement</li>
+                <li>Stale “verified” copy reads as active when it is not</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">Coercion &amp; dependency</p>
+              <ul class="scenario-card-list">
+                <li>Gate access behind installing an app or account</li>
+                <li>Single operator can kill every card in a city</li>
+                <li>Revoke used to silence, not protect</li>
+              </ul>
+            </article>
+          </div>
+          <ul class="tag-chips tag-chips-neutral" aria-label="More implications">
+            <li>deanonymization via relay</li>
+            <li>language access</li>
+            <li>immigration enforcement risk</li>
+            <li>counter-protest infiltration</li>
+            <li>donor-driven “metrics” pressure</li>
+            <li>volunteer burnout mis-updates</li>
+            <li>photocopied rogue cards</li>
+            <li>mental-health triggering copy</li>
+          </ul>
+        </section>
+
+        <section class="idea-section" aria-labelledby="possibilities-title">
+          <h2 class="group-label" id="possibilities-title">Possibilities not to forget</h2>
+          <p class="group-intro short">
+            Live objects open humane options if the coalition stays in charge:
+          </p>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-purple" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Print once, fix in one signed update</span>
+                <span class="list-sub"
+                  >Clinic moved — every old card shows the new address on next scan</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Revoke a compromised batch</span>
+                <span class="list-sub"
+                  >Counterfeit cards in circulation → series revoked → “get a new card at desk”</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Multilingual status without reprinting</span>
+                <span class="list-sub"
+                  >Same card, scan language follows browser or coalition publishes parallel lines</span
+                >
+              </span>
+            </li>
+          </ul>
+          <ul class="tag-chips" aria-label="Future possibilities">
+            <li>offline printed fallback number</li>
+            <li>expiring card series</li>
+            <li>separate keys per region</li>
+            <li>plain-language “last updated”</li>
+            <li>no-scan SMS shortcode on card</li>
+            <li>peer org federation</li>
+            <li>minimal scan page (low bandwidth)</li>
+          </ul>
+        </section>
+
+        <section class="idea-section" aria-labelledby="refuse-title">
+          <h2 class="group-label" id="refuse-title">What we refuse by design</h2>
+          <div class="qr-compare-grid">
+            <article class="qr-compare-col qr-compare-col-muted">
+              <h3 class="qr-compare-heading">Not this</h3>
+              <ul class="qr-compare-list">
+                <li>Crisis people as marketing assets</li>
+                <li>Scan analytics by default</li>
+                <li>KYC to read a hotline list</li>
+                <li>Permanent identity on the card</li>
+                <li>Platform lock-in for coalitions</li>
+              </ul>
+            </article>
+            <article class="qr-compare-col qr-compare-col-live">
+              <h3 class="qr-compare-heading">This</h3>
+              <ul class="qr-compare-list">
+                <li>Coalition-controlled status</li>
+                <li>Revocable series</li>
+                <li>Honest “what scan does not prove”</li>
+                <li>Inspectable signed updates</li>
+                <li>Exportable, federatable spec</li>
+              </ul>
+            </article>
+          </div>
         </section>
 
         <section class="idea-section" aria-labelledby="card-title">
@@ -93,6 +276,10 @@
               </ul>
             </article>
           </div>
+          <p class="idea-footnote">
+            Pilot rule: coalitions run cards with their own keys and copy review — humanity.llc ships
+            the primitive, not the pastoral care.
+          </p>
         </section>
 
         <section class="idea-section" aria-labelledby="fields-title">
@@ -109,8 +296,9 @@
         </section>
 
         <p class="insight">
-          A card in someone&rsquo;s pocket stays useful when the <strong>answer can change</strong>.
-          That is the magic.
+          Functionality without extraction: a card in someone&rsquo;s pocket stays useful when the
+          <strong>answer can change</strong> — and when no one had to become the product to get
+          that help.
         </p>
 
         <section class="group">
