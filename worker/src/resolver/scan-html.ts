@@ -6,6 +6,7 @@ import { SCAN_PASS_FLIP_JS } from "./scan-pass-flip";
 import { SCAN_PASS_CSS } from "./scan-pass-styles";
 import {
   humanTrustDisplay,
+  humanTrustListIcon,
 } from "./verification-display";
 import { renderScanQrMarkup } from "./scan-qr";
 
@@ -359,13 +360,7 @@ function renderTrustGroups(vm: ScanViewModel, origin: string): string {
   }
 
   if (vm.kind === "active" && vm.profileId && vm.showHumanTrustBlock) {
-    sections.push(
-      trustGroup(
-        "Vouch",
-        vouchIssuanceGroupRows(vm),
-        "vouch"
-      )
-    );
+    sections.push(renderVouchSection(vm, origin));
   }
 
   return `<div class="scan-trust-groups" aria-label="Network status at scan time">
@@ -424,13 +419,40 @@ function cardGroupRows(vm: ScanViewModel): string {
 
 function humanGroupRows(vm: ScanViewModel): string {
   const display = humanTrustDisplay(vm);
+  const icon = humanTrustListIcon(display);
   return `<li class="list-row" id="human-trust-row">
-  ${scanListIcon("people", display.iconTone)}
+  ${scanListIcon(icon.tone, icon.id)}
   <span class="list-content">
     <span class="list-title" id="human-trust-row-title">${escapeHtml(display.label)}</span>
     <span class="list-sub" id="human-trust-row-sub">${escapeHtml(display.subtitle)}</span>
   </span>
 </li>`;
+}
+
+function renderVouchSection(vm: ScanViewModel, origin: string): string {
+  const walletUrl = `${origin.replace(/\/$/, "")}/wallet/`;
+  const createUrl = `${origin.replace(/\/$/, "")}/create/`;
+  return `<section class="group scan-group scan-group-vouch" aria-label="Vouch for this person">
+  <h2 class="group-label">Vouch</h2>
+  <div id="vouch-explainer" class="vouch-card vouch-card-hint">
+    <div class="vouch-card-head">
+      ${scanListIcon("slate", "key")}
+      <div class="vouch-card-head-text">
+        <span class="vouch-eyebrow">Your keys on this device</span>
+        <span class="vouch-title">Vouch from a saved card</span>
+      </div>
+    </div>
+    <p class="vouch-lead" id="vouch-explainer-copy">
+      To attest for someone else, activate <strong>your</strong> card in
+      <a href="${escapeHtml(walletUrl)}">Saved cards</a> (or
+      <a href="${escapeHtml(createUrl)}">create one</a>), then return to this scan page.
+      Your private key never uploads — only the signed vouch does.
+    </p>
+  </div>
+  <ul class="list vouch-list">
+    ${vouchIssuanceGroupRows(vm)}
+  </ul>
+</section>`;
 }
 
 function qrGroupRows(vm: ScanViewModel): string {
@@ -511,7 +533,7 @@ function vouchIssuanceGroupRows(vm: ScanViewModel): string {
 function renderVouchIssuanceScript(vm: ScanViewModel, origin: string): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
   const assetOrigin = pagesJsOrigin(origin);
-  const mod = JSON.stringify(`${assetOrigin}/js/vouch-issue.mjs?v=1`);
+  const mod = JSON.stringify(`${assetOrigin}/js/vouch-issue.mjs?v=2`);
   return `<script type="module" src=${mod}></script>`;
 }
 

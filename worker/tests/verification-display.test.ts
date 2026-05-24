@@ -4,6 +4,7 @@ import type { ScanContext } from "../src/db/scan";
 import {
   formatVouchRecency,
   humanTrustDisplay,
+  humanTrustListIcon,
 } from "../src/resolver/verification-display";
 import { buildScanViewModel } from "../src/resolver/scan-state";
 
@@ -172,5 +173,24 @@ describe("humanTrustDisplay (V-001)", () => {
     const d = humanTrustDisplay(vm);
     expect(d.label).toBe("Suspended");
     expect(d.pillActive).toBe(false);
+  });
+
+  it("humanTrustListIcon uses slate people for Registered", () => {
+    const d = humanTrustDisplay(activeVm());
+    expect(humanTrustListIcon(d)).toEqual({ id: "people", tone: "slate" });
+  });
+
+  it("humanTrustListIcon uses trust shield for Vouched Human", () => {
+    const d = humanTrustDisplay(
+      activeVm({
+        state: "verified_human",
+        level: 2,
+        label: "Vouched Human",
+        method: "vouch",
+        vouch_count: 3,
+        latest_accepted_vouch_at: "2026-05-21T12:00:00.000Z",
+      })
+    );
+    expect(humanTrustListIcon(d)).toEqual({ id: "shield", tone: "trust" });
   });
 });

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Saved cards · humanity.llc</title>
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=51" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Your device</p>
+          <h1>Saved cards</h1>
+          <p class="hero-line">
+            Signing keys for cards you care about — stored only in this browser. The operator
+            never receives private keys.
+          </p>
+        </section>
+
+        <section class="group">
+          <h2 class="group-label">How vouching works</h2>
+          <ol class="wallet-how-steps">
+            <li>
+              <strong>Use keys</strong> on a saved card (loads keys into this tab).
+            </li>
+            <li>
+              Open someone else's <strong>scan link</strong> in this same browser.
+            </li>
+            <li>
+              Scroll to <strong>Vouch</strong> on their scan page and submit your public
+              statement.
+            </li>
+          </ol>
+          <p class="form-hint">
+            You must be a <strong>Vouched Human</strong> (or steward) to vouch for others. Revoke
+            and updates use the same active keys — open your card on
+            <a href="/created/">/created/</a> after activating.
+          </p>
+        </section>
+
+        <form id="wallet-save-form" class="group wallet-save-form" hidden>
+          <h2 class="group-label">Save from this tab</h2>
+          <p class="form-hint">
+            Available when you still have owner keys from a recent create (same browser session).
+          </p>
+          <label class="form-label" for="wallet-save-label">Label</label>
+          <input
+            class="form-input"
+            id="wallet-save-label"
+            type="text"
+            maxlength="48"
+            placeholder="Personal card"
+          />
+          <button type="submit" class="btn-secondary">Save to this device</button>
+          <p id="wallet-save-status" class="form-status" hidden role="status"></p>
+        </form>
+
+        <section class="group">
+          <h2 class="group-label">Saved on this device</h2>
+          <p id="wallet-empty" class="form-hint">
+            No saved cards yet. After <a href="/create/">create</a>, use “Save from this tab” on
+            <a href="/created/">/created/</a> or return here when keys are still loaded.
+          </p>
+          <ul class="list list-compact" id="wallet-list"></ul>
+        </section>
+
+        <p class="form-warning">
+          Saving cards here does not sync across phones or browsers. For portability use encrypted
+          backup on <a href="/created/">/created/</a>. Never save keys on a shared or untrusted
+          device.
+        </p>
+      </main>
+    </div>
+    <script type="module" src="/js/card-wallet.mjs?v=1"></script>
+  </body>
+</html>

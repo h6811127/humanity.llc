@@ -699,6 +699,11 @@ a {
   background: #5856d6;
 }
 
+/* Vouched Human — vibrant trust blue (distinct from system link blue) */
+.list-icon-tone-trust {
+  background: #0a84ff;
+}
+
 .list-icon-tone-pink {
   background: #ff2d55;
 }
@@ -992,6 +997,23 @@ a {
   border-radius: 18px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   background: #f7f7f9;
+}
+
+.vouch-card-hint {
+  margin-bottom: 10px;
+  border-color: rgba(10, 132, 255, 0.22);
+  background: rgba(10, 132, 255, 0.06);
+}
+
+.vouch-card-hint a {
+  color: #0a84ff;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.vouch-list:has(#vouch-row[hidden]) {
+  display: none;
 }
 
 .vouch-card-head {

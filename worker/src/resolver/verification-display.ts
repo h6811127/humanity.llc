@@ -10,6 +10,31 @@ export interface HumanTrustDisplay {
   pillActive: boolean;
 }
 
+export type HumanTrustListIconId = "people" | "shield" | "warning" | "ban";
+
+/** Scan list row icon — tone maps to bundled scan-pass.css list-icon-tone-* */
+export function humanTrustListIcon(display: HumanTrustDisplay): {
+  id: HumanTrustListIconId;
+  tone: HumanTrustIconTone | "trust";
+} {
+  if (display.label === "Suspended") {
+    return { id: "warning", tone: "orange" };
+  }
+  if (display.label === "Verification revoked") {
+    return { id: "ban", tone: "red" };
+  }
+  if (display.label === "Vouched Human" || display.label === "Steward") {
+    return { id: "shield", tone: display.label === "Steward" ? "green" : "trust" };
+  }
+  if (display.subtitle.includes(" of 3 vouches")) {
+    return { id: "people", tone: "purple" };
+  }
+  if (display.label === "Unverified") {
+    return { id: "people", tone: "slate" };
+  }
+  return { id: "people", tone: "slate" };
+}
+
 /** Public freshness signal for latest accepted vouch (HV-FR-32). */
 export function formatVouchRecency(iso: string, now: Date = new Date()): string | null {
   const t = Date.parse(iso);

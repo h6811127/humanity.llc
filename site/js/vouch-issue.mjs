@@ -12,6 +12,8 @@ const VOUCHER_WAIT_DAYS = 90;
 const VOUCH_THRESHOLD = 3;
 
 const row = document.getElementById("vouch-row");
+const explainer = document.getElementById("vouch-explainer");
+const explainerCopy = document.getElementById("vouch-explainer-copy");
 const interactive = document.getElementById("vouch-interactive");
 const ineligible = document.getElementById("vouch-ineligible");
 const ineligibleCopy = document.getElementById("vouch-ineligible-copy");
@@ -136,6 +138,16 @@ function showSuccess(verification) {
   updateHumanTrustRow(verification);
 }
 
+function hideExplainer() {
+  if (explainer) explainer.hidden = true;
+}
+
+function showExplainerHtml(html) {
+  if (explainer) explainer.hidden = false;
+  if (explainerCopy) explainerCopy.innerHTML = html;
+  if (row) row.hidden = true;
+}
+
 async function init() {
   if (!row) return;
 
@@ -152,8 +164,14 @@ async function init() {
   }
 
   const voucherProfileId = session.profile_id;
-  if (voucherProfileId === voucheeProfileId) return;
+  if (voucherProfileId === voucheeProfileId) {
+    showExplainerHtml(
+      "You can't vouch for your own card. Open someone else's scan link while <strong>your</strong> keys are active in this browser."
+    );
+    return;
+  }
 
+  hideExplainer();
   row.hidden = false;
 
   if (statementEl && !statementEl.value) {
