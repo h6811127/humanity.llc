@@ -32,6 +32,11 @@ export const PAYLOAD_FIELD_RULES: Record<PayloadType, PayloadFieldRules> = {
     timestampFields: ["created_at"],
     uniqueIdFields: ["vouch_id", "nonce"],
   },
+  [PAYLOAD_TYPES.VOUCH_REVOCATION]: {
+    subjectProfileField: "vouchee_profile_id",
+    timestampFields: ["revoked_at"],
+    uniqueIdFields: ["vouch_id", "nonce"],
+  },
   [PAYLOAD_TYPES.REVOCATION]: {
     subjectProfileField: "profile_id",
     timestampFields: ["revoked_at"],

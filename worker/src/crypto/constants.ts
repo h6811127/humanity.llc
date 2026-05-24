@@ -12,6 +12,7 @@ export const PAYLOAD_TYPES = {
   HUMANITY_CARD: "humanity_card",
   QR_CREDENTIAL: "qr_credential",
   VOUCH: "vouch",
+  VOUCH_REVOCATION: "vouch_revocation",
   REVOCATION: "revocation",
   BADGE: "badge",
   SUSPENSION: "suspension",

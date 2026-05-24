@@ -5,7 +5,6 @@ import {
   verifySignedDocument,
 } from "../crypto";
 import {
-  activeVouchCountSince,
   activeVouchPairExists,
   getVerificationSummary,
   getVouchCardOwner,
@@ -13,6 +12,7 @@ import {
   recalculateVouchSummary,
   VOUCHER_ACTIVE_QUOTA_PER_YEAR,
   VOUCHER_WAIT_DAYS,
+  voucherIssuanceCountSince,
   vouchNonceUsed,
 } from "../db/verification";
 import { errorResponse, jsonResponse } from "../http/resolver";
@@ -184,11 +184,11 @@ export async function handlePostVouch(
   }
 
   const quotaSince = minusDaysIso(createdAt, 365);
-  const activeIssued = await activeVouchCountSince(db, voucherProfileId, quotaSince);
+  const activeIssued = await voucherIssuanceCountSince(db, voucherProfileId, quotaSince);
   if (activeIssued >= VOUCHER_ACTIVE_QUOTA_PER_YEAR) {
     return errorResponse(
       "VOUCH_QUOTA_EXCEEDED",
-      `Voucher has reached ${VOUCHER_ACTIVE_QUOTA_PER_YEAR} active vouches this year.`,
+      `Voucher has reached ${VOUCHER_ACTIVE_QUOTA_PER_YEAR} vouches this year.`,
       403
     );
   }

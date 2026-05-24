@@ -130,4 +130,6 @@ export interface VouchRow {
   issuer_public_key: string;
   created_at: string;
   revoked_at: string | null;
+  revoke_nonce: string | null;
+  revoke_signed_document_json: string | null;
 }

@@ -104,9 +104,7 @@ class FakeVerificationDb {
               const [voucherProfileId, since] = args as [string, string];
               const n = self.vouches.filter(
                 (v) =>
-                  v.voucher_profile_id === voucherProfileId &&
-                  v.status === "active" &&
-                  v.created_at >= since
+                  v.voucher_profile_id === voucherProfileId && v.created_at >= since
               ).length;
               return { n } as T;
             }
@@ -149,6 +147,8 @@ class FakeVerificationDb {
                 issuer_public_key,
                 created_at,
                 revoked_at: null,
+                revoke_nonce: null,
+                revoke_signed_document_json: null,
               });
             }
             if (sql.includes("UPDATE verification_summaries")) {

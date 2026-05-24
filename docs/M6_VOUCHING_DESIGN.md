@@ -136,7 +136,7 @@ Do **not** publish graph analytics on scan pages. Audits are for stewards/operat
 | Control | V1 status |
 |---|---|
 | Voucher-initiated vouch (not vouchee self-attestation) | By design |
-| Revocable vouch | **API spec’d; POST revoke not yet shipped** |
+| Revocable vouch | **Enforced** (POST revoke + summary recalc) |
 | Standardized statement template | UX + validation |
 | Appeal path for wrongful suspension | Governance (HV-FR-40) |
 
@@ -154,11 +154,11 @@ Pair with live control when in-person trust matters.
 
 ### Threat: quota gaming via revoke/re-issue
 
-**Policy (to implement with revoke):**
+**Policy (implemented with revoke, M6 Step 3):**
 
 - Revoked vouches stop counting immediately in summary recalc.
 - Re-vouching the same pair requires a **new** signed credential with a **new** nonce.
-- Consider whether re-vouch after revoke counts toward **yearly quota** — default **yes** to prevent revoke-as-quota-reset abuse.
+- Re-vouch after revoke **counts toward yearly quota** (default yes — prevents revoke-as-quota-reset abuse).
 
 ---
 
@@ -278,8 +278,20 @@ Revoked/suspended card states must **override** positive verification on scan (a
 
 **Step 3 — Vouch revocation**
 
-- [ ] POST `/v1/verification/vouches/{vouch_id}/revoke` with signed revoke payload.
-- [ ] Summary recalc; quota policy for re-vouch documented and tested.
+- [x] POST `/v1/verification/vouches/{vouch_id}/revoke` with signed revoke payload.
+- [x] Summary recalc; quota policy for re-vouch documented and tested.
+- [x] Client: sign + revoke from `/created/` for vouches issued in this browser session.
+
+**Step 3 decision log (assumptions)**
+
+| Decision | Choice | Rationale |
+|---|---|---|
+| Revoke payload type | `vouch_revocation` v1.0 | Not yet in Technical Standards §10; mirrors card `revocation` shape with vouch subjects. |
+| Who may revoke (v1) | Voucher signature only | Contracts mention governance; steward revoke deferred to Step 4 / governance. |
+| Revoke reason enum | `voucher_revoked` only | Matches card revoke pattern; other reasons reserved. |
+| Yearly quota | Count **all** issuances in window (active + revoked) | M6 default — revoke cannot reset quota. |
+| GET vouch metadata | Added `/v1/verification/vouches/{vouch_id}` | Supports inspection; revoke UI uses session-tracked list instead. |
+| Revoke UI scope | Session `issued_vouches` only | No voucher-side list API in v1; only vouches signed in this browser appear for revoke. |
 
 **Step 4 — Abuse hooks (operator-only)**
 
@@ -317,7 +329,7 @@ Revoked/suspended card states must **override** positive verification on scan (a
 ## Open questions (resolve before public launch)
 
 1. **Public voucher handles on scan?** Default no on first screen; credential detail page only.
-2. **Re-vouch after revoke and quota** — confirm year window includes re-issues.
+2. **Re-vouch after revoke and quota** — **confirmed:** year window includes all issuances, not just active.
 3. **Bootstrap verified humans** — founding cohort vouch rules in `FOUNDING_COHORT_PLAYBOOK.md`.
 4. **Cross-card detection** — same human, many cards: out of scope v1; document honestly.
 5. **Comprehension test** — “What does Vouched Human mean?” before replacing Registered everywhere.

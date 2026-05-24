@@ -31,6 +31,23 @@ function loadSession() {
   }
 }
 
+function saveIssuedVouch(signed) {
+  const session = loadSession();
+  if (!session) return;
+  const list = Array.isArray(session.issued_vouches) ? session.issued_vouches : [];
+  list.unshift({
+    vouch_id: signed.vouch_id,
+    vouchee_profile_id: signed.vouchee_profile_id,
+    statement: signed.statement,
+    created_at: signed.created_at,
+    status: "active",
+  });
+  sessionStorage.setItem(
+    "hc_created",
+    JSON.stringify({ ...session, issued_vouches: list })
+  );
+}
+
 function setStatus(msg, tone = "neutral") {
   if (!statusEl) return;
   statusEl.textContent = msg;
@@ -43,7 +60,7 @@ function plainVouchError(code, fallback) {
     VOUCHER_NOT_VERIFIED:
       "Your card must be a Vouched Human or steward before you can vouch for others.",
     VOUCHER_TOO_NEW: `You need to wait ${VOUCHER_WAIT_DAYS} days after becoming verified before vouching.`,
-    VOUCH_QUOTA_EXCEEDED: "You've reached your limit of 5 active vouches this year.",
+    VOUCH_QUOTA_EXCEEDED: "You've reached your limit of 5 vouches this year.",
     VOUCH_ALREADY_ACTIVE: "You already have an active vouch for this person.",
     VOUCH_ALREADY_EXISTS: "This vouch was already recorded.",
     VOUCHER_INACTIVE: "Your card is not active.",
@@ -214,6 +231,7 @@ async function init() {
       }
 
       showSuccess(body?.verification);
+      saveIssuedVouch(signed);
     } catch (err) {
       setStatus(err instanceof Error ? err.message : "Could not sign vouch.", "error");
       submitBtn.disabled = false;
