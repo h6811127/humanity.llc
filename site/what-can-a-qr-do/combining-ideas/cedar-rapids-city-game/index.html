@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Demo scan · Cedar Rapids city game · humanity.llc</title>
+    <meta
+      name="description"
+      content="Demo scan page for a Cedar Rapids city-scale game where different nodes resolve to different card chains, relay state, and compromise notices without scan tracking."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=46" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Demo scan page · combo 4</p>
+          <h1>Cedar Rapids city game</h1>
+          <p class="hero-line">
+            A weekend game spreads across NewBo, Czech Village, the river trail, and the skywalk.
+            Each node resolves to a different <strong>card chain</strong>: district control, relay
+            bulletin, steward status, and optional local lore.
+          </p>
+          <p class="hero-line hero-line-sub">
+            Research demo, not shipping behavior yet. No scan analytics, no device fingerprinting,
+            no identity trails.
+          </p>
+        </section>
+
+        <section class="idea-section" aria-labelledby="framing-title">
+          <h2 class="group-label" id="framing-title">What this scan demo is exploring</h2>
+          <div class="scenario-grid" aria-label="Cedar Rapids demo framing">
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Different nodes, different chains</p>
+              <ul class="scenario-card-list">
+                <li>Relay arches show district control plus current team bulletin</li>
+                <li>Bridges show compromise state plus route rules</li>
+                <li>Lookouts can add weather, flood, or lore overlays</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">Communication points</p>
+              <ul class="scenario-card-list">
+                <li>Controlling a node unlocks one rotating signed team message</li>
+                <li>The resolver stores the bulletin, not who pulled it</li>
+                <li>Neutral zones can expose public truce or meetup windows</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">Compromise without surveillance</p>
+              <ul class="scenario-card-list">
+                <li>Spies can jam or poison a relay by publishing a signed compromise notice</li>
+                <li>The scan shows current trust state, not a per-player access log</li>
+                <li>Rekeying clears the relay without keeping scan history</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="ticker-title">
+          <h2 class="group-label" id="ticker-title">Live map flavor</h2>
+          <ul class="guestbook-lines guestbook-lines-update" aria-label="Example live updates">
+            <li>Red holds the NewBo relay arch</li>
+            <li>Blue compromised the 16th Avenue bridge bulletin</li>
+            <li>Green opened a truce window at the river market</li>
+            <li>Flood stage muted the Ellis trail lookout until sunset</li>
+            <li>Skywalk switchboard rekeyed and returned to neutral</li>
+          </ul>
+        </section>
+
+        <section class="idea-section" aria-labelledby="newbo-title">
+          <h2 class="group-label" id="newbo-title">Scan view · NewBo relay arch</h2>
+          <div class="scenario-grid" aria-label="NewBo relay arch states">
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">What the scanner sees now</p>
+              <ul class="scenario-card-list">
+                <li>District: NewBo relay arch</li>
+                <li>Controller: Red team</li>
+                <li>Relay status: open for the next 18 minutes</li>
+                <li>Current bulletin: "Shift west, mural alley stays safe"</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">Card chain behind this node</p>
+              <ul class="scenario-card-list">
+                <li>Base node card: relay arch, coordinates, public label</li>
+                <li>District stream: controller, capture window, truce timer</li>
+                <li>Red relay stream: rotating bulletin, route hint, courier drop</li>
+                <li>Steward stream: mural wall clear, no obstruction, event note</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">Boundary</p>
+              <ul class="scenario-card-list">
+                <li>Owning the relay posts a message, not private chat transcripts</li>
+                <li>If a steward freezes the wall for repainting, the relay disappears</li>
+                <li>Physical safety and cleanup notes outrank game copy</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="bridge-title">
+          <h2 class="group-label" id="bridge-title">Scan view · Czech Village bridge</h2>
+          <div class="scenario-grid" aria-label="Compromised bridge states">
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">What the scanner sees now</p>
+              <ul class="scenario-card-list">
+                <li>Node: 16th Avenue bridge crossing</li>
+                <li>State: compromised relay</li>
+                <li>Trusted bulletin paused pending rekey</li>
+                <li>Route bonus suspended; neutral capture allowed</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">Card chain behind this node</p>
+              <ul class="scenario-card-list">
+                <li>Base bridge card: crossing, district edge, escape route</li>
+                <li>District stream: Blue held this node 42 minutes ago</li>
+                <li>Compromise stream: spy action acknowledged, trust degraded</li>
+                <li>Steward stream: bridge remains physically open and safe to cross</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">How spies work here</p>
+              <ul class="scenario-card-list">
+                <li>Spies can replace the relay packet with a decoy clue</li>
+                <li>The scan exposes that the relay is compromised immediately</li>
+                <li>Teams recover by rotating the relay key, not by reading scan logs</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="lookout-title">
+          <h2 class="group-label" id="lookout-title">Scan view · Ellis river lookout</h2>
+          <div class="scenario-grid" aria-label="River lookout states">
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">What the scanner sees now</p>
+              <ul class="scenario-card-list">
+                <li>Node: Ellis river lookout</li>
+                <li>Controller: Green team</li>
+                <li>Weather window: open until wind advisory begins</li>
+                <li>Lore unlock: ferry ledger, chapter 3</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">Card chain behind this node</p>
+              <ul class="scenario-card-list">
+                <li>Base lookout card: overlook, sight lines, fallback path</li>
+                <li>District stream: controller, beacon range, dusk vulnerability</li>
+                <li>Weather stream: flood stage, trail closure, safe-hours digest</li>
+                <li>Archive stream: local history fragment unlocked for everyone</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">Additional ideas worth trying</p>
+              <ul class="scenario-card-list">
+                <li>Neutral cafe nodes as temporary truce markets</li>
+                <li>Portable courier kits that rekey field relays during play</li>
+                <li>Skywalk switchboards that light up only during rain or snow</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-callout" aria-labelledby="policy-title">
+          <div class="idea-callout-header">
+            <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            <div>
+              <h2 class="idea-callout-title" id="policy-title">Data policy fit</h2>
+              <p class="idea-callout-sub">
+                The fun state lives in signed node streams, not in per-scan tracking.
+              </p>
+            </div>
+          </div>
+          <div class="idea-callout-body">
+            <p>
+              This demo assumes no scan analytics, no phone-number requirement, and no device
+              fingerprinting. Team relay copy is a current signed bulletin, not a record of who
+              visited. If a node is compromised, the scan shows the current trust warning instead of
+              exposing a scan trail.
+            </p>
+            <p>
+              Public stewards can still publish closures, flood warnings, or cleanup holds when real
+              space takes priority. That keeps the game playful without turning the resolver into a
+              surveillance system.
+            </p>
+          </div>
+        </section>
+
+        <p class="insight">
+          The city becomes a <strong>playable relay map</strong>: territory, rumors, weather, and
+          truce windows all ride on clear authority boundaries.
+        </p>
+
+        <section class="group">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/data-policy.html">
+                <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Operator data policy</span>
+                  <span class="list-sub">No scan analytics or identity trails by default</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/physical-world-multiplayer/">
+                <span class="list-icon list-icon-tone-purple" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21 1.18.38 2.03 1.46 2.03 2.79"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Physical-world multiplayer</span>
+                  <span class="list-sub">Back to the broader city-game framing</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/combining-ideas/">
+                <span class="list-icon list-icon-tone-gold" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Combining demos</span>
+                  <span class="list-sub">Back to all combo scan pages</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
