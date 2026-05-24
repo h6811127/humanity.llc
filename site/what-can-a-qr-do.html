@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=43" />
+    <link rel="stylesheet" href="/styles.css?v=48" />
   </head>
   <body>
     <div class="page">
@@ -306,6 +306,20 @@
                 <span class="list-chevron" aria-hidden="true">›</span>
               </a>
             </li>
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/combining-ideas/">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><path d="M13 7.5h7"/><path d="M7.5 13v-2"/><path d="M13 16.5h7"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Combining ideas</span>
+                  <span class="list-sub"
+                    >One QR, several signed streams, three demo scan pages</span
+                  >
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
           </ul>
         </section>
 
@@ -315,31 +329,46 @@
             The strong patterns stack: one QR can stay a simple scan while the card behind it pulls
             from several signed, revocable streams.
           </p>
-          <div class="scenario-grid" aria-label="Combined live QR examples">
-            <article class="scenario-card scenario-card-live">
-              <p class="scenario-card-label">Games + maintenance</p>
-              <ul class="scenario-card-list">
-                <li>Players find AED, filter, and trail-marker nodes</li>
-                <li>Maintainer-signed status stays separate from game points</li>
-                <li>Fix verified → local map unlocks the next route</li>
+          <div class="combo-link-grid" aria-label="Combined live QR examples">
+            <a class="combo-link-card" href="/what-can-a-qr-do/combining-ideas/games-maintenance/">
+              <p class="combo-link-card-kicker">Demo scan</p>
+              <h3 class="combo-link-card-title">Games + maintenance</h3>
+              <p class="combo-link-card-sub">
+                Players find AED, filter, and trail-marker nodes while maintainer-signed status
+                stays separate from game points.
+              </p>
+              <ul class="combo-link-card-list">
+                <li>Players discover the node</li>
+                <li>Maintainer signs whether it is safe or fixed</li>
+                <li>Fix verified -> local map unlocks the next route</li>
               </ul>
-            </article>
-            <article class="scenario-card">
-              <p class="scenario-card-label">Crisis cards + freshness</p>
-              <ul class="scenario-card-list">
-                <li>Wallet aid card lists nearby pantry and fridge options</li>
-                <li>Each food batch keeps made, expires, allergen, recall state</li>
+            </a>
+            <a class="combo-link-card" href="/what-can-a-qr-do/combining-ideas/crisis-freshness/">
+              <p class="combo-link-card-kicker">Demo scan</p>
+              <h3 class="combo-link-card-title">Crisis cards + freshness</h3>
+              <p class="combo-link-card-sub">
+                Wallet aid card lists nearby pantry and fridge options while each food batch keeps
+                its own freshness state.
+              </p>
+              <ul class="combo-link-card-list">
+                <li>Each batch keeps made, expires, allergen, recall state</li>
+                <li>Coalition signs routing; kitchen signs food truth</li>
                 <li>Resource page updates without tracking who scanned</li>
               </ul>
-            </article>
-            <article class="scenario-card">
-              <p class="scenario-card-label">Markets + menus + surplus</p>
-              <ul class="scenario-card-list">
-                <li>Co-op pass links to today&rsquo;s stalls and live menus</li>
-                <li>Prepared-food tags mark safe-to-take surplus</li>
+            </a>
+            <a class="combo-link-card" href="/what-can-a-qr-do/combining-ideas/markets-menus-surplus/">
+              <p class="combo-link-card-kicker">Demo scan</p>
+              <h3 class="combo-link-card-title">Markets + menus + surplus</h3>
+              <p class="combo-link-card-sub">
+                Co-op pass links to today&rsquo;s stalls and live menus while prepared-food tags mark
+                safe-to-take surplus.
+              </p>
+              <ul class="combo-link-card-list">
+                <li>Organizer signs market state</li>
                 <li>Vendor updates one state object instead of reprinting</li>
+                <li>Kitchen keeps freshness authority for surplus</li>
               </ul>
-            </article>
+            </a>
           </div>
           <p class="idea-footnote">
             Best combos keep authority clear: the game can reward discovery, but only the maintainer

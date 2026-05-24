@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Demo scan · Markets + menus + surplus · humanity.llc</title>
+    <meta
+      name="description"
+      content="Demo scan page showing a co-op pass that links to today's stalls, live menus, and safe-to-take surplus with organizer, vendor, and kitchen authority kept separate."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=48" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Demo scan · markets + menus + surplus</p>
+          <h1>Saturday co-op market pass</h1>
+          <p class="hero-line">
+            One pass can link to today&apos;s stalls, live menus, and safe-to-take surplus while
+            <strong>organizer, vendor, and kitchen authority stay separate</strong>.
+          </p>
+          <p class="hero-line hero-line-sub">Research demo, not a shipping resolver page.</p>
+        </section>
+
+        <section class="demo-scan-shell" aria-label="Demo scan shell">
+          <div class="demo-scan-shell-head">
+            <div class="demo-scan-brand">
+              <span class="pass-dot" aria-hidden="true"></span>
+              <span>humanity.llc</span>
+            </div>
+            <span class="demo-scan-badge">Current scan</span>
+          </div>
+          <p class="demo-scan-type">Combined card</p>
+          <h2 class="demo-scan-name">Saturday co-op market pass</h2>
+          <p class="demo-scan-copy">
+            The pass says which stalls are active today. It can surface a live menu and prepared-food
+            surplus without pretending one signer owns every food claim on the page.
+          </p>
+          <ul class="demo-scan-pills" aria-label="Current card digest">
+            <li>Market open until 2 PM</li>
+            <li>Booths active: 18</li>
+            <li>Surplus pickup window: after service</li>
+          </ul>
+        </section>
+
+        <section class="idea-section" aria-labelledby="streams-title">
+          <h2 class="group-label" id="streams-title">Signed streams behind this scan</h2>
+          <div class="claim-stream-grid" aria-label="Market, menu, and surplus streams">
+            <article class="claim-stream claim-stream-live">
+              <div class="claim-stream-header">
+                <p class="claim-stream-label">Organizer stream</p>
+                <h3 class="claim-stream-title">Market and stall truth</h3>
+                <p class="claim-stream-signer">Signed by: Co-op market organizer</p>
+              </div>
+              <ul class="claim-stream-list">
+                <li>Booth B12 active today: Northside soups</li>
+                <li>Member pricing valid on produce aisle until 2 PM</li>
+                <li>Rain move in effect: prepared food under west canopy</li>
+              </ul>
+              <p class="claim-stream-note">This stream answers whether the vendor or stall is part of the market today.</p>
+            </article>
+
+            <div class="claim-stack-connector" aria-hidden="true">+</div>
+
+            <article class="claim-stream">
+              <div class="claim-stream-header">
+                <p class="claim-stream-label">Vendor menu stream</p>
+                <h3 class="claim-stream-title">Current service menu</h3>
+                <p class="claim-stream-signer">Signed by: Vendor</p>
+              </div>
+              <ul class="claim-stream-list">
+                <li>Tomato basil soup available now</li>
+                <li>Sweet corn chowder sold out</li>
+                <li>Bread bowl service ends at 12:45 PM</li>
+              </ul>
+              <p class="claim-stream-note">Vendor updates one menu state object instead of reprinting signs all morning.</p>
+            </article>
+
+            <div class="claim-stack-connector" aria-hidden="true">+</div>
+
+            <article class="claim-stream">
+              <div class="claim-stream-header">
+                <p class="claim-stream-label">Kitchen surplus stream</p>
+                <h3 class="claim-stream-title">Safe-to-take prepared food</h3>
+                <p class="claim-stream-signer">Signed by: Kitchen or food-prep lead</p>
+              </div>
+              <ul class="claim-stream-list">
+                <li>Three soup trays safe to take after 1 PM</li>
+                <li>Expires 7 PM, keep refrigerated</li>
+                <li>Allergens: dairy, wheat; recall state clear</li>
+              </ul>
+              <p class="claim-stream-note">Surplus is a separate freshness claim, not just a menu footnote.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="idea-section" aria-labelledby="boundary-title">
+          <h2 class="group-label" id="boundary-title">Authority boundary on the page</h2>
+          <div class="authority-grid" aria-label="Authority boundaries">
+            <article class="authority-card">
+              <h3>The organizer is allowed to say</h3>
+              <p>Which stalls are active, where the market moved, what pass is valid, and whether a booth is approved today.</p>
+            </article>
+            <article class="authority-card">
+              <h3>The vendor or kitchen is allowed to say</h3>
+              <p>Menu items, sold-out state, service window, freshness window, allergens, and surplus safety.</p>
+            </article>
+            <article class="authority-card">
+              <h3>The page should never imply</h3>
+              <p>That market membership alone certifies every prepared-food item as safe, current, or allergen-reviewed.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="scenario-grid" aria-label="What this pattern enables">
+          <article class="scenario-card scenario-card-live">
+            <p class="scenario-card-label">Morning market</p>
+            <ul class="scenario-card-list">
+              <li>Scan pass -> find active stall</li>
+              <li>Open menu shows what is real right now</li>
+              <li>Member pass can unlock co-op pricing without becoming a giant app</li>
+            </ul>
+          </article>
+          <article class="scenario-card">
+            <p class="scenario-card-label">After service</p>
+            <ul class="scenario-card-list">
+              <li>Prepared food flips from menu inventory to surplus inventory</li>
+              <li>Same card can route to pickup without changing the printed pass</li>
+              <li>Freshness window remains narrow and revocable</li>
+            </ul>
+          </article>
+          <article class="scenario-card scenario-card-warn">
+            <p class="scenario-card-label">Failure to avoid</p>
+            <ul class="scenario-card-list">
+              <li>Organizer signing menu details they do not control</li>
+              <li>Vendor claiming prepared-food safety after the kitchen has changed status</li>
+              <li>Overloading one card until nobody knows who is accountable</li>
+            </ul>
+          </article>
+        </section>
+
+        <p class="insight">
+          A good market pass does not become a mega-platform. It stays a
+          <strong>small coordination shell</strong> that hands off to the right signer for menu and
+          surplus truth.
+        </p>
+
+        <section class="group">
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/combining-ideas/">
+                <span class="list-content">
+                  <span class="list-title">Combining ideas</span>
+                  <span class="list-sub">Back to the stacked-pattern overview</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/local-economies/">
+                <span class="list-content">
+                  <span class="list-title">Local economies</span>
+                  <span class="list-sub">Standalone framing for market and co-op passes</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/live-menus/">
+                <span class="list-content">
+                  <span class="list-title">Live menus</span>
+                  <span class="list-sub">Standalone framing for current service state</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do/food-freshness-tags/">
+                <span class="list-content">
+                  <span class="list-title">Food freshness tags</span>
+                  <span class="list-sub">Standalone framing for safe-to-take surplus</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
