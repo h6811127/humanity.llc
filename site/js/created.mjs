@@ -13,7 +13,6 @@ import { initKeyBackupUi } from "./key-backup-ui.mjs";
 import { initRecoveryKeyUi } from "./recovery-key-ui.mjs";
 import { initManifestoUpdate } from "./created-manifesto-update.mjs";
 import { inferPilotTemplate } from "./manifesto-display.mjs";
-import { initManifestoUpdate } from "./created-manifesto-update.mjs";
 
 const params = new URLSearchParams(location.search);
 const profileIdParam = params.get("profile_id")?.trim() || null;
