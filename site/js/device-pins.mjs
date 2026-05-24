@@ -20,6 +20,7 @@ export function loadPins() {
 
 export function savePins(entries) {
   localStorage.setItem(PINS_STORAGE_KEY, JSON.stringify(entries));
+  window.dispatchEvent(new Event("hc-device-hub-changed"));
 }
 
 /**

@@ -16,6 +16,7 @@ export function loadWallet() {
 
 export function saveWallet(entries) {
   localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify(entries));
+  window.dispatchEvent(new Event("hc-device-hub-changed"));
 }
 
 export function walletEntryFromSession(session, label) {
