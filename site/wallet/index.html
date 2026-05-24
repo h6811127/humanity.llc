@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Saved cards · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=57" />
+    <link rel="stylesheet" href="/styles.css?v=58" />
   </head>
   <body class="has-device-hub-search">
     <div class="page">
@@ -17,65 +17,66 @@
         <a class="top-create" href="/create/">Create</a>
       </header>
 
-      <main class="screen screen-wallet">
-        <section class="hero hero-compact">
-          <p class="hero-eyebrow">On this device</p>
-          <h1>Saved cards</h1>
-          <p class="hero-line">
-            Signing keys and pinned scan links for cards you care about — this device only, never
-            uploaded.
-          </p>
-        </section>
+      <main class="screen screen-wallet screen-wallet-sleek">
+        <header class="wallet-page-head">
+          <h1 class="wallet-page-title">Saved cards</h1>
+          <p class="wallet-page-tagline">This device only · never uploaded</p>
+        </header>
 
-        <div class="device-storage-explainer" aria-label="How saving works">
-          <p class="device-storage-explainer-title">Two places keys can live</p>
-          <ul class="device-storage-explainer-list">
-            <li>
-              <strong>This tab</strong> — right after create (<code>sessionStorage</code>). Gone if
-              you close the tab unless you saved or backed up.
-            </li>
-            <li>
-              <strong>This device</strong> — after you tap <strong>Save to this device</strong>
-              (<code>localStorage</code>). Any tab on this browser can load them from here.
-            </li>
-          </ul>
-          <p class="form-hint device-storage-explainer-foot">
-            Copying the recovery key is not the same as saving. Pins are bookmarks only (no keys).
-          </p>
-        </div>
-
-        <p class="form-warning device-tab-hint" id="wallet-tab-hint" hidden>
-          No signing keys in <strong>this tab</strong>. Go back to the tab where you finished
-          create and tap <strong>Save on this device</strong> on <a href="/created/">/created/</a>,
-          or use <strong>Use keys</strong> below if you already saved.
+        <p class="wallet-strip-hint" id="wallet-tab-hint" hidden>
+          Keys are in another tab —
+          <a href="/created/">open /created/</a> there and save, or tap <strong>Use keys</strong> below.
         </p>
 
-        <div
-          class="wallet-active-banner"
-          id="wallet-active-banner"
-          hidden
-          role="status"
-        >
+        <div class="wallet-active-banner" id="wallet-active-banner" hidden role="status">
           <span class="wallet-active-dot" aria-hidden="true"></span>
           <span class="wallet-active-text" id="wallet-active-text"></span>
         </div>
 
-        <section class="device-hub" id="wallet-device-hub" aria-label="Saved cards">
-          <div class="device-hub-group" data-hub-group="pin-add">
-            <p class="device-hub-group-label">Pin a public card</p>
-            <form id="pin-save-form" class="wallet-save-inset" autocomplete="off" novalidate>
-              <label class="wallet-save-field">
-                <span class="form-label">Label</span>
+        <section class="wallet-hub" id="wallet-device-hub" aria-label="Saved cards">
+          <div class="device-hub-group wallet-section" id="wallet-cards-group" data-hub-group="saved">
+            <p class="device-hub-group-label">With signing keys</p>
+            <ul class="list list-compact wallet-card-list" id="wallet-list" hidden></ul>
+            <p id="wallet-empty" class="wallet-empty-state">
+              None yet —
+              <a href="/create/">create</a>, then save on
+              <a href="/created/">/created/</a>.
+            </p>
+          </div>
+
+          <div class="device-hub-group wallet-section" id="wallet-save-group" hidden data-hub-group="save">
+            <p class="device-hub-group-label">From this tab</p>
+            <form id="wallet-save-form" class="wallet-inline-form" autocomplete="off" novalidate>
+              <input
+                class="form-input wallet-inline-input"
+                id="wallet-save-label"
+                type="text"
+                maxlength="48"
+                placeholder="Label"
+                aria-label="Card label"
+              />
+              <button type="submit" class="btn-secondary wallet-inline-btn">Save</button>
+            </form>
+            <p id="wallet-save-status" class="form-status wallet-inline-status" hidden role="status"></p>
+          </div>
+
+          <div class="device-hub-group wallet-section" data-hub-group="pins">
+            <p class="device-hub-group-label">Pinned scans</p>
+            <p class="wallet-section-hint">Bookmarks only — no keys</p>
+            <ul class="list list-compact wallet-pin-list" id="pin-list"></ul>
+            <p id="pins-empty" class="wallet-empty-state" hidden>No pins yet</p>
+
+            <details class="wallet-add-details">
+              <summary class="wallet-add-summary">Add pin</summary>
+              <form id="pin-save-form" class="wallet-inline-form wallet-inline-form-stack" autocomplete="off" novalidate>
                 <input
                   class="form-input"
                   id="pin-save-label"
                   type="text"
                   maxlength="48"
-                  placeholder="Studio door · River"
+                  placeholder="Label"
+                  aria-label="Pin label"
                 />
-              </label>
-              <label class="wallet-save-field">
-                <span class="form-label">Scan link or profile ID</span>
                 <input
                   class="form-input"
                   id="pin-save-url"
@@ -83,85 +84,31 @@
                   inputmode="url"
                   autocapitalize="off"
                   spellcheck="false"
-                  placeholder="https://humanity.llc/c/…?q=qr_…"
+                  placeholder="Scan link or profile ID"
+                  aria-label="Scan link or profile ID"
                 />
-              </label>
-              <button type="submit" class="btn-secondary wallet-save-btn">Pin on this device</button>
-              <p id="pin-save-status" class="form-status" hidden role="status"></p>
-            </form>
-            <p class="form-hint device-pin-hint">
-              No private keys — bookmark a scan page you return to (vouch, check status). Paste a
-              full scan URL or profile ID.
-            </p>
+                <button type="submit" class="btn-secondary wallet-inline-btn-full">Pin</button>
+              </form>
+              <p id="pin-save-status" class="form-status wallet-inline-status" hidden role="status"></p>
+            </details>
           </div>
 
-          <div class="device-hub-group" id="wallet-pins-group" data-hub-group="pins" hidden>
-            <p class="device-hub-group-label">Pinned public cards</p>
-            <p id="pins-empty" class="device-hub-empty" hidden>
-              No pinned scans yet. Add a scan link above.
-            </p>
-            <ul class="list list-compact wallet-pin-list" id="pin-list"></ul>
-          </div>
-
-          <div class="device-hub-group" id="wallet-save-group" hidden data-hub-group="save">
-            <p class="device-hub-group-label">Save signing keys (this tab → this device)</p>
-            <p class="form-hint">
-              Only visible while this tab still holds keys from a recent create. Switching tabs
-              without saving is why Saved cards looks empty.
-            </p>
-            <form id="wallet-save-form" class="wallet-save-inset" autocomplete="off" novalidate>
-              <label class="wallet-save-field">
-                <span class="form-label">Label</span>
-                <input
-                  class="form-input"
-                  id="wallet-save-label"
-                  type="text"
-                  maxlength="48"
-                  placeholder="Personal card"
-                />
-              </label>
-              <button type="submit" class="btn-secondary wallet-save-btn">Save current tab</button>
-              <p id="wallet-save-status" class="form-status" hidden role="status"></p>
-            </form>
-          </div>
-
-          <div class="device-hub-group" id="wallet-cards-group" data-hub-group="saved">
-            <p class="device-hub-group-label">Saved cards</p>
-            <p id="wallet-empty" class="device-hub-empty">
-              No saved cards yet.
-              <a href="/create/">Create one</a> or return after create while keys are still in this tab.
-            </p>
-            <ul class="list list-compact wallet-card-list" id="wallet-list" hidden></ul>
-          </div>
-
-          <details class="settings-disclosure settings-disclosure-info device-hub-disclosure">
-            <summary class="settings-summary">
-              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-              </span>
+          <details class="settings-disclosure settings-disclosure-info wallet-help-details">
+            <summary class="settings-summary wallet-help-summary">
               <span class="settings-summary-text">
-                <span class="settings-summary-title">How vouching works</span>
-                <span class="settings-summary-sub">Use keys → their scan link → Vouch</span>
+                <span class="settings-summary-title">How this works</span>
               </span>
               <span class="list-chevron" aria-hidden="true">›</span>
             </summary>
-            <div class="settings-panel settings-panel-info">
-              <ol class="wallet-how-steps">
-                <li><strong>Use keys</strong> on a saved card (loads signing keys into this tab).</li>
-                <li>Open someone else&rsquo;s <strong>scan link</strong> in this browser.</li>
-                <li>On their scan page, submit your statement under <strong>Vouch</strong>.</li>
-              </ol>
-              <p class="form-hint">
-                You must be a <strong>Vouched Human</strong> or steward. Revoke and updates:
-                <a href="/created/">/created/</a> after activating.
-              </p>
+            <div class="settings-panel settings-panel-info wallet-help-panel">
+              <ul class="wallet-help-list">
+                <li><strong>Save</strong> copies keys from the create tab to this device.</li>
+                <li><strong>Use keys</strong> loads a card so you can vouch or revoke.</li>
+                <li><strong>Pin</strong> saves a scan link to reopen later (↗).</li>
+              </ul>
+              <p class="form-hint">Recovery key ≠ save. Does not sync to other phones.</p>
             </div>
           </details>
-
-          <p class="device-hub-footnote form-warning">
-            Does not sync across devices. Use encrypted backup on
-            <a href="/created/">/created/</a> to move keys. Never save on a shared device.
-          </p>
         </section>
       </main>
     </div>
@@ -175,14 +122,13 @@
           type="search"
           id="device-hub-search"
           class="device-hub-search-input"
-          placeholder="Search my artifacts and public cards"
+          placeholder="Search this device"
           autocomplete="off"
           enterkeyhint="search"
         />
       </label>
-      <p class="device-hub-search-hint">This device only — not the public resolver</p>
     </div>
 
-    <script type="module" src="/js/card-wallet.mjs?v=4"></script>
+    <script type="module" src="/js/card-wallet.mjs?v=5"></script>
   </body>
 </html>

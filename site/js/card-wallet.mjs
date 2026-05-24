@@ -85,7 +85,6 @@ const pinLabel = document.getElementById("pin-save-label");
 const pinUrl = document.getElementById("pin-save-url");
 const pinStatus = document.getElementById("pin-save-status");
 const pinList = document.getElementById("pin-list");
-const pinsGroup = document.getElementById("wallet-pins-group");
 const pinsEmpty = document.getElementById("pins-empty");
 
 let searchQuery = "";
@@ -99,26 +98,21 @@ function setStatus(el, msg, isError = false) {
 
 function renderPinList() {
   const pins = loadPins();
-  if (!pinList || !pinsGroup) return;
+  if (!pinList) return;
   pinList.innerHTML = "";
 
   if (pins.length === 0) {
-    pinsGroup.hidden = true;
-    if (pinsEmpty) {
-      pinsEmpty.hidden = false;
-      pinsEmpty.textContent = "No pinned scans yet. Add a scan link above.";
-    }
+    if (pinsEmpty) pinsEmpty.hidden = false;
     return;
   }
 
-  pinsGroup.hidden = false;
   if (pinsEmpty) pinsEmpty.hidden = true;
 
   for (const pin of pins) {
     const li = document.createElement("li");
     li.className = "wallet-card-item device-pin-item";
     li.dataset.hubSearchable = pinHaystack(pin);
-    const sub = pin.qr_id ? "Opens live scan · new tab" : "Card-level scan · new tab";
+    const sub = pin.qr_id ? "Scan · new tab" : "Card scan · new tab";
     li.innerHTML = `
       <a
         class="wallet-card-main wallet-pin-open"
@@ -136,7 +130,7 @@ function renderPinList() {
         <span class="list-chevron list-chevron-external" aria-hidden="true">↗</span>
       </a>
       <div class="wallet-card-footer">
-        <button type="button" class="wallet-card-footer-btn wallet-pin-remove" data-id="${escapeHtml(pin.id)}">Remove pin</button>
+        <button type="button" class="wallet-card-footer-btn wallet-pin-remove" data-id="${escapeHtml(pin.id)}">Remove</button>
       </div>`;
     pinList.appendChild(li);
   }
@@ -189,7 +183,7 @@ function renderList() {
         <span class="list-chevron" aria-hidden="true">›</span>
       </button>
       <div class="wallet-card-footer">
-        <button type="button" class="wallet-card-footer-btn wallet-remove" data-id="${escapeHtml(entry.id)}">Remove from device</button>
+        <button type="button" class="wallet-card-footer-btn wallet-remove" data-id="${escapeHtml(entry.id)}">Remove</button>
       </div>`;
     listEl.appendChild(li);
   }
@@ -223,15 +217,16 @@ function applyHubSearch() {
   applyDeviceHubSearch(hubEl, searchQuery);
 
   const pins = loadPins();
-  if (pinsEmpty && pins.length > 0) {
-    const anyPin = [...(pinList?.querySelectorAll("[data-hub-searchable]") || [])].some(
-      (el) => !el.hidden
-    );
-    if (searchQuery && !anyPin) {
-      pinsEmpty.hidden = false;
-      pinsEmpty.textContent = "No pinned cards match your search.";
-    } else {
+  if (pinsEmpty) {
+    if (pins.length === 0) {
       pinsEmpty.hidden = true;
+    } else {
+      const anyPin = [...(pinList?.querySelectorAll("[data-hub-searchable]") || [])].some(
+        (el) => !el.hidden
+      );
+      pinsEmpty.hidden = anyPin;
+      pinsEmpty.textContent = searchQuery ? "No matches" : "No pins yet";
+      if (!searchQuery && pins.length > 0) pinsEmpty.hidden = true;
     }
   }
 
