@@ -15,6 +15,11 @@ import {
 } from "./http/resolver";
 import { handlePostArtifactIntent } from "./resolver/artifact-intents";
 import { handleGetCard, handlePostCards } from "./resolver/create-card";
+import {
+  handleGetLiveControlChallenge,
+  handlePostLiveControlChallenge,
+  handlePostLiveControlResponse,
+} from "./resolver/live-control";
 import { handlePostRevoke } from "./resolver/revoke";
 import { handleGetScan } from "./resolver/scan";
 import { handleGetScanStatus } from "./resolver/scan-status";
@@ -76,6 +81,61 @@ export default {
         );
       }
       const res = await handlePostRevoke(request, env.DB, revokeMatch[1]!);
+      return withCors(request, res);
+    }
+
+    const liveChallengeStatusMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/live-control\/challenges\/([^/]+)$/
+    );
+    if (liveChallengeStatusMatch && request.method === "GET") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetLiveControlChallenge(
+        request,
+        env.DB,
+        liveChallengeStatusMatch[1]!,
+        liveChallengeStatusMatch[2]!
+      );
+      return withCors(request, res);
+    }
+
+    const liveChallengeMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/live-control\/challenges$/
+    );
+    if (liveChallengeMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostLiveControlChallenge(
+        request,
+        env.DB,
+        liveChallengeMatch[1]!
+      );
+      return withCors(request, res);
+    }
+
+    const liveResponseMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/live-control\/responses$/
+    );
+    if (liveResponseMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostLiveControlResponse(
+        request,
+        env.DB,
+        liveResponseMatch[1]!
+      );
       return withCors(request, res);
     }
 

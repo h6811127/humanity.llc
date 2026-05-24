@@ -19,3 +19,13 @@ export function generateProfileId(): string {
 export function generateQrId(): string {
   return `qr_${randomBase58(16)}`;
 }
+
+/** lc_ + opaque base58 challenge id for short-lived live control proof. */
+export function generateLiveControlChallengeId(): string {
+  return `lc_${randomBase58(18)}`;
+}
+
+/** Opaque scanner session reference; not a user identifier. */
+export function generateVerifierSessionId(): string {
+  return `vs_${randomBase58(18)}`;
+}

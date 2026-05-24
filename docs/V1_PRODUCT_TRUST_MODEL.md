@@ -132,6 +132,8 @@ Avoid vague claims such as "real person verified" unless the mechanism is shown 
 
 ### Level 3: Live Control Proof
 
+**Alpha implementation:** `docs/M7_LIVE_CONTROL_ALPHA.md`.
+
 **Examples:**
 
 - Scanner requests a short-lived challenge from the card page.

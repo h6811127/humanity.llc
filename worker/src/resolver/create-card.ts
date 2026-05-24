@@ -11,6 +11,7 @@ import {
   clientIp,
   errorResponse,
   jsonResponse,
+  requestOrigin,
   RESOLVER_ORIGIN,
 } from "../http/resolver";
 import { validateHandle } from "../validation/handle";
@@ -32,8 +33,31 @@ function parseCreateBody(body: unknown): CreateCardBody | null {
   };
 }
 
-function qrPayload(profileId: string, qrId: string): string {
-  return `${RESOLVER_ORIGIN}/c/${profileId}?q=${qrId}`;
+function qrPayload(origin: string, profileId: string, qrId: string): string {
+  return `${origin}/c/${profileId}?q=${qrId}`;
+}
+
+function isLocalOrigin(origin: string): boolean {
+  try {
+    const url = new URL(origin);
+    return url.hostname === "localhost" || url.hostname === "127.0.0.1";
+  } catch {
+    return false;
+  }
+}
+
+function expectedQrOrigin(request: Request, payload: unknown): string {
+  const origin = requestOrigin(request);
+  const requestOriginHeader = request.headers.get("Origin") ?? "";
+  if (isLocalOrigin(requestOriginHeader) && typeof payload === "string") {
+    try {
+      const payloadUrl = new URL(payload);
+      if (isLocalOrigin(payloadUrl.origin)) return payloadUrl.origin;
+    } catch {
+      /* Keep canonical validation error below. */
+    }
+  }
+  return origin;
 }
 
 export async function handlePostCards(
@@ -138,7 +162,11 @@ export async function handlePostCards(
     );
   }
 
-  const expectedPayload = qrPayload(profileId, qr.qr_id as string);
+  const expectedPayload = qrPayload(
+    expectedQrOrigin(request, qr.payload),
+    profileId,
+    qr.qr_id as string
+  );
   if (qr.payload !== expectedPayload) {
     return errorResponse(
       "INVALID_QR_PAYLOAD",
