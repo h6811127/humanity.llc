@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light" />
+  <meta name="theme-color" content="#ffffff" />
+  <title>River City Co-op · humanity.llc</title>
+  <meta
+    name="description"
+    content="Demo scan: co-op market pass linking to today's stalls, a live vendor menu, and safe-to-take surplus signed by the kitchen."
+  />
+  <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+  <link rel="stylesheet" href="/scan-pass.css" />
+</head>
+<body>
+  <div class="page scan-page">
+    <header class="top">
+      <a class="top-brand" href="/">
+        <span class="pass-dot" aria-hidden="true"></span>
+        <span>humanity.llc</span>
+      </a>
+    </header>
+
+    <main class="screen scan-screen">
+      <p style="background:#f5f5f7;border-radius:10px;padding:10px 14px;font-size:13px;line-height:1.4;color:#636366;margin-bottom:-6px;">
+        Demo scan · static simulation · not a live card ·
+        <a href="/what-can-a-qr-do/combining-ideas/" style="color:#db1b43;">Markets + menus + surplus</a>
+      </p>
+
+      <p class="section-kicker">Network status</p>
+
+      <p class="scan-bearer-line" role="note">This QR resolves to a Humanity Card. It does not prove the person holding this item is the card owner.</p>
+
+      <section class="pass" aria-label="Humanity Card at scan time">
+        <div class="pass-scene" id="pass-scene">
+          <div class="pass-tilt-wrap" id="pass-tilt-wrap">
+            <div class="pass-flip" id="pass-flip">
+              <div class="pass-inner">
+                <div class="pass-face pass-front">
+                  <div class="pass-tilt-surface" id="pass-tilt-surface">
+                    <div class="pass-head">
+                      <div class="pass-brand">
+                        <span class="pass-dot" aria-hidden="true"></span>
+                        <span>humanity.llc</span>
+                      </div>
+                      <span class="pass-badge badge-live">Active</span>
+                    </div>
+                    <div class="pass-body">
+                      <div class="pass-main">
+                        <p class="pass-type">Status plate</p>
+                        <h1 class="pass-name">River City Co-op</h1>
+                        <p class="pass-manifesto pass-manifesto-status">Saturdays 8–1 · 9 vendors today</p>
+                        <p class="pass-handle-muted">@rivercity.coop</p>
+                        <ul class="pass-trust" aria-label="Status at a glance">
+                          <li class="trust-on">Card active</li>
+                          <li class="trust-on">Registered</li>
+                          <li class="trust-on">QR active</li>
+                        </ul>
+                      </div>
+                      <div class="pass-qr">
+                        <img
+                          src="/assets/red_qr_transparent_bg.png"
+                          width="88"
+                          height="88"
+                          alt="QR code for this card scan link"
+                        />
+                      </div>
+                    </div>
+                    <p class="pass-foot">Scan shows current status for this market — not who owns the pass.</p>
+                  </div>
+                </div>
+                <div class="pass-face pass-back" aria-hidden="true">
+                  <div class="pass-back-accent" aria-hidden="true"></div>
+                  <div class="pass-back-inner">
+                    <div class="pass-head">
+                      <div class="pass-brand">
+                        <span class="pass-dot" aria-hidden="true"></span>
+                        <span>At scan time</span>
+                      </div>
+                      <span class="pass-badge badge-neutral">Flip</span>
+                    </div>
+                    <ul class="pass-back-grid" aria-label="Network facts">
+                      <li>
+                        <span class="pass-back-label">Live</span>
+                        <span class="pass-back-value">status from the operator, not a frozen page</span>
+                      </li>
+                      <li>
+                        <span class="pass-back-label">Revocable</span>
+                        <span class="pass-back-value">per card and per printed-item QR</span>
+                      </li>
+                    </ul>
+                    <p class="pass-foot pass-foot-muted">Limits: open "What this scan does not prove" below.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="pass-flip-btn" id="pass-flip-btn" aria-label="Flip card">
+            Tap to flip
+          </button>
+        </div>
+      </section>
+
+      <div class="scan-trust-groups" aria-label="Network status at scan time">
+
+        <section class="group scan-group scan-group-market">
+          <h2 class="group-label">Today's market · signed by co-op</h2>
+          <ul class="list">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2"/><path d="M12 12v.01"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">9 vendors active today</span>
+                <span class="list-sub">Cheese stall added at 9 AM · market hours 8 AM – 1 PM</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Location · 2nd Ave Plaza</span>
+                <span class="list-sub">Signed by River City Co-op · organizer-issued stalls for today</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">One state object per vendor</span>
+                <span class="list-sub">Vendor updates their stall status · no reprint needed</span>
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="group scan-group scan-group-menu">
+          <h2 class="group-label">River City Tacos · signed by vendor</h2>
+          <ul class="list">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Carnitas · sold out</span>
+                <span class="list-sub">Updated 10:45 AM · allergens: pork, wheat</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Birria tacos · open</span>
+                <span class="list-sub">Allergens: wheat · beef · serving now</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Moved to 4th &amp; Elm lot after 11 AM</span>
+                <span class="list-sub">Signed by vendor · same QR still valid at new location</span>
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="group scan-group scan-group-surplus">
+          <h2 class="group-label">Surplus tonight · signed by vendor</h2>
+          <ul class="list">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><path d="M6 1v3"/><path d="M10 1v3"/><path d="M14 1v3"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Posole pot · safe to take</span>
+                <span class="list-sub">Tagged 6:15 PM · expires 8 PM · allergens: wheat, pork</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M18 12h4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Freshness signed by kitchen · not by co-op</span>
+                <span class="list-sub">Authority stays clear — vendor signs food, co-op signs stall assignment</span>
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="group scan-group scan-group-qr">
+          <h2 class="group-label">This QR</h2>
+          <ul class="list">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">QR active · co-op market pass</span>
+                <span class="list-sub">Card-scoped credential</span>
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h4"/><path d="M7 13h6"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Credential</span>
+                <span class="list-sub">qr_rivercity_coop_pass_01</span>
+              </span>
+            </li>
+          </ul>
+        </section>
+
+      </div>
+
+      <details class="scan-limits-settings">
+        <summary class="scan-limits-summary">
+          <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </span>
+          <span class="scan-limits-summary-text">
+            <span class="scan-limits-summary-title">What this scan does not prove</span>
+            <span class="scan-limits-summary-sub">Tap for ownership, ID, KYC, employment, and age</span>
+          </span>
+          <span class="list-chevron" aria-hidden="true">›</span>
+        </summary>
+        <div class="scan-limits-panel">
+          <ul class="scan-limits-list">
+            <li>Legal identity, government ID, KYC, or background checks</li>
+            <li>Employment eligibility, age verification, or a hidden trust score</li>
+            <li>That social vouches were honest or complete</li>
+            <li>Permanent ownership of a physical item</li>
+            <li>Who scanned, when, or where — this page returns object state, not a people trail</li>
+            <li>That the person holding this pass is a co-op member</li>
+          </ul>
+          <p class="scan-limits-meta">No scan analytics on this page. <a href="/data-policy.html">Operator data policy</a></p>
+        </div>
+      </details>
+
+      <div class="scan-footer">
+        <a class="scan-footer-link" href="/what-can-a-qr-do/combining-ideas/">
+          ← Back to combining ideas
+        </a>
+        <a class="scan-footer-link" href="/what-can-a-qr-do/local-economies/">
+          Learn about local economies
+        </a>
+        <a class="scan-footer-link" href="/what-can-a-qr-do/live-menus/">
+          Learn about live menus
+        </a>
+      </div>
+    </main>
+  </div>
+  <script src="/js/pass-flip.js"></script>
+</body>
+</html>
