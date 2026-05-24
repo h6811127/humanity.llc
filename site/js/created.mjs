@@ -13,6 +13,7 @@ import { initKeyBackupUi } from "./key-backup-ui.mjs";
 import { initRecoveryKeyUi } from "./recovery-key-ui.mjs";
 import { initManifestoUpdate } from "./created-manifesto-update.mjs";
 import { inferPilotTemplate } from "./manifesto-display.mjs";
+import { initCreatedTabs } from "./created-tabs.mjs";
 
 const params = new URLSearchParams(location.search);
 const profileIdParam = params.get("profile_id")?.trim() || null;
@@ -85,12 +86,15 @@ const networkCardStatusEl = document.getElementById("network-card-status");
 const networkQrExpiresEl = document.getElementById("network-qr-expires");
 const jsonLink = document.getElementById("card-json-link");
 const revokeDetails = document.getElementById("revoke-details");
-const ownerActionsEl = document.getElementById("created-owner-actions");
+const copyProfileIdBtn = document.getElementById("copy-profile-id");
 const statusPlateTipEl = document.getElementById("created-status-plate-tip");
 const lostItemTipEl = document.getElementById("created-lost-item-tip");
 
+let createdTabs = null;
+
 function revealOwnerActions() {
-  if (ownerActionsEl) ownerActionsEl.hidden = false;
+  createdTabs?.select("manage");
+  if (revokeDetails && !revokeDetails.open) revokeDetails.open = true;
 }
 
 function currentSigningKeys() {
@@ -377,8 +381,22 @@ if (data?.manifesto_line) {
 
 if (profileId) {
   profileIdEl.textContent = profileId;
-  jsonLink.href = getCardJsonUrl(profileId);
-} else {
+  if (jsonLink) jsonLink.href = getCardJsonUrl(profileId);
+  if (copyProfileIdBtn) {
+    copyProfileIdBtn.hidden = false;
+    copyProfileIdBtn.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(profileId);
+        copyProfileIdBtn.textContent = "Copied";
+        setTimeout(() => {
+          copyProfileIdBtn.textContent = "Copy";
+        }, 2000);
+      } catch {
+        copyProfileIdBtn.textContent = "Select ID";
+      }
+    };
+  }
+} else if (jsonLink) {
   jsonLink.removeAttribute("href");
 }
 
@@ -456,6 +474,7 @@ if (scanUrl) {
     openScanBtn.addEventListener("click", () => {
       markLoopDone("scan");
       setLoopStep("revoke");
+      createdTabs?.select("manage");
       if (revokeDetails && !revokeDetails.open) {
         revokeDetails.open = true;
       }
@@ -581,6 +600,8 @@ async function bootstrapOwnerTools() {
     revealOwnerActions();
   }
 }
+
+createdTabs = initCreatedTabs();
 
 if (profileId && qrId) {
   void bootstrapOwnerTools();

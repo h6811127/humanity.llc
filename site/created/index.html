@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Your live object · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=49" />
+    <link rel="stylesheet" href="/styles.css?v=51" />
   </head>
   <body>
     <div class="page">
@@ -48,569 +48,602 @@
           </div>
         </section>
 
-        <p class="created-primitive">
-          This QR is not just a link. It resolves to <strong>current object state</strong> on the
-          network — active, expired, revoked, or disabled — when someone scans. Printing deploys the
-          object; you change its rules later.
-        </p>
+        <nav class="created-tabs" role="tablist" aria-label="Owner tools">
+          <button
+            type="button"
+            class="created-tab-btn is-active"
+            role="tab"
+            aria-selected="true"
+            data-created-tab="now"
+            id="created-tab-btn-now"
+          >
+            Now
+          </button>
+          <button
+            type="button"
+            class="created-tab-btn"
+            role="tab"
+            aria-selected="false"
+            data-created-tab="manage"
+            id="created-tab-btn-manage"
+          >
+            Manage
+          </button>
+          <button
+            type="button"
+            class="created-tab-btn"
+            role="tab"
+            aria-selected="false"
+            data-created-tab="help"
+            id="created-tab-btn-help"
+          >
+            Help
+          </button>
+        </nav>
 
-        <section class="created-loop" id="created-loop" aria-label="Try the loop" hidden>
-          <h2 class="created-loop-title">Try the loop</h2>
-          <ol class="created-loop-steps">
-            <li class="created-loop-step is-current" data-step="live">
-              <span class="created-loop-num">1</span>
-              <span class="created-loop-label">Your QR is live</span>
-            </li>
-            <li class="created-loop-step" data-step="scan">
-              <span class="created-loop-num">2</span>
-              <span class="created-loop-label">Scan it</span>
-            </li>
-            <li class="created-loop-step" data-step="revoke">
-              <span class="created-loop-num">3</span>
-              <span class="created-loop-label">Revoke it</span>
-            </li>
-            <li class="created-loop-step" data-step="scan-again">
-              <span class="created-loop-num">4</span>
-              <span class="created-loop-label">Scan again</span>
-            </li>
-          </ol>
-        </section>
+        <!-- ——— Now: deploy, status, QR ——— -->
+        <div class="created-tab-panel" data-created-panel="now" id="created-tab-now" role="tabpanel" aria-labelledby="created-tab-btn-now">
+          <section class="group created-status-group" aria-label="Live on network">
+            <h2 class="group-label">On the network</h2>
+            <ul class="list list-compact created-status-strip">
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Card</span>
+                  <span class="list-sub" id="network-card-status">Active</span>
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Verification</span>
+                  <span class="list-sub" id="card-status">Registered</span>
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">This QR valid until</span>
+                  <span class="list-sub" id="network-qr-expires">—</span>
+                </span>
+              </li>
+              <li class="list-row created-status-profile">
+                <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9h16"/><path d="M4 15h16"/><path d="M10 3 8 21"/><path d="M16 3 14 21"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Profile ID</span>
+                  <span class="list-sub mono" id="profile-id">—</span>
+                </span>
+                <button type="button" class="created-copy-id" id="copy-profile-id" hidden aria-label="Copy profile ID">
+                  Copy
+                </button>
+              </li>
+            </ul>
+          </section>
 
-        <section class="group created-qr-hero" id="created-qr-section">
-          <h2 class="group-label">Your scan QR</h2>
-          <div class="qr-box qr-box-hero">
-            <img id="qr-img" width="220" height="220" alt="" />
-          </div>
-          <div class="created-scan-actions">
-            <a
-              class="btn-primary"
-              id="open-scan"
-              href="#"
-              target="_blank"
-              rel="noopener noreferrer"
-              hidden
-            >
-              Open scan page
-            </a>
-            <button type="button" class="btn-secondary" id="download-qr" disabled>
-              Download QR image
-            </button>
-            <button type="button" class="btn-secondary" id="copy-scan">Copy scan link</button>
-          </div>
-          <details class="created-print-tip">
-            <summary>Print from your phone</summary>
-            <ol class="created-print-steps">
-              <li>Download the QR image above.</li>
-              <li>Open it in Photos or Files.</li>
-              <li>
-                Share → Print (iPhone) or ⋮ → Print (Android). For a sticker, use label paper or
-                tape the printout.
+          <section class="created-loop" id="created-loop" aria-label="Try the loop" hidden>
+            <h2 class="created-loop-title">Try the loop</h2>
+            <ol class="created-loop-steps">
+              <li class="created-loop-step is-current" data-step="live">
+                <span class="created-loop-num">1</span>
+                <span class="created-loop-label">Your QR is live</span>
+              </li>
+              <li class="created-loop-step" data-step="scan">
+                <span class="created-loop-num">2</span>
+                <span class="created-loop-label">Scan it</span>
+              </li>
+              <li class="created-loop-step" data-step="revoke">
+                <span class="created-loop-num">3</span>
+                <span class="created-loop-label">Revoke it</span>
+              </li>
+              <li class="created-loop-step" data-step="scan-again">
+                <span class="created-loop-num">4</span>
+                <span class="created-loop-label">Scan again</span>
               </li>
             </ol>
-          </details>
-          <p class="mono-link mono-link-compact" id="scan-url" hidden></p>
-        </section>
+          </section>
 
-
-        <section class="created-what-now" id="created-status-plate-tip" hidden>
-          <h2 class="created-what-now-title">Status plate pilot</h2>
-          <p class="created-what-now-body">
-            Print and mount on a door or wall. Scanners see your <strong>object name</strong> and
-            <strong>status line</strong> — not a generic profile page.
-          </p>
-        </section>
-
-        <section class="created-what-now" id="created-lost-item-tip" hidden>
-          <h2 class="created-what-now-title">Lost item relay pilot</h2>
-          <p class="created-what-now-body">
-            Attach the QR to the item or a tag. Finders see <strong>what it is</strong> and your
-            <strong>return message</strong> — scan does not prove who is holding it. Revoke when
-            recovered.
-          </p>
-        </section>
-
-        <details
-          class="settings-disclosure settings-disclosure-action"
-          id="manifesto-update-panel"
-          hidden
-        >
-          <summary class="settings-summary">
-            <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            </span>
-            <span class="settings-summary-text">
-              <span class="settings-summary-title">Update public line</span>
-              <span class="settings-summary-sub">Same QR — new manifesto on the network</span>
-            </span>
-            <span class="list-chevron" aria-hidden="true">›</span>
-          </summary>
-          <div class="settings-panel settings-panel-action">
-            <p class="form-hint">
-              Sign an updated card document with your owner or recovery key. Scanners see the new
-              line on the next fetch — no reprint.
-            </p>
-            <form id="manifesto-update-form" class="compact-form" novalidate>
-              <div id="update-fields-status-plate" hidden>
-                <label class="form-label" for="update-object-label">Object name</label>
-                <input class="form-input" id="update-object-label" type="text" maxlength="120" />
-                <label class="form-label" for="update-status-line">Status line</label>
-                <input class="form-input" id="update-status-line" type="text" maxlength="160" />
-              </div>
-              <div id="update-fields-lost-item" hidden>
-                <label class="form-label" for="update-relay-item">What is lost?</label>
-                <input class="form-input" id="update-relay-item" type="text" maxlength="120" />
-                <label class="form-label" for="update-relay-message">Return message</label>
-                <textarea
-                  class="form-input form-textarea"
-                  id="update-relay-message"
-                  rows="3"
-                  maxlength="160"
-                ></textarea>
-              </div>
-              <div id="update-fields-general">
-                <label class="form-label" for="update-manifesto-general">Public line</label>
-                <textarea
-                  class="form-input form-textarea"
-                  id="update-manifesto-general"
-                  rows="3"
-                  maxlength="280"
-                ></textarea>
-              </div>
-              <button type="submit" class="btn-primary" id="manifesto-update-submit">
-                Publish update
-              </button>
-            </form>
-            <p class="form-status" id="manifesto-update-status" hidden role="status"></p>
-          </div>
-        </details>
-
-        <section class="created-what-now" aria-labelledby="what-now-title">
-          <h2 class="created-what-now-title" id="what-now-title">What to do now</h2>
-          <p class="created-what-now-body" id="created-what-now-body">
-            Before you close this tab, save your recovery key and/or download an encrypted backup.
-            Then print the QR, scan it from another phone, revoke it under
-            <strong>Revoke this QR</strong>, and scan again to see live state change.
-          </p>
-          <p class="created-what-now-more">
-            <a href="/what-can-a-qr-do.html">What can a QR do?</a> — ideas for benches, games,
-            civic nodes, and more once your mark is live.
-          </p>
-        </section>
-
-        <section class="recovery-reveal-card" id="organizer-reveal" hidden>
-          <div class="recovery-reveal-header">
-            <span class="recovery-reveal-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </span>
-            <div class="recovery-reveal-heading">
-              <h2 class="recovery-reveal-title">Hand off organizer revoke key</h2>
-              <p class="recovery-reveal-sub">
-                Give this private key to your coalition once. They can kill a compromised flyer batch
-                at <a id="organizer-revoke-link-inline" href="/organizer-revoke/">/organizer-revoke/</a>
-                — not the owner revoke screen.
-              </p>
+          <section class="group created-qr-hero" id="created-qr-section">
+            <h2 class="group-label">Your scan QR</h2>
+            <div class="qr-box qr-box-hero">
+              <img id="qr-img" width="220" height="220" alt="" />
             </div>
-          </div>
-          <p class="mono-link" id="organizer-key-display"></p>
-          <button type="button" class="btn-secondary" id="copy-organizer-key">Copy organizer key</button>
-        </section>
-
-        <section class="recovery-reveal-card" id="recovery-reveal" hidden>
-          <div class="recovery-reveal-header">
-            <span class="recovery-reveal-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-            </span>
-            <div class="recovery-reveal-heading">
-              <h2 class="recovery-reveal-title">Save your recovery key</h2>
-              <p class="recovery-reveal-sub">
-                One-time step. Store it in a password manager or on paper before you continue.
-              </p>
-            </div>
-          </div>
-          <div class="recovery-reveal-body">
-            <p class="recovery-reveal-note">
-              If you lose this tab and skip backup, this key is the only way to revoke without
-              creating a new card.
-            </p>
-            <p class="mono recovery-key-display" id="recovery-key-display"></p>
-            <button type="button" class="btn-secondary" id="copy-recovery-key">Copy recovery key</button>
-            <label class="revoke-confirm revoke-confirm-spaced">
-              <input type="checkbox" id="recovery-reveal-confirm" />
-              <span>I saved this recovery key</span>
-            </label>
-            <button type="button" class="btn-primary" id="recovery-reveal-dismiss" disabled>
-              Continue
-            </button>
-          </div>
-        </section>
-
-        <section class="created-revoke-rules" id="revoke-rules" aria-labelledby="revoke-rules-title">
-          <h2 class="created-revoke-rules-title" id="revoke-rules-title">Object lifecycle</h2>
-          <p class="created-revoke-rules-lead">
-            Revoke is not “delete the sticker.” It is one <strong>state transition</strong> after
-            the object is in the world — same idea as expiry or (later) claimed or recovered.
-            Humanity stores <strong>object state</strong>, not who scanned.
-          </p>
-          <ul class="created-revoke-rules-list">
-            <li>
-              <strong>Active</strong> — scan shows live manifesto or pilot layout (status plate,
-              lost item, etc.).
-            </li>
-            <li>
-              <strong>Expiry</strong> — time runs out on this credential (set at create). Scan shows
-              expired; you can still revoke early.
-            </li>
-            <li>
-              <strong>Revoke this QR</strong> — one pointer turns off. Other QRs on the same card
-              can stay active.
-            </li>
-            <li>
-              <strong>Disable card</strong> — whole profile offline; every active QR stops
-              resolving as active.
-            </li>
-            <li>
-              <strong>Organizer revoke</strong> — coalition key registered at create;
-              <a id="organizer-revoke-link" href="/organizer-revoke/">organizer revoke</a> without
-              your owner key.
-            </li>
-          </ul>
-          <p class="form-hint revoke-id-warning">
-            Printed QRs always keep profile ID and QR ID in the URL. Transitions change what the
-            resolver returns — not the ink.
-          </p>
-          <p class="form-hint">
-            Future transitions (after next scan, claimed, redirect) stay object-state-only — no
-            scan tracking on the operator.
-          </p>
-        </section>
-
-        <details class="settings-disclosure settings-disclosure-action" id="revoke-details">
-          <summary class="settings-summary">
-            <span class="list-icon list-icon-tone-red" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h4"/><path d="M7 13h6"/><path d="m4 4 16 16"/></svg>
-            </span>
-            <span class="settings-summary-text">
-              <span class="settings-summary-title">Revoke this QR</span>
-              <span class="settings-summary-sub" id="revoke-summary-sub">Step 3 in the loop</span>
-            </span>
-            <span class="list-chevron" aria-hidden="true">›</span>
-          </summary>
-          <div class="settings-panel settings-panel-action">
-            <div class="owner-network-status" id="owner-network-status" aria-live="polite">
-              <p class="owner-network-status-kicker">Live scan answer</p>
-              <p class="owner-network-status-lead">
-                This is what anyone scanning your QR sees on the network <strong>right now</strong> —
-                fetched from the resolver, not guessed from this tab.
-              </p>
-              <ul class="list list-compact owner-network-status-rows">
-                <li class="list-row">
-                  <span class="list-icon list-icon-tone-green" id="owner-status-card-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
-                  </span>
-                  <span class="list-content">
-                    <span class="list-title">Card</span>
-                    <span class="list-sub" id="owner-status-card">Checking…</span>
-                  </span>
-                </li>
-                <li class="list-row">
-                  <span class="list-icon list-icon-tone-green" id="owner-status-qr-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
-                  </span>
-                  <span class="list-content">
-                    <span class="list-title">This QR</span>
-                    <span class="list-sub" id="owner-status-qr">Checking…</span>
-                  </span>
-                </li>
-                <li class="list-row">
-                  <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                  </span>
-                  <span class="list-content">
-                    <span class="list-title">Human trust</span>
-                    <span class="list-sub" id="owner-status-verification">Checking…</span>
-                  </span>
-                </li>
-              </ul>
-              <p class="owner-network-status-hint" id="owner-network-status-hint"></p>
-              <a class="owner-network-scan-link" id="owner-network-scan-link" href="#" target="_blank" rel="noopener noreferrer" hidden>
-                Open scan page (what others see)
+            <div class="created-scan-actions">
+              <a
+                class="btn-primary"
+                id="open-scan"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                hidden
+              >
+                Open scan page
               </a>
+              <button type="button" class="btn-secondary" id="download-qr" disabled>
+                Download QR image
+              </button>
+              <button type="button" class="btn-secondary" id="copy-scan">Copy scan link</button>
             </div>
-            <p class="form-warning owner-revoked-banner" id="owner-revoked-banner" hidden></p>
-            <p class="form-hint" id="owner-no-key">
-              This page cannot sign until it has an owner or recovery key in this browser. Unlock a
-              saved backup or recovery key below, or create again on <a href="/create/">/create/</a>.
-              humanity.llc cannot revoke for you.
+            <details class="created-print-tip">
+              <summary>Print from your phone</summary>
+              <ol class="created-print-steps">
+                <li>Download the QR image above.</li>
+                <li>Open it in Photos or Files.</li>
+                <li>
+                  Share → Print (iPhone) or ⋮ → Print (Android). For a sticker, use label paper or
+                  tape the printout.
+                </li>
+              </ol>
+            </details>
+            <p class="mono-link mono-link-compact" id="scan-url" hidden></p>
+          </section>
+
+          <section class="created-what-now created-what-now-compact" id="created-status-plate-tip" hidden>
+            <h2 class="created-what-now-title">Status plate</h2>
+            <p class="created-what-now-body">
+              Mount on a door or wall. Scanners see <strong>object name</strong> and
+              <strong>status line</strong>. Change the line under <strong>Manage</strong> without
+              reprinting.
             </p>
+          </section>
 
-            <div id="revoke-actions" hidden>
-              <div id="revoke-qr-block">
-                <p class="form-hint revoke-id-warning">
-                  The QR code still contains its QR ID and profile ID in the URL. Revoking
-                  changes live network status, not the physical sticker or photo.
-                </p>
-                <label class="revoke-confirm">
-                  <input type="checkbox" id="confirm-revoke-qr" />
-                  <span>I understand and want to revoke this scan QR only</span>
-                </label>
-                <button type="button" class="btn-danger" id="revoke-qr-btn" disabled>
-                  Revoke this QR
-                </button>
-              </div>
+          <section class="created-what-now created-what-now-compact" id="created-lost-item-tip" hidden>
+            <h2 class="created-what-now-title">Lost item relay</h2>
+            <p class="created-what-now-body">
+              Tag the item. Finders see what it is and your return message — not your phone number.
+              Revoke when recovered under <strong>Manage</strong>.
+            </p>
+          </section>
 
-              <div id="revoke-card-block">
-                <p class="form-hint revoke-id-warning revoke-confirm-spaced">
-                  Card details will no longer be viewable on scan. All active QRs on this card
-                  will stop resolving as active. Profile ID and QR IDs remain on anything already
-                  printed or shared.
+          <section class="recovery-reveal-card" id="recovery-reveal" hidden>
+            <div class="recovery-reveal-header">
+              <span class="recovery-reveal-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+              </span>
+              <div class="recovery-reveal-heading">
+                <h2 class="recovery-reveal-title">Save your recovery key</h2>
+                <p class="recovery-reveal-sub">
+                  One-time step before you close this tab.
                 </p>
-                <label class="revoke-confirm revoke-confirm-spaced">
-                  <input type="checkbox" id="confirm-revoke-card" />
-                  <span>I understand and want to disable this card</span>
-                </label>
-                <button type="button" class="btn-danger btn-danger-solid" id="revoke-card-btn" disabled>
-                  Disable card
-                </button>
               </div>
             </div>
-            <p class="form-status" id="revoke-status" hidden></p>
-          </div>
-        </details>
+            <div class="recovery-reveal-body">
+              <p class="recovery-reveal-note">
+                Without this key or an encrypted backup, this browser cannot sign revoke or updates
+                later.
+              </p>
+              <p class="mono recovery-key-display" id="recovery-key-display"></p>
+              <button type="button" class="btn-secondary" id="copy-recovery-key">Copy recovery key</button>
+              <label class="revoke-confirm revoke-confirm-spaced">
+                <input type="checkbox" id="recovery-reveal-confirm" />
+                <span>I saved this recovery key</span>
+              </label>
+              <button type="button" class="btn-primary" id="recovery-reveal-dismiss" disabled>
+                Continue
+              </button>
+            </div>
+          </section>
 
-        <div class="created-owner-actions" id="created-owner-actions" hidden>
-          <p class="settings-actions-label">More options</p>
+          <section class="created-checklist" aria-labelledby="checklist-title">
+            <h2 class="created-checklist-title" id="checklist-title">Next steps</h2>
+            <ol class="created-checklist-steps">
+              <li>Save your recovery key above (or encrypted backup under <strong>Manage</strong>).</li>
+              <li>Print the QR and <strong>Open scan page</strong> from another phone.</li>
+              <li>
+                Under <strong>Manage → Revoke this QR</strong>, pull trust back, then scan again to
+                see revoked state.
+              </li>
+            </ol>
+          </section>
+        </div>
 
-          <details class="settings-disclosure settings-disclosure-action" id="vouch-revoke-details" hidden>
+        <!-- ——— Manage: update, revoke, keys ——— -->
+        <div class="created-tab-panel" data-created-panel="manage" id="created-tab-manage" role="tabpanel" aria-labelledby="created-tab-btn-manage" hidden>
+          <p class="created-tab-lead">
+            Update copy, revoke, or unlock keys. Same printed QR — you change resolver state, not
+            the sticker.
+          </p>
+
+          <details
+            class="settings-disclosure settings-disclosure-action"
+            id="manifesto-update-panel"
+            hidden
+          >
             <summary class="settings-summary">
-              <span class="list-icon list-icon-tone-orange" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
               </span>
               <span class="settings-summary-text">
-                <span class="settings-summary-title">Vouches you gave</span>
-                <span class="settings-summary-sub">Revoke a mistaken attestation</span>
+                <span class="settings-summary-title">Update public line</span>
+                <span class="settings-summary-sub">Same QR — new text on the network</span>
               </span>
               <span class="list-chevron" aria-hidden="true">›</span>
             </summary>
             <div class="settings-panel settings-panel-action">
               <p class="form-hint">
-                Vouches are public and revocable. Revoking removes your attestation from the
-                vouchee's count immediately. Re-vouching later still counts toward your yearly
-                quota.
+                Sign an updated card with your owner or recovery key. Scanners see the new line on
+                the next fetch.
               </p>
-              <p class="form-hint" id="vouch-revoke-no-key" hidden>
-                Unlock your signing key below to revoke a vouch from this session.
-              </p>
-              <p class="form-hint" id="issued-vouch-empty" hidden></p>
-              <ul class="issued-vouch-list" id="issued-vouch-list"></ul>
-              <p class="form-status" id="vouch-revoke-status" hidden></p>
+              <form id="manifesto-update-form" class="compact-form" novalidate>
+                <div id="update-fields-status-plate" hidden>
+                  <label class="form-label" for="update-object-label">Object name</label>
+                  <input class="form-input" id="update-object-label" type="text" maxlength="120" />
+                  <label class="form-label" for="update-status-line">Status line</label>
+                  <input class="form-input" id="update-status-line" type="text" maxlength="160" />
+                </div>
+                <div id="update-fields-lost-item" hidden>
+                  <label class="form-label" for="update-relay-item">What is lost?</label>
+                  <input class="form-input" id="update-relay-item" type="text" maxlength="120" />
+                  <label class="form-label" for="update-relay-message">Return message</label>
+                  <textarea
+                    class="form-input form-textarea"
+                    id="update-relay-message"
+                    rows="3"
+                    maxlength="160"
+                  ></textarea>
+                </div>
+                <div id="update-fields-general">
+                  <label class="form-label" for="update-manifesto-general">Public line</label>
+                  <textarea
+                    class="form-input form-textarea"
+                    id="update-manifesto-general"
+                    rows="3"
+                    maxlength="280"
+                  ></textarea>
+                </div>
+                <button type="submit" class="btn-primary" id="manifesto-update-submit">
+                  Publish update
+                </button>
+              </form>
+              <p class="form-status" id="manifesto-update-status" hidden role="status"></p>
             </div>
           </details>
 
-          <details class="settings-disclosure settings-disclosure-info" id="key-help-details">
+          <details class="settings-disclosure settings-disclosure-action" id="revoke-details" open>
             <summary class="settings-summary">
-              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+              <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h4"/><path d="M7 13h6"/><path d="m4 4 16 16"/></svg>
               </span>
               <span class="settings-summary-text">
-                <span class="settings-summary-title">Your signing key</span>
-                <span class="settings-summary-sub">Read only · password managers · this tab</span>
-              </span>
-              <span class="list-chevron" aria-hidden="true">›</span>
-            </summary>
-            <div class="settings-panel">
-              <p>
-                Your card is controlled by a <strong>private signing key</strong> generated in this
-                browser. It never uploads to humanity.llc. The network only sees
-                <strong>signed</strong> actions (like revoke).
-              </p>
-              <ul class="settings-list">
-                <li>
-                  <strong>This browser tab</strong> keeps the key until you close it or clear site
-                  data. Add to Home Screen does not save the key.
-                </li>
-                <li>
-                  <strong>Recovery key</strong> (shown once at create) or <strong>encrypted backup</strong>
-                  (below) lets you unlock this page later from another device. humanity.llc does
-                  not hold either secret.
-                </li>
-                <li>
-                  <strong>iPhone (Passwords)</strong> or <strong>Android (Google Password Manager)</strong>:
-                  save the backup passphrase as a secure note or login entry for
-                  <code>humanity.llc backup</code>. When importing, tap the passphrase field and
-                  pick that entry. Autofill often fills the wrong field or leaves it empty.
-                </li>
-                <li>
-                  Do not store the <code>.hcbackup.json</code> file in a shared folder without
-                  understanding anyone with the file can try to guess your passphrase.
-                </li>
-              </ul>
-            </div>
-          </details>
-
-          <details class="settings-disclosure settings-disclosure-action" id="backup-details">
-            <summary class="settings-summary">
-              <span class="list-icon list-icon-tone-purple" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
-              </span>
-              <span class="settings-summary-text">
-                <span class="settings-summary-title">Encrypted backup</span>
-                <span class="settings-summary-sub">Download · import on another device</span>
+                <span class="settings-summary-title">Revoke this QR</span>
+                <span class="settings-summary-sub" id="revoke-summary-sub">Turn off this scan pointer</span>
               </span>
               <span class="list-chevron" aria-hidden="true">›</span>
             </summary>
             <div class="settings-panel settings-panel-action">
-              <div id="backup-export-block" hidden>
-                <p class="form-hint">
-                  Available only while this tab still has your owner key from create. The backup
-                  file downloads to your device; it is not uploaded to humanity.llc.
+              <div class="owner-network-status" id="owner-network-status" aria-live="polite">
+                <p class="owner-network-status-kicker">Resolver check</p>
+                <p class="owner-network-status-lead">
+                  What scanners see <strong>right now</strong> — fetched live, not guessed from this tab.
                 </p>
-                <p class="form-hint">
-                  Passphrase is never sent to humanity.llc. If you lose it, the backup file is
-                  useless and we cannot reset it.
-                </p>
-                <form id="export-backup-form" class="compact-form" autocomplete="off" novalidate>
-                  <label class="form-label" for="export-passphrase">New backup passphrase</label>
-                  <input
-                    class="form-input"
-                    id="export-passphrase"
-                    name="passphrase"
-                    type="password"
-                    autocomplete="new-password"
-                    minlength="12"
-                    required
-                  />
-                  <label class="form-label" for="export-passphrase-confirm">Confirm</label>
-                  <input
-                    class="form-input"
-                    id="export-passphrase-confirm"
-                    name="passphrase_confirm"
-                    type="password"
-                    autocomplete="new-password"
-                    minlength="12"
-                    required
-                  />
-                  <button type="submit" class="btn-secondary">Download backup file</button>
-                </form>
-                <p class="form-status" id="export-backup-status" hidden></p>
+                <ul class="list list-compact owner-network-status-rows">
+                  <li class="list-row">
+                    <span class="list-icon list-icon-tone-green" id="owner-status-card-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+                    </span>
+                    <span class="list-content">
+                      <span class="list-title">Card</span>
+                      <span class="list-sub" id="owner-status-card">Checking…</span>
+                    </span>
+                  </li>
+                  <li class="list-row">
+                    <span class="list-icon list-icon-tone-green" id="owner-status-qr-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+                    </span>
+                    <span class="list-content">
+                      <span class="list-title">This QR</span>
+                      <span class="list-sub" id="owner-status-qr">Checking…</span>
+                    </span>
+                  </li>
+                  <li class="list-row">
+                    <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </span>
+                    <span class="list-content">
+                      <span class="list-title">Human trust</span>
+                      <span class="list-sub" id="owner-status-verification">Checking…</span>
+                    </span>
+                  </li>
+                </ul>
+                <p class="owner-network-status-hint" id="owner-network-status-hint"></p>
+                <a class="owner-network-scan-link" id="owner-network-scan-link" href="#" target="_blank" rel="noopener noreferrer" hidden>
+                  Open scan page
+                </a>
               </div>
+              <p class="form-warning owner-revoked-banner" id="owner-revoked-banner" hidden></p>
+              <p class="form-hint" id="owner-no-key">
+                Unlock a saved backup or recovery key below, or create again on
+                <a href="/create/">/create/</a>. humanity.llc cannot revoke for you.
+              </p>
 
-              <p class="form-hint backup-divider-label">Lost this tab?</p>
-              <form id="import-recovery-form" class="compact-form" novalidate>
-                <label class="form-label" for="import-recovery-key">Recovery private key</label>
-                <textarea
-                  class="form-input form-textarea"
-                  id="import-recovery-key"
-                  name="recovery_key"
-                  rows="3"
-                  placeholder="Paste the recovery key you saved at create"
-                  autocomplete="off"
-                  required
-                ></textarea>
-                <button type="submit" class="btn-secondary">Unlock with recovery key</button>
-              </form>
-              <p class="form-status" id="import-recovery-status" hidden></p>
+              <div id="revoke-actions" hidden>
+                <div id="revoke-qr-block">
+                  <p class="form-hint revoke-id-warning">
+                    Revoking changes live network status, not the physical sticker.
+                  </p>
+                  <label class="revoke-confirm">
+                    <input type="checkbox" id="confirm-revoke-qr" />
+                    <span>I understand — revoke this scan QR only</span>
+                  </label>
+                  <button type="button" class="btn-danger" id="revoke-qr-btn" disabled>
+                    Revoke this QR
+                  </button>
+                </div>
 
-              <p class="form-hint backup-divider-label">Have encrypted backup?</p>
-              <form id="import-backup-form" class="compact-form" novalidate>
-                <label class="form-label" for="import-backup-file">Backup file</label>
-                <input
-                  class="form-input"
-                  id="import-backup-file"
-                  name="backup_file"
-                  type="file"
-                  accept=".json,.hcbackup,application/json"
-                  required
-                />
-                <label class="form-label" for="import-passphrase">Backup passphrase</label>
-                <input
-                  class="form-input"
-                  id="import-passphrase"
-                  name="passphrase"
-                  type="password"
-                  autocomplete="off"
-                  minlength="12"
-                  required
-                  placeholder="Same passphrase used when downloading"
-                />
-                <button type="submit" class="btn-secondary">Unlock for revoke</button>
-              </form>
-              <p class="form-status" id="import-backup-status" hidden></p>
+                <div id="revoke-card-block">
+                  <p class="form-hint revoke-id-warning revoke-confirm-spaced">
+                    Disabling the card stops every active QR on this profile.
+                  </p>
+                  <label class="revoke-confirm revoke-confirm-spaced">
+                    <input type="checkbox" id="confirm-revoke-card" />
+                    <span>I understand — disable this card</span>
+                  </label>
+                  <button type="button" class="btn-danger btn-danger-solid" id="revoke-card-btn" disabled>
+                    Disable card
+                  </button>
+                </div>
+              </div>
+              <p class="form-status" id="revoke-status" hidden></p>
             </div>
           </details>
 
-          <details class="settings-disclosure settings-disclosure-info" id="network-details">
-            <summary class="settings-summary">
-              <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+          <div class="created-manage-tools" id="created-owner-actions">
+            <details class="settings-disclosure settings-disclosure-action" id="vouch-revoke-details" hidden>
+              <summary class="settings-summary">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </span>
+                <span class="settings-summary-text">
+                  <span class="settings-summary-title">Vouches you gave</span>
+                  <span class="settings-summary-sub">Revoke a mistaken attestation</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="settings-panel settings-panel-action">
+                <p class="form-hint">
+                  Vouches are public and revocable. Re-vouching still counts toward your yearly quota.
+                </p>
+                <p class="form-hint" id="vouch-revoke-no-key" hidden>
+                  Unlock your signing key below to revoke a vouch from this session.
+                </p>
+                <p class="form-hint" id="issued-vouch-empty" hidden></p>
+                <ul class="issued-vouch-list" id="issued-vouch-list"></ul>
+                <p class="form-status" id="vouch-revoke-status" hidden></p>
+              </div>
+            </details>
+
+            <details class="settings-disclosure settings-disclosure-action" id="backup-details">
+              <summary class="settings-summary">
+                <span class="list-icon list-icon-tone-purple" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+                </span>
+                <span class="settings-summary-text">
+                  <span class="settings-summary-title">Encrypted backup</span>
+                  <span class="settings-summary-sub">Download · import on another device</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="settings-panel settings-panel-action">
+                <div id="backup-export-block" hidden>
+                  <p class="form-hint">
+                    Available while this tab still has your owner key. Never uploaded to humanity.llc.
+                  </p>
+                  <form id="export-backup-form" class="compact-form" autocomplete="off" novalidate>
+                    <label class="form-label" for="export-passphrase">New backup passphrase</label>
+                    <input
+                      class="form-input"
+                      id="export-passphrase"
+                      name="passphrase"
+                      type="password"
+                      autocomplete="new-password"
+                      minlength="12"
+                      required
+                    />
+                    <label class="form-label" for="export-passphrase-confirm">Confirm</label>
+                    <input
+                      class="form-input"
+                      id="export-passphrase-confirm"
+                      name="passphrase_confirm"
+                      type="password"
+                      autocomplete="new-password"
+                      minlength="12"
+                      required
+                    />
+                    <button type="submit" class="btn-secondary">Download backup file</button>
+                  </form>
+                  <p class="form-status" id="export-backup-status" hidden></p>
+                </div>
+
+                <p class="form-hint backup-divider-label">Lost this tab?</p>
+                <form id="import-recovery-form" class="compact-form" novalidate>
+                  <label class="form-label" for="import-recovery-key">Recovery private key</label>
+                  <textarea
+                    class="form-input form-textarea"
+                    id="import-recovery-key"
+                    name="recovery_key"
+                    rows="3"
+                    placeholder="Paste the recovery key you saved at create"
+                    autocomplete="off"
+                    required
+                  ></textarea>
+                  <button type="submit" class="btn-secondary">Unlock with recovery key</button>
+                </form>
+                <p class="form-status" id="import-recovery-status" hidden></p>
+
+                <p class="form-hint backup-divider-label">Have encrypted backup?</p>
+                <form id="import-backup-form" class="compact-form" novalidate>
+                  <label class="form-label" for="import-backup-file">Backup file</label>
+                  <input
+                    class="form-input"
+                    id="import-backup-file"
+                    name="backup_file"
+                    type="file"
+                    accept=".json,.hcbackup,application/json"
+                    required
+                  />
+                  <label class="form-label" for="import-passphrase">Backup passphrase</label>
+                  <input
+                    class="form-input"
+                    id="import-passphrase"
+                    name="passphrase"
+                    type="password"
+                    autocomplete="off"
+                    minlength="12"
+                    required
+                    placeholder="Same passphrase used when downloading"
+                  />
+                  <button type="submit" class="btn-secondary">Unlock for revoke</button>
+                </form>
+                <p class="form-status" id="import-backup-status" hidden></p>
+              </div>
+            </details>
+
+            <details class="settings-disclosure settings-disclosure-info" id="network-details">
+              <summary class="settings-summary">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+                </span>
+                <span class="settings-summary-text">
+                  <span class="settings-summary-title">Inspect on network</span>
+                  <span class="settings-summary-sub">Architecture · public JSON</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="settings-panel settings-panel-info-body">
+                <p class="settings-panel-lead">
+                  Status at a glance is on the <strong>Now</strong> tab. Each printed QR is its own
+                  credential — revoke one sticker without killing siblings.
+                </p>
+                <ul class="list list-compact">
+                  <li class="list-row list-action">
+                    <a href="/architecture.html">
+                      <span class="list-content">
+                        <span class="list-title">Architecture</span>
+                        <span class="list-sub">How revoke, keys, and resolver state work</span>
+                      </span>
+                      <span class="list-chevron" aria-hidden="true">›</span>
+                    </a>
+                  </li>
+                  <li class="list-row list-action">
+                    <a id="card-json-link" href="#" target="_blank" rel="noopener noreferrer">
+                      <span class="list-content">
+                        <span class="list-title">Public JSON</span>
+                        <span class="list-sub">Signed card document</span>
+                      </span>
+                      <span class="list-chevron" aria-hidden="true">›</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </details>
+          </div>
+
+          <section class="recovery-reveal-card" id="organizer-reveal" hidden>
+            <div class="recovery-reveal-header">
+              <span class="recovery-reveal-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               </span>
-              <span class="settings-summary-text">
-                <span class="settings-summary-title">On network</span>
-                <span class="settings-summary-sub">Status · profile ID · JSON</span>
-              </span>
-              <span class="list-chevron" aria-hidden="true">›</span>
-            </summary>
-            <div class="settings-panel settings-panel-info-body">
-              <p class="settings-panel-lead">
-                Your <strong>card</strong> is the signed profile (one handle, one manifesto).
-                Each printed <strong>QR</strong> is its own credential (<code>qr_id</code>) on that
-                card — revoke one sticker without killing siblings.
+              <div class="recovery-reveal-heading">
+                <h2 class="recovery-reveal-title">Organizer revoke key</h2>
+                <p class="recovery-reveal-sub">
+                  Hand off once for coalition revoke at
+                  <a id="organizer-revoke-link-inline" href="/organizer-revoke/">/organizer-revoke/</a>.
+                </p>
+              </div>
+            </div>
+            <p class="mono-link" id="organizer-key-display"></p>
+            <button type="button" class="btn-secondary" id="copy-organizer-key">Copy organizer key</button>
+          </section>
+        </div>
+
+        <!-- ——— Help: concepts & limits ——— -->
+        <div class="created-tab-panel" data-created-panel="help" id="created-tab-help" role="tabpanel" aria-labelledby="created-tab-btn-help" hidden>
+          <p class="created-primitive">
+            This QR resolves to <strong>current object state</strong> on the network — active,
+            expired, revoked, or disabled. Printing deploys the object; you change its rules later.
+          </p>
+
+          <section class="created-revoke-rules" id="revoke-rules" aria-labelledby="revoke-rules-title">
+            <h2 class="created-revoke-rules-title" id="revoke-rules-title">Object lifecycle</h2>
+            <p class="created-revoke-rules-lead">
+              Revoke is a <strong>state transition</strong>, not deleting the sticker. Humanity stores
+              object state, not who scanned.
+            </p>
+            <ul class="created-revoke-rules-list">
+              <li><strong>Active</strong> — live manifesto or pilot layout.</li>
+              <li><strong>Expiry</strong> — credential time runs out; scan shows expired.</li>
+              <li><strong>Revoke this QR</strong> — one pointer off; siblings can stay active.</li>
+              <li><strong>Disable card</strong> — whole profile offline.</li>
+              <li>
+                <strong>Organizer revoke</strong> —
+                <a id="organizer-revoke-link" href="/organizer-revoke/">coalition key</a> from create.
+              </li>
+            </ul>
+            <p class="form-hint revoke-id-warning">
+              Printed URLs keep profile ID and QR ID. Transitions change what the resolver returns.
+            </p>
+          </section>
+
+          <section class="group created-help-keys">
+            <h2 class="group-label">Your signing key</h2>
+            <div class="settings-panel settings-panel-flat">
+              <p>
+                Generated in this browser. It never uploads to humanity.llc — the network only sees
+                <strong>signed</strong> actions.
               </p>
-              <ul class="list list-compact">
-                <li class="list-row">
-                  <span class="list-content">
-                    <span class="list-title">Card on network</span>
-                    <span class="list-sub" id="network-card-status">Active</span>
-                  </span>
+              <ul class="settings-list">
+                <li>
+                  <strong>This tab</strong> holds the key until you close it or clear site data.
                 </li>
-                <li class="list-row">
-                  <span class="list-content">
-                    <span class="list-title">Verification</span>
-                    <span class="list-sub" id="card-status">Registered</span>
-                  </span>
+                <li>
+                  <strong>Recovery key</strong> or <strong>encrypted backup</strong> (Manage tab) unlock
+                  revoke and updates on another device.
                 </li>
-                <li class="list-row">
-                  <span class="list-content">
-                    <span class="list-title">This QR valid until</span>
-                    <span class="list-sub" id="network-qr-expires">—</span>
-                  </span>
-                </li>
-                <li class="list-row">
-                  <span class="list-content">
-                    <span class="list-title">Profile ID</span>
-                    <span class="list-sub mono" id="profile-id">—</span>
-                  </span>
-                </li>
-                <li class="list-row list-action">
-                  <a href="/architecture.html">
-                    <span class="list-content">
-                      <span class="list-title">Architecture</span>
-                      <span class="list-sub">How revoke, keys, and resolver state work</span>
-                    </span>
-                    <span class="list-chevron" aria-hidden="true">›</span>
-                  </a>
-                </li>
-                <li class="list-row list-action">
-                  <a id="card-json-link" href="#" target="_blank" rel="noopener noreferrer">
-                    <span class="list-content">
-                      <span class="list-title">Public JSON</span>
-                      <span class="list-sub">Signed card on network</span>
-                    </span>
-                    <span class="list-chevron" aria-hidden="true">›</span>
-                  </a>
+                <li>
+                  Save backup passphrases in a password manager as
+                  <code>humanity.llc backup</code>.
                 </li>
               </ul>
             </div>
-          </details>
+          </section>
+
+          <ul class="list list-compact created-help-links">
+            <li class="list-row list-action">
+              <a href="/what-can-a-qr-do.html">
+                <span class="list-content">
+                  <span class="list-title">What can a QR do?</span>
+                  <span class="list-sub">Ideas for plates, relays, civic nodes</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/architecture.html">
+                <span class="list-content">
+                  <span class="list-title">Architecture &amp; security</span>
+                  <span class="list-sub">Threat model, tests, failure modes</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
         </div>
 
         <p class="form-warning" id="created-error" hidden></p>
         <p class="form-warning" id="no-session" hidden>
           Open this page right after create, or use a link with both
-          <code>profile_id</code> and <code>qr_id</code>. If this is a later visit, you will also
-          need a saved recovery key or encrypted backup before the web UI can sign revoke.
+          <code>profile_id</code> and <code>qr_id</code>. For a later visit, unlock a saved recovery
+          key or encrypted backup under <strong>Manage</strong>.
         </p>
       </main>
     </div>
-    <script type="module" src="/js/created.mjs?v=29"></script>
+    <script type="module" src="/js/created.mjs?v=30"></script>
   </body>
 </html>

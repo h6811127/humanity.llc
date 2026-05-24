@@ -2720,7 +2720,154 @@ button.btn-danger {
 }
 
 .created-screen {
-  gap: 24px;
+  gap: 16px;
+}
+
+.created-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin: 2px 0 6px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.created-tab-btn {
+  flex: 1;
+  margin: 0;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--grey);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.created-tab-btn.is-active,
+.created-tab-btn[aria-selected="true"] {
+  background: var(--white);
+  color: var(--red);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.created-tab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.created-tab-panel[hidden] {
+  display: none !important;
+}
+
+.created-tab-lead {
+  margin: 0 0 4px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+.created-status-group .group-label {
+  margin-bottom: 6px;
+}
+
+.created-status-strip .list-row {
+  align-items: center;
+}
+
+.created-status-profile {
+  position: relative;
+}
+
+.created-copy-id {
+  flex-shrink: 0;
+  margin-left: 8px;
+  padding: 6px 10px;
+  border: 1px solid rgba(219, 27, 67, 0.35);
+  border-radius: 8px;
+  background: rgba(219, 27, 67, 0.06);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--red);
+  cursor: pointer;
+}
+
+.created-checklist {
+  padding: 16px 18px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #f7f7f9;
+}
+
+.created-checklist-title {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--grey);
+}
+
+.created-checklist-steps {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--black);
+}
+
+.created-checklist-steps li + li {
+  margin-top: 8px;
+}
+
+.created-what-now-compact {
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(219, 27, 67, 0.15);
+  background: rgba(219, 27, 67, 0.04);
+}
+
+.created-what-now-compact .created-what-now-title {
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.created-what-now-compact .created-what-now-body {
+  margin: 0;
+  font-size: 14px;
+}
+
+.created-manage-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.created-manage-tools .settings-disclosure:first-child {
+  margin-top: 0;
+}
+
+.settings-panel-flat {
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.created-help-keys .settings-panel-flat {
+  padding: 4px 2px 0;
+}
+
+.created-help-links {
+  margin-top: 4px;
 }
 
 .created-primitive {
