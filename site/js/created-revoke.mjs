@@ -116,7 +116,9 @@ export function initOwnerRevoke(ctx) {
         liveStatusEl.textContent = `Network: ${kind}`;
       }
     } catch {
-      liveStatusEl.textContent = "Could not reach the network.";
+      liveStatusEl.textContent = keys()
+        ? "Could not reach the network."
+        : "Network status unavailable here. This page still needs a saved backup or recovery key to sign.";
     }
   }
 
