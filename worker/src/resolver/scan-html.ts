@@ -481,6 +481,7 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
   var btn = document.getElementById("live-control-request");
   var status = document.getElementById("live-control-status");
   var ownerLink = document.getElementById("live-control-owner-link");
+  var currentOwnerUrl = null;
   if (!btn || !status) return;
   var pollTimer = null;
   function setStatus(text) {
@@ -540,6 +541,10 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
       });
   }
   btn.addEventListener("click", function () {
+    if (currentOwnerUrl) {
+      location.href = currentOwnerUrl;
+      return;
+    }
     btn.disabled = true;
     btn.textContent = "Waiting…";
     setStatus("Creating a live proof request…");
@@ -554,6 +559,9 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
       .then(function (res) { return res.json().then(function (body) { return { ok: res.ok, body: body }; }); })
       .then(function (result) {
         if (!result.ok) throw new Error(result.body.message || result.body.error || "Could not create live proof request.");
+        currentOwnerUrl = result.body.owner_url;
+        btn.disabled = false;
+        btn.textContent = "Open owner proof link";
         if (ownerLink) {
           ownerLink.hidden = false;
           ownerLink.href = result.body.owner_url;
