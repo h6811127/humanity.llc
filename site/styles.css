@@ -2421,11 +2421,15 @@ a {
   margin-top: 8px;
 }
 
+.hero-tight .landing-hero-actions {
+  margin-top: 24px;
+  max-width: 22em;
+}
+
 .landing-hero-actions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 20px;
+  gap: 10px;
 }
 
 .landing-hero-btn {
@@ -2440,6 +2444,7 @@ a {
   letter-spacing: -0.02em;
   border-radius: var(--radius-pill);
   text-decoration: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
 .landing-hero-btn-primary {
@@ -2450,27 +2455,18 @@ a {
 
 .landing-hero-btn-primary:active {
   opacity: 0.85;
+  transform: scale(0.99);
 }
 
-.landing-hero-secondary {
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--grey);
-  text-align: center;
-}
-
-.landing-hero-secondary a {
+.landing-hero-btn-secondary {
+  background: var(--white);
+  border: 1px solid rgba(0, 0, 0, 0.14);
   color: var(--black);
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 2px;
 }
 
-.landing-hero-sep {
-  margin: 0 0.35em;
-  color: var(--grey);
-  font-weight: 400;
-  text-decoration: none;
+.landing-hero-btn-secondary:active {
+  opacity: 0.7;
+  transform: scale(0.99);
 }
 
 .form-warning {
