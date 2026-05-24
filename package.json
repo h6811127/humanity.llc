@@ -16,7 +16,8 @@
     "worker:fixtures": "tsx worker/scripts/generate-fixtures.ts",
     "worker:test": "vitest run",
     "worker:test:watch": "vitest",
-    "site:vendor-qr": "esbuild node_modules/qrcode/lib/browser.js --bundle --format=esm --platform=browser --outfile=site/js/vendor/qrcode.mjs"
+    "site:vendor-qr": "esbuild node_modules/qrcode/lib/browser.js --bundle --format=esm --platform=browser --outfile=site/js/vendor/qrcode.mjs",
+    "site:seed-showcase": "node worker/scripts/seed-showcase-status-plate.mjs"
   },
   "dependencies": {
     "@noble/ed25519": "^2.3.0",

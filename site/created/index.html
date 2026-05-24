@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Your live object · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=48" />
+    <link rel="stylesheet" href="/styles.css?v=49" />
   </head>
   <body>
     <div class="page">
@@ -111,6 +111,7 @@
           <p class="mono-link mono-link-compact" id="scan-url" hidden></p>
         </section>
 
+
         <section class="created-what-now" id="created-status-plate-tip" hidden>
           <h2 class="created-what-now-title">Status plate pilot</h2>
           <p class="created-what-now-body">
@@ -127,6 +128,61 @@
             recovered.
           </p>
         </section>
+
+        <details
+          class="settings-disclosure settings-disclosure-action"
+          id="manifesto-update-panel"
+          hidden
+        >
+          <summary class="settings-summary">
+            <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </span>
+            <span class="settings-summary-text">
+              <span class="settings-summary-title">Update public line</span>
+              <span class="settings-summary-sub">Same QR — new manifesto on the network</span>
+            </span>
+            <span class="list-chevron" aria-hidden="true">›</span>
+          </summary>
+          <div class="settings-panel settings-panel-action">
+            <p class="form-hint">
+              Sign an updated card document with your owner or recovery key. Scanners see the new
+              line on the next fetch — no reprint.
+            </p>
+            <form id="manifesto-update-form" class="compact-form" novalidate>
+              <div id="update-fields-status-plate" hidden>
+                <label class="form-label" for="update-object-label">Object name</label>
+                <input class="form-input" id="update-object-label" type="text" maxlength="120" />
+                <label class="form-label" for="update-status-line">Status line</label>
+                <input class="form-input" id="update-status-line" type="text" maxlength="160" />
+              </div>
+              <div id="update-fields-lost-item" hidden>
+                <label class="form-label" for="update-relay-item">What is lost?</label>
+                <input class="form-input" id="update-relay-item" type="text" maxlength="120" />
+                <label class="form-label" for="update-relay-message">Return message</label>
+                <textarea
+                  class="form-input form-textarea"
+                  id="update-relay-message"
+                  rows="3"
+                  maxlength="160"
+                ></textarea>
+              </div>
+              <div id="update-fields-general">
+                <label class="form-label" for="update-manifesto-general">Public line</label>
+                <textarea
+                  class="form-input form-textarea"
+                  id="update-manifesto-general"
+                  rows="3"
+                  maxlength="280"
+                ></textarea>
+              </div>
+              <button type="submit" class="btn-primary" id="manifesto-update-submit">
+                Publish update
+              </button>
+            </form>
+            <p class="form-status" id="manifesto-update-status" hidden role="status"></p>
+          </div>
+        </details>
 
         <section class="created-what-now" aria-labelledby="what-now-title">
           <h2 class="created-what-now-title" id="what-now-title">What to do now</h2>
@@ -323,6 +379,32 @@
 
         <div class="created-owner-actions" id="created-owner-actions" hidden>
           <p class="settings-actions-label">More options</p>
+
+          <details class="settings-disclosure settings-disclosure-action" id="vouch-revoke-details" hidden>
+            <summary class="settings-summary">
+              <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </span>
+              <span class="settings-summary-text">
+                <span class="settings-summary-title">Vouches you gave</span>
+                <span class="settings-summary-sub">Revoke a mistaken attestation</span>
+              </span>
+              <span class="list-chevron" aria-hidden="true">›</span>
+            </summary>
+            <div class="settings-panel settings-panel-action">
+              <p class="form-hint">
+                Vouches are public and revocable. Revoking removes your attestation from the
+                vouchee's count immediately. Re-vouching later still counts toward your yearly
+                quota.
+              </p>
+              <p class="form-hint" id="vouch-revoke-no-key" hidden>
+                Unlock your signing key below to revoke a vouch from this session.
+              </p>
+              <p class="form-hint" id="issued-vouch-empty" hidden></p>
+              <ul class="issued-vouch-list" id="issued-vouch-list"></ul>
+              <p class="form-status" id="vouch-revoke-status" hidden></p>
+            </div>
+          </details>
 
           <details class="settings-disclosure settings-disclosure-info" id="key-help-details">
             <summary class="settings-summary">
@@ -529,6 +611,6 @@
         </p>
       </main>
     </div>
-    <script type="module" src="/js/created.mjs?v=26"></script>
+    <script type="module" src="/js/created.mjs?v=28"></script>
   </body>
 </html>

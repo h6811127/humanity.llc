@@ -38,7 +38,9 @@ npm run deploy
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Landing page |
+| `index.html` | Landing page (short loop + status plate pilot) |
+| `case-study/index.html` | Recruiter walkthrough: create → scan → update → revoke → live control |
+| `data/showcase-status-plate.json` | Live public status-plate scan for homepage pilot |
 | `create/index.html` | Create card UI at `/create/` |
 | `created/index.html` | Post-create QR + scan link + owner revoke (session key) |
 | `js/create-card.mjs`, `js/hc-sign.mjs` | Browser signing + POST to resolver |
@@ -50,6 +52,14 @@ npm run deploy
 | `_headers` | Security and cache headers |
 | `_redirects` | `/create` → `/create/` (301; avoid `create.html` — Pages strips `.html` and loops) |
 | `assets/red_qr_transparent_bg.png` | Favicon, brand mark, card preview |
+
+### Homepage showcase card
+
+```bash
+API_ORIGIN=https://humanity.llc npm run site:seed-showcase
+```
+
+Writes `data/showcase-status-plate.json` with a live scan URL for the status-plate pilot block on the landing page.
 
 ### After changing Pages files
 

@@ -22,6 +22,7 @@ import {
   handlePostLiveControlResponse,
 } from "./resolver/live-control";
 import { handlePostRevoke } from "./resolver/revoke";
+import { handlePostCardUpdate } from "./resolver/update-card";
 import { handleGetScan } from "./resolver/scan";
 import { handleGetScanStatus } from "./resolver/scan-status";
 import { handlePostVouch } from "./resolver/vouch";
@@ -82,6 +83,20 @@ export default {
         );
       }
       const res = await handlePostRevoke(request, env.DB, revokeMatch[1]!);
+      return withCors(request, res);
+    }
+
+    const updateMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/update$/
+    );
+    if (updateMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostCardUpdate(request, env.DB, updateMatch[1]!);
       return withCors(request, res);
     }
 

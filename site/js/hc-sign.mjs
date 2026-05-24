@@ -160,6 +160,13 @@ export function postRevokeUrl(profileId) {
   ).href;
 }
 
+export function postCardUpdateUrl(profileId) {
+  return new URL(
+    `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/update`,
+    resolverApiOrigin()
+  ).href;
+}
+
 export function postLiveControlResponseUrl(profileId) {
   return new URL(
     `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/live-control/responses`,

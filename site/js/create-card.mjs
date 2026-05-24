@@ -263,6 +263,8 @@ export async function runCreateCard(input) {
           }
         : {}),
       private_key_warning: true,
+      created_at: now,
+      handle,
       ...(sampleCard ? { sample_card: true } : {}),
     })
   );
@@ -322,6 +324,13 @@ document.querySelectorAll('input[name="organizer_key_mode"]').forEach((el) => {
   el.addEventListener("change", syncOrganizerFieldsUi);
 });
 syncOrganizerFieldsUi();
+
+const urlTemplate = new URLSearchParams(location.search).get("template");
+if (urlTemplate === "status_plate") {
+  setTemplate("status_plate");
+} else if (urlTemplate === "lost_item") {
+  setTemplate("lost_item_relay");
+}
 
 demoBtn?.addEventListener("click", async () => {
   const handleEl = document.getElementById("handle");

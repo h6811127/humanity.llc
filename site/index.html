@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=49" />
+    <link rel="stylesheet" href="/styles.css?v=50" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -107,17 +107,8 @@
                             <p class="pass-type">Network status</p>
                             <p class="pass-revoke-headline">Revoked</p>
                             <p class="pass-revoke-message">
-                              Until <strong>3 more scans</strong> are achieved.
+                              This object is <strong>revoked</strong> on the network.
                             </p>
-                            <div class="pass-scan-meter" aria-hidden="true">
-                              <span class="pass-scan-meter-label">Scans toward restore</span>
-                              <div class="pass-scan-meter-track">
-                                <span class="pass-scan-meter-fill" id="pass-demo-meter"></span>
-                              </div>
-                              <span class="pass-scan-meter-count" id="pass-demo-meter-count"
-                                >0 / 3</span
-                              >
-                            </div>
                           </div>
                           <div class="pass-qr pass-qr-revoked">
                             <img
@@ -188,6 +179,11 @@
           </div>
         </section>
 
+        <nav class="dock dock-early" aria-label="Actions">
+          <a class="dock-btn dock-btn-primary" href="/create/">Create a live object</a>
+          <a class="dock-btn" href="/case-study/">See the full loop</a>
+        </nav>
+
         <section class="landing-framing" aria-labelledby="framing-title">
           <p class="section-kicker">The idea</p>
           <h2 class="landing-framing-title" id="framing-title">Physical software objects</h2>
@@ -220,40 +216,46 @@
           </div>
         </section>
 
-        <section class="landing-vision" aria-labelledby="streams-title">
-          <p class="section-kicker">Where this goes</p>
-          <h2 class="landing-vision-title" id="streams-title">Activity streams, not a social feed</h2>
-          <p class="landing-vision-lead">
-            Today a scan returns <strong>current object state</strong> — active, revoked, vouched,
-            control proven. The longer arc is richer: one physical QR as a handle for
-            <strong>multiple signed update channels</strong> controlled by different accountable keys.
+        <section class="pilot-showcase" aria-labelledby="pilot-title" id="status-plate-pilot">
+          <p class="section-kicker">On a real object</p>
+          <h2 class="pilot-showcase-title" id="pilot-title">Status plate pilot</h2>
+          <p class="pilot-showcase-lead">
+            A QR on a studio door. Scanners see whether you&rsquo;re open, closed, or done for the
+            night — then you can <strong>change the line</strong> without reprinting.
           </p>
-          <ul class="landing-vision-list">
-            <li>A <strong>game stream</strong> — faction holds, route windows, season lore</li>
-            <li>A <strong>maintainer stream</strong> — repair notices, closures, safety pauses</li>
-            <li>An <strong>artist or place stream</strong> — history, commentary, local canon</li>
-          </ul>
-          <p class="landing-vision-lead">
-            Each stream has an owner and honest limits. Maintenance and safety truth wins when channels
-            conflict. This is how benches, murals, and door plates become
-            <strong>physical software objects</strong> with living history — without building another
-            attention feed or scan-tracking graph.
-          </p>
-          <div class="landing-vision-actions">
-            <a
-              class="landing-framing-tab"
-              href="/what-can-a-qr-do/physical-world-multiplayer/"
-            >
-              <span class="list-icon list-icon-tone-purple" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M18 12h4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
+          <div class="pilot-showcase-visual" aria-hidden="true">
+            <div class="flow-door pilot-showcase-door">
+              <span class="flow-plaque">
+                <img src="/assets/red_qr_transparent_bg.png" width="36" height="36" alt="" />
               </span>
-              <span class="landing-framing-tab-text">
-                <span class="landing-framing-tab-title">Physical-world multiplayer</span>
-                <span class="landing-framing-tab-sub">City-scale play research — not shipping yet</span>
-              </span>
-              <span class="list-chevron" aria-hidden="true">›</span>
-            </a>
+            </div>
           </div>
+          <ul class="pilot-showcase-actions list list-compact">
+            <li class="list-row list-action" id="pilot-live-scan-row" hidden>
+              <a id="pilot-live-scan-link" href="#">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Try a live scan</span>
+                  <span class="list-sub" id="pilot-live-scan-sub">Public status plate on the network</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/create/?template=status_plate">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Create your status plate</span>
+                  <span class="list-sub">Object name + live status line · print QR</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
         </section>
 
         <section class="example-flow" aria-label="Concrete example">
@@ -304,29 +306,6 @@
           </p>
         </section>
 
-        <section class="object-model" aria-label="How it works">
-          <h2 class="group-label">The model</h2>
-          <p class="group-intro short">
-            Not identity. Not crypto. Not social media. A <strong>live public object</strong>.
-          </p>
-          <ol class="model-ladder">
-            <li>
-              <span class="model-icon" aria-hidden="true">◇</span>
-              <span class="model-text"><strong>Physical thing</strong> in the world</span>
-            </li>
-            <li class="model-connector" aria-hidden="true"></li>
-            <li>
-              <span class="model-icon" aria-hidden="true">↯</span>
-              <span class="model-text"><strong>Network</strong> returns signed status</span>
-            </li>
-            <li class="model-connector" aria-hidden="true"></li>
-            <li>
-              <span class="model-icon model-icon-live" aria-hidden="true">●</span>
-              <span class="model-text"><strong>Live state</strong> you can read in seconds</span>
-            </li>
-          </ol>
-        </section>
-
         <section class="group trust-posture" aria-label="Trust posture">
           <h2 class="group-label">Design choices</h2>
           <p class="group-intro short">
@@ -355,18 +334,6 @@
                   >Owner signs revoke with an Ed25519 key held locally; the resolver verifies the
                   signature and updates server-side status for that <code>qr_id</code>. The printed URL
                   stays — the live answer changes.</span
-                >
-              </span>
-            </li>
-            <li class="list-row">
-              <span class="list-icon list-icon-tone-purple" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22v-8.3a4 4 0 0 0 1.172-2.828L21 7"/><path d="M21 3 9 15"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">Scoped</span>
-                <span class="list-sub"
-                  >Each QR is its own credential on a card. Revoke one wristband or sticker without
-                  killing sibling QRs on the same profile.</span
                 >
               </span>
             </li>
@@ -409,16 +376,6 @@
           </ul>
         </section>
 
-        <nav class="dock" aria-label="Actions">
-          <a class="dock-btn dock-btn-primary" href="/create/">Create a live object</a>
-          <a
-            class="dock-btn"
-            href="https://github.com/h6811127/humanity.llc"
-            rel="noopener noreferrer"
-            >Specs on GitHub</a
-          >
-        </nav>
-
         <section class="group" id="limits">
           <h2 class="group-label">Clear limits</h2>
           <ul class="list list-compact">
@@ -455,18 +412,6 @@
               </span>
             </li>
             <li class="list-row list-action">
-              <a href="/architecture.html">
-                <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Architecture</span>
-                  <span class="list-sub">Keys, revoke path, resolver state, tradeoffs</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li class="list-row list-action">
               <a href="/data-policy.html">
                 <span class="list-icon list-icon-tone-blue" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
@@ -480,53 +425,12 @@
           </ul>
         </section>
 
-        <section class="same-idea" aria-label="Same idea elsewhere">
-          <h2 class="group-label">Same idea elsewhere</h2>
+        <section class="group pilot-more-ideas" aria-label="More ideas">
           <p class="group-intro short">
-            One primitive: a physical thing points at <strong>current</strong> signed status, not a
-            permanent file. QR works on any camera today.
+            One primitive — current signed status on any camera. Benches, wearables, markets, and
+            flyers are in the
+            <a href="/what-can-a-qr-do.html">design space</a> (research, not all shipping yet).
           </p>
-          <ul class="list list-compact">
-            <li class="list-row">
-              <span class="list-icon list-icon-tone-red" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">Poster or flyer</span>
-                <span class="list-sub">Mutual-aid or event contact. Revoke when the run ends, not when stickers fade.</span>
-              </span>
-            </li>
-            <li class="list-row">
-              <span class="list-icon list-icon-tone-pink" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3h12l4 6-10 12L2 9z"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">Sticker on merch</span>
-                <span class="list-sub">Scan shows active or revoked; a stolen batch can be killed without reprinting the line</span>
-              </span>
-            </li>
-            <li class="list-row">
-              <span class="list-icon list-icon-tone-purple" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">Member badge or card</span>
-                <span class="list-sub">Club or co-op asks for live membership state, not a static plastic claim</span>
-              </span>
-            </li>
-            <li class="list-row list-action">
-              <a href="/research-directions.html">
-                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M18 12h4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Research directions</span>
-                  <span class="list-sub">NFC, mesh, and the Humanity node</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-          </ul>
         </section>
 
         <section class="group group-muted">
@@ -553,14 +457,17 @@
                 <span class="list-sub">Phase A loop live on Worker + Pages</span>
               </span>
             </li>
-            <li>
-              <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">Stranger test</span>
-                <span class="list-sub">First outside run complete — create is open</span>
-              </span>
+            <li class="list-row list-action">
+              <a href="/case-study/">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Case study</span>
+                  <span class="list-sub">Create → scan → update → revoke → live control</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
             </li>
           </ul>
         </section>
@@ -582,7 +489,11 @@
         </section>
       </main>
     </div>
+    <nav class="dock dock-sticky" aria-label="Create">
+      <a class="dock-btn dock-btn-primary" href="/create/">Create a live object</a>
+    </nav>
     <script src="/js/pass-flip.js?v=1" defer></script>
     <script src="/js/pass-demo-revoke.js?v=1" defer></script>
+    <script src="/js/landing-showcase.mjs?v=1" type="module"></script>
   </body>
 </html>

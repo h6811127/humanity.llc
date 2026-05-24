@@ -10,6 +10,9 @@ import {
 import { initOwnerRevoke } from "./created-revoke.mjs";
 import { initKeyBackupUi } from "./key-backup-ui.mjs";
 import { initRecoveryKeyUi } from "./recovery-key-ui.mjs";
+import { initManifestoUpdate } from "./created-manifesto-update.mjs";
+import { inferPilotTemplate } from "./manifesto-display.mjs";
+import { initManifestoUpdate } from "./created-manifesto-update.mjs";
 
 const params = new URLSearchParams(location.search);
 const profileIdParam = params.get("profile_id")?.trim() || null;
@@ -276,13 +279,51 @@ function initLiveControlProof() {
   };
 }
 
+function resolvePilotTemplate(session) {
+  if (session?.pilot_template) return session.pilot_template;
+  if (session?.manifesto_line) return inferPilotTemplate(session.manifesto_line);
+  return "general";
+}
+
 function applyPilotTemplateUi(session) {
-  if (session?.pilot_template === "status_plate" && statusPlateTipEl) {
+  const pilot = resolvePilotTemplate(session);
+  if (pilot === "status_plate" && statusPlateTipEl) {
     statusPlateTipEl.hidden = false;
   }
-  if (session?.pilot_template === "lost_item_relay" && lostItemTipEl) {
+  if (pilot === "lost_item_relay" && lostItemTipEl) {
     lostItemTipEl.hidden = false;
   }
+}
+
+/** Load handle/manifesto/created_at from resolver when session is partial (return visit). */
+async function hydrateSessionFromNetwork() {
+  if (!profileId) return;
+  const existing = loadSession() || {};
+  if (existing.handle && existing.manifesto_line && existing.created_at) return;
+
+  const res = await fetch(getCardJsonUrl(profileId), {
+    headers: { Accept: "application/json" },
+    cache: "no-store",
+  });
+  if (!res.ok) return;
+  const card = await res.json();
+  if (!card?.handle || !card?.manifesto_line) return;
+
+  const next = {
+    ...existing,
+    profile_id: profileId,
+    qr_id: existing.qr_id || qrId,
+    handle: card.handle,
+    manifesto_line: card.manifesto_line,
+    created_at: card.created_at,
+    status: card.status || existing.status || "active",
+    pilot_template:
+      existing.pilot_template || inferPilotTemplate(card.manifesto_line),
+  };
+  saveSession(next);
+  data = next;
+  if (handleEl) handleEl.textContent = `@${card.handle}`;
+  if (manifestoEl) manifestoEl.textContent = card.manifesto_line;
 }
 
 function applyOrganizerHandoffUi(session) {
@@ -466,8 +507,12 @@ function applySampleLoopUi(session) {
   }
 }
 
-if (profileId && qrId) {
+async function bootstrapOwnerTools() {
+  if (!profileId || !qrId) return;
+
+  await hydrateSessionFromNetwork();
   void refreshNetworkStatus();
+
   const revokeCtx = {
     profileId,
     qrId,
@@ -486,6 +531,18 @@ if (profileId && qrId) {
   };
   const revoke = initOwnerRevoke(revokeCtx);
   const liveControl = initLiveControlProof();
+  const manifestoUpdate = initManifestoUpdate({
+    profileId,
+    getSession: loadSession,
+    setSession: saveSession,
+    showError,
+    getSigningKeys: currentSigningKeys,
+    onUpdated(manifestoLine) {
+      if (manifestoEl) manifestoEl.textContent = manifestoLine;
+      void refreshNetworkStatus();
+    },
+  });
+  manifestoUpdate?.show();
   const backup = initKeyBackupUi({
     profileId,
     getSession: loadSession,
@@ -505,6 +562,7 @@ if (profileId && qrId) {
       liveControl?.refresh();
     },
   });
+  void manifestoUpdate;
 
   const session = loadSession();
   applySampleLoopUi(session);
@@ -515,4 +573,8 @@ if (profileId && qrId) {
     setLoopStep("scan-again");
     revealOwnerActions();
   }
+}
+
+if (profileId && qrId) {
+  void bootstrapOwnerTools();
 }
