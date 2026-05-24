@@ -78,6 +78,8 @@ describe("scan status JSON (M3.4)", () => {
     expect(body.scan.scan_url).toBe(`https://humanity.llc/c/${PROFILE}?q=${QR}`);
     expect(body.scan.qr?.status).toBe("active");
     expect(body.scan.limits.bearer_warning).toBe(BEARER_WARNING);
+    expect(body.scan.human_trust.label).toBe("Registered");
+    expect(body.scan.human_trust.subtitle).toContain("No accepted vouches");
     expect(body.scan.limits.scan_analytics).toBe(false);
     expect(body.scan.verification.vouch_count).toBe(0);
     expect(httpStatusForScanKind(vm.kind)).toBe(200);
@@ -108,6 +110,9 @@ describe("scan status JSON (M3.4)", () => {
     expect(body.scan.verification.latest_accepted_vouch_at).toBe(
       "2026-05-21T12:00:00.000Z"
     );
+    expect(body.scan.human_trust.label).toBe("Vouched Human");
+    expect(body.scan.human_trust.subtitle).toContain("3 accepted vouches");
+    expect(body.scan.human_trust.pill_active).toBe(true);
   });
 
   it("unknown profile returns 404", () => {

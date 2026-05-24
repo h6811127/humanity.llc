@@ -1,6 +1,6 @@
 # M6 — Vouching design
 
-**Status:** Design draft (pre-build)  
+**Status:** Step 1 (V-001) shipped in repo — verify on production; Steps 2–3 shipped; Step 4 pending  
 **Canonical refs:** `docs/V1_PRODUCT_TRUST_MODEL.md` § Level 2, `docs/V1_ADVERSARIAL_REVIEW.md` § Perspective 1, `docs/features/Human Verification v1.0.md`, `docs/V1_IMPLEMENTATION_BACKLOG.md` (V-001, V-002)  
 **Product thesis:** Live control proves recent key possession. Vouching proves that other accountable humans attested this card belongs to a distinct person — under published rules, not under legal-ID assumptions.
 
@@ -269,6 +269,8 @@ Revoked/suspended card states must **override** positive verification on scan (a
 - [x] Wire verification summary consistently on scan (state, label, count, recency).
 - [x] Copy pass: **Vouched Human** vs registered; show progress below threshold.
 - [x] Tests: revoked/suspended override; stale cache banner unchanged.
+- [x] Status JSON exposes `scan.human_trust` (same copy as scan HTML) for `/created/` and clients.
+- [ ] Production smoke: scan + status JSON for 0 / 2 / 3 vouches; revoked card overrides label.
 
 **Step 2 — Vouch issuance UX (V-002)**
 

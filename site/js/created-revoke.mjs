@@ -108,8 +108,8 @@ export function initOwnerRevoke(ctx) {
     const scan = body?.scan ?? {};
     const cardStatus = scan.card?.status ?? "unknown";
     const qrStatus = scan.qr?.status ?? "unknown";
+    const humanTrust = scan.human_trust;
     const verificationLabel = scan.verification?.label ?? "Unknown";
-    const vouchCount = scan.verification?.vouch_count ?? 0;
     const scanKind = scanKindOverride ?? scan.kind ?? "unknown";
 
     if (statusCardEl) {
@@ -122,8 +122,9 @@ export function initOwnerRevoke(ctx) {
         : capitalize(qrStatus);
     }
     if (statusVerificationEl) {
-      statusVerificationEl.textContent =
-        vouchCount > 0 ? `${verificationLabel} · ${vouchCount} vouch${vouchCount === 1 ? "" : "es"}` : verificationLabel;
+      statusVerificationEl.textContent = humanTrust
+        ? `${humanTrust.label} — ${humanTrust.subtitle}`
+        : verificationLabel;
     }
 
     setIconTone(statusCardIcon, cardTone(cardStatus));

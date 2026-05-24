@@ -81,7 +81,8 @@ const copyBtn = document.getElementById("copy-scan");
 const downloadQrBtn = document.getElementById("download-qr");
 const openScanBtn = document.getElementById("open-scan");
 const profileIdEl = document.getElementById("profile-id");
-const cardStatusEl = document.getElementById("card-status");
+const humanTrustLabelEl = document.getElementById("human-trust-label");
+const humanTrustSubEl = document.getElementById("human-trust-sub");
 const networkCardStatusEl = document.getElementById("network-card-status");
 const networkQrExpiresEl = document.getElementById("network-qr-expires");
 const jsonLink = document.getElementById("card-json-link");
@@ -400,10 +401,25 @@ if (profileId) {
   jsonLink.removeAttribute("href");
 }
 
+function applyHumanTrustDisplay(ht) {
+  if (!ht) return;
+  if (humanTrustLabelEl) humanTrustLabelEl.textContent = ht.label ?? "Registered";
+  if (humanTrustSubEl) humanTrustSubEl.textContent = ht.subtitle ?? "";
+}
+
 if (data?.verification?.label) {
-  cardStatusEl.textContent = data.verification.label;
+  applyHumanTrustDisplay({
+    label: data.verification.label,
+    subtitle:
+      data.verification.vouch_count > 0
+        ? `${data.verification.vouch_count} accepted vouch${data.verification.vouch_count === 1 ? "" : "es"}`
+        : "No accepted vouches yet — registered on this operator",
+  });
 } else {
-  cardStatusEl.textContent = "Registered";
+  applyHumanTrustDisplay({
+    label: "Registered",
+    subtitle: "No accepted vouches yet — registered on this operator",
+  });
 }
 
 if (networkCardStatusEl) {
@@ -429,20 +445,26 @@ function capitalizeStatus(value) {
 }
 
 async function refreshNetworkStatus() {
-  if (!profileId || !qrId || !networkQrExpiresEl) return;
+  if (!profileId || !qrId) return;
   try {
     const res = await fetch(getCardStatusUrl(profileId, qrId), { cache: "no-store" });
     if (!res.ok) return;
     const body = await res.json();
-    const cardStatus = body.scan?.card?.status;
-    const qrExpires = body.scan?.qr?.expires_at;
+    const scan = body.scan ?? {};
+    const cardStatus = scan.card?.status;
+    const qrExpires = scan.qr?.expires_at;
     if (networkCardStatusEl && cardStatus) {
       networkCardStatusEl.textContent = capitalizeStatus(cardStatus);
     }
-    if (qrExpires) {
-      networkQrExpiresEl.textContent = formatNetworkExpiry(qrExpires);
-    } else if (body.scan?.qr) {
-      networkQrExpiresEl.textContent = "No expiry set";
+    if (networkQrExpiresEl) {
+      if (qrExpires) {
+        networkQrExpiresEl.textContent = formatNetworkExpiry(qrExpires);
+      } else if (scan.qr) {
+        networkQrExpiresEl.textContent = "No expiry set";
+      }
+    }
+    if (scan.human_trust) {
+      applyHumanTrustDisplay(scan.human_trust);
     }
     if (data && qrExpires) {
       const next = { ...data, qr_expires_at: qrExpires };

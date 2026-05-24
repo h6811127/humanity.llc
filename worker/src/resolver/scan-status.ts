@@ -16,6 +16,7 @@ import {
   type ScanViewModel,
 } from "./scan-state";
 import { BEARER_WARNING } from "./trust-copy";
+import { humanTrustDisplay } from "./verification-display";
 
 export { BEARER_WARNING };
 
@@ -45,6 +46,12 @@ export interface ScanStatusBody {
       vouch_count: number;
       latest_accepted_vouch_at: string | null;
     };
+    /** V-001 scan copy — matches Human trust row on scan HTML */
+    human_trust: {
+      label: string;
+      subtitle: string;
+      pill_active: boolean;
+    };
     live_control: { available: boolean; proven_at: string | null };
     limits: {
       bearer_warning: string;
@@ -54,6 +61,7 @@ export interface ScanStatusBody {
 }
 
 export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
+  const humanTrust = humanTrustDisplay(vm);
   return {
     version: PROTOCOL_VERSION,
     resolver: {
@@ -86,6 +94,11 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
         method: vm.verificationMethod,
         vouch_count: vm.vouchCount,
         latest_accepted_vouch_at: vm.latestVouchAt,
+      },
+      human_trust: {
+        label: humanTrust.label,
+        subtitle: humanTrust.subtitle,
+        pill_active: humanTrust.pillActive,
       },
       live_control: {
         available: vm.liveControlAvailable,
