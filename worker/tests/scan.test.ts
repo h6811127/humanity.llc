@@ -217,6 +217,27 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).not.toContain("Human trust");
   });
 
+  it("renders QR expired minimal while card stays active (M4.6)", async () => {
+    const expiredQr = "qr_expired_test_001";
+    const past = new Date(Date.now() - 86_400_000).toISOString();
+    const vm = buildScanViewModel(
+      PROFILE,
+      expiredQr,
+      {
+        card: card(),
+        qr: qr({ qr_id: expiredQr, expires_at: past }),
+        verification: summary(),
+      },
+      "https://humanity.llc"
+    );
+    expect(vm.kind).toBe("qr_expired");
+    expect(vm.minimalScan).toBe(true);
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain("This QR has expired");
+    expect(html).not.toContain("@river_example");
+    expect(html).not.toContain('id="pass-flip-btn"');
+  });
+
   it("renders QR revoked minimal while card stays active (M4.5)", async () => {
     const revokedQr = "qr_revoked_sibling_test";
     const vmRevoked = buildScanViewModel(

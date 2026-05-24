@@ -66,6 +66,7 @@ const openScanBtn = document.getElementById("open-scan");
 const profileIdEl = document.getElementById("profile-id");
 const cardStatusEl = document.getElementById("card-status");
 const networkCardStatusEl = document.getElementById("network-card-status");
+const networkQrExpiresEl = document.getElementById("network-qr-expires");
 const jsonLink = document.getElementById("card-json-link");
 const revokeDetails = document.getElementById("revoke-details");
 const ownerActionsEl = document.getElementById("created-owner-actions");
@@ -120,6 +121,22 @@ if (networkCardStatusEl) {
   const cardState = data?.status || "active";
   networkCardStatusEl.textContent =
     cardState.charAt(0).toUpperCase() + cardState.slice(1);
+}
+
+if (networkQrExpiresEl) {
+  const expiresAt = data?.qr_expires_at;
+  if (expiresAt) {
+    try {
+      networkQrExpiresEl.textContent = new Date(expiresAt).toLocaleString(undefined, {
+        dateStyle: "medium",
+        timeStyle: "short",
+      });
+    } catch {
+      networkQrExpiresEl.textContent = expiresAt;
+    }
+  } else {
+    networkQrExpiresEl.textContent = "—";
+  }
 }
 
 if (scanUrl) {

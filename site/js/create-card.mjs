@@ -1,5 +1,5 @@
 import {
-  defaultQrExpiry,
+  qrExpiryFromIssued,
   encodePrivateKeyBase58,
   generateKeypair,
   generateProfileId,
@@ -100,8 +100,23 @@ function buildManifestoLine() {
 /**
  * @param {{ handle: string, manifesto: string, wantRecovery: boolean, pilotTemplate?: string }} input
  */
+function readQrValidityDays() {
+  const raw = document.getElementById("qr-validity-days")?.value;
+  const days = Number.parseInt(String(raw ?? "365"), 10);
+  if (!Number.isFinite(days) || days < 1 || days > 3650) {
+    return 365;
+  }
+  return days;
+}
+
 export async function runCreateCard(input) {
-  const { handle, manifesto, wantRecovery, pilotTemplate = "general" } = input;
+  const {
+    handle,
+    manifesto,
+    wantRecovery,
+    pilotTemplate = "general",
+    qrValidityDays = 365,
+  } = input;
   const { privateKey, publicKeyBase58 } = await generateKeypair();
   let recoveryPrivateKey = null;
   let recoveryPublicKeyBase58 = null;
@@ -119,7 +134,7 @@ export async function runCreateCard(input) {
       ? apiOrigin
       : "https://humanity.llc";
   const scanUrl = qrScanUrl(profileId, qrId, origin);
-  const expiresAt = defaultQrExpiry(now);
+  const expiresAt = qrExpiryFromIssued(now, qrValidityDays);
 
   const cardFields = {
     profile_id: profileId,
@@ -192,6 +207,8 @@ export async function runCreateCard(input) {
       ...data,
       manifesto_line: manifesto,
       pilot_template: pilotTemplate,
+      qr_expires_at: expiresAt,
+      qr_validity_days: qrValidityDays,
       owner_public_key_b58: publicKeyBase58,
       owner_private_key_b58: encodePrivateKeyBase58(privateKey),
       ...(recoveryPublicKeyBase58
@@ -221,8 +238,9 @@ async function submitCreate(e) {
     const wantRecovery = document.getElementById("generate-recovery")?.checked ?? true;
     if (!handle) throw new Error("Handle is required.");
     const { manifesto, pilotTemplate } = buildManifestoLine();
+    const qrValidityDays = readQrValidityDays();
     setStatus("Submitting to resolver…");
-    await runCreateCard({ handle, manifesto, wantRecovery, pilotTemplate });
+    await runCreateCard({ handle, manifesto, wantRecovery, pilotTemplate, qrValidityDays });
   } catch (err) {
     setStatus(err.message || String(err), true);
     if (submitBtn) submitBtn.disabled = false;

@@ -14,7 +14,7 @@
 3. **Revoke requires signing material** — session key, encrypted backup import, or recovery key on `/created/` (`docs/M5_5_OWNER_KEY_PORTABILITY.md`). Opening `/created/?profile_id=…&qr_id=…` without any of these shows read-only copy; owner actions stay hidden.
 4. **Two owner actions** (per Standards §10 + item-scoped QR):
    - **Revoke this scan QR** — `target_kind: qr_credential`, `target_qr_id` = credential id. UI label stays **Revoke this QR**.
-   - **Disable card** (API: `target_kind: card`) — UI today still says “Revoke entire card”; rename to **Disable card** per `REVOKE_AND_LIFECYCLE_V1.md`.
+   - **Disable card** (API: `target_kind: card`) — UI label **Disable card** per `REVOKE_AND_LIFECYCLE_V1.md`.
 5. **Confirm before submit** — checkbox + disabled button until checked (no accidental tap).
 6. **Live status** — on load, `GET …/status?q=` shows resolver truth; after revoke, user can open scan URL to verify.
 
@@ -51,6 +51,14 @@
 
 Session-only keys are intentional for Phase A. **Encrypted export/import** and optional **recovery key** are specified in `docs/M5_5_OWNER_KEY_PORTABILITY.md` so owners can revoke after closing the tab or from another device.
 
-## Follow-up: lifecycle UX (M4.5+)
+## Lifecycle UX (M4.5 + M4.6)
 
-Minimal scan pages, **Disable card** labeling, **Show link**, scheduled expiry, and optional privacy modes are specified in `docs/REVOKE_AND_LIFECYCLE_V1.md` — not yet implemented in scan HTML or `/created/` copy.
+| Feature | Status |
+|---------|--------|
+| Minimal scan (QR revoked, card disabled, QR expired) | Shipped — `pass-v9` |
+| **Show link** on scan pages | Shipped |
+| **Disable card** + **Revoke this QR** labels and ID warnings | Shipped |
+| **Revoke rules** explainer (`/created/#revoke-rules`) | Shipped |
+| Validity at create (7 / 30 / 90 / 365 days) | Shipped — M4.6 |
+
+Optional privacy modes (`display_mode`), revoke-on-next-scan: `docs/REVOKE_AND_LIFECYCLE_V1.md` — not shipped.

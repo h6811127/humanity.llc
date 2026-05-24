@@ -7,7 +7,7 @@ import { SCAN_PASS_CSS } from "./scan-pass-styles";
 import { renderScanQrMarkup } from "./scan-qr";
 
 /** Response header — confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v8";
+export const SCAN_UI_VERSION = "pass-v9";
 
 /**
  * Public scan UI — flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -133,14 +133,24 @@ function renderPassSection(
 </section>`;
 }
 
+function minimalScanHeadline(kind: ScanViewModel["kind"]): string {
+  switch (kind) {
+    case "qr_revoked":
+      return "This QR is no longer valid";
+    case "qr_expired":
+      return "This QR has expired";
+    case "card_revoked":
+      return "This card has been disabled";
+    default:
+      return "Scan result";
+  }
+}
+
 function renderMinimalPassFront(
   vm: ScanViewModel,
   badgeClass: string
 ): string {
-  const headline =
-    vm.kind === "qr_revoked"
-      ? "This QR is no longer valid"
-      : "This card has been disabled";
+  const headline = minimalScanHeadline(vm.kind);
   return `<div class="pass-head">
   <div class="pass-brand">
     <span class="pass-dot" aria-hidden="true"></span>
@@ -560,7 +570,7 @@ function scanLead(vm: ScanViewModel): string {
     case "qr_revoked":
       return "Revoked by owner. Network status at scan time.";
     case "qr_expired":
-      return "This QR credential has expired.";
+      return "Validity ended at scan time. The card may still be active for other QRs.";
     case "qr_replaced":
       return "This QR was replaced by a newer credential.";
     default:
@@ -570,9 +580,16 @@ function scanLead(vm: ScanViewModel): string {
 
 function pageTitle(vm: ScanViewModel): string {
   if (vm.minimalScan) {
-    return vm.kind === "qr_revoked"
-      ? "QR no longer valid"
-      : "Card disabled";
+    switch (vm.kind) {
+      case "qr_revoked":
+        return "QR no longer valid";
+      case "qr_expired":
+        return "QR expired";
+      case "card_revoked":
+        return "Card disabled";
+      default:
+        return "Scan result";
+    }
   }
   if (vm.handle) return `@${vm.handle}`;
   return vm.primaryBadge.label;

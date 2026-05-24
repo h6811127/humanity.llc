@@ -188,6 +188,12 @@ export function buildScanViewModel(
     return statusView("qr_expired", card, qr, ctx.verification, origin, {
       label: "QR expired",
       tone: "warn",
+    }, {
+      minimalScan: true,
+      showCardBlock: false,
+      showHumanTrustBlock: false,
+      showArtifactBlock: false,
+      showLiveControlBlock: false,
     });
   }
 

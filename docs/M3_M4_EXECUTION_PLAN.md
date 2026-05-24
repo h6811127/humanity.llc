@@ -158,21 +158,22 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ---
 
-## M4.5 — Lifecycle UX (proposed, after M5 stranger test)
+## M4.5 — Lifecycle UX
 
-**Spec:** `docs/REVOKE_AND_LIFECYCLE_V1.md`
+**Spec:** `docs/REVOKE_AND_LIFECYCLE_V1.md`  
+**Scan UI:** `pass-v9` (deploy Worker after changes)
 
 ### Scan pages
 
-- [ ] QR revoked → headline **This QR is no longer valid**; hide handle/manifesto by default
-- [ ] Card disabled → headline **This card has been disabled**; hide card details by default
-- [ ] **Show link** control for scan URL (active + revoked pages)
+- [x] QR revoked → headline **This QR is no longer valid**; hide handle/manifesto by default
+- [x] Card disabled → headline **This card has been disabled**; hide card details by default
+- [x] **Show link** control for scan URL (active + revoked pages)
 
 ### `/created/` owner copy
 
-- [ ] Rename “Revoke entire card” → **Disable card**
-- [ ] Confirm step warns: printed QRs still contain profile ID and QR ID
-- [ ] Revoke QR confirm: same physical-ID warning (QR ID always in URL)
+- [x] **Disable card** label (API: `target_kind: card`)
+- [x] Confirm step warns: printed QRs still contain profile ID and QR ID
+- [x] **Revoke rules** section — Revoke QR vs Disable card vs Expiry (`/created/#revoke-rules`)
 
 ### Not in M4.5
 
@@ -181,11 +182,26 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ---
 
+## M4.6 — QR validity (scheduled end)
+
+**Spec:** `docs/REVOKE_AND_LIFECYCLE_V1.md` § Revoke QR → Scheduled end
+
+- [x] Create: choose validity (7 / 30 / 90 / 365 days) → signed `expires_at` on credential
+- [x] Scan: **qr_expired** minimal page — **This QR has expired** (card may stay active)
+- [x] `/created/`: show “This QR valid until” in network panel
+
+### Not in M4.6
+
+- Post-create expiry extension UI
+- Resolver cron to flip `qr_credentials.status` to `expired` (expiry evaluated at scan time today)
+
+---
+
 ## What we are **not** doing in this track
 
 - NFC / Bluetooth mesh implementation — research page only (`site/research-directions.html`)
 - **Owner key export / recovery** (revoke from any device) — **M5.5** (`docs/M5_5_OWNER_KEY_PORTABILITY.md`) — largely shipped; see doc for exit checks
-- **Lifecycle UX** (Disable card label, minimal revoke scans, Show link) — **M4.5** (`docs/REVOKE_AND_LIFECYCLE_V1.md`)
+- **Lifecycle UX** — **M4.5** shipped; **M4.6** QR validity at create (`docs/REVOKE_AND_LIFECYCLE_V1.md`)
 - Vouches (M6), live control (M7), merch (M8)
 - Commons Pass (M10+)
 
@@ -193,6 +209,6 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ## Current step
 
-**→ Lost item relay pilot** — `docs/LOST_ITEM_RELAY_PILOT.md` (vertical #2). Create template + `[relay]` scan layout shipped; run 5–10 real tags and score with M5 scorecard. Status plate (#1): `docs/STATUS_PLATE_PILOT.md`.
+**→ Revoke lifecycle** — M4.5 + M4.6 shipped in code; deploy Worker (`pass-v9`). Field-test revoke vs disable vs expiry with strangers. Vertical pilots: `docs/LOST_ITEM_RELAY_PILOT.md`, `docs/STATUS_PLATE_PILOT.md`.
 
 M5 stranger gate: `docs/M5_STRANGER_TEST_RUNBOOK.md` (still required before merch / Commons Pass).

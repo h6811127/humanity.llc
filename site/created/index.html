@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Your live object · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=46" />
+    <link rel="stylesheet" href="/styles.css?v=47" />
   </head>
   <body>
     <div class="page">
@@ -142,6 +142,32 @@
               Continue
             </button>
           </div>
+        </section>
+
+        <section class="created-revoke-rules" id="revoke-rules" aria-labelledby="revoke-rules-title">
+          <h2 class="created-revoke-rules-title" id="revoke-rules-title">Revoke rules</h2>
+          <p class="created-revoke-rules-lead">
+            You own the <strong>lifecycle</strong> of this object — when a pointer stops, what
+            scope it affects, and what strangers see after.
+          </p>
+          <ul class="created-revoke-rules-list">
+            <li>
+              <strong>Revoke this QR</strong> — one printed pointer stops (sticker, tag, one link).
+              Other QRs on the same card can stay active.
+            </li>
+            <li>
+              <strong>Disable card</strong> — the whole profile goes offline; every active QR on
+              this card stops resolving as active.
+            </li>
+            <li>
+              <strong>Expiry</strong> — time runs out on this credential only (set at create).
+              Scan shows expired; you can still revoke early.
+            </li>
+          </ul>
+          <p class="form-hint revoke-id-warning">
+            Printed QRs always keep profile ID and QR ID in the URL. Revoke, disable, and expiry
+            change what the resolver returns — not the ink.
+          </p>
         </section>
 
         <details class="settings-disclosure settings-disclosure-action" id="revoke-details">
@@ -360,6 +386,12 @@
                 </li>
                 <li class="list-row">
                   <span class="list-content">
+                    <span class="list-title">This QR valid until</span>
+                    <span class="list-sub" id="network-qr-expires">—</span>
+                  </span>
+                </li>
+                <li class="list-row">
+                  <span class="list-content">
                     <span class="list-title">Profile ID</span>
                     <span class="list-sub mono" id="profile-id">—</span>
                   </span>
@@ -385,6 +417,6 @@
         </p>
       </main>
     </div>
-    <script type="module" src="/js/created.mjs?v=18"></script>
+    <script type="module" src="/js/created.mjs?v=19"></script>
   </body>
 </html>

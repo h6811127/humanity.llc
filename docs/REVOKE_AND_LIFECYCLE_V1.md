@@ -40,7 +40,9 @@ A Humanity **QR credential** (`qr_id`) is a **signed capability pointer**: it re
 | Encrypted backup import → revoke on `/created/` | **Live** |
 | Scan shows `qr_revoked` (card may stay active) or `card_revoked` | **Live** |
 | Public card JSON `410` when card disabled | **Live** |
-| Privacy modes, disable vs revoke copy, hide URL, scheduled revoke | **Not shipped** — this doc |
+| Minimal revoke/disable scan, Show link, Disable card label, owner ID warnings | **Shipped** (M4.5, `pass-v9`) |
+| Validity at create (`expires_at` 7–365 days), minimal **qr_expired** scan | **Shipped** (M4.6) |
+| Privacy modes, revoke-on-next-scan, post-create expiry edit | **Not shipped** — this doc |
 
 Current scan copy (whole card): handle/manifesto may still appear on revoked scans — **planned change** under Disable card (§Disable card).
 
@@ -258,8 +260,8 @@ Resolver stores on `revocations` row; scan HTML respects mode. **Not in v1 API y
 |------|-----------|
 | Revoke QR / disable card API + basic scan | **M4** ✓ |
 | Recovery + backup revoke | **M5.5** ✓ |
-| UI labels (Disable card), minimal scan pages, Show link | **M4.5** (proposed) |
-| Scheduled QR expiry UI | **M4.6** / `expires_at` |
+| UI labels (Disable card), minimal scan pages, Show link | **M4.5** ✓ |
+| Scheduled QR expiry UI (create + minimal expired scan) | **M4.6** ✓ |
 | QR rotation `replaced` | **A.6** |
 | `display_mode` on revocation | **M4.7** |
 | Revoke-on-next-scan / opaque URLs | **Research spike** |
@@ -286,3 +288,4 @@ Resolver stores on `revocations` row; scan HTML respects mode. **Not in v1 API y
 |------|--------|
 | 2026-05-23 | Initial spec from owner notes + Phase A/M5.5 implementation reality |
 | 2026-05-21 | Owner warning copy, delete scan headline, cross-links across doc set |
+| 2026-05-24 | M4.5 minimal scans + Show link shipped; M4.6 create validity + qr_expired minimal scan |

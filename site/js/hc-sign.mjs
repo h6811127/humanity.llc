@@ -164,10 +164,15 @@ export function qrScanUrl(profileId, qrId, origin = "https://humanity.llc") {
   return `${origin}/c/${profileId}?q=${qrId}`;
 }
 
-export function defaultQrExpiry(issuedAt) {
+/** @param {string} issuedAt ISO timestamp @param {number} days valid from issue */
+export function qrExpiryFromIssued(issuedAt, days) {
   const d = new Date(issuedAt);
-  d.setUTCFullYear(d.getUTCFullYear() + 1);
+  d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString();
+}
+
+export function defaultQrExpiry(issuedAt) {
+  return qrExpiryFromIssued(issuedAt, 365);
 }
 
 /**

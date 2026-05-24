@@ -337,7 +337,8 @@ Goal: launch the identity core without commerce.
 - Owner-signed revocation flow (`target_kind: qr_credential` | `card`).
 - Governance-signed suspension placeholder flow using bootstrap keys.
 - Revoked, suspended, expired, unknown, and stale/offline UI states.
-- **M4.5 (planned):** QR-revoked minimal scan (“This QR is no longer valid”); card-disabled minimal scan; **Disable card** label on `/created/`; **Show link** for scan URL; owner confirm warnings about permanent IDs on printed QRs.
+- **M4.5 (shipped):** Minimal revoke/disable scans, **Disable card** label, **Show link**, owner ID warnings, revoke rules on `/created/`.
+- **M4.6 (shipped):** Validity at create (7–365 days); minimal **qr_expired** scan.
 
 **Exit criteria:**
 
