@@ -9,11 +9,11 @@
     <title>Demo scan · games + maintenance · humanity.llc</title>
     <meta
       name="description"
-      content="Demo scan page showing how a game layer can reward discovery while only maintainers sign safety status."
+      content="Demo scan page showing how evolving local objects and revocable clues can sit beside maintainer-signed safety without scan tracking."
     />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=46" />
+    <link rel="stylesheet" href="/styles.css?v=47" />
   </head>
   <body>
     <div class="page">
@@ -30,37 +30,38 @@
           <p class="hero-eyebrow">Demo scan page · combo 1</p>
           <h1>Games + maintenance</h1>
           <p class="hero-line">
-            One scan can power neighborhood play while keeping safety authority separate from
-            points, quests, and map unlocks.
+            One scan can host evolving objects, rotating messages, and local secrets while keeping
+            maintainer-signed safety authority separate from public play.
           </p>
         </section>
 
         <section class="idea-section" aria-labelledby="scan-view-title">
-          <h2 class="group-label" id="scan-view-title">Scan view · trail node / AED hallway</h2>
+          <h2 class="group-label" id="scan-view-title">Scan view · riverwalk beacon / AED hallway</h2>
           <div class="scenario-grid" aria-label="Demo scan states">
             <article class="scenario-card scenario-card-live">
               <p class="scenario-card-label">What the scanner sees now</p>
               <ul class="scenario-card-list">
                 <li>Node status: in service</li>
                 <li>Last maintainer check: today, 09:14</li>
-                <li>Nearby route: checkpoint 7 unlocked</li>
+                <li>Local object: River Lantern Shell</li>
+                <li>Clue window: visible for the next 48 hours</li>
                 <li>Issue report path available</li>
               </ul>
             </article>
             <article class="scenario-card">
-              <p class="scenario-card-label">Game layer</p>
+              <p class="scenario-card-label">Public-play layer</p>
               <ul class="scenario-card-list">
-                <li>Players find AED, filter, and trail-marker nodes</li>
-                <li>Discovery grants map points and lore fragments</li>
-                <li>No points awarded for declaring equipment safe</li>
+                <li>Evolving objects change after enough anonymous scans</li>
+                <li>Rotating messages and ephemeral drops create timed neighborhood moments</li>
+                <li>Collaborative discovery unlocks the next object without points, XP, or leaderboards</li>
               </ul>
             </article>
             <article class="scenario-card scenario-card-warn">
               <p class="scenario-card-label">Safety boundary</p>
               <ul class="scenario-card-list">
-                <li>Maintainer-signed status stays separate from game points</li>
-                <li>If signatures conflict, safety copy overrides game copy</li>
-                <li>Out-of-service state pauses route rewards automatically</li>
+                <li>Maintainer-signed status stays separate from lore and clue state</li>
+                <li>If signatures conflict, safety copy overrides the object copy</li>
+                <li>Resolver stores unlock state, not a movement history</li>
               </ul>
             </article>
           </div>
@@ -83,8 +84,8 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21 1.18.38 2.03 1.46 2.03 2.79"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
               </span>
               <span class="list-content">
-                <span class="list-title">Game stream</span>
-                <span class="list-sub">Routes, checkpoints, faction points, narrative unlocks</span>
+                <span class="list-title">Object stream</span>
+                <span class="list-sub">Current object form, rotating message, and local unlock conditions</span>
               </span>
             </li>
             <li class="list-row">
@@ -92,16 +93,46 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
               </span>
               <span class="list-content">
-                <span class="list-title">Resolver rules</span>
-                <span class="list-sub">Fix verified → local map unlocks the next route</span>
+                <span class="list-title">Trust chain</span>
+                <span class="list-sub">Which nearby object vouched, whether the clue is revoked, and what appears next</span>
               </span>
             </li>
           </ul>
         </section>
 
+        <section class="idea-section" aria-labelledby="chain-title">
+          <h2 class="group-label" id="chain-title">Example object chain</h2>
+          <div class="scenario-grid" aria-label="Example shared discovery sequence">
+            <article class="scenario-card scenario-card-live">
+              <p class="scenario-card-label">Temporary drop</p>
+              <ul class="scenario-card-list">
+                <li>A QR appears near the riverwalk for 48 hours</li>
+                <li>It resolves to a hidden object instead of a generic reward screen</li>
+                <li>Stewards can revoke it if the physical site needs to change</li>
+              </ul>
+            </article>
+            <article class="scenario-card">
+              <p class="scenario-card-label">Collaborative unlock</p>
+              <ul class="scenario-card-list">
+                <li>If enough people scan the first object, a second object wakes up in Czech Village</li>
+                <li>The resolver only stores whether the threshold was met</li>
+                <li>No account or player dossier is required to participate</li>
+              </ul>
+            </article>
+            <article class="scenario-card scenario-card-warn">
+              <p class="scenario-card-label">Trust gate</p>
+              <ul class="scenario-card-list">
+                <li>A third object appears only after another local object vouches for it</li>
+                <li>Revocable physical clues keep the chain grounded in real space</li>
+                <li>The object can disappear cleanly without preserving scan histories</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
         <p class="insight">
-          This pattern rewards discovery while preserving a hard line: only the maintainer signs
-          safety-critical truth.
+          The strongest mechanic is not points; it is anonymous participation in shared urban
+          memory while the maintainer still signs safety-critical truth.
         </p>
 
         <section class="group">
