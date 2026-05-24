@@ -148,6 +148,86 @@ These are strong because they use **live object state**, not secret telemetry.
 
 ---
 
+## Game theory / cooperation design
+
+Use game theory to design rules that make cooperation more rewarding than exploitation.
+
+### Public goods mechanics
+
+Some city objects should only "wake up" when enough people contribute.
+
+Example:
+
+- 20 anonymous scans unlock the next clue
+- no leaderboard, just collective progress
+
+### Anti-hoarding rewards
+
+If someone discovers a QR first, they should get more value by sharing it than hiding it.
+
+Example:
+
+- first finder gets an initial clue
+- the object evolves only after 5 more people scan it
+
+### Trust / vouch mechanics
+
+Players can unlock deeper paths by being vouched for by previous objects, businesses, or community
+members.
+
+Example:
+
+- "This clue requires a vouch from a NewBo object"
+- legitimacy comes from place-linked trust, not legal identity
+
+### Prisoner's dilemma design
+
+Give players choices where selfish behavior gives a small short-term reward, but cooperation unlocks
+a larger shared reward.
+
+Example:
+
+- reveal a clue privately now
+- or leave it hidden so the group can unlock a better ending
+
+### Scarcity without surveillance
+
+Create scarcity with time windows, expiring clues, rotating QR states, or limited-use capabilities
+instead of tracking people.
+
+Example:
+
+- "This object can only issue 25 passes before sunset"
+
+### Sybil resistance
+
+Reduce spam and fake participation without requiring identity.
+
+Options:
+
+- rate limits
+- proof-of-control challenges
+- local physical codes
+- one-time signed tokens
+- business-issued vouches
+- device-local limits
+
+### Coordination games
+
+Some puzzles should require people to visit different places and combine information.
+
+Example:
+
+- Czech Village, NewBo, and Greene Square each reveal one fragment
+- together they unlock the next state
+
+The strongest version is not points and badges.
+
+It is a city-scale coordination game where trust, timing, scarcity, and cooperation change what
+physical objects reveal.
+
+---
+
 ## Disallowed mechanics
 
 Avoid mechanics that quietly demand surveillance infrastructure or fake authority:
