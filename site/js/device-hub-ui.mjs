@@ -3,6 +3,7 @@
  */
 import {
   activityHaystack,
+  activityTypeLabel,
   formatActivityTime,
   lastActivityForEntry,
   loadActivity,
@@ -89,7 +90,8 @@ let activityEmptyEl;
 const HUB_SECTION_EMPTY = {
   pins: "Your pinned scans will show here.",
   saved: "Cards you save on this device will show here.",
-  activity: "Recent activity on this device will show here.",
+  activity:
+    "Actions you take in this browser will show here. The network does not log scans.",
 };
 
 function setHubSectionEmpty(group, list, emptyEl, isEmpty, message) {
@@ -304,7 +306,9 @@ function renderActivityRows() {
   for (const entry of entries) {
     const li = document.createElement("li");
     const when = formatActivityTime(entry.at);
-    const sub = when;
+    const sub = when
+      ? `${activityTypeLabel(entry.type)} · ${when}`
+      : activityTypeLabel(entry.type);
     li.className = "list-row list-action device-activity-row device-activity-row--compact";
     li.dataset.hubSearchable = activityHaystack(entry);
     li.innerHTML = `

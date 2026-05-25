@@ -436,6 +436,13 @@ body.device-hub-sheet-open .top-chrome--float .top-chrome-bar--minimal,
 }
 
 /* Typography  -  calmer hierarchy */
+.device-hub-group-hint {
+  margin: -4px 4px 10px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--shell-label);
+}
+
 .group-label,
 .device-hub-group-label,
 .section-kicker {
@@ -817,4 +824,286 @@ body.device-hub-sheet-open {
   .created-tab-panel {
     animation: none;
   }
+}
+
+/* Create + created flow pages */
+body.flow-shell-create,
+body.device-shell-created {
+  background: var(--shell-bg);
+}
+
+body.flow-shell-create .page > main.screen,
+body.device-shell-created .created-screen {
+  padding-top: 4px;
+}
+
+.flow-section {
+  margin-bottom: var(--shell-space-group);
+}
+
+.flow-glossary.list {
+  margin-top: 0;
+}
+
+.flow-glossary .list-row {
+  align-items: flex-start;
+  padding: 12px 14px;
+}
+
+.flow-demo-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: var(--shell-space-group);
+}
+
+.flow-demo-strip .btn-secondary {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 12px;
+}
+
+.flow-form-card {
+  gap: var(--shell-space-group);
+}
+
+.flow-form-section {
+  margin: 0;
+}
+
+.flow-form-section .group-label {
+  margin-bottom: 10px;
+}
+
+.flow-segmented.create-template-row {
+  display: flex;
+  gap: 0;
+  padding: 3px;
+  border-radius: 10px;
+  background: rgba(118, 118, 128, 0.12);
+}
+
+.flow-segmented .create-template-btn {
+  flex: 1;
+  min-height: 36px;
+  margin: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--shell-label);
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: none;
+  transition:
+    background 0.35s var(--shell-spring),
+    color 0.25s var(--shell-ease),
+    box-shadow 0.35s var(--shell-spring);
+}
+
+.flow-segmented .create-template-btn.is-active {
+  color: var(--shell-label-strong);
+  background: var(--shell-fill);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.flow-inset-fields {
+  padding: 4px 14px 14px;
+  border-radius: 12px;
+  background: var(--shell-fill);
+  box-shadow: var(--shell-shadow-sm);
+}
+
+.flow-inset-fields .form-label {
+  text-transform: none;
+  letter-spacing: -0.01em;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--shell-label);
+  margin-top: 12px;
+}
+
+.flow-inset-fields .form-label:first-child {
+  margin-top: 8px;
+}
+
+.flow-inset-fields .form-input,
+.flow-inset-fields .form-textarea,
+.flow-inset-fields select.form-input {
+  border: none;
+  border-radius: 10px;
+  background: var(--shell-fill-secondary);
+  padding: 12px 14px;
+}
+
+.flow-inset-fields .form-input:focus,
+.flow-inset-fields .form-textarea:focus,
+.flow-inset-fields select.form-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(219, 27, 67, 0.18);
+}
+
+.flow-inset-fields .form-hint {
+  margin-bottom: 4px;
+}
+
+.flow-disclosure.create-organizer-opt {
+  margin: 12px 0 0;
+  border-radius: 10px;
+  background: var(--shell-fill-secondary);
+  overflow: hidden;
+}
+
+.flow-disclosure.create-organizer-opt summary {
+  padding: 12px 14px;
+  margin: 0;
+  text-transform: none;
+  letter-spacing: -0.01em;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--shell-label-strong);
+}
+
+.flow-inset-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px 0 4px;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.flow-form-warning {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(219, 27, 67, 0.06);
+  border: none;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.flow-submit {
+  width: 100%;
+  min-height: 50px;
+  border-radius: 14px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Created — keys group */
+.flow-keys-group {
+  margin-bottom: var(--shell-space-group);
+}
+
+.flow-keys-group .group-intro {
+  margin-bottom: 12px;
+}
+
+body.device-shell-created .created-keys-strip {
+  margin-bottom: var(--shell-space-group);
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.flow-keys-panel {
+  margin-top: 12px;
+  padding: 4px 14px 14px;
+  border-radius: 12px;
+  background: var(--shell-fill);
+  box-shadow: var(--shell-shadow-sm);
+}
+
+.flow-inset-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.flow-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 0 4px;
+}
+
+.flow-field-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--shell-label);
+  letter-spacing: -0.01em;
+}
+
+.flow-field-input,
+.flow-inset-form .flow-field-input {
+  width: 100%;
+  font: inherit;
+  font-size: 17px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--shell-fill-secondary);
+  color: var(--shell-label-strong);
+}
+
+.flow-field-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(219, 27, 67, 0.18);
+}
+
+.flow-keys-panel .created-keys-save-btn {
+  width: 100%;
+  min-height: 50px;
+  margin-top: 8px;
+  border-radius: 14px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.flow-keys-panel .created-keys-saved {
+  margin: 12px 0 0;
+  padding-top: 4px;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.flow-disclosure.created-recovery-details {
+  margin-top: 12px;
+  border: none;
+  border-radius: 12px;
+  background: var(--shell-fill);
+  box-shadow: var(--shell-shadow-sm);
+  overflow: hidden;
+}
+
+.flow-disclosure.created-recovery-details summary {
+  padding: 14px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--shell-label-strong);
+  list-style: none;
+  cursor: pointer;
+}
+
+.flow-disclosure.created-recovery-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.flow-disclosure-body {
+  padding: 0 16px 16px;
+  border-top: 0.5px solid var(--shell-separator);
+}
+
+.flow-disclosure-body .btn-secondary {
+  width: 100%;
+  margin-top: 8px;
+  border-radius: 12px;
+  min-height: 44px;
+}
+
+.created-keys-foot {
+  margin: 12px 4px 0;
+  color: var(--shell-label);
 }

@@ -120,7 +120,7 @@ export function refreshHubGlance() {
     li.innerHTML = `
       <button type="button" class="device-hub-glance-btn">
         <span class="device-hub-glance-title">${escapeHtml(entry.label)}</span>
-        <span class="device-hub-glance-sub">${escapeHtml(subLine)} · Now</span>
+        <span class="device-hub-glance-sub">${escapeHtml(subLine)} · Saved on device</span>
       </button>`;
     li.querySelector("button")?.addEventListener("click", () => {
       openCardNowPage(entry);

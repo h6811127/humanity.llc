@@ -87,6 +87,19 @@ export function walletEntryForActivity(entry) {
   );
 }
 
+/** @param {ActivityType | string} type */
+export function activityTypeLabel(type) {
+  const labels = {
+    saved: "Saved on device",
+    use_keys: "Loaded keys",
+    remove_card: "Removed from wallet",
+    pin_added: "Pinned scan link",
+    backup_import: "Imported backup",
+    live_control: "Signed live proof",
+  };
+  return labels[type] ?? "Action on device";
+}
+
 /** @param {{ type: string }} entry */
 export function activityActionHint(entry) {
   if (entry.type === "pin_added") return "Pinned scan";

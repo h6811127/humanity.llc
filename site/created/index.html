@@ -6,7 +6,7 @@
     <title>Your live object · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="/styles.css?v=80" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=11" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=12" />
   </head>
   <body class="has-device-hub-search device-shell-created">
     <div class="page">
@@ -52,7 +52,7 @@
             <div class="device-hub-group" id="device-hub-notice-group" hidden></div>
           </div>
           <div class="device-hub-status-head">
-            <a class="device-hub-create-btn" href="/create/" aria-label="Create a live object"><span class="device-hub-create-glyph" aria-hidden="true">+</span></a>
+            <a class="device-hub-create-btn" href="/create/" aria-label="Create a live card"><span class="device-hub-create-glyph" aria-hidden="true">+</span></a>
             <div
               class="device-hub-status-panel"
               id="device-hub-status-panel"
@@ -90,10 +90,11 @@
             id="device-hub-activity-group"
             data-hub-group="activity"
           >
-            <p class="device-hub-group-label">Recent on this device</p>
+            <p class="device-hub-group-label">Your actions on this device</p>
+            <p class="device-hub-group-hint">Save, import, load keys  -  not who scanned your QR.</p>
             <ul class="list list-compact" id="device-hub-activity-list" hidden></ul>
             <p class="device-hub-section-empty" id="device-hub-activity-empty">
-              Recent activity on this device will show here.
+              Actions you take in this browser will show here. The network does not log scans.
             </p>
           </div>
 
@@ -207,9 +208,13 @@
 
       <main class="screen created-screen">
         <section class="hero hero-compact">
-          <p class="hero-eyebrow">Live object created</p>
+          <p class="hero-eyebrow">Card created</p>
           <h1 id="created-handle"> - </h1>
           <p class="hero-line" id="created-manifesto"></p>
+          <p class="hero-line hero-line-sub">
+            Your <strong>card</strong> is on the network. The <strong>QR</strong> below is what you
+            print  -  same profile, signed credential.
+          </p>
         </section>
 
         <section
@@ -272,43 +277,80 @@
         <!--  -  -  -  Now: deploy, status, QR  -  -  -  -->
         <div class="created-tab-panel" data-created-panel="now" id="created-tab-now" role="tabpanel" aria-labelledby="created-tab-btn-now">
           <section
-            class="created-keys-strip"
+            class="group flow-keys-group created-keys-strip"
             id="created-keys-strip"
             hidden
             aria-labelledby="created-keys-title"
           >
-            <h2 class="created-keys-title" id="created-keys-title">Keys on this device</h2>
-            <p class="created-keys-lead">
-              One tap so the homepage and other tabs can sign for this card. Not the same as a
-              recovery key.
+            <h2 class="group-label" id="created-keys-title">Save keys on this device</h2>
+            <p class="group-intro created-keys-lead">
+              Store the owner key in this browser&rsquo;s wallet so the hub and other tabs can sign.
+              Not the same as a recovery key.
             </p>
-            <form
-              id="created-device-save-form"
-              class="created-keys-save-form"
-              autocomplete="off"
-              novalidate
-            >
-              <label class="form-label" for="created-device-save-label">Label</label>
-              <input
-                class="form-input"
-                id="created-device-save-label"
-                type="text"
-                maxlength="48"
-                placeholder="Personal card"
-              />
-              <button type="button" class="btn-primary created-keys-save-btn" id="created-device-save-btn">
+
+            <ul class="list list-compact flow-glossary" aria-label="Card, QR, and profile ID">
+              <li class="list-row">
+                <span class="list-content">
+                  <span class="list-title">Card</span>
+                  <span class="list-sub"
+                    >What you just created: handle, public line, live status on the network</span
+                  >
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-content">
+                  <span class="list-title">QR</span>
+                  <span class="list-sub"
+                    >Signed code you print; can expire or be revoked without changing profile ID</span
+                  >
+                </span>
+              </li>
+              <li class="list-row">
+                <span class="list-content">
+                  <span class="list-title">Profile ID</span>
+                  <span class="list-sub"
+                    >Opaque ID for this card on the network (shown below after save)</span
+                  >
+                </span>
+              </li>
+            </ul>
+
+            <div class="flow-keys-panel">
+              <form
+                id="created-device-save-form"
+                class="created-keys-save-form flow-inset-form"
+                autocomplete="off"
+                novalidate
+              >
+                <label class="flow-field" for="created-device-save-label">
+                  <span class="flow-field-label">Label in wallet</span>
+                  <input
+                    class="flow-field-input"
+                    id="created-device-save-label"
+                    type="text"
+                    maxlength="48"
+                    placeholder="Personal card"
+                  />
+                </label>
+              </form>
+              <button
+                type="button"
+                class="btn-primary created-keys-save-btn"
+                id="created-device-save-btn"
+              >
                 Save on this device
               </button>
               <p id="created-device-save-status" class="form-status" hidden role="status"></p>
-            </form>
-            <p class="created-keys-saved" id="created-device-save-done" hidden>
-              Saved on this device.
-              <a href="/wallet/">All saved cards</a> ·
-              <a href="/">Homepage hub</a>
-            </p>
-            <details class="created-recovery-details" id="created-recovery-details">
+              <p class="created-keys-saved" id="created-device-save-done" hidden>
+                Saved on this device.
+                <a href="/wallet/">All saved cards</a> ·
+                <a href="/">Homepage hub</a>
+              </p>
+            </div>
+
+            <details class="flow-disclosure created-recovery-details" id="created-recovery-details">
               <summary>Break-glass recovery key (optional)</summary>
-              <div class="created-recovery-panel">
+              <div class="created-recovery-panel flow-disclosure-body">
                 <p class="form-hint">
                   For a <strong>new browser</strong> if you lose this tab  -  does not add keys to
                   Saved on this device.
