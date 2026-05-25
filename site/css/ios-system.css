@@ -1,0 +1,383 @@
+/**
+ * iOS system utility layer — materials, rhythm, motion.
+ * Loaded after styles.css on device-shell pages.
+ */
+
+:root {
+  --ios-bg: #f2f2f7;
+  --ios-bg-elevated: rgba(255, 255, 255, 0.82);
+  --ios-fill: rgba(255, 255, 255, 0.94);
+  --ios-fill-secondary: rgba(255, 255, 255, 0.72);
+  --ios-separator: rgba(60, 60, 67, 0.11);
+  --ios-label: rgba(60, 60, 67, 0.55);
+  --ios-label-strong: rgba(0, 0, 0, 0.88);
+  --ios-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 14px rgba(0, 0, 0, 0.05);
+  --ios-shadow-md: 0 8px 28px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+  --ios-blur: saturate(180%) blur(20px);
+  --ios-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --ios-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ios-space-group: 28px;
+  --ios-space-section: 20px;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --ios-bg-elevated: #ffffff;
+    --ios-fill: #ffffff;
+    --ios-fill-secondary: #ffffff;
+  }
+}
+
+body {
+  background: var(--ios-bg);
+  color: var(--ios-label-strong);
+}
+
+.page {
+  background: transparent;
+}
+
+/* Frosted chrome */
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  padding-bottom: 10px;
+  background: var(--ios-bg-elevated);
+  -webkit-backdrop-filter: var(--ios-blur);
+  backdrop-filter: var(--ios-blur);
+  border-bottom: 0.5px solid var(--ios-separator);
+  transition: background 0.35s var(--ios-ease);
+}
+
+.top-create {
+  border: none;
+  background: var(--red);
+  color: var(--white);
+  box-shadow: 0 2px 10px rgba(219, 27, 67, 0.28);
+}
+
+.top-create:active {
+  transform: scale(0.97);
+  opacity: 0.92;
+}
+
+.top-status {
+  margin-top: 0;
+  padding-bottom: 12px;
+}
+
+.device-status-summary {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--ios-fill-secondary);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--ios-shadow-sm);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ios-label);
+  transition:
+    background 0.35s var(--ios-ease),
+    color 0.25s var(--ios-ease),
+    box-shadow 0.35s var(--ios-ease);
+}
+
+.device-status-summary[aria-expanded="true"] {
+  background: var(--ios-fill);
+  color: var(--ios-label-strong);
+  box-shadow: var(--ios-shadow-md);
+}
+
+.device-status-seg.is-highlight {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.device-status-search-btn {
+  border: none;
+  background: var(--ios-fill);
+  box-shadow: var(--ios-shadow-sm);
+  transition: transform 0.2s var(--ios-spring);
+}
+
+.device-status-search-btn:active {
+  transform: scale(0.94);
+}
+
+.device-status-chevron {
+  transition: transform 0.4s var(--ios-spring), color 0.25s var(--ios-ease);
+}
+
+.brand-status-popover {
+  border: 0.5px solid var(--ios-separator);
+  background: var(--ios-bg-elevated);
+  -webkit-backdrop-filter: var(--ios-blur);
+  backdrop-filter: var(--ios-blur);
+  box-shadow: var(--ios-shadow-md);
+  border-radius: 16px;
+}
+
+.brand-status-sheet-row {
+  border-bottom-color: var(--ios-separator);
+}
+
+.brand-status-sheet-key {
+  text-transform: none;
+  letter-spacing: -0.01em;
+  font-weight: 500;
+  color: var(--ios-label);
+}
+
+.device-system-banner,
+.device-cross-tab-banner {
+  border: none;
+  box-shadow: var(--ios-shadow-sm);
+}
+
+.device-system-banner {
+  background: rgba(219, 27, 67, 0.09);
+}
+
+.device-cross-tab-banner {
+  background: rgba(0, 122, 255, 0.08);
+}
+
+/* Typography — calmer hierarchy */
+.group-label,
+.device-hub-group-label,
+.section-kicker {
+  text-transform: none;
+  letter-spacing: -0.02em;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ios-label);
+  margin: 0 0 10px 4px;
+}
+
+.group-intro,
+.device-hub-lead,
+.hero-line-sub {
+  color: var(--ios-label);
+}
+
+.hero h1,
+.screen-shop .shop-hero h1 {
+  letter-spacing: -0.04em;
+  font-weight: 700;
+}
+
+.hero-line {
+  color: var(--ios-label-strong);
+  font-weight: 400;
+}
+
+/* Grouped lists — inset material, not outlined boxes */
+.list {
+  border: none;
+  background: var(--ios-fill);
+  box-shadow: var(--ios-shadow-sm);
+}
+
+.list li {
+  border-bottom: 0.5px solid var(--ios-separator);
+}
+
+.list-sub {
+  font-weight: 400;
+  color: var(--ios-label);
+}
+
+.list-title {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.list-action .list-title {
+  font-weight: 600;
+}
+
+/* Device hub */
+.device-hub-group {
+  margin-bottom: var(--ios-space-group);
+}
+
+.device-hub-title {
+  letter-spacing: -0.03em;
+}
+
+.device-hub-lead {
+  margin-bottom: var(--ios-space-section);
+}
+
+.device-hub-search-block {
+  margin-bottom: var(--ios-space-section);
+}
+
+.device-hub-search--inline {
+  border: none;
+  background: var(--ios-fill);
+  box-shadow: var(--ios-shadow-sm);
+  transition: box-shadow 0.3s var(--ios-ease);
+}
+
+.device-hub-search--inline:focus {
+  box-shadow: 0 0 0 3px rgba(219, 27, 67, 0.18), var(--ios-shadow-sm);
+}
+
+.device-hub-empty {
+  border: none;
+  background: var(--ios-fill-secondary);
+  color: var(--ios-label);
+}
+
+.hub-card-item {
+  border: none;
+  background: var(--ios-fill);
+  box-shadow: var(--ios-shadow-sm);
+  transition:
+    transform 0.35s var(--ios-spring),
+    box-shadow 0.35s var(--ios-ease);
+}
+
+.hub-card-item:active {
+  transform: scale(0.985);
+}
+
+.hub-card-action {
+  border: none;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+button.hub-card-action.hub-use-keys {
+  background: var(--red);
+  color: var(--white);
+  box-shadow: 0 2px 8px rgba(219, 27, 67, 0.25);
+}
+
+.hub-card-menu-btn {
+  border: none;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.hub-card-menu-panel {
+  border: 0.5px solid var(--ios-separator);
+  box-shadow: var(--ios-shadow-md);
+}
+
+.device-hub-glance-btn {
+  border: none;
+  background: var(--ios-fill);
+  box-shadow: var(--ios-shadow-sm);
+  transition: transform 0.3s var(--ios-spring);
+}
+
+.device-hub-glance-btn:active {
+  transform: scale(0.98);
+}
+
+.device-hub-body {
+  transition: opacity 0.35s var(--ios-ease);
+}
+
+.device-hub.device-hub-collapsed .device-hub-body {
+  opacity: 0;
+}
+
+.device-hub:not(.device-hub-collapsed) .device-hub-body {
+  opacity: 1;
+}
+
+/* Buttons — filled, not outlined */
+.btn-primary {
+  border: none;
+  box-shadow: 0 4px 16px rgba(219, 27, 67, 0.28);
+  transition: transform 0.25s var(--ios-spring), opacity 0.2s ease;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary,
+.landing-hero-btn-secondary {
+  border: none;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--ios-label-strong);
+}
+
+.landing-hero-btn-primary {
+  border: none;
+  box-shadow: 0 4px 16px rgba(219, 27, 67, 0.28);
+}
+
+/* Created — segmented control */
+.created-tabs {
+  border: none;
+  background: rgba(118, 118, 128, 0.12);
+  padding: 3px;
+}
+
+.created-tab-btn {
+  transition:
+    background 0.4s var(--ios-spring),
+    color 0.25s var(--ios-ease),
+    box-shadow 0.4s var(--ios-spring);
+}
+
+.created-tab-btn.is-active,
+.created-tab-btn[aria-selected="true"] {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.created-tab-panel {
+  animation: ios-panel-in 0.4s var(--ios-spring) both;
+}
+
+@keyframes ios-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.shop-product-card {
+  border: none;
+  background: var(--ios-fill);
+  box-shadow: var(--ios-shadow-sm);
+}
+
+.shop-faq {
+  border: none;
+  background: var(--ios-fill-secondary);
+}
+
+/* Reduce icon noise in hub shortcuts — keep color for state only */
+.device-hub-group[data-hub-group="shortcuts"] .list-icon {
+  opacity: 0.92;
+}
+
+.ios-press-active {
+  opacity: 0.88;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .device-hub-body,
+  .created-tab-panel,
+  .hub-card-item,
+  .device-hub-glance-btn,
+  .device-status-chevron,
+  .btn-primary {
+    transition: none;
+    animation: none;
+  }
+
+  .created-tab-panel {
+    animation: none;
+  }
+}

@@ -24,10 +24,10 @@ export function buildStatusSegments(network = "offline") {
 
   const networkLabel =
     network === "ok"
-      ? "Network live"
+      ? "Resolver Online"
       : network === "degraded"
-        ? "Network limited"
-        : "Network offline";
+        ? "Resolver Limited"
+        : "Resolver Offline";
 
   const segments = [
     {
@@ -39,25 +39,28 @@ export function buildStatusSegments(network = "offline") {
     },
     {
       id: "saved",
-      label: `${saved} saved`,
-      detail: `${saved} saved card${saved === 1 ? "" : "s"} on this device`,
+      label: saved === 0 ? "No Cards on Device" : `${saved} on Device`,
+      detail:
+        saved === 0
+          ? "No signing keys saved on this device"
+          : `${saved} card${saved === 1 ? "" : "s"} stored on this device`,
       zero: saved === 0,
       highlight: false,
     },
     {
       id: "pinned",
-      label: `${pins} pinned`,
-      detail: `${pins} pinned scan${pins === 1 ? "" : "s"}`,
+      label: pins === 0 ? "No Pinned Scans" : `${pins} Pinned`,
+      detail: `${pins} pinned scan${pins === 1 ? "" : "s"} on this device`,
       zero: pins === 0,
       highlight: false,
     },
     {
       id: "notices",
-      label: `${notices} notice${notices === 1 ? "" : "s"}`,
+      label: notices > 0 ? "Tab Keys Active" : "Local Keys Ready",
       detail:
         notices > 0
-          ? "Keys in this tab — not saved on device"
-          : "No pending notices",
+          ? "Signing keys in this tab — not saved on device"
+          : "This device can open saved cards",
       zero: notices === 0,
       highlight: notices > 0,
     },
@@ -66,8 +69,8 @@ export function buildStatusSegments(network = "offline") {
   if (liveProof > 0) {
     segments.push({
       id: "liveproof",
-      label: `${liveProof} proof waiting`,
-      detail: `${liveProof} live proof request${liveProof === 1 ? "" : "s"} on saved cards`,
+      label: `${liveProof} Live Proof Waiting`,
+      detail: `${liveProof} live proof request${liveProof === 1 ? "" : "s"} awaiting signature`,
       zero: false,
       highlight: true,
     });
@@ -95,8 +98,8 @@ export function getDeviceCounts() {
   const saved = loadWallet().length;
   const pins = loadPins().length;
   const parts = [];
-  if (saved > 0) parts.push(`${saved} saved`);
-  if (pins > 0) parts.push(`${pins} pinned`);
+  if (saved > 0) parts.push(`${saved} on Device`);
+  if (pins > 0) parts.push(`${pins} Pinned`);
   return {
     saved,
     pins,

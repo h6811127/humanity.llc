@@ -232,7 +232,7 @@ function updateActiveBanner() {
     session.wallet_label ||
     (session.handle ? `@${session.handle}` : session.profile_id.slice(0, 12));
   activeBanner.hidden = false;
-  activeText.textContent = `Keys active in this tab: ${label}`;
+  activeText.textContent = `Tab Keys Active · ${label}`;
 }
 
 if (searchInput) {

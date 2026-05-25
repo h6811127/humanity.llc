@@ -7,6 +7,7 @@ import { getTabSession } from "./device-keys.mjs";
 import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
+import "./ios-motion.mjs";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 
 const HUB_OPEN_KEY = "hc_hub_open";
@@ -132,10 +133,10 @@ function renderPopoverSheet(segments) {
 
 function escapeSheetKey(id) {
   const map = {
-    network: "Network",
-    saved: "Saved",
+    network: "Resolver",
+    saved: "On device",
     pinned: "Pinned",
-    notices: "Notice",
+    notices: "Tab keys",
     liveproof: "Live proof",
   };
   return map[id] || id;
@@ -188,8 +189,8 @@ function renderSystemBanner() {
   systemBanner.hidden = false;
   systemBanner.textContent =
     networkStatus === "degraded"
-      ? "Resolver degraded — create, update, and revoke may fail until health recovers."
-      : "Network unreachable from this browser — public scans may still load; signing needs a connection.";
+      ? "Resolver limited — create, update, and revoke may fail until service recovers."
+      : "Resolver offline — scans may still load; signing needs a connection.";
 }
 
 function refreshSummary() {

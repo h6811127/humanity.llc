@@ -1220,3 +1220,80 @@ a {
     transition: none;
   }
 }
+
+/* —— iOS sheet environment (keep in sync with site/css/ios-system.css) —— */
+body {
+  background: #f2f2f7;
+}
+
+.page.scan-page {
+  background: transparent;
+}
+
+.scan-page .top {
+  background: rgba(255, 255, 255, 0.82);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 0.5px solid rgba(60, 60, 67, 0.11);
+}
+
+.scan-screen {
+  gap: 22px;
+}
+
+.section-kicker,
+.scan-page .group-label {
+  text-transform: none;
+  letter-spacing: -0.02em;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(60, 60, 67, 0.55);
+}
+
+.pass-tilt-wrap {
+  border: none;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.1),
+    0 1px 0 rgba(255, 255, 255, 0.8) inset;
+}
+
+.pass-face {
+  border: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.scan-page .list {
+  border: none;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+.scan-page .list li {
+  border-bottom: 0.5px solid rgba(60, 60, 67, 0.11);
+}
+
+.scan-limits-settings {
+  border: none;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.live-control-card,
+.vouch-card {
+  border: none;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+}
+
+.dock-btn {
+  border: none;
+}
+
+.dock-btn-secondary {
+  border: none;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.dock-btn-primary {
+  box-shadow: 0 4px 16px rgba(219, 27, 67, 0.28);
+}

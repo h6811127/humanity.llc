@@ -40,10 +40,10 @@ export function getCachedNetworkStatus(profileId) {
  */
 export function networkStatusChip(status) {
   const s = String(status || "").toLowerCase();
-  if (s === "active") return { label: "Active", tone: "ok" };
-  if (s === "revoked") return { label: "Revoked", tone: "warn" };
-  if (s === "offline" || s === "error") return { label: "Unreachable", tone: "offline" };
-  if (s === "checking") return { label: "Checking…", tone: "muted" };
+  if (s === "active") return { label: "Live State Active", tone: "ok" };
+  if (s === "revoked") return { label: "Revoked on Network", tone: "warn" };
+  if (s === "offline" || s === "error") return { label: "Resolver Unreachable", tone: "offline" };
+  if (s === "checking") return { label: "Sync Checking…", tone: "muted" };
   return { label: s ? s.charAt(0).toUpperCase() + s.slice(1) : "Unknown", tone: "muted" };
 }
 
