@@ -68,7 +68,7 @@ function walletHaystack(entry) {
 let hubConfig = {
   noticeMode: "created-url",
   fetchNetworkStatus: true,
-  savedLabel: "Saved cards",
+  savedLabel: "Cards",
   showLiveControlInbox: false,
 };
 
@@ -101,13 +101,15 @@ function hubEl(id) {
 const HUB_SECTION_EMPTY = {
   pins: "Your pinned scans will show here.",
   saved: "Cards you save on this device will show here.",
-  activity:
-    "Actions you take in this browser will show here. The network does not log scans.",
+  activity: "Nothing logged yet on this browser.",
 };
 
 function setHubListVisible(list, isEmpty) {
   if (!list) return;
-  if (list.classList.contains("wallet-activity-list")) {
+  if (
+    list.classList.contains("wallet-activity-list") ||
+    list.classList.contains("device-hub-action-list")
+  ) {
     list.removeAttribute("hidden");
     list.setAttribute("aria-hidden", isEmpty ? "true" : "false");
     list.classList.toggle("wallet-activity-list--empty", isEmpty);
@@ -350,16 +352,13 @@ function renderActivityRows() {
         openActivityNow(entry);
       });
     } else {
-      li.className = "list-row list-action device-activity-row device-activity-row--compact";
+      li.className = "device-hub-action-item";
       li.innerHTML = `
-        <button type="button" class="device-activity-open">
-          <span class="list-content">
-            <span class="list-title">${escapeHtml(entry.label)}</span>
-            <span class="list-sub">${escapeHtml(sub)}</span>
-          </span>
-          <span class="list-chevron" aria-hidden="true">›</span>
+        <button type="button" class="device-hub-action-btn">
+          <span class="device-hub-action-label">${escapeHtml(entry.label)}</span>
+          <span class="device-hub-action-meta">${escapeHtml(sub)}</span>
         </button>`;
-      li.querySelector(".device-activity-open")?.addEventListener("click", () => {
+      li.querySelector(".device-hub-action-btn")?.addEventListener("click", () => {
         openActivityNow(entry);
       });
     }
@@ -371,7 +370,9 @@ function renderSavedRows() {
   const entries = loadWallet();
   if (!savedList || !savedGroup) return;
 
-  const labelEl = savedGroup.querySelector(".device-hub-group-label");
+  const labelEl =
+    savedGroup.querySelector(".device-hub-subgroup-label") ||
+    savedGroup.querySelector(".device-hub-group-label");
   if (labelEl) labelEl.textContent = hubConfig.savedLabel;
 
   savedList.innerHTML = "";
@@ -648,7 +649,7 @@ export function initDeviceHub(config = {}) {
   hubConfig = {
     noticeMode: config.noticeMode ?? "created-url",
     fetchNetworkStatus: config.fetchNetworkStatus !== false,
-    savedLabel: config.savedLabel ?? "Saved cards",
+    savedLabel: config.savedLabel ?? "Cards",
     showLiveControlInbox: config.showLiveControlInbox === true,
   };
 

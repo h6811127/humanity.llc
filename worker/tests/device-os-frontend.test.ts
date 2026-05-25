@@ -266,7 +266,20 @@ describe("buildStatusSegmentsFromCounts", () => {
     });
     const notices = segments.find((s) => s.id === "notices");
     expect(notices?.label).toBe("Tab Keys Active");
+    expect(notices?.chipLabel).toBe("Tab keys");
     expect(notices?.highlight).toBe(true);
+  });
+
+  it("omits tab keys chip when no unsaved keys in tab", () => {
+    const segments = buildStatusSegmentsFromCounts({
+      network: "ok",
+      saved: 1,
+      pins: 0,
+      notices: 0,
+      liveProof: 0,
+    });
+    expect(segments.find((s) => s.id === "notices")).toBeUndefined();
+    expect(segments.find((s) => s.id === "network")?.chipLabel).toBe("Online");
   });
 
   it("shows proof check limited when poll health is degraded", () => {

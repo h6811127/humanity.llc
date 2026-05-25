@@ -5,7 +5,7 @@ import { loadWallet } from "./device-wallet.mjs";
 
 const STORAGE_KEY = "hc_device_activity";
 const MAX_ENTRIES = 40;
-export const HUB_RECENT_DISPLAY_LIMIT = 5;
+export const HUB_RECENT_DISPLAY_LIMIT = 3;
 
 /**
  * Skip back-to-back duplicate actions (e.g. Use keys twice on the same card).

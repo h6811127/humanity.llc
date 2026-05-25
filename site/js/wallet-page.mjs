@@ -156,7 +156,7 @@ if (pinForm) {
 initDeviceHub({
   hubRoot: "#wallet-page",
   noticeMode: "created-url",
-  savedLabel: "With signing keys",
+  savedLabel: "Cards",
   showShortcuts: false,
   showImport: true,
   showActivity: true,

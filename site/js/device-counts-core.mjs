@@ -35,18 +35,24 @@ export function buildStatusSegmentsFromCounts(input) {
       : network === "degraded"
         ? "Resolver Limited"
         : "Resolver Offline";
+  const networkChip =
+    network === "ok" ? "Online" : network === "degraded" ? "Limited" : "Offline";
 
+  /** @type {Array<{ id: string, label: string, chipLabel: string, detail: string, zero: boolean, highlight: boolean, chipTone?: string }>} */
   const segments = [
     {
       id: "network",
       label: networkLabel,
+      chipLabel: networkChip,
       detail: networkLabel,
       zero: false,
       highlight: false,
+      chipTone: `network-${network}`,
     },
     {
       id: "saved",
       label: saved === 0 ? "No Cards on Device" : `${saved} on Device`,
+      chipLabel: saved === 0 ? "0 cards" : `${saved} card${saved === 1 ? "" : "s"}`,
       detail:
         saved === 0
           ? "No signing keys saved on this device"
@@ -57,45 +63,54 @@ export function buildStatusSegmentsFromCounts(input) {
     {
       id: "pinned",
       label: pins === 0 ? "No Pinned Scans" : `${pins} Pinned`,
+      chipLabel: pins === 0 ? "0 pins" : `${pins} pin${pins === 1 ? "" : "s"}`,
       detail: `${pins} pinned scan${pins === 1 ? "" : "s"} on this device`,
       zero: pins === 0,
       highlight: false,
     },
-    {
-      id: "notices",
-      label: notices > 0 ? "Tab Keys Active" : "Local Keys Ready",
-      detail:
-        notices > 0
-          ? "Signing keys in this tab  -  not saved on device"
-          : "This device can open saved cards",
-      zero: notices === 0,
-      highlight: notices > 0,
-    },
   ];
+
+  if (notices > 0) {
+    segments.push({
+      id: "notices",
+      label: "Tab Keys Active",
+      chipLabel: "Tab keys",
+      detail: "Signing keys in this tab  -  not saved on device",
+      zero: false,
+      highlight: true,
+      chipTone: "highlight",
+    });
+  }
 
   if (liveProof > 0) {
     segments.push({
       id: "liveproof",
       label: `${liveProof} Live Proof Waiting`,
+      chipLabel: `${liveProof} proof`,
       detail: `${liveProof} live proof request${liveProof === 1 ? "" : "s"} awaiting signature`,
       zero: false,
       highlight: true,
+      chipTone: "highlight",
     });
   } else if (pollableSaved > 0 && liveProofPollHealth === "degraded") {
     segments.push({
       id: "liveproof",
       label: "Proof Check Limited",
+      chipLabel: "Proof limited",
       detail: "Could not reach the resolver for some saved cards",
       zero: false,
       highlight: true,
+      chipTone: "highlight",
     });
   } else if (pollableSaved > 0 && liveProofPollHealth === "offline") {
     segments.push({
       id: "liveproof",
       label: "Proof Check Offline",
+      chipLabel: "Proof offline",
       detail: "Live proof inbox unavailable while resolver is unreachable",
       zero: false,
       highlight: true,
+      chipTone: "highlight",
     });
   }
 

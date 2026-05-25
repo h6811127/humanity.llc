@@ -4261,6 +4261,21 @@ body.page-wallet .wallet-status-head {
   color: var(--grey);
 }
 
+.device-hub-section--secondary .wallet-activity-btn {
+  padding: 8px 10px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(120, 120, 128, 0.08);
+}
+
+.device-hub-section--secondary .wallet-activity-label {
+  font-size: 13px;
+}
+
+.device-hub-section--secondary .wallet-activity-meta {
+  font-size: 11px;
+}
+
 .wallet-activity-list {
   list-style: none;
   margin: 0;

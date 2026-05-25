@@ -149,21 +149,20 @@ function renderStatusKey() {
 
 function renderHubStatusPanel(segments) {
   if (!hubStatusPanel) return;
-  const parts = segments.map((seg, i) => {
-    const sep =
-      i > 0
-        ? '<span class="device-hub-status-sep" aria-hidden="true"> · </span>'
-        : "";
+  const chips = segments.map((seg) => {
+    const label = seg.chipLabel ?? seg.label;
+    const tone = seg.chipTone ?? (seg.highlight ? "highlight" : "neutral");
     const cls = [
-      "device-hub-status-seg",
-      seg.zero ? "is-zero" : "",
-      seg.highlight ? "is-highlight" : "",
+      "device-hub-chip",
+      `device-hub-chip--${seg.id}`,
+      `device-hub-chip--${tone}`,
+      seg.zero ? "device-hub-chip--zero" : "",
     ]
       .filter(Boolean)
       .join(" ");
-    return `${sep}<span class="${cls}" data-seg="${seg.id}">${escapeHtml(seg.label)}</span>`;
+    return `<span class="${cls}" data-seg="${seg.id}" title="${escapeHtml(seg.detail)}">${escapeHtml(label)}</span>`;
   });
-  hubStatusPanel.innerHTML = `<p class="device-hub-status-line" role="status">${parts.join("")}</p>`;
+  hubStatusPanel.innerHTML = `<div class="device-hub-status-chips" role="status">${chips.join("")}</div>`;
 }
 
 function renderNotifBadge() {
