@@ -1,4 +1,7 @@
-import { isRevokedSinceLastVisitFromBaseline } from "./wallet-network-baseline.mjs";
+import {
+  alertStateFromScanKind,
+  isRevokedSinceLastVisitFromBaseline,
+} from "./wallet-network-baseline.mjs";
 
 export const WALLET_NETWORK_CACHE_TTL_MS = 5 * 60 * 1000;
 
@@ -25,7 +28,9 @@ export function networkStatusChip(status) {
 }
 
 /**
- * Cards in revoked-since-last-visit transition are skipped when syncing baselines.
+ * After a fresh resolver fetch, update device baselines.
+ * Skips only during active→revoked transition (alert visible until Got it).
+ * Self-heal: a non-revoked fetch always updates baseline (recovers from stale cache).
  * @param {Record<string, string>} statusMap
  * @param {Record<string, string>} lastSeenMap
  */
@@ -33,10 +38,42 @@ export function mergeLastSeenFromNetworkMap(statusMap, lastSeenMap) {
   const next = { ...lastSeenMap };
   for (const [profileId, status] of Object.entries(statusMap)) {
     if (!profileId || !status) continue;
-    if (isRevokedSinceLastVisitFromBaseline(lastSeenMap[profileId], status)) continue;
-    next[profileId] = String(status).toLowerCase();
+    const normalized = String(status).toLowerCase();
+    if (isRevokedSinceLastVisitFromBaseline(lastSeenMap[profileId], normalized)) {
+      continue;
+    }
+    next[profileId] = normalized;
   }
   return next;
+}
+
+/**
+ * @param {Record<string, string>} lastSeenMap
+ * @param {string} profileId
+ * @param {{ status?: string, scanKind?: string | null, at?: number } | undefined} cachedEntry
+ * @param {number} now
+ * @param {number} [ttlMs]
+ */
+export function shouldUseCachedNetworkStatus(
+  lastSeenMap,
+  profileId,
+  cachedEntry,
+  now,
+  ttlMs = WALLET_NETWORK_CACHE_TTL_MS
+) {
+  if (!readCachedNetworkStatus({ [profileId]: cachedEntry }, profileId, now, ttlMs)) {
+    return false;
+  }
+  const cachedStatus = String(cachedEntry?.status || "").toLowerCase();
+  const lastSeen = lastSeenMap[profileId];
+  const cachedAlert = alertStateFromScanKind(cachedEntry?.scanKind, cachedStatus);
+  if (
+    cachedAlert === "card_revoked" &&
+    isRevokedSinceLastVisitFromBaseline(lastSeen, cachedAlert)
+  ) {
+    return false;
+  }
+  return true;
 }
 
 /**

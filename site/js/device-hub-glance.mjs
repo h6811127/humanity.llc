@@ -8,7 +8,7 @@ import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
 import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
 import {
-  getCachedNetworkStatus,
+  getCachedNetworkAlertState,
   isRevokedSinceLastVisit,
 } from "./device-wallet-network.mjs";
 import { loadWallet, walletEntrySubtitle } from "./device-wallet.mjs";
@@ -143,8 +143,8 @@ function refreshGlanceTarget(target) {
   const shown = entries.slice(0, GLANCE_MAX_CARDS);
   for (const entry of shown) {
     const li = document.createElement("li");
-    const status = getCachedNetworkStatus(entry.profile_id) ?? entry.status;
-    const revokedSince = isRevokedSinceLastVisit(entry.profile_id, status);
+    const alertState = getCachedNetworkAlertState(entry.profile_id) ?? "checking";
+    const revokedSince = isRevokedSinceLastVisit(entry.profile_id, alertState);
     li.className = revokedSince
       ? "device-hub-glance-row device-hub-glance-row--revoked"
       : "device-hub-glance-row";

@@ -202,11 +202,13 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 ### Revoked since last visit (Phase 6)
 
-**Storage:** `localStorage` key `hc_wallet_last_seen_network`  -  map of `profile_id` → last recorded resolver card status.
+**Storage:** `localStorage` key `hc_wallet_last_seen_network`  -  map of `profile_id` → last recorded **alert baseline** (`active` or `card_revoked`). Legacy `revoked` values are treated as acknowledged `card_revoked`.
 
-**When:** On fetch, if last seen ≠ `revoked` and resolver now reports `revoked`, show alert on the saved row and highlight in hub glance.
+**When:** On fetch, if last seen ≠ `card_revoked` and resolver now reports **`scan.kind === card_revoked`**, show alert on the saved row and highlight in hub glance. QR-only revoke (`qr_revoked`) does not trigger this alert.
 
-**Clear:** **Got it**, **Use keys**, or **Manage** records current status as seen. Leaving the page (`pagehide` / tab hidden) snapshots all cached statuses for the next visit.
+**Cache:** Session cache (~5 min, `sessionStorage.hc_wallet_network_cache`, includes `scanKind`) is bypassed when it says `card_revoked` but the device baseline still says non-revoked — the hub re-fetches from the resolver before showing the alert. A fresh non-revoked fetch always updates the baseline (self-heal).
+
+**Clear:** **Got it**, **Use keys**, or **Manage** records the current alert baseline (`active` or `card_revoked`) as seen and dispatches `hc-wallet-network-baseline-changed` so hub rows and glance re-apply without a full re-render. Leaving the page (`pagehide` / tab hidden) snapshots all cached alert states for the next visit. Returning to the tab re-fetches network status for saved rows so stale alerts can clear.
 
 ---
 

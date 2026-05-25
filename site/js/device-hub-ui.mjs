@@ -30,8 +30,10 @@ import {
   walletEntrySubtitle,
 } from "./device-wallet.mjs";
 import {
+  getCachedNetworkAlertState,
   getCachedNetworkStatus,
   isRevokedSinceLastVisit,
+  CARD_REVOKED_ALERT_STATE,
   networkStatusChip,
   recordNetworkSeen,
   refreshWalletNetworkStatuses,
@@ -180,7 +182,11 @@ function currentNetworkStatus(profileId, statusMap = {}) {
   return statusMap[profileId] ?? getCachedNetworkStatus(profileId) ?? "checking";
 }
 
-function applyNetworkChipsToDom(statusMap = {}) {
+function currentNetworkAlertState(profileId, alertStateMap = {}) {
+  return alertStateMap[profileId] ?? getCachedNetworkAlertState(profileId) ?? "checking";
+}
+
+function applyNetworkChipsToDom(statusMap = {}, alertStateMap = null) {
   if (!savedList) return;
   savedList.querySelectorAll(".hub-card-item").forEach((li) => {
     const pid = li.dataset.profileId;
@@ -192,17 +198,17 @@ function applyNetworkChipsToDom(statusMap = {}) {
     chipEl.className = `hub-card-network hub-card-network--${chip.tone}`;
     chipEl.textContent = chip.label;
   });
-  applyRevokedSinceVisitAlerts(statusMap);
+  applyRevokedSinceVisitAlerts(statusMap, alertStateMap);
 }
 
-function applyRevokedSinceVisitAlerts(statusMap = {}) {
+function applyRevokedSinceVisitAlerts(statusMap = {}, alertStateMap = null) {
   if (!savedList || !hubConfig.fetchNetworkStatus) return;
 
   savedList.querySelectorAll(".hub-card-item").forEach((li) => {
     const pid = li.dataset.profileId;
     if (!pid) return;
-    const status = currentNetworkStatus(pid, statusMap);
-    const show = isRevokedSinceLastVisit(pid, status);
+    const alertState = currentNetworkAlertState(pid, alertStateMap ?? {});
+    const show = isRevokedSinceLastVisit(pid, alertState);
     const alertEl = li.querySelector(".hub-card-status-alert");
 
     li.classList.toggle("hub-card-item--revoked-since-visit", show);
@@ -226,17 +232,17 @@ function bindRevokedAlertHandlers() {
       const li = btn.closest(".hub-card-item");
       const pid = li?.dataset.profileId;
       if (!pid) return;
-      recordNetworkSeen(pid, "revoked");
-      li?.classList.remove("hub-card-item--revoked-since-visit");
-      const alertEl = li?.querySelector(".hub-card-status-alert");
-      if (alertEl) alertEl.hidden = true;
+      recordNetworkSeen(pid, CARD_REVOKED_ALERT_STATE);
     });
   });
 }
 
 function acknowledgeNetworkSeenForEntry(entry) {
   if (!entry?.profile_id) return;
-  recordNetworkSeen(entry.profile_id, getCachedNetworkStatus(entry.profile_id) ?? entry.status);
+  recordNetworkSeen(
+    entry.profile_id,
+    getCachedNetworkAlertState(entry.profile_id) ?? "active"
+  );
 }
 
 async function fetchAndApplyNetworkChips() {
@@ -248,13 +254,13 @@ async function fetchAndApplyNetworkChips() {
       entries.map((e) => [e.profile_id, getCachedNetworkStatus(e.profile_id) ?? "checking"])
     )
   );
-  await refreshWalletNetworkStatuses(entries, (map) => {
-    applyNetworkChipsToDom(map);
-    syncLastSeenFromNetworkMap(map);
+  await refreshWalletNetworkStatuses(entries, ({ statusMap, alertStateMap }) => {
+    applyNetworkChipsToDom(statusMap, alertStateMap);
+    syncLastSeenFromNetworkMap(alertStateMap);
     const stored = loadWallet();
     let changed = false;
     const next = stored.map((e) => {
-      const net = map[e.profile_id];
+      const net = statusMap[e.profile_id];
       if (net && e.status !== net) {
         changed = true;
         return { ...e, status: net };
@@ -757,10 +763,21 @@ export function initDeviceHub(config = {}) {
   });
 
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "hidden") snapshotNetworkSeenOnExit();
+    if (document.visibilityState === "hidden") {
+      snapshotNetworkSeenOnExit();
+      return;
+    }
+    if (document.visibilityState === "visible") {
+      void fetchAndApplyNetworkChips();
+    }
   });
 
   window.addEventListener("pagehide", () => snapshotNetworkSeenOnExit());
+
+  window.addEventListener("hc-wallet-network-baseline-changed", () => {
+    applyRevokedSinceVisitAlerts();
+    notifyHubChanged();
+  });
 }
 
 window.addEventListener("hc-focus-hub-search", () => focusHubSearch());

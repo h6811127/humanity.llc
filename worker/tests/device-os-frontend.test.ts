@@ -20,6 +20,7 @@ import {
   mergeLastSeenFromNetworkMap,
   networkStatusChip,
   readCachedNetworkStatus,
+  shouldUseCachedNetworkStatus,
   WALLET_NETWORK_CACHE_TTL_MS,
 } from "../../site/js/device-wallet-network-core.mjs";
 import { isRevokedSinceLastVisitFromBaseline } from "../../site/js/wallet-network-baseline.mjs";
@@ -169,15 +170,34 @@ describe("readCachedNetworkStatus", () => {
 describe("mergeLastSeenFromNetworkMap", () => {
   it("updates baselines except cards in revoked-since-last-visit transition", () => {
     const next = mergeLastSeenFromNetworkMap(
-      { a: "active", b: "revoked", c: "revoked" },
-      { b: "active", c: "revoked" }
+      { a: "active", b: "card_revoked", c: "card_revoked" },
+      { b: "active", c: "card_revoked" }
     );
     expect(next).toEqual({
       b: "active",
-      c: "revoked",
+      c: "card_revoked",
       a: "active",
     });
-    expect(isRevokedSinceLastVisitFromBaseline("active", "revoked")).toBe(true);
+    expect(isRevokedSinceLastVisitFromBaseline("active", "card_revoked")).toBe(true);
+  });
+
+  it("self-heals baseline when fetch returns non-revoked after false transition", () => {
+    const next = mergeLastSeenFromNetworkMap({ card: "active" }, { card: "active" });
+    expect(next).toEqual({ card: "active" });
+    expect(isRevokedSinceLastVisitFromBaseline("active", "active")).toBe(false);
+  });
+});
+
+describe("shouldUseCachedNetworkStatus", () => {
+  it("bypasses cache when cached card_revoked disagrees with baseline", () => {
+    const now = 1_000_000;
+    const cached = { status: "revoked", scanKind: "card_revoked", at: now - 1000 };
+    expect(
+      shouldUseCachedNetworkStatus({ p1: "active" }, "p1", cached, now)
+    ).toBe(false);
+    expect(
+      shouldUseCachedNetworkStatus({ p1: "card_revoked" }, "p1", cached, now)
+    ).toBe(true);
   });
 });
 
