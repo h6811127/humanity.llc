@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Your live object · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=68" />
+    <link rel="stylesheet" href="/styles.css?v=70" />
   </head>
   <body class="has-device-hub-search device-shell-created">
     <div class="page">
@@ -27,20 +27,23 @@
       </header>
 
       <div class="top-status" id="top-status">
-        <button
-          type="button"
-          class="device-status-summary"
-          id="device-status-summary"
-          aria-expanded="false"
-          aria-controls="device-hub"
-        >
-          <span class="device-status-segments" id="device-status-segments"></span>
-          <span class="device-status-chevron" aria-hidden="true">›</span>
-        </button>
-        <div class="device-status-actions">
-          <p class="device-status-hint" id="device-status-hint">
-            Tap to manage keys on this device
-          </p>
+        <div class="top-status-row">
+          <button
+            type="button"
+            class="device-status-summary"
+            id="device-status-summary"
+            aria-expanded="false"
+            aria-controls="device-hub"
+            aria-label="On this device"
+          >
+            <span class="device-status-segments" id="device-status-segments"></span>
+            <span class="device-status-trail">
+              <span class="device-status-device-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </span>
+              <span class="device-status-chevron" aria-hidden="true">›</span>
+            </span>
+          </button>
           <button
             type="button"
             class="device-status-search-btn"

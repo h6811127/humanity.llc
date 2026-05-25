@@ -13,7 +13,7 @@
     />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=50" />
+    <link rel="stylesheet" href="/styles.css?v=70" />
   </head>
   <body>
     <div class="page">
@@ -39,26 +39,58 @@
         <section class="group" aria-labelledby="loop-title">
           <h2 class="group-label" id="loop-title">Try it in order</h2>
           <ol class="case-study-steps">
-            <li>
-              <strong>Create</strong> — generate keys in the browser, sign card + QR, POST to the
-              resolver. Keys stay on your device unless you save recovery or encrypted backup.
-              <a href="/create/?template=status_plate">Create a status plate</a>
+            <li class="case-study-step">
+              <span class="case-study-step-num" aria-hidden="true">1</span>
+              <div class="case-study-step-body">
+                <p class="case-study-step-title">Create</p>
+                <p class="case-study-step-desc">
+                  Generate keys in the browser, sign card + QR, POST to the resolver. Keys stay on
+                  your device unless you save recovery or encrypted backup.
+                </p>
+                <a class="case-study-step-link" href="/create/?template=status_plate"
+                  >Create a status plate</a
+                >
+              </div>
             </li>
-            <li>
-              <strong>Scan</strong> — open the scan link from another phone. The pass UI separates
-              card status, QR credential, human trust, and limits.
+            <li class="case-study-step">
+              <span class="case-study-step-num" aria-hidden="true">2</span>
+              <div class="case-study-step-body">
+                <p class="case-study-step-title">Scan</p>
+                <p class="case-study-step-desc">
+                  Open the scan link from another phone. The pass UI separates card status, QR
+                  credential, human trust, and limits.
+                </p>
+              </div>
             </li>
-            <li>
-              <strong>Update</strong> — on <code>/created/</code>, change the public line (status
-              plate: object name + status). Same printed QR; network returns the new manifesto.
+            <li class="case-study-step">
+              <span class="case-study-step-num" aria-hidden="true">3</span>
+              <div class="case-study-step-body">
+                <p class="case-study-step-title">Update</p>
+                <p class="case-study-step-desc">
+                  On <code>/created/</code>, change the public line (status plate: object name +
+                  status). Same printed QR; the network returns the new manifesto.
+                </p>
+              </div>
             </li>
-            <li>
-              <strong>Revoke</strong> — owner-signed revoke updates resolver state. The URL on the
-              sticker stays; the answer changes to revoked.
+            <li class="case-study-step">
+              <span class="case-study-step-num" aria-hidden="true">4</span>
+              <div class="case-study-step-body">
+                <p class="case-study-step-title">Revoke</p>
+                <p class="case-study-step-desc">
+                  Owner-signed revoke updates resolver state. The URL on the sticker stays; the
+                  answer changes to revoked.
+                </p>
+              </div>
             </li>
-            <li>
-              <strong>Live control</strong> — scanner requests a short-lived challenge; owner signs
-              on a key-holding device. Proves recent key possession, not legal ID.
+            <li class="case-study-step">
+              <span class="case-study-step-num" aria-hidden="true">5</span>
+              <div class="case-study-step-body">
+                <p class="case-study-step-title">Live control</p>
+                <p class="case-study-step-desc">
+                  Scanner requests a short-lived challenge; owner signs on a key-holding device.
+                  Proves recent key possession, not legal ID.
+                </p>
+              </div>
             </li>
           </ol>
         </section>
@@ -109,7 +141,6 @@
         </section>
 
         <nav class="dock" aria-label="Actions">
-          <a class="dock-btn dock-btn-primary" href="/create/">Create a live object</a>
           <a class="dock-btn" href="/">Back to landing</a>
         </nav>
       </main>

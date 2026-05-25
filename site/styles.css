@@ -172,11 +172,19 @@ a {
   margin-top: -2px;
 }
 
+.top-status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .device-status-summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  flex: 1;
+  min-width: 0;
   width: 100%;
   margin: 0;
   padding: 0 2px;
@@ -207,6 +215,26 @@ a {
   opacity: 1;
 }
 
+.device-status-trail {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.device-status-device-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  color: var(--grey);
+  opacity: 0.7;
+}
+
+.device-status-device-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
 .device-status-chevron {
   flex-shrink: 0;
   font-size: 16px;
@@ -220,28 +248,13 @@ a {
   color: var(--red);
 }
 
+.device-status-summary[aria-expanded="true"] .device-status-device-icon {
+  color: var(--red);
+  opacity: 1;
+}
+
 .device-status-summary--static .device-status-chevron {
   display: none;
-}
-
-.device-status-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 4px;
-}
-
-.device-status-hint {
-  margin: 0;
-  padding: 0 2px;
-  font-size: 11px;
-  font-weight: 500;
-  line-height: 1.35;
-  color: var(--grey);
-  opacity: 0.85;
-  flex: 1;
-  min-width: 0;
 }
 
 .device-status-search-btn {
@@ -2829,45 +2842,79 @@ body.landing-focus-mode .landing-docs-full {
   display: none;
 }
 
-body.landing-focus-mode .landing-docs-footer {
-  display: block;
-}
-
 body.landing-focus-mode .screen-landing {
   padding-top: 4px;
   gap: 18px;
 }
 
-.landing-protocol-details {
-  border-radius: var(--radius);
-  background: rgba(0, 0, 0, 0.03);
-}
-
-.landing-protocol-summary {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
+/* Case study ordered walkthrough */
+.case-study-steps {
   list-style: none;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.landing-protocol-summary::-webkit-details-marker {
-  display: none;
+.case-study-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.02);
 }
 
-.landing-protocol-summary .list-chevron {
-  margin-left: auto;
-  transition: transform 0.15s ease;
+.case-study-step-num {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--red);
+  background: rgba(219, 27, 67, 0.1);
 }
 
-.landing-protocol-details[open] .landing-protocol-summary .list-chevron {
-  transform: rotate(90deg);
+.case-study-step-body {
+  flex: 1;
+  min-width: 0;
 }
 
-.landing-protocol-links {
-  padding: 0 8px 8px;
+.case-study-step-title {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--black);
+}
+
+.case-study-step-desc {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+.case-study-step-desc code {
+  font-size: 13px;
+}
+
+.case-study-step-link {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--red);
+  text-decoration: none;
+}
+
+.case-study-step-link:active {
+  opacity: 0.75;
 }
 
 .landing-focus-toggle {
@@ -3434,7 +3481,7 @@ body.landing-focus-mode .screen-landing {
 }
 
 .has-device-hub-search .screen-landing {
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 88px);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
 }
 
 .has-device-hub-search .screen-wallet {

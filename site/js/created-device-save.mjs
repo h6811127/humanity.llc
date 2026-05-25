@@ -1,3 +1,4 @@
+import { isAutoSaveEnabled } from "./device-auto-save.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
 import {
   defaultWalletLabel,
@@ -45,6 +46,9 @@ export function initCreatedDeviceSave(getSession) {
     } else if (form && doneEl) {
       form.hidden = false;
       doneEl.hidden = true;
+      if (isAutoSaveEnabled()) {
+        queueMicrotask(() => runSave());
+      }
     }
   }
 

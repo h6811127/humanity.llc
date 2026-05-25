@@ -26,7 +26,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Hub rows (shipped):** Saved cards — **Use keys**, **Open scan**, **⋯** (Relabel, Remove). **Import backup file** decrypts `.hcbackup.json` into `hc_wallet`.
 
-**Landing focus mode:** `localStorage.hc_landing_focus` hides intro (`[data-landing-tutorial]`). Keeps **hub**, **hub glance** (when collapsed), **system banner** (if network unhealthy), **Help & protocol** footer (`<details>`), and **contact**. Full **Documentation** block is for intro mode only — see [`DEVICE_OS.md`](DEVICE_OS.md) immutable vs reference.
+**Landing focus mode:** `localStorage.hc_landing_focus` hides intro (`[data-landing-tutorial]`). Keeps **hub**, **hub glance**, **system banner** (if unhealthy), **Help & protocol** list (not full Documentation), and **contact**. No bottom Create dock or “New here?” float. **Auto-save** optional via `hc_auto_save_device` in hub shortcuts.
 
 **Hub glance (landing):** When the hub is collapsed, `#device-hub-glance` shows notice (if any) and up to three saved card labels; tap expands the hub.
 

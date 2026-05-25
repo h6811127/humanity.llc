@@ -27,7 +27,7 @@ Before shipping UI, answer:
 | Save, search, relabel, import backup, activity log, collapsed glance | **Device hub** (`#device-hub`) + glance strip |
 | Manifesto, revoke, QR, backup export | **Network object** + `/created/` Manage tab |
 | What a stranger sees | **Scan page only** — never a second homepage demo |
-| Protocol essays, threat models, case study walkthrough | **Reference** (full docs intro, or Help drawer in focus mode) — not the operational desktop |
+| Protocol essays, threat models, case study walkthrough | **Reference** (full docs in intro mode; Help & protocol footer in focus mode) |
 
 **Do not put on the landing hub:** per-pin revoke, disable QR, or any signed network mutation without **Use keys → /created/**. Pins are public bookmarks only.
 
@@ -66,13 +66,30 @@ Hides `[data-landing-tutorial]` (hero, progress, One use, design choices, dock, 
 
 **Stays visible:**
 
-- Status line, system banner (if any), hub, hub glance, contact  
-- **Help & protocol** — one collapsible footer (not the full Documentation block)  
-- Hub **Show intro again** toggle in shortcuts  
+- Status line (shield + chevron; search on the right), system banner (if any), hub, hub glance, contact  
+- **Help & protocol** — compact list group (`#landing-docs-footer`); full Documentation hidden  
+- Hub **Auto-save** toggle and **Show intro again**  
 
 **Default:** on when wallet or pins exist (`landing-focus.mjs`). Entering focus mode expands the hub once.
 
+**Removed from landing:** bottom Create dock, floating “New here?” pill, “Tap to manage keys” hint.
+
 **Not the desktop:** a scroll of static documentation links. The desktop is **hub-first**; protocol links are secondary.
+
+### Auto-save (`hc_auto_save_device`)
+
+Optional hub toggle (off by default): after create, write tab keys to `hc_wallet` without tapping **Save on this device**. For returning users on a trusted browser — not a substitute for recovery key or encrypted backup.
+
+### Global information on the desktop (now vs later)
+
+| Now | Later (careful) |
+|-----|------------------|
+| Network health in status line + banner | Resolver build / incident feed |
+| Saved · pinned · notice counts | “Card revoked since last visit” per saved row |
+| Hub glance when collapsed | Cross-tab “keys in another tab” banner |
+| Recent activity on device | Live-control inbox (signed actions only on `/created/`) |
+
+Do **not** add per-pin revoke on the homepage — pins have no keys; use **Use keys → Manage**.
 
 ---
 
@@ -120,7 +137,9 @@ See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` for storage and search.
 | 3 | Brand dot sheet: **Help & protocol** row (landing) | ✅ |
 | 4 | `#device-hub-glance` when hub collapsed | ✅ |
 | 5 | `#device-system-banner` when network degraded/offline | ✅ |
-| 6 | Deferred: live-control inbox queue | — |
+| 6 | Auto-save toggle (`hc_auto_save_device`) | ✅ |
+| 7 | Landing cleanup: no dock, no help float, no status hint | ✅ |
+| 8 | Deferred: live-control inbox queue | — |
 | 7 | Deferred: cross-tab keys banner beyond notice row | — |
 | 8 | Deferred: resolver-wide search / directory | — |
 | 9 | Deferred: per-card revoke chips on landing hub | — (use Manage) |

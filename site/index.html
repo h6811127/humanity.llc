@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=69" />
+    <link rel="stylesheet" href="/styles.css?v=70" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -44,20 +44,23 @@
       </header>
 
       <div class="top-status" id="top-status">
-        <button
-          type="button"
-          class="device-status-summary"
-          id="device-status-summary"
-          aria-expanded="false"
-          aria-controls="device-hub"
-        >
-          <span class="device-status-segments" id="device-status-segments"></span>
-          <span class="device-status-chevron" aria-hidden="true">›</span>
-        </button>
-        <div class="device-status-actions">
-          <p class="device-status-hint" id="device-status-hint">
-            Tap to manage keys on this device
-          </p>
+        <div class="top-status-row">
+          <button
+            type="button"
+            class="device-status-summary"
+            id="device-status-summary"
+            aria-expanded="false"
+            aria-controls="device-hub"
+            aria-label="On this device"
+          >
+            <span class="device-status-segments" id="device-status-segments"></span>
+            <span class="device-status-trail">
+              <span class="device-status-device-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </span>
+              <span class="device-status-chevron" aria-hidden="true">›</span>
+            </span>
+          </button>
           <button
             type="button"
             class="device-status-search-btn"
@@ -212,6 +215,11 @@
                   </span>
                   <span class="list-chevron" aria-hidden="true">›</span>
                 </a>
+              </li>
+              <li class="list-row device-hub-focus-row" data-hub-searchable="auto save device keys">
+                <button type="button" class="landing-focus-toggle" id="device-auto-save-toggle">
+                  Auto-save off · save after each create
+                </button>
               </li>
               <li class="list-row device-hub-focus-row" data-hub-searchable="focus intro tutorial">
                 <button type="button" class="landing-focus-toggle" id="landing-focus-toggle">
@@ -648,61 +656,58 @@
           </ul>
         </section>
 
-        <section class="group landing-essentials landing-docs-footer" id="landing-docs-footer">
-          <details class="landing-protocol-details">
-            <summary class="landing-protocol-summary">
-              <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">Help &amp; protocol</span>
-                <span class="list-sub">Features, case study, architecture, data policy</span>
-              </span>
-              <span class="list-chevron" aria-hidden="true">›</span>
-            </summary>
-            <ul class="list list-compact landing-protocol-links">
-              <li class="list-row list-action">
-                <a href="/features-available-now.html">
-                  <span class="list-content">
-                    <span class="list-title">All features available now</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </a>
-              </li>
-              <li class="list-row list-action">
-                <a href="/studio/">
-                  <span class="list-content">
-                    <span class="list-title">Studio blog</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </a>
-              </li>
-              <li class="list-row list-action">
-                <a href="/case-study/">
-                  <span class="list-content">
-                    <span class="list-title">Case study</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </a>
-              </li>
-              <li class="list-row list-action">
-                <a href="/architecture.html">
-                  <span class="list-content">
-                    <span class="list-title">Architecture &amp; security</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </a>
-              </li>
-              <li class="list-row list-action">
-                <a href="/data-policy.html">
-                  <span class="list-content">
-                    <span class="list-title">Data policy</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </a>
-              </li>
-            </ul>
-          </details>
+        <section class="group landing-essentials landing-docs-footer" id="landing-docs-footer" hidden>
+          <h2 class="group-label">Help &amp; protocol</h2>
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/features-available-now.html">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">All features available now</span>
+                  <span class="list-sub">Protocol map, limits, security</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/case-study/">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Case study</span>
+                  <span class="list-sub">Create → scan → revoke loop</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/architecture.html">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Architecture &amp; security</span>
+                  <span class="list-sub">Threat model and tests</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/data-policy.html">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Data policy</span>
+                  <span class="list-sub">What the network stores</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
         </section>
 
         <section class="group landing-essentials" id="now">
@@ -722,63 +727,10 @@
         </section>
       </main>
     </div>
-    <div class="landing-help-float" id="landing-help-root" hidden data-landing-tutorial>
-      <button
-        type="button"
-        class="landing-new-here-pill"
-        id="landing-help-open"
-        aria-label="New here? Tips and demos"
-        aria-expanded="false"
-        aria-controls="landing-help-drawer"
-      >
-        <span class="landing-new-here-label">New here?</span>
-      </button>
-      <div class="device-hub-search-drawer landing-help-drawer" id="landing-help-drawer" hidden>
-        <div class="landing-help-head">
-          <span class="landing-help-title">New here?</span>
-          <button
-            type="button"
-            class="device-hub-search-close"
-            id="landing-help-close"
-            aria-label="Close help"
-          >
-            ×
-          </button>
-        </div>
-        <ol class="landing-help-steps">
-          <li><a href="/create/"><span class="landing-help-step-num">1</span> Create</a></li>
-          <li>
-            <a href="/created/"
-              ><span class="landing-help-step-num">2</span> Save on this device</a
-            >
-          </li>
-          <li><a href="/created/"><span class="landing-help-step-num">3</span> Print QR</a></li>
-          <li><a href="/created/"><span class="landing-help-step-num">4</span> Manage &amp; revoke</a></li>
-        </ol>
-        <p class="form-hint landing-help-hint">
-          Step 2 writes keys to this browser — not iCloud by default. Other tabs on this device
-          see them after save. Pin public scans from <a href="/wallet/">/wallet/</a> when you only
-          need a bookmark.
-        </p>
-        <p class="landing-help-more">
-          <a href="/case-study/">See the full loop</a>
-          ·
-          <a href="/wallet/">All saved cards</a>
-        </p>
-        <button type="button" class="landing-help-dismiss" id="landing-help-dismiss">
-          Hide for this session
-        </button>
-      </div>
-    </div>
-
-    <nav class="dock dock-sticky" aria-label="Get started" data-landing-tutorial>
-      <a class="dock-btn dock-btn-primary" href="/create/">Create a live object</a>
-    </nav>
-    <script src="/js/landing-focus.mjs?v=1" type="module"></script>
+    <script src="/js/landing-focus.mjs?v=2" type="module"></script>
     <script src="/js/device-status.mjs?v=5" type="module"></script>
     <script src="/js/landing-progress.mjs?v=2" type="module"></script>
-    <script src="/js/landing-help.mjs?v=3" type="module"></script>
-    <script src="/js/landing-device-hub.mjs?v=9" type="module"></script>
+    <script src="/js/landing-device-hub.mjs?v=10" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=2" type="module"></script>
   </body>
 </html>

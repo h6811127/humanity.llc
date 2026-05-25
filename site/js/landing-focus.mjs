@@ -7,6 +7,8 @@ import { loadPins } from "./device-pins.mjs";
 const FOCUS_KEY = "hc_landing_focus";
 
 const toggle = document.getElementById("landing-focus-toggle");
+const docsFull = document.getElementById("landing-docs-full");
+const docsFooter = document.getElementById("landing-docs-footer");
 
 function hasDeviceData() {
   return loadWallet().length > 0 || loadPins().length > 0;
@@ -22,6 +24,8 @@ function isFocusMode() {
 function applyFocus() {
   const on = isFocusMode();
   document.body.classList.toggle("landing-focus-mode", on);
+  if (docsFull) docsFull.hidden = on;
+  if (docsFooter) docsFooter.hidden = !on;
   if (toggle) {
     toggle.textContent = on ? "Show intro again" : "Hide intro · focus on this device";
     toggle.setAttribute("aria-pressed", on ? "true" : "false");

@@ -23,7 +23,6 @@ const DEVICE_CLASSES = [
 
 const summaryBtn = document.getElementById("device-status-summary");
 const segmentsEl = document.getElementById("device-status-segments");
-const statusHint = document.getElementById("device-status-hint");
 const dotBtn = document.getElementById("brand-status-dot-btn");
 const dot = document.getElementById("brand-status-dot");
 const popover = document.getElementById("brand-status-popover");
@@ -62,7 +61,6 @@ export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
   if (!hub) return;
   hub.classList.toggle("device-hub-collapsed", !open);
   if (summaryBtn) summaryBtn.setAttribute("aria-expanded", open ? "true" : "false");
-  if (statusHint) statusHint.hidden = open;
   if (persist) {
     sessionStorage.setItem(HUB_OPEN_KEY, open ? "1" : "0");
   }
