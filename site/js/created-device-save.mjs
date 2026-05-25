@@ -8,7 +8,7 @@ import {
  * @param {() => Record<string, unknown> | null} getSession
  */
 export function initCreatedDeviceSave(getSession) {
-  const card = document.getElementById("device-save-card");
+  const card = document.getElementById("created-keys-strip");
   const form = document.getElementById("created-device-save-form");
   const labelInput = document.getElementById("created-device-save-label");
   const statusEl = document.getElementById("created-device-save-status");

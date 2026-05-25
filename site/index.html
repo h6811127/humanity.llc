@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=65" />
+    <link rel="stylesheet" href="/styles.css?v=66" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -186,13 +186,18 @@
                   </form>
                 </details>
               </li>
+              <li class="list-row device-hub-focus-row" data-hub-searchable="focus intro tutorial">
+                <button type="button" class="landing-focus-toggle" id="landing-focus-toggle">
+                  Hide intro · focus on this device
+                </button>
+              </li>
             </ul>
           </div>
         </div>
       </section>
 
       <main class="screen screen-landing">
-        <section class="hero hero-tight">
+        <section class="hero hero-tight" data-landing-tutorial>
           <p class="hero-eyebrow">Try it</p>
           <h1>Live state<br />on real objects.</h1>
           <p class="hero-tagline">Print a QR once. Change its live state later.</p>
@@ -218,7 +223,7 @@
           </div>
         </section>
 
-        <nav class="landing-progress" aria-label="Your path">
+        <nav class="landing-progress" aria-label="Your path" data-landing-tutorial>
           <p class="landing-progress-kicker">Five steps · no account</p>
           <ol class="landing-progress-steps">
             <li class="landing-progress-step">
@@ -254,7 +259,7 @@
           </ol>
         </nav>
 
-        <section class="pass" id="card" aria-label="Network status preview">
+        <section class="pass" id="card" aria-label="Network status preview" data-landing-tutorial>
           <p class="section-kicker">What someone sees when they scan</p>
           <div class="pass-scene" id="pass-scene">
             <div class="pass-tilt-wrap" id="pass-tilt-wrap">
@@ -385,7 +390,7 @@
           </div>
         </section>
 
-        <section class="landing-framing" aria-labelledby="framing-title">
+        <section class="landing-framing" aria-labelledby="framing-title" data-landing-tutorial>
           <p class="section-kicker">The idea</p>
           <h2 class="landing-framing-title" id="framing-title">Physical software objects</h2>
           <p class="landing-framing-lead">
@@ -417,7 +422,12 @@
           </div>
         </section>
 
-        <section class="pilot-showcase" aria-labelledby="pilot-title" id="status-plate-pilot">
+        <section
+          class="pilot-showcase"
+          aria-labelledby="pilot-title"
+          id="status-plate-pilot"
+          data-landing-tutorial
+        >
           <p class="section-kicker">On a real object</p>
           <h2 class="pilot-showcase-title" id="pilot-title">Status plate pilot</h2>
           <p class="pilot-showcase-lead">
@@ -459,7 +469,7 @@
           </ul>
         </section>
 
-        <section class="example-flow" aria-label="Concrete example">
+        <section class="example-flow" aria-label="Concrete example" data-landing-tutorial>
           <h2 class="group-label">One use</h2>
           <p class="group-intro short">
             A status plate on a studio door. Someone scans for tonight’s hours, whether
@@ -507,7 +517,7 @@
           </p>
         </section>
 
-        <section class="group trust-posture" aria-label="Trust posture">
+        <section class="group trust-posture" aria-label="Trust posture" data-landing-tutorial>
           <h2 class="group-label">Design choices</h2>
           <p class="group-intro short">
             Engineering decisions — each tag names a concrete mechanism, not marketing copy.
@@ -577,7 +587,7 @@
           </ul>
         </section>
 
-        <section class="group" id="limits">
+        <section class="group" id="limits" data-landing-tutorial>
           <h2 class="group-label">Clear limits</h2>
           <ul class="list list-compact">
             <li class="list-row">
@@ -626,7 +636,7 @@
           </ul>
         </section>
 
-        <section class="group pilot-more-ideas" aria-label="More ideas">
+        <section class="group pilot-more-ideas" aria-label="More ideas" data-landing-tutorial>
           <p class="group-intro short">
             One primitive — current signed status on any camera. Benches, wearables, markets, and
             flyers are in the
@@ -634,8 +644,8 @@
           </p>
         </section>
 
-        <section class="group group-muted">
-          <h2 class="group-label">Building now</h2>
+        <section class="group group-muted landing-essentials">
+          <h2 class="group-label">Documentation</h2>
           <ul class="list list-compact">
             <li class="list-row list-action">
               <a href="/features-available-now.html">
@@ -670,10 +680,34 @@
                 <span class="list-chevron" aria-hidden="true">›</span>
               </a>
             </li>
+            <li class="list-row list-action">
+              <a href="/architecture.html">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Architecture &amp; security</span>
+                  <span class="list-sub">Threat models, tests, tradeoffs</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/data-policy.html">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Data policy</span>
+                  <span class="list-sub">What the network stores</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
           </ul>
         </section>
 
-        <section class="group" id="now">
+        <section class="group landing-essentials" id="now">
           <ul class="list">
             <li class="list-row list-action">
               <a href="mailto:info@humanity.llc">
@@ -690,7 +724,7 @@
         </section>
       </main>
     </div>
-    <div class="landing-help-float" id="landing-help-root" hidden>
+    <div class="landing-help-float" id="landing-help-root" hidden data-landing-tutorial>
       <button
         type="button"
         class="landing-new-here-pill"
@@ -801,11 +835,12 @@
       </div>
     </div>
 
-    <nav class="dock dock-sticky" aria-label="Get started">
+    <nav class="dock dock-sticky" aria-label="Get started" data-landing-tutorial>
       <a class="dock-btn dock-btn-primary" href="/create/">Create a live object</a>
     </nav>
     <script src="/js/pass-flip.js?v=1" defer></script>
     <script src="/js/pass-demo-revoke.js?v=1" defer></script>
+    <script src="/js/landing-focus.mjs?v=1" type="module"></script>
     <script src="/js/device-status.mjs?v=3" type="module"></script>
     <script src="/js/landing-progress.mjs?v=1" type="module"></script>
     <script src="/js/landing-help.mjs?v=3" type="module"></script>

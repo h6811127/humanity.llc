@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Your live object · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=65" />
+    <link rel="stylesheet" href="/styles.css?v=66" />
   </head>
   <body>
     <div class="page">
@@ -112,6 +112,66 @@
 
         <!-- ——— Now: deploy, status, QR ——— -->
         <div class="created-tab-panel" data-created-panel="now" id="created-tab-now" role="tabpanel" aria-labelledby="created-tab-btn-now">
+          <section
+            class="created-keys-strip"
+            id="created-keys-strip"
+            hidden
+            aria-labelledby="created-keys-title"
+          >
+            <h2 class="created-keys-title" id="created-keys-title">Keys on this device</h2>
+            <p class="created-keys-lead">
+              One tap so the homepage and other tabs can sign for this card. Not the same as a
+              recovery key.
+            </p>
+            <form
+              id="created-device-save-form"
+              class="created-keys-save-form"
+              autocomplete="off"
+              novalidate
+            >
+              <label class="form-label" for="created-device-save-label">Label</label>
+              <input
+                class="form-input"
+                id="created-device-save-label"
+                type="text"
+                maxlength="48"
+                placeholder="Personal card"
+              />
+              <button type="submit" class="btn-primary created-keys-save-btn">
+                Save on this device
+              </button>
+              <p id="created-device-save-status" class="form-status" hidden role="status"></p>
+            </form>
+            <p class="created-keys-saved" id="created-device-save-done" hidden>
+              Saved on this device.
+              <a href="/wallet/">All saved cards</a> ·
+              <a href="/">Homepage hub</a>
+            </p>
+            <details class="created-recovery-details" id="created-recovery-details">
+              <summary>Break-glass recovery key (optional)</summary>
+              <div class="created-recovery-panel">
+                <p class="form-hint">
+                  For a <strong>new browser</strong> if you lose this tab — does not add keys to
+                  Saved on this device.
+                </p>
+                <p class="mono recovery-key-display" id="recovery-key-display"></p>
+                <button type="button" class="btn-secondary" id="copy-recovery-key">
+                  Copy recovery key
+                </button>
+                <label class="revoke-confirm revoke-confirm-spaced">
+                  <input type="checkbox" id="recovery-reveal-confirm" />
+                  <span>I saved this recovery key</span>
+                </label>
+                <button type="button" class="btn-secondary" id="recovery-reveal-dismiss" disabled>
+                  Mark saved &amp; close
+                </button>
+              </div>
+            </details>
+            <p class="created-keys-foot form-hint">
+              Then print your QR below and open scan from another phone.
+            </p>
+          </section>
+
           <section class="group created-status-group" aria-label="Live on network">
             <h2 class="group-label">On the network</h2>
             <ul class="list list-compact created-status-strip">
@@ -231,80 +291,6 @@
             </p>
           </section>
 
-          <section class="recovery-reveal-card" id="recovery-reveal" hidden>
-            <div class="recovery-reveal-header">
-              <span class="recovery-reveal-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-              </span>
-              <div class="recovery-reveal-heading">
-                <h2 class="recovery-reveal-title">Save your recovery key</h2>
-                <p class="recovery-reveal-sub">
-                  One-time step before you close this tab.
-                </p>
-              </div>
-            </div>
-            <div class="recovery-reveal-body">
-              <p class="recovery-reveal-note">
-                Without this key or an encrypted backup, this browser cannot sign revoke or updates
-                later.
-              </p>
-              <p class="mono recovery-key-display" id="recovery-key-display"></p>
-              <button type="button" class="btn-secondary" id="copy-recovery-key">Copy recovery key</button>
-              <label class="revoke-confirm revoke-confirm-spaced">
-                <input type="checkbox" id="recovery-reveal-confirm" />
-                <span>I saved this recovery key</span>
-              </label>
-              <button type="button" class="btn-primary" id="recovery-reveal-dismiss" disabled>
-                Continue
-              </button>
-            </div>
-          </section>
-
-          <section
-            class="device-save-card"
-            id="device-save-card"
-            hidden
-            aria-labelledby="device-save-title"
-          >
-            <h2 class="device-save-title" id="device-save-title">Save on this device</h2>
-            <p class="device-save-lead">
-              Signing keys are in <strong>this tab only</strong> right now. Other tabs (including
-              the homepage) cannot see them until you save here. Copying the recovery key does not
-              add them to Saved cards.
-            </p>
-            <form id="created-device-save-form" class="device-save-form" autocomplete="off" novalidate>
-              <label class="form-label" for="created-device-save-label">Label</label>
-              <input
-                class="form-input"
-                id="created-device-save-label"
-                type="text"
-                maxlength="48"
-                placeholder="Personal card"
-              />
-              <button type="submit" class="btn-secondary">Save to this device</button>
-              <p id="created-device-save-status" class="form-status" hidden role="status"></p>
-            </form>
-            <p class="device-save-done" id="created-device-save-done" hidden>
-              Saved. Find this card under <a href="/wallet/">Saved cards</a> and in
-              <strong>On this device</strong> on the homepage — search works there too.
-            </p>
-          </section>
-
-          <section class="created-checklist" aria-labelledby="checklist-title">
-            <h2 class="created-checklist-title" id="checklist-title">Next steps</h2>
-            <ol class="created-checklist-steps">
-              <li>
-                <strong>Save on this device</strong> (above) so other tabs can load your keys — or
-                use encrypted backup under <strong>Manage</strong>.
-              </li>
-              <li>Save your recovery key above before you lose this tab.</li>
-              <li>Print the QR and <strong>Open scan page</strong> from another phone.</li>
-              <li>
-                Under <strong>Manage → Revoke this QR</strong>, pull trust back, then scan again to
-                see revoked state.
-              </li>
-            </ol>
-          </section>
         </div>
 
         <!-- ——— Manage: update, revoke, keys ——— -->

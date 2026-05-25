@@ -12,7 +12,7 @@ import { getCardJsonUrl, publicKeyFromPrivateKeyBase58 } from "./hc-sign.mjs";
  * }} opts
  */
 export function initRecoveryKeyUi(opts) {
-  const revealEl = document.getElementById("recovery-reveal");
+  const detailsEl = document.getElementById("created-recovery-details");
   const revealKeyEl = document.getElementById("recovery-key-display");
   const revealConfirm = document.getElementById("recovery-reveal-confirm");
   const revealDismiss = document.getElementById("recovery-reveal-dismiss");
@@ -28,15 +28,15 @@ export function initRecoveryKeyUi(opts) {
   }
 
   const session = opts.getSession();
-  if (
-    revealEl &&
-    session?.recovery_private_key_b58 &&
-    !session?.recovery_key_acknowledged
-  ) {
-    revealEl.hidden = false;
-    if (revealKeyEl) {
-      revealKeyEl.textContent = String(session.recovery_private_key_b58);
-    }
+  const hasRecovery = !!session?.recovery_private_key_b58;
+  const needsAck = hasRecovery && !session?.recovery_key_acknowledged;
+
+  if (detailsEl) {
+    detailsEl.hidden = !hasRecovery;
+    if (needsAck) detailsEl.open = true;
+  }
+  if (revealKeyEl && hasRecovery) {
+    revealKeyEl.textContent = String(session.recovery_private_key_b58);
   }
 
   revealConfirm?.addEventListener("change", () => {
@@ -61,7 +61,7 @@ export function initRecoveryKeyUi(opts) {
     if (!revealConfirm?.checked) return;
     const s = opts.getSession() || {};
     opts.setSession({ ...s, recovery_key_acknowledged: true });
-    if (revealEl) revealEl.hidden = true;
+    if (detailsEl) detailsEl.open = false;
     window.dispatchEvent(new CustomEvent("hc-recovery-acknowledged"));
   });
 

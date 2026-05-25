@@ -203,6 +203,10 @@ if (hub) {
   }
 }
 
+window.addEventListener("hc-landing-focus-on", () => {
+  if (hub) setHubExpanded(true, { persist: true, haptic: false });
+});
+
 summaryBtn?.addEventListener("click", () => {
   setPopover(false);
   if (hub) {

@@ -27,6 +27,10 @@ We kept the current landing funnel (hero create → pass demo → device hub →
 
 **Shared header:** Landing, `/wallet/`, and `/created/` use the same status module (`device-status.mjs`).
 
+**Landing focus mode:** Toggle in hub shortcuts — `localStorage.hc_landing_focus` (`1` = hide intro sections marked `data-landing-tutorial`; default on when wallet/pins exist). Keeps **On this device**, **Documentation**, and **Contact**.
+
+**Created keys strip:** On `/created/` **Now** tab, **Keys on this device** appears first (primary save); recovery key lives in a **Break-glass** `<details>` block below — not competing with the QR block.
+
 **Naming:** UI says **Saved on this device** / **All saved cards** — not “wallet”. URL stays `/wallet/` for compatibility.
 
 | Approach | Verdict |

@@ -2525,6 +2525,120 @@ button.hub-card-action.hub-use-keys {
   margin-bottom: 14px;
 }
 
+/* Created — keys strip (above QR) */
+.created-keys-strip {
+  margin-bottom: 8px;
+  padding: 16px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(219, 27, 67, 0.22);
+  background: rgba(219, 27, 67, 0.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.created-keys-title {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.created-keys-lead {
+  margin: 0 0 14px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+.created-keys-save-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.created-keys-save-btn {
+  width: 100%;
+}
+
+.created-keys-saved {
+  margin: 10px 0 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.created-keys-saved a {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.created-recovery-details {
+  margin-top: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--white);
+  overflow: hidden;
+}
+
+.created-recovery-details summary {
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--black);
+  cursor: pointer;
+  list-style: none;
+}
+
+.created-recovery-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.created-recovery-panel {
+  padding: 0 14px 14px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.created-keys-foot {
+  margin: 12px 0 0;
+}
+
+/* Landing focus mode */
+body.landing-focus-mode [data-landing-tutorial] {
+  display: none !important;
+}
+
+body.landing-focus-mode .screen-landing {
+  padding-top: 4px;
+  gap: 18px;
+}
+
+.landing-focus-toggle {
+  display: block;
+  width: 100%;
+  padding: 12px 14px;
+  border: none;
+  border-radius: var(--radius);
+  background: rgba(0, 0, 0, 0.04);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--red);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.landing-focus-toggle:active {
+  background: rgba(219, 27, 67, 0.08);
+}
+
+.landing-focus-toggle[aria-pressed="true"] {
+  background: rgba(219, 27, 67, 0.08);
+}
+
+.device-hub-focus-row {
+  list-style: none;
+}
+
 .device-save-card {
   margin: 16px 0;
   padding: 16px;
