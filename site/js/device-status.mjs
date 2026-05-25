@@ -6,15 +6,23 @@ import { buildStatusSegments, tabNoticeCount } from "./device-counts.mjs";
 import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
-import {
-  crossTabNoticeCount,
-  renderCrossTabKeysBanner,
-} from "./device-cross-tab-banner.mjs";
+import { crossTabNoticeCount } from "./device-tab-presence.mjs";
+import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
 import "./device-shell-motion.mjs";
 import "./device-shell-chrome.mjs";
 import { isHubSheet, setHubSheetOpen } from "./device-hub-sheet.mjs";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
+
+function ensureWalletHubVisible() {
+  const backdrop = document.getElementById("device-hub-backdrop");
+  if (backdrop) {
+    backdrop.hidden = true;
+    backdrop.classList.remove("is-visible");
+  }
+  document.body.classList.remove("device-hub-sheet-open");
+  document.getElementById("top-chrome")?.classList.remove("top-chrome--hub-locked");
+}
 
 const HUB_OPEN_KEY = "hc_hub_open";
 
@@ -61,16 +69,6 @@ function deviceState() {
   if (hasUnsavedTabKeys()) return "unsaved";
   if (loadWallet().length > 0) return "keys";
   return "none";
-}
-
-function crossTabNoticeCount() {
-  if (tabNoticeCount() > 0) return 0;
-  const session = getTabSession();
-  const thisHasKeys = !!(session?.profile_id && session?.owner_private_key_b58);
-  const others = getOtherTabsWithKeys();
-  if (others.length === 0) return 0;
-  if (!thisHasKeys) return 1;
-  return others.some((o) => o.profile_id !== session.profile_id) ? 1 : 0;
 }
 
 export function notificationCount() {
@@ -266,8 +264,8 @@ function openHubFromChrome() {
     hapticTap();
     return;
   }
-  const open = hub.classList.contains("device-hub-collapsed");
-  setHubExpanded(open, { haptic: true, persist: false });
+  const willOpen = hub.classList.contains("device-hub-collapsed");
+  setHubExpanded(willOpen, { haptic: true, persist: false });
 }
 
 if (hub) {

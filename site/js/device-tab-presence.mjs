@@ -75,6 +75,7 @@ export function clearTabKeysPresence() {
 
 /**
  * @returns {Array<{
+ *   tabId: string,
  *   profile_id: string,
  *   qr_id: string | null,
  *   handle: string | null,
@@ -89,10 +90,53 @@ export function getOtherTabsWithKeys() {
   const others = [];
   for (const [id, entry] of Object.entries(map)) {
     if (id === tabId || !entry?.profile_id) continue;
-    others.push(entry);
+    others.push({ tabId: id, ...entry });
   }
   others.sort((a, b) => b.updatedAt - a.updatedAt);
   return others;
+}
+
+export function crossTabNoticeCount() {
+  const others = getOtherTabsWithKeys();
+  if (others.length === 0) return 0;
+  const session = getTabSession();
+  const thisHasKeys = !!(session?.profile_id && session?.owner_private_key_b58);
+  if (!thisHasKeys) return others.length;
+  return others.filter((o) => o.profile_id !== session.profile_id).length;
+}
+
+/** Ask another tab (same origin) to bring itself to the front. */
+export function requestFocusTab(targetTabId) {
+  if (!targetTabId) return false;
+  try {
+    const ch = new BroadcastChannel(FOCUS_CHANNEL);
+    ch.postMessage({ type: "focus", tabId: targetTabId });
+    ch.close();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function bindFocusChannel() {
+  if (focusChannel) return;
+  try {
+    focusChannel = new BroadcastChannel(FOCUS_CHANNEL);
+    focusChannel.onmessage = (ev) => {
+      const data = ev.data;
+      if (data?.type !== "focus" || data.tabId !== getTabId()) return;
+      window.focus();
+      if (!document.title.startsWith("● ")) {
+        const prev = document.title;
+        document.title = `● ${prev}`;
+        window.setTimeout(() => {
+          document.title = prev;
+        }, 2000);
+      }
+    };
+  } catch {
+    focusChannel = null;
+  }
 }
 
 export function startTabKeysPresence() {

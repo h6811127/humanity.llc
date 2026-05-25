@@ -155,15 +155,6 @@ export function renderCrossTabKeysBanner() {
   bindCrossTabAction(banner, msg.primary);
 }
 
-export function crossTabNoticeCount() {
-  const others = getOtherTabsWithKeys();
-  if (others.length === 0) return 0;
-  const session = getTabSession();
-  const thisHasKeys = !!(session?.profile_id && session?.owner_private_key_b58);
-  if (!thisHasKeys) return others.length;
-  return others.filter((o) => o.profile_id !== session.profile_id).length;
-}
-
 if (banner || hubSlot) {
   renderCrossTabKeysBanner();
   window.addEventListener("hc-tab-presence-changed", renderCrossTabKeysBanner);
