@@ -103,25 +103,55 @@ const humanTrustLabelEl = document.getElementById("human-trust-label");
 const humanTrustSubEl = document.getElementById("human-trust-sub");
 const networkCardStatusEl = document.getElementById("network-card-status");
 const networkQrExpiresEl = document.getElementById("network-qr-expires");
-const dashboardMetaEl = document.getElementById("created-dashboard-meta");
+const dashboardMetaEl = document.getElementById("created-hero-meta");
+const qrPreviewWrap = document.getElementById("created-qr-preview-wrap");
+const qrPreviewImg = document.getElementById("created-qr-preview-img");
+const saveRequiredBadge = document.getElementById("created-save-required-badge");
 const jsonLink = document.getElementById("card-json-link");
 const revokeDetails = document.getElementById("revoke-details");
 const copyProfileIdBtn = document.getElementById("copy-profile-id");
 const statusPlateTipEl = document.getElementById("created-status-plate-tip");
 const lostItemTipEl = document.getElementById("created-lost-item-tip");
 
-function updateDashboardMeta() {
+function formatHeroExpiry(iso) {
+  try {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    return d.toLocaleString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  } catch {
+    return iso;
+  }
+}
+
+function updateHeroMeta() {
   if (!dashboardMetaEl) return;
   const parts = [];
-  if (networkCardStatusEl?.textContent && networkCardStatusEl.textContent !== " - ") {
-    parts.push(`Card ${networkCardStatusEl.textContent.toLowerCase()}`);
+  const cardStatus = networkCardStatusEl?.textContent?.trim();
+  if (cardStatus && cardStatus !== " - ") {
+    parts.push(`Card ${cardStatus.toLowerCase()}`);
   }
-  if (networkQrExpiresEl?.textContent && networkQrExpiresEl.textContent !== " - ") {
-    parts.push(`QR valid until ${networkQrExpiresEl.textContent}`);
+  const qrExpiry = networkQrExpiresEl?.textContent?.trim();
+  if (qrExpiry && qrExpiry !== " - " && qrExpiry !== "No expiry set") {
+    parts.push(`QR expires ${qrExpiry}`);
+  } else if (data?.qr_expires_at) {
+    parts.push(`QR expires ${formatHeroExpiry(data.qr_expires_at)}`);
   }
   dashboardMetaEl.textContent = parts.length
     ? parts.join(" · ")
-    : "Print the QR, test a scan, then save your control key on this device.";
+    : "Save your control key to keep update and revoke access in this browser.";
+}
+
+function syncQrPreview() {
+  if (!qrImg?.src || !qrPreviewImg) return;
+  qrPreviewImg.src = qrImg.src;
+  qrPreviewImg.alt = qrImg.alt || "Your scan QR preview";
+  if (qrPreviewWrap) qrPreviewWrap.hidden = false;
 }
 let deviceSaveCtl = null;
 
@@ -429,6 +459,7 @@ if (data?.handle) {
 
 if (data?.manifesto_line) {
   manifestoEl.textContent = data.manifesto_line;
+  manifestoEl.hidden = false;
 }
 
 if (profileId) {
@@ -452,10 +483,24 @@ if (profileId) {
   jsonLink.removeAttribute("href");
 }
 
+function displayVouchLabel(label) {
+  if (!label || label === "Registered") return "Vouch status";
+  return label;
+}
+
+function displayVouchSubtitle(subtitle) {
+  if (!subtitle) return "No accepted vouches yet.";
+  return subtitle.replace(/\s*-\s*registered on this operator/i, "").trim() || subtitle;
+}
+
 function applyHumanTrustDisplay(ht) {
   if (!ht) return;
-  if (humanTrustLabelEl) humanTrustLabelEl.textContent = ht.label ?? "Registered";
-  if (humanTrustSubEl) humanTrustSubEl.textContent = ht.subtitle ?? "";
+  if (humanTrustLabelEl) {
+    humanTrustLabelEl.textContent = displayVouchLabel(ht.label);
+  }
+  if (humanTrustSubEl) {
+    humanTrustSubEl.textContent = displayVouchSubtitle(ht.subtitle);
+  }
 }
 
 if (data?.verification?.label) {
@@ -464,12 +509,12 @@ if (data?.verification?.label) {
     subtitle:
       data.verification.vouch_count > 0
         ? `${data.verification.vouch_count} accepted vouch${data.verification.vouch_count === 1 ? "" : "es"}`
-        : "No accepted vouches yet  -  registered on this operator",
+        : "No accepted vouches yet.",
   });
 } else {
   applyHumanTrustDisplay({
-    label: "Registered",
-    subtitle: "No accepted vouches yet  -  registered on this operator",
+    label: "Vouch status",
+    subtitle: "No accepted vouches yet.",
   });
 }
 
@@ -509,7 +554,7 @@ async function refreshNetworkStatus() {
     }
     if (networkQrExpiresEl) {
       if (qrExpires) {
-        networkQrExpiresEl.textContent = formatNetworkExpiry(qrExpires);
+        networkQrExpiresEl.textContent = formatHeroExpiry(qrExpires);
       } else if (scan.qr) {
         networkQrExpiresEl.textContent = "No expiry set";
       }
@@ -525,18 +570,18 @@ async function refreshNetworkStatus() {
   } catch {
     /* keep session copy if fetch fails */
   }
-  updateDashboardMeta();
+  updateHeroMeta();
 }
 
 if (networkQrExpiresEl) {
   const expiresAt = data?.qr_expires_at;
   if (expiresAt) {
-    networkQrExpiresEl.textContent = formatNetworkExpiry(expiresAt);
+    networkQrExpiresEl.textContent = formatHeroExpiry(expiresAt);
   } else {
     networkQrExpiresEl.textContent = " - ";
   }
 }
-updateDashboardMeta();
+updateHeroMeta();
 
 if (activeScanUrl) {
   scanUrlEl.textContent = activeScanUrl;
@@ -559,6 +604,7 @@ if (activeScanUrl) {
   try {
     const { renderQrToImage, downloadQrPng } = await import("./qr-render.mjs");
     await renderQrToImage(qrImg, activeScanUrl);
+    syncQrPreview();
     if (downloadQrBtn) {
       downloadQrBtn.disabled = false;
       const slug = data?.handle ? String(data.handle) : activeQrId?.slice(0, 8) || "scan";

@@ -3,7 +3,8 @@
 **Status:** Implementation contract (Phase A)  
 **API:** `POST /.well-known/hc/v1/cards/{profile_id}/revoke` (`worker/src/resolver/revoke.ts`)  
 **Trust:** `docs/V1_PRODUCT_TRUST_MODEL.md` Level 0–1  
-**Product vocabulary & roadmap:** `docs/REVOKE_AND_LIFECYCLE_V1.md` (Revoke QR vs Disable card, privacy modes, planned UI)
+**Product vocabulary & roadmap:** `docs/REVOKE_AND_LIFECYCLE_V1.md` (Revoke QR vs Disable card, privacy modes, planned UI)  
+**Tasks tab UX:** `docs/CREATED_TASK_DASHBOARD.md`
 
 ---
 

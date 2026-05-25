@@ -4392,6 +4392,119 @@ body.page-wallet .device-hub-status-key {
   margin: 0 0 18px;
 }
 
+.created-hero-handle {
+  margin-bottom: 4px;
+}
+
+.created-hero-title {
+  margin: 0 0 6px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.created-hero-meta {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+.created-hero-manifesto {
+  margin-top: 8px;
+}
+
+.created-qr-preview-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 16px;
+}
+
+.created-qr-preview-hit {
+  display: block;
+  padding: 10px;
+  border: 0.5px solid var(--shell-separator, rgba(60, 60, 67, 0.14));
+  border-radius: 14px;
+  background: var(--shell-fill, var(--white, #fff));
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.created-qr-preview-hit:active {
+  opacity: 0.85;
+}
+
+.created-qr-preview-hit img {
+  display: block;
+  width: 96px;
+  height: 96px;
+  border-radius: 8px;
+}
+
+.created-task-list-title {
+  margin: 16px 0 8px;
+  padding: 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.created-primary-actions--setup {
+  margin-bottom: 4px;
+}
+
+.created-primary-actions--setup .created-primary-action--setup {
+  border-left: 3px solid #007aff;
+}
+
+.created-primary-action--setup.is-done {
+  border-left-color: #248a3d;
+}
+
+.created-primary-action-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.created-primary-action-step {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: #007aff;
+}
+
+.created-primary-action--setup.is-done .created-primary-action-step {
+  background: #248a3d;
+}
+
+.created-primary-action-badge {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #007aff;
+  background: rgba(0, 122, 255, 0.12);
+}
+
+.created-primary-action--setup.is-done .created-primary-action-badge {
+  display: none;
+}
+
 .created-dashboard-title {
   margin: 0 0 6px;
   font-size: 22px;

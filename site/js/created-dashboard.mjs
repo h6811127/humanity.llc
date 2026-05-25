@@ -1,5 +1,6 @@
 /**
  * Task dashboard primary actions on /created/.
+ * @see docs/CREATED_TASK_DASHBOARD.md
  */
 
 import { isWalletSaved } from "./device-wallet.mjs";
@@ -43,14 +44,28 @@ function persistDoneAction(profileId, actionId) {
 export function initCreatedDashboard({ selectTab, runSave, getScanUrl, getProfileId }) {
   const keysStrip = document.getElementById("created-keys-strip");
   const qrSection = document.getElementById("created-qr-section");
-  const downloadBtn = document.getElementById("download-qr");
   const openScan = document.getElementById("open-scan");
   const manifestoPanel = document.getElementById("manifesto-update-panel");
   const revokeDetails = document.getElementById("revoke-details");
   const printTip = document.querySelector("#created-qr-section .created-print-tip");
+  const saveRequiredBadge = document.getElementById("created-save-required-badge");
 
   function profileId() {
     return getProfileId?.() ?? null;
+  }
+
+  function openScanUrl() {
+    const scanUrl = getScanUrl?.() || openScan?.href;
+    if (scanUrl && scanUrl !== "#" && scanUrl.startsWith("http")) {
+      window.open(scanUrl, "_blank", "noopener,noreferrer");
+      return true;
+    }
+    return false;
+  }
+
+  function scrollToQr() {
+    selectTab("now");
+    qrSection?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function markDone(actionId) {
@@ -61,11 +76,15 @@ export function initCreatedDashboard({ selectTab, runSave, getScanUrl, getProfil
   function syncDoneStates() {
     const pid = profileId();
     const done = loadDoneActions(pid);
-    if (pid && isWalletSaved(pid)) done.add("save-keys");
+    const saved = !!(pid && isWalletSaved(pid));
+    if (saved) done.add("save-keys");
+
     document.querySelectorAll("[data-created-action]").forEach((btn) => {
       const id = btn.getAttribute("data-created-action");
       btn.classList.toggle("is-done", !!(id && done.has(id)));
     });
+
+    if (saveRequiredBadge) saveRequiredBadge.hidden = saved;
   }
 
   const actions = {
@@ -77,29 +96,29 @@ export function initCreatedDashboard({ selectTab, runSave, getScanUrl, getProfil
         markDone("save-keys");
       }
     },
-    "download-qr": () => {
+    "open-scan": () => {
       selectTab("now");
-      qrSection?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      if (downloadBtn && !downloadBtn.disabled) {
-        downloadBtn.click();
-        markDone("download-qr");
-      }
+      if (openScanUrl()) markDone("open-scan");
+    },
+    "scroll-qr": () => {
+      scrollToQr();
+    },
+    "download-qr": () => {
+      scrollToQr();
+      markDone("download-qr");
     },
     "print-qr": () => {
-      selectTab("now");
-      qrSection?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      scrollToQr();
       printTip?.setAttribute("open", "");
       markDone("print-qr");
     },
     "test-scan": () => {
       selectTab("now");
-      const scanUrl = getScanUrl?.() || openScan?.href;
-      if (scanUrl && scanUrl !== "#" && scanUrl.startsWith("http")) {
-        window.open(scanUrl, "_blank", "noopener,noreferrer");
+      if (openScanUrl()) {
         markDone("test-scan");
-        return;
+      } else {
+        scrollToQr();
       }
-      qrSection?.scrollIntoView({ behavior: "smooth", block: "nearest" });
     },
     "update-status": () => {
       selectTab("manage");

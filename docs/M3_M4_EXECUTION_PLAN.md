@@ -200,7 +200,7 @@ Do these **in order**. Each step has an exit test before moving on.
 
 - [x] Create: choose validity (7 / 30 / 90 / 365 days) → signed `expires_at` on credential
 - [x] Scan: **qr_expired** minimal page  -  **This QR has expired** (card may stay active)
-- [x] `/created/`: show “This QR valid until” in network panel
+- [x] `/created/`: show **QR expires** in network panel
 
 ### Not in M4.6
 

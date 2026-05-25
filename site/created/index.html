@@ -18,9 +18,9 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="/styles.css?v=88" />
+    <link rel="stylesheet" href="/styles.css?v=89" />
     <link rel="stylesheet" href="/css/device-shell.css?v=30" />
-    <link rel="stylesheet" href="/css/theme-dark.css?v=4" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=5" />
   </head>
   <body class="has-device-hub-search device-shell-created">
     <div class="page">
@@ -199,10 +199,11 @@
       </section>
 
       <main class="screen created-screen">
-        <section class="hero hero-compact">
-          <p class="hero-eyebrow">Card created</p>
-          <h1 id="created-handle"> - </h1>
-          <p class="hero-line" id="created-manifesto"></p>
+        <section class="hero hero-compact created-hero">
+          <p class="hero-eyebrow created-hero-handle" id="created-handle"> - </p>
+          <h1 class="created-hero-title">Live QR ready</h1>
+          <p class="created-hero-meta" id="created-hero-meta"></p>
+          <p class="hero-line hero-line-sub created-hero-manifesto" id="created-manifesto" hidden></p>
         </section>
 
         <section
@@ -263,12 +264,35 @@
         </nav>
 
         <div class="created-tab-panel" data-created-panel="now" id="created-tab-now" role="tabpanel" aria-labelledby="created-tab-btn-now">
-          <section class="created-dashboard" aria-labelledby="created-dashboard-title">
-            <h2 class="created-dashboard-title" id="created-dashboard-title">Your live QR is ready</h2>
-            <p class="created-dashboard-meta" id="created-dashboard-meta"></p>
-            <ul class="created-primary-actions">
-              <li><button type="button" class="created-primary-action" data-created-action="save-keys"><span class="created-primary-action-title">Save control key</span><span class="created-primary-action-sub">Keep signing keys in this browser</span></button></li>
-              <li><button type="button" class="created-primary-action" data-created-action="download-qr"><span class="created-primary-action-title">Download QR</span><span class="created-primary-action-sub">PNG for print or share</span></button></li>
+          <section class="created-dashboard" aria-label="Your live QR tasks">
+            <div class="created-qr-preview-wrap" id="created-qr-preview-wrap" hidden>
+              <button type="button" class="created-qr-preview-hit" data-created-action="scroll-qr" aria-label="Scroll to full QR">
+                <img id="created-qr-preview-img" width="96" height="96" alt="" />
+              </button>
+            </div>
+
+            <ul class="created-primary-actions created-primary-actions--setup">
+              <li>
+                <button type="button" class="created-primary-action created-primary-action--setup" data-created-action="save-keys">
+                  <span class="created-primary-action-head">
+                    <span class="created-primary-action-step" aria-hidden="true">1</span>
+                    <span class="created-primary-action-title">Save control key</span>
+                    <span class="created-primary-action-badge" id="created-save-required-badge">Required</span>
+                  </span>
+                  <span class="created-primary-action-sub">Keep update/revoke access in this browser.</span>
+                </button>
+              </li>
+              <li>
+                <button type="button" class="created-primary-action created-primary-action--scan" data-created-action="open-scan">
+                  <span class="created-primary-action-title">Open scan page</span>
+                  <span class="created-primary-action-sub">See what scanners see on the network.</span>
+                </button>
+              </li>
+            </ul>
+
+            <h3 class="created-task-list-title">More tasks</h3>
+            <ul class="created-primary-actions created-primary-actions--tasks">
+              <li><button type="button" class="created-primary-action" data-created-action="download-qr"><span class="created-primary-action-title">Download QR</span><span class="created-primary-action-sub">Jump to QR image for print or share</span></button></li>
               <li><button type="button" class="created-primary-action" data-created-action="print-qr"><span class="created-primary-action-title">Print instructions</span><span class="created-primary-action-sub">Steps from your phone</span></button></li>
               <li><button type="button" class="created-primary-action" data-created-action="test-scan"><span class="created-primary-action-title">Test scan</span><span class="created-primary-action-sub">Open what scanners see</span></button></li>
               <li><button type="button" class="created-primary-action" data-created-action="update-status"><span class="created-primary-action-title">Update status</span><span class="created-primary-action-sub">Change public line on the network</span></button></li>
@@ -404,8 +428,8 @@
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 </span>
                 <span class="list-content">
-                  <span class="list-title" id="human-trust-label">Registered</span>
-                  <span class="list-sub" id="human-trust-sub">No accepted vouches yet</span>
+                  <span class="list-title" id="human-trust-label">Vouch status</span>
+                  <span class="list-sub" id="human-trust-sub">No accepted vouches yet.</span>
                 </span>
               </li>
               <li class="list-row">
@@ -413,7 +437,7 @@
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                 </span>
                 <span class="list-content">
-                  <span class="list-title">This QR valid until</span>
+                  <span class="list-title">QR expires</span>
                   <span class="list-sub" id="network-qr-expires"> - </span>
                 </span>
               </li>
