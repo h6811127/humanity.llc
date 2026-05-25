@@ -3,6 +3,8 @@
  */
 import { prefersReducedMotion } from "./device-shell-motion.mjs";
 
+const HUB_OPEN_KEY = "hc_hub_open";
+
 const hub = document.getElementById("device-hub");
 let backdrop = document.getElementById("device-hub-backdrop");
 
@@ -25,6 +27,12 @@ function ensureBackdrop() {
   return backdrop;
 }
 
+export function closeHubBeforeNavigation() {
+  sessionStorage.setItem(HUB_OPEN_KEY, "0");
+  if (!isHubSheet() || !hub) return;
+  setHubSheetOpen(false);
+}
+
 export function setHubSheetOpen(open) {
   if (!isHubSheet() || !hub) return;
   ensureBackdrop();
@@ -42,13 +50,27 @@ export function setHubSheetOpen(open) {
   }
 }
 
-export function bindHubSheetUi() {
+function bindHubSheetUi() {
   if (!isHubSheet()) return;
   ensureBackdrop();
   const closeBtn = hub?.querySelector(".device-hub-sheet-close");
   closeBtn?.addEventListener("click", () => {
     window.dispatchEvent(new CustomEvent("hc-hub-sheet-close"));
   });
+
+  hub?.addEventListener(
+    "click",
+    (e) => {
+      const link = e.target.closest?.("a[href]");
+      if (!link || !hub.contains(link)) return;
+      const href = link.getAttribute("href");
+      if (!href || href.startsWith("#")) return;
+      closeHubBeforeNavigation();
+    },
+    true
+  );
 }
 
 bindHubSheetUi();
+
+window.addEventListener("pagehide", closeHubBeforeNavigation);

@@ -6,7 +6,7 @@
     <title>Saved on this device · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="/styles.css?v=77" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=5" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=6" />
   </head>
   <body class="has-device-hub-search device-shell-wallet">
     <div class="page">
@@ -62,6 +62,19 @@
         <div class="device-hub-body" id="device-hub-body">
           <button type="button" class="device-hub-sheet-close" aria-label="Close">×</button>
           <div class="device-hub-sheet-handle" aria-hidden="true"></div>
+          <div class="device-hub-alerts-top" id="device-hub-alerts-top">
+            <div class="device-hub-group" id="device-hub-crosstab-notice" hidden role="status"></div>
+            <div class="device-hub-group" id="device-hub-notice-group" hidden></div>
+            <div
+              class="device-hub-group"
+              id="device-hub-live-control-group"
+              hidden
+              data-hub-group="liveproof"
+            >
+              <p class="device-hub-group-label">Live proof waiting</p>
+              <ul class="list list-compact" id="device-hub-live-control-list"></ul>
+            </div>
+          </div>
           <div
             class="device-hub-status-panel"
             id="device-hub-status-panel"
@@ -117,18 +130,6 @@
           >
             <p class="device-hub-group-label">Recent on this device</p>
             <ul class="list list-compact" id="device-hub-activity-list"></ul>
-          </div>
-
-          <div class="device-hub-group" id="device-hub-notice-group" hidden></div>
-
-          <div
-            class="device-hub-group"
-            id="device-hub-live-control-group"
-            hidden
-            data-hub-group="liveproof"
-          >
-            <p class="device-hub-group-label">Live proof waiting</p>
-            <ul class="list list-compact" id="device-hub-live-control-list"></ul>
           </div>
 
           <div
@@ -282,7 +283,7 @@
       <main class="screen screen-wallet screen-wallet-sleek" hidden aria-hidden="true"></main>
     </div>
 
-    <script src="/js/device-status.mjs?v=10" type="module"></script>
+    <script src="/js/device-status.mjs?v=11" type="module"></script>
     <script src="/js/wallet-hub.mjs?v=3" type="module"></script>
   </body>
 </html>

@@ -196,20 +196,42 @@ body.has-shell-chrome .page {
   padding-bottom: 8px;
 }
 
-.device-hub-status-panel {
-  margin-bottom: var(--shell-space-section);
+.device-hub-alerts-top {
+  margin-bottom: 10px;
 }
 
-.device-hub-status-panel .device-hub-group-label {
+.device-hub-alerts-top .device-hub-group {
   margin-bottom: 8px;
 }
 
-.device-hub-status-list .list-row {
-  padding: 10px 0;
+.device-hub-alerts-top .device-hub-group:last-child {
+  margin-bottom: 0;
 }
 
-.device-hub-status-row--alert .list-title {
+.device-hub-status-panel {
+  margin: 0 0 14px;
+}
+
+.device-hub-status-line {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--shell-label);
+  letter-spacing: -0.01em;
+}
+
+.device-hub-status-seg.is-zero {
+  opacity: 0.42;
+}
+
+.device-hub-status-seg.is-highlight {
   color: var(--red);
+  font-weight: 600;
+}
+
+.device-hub-status-sep {
+  opacity: 0.55;
 }
 
 .device-system-banner,
@@ -478,9 +500,9 @@ button.hub-card-action.hub-use-keys {
   transform: translateX(-50%) translateY(100%);
   transition: transform 0.45s var(--shell-spring);
   border-radius: 16px 16px 0 0;
-  background: var(--shell-surface);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
+  background: rgba(242, 242, 247, 0.88);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+  backdrop-filter: saturate(180%) blur(18px);
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.14);
   overflow: hidden;
   display: flex;
@@ -502,7 +524,7 @@ button.hub-card-action.hub-use-keys {
   padding: 4px var(--pad) calc(20px + env(safe-area-inset-bottom, 0px));
   flex: 1;
   min-height: 0;
-  background: var(--shell-surface);
+  background: transparent;
 }
 
 .device-hub.device-hub--sheet.device-hub-collapsed .device-hub-body {

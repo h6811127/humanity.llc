@@ -15,7 +15,6 @@ import { isHubSheet, setHubSheetOpen } from "./device-hub-sheet.mjs";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 
 const HUB_OPEN_KEY = "hc_hub_open";
-const NOTICE_EXPAND_KEY = "hc_notice_hub_expand";
 
 const NETWORK_CLASSES = [
   "pass-dot-status-network-ok",
@@ -106,34 +105,23 @@ function escapeHtml(s) {
     .replace(/>/g, "&gt;");
 }
 
-function segmentSheetKey(id) {
-  const map = {
-    network: "Resolver",
-    saved: "On device",
-    pinned: "Pinned",
-    notices: "Tab keys",
-    liveproof: "Live proof",
-  };
-  return map[id] || id;
-}
-
 function renderHubStatusPanel(segments) {
   if (!hubStatusPanel) return;
-  const rows = segments
-    .map(
-      (seg) => `
-    <li class="list-row device-hub-status-row${seg.highlight ? " device-hub-status-row--alert" : ""}">
-      <span class="list-content">
-        <span class="list-title">${escapeHtml(segmentSheetKey(seg.id))}</span>
-        <span class="list-sub">${escapeHtml(seg.detail)}</span>
-      </span>
-    </li>`
-    )
-    .join("");
-
-  hubStatusPanel.innerHTML = `
-    <p class="device-hub-group-label">System</p>
-    <ul class="list list-compact device-hub-status-list">${rows}</ul>`;
+  const parts = segments.map((seg, i) => {
+    const sep =
+      i > 0
+        ? '<span class="device-hub-status-sep" aria-hidden="true"> · </span>'
+        : "";
+    const cls = [
+      "device-hub-status-seg",
+      seg.zero ? "is-zero" : "",
+      seg.highlight ? "is-highlight" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+    return `${sep}<span class="${cls}" data-seg="${seg.id}">${escapeHtml(seg.label)}</span>`;
+  });
+  hubStatusPanel.innerHTML = `<p class="device-hub-status-line" role="status">${parts.join("")}</p>`;
 }
 
 function renderNotifBadge() {
@@ -146,26 +134,10 @@ function renderNotifBadge() {
 }
 
 function scrollToFirstNotification() {
-  if (tabNoticeCount() > 0) {
-    document.getElementById("device-hub-notice-group")?.scrollIntoView({
-      behavior: prefersReducedMotion() ? "auto" : "smooth",
-      block: "nearest",
-    });
-    return;
-  }
-  if (getLiveControlPendingCount() > 0) {
-    document.getElementById("device-hub-live-control-group")?.scrollIntoView({
-      behavior: prefersReducedMotion() ? "auto" : "smooth",
-      block: "nearest",
-    });
-    return;
-  }
-  if (crossTabNoticeCount() > 0) {
-    document.getElementById("device-hub-notice-group")?.scrollIntoView({
-      behavior: prefersReducedMotion() ? "auto" : "smooth",
-      block: "nearest",
-    });
-  }
+  document.getElementById("device-hub-alerts-top")?.scrollIntoView({
+    behavior: prefersReducedMotion() ? "auto" : "smooth",
+    block: "nearest",
+  });
 }
 
 function renderSystemBanner() {
@@ -197,13 +169,6 @@ function refreshSummary() {
   refreshHubGlance();
 }
 
-function maybeAutoExpandNotice() {
-  if (!hub || notificationCount() === 0) return;
-  if (sessionStorage.getItem(NOTICE_EXPAND_KEY) === "1") return;
-  sessionStorage.setItem(NOTICE_EXPAND_KEY, "1");
-  setHubExpanded(true, { persist: false });
-}
-
 async function fetchNetworkStatus() {
   const url = new URL("/.well-known/hc/v1/health", resolverApiOrigin()).href;
   const controller = new AbortController();
@@ -228,40 +193,19 @@ async function refreshNetwork() {
   refreshSummary();
 }
 
-function maybeAutoExpandCreated() {
-  if (!hub || !location.pathname.startsWith("/created")) return;
-  const session = getTabSession();
-  if (!session?.owner_private_key_b58) return;
-  if (sessionStorage.getItem(HUB_OPEN_KEY) != null) return;
-  setHubExpanded(true, { persist: true });
-}
-
-function maybeExpandWalletHub() {
-  if (!hub || !location.pathname.startsWith("/wallet")) return;
-  setHubExpanded(true, { persist: true });
-}
-
 function toggleHubFromChrome() {
   if (!hub) return;
   const open = hub.classList.contains("device-hub-collapsed");
-  setHubExpanded(open, { haptic: true, persist: true });
+  setHubExpanded(open, { haptic: true, persist: false });
 }
 
 if (hub) {
-  if (location.pathname.startsWith("/wallet")) {
-    maybeExpandWalletHub();
-  } else {
-    const persisted = sessionStorage.getItem(HUB_OPEN_KEY) === "1";
-    setHubExpanded(persisted, { persist: false });
-    if (!persisted) {
-      maybeAutoExpandNotice();
-      maybeAutoExpandCreated();
-    }
-  }
+  sessionStorage.setItem(HUB_OPEN_KEY, "0");
+  setHubExpanded(false, { persist: false });
 }
 
 window.addEventListener("hc-landing-focus-on", () => {
-  if (hub) setHubExpanded(true, { persist: true, haptic: false });
+  if (hub) setHubExpanded(true, { persist: false, haptic: false });
 });
 
 dotBtn?.addEventListener("click", (e) => {
@@ -273,7 +217,7 @@ dotBtn?.addEventListener("click", (e) => {
 notifBtn?.addEventListener("click", (e) => {
   e.preventDefault();
   e.stopPropagation();
-  setHubExpanded(true, { haptic: true, persist: true });
+  setHubExpanded(true, { haptic: true, persist: false });
   window.setTimeout(scrollToFirstNotification, 120);
 });
 
@@ -284,11 +228,11 @@ document.addEventListener("keydown", (e) => {
 });
 
 window.addEventListener("hc-hub-sheet-close", () => {
-  setHubExpanded(false, { haptic: false, persist: true });
+  setHubExpanded(false, { haptic: false, persist: false });
 });
 
 window.addEventListener("hc-focus-hub-search", () => {
-  setHubExpanded(true, { haptic: false, persist: true });
+  setHubExpanded(true, { haptic: false, persist: false });
   document.getElementById("device-hub-search")?.focus({ preventScroll: true });
 });
 
@@ -311,7 +255,7 @@ window.addEventListener("hc-tab-presence-changed", refreshSummary);
 
 window.addEventListener("hc-hub-expand-request", (e) => {
   if (!hub) return;
-  setHubExpanded(true, { haptic: true, persist: true });
+  setHubExpanded(true, { haptic: true, persist: false });
   const targetId = e.detail?.targetId;
   if (targetId) {
     document.getElementById(targetId)?.scrollIntoView({

@@ -6,6 +6,7 @@ import { getTabSession } from "./device-keys.mjs";
 import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 
 const banner = document.getElementById("device-cross-tab-banner");
+const hubSlot = document.getElementById("device-hub-crosstab-notice");
 
 function escapeHtml(s) {
   return String(s)
@@ -27,8 +28,7 @@ function createdUrlForPresence(entry) {
   return url.href;
 }
 
-function shouldShowBanner() {
-  if (!banner) return false;
+function shouldShowCrossTabNotice() {
   if (tabNoticeCount() > 0) return false;
 
   const session = getTabSession();
@@ -40,22 +40,9 @@ function shouldShowBanner() {
   return others.some((o) => o.profile_id !== session.profile_id);
 }
 
-export function renderCrossTabKeysBanner() {
-  if (!banner) return;
-
-  if (document.getElementById("shell-notif-badge")) {
-    banner.hidden = true;
-    banner.innerHTML = "";
-    return;
-  }
-
-  if (!shouldShowBanner()) {
-    banner.hidden = true;
-    banner.innerHTML = "";
-    return;
-  }
-
+function crossTabMessage() {
   const others = getOtherTabsWithKeys();
+  if (others.length === 0) return null;
   const primary = others[0];
   const label = escapeHtml(labelForPresence(primary));
   const manageHref = escapeHtml(createdUrlForPresence(primary));
@@ -63,15 +50,74 @@ export function renderCrossTabKeysBanner() {
     others.length > 1
       ? ` (+${others.length - 1} other tab${others.length === 2 ? "" : "s"})`
       : "";
+  return {
+    label,
+    manageHref,
+    extra,
+  };
+}
+
+function renderHubCrossTabNotice() {
+  if (!hubSlot) return;
+  if (!shouldShowCrossTabNotice()) {
+    hubSlot.hidden = true;
+    hubSlot.innerHTML = "";
+    return;
+  }
+  const msg = crossTabMessage();
+  if (!msg) {
+    hubSlot.hidden = true;
+    hubSlot.innerHTML = "";
+    return;
+  }
+  hubSlot.hidden = false;
+  hubSlot.innerHTML = `
+    <ul class="list list-compact">
+      <li class="list-row list-action device-hub-notice-row">
+        <a href="${msg.manageHref}">
+          <span class="list-content">
+            <span class="list-title">Keys in another tab</span>
+            <span class="list-sub">${msg.label}${msg.extra}</span>
+          </span>
+          <span class="list-chevron" aria-hidden="true">›</span>
+        </a>
+      </li>
+    </ul>`;
+}
+
+export function renderCrossTabKeysBanner() {
+  if (document.getElementById("shell-notif-badge")) {
+    renderHubCrossTabNotice();
+    if (banner) {
+      banner.hidden = true;
+      banner.innerHTML = "";
+    }
+    return;
+  }
+
+  if (!banner) return;
+
+  if (!shouldShowCrossTabNotice()) {
+    banner.hidden = true;
+    banner.innerHTML = "";
+    return;
+  }
+
+  const msg = crossTabMessage();
+  if (!msg) {
+    banner.hidden = true;
+    banner.innerHTML = "";
+    return;
+  }
 
   banner.hidden = false;
   banner.innerHTML = `
     <strong>Signing keys in another tab</strong>
-    ${label}${extra}  -  switch to that tab to manage, or
-    <a href="${manageHref}">open /created/</a> here (load keys from a saved card).`;
+    ${msg.label}${msg.extra}  -  switch to that tab to manage, or
+    <a href="${msg.manageHref}">open /created/</a> here (load keys from a saved card).`;
 }
 
-if (banner) {
+if (banner || hubSlot) {
   renderCrossTabKeysBanner();
   window.addEventListener("hc-tab-presence-changed", renderCrossTabKeysBanner);
   window.addEventListener("hc-device-hub-changed", renderCrossTabKeysBanner);
