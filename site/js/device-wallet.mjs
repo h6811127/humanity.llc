@@ -72,7 +72,7 @@ export function saveSessionToWallet(session, label = "") {
   const idx = entries.findIndex((e) => e.profile_id === session.profile_id);
   if (idx >= 0) {
     const trimmed = label.trim();
-    if (trimmed) {
+    if (trimmed && trimmed !== entries[idx].label) {
       entries[idx] = {
         ...entries[idx],
         label: trimmed,
@@ -83,7 +83,7 @@ export function saveSessionToWallet(session, label = "") {
       saveWallet(entries);
       return { ok: true, updated: true };
     }
-    return { error: "Already saved on this device." };
+    return { ok: true, already: true };
   }
   entries.unshift(walletEntryFromSession(session, label));
   saveWallet(entries);

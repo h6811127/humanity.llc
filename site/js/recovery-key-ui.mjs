@@ -13,37 +13,54 @@ import { getCardJsonUrl, publicKeyFromPrivateKeyBase58 } from "./hc-sign.mjs";
  */
 export function initRecoveryKeyUi(opts) {
   const detailsEl = document.getElementById("created-recovery-details");
-  const revealKeyEl = document.getElementById("recovery-key-display");
-  const revealConfirm = document.getElementById("recovery-reveal-confirm");
-  const revealDismiss = document.getElementById("recovery-reveal-dismiss");
-  const copyBtn = document.getElementById("copy-recovery-key");
+  const revealKeyEl = detailsEl?.querySelector("#recovery-key-display");
+  const revealConfirm = detailsEl?.querySelector("#recovery-reveal-confirm");
+  const revealDismiss = detailsEl?.querySelector("#recovery-reveal-dismiss");
+  const copyBtn = detailsEl?.querySelector("#copy-recovery-key");
+  const recoveryStatus = detailsEl?.querySelector("#created-recovery-status");
   const importForm = document.getElementById("import-recovery-form");
   const importStatus = document.getElementById("import-recovery-status");
 
-  function setStatus(msg, isError = false) {
+  function setImportStatus(msg, isError = false) {
     if (!importStatus) return;
     importStatus.hidden = !msg;
     importStatus.textContent = msg;
     importStatus.className = isError ? "form-status error" : "form-status";
   }
 
-  const session = opts.getSession();
-  const hasRecovery = !!session?.recovery_private_key_b58;
-  const needsAck = hasRecovery && !session?.recovery_key_acknowledged;
+  function setRecoveryStatus(msg, isError = false) {
+    if (!recoveryStatus) return;
+    recoveryStatus.hidden = !msg;
+    recoveryStatus.textContent = msg;
+    recoveryStatus.className = isError ? "form-status error" : "form-status";
+  }
 
-  if (detailsEl) {
-    detailsEl.hidden = !hasRecovery;
-    if (needsAck) detailsEl.open = true;
+  function syncFromSession() {
+    const session = opts.getSession();
+    const hasRecovery = !!session?.recovery_private_key_b58;
+    const needsAck = hasRecovery && !session?.recovery_key_acknowledged;
+
+    if (detailsEl) {
+      detailsEl.hidden = !hasRecovery;
+      if (needsAck) detailsEl.open = true;
+    }
+    if (revealKeyEl && hasRecovery) {
+      revealKeyEl.textContent = String(session.recovery_private_key_b58);
+    }
+    if (revealDismiss) {
+      revealDismiss.disabled = false;
+    }
   }
-  if (revealKeyEl && hasRecovery) {
-    revealKeyEl.textContent = String(session.recovery_private_key_b58);
-  }
+
+  syncFromSession();
 
   revealConfirm?.addEventListener("change", () => {
-    if (revealDismiss) revealDismiss.disabled = !revealConfirm.checked;
+    setRecoveryStatus("");
   });
 
-  copyBtn?.addEventListener("click", async () => {
+  copyBtn?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     const text = revealKeyEl?.textContent?.trim();
     if (!text) return;
     try {
@@ -57,11 +74,18 @@ export function initRecoveryKeyUi(opts) {
     }
   });
 
-  revealDismiss?.addEventListener("click", () => {
-    if (!revealConfirm?.checked) return;
+  revealDismiss?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!revealConfirm?.checked) {
+      setRecoveryStatus("Check the box after you save the recovery key.", true);
+      revealConfirm?.focus();
+      return;
+    }
     const s = opts.getSession() || {};
     opts.setSession({ ...s, recovery_key_acknowledged: true });
     if (detailsEl) detailsEl.open = false;
+    setRecoveryStatus("Recovery key marked saved.");
     window.dispatchEvent(new CustomEvent("hc-recovery-acknowledged"));
   });
 
@@ -70,10 +94,10 @@ export function initRecoveryKeyUi(opts) {
     const input = importForm.querySelector("#import-recovery-key");
     const raw = String(input?.value ?? "").trim();
     if (!raw) {
-      setStatus("Paste your recovery private key first.", true);
+      setImportStatus("Paste your recovery private key first.", true);
       return;
     }
-    setStatus("Checking key…");
+    setImportStatus("Checking key…");
     try {
       const derivedPub = await publicKeyFromPrivateKeyBase58(raw);
       const res = await fetch(getCardJsonUrl(opts.profileId));
@@ -95,12 +119,15 @@ export function initRecoveryKeyUi(opts) {
         recovery_private_key_b58: raw,
         recovery_imported_at: new Date().toISOString(),
       });
-      setStatus("Recovery key unlocked locally. Revoke controls are available below.");
+      setImportStatus("Recovery key unlocked locally. Revoke controls are available below.");
       importForm.reset();
+      syncFromSession();
       opts.onKeysUnlocked();
       document.getElementById("revoke-details")?.setAttribute("open", "");
     } catch (err) {
-      setStatus(err.message || String(err), true);
+      setImportStatus(err.message || String(err), true);
     }
   });
+
+  return { refresh: syncFromSession };
 }

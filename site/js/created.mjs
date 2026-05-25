@@ -93,6 +93,7 @@ const statusPlateTipEl = document.getElementById("created-status-plate-tip");
 const lostItemTipEl = document.getElementById("created-lost-item-tip");
 
 let createdTabs = null;
+let deviceSaveCtl = null;
 
 function revealOwnerActions() {
   createdTabs?.select("manage");
@@ -609,8 +610,8 @@ async function bootstrapOwnerTools() {
       liveControl?.refresh();
     },
   });
-  const deviceSave = initCreatedDeviceSave(loadSession);
-  initRecoveryKeyUi({
+  deviceSaveCtl?.refresh();
+  const recoveryUi = initRecoveryKeyUi({
     profileId,
     getSession: loadSession,
     setSession: saveSession,
@@ -618,10 +619,16 @@ async function bootstrapOwnerTools() {
       revoke?.refresh();
       voucherRevoke?.refresh();
       liveControl?.refresh();
-      deviceSave?.refresh();
+      deviceSaveCtl?.refresh();
+      recoveryUi?.refresh();
     },
   });
-  window.addEventListener("hc-recovery-acknowledged", () => deviceSave?.refresh());
+  deviceSaveCtl?.refresh();
+  recoveryUi?.refresh();
+  window.addEventListener("hc-recovery-acknowledged", () => {
+    deviceSaveCtl?.refresh();
+    recoveryUi?.refresh();
+  });
   void manifestoUpdate;
 
   const session = loadSession();
@@ -638,5 +645,6 @@ async function bootstrapOwnerTools() {
 createdTabs = initCreatedTabs();
 
 if (profileId && qrId) {
+  deviceSaveCtl = initCreatedDeviceSave(loadSession);
   void bootstrapOwnerTools();
 }

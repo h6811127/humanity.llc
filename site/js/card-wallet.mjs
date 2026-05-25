@@ -278,7 +278,11 @@ if (saveForm && saveGroup && session?.owner_private_key_b58 && session?.profile_
     }
     setStatus(
       saveStatus,
-      result.updated ? "Label updated." : "Saved on this device only."
+      result.updated
+        ? "Label updated."
+        : result.already
+          ? "Already saved on this device."
+          : "Saved on this device only."
     );
     prefillSaveLabel(session);
     renderList();

@@ -13,6 +13,7 @@ export function initCreatedDeviceSave(getSession) {
   const labelInput = document.getElementById("created-device-save-label");
   const statusEl = document.getElementById("created-device-save-status");
   const doneEl = document.getElementById("created-device-save-done");
+  const saveBtn = document.getElementById("created-device-save-btn");
   if (!card) return;
 
   function setStatus(msg, isError = false) {
@@ -46,20 +47,35 @@ export function initCreatedDeviceSave(getSession) {
     }
   }
 
-  if (form) {
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const session = getSession();
-      const result = saveSessionToWallet(session, labelInput?.value ?? "");
-      if ("error" in result) {
-        setStatus(result.error, true);
-        refresh();
-        return;
-      }
-      setStatus("");
+  function runSave() {
+    const session = getSession();
+    if (!session?.profile_id || !session?.owner_private_key_b58) {
+      setStatus("No signing keys in this tab.", true);
+      return;
+    }
+    const result = saveSessionToWallet(session, labelInput?.value ?? "");
+    if ("error" in result) {
+      setStatus(result.error, true);
       refresh();
-    });
+      return;
+    }
+    setStatus(
+      result.already ? "Already saved on this device." : "Saved on this device.",
+      false
+    );
+    refresh();
+    window.dispatchEvent(new Event("hc-device-hub-changed"));
   }
+
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    runSave();
+  });
+
+  saveBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    runSave();
+  });
 
   refresh();
   return { refresh };

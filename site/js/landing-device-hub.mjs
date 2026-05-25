@@ -105,8 +105,10 @@ function renderSavedRows() {
         </span>
       </div>
       <div class="hub-card-actions">
-        <button type="button" class="hub-card-action hub-use-keys" data-id="${escapeHtml(entry.id)}">Use keys</button>
-        <a class="hub-card-action hub-open-scan" href="${escapeHtml(scan)}" target="_blank" rel="noopener noreferrer">Open scan</a>
+        <div class="hub-card-actions-primary">
+          <button type="button" class="hub-card-action hub-use-keys" data-id="${escapeHtml(entry.id)}">Use keys</button>
+          <a class="hub-card-action hub-open-scan" href="${escapeHtml(scan)}" target="_blank" rel="noopener noreferrer">Open scan</a>
+        </div>
         <details class="hub-card-menu">
           <summary class="hub-card-menu-btn" aria-label="More">⋯</summary>
           <div class="hub-card-menu-panel">

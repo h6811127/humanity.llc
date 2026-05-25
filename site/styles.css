@@ -354,10 +354,35 @@ a {
 
 .hub-card-actions {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 8px 8px 12px;
+}
+
+.hub-card-actions-primary {
+  display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 6px;
-  padding: 0 8px 8px 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 400px) {
+  .hub-card-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hub-card-actions-primary .hub-card-action {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .hub-card-menu {
+    align-self: flex-end;
+  }
 }
 
 .hub-card-action {
