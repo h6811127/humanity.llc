@@ -84,6 +84,15 @@ body.has-shell-chrome .page {
   min-height: 0;
   padding: 8px var(--pad) 4px;
   padding-top: calc(8px + env(safe-area-inset-top, 0px));
+  transition:
+    transform 0.4s var(--shell-spring),
+    opacity 0.28s ease;
+}
+
+.top-chrome--float.top-chrome--edge-hidden .top-chrome-bar--minimal {
+  transform: translateY(calc(-100% - env(safe-area-inset-top, 0px)));
+  opacity: 0;
+  pointer-events: none;
 }
 
 .shell-status-cluster {
@@ -470,6 +479,10 @@ button.hub-card-action.hub-use-keys {
   opacity: 0.88;
 }
 
+.shell-status-dot {
+  view-transition-name: shell-status-dot;
+}
+
 .pass-dot {
   transition:
     background 0.35s var(--shell-spring),
@@ -480,8 +493,19 @@ button.hub-card-action.hub-use-keys {
   navigation: auto;
 }
 
+::view-transition-old(shell-status-dot),
+::view-transition-new(shell-status-dot) {
+  animation-duration: 0.35s;
+  animation-timing-function: var(--shell-spring);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .pass-dot {
+  .shell-status-dot {
+    view-transition-name: none;
+  }
+
+  .pass-dot,
+  .top-chrome-bar--minimal {
     transition: none;
   }
 }

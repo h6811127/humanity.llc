@@ -1,4 +1,5 @@
 import { logDeviceActivity, walletEntryForActivity } from "./device-activity.mjs";
+import { navigateTo } from "./device-shell-motion.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 
 /**
@@ -65,14 +66,7 @@ export function openCardNowPage(entry) {
   if (saved?.owner_private_key_b58) {
     activateWalletEntry(saved);
   }
-  const url = createdUrlForEntry(target);
-  if (typeof document.startViewTransition === "function") {
-    document.startViewTransition(() => {
-      location.assign(url);
-    });
-  } else {
-    location.href = url;
-  }
+  navigateTo(createdUrlForEntry(target));
   return true;
 }
 
@@ -81,7 +75,7 @@ export function openCardNowPage(entry) {
  */
 export function openActivityNow(activity) {
   if (activity.type === "pin_added") {
-    location.href = "/wallet/";
+    navigateTo("/wallet/");
     return true;
   }
 

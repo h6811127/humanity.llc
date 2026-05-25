@@ -453,6 +453,51 @@ a {
   gap: 16px;
 }
 
+.scan-pass-layer {
+  position: relative;
+  z-index: 6;
+  margin-bottom: 2px;
+}
+
+.scan-limits-layer {
+  position: relative;
+  z-index: 5;
+  margin-top: -10px;
+}
+
+.scan-trust-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: -12px;
+  padding-bottom: 6px;
+}
+
+.scan-trust-stack > .scan-trust-layer {
+  position: relative;
+  margin-top: -14px;
+}
+
+.scan-trust-stack > .scan-trust-layer:first-child {
+  margin-top: 0;
+}
+
+.scan-trust-stack > .scan-trust-layer:nth-child(1) {
+  z-index: 4;
+}
+
+.scan-trust-stack > .scan-trust-layer:nth-child(2) {
+  z-index: 3;
+}
+
+.scan-trust-stack > .scan-trust-layer:nth-child(3) {
+  z-index: 2;
+}
+
+.scan-trust-stack > .scan-trust-layer:nth-child(n + 4) {
+  z-index: 1;
+}
+
 /* M3.3  -  one line above the card */
 .scan-bearer-line {
   font-size: 13px;
@@ -616,10 +661,9 @@ a {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-.scan-trust-groups {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+.scan-trust-stack .scan-group .group-label,
+.scan-trust-stack .scan-group-vouch .group-label {
+  margin-bottom: 6px;
 }
 
 .group-label {

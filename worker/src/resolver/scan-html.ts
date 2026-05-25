@@ -49,8 +49,8 @@ export async function renderScanPage(
       <p class="section-kicker">Network status</p>
       ${renderPassSection(vm, origin, qrMarkup)}
       ${renderScanUrlControl(vm)}
-      ${renderTrustGroups(vm, origin)}
       ${renderLimitsSettings(origin)}
+      ${renderTrustGroups(vm, origin)}
       ${renderFooter(vm, origin)}
     </main>
   </div>
@@ -119,7 +119,7 @@ function renderPassSection(
             ${backBody}
           </div>`;
 
-  return `${bearer}
+  return `<div class="scan-pass-layer">${bearer}
 <section class="pass" aria-label="Humanity Card at scan time">
   <div class="pass-scene" id="pass-scene">
     <div class="pass-tilt-wrap" id="pass-tilt-wrap">
@@ -136,7 +136,7 @@ function renderPassSection(
     </div>
     ${flipBtn}
   </div>
-</section>`;
+</section></div>`;
 }
 
 function minimalScanHeadline(kind: ScanViewModel["kind"]): string {
@@ -363,7 +363,7 @@ function renderTrustGroups(vm: ScanViewModel, origin: string): string {
     sections.push(renderVouchSection(vm, origin));
   }
 
-  return `<div class="scan-trust-groups" aria-label="Network status at scan time">
+  return `<div class="scan-trust-stack" aria-label="Network status at scan time">
 ${sections.join("\n")}
 </div>`;
 }
@@ -373,7 +373,7 @@ function trustGroup(
   rows: string,
   mod: string
 ): string {
-  return `<section class="group scan-group scan-group-${mod}">
+  return `<section class="group scan-group scan-group-${mod} scan-trust-layer">
   <h2 class="group-label">${escapeHtml(label)}</h2>
   <ul class="list">
     ${rows}
@@ -432,7 +432,7 @@ function humanGroupRows(vm: ScanViewModel): string {
 function renderVouchSection(vm: ScanViewModel, origin: string): string {
   const walletUrl = `${origin.replace(/\/$/, "")}/wallet/`;
   const createUrl = `${origin.replace(/\/$/, "")}/create/`;
-  return `<section class="group scan-group scan-group-vouch" aria-label="Vouch for this person">
+  return `<section class="group scan-group scan-group-vouch scan-trust-layer" aria-label="Vouch for this person">
   <h2 class="group-label">Vouch</h2>
   <div id="vouch-explainer" class="vouch-card vouch-card-hint">
     <div class="vouch-card-head">
@@ -971,7 +971,7 @@ function liveControlApiOrigin(vm: ScanViewModel, fallback: string): string {
 function renderLimitsSettings(origin: string): string {
   const policy = `${origin}/data-policy.html`;
   const architecture = `${origin}/architecture.html`;
-  return `<details class="scan-limits-settings">
+  return `<details class="scan-limits-settings scan-trust-layer scan-limits-layer">
   <summary class="scan-limits-summary">
     ${scanListIcon("orange", "shield")}
     <span class="scan-limits-summary-text">

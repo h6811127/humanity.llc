@@ -16,6 +16,7 @@ import {
   createdUrlForEntry,
   getTabSession,
   openActivityNow,
+  openCardNowPage,
 } from "./device-keys.mjs";
 import { loadPins, pinHaystack } from "./device-pins.mjs";
 import {
@@ -385,8 +386,7 @@ function renderSavedRows() {
       const entry = loadWallet().find((e) => e.id === id);
       if (!entry) return;
       acknowledgeNetworkSeenForEntry(entry);
-      activateWalletEntry(entry);
-      location.href = createdUrlForEntry(entry);
+      openCardNowPage(entry);
     });
   });
 

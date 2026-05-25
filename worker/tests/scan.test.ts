@@ -206,7 +206,9 @@ describe("renderScanPage M3.2 trust blocks", () => {
       "https://humanity.llc"
     );
     const html = await renderScanPage(vm, "https://humanity.llc");
-    expect(html).toContain("scan-trust-groups");
+    expect(html).toContain("scan-trust-stack");
+    expect(html).toContain("scan-trust-layer");
+    expect(html).toContain("scan-pass-layer");
     expect(html).toContain("Card status");
     expect(html).toContain("Human trust");
     expect(html).toContain("Live control");

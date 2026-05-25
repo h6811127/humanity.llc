@@ -10,10 +10,47 @@ export function syncShellChromeInset() {
   document.documentElement.style.setProperty("--shell-chrome-h", `${Math.ceil(h)}px`);
 }
 
+function initScrollEdgeChrome() {
+  if (!chrome) return;
+  const bar = chrome.querySelector(".top-chrome-bar");
+  if (!bar) return;
+
+  let lastY = window.scrollY;
+  let ticking = false;
+  const threshold = 36;
+
+  const update = () => {
+    ticking = false;
+    const y = window.scrollY;
+    const scrollingDown = y > lastY && y > threshold;
+    const nearTop = y <= threshold;
+    if (nearTop) {
+      chrome.classList.remove("top-chrome--edge-hidden");
+    } else if (scrollingDown) {
+      chrome.classList.add("top-chrome--edge-hidden");
+    } else {
+      chrome.classList.remove("top-chrome--edge-hidden");
+    }
+    lastY = y;
+  };
+
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    },
+    { passive: true }
+  );
+}
+
 export function initShellChrome() {
   if (!chrome) return;
   document.body.classList.add("has-shell-chrome");
   syncShellChromeInset();
+  initScrollEdgeChrome();
   window.addEventListener("resize", syncShellChromeInset);
   if (typeof ResizeObserver !== "undefined") {
     const ro = new ResizeObserver(() => syncShellChromeInset());

@@ -9,7 +9,7 @@ import {
   pinHaystack,
   savePins,
 } from "./device-pins.mjs";
-import { activateWalletEntry, createdUrlForEntry, getTabSession } from "./device-keys.mjs";
+import { openCardNowPage, getTabSession } from "./device-keys.mjs";
 import {
   defaultWalletLabel,
   loadWallet,
@@ -166,8 +166,7 @@ function renderList() {
       const id = btn.getAttribute("data-id");
       const entry = loadWallet().find((e) => e.id === id);
       if (!entry) return;
-      activateWalletEntry(entry);
-      location.href = createdUrlForEntry(entry);
+      openCardNowPage(entry);
     });
   });
 

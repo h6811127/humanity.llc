@@ -16,6 +16,19 @@ export function hapticLight() {
   }
 }
 
+/** Cross-route navigation with view transition when supported. */
+export function navigateTo(url, { replace = false } = {}) {
+  const go = () => {
+    if (replace) location.replace(url);
+    else location.assign(url);
+  };
+  if (!reduced && typeof document.startViewTransition === "function") {
+    document.startViewTransition(go);
+  } else {
+    go();
+  }
+}
+
 function bindHubExpandMotion() {
   const hub = document.getElementById("device-hub");
   if (!hub) return;

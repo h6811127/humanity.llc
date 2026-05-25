@@ -92,10 +92,17 @@ export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
 
 function applyDot() {
   if (!dot) return;
-  const device = deviceState();
-  dot.classList.remove(...NETWORK_CLASSES, ...DEVICE_CLASSES);
-  dot.classList.add(`pass-dot-status-network-${networkStatus}`);
-  dot.classList.add(`pass-dot-status-device-${device}`);
+  const run = () => {
+    const device = deviceState();
+    dot.classList.remove(...NETWORK_CLASSES, ...DEVICE_CLASSES);
+    dot.classList.add(`pass-dot-status-network-${networkStatus}`);
+    dot.classList.add(`pass-dot-status-device-${device}`);
+  };
+  if (!prefersReducedMotion() && typeof document.startViewTransition === "function") {
+    document.startViewTransition(run);
+  } else {
+    run();
+  }
 }
 
 function escapeHtml(s) {

@@ -44,11 +44,13 @@ Principles:
 2. **Hub as sheet**  -  `/`, `/wallet/`, `/created/` use `device-hub--sheet` + backdrop (`device-hub-sheet.mjs`).
 3. **Landing de-explain**  -  shorter hero + compact framing on `/` (more trimming possible).
 
-### Phase B  -  Object continuity (in progress)
+### Phase B  -  Object continuity (shipped v1)
 
-4. **Card open transition**  -  `openCardNowPage` uses `document.startViewTransition` when available; trust dot CSS transition added.
-5. **Trust state morph**  -  dot / shield / revoke states animate between segments, not swap instantly.
-6. **Scan environments**  -  scan HTML as stacked trust layers (pass → limits → live control), not centered cards on a page.
+4. **Card open transition**  -  `navigateTo` / `openCardNowPage` use `document.startViewTransition` when available (hub, wallet, activity).
+5. **Trust state morph**  -  shell status dot uses view transitions + spring CSS on class changes (`device-status.mjs`).
+6. **Scan environments**  -  pass layer → limits → stacked trust sheets (`scan-pass-layer`, `scan-trust-stack`, `scan-trust-layer`).
+
+**Also:** scroll-edge chrome hides the floating bar while scrolling down (`top-chrome--edge-hidden` in `device-shell-chrome.mjs`).
 
 ### Phase C  -  Native shell (optional)
 
