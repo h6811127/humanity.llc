@@ -33,6 +33,7 @@ import {
   getCachedNetworkAlertState,
   getCachedNetworkScanKind,
   getCachedNetworkStatus,
+  getCachedVerification,
   isRevokedSinceLastVisit,
   CARD_REVOKED_ALERT_STATE,
   networkStatusChip,
@@ -41,6 +42,10 @@ import {
   snapshotNetworkSeenOnExit,
   syncLastSeenFromNetworkMap,
 } from "./device-wallet-network.mjs";
+import {
+  humanTrustIconMeta,
+  verificationTrustChip,
+} from "./human-trust-ui.mjs";
 import {
   CARD_DISABLED_SINCE_VISIT_ALERT_TEXT,
   CARD_DISABLED_SINCE_VISIT_SEARCH_SNIPPET,
@@ -226,6 +231,25 @@ function networkChipHtml(profileId, statusOverride, scanKindOverride) {
   return `<span class="hub-card-network hub-card-network--${chip.tone}">${escapeHtml(chip.label)}</span>`;
 }
 
+function verificationChipHtml(profileId) {
+  if (!hubConfig.fetchNetworkStatus) return "";
+  const cached = getCachedVerification(profileId);
+  const chip = verificationTrustChip({
+    label: cached?.label,
+    state: cached?.state,
+  });
+  return `<span class="hub-card-verification hub-card-verification--${chip.tone}">${escapeHtml(chip.label)}</span>`;
+}
+
+function hubCardIconHtml(profileId) {
+  const cached = getCachedVerification(profileId);
+  const meta = humanTrustIconMeta({
+    label: cached?.label,
+    state: cached?.state,
+  });
+  return `<span class="list-icon ${meta.toneClass}" aria-hidden="true">${meta.svg}</span>`;
+}
+
 function currentNetworkStatus(profileId, statusMap = {}) {
   return statusMap[profileId] ?? getCachedNetworkStatus(profileId) ?? "checking";
 }
@@ -240,11 +264,32 @@ function applyNetworkChipsToDom(statusMap = {}, alertStateMap = null) {
     const pid = li.dataset.profileId;
     if (!pid) return;
     const chipEl = li.querySelector(".hub-card-network");
-    if (!chipEl) return;
-    const status = currentNetworkStatus(pid, statusMap);
-    const chip = networkStatusChip(status, getCachedNetworkScanKind(pid));
-    chipEl.className = `hub-card-network hub-card-network--${chip.tone}`;
-    chipEl.textContent = chip.label;
+    if (chipEl) {
+      const status = currentNetworkStatus(pid, statusMap);
+      const chip = networkStatusChip(status, getCachedNetworkScanKind(pid));
+      chipEl.className = `hub-card-network hub-card-network--${chip.tone}`;
+      chipEl.textContent = chip.label;
+    }
+    const verifyEl = li.querySelector(".hub-card-verification");
+    if (verifyEl) {
+      const cached = getCachedVerification(pid);
+      const vChip = verificationTrustChip({
+        label: cached?.label,
+        state: cached?.state,
+      });
+      verifyEl.className = `hub-card-verification hub-card-verification--${vChip.tone}`;
+      verifyEl.textContent = vChip.label;
+    }
+    const iconEl = li.querySelector(".hub-card-head .list-icon");
+    if (iconEl) {
+      const cached = getCachedVerification(pid);
+      const meta = humanTrustIconMeta({
+        label: cached?.label,
+        state: cached?.state,
+      });
+      iconEl.className = `list-icon ${meta.toneClass}`;
+      iconEl.innerHTML = meta.svg;
+    }
   });
   applyRevokedSinceVisitAlerts(statusMap, alertStateMap);
 }
@@ -489,6 +534,10 @@ function renderSavedRows() {
     const netChip = hubConfig.fetchNetworkStatus
       ? networkChipHtml(entry.profile_id, getCachedNetworkStatus(entry.profile_id) ?? "checking")
       : "";
+    const verifyChip = verificationChipHtml(entry.profile_id);
+    const cardIcon = hubConfig.fetchNetworkStatus
+      ? hubCardIconHtml(entry.profile_id)
+      : `<span class="list-icon list-icon-tone-trust" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>`;
     const revokedAlert = hubConfig.fetchNetworkStatus
       ? `<div class="hub-card-status-alert" data-hub-searchable="${escapeHtml(CARD_DISABLED_SINCE_VISIT_SEARCH_SNIPPET)} network" hidden role="status">
           <p class="hub-card-status-alert-text">${escapeHtml(CARD_DISABLED_SINCE_VISIT_ALERT_TEXT)}</p>
@@ -511,14 +560,13 @@ function renderSavedRows() {
 
     li.innerHTML = `
       <div class="hub-card-head">
-        <span class="list-icon list-icon-tone-trust" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </span>
+        ${cardIcon}
         <span class="list-content">
           <span class="list-title">${escapeHtml(entry.label)}</span>
           ${hubCardSubHtml(entry, lastUsed)}
         </span>
         <div class="hub-card-head-meta">
+          ${verifyChip}
           ${netChip}
           ${menuBlock}
         </div>

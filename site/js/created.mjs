@@ -19,6 +19,7 @@ import { initCreatedTabs } from "./created-tabs.mjs";
 import { initCreatedDashboard } from "./created-dashboard.mjs?v=2";
 import { initCreatedDeviceSave } from "./created-device-save.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
+import { applyHumanTrustIconToElement } from "./human-trust-ui.mjs";
 
 const params = new URLSearchParams(location.search);
 const profileIdParam = params.get("profile_id")?.trim() || null;
@@ -84,6 +85,7 @@ const openScanBtn = document.getElementById("open-scan");
 const profileIdEl = document.getElementById("profile-id");
 const humanTrustLabelEl = document.getElementById("human-trust-label");
 const humanTrustSubEl = document.getElementById("human-trust-sub");
+const humanTrustIconEl = document.getElementById("human-trust-icon");
 const networkCardStatusEl = document.getElementById("network-card-status");
 const networkQrExpiresEl = document.getElementById("network-qr-expires");
 const dashboardMetaEl = document.getElementById("created-hero-meta");
@@ -478,14 +480,20 @@ function displayVouchSubtitle(subtitle) {
   return subtitle.replace(/\s*-\s*registered on this operator/i, "").trim() || subtitle;
 }
 
-function applyHumanTrustDisplay(ht) {
+function applyHumanTrustDisplay(ht, verification) {
   if (!ht) return;
+  const label = displayVouchLabel(ht.label);
   if (humanTrustLabelEl) {
-    humanTrustLabelEl.textContent = displayVouchLabel(ht.label);
+    humanTrustLabelEl.textContent = label;
   }
   if (humanTrustSubEl) {
     humanTrustSubEl.textContent = displayVouchSubtitle(ht.subtitle);
   }
+  applyHumanTrustIconToElement(humanTrustIconEl, {
+    label: ht.label ?? label,
+    subtitle: ht.subtitle,
+    state: verification?.state ?? null,
+  });
 }
 
 if (data?.verification?.label) {
@@ -545,7 +553,7 @@ async function refreshNetworkStatus() {
       }
     }
     if (scan.human_trust) {
-      applyHumanTrustDisplay(scan.human_trust);
+      applyHumanTrustDisplay(scan.human_trust, scan.verification);
     }
     if (data && qrExpires) {
       const next = { ...data, qr_expires_at: qrExpires };

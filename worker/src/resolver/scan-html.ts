@@ -631,9 +631,10 @@ function renderVouchSection(vm: ScanViewModel, origin: string): string {
       </div>
     </div>
     <p class="vouch-lead" id="vouch-explainer-copy">
-      To attest for someone else, activate <strong>your</strong> card in
+      Checking this device for your signing keys… Steward or Vouched Human on the network is not enough —
+      you must <strong>Use keys</strong> in
       <a href="${escapeHtml(walletUrl)}">Saved cards</a> (or
-      <a href="${escapeHtml(createUrl)}">create one</a>), then return to this scan page.
+      <a href="${escapeHtml(createUrl)}">create one</a>) in this browser, then return here.
       Your private key never uploads  -  only the signed vouch does.
     </p>
   </div>
@@ -721,7 +722,7 @@ function vouchIssuanceGroupRows(vm: ScanViewModel): string {
 function renderVouchIssuanceScript(vm: ScanViewModel, origin: string): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
   const assetOrigin = pagesJsOrigin(origin);
-  const mod = JSON.stringify(`${assetOrigin}/js/vouch-issue.mjs?v=2`);
+  const mod = JSON.stringify(`${assetOrigin}/js/vouch-issue.mjs?v=3`);
   return `<script type="module" src=${mod}></script>`;
 }
 

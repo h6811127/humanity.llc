@@ -12,10 +12,14 @@ import {
 import {
   mergeLastSeenFromNetworkMap,
   networkStatusChip,
+  parseNetworkVerification,
   readCachedNetworkStatus,
+  readCachedVerification,
   shouldUseCachedNetworkStatus,
   WALLET_NETWORK_CACHE_TTL_MS,
 } from "./device-wallet-network-core.mjs";
+
+export { readCachedVerification };
 
 const CACHE_KEY = "hc_wallet_network_cache";
 const LAST_SEEN_KEY = "hc_wallet_last_seen_network";
@@ -74,6 +78,11 @@ export function getCachedNetworkScanKind(profileId) {
   return entry?.scanKind ?? null;
 }
 
+/** @param {string} profileId */
+export function getCachedVerification(profileId) {
+  return readCachedVerification(loadCache(), profileId, Date.now(), WALLET_NETWORK_CACHE_TTL_MS);
+}
+
 /**
  * @param {unknown} body
  * @returns {{ status: string, scanKind: string | null, alertState: string }}
@@ -81,10 +90,13 @@ export function getCachedNetworkScanKind(profileId) {
 function parseNetworkFetchBody(body) {
   const scanKind = typeof body?.scan?.kind === "string" ? body.scan.kind : null;
   const status = body?.scan?.card?.status || "unknown";
+  const { verificationLabel, verificationState } = parseNetworkVerification(body);
   return {
     status,
     scanKind,
     alertState: alertStateFromScanKind(scanKind, status),
+    verificationLabel,
+    verificationState,
   };
 }
 
@@ -117,18 +129,36 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
           if (!res.ok) {
             statusMap[pid] = "error";
             alertStateMap[pid] = "active";
-            cache[pid] = { status: "error", scanKind: null, at: now };
+            cache[pid] = {
+              status: "error",
+              scanKind: null,
+              verificationLabel: null,
+              verificationState: null,
+              at: now,
+            };
             return;
           }
           const body = await res.json();
           const parsed = parseNetworkFetchBody(body);
           statusMap[pid] = parsed.status;
           alertStateMap[pid] = parsed.alertState;
-          cache[pid] = { status: parsed.status, scanKind: parsed.scanKind, at: now };
+          cache[pid] = {
+            status: parsed.status,
+            scanKind: parsed.scanKind,
+            verificationLabel: parsed.verificationLabel,
+            verificationState: parsed.verificationState,
+            at: now,
+          };
         } catch {
           statusMap[pid] = "offline";
           alertStateMap[pid] = "active";
-          cache[pid] = { status: "offline", scanKind: null, at: now };
+          cache[pid] = {
+            status: "offline",
+            scanKind: null,
+            verificationLabel: null,
+            verificationState: null,
+            at: now,
+          };
         }
       })()
     );

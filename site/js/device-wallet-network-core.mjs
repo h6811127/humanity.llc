@@ -91,3 +91,34 @@ export function readCachedNetworkStatus(cache, profileId, now, ttlMs = WALLET_NE
   if (!entry || !isNetworkCacheFresh(entry.at, now, ttlMs)) return null;
   return entry.status ?? null;
 }
+
+/**
+ * @param {unknown} body Resolver GET .../status JSON
+ * @returns {{ verificationLabel: string | null, verificationState: string | null }}
+ */
+export function parseNetworkVerification(body) {
+  const verification = body?.scan?.verification;
+  const human = body?.scan?.human_trust;
+  const label =
+    (typeof human?.label === "string" && human.label) ||
+    (typeof verification?.label === "string" && verification.label) ||
+    null;
+  const state =
+    (typeof verification?.state === "string" && verification.state) || null;
+  return { verificationLabel: label, verificationState: state };
+}
+
+/**
+ * @param {Record<string, { verificationLabel?: string | null, verificationState?: string | null, at?: number }>} cache
+ * @param {string} profileId
+ * @param {number} now
+ * @param {number} [ttlMs]
+ */
+export function readCachedVerification(cache, profileId, now, ttlMs = WALLET_NETWORK_CACHE_TTL_MS) {
+  const entry = cache[profileId];
+  if (!entry || !isNetworkCacheFresh(entry.at, now, ttlMs)) return null;
+  return {
+    label: entry.verificationLabel ?? null,
+    state: entry.verificationState ?? null,
+  };
+}

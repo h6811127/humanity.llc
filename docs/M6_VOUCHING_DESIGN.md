@@ -278,6 +278,9 @@ Revoked/suspended card states must **override** positive verification on scan (a
 - [x] Card client: “Vouch for this person” for eligible vouchers.
 - [x] Sign + POST flow with default statement template.
 - [x] Eligibility errors surfaced in plain language (quota, wait period, not verified).
+- [x] Scan explainer distinguishes network verification vs keys on this device (saved Steward detection).
+- [x] `/created/` human-trust icon follows label (green shield = Steward).
+- [x] `/wallet/` verification chip (Steward / Vouched Human / Registered).
 
 **Step 3  -  Vouch revocation**
 
@@ -355,8 +358,21 @@ Revoked/suspended card states must **override** positive verification on scan (a
 
 ---
 
+## Device keys vs network verification (read this first)
+
+Vouching confuses people when these are mixed up. Full guide: [`docs/KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md).
+
+- **Steward / Vouched Human** = resolver state for a `profile_id` (visible on scan, `/created/`, `/wallet/` chips).
+- **Signing keys** = owner keypair in **`hc_created`** for this tab (loaded via create or **Use keys** from `hc_wallet`).
+- **iPhone vs laptop** = separate devices unless you import a backup or save + Use keys on each.
+
+Scan vouch UI (shipped): if keys are missing but a saved card is Steward on the network, the explainer names that card and tells you to **Use keys** on this device.
+
+---
+
 ## Related docs
 
+- [`docs/KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md)  -  cards, keys, verification, multi-device
 - `docs/M7_LIVE_CONTROL_ALPHA.md`  -  ephemeral key control (build before vouch UI polish is done)
 - `docs/V1_DECISION_LOCK.md`  -  launch copy locks
 - `docs/architecture.html`  -  public-facing trust map (link from scan settings when updated)

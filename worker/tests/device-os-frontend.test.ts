@@ -24,6 +24,59 @@ import {
   WALLET_NETWORK_CACHE_TTL_MS,
 } from "../../site/js/device-wallet-network-core.mjs";
 import { isRevokedSinceLastVisitFromBaseline } from "../../site/js/wallet-network-baseline.mjs";
+import {
+  humanTrustIconMeta,
+  isEligibleVoucherState,
+  verificationTrustChip,
+} from "../../site/js/human-trust-ui.mjs";
+import { parseNetworkVerification } from "../../site/js/device-wallet-network-core.mjs";
+
+describe("humanTrustIconMeta", () => {
+  it("uses green shield for Steward", () => {
+    const meta = humanTrustIconMeta({ label: "Steward", state: "steward" });
+    expect(meta.toneClass).toBe("list-icon-tone-green");
+    expect(meta.svg).toContain("M12 22");
+  });
+
+  it("uses trust tone shield for Vouched Human", () => {
+    const meta = humanTrustIconMeta({ label: "Vouched Human", state: "verified_human" });
+    expect(meta.toneClass).toBe("list-icon-tone-trust");
+  });
+});
+
+describe("verificationTrustChip", () => {
+  it("labels steward and vouched distinctly", () => {
+    expect(verificationTrustChip({ state: "steward" })).toEqual({
+      label: "Steward",
+      tone: "steward",
+    });
+    expect(verificationTrustChip({ state: "verified_human", label: "Vouched Human" })).toEqual({
+      label: "Vouched Human",
+      tone: "vouched",
+    });
+  });
+});
+
+describe("parseNetworkVerification", () => {
+  it("reads label and state from status JSON", () => {
+    expect(
+      parseNetworkVerification({
+        scan: {
+          verification: { state: "steward", label: "Steward" },
+          human_trust: { label: "Steward", subtitle: "x" },
+        },
+      })
+    ).toEqual({ verificationLabel: "Steward", verificationState: "steward" });
+  });
+});
+
+describe("isEligibleVoucherState", () => {
+  it("allows verified_human and steward only", () => {
+    expect(isEligibleVoucherState("steward")).toBe(true);
+    expect(isEligibleVoucherState("verified_human")).toBe(true);
+    expect(isEligibleVoucherState("registered")).toBe(false);
+  });
+});
 
 describe("isPollableWalletEntry", () => {
   it("requires profile_id and qr_id strings", () => {
