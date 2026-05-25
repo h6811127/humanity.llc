@@ -5,12 +5,10 @@
 
 :root {
   --shell-bg: #f2f2f7;
-  --shell-chrome-bg: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.52) 0%,
-    rgba(242, 242, 247, 0.28) 100%
-  );
-  --shell-chrome-blur: saturate(195%) blur(32px);
+  --shell-chrome-bg: rgba(242, 242, 247, 0.92);
+  --shell-chrome-blur: saturate(160%) blur(12px);
+  --shell-surface: #f2f2f7;
+  --shell-surface-elevated: #ffffff;
   --shell-chrome-edge: rgba(60, 60, 67, 0.07);
   --shell-bg-elevated: rgba(255, 255, 255, 0.68);
   --shell-fill: rgba(255, 255, 255, 0.88);
@@ -99,23 +97,14 @@ body.has-shell-chrome .page {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px var(--pad) 8px;
-  padding-top: calc(6px + env(safe-area-inset-top, 0px));
+  min-height: 40px;
+  padding: 4px var(--pad) 6px;
+  padding-top: calc(4px + env(safe-area-inset-top, 0px));
 }
 
 .top-chrome--compact .device-status-summary,
 .top-chrome--compact .device-status-search-btn {
-  flex: 0 0 0;
-  max-width: 0;
-  min-width: 0;
-  opacity: 0;
-  overflow: hidden;
-  padding: 0;
-  margin: 0;
-  pointer-events: none;
-  transition:
-    opacity 0.3s var(--shell-ease),
-    max-width 0.35s var(--shell-spring);
+  display: none;
 }
 
 .top-chrome .brand-status-popover {
@@ -211,9 +200,9 @@ body.has-shell-chrome .page {
 
 .brand-status-popover {
   border: 0.5px solid var(--shell-separator);
-  background: var(--shell-bg-elevated);
-  -webkit-backdrop-filter: var(--shell-blur);
-  backdrop-filter: var(--shell-blur);
+  background: var(--shell-surface-elevated);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   box-shadow: var(--shell-shadow-md);
   border-radius: 16px;
 }
@@ -465,6 +454,22 @@ button.hub-card-action.hub-use-keys {
   opacity: 0.88;
 }
 
+.pass-dot {
+  transition:
+    background 0.35s var(--shell-spring),
+    box-shadow 0.35s var(--shell-spring);
+}
+
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pass-dot {
+    transition: none;
+  }
+}
+
 /* Hub bottom sheet */
 .device-hub.device-hub--sheet {
   position: fixed;
@@ -479,9 +484,9 @@ button.hub-card-action.hub-use-keys {
   transform: translateX(-50%) translateY(100%);
   transition: transform 0.45s var(--shell-spring);
   border-radius: 16px 16px 0 0;
-  background: var(--shell-fill);
-  -webkit-backdrop-filter: var(--shell-blur);
-  backdrop-filter: var(--shell-blur);
+  background: var(--shell-surface);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.14);
   overflow: hidden;
   display: flex;
@@ -503,6 +508,7 @@ button.hub-card-action.hub-use-keys {
   padding: 4px var(--pad) calc(20px + env(safe-area-inset-bottom, 0px));
   flex: 1;
   min-height: 0;
+  background: var(--shell-surface);
 }
 
 .device-hub.device-hub--sheet.device-hub-collapsed .device-hub-body {

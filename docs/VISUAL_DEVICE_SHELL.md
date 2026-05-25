@@ -44,9 +44,9 @@ Principles:
 2. **Hub as sheet** — `/`, `/wallet/`, `/created/` use `device-hub--sheet` + backdrop (`device-hub-sheet.mjs`).
 3. **Landing de-explain** — shorter hero + compact framing on `/` (more trimming possible).
 
-### Phase B — Object continuity (next)
+### Phase B — Object continuity (in progress)
 
-4. **Card open transition** — tap saved card → `/created/` with expand-from-row (FLIP or View Transitions API).
+4. **Card open transition** — `openCardNowPage` uses `document.startViewTransition` when available; trust dot CSS transition added.
 5. **Trust state morph** — dot / shield / revoke states animate between segments, not swap instantly.
 6. **Scan environments** — scan HTML as stacked trust layers (pass → limits → live control), not centered cards on a page.
 

@@ -295,6 +295,11 @@ statusSearchBtn?.addEventListener("click", (e) => {
 dotBtn?.addEventListener("click", (e) => {
   e.preventDefault();
   e.stopPropagation();
+  setPopover(false);
+  if (hub) {
+    setHubExpanded(true, { haptic: true, persist: true });
+    return;
+  }
   setPopover(!popoverOpen);
   hapticTap();
 });

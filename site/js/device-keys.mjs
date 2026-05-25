@@ -65,7 +65,14 @@ export function openCardNowPage(entry) {
   if (saved?.owner_private_key_b58) {
     activateWalletEntry(saved);
   }
-  location.href = createdUrlForEntry(target);
+  const url = createdUrlForEntry(target);
+  if (typeof document.startViewTransition === "function") {
+    document.startViewTransition(() => {
+      location.assign(url);
+    });
+  } else {
+    location.href = url;
+  }
   return true;
 }
 
