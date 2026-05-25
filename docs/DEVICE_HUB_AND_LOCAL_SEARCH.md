@@ -1,6 +1,6 @@
 # Device hub and local search
 
-**Status:** Phase 1–3 shipped · shared hub on `/created/` · activity log  
+**Status:** Phase 1–4 shipped · shared hub · activity log · returning-user desktop  
 **Scope:** Browser-local personalization only — not resolver-wide discovery  
 **Companion:** [`DEVICE_OS.md`](DEVICE_OS.md) — two-layer model, placement rule, landing story
 
@@ -26,7 +26,9 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Hub rows (shipped):** Saved cards — **Use keys**, **Open scan**, **⋯** (Relabel, Remove). **Import backup file** decrypts `.hcbackup.json` into `hc_wallet`.
 
-**Landing focus mode:** Toggle in hub shortcuts — `localStorage.hc_landing_focus` hides intro sections; keeps hub, documentation, contact.
+**Landing focus mode:** `localStorage.hc_landing_focus` hides intro (`[data-landing-tutorial]`). Keeps **hub**, **hub glance** (when collapsed), **system banner** (if network unhealthy), **Help & protocol** footer (`<details>`), and **contact**. Full **Documentation** block is for intro mode only — see [`DEVICE_OS.md`](DEVICE_OS.md) immutable vs reference.
+
+**Hub glance (landing):** When the hub is collapsed, `#device-hub-glance` shows notice (if any) and up to three saved card labels; tap expands the hub.
 
 **Created keys strip:** On `/created/` **Now** tab, **Keys on this device** first; recovery in **Break-glass** `<details>` below.
 
@@ -99,8 +101,10 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 | `site/created/index.html` | Created hub shell |
 | `site/js/device-hub-ui.mjs` | Shared hub render + init |
 | `site/js/device-activity.mjs` | Activity log API |
+| `site/js/device-hub-glance.mjs` | Collapsed-hub summary (landing) |
 | `site/js/landing-device-hub.mjs` | Landing init wrapper |
 | `site/js/created-hub.mjs` | Created init wrapper |
+| `site/js/landing-focus.mjs` | Focus mode + intro toggle |
 | `site/js/device-status.mjs` | Status line, dot sheet, hub expand |
 | `site/js/device-hub-search.mjs` | Shared filter |
 | `site/js/device-hub-import.mjs` | Hub backup import |

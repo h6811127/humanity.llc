@@ -5,6 +5,7 @@ import { resolverApiOrigin } from "./hc-sign.mjs";
 import { buildStatusSegments, tabNoticeCount } from "./device-counts.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
+import { refreshHubGlance } from "./device-hub-glance.mjs";
 
 const HUB_OPEN_KEY = "hc_hub_open";
 const NOTICE_EXPAND_KEY = "hc_notice_hub_expand";
@@ -28,6 +29,7 @@ const dot = document.getElementById("brand-status-dot");
 const popover = document.getElementById("brand-status-popover");
 const popoverSheet = document.getElementById("brand-status-sheet");
 const hub = document.getElementById("device-hub");
+const systemBanner = document.getElementById("device-system-banner");
 
 let networkStatus = "offline";
 let popoverOpen = false;
@@ -65,6 +67,7 @@ export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
     sessionStorage.setItem(HUB_OPEN_KEY, open ? "1" : "0");
   }
   if (haptic) hapticTap();
+  refreshHubGlance();
 }
 
 function applyDot() {
@@ -114,6 +117,14 @@ function renderPopoverSheet(segments) {
     });
     popoverSheet.appendChild(row);
   }
+  if (document.getElementById("landing-docs-footer")) {
+    const help = document.createElement("a");
+    help.href = "/features-available-now.html";
+    help.className = "brand-status-sheet-row brand-status-sheet-link";
+    help.innerHTML =
+      '<span class="brand-status-sheet-key">Help</span><span class="brand-status-sheet-val">Protocol &amp; features ›</span>';
+    popoverSheet.appendChild(help);
+  }
 }
 
 function escapeSheetKey(id) {
@@ -157,11 +168,27 @@ function setPopover(open) {
   if (dotBtn) dotBtn.setAttribute("aria-expanded", open ? "true" : "false");
 }
 
+function renderSystemBanner() {
+  if (!systemBanner) return;
+  if (networkStatus === "ok") {
+    systemBanner.hidden = true;
+    systemBanner.textContent = "";
+    return;
+  }
+  systemBanner.hidden = false;
+  systemBanner.textContent =
+    networkStatus === "degraded"
+      ? "Resolver degraded — create, update, and revoke may fail until health recovers."
+      : "Network unreachable from this browser — public scans may still load; signing needs a connection.";
+}
+
 function refreshSummary() {
   const segments = renderSegments();
   renderPopoverSheet(segments);
   applyDot();
+  renderSystemBanner();
   maybeAutoExpandNotice();
+  refreshHubGlance();
 }
 
 function maybeAutoExpandNotice() {
@@ -276,3 +303,15 @@ window.addEventListener("storage", (e) => {
 });
 
 window.addEventListener("hc-device-hub-changed", refreshSummary);
+
+window.addEventListener("hc-hub-expand-request", (e) => {
+  if (!hub) return;
+  setHubExpanded(true, { haptic: true, persist: true });
+  const targetId = e.detail?.targetId;
+  if (targetId) {
+    document.getElementById(targetId)?.scrollIntoView({
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
+      block: "nearest",
+    });
+  }
+});

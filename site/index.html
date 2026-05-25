@@ -78,6 +78,13 @@
         </div>
       </div>
 
+      <p
+        class="device-system-banner"
+        id="device-system-banner"
+        role="status"
+        hidden
+      ></p>
+
       <section
         class="device-hub device-hub-top device-hub-collapsed"
         id="device-hub"
@@ -253,6 +260,10 @@
           </div>
         </div>
       </section>
+
+      <div class="device-hub-glance" id="device-hub-glance" hidden aria-label="On this device summary">
+        <ul class="device-hub-glance-list" id="device-hub-glance-list"></ul>
+      </div>
 
       <main class="screen screen-landing">
         <section class="hero hero-tight" data-landing-tutorial>
@@ -571,7 +582,7 @@
           </p>
         </section>
 
-        <section class="group group-muted landing-essentials">
+        <section class="group group-muted landing-essentials landing-docs-full" id="landing-docs-full">
           <h2 class="group-label">Documentation</h2>
           <ul class="list list-compact">
             <li class="list-row list-action">
@@ -635,6 +646,63 @@
               </a>
             </li>
           </ul>
+        </section>
+
+        <section class="group landing-essentials landing-docs-footer" id="landing-docs-footer">
+          <details class="landing-protocol-details">
+            <summary class="landing-protocol-summary">
+              <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Help &amp; protocol</span>
+                <span class="list-sub">Features, case study, architecture, data policy</span>
+              </span>
+              <span class="list-chevron" aria-hidden="true">›</span>
+            </summary>
+            <ul class="list list-compact landing-protocol-links">
+              <li class="list-row list-action">
+                <a href="/features-available-now.html">
+                  <span class="list-content">
+                    <span class="list-title">All features available now</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </a>
+              </li>
+              <li class="list-row list-action">
+                <a href="/studio/">
+                  <span class="list-content">
+                    <span class="list-title">Studio blog</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </a>
+              </li>
+              <li class="list-row list-action">
+                <a href="/case-study/">
+                  <span class="list-content">
+                    <span class="list-title">Case study</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </a>
+              </li>
+              <li class="list-row list-action">
+                <a href="/architecture.html">
+                  <span class="list-content">
+                    <span class="list-title">Architecture &amp; security</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </a>
+              </li>
+              <li class="list-row list-action">
+                <a href="/data-policy.html">
+                  <span class="list-content">
+                    <span class="list-title">Data policy</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </a>
+              </li>
+            </ul>
+          </details>
         </section>
 
         <section class="group landing-essentials" id="now">
@@ -707,7 +775,7 @@
       <a class="dock-btn dock-btn-primary" href="/create/">Create a live object</a>
     </nav>
     <script src="/js/landing-focus.mjs?v=1" type="module"></script>
-    <script src="/js/device-status.mjs?v=4" type="module"></script>
+    <script src="/js/device-status.mjs?v=5" type="module"></script>
     <script src="/js/landing-progress.mjs?v=2" type="module"></script>
     <script src="/js/landing-help.mjs?v=3" type="module"></script>
     <script src="/js/landing-device-hub.mjs?v=9" type="module"></script>

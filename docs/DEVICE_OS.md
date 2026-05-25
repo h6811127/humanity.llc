@@ -1,6 +1,6 @@
 # Device OS — browser shell + physical network
 
-**Status:** Phase 1–3 shipped (docs + shared hub on `/created/` + activity log)  
+**Status:** Phase 4 shipped (returning-user desktop on landing)  
 **Audience:** Product, frontend, and anyone extending Pages without accounts
 
 ---
@@ -24,83 +24,106 @@ Before shipping UI, answer:
 
 | Question | Put it here |
 |----------|-------------|
-| Save, search, relabel, import backup, activity log | **Device hub** (`#device-hub`) |
+| Save, search, relabel, import backup, activity log, collapsed glance | **Device hub** (`#device-hub`) + glance strip |
 | Manifesto, revoke, QR, backup export | **Network object** + `/created/` Manage tab |
 | What a stranger sees | **Scan page only** — never a second homepage demo |
+| Protocol essays, threat models, case study walkthrough | **Reference** (full docs intro, or Help drawer in focus mode) — not the operational desktop |
+
+**Do not put on the landing hub:** per-pin revoke, disable QR, or any signed network mutation without **Use keys → /created/**. Pins are public bookmarks only.
 
 ---
 
-## Landing story (current)
+## Immutable vs reference (returning users)
 
-1. **Header** — brand dot (network + device spec sheet) + Create  
-2. **Status line** — `Network live · N saved · N pinned · N notice` → tap expands hub  
-3. **On this device** — search, activity, saved cards, pins, shortcuts, backup import  
-4. **Main column** — hero, four-step progress (Create → Save → Print → Manage), framing, **One use · status plate**, design choices, documentation  
+**Immutable** means “cannot miss because it is true *right now*” — not “always show five doc links.”
 
-**Removed (intentionally):** homepage pass-card demo (“What someone sees when they scan”) — redundant with real scan pages and case study.  
-**Removed:** Documentation row “Create → scan → revoke” — case study and features hub cover the loop.
+| Tier | What | Where |
+|------|------|--------|
+| **Glance** | Network live / limited / offline, saved · pinned · notice counts | Status line + brand dot sheet |
+| **Act** | Hub: cards, pins, search, activity, shortcuts, import | `#device-hub` (expand to work) |
+| **Glance (collapsed hub)** | Notice + up to 3 saved labels (+ “N more”) | `#device-hub-glance` (landing only) |
+| **System** | Resolver degraded or offline (actionable) | `#device-system-banner` (landing only, hidden when ok) |
+| **Reference** | Features map, studio, case study, architecture, data policy | Full **Documentation** section (intro mode) or **Help & protocol** `<details>` (focus mode) |
 
-**Returning users:** focus mode (`hc_landing_focus`) hides intro sections; hub + documentation + contact stay.
+Documentation is **trust and onboarding**, not **state**. Returning users need what changed on **this device** and **network health**, not architecture every visit.
 
 ---
 
-## Shared device shell (shipped)
+## Landing story
+
+1. **Header** — brand dot (network + device + Help link) + Create  
+2. **Status line** — segmented counts → tap expands hub  
+3. **System banner** — only when network ≠ ok  
+4. **On this device** — hub body when expanded  
+5. **Hub glance** — compact rows when hub collapsed (landing)  
+6. **Main column** — intro sections **or** focus-mode footer (see below)
+
+**Removed (intentionally):** homepage pass-card demo; doc row “Create → scan → revoke.”
+
+### Focus mode (`hc_landing_focus`)
+
+Hides `[data-landing-tutorial]` (hero, progress, One use, design choices, dock, help pill).
+
+**Stays visible:**
+
+- Status line, system banner (if any), hub, hub glance, contact  
+- **Help & protocol** — one collapsible footer (not the full Documentation block)  
+- Hub **Show intro again** toggle in shortcuts  
+
+**Default:** on when wallet or pins exist (`landing-focus.mjs`). Entering focus mode expands the hub once.
+
+**Not the desktop:** a scroll of static documentation links. The desktop is **hub-first**; protocol links are secondary.
+
+---
+
+## Shared device shell
 
 Same chrome on **landing**, **`/created/`**, and **`/wallet/`**:
 
 | Piece | Module | Notes |
 |-------|--------|-------|
-| Status line + dot sheet | `device-status.mjs` | Expandable hub on landing + created; wallet scrolls to hub |
-| Hub body | `device-hub-ui.mjs` | Saved rows, pins, notice, activity, search |
-| Wallet save helpers | `device-wallet.mjs` | `hc_wallet` |
-| Tab keys | `sessionStorage` `hc_created` | This tab only |
-| Activity log | `device-activity.mjs` | `hc_device_activity`, max 40 entries |
+| Status line + dot sheet | `device-status.mjs` | Hub expand; system banner + Help row on landing |
+| Hub body | `device-hub-ui.mjs` | Saved, pins, notice, activity, search, import |
+| Hub glance | `device-hub-glance.mjs` | Landing only; visible when hub collapsed |
+| Wallet / activity / keys | `device-wallet.mjs`, `device-activity.mjs`, `device-keys.mjs` | |
 
 ### `/created/` differences
 
-- Hub sits **above** owner tabs (not below hero).  
-- Status line is **expandable** (not static).  
-- Default **expanded** when this tab holds signing keys (first paint).  
-- Notice row links to **`#created-keys-strip`** instead of another `/created/` URL.  
-- Shortcuts: **Manage this card**, All saved cards, Homepage — no landing focus toggle.
+- Hub above owner tabs; notice → `#created-keys-strip`; no focus toggle; no glance strip (hub + tabs are enough).
 
 ---
 
-## Local activity log (Phase 3)
+## Local activity log
 
-**Storage:** `localStorage` key `hc_device_activity` — array of `{ id, type, label, at }`.
-
-**Types:** `saved`, `use_keys`, `remove_card`, `pin_added`, `backup_import`, `live_control`
-
-**UI:** Hub group **Recent on this device** — newest first; not filtered away when search is empty (group always visible if entries exist).
-
-**Not logged:** resolver scans, failed imports, relabel-only edits (low signal).
+**Storage:** `hc_device_activity` — max 40 entries.  
+**Types:** `saved`, `use_keys`, `remove_card`, `pin_added`, `backup_import`, `live_control`  
+**UI:** Hub group **Recent on this device**.
 
 ---
 
 ## Network layer (unchanged contract)
 
-- One primitive: signed card + QR credential + resolver status  
-- **Status plate** = first dogfooded template (`/create/?template=status_plate`)  
-- Scan = public truth; device hub never replaces scan UI  
-- Studio blog (`/studio/`) documents building the site in public  
+- Signed card + QR + resolver status  
+- **Status plate** — first dogfooded template  
+- Scan = public truth  
 
-See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` for storage tables and search phases.
+See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` for storage and search.
 
 ---
 
 ## Implementation checklist
 
-Use this order when extending the device OS:
-
-- [x] **Doc** — this file + update `DEVICE_HUB_AND_LOCAL_SEARCH.md`  
-- [x] **Extract** — `device-hub-ui.mjs` shared by landing and created  
-- [x] **Created shell** — full hub HTML + expandable status + `device-hub-ui` init  
-- [x] **Activity** — `device-activity.mjs` + hub group + hooks on save/use/remove/import/pin  
-- [x] **Auto-expand** — `/created/` opens hub when tab has keys  
-- [ ] **Deferred** — live-control inbox queue UI (activity type only for now)  
-- [ ] **Deferred** — cross-tab “keys waiting in another tab” banner beyond notice row  
-- [ ] **Deferred** — resolver-wide search / directory  
+| Step | Item | Status |
+|------|------|--------|
+| 1 | Doc — returning desktop + immutable vs reference | ✅ |
+| 2 | Focus mode: hide full Documentation; show Help & protocol footer | ✅ |
+| 3 | Brand dot sheet: **Help & protocol** row (landing) | ✅ |
+| 4 | `#device-hub-glance` when hub collapsed | ✅ |
+| 5 | `#device-system-banner` when network degraded/offline | ✅ |
+| 6 | Deferred: live-control inbox queue | — |
+| 7 | Deferred: cross-tab keys banner beyond notice row | — |
+| 8 | Deferred: resolver-wide search / directory | — |
+| 9 | Deferred: per-card revoke chips on landing hub | — (use Manage) |
 
 ---
 
@@ -109,11 +132,9 @@ Use this order when extending the device OS:
 | Path | Role |
 |------|------|
 | `docs/DEVICE_OS.md` | This document |
-| `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` | Storage, search, pins — companion |
-| `site/js/device-hub-ui.mjs` | Shared hub render + init |
-| `site/js/device-activity.mjs` | Activity log API |
-| `site/js/device-status.mjs` | Status line, hub expand |
-| `site/js/landing-device-hub.mjs` | Landing init wrapper |
-| `site/js/created-hub.mjs` | Created page init wrapper |
-| `site/index.html` | Landing hub + activity group |
-| `site/created/index.html` | Created hub + activity group |
+| `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` | Storage, search, focus mode |
+| `site/js/device-hub-glance.mjs` | Collapsed-hub summary (landing) |
+| `site/js/device-status.mjs` | Status, banner, popover Help row |
+| `site/js/device-hub-ui.mjs` | Shared hub |
+| `site/js/landing-focus.mjs` | Focus mode toggle |
+| `site/index.html` | Glance + banner + docs split |

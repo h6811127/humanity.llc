@@ -72,7 +72,7 @@ Writes `data/showcase-status-plate.json` with a live scan URL for the status-pla
 
 ### Device OS (browser shell)
 
-Landing, **`/created/`**, and **`/wallet/`** share status line + **On this device** hub (saved keys, pins, activity, backup import). Search filters **this device only** — not the public resolver. See `docs/DEVICE_OS.md` and `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md`.
+Landing, **`/created/`**, and **`/wallet/`** share status line + **On this device** hub (saved keys, pins, activity, backup import). **Focus mode** on the landing page hides intro content and shows a hub-first desktop (glance strip when collapsed, Help & protocol footer, system banner when unhealthy). See `docs/DEVICE_OS.md` and `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md`.
 
 ### After changing Pages files
 
