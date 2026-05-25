@@ -1,6 +1,6 @@
 # Device OS — browser shell + physical network
 
-**Status:** Phase 7 shipped (live-control inbox on device hub)  
+**Status:** Phase 8 shipped (cross-tab keys banner + glance polish)  
 **Audience:** Product, frontend, and anyone extending Pages without accounts
 
 ---
@@ -89,7 +89,8 @@ Optional hub toggle (off by default): after create, write tab keys to `hc_wallet
 | Network health in status line + banner | Resolver build / incident feed |
 | Saved · pinned · notice counts | — |
 | **Revoked since last visit** per saved row + hub glance hint | — |
-| Hub glance when collapsed | Cross-tab “keys in another tab” banner |
+| Hub glance when collapsed | Live proof + cross-tab keys rows when collapsed |
+| Cross-tab keys banner (keys in another tab) | — |
 | Recent activity on device | — |
 | **Live proof waiting** inbox (hub group; prove on `/created/`) | — |
 
@@ -153,9 +154,17 @@ See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` for storage and search.
 | 8 | Wallet shell parity + `device-wallet-network.mjs` status chips | ✅ |
 | 9 | **Revoked since last visit** (`hc_wallet_last_seen_network`) | ✅ |
 | 10 | Live-control inbox (`device-live-control-inbox.mjs`) | ✅ |
-| 11 | Deferred: cross-tab keys banner beyond notice row | — |
+| 11 | Cross-tab keys banner (`device-tab-presence.mjs`) | ✅ |
 | 12 | Deferred: resolver-wide search / directory | — |
 | — | Deferred: per-card revoke on landing hub | — (use Manage) |
+
+### Cross-tab keys (Phase 8)
+
+**Presence:** `localStorage` `hc_tab_keys_presence` — each tab heartbeats every 5s with `profile_id` / handle / label only (never private keys). Stale entries drop after 15s.
+
+**Banner:** `#device-cross-tab-banner` on landing and `/wallet/` when another tab holds keys and this tab does not show the unsaved-keys notice row.
+
+**Glance:** Collapsed hub shows **Keys in another tab** and **N live proof waiting** rows.
 
 ### Live-control inbox (Phase 7)
 
@@ -187,6 +196,8 @@ See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` for storage and search.
 |------|------|
 | `docs/DEVICE_OS.md` | This document |
 | `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` | Storage, search, focus mode |
+| `site/js/device-tab-presence.mjs` | Cross-tab signing-key heartbeat |
+| `site/js/device-cross-tab-banner.mjs` | Cross-tab keys banner copy |
 | `site/js/device-live-control-inbox.mjs` | Poll pending challenges for saved cards |
 | `site/js/device-wallet-network.mjs` | Resolver status cache for saved rows |
 | `site/js/wallet-hub.mjs` | Wallet page init |

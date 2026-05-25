@@ -5,7 +5,9 @@ import { resolverApiOrigin } from "./hc-sign.mjs";
 import { buildStatusSegments, tabNoticeCount } from "./device-counts.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
+import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
+import { startTabKeysPresence } from "./device-tab-presence.mjs";
 
 const HUB_OPEN_KEY = "hc_hub_open";
 const NOTICE_EXPAND_KEY = "hc_notice_hub_expand";
@@ -195,6 +197,7 @@ function refreshSummary() {
   renderPopoverSheet(segments);
   applyDot();
   renderSystemBanner();
+  renderCrossTabKeysBanner();
   maybeAutoExpandNotice();
   refreshHubGlance();
 }
@@ -321,6 +324,7 @@ window.addEventListener("storage", (e) => {
 
 window.addEventListener("hc-device-hub-changed", refreshSummary);
 window.addEventListener("hc-live-control-inbox-changed", refreshSummary);
+window.addEventListener("hc-tab-presence-changed", refreshSummary);
 
 window.addEventListener("hc-hub-expand-request", (e) => {
   if (!hub) return;

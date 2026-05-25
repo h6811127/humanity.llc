@@ -73,6 +73,12 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 - Hub group **Live proof waiting** on landing and `/wallet/`; tap loads keys and opens `/created/` to sign.
 - `/created/` keeps the existing proof panel (no duplicate inbox).
 
+### Phase 5 — cross-tab keys (shipped)
+
+- **`device-tab-presence.mjs`** heartbeats which tabs hold signing keys (metadata only).
+- **`device-cross-tab-banner.mjs`** on landing and `/wallet/` when keys live in another tab.
+- Hub glance rows for cross-tab keys and live proof when collapsed.
+
 ### Deferred
 
 - Resolver search API, directory of handles.
