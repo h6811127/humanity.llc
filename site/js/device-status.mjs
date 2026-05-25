@@ -6,9 +6,11 @@ import { buildStatusSegments, tabNoticeCount } from "./device-counts.mjs";
 import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
-import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
+import {
+  crossTabNoticeCount,
+  renderCrossTabKeysBanner,
+} from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
-import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import "./device-shell-motion.mjs";
 import "./device-shell-chrome.mjs";
 import { isHubSheet, setHubSheetOpen } from "./device-hub-sheet.mjs";

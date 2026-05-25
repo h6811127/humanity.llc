@@ -4,7 +4,7 @@
 import { tabNoticeCount } from "./device-counts.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
-import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
+import { getOtherTabsWithKeys, requestFocusTab } from "./device-tab-presence.mjs";
 import {
   getCachedNetworkStatus,
   isRevokedSinceLastVisit,
@@ -84,6 +84,7 @@ export function refreshHubGlance() {
         <span class="device-hub-glance-sub">${escapeHtml(label)}${escapeHtml(extra)}</span>
       </button>`;
     li.querySelector("button")?.addEventListener("click", () => {
+      if (entry.tabId) requestFocusTab(entry.tabId);
       expandHub(null);
     });
     list.appendChild(li);

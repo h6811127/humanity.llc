@@ -266,11 +266,15 @@ function renderNoticeRow() {
 
   if (hubConfig.noticeMode === "keys-strip") {
     noticeGroup.innerHTML = `
-    <a class="device-hub-notice-banner" href="#created-keys-strip" data-hub-searchable="notice save tab keys strip">
+    <button type="button" class="device-hub-notice-banner" data-hub-go-now-tab data-hub-searchable="notice save tab keys strip">
       <span class="device-hub-notice-title">Keys in this tab · Save on this device</span>
-      <span class="device-hub-notice-sub">${escapeHtml(label)}  -  scroll to save below</span>
+      <span class="device-hub-notice-sub">${escapeHtml(label)} — open the Now tab to save</span>
       <span class="device-hub-notice-chevron" aria-hidden="true">›</span>
-    </a>`;
+    </button>`;
+    noticeGroup.querySelector("[data-hub-go-now-tab]")?.addEventListener("click", () => {
+      window.dispatchEvent(new CustomEvent("hc-hub-sheet-close"));
+      window.dispatchEvent(new CustomEvent("hc-created-go-now-tab"));
+    });
     return;
   }
 

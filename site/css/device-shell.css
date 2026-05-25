@@ -215,6 +215,59 @@ body.device-hub-sheet-open .top-chrome--float .top-chrome-bar--minimal,
 
 .device-hub-alerts-top {
   margin-bottom: 10px;
+  padding-right: 44px;
+  padding-top: 2px;
+}
+
+.device-hub-crosstab-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+button.device-hub-notice-banner {
+  width: 100%;
+  border: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
+}
+
+.device-hub-notice-secondary {
+  align-self: flex-start;
+  margin: 0 2px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #007aff;
+  background: rgba(0, 122, 255, 0.12);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.device-cross-tab-focus-btn {
+  margin-left: 6px;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #007aff;
+  background: rgba(0, 122, 255, 0.12);
+  cursor: pointer;
+}
+
+.device-cross-tab-or {
+  margin: 0 4px;
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.device-cross-tab-sub {
+  display: inline;
 }
 
 .device-hub-alerts-top .device-hub-group {

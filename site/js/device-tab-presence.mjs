@@ -5,10 +5,12 @@
 import { getTabSession } from "./device-keys.mjs";
 
 const PRESENCE_KEY = "hc_tab_keys_presence";
+const FOCUS_CHANNEL = "hc-tab-focus";
 const STALE_MS = 15000;
 const HEARTBEAT_MS = 5000;
 
 let heartbeatTimer = null;
+let focusChannel = null;
 
 function getTabId() {
   let id = sessionStorage.getItem("hc_tab_id");
@@ -95,6 +97,7 @@ export function getOtherTabsWithKeys() {
 
 export function startTabKeysPresence() {
   if (heartbeatTimer != null) return;
+  bindFocusChannel();
   syncTabKeysPresence();
   heartbeatTimer = window.setInterval(syncTabKeysPresence, HEARTBEAT_MS);
   window.addEventListener("pagehide", clearTabKeysPresence);
