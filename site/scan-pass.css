@@ -462,40 +462,27 @@ a {
 .scan-limits-layer {
   position: relative;
   z-index: 5;
-  margin-top: -10px;
+  margin-top: 4px;
 }
 
 .scan-trust-stack {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  margin-top: -12px;
+  gap: 22px;
+  margin-top: 10px;
   padding-bottom: 6px;
 }
 
 .scan-trust-stack > .scan-trust-layer {
   position: relative;
-  margin-top: -14px;
-}
-
-.scan-trust-stack > .scan-trust-layer:first-child {
   margin-top: 0;
+  z-index: auto;
 }
 
-.scan-trust-stack > .scan-trust-layer:nth-child(1) {
-  z-index: 4;
-}
-
-.scan-trust-stack > .scan-trust-layer:nth-child(2) {
-  z-index: 3;
-}
-
-.scan-trust-stack > .scan-trust-layer:nth-child(3) {
-  z-index: 2;
-}
-
-.scan-trust-stack > .scan-trust-layer:nth-child(n + 4) {
-  z-index: 1;
+.scan-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 /* M3.3  -  one line above the card */
@@ -663,7 +650,8 @@ a {
 
 .scan-trust-stack .scan-group .group-label,
 .scan-trust-stack .scan-group-vouch .group-label {
-  margin-bottom: 6px;
+  margin: 0 0 0 4px;
+  padding: 0;
 }
 
 .group-label {
@@ -1285,13 +1273,122 @@ body {
   gap: 22px;
 }
 
-.section-kicker,
-.scan-page .group-label {
+.section-kicker {
   text-transform: none;
   letter-spacing: -0.02em;
   font-size: 15px;
   font-weight: 600;
   color: rgba(60, 60, 67, 0.55);
+  margin-bottom: 10px;
+}
+
+.scan-page .group-label {
+  display: block;
+  text-transform: none;
+  letter-spacing: -0.02em;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(60, 60, 67, 0.62);
+  margin: 0 0 8px 4px;
+  padding: 0;
+}
+
+/* Flat status panel (not a flippable ID-style card) */
+.scan-status-panel {
+  border-radius: 18px;
+  padding: 16px 16px 14px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 0.5px solid rgba(60, 60, 67, 0.14);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 10px 28px rgba(0, 0, 0, 0.07);
+}
+
+.scan-status-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.scan-status-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: rgba(60, 60, 67, 0.55);
+  text-transform: none;
+}
+
+.scan-status-body {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.scan-status-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.scan-status-eyebrow {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(60, 60, 67, 0.5);
+}
+
+.scan-status-title {
+  margin: 0 0 6px;
+  font-size: clamp(20px, 5.5vw, 24px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--black);
+  word-break: break-word;
+}
+
+.scan-status-line {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--black);
+}
+
+.scan-status-meta,
+.scan-status-sub {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(60, 60, 67, 0.62);
+}
+
+.scan-status-meta + .scan-status-sub {
+  margin-top: 6px;
+}
+
+.scan-status-qr {
+  flex-shrink: 0;
+}
+
+.scan-status-foot {
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 0.5px solid rgba(60, 60, 67, 0.1);
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(60, 60, 67, 0.55);
+}
+
+.scan-page .pass-trust {
+  display: none;
 }
 
 .pass-tilt-wrap {

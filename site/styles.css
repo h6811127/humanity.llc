@@ -2843,6 +2843,15 @@ a.hub-card-menu-item {
   padding-top: 0;
 }
 
+.screen-landing > .hero.hero-tight {
+  margin-top: 14px;
+  padding-top: 6px;
+}
+
+body.landing-focus-mode .screen-landing > .hero.hero-tight {
+  margin-top: 18px;
+}
+
 .device-hub-title {
   font-size: 22px;
   font-weight: 700;

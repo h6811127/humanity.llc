@@ -159,7 +159,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("current status for this place");
   });
 
-  it("renders landing pass card with flip and shared styles", async () => {
+  it("renders flat status panel with shared styles (no ID-style flip card)", async () => {
     const vm = buildScanViewModel(
       PROFILE,
       QR,
@@ -172,13 +172,16 @@ describe("renderScanPage M3.2 trust blocks", () => {
       "https://humanity.llc"
     );
     const html = await renderScanPage(vm, "https://humanity.llc");
-    expect(html).toContain("pass-scene");
-    expect(html).toContain("pass-flip-btn");
-    expect(html).toContain("pass-tilt-wrap");
-    expect(html).toContain("getElementById(\"pass-scene\")");
+    expect(html).toContain("scan-status-panel");
+    expect(html).not.toMatch(/id="pass-scene"/);
+    expect(html).not.toMatch(/class="pass-scene/);
+    expect(html).not.toContain('id="pass-flip-btn"');
+    expect(html).not.toMatch(/id="pass-tilt-wrap"/);
+    expect(html).not.toContain('getElementById("pass-scene")');
     expect(html).not.toContain('class="block"');
     expect(html).not.toContain("HUMAN TRUST");
-    expect(html).toContain("Live object");
+    expect(html).toContain("Public scan");
+    expect(html).toContain("not an ID");
     expect(html).toContain("@river_example");
     expect(html).toContain("Card active");
     expect(html).toContain("QR active");

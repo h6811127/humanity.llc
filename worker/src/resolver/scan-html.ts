@@ -3,7 +3,6 @@ import { parseManifestoDisplay } from "./manifesto-display";
 import { publicReasonLabel } from "./revocation-display";
 import { scanListIcon, type ScanIconId } from "./scan-icons";
 import { BEARER_WARNING } from "./trust-copy";
-import { SCAN_PASS_FLIP_JS } from "./scan-pass-flip";
 import { SCAN_PASS_CSS } from "./scan-pass-styles";
 import {
   humanTrustDisplay,
@@ -12,7 +11,7 @@ import {
 import { renderScanQrMarkup } from "./scan-qr";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v18";
+export const SCAN_UI_VERSION = "pass-v19";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -55,7 +54,6 @@ export async function renderScanPage(
       ${renderFooter(vm, origin)}
     </main>
   </div>
-  <script>${SCAN_PASS_FLIP_JS}</script>
   ${renderLiveControlScript(vm, origin)}
   ${renderVouchIssuanceScript(vm, origin)}
   ${renderQrFallbackScript(origin, vm.scanUrl)}
@@ -100,46 +98,164 @@ function renderTopHeader(origin: string): string {
 
 function renderPassSection(
   vm: ScanViewModel,
-  origin: string,
+  _origin: string,
   qrMarkup: string
 ): string {
   const badgeClass = `pass-badge badge-${vm.primaryBadge.tone}`;
-  const frontBody = vm.minimalScan
-    ? renderMinimalPassFront(vm, badgeClass)
-    : renderPassFront(vm, badgeClass, qrMarkup);
-  const backBody = renderPassBack(origin);
-  const noFlip =
-    vm.minimalScan || vm.kind === "qr_revoked" || vm.kind === "card_revoked";
-  const flipBtn = noFlip
-    ? ""
-    : `<button type="button" class="pass-flip-btn" id="pass-flip-btn" aria-label="Flip card">
-      Tap to flip
-    </button>`;
-  const bearer = noFlip ? "" : renderBearerLine();
-  const backFace = noFlip
-    ? ""
-    : `<div class="pass-face pass-back" aria-hidden="true">
-            ${backBody}
-          </div>`;
+  const body = buildScanStatusPanelBody(vm, badgeClass, qrMarkup);
+  return `<div class="scan-pass-layer">
+${renderBearerLine()}
+<article class="scan-status-panel" aria-label="Public scan result at this moment">
+${body}
+</article>
+</div>`;
+}
 
-  return `<div class="scan-pass-layer">${bearer}
-<section class="pass" aria-label="Humanity Card at scan time">
-  <div class="pass-scene" id="pass-scene">
-    <div class="pass-tilt-wrap" id="pass-tilt-wrap">
-      <div class="pass-flip" id="pass-flip">
-        <div class="pass-inner">
-          <div class="pass-face pass-front">
-            <div class="pass-tilt-surface" id="pass-tilt-surface">
-              ${frontBody}
-            </div>
-          </div>
-          ${backFace}
-        </div>
-      </div>
-    </div>
-    ${flipBtn}
+function scanStatusHead(vm: ScanViewModel, badgeClass: string): string {
+  return `<header class="scan-status-head">
+  <div class="scan-status-brand"><span class="pass-dot" aria-hidden="true"></span><span>humanity.llc</span></div>
+  <span class="${badgeClass}">${escapeHtml(vm.primaryBadge.label)}</span>
+</header>`;
+}
+
+function scanStatusQrBlock(vm: ScanViewModel, qrMarkup: string): string {
+  if (!vm.scanUrl) return "";
+  const qrSlotAttr = ` id="pass-qr-slot" data-scan-url="${escapeHtml(vm.scanUrl)}"`;
+  return `<div class="scan-status-qr pass-qr"${qrSlotAttr}>${qrMarkup}</div>`;
+}
+
+function scanStatusFoot(text: string): string {
+  return `<p class="scan-status-foot">${escapeHtml(text)}</p>`;
+}
+
+function scanStatusMetaLine(vm: ScanViewModel): string {
+  const parts: string[] = [];
+  if (vm.handle) parts.push(`@${vm.handle}`);
+  if (vm.profileId) parts.push(`${vm.profileId.slice(0, 14)}…`);
+  return parts.join(" · ");
+}
+
+function buildScanStatusPanelBody(
+  vm: ScanViewModel,
+  badgeClass: string,
+  qrMarkup: string
+): string {
+  const head = scanStatusHead(vm, badgeClass);
+
+  if (vm.minimalScan) {
+    const headline = minimalScanHeadline(vm.kind);
+    return `${head}
+<div class="scan-status-body">
+  <div class="scan-status-main">
+    <p class="scan-status-eyebrow">Scan result</p>
+    <h1 class="scan-status-title">${escapeHtml(headline)}</h1>
+    <p class="scan-status-sub">${escapeHtml(scanLead(vm))}</p>
   </div>
-</section></div>`;
+</div>
+${scanStatusFoot("This is network state for a QR, not proof of who is holding it.")}`;
+  }
+
+  if (
+    !vm.minimalScan &&
+    (vm.kind === "qr_revoked" || vm.kind === "card_revoked")
+  ) {
+    const headline = minimalScanHeadline(vm.kind);
+    const title = vm.handle
+      ? `@${escapeHtml(vm.handle)}`
+      : escapeHtml(headline);
+    const statusLine = vm.handle
+      ? `<p class="scan-status-line">${escapeHtml(headline)}</p>`
+      : "";
+    const manifesto =
+      vm.manifestoLine && vm.handle
+        ? `<p class="scan-status-sub">${escapeHtml(vm.manifestoLine)}</p>`
+        : "";
+    const meta = scanStatusMetaLine(vm);
+    return `${head}
+<div class="scan-status-body">
+  <div class="scan-status-main">
+    <p class="scan-status-eyebrow">Scan result</p>
+    <h1 class="scan-status-title">${title}</h1>
+    ${statusLine}
+    ${manifesto}
+    ${meta ? `<p class="scan-status-meta">${escapeHtml(meta)}</p>` : ""}
+    <p class="scan-status-sub">${escapeHtml(scanLead(vm))}</p>
+  </div>
+  ${scanStatusQrBlock(vm, qrMarkup)}
+</div>
+${scanStatusFoot("Holding a printed object does not prove ownership.")}`;
+  }
+
+  const isError =
+    vm.kind !== "active" &&
+    !vm.kind.startsWith("qr_") &&
+    !vm.kind.startsWith("card_");
+
+  if (isError) {
+    return `${head}
+<div class="scan-status-body">
+  <div class="scan-status-main">
+    <p class="scan-status-eyebrow">Scan result</p>
+    <h1 class="scan-status-title">${escapeHtml(vm.primaryBadge.label)}</h1>
+    <p class="scan-status-sub">${escapeHtml(scanLead(vm))}</p>
+  </div>
+</div>
+${scanStatusFoot("This page shows resolver state only.")}`;
+  }
+
+  const display = parseManifestoDisplay(vm.manifestoLine);
+  const meta = scanStatusMetaLine(vm);
+  const qrBlock = scanStatusQrBlock(vm, qrMarkup);
+
+  if (display.kind === "status_plate") {
+    return `${head}
+<div class="scan-status-body">
+  <div class="scan-status-main">
+    <p class="scan-status-eyebrow">Status plate</p>
+    <h1 class="scan-status-title">${escapeHtml(display.objectLabel)}</h1>
+    <p class="scan-status-line">${escapeHtml(display.statusLine)}</p>
+    ${meta ? `<p class="scan-status-meta">${escapeHtml(meta)}</p>` : ""}
+  </div>
+  ${qrBlock}
+</div>
+${scanStatusFoot("Scan shows current status for this place, not who owns the door.")}`;
+  }
+
+  if (display.kind === "lost_item_relay") {
+    return `${head}
+<div class="scan-status-body">
+  <div class="scan-status-main">
+    <p class="scan-status-eyebrow">Lost item relay</p>
+    <h1 class="scan-status-title">${escapeHtml(display.objectLabel)}</h1>
+    <p class="scan-status-line">${escapeHtml(display.statusLine)}</p>
+    ${meta ? `<p class="scan-status-meta">${escapeHtml(meta)}</p>` : ""}
+  </div>
+  ${qrBlock}
+</div>
+${scanStatusFoot("This scan does not prove who holds the item.")}`;
+  }
+
+  const title = vm.manifestoLine
+    ? escapeHtml(vm.manifestoLine)
+    : vm.handle
+      ? `@${escapeHtml(vm.handle)}`
+      : "Signed public card";
+  const sub = vm.manifestoLine && vm.handle
+    ? `<p class="scan-status-meta">${escapeHtml(meta)}</p>`
+    : meta
+      ? `<p class="scan-status-meta">${escapeHtml(meta)}</p>`
+      : "";
+
+  return `${head}
+<div class="scan-status-body">
+  <div class="scan-status-main">
+    <p class="scan-status-eyebrow">Public scan · not an ID</p>
+    <h1 class="scan-status-title">${title}</h1>
+    ${sub}
+  </div>
+  ${qrBlock}
+</div>
+${scanStatusFoot("Scan shows live state. Holding the object does not prove ownership.")}`;
 }
 
 function minimalScanHeadline(kind: ScanViewModel["kind"]): string {
