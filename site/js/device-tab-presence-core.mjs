@@ -2,6 +2,8 @@
 
 export const PRESENCE_STALE_MS = 10000;
 export const PRESENCE_HEARTBEAT_MS = 4000;
+/** UI only — must have heartbeated recently (avoids ghost rows before prune). */
+export const PRESENCE_SHOW_MS = PRESENCE_HEARTBEAT_MS + 2000;
 export const MAX_PRESENCE_ENTRIES = 20;
 /** Matches worker PROFILE_ID (base58, 20–32 chars). */
 export const PRESENCE_PROFILE_ID_PATTERN = /^[1-9A-HJ-NP-Za-km-z]{20,32}$/;
@@ -77,13 +79,20 @@ export function pruneStalePresence(map, now, staleMs = PRESENCE_STALE_MS) {
  *   map: Record<string, PresenceEntry>,
  *   tabId: string,
  *   thisProfile: string | null,
+ *   savedProfileIds?: Set<string> | string[],
  *   now?: number,
  *   staleMs?: number,
+ *   showMs?: number,
  * }} input
  */
 export function listOtherTabsWithKeys(input) {
   const now = input.now ?? Date.now();
   const staleMs = input.staleMs ?? PRESENCE_STALE_MS;
+  const showMs = input.showMs ?? PRESENCE_SHOW_MS;
+  const saved =
+    input.savedProfileIds instanceof Set
+      ? input.savedProfileIds
+      : new Set(input.savedProfileIds ?? []);
   const map = { ...input.map };
   pruneStalePresence(map, now, staleMs);
 
@@ -92,7 +101,9 @@ export function listOtherTabsWithKeys(input) {
     if (id === input.tabId) continue;
     const normalized = normalizePresenceEntry(entry, now);
     if (!normalized) continue;
+    if (now - normalized.updatedAt > showMs) continue;
     if (input.thisProfile && normalized.profile_id === input.thisProfile) continue;
+    if (saved.has(normalized.profile_id)) continue;
     others.push({ tabId: id, ...normalized });
   }
   others.sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0));

@@ -5,6 +5,7 @@
 import { tabNoticeCount } from "./device-counts.mjs";
 import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs";
 import { getTabSession } from "./device-keys.mjs";
+import { loadWallet } from "./device-wallet.mjs";
 import {
   capPresenceMap,
   listOtherTabsWithKeys,
@@ -38,15 +39,18 @@ function readPresence() {
   }
 }
 
-function writePresence(map) {
-  localStorage.setItem(PRESENCE_KEY, JSON.stringify(map));
+function writePresenceIfChanged(map) {
+  const next = JSON.stringify(map);
+  if (localStorage.getItem(PRESENCE_KEY) === next) return false;
+  localStorage.setItem(PRESENCE_KEY, next);
+  return true;
 }
 
 function readPrunedPresence() {
   const raw = readPresence();
   const normalized = normalizePresenceMap(raw);
   if (JSON.stringify(normalized) !== JSON.stringify(raw)) {
-    writePresence(normalized);
+    writePresenceIfChanged(normalized);
   }
   return normalized;
 }
@@ -75,16 +79,24 @@ export function syncTabKeysPresence() {
   }
 
   map = capPresenceMap(map);
-  writePresence(map);
-  window.dispatchEvent(new Event("hc-tab-presence-changed"));
+  const changed = writePresenceIfChanged(map);
+  if (changed) {
+    window.dispatchEvent(new Event("hc-tab-presence-changed"));
+  }
 }
 
 export function clearTabKeysPresence() {
   const tabId = getTabId();
   const map = readPrunedPresence();
+  if (!(tabId in map)) return;
   delete map[tabId];
-  writePresence(map);
-  window.dispatchEvent(new Event("hc-tab-presence-changed"));
+  if (writePresenceIfChanged(map)) {
+    window.dispatchEvent(new Event("hc-tab-presence-changed"));
+  }
+}
+
+function savedProfileIdsOnDevice() {
+  return new Set(loadWallet().map((e) => e.profile_id).filter(Boolean));
 }
 
 /**
@@ -102,7 +114,12 @@ export function getOtherTabsWithKeys() {
   const map = readPrunedPresence();
   const session = getTabSession();
   const thisProfile = session?.profile_id ?? null;
-  return listOtherTabsWithKeys({ map, tabId, thisProfile }).others;
+  return listOtherTabsWithKeys({
+    map,
+    tabId,
+    thisProfile,
+    savedProfileIds: savedProfileIdsOnDevice(),
+  }).others;
 }
 
 export function crossTabNoticeCount() {

@@ -11,6 +11,7 @@ import {
   capPresenceMap,
   isValidPresenceProfileId,
   pruneStalePresence,
+  PRESENCE_SHOW_MS,
   PRESENCE_STALE_MS,
 } from "../../site/js/device-tab-presence-core.mjs";
 
@@ -71,6 +72,39 @@ describe("listOtherTabsWithKeys", () => {
       now,
     });
     expect(others.map((o) => o.tabId)).toEqual(["b", "a"]);
+  });
+
+  it("hides other tabs when that profile is already saved on this device", () => {
+    const otherProfile = "7Xk9mP2nQ4rT6vW8yZ1aB3cD6";
+    const map = {
+      self: { profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5", updatedAt: now },
+      other: { profile_id: otherProfile, updatedAt: now },
+    };
+    const { others } = listOtherTabsWithKeys({
+      map,
+      tabId: "self",
+      thisProfile: null,
+      savedProfileIds: [otherProfile],
+      now,
+    });
+    expect(others).toHaveLength(0);
+  });
+
+  it("hides stale-but-not-pruned rows from UI", () => {
+    const map = {
+      self: { profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5", updatedAt: now },
+      ghost: {
+        profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD6",
+        updatedAt: now - PRESENCE_SHOW_MS - 1,
+      },
+    };
+    const { others } = listOtherTabsWithKeys({
+      map,
+      tabId: "self",
+      thisProfile: null,
+      now,
+    });
+    expect(others).toHaveLength(0);
   });
 });
 

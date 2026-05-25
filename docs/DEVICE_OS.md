@@ -182,7 +182,7 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 **Presence:** `localStorage` `hc_tab_keys_presence`  -  each tab heartbeats every 4s while visible with `profile_id` / handle / label only (never private keys). Stale entries drop after 10s; pruned on read. Cleared when tab is hidden (`visibilitychange`) or `pagehide`; `pageshow` (bfcache) re-syncs.
 
-**Banner:** `#device-cross-tab-banner` on landing and `/wallet/` when another tab holds keys **and** this tab does not show the unsaved-keys notice row (`tabNoticeCount === 0`). Tap focuses the other tab; navigates to `/created/` only when saved keys can be loaded into this tab (`Use keys here` / wallet path).
+**Banner:** `#device-cross-tab-banner` on landing and `/wallet/` when another tab holds keys **this device has not saved yet**, and this tab does not show the unsaved-keys notice row (`tabNoticeCount === 0`). Saved cards use **Use keys** from the hub/wallet instead. Presence rows must heartbeat within ~6s (ghost entries drop from UI sooner than the 10s storage prune).
 
 **Glance:** Collapsed hub shows **Keys in another tab** and **N live proof waiting** rows.
 
