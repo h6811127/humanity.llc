@@ -534,11 +534,29 @@ body.page-flow .page > main.screen {
   align-items: flex-start;
   gap: 10px;
   padding: 10px 12px 6px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+}
+
+.hub-card-head-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
+  max-width: 58%;
+}
+
+.hub-card-head .hub-card-menu {
+  margin-left: 0;
+}
+
+.hub-card-head .hub-card-menu-panel {
+  top: calc(100% + 4px);
+  bottom: auto;
 }
 
 .hub-card-network {
-  margin-left: auto;
+  margin-left: 0;
   flex-shrink: 0;
   font-size: 11px;
   font-weight: 600;
@@ -609,7 +627,6 @@ body.page-flow .page > main.screen {
 .hub-card-actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
   padding: 0 8px 8px 12px;
 }
@@ -3127,9 +3144,9 @@ body.landing-focus-mode .screen-landing {
 .device-hub-section-empty {
   font-size: 13px;
   line-height: 1.4;
-  color: rgba(60, 60, 67, 0.52);
+  color: rgba(60, 60, 67, 0.58);
   margin: 0;
-  padding: 4px 4px 10px 14px;
+  padding: 8px 4px 10px 14px;
 }
 
 .device-hub-empty {

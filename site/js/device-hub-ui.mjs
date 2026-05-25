@@ -7,7 +7,6 @@ import {
   lastActivityForEntry,
   loadActivity,
   HUB_RECENT_DISPLAY_LIMIT,
-  activityActionHint,
   logDeviceActivity,
 } from "./device-activity.mjs";
 import { applyDeviceHubSearch } from "./device-hub-search.mjs";
@@ -322,10 +321,9 @@ function renderActivityRows() {
   setHubSectionEmpty(activityGroup, activityList, activityEmptyEl, false, "");
   for (const entry of entries) {
     const li = document.createElement("li");
-    const hint = activityActionHint(entry);
     const when = formatActivityTime(entry.at);
-    const sub = hint ? `${when} · ${hint}` : when;
-    li.className = "list-row list-action device-activity-row";
+    const sub = when;
+    li.className = "list-row list-action device-activity-row device-activity-row--compact";
     li.dataset.hubSearchable = activityHaystack(entry);
     li.innerHTML = `
       <button type="button" class="device-activity-open">
@@ -382,6 +380,16 @@ function renderSavedRows() {
         </p>`
       : "";
 
+    const menuBlock = `
+        <details class="hub-card-menu">
+          <summary class="hub-card-menu-btn" aria-label="More">⋯</summary>
+          <div class="hub-card-menu-panel">
+            <a class="hub-card-menu-item hub-manage" href="${escapeHtml(manage)}">Manage</a>
+            <button type="button" class="hub-card-menu-item hub-relabel" data-id="${escapeHtml(entry.id)}">Relabel</button>
+            <button type="button" class="hub-card-menu-item hub-remove" data-id="${escapeHtml(entry.id)}">Remove from device</button>
+          </div>
+        </details>`;
+
     li.innerHTML = `
       <div class="hub-card-head">
         <span class="list-icon list-icon-tone-trust" aria-hidden="true">
@@ -391,7 +399,10 @@ function renderSavedRows() {
           <span class="list-title">${escapeHtml(entry.label)}</span>
           <span class="list-sub">${escapeHtml(subLine)}</span>
         </span>
-        ${netChip}
+        <div class="hub-card-head-meta">
+          ${netChip}
+          ${menuBlock}
+        </div>
       </div>
       ${revokedAlert}
       <div class="hub-card-actions">
@@ -399,14 +410,6 @@ function renderSavedRows() {
           <button type="button" class="hub-card-action hub-use-keys" data-id="${escapeHtml(entry.id)}">Use keys</button>
           <a class="hub-card-action hub-open-scan" href="${escapeHtml(scan)}" target="_blank" rel="noopener noreferrer">Open scan</a>
         </div>
-        <details class="hub-card-menu">
-          <summary class="hub-card-menu-btn" aria-label="More">⋯</summary>
-          <div class="hub-card-menu-panel">
-            <a class="hub-card-menu-item hub-manage" href="${escapeHtml(manage)}">Manage</a>
-            <button type="button" class="hub-card-menu-item hub-relabel" data-id="${escapeHtml(entry.id)}">Relabel</button>
-            <button type="button" class="hub-card-menu-item hub-remove" data-id="${escapeHtml(entry.id)}">Remove from device</button>
-          </div>
-        </details>
       </div>`;
     savedList.appendChild(li);
   }
