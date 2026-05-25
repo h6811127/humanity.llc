@@ -6,13 +6,12 @@
     <title>Saved on this device · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="/styles.css?v=77" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=2" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=3" />
   </head>
   <body class="has-device-hub-search device-shell-wallet">
     <div class="page">
-      <div class="top-chrome">
-      <header class="top">
-        <div class="top-brand-row">
+      <div class="top-chrome" id="top-chrome">
+        <div class="top-chrome-bar" id="top-status">
           <button
             type="button"
             class="brand-status-dot-btn"
@@ -23,17 +22,11 @@
           >
             <span class="pass-dot" id="brand-status-dot"></span>
           </button>
-        </div>
-        <a class="top-create" href="/create/">Create</a>
-      </header>
-
-      <div class="top-status" id="top-status">
-        <div class="top-status-row">
           <button
             type="button"
             class="device-status-summary"
             id="device-status-summary"
-            aria-expanded="true"
+            aria-expanded="false"
             aria-controls="device-hub"
             aria-label="On this device"
           >
@@ -53,6 +46,7 @@
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           </button>
+          <a class="top-create" href="/create/">Create</a>
         </div>
         <div
           class="brand-status-popover"
@@ -63,7 +57,6 @@
         >
           <div class="brand-status-sheet" id="brand-status-sheet"></div>
         </div>
-      </div>
       </div>
 
       <p
@@ -81,11 +74,15 @@
       ></p>
 
       <section
-        class="device-hub device-hub-top"
+        class="device-hub device-hub-top device-hub--sheet device-hub-collapsed"
         id="device-hub"
         aria-labelledby="device-hub-title"
+        aria-hidden="true"
+        inert
       >
         <div class="device-hub-body" id="device-hub-body">
+          <button type="button" class="device-hub-sheet-close" aria-label="Close">×</button>
+          <div class="device-hub-sheet-handle" aria-hidden="true"></div>
           <h2 class="device-hub-title" id="device-hub-title">Saved on this device</h2>
           <p class="device-hub-lead wallet-hub-lead">
             Signing keys live in <strong>this browser</strong> — never uploaded to the network.
@@ -301,7 +298,7 @@
       <main class="screen screen-wallet screen-wallet-sleek" hidden aria-hidden="true"></main>
     </div>
 
-    <script src="/js/device-status.mjs?v=7" type="module"></script>
+    <script src="/js/device-status.mjs?v=8" type="module"></script>
     <script src="/js/wallet-hub.mjs?v=3" type="module"></script>
   </body>
 </html>

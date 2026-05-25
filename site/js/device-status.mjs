@@ -8,6 +8,8 @@ import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
 import "./device-shell-motion.mjs";
+import "./device-shell-chrome.mjs";
+import { isHubSheet, setHubSheetOpen } from "./device-hub-sheet.mjs";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 
 const HUB_OPEN_KEY = "hc_hub_open";
@@ -62,7 +64,11 @@ function deviceState() {
 
 export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
   if (!hub) return;
-  hub.classList.toggle("device-hub-collapsed", !open);
+  if (isHubSheet()) {
+    setHubSheetOpen(open);
+  } else {
+    hub.classList.toggle("device-hub-collapsed", !open);
+  }
   if (summaryBtn) summaryBtn.setAttribute("aria-expanded", open ? "true" : "false");
   if (persist) {
     sessionStorage.setItem(HUB_OPEN_KEY, open ? "1" : "0");
@@ -309,6 +315,10 @@ document.addEventListener("keydown", (e) => {
       setHubExpanded(false, { haptic: false });
     }
   }
+});
+
+window.addEventListener("hc-hub-sheet-close", () => {
+  setHubExpanded(false, { haptic: false, persist: true });
 });
 
 startTabKeysPresence();

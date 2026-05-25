@@ -29,6 +29,8 @@ Principles:
 |------|------|
 | `site/css/device-shell.css` | Materials, typography, `top-chrome`, hub/created/shop overrides |
 | `site/js/device-shell-motion.mjs` | Hub open state, list press feedback |
+| `site/js/device-shell-chrome.mjs` | Fixed chrome inset + scroll-edge compact |
+| `site/js/device-hub-sheet.mjs` | Hub bottom sheet + backdrop |
 | `site/js/device-counts.mjs` | System status segment copy |
 | `site/scan-pass.css` | Scan page (run `npm run worker:bundle-scan` after edits) |
 
@@ -36,13 +38,13 @@ Principles:
 
 ## Roadmap (OSification)
 
-### Phase A — Kill the “website header” (highest impact)
+### Phase A — Kill the “website header” (shipped v1)
 
-1. **Scroll-edge chrome** — chrome stays `position: fixed`; content scrolls underneath with top padding; on scroll down, status row collapses (brand + Create only); scroll up restores. Removes the “floating slab” mental model.
-2. **Hub as sheet** — “On this device” opens a bottom sheet or full-screen overlay instead of expanding inline below the header. Header stays environmental; hub becomes a place.
-3. **Landing de-explain** — shorten hero/manifesto blocks; let status segments + card objects carry meaning.
+1. **Scroll-edge chrome** — fixed `top-chrome`, content inset via `--shell-chrome-h`, single-row bar; status collapses on scroll down (`device-shell-chrome.mjs`).
+2. **Hub as sheet** — `/`, `/wallet/`, `/created/` use `device-hub--sheet` + backdrop (`device-hub-sheet.mjs`).
+3. **Landing de-explain** — shorter hero + compact framing on `/` (more trimming possible).
 
-### Phase B — Object continuity
+### Phase B — Object continuity (next)
 
 4. **Card open transition** — tap saved card → `/created/` with expand-from-row (FLIP or View Transitions API).
 5. **Trust state morph** — dot / shield / revoke states animate between segments, not swap instantly.

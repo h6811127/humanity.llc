@@ -15,7 +15,7 @@
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="/styles.css?v=77" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=2" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=3" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -27,9 +27,8 @@
   </head>
   <body class="has-device-hub-search">
     <div class="page">
-      <div class="top-chrome">
-      <header class="top">
-        <div class="top-brand-row">
+      <div class="top-chrome" id="top-chrome">
+        <div class="top-chrome-bar" id="top-status">
           <button
             type="button"
             class="brand-status-dot-btn"
@@ -40,12 +39,6 @@
           >
             <span class="pass-dot" id="brand-status-dot"></span>
           </button>
-        </div>
-        <a class="top-create" href="/create/">Create</a>
-      </header>
-
-      <div class="top-status" id="top-status">
-        <div class="top-status-row">
           <button
             type="button"
             class="device-status-summary"
@@ -70,6 +63,7 @@
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           </button>
+          <a class="top-create" href="/create/">Create</a>
         </div>
         <div
           class="brand-status-popover"
@@ -80,7 +74,6 @@
         >
           <div class="brand-status-sheet" id="brand-status-sheet"></div>
         </div>
-      </div>
       </div>
 
       <p
@@ -98,11 +91,15 @@
       ></p>
 
       <section
-        class="device-hub device-hub-top device-hub-collapsed"
+        class="device-hub device-hub-top device-hub--sheet device-hub-collapsed"
         id="device-hub"
         aria-labelledby="device-hub-title"
+        aria-hidden="true"
+        inert
       >
         <div class="device-hub-body" id="device-hub-body">
+          <button type="button" class="device-hub-sheet-close" aria-label="Close">×</button>
+          <div class="device-hub-sheet-handle" aria-hidden="true"></div>
           <h2 class="device-hub-title" id="device-hub-title">On this device</h2>
           <p class="device-hub-lead">
             Personal to <strong>this browser</strong> — not your profile on the network.
@@ -309,20 +306,10 @@
 
       <main class="screen screen-landing">
         <section class="hero hero-tight" data-landing-tutorial>
-          <p class="hero-eyebrow">Try it</p>
           <h1>Live state<br />on real objects.</h1>
-          <p class="hero-tagline">Print a QR once. Change its live state later.</p>
-          <p class="landing-story-hook">
-            Create in your browser, save keys on this device, print once — anyone who scans sees
-            <strong>live</strong> state you can revoke later. No account.
-          </p>
-          <p class="hero-line">
-            Not a bio link. A sticker, wristband, or card that resolves to
-            <strong>current</strong> state: active, expired, revoked, or disabled.
-          </p>
-          <p class="hero-line hero-line-sub">
-            Normal QR codes are permanent. Humanity live objects can be updated, revoked, or
-            limited after they&rsquo;re printed — no invite, no app, keys stay in your browser.
+          <p class="hero-tagline">
+            Print once. Scanners see <strong>current</strong> state — active, revoked, or limited.
+            Keys stay in this browser.
           </p>
           <div class="landing-hero-actions" aria-label="Get started">
             <a class="landing-hero-btn landing-hero-btn-primary" href="/create/"
@@ -367,25 +354,13 @@
           </ol>
         </nav>
 
-        <section class="landing-framing" aria-labelledby="framing-title" data-landing-tutorial>
-          <p class="section-kicker">The idea</p>
+        <section class="landing-framing landing-framing--compact" aria-labelledby="framing-title" data-landing-tutorial>
           <h2 class="landing-framing-title" id="framing-title">Physical software objects</h2>
           <p class="landing-framing-lead">
-            Stickers, clothing, signs, and cards are not just printed media. Each QR is a
-            <strong>deployed software endpoint</strong> in the world — status, permissions, and
-            revocation can change after the ink dries.
+            Each QR is a live endpoint — status and revocation can change after print.
+            <a href="/what-can-a-qr-do/physical-software-objects/">Read more</a>
           </p>
-          <ul class="landing-framing-list">
-            <li>Printing is deployment, not a dead link</li>
-            <li>Scan interacts with live state, not a frozen file</li>
-            <li>One primitive powers benches, wearables, markets, and flyers</li>
-          </ul>
           <div class="landing-framing-actions">
-            <a
-              class="btn-secondary landing-framing-cta"
-              href="/what-can-a-qr-do/physical-software-objects/"
-              >Read the full framing</a
-            >
             <a class="landing-framing-tab" href="/what-can-a-qr-do.html">
               <span class="list-icon list-icon-tone-gold" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
@@ -765,7 +740,7 @@
       </main>
     </div>
     <script src="/js/landing-focus.mjs?v=2" type="module"></script>
-    <script src="/js/device-status.mjs?v=7" type="module"></script>
+    <script src="/js/device-status.mjs?v=8" type="module"></script>
     <script src="/js/landing-progress.mjs?v=2" type="module"></script>
     <script src="/js/landing-device-hub.mjs?v=12" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=2" type="module"></script>
