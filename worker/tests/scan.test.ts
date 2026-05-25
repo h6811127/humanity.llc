@@ -100,6 +100,7 @@ describe("buildScanViewModel", () => {
         card: card(),
         qr: qr(),
         verification: summary(),
+        revocationDisplay: null,
       },
       "https://humanity.llc"
     );
@@ -123,6 +124,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
         }),
         qr: qr(),
         verification: summary(),
+        revocationDisplay: null,
       },
       "https://humanity.llc"
     );
@@ -144,6 +146,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
         }),
         qr: qr(),
         verification: summary(),
+        revocationDisplay: null,
       },
       "https://humanity.llc"
     );
@@ -164,6 +167,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
         card: card(),
         qr: qr(),
         verification: summary(),
+        revocationDisplay: null,
       },
       "https://humanity.llc"
     );
@@ -202,6 +206,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
         card: card(),
         qr: qr(),
         verification: summary(),
+        revocationDisplay: null,
       },
       "https://humanity.llc"
     );
@@ -267,6 +272,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
         card: card(),
         qr: qr({ scope: "print_artifact", print_artifact_id: "art_001" }),
         verification: summary(),
+        revocationDisplay: null,
       },
       "https://humanity.llc"
     );
@@ -290,6 +296,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
           vouch_count: 3,
           latest_accepted_vouch_at: "2026-05-21T12:00:00.000Z",
         },
+        revocationDisplay: null,
       },
       "https://humanity.llc"
     );
@@ -311,6 +318,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
           vouch_count: 2,
           latest_accepted_vouch_at: "2026-05-20T12:00:00.000Z",
         },
+        revocationDisplay: null,
       },
       "https://humanity.llc"
     );
@@ -333,6 +341,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
           vouch_count: 4,
           latest_accepted_vouch_at: "2026-05-20T12:00:00.000Z",
         },
+        revocationDisplay: null,
       },
       "https://humanity.llc"
     );
@@ -349,6 +358,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
         card: card({ status: "revoked" }),
         qr: qr(),
         verification: summary(),
+        revocationDisplay: null,
       },
       "https://humanity.llc"
     );
@@ -371,6 +381,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
         card: card(),
         qr: qr({ qr_id: expiredQr, expires_at: past }),
         verification: summary(),
+        revocationDisplay: null,
       },
       "https://humanity.llc"
     );
@@ -391,6 +402,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
         card: card(),
         qr: qr({ qr_id: revokedQr, status: "revoked" }),
         verification: summary(),
+        revocationDisplay: null,
       },
       "https://humanity.llc"
     );
@@ -403,6 +415,26 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(htmlRevoked).not.toContain("Human trust");
     expect(htmlRevoked).not.toContain('id="pass-flip-btn"');
 
+    const vmTombstone = buildScanViewModel(
+      PROFILE,
+      revokedQr,
+      {
+        card: card(),
+        qr: qr({ qr_id: revokedQr, status: "revoked" }),
+        verification: summary(),
+        revocationDisplay: {
+          display_mode: "tombstone",
+          public_reason: "event_ended",
+        },
+      },
+      "https://humanity.llc"
+    );
+    expect(vmTombstone.minimalScan).toBe(false);
+    const htmlTombstone = await renderScanPage(vmTombstone, "https://humanity.llc");
+    expect(htmlTombstone).toContain("@river_example");
+    expect(htmlTombstone).toContain("Event ended");
+    expect(htmlTombstone).not.toContain('id="pass-flip-btn"');
+
     const vmSibling = buildScanViewModel(
       PROFILE,
       QR,
@@ -410,6 +442,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
         card: card(),
         qr: qr({ status: "active" }),
         verification: summary(),
+        revocationDisplay: null,
       },
       "https://humanity.llc"
     );

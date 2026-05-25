@@ -1,5 +1,6 @@
 import type { ScanViewModel } from "./scan-state";
 import { parseManifestoDisplay } from "./manifesto-display";
+import { publicReasonLabel } from "./revocation-display";
 import { scanListIcon, type ScanIconId } from "./scan-icons";
 import { BEARER_WARNING } from "./trust-copy";
 import { SCAN_PASS_FLIP_JS } from "./scan-pass-flip";
@@ -11,7 +12,7 @@ import {
 import { renderScanQrMarkup } from "./scan-qr";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v17";
+export const SCAN_UI_VERSION = "pass-v18";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -107,13 +108,15 @@ function renderPassSection(
     ? renderMinimalPassFront(vm, badgeClass)
     : renderPassFront(vm, badgeClass, qrMarkup);
   const backBody = renderPassBack(origin);
-  const flipBtn = vm.minimalScan
+  const noFlip =
+    vm.minimalScan || vm.kind === "qr_revoked" || vm.kind === "card_revoked";
+  const flipBtn = noFlip
     ? ""
     : `<button type="button" class="pass-flip-btn" id="pass-flip-btn" aria-label="Flip card">
       Tap to flip
     </button>`;
-  const bearer = vm.minimalScan ? "" : renderBearerLine();
-  const backFace = vm.minimalScan
+  const bearer = noFlip ? "" : renderBearerLine();
+  const backFace = noFlip
     ? ""
     : `<div class="pass-face pass-back" aria-hidden="true">
             ${backBody}
@@ -177,11 +180,51 @@ function renderScanUrlControl(vm: ScanViewModel): string {
 </details>`;
 }
 
+function renderRevokedTombstoneFront(
+  vm: ScanViewModel,
+  badgeClass: string
+): string {
+  const headline = minimalScanHeadline(vm.kind);
+  const handleLine = vm.handle
+    ? `<h1 class="pass-name">@${escapeHtml(vm.handle)}</h1>`
+    : `<h1 class="pass-name">${escapeHtml(headline)}</h1>`;
+  const statusLine = vm.handle
+    ? `<p class="pass-manifesto pass-manifesto-status">${escapeHtml(headline)}</p>`
+    : "";
+  const manifesto =
+    vm.manifestoLine && vm.handle
+      ? `<p class="pass-manifesto">${escapeHtml(vm.manifestoLine)}</p>`
+      : "";
+  return `<div class="pass-head">
+  <div class="pass-brand">
+    <span class="pass-dot" aria-hidden="true"></span>
+    <span>humanity.llc</span>
+  </div>
+  <span class="${badgeClass}">${escapeHtml(vm.primaryBadge.label)}</span>
+</div>
+<div class="pass-body">
+  <div class="pass-main">
+    <p class="pass-type">Scan result</p>
+    ${handleLine}
+    ${statusLine}
+    ${manifesto}
+    <p class="pass-manifesto">${escapeHtml(scanLead(vm))}</p>
+  </div>
+</div>`;
+}
+
 function renderPassFront(
   vm: ScanViewModel,
   badgeClass: string,
   qrMarkup: string
 ): string {
+  if (
+    !vm.minimalScan &&
+    (vm.kind === "qr_revoked" || vm.kind === "card_revoked")
+  ) {
+    return renderRevokedTombstoneFront(vm, badgeClass);
+  }
+
   const isError =
     vm.kind !== "active" &&
     !vm.kind.startsWith("qr_") &&
@@ -1071,14 +1114,22 @@ function scanLead(vm: ScanViewModel): string {
       return "This QR does not belong to the profile in the URL.";
     case "malformed":
       return "This scan link is missing a valid profile or QR id.";
-    case "card_revoked":
-      return "Object state: card disabled. Printed QRs still exist; card details are hidden.";
+    case "card_revoked": {
+      const base =
+        "Object state: card disabled. Printed QRs still exist; card details are hidden.";
+      const reason = publicReasonLabel(vm.publicReason);
+      return reason ? `${base} ${reason}.` : base;
+    }
     case "card_suspended":
       return "This card is suspended under published rules.";
     case "card_expired":
       return "This card has expired.";
-    case "qr_revoked":
-      return "Object state: this pointer is off. The sticker is unchanged; only live rules changed.";
+    case "qr_revoked": {
+      const base =
+        "Object state: this pointer is off. The sticker is unchanged; only live rules changed.";
+      const reason = publicReasonLabel(vm.publicReason);
+      return reason ? `${base} ${reason}.` : base;
+    }
     case "qr_expired":
       return "Object state: validity ended. The card may still be active for other QRs.";
     case "qr_replaced":

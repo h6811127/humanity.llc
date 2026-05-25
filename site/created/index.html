@@ -6,7 +6,7 @@
     <title>Your live object · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="/styles.css?v=80" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=14" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=15" />
   </head>
   <body class="has-device-hub-search device-shell-created">
     <div class="page">
@@ -617,6 +617,28 @@
               </p>
 
               <div id="revoke-actions" hidden>
+                <fieldset class="revoke-display-prefs" id="revoke-display-prefs">
+                  <legend class="form-label">What scanners see</legend>
+                  <label class="revoke-display-opt">
+                    <input type="radio" name="revoke-display-mode" value="minimal" checked />
+                    <span>Minimal  -  headline only (default)</span>
+                  </label>
+                  <label class="revoke-display-opt">
+                    <input type="radio" name="revoke-display-mode" value="tombstone" />
+                    <span>Show @handle and public line</span>
+                  </label>
+                  <label class="form-label" for="revoke-public-reason">Optional reason on scan</label>
+                  <select class="form-input" id="revoke-public-reason" name="revoke_public_reason">
+                    <option value="">None</option>
+                    <option value="event_ended">Event ended</option>
+                    <option value="rotated">QR rotated</option>
+                    <option value="lost_item">Lost item recovered</option>
+                    <option value="owner_revoked">Revoked by owner</option>
+                    <option value="compromised">Compromised or abused</option>
+                    <option value="other">Other</option>
+                  </select>
+                </fieldset>
+
                 <div id="revoke-qr-block">
                   <p class="form-hint revoke-id-warning">
                     Revoking changes live network status, not the physical sticker.
@@ -833,6 +855,10 @@
               <li><strong>Active</strong>  -  live manifesto or pilot layout.</li>
               <li><strong>Expiry</strong>  -  credential time runs out; scan shows expired.</li>
               <li><strong>Revoke this QR</strong>  -  one pointer off; siblings can stay active.</li>
+              <li>
+                <strong>Scan display</strong>  -  minimal headline (default) or show @handle on scan
+                (tombstone).
+              </li>
               <li><strong>Disable card</strong>  -  whole profile offline.</li>
               <li>
                 <strong>Organizer revoke</strong>  - 

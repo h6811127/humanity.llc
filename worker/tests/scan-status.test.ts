@@ -70,7 +70,7 @@ describe("scan status JSON (M3.4)", () => {
     const vm = buildScanViewModel(
       PROFILE,
       QR,
-      { card: card(), qr: qr(), verification: summary() },
+      { card: card(), qr: qr(), verification: summary(), revocationDisplay: null },
       "https://humanity.llc"
     );
     const body = scanStatusBodyFromViewModel(vm);
@@ -119,7 +119,7 @@ describe("scan status JSON (M3.4)", () => {
     const vm = buildScanViewModel(
       PROFILE,
       QR,
-      { card: null, qr: null, verification: null },
+      { card: null, qr: null, verification: null, revocationDisplay: null },
       "https://humanity.llc"
     );
     expect(vm.kind).toBe("unknown_profile");
@@ -130,7 +130,7 @@ describe("scan status JSON (M3.4)", () => {
     const vm = buildScanViewModel(
       PROFILE,
       QR,
-      { card: card({ status: "revoked" }), qr: qr(), verification: summary() },
+      { card: card({ status: "revoked" }), qr: qr(), verification: summary(), revocationDisplay: null },
       "https://humanity.llc"
     );
     expect(vm.kind).toBe("card_revoked");
@@ -141,7 +141,7 @@ describe("scan status JSON (M3.4)", () => {
     const vm = buildScanViewModel(
       PROFILE,
       QR,
-      { card: card(), qr: qr({ status: "revoked" }), verification: summary() },
+      { card: card(), qr: qr({ status: "revoked" }), verification: summary(), revocationDisplay: null },
       "https://humanity.llc"
     );
     expect(vm.kind).toBe("qr_revoked");

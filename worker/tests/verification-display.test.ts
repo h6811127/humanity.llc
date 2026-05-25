@@ -55,6 +55,7 @@ function activeVm(overrides: Partial<ScanContext["verification"]> = {}) {
         updated_at: "2026-05-16T17:00:00Z",
         ...overrides,
       },
+      revocationDisplay: null,
     },
     "https://humanity.llc"
   );

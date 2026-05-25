@@ -260,6 +260,8 @@ export async function signRevocation({
   privateKeyBase58,
   publicKeyBase58,
   reason = "owner_revoked",
+  displayMode = "minimal",
+  publicReason = null,
 }) {
   const privateKey = decodePrivateKeyBase58(privateKeyBase58);
   const revokedAt = new Date().toISOString();
@@ -270,6 +272,12 @@ export async function signRevocation({
     revoked_at: revokedAt,
     nonce: generateRevocationNonce(),
   };
+  if (displayMode && displayMode !== "minimal") {
+    payload.display_mode = displayMode;
+  }
+  if (publicReason) {
+    payload.public_reason = publicReason;
+  }
   if (targetKind === "qr_credential") {
     if (!targetQrId) throw new Error("target_qr_id required for QR revocation.");
     payload.target_qr_id = targetQrId;

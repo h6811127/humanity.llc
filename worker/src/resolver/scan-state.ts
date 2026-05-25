@@ -1,5 +1,10 @@
 import type { ScanContext } from "../db/scan";
 import type { CardStatus, QrScope, QrStatus } from "../db/types";
+import {
+  publicReasonLabel,
+  scanLayoutForRevocationDisplay,
+  type RevocationDisplayMeta,
+} from "./revocation-display";
 
 export const QR_ID_REGEX =
   /^qr_[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{8,40}$/;
@@ -62,6 +67,8 @@ export interface ScanViewModel {
   liveControlProvenAt: string | null;
   qrExpiresAt: string | null;
   minimalScan: boolean;
+  revocationDisplayMode: string | null;
+  publicReason: string | null;
   primaryBadge: { label: string; tone: StatusTone };
   scanUrl: string | null;
   cacheControl: string;
@@ -145,16 +152,16 @@ export function buildScanViewModel(
   const qr = ctx.qr;
 
   if (card.status === "revoked") {
-    return statusView("card_revoked", card, qr, ctx.verification, origin, {
-      label: "Disabled",
-      tone: "bad",
-    }, {
-      minimalScan: true,
-      showCardBlock: false,
-      showHumanTrustBlock: false,
-      showArtifactBlock: false,
-      showLiveControlBlock: false,
-    });
+    return statusView(
+      "card_revoked",
+      card,
+      qr,
+      ctx.verification,
+      origin,
+      { label: "Disabled", tone: "bad" },
+      revocationDisplayLayout(ctx.revocationDisplay),
+      ctx.revocationDisplay
+    );
   }
   if (card.status === "suspended") {
     return statusView("card_suspended", card, qr, ctx.verification, origin, {
@@ -169,16 +176,16 @@ export function buildScanViewModel(
     });
   }
   if (qr.status === "revoked") {
-    return statusView("qr_revoked", card, qr, ctx.verification, origin, {
-      label: "QR invalid",
-      tone: "bad",
-    }, {
-      minimalScan: true,
-      showCardBlock: false,
-      showHumanTrustBlock: false,
-      showArtifactBlock: false,
-      showLiveControlBlock: false,
-    });
+    return statusView(
+      "qr_revoked",
+      card,
+      qr,
+      ctx.verification,
+      origin,
+      { label: "QR invalid", tone: "bad" },
+      revocationDisplayLayout(ctx.revocationDisplay),
+      ctx.revocationDisplay
+    );
   }
   if (qr.status === "replaced") {
     return statusView("qr_replaced", card, qr, ctx.verification, origin, {
@@ -296,6 +303,27 @@ export function buildCardOnlyScanViewModel(
   );
 }
 
+function revocationDisplayLayout(
+  row: ScanContext["revocationDisplay"]
+): Partial<
+  Pick<
+    ScanViewModel,
+    | "minimalScan"
+    | "showCardBlock"
+    | "showHumanTrustBlock"
+    | "showArtifactBlock"
+    | "showLiveControlBlock"
+  >
+> {
+  if (!row?.display_mode) {
+    return scanLayoutForRevocationDisplay(null);
+  }
+  return scanLayoutForRevocationDisplay({
+    display_mode: row.display_mode as RevocationDisplayMeta["display_mode"],
+    public_reason: row.public_reason,
+  });
+}
+
 function statusView(
   kind: ScanPageKind,
   card: ScanContext["card"] & object,
@@ -312,7 +340,8 @@ function statusView(
       | "showArtifactBlock"
       | "showLiveControlBlock"
     >
-  >
+  >,
+  revocationDisplay?: ScanContext["revocationDisplay"]
 ): ScanViewModel {
   return baseView(
     {
@@ -328,6 +357,8 @@ function statusView(
       showArtifactBlock: display?.showArtifactBlock ?? true,
       showLiveControlBlock: display?.showLiveControlBlock ?? true,
       minimalScan: display?.minimalScan ?? false,
+      revocationDisplayMode: revocationDisplay?.display_mode ?? null,
+      publicReason: revocationDisplay?.public_reason ?? null,
     },
     origin
   );
@@ -374,6 +405,8 @@ interface BaseViewInput {
   showArtifactBlock: boolean;
   showLiveControlBlock?: boolean;
   minimalScan?: boolean;
+  revocationDisplayMode?: string | null;
+  publicReason?: string | null;
 }
 
 function baseView(input: BaseViewInput, origin: string): ScanViewModel {
@@ -409,6 +442,8 @@ function baseView(input: BaseViewInput, origin: string): ScanViewModel {
     liveControlProvenAt: null,
     qrExpiresAt: qr?.expires_at ?? null,
     minimalScan: input.minimalScan ?? false,
+    revocationDisplayMode: input.revocationDisplayMode ?? null,
+    publicReason: input.publicReason ?? null,
     primaryBadge: input.primaryBadge,
     scanUrl: resolveScanUrl(origin, input.profileId, input.qrId, qr?.payload),
     cacheControl: isHealthy ? CACHE_ACTIVE : CACHE_INACTIVE,

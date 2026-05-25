@@ -255,6 +255,15 @@ export function initOwnerRevoke(ctx) {
     }
   }
 
+  function revokeDisplayPrefs() {
+    const mode =
+      document.querySelector('input[name="revoke-display-mode"]:checked')?.value ??
+      "minimal";
+    const reasonRaw = document.getElementById("revoke-public-reason")?.value?.trim();
+    const publicReason = reasonRaw || null;
+    return { displayMode: mode, publicReason };
+  }
+
   async function postRevocation(targetKind) {
     const k = keys();
     if (!k) {
@@ -263,6 +272,7 @@ export function initOwnerRevoke(ctx) {
     }
 
     const targetQrId = targetKind === "qr_credential" ? ctx.qrId : null;
+    const { displayMode, publicReason } = revokeDisplayPrefs();
     setRevokeStatus("Signing…");
     if (revokeQrBtn) revokeQrBtn.disabled = true;
     if (revokeCardBtn) revokeCardBtn.disabled = true;
@@ -274,6 +284,8 @@ export function initOwnerRevoke(ctx) {
         targetQrId,
         privateKeyBase58: k.privateKeyBase58,
         publicKeyBase58: k.publicKeyBase58,
+        displayMode,
+        publicReason,
       });
 
       setRevokeStatus("Submitting…");

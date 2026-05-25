@@ -89,7 +89,7 @@ describe("artifact intent pre-commerce guard (M4.4)", () => {
   it("blocks revoked source QR with 403", async () => {
     const res = await handlePostArtifactIntent(
       request({ profile_id: PROFILE, source_qr_id: QR, product_id: "prod_sticker_square" }),
-      dbFor({ card: card(), qr: qr({ status: "revoked" }), verification: summary() })
+      dbFor({ card: card(), qr: qr({ status: "revoked" }), verification: summary(), revocationDisplay: null })
     );
 
     const json = (await res.json()) as {
@@ -106,7 +106,7 @@ describe("artifact intent pre-commerce guard (M4.4)", () => {
   it("blocks suspended cards before preview generation", async () => {
     const res = await handlePostArtifactIntent(
       request({ profile_id: PROFILE, source_qr_id: QR }),
-      dbFor({ card: card({ status: "suspended" }), qr: qr(), verification: summary() })
+      dbFor({ card: card({ status: "suspended" }), qr: qr(), verification: summary(), revocationDisplay: null })
     );
 
     const json = (await res.json()) as { error: string; scan: { kind: string } };
@@ -118,7 +118,7 @@ describe("artifact intent pre-commerce guard (M4.4)", () => {
   it("keeps active source QR behind the pre-commerce stub", async () => {
     const res = await handlePostArtifactIntent(
       request({ profile_id: PROFILE, source_qr_id: QR }),
-      dbFor({ card: card(), qr: qr(), verification: summary() })
+      dbFor({ card: card(), qr: qr(), verification: summary(), revocationDisplay: null })
     );
 
     const json = (await res.json()) as { error: string };
