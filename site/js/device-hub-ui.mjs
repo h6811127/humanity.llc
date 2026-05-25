@@ -76,6 +76,49 @@ let hubConfig = {
   showLiveControlInbox: false,
 };
 
+const REVOKED_SINCE_VISIT_SEARCH = "revoked since last visit";
+
+/** Bumped when saved-card DOM is replaced or a new network fetch starts; stale fetches must not apply. */
+let walletNetworkApplyGen = 0;
+
+function bumpWalletNetworkApplyGen() {
+  walletNetworkApplyGen += 1;
+  return walletNetworkApplyGen;
+}
+
+function restoreHubCardSearchable(li, profileId) {
+  const entry = loadWallet().find((e) => e.profile_id === profileId);
+  if (entry) {
+    li.dataset.hubSearchable = walletHaystack(entry);
+    return;
+  }
+  const text = li.dataset.hubSearchable || "";
+  li.dataset.hubSearchable = text
+    .replace(/\s*revoked since last visit\s*/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function setRevokedSinceVisitAlertVisible(li, profileId, show) {
+  const alertEl = li.querySelector(".hub-card-status-alert");
+  li.classList.toggle("hub-card-item--revoked-since-visit", show);
+  if (alertEl) {
+    alertEl.hidden = !show;
+    if (show) alertEl.removeAttribute("hidden");
+    else alertEl.setAttribute("hidden", "");
+  }
+  if (show) {
+    const base = li.dataset.hubSearchable || walletHaystack(
+      loadWallet().find((e) => e.profile_id === profileId) || {}
+    );
+    if (!base.includes(REVOKED_SINCE_VISIT_SEARCH)) {
+      li.dataset.hubSearchable = `${base} ${REVOKED_SINCE_VISIT_SEARCH}`.trim();
+    }
+  } else {
+    restoreHubCardSearchable(li, profileId);
+  }
+}
+
 let savedGroup;
 let liveControlGroup;
 let liveControlList;
@@ -208,17 +251,10 @@ function applyRevokedSinceVisitAlerts(statusMap = {}, alertStateMap = null) {
     const pid = li.dataset.profileId;
     if (!pid) return;
     const alertState = currentNetworkAlertState(pid, alertStateMap ?? {});
-    const show = isRevokedSinceLastVisit(pid, alertState);
-    const alertEl = li.querySelector(".hub-card-status-alert");
-
-    li.classList.toggle("hub-card-item--revoked-since-visit", show);
-    if (alertEl) alertEl.hidden = !show;
-    if (show) {
-      const base = li.dataset.hubSearchable || "";
-      if (!base.includes("revoked since last visit")) {
-        li.dataset.hubSearchable = `${base} revoked since last visit`.trim();
-      }
-    }
+    const show =
+      String(alertState || "").toLowerCase() === CARD_REVOKED_ALERT_STATE &&
+      isRevokedSinceLastVisit(pid, alertState);
+    setRevokedSinceVisitAlertVisible(li, pid, show);
   });
 }
 
@@ -249,12 +285,14 @@ async function fetchAndApplyNetworkChips() {
   if (!hubConfig.fetchNetworkStatus || !savedList) return;
   const entries = loadWallet();
   if (entries.length === 0) return;
+  const gen = bumpWalletNetworkApplyGen();
   applyNetworkChipsToDom(
     Object.fromEntries(
       entries.map((e) => [e.profile_id, getCachedNetworkStatus(e.profile_id) ?? "checking"])
     )
   );
   await refreshWalletNetworkStatuses(entries, ({ statusMap, alertStateMap }) => {
+    if (gen !== walletNetworkApplyGen) return;
     applyNetworkChipsToDom(statusMap, alertStateMap);
     syncLastSeenFromNetworkMap(alertStateMap);
     const stored = loadWallet();
@@ -413,6 +451,7 @@ function renderActivityRows() {
 }
 
 function renderSavedRows() {
+  bumpWalletNetworkApplyGen();
   const entries = loadWallet();
   if (!savedList || !savedGroup) return;
 
@@ -490,6 +529,7 @@ function renderSavedRows() {
   }
 
   bindRevokedAlertHandlers();
+  applyRevokedSinceVisitAlerts();
 
   savedList.querySelectorAll(".hub-use-keys").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -523,7 +563,6 @@ function renderSavedRows() {
       entries[idx] = { ...entries[idx], label: next.trim() };
       saveWallet(entries);
       renderSavedRows();
-      void fetchAndApplyNetworkChips();
       notifyHubChanged();
     });
   });
