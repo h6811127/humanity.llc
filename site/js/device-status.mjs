@@ -221,8 +221,11 @@ async function refreshNetwork() {
   refreshSummary();
 }
 
-function toggleHubFromChrome() {
-  if (!hub) return;
+function openHubFromChrome() {
+  if (!hub) {
+    location.href = "/";
+    return;
+  }
   const open = hub.classList.contains("device-hub-collapsed");
   setHubExpanded(open, { haptic: true, persist: false });
 }
@@ -240,12 +243,16 @@ window.addEventListener("hc-landing-focus-on", () => {
 dotBtn?.addEventListener("click", (e) => {
   e.preventDefault();
   e.stopPropagation();
-  toggleHubFromChrome();
+  openHubFromChrome();
 });
 
 notifBtn?.addEventListener("click", (e) => {
   e.preventDefault();
   e.stopPropagation();
+  if (!hub) {
+    location.href = "/";
+    return;
+  }
   setHubExpanded(true, { haptic: true, persist: false });
   window.setTimeout(scrollToFirstNotification, 120);
 });

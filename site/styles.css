@@ -69,6 +69,10 @@ body.page-flow .page > main.screen {
   padding-top: calc(12px + env(safe-area-inset-top, 0px));
 }
 
+body.page-flow.has-shell-chrome .page > main.screen {
+  padding-top: 8px;
+}
+
 .top-brand-row {
   display: inline-flex;
   align-items: center;
@@ -749,11 +753,6 @@ a.hub-card-menu-item {
   color: var(--red);
 }
 
-.device-hub-notice-row a {
-  border: 1px solid rgba(219, 27, 67, 0.2);
-  border-radius: var(--radius);
-  background: rgba(219, 27, 67, 0.04);
-}
 
 #device-hub-live-control-group .device-hub-group-label {
   color: var(--gold-dark, #8a6d1f);

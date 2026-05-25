@@ -9,10 +9,36 @@
       content="Create a QR-backed live object you can scan, verify, and revoke. Your private key stays in this browser session unless you save backup or recovery."
     />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=78" />
+    <link rel="stylesheet" href="/styles.css?v=80" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=11" />
   </head>
-  <body class="page-flow">
+  <body class="page-flow has-shell-chrome">
     <div class="page">
+      <div class="top-chrome top-chrome--float top-chrome--flow" id="top-chrome">
+        <div class="top-chrome-bar top-chrome-bar--minimal" id="top-status">
+          <div class="shell-status-cluster">
+            <button
+              type="button"
+              class="shell-status-dot-btn"
+              id="brand-status-dot-btn"
+              aria-label="Device and system status"
+              aria-expanded="false"
+            >
+              <span class="pass-dot shell-status-dot" id="brand-status-dot"></span>
+            </button>
+            <button
+              type="button"
+              class="shell-notif-badge"
+              id="shell-notif-badge"
+              hidden
+              aria-label="Notifications"
+            >
+              <span class="shell-notif-badge-ring" aria-hidden="true"></span>
+              <span class="shell-notif-badge-count" id="shell-notif-badge-count">0</span>
+            </button>
+          </div>
+        </div>
+      </div>
       <main class="screen">
         <section class="hero hero-compact">
           <p class="hero-eyebrow">Create</p>
@@ -195,6 +221,7 @@
         </form>
       </main>
     </div>
+    <script src="/js/device-status.mjs?v=15" type="module"></script>
     <script type="module" src="/js/create-card.mjs?v=12"></script>
   </body>
 </html>

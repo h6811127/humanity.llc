@@ -72,17 +72,11 @@ function renderHubCrossTabNotice() {
   }
   hubSlot.hidden = false;
   hubSlot.innerHTML = `
-    <ul class="list list-compact">
-      <li class="list-row list-action device-hub-notice-row">
-        <a href="${msg.manageHref}">
-          <span class="list-content">
-            <span class="list-title">Keys in another tab</span>
-            <span class="list-sub">${msg.label}${msg.extra}</span>
-          </span>
-          <span class="list-chevron" aria-hidden="true">›</span>
-        </a>
-      </li>
-    </ul>`;
+    <a class="device-hub-notice-banner device-hub-notice-banner--info" href="${msg.manageHref}">
+      <span class="device-hub-notice-title">Keys in another tab</span>
+      <span class="device-hub-notice-sub">${msg.label}${msg.extra}</span>
+      <span class="device-hub-notice-chevron" aria-hidden="true">›</span>
+    </a>`;
 }
 
 export function renderCrossTabKeysBanner() {

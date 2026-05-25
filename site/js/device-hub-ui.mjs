@@ -264,20 +264,11 @@ function renderNoticeRow() {
 
   if (hubConfig.noticeMode === "keys-strip") {
     noticeGroup.innerHTML = `
-    <ul class="list list-compact">
-      <li class="list-row list-action device-hub-notice-row" data-hub-searchable="notice save tab keys strip">
-        <a href="#created-keys-strip">
-          <span class="list-icon list-icon-tone-red" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
-          </span>
-          <span class="list-content">
-            <span class="list-title">Keys in this tab · Save on this device</span>
-            <span class="list-sub">${escapeHtml(label)}  -  scroll to save below</span>
-          </span>
-          <span class="list-chevron" aria-hidden="true">›</span>
-        </a>
-      </li>
-    </ul>`;
+    <a class="device-hub-notice-banner" href="#created-keys-strip" data-hub-searchable="notice save tab keys strip">
+      <span class="device-hub-notice-title">Keys in this tab · Save on this device</span>
+      <span class="device-hub-notice-sub">${escapeHtml(label)}  -  scroll to save below</span>
+      <span class="device-hub-notice-chevron" aria-hidden="true">›</span>
+    </a>`;
     return;
   }
 
@@ -286,20 +277,11 @@ function renderNoticeRow() {
   if (session?.qr_id) url.searchParams.set("qr_id", session.qr_id);
 
   noticeGroup.innerHTML = `
-    <ul class="list list-compact">
-      <li class="list-row list-action device-hub-notice-row" data-hub-searchable="notice save tab keys">
-        <a href="${escapeHtml(url.href)}">
-          <span class="list-icon list-icon-tone-red" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
-          </span>
-          <span class="list-content">
-            <span class="list-title">Keys in this tab · Save on this device</span>
-            <span class="list-sub">${escapeHtml(label)}  -  tap to open /created/</span>
-          </span>
-          <span class="list-chevron" aria-hidden="true">›</span>
-        </a>
-      </li>
-    </ul>`;
+    <a class="device-hub-notice-banner" href="${escapeHtml(url.href)}" data-hub-searchable="notice save tab keys">
+      <span class="device-hub-notice-title">Keys in this tab · Save on this device</span>
+      <span class="device-hub-notice-sub">${escapeHtml(label)}  -  tap to open /created/</span>
+      <span class="device-hub-notice-chevron" aria-hidden="true">›</span>
+    </a>`;
 }
 
 function renderActivityRows() {
