@@ -250,6 +250,18 @@ html[data-theme="dark"] .created-primary-actions--setup .created-primary-action-
   border-left-color: #0a84ff;
 }
 
+html[data-theme="dark"] .created-dashboard-feedback {
+  color: #30d158;
+  background: rgba(48, 209, 88, 0.14);
+  border-color: rgba(48, 209, 88, 0.32);
+}
+
+html[data-theme="dark"] .created-dashboard-feedback--error {
+  color: #ff6961;
+  background: rgba(255, 69, 58, 0.14);
+  border-color: rgba(255, 69, 58, 0.35);
+}
+
 html[data-theme="dark"] .hub-card-status-alert {
   background: var(--shell-fill-secondary);
   border-color: rgba(255, 69, 58, 0.45);

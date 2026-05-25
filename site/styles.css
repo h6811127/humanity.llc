@@ -4455,6 +4455,28 @@ body.page-wallet .device-hub-status-key {
   margin-bottom: 4px;
 }
 
+.created-dashboard-feedback {
+  margin: 8px 4px 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #248a3d;
+  background: rgba(52, 199, 89, 0.12);
+  border: 0.5px solid rgba(52, 199, 89, 0.28);
+}
+
+.created-dashboard-feedback--error {
+  color: #c9342a;
+  background: rgba(255, 59, 48, 0.1);
+  border-color: rgba(255, 59, 48, 0.28);
+}
+
+.created-dashboard-feedback[hidden] {
+  display: none !important;
+}
+
 .created-primary-actions--setup .created-primary-action--setup {
   border-left: 3px solid #007aff;
 }

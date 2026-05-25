@@ -36,12 +36,19 @@ function persistDoneAction(profileId, actionId) {
 /**
  * @param {{
  *   selectTab: (id: string) => void,
- *   runSave?: () => boolean,
+ *   runSave?: () => boolean | null,
+ *   refreshSave?: () => void,
  *   getScanUrl?: () => string | null,
  *   getProfileId?: () => string | null,
  * }} opts
  */
-export function initCreatedDashboard({ selectTab, runSave, getScanUrl, getProfileId }) {
+export function initCreatedDashboard({
+  selectTab,
+  runSave,
+  refreshSave,
+  getScanUrl,
+  getProfileId,
+}) {
   const keysStrip = document.getElementById("created-keys-strip");
   const qrSection = document.getElementById("created-qr-section");
   const openScan = document.getElementById("open-scan");
@@ -49,9 +56,22 @@ export function initCreatedDashboard({ selectTab, runSave, getScanUrl, getProfil
   const revokeDetails = document.getElementById("revoke-details");
   const printTip = document.querySelector("#created-qr-section .created-print-tip");
   const saveRequiredBadge = document.getElementById("created-save-required-badge");
+  const feedbackEl = document.getElementById("created-dashboard-feedback");
+  let feedbackTimer = null;
 
   function profileId() {
     return getProfileId?.() ?? null;
+  }
+
+  function showFeedback(message, isError = false) {
+    if (!feedbackEl) return;
+    feedbackEl.hidden = false;
+    feedbackEl.textContent = message;
+    feedbackEl.classList.toggle("created-dashboard-feedback--error", isError);
+    if (feedbackTimer) window.clearTimeout(feedbackTimer);
+    feedbackTimer = window.setTimeout(() => {
+      feedbackEl.hidden = true;
+    }, isError ? 8000 : 5000);
   }
 
   function openScanUrl() {
@@ -66,6 +86,11 @@ export function initCreatedDashboard({ selectTab, runSave, getScanUrl, getProfil
   function scrollToQr() {
     selectTab("now");
     qrSection?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function revealKeysStrip() {
+    if (keysStrip) keysStrip.hidden = false;
+    keysStrip?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function markDone(actionId) {
@@ -90,15 +115,45 @@ export function initCreatedDashboard({ selectTab, runSave, getScanUrl, getProfil
   const actions = {
     "save-keys": () => {
       selectTab("now");
-      if (keysStrip) keysStrip.hidden = false;
-      keysStrip?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      if (runSave?.() === true) {
+      revealKeysStrip();
+
+      if (!runSave) {
+        showFeedback(
+          "No signing keys in this tab. Open /created/ from create, or use Control card from Saved cards.",
+          true
+        );
+        return;
+      }
+
+      const saved = runSave();
+      refreshSave?.();
+
+      if (saved === null) {
+        showFeedback(
+          "No signing keys in this tab. Open /created/ from create, or use Control card from Saved cards.",
+          true
+        );
+        return;
+      }
+
+      if (saved) {
         markDone("save-keys");
+        showFeedback("Saved on this device. You can update and revoke from this browser.");
+      } else {
+        showFeedback(
+          "Could not save yet. Keys must be in this tab — finish create here or import a backup below.",
+          true
+        );
       }
     },
     "open-scan": () => {
       selectTab("now");
-      if (openScanUrl()) markDone("open-scan");
+      if (openScanUrl()) {
+        markDone("open-scan");
+        showFeedback("Opened scan page in a new tab.");
+      } else {
+        showFeedback("Scan link is not ready yet.", true);
+      }
     },
     "scroll-qr": () => {
       scrollToQr();
@@ -106,6 +161,7 @@ export function initCreatedDashboard({ selectTab, runSave, getScanUrl, getProfil
     "download-qr": () => {
       scrollToQr();
       markDone("download-qr");
+      showFeedback("Full QR below — use Download QR image to save the PNG.");
     },
     "print-qr": () => {
       scrollToQr();
@@ -118,6 +174,7 @@ export function initCreatedDashboard({ selectTab, runSave, getScanUrl, getProfil
         markDone("test-scan");
       } else {
         scrollToQr();
+        showFeedback("Scan link is not ready yet.", true);
       }
     },
     "update-status": () => {

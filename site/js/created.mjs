@@ -16,7 +16,7 @@ import { initQrRotate } from "./created-qr-rotate.mjs";
 import { initQrExtend } from "./created-qr-extend.mjs";
 import { inferPilotTemplate } from "./manifesto-display.mjs";
 import { initCreatedTabs } from "./created-tabs.mjs";
-import { initCreatedDashboard } from "./created-dashboard.mjs";
+import { initCreatedDashboard } from "./created-dashboard.mjs?v=2";
 import { initCreatedDeviceSave } from "./created-device-save.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
 
@@ -583,6 +583,29 @@ if (networkQrExpiresEl) {
 }
 updateHeroMeta();
 
+function setupCreatedDashboard() {
+  initCreatedDashboard({
+    selectTab: (id) => createdTabs?.select(id),
+    runSave: () => {
+      if (!deviceSaveCtl?.runSave) return null;
+      return deviceSaveCtl.runSave() === true;
+    },
+    refreshSave: () => deviceSaveCtl?.refresh?.(),
+    getScanUrl: () => {
+      const href = openScanBtn?.getAttribute("href");
+      return href && href.startsWith("http") ? href : null;
+    },
+    getProfileId: () => profileId,
+  });
+}
+
+createdTabs = initCreatedTabs();
+setupCreatedDashboard();
+
+if (profileId && activeQrId) {
+  deviceSaveCtl = initCreatedDeviceSave(loadSession);
+}
+
 if (activeScanUrl) {
   scanUrlEl.textContent = activeScanUrl;
   copyBtn.disabled = false;
@@ -792,24 +815,6 @@ async function bootstrapOwnerTools() {
   }
 }
 
-createdTabs = initCreatedTabs();
-
-function setupCreatedDashboard() {
-  initCreatedDashboard({
-    selectTab: (id) => createdTabs?.select(id),
-    runSave: () => deviceSaveCtl?.runSave?.() === true,
-    getScanUrl: () => {
-      const href = openScanBtn?.getAttribute("href");
-      return href && href.startsWith("http") ? href : null;
-    },
-    getProfileId: () => profileId,
-  });
-}
-
 if (profileId && activeQrId) {
-  deviceSaveCtl = initCreatedDeviceSave(loadSession);
-  setupCreatedDashboard();
   void bootstrapOwnerTools();
-} else {
-  setupCreatedDashboard();
 }
