@@ -31,10 +31,10 @@ Do **not** put full trust copy on the card back (it clips). Spec blocks live in 
 | **Source of truth** | `qr_credentials.payload` from D1 when present; otherwise build from request origin + ids (`resolveScanUrl` in `scan-state.ts`) |
 | **Not allowed** | Brand placeholder `red_qr_transparent_bg.png`, homepage URL, or generic `humanity.llc` QR |
 | **Color** | Modules `#db1b43`, background `#ffffff` (same as creation flow brand red) |
-| **Center logo** | Small mostly transparent mark (`site/assets/qr-center-logo.png`, ~32% opacity, ~22% width) — see [`docs/QR_BRANDING.md`](QR_BRANDING.md) |
+| **Center logo** | Small mostly transparent concentric circles (vector, ~48% opacity, ~22% width) — see [`docs/QR_BRANDING.md`](QR_BRANDING.md) |
 | **Error correction** | **Q** (required with center logo) |
 | **Creation page** | `/created/` renders the same payload client-side via `site/js/qr-render.mjs` + `qrScanUrl()` in `hc-sign.mjs` |
-| **Scan page** | Worker renders the same payload server-side via `worker/src/resolver/scan-qr.ts` (`QRCode.toString`, type `svg` + centered `<image>`) |
+| **Scan page** | Worker renders the same payload server-side via `worker/src/resolver/scan-qr.ts` (`QRCode.toString`, type `svg` + centered vector circles) |
 | **Fallback** | If server SVG fails, inline module script loads `/js/qr-render.mjs` and fills `#pass-qr-slot[data-scan-url]` (never the brand PNG) |
 | **Visible URL** | Red monospace line under QR on card front: full scan URL (confirms payload for humans) |
 
@@ -63,7 +63,7 @@ Below-card rows use **colored tile + white stroke SVG** (same visual language as
 | `site/scan-pass.css` | Bundled styles → `scan-pass-styles.ts` |
 | `site/js/qr-branding.mjs` | Shared logo opacity, size, correction Q |
 | `site/js/qr-render.mjs` | Browser QR for `/created/` (+ scan fallback) |
-| `site/assets/qr-center-logo.png` | Center logo asset |
+| `site/assets/qr-center-logo.svg` | Design reference for center mark (runtime uses `qr-branding.mjs`) |
 | `docs/QR_BRANDING.md` | Branding spec + QA checklist |
 | `site/js/hc-sign.mjs` | `qrScanUrl(profileId, qrId, origin)` |
 

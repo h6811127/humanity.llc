@@ -24,7 +24,7 @@ export async function renderScanPage(
   let qrMarkup = "";
   if (vm.scanUrl) {
     try {
-      qrMarkup = await renderScanQrMarkup(vm.scanUrl, origin);
+      qrMarkup = await renderScanQrMarkup(vm.scanUrl);
     } catch {
       qrMarkup = "";
     }
@@ -67,7 +67,7 @@ function renderQrFallbackScript(
   scanUrl: string | null
 ): string {
   if (!scanUrl) return "";
-  const mod = JSON.stringify(`${origin}/js/qr-render.mjs?v=3`);
+  const mod = JSON.stringify(`${origin}/js/qr-render.mjs?v=4`);
   return `<script type="module">
 import { renderQrToImage } from ${mod};
 var slot = document.getElementById("pass-qr-slot");
