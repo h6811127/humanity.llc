@@ -310,6 +310,7 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
+startTabKeysPresence();
 refreshNetwork();
 
 document.addEventListener("visibilitychange", () => {
