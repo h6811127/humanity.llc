@@ -6,6 +6,7 @@ import { isAutoSaveEnabled, initAutoSaveToggle } from "./device-auto-save.mjs";
 import { initDeviceHub, refreshDeviceHub } from "./device-hub-ui.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import { createPinEntry, loadPins, savePins } from "./device-pins.mjs";
+import { mountKeysCustody } from "./device-keys-custody.mjs";
 import {
   defaultWalletLabel,
   loadWallet,
@@ -141,14 +142,6 @@ if (pinForm) {
   });
 }
 
-function refreshActivityDetailsOpen() {
-  const details = document.getElementById("device-hub-activity-group");
-  const list = document.getElementById("device-hub-activity-list");
-  if (!details || details.tagName !== "DETAILS") return;
-  const hasRows = list && !list.hidden && list.children.length > 0;
-  details.open = hasRows;
-}
-
 initDeviceHub({
   hubRoot: "#wallet-page",
   noticeMode: "created-url",
@@ -160,21 +153,21 @@ initDeviceHub({
   showLiveControlInbox: true,
 });
 
+mountKeysCustody("#device-keys-custody-wallet", "wallet", {
+  importHref: "#hub-import-form",
+});
+
 initAutoSaveToggle();
 initTabSave();
 refreshAutoSaveLine();
 updateContextBanners();
 refreshHelpVisibility();
-refreshActivityDetailsOpen();
 
 window.addEventListener("hc-device-hub-changed", () => {
   refreshHelpVisibility();
   updateContextBanners();
   refreshAutoSaveLine();
-  refreshActivityDetailsOpen();
 });
-
-window.addEventListener("hc-device-activity-changed", refreshActivityDetailsOpen);
 
 window.addEventListener("storage", (e) => {
   if (e.key === "hc_created") updateContextBanners();

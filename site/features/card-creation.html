@@ -65,16 +65,18 @@
     <p class="settings-panel-lead">Private signing keys never leave the owner device unless the user exports an encrypted backup. Resolver verifies signatures on ingest and stores only public documents and status flags  -  not a people trail.</p>
   </div>
 </details>
-<details class="settings-disclosure settings-disclosure-info feature-aspect">
+<details class="settings-disclosure settings-disclosure-info feature-aspect" id="keys-custody">
   <summary class="settings-summary">
     <span class="list-icon list-icon-tone-orange" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span>
     <span class="settings-summary-text">
-      <span class="settings-summary-title">Limits</span>
+      <span class="settings-summary-title">Where keys live (critical)</span>
     </span>
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Keys start in <code>sessionStorage</code> (this tab only). <strong>Save on this device</strong> on <a href="/created/">/created/</a> copies them to <code>localStorage</code> (<code>hc_wallet</code>) for other tabs  -  not automatic on create. Operator cannot reset your key. Printed URL exposes <code>profile_id</code> and <code>qr_id</code> (v1 privacy lock).</p>
+    <p class="settings-panel-lead"><strong>This tab only:</strong> right after create, keys sit in <code>sessionStorage</code> (<code>hc_created</code>). Close the tab and you lose revoke/update unless you saved or exported a backup.</p>
+    <p class="settings-panel-lead"><strong>Saved on this device:</strong> <a href="/created/">/created/</a> <strong>Save on this device</strong> copies keys to <code>localStorage</code> (<code>hc_wallet</code>). They stay in this browser until you clear site data. You can return months later and tap <strong>Use keys</strong> on <a href="/wallet/">/wallet/</a>.</p>
+    <p class="settings-panel-lead">Create does not auto-save. Auto-save (optional in the hub) writes to the device after each create. Operator cannot reset your key. Printed URL exposes <code>profile_id</code> and <code>qr_id</code> (v1 privacy lock).</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">

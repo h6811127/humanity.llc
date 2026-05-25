@@ -14,8 +14,8 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=82" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=21" />
+    <link rel="stylesheet" href="/styles.css?v=83" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=23" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -121,11 +121,12 @@
           </div>
           <h2 class="device-hub-title" id="device-hub-title">On this device</h2>
           <p class="device-hub-lead">
-            Personal to <strong>this browser</strong>  -  not your profile on the network.
+            Personal to <strong>this browser</strong>, not your profile on the network.
           </p>
+          <div id="device-keys-custody-hub"></div>
           <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint">
-            Nothing here yet? After create, use step <strong>Save</strong> on
-            <a href="/created/">/created/</a>  -  keys stay in this browser only.
+            Nothing saved yet? After create, tap <strong>Save on this device</strong> on
+            <a href="/created/">/created/</a>. Until then, keys exist only in that tab.
           </p>
 
           <div class="device-hub-search-block" id="device-hub-search-block" role="search">
@@ -340,7 +341,7 @@
         </section>
 
         <nav class="landing-progress" aria-label="Your path" data-landing-tutorial>
-          <p class="landing-progress-kicker">Four steps · no account</p>
+          <p class="landing-progress-kicker">Four steps · no account · keys stay in your browser</p>
           <ol class="landing-progress-steps">
             <li class="landing-progress-step">
               <a href="/create/">
@@ -349,9 +350,9 @@
               </a>
             </li>
             <li class="landing-progress-step">
-              <a href="/created/">
+              <a href="/created/" title="Save on this device so keys persist after you close the tab">
                 <span class="landing-progress-num" aria-hidden="true">2</span>
-                <span class="landing-progress-label">Save</span>
+                <span class="landing-progress-label">Save keys</span>
               </a>
             </li>
             <li class="landing-progress-step">
@@ -398,16 +399,56 @@
           <h2 class="group-label" id="one-use-title">One use · status plate</h2>
           <p class="group-intro short">
             Our first deployed object is a <strong>studio door plate</strong>: a QR that answers
-            with live hours, open/closed, and “done for the night”  -  updatable without reprinting.
+            with live hours, open/closed, and “done for the night,” updatable without reprinting.
             The same primitive works on shops, booths, and rehearsal rooms.
           </p>
 
-          <ul class="studio-use-cases">
-            <li><strong>Door scan</strong>  -  “Open Thu–Sun · back at 7” before someone pulls the handle.</li>
-            <li><strong>Run state</strong>  -  flip to closed or done for the night from <code>/created/</code>.</li>
-            <li><strong>Special hours</strong>  -  one signed line change for a open studio, critique night, or holiday.</li>
-            <li><strong>Guest wayfinding</strong>  -  object name + status when the studio shares a building entrance.</li>
-            <li><strong>After revoke</strong>  -  plate still resolves; scanners see revoked, not a dead 404 link.</li>
+          <ul class="list list-compact studio-use-cases-list">
+            <li class="list-row studio-use-case-row">
+              <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Door scan</span>
+                <span class="list-sub">“Open Thu–Sun · back at 7” before someone pulls the handle</span>
+              </span>
+            </li>
+            <li class="list-row studio-use-case-row">
+              <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="M12 18v4"/><circle cx="12" cy="12" r="4"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Run state</span>
+                <span class="list-sub">Flip to closed or done for the night from <code>/created/</code></span>
+              </span>
+            </li>
+            <li class="list-row studio-use-case-row">
+              <span class="list-icon list-icon-tone-gold" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Special hours</span>
+                <span class="list-sub">One signed line for open studio, critique night, or a holiday</span>
+              </span>
+            </li>
+            <li class="list-row studio-use-case-row">
+              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Guest wayfinding</span>
+                <span class="list-sub">Object name and status when the studio shares a building entrance</span>
+              </span>
+            </li>
+            <li class="list-row studio-use-case-row">
+              <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">After revoke</span>
+                <span class="list-sub">Plate still resolves; scanners see revoked, not a dead 404</span>
+              </span>
+            </li>
           </ul>
 
           <div class="flow-strip">
@@ -699,6 +740,18 @@
               </a>
             </li>
             <li class="list-row list-action">
+              <a href="/features/card-creation.html#keys-custody">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">How signing keys work</span>
+                  <span class="list-sub">Tab only vs saved on this device</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
               <a href="/case-study/">
                 <span class="list-icon list-icon-tone-blue" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
@@ -757,7 +810,7 @@
     <script src="/js/landing-focus.mjs?v=3" type="module"></script>
     <script src="/js/device-status.mjs?v=20" type="module"></script>
     <script src="/js/landing-progress.mjs?v=2" type="module"></script>
-    <script src="/js/landing-device-hub.mjs?v=12" type="module"></script>
+    <script src="/js/landing-device-hub.mjs?v=13" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=2" type="module"></script>
   </body>
 </html>

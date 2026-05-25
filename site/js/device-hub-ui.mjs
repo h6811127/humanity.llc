@@ -102,11 +102,22 @@ const HUB_SECTION_EMPTY = {
     "Actions you take in this browser will show here. The network does not log scans.",
 };
 
+function setHubListVisible(list, isEmpty) {
+  if (!list) return;
+  if (list.classList.contains("wallet-activity-list")) {
+    list.removeAttribute("hidden");
+    list.setAttribute("aria-hidden", isEmpty ? "true" : "false");
+    list.classList.toggle("wallet-activity-list--empty", isEmpty);
+    return;
+  }
+  list.hidden = isEmpty;
+}
+
 function setHubSectionEmpty(group, list, emptyEl, isEmpty, message) {
   if (!group) return;
   group.hidden = false;
   group.classList.toggle("device-hub-group--empty", isEmpty);
-  if (list) list.hidden = isEmpty;
+  setHubListVisible(list, isEmpty);
   if (emptyEl) {
     emptyEl.textContent = message;
     emptyEl.hidden = !isEmpty;
@@ -293,7 +304,7 @@ function renderNoticeRow() {
   noticeGroup.innerHTML = `
     <a class="device-hub-notice-banner" href="${escapeHtml(url.href)}" data-hub-searchable="notice save tab keys">
       <span class="device-hub-notice-title">Keys in this tab · Save on this device</span>
-      <span class="device-hub-notice-sub">${escapeHtml(label)}  -  tap to open /created/</span>
+      <span class="device-hub-notice-sub">${escapeHtml(label)} · tab only until you save on this device</span>
       <span class="device-hub-notice-chevron" aria-hidden="true">›</span>
     </a>`;
 }

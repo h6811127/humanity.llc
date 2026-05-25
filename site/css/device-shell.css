@@ -212,6 +212,111 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   display: none !important;
 }
 
+/* Signing key custody (tab vs saved on device) */
+.device-keys-custody {
+  margin: 0 0 16px;
+  padding: 14px 14px 12px;
+  border-radius: 14px;
+  background: rgba(219, 27, 67, 0.06);
+  border: 1px solid rgba(219, 27, 67, 0.2);
+}
+
+.device-keys-custody-kicker {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--red, #db1b43);
+}
+
+.device-keys-custody-lead {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--shell-label-strong, #1c1c1e);
+}
+
+.device-keys-custody-network {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--shell-label-strong, #1c1c1e);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--shell-separator, rgba(60, 60, 67, 0.11));
+}
+
+.device-keys-custody-tiers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.device-keys-custody-tier {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--shell-fill, #fff);
+  border: 1px solid var(--shell-separator, rgba(60, 60, 67, 0.11));
+}
+
+.device-keys-custody-tier--saved {
+  border-color: rgba(26, 107, 50, 0.35);
+  background: rgba(26, 107, 50, 0.06);
+}
+
+.device-keys-custody-tier-title {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--shell-label-strong, #1c1c1e);
+}
+
+.device-keys-custody-tier-desc {
+  display: block;
+  margin-top: 3px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--shell-label, rgba(60, 60, 67, 0.72));
+}
+
+.device-keys-custody-foot {
+  margin: 12px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.device-keys-custody-foot a {
+  color: var(--red, #db1b43);
+  text-decoration: none;
+}
+
+.device-keys-custody-foot a:active {
+  opacity: 0.75;
+}
+
+.device-keys-custody--compact {
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.device-keys-custody--compact .device-keys-custody-lead {
+  margin: 0;
+  font-size: 13px;
+}
+
+.device-keys-custody--created {
+  margin-bottom: 14px;
+}
+
+body.page-wallet .device-keys-custody--wallet {
+  margin-top: 4px;
+}
+
 .shell-status-dot-btn {
   display: inline-flex;
   align-items: center;

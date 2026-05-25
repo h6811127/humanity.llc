@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Saved on this device · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=82" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=22" />
+    <link rel="stylesheet" href="/styles.css?v=83" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=24" />
   </head>
   <body class="page-wallet has-shell-chrome">
     <div class="page">
@@ -58,9 +58,7 @@
       >
         <header class="wallet-page-head">
           <h1 class="wallet-page-title" id="wallet-page-title">Saved on this device</h1>
-          <p class="wallet-page-tagline">
-            Signing keys live in <strong>this browser</strong>, not on the network.
-          </p>
+          <div id="device-keys-custody-wallet"></div>
         </header>
 
         <div class="wallet-alerts-top" id="wallet-alerts-top">
@@ -186,20 +184,20 @@
           </details>
         </div>
 
-        <details
-          class="wallet-activity-details device-hub-group device-hub-group--empty"
+        <div
+          class="device-hub-group device-hub-group--empty wallet-activity-group"
           id="device-hub-activity-group"
           data-hub-group="activity"
         >
-          <summary class="wallet-activity-summary device-hub-group-label">Recent on this device</summary>
+          <p class="device-hub-group-label">Recent on this device</p>
           <p class="device-hub-group-hint wallet-activity-hint">
             Save, import, and load keys. Not who scanned your QR.
           </p>
-          <ul class="wallet-activity-list" id="device-hub-activity-list" hidden></ul>
+          <ul class="wallet-activity-list wallet-activity-list--empty" id="device-hub-activity-list" aria-hidden="true"></ul>
           <p class="device-hub-section-empty" id="device-hub-activity-empty">
             Actions you take in this browser will show here. The network does not log scans.
           </p>
-        </details>
+        </div>
 
         <div class="device-hub-group" data-hub-group="import">
           <p class="device-hub-group-label">Backup</p>
@@ -261,6 +259,7 @@
           </summary>
           <div class="settings-panel settings-panel-info wallet-help-panel">
             <ul class="wallet-help-list">
+              <li><strong>Saved here</strong> means keys stay in this browser until you clear site data. Not tied to an account or the network.</li>
               <li><strong>Use keys</strong> loads signing keys into this tab, then opens /created/.</li>
               <li><strong>Network</strong> chip is live from the resolver; <strong>Revoked since last visit</strong> compares to your last session.</li>
               <li><strong>Pin</strong> is a scan bookmark only (↗), no keys.</li>
@@ -270,7 +269,7 @@
       </main>
     </div>
 
-    <script src="/js/device-status.mjs?v=21" type="module"></script>
-    <script src="/js/wallet-page.mjs?v=2" type="module"></script>
+    <script src="/js/device-status.mjs?v=20" type="module"></script>
+    <script src="/js/wallet-page.mjs?v=4" type="module"></script>
   </body>
 </html>
