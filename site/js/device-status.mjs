@@ -162,7 +162,7 @@ function renderHubStatusPanel(segments) {
       .join(" ");
     return `<span class="${cls}" data-seg="${seg.id}" title="${escapeHtml(seg.detail)}">${escapeHtml(label)}</span>`;
   });
-  hubStatusPanel.innerHTML = `<div class="device-hub-status-chips" role="status">${chips.join("")}</div>`;
+  hubStatusPanel.innerHTML = `<div class="device-hub-status-chips" role="status" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">${chips.join("")}</div>`;
 }
 
 function renderNotifBadge() {

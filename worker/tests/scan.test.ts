@@ -151,12 +151,11 @@ describe("renderScanPage M3.2 trust blocks", () => {
       "https://humanity.llc"
     );
     const html = await renderScanPage(vm, "https://humanity.llc");
-    expect(html).toContain("Status plate");
     expect(html).toContain("Studio door");
     expect(html).toContain("Open · Thu–Sun until 9 PM");
-    expect(html).toContain("pass-handle-muted");
-    expect(html).toContain("@river_example");
-    expect(html).toContain("current status for this place");
+    expect(html).toContain("This QR is active");
+    expect(html).toContain("Controlled by");
+    expect(html).toContain("scan-state-facts");
   });
 
   it("renders flat status panel with shared styles (no ID-style flip card)", async () => {
@@ -180,8 +179,10 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).not.toContain('getElementById("pass-scene")');
     expect(html).not.toContain('class="block"');
     expect(html).not.toContain("HUMAN TRUST");
-    expect(html).toContain("Public scan");
-    expect(html).toContain("not an ID");
+    expect(html).toContain("This QR is active");
+    expect(html).toContain("Controlled by");
+    expect(html).toContain("scan-state-facts");
+    expect(html).toContain("This does not prove ownership or legal identity");
     expect(html).toContain("@river_example");
     expect(html).toContain("Card active");
     expect(html).toContain("QR active");

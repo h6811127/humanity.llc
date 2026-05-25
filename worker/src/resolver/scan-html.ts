@@ -135,6 +135,45 @@ function scanStatusMetaLine(vm: ScanViewModel): string {
   return parts.join(" · ");
 }
 
+function formatQrExpiryLabel(expiresAt: string | null): string | null {
+  if (!expiresAt) return null;
+  const t = Date.parse(expiresAt);
+  if (Number.isNaN(t)) return null;
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(t));
+}
+
+function objectStateHeadline(vm: ScanViewModel): string {
+  if (vm.kind === "active") return "This QR is active";
+  return minimalScanHeadline(vm.kind);
+}
+
+function renderObjectStateFacts(vm: ScanViewModel, statusText: string): string {
+  const rows: string[] = [
+    `<p class="scan-state-row"><span class="scan-state-label">Status</span><span class="scan-state-value">${escapeHtml(statusText)}</span></p>`,
+  ];
+  if (vm.handle) {
+    rows.push(
+      `<p class="scan-state-row"><span class="scan-state-label">Controlled by</span><span class="scan-state-value">@${escapeHtml(vm.handle)}</span></p>`
+    );
+  }
+  const expiry = formatQrExpiryLabel(vm.qrExpiresAt);
+  if (expiry && vm.kind === "active") {
+    rows.push(
+      `<p class="scan-state-row"><span class="scan-state-label">Valid until</span><span class="scan-state-value">${escapeHtml(expiry)}</span></p>`
+    );
+  }
+  rows.push(
+    `<p class="scan-state-row scan-state-limits"><span class="scan-state-label">Limits</span><span class="scan-state-value">This does not prove ownership or legal identity.</span></p>`
+  );
+  return `<div class="scan-state-facts">${rows.join("")}</div>`;
+}
+
 function buildScanStatusPanelBody(
   vm: ScanViewModel,
   badgeClass: string,
@@ -211,14 +250,13 @@ ${scanStatusFoot("This page shows resolver state only.")}`;
     return `${head}
 <div class="scan-status-body">
   <div class="scan-status-main">
-    <p class="scan-status-eyebrow">Status plate</p>
+    <p class="scan-status-eyebrow">${escapeHtml(objectStateHeadline(vm))}</p>
     <h1 class="scan-status-title">${escapeHtml(display.objectLabel)}</h1>
-    <p class="scan-status-line">${escapeHtml(display.statusLine)}</p>
-    ${meta ? `<p class="scan-status-meta">${escapeHtml(meta)}</p>` : ""}
+    ${renderObjectStateFacts(vm, display.statusLine)}
   </div>
   ${qrBlock}
 </div>
-${scanStatusFoot("Scan shows current status for this place, not who owns the door.")}`;
+${scanStatusFoot("Scan shows current status for this place.")}`;
   }
 
   if (display.kind === "lost_item_relay") {
@@ -235,27 +273,18 @@ ${scanStatusFoot("Scan shows current status for this place, not who owns the doo
 ${scanStatusFoot("This scan does not prove who holds the item.")}`;
   }
 
-  const title = vm.manifestoLine
-    ? escapeHtml(vm.manifestoLine)
-    : vm.handle
-      ? `@${escapeHtml(vm.handle)}`
-      : "Signed public card";
-  const sub = vm.manifestoLine && vm.handle
-    ? `<p class="scan-status-meta">${escapeHtml(meta)}</p>`
-    : meta
-      ? `<p class="scan-status-meta">${escapeHtml(meta)}</p>`
-      : "";
+  const statusText = vm.manifestoLine || "Live on the network";
 
   return `${head}
 <div class="scan-status-body">
   <div class="scan-status-main">
-    <p class="scan-status-eyebrow">Public scan · not an ID</p>
-    <h1 class="scan-status-title">${title}</h1>
-    ${sub}
+    <p class="scan-status-eyebrow">${escapeHtml(objectStateHeadline(vm))}</p>
+    <h1 class="scan-status-title">${escapeHtml(statusText)}</h1>
+    ${renderObjectStateFacts(vm, vm.kind === "active" ? "Active" : vm.primaryBadge.label)}
   </div>
   ${qrBlock}
 </div>
-${scanStatusFoot("Scan shows live state. Holding the object does not prove ownership.")}`;
+${scanStatusFoot("Scan shows live object state.")}`;
 }
 
 function minimalScanHeadline(kind: ScanViewModel["kind"]): string {

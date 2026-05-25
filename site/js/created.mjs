@@ -16,6 +16,7 @@ import { initQrRotate } from "./created-qr-rotate.mjs";
 import { initQrExtend } from "./created-qr-extend.mjs";
 import { inferPilotTemplate } from "./manifesto-display.mjs";
 import { initCreatedTabs } from "./created-tabs.mjs";
+import { initCreatedDashboard } from "./created-dashboard.mjs";
 import { initCreatedDeviceSave } from "./created-device-save.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
 
@@ -102,13 +103,26 @@ const humanTrustLabelEl = document.getElementById("human-trust-label");
 const humanTrustSubEl = document.getElementById("human-trust-sub");
 const networkCardStatusEl = document.getElementById("network-card-status");
 const networkQrExpiresEl = document.getElementById("network-qr-expires");
+const dashboardMetaEl = document.getElementById("created-dashboard-meta");
 const jsonLink = document.getElementById("card-json-link");
 const revokeDetails = document.getElementById("revoke-details");
 const copyProfileIdBtn = document.getElementById("copy-profile-id");
 const statusPlateTipEl = document.getElementById("created-status-plate-tip");
 const lostItemTipEl = document.getElementById("created-lost-item-tip");
 
-let createdTabs = null;
+function updateDashboardMeta() {
+  if (!dashboardMetaEl) return;
+  const parts = [];
+  if (networkCardStatusEl?.textContent && networkCardStatusEl.textContent !== " - ") {
+    parts.push(`Card ${networkCardStatusEl.textContent.toLowerCase()}`);
+  }
+  if (networkQrExpiresEl?.textContent && networkQrExpiresEl.textContent !== " - ") {
+    parts.push(`QR valid until ${networkQrExpiresEl.textContent}`);
+  }
+  dashboardMetaEl.textContent = parts.length
+    ? parts.join(" · ")
+    : "Print the QR, test a scan, then save your control key on this device.";
+}
 let deviceSaveCtl = null;
 
 function revealOwnerActions() {
@@ -511,6 +525,7 @@ async function refreshNetworkStatus() {
   } catch {
     /* keep session copy if fetch fails */
   }
+  updateDashboardMeta();
 }
 
 if (networkQrExpiresEl) {
@@ -521,6 +536,7 @@ if (networkQrExpiresEl) {
     networkQrExpiresEl.textContent = " - ";
   }
 }
+updateDashboardMeta();
 
 if (activeScanUrl) {
   scanUrlEl.textContent = activeScanUrl;
@@ -731,6 +747,7 @@ async function bootstrapOwnerTools() {
 }
 
 createdTabs = initCreatedTabs();
+initCreatedDashboard({ selectTab: (id) => createdTabs?.select(id) });
 
 if (profileId && activeQrId) {
   deviceSaveCtl = initCreatedDeviceSave(loadSession);

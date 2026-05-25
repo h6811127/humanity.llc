@@ -646,6 +646,7 @@ button.device-hub-notice-banner {
   display: inline-flex;
   align-items: center;
   max-width: 100%;
+  margin: 0 6px 6px 0;
   padding: 4px 10px;
   border-radius: 999px;
   font-size: 11px;
@@ -655,6 +656,13 @@ button.device-hub-notice-banner {
   white-space: nowrap;
   background: rgba(120, 120, 128, 0.12);
   color: var(--shell-label-strong, #1c1c1e);
+}
+
+.device-hub-status-panel .device-hub-status-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
 }
 
 .device-hub-chip--network-ok {
@@ -692,40 +700,53 @@ button.device-hub-notice-banner {
 }
 
 .device-hub-section-title {
-  margin: 0 0 4px 4px;
-  font-size: 17px;
+  margin: 0 0 6px 4px;
+  font-size: 15px;
   font-weight: 650;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   color: var(--shell-label-strong, #1c1c1e);
 }
 
-.device-hub-section--secondary .device-hub-section-title {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--shell-label);
-}
-
-.device-hub-section-lead {
-  margin: 0 0 12px 4px;
-  font-size: 13px;
-  line-height: 1.45;
-  color: var(--shell-label);
-}
-
-.device-hub-section--secondary .device-hub-section-lead {
+.device-hub-section--secondary {
+  margin-top: 8px;
   margin-bottom: 8px;
+  padding-top: 12px;
+  border-top: 0.5px solid var(--shell-separator);
+}
+
+.device-hub-section--secondary .device-hub-section-title {
   font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--shell-label);
   opacity: 0.9;
 }
 
-.device-hub-subgroup-label {
-  margin: 0 0 8px 4px;
+.device-hub-section-lead {
+  margin: 0 0 10px 4px;
   font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  line-height: 1.45;
   color: var(--shell-label);
-  opacity: 0.88;
+  opacity: 0.92;
+}
+
+.device-hub-section--secondary .device-hub-section-lead {
+  display: none;
+}
+
+.device-hub-subgroup-label {
+  margin: 12px 0 6px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--shell-label);
+  opacity: 0.72;
+}
+
+.device-hub-section > .device-hub-group:first-of-type .device-hub-subgroup-label {
+  margin-top: 0;
 }
 
 .device-hub-section .device-hub-group {

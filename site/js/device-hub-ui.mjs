@@ -352,17 +352,24 @@ function renderActivityRows() {
         openActivityNow(entry);
       });
     } else {
-      li.className = "device-hub-action-item";
+      li.className = "wallet-activity-item device-hub-action-item";
       li.innerHTML = `
-        <button type="button" class="device-hub-action-btn">
-          <span class="device-hub-action-label">${escapeHtml(entry.label)}</span>
-          <span class="device-hub-action-meta">${escapeHtml(sub)}</span>
+        <button type="button" class="wallet-activity-btn device-hub-action-btn">
+          <span class="wallet-activity-label device-hub-action-label">${escapeHtml(entry.label)}</span>
+          <span class="wallet-activity-meta device-hub-action-meta">${escapeHtml(sub)}</span>
         </button>`;
       li.querySelector(".device-hub-action-btn")?.addEventListener("click", () => {
         openActivityNow(entry);
       });
     }
     activityList.appendChild(li);
+  }
+
+  if (!walletActivity && activityList) {
+    activityList.classList.add("wallet-activity-list", "device-hub-action-list");
+    activityList.removeAttribute("hidden");
+    activityList.setAttribute("aria-hidden", "false");
+    activityList.classList.remove("wallet-activity-list--empty");
   }
 }
 

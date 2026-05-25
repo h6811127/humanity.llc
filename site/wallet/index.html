@@ -19,7 +19,7 @@
       })();
     </script>
     <link rel="stylesheet" href="/styles.css?v=86" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=28" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=29" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=3" />
   </head>
   <body class="page-wallet has-shell-chrome">
@@ -123,9 +123,6 @@
               enterkeyhint="search"
             />
           </label>
-          <p class="device-hub-search-hint device-hub-privacy-hint">
-            This hub only stores things you choose to save. It does not track who scans your QR codes.
-          </p>
           <p class="device-hub-search-status" id="device-hub-search-status" hidden role="status"></p>
         </div>
 
@@ -136,7 +133,7 @@
         >
           <h3 class="device-hub-section-title" id="device-hub-saved-items-title">Saved items</h3>
           <p class="device-hub-section-lead">
-            Cards, keys, scans, and shortcuts stored in this browser.
+            Cards, pins, and shortcuts on this device. Does not track who scans your QR.
           </p>
 
         <div
@@ -144,7 +141,6 @@
           id="device-hub-saved-group"
           data-hub-group="saved"
         >
-          <p class="device-hub-subgroup-label">Cards</p>
           <ul class="hub-card-list" id="device-hub-wallet-list" hidden></ul>
           <p class="device-hub-section-empty" id="device-hub-saved-empty">
             Cards you save on this device will show here.

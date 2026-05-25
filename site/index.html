@@ -27,7 +27,7 @@
       })();
     </script>
     <link rel="stylesheet" href="/styles.css?v=86" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=28" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=29" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=3" />
     <meta property="og:title" content="humanity.llc" />
     <meta
@@ -137,9 +137,7 @@
           </div>
 
           <h2 class="device-hub-title" id="device-hub-title">On this device</h2>
-          <p class="device-hub-lead">
-            Personal to <strong>this browser</strong>, not your profile on the network.
-          </p>
+          <p class="device-hub-lead">Saved in this browser — cards, keys, and pins you choose to keep here.</p>
           <div id="device-keys-custody-hub"></div>
           <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint">
             Nothing saved yet? After create, tap <strong>Save on this device</strong> on
@@ -160,9 +158,6 @@
                 enterkeyhint="search"
               />
             </label>
-            <p class="device-hub-search-hint device-hub-privacy-hint">
-              This hub only stores things you choose to save. It does not track who scans your QR codes.
-            </p>
             <p class="device-hub-search-status" id="device-hub-search-status" hidden role="status"></p>
           </div>
 
@@ -173,7 +168,7 @@
           >
             <h3 class="device-hub-section-title" id="device-hub-saved-items-title">Saved items</h3>
             <p class="device-hub-section-lead">
-              Cards, keys, scans, and shortcuts stored in this browser.
+              Cards, pins, and shortcuts on this device. Does not track who scans your QR.
             </p>
 
           <div
@@ -181,7 +176,6 @@
             id="device-hub-saved-group"
             data-hub-group="saved"
           >
-            <p class="device-hub-subgroup-label">Cards</p>
             <ul class="hub-card-list" id="device-hub-wallet-list" hidden></ul>
             <p class="device-hub-section-empty" id="device-hub-saved-empty">
               Cards you save on this device will show here.

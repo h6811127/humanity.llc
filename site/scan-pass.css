@@ -1362,6 +1362,38 @@ body {
   color: var(--black);
 }
 
+.scan-state-facts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.scan-state-row {
+  display: flex;
+  gap: 10px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.scan-state-label {
+  flex: 0 0 6.5rem;
+  font-weight: 600;
+  color: rgba(60, 60, 67, 0.72);
+}
+
+.scan-state-value {
+  flex: 1;
+  color: var(--black);
+  word-break: break-word;
+}
+
+.scan-state-limits .scan-state-value {
+  color: rgba(60, 60, 67, 0.78);
+  font-size: 13px;
+}
+
 .scan-status-meta,
 .scan-status-sub {
   margin: 0;
