@@ -258,6 +258,14 @@ function openHubFromChrome() {
     location.href = "/";
     return;
   }
+  if (isWalletShellPage()) {
+    document.getElementById("device-hub-body")?.scrollTo({
+      top: 0,
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
+    });
+    hapticTap();
+    return;
+  }
   const open = hub.classList.contains("device-hub-collapsed");
   setHubExpanded(open, { haptic: true, persist: false });
 }
