@@ -24,6 +24,7 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 - **Install deps**: `npm install`
 - **Migrations**: `npm run worker:migrate:local` (idempotent, required before worker:dev)
 - **Tests**: `npm run worker:test` (Vitest, worker tests under `worker/tests/`)
+- **E2E**: `npm run e2e:install` once, then `npm run e2e` (Playwright; starts `pages:dev` unless `PLAYWRIGHT_SKIP_WEBSERVER=1`)
 - **Orphan purge**: Daily cron purges abandoned cards per `docs/CARD_RETENTION_AND_ORPHAN_CLEANUP.md`
 - **Landing desktop**: Wider two-column intro at ≥880px per `docs/LANDING_DESKTOP_LAYOUT.md`
 - **Build check**: `npm run build` (validates static site exists)

@@ -7,11 +7,13 @@ import {
 } from "../../site/js/device-counts-core.mjs";
 import {
   buildLiveControlProofHref,
+  classifyChallengeHttpStatus,
   formatLiveControlExpiry,
   isPollableWalletEntry,
   liveControlInboxChanged,
   liveControlPendingSignature,
   parsePendingChallengeBody,
+  summarizeLiveControlPoll,
 } from "../../site/js/device-live-control-inbox-core.mjs";
 import {
   isNetworkCacheFresh,
@@ -197,6 +199,48 @@ describe("tabNoticeCountFromState", () => {
   });
 });
 
+describe("classifyChallengeHttpStatus", () => {
+  it("maps 404 to none and 5xx to unreachable", () => {
+    expect(classifyChallengeHttpStatus(404)).toBe("none");
+    expect(classifyChallengeHttpStatus(200)).toBe("ok");
+    expect(classifyChallengeHttpStatus(503)).toBe("unreachable");
+  });
+});
+
+describe("summarizeLiveControlPoll", () => {
+  const item = {
+    entry: { profile_id: "p1", qr_id: "q1" },
+    challenge_id: "c1",
+    return_url: null,
+    owner_url: null,
+    expires_at: "",
+  };
+
+  it("returns ok when all polls succeed with no pending", () => {
+    expect(
+      summarizeLiveControlPoll(
+        [{ kind: "none" }, { kind: "none" }],
+        2
+      )
+    ).toEqual({ pending: [], health: "ok" });
+  });
+
+  it("returns degraded when some polls fail", () => {
+    const summary = summarizeLiveControlPoll(
+      [{ kind: "pending", item }, { kind: "unreachable" }],
+      2
+    );
+    expect(summary.pending).toHaveLength(1);
+    expect(summary.health).toBe("degraded");
+  });
+
+  it("returns offline when every poll fails", () => {
+    expect(
+      summarizeLiveControlPoll([{ kind: "unreachable" }], 1).health
+    ).toBe("offline");
+  });
+});
+
 describe("buildStatusSegmentsFromCounts", () => {
   it("includes live proof segment when count is positive", () => {
     const segments = buildStatusSegmentsFromCounts({
@@ -223,6 +267,21 @@ describe("buildStatusSegmentsFromCounts", () => {
     const notices = segments.find((s) => s.id === "notices");
     expect(notices?.label).toBe("Tab Keys Active");
     expect(notices?.highlight).toBe(true);
+  });
+
+  it("shows proof check limited when poll health is degraded", () => {
+    const segments = buildStatusSegmentsFromCounts({
+      network: "ok",
+      saved: 1,
+      pins: 0,
+      notices: 0,
+      liveProof: 0,
+      pollableSaved: 1,
+      liveProofPollHealth: "degraded",
+    });
+    expect(segments.find((s) => s.id === "liveproof")?.label).toBe(
+      "Proof Check Limited"
+    );
   });
 });
 

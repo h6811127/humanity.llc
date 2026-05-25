@@ -1,4 +1,38 @@
-/** @typedef {{ profile_id?: unknown, qr_id?: unknown }} WalletPollEntry */
+/** @typedef {'none' | 'pending' | 'unreachable'} LiveControlPollKind */
+
+/** @typedef {'ok' | 'degraded' | 'offline'} LiveControlPollHealth */
+
+/**
+ * @param {number} status HTTP status from challenge poll
+ */
+export function classifyChallengeHttpStatus(status) {
+  if (status === 404) return "none";
+  if (status >= 200 && status < 300) return "ok";
+  return "unreachable";
+}
+
+/**
+ * @param {Array<{ kind: LiveControlPollKind, item?: LiveControlPendingItem }>} results
+ * @param {number} pollableCount wallet rows that were polled
+ * @returns {{ pending: LiveControlPendingItem[], health: LiveControlPollHealth }}
+ */
+export function summarizeLiveControlPoll(results, pollableCount) {
+  const pending = results
+    .filter((r) => r.kind === "pending" && r.item)
+    .map((r) => r.item);
+  const unreachable = results.filter((r) => r.kind === "unreachable").length;
+
+  if (pollableCount === 0) {
+    return { pending, health: "ok" };
+  }
+  if (unreachable === pollableCount) {
+    return { pending, health: "offline" };
+  }
+  if (unreachable > 0) {
+    return { pending, health: "degraded" };
+  }
+  return { pending, health: "ok" };
+}
 
 /** @typedef {{
  *   entry: Record<string, unknown>,
@@ -7,6 +41,8 @@
  *   owner_url: string | null,
  *   expires_at: string,
  * }} LiveControlPendingItem */
+
+/** @typedef {{ profile_id?: unknown, qr_id?: unknown }} WalletPollEntry */
 
 /**
  * @param {WalletPollEntry | null | undefined} entry

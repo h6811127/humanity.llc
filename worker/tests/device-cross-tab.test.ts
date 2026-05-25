@@ -7,6 +7,9 @@ import {
 } from "../../site/js/device-notice-nav-logic.mjs";
 import {
   listOtherTabsWithKeys,
+  normalizePresenceMap,
+  capPresenceMap,
+  isValidPresenceProfileId,
   pruneStalePresence,
   PRESENCE_STALE_MS,
 } from "../../site/js/device-tab-presence-core.mjs";
@@ -35,30 +38,31 @@ describe("pruneStalePresence", () => {
 
 describe("listOtherTabsWithKeys", () => {
   const now = 100_000;
+  const validProfile = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 
-  it("excludes self, stale rows, and same profile as this tab", () => {
+  it("excludes self, stale rows, invalid profile ids, and same profile as this tab", () => {
     const map = {
-      self: { profile_id: "same", updatedAt: now },
-      other: { profile_id: "other", updatedAt: now, label: "B" },
-      stale: { profile_id: "gone", updatedAt: 0 },
-      same: { profile_id: "same", updatedAt: now },
+      self: { profile_id: validProfile, updatedAt: now },
+      other: { profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD6", updatedAt: now, label: "B" },
+      stale: { profile_id: validProfile, updatedAt: 0 },
+      same: { profile_id: validProfile, updatedAt: now },
+      bad: { profile_id: "not-valid!!!", updatedAt: now },
     };
     const { others } = listOtherTabsWithKeys({
       map,
       tabId: "self",
-      thisProfile: "same",
+      thisProfile: validProfile,
       now,
     });
     expect(others).toHaveLength(1);
     expect(others[0]?.tabId).toBe("other");
-    expect(others[0]?.profile_id).toBe("other");
   });
 
   it("sorts by updatedAt descending", () => {
     const map = {
-      self: { profile_id: "x", updatedAt: now },
-      a: { profile_id: "a", updatedAt: now - 1000 },
-      b: { profile_id: "b", updatedAt: now },
+      self: { profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5", updatedAt: now },
+      a: { profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD6", updatedAt: now - 1000 },
+      b: { profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD7", updatedAt: now },
     };
     const { others } = listOtherTabsWithKeys({
       map,
@@ -129,6 +133,39 @@ describe("resolveOtherTabKeysAction", () => {
         hasWalletEntry: true,
       })
     ).toEqual({ kind: "focus-then-open-wallet", needsConfirm: true });
+  });
+});
+
+describe("presence map hardening", () => {
+  it("validates profile_id shape", () => {
+    expect(isValidPresenceProfileId("7Xk9mP2nQ4rT6vW8yZ1aB3cD5")).toBe(true);
+    expect(isValidPresenceProfileId("bad id")).toBe(false);
+    expect(isValidPresenceProfileId("")).toBe(false);
+  });
+
+  it("drops invalid rows and caps entry count", () => {
+    const now = 100_000;
+    const map = {};
+    for (let i = 0; i < 25; i++) {
+      map[`t${i}`] = {
+        profile_id: `7Xk9mP2nQ4rT6vW8yZ1aB3c${String(i).padStart(2, "0")}`,
+        updatedAt: now - i,
+      };
+    }
+    map.bad = { profile_id: "!!!", updatedAt: now };
+    const normalized = normalizePresenceMap(map, now);
+    expect(Object.keys(normalized).length).toBeLessThanOrEqual(20);
+    expect(normalized.bad).toBeUndefined();
+  });
+
+  it("caps presence map to newest entries", () => {
+    const map = {
+      a: { profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5", updatedAt: 1 },
+      b: { profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD6", updatedAt: 3 },
+      c: { profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD7", updatedAt: 2 },
+    };
+    const capped = capPresenceMap(map, 2);
+    expect(Object.keys(capped)).toEqual(["b", "c"]);
   });
 });
 

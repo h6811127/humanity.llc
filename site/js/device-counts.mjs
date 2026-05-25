@@ -1,4 +1,5 @@
-import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
+import { getLiveControlPendingCount, getLiveControlPollHealth } from "./device-live-control-inbox.mjs";
+import { isPollableWalletEntry } from "./device-live-control-inbox-core.mjs";
 import {
   buildDeviceCountsLabel,
   buildStatusSegmentsFromCounts,
@@ -18,6 +19,10 @@ export function tabNoticeCount() {
   }
 }
 
+function pollableSavedCount() {
+  return loadWallet().filter((e) => isPollableWalletEntry(e)).length;
+}
+
 /**
  * @param {"ok"|"degraded"|"offline"} network
  */
@@ -28,6 +33,8 @@ export function buildStatusSegments(network = "offline") {
     pins: loadPins().length,
     notices: tabNoticeCount(),
     liveProof: getLiveControlPendingCount(),
+    pollableSaved: pollableSavedCount(),
+    liveProofPollHealth: getLiveControlPollHealth(),
   });
 }
 

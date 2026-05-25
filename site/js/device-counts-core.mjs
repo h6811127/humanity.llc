@@ -14,10 +14,20 @@ export function tabNoticeCountFromState(session, isSavedOnDevice) {
  *   pins: number,
  *   notices: number,
  *   liveProof: number,
+ *   pollableSaved?: number,
+ *   liveProofPollHealth?: "ok" | "degraded" | "offline",
  * }} input
  */
 export function buildStatusSegmentsFromCounts(input) {
-  const { network, saved, pins, notices, liveProof } = input;
+  const {
+    network,
+    saved,
+    pins,
+    notices,
+    liveProof,
+    pollableSaved = 0,
+    liveProofPollHealth = "ok",
+  } = input;
 
   const networkLabel =
     network === "ok"
@@ -68,6 +78,22 @@ export function buildStatusSegmentsFromCounts(input) {
       id: "liveproof",
       label: `${liveProof} Live Proof Waiting`,
       detail: `${liveProof} live proof request${liveProof === 1 ? "" : "s"} awaiting signature`,
+      zero: false,
+      highlight: true,
+    });
+  } else if (pollableSaved > 0 && liveProofPollHealth === "degraded") {
+    segments.push({
+      id: "liveproof",
+      label: "Proof Check Limited",
+      detail: "Could not reach the resolver for some saved cards",
+      zero: false,
+      highlight: true,
+    });
+  } else if (pollableSaved > 0 && liveProofPollHealth === "offline") {
+    segments.push({
+      id: "liveproof",
+      label: "Proof Check Offline",
+      detail: "Live proof inbox unavailable while resolver is unreachable",
       zero: false,
       highlight: true,
     });

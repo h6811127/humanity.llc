@@ -3,13 +3,15 @@
  * Signing stays on /created/  -  inbox only surfaces waiting requests.
  */
 import { getPendingLiveControlChallengeUrl } from "./hc-sign.mjs";
-import { activateWalletEntry, createdUrlForEntry } from "./device-keys.mjs";
+import { activateWalletEntry } from "./device-keys.mjs";
 import {
   buildLiveControlProofHref,
+  classifyChallengeHttpStatus,
   formatLiveControlExpiry,
   isPollableWalletEntry,
   liveControlInboxChanged,
   parsePendingChallengeBody,
+  summarizeLiveControlPoll,
 } from "./device-live-control-inbox-core.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 
@@ -17,6 +19,9 @@ const POLL_MS = 5000;
 
 /** @type {import("./device-live-control-inbox-core.mjs").LiveControlPendingItem[]} */
 let pending = [];
+
+/** @type {import("./device-live-control-inbox-core.mjs").LiveControlPollHealth} */
+let pollHealth = "ok";
 
 let pollTimer = null;
 
@@ -30,11 +35,17 @@ export function getLiveControlPendingCount() {
   return pending.length;
 }
 
+/** @returns {import("./device-live-control-inbox-core.mjs").LiveControlPollHealth} */
+export function getLiveControlPollHealth() {
+  return pollHealth;
+}
+
 /**
  * @param {Record<string, unknown>} entry
+ * @returns {Promise<{ kind: import("./device-live-control-inbox-core.mjs").LiveControlPollKind, item?: import("./device-live-control-inbox-core.mjs").LiveControlPendingItem }>}
  */
 async function fetchPendingForEntry(entry) {
-  if (!isPollableWalletEntry(entry)) return null;
+  if (!isPollableWalletEntry(entry)) return { kind: "none" };
 
   const profileId = entry.profile_id;
   const qrId = entry.qr_id;
@@ -43,20 +54,25 @@ async function fetchPendingForEntry(entry) {
     const res = await fetch(getPendingLiveControlChallengeUrl(profileId, qrId), {
       cache: "no-store",
     });
-    if (res.status === 404) return null;
-    if (!res.ok) return null;
+    const httpKind = classifyChallengeHttpStatus(res.status);
+    if (httpKind === "none") return { kind: "none" };
+    if (httpKind === "unreachable") return { kind: "unreachable" };
     const body = await res.json();
-    return parsePendingChallengeBody(body, entry);
+    const item = parsePendingChallengeBody(body, entry);
+    return item ? { kind: "pending", item } : { kind: "none" };
   } catch {
-    return null;
+    return { kind: "unreachable" };
   }
 }
 
 export async function refreshLiveControlInbox() {
   const entries = loadWallet().filter((e) => isPollableWalletEntry(e));
   const results = await Promise.all(entries.map(fetchPendingForEntry));
-  const next = results.filter(Boolean);
-  const changed = liveControlInboxChanged(pending, next);
+  const summary = summarizeLiveControlPoll(results, entries.length);
+  const next = summary.pending;
+  const prevHealth = pollHealth;
+  pollHealth = summary.health;
+  const changed = liveControlInboxChanged(pending, next) || prevHealth !== pollHealth;
   pending = next;
   if (changed) {
     window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
