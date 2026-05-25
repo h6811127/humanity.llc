@@ -1,10 +1,10 @@
 /**
  * Banner when signing keys are active in another tab on this device.
  */
-import { tabNoticeCount } from "./device-counts.mjs";
+import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { getTabSession } from "./device-keys.mjs";
-import { getOtherTabsWithKeys, requestFocusTab } from "./device-tab-presence.mjs";
 import { loadWallet } from "./device-wallet.mjs";
+import { actOnOtherTabKeys, walletEntryForProfile } from "./device-notice-nav.mjs";
 import { openCardNowPage } from "./device-keys.mjs";
 
 const banner = document.getElementById("device-cross-tab-banner");
@@ -24,13 +24,7 @@ function labelForPresence(entry) {
 }
 
 function shouldShowCrossTabNotice() {
-  const others = getOtherTabsWithKeys();
-  if (others.length === 0) return false;
-
-  const session = getTabSession();
-  const thisHasKeys = !!(session?.profile_id && session?.owner_private_key_b58);
-  if (!thisHasKeys) return true;
-  return others.some((o) => o.profile_id !== session.profile_id);
+  return getOtherTabsWithKeys().length > 0;
 }
 
 function crossTabMessage() {
@@ -49,24 +43,14 @@ function crossTabMessage() {
   };
 }
 
-function walletEntryForProfile(profileId) {
-  return loadWallet().find((e) => e.profile_id === profileId) ?? null;
-}
-
 function bindCrossTabAction(root, entry) {
   const btn = root.querySelector("[data-cross-tab-action]");
   if (!btn || !entry?.tabId) return;
 
   btn.addEventListener("click", (e) => {
     e.preventDefault();
-    const focused = requestFocusTab(entry.tabId);
-    if (!focused) {
-      btn.setAttribute("aria-live", "polite");
-      const sub = root.querySelector(".device-hub-notice-sub, .device-cross-tab-sub");
-      if (sub) {
-        sub.textContent =
-          "Could not switch tabs automatically — use your browser tab bar.";
-      }
+    if (!actOnOtherTabKeys(entry)) {
+      renderCrossTabKeysBanner();
     }
   });
 }
@@ -111,8 +95,8 @@ function renderHubCrossTabNotice() {
     <div class="device-hub-crosstab-card" data-hub-searchable="keys another tab">
       <button type="button" class="device-hub-notice-banner device-hub-notice-banner--info" data-cross-tab-action>
         <span class="device-hub-notice-title">Keys in another tab</span>
-        <span class="device-hub-notice-sub">${msg.label}${msg.extra} — tap to switch to that tab</span>
-        <span class="device-hub-notice-chevron" aria-hidden="true">↗</span>
+        <span class="device-hub-notice-sub">${msg.label}${msg.extra} — tap to open signing</span>
+        <span class="device-hub-notice-chevron" aria-hidden="true">›</span>
       </button>
       ${useKeysBtn}
     </div>`;
@@ -153,7 +137,7 @@ export function renderCrossTabKeysBanner() {
   banner.innerHTML = `
     <strong>Signing keys in another tab</strong>
     <span class="device-cross-tab-sub">${msg.label}${msg.extra}</span>
-    <button type="button" class="device-cross-tab-focus-btn" data-cross-tab-action>Switch to that tab</button>
+    <button type="button" class="device-cross-tab-focus-btn" data-cross-tab-action>Open signing</button>
     <span class="device-cross-tab-or">or</span>
     <a href="/wallet/">load keys from Saved cards</a>.`;
   bindCrossTabAction(banner, msg.primary);

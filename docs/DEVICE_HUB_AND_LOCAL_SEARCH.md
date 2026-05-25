@@ -20,7 +20,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Landing story (shipped):** Hero one-liner, a **four-step progress strip** (Create → Save → Print → Manage), **On this device** below the status line (inline search  -  no floating FAB), and a **New here?** help drawer. Homepage pass-card demo removed; strangers see real scan pages and the case study.
 
-**Landing desktop (shipped):** From **880px** on pointer-fine screens, `.page` widens to **760px** and the hero + progress strip sit in a **left column** beside the “Physical software objects” framing card. See [`LANDING_DESKTOP_LAYOUT.md`](LANDING_DESKTOP_LAYOUT.md).
+**Landing layout:** Mobile-first single column only (no desktop widening grid). See [`LANDING_DESKTOP_LAYOUT.md`](LANDING_DESKTOP_LAYOUT.md) for retired desktop experiment notes.
 
 **Status line (shipped):** Segmented grey text (`Network live · 2 saved · 0 pinned · 1 notice`). Hub open state in `sessionStorage`; first unsaved-tab notice auto-expands hub once. On **`/created/`**, hub auto-opens when this tab has signing keys and hub state was never set.
 
@@ -30,7 +30,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Landing focus mode:** `localStorage.hc_landing_focus` hides intro (`[data-landing-tutorial]`). Keeps **hub**, **hub glance**, **system banner** (if unhealthy), **Help & protocol** list (not full Documentation), and **contact**. No bottom Create dock or “New here?” float. **Auto-save** optional via `hc_auto_save_device` in hub shortcuts.
 
-**Shortcuts & settings (shipped):** Hub group sits **under the status row** on landing, `/create/`, `/created/`, and near the top on `/wallet/` (not duplicated on the landing hero — CTAs stay there). Settings in hub today: **Appearance** (`localStorage.hc_theme` = `light` | `dark`, pure `#000` page background in dark), **Focus mode** (landing only), **Auto-save** (landing + wallet). Future device-only ideas: match system appearance, reduce motion, live-proof browser notifications.
+**Shortcuts & settings (shipped):** On the **homepage** (`/`), **Shortcuts & settings** is a visible section under the progress strip (Appearance, browser alerts, saved cards, manage, auto-save, focus). Inside the hub sheet on `/create/`, `/created/`, and `/wallet/` the same controls stay **under the status row**. **Appearance** (`hc_theme`), **Browser alerts** (`hc_browser_notif` + Notification API for live proof when the tab is backgrounded), **Auto-save**, **Focus mode** (landing).
 
 **Hub glance (landing):** When the hub is collapsed, `#device-hub-glance` shows notice (if any) and up to three saved card labels; tap expands the hub. Quick-look popover rows use **light pastel** fills (red / blue / orange by notice type).
 

@@ -1,23 +1,23 @@
 # Landing desktop layout
 
-**Status:** Shipped  
-**Scope:** `/` (`site/index.html`) · `body.has-device-hub-search`  
+**Status:** Retired (mobile-only layout restored May 2026)  
+**Scope:** Was `/` (`site/index.html`) · `body.has-device-hub-search`  
 **Companion:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)
 
 ---
 
-## Problem
+## Problem (original)
 
-The site uses a **430px** centered `.page` column (mobile-first “device frame”). On desktop monitors this leaves large empty gutters and reads as a floating phone, not a product homepage.
+The site uses a **430px** centered `.page` column (mobile-first “device frame”). A desktop widening experiment caused inconsistent rendering on mobile Chrome; layout is **430px at all viewports** again.
 
 ---
 
-## Design (reference operator)
+## Design (retired)
 
 | Viewport | Behavior |
 |----------|----------|
-| **&lt; 880px** | Unchanged: `max-width: 430px`, optional phone border from 500px |
-| **≥ 880px** (`hover: hover` and `pointer: fine`) | Wider page (**760px**), softer frame, **two-column** intro in `main.screen-landing` |
+| **All** | `max-width: 430px`, optional phone border from 500px |
+| ~~**≥ 880px**~~ | ~~Removed: 760px grid, two-column hero~~ |
 
 ### Two-column intro (desktop only)
 

@@ -53,7 +53,15 @@ function syncThemeToggleButtons(theme) {
   document.querySelectorAll("[data-device-theme-toggle]").forEach((btn) => {
     if (!(btn instanceof HTMLButtonElement)) return;
     btn.setAttribute("aria-pressed", pref === "dark" ? "true" : "false");
-    btn.textContent = themeToggleLabel(pref);
+    const title = btn.querySelector(".list-title");
+    const sub = btn.querySelector(".list-sub");
+    if (title && sub) {
+      title.textContent = "Appearance";
+      sub.textContent =
+        pref === "dark" ? "Dark · OLED black" : "Light · default";
+    } else {
+      btn.textContent = themeToggleLabel(pref);
+    }
   });
 }
 

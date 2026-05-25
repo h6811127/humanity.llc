@@ -17,6 +17,7 @@ import {
 import "./device-shell-motion.mjs";
 import "./device-shell-chrome.mjs";
 import "./device-theme.mjs";
+import "./device-browser-notifications.mjs";
 import { isHubSheet, setHubSheetOpen } from "./device-hub-sheet.mjs";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 

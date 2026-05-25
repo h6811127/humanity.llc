@@ -217,6 +217,37 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   margin-bottom: 14px;
 }
 
+.device-hub-search-hint {
+  text-align: center;
+}
+
+.landing-device-settings {
+  margin: 20px 0 8px;
+}
+
+.landing-device-settings-title {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.device-hub-theme-row.list-action .landing-focus-toggle,
+.device-hub-notif-row.list-action .landing-focus-toggle {
+  width: 100%;
+  border-radius: 0;
+  background: transparent;
+  text-align: left;
+  color: var(--shell-label-strong);
+}
+
+.device-hub-theme-row.list-action .landing-focus-toggle[aria-pressed="true"],
+.device-hub-notif-row.list-action .landing-focus-toggle[aria-pressed="true"] {
+  background: transparent;
+}
+
 .device-hub-glance-help {
   display: flex;
   align-items: center;

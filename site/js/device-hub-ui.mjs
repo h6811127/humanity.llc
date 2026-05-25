@@ -13,6 +13,7 @@ import {
 import { applyDeviceHubSearch } from "./device-hub-search.mjs";
 import { initHubBackupImport } from "./device-hub-import.mjs";
 import { mountThemeToggles } from "./device-theme.mjs";
+import { openSaveKeysForThisTab } from "./device-notice-nav.mjs";
 import {
   activateWalletEntry,
   createdUrlForEntry,
@@ -294,8 +295,7 @@ function renderNoticeRow() {
       <span class="device-hub-notice-chevron" aria-hidden="true">›</span>
     </button>`;
     noticeGroup.querySelector("[data-hub-go-now-tab]")?.addEventListener("click", () => {
-      window.dispatchEvent(new CustomEvent("hc-hub-sheet-close"));
-      window.dispatchEvent(new CustomEvent("hc-created-go-now-tab"));
+      openSaveKeysForThisTab();
     });
     return;
   }

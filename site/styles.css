@@ -2757,60 +2757,6 @@ a.hub-card-menu-item {
   }
 }
 
-/* Landing desktop — see docs/LANDING_DESKTOP_LAYOUT.md */
-@media (min-width: 880px) and (hover: hover) and (pointer: fine) {
-  body.has-device-hub-search .page {
-    max-width: 760px;
-    margin-top: 24px;
-    margin-bottom: 24px;
-    border-color: rgba(60, 60, 67, 0.14);
-    border-radius: 24px;
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.04),
-      0 16px 48px rgba(0, 0, 0, 0.06);
-  }
-
-  body.has-device-hub-search .screen-landing {
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    column-gap: 36px;
-    row-gap: 28px;
-    align-items: start;
-  }
-
-  body.has-device-hub-search .screen-landing > .hero.hero-tight {
-    grid-column: 1;
-    grid-row: 1;
-    margin-top: 8px;
-  }
-
-  body.has-device-hub-search .screen-landing > .landing-progress {
-    grid-column: 1;
-    grid-row: 2;
-  }
-
-  body.has-device-hub-search .screen-landing > .landing-framing {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    align-self: start;
-    margin-top: 0;
-  }
-
-  body.has-device-hub-search .screen-landing > :not(.hero):not(.landing-progress):not(.landing-framing) {
-    grid-column: 1 / -1;
-  }
-
-  body.has-device-hub-search .hero-tight .hero-line,
-  body.has-device-hub-search .landing-story-hook,
-  body.has-device-hub-search .hero-tagline {
-    max-width: none;
-  }
-
-  body.has-device-hub-search .landing-progress-steps {
-    flex-wrap: wrap;
-  }
-}
-
 @media (hover: none) and (pointer: coarse) {
   .pass-tilt-wrap {
     animation: none;
@@ -3254,7 +3200,9 @@ body.landing-focus-mode .screen-landing {
 }
 
 .device-hub .list-action a,
-.device-hub .list-action button {
+.device-hub .list-action button,
+.landing-device-settings .list-action a,
+.landing-device-settings .list-action button {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -3263,7 +3211,8 @@ body.landing-focus-mode .screen-landing {
   text-decoration: none;
 }
 
-.device-hub .list-action button {
+.device-hub .list-action button,
+.landing-device-settings .list-action button {
   padding: 12px 14px;
   margin: 0;
   border: none;
@@ -3274,7 +3223,8 @@ body.landing-focus-mode .screen-landing {
   cursor: pointer;
 }
 
-.device-hub .list-action button:active {
+.device-hub .list-action button:active,
+.landing-device-settings .list-action button:active {
   background: rgba(219, 27, 67, 0.06);
 }
 
@@ -3282,12 +3232,14 @@ body.landing-focus-mode .screen-landing {
   width: 100%;
 }
 
-.device-hub .list-action .list-content {
+.device-hub .list-action .list-content,
+.landing-device-settings .list-action .list-content {
   flex: 1;
   min-width: 0;
 }
 
-.device-hub .list-action .list-title {
+.device-hub .list-action .list-title,
+.landing-device-settings .list-action .list-title {
   display: block;
   margin-bottom: 2px;
 }

@@ -4,7 +4,8 @@
 import { tabNoticeCount } from "./device-counts.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
-import { getOtherTabsWithKeys, requestFocusTab } from "./device-tab-presence.mjs";
+import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
+import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
 import {
   getCachedNetworkStatus,
   isRevokedSinceLastVisit,
@@ -70,7 +71,7 @@ function refreshGlanceTarget(target) {
   const liveProof = getLiveControlPendingCount();
   const session = getTabSession();
   const thisHasKeys = !!(session?.profile_id && session?.owner_private_key_b58);
-  const otherTabs = thisHasKeys || notices > 0 ? [] : getOtherTabsWithKeys();
+  const otherTabs = getOtherTabsWithKeys();
   const hasCards = entries.length > 0;
 
   if (!hasCards && notices === 0 && liveProof === 0 && otherTabs.length === 0) {
@@ -109,8 +110,10 @@ function refreshGlanceTarget(target) {
         <span class="device-hub-glance-sub">${escapeHtml(label)}${escapeHtml(extra)}</span>
       </button>`;
     li.querySelector("button")?.addEventListener("click", () => {
-      if (entry.tabId) requestFocusTab(entry.tabId);
-      expandHub(wallet ? "device-hub-crosstab-notice" : null);
+      if (!actOnOtherTabKeys(entry)) {
+        refreshHubGlance();
+        return;
+      }
     });
     list.appendChild(li);
   }
@@ -128,7 +131,7 @@ function refreshGlanceTarget(target) {
         <span class="device-hub-glance-sub">${escapeHtml(label)}</span>
       </button>`;
     li.querySelector("button")?.addEventListener("click", () => {
-      expandHub("device-hub-notice-group");
+      openSaveKeysForThisTab();
     });
     list.appendChild(li);
   }

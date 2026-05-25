@@ -18,9 +18,18 @@ export function initAutoSaveToggle() {
 
   function sync() {
     const on = isAutoSaveEnabled();
-    btn.textContent = on
-      ? "Auto-save on · new cards stay on this device"
-      : "Auto-save off · save after each create";
+    const title = btn.querySelector(".list-title");
+    const sub = btn.querySelector(".list-sub");
+    if (title && sub) {
+      title.textContent = "Auto-save";
+      sub.textContent = on
+        ? "On · new cards stay on this device"
+        : "Off · save after each create";
+    } else {
+      btn.textContent = on
+        ? "Auto-save on · new cards stay on this device"
+        : "Auto-save off · save after each create";
+    }
     btn.setAttribute("aria-pressed", on ? "true" : "false");
   }
 

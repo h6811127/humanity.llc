@@ -27,8 +27,8 @@
       })();
     </script>
     <link rel="stylesheet" href="/styles.css?v=86" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=25" />
-    <link rel="stylesheet" href="/css/theme-dark.css?v=1" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=26" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=2" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -131,112 +131,6 @@
               id="device-hub-status-panel"
               aria-label="System status"
             ></div>
-          </div>
-
-          <div
-            class="device-hub-group device-hub-group--shortcuts-top"
-            id="device-hub-shortcuts-group"
-            data-hub-group="shortcuts"
-          >
-            <p class="device-hub-group-label">Shortcuts &amp; settings</p>
-            <ul class="list list-compact">
-              <li class="list-row device-hub-theme-row" data-hub-searchable="dark mode appearance theme">
-                <button
-                  type="button"
-                  class="landing-focus-toggle device-theme-toggle"
-                  data-device-theme-toggle
-                  id="device-theme-toggle"
-                  aria-pressed="false"
-                >
-                  Appearance · light
-                </button>
-              </li>
-              <li
-                class="list-row list-action"
-                data-hub-searchable="saved cards keys store vouch"
-              >
-                <a href="/wallet/">
-                  <span class="list-icon list-icon-tone-trust" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                  </span>
-                  <span class="list-content">
-                    <span class="list-title">All saved cards</span>
-                    <span class="list-sub">Keys on this device</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </a>
-              </li>
-              <li
-                class="list-row list-action"
-                data-hub-searchable="revoke manage created update backup"
-              >
-                <a href="/created/">
-                  <span class="list-icon list-icon-tone-red" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
-                  </span>
-                  <span class="list-content">
-                    <span class="list-title">Revoke &amp; manage</span>
-                    <span class="list-sub">Update, revoke, backup</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </a>
-              </li>
-              <li
-                class="list-row list-action"
-                data-hub-searchable="shop sticker merch founding drop curiosity"
-              >
-                <a href="/shop/">
-                  <span class="list-icon list-icon-tone-gold" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                  </span>
-                  <span class="list-content">
-                    <span class="list-title">Founding sticker drop</span>
-                    <span class="list-sub">Tier 0 shop · merch does not verify</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </a>
-              </li>
-              <li
-                class="list-row list-action"
-                data-hub-searchable="studio blog building notes door plate"
-              >
-                <a href="/studio/">
-                  <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
-                  </span>
-                  <span class="list-content">
-                    <span class="list-title">Studio blog</span>
-                    <span class="list-sub">Building this site in public</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </a>
-              </li>
-              <li
-                class="list-row list-action"
-                data-hub-searchable="vouch attest human scan link"
-              >
-                <a href="/wallet/">
-                  <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                  </span>
-                  <span class="list-content">
-                    <span class="list-title">Vouch</span>
-                    <span class="list-sub">Load keys, open their scan</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </a>
-              </li>
-              <li class="list-row device-hub-focus-row" data-hub-searchable="auto save device keys">
-                <button type="button" class="landing-focus-toggle" id="device-auto-save-toggle">
-                  Auto-save off · save after each create
-                </button>
-              </li>
-              <li class="list-row device-hub-focus-row" data-hub-searchable="focus intro tutorial">
-                <button type="button" class="landing-focus-toggle" id="landing-focus-toggle">
-                  Hide intro · focus on this device
-                </button>
-              </li>
-            </ul>
           </div>
 
           <h2 class="device-hub-title" id="device-hub-title">On this device</h2>
@@ -398,6 +292,97 @@
             </li>
           </ol>
         </nav>
+
+        <section
+          class="landing-device-settings"
+          id="landing-device-settings"
+          aria-labelledby="landing-device-settings-title"
+        >
+          <h2 class="landing-device-settings-title" id="landing-device-settings-title">
+            Shortcuts &amp; settings
+          </h2>
+          <ul class="list list-compact">
+            <li class="list-row list-action device-hub-theme-row" data-hub-searchable="dark mode appearance theme">
+              <button
+                type="button"
+                class="landing-focus-toggle device-theme-toggle"
+                data-device-theme-toggle
+                id="device-theme-toggle"
+                aria-pressed="false"
+              >
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Appearance</span>
+                  <span class="list-sub">Light · OLED black available</span>
+                </span>
+              </button>
+            </li>
+            <li class="list-row list-action device-hub-notif-row" data-hub-searchable="browser notifications alerts">
+              <button
+                type="button"
+                class="landing-focus-toggle"
+                data-device-browser-notif-toggle
+                aria-pressed="false"
+              >
+                <span class="list-icon list-icon-tone-gold" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Browser alerts</span>
+                  <span class="list-sub">Live proof waiting · off</span>
+                </span>
+              </button>
+            </li>
+            <li class="list-row list-action" data-hub-searchable="saved cards keys store vouch">
+              <a href="/wallet/">
+                <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">All saved cards</span>
+                  <span class="list-sub">Keys on this device</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action" data-hub-searchable="revoke manage created update backup">
+              <a href="/created/">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Revoke &amp; manage</span>
+                  <span class="list-sub">Update, revoke, backup</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action device-hub-focus-row" data-hub-searchable="auto save device keys">
+              <button type="button" class="landing-focus-toggle" id="device-auto-save-toggle">
+                <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Auto-save</span>
+                  <span class="list-sub">Off · save after each create</span>
+                </span>
+              </button>
+            </li>
+            <li class="list-row list-action device-hub-focus-row" data-hub-searchable="focus intro tutorial">
+              <button type="button" class="landing-focus-toggle" id="landing-focus-toggle">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Focus mode</span>
+                  <span class="list-sub">Hide intro · hub-first</span>
+                </span>
+              </button>
+            </li>
+          </ul>
+        </section>
 
         <section class="landing-framing landing-framing--compact" aria-labelledby="framing-title" data-landing-tutorial>
           <h2 class="landing-framing-title" id="framing-title">Physical software objects</h2>

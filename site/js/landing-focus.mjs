@@ -27,7 +27,14 @@ function applyFocus() {
   if (docsFull) docsFull.hidden = on;
   if (docsFooter) docsFooter.hidden = !on;
   if (toggle) {
-    toggle.textContent = on ? "Show intro again" : "Hide intro · focus on this device";
+    const title = toggle.querySelector(".list-title");
+    const sub = toggle.querySelector(".list-sub");
+    if (title && sub) {
+      title.textContent = "Focus mode";
+      sub.textContent = on ? "On · show intro again" : "Off · hide intro, hub-first";
+    } else {
+      toggle.textContent = on ? "Show intro again" : "Hide intro · focus on this device";
+    }
     toggle.setAttribute("aria-pressed", on ? "true" : "false");
   }
 }

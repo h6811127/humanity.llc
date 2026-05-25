@@ -6,8 +6,9 @@ import { getTabSession } from "./device-keys.mjs";
 
 const PRESENCE_KEY = "hc_tab_keys_presence";
 const FOCUS_CHANNEL = "hc-tab-focus";
-const STALE_MS = 15000;
-const HEARTBEAT_MS = 5000;
+/** Stale entries hidden from UI (iOS suspends background tabs without pagehide). */
+const STALE_MS = 10000;
+const HEARTBEAT_MS = 4000;
 
 let heartbeatTimer = null;
 let focusChannel = null;
@@ -87,9 +88,12 @@ export function getOtherTabsWithKeys() {
   const tabId = getTabId();
   const map = readPresence();
   pruneStale(map);
+  const session = getTabSession();
+  const thisProfile = session?.profile_id ?? null;
   const others = [];
   for (const [id, entry] of Object.entries(map)) {
     if (id === tabId || !entry?.profile_id) continue;
+    if (thisProfile && entry.profile_id === thisProfile) continue;
     others.push({ tabId: id, ...entry });
   }
   others.sort((a, b) => b.updatedAt - a.updatedAt);
@@ -97,12 +101,7 @@ export function getOtherTabsWithKeys() {
 }
 
 export function crossTabNoticeCount() {
-  const others = getOtherTabsWithKeys();
-  if (others.length === 0) return 0;
-  const session = getTabSession();
-  const thisHasKeys = !!(session?.profile_id && session?.owner_private_key_b58);
-  if (!thisHasKeys) return others.length;
-  return others.filter((o) => o.profile_id !== session.profile_id).length;
+  return getOtherTabsWithKeys().length;
 }
 
 /** Ask another tab (same origin) to bring itself to the front. */
@@ -139,12 +138,25 @@ function bindFocusChannel() {
   }
 }
 
+function onVisibilityPresence() {
+  if (document.visibilityState === "hidden") {
+    clearTabKeysPresence();
+  } else {
+    syncTabKeysPresence();
+  }
+}
+
 export function startTabKeysPresence() {
   if (heartbeatTimer != null) return;
   bindFocusChannel();
   syncTabKeysPresence();
-  heartbeatTimer = window.setInterval(syncTabKeysPresence, HEARTBEAT_MS);
+  heartbeatTimer = window.setInterval(() => {
+    if (document.visibilityState === "visible") {
+      syncTabKeysPresence();
+    }
+  }, HEARTBEAT_MS);
   window.addEventListener("pagehide", clearTabKeysPresence);
+  window.addEventListener("visibilitychange", onVisibilityPresence);
   window.addEventListener("hc-device-hub-changed", syncTabKeysPresence);
   window.addEventListener("storage", (e) => {
     if (e.key === PRESENCE_KEY) {
