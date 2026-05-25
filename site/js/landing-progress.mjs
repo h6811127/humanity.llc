@@ -35,24 +35,21 @@ function applyProgressState() {
     step.classList.remove("is-next", "is-done");
   }
 
-  if (!hasWallet && !hasPins) {
+  if (!hasWallet) {
     steps[1]?.classList.add("is-next");
     return;
   }
 
-  if (hasWallet && !hasPins) {
-    steps[0]?.classList.add("is-done");
-    steps[1]?.classList.add("is-done");
-    steps[2]?.classList.add("is-next");
+  steps[0]?.classList.add("is-done");
+  steps[1]?.classList.add("is-done");
+
+  if (hasPins) {
+    steps[2]?.classList.add("is-done");
+    steps[3]?.classList.add("is-next");
     return;
   }
 
-  if (hasWallet && hasPins) {
-    steps[0]?.classList.add("is-done");
-    steps[1]?.classList.add("is-done");
-    steps[2]?.classList.add("is-done");
-    steps[3]?.classList.add("is-done");
-  }
+  steps[2]?.classList.add("is-next");
 }
 
 applyProgressState();
