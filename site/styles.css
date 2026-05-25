@@ -64,6 +64,11 @@ a {
   padding: 16px var(--pad) 8px;
 }
 
+/* Focused flows (e.g. /create/) — no app chrome; browser back is home */
+body.page-flow .page > main.screen {
+  padding-top: calc(12px + env(safe-area-inset-top, 0px));
+}
+
 .top-brand-row {
   display: inline-flex;
   align-items: center;

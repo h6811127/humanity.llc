@@ -44,6 +44,8 @@ Principles:
 2. **Hub as sheet**  -  `/`, `/wallet/`, `/created/` use `device-hub--sheet` + backdrop (`device-hub-sheet.mjs`).
 3. **Landing de-explain**  -  shorter hero + compact framing on `/` (more trimming possible).
 
+**Flow pages** (`/create/`, etc.) use `body.page-flow` with no header chrome  -  rely on the browser back gesture/button for home, not a floating dot or Create pill.
+
 ### Phase B  -  Object continuity (shipped v1)
 
 4. **Card open transition**  -  `navigateTo` / `openCardNowPage` use `document.startViewTransition` when available (hub, wallet, activity).

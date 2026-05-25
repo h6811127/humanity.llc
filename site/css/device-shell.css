@@ -59,8 +59,7 @@ body.has-shell-chrome .page {
   padding-top: var(--shell-chrome-h, 52px);
 }
 
-.top-chrome--float,
-.page > header.top {
+.top-chrome--float {
   position: fixed;
   top: 0;
   left: 50%;
@@ -198,11 +197,6 @@ body.has-shell-chrome .page {
 .top-brand--mark .pass-dot {
   width: 8px;
   height: 8px;
-}
-
-.page > header.top {
-  padding-top: calc(8px + env(safe-area-inset-top, 0px));
-  padding-bottom: 8px;
 }
 
 .device-hub-alerts-top {
