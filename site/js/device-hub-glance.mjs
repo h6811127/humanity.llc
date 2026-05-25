@@ -2,6 +2,7 @@
  * Compact hub summary: landing when sheet is collapsed; /wallet/ always when non-empty.
  */
 import { tabNoticeCount } from "./device-counts.mjs";
+import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
 import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
@@ -71,7 +72,10 @@ function refreshGlanceTarget(target) {
   const liveProof = getLiveControlPendingCount();
   const session = getTabSession();
   const thisHasKeys = !!(session?.profile_id && session?.owner_private_key_b58);
-  const otherTabs = getOtherTabsWithKeys();
+  const otherTabsRaw = getOtherTabsWithKeys();
+  const otherTabs = shouldShowCrossTabKeysNotice(otherTabsRaw.length, notices)
+    ? otherTabsRaw
+    : [];
   const hasCards = entries.length > 0;
 
   if (!hasCards && notices === 0 && liveProof === 0 && otherTabs.length === 0) {

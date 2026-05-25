@@ -83,7 +83,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 ### Phase 5  -  cross-tab keys (shipped)
 
 - **`device-tab-presence.mjs`** heartbeats which tabs hold signing keys (metadata only).
-- **`device-cross-tab-banner.mjs`** on landing and `/wallet/` when keys live in another tab.
+- **`device-cross-tab-banner.mjs`** on landing and `/wallet/` when keys live in another tab and this tab is not already showing the unsaved-keys notice.
 - Hub glance rows for cross-tab keys and live proof when collapsed.
 
 ### Optional hub polish (deferred)

@@ -2,13 +2,18 @@
  * Cross-tab heartbeat: which browser tabs currently hold signing keys (sessionStorage).
  * Stores only public metadata in localStorage  -  never private keys.
  */
+import { tabNoticeCount } from "./device-counts.mjs";
+import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs";
 import { getTabSession } from "./device-keys.mjs";
+import {
+  listOtherTabsWithKeys,
+  PRESENCE_HEARTBEAT_MS,
+  PRESENCE_STALE_MS,
+  pruneStalePresence,
+} from "./device-tab-presence-core.mjs";
 
 const PRESENCE_KEY = "hc_tab_keys_presence";
 const FOCUS_CHANNEL = "hc-tab-focus";
-/** Stale entries hidden from UI (iOS suspends background tabs without pagehide). */
-const STALE_MS = 10000;
-const HEARTBEAT_MS = 4000;
 
 let heartbeatTimer = null;
 let focusChannel = null;
@@ -25,7 +30,8 @@ function getTabId() {
 function readPresence() {
   try {
     const raw = localStorage.getItem(PRESENCE_KEY);
-    return raw ? JSON.parse(raw) : {};
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
   } catch {
     return {};
   }
@@ -35,19 +41,16 @@ function writePresence(map) {
   localStorage.setItem(PRESENCE_KEY, JSON.stringify(map));
 }
 
-function pruneStale(map) {
-  const now = Date.now();
-  for (const [id, entry] of Object.entries(map)) {
-    if (!entry?.updatedAt || now - entry.updatedAt > STALE_MS) {
-      delete map[id];
-    }
-  }
+function readPrunedPresence() {
+  const map = readPresence();
+  const changed = pruneStalePresence(map, Date.now(), PRESENCE_STALE_MS);
+  if (changed) writePresence(map);
+  return map;
 }
 
 export function syncTabKeysPresence() {
   const tabId = getTabId();
-  const map = readPresence();
-  pruneStale(map);
+  const map = readPrunedPresence();
   const session = getTabSession();
 
   if (session?.profile_id && session?.owner_private_key_b58) {
@@ -68,7 +71,7 @@ export function syncTabKeysPresence() {
 
 export function clearTabKeysPresence() {
   const tabId = getTabId();
-  const map = readPresence();
+  const map = readPrunedPresence();
   delete map[tabId];
   writePresence(map);
   window.dispatchEvent(new Event("hc-tab-presence-changed"));
@@ -86,22 +89,15 @@ export function clearTabKeysPresence() {
  */
 export function getOtherTabsWithKeys() {
   const tabId = getTabId();
-  const map = readPresence();
-  pruneStale(map);
+  const map = readPrunedPresence();
   const session = getTabSession();
   const thisProfile = session?.profile_id ?? null;
-  const others = [];
-  for (const [id, entry] of Object.entries(map)) {
-    if (id === tabId || !entry?.profile_id) continue;
-    if (thisProfile && entry.profile_id === thisProfile) continue;
-    others.push({ tabId: id, ...entry });
-  }
-  others.sort((a, b) => b.updatedAt - a.updatedAt);
-  return others;
+  return listOtherTabsWithKeys({ map, tabId, thisProfile }).others;
 }
 
 export function crossTabNoticeCount() {
-  return getOtherTabsWithKeys().length;
+  const others = getOtherTabsWithKeys();
+  return shouldShowCrossTabKeysNotice(others.length, tabNoticeCount()) ? others.length : 0;
 }
 
 /** Ask another tab (same origin) to bring itself to the front. */
@@ -146,6 +142,12 @@ function onVisibilityPresence() {
   }
 }
 
+function onPageShowPresence(ev) {
+  if (ev.persisted) {
+    syncTabKeysPresence();
+  }
+}
+
 export function startTabKeysPresence() {
   if (heartbeatTimer != null) return;
   bindFocusChannel();
@@ -154,8 +156,9 @@ export function startTabKeysPresence() {
     if (document.visibilityState === "visible") {
       syncTabKeysPresence();
     }
-  }, HEARTBEAT_MS);
+  }, PRESENCE_HEARTBEAT_MS);
   window.addEventListener("pagehide", clearTabKeysPresence);
+  window.addEventListener("pageshow", onPageShowPresence);
   window.addEventListener("visibilitychange", onVisibilityPresence);
   window.addEventListener("hc-device-hub-changed", syncTabKeysPresence);
   window.addEventListener("storage", (e) => {

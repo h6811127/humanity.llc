@@ -5,6 +5,9 @@ import { logDeviceActivity } from "./device-activity.mjs";
 import { isAutoSaveEnabled, initAutoSaveToggle } from "./device-auto-save.mjs";
 import { initDeviceHub, refreshDeviceHub } from "./device-hub-ui.mjs";
 import { getTabSession } from "./device-keys.mjs";
+import { tabNoticeCount } from "./device-counts.mjs";
+import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs";
+import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { createPinEntry, loadPins, savePins } from "./device-pins.mjs";
 import { mountKeysCustody } from "./device-keys-custody.mjs";
 import {
@@ -51,11 +54,19 @@ function refreshHelpVisibility() {
   helpDetails.hidden = loadWallet().length > 0;
 }
 
+function updateTabHint() {
+  if (!tabHint) return;
+  tabHint.hidden = !shouldShowCrossTabKeysNotice(
+    getOtherTabsWithKeys().length,
+    tabNoticeCount()
+  );
+}
+
 function updateContextBanners() {
   const session = getTabSession();
   const hasKeys = !!(session?.profile_id && session?.owner_private_key_b58);
 
-  if (tabHint) tabHint.hidden = hasKeys;
+  updateTabHint();
 
   if (!activeBanner || !activeText) return;
   if (!hasKeys) {
@@ -170,7 +181,9 @@ window.addEventListener("hc-device-hub-changed", () => {
 });
 
 window.addEventListener("storage", (e) => {
-  if (e.key === "hc_created") updateContextBanners();
+  if (e.key === "hc_created" || e.key === "hc_tab_keys_presence") updateContextBanners();
 });
+
+window.addEventListener("hc-tab-presence-changed", updateContextBanners);
 
 window.addEventListener("hc-auto-save-changed", refreshAutoSaveLine);

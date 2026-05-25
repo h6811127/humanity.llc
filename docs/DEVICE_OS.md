@@ -180,9 +180,9 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 ### Cross-tab keys (Phase 8)
 
-**Presence:** `localStorage` `hc_tab_keys_presence`  -  each tab heartbeats every 5s with `profile_id` / handle / label only (never private keys). Stale entries drop after 15s.
+**Presence:** `localStorage` `hc_tab_keys_presence`  -  each tab heartbeats every 4s while visible with `profile_id` / handle / label only (never private keys). Stale entries drop after 10s; pruned on read. Cleared when tab is hidden (`visibilitychange`) or `pagehide`; `pageshow` (bfcache) re-syncs.
 
-**Banner:** `#device-cross-tab-banner` on landing and `/wallet/` when another tab holds keys and this tab does not show the unsaved-keys notice row.
+**Banner:** `#device-cross-tab-banner` on landing and `/wallet/` when another tab holds keys **and** this tab does not show the unsaved-keys notice row (`tabNoticeCount === 0`). Tap focuses the other tab; navigates to `/created/` only when saved keys can be loaded into this tab (`Use keys here` / wallet path).
 
 **Glance:** Collapsed hub shows **Keys in another tab** and **N live proof waiting** rows.
 

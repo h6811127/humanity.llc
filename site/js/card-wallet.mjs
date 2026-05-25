@@ -9,7 +9,10 @@ import {
   pinHaystack,
   savePins,
 } from "./device-pins.mjs";
+import { tabNoticeCount } from "./device-counts.mjs";
+import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs";
 import { openCardNowPage, getTabSession } from "./device-keys.mjs";
+import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import {
   defaultWalletLabel,
   loadWallet,
@@ -219,7 +222,10 @@ function updateActiveBanner() {
   const hasKeys = !!(session?.profile_id && session?.owner_private_key_b58);
 
   if (tabHint) {
-    tabHint.hidden = hasKeys;
+    tabHint.hidden = !shouldShowCrossTabKeysNotice(
+      getOtherTabsWithKeys().length,
+      tabNoticeCount()
+    );
   }
 
   if (!activeBanner || !activeText) return;

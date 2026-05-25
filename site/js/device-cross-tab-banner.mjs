@@ -2,8 +2,8 @@
  * Banner when signing keys are active in another tab on this device.
  */
 import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
-import { getTabSession } from "./device-keys.mjs";
-import { loadWallet } from "./device-wallet.mjs";
+import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs";
+import { tabNoticeCount } from "./device-counts.mjs";
 import { actOnOtherTabKeys, walletEntryForProfile } from "./device-notice-nav.mjs";
 import { openCardNowPage } from "./device-keys.mjs";
 
@@ -24,7 +24,7 @@ function labelForPresence(entry) {
 }
 
 function shouldShowCrossTabNotice() {
-  return getOtherTabsWithKeys().length > 0;
+  return shouldShowCrossTabKeysNotice(getOtherTabsWithKeys().length, tabNoticeCount());
 }
 
 function crossTabMessage() {
