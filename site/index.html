@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=63" />
+    <link rel="stylesheet" href="/styles.css?v=64" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -27,35 +27,129 @@
   <body class="has-device-hub-search">
     <div class="page">
       <header class="top">
-        <a class="top-brand" href="/">
-          <span class="pass-dot" id="brand-status-dot" aria-hidden="true"></span>
-          <span>humanity.llc</span>
-        </a>
+        <div class="top-brand-row">
+          <button
+            type="button"
+            class="brand-status-dot-btn"
+            id="brand-status-dot-btn"
+            aria-label="Network and device status"
+            aria-expanded="false"
+            aria-controls="brand-status-popover"
+          >
+            <span class="pass-dot" id="brand-status-dot"></span>
+          </button>
+          <a class="top-brand" href="/">humanity.llc</a>
+        </div>
         <a class="top-create" href="/create/">Create</a>
       </header>
 
-      <div class="device-strip" id="device-strip" hidden>
-        <div class="device-strip-bar">
-          <button
-            type="button"
-            class="device-strip-toggle"
-            id="device-strip-toggle"
-            aria-expanded="false"
-            aria-controls="device-strip-panel"
-          >
-            <span class="device-strip-label" id="device-strip-label"></span>
-            <span class="device-strip-chevron" aria-hidden="true">›</span>
-          </button>
-          <a class="device-strip-wallet" href="/wallet/">Wallet</a>
-        </div>
-        <div class="device-strip-panel" id="device-strip-panel" hidden>
-          <ul class="device-strip-list" id="device-strip-saved"></ul>
-          <ul class="device-strip-list" id="device-strip-pins"></ul>
-          <p class="device-strip-foot">
-            <a href="#device-hub" id="device-strip-hub-link">On this device</a>
-          </p>
+      <div class="top-status" id="top-status">
+        <button
+          type="button"
+          class="device-status-summary"
+          id="device-status-summary"
+          aria-expanded="false"
+          aria-controls="device-hub"
+        >
+          <span id="device-status-text">Network live · 0 saved · 0 pinned · 0 notices</span>
+        </button>
+        <div
+          class="brand-status-popover"
+          id="brand-status-popover"
+          role="tooltip"
+          hidden
+        >
+          <p id="brand-status-popover-text"></p>
         </div>
       </div>
+
+      <section
+        class="device-hub device-hub-top device-hub-collapsed"
+        id="device-hub"
+        aria-labelledby="device-hub-title"
+      >
+        <div class="device-hub-body" id="device-hub-body">
+          <h2 class="device-hub-title" id="device-hub-title">On this device</h2>
+          <p class="device-hub-lead">
+            Personal to <strong>this browser</strong> — not your profile on the network.
+          </p>
+          <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint">
+            Nothing here yet? After create, use step <strong>Save</strong> on
+            <a href="/created/">/created/</a> — keys stay in this browser only.
+          </p>
+
+          <div
+            class="device-hub-group"
+            id="device-hub-saved-group"
+            hidden
+            data-hub-group="saved"
+          >
+            <p class="device-hub-group-label">Saved cards</p>
+            <ul class="list list-compact" id="device-hub-wallet-list"></ul>
+          </div>
+
+          <div
+            class="device-hub-group"
+            id="device-hub-pins-group"
+            hidden
+            data-hub-group="pins"
+          >
+            <p class="device-hub-group-label">Pinned scans</p>
+            <ul class="list list-compact" id="device-hub-pins-list"></ul>
+          </div>
+
+          <div class="device-hub-group" data-hub-group="shortcuts">
+            <p class="device-hub-group-label">Shortcuts</p>
+            <ul class="list list-compact">
+              <li
+                class="list-row list-action"
+                data-hub-searchable="saved cards keys store vouch"
+              >
+                <a href="/wallet/">
+                  <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">All saved cards</span>
+                    <span class="list-sub">Keys on this device</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </a>
+              </li>
+              <li
+                class="list-row list-action"
+                data-hub-searchable="revoke manage created update backup"
+              >
+                <a href="/created/">
+                  <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Revoke &amp; manage</span>
+                    <span class="list-sub">Update, revoke, backup</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </a>
+              </li>
+              <li
+                class="list-row list-action"
+                data-hub-searchable="vouch attest human scan link"
+              >
+                <a href="/wallet/">
+                  <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Vouch</span>
+                    <span class="list-sub">Load keys, open their scan</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
       <main class="screen screen-landing">
         <section class="hero hero-tight">
@@ -119,88 +213,6 @@
             </li>
           </ol>
         </nav>
-
-        <section class="device-hub" id="device-hub" aria-labelledby="device-hub-title">
-          <h2 class="device-hub-title" id="device-hub-title">On this device</h2>
-          <p class="device-hub-lead">
-            Personal to <strong>this browser</strong> — not your profile on the network.
-          </p>
-          <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint">
-            Nothing here yet? After create, use step <strong>Save</strong> on
-            <a href="/created/">/created/</a> — keys stay in this browser only.
-          </p>
-
-          <div
-            class="device-hub-group"
-            id="device-hub-saved-group"
-            hidden
-            data-hub-group="saved"
-          >
-            <p class="device-hub-group-label">Saved cards</p>
-            <ul class="list list-compact" id="device-hub-wallet-list"></ul>
-          </div>
-
-          <div
-            class="device-hub-group"
-            id="device-hub-pins-group"
-            hidden
-            data-hub-group="pins"
-          >
-            <p class="device-hub-group-label">Pinned scans</p>
-            <ul class="list list-compact" id="device-hub-pins-list"></ul>
-          </div>
-
-          <div class="device-hub-group" data-hub-group="shortcuts">
-            <p class="device-hub-group-label">Shortcuts</p>
-            <ul class="list list-compact">
-              <li
-                class="list-row list-action"
-                data-hub-searchable="saved cards wallet store keys vouch"
-              >
-                <a href="/wallet/">
-                  <span class="list-icon list-icon-tone-trust" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                  </span>
-                  <span class="list-content">
-                    <span class="list-title">Saved cards</span>
-                    <span class="list-sub">Store and load signing keys</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </a>
-              </li>
-              <li
-                class="list-row list-action"
-                data-hub-searchable="revoke manage created update backup"
-              >
-                <a href="/created/">
-                  <span class="list-icon list-icon-tone-red" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
-                  </span>
-                  <span class="list-content">
-                    <span class="list-title">Revoke &amp; manage</span>
-                    <span class="list-sub">Update, revoke, backup</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </a>
-              </li>
-              <li
-                class="list-row list-action"
-                data-hub-searchable="vouch attest human scan link"
-              >
-                <a href="/wallet/">
-                  <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                  </span>
-                  <span class="list-content">
-                    <span class="list-title">Vouch</span>
-                    <span class="list-sub">Load keys, open their scan</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </section>
 
         <section class="pass" id="card" aria-label="Network status preview">
           <p class="section-kicker">What someone sees when they scan</p>
@@ -680,7 +692,7 @@
         <p class="landing-help-more">
           <a href="/case-study/">See the full loop</a>
           ·
-          <a href="/wallet/">Saved cards</a>
+          <a href="/wallet/">All saved cards</a>
         </p>
         <button type="button" class="landing-help-dismiss" id="landing-help-dismiss">
           Hide for this session
@@ -754,8 +766,7 @@
     </nav>
     <script src="/js/pass-flip.js?v=1" defer></script>
     <script src="/js/pass-demo-revoke.js?v=1" defer></script>
-    <script src="/js/brand-status-dot.mjs?v=1" type="module"></script>
-    <script src="/js/device-strip.mjs?v=1" type="module"></script>
+    <script src="/js/device-status.mjs?v=2" type="module"></script>
     <script src="/js/landing-progress.mjs?v=1" type="module"></script>
     <script src="/js/landing-help.mjs?v=3" type="module"></script>
     <script src="/js/landing-device-hub.mjs?v=5" type="module"></script>

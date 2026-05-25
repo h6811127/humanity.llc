@@ -3,44 +3,51 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Saved cards · humanity.llc</title>
+    <title>Saved on this device · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=63" />
+    <link rel="stylesheet" href="/styles.css?v=64" />
   </head>
   <body class="has-device-hub-search">
     <div class="page">
       <header class="top">
-        <a class="top-brand" href="/">
-          <span class="pass-dot" id="brand-status-dot" aria-hidden="true"></span>
-          <span>humanity.llc</span>
-        </a>
+        <div class="top-brand-row">
+          <button
+            type="button"
+            class="brand-status-dot-btn"
+            id="brand-status-dot-btn"
+            aria-label="Network and device status"
+            aria-expanded="false"
+            aria-controls="brand-status-popover"
+          >
+            <span class="pass-dot" id="brand-status-dot"></span>
+          </button>
+          <a class="top-brand" href="/">humanity.llc</a>
+        </div>
         <a class="top-create" href="/create/">Create</a>
       </header>
 
-      <div class="device-strip" id="device-strip" hidden>
-        <div class="device-strip-bar">
-          <button
-            type="button"
-            class="device-strip-toggle"
-            id="device-strip-toggle"
-            aria-expanded="false"
-            aria-controls="device-strip-panel"
-          >
-            <span class="device-strip-label" id="device-strip-label"></span>
-            <span class="device-strip-chevron" aria-hidden="true">›</span>
-          </button>
-          <a class="device-strip-wallet" href="/wallet/" aria-current="page">Wallet</a>
-        </div>
-        <div class="device-strip-panel" id="device-strip-panel" hidden>
-          <ul class="device-strip-list" id="device-strip-saved"></ul>
-          <ul class="device-strip-list" id="device-strip-pins"></ul>
+      <div class="top-status" id="top-status">
+        <button
+          type="button"
+          class="device-status-summary device-status-summary--static"
+          id="device-status-summary"
+        >
+          <span id="device-status-text">Network live · 0 saved · 0 pinned · 0 notices</span>
+        </button>
+        <div
+          class="brand-status-popover"
+          id="brand-status-popover"
+          role="tooltip"
+          hidden
+        >
+          <p id="brand-status-popover-text"></p>
         </div>
       </div>
 
       <main class="screen screen-wallet screen-wallet-sleek">
         <header class="wallet-page-head">
-          <h1 class="wallet-page-title">Saved cards</h1>
-          <p class="wallet-page-tagline">This device only · never uploaded</p>
+          <h1 class="wallet-page-title">Saved on this device</h1>
+          <p class="wallet-page-tagline">Signing keys in this browser only · never uploaded</p>
         </header>
 
         <p class="wallet-strip-hint" id="wallet-tab-hint" hidden>
@@ -152,8 +159,7 @@
       </label>
     </div>
 
-    <script src="/js/brand-status-dot.mjs?v=1" type="module"></script>
-    <script src="/js/device-strip.mjs?v=1" type="module"></script>
+    <script src="/js/device-status.mjs?v=2" type="module"></script>
     <script type="module" src="/js/card-wallet.mjs?v=6"></script>
   </body>
 </html>

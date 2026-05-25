@@ -19,9 +19,11 @@ We kept the current landing funnel (hero create → pass demo → device hub →
 
 **Landing story (shipped):** Hero one-liner (`landing-story-hook`), a **five-step progress strip** (Create → Revoke) with the next step highlighted from `hc_wallet` / `hc_device_pins`, **On this device** above the pass demo, and a floating **New here?** pill (hidden once wallet or pins exist) that mirrors the same steps.
 
-**Compact device strip (shipped):** When wallet or pins exist, a bar under the header shows e.g. `2 saved · 1 pin` — tap to expand a quick list, **Wallet** opens `/wallet/`, **On this device** scrolls to the full hub on the landing page.
+**Status line (shipped):** Grey text under the header, always visible on landing and `/wallet/`, e.g. `Network live · 2 saved · 1 pinned · 1 notice`. **Notices** = keys in this tab not yet saved on device. Tap the line to expand/collapse **On this device** (landing); on `/wallet/` tap scrolls to the list.
 
-**Brand dot status (shipped):** The red logo dot on `top-brand` reflects **network** (`GET /.well-known/hc/v1/health`: red = ok, amber = degraded, grey = offline) and **this device** (bright red = saved keys, soft pulse = keys in tab not yet saved, muted red = no local keys). Hover for a short tooltip.
+**Brand dot (shipped):** Separate tap target beside the wordmark (works on mobile). Opens a short popover with the same status detail. Dot color: **network** (red/amber/grey from `GET /.well-known/hc/v1/health`) + **device** (pulse = unsaved tab keys).
+
+**Naming:** UI says **Saved on this device** / **All saved cards** — not “wallet”. URL stays `/wallet/` for compatibility.
 
 | Approach | Verdict |
 |----------|---------|
@@ -97,8 +99,7 @@ Returning users see their labels on the homepage; strangers still see the same s
 | `site/js/landing-device-hub.mjs` | Wallet + pin injection, FAB, search |
 | `site/js/landing-progress.mjs` | Progress strip next/done from local storage |
 | `site/js/landing-help.mjs` | Floating “New here?” for empty device storage |
-| `site/js/device-strip.mjs` | Header strip: counts, expand, wallet link |
-| `site/js/brand-status-dot.mjs` | Logo dot: network health + device key state |
+| `site/js/device-status.mjs` | Status line, dot popover, hub expand/collapse |
 | `site/js/device-counts.mjs` | Shared saved/pin count label |
 | `site/js/device-pins.mjs` | Parse, validate, dedupe, `hc_device_pins` |
 | `site/js/device-hub-search.mjs` | Shared filter over `[data-hub-searchable]` |
