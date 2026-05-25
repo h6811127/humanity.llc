@@ -1221,7 +1221,7 @@ a {
   }
 }
 
-/* —— iOS sheet environment (keep in sync with site/css/ios-system.css) —— */
+/* —— Scan shell environment (keep in sync with site/css/device-shell.css) —— */
 body {
   background: #f2f2f7;
 }

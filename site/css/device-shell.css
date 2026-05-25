@@ -1,74 +1,74 @@
 /**
- * iOS system utility layer — materials, rhythm, motion.
- * Loaded after styles.css on device-shell pages.
+ * Device shell layer — materials, rhythm, motion.
+ * Loaded after styles.css on hub / wallet / created pages.
  */
 
 :root {
-  --ios-bg: #f2f2f7;
-  --ios-chrome-bg: linear-gradient(
+  --shell-bg: #f2f2f7;
+  --shell-chrome-bg: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.52) 0%,
     rgba(242, 242, 247, 0.28) 100%
   );
-  --ios-chrome-blur: saturate(195%) blur(32px);
-  --ios-chrome-edge: rgba(60, 60, 67, 0.07);
-  --ios-bg-elevated: rgba(255, 255, 255, 0.68);
-  --ios-fill: rgba(255, 255, 255, 0.88);
-  --ios-fill-secondary: rgba(120, 120, 128, 0.1);
-  --ios-separator: rgba(60, 60, 67, 0.11);
-  --ios-label: rgba(60, 60, 67, 0.55);
-  --ios-label-strong: rgba(0, 0, 0, 0.88);
-  --ios-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
-  --ios-shadow-md: 0 12px 32px rgba(0, 0, 0, 0.1);
-  --ios-blur: saturate(195%) blur(28px);
-  --ios-spring: cubic-bezier(0.32, 0.72, 0, 1);
-  --ios-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
-  --ios-space-group: 28px;
-  --ios-space-section: 20px;
+  --shell-chrome-blur: saturate(195%) blur(32px);
+  --shell-chrome-edge: rgba(60, 60, 67, 0.07);
+  --shell-bg-elevated: rgba(255, 255, 255, 0.68);
+  --shell-fill: rgba(255, 255, 255, 0.88);
+  --shell-fill-secondary: rgba(120, 120, 128, 0.1);
+  --shell-separator: rgba(60, 60, 67, 0.11);
+  --shell-label: rgba(60, 60, 67, 0.55);
+  --shell-label-strong: rgba(0, 0, 0, 0.88);
+  --shell-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shell-shadow-md: 0 12px 32px rgba(0, 0, 0, 0.1);
+  --shell-blur: saturate(195%) blur(28px);
+  --shell-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --shell-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --shell-space-group: 28px;
+  --shell-space-section: 20px;
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   :root {
-    --ios-chrome-bg: rgba(242, 242, 247, 0.96);
-    --ios-bg-elevated: rgba(255, 255, 255, 0.96);
-    --ios-fill: #ffffff;
-    --ios-fill-secondary: rgba(120, 120, 128, 0.12);
+    --shell-chrome-bg: rgba(242, 242, 247, 0.96);
+    --shell-bg-elevated: rgba(255, 255, 255, 0.96);
+    --shell-fill: #ffffff;
+    --shell-fill-secondary: rgba(120, 120, 128, 0.12);
   }
 }
 
 @media (prefers-reduced-transparency: reduce) {
   :root {
-    --ios-chrome-bg: rgba(242, 242, 247, 0.97);
-    --ios-chrome-blur: none;
-    --ios-blur: none;
-    --ios-bg-elevated: rgba(255, 255, 255, 0.98);
-    --ios-fill: #ffffff;
-    --ios-fill-secondary: rgba(120, 120, 128, 0.12);
+    --shell-chrome-bg: rgba(242, 242, 247, 0.97);
+    --shell-chrome-blur: none;
+    --shell-blur: none;
+    --shell-bg-elevated: rgba(255, 255, 255, 0.98);
+    --shell-fill: #ffffff;
+    --shell-fill-secondary: rgba(120, 120, 128, 0.12);
   }
 }
 
 body {
-  background: var(--ios-bg);
-  color: var(--ios-label-strong);
+  background: var(--shell-bg);
+  color: var(--shell-label-strong);
 }
 
 .page {
   background: transparent;
 }
 
-/* Liquid Glass chrome — one layer, content shows through */
+/* Translucent chrome — one layer, content shows through */
 .top-chrome,
 .page > header.top {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: var(--ios-chrome-bg);
-  -webkit-backdrop-filter: var(--ios-chrome-blur);
-  backdrop-filter: var(--ios-chrome-blur);
-  border-bottom: 0.5px solid var(--ios-chrome-edge);
+  background: var(--shell-chrome-bg);
+  -webkit-backdrop-filter: var(--shell-chrome-blur);
+  backdrop-filter: var(--shell-chrome-blur);
+  border-bottom: 0.5px solid var(--shell-chrome-edge);
   transition:
-    background 0.45s var(--ios-ease),
-    border-color 0.35s var(--ios-ease);
+    background 0.45s var(--shell-ease),
+    border-color 0.35s var(--shell-ease);
 }
 
 .top-chrome {
@@ -107,13 +107,31 @@ body {
 }
 
 .top-chrome > .top {
-  padding-top: 12px;
-  padding-bottom: 6px;
+  padding-top: 8px;
+  padding-bottom: 4px;
+}
+
+.top-brand-row {
+  min-width: 0;
+}
+
+.top-brand--mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.top-brand--mark .pass-dot {
+  width: 8px;
+  height: 8px;
 }
 
 .page > header.top {
-  padding-top: calc(12px + env(safe-area-inset-top, 0px));
-  padding-bottom: 10px;
+  padding-top: calc(8px + env(safe-area-inset-top, 0px));
+  padding-bottom: 8px;
 }
 
 .top-create {
@@ -141,14 +159,14 @@ body {
   box-shadow: none;
   font-size: 13px;
   font-weight: 500;
-  color: var(--ios-label);
+  color: var(--shell-label);
   letter-spacing: -0.01em;
-  transition: color 0.25s var(--ios-ease);
+  transition: color 0.25s var(--shell-ease);
 }
 
 .device-status-summary[aria-expanded="true"] {
   background: transparent;
-  color: var(--ios-label-strong);
+  color: var(--shell-label-strong);
   box-shadow: none;
   font-weight: 600;
 }
@@ -160,10 +178,10 @@ body {
 
 .device-status-search-btn {
   border: none;
-  background: var(--ios-fill-secondary);
+  background: var(--shell-fill-secondary);
   box-shadow: none;
-  color: var(--ios-label-strong);
-  transition: transform 0.2s var(--ios-spring), background 0.2s var(--ios-ease);
+  color: var(--shell-label-strong);
+  transition: transform 0.2s var(--shell-spring), background 0.2s var(--shell-ease);
 }
 
 .device-status-search-btn:active {
@@ -172,33 +190,33 @@ body {
 }
 
 .device-status-chevron {
-  transition: transform 0.4s var(--ios-spring), color 0.25s var(--ios-ease);
+  transition: transform 0.4s var(--shell-spring), color 0.25s var(--shell-ease);
 }
 
 .brand-status-popover {
-  border: 0.5px solid var(--ios-separator);
-  background: var(--ios-bg-elevated);
-  -webkit-backdrop-filter: var(--ios-blur);
-  backdrop-filter: var(--ios-blur);
-  box-shadow: var(--ios-shadow-md);
+  border: 0.5px solid var(--shell-separator);
+  background: var(--shell-bg-elevated);
+  -webkit-backdrop-filter: var(--shell-blur);
+  backdrop-filter: var(--shell-blur);
+  box-shadow: var(--shell-shadow-md);
   border-radius: 16px;
 }
 
 .brand-status-sheet-row {
-  border-bottom-color: var(--ios-separator);
+  border-bottom-color: var(--shell-separator);
 }
 
 .brand-status-sheet-key {
   text-transform: none;
   letter-spacing: -0.01em;
   font-weight: 500;
-  color: var(--ios-label);
+  color: var(--shell-label);
 }
 
 .device-system-banner,
 .device-cross-tab-banner {
   border: none;
-  box-shadow: var(--ios-shadow-sm);
+  box-shadow: var(--shell-shadow-sm);
 }
 
 .device-system-banner {
@@ -217,14 +235,14 @@ body {
   letter-spacing: -0.02em;
   font-size: 15px;
   font-weight: 600;
-  color: var(--ios-label);
+  color: var(--shell-label);
   margin: 0 0 10px 4px;
 }
 
 .group-intro,
 .device-hub-lead,
 .hero-line-sub {
-  color: var(--ios-label);
+  color: var(--shell-label);
 }
 
 .hero h1,
@@ -234,24 +252,24 @@ body {
 }
 
 .hero-line {
-  color: var(--ios-label-strong);
+  color: var(--shell-label-strong);
   font-weight: 400;
 }
 
 /* Grouped lists — inset material, not outlined boxes */
 .list {
   border: none;
-  background: var(--ios-fill);
-  box-shadow: var(--ios-shadow-sm);
+  background: var(--shell-fill);
+  box-shadow: var(--shell-shadow-sm);
 }
 
 .list li {
-  border-bottom: 0.5px solid var(--ios-separator);
+  border-bottom: 0.5px solid var(--shell-separator);
 }
 
 .list-sub {
   font-weight: 400;
-  color: var(--ios-label);
+  color: var(--shell-label);
 }
 
 .list-title {
@@ -265,7 +283,7 @@ body {
 
 /* Device hub */
 .device-hub-group {
-  margin-bottom: var(--ios-space-group);
+  margin-bottom: var(--shell-space-group);
 }
 
 .device-hub-title {
@@ -273,37 +291,37 @@ body {
 }
 
 .device-hub-lead {
-  margin-bottom: var(--ios-space-section);
+  margin-bottom: var(--shell-space-section);
 }
 
 .device-hub-search-block {
-  margin-bottom: var(--ios-space-section);
+  margin-bottom: var(--shell-space-section);
 }
 
 .device-hub-search--inline {
   border: none;
-  background: var(--ios-fill);
-  box-shadow: var(--ios-shadow-sm);
-  transition: box-shadow 0.3s var(--ios-ease);
+  background: var(--shell-fill);
+  box-shadow: var(--shell-shadow-sm);
+  transition: box-shadow 0.3s var(--shell-ease);
 }
 
 .device-hub-search--inline:focus {
-  box-shadow: 0 0 0 3px rgba(219, 27, 67, 0.18), var(--ios-shadow-sm);
+  box-shadow: 0 0 0 3px rgba(219, 27, 67, 0.18), var(--shell-shadow-sm);
 }
 
 .device-hub-empty {
   border: none;
-  background: var(--ios-fill-secondary);
-  color: var(--ios-label);
+  background: var(--shell-fill-secondary);
+  color: var(--shell-label);
 }
 
 .hub-card-item {
   border: none;
-  background: var(--ios-fill);
-  box-shadow: var(--ios-shadow-sm);
+  background: var(--shell-fill);
+  box-shadow: var(--shell-shadow-sm);
   transition:
-    transform 0.35s var(--ios-spring),
-    box-shadow 0.35s var(--ios-ease);
+    transform 0.35s var(--shell-spring),
+    box-shadow 0.35s var(--shell-ease);
 }
 
 .hub-card-item:active {
@@ -327,15 +345,15 @@ button.hub-card-action.hub-use-keys {
 }
 
 .hub-card-menu-panel {
-  border: 0.5px solid var(--ios-separator);
-  box-shadow: var(--ios-shadow-md);
+  border: 0.5px solid var(--shell-separator);
+  box-shadow: var(--shell-shadow-md);
 }
 
 .device-hub-glance-btn {
   border: none;
-  background: var(--ios-fill);
-  box-shadow: var(--ios-shadow-sm);
-  transition: transform 0.3s var(--ios-spring);
+  background: var(--shell-fill);
+  box-shadow: var(--shell-shadow-sm);
+  transition: transform 0.3s var(--shell-spring);
 }
 
 .device-hub-glance-btn:active {
@@ -343,7 +361,7 @@ button.hub-card-action.hub-use-keys {
 }
 
 .device-hub-body {
-  transition: opacity 0.35s var(--ios-ease);
+  transition: opacity 0.35s var(--shell-ease);
 }
 
 .device-hub.device-hub-collapsed .device-hub-body {
@@ -358,7 +376,7 @@ button.hub-card-action.hub-use-keys {
 .btn-primary {
   border: none;
   box-shadow: 0 4px 16px rgba(219, 27, 67, 0.28);
-  transition: transform 0.25s var(--ios-spring), opacity 0.2s ease;
+  transition: transform 0.25s var(--shell-spring), opacity 0.2s ease;
 }
 
 .btn-primary:active {
@@ -369,7 +387,7 @@ button.hub-card-action.hub-use-keys {
 .landing-hero-btn-secondary {
   border: none;
   background: rgba(0, 0, 0, 0.06);
-  color: var(--ios-label-strong);
+  color: var(--shell-label-strong);
 }
 
 .landing-hero-btn-primary {
@@ -386,9 +404,9 @@ button.hub-card-action.hub-use-keys {
 
 .created-tab-btn {
   transition:
-    background 0.4s var(--ios-spring),
-    color 0.25s var(--ios-ease),
-    box-shadow 0.4s var(--ios-spring);
+    background 0.4s var(--shell-spring),
+    color 0.25s var(--shell-ease),
+    box-shadow 0.4s var(--shell-spring);
 }
 
 .created-tab-btn.is-active,
@@ -397,10 +415,10 @@ button.hub-card-action.hub-use-keys {
 }
 
 .created-tab-panel {
-  animation: ios-panel-in 0.4s var(--ios-spring) both;
+  animation: shell-panel-in 0.4s var(--shell-spring) both;
 }
 
-@keyframes ios-panel-in {
+@keyframes shell-panel-in {
   from {
     opacity: 0;
     transform: translateY(6px);
@@ -413,13 +431,13 @@ button.hub-card-action.hub-use-keys {
 
 .shop-product-card {
   border: none;
-  background: var(--ios-fill);
-  box-shadow: var(--ios-shadow-sm);
+  background: var(--shell-fill);
+  box-shadow: var(--shell-shadow-sm);
 }
 
 .shop-faq {
   border: none;
-  background: var(--ios-fill-secondary);
+  background: var(--shell-fill-secondary);
 }
 
 /* Reduce icon noise in hub shortcuts — keep color for state only */
@@ -427,7 +445,7 @@ button.hub-card-action.hub-use-keys {
   opacity: 0.92;
 }
 
-.ios-press-active {
+.shell-press-active {
   opacity: 0.88;
 }
 

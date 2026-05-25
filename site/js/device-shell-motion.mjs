@@ -1,5 +1,5 @@
 /**
- * iOS-grade motion: spring continuity, reduced-motion safe.
+ * Device shell motion — spring continuity, reduced-motion safe.
  */
 const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -36,8 +36,8 @@ function bindListPressFeedback() {
           ".list-action a, .list-action button, .device-activity-open, .hub-card-item"
         );
         if (!row || reduced) return;
-        row.classList.add("ios-press-active");
-        window.setTimeout(() => row.classList.remove("ios-press-active"), 220);
+        row.classList.add("shell-press-active");
+        window.setTimeout(() => row.classList.remove("shell-press-active"), 220);
       },
       true
     );

@@ -224,8 +224,8 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 | `site/js/device-hub-glance.mjs` | Collapsed-hub summary (landing) |
 | `site/wallet/index.html` | Saved cards device shell |
 | `site/js/device-status.mjs` | Status, banner, popover Help row |
-| `site/css/ios-system.css` | iOS materials, motion, system status chrome |
-| `docs/VISUAL_IOS_SYSTEM.md` | Visual / interaction philosophy |
+| `site/css/device-shell.css` | Shell materials, motion, system status chrome |
+| `docs/VISUAL_DEVICE_SHELL.md` | Visual / interaction philosophy + OSification roadmap |
 | `site/js/device-hub-ui.mjs` | Shared hub |
 | `site/js/landing-focus.mjs` | Focus mode toggle |
 | `site/index.html` | Glance + banner + docs split |

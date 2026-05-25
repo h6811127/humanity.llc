@@ -7,7 +7,7 @@ import { getTabSession } from "./device-keys.mjs";
 import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
-import "./ios-motion.mjs";
+import "./device-shell-motion.mjs";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 
 const HUB_OPEN_KEY = "hc_hub_open";

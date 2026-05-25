@@ -1,0 +1,61 @@
+# Visual system — device shell layer
+
+**Status:** Shipped on device-shell pages + scan bundle  
+**Load order:** `styles.css` → `css/device-shell.css`  
+**Motion:** `js/device-shell-motion.mjs` (imported from `device-status.mjs`)
+
+---
+
+## Design intent
+
+The product should feel like a **native system utility** — calm, layered, under-explained — not a dashboard or crypto admin panel.
+
+Principles:
+
+| Principle | Implementation |
+|-----------|----------------|
+| Materials over outlines | Grouped fills, hairline separators, soft elevation |
+| Translucency | Unified `top-chrome` bar; status row is inline text |
+| Weight over size | Section labels 15px semibold, not uppercase micro-labels |
+| System language | Status line: Resolver Online, N on Device, Tab Keys Active |
+| Motion continuity | Spring easing, hub expand fade, tab panel enter, press feedback |
+| Scan as sheet | `site/scan-pass.css` shell block → Worker bundle |
+
+---
+
+## Files
+
+| Path | Role |
+|------|------|
+| `site/css/device-shell.css` | Materials, typography, `top-chrome`, hub/created/shop overrides |
+| `site/js/device-shell-motion.mjs` | Hub open state, list press feedback |
+| `site/js/device-counts.mjs` | System status segment copy |
+| `site/scan-pass.css` | Scan page (run `npm run worker:bundle-scan` after edits) |
+
+---
+
+## Roadmap (OSification)
+
+### Phase A — Kill the “website header” (highest impact)
+
+1. **Scroll-edge chrome** — chrome stays `position: fixed`; content scrolls underneath with top padding; on scroll down, status row collapses (brand + Create only); scroll up restores. Removes the “floating slab” mental model.
+2. **Hub as sheet** — “On this device” opens a bottom sheet or full-screen overlay instead of expanding inline below the header. Header stays environmental; hub becomes a place.
+3. **Landing de-explain** — shorten hero/manifesto blocks; let status segments + card objects carry meaning.
+
+### Phase B — Object continuity
+
+4. **Card open transition** — tap saved card → `/created/` with expand-from-row (FLIP or View Transitions API).
+5. **Trust state morph** — dot / shield / revoke states animate between segments, not swap instantly.
+6. **Scan environments** — scan HTML as stacked trust layers (pass → limits → live control), not centered cards on a page.
+
+### Phase C — Native shell (optional)
+
+7. **WKWebView wrapper** — haptics on save / revoke / prove; safe-area owned by shell not CSS sticky hacks.
+
+---
+
+## Regenerate scan CSS in Worker
+
+```bash
+npm run worker:bundle-scan
+```
