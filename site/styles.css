@@ -3122,6 +3122,14 @@ body.landing-focus-mode .screen-landing {
   padding-left: 14px;
 }
 
+.device-hub-section-empty {
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(60, 60, 67, 0.52);
+  margin: 0;
+  padding: 4px 4px 10px 14px;
+}
+
 .device-hub-empty {
   font-size: 14px;
   line-height: 1.45;

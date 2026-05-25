@@ -22,8 +22,6 @@ const activeLink = document.getElementById("wallet-active-link");
 const tabHint = document.getElementById("wallet-tab-hint");
 const autoSaveLine = document.getElementById("wallet-auto-save-line");
 const helpDetails = document.getElementById("wallet-help-details");
-const pinsEmpty = document.getElementById("wallet-pins-empty");
-
 const pinForm = document.getElementById("pin-save-form");
 const pinLabel = document.getElementById("pin-save-label");
 const pinUrl = document.getElementById("pin-save-url");
@@ -50,12 +48,6 @@ function refreshHelpVisibility() {
   if (!helpDetails) return;
   const hasWallet = loadWallet().length > 0;
   helpDetails.hidden = hasWallet;
-}
-
-function updatePinsEmpty() {
-  if (!pinsEmpty) return;
-  const pins = loadPins();
-  pinsEmpty.hidden = pins.length > 0;
 }
 
 function updateContextBanners() {
@@ -146,7 +138,6 @@ if (pinForm) {
     if (pinLabel) pinLabel.value = "";
     setStatus(pinStatus, "Pinned on this device only.");
     refreshDeviceHub();
-    updatePinsEmpty();
   });
 }
 
@@ -165,11 +156,9 @@ initTabSave();
 refreshAutoSaveLine();
 updateContextBanners();
 refreshHelpVisibility();
-updatePinsEmpty();
 
 window.addEventListener("hc-device-hub-changed", () => {
   refreshHelpVisibility();
-  updatePinsEmpty();
   updateContextBanners();
   refreshAutoSaveLine();
 });

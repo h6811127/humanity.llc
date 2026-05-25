@@ -82,6 +82,26 @@ let searchStatus;
 let deviceHub;
 let emptyHint;
 let shortcutsGroup;
+let pinsEmptyEl;
+let savedEmptyEl;
+let activityEmptyEl;
+
+const HUB_SECTION_EMPTY = {
+  pins: "Your pinned scans will show here.",
+  saved: "Cards you save on this device will show here.",
+  activity: "Recent activity on this device will show here.",
+};
+
+function setHubSectionEmpty(group, list, emptyEl, isEmpty, message) {
+  if (!group) return;
+  group.hidden = false;
+  group.classList.toggle("device-hub-group--empty", isEmpty);
+  if (list) list.hidden = isEmpty;
+  if (emptyEl) {
+    emptyEl.textContent = message;
+    emptyEl.hidden = !isEmpty;
+  }
+}
 
 function scanUrlForEntry(entry) {
   if (entry.scan_url) return entry.scan_url;
@@ -288,11 +308,17 @@ function renderActivityRows() {
 
   activityList.innerHTML = "";
   if (entries.length === 0) {
-    activityGroup.hidden = true;
+    setHubSectionEmpty(
+      activityGroup,
+      activityList,
+      activityEmptyEl,
+      true,
+      HUB_SECTION_EMPTY.activity
+    );
     return;
   }
 
-  activityGroup.hidden = false;
+  setHubSectionEmpty(activityGroup, activityList, activityEmptyEl, false, "");
   for (const entry of entries) {
     const li = document.createElement("li");
     const hint = activityActionHint(entry);
@@ -324,11 +350,17 @@ function renderSavedRows() {
 
   savedList.innerHTML = "";
   if (entries.length === 0) {
-    savedGroup.hidden = true;
+    setHubSectionEmpty(
+      savedGroup,
+      savedList,
+      savedEmptyEl,
+      true,
+      HUB_SECTION_EMPTY.saved
+    );
     return;
   }
 
-  savedGroup.hidden = false;
+  setHubSectionEmpty(savedGroup, savedList, savedEmptyEl, false, "");
   for (const entry of entries) {
     const li = document.createElement("li");
     li.className = "hub-card-item";
@@ -447,11 +479,11 @@ function renderPinRows() {
 
   pinsList.innerHTML = "";
   if (pins.length === 0) {
-    pinsGroup.hidden = false;
+    setHubSectionEmpty(pinsGroup, pinsList, pinsEmptyEl, true, HUB_SECTION_EMPTY.pins);
     return;
   }
 
-  pinsGroup.hidden = false;
+  setHubSectionEmpty(pinsGroup, pinsList, pinsEmptyEl, false, "");
   for (const pin of pins) {
     const li = document.createElement("li");
     li.className = "list-row list-action device-pin-row";
@@ -527,6 +559,9 @@ function bindDom() {
   searchStatus = document.getElementById("device-hub-search-status");
   emptyHint = document.getElementById("device-hub-empty-hint");
   shortcutsGroup = document.getElementById("device-hub-shortcuts-group");
+  pinsEmptyEl = document.getElementById("device-hub-pins-empty");
+  savedEmptyEl = document.getElementById("device-hub-saved-empty");
+  activityEmptyEl = document.getElementById("device-hub-activity-empty");
 }
 
 export function refreshDeviceHub() {
