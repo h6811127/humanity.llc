@@ -75,8 +75,27 @@ export function notificationCount() {
   return tabNoticeCount() + getLiveControlPendingCount() + crossTabNoticeCount();
 }
 
+function isWalletShellPage() {
+  return document.body.classList.contains("device-shell-wallet");
+}
+
 export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
   if (!hub) return;
+  if (isWalletShellPage()) {
+    hub.classList.remove("device-hub-collapsed");
+    hub.setAttribute("aria-hidden", "false");
+    hub.removeAttribute("inert");
+    if (isHubSheet()) {
+      ensureWalletHubVisible();
+    }
+    if (dotBtn) dotBtn.setAttribute("aria-expanded", "true");
+    if (persist) {
+      sessionStorage.setItem(HUB_OPEN_KEY, "1");
+    }
+    if (haptic) hapticTap();
+    refreshHubGlance();
+    return;
+  }
   if (isHubSheet()) {
     setHubSheetOpen(open);
   } else {
@@ -242,8 +261,12 @@ function openHubFromChrome() {
 }
 
 if (hub) {
-  sessionStorage.setItem(HUB_OPEN_KEY, "0");
-  setHubExpanded(false, { persist: false });
+  if (isWalletShellPage()) {
+    setHubExpanded(true, { persist: false });
+  } else {
+    sessionStorage.setItem(HUB_OPEN_KEY, "0");
+    setHubExpanded(false, { persist: false });
+  }
   renderStatusKey();
 }
 
@@ -270,11 +293,19 @@ notifBtn?.addEventListener("click", (e) => {
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && hub && !hub.classList.contains("device-hub-collapsed")) {
+    if (isWalletShellPage()) {
+      location.href = "/";
+      return;
+    }
     setHubExpanded(false, { haptic: false });
   }
 });
 
 window.addEventListener("hc-hub-sheet-close", () => {
+  if (isWalletShellPage()) {
+    location.href = "/";
+    return;
+  }
   setHubExpanded(false, { haptic: false, persist: false });
 });
 

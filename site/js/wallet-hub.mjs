@@ -3,8 +3,9 @@
  */
 import { logDeviceActivity } from "./device-activity.mjs";
 import { isAutoSaveEnabled, initAutoSaveToggle } from "./device-auto-save.mjs";
+import { setHubExpanded } from "./device-status.mjs";
 import { initDeviceHub, refreshDeviceHub } from "./device-hub-ui.mjs";
-import { activateWalletEntry, createdUrlForEntry, getTabSession } from "./device-keys.mjs";
+import { getTabSession } from "./device-keys.mjs";
 import { createPinEntry, loadPins, savePins } from "./device-pins.mjs";
 import {
   defaultWalletLabel,
@@ -150,6 +151,8 @@ initDeviceHub({
   showEmptyHint: true,
   showLiveControlInbox: true,
 });
+
+setHubExpanded(true, { persist: false });
 
 initAutoSaveToggle();
 initTabSave();
