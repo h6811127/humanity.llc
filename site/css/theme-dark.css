@@ -176,6 +176,19 @@ html[data-theme="dark"] .hc-notice--info .hc-notice-icon {
   color: #0a84ff;
 }
 
+html[data-theme="dark"] .hub-card-status-alert {
+  background: rgba(28, 28, 30, 0.96);
+  border-color: rgba(255, 69, 58, 0.45);
+}
+
+html[data-theme="dark"] .hub-card-status-alert-text {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .hub-card-details-body {
+  color: var(--shell-label);
+}
+
 html[data-theme="dark"] .hc-notice-title,
 html[data-theme="dark"] .hc-notice-body,
 html[data-theme="dark"] .hc-notice-foot,

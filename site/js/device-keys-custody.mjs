@@ -2,7 +2,7 @@
  * Shared copy for where signing keys live (tab vs saved on device).
  */
 
-import { HC_CAUTION_ICON } from "./hc-notice-icons.mjs";
+import { HC_CAUTION_ICON, HC_INFO_ICON } from "./hc-notice-icons.mjs";
 
 /** @typedef {'hub' | 'wallet' | 'created' | 'compact'} CustodyVariant */
 
@@ -49,13 +49,12 @@ export function keysCustodyHtml(variant, opts = {}) {
 
   if (variant === "hub") {
     return `
-      <div class="hc-notice hc-notice--warning device-keys-custody device-keys-custody--hub" role="note">
-        <span class="hc-notice-icon">${HC_CAUTION_ICON}</span>
+      <div class="hc-notice hc-notice--info device-keys-custody device-keys-custody--hub" role="note">
+        <span class="hc-notice-icon">${HC_INFO_ICON}</span>
         <div class="hc-notice-content">
-          <p class="hc-notice-title">Keys control your card</p>
+          <p class="hc-notice-title">Your browser holds the private key</p>
           <p class="hc-notice-body">
-            Revoke, update, and live proof need the <strong>private key</strong> in this browser. The network never holds it.
-            <a href="${escapeHtml(learnHref)}">How keys work</a>
+            This lets you update, revoke, and prove control. The network never receives it.
           </p>
         </div>
       </div>`;
@@ -79,15 +78,13 @@ export function keysCustodyHtml(variant, opts = {}) {
 
   if (variant === "wallet") {
     return `
-      <div class="hc-notice hc-notice--warning device-keys-custody device-keys-custody--wallet" role="note">
-        <span class="hc-notice-icon">${HC_CAUTION_ICON}</span>
+      <div class="hc-notice hc-notice--info device-keys-custody device-keys-custody--wallet" role="note">
+        <span class="hc-notice-icon">${HC_INFO_ICON}</span>
         <div class="hc-notice-content">
-          <p class="hc-notice-title">Your signing keys</p>
+          <p class="hc-notice-title">Your browser holds the private key</p>
           <p class="hc-notice-body">
-            Cards here are stored only in <strong>this browser</strong>. humanity.llc does not hold your private keys.
+            This lets you update, revoke, and prove control. The network never receives it.
           </p>
-          ${tiersDl}
-          ${networkNote}
           ${foot}
         </div>
       </div>`;

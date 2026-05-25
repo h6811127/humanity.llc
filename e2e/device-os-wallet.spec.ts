@@ -22,12 +22,12 @@ test.describe("device OS wallet flow", () => {
     }, SAMPLE_WALLET_ENTRY);
   });
 
-  test("shows saved card and Use keys opens /created/ with session keys", async ({
+  test("shows saved card and Control card opens /created/ with session keys", async ({
     page,
   }) => {
     await page.goto("/wallet/");
     await expect(page.getByText("E2E Test Card")).toBeVisible();
-    await page.getByRole("button", { name: "Use keys" }).click();
+    await page.getByRole("button", { name: "Control card" }).click();
     await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
     const sessionRaw = await page.evaluate(() => sessionStorage.getItem("hc_created"));
     expect(sessionRaw).toContain("privkeyfortestonlyxxxxxxxxx");

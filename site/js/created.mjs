@@ -417,7 +417,7 @@ if (!profileId && !activeQrId && !data) {
   profileIdParam !== data.profile_id
 ) {
   setNoSessionNotice(
-    'This link is for a different card than the keys in this tab. Open <a href="/wallet/">Saved cards</a> and tap <strong>Use keys</strong> on the card you want.'
+    'This link is for a different card than the keys in this tab. Open <a href="/wallet/">Saved cards</a> and tap <strong>Control card</strong> on the card you want.'
   );
 }
 

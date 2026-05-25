@@ -25,6 +25,8 @@ import { loadPins, pinHaystack } from "./device-pins.mjs";
 import {
   loadWallet,
   saveWallet,
+  formatSavedAt,
+  walletEntryKeyPreview,
   walletEntrySubtitle,
 } from "./device-wallet.mjs";
 import {
@@ -127,6 +129,37 @@ function setHubSectionEmpty(group, list, emptyEl, isEmpty, message) {
     emptyEl.textContent = message;
     emptyEl.hidden = !isEmpty;
   }
+}
+
+function hubCardSubHtml(entry, lastUsed) {
+  const savedLabel = formatSavedAt(entry.saved_at) || lastUsed;
+  const keyPreview = walletEntryKeyPreview(entry);
+  const handle = entry.handle ? `@${entry.handle}` : "";
+  const idPreview =
+    entry.profile_id && entry.handle ? `${entry.profile_id.slice(0, 10)}…` : "";
+
+  const detailParts = [];
+  if (keyPreview) detailParts.push(`Key: ${escapeHtml(keyPreview)}`);
+  if (handle) detailParts.push(escapeHtml(handle));
+  if (idPreview) detailParts.push(escapeHtml(idPreview));
+
+  if (!savedLabel && detailParts.length === 0) {
+    return `<span class="list-sub">${escapeHtml(walletEntrySubtitle(entry))}</span>`;
+  }
+
+  const lines = [];
+  if (savedLabel) {
+    lines.push(
+      `<span class="hub-card-sub-line">Last saved: ${escapeHtml(savedLabel)}</span>`
+    );
+  }
+  if (detailParts.length > 0) {
+    lines.push(
+      `<details class="hub-card-details"><summary class="hub-card-details-summary">Details</summary><span class="hub-card-details-body">${detailParts.join("<br>")}</span></details>`
+    );
+  }
+
+  return `<span class="list-sub hub-card-sub">${lines.join("")}</span>`;
 }
 
 function scanUrlForEntry(entry) {
@@ -400,9 +433,7 @@ function renderSavedRows() {
     li.className = "hub-card-item";
     li.dataset.hubSearchable = walletHaystack(entry);
     li.dataset.profileId = entry.profile_id;
-    const sub = walletEntrySubtitle(entry);
     const lastUsed = lastActivityForEntry(entry);
-    const subLine = lastUsed ? `${sub} · Last on device ${lastUsed}` : sub;
     const scan = scanUrlForEntry(entry);
     const manage = createdUrlForEntry(entry);
     const netChip = hubConfig.fetchNetworkStatus
@@ -410,8 +441,11 @@ function renderSavedRows() {
       : "";
     const revokedAlert = hubConfig.fetchNetworkStatus
       ? `<div class="hub-card-status-alert" data-hub-searchable="revoked since last visit network" hidden role="status">
-          <p class="hub-card-status-alert-text">Revoked on the network since your last visit.</p>
-          <button type="button" class="hub-card-alert-dismiss">Got it</button>
+          <p class="hub-card-status-alert-text">Network status changed: revoked since last visit.</p>
+          <div class="hub-card-status-alert-actions">
+            <button type="button" class="hub-card-alert-dismiss">Got it</button>
+            <a class="hub-card-alert-view-scan" href="${escapeHtml(scan)}" target="_blank" rel="noopener noreferrer">View scan</a>
+          </div>
         </div>`
       : "";
 
@@ -432,7 +466,7 @@ function renderSavedRows() {
         </span>
         <span class="list-content">
           <span class="list-title">${escapeHtml(entry.label)}</span>
-          <span class="list-sub">${escapeHtml(subLine)}</span>
+          ${hubCardSubHtml(entry, lastUsed)}
         </span>
         <div class="hub-card-head-meta">
           ${netChip}
@@ -442,7 +476,7 @@ function renderSavedRows() {
       ${revokedAlert}
       <div class="hub-card-actions">
         <div class="hub-card-actions-primary">
-          <button type="button" class="hub-card-action hub-use-keys" data-id="${escapeHtml(entry.id)}">Use keys</button>
+          <button type="button" class="hub-card-action hub-use-keys" data-id="${escapeHtml(entry.id)}">Control card</button>
           <a class="hub-card-action hub-open-scan" href="${escapeHtml(scan)}" target="_blank" rel="noopener noreferrer">Open scan</a>
         </div>
       </div>`;

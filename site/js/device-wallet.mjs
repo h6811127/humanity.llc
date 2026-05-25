@@ -55,6 +55,31 @@ export function walletEntrySubtitle(entry) {
   return parts.join(" · ") || "Saved card";
 }
 
+/** @param {string} iso */
+export function formatSavedAt(iso) {
+  try {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return "";
+    return d
+      .toLocaleString(undefined, {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      })
+      .replace(/\s+at\s+/i, ", ");
+  } catch {
+    return "";
+  }
+}
+
+/** @param {{ owner_public_key_b58?: string, profile_id?: string }} entry */
+export function walletEntryKeyPreview(entry) {
+  const raw = entry.owner_public_key_b58 || entry.profile_id;
+  if (!raw) return "";
+  return raw.length > 9 ? `${raw.slice(0, 8)}…` : raw;
+}
+
 export function defaultWalletLabel(session) {
   return session?.handle ? `@${session.handle}` : session?.profile_id?.slice(0, 12) || "Saved card";
 }
