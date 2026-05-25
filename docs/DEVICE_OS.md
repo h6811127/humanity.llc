@@ -112,7 +112,7 @@ Same chrome on **landing**, **`/created/`**, and **`/wallet/`**:
 ### `/wallet/` (saved page)
 
 - Same status chrome as landing (shield, search, system banner, expandable hub  -  **expanded by default**).
-- Shared `device-hub-ui.mjs`: saved rows with **live network chip**, **revoked since last visit** alert, **Last on device** from activity, **Manage** in ⋯ menu.
+- Shared `device-hub-ui.mjs`: saved rows with **live network chip** (`scan.kind`-aware: Card disabled / QR revoked / active), **card disabled since last visit** alert, **Last on device** from activity, **Manage** in ⋯ menu.
 - Tab save strip, pin add form, auto-save toggle, activity, backup import.
 - **How this works** hidden when any card is saved.
 
@@ -200,11 +200,11 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 **Not in inbox:** Pins (no keys), saved rows without `qr_id`, signing (stays on `/created/`).
 
-### Revoked since last visit (Phase 6)
+### Card disabled since last visit (Phase 6)
 
 **Storage:** `localStorage` key `hc_wallet_last_seen_network`  -  map of `profile_id` → last recorded **alert baseline** (`active` or `card_revoked`). Legacy `revoked` values are treated as acknowledged `card_revoked`.
 
-**When:** On fetch, if last seen ≠ `card_revoked` and resolver now reports **`scan.kind === card_revoked`**, show alert on the saved row and highlight in hub glance. QR-only revoke (`qr_revoked`) does not trigger this alert.
+**When:** On fetch, if last seen ≠ `card_revoked` and resolver now reports **`scan.kind === card_revoked`**, show alert on the saved row and highlight in hub glance. Banner copy: **Card disabled on the network since your last visit.** Chip label: **Card disabled**. QR-only revoke (`qr_revoked`) updates the chip to **QR revoked** but does not trigger this alert.
 
 **Cache:** Session cache (~5 min, `sessionStorage.hc_wallet_network_cache`, includes `scanKind`) is bypassed when it says `card_revoked` but the device baseline still says non-revoked — the hub re-fetches from the resolver before showing the alert. A fresh non-revoked fetch always updates the baseline (self-heal).
 

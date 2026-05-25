@@ -142,6 +142,14 @@ describe("networkStatusChip", () => {
       label: "Sync Checking…",
       tone: "muted",
     });
+    expect(networkStatusChip("active", "card_revoked")).toEqual({
+      label: "Card disabled",
+      tone: "warn",
+    });
+    expect(networkStatusChip("active", "qr_revoked")).toEqual({
+      label: "QR revoked",
+      tone: "warn",
+    });
   });
 });
 

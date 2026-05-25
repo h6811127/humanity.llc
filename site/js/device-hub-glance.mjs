@@ -11,6 +11,7 @@ import {
   getCachedNetworkAlertState,
   isRevokedSinceLastVisit,
 } from "./device-wallet-network.mjs";
+import { CARD_DISABLED_SINCE_VISIT_GLANCE_SUFFIX } from "./wallet-network-baseline.mjs";
 import { loadWallet, walletEntrySubtitle } from "./device-wallet.mjs";
 
 const GLANCE_MAX_CARDS = 3;
@@ -149,7 +150,7 @@ function refreshGlanceTarget(target) {
       ? "device-hub-glance-row device-hub-glance-row--revoked"
       : "device-hub-glance-row";
     const sub = walletEntrySubtitle(entry);
-    const subLine = revokedSince ? `${sub} · Revoked since last visit` : sub;
+    const subLine = revokedSince ? `${sub} · ${CARD_DISABLED_SINCE_VISIT_GLANCE_SUFFIX}` : sub;
     li.innerHTML = `
       <button type="button" class="device-hub-glance-btn">
         <span class="device-hub-glance-title">${escapeHtml(entry.label)}</span>

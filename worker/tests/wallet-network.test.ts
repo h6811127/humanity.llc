@@ -2,10 +2,18 @@ import { describe, expect, it } from "vitest";
 
 import {
   alertStateFromScanKind,
+  CARD_DISABLED_SINCE_VISIT_ALERT_TEXT,
   CARD_REVOKED_ALERT_STATE,
   isRevokedSinceLastVisitFromBaseline,
   normalizeBaselineState,
 } from "../../site/js/wallet-network-baseline.mjs";
+
+describe("card-disabled since-visit copy", () => {
+  it("uses card-disabled wording, not generic revoked", () => {
+    expect(CARD_DISABLED_SINCE_VISIT_ALERT_TEXT).toMatch(/card disabled/i);
+    expect(CARD_DISABLED_SINCE_VISIT_ALERT_TEXT).not.toMatch(/revoked since last visit/i);
+  });
+});
 
 describe("alertStateFromScanKind", () => {
   it("returns card_revoked only for card_revoked scan kind", () => {

@@ -1,27 +1,35 @@
 import QRCode from "qrcode";
-
-const BRAND_RED = "#db1b43";
+import {
+  overlayCenterLogoOnSvg,
+  QR_BRANDED_RENDER_OPTIONS,
+  QR_BRAND_RED,
+  qrCenterLogoHref,
+} from "../../../site/js/qr-branding.mjs";
 
 /**
- * Encodes the card scan URL as a red-on-white QR (same payload as /created/).
- * Uses inline SVG  -  works in Cloudflare Workers (no node-canvas).
+ * Encodes the card scan URL as a branded red-on-white QR with a semi-transparent center logo.
+ * Uses inline SVG — works in Cloudflare Workers (no node-canvas).
  */
-export async function renderScanQrMarkup(scanUrl: string): Promise<string> {
-  const svg = await QRCode.toString(scanUrl, {
+export async function renderScanQrMarkup(
+  scanUrl: string,
+  origin = "https://humanity.llc"
+): Promise<string> {
+  let svg = await QRCode.toString(scanUrl, {
     type: "svg",
     margin: 1,
-    errorCorrectionLevel: "M",
-    color: { dark: BRAND_RED, light: "#ffffff" },
+    ...QR_BRANDED_RENDER_OPTIONS,
+    color: { dark: QR_BRAND_RED, light: QR_BRANDED_RENDER_OPTIONS.color.light },
   });
+  svg = overlayCenterLogoOnSvg(svg, { logoHref: qrCenterLogoHref(origin) });
   return `<div class="pass-qr-svg" role="img" aria-label="QR code for this card scan link">${svg}</div>`;
 }
 
-/** @deprecated Use renderScanQrMarkup  -  kept for tests that expect data URLs */
+/** @deprecated Use renderScanQrMarkup — kept for tests that expect data URLs */
 export async function scanQrDataUrl(scanUrl: string): Promise<string> {
   return QRCode.toDataURL(scanUrl, {
     width: 176,
     margin: 1,
-    errorCorrectionLevel: "M",
-    color: { dark: BRAND_RED, light: "#ffffff" },
+    ...QR_BRANDED_RENDER_OPTIONS,
+    color: { dark: QR_BRAND_RED, light: QR_BRANDED_RENDER_OPTIONS.color.light },
   });
 }

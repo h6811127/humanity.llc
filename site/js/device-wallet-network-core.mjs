@@ -16,9 +16,13 @@ export function isNetworkCacheFresh(cachedAt, now, ttlMs = WALLET_NETWORK_CACHE_
 
 /**
  * @param {string | null | undefined} status
+ * @param {string | null | undefined} [scanKind] Resolver scan.kind when available (overrides ambiguous card.status).
  * @returns {{ label: string, tone: 'ok' | 'warn' | 'muted' | 'offline' }}
  */
-export function networkStatusChip(status) {
+export function networkStatusChip(status, scanKind) {
+  const kind = String(scanKind || "").toLowerCase();
+  if (kind === "card_revoked") return { label: "Card disabled", tone: "warn" };
+  if (kind === "qr_revoked") return { label: "QR revoked", tone: "warn" };
   const s = String(status || "").toLowerCase();
   if (s === "active") return { label: "Live State Active", tone: "ok" };
   if (s === "revoked") return { label: "Revoked on Network", tone: "warn" };

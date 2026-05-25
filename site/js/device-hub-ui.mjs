@@ -31,6 +31,7 @@ import {
 } from "./device-wallet.mjs";
 import {
   getCachedNetworkAlertState,
+  getCachedNetworkScanKind,
   getCachedNetworkStatus,
   isRevokedSinceLastVisit,
   CARD_REVOKED_ALERT_STATE,
@@ -40,6 +41,10 @@ import {
   snapshotNetworkSeenOnExit,
   syncLastSeenFromNetworkMap,
 } from "./device-wallet-network.mjs";
+import {
+  CARD_DISABLED_SINCE_VISIT_ALERT_TEXT,
+  CARD_DISABLED_SINCE_VISIT_SEARCH_SNIPPET,
+} from "./wallet-network-baseline.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
 import {
   formatLiveControlExpiry,
@@ -76,8 +81,6 @@ let hubConfig = {
   showLiveControlInbox: false,
 };
 
-const REVOKED_SINCE_VISIT_SEARCH = "revoked since last visit";
-
 /** Bumped when saved-card DOM is replaced or a new network fetch starts; stale fetches must not apply. */
 let walletNetworkApplyGen = 0;
 
@@ -95,6 +98,7 @@ function restoreHubCardSearchable(li, profileId) {
   const text = li.dataset.hubSearchable || "";
   li.dataset.hubSearchable = text
     .replace(/\s*revoked since last visit\s*/gi, " ")
+    .replace(/\s*card disabled since last visit\s*/gi, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -111,8 +115,8 @@ function setRevokedSinceVisitAlertVisible(li, profileId, show) {
     const base = li.dataset.hubSearchable || walletHaystack(
       loadWallet().find((e) => e.profile_id === profileId) || {}
     );
-    if (!base.includes(REVOKED_SINCE_VISIT_SEARCH)) {
-      li.dataset.hubSearchable = `${base} ${REVOKED_SINCE_VISIT_SEARCH}`.trim();
+    if (!base.includes(CARD_DISABLED_SINCE_VISIT_SEARCH_SNIPPET)) {
+      li.dataset.hubSearchable = `${base} ${CARD_DISABLED_SINCE_VISIT_SEARCH_SNIPPET}`.trim();
     }
   } else {
     restoreHubCardSearchable(li, profileId);
@@ -213,11 +217,12 @@ function scanUrlForEntry(entry) {
   return entry.qr_id ? `${base}?q=${encodeURIComponent(entry.qr_id)}` : base;
 }
 
-function networkChipHtml(profileId, statusOverride) {
+function networkChipHtml(profileId, statusOverride, scanKindOverride) {
   const raw =
     statusOverride ?? getCachedNetworkStatus(profileId) ?? (hubConfig.fetchNetworkStatus ? "checking" : null);
   if (!raw) return "";
-  const chip = networkStatusChip(raw);
+  const scanKind = scanKindOverride ?? getCachedNetworkScanKind(profileId);
+  const chip = networkStatusChip(raw, scanKind);
   return `<span class="hub-card-network hub-card-network--${chip.tone}">${escapeHtml(chip.label)}</span>`;
 }
 
@@ -237,7 +242,7 @@ function applyNetworkChipsToDom(statusMap = {}, alertStateMap = null) {
     const chipEl = li.querySelector(".hub-card-network");
     if (!chipEl) return;
     const status = currentNetworkStatus(pid, statusMap);
-    const chip = networkStatusChip(status);
+    const chip = networkStatusChip(status, getCachedNetworkScanKind(pid));
     chipEl.className = `hub-card-network hub-card-network--${chip.tone}`;
     chipEl.textContent = chip.label;
   });
@@ -485,8 +490,8 @@ function renderSavedRows() {
       ? networkChipHtml(entry.profile_id, getCachedNetworkStatus(entry.profile_id) ?? "checking")
       : "";
     const revokedAlert = hubConfig.fetchNetworkStatus
-      ? `<div class="hub-card-status-alert" data-hub-searchable="revoked since last visit network" hidden role="status">
-          <p class="hub-card-status-alert-text">Network status changed: revoked since last visit.</p>
+      ? `<div class="hub-card-status-alert" data-hub-searchable="${escapeHtml(CARD_DISABLED_SINCE_VISIT_SEARCH_SNIPPET)} network" hidden role="status">
+          <p class="hub-card-status-alert-text">${escapeHtml(CARD_DISABLED_SINCE_VISIT_ALERT_TEXT)}</p>
           <div class="hub-card-status-alert-actions">
             <button type="button" class="hub-card-alert-dismiss">Got it</button>
             <a class="hub-card-alert-view-scan" href="${escapeHtml(scan)}" target="_blank" rel="noopener noreferrer">View scan</a>

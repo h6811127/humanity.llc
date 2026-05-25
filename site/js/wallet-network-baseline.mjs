@@ -5,9 +5,19 @@
 /** Baseline / alert value when the card profile is disabled on the network. */
 export const CARD_REVOKED_ALERT_STATE = "card_revoked";
 
+/** Hub row alert (card-level disable only — not QR-only revoke). */
+export const CARD_DISABLED_SINCE_VISIT_ALERT_TEXT =
+  "Card disabled on the network since your last visit.";
+
+/** Hub search / hubSearchable snippet when the since-visit alert is visible. */
+export const CARD_DISABLED_SINCE_VISIT_SEARCH_SNIPPET = "card disabled since last visit";
+
+/** Hub glance subtitle suffix when the since-visit alert applies. */
+export const CARD_DISABLED_SINCE_VISIT_GLANCE_SUFFIX = "Card disabled since last visit";
+
 /**
  * Map resolver scan.kind (+ optional legacy card.status) to alert baseline state.
- * Only card-level disablement triggers “revoked since last visit”; QR-only revoke does not.
+ * Only card-level disablement triggers the since-visit alert; QR-only revoke does not.
  * @param {string | null | undefined} scanKind
  * @param {string | null | undefined} [cardStatus]
  */

@@ -1,6 +1,6 @@
 /**
  * Fetch resolver card status for saved-wallet rows (cached in sessionStorage).
- * Tracks last-seen network status per card for "revoked since last visit" alerts.
+ * Tracks last-seen network status per card for card-disabled-since-visit alerts.
  */
 import { getCardStatusUrl } from "./hc-sign.mjs";
 import { loadWallet } from "./device-wallet.mjs";
@@ -66,6 +66,12 @@ export function getCachedNetworkAlertState(profileId) {
   const entry = readCachedEntry(profileId);
   if (!entry) return null;
   return alertStateFromScanKind(entry.scanKind, entry.status);
+}
+
+/** @param {string} profileId */
+export function getCachedNetworkScanKind(profileId) {
+  const entry = readCachedEntry(profileId);
+  return entry?.scanKind ?? null;
 }
 
 /**
