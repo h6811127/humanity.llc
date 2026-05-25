@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Your live object · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=79" />
+    <link rel="stylesheet" href="/styles.css?v=80" />
     <link rel="stylesheet" href="/css/device-shell.css?v=7" />
   </head>
   <body class="has-device-hub-search device-shell-created">
@@ -34,7 +34,6 @@
               <span class="shell-notif-badge-count" id="shell-notif-badge-count">0</span>
             </button>
           </div>
-          <a class="top-create top-create--outline" href="/create/">Create</a>
         </div>
       </div>
 
@@ -52,11 +51,15 @@
             <div class="device-hub-group" id="device-hub-crosstab-notice" hidden role="status"></div>
             <div class="device-hub-group" id="device-hub-notice-group" hidden></div>
           </div>
-          <div
-            class="device-hub-status-panel"
-            id="device-hub-status-panel"
-            aria-label="System status"
-          ></div>
+          <div class="device-hub-status-head">
+            <div
+              class="device-hub-status-panel"
+              id="device-hub-status-panel"
+              aria-label="System status"
+            ></div>
+            <a class="device-hub-create-btn" href="/create/" aria-label="Create a live object">+</a>
+          </div>
+          <div class="device-hub-status-key" id="device-hub-status-key" aria-label="Status dot legend"></div>
           <h2 class="device-hub-title" id="device-hub-title">On this device</h2>
           <p class="device-hub-lead">
             Personal to <strong>this browser</strong>  -  not your profile on the network.
@@ -852,7 +855,7 @@
         </p>
       </main>
     </div>
-    <script src="/js/device-status.mjs?v=12" type="module"></script>
+    <script src="/js/device-status.mjs?v=13" type="module"></script>
     <script src="/js/created-hub.mjs?v=1" type="module"></script>
     <script type="module" src="/js/created.mjs?v=34"></script>
   </body>

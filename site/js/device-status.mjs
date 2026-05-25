@@ -112,6 +112,31 @@ function escapeHtml(s) {
     .replace(/>/g, "&gt;");
 }
 
+function renderStatusKey() {
+  const el = document.getElementById("device-hub-status-key");
+  if (!el) return;
+  el.innerHTML = `
+    <p class="device-hub-status-key-label">Status dot</p>
+    <ul class="device-hub-status-key-list">
+      <li>
+        <span class="device-hub-status-key-dot device-hub-status-key-dot--pulse" aria-hidden="true"></span>
+        Pulsing red — default; keys in tab not saved on device
+      </li>
+      <li>
+        <span class="device-hub-status-key-dot device-hub-status-key-dot--solid" aria-hidden="true"></span>
+        Solid red — saved keys on this device
+      </li>
+      <li>
+        <span class="device-hub-status-key-dot device-hub-status-key-dot--amber" aria-hidden="true"></span>
+        Amber — resolver limited
+      </li>
+      <li>
+        <span class="device-hub-status-key-dot device-hub-status-key-dot--gray" aria-hidden="true"></span>
+        Gray — resolver offline
+      </li>
+    </ul>`;
+}
+
 function renderHubStatusPanel(segments) {
   if (!hubStatusPanel) return;
   const parts = segments.map((seg, i) => {
@@ -169,6 +194,7 @@ function renderSystemBanner() {
 function refreshSummary() {
   const segments = buildStatusSegments(networkStatus);
   renderHubStatusPanel(segments);
+  renderStatusKey();
   applyDot();
   renderNotifBadge();
   renderSystemBanner();
@@ -209,6 +235,7 @@ function toggleHubFromChrome() {
 if (hub) {
   sessionStorage.setItem(HUB_OPEN_KEY, "0");
   setHubExpanded(false, { persist: false });
+  renderStatusKey();
 }
 
 window.addEventListener("hc-landing-focus-on", () => {

@@ -148,7 +148,9 @@ body.page-flow .page > main.screen {
 }
 
 .pass-dot-status-network-ok.pass-dot-status-device-none {
-  background: rgba(219, 27, 67, 0.45);
+  background: var(--red);
+  box-shadow: 0 0 0 2px rgba(219, 27, 67, 0.35);
+  animation: brand-dot-pulse 2s ease-in-out infinite;
 }
 
 .pass-dot-status-network-ok.pass-dot-status-device-keys {

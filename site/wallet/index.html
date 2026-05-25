@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Saved on this device · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=79" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=7" />
+    <link rel="stylesheet" href="/styles.css?v=80" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=8" />
   </head>
   <body class="has-device-hub-search device-shell-wallet">
     <div class="page">
@@ -34,7 +34,6 @@
               <span class="shell-notif-badge-count" id="shell-notif-badge-count">0</span>
             </button>
           </div>
-          <a class="top-create top-create--outline" href="/create/">Create</a>
         </div>
       </div>
 
@@ -75,11 +74,15 @@
               <ul class="list list-compact" id="device-hub-live-control-list"></ul>
             </div>
           </div>
-          <div
-            class="device-hub-status-panel"
-            id="device-hub-status-panel"
-            aria-label="System status"
-          ></div>
+          <div class="device-hub-status-head">
+            <div
+              class="device-hub-status-panel"
+              id="device-hub-status-panel"
+              aria-label="System status"
+            ></div>
+            <a class="device-hub-create-btn" href="/create/" aria-label="Create a live object">+</a>
+          </div>
+          <div class="device-hub-status-key" id="device-hub-status-key" aria-label="Status dot legend"></div>
           <h2 class="device-hub-title" id="device-hub-title">Saved on this device</h2>
           <p class="device-hub-lead wallet-hub-lead">
             Signing keys live in <strong>this browser</strong>  -  never uploaded to the network.
@@ -289,7 +292,7 @@
       <main class="screen screen-wallet screen-wallet-sleek" hidden aria-hidden="true"></main>
     </div>
 
-    <script src="/js/device-status.mjs?v=12" type="module"></script>
+    <script src="/js/device-status.mjs?v=13" type="module"></script>
     <script src="/js/wallet-hub.mjs?v=4" type="module"></script>
   </body>
 </html>
