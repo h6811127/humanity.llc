@@ -15,7 +15,7 @@ Principles:
 | Principle | Implementation |
 |-----------|----------------|
 | Materials over outlines | Grouped fills, hairline separators, soft elevation |
-| Translucency | Frosted top chrome, status bar, search (with solid fallbacks) |
+| Translucency | Unified `top-chrome` Liquid Glass bar (not a floating white card); status row is inline text |
 | Weight over size | Section labels 15px semibold, not uppercase micro-labels |
 | System language | Status line: Resolver Online, N on Device, Tab Keys Active |
 | Motion continuity | Spring easing, hub expand fade, tab panel enter, press feedback |
@@ -27,7 +27,7 @@ Principles:
 
 | Path | Role |
 |------|------|
-| `site/css/ios-system.css` | Materials, typography, hub/created/shop overrides |
+| `site/css/ios-system.css` | Materials, typography, `top-chrome` glass, hub/created/shop overrides |
 | `site/js/ios-motion.mjs` | Hub open state, list press feedback |
 | `site/js/device-counts.mjs` | System status segment copy |
 | `site/scan-pass.css` | Scan page (run `npm run worker:bundle-scan` after edits) |
