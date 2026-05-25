@@ -10,6 +10,7 @@ const interestSection = document.getElementById("shop-interest-group");
 const priceEl = document.getElementById("shop-product-price");
 const buyBtn = document.getElementById("shop-buy-btn");
 const buyBtnFooter = document.getElementById("shop-buy-btn-footer");
+const notifyBtn = document.getElementById("shop-notify-btn");
 const checkoutNote = document.getElementById("shop-checkout-note");
 const heroPrimary = document.getElementById("shop-hero-primary");
 const interestForm = document.getElementById("shop-interest-form");
@@ -34,6 +35,21 @@ function setInterestStatus(msg, isError = false) {
   interestStatus.hidden = !msg;
   interestStatus.textContent = msg;
   interestStatus.className = isError ? "form-status error" : "form-status";
+}
+
+function setBuyButtonsVisible(visible, checkoutUrl = "") {
+  for (const btn of [buyBtn, buyBtnFooter]) {
+    if (!btn) continue;
+    if (visible && checkoutUrl) {
+      btn.href = checkoutUrl;
+      btn.hidden = false;
+      btn.removeAttribute("aria-disabled");
+    } else {
+      btn.removeAttribute("href");
+      btn.hidden = true;
+      btn.setAttribute("aria-disabled", "true");
+    }
+  }
 }
 
 function bindInterestForm() {
@@ -68,15 +84,14 @@ function showCheckout(display, checkoutUrl) {
     priceEl.textContent = display.price || "Available now";
     priceEl.classList.add("shop-product-price--live");
   }
-  for (const btn of [buyBtn, buyBtnFooter]) {
-    if (!btn) continue;
-    btn.href = checkoutUrl;
-    btn.hidden = false;
-  }
+  setBuyButtonsVisible(true, checkoutUrl);
   if (checkoutNote) checkoutNote.hidden = false;
+  if (notifyBtn) notifyBtn.hidden = true;
   if (heroPrimary) {
     heroPrimary.href = checkoutUrl;
     heroPrimary.textContent = "Buy the founding sticker";
+    heroPrimary.target = "_blank";
+    heroPrimary.rel = "noopener noreferrer";
     heroPrimary.classList.add("landing-hero-btn-primary");
     heroPrimary.classList.remove("landing-hero-btn-secondary");
   }
@@ -89,10 +104,17 @@ function showInterestPending(display) {
     priceEl.textContent = display.price ? `${display.price} · checkout soon` : "Checkout opening soon";
     priceEl.classList.remove("shop-product-price--live");
   }
-  for (const btn of [buyBtn, buyBtnFooter]) {
-    if (btn) btn.hidden = true;
-  }
+  setBuyButtonsVisible(false);
   if (checkoutNote) checkoutNote.hidden = true;
+  if (notifyBtn) notifyBtn.hidden = false;
+  if (heroPrimary) {
+    heroPrimary.href = "#shop-interest-group";
+    heroPrimary.textContent = "Notify when checkout opens";
+    heroPrimary.removeAttribute("target");
+    heroPrimary.removeAttribute("rel");
+    heroPrimary.classList.add("landing-hero-btn-primary");
+    heroPrimary.classList.remove("landing-hero-btn-secondary");
+  }
   if (checkoutSection) checkoutSection.hidden = true;
   if (interestSection) interestSection.hidden = false;
 }

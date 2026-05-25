@@ -60,10 +60,17 @@
             <a
               class="btn-primary shop-buy-btn"
               id="shop-buy-btn"
-              href="#shop-checkout-group"
+              href=""
               hidden
               rel="noopener noreferrer"
+              target="_blank"
               >Buy the founding sticker</a
+            >
+            <a
+              class="btn-secondary shop-notify-btn"
+              id="shop-notify-btn"
+              href="#shop-interest-group"
+              >Notify when checkout opens</a
             >
             <ul class="shop-bullets shop-bullets-get">
               <li>One durable sticker with a scannable QR</li>
@@ -97,8 +104,10 @@
           <a
             class="btn-primary shop-buy-btn shop-buy-btn-block"
             id="shop-buy-btn-footer"
-            href="#"
+            href=""
+            hidden
             rel="noopener noreferrer"
+            target="_blank"
             >Continue to checkout</a
           >
           <p class="shop-lead shop-lead-muted">
@@ -113,9 +122,9 @@
           aria-labelledby="shop-interest-title"
         >
           <h2 class="group-label" id="shop-interest-title">Notify when checkout opens</h2>
-          <p class="shop-lead shop-lead-muted">
-            Shopify checkout is not wired yet. Leave an optional email on this device, or
-            bookmark this page — interest is stored locally only (see
+          <p class="shop-lead shop-lead-muted" id="shop-interest-lead">
+            Checkout is not open yet. Leave an optional email on this device, or bookmark this
+            page — interest is stored locally only (see
             <a href="/data-policy.html">data policy</a>).
           </p>
           <form id="shop-interest-form" class="shop-interest-form" autocomplete="on" novalidate>
@@ -204,6 +213,6 @@
         </section>
       </main>
     </div>
-    <script src="/js/shop.mjs?v=1" type="module"></script>
+    <script src="/js/shop.mjs?v=2" type="module"></script>
   </body>
 </html>

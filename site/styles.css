@@ -3784,12 +3784,29 @@ body.landing-focus-mode .screen-landing {
   margin: 0 0 12px;
 }
 
+.shop-buy-btn[hidden],
+.shop-buy-btn[aria-disabled="true"] {
+  display: none !important;
+}
+
 .shop-buy-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   margin: 0 0 14px;
   text-decoration: none;
+  box-sizing: border-box;
+}
+
+.shop-notify-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 0 0 14px;
+  text-align: center;
+  text-decoration: none;
+  box-sizing: border-box;
 }
 
 .shop-buy-btn-block {
