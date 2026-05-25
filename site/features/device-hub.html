@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Human verification & vouching · Features · humanity.llc</title>
-    <meta name="description" content="Social attestation without legal ID." />
+    <title>On this device hub · Features · humanity.llc</title>
+    <meta name="description" content="Returning users manage keys, pins, and shortcuts without accounts." />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="/styles.css?v=69" />
@@ -20,12 +20,12 @@
       </header>
       <main class="screen">
         <section class="hero">
-          <p class="hero-eyebrow">Feature <span class="phase">5</span></p>
-          <h1>Human verification & vouching</h1>
+          <p class="hero-eyebrow">Feature <span class="phase">10</span></p>
+          <h1>On this device hub</h1>
         </section>
         <div class="feature">
-          <p class="feature-lead">Social attestation without legal ID.</p>
-          <p class="feature-sub"><span class="ship-badge ship-badge-partial">Partial</span> scan truth + vouch issuance + revoke live; abuse hooks next</p>
+          <p class="feature-lead">Returning users manage keys, pins, and shortcuts without accounts.</p>
+          <p class="feature-sub"><span class="ship-badge ship-badge-live">Live</span> homepage + <a href="/wallet/">/wallet/</a> + shared status header on <a href="/created/">/created/</a></p>
         </div>
         <section class="group feature-aspects">
           <h2 class="group-label">About this feature</h2>
@@ -38,7 +38,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Communities need accountable human trust without KYC or buying merch. Three eligible vouchers can upgrade a card to <strong>Vouched Human</strong> — a public label backed by signed statements, not a government check.</p>
+    <p class="settings-panel-lead">Create puts keys in one tab; strangers need the story, returners need a control center. The hub names the two storage layers and surfaces the next action (save, notice, revoke, vouch).</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -50,7 +50,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Public signed vouch documents; default 280-char statement template; private notes never POSTed. Abuse controls: 3-vouch threshold, 5 active vouches/voucher/year, 90-day wait, one active vouch per pair. Scan shows count + recency, not a social graph.</p>
+    <p class="settings-panel-lead"><strong>Status line</strong> — segmented counts (network, saved, pinned, notice); tap expands <strong>On this device</strong>. <strong>Saved cards</strong> — Use keys, Open scan, relabel/remove. <strong>Pinned scans</strong> — public bookmarks only (<code>hc_device_pins</code>). <strong>Search</strong> — inline in hub; filters local rows only (not resolver-wide). <strong>Backup import</strong> — decrypt <code>.hcbackup.json</code> into <code>hc_wallet</code>. <strong>Focus mode</strong> — hide intro sections; keep hub + documentation.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -62,7 +62,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Nonce replay protection on vouch POST. Voucher must be verified human or steward. Collusion rings mitigated by quotas and operator-only cluster hooks (planned).</p>
+    <p class="settings-panel-lead">Private keys stay in browser storage; pins never hold signing material. Search is client-side over data you already saved. Labels are yours — rows show <code>@handle</code> + profile id so synced browser data cannot lie silently.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -74,7 +74,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Registration alone never displays as human verification. Bootstrap requires founding stewards or verified humans to vouch first. Revoke UI lists vouches from this browser session only.</p>
+    <p class="settings-panel-lead">Not cloud sync or multi-device accounts. Browser profile sync (Safari/Chrome) may copy <code>localStorage</code> incompletely — prefer explicit save per machine. No directory search for other people’s cards.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -86,14 +86,14 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Vouch revocation flow, steward review queue, ceremony credentials (separate path), cross-operator federation.</p>
+    <p class="settings-panel-lead">Optional activity log on device, clearer multi-tab key handoff, federated read — still no operator custody of owner keys.</p>
   </div>
 </details></div>
         </section>
         <section class="group">
   <div class="feature-nav">
-    <a href="/features/scan-ui.html"><span class="feature-nav-label">Previous</span><span class="feature-nav-title"><span class="phase">4</span> Scan trust-state UI</span></a>
-    <a href="/features/organizer-revoke.html"><span class="feature-nav-label">Next</span><span class="feature-nav-title"><span class="phase">6</span> Organizer revoke</span></a>
+    <a href="/features/test-harness.html"><span class="feature-nav-label">Previous</span><span class="feature-nav-title"><span class="phase">9</span> Security test harness</span></a>
+    <a href="/features/studio-blog.html"><span class="feature-nav-label">Next</span><span class="feature-nav-title"><span class="phase">11</span> Studio blog & door-plate pilot</span></a>
   </div>
 </section>
       </main>

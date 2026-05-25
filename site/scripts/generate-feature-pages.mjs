@@ -20,6 +20,8 @@ const ICONS = {
   link: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`,
   box: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>`,
   test: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77A6 6 0 0 1 21 12"/><path d="M9.3 17.7a1 1 0 0 0 0-1.4l-1.6-1.6a1 1 0 0 0-1.4 0L2.5 18.5A6 6 0 0 1 3 12"/></svg>`,
+  device: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>`,
+  book: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>`,
   why: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>`,
   design: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg>`,
   safety: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
@@ -50,7 +52,7 @@ const FEATURES = [
       why: "Proves the core thesis: a printed QR is a <strong>live software endpoint</strong>, not a frozen link. No app install, no account gate for scanning — any camera can read current public state.",
       design: "Ed25519 keys generated in-browser; signed card + QR credential POSTed to <code>/.well-known/hc/v1/cards</code>. JCS canonicalization for cross-client parity. Profile and QR ids are base58 — stable in the printed URL forever; meaning changes via resolver status, not reprinting.",
       safety: "Private signing keys never leave the owner device unless the user exports an encrypted backup. Resolver verifies signatures on ingest and stores only public documents and status flags — not a people trail.",
-      limits: "Session keys live in <code>sessionStorage</code> until backup/recovery is saved. Operator cannot reset your key. Printed URL exposes <code>profile_id</code> and <code>qr_id</code> (v1 privacy lock).",
+      limits: "Keys start in <code>sessionStorage</code> (this tab only). <strong>Save on this device</strong> on <a href=\"/created/\">/created/</a> copies them to <code>localStorage</code> (<code>hc_wallet</code>) for other tabs — not automatic on create. Operator cannot reset your key. Printed URL exposes <code>profile_id</code> and <code>qr_id</code> (v1 privacy lock).",
       future: "Federated resolvers implementing the same <code>hc/v1</code> API; NFC/mesh carriers pointing at the same truth; optional multi-device sync without central key custody.",
     },
   },
@@ -61,7 +63,7 @@ const FEATURES = [
     icon: "key",
     iconTone: "blue",
     lead: "Survive a closed tab without giving us your keys.",
-    subHtml: `<span class="ship-badge ship-badge-live">Live</span> on <a href="/created/">/created/</a> after create`,
+    subHtml: `<span class="ship-badge ship-badge-live">Live</span> on <a href="/created/">/created/</a>; hub import of <code>.hcbackup.json</code> on homepage`,
     badge: "live",
     aspects: {
       why: "Browser-held keys are powerful and fragile. Without backup, losing the create tab means losing revoke and live-control ability — the sticker still scans, but the owner cannot mutate it.",
@@ -112,11 +114,11 @@ const FEATURES = [
     icon: "layers",
     iconTone: "gold",
     lead: "One primitive — many physical roles.",
-    subHtml: `<span class="ship-badge ship-badge-partial">Partial</span> basic card live; status plate copy live; lost-item relay is design research`,
+    subHtml: `<span class="ship-badge ship-badge-partial">Partial</span> <a href="/create/?template=status_plate">status plate</a> template live; basic card live; lost-item relay is research`,
     badge: "partial",
     aspects: {
       why: "The product is not “a membership card.” The same signed object model powers a studio door plate, a festival wristband, a keys sticker, and a mutual-aid flyer — each with different scan copy and credential scope.",
-      design: "<strong>Basic card</strong> — handle + manifesto line + verification summary. <strong>Status plate</strong> — manifesto as hours/open-closed signal. <strong>Lost item relay</strong> — scan shows lost + relay contact without printing phone numbers (<a href=\"/what-can-a-qr-do/lost-item-relay/\">design</a>). <strong>Print artifact</strong> — unique <code>qr_id</code> per physical unit via artifact intent.",
+      design: "<strong>Status plate (shipped pilot)</strong> — object name + live status line for doors and booths; homepage <strong>One use</strong> section + <a href=\"/studio/\">Studio blog</a>. <strong>Basic card</strong> — handle + manifesto + verification summary. <strong>Lost item relay</strong> — design only (<a href=\"/what-can-a-qr-do/lost-item-relay/\">research</a>). <strong>Print artifact</strong> — unique <code>qr_id</code> per unit via artifact intent.",
       safety: "Relay patterns must not doxx owners. Per-item QR scope limits blast radius when one sticker is stolen. Template copy stays honest about what scan proves.",
       limits: "Lost-item relay UI and contact routing not shipped. Storefront → Printify personalization path still in build.",
       future: "Template library for organizers, commerce-backed unique QRs, city-game objects (<a href=\"/what-can-a-qr-do/physical-world-multiplayer/\">research</a>).",
@@ -214,7 +216,7 @@ const FEATURES = [
     icon: "test",
     iconTone: "green",
     lead: "Documented threats backed by automated tests.",
-    subHtml: `<span class="ship-badge ship-badge-live">Live</span> 78 Vitest cases across crypto, revoke, vouch, live control, scan`,
+    subHtml: `<span class="ship-badge ship-badge-live">Live</span> 94 Vitest cases across crypto, revoke, vouch, live control, scan`,
     badge: "live",
     aspects: {
       why: "Recruiters and security reviewers should see boundaries enforced in CI — not only in markdown threat models.",
@@ -222,6 +224,40 @@ const FEATURES = [
       safety: "Covers replay nonces, signature mismatch, vouch quotas, live-control expiry, verification display overrides. Adversarial review doc in repo for open questions.",
       limits: "No production penetration test report yet. Browser E2E for create flow is manual / stranger-test driven.",
       future: "Playwright smoke path, fuzzing on canonicalization, operator abuse simulation fixtures.",
+    },
+  },
+  {
+    slug: "device-hub",
+    phase: "10",
+    title: "On this device hub",
+    icon: "device",
+    iconTone: "trust",
+    lead: "Returning users manage keys, pins, and shortcuts without accounts.",
+    subHtml: `<span class="ship-badge ship-badge-live">Live</span> homepage + <a href="/wallet/">/wallet/</a> + shared status header on <a href="/created/">/created/</a>`,
+    badge: "live",
+    aspects: {
+      why: "Create puts keys in one tab; strangers need the story, returners need a control center. The hub names the two storage layers and surfaces the next action (save, notice, revoke, vouch).",
+      design: "<strong>Status line</strong> — segmented counts (network, saved, pinned, notice); tap expands <strong>On this device</strong>. <strong>Saved cards</strong> — Use keys, Open scan, relabel/remove. <strong>Pinned scans</strong> — public bookmarks only (<code>hc_device_pins</code>). <strong>Search</strong> — inline in hub; filters local rows only (not resolver-wide). <strong>Backup import</strong> — decrypt <code>.hcbackup.json</code> into <code>hc_wallet</code>. <strong>Focus mode</strong> — hide intro sections; keep hub + documentation.",
+      safety: "Private keys stay in browser storage; pins never hold signing material. Search is client-side over data you already saved. Labels are yours — rows show <code>@handle</code> + profile id so synced browser data cannot lie silently.",
+      limits: "Not cloud sync or multi-device accounts. Browser profile sync (Safari/Chrome) may copy <code>localStorage</code> incompletely — prefer explicit save per machine. No directory search for other people’s cards.",
+      future: "Optional activity log on device, clearer multi-tab key handoff, federated read — still no operator custody of owner keys.",
+    },
+  },
+  {
+    slug: "studio-blog",
+    phase: "11",
+    title: "Studio blog & door-plate pilot",
+    icon: "book",
+    iconTone: "blue",
+    lead: "Building the project in public — starting with a real studio door plate.",
+    subHtml: `<span class="ship-badge ship-badge-live">Live</span> <a href="/studio/">/studio/</a> + homepage One use · live showcase scan when configured`,
+    badge: "live",
+    aspects: {
+      why: "The site should explain itself the same way the product explains physical objects: short, honest cards. The studio door plate is the first object we dogfood — hours, open/closed, and line updates without reprinting.",
+      design: "<a href=\"/studio/\">Studio blog</a> — card index + posts on the plate, device hub, stack, and framing. Homepage <strong>One use · status plate</strong> lists concrete scenarios (door scan, run state, special hours, revoke visibility). <strong>Try a live scan</strong> loads from <code>site/data/showcase-status-plate.json</code> when present.",
+      safety: "Blog posts are static Pages content — no extra tracking. Showcase scan is a normal public resolver object; same limits as any card (no scan analytics by default).",
+      limits: "Blog is manual HTML, not a CMS feed. Only status-plate create template is fully productized; other card types remain research pages.",
+      future: "More pilot objects documented as cards, RSS/Atom for posts, organizer-facing build notes tied to artifact-intent launches.",
     },
   },
 ];
@@ -276,7 +312,7 @@ function renderFeaturePage(f, i) {
     <meta name="description" content="${f.lead}" />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=49" />
+    <link rel="stylesheet" href="/styles.css?v=69" />
   </head>
   <body>
     <div class="page feature-page">
@@ -325,16 +361,20 @@ function hubRow(f) {
 }
 
 function renderHub() {
+  const protocolPhases = new Set(["0", "0.5", "1", "2", "3", "4", "5", "6", "7", "8", "9"]);
+  const protocol = FEATURES.filter((f) => protocolPhases.has(f.phase));
+  const site = FEATURES.filter((f) => !protocolPhases.has(f.phase));
+
   return `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Features available now · humanity.llc</title>
-    <meta name="description" content="What ships today on humanity.llc — one page per feature with design decisions, security posture, and limits." />
+    <meta name="description" content="What ships today on humanity.llc — resolver protocol, device hub, studio pilot, and one page per feature." />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=49" />
+    <link rel="stylesheet" href="/styles.css?v=69" />
   </head>
   <body>
     <div class="page feature-page feature-hub">
@@ -349,13 +389,44 @@ function renderHub() {
         <section class="hero">
           <p class="hero-eyebrow">Building now</p>
           <h1>All features available now</h1>
-          <p class="hero-line">Pick a feature for design decisions, safety boundaries, limits, and what ships today.</p>
+          <p class="hero-line">Protocol features (signed objects on the Worker) plus the Pages shell returners use every day — hub, wallet, studio blog.</p>
         </section>
-        <p class="insight"><strong>For recruiters:</strong> production-shaped slice on <strong>Cloudflare Workers + D1 + Pages</strong> — Ed25519-signed writes, replay-protected mutations, mechanism-visible scan UI, and <strong>78 automated Worker tests</strong>.</p>
+        <p class="insight"><strong>For recruiters:</strong> <strong>Cloudflare Workers + D1 + Pages</strong> — Ed25519-signed writes, replay-protected mutations, mechanism-visible scan UI, <strong>On this device</strong> hub (no accounts), status-plate pilot, and <strong>94 automated Worker tests</strong>.</p>
         <section class="group">
-          <h2 class="group-label">Quick map</h2>
+          <h2 class="group-label">Site &amp; returning users</h2>
           <ul class="list">
-            ${FEATURES.map(hubRow).join("\n")}
+            ${site.map(hubRow).join("\n")}
+          </ul>
+        </section>
+        <section class="group">
+          <h2 class="group-label">Protocol &amp; resolver</h2>
+          <ul class="list">
+            ${protocol.map(hubRow).join("\n")}
+          </ul>
+        </section>
+        <section class="group">
+          <h2 class="group-label">Also on the site</h2>
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/case-study/">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">${ICONS.book}</span>
+                <span class="list-content">
+                  <span class="list-title">Case study</span>
+                  <span class="list-sub">Create → scan → update → revoke → live control</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/wallet/">
+                <span class="list-icon list-icon-tone-trust" aria-hidden="true">${ICONS.shield}</span>
+                <span class="list-content">
+                  <span class="list-title">All saved cards</span>
+                  <span class="list-sub">Full device wallet view</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
           </ul>
         </section>
         <section class="group">
