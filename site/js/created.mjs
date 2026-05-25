@@ -164,7 +164,12 @@ function initLiveControlProof() {
     panel.classList.toggle("live-control-proof-requested", !!fromPoll || !!activeChallengeId);
     if (activeChallengeId && loggedChallengeId !== activeChallengeId) {
       loggedChallengeId = activeChallengeId;
-      logDeviceActivity("live_control", "Live proof request");
+      const lcLabel =
+        data?.handle ? `@${data.handle}` : profileId ? profileId.slice(0, 12) : "Live proof request";
+      logDeviceActivity("live_control", lcLabel, {
+        profile_id: profileId ?? null,
+        qr_id: qrId ?? null,
+      });
     }
   }
 

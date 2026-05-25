@@ -70,7 +70,12 @@ export function initHubBackupImport(form, statusEl) {
         saveWallet(entries);
       }
       setStatus("Imported to this device. Use keys to open /created/.");
-      logDeviceActivity("backup_import", "Imported backup");
+      const savedEntry =
+        idx >= 0 ? entries[idx] : walletEntryFromSession(session, unlocked.profileId.slice(0, 12));
+      logDeviceActivity("backup_import", savedEntry.label || "Imported backup", {
+        profile_id: unlocked.profileId,
+        qr_id: savedEntry.qr_id ?? null,
+      });
       window.dispatchEvent(new Event("hc-device-hub-changed"));
       form.reset();
     } catch (err) {

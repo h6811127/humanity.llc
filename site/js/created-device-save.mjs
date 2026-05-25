@@ -71,7 +71,10 @@ export function initCreatedDeviceSave(getSession) {
     if (!result.already) {
       const label =
         labelInput?.value?.trim() || defaultWalletLabel(session);
-      logDeviceActivity("saved", label);
+      logDeviceActivity("saved", label, {
+        profile_id: session.profile_id,
+        qr_id: session.qr_id ?? null,
+      });
     }
     refresh();
     window.dispatchEvent(new Event("hc-device-hub-changed"));

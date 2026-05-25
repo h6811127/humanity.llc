@@ -1,4 +1,5 @@
-import { logDeviceActivity } from "./device-activity.mjs";
+import { logDeviceActivity, walletEntryForActivity } from "./device-activity.mjs";
+import { loadWallet } from "./device-wallet.mjs";
 
 /**
  * Load saved-card keys into this tab (sessionStorage).
@@ -33,7 +34,10 @@ export function activateWalletEntry(entry) {
       wallet_label: entry.label,
     })
   );
-  logDeviceActivity("use_keys", entry.label || entry.handle || String(entry.profile_id).slice(0, 12));
+  logDeviceActivity("use_keys", entry.label || entry.handle || String(entry.profile_id).slice(0, 12), {
+    profile_id: entry.profile_id,
+    qr_id: entry.qr_id ?? null,
+  });
   window.dispatchEvent(new Event("hc-device-hub-changed"));
 }
 
@@ -43,4 +47,49 @@ export function createdUrlForEntry(entry) {
   url.searchParams.set("profile_id", String(entry.profile_id));
   if (entry.qr_id) url.searchParams.set("qr_id", String(entry.qr_id));
   return url.href;
+}
+
+/**
+ * Load saved keys when available and open /created/ (Now tab by default).
+ * @param {Record<string, unknown>} entry
+ */
+export function openCardNowPage(entry) {
+  if (!entry?.profile_id) return false;
+
+  const saved =
+    entry.owner_private_key_b58 != null
+      ? entry
+      : loadWallet().find((w) => w.profile_id === entry.profile_id) ?? null;
+
+  const target = saved ?? entry;
+  if (saved?.owner_private_key_b58) {
+    activateWalletEntry(saved);
+  }
+  location.href = createdUrlForEntry(target);
+  return true;
+}
+
+/**
+ * @param {{ type: string, label: string, profile_id?: string | null, qr_id?: string | null }} activity
+ */
+export function openActivityNow(activity) {
+  if (activity.type === "pin_added") {
+    location.href = "/wallet/";
+    return true;
+  }
+
+  const wallet = walletEntryForActivity(activity);
+  if (wallet) {
+    openCardNowPage(wallet);
+    return true;
+  }
+
+  if (activity.profile_id) {
+    return openCardNowPage({
+      profile_id: activity.profile_id,
+      qr_id: activity.qr_id ?? null,
+    });
+  }
+
+  return false;
 }

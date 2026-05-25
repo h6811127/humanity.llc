@@ -41,9 +41,10 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 ## Local activity log (Phase 3)
 
 | Key | `hc_device_activity` |
-| Schema | `{ id, type, label, at }` — max 40 entries |
+| Schema | `{ id, type, label, at, profile_id?, qr_id? }` — max 40 entries |
 | Types | `saved`, `use_keys`, `remove_card`, `pin_added`, `backup_import`, `live_control` |
-| UI | **Recent on this device** in hub (searchable rows) |
+| UI | **Recent on this device** in hub — tap row → `/created/` **Now** (loads saved keys when available) |
+| Glance (landing) | Saved card rows → **Now** (not expand hub only) |
 
 ---
 

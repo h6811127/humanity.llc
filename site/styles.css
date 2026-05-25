@@ -3162,6 +3162,10 @@ body.landing-focus-mode .screen-landing {
   background: rgba(219, 27, 67, 0.06);
 }
 
+.device-activity-open {
+  width: 100%;
+}
+
 .device-hub .list-action .list-content {
   flex: 1;
   min-width: 0;

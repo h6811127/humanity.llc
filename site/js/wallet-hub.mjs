@@ -119,7 +119,10 @@ function initTabSave() {
           : "Saved on this device."
     );
     if (!result.already && !result.updated) {
-      logDeviceActivity("saved", label || defaultWalletLabel(current));
+      logDeviceActivity("saved", label || defaultWalletLabel(current), {
+        profile_id: current.profile_id,
+        qr_id: current.qr_id ?? null,
+      });
     }
     refreshDeviceHub();
     refreshHelpVisibility();

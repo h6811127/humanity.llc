@@ -6,11 +6,17 @@ import {
   formatActivityTime,
   lastActivityForEntry,
   loadActivity,
+  activityActionHint,
   logDeviceActivity,
 } from "./device-activity.mjs";
 import { applyDeviceHubSearch } from "./device-hub-search.mjs";
 import { initHubBackupImport } from "./device-hub-import.mjs";
-import { activateWalletEntry, createdUrlForEntry, getTabSession } from "./device-keys.mjs";
+import {
+  activateWalletEntry,
+  createdUrlForEntry,
+  getTabSession,
+  openActivityNow,
+} from "./device-keys.mjs";
 import { loadPins, pinHaystack } from "./device-pins.mjs";
 import {
   loadWallet,
@@ -288,14 +294,22 @@ function renderActivityRows() {
   activityGroup.hidden = false;
   for (const entry of entries) {
     const li = document.createElement("li");
-    li.className = "list-row device-activity-row";
-    li.dataset.hubSearchable = activityHaystack(entry);
+    const hint = activityActionHint(entry);
     const when = formatActivityTime(entry.at);
+    const sub = hint ? `${when} · ${hint}` : when;
+    li.className = "list-row list-action device-activity-row";
+    li.dataset.hubSearchable = activityHaystack(entry);
     li.innerHTML = `
-      <span class="list-content">
-        <span class="list-title">${escapeHtml(entry.label)}</span>
-        <span class="list-sub">${escapeHtml(when)}</span>
-      </span>`;
+      <button type="button" class="device-activity-open">
+        <span class="list-content">
+          <span class="list-title">${escapeHtml(entry.label)}</span>
+          <span class="list-sub">${escapeHtml(sub)}</span>
+        </span>
+        <span class="list-chevron" aria-hidden="true">›</span>
+      </button>`;
+    li.querySelector(".device-activity-open")?.addEventListener("click", () => {
+      openActivityNow(entry);
+    });
     activityList.appendChild(li);
   }
 }
@@ -410,7 +424,12 @@ function renderSavedRows() {
       if (!window.confirm("Remove this card from this device? Keys stay in any other tab until you close it.")) {
         return;
       }
-      if (entry) logDeviceActivity("remove_card", entry.label);
+      if (entry) {
+        logDeviceActivity("remove_card", entry.label, {
+          profile_id: entry.profile_id,
+          qr_id: entry.qr_id ?? null,
+        });
+      }
       saveWallet(loadWallet().filter((e) => e.id !== id));
       renderSavedRows();
       renderNoticeRow();

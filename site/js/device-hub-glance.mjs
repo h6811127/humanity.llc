@@ -2,7 +2,7 @@
  * Landing-only compact summary when #device-hub is collapsed.
  */
 import { tabNoticeCount } from "./device-counts.mjs";
-import { getTabSession } from "./device-keys.mjs";
+import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
 import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import {
@@ -120,10 +120,10 @@ export function refreshHubGlance() {
     li.innerHTML = `
       <button type="button" class="device-hub-glance-btn">
         <span class="device-hub-glance-title">${escapeHtml(entry.label)}</span>
-        <span class="device-hub-glance-sub">${escapeHtml(subLine)}</span>
+        <span class="device-hub-glance-sub">${escapeHtml(subLine)} · Now</span>
       </button>`;
     li.querySelector("button")?.addEventListener("click", () => {
-      expandHub("device-hub-saved-group");
+      openCardNowPage(entry);
     });
     list.appendChild(li);
   }
