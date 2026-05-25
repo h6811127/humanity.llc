@@ -38,7 +38,10 @@ export function setHubSheetOpen(open) {
   if (!isHubSheet() || !hub) return;
   ensureBackdrop();
   hub.classList.toggle("device-hub-collapsed", !open);
-  if (backdrop) backdrop.hidden = !open;
+  if (backdrop) {
+    backdrop.hidden = false;
+    backdrop.classList.toggle("is-visible", open);
+  }
   document.body.classList.toggle("device-hub-sheet-open", open);
   chrome?.classList.toggle("top-chrome--hub-locked", open);
   hub.setAttribute("aria-hidden", open ? "false" : "true");

@@ -240,94 +240,46 @@ body.device-hub-sheet-open .top-chrome--float .top-chrome-bar--minimal,
   padding-top: 4px;
 }
 
+/* Solid torus profile: flat top, rounded sides, no hole */
 .device-hub-create-btn {
-  position: relative;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 46px;
+  height: 42px;
   text-decoration: none;
   color: #ffffff;
   border: none;
   border-radius: 50%;
-  overflow: hidden;
-  background: radial-gradient(
-    circle at 34% 28%,
-    #ff8aa0 0%,
-    #ff4d6d 22%,
-    var(--red) 52%,
-    #b8183f 78%,
-    #7a0f2a 100%
-  );
+  background: var(--red);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.55) inset,
-    0 -3px 6px rgba(60, 0, 18, 0.35) inset,
-    0 8px 22px rgba(219, 27, 67, 0.48),
-    0 3px 8px rgba(0, 0, 0, 0.14);
+    0 1px 0 rgba(255, 255, 255, 0.28) inset,
+    0 -5px 10px rgba(0, 0, 0, 0.14) inset,
+    0 3px 10px rgba(219, 27, 67, 0.28);
   -webkit-tap-highlight-color: transparent;
-  transition:
-    transform 0.28s var(--shell-spring),
-    box-shadow 0.28s var(--shell-ease);
-}
-
-.device-hub-create-btn::before {
-  content: "";
-  position: absolute;
-  inset: 5% 10% 48% 10%;
-  border-radius: 50%;
-  background: radial-gradient(
-    ellipse 85% 70% at 50% 0%,
-    rgba(255, 255, 255, 0.72) 0%,
-    rgba(255, 255, 255, 0.12) 52%,
-    transparent 72%
-  );
-  pointer-events: none;
-}
-
-.device-hub-create-btn::after {
-  content: "";
-  position: absolute;
-  inset: 55% 14% 6% 14%;
-  border-radius: 50%;
-  background: radial-gradient(
-    ellipse 90% 55% at 50% 100%,
-    rgba(0, 0, 0, 0.28) 0%,
-    transparent 68%
-  );
-  pointer-events: none;
+  transition: transform 0.2s var(--shell-spring);
 }
 
 .device-hub-create-glyph {
-  position: relative;
-  z-index: 1;
   display: block;
-  font-size: 30px;
-  font-weight: 400;
+  font-size: 28px;
+  font-weight: 500;
   line-height: 1;
   margin-top: -1px;
-  text-shadow:
-    0 1px 0 rgba(0, 0, 0, 0.22),
-    0 -1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .device-hub-create-btn:active {
-  transform: scale(0.92) translateY(1px);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.4) inset,
-    0 -1px 3px rgba(60, 0, 18, 0.3) inset,
-    0 4px 12px rgba(219, 27, 67, 0.4),
-    0 1px 4px rgba(0, 0, 0, 0.12);
+  transform: scale(0.96);
 }
 
 .device-hub-create-btn:focus-visible {
   outline: none;
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.55) inset,
-    0 -3px 6px rgba(60, 0, 18, 0.35) inset,
-    0 8px 22px rgba(219, 27, 67, 0.48),
-    0 0 0 3px rgba(219, 27, 67, 0.35);
+    0 1px 0 rgba(255, 255, 255, 0.28) inset,
+    0 -5px 10px rgba(0, 0, 0, 0.14) inset,
+    0 3px 10px rgba(219, 27, 67, 0.28),
+    0 0 0 3px rgba(219, 27, 67, 0.32);
 }
 
 .device-hub-notice-banner {
@@ -763,9 +715,7 @@ button.hub-card-action.hub-use-keys {
   transform: translateX(-50%) translateY(100%);
   transition: transform 0.45s var(--shell-spring);
   border-radius: 16px 16px 0 0;
-  background: rgba(242, 242, 247, 0.95);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  backdrop-filter: saturate(180%) blur(20px);
+  background: rgba(242, 242, 247, 0.98);
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.14);
   overflow: hidden;
   display: flex;
@@ -831,15 +781,41 @@ button.hub-card-action.hub-use-keys {
   margin: 0;
   padding: 0;
   border: none;
-  background: rgba(0, 0, 0, 0.2);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.28);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   cursor: default;
   -webkit-tap-highlight-color: transparent;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  transition:
+    opacity 0.35s var(--shell-ease),
+    visibility 0.35s var(--shell-ease);
+}
+
+.device-hub-backdrop.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 body.device-hub-sheet-open {
   overflow: hidden;
+}
+
+body.device-hub-sheet-open .shell-status-dot {
+  view-transition-name: none;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .device-hub-backdrop {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(0, 0, 0, 0.45);
+  }
 }
 
 .landing-framing--compact {

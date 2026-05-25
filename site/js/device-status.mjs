@@ -90,6 +90,13 @@ export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
   refreshHubGlance();
 }
 
+function hubSheetOpen() {
+  return (
+    document.body.classList.contains("device-hub-sheet-open") ||
+    (hub && !hub.classList.contains("device-hub-collapsed"))
+  );
+}
+
 function applyDot() {
   if (!dot) return;
   const run = () => {
@@ -98,7 +105,11 @@ function applyDot() {
     dot.classList.add(`pass-dot-status-network-${networkStatus}`);
     dot.classList.add(`pass-dot-status-device-${device}`);
   };
-  if (!prefersReducedMotion() && typeof document.startViewTransition === "function") {
+  if (
+    !prefersReducedMotion() &&
+    !hubSheetOpen() &&
+    typeof document.startViewTransition === "function"
+  ) {
     document.startViewTransition(run);
   } else {
     run();
