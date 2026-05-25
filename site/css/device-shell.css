@@ -212,40 +212,24 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   display: none !important;
 }
 
-/* Signing key custody (tab vs saved on device) */
+/* Signing key custody (tab vs saved on device) — uses .hc-notice */
 .device-keys-custody {
   margin: 0 0 16px;
-  padding: 14px 14px 12px;
-  border-radius: 14px;
-  background: rgba(219, 27, 67, 0.06);
-  border: 1px solid rgba(219, 27, 67, 0.2);
 }
 
-.device-keys-custody-kicker {
-  margin: 0 0 6px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--red, #db1b43);
-}
-
-.device-keys-custody-lead {
-  margin: 0 0 12px;
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--shell-label-strong, #1c1c1e);
+.device-keys-custody--hub {
+  margin-bottom: 12px;
 }
 
 .device-keys-custody-network {
-  margin: 0 0 12px;
+  margin: 12px 0;
   padding: 10px 12px;
   border-radius: 10px;
   font-size: 13px;
   line-height: 1.4;
   color: var(--shell-label-strong, #1c1c1e);
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid var(--shell-separator, rgba(60, 60, 67, 0.11));
+  background: rgba(255, 255, 255, 0.55);
+  border: 0.5px solid rgba(60, 60, 67, 0.1);
 }
 
 .device-keys-custody-tiers {
@@ -284,29 +268,8 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   color: var(--shell-label, rgba(60, 60, 67, 0.72));
 }
 
-.device-keys-custody-foot {
-  margin: 12px 0 0;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.device-keys-custody-foot a {
-  color: var(--red, #db1b43);
-  text-decoration: none;
-}
-
-.device-keys-custody-foot a:active {
-  opacity: 0.75;
-}
-
 .device-keys-custody--compact {
-  padding: 10px 12px;
   margin-bottom: 12px;
-}
-
-.device-keys-custody--compact .device-keys-custody-lead {
-  margin: 0;
-  font-size: 13px;
 }
 
 .device-keys-custody--created {
@@ -706,18 +669,11 @@ button.device-hub-notice-banner {
   opacity: 0.55;
 }
 
-.device-system-banner,
-.device-cross-tab-banner {
-  border: none;
-  box-shadow: var(--shell-shadow-sm);
-}
-
-.device-system-banner {
-  background: rgba(219, 27, 67, 0.09);
-}
-
-.device-cross-tab-banner {
-  background: rgba(0, 122, 255, 0.08);
+.device-system-banner.hc-notice,
+.device-cross-tab-banner.hc-notice {
+  margin-left: 0;
+  margin-right: 0;
+  box-shadow: none;
 }
 
 /* Typography  -  calmer hierarchy */
@@ -1288,12 +1244,8 @@ body.device-shell-created .created-screen {
 }
 
 .flow-form-warning {
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: rgba(219, 27, 67, 0.06);
-  border: none;
-  font-size: 14px;
-  line-height: 1.45;
+  margin-top: 12px;
+  margin-bottom: 12px;
 }
 
 .flow-submit {

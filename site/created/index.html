@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Your live object · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=80" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=19" />
+    <link rel="stylesheet" href="/styles.css?v=84" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=24" />
   </head>
   <body class="has-device-hub-search device-shell-created">
     <div class="page">
@@ -684,7 +684,7 @@
                   Open scan page
                 </a>
               </div>
-              <p class="form-warning owner-revoked-banner" id="owner-revoked-banner" hidden></p>
+              <p class="hc-notice hc-notice--error form-warning owner-revoked-banner" id="owner-revoked-banner" hidden></p>
               <p class="form-hint" id="owner-no-key">
                 Unlock a saved backup or recovery key below, or create again on
                 <a href="/create/">/create/</a>. humanity.llc cannot revoke for you.
@@ -714,7 +714,7 @@
                 </fieldset>
 
                 <div id="revoke-qr-block">
-                  <p class="form-hint revoke-id-warning">
+                  <p class="hc-notice hc-notice--warning revoke-id-warning">
                     Revoking changes live network status, not the physical sticker.
                   </p>
                   <label class="revoke-confirm">
@@ -727,7 +727,7 @@
                 </div>
 
                 <div id="revoke-card-block">
-                  <p class="form-hint revoke-id-warning revoke-confirm-spaced">
+                  <p class="hc-notice hc-notice--warning revoke-id-warning revoke-confirm-spaced">
                     Disabling the card stops every active QR on this profile.
                   </p>
                   <label class="revoke-confirm revoke-confirm-spaced">
@@ -939,7 +939,7 @@
                 <a id="organizer-revoke-link" href="/organizer-revoke/">coalition key</a> from create.
               </li>
             </ul>
-            <p class="form-hint revoke-id-warning">
+            <p class="hc-notice hc-notice--warning revoke-id-warning">
               Printed URLs keep profile ID and QR ID. Transitions change what the resolver returns.
             </p>
           </section>
@@ -989,8 +989,8 @@
           </ul>
         </div>
 
-        <p class="form-warning" id="created-error" hidden></p>
-        <p class="form-warning" id="no-session" hidden>
+        <p class="hc-notice hc-notice--error form-warning" id="created-error" hidden></p>
+        <p class="hc-notice hc-notice--warning form-warning" id="no-session" hidden>
           No signing keys in <strong>this tab</strong>. Finish create in the tab where you clicked
           Create, then tap <strong>Save on this device</strong> there  -  or open
           <a href="/wallet/">Saved cards</a> in that same tab. Later: recovery key or encrypted

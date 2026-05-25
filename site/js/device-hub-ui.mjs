@@ -398,7 +398,7 @@ function renderSavedRows() {
       ? networkChipHtml(entry.profile_id, getCachedNetworkStatus(entry.profile_id) ?? "checking")
       : "";
     const revokedAlert = hubConfig.fetchNetworkStatus
-      ? `<p class="hub-card-status-alert" data-hub-searchable="revoked since last visit network" hidden role="status">
+      ? `<p class="hub-card-status-alert hc-notice hc-notice--warning hc-notice--compact" data-hub-searchable="revoked since last visit network" hidden role="status">
           Revoked on the network since your last visit.
           <button type="button" class="hub-card-alert-dismiss">Got it</button>
         </p>`

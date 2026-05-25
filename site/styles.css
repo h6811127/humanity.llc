@@ -389,24 +389,10 @@ body.page-flow.has-shell-chrome .page > main.screen {
 
 .device-system-banner {
   margin: 0 var(--pad) 8px;
-  padding: 10px 12px;
-  border-radius: var(--radius);
-  font-size: 13px;
-  line-height: 1.4;
-  color: var(--black);
-  background: rgba(219, 27, 67, 0.08);
-  border: 1px solid rgba(219, 27, 67, 0.22);
 }
 
 .device-cross-tab-banner {
   margin: 0 var(--pad) 8px;
-  padding: 10px 12px;
-  border-radius: var(--radius);
-  font-size: 13px;
-  line-height: 1.45;
-  color: var(--black);
-  background: rgba(30, 90, 160, 0.07);
-  border: 1px solid rgba(30, 90, 160, 0.22);
 }
 
 .device-cross-tab-banner a {
@@ -597,11 +583,13 @@ body.page-flow.has-shell-chrome .page > main.screen {
 
 .hub-card-status-alert {
   margin: 0;
-  padding: 8px 12px 4px;
-  font-size: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13px;
   font-weight: 500;
   line-height: 1.4;
-  color: var(--red);
+  color: rgba(60, 60, 67, 0.88);
+  background: rgba(255, 149, 0, 0.14);
 }
 
 .hub-card-alert-dismiss {
@@ -610,10 +598,10 @@ body.page-flow.has-shell-chrome .page > main.screen {
   border: none;
   background: none;
   font: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--red);
-  text-decoration: underline;
+  font-size: 13px;
+  font-weight: 600;
+  color: #007aff;
+  text-decoration: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
@@ -4541,13 +4529,163 @@ a.wallet-pin-open {
   transform: scale(0.99);
 }
 
-.form-warning {
-  font-size: 14px;
-  color: var(--black);
-  background: rgba(219, 27, 67, 0.08);
-  border-radius: 14px;
-  padding: 12px 14px;
+/* iOS-style inline notices (warnings, info, errors) */
+.hc-notice {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
   margin: 8px 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(60, 60, 67, 0.92);
+  background: #f2f2f7;
+  border: none;
+}
+
+.hc-notice-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  color: rgba(60, 60, 67, 0.45);
+}
+
+.hc-notice-icon svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+.hc-notice-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.hc-notice-title {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #1c1c1e;
+}
+
+.hc-notice-body {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(60, 60, 67, 0.88);
+}
+
+.hc-notice-body strong {
+  font-weight: 600;
+  color: #1c1c1e;
+}
+
+.hc-notice-body a {
+  font-weight: 600;
+  color: #007aff;
+  text-decoration: none;
+}
+
+.hc-notice-body a:active {
+  opacity: 0.7;
+}
+
+.hc-notice-foot {
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 0.5px solid rgba(60, 60, 67, 0.12);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.hc-notice-foot a {
+  color: #007aff;
+  text-decoration: none;
+}
+
+.hc-notice-foot a:active {
+  opacity: 0.7;
+}
+
+.hc-notice--warning {
+  background: rgba(255, 149, 0, 0.14);
+}
+
+.hc-notice--warning .hc-notice-icon {
+  color: #ff9500;
+}
+
+.hc-notice--warning .hc-notice-title {
+  color: #1c1c1e;
+}
+
+.hc-notice--error {
+  background: rgba(255, 59, 48, 0.12);
+}
+
+.hc-notice--error .hc-notice-icon {
+  color: #ff3b30;
+}
+
+.hc-notice--info {
+  background: rgba(0, 122, 255, 0.12);
+}
+
+.hc-notice--info .hc-notice-icon {
+  color: #007aff;
+}
+
+.hc-notice--compact {
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.hc-notice--compact .hc-notice-body {
+  font-size: 13px;
+}
+
+.hc-notice--compact .hc-notice-title {
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.hc-notice--block {
+  display: block;
+}
+
+.hc-notice--block .hc-notice-icon {
+  display: none;
+}
+
+.form-warning:not(.hc-notice--error) {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 8px 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(60, 60, 67, 0.92);
+  background: rgba(255, 149, 0, 0.14);
+  border: none;
+}
+
+.hc-notice--error.form-warning,
+.hc-notice--error.owner-revoked-banner {
+  display: flex;
+  margin: 8px 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  border: none;
 }
 
 .form-status {
@@ -5064,7 +5202,24 @@ button.btn-danger {
 
 .revoke-id-warning {
   margin: 0 0 12px;
+}
+
+.revoke-id-warning.hc-notice {
+  display: flex;
+}
+
+.research-live-banner {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14px;
   line-height: 1.45;
+  color: rgba(60, 60, 67, 0.88);
+  background: rgba(0, 122, 255, 0.12);
+}
+
+.research-live-banner p {
+  margin: 0;
 }
 
 .recovery-reveal-card {
