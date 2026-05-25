@@ -15,7 +15,7 @@
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="/styles.css?v=82" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=19" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=21" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -36,10 +36,30 @@
               id="brand-status-dot-btn"
               aria-label="Device and system status"
               aria-expanded="false"
-              aria-controls="device-hub"
+              aria-haspopup="dialog"
+              aria-controls="device-hub-glance-popover device-hub"
             >
               <span class="pass-dot shell-status-dot" id="brand-status-dot"></span>
             </button>
+            <div
+              class="brand-status-popover device-hub-glance-popover"
+              id="device-hub-glance-popover"
+              role="dialog"
+              aria-label="Saved cards and notices on this device"
+              hidden
+            >
+              <ul class="device-hub-glance-list" id="device-hub-glance-list"></ul>
+              <a
+                class="device-hub-glance-help brand-status-sheet-link"
+                href="mailto:info@humanity.llc"
+              >
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                </span>
+                <span class="device-hub-glance-help-text">info@humanity.llc</span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </div>
             <button
               type="button"
               class="shell-notif-badge"
@@ -295,15 +315,6 @@
           <div class="device-hub-status-key" id="device-hub-status-key" aria-label="Status dot reference"></div>
         </div>
       </section>
-
-      <div
-        class="device-hub-glance"
-        id="device-hub-glance"
-        hidden
-        aria-label="Saved cards and notices on this device"
-      >
-        <ul class="device-hub-glance-list" id="device-hub-glance-list"></ul>
-      </div>
 
       <main class="screen screen-landing">
         <section class="hero hero-tight" data-landing-tutorial>
@@ -743,8 +754,8 @@
         </section>
       </main>
     </div>
-    <script src="/js/landing-focus.mjs?v=2" type="module"></script>
-    <script src="/js/device-status.mjs?v=19" type="module"></script>
+    <script src="/js/landing-focus.mjs?v=3" type="module"></script>
+    <script src="/js/device-status.mjs?v=20" type="module"></script>
     <script src="/js/landing-progress.mjs?v=2" type="module"></script>
     <script src="/js/landing-device-hub.mjs?v=12" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=2" type="module"></script>

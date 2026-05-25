@@ -30,9 +30,6 @@ function applyFocus() {
     toggle.textContent = on ? "Show intro again" : "Hide intro · focus on this device";
     toggle.setAttribute("aria-pressed", on ? "true" : "false");
   }
-  if (on) {
-    window.dispatchEvent(new CustomEvent("hc-landing-focus-on"));
-  }
 }
 
 toggle?.addEventListener("click", () => {

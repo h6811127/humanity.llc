@@ -16,6 +16,8 @@ const GLANCE_MAX_CARDS = 3;
 /** @type {{ root: HTMLElement, list: HTMLElement, hub: HTMLElement | null, wallet: boolean }[]} */
 const glanceTargets = [];
 
+let glanceHasRenderableContent = false;
+
 function escapeHtml(s) {
   return String(s)
     .replace(/&/g, "&amp;")
@@ -23,11 +25,12 @@ function escapeHtml(s) {
     .replace(/>/g, "&gt;");
 }
 
-function hubCollapsed(hub) {
-  return hub?.classList.contains("device-hub-collapsed") ?? true;
+function closeGlancePopoverEvent() {
+  window.dispatchEvent(new CustomEvent("hc-glance-popover-close"));
 }
 
 function expandHub(targetId) {
+  closeGlancePopoverEvent();
   window.dispatchEvent(
     new CustomEvent("hc-hub-expand-request", { detail: { targetId: targetId ?? null } })
   );
@@ -41,8 +44,8 @@ function registerGlanceTarget(id, listId, hubId, wallet) {
   glanceTargets.push({ root, list, hub, wallet });
 }
 
-registerGlanceTarget("device-hub-glance", "device-hub-glance-list", "device-hub", false);
-registerGlanceTarget("wallet-hub-glance", "wallet-hub-glance-list", null, true);
+registerGlanceTarget("device-hub-glance-popover", "device-hub-glance-list", "device-hub", false);
+registerGlanceTarget("wallet-hub-glance-popover", "wallet-hub-glance-list", null, true);
 
 function glanceCopy(wallet) {
   return wallet
@@ -63,11 +66,6 @@ function refreshGlanceTarget(target) {
   const { root, list, hub, wallet } = target;
   const copy = glanceCopy(wallet);
 
-  if (hub && !hubCollapsed(hub)) {
-    root.hidden = true;
-    return;
-  }
-
   const entries = loadWallet();
   const notices = tabNoticeCount();
   const liveProof = getLiveControlPendingCount();
@@ -81,7 +79,7 @@ function refreshGlanceTarget(target) {
     return;
   }
 
-  root.hidden = false;
+  glanceHasRenderableContent = true;
   list.innerHTML = "";
 
   if (liveProof > 0) {
@@ -152,6 +150,7 @@ function refreshGlanceTarget(target) {
         <span class="device-hub-glance-sub">${escapeHtml(subLine)} · Saved on device</span>
       </button>`;
     li.querySelector("button")?.addEventListener("click", () => {
+      closeGlancePopoverEvent();
       openCardNowPage(entry);
     });
     list.appendChild(li);
@@ -173,10 +172,18 @@ function refreshGlanceTarget(target) {
   }
 }
 
+export function hubGlanceHasContent() {
+  return glanceHasRenderableContent;
+}
+
 export function refreshHubGlance() {
   if (glanceTargets.length === 0) return;
+  glanceHasRenderableContent = false;
   for (const target of glanceTargets) {
     refreshGlanceTarget(target);
+  }
+  if (!glanceHasRenderableContent) {
+    closeGlancePopoverEvent();
   }
 }
 

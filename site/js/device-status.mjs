@@ -8,7 +8,12 @@ import { getTabSession } from "./device-keys.mjs";
 import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
 import { crossTabNoticeCount } from "./device-tab-presence.mjs";
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
-import { refreshHubGlance } from "./device-hub-glance.mjs";
+import { hubGlanceHasContent, refreshHubGlance } from "./device-hub-glance.mjs";
+import {
+  closeGlancePopover,
+  isGlancePopoverOpen,
+  setGlancePopoverOpen,
+} from "./device-hub-glance-popover.mjs";
 import "./device-shell-motion.mjs";
 import "./device-shell-chrome.mjs";
 import { isHubSheet, setHubSheetOpen } from "./device-hub-sheet.mjs";
@@ -83,6 +88,7 @@ function scrollWalletToTop() {
 
 export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
   if (!hub) return;
+  if (open) closeGlancePopover();
   if (isHubSheet()) {
     setHubSheetOpen(open);
   } else {
@@ -241,18 +247,46 @@ async function refreshNetwork() {
   refreshSummary();
 }
 
-function openHubFromChrome() {
-  if (isWalletPage()) {
+function openWalletFromChrome() {
+  if (isGlancePopoverOpen()) {
+    closeGlancePopover();
     scrollWalletToTop();
     hapticTap();
+    return;
+  }
+  if (hubGlanceHasContent()) {
+    setGlancePopoverOpen(true);
+    hapticTap();
+    return;
+  }
+  scrollWalletToTop();
+  hapticTap();
+}
+
+function openHubFromChrome() {
+  if (isWalletPage()) {
+    openWalletFromChrome();
     return;
   }
   if (!hub) {
     location.href = "/";
     return;
   }
-  const willOpen = hub.classList.contains("device-hub-collapsed");
-  setHubExpanded(willOpen, { haptic: true, persist: false });
+  if (hubSheetOpen()) {
+    setHubExpanded(false, { haptic: true, persist: false });
+    return;
+  }
+  if (isGlancePopoverOpen()) {
+    closeGlancePopover();
+    setHubExpanded(true, { haptic: true, persist: false });
+    return;
+  }
+  if (hubGlanceHasContent()) {
+    setGlancePopoverOpen(true);
+    hapticTap();
+    return;
+  }
+  setHubExpanded(true, { haptic: true, persist: false });
 }
 
 if (hub) {
@@ -262,10 +296,6 @@ if (hub) {
 } else if (isWalletPage()) {
   renderStatusKey();
 }
-
-window.addEventListener("hc-landing-focus-on", () => {
-  if (hub) setHubExpanded(true, { persist: false, haptic: false });
-});
 
 dotBtn?.addEventListener("click", (e) => {
   e.preventDefault();
@@ -285,12 +315,17 @@ notifBtn?.addEventListener("click", (e) => {
     location.href = "/";
     return;
   }
+  closeGlancePopover();
   setHubExpanded(true, { haptic: true, persist: false });
   window.setTimeout(scrollToFirstNotification, 120);
 });
 
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
+  if (isGlancePopoverOpen()) {
+    closeGlancePopover();
+    return;
+  }
   if (hub && !hub.classList.contains("device-hub-collapsed")) {
     setHubExpanded(false, { haptic: false });
   }

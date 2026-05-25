@@ -110,9 +110,96 @@ body.device-hub-sheet-open .top-chrome--float .top-chrome-bar--minimal,
 }
 
 .shell-status-cluster {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 10px;
+}
+
+/* Glance menu anchored to status dot */
+.device-hub-glance-popover {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  z-index: 70;
+  width: min(calc(100vw - 32px), 380px);
+  max-height: min(70vh, 520px);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 10px;
+  border-radius: 16px;
+  background: var(--shell-fill, #fff);
+  border: 1px solid var(--shell-separator, rgba(60, 60, 67, 0.11));
+  box-shadow: var(--shell-shadow-md, 0 12px 32px rgba(0, 0, 0, 0.1));
+}
+
+.device-hub-glance-popover[hidden] {
+  display: none !important;
+}
+
+body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
+  animation: device-glance-popover-in 0.2s var(--shell-spring, ease) both;
+}
+
+@keyframes device-glance-popover-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.device-hub-glance-popover .device-hub-glance-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.device-hub-glance-popover .device-hub-glance-btn {
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--shell-separator, rgba(60, 60, 67, 0.11));
+  background: var(--shell-surface-elevated, #fff);
+}
+
+.device-hub-glance-help {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--shell-separator, rgba(60, 60, 67, 0.11));
+  background: var(--shell-surface-elevated, #fff);
+  font-weight: 600;
+  color: var(--red, #db1b43);
+  text-decoration: none;
+}
+
+.device-hub-glance-help:active {
+  opacity: 0.75;
+}
+
+.device-hub-glance-help-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.device-hub-glance-help .list-chevron {
+  color: var(--shell-label, rgba(60, 60, 67, 0.55));
+}
+
+/* Legacy page-strip glance (removed from DOM) */
+.device-hub-glance:not(.device-hub-glance-popover) {
+  display: none !important;
 }
 
 .shell-status-dot-btn {

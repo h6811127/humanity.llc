@@ -6,7 +6,7 @@
     <title>Saved on this device · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="/styles.css?v=81" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=20" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=21" />
   </head>
   <body class="page-wallet">
     <div class="page">
@@ -21,10 +21,21 @@
               class="shell-status-dot-btn"
               id="brand-status-dot-btn"
               aria-label="Device and system status"
-              aria-controls="wallet-page"
+              aria-expanded="false"
+              aria-haspopup="dialog"
+              aria-controls="wallet-hub-glance-popover wallet-page"
             >
               <span class="pass-dot shell-status-dot" id="brand-status-dot"></span>
             </button>
+            <div
+              class="brand-status-popover device-hub-glance-popover"
+              id="wallet-hub-glance-popover"
+              role="dialog"
+              aria-label="Quick summary"
+              hidden
+            >
+              <ul class="device-hub-glance-list" id="wallet-hub-glance-list"></ul>
+            </div>
             <button
               type="button"
               class="shell-notif-badge"
@@ -64,15 +75,6 @@
             Signing keys live in <strong>this browser</strong> — never uploaded to the network.
           </p>
         </header>
-
-        <div
-          class="device-hub-glance wallet-hub-glance"
-          id="wallet-hub-glance"
-          hidden
-          aria-label="Quick summary"
-        >
-          <ul class="device-hub-glance-list" id="wallet-hub-glance-list"></ul>
-        </div>
 
         <div class="wallet-alerts-top" id="wallet-alerts-top">
           <div class="device-hub-group" id="device-hub-crosstab-notice" hidden role="status"></div>
