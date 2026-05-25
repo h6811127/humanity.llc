@@ -63,7 +63,7 @@ html[data-theme="dark"] .device-hub-group-hint,
 html[data-theme="dark"] .device-hub-group-label,
 html[data-theme="dark"] .device-hub-subgroup-label,
 html[data-theme="dark"] .device-hub-section-lead,
-html[data-theme="dark"] .device-hub-privacy-hint {
+html[data-theme="dark"] .device-hub-privacy-hint,
 html[data-theme="dark"] .created-loop-title,
 html[data-theme="dark"] .created-print-tip summary,
 html[data-theme="dark"] .created-print-steps {
@@ -187,6 +187,50 @@ html[data-theme="dark"] .hub-card-status-alert-text {
 
 html[data-theme="dark"] .hub-card-details-body {
   color: var(--shell-label);
+}
+
+html[data-theme="dark"] .created-primary-actions {
+  background: var(--shell-fill);
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .created-primary-action {
+  border-bottom-color: var(--shell-separator);
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .created-primary-action-sub {
+  color: var(--shell-label);
+}
+
+html[data-theme="dark"] .created-primary-action.is-done {
+  background: rgba(48, 209, 88, 0.14);
+}
+
+html[data-theme="dark"] .created-primary-action.is-done .created-primary-action-title {
+  color: #30d158;
+}
+
+html[data-theme="dark"] .created-primary-action.is-done .created-primary-action-sub {
+  color: rgba(48, 209, 88, 0.82);
+}
+
+html[data-theme="dark"] .created-advanced-block {
+  background: var(--shell-fill-secondary);
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .created-advanced-summary {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .created-advanced-summary-icon {
+  color: #0a84ff;
+}
+
+html[data-theme="dark"] .hub-card-status-alert {
+  background: var(--shell-fill-secondary);
+  border-color: rgba(255, 69, 58, 0.45);
 }
 
 html[data-theme="dark"] .hc-notice-title,

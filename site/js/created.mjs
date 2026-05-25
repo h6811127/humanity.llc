@@ -747,9 +747,23 @@ async function bootstrapOwnerTools() {
 }
 
 createdTabs = initCreatedTabs();
-initCreatedDashboard({ selectTab: (id) => createdTabs?.select(id) });
+
+function setupCreatedDashboard() {
+  initCreatedDashboard({
+    selectTab: (id) => createdTabs?.select(id),
+    runSave: () => deviceSaveCtl?.runSave?.() === true,
+    getScanUrl: () => {
+      const href = openScanBtn?.getAttribute("href");
+      return href && href.startsWith("http") ? href : null;
+    },
+    getProfileId: () => profileId,
+  });
+}
 
 if (profileId && activeQrId) {
   deviceSaveCtl = initCreatedDeviceSave(loadSession);
+  setupCreatedDashboard();
   void bootstrapOwnerTools();
+} else {
+  setupCreatedDashboard();
 }

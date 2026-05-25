@@ -61,13 +61,13 @@ export function initCreatedDeviceSave(getSession) {
     const session = getSession();
     if (!session?.profile_id || !session?.owner_private_key_b58) {
       setStatus("No signing keys in this tab.", true);
-      return;
+      return false;
     }
     const result = saveSessionToWallet(session, labelInput?.value ?? "");
     if ("error" in result) {
       setStatus(result.error, true);
       refresh();
-      return;
+      return false;
     }
     setStatus(
       result.already ? "Already saved on this device." : "Saved on this device.",
@@ -83,6 +83,7 @@ export function initCreatedDeviceSave(getSession) {
     }
     refresh();
     window.dispatchEvent(new Event("hc-device-hub-changed"));
+    return true;
   }
 
   form?.addEventListener("submit", (e) => {
@@ -96,5 +97,5 @@ export function initCreatedDeviceSave(getSession) {
   });
 
   refresh();
-  return { refresh };
+  return { refresh, runSave };
 }
