@@ -5,17 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Your live object · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=51" />
+    <link rel="stylesheet" href="/styles.css?v=65" />
   </head>
   <body>
     <div class="page">
       <header class="top">
-        <a class="top-brand" href="/">
-          <span class="pass-dot" aria-hidden="true"></span>
-          <span>humanity.llc</span>
-        </a>
+        <div class="top-brand-row">
+          <button
+            type="button"
+            class="brand-status-dot-btn"
+            id="brand-status-dot-btn"
+            aria-label="Network and device status"
+            aria-expanded="false"
+            aria-controls="brand-status-popover"
+          >
+            <span class="pass-dot" id="brand-status-dot"></span>
+          </button>
+          <a class="top-brand" href="/">humanity.llc</a>
+        </div>
         <a class="top-create" href="/create/">Create</a>
       </header>
+
+      <div class="top-status" id="top-status">
+        <button
+          type="button"
+          class="device-status-summary device-status-summary--static"
+          id="device-status-summary"
+        >
+          <span class="device-status-segments" id="device-status-segments"></span>
+          <span class="device-status-chevron" aria-hidden="true">›</span>
+        </button>
+        <div
+          class="brand-status-popover"
+          id="brand-status-popover"
+          role="dialog"
+          aria-label="Status"
+          hidden
+        >
+          <div class="brand-status-sheet" id="brand-status-sheet"></div>
+        </div>
+      </div>
 
       <main class="screen created-screen">
         <section class="hero hero-compact">
@@ -681,6 +710,7 @@
         </p>
       </main>
     </div>
+    <script src="/js/device-status.mjs?v=3" type="module"></script>
     <script type="module" src="/js/created.mjs?v=33"></script>
   </body>
 </html>

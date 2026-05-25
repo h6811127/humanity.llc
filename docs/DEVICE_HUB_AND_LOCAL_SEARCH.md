@@ -19,9 +19,13 @@ We kept the current landing funnel (hero create → pass demo → device hub →
 
 **Landing story (shipped):** Hero one-liner (`landing-story-hook`), a **five-step progress strip** (Create → Revoke) with the next step highlighted from `hc_wallet` / `hc_device_pins`, **On this device** above the pass demo, and a floating **New here?** pill (hidden once wallet or pins exist) that mirrors the same steps.
 
-**Status line (shipped):** Grey text under the header, always visible on landing and `/wallet/`, e.g. `Network live · 2 saved · 1 pinned · 1 notice`. **Notices** = keys in this tab not yet saved on device. Tap the line to expand/collapse **On this device** (landing); on `/wallet/` tap scrolls to the list.
+**Status line (shipped):** Segmented grey text (`Network live · 2 saved · 0 pinned · 1 notice`) — zero counts are muted; **notice** is bold red when &gt; 0. Hint: “Tap to manage keys on this device” when hub collapsed. Chevron rotates when open. Hub open state persists in `sessionStorage` for the session; first unsaved-tab notice auto-expands hub once.
 
-**Brand dot (shipped):** Separate tap target beside the wordmark (works on mobile). Opens a short popover with the same status detail. Dot color: **network** (red/amber/grey from `GET /.well-known/hc/v1/health`) + **device** (pulse = unsaved tab keys).
+**Brand dot (shipped):** Tap opens an iOS-style spec sheet (Network / Saved / Pinned / Notice rows). Row taps expand hub or scroll to the matching group.
+
+**Hub rows (shipped):** Saved cards show **Use keys**, **Open scan**, **⋯** (Relabel, Remove). Notice row routes to `/created/` when tab has unsaved keys. **Import backup file** shortcut decrypts `.hcbackup.json` into `hc_wallet`.
+
+**Shared header:** Landing, `/wallet/`, and `/created/` use the same status module (`device-status.mjs`).
 
 **Naming:** UI says **Saved on this device** / **All saved cards** — not “wallet”. URL stays `/wallet/` for compatibility.
 
@@ -53,11 +57,10 @@ Returning users see their labels on the homepage; strangers still see the same s
 - **Search:** Pins included in landing FAB search and wallet search (haystack: label, ids, url, “public pinned”).
 - **Landing:** Injected **Pinned public cards** group when pins exist; ↗ chevron indicates external scan.
 
-### Phase 3 — “Complete device hub” (optional, not cryptocurrency)
+### Phase 3 — backup import (shipped on landing hub)
 
-- **Encrypted backup import → wallet** (M5.5): user chooses a passphrase, downloads a backup **file**, later imports on `/wallet/` or `/created/` → decrypted keys written to `hc_wallet`.
-- **Not** blockchain, tokens, or server-side key custody — same Ed25519 + AES-GCM backup already used under **Manage** on `/created/`.
-- **Effort:** Medium — reuse `key-backup.mjs` decrypt path; add wallet import UI + one row in search.
+- **Import backup file** on landing **On this device** → decrypt `.hcbackup.json` into `hc_wallet` (`device-hub-import.mjs`).
+- Full export/import UI remains under **Manage** on `/created/`.
 
 ### Explicitly deferred
 
@@ -99,7 +102,9 @@ Returning users see their labels on the homepage; strangers still see the same s
 | `site/js/landing-device-hub.mjs` | Wallet + pin injection, FAB, search |
 | `site/js/landing-progress.mjs` | Progress strip next/done from local storage |
 | `site/js/landing-help.mjs` | Floating “New here?” for empty device storage |
-| `site/js/device-status.mjs` | Status line, dot popover, hub expand/collapse |
+| `site/js/device-status.mjs` | Status line, dot spec sheet, hub expand/collapse |
+| `site/js/device-keys.mjs` | Use keys → session + `/created/` URL |
+| `site/js/device-hub-import.mjs` | Hub backup import → `hc_wallet` |
 | `site/js/device-counts.mjs` | Shared saved/pin count label |
 | `site/js/device-pins.mjs` | Parse, validate, dedupe, `hc_device_pins` |
 | `site/js/device-hub-search.mjs` | Shared filter over `[data-hub-searchable]` |

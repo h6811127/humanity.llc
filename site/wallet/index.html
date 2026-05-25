@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Saved on this device · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=64" />
+    <link rel="stylesheet" href="/styles.css?v=65" />
   </head>
   <body class="has-device-hub-search">
     <div class="page">
@@ -32,15 +32,17 @@
           class="device-status-summary device-status-summary--static"
           id="device-status-summary"
         >
-          <span id="device-status-text">Network live · 0 saved · 0 pinned · 0 notices</span>
+          <span class="device-status-segments" id="device-status-segments"></span>
+          <span class="device-status-chevron" aria-hidden="true">›</span>
         </button>
         <div
           class="brand-status-popover"
           id="brand-status-popover"
-          role="tooltip"
+          role="dialog"
+          aria-label="Status"
           hidden
         >
-          <p id="brand-status-popover-text"></p>
+          <div class="brand-status-sheet" id="brand-status-sheet"></div>
         </div>
       </div>
 
@@ -159,7 +161,7 @@
       </label>
     </div>
 
-    <script src="/js/device-status.mjs?v=2" type="module"></script>
+    <script src="/js/device-status.mjs?v=3" type="module"></script>
     <script type="module" src="/js/card-wallet.mjs?v=6"></script>
   </body>
 </html>

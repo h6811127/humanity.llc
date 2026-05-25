@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=64" />
+    <link rel="stylesheet" href="/styles.css?v=65" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -51,15 +51,20 @@
           aria-expanded="false"
           aria-controls="device-hub"
         >
-          <span id="device-status-text">Network live · 0 saved · 0 pinned · 0 notices</span>
+          <span class="device-status-segments" id="device-status-segments"></span>
+          <span class="device-status-chevron" aria-hidden="true">›</span>
         </button>
+        <p class="device-status-hint" id="device-status-hint">
+          Tap to manage keys on this device
+        </p>
         <div
           class="brand-status-popover"
           id="brand-status-popover"
-          role="tooltip"
+          role="dialog"
+          aria-label="Status"
           hidden
         >
-          <p id="brand-status-popover-text"></p>
+          <div class="brand-status-sheet" id="brand-status-sheet"></div>
         </div>
       </div>
 
@@ -77,6 +82,8 @@
             Nothing here yet? After create, use step <strong>Save</strong> on
             <a href="/created/">/created/</a> — keys stay in this browser only.
           </p>
+
+          <div class="device-hub-group" id="device-hub-notice-group" hidden></div>
 
           <div
             class="device-hub-group"
@@ -145,6 +152,39 @@
                   </span>
                   <span class="list-chevron" aria-hidden="true">›</span>
                 </a>
+              </li>
+              <li class="device-hub-import-row" data-hub-searchable="import backup file keys">
+                <details class="device-hub-import">
+                  <summary class="list-row list-action device-hub-import-summary">
+                    <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    </span>
+                    <span class="list-content">
+                      <span class="list-title">Import backup file</span>
+                      <span class="list-sub">Move keys to this device</span>
+                    </span>
+                    <span class="list-chevron" aria-hidden="true">›</span>
+                  </summary>
+                  <form class="device-hub-import-form" id="hub-import-form">
+                    <p class="form-hint">
+                      Encrypted .hcbackup.json from /created/ — never uploaded.
+                    </p>
+                    <input type="file" accept=".json,application/json" required />
+                    <label class="form-label" for="hub-import-passphrase">Passphrase</label>
+                    <input
+                      type="password"
+                      id="hub-import-passphrase"
+                      name="passphrase"
+                      class="form-input"
+                      autocomplete="off"
+                      required
+                    />
+                    <button type="submit" class="landing-hero-btn landing-hero-btn-secondary">
+                      Import to this device
+                    </button>
+                    <p class="form-status" id="hub-import-status" hidden></p>
+                  </form>
+                </details>
               </li>
             </ul>
           </div>
@@ -766,10 +806,10 @@
     </nav>
     <script src="/js/pass-flip.js?v=1" defer></script>
     <script src="/js/pass-demo-revoke.js?v=1" defer></script>
-    <script src="/js/device-status.mjs?v=2" type="module"></script>
+    <script src="/js/device-status.mjs?v=3" type="module"></script>
     <script src="/js/landing-progress.mjs?v=1" type="module"></script>
     <script src="/js/landing-help.mjs?v=3" type="module"></script>
-    <script src="/js/landing-device-hub.mjs?v=5" type="module"></script>
+    <script src="/js/landing-device-hub.mjs?v=6" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=1" type="module"></script>
   </body>
 </html>

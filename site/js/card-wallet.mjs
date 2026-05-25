@@ -8,6 +8,7 @@ import {
   pinHaystack,
   savePins,
 } from "./device-pins.mjs";
+import { activateWalletEntry, createdUrlForEntry, getTabSession } from "./device-keys.mjs";
 import {
   defaultWalletLabel,
   loadWallet,
@@ -15,37 +16,6 @@ import {
   saveWallet,
   walletEntrySubtitle,
 } from "./device-wallet.mjs";
-
-function loadActiveSession() {
-  try {
-    const raw = sessionStorage.getItem("hc_created");
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-function activateEntry(entry) {
-  sessionStorage.setItem(
-    "hc_created",
-    JSON.stringify({
-      profile_id: entry.profile_id,
-      qr_id: entry.qr_id,
-      handle: entry.handle,
-      manifesto_line: entry.manifesto_line,
-      scan_url: entry.scan_url,
-      owner_public_key_b58: entry.owner_public_key_b58,
-      owner_private_key_b58: entry.owner_private_key_b58,
-      recovery_public_key_b58: entry.recovery_public_key_b58,
-      recovery_private_key_b58: entry.recovery_private_key_b58,
-      qr_expires_at: entry.qr_expires_at,
-      status: entry.status || "active",
-      verification: entry.verification,
-      issued_vouches: entry.issued_vouches || [],
-      wallet_label: entry.label,
-    })
-  );
-}
 
 function escapeHtml(s) {
   return String(s)
@@ -195,11 +165,8 @@ function renderList() {
       const id = btn.getAttribute("data-id");
       const entry = loadWallet().find((e) => e.id === id);
       if (!entry) return;
-      activateEntry(entry);
-      const url = new URL("/created/", location.origin);
-      url.searchParams.set("profile_id", entry.profile_id);
-      if (entry.qr_id) url.searchParams.set("qr_id", entry.qr_id);
-      location.href = url.href;
+      activateWalletEntry(entry);
+      location.href = createdUrlForEntry(entry);
     });
   });
 
@@ -248,7 +215,7 @@ function applyHubSearch() {
 }
 
 function updateActiveBanner() {
-  const session = loadActiveSession();
+  const session = getTabSession();
   const hasKeys = !!(session?.profile_id && session?.owner_private_key_b58);
 
   if (tabHint) {
@@ -297,7 +264,7 @@ function prefillSaveLabel(session) {
   saveLabel.value = defaultWalletLabel(session);
 }
 
-const session = loadActiveSession();
+const session = getTabSession();
 if (saveForm && saveGroup && session?.owner_private_key_b58 && session?.profile_id) {
   saveGroup.hidden = false;
   prefillSaveLabel(session);

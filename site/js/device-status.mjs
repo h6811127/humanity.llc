@@ -1,9 +1,13 @@
 /**
- * Header status line, brand dot, and collapsible On this device hub.
+ * Header status line, brand dot popover, collapsible On this device hub.
  */
 import { resolverApiOrigin } from "./hc-sign.mjs";
-import { loadWallet, isWalletSaved } from "./device-wallet.mjs";
-import { buildStatusLine } from "./device-counts.mjs";
+import { buildStatusSegments, tabNoticeCount } from "./device-counts.mjs";
+import { getTabSession } from "./device-keys.mjs";
+import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
+
+const HUB_OPEN_KEY = "hc_hub_open";
+const NOTICE_EXPAND_KEY = "hc_notice_hub_expand";
 
 const NETWORK_CLASSES = [
   "pass-dot-status-network-ok",
@@ -17,25 +21,33 @@ const DEVICE_CLASSES = [
 ];
 
 const summaryBtn = document.getElementById("device-status-summary");
-const summaryText = document.getElementById("device-status-text");
+const segmentsEl = document.getElementById("device-status-segments");
+const statusHint = document.getElementById("device-status-hint");
 const dotBtn = document.getElementById("brand-status-dot-btn");
 const dot = document.getElementById("brand-status-dot");
 const popover = document.getElementById("brand-status-popover");
-const popoverText = document.getElementById("brand-status-popover-text");
+const popoverSheet = document.getElementById("brand-status-sheet");
 const hub = document.getElementById("device-hub");
 
 let networkStatus = "offline";
 let popoverOpen = false;
 
-function hasUnsavedTabKeys() {
+function prefersReducedMotion() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function hapticTap() {
   try {
-    const raw = sessionStorage.getItem("hc_created");
-    const session = raw ? JSON.parse(raw) : null;
-    if (!session?.profile_id || !session?.owner_private_key_b58) return false;
-    return !isWalletSaved(session.profile_id);
+    navigator.vibrate?.(1);
   } catch {
-    return false;
+    /* ignore */
   }
+}
+
+function hasUnsavedTabKeys() {
+  const session = getTabSession();
+  if (!session?.profile_id || !session?.owner_private_key_b58) return false;
+  return !isWalletSaved(session.profile_id);
 }
 
 function deviceState() {
@@ -44,15 +56,15 @@ function deviceState() {
   return "none";
 }
 
-function statusDetailText() {
-  const { parts } = buildStatusLine(networkStatus);
-  const device =
-    deviceState() === "unsaved"
-      ? "Keys in this tab are not saved on this device yet."
-      : deviceState() === "keys"
-        ? "Signing keys are saved in this browser."
-        : "No signing keys saved on this device.";
-  return `${parts.join(" · ")}. ${device} Tap the line below to open On this device.`;
+export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
+  if (!hub) return;
+  hub.classList.toggle("device-hub-collapsed", !open);
+  if (summaryBtn) summaryBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  if (statusHint) statusHint.hidden = open;
+  if (persist) {
+    sessionStorage.setItem(HUB_OPEN_KEY, open ? "1" : "0");
+  }
+  if (haptic) hapticTap();
 }
 
 function applyDot() {
@@ -63,24 +75,100 @@ function applyDot() {
   dot.classList.add(`pass-dot-status-device-${device}`);
 }
 
+function renderSegments() {
+  const segments = buildStatusSegments(networkStatus);
+  if (!segmentsEl) return segments;
+
+  segmentsEl.innerHTML = "";
+  segments.forEach((seg, i) => {
+    if (i > 0) {
+      const sep = document.createElement("span");
+      sep.className = "device-status-sep";
+      sep.setAttribute("aria-hidden", "true");
+      sep.textContent = " · ";
+      segmentsEl.appendChild(sep);
+    }
+    const span = document.createElement("span");
+    span.className = "device-status-seg";
+    span.dataset.seg = seg.id;
+    if (seg.zero) span.classList.add("is-zero");
+    if (seg.highlight) span.classList.add("is-highlight");
+    span.textContent = seg.label;
+    segmentsEl.appendChild(span);
+  });
+  return segments;
+}
+
+function renderPopoverSheet(segments) {
+  if (!popoverSheet) return;
+  popoverSheet.innerHTML = "";
+  for (const seg of segments) {
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "brand-status-sheet-row";
+    row.dataset.seg = seg.id;
+    row.innerHTML = `<span class="brand-status-sheet-key">${escapeSheetKey(seg.id)}</span><span class="brand-status-sheet-val">${seg.detail}</span>`;
+    row.addEventListener("click", () => {
+      handleSegmentAction(seg.id);
+      setPopover(false);
+    });
+    popoverSheet.appendChild(row);
+  }
+}
+
+function escapeSheetKey(id) {
+  const map = {
+    network: "Network",
+    saved: "Saved",
+    pinned: "Pinned",
+    notices: "Notice",
+  };
+  return map[id] || id;
+}
+
+function handleSegmentAction(segId) {
+  if (segId === "network") return;
+  if (segId === "notices" && tabNoticeCount() > 0) {
+    setHubExpanded(true, { haptic: true });
+    document.getElementById("device-hub-notice-group")?.scrollIntoView({
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
+      block: "nearest",
+    });
+    return;
+  }
+  setHubExpanded(true, { haptic: true });
+  if (segId === "saved") {
+    document.getElementById("device-hub-saved-group")?.scrollIntoView({
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
+      block: "nearest",
+    });
+  }
+  if (segId === "pinned") {
+    document.getElementById("device-hub-pins-group")?.scrollIntoView({
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
+      block: "nearest",
+    });
+  }
+}
+
 function setPopover(open) {
   popoverOpen = open;
   if (popover) popover.hidden = !open;
   if (dotBtn) dotBtn.setAttribute("aria-expanded", open ? "true" : "false");
-  if (popoverText) popoverText.textContent = statusDetailText();
-}
-
-function setHubExpanded(open) {
-  if (!hub) return;
-  hub.classList.toggle("device-hub-collapsed", !open);
-  if (summaryBtn) summaryBtn.setAttribute("aria-expanded", open ? "true" : "false");
 }
 
 function refreshSummary() {
-  const { line } = buildStatusLine(networkStatus);
-  if (summaryText) summaryText.textContent = line;
+  const segments = renderSegments();
+  renderPopoverSheet(segments);
   applyDot();
-  if (popoverOpen && popoverText) popoverText.textContent = statusDetailText();
+  maybeAutoExpandNotice();
+}
+
+function maybeAutoExpandNotice() {
+  if (!hub || tabNoticeCount() === 0) return;
+  if (sessionStorage.getItem(NOTICE_EXPAND_KEY) === "1") return;
+  sessionStorage.setItem(NOTICE_EXPAND_KEY, "1");
+  setHubExpanded(true, { persist: false });
 }
 
 async function fetchNetworkStatus() {
@@ -108,24 +196,31 @@ async function refreshNetwork() {
 }
 
 if (hub) {
-  setHubExpanded(false);
+  const persisted = sessionStorage.getItem(HUB_OPEN_KEY) === "1";
+  setHubExpanded(persisted, { persist: false });
+  if (!persisted) {
+    maybeAutoExpandNotice();
+  }
 }
 
 summaryBtn?.addEventListener("click", () => {
   setPopover(false);
   if (hub) {
     const open = hub.classList.contains("device-hub-collapsed");
-    setHubExpanded(open);
+    setHubExpanded(open, { haptic: true });
     return;
   }
-  const walletHub = document.getElementById("wallet-device-hub");
-  walletHub?.scrollIntoView({ behavior: "smooth", block: "start" });
+  document.getElementById("wallet-device-hub")?.scrollIntoView({
+    behavior: prefersReducedMotion() ? "auto" : "smooth",
+    block: "start",
+  });
 });
 
 dotBtn?.addEventListener("click", (e) => {
   e.preventDefault();
   e.stopPropagation();
   setPopover(!popoverOpen);
+  hapticTap();
 });
 
 document.addEventListener("click", (e) => {
@@ -141,13 +236,12 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     setPopover(false);
     if (hub && !hub.classList.contains("device-hub-collapsed")) {
-      setHubExpanded(false);
+      setHubExpanded(false, { haptic: false });
     }
   }
 });
 
 refreshNetwork();
-refreshSummary();
 
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") refreshNetwork();

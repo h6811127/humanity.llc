@@ -1,7 +1,7 @@
 import { loadWallet, isWalletSaved } from "./device-wallet.mjs";
 import { loadPins } from "./device-pins.mjs";
 
-function tabNoticeCount() {
+export function tabNoticeCount() {
   try {
     const raw = sessionStorage.getItem("hc_created");
     const session = raw ? JSON.parse(raw) : null;
@@ -14,28 +14,64 @@ function tabNoticeCount() {
 
 /**
  * @param {"ok"|"degraded"|"offline"} network
- * @returns {{ saved: number, pins: number, notices: number, parts: string[], line: string }}
  */
-export function buildStatusLine(network = "offline") {
+export function buildStatusSegments(network = "offline") {
   const saved = loadWallet().length;
   const pins = loadPins().length;
   const notices = tabNoticeCount();
 
-  const networkPart =
+  const networkLabel =
     network === "ok"
       ? "Network live"
       : network === "degraded"
         ? "Network limited"
         : "Network offline";
 
-  const parts = [
-    networkPart,
-    `${saved} saved`,
-    `${pins} pinned`,
-    `${notices} notice${notices === 1 ? "" : "s"}`,
+  return [
+    {
+      id: "network",
+      label: networkLabel,
+      detail: networkLabel,
+      zero: false,
+      highlight: false,
+    },
+    {
+      id: "saved",
+      label: `${saved} saved`,
+      detail: `${saved} saved card${saved === 1 ? "" : "s"} on this device`,
+      zero: saved === 0,
+      highlight: false,
+    },
+    {
+      id: "pinned",
+      label: `${pins} pinned`,
+      detail: `${pins} pinned scan${pins === 1 ? "" : "s"}`,
+      zero: pins === 0,
+      highlight: false,
+    },
+    {
+      id: "notices",
+      label: `${notices} notice${notices === 1 ? "" : "s"}`,
+      detail:
+        notices > 0
+          ? "Keys in this tab — not saved on device"
+          : "No pending notices",
+      zero: notices === 0,
+      highlight: notices > 0,
+    },
   ];
+}
 
-  return { saved, pins, notices, parts, line: parts.join(" · ") };
+/** @param {"ok"|"degraded"|"offline"} network */
+export function buildStatusLine(network = "offline") {
+  const segments = buildStatusSegments(network);
+  return {
+    saved: loadWallet().length,
+    pins: loadPins().length,
+    notices: tabNoticeCount(),
+    segments,
+    line: segments.map((s) => s.label).join(" · "),
+  };
 }
 
 /**
