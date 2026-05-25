@@ -3200,9 +3200,7 @@ body.landing-focus-mode .screen-landing {
 }
 
 .device-hub .list-action a,
-.device-hub .list-action button,
-.landing-device-settings .list-action a,
-.landing-device-settings .list-action button {
+.device-hub .list-action button {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -3211,8 +3209,7 @@ body.landing-focus-mode .screen-landing {
   text-decoration: none;
 }
 
-.device-hub .list-action button,
-.landing-device-settings .list-action button {
+.device-hub .list-action button {
   padding: 12px 14px;
   margin: 0;
   border: none;
@@ -3223,8 +3220,7 @@ body.landing-focus-mode .screen-landing {
   cursor: pointer;
 }
 
-.device-hub .list-action button:active,
-.landing-device-settings .list-action button:active {
+.device-hub .list-action button:active {
   background: rgba(219, 27, 67, 0.06);
 }
 
@@ -3232,31 +3228,14 @@ body.landing-focus-mode .screen-landing {
   width: 100%;
 }
 
-.device-hub .list-action .list-content,
-.landing-device-settings .list-action .list-content {
+.device-hub .list-action .list-content {
   flex: 1;
   min-width: 0;
 }
 
-.device-hub .list-action .list-title,
-.landing-device-settings .list-action .list-title {
+.device-hub .list-action .list-title {
   display: block;
   margin-bottom: 2px;
-}
-
-.landing-device-settings .list-action a:has(.list-sub),
-.landing-device-settings .list-action button:has(.list-sub) {
-  align-items: flex-start;
-}
-
-.landing-device-settings .list-action a:has(.list-sub) .list-icon,
-.landing-device-settings .list-action button:has(.list-sub) .list-icon {
-  margin-top: 2px;
-}
-
-.landing-device-settings .list-action .list-title {
-  color: var(--red);
-  font-weight: 600;
 }
 
 .device-hub-disclosure {

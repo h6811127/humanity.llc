@@ -234,29 +234,104 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   color: var(--grey);
 }
 
+/* Inset settings group — do not combine with .list (double padding/borders break button rows) */
 .landing-device-settings-list {
   margin: 0;
   padding: 0;
   list-style: none;
   border-radius: 12px;
-  border: 1px solid var(--shell-separator, rgba(60, 60, 67, 0.11));
-  background: var(--shell-surface-elevated, #fff);
+  border: 1px solid rgba(60, 60, 67, 0.14);
+  background: #ffffff;
   overflow: hidden;
 }
 
 .landing-device-settings-list > .list-row {
+  display: block;
   margin: 0;
-  border-radius: 0;
+  padding: 0;
+  border: none;
+  border-bottom: 1px solid rgba(60, 60, 67, 0.12);
   background: transparent;
-  border-bottom: 1px solid var(--shell-separator, rgba(60, 60, 67, 0.11));
 }
 
 .landing-device-settings-list > .list-row:last-child {
   border-bottom: none;
 }
 
-.landing-device-settings .list-action button[aria-pressed="true"] {
+.landing-device-settings-list .list-action > a,
+.landing-device-settings-list .list-action > button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 0;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 0;
   background: transparent;
+  box-sizing: border-box;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  appearance: none;
+}
+
+.landing-device-settings-list .list-action > a:has(.list-sub),
+.landing-device-settings-list .list-action > button:has(.list-sub) {
+  align-items: flex-start;
+}
+
+.landing-device-settings-list .list-action > a:has(.list-sub) .list-icon,
+.landing-device-settings-list .list-action > button:has(.list-sub) .list-icon {
+  margin-top: 2px;
+}
+
+.landing-device-settings-list .list-action > button:focus-visible {
+  outline: 2px solid rgba(0, 122, 255, 0.45);
+  outline-offset: -2px;
+}
+
+.landing-device-settings-list .list-action > a:active,
+.landing-device-settings-list .list-action > button:active {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.landing-device-settings-list .list-action .list-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.landing-device-settings-list .list-action .list-title {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--black, #1c1c1e);
+}
+
+.landing-device-settings-list .list-action .list-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--grey);
+}
+
+.landing-device-settings-list .list-action .list-chevron {
+  flex-shrink: 0;
+  margin-left: auto;
+  align-self: center;
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--grey);
+}
+
+.landing-device-settings-list .list-chevron--spacer {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .device-hub-glance-help {

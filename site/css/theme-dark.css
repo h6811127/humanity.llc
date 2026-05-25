@@ -42,8 +42,7 @@ html[data-theme="dark"] .list-row,
 html[data-theme="dark"] .hub-card-item,
 html[data-theme="dark"] .device-hub-glance-btn,
 html[data-theme="dark"] .studio-post-card,
-html[data-theme="dark"] .landing-framing-tab,
-html[data-theme="dark"] .landing-device-settings .list-row {
+html[data-theme="dark"] .landing-framing-tab {
   background: var(--shell-fill);
   border-color: var(--shell-separator);
 }
@@ -92,11 +91,6 @@ html[data-theme="dark"] .device-hub .list-action a:active {
 
 html[data-theme="dark"] .device-hub-theme-row.list-action .landing-focus-toggle,
 html[data-theme="dark"] .device-hub-notif-row.list-action .landing-focus-toggle,
-html[data-theme="dark"] .landing-device-settings .list-action .landing-focus-toggle {
-  background: transparent;
-  color: var(--shell-label-strong);
-}
-
 html[data-theme="dark"] .landing-focus-toggle,
 html[data-theme="dark"] .device-theme-toggle {
   background: var(--shell-fill);
@@ -200,6 +194,15 @@ html[data-theme="dark"] .landing-device-settings-list {
 
 html[data-theme="dark"] .landing-device-settings-list > .list-row {
   border-bottom-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .landing-device-settings-list .list-action .list-title {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .landing-device-settings-list .list-action > a:active,
+html[data-theme="dark"] .landing-device-settings-list .list-action > button:active {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 html[data-theme="dark"] .top-chrome-bar,
