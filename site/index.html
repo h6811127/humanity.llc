@@ -111,6 +111,16 @@
             <p class="device-hub-search-status" id="device-hub-search-status" hidden role="status"></p>
           </div>
 
+          <div
+            class="device-hub-group"
+            id="device-hub-activity-group"
+            hidden
+            data-hub-group="activity"
+          >
+            <p class="device-hub-group-label">Recent on this device</p>
+            <ul class="list list-compact" id="device-hub-activity-list"></ul>
+          </div>
+
           <div class="device-hub-group" id="device-hub-notice-group" hidden></div>
 
           <div
@@ -700,7 +710,7 @@
     <script src="/js/device-status.mjs?v=4" type="module"></script>
     <script src="/js/landing-progress.mjs?v=2" type="module"></script>
     <script src="/js/landing-help.mjs?v=3" type="module"></script>
-    <script src="/js/landing-device-hub.mjs?v=8" type="module"></script>
+    <script src="/js/landing-device-hub.mjs?v=9" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=2" type="module"></script>
   </body>
 </html>

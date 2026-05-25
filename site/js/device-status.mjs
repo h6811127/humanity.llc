@@ -195,11 +195,20 @@ async function refreshNetwork() {
   refreshSummary();
 }
 
+function maybeAutoExpandCreated() {
+  if (!hub || !location.pathname.startsWith("/created")) return;
+  const session = getTabSession();
+  if (!session?.owner_private_key_b58) return;
+  if (sessionStorage.getItem(HUB_OPEN_KEY) != null) return;
+  setHubExpanded(true, { persist: true });
+}
+
 if (hub) {
   const persisted = sessionStorage.getItem(HUB_OPEN_KEY) === "1";
   setHubExpanded(persisted, { persist: false });
   if (!persisted) {
     maybeAutoExpandNotice();
+    maybeAutoExpandCreated();
   }
 }
 

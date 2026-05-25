@@ -42,9 +42,12 @@ npm run deploy
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Landing page (short loop + device hub + status plate pilot) |
+| `index.html` | Landing (four-step progress, device hub, status plate pilot — no pass demo) |
+| `created/index.html` | Post-create owner UI + shared device hub |
 | `wallet/index.html` | Saved cards on this device (`hc_wallet` in localStorage) |
-| `js/card-wallet.mjs`, `js/landing-device-hub.mjs` | Wallet CRUD + landing hub injection / local search filter |
+| `js/device-hub-ui.mjs`, `js/device-activity.mjs` | Shared hub + local activity log |
+| `js/landing-device-hub.mjs`, `js/created-hub.mjs` | Page-specific hub init |
+| `js/card-wallet.mjs` | Wallet CRUD + pin form |
 | `case-study/index.html` | Recruiter walkthrough: create → scan → update → revoke → live control |
 | `data/showcase-status-plate.json` | Live public status-plate scan for homepage pilot |
 | `create/index.html` | Create card UI at `/create/` |
@@ -67,9 +70,9 @@ API_ORIGIN=https://humanity.llc npm run site:seed-showcase
 
 Writes `data/showcase-status-plate.json` with a live scan URL for the status-plate pilot block on the landing page.
 
-### Device hub and local search
+### Device OS (browser shell)
 
-Landing **On this device** and `/wallet/` use grouped Settings-style lists. **Phase 1:** `hc_wallet` (saved keys). **Phase 2:** `hc_device_pins` (pinned public scan links, no keys). Both appear on the landing page when present. Search filters **this device only** — not the public resolver. Design notes: `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md`.
+Landing, **`/created/`**, and **`/wallet/`** share status line + **On this device** hub (saved keys, pins, activity, backup import). Search filters **this device only** — not the public resolver. See `docs/DEVICE_OS.md` and `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md`.
 
 ### After changing Pages files
 

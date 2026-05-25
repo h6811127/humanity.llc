@@ -1,6 +1,7 @@
 /**
  * Device-local saved cards (keys) + Phase 2 pinned public scan links.
  */
+import { logDeviceActivity } from "./device-activity.mjs";
 import { applyDeviceHubSearch } from "./device-hub-search.mjs";
 import {
   createPinEntry,
@@ -253,6 +254,7 @@ if (pinForm) {
     const pins = loadPins();
     pins.unshift(created);
     savePins(pins);
+    logDeviceActivity("pin_added", created.label);
     if (pinUrl) pinUrl.value = "";
     if (pinLabel) pinLabel.value = "";
     setStatus(pinStatus, "Pinned on this device only.");
@@ -286,6 +288,9 @@ if (saveForm && saveGroup && session?.owner_private_key_b58 && session?.profile_
           ? "Already saved on this device."
           : "Saved on this device only."
     );
+    if (!result.already && !result.updated) {
+      logDeviceActivity("saved", label || defaultWalletLabel(session));
+    }
     prefillSaveLabel(session);
     renderList();
     applyHubSearch();

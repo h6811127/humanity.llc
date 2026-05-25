@@ -1,3 +1,5 @@
+import { logDeviceActivity } from "./device-activity.mjs";
+
 /**
  * Load saved-card keys into this tab (sessionStorage).
  */
@@ -31,6 +33,7 @@ export function activateWalletEntry(entry) {
       wallet_label: entry.label,
     })
   );
+  logDeviceActivity("use_keys", entry.label || entry.handle || String(entry.profile_id).slice(0, 12));
   window.dispatchEvent(new Event("hc-device-hub-changed"));
 }
 

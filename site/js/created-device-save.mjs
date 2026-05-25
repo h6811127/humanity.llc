@@ -1,3 +1,4 @@
+import { logDeviceActivity } from "./device-activity.mjs";
 import {
   defaultWalletLabel,
   isWalletSaved,
@@ -63,6 +64,11 @@ export function initCreatedDeviceSave(getSession) {
       result.already ? "Already saved on this device." : "Saved on this device.",
       false
     );
+    if (!result.already) {
+      const label =
+        labelInput?.value?.trim() || defaultWalletLabel(session);
+      logDeviceActivity("saved", label);
+    }
     refresh();
     window.dispatchEvent(new Event("hc-device-hub-changed"));
   }

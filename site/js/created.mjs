@@ -15,6 +15,7 @@ import { initManifestoUpdate } from "./created-manifesto-update.mjs";
 import { inferPilotTemplate } from "./manifesto-display.mjs";
 import { initCreatedTabs } from "./created-tabs.mjs";
 import { initCreatedDeviceSave } from "./created-device-save.mjs";
+import { logDeviceActivity } from "./device-activity.mjs";
 
 const params = new URLSearchParams(location.search);
 const profileIdParam = params.get("profile_id")?.trim() || null;
@@ -156,9 +157,15 @@ function initLiveControlProof() {
     history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
   }
 
+  let loggedChallengeId = null;
+
   function revealPanel(fromPoll = false) {
     panel.hidden = false;
     panel.classList.toggle("live-control-proof-requested", !!fromPoll || !!activeChallengeId);
+    if (activeChallengeId && loggedChallengeId !== activeChallengeId) {
+      loggedChallengeId = activeChallengeId;
+      logDeviceActivity("live_control", "Live proof request");
+    }
   }
 
   function showListeningState(message = LISTENING_STATUS) {

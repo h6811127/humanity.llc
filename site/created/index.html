@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Your live object · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=67" />
+    <link rel="stylesheet" href="/styles.css?v=68" />
   </head>
-  <body>
+  <body class="has-device-hub-search device-shell-created">
     <div class="page">
       <header class="top">
         <div class="top-brand-row">
@@ -29,12 +29,27 @@
       <div class="top-status" id="top-status">
         <button
           type="button"
-          class="device-status-summary device-status-summary--static"
+          class="device-status-summary"
           id="device-status-summary"
+          aria-expanded="false"
+          aria-controls="device-hub"
         >
           <span class="device-status-segments" id="device-status-segments"></span>
           <span class="device-status-chevron" aria-hidden="true">›</span>
         </button>
+        <div class="device-status-actions">
+          <p class="device-status-hint" id="device-status-hint">
+            Tap to manage keys on this device
+          </p>
+          <button
+            type="button"
+            class="device-status-search-btn"
+            id="device-status-search"
+            aria-label="Search on this device"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </button>
+        </div>
         <div
           class="brand-status-popover"
           id="brand-status-popover"
@@ -45,6 +60,152 @@
           <div class="brand-status-sheet" id="brand-status-sheet"></div>
         </div>
       </div>
+
+      <section
+        class="device-hub device-hub-top device-hub-collapsed"
+        id="device-hub"
+        aria-labelledby="device-hub-title"
+      >
+        <div class="device-hub-body" id="device-hub-body">
+          <h2 class="device-hub-title" id="device-hub-title">On this device</h2>
+          <p class="device-hub-lead">
+            Personal to <strong>this browser</strong> — not your profile on the network.
+          </p>
+          <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint" hidden>
+            Save this card below to keep keys after you close the tab.
+          </p>
+
+          <div class="device-hub-search-block" id="device-hub-search-block" role="search">
+            <label class="device-hub-search device-hub-search--inline" for="device-hub-search">
+              <span class="device-hub-search-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              </span>
+              <input
+                type="search"
+                id="device-hub-search"
+                class="device-hub-search-input"
+                placeholder="Search saved cards, pins, shortcuts"
+                autocomplete="off"
+                enterkeyhint="search"
+              />
+            </label>
+            <p class="device-hub-search-hint">This device only — not the public resolver</p>
+            <p class="device-hub-search-status" id="device-hub-search-status" hidden role="status"></p>
+          </div>
+
+          <div
+            class="device-hub-group"
+            id="device-hub-activity-group"
+            hidden
+            data-hub-group="activity"
+          >
+            <p class="device-hub-group-label">Recent on this device</p>
+            <ul class="list list-compact" id="device-hub-activity-list"></ul>
+          </div>
+
+          <div class="device-hub-group" id="device-hub-notice-group" hidden></div>
+
+          <div
+            class="device-hub-group"
+            id="device-hub-saved-group"
+            hidden
+            data-hub-group="saved"
+          >
+            <p class="device-hub-group-label">Saved cards</p>
+            <ul class="hub-card-list" id="device-hub-wallet-list"></ul>
+          </div>
+
+          <div
+            class="device-hub-group"
+            id="device-hub-pins-group"
+            hidden
+            data-hub-group="pins"
+          >
+            <p class="device-hub-group-label">Pinned scans</p>
+            <ul class="list list-compact" id="device-hub-pins-list"></ul>
+          </div>
+
+          <div class="device-hub-group" data-hub-group="shortcuts">
+            <p class="device-hub-group-label">Shortcuts</p>
+            <ul class="list list-compact">
+              <li class="list-row list-action" data-hub-searchable="manage revoke update manifesto">
+                <button type="button" id="created-hub-manage-tab">
+                  <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Manage this card</span>
+                    <span class="list-sub">Revoke, update, backup export</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </button>
+              </li>
+              <li class="list-row list-action" data-hub-searchable="saved cards keys store">
+                <a href="/wallet/">
+                  <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">All saved cards</span>
+                    <span class="list-sub">Keys on this device</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </a>
+              </li>
+              <li class="list-row list-action" data-hub-searchable="home landing">
+                <a href="/">
+                  <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Homepage</span>
+                    <span class="list-sub">humanity.llc</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="device-hub-group" data-hub-group="import">
+            <p class="device-hub-group-label">Backup</p>
+            <details
+              class="device-hub-import device-hub-import-block"
+              data-hub-searchable="import backup file keys"
+            >
+              <summary class="device-hub-import-summary">
+                <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Import backup file</span>
+                  <span class="list-sub">Move keys to this device</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <form class="device-hub-import-form" id="hub-import-form">
+                <p class="form-hint">
+                  Encrypted .hcbackup.json from Manage — never uploaded.
+                </p>
+                <input type="file" accept=".json,application/json" required />
+                <label class="form-label" for="hub-import-passphrase">Passphrase</label>
+                <input
+                  type="password"
+                  id="hub-import-passphrase"
+                  name="passphrase"
+                  class="form-input"
+                  autocomplete="off"
+                  required
+                />
+                <button type="submit" class="btn-secondary device-hub-import-btn">
+                  Import to this device
+                </button>
+                <p class="form-status" id="hub-import-status" hidden role="status"></p>
+              </form>
+            </details>
+          </div>
+        </div>
+      </section>
 
       <main class="screen created-screen">
         <section class="hero hero-compact">
@@ -697,7 +858,8 @@
         </p>
       </main>
     </div>
-    <script src="/js/device-status.mjs?v=3" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=33"></script>
+    <script src="/js/device-status.mjs?v=4" type="module"></script>
+    <script src="/js/created-hub.mjs?v=1" type="module"></script>
+    <script type="module" src="/js/created.mjs?v=34"></script>
   </body>
 </html>

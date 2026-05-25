@@ -2860,13 +2860,29 @@ body.landing-focus-mode .screen-landing {
   margin-top: 4px;
 }
 
-.device-hub .list-action a {
+.device-hub .list-action a,
+.device-hub .list-action button {
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
   color: inherit;
   text-decoration: none;
+}
+
+.device-hub .list-action button {
+  padding: 12px 14px;
+  margin: 0;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.device-hub .list-action button:active {
+  background: rgba(219, 27, 67, 0.06);
 }
 
 .device-hub .list-action .list-content {

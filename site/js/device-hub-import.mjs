@@ -8,6 +8,7 @@ import {
   normalizePassphrase,
   readBackupFile,
 } from "./key-backup.mjs";
+import { logDeviceActivity } from "./device-activity.mjs";
 import { loadWallet, saveWallet, walletEntryFromSession } from "./device-wallet.mjs";
 
 /**
@@ -69,6 +70,8 @@ export function initHubBackupImport(form, statusEl) {
         saveWallet(entries);
       }
       setStatus("Imported to this device. Use keys to open /created/.");
+      logDeviceActivity("backup_import", "Imported backup");
+      window.dispatchEvent(new Event("hc-device-hub-changed"));
       form.reset();
     } catch (err) {
       setStatus(importErrorMessage(err), true);
