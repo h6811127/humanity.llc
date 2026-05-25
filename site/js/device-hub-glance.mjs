@@ -1,5 +1,5 @@
 /**
- * Landing-only compact summary when #device-hub is collapsed.
+ * Compact hub summary: landing when sheet is collapsed; /wallet/ always when non-empty.
  */
 import { tabNoticeCount } from "./device-counts.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
@@ -10,11 +10,11 @@ import {
   isRevokedSinceLastVisit,
 } from "./device-wallet-network.mjs";
 import { loadWallet, walletEntrySubtitle } from "./device-wallet.mjs";
+
 const GLANCE_MAX_CARDS = 3;
 
-const root = document.getElementById("device-hub-glance");
-const list = document.getElementById("device-hub-glance-list");
-const hub = document.getElementById("device-hub");
+/** @type {{ root: HTMLElement, list: HTMLElement, hub: HTMLElement | null, wallet: boolean }[]} */
+const glanceTargets = [];
 
 function escapeHtml(s) {
   return String(s)
@@ -23,7 +23,7 @@ function escapeHtml(s) {
     .replace(/>/g, "&gt;");
 }
 
-function hubCollapsed() {
+function hubCollapsed(hub) {
   return hub?.classList.contains("device-hub-collapsed") ?? true;
 }
 
@@ -33,10 +33,37 @@ function expandHub(targetId) {
   );
 }
 
-export function refreshHubGlance() {
-  if (!root || !list || !hub) return;
+function registerGlanceTarget(id, listId, hubId, wallet) {
+  const root = document.getElementById(id);
+  const list = document.getElementById(listId);
+  if (!root || !list) return;
+  const hub = hubId ? document.getElementById(hubId) : null;
+  glanceTargets.push({ root, list, hub, wallet });
+}
 
-  if (!hubCollapsed()) {
+registerGlanceTarget("device-hub-glance", "device-hub-glance-list", "device-hub", false);
+registerGlanceTarget("wallet-hub-glance", "wallet-hub-glance-list", null, true);
+
+function glanceCopy(wallet) {
+  return wallet
+    ? {
+        liveProofSub: "Tap to view waiting proofs",
+        moreSub: "Tap to view all saved",
+      }
+    : {
+        liveProofSub: "Tap to open hub and sign",
+        moreSub: "Tap to open hub",
+      };
+}
+
+/**
+ * @param {{ root: HTMLElement, list: HTMLElement, hub: HTMLElement | null, wallet: boolean }} target
+ */
+function refreshGlanceTarget(target) {
+  const { root, list, hub, wallet } = target;
+  const copy = glanceCopy(wallet);
+
+  if (hub && !hubCollapsed(hub)) {
     root.hidden = true;
     return;
   }
@@ -64,7 +91,7 @@ export function refreshHubGlance() {
     li.innerHTML = `
       <button type="button" class="device-hub-glance-btn">
         <span class="device-hub-glance-title">${n} live proof waiting</span>
-        <span class="device-hub-glance-sub">Tap to open hub and sign</span>
+        <span class="device-hub-glance-sub">${escapeHtml(copy.liveProofSub)}</span>
       </button>`;
     li.querySelector("button")?.addEventListener("click", () => {
       expandHub("device-hub-live-control-group");
@@ -74,7 +101,8 @@ export function refreshHubGlance() {
 
   if (otherTabs.length > 0) {
     const entry = otherTabs[0];
-    const label = entry.label || (entry.handle ? `@${entry.handle}` : `${entry.profile_id.slice(0, 12)}…`);
+    const label =
+      entry.label || (entry.handle ? `@${entry.handle}` : `${entry.profile_id.slice(0, 12)}…`);
     const extra = otherTabs.length > 1 ? ` (+${otherTabs.length - 1} more)` : "";
     const li = document.createElement("li");
     li.className = "device-hub-glance-row device-hub-glance-row--crosstab";
@@ -85,16 +113,16 @@ export function refreshHubGlance() {
       </button>`;
     li.querySelector("button")?.addEventListener("click", () => {
       if (entry.tabId) requestFocusTab(entry.tabId);
-      expandHub(null);
+      expandHub(wallet ? "device-hub-crosstab-notice" : null);
     });
     list.appendChild(li);
   }
 
   if (notices > 0) {
-    const session = getTabSession();
-    const label = session?.handle
-      ? `@${session.handle}`
-      : session?.profile_id?.slice(0, 12) || "This tab";
+    const tabSession = getTabSession();
+    const label = tabSession?.handle
+      ? `@${tabSession.handle}`
+      : tabSession?.profile_id?.slice(0, 12) || "This tab";
     const li = document.createElement("li");
     li.className = "device-hub-glance-row device-hub-glance-row--notice";
     li.innerHTML = `
@@ -136,16 +164,23 @@ export function refreshHubGlance() {
     li.innerHTML = `
       <button type="button" class="device-hub-glance-btn device-hub-glance-btn--muted">
         <span class="device-hub-glance-title">${remaining} more saved on this device</span>
-        <span class="device-hub-glance-sub">Tap to open hub</span>
+        <span class="device-hub-glance-sub">${escapeHtml(copy.moreSub)}</span>
       </button>`;
     li.querySelector("button")?.addEventListener("click", () => {
-      expandHub(null);
+      expandHub(wallet ? "device-hub-saved-group" : null);
     });
     list.appendChild(li);
   }
 }
 
-if (root) {
+export function refreshHubGlance() {
+  if (glanceTargets.length === 0) return;
+  for (const target of glanceTargets) {
+    refreshGlanceTarget(target);
+  }
+}
+
+if (glanceTargets.length > 0) {
   refreshHubGlance();
   window.addEventListener("hc-device-hub-changed", refreshHubGlance);
   window.addEventListener("hc-live-control-inbox-changed", refreshHubGlance);

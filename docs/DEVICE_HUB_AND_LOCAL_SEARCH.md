@@ -85,7 +85,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 No backend required:
 
 - Browser notifications when a live proof is waiting (device-only).
-- Hub glance on `/wallet/` (landing-only today).
+- ~~Hub glance on `/wallet/`~~ — shipped as `#wallet-hub-glance` below page title.
 - Light frontend tests for tab presence and live-control inbox polling.
 
 ### Deferred

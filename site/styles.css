@@ -4192,6 +4192,10 @@ body.page-wallet .wallet-alerts-top {
   margin-bottom: 4px;
 }
 
+body.page-wallet .wallet-hub-glance {
+  margin: 0 0 12px;
+}
+
 body.page-wallet .wallet-status-head {
   margin-bottom: 12px;
 }

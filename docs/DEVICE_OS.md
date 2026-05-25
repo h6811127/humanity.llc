@@ -165,7 +165,7 @@ Small TLC items that need **no new resolver APIs**:
 | Item | Notes |
 |------|--------|
 | Browser notifications when live proof is waiting | Device-only; `Notification` API after inbox poll finds pending |
-| Glance on `/wallet/` | Today `#device-hub-glance` is landing-only; mirror collapsed summary on wallet shell |
+| Glance on `/wallet/` | ✅ `#wallet-hub-glance` mirrors landing glance (`device-hub-glance.mjs`) |
 | Light frontend tests | Vitest or Playwright for `device-tab-presence` + `device-live-control-inbox` poll/render |
 
 ### Owner key portability (shipped  -  see M5.5)
