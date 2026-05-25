@@ -75,11 +75,11 @@ body.has-shell-chrome .page {
   pointer-events: none;
 }
 
-.top-chrome-bar--minimal {
+.top-chrome-bar--minimal,
+.top-chrome-bar--wallet {
   pointer-events: auto;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   gap: 12px;
   min-height: 0;
   padding: 8px var(--pad) 4px;
@@ -89,7 +89,17 @@ body.has-shell-chrome .page {
     opacity 0.28s ease;
 }
 
-.top-chrome--float.top-chrome--edge-hidden .top-chrome-bar--minimal {
+.top-chrome-bar--minimal {
+  justify-content: flex-start;
+}
+
+.top-chrome-bar--wallet {
+  justify-content: space-between;
+  width: 100%;
+}
+
+.top-chrome--float.top-chrome--edge-hidden .top-chrome-bar--minimal,
+.top-chrome--float.top-chrome--edge-hidden .top-chrome-bar--wallet {
   transform: translateY(calc(-100% - env(safe-area-inset-top, 0px)));
   opacity: 0;
   pointer-events: none;

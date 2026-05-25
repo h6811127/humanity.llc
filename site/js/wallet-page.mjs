@@ -42,7 +42,7 @@ function refreshAutoSaveLine() {
   }
   autoSaveLine.hidden = false;
   autoSaveLine.textContent =
-    "Auto-save is on — new cards are written to this device after create.";
+    "Auto-save is on. New cards are written to this device after create.";
 }
 
 function refreshHelpVisibility() {
@@ -141,6 +141,14 @@ if (pinForm) {
   });
 }
 
+function refreshActivityDetailsOpen() {
+  const details = document.getElementById("device-hub-activity-group");
+  const list = document.getElementById("device-hub-activity-list");
+  if (!details || details.tagName !== "DETAILS") return;
+  const hasRows = list && !list.hidden && list.children.length > 0;
+  details.open = hasRows;
+}
+
 initDeviceHub({
   hubRoot: "#wallet-page",
   noticeMode: "created-url",
@@ -157,12 +165,16 @@ initTabSave();
 refreshAutoSaveLine();
 updateContextBanners();
 refreshHelpVisibility();
+refreshActivityDetailsOpen();
 
 window.addEventListener("hc-device-hub-changed", () => {
   refreshHelpVisibility();
   updateContextBanners();
   refreshAutoSaveLine();
+  refreshActivityDetailsOpen();
 });
+
+window.addEventListener("hc-device-activity-changed", refreshActivityDetailsOpen);
 
 window.addEventListener("storage", (e) => {
   if (e.key === "hc_created") updateContextBanners();

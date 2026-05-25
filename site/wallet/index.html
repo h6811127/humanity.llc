@@ -5,37 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Saved on this device · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=81" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=21" />
+    <link rel="stylesheet" href="/styles.css?v=82" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=22" />
   </head>
-  <body class="page-wallet">
+  <body class="page-wallet has-shell-chrome">
     <div class="page">
       <div class="top-chrome top-chrome--float" id="top-chrome">
         <div class="top-chrome-bar top-chrome-bar--wallet" id="top-status">
-          <a href="/" class="wallet-chrome-back" aria-label="Back to home">
-            <span aria-hidden="true">‹</span>
-          </a>
           <div class="shell-status-cluster">
             <button
               type="button"
               class="shell-status-dot-btn"
               id="brand-status-dot-btn"
-              aria-label="Device and system status"
-              aria-expanded="false"
-              aria-haspopup="dialog"
-              aria-controls="wallet-hub-glance-popover wallet-page"
+              aria-label="Scroll to saved cards"
+              aria-controls="device-hub-saved-group"
             >
               <span class="pass-dot shell-status-dot" id="brand-status-dot"></span>
             </button>
-            <div
-              class="brand-status-popover device-hub-glance-popover"
-              id="wallet-hub-glance-popover"
-              role="dialog"
-              aria-label="Quick summary"
-              hidden
-            >
-              <ul class="device-hub-glance-list" id="wallet-hub-glance-list"></ul>
-            </div>
             <button
               type="button"
               class="shell-notif-badge"
@@ -47,6 +33,7 @@
               <span class="shell-notif-badge-count" id="shell-notif-badge-count">0</span>
             </button>
           </div>
+          <a href="/" class="wallet-chrome-home">Home</a>
         </div>
       </div>
 
@@ -72,7 +59,7 @@
         <header class="wallet-page-head">
           <h1 class="wallet-page-title" id="wallet-page-title">Saved on this device</h1>
           <p class="wallet-page-tagline">
-            Signing keys live in <strong>this browser</strong> — never uploaded to the network.
+            Signing keys live in <strong>this browser</strong>, not on the network.
           </p>
         </header>
 
@@ -90,20 +77,9 @@
           </div>
         </div>
 
-        <div class="device-hub-status-head wallet-status-head">
-          <a class="device-hub-create-btn" href="/create/" aria-label="Create a live card"
-            ><span class="device-hub-create-glyph" aria-hidden="true">+</span></a
-          >
-          <div
-            class="device-hub-status-panel"
-            id="device-hub-status-panel"
-            aria-label="System status"
-          ></div>
-        </div>
-
         <p class="form-hint wallet-empty-hint" id="device-hub-empty-hint">
-          No cards saved yet —
-          <a href="/create/">create one</a>
+          No cards saved yet.
+          <a href="/create/">Create one</a>
           or
           <a href="#hub-import-form">import a backup</a>.
         </p>
@@ -117,8 +93,8 @@
         </div>
 
         <p class="wallet-strip-hint" id="wallet-tab-hint" hidden>
-          Keys are in another tab —
-          <a href="/created/">open /created/</a> there and save, or use <strong>Use keys</strong> below.
+          Keys are in another tab.
+          <a href="/created/">Open /created/</a> there and save, or use <strong>Use keys</strong> below.
         </p>
 
         <div class="device-hub-search-block" id="device-hub-search-block" role="search">
@@ -135,20 +111,19 @@
               enterkeyhint="search"
             />
           </label>
-          <p class="device-hub-search-hint">This device only — not the public resolver</p>
+          <p class="device-hub-search-hint">This device only, not the public resolver</p>
           <p class="device-hub-search-status" id="device-hub-search-status" hidden role="status"></p>
         </div>
 
         <div
           class="device-hub-group device-hub-group--empty"
-          id="device-hub-activity-group"
-          data-hub-group="activity"
+          id="device-hub-saved-group"
+          data-hub-group="saved"
         >
-          <p class="device-hub-group-label">Your actions on this device</p>
-          <p class="device-hub-group-hint">Save, import, load keys — not who scanned your QR.</p>
-          <ul class="list list-compact" id="device-hub-activity-list" hidden></ul>
-          <p class="device-hub-section-empty" id="device-hub-activity-empty">
-            Actions you take in this browser will show here. The network does not log scans.
+          <p class="device-hub-group-label">With signing keys</p>
+          <ul class="hub-card-list" id="device-hub-wallet-list" hidden></ul>
+          <p class="device-hub-section-empty" id="device-hub-saved-empty">
+            Cards you save on this device will show here.
           </p>
         </div>
 
@@ -175,23 +150,11 @@
 
         <div
           class="device-hub-group device-hub-group--empty"
-          id="device-hub-saved-group"
-          data-hub-group="saved"
-        >
-          <p class="device-hub-group-label">With signing keys</p>
-          <ul class="hub-card-list" id="device-hub-wallet-list" hidden></ul>
-          <p class="device-hub-section-empty" id="device-hub-saved-empty">
-            Cards you save on this device will show here.
-          </p>
-        </div>
-
-        <div
-          class="device-hub-group device-hub-group--empty"
           id="device-hub-pins-group"
           data-hub-group="pins"
         >
           <p class="device-hub-group-label">Pinned scans</p>
-          <p class="wallet-section-hint">Bookmarks only — no signing keys</p>
+          <p class="wallet-section-hint">Bookmarks only, no signing keys</p>
           <ul class="list list-compact" id="device-hub-pins-list" hidden></ul>
           <p class="device-hub-section-empty" id="device-hub-pins-empty">
             Your pinned scans will show here.
@@ -223,6 +186,21 @@
           </details>
         </div>
 
+        <details
+          class="wallet-activity-details device-hub-group device-hub-group--empty"
+          id="device-hub-activity-group"
+          data-hub-group="activity"
+        >
+          <summary class="wallet-activity-summary device-hub-group-label">Recent on this device</summary>
+          <p class="device-hub-group-hint wallet-activity-hint">
+            Save, import, and load keys. Not who scanned your QR.
+          </p>
+          <ul class="wallet-activity-list" id="device-hub-activity-list" hidden></ul>
+          <p class="device-hub-section-empty" id="device-hub-activity-empty">
+            Actions you take in this browser will show here. The network does not log scans.
+          </p>
+        </details>
+
         <div class="device-hub-group" data-hub-group="import">
           <p class="device-hub-group-label">Backup</p>
           <details
@@ -240,7 +218,7 @@
               <span class="list-chevron" aria-hidden="true">›</span>
             </summary>
             <form class="device-hub-import-form" id="hub-import-form">
-              <p class="form-hint">Encrypted .hcbackup.json — never uploaded.</p>
+              <p class="form-hint">Encrypted .hcbackup.json, never uploaded.</p>
               <input type="file" accept=".json,application/json" required />
               <label class="form-label" for="hub-import-passphrase">Passphrase</label>
               <input
@@ -260,24 +238,12 @@
         </div>
 
         <div class="device-hub-group" data-hub-group="shortcuts" id="device-hub-shortcuts-group">
-          <p class="device-hub-group-label">Shortcuts</p>
+          <p class="device-hub-group-label">Settings</p>
           <ul class="list list-compact">
             <li class="list-row device-hub-focus-row" data-hub-searchable="auto save device keys">
               <button type="button" class="landing-focus-toggle" id="device-auto-save-toggle">
                 Auto-save off · save after each create
               </button>
-            </li>
-            <li class="list-row list-action" data-hub-searchable="home landing">
-              <a href="/">
-                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Home</span>
-                  <span class="list-sub">Landing</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
             </li>
           </ul>
         </div>
@@ -297,16 +263,14 @@
             <ul class="wallet-help-list">
               <li><strong>Use keys</strong> loads signing keys into this tab, then opens /created/.</li>
               <li><strong>Network</strong> chip is live from the resolver; <strong>Revoked since last visit</strong> compares to your last session.</li>
-              <li><strong>Pin</strong> is a scan bookmark only (↗) — no keys.</li>
+              <li><strong>Pin</strong> is a scan bookmark only (↗), no keys.</li>
             </ul>
           </div>
         </details>
-
-        <div class="device-hub-status-key" id="device-hub-status-key" aria-label="Status dot reference"></div>
       </main>
     </div>
 
-    <script src="/js/device-status.mjs?v=20" type="module"></script>
-    <script src="/js/wallet-page.mjs?v=1" type="module"></script>
+    <script src="/js/device-status.mjs?v=21" type="module"></script>
+    <script src="/js/wallet-page.mjs?v=2" type="module"></script>
   </body>
 </html>

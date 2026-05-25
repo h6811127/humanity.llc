@@ -75,16 +75,6 @@ function isWalletPage() {
   return document.body.classList.contains("page-wallet");
 }
 
-function scrollWalletToTop() {
-  walletPage?.scrollIntoView({
-    behavior: prefersReducedMotion() ? "auto" : "smooth",
-    block: "start",
-  });
-  document.getElementById("device-hub-status-panel")?.scrollIntoView({
-    behavior: prefersReducedMotion() ? "auto" : "smooth",
-    block: "nearest",
-  });
-}
 
 export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
   if (!hub) return;
@@ -247,19 +237,19 @@ async function refreshNetwork() {
   refreshSummary();
 }
 
+function scrollWalletToSaved() {
+  const target =
+    document.getElementById("device-hub-saved-group") ||
+    document.getElementById("wallet-page");
+  target?.scrollIntoView({
+    behavior: prefersReducedMotion() ? "auto" : "smooth",
+    block: "start",
+  });
+}
+
 function openWalletFromChrome() {
-  if (isGlancePopoverOpen()) {
-    closeGlancePopover();
-    scrollWalletToTop();
-    hapticTap();
-    return;
-  }
-  if (hubGlanceHasContent()) {
-    setGlancePopoverOpen(true);
-    hapticTap();
-    return;
-  }
-  scrollWalletToTop();
+  closeGlancePopover();
+  scrollWalletToSaved();
   hapticTap();
 }
 

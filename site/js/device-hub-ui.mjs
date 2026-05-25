@@ -276,7 +276,7 @@ function renderNoticeRow() {
     noticeGroup.innerHTML = `
     <button type="button" class="device-hub-notice-banner" data-hub-go-now-tab data-hub-searchable="notice save tab keys strip">
       <span class="device-hub-notice-title">Keys in this tab · Save on this device</span>
-      <span class="device-hub-notice-sub">${escapeHtml(label)} — open the Now tab to save</span>
+      <span class="device-hub-notice-sub">${escapeHtml(label)} · open the Now tab to save</span>
       <span class="device-hub-notice-chevron" aria-hidden="true">›</span>
     </button>`;
     noticeGroup.querySelector("[data-hub-go-now-tab]")?.addEventListener("click", () => {
@@ -315,25 +315,40 @@ function renderActivityRows() {
   }
 
   setHubSectionEmpty(activityGroup, activityList, activityEmptyEl, false, "");
+  const walletActivity = hubQueryRoot?.id === "wallet-page";
+
   for (const entry of entries) {
     const li = document.createElement("li");
     const when = formatActivityTime(entry.at);
     const sub = when
       ? `${activityTypeLabel(entry.type)} · ${when}`
       : activityTypeLabel(entry.type);
-    li.className = "list-row list-action device-activity-row device-activity-row--compact";
     li.dataset.hubSearchable = activityHaystack(entry);
-    li.innerHTML = `
-      <button type="button" class="device-activity-open">
-        <span class="list-content">
-          <span class="list-title">${escapeHtml(entry.label)}</span>
-          <span class="list-sub">${escapeHtml(sub)}</span>
-        </span>
-        <span class="list-chevron" aria-hidden="true">›</span>
-      </button>`;
-    li.querySelector(".device-activity-open")?.addEventListener("click", () => {
-      openActivityNow(entry);
-    });
+
+    if (walletActivity) {
+      li.className = "wallet-activity-item";
+      li.innerHTML = `
+        <button type="button" class="wallet-activity-btn">
+          <span class="wallet-activity-label">${escapeHtml(entry.label)}</span>
+          <span class="wallet-activity-meta">${escapeHtml(sub)}</span>
+        </button>`;
+      li.querySelector(".wallet-activity-btn")?.addEventListener("click", () => {
+        openActivityNow(entry);
+      });
+    } else {
+      li.className = "list-row list-action device-activity-row device-activity-row--compact";
+      li.innerHTML = `
+        <button type="button" class="device-activity-open">
+          <span class="list-content">
+            <span class="list-title">${escapeHtml(entry.label)}</span>
+            <span class="list-sub">${escapeHtml(sub)}</span>
+          </span>
+          <span class="list-chevron" aria-hidden="true">›</span>
+        </button>`;
+      li.querySelector(".device-activity-open")?.addEventListener("click", () => {
+        openActivityNow(entry);
+      });
+    }
     activityList.appendChild(li);
   }
 }

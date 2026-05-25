@@ -45,7 +45,6 @@ function registerGlanceTarget(id, listId, hubId, wallet) {
 }
 
 registerGlanceTarget("device-hub-glance-popover", "device-hub-glance-list", "device-hub", false);
-registerGlanceTarget("wallet-hub-glance-popover", "wallet-hub-glance-list", null, true);
 
 function glanceCopy(wallet) {
   return wallet
