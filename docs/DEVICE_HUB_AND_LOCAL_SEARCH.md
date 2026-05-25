@@ -29,6 +29,8 @@ We kept the current landing funnel (hero create → pass demo → device hub →
 
 **Landing focus mode:** Toggle in hub shortcuts — `localStorage.hc_landing_focus` (`1` = hide intro sections marked `data-landing-tutorial`; default on when wallet/pins exist). Keeps **On this device**, **Documentation**, and **Contact**.
 
+**Search reset:** Clearing the hub search field restores all rows; **Shortcuts** and **Backup** groups are never fully hidden by a filter (iOS `search` event wired).
+
 **Created keys strip:** On `/created/` **Now** tab, **Keys on this device** appears first (primary save); recovery key lives in a **Break-glass** `<details>` block below — not competing with the QR block.
 
 **Naming:** UI says **Saved on this device** / **All saved cards** — not “wallet”. URL stays `/wallet/` for compatibility.

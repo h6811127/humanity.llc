@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=68" />
+    <link rel="stylesheet" href="/styles.css?v=69" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -162,6 +162,21 @@
                   <span class="list-content">
                     <span class="list-title">Revoke &amp; manage</span>
                     <span class="list-sub">Update, revoke, backup</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </a>
+              </li>
+              <li
+                class="list-row list-action"
+                data-hub-searchable="studio blog building notes door plate"
+              >
+                <a href="/studio/">
+                  <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Studio blog</span>
+                    <span class="list-sub">Building this site in public</span>
                   </span>
                   <span class="list-chevron" aria-hidden="true">›</span>
                 </a>
@@ -456,58 +471,25 @@
         </section>
 
         <section
-          class="pilot-showcase"
-          aria-labelledby="pilot-title"
-          id="status-plate-pilot"
+          class="example-flow studio-one-use"
+          aria-labelledby="one-use-title"
           data-landing-tutorial
         >
-          <p class="section-kicker">On a real object</p>
-          <h2 class="pilot-showcase-title" id="pilot-title">Status plate pilot</h2>
-          <p class="pilot-showcase-lead">
-            A QR on a studio door. Scanners see whether you&rsquo;re open, closed, or done for the
-            night — then you can <strong>change the line</strong> without reprinting.
-          </p>
-          <div class="pilot-showcase-visual" aria-hidden="true">
-            <div class="flow-door pilot-showcase-door">
-              <span class="flow-plaque">
-                <img src="/assets/red_qr_transparent_bg.png" width="36" height="36" alt="" />
-              </span>
-            </div>
-          </div>
-          <ul class="pilot-showcase-actions list list-compact">
-            <li class="list-row list-action" id="pilot-live-scan-row" hidden>
-              <a id="pilot-live-scan-link" href="#">
-                <span class="list-icon list-icon-tone-red" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Try a live scan</span>
-                  <span class="list-sub" id="pilot-live-scan-sub">Public status plate on the network</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li class="list-row list-action">
-              <a href="/create/?template=status_plate">
-                <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Create your status plate</span>
-                  <span class="list-sub">Object name + live status line · print QR</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-          </ul>
-        </section>
-
-        <section class="example-flow" aria-label="Concrete example" data-landing-tutorial>
-          <h2 class="group-label">One use</h2>
+          <p class="section-kicker">Studio</p>
+          <h2 class="group-label" id="one-use-title">One use · status plate</h2>
           <p class="group-intro short">
-            A status plate on a studio door. Someone scans for tonight’s hours, whether
-            the door is open, or when the run ends. The network answers. Not a dead link.
+            Our first deployed object is a <strong>studio door plate</strong>: a QR that answers
+            with live hours, open/closed, and “done for the night” — updatable without reprinting.
+            The same primitive works on shops, booths, and rehearsal rooms.
           </p>
+
+          <ul class="studio-use-cases">
+            <li><strong>Door scan</strong> — “Open Thu–Sun · back at 7” before someone pulls the handle.</li>
+            <li><strong>Run state</strong> — flip to closed or done for the night from <code>/created/</code>.</li>
+            <li><strong>Special hours</strong> — one signed line change for a open studio, critique night, or holiday.</li>
+            <li><strong>Guest wayfinding</strong> — object name + status when the studio shares a building entrance.</li>
+            <li><strong>After revoke</strong> — plate still resolves; scanners see revoked, not a dead 404 link.</li>
+          </ul>
 
           <div class="flow-strip">
             <div class="flow-step">
@@ -548,6 +530,45 @@
           <p class="example-note">
             Tomorrow the same plate can read <em>closed</em>. No reprint required.
           </p>
+
+          <ul class="list list-compact studio-one-use-actions">
+            <li class="list-row list-action" id="one-use-live-scan-row" hidden>
+              <a id="one-use-live-scan-link" href="#">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Try a live scan</span>
+                  <span class="list-sub" id="one-use-live-scan-sub">Public status plate on the network</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/create/?template=status_plate">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Create your status plate</span>
+                  <span class="list-sub">Object name + live status line · print QR</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/studio/">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Studio blog</span>
+                  <span class="list-sub">Cards on building this site &amp; the door plate</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
         </section>
 
         <section class="group trust-posture" aria-label="Trust posture" data-landing-tutorial>
@@ -702,6 +723,18 @@
               </span>
             </li>
             <li class="list-row list-action">
+              <a href="/studio/">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Studio blog</span>
+                  <span class="list-sub">Notes on the door plate pilot and this codebase</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
               <a href="/case-study/">
                 <span class="list-icon list-icon-tone-blue" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
@@ -816,7 +849,7 @@
     <script src="/js/device-status.mjs?v=4" type="module"></script>
     <script src="/js/landing-progress.mjs?v=1" type="module"></script>
     <script src="/js/landing-help.mjs?v=3" type="module"></script>
-    <script src="/js/landing-device-hub.mjs?v=7" type="module"></script>
-    <script src="/js/landing-showcase.mjs?v=1" type="module"></script>
+    <script src="/js/landing-device-hub.mjs?v=8" type="module"></script>
+    <script src="/js/landing-showcase.mjs?v=2" type="module"></script>
   </body>
 </html>

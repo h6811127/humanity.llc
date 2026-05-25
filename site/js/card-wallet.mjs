@@ -236,6 +236,8 @@ function updateActiveBanner() {
 
 if (searchInput) {
   searchInput.addEventListener("input", applyHubSearch);
+  searchInput.addEventListener("search", applyHubSearch);
+  searchInput.addEventListener("change", applyHubSearch);
 }
 
 if (pinForm) {

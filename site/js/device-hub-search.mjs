@@ -2,6 +2,8 @@
  * Shared Phase 1–2 local search over a device hub root element.
  */
 
+const ALWAYS_VISIBLE_GROUPS = new Set(["shortcuts", "import"]);
+
 /**
  * @param {HTMLElement | null} hub
  * @param {string} query
@@ -12,18 +14,29 @@ export function applyDeviceHubSearch(hub, query) {
 
   const groups = {};
   hub.querySelectorAll("[data-hub-group]").forEach((groupEl) => {
-    const id = groupEl.id || groupEl.getAttribute("data-hub-group") || "unknown";
+    const groupKey = groupEl.getAttribute("data-hub-group") || groupEl.id || "unknown";
     const items = [...groupEl.querySelectorAll("[data-hub-searchable]")];
+    const keepGroupVisible = ALWAYS_VISIBLE_GROUPS.has(groupKey);
+
+    if (!q) {
+      groupEl.hidden = false;
+      for (const el of items) {
+        el.hidden = false;
+      }
+      groups[groupKey] = { anyVisible: true, hasItems: items.length > 0 };
+      return;
+    }
+
     let anyVisible = false;
     for (const el of items) {
       const text = (el.dataset.hubSearchable || "").toLowerCase();
-      const match = !q || text.includes(q);
+      const match = text.includes(q);
       el.hidden = !match;
       if (match) anyVisible = true;
     }
     const hasItems = items.length > 0;
-    groupEl.hidden = hasItems && !anyVisible;
-    groups[id] = { anyVisible, hasItems };
+    groupEl.hidden = keepGroupVisible ? false : hasItems && !anyVisible;
+    groups[groupKey] = { anyVisible, hasItems };
   });
 
   const matchCount = [...hub.querySelectorAll("[data-hub-searchable]")].filter(

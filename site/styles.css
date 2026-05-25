@@ -347,10 +347,25 @@ a {
 .device-hub.device-hub-top {
   padding: 0 var(--pad) 4px;
   margin: 0;
+  position: relative;
+  z-index: 3;
+}
+
+.device-hub-top:not(.device-hub-collapsed) {
+  margin-bottom: 12px;
+}
+
+.device-hub-top:not(.device-hub-collapsed) .device-hub-body {
+  padding-bottom: 8px;
 }
 
 .device-hub-collapsed .device-hub-body {
   display: none;
+}
+
+.device-hub-top:not(.device-hub-collapsed) + .screen-landing {
+  position: relative;
+  z-index: 1;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -2806,6 +2821,11 @@ body.landing-focus-mode .screen-landing {
   overflow: visible;
 }
 
+.device-hub-group[data-hub-group="shortcuts"] .list,
+.device-hub-group[data-hub-group="import"] {
+  overflow: visible;
+}
+
 #device-hub-saved-group {
   overflow: visible;
 }
@@ -3290,7 +3310,136 @@ body.landing-focus-mode .screen-landing {
   margin-bottom: 18px;
 }
 
-/* ——— Status plate pilot visual ——— */
+/* ——— Studio one use + blog ——— */
+.studio-one-use {
+  margin-top: 8px;
+}
+
+.studio-use-cases {
+  margin: 0 0 18px;
+  padding: 14px 16px 14px 1.25rem;
+  border-radius: var(--radius);
+  background: #f2f2f7;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--black);
+}
+
+.studio-use-cases li + li {
+  margin-top: 8px;
+}
+
+.studio-one-use-actions {
+  margin-top: 4px;
+}
+
+.studio-blog-hero {
+  margin-bottom: 8px;
+}
+
+.studio-post-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.studio-post-card {
+  border-radius: var(--radius);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--white);
+  overflow: hidden;
+}
+
+.studio-post-card-link {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 14px 14px 12px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.studio-post-card-link:active {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.studio-post-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.studio-post-kicker {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--grey);
+  margin-bottom: 4px;
+}
+
+.studio-post-title {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+
+.studio-post-lead {
+  display: block;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+.studio-post-article {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.studio-post-article:first-of-type {
+  margin-top: 22px;
+  padding-top: 0;
+  border-top: none;
+}
+
+.studio-post-article h2 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0 0 10px;
+}
+
+.studio-post-article p {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--black);
+  margin: 0 0 12px;
+}
+
+.studio-post-article ul {
+  margin: 0 0 12px;
+  padding-left: 1.2rem;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.studio-post-back {
+  display: inline-block;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--red);
+  text-decoration: none;
+}
+
+/* ——— Status plate pilot visual (legacy) ——— */
 .pilot-showcase {
   margin-top: 8px;
 }

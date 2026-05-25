@@ -1,9 +1,9 @@
 /**
  * Loads public status-plate showcase scan link from site/data/showcase-status-plate.json
  */
-const row = document.getElementById("pilot-live-scan-row");
-const link = document.getElementById("pilot-live-scan-link");
-const sub = document.getElementById("pilot-live-scan-sub");
+const row = document.getElementById("one-use-live-scan-row");
+const link = document.getElementById("one-use-live-scan-link");
+const sub = document.getElementById("one-use-live-scan-sub");
 if (!row || !link) {
   // nothing to wire
 } else {

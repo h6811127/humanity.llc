@@ -152,6 +152,7 @@ function renderSavedRows() {
       saveWallet(loadWallet().filter((e) => e.id !== id));
       renderSavedRows();
       renderNoticeRow();
+      applySearchFilter();
       notifyHubChanged();
     });
   });
@@ -242,6 +243,8 @@ notifyHubChanged();
 
 if (searchInput) {
   searchInput.addEventListener("input", applySearchFilter);
+  searchInput.addEventListener("search", applySearchFilter);
+  searchInput.addEventListener("change", applySearchFilter);
 }
 
 window.addEventListener("storage", (e) => {
