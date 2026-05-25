@@ -1,0 +1,239 @@
+import { describe, expect, it } from "vitest";
+
+import {
+  buildDeviceCountsLabel,
+  buildStatusSegmentsFromCounts,
+  tabNoticeCountFromState,
+} from "../../site/js/device-counts-core.mjs";
+import {
+  buildLiveControlProofHref,
+  formatLiveControlExpiry,
+  isPollableWalletEntry,
+  liveControlInboxChanged,
+  liveControlPendingSignature,
+  parsePendingChallengeBody,
+} from "../../site/js/device-live-control-inbox-core.mjs";
+import {
+  isNetworkCacheFresh,
+  mergeLastSeenFromNetworkMap,
+  networkStatusChip,
+  readCachedNetworkStatus,
+  WALLET_NETWORK_CACHE_TTL_MS,
+} from "../../site/js/device-wallet-network-core.mjs";
+import { isRevokedSinceLastVisitFromBaseline } from "../../site/js/wallet-network-baseline.mjs";
+
+describe("isPollableWalletEntry", () => {
+  it("requires profile_id and qr_id strings", () => {
+    expect(isPollableWalletEntry({ profile_id: "p1", qr_id: "q1" })).toBe(true);
+    expect(isPollableWalletEntry({ profile_id: "p1" })).toBe(false);
+    expect(isPollableWalletEntry({ profile_id: "p1", qr_id: "" })).toBe(false);
+    expect(isPollableWalletEntry(null)).toBe(false);
+  });
+});
+
+describe("parsePendingChallengeBody", () => {
+  const entry = { profile_id: "p1", qr_id: "q1" };
+
+  it("accepts pending challenges with optional urls", () => {
+    expect(
+      parsePendingChallengeBody(
+        {
+          status: "pending",
+          challenge_id: "c1",
+          return_url: "https://scan.example/r",
+          owner_url: "https://humanity.llc/created/?profile_id=p1",
+          expires_at: "2026-05-25T20:00:00.000Z",
+        },
+        entry
+      )
+    ).toEqual({
+      entry,
+      challenge_id: "c1",
+      return_url: "https://scan.example/r",
+      owner_url: "https://humanity.llc/created/?profile_id=p1",
+      expires_at: "2026-05-25T20:00:00.000Z",
+    });
+  });
+
+  it("rejects non-pending or malformed bodies", () => {
+    expect(parsePendingChallengeBody({ status: "done", challenge_id: "c1" }, entry)).toBe(
+      null
+    );
+    expect(parsePendingChallengeBody({ status: "pending" }, entry)).toBe(null);
+    expect(parsePendingChallengeBody(null, entry)).toBe(null);
+  });
+});
+
+describe("liveControlPendingSignature", () => {
+  it("orders ids deterministically", () => {
+    const items = [
+      { entry: { profile_id: "b" }, challenge_id: "2" },
+      { entry: { profile_id: "a" }, challenge_id: "1" },
+    ];
+    expect(liveControlPendingSignature(items)).toBe("a:1|b:2");
+  });
+});
+
+describe("liveControlInboxChanged", () => {
+  const base = [{ entry: { profile_id: "a" }, challenge_id: "1" }];
+
+  it("detects added or removed pending rows", () => {
+    expect(liveControlInboxChanged(base, base)).toBe(false);
+    expect(
+      liveControlInboxChanged(base, [{ entry: { profile_id: "a" }, challenge_id: "2" }])
+    ).toBe(true);
+    expect(liveControlInboxChanged(base, [])).toBe(true);
+  });
+});
+
+describe("formatLiveControlExpiry", () => {
+  const now = Date.parse("2026-05-25T12:00:00.000Z");
+
+  it("formats minute buckets", () => {
+    expect(formatLiveControlExpiry("2026-05-25T12:00:20.000Z", now)).toBe("expires soon");
+    expect(formatLiveControlExpiry("2026-05-25T12:01:00.000Z", now)).toBe("expires in 1 min");
+    expect(formatLiveControlExpiry("2026-05-25T12:04:00.000Z", now)).toBe("expires in 4 min");
+  });
+
+  it("returns empty for invalid timestamps", () => {
+    expect(formatLiveControlExpiry("not-a-date", now)).toBe("");
+  });
+});
+
+describe("buildLiveControlProofHref", () => {
+  it("prefers owner_url when provided", () => {
+    expect(
+      buildLiveControlProofHref({
+        entry: { profile_id: "p1", qr_id: "q1" },
+        challenge_id: "c1",
+        owner_url: "https://humanity.llc/created/?profile_id=p1&live_challenge=c1",
+      })
+    ).toBe("https://humanity.llc/created/?profile_id=p1&live_challenge=c1");
+  });
+
+  it("builds /created/ url with live_challenge when owner_url is absent", () => {
+    expect(
+      buildLiveControlProofHref(
+        { entry: { profile_id: "p1", qr_id: "q1" }, challenge_id: "c1" },
+        "https://humanity.llc"
+      )
+    ).toBe("https://humanity.llc/created/?profile_id=p1&qr_id=q1&live_challenge=c1");
+  });
+});
+
+describe("networkStatusChip", () => {
+  it("maps resolver statuses to chip labels and tones", () => {
+    expect(networkStatusChip("active")).toEqual({
+      label: "Live State Active",
+      tone: "ok",
+    });
+    expect(networkStatusChip("revoked")).toEqual({
+      label: "Revoked on Network",
+      tone: "warn",
+    });
+    expect(networkStatusChip("offline")).toEqual({
+      label: "Resolver Unreachable",
+      tone: "offline",
+    });
+    expect(networkStatusChip("checking")).toEqual({
+      label: "Sync Checking…",
+      tone: "muted",
+    });
+  });
+});
+
+describe("isNetworkCacheFresh", () => {
+  it("respects ttl window", () => {
+    const now = 1_000_000;
+    expect(isNetworkCacheFresh(now - 1000, now, WALLET_NETWORK_CACHE_TTL_MS)).toBe(true);
+    expect(isNetworkCacheFresh(now - WALLET_NETWORK_CACHE_TTL_MS - 1, now)).toBe(false);
+    expect(isNetworkCacheFresh(undefined, now)).toBe(false);
+  });
+});
+
+describe("readCachedNetworkStatus", () => {
+  it("returns status only while cache entry is fresh", () => {
+    const now = 500_000;
+    const cache = {
+      p1: { status: "active", at: now - 1000 },
+      p2: { status: "revoked", at: now - WALLET_NETWORK_CACHE_TTL_MS - 1 },
+    };
+    expect(readCachedNetworkStatus(cache, "p1", now)).toBe("active");
+    expect(readCachedNetworkStatus(cache, "p2", now)).toBe(null);
+    expect(readCachedNetworkStatus(cache, "missing", now)).toBe(null);
+  });
+});
+
+describe("mergeLastSeenFromNetworkMap", () => {
+  it("updates baselines except cards in revoked-since-last-visit transition", () => {
+    const next = mergeLastSeenFromNetworkMap(
+      { a: "active", b: "revoked", c: "revoked" },
+      { b: "active", c: "revoked" }
+    );
+    expect(next).toEqual({
+      b: "active",
+      c: "revoked",
+      a: "active",
+    });
+    expect(isRevokedSinceLastVisitFromBaseline("active", "revoked")).toBe(true);
+  });
+});
+
+describe("tabNoticeCountFromState", () => {
+  it("counts unsaved tab keys only", () => {
+    expect(
+      tabNoticeCountFromState(
+        { profile_id: "p1", owner_private_key_b58: "k" },
+        false
+      )
+    ).toBe(1);
+    expect(
+      tabNoticeCountFromState(
+        { profile_id: "p1", owner_private_key_b58: "k" },
+        true
+      )
+    ).toBe(0);
+    expect(tabNoticeCountFromState(null, false)).toBe(0);
+  });
+});
+
+describe("buildStatusSegmentsFromCounts", () => {
+  it("includes live proof segment when count is positive", () => {
+    const segments = buildStatusSegmentsFromCounts({
+      network: "ok",
+      saved: 2,
+      pins: 1,
+      notices: 0,
+      liveProof: 2,
+    });
+    expect(segments.some((s) => s.id === "liveproof")).toBe(true);
+    expect(segments.find((s) => s.id === "liveproof")?.label).toBe(
+      "2 Live Proof Waiting"
+    );
+  });
+
+  it("highlights tab keys when notices are present", () => {
+    const segments = buildStatusSegmentsFromCounts({
+      network: "degraded",
+      saved: 0,
+      pins: 0,
+      notices: 1,
+      liveProof: 0,
+    });
+    const notices = segments.find((s) => s.id === "notices");
+    expect(notices?.label).toBe("Tab Keys Active");
+    expect(notices?.highlight).toBe(true);
+  });
+});
+
+describe("buildDeviceCountsLabel", () => {
+  it("joins saved and pinned counts", () => {
+    expect(buildDeviceCountsLabel(2, 3)).toEqual({
+      saved: 2,
+      pins: 3,
+      total: 5,
+      label: "2 on Device · 3 Pinned",
+    });
+    expect(buildDeviceCountsLabel(0, 0).label).toBe("");
+  });
+});

@@ -5,10 +5,17 @@
 import { getCardStatusUrl } from "./hc-sign.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import { isRevokedSinceLastVisitFromBaseline } from "./wallet-network-baseline.mjs";
+import {
+  mergeLastSeenFromNetworkMap,
+  networkStatusChip,
+  readCachedNetworkStatus,
+  WALLET_NETWORK_CACHE_TTL_MS,
+} from "./device-wallet-network-core.mjs";
 
 const CACHE_KEY = "hc_wallet_network_cache";
 const LAST_SEEN_KEY = "hc_wallet_last_seen_network";
-const TTL_MS = 5 * 60 * 1000;
+
+export { networkStatusChip };
 
 function loadCache() {
   try {
@@ -30,22 +37,7 @@ function saveCache(cache) {
 
 /** @param {string} profileId */
 export function getCachedNetworkStatus(profileId) {
-  const entry = loadCache()[profileId];
-  if (!entry || Date.now() - entry.at > TTL_MS) return null;
-  return entry.status;
-}
-
-/**
- * @param {string} status
- * @returns {{ label: string, tone: 'ok' | 'warn' | 'muted' | 'offline' }}
- */
-export function networkStatusChip(status) {
-  const s = String(status || "").toLowerCase();
-  if (s === "active") return { label: "Live State Active", tone: "ok" };
-  if (s === "revoked") return { label: "Revoked on Network", tone: "warn" };
-  if (s === "offline" || s === "error") return { label: "Resolver Unreachable", tone: "offline" };
-  if (s === "checking") return { label: "Sync Checking…", tone: "muted" };
-  return { label: s ? s.charAt(0).toUpperCase() + s.slice(1) : "Unknown", tone: "muted" };
+  return readCachedNetworkStatus(loadCache(), profileId, Date.now(), WALLET_NETWORK_CACHE_TTL_MS);
 }
 
 /**
@@ -56,11 +48,12 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
   const cache = loadCache();
   const map = {};
   const fetches = [];
+  const now = Date.now();
 
   for (const entry of entries) {
     const pid = entry.profile_id;
     const cached = cache[pid];
-    if (cached && Date.now() - cached.at <= TTL_MS) {
+    if (readCachedNetworkStatus({ [pid]: cached }, pid, now, WALLET_NETWORK_CACHE_TTL_MS)) {
       map[pid] = cached.status;
       continue;
     }
@@ -72,16 +65,16 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
           });
           if (!res.ok) {
             map[pid] = "error";
-            cache[pid] = { status: "error", at: Date.now() };
+            cache[pid] = { status: "error", at: now };
             return;
           }
           const body = await res.json();
           const status = body?.scan?.card?.status || "unknown";
           map[pid] = status;
-          cache[pid] = { status, at: Date.now() };
+          cache[pid] = { status, at: now };
         } catch {
           map[pid] = "offline";
-          cache[pid] = { status: "offline", at: Date.now() };
+          cache[pid] = { status: "offline", at: now };
         }
       })()
     );
@@ -145,9 +138,5 @@ export function snapshotNetworkSeenOnExit() {
  * @param {Record<string, string>} statusMap
  */
 export function syncLastSeenFromNetworkMap(statusMap) {
-  for (const [profileId, status] of Object.entries(statusMap)) {
-    if (!profileId || !status) continue;
-    if (isRevokedSinceLastVisit(profileId, status)) continue;
-    recordNetworkSeen(profileId, status);
-  }
+  saveLastSeen(mergeLastSeenFromNetworkMap(statusMap, loadLastSeen()));
 }
