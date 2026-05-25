@@ -28,5 +28,6 @@ export function initAutoSaveToggle() {
   btn.addEventListener("click", () => {
     setAutoSaveEnabled(!isAutoSaveEnabled());
     sync();
+    window.dispatchEvent(new Event("hc-auto-save-changed"));
   });
 }

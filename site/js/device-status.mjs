@@ -115,7 +115,10 @@ function renderPopoverSheet(segments) {
     });
     popoverSheet.appendChild(row);
   }
-  if (document.getElementById("landing-docs-footer")) {
+  if (
+    document.getElementById("landing-docs-footer") ||
+    document.body.classList.contains("device-shell-wallet")
+  ) {
     const help = document.createElement("a");
     help.href = "/features-available-now.html";
     help.className = "brand-status-sheet-row brand-status-sheet-link";
@@ -228,12 +231,21 @@ function maybeAutoExpandCreated() {
   setHubExpanded(true, { persist: true });
 }
 
+function maybeExpandWalletHub() {
+  if (!hub || !location.pathname.startsWith("/wallet")) return;
+  setHubExpanded(true, { persist: true });
+}
+
 if (hub) {
-  const persisted = sessionStorage.getItem(HUB_OPEN_KEY) === "1";
-  setHubExpanded(persisted, { persist: false });
-  if (!persisted) {
-    maybeAutoExpandNotice();
-    maybeAutoExpandCreated();
+  if (location.pathname.startsWith("/wallet")) {
+    maybeExpandWalletHub();
+  } else {
+    const persisted = sessionStorage.getItem(HUB_OPEN_KEY) === "1";
+    setHubExpanded(persisted, { persist: false });
+    if (!persisted) {
+      maybeAutoExpandNotice();
+      maybeAutoExpandCreated();
+    }
   }
 }
 
@@ -248,7 +260,7 @@ summaryBtn?.addEventListener("click", () => {
     setHubExpanded(open, { haptic: true });
     return;
   }
-  document.getElementById("wallet-device-hub")?.scrollIntoView({
+  document.getElementById("device-hub")?.scrollIntoView({
     behavior: prefersReducedMotion() ? "auto" : "smooth",
     block: "start",
   });

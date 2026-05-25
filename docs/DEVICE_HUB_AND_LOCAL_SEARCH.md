@@ -30,6 +30,8 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Hub glance (landing):** When the hub is collapsed, `#device-hub-glance` shows notice (if any) and up to three saved card labels; tap expands the hub.
 
+**`/wallet/` (Phase 5):** Uses the same hub renderer as landing. Each saved row shows a **network chip** (resolver status, ~5 min cache), **Last on device** from `hc_device_activity`, and **Use keys / Open scan / Manage**. Page is hub-expanded by default; help disclosure hides when cards exist.
+
 **Created keys strip:** On `/created/` **Now** tab, **Keys on this device** first; recovery in **Break-glass** `<details>` below.
 
 **Naming:** UI says **Saved on this device** — not “wallet”. URL stays `/wallet/`.
@@ -108,5 +110,6 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 | `site/js/device-status.mjs` | Status line, dot sheet, hub expand |
 | `site/js/device-hub-search.mjs` | Shared filter |
 | `site/js/device-hub-import.mjs` | Hub backup import |
-| `site/wallet/index.html` | Save keys + pin form |
-| `site/js/card-wallet.mjs` | Wallet + pin CRUD |
+| `site/wallet/index.html` | Saved cards device shell |
+| `site/js/wallet-hub.mjs` | Wallet hub + tab save + pins |
+| `site/js/device-wallet-network.mjs` | Network status chips |

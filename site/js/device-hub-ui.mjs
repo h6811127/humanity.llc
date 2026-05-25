@@ -4,6 +4,7 @@
 import {
   activityHaystack,
   formatActivityTime,
+  lastActivityForEntry,
   loadActivity,
   logDeviceActivity,
 } from "./device-activity.mjs";
@@ -16,6 +17,11 @@ import {
   saveWallet,
   walletEntrySubtitle,
 } from "./device-wallet.mjs";
+import {
+  getCachedNetworkStatus,
+  networkStatusChip,
+  refreshWalletNetworkStatuses,
+} from "./device-wallet-network.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
 
 function escapeHtml(s) {
@@ -32,25 +38,81 @@ function walletHaystack(entry) {
     .toLowerCase();
 }
 
-const savedGroup = document.getElementById("device-hub-saved-group");
-const savedList = document.getElementById("device-hub-wallet-list");
-const pinsGroup = document.getElementById("device-hub-pins-group");
-const pinsList = document.getElementById("device-hub-pins-list");
-const noticeGroup = document.getElementById("device-hub-notice-group");
-const activityGroup = document.getElementById("device-hub-activity-group");
-const activityList = document.getElementById("device-hub-activity-list");
-const searchInput = document.getElementById("device-hub-search");
-const searchStatus = document.getElementById("device-hub-search-status");
-const deviceHub = document.getElementById("device-hub");
-const emptyHint = document.getElementById("device-hub-empty-hint");
+/** @type {{
+ *   noticeMode: 'created-url' | 'keys-strip',
+ *   fetchNetworkStatus: boolean,
+ *   savedLabel: string,
+ * }} */
+let hubConfig = {
+  noticeMode: "created-url",
+  fetchNetworkStatus: true,
+  savedLabel: "Saved cards",
+};
 
-/** @type {{ noticeMode: 'created-url' | 'keys-strip' }} */
-let hubConfig = { noticeMode: "created-url" };
+let savedGroup;
+let savedList;
+let pinsGroup;
+let pinsList;
+let noticeGroup;
+let activityGroup;
+let activityList;
+let searchInput;
+let searchStatus;
+let deviceHub;
+let emptyHint;
+let shortcutsGroup;
 
 function scanUrlForEntry(entry) {
   if (entry.scan_url) return entry.scan_url;
   const base = `${location.origin}/c/${encodeURIComponent(entry.profile_id)}`;
   return entry.qr_id ? `${base}?q=${encodeURIComponent(entry.qr_id)}` : base;
+}
+
+function networkChipHtml(profileId, statusOverride) {
+  const raw =
+    statusOverride ?? getCachedNetworkStatus(profileId) ?? (hubConfig.fetchNetworkStatus ? "checking" : null);
+  if (!raw) return "";
+  const chip = networkStatusChip(raw);
+  return `<span class="hub-card-network hub-card-network--${chip.tone}">${escapeHtml(chip.label)}</span>`;
+}
+
+function applyNetworkChipsToDom(statusMap = {}) {
+  if (!savedList) return;
+  savedList.querySelectorAll(".hub-card-item").forEach((li) => {
+    const pid = li.dataset.profileId;
+    if (!pid) return;
+    const chipEl = li.querySelector(".hub-card-network");
+    if (!chipEl) return;
+    const status = statusMap[pid] ?? getCachedNetworkStatus(pid) ?? "checking";
+    const chip = networkStatusChip(status);
+    chipEl.className = `hub-card-network hub-card-network--${chip.tone}`;
+    chipEl.textContent = chip.label;
+  });
+}
+
+async function fetchAndApplyNetworkChips() {
+  if (!hubConfig.fetchNetworkStatus || !savedList) return;
+  const entries = loadWallet();
+  if (entries.length === 0) return;
+  applyNetworkChipsToDom(
+    Object.fromEntries(
+      entries.map((e) => [e.profile_id, getCachedNetworkStatus(e.profile_id) ?? "checking"])
+    )
+  );
+  await refreshWalletNetworkStatuses(entries, (map) => {
+    applyNetworkChipsToDom(map);
+    const stored = loadWallet();
+    let changed = false;
+    const next = stored.map((e) => {
+      const net = map[e.profile_id];
+      if (net && e.status !== net) {
+        changed = true;
+        return { ...e, status: net };
+      }
+      return e;
+    });
+    if (changed) saveWallet(next);
+  });
 }
 
 function renderNoticeRow() {
@@ -133,6 +195,9 @@ function renderSavedRows() {
   const entries = loadWallet();
   if (!savedList || !savedGroup) return;
 
+  const labelEl = savedGroup.querySelector(".device-hub-group-label");
+  if (labelEl) labelEl.textContent = hubConfig.savedLabel;
+
   savedList.innerHTML = "";
   if (entries.length === 0) {
     savedGroup.hidden = true;
@@ -144,8 +209,15 @@ function renderSavedRows() {
     const li = document.createElement("li");
     li.className = "hub-card-item";
     li.dataset.hubSearchable = walletHaystack(entry);
+    li.dataset.profileId = entry.profile_id;
     const sub = walletEntrySubtitle(entry);
+    const lastUsed = lastActivityForEntry(entry);
+    const subLine = lastUsed ? `${sub} · Last on device ${lastUsed}` : sub;
     const scan = scanUrlForEntry(entry);
+    const manage = createdUrlForEntry(entry);
+    const netChip = hubConfig.fetchNetworkStatus
+      ? networkChipHtml(entry.profile_id, getCachedNetworkStatus(entry.profile_id) ?? "checking")
+      : "";
     li.innerHTML = `
       <div class="hub-card-head">
         <span class="list-icon list-icon-tone-trust" aria-hidden="true">
@@ -153,8 +225,9 @@ function renderSavedRows() {
         </span>
         <span class="list-content">
           <span class="list-title">${escapeHtml(entry.label)}</span>
-          <span class="list-sub">${escapeHtml(sub)}</span>
+          <span class="list-sub">${escapeHtml(subLine)}</span>
         </span>
+        ${netChip}
       </div>
       <div class="hub-card-actions">
         <div class="hub-card-actions-primary">
@@ -164,6 +237,7 @@ function renderSavedRows() {
         <details class="hub-card-menu">
           <summary class="hub-card-menu-btn" aria-label="More">⋯</summary>
           <div class="hub-card-menu-panel">
+            <a class="hub-card-menu-item hub-manage" href="${escapeHtml(manage)}">Manage</a>
             <button type="button" class="hub-card-menu-item hub-relabel" data-id="${escapeHtml(entry.id)}">Relabel</button>
             <button type="button" class="hub-card-menu-item hub-remove" data-id="${escapeHtml(entry.id)}">Remove from device</button>
           </div>
@@ -195,6 +269,7 @@ function renderSavedRows() {
       entries[idx] = { ...entries[idx], label: next.trim() };
       saveWallet(entries);
       renderSavedRows();
+      void fetchAndApplyNetworkChips();
       notifyHubChanged();
     });
   });
@@ -214,6 +289,8 @@ function renderSavedRows() {
       notifyHubChanged();
     });
   });
+
+  void fetchAndApplyNetworkChips();
 }
 
 function renderPinRows() {
@@ -222,7 +299,7 @@ function renderPinRows() {
 
   pinsList.innerHTML = "";
   if (pins.length === 0) {
-    pinsGroup.hidden = true;
+    pinsGroup.hidden = false;
     return;
   }
 
@@ -283,6 +360,21 @@ function applySearchFilter() {
   }
 }
 
+function bindDom() {
+  deviceHub = document.getElementById("device-hub");
+  savedGroup = document.getElementById("device-hub-saved-group");
+  savedList = document.getElementById("device-hub-wallet-list");
+  pinsGroup = document.getElementById("device-hub-pins-group");
+  pinsList = document.getElementById("device-hub-pins-list");
+  noticeGroup = document.getElementById("device-hub-notice-group");
+  activityGroup = document.getElementById("device-hub-activity-group");
+  activityList = document.getElementById("device-hub-activity-list");
+  searchInput = document.getElementById("device-hub-search");
+  searchStatus = document.getElementById("device-hub-search-status");
+  emptyHint = document.getElementById("device-hub-empty-hint");
+  shortcutsGroup = document.getElementById("device-hub-shortcuts-group");
+}
+
 export function refreshDeviceHub() {
   renderNoticeRow();
   renderActivityRows();
@@ -298,10 +390,29 @@ export function focusHubSearch() {
 }
 
 /**
- * @param {{ noticeMode?: 'created-url' | 'keys-strip' }} [config]
+ * @param {{
+ *   noticeMode?: 'created-url' | 'keys-strip',
+ *   fetchNetworkStatus?: boolean,
+ *   savedLabel?: string,
+ *   showShortcuts?: boolean,
+ *   showImport?: boolean,
+ *   showActivity?: boolean,
+ *   showEmptyHint?: boolean,
+ * }} [config]
  */
 export function initDeviceHub(config = {}) {
-  hubConfig = { noticeMode: config.noticeMode ?? "created-url" };
+  bindDom();
+  hubConfig = {
+    noticeMode: config.noticeMode ?? "created-url",
+    fetchNetworkStatus: config.fetchNetworkStatus !== false,
+    savedLabel: config.savedLabel ?? "Saved cards",
+  };
+
+  if (shortcutsGroup) shortcutsGroup.hidden = config.showShortcuts === false;
+  if (activityGroup && config.showActivity === false) activityGroup.hidden = true;
+  const importGroup = document.querySelector('[data-hub-group="import"]');
+  if (importGroup) importGroup.hidden = config.showImport === false;
+  if (emptyHint && config.showEmptyHint === false) emptyHint.hidden = true;
 
   initHubBackupImport(
     document.getElementById("hub-import-form"),
@@ -331,6 +442,7 @@ export function initDeviceHub(config = {}) {
 
   window.addEventListener("hc-device-activity-changed", () => {
     renderActivityRows();
+    renderSavedRows();
     applySearchFilter();
     refreshEmptyHint();
   });

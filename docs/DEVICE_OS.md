@@ -1,6 +1,6 @@
 # Device OS — browser shell + physical network
 
-**Status:** Phase 4 shipped (returning-user desktop on landing)  
+**Status:** Phase 5 shipped (wallet device-shell parity + live network chips)  
 **Audience:** Product, frontend, and anyone extending Pages without accounts
 
 ---
@@ -104,6 +104,13 @@ Same chrome on **landing**, **`/created/`**, and **`/wallet/`**:
 | Hub glance | `device-hub-glance.mjs` | Landing only; visible when hub collapsed |
 | Wallet / activity / keys | `device-wallet.mjs`, `device-activity.mjs`, `device-keys.mjs` | |
 
+### `/wallet/` (saved page)
+
+- Same status chrome as landing (shield, search, system banner, expandable hub — **expanded by default**).
+- Shared `device-hub-ui.mjs`: saved rows with **live network chip**, **Last on device** from activity, **Manage** in ⋯ menu.
+- Tab save strip, pin add form, auto-save toggle, activity, backup import.
+- **How this works** hidden when any card is saved.
+
 ### `/created/` differences
 
 - Hub above owner tabs; notice → `#created-keys-strip`; no focus toggle; no glance strip (hub + tabs are enough).
@@ -139,7 +146,8 @@ See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` for storage and search.
 | 5 | `#device-system-banner` when network degraded/offline | ✅ |
 | 6 | Auto-save toggle (`hc_auto_save_device`) | ✅ |
 | 7 | Landing cleanup: no dock, no help float, no status hint | ✅ |
-| 8 | Deferred: live-control inbox queue | — |
+| 8 | Wallet shell parity + `device-wallet-network.mjs` status chips | ✅ |
+| 9 | Deferred: live-control inbox queue | — |
 | 7 | Deferred: cross-tab keys banner beyond notice row | — |
 | 8 | Deferred: resolver-wide search / directory | — |
 | 9 | Deferred: per-card revoke chips on landing hub | — (use Manage) |
@@ -152,7 +160,10 @@ See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` for storage and search.
 |------|------|
 | `docs/DEVICE_OS.md` | This document |
 | `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` | Storage, search, focus mode |
+| `site/js/device-wallet-network.mjs` | Resolver status cache for saved rows |
+| `site/js/wallet-hub.mjs` | Wallet page init |
 | `site/js/device-hub-glance.mjs` | Collapsed-hub summary (landing) |
+| `site/wallet/index.html` | Saved cards device shell |
 | `site/js/device-status.mjs` | Status, banner, popover Help row |
 | `site/js/device-hub-ui.mjs` | Shared hub |
 | `site/js/landing-focus.mjs` | Focus mode toggle |

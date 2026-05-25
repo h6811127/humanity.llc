@@ -498,9 +498,41 @@ a {
 
 .hub-card-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   padding: 10px 12px 6px;
+  flex-wrap: wrap;
+}
+
+.hub-card-network {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.3;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.hub-card-network--ok {
+  color: #1a6b32;
+  background: rgba(26, 107, 50, 0.12);
+}
+
+.hub-card-network--warn {
+  color: var(--red);
+  background: rgba(219, 27, 67, 0.1);
+}
+
+.hub-card-network--muted {
+  color: var(--grey);
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.hub-card-network--offline {
+  color: var(--grey);
+  background: rgba(0, 0, 0, 0.08);
 }
 
 .hub-card-actions {
@@ -602,10 +634,14 @@ button.hub-card-action.hub-use-keys {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
-.hub-card-menu-item {
+.hub-card-menu-item,
+a.hub-card-menu-item {
   display: block;
   width: 100%;
   padding: 10px 12px;
+  box-sizing: border-box;
+  text-decoration: none;
+  color: inherit;
   border: none;
   border-radius: 8px;
   background: transparent;
@@ -3863,6 +3899,47 @@ body.landing-focus-mode .screen-landing {
 
 .has-device-hub-search .screen-wallet-sleek {
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 32px);
+}
+
+.device-shell-wallet .device-hub-top {
+  margin-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+}
+
+.device-shell-wallet .wallet-hub-lead {
+  margin-bottom: 8px;
+}
+
+.wallet-context-line {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--red);
+}
+
+.wallet-active-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: rgba(26, 107, 50, 0.08);
+  border: 1px solid rgba(26, 107, 50, 0.2);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.wallet-active-link {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--red);
+  text-decoration: none;
+}
+
+.wallet-active-link:active {
+  opacity: 0.75;
 }
 
 .wallet-active-banner {

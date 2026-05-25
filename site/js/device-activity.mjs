@@ -48,6 +48,21 @@ export function activityHaystack(entry) {
   return [entry.label, entry.type, "activity recent device"].join(" ").toLowerCase();
 }
 
+/**
+ * @param {{ label?: string, handle?: string }} entry
+ * @returns {string}
+ */
+export function lastActivityForEntry(entry) {
+  const activities = loadActivity();
+  const candidates = new Set(
+    [entry.label, entry.handle ? `@${entry.handle}` : null].filter(Boolean)
+  );
+  for (const act of activities) {
+    if (candidates.has(act.label)) return formatActivityTime(act.at);
+  }
+  return "";
+}
+
 /** @param {string} iso */
 export function formatActivityTime(iso) {
   try {
