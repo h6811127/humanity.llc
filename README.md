@@ -247,7 +247,7 @@ Health: `GET /.well-known/hc/v1/health` · Create: `POST /.well-known/hc/v1/card
 
 **MVP** = Phase A through roadmap step **5.3** (honest create → scan → revoke). Commons Pass and federation are **not** required for that gate.
 
-**Current focus:** `docs/MANIFESTO_STATUS_UPDATE.md`  -  post-create status line / manifesto edits (status plate, lost-item relay). See `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`.
+**Current focus:** `docs/M5_STRANGER_TEST_RUNBOOK.md`  -  Phase A exit gate (manual stranger tests). Product loops (manifesto update, QR rotate, expiry extend) are shipped in repo.
 
 ---
 

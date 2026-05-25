@@ -86,6 +86,8 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
             scope: vm.qrScope,
             epoch: vm.qrEpoch,
             expires_at: vm.qrExpiresAt,
+            issued_at: vm.qrIssuedAt,
+            payload: vm.qrPayload,
           }
         : null,
       verification: {

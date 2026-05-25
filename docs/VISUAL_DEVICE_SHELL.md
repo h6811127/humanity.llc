@@ -41,7 +41,7 @@ Principles:
 ### Phase A  -  Kill the “website header” (shipped v1)
 
 1. **Scroll-edge chrome**  -  fixed `top-chrome`, content inset via `--shell-chrome-h`, single-row bar; status collapses on scroll down (`device-shell-chrome.mjs`).
-2. **Hub as sheet**  -  `/`, `/wallet/`, `/created/` use `device-hub--sheet` + backdrop (`device-hub-sheet.mjs`).
+2. **Hub as sheet**  -  `/` and `/created/` use `device-hub--sheet` + backdrop (`device-hub-sheet.mjs`). **`/wallet/`** uses the same hub DOM as a **full-page** surface (always visible; × goes home).
 3. **Landing de-explain**  -  shorter hero + compact framing on `/` (more trimming possible).
 
 **Flow pages** (`/create/`, etc.) use `body.page-flow` with no header chrome  -  rely on the browser back gesture/button for home, not a floating dot or Create pill.

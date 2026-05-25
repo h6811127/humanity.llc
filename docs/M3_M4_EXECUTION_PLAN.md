@@ -204,8 +204,11 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ### Not in M4.6
 
-- Post-create expiry extension UI
 - Resolver cron to flip `qr_credentials.status` to `expired` (expiry evaluated at scan time today)
+
+### M4.6b (shipped)
+
+- [x] Post-create expiry extension UI + `POST …/cards/{profile_id}/qr/extend` (same QR, later `expires_at`)
 
 ---
 
@@ -221,8 +224,8 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ## Current step
 
-**→ Post-create manifesto / status line updates**  -  `docs/MANIFESTO_STATUS_UPDATE.md`. Same printed QR; owner-signed `POST …/cards/{profile_id}/update` changes public copy for status plates, lost-item relays, and general cards.
+**→ M5 stranger test batch**  -  `docs/M5_STRANGER_TEST_RUNBOOK.md` (Phase A exit gate; manual, not a code milestone).
 
-**Shipped in repo (verify on production):** M7 live control Step 1 (`docs/M7_LIVE_CONTROL_ALPHA.md`), M4.4 artifact-intent gate, organizer revoke pilot.
+**Shipped in repo (verify on production):** Manifesto/status updates (`docs/MANIFESTO_STATUS_UPDATE.md`), A.6 QR rotation, M4.6b QR expiry extension, M7 live control Step 1, M4.4 artifact-intent gate.
 
-**Deferred (not blocking this track):** M5 stranger batch (`docs/M5_STRANGER_TEST_RUNBOOK.md`), M7 Step 2 polish.
+**Deferred (not blocking this track):** M7 Step 2 polish; resolver cron for `expired` status column.

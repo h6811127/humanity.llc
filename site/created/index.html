@@ -540,6 +540,44 @@
 
           <details
             class="settings-disclosure settings-disclosure-action"
+            id="qr-extend-panel"
+            hidden
+          >
+            <summary class="settings-summary">
+              <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              </span>
+              <span class="settings-summary-text">
+                <span class="settings-summary-title">Extend QR validity</span>
+                <span class="settings-summary-sub">Same scan link · later expiry on the network</span>
+              </span>
+              <span class="list-chevron" aria-hidden="true">›</span>
+            </summary>
+            <div class="settings-panel settings-panel-action">
+              <p class="form-hint">
+                Extends <code>expires_at</code> on your active QR without reprinting (M4.6). Counts
+                from the later of now or your current expiry.
+              </p>
+              <p class="form-hint">
+                Current expiry:
+                <strong id="qr-extend-current">Loading…</strong>
+              </p>
+              <label class="form-label" for="qr-extend-validity">Add validity</label>
+              <select class="form-input" id="qr-extend-validity">
+                <option value="7">7 more days</option>
+                <option value="30">30 more days</option>
+                <option value="90">90 more days</option>
+                <option value="365" selected>1 more year</option>
+              </select>
+              <button type="button" class="btn-primary" id="qr-extend-submit">
+                Extend validity
+              </button>
+              <p class="form-status" id="qr-extend-status" hidden role="status"></p>
+            </div>
+          </details>
+
+          <details
+            class="settings-disclosure settings-disclosure-action"
             id="manifesto-update-panel"
             hidden
           >
@@ -960,6 +998,6 @@
     </div>
     <script src="/js/device-status.mjs?v=15" type="module"></script>
     <script src="/js/created-hub.mjs?v=1" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=35"></script>
+    <script type="module" src="/js/created.mjs?v=36"></script>
   </body>
 </html>

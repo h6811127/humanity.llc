@@ -104,5 +104,7 @@ Deep link: `/created/?profile_id=…&qr_id=…`  -  hydrates handle/manifesto fr
 | `worker/src/resolver/update-card.ts` | POST handler |
 | `site/js/created-manifesto-update.mjs` | Owner form |
 | `site/js/created-update.mjs` | Sign + POST |
+| `worker/src/resolver/extend-qr.ts` | QR expiry extension (M4.6b) |
+| `worker/src/resolver/rotate-qr.ts` | QR rotation (A.6) |
 | `docs/STATUS_PLATE_PILOT.md` | Vertical #1 |
 | `docs/LOST_ITEM_RELAY_PILOT.md` | Vertical #2 |

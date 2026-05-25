@@ -13,6 +13,7 @@ import { initKeyBackupUi } from "./key-backup-ui.mjs";
 import { initRecoveryKeyUi } from "./recovery-key-ui.mjs";
 import { initManifestoUpdate } from "./created-manifesto-update.mjs";
 import { initQrRotate } from "./created-qr-rotate.mjs";
+import { initQrExtend } from "./created-qr-extend.mjs";
 import { inferPilotTemplate } from "./manifesto-display.mjs";
 import { initCreatedTabs } from "./created-tabs.mjs";
 import { initCreatedDeviceSave } from "./created-device-save.mjs";
@@ -651,6 +652,28 @@ async function bootstrapOwnerTools() {
     },
   });
   qrRotate?.show();
+
+  const qrExtend = initQrExtend({
+    profileId,
+    qrId: activeQrId,
+    getSession: loadSession,
+    setSession: saveSession,
+    showError,
+    getSigningKeys: currentSigningKeys,
+    async onExtended({ expiresAt }) {
+      data = loadSession();
+      void refreshNetworkStatus();
+      if (networkQrExpiresEl && expiresAt) {
+        networkQrExpiresEl.textContent = formatNetworkExpiry(expiresAt);
+      }
+      logDeviceActivity("saved", {
+        title: "Extended QR validity",
+        detail: new Date(expiresAt).toLocaleDateString(),
+      });
+    },
+  });
+  qrExtend?.show();
+
   const backup = initKeyBackupUi({
     profileId,
     getSession: loadSession,

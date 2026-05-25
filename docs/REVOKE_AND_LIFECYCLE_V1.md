@@ -65,7 +65,8 @@ A Humanity **QR credential** (`qr_id`) is a **signed capability pointer**: it re
 | Public card JSON `410` when card disabled | **Live** |
 | Minimal revoke/disable scan, Show link, Disable card label, owner ID warnings | **Shipped** (M4.5, `pass-v9`) |
 | Validity at create (`expires_at` 7–365 days), minimal **qr_expired** scan | **Shipped** (M4.6) |
-| Privacy modes, revoke-on-next-scan, post-create expiry edit | **Not shipped**  -  this doc |
+| Post-create QR expiry extension (`POST …/qr/extend`) | **Shipped** (M4.6b) |
+| Privacy modes, revoke-on-next-scan | **Not shipped**  -  this doc |
 
 Current scan copy (whole card): handle/manifesto may still appear on revoked scans  -  **planned change** under Disable card (§Disable card).
 

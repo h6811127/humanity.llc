@@ -66,6 +66,8 @@ export interface ScanViewModel {
   liveControlAvailable: boolean;
   liveControlProvenAt: string | null;
   qrExpiresAt: string | null;
+  qrIssuedAt: string | null;
+  qrPayload: string | null;
   minimalScan: boolean;
   revocationDisplayMode: string | null;
   publicReason: string | null;
@@ -441,6 +443,8 @@ function baseView(input: BaseViewInput, origin: string): ScanViewModel {
     liveControlAvailable: false,
     liveControlProvenAt: null,
     qrExpiresAt: qr?.expires_at ?? null,
+    qrIssuedAt: qr?.issued_at ?? null,
+    qrPayload: qr?.payload ?? null,
     minimalScan: input.minimalScan ?? false,
     revocationDisplayMode: input.revocationDisplayMode ?? null,
     publicReason: input.publicReason ?? null,
