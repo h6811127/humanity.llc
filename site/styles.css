@@ -1758,6 +1758,16 @@ a.hub-card-menu-item {
   color: var(--black);
 }
 
+.hero h1 .hero-headline-kicker {
+  display: block;
+  margin-bottom: 10px;
+  font-size: clamp(16px, 4.2vw, 19px);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--red);
+}
+
 .hero-line {
   margin-top: 10px;
   font-size: 15px;
