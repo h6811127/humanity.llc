@@ -705,6 +705,17 @@ a.hub-card-menu-item {
   background: rgba(219, 27, 67, 0.04);
 }
 
+#device-hub-live-control-group .device-hub-group-label {
+  color: var(--gold-dark, #8a6d1f);
+}
+
+.device-live-control-row .device-live-control-open {
+  width: 100%;
+  border: 1px solid rgba(180, 140, 20, 0.25);
+  border-radius: var(--radius);
+  background: rgba(180, 140, 20, 0.06);
+}
+
 .device-hub-search-block {
   margin: 0 0 16px;
   display: flex;

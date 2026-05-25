@@ -1,3 +1,4 @@
+import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
 import { loadWallet, isWalletSaved } from "./device-wallet.mjs";
 import { loadPins } from "./device-pins.mjs";
 
@@ -19,6 +20,7 @@ export function buildStatusSegments(network = "offline") {
   const saved = loadWallet().length;
   const pins = loadPins().length;
   const notices = tabNoticeCount();
+  const liveProof = getLiveControlPendingCount();
 
   const networkLabel =
     network === "ok"
@@ -27,7 +29,7 @@ export function buildStatusSegments(network = "offline") {
         ? "Network limited"
         : "Network offline";
 
-  return [
+  const segments = [
     {
       id: "network",
       label: networkLabel,
@@ -60,6 +62,18 @@ export function buildStatusSegments(network = "offline") {
       highlight: notices > 0,
     },
   ];
+
+  if (liveProof > 0) {
+    segments.push({
+      id: "liveproof",
+      label: `${liveProof} proof waiting`,
+      detail: `${liveProof} live proof request${liveProof === 1 ? "" : "s"} on saved cards`,
+      zero: false,
+      highlight: true,
+    });
+  }
+
+  return segments;
 }
 
 /** @param {"ok"|"degraded"|"offline"} network */

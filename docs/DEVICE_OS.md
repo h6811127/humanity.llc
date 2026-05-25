@@ -1,6 +1,6 @@
 # Device OS — browser shell + physical network
 
-**Status:** Phase 6 shipped (revoked-since-last-visit alerts on saved rows)  
+**Status:** Phase 7 shipped (live-control inbox on device hub)  
 **Audience:** Product, frontend, and anyone extending Pages without accounts
 
 ---
@@ -25,7 +25,9 @@ Before shipping UI, answer:
 | Question | Put it here |
 |----------|-------------|
 | Save, search, relabel, import backup, activity log, collapsed glance | **Device hub** (`#device-hub`) + glance strip |
+| Live proof **inbox** (pending challenges for saved cards) | **Device hub** — tap opens `/created/` to sign |
 | Manifesto, revoke, QR, backup export | **Network object** + `/created/` Manage tab |
+| Live proof **signing** | **`/created/`** only (existing proof panel + poll) |
 | What a stranger sees | **Scan page only** — never a second homepage demo |
 | Protocol essays, threat models, case study walkthrough | **Reference** (full docs in intro mode; Help & protocol footer in focus mode) |
 
@@ -88,7 +90,8 @@ Optional hub toggle (off by default): after create, write tab keys to `hc_wallet
 | Saved · pinned · notice counts | — |
 | **Revoked since last visit** per saved row + hub glance hint | — |
 | Hub glance when collapsed | Cross-tab “keys in another tab” banner |
-| Recent activity on device | Live-control inbox (signed actions only on `/created/`) |
+| Recent activity on device | — |
+| **Live proof waiting** inbox (hub group; prove on `/created/`) | — |
 
 Do **not** add per-pin revoke on the homepage — pins have no keys; use **Use keys → Manage**.
 
@@ -149,10 +152,24 @@ See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` for storage and search.
 | 7 | Landing cleanup: no dock, no help float, no status hint | ✅ |
 | 8 | Wallet shell parity + `device-wallet-network.mjs` status chips | ✅ |
 | 9 | **Revoked since last visit** (`hc_wallet_last_seen_network`) | ✅ |
-| 10 | Deferred: live-control inbox queue | — |
+| 10 | Live-control inbox (`device-live-control-inbox.mjs`) | ✅ |
 | 11 | Deferred: cross-tab keys banner beyond notice row | — |
 | 12 | Deferred: resolver-wide search / directory | — |
 | — | Deferred: per-card revoke on landing hub | — (use Manage) |
+
+### Live-control inbox (Phase 7)
+
+**Scope:** Device hub only on **landing** and **`/wallet/`** — not duplicated on `/created/` (that page keeps the existing **Prove live control** panel for the open card).
+
+**Poll:** Every 5s while the tab is visible, `GET /.well-known/hc/v1/cards/{profile_id}/live-control/challenges?qr_id=…` for each **saved** wallet row that has a `qr_id`.
+
+**UI:**
+
+- Hub group **Live proof waiting** — one row per pending challenge (card label, “Someone is waiting”).
+- Status line adds **`N proof waiting`** (highlighted) when N &gt; 0.
+- Row tap → **Use keys** for that card → `/created/?profile_id&qr_id&live_challenge&return_url` (from resolver `owner_url`).
+
+**Not in inbox:** Pins (no keys), saved rows without `qr_id`, signing (stays on `/created/`).
 
 ### Revoked since last visit (Phase 6)
 
@@ -170,6 +187,7 @@ See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` for storage and search.
 |------|------|
 | `docs/DEVICE_OS.md` | This document |
 | `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` | Storage, search, focus mode |
+| `site/js/device-live-control-inbox.mjs` | Poll pending challenges for saved cards |
 | `site/js/device-wallet-network.mjs` | Resolver status cache for saved rows |
 | `site/js/wallet-hub.mjs` | Wallet page init |
 | `site/js/device-hub-glance.mjs` | Collapsed-hub summary (landing) |

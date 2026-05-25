@@ -67,9 +67,15 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 - Full export/import under **Manage** on `/created/`.
 - Activity log (`device-activity.mjs`).
 
+### Phase 4 — live-control inbox (shipped)
+
+- **`device-live-control-inbox.mjs`** polls pending challenges for saved cards with `qr_id`.
+- Hub group **Live proof waiting** on landing and `/wallet/`; tap loads keys and opens `/created/` to sign.
+- `/created/` keeps the existing proof panel (no duplicate inbox).
+
 ### Deferred
 
-- Resolver search API, directory of handles, live-control inbox queue UI.
+- Resolver search API, directory of handles.
 
 ---
 
@@ -103,6 +109,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 | `site/created/index.html` | Created hub shell |
 | `site/js/device-hub-ui.mjs` | Shared hub render + init |
 | `site/js/device-activity.mjs` | Activity log API |
+| `site/js/device-live-control-inbox.mjs` | Live proof inbox poll + open |
 | `site/js/device-hub-glance.mjs` | Collapsed-hub summary (landing) |
 | `site/js/landing-device-hub.mjs` | Landing init wrapper |
 | `site/js/created-hub.mjs` | Created init wrapper |

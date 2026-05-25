@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=72" />
+    <link rel="stylesheet" href="/styles.css?v=73" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -132,6 +132,16 @@
           </div>
 
           <div class="device-hub-group" id="device-hub-notice-group" hidden></div>
+
+          <div
+            class="device-hub-group"
+            id="device-hub-live-control-group"
+            hidden
+            data-hub-group="liveproof"
+          >
+            <p class="device-hub-group-label">Live proof waiting</p>
+            <ul class="list list-compact" id="device-hub-live-control-list"></ul>
+          </div>
 
           <div
             class="device-hub-group"
@@ -730,7 +740,7 @@
     <script src="/js/landing-focus.mjs?v=2" type="module"></script>
     <script src="/js/device-status.mjs?v=6" type="module"></script>
     <script src="/js/landing-progress.mjs?v=2" type="module"></script>
-    <script src="/js/landing-device-hub.mjs?v=11" type="module"></script>
+    <script src="/js/landing-device-hub.mjs?v=12" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=2" type="module"></script>
   </body>
 </html>

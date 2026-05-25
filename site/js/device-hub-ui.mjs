@@ -26,6 +26,13 @@ import {
   snapshotNetworkSeenOnExit,
 } from "./device-wallet-network.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
+import {
+  formatLiveControlExpiry,
+  getLiveControlPending,
+  openLiveControlProof,
+  refreshLiveControlInbox,
+  startLiveControlInboxPolling,
+} from "./device-live-control-inbox.mjs";
 
 function escapeHtml(s) {
   return String(s)
@@ -45,14 +52,18 @@ function walletHaystack(entry) {
  *   noticeMode: 'created-url' | 'keys-strip',
  *   fetchNetworkStatus: boolean,
  *   savedLabel: string,
+ *   showLiveControlInbox: boolean,
  * }} */
 let hubConfig = {
   noticeMode: "created-url",
   fetchNetworkStatus: true,
   savedLabel: "Saved cards",
+  showLiveControlInbox: false,
 };
 
 let savedGroup;
+let liveControlGroup;
+let liveControlList;
 let savedList;
 let pinsGroup;
 let pinsList;
@@ -165,6 +176,52 @@ async function fetchAndApplyNetworkChips() {
     });
     if (changed) saveWallet(next);
   });
+}
+
+function renderLiveControlInbox() {
+  if (!liveControlGroup || !liveControlList || !hubConfig.showLiveControlInbox) {
+    if (liveControlGroup) liveControlGroup.hidden = true;
+    return;
+  }
+
+  const pending = getLiveControlPending();
+  liveControlList.innerHTML = "";
+  if (pending.length === 0) {
+    liveControlGroup.hidden = true;
+    return;
+  }
+
+  liveControlGroup.hidden = false;
+  for (const item of pending) {
+    const entry = item.entry;
+    const label =
+      typeof entry.label === "string" && entry.label
+        ? entry.label
+        : typeof entry.handle === "string" && entry.handle
+          ? `@${entry.handle}`
+          : "Saved card";
+    const expiry = item.expires_at ? formatLiveControlExpiry(item.expires_at) : "";
+    const sub = expiry ? `Someone is waiting · ${expiry}` : "Someone is waiting";
+
+    const li = document.createElement("li");
+    li.className = "list-row list-action device-live-control-row";
+    li.dataset.hubSearchable = `live proof waiting ${label} ${entry.profile_id || ""}`.toLowerCase();
+    li.innerHTML = `
+      <button type="button" class="device-live-control-open">
+        <span class="list-icon list-icon-tone-gold" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="M12 18v4"/><circle cx="12" cy="12" r="4"/><path d="m4.93 4.93 2.83 2.83"/><path d="m16.24 16.24 2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="m16.24 7.76 2.83-2.83"/></svg>
+        </span>
+        <span class="list-content">
+          <span class="list-title">${escapeHtml(label)}</span>
+          <span class="list-sub">${escapeHtml(sub)}</span>
+        </span>
+        <span class="list-chevron" aria-hidden="true">›</span>
+      </button>`;
+    li.querySelector(".device-live-control-open")?.addEventListener("click", () => {
+      openLiveControlProof(item);
+    });
+    liveControlList.appendChild(li);
+  }
 }
 
 function renderNoticeRow() {
@@ -404,7 +461,8 @@ function refreshEmptyHint() {
     loadWallet().length > 0 ||
     loadPins().length > 0 ||
     tabNoticeCount() > 0 ||
-    loadActivity().length > 0;
+    loadActivity().length > 0 ||
+    (hubConfig.showLiveControlInbox && getLiveControlPending().length > 0);
   emptyHint.hidden = hasData;
 }
 
@@ -415,6 +473,9 @@ function notifyHubChanged() {
 function applySearchFilter() {
   const q = searchInput?.value ?? "";
   const { matchCount } = applyDeviceHubSearch(deviceHub, q);
+  if (hubConfig.showLiveControlInbox && liveControlGroup && !q.trim()) {
+    liveControlGroup.hidden = getLiveControlPending().length === 0;
+  }
   refreshEmptyHint();
 
   if (searchStatus) {
@@ -439,6 +500,8 @@ function bindDom() {
   pinsGroup = document.getElementById("device-hub-pins-group");
   pinsList = document.getElementById("device-hub-pins-list");
   noticeGroup = document.getElementById("device-hub-notice-group");
+  liveControlGroup = document.getElementById("device-hub-live-control-group");
+  liveControlList = document.getElementById("device-hub-live-control-list");
   activityGroup = document.getElementById("device-hub-activity-group");
   activityList = document.getElementById("device-hub-activity-list");
   searchInput = document.getElementById("device-hub-search");
@@ -449,6 +512,7 @@ function bindDom() {
 
 export function refreshDeviceHub() {
   renderNoticeRow();
+  renderLiveControlInbox();
   renderActivityRows();
   renderSavedRows();
   renderPinRows();
@@ -470,6 +534,7 @@ export function focusHubSearch() {
  *   showImport?: boolean,
  *   showActivity?: boolean,
  *   showEmptyHint?: boolean,
+ *   showLiveControlInbox?: boolean,
  * }} [config]
  */
 export function initDeviceHub(config = {}) {
@@ -478,7 +543,12 @@ export function initDeviceHub(config = {}) {
     noticeMode: config.noticeMode ?? "created-url",
     fetchNetworkStatus: config.fetchNetworkStatus !== false,
     savedLabel: config.savedLabel ?? "Saved cards",
+    showLiveControlInbox: config.showLiveControlInbox === true,
   };
+
+  if (liveControlGroup) {
+    liveControlGroup.hidden = !hubConfig.showLiveControlInbox;
+  }
 
   if (shortcutsGroup) shortcutsGroup.hidden = config.showShortcuts === false;
   if (activityGroup && config.showActivity === false) activityGroup.hidden = true;
@@ -493,6 +563,22 @@ export function initDeviceHub(config = {}) {
 
   refreshDeviceHub();
   notifyHubChanged();
+
+  if (hubConfig.showLiveControlInbox) {
+    startLiveControlInboxPolling();
+    void refreshLiveControlInbox().then(() => {
+      renderLiveControlInbox();
+      applySearchFilter();
+      refreshEmptyHint();
+      notifyHubChanged();
+    });
+    window.addEventListener("hc-live-control-inbox-changed", () => {
+      renderLiveControlInbox();
+      applySearchFilter();
+      refreshEmptyHint();
+      notifyHubChanged();
+    });
+  }
 
   if (searchInput) {
     searchInput.addEventListener("input", applySearchFilter);
@@ -509,6 +595,9 @@ export function initDeviceHub(config = {}) {
     ) {
       refreshDeviceHub();
       notifyHubChanged();
+      if (hubConfig.showLiveControlInbox) {
+        void refreshLiveControlInbox();
+      }
     }
   });
 

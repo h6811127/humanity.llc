@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Saved on this device · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=72" />
+    <link rel="stylesheet" href="/styles.css?v=73" />
   </head>
   <body class="has-device-hub-search device-shell-wallet">
     <div class="page">
@@ -130,6 +130,16 @@
           </div>
 
           <div class="device-hub-group" id="device-hub-notice-group" hidden></div>
+
+          <div
+            class="device-hub-group"
+            id="device-hub-live-control-group"
+            hidden
+            data-hub-group="liveproof"
+          >
+            <p class="device-hub-group-label">Live proof waiting</p>
+            <ul class="list list-compact" id="device-hub-live-control-list"></ul>
+          </div>
 
           <div
             class="device-hub-group"
@@ -283,6 +293,6 @@
     </div>
 
     <script src="/js/device-status.mjs?v=6" type="module"></script>
-    <script src="/js/wallet-hub.mjs?v=2" type="module"></script>
+    <script src="/js/wallet-hub.mjs?v=3" type="module"></script>
   </body>
 </html>

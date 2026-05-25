@@ -3,7 +3,7 @@
  */
 import { initDeviceHub } from "./device-hub-ui.mjs";
 
-initDeviceHub({ noticeMode: "keys-strip" });
+initDeviceHub({ noticeMode: "keys-strip", showLiveControlInbox: false });
 
 document.getElementById("created-hub-manage-tab")?.addEventListener("click", () => {
   document.getElementById("created-tab-btn-manage")?.click();

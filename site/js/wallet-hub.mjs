@@ -154,6 +154,7 @@ initDeviceHub({
   showImport: true,
   showActivity: true,
   showEmptyHint: true,
+  showLiveControlInbox: true,
 });
 
 initAutoSaveToggle();

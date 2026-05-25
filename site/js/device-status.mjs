@@ -134,6 +134,7 @@ function escapeSheetKey(id) {
     saved: "Saved",
     pinned: "Pinned",
     notices: "Notice",
+    liveproof: "Live proof",
   };
   return map[id] || id;
 }
@@ -157,6 +158,12 @@ function handleSegmentAction(segId) {
   }
   if (segId === "pinned") {
     document.getElementById("device-hub-pins-group")?.scrollIntoView({
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
+      block: "nearest",
+    });
+  }
+  if (segId === "liveproof") {
+    document.getElementById("device-hub-live-control-group")?.scrollIntoView({
       behavior: prefersReducedMotion() ? "auto" : "smooth",
       block: "nearest",
     });
@@ -313,6 +320,7 @@ window.addEventListener("storage", (e) => {
 });
 
 window.addEventListener("hc-device-hub-changed", refreshSummary);
+window.addEventListener("hc-live-control-inbox-changed", refreshSummary);
 
 window.addEventListener("hc-hub-expand-request", (e) => {
   if (!hub) return;
