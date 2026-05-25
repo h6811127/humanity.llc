@@ -582,7 +582,11 @@ body.page-flow.has-shell-chrome .page > main.screen {
 }
 
 .hub-card-status-alert {
-  margin: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 8px 8px;
   padding: 10px 12px;
   border-radius: 10px;
   font-size: 13px;
@@ -592,8 +596,19 @@ body.page-flow.has-shell-chrome .page > main.screen {
   background: rgba(255, 149, 0, 0.14);
 }
 
+.hub-card-status-alert[hidden] {
+  display: none !important;
+}
+
+.hub-card-status-alert-text {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+
 .hub-card-alert-dismiss {
-  margin-left: 6px;
+  flex-shrink: 0;
+  margin: 0;
   padding: 0;
   border: none;
   background: none;
@@ -604,6 +619,15 @@ body.page-flow.has-shell-chrome .page > main.screen {
   text-decoration: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+}
+
+.device-system-banner[hidden],
+.device-cross-tab-banner[hidden],
+.device-system-banner:empty,
+.device-cross-tab-banner:empty {
+  display: none !important;
+  margin: 0;
+  padding: 0;
 }
 
 .device-hub-glance-row--revoked .device-hub-glance-btn {

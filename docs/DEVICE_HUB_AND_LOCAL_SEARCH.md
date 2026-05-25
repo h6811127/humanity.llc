@@ -34,6 +34,8 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **`/wallet/` (Phase 5–6):** Uses the same hub renderer as landing. Each saved row shows a **network chip** (resolver status, ~5 min cache), optional **Revoked since last visit** alert (`hc_wallet_last_seen_network`), **Last on device** from activity, and **Use keys / Open scan / Manage**. Page is hub-expanded by default; help disclosure hides when cards exist.
 
+**Revoked-since-visit alert:** Only appears when this device previously recorded a **non-revoked** network status (snapshot on leave or after a successful fetch), and the resolver now reports **revoked**. First sight of a revoked card shows the chip only, not “since your last visit.” Dismiss **Got it** stores acknowledged state.
+
 **Created keys strip:** On `/created/` **Now** tab, **Keys on this device** first; recovery in **Break-glass** `<details>` below.
 
 **Naming:** UI says **Saved on this device**  -  not “wallet”. URL stays `/wallet/`.

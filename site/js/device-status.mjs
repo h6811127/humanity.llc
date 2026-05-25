@@ -188,14 +188,17 @@ function renderSystemBanner() {
   if (hubStatusPanel) {
     systemBanner.hidden = true;
     systemBanner.textContent = "";
+    systemBanner.classList.remove("hc-notice", "hc-notice--error");
     return;
   }
   if (networkStatus === "ok") {
     systemBanner.hidden = true;
     systemBanner.textContent = "";
+    systemBanner.classList.remove("hc-notice", "hc-notice--error");
     return;
   }
   systemBanner.hidden = false;
+  systemBanner.classList.add("hc-notice", "hc-notice--error");
   systemBanner.textContent =
     networkStatus === "degraded"
       ? "Resolver limited - create, update, and revoke may fail until service recovers."

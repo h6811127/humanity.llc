@@ -126,6 +126,7 @@ export function renderCrossTabKeysBanner() {
     if (banner) {
       banner.hidden = true;
       banner.innerHTML = "";
+      banner.classList.remove("hc-notice", "hc-notice--info");
     }
     return;
   }
@@ -135,6 +136,7 @@ export function renderCrossTabKeysBanner() {
   if (!shouldShowCrossTabNotice()) {
     banner.hidden = true;
     banner.innerHTML = "";
+    banner.classList.remove("hc-notice", "hc-notice--info");
     return;
   }
 
@@ -142,10 +144,12 @@ export function renderCrossTabKeysBanner() {
   if (!msg) {
     banner.hidden = true;
     banner.innerHTML = "";
+    banner.classList.remove("hc-notice", "hc-notice--info");
     return;
   }
 
   banner.hidden = false;
+  banner.classList.add("hc-notice", "hc-notice--info");
   banner.innerHTML = `
     <strong>Signing keys in another tab</strong>
     <span class="device-cross-tab-sub">${msg.label}${msg.extra}</span>

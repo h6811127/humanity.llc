@@ -4,6 +4,7 @@
  */
 import { getCardStatusUrl } from "./hc-sign.mjs";
 import { loadWallet } from "./device-wallet.mjs";
+import { isRevokedSinceLastVisitFromBaseline } from "./wallet-network-baseline.mjs";
 
 const CACHE_KEY = "hc_wallet_network_cache";
 const LAST_SEEN_KEY = "hc_wallet_last_seen_network";
@@ -115,11 +116,8 @@ function saveLastSeen(map) {
  * @param {string | null | undefined} currentStatus
  */
 export function isRevokedSinceLastVisit(profileId, currentStatus) {
-  const current = String(currentStatus || "").toLowerCase();
-  if (current !== "revoked") return false;
   const last = loadLastSeen()[profileId];
-  if (last == null || last === "") return true;
-  return String(last).toLowerCase() !== "revoked";
+  return isRevokedSinceLastVisitFromBaseline(last, currentStatus);
 }
 
 /** @param {string} profileId @param {string} status */
@@ -135,8 +133,21 @@ export function snapshotNetworkSeenOnExit() {
   const seen = loadLastSeen();
   for (const entry of loadWallet()) {
     const pid = entry.profile_id;
-    const status = getCachedNetworkStatus(pid) ?? entry.status ?? "unknown";
-    seen[pid] = String(status).toLowerCase();
+    const cached = getCachedNetworkStatus(pid);
+    if (!cached) continue;
+    seen[pid] = String(cached).toLowerCase();
   }
   saveLastSeen(seen);
+}
+
+/**
+ * After a fresh resolver fetch, store baseline for cards that are not in transition.
+ * @param {Record<string, string>} statusMap
+ */
+export function syncLastSeenFromNetworkMap(statusMap) {
+  for (const [profileId, status] of Object.entries(statusMap)) {
+    if (!profileId || !status) continue;
+    if (isRevokedSinceLastVisit(profileId, status)) continue;
+    recordNetworkSeen(profileId, status);
+  }
 }

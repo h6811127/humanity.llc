@@ -32,6 +32,7 @@ import {
   recordNetworkSeen,
   refreshWalletNetworkStatuses,
   snapshotNetworkSeenOnExit,
+  syncLastSeenFromNetworkMap,
 } from "./device-wallet-network.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
 import {
@@ -212,6 +213,7 @@ async function fetchAndApplyNetworkChips() {
   );
   await refreshWalletNetworkStatuses(entries, (map) => {
     applyNetworkChipsToDom(map);
+    syncLastSeenFromNetworkMap(map);
     const stored = loadWallet();
     let changed = false;
     const next = stored.map((e) => {
@@ -398,10 +400,10 @@ function renderSavedRows() {
       ? networkChipHtml(entry.profile_id, getCachedNetworkStatus(entry.profile_id) ?? "checking")
       : "";
     const revokedAlert = hubConfig.fetchNetworkStatus
-      ? `<p class="hub-card-status-alert hc-notice hc-notice--warning hc-notice--compact" data-hub-searchable="revoked since last visit network" hidden role="status">
-          Revoked on the network since your last visit.
+      ? `<div class="hub-card-status-alert" data-hub-searchable="revoked since last visit network" hidden role="status">
+          <p class="hub-card-status-alert-text">Revoked on the network since your last visit.</p>
           <button type="button" class="hub-card-alert-dismiss">Got it</button>
-        </p>`
+        </div>`
       : "";
 
     const menuBlock = `
