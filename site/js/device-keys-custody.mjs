@@ -30,22 +30,22 @@ export function keysCustodyHtml(variant, opts = {}) {
   const importHref = opts.importHref ?? "#hub-import-form";
   const learnHref = "/features/card-creation.html#keys-custody";
 
-  const tiers = `
-    <ul class="device-keys-custody-tiers">
-      <li class="device-keys-custody-tier device-keys-custody-tier--tab">
-        <span class="device-keys-custody-tier-title">This tab only</span>
-        <span class="device-keys-custody-tier-desc">Keys sit in this browser tab. Close the tab or clear the session and they are gone.</span>
-      </li>
-      <li class="device-keys-custody-tier device-keys-custody-tier--saved">
-        <span class="device-keys-custody-tier-title">Saved on this device</span>
-        <span class="device-keys-custody-tier-desc">Written to this browser&apos;s storage. You can come back months later, open <strong>Saved on this device</strong>, and tap <strong>Use keys</strong>.</span>
-      </li>
-    </ul>`;
+  const tiersDl = `
+    <dl class="device-keys-custody-dl">
+      <div class="device-keys-custody-dl-row">
+        <dt>This tab only</dt>
+        <dd>Gone when you close this tab or clear site data for humanity.llc.</dd>
+      </div>
+      <div class="device-keys-custody-dl-row device-keys-custody-dl-row--saved">
+        <dt>Saved on this device</dt>
+        <dd>Stays in this browser until you remove the card or clear site data.</dd>
+      </div>
+    </dl>`;
 
   const foot = noticeFoot(importHref, learnHref);
 
   const networkNote =
-    '<p class="device-keys-custody-network">Create already registers a <strong>public card</strong> on the network. Save only copies your <strong>private key</strong> into this browser.</p>';
+    '<p class="device-keys-custody-note">Your card is already on the network. Save only stores the signing key in this browser.</p>';
 
   if (variant === "hub") {
     return `
@@ -66,13 +66,12 @@ export function keysCustodyHtml(variant, opts = {}) {
       <div class="hc-notice hc-notice--warning device-keys-custody device-keys-custody--created" role="note">
         <span class="hc-notice-icon">${HC_CAUTION_ICON}</span>
         <div class="hc-notice-content">
-          <p class="hc-notice-title">Save your key now</p>
+          <p class="hc-notice-title">Save your key on this device</p>
           <p class="hc-notice-body">
-            You can revoke and update from <strong>this tab</strong> right now. To keep that power after you close the tab,
-            tap <strong>Save on this device</strong> below.
+            You can sign from this tab now. Tap <strong>Save on this device</strong> below to keep that ability after you close the tab.
           </p>
+          ${tiersDl}
           ${networkNote}
-          ${tiers}
           ${foot}
         </div>
       </div>`;
@@ -85,11 +84,10 @@ export function keysCustodyHtml(variant, opts = {}) {
         <div class="hc-notice-content">
           <p class="hc-notice-title">Your signing keys</p>
           <p class="hc-notice-body">
-            Cards listed here have private keys in <strong>this browser</strong>. humanity.llc does not store them on servers.
-            Clearing site data for this site removes them.
+            Cards here are stored only in <strong>this browser</strong>. humanity.llc does not hold your private keys.
           </p>
+          ${tiersDl}
           ${networkNote}
-          ${tiers}
           ${foot}
         </div>
       </div>`;

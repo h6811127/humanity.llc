@@ -8,13 +8,18 @@ html[data-theme="dark"] {
   --grey: #98989d;
   --shell-bg: #000000;
   --shell-fill: #1c1c1e;
-  --shell-fill-secondary: #141414;
-  --shell-surface-elevated: #2c2c2e;
+  --shell-fill-secondary: #2c2c2e;
+  --shell-surface-elevated: #3a3a3c;
   --shell-separator: rgba(255, 255, 255, 0.12);
   --shell-label: rgba(235, 235, 245, 0.62);
   --shell-label-strong: #f5f5f7;
   --shell-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45);
   --shell-shadow-md: 0 12px 32px rgba(0, 0, 0, 0.55);
+  --hc-notice-fg: rgba(235, 235, 245, 0.88);
+  --hc-notice-title-fg: #f5f5f7;
+  --hc-notice-strong-fg: #ffffff;
+  --hc-notice-link: #0a84ff;
+  --hc-notice-foot-border: rgba(255, 255, 255, 0.14);
 }
 
 html[data-theme="dark"] body {
@@ -55,13 +60,19 @@ html[data-theme="dark"] .list-sub,
 html[data-theme="dark"] .form-hint,
 html[data-theme="dark"] .device-hub-lead,
 html[data-theme="dark"] .device-hub-group-hint,
-html[data-theme="dark"] .device-hub-group-label {
+html[data-theme="dark"] .device-hub-group-label,
+html[data-theme="dark"] .created-loop-title,
+html[data-theme="dark"] .created-print-tip summary,
+html[data-theme="dark"] .created-print-steps {
   color: var(--shell-label);
 }
 
 html[data-theme="dark"] .device-hub-title,
 html[data-theme="dark"] .wallet-page-title,
-html[data-theme="dark"] .landing-device-settings-title {
+html[data-theme="dark"] .landing-device-settings-title,
+html[data-theme="dark"] .created-loop-label,
+html[data-theme="dark"] .live-control-notification-title,
+html[data-theme="dark"] .live-control-notification-copy {
   color: var(--shell-label-strong);
 }
 
@@ -104,41 +115,128 @@ html[data-theme="dark"] .btn-secondary {
   color: var(--shell-label-strong);
 }
 
+/* Floating chrome — dot and badge only, no bar */
+html[data-theme="dark"] .top-chrome--float,
+html[data-theme="dark"] .top-chrome-bar,
+html[data-theme="dark"] .top-chrome-bar--minimal,
+html[data-theme="dark"] .top-chrome-bar--wallet {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html[data-theme="dark"] .shell-status-dot-btn {
+  background: transparent;
+  box-shadow: none;
+}
+
+html[data-theme="dark"] .shell-status-dot-btn:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme="dark"] .shell-notif-badge-ring {
+  background: transparent;
+  border-color: var(--red);
+  box-shadow: none;
+}
+
+/* Notices */
+html[data-theme="dark"] .hc-notice {
+  background: var(--shell-fill);
+  border: 0.5px solid var(--shell-separator);
+}
+
 html[data-theme="dark"] .hc-notice--warning {
-  background: rgba(255, 149, 0, 0.2);
-  border-color: rgba(255, 149, 0, 0.28);
+  background: rgba(255, 159, 10, 0.14);
+  border-color: rgba(255, 159, 10, 0.28);
+}
+
+html[data-theme="dark"] .hc-notice--warning .hc-notice-icon {
+  color: #ff9f0a;
 }
 
 html[data-theme="dark"] .hc-notice--error {
-  background: rgba(255, 59, 48, 0.18);
+  background: rgba(255, 69, 58, 0.16);
+  border-color: rgba(255, 69, 58, 0.32);
+}
+
+html[data-theme="dark"] .hc-notice--error .hc-notice-icon {
+  color: #ff453a;
 }
 
 html[data-theme="dark"] .hc-notice--info {
-  background: rgba(0, 122, 255, 0.2);
+  background: rgba(10, 132, 255, 0.18);
+  border-color: rgba(10, 132, 255, 0.32);
+}
+
+html[data-theme="dark"] .hc-notice--info .hc-notice-icon {
+  color: #0a84ff;
 }
 
 html[data-theme="dark"] .hc-notice-title,
 html[data-theme="dark"] .hc-notice-body,
-html[data-theme="dark"] .device-keys-custody-tier-title {
-  color: var(--shell-label-strong);
+html[data-theme="dark"] .hc-notice-foot,
+html[data-theme="dark"] .form-warning {
+  color: var(--hc-notice-fg);
 }
 
-html[data-theme="dark"] .device-keys-custody-tier-desc,
-html[data-theme="dark"] .device-keys-custody-network {
+html[data-theme="dark"] .hc-notice-body strong,
+html[data-theme="dark"] .form-warning strong {
+  color: var(--hc-notice-strong-fg);
+}
+
+html[data-theme="dark"] .hc-notice-body a,
+html[data-theme="dark"] .hc-notice-foot a,
+html[data-theme="dark"] p.hc-notice:not(:has(.hc-notice-content)) a,
+html[data-theme="dark"] .form-warning a {
+  color: var(--hc-notice-link);
+}
+
+html[data-theme="dark"] .device-keys-custody-dl {
+  background: rgba(0, 0, 0, 0.28);
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .device-keys-custody-dl-row {
+  border-bottom-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .device-keys-custody-dl-row dt {
+  color: var(--hc-notice-title-fg);
+}
+
+html[data-theme="dark"] .device-keys-custody-dl-row--saved dt {
+  color: #30d158;
+}
+
+html[data-theme="dark"] .device-keys-custody-note {
   color: var(--shell-label);
 }
 
-html[data-theme="dark"] .device-keys-custody-tier {
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid var(--shell-separator);
-  border-radius: 10px;
+/* Try the loop */
+html[data-theme="dark"] .created-loop-step {
+  background: var(--shell-fill);
+  border-color: var(--shell-separator);
 }
 
-html[data-theme="dark"] .device-keys-custody-tier--saved {
-  background: rgba(52, 199, 89, 0.12);
-  border-color: rgba(52, 199, 89, 0.22);
+html[data-theme="dark"] .created-loop-step.is-current {
+  border-color: rgba(255, 77, 109, 0.55);
+  background: rgba(255, 77, 109, 0.12);
 }
 
+html[data-theme="dark"] .created-loop-step.is-done .created-loop-num {
+  background: var(--red);
+  color: #000;
+  border-color: var(--red);
+}
+
+html[data-theme="dark"] .created-loop-num {
+  background: var(--shell-surface-elevated);
+  color: var(--red);
+  border-color: var(--red);
+}
+
+/* Created page groups */
 html[data-theme="dark"] .created-tabs {
   background: rgba(255, 255, 255, 0.08);
 }
@@ -151,6 +249,35 @@ html[data-theme="dark"] .created-tab-btn.is-active,
 html[data-theme="dark"] .created-tab-btn[aria-selected="true"] {
   background: var(--shell-surface-elevated);
   color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .flow-keys-panel,
+html[data-theme="dark"] .flow-disclosure.created-recovery-details {
+  background: var(--shell-fill);
+  border: 0.5px solid var(--shell-separator);
+  box-shadow: none;
+}
+
+html[data-theme="dark"] body.device-shell-created .flow-keys-group .list-row {
+  background: var(--shell-fill);
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .created-copy-id {
+  background: rgba(255, 77, 109, 0.12);
+  border-color: rgba(255, 77, 109, 0.35);
+  color: var(--red);
+}
+
+html[data-theme="dark"] .live-control-notification-inner {
+  background: rgba(255, 77, 109, 0.1);
+  border-color: rgba(255, 77, 109, 0.28);
+  box-shadow: none;
+}
+
+html[data-theme="dark"] .created-what-now-compact {
+  background: var(--shell-fill);
+  border-color: var(--shell-separator);
 }
 
 html[data-theme="dark"] .device-hub-glance-popover {
@@ -203,11 +330,6 @@ html[data-theme="dark"] .landing-device-settings-list .list-action .list-title {
 html[data-theme="dark"] .landing-device-settings-list .list-action > a:active,
 html[data-theme="dark"] .landing-device-settings-list .list-action > button:active {
   background: rgba(255, 255, 255, 0.06);
-}
-
-html[data-theme="dark"] .top-chrome-bar,
-html[data-theme="dark"] .shell-status-dot-btn {
-  background: rgba(28, 28, 30, 0.94);
 }
 
 html[data-theme="dark"] .scan-status-panel,

@@ -375,51 +375,49 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   margin-bottom: 12px;
 }
 
-.device-keys-custody-network {
-  margin: 12px 0;
-  padding: 10px 12px;
-  border-radius: 10px;
-  font-size: 13px;
-  line-height: 1.4;
-  color: var(--shell-label-strong, #1c1c1e);
-  background: rgba(255, 255, 255, 0.55);
-  border: 0.5px solid rgba(60, 60, 67, 0.1);
-}
-
-.device-keys-custody-tiers {
-  list-style: none;
-  margin: 0;
+.device-keys-custody-dl {
+  margin: 12px 0 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--shell-fill-secondary, rgba(120, 120, 128, 0.12));
+  border: 0.5px solid var(--shell-separator, rgba(60, 60, 67, 0.11));
 }
 
-.device-keys-custody-tier {
+.device-keys-custody-dl-row {
+  margin: 0;
   padding: 10px 12px;
-  border-radius: 10px;
-  background: var(--shell-fill, #fff);
-  border: 1px solid var(--shell-separator, rgba(60, 60, 67, 0.11));
+  border-bottom: 0.5px solid var(--shell-separator, rgba(60, 60, 67, 0.11));
 }
 
-.device-keys-custody-tier--saved {
-  border-color: rgba(26, 107, 50, 0.35);
-  background: rgba(26, 107, 50, 0.06);
+.device-keys-custody-dl-row:last-child {
+  border-bottom: none;
 }
 
-.device-keys-custody-tier-title {
-  display: block;
+.device-keys-custody-dl-row dt {
+  margin: 0;
   font-size: 14px;
-  font-weight: 700;
-  color: var(--shell-label-strong, #1c1c1e);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--hc-notice-title-fg, var(--shell-label-strong, #1c1c1e));
 }
 
-.device-keys-custody-tier-desc {
-  display: block;
-  margin-top: 3px;
+.device-keys-custody-dl-row dd {
+  margin: 4px 0 0;
   font-size: 13px;
   line-height: 1.4;
-  color: var(--shell-label, rgba(60, 60, 67, 0.72));
+  color: var(--hc-notice-fg, var(--shell-label, rgba(60, 60, 67, 0.72)));
+}
+
+.device-keys-custody-dl-row--saved dt {
+  color: #248a3d;
+}
+
+.device-keys-custody-note {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--hc-notice-fg, var(--shell-label, rgba(60, 60, 67, 0.72)));
 }
 
 .device-keys-custody--compact {
@@ -443,10 +441,8 @@ body.page-wallet .device-keys-custody--wallet {
   padding: 0;
   border: none;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow:
-    0 2px 10px rgba(0, 0, 0, 0.08),
-    0 0 0 0.5px rgba(0, 0, 0, 0.04);
+  background: transparent;
+  box-shadow: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.25s var(--shell-spring);
@@ -484,8 +480,8 @@ body.page-wallet .device-keys-custody--wallet {
   inset: 0;
   border: 2px solid var(--red);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 1px 6px rgba(219, 27, 67, 0.18);
+  background: transparent;
+  box-shadow: none;
 }
 
 .shell-notif-badge-count {

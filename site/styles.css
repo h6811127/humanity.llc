@@ -2921,11 +2921,10 @@ body.landing-focus-mode .screen-landing > .hero.hero-tight {
 /* Created  -  keys strip (above QR) */
 .created-keys-strip {
   margin-bottom: 8px;
-  padding: 16px;
-  border-radius: var(--radius);
-  border: 1px solid rgba(219, 27, 67, 0.22);
-  background: rgba(219, 27, 67, 0.05);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
 }
 
 .created-keys-title {
@@ -4555,6 +4554,11 @@ a.wallet-pin-open {
 
 /* iOS-style inline notices (warnings, info, errors) */
 .hc-notice {
+  --hc-notice-fg: rgba(60, 60, 67, 0.88);
+  --hc-notice-title-fg: #1c1c1e;
+  --hc-notice-strong-fg: #1c1c1e;
+  --hc-notice-link: #007aff;
+  --hc-notice-foot-border: rgba(60, 60, 67, 0.12);
   display: flex;
   gap: 10px;
   align-items: flex-start;
@@ -4563,7 +4567,7 @@ a.wallet-pin-open {
   border-radius: 12px;
   font-size: 14px;
   line-height: 1.45;
-  color: rgba(60, 60, 67, 0.92);
+  color: var(--hc-notice-fg);
   background: #f2f2f7;
   border: none;
 }
@@ -4595,24 +4599,24 @@ a.wallet-pin-open {
   font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.02em;
-  color: #1c1c1e;
+  color: var(--hc-notice-title-fg);
 }
 
 .hc-notice-body {
   margin: 0;
   font-size: 14px;
   line-height: 1.45;
-  color: rgba(60, 60, 67, 0.88);
+  color: var(--hc-notice-fg);
 }
 
 .hc-notice-body strong {
   font-weight: 600;
-  color: #1c1c1e;
+  color: var(--hc-notice-strong-fg);
 }
 
 .hc-notice-body a {
   font-weight: 600;
-  color: #007aff;
+  color: var(--hc-notice-link);
   text-decoration: none;
 }
 
@@ -4623,13 +4627,14 @@ a.wallet-pin-open {
 .hc-notice-foot {
   margin: 10px 0 0;
   padding-top: 10px;
-  border-top: 0.5px solid rgba(60, 60, 67, 0.12);
+  border-top: 0.5px solid var(--hc-notice-foot-border);
   font-size: 13px;
   font-weight: 600;
+  color: var(--hc-notice-fg);
 }
 
 .hc-notice-foot a {
-  color: #007aff;
+  color: var(--hc-notice-link);
   text-decoration: none;
 }
 
@@ -4638,7 +4643,8 @@ a.wallet-pin-open {
 }
 
 .hc-notice--warning {
-  background: rgba(255, 149, 0, 0.14);
+  background: rgba(255, 149, 0, 0.12);
+  border: 0.5px solid rgba(255, 149, 0, 0.22);
 }
 
 .hc-notice--warning .hc-notice-icon {
@@ -4646,11 +4652,12 @@ a.wallet-pin-open {
 }
 
 .hc-notice--warning .hc-notice-title {
-  color: #1c1c1e;
+  color: var(--hc-notice-title-fg);
 }
 
 .hc-notice--error {
-  background: rgba(255, 59, 48, 0.12);
+  background: rgba(255, 59, 48, 0.1);
+  border: 0.5px solid rgba(255, 59, 48, 0.22);
 }
 
 .hc-notice--error .hc-notice-icon {
@@ -4658,7 +4665,8 @@ a.wallet-pin-open {
 }
 
 .hc-notice--info {
-  background: rgba(0, 122, 255, 0.12);
+  background: rgba(0, 122, 255, 0.1);
+  border: 0.5px solid rgba(0, 122, 255, 0.2);
 }
 
 .hc-notice--info .hc-notice-icon {
@@ -4695,8 +4703,19 @@ p.hc-notice:not(:has(.hc-notice-content)),
 
 p.hc-notice:not(:has(.hc-notice-content)) a {
   font-weight: 600;
-  color: #007aff;
+  color: var(--hc-notice-link);
   text-decoration: none;
+}
+
+#created-error[hidden],
+#created-error:empty,
+#no-session[hidden],
+.live-control-notification[hidden] {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+  border: none !important;
 }
 
 .form-warning:not(.hc-notice--error) {
@@ -5619,13 +5638,13 @@ button.btn-danger {
   gap: 10px;
   padding: 12px 12px 11px;
   border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  background: #f7f7f7;
+  border: 1px solid var(--shell-separator, rgba(60, 60, 67, 0.14));
+  background: var(--shell-fill, #f2f2f7);
 }
 
 .created-loop-step.is-current {
-  border-color: var(--red);
-  background: rgba(219, 27, 67, 0.06);
+  border-color: rgba(219, 27, 67, 0.45);
+  background: rgba(219, 27, 67, 0.08);
 }
 
 .created-loop-step.is-done .created-loop-num {
@@ -5643,9 +5662,9 @@ button.btn-danger {
   font-size: 13px;
   font-weight: 700;
   border-radius: 50%;
-  border: 1px solid var(--red);
+  border: 1.5px solid var(--red);
   color: var(--red);
-  background: var(--white);
+  background: var(--shell-surface-elevated, var(--white));
 }
 
 .created-loop-label {
@@ -5653,7 +5672,18 @@ button.btn-danger {
   font-weight: 600;
   line-height: 1.35;
   letter-spacing: -0.02em;
-  color: var(--black);
+  color: var(--shell-label-strong, var(--black));
+}
+
+.created-screen > #no-session,
+.created-screen > #created-error {
+  margin: 20px var(--pad) 24px;
+}
+
+body.device-shell-created .flow-keys-group .list-row {
+  background: var(--shell-fill, #fff);
+  border-radius: 12px;
+  border: 0.5px solid var(--shell-separator, rgba(60, 60, 67, 0.11));
 }
 
 .created-qr-hero .group-label {
