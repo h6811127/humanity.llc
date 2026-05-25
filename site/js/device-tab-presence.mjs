@@ -162,11 +162,11 @@ function bindFocusChannel() {
 }
 
 function onVisibilityPresence() {
-  if (document.visibilityState === "hidden") {
-    clearTabKeysPresence();
-  } else {
+  if (document.visibilityState === "visible") {
     syncTabKeysPresence();
   }
+  // Background tabs stop heartbeating; stale/show windows retire the row.
+  // Do not clear on hidden — that breaks multi-window (other tabs need the last heartbeat).
 }
 
 function onPageShowPresence(ev) {
