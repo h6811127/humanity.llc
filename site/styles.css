@@ -4354,6 +4354,14 @@ button.btn-danger {
   box-shadow: 0 10px 24px rgba(219, 27, 67, 0.06);
 }
 
+.case-study-page .feature-nav {
+  margin-bottom: 8px;
+}
+
+.case-study-page .dock {
+  margin-top: 10px;
+}
+
 @media (min-width: 380px) {
   .case-study-proof-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
