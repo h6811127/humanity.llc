@@ -6,6 +6,7 @@ import { prefersReducedMotion } from "./device-shell-motion.mjs";
 const HUB_OPEN_KEY = "hc_hub_open";
 
 const hub = document.getElementById("device-hub");
+const chrome = document.getElementById("top-chrome");
 let backdrop = document.getElementById("device-hub-backdrop");
 
 export function isHubSheet() {
@@ -39,6 +40,7 @@ export function setHubSheetOpen(open) {
   hub.classList.toggle("device-hub-collapsed", !open);
   if (backdrop) backdrop.hidden = !open;
   document.body.classList.toggle("device-hub-sheet-open", open);
+  chrome?.classList.toggle("top-chrome--hub-locked", open);
   hub.setAttribute("aria-hidden", open ? "false" : "true");
   if (open) {
     hub.removeAttribute("inert");

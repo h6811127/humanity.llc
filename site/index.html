@@ -15,7 +15,7 @@
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="/styles.css?v=80" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=7" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=9" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -97,9 +97,8 @@
               id="device-hub-status-panel"
               aria-label="System status"
             ></div>
-            <a class="device-hub-create-btn" href="/create/" aria-label="Create a live object">+</a>
+            <a class="device-hub-create-btn" href="/create/" aria-label="Create a live object"><span class="device-hub-create-glyph" aria-hidden="true">+</span></a>
           </div>
-          <div class="device-hub-status-key" id="device-hub-status-key" aria-label="Status dot legend"></div>
           <h2 class="device-hub-title" id="device-hub-title">On this device</h2>
           <p class="device-hub-lead">
             Personal to <strong>this browser</strong>  -  not your profile on the network.
@@ -291,6 +290,8 @@
               </form>
             </details>
           </div>
+
+          <div class="device-hub-status-key" id="device-hub-status-key" aria-label="Status dot reference"></div>
         </div>
       </section>
 
@@ -734,7 +735,7 @@
       </main>
     </div>
     <script src="/js/landing-focus.mjs?v=2" type="module"></script>
-    <script src="/js/device-status.mjs?v=13" type="module"></script>
+    <script src="/js/device-status.mjs?v=14" type="module"></script>
     <script src="/js/landing-progress.mjs?v=2" type="module"></script>
     <script src="/js/landing-device-hub.mjs?v=12" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=2" type="module"></script>

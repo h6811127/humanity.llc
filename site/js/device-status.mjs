@@ -112,28 +112,23 @@ function escapeHtml(s) {
     .replace(/>/g, "&gt;");
 }
 
+function statusKeyDot(fill, ring = false) {
+  const inner = ring
+    ? `<circle cx="5" cy="5" r="5" fill="${fill}"/><circle cx="5" cy="5" r="5" fill="none" stroke="${fill}" stroke-width="2" opacity="0.45"/>`
+    : `<circle cx="5" cy="5" r="5" fill="${fill}"/>`;
+  return `<svg class="device-hub-status-key-dot" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">${inner}</svg>`;
+}
+
 function renderStatusKey() {
   const el = document.getElementById("device-hub-status-key");
   if (!el) return;
   el.innerHTML = `
-    <p class="device-hub-status-key-label">Status dot</p>
+    <p class="device-hub-status-key-label">Status dot reference</p>
     <ul class="device-hub-status-key-list">
-      <li>
-        <span class="device-hub-status-key-dot device-hub-status-key-dot--pulse" aria-hidden="true"></span>
-        Pulsing red — default; keys in tab not saved on device
-      </li>
-      <li>
-        <span class="device-hub-status-key-dot device-hub-status-key-dot--solid" aria-hidden="true"></span>
-        Solid red — saved keys on this device
-      </li>
-      <li>
-        <span class="device-hub-status-key-dot device-hub-status-key-dot--amber" aria-hidden="true"></span>
-        Amber — resolver limited
-      </li>
-      <li>
-        <span class="device-hub-status-key-dot device-hub-status-key-dot--gray" aria-hidden="true"></span>
-        Gray — resolver offline
-      </li>
+      <li>${statusKeyDot("#db1b43", true)} Pulsing red — default; tab keys not saved</li>
+      <li>${statusKeyDot("#db1b43")} Solid red — saved keys on device</li>
+      <li>${statusKeyDot("#d97706")} Amber — resolver limited</li>
+      <li>${statusKeyDot("#9ca3af")} Gray — resolver offline</li>
     </ul>`;
 }
 

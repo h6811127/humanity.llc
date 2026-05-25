@@ -21,8 +21,10 @@ function initScrollEdgeChrome() {
 
   const update = () => {
     ticking = false;
-    if (document.body.classList.contains("device-hub-sheet-open")) {
-      chrome.classList.remove("top-chrome--edge-hidden");
+    if (
+      document.body.classList.contains("device-hub-sheet-open") ||
+      chrome.classList.contains("top-chrome--hub-locked")
+    ) {
       return;
     }
     const y = window.scrollY;
