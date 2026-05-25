@@ -4693,6 +4693,18 @@ a.wallet-pin-open {
   display: none;
 }
 
+/* Plain <p> notices (no icon/content wrapper) — avoid flex splitting text nodes */
+p.hc-notice:not(:has(.hc-notice-content)),
+.hc-notice--plain {
+  display: block;
+}
+
+p.hc-notice:not(:has(.hc-notice-content)) a {
+  font-weight: 600;
+  color: #007aff;
+  text-decoration: none;
+}
+
 .form-warning:not(.hc-notice--error) {
   display: flex;
   gap: 10px;

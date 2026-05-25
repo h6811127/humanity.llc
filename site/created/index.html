@@ -1024,17 +1024,19 @@
           </ul>
         </div>
 
-        <p class="hc-notice hc-notice--error form-warning" id="created-error" hidden></p>
-        <p class="hc-notice hc-notice--warning form-warning" id="no-session" hidden>
-          No signing keys in <strong>this tab</strong>. Finish create in the tab where you clicked
-          Create, then tap <strong>Save on this device</strong> there  -  or open
-          <a href="/wallet/">Saved cards</a> in that same tab. Later: recovery key or encrypted
-          backup under <strong>Manage</strong>.
-        </p>
+        <div class="hc-notice hc-notice--error hc-notice--plain form-warning" id="created-error" hidden role="alert"></div>
+        <div class="hc-notice hc-notice--warning hc-notice--plain form-warning" id="no-session" hidden role="status">
+          <p class="hc-notice-body">
+            No signing keys in <strong>this tab</strong>. Finish create in the tab where you clicked
+            Create, then tap <strong>Save on this device</strong> there — or open
+            <a href="/wallet/">Saved cards</a> in that same tab. Later: recovery key or encrypted
+            backup under <strong>Manage</strong>.
+          </p>
+        </div>
       </main>
     </div>
     <script src="/js/device-status.mjs?v=20" type="module"></script>
     <script src="/js/created-hub.mjs?v=2" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=36"></script>
+    <script type="module" src="/js/created.mjs?v=37"></script>
   </body>
 </html>

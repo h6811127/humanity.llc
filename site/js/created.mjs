@@ -32,7 +32,20 @@ const loopSteps = loopSection ? loopSection.querySelectorAll(".created-loop-step
 function showError(msg) {
   if (!errorEl) return;
   errorEl.hidden = false;
-  errorEl.textContent = msg;
+  errorEl.innerHTML = `<p class="hc-notice-body">${escapeHtml(String(msg))}</p>`;
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function setNoSessionNotice(html) {
+  if (!noSessionEl) return;
+  noSessionEl.hidden = false;
+  noSessionEl.innerHTML = `<p class="hc-notice-body">${html}</p>`;
 }
 
 function setLoopStep(step) {
@@ -381,17 +394,17 @@ function applyOrganizerHandoffUi(session) {
 if (!profileId && !activeQrId && !data) {
   noSessionEl.hidden = false;
 } else if (!profileId || !activeQrId) {
-  noSessionEl.hidden = false;
-  noSessionEl.textContent =
-    "Missing profile or QR in this link. Create a new card, or open the full URL from your create confirmation.";
+  setNoSessionNotice(
+    "Missing profile or QR in this link. Create a new card, or open the full URL from your create confirmation."
+  );
 } else if (
   profileIdParam &&
   data?.profile_id &&
   profileIdParam !== data.profile_id
 ) {
-  noSessionEl.hidden = false;
-  noSessionEl.textContent =
-    "This link is for a different card than the keys in this tab. Open Saved cards and tap Use keys on the card you want.";
+  setNoSessionNotice(
+    'This link is for a different card than the keys in this tab. Open <a href="/wallet/">Saved cards</a> and tap <strong>Use keys</strong> on the card you want.'
+  );
 }
 
 if (data?.handle) {
