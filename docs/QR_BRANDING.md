@@ -13,7 +13,7 @@ All Humanity scan QRs (creation page, download PNG, scan pass card) MUST match t
 | Property | Value |
 |----------|--------|
 | Modules | Brand red `#db1b43` on white `#ffffff` |
-| Center mark | Small concentric-circle logo, **mostly transparent** (~32% opacity) |
+| Center mark | Small concentric-circle logo, **mostly transparent** (~48% opacity) |
 | Logo size | ~22% of QR width (does not cover finder patterns) |
 | Error correction | **Q** (required for center overlay; stickers/apparel per §8.5) |
 | Payload | Unchanged — still the HTTPS scan URL for this card + `qr_id` |
@@ -72,7 +72,7 @@ npm run worker:test -- worker/tests/scan-qr-branding.test.ts
 
 | Opacity | Effect |
 |---------|--------|
-| ~0.25–0.35 (shipped) | Logo visible; modules show through; good balance for brand red on white |
+| ~0.45–0.50 (shipped) | Logo more visible; modules still show through on white |
 | &gt; 0.5 | Risk of muddy contrast over red modules |
 | Opaque + large pad | Needs Q/H; hides more modules — not the chosen design |
 

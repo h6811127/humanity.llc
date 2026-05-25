@@ -27,9 +27,6 @@ const liveChallengeParam = params.get("live_challenge")?.trim() || null;
 const liveReturnUrlParam = params.get("return_url")?.trim() || null;
 
 const errorEl = document.getElementById("created-error");
-const loopSection = document.getElementById("created-loop");
-const loopSteps = loopSection ? loopSection.querySelectorAll(".created-loop-step") : [];
-
 function showError(msg) {
   if (!errorEl) return;
   errorEl.hidden = false;
@@ -47,20 +44,6 @@ function setNoSessionNotice(html) {
   if (!noSessionEl) return;
   noSessionEl.hidden = false;
   noSessionEl.innerHTML = `<p class="hc-notice-body">${html}</p>`;
-}
-
-function setLoopStep(step) {
-  if (!loopSection || loopSection.hidden) return;
-  loopSteps.forEach((el) => {
-    el.classList.toggle("is-current", el.dataset.step === step);
-    el.classList.toggle("is-done", el.dataset.stepDone === "1");
-  });
-}
-
-function markLoopDone(step) {
-  if (!loopSection || loopSection.hidden) return;
-  const el = loopSection.querySelector(`.created-loop-step[data-step="${step}"]`);
-  if (el) el.dataset.stepDone = "1";
 }
 
 function loadSession() {
@@ -617,8 +600,6 @@ if (activeScanUrl) {
     openScanBtn.hidden = false;
     openScanBtn.href = activeScanUrl;
     openScanBtn.addEventListener("click", () => {
-      markLoopDone("scan");
-      setLoopStep("revoke");
       createdTabs?.select("manage");
       if (revokeDetails && !revokeDetails.open) {
         revokeDetails.open = true;
@@ -660,18 +641,6 @@ if (activeScanUrl) {
   scanUrlEl.textContent = "Scan link unavailable.";
 }
 
-setLoopStep("live");
-
-function applySampleLoopUi(session) {
-  if (!loopSection) return;
-  if (session?.sample_card) {
-    loopSection.hidden = false;
-    setLoopStep("live");
-  } else {
-    loopSection.hidden = true;
-  }
-}
-
 async function bootstrapOwnerTools() {
   if (!profileId || !activeQrId) return;
 
@@ -686,8 +655,6 @@ async function bootstrapOwnerTools() {
     setSession: saveSession,
     showError,
     onRevoked(kind) {
-      markLoopDone("revoke");
-      setLoopStep("scan-again");
       revealOwnerActions();
       if (openScanBtn && activeScanUrl) {
         openScanBtn.textContent = "Scan again (see revoked state)";
@@ -807,12 +774,9 @@ async function bootstrapOwnerTools() {
   void manifestoUpdate;
 
   const session = loadSession();
-  applySampleLoopUi(session);
   applyPilotTemplateUi(session);
   applyOrganizerHandoffUi(session);
   if (session?.revoke_state?.target_kind) {
-    markLoopDone("revoke");
-    setLoopStep("scan-again");
     revealOwnerActions();
   }
 }

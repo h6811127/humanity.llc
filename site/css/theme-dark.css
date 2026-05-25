@@ -459,6 +459,20 @@ html[data-theme="dark"] .created-primitive {
   color: var(--shell-label-strong);
 }
 
+html[data-theme="dark"] .created-revoke-rules {
+  background: var(--shell-fill);
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .created-revoke-rules-title {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .created-revoke-rules-lead,
+html[data-theme="dark"] .created-revoke-rules-list {
+  color: var(--shell-label);
+}
+
 html[data-theme="dark"] .device-hub-glance-popover {
   background: #1c1c1e;
   border-color: var(--shell-separator);

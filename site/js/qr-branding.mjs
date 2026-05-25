@@ -9,8 +9,8 @@ export const QR_BRAND_LIGHT = "#ffffff";
 /** Public path (Pages static asset). */
 export const QR_CENTER_LOGO_PATH = "/assets/qr-center-logo.png";
 
-/** Mostly transparent center mark (see docs/QR_BRANDING.md). */
-export const QR_CENTER_LOGO_OPACITY = 0.32;
+/** Mostly transparent center mark — visible but modules still show through (docs/QR_BRANDING.md). */
+export const QR_CENTER_LOGO_OPACITY = 0.48;
 
 /** Logo width as fraction of QR width — keep small (~5 modules on typical versions). */
 export const QR_CENTER_LOGO_SIZE_RATIO = 0.22;
