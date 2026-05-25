@@ -4623,8 +4623,9 @@ body.page-wallet .device-hub-status-key {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 11px 14px;
-  font-size: 14px;
+  min-height: 52px;
+  padding: 16px 16px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   list-style: none;
@@ -4668,6 +4669,11 @@ details[open] > .created-advanced-summary::after {
 
 .created-advanced-block > summary {
   padding: 0;
+}
+
+.created-advanced-block > summary.created-advanced-summary {
+  min-height: 52px;
+  padding: 16px 16px;
 }
 
 .created-advanced-block > summary:not(.created-advanced-summary) {

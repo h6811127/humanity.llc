@@ -1,5 +1,4 @@
 import { isAutoSaveEnabled } from "./device-auto-save.mjs";
-import { mountKeysCustody } from "./device-keys-custody.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
 import {
   defaultWalletLabel,
@@ -18,10 +17,6 @@ export function initCreatedDeviceSave(getSession) {
   const doneEl = document.getElementById("created-device-save-done");
   const saveBtn = document.getElementById("created-device-save-btn");
   if (!card) return;
-
-  mountKeysCustody("#device-keys-custody-created", "created", {
-    importHref: "/wallet/#hub-import-form",
-  });
 
   function setStatus(msg, isError = false) {
     if (!statusEl) return;

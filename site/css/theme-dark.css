@@ -374,6 +374,91 @@ html[data-theme="dark"] .created-what-now-compact {
   border-color: var(--shell-separator);
 }
 
+/* Manage tab disclosures (/created/) */
+html[data-theme="dark"] .list {
+  background: var(--shell-fill);
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .settings-disclosure-info,
+html[data-theme="dark"] .settings-disclosure-action {
+  background: var(--shell-fill);
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .settings-panel {
+  border-top-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .settings-disclosure-info .settings-panel {
+  border-top-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .settings-summary-title {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .settings-summary-sub {
+  color: var(--shell-label);
+}
+
+html[data-theme="dark"] .settings-panel-lead,
+html[data-theme="dark"] .settings-panel-flat,
+html[data-theme="dark"] .settings-panel-flat p {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .settings-panel-action {
+  background: var(--shell-fill-secondary);
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .owner-network-status {
+  background: var(--shell-fill-secondary);
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .owner-network-status-lead {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .owner-network-status-rows {
+  background: var(--shell-fill);
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .owner-network-status-rows .list-row {
+  border-bottom-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .revoke-display-opt {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .btn-danger {
+  background: var(--shell-fill);
+  border-color: var(--red);
+  color: var(--red);
+}
+
+html[data-theme="dark"] .btn-danger-solid {
+  color: #000000;
+}
+
+html[data-theme="dark"] .backup-divider-label {
+  color: var(--shell-label);
+}
+
+html[data-theme="dark"] .created-tab-lead {
+  color: var(--shell-label);
+}
+
+html[data-theme="dark"] .created-primitive {
+  background: rgba(255, 77, 109, 0.12);
+  border-color: rgba(255, 77, 109, 0.28);
+  color: var(--shell-label-strong);
+}
+
 html[data-theme="dark"] .device-hub-glance-popover {
   background: #1c1c1e;
   border-color: var(--shell-separator);
