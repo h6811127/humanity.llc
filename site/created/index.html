@@ -6,56 +6,35 @@
     <title>Your live object · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="/styles.css?v=77" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=4" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=5" />
   </head>
   <body class="has-device-hub-search device-shell-created">
     <div class="page">
-      <div class="top-chrome" id="top-chrome">
-        <div class="top-chrome-bar" id="top-status">
-          <button
-            type="button"
-            class="brand-status-dot-btn"
-            id="brand-status-dot-btn"
-            aria-label="Network and device status"
-            aria-expanded="false"
-            aria-controls="brand-status-popover"
-          >
-            <span class="pass-dot" id="brand-status-dot"></span>
-          </button>
-          <button
-            type="button"
-            class="device-status-summary"
-            id="device-status-summary"
-            aria-expanded="false"
-            aria-controls="device-hub"
-            aria-label="On this device"
-          >
-            <span class="device-status-segments" id="device-status-segments"></span>
-            <span class="device-status-trail">
-              <span class="device-status-device-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              </span>
-              <span class="device-status-chevron" aria-hidden="true">›</span>
-            </span>
-          </button>
-          <button
-            type="button"
-            class="device-status-search-btn"
-            id="device-status-search"
-            aria-label="Search on this device"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          </button>
-          <a class="top-create" href="/create/">Create</a>
-        </div>
-        <div
-          class="brand-status-popover"
-          id="brand-status-popover"
-          role="dialog"
-          aria-label="Status"
-          hidden
-        >
-          <div class="brand-status-sheet" id="brand-status-sheet"></div>
+      <div class="top-chrome top-chrome--float" id="top-chrome">
+        <div class="top-chrome-bar top-chrome-bar--minimal" id="top-status">
+          <div class="shell-status-cluster">
+            <button
+              type="button"
+              class="shell-status-dot-btn"
+              id="brand-status-dot-btn"
+              aria-label="Device and system status"
+              aria-expanded="false"
+              aria-controls="device-hub"
+            >
+              <span class="pass-dot shell-status-dot" id="brand-status-dot"></span>
+            </button>
+            <button
+              type="button"
+              class="shell-notif-badge"
+              id="shell-notif-badge"
+              hidden
+              aria-label="Notifications"
+            >
+              <span class="shell-notif-badge-ring" aria-hidden="true"></span>
+              <span class="shell-notif-badge-count" id="shell-notif-badge-count">0</span>
+            </button>
+          </div>
+          <a class="top-create top-create--outline" href="/create/">Create</a>
         </div>
       </div>
 
@@ -69,9 +48,14 @@
         <div class="device-hub-body" id="device-hub-body">
           <button type="button" class="device-hub-sheet-close" aria-label="Close">×</button>
           <div class="device-hub-sheet-handle" aria-hidden="true"></div>
+          <div
+            class="device-hub-status-panel"
+            id="device-hub-status-panel"
+            aria-label="System status"
+          ></div>
           <h2 class="device-hub-title" id="device-hub-title">On this device</h2>
           <p class="device-hub-lead">
-            Personal to <strong>this browser</strong> — not your profile on the network.
+            Personal to <strong>this browser</strong>  -  not your profile on the network.
           </p>
           <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint" hidden>
             Save this card below to keep keys after you close the tab.
@@ -91,7 +75,7 @@
                 enterkeyhint="search"
               />
             </label>
-            <p class="device-hub-search-hint">This device only — not the public resolver</p>
+            <p class="device-hub-search-hint">This device only  -  not the public resolver</p>
             <p class="device-hub-search-status" id="device-hub-search-status" hidden role="status"></p>
           </div>
 
@@ -187,7 +171,7 @@
               </summary>
               <form class="device-hub-import-form" id="hub-import-form">
                 <p class="form-hint">
-                  Encrypted .hcbackup.json from Manage — never uploaded.
+                  Encrypted .hcbackup.json from Manage  -  never uploaded.
                 </p>
                 <input type="file" accept=".json,application/json" required />
                 <label class="form-label" for="hub-import-passphrase">Passphrase</label>
@@ -212,7 +196,7 @@
       <main class="screen created-screen">
         <section class="hero hero-compact">
           <p class="hero-eyebrow">Live object created</p>
-          <h1 id="created-handle">—</h1>
+          <h1 id="created-handle"> - </h1>
           <p class="hero-line" id="created-manifesto"></p>
         </section>
 
@@ -230,7 +214,7 @@
               <p class="live-control-notification-title">Prove live control</p>
               <p class="live-control-notification-copy" id="live-control-proof-lead">
                 Someone nearby scanned your QR and asked for live proof. Sign once from this
-                key-holding device — it does not reveal legal identity or create a badge.
+                key-holding device  -  it does not reveal legal identity or create a badge.
               </p>
               <button type="button" class="btn-primary live-control-notification-btn" id="live-control-proof-btn">
                 Prove control now
@@ -273,7 +257,7 @@
           </button>
         </nav>
 
-        <!-- ——— Now: deploy, status, QR ——— -->
+        <!--  -  -  -  Now: deploy, status, QR  -  -  -  -->
         <div class="created-tab-panel" data-created-panel="now" id="created-tab-now" role="tabpanel" aria-labelledby="created-tab-btn-now">
           <section
             class="created-keys-strip"
@@ -314,7 +298,7 @@
               <summary>Break-glass recovery key (optional)</summary>
               <div class="created-recovery-panel">
                 <p class="form-hint">
-                  For a <strong>new browser</strong> if you lose this tab — does not add keys to
+                  For a <strong>new browser</strong> if you lose this tab  -  does not add keys to
                   Saved on this device.
                 </p>
                 <p class="mono recovery-key-display" id="recovery-key-display"></p>
@@ -363,7 +347,7 @@
                 </span>
                 <span class="list-content">
                   <span class="list-title">This QR valid until</span>
-                  <span class="list-sub" id="network-qr-expires">—</span>
+                  <span class="list-sub" id="network-qr-expires"> - </span>
                 </span>
               </li>
               <li class="list-row created-status-profile">
@@ -372,7 +356,7 @@
                 </span>
                 <span class="list-content">
                   <span class="list-title">Profile ID</span>
-                  <span class="list-sub mono" id="profile-id">—</span>
+                  <span class="list-sub mono" id="profile-id"> - </span>
                 </span>
                 <button type="button" class="created-copy-id" id="copy-profile-id" hidden aria-label="Copy profile ID">
                   Copy
@@ -450,17 +434,17 @@
           <section class="created-what-now created-what-now-compact" id="created-lost-item-tip" hidden>
             <h2 class="created-what-now-title">Lost item relay</h2>
             <p class="created-what-now-body">
-              Tag the item. Finders see what it is and your return message — not your phone number.
+              Tag the item. Finders see what it is and your return message  -  not your phone number.
               Revoke when recovered under <strong>Manage</strong>.
             </p>
           </section>
 
         </div>
 
-        <!-- ——— Manage: update, revoke, keys ——— -->
+        <!--  -  -  -  Manage: update, revoke, keys  -  -  -  -->
         <div class="created-tab-panel" data-created-panel="manage" id="created-tab-manage" role="tabpanel" aria-labelledby="created-tab-btn-manage" hidden>
           <p class="created-tab-lead">
-            Update copy, revoke, or unlock keys. Same printed QR — you change resolver state, not
+            Update copy, revoke, or unlock keys. Same printed QR  -  you change resolver state, not
             the sticker.
             Use <strong>Save on this device</strong> on the Now tab (or
             <a href="/wallet/">Saved cards</a> in the same tab) before switching tabs.
@@ -477,7 +461,7 @@
               </span>
               <span class="settings-summary-text">
                 <span class="settings-summary-title">Update public line</span>
-                <span class="settings-summary-sub">Same QR — new text on the network</span>
+                <span class="settings-summary-sub">Same QR  -  new text on the network</span>
               </span>
               <span class="list-chevron" aria-hidden="true">›</span>
             </summary>
@@ -536,7 +520,7 @@
               <div class="owner-network-status" id="owner-network-status" aria-live="polite">
                 <p class="owner-network-status-kicker">Resolver check</p>
                 <p class="owner-network-status-lead">
-                  What scanners see <strong>right now</strong> — fetched live, not guessed from this tab.
+                  What scanners see <strong>right now</strong>  -  fetched live, not guessed from this tab.
                 </p>
                 <ul class="list list-compact owner-network-status-rows">
                   <li class="list-row">
@@ -585,7 +569,7 @@
                   </p>
                   <label class="revoke-confirm">
                     <input type="checkbox" id="confirm-revoke-qr" />
-                    <span>I understand — revoke this scan QR only</span>
+                    <span>I understand  -  revoke this scan QR only</span>
                   </label>
                   <button type="button" class="btn-danger" id="revoke-qr-btn" disabled>
                     Revoke this QR
@@ -598,7 +582,7 @@
                   </p>
                   <label class="revoke-confirm revoke-confirm-spaced">
                     <input type="checkbox" id="confirm-revoke-card" />
-                    <span>I understand — disable this card</span>
+                    <span>I understand  -  disable this card</span>
                   </label>
                   <button type="button" class="btn-danger btn-danger-solid" id="revoke-card-btn" disabled>
                     Disable card
@@ -734,7 +718,7 @@
               <div class="settings-panel settings-panel-info-body">
                 <p class="settings-panel-lead">
                   Status at a glance is on the <strong>Now</strong> tab. Each printed QR is its own
-                  credential — revoke one sticker without killing siblings.
+                  credential  -  revoke one sticker without killing siblings.
                 </p>
                 <ul class="list list-compact">
                   <li class="list-row list-action">
@@ -778,10 +762,10 @@
           </section>
         </div>
 
-        <!-- ——— Help: concepts & limits ——— -->
+        <!--  -  -  -  Help: concepts & limits  -  -  -  -->
         <div class="created-tab-panel" data-created-panel="help" id="created-tab-help" role="tabpanel" aria-labelledby="created-tab-btn-help" hidden>
           <p class="created-primitive">
-            This QR resolves to <strong>current object state</strong> on the network — active,
+            This QR resolves to <strong>current object state</strong> on the network  -  active,
             expired, revoked, or disabled. Printing deploys the object; you change its rules later.
           </p>
 
@@ -792,12 +776,12 @@
               object state, not who scanned.
             </p>
             <ul class="created-revoke-rules-list">
-              <li><strong>Active</strong> — live manifesto or pilot layout.</li>
-              <li><strong>Expiry</strong> — credential time runs out; scan shows expired.</li>
-              <li><strong>Revoke this QR</strong> — one pointer off; siblings can stay active.</li>
-              <li><strong>Disable card</strong> — whole profile offline.</li>
+              <li><strong>Active</strong>  -  live manifesto or pilot layout.</li>
+              <li><strong>Expiry</strong>  -  credential time runs out; scan shows expired.</li>
+              <li><strong>Revoke this QR</strong>  -  one pointer off; siblings can stay active.</li>
+              <li><strong>Disable card</strong>  -  whole profile offline.</li>
               <li>
-                <strong>Organizer revoke</strong> —
+                <strong>Organizer revoke</strong>  - 
                 <a id="organizer-revoke-link" href="/organizer-revoke/">coalition key</a> from create.
               </li>
             </ul>
@@ -810,7 +794,7 @@
             <h2 class="group-label">Your signing key</h2>
             <div class="settings-panel settings-panel-flat">
               <p>
-                Generated in this browser. It never uploads to humanity.llc — the network only sees
+                Generated in this browser. It never uploads to humanity.llc  -  the network only sees
                 <strong>signed</strong> actions.
               </p>
               <ul class="settings-list">
@@ -854,13 +838,13 @@
         <p class="form-warning" id="created-error" hidden></p>
         <p class="form-warning" id="no-session" hidden>
           No signing keys in <strong>this tab</strong>. Finish create in the tab where you clicked
-          Create, then tap <strong>Save on this device</strong> there — or open
+          Create, then tap <strong>Save on this device</strong> there  -  or open
           <a href="/wallet/">Saved cards</a> in that same tab. Later: recovery key or encrypted
           backup under <strong>Manage</strong>.
         </p>
       </main>
     </div>
-    <script src="/js/device-status.mjs?v=9" type="module"></script>
+    <script src="/js/device-status.mjs?v=10" type="module"></script>
     <script src="/js/created-hub.mjs?v=1" type="module"></script>
     <script type="module" src="/js/created.mjs?v=34"></script>
   </body>

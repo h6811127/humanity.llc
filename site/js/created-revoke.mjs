@@ -123,7 +123,7 @@ export function initOwnerRevoke(ctx) {
     }
     if (statusVerificationEl) {
       statusVerificationEl.textContent = humanTrust
-        ? `${humanTrust.label} — ${humanTrust.subtitle}`
+        ? `${humanTrust.label}  -  ${humanTrust.subtitle}`
         : verificationLabel;
     }
 
@@ -135,7 +135,7 @@ export function initOwnerRevoke(ctx) {
     if (statusHintEl) {
       if (scanKind === "active") {
         statusHintEl.textContent =
-          "Revoking changes this live answer on the network. The printed URL stays the same — only the resolver status changes.";
+          "Revoking changes this live answer on the network. The printed URL stays the same  -  only the resolver status changes.";
       } else if (scanKind === "qr_revoked") {
         statusHintEl.textContent =
           "This QR is already revoked on the network. Scanners see revoked state; you can still disable the whole card below.";
@@ -246,7 +246,7 @@ export function initOwnerRevoke(ctx) {
     } catch {
       if (statusCardEl) statusCardEl.textContent = "Unreachable";
       if (statusQrEl) statusQrEl.textContent = "Unreachable";
-      if (statusVerificationEl) statusVerificationEl.textContent = "—";
+      if (statusVerificationEl) statusVerificationEl.textContent = " - ";
       if (revokeSummarySub) revokeSummarySub.textContent = "Could not reach the network";
       if (statusHintEl) {
         statusHintEl.textContent =

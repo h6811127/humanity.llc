@@ -251,7 +251,7 @@ function renderNoticeRow() {
           </span>
           <span class="list-content">
             <span class="list-title">Keys in this tab · Save on this device</span>
-            <span class="list-sub">${escapeHtml(label)} — scroll to save below</span>
+            <span class="list-sub">${escapeHtml(label)}  -  scroll to save below</span>
           </span>
           <span class="list-chevron" aria-hidden="true">›</span>
         </a>
@@ -273,7 +273,7 @@ function renderNoticeRow() {
           </span>
           <span class="list-content">
             <span class="list-title">Keys in this tab · Save on this device</span>
-            <span class="list-sub">${escapeHtml(label)} — tap to open /created/</span>
+            <span class="list-sub">${escapeHtml(label)}  -  tap to open /created/</span>
           </span>
           <span class="list-chevron" aria-hidden="true">›</span>
         </a>

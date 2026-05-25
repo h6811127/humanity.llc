@@ -17,27 +17,27 @@ People care when the scan answers **operational trust questions** under **publis
 | Question at the door | What helps |
 |----------------------|------------|
 | Is this printed QR still valid? | Live network status (active / revoked / suspended) |
-| Is this person known in our network? | Vouches and credentials—not follower counts |
+| Is this person known in our network? | Vouches and credentials - not follower counts |
 | Is the person here holding the key *now*? | Live control proof (short-lived) |
 | Can we stop trusting this object tomorrow? | Owner revoke; per-sticker revoke |
 | Can our org run this without one CEO? | Federated operators + export |
 
 **Phase A** will look thin: create, scan status, revoke. That is the honest floor. **Phase D** adds Commons Pass (membership, events, check-in). **Phase E** proves you are not locked to one company.
 
-If we never ship vouches, live control, org tools, or federation, stop the project—the skeptics are right. See `docs/DEMOCRATIC_INFRASTRUCTURE.md` §2 (value stack).
+If we never ship vouches, live control, org tools, or federation, stop the project - the skeptics are right. See `docs/DEMOCRATIC_INFRASTRUCTURE.md` §2 (value stack).
 
 ---
 
 ## Isn't This Just A QR Profile?
 
-No—if we ship the full trust loop. Yes—if we stop at a pretty link.
+No - if we ship the full trust loop. Yes - if we stop at a pretty link.
 
 A generic QR profile points to **content**. A Humanity Card points to **current signed state**:
 
 - The card has signed public data anyone can inspect.
 - The QR resolves to **live** status (not a cached bio).
 - The owner can revoke the card or **specific printed-item** QR credentials.
-- Vouches show accountable social trust under rules—not a hidden score.
+- Vouches show accountable social trust under rules - not a hidden score.
 - Live control proof can show recent control of the card key in person.
 - The scan page states what the QR does and does not prove.
 
@@ -287,7 +287,7 @@ It can be if built like a surveillance identity company.
 
 The reference design is intentionally **minimal**:
 
-- Pseudonymous `profile_id` and public key—not legal identity in the core loop.
+- Pseudonymous `profile_id` and public key - not legal identity in the core loop.
 - No scan analytics by default.
 - Private keys stay on the user device.
 - Commerce PII stays in Shopify/Printify, not the network.
@@ -306,9 +306,9 @@ See `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` §5.
 
 Not part of this project’s trust model.
 
-Public blockchains make many trust problems **more permanent and more traceable** (wallets, indexers, immutable graphs)—not less. Humanity Commons needs **live status at scan time** (revoked, suspended, active). That is a **network** job with **Ed25519-signed documents**, not chain gas or NFT identity.
+Public blockchains make many trust problems **more permanent and more traceable** (wallets, indexers, immutable graphs) - not less. Humanity Commons needs **live status at scan time** (revoked, suspended, active). That is a **network** job with **Ed25519-signed documents**, not chain gas or NFT identity.
 
-Ledger anchoring is **out of v1 scope** and not a default roadmap bet. If it is ever reconsidered, it needs a concrete governance-approved use case that a minimal operator cannot meet honestly—see `docs/V1_DECISION_LOCK.md`.
+Ledger anchoring is **out of v1 scope** and not a default roadmap bet. If it is ever reconsidered, it needs a concrete governance-approved use case that a minimal operator cannot meet honestly - see `docs/V1_DECISION_LOCK.md`.
 
 ---
 
@@ -316,7 +316,7 @@ Ledger anchoring is **out of v1 scope** and not a default roadmap bet. If it is 
 
 No.
 
-**Public launch** means anyone can create a card when Phase A ships. An optional early tester pool may help stress-test copy and support—it is not a gate, paid tier, or fake democracy.
+**Public launch** means anyone can create a card when Phase A ships. An optional early tester pool may help stress-test copy and support - it is not a gate, paid tier, or fake democracy.
 
 ---
 

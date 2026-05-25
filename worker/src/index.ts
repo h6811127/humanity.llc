@@ -1,5 +1,5 @@
 /**
- * humanity.llc reference resolver — route dispatcher.
+ * humanity.llc reference resolver  -  route dispatcher.
  * M1: health + D1. M2: create card. M3: scan trust UI.
  */
 

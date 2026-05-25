@@ -1,8 +1,8 @@
-# M6 — Vouching design
+# M6  -  Vouching design
 
-**Status:** Step 1 (V-001) shipped in repo — verify on production; Steps 2–3 shipped; Step 4 internal cluster flags shipped; steward review queue pending
+**Status:** Step 1 (V-001) shipped in repo  -  verify on production; Steps 2–3 shipped; Step 4 internal cluster flags shipped; steward review queue pending
 **Canonical refs:** `docs/V1_PRODUCT_TRUST_MODEL.md` § Level 2, `docs/V1_ADVERSARIAL_REVIEW.md` § Perspective 1, `docs/features/Human Verification v1.0.md`, `docs/V1_IMPLEMENTATION_BACKLOG.md` (V-001, V-002)  
-**Product thesis:** Live control proves recent key possession. Vouching proves that other accountable humans attested this card belongs to a distinct person — under published rules, not under legal-ID assumptions.
+**Product thesis:** Live control proves recent key possession. Vouching proves that other accountable humans attested this card belongs to a distinct person  -  under published rules, not under legal-ID assumptions.
 
 ---
 
@@ -12,7 +12,7 @@ Humanity Commons v1 does not try to be a government ID. It tries to make **mecha
 
 - A scan shows **current resolver state** (card active, QR active, verification summary).
 - **Vouches** are signed statements from eligible humans: “I attest this is a distinct human I know.”
-- When enough **active, accepted** vouches exist, the card earns the public label **Vouched Human** — not “Verified Human” unless copy testing says otherwise.
+- When enough **active, accepted** vouches exist, the card earns the public label **Vouched Human**  -  not “Verified Human” unless copy testing says otherwise.
 
 The scanner-facing sentence is:
 
@@ -34,7 +34,7 @@ Do not lead with graph theory, sybil resistance claims, or “bot-proof.” Thos
 | Legal name, age, immigration status, employment eligibility | No |
 | Global uniqueness (one human, one card) | No |
 | The person holding a printed QR is the card owner | No |
-| Recent key control | No — that is live control (M7), separate block |
+| Recent key control | No  -  that is live control (M7), separate block |
 
 ---
 
@@ -57,32 +57,32 @@ Keep vouching **visually separate** from:
 
 1. Card status (active / revoked / suspended).
 2. This QR status (credential scope, expiry).
-3. Live control (recent key proof — green block).
+3. Live control (recent key proof  -  green block).
 
-**Human trust row — default copy patterns:**
+**Human trust row  -  default copy patterns:**
 
 | State | Title | Subtitle |
 |---|---|---|
 | Unverified / registered | Registered | No accepted human vouches yet |
-| 1–2 active vouches | Registered | 2 accepted vouches — needs 3 for Vouched Human |
+| 1–2 active vouches | Registered | 2 accepted vouches  -  needs 3 for Vouched Human |
 | ≥3 active vouches | Vouched Human | Latest vouch {recency} · count on this operator |
 | Revoked / suspended | (override) | Positive badges hidden; explain override |
 
 **Recency:** show `latest_accepted_vouch_at` as a human-readable freshness signal (“Latest vouch 3 days ago”), not as a permanent badge.
 
-**Limitations row:** retain “What this scan does not prove” — vouch honesty, legal identity, physical possession.
+**Limitations row:** retain “What this scan does not prove”  -  vouch honesty, legal identity, physical possession.
 
 ### Voucher flow (card client)
 
 1. Voucher opens vouchee card (scan or profile link).
 2. Voucher confirms eligibility (already Vouched Human or steward, past 90-day wait, quota remaining).
 3. Voucher signs a **standardized public statement** (editable within 280 chars; default template provided).
-4. Optional **private note** stays on device only — never POSTed to resolver (server rejects `private_note` in body today).
+4. Optional **private note** stays on device only  -  never POSTed to resolver (server rejects `private_note` in body today).
 5. Success: “Vouch recorded.” Vouchee summary updates when threshold met.
 
 ### Vouchee flow
 
-- Request vouches by sharing card link / QR — no central “friend finder.”
+- Request vouches by sharing card link / QR  -  no central “friend finder.”
 - Show progress: “2 of 3 active vouches” without exposing voucher private notes.
 - When verified: label upgrades to **Vouched Human** with method summary “vouch.”
 
@@ -158,7 +158,7 @@ Pair with live control when in-person trust matters.
 
 - Revoked vouches stop counting immediately in summary recalc.
 - Re-vouching the same pair requires a **new** signed credential with a **new** nonce.
-- Re-vouch after revoke **counts toward yearly quota** (default yes — prevents revoke-as-quota-reset abuse).
+- Re-vouch after revoke **counts toward yearly quota** (default yes  -  prevents revoke-as-quota-reset abuse).
 
 ---
 
@@ -185,7 +185,7 @@ Pair with live control when in-person trust matters.
 If added later:
 
 - Encrypt on device with vouchee or voucher key.
-- Store ciphertext only if explicitly synced — **not** in `vouches` table used for public resolution.
+- Store ciphertext only if explicitly synced  -  **not** in `vouches` table used for public resolution.
 - Default path: omit entirely in v1.
 
 ### Data minimization on scan
@@ -195,7 +195,7 @@ Show **aggregate + recency**, not social graph:
 - Good: “3 accepted vouches · latest 2 weeks ago”
 - Bad: “Vouched by @alice, @bob, @carol” on first screen (deferred unless product testing wants it)
 
-Credential detail pages may list public evidence per `HV-FR-30` — still no private notes.
+Credential detail pages may list public evidence per `HV-FR-30`  -  still no private notes.
 
 ---
 
@@ -265,7 +265,7 @@ Revoked/suspended card states must **override** positive verification on scan (a
 
 ### Not yet built (recommended order)
 
-**Step 1 — Scan truth (V-001)**
+**Step 1  -  Scan truth (V-001)**
 
 - [x] Wire verification summary consistently on scan (state, label, count, recency).
 - [x] Copy pass: **Vouched Human** vs registered; show progress below threshold.
@@ -273,13 +273,13 @@ Revoked/suspended card states must **override** positive verification on scan (a
 - [x] Status JSON exposes `scan.human_trust` (same copy as scan HTML) for `/created/` and clients.
 - [ ] Production smoke: scan + status JSON for 0 / 2 / 3 vouches; revoked card overrides label.
 
-**Step 2 — Vouch issuance UX (V-002)**
+**Step 2  -  Vouch issuance UX (V-002)**
 
 - [x] Card client: “Vouch for this person” for eligible vouchers.
 - [x] Sign + POST flow with default statement template.
 - [x] Eligibility errors surfaced in plain language (quota, wait period, not verified).
 
-**Step 3 — Vouch revocation**
+**Step 3  -  Vouch revocation**
 
 - [x] POST `/v1/verification/vouches/{vouch_id}/revoke` with signed revoke payload.
 - [x] Summary recalc; quota policy for re-vouch documented and tested.
@@ -292,11 +292,11 @@ Revoked/suspended card states must **override** positive verification on scan (a
 | Revoke payload type | `vouch_revocation` v1.0 | Not yet in Technical Standards §10; mirrors card `revocation` shape with vouch subjects. |
 | Who may revoke (v1) | Voucher signature only | Contracts mention governance; steward revoke deferred to Step 4 / governance. |
 | Revoke reason enum | `voucher_revoked` only | Matches card revoke pattern; other reasons reserved. |
-| Yearly quota | Count **all** issuances in window (active + revoked) | M6 default — revoke cannot reset quota. |
+| Yearly quota | Count **all** issuances in window (active + revoked) | M6 default  -  revoke cannot reset quota. |
 | GET vouch metadata | Added `/v1/verification/vouches/{vouch_id}` | Supports inspection; revoke UI uses session-tracked list instead. |
 | Revoke UI scope | Session `issued_vouches` only | No voucher-side list API in v1; only vouches signed in this browser appear for revoke. |
 
-**Step 4 — Abuse hooks (operator-only)**
+**Step 4  -  Abuse hooks (operator-only)**
 
 - [x] Internal cluster flags (no public graph UI).
 - [ ] Steward review queue spec (can be spreadsheet + manual in alpha).
@@ -332,10 +332,10 @@ Revoked/suspended card states must **override** positive verification on scan (a
 ## Open questions (resolve before public launch)
 
 1. **Public voucher handles on scan?** Default no on first screen; credential detail page only.
-2. **Re-vouch after revoke and quota** — **confirmed:** year window includes all issuances, not just active.
-3. **Bootstrap verified humans** — founding cohort vouch rules in `FOUNDING_COHORT_PLAYBOOK.md`.
-4. **Cross-card detection** — same human, many cards: out of scope v1; document honestly.
-5. **Comprehension test** — “What does Vouched Human mean?” before replacing Registered everywhere.
+2. **Re-vouch after revoke and quota**  -  **confirmed:** year window includes all issuances, not just active.
+3. **Bootstrap verified humans**  -  founding cohort vouch rules in `FOUNDING_COHORT_PLAYBOOK.md`.
+4. **Cross-card detection**  -  same human, many cards: out of scope v1; document honestly.
+5. **Comprehension test**  -  “What does Vouched Human mean?” before replacing Registered everywhere.
 
 ---
 
@@ -357,6 +357,6 @@ Revoked/suspended card states must **override** positive verification on scan (a
 
 ## Related docs
 
-- `docs/M7_LIVE_CONTROL_ALPHA.md` — ephemeral key control (build before vouch UI polish is done)
-- `docs/V1_DECISION_LOCK.md` — launch copy locks
-- `docs/architecture.html` — public-facing trust map (link from scan settings when updated)
+- `docs/M7_LIVE_CONTROL_ALPHA.md`  -  ephemeral key control (build before vouch UI polish is done)
+- `docs/V1_DECISION_LOCK.md`  -  launch copy locks
+- `docs/architecture.html`  -  public-facing trust map (link from scan settings when updated)

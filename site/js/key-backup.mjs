@@ -1,5 +1,5 @@
 /**
- * Encrypted owner key backup (M5.5.1) — browser only, never uploaded by default.
+ * Encrypted owner key backup (M5.5.1)  -  browser only, never uploaded by default.
  * Crypto parity: worker/src/crypto/key-backup.ts (tests).
  * @see docs/M5_5_OWNER_KEY_PORTABILITY.md
  */

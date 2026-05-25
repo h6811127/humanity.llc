@@ -1,5 +1,5 @@
 /**
- * Tier 0 shop — checkout handoff or local interest until Shopify URL is set.
+ * Tier 0 shop  -  checkout handoff or local interest until Shopify URL is set.
  */
 import { isTier0CheckoutOpen, loadShopConfig, tier0Display } from "./shop-config.mjs";
 
@@ -70,7 +70,7 @@ function bindInterestForm() {
     saveInterest(entries);
     if (emailInput) emailInput.value = "";
     setInterestStatus(
-      "Saved on this device. Bookmark this page — we will enable checkout when the drop opens."
+      "Saved on this device. Bookmark this page  -  we will enable checkout when the drop opens."
     );
   });
 }

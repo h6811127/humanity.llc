@@ -44,7 +44,7 @@ export function isWalletSaved(profileId) {
   return loadWallet().some((e) => e.profile_id === profileId);
 }
 
-/** Row subtitle — always show network handle + id so labels cannot lie. */
+/** Row subtitle  -  always show network handle + id so labels cannot lie. */
 export function walletEntrySubtitle(entry) {
   const parts = [];
   if (entry.handle) parts.push(`@${entry.handle}`);

@@ -12,7 +12,7 @@ export interface HumanTrustDisplay {
 
 export type HumanTrustListIconId = "people" | "shield" | "warning" | "ban";
 
-/** Scan list row icon — tone maps to bundled scan-pass.css list-icon-tone-* */
+/** Scan list row icon  -  tone maps to bundled scan-pass.css list-icon-tone-* */
 export function humanTrustListIcon(display: HumanTrustDisplay): {
   id: HumanTrustListIconId;
   tone: HumanTrustIconTone | "trust";
@@ -59,7 +59,7 @@ function vouchCountLine(count: number): string {
 }
 
 /**
- * Scan Human trust row — mechanism-revealing copy (V-001, M6 Step 1).
+ * Scan Human trust row  -  mechanism-revealing copy (V-001, M6 Step 1).
  * Revoked/suspended verification and card suspension override positive badges.
  */
 export function humanTrustDisplay(
@@ -128,7 +128,7 @@ export function humanTrustDisplay(
   if (count > 0 && count < VOUCH_THRESHOLD) {
     return {
       label: "Registered",
-      subtitle: `${count} of ${VOUCH_THRESHOLD} vouches accepted — not yet a Vouched Human`,
+      subtitle: `${count} of ${VOUCH_THRESHOLD} vouches accepted  -  not yet a Vouched Human`,
       iconTone: "purple",
       pillActive: cardActive,
     };
@@ -146,7 +146,7 @@ export function humanTrustDisplay(
   return {
     label: "Registered",
     subtitle:
-      "No accepted vouches yet — registered on this operator, not proof of humanity.",
+      "No accepted vouches yet  -  registered on this operator, not proof of humanity.",
     iconTone: "purple",
     pillActive: cardActive,
   };

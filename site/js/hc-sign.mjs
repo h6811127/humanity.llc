@@ -13,11 +13,11 @@ const PAYLOAD_TYPE_LIVE_CONTROL_RESPONSE = "live_control_response";
 const PAYLOAD_TYPE_VOUCH = "vouch";
 const PAYLOAD_TYPE_VOUCH_REVOCATION = "vouch_revocation";
 
-/** Default public vouch statement (M6 copy kit — max 280 chars). */
+/** Default public vouch statement (M6 copy kit  -  max 280 chars). */
 export const DEFAULT_VOUCH_STATEMENT =
   "I attest this is a distinct human I know. This is not legal ID. My vouch is public and revocable.";
 
-/** Level 0 bearer copy (V1_PRODUCT_TRUST_MODEL.md) — keep in sync with worker trust-copy.ts */
+/** Level 0 bearer copy (V1_PRODUCT_TRUST_MODEL.md)  -  keep in sync with worker trust-copy.ts */
 export const BEARER_WARNING =
   "This QR resolves to a Humanity Card. It does not prove the person holding this item is the card owner.";
 const BASE58 =
@@ -63,7 +63,7 @@ export function generateRevocationNonce() {
   return `nonce_${randomBase58(16)}`;
 }
 
-/** Vouch nonce — replay protection on POST. */
+/** Vouch nonce  -  replay protection on POST. */
 export function generateVouchNonce() {
   return `nonce_${randomBase58(16)}`;
 }
@@ -122,7 +122,7 @@ function isLocalDevHost(hostname) {
   return hostname === "localhost" || hostname === "127.0.0.1";
 }
 
-/** Cloudflare Pages preview URLs serve static files only — API lives on humanity.llc. */
+/** Cloudflare Pages preview URLs serve static files only  -  API lives on humanity.llc. */
 function isPagesPreviewHost(hostname) {
   return hostname.endsWith(".pages.dev");
 }
@@ -161,7 +161,7 @@ export function resolverApiOrigin() {
   return location.origin;
 }
 
-/** @deprecated use resolverApiOrigin — kept for existing imports */
+/** @deprecated use resolverApiOrigin  -  kept for existing imports */
 export function resolverApiBase() {
   return resolverApiOrigin();
 }

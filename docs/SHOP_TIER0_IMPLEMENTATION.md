@@ -1,4 +1,4 @@
-# Shop — Tier 0 curiosity drop (implementation)
+# Shop  -  Tier 0 curiosity drop (implementation)
 
 **Status:** Checkout handoff wired (config-driven) · set `shop-config.json` when Shopify product exists  
 **Canonical strategy:** `docs/MERCH_LED_V1.md` Phase B, `docs/FOUNDING_DROP_BRIEF.md` Tier 0  
@@ -12,9 +12,9 @@
 |-------|------|
 | Story-row drop page | `site/shop/index.html` |
 | Checkout config | `site/data/shop-config.json` (see `shop-config.example.json`) |
-| Shop UI | `site/js/shop.mjs` + `site/js/shop-config.mjs` — Buy vs interest by `checkout_open` |
+| Shop UI | `site/js/shop.mjs` + `site/js/shop-config.mjs`  -  Buy vs interest by `checkout_open` |
 | Drop interest (device-local) | `localStorage` `hc_shop_drop_interest` when checkout closed |
-| Post-checkout page | `site/shop/thanks/index.html` — link from Shopify thank-you / order status URL |
+| Post-checkout page | `site/shop/thanks/index.html`  -  link from Shopify thank-you / order status URL |
 | Hub shortcut | Landing **Shortcuts** → Founding sticker drop |
 | Hero secondary CTA | Landing hero → `/shop/` |
 
@@ -25,7 +25,7 @@ The interest form records **optional email** on this browser only (no server upl
 ## Enable checkout (operator)
 
 1. Create **Founding signal sticker** in Shopify (test or live store).
-2. Copy a checkout URL — product page, cart permalink (`/cart/VARIANT_ID:1`), or Buy Button link.
+2. Copy a checkout URL  -  product page, cart permalink (`/cart/VARIANT_ID:1`), or Buy Button link.
 3. Edit `site/data/shop-config.json`:
 
 ```json
@@ -48,7 +48,7 @@ The interest form records **optional email** on this browser only (no server upl
 
 | Piece | Owner / doc |
 |-------|-------------|
-| Shopify store + live product URL in config | Operator — paste into `shop-config.json` |
+| Shopify store + live product URL in config | Operator  -  paste into `shop-config.json` |
 | `shopify.order_paid` → Printify middleware | Worker / fulfillment track |
 | Batch QR artwork + Printify product ID | `FOUNDING_DROP_BRIEF.md` |
 | Scan→create analytics (aggregate, no PII) | Product / ops |

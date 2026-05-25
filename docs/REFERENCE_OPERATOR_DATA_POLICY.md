@@ -26,7 +26,7 @@ Minimize stored data so the network is not a surveillance honeypot. Publish what
 ## Access logs
 
 - **Default:** no logging of scan requests.
-- If minimal access logs are ever required for abuse response, that MUST be a **governance-approved** policy with published retention—not a silent product default.
+- If minimal access logs are ever required for abuse response, that MUST be a **governance-approved** policy with published retention - not a silent product default.
 
 ## Commerce firewall
 
@@ -51,7 +51,7 @@ Minimize stored data so the network is not a surveillance honeypot. Publish what
 
 ## Changes
 
-Rights-affecting retention changes require published notice and member governance per launch plan—not silent expansion.
+Rights-affecting retention changes require published notice and member governance per launch plan - not silent expansion.
 
 ## Related documents
 

@@ -3,9 +3,9 @@
 **Status:** Pre-build product contract  
 **Purpose:** Define what the v1 trust loop proves, what it does not prove, and how the product must explain those boundaries.
 
-**Resolver role and federation:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — the resolver serves signed public state; it is not legal identity infrastructure and should not collect scan analytics by default.
+**Resolver role and federation:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  -  the resolver serves signed public state; it is not legal identity infrastructure and should not collect scan analytics by default.
 
-**Why scans matter (not a static profile):** `docs/DEMOCRATIC_INFRASTRUCTURE.md` §2 — live status, revoke, vouches, live control, then Commons Pass.
+**Why scans matter (not a static profile):** `docs/DEMOCRATIC_INFRASTRUCTURE.md` §2  -  live status, revoke, vouches, live control, then Commons Pass.
 
 ---
 
@@ -232,9 +232,9 @@ Scanners must distinguish:
 
 | Action | Who | Typical scan headline (target UX) |
 |--------|-----|-----------------------------------|
-| **Revoke QR** | Owner | “This QR is no longer valid” — minimal by default |
-| **Disable card** | Owner | “This card has been disabled” — card details hidden by default |
-| **Suspend** | Governance | “Suspended under public rules” — public notice required |
+| **Revoke QR** | Owner | “This QR is no longer valid”  -  minimal by default |
+| **Disable card** | Owner | “This card has been disabled”  -  card details hidden by default |
+| **Suspend** | Governance | “Suspended under public rules”  -  public notice required |
 
 **Physical limit:** Printed QRs always contain `profile_id` and `qr_id` in the URL. Revoke/disable changes resolver state, not ink. Copy must warn owners.
 

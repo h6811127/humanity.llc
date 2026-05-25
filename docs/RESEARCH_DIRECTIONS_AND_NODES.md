@@ -1,12 +1,12 @@
 # Research directions / infrastructure layers
 
-**Status:** Research only — not on the Phase A shipping path (`create → scan → revoke`).
+**Status:** Research only  -  not on the Phase A shipping path (`create → scan → revoke`).
 
 **Public summary:** [research-directions.html](https://humanity.llc/research-directions.html)
 
 ## Principle
 
-One primitive: a physical thing points at **current** signed status on the resolver. Carrier layers (QR, NFC, mesh, node uplink) are different ways to reach the same URL and semantics—not different trust models.
+One primitive: a physical thing points at **current** signed status on the resolver. Carrier layers (QR, NFC, mesh, node uplink) are different ways to reach the same URL and semantics - not different trust models.
 
 ## Live today
 
@@ -26,7 +26,7 @@ One tap wakes a tag; phones and wearables relay signed status locally. Resolver 
 
 ## The Humanity node (vision)
 
-Concept spec sheet (public): `site/assets/humanity-node-001.png` on [research-directions.html](https://humanity.llc/research-directions.html) — 150×150×55 mm solar node, QR + NFC, Pi 5 / NVMe / LiFePO₄ stack, mesh + LTE, live signed state UI. **Not a shipping unit.**
+Concept spec sheet (public): `site/assets/humanity-node-001.png` on [research-directions.html](https://humanity.llc/research-directions.html)  -  150×150×55 mm solar node, QR + NFC, Pi 5 / NVMe / LiFePO₄ stack, mesh + LTE, live signed state UI. **Not a shipping unit.**
 
 The **node** is the ultimate object: links, tap, relay, and edge compute in one installable artifact.
 
@@ -40,14 +40,14 @@ The **node** is the ultimate object: links, tap, relay, and edge compute in one 
 
 ### Connectivity stack (later)
 
-- **Cellular LTE** — resolver sync where Wi‑Fi does not reach
-- **Satellite backhaul (e.g. Starlink)** — research only; no hardware or cost model chosen
-- **Bluetooth mesh** — node as relay between NFC tap and nearby phones
+- **Cellular LTE**  -  resolver sync where Wi‑Fi does not reach
+- **Satellite backhaul (e.g. Starlink)**  -  research only; no hardware or cost model chosen
+- **Bluetooth mesh**  -  node as relay between NFC tap and nearby phones
 
 ### Open questions
 
 - Firmware update and operator model (who runs the node?)
-- Key custody on device — node must **not** become a second signing root without explicit design
+- Key custody on device  -  node must **not** become a second signing root without explicit design
 - Whether the node only caches **public** resolver state or ever participates in owner actions
 - Supply chain, engraving, and founding-drop relationship to merch stickers
 
@@ -57,5 +57,5 @@ NFC/mesh diagrams were removed from `site/index.html` (May 2026) and live on the
 
 ## Related backlog
 
-- `docs/M3_M4_EXECUTION_PLAN.md` — NFC/mesh called out as post–vertical-slice
-- `docs/V1_USE_CASES.md` — full use-case catalog (not on homepage scroll)
+- `docs/M3_M4_EXECUTION_PLAN.md`  -  NFC/mesh called out as post–vertical-slice
+- `docs/V1_USE_CASES.md`  -  full use-case catalog (not on homepage scroll)

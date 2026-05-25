@@ -1,4 +1,4 @@
-# M3 finish + M4 revoke — careful execution plan
+# M3 finish + M4 revoke  -  careful execution plan
 
 **Status:** Working checklist (Phase A MVP)  
 **Canonical milestones:** `docs/V1_0_ARCHITECTURE_ROADMAP.md` §12–13, steps M3.3–M4.4  
@@ -28,7 +28,7 @@
 
 Do these **in order**. Each step has an exit test before moving on.
 
-### 3.3 — Bearer warning (mobile audit)
+### 3.3  -  Bearer warning (mobile audit)
 
 **Refs:** `V1_PRODUCT_TRUST_MODEL.md` Level 0–1; roadmap Flow audit §2  
 
@@ -43,14 +43,14 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ---
 
-### 3.4 — Machine-readable status JSON
+### 3.4  -  Machine-readable status JSON
 
 **Refs:** `V1_IMPLEMENTATION_CONTRACTS.md` · `GET /.well-known/hc/v1/cards/{profile_id}/status`  
 **Standards:** §9.1, §9.3 cache, §9.5 status codes  
 
 **Implement:**
 - `GET /.well-known/hc/v1/cards/{profile_id}/status`
-- Optional `?q={qr_id}` — when present, status **matches** `/c/{profile_id}?q={qr_id}` HTML (`buildScanViewModel`)
+- Optional `?q={qr_id}`  -  when present, status **matches** `/c/{profile_id}?q={qr_id}` HTML (`buildScanViewModel`)
 - Without `?q`, card-level status only (handle, card status, verification summary)
 
 **Exit:**
@@ -63,7 +63,7 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ---
 
-### 3.5 — Unknown / malformed scan pages
+### 3.5  -  Unknown / malformed scan pages
 
 **Refs:** roadmap R-002; contracts “no blank 404”  
 
@@ -78,7 +78,7 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ---
 
-### 3.6 — Cache-Control alignment
+### 3.6  -  Cache-Control alignment
 
 **Refs:** Technical Standards §9.3  
 
@@ -93,7 +93,7 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ---
 
-### 3.7 — Stranger path on scan page
+### 3.7  -  Stranger path on scan page
 
 **Refs:** roadmap A.8  
 
@@ -107,11 +107,11 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ---
 
-## M4 — Revoke (Phase A core)
+## M4  -  Revoke (Phase A core)
 
 **Refs:** Technical Standards §10; contracts `POST …/revoke`; fixtures `worker/tests/fixtures/revocation.json`
 
-### 4.1 — Owner-signed revoke API
+### 4.1  -  Owner-signed revoke API
 
 **Payload:** `type: revocation`, fields per `PAYLOAD_FIELD_RULES` in `worker/src/crypto/signed-payload.ts`
 
@@ -124,40 +124,40 @@ Do these **in order**. Each step has an exit test before moving on.
 - [x] Append row to `revocations`
 - [x] Invalid signature → 401; wrong key → 401 (`resolver/revoke.ts`)
 
-### 4.2 — Revoked scan + JSON
+### 4.2  -  Revoked scan + JSON
 
 **Exit:**
-- [x] Scan HTML shows revoked state (card / QR) — `scan.test.ts`
-- [x] Status JSON `kind` matches HTML — `scan-status.test.ts`
+- [x] Scan HTML shows revoked state (card / QR)  -  `scan.test.ts`
+- [x] Status JSON `kind` matches HTML  -  `scan-status.test.ts`
 - [x] Card JSON `GET …/cards/{id}` → 410 when revoked (Standards §10.2)
 - [x] Owner revoke UI on `/created/` (`docs/M4_CREATED_REVOKE_UI.md`, `site/js/created-revoke.mjs`)
 
-### 4.3 — Item-scoped revoke
+### 4.3  -  Item-scoped revoke
 
 **Exit:**
 - [x] Revoke one QR; sibling QR on same card stays active (view-model tests)
 - [ ] End-to-end on production D1 with two QRs on one card
 
-### 4.4 — Block intents on revoked QR (stub)
+### 4.4  -  Block intents on revoked QR (stub)
 
 **Exit:**
-- [x] Revoked QR returns 403 on print intent endpoint (stub OK pre-commerce) — `POST /v1/store/artifact-intents`, `worker/src/resolver/artifact-intents.ts`
+- [x] Revoked QR returns 403 on print intent endpoint (stub OK pre-commerce)  -  `POST /v1/store/artifact-intents`, `worker/src/resolver/artifact-intents.ts`
 
 ---
 
-## M4.7 — Manifesto / status line updates
+## M4.7  -  Manifesto / status line updates
 
 **Spec:** `docs/MANIFESTO_STATUS_UPDATE.md`
 
 **Exit:**
-- [x] `POST /.well-known/hc/v1/cards/{profile_id}/update` — owner/recovery signed (`worker/src/resolver/update-card.ts`)
+- [x] `POST /.well-known/hc/v1/cards/{profile_id}/update`  -  owner/recovery signed (`worker/src/resolver/update-card.ts`)
 - [x] `/created/` **Update public line** UI (`site/js/created-manifesto-update.mjs`)
 - [x] Status plate + lost-item relay field layouts; infer pilot from stored manifesto on return visit
 - [x] Scan HTML shows updated two-line copy (`update-card.test.ts`)
 
 ---
 
-## M5 — Launch gate (after M4)
+## M5  -  Launch gate (after M4)
 
 **Refs:** roadmap §12 Phase A exit; **`docs/M5_STRANGER_TEST_RUNBOOK.md`** (step-by-step)
 
@@ -170,7 +170,7 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ---
 
-## M4.5 — Lifecycle UX
+## M4.5  -  Lifecycle UX
 
 **Spec:** `docs/REVOKE_AND_LIFECYCLE_V1.md`  
 **Scan UI:** `pass-v9` (deploy Worker after changes)
@@ -185,7 +185,7 @@ Do these **in order**. Each step has an exit test before moving on.
 
 - [x] **Disable card** label (API: `target_kind: card`)
 - [x] Confirm step warns: printed QRs still contain profile ID and QR ID
-- [x] **Revoke rules** section — Revoke QR vs Disable card vs Expiry (`/created/#revoke-rules`)
+- [x] **Revoke rules** section  -  Revoke QR vs Disable card vs Expiry (`/created/#revoke-rules`)
 
 ### Not in M4.5
 
@@ -194,12 +194,12 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ---
 
-## M4.6 — QR validity (scheduled end)
+## M4.6  -  QR validity (scheduled end)
 
 **Spec:** `docs/REVOKE_AND_LIFECYCLE_V1.md` § Revoke QR → Scheduled end
 
 - [x] Create: choose validity (7 / 30 / 90 / 365 days) → signed `expires_at` on credential
-- [x] Scan: **qr_expired** minimal page — **This QR has expired** (card may stay active)
+- [x] Scan: **qr_expired** minimal page  -  **This QR has expired** (card may stay active)
 - [x] `/created/`: show “This QR valid until” in network panel
 
 ### Not in M4.6
@@ -211,9 +211,9 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ## What we are **not** doing in this track
 
-- NFC / Bluetooth mesh implementation — research page only (`site/research-directions.html`)
-- **Owner key export / recovery** (revoke from any device) — **M5.5** (`docs/M5_5_OWNER_KEY_PORTABILITY.md`) — largely shipped; see doc for exit checks
-- **Lifecycle UX** — **M4.5** shipped; **M4.6** QR validity at create (`docs/REVOKE_AND_LIFECYCLE_V1.md`)
+- NFC / Bluetooth mesh implementation  -  research page only (`site/research-directions.html`)
+- **Owner key export / recovery** (revoke from any device)  -  **M5.5** (`docs/M5_5_OWNER_KEY_PORTABILITY.md`)  -  largely shipped; see doc for exit checks
+- **Lifecycle UX**  -  **M4.5** shipped; **M4.6** QR validity at create (`docs/REVOKE_AND_LIFECYCLE_V1.md`)
 - Vouches (M6), live control (M7), merch (M8)
 - Commons Pass (M10+)
 
@@ -221,7 +221,7 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ## Current step
 
-**→ Post-create manifesto / status line updates** — `docs/MANIFESTO_STATUS_UPDATE.md`. Same printed QR; owner-signed `POST …/cards/{profile_id}/update` changes public copy for status plates, lost-item relays, and general cards.
+**→ Post-create manifesto / status line updates**  -  `docs/MANIFESTO_STATUS_UPDATE.md`. Same printed QR; owner-signed `POST …/cards/{profile_id}/update` changes public copy for status plates, lost-item relays, and general cards.
 
 **Shipped in repo (verify on production):** M7 live control Step 1 (`docs/M7_LIVE_CONTROL_ALPHA.md`), M4.4 artifact-intent gate, organizer revoke pilot.
 

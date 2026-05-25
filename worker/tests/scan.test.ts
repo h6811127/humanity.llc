@@ -119,7 +119,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
       QR,
       {
         card: card({
-          manifesto_line: "[relay] House keys\nLost — contact owner through relay",
+          manifesto_line: "[relay] House keys\nLost  -  contact owner through relay",
         }),
         qr: qr(),
         verification: summary(),

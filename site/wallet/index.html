@@ -6,56 +6,35 @@
     <title>Saved on this device · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="/styles.css?v=77" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=4" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=5" />
   </head>
   <body class="has-device-hub-search device-shell-wallet">
     <div class="page">
-      <div class="top-chrome" id="top-chrome">
-        <div class="top-chrome-bar" id="top-status">
-          <button
-            type="button"
-            class="brand-status-dot-btn"
-            id="brand-status-dot-btn"
-            aria-label="Network and device status"
-            aria-expanded="false"
-            aria-controls="brand-status-popover"
-          >
-            <span class="pass-dot" id="brand-status-dot"></span>
-          </button>
-          <button
-            type="button"
-            class="device-status-summary"
-            id="device-status-summary"
-            aria-expanded="false"
-            aria-controls="device-hub"
-            aria-label="On this device"
-          >
-            <span class="device-status-segments" id="device-status-segments"></span>
-            <span class="device-status-trail">
-              <span class="device-status-device-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              </span>
-              <span class="device-status-chevron" aria-hidden="true">›</span>
-            </span>
-          </button>
-          <button
-            type="button"
-            class="device-status-search-btn"
-            id="device-status-search"
-            aria-label="Search on this device"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          </button>
-          <a class="top-create" href="/create/">Create</a>
-        </div>
-        <div
-          class="brand-status-popover"
-          id="brand-status-popover"
-          role="dialog"
-          aria-label="Status"
-          hidden
-        >
-          <div class="brand-status-sheet" id="brand-status-sheet"></div>
+      <div class="top-chrome top-chrome--float" id="top-chrome">
+        <div class="top-chrome-bar top-chrome-bar--minimal" id="top-status">
+          <div class="shell-status-cluster">
+            <button
+              type="button"
+              class="shell-status-dot-btn"
+              id="brand-status-dot-btn"
+              aria-label="Device and system status"
+              aria-expanded="false"
+              aria-controls="device-hub"
+            >
+              <span class="pass-dot shell-status-dot" id="brand-status-dot"></span>
+            </button>
+            <button
+              type="button"
+              class="shell-notif-badge"
+              id="shell-notif-badge"
+              hidden
+              aria-label="Notifications"
+            >
+              <span class="shell-notif-badge-ring" aria-hidden="true"></span>
+              <span class="shell-notif-badge-count" id="shell-notif-badge-count">0</span>
+            </button>
+          </div>
+          <a class="top-create top-create--outline" href="/create/">Create</a>
         </div>
       </div>
 
@@ -83,12 +62,17 @@
         <div class="device-hub-body" id="device-hub-body">
           <button type="button" class="device-hub-sheet-close" aria-label="Close">×</button>
           <div class="device-hub-sheet-handle" aria-hidden="true"></div>
+          <div
+            class="device-hub-status-panel"
+            id="device-hub-status-panel"
+            aria-label="System status"
+          ></div>
           <h2 class="device-hub-title" id="device-hub-title">Saved on this device</h2>
           <p class="device-hub-lead wallet-hub-lead">
-            Signing keys live in <strong>this browser</strong> — never uploaded to the network.
+            Signing keys live in <strong>this browser</strong>  -  never uploaded to the network.
           </p>
           <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint">
-            No cards saved yet —
+            No cards saved yet  - 
             <a href="/create/">create one</a>
             or
             <a href="#hub-import-form">import a backup</a>.
@@ -103,7 +87,7 @@
           </div>
 
           <p class="wallet-strip-hint" id="wallet-tab-hint" hidden>
-            Keys are in another tab —
+            Keys are in another tab  - 
             <a href="/created/">open /created/</a> there and save, or use <strong>Use keys</strong> below.
           </p>
 
@@ -121,7 +105,7 @@
                 enterkeyhint="search"
               />
             </label>
-            <p class="device-hub-search-hint">This device only — not the public resolver</p>
+            <p class="device-hub-search-hint">This device only  -  not the public resolver</p>
             <p class="device-hub-search-status" id="device-hub-search-status" hidden role="status"></p>
           </div>
 
@@ -184,7 +168,7 @@
             data-hub-group="pins"
           >
             <p class="device-hub-group-label">Pinned scans</p>
-            <p class="wallet-section-hint">Bookmarks only — no signing keys</p>
+            <p class="wallet-section-hint">Bookmarks only  -  no signing keys</p>
             <ul class="list list-compact" id="device-hub-pins-list"></ul>
             <p id="wallet-pins-empty" class="wallet-empty-state">No pins yet</p>
             <details class="wallet-add-details">
@@ -231,7 +215,7 @@
                 <span class="list-chevron" aria-hidden="true">›</span>
               </summary>
               <form class="device-hub-import-form" id="hub-import-form">
-                <p class="form-hint">Encrypted .hcbackup.json — never uploaded.</p>
+                <p class="form-hint">Encrypted .hcbackup.json  -  never uploaded.</p>
                 <input type="file" accept=".json,application/json" required />
                 <label class="form-label" for="hub-import-passphrase">Passphrase</label>
                 <input
@@ -288,7 +272,7 @@
               <ul class="wallet-help-list">
                 <li><strong>Use keys</strong> loads signing keys into this tab, then opens /created/.</li>
                 <li><strong>Network</strong> chip is live from the resolver; <strong>Revoked since last visit</strong> compares to your last session.</li>
-                <li><strong>Pin</strong> is a scan bookmark only (↗) — no keys.</li>
+                <li><strong>Pin</strong> is a scan bookmark only (↗)  -  no keys.</li>
               </ul>
             </div>
           </details>
@@ -298,7 +282,7 @@
       <main class="screen screen-wallet screen-wallet-sleek" hidden aria-hidden="true"></main>
     </div>
 
-    <script src="/js/device-status.mjs?v=9" type="module"></script>
+    <script src="/js/device-status.mjs?v=10" type="module"></script>
     <script src="/js/wallet-hub.mjs?v=3" type="module"></script>
   </body>
 </html>

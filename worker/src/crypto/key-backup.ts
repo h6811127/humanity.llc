@@ -1,5 +1,5 @@
 /**
- * Encrypted owner key backup (M5.5) — shared logic for tests; keep in sync with site/js/key-backup.mjs.
+ * Encrypted owner key backup (M5.5)  -  shared logic for tests; keep in sync with site/js/key-backup.mjs.
  */
 import { decodeBase58, encodeBase58 } from "./base58";
 

@@ -6,7 +6,7 @@ Implements `/.well-known/hc/v1/*` and public scan shortcuts per `docs/V1_0_ARCHI
 
 This repo pins **`wrangler@4.47.0`**, which runs on **Node 20 LTS** (not Node 22).
 
-**Recommended Node:** `>=20.18.1` (see `.nvmrc`). On `20.11.0` you may see a harmless-looking `EBADENGINE` for `undici` — it still installs; bumping to the latest **20.x** clears it:
+**Recommended Node:** `>=20.18.1` (see `.nvmrc`). On `20.11.0` you may see a harmless-looking `EBADENGINE` for `undici`  -  it still installs; bumping to the latest **20.x** clears it:
 
 ```bash
 nvm install    # reads .nvmrc → 20.18.1
@@ -89,9 +89,9 @@ export CLOUDFLARE_API_TOKEN="your_token_here"
 npm run worker:deploy
 ```
 
-Optional: copy `worker/.env.example` to **repo root** `.env` and load it (`set -a; source .env; set +a`) — keep `.env` in `.gitignore`.
+Optional: copy `worker/.env.example` to **repo root** `.env` and load it (`set -a; source .env; set +a`)  -  keep `.env` in `.gitignore`.
 
-**Alternative:** `npx wrangler login` (browser OAuth) — no API token file needed for interactive deploys.
+**Alternative:** `npx wrangler login` (browser OAuth)  -  no API token file needed for interactive deploys.
 
 **CI:** GitHub Actions uses repository secret `CLOUDFLARE_API_TOKEN` (see `.github/workflows/deploy-worker.yml`).
 
@@ -144,9 +144,9 @@ npm run worker:dev
 
 - **Create UI:** https://humanity.llc/create/ (or Pages dev; API defaults to `http://127.0.0.1:8787` on localhost)
 - **POST** `/.well-known/hc/v1/cards` with `{ card, qr_credential }` signed documents
-- **GET** `/.well-known/hc/v1/cards/{profile_id}` — public card JSON
-- **GET** `/.well-known/hc/v1/cards/{profile_id}/status?q={qr_id}` — machine-readable scan state (M3.4)
-- **POST** `/.well-known/hc/v1/cards/{profile_id}/revoke` — owner-signed revocation (M4.1)
+- **GET** `/.well-known/hc/v1/cards/{profile_id}`  -  public card JSON
+- **GET** `/.well-known/hc/v1/cards/{profile_id}/status?q={qr_id}`  -  machine-readable scan state (M3.4)
+- **POST** `/.well-known/hc/v1/cards/{profile_id}/revoke`  -  owner-signed revocation (M4.1)
 
 After create, open `/created/` for scan link + QR image.
 

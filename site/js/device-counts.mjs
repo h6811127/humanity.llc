@@ -59,7 +59,7 @@ export function buildStatusSegments(network = "offline") {
       label: notices > 0 ? "Tab Keys Active" : "Local Keys Ready",
       detail:
         notices > 0
-          ? "Signing keys in this tab — not saved on device"
+          ? "Signing keys in this tab  -  not saved on device"
           : "This device can open saved cards",
       zero: notices === 0,
       highlight: notices > 0,

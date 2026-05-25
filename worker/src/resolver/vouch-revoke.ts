@@ -65,7 +65,7 @@ export async function handleGetVouch(
  * Body: { "vouch_revocation": <signed document> } (M6 Step 3)
  *
  * Decision (v1): voucher signature only; steward/governance revoke deferred.
- * Payload type `vouch_revocation` — not in Technical Standards §10 yet; mirrors card revoke shape.
+ * Payload type `vouch_revocation`  -  not in Technical Standards §10 yet; mirrors card revoke shape.
  */
 export async function handlePostVouchRevoke(
   request: Request,

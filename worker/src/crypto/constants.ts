@@ -5,7 +5,7 @@ export const SIGNATURE_ALG = "Ed25519" as const;
 export const CANONICALIZATION = "JCS" as const;
 
 /**
- * Signed payload `type` values (Technical Standards §17 — prevents signature confusion).
+ * Signed payload `type` values (Technical Standards §17  -  prevents signature confusion).
  * @see docs/Technical Standards v1.0.md
  */
 export const PAYLOAD_TYPES = {

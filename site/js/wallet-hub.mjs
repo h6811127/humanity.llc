@@ -1,5 +1,5 @@
 /**
- * /wallet/ — shared device hub + tab save, pins, context banners.
+ * /wallet/  -  shared device hub + tab save, pins, context banners.
  */
 import { logDeviceActivity } from "./device-activity.mjs";
 import { isAutoSaveEnabled, initAutoSaveToggle } from "./device-auto-save.mjs";
@@ -43,7 +43,7 @@ function refreshAutoSaveLine() {
     return;
   }
   autoSaveLine.hidden = false;
-  autoSaveLine.textContent = "Auto-save is on — new cards are written to this device after create.";
+  autoSaveLine.textContent = "Auto-save is on  -  new cards are written to this device after create.";
 }
 
 function refreshHelpVisibility() {

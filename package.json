@@ -1,7 +1,7 @@
 {
   "name": "humanity-llc",
   "private": true,
-  "description": "Humanity Commons — static site (Pages) + reference resolver (Worker)",
+  "description": "Humanity Commons  -  static site (Pages) + reference resolver (Worker)",
   "scripts": {
     "build": "node -e \"require('fs').accessSync('site/index.html'); console.log('Static site ready: site/')\"",
     "deploy": "wrangler pages deploy site --project-name=humanity-llc",

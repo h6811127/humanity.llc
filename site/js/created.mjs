@@ -129,7 +129,7 @@ function initLiveControlProof() {
   const LISTENING_STATUS =
     "Keep this tab open while someone scans. The next live proof request will appear here automatically.";
   const AFTER_PROOF_STATUS =
-    "Control proven. Keep this tab open — the next request will appear here automatically.";
+    "Control proven. Keep this tab open  -  the next request will appear here automatically.";
 
   let activeChallengeId = liveChallengeParam;
   let activeReturnUrl = liveReturnUrlParam;
@@ -178,7 +178,7 @@ function initLiveControlProof() {
     if (lead) {
       lead.hidden = false;
       lead.textContent =
-        "Someone nearby scanned your QR and asked for live proof. Sign once from this key-holding device — it does not reveal legal identity or create a badge.";
+        "Someone nearby scanned your QR and asked for live proof. Sign once from this key-holding device  -  it does not reveal legal identity or create a badge.";
     }
     btn.textContent = PROVE_BTN_LABEL;
     status.textContent = message;
@@ -395,7 +395,7 @@ if (!profileId && !qrId && !data) {
 if (data?.handle) {
   handleEl.textContent = `@${data.handle}`;
 } else if (!profileId) {
-  handleEl.textContent = "—";
+  handleEl.textContent = " - ";
 }
 
 if (data?.manifesto_line) {
@@ -435,12 +435,12 @@ if (data?.verification?.label) {
     subtitle:
       data.verification.vouch_count > 0
         ? `${data.verification.vouch_count} accepted vouch${data.verification.vouch_count === 1 ? "" : "es"}`
-        : "No accepted vouches yet — registered on this operator",
+        : "No accepted vouches yet  -  registered on this operator",
   });
 } else {
   applyHumanTrustDisplay({
     label: "Registered",
-    subtitle: "No accepted vouches yet — registered on this operator",
+    subtitle: "No accepted vouches yet  -  registered on this operator",
   });
 }
 
@@ -462,7 +462,7 @@ function formatNetworkExpiry(iso) {
 }
 
 function capitalizeStatus(value) {
-  if (!value || typeof value !== "string") return "—";
+  if (!value || typeof value !== "string") return " - ";
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
@@ -503,7 +503,7 @@ if (networkQrExpiresEl) {
   if (expiresAt) {
     networkQrExpiresEl.textContent = formatNetworkExpiry(expiresAt);
   } else {
-    networkQrExpiresEl.textContent = "—";
+    networkQrExpiresEl.textContent = " - ";
   }
 }
 

@@ -1,9 +1,9 @@
-# Phase A — Harden the stranger path (post-M5 priorities)
+# Phase A  -  Harden the stranger path (post-M5 priorities)
 
 **Status:** Active product direction  
 **Purpose:** Record what to build **after** the generic create → scan → revoke loop is proven, without expanding the design-space catalog faster than real deployments.
 
-**Prerequisite:** `docs/M5_STRANGER_TEST_RUNBOOK.md` — three strangers complete the loop unassisted.
+**Prerequisite:** `docs/M5_STRANGER_TEST_RUNBOOK.md`  -  three strangers complete the loop unassisted.
 
 **Canonical loop (unchanged):** Create card → print QR → scan live status → revoke → re-scan revoked state. See `docs/M3_M4_EXECUTION_PLAN.md`.
 
@@ -11,7 +11,7 @@
 
 ## Operating rule
 
-**One vertical, end-to-end, on real objects** — not more hub pages.
+**One vertical, end-to-end, on real objects**  -  not more hub pages.
 
 The site’s **What can a QR do?** walkthroughs (`site/what-can-a-qr-do/`) are **research and narrative**. They do not replace a single template strangers can print and use tomorrow on a door, sticker, or card.
 
@@ -30,11 +30,11 @@ Defer until a vertical pilot succeeds:
 |----------|----------|-----|
 | **1** | **Status plate** (“open / closed / until …”) | Matches the landing demo (studio door, hours, run ends). Easiest story for strangers: one object, one question, one scan. |
 | **2** | **Lost-item relay** | Emotional and clear: return contact **without** printing a phone number; revoke when recovered or abused. Site research: `site/what-can-a-qr-do/lost-item-relay/`. |
-| **3** | **Organizer-signed revoke** | Unlocks civic flyers, vendor placards, market passes — anything where a **trusted issuer** must update or kill a printed QR. Requires signed updates/revokes, not open crowd vouch. Site research: `site/what-can-a-qr-do/civic-protest-infrastructure/`, `site/what-can-a-qr-do/local-economies/`. |
+| **3** | **Organizer-signed revoke** | Unlocks civic flyers, vendor placards, market passes  -  anything where a **trusted issuer** must update or kill a printed QR. Requires signed updates/revokes, not open crowd vouch. Site research: `site/what-can-a-qr-do/civic-protest-infrastructure/`, `site/what-can-a-qr-do/local-economies/`. |
 
 Pick **one** for the first real-world pilot (5–10 printed QRs, watch where people stall: print, recovery key, finding revoke).
 
-**Current build focus:** **Manifesto / status line updates** — `docs/MANIFESTO_STATUS_UPDATE.md` (same QR, live public copy). Enables status plate (#1) and lost-item relay (#2) without reprinting.
+**Current build focus:** **Manifesto / status line updates**  -  `docs/MANIFESTO_STATUS_UPDATE.md` (same QR, live public copy). Enables status plate (#1) and lost-item relay (#2) without reprinting.
 
 Organizer revoke shipped: `docs/ORGANIZER_SIGNED_REVOKE_PILOT.md`.
 
@@ -50,7 +50,7 @@ These tighten Phase A for the chosen vertical without a new “product tab”:
 | **Scan page** | Active vs revoked must read in &lt;30s for non-technical scanners (`docs/M3_SCAN_PAGE_UI.md`). |
 | **`/created/`** | Recovery gate stays; consider tucking **More options** until after first successful revoke in-session (`docs/M4_CREATED_REVOKE_UI.md`). |
 | **Print path** | Download QR PNG + phone print steps on `/created/` (shipped); validate strangers actually print before testing revoke in the wild. |
-| **Landing** | Physical software objects framing + demo revoke animation are **marketing only** — not resolver behavior. |
+| **Landing** | Physical software objects framing + demo revoke animation are **marketing only**  -  not resolver behavior. |
 
 ---
 

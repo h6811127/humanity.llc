@@ -43,6 +43,12 @@ function shouldShowBanner() {
 export function renderCrossTabKeysBanner() {
   if (!banner) return;
 
+  if (document.getElementById("shell-notif-badge")) {
+    banner.hidden = true;
+    banner.innerHTML = "";
+    return;
+  }
+
   if (!shouldShowBanner()) {
     banner.hidden = true;
     banner.innerHTML = "";
@@ -61,7 +67,7 @@ export function renderCrossTabKeysBanner() {
   banner.hidden = false;
   banner.innerHTML = `
     <strong>Signing keys in another tab</strong>
-    ${label}${extra} — switch to that tab to manage, or
+    ${label}${extra}  -  switch to that tab to manage, or
     <a href="${manageHref}">open /created/</a> here (load keys from a saved card).`;
 }
 

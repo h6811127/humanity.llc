@@ -1,4 +1,4 @@
-# M5.5 — Owner key portability (revoke from any device)
+# M5.5  -  Owner key portability (revoke from any device)
 
 **Status:** Core owner-portability flow shipped in repo; deploy/manual checks remain  
 **Blocks:** Revoke anytime / any device after create session ends  
@@ -12,8 +12,8 @@
 
 Phase A ships:
 
-- **Revoke API** — owner-signed `POST …/revoke` (M4.1).
-- **Revoke UI** — `/created/` signs in-browser **only while `sessionStorage` still holds the create key**.
+- **Revoke API**  -  owner-signed `POST …/revoke` (M4.1).
+- **Revoke UI**  -  `/created/` signs in-browser **only while `sessionStorage` still holds the create key**.
 
 If the user closes the tab, switches devices, or clears site data, they **cannot sign a new revocation**. The card/QR may still be **active on the resolver** until someone with a key revokes it.
 
@@ -29,20 +29,20 @@ Two complementary paths (ship both; user may use one or both):
 
 | Path | User story | Standards alignment |
 |------|------------|---------------------|
-| **A. Encrypted key export / import** | “I saved a backup file at create; I import it on my laptop to revoke.” | Export bundle §12.1 — encrypted private key **if user opts in** |
-| **B. Recovery key** | “I lost my phone but I wrote down a recovery code; I can still revoke.” | Revocation §10.1 — **accepted recovery key**; live control §challenge |
+| **A. Encrypted key export / import** | “I saved a backup file at create; I import it on my laptop to revoke.” | Export bundle §12.1  -  encrypted private key **if user opts in** |
+| **B. Recovery key** | “I lost my phone but I wrote down a recovery code; I can still revoke.” | Revocation §10.1  -  **accepted recovery key**; live control §challenge |
 
 Neither path uploads plaintext private keys to the resolver.
 
 ---
 
-## Threat model (export/import — Phase 1)
+## Threat model (export/import  -  Phase 1)
 
 ### Assets
 
-- **Owner Ed25519 private key** — can sign revoke, future vouch/rotate.
-- **Encrypted backup file** — ciphertext + public metadata (`profile_id`, `public_key`, KDF salt, IV).
-- **Passphrase** — never stored by humanity.llc; user memory or password manager only.
+- **Owner Ed25519 private key**  -  can sign revoke, future vouch/rotate.
+- **Encrypted backup file**  -  ciphertext + public metadata (`profile_id`, `public_key`, KDF salt, IV).
+- **Passphrase**  -  never stored by humanity.llc; user memory or password manager only.
 
 ### Trust boundaries
 
@@ -79,7 +79,7 @@ Neither path uploads plaintext private keys to the resolver.
 - User stores backup in synced folder without understanding exposure.
 - Phishing: “upload your backup to verify” (out of scope for product; educate in copy).
 
-### Recovery key (Phase 2 — not shipped yet)
+### Recovery key (Phase 2  -  not shipped yet)
 
 Separate threat model when **5.5.3–5.5.4** ship: one-time recovery code, recovery pubkey on card, no recovery private key on server.
 
@@ -87,9 +87,9 @@ Separate threat model when **5.5.3–5.5.4** ship: one-time recovery code, recov
 
 ## Milestone steps
 
-### 5.5.1 — Encrypted owner key export (opt-in at create)
+### 5.5.1  -  Encrypted owner key export (opt-in at create)
 
-**UI:** `/create/` and `/created/` — “Save encrypted backup” with passphrase (or OS keychain where available).
+**UI:** `/create/` and `/created/`  -  “Save encrypted backup” with passphrase (or OS keychain where available).
 
 **Artifact:** Downloadable file (e.g. `humanity-card-backup.json` or `.hcbackup`) containing:
 
@@ -103,9 +103,9 @@ Separate threat model when **5.5.3–5.5.4** ship: one-time recovery code, recov
 - [x] Copy warns: lose passphrase = lose backup; we cannot recover (in UI)
 - [ ] Deploy Pages and verify download on production
 
-### 5.5.2 — Import key on owner surface
+### 5.5.2  -  Import key on owner surface
 
-**UI:** `/created/` or new `/manage/` — “Import backup” → unlock → show same Owner controls (revoke QR / card).
+**UI:** `/created/` or new `/manage/`  -  “Import backup” → unlock → show same Owner controls (revoke QR / card).
 
 **Exit:**
 
@@ -113,9 +113,9 @@ Separate threat model when **5.5.3–5.5.4** ship: one-time recovery code, recov
 - [ ] Import + revoke QR works on second device (manual test after deploy)
 - [x] Wrong passphrase fails clearly (`decryptBackup` error message)
 
-### 5.5.3 — Recovery key at create (optional)
+### 5.5.3  -  Recovery key at create (optional)
 
-**UI:** At create, optional “Generate recovery key” — show once (copy + confirm), user confirms they saved it.
+**UI:** At create, optional “Generate recovery key”  -  show once (copy + confirm), user confirms they saved it.
 
 **Resolver:** Store **recovery public key** on card row + in signed card document; recovery revocations verified per §10.1.
 
@@ -126,7 +126,7 @@ Separate threat model when **5.5.3–5.5.4** ship: one-time recovery code, recov
 - [x] Revoke API accepts recovery-signed document (`revoke.test.ts`)
 - [ ] Production: apply migration `0003_recovery_public_key.sql` + Worker deploy
 
-### 5.5.4 — Wire recovery into revoke API
+### 5.5.4  -  Wire recovery into revoke API
 
 **Worker:** `handlePostRevoke` accepts signatures from `cards.public_key` **or** registered recovery public key.
 
@@ -135,7 +135,7 @@ Separate threat model when **5.5.3–5.5.4** ship: one-time recovery code, recov
 - [x] Fixture + test: revocation signed by recovery key updates status.
 - [x] Invalid signing key → 401 (owner-only check extended to allowed keys).
 
-### 5.5.5 — Copy, data policy, and threat model
+### 5.5.5  -  Copy, data policy, and threat model
 
 **Exit:**
 
@@ -155,8 +155,8 @@ Separate threat model when **5.5.3–5.5.4** ship: one-time recovery code, recov
 
 ## Suggested build order
 
-1. **5.5.1 + 5.5.2** (export/import) — unblocks most “second device” needs.  
-2. **5.5.3 + 5.5.4** (recovery key) — unblocks “lost device, have code”.  
+1. **5.5.1 + 5.5.2** (export/import)  -  unblocks most “second device” needs.  
+2. **5.5.3 + 5.5.4** (recovery key)  -  unblocks “lost device, have code”.  
 3. Align with **M10.2** full export bundle when federation/export milestone starts.
 
 ---

@@ -1,6 +1,6 @@
 /**
  * Cross-tab heartbeat: which browser tabs currently hold signing keys (sessionStorage).
- * Stores only public metadata in localStorage — never private keys.
+ * Stores only public metadata in localStorage  -  never private keys.
  */
 import { getTabSession } from "./device-keys.mjs";
 

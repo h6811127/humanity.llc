@@ -1,4 +1,4 @@
-# M7 — Live control alpha
+# M7  -  Live control alpha
 
 **Status:** Step 1 shipped (verify on production); Step 2 polish deferred  
 **Canonical refs:** `docs/Technical Standards v1.0.md` §8.6, `docs/V1_PRODUCT_TRUST_MODEL.md` § Live Control Proof Flow  
@@ -33,7 +33,7 @@ Do not lead with cryptography, sessions, signatures, or protocol language. Those
 
 ---
 
-## Step 1 — Live proof loop
+## Step 1  -  Live proof loop
 
 **Goal:** prove the interaction primitive end to end without adding permissions, events, handoff, commerce, or access control.
 

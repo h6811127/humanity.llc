@@ -1,4 +1,4 @@
-# Device OS — browser shell + physical network
+# Device OS  -  browser shell + physical network
 
 **Status:** Phase 8 shipped (device hub) · **Active vertical:** merch Tier 0 shop (`/shop/`)  
 **Audience:** Product, frontend, and anyone extending Pages without accounts
@@ -25,10 +25,10 @@ Before shipping UI, answer:
 | Question | Put it here |
 |----------|-------------|
 | Save, search, relabel, import backup, activity log, collapsed glance | **Device hub** (`#device-hub`) + glance strip |
-| Live proof **inbox** (pending challenges for saved cards) | **Device hub** — tap opens `/created/` to sign |
+| Live proof **inbox** (pending challenges for saved cards) | **Device hub**  -  tap opens `/created/` to sign |
 | Manifesto, revoke, QR, backup export | **Network object** + `/created/` Manage tab |
 | Live proof **signing** | **`/created/`** only (existing proof panel + poll) |
-| What a stranger sees | **Scan page only** — never a second homepage demo |
+| What a stranger sees | **Scan page only**  -  never a second homepage demo |
 | Protocol essays, threat models, case study walkthrough | **Reference** (full docs in intro mode; Help & protocol footer in focus mode) |
 
 **Do not put on the landing hub:** per-pin revoke, disable QR, or any signed network mutation without **Use keys → /created/**. Pins are public bookmarks only.
@@ -37,7 +37,7 @@ Before shipping UI, answer:
 
 ## Immutable vs reference (returning users)
 
-**Immutable** means “cannot miss because it is true *right now*” — not “always show five doc links.”
+**Immutable** means “cannot miss because it is true *right now*”  -  not “always show five doc links.”
 
 | Tier | What | Where |
 |------|------|--------|
@@ -53,12 +53,12 @@ Documentation is **trust and onboarding**, not **state**. Returning users need w
 
 ## Landing story
 
-1. **Header** — brand dot (network + device + Help link) + Create  
-2. **Status line** — segmented counts → tap expands hub  
-3. **System banner** — only when network ≠ ok  
-4. **On this device** — hub body when expanded  
-5. **Hub glance** — compact rows when hub collapsed (landing)  
-6. **Main column** — intro sections **or** focus-mode footer (see below)
+1. **Header**  -  brand dot (network + device + Help link) + Create  
+2. **Status line**  -  segmented counts → tap expands hub  
+3. **System banner**  -  only when network ≠ ok  
+4. **On this device**  -  hub body when expanded  
+5. **Hub glance**  -  compact rows when hub collapsed (landing)  
+6. **Main column**  -  intro sections **or** focus-mode footer (see below)
 
 **Removed (intentionally):** homepage pass-card demo; doc row “Create → scan → revoke.”
 
@@ -69,7 +69,7 @@ Hides `[data-landing-tutorial]` (hero, progress, One use, design choices, dock, 
 **Stays visible:**
 
 - Status line (shield + chevron; search on the right), system banner (if any), hub, hub glance, contact  
-- **Help & protocol** — compact list group (`#landing-docs-footer`); full Documentation hidden  
+- **Help & protocol**  -  compact list group (`#landing-docs-footer`); full Documentation hidden  
 - Hub **Auto-save** toggle and **Show intro again**  
 
 **Default:** on when wallet or pins exist (`landing-focus.mjs`). Entering focus mode expands the hub once.
@@ -80,21 +80,21 @@ Hides `[data-landing-tutorial]` (hero, progress, One use, design choices, dock, 
 
 ### Auto-save (`hc_auto_save_device`)
 
-Optional hub toggle (off by default): after create, write tab keys to `hc_wallet` without tapping **Save on this device**. For returning users on a trusted browser — not a substitute for recovery key or encrypted backup.
+Optional hub toggle (off by default): after create, write tab keys to `hc_wallet` without tapping **Save on this device**. For returning users on a trusted browser  -  not a substitute for recovery key or encrypted backup.
 
 ### Global information on the desktop (now vs later)
 
 | Now | Later (careful) |
 |-----|------------------|
 | Network health in status line + banner | Resolver build / incident feed |
-| Saved · pinned · notice counts | — |
-| **Revoked since last visit** per saved row + hub glance hint | — |
+| Saved · pinned · notice counts |  -  |
+| **Revoked since last visit** per saved row + hub glance hint |  -  |
 | Hub glance when collapsed | Live proof + cross-tab keys rows when collapsed |
-| Cross-tab keys banner (keys in another tab) | — |
-| Recent activity on device | — |
-| **Live proof waiting** inbox (hub group; prove on `/created/`) | — |
+| Cross-tab keys banner (keys in another tab) |  -  |
+| Recent activity on device |  -  |
+| **Live proof waiting** inbox (hub group; prove on `/created/`) |  -  |
 
-Do **not** add per-pin revoke on the homepage — pins have no keys; use **Use keys → Manage**.
+Do **not** add per-pin revoke on the homepage  -  pins have no keys; use **Use keys → Manage**.
 
 ---
 
@@ -111,7 +111,7 @@ Same chrome on **landing**, **`/created/`**, and **`/wallet/`**:
 
 ### `/wallet/` (saved page)
 
-- Same status chrome as landing (shield, search, system banner, expandable hub — **expanded by default**).
+- Same status chrome as landing (shield, search, system banner, expandable hub  -  **expanded by default**).
 - Shared `device-hub-ui.mjs`: saved rows with **live network chip**, **revoked since last visit** alert, **Last on device** from activity, **Manage** in ⋯ menu.
 - Tab save strip, pin add form, auto-save toggle, activity, backup import.
 - **How this works** hidden when any card is saved.
@@ -124,7 +124,7 @@ Same chrome on **landing**, **`/created/`**, and **`/wallet/`**:
 
 ## Local activity log
 
-**Storage:** `hc_device_activity` — max 40 entries.  
+**Storage:** `hc_device_activity`  -  max 40 entries.  
 **Types:** `saved`, `use_keys`, `remove_card`, `pin_added`, `backup_import`, `live_control`  
 **UI:** Hub group **Recent on this device**.
 
@@ -133,7 +133,7 @@ Same chrome on **landing**, **`/created/`**, and **`/wallet/`**:
 ## Network layer (unchanged contract)
 
 - Signed card + QR + resolver status  
-- **Status plate** — first dogfooded template  
+- **Status plate**  -  first dogfooded template  
 - Scan = public truth  
 
 See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` for storage and search.
@@ -144,7 +144,7 @@ See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` for storage and search.
 
 | Step | Item | Status |
 |------|------|--------|
-| 1 | Doc — returning desktop + immutable vs reference | ✅ |
+| 1 | Doc  -  returning desktop + immutable vs reference | ✅ |
 | 2 | Focus mode: hide full Documentation; show Help & protocol footer | ✅ |
 | 3 | Brand dot sheet: **Help & protocol** row (landing) | ✅ |
 | 4 | `#device-hub-glance` when hub collapsed | ✅ |
@@ -155,8 +155,8 @@ See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` for storage and search.
 | 9 | **Revoked since last visit** (`hc_wallet_last_seen_network`) | ✅ |
 | 10 | Live-control inbox (`device-live-control-inbox.mjs`) | ✅ |
 | 11 | Cross-tab keys banner (`device-tab-presence.mjs`) | ✅ |
-| 12 | Deferred: resolver-wide search / directory | — |
-| — | Deferred: per-card revoke on landing hub | — (use Manage) |
+| 12 | Deferred: resolver-wide search / directory |  -  |
+|  -  | Deferred: per-card revoke on landing hub |  -  (use Manage) |
 
 ### Optional hub polish (not scheduled)
 
@@ -168,7 +168,7 @@ Small TLC items that need **no new resolver APIs**:
 | Glance on `/wallet/` | Today `#device-hub-glance` is landing-only; mirror collapsed summary on wallet shell |
 | Light frontend tests | Vitest or Playwright for `device-tab-presence` + `device-live-control-inbox` poll/render |
 
-### Owner key portability (shipped — see M5.5)
+### Owner key portability (shipped  -  see M5.5)
 
 Revoke and manage from a **new device** without a duplicate card is **in repo** (`docs/M5_5_OWNER_KEY_PORTABILITY.md`):
 
@@ -180,7 +180,7 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 ### Cross-tab keys (Phase 8)
 
-**Presence:** `localStorage` `hc_tab_keys_presence` — each tab heartbeats every 5s with `profile_id` / handle / label only (never private keys). Stale entries drop after 15s.
+**Presence:** `localStorage` `hc_tab_keys_presence`  -  each tab heartbeats every 5s with `profile_id` / handle / label only (never private keys). Stale entries drop after 15s.
 
 **Banner:** `#device-cross-tab-banner` on landing and `/wallet/` when another tab holds keys and this tab does not show the unsaved-keys notice row.
 
@@ -188,13 +188,13 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 ### Live-control inbox (Phase 7)
 
-**Scope:** Device hub only on **landing** and **`/wallet/`** — not duplicated on `/created/` (that page keeps the existing **Prove live control** panel for the open card).
+**Scope:** Device hub only on **landing** and **`/wallet/`**  -  not duplicated on `/created/` (that page keeps the existing **Prove live control** panel for the open card).
 
 **Poll:** Every 5s while the tab is visible, `GET /.well-known/hc/v1/cards/{profile_id}/live-control/challenges?qr_id=…` for each **saved** wallet row that has a `qr_id`.
 
 **UI:**
 
-- Hub group **Live proof waiting** — one row per pending challenge (card label, “Someone is waiting”).
+- Hub group **Live proof waiting**  -  one row per pending challenge (card label, “Someone is waiting”).
 - Status line adds **`N proof waiting`** (highlighted) when N &gt; 0.
 - Row tap → **Use keys** for that card → `/created/?profile_id&qr_id&live_challenge&return_url` (from resolver `owner_url`).
 
@@ -202,7 +202,7 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 ### Revoked since last visit (Phase 6)
 
-**Storage:** `localStorage` key `hc_wallet_last_seen_network` — map of `profile_id` → last recorded resolver card status.
+**Storage:** `localStorage` key `hc_wallet_last_seen_network`  -  map of `profile_id` → last recorded resolver card status.
 
 **When:** On fetch, if last seen ≠ `revoked` and resolver now reports `revoked`, show alert on the saved row and highlight in hub glance.
 

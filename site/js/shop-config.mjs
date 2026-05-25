@@ -1,5 +1,5 @@
 /**
- * Tier 0 shop config — operator sets checkout in site/data/shop-config.json.
+ * Tier 0 shop config  -  operator sets checkout in site/data/shop-config.json.
  * See docs/SHOP_TIER0_IMPLEMENTATION.md.
  */
 

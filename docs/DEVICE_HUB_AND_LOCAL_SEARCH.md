@@ -1,8 +1,8 @@
 # Device hub and local search
 
 **Status:** Phase 1–4 shipped · shared hub · activity log · returning-user desktop  
-**Scope:** Browser-local personalization only — not resolver-wide discovery  
-**Companion:** [`DEVICE_OS.md`](DEVICE_OS.md) — two-layer model, placement rule, landing story
+**Scope:** Browser-local personalization only  -  not resolver-wide discovery  
+**Companion:** [`DEVICE_OS.md`](DEVICE_OS.md)  -  two-layer model, placement rule, landing story
 
 ---
 
@@ -18,13 +18,13 @@ The landing page, **`/created/`**, and **`/wallet/`** share an **“on this devi
 
 We kept the landing funnel (hero → device hub → long-form content) and **enriched** it rather than replacing it with a full dashboard.
 
-**Landing story (shipped):** Hero one-liner, a **four-step progress strip** (Create → Save → Print → Manage), **On this device** below the status line (inline search — no floating FAB), and a **New here?** help drawer. Homepage pass-card demo removed; strangers see real scan pages and the case study.
+**Landing story (shipped):** Hero one-liner, a **four-step progress strip** (Create → Save → Print → Manage), **On this device** below the status line (inline search  -  no floating FAB), and a **New here?** help drawer. Homepage pass-card demo removed; strangers see real scan pages and the case study.
 
 **Status line (shipped):** Segmented grey text (`Network live · 2 saved · 0 pinned · 1 notice`). Hub open state in `sessionStorage`; first unsaved-tab notice auto-expands hub once. On **`/created/`**, hub auto-opens when this tab has signing keys and hub state was never set.
 
 **`/created/` hub (shipped):** Same groups as landing except: notice links to **`#created-keys-strip`**; shortcuts are **Manage this card**, **All saved cards**, **Homepage** (no focus toggle).
 
-**Hub rows (shipped):** Saved cards — **Use keys**, **Open scan**, **⋯** (Relabel, Remove). **Import backup file** decrypts `.hcbackup.json` into `hc_wallet`.
+**Hub rows (shipped):** Saved cards  -  **Use keys**, **Open scan**, **⋯** (Relabel, Remove). **Import backup file** decrypts `.hcbackup.json` into `hc_wallet`.
 
 **Landing focus mode:** `localStorage.hc_landing_focus` hides intro (`[data-landing-tutorial]`). Keeps **hub**, **hub glance**, **system banner** (if unhealthy), **Help & protocol** list (not full Documentation), and **contact**. No bottom Create dock or “New here?” float. **Auto-save** optional via `hc_auto_save_device` in hub shortcuts.
 
@@ -34,21 +34,21 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Created keys strip:** On `/created/` **Now** tab, **Keys on this device** first; recovery in **Break-glass** `<details>` below.
 
-**Naming:** UI says **Saved on this device** — not “wallet”. URL stays `/wallet/`.
+**Naming:** UI says **Saved on this device**  -  not “wallet”. URL stays `/wallet/`.
 
 ---
 
 ## Local activity log (Phase 3)
 
 | Key | `hc_device_activity` |
-| Schema | `{ id, type, label, at, profile_id?, qr_id? }` — max 40 entries |
+| Schema | `{ id, type, label, at, profile_id?, qr_id? }`  -  max 40 entries |
 | Types | `saved`, `use_keys`, `remove_card`, `pin_added`, `backup_import`, `live_control` |
-| UI | **Recent on this device** in hub — tap row → `/created/` **Now** (loads saved keys when available) |
+| UI | **Recent on this device** in hub  -  tap row → `/created/` **Now** (loads saved keys when available) |
 | Glance (landing) | Saved card rows → **Now** (not expand hub only) |
 
 ---
 
-## Local search — phases
+## Local search  -  phases
 
 ### Phase 1 (shipped)
 
@@ -58,8 +58,8 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 ### Phase 2 (shipped)
 
-- **Storage:** `hc_device_pins` — public scan bookmarks only.
-- **Add pin:** `/wallet/` form — `device-pins.mjs`.
+- **Storage:** `hc_device_pins`  -  public scan bookmarks only.
+- **Add pin:** `/wallet/` form  -  `device-pins.mjs`.
 - **Landing + created:** Injected pin group when pins exist.
 
 ### Phase 3 (shipped)
@@ -68,13 +68,13 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 - Full export/import under **Manage** on `/created/`.
 - Activity log (`device-activity.mjs`).
 
-### Phase 4 — live-control inbox (shipped)
+### Phase 4  -  live-control inbox (shipped)
 
 - **`device-live-control-inbox.mjs`** polls pending challenges for saved cards with `qr_id`.
 - Hub group **Live proof waiting** on landing and `/wallet/`; tap loads keys and opens `/created/` to sign.
 - `/created/` keeps the existing proof panel (no duplicate inbox).
 
-### Phase 5 — cross-tab keys (shipped)
+### Phase 5  -  cross-tab keys (shipped)
 
 - **`device-tab-presence.mjs`** heartbeats which tabs hold signing keys (metadata only).
 - **`device-cross-tab-banner.mjs`** on landing and `/wallet/` when keys live in another tab.

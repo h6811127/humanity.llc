@@ -1,5 +1,5 @@
 /**
- * Landing focus mode — hide tutorial sections, show device hub + docs + contact.
+ * Landing focus mode  -  hide tutorial sections, show device hub + docs + contact.
  */
 import { loadWallet } from "./device-wallet.mjs";
 import { loadPins } from "./device-pins.mjs";

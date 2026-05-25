@@ -1,4 +1,4 @@
-/* humanity.llc — iOS grouped UI, light. #DB1B43 · #000 · #fff · #b8b8b8 */
+/* humanity.llc  -  iOS grouped UI, light. #DB1B43 · #000 · #fff · #b8b8b8 */
 
 :root {
   --red: #db1b43;
@@ -997,7 +997,7 @@ a.hub-card-menu-item {
   line-height: 1.4;
 }
 
-/* Concrete example — door plate → scan → state */
+/* Concrete example  -  door plate → scan → state */
 .example-flow {
   margin-top: 4px;
 }
@@ -1240,7 +1240,7 @@ a.hub-card-menu-item {
   border-left: 2px solid rgba(219, 27, 67, 0.35);
 }
 
-/* Trust pills — anti-surveillance, glanceable */
+/* Trust pills  -  anti-surveillance, glanceable */
 .trust-pills {
   list-style: none;
   display: flex;
@@ -1743,7 +1743,7 @@ a.hub-card-menu-item {
   line-height: 1.5;
 }
 
-/* Pass card — tilt on .pass-tilt-wrap; 3D flip on .pass-inner only */
+/* Pass card  -  tilt on .pass-tilt-wrap; 3D flip on .pass-inner only */
 .pass-scene {
   perspective: 900px;
   -webkit-perspective: 900px;
@@ -2321,7 +2321,7 @@ a.hub-card-menu-item {
   content: "● ";
 }
 
-/* QR — tight neutral frame, no glow */
+/* QR  -  tight neutral frame, no glow */
 .pass-qr {
   flex-shrink: 0;
   line-height: 0;
@@ -2537,7 +2537,7 @@ a.hub-card-menu-item {
   background: transparent;
 }
 
-/* iOS grouped lists — solid, no blur (low bandwidth / old phones) */
+/* iOS grouped lists  -  solid, no blur (low bandwidth / old phones) */
 .group-label {
   font-size: 13px;
   font-weight: 600;
@@ -2801,7 +2801,7 @@ a.hub-card-menu-item {
   text-decoration: underline;
 }
 
-/* ——— Device hub (landing + wallet) ——— */
+/*  -  -  -  Device hub (landing + wallet)  -  -  -  */
 .device-hub {
   margin-top: 0;
 }
@@ -2864,7 +2864,7 @@ a.hub-card-menu-item {
   margin-bottom: 14px;
 }
 
-/* Created — keys strip (above QR) */
+/* Created  -  keys strip (above QR) */
 .created-keys-strip {
   margin-bottom: 8px;
   padding: 16px;
@@ -3607,7 +3607,7 @@ body.landing-focus-mode .screen-landing {
   margin-bottom: 18px;
 }
 
-/* ——— Studio one use + blog ——— */
+/*  -  -  -  Studio one use + blog  -  -  -  */
 .studio-one-use {
   margin-top: 8px;
 }
@@ -3886,7 +3886,7 @@ body.landing-focus-mode .screen-landing {
   text-decoration: none;
 }
 
-/* ——— Status plate pilot visual (legacy) ——— */
+/*  -  -  -  Status plate pilot visual (legacy)  -  -  -  */
 .pilot-showcase {
   margin-top: 8px;
 }
@@ -3953,7 +3953,7 @@ body.landing-focus-mode .screen-landing {
   margin-top: 0;
 }
 
-/* ——— Wallet page ——— */
+/*  -  -  -  Wallet page  -  -  -  */
 .screen-wallet {
   gap: 14px;
 }

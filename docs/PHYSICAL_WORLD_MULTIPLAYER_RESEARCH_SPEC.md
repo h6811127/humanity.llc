@@ -1,6 +1,6 @@
 # Physical-world multiplayer research spec
 
-**Status:** Research only — not on the Phase A shipping path (`create → scan → revoke`)
+**Status:** Research only  -  not on the Phase A shipping path (`create → scan → revoke`)
 **Public summary:** `site/what-can-a-qr-do/physical-world-multiplayer/`
 **Privacy boundary:** `docs/REFERENCE_OPERATOR_DATA_POLICY.md`
 **Roadmap context:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`

@@ -1,5 +1,5 @@
 /**
- * M6 Step 3 — revoke vouches the viewer issued from this browser session.
+ * M6 Step 3  -  revoke vouches the viewer issued from this browser session.
  */
 import { postVouchRevokeUrl, signVouchRevocation } from "./hc-sign.mjs";
 
@@ -60,7 +60,7 @@ export function initVoucherRevoke(ctx) {
   }
 
   function truncateProfileId(id) {
-    if (typeof id !== "string" || id.length < 10) return id ?? "—";
+    if (typeof id !== "string" || id.length < 10) return id ?? " - ";
     return `${id.slice(0, 6)}…${id.slice(-4)}`;
   }
 

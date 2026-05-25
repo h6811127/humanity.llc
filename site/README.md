@@ -11,7 +11,7 @@ npm run pages:dev
 
 Open the URL Wrangler prints (usually `http://localhost:8788`).
 
-Run `npm run worker:dev` on port **8787** before using `/create/` locally — the UI signs in the browser and POSTs to the resolver.
+Run `npm run worker:dev` on port **8787** before using `/create/` locally  -  the UI signs in the browser and POSTs to the resolver.
 
 **Pages preview URLs** (`*.pages.dev` after `npm run pages:deploy`) are static-only. Create/revoke/vouch calls use the production resolver at `https://humanity.llc` automatically. Override with `?api=http://127.0.0.1:8787` when testing against a local worker.
 
@@ -42,10 +42,10 @@ npm run deploy
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Landing (four-step progress, device hub, status plate pilot — no pass demo) |
+| `index.html` | Landing (four-step progress, device hub, status plate pilot  -  no pass demo) |
 | `created/index.html` | Post-create owner UI + shared device hub |
 | `wallet/index.html` | Saved cards on this device (`hc_wallet` in localStorage) |
-| `shop/index.html` | Tier 0 drop — config-driven Shopify checkout handoff |
+| `shop/index.html` | Tier 0 drop  -  config-driven Shopify checkout handoff |
 | `data/shop-config.json` | Set `checkout_url` + `checkout_open` to enable Buy |
 | `shop/thanks/index.html` | Post-checkout guidance (Tier 0 email copy) |
 | `js/device-hub-ui.mjs`, `js/device-activity.mjs` | Shared hub + local activity log |
@@ -57,12 +57,12 @@ npm run deploy
 | `created/index.html` | Post-create QR + scan link + owner revoke (session key) |
 | `js/create-card.mjs`, `js/hc-sign.mjs` | Browser signing + POST to resolver |
 | `data-policy.html` | Mobile-friendly operator data policy summary |
-| `architecture.html` | Sparse architecture map — keys, revoke, resolver, tradeoffs |
-| `research-directions.html` | NFC, mesh, and Humanity node — research / future infrastructure |
+| `architecture.html` | Sparse architecture map  -  keys, revoke, resolver, tradeoffs |
+| `research-directions.html` | NFC, mesh, and Humanity node  -  research / future infrastructure |
 | `styles.css` | Layout and visual system |
 | `js/pass-flip.js` | Pass card tilt (touch + desktop), tap-to-flip (landing + scan) |
 | `_headers` | Security and cache headers |
-| `_redirects` | `/create` → `/create/` (301; avoid `create.html` — Pages strips `.html` and loops) |
+| `_redirects` | `/create` → `/create/` (301; avoid `create.html`  -  Pages strips `.html` and loops) |
 | `assets/red_qr_transparent_bg.png` | Favicon, brand mark, card preview |
 
 ### Homepage showcase card

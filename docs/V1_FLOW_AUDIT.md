@@ -3,7 +3,7 @@
 **Status:** Pre-rebuild hardening artifact  
 **Scope:** Humanity Card, QR Public Profile, Human Verification, Storefront, Printify Fulfillment Middleware
 
-**Network model:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — reference operator first; federated hosts; data minimization.
+**Network model:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  -  reference operator first; federated hosts; data minimization.
 
 ---
 

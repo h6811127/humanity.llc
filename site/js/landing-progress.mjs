@@ -1,5 +1,5 @@
 /**
- * Landing progress strip — highlight the next step from local wallet/pins.
+ * Landing progress strip  -  highlight the next step from local wallet/pins.
  */
 const WALLET_KEY = "hc_wallet";
 const PINS_KEY = "hc_device_pins";

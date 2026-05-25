@@ -1,6 +1,6 @@
 # Manifesto / status line updates (post-create)
 
-**Status:** Active — current Phase A product focus  
+**Status:** Active  -  current Phase A product focus  
 **Parent:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` (status plate, lost-item relay)  
 **Skipped for now:** M5 stranger gate batch, M7 Step 2 polish (see `docs/M3_M4_EXECUTION_PLAN.md`)
 
@@ -54,24 +54,24 @@ Scans and `GET …/cards/{id}` read the updated document on next fetch (active c
 
 ## Storage formats (pilots)
 
-Same as create — one `manifesto_line` field, layout parsed at scan time (`worker/src/resolver/manifesto-display.ts`):
+Same as create  -  one `manifesto_line` field, layout parsed at scan time (`worker/src/resolver/manifesto-display.ts`):
 
 | Pilot | Format | Example line 1 · line 2 |
 |-------|--------|-------------------------|
 | **Status plate** | Two lines | `Studio door` · `Closed until Monday` |
-| **Lost item relay** | `[relay]` prefix | `[relay] Keys` · `Found — thank you` |
+| **Lost item relay** | `[relay]` prefix | `[relay] Keys` · `Found  -  thank you` |
 | **General card** | One line (or two treated as plate if newline) | Single public statement |
 
 ---
 
 ## Owner UI (`/created/`)
 
-1. Section **Update public line** (same QR — new manifesto on the network).
+1. Section **Update public line** (same QR  -  new manifesto on the network).
 2. Fields match pilot template (status plate / relay / general).
 3. Requires owner or recovery key (session, backup import, or recovery unlock).
 4. Success: *Updated. Next scan shows the new line.*
 
-Deep link: `/created/?profile_id=…&qr_id=…` — hydrates handle/manifesto from network when session is empty; infers pilot layout from stored `manifesto_line`.
+Deep link: `/created/?profile_id=…&qr_id=…`  -  hydrates handle/manifesto from network when session is empty; infers pilot layout from stored `manifesto_line`.
 
 ---
 

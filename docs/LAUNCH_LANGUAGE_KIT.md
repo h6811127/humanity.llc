@@ -3,9 +3,9 @@
 **Status:** Strategic draft  
 **Purpose:** Provide repeatable public language for launch without overclaiming identity, verification, or governance.
 
-**Architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — public launch; federated networks.
+**Architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  -  public launch; federated networks.
 
-**Merch-led tiers:** Tier 0 = proof of curiosity (open drop). Tier 1 = proof of belonging (personalized for card holders—not a protocol invite gate). See `docs/MERCH_LED_V1.md` and `docs/FOUNDING_DROP_BRIEF.md`.
+**Merch-led tiers:** Tier 0 = proof of curiosity (open drop). Tier 1 = proof of belonging (personalized for card holders - not a protocol invite gate). See `docs/MERCH_LED_V1.md` and `docs/FOUNDING_DROP_BRIEF.md`.
 
 ---
 
@@ -79,13 +79,13 @@ Draft:
 >
 > This is not government ID. It is not KYC. It is not a social network. It is a public trust primitive designed to become member-governed infrastructure if the first trust loop works.
 >
-> When the network ships, anyone can create a card—no invite list. If you want to help stress-test early, reach out; optional early testers break copy and test vouching before we scale marketing.
+> When the network ships, anyone can create a card - no invite list. If you want to help stress-test early, reach out; optional early testers break copy and test vouching before we scale marketing.
 
 ---
 
 ## Optional Early Tester Invite (Non-Gating)
 
-Use only for volunteers—not as a product gate. See `docs/FOUNDING_COHORT_PLAYBOOK.md`.
+Use only for volunteers - not as a product gate. See `docs/FOUNDING_COHORT_PLAYBOOK.md`.
 
 Short:
 
@@ -95,7 +95,7 @@ Short:
 
 Long:
 
-> Humanity Commons is a public card you control—signed, revocable, vouched under published rules. We're opening card creation to the world when Phase A is stable. Optional early testers help us catch copy and support issues first.
+> Humanity Commons is a public card you control - signed, revocable, vouched under published rules. We're opening card creation to the world when Phase A is stable. Optional early testers help us catch copy and support issues first.
 >
 > The goal is not a fake democracy or exclusive club. The goal is working trust infrastructure on an open spec with federated operators over time.
 
@@ -119,27 +119,27 @@ Product page:
 
 ---
 
-## Tier 0 — Curiosity Drop Copy
+## Tier 0  -  Curiosity Drop Copy
 
 Use for the **open** founding sticker/card: spread, scans, card creation. No vouch implied on the object.
 
 ### One-liners
 
 - Scan it. See what we actually prove.
-- A walking QR for human trust — not surveillance.
+- A walking QR for human trust  -  not surveillance.
 - Curiosity counts. Verification doesn't come in the mail.
 
 ### Storefront hero
 
 **Headline:** Scan the sticker. See the experiment.
 
-**Subheadline:** A physical QR that resolves to a live, signed Humanity Card — honest about what it proves and what it doesn't. No phone. No ID. No scan analytics.
+**Subheadline:** A physical QR that resolves to a live, signed Humanity Card  -  honest about what it proves and what it doesn't. No phone. No ID. No scan analytics.
 
 **Primary CTA:** Get the founding sticker
 
 **Secondary CTA:** Create a free card
 
-### Product page — above the fold
+### Product page  -  above the fold
 
 **Title:** Founding signal sticker
 
@@ -147,13 +147,13 @@ Use for the **open** founding sticker/card: spread, scans, card creation. No vou
 
 > This is a pointer, not a passport. The QR always resolves to **current** card status when scanned. What you hold is ink and vinyl; what you trust is what the scan shows right now.
 
-**Bullets — what you get:**
+**Bullets  -  what you get:**
 
 - One durable sticker with a scannable QR
 - A story about trust without surveillance
 - Support for a founder-built experiment heading toward member governance
 
-**Bullets — what you do not get:**
+**Bullets  -  what you do not get:**
 
 - Legal identity or KYC
 - Automatic "verified human" status
@@ -162,43 +162,43 @@ Use for the **open** founding sticker/card: spread, scans, card creation. No vou
 
 **Required line (footer or FAQ):**
 
-> **Buying this sticker does not verify you.** Create a card separately. Vouches come from real people under public rules — not from checkout.
+> **Buying this sticker does not verify you.** Create a card separately. Vouches come from real people under public rules  -  not from checkout.
 
-### Scan page — curiosity state (scanner is stranger)
+### Scan page  -  curiosity state (scanner is stranger)
 
-**Status line:** `[Active | Revoked | Suspended | Unknown]` — factual, no drama.
+**Status line:** `[Active | Revoked | Suspended | Unknown]`  -  factual, no drama.
 
 **Hook:**
 
-> You're looking at a Humanity Card — a signed, revocable trust object, not a platform profile.
+> You're looking at a Humanity Card  -  a signed, revocable trust object, not a platform profile.
 
-**CTA block — curiosity:**
+**CTA block  -  curiosity:**
 
-- **Create your card** — free, no phone or government ID required
-- **Get the founding sticker** — same experiment, wearable
-- **Read what this does not prove** — link to trust model
+- **Create your card**  -  free, no phone or government ID required
+- **Get the founding sticker**  -  same experiment, wearable
+- **Read what this does not prove**  -  link to trust model
 
 **Limits (always visible):**
 
 > This QR resolves to a Humanity Card. It does **not** prove the person holding this item owns the card. Always scan for current status.
 
-### Email — post-purchase (Tier 0)
+### Email  -  post-purchase (Tier 0)
 
-**Subject:** Your sticker ships — your status doesn't
+**Subject:** Your sticker ships  -  your status doesn't
 
 **Body (short):**
 
 > Thanks for backing a physical experiment in human trust.
 >
-> When your sticker arrives: scan it before you stick it anywhere. You'll see live status and plain limits — not a verified badge in the mail.
+> When your sticker arrives: scan it before you stick it anywhere. You'll see live status and plain limits  -  not a verified badge in the mail.
 >
 > Want belonging in the founding graph? Create a card, join the cohort waitlist, and vouch only when it's true.
 >
 > Buying merch never makes anyone vouched.
 
-### Social — Tier 0 launch
+### Social  -  Tier 0 launch
 
-**Post A — object**
+**Post A  -  object**
 
 > I made a sticker that is literally a walking advertisement for an honest trust experiment.
 >
@@ -208,57 +208,57 @@ Use for the **open** founding sticker/card: spread, scans, card creation. No vou
 >
 > `[link]`
 
-**Post B — curiosity hook**
+**Post B  -  curiosity hook**
 
 > Most QR codes want your data. This one wants you to **read the limits**.
 >
-> Founding sticker drop — pointer to a live card, not a fake ID.
+> Founding sticker drop  -  pointer to a live card, not a fake ID.
 
-### Tier 0 — lines to avoid
+### Tier 0  -  lines to avoid
 
 - "Get verified" / "official founding verified"
-- "Prove you're human" (too broad — prefer "see what we prove")
+- "Prove you're human" (too broad  -  prefer "see what we prove")
 - "Limited verified edition"
 - Any print copy that says Verified Human, KYC-free ID, or bot-proof
 
 ---
 
-## Tier 1 — Belonging Drop Copy
+## Tier 1  -  Belonging Drop Copy
 
-Use for **card holders** ready to personalize (time-limited drop OK)—not for gating protocol access. Personalized artifact optional; vouch graph; repeat wear.
+Use for **card holders** ready to personalize (time-limited drop OK) - not for gating protocol access. Personalized artifact optional; vouch graph; repeat wear.
 
 ### One-liners
 
 - Worn by people who vouch for each other under public rules.
-- Founding humans — not platform inventory.
+- Founding humans  -  not platform inventory.
 - Belonging is signed, revocable, and inspectable.
 
 ### Storefront hero (personalized drop)
 
 **Headline:** Personalize your artifact
 
-**Subheadline:** For card holders who want a wearable QR tied to **your** card. Status comes from vouches and credentials under public rules—not from checkout.
+**Subheadline:** For card holders who want a wearable QR tied to **your** card. Status comes from vouches and credentials under public rules - not from checkout.
 
 **Primary CTA:** Create card (if needed) · Personalize
 
 **Secondary CTA:** Read trust rules
 
-### Product page — above the fold
+### Product page  -  above the fold
 
 **Title:** Founding human artifact
 
 **Short description:**
 
-> For Humanity Card holders. A wearable QR tied to **your** card — with public rules for vouching, quotas, and revocation. Still not legal ID. Still not proof the wearer owns the card without live control when it matters.
+> For Humanity Card holders. A wearable QR tied to **your** card  -  with public rules for vouching, quotas, and revocation. Still not legal ID. Still not proof the wearer owns the card without live control when it matters.
 
-**Bullets — what belonging means here:**
+**Bullets  -  what belonging means here:**
 
 - You're in the first accountable trust graph
 - Vouches are signed, limited, and revocable
-- Scan shows `Founding Human` / `Vouched Human` when earned — never printed as static truth on the object
+- Scan shows `Founding Human` / `Vouched Human` when earned  -  never printed as static truth on the object
 - You help decide if this becomes member-governed infrastructure
 
-**Bullets — what money still doesn't buy:**
+**Bullets  -  what money still doesn't buy:**
 
 - Vouches (peers grant them)
 - Legal identity
@@ -268,30 +268,30 @@ Use for **card holders** ready to personalize (time-limited drop OK)—not for g
 
 > **Checkout does not vouch you.** Receive vouches from people who can stand behind the statement under published rules.
 
-### Scan page — belonging state (holder)
+### Scan page  -  belonging state (holder)
 
-**Trust block:** Show mechanism labels — `Registered`, `Vouched Human`, `Founding Human`, vouch recency — not "Verified forever."
+**Trust block:** Show mechanism labels  -  `Registered`, `Vouched Human`, `Founding Human`, vouch recency  -  not "Verified forever."
 
-**CTA block — belonging (holder):**
+**CTA block  -  belonging (holder):**
 
 - Prove live control (when implemented)
 - Export card / credentials
 - Revoke this QR credential
 - Request vouch (if policy allows)
 
-**CTA block — curiosity (stranger still sees):**
+**CTA block  -  curiosity (stranger still sees):**
 
 - Create a card · Join waitlist · Read trust model
 
 **Limits:** Same bearer + non-legal-ID block as Tier 0.
 
-### Email — cohort invite (Tier 1)
+### Email  -  cohort invite (Tier 1)
 
-**Subject:** Founding human line — you're in
+**Subject:** Founding human line  -  you're in
 
 **Body (short):**
 
-> You're invited into the first belonging cohort for Humanity Commons — not a status tier you bought.
+> You're invited into the first belonging cohort for Humanity Commons  -  not a status tier you bought.
 >
 > This week: create your card, scan someone in the cohort, vouch only when true, and attend `[scan circle date]` if you can.
 >
@@ -299,29 +299,29 @@ Use for **card holders** ready to personalize (time-limited drop OK)—not for g
 >
 > Rules: `[link]`. Trust model: `[link]`.
 
-### Email — post-purchase (Tier 1)
+### Email  -  post-purchase (Tier 1)
 
-**Subject:** Your founding artifact — wear the pointer, earn the trust
+**Subject:** Your founding artifact  -  wear the pointer, earn the trust
 
 **Body (short):**
 
 > Your order is production. When it arrives, scan before you flex it.
 >
-> The sticker/card points at your card. Vouches and founding labels appear on the scan when earned — not because Printify said so.
+> The sticker/card points at your card. Vouches and founding labels appear on the scan when earned  -  not because Printify said so.
 >
-> If someone steals the physical item, revoke that item's QR — you don't have to revoke your whole card.
+> If someone steals the physical item, revoke that item's QR  -  you don't have to revoke your whole card.
 
-### Social — Tier 1 (cohort-facing, not hype-outside)
+### Social  -  Tier 1 (cohort-facing, not hype-outside)
 
-**Post — belonging**
+**Post  -  belonging**
 
-> Personalized drop is live for card holders: vouches under public rules—no surveillance, no phone, no government ID on day one.
+> Personalized drop is live for card holders: vouches under public rules - no surveillance, no phone, no government ID on day one.
 >
 > Wear the QR. Scan each other. Say what it doesn't prove.
 >
 > No card yet? Create one or grab the curiosity drop: `[Tier 0 link]`
 
-### Tier 1 — lines to avoid
+### Tier 1  -  lines to avoid
 
 - "Founding verified humans" (implies verification product)
 - "Inner circle gets legal-level trust"
@@ -330,7 +330,7 @@ Use for **card holders** ready to personalize (time-limited drop OK)—not for g
 
 ---
 
-## Scan Page — Dual CTA Block (Template)
+## Scan Page  -  Dual CTA Block (Template)
 
 Use on every public resolve. Show both blocks; gray out belonging actions when not applicable.
 
@@ -429,31 +429,31 @@ The card is practical. The politics live in the infrastructure commitments: no s
 
 ## Launch Page Hero Variants
 
-### Variant A — card-first
+### Variant A  -  card-first
 
 **Headline:** A public card for real humans.
 
 **Subheadline:** Create a signed card, get vouched for, prove live control, and share a QR that always resolves to current status.
 
-### Variant B — anti-surveillance
+### Variant B  -  anti-surveillance
 
 **Headline:** Prove you're real without becoming a data product.
 
 **Subheadline:** Humanity Commons is a signed, revocable trust card with no phone number, government ID, ads, or scan analytics.
 
-### Variant C — community (Phase D / Commons Pass)
+### Variant C  -  community (Phase D / Commons Pass)
 
 **Headline:** Human trust without platform surveillance.
 
 **Subheadline:** A signed public card for communities that need real people, real vouches, and a right to revoke.
 
-### Variant D — Tier 0 merch-led (default for open drop)
+### Variant D  -  Tier 0 merch-led (default for open drop)
 
 **Headline:** Scan the sticker. See the experiment.
 
-**Subheadline:** Walking ads for honest trust — live status, no surveillance, no verification in the mail.
+**Subheadline:** Walking ads for honest trust  -  live status, no surveillance, no verification in the mail.
 
-### Variant E — Tier 1 gated
+### Variant E  -  Tier 1 gated
 
 **Headline:** Founding humans, inspectable rules.
 
@@ -478,5 +478,5 @@ Before public launch, ask testers:
 8. After reading the product page, do you believe **buying the sticker makes you verified**?
 9. After scanning, do you know what to do if you're **curious** vs if you're the **owner**?
 10. Would you wear this if you were **not** yet vouched? Why or why not?
-11. Which tier message would you forward — curiosity post or belonging invite?
+11. Which tier message would you forward  -  curiosity post or belonging invite?
 

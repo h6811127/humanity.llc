@@ -18,7 +18,7 @@ Humanity Commons is **democratic infrastructure**, not a platform empire.
 | Member-governed standards over rights-affecting rules | Surveillance analytics as the business model |
 | Honest scan pages that separate what is proved | “Verified human” theater on stickers or legal-ID claims |
 
-**Power** comes from protocol adoption, repeat checks at the door, and orgs that depend on the same resolver API—not from locking users inside one app.
+**Power** comes from protocol adoption, repeat checks at the door, and orgs that depend on the same resolver API - not from locking users inside one app.
 
 **Commons Pass** (community membership, events, check-in, stamps) is the **organizer layer on top of** the Humanity Card. Phase A proves the card loop; Phase D expands into org tools. See `docs/V1_0_ARCHITECTURE_ROADMAP.md`.
 
@@ -33,24 +33,24 @@ The product is not “Linktree with a red QR.” The product is a **live trust o
 ### What a scan is supposed to answer (in seconds)
 
 1. **Is this card or printed QR still valid right now?** (active, revoked, suspended, expired, unknown)
-2. **What social trust is attached?** (e.g. vouches under published rules—not a hidden score)
-3. **Did the person nearby just prove control of the key?** (live control—optional, short-lived)
+2. **What social trust is attached?** (e.g. vouches under published rules - not a hidden score)
+3. **Did the person nearby just prove control of the key?** (live control - optional, short-lived)
 4. **What does this scan explicitly not prove?** (no legal ID, no “holder owns this sticker” from QR alone)
 
 Revocation matters because **physical trust leaks**: stolen stickers, lost cards, breakups, expelled members, compromised keys. A profile link cannot say “this printed item is dead” without you trusting the platform forever. A resolver can.
 
-**Owner actions (distinct — not one “revoke” button):** **Revoke QR** (one pointer), **Disable card** (whole profile off), **Suspend** (governance only), and (future) **Delete**. Vocabulary, scan copy, and physical-ID warnings: `docs/REVOKE_AND_LIFECYCLE_V1.md`.
+**Owner actions (distinct  -  not one “revoke” button):** **Revoke QR** (one pointer), **Disable card** (whole profile off), **Suspend** (governance only), and (future) **Delete**. Vocabulary, scan copy, and physical-ID warnings: `docs/REVOKE_AND_LIFECYCLE_V1.md`.
 
 ### Value stack (phased)
 
 | Layer | What the user gets | When |
 |-------|-------------------|------|
-| **L0 — Live status** | Current card/QR state, signed public data, clear limits copy | Phase A MVP |
-| **L1 — Social trust** | Vouches, founding/steward credentials, recency | Phase A–B |
-| **L2 — In-person proof** | Live control challenge (“prove you hold the key now”) | Phase A (alpha) / M7 |
-| **L3 — Physical wedge** | Per-item QR on merch; revoke one sticker without killing the card | Phase B–C |
-| **L4 — Community ops** | Commons Pass: membership, events, check-in, stamps | Phase D |
-| **L5 — Federation** | Same card works across operators; export and exit | Phase E |
+| **L0  -  Live status** | Current card/QR state, signed public data, clear limits copy | Phase A MVP |
+| **L1  -  Social trust** | Vouches, founding/steward credentials, recency | Phase A–B |
+| **L2  -  In-person proof** | Live control challenge (“prove you hold the key now”) | Phase A (alpha) / M7 |
+| **L3  -  Physical wedge** | Per-item QR on merch; revoke one sticker without killing the card | Phase B–C |
+| **L4  -  Community ops** | Commons Pass: membership, events, check-in, stamps | Phase D |
+| **L5  -  Federation** | Same card works across operators; export and exit | Phase E |
 
 If we ship only L0 forever, skeptics are right to shrug. The roadmap exists so L0 is the **foundation**, not the **ceiling**.
 

@@ -22,9 +22,9 @@ Not proof of ownership. Not a phone number printed in plain sight. Item name + r
 1. Go to **https://humanity.llc/create/**
 2. Choose **Lost item** under “Start from”
 3. Fill in:
-   - **Handle** — your card id (e.g. `keys_relay`)
-   - **What is lost?** — headline on scan (e.g. `House keys`)
-   - **What should finders see?** — return message (e.g. `Lost — contact owner through relay`)
+   - **Handle**  -  your card id (e.g. `keys_relay`)
+   - **What is lost?**  -  headline on scan (e.g. `House keys`)
+   - **What should finders see?**  -  return message (e.g. `Lost  -  contact owner through relay`)
 4. Save recovery key on `/created/`, print QR, scan from another phone, revoke when recovered.
 
 ### Storage format (no new API field)
@@ -33,7 +33,7 @@ The resolver stores one `manifesto_line` with **two lines** and a line-1 prefix:
 
 ```text
 [relay] House keys
-Lost — contact owner through relay
+Lost  -  contact owner through relay
 ```
 
 Line 1 = `[relay] ` + item label · Line 2 = return message. Parsed in `worker/src/resolver/manifesto-display.ts`.
@@ -69,7 +69,7 @@ Score with `docs/M5_STRANGER_TEST_RUNBOOK.md`.
 
 ## Return message updates
 
-Owner can change line 2 (return message) without reprinting — `docs/MANIFESTO_STATUS_UPDATE.md`, **Update public line** on `/created/`.
+Owner can change line 2 (return message) without reprinting  -  `docs/MANIFESTO_STATUS_UPDATE.md`, **Update public line** on `/created/`.
 
 ---
 
@@ -77,7 +77,7 @@ Owner can change line 2 (return message) without reprinting — `docs/MANIFESTO_
 
 - **Do not** imply scan proves the holder is the owner.  
 - **Do not** use scan analytics on crisis or lost-item pilots by default.  
-- **Revoke** when recovered — a live relay after return is a liability.  
+- **Revoke** when recovered  -  a live relay after return is a liability.  
 - Prefer coalition or owner-controlled copy review; humanity.llc ships the primitive.
 
 ---

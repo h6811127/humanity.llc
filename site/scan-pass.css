@@ -1,4 +1,4 @@
-/* Scan + landing pass card — bundled into Worker HTML. Keep in sync with styles.css pass block. */
+/* Scan + landing pass card  -  bundled into Worker HTML. Keep in sync with styles.css pass block. */
 
 :root {
   --red: #db1b43;
@@ -453,7 +453,7 @@ a {
   gap: 16px;
 }
 
-/* M3.3 — one line above the card */
+/* M3.3  -  one line above the card */
 .scan-bearer-line {
   font-size: 13px;
   font-weight: 500;
@@ -699,7 +699,7 @@ a {
   background: #5856d6;
 }
 
-/* Vouched Human — vibrant trust blue (distinct from system link blue) */
+/* Vouched Human  -  vibrant trust blue (distinct from system link blue) */
 .list-icon-tone-trust {
   background: #0a84ff;
 }
@@ -975,7 +975,7 @@ a {
   background: rgba(0, 122, 255, 0.05);
 }
 
-/* V-002 — vouch issuance (scan page, client-revealed) */
+/* V-002  -  vouch issuance (scan page, client-revealed) */
 .vouch-card-wrap {
   display: block;
   width: 100%;
@@ -1221,7 +1221,7 @@ a {
   }
 }
 
-/* —— Scan shell environment (keep in sync with site/css/device-shell.css) —— */
+/*  -  -  Scan shell environment (keep in sync with site/css/device-shell.css)  -  -  */
 body {
   background: #f2f2f7;
 }

@@ -3,15 +3,15 @@
 **Status:** Strategic draft  
 **Purpose:** Define concrete contexts where Humanity Commons should be useful, so the project does not become a generic QR profile with movement language.
 
-**Direction:** `docs/DEMOCRATIC_INFRASTRUCTURE.md` — scan must deliver live status, vouches, revoke, and (later) org tools—not “another link in bio.”
+**Direction:** `docs/DEMOCRATIC_INFRASTRUCTURE.md`  -  scan must deliver live status, vouches, revoke, and (later) org tools - not “another link in bio.”
 
-**Trust boundaries:** `docs/V1_PRODUCT_TRUST_MODEL.md` — what scans prove and do not prove at each level.
+**Trust boundaries:** `docs/V1_PRODUCT_TRUST_MODEL.md`  -  what scans prove and do not prove at each level.
 
-**Build phases:** `docs/V1_0_ARCHITECTURE_ROADMAP.md` — Phase A (digital trust) before commerce and Commons Pass.
+**Build phases:** `docs/V1_0_ARCHITECTURE_ROADMAP.md`  -  Phase A (digital trust) before commerce and Commons Pass.
 
-**Public landing:** `site/index.html` — “One use” (door plate + QR), “Same idea elsewhere” (mechanism bullets). NFC/mesh diagrams and **Humanity node** vision live on `site/research-directions.html` (`docs/RESEARCH_DIRECTIONS_AND_NODES.md`). Full catalog stays in this doc, not on the homepage scroll.
+**Public landing:** `site/index.html`  -  “One use” (door plate + QR), “Same idea elsewhere” (mechanism bullets). NFC/mesh diagrams and **Humanity node** vision live on `site/research-directions.html` (`docs/RESEARCH_DIRECTIONS_AND_NODES.md`). Full catalog stays in this doc, not on the homepage scroll.
 
-**Post-M5 product focus:** After strangers pass the generic loop, pick **one** vertical to harden on real objects — `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` (status plate, lost-item relay, organizer-signed revoke). Do not expand the public idea hub faster than that pilot.
+**Post-M5 product focus:** After strangers pass the generic loop, pick **one** vertical to harden on real objects  -  `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` (status plate, lost-item relay, organizer-signed revoke). Do not expand the public idea hub faster than that pilot.
 
 ---
 
@@ -46,13 +46,13 @@ Every use case must answer:
 
 A revocable HTTPS QR is **not just a link**. It is a **claim with current validity**: whoever scans gets what the resolver returns **now** (active, revoked, suspended, vouched, etc.), not a frozen file or cached profile.
 
-The web normalized **permanent URLs**. Memberships, trust, affiliations, permissions, public statements, and contact endpoints are **dynamic**. A revocable QR lets physical artifacts—stickers, cards, posters, badges, tools—point at **dynamic truth** instead of static HTML.
+The web normalized **permanent URLs**. Memberships, trust, affiliations, permissions, public statements, and contact endpoints are **dynamic**. A revocable QR lets physical artifacts - stickers, cards, posters, badges, tools - point at **dynamic truth** instead of static HTML.
 
 That is the primitive Humanity Commons implements. **Global identity is not required** for the primitive to matter; scoped, revocable, mechanism-revealing trust is enough.
 
 ### Product line (one sentence)
 
-> Physical artifacts point at current signed status, not a permanent file—so trust, membership, and public claims can change without pretending the world is static.
+> Physical artifacts point at current signed status, not a permanent file - so trust, membership, and public claims can change without pretending the world is static.
 
 ### How it differs from “link in bio”
 
@@ -70,7 +70,7 @@ Examples that fit the primitive when scoped honestly:
 
 - Protest or event coordination contact that should **expire or revoke** after the action.
 - Journalist tip line or mutual-aid contact on a poster (rotate QR without trusting old stickers forever).
-- Creator or campaign offering something **sensitive for a limited time**—revoke when the moment passes.
+- Creator or campaign offering something **sensitive for a limited time** - revoke when the moment passes.
 - Signed public statement, manifesto, or correction that can be **superseded or revoked** without dead stickers implying it is still current.
 
 **What this proves:** The QR credential and card resolve to an intentional status at scan time; the owner (or governance) can end or suspend that pointer.
@@ -79,15 +79,15 @@ Examples that fit the primitive when scoped honestly:
 
 | Action | Stranger sees (target UX) |
 |--------|---------------------------|
-| **Revoke QR** | “This QR is no longer valid” — minimal by default |
-| **Disable card** | “This card has been disabled” — card details hidden |
-| **Suspend** | “Suspended under public rules” — governance, not owner menu |
+| **Revoke QR** | “This QR is no longer valid”  -  minimal by default |
+| **Disable card** | “This card has been disabled”  -  card details hidden |
+| **Suspend** | “Suspended under public rules”  -  governance, not owner menu |
 
 Printed objects always keep `profile_id` and `qr_id` in the URL; lifecycle changes resolver truth, not ink.
 
 **What it does not prove:** Anonymity suitable for whistleblower threat models (a public card is pseudonymous, not a dead drop). That the person holding the printed item controls the card key. Legal identity, safety, or eligibility.
 
-**Operator note:** High-risk contexts need explicit retention, abuse, and legal review—not only a revocable QR.
+**Operator note:** High-risk contexts need explicit retention, abuse, and legal review - not only a revocable QR.
 
 ### Examples by build phase
 
@@ -95,19 +95,19 @@ Use this table to avoid building five products at once. Pilot conversations shou
 
 | Example | Primary use cases (below) | Phase | Humanity capability |
 |---|---|---|---|
-| In-person “scan my card”; follow-up without platform accounts | UC1, UC5 | **A** — MVP | Create card, HTTPS QR, trust-state scan UI, revoke |
+| In-person “scan my card”; follow-up without platform accounts | UC1, UC5 | **A**  -  MVP | Create card, HTTPS QR, trust-state scan UI, revoke |
 | Revocable public handle / bio that stays live after job or project change | UC5 | **A** | Same; optional live control proof |
 | Temporary activist, mutual-aid, or event contact on posters | UC3, UC1 | **A** | Revoke/rotate QR; status pages; no “verified forever” on print |
 | Vouched portable reputation under community rules | UC2, UC4 | **A + M6** | Vouches, verification summary on scan |
 | Live control in a meeting (“prove you hold the key”) | UC1, UC4 | **A + M7** (optional) | Short-lived challenge; separate UI block |
 | Curiosity sticker → stranger creates card | UC1, MERCH_LED | **B** | Batch/card QR; store; no merch = vouched |
 | Creator merch authenticity; limited edition still “recognized” | UC5 | **C** | Per-item QR; artifact intent; revoke one sticker |
-| Revoke stolen badge; suspend abusive attendee | UC1, UC2 | **D** — Commons Pass | Org pass, check-in, suspension under public rules |
+| Revoke stolen badge; suspend abusive attendee | UC1, UC2 | **D**  -  Commons Pass | Org pass, check-in, suspension under public rules |
 | “Current member” for co-op, club, festival | UC2 | **D** | Community pass + scan, not static plastic |
 | Workshop completed / membership active / cert expired | UC2 | **D+** | Signed community stamps; explicit issuance rules |
 | Backstage, popup, volunteer, housing access | UC1, UC2 | **D+** | Pass permissions + live status; not v1 card alone |
-| Device, lab equipment, prototype “still official / maintained?” | — | **Future** | Object/credential layer; separate spec |
-| Educational credential on transcript QR | — | **Future / ceremony** | Steward-attested credentials; not launch-critical |
+| Device, lab equipment, prototype “still official / maintained?” |  -  | **Future** | Object/credential layer; separate spec |
+| Educational credential on transcript QR |  -  | **Future / ceremony** | Steward-attested credentials; not launch-critical |
 
 **Phase key:** A = digital trust MVP (`V1_0_ARCHITECTURE_ROADMAP` M2–M5). B = curiosity drop merch. C = personalized artifact commerce. D = Commons Pass (`docs/commons/`).
 
@@ -126,9 +126,9 @@ Use this table to avoid building five products at once. Pilot conversations shou
 
 ### Strongest public framing (design space, not roadmap)
 
-> **Live public objects** — physical things that resolve to **current** signed status.
+> **Live public objects**  -  physical things that resolve to **current** signed status.
 
-Avoid leading with: social network, universal identity, crypto, or ideology. Those trigger the wrong comparisons. The node mockup reinforces **infrastructure you can point at on a wall**—that is unusually legible for a trust protocol.
+Avoid leading with: social network, universal identity, crypto, or ideology. Those trigger the wrong comparisons. The node mockup reinforces **infrastructure you can point at on a wall** - that is unusually legible for a trust protocol.
 
 **Deeper layer:** infrastructure for **changing public truth attached to physical objects**. Every row below is the same question in a different costume: *Is this still valid? Who issued it? Can I trust this printed thing right now?*
 
@@ -166,7 +166,7 @@ Not a build list. Use to test positioning, pilots, and what **not** to promise. 
 - Embedded civic kiosks · park facility open/closed · trail or beach condition beacons
 - Cooling center / warming shelter “open tonight” · disaster supply point status
 - Transit disruption plaques (“this stop detour active”) · construction site public notices
-- “Is this public Wi‑Fi the one we operate?” (operator attestation only—not crypto panacea)
+- “Is this public Wi‑Fi the one we operate?” (operator attestation only - not crypto panacea)
 
 #### Physical objects with state
 

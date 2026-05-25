@@ -1,5 +1,5 @@
 /**
- * Device shell layer — materials, rhythm, motion.
+ * Device shell layer  -  materials, rhythm, motion.
  * Loaded after styles.css on hub / wallet / created pages.
  */
 
@@ -54,12 +54,12 @@ body {
   background: transparent;
 }
 
-/* Fixed chrome — content scrolls underneath */
+/* Floating chrome - dot + optional notif badge + outline Create */
 body.has-shell-chrome .page {
-  padding-top: var(--shell-chrome-h, 48px);
+  padding-top: var(--shell-chrome-h, 52px);
 }
 
-.top-chrome,
+.top-chrome--float,
 .page > header.top {
   position: fixed;
   top: 0;
@@ -68,47 +68,113 @@ body.has-shell-chrome .page {
   width: 100%;
   max-width: 430px;
   z-index: 40;
-  background: var(--shell-chrome-bg);
-  -webkit-backdrop-filter: var(--shell-chrome-blur);
-  backdrop-filter: var(--shell-chrome-blur);
-  border-bottom: 0.5px solid var(--shell-chrome-edge);
-  transition:
-    background 0.45s var(--shell-ease),
-    border-color 0.35s var(--shell-ease);
-}
-
-.top-chrome {
-  padding-top: 0;
-}
-
-.top-chrome::before,
-.page > header.top::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: 40%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), transparent);
+  background: transparent;
+  border: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   pointer-events: none;
 }
 
-.top-chrome-bar {
-  position: relative;
-  z-index: 1;
+.top-chrome-bar--minimal {
+  pointer-events: auto;
   display: flex;
   align-items: center;
-  gap: 6px;
-  min-height: 40px;
-  padding: 4px var(--pad) 6px;
-  padding-top: calc(4px + env(safe-area-inset-top, 0px));
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 0;
+  padding: 8px var(--pad) 4px;
+  padding-top: calc(8px + env(safe-area-inset-top, 0px));
 }
 
-.top-chrome--compact .device-status-summary,
-.top-chrome--compact .device-status-search-btn {
+.shell-status-cluster {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.shell-status-dot-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.08),
+    0 0 0 0.5px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.25s var(--shell-spring);
+}
+
+.shell-status-dot-btn:active {
+  transform: scale(0.94);
+}
+
+.shell-status-dot {
+  width: 10px;
+  height: 10px;
+}
+
+.shell-notif-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.shell-notif-badge[hidden] {
   display: none;
 }
 
-.top-chrome .brand-status-popover {
-  top: 100%;
+.shell-notif-badge-ring {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--red);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 1px 6px rgba(219, 27, 67, 0.18);
+}
+
+.shell-notif-badge-count {
+  position: relative;
+  z-index: 1;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--red);
+  letter-spacing: -0.02em;
+}
+
+.top-create--outline {
+  pointer-events: auto;
+  flex-shrink: 0;
+  min-height: 36px;
+  padding: 7px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--red);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1.5px solid var(--red);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  transition: transform 0.25s var(--shell-spring), opacity 0.2s ease;
+}
+
+.top-create--outline:active {
+  transform: scale(0.97);
+  opacity: 0.88;
 }
 
 .top-brand--mark {
@@ -126,96 +192,24 @@ body.has-shell-chrome .page {
 }
 
 .page > header.top {
-  z-index: 1;
-  background: transparent;
-  border: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  box-shadow: none;
   padding-top: calc(8px + env(safe-area-inset-top, 0px));
   padding-bottom: 8px;
 }
 
-.top-create {
-  flex-shrink: 0;
-  min-height: 32px;
-  padding: 6px 14px;
-  font-size: 13px;
-  border: none;
-  background: var(--red);
-  color: var(--white);
-  box-shadow: 0 2px 12px rgba(219, 27, 67, 0.22);
+.device-hub-status-panel {
+  margin-bottom: var(--shell-space-section);
 }
 
-.top-create:active {
-  transform: scale(0.97);
-  opacity: 0.92;
+.device-hub-status-panel .device-hub-group-label {
+  margin-bottom: 8px;
 }
 
-.device-status-summary {
-  flex: 1;
-  min-width: 0;
-  padding: 4px 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--shell-label);
-  letter-spacing: -0.01em;
-  transition:
-    color 0.25s var(--shell-ease),
-    opacity 0.3s var(--shell-ease),
-    max-width 0.35s var(--shell-spring);
+.device-hub-status-list .list-row {
+  padding: 10px 0;
 }
 
-.device-status-summary[aria-expanded="true"] {
-  background: transparent;
-  color: var(--shell-label-strong);
-  box-shadow: none;
-  font-weight: 600;
-}
-
-.device-status-seg.is-highlight {
+.device-hub-status-row--alert .list-title {
   color: var(--red);
-  font-weight: 600;
-}
-
-.device-status-search-btn {
-  border: none;
-  background: var(--shell-fill-secondary);
-  box-shadow: none;
-  color: var(--shell-label-strong);
-  transition: transform 0.2s var(--shell-spring), background 0.2s var(--shell-ease);
-}
-
-.device-status-search-btn:active {
-  transform: scale(0.94);
-  background: rgba(120, 120, 128, 0.18);
-}
-
-.device-status-chevron {
-  transition: transform 0.4s var(--shell-spring), color 0.25s var(--shell-ease);
-}
-
-.brand-status-popover {
-  border: 0.5px solid var(--shell-separator);
-  background: var(--shell-surface-elevated);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  box-shadow: var(--shell-shadow-md);
-  border-radius: 16px;
-}
-
-.brand-status-sheet-row {
-  border-bottom-color: var(--shell-separator);
-}
-
-.brand-status-sheet-key {
-  text-transform: none;
-  letter-spacing: -0.01em;
-  font-weight: 500;
-  color: var(--shell-label);
 }
 
 .device-system-banner,
@@ -232,7 +226,7 @@ body.has-shell-chrome .page {
   background: rgba(0, 122, 255, 0.08);
 }
 
-/* Typography — calmer hierarchy */
+/* Typography  -  calmer hierarchy */
 .group-label,
 .device-hub-group-label,
 .section-kicker {
@@ -261,7 +255,7 @@ body.has-shell-chrome .page {
   font-weight: 400;
 }
 
-/* Grouped lists — inset material, not outlined boxes */
+/* Grouped lists  -  inset material, not outlined boxes */
 .list {
   border: none;
   background: var(--shell-fill);
@@ -377,7 +371,7 @@ button.hub-card-action.hub-use-keys {
   opacity: 1;
 }
 
-/* Buttons — filled, not outlined */
+/* Buttons  -  filled, not outlined */
 .btn-primary {
   border: none;
   box-shadow: 0 4px 16px rgba(219, 27, 67, 0.28);
@@ -400,7 +394,7 @@ button.hub-card-action.hub-use-keys {
   box-shadow: 0 4px 16px rgba(219, 27, 67, 0.28);
 }
 
-/* Created — segmented control */
+/* Created  -  segmented control */
 .created-tabs {
   border: none;
   background: rgba(118, 118, 128, 0.12);
@@ -445,7 +439,7 @@ button.hub-card-action.hub-use-keys {
   background: var(--shell-fill-secondary);
 }
 
-/* Reduce icon noise in hub shortcuts — keep color for state only */
+/* Reduce icon noise in hub shortcuts  -  keep color for state only */
 .device-hub-group[data-hub-group="shortcuts"] .list-icon {
   opacity: 0.92;
 }
@@ -583,11 +577,6 @@ body.device-hub-sheet-open {
 
 @media (prefers-reduced-motion: reduce) {
   .device-hub.device-hub--sheet {
-    transition: none;
-  }
-
-  .top-chrome--compact .device-status-summary,
-  .top-chrome--compact .device-status-search-btn {
     transition: none;
   }
 

@@ -87,7 +87,7 @@ describe("humanTrustDisplay (V-001)", () => {
     );
     expect(d.label).toBe("Registered");
     expect(d.subtitle).toBe(
-      "2 of 3 vouches accepted — not yet a Vouched Human"
+      "2 of 3 vouches accepted  -  not yet a Vouched Human"
     );
   });
 

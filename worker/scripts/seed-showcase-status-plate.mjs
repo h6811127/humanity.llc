@@ -130,7 +130,7 @@ async function main() {
     label: "Studio door · Open Thu–Sun (showcase)",
     scan_url: scanUrl,
     created_at: now,
-    note: "Showcase card — owner key not stored. Revoke only via operator DB if needed.",
+    note: "Showcase card  -  owner key not stored. Revoke only via operator DB if needed.",
   };
 
   mkdirSync(dirname(outPath), { recursive: true });

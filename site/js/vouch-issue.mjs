@@ -1,5 +1,5 @@
 /**
- * V-002 — vouch issuance on scan page when viewer has hc_created keys.
+ * V-002  -  vouch issuance on scan page when viewer has hc_created keys.
  */
 import {
   DEFAULT_VOUCH_STATEMENT,
@@ -104,7 +104,7 @@ function humanTrustSubtitle(verification) {
       : `${count} humans vouched for this card on this network.`;
   }
   if (count > 0) {
-    return `${count} of ${VOUCH_THRESHOLD} vouches accepted — needs ${VOUCH_THRESHOLD} for Vouched Human.`;
+    return `${count} of ${VOUCH_THRESHOLD} vouches accepted  -  needs ${VOUCH_THRESHOLD} for Vouched Human.`;
   }
   return "No accepted human vouches yet.";
 }

@@ -1,4 +1,4 @@
-# M5 — Stranger test runbook (Phase A exit gate)
+# M5  -  Stranger test runbook (Phase A exit gate)
 
 **Status:** Active checklist  
 **Canonical gate:** `docs/V1_0_ARCHITECTURE_ROADMAP.md` §12 Phase A exit; `docs/M3_M4_EXECUTION_PLAN.md` § M5  
@@ -12,20 +12,20 @@
 
 Run this yourself once (5 minutes):
 
-1. **Create** — `https://humanity.llc/create/` → land on `/created/`.
-2. **Scan** — open scan link on phone; confirm pass card + bearer line + “What this scan does not prove” at bottom.
-3. **Save recovery and/or download backup** — on `/created/`, save the one-time recovery key and/or encrypted backup if you care about cross-device revoke.
-4. **Session-only check** (optional but recommended) — if you close the tab without recovery/backup, the web UI should no longer be able to sign revoke until you unlock one.
-5. **Revoke QR** — on `/created/`, revoke **this QR only** (not whole card).
-6. **Re-scan** — scan link shows **QR revoked** within ~60s (cache TTL).
-7. **Status JSON** — replace `PROFILE` and `QR` below:
+1. **Create**  -  `https://humanity.llc/create/` → land on `/created/`.
+2. **Scan**  -  open scan link on phone; confirm pass card + bearer line + “What this scan does not prove” at bottom.
+3. **Save recovery and/or download backup**  -  on `/created/`, save the one-time recovery key and/or encrypted backup if you care about cross-device revoke.
+4. **Session-only check** (optional but recommended)  -  if you close the tab without recovery/backup, the web UI should no longer be able to sign revoke until you unlock one.
+5. **Revoke QR**  -  on `/created/`, revoke **this QR only** (not whole card).
+6. **Re-scan**  -  scan link shows **QR revoked** within ~60s (cache TTL).
+7. **Status JSON**  -  replace `PROFILE` and `QR` below:
 
 ```bash
 curl -sS "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status?q=QR" | jq '.scan.kind, .scan.qr.status'
 # After revoke: kind should be "qr_revoked", qr.status "revoked"
 ```
 
-8. **No analytics** — confirm scan HTML has no third-party trackers (view source / Network tab once).
+8. **No analytics**  -  confirm scan HTML has no third-party trackers (view source / Network tab once).
 
 **Deploy check:** scan response header `X-HC-Scan-UI: pass-v5` on an active scan.
 
@@ -49,7 +49,7 @@ curl -sS "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status?q=QR" | jq
 > 2) What it **does not** prove  
 >  
 > Optional: revoke the QR from the “created” page and scan again.  
-> No account, no app — just Safari/Chrome.
+> No account, no app  -  just Safari/Chrome.
 
 Do **not** send the data policy or research page unless they ask.
 
@@ -80,10 +80,10 @@ Do **not** send the data policy or research page unless they ask.
 ## After three pass
 
 1. Check boxes in `docs/M3_M4_EXECUTION_PLAN.md` § M5.
-2. Update landing **Building now** — move stranger tests to done; optional one-line public note (email list, post, or hero eyebrow).
+2. Update landing **Building now**  -  move stranger tests to done; optional one-line public note (email list, post, or hero eyebrow).
 3. **Do not** start merch (M8) or Commons Pass until M5 is checked.
 4. **Recommended next:** finish M5.5 backup confidence (import on second device) if strangers struggled with “revoke later.”
-5. **Then:** harden the stranger path with **one vertical pilot** — see `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` (status plate, lost-item relay, organizer-signed revoke; not more hub pages).
+5. **Then:** harden the stranger path with **one vertical pilot**  -  see `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` (status plate, lost-item relay, organizer-signed revoke; not more hub pages).
 
 ---
 

@@ -1,4 +1,4 @@
-# Visual system — device shell layer
+# Visual system  -  device shell layer
 
 **Status:** Shipped on device-shell pages + scan bundle  
 **Load order:** `styles.css` → `css/device-shell.css`  
@@ -8,7 +8,7 @@
 
 ## Design intent
 
-The product should feel like a **native system utility** — calm, layered, under-explained — not a dashboard or crypto admin panel.
+The product should feel like a **native system utility**  -  calm, layered, under-explained  -  not a dashboard or crypto admin panel.
 
 Principles:
 
@@ -38,21 +38,21 @@ Principles:
 
 ## Roadmap (OSification)
 
-### Phase A — Kill the “website header” (shipped v1)
+### Phase A  -  Kill the “website header” (shipped v1)
 
-1. **Scroll-edge chrome** — fixed `top-chrome`, content inset via `--shell-chrome-h`, single-row bar; status collapses on scroll down (`device-shell-chrome.mjs`).
-2. **Hub as sheet** — `/`, `/wallet/`, `/created/` use `device-hub--sheet` + backdrop (`device-hub-sheet.mjs`).
-3. **Landing de-explain** — shorter hero + compact framing on `/` (more trimming possible).
+1. **Scroll-edge chrome**  -  fixed `top-chrome`, content inset via `--shell-chrome-h`, single-row bar; status collapses on scroll down (`device-shell-chrome.mjs`).
+2. **Hub as sheet**  -  `/`, `/wallet/`, `/created/` use `device-hub--sheet` + backdrop (`device-hub-sheet.mjs`).
+3. **Landing de-explain**  -  shorter hero + compact framing on `/` (more trimming possible).
 
-### Phase B — Object continuity (in progress)
+### Phase B  -  Object continuity (in progress)
 
-4. **Card open transition** — `openCardNowPage` uses `document.startViewTransition` when available; trust dot CSS transition added.
-5. **Trust state morph** — dot / shield / revoke states animate between segments, not swap instantly.
-6. **Scan environments** — scan HTML as stacked trust layers (pass → limits → live control), not centered cards on a page.
+4. **Card open transition**  -  `openCardNowPage` uses `document.startViewTransition` when available; trust dot CSS transition added.
+5. **Trust state morph**  -  dot / shield / revoke states animate between segments, not swap instantly.
+6. **Scan environments**  -  scan HTML as stacked trust layers (pass → limits → live control), not centered cards on a page.
 
-### Phase C — Native shell (optional)
+### Phase C  -  Native shell (optional)
 
-7. **WKWebView wrapper** — haptics on save / revoke / prove; safe-area owned by shell not CSS sticky hacks.
+7. **WKWebView wrapper**  -  haptics on save / revoke / prove; safe-area owned by shell not CSS sticky hacks.
 
 ---
 

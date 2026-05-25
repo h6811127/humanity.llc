@@ -16,11 +16,11 @@ describe("parseManifestoDisplay", () => {
   });
 
   it("parses lost item relay prefix", () => {
-    const r = parseManifestoDisplay(`${LOST_ITEM_RELAY_PREFIX}Keys\nLost — relay active`);
+    const r = parseManifestoDisplay(`${LOST_ITEM_RELAY_PREFIX}Keys\nLost  -  relay active`);
     expect(r.kind).toBe("lost_item_relay");
     if (r.kind === "lost_item_relay") {
       expect(r.objectLabel).toBe("Keys");
-      expect(r.statusLine).toBe("Lost — relay active");
+      expect(r.statusLine).toBe("Lost  -  relay active");
     }
   });
 

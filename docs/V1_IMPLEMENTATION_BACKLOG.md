@@ -136,7 +136,7 @@ These are not engineering tasks. They are short owner decisions needed to preven
 
 ### D-007: Separate Product, Trust, And Movement Layers
 
-**Recommendation:** Keep the scan/card UI practical and fast. Put movement narrative, launch language, skeptic answers, and governance depth in supporting pages—not on the scan surface. See `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
+**Recommendation:** Keep the scan/card UI practical and fast. Put movement narrative, launch language, skeptic answers, and governance depth in supporting pages - not on the scan surface. See `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
 
 **Decision needed:**
 
@@ -330,7 +330,7 @@ Goal: launch the identity core without commerce.
 
 ### R-003: Revocation And Suspension Status Pages
 
-**Product spec:** `docs/REVOKE_AND_LIFECYCLE_V1.md` — Revoke QR vs Disable card, minimal scan pages, owner warnings, planned privacy modes.
+**Product spec:** `docs/REVOKE_AND_LIFECYCLE_V1.md`  -  Revoke QR vs Disable card, minimal scan pages, owner warnings, planned privacy modes.
 
 **Build:**
 

@@ -46,7 +46,7 @@ export interface ScanStatusBody {
       vouch_count: number;
       latest_accepted_vouch_at: string | null;
     };
-    /** V-001 scan copy — matches Human trust row on scan HTML */
+    /** V-001 scan copy  -  matches Human trust row on scan HTML */
     human_trust: {
       label: string;
       subtitle: string;

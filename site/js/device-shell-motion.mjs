@@ -1,5 +1,5 @@
 /**
- * Device shell motion — spring continuity, reduced-motion safe.
+ * Device shell motion  -  spring continuity, reduced-motion safe.
  */
 const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 

@@ -1,12 +1,14 @@
 /**
- * Header status line, brand dot popover, collapsible On this device hub.
+ * Floating status dot, notification badge, hub sheet host.
  */
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { buildStatusSegments, tabNoticeCount } from "./device-counts.mjs";
+import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
+import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import "./device-shell-motion.mjs";
 import "./device-shell-chrome.mjs";
 import { isHubSheet, setHubSheetOpen } from "./device-hub-sheet.mjs";
@@ -26,17 +28,15 @@ const DEVICE_CLASSES = [
   "pass-dot-status-device-unsaved",
 ];
 
-const summaryBtn = document.getElementById("device-status-summary");
-const segmentsEl = document.getElementById("device-status-segments");
 const dotBtn = document.getElementById("brand-status-dot-btn");
 const dot = document.getElementById("brand-status-dot");
-const popover = document.getElementById("brand-status-popover");
-const popoverSheet = document.getElementById("brand-status-sheet");
+const notifBtn = document.getElementById("shell-notif-badge");
+const notifCountEl = document.getElementById("shell-notif-badge-count");
+const hubStatusPanel = document.getElementById("device-hub-status-panel");
 const hub = document.getElementById("device-hub");
 const systemBanner = document.getElementById("device-system-banner");
 
 let networkStatus = "offline";
-let popoverOpen = false;
 
 function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -62,6 +62,20 @@ function deviceState() {
   return "none";
 }
 
+function crossTabNoticeCount() {
+  if (tabNoticeCount() > 0) return 0;
+  const session = getTabSession();
+  const thisHasKeys = !!(session?.profile_id && session?.owner_private_key_b58);
+  const others = getOtherTabsWithKeys();
+  if (others.length === 0) return 0;
+  if (!thisHasKeys) return 1;
+  return others.some((o) => o.profile_id !== session.profile_id) ? 1 : 0;
+}
+
+export function notificationCount() {
+  return tabNoticeCount() + getLiveControlPendingCount() + crossTabNoticeCount();
+}
+
 export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
   if (!hub) return;
   if (isHubSheet()) {
@@ -69,7 +83,7 @@ export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
   } else {
     hub.classList.toggle("device-hub-collapsed", !open);
   }
-  if (summaryBtn) summaryBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  if (dotBtn) dotBtn.setAttribute("aria-expanded", open ? "true" : "false");
   if (persist) {
     sessionStorage.setItem(HUB_OPEN_KEY, open ? "1" : "0");
   }
@@ -85,59 +99,14 @@ function applyDot() {
   dot.classList.add(`pass-dot-status-device-${device}`);
 }
 
-function renderSegments() {
-  const segments = buildStatusSegments(networkStatus);
-  if (!segmentsEl) return segments;
-
-  segmentsEl.innerHTML = "";
-  segments.forEach((seg, i) => {
-    if (i > 0) {
-      const sep = document.createElement("span");
-      sep.className = "device-status-sep";
-      sep.setAttribute("aria-hidden", "true");
-      sep.textContent = " · ";
-      segmentsEl.appendChild(sep);
-    }
-    const span = document.createElement("span");
-    span.className = "device-status-seg";
-    span.dataset.seg = seg.id;
-    if (seg.zero) span.classList.add("is-zero");
-    if (seg.highlight) span.classList.add("is-highlight");
-    span.textContent = seg.label;
-    segmentsEl.appendChild(span);
-  });
-  return segments;
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
-function renderPopoverSheet(segments) {
-  if (!popoverSheet) return;
-  popoverSheet.innerHTML = "";
-  for (const seg of segments) {
-    const row = document.createElement("button");
-    row.type = "button";
-    row.className = "brand-status-sheet-row";
-    row.dataset.seg = seg.id;
-    row.innerHTML = `<span class="brand-status-sheet-key">${escapeSheetKey(seg.id)}</span><span class="brand-status-sheet-val">${seg.detail}</span>`;
-    row.addEventListener("click", () => {
-      handleSegmentAction(seg.id);
-      setPopover(false);
-    });
-    popoverSheet.appendChild(row);
-  }
-  if (
-    document.getElementById("landing-docs-footer") ||
-    document.body.classList.contains("device-shell-wallet")
-  ) {
-    const help = document.createElement("a");
-    help.href = "/features-available-now.html";
-    help.className = "brand-status-sheet-row brand-status-sheet-link";
-    help.innerHTML =
-      '<span class="brand-status-sheet-key">Help</span><span class="brand-status-sheet-val">Protocol &amp; features ›</span>';
-    popoverSheet.appendChild(help);
-  }
-}
-
-function escapeSheetKey(id) {
+function segmentSheetKey(id) {
   const map = {
     network: "Resolver",
     saved: "On device",
@@ -148,45 +117,64 @@ function escapeSheetKey(id) {
   return map[id] || id;
 }
 
-function handleSegmentAction(segId) {
-  if (segId === "network") return;
-  if (segId === "notices" && tabNoticeCount() > 0) {
-    setHubExpanded(true, { haptic: true });
+function renderHubStatusPanel(segments) {
+  if (!hubStatusPanel) return;
+  const rows = segments
+    .map(
+      (seg) => `
+    <li class="list-row device-hub-status-row${seg.highlight ? " device-hub-status-row--alert" : ""}">
+      <span class="list-content">
+        <span class="list-title">${escapeHtml(segmentSheetKey(seg.id))}</span>
+        <span class="list-sub">${escapeHtml(seg.detail)}</span>
+      </span>
+    </li>`
+    )
+    .join("");
+
+  hubStatusPanel.innerHTML = `
+    <p class="device-hub-group-label">System</p>
+    <ul class="list list-compact device-hub-status-list">${rows}</ul>`;
+}
+
+function renderNotifBadge() {
+  if (!notifBtn) return;
+  const n = notificationCount();
+  notifBtn.hidden = n === 0;
+  if (notifCountEl) {
+    notifCountEl.textContent = n > 9 ? "9+" : String(n);
+  }
+}
+
+function scrollToFirstNotification() {
+  if (tabNoticeCount() > 0) {
     document.getElementById("device-hub-notice-group")?.scrollIntoView({
       behavior: prefersReducedMotion() ? "auto" : "smooth",
       block: "nearest",
     });
     return;
   }
-  setHubExpanded(true, { haptic: true });
-  if (segId === "saved") {
-    document.getElementById("device-hub-saved-group")?.scrollIntoView({
-      behavior: prefersReducedMotion() ? "auto" : "smooth",
-      block: "nearest",
-    });
-  }
-  if (segId === "pinned") {
-    document.getElementById("device-hub-pins-group")?.scrollIntoView({
-      behavior: prefersReducedMotion() ? "auto" : "smooth",
-      block: "nearest",
-    });
-  }
-  if (segId === "liveproof") {
+  if (getLiveControlPendingCount() > 0) {
     document.getElementById("device-hub-live-control-group")?.scrollIntoView({
       behavior: prefersReducedMotion() ? "auto" : "smooth",
       block: "nearest",
     });
+    return;
   }
-}
-
-function setPopover(open) {
-  popoverOpen = open;
-  if (popover) popover.hidden = !open;
-  if (dotBtn) dotBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  if (crossTabNoticeCount() > 0) {
+    document.getElementById("device-hub-notice-group")?.scrollIntoView({
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
+      block: "nearest",
+    });
+  }
 }
 
 function renderSystemBanner() {
   if (!systemBanner) return;
+  if (hubStatusPanel) {
+    systemBanner.hidden = true;
+    systemBanner.textContent = "";
+    return;
+  }
   if (networkStatus === "ok") {
     systemBanner.hidden = true;
     systemBanner.textContent = "";
@@ -195,22 +183,22 @@ function renderSystemBanner() {
   systemBanner.hidden = false;
   systemBanner.textContent =
     networkStatus === "degraded"
-      ? "Resolver limited — create, update, and revoke may fail until service recovers."
-      : "Resolver offline — scans may still load; signing needs a connection.";
+      ? "Resolver limited - create, update, and revoke may fail until service recovers."
+      : "Resolver offline - scans may still load; signing needs a connection.";
 }
 
 function refreshSummary() {
-  const segments = renderSegments();
-  renderPopoverSheet(segments);
+  const segments = buildStatusSegments(networkStatus);
+  renderHubStatusPanel(segments);
   applyDot();
+  renderNotifBadge();
   renderSystemBanner();
   renderCrossTabKeysBanner();
-  maybeAutoExpandNotice();
   refreshHubGlance();
 }
 
 function maybeAutoExpandNotice() {
-  if (!hub || tabNoticeCount() === 0) return;
+  if (!hub || notificationCount() === 0) return;
   if (sessionStorage.getItem(NOTICE_EXPAND_KEY) === "1") return;
   sessionStorage.setItem(NOTICE_EXPAND_KEY, "1");
   setHubExpanded(true, { persist: false });
@@ -253,6 +241,12 @@ function maybeExpandWalletHub() {
   setHubExpanded(true, { persist: true });
 }
 
+function toggleHubFromChrome() {
+  if (!hub) return;
+  const open = hub.classList.contains("device-hub-collapsed");
+  setHubExpanded(open, { haptic: true, persist: true });
+}
+
 if (hub) {
   if (location.pathname.startsWith("/wallet")) {
     maybeExpandWalletHub();
@@ -270,60 +264,32 @@ window.addEventListener("hc-landing-focus-on", () => {
   if (hub) setHubExpanded(true, { persist: true, haptic: false });
 });
 
-summaryBtn?.addEventListener("click", () => {
-  setPopover(false);
-  if (hub) {
-    const open = hub.classList.contains("device-hub-collapsed");
-    setHubExpanded(open, { haptic: true });
-    return;
-  }
-  document.getElementById("device-hub")?.scrollIntoView({
-    behavior: prefersReducedMotion() ? "auto" : "smooth",
-    block: "start",
-  });
-});
-
-const statusSearchBtn = document.getElementById("device-status-search");
-statusSearchBtn?.addEventListener("click", (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-  setPopover(false);
-  setHubExpanded(true, { haptic: true });
-  window.dispatchEvent(new Event("hc-focus-hub-search"));
-});
-
 dotBtn?.addEventListener("click", (e) => {
   e.preventDefault();
   e.stopPropagation();
-  setPopover(false);
-  if (hub) {
-    setHubExpanded(true, { haptic: true, persist: true });
-    return;
-  }
-  setPopover(!popoverOpen);
-  hapticTap();
+  toggleHubFromChrome();
 });
 
-document.addEventListener("click", (e) => {
-  if (!popoverOpen || !popover) return;
-  const target = e.target;
-  if (target instanceof Node && (popover.contains(target) || dotBtn?.contains(target))) {
-    return;
-  }
-  setPopover(false);
+notifBtn?.addEventListener("click", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  setHubExpanded(true, { haptic: true, persist: true });
+  window.setTimeout(scrollToFirstNotification, 120);
 });
 
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    setPopover(false);
-    if (hub && !hub.classList.contains("device-hub-collapsed")) {
-      setHubExpanded(false, { haptic: false });
-    }
+  if (e.key === "Escape" && hub && !hub.classList.contains("device-hub-collapsed")) {
+    setHubExpanded(false, { haptic: false });
   }
 });
 
 window.addEventListener("hc-hub-sheet-close", () => {
   setHubExpanded(false, { haptic: false, persist: true });
+});
+
+window.addEventListener("hc-focus-hub-search", () => {
+  setHubExpanded(true, { haptic: false, persist: true });
+  document.getElementById("device-hub-search")?.focus({ preventScroll: true });
 });
 
 startTabKeysPresence();

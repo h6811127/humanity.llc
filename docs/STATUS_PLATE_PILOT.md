@@ -21,12 +21,12 @@ Not a bio link. Not legal ID. Object name + live network status.
 1. Go to **https://humanity.llc/create/**
 2. Choose **Status plate** under “Start from”
 3. Fill in:
-   - **Handle** — your card id (e.g. `river_studio`)
-   - **What is this plate on?** — headline on scan (e.g. `Studio door`)
-   - **What should scanners see?** — status line (e.g. `Open · Thu–Sun until 9 PM`)
+   - **Handle**  -  your card id (e.g. `river_studio`)
+   - **What is this plate on?**  -  headline on scan (e.g. `Studio door`)
+   - **What should scanners see?**  -  status line (e.g. `Open · Thu–Sun until 9 PM`)
 4. Save recovery key on `/created/`, print QR, scan from another phone, **update the status line** on `/created/`, then revoke to test.
 
-Public showcase scan (homepage pilot): see `site/data/showcase-status-plate.json` — refresh with `npm run site:seed-showcase`.
+Public showcase scan (homepage pilot): see `site/data/showcase-status-plate.json`  -  refresh with `npm run site:seed-showcase`.
 
 ### Storage format (no new API field)
 
@@ -48,7 +48,7 @@ Line 1 = object label · Line 2 = status detail. The scan page detects this and 
 - **Status line:** line 2 (emphasized)  
 - **Handle:** smaller `@handle` under the status  
 - **Badge:** Active / Revoked / etc. from network  
-- **Foot:** “Scan shows current status for this place—not who owns the door.”
+- **Foot:** “Scan shows current status for this place - not who owns the door.”
 
 Deploy Worker with `X-HC-Scan-UI: pass-v7` for this layout.
 
@@ -71,7 +71,7 @@ Deploy Worker with `X-HC-Scan-UI: pass-v7` for this layout.
 - Calendar / geofence auto-open  
 - “Scans to restore” gamification (landing demo only)
 
-**Status line edits:** shipped — `docs/MANIFESTO_STATUS_UPDATE.md`, **Update public line** on `/created/`.
+**Status line edits:** shipped  -  `docs/MANIFESTO_STATUS_UPDATE.md`, **Update public line** on `/created/`.
 
 ---
 

@@ -1,4 +1,4 @@
-# M3 — Public scan page UI (`GET /c/{profile_id}?q={qr_id}`)
+# M3  -  Public scan page UI (`GET /c/{profile_id}?q={qr_id}`)
 
 **Status:** Implementation contract for Worker HTML  
 **Related:** `docs/V1_PRODUCT_TRUST_MODEL.md` §7, `docs/V1_0_ARCHITECTURE_ROADMAP.md` §7, `docs/V1_IMPLEMENTATION_CONTRACTS.md` (QR payload)
@@ -15,9 +15,9 @@ Response header when the new UI is live: `X-HC-Scan-UI: pass-v4` (or later).
 
 ## Layout (three layers)
 
-1. **Pass card (front)** — At-a-glance identity: handle, manifesto, trust pills, **this card’s scan QR**, one-line bearer foot.
-2. **Pass card (back)** — Short limits only (same pattern as landing preview): bearer, not ID, revocable, link to data policy.
-3. **Grouped lists below** — iOS-style sections per trust model: Card status, Human trust, This QR, Live control, Limitations.
+1. **Pass card (front)**  -  At-a-glance identity: handle, manifesto, trust pills, **this card’s scan QR**, one-line bearer foot.
+2. **Pass card (back)**  -  Short limits only (same pattern as landing preview): bearer, not ID, revocable, link to data policy.
+3. **Grouped lists below**  -  iOS-style sections per trust model: Card status, Human trust, This QR, Live control, Limitations.
 
 Do **not** put full trust copy on the card back (it clips). Spec blocks live in the lists below.
 
@@ -73,7 +73,7 @@ After changing `scan-pass.css` or `pass-flip.js`, run `npm run worker:bundle-sca
 | Card status | Pill + badge | Group: status, profile id, does not prove |
 | Human trust | Pill | Group: label, vouches, does not prove |
 | This QR | Pill | Group: QR status, scope, credential id, scan link, bearer warning |
-| Live control | — | Group: not shown / proven (M7) |
+| Live control |  -  | Group: not shown / proven (M7) |
 | Limitations | Back face summary | Group: not ID, no analytics, data policy link |
 
 **Limits copy:** one line above the card (`scan-bearer-line`, Level 0 canonical sentence). Status groups are **facts only** (card, human trust, QR, live control). All “does not prove” detail lives in one **settings-style** `<details>` row at the bottom (`scan-limits-settings`). Response header `X-HC-Scan-UI: pass-v5`.

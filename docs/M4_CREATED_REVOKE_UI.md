@@ -1,4 +1,4 @@
-# M4.2 — Owner revoke on `/created/`
+# M4.2  -  Owner revoke on `/created/`
 
 **Status:** Implementation contract (Phase A)  
 **API:** `POST /.well-known/hc/v1/cards/{profile_id}/revoke` (`worker/src/resolver/revoke.ts`)  
@@ -10,13 +10,13 @@
 ## Product rules
 
 1. **Private key never leaves the browser** except as a signed `revocation` document POSTed to the resolver.
-2. **Session-only key storage** — at create, `create-card.mjs` stores `owner_private_key_b58` in `sessionStorage` (`hc_created`). Closing the tab clears it. No localStorage, no server upload.
-3. **Revoke requires signing material** — session key, encrypted backup import, or recovery key on `/created/` (`docs/M5_5_OWNER_KEY_PORTABILITY.md`). Opening `/created/?profile_id=…&qr_id=…` without any of these shows read-only copy; owner actions stay hidden.
+2. **Session-only key storage**  -  at create, `create-card.mjs` stores `owner_private_key_b58` in `sessionStorage` (`hc_created`). Closing the tab clears it. No localStorage, no server upload.
+3. **Revoke requires signing material**  -  session key, encrypted backup import, or recovery key on `/created/` (`docs/M5_5_OWNER_KEY_PORTABILITY.md`). Opening `/created/?profile_id=…&qr_id=…` without any of these shows read-only copy; owner actions stay hidden.
 4. **Two owner actions** (per Standards §10 + item-scoped QR):
-   - **Revoke this scan QR** — `target_kind: qr_credential`, `target_qr_id` = credential id. UI label stays **Revoke this QR**.
-   - **Disable card** (API: `target_kind: card`) — UI label **Disable card** per `REVOKE_AND_LIFECYCLE_V1.md`.
-5. **Confirm before submit** — checkbox + disabled button until checked (no accidental tap).
-6. **Live status** — on load, `GET …/status?q=` shows resolver truth; after revoke, user can open scan URL to verify.
+   - **Revoke this scan QR**  -  `target_kind: qr_credential`, `target_qr_id` = credential id. UI label stays **Revoke this QR**.
+   - **Disable card** (API: `target_kind: card`)  -  UI label **Disable card** per `REVOKE_AND_LIFECYCLE_V1.md`.
+5. **Confirm before submit**  -  checkbox + disabled button until checked (no accidental tap).
+6. **Live status**  -  on load, `GET …/status?q=` shows resolver truth; after revoke, user can open scan URL to verify.
 
 ---
 
@@ -53,14 +53,14 @@ Session-only keys are intentional for Phase A. **Encrypted export/import** and o
 
 ## Lifecycle UX (M4.5 + M4.6)
 
-**Product frame:** `/created/#revoke-rules` is titled **Object lifecycle** — revoke is one state transition, not “delete the QR.” See `docs/REVOKE_AND_LIFECYCLE_V1.md` § State transitions.
+**Product frame:** `/created/#revoke-rules` is titled **Object lifecycle**  -  revoke is one state transition, not “delete the QR.” See `docs/REVOKE_AND_LIFECYCLE_V1.md` § State transitions.
 
 | Feature | Status |
 |---------|--------|
-| Minimal scan (QR revoked, card disabled, QR expired) | Shipped — `pass-v10` |
+| Minimal scan (QR revoked, card disabled, QR expired) | Shipped  -  `pass-v10` |
 | **Show link** on scan pages | Shipped |
 | **Disable card** + **Revoke this QR** labels and ID warnings | Shipped |
 | **Revoke rules** explainer (`/created/#revoke-rules`) | Shipped |
-| Validity at create (7 / 30 / 90 / 365 days) | Shipped — M4.6 |
+| Validity at create (7 / 30 / 90 / 365 days) | Shipped  -  M4.6 |
 
-Optional privacy modes (`display_mode`), revoke-on-next-scan: `docs/REVOKE_AND_LIFECYCLE_V1.md` — not shipped.
+Optional privacy modes (`display_mode`), revoke-on-next-scan: `docs/REVOKE_AND_LIFECYCLE_V1.md`  -  not shipped.

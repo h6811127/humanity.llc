@@ -1,7 +1,7 @@
 /**
  * Pilot manifesto layouts (two lines, line 1 may carry a prefix):
  * - Status plate: "Studio door" + "Open until 9 PM"
- * - Lost item relay: "[relay] Keys" + "Lost — contact owner via relay"
+ * - Lost item relay: "[relay] Keys" + "Lost  -  contact owner via relay"
  */
 export const LOST_ITEM_RELAY_PREFIX = "[relay] ";
 

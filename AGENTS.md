@@ -31,7 +31,7 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 ### Non-obvious notes
 
 - The Worker health endpoint is at `/.well-known/hc/v1/health`. If `database` shows `schema_missing`, run migrations.
-- The D1 database is emulated locally by Wrangler — no external SQLite or Cloudflare account needed for dev.
+- The D1 database is emulated locally by Wrangler  -  no external SQLite or Cloudflare account needed for dev.
 - Card creation requires Ed25519-signed JSON documents (card + qr_credential). Test fixtures in `worker/tests/fixtures/` provide valid signed payloads.
 - The `CLOUDFLARE_API_TOKEN` env var is only needed for remote deployment, not local dev/test.
-- Wrangler may print deprecation warnings about Vite CJS build — these are harmless.
+- Wrangler may print deprecation warnings about Vite CJS build  -  these are harmless.

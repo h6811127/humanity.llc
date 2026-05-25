@@ -1,4 +1,4 @@
-# Cloudflare Pages — use directory index files (same pattern as /created/).
+# Cloudflare Pages  -  use directory index files (same pattern as /created/).
 # Do not rewrite /create → create.html (Pages 308-strips .html and causes a redirect loop).
 
 /create  /create/  301

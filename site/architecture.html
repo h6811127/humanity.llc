@@ -37,7 +37,7 @@
 
         <p class="insight">
           The product is not “a QR that links somewhere.” It is
-          <strong>signed public state</strong> that any camera can read — with honest limits on what
+          <strong>signed public state</strong> that any camera can read  -  with honest limits on what
           a scan proves.
         </p>
 
@@ -167,7 +167,7 @@
                 <span class="list-title">Resolver (public)</span>
                 <span class="list-sub"
                   >Signed card JSON, QR credential rows, status flags, vouches, revocation
-                  records. Returns scan HTML + JSON — not a people trail.</span
+                  records. Returns scan HTML + JSON  -  not a people trail.</span
                 >
               </span>
             </li>
@@ -220,7 +220,7 @@
                 <span class="list-title">Mechanism-revealing scan UI</span>
                 <span class="list-sub"
                   >Separate card status, human trust, QR status, and live control. Limits live in one
-                  settings row — not buried in marketing copy.</span
+                  settings row  -  not buried in marketing copy.</span
                 >
               </span>
             </li>
@@ -228,7 +228,7 @@
               <span class="list-content">
                 <span class="list-title">Not blockchain, not legal ID</span>
                 <span class="list-sub"
-                  >Signed social state for communities that refuse surveillance — not KYC, not a
+                  >Signed social state for communities that refuse surveillance  -  not KYC, not a
                   global uniqueness oracle.</span
                 >
               </span>
@@ -239,7 +239,7 @@
         <section class="group">
           <h2 class="group-label">Security &amp; assurance</h2>
           <p class="group-intro short">
-            Words like <em>signed</em>, <em>revoke</em>, and <em>resolver</em> need backing — threat
+            Words like <em>signed</em>, <em>revoke</em>, and <em>resolver</em> need backing  -  threat
             models, failure modes, tests, and clean boundaries. The repo documents these for reviewers
             and implementers.
           </p>
@@ -252,7 +252,7 @@
                 <span class="list-title">Threat model &amp; adversarial review</span>
                 <span class="list-sub"
                   >Abuse paths (collusion, replay, stolen stickers), privacy leaks, and required
-                  hardening — documented before broad launch.</span
+                  hardening  -  documented before broad launch.</span
                 >
               </span>
             </li>
@@ -275,7 +275,7 @@
               <span class="list-content">
                 <span class="list-title">Automated tests (Worker)</span>
                 <span class="list-sub"
-                  >Vitest covers create, scan, revoke, live control, crypto, CORS, and key backup —
+                  >Vitest covers create, scan, revoke, live control, crypto, CORS, and key backup  - 
                   run <code>npm run worker:test</code> before deploy.</span
                 >
               </span>
@@ -288,7 +288,7 @@
                 <span class="list-title">Key recovery boundaries</span>
                 <span class="list-sub"
                   >Owner key stays in browser; recovery key or encrypted backup unlocks revoke/live
-                  proof later. Operator cannot reset or impersonate — lost keys mean lost signing
+                  proof later. Operator cannot reset or impersonate  -  lost keys mean lost signing
                   ability.</span
                 >
               </span>

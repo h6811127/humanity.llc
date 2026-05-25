@@ -10,11 +10,11 @@ import {
 } from "./verification-display";
 import { renderScanQrMarkup } from "./scan-qr";
 
-/** Response header — confirms pass-card scan UI (not legacy .block layout). */
+/** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
 export const SCAN_UI_VERSION = "pass-v17";
 
 /**
- * Public scan UI — flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
+ * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
  */
 export async function renderScanPage(
   vm: ScanViewModel,
@@ -62,7 +62,7 @@ export async function renderScanPage(
 </html>`;
 }
 
-/** Client fallback — same encoder as /created/ (`qr-render.mjs`). Never use brand PNG. */
+/** Client fallback  -  same encoder as /created/ (`qr-render.mjs`). Never use brand PNG. */
 function renderQrFallbackScript(
   origin: string,
   scanUrl: string | null
@@ -83,7 +83,7 @@ if (slot && !slot.querySelector("svg") && slot.dataset.scanUrl) {
 </script>`;
 }
 
-/** M3.3 — one line above the card (full detail in limits settings below). */
+/** M3.3  -  one line above the card (full detail in limits settings below). */
 function renderBearerLine(): string {
   return `<p class="scan-bearer-line" role="note">${escapeHtml(BEARER_WARNING)}</p>`;
 }
@@ -213,7 +213,7 @@ function renderPassFront(
 
   if (display.kind === "status_plate") {
     const passFoot =
-      "Scan shows current status for this place—not who owns the door.";
+      "Scan shows current status for this place - not who owns the door.";
     return `<div class="pass-head">
   <div class="pass-brand">
     <span class="pass-dot" aria-hidden="true"></span>
@@ -290,7 +290,7 @@ function renderPassFront(
 <p class="pass-foot">${escapeHtml(passFoot)}</p>`;
 }
 
-/** Back — status hints only; limits live in settings row below the card. */
+/** Back  -  status hints only; limits live in settings row below the card. */
 function renderPassBack(origin: string): string {
   return `<div class="pass-back-accent" aria-hidden="true"></div>
 <div class="pass-back-inner">
@@ -315,7 +315,7 @@ function renderPassBack(origin: string): string {
 </div>`;
 }
 
-/** Spec §7 / roadmap §7 — separate grouped blocks below the card. */
+/** Spec §7 / roadmap §7  -  separate grouped blocks below the card. */
 function renderTrustGroups(vm: ScanViewModel, origin: string): string {
   const sections: string[] = [];
 
@@ -446,7 +446,7 @@ function renderVouchSection(vm: ScanViewModel, origin: string): string {
       To attest for someone else, activate <strong>your</strong> card in
       <a href="${escapeHtml(walletUrl)}">Saved cards</a> (or
       <a href="${escapeHtml(createUrl)}">create one</a>), then return to this scan page.
-      Your private key never uploads — only the signed vouch does.
+      Your private key never uploads  -  only the signed vouch does.
     </p>
   </div>
   <ul class="list vouch-list">
@@ -459,7 +459,7 @@ function qrGroupRows(vm: ScanViewModel): string {
   const status = vm.qrStatus ? `QR ${formatQrStatus(vm.qrStatus)}` : "QR unknown";
   const scope =
     vm.qrScope === "print_artifact"
-      ? "Printed item — revoke one artifact without killing the card"
+      ? "Printed item  -  revoke one artifact without killing the card"
       : "Card-scoped credential";
   const rows = [listRow("qr", qrStatusIconTone(vm), status, scope)];
   if (vm.qrId) {
@@ -569,7 +569,7 @@ function liveControlInteractiveRow(provenAt: string | null): string {
         </div>
       </div>
       <p class="live-control-lead">
-        Ask the owner to prove they hold the signing key for this object — right now, on the spot.
+        Ask the owner to prove they hold the signing key for this object  -  right now, on the spot.
       </p>
       <button type="button" class="live-control-cta" id="live-control-request">
         Ask for live proof
@@ -797,7 +797,7 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
     if (ownerCopy) {
       var proven = getProvenIso();
       ownerCopy.textContent = proven
-        ? "Control proven from this device. The scanner should see success on their screen — you do not need to ask again here."
+        ? "Control proven from this device. The scanner should see success on their screen  -  you do not need to ask again here."
         : "This section is for someone else scanning your QR. When they ask for live proof, open your card page to sign.";
     }
     return true;
@@ -813,7 +813,7 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
             copyOwnerLink.textContent = "Copy owner link";
           }, 2000);
         }).catch(function () {
-          copyOwnerLink.textContent = "Copy failed — use Open link";
+          copyOwnerLink.textContent = "Copy failed  -  use Open link";
         });
       };
     }
@@ -967,7 +967,7 @@ function liveControlApiOrigin(vm: ScanViewModel, fallback: string): string {
   return fallback;
 }
 
-/** iOS-style settings row — all “does not prove” copy in one place. */
+/** iOS-style settings row  -  all “does not prove” copy in one place. */
 function renderLimitsSettings(origin: string): string {
   const policy = `${origin}/data-policy.html`;
   const architecture = `${origin}/architecture.html`;
@@ -986,7 +986,7 @@ function renderLimitsSettings(origin: string): string {
       <li>Employment eligibility, age verification, or a hidden trust score</li>
       <li>That social vouches were honest or complete</li>
       <li>Permanent ownership of a physical item (lifecycle transitions can change state)</li>
-      <li>Who scanned, when, or where — this page returns object state, not a people trail</li>
+      <li>Who scanned, when, or where  -  this page returns object state, not a people trail</li>
     </ul>
     <p class="scan-limits-meta">No scan analytics on this page. <a href="${escapeHtml(policy)}">Operator data policy</a> · <a href="${escapeHtml(architecture)}">Architecture</a></p>
   </div>
@@ -1059,7 +1059,7 @@ function scanLead(vm: ScanViewModel): string {
         return "Current status for this place on the network.";
       }
       if (display.kind === "lost_item_relay") {
-        return "Return instructions for this item — relay active or revoked at scan time.";
+        return "Return instructions for this item  -  relay active or revoked at scan time.";
       }
       return "The network returned current status for this card and QR.";
     }

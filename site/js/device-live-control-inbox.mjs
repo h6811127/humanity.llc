@@ -1,6 +1,6 @@
 /**
  * Poll resolver for pending live-control challenges on saved wallet cards.
- * Signing stays on /created/ — inbox only surfaces waiting requests.
+ * Signing stays on /created/  -  inbox only surfaces waiting requests.
  */
 import { getPendingLiveControlChallengeUrl } from "./hc-sign.mjs";
 import { activateWalletEntry, createdUrlForEntry } from "./device-keys.mjs";
