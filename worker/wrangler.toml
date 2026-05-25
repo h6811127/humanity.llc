@@ -22,8 +22,11 @@ preview_database_id = "f16391f9-613a-4506-9ad7-35d19178b8b6"
 [dev]
 port = 8787
 
+# Daily orphan card purge (04:00 UTC). See docs/CARD_RETENTION_AND_ORPHAN_CLEANUP.md
+[triggers]
+crons = ["0 4 * * *"]
 
- [[routes]]
+[[routes]]
  pattern = "humanity.llc/.well-known/hc/v1/*"
  zone_id = "180ee38ceea795d281fb5a3bd51af533"
  [[routes]]

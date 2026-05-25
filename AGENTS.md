@@ -23,7 +23,9 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 
 - **Install deps**: `npm install`
 - **Migrations**: `npm run worker:migrate:local` (idempotent, required before worker:dev)
-- **Tests**: `npm run worker:test` (Vitest, 56 tests across 8 files)
+- **Tests**: `npm run worker:test` (Vitest, worker tests under `worker/tests/`)
+- **Orphan purge**: Daily cron purges abandoned cards per `docs/CARD_RETENTION_AND_ORPHAN_CLEANUP.md`
+- **Landing desktop**: Wider two-column intro at ≥880px per `docs/LANDING_DESKTOP_LAYOUT.md`
 - **Build check**: `npm run build` (validates static site exists)
 - **Worker dev**: `npm run worker:dev`
 - **Pages dev**: `npm run pages:dev`

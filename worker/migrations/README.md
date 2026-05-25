@@ -25,6 +25,8 @@ Reference resolver SQLite schema for Cloudflare D1. Implements roadmap step **1.
 
 **Out of scope for 0001**  -  `vouches`, `live_control_challenges`, `artifact_intents`, `commerce_order_links`, `print_orders` (M6+ / Phase C).
 
+**Orphan purge (no migration):** Abandoned active cards are deleted by daily Worker cron per `docs/CARD_RETENTION_AND_ORPHAN_CLEANUP.md` (`worker/src/db/orphan-purge.ts`).
+
 ## Apply migrations
 
 From repo root (after `npm install`):

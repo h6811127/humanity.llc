@@ -188,6 +188,14 @@ curl -s -X POST "https://humanity.llc/v1/store/artifact-intents" \
 
 **Production:** run `npm run worker:migrate:remote` then `npm run worker:deploy`.
 
+## Orphan card purge (cron)
+
+Daily cron (`0 4 * * *` UTC) removes **abandoned** registrations: active, older than 90 days, never updated, no vouches, no non-expired active QR. See `docs/CARD_RETENTION_AND_ORPHAN_CLEANUP.md`.
+
+- Implementation: `worker/src/db/orphan-purge.ts` · `scheduled()` in `worker/src/index.ts`
+- Tests: `worker/tests/orphan-purge.test.ts`
+- Batch cap: 50 profiles per run
+
 ## Cryptography (1.5)
 
 - RFC 8785 JCS + Ed25519 sign/verify: `worker/src/crypto/`

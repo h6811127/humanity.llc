@@ -1,8 +1,8 @@
 # Device hub and local search
 
-**Status:** Phase 1–4 shipped · shared hub · activity log · returning-user desktop  
+**Status:** Phase 1–4 shipped · shared hub · activity log · returning-user desktop · **landing desktop layout**  
 **Scope:** Browser-local personalization only  -  not resolver-wide discovery  
-**Companion:** [`DEVICE_OS.md`](DEVICE_OS.md)  -  two-layer model, placement rule, landing story
+**Companion:** [`DEVICE_OS.md`](DEVICE_OS.md)  -  two-layer model, placement rule, landing story · [`LANDING_DESKTOP_LAYOUT.md`](LANDING_DESKTOP_LAYOUT.md)
 
 ---
 
@@ -19,6 +19,8 @@ The landing page, **`/created/`**, and **`/wallet/`** share an **“on this devi
 We kept the landing funnel (hero → device hub → long-form content) and **enriched** it rather than replacing it with a full dashboard.
 
 **Landing story (shipped):** Hero one-liner, a **four-step progress strip** (Create → Save → Print → Manage), **On this device** below the status line (inline search  -  no floating FAB), and a **New here?** help drawer. Homepage pass-card demo removed; strangers see real scan pages and the case study.
+
+**Landing desktop (shipped):** From **880px** on pointer-fine screens, `.page` widens to **760px** and the hero + progress strip sit in a **left column** beside the “Physical software objects” framing card. See [`LANDING_DESKTOP_LAYOUT.md`](LANDING_DESKTOP_LAYOUT.md).
 
 **Status line (shipped):** Segmented grey text (`Network live · 2 saved · 0 pinned · 1 notice`). Hub open state in `sessionStorage`; first unsaved-tab notice auto-expands hub once. On **`/created/`**, hub auto-opens when this tab has signing keys and hub state was never set.
 

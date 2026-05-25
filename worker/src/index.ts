@@ -4,6 +4,7 @@
  */
 
 import { schemaReady } from "./db";
+import { runOrphanPurge } from "./db/orphan-purge";
 import {
   clientIp,
   corsHeaders,
@@ -35,6 +36,21 @@ export interface Env {
 }
 
 export default {
+  async scheduled(
+    _event: ScheduledEvent,
+    env: Env,
+    _ctx: ExecutionContext
+  ): Promise<void> {
+    if (!env.DB) return;
+    try {
+      const ready = await schemaReady(env.DB);
+      if (!ready) return;
+      await runOrphanPurge(env.DB);
+    } catch (err) {
+      console.error("orphan_purge_failed", err);
+    }
+  },
+
   async fetch(
     request: Request,
     env: Env,

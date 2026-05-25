@@ -38,7 +38,8 @@ Minimize stored data so the network is not a surveillance honeypot. Publish what
 
 | Data class | Retention |
 |------------|-----------|
-| Public card + credential state | Until user export + delete, or operator policy after account closure |
+| Public card + credential state (active, maintained) | Until owner revoke/disable, user-initiated delete (future), or operator suspension |
+| **Orphan registrations** (active, never updated, no vouches, no live QR, older than 90 days) | **Automatic purge** daily via Worker cron — see [`CARD_RETENTION_AND_ORPHAN_CLEANUP.md`](CARD_RETENTION_AND_ORPHAN_CLEANUP.md) |
 | Revocation / suspension records | Retained while status matters for trust; public notice fields follow governance |
 | Live-control challenges | Minutes (TTL); not kept as long-term history |
 | Access logs (if ever enabled) | Short, published maximum; governance-approved only |
@@ -55,6 +56,7 @@ Rights-affecting retention changes require published notice and member governanc
 
 ## Related documents
 
+- `docs/CARD_RETENTION_AND_ORPHAN_CLEANUP.md` (orphan eligibility + cron purge)
 - `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` §5 (normative minimization rules)
 - `docs/Technical Standards v1.0.md`
 - `docs/V1_PRODUCT_TRUST_MODEL.md`
