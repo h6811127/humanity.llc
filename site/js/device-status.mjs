@@ -14,16 +14,6 @@ import "./device-shell-chrome.mjs";
 import { isHubSheet, setHubSheetOpen } from "./device-hub-sheet.mjs";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 
-function ensureWalletHubVisible() {
-  const backdrop = document.getElementById("device-hub-backdrop");
-  if (backdrop) {
-    backdrop.hidden = true;
-    backdrop.classList.remove("is-visible");
-  }
-  document.body.classList.remove("device-hub-sheet-open");
-  document.getElementById("top-chrome")?.classList.remove("top-chrome--hub-locked");
-}
-
 const HUB_OPEN_KEY = "hc_hub_open";
 
 const NETWORK_CLASSES = [
@@ -43,6 +33,7 @@ const notifBtn = document.getElementById("shell-notif-badge");
 const notifCountEl = document.getElementById("shell-notif-badge-count");
 const hubStatusPanel = document.getElementById("device-hub-status-panel");
 const hub = document.getElementById("device-hub");
+const walletPage = document.getElementById("wallet-page");
 const systemBanner = document.getElementById("device-system-banner");
 
 let networkStatus = "offline";
@@ -75,27 +66,23 @@ export function notificationCount() {
   return tabNoticeCount() + getLiveControlPendingCount() + crossTabNoticeCount();
 }
 
-function isWalletShellPage() {
-  return document.body.classList.contains("device-shell-wallet");
+function isWalletPage() {
+  return document.body.classList.contains("page-wallet");
+}
+
+function scrollWalletToTop() {
+  walletPage?.scrollIntoView({
+    behavior: prefersReducedMotion() ? "auto" : "smooth",
+    block: "start",
+  });
+  document.getElementById("device-hub-status-panel")?.scrollIntoView({
+    behavior: prefersReducedMotion() ? "auto" : "smooth",
+    block: "nearest",
+  });
 }
 
 export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
   if (!hub) return;
-  if (isWalletShellPage()) {
-    hub.classList.remove("device-hub-collapsed");
-    hub.setAttribute("aria-hidden", "false");
-    hub.removeAttribute("inert");
-    if (isHubSheet()) {
-      ensureWalletHubVisible();
-    }
-    if (dotBtn) dotBtn.setAttribute("aria-expanded", "true");
-    if (persist) {
-      sessionStorage.setItem(HUB_OPEN_KEY, "1");
-    }
-    if (haptic) hapticTap();
-    refreshHubGlance();
-    return;
-  }
   if (isHubSheet()) {
     setHubSheetOpen(open);
   } else {
@@ -191,7 +178,10 @@ function renderNotifBadge() {
 }
 
 function scrollToFirstNotification() {
-  document.getElementById("device-hub-alerts-top")?.scrollIntoView({
+  const alerts =
+    document.getElementById("wallet-alerts-top") ||
+    document.getElementById("device-hub-alerts-top");
+  alerts?.scrollIntoView({
     behavior: prefersReducedMotion() ? "auto" : "smooth",
     block: "nearest",
   });
@@ -252,16 +242,13 @@ async function refreshNetwork() {
 }
 
 function openHubFromChrome() {
-  if (!hub) {
-    location.href = "/";
+  if (isWalletPage()) {
+    scrollWalletToTop();
+    hapticTap();
     return;
   }
-  if (isWalletShellPage()) {
-    document.getElementById("device-hub-body")?.scrollTo({
-      top: 0,
-      behavior: prefersReducedMotion() ? "auto" : "smooth",
-    });
-    hapticTap();
+  if (!hub) {
+    location.href = "/";
     return;
   }
   const willOpen = hub.classList.contains("device-hub-collapsed");
@@ -269,12 +256,10 @@ function openHubFromChrome() {
 }
 
 if (hub) {
-  if (isWalletShellPage()) {
-    setHubExpanded(true, { persist: false });
-  } else {
-    sessionStorage.setItem(HUB_OPEN_KEY, "0");
-    setHubExpanded(false, { persist: false });
-  }
+  sessionStorage.setItem(HUB_OPEN_KEY, "0");
+  setHubExpanded(false, { persist: false });
+  renderStatusKey();
+} else if (isWalletPage()) {
   renderStatusKey();
 }
 
@@ -291,6 +276,11 @@ dotBtn?.addEventListener("click", (e) => {
 notifBtn?.addEventListener("click", (e) => {
   e.preventDefault();
   e.stopPropagation();
+  if (isWalletPage()) {
+    hapticTap();
+    scrollToFirstNotification();
+    return;
+  }
   if (!hub) {
     location.href = "/";
     return;
@@ -300,24 +290,22 @@ notifBtn?.addEventListener("click", (e) => {
 });
 
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && hub && !hub.classList.contains("device-hub-collapsed")) {
-    if (isWalletShellPage()) {
-      location.href = "/";
-      return;
-    }
+  if (e.key !== "Escape") return;
+  if (hub && !hub.classList.contains("device-hub-collapsed")) {
     setHubExpanded(false, { haptic: false });
   }
 });
 
 window.addEventListener("hc-hub-sheet-close", () => {
-  if (isWalletShellPage()) {
-    location.href = "/";
-    return;
-  }
+  if (!hub) return;
   setHubExpanded(false, { haptic: false, persist: false });
 });
 
 window.addEventListener("hc-focus-hub-search", () => {
+  if (isWalletPage()) {
+    document.getElementById("device-hub-search")?.focus({ preventScroll: true });
+    return;
+  }
   setHubExpanded(true, { haptic: false, persist: false });
   document.getElementById("device-hub-search")?.focus({ preventScroll: true });
 });
@@ -340,9 +328,20 @@ window.addEventListener("hc-live-control-inbox-changed", refreshSummary);
 window.addEventListener("hc-tab-presence-changed", refreshSummary);
 
 window.addEventListener("hc-hub-expand-request", (e) => {
+  const targetId = e.detail?.targetId;
+  if (isWalletPage()) {
+    if (targetId) {
+      document.getElementById(targetId)?.scrollIntoView({
+        behavior: prefersReducedMotion() ? "auto" : "smooth",
+        block: "nearest",
+      });
+    } else {
+      scrollToFirstNotification();
+    }
+    return;
+  }
   if (!hub) return;
   setHubExpanded(true, { haptic: true, persist: false });
-  const targetId = e.detail?.targetId;
   if (targetId) {
     document.getElementById(targetId)?.scrollIntoView({
       behavior: prefersReducedMotion() ? "auto" : "smooth",

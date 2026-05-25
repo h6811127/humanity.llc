@@ -826,47 +826,6 @@ button.hub-card-action.hub-use-keys {
   display: none;
 }
 
-/* /wallet/ — saved-cards route; hub is the page, not a dismissible sheet */
-body.device-shell-wallet .page {
-  display: flex;
-  flex-direction: column;
-  min-height: 100dvh;
-}
-
-body.device-shell-wallet .device-hub.device-hub--sheet {
-  position: relative;
-  left: auto;
-  bottom: auto;
-  z-index: 1;
-  width: 100%;
-  max-width: 430px;
-  margin: 0 auto;
-  max-height: none;
-  transform: none !important;
-  border-radius: 0;
-  box-shadow: none;
-  overflow: visible;
-  flex: 1;
-  pointer-events: auto;
-}
-
-body.device-shell-wallet .device-hub.device-hub--sheet .device-hub-body {
-  display: block !important;
-}
-
-body.device-shell-wallet .device-hub-sheet-handle {
-  display: none;
-}
-
-body.device-shell-wallet .device-hub-backdrop {
-  display: none !important;
-}
-
-body.device-shell-wallet .device-hub-sheet-close {
-  text-decoration: none;
-  color: inherit;
-}
-
 .device-hub-sheet-handle {
   width: 36px;
   height: 5px;

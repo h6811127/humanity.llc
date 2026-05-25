@@ -133,5 +133,5 @@ No backend required:
 | `site/js/device-hub-search.mjs` | Shared filter |
 | `site/js/device-hub-import.mjs` | Hub backup import |
 | `site/wallet/index.html` | Saved cards device shell |
-| `site/js/wallet-hub.mjs` | Wallet hub + tab save + pins |
+| `site/js/wallet-page.mjs` | Wallet page + tab save + pins |
 | `site/js/device-wallet-network.mjs` | Network status chips |

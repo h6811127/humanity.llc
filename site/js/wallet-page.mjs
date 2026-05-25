@@ -1,9 +1,8 @@
 /**
- * /wallet/  -  shared device hub + tab save, pins, context banners.
+ * /wallet/ — dedicated saved-cards page (not the hub bottom sheet).
  */
 import { logDeviceActivity } from "./device-activity.mjs";
 import { isAutoSaveEnabled, initAutoSaveToggle } from "./device-auto-save.mjs";
-import { setHubExpanded } from "./device-status.mjs";
 import { initDeviceHub, refreshDeviceHub } from "./device-hub-ui.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import { createPinEntry, loadPins, savePins } from "./device-pins.mjs";
@@ -42,13 +41,13 @@ function refreshAutoSaveLine() {
     return;
   }
   autoSaveLine.hidden = false;
-  autoSaveLine.textContent = "Auto-save is on  -  new cards are written to this device after create.";
+  autoSaveLine.textContent =
+    "Auto-save is on — new cards are written to this device after create.";
 }
 
 function refreshHelpVisibility() {
   if (!helpDetails) return;
-  const hasWallet = loadWallet().length > 0;
-  helpDetails.hidden = hasWallet;
+  helpDetails.hidden = loadWallet().length > 0;
 }
 
 function updateContextBanners() {
@@ -143,6 +142,7 @@ if (pinForm) {
 }
 
 initDeviceHub({
+  hubRoot: "#wallet-page",
   noticeMode: "created-url",
   savedLabel: "With signing keys",
   showShortcuts: true,
@@ -151,8 +151,6 @@ initDeviceHub({
   showEmptyHint: true,
   showLiveControlInbox: true,
 });
-
-setHubExpanded(true, { persist: false });
 
 initAutoSaveToggle();
 initTabSave();

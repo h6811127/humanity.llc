@@ -81,11 +81,19 @@ let activityList;
 let searchInput;
 let searchStatus;
 let deviceHub;
+let hubQueryRoot;
 let emptyHint;
 let shortcutsGroup;
 let pinsEmptyEl;
 let savedEmptyEl;
 let activityEmptyEl;
+
+function hubEl(id) {
+  if (!id) return null;
+  const inRoot = hubQueryRoot?.querySelector(`#${CSS.escape(id)}`);
+  if (inRoot) return inRoot;
+  return document.getElementById(id);
+}
 
 const HUB_SECTION_EMPTY = {
   pins: "Your pinned scans will show here.",
@@ -538,24 +546,43 @@ function applySearchFilter() {
   }
 }
 
+function resolveHubQueryRoot(config) {
+  if (config?.hubRoot) {
+    if (typeof config.hubRoot === "string") {
+      return document.querySelector(config.hubRoot);
+    }
+    if (config.hubRoot instanceof HTMLElement) {
+      return config.hubRoot;
+    }
+  }
+  return (
+    document.getElementById("wallet-page") ||
+    document.getElementById("device-hub") ||
+    document
+  );
+}
+
 function bindDom() {
-  deviceHub = document.getElementById("device-hub");
-  savedGroup = document.getElementById("device-hub-saved-group");
-  savedList = document.getElementById("device-hub-wallet-list");
-  pinsGroup = document.getElementById("device-hub-pins-group");
-  pinsList = document.getElementById("device-hub-pins-list");
-  noticeGroup = document.getElementById("device-hub-notice-group");
-  liveControlGroup = document.getElementById("device-hub-live-control-group");
-  liveControlList = document.getElementById("device-hub-live-control-list");
-  activityGroup = document.getElementById("device-hub-activity-group");
-  activityList = document.getElementById("device-hub-activity-list");
-  searchInput = document.getElementById("device-hub-search");
-  searchStatus = document.getElementById("device-hub-search-status");
-  emptyHint = document.getElementById("device-hub-empty-hint");
-  shortcutsGroup = document.getElementById("device-hub-shortcuts-group");
-  pinsEmptyEl = document.getElementById("device-hub-pins-empty");
-  savedEmptyEl = document.getElementById("device-hub-saved-empty");
-  activityEmptyEl = document.getElementById("device-hub-activity-empty");
+  deviceHub =
+    hubQueryRoot?.id === "wallet-page"
+      ? hubQueryRoot
+      : hubEl("device-hub") || hubQueryRoot;
+  savedGroup = hubEl("device-hub-saved-group");
+  savedList = hubEl("device-hub-wallet-list");
+  pinsGroup = hubEl("device-hub-pins-group");
+  pinsList = hubEl("device-hub-pins-list");
+  noticeGroup = hubEl("device-hub-notice-group");
+  liveControlGroup = hubEl("device-hub-live-control-group");
+  liveControlList = hubEl("device-hub-live-control-list");
+  activityGroup = hubEl("device-hub-activity-group");
+  activityList = hubEl("device-hub-activity-list");
+  searchInput = hubEl("device-hub-search");
+  searchStatus = hubEl("device-hub-search-status");
+  emptyHint = hubEl("device-hub-empty-hint");
+  shortcutsGroup = hubEl("device-hub-shortcuts-group");
+  pinsEmptyEl = hubEl("device-hub-pins-empty");
+  savedEmptyEl = hubEl("device-hub-saved-empty");
+  activityEmptyEl = hubEl("device-hub-activity-empty");
 }
 
 export function refreshDeviceHub() {
@@ -583,9 +610,11 @@ export function focusHubSearch() {
  *   showActivity?: boolean,
  *   showEmptyHint?: boolean,
  *   showLiveControlInbox?: boolean,
+ *   hubRoot?: string | HTMLElement,
  * }} [config]
  */
 export function initDeviceHub(config = {}) {
+  hubQueryRoot = resolveHubQueryRoot(config);
   bindDom();
   hubConfig = {
     noticeMode: config.noticeMode ?? "created-url",
@@ -600,14 +629,13 @@ export function initDeviceHub(config = {}) {
 
   if (shortcutsGroup) shortcutsGroup.hidden = config.showShortcuts === false;
   if (activityGroup && config.showActivity === false) activityGroup.hidden = true;
-  const importGroup = document.querySelector('[data-hub-group="import"]');
+  const importGroup =
+    hubQueryRoot?.querySelector('[data-hub-group="import"]') ||
+    document.querySelector('[data-hub-group="import"]');
   if (importGroup) importGroup.hidden = config.showImport === false;
   if (emptyHint && config.showEmptyHint === false) emptyHint.hidden = true;
 
-  initHubBackupImport(
-    document.getElementById("hub-import-form"),
-    document.getElementById("hub-import-status")
-  );
+  initHubBackupImport(hubEl("hub-import-form"), hubEl("hub-import-status"));
 
   refreshDeviceHub();
   notifyHubChanged();

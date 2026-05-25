@@ -5,21 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Saved on this device · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=80" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=19" />
+    <link rel="stylesheet" href="/styles.css?v=81" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=20" />
   </head>
-  <body class="has-device-hub-search device-shell-wallet">
+  <body class="page-wallet">
     <div class="page">
       <div class="top-chrome top-chrome--float" id="top-chrome">
-        <div class="top-chrome-bar top-chrome-bar--minimal" id="top-status">
+        <div class="top-chrome-bar top-chrome-bar--wallet" id="top-status">
+          <a href="/" class="wallet-chrome-back" aria-label="Back to home">
+            <span aria-hidden="true">‹</span>
+          </a>
           <div class="shell-status-cluster">
             <button
               type="button"
               class="shell-status-dot-btn"
               id="brand-status-dot-btn"
               aria-label="Device and system status"
-              aria-expanded="false"
-              aria-controls="device-hub"
+              aria-controls="wallet-page"
             >
               <span class="pass-dot shell-status-dot" id="brand-status-dot"></span>
             </button>
@@ -51,248 +53,249 @@
         hidden
       ></p>
 
-      <section
-        class="device-hub device-hub-top device-hub--sheet"
-        id="device-hub"
-        aria-labelledby="device-hub-title"
+      <main
+        class="screen screen-wallet screen-wallet-sleek wallet-hub"
+        id="wallet-page"
+        aria-labelledby="wallet-page-title"
       >
-        <div class="device-hub-body" id="device-hub-body">
-          <a href="/" class="device-hub-sheet-close" aria-label="Back to home">×</a>
-          <div class="device-hub-sheet-handle" aria-hidden="true"></div>
-          <div class="device-hub-alerts-top" id="device-hub-alerts-top">
-            <div class="device-hub-group" id="device-hub-crosstab-notice" hidden role="status"></div>
-            <div class="device-hub-group" id="device-hub-notice-group" hidden></div>
-            <div
-              class="device-hub-group"
-              id="device-hub-live-control-group"
-              hidden
-              data-hub-group="liveproof"
-            >
-              <p class="device-hub-group-label">Live proof waiting</p>
-              <ul class="list list-compact" id="device-hub-live-control-list"></ul>
-            </div>
-          </div>
-          <div class="device-hub-status-head">
-            <a class="device-hub-create-btn" href="/create/" aria-label="Create a live card"><span class="device-hub-create-glyph" aria-hidden="true">+</span></a>
-            <div
-              class="device-hub-status-panel"
-              id="device-hub-status-panel"
-              aria-label="System status"
-            ></div>
-          </div>
-          <h2 class="device-hub-title" id="device-hub-title">Saved on this device</h2>
-          <p class="device-hub-lead wallet-hub-lead">
-            Signing keys live in <strong>this browser</strong>  -  never uploaded to the network.
+        <header class="wallet-page-head">
+          <h1 class="wallet-page-title" id="wallet-page-title">Saved on this device</h1>
+          <p class="wallet-page-tagline">
+            Signing keys live in <strong>this browser</strong> — never uploaded to the network.
           </p>
-          <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint">
-            No cards saved yet  - 
-            <a href="/create/">create one</a>
-            or
-            <a href="#hub-import-form">import a backup</a>.
-          </p>
+        </header>
 
-          <p class="wallet-context-line" id="wallet-auto-save-line" hidden></p>
-
-          <div class="wallet-active-banner" id="wallet-active-banner" hidden role="status">
-            <span class="wallet-active-dot" aria-hidden="true"></span>
-            <span class="wallet-active-text" id="wallet-active-text"></span>
-            <a class="wallet-active-link" id="wallet-active-link" href="/created/">Open /created/</a>
-          </div>
-
-          <p class="wallet-strip-hint" id="wallet-tab-hint" hidden>
-            Keys are in another tab  - 
-            <a href="/created/">open /created/</a> there and save, or use <strong>Use keys</strong> below.
-          </p>
-
-          <div class="device-hub-search-block" id="device-hub-search-block" role="search">
-            <label class="device-hub-search device-hub-search--inline" for="device-hub-search">
-              <span class="device-hub-search-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-              </span>
-              <input
-                type="search"
-                id="device-hub-search"
-                class="device-hub-search-input"
-                placeholder="Search saved cards and pins"
-                autocomplete="off"
-                enterkeyhint="search"
-              />
-            </label>
-            <p class="device-hub-search-hint">This device only  -  not the public resolver</p>
-            <p class="device-hub-search-status" id="device-hub-search-status" hidden role="status"></p>
-          </div>
-
-          <div
-            class="device-hub-group device-hub-group--empty"
-            id="device-hub-activity-group"
-            data-hub-group="activity"
-          >
-            <p class="device-hub-group-label">Your actions on this device</p>
-            <p class="device-hub-group-hint">Save, import, load keys  -  not who scanned your QR.</p>
-            <ul class="list list-compact" id="device-hub-activity-list" hidden></ul>
-            <p class="device-hub-section-empty" id="device-hub-activity-empty">
-              Actions you take in this browser will show here. The network does not log scans.
-            </p>
-          </div>
-
+        <div class="wallet-alerts-top" id="wallet-alerts-top">
+          <div class="device-hub-group" id="device-hub-crosstab-notice" hidden role="status"></div>
+          <div class="device-hub-group" id="device-hub-notice-group" hidden></div>
           <div
             class="device-hub-group"
-            id="device-hub-save-tab-group"
+            id="device-hub-live-control-group"
             hidden
-            data-hub-group="save-tab"
+            data-hub-group="liveproof"
           >
-            <p class="device-hub-group-label">From this tab</p>
-            <form id="wallet-save-form" class="wallet-inline-form" autocomplete="off" novalidate>
+            <p class="device-hub-group-label">Live proof waiting</p>
+            <ul class="list list-compact" id="device-hub-live-control-list"></ul>
+          </div>
+        </div>
+
+        <div class="device-hub-status-head wallet-status-head">
+          <a class="device-hub-create-btn" href="/create/" aria-label="Create a live card"
+            ><span class="device-hub-create-glyph" aria-hidden="true">+</span></a
+          >
+          <div
+            class="device-hub-status-panel"
+            id="device-hub-status-panel"
+            aria-label="System status"
+          ></div>
+        </div>
+
+        <p class="form-hint wallet-empty-hint" id="device-hub-empty-hint">
+          No cards saved yet —
+          <a href="/create/">create one</a>
+          or
+          <a href="#hub-import-form">import a backup</a>.
+        </p>
+
+        <p class="wallet-context-line" id="wallet-auto-save-line" hidden></p>
+
+        <div class="wallet-active-banner" id="wallet-active-banner" hidden role="status">
+          <span class="wallet-active-dot" aria-hidden="true"></span>
+          <span class="wallet-active-text" id="wallet-active-text"></span>
+          <a class="wallet-active-link" id="wallet-active-link" href="/created/">Open /created/</a>
+        </div>
+
+        <p class="wallet-strip-hint" id="wallet-tab-hint" hidden>
+          Keys are in another tab —
+          <a href="/created/">open /created/</a> there and save, or use <strong>Use keys</strong> below.
+        </p>
+
+        <div class="device-hub-search-block" id="device-hub-search-block" role="search">
+          <label class="device-hub-search device-hub-search--inline" for="device-hub-search">
+            <span class="device-hub-search-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </span>
+            <input
+              type="search"
+              id="device-hub-search"
+              class="device-hub-search-input"
+              placeholder="Search saved cards and pins"
+              autocomplete="off"
+              enterkeyhint="search"
+            />
+          </label>
+          <p class="device-hub-search-hint">This device only — not the public resolver</p>
+          <p class="device-hub-search-status" id="device-hub-search-status" hidden role="status"></p>
+        </div>
+
+        <div
+          class="device-hub-group device-hub-group--empty"
+          id="device-hub-activity-group"
+          data-hub-group="activity"
+        >
+          <p class="device-hub-group-label">Your actions on this device</p>
+          <p class="device-hub-group-hint">Save, import, load keys — not who scanned your QR.</p>
+          <ul class="list list-compact" id="device-hub-activity-list" hidden></ul>
+          <p class="device-hub-section-empty" id="device-hub-activity-empty">
+            Actions you take in this browser will show here. The network does not log scans.
+          </p>
+        </div>
+
+        <div
+          class="device-hub-group"
+          id="device-hub-save-tab-group"
+          hidden
+          data-hub-group="save-tab"
+        >
+          <p class="device-hub-group-label">From this tab</p>
+          <form id="wallet-save-form" class="wallet-inline-form" autocomplete="off" novalidate>
+            <input
+              class="form-input wallet-inline-input"
+              id="wallet-save-label"
+              type="text"
+              maxlength="48"
+              placeholder="Label"
+              aria-label="Card label"
+            />
+            <button type="submit" class="btn-secondary wallet-inline-btn">Save</button>
+          </form>
+          <p id="wallet-save-status" class="form-status wallet-inline-status" hidden role="status"></p>
+        </div>
+
+        <div
+          class="device-hub-group device-hub-group--empty"
+          id="device-hub-saved-group"
+          data-hub-group="saved"
+        >
+          <p class="device-hub-group-label">With signing keys</p>
+          <ul class="hub-card-list" id="device-hub-wallet-list" hidden></ul>
+          <p class="device-hub-section-empty" id="device-hub-saved-empty">
+            Cards you save on this device will show here.
+          </p>
+        </div>
+
+        <div
+          class="device-hub-group device-hub-group--empty"
+          id="device-hub-pins-group"
+          data-hub-group="pins"
+        >
+          <p class="device-hub-group-label">Pinned scans</p>
+          <p class="wallet-section-hint">Bookmarks only — no signing keys</p>
+          <ul class="list list-compact" id="device-hub-pins-list" hidden></ul>
+          <p class="device-hub-section-empty" id="device-hub-pins-empty">
+            Your pinned scans will show here.
+          </p>
+          <details class="wallet-add-details">
+            <summary class="wallet-add-summary">Add pin</summary>
+            <form id="pin-save-form" class="wallet-inline-form wallet-inline-form-stack" autocomplete="off" novalidate>
               <input
-                class="form-input wallet-inline-input"
-                id="wallet-save-label"
+                class="form-input"
+                id="pin-save-label"
                 type="text"
                 maxlength="48"
                 placeholder="Label"
-                aria-label="Card label"
+                aria-label="Pin label"
               />
-              <button type="submit" class="btn-secondary wallet-inline-btn">Save</button>
+              <input
+                class="form-input"
+                id="pin-save-url"
+                type="text"
+                inputmode="url"
+                autocapitalize="off"
+                spellcheck="false"
+                placeholder="Scan link or profile ID"
+                aria-label="Scan link or profile ID"
+              />
+              <button type="submit" class="btn-secondary wallet-inline-btn-full">Pin</button>
             </form>
-            <p id="wallet-save-status" class="form-status wallet-inline-status" hidden role="status"></p>
-          </div>
+            <p id="pin-save-status" class="form-status wallet-inline-status" hidden role="status"></p>
+          </details>
+        </div>
 
-          <div
-            class="device-hub-group device-hub-group--empty"
-            id="device-hub-saved-group"
-            data-hub-group="saved"
-          >
-            <p class="device-hub-group-label">With signing keys</p>
-            <ul class="hub-card-list" id="device-hub-wallet-list" hidden></ul>
-            <p class="device-hub-section-empty" id="device-hub-saved-empty">
-              Cards you save on this device will show here.
-            </p>
-          </div>
-
-          <div
-            class="device-hub-group device-hub-group--empty"
-            id="device-hub-pins-group"
-            data-hub-group="pins"
-          >
-            <p class="device-hub-group-label">Pinned scans</p>
-            <p class="wallet-section-hint">Bookmarks only  -  no signing keys</p>
-            <ul class="list list-compact" id="device-hub-pins-list" hidden></ul>
-            <p class="device-hub-section-empty" id="device-hub-pins-empty">
-              Your pinned scans will show here.
-            </p>
-            <details class="wallet-add-details">
-              <summary class="wallet-add-summary">Add pin</summary>
-              <form id="pin-save-form" class="wallet-inline-form wallet-inline-form-stack" autocomplete="off" novalidate>
-                <input
-                  class="form-input"
-                  id="pin-save-label"
-                  type="text"
-                  maxlength="48"
-                  placeholder="Label"
-                  aria-label="Pin label"
-                />
-                <input
-                  class="form-input"
-                  id="pin-save-url"
-                  type="text"
-                  inputmode="url"
-                  autocapitalize="off"
-                  spellcheck="false"
-                  placeholder="Scan link or profile ID"
-                  aria-label="Scan link or profile ID"
-                />
-                <button type="submit" class="btn-secondary wallet-inline-btn-full">Pin</button>
-              </form>
-              <p id="pin-save-status" class="form-status wallet-inline-status" hidden role="status"></p>
-            </details>
-          </div>
-
-          <div class="device-hub-group" data-hub-group="import">
-            <p class="device-hub-group-label">Backup</p>
-            <details
-              class="device-hub-import device-hub-import-block"
-              data-hub-searchable="import backup file keys"
-            >
-              <summary class="device-hub-import-summary">
-                <span class="list-icon list-icon-tone-trust" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </span>
-                <span class="list-content">
-                  <span class="list-title">Import backup file</span>
-                  <span class="list-sub">Move keys to this device</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </summary>
-              <form class="device-hub-import-form" id="hub-import-form">
-                <p class="form-hint">Encrypted .hcbackup.json  -  never uploaded.</p>
-                <input type="file" accept=".json,application/json" required />
-                <label class="form-label" for="hub-import-passphrase">Passphrase</label>
-                <input
-                  type="password"
-                  id="hub-import-passphrase"
-                  name="passphrase"
-                  class="form-input"
-                  autocomplete="off"
-                  required
-                />
-                <button type="submit" class="btn-secondary device-hub-import-btn">
-                  Import to this device
-                </button>
-                <p class="form-status" id="hub-import-status" hidden role="status"></p>
-              </form>
-            </details>
-          </div>
-
-          <div class="device-hub-group" data-hub-group="shortcuts" id="device-hub-shortcuts-group">
-            <p class="device-hub-group-label">Shortcuts</p>
-            <ul class="list list-compact">
-              <li class="list-row device-hub-focus-row" data-hub-searchable="auto save device keys">
-                <button type="button" class="landing-focus-toggle" id="device-auto-save-toggle">
-                  Auto-save off · save after each create
-                </button>
-              </li>
-              <li class="list-row list-action" data-hub-searchable="home landing">
-                <a href="/">
-                  <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-                  </span>
-                  <span class="list-content">
-                    <span class="list-title">Home</span>
-                    <span class="list-sub">Landing</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-
+        <div class="device-hub-group" data-hub-group="import">
+          <p class="device-hub-group-label">Backup</p>
           <details
-            class="settings-disclosure wallet-help-details"
-            id="wallet-help-details"
-            data-hub-searchable="how wallet save keys help"
+            class="device-hub-import device-hub-import-block"
+            data-hub-searchable="import backup file keys"
           >
-            <summary class="settings-summary wallet-help-summary">
-              <span class="settings-summary-text">
-                <span class="settings-summary-title">How this works</span>
+            <summary class="device-hub-import-summary">
+              <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Import backup file</span>
+                <span class="list-sub">Move keys to this device</span>
               </span>
               <span class="list-chevron" aria-hidden="true">›</span>
             </summary>
-            <div class="settings-panel settings-panel-info wallet-help-panel">
-              <ul class="wallet-help-list">
-                <li><strong>Use keys</strong> loads signing keys into this tab, then opens /created/.</li>
-                <li><strong>Network</strong> chip is live from the resolver; <strong>Revoked since last visit</strong> compares to your last session.</li>
-                <li><strong>Pin</strong> is a scan bookmark only (↗)  -  no keys.</li>
-              </ul>
-            </div>
+            <form class="device-hub-import-form" id="hub-import-form">
+              <p class="form-hint">Encrypted .hcbackup.json — never uploaded.</p>
+              <input type="file" accept=".json,application/json" required />
+              <label class="form-label" for="hub-import-passphrase">Passphrase</label>
+              <input
+                type="password"
+                id="hub-import-passphrase"
+                name="passphrase"
+                class="form-input"
+                autocomplete="off"
+                required
+              />
+              <button type="submit" class="btn-secondary device-hub-import-btn">
+                Import to this device
+              </button>
+              <p class="form-status" id="hub-import-status" hidden role="status"></p>
+            </form>
           </details>
-
-          <div class="device-hub-status-key" id="device-hub-status-key" aria-label="Status dot reference"></div>
         </div>
-      </section>
 
-      <main class="screen screen-wallet screen-wallet-sleek" hidden aria-hidden="true"></main>
+        <div class="device-hub-group" data-hub-group="shortcuts" id="device-hub-shortcuts-group">
+          <p class="device-hub-group-label">Shortcuts</p>
+          <ul class="list list-compact">
+            <li class="list-row device-hub-focus-row" data-hub-searchable="auto save device keys">
+              <button type="button" class="landing-focus-toggle" id="device-auto-save-toggle">
+                Auto-save off · save after each create
+              </button>
+            </li>
+            <li class="list-row list-action" data-hub-searchable="home landing">
+              <a href="/">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Home</span>
+                  <span class="list-sub">Landing</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <details
+          class="settings-disclosure wallet-help-details"
+          id="wallet-help-details"
+          data-hub-searchable="how wallet save keys help"
+        >
+          <summary class="settings-summary wallet-help-summary">
+            <span class="settings-summary-text">
+              <span class="settings-summary-title">How this works</span>
+            </span>
+            <span class="list-chevron" aria-hidden="true">›</span>
+          </summary>
+          <div class="settings-panel settings-panel-info wallet-help-panel">
+            <ul class="wallet-help-list">
+              <li><strong>Use keys</strong> loads signing keys into this tab, then opens /created/.</li>
+              <li><strong>Network</strong> chip is live from the resolver; <strong>Revoked since last visit</strong> compares to your last session.</li>
+              <li><strong>Pin</strong> is a scan bookmark only (↗) — no keys.</li>
+            </ul>
+          </div>
+        </details>
+
+        <div class="device-hub-status-key" id="device-hub-status-key" aria-label="Status dot reference"></div>
+      </main>
     </div>
 
-    <script src="/js/device-status.mjs?v=19" type="module"></script>
-    <script src="/js/wallet-hub.mjs?v=5" type="module"></script>
+    <script src="/js/device-status.mjs?v=20" type="module"></script>
+    <script src="/js/wallet-page.mjs?v=1" type="module"></script>
   </body>
 </html>

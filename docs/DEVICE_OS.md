@@ -220,7 +220,7 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 | `site/js/device-cross-tab-banner.mjs` | Cross-tab keys banner copy |
 | `site/js/device-live-control-inbox.mjs` | Poll pending challenges for saved cards |
 | `site/js/device-wallet-network.mjs` | Resolver status cache for saved rows |
-| `site/js/wallet-hub.mjs` | Wallet page init |
+| `site/js/wallet-page.mjs` | Wallet page init |
 | `site/js/device-hub-glance.mjs` | Collapsed-hub summary (landing) |
 | `site/wallet/index.html` | Saved cards device shell |
 | `site/js/device-status.mjs` | Status, banner, popover Help row |
