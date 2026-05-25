@@ -32,10 +32,6 @@ const pinsGroup = document.getElementById("device-hub-pins-group");
 const pinsList = document.getElementById("device-hub-pins-list");
 const noticeGroup = document.getElementById("device-hub-notice-group");
 const searchInput = document.getElementById("device-hub-search");
-const searchRoot = document.getElementById("device-hub-search-root");
-const searchOpen = document.getElementById("device-hub-search-open");
-const searchDrawer = document.getElementById("device-hub-search-drawer");
-const searchClose = document.getElementById("device-hub-search-close");
 const searchStatus = document.getElementById("device-hub-search-status");
 const deviceHub = document.getElementById("device-hub");
 const emptyHint = document.getElementById("device-hub-empty-hint");
@@ -225,41 +221,12 @@ function applySearchFilter() {
   }
 }
 
-function setSearchExpanded(open) {
-  if (!searchRoot || !searchOpen || !searchDrawer) return;
-  searchRoot.classList.toggle("is-expanded", open);
-  searchOpen.hidden = open;
-  searchOpen.setAttribute("aria-expanded", open ? "true" : "false");
-  searchDrawer.hidden = !open;
-  if (open) {
-    searchInput?.focus();
-    deviceHub?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  } else if (searchInput) {
-    searchInput.value = "";
-    applySearchFilter();
-  }
+export function focusHubSearch() {
+  searchInput?.focus({ preventScroll: true });
+  deviceHub?.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
-if (searchOpen) {
-  searchOpen.addEventListener("click", () => setSearchExpanded(true));
-}
-
-if (searchClose) {
-  searchClose.addEventListener("click", () => setSearchExpanded(false));
-}
-
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && searchRoot?.classList.contains("is-expanded")) {
-    setSearchExpanded(false);
-  }
-});
-
-document.addEventListener("click", (e) => {
-  if (!searchRoot?.classList.contains("is-expanded")) return;
-  const target = e.target;
-  if (target instanceof Node && searchRoot.contains(target)) return;
-  setSearchExpanded(false);
-});
+window.addEventListener("hc-focus-hub-search", () => focusHubSearch());
 
 initHubBackupImport(
   document.getElementById("hub-import-form"),

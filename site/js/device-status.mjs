@@ -220,6 +220,15 @@ summaryBtn?.addEventListener("click", () => {
   });
 });
 
+const statusSearchBtn = document.getElementById("device-status-search");
+statusSearchBtn?.addEventListener("click", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  setPopover(false);
+  setHubExpanded(true, { haptic: true });
+  window.dispatchEvent(new Event("hc-focus-hub-search"));
+});
+
 dotBtn?.addEventListener("click", (e) => {
   e.preventDefault();
   e.stopPropagation();

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Saved on this device · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=65" />
+    <link rel="stylesheet" href="/styles.css?v=68" />
   </head>
   <body class="has-device-hub-search">
     <div class="page">
@@ -63,6 +63,23 @@
         </div>
 
         <section class="wallet-hub" id="wallet-device-hub" aria-label="Saved cards">
+          <div class="device-hub-search-block wallet-search-block" role="search">
+            <label class="device-hub-search device-hub-search--inline" for="device-hub-search">
+              <span class="device-hub-search-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              </span>
+              <input
+                type="search"
+                id="device-hub-search"
+                class="device-hub-search-input"
+                placeholder="Search saved cards and pins"
+                autocomplete="off"
+                enterkeyhint="search"
+              />
+            </label>
+            <p class="device-hub-search-hint">This device only — not the public resolver</p>
+          </div>
+
           <div class="device-hub-group wallet-section" id="wallet-cards-group" data-hub-group="saved">
             <p class="device-hub-group-label">With signing keys</p>
             <ul class="list list-compact wallet-card-list" id="wallet-list" hidden></ul>
@@ -145,23 +162,7 @@
       </main>
     </div>
 
-    <div class="device-hub-search-float" role="search">
-      <label class="device-hub-search">
-        <span class="device-hub-search-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        </span>
-        <input
-          type="search"
-          id="device-hub-search"
-          class="device-hub-search-input"
-          placeholder="Search this device"
-          autocomplete="off"
-          enterkeyhint="search"
-        />
-      </label>
-    </div>
-
-    <script src="/js/device-status.mjs?v=3" type="module"></script>
+    <script src="/js/device-status.mjs?v=4" type="module"></script>
     <script type="module" src="/js/card-wallet.mjs?v=6"></script>
   </body>
 </html>

@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=67" />
+    <link rel="stylesheet" href="/styles.css?v=68" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -54,9 +54,19 @@
           <span class="device-status-segments" id="device-status-segments"></span>
           <span class="device-status-chevron" aria-hidden="true">›</span>
         </button>
-        <p class="device-status-hint" id="device-status-hint">
-          Tap to manage keys on this device
-        </p>
+        <div class="device-status-actions">
+          <p class="device-status-hint" id="device-status-hint">
+            Tap to manage keys on this device
+          </p>
+          <button
+            type="button"
+            class="device-status-search-btn"
+            id="device-status-search"
+            aria-label="Search on this device"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </button>
+        </div>
         <div
           class="brand-status-popover"
           id="brand-status-popover"
@@ -83,6 +93,24 @@
             <a href="/created/">/created/</a> — keys stay in this browser only.
           </p>
 
+          <div class="device-hub-search-block" id="device-hub-search-block" role="search">
+            <label class="device-hub-search device-hub-search--inline" for="device-hub-search">
+              <span class="device-hub-search-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              </span>
+              <input
+                type="search"
+                id="device-hub-search"
+                class="device-hub-search-input"
+                placeholder="Search saved cards, pins, shortcuts"
+                autocomplete="off"
+                enterkeyhint="search"
+              />
+            </label>
+            <p class="device-hub-search-hint">This device only — not the public resolver</p>
+            <p class="device-hub-search-status" id="device-hub-search-status" hidden role="status"></p>
+          </div>
+
           <div class="device-hub-group" id="device-hub-notice-group" hidden></div>
 
           <div
@@ -92,7 +120,7 @@
             data-hub-group="saved"
           >
             <p class="device-hub-group-label">Saved cards</p>
-            <ul class="list list-compact" id="device-hub-wallet-list"></ul>
+            <ul class="hub-card-list" id="device-hub-wallet-list"></ul>
           </div>
 
           <div
@@ -153,45 +181,50 @@
                   <span class="list-chevron" aria-hidden="true">›</span>
                 </a>
               </li>
-              <li class="device-hub-import-row" data-hub-searchable="import backup file keys">
-                <details class="device-hub-import">
-                  <summary class="list-row list-action device-hub-import-summary">
-                    <span class="list-icon list-icon-tone-trust" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    </span>
-                    <span class="list-content">
-                      <span class="list-title">Import backup file</span>
-                      <span class="list-sub">Move keys to this device</span>
-                    </span>
-                    <span class="list-chevron" aria-hidden="true">›</span>
-                  </summary>
-                  <form class="device-hub-import-form" id="hub-import-form">
-                    <p class="form-hint">
-                      Encrypted .hcbackup.json from /created/ — never uploaded.
-                    </p>
-                    <input type="file" accept=".json,application/json" required />
-                    <label class="form-label" for="hub-import-passphrase">Passphrase</label>
-                    <input
-                      type="password"
-                      id="hub-import-passphrase"
-                      name="passphrase"
-                      class="form-input"
-                      autocomplete="off"
-                      required
-                    />
-                    <button type="submit" class="landing-hero-btn landing-hero-btn-secondary">
-                      Import to this device
-                    </button>
-                    <p class="form-status" id="hub-import-status" hidden></p>
-                  </form>
-                </details>
-              </li>
               <li class="list-row device-hub-focus-row" data-hub-searchable="focus intro tutorial">
                 <button type="button" class="landing-focus-toggle" id="landing-focus-toggle">
                   Hide intro · focus on this device
                 </button>
               </li>
             </ul>
+          </div>
+
+          <div class="device-hub-group" data-hub-group="import">
+            <p class="device-hub-group-label">Backup</p>
+            <details
+              class="device-hub-import device-hub-import-block"
+              data-hub-searchable="import backup file keys"
+            >
+              <summary class="device-hub-import-summary">
+                <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Import backup file</span>
+                  <span class="list-sub">Move keys to this device</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <form class="device-hub-import-form" id="hub-import-form">
+                <p class="form-hint">
+                  Encrypted .hcbackup.json from /created/ — never uploaded.
+                </p>
+                <input type="file" accept=".json,application/json" required />
+                <label class="form-label" for="hub-import-passphrase">Passphrase</label>
+                <input
+                  type="password"
+                  id="hub-import-passphrase"
+                  name="passphrase"
+                  class="form-input"
+                  autocomplete="off"
+                  required
+                />
+                <button type="submit" class="btn-secondary device-hub-import-btn">
+                  Import to this device
+                </button>
+                <p class="form-status" id="hub-import-status" hidden role="status"></p>
+              </form>
+            </details>
           </div>
         </div>
       </section>
@@ -774,77 +807,16 @@
       </div>
     </div>
 
-    <div
-      class="device-hub-search-float device-hub-search-float--landing"
-      id="device-hub-search-root"
-      role="search"
-    >
-      <button
-        type="button"
-        class="device-hub-search-fab"
-        id="device-hub-search-open"
-        aria-label="Search this device"
-        aria-expanded="false"
-        aria-controls="device-hub-search-drawer"
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      </button>
-      <div class="device-hub-search-drawer" id="device-hub-search-drawer" hidden>
-        <div class="device-hub-search device-hub-search--bar">
-          <span class="device-hub-search-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          </span>
-          <input
-            type="search"
-            id="device-hub-search"
-            class="device-hub-search-input"
-            placeholder="Search my artifacts and public cards"
-            autocomplete="off"
-            enterkeyhint="search"
-          />
-          <button
-            type="button"
-            class="device-hub-search-close"
-            id="device-hub-search-close"
-            aria-label="Close search"
-          >
-            ×
-          </button>
-        </div>
-        <p class="device-hub-search-hint">This device only — not the public resolver</p>
-        <p class="device-hub-search-status" id="device-hub-search-status" hidden role="status"></p>
-        <details class="settings-disclosure settings-disclosure-info device-hub-search-disclosure">
-          <summary class="settings-summary">
-            <span class="list-icon list-icon-tone-red" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-            </span>
-            <span class="settings-summary-text">
-              <span class="settings-summary-title">What this searches</span>
-              <span class="settings-summary-sub">This browser only — not the resolver</span>
-            </span>
-            <span class="list-chevron" aria-hidden="true">›</span>
-          </summary>
-          <div class="settings-panel settings-panel-info">
-            <p class="form-hint">
-              Filters <strong>On this device</strong>: saved cards (with keys),
-              <a href="/wallet/">pinned scan links</a>, and shortcuts. Does not search the public
-              resolver. Empty until you save from the create tab.
-            </p>
-          </div>
-        </details>
-      </div>
-    </div>
-
     <nav class="dock dock-sticky" aria-label="Get started" data-landing-tutorial>
       <a class="dock-btn dock-btn-primary" href="/create/">Create a live object</a>
     </nav>
     <script src="/js/pass-flip.js?v=1" defer></script>
     <script src="/js/pass-demo-revoke.js?v=1" defer></script>
     <script src="/js/landing-focus.mjs?v=1" type="module"></script>
-    <script src="/js/device-status.mjs?v=3" type="module"></script>
+    <script src="/js/device-status.mjs?v=4" type="module"></script>
     <script src="/js/landing-progress.mjs?v=1" type="module"></script>
     <script src="/js/landing-help.mjs?v=3" type="module"></script>
-    <script src="/js/landing-device-hub.mjs?v=6" type="module"></script>
+    <script src="/js/landing-device-hub.mjs?v=7" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=1" type="module"></script>
   </body>
 </html>

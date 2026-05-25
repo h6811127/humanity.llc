@@ -49,8 +49,8 @@ Returning users see their labels on the homepage; strangers still see the same s
 
 - **Data:** `hc_wallet` entries (label, handle, manifesto line, `profile_id`, `scan_url`).
 - **UI:** Client-side filter (case-insensitive substring) over device-hub rows and wallet list.
-- **Landing:** Bottom-left **search FAB** → drawer with field, hint, disclosure, match count.
-- **Wallet:** Always-visible centered search bar.
+- **Landing:** Search field at top of **On this device** (hub); status-line magnifier opens hub and focuses search.
+- **Wallet:** Inline search bar at top of the saved-cards section.
 
 ### Phase 2 (shipped)
 
