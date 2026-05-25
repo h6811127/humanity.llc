@@ -6,6 +6,7 @@ import {
   formatActivityTime,
   lastActivityForEntry,
   loadActivity,
+  HUB_RECENT_DISPLAY_LIMIT,
   activityActionHint,
   logDeviceActivity,
 } from "./device-activity.mjs";
@@ -303,7 +304,7 @@ function renderNoticeRow() {
 }
 
 function renderActivityRows() {
-  const entries = loadActivity();
+  const entries = loadActivity().slice(0, HUB_RECENT_DISPLAY_LIMIT);
   if (!activityList || !activityGroup) return;
 
   activityList.innerHTML = "";
@@ -512,7 +513,7 @@ function refreshEmptyHint() {
     loadWallet().length > 0 ||
     loadPins().length > 0 ||
     tabNoticeCount() > 0 ||
-    loadActivity().length > 0 ||
+    loadActivity().slice(0, HUB_RECENT_DISPLAY_LIMIT).length > 0 ||
     (hubConfig.showLiveControlInbox && getLiveControlPending().length > 0);
   emptyHint.hidden = hasData;
 }

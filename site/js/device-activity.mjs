@@ -5,6 +5,21 @@ import { loadWallet } from "./device-wallet.mjs";
 
 const STORAGE_KEY = "hc_device_activity";
 const MAX_ENTRIES = 40;
+export const HUB_RECENT_DISPLAY_LIMIT = 5;
+
+/**
+ * Skip back-to-back duplicate actions (e.g. Use keys twice on the same card).
+ * @param {ReturnType<typeof loadActivity>} entries
+ * @param {{ type: string, label: string, profile_id?: string | null, qr_id?: string | null }} entry
+ */
+function isRepeatOfLatest(entries, entry) {
+  const prev = entries[0];
+  if (!prev || prev.type !== entry.type) return false;
+  if (entry.profile_id && prev.profile_id) {
+    return entry.profile_id === prev.profile_id;
+  }
+  return prev.label === entry.label;
+}
 
 /** @typedef {'saved'|'use_keys'|'remove_card'|'pin_added'|'backup_import'|'live_control'} ActivityType */
 
@@ -27,6 +42,8 @@ export function logDeviceActivity(type, label, meta = {}) {
   };
 
   const entries = loadActivity();
+  if (isRepeatOfLatest(entries, entry)) return;
+
   entries.unshift(entry);
   if (entries.length > MAX_ENTRIES) entries.length = MAX_ENTRIES;
 
