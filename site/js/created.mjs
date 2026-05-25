@@ -154,6 +154,8 @@ function syncQrPreview() {
   if (qrPreviewWrap) qrPreviewWrap.hidden = false;
 }
 let deviceSaveCtl = null;
+/** @type {{ select: (tabId: string) => void } | undefined} */
+let createdTabs;
 
 function revealOwnerActions() {
   createdTabs?.select("manage");

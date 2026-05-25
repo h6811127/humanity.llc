@@ -75,13 +75,26 @@ Done states persist per card in `sessionStorage` (`hc_created_task_done`).
 
 ---
 
+## Bootstrap order (`created.mjs`)
+
+Dashboard actions must wire **before** the top-level QR render so **Save control key** can call `runSave()` without waiting for `bootstrapOwnerTools()`. That ordering requires a declared tab handle:
+
+1. `let createdTabs` — ES modules are strict; undeclared assignment throws and blocks QR render.
+2. `createdTabs = initCreatedTabs()` + `setupCreatedDashboard()` + `initCreatedDeviceSave()`.
+3. QR block (`renderQrToImage`, preview sync, copy/download handlers).
+4. `void bootstrapOwnerTools()` (revoke, rotate, backup — async).
+
+See `docs/CREATED_QR_BOOTSTRAP_FIX.md` for the 2026-05-25 regression (commit `69f4d6c` moved dashboard init up without adding the declaration).
+
+---
+
 ## Files
 
 | Path | Role |
 |------|------|
 | `site/created/index.html` | Hero, preview, primary + task lists, network labels |
 | `site/js/created-dashboard.mjs` | Action wiring, done states |
-| `site/js/created.mjs` | Hero meta, QR preview sync, vouch/expiry copy |
+| `site/js/created.mjs` | Hero meta, QR preview sync, vouch/expiry copy, bootstrap order |
 | `site/js/created-device-save.mjs` | `runSave()` for dashboard |
 | `site/styles.css` | Dashboard hierarchy styles |
 
