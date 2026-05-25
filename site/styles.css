@@ -3244,6 +3244,21 @@ body.landing-focus-mode .screen-landing {
   margin-bottom: 2px;
 }
 
+.landing-device-settings .list-action a:has(.list-sub),
+.landing-device-settings .list-action button:has(.list-sub) {
+  align-items: flex-start;
+}
+
+.landing-device-settings .list-action a:has(.list-sub) .list-icon,
+.landing-device-settings .list-action button:has(.list-sub) .list-icon {
+  margin-top: 2px;
+}
+
+.landing-device-settings .list-action .list-title {
+  color: var(--red);
+  font-weight: 600;
+}
+
 .device-hub-disclosure {
   margin-top: 4px;
 }

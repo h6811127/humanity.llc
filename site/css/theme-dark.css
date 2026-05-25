@@ -188,6 +188,20 @@ html[data-theme="dark"] .device-hub-create-btn {
   box-shadow: 0 2px 10px rgba(255, 77, 109, 0.35);
 }
 
+html[data-theme="dark"] .device-hub-home-btn {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .landing-device-settings-list {
+  background: var(--shell-fill);
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .landing-device-settings-list > .list-row {
+  border-bottom-color: var(--shell-separator);
+}
+
 html[data-theme="dark"] .top-chrome-bar,
 html[data-theme="dark"] .shell-status-dot-btn {
   background: rgba(28, 28, 30, 0.94);

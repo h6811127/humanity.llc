@@ -30,7 +30,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Landing focus mode:** `localStorage.hc_landing_focus` hides intro (`[data-landing-tutorial]`). Keeps **hub**, **hub glance**, **system banner** (if unhealthy), **Help & protocol** list (not full Documentation), and **contact**. No bottom Create dock or “New here?” float. **Auto-save** optional via `hc_auto_save_device` in hub shortcuts.
 
-**Shortcuts & settings (shipped):** On the **homepage** (`/`), **Shortcuts & settings** is a visible section under the progress strip (Appearance, browser alerts, saved cards, manage, auto-save, focus). Inside the hub sheet on `/create/`, `/created/`, and `/wallet/` the same controls stay **under the status row**. **Appearance** (`hc_theme`), **Browser alerts** (`hc_browser_notif` + Notification API for live proof when the tab is backgrounded), **Auto-save**, **Focus mode** (landing).
+**Shortcuts & settings (shipped):** On the **homepage** (`/`) only — section under the progress strip (unified list rows: Appearance, browser alerts, saved cards, manage, auto-save, focus). Hub sheet on all routes has **home icon** (left), status line (center), **Create +** (right); no shortcuts block in the hub.
 
 **Hub glance (landing):** When the hub is collapsed, `#device-hub-glance` shows notice (if any) and up to three saved card labels; tap expands the hub. Quick-look popover rows use **light pastel** fills (red / blue / orange by notice type).
 

@@ -146,7 +146,7 @@ initDeviceHub({
   hubRoot: "#wallet-page",
   noticeMode: "created-url",
   savedLabel: "With signing keys",
-  showShortcuts: true,
+  showShortcuts: false,
   showImport: true,
   showActivity: true,
   showEmptyHint: true,

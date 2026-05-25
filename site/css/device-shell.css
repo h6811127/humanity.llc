@@ -234,17 +234,28 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   color: var(--grey);
 }
 
-.device-hub-theme-row.list-action .landing-focus-toggle,
-.device-hub-notif-row.list-action .landing-focus-toggle {
-  width: 100%;
-  border-radius: 0;
-  background: transparent;
-  text-align: left;
-  color: var(--shell-label-strong);
+.landing-device-settings-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: 12px;
+  border: 1px solid var(--shell-separator, rgba(60, 60, 67, 0.11));
+  background: var(--shell-surface-elevated, #fff);
+  overflow: hidden;
 }
 
-.device-hub-theme-row.list-action .landing-focus-toggle[aria-pressed="true"],
-.device-hub-notif-row.list-action .landing-focus-toggle[aria-pressed="true"] {
+.landing-device-settings-list > .list-row {
+  margin: 0;
+  border-radius: 0;
+  background: transparent;
+  border-bottom: 1px solid var(--shell-separator, rgba(60, 60, 67, 0.11));
+}
+
+.landing-device-settings-list > .list-row:last-child {
+  border-bottom: none;
+}
+
+.landing-device-settings .list-action button[aria-pressed="true"] {
   background: transparent;
 }
 
@@ -520,6 +531,32 @@ button.device-hub-notice-banner {
   padding-right: 44px;
 }
 
+.device-hub-home-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(120, 120, 128, 0.14);
+  color: var(--shell-label-strong, #1c1c1e);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.2s var(--shell-spring);
+}
+
+.device-hub-home-btn svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+.device-hub-home-btn:active {
+  transform: scale(0.96);
+}
+
 .device-hub-status-panel {
   flex: 1;
   min-width: 0;
@@ -529,6 +566,7 @@ button.device-hub-notice-banner {
 
 /* Solid torus profile: flat top, rounded sides, no hole */
 .device-hub-create-btn {
+  margin-left: auto;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
