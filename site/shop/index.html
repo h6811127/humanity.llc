@@ -9,7 +9,7 @@
       content="Tier 0 curiosity drop — a physical QR sticker that resolves to live Humanity Card status. Buying merch does not verify you."
     />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=75" />
+    <link rel="stylesheet" href="/styles.css?v=76" />
   </head>
   <body class="screen-shop-body">
     <div class="page">
@@ -30,7 +30,10 @@
             proves and what it doesn't. No phone. No ID. No scan analytics.
           </p>
           <div class="landing-hero-actions shop-hero-actions">
-            <a class="landing-hero-btn landing-hero-btn-primary" href="#shop-product"
+            <a
+              class="landing-hero-btn landing-hero-btn-primary"
+              id="shop-hero-primary"
+              href="#shop-product"
               >About this sticker</a
             >
             <a class="landing-hero-btn landing-hero-btn-secondary" href="/create/"
@@ -49,7 +52,19 @@
 
           <div class="shop-product-card">
             <p class="shop-product-kicker">One design · batch QR</p>
-            <p class="shop-product-price">Checkout opening soon</p>
+            <p class="shop-product-price" id="shop-product-price">Checkout opening soon</p>
+            <p class="shop-checkout-note" id="shop-checkout-note" hidden>
+              Checkout is hosted by Shopify — taxes and shipping shown there. humanity.llc does not
+              store your payment details.
+            </p>
+            <a
+              class="btn-primary shop-buy-btn"
+              id="shop-buy-btn"
+              href="#shop-checkout-group"
+              hidden
+              rel="noopener noreferrer"
+              >Buy the founding sticker</a
+            >
             <ul class="shop-bullets shop-bullets-get">
               <li>One durable sticker with a scannable QR</li>
               <li>A story about trust without surveillance</li>
@@ -68,7 +83,35 @@
           </div>
         </section>
 
-        <section class="group shop-interest-group" aria-labelledby="shop-interest-title">
+        <section
+          class="group shop-checkout-group"
+          id="shop-checkout-group"
+          hidden
+          aria-labelledby="shop-checkout-title"
+        >
+          <h2 class="group-label" id="shop-checkout-title">Checkout</h2>
+          <p class="shop-lead">
+            Ready to order. You will complete payment on Shopify&rsquo;s secure checkout — then
+            return here for what to expect when the sticker ships.
+          </p>
+          <a
+            class="btn-primary shop-buy-btn shop-buy-btn-block"
+            id="shop-buy-btn-footer"
+            href="#"
+            rel="noopener noreferrer"
+            >Continue to checkout</a
+          >
+          <p class="shop-lead shop-lead-muted">
+            After purchase:
+            <a href="/shop/thanks/">what happens next</a>
+          </p>
+        </section>
+
+        <section
+          class="group shop-interest-group"
+          id="shop-interest-group"
+          aria-labelledby="shop-interest-title"
+        >
           <h2 class="group-label" id="shop-interest-title">Notify when checkout opens</h2>
           <p class="shop-lead shop-lead-muted">
             Shopify checkout is not wired yet. Leave an optional email on this device, or
@@ -161,6 +204,6 @@
         </section>
       </main>
     </div>
-    <script src="/js/shop-drop.mjs?v=1" type="module"></script>
+    <script src="/js/shop.mjs?v=1" type="module"></script>
   </body>
 </html>

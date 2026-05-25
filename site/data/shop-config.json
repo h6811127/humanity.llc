@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "tier0": {
+    "product_title": "Founding signal sticker",
+    "price_display": null,
+    "checkout_url": "",
+    "checkout_open": false
+  },
+  "thanks_path": "/shop/thanks/"
+}

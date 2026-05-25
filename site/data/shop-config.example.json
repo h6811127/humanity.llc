@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "tier0": {
+    "product_title": "Founding signal sticker",
+    "price_display": "$12 + shipping",
+    "checkout_url": "https://YOUR-STORE.myshopify.com/cart/VARIANT_ID:1",
+    "checkout_open": true
+  },
+  "thanks_path": "/shop/thanks/"
+}

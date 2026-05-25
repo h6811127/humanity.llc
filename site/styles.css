@@ -3773,6 +3773,32 @@ body.landing-focus-mode .screen-landing {
   margin: 0 0 14px;
 }
 
+.shop-product-price--live {
+  color: var(--black);
+}
+
+.shop-checkout-note {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--grey);
+  margin: 0 0 12px;
+}
+
+.shop-buy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 14px;
+  text-decoration: none;
+}
+
+.shop-buy-btn-block {
+  display: flex;
+  width: 100%;
+  max-width: 22rem;
+  margin-bottom: 12px;
+}
+
 .shop-bullets {
   margin: 0 0 12px;
   padding-left: 1.15rem;

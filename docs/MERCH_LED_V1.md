@@ -134,7 +134,7 @@ Prove the scan moment is worth a stranger’s attention:
 Prove walking ads work:
 
 1. One flagship artifact (sticker recommended first for scan QA; flat card second).
-2. Story-row storefront — one narrative, not a 50-SKU grid. **Shipped (UI):** [`/shop/`](../site/shop/index.html) — copy from `LAUNCH_LANGUAGE_KIT.md` Tier 0; checkout not wired yet.
+2. Story-row storefront — one narrative, not a 50-SKU grid. **Shipped (UI):** [`/shop/`](../site/shop/index.html) — Shopify URL via `site/data/shop-config.json` when operator enables.
 3. Non-personalized or lightly personalized QR pointing at network (personalized per-item QR only after Printify spike passes — see `docs/V1_ASSUMPTION_REGISTER.md`).
 4. Packaging / product page with bearer warning and “merch ≠ vouched” line.
 
