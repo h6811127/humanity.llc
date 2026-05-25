@@ -180,6 +180,43 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   background: var(--shell-surface-elevated, #fff);
 }
 
+/* Glance notifications — light pastel fills (hub quick look) */
+.device-hub-glance-popover .device-hub-glance-row--notice .device-hub-glance-btn {
+  border-color: rgba(255, 59, 48, 0.22);
+  background: rgba(255, 59, 48, 0.1);
+}
+
+.device-hub-glance-popover .device-hub-glance-row--crosstab .device-hub-glance-btn {
+  border-color: rgba(0, 122, 255, 0.28);
+  background: rgba(0, 122, 255, 0.12);
+}
+
+.device-hub-glance-popover .device-hub-glance-row--liveproof .device-hub-glance-btn {
+  border-color: rgba(255, 149, 0, 0.32);
+  background: rgba(255, 149, 0, 0.14);
+}
+
+.device-hub-glance-popover .device-hub-glance-row--revoked .device-hub-glance-btn {
+  border-color: rgba(255, 149, 0, 0.28);
+  background: rgba(255, 149, 0, 0.12);
+}
+
+.device-hub-glance-popover .device-hub-glance-row--notice .device-hub-glance-title {
+  color: #c9342a;
+}
+
+.device-hub-glance-popover .device-hub-glance-row--crosstab .device-hub-glance-title {
+  color: #0060df;
+}
+
+.device-hub-glance-popover .device-hub-glance-row--liveproof .device-hub-glance-title {
+  color: #a16207;
+}
+
+.device-hub-group--shortcuts-top {
+  margin-bottom: 14px;
+}
+
 .device-hub-glance-help {
   display: flex;
   align-items: center;

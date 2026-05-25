@@ -5,8 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Saved on this device · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <meta name="theme-color" content="#ffffff" />
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem("hc_theme") === "dark") {
+            document.documentElement.dataset.theme = "dark";
+            document.documentElement.style.colorScheme = "dark";
+          }
+        } catch (e) {
+          /* ignore */
+        }
+      })();
+    </script>
     <link rel="stylesheet" href="/styles.css?v=86" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=24" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=25" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=1" />
   </head>
   <body class="page-wallet has-shell-chrome">
     <div class="page">
@@ -73,6 +87,31 @@
             <p class="device-hub-group-label">Live proof waiting</p>
             <ul class="list list-compact" id="device-hub-live-control-list"></ul>
           </div>
+        </div>
+
+        <div
+          class="device-hub-group device-hub-group--shortcuts-top"
+          data-hub-group="shortcuts"
+          id="device-hub-shortcuts-group"
+        >
+          <p class="device-hub-group-label">Shortcuts &amp; settings</p>
+          <ul class="list list-compact">
+            <li class="list-row device-hub-theme-row" data-hub-searchable="dark mode appearance theme">
+              <button
+                type="button"
+                class="landing-focus-toggle device-theme-toggle"
+                data-device-theme-toggle
+                aria-pressed="false"
+              >
+                Appearance · light
+              </button>
+            </li>
+            <li class="list-row device-hub-focus-row" data-hub-searchable="auto save device keys">
+              <button type="button" class="landing-focus-toggle" id="device-auto-save-toggle">
+                Auto-save off · save after each create
+              </button>
+            </li>
+          </ul>
         </div>
 
         <p class="form-hint wallet-empty-hint" id="device-hub-empty-hint">
@@ -233,17 +272,6 @@
               <p class="form-status" id="hub-import-status" hidden role="status"></p>
             </form>
           </details>
-        </div>
-
-        <div class="device-hub-group" data-hub-group="shortcuts" id="device-hub-shortcuts-group">
-          <p class="device-hub-group-label">Settings</p>
-          <ul class="list list-compact">
-            <li class="list-row device-hub-focus-row" data-hub-searchable="auto save device keys">
-              <button type="button" class="landing-focus-toggle" id="device-auto-save-toggle">
-                Auto-save off · save after each create
-              </button>
-            </li>
-          </ul>
         </div>
 
         <details

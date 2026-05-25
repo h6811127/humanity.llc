@@ -12,10 +12,23 @@
       content="Physical objects with programmable social state. Scan a tag or card for live active or revoked status. Optional, revocable, no scan tracking."
     />
     <meta name="theme-color" content="#ffffff" />
-    <meta name="color-scheme" content="light" />
+    <meta name="color-scheme" content="light dark" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem("hc_theme") === "dark") {
+            document.documentElement.dataset.theme = "dark";
+            document.documentElement.style.colorScheme = "dark";
+          }
+        } catch (e) {
+          /* ignore */
+        }
+      })();
+    </script>
     <link rel="stylesheet" href="/styles.css?v=86" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=24" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=25" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=1" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -119,74 +132,25 @@
               aria-label="System status"
             ></div>
           </div>
-          <h2 class="device-hub-title" id="device-hub-title">On this device</h2>
-          <p class="device-hub-lead">
-            Personal to <strong>this browser</strong>, not your profile on the network.
-          </p>
-          <div id="device-keys-custody-hub"></div>
-          <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint">
-            Nothing saved yet? After create, tap <strong>Save on this device</strong> on
-            <a href="/created/">/created/</a>. Until then, keys exist only in that tab.
-          </p>
-
-          <div class="device-hub-search-block" id="device-hub-search-block" role="search">
-            <label class="device-hub-search device-hub-search--inline" for="device-hub-search">
-              <span class="device-hub-search-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-              </span>
-              <input
-                type="search"
-                id="device-hub-search"
-                class="device-hub-search-input"
-                placeholder="Search saved cards, pins, shortcuts"
-                autocomplete="off"
-                enterkeyhint="search"
-              />
-            </label>
-            <p class="device-hub-search-hint">This device only  -  not the public resolver</p>
-            <p class="device-hub-search-status" id="device-hub-search-status" hidden role="status"></p>
-          </div>
 
           <div
-            class="device-hub-group device-hub-group--empty"
-            id="device-hub-activity-group"
-            data-hub-group="activity"
+            class="device-hub-group device-hub-group--shortcuts-top"
+            id="device-hub-shortcuts-group"
+            data-hub-group="shortcuts"
           >
-            <p class="device-hub-group-label">Your actions on this device</p>
-            <p class="device-hub-group-hint">Save, import, load keys  -  not who scanned your QR.</p>
-            <ul class="list list-compact" id="device-hub-activity-list" hidden></ul>
-            <p class="device-hub-section-empty" id="device-hub-activity-empty">
-              Actions you take in this browser will show here. The network does not log scans.
-            </p>
-          </div>
-
-          <div
-            class="device-hub-group device-hub-group--empty"
-            id="device-hub-saved-group"
-            data-hub-group="saved"
-          >
-            <p class="device-hub-group-label">Saved cards</p>
-            <ul class="hub-card-list" id="device-hub-wallet-list" hidden></ul>
-            <p class="device-hub-section-empty" id="device-hub-saved-empty">
-              Cards you save on this device will show here.
-            </p>
-          </div>
-
-          <div
-            class="device-hub-group device-hub-group--empty"
-            id="device-hub-pins-group"
-            data-hub-group="pins"
-          >
-            <p class="device-hub-group-label">Pinned scans</p>
-            <ul class="list list-compact" id="device-hub-pins-list" hidden></ul>
-            <p class="device-hub-section-empty" id="device-hub-pins-empty">
-              Your pinned scans will show here.
-            </p>
-          </div>
-
-          <div class="device-hub-group" id="device-hub-shortcuts-group" data-hub-group="shortcuts">
-            <p class="device-hub-group-label">Shortcuts</p>
+            <p class="device-hub-group-label">Shortcuts &amp; settings</p>
             <ul class="list list-compact">
+              <li class="list-row device-hub-theme-row" data-hub-searchable="dark mode appearance theme">
+                <button
+                  type="button"
+                  class="landing-focus-toggle device-theme-toggle"
+                  data-device-theme-toggle
+                  id="device-theme-toggle"
+                  aria-pressed="false"
+                >
+                  Appearance · light
+                </button>
+              </li>
               <li
                 class="list-row list-action"
                 data-hub-searchable="saved cards keys store vouch"
@@ -273,6 +237,71 @@
                 </button>
               </li>
             </ul>
+          </div>
+
+          <h2 class="device-hub-title" id="device-hub-title">On this device</h2>
+          <p class="device-hub-lead">
+            Personal to <strong>this browser</strong>, not your profile on the network.
+          </p>
+          <div id="device-keys-custody-hub"></div>
+          <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint">
+            Nothing saved yet? After create, tap <strong>Save on this device</strong> on
+            <a href="/created/">/created/</a>. Until then, keys exist only in that tab.
+          </p>
+
+          <div class="device-hub-search-block" id="device-hub-search-block" role="search">
+            <label class="device-hub-search device-hub-search--inline" for="device-hub-search">
+              <span class="device-hub-search-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              </span>
+              <input
+                type="search"
+                id="device-hub-search"
+                class="device-hub-search-input"
+                placeholder="Search saved cards, pins, shortcuts"
+                autocomplete="off"
+                enterkeyhint="search"
+              />
+            </label>
+            <p class="device-hub-search-hint">This device only  -  not the public resolver</p>
+            <p class="device-hub-search-status" id="device-hub-search-status" hidden role="status"></p>
+          </div>
+
+          <div
+            class="device-hub-group device-hub-group--empty"
+            id="device-hub-activity-group"
+            data-hub-group="activity"
+          >
+            <p class="device-hub-group-label">Your actions on this device</p>
+            <p class="device-hub-group-hint">Save, import, load keys  -  not who scanned your QR.</p>
+            <ul class="list list-compact" id="device-hub-activity-list" hidden></ul>
+            <p class="device-hub-section-empty" id="device-hub-activity-empty">
+              Actions you take in this browser will show here. The network does not log scans.
+            </p>
+          </div>
+
+          <div
+            class="device-hub-group device-hub-group--empty"
+            id="device-hub-saved-group"
+            data-hub-group="saved"
+          >
+            <p class="device-hub-group-label">Saved cards</p>
+            <ul class="hub-card-list" id="device-hub-wallet-list" hidden></ul>
+            <p class="device-hub-section-empty" id="device-hub-saved-empty">
+              Cards you save on this device will show here.
+            </p>
+          </div>
+
+          <div
+            class="device-hub-group device-hub-group--empty"
+            id="device-hub-pins-group"
+            data-hub-group="pins"
+          >
+            <p class="device-hub-group-label">Pinned scans</p>
+            <ul class="list list-compact" id="device-hub-pins-list" hidden></ul>
+            <p class="device-hub-section-empty" id="device-hub-pins-empty">
+              Your pinned scans will show here.
+            </p>
           </div>
 
           <div class="device-hub-group" data-hub-group="import">

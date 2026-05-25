@@ -5,8 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Your live object · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <meta name="theme-color" content="#ffffff" />
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem("hc_theme") === "dark") {
+            document.documentElement.dataset.theme = "dark";
+            document.documentElement.style.colorScheme = "dark";
+          }
+        } catch (e) {
+          /* ignore */
+        }
+      })();
+    </script>
     <link rel="stylesheet" href="/styles.css?v=84" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=24" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=25" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=1" />
   </head>
   <body class="has-device-hub-search device-shell-created">
     <div class="page">
@@ -59,6 +73,63 @@
               aria-label="System status"
             ></div>
           </div>
+
+          <div
+            class="device-hub-group device-hub-group--shortcuts-top"
+            id="device-hub-shortcuts-group"
+            data-hub-group="shortcuts"
+          >
+            <p class="device-hub-group-label">Shortcuts &amp; settings</p>
+            <ul class="list list-compact">
+              <li class="list-row device-hub-theme-row" data-hub-searchable="dark mode appearance theme">
+                <button
+                  type="button"
+                  class="landing-focus-toggle device-theme-toggle"
+                  data-device-theme-toggle
+                  aria-pressed="false"
+                >
+                  Appearance · light
+                </button>
+              </li>
+              <li class="list-row list-action" data-hub-searchable="manage revoke update manifesto">
+                <button type="button" id="created-hub-manage-tab">
+                  <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Manage this card</span>
+                    <span class="list-sub">Revoke, update, backup export</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </button>
+              </li>
+              <li class="list-row list-action" data-hub-searchable="saved cards keys store">
+                <a href="/wallet/">
+                  <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">All saved cards</span>
+                    <span class="list-sub">Keys on this device</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </a>
+              </li>
+              <li class="list-row list-action" data-hub-searchable="home landing">
+                <a href="/">
+                  <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Home</span>
+                    <span class="list-sub">Landing</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
           <h2 class="device-hub-title" id="device-hub-title">On this device</h2>
           <p class="device-hub-lead">
             Personal to <strong>this browser</strong>  -  not your profile on the network.
@@ -120,48 +191,6 @@
             <p class="device-hub-section-empty" id="device-hub-pins-empty">
               Your pinned scans will show here.
             </p>
-          </div>
-
-          <div class="device-hub-group" data-hub-group="shortcuts">
-            <p class="device-hub-group-label">Shortcuts</p>
-            <ul class="list list-compact">
-              <li class="list-row list-action" data-hub-searchable="manage revoke update manifesto">
-                <button type="button" id="created-hub-manage-tab">
-                  <span class="list-icon list-icon-tone-red" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
-                  </span>
-                  <span class="list-content">
-                    <span class="list-title">Manage this card</span>
-                    <span class="list-sub">Revoke, update, backup export</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </button>
-              </li>
-              <li class="list-row list-action" data-hub-searchable="saved cards keys store">
-                <a href="/wallet/">
-                  <span class="list-icon list-icon-tone-trust" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                  </span>
-                  <span class="list-content">
-                    <span class="list-title">All saved cards</span>
-                    <span class="list-sub">Keys on this device</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </a>
-              </li>
-              <li class="list-row list-action" data-hub-searchable="home landing">
-                <a href="/">
-                  <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                  </span>
-                  <span class="list-content">
-                    <span class="list-title">Home</span>
-                    <span class="list-sub">Landing</span>
-                  </span>
-                  <span class="list-chevron" aria-hidden="true">›</span>
-                </a>
-              </li>
-            </ul>
           </div>
 
           <div class="device-hub-group" data-hub-group="import">
@@ -998,7 +1027,7 @@
         </p>
       </main>
     </div>
-    <script src="/js/device-status.mjs?v=19" type="module"></script>
+    <script src="/js/device-status.mjs?v=20" type="module"></script>
     <script src="/js/created-hub.mjs?v=2" type="module"></script>
     <script type="module" src="/js/created.mjs?v=36"></script>
   </body>

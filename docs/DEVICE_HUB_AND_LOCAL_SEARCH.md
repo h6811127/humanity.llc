@@ -30,7 +30,9 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Landing focus mode:** `localStorage.hc_landing_focus` hides intro (`[data-landing-tutorial]`). Keeps **hub**, **hub glance**, **system banner** (if unhealthy), **Help & protocol** list (not full Documentation), and **contact**. No bottom Create dock or “New here?” float. **Auto-save** optional via `hc_auto_save_device` in hub shortcuts.
 
-**Hub glance (landing):** When the hub is collapsed, `#device-hub-glance` shows notice (if any) and up to three saved card labels; tap expands the hub.
+**Shortcuts & settings (shipped):** Hub group sits **under the status row** on landing, `/create/`, `/created/`, and near the top on `/wallet/` (not duplicated on the landing hero — CTAs stay there). Settings in hub today: **Appearance** (`localStorage.hc_theme` = `light` | `dark`, pure `#000` page background in dark), **Focus mode** (landing only), **Auto-save** (landing + wallet). Future device-only ideas: match system appearance, reduce motion, live-proof browser notifications.
+
+**Hub glance (landing):** When the hub is collapsed, `#device-hub-glance` shows notice (if any) and up to three saved card labels; tap expands the hub. Quick-look popover rows use **light pastel** fills (red / blue / orange by notice type).
 
 **`/wallet/` (Phase 5–6):** Uses the same hub renderer as landing. Each saved row shows a **network chip** (resolver status, ~5 min cache), optional **Revoked since last visit** alert (`hc_wallet_last_seen_network`), **Last on device** from activity, and **Use keys / Open scan / Manage**. Page is hub-expanded by default; help disclosure hides when cards exist.
 
@@ -134,6 +136,8 @@ No backend required:
 | `site/js/created-hub.mjs` | Created init wrapper |
 | `site/js/landing-focus.mjs` | Focus mode + intro toggle |
 | `site/js/device-status.mjs` | Status line, dot sheet, hub expand |
+| `site/js/device-theme.mjs` | Appearance toggle (`hc_theme`) |
+| `site/css/theme-dark.css` | Pure-black dark palette |
 | `site/js/device-hub-search.mjs` | Shared filter |
 | `site/js/device-hub-import.mjs` | Hub backup import |
 | `site/wallet/index.html` | Saved cards device shell |

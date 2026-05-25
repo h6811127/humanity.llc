@@ -16,6 +16,7 @@ import {
 } from "./device-hub-glance-popover.mjs";
 import "./device-shell-motion.mjs";
 import "./device-shell-chrome.mjs";
+import "./device-theme.mjs";
 import { isHubSheet, setHubSheetOpen } from "./device-hub-sheet.mjs";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 

@@ -12,6 +12,7 @@ import {
 } from "./device-activity.mjs";
 import { applyDeviceHubSearch } from "./device-hub-search.mjs";
 import { initHubBackupImport } from "./device-hub-import.mjs";
+import { mountThemeToggles } from "./device-theme.mjs";
 import {
   activateWalletEntry,
   createdUrlForEntry,
@@ -664,6 +665,7 @@ export function initDeviceHub(config = {}) {
   if (emptyHint && config.showEmptyHint === false) emptyHint.hidden = true;
 
   initHubBackupImport(hubEl("hub-import-form"), hubEl("hub-import-status"));
+  mountThemeToggles();
 
   refreshDeviceHub();
   notifyHubChanged();
