@@ -1,9 +1,12 @@
 /**
  * Fetch resolver card status for saved-wallet rows (cached in sessionStorage).
+ * Tracks last-seen network status per card for "revoked since last visit" alerts.
  */
 import { getCardStatusUrl } from "./hc-sign.mjs";
+import { loadWallet } from "./device-wallet.mjs";
 
 const CACHE_KEY = "hc_wallet_network_cache";
+const LAST_SEEN_KEY = "hc_wallet_last_seen_network";
 const TTL_MS = 5 * 60 * 1000;
 
 function loadCache() {
@@ -86,4 +89,54 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
   await Promise.all(fetches);
   saveCache(cache);
   onDone?.(map);
+}
+
+function loadLastSeen() {
+  try {
+    const raw = localStorage.getItem(LAST_SEEN_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveLastSeen(map) {
+  try {
+    localStorage.setItem(LAST_SEEN_KEY, JSON.stringify(map));
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * True when the resolver now reports revoked but this device last recorded a non-revoked state.
+ * @param {string} profileId
+ * @param {string | null | undefined} currentStatus
+ */
+export function isRevokedSinceLastVisit(profileId, currentStatus) {
+  const current = String(currentStatus || "").toLowerCase();
+  if (current !== "revoked") return false;
+  const last = loadLastSeen()[profileId];
+  if (last == null || last === "") return true;
+  return String(last).toLowerCase() !== "revoked";
+}
+
+/** @param {string} profileId @param {string} status */
+export function recordNetworkSeen(profileId, status) {
+  if (!profileId) return;
+  const map = loadLastSeen();
+  map[profileId] = String(status || "").toLowerCase();
+  saveLastSeen(map);
+}
+
+/** Snapshot current cached statuses when leaving the site (end of visit). */
+export function snapshotNetworkSeenOnExit() {
+  const seen = loadLastSeen();
+  for (const entry of loadWallet()) {
+    const pid = entry.profile_id;
+    const status = getCachedNetworkStatus(pid) ?? entry.status ?? "unknown";
+    seen[pid] = String(status).toLowerCase();
+  }
+  saveLastSeen(seen);
 }

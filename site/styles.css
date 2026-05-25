@@ -535,6 +535,44 @@ a {
   background: rgba(0, 0, 0, 0.08);
 }
 
+.hub-card-item--revoked-since-visit {
+  border-color: rgba(219, 27, 67, 0.45);
+  background: rgba(219, 27, 67, 0.04);
+}
+
+.hub-card-status-alert {
+  margin: 0;
+  padding: 8px 12px 4px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--red);
+}
+
+.hub-card-alert-dismiss {
+  margin-left: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--red);
+  text-decoration: underline;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.device-hub-glance-row--revoked .device-hub-glance-btn {
+  border-color: rgba(219, 27, 67, 0.35);
+  background: rgba(219, 27, 67, 0.05);
+}
+
+.device-hub-glance-row--revoked .device-hub-glance-sub {
+  color: var(--red);
+  font-weight: 600;
+}
+
 .hub-card-actions {
   display: flex;
   align-items: center;

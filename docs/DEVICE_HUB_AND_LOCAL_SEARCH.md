@@ -30,7 +30,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Hub glance (landing):** When the hub is collapsed, `#device-hub-glance` shows notice (if any) and up to three saved card labels; tap expands the hub.
 
-**`/wallet/` (Phase 5):** Uses the same hub renderer as landing. Each saved row shows a **network chip** (resolver status, ~5 min cache), **Last on device** from `hc_device_activity`, and **Use keys / Open scan / Manage**. Page is hub-expanded by default; help disclosure hides when cards exist.
+**`/wallet/` (Phase 5–6):** Uses the same hub renderer as landing. Each saved row shows a **network chip** (resolver status, ~5 min cache), optional **Revoked since last visit** alert (`hc_wallet_last_seen_network`), **Last on device** from activity, and **Use keys / Open scan / Manage**. Page is hub-expanded by default; help disclosure hides when cards exist.
 
 **Created keys strip:** On `/created/` **Now** tab, **Keys on this device** first; recovery in **Break-glass** `<details>` below.
 

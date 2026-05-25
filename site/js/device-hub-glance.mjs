@@ -3,6 +3,10 @@
  */
 import { tabNoticeCount } from "./device-counts.mjs";
 import { getTabSession } from "./device-keys.mjs";
+import {
+  getCachedNetworkStatus,
+  isRevokedSinceLastVisit,
+} from "./device-wallet-network.mjs";
 import { loadWallet, walletEntrySubtitle } from "./device-wallet.mjs";
 const GLANCE_MAX_CARDS = 3;
 
@@ -68,12 +72,17 @@ export function refreshHubGlance() {
   const shown = entries.slice(0, GLANCE_MAX_CARDS);
   for (const entry of shown) {
     const li = document.createElement("li");
-    li.className = "device-hub-glance-row";
+    const status = getCachedNetworkStatus(entry.profile_id) ?? entry.status;
+    const revokedSince = isRevokedSinceLastVisit(entry.profile_id, status);
+    li.className = revokedSince
+      ? "device-hub-glance-row device-hub-glance-row--revoked"
+      : "device-hub-glance-row";
     const sub = walletEntrySubtitle(entry);
+    const subLine = revokedSince ? `${sub} · Revoked since last visit` : sub;
     li.innerHTML = `
       <button type="button" class="device-hub-glance-btn">
         <span class="device-hub-glance-title">${escapeHtml(entry.label)}</span>
-        <span class="device-hub-glance-sub">${escapeHtml(sub)}</span>
+        <span class="device-hub-glance-sub">${escapeHtml(subLine)}</span>
       </button>`;
     li.querySelector("button")?.addEventListener("click", () => {
       expandHub("device-hub-saved-group");

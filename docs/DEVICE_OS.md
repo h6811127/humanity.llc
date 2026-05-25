@@ -1,6 +1,6 @@
 # Device OS — browser shell + physical network
 
-**Status:** Phase 5 shipped (wallet device-shell parity + live network chips)  
+**Status:** Phase 6 shipped (revoked-since-last-visit alerts on saved rows)  
 **Audience:** Product, frontend, and anyone extending Pages without accounts
 
 ---
@@ -85,7 +85,8 @@ Optional hub toggle (off by default): after create, write tab keys to `hc_wallet
 | Now | Later (careful) |
 |-----|------------------|
 | Network health in status line + banner | Resolver build / incident feed |
-| Saved · pinned · notice counts | “Card revoked since last visit” per saved row |
+| Saved · pinned · notice counts | — |
+| **Revoked since last visit** per saved row + hub glance hint | — |
 | Hub glance when collapsed | Cross-tab “keys in another tab” banner |
 | Recent activity on device | Live-control inbox (signed actions only on `/created/`) |
 
@@ -107,7 +108,7 @@ Same chrome on **landing**, **`/created/`**, and **`/wallet/`**:
 ### `/wallet/` (saved page)
 
 - Same status chrome as landing (shield, search, system banner, expandable hub — **expanded by default**).
-- Shared `device-hub-ui.mjs`: saved rows with **live network chip**, **Last on device** from activity, **Manage** in ⋯ menu.
+- Shared `device-hub-ui.mjs`: saved rows with **live network chip**, **revoked since last visit** alert, **Last on device** from activity, **Manage** in ⋯ menu.
 - Tab save strip, pin add form, auto-save toggle, activity, backup import.
 - **How this works** hidden when any card is saved.
 
@@ -147,10 +148,19 @@ See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` for storage and search.
 | 6 | Auto-save toggle (`hc_auto_save_device`) | ✅ |
 | 7 | Landing cleanup: no dock, no help float, no status hint | ✅ |
 | 8 | Wallet shell parity + `device-wallet-network.mjs` status chips | ✅ |
-| 9 | Deferred: live-control inbox queue | — |
-| 7 | Deferred: cross-tab keys banner beyond notice row | — |
-| 8 | Deferred: resolver-wide search / directory | — |
-| 9 | Deferred: per-card revoke chips on landing hub | — (use Manage) |
+| 9 | **Revoked since last visit** (`hc_wallet_last_seen_network`) | ✅ |
+| 10 | Deferred: live-control inbox queue | — |
+| 11 | Deferred: cross-tab keys banner beyond notice row | — |
+| 12 | Deferred: resolver-wide search / directory | — |
+| — | Deferred: per-card revoke on landing hub | — (use Manage) |
+
+### Revoked since last visit (Phase 6)
+
+**Storage:** `localStorage` key `hc_wallet_last_seen_network` — map of `profile_id` → last recorded resolver card status.
+
+**When:** On fetch, if last seen ≠ `revoked` and resolver now reports `revoked`, show alert on the saved row and highlight in hub glance.
+
+**Clear:** **Got it**, **Use keys**, or **Manage** records current status as seen. Leaving the page (`pagehide` / tab hidden) snapshots all cached statuses for the next visit.
 
 ---
 

@@ -19,8 +19,11 @@ import {
 } from "./device-wallet.mjs";
 import {
   getCachedNetworkStatus,
+  isRevokedSinceLastVisit,
   networkStatusChip,
+  recordNetworkSeen,
   refreshWalletNetworkStatuses,
+  snapshotNetworkSeenOnExit,
 } from "./device-wallet-network.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
 
@@ -76,6 +79,10 @@ function networkChipHtml(profileId, statusOverride) {
   return `<span class="hub-card-network hub-card-network--${chip.tone}">${escapeHtml(chip.label)}</span>`;
 }
 
+function currentNetworkStatus(profileId, statusMap = {}) {
+  return statusMap[profileId] ?? getCachedNetworkStatus(profileId) ?? "checking";
+}
+
 function applyNetworkChipsToDom(statusMap = {}) {
   if (!savedList) return;
   savedList.querySelectorAll(".hub-card-item").forEach((li) => {
@@ -83,11 +90,56 @@ function applyNetworkChipsToDom(statusMap = {}) {
     if (!pid) return;
     const chipEl = li.querySelector(".hub-card-network");
     if (!chipEl) return;
-    const status = statusMap[pid] ?? getCachedNetworkStatus(pid) ?? "checking";
+    const status = currentNetworkStatus(pid, statusMap);
     const chip = networkStatusChip(status);
     chipEl.className = `hub-card-network hub-card-network--${chip.tone}`;
     chipEl.textContent = chip.label;
   });
+  applyRevokedSinceVisitAlerts(statusMap);
+}
+
+function applyRevokedSinceVisitAlerts(statusMap = {}) {
+  if (!savedList || !hubConfig.fetchNetworkStatus) return;
+
+  savedList.querySelectorAll(".hub-card-item").forEach((li) => {
+    const pid = li.dataset.profileId;
+    if (!pid) return;
+    const status = currentNetworkStatus(pid, statusMap);
+    const show = isRevokedSinceLastVisit(pid, status);
+    const alertEl = li.querySelector(".hub-card-status-alert");
+
+    li.classList.toggle("hub-card-item--revoked-since-visit", show);
+    if (alertEl) alertEl.hidden = !show;
+    if (show) {
+      const base = li.dataset.hubSearchable || "";
+      if (!base.includes("revoked since last visit")) {
+        li.dataset.hubSearchable = `${base} revoked since last visit`.trim();
+      }
+    }
+  });
+}
+
+function bindRevokedAlertHandlers() {
+  if (!savedList) return;
+
+  savedList.querySelectorAll(".hub-card-alert-dismiss").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const li = btn.closest(".hub-card-item");
+      const pid = li?.dataset.profileId;
+      if (!pid) return;
+      recordNetworkSeen(pid, "revoked");
+      li?.classList.remove("hub-card-item--revoked-since-visit");
+      const alertEl = li?.querySelector(".hub-card-status-alert");
+      if (alertEl) alertEl.hidden = true;
+    });
+  });
+}
+
+function acknowledgeNetworkSeenForEntry(entry) {
+  if (!entry?.profile_id) return;
+  recordNetworkSeen(entry.profile_id, getCachedNetworkStatus(entry.profile_id) ?? entry.status);
 }
 
 async function fetchAndApplyNetworkChips() {
@@ -218,6 +270,13 @@ function renderSavedRows() {
     const netChip = hubConfig.fetchNetworkStatus
       ? networkChipHtml(entry.profile_id, getCachedNetworkStatus(entry.profile_id) ?? "checking")
       : "";
+    const revokedAlert = hubConfig.fetchNetworkStatus
+      ? `<p class="hub-card-status-alert" data-hub-searchable="revoked since last visit network" hidden role="status">
+          Revoked on the network since your last visit.
+          <button type="button" class="hub-card-alert-dismiss">Got it</button>
+        </p>`
+      : "";
+
     li.innerHTML = `
       <div class="hub-card-head">
         <span class="list-icon list-icon-tone-trust" aria-hidden="true">
@@ -229,6 +288,7 @@ function renderSavedRows() {
         </span>
         ${netChip}
       </div>
+      ${revokedAlert}
       <div class="hub-card-actions">
         <div class="hub-card-actions-primary">
           <button type="button" class="hub-card-action hub-use-keys" data-id="${escapeHtml(entry.id)}">Use keys</button>
@@ -246,13 +306,25 @@ function renderSavedRows() {
     savedList.appendChild(li);
   }
 
+  bindRevokedAlertHandlers();
+
   savedList.querySelectorAll(".hub-use-keys").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-id");
       const entry = loadWallet().find((e) => e.id === id);
       if (!entry) return;
+      acknowledgeNetworkSeenForEntry(entry);
       activateWalletEntry(entry);
       location.href = createdUrlForEntry(entry);
+    });
+  });
+
+  savedList.querySelectorAll(".hub-manage").forEach((link) => {
+    link.addEventListener("click", () => {
+      const li = link.closest(".hub-card-item");
+      const pid = li?.dataset.profileId;
+      const entry = loadWallet().find((e) => e.profile_id === pid);
+      if (entry) acknowledgeNetworkSeenForEntry(entry);
     });
   });
 
@@ -446,6 +518,12 @@ export function initDeviceHub(config = {}) {
     applySearchFilter();
     refreshEmptyHint();
   });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") snapshotNetworkSeenOnExit();
+  });
+
+  window.addEventListener("pagehide", () => snapshotNetworkSeenOnExit());
 }
 
 window.addEventListener("hc-focus-hub-search", () => focusHubSearch());
