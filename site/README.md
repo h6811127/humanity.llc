@@ -45,6 +45,7 @@ npm run deploy
 | `index.html` | Landing (four-step progress, device hub, status plate pilot — no pass demo) |
 | `created/index.html` | Post-create owner UI + shared device hub |
 | `wallet/index.html` | Saved cards on this device (`hc_wallet` in localStorage) |
+| `shop/index.html` | Tier 0 founding sticker drop (story shop; checkout TBD) |
 | `js/device-hub-ui.mjs`, `js/device-activity.mjs` | Shared hub + local activity log |
 | `js/landing-device-hub.mjs`, `js/created-hub.mjs` | Page-specific hub init |
 | `js/card-wallet.mjs` | Wallet CRUD + pin form |

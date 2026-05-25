@@ -3723,6 +3723,113 @@ body.landing-focus-mode .screen-landing {
   line-height: 1.5;
 }
 
+.screen-shop {
+  padding: 0 var(--pad) 48px;
+}
+
+.shop-hero {
+  margin-bottom: 8px;
+}
+
+.shop-hero-actions {
+  margin-top: 16px;
+}
+
+.shop-story-row {
+  margin-bottom: 28px;
+}
+
+.shop-lead {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--black);
+  margin: 0 0 16px;
+}
+
+.shop-lead-muted {
+  color: var(--grey);
+  font-size: 14px;
+}
+
+.shop-product-card {
+  padding: 16px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--white);
+}
+
+.shop-product-kicker {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--grey);
+  margin: 0 0 6px;
+}
+
+.shop-product-price {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 14px;
+}
+
+.shop-bullets {
+  margin: 0 0 12px;
+  padding-left: 1.15rem;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.shop-bullets-get {
+  color: var(--black);
+}
+
+.shop-bullets-not {
+  color: var(--grey);
+}
+
+.shop-required-line {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  line-height: 1.45;
+  background: rgba(219, 27, 67, 0.06);
+  border: 1px solid rgba(219, 27, 67, 0.18);
+}
+
+.shop-interest-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 28rem;
+}
+
+.shop-interest-btn {
+  align-self: flex-start;
+}
+
+.shop-faq {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.shop-faq summary {
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.shop-faq p {
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--grey);
+}
+
 .studio-post-back {
   display: inline-block;
   margin-bottom: 12px;

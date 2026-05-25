@@ -39,7 +39,7 @@ Check every box before taking money.
 ### Tier 0 (curiosity)
 
 - [ ] One sticker (or card) passes physical scan QA on ≥3 phones
-- [ ] Story-row product page live with Tier 0 copy
+- [x] Story-row product page live with Tier 0 copy (`/shop/`, `docs/SHOP_TIER0_IMPLEMENTATION.md`)
 - [ ] Batch QR resolves to correct landing (no stale verification on print)
 - [ ] Analytics: scan count + scan→card-create (no per-scan PII logging)
 

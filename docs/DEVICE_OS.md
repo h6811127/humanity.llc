@@ -1,6 +1,6 @@
 # Device OS — browser shell + physical network
 
-**Status:** Phase 8 shipped (cross-tab keys banner + glance polish)  
+**Status:** Phase 8 shipped (device hub) · **Active vertical:** merch Tier 0 shop (`/shop/`)  
 **Audience:** Product, frontend, and anyone extending Pages without accounts
 
 ---
@@ -157,6 +157,26 @@ See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` for storage and search.
 | 11 | Cross-tab keys banner (`device-tab-presence.mjs`) | ✅ |
 | 12 | Deferred: resolver-wide search / directory | — |
 | — | Deferred: per-card revoke on landing hub | — (use Manage) |
+
+### Optional hub polish (not scheduled)
+
+Small TLC items that need **no new resolver APIs**:
+
+| Item | Notes |
+|------|--------|
+| Browser notifications when live proof is waiting | Device-only; `Notification` API after inbox poll finds pending |
+| Glance on `/wallet/` | Today `#device-hub-glance` is landing-only; mirror collapsed summary on wallet shell |
+| Light frontend tests | Vitest or Playwright for `device-tab-presence` + `device-live-control-inbox` poll/render |
+
+### Owner key portability (shipped — see M5.5)
+
+Revoke and manage from a **new device** without a duplicate card is **in repo** (`docs/M5_5_OWNER_KEY_PORTABILITY.md`):
+
+- Encrypted backup export/import (`.hcbackup`, PBKDF2 + AES-GCM) on `/created/` and hub **Import backup**
+- Recovery key at create + recovery-signed revoke on the Worker
+- Remaining gaps: production deploy checks, second-device manual QA
+
+Merch and stranger tests do **not** block on further M5.5 work unless QA finds a gap.
 
 ### Cross-tab keys (Phase 8)
 

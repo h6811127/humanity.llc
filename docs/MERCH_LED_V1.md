@@ -1,7 +1,9 @@
 # Merch-Led V1: Curiosity + Belonging
 
-**Status:** Canonical wedge (v1 GTM)  
+**Status:** Canonical wedge (v1 GTM) · **Phase B in progress** — Tier 0 story shop at `/shop/`  
 **Purpose:** Lead with physical artifacts as viral distribution while pairing **proof of curiosity** (spread) with **proof of belonging** (retention). Commons Pass and organizer tooling follow once people already wear the object.
+
+**Implementation tracker:** `docs/SHOP_TIER0_IMPLEMENTATION.md` (Pages UI, waitlist interest, Shopify handoff checklist).
 
 **Architecture and launch gate:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — public card creation when Phase A ships; federated networks long-term; founding cohort is optional feedback only.
 
@@ -132,11 +134,13 @@ Prove the scan moment is worth a stranger’s attention:
 Prove walking ads work:
 
 1. One flagship artifact (sticker recommended first for scan QA; flat card second).
-2. Story-row storefront — one narrative, not a 50-SKU grid.
+2. Story-row storefront — one narrative, not a 50-SKU grid. **Shipped (UI):** [`/shop/`](../site/shop/index.html) — copy from `LAUNCH_LANGUAGE_KIT.md` Tier 0; checkout not wired yet.
 3. Non-personalized or lightly personalized QR pointing at network (personalized per-item QR only after Printify spike passes — see `docs/V1_ASSUMPTION_REGISTER.md`).
 4. Packaging / product page with bearer warning and “merch ≠ vouched” line.
 
 **Exit:** Orders from outside founder network; scan→create conversion tracked; at least one organic reshare.
+
+**Prerequisite (digital):** Owner key portability for revoke-any-device is shipped in repo (`docs/M5_5_OWNER_KEY_PORTABILITY.md`) — encrypted backup + recovery key; deploy QA remains.
 
 ### Phase C — Belonging on the object (personalized line)
 

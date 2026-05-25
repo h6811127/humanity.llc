@@ -79,6 +79,14 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 - **`device-cross-tab-banner.mjs`** on landing and `/wallet/` when keys live in another tab.
 - Hub glance rows for cross-tab keys and live proof when collapsed.
 
+### Optional hub polish (deferred)
+
+No backend required:
+
+- Browser notifications when a live proof is waiting (device-only).
+- Hub glance on `/wallet/` (landing-only today).
+- Light frontend tests for tab presence and live-control inbox polling.
+
 ### Deferred
 
 - Resolver search API, directory of handles.
