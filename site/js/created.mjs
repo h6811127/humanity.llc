@@ -12,6 +12,7 @@ import { initVoucherRevoke } from "./vouch-revoke.mjs";
 import { initKeyBackupUi } from "./key-backup-ui.mjs";
 import { initRecoveryKeyUi } from "./recovery-key-ui.mjs";
 import { initManifestoUpdate } from "./created-manifesto-update.mjs";
+import { initQrRotate } from "./created-qr-rotate.mjs";
 import { inferPilotTemplate } from "./manifesto-display.mjs";
 import { initCreatedTabs } from "./created-tabs.mjs";
 import { initCreatedDeviceSave } from "./created-device-save.mjs";
@@ -69,10 +70,10 @@ const scanOrigin =
     : location.origin;
 
 const profileId = data?.profile_id || profileIdParam;
-const qrId = data?.qr_id || qrIdParam;
-const scanUrl =
+let activeQrId = data?.qr_id || qrIdParam;
+let activeScanUrl =
   data?.scan_url ||
-  (profileId && qrId ? qrScanUrl(profileId, qrId, scanOrigin) : null);
+  (profileId && activeQrId ? qrScanUrl(profileId, activeQrId, scanOrigin) : null);
 
 const noSessionEl = document.getElementById("no-session");
 const handleEl = document.getElementById("created-handle");
@@ -121,7 +122,7 @@ function initLiveControlProof() {
   const btn = document.getElementById("live-control-proof-btn");
   const status = document.getElementById("live-control-proof-status");
   const lead = document.getElementById("live-control-proof-lead");
-  if (!panel || !btn || !status || !profileId || !qrId) {
+  if (!panel || !btn || !status || !profileId || !activeQrId) {
     return { refresh: () => {} };
   }
 
@@ -168,7 +169,7 @@ function initLiveControlProof() {
         data?.handle ? `@${data.handle}` : profileId ? profileId.slice(0, 12) : "Live proof request";
       logDeviceActivity("live_control", lcLabel, {
         profile_id: profileId ?? null,
-        qr_id: qrId ?? null,
+        qr_id: activeQrId ?? null,
       });
     }
   }
@@ -227,7 +228,7 @@ function initLiveControlProof() {
     const keys = currentSigningKeys();
     if (!keys) return;
     try {
-      const res = await fetch(getPendingLiveControlChallengeUrl(profileId, qrId), {
+      const res = await fetch(getPendingLiveControlChallengeUrl(profileId, activeQrId), {
         cache: "no-store",
       });
       if (res.status === 404) return;
@@ -265,7 +266,7 @@ function initLiveControlProof() {
     try {
       const response = await signLiveControlResponse({
         profileId,
-        qrId,
+        qrId: activeQrId,
         challengeId: activeChallengeId,
         privateKeyBase58: keys.privateKeyBase58,
         publicKeyBase58: keys.publicKeyBase58,
@@ -331,7 +332,7 @@ async function hydrateSessionFromNetwork() {
   const next = {
     ...existing,
     profile_id: profileId,
-    qr_id: existing.qr_id || qrId,
+    qr_id: existing.qr_id || activeQrId,
     handle: card.handle,
     manifesto_line: card.manifesto_line,
     created_at: card.created_at,
@@ -354,7 +355,7 @@ function applyOrganizerHandoffUi(session) {
 
   const orgUrl = new URL("/organizer-revoke/", location.origin);
   if (profileId) orgUrl.searchParams.set("profile_id", profileId);
-  if (qrId) orgUrl.searchParams.set("qr_id", qrId);
+  if (activeQrId) orgUrl.searchParams.set("qr_id", activeQrId);
   const href = orgUrl.href;
   if (link) link.href = href;
   if (linkInline) linkInline.href = href;
@@ -376,9 +377,9 @@ function applyOrganizerHandoffUi(session) {
   });
 }
 
-if (!profileId && !qrId && !data) {
+if (!profileId && !activeQrId && !data) {
   noSessionEl.hidden = false;
-} else if (!profileId || !qrId) {
+} else if (!profileId || !activeQrId) {
   noSessionEl.hidden = false;
   noSessionEl.textContent =
     "Missing profile or QR in this link. Create a new card, or open the full URL from your create confirmation.";
@@ -467,9 +468,9 @@ function capitalizeStatus(value) {
 }
 
 async function refreshNetworkStatus() {
-  if (!profileId || !qrId) return;
+  if (!profileId || !activeQrId) return;
   try {
-    const res = await fetch(getCardStatusUrl(profileId, qrId), { cache: "no-store" });
+    const res = await fetch(getCardStatusUrl(profileId, activeQrId), { cache: "no-store" });
     if (!res.ok) return;
     const body = await res.json();
     const scan = body.scan ?? {};
@@ -507,14 +508,14 @@ if (networkQrExpiresEl) {
   }
 }
 
-if (scanUrl) {
-  scanUrlEl.textContent = scanUrl;
+if (activeScanUrl) {
+  scanUrlEl.textContent = activeScanUrl;
   copyBtn.disabled = false;
-  copyBtn.onclick = () => navigator.clipboard.writeText(scanUrl);
+  copyBtn.onclick = () => navigator.clipboard.writeText(activeScanUrl);
 
   if (openScanBtn) {
     openScanBtn.hidden = false;
-    openScanBtn.href = scanUrl;
+    openScanBtn.href = activeScanUrl;
     openScanBtn.addEventListener("click", () => {
       markLoopDone("scan");
       setLoopStep("revoke");
@@ -527,15 +528,15 @@ if (scanUrl) {
 
   try {
     const { renderQrToImage, downloadQrPng } = await import("./qr-render.mjs");
-    await renderQrToImage(qrImg, scanUrl);
+    await renderQrToImage(qrImg, activeScanUrl);
     if (downloadQrBtn) {
       downloadQrBtn.disabled = false;
-      const slug = data?.handle ? String(data.handle) : qrId?.slice(0, 8) || "scan";
+      const slug = data?.handle ? String(data.handle) : activeQrId?.slice(0, 8) || "scan";
       downloadQrBtn.onclick = async () => {
         const prev = downloadQrBtn.textContent;
         downloadQrBtn.disabled = true;
         try {
-          await downloadQrPng(scanUrl, `humanity-${slug}-qr.png`);
+          await downloadQrPng(activeScanUrl, `humanity-${slug}-qr.png`);
           downloadQrBtn.textContent = "Downloaded";
           setTimeout(() => {
             downloadQrBtn.textContent = prev;
@@ -571,15 +572,15 @@ function applySampleLoopUi(session) {
 }
 
 async function bootstrapOwnerTools() {
-  if (!profileId || !qrId) return;
+  if (!profileId || !activeQrId) return;
 
   await hydrateSessionFromNetwork();
   void refreshNetworkStatus();
 
   const revokeCtx = {
     profileId,
-    qrId,
-    scanUrl,
+    qrId: activeQrId,
+    scanUrl: activeScanUrl,
     getSession: loadSession,
     setSession: saveSession,
     showError,
@@ -587,7 +588,7 @@ async function bootstrapOwnerTools() {
       markLoopDone("revoke");
       setLoopStep("scan-again");
       revealOwnerActions();
-      if (openScanBtn && scanUrl) {
+      if (openScanBtn && activeScanUrl) {
         openScanBtn.textContent = "Scan again (see revoked state)";
       }
     },
@@ -611,6 +612,45 @@ async function bootstrapOwnerTools() {
     },
   });
   manifestoUpdate?.show();
+
+  const qrRotate = initQrRotate({
+    profileId,
+    getSession: loadSession,
+    setSession: saveSession,
+    showError,
+    getSigningKeys: currentSigningKeys,
+    async onRotated({ qrId: newQrId, scanUrl: newScanUrl, expiresAt }) {
+      activeQrId = newQrId;
+      activeScanUrl = newScanUrl;
+      data = loadSession();
+      if (profileIdEl) profileIdEl.textContent = profileId;
+      if (scanUrlEl) scanUrlEl.textContent = newScanUrl;
+      if (newScanUrl) {
+        if (copyBtn) {
+          copyBtn.disabled = false;
+          copyBtn.onclick = () => navigator.clipboard.writeText(newScanUrl);
+        }
+        if (openScanBtn) openScanBtn.href = newScanUrl;
+        if (qrImg) {
+          try {
+            const { renderQrToImage } = await import("./qr-render.mjs");
+            await renderQrToImage(qrImg, newScanUrl);
+          } catch (err) {
+            console.error(err);
+          }
+        }
+      }
+      void refreshNetworkStatus();
+      logDeviceActivity("saved", {
+        title: "Rotated QR",
+        detail: newQrId ? `${newQrId.slice(0, 12)}…` : "New credential",
+      });
+      if (networkQrExpiresEl && expiresAt) {
+        networkQrExpiresEl.textContent = new Date(expiresAt).toLocaleDateString();
+      }
+    },
+  });
+  qrRotate?.show();
   const backup = initKeyBackupUi({
     profileId,
     getSession: loadSession,
@@ -656,7 +696,7 @@ async function bootstrapOwnerTools() {
 
 createdTabs = initCreatedTabs();
 
-if (profileId && qrId) {
+if (profileId && activeQrId) {
   deviceSaveCtl = initCreatedDeviceSave(loadSession);
   void bootstrapOwnerTools();
 }

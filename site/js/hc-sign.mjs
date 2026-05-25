@@ -184,6 +184,13 @@ export function postCardUpdateUrl(profileId) {
   ).href;
 }
 
+export function postQrRotateUrl(profileId) {
+  return new URL(
+    `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/qr`,
+    resolverApiOrigin()
+  ).href;
+}
+
 export function postLiveControlResponseUrl(profileId) {
   return new URL(
     `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/live-control/responses`,
