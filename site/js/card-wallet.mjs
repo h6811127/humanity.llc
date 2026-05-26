@@ -12,7 +12,8 @@ import {
 import { tabNoticeCount } from "./device-counts.mjs";
 import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs";
 import { openCardNowPage, getTabSession } from "./device-keys.mjs";
-import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
+import { getOtherTabsWithKeys, purgePresenceForProfile } from "./device-tab-presence.mjs";
+import { markProfileRemovedFromDevice } from "./device-wallet-removed-profiles.mjs";
 import {
   defaultWalletLabel,
   loadWallet,
@@ -176,6 +177,18 @@ function renderList() {
   listEl.querySelectorAll(".wallet-remove").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-id");
+      const entry = loadWallet().find((e) => e.id === id);
+      if (
+        !window.confirm(
+          "Remove this card from this device? Keys stay in any other tab until you close it."
+        )
+      ) {
+        return;
+      }
+      if (entry?.profile_id) {
+        markProfileRemovedFromDevice(entry.profile_id);
+        purgePresenceForProfile(entry.profile_id);
+      }
       saveWallet(loadWallet().filter((e) => e.id !== id));
       renderList();
       updateActiveBanner();

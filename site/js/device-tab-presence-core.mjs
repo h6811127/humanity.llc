@@ -75,11 +75,30 @@ export function pruneStalePresence(map, now, staleMs = PRESENCE_STALE_MS) {
 }
 
 /**
+ * @param {Record<string, PresenceEntry>} map
+ * @param {string} profileId
+ * @returns {{ map: Record<string, PresenceEntry>, changed: boolean }}
+ */
+export function removePresenceRowsForProfile(map, profileId) {
+  const pid = typeof profileId === "string" ? profileId.trim() : "";
+  if (!pid) return { map, changed: false };
+  let changed = false;
+  for (const [id, entry] of Object.entries(map)) {
+    if (entry?.profile_id === pid) {
+      delete map[id];
+      changed = true;
+    }
+  }
+  return { map, changed };
+}
+
+/**
  * @param {{
  *   map: Record<string, PresenceEntry>,
  *   tabId: string,
  *   thisProfile: string | null,
  *   savedProfileIds?: Set<string> | string[],
+ *   removedProfileIds?: Set<string> | string[],
  *   now?: number,
  *   staleMs?: number,
  *   showMs?: number,
@@ -93,6 +112,10 @@ export function listOtherTabsWithKeys(input) {
     input.savedProfileIds instanceof Set
       ? input.savedProfileIds
       : new Set(input.savedProfileIds ?? []);
+  const removed =
+    input.removedProfileIds instanceof Set
+      ? input.removedProfileIds
+      : new Set(input.removedProfileIds ?? []);
   const map = { ...input.map };
   pruneStalePresence(map, now, staleMs);
 
@@ -104,6 +127,7 @@ export function listOtherTabsWithKeys(input) {
     if (now - normalized.updatedAt > showMs) continue;
     if (input.thisProfile && normalized.profile_id === input.thisProfile) continue;
     if (saved.has(normalized.profile_id)) continue;
+    if (removed.has(normalized.profile_id)) continue;
     others.push({ tabId: id, ...normalized });
   }
   others.sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0));

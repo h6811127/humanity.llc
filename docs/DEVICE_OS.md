@@ -218,7 +218,11 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 **Presence:** `localStorage` `hc_tab_keys_presence`  -  each tab heartbeats every 4s **while that tab is visible** with `profile_id` / handle / label only (never private keys). Rows age out of the UI after ~6s without a heartbeat and are pruned from storage after 10s. Cleared on `pagehide` (tab close/navigation away). Background tabs do not heartbeat but leave a recent row until stale.
 
+**Count semantics (inbox badge / banner):** The shell badge number is the **total actionable inbox count** (live proof + cross-tab + unsaved-this-tab + card-disabled), not “number of create tabs.” For cross-tab only: the count is **other open tabs with keys that heartbeated while visible in the last ~6s** — not a historical total of tabs you opened or closed. Six create tabs in the background typically contribute **0–1** to cross-tab until you focus each tab; closing a tab removes it from presence immediately. See [`DEVICE_INBOX.md`](DEVICE_INBOX.md) counting rule 5.
+
 **Banner:** `#device-cross-tab-banner` on landing and `/wallet/` when another tab holds keys **this device has not saved yet**, and this tab does not show the unsaved-keys notice row (`tabNoticeCount === 0`). Saved cards use **Open controls** from the hub/wallet instead. Presence rows must heartbeat within ~6s (ghost entries drop from UI sooner than the 10s storage prune).
+
+**Removed from device:** Profiles in `localStorage` `hc_wallet_removed_profile_ids` (set on hub/wallet remove) are excluded from cross-tab inbox/banner even if another tab still heartbeats keys; presence rows for that profile are purged on remove. Re-saving the card to `hc_wallet` clears the denylist entry. See [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md).
 
 **Glance:** Collapsed hub shows inbox actionable rows (live proof, cross-tab, tab keys, card-disabled-since-visit) plus saved-card peek via `buildGlanceRowPlan()` — see [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 
@@ -226,7 +230,7 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 **Scope:** Device hub only on **landing** and **`/wallet/`**  -  not duplicated on `/created/` (that page keeps the existing **Prove live control** panel for the open card).
 
-**Poll:** Every 5s while the tab is visible, `GET /.well-known/hc/v1/cards/{profile_id}/live-control/challenges?qr_id=…` for each **saved** wallet row that has a `qr_id`.
+**Poll (shipped — under review):** Every 5s while the tab is visible, `GET /.well-known/hc/v1/cards/{profile_id}/live-control/challenges?qr_id=…` for **each** saved wallet row that has a `qr_id` (parallel). This can exceed the **entire Workers Free daily quota** with a modest wallet and one open tab — see **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)**. Planned direction: poll only when hub/inbox needs it, round-robin one card per tick, longer idle interval — **not** remove network awareness entirely.
 
 **UI:**
 

@@ -1,7 +1,7 @@
 # Investigation: “Card disabled on the network since your last visit” on every saved card
 
-**Date:** 2026-05-25 (updated 2026-05-26)  
-**Status:** **Reopened (client gap)** — Slices 1–8 fixed the session-cache / baseline-changed false positive; a **second gap** remains (stale in-visit resolver-confirmed state). See [§ Follow-up 2026-05-26](#follow-up-2026-05-26-stale-in-visit-resolver-confirmed-state).  
+**Date:** 2026-05-25 (updated 2026-05-26 afternoon)  
+**Status:** **Environmental + client** — Production **Cloudflare Error 1027** (`workers_daily_limit`) is the primary driver for “Resolver limited” and resolver 429s; client false positives (Slices 1–8 + second-pass gate) are secondary when polls are untrustworthy. See [§ Production incident — Workers daily limit](#production-incident-2026-05-26--cloudflare-workers-daily-limit-error-1027).  
 **Scope:** Saved-card hub rows on `/`, `/wallet/`, `/created/` — not Worker resolver logic unless `scan.kind` truly disagrees  
 **Related audits:** [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md) (DH-1–DH-15, Slices 1–8), [`DEVICE_OS.md`](DEVICE_OS.md) § Card disabled since last visit, [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P1 / P5b  
 
@@ -337,10 +337,113 @@ Slices 1–8 prevent **cache-only** banners (`resolverConfirmed: false`). A bann
 
 ### Immediate user mitigation
 
-1. Hard refresh after deploy of the fix above.
-2. If still rate-limited: close extra tabs, wait ~60s (live-control backoff), then refresh once.
-3. Optional: `sessionStorage.removeItem("hc_wallet_network_cache"); location.reload();`
-4. In DevTools → Network, confirm `GET …/status?q=` returns `"scan": { "kind": "active" }` when the resolver is reachable — only then should the since-visit banner be legitimate.
+1. **If health returns Cloudflare 1027** — see [§ Production incident](#production-incident-2026-05-26--cloudflare-workers-daily-limit-error-1027). Do **not** retry; wait for UTC midnight reset or upgrade Workers plan. Client mitigations cannot restore the resolver.
+2. Hard refresh after deploy of the second-pass client fix (`70769c1`+).
+3. If edge returns transient 429 (not 1027): close extra tabs, wait ~60s (live-control backoff), then refresh once.
+4. Optional: `sessionStorage.removeItem("hc_wallet_network_cache"); location.reload();`
+5. In DevTools → Network, confirm `GET …/status?q=` returns `"scan": { "kind": "active" }` when the resolver is reachable — only then should the since-visit banner be legitimate.
+
+---
+
+## Production incident 2026-05-26 — Cloudflare Workers daily limit (Error 1027)
+
+### Evidence (browser Network → health)
+
+`GET https://humanity.llc/.well-known/hc/v1/health` can return **429** with a Cloudflare JSON body (not Worker app JSON), for example:
+
+| Field | Value |
+|-------|--------|
+| `error_code` | **1027** |
+| `error_name` | `workers_daily_limit` |
+| `title` | Error 1027: This website has been temporarily rate limited |
+| `detail` | Site owner exceeded **Workers free tier daily request limit**; resets **midnight UTC** |
+| `retryable` | **false** |
+| `owner_action_required` | **true** |
+
+This is **account / plan capacity**, not a per-IP burst limit and not “too many cards in one tab” alone. Retrying from the browser **does not help** until the quota resets or the plan is upgraded.
+
+### Revised root-cause hierarchy
+
+```mermaid
+flowchart TB
+  subgraph primary [Primary — infrastructure]
+    CF[Cloudflare 1027 workers_daily_limit]
+    CF --> H429[Health + status + live-control return 429]
+    H429 --> RL[Shell: Resolver limited / degraded]
+  end
+
+  subgraph secondary [Secondary — client amplification]
+    LP[Live proof: every saved card every 5s while tab visible]
+    WN[Wallet network status poll per saved row]
+    MT[Many tabs / refreshes / create flows]
+    LP --> CF
+    WN --> CF
+    MT --> CF
+  end
+
+  subgraph tertiary [Tertiary — client UI bugs when polls mixed]
+    ST[Stale latestResolved* or session cache]
+    ST --> BAN[Since-visit banner while chips say unreachable]
+    GATE[since-visit gate when degraded — shipped 70769c1]
+    GATE -.->|should hide| BAN
+  end
+
+  RL --> GATE
+  H429 --> ST
+```
+
+| Layer | What it explains | Fix owner |
+|-------|------------------|-----------|
+| **1027 daily limit** | Top banner **Resolver limited**; health 429; widespread `live-control/challenges` 429 in console | **Site owner** — upgrade Workers or wait for UTC reset |
+| **Request amplification** | How the account hit the daily cap (many saved cards × 5s live proof + status polls + multi-tab testing) | Product/engineering — backoff, scope polls when degraded ([`UI_UX_REVERT_PLAN.md`](UI_UX_REVERT_PLAN.md)) |
+| **Stale since-visit UI** | Red **Card disabled since your last visit** on rows while chips say **Can't reach resolver** | Client — Slices 1–8 + second pass + gate when `degraded`/`offline` |
+
+**Conclusion:** The screenshot (Resolver limited + many live-control 429s + since-visit banners) is **expected** while 1027 is active **unless** the deployed bundle includes the since-visit **suppression gate** and it has run (`setResolverHealthStatusForSinceVisit("degraded")` → `shouldSuppressCardDisabledSinceVisitAlerts()`). If banners persist **with** Resolver limited on a bundle **after** `70769c1`, treat as a regression (health/gate ordering or a code path that bypasses `applyRevokedSinceVisitAlerts` suppress).
+
+### Client mapping of 429 health
+
+`fetchResolverHealth()` (`device-network-health.mjs`) treats any non-OK health response (including Cloudflare 1027 JSON) as **`degraded`**, which drives:
+
+- System banner: **Resolver limited - create, update, and revoke may fail until service recovers.**
+- `setResolverHealthStatusForSinceVisit("degraded")` → since-visit gate **should** hide hub/inbox/dot since-visit surfaces.
+
+Live-control polls classify HTTP **429** as `rate_limited` → poll health **`degraded`**, which also satisfies the gate via `getLiveControlPollHealth()`.
+
+### Console noise: view transition `AbortError`
+
+Repeated **`AbortError: Old view transition aborted by new view transition`** from `applyDot` → `startViewTransition` (`device-status.mjs`) while `notifyHubChanged` / `refreshSummary` run is **cosmetic**. It happens when hub/inbox refresh fires faster than view transitions complete (common under poll churn). It does **not** set `scan.kind` and is unrelated to since-visit correctness. Optional hardening: skip `startViewTransition` for dot-only updates or catch/suppress abort on the transition promise.
+
+### If symptoms persist after UTC reset + deploy
+
+1. Confirm health returns **200** with app JSON (not 1027).
+2. Confirm `device-wallet-since-visit-gate` is on the loaded bundle (hard refresh / `?v=` on shell scripts).
+3. Confirm row `GET …/status?q=` `scan.kind` — banner is only legitimate when **`active` → `card_revoked`** with a confirmed poll, not when resolver is down.
+
+---
+
+## Cross-tab “Keys in another tab” badge (related report, 2026-05-26)
+
+**User expectation:** After opening six create tabs (keys unsaved) and closing them, the inbox badge should reflect **six** outstanding key tabs.
+
+**Documented behavior (not a live “tabs I opened today” counter):**
+
+| Rule | Implementation |
+|------|----------------|
+| Presence is **per open tab**, not historical | `pagehide` → `clearTabKeysPresence()` removes a tab from `hc_tab_keys_presence` when it closes |
+| Heartbeat only while **visible** | `device-tab-presence.mjs` — `setInterval` calls `syncTabKeysPresence()` only when `document.visibilityState === "visible"` |
+| UI list uses **fresh** heartbeats | `listOtherTabsWithKeys()` drops rows older than **`PRESENCE_SHOW_MS` (~6s)** (`device-tab-presence-core.mjs`) |
+| Cross-tab hidden if **this tab** has unsaved keys | `shouldShowCrossTabKeysNotice(otherCount, tabNoticeCount)` requires `tabNoticeCount === 0` |
+| Badge is **total inbox count**, not cross-tab only | `inboxCountFromItems()` sums `live_proof` + `cross_tab_keys` + `tab_keys_unsaved` + `card_disabled_since_visit` |
+
+So a badge showing **1–3** while six create tabs existed usually means: only **1–3 other tabs** had a visible heartbeat in the last ~6 seconds (background tabs do not heartbeat), and/or the badge includes **other inbox kinds** (e.g. live proof pending). **Closing all six tabs removes them from presence** — the badge should drop to **0** for cross-tab within ~6–10s unless another tab still holds keys.
+
+**Docs:** [`DEVICE_OS.md`](DEVICE_OS.md) § Cross-tab keys (Phase 8); [`DEVICE_INBOX.md`](DEVICE_INBOX.md) § Counting rules (cross-tab row).
+
+**Product gap (optional future):** A “tabs with unsaved keys you opened recently” count would need a different signal than visibility heartbeats (e.g. session-scoped registry updated on create, pruned on save/close).
+
+**Flash after card delete (2026-05-26):** See [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md) — remove/revoke does not clear `hc_created` or presence; wallet remove re-enables cross-tab for that profile.
+
+**Polling / quota (same incident family):** Resolver 429s and 1027 were worsened by **live-control + wallet status polling** (N cards every 5s). That is separate from since-visit UI logic but shares the same user-visible “Resolver limited” window. Remediation plan: **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)**.
 
 ---
 

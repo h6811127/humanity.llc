@@ -60,6 +60,8 @@ import {
   hubCardTitle,
 } from "./device-hub-card-row-core.mjs";
 import { humanTrustIconMeta, isEligibleVoucherState } from "./human-trust-ui.mjs";
+import { purgePresenceForProfile } from "./device-tab-presence.mjs";
+import { markProfileRemovedFromDevice } from "./device-wallet-removed-profiles.mjs";
 import {
   clearDefaultVouchIfProfile,
   isDefaultVouchProfile,
@@ -946,8 +948,9 @@ function renderSavedRows() {
       if (!window.confirm("Remove this card from this device? Keys stay in any other tab until you close it.")) {
         return;
       }
-      if (entry) {
-        clearDefaultVouchIfProfile(entry.profile_id);
+      if (entry?.profile_id) {
+        markProfileRemovedFromDevice(entry.profile_id);
+        purgePresenceForProfile(entry.profile_id);
         clearSignLock(entry.profile_id);
         logDeviceActivity("remove_card", entry.label, {
           profile_id: entry.profile_id,

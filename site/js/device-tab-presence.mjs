@@ -5,6 +5,7 @@
 import { tabNoticeCount } from "./device-counts.mjs";
 import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs";
 import { getTabSession } from "./device-keys.mjs";
+import { loadRemovedProfileIds } from "./device-wallet-removed-profiles.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import {
   capPresenceMap,
@@ -12,6 +13,7 @@ import {
   normalizePresenceEntry,
   normalizePresenceMap,
   PRESENCE_HEARTBEAT_MS,
+  removePresenceRowsForProfile,
 } from "./device-tab-presence-core.mjs";
 
 const PRESENCE_KEY = "hc_tab_keys_presence";
@@ -127,7 +129,21 @@ export function getOtherTabsWithKeys(opts = {}) {
     tabId,
     thisProfile,
     savedProfileIds,
+    removedProfileIds: loadRemovedProfileIds(),
   }).others;
+}
+
+/**
+ * Drop presence rows for a profile (e.g. after remove from device).
+ * @param {string} profileId
+ */
+export function purgePresenceForProfile(profileId) {
+  const map = readPrunedPresence();
+  const { map: next, changed } = removePresenceRowsForProfile({ ...map }, profileId);
+  if (!changed) return;
+  if (writePresenceIfChanged(next)) {
+    window.dispatchEvent(new Event("hc-tab-presence-changed"));
+  }
 }
 
 export function crossTabNoticeCount() {
@@ -191,5 +207,8 @@ export function startTabKeysPresence() {
     if (e.key === PRESENCE_KEY) {
       window.dispatchEvent(new Event("hc-tab-presence-changed"));
     }
+  });
+  window.addEventListener("hc-wallet-removed-profiles-changed", () => {
+    window.dispatchEvent(new Event("hc-tab-presence-changed"));
   });
 }

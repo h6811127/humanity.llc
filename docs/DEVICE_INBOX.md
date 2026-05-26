@@ -83,6 +83,7 @@ Canonical `kind` values (target: one module `device-inbox-core.mjs`, Vitest-cove
 2. **Dot overlay = highest-priority inbox kind** — `proof_waiting` → `cross_tab_keys` → `card_disabled_since_visit` (see `dotOverlayFromCounts()` in `device-dot-state-core.mjs`).
 3. **No double-counting** — e.g. cross-tab banner/glance only when `tabNoticeCount === 0` (`device-cross-tab-visibility.mjs`).
 4. **Live proof** — N pending challenges may show as one inbox group with quantity N; badge may show total count or “1” per product choice; document in tests when unified.
+5. **Cross-tab keys (`cross_tab_keys`)** — Badge contribution = **count of other tabs with a fresh presence heartbeat**, not “every create tab you ever opened.” Only tabs that are **open**, hold `hc_created` signing keys, and have heartbeated within ~**6s** while **visible** appear (`device-tab-presence.mjs`, `PRESENCE_SHOW_MS` in `device-tab-presence-core.mjs`). Closing a tab clears its row on `pagehide`; background tabs do not heartbeat. Profiles in `hc_wallet_removed_profile_ids` (after **Remove from device**) do not count toward cross-tab. The numeric badge is the **sum of all inbox item counts** (live proof + cross-tab + unsaved-this-tab + card-disabled), so **3** does not necessarily mean three key tabs — see [`DEVICE_OS.md`](DEVICE_OS.md) § Cross-tab keys and [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md).
 
 ---
 
@@ -190,6 +191,8 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 - OS notification via `registration.showNotification()` (same copy + sign deep link as Phase B); click handled in the SW.
 - **No server push** — device-only polling, `live_proof` policy only (Phase C).
 - **Limits:** Browsers may throttle or deny periodic sync; fully force-quit browsers may not wake the SW. Hidden-tab alerts still use the page path first (`maybeNotifyLiveProof`).
+
+**Request budget (ops):** Live proof is the main Worker cost driver (N saved cards × 5s × parallel `GET` while a tab is visible). A single tab can burn **100k+ requests/day** without viral traffic. Background SW polls add more when opted in. See **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)** for math, targets, and phased plan to scope polling.
 
 ---
 

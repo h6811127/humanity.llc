@@ -3,6 +3,7 @@
  * @see docs/DEVICE_HUB_AND_LOCAL_SEARCH.md
  */
 import { verificationRecordFromLabelState } from "./device-wallet-network-core.mjs";
+import { reconcileRemovedProfilesAfterWalletSave } from "./device-wallet-removed-profiles.mjs";
 
 export const WALLET_STORAGE_KEY = "hc_wallet";
 
@@ -66,6 +67,7 @@ export function loadWallet() {
 
 export function saveWallet(entries) {
   localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify(entries));
+  reconcileRemovedProfilesAfterWalletSave(entries);
   window.dispatchEvent(new Event("hc-device-hub-changed"));
 }
 

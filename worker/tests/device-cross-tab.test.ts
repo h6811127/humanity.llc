@@ -11,9 +11,15 @@ import {
   capPresenceMap,
   isValidPresenceProfileId,
   pruneStalePresence,
+  removePresenceRowsForProfile,
   PRESENCE_SHOW_MS,
   PRESENCE_STALE_MS,
 } from "../../site/js/device-tab-presence-core.mjs";
+import {
+  addRemovedProfileId,
+  isProfileRemovedFromDevice,
+  reconcileRemovedProfileIds,
+} from "../../site/js/device-wallet-removed-profiles-core.mjs";
 
 describe("pruneStalePresence", () => {
   it("removes entries without updatedAt", () => {
@@ -106,6 +112,22 @@ describe("listOtherTabsWithKeys", () => {
     expect(others).toHaveLength(0);
   });
 
+  it("hides other tabs for profiles removed from this device", () => {
+    const removedProfile = "7Xk9mP2nQ4rT6vW8yZ1aB3cD6";
+    const map = {
+      self: { profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5", updatedAt: now },
+      other: { profile_id: removedProfile, updatedAt: now },
+    };
+    const { others } = listOtherTabsWithKeys({
+      map,
+      tabId: "self",
+      thisProfile: null,
+      removedProfileIds: [removedProfile],
+      now,
+    });
+    expect(others).toHaveLength(0);
+  });
+
   it("hides stale-but-not-pruned rows from UI", () => {
     const map = {
       self: { profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5", updatedAt: now },
@@ -121,6 +143,33 @@ describe("listOtherTabsWithKeys", () => {
       now,
     });
     expect(others).toHaveLength(0);
+  });
+});
+
+describe("removePresenceRowsForProfile", () => {
+  it("removes all tab rows for a profile", () => {
+    const profile = "7Xk9mP2nQ4rT6vW8yZ1aB3cD6";
+    const map = {
+      a: { profile_id: profile, updatedAt: 1 },
+      b: { profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5", updatedAt: 2 },
+    };
+    const { map: next, changed } = removePresenceRowsForProfile(map, profile);
+    expect(changed).toBe(true);
+    expect(next).toEqual({ b: { profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5", updatedAt: 2 } });
+  });
+});
+
+describe("device-wallet-removed-profiles-core", () => {
+  it("adds profile to denylist front", () => {
+    const ids = addRemovedProfileId(["7Xk9mP2nQ4rT6vW8yZ1aB3cD5"], "7Xk9mP2nQ4rT6vW8yZ1aB3cD6");
+    expect(ids[0]).toBe("7Xk9mP2nQ4rT6vW8yZ1aB3cD6");
+    expect(isProfileRemovedFromDevice("7Xk9mP2nQ4rT6vW8yZ1aB3cD6", ids)).toBe(true);
+  });
+
+  it("reconcile clears denylist when profile is saved again", () => {
+    const removed = ["7Xk9mP2nQ4rT6vW8yZ1aB3cD6", "7Xk9mP2nQ4rT6vW8yZ1aB3cD7"];
+    const next = reconcileRemovedProfileIds(removed, ["7Xk9mP2nQ4rT6vW8yZ1aB3cD6"]);
+    expect(next).toEqual(["7Xk9mP2nQ4rT6vW8yZ1aB3cD7"]);
   });
 });
 
