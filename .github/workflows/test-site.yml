@@ -1,0 +1,41 @@
+# Site shell + trust-dot regression (Vitest helpers + Playwright).
+# @see docs/STATUS_INDICATOR_STEWARD_GREEN.md (optional follow-up: CI for device-status-dot)
+name: Test site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "e2e/**"
+      - "package.json"
+      - "package-lock.json"
+      - "playwright.config.ts"
+      - ".github/workflows/test-site.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "e2e/**"
+      - "package.json"
+      - "package-lock.json"
+      - "playwright.config.ts"
+      - ".github/workflows/test-site.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npm run worker:test
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Status dot E2E
+        run: npm run e2e -- e2e/device-status-dot.spec.ts
+        env:
+          CI: "true"

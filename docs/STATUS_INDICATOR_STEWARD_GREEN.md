@@ -138,7 +138,7 @@ Implementation snapshot:
 - Phase 1: `site/js/device-status.mjs` + `site/styles.css` — steward green (`#22c55e`), ARIA, status key legend.
 - Phase 2: `describeDotState()` in `site/js/device-dot-state-core.mjs` — **Now / Why / Next** in hub status key and glance popover; steward queue link when present.
 - Phase 3: overlay axis (`proof_waiting`, `cross_tab_keys`), `::after` notch in `site/styles.css`, `data-dot-state` / `data-dot-overlay`, Vitest in `worker/tests/device-dot-state.test.ts`.
-- Phase 4: steward celebration pulse (`pass-dot-steward-celebrate`), `hc-dot-state-changed` + optional `hc_dot_diag_log`, E2E in `e2e/device-status-dot.spec.ts`.
+- Phase 4: steward celebration pulse (`pass-dot-steward-celebrate`), `hc-dot-state-changed` + optional `hc_dot_diag_log`, E2E in `e2e/device-status-dot.spec.ts`, CI via `test-site.yml`.
 - Clickability: `site/css/device-shell.css` + `site/js/device-hub-sheet.mjs` — dot stays fixed/clickable when hub is open or chrome is edge-hidden; dot opens hub on first tap (not glance-first).
 
 ### Phase 4 - Hardening
@@ -200,7 +200,7 @@ Network refresh for dot coloring uses `device-os-coordinator.mjs` (`DEVICE_OS_RE
 
 ## Optional follow-up
 
-- Run `e2e/device-status-dot.spec.ts` in CI alongside `npm run worker:test`.
+- **CI (shipped):** `.github/workflows/test-site.yml` runs `npm run worker:test` and `e2e/device-status-dot.spec.ts` on `site/` / `e2e/` changes.
 - Popover open/click telemetry (local diagnostics only; see Telemetry section).
 
 ---
