@@ -120,6 +120,33 @@ Requires a saved card and ability to disable it on the network (owner revoke **c
 | 1 | Saved card with `qr_id` | Hub may poll challenges |
 | 2 | Pending challenge exists | **Live proof waiting** row; status shows count |
 | 3 | Tap row | Opens `/created/` with `live_challenge` |
+| 4 | Tab hidden + **Browser alerts** on (`hc_browser_notif`) | OS notification (live proof); click focuses tab (v1 → `/wallet/`) |
+| 5 | `#shell-notif-badge` visible | Count &gt; 0; tap scrolls hub/wallet alerts |
+
+Spec: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
+
+### P2-3 · Inbox badge vs status dot (regression)
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Unsaved tab keys | Pulsing red dot; badge may show `1` |
+| 2 | Live proof pending (saved card) | Amber overlay on dot; badge includes proof count |
+| 3 | Tap dot | Opens hub (not same as badge-only inbox sheet — until inbox sheet ships) |
+| 4 | Tap badge | Hub expands (landing) or scrolls alerts (wallet) |
+
+---
+
+## P3 — Device inbox unification (planned — not yet QA)
+
+When [`DEVICE_INBOX.md`](DEVICE_INBOX.md) phases 1–4 ship, add:
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | First live proof while tab visible | Contextual “background alerts” strip (not on first visit globally) |
+| 2 | Enable background alerts | Permission prompt; `hc_browser_notif` on |
+| 3 | OS notification click | Deep link to `/created/` sign URL for first pending proof |
+| 4 | Badge `aria-label` | Describes kinds (e.g. “2 live proofs”) not generic “Notifications” |
+| 5 | Resolver offline | System banner only; badge does **not** increment for network alone |
 
 ---
 

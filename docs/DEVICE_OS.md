@@ -26,6 +26,8 @@ Before shipping UI, answer:
 |----------|-------------|
 | Save, search, relabel, import backup, activity log, collapsed glance | **Device hub** (`#device-hub`) + glance strip |
 | Live proof **inbox** (pending challenges for saved cards) | **Device hub**  -  tap opens `/created/` to sign |
+| Actionable **device inbox** (badge, alerts, glance) | **Chrome** + hub `#device-hub-alerts-top` — see [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
+| **Background alerts** (OS notifications, opt-in) | Device-only; live proof when tab hidden — see [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
 | Manifesto, revoke, QR, backup export | **Network object** + `/created/` **Advanced** tab |
 | Live proof **signing** | **`/created/`** only (existing proof panel + poll) |
 | What a stranger sees | **Scan page only**  -  never a second homepage demo |
@@ -42,6 +44,7 @@ Before shipping UI, answer:
 | Tier | What | Where |
 |------|------|--------|
 | **Glance** | Network live / limited / offline, saved · pinned · notice counts | Status line + brand dot sheet |
+| **Inbox** | Action items: live proof, unsaved tab keys, cross-tab keys (+ planned: card disabled since visit in badge) | `#shell-notif-badge`, hub alerts, glance rows — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
 | **Act** | Hub: cards, pins, search, activity, shortcuts, import | `#device-hub` (expand to work) |
 | **Glance (collapsed hub)** | Notice + up to 3 saved labels (+ “N more”) | `#device-hub-glance` (landing only) |
 | **System** | Resolver degraded or offline (actionable) | `#device-system-banner` (landing only, hidden when ok) |
@@ -53,7 +56,7 @@ Documentation is **trust and onboarding**, not **state**. Returning users need w
 
 ## Landing story
 
-1. **Header**  -  brand dot (network + device + Help link) + Create  
+1. **Header**  -  brand dot (network + device + Help link), **inbox badge** when action items exist, + Create  
 2. **Status line**  -  segmented counts → tap expands hub  
 3. **System banner**  -  only when network ≠ ok  
 4. **On this device**  -  hub body when expanded  
@@ -104,7 +107,8 @@ Same chrome on **landing**, **`/created/`**, and **`/wallet/`**:
 
 | Piece | Module | Notes |
 |-------|--------|-------|
-| Status line + dot sheet | `device-status.mjs` | Hub expand; system banner + Help row on landing |
+| Status line + dot + inbox badge | `device-status.mjs` | Dot → hub; badge → alerts (planned: inbox sheet). See [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
+| Background alerts (live proof) | `device-browser-notifications.mjs` | Opt-in `hc_browser_notif`; OS notify when tab hidden |
 | Hub body | `device-hub-ui.mjs` | Saved, pins, notice, activity, search, import |
 | Hub glance | `device-hub-glance.mjs` | Landing only; visible when hub collapsed |
 | Wallet / activity / keys | `device-wallet.mjs`, `device-activity.mjs`, `device-keys.mjs` | |
@@ -173,13 +177,27 @@ Manual regression: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) (especially **P1-1** —
 | 12 | Deferred: resolver-wide search / directory |  -  |
 |  -  | Deferred: per-card revoke on landing hub |  -  (use Manage) |
 
-### Optional hub polish (not scheduled)
+### Device inbox & chrome notifications
+
+Full spec: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
+
+| Piece | Shipped | Planned |
+|-------|---------|---------|
+| Inbox badge (`#shell-notif-badge`) | Aggregate count; tap → hub alerts scroll | Inbox sheet; rich ARIA; chroma sync with dot overlay |
+| Hub / glance rows | Live proof, cross-tab, tab keys, card-disabled in glance | Single `buildInboxItems()` source |
+| Browser background alerts | Live proof only; toggle on landing settings | Contextual opt-in; deep link to `/created/` sign URL |
+| Status dot | Overlays for proof / cross-tab; `open_notifications` action | — (dot stays non-numeric) |
+
+**Do not:** server push, OS alerts for resolver health, or permission prompt on first visit.
+
+### Optional hub polish
 
 Small TLC items that need **no new resolver APIs**:
 
 | Item | Notes |
 |------|--------|
-| Browser notifications when live proof is waiting | ✅ Shipped (device-only; `Notification` API after inbox poll finds pending) |
+| Browser notifications when live proof is waiting | ✅ Shipped v1 — see [`DEVICE_INBOX.md`](DEVICE_INBOX.md) for v2 roadmap |
+| Unified device inbox core + inbox sheet | Planned — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) phases 1–3 |
 | Glance on `/wallet/` | Landing popover only; wallet uses scroll-to-saved chrome |
 | Light frontend tests | Vitest (`worker/tests/device-*`) + Playwright smoke (`e2e/device-os-wallet.spec.ts`) |
 
@@ -199,7 +217,7 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 **Banner:** `#device-cross-tab-banner` on landing and `/wallet/` when another tab holds keys **this device has not saved yet**, and this tab does not show the unsaved-keys notice row (`tabNoticeCount === 0`). Saved cards use **Open controls** from the hub/wallet instead. Presence rows must heartbeat within ~6s (ghost entries drop from UI sooner than the 10s storage prune).
 
-**Glance:** Collapsed hub shows **Keys in another tab** and **N live proof waiting** rows.
+**Glance:** Collapsed hub shows **Keys in another tab** and **N live proof waiting** rows (same items as inbox badge when counts &gt; 0; unification planned in [`DEVICE_INBOX.md`](DEVICE_INBOX.md)).
 
 ### Live-control inbox (Phase 7)
 
@@ -232,7 +250,9 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 | Path | Role |
 |------|------|
 | `docs/DEVICE_OS.md` | This document |
+| `docs/DEVICE_INBOX.md` | Inbox taxonomy, badge, background alerts roadmap |
 | `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` | Storage, search, focus mode |
+| `site/js/device-browser-notifications.mjs` | OS notifications v1 + settings toggle |
 | `docs/DEVICE_OS_QA.md` | Manual QA runbook + bug triage |
 | `site/js/device-os-coordinator.mjs` | Debounced device OS refresh pipeline |
 | `site/js/device-network-health.mjs` | Shared resolver `/.well-known/hc/v1/health` fetch |

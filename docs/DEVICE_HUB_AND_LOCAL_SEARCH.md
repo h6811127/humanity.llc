@@ -64,7 +64,9 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Landing focus mode:** `localStorage.hc_landing_focus` hides intro (`[data-landing-tutorial]`). Keeps **hub**, **hub glance**, **system banner** (if unhealthy), **Help & protocol** list (not full Documentation), and **contact**. No bottom Create dock or “New here?” float. **Auto-save** on by default via `hc_auto_save_device` (opt out in hub shortcuts).
 
-**Shortcuts & settings (shipped):** On the **homepage** (`/`) only — section under the progress strip (unified list rows: Appearance, browser alerts, saved cards, manage, auto-save, focus). Hub sheet on all routes has **home icon** (left), status line (center), **Create +** (right); no shortcuts block in the hub.
+**Shortcuts & settings (shipped):** On the **homepage** (`/`) only — section under the progress strip (unified list rows: Appearance, **Browser alerts** (background OS notifications for live proof), saved cards, manage, auto-save, focus). Hub sheet on all routes has **home icon** (left), status line (center), **Create +** (right); no shortcuts block in the hub.
+
+**Chrome inbox (shipped + planned):** Floating **inbox badge** next to the status dot when action items exist; hub `#device-hub-alerts-top` holds full rows. Spec and roadmap: [`DEVICE_INBOX.md`](DEVICE_INBOX.md). Status dot semantics: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 
 **Hub glance (landing):** When the hub is collapsed, `#device-hub-glance` shows notice (if any) and up to three saved card labels; tap expands the hub. Quick-look popover rows use **light pastel** fills (red / blue / orange by notice type). Glance **Card disabled since last visit** copy follows the latest resolver-confirmed alert state from the wallet network poll (not stale cache and not the persisted `hc_wallet[].status` field).
 
@@ -130,13 +132,26 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 - **`device-cross-tab-banner.mjs`** on landing and `/wallet/` when keys live in another tab and this tab is not already showing the unsaved-keys notice.
 - Hub glance rows for cross-tab keys and live proof when collapsed.
 
-### Optional hub polish (deferred)
+### Device inbox & background alerts
+
+See [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
+
+| Item | Status |
+|------|--------|
+| Inbox badge + hub alert stack + glance rows | ✅ Shipped (parallel logic today) |
+| Browser background alerts (live proof, tab hidden) | ✅ Shipped v1 — `device-browser-notifications.mjs`, `hc_browser_notif` |
+| Unified `device-inbox-core.mjs` | Planned |
+| Inbox sheet from badge tap | Planned |
+| Contextual opt-in + OS click deep link to `/created/` sign URL | Planned |
+
+### Optional hub polish (remaining)
 
 No backend required:
 
-- Browser notifications when a live proof is waiting (device-only).
-- ~~Hub glance on `/wallet/`~~ — shipped as `#wallet-hub-glance` below page title.
-- Light frontend tests for tab presence, live-control inbox, wallet network, and status counts.
+- ~~Browser notifications when a live proof is waiting~~ — ✅ v1 shipped; v2 in [`DEVICE_INBOX.md`](DEVICE_INBOX.md)
+- ~~Hub glance on `/wallet/`~~ — landing popover only; wallet scrolls from dot
+- Light frontend tests for tab presence, live-control inbox, wallet network, and status counts
+- Inbox unification phases 1–6 — [`DEVICE_INBOX.md`](DEVICE_INBOX.md)
 
 ### Deferred
 
@@ -170,6 +185,8 @@ No backend required:
 | Path | Role |
 |------|------|
 | `docs/DEVICE_OS.md` | Device OS vision + checklist |
+| `docs/DEVICE_INBOX.md` | Inbox badge, alerts, background alerts roadmap |
+| `site/js/device-browser-notifications.mjs` | OS notifications v1 |
 | `site/index.html` | Landing hub + progress strip |
 | `site/created/index.html` | Created hub shell |
 | `site/js/device-hub-ui.mjs` | Shared hub render + init |

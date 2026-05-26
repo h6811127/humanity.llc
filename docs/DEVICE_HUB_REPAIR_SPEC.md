@@ -12,7 +12,9 @@
 | Doc | Use for |
 |-----|---------|
 | `docs/DEVICE_OS.md` | Placement rules, layers, live-control inbox scope, baseline/alert behavior |
+| `docs/DEVICE_INBOX.md` | Inbox badge, hub alerts, background alerts (shipped v1 + planned unification) |
 | `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` | Storage keys, search, glance, wallet row chips, copy alignment |
+| `docs/STATUS_INDICATOR_STEWARD_GREEN.md` | Status dot only (not inbox badge) |
 | `docs/CREATED_TASK_DASHBOARD.md` | `/created/` Tasks tab (separate from hub shell, shares chrome) |
 | `docs/M6_VOUCHING_DESIGN.md` | Return-to-scan vouch (`hc_vouch_return_url`) |
 | `docs/V1_IMPLEMENTATION_CONTRACTS.md` | `GET …/cards/{id}/status?q=` scan JSON |

@@ -1,8 +1,9 @@
 # Status Indicator: Steward Green + Intelligent Trust Dot
 
-**Status:** Implemented (Phases 1–4)  
+**Status:** Implemented (Phases 1–7, v1 complete)  
 **Owners:** Device shell + resolver trust UX  
-**Scope:** `site/js/device-status.mjs`, `site/js/device-dot-state-core.mjs`, `site/styles.css`, `site/css/device-shell.css`, status key copy in hub/wallet/created
+**Scope:** `site/js/device-status.mjs`, `site/js/device-dot-state-core.mjs`, `site/styles.css`, `site/css/device-shell.css`, status key copy in hub/wallet/created  
+**Related:** [`DEVICE_INBOX.md`](DEVICE_INBOX.md) — inbox badge, hub alerts, background alerts (separate from dot semantics)
 
 ---
 
@@ -93,6 +94,26 @@ Example popover content:
 - **Next:** "Open steward review queue."
 
 This gives users confidence and direction without turning the header into a dashboard.
+
+---
+
+## Relationship to device inbox (do not merge)
+
+The header **shell status cluster** has two controls:
+
+| Control | Job | Module |
+|---------|-----|--------|
+| **Status dot** | Network + custody + urgent **overlay** (`proof_waiting`, `cross_tab_keys`) | `device-status.mjs`, `device-dot-state-core.mjs` |
+| **Inbox badge** (`#shell-notif-badge`) | Count of **action items** (live proof, unsaved tab keys, cross-tab keys) | `notificationCount()` in `device-status.mjs` |
+
+**Rules:**
+
+- The dot is **never** a numeric notification bell.
+- Overlay priority on the dot matches inbox urgency: live proof beats cross-tab (`dotOverlayFromCounts()`).
+- When overlay is `proof_waiting`, dot explainer quick action is `open_notifications` (scrolls hub/wallet alerts today; inbox sheet planned — see [`DEVICE_INBOX.md`](DEVICE_INBOX.md)).
+- **Background alerts** (OS `Notification` API) are a third channel for live proof only when the tab is hidden; configured separately from dot color.
+
+Full inbox taxonomy, browser-alert roadmap, and implementation phases: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 
 ---
 
@@ -228,6 +249,8 @@ Network refresh for dot coloring uses `device-os-coordinator.mjs` (`DEVICE_OS_RE
 - **CI (shipped):** `.github/workflows/test-site.yml` runs `npm run worker:test` and `e2e/device-status-dot.spec.ts` on `site/` / `e2e/` changes.
 - **Interaction telemetry (shipped):** Phase 5 dev-only log; see Telemetry section and Phase 5 above.
 - **A11y E2E (shipped):** Phase 6 Playwright checks in `e2e/device-status-dot.spec.ts`.
+- **Inbox chroma sync:** badge ring color matches top inbox kind — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) phase 5.
+- **Unified inbox core:** `buildInboxItems()` shared by badge, glance, and hub alerts — keeps overlay and counts aligned.
 
 ---
 

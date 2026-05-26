@@ -34,6 +34,7 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 ### Non-obvious notes
 
 - **Cards vs keys vs verification:** `docs/KEYS_CARDS_AND_VERIFICATION.md` — steward status is on the resolver; vouch signing needs `hc_created` keys on the same browser tab.
+- **Status dot vs inbox vs OS alerts:** `docs/DEVICE_INBOX.md` (action items, badge, background alerts) vs `docs/STATUS_INDICATOR_STEWARD_GREEN.md` (trust dot only).
 - The Worker health endpoint is at `/.well-known/hc/v1/health`. If `database` shows `schema_missing`, run migrations.
 - The D1 database is emulated locally by Wrangler  -  no external SQLite or Cloudflare account needed for dev.
 - Card creation requires Ed25519-signed JSON documents (card + qr_credential). Test fixtures in `worker/tests/fixtures/` provide valid signed payloads.

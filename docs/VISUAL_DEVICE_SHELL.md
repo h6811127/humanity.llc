@@ -18,6 +18,7 @@ Principles:
 | Translucency | Unified `top-chrome` bar; status row is inline text |
 | Weight over size | Section labels 15px semibold, not uppercase micro-labels |
 | System language | Status line: Resolver Online, N on Device, Tab Keys Active |
+| Status cluster | Dot = trust/state; inbox badge = actionable count (see [`DEVICE_INBOX.md`](DEVICE_INBOX.md)) |
 | Motion continuity | Spring easing, hub expand fade, tab panel enter, press feedback |
 | Scan as sheet | `site/scan-pass.css` shell block → Worker bundle |
 
@@ -32,6 +33,8 @@ Principles:
 | `site/js/device-shell-chrome.mjs` | Fixed chrome inset + scroll-edge compact |
 | `site/js/device-hub-sheet.mjs` | Hub bottom sheet + backdrop |
 | `site/js/device-counts.mjs` | System status segment copy |
+| `site/js/device-status.mjs` | Status dot + inbox badge |
+| `docs/DEVICE_INBOX.md` | Inbox + background alerts spec |
 | `site/scan-pass.css` | Scan page (run `npm run worker:bundle-scan` after edits) |
 
 ---
