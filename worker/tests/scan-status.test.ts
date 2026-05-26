@@ -255,7 +255,7 @@ describe("scan status JSON (M3.4)", () => {
     expect(httpStatusForScanKind(vm.kind)).toBe(400);
   });
 
-  it("malformed status response includes hint", async () => {
+  it("malformed status response includes hint for invalid profile id", async () => {
     const { handleGetScanStatus } = await import("../src/resolver/scan-status");
     const db = {
       prepare: () => ({

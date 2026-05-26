@@ -8,9 +8,16 @@ import {
   scanLayoutForRevocationDisplay,
   type RevocationDisplayMeta,
 } from "./revocation-display";
+import {
+  resolveScanMalformedReason,
+  type ScanMalformedReason,
+} from "./scan-malformed-hint";
 
 export const QR_ID_REGEX =
   /^qr_[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{8,40}$/;
+
+export type { ScanMalformedReason } from "./scan-malformed-hint";
+export { resolveScanMalformedReason } from "./scan-malformed-hint";
 
 export type ScanPageKind =
   | "active"
@@ -79,6 +86,8 @@ export interface ScanViewModel {
   /** Human fingerprint for print / verifier (Phase F). */
   credentialCode: string | null;
   cacheControl: string;
+  /** Set when kind === "malformed" (P2-1 differentiated copy). */
+  malformedReason: ScanMalformedReason | null;
 }
 
 /** Canonical HTTPS scan target for this request. */
@@ -117,7 +126,7 @@ export function buildScanViewModel(
   now: Date = new Date()
 ): ScanViewModel {
   if (!qrId) {
-    return malformedView(profileId, null, origin);
+    return malformedView(profileId, null, origin, "missing_qr");
   }
 
   if (!ctx.card) {
@@ -248,9 +257,15 @@ export function buildScanViewModel(
 export function malformedScanView(
   profileId: string | null,
   qrId: string | null,
-  origin: string = "https://humanity.llc"
+  origin: string = "https://humanity.llc",
+  reason?: ScanMalformedReason
 ): ScanViewModel {
-  return malformedView(profileId, qrId, origin);
+  return malformedView(
+    profileId,
+    qrId,
+    origin,
+    reason ?? resolveScanMalformedReason(profileId, qrId)
+  );
 }
 
 /**
@@ -394,9 +409,10 @@ function isQrPastExpiry(expiresAt: string | null, now: Date): boolean {
 function malformedView(
   profileId: string | null,
   qrId: string | null,
-  origin: string
+  origin: string,
+  reason: ScanMalformedReason
 ): ScanViewModel {
-  return baseView(
+  const vm = baseView(
     {
       kind: "malformed",
       profileId,
@@ -409,6 +425,7 @@ function malformedView(
     },
     origin
   );
+  return { ...vm, malformedReason: reason };
 }
 
 interface BaseViewInput {
@@ -474,5 +491,6 @@ function baseView(input: BaseViewInput, origin: string): ScanViewModel {
         ? deriveCredentialCodeSync(input.profileId, input.qrId)
         : null,
     cacheControl: isHealthy ? CACHE_ACTIVE : CACHE_INACTIVE,
+    malformedReason: null,
   };
 }

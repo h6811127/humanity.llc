@@ -158,6 +158,8 @@ Examples seen in create flow:
 
 ### P2-1 · Scan URLs — resolver error pages (good) but strict
 
+**Status (2026-05-26):** Fix shipped — malformed scan pages differentiate missing `?q=`, invalid profile id, and invalid `qr_` id (`scan-malformed-hint.ts`, `scan-html.ts`, `scan-status.ts`).
+
 | URL | HTTP | User-facing title |
 |-----|------|-------------------|
 | `/c/not-a-real-profile` | 400 | Invalid link |

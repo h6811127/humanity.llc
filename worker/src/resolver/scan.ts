@@ -9,6 +9,7 @@ import {
   httpStatusForScanKind,
   malformedScanView,
   QR_ID_REGEX,
+  resolveScanMalformedReason,
   type ScanViewModel,
 } from "./scan-state";
 import { guardScanResponse, scanRedirectQueryBlocked } from "./scan-redirect-guard";
@@ -31,7 +32,10 @@ export async function handleGetScan(
     const vm = malformedScanView(
       profileId,
       qrRaw?.trim() ?? null,
-      origin
+      origin,
+      resolveScanMalformedReason(profileId, qrRaw?.trim() ?? null, {
+        redirectBlocked: true,
+      })
     );
     return guardScanResponse(
       request,

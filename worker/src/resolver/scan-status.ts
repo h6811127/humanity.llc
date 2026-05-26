@@ -23,6 +23,7 @@ import {
 } from "./scan-governance";
 import { deriveCredentialCodeSync } from "../../../site/js/qr-credential-code.mjs";
 import { scanContractErrorForKind } from "./scan-contract-error";
+import { scanMalformedStatusHint } from "./scan-malformed-hint";
 import { guardScanResponse, scanRedirectQueryBlocked } from "./scan-redirect-guard";
 import { BEARER_WARNING } from "./trust-copy";
 import { humanTrustDisplay } from "./verification-display";
@@ -218,9 +219,6 @@ export async function handleGetScanStatus(
   return guardScanResponse(request, await statusResponse(request, vm));
 }
 
-const MALFORMED_HINT =
-  "Use your real profile_id (20–32 base58 characters) and qr_id (qr_ plus base58). Copy both from /created/ or the scan URL.";
-
 async function statusResponse(
   request: Request,
   vm: ScanViewModel
@@ -229,7 +227,12 @@ async function statusResponse(
   const body = scanStatusBodyFromViewModel(vm);
   const payload =
     vm.kind === "malformed"
-      ? { ...body, hint: MALFORMED_HINT }
+      ? {
+          ...body,
+          hint: scanMalformedStatusHint(
+            vm.malformedReason ?? "invalid_profile_id"
+          ),
+        }
       : body;
   if (status >= 200 && status < 300) {
     return jsonResponseWithWeakEtag(request, payload, status, {
