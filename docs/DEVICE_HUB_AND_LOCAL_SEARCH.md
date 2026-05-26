@@ -42,7 +42,7 @@ These notes are captured as individual product refinements so implementation can
 - **Step 2 (now):** rename `Use keys` to `Open controls` across hub/wallet and tests.
 - **Step 3 (now):** add network liveliness indicators and wording pass.
 - **Step 4 (now):** status-pill terminology pass (`pins`, `online` semantics).
-- **Step 5:** object identity visual system (types, glyph/color cues).
+- **Step 5 (now):** object identity visual system (types, glyph/color cues).
 - **Step 6:** modal/shell visual polish pass.
 - **Step 7:** action-forward card IA and command surface.
 
@@ -71,6 +71,8 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 **`/wallet/` (Phase 5–6):** Uses the same hub renderer as landing. Each saved row shows a **verification chip** (Steward / Vouched Human / Registered from resolver, ~5 min cache), a **network chip** (card/QR live state), optional **card disabled since last visit** alert (`hc_wallet_last_seen_network`), **Last on device** from activity, and **Open controls / Open scan / Manage**. Row icon tone follows verification (green shield = Steward). Page is hub-expanded by default; help disclosure hides when cards exist.
 
 **Card liveliness (Step 3):** Saved rows also show a compact liveliness line (e.g., **Network reachable · seen 2m ago**, **Pending sync**, **Offline**) derived from the same wallet network cache and resolver fetch cycle used for chips/alerts.
+
+**Object identity visuals (Step 5):** Saved rows include a lightweight object-type chip (e.g., Membership, Status plate, Lost item, Event pass, Wearable, Live demo, Tool, Civic object) inferred from local card metadata (`pilot_template`, label, manifesto text), plus subtle type color accents to reduce visual sameness at larger card counts.
 
 **Keys vs verification:** See [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md). **Open controls** loads signing material into `hc_created`; the verification chip is read-only network state.
 

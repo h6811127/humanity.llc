@@ -80,6 +80,29 @@ function walletHaystack(entry) {
     .toLowerCase();
 }
 
+function classifyObjectType(entry) {
+  const pilot = String(entry?.pilot_template || "").toLowerCase();
+  if (pilot === "status_plate") return { label: "Status plate", tone: "status-plate" };
+  if (pilot === "lost_item_relay") return { label: "Lost item", tone: "lost-item" };
+
+  const text = [
+    entry?.label,
+    entry?.manifesto_line,
+    entry?.handle,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  if (/(membership|member|club|cohort)/.test(text)) return { label: "Membership", tone: "membership" };
+  if (/(event|pass|ticket|entry)/.test(text)) return { label: "Event pass", tone: "event-pass" };
+  if (/(wearable|band|wrist|badge)/.test(text)) return { label: "Wearable", tone: "wearable" };
+  if (/(demo|showcase|prototype|live demo)/.test(text)) return { label: "Live demo", tone: "live-demo" };
+  if (/(tool|device|equipment|kit)/.test(text)) return { label: "Tool", tone: "tool" };
+  if (/(civic|city|commons|public)/.test(text)) return { label: "Civic object", tone: "civic" };
+  return { label: "Object", tone: "general" };
+}
+
 /** @type {{
  *   noticeMode: 'created-url' | 'keys-strip',
  *   fetchNetworkStatus: boolean,
@@ -396,9 +419,12 @@ async function fetchAndApplyNetworkChips() {
     let changed = false;
     const next = stored.map((e) => {
       const net = statusMap[e.profile_id];
-      if (net && e.status !== net) {
+      const scanKind = scanKindMap[e.profile_id] ?? null;
+      const hadScanKind = Object.prototype.hasOwnProperty.call(e, "scan_kind");
+      const currentScanKind = hadScanKind ? e.scan_kind ?? null : null;
+      if (net && (e.status !== net || currentScanKind !== scanKind)) {
         changed = true;
-        return { ...e, status: net };
+        return { ...e, status: net, scan_kind: scanKind };
       }
       return e;
     });
@@ -572,7 +598,8 @@ function renderSavedRows() {
   setHubSectionEmpty(savedGroup, savedList, savedEmptyEl, false, "");
   for (const entry of entries) {
     const li = document.createElement("li");
-    li.className = "hub-card-item";
+    const objectType = classifyObjectType(entry);
+    li.className = `hub-card-item hub-card-item--${objectType.tone}`;
     li.dataset.hubSearchable = walletHaystack(entry);
     li.dataset.profileId = entry.profile_id;
     const lastUsed = lastActivityForEntry(entry);
@@ -619,6 +646,7 @@ function renderSavedRows() {
         ${cardIcon}
         <span class="list-content">
           <span class="list-title">${escapeHtml(entry.label)}</span>
+          <span class="hub-card-type hub-card-type--${objectType.tone}">${escapeHtml(objectType.label)}</span>
           ${hubCardSubHtml(entry, lastUsed)}
           <span class="hub-card-live hub-card-live--${liveMeta.tone}">${escapeHtml(liveMeta.label)}</span>
         </span>

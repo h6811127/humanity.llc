@@ -28,6 +28,7 @@ export function walletEntryFromSession(session, label) {
     qr_id: session.qr_id,
     handle: session.handle,
     manifesto_line: session.manifesto_line,
+    pilot_template: session.pilot_template,
     scan_url: session.scan_url,
     owner_public_key_b58: session.owner_public_key_b58,
     owner_private_key_b58: session.owner_private_key_b58,
@@ -103,6 +104,7 @@ export function saveSessionToWallet(session, label = "") {
         label: trimmed,
         handle: session.handle ?? entries[idx].handle,
         manifesto_line: session.manifesto_line ?? entries[idx].manifesto_line,
+        pilot_template: session.pilot_template ?? entries[idx].pilot_template,
         saved_at: new Date().toISOString(),
       };
       saveWallet(entries);

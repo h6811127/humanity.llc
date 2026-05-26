@@ -137,10 +137,40 @@ body.page-flow.has-shell-chrome .page > main.screen {
 }
 
 .pass-dot {
+  position: relative;
+  display: inline-block;
   flex-shrink: 0;
   transition:
     background 0.25s ease,
     box-shadow 0.25s ease;
+}
+
+.pass-dot::after {
+  content: "";
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  background: transparent;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.2s ease;
+}
+
+.pass-dot-overlay-proof_waiting::after {
+  opacity: 1;
+  background: #f59e0b;
+}
+
+.pass-dot-overlay-cross_tab_keys::after {
+  opacity: 1;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: #2563eb;
 }
 
 .pass-dot-status-network-offline {
@@ -572,6 +602,38 @@ body.page-flow.has-shell-chrome .page > main.screen {
   z-index: 0;
 }
 
+.hub-card-item--membership {
+  border-left: 3px solid rgba(76, 110, 245, 0.55);
+}
+
+.hub-card-item--status-plate {
+  border-left: 3px solid rgba(22, 163, 74, 0.55);
+}
+
+.hub-card-item--lost-item {
+  border-left: 3px solid rgba(245, 158, 11, 0.6);
+}
+
+.hub-card-item--event-pass {
+  border-left: 3px solid rgba(219, 39, 119, 0.55);
+}
+
+.hub-card-item--wearable {
+  border-left: 3px solid rgba(14, 165, 233, 0.55);
+}
+
+.hub-card-item--live-demo {
+  border-left: 3px solid rgba(99, 102, 241, 0.55);
+}
+
+.hub-card-item--tool {
+  border-left: 3px solid rgba(107, 114, 128, 0.6);
+}
+
+.hub-card-item--civic {
+  border-left: 3px solid rgba(20, 184, 166, 0.55);
+}
+
 .hub-card-item:has(.hub-card-menu[open]) {
   z-index: 2;
 }
@@ -685,6 +747,60 @@ body.page-flow.has-shell-chrome .page > main.screen {
   display: block;
   font-size: 12px;
   line-height: 1.25;
+}
+
+.hub-card-type {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 2px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--grey);
+  background: rgba(120, 120, 128, 0.12);
+}
+
+.hub-card-type--membership {
+  color: #364fc7;
+  background: rgba(76, 110, 245, 0.14);
+}
+
+.hub-card-type--status-plate {
+  color: #1f7a35;
+  background: rgba(22, 163, 74, 0.14);
+}
+
+.hub-card-type--lost-item {
+  color: #9a5b00;
+  background: rgba(245, 158, 11, 0.16);
+}
+
+.hub-card-type--event-pass {
+  color: #a21a67;
+  background: rgba(219, 39, 119, 0.14);
+}
+
+.hub-card-type--wearable {
+  color: #0b69a7;
+  background: rgba(14, 165, 233, 0.14);
+}
+
+.hub-card-type--live-demo {
+  color: #4338ca;
+  background: rgba(99, 102, 241, 0.14);
+}
+
+.hub-card-type--tool {
+  color: #4b5563;
+  background: rgba(107, 114, 128, 0.14);
+}
+
+.hub-card-type--civic {
+  color: #0f766e;
+  background: rgba(20, 184, 166, 0.14);
 }
 
 .hub-card-live {
