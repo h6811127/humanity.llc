@@ -1,8 +1,11 @@
 /**
- * Browser cross-tab notification snapshot — holds streak between reads.
+ * Browser cross-tab notification snapshot - holds streak between reads.
  * @see docs/CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md
  */
-import { computeCrossTabNotificationState } from "./device-cross-tab-state-core.mjs";
+import {
+  computeCrossTabNotificationState,
+  stableCrossTabLaneAfterRead,
+} from "./device-cross-tab-state-core.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
 import {
   shouldShowCrossTabKeysNotice,
@@ -16,6 +19,9 @@ let genericPreviousFingerprint = null;
 let orphanStreak = 0;
 /** @type {string | null} */
 let orphanPreviousFingerprint = null;
+let scanStreak = 0;
+/** @type {string | null} */
+let scanPreviousFingerprint = null;
 let custodyListenersBound = false;
 
 /** Reset fingerprint streaks (custody change, tests). */
@@ -24,6 +30,8 @@ export function invalidateCrossTabNotificationState() {
   genericPreviousFingerprint = null;
   orphanStreak = 0;
   orphanPreviousFingerprint = null;
+  scanStreak = 0;
+  scanPreviousFingerprint = null;
 }
 
 /** @returns {import("./device-cross-tab-state-core.mjs").CrossTabNotificationState} */
@@ -49,7 +57,7 @@ export function getCrossTabNotificationState() {
   return state;
 }
 
-/** Invalidate streak when wallet/session custody changes (Phase 1 partial — full list in rebuild Phase 4). */
+/** Invalidate streak when wallet/session custody changes (Phase 1 partial - full list in rebuild Phase 4). */
 export function startCrossTabNotificationState() {
   if (custodyListenersBound) return;
   custodyListenersBound = true;
@@ -61,4 +69,25 @@ export function startCrossTabNotificationState() {
   });
   window.addEventListener("hc-device-hub-changed", invalidateCrossTabNotificationState);
   window.addEventListener("hc-wallet-removed-profiles-changed", invalidateCrossTabNotificationState);
+}
+
+/**
+ * Stabilized scan-surface entries (includes saved profiles for vouch scan).
+ * Scan pages need “keys in another tab” even when the profile is already saved on this device.
+ *
+ * @returns {{ show: boolean, entries: Array<{ tabId: string, profile_id: string, qr_id?: string | null, handle?: string | null, label?: string | null, updatedAt?: number }> }}
+ */
+export function getCrossTabScanSnapshot() {
+  const notices = tabNoticeCount();
+  const lane = stableCrossTabLaneAfterRead({
+    rawEntries: getOtherTabsWithKeys({ includeSavedProfiles: true }),
+    tabNoticeCount: notices,
+    shouldShow: shouldShowCrossTabKeysNotice,
+    previousStreak: scanStreak,
+    previousFingerprint: scanPreviousFingerprint,
+  });
+
+  scanStreak = lane.streak;
+  scanPreviousFingerprint = lane.fingerprint;
+  return { show: lane.show, entries: lane.entries };
 }

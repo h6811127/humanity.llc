@@ -10,7 +10,7 @@ import {
   actOnOrphanRemovedTabKeys,
   clearOrphanKeysOnDevice,
 } from "./device-orphan-keys-nav.mjs";
-import { getOtherTabsWithKeys, requestFocusTab } from "./device-tab-presence.mjs";
+import { requestFocusTab } from "./device-tab-presence.mjs";
 import {
   shouldShowCrossTabKeysNotice,
   shouldShowOrphanRemovedKeysNotice,
@@ -19,6 +19,7 @@ import { gatherInboxInput, getInboxItems } from "./device-inbox.mjs";
 import { inboxItemsIncludeKind } from "./device-hub-inbox-alerts.mjs";
 import { actOnOtherTabKeys, walletEntryForProfile } from "./device-notice-nav.mjs";
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
+import { getCrossTabScanSnapshot } from "./device-cross-tab-state.mjs";
 
 const banner = document.getElementById("device-cross-tab-banner");
 const hubSlot = document.getElementById("device-hub-crosstab-notice");
@@ -108,8 +109,8 @@ function bindUseKeysHere(root, profileId, opts = {}) {
 
 function vouchCrossTabSubtext() {
   return getDefaultVouchProfileId()
-    ? " — open that tab to vouch, or load keys here"
-    : " — open that tab to sign, or load keys from My cards";
+    ? " - open that tab to vouch, or load keys here"
+    : " - open that tab to sign, or load keys from My cards";
 }
 
 function walletEntryForVouchHere(primaryProfileId) {
@@ -209,14 +210,14 @@ function renderScanCrossTabNotice() {
     return;
   }
 
-  if (!shouldShowCrossTabNotice()) {
+  const snap = getCrossTabScanSnapshot();
+  if (!snap.show || snap.entries.length === 0) {
     scanBanner.hidden = true;
     scanBanner.innerHTML = "";
     return;
   }
 
-  const others = getOtherTabsWithKeys({ includeSavedProfiles: true });
-  const msg = crossTabMessage(others);
+  const msg = crossTabMessage(snap.entries);
   if (!msg) {
     scanBanner.hidden = true;
     scanBanner.innerHTML = "";
@@ -231,7 +232,7 @@ function renderScanCrossTabNotice() {
   scanBanner.hidden = false;
   scanBanner.innerHTML = `
     <strong>Signing keys in another tab</strong>
-    <span class="scan-cross-tab-sub">${msg.label}${msg.extra} — open that tab to vouch${walletEntry ? ", or:" : "."}</span>
+    <span class="scan-cross-tab-sub">${msg.label}${msg.extra} - open that tab to vouch${walletEntry ? ", or:" : "."}</span>
     <div class="scan-cross-tab-actions">
       <button type="button" class="scan-cross-tab-focus-btn" data-cross-tab-action>Open that tab</button>
       ${useKeysBtn}
