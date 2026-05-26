@@ -35,13 +35,13 @@ describe("centerLogoSvgFragment", () => {
 });
 
 describe("brandMarkGlyphSvgFragment", () => {
-  it("draws a transparent brand-red finder fingerprint (no salmon/ink circles)", () => {
+  it("draws a soft transparent brand-red corner dot (no salmon/ink rings)", () => {
     const frag = brandMarkGlyphSvgFragment(14, 6, 6);
     expect(frag).toContain('class="hc-qr-brand-mark"');
     expect(frag).toContain(`opacity="${QR_FRAME_BRAND_MARK_OPACITY}"`);
     expect(frag).toContain(`fill="${QR_BRAND_RED}"`);
-    expect(frag).toContain("<rect");
-    expect(frag).not.toContain("<circle");
+    expect(frag).toContain("<circle");
+    expect(frag).not.toContain("<rect");
     expect(frag).not.toContain(QR_CENTER_LOGO_OUTER_FILL);
     expect(frag).not.toContain(QR_CENTER_LOGO_INNER_FILL);
   });
@@ -71,7 +71,7 @@ describe("overlayCenterLogoOnSvg", () => {
 });
 
 describe("renderHumanityQrFrameSvg", () => {
-  it("adds border, brand mark, LIVE OBJECT, and humanity.llc footer", async () => {
+  it("adds border, transparent red corner dot, LIVE OBJECT, and footer", async () => {
     const scanUrl = "https://humanity.llc/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_7Xk9mP2nQ4rT6vW8";
     let svg = await QRCode.toString(scanUrl, {
       type: "svg",

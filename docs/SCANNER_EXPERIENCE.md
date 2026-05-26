@@ -108,7 +108,7 @@ Third parties must not ship lookalike “Humanity pink” QRs that encode non-Hu
 | Standard outer frame | Thin brand border + rounded corners (`renderHumanityQrFrameSvg`) |
 | Footer microtype | Always `humanity.llc` under the code |
 | `LIVE OBJECT` band | Behavioral cue: status is live on the network |
-| Brand mark | Transparent brand-red finder fingerprint in top-left frame margin (not on data modules) |
+| Brand mark | Soft transparent brand-red dot in top-left frame margin (not on data modules) |
 | Closed renderer | `renderHumanityQrFrameMarkup` (Worker), `renderHumanityQrFrameToCanvas` (browser) |
 
 **Engineering rule:** Do not fork frame styling in product pages; tune `qrFrameMetrics()` in `qr-branding.mjs` only.

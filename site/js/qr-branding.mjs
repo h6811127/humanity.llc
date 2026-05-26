@@ -48,8 +48,11 @@ export const QR_FRAME_LIVE_OBJECT_TEXT = "LIVE OBJECT";
 /** Grey for footer microtype on frame. */
 export const QR_FRAME_FOOTER_FILL = "#8a8a8a";
 
-/** Transparent brand-red finder fingerprint in the frame margin (not on data modules). */
+/** Soft transparent brand-red corner dot (same family as `red_qr_transparent_bg.png`). */
 export const QR_FRAME_BRAND_MARK_OPACITY = 0.34;
+
+/** Single filled circle in the frame margin - not salmon/ink rings, not a second finder. */
+export const QR_FRAME_BRAND_MARK_ENABLED = true;
 
 /**
  * Layout around the QR modules (not including outer canvas margin).
@@ -129,39 +132,15 @@ export function extractSvgInner(svg) {
 }
 
 /**
- * @param {number} x module column 0..6
- * @param {number} y module row 0..6
- */
-function qrFinderModuleFilled(x, y) {
-  if (x === 0 || x === 6 || y === 0 || y === 6) return true;
-  if (x >= 2 && x <= 4 && y >= 2 && y <= 4) {
-    if (x === 3 && y === 3) return true;
-    if (x === 2 || x === 4 || y === 2 || y === 4) return true;
-  }
-  return false;
-}
-
-/**
- * Miniature QR finder pattern in brand red (transparent) - matches the favicon mark family.
+ * Soft transparent brand-red dot in the frame margin (reference: favicon / red_qr_transparent_bg.png).
  * @param {number} size bounding box edge
  * @param {number} cx
  * @param {number} cy
  * @param {number} [opacity]
  */
 export function brandMarkGlyphSvgFragment(size, cx, cy, opacity = QR_FRAME_BRAND_MARK_OPACITY) {
-  const module = size / 7;
-  const x0 = cx - size / 2;
-  const y0 = cy - size / 2;
-  const rects = [];
-  for (let y = 0; y < 7; y++) {
-    for (let x = 0; x < 7; x++) {
-      if (!qrFinderModuleFilled(x, y)) continue;
-      rects.push(
-        `<rect x="${x0 + x * module}" y="${y0 + y * module}" width="${module}" height="${module}" fill="${QR_BRAND_RED}"/>`
-      );
-    }
-  }
-  return `<g class="hc-qr-brand-mark" opacity="${opacity}" aria-hidden="true">${rects.join("")}</g>`;
+  const r = size / 2;
+  return `<g class="hc-qr-brand-mark" aria-hidden="true"><circle cx="${cx}" cy="${cy}" r="${r}" fill="${QR_BRAND_RED}" opacity="${opacity}"/></g>`;
 }
 
 /**
@@ -182,7 +161,9 @@ export function renderHumanityQrFrameSvg(brandedQrSvg, opts = {}) {
   const m = qrFrameMetrics(qrSize, { credentialCode: opts.credentialCode });
   const inner = extractSvgInner(brandedQrSvg);
   const showLiveObject = opts.showLiveObject !== false;
-  const glyph = brandMarkGlyphSvgFragment(m.glyphSize, m.glyphCx, m.glyphCy);
+  const glyph = QR_FRAME_BRAND_MARK_ENABLED
+    ? brandMarkGlyphSvgFragment(m.glyphSize, m.glyphCx, m.glyphCy)
+    : "";
   const pillText = showLiveObject
     ? `<text class="hc-qr-frame-pill-text" x="${m.innerW / 2}" y="${m.pillY + m.pillH * 0.72}" text-anchor="middle" font-family="system-ui,sans-serif" font-size="${m.pillFont}" font-weight="600" letter-spacing="0.14em" fill="${QR_BRAND_RED}">${QR_FRAME_LIVE_OBJECT_TEXT}</text>`
     : "";
@@ -213,7 +194,7 @@ export function renderHumanityQrFrameMarkup(brandedQrSvg, opts = {}) {
 }
 
 /**
- * Draw brand-red finder fingerprint on canvas (frame margin only).
+ * Draw soft transparent brand-red corner dot on canvas (frame margin only).
  * @param {CanvasRenderingContext2D} ctx
  * @param {number} cx
  * @param {number} cy
@@ -221,18 +202,12 @@ export function renderHumanityQrFrameMarkup(brandedQrSvg, opts = {}) {
  * @param {number} [opacity]
  */
 export function drawBrandMarkGlyphOnCanvas(ctx, cx, cy, size, opacity = QR_FRAME_BRAND_MARK_OPACITY) {
-  const module = size / 7;
-  const x0 = cx - size / 2;
-  const y0 = cy - size / 2;
   ctx.save();
   ctx.globalAlpha = opacity;
+  ctx.beginPath();
+  ctx.arc(cx, cy, size / 2, 0, Math.PI * 2);
   ctx.fillStyle = QR_BRAND_RED;
-  for (let y = 0; y < 7; y++) {
-    for (let x = 0; x < 7; x++) {
-      if (!qrFinderModuleFilled(x, y)) continue;
-      ctx.fillRect(x0 + x * module, y0 + y * module, module, module);
-    }
-  }
+  ctx.fill();
   ctx.restore();
 }
 
@@ -268,7 +243,9 @@ export function drawHumanityQrFrameCanvas(ctx, m, drawQr) {
     Math.max(1, cornerR - strokeInset)
   );
   ctx.stroke();
-  drawBrandMarkGlyphOnCanvas(ctx, m.glyphCx, m.glyphCy, m.glyphSize);
+  if (QR_FRAME_BRAND_MARK_ENABLED) {
+    drawBrandMarkGlyphOnCanvas(ctx, m.glyphCx, m.glyphCy, m.glyphSize);
+  }
   drawQr();
   ctx.fillStyle = QR_BRAND_RED;
   ctx.font = `600 ${m.pillFont}px system-ui,sans-serif`;
@@ -430,20 +407,16 @@ export function drawMaskedCenterLogoOnCanvas(
   const qrCtx = qrCanvas.getContext("2d");
   if (!qrCtx) return;
 
-  const { cx, cy, outerR, innerR } = centerLogoMetrics(qrWidth, sizeRatio);
+  const w = qrCanvas.width;
+  const h = qrCanvas.height;
+  const { cx, cy, outerR, innerR } = centerLogoMetrics(w, sizeRatio);
 
-  // Build a mask from "dark module" pixels in the QR canvas.
-  const qrImage = qrCtx.getImageData(0, 0, qrWidth, qrWidth);
-  const qrData = qrImage.data;
-
-  const red = hexToRgb(QR_BRAND_RED);
   const circleCanvas = document.createElement("canvas");
-  circleCanvas.width = qrWidth;
-  circleCanvas.height = qrWidth;
+  circleCanvas.width = w;
+  circleCanvas.height = h;
   const circleCtx = circleCanvas.getContext("2d");
   if (!circleCtx) return;
 
-  // Draw the full circles first; we will then punch holes using the QR-mask.
   circleCtx.save();
   circleCtx.globalAlpha = outerOpacity;
   circleCtx.beginPath();
@@ -457,32 +430,42 @@ export function drawMaskedCenterLogoOnCanvas(
   circleCtx.fill();
   circleCtx.restore();
 
-  const circleImage = circleCtx.getImageData(0, 0, qrWidth, qrWidth);
-  const circleData = circleImage.data;
+  const maskCanvas = document.createElement("canvas");
+  maskCanvas.width = w;
+  maskCanvas.height = h;
+  const maskCtx = maskCanvas.getContext("2d");
+  if (!maskCtx) return;
 
-  // Threshold based on distance to the exact brand red.
-  // (QR code rasterization is crispEdges so this is usually exact, but we allow minor anti-aliasing.)
-  const maxDistSq = 1800; // empirically tolerant for edge pixels
-  for (let i = 0; i < qrWidth * qrWidth; i++) {
+  const qrImage = qrCtx.getImageData(0, 0, w, h);
+  const maskImage = maskCtx.createImageData(w, h);
+  const qrData = qrImage.data;
+  const maskData = maskImage.data;
+  const red = hexToRgb(QR_BRAND_RED);
+  const maxDistSq = 1800;
+
+  for (let i = 0; i < w * h; i++) {
     const p = i * 4;
     const r = qrData[p];
     const g = qrData[p + 1];
     const b = qrData[p + 2];
     const a = qrData[p + 3];
-
     const dr = r - red.r;
     const dg = g - red.g;
     const db = b - red.b;
     const distSq = dr * dr + dg * dg + db * db;
-
-    const isDarkModule = a > 0 && distSq <= maxDistSq;
-    if (!isDarkModule) {
-      // Keep RGB, but fully hide outside-module pixels.
-      circleData[p + 3] = 0;
-    }
+    const isDarkModule = a > 128 && distSq <= maxDistSq;
+    const on = isDarkModule ? 255 : 0;
+    maskData[p] = on;
+    maskData[p + 1] = on;
+    maskData[p + 2] = on;
+    maskData[p + 3] = on;
   }
+  maskCtx.putImageData(maskImage, 0, 0);
 
-  circleCtx.putImageData(circleImage, 0, 0);
+  circleCtx.globalCompositeOperation = "destination-in";
+  circleCtx.drawImage(maskCanvas, 0, 0);
+  circleCtx.globalCompositeOperation = "source-over";
+
   ctx.drawImage(circleCanvas, offsetX, offsetY);
 }
 
