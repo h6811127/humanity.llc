@@ -101,7 +101,7 @@ Third parties must not ship lookalike “Humanity pink” QRs that encode non-Hu
 
 **Engineering rule:** Do not fork frame styling in product pages; tune `qrFrameMetrics()` in `qr-branding.mjs` only.
 
-**Optional later:** Short issuer code under QR derived from `profile_id` + `qr_id` for humans to compare with resolver JSON; print QA watermark for fulfillment pipeline.
+**Shipped (Phase F):** Short credential code (`HC-XXXX-XXXX`) under on-page QR and on print stickers; same value in `scan.qr.credential_code` on status JSON. Derived in `site/js/qr-credential-code.mjs` (not secret). **Optional later:** print QA watermark for fulfillment pipeline.
 
 ---
 
@@ -234,9 +234,9 @@ From [`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md)—do 
 | **C** | Host-lock lint in tests + generator docs | Malicious payloads — **shipped** (`site/js/qr-scan-url-lock.mjs`) |
 | **D** | Print sticker SVG template (50.8 mm trim + bleed) | Physical impersonation — **shipped** (`site/js/qr-print-sticker.mjs`) |
 | **E** | `/c/…/out` interstitial + redirect ban in Worker | Weaponized branding — **shipped** (`scan-out.ts`, `scan-redirect-guard.ts`) |
-| **F** | Short credential code on print + optional verifier app | Supply-chain / advanced fakes |
+| **F** | Short credential code on print + status JSON | Supply-chain / advanced fakes — **shipped** (`qr-credential-code.mjs`, print sticker, scan HTML, `scan.qr.credential_code`) |
 
-Phases **A–E** are shipped; **F** (short credential code on print) is next. **E** remains mandatory before any external destination product feature ships.
+Phases **A–F** are shipped for the reference network. **E** remains mandatory before any external destination product feature ships.
 
 ---
 
@@ -255,7 +255,7 @@ Show mixed QRs at phone distance; target &lt;1s Humanity identification without 
 ### Automated checks
 
 ```bash
-npm run worker:test -- worker/tests/scan-qr-branding.test.ts worker/tests/scan.test.ts worker/tests/scan-safety.test.ts worker/tests/qr-scan-url-lock.test.ts worker/tests/qr-print-sticker.test.ts worker/tests/scan-out.test.ts
+npm run worker:test -- worker/tests/scan-qr-branding.test.ts worker/tests/scan.test.ts worker/tests/scan-safety.test.ts worker/tests/qr-scan-url-lock.test.ts worker/tests/qr-print-sticker.test.ts worker/tests/qr-credential-code.test.ts worker/tests/scan-out.test.ts worker/tests/qr-credential-code.test.ts
 ```
 
 ---
@@ -267,6 +267,7 @@ npm run worker:test -- worker/tests/scan-qr-branding.test.ts worker/tests/scan.t
 | Scan HTML | `worker/src/resolver/scan-html.ts` |
 | Scan URL host lock | `site/js/qr-scan-url-lock.mjs` |
 | Print sticker template | `site/js/qr-print-sticker.mjs`, `renderPrintStickerFromScanUrl` in `scan-qr.ts` |
+| Credential code + verifier | `site/js/qr-credential-code.mjs`, `/verify/` |
 | External link interstitial | `worker/src/resolver/scan-out.ts`, `scan-out-token.ts`, `scan-out-html.ts` |
 | Redirect ban | `worker/src/resolver/scan-redirect-guard.ts` |
 | Scanner safety header | `worker/src/resolver/scan-safety.ts` |

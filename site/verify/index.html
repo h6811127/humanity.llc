@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Verify credential code · humanity.llc</title>
+    <meta
+      name="description"
+      content="Compare a printed Humanity credential code with live resolver status JSON."
+    />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=77" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=2" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand top-brand--mark" href="/" aria-label="Home">
+          <span class="pass-dot" aria-hidden="true"></span>
+        </a>
+        <a class="top-create" href="/create/">Create card</a>
+      </header>
+
+      <main class="screen">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Scanner tools</p>
+          <h1>Verify credential code</h1>
+          <p class="hero-line">
+            Printed stickers include a short <strong>HC-…</strong> code under the QR. It must match
+            the resolver status JSON for that object — not proof of identity.
+          </p>
+        </section>
+
+        <form class="settings-panel" id="verify-form">
+          <label class="form-label" for="verify-scan-url">Scan URL (optional)</label>
+          <input
+            class="form-input mono"
+            id="verify-scan-url"
+            name="scan_url"
+            type="url"
+            placeholder="https://humanity.llc/c/…?q=qr_…"
+            autocomplete="off"
+          />
+
+          <label class="form-label" for="verify-code">Credential code on print</label>
+          <input
+            class="form-input mono"
+            id="verify-code"
+            name="code"
+            type="text"
+            placeholder="HC-XXXX-XXXX"
+            autocomplete="off"
+            spellcheck="false"
+          />
+
+          <button type="submit" class="btn-primary" id="verify-submit">Check against network</button>
+        </form>
+
+        <div class="settings-panel" id="verify-result" hidden>
+          <p class="settings-panel-lead" id="verify-result-lead"></p>
+          <dl class="verify-facts" id="verify-facts"></dl>
+        </div>
+      </main>
+    </div>
+    <script type="module" src="/js/verify-credential.mjs"></script>
+  </body>
+</html>

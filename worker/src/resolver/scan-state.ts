@@ -1,3 +1,4 @@
+import { deriveCredentialCodeSync } from "../../../site/js/qr-credential-code.mjs";
 import { validateOfficialScanUrl } from "../../../site/js/qr-scan-url-lock.mjs";
 import type { ScanContext } from "../db/scan";
 import type { CardStatus, QrScope, QrStatus } from "../db/types";
@@ -75,6 +76,8 @@ export interface ScanViewModel {
   publicReason: string | null;
   primaryBadge: { label: string; tone: StatusTone };
   scanUrl: string | null;
+  /** Human fingerprint for print / verifier (Phase F). */
+  credentialCode: string | null;
   cacheControl: string;
 }
 
@@ -466,6 +469,10 @@ function baseView(input: BaseViewInput, origin: string): ScanViewModel {
     publicReason: input.publicReason ?? null,
     primaryBadge: input.primaryBadge,
     scanUrl: resolveScanUrl(origin, input.profileId, input.qrId, qr?.payload),
+    credentialCode:
+      input.profileId && input.qrId
+        ? deriveCredentialCodeSync(input.profileId, input.qrId)
+        : null,
     cacheControl: isHealthy ? CACHE_ACTIVE : CACHE_INACTIVE,
   };
 }

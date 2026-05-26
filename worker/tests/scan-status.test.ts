@@ -14,7 +14,7 @@ import {
 } from "../src/resolver/scan-state";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
-const QR = "qr_test_card_001";
+const QR = "qr_7Xk9mP2nQ4rT6vW8";
 
 function card(overrides: Partial<CardRow> = {}): CardRow {
   return {

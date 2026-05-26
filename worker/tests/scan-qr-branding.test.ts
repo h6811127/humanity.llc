@@ -16,6 +16,7 @@ import {
   QR_FRAME_LIVE_OBJECT_TEXT,
   renderHumanityQrFrameSvg,
 } from "../../site/js/qr-branding.mjs";
+import { credentialCodeFromScanUrl } from "../../site/js/qr-credential-code.mjs";
 import { renderScanQrMarkup } from "../src/resolver/scan-qr";
 
 describe("centerLogoSvgFragment", () => {
@@ -52,19 +53,23 @@ describe("overlayCenterLogoOnSvg", () => {
 
 describe("renderHumanityQrFrameSvg", () => {
   it("adds border, network glyph, LIVE OBJECT, and humanity.llc footer", async () => {
-    const scanUrl = "https://humanity.llc/c/abc?q=qr_xyz";
+    const scanUrl = "https://humanity.llc/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_7Xk9mP2nQ4rT6vW8";
     let svg = await QRCode.toString(scanUrl, {
       type: "svg",
       margin: 1,
       errorCorrectionLevel: "Q",
     });
     svg = overlayCenterLogoOnSvg(svg);
-    const framed = renderHumanityQrFrameSvg(svg);
+    const framed = renderHumanityQrFrameSvg(svg, {
+      credentialCode: credentialCodeFromScanUrl(scanUrl),
+    });
     expect(framed).toContain('class="hc-qr-frame-svg"');
     expect(framed).toContain('class="hc-qr-network-glyph"');
     expect(framed).toContain(QR_FRAME_LIVE_OBJECT_TEXT);
     expect(framed).toContain(QR_FRAME_FOOTER_TEXT);
     expect(framed).toContain(`stroke="${QR_BRAND_RED}"`);
+    expect(framed).toContain('class="hc-qr-frame-code-text"');
+    expect(framed).toContain("HC-");
   });
 });
 

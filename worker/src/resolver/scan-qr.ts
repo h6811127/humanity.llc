@@ -6,6 +6,7 @@ import {
   renderHumanityQrFrameSvg,
 } from "../../../site/js/qr-branding.mjs";
 import { renderPrintStickerSvg as buildPrintStickerSheetSvg } from "../../../site/js/qr-print-sticker.mjs";
+import { credentialCodeFromScanUrl } from "../../../site/js/qr-credential-code.mjs";
 import { assertOfficialScanUrl } from "../../../site/js/qr-scan-url-lock.mjs";
 
 /**
@@ -20,7 +21,9 @@ export async function renderFramedScanQrSvg(scanUrl: string): Promise<string> {
     color: { dark: QR_BRAND_RED, light: QR_BRANDED_RENDER_OPTIONS.color.light },
   });
   svg = overlayCenterLogoOnSvg(svg);
-  return renderHumanityQrFrameSvg(svg);
+  return renderHumanityQrFrameSvg(svg, {
+    credentialCode: credentialCodeFromScanUrl(scanUrl),
+  });
 }
 
 /**
@@ -38,7 +41,10 @@ export async function renderScanQrMarkup(scanUrl: string): Promise<string> {
  */
 export async function renderPrintStickerFromScanUrl(scanUrl: string): Promise<string> {
   const framed = await renderFramedScanQrSvg(scanUrl);
-  return buildPrintStickerSheetSvg(framed);
+  const credentialCode = credentialCodeFromScanUrl(scanUrl);
+  return buildPrintStickerSheetSvg(framed, {
+    credentialCode: credentialCode ?? undefined,
+  });
 }
 
 /** @deprecated Use renderScanQrMarkup — kept for tests that expect data URLs */

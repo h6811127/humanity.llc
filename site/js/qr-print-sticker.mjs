@@ -4,6 +4,7 @@
  */
 
 import { extractQrSvgViewBoxSize, extractSvgInner } from "./qr-branding.mjs";
+import { CREDENTIAL_CODE_PATTERN } from "./qr-credential-code.mjs";
 
 /** Finished sticker trim — 2 in square (founding drop default). */
 export const STICKER_TRIM_MM = 50.8;
@@ -77,9 +78,19 @@ function cropMarksSvg(m) {
 }
 
 /**
+ * @param {string} text
+ */
+function escapeSvgText(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+/**
  * Build print-ready SVG (mm units) from a framed Humanity QR SVG.
  * @param {string} framedQrSvg output of renderHumanityQrFrameSvg
- * @param {{ trimMm?: number, bleedMm?: number, safeInsetMm?: number, showGuides?: boolean }} [opts]
+ * @param {{ trimMm?: number, bleedMm?: number, safeInsetMm?: number, showGuides?: boolean, credentialCode?: string | null }} [opts]
  */
 export function renderPrintStickerSvg(framedQrSvg, opts = {}) {
   const viewBoxMatch = framedQrSvg.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/);
@@ -107,6 +118,11 @@ export function renderPrintStickerSvg(framedQrSvg, opts = {}) {
     ? `<rect class="hc-print-safe-guide" x="${m.safeX}" y="${m.safeY}" width="${m.safeSizeMm}" height="${m.safeSizeMm}" fill="none" stroke="#f0f0f0" stroke-width="0.1"/>`
     : "";
   const marks = showGuides ? cropMarksSvg(m) : "";
+  const code = opts.credentialCode?.trim();
+  const codeLabel =
+    code && CREDENTIAL_CODE_PATTERN.test(code)
+      ? `<text class="hc-print-credential-code" x="${m.canvasMm / 2}" y="${m.canvasMm - m.bleedMm - 0.65}" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="1.35" fill="#8a8a8a">${escapeSvgText(code)}</text>`
+      : "";
 
-  return `<svg class="hc-print-sticker-svg" xmlns="http://www.w3.org/2000/svg" width="${m.canvasMm}mm" height="${m.canvasMm}mm" viewBox="0 0 ${m.canvasMm} ${m.canvasMm}" role="img" aria-label="Humanity print sticker"><rect width="${m.canvasMm}" height="${m.canvasMm}" fill="#ffffff"/>${trimGuide}${safeGuide}${marks}<g class="hc-print-sticker-qr" transform="translate(${offsetX} ${offsetY}) scale(${scale})">${inner}</g></svg>`;
+  return `<svg class="hc-print-sticker-svg" xmlns="http://www.w3.org/2000/svg" width="${m.canvasMm}mm" height="${m.canvasMm}mm" viewBox="0 0 ${m.canvasMm} ${m.canvasMm}" role="img" aria-label="Humanity print sticker"><rect width="${m.canvasMm}" height="${m.canvasMm}" fill="#ffffff"/>${trimGuide}${safeGuide}${marks}<g class="hc-print-sticker-qr" transform="translate(${offsetX} ${offsetY}) scale(${scale})">${inner}</g>${codeLabel}</svg>`;
 }

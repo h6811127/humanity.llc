@@ -651,6 +651,15 @@ a {
   word-break: break-all;
 }
 
+.pass-credential-code {
+  margin: 4px 0 0;
+  font-size: 10px;
+  line-height: 1.3;
+  color: var(--text-muted, #6b6b6b);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
 .mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
@@ -1610,6 +1619,18 @@ body {
   flex: 1 1 8rem;
   text-align: center;
   text-decoration: none;
+}
+
+.scan-credential-code {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(60, 60, 67, 0.75);
+}
+
+.scan-credential-code strong {
+  color: #db1b43;
+  font-weight: 600;
 }
 
 /* Flat status panel (not a flippable ID-style card) */

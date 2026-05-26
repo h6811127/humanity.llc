@@ -123,3 +123,15 @@ Fulfillment and DIY print use `renderPrintStickerSvg()` in `site/js/qr-print-sti
 ```bash
 npm run worker:test -- worker/tests/qr-print-sticker.test.ts
 ```
+
+---
+
+## Credential code (Phase F)
+
+Official framed QRs include a short **HC-XXXX-XXXX** line under `humanity.llc`, derived from `profile_id` + `qr_id` (`site/js/qr-credential-code.mjs`). Same value appears in status JSON as `credential_code` and on DIY print exports. Humans compare sticker to network — not a secret, not proof of identity.
+
+Optional verifier: [`/verify/`](https://humanity.llc/verify/).
+
+```bash
+npm run worker:test -- worker/tests/qr-credential-code.test.ts
+```

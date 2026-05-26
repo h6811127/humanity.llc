@@ -10,6 +10,10 @@ import {
 } from "./verification-display";
 import { governanceProcessUrls, originFromScanUrl } from "./scan-governance";
 import { SCAN_OFFLINE_BANNER_TEXT } from "./scan-offline";
+import {
+  credentialCodeFromScanUrl,
+  deriveCredentialCodeSync,
+} from "../../../site/js/qr-credential-code.mjs";
 import { renderScanQrMarkup } from "./scan-qr";
 import {
   EMPTY_SCAN_SAFETY,
@@ -149,10 +153,30 @@ function scanStatusHead(vm: ScanViewModel, badgeClass: string): string {
 </header>`;
 }
 
+function credentialCodeForVm(vm: ScanViewModel): string | null {
+  if (vm.scanUrl) {
+    return credentialCodeFromScanUrl(vm.scanUrl);
+  }
+  if (vm.profileId && vm.qrId) {
+    try {
+      return deriveCredentialCodeSync(vm.profileId, vm.qrId);
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+function renderCredentialCodeLine(code: string | null): string {
+  if (!code) return "";
+  return `<p class="pass-credential-code mono" aria-label="Credential code for print verification">${escapeHtml(code)}</p>`;
+}
+
 function scanStatusQrBlock(vm: ScanViewModel, qrMarkup: string): string {
   if (!vm.scanUrl) return "";
   const qrSlotAttr = ` id="pass-qr-slot" data-scan-url="${escapeHtml(vm.scanUrl)}"`;
-  return `<div class="scan-status-qr pass-qr"${qrSlotAttr}>${qrMarkup}</div>`;
+  const codeLine = renderCredentialCodeLine(credentialCodeForVm(vm));
+  return `<div class="scan-status-qr pass-qr"${qrSlotAttr}>${qrMarkup}${codeLine}</div>`;
 }
 
 function scanStatusFoot(text: string): string {
@@ -373,9 +397,13 @@ function renderMinimalPassFront(
 
 function renderScanUrlControl(vm: ScanViewModel): string {
   if (!vm.scanUrl) return "";
+  const codeLine = vm.credentialCode
+    ? `<p class="scan-credential-code">Credential code on print: <strong class="mono">${escapeHtml(vm.credentialCode)}</strong> — compare with the sticker or status JSON.</p>`
+    : "";
   return `<details class="scan-show-link">
   <summary class="scan-show-link-summary">Show link</summary>
   <p class="pass-scan-url mono">${escapeHtml(vm.scanUrl)}</p>
+  ${codeLine}
 </details>`;
 }
 
@@ -706,6 +734,17 @@ function qrGroupRows(vm: ScanViewModel): string {
   const rows = [listRow("qr", qrStatusIconTone(vm), status, scope)];
   if (vm.qrId) {
     rows.push(listRow("profile", "blue", "Credential", vm.qrId));
+  }
+  const code = credentialCodeForVm(vm);
+  if (code) {
+    rows.push(
+      listRow(
+        "profile",
+        "slate",
+        code,
+        "Compare with print sticker · not secret"
+      )
+    );
   }
   return rows.join("\n");
 }

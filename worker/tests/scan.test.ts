@@ -228,6 +228,8 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain('class="pass-dot"');
     expect(html).toContain("pass-qr-slot");
     expect(html).toContain(`q=${QR}`);
+    expect(html).toContain("pass-credential-code");
+    expect(html).toMatch(/HC-[0-9A-HJKMNP-TV-Z]{4}-[0-9A-HJKMNP-TV-Z]{4}/);
     expect(html).toContain("Show link");
     expect(html).toMatch(/<svg[^>]*viewBox="0 0 \d+ \d+"/);
     expect(html).toContain("list-icon-tone-red");

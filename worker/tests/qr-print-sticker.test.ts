@@ -13,6 +13,7 @@ import {
   QR_FRAME_LIVE_OBJECT_TEXT,
   renderHumanityQrFrameSvg,
 } from "../../site/js/qr-branding.mjs";
+import { deriveCredentialCodeSync } from "../../site/js/qr-credential-code.mjs";
 import { renderPrintStickerFromScanUrl, renderScanQrMarkup } from "../src/resolver/scan-qr";
 import QRCode from "qrcode";
 
@@ -65,8 +66,14 @@ describe("renderPrintStickerSvg", () => {
 describe("renderPrintStickerFromScanUrl", () => {
   it("builds print sheet from scan URL with host lock", async () => {
     const sheet = await renderPrintStickerFromScanUrl(SCAN_URL);
+    const code = deriveCredentialCodeSync(
+      "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+      "qr_7Xk9mP2nQ4rT6vW8"
+    );
     expect(sheet).toContain('class="hc-print-sticker-svg"');
     expect(sheet).toContain('class="hc-qr-network-glyph"');
+    expect(sheet).toContain('class="hc-print-credential-code"');
+    expect(sheet).toContain(code);
     expect(sheet).not.toContain("scale(NaN)");
   });
 

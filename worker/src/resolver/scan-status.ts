@@ -20,6 +20,7 @@ import {
   originFromScanUrl,
   type GovernanceProcessUrls,
 } from "./scan-governance";
+import { deriveCredentialCodeSync } from "../../../site/js/qr-credential-code.mjs";
 import { scanContractErrorForKind } from "./scan-contract-error";
 import { guardScanResponse, scanRedirectQueryBlocked } from "./scan-redirect-guard";
 import { BEARER_WARNING } from "./trust-copy";
@@ -37,6 +38,8 @@ export interface ScanStatusBody {
     profile_id: string | null;
     qr_id: string | null;
     scan_url: string | null;
+    /** Print / verifier fingerprint (Phase F); omitted when profile or QR id missing. */
+    credential_code?: string;
     card: {
       status: string | null;
       handle: string | null;
@@ -47,6 +50,8 @@ export interface ScanStatusBody {
       scope: string | null;
       epoch: number | null;
       expires_at: string | null;
+      /** Human-readable fingerprint for print QA (SCANNER_EXPERIENCE Phase F). */
+      credential_code?: string;
     } | null;
     verification: {
       state: string | null;
@@ -90,6 +95,7 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
       profile_id: vm.profileId,
       qr_id: vm.qrId,
       scan_url: vm.scanUrl,
+      ...(vm.credentialCode ? { credential_code: vm.credentialCode } : {}),
       card: vm.profileId
         ? {
             status: vm.cardStatus,
@@ -105,6 +111,11 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
             expires_at: vm.qrExpiresAt,
             issued_at: vm.qrIssuedAt,
             payload: vm.qrPayload,
+            ...(vm.profileId
+              ? {
+                  credential_code: deriveCredentialCodeSync(vm.profileId, vm.qrId),
+                }
+              : {}),
           }
         : null,
       verification: {

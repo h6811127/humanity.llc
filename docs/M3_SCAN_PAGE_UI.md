@@ -49,6 +49,7 @@ Do **not** put full trust copy on the card back (it clips). Spec blocks live in 
 | **Scan page** | Worker renders the same payload server-side via `worker/src/resolver/scan-qr.ts` (`QRCode.toString`, type `svg` + centered vector circles) |
 | **Fallback** | If server SVG fails, inline module script loads `/js/qr-render.mjs` and fills `#pass-qr-slot[data-scan-url]` (never the brand PNG) |
 | **Visible URL** | Red monospace line under QR on card front: full scan URL (confirms payload for humans) |
+| **Credential code** | `HC-XXXX-XXXX` under QR (Phase F); matches `scan.qr.credential_code` in status JSON and print sticker |
 
 ### Verification checklist
 
