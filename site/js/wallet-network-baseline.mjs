@@ -47,3 +47,20 @@ export function isRevokedSinceLastVisitFromBaseline(lastSeenStatus, currentAlert
   if (lastNorm === CARD_REVOKED_ALERT_STATE) return false;
   return true;
 }
+
+/**
+ * Hub row "card disabled since last visit" banner.
+ * @param {string | null | undefined} alertState From fresh resolver fetch (`alertStateMap`), not session cache.
+ * @param {string | null | undefined} lastSeenStatus Device baseline (`hc_wallet_last_seen_network`).
+ * @param {{ resolverConfirmed?: boolean }} [options]
+ */
+export function shouldShowCardDisabledSinceVisitAlert(
+  alertState,
+  lastSeenStatus,
+  options = {}
+) {
+  if (!options.resolverConfirmed) return false;
+  const current = String(alertState || "").toLowerCase();
+  if (current !== CARD_REVOKED_ALERT_STATE) return false;
+  return isRevokedSinceLastVisitFromBaseline(lastSeenStatus, current);
+}

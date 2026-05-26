@@ -263,7 +263,11 @@ function currentNetworkStatus(profileId, statusMap = {}) {
   return statusMap[profileId] ?? getCachedNetworkStatus(profileId) ?? "checking";
 }
 
-function applyNetworkChipsToDom(statusMap = {}, alertStateMap = null) {
+function currentNetworkScanKind(profileId, scanKindMap = {}) {
+  return scanKindMap[profileId] ?? getCachedNetworkScanKind(profileId) ?? null;
+}
+
+function applyNetworkChipsToDom(statusMap = {}, alertStateMap = null, scanKindMap = {}) {
   if (!savedList) return;
   savedList.querySelectorAll(".hub-card-item").forEach((li) => {
     const pid = li.dataset.profileId;
@@ -271,7 +275,7 @@ function applyNetworkChipsToDom(statusMap = {}, alertStateMap = null) {
     const chipEl = li.querySelector(".hub-card-network");
     if (chipEl) {
       const status = currentNetworkStatus(pid, statusMap);
-      const chip = networkStatusChip(status, getCachedNetworkScanKind(pid));
+      const chip = networkStatusChip(status, currentNetworkScanKind(pid, scanKindMap));
       chipEl.className = `hub-card-network hub-card-network--${chip.tone}`;
       chipEl.textContent = chip.label;
     }
@@ -349,9 +353,9 @@ async function fetchAndApplyNetworkChips() {
       entries.map((e) => [e.profile_id, getCachedNetworkStatus(e.profile_id) ?? "checking"])
     )
   );
-  await refreshWalletNetworkStatuses(entries, ({ statusMap, alertStateMap }) => {
+  await refreshWalletNetworkStatuses(entries, ({ statusMap, alertStateMap, scanKindMap }) => {
     if (gen !== walletNetworkApplyGen) return;
-    applyNetworkChipsToDom(statusMap, alertStateMap);
+    applyNetworkChipsToDom(statusMap, alertStateMap, scanKindMap);
     syncLastSeenFromNetworkMap(alertStateMap);
     const stored = loadWallet();
     let changed = false;

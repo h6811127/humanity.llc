@@ -8,8 +8,9 @@ import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
 import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
 import {
-  getCachedNetworkAlertState,
+  getLatestResolvedAlertState,
   isRevokedSinceLastVisit,
+  NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import { CARD_DISABLED_SINCE_VISIT_GLANCE_SUFFIX } from "./wallet-network-baseline.mjs";
 import { loadWallet, walletEntrySubtitle } from "./device-wallet.mjs";
@@ -144,8 +145,11 @@ function refreshGlanceTarget(target) {
   const shown = entries.slice(0, GLANCE_MAX_CARDS);
   for (const entry of shown) {
     const li = document.createElement("li");
-    const alertState = getCachedNetworkAlertState(entry.profile_id) ?? "checking";
-    const revokedSince = isRevokedSinceLastVisit(entry.profile_id, alertState);
+    // DH-3: only trust fresh resolver poll state, never stale session cache.
+    const alertState = getLatestResolvedAlertState(entry.profile_id);
+    const revokedSince = alertState
+      ? isRevokedSinceLastVisit(entry.profile_id, alertState)
+      : false;
     li.className = revokedSince
       ? "device-hub-glance-row device-hub-glance-row--revoked"
       : "device-hub-glance-row";
@@ -197,6 +201,7 @@ export function refreshHubGlance() {
 if (glanceTargets.length > 0) {
   refreshHubGlance();
   window.addEventListener("hc-device-hub-changed", refreshHubGlance);
+  window.addEventListener(NETWORK_REFRESHED, refreshHubGlance);
   window.addEventListener("hc-live-control-inbox-changed", refreshHubGlance);
   window.addEventListener("hc-tab-presence-changed", refreshHubGlance);
   window.addEventListener("storage", (e) => {

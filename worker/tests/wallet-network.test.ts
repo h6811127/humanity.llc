@@ -6,6 +6,7 @@ import {
   CARD_REVOKED_ALERT_STATE,
   isRevokedSinceLastVisitFromBaseline,
   normalizeBaselineState,
+  shouldShowCardDisabledSinceVisitAlert,
 } from "../../site/js/wallet-network-baseline.mjs";
 
 describe("card-disabled since-visit copy", () => {
@@ -67,5 +68,28 @@ describe("isRevokedSinceLastVisitFromBaseline", () => {
 describe("normalizeBaselineState", () => {
   it("maps legacy revoked to card_revoked", () => {
     expect(normalizeBaselineState("revoked")).toBe(CARD_REVOKED_ALERT_STATE);
+  });
+});
+
+describe("shouldShowCardDisabledSinceVisitAlert (DH-1)", () => {
+  it("never shows from stale cache before resolver confirms", () => {
+    expect(
+      shouldShowCardDisabledSinceVisitAlert("card_revoked", "active", {
+        resolverConfirmed: false,
+      })
+    ).toBe(false);
+  });
+
+  it("shows only after resolver confirms a real card_revoked transition", () => {
+    expect(
+      shouldShowCardDisabledSinceVisitAlert("card_revoked", "active", {
+        resolverConfirmed: true,
+      })
+    ).toBe(true);
+    expect(
+      shouldShowCardDisabledSinceVisitAlert("active", "active", {
+        resolverConfirmed: true,
+      })
+    ).toBe(false);
   });
 });
