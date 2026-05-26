@@ -64,6 +64,7 @@ export function actOnOtherTabKeys(entry) {
   });
 
   if (plan.kind === "dismiss") {
+    window.dispatchEvent(new Event("hc-cross-tab-custody-invalidated"));
     return false;
   }
 

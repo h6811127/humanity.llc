@@ -1,5 +1,5 @@
 /**
- * Device inbox — browser facade over device-inbox-core.
+ * Device inbox - browser facade over device-inbox-core.
  * @see docs/DEVICE_INBOX.md
  */
 import {
@@ -59,6 +59,19 @@ export function resetPresenceInboxGatherCache() {
   lastGatherMs = 0;
   invalidateCrossTabNotificationState();
 }
+
+/**
+ * Phase 4 custody invalidation entry point.
+ * Clears coalesced inbox gather data and cross-tab fingerprint streak state.
+ */
+export function invalidateCrossTabInboxState() {
+  resetPresenceInboxGatherCache();
+}
+
+// Phase 4: custody-affecting events must invalidate coalesced inbox snapshot.
+window.addEventListener("hc-device-hub-changed", invalidateCrossTabInboxState);
+window.addEventListener("hc-wallet-removed-profiles-changed", invalidateCrossTabInboxState);
+window.addEventListener("hc-cross-tab-custody-invalidated", invalidateCrossTabInboxState);
 
 /** @returns {Parameters<typeof buildInboxItems>[0]} */
 export function gatherInboxInput() {

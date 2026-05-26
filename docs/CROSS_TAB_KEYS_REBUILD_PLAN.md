@@ -1,11 +1,11 @@
-# Cross-tab keys — rebuild plan (restart)
+# Cross-tab keys - rebuild plan (restart)
 
 **Status:** Phase 1 shipped · Phase 2+ pending  
 **Audience:** Engineering  
 **Canonical spec:** [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md)  
 **Context:** Paths B, F, G shipped ([`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md)) but reports continue: random flashes, glitchy card labels, notices persisting after save or tab close, scroll jank with many tabs.
 
-**Goal:** Replace the current patch stack with a **small, testable state machine** and **one chrome refresh path** — not more per-surface band-aids.
+**Goal:** Replace the current patch stack with a **small, testable state machine** and **one chrome refresh path** - not more per-surface band-aids.
 
 **Non-goals (this rebuild):**
 
@@ -32,12 +32,12 @@ Path G (streak, gather cache, debounced `refreshSummary`, skip cross-tab view tr
 
 ## Design principles
 
-1. **One snapshot per tick** — `computeCrossTabNotificationState()` returns everything chrome needs; surfaces are dumb renderers.
-2. **Identity-stable show** — Show only when the **set of qualifying `(tabId, profile_id)`** is unchanged for two reads (or one read + 300ms quiet window — pick one in implementation).
-3. **Fast hide** — Any read with zero qualifying presence → hide all surfaces on the **same** synchronous refresh (no debounce on hide).
-4. **Debounced show only** — Coalesce presence **show** edges; never debounce **hide**.
-5. **Custody invalidation** — Reset machine on wallet, session, denylist, and explicit clear/focus actions.
-6. **Keep security honesty** — Removing from device does not delete keys in other tabs unless user confirms broadcast clear; denylist + orphan copy stays.
+1. **One snapshot per tick** - `computeCrossTabNotificationState()` returns everything chrome needs; surfaces are dumb renderers.
+2. **Identity-stable show** - Show only when the **set of qualifying `(tabId, profile_id)`** is unchanged for two reads (or one read + 300ms quiet window - pick one in implementation).
+3. **Fast hide** - Any read with zero qualifying presence → hide all surfaces on the **same** synchronous refresh (no debounce on hide).
+4. **Debounced show only** - Coalesce presence **show** edges; never debounce **hide**.
+5. **Custody invalidation** - Reset machine on wallet, session, denylist, and explicit clear/focus actions.
+6. **Keep security honesty** - Removing from device does not delete keys in other tabs unless user confirms broadcast clear; denylist + orphan copy stays.
 
 ---
 
@@ -70,13 +70,13 @@ stateDiagram-v2
 
 ## Phased delivery
 
-### Phase 0 — Documentation & tests lock (this PR)
+### Phase 0 - Documentation & tests lock (this PR)
 
-- [x] [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) — canonical spec
+- [x] [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) - canonical spec
 - [x] This rebuild plan
 - [x] Vitest: fingerprint + “hide immediate / show delayed” in `worker/tests/device-cross-tab-state.test.ts`
 
-### Phase 1 — Pure state core + snapshot API ✅
+### Phase 1 - Pure state core + snapshot API ✅
 
 **Deliverable:** `computeCrossTabNotificationState()` with:
 
@@ -96,13 +96,13 @@ stateDiagram-v2
 
 - Identity-stable show (fingerprint match across reads).
 - `tabNoticeCount > 0` → force hidden generic + orphan.
-- Reuse existing `listOtherTabsWithKeys` / denylist / orphan filters — do not duplicate filter logic.
+- Reuse existing `listOtherTabsWithKeys` / denylist / orphan filters - do not duplicate filter logic.
 
-**Tests:** `worker/tests/device-cross-tab-state.test.ts` — table-driven cases from failure modes table.
+**Tests:** `worker/tests/device-cross-tab-state.test.ts` - table-driven cases from failure modes table.
 
 **Shipped modules:** `device-cross-tab-state-core.mjs`, `device-cross-tab-state.mjs`; `gatherInboxInput()` wired; custody invalidation on `hc_wallet` / `hc_created` / hub / denylist; shell manifest + `DEVICE_SHELL_ASSET_VERSION` **36**.
 
-### Phase 2 — Single chrome refresh coordinator ✅
+### Phase 2 - Single chrome refresh coordinator ✅
 
 **Deliverable:**
 
@@ -117,18 +117,18 @@ stateDiagram-v2
 
 **Shipped:** `device-chrome-refresh.mjs` coordinator, removed duplicate `hc-tab-presence-changed` listeners from hub/banner/glance/sheet/wallet, and wired `device-status.mjs` to delegate cross-tab chrome refresh.
 
-### Phase 3 — Wire all surfaces to snapshot
+### Phase 3 - Wire all surfaces to snapshot
 
 | Surface | Change |
 |---------|--------|
-| `device-inbox.mjs` | `gatherInboxInput` uses `getCrossTabNotificationState()` — remove module-level streak from inbox |
+| `device-inbox.mjs` | `gatherInboxInput` uses `getCrossTabNotificationState()` - remove module-level streak from inbox |
 | `device-cross-tab-banner.mjs` | Scan + hub + legacy banner read snapshot; delete raw `getOtherTabsWithKeys` in scan |
 | `device-inbox-sheet.mjs` | Rows from snapshot entries only |
 | `wallet-page.mjs` / `card-wallet.mjs` | Hint from snapshot |
 
 **Acceptance:** Two-tab Vitest + manual: scan banner label matches inbox sheet primary row.
 
-### Phase 4 — Custody invalidation & clear semantics
+### Phase 4 - Custody invalidation & clear semantics ✅
 
 **On:**
 
@@ -139,19 +139,21 @@ stateDiagram-v2
 
 **Do:** `invalidateCrossTabNotificationState()` (reset streak + fingerprint + gather cache).
 
-**Optional (product decision):** after **Save on this device**, `BroadcastChannel` ask other tabs to clear presence for that `profile_id` only (non-destructive to keys — presence-only). Document in spec if shipped.
+**Optional (product decision):** after **Save on this device**, `BroadcastChannel` ask other tabs to clear presence for that `profile_id` only (non-destructive to keys - presence-only). Document in spec if shipped.
 
 **Acceptance:** Save keys in tab A → tab B badge clears for that profile within one refresh tick (not 6s stale row).
 
-### Phase 5 — Performance hardening
+**Shipped:** `invalidateCrossTabInboxState()` and custody invalidation event wiring (`hc-device-hub-changed`, `hc-wallet-removed-profiles-changed`, `hc-cross-tab-custody-invalidated`), plus `actOnOtherTabKeys()` dismiss invalidation.
+
+### Phase 5 - Performance hardening
 
 - Ensure `gatherInboxInput` / inbox items computed **once** per `refreshDeviceChrome`.
 - Keep `shouldSkipCrossTabOverlayViewTransition` when only cross-tab overlay flaps.
-- Consider slowing heartbeat to 5s or writing presence only when fingerprint changes (reduces `storage` storms) — measure against [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
+- Consider slowing heartbeat to 5s or writing presence only when fingerprint changes (reduces `storage` storms) - measure against [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 
-**Acceptance:** Repro from [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md) — 6 tabs, landing scroll acceptable.
+**Acceptance:** Repro from [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md) - 6 tabs, landing scroll acceptable.
 
-### Phase 6 — E2E & QA
+### Phase 6 - E2E & QA
 
 - Playwright: two tabs, keys in tab B, tab A badge stable label, close tab B → badge clears ≤10s.
 - Playwright: save wallet in tab A, other tab same profile → no generic cross-tab for that profile.
@@ -193,8 +195,8 @@ stateDiagram-v2
 
 | Item | Where |
 |------|--------|
-| Orphan denylist (path B) | Shipped — keep |
-| Orphan copy (path F) | Shipped — keep |
+| Orphan denylist (path B) | Shipped - keep |
+| Orphan copy (path F) | Shipped - keep |
 | Path G streak | Replace with fingerprint streak in Phase 1 |
-| Live proof OS alerts | [`DEVICE_INBOX.md`](DEVICE_INBOX.md) — separate channel |
-| Card disabled since visit | [`device-inbox-card-disabled.mjs`](../site/js/device-inbox-card-disabled.mjs) — separate kind |
+| Live proof OS alerts | [`DEVICE_INBOX.md`](DEVICE_INBOX.md) - separate channel |
+| Card disabled since visit | [`device-inbox-card-disabled.mjs`](../site/js/device-inbox-card-disabled.mjs) - separate kind |
