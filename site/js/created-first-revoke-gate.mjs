@@ -36,9 +36,9 @@ export function hasFirstRevokeDone(profileId) {
  * @param {string | null | undefined} profileId
  */
 export function syncUpdateStatusTaskGate(profileId) {
-  const row = document.getElementById("created-task-update-status");
-  const hint = document.getElementById("created-task-update-status-hint");
+  const scannersSee = document.getElementById("created-live-scanners-see");
+  const hint = document.getElementById("created-scanners-see-gate-hint");
   const unlocked = hasFirstRevokeDone(profileId);
-  if (row) row.hidden = !unlocked;
+  if (scannersSee) scannersSee.hidden = !unlocked;
   if (hint) hint.hidden = unlocked;
 }

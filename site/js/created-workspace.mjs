@@ -34,18 +34,12 @@ export function clearFreshUrlParam() {
   history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
 }
 
-/** Move keys strip back into the control Live panel after setup. */
+/** Move keys strip back into the Live custody panel after setup. */
 export function restoreKeysStripToControlPanel() {
   const keysStrip = document.getElementById("created-keys-strip");
-  const tabNow = document.getElementById("created-tab-now");
-  const dashboard = tabNow?.querySelector(".created-dashboard");
-  if (!keysStrip || !dashboard) return;
-  const networkDetails = tabNow?.querySelector(
-    ".created-advanced-block:not(.created-recovery-details)"
-  );
-  if (networkDetails) {
-    tabNow.insertBefore(keysStrip, networkDetails);
-  } else {
-    dashboard.after(keysStrip);
+  const custodyPanel = document.getElementById("created-custody-panel");
+  if (!keysStrip || !custodyPanel) return;
+  if (keysStrip.parentElement !== custodyPanel) {
+    custodyPanel.prepend(keysStrip);
   }
 }

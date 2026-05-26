@@ -15,24 +15,20 @@ After create, `/created/` is a **task dashboard**, not a settings dump. The user
 
 ---
 
-## Page hierarchy (Tasks tab)
+## Page hierarchy (Live tab, T2)
 
 Top to bottom:
 
-1. **Hero** - `@handle` · **Live QR ready** · status meta (`Card active · QR expires …`)
-2. **Small QR preview** - tap scrolls to full QR block (emotional “here’s the thing you made”)
-3. **Primary actions** (prominent)
-   - **1. Save control key** - `Required` badge; first setup step
-   - **Open scan page**
-4. **More tasks** (grouped list)
-   - Download QR → scrolls to full QR section (download button lives there)
-   - Print instructions
-   - Test scan
-   - Update status
-   - Revoke QR
-5. **Keys strip** - custody notice + save form (revealed when saving)
-6. **Network status & IDs** - collapsed `<details>` with icons
-7. **Full QR section** - large QR, download, copy link, print steps
+1. **Status strip** - live on network chip + resolver meta
+2. **Live object card** - 160px QR, manifesto teaser, open scan / copy link
+3. **What scanners see** - template fields + publish (gated until first revoke in session per Phase A)
+4. **Deploy disclosures** - print & share, test from another device, download QR
+5. **Keys on this device** - custody disclosure with save form
+6. **Manage hint** + footer links (My cards, loop)
+7. **Network status & IDs** - collapsed glossary block
+8. **Full-size QR** - collapsed disclosure with download and scan actions
+
+Revoke and rotate stay on **Manage** only.
 
 ---
 

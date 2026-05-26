@@ -5238,6 +5238,46 @@ body[data-created-mode="control"] .created-dashboard .created-qr-preview-wrap {
   margin: 0 0 12px;
 }
 
+.created-live-deploy {
+  margin: 0 0 14px;
+}
+
+.created-live-deploy .settings-disclosure {
+  margin-bottom: 8px;
+}
+
+.created-live-deploy .settings-disclosure:last-child {
+  margin-bottom: 0;
+}
+
+.created-live-manage-hint {
+  margin: 14px 4px 0;
+}
+
+.created-live-footer {
+  margin: 12px 0 0;
+  padding: 0 4px;
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
+  color: var(--grey);
+}
+
+.created-scanners-see-gate-hint {
+  margin: 0 0 12px;
+}
+
+#created-tab-now .created-keys-strip {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+#created-custody-panel .flow-keys-panel {
+  margin-top: 0;
+}
+
 .created-dashboard {
   margin: 0 0 18px;
 }

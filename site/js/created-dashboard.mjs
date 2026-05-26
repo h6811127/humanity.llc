@@ -1,6 +1,6 @@
 /**
- * Task dashboard primary actions on /created/.
- * @see docs/CREATED_TASK_DASHBOARD.md
+ * Live tab deploy + custody actions on /created/.
+ * @see docs/CREATED_TASK_DASHBOARD.md · docs/CREATED_TASKS_TAB_REDESIGN.md
  */
 
 import { isWalletSaved } from "./device-wallet.mjs";
@@ -54,10 +54,11 @@ export function initCreatedDashboard({
   const qrSection = document.getElementById("created-qr-section");
   const liveObjectCard = document.getElementById("created-live-object-card");
   const openScan = document.getElementById("open-scan");
+  const downloadQrBtn = document.getElementById("download-qr");
   const scannersSeeSection = document.getElementById("created-live-scanners-see");
+  const custodyDisclosure = document.getElementById("created-custody-disclosure");
+  const custodySummarySub = document.getElementById("created-custody-summary-sub");
   const revokeDetails = document.getElementById("revoke-details");
-  const printTip = document.querySelector("#created-qr-section .created-print-tip");
-  const saveRequiredBadge = document.getElementById("created-save-required-badge");
   const feedbackEl = document.getElementById("created-dashboard-feedback");
   let feedbackTimer = null;
 
@@ -76,6 +77,13 @@ export function initCreatedDashboard({
     }, isError ? 8000 : 5000);
   }
 
+  function openDisclosure(id) {
+    const el = document.getElementById(id);
+    if (!el || el.tagName !== "DETAILS") return;
+    el.removeAttribute("hidden");
+    el.setAttribute("open", "");
+  }
+
   function openScanUrl() {
     const scanUrl = getScanUrl?.() || openScan?.href;
     if (scanUrl && scanUrl !== "#" && scanUrl.startsWith("http")) {
@@ -87,18 +95,30 @@ export function initCreatedDashboard({
 
   function scrollToQr() {
     selectTab("now");
+    openDisclosure("created-deploy-full-qr");
     const target = liveObjectCard || qrSection;
     target?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function revealKeysStrip() {
+    openDisclosure("created-custody-disclosure");
     if (keysStrip) keysStrip.hidden = false;
-    keysStrip?.scrollIntoView({ behavior: "smooth", block: "start" });
+    keysStrip?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   function markDone(actionId) {
     persistDoneAction(profileId(), actionId);
     syncDoneStates();
+  }
+
+  function syncCustodySummary(saved) {
+    if (!custodySummarySub) return;
+    custodySummarySub.textContent = saved
+      ? "Saved on this device"
+      : "Save to update and revoke later";
+    if (custodyDisclosure) {
+      custodyDisclosure.classList.toggle("created-custody-disclosure--saved", saved);
+    }
   }
 
   function syncDoneStates() {
@@ -112,7 +132,7 @@ export function initCreatedDashboard({
       btn.classList.toggle("is-done", !!(id && done.has(id)));
     });
 
-    if (saveRequiredBadge) saveRequiredBadge.hidden = saved;
+    syncCustodySummary(saved);
     syncUpdateStatusTaskGate(pid);
   }
 
@@ -145,7 +165,7 @@ export function initCreatedDashboard({
         showFeedback("Saved on this device. You can update and revoke from this browser.");
       } else {
         showFeedback(
-          "Could not save yet. Keys must be in this tab - finish create here or import a backup below.",
+          "Could not save yet. Keys must be in this tab - finish create here or import a backup in Manage.",
           true
         );
       }
@@ -163,21 +183,29 @@ export function initCreatedDashboard({
       scrollToQr();
     },
     "download-qr": () => {
+      selectTab("now");
+      if (downloadQrBtn && !downloadQrBtn.disabled) {
+        downloadQrBtn.click();
+        markDone("download-qr");
+        showFeedback("Downloading QR image.");
+        return;
+      }
+      openDisclosure("created-deploy-download");
       scrollToQr();
       markDone("download-qr");
-      showFeedback("Full QR below - use Download QR image to save the PNG.");
+      showFeedback("Open full-size QR below when the image is ready, then download.");
     },
     "print-qr": () => {
-      scrollToQr();
-      printTip?.setAttribute("open", "");
+      selectTab("now");
+      openDisclosure("created-deploy-print");
       markDone("print-qr");
     },
     "test-scan": () => {
       selectTab("now");
+      openDisclosure("created-deploy-test");
       if (openScanUrl()) {
         markDone("test-scan");
       } else {
-        scrollToQr();
         showFeedback("Scan link is not ready yet.", true);
       }
     },

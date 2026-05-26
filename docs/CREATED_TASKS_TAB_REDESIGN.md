@@ -1,6 +1,6 @@
 # Card controls - Tasks tab redesign (brainstorm)
 
-**Status:** In progress - **T1** and **T1b** shipped (Live · Manage, live object card, **What scanners see** on Live). **T2** next (deploy disclosures).  
+**Status:** In progress - **T1**, **T1b**, and **T2** shipped. **T3** next (contextual primary CTA).  
 **Audience:** Product, design, frontend  
 **Scope:** `/created/` **control mode**, **Live** tab (rename from Tasks) - redesign. **Manage** tab (rename from Advanced) - layout/copy only, same disclosure pattern; remove duplicate public-line editor when Live ships inline publish.  
 **Related:** [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`CREATED_TASK_DASHBOARD.md`](CREATED_TASK_DASHBOARD.md) · [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) · [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) · setup wizard in [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md)
@@ -301,7 +301,7 @@ flowchart LR
 | **T0** | This doc + wireframe sketches in issue | Low |
 | **T1** | HTML/CSS: Hero card + status strip; tab labels **Live · Manage**; phone-only | **Shipped** |
 | **T1b** | **What scanners see** inline publish on Live (`created-manifesto-update.mjs`; Manage duplicate removed) | **Shipped** |
-| **T2** | Replace flat task list with 3-4 `settings-disclosure` deploy rows | Low if pattern copied from Advanced |
+| **T2** | Replace flat task list with 3-4 `settings-disclosure` deploy rows | **Shipped** |
 | **T3** | Contextual primary CTA logic in `created-dashboard.mjs` | Medium - state matrix |
 | **T4** | Optional completed wizard chips; copy pass | Low |
 | **T5** | E2E: control mode Tasks smoke; update `device-os-wallet` | Low |
