@@ -214,7 +214,13 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).not.toContain('class="hc-qr-center-logo"');
     expect(html).not.toContain('class="top-brand"');
     expect(html).not.toContain('<header class="top">');
-    expect(html.match(/class="scan-hero-host"/g)?.length ?? 0).toBe(1);
+    expect(html.match(/class="scan-hero-host scan-hero-wordmark"/g)?.length ?? 0).toBe(
+      1
+    );
+    expect(html).toContain('class="scan-hero-host scan-hero-wordmark"');
+    expect(html).not.toMatch(
+      /class="scan-hero-host[^"]*"[^>]*>[\s\S]*?<span class="pass-dot"/
+    );
     expect(html).toContain("scan-hero");
     expect(html).toContain("scan-status-panel");
     expect(html).not.toMatch(/id="pass-scene"/);

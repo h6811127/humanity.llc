@@ -4,7 +4,7 @@
  * @see docs/CROSS_TAB_KEYS_REBUILD_PLAN.md Phase 3
  * @see docs/SCAN_PAGE_DEVICE_DOT.md Phase 8
  */
-import "./scan-page-dot.mjs?v=4";
+import "./scan-page-dot.mjs?v=5";
 import {
   refreshDeviceChrome,
   startDeviceChromeRefresh,

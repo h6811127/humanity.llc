@@ -28,7 +28,7 @@ import {
 } from "./scan-safety";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v30";
+export const SCAN_UI_VERSION = "pass-v31";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -121,6 +121,14 @@ if (slot && !slot.querySelector("svg") && slot.dataset.scanUrl) {
 </script>`;
 }
 
+/**
+ * In-card host label only (Phase 8.4) — brand dot lives in page chrome, not here.
+ * @see docs/SCAN_PAGE_DEVICE_DOT.md Phase 4
+ */
+function renderScanHeroHost(): string {
+  return `<p class="scan-hero-host scan-hero-wordmark" translate="no">humanity.llc</p>`;
+}
+
 /** Page chrome: status dot only (docs/M3_SCAN_PAGE_UI.md Phase 7; progressive dot Phase 8). */
 function renderScanPageChrome(origin: string): string {
   const home = `${escapeHtml(origin)}/`;
@@ -130,7 +138,7 @@ function renderScanPageChrome(origin: string): string {
       <span class="pass-dot" id="scan-page-dot" aria-hidden="true"></span>
     </a>
     <div class="scan-page-dot-glance" id="scan-page-dot-glance" role="dialog" aria-label="Your device on this scan" hidden>
-      <div class="scan-page-dot-explainer device-dot-explainer device-dot-explainer--popover" id="scan-page-dot-explainer"></div>
+      <div class="scan-page-dot-explainer" id="scan-page-dot-explainer" aria-live="polite"></div>
       <a class="scan-page-dot-home" id="scan-page-dot-home" href="${home}">humanity.llc home</a>
     </div>
   </div>
@@ -173,7 +181,7 @@ function renderScanHeroSection(
   return `<div class="scan-pass-layer">
 <article class="scan-hero scan-status-panel scan-safety-header" id="scan-safety-header" aria-label="Live check"${profileAttr}${qrAttr}>
   <header class="scan-hero-head">
-    <div class="scan-hero-host"><span class="pass-dot" aria-hidden="true"></span><span>humanity.llc</span></div>
+    ${renderScanHeroHost()}
     ${renderHeroStatusStrip(vm)}
   </header>
   <div class="scan-hero-body">

@@ -13,18 +13,18 @@
 
 The scan page is **live resolver output** (Cloudflare Worker), not the static Pages site. Deploy with `npm run worker:deploy`. Pages deploy alone does not change `/c/…`.
 
-Response header when the new UI is live: `X-HC-Scan-UI: pass-v30` (or later). **`pass-v30`:** scan dot motion polish (Phase 8.3) — one-shot hollow-ring attention, cross-tab overlay synced with `#scan-cross-tab-banner`, gray resolving ring, steward celebrate; reduced-motion safe. **`pass-v29`:** scan glance on page chrome dot (Phase 8.2). **`pass-v28`:** progressive **viewer device** dot when vouch-ready (Phase 8.1). **`pass-v27`:** one “does not prove” disclosure (under “What this scan shows”); removed duplicate warning module; inbox sheet does not mount on scan pages. **`pass-v26`:** page chrome is **status dot only** (no frosted top bar, no `humanity.llc` text above the card). **`pass-v25`:** emphasized trust-tool rows (icon + peek + thicker summaries), “Check at scan time” section, trust groups above show-link/limits, shorter vouch explainer. **`pass-v24`:** omit empty trust groups; M5 live-object showcase seed + landing. **`pass-v23`:** scan-type heroes, trust modules, Phase 4 tests.
+Response header when the new UI is live: `X-HC-Scan-UI: pass-v31` (or later). **`pass-v31`:** hero card host is text-only wordmark (Phase 8.4); brand dot only in page chrome. **`pass-v30`:** scan dot motion polish (Phase 8.3) — one-shot hollow-ring attention, cross-tab overlay synced with `#scan-cross-tab-banner`, gray resolving ring, steward celebrate; reduced-motion safe. **`pass-v29`:** scan glance on page chrome dot (Phase 8.2). **`pass-v28`:** progressive **viewer device** dot when vouch-ready (Phase 8.1). **`pass-v27`:** one “does not prove” disclosure (under “What this scan shows”); removed duplicate warning module; inbox sheet does not mount on scan pages. **`pass-v26`:** page chrome is **status dot only** (no frosted top bar, no `humanity.llc` text above the card). **`pass-v25`:** emphasized trust-tool rows (icon + peek + thicker summaries), “Check at scan time” section, trust groups above show-link/limits, shorter vouch explainer. **`pass-v24`:** omit empty trust groups; M5 live-object showcase seed + landing. **`pass-v23`:** scan-type heroes, trust modules, Phase 4 tests.
 
 ---
 
 ## Layout
 
-### Shipped today (`pass-v30`)
+### Shipped today (`pass-v31`)
 
 `scan-html.ts` renders, top to bottom:
 
-1. **Page chrome** (`renderScanPageChrome` + `scan-page-dot.mjs`) - **status dot only** for strangers (home link). **Progressive viewer device** dot when vouch-ready (`scan-page-dot--dynamic`): hollow red ring for `ok`+`none`, one-shot attention pulse on enter, cross-tab overlay aligned with `#scan-cross-tab-banner`; tap opens **scan glance** (`#scan-page-dot-glance`) with scroll/use-keys actions — not the hub sheet. No frosted bar or `humanity.llc` wordmark in page chrome.
-2. **Live check hero** (`renderScanHeroSection`) - host + single status strip, H1 (manifesto / plate / `@handle` / failure copy), steward strip, trust pills on personal cards, resolver line, **Level 0 bearer line** (`scan-hero-limit`), detail chips, first-seen footnote, demoted QR (`scan-hero-qr`).
+1. **Page chrome** (`renderScanPageChrome` + `scan-page-dot.mjs`) - **status dot only** for strangers (home link). **Progressive viewer device** dot when vouch-ready (`scan-page-dot--dynamic`); tap opens **scan glance** — not the hub sheet. **Hero card** (`renderScanHeroHost`) shows a muted `humanity.llc` wordmark only (`pass-v31`); no second dot inside the card.
+2. **Live check hero** (`renderScanHeroSection`) - quiet text-only `humanity.llc` host label (no dot in card; `pass-v31`), single status strip, H1 (manifesto / plate / `@handle` / failure copy), steward strip, trust pills on personal cards, resolver line, **Level 0 bearer line** (`scan-hero-limit`), detail chips, first-seen footnote, demoted QR (`scan-hero-qr`).
 3. **What this scan shows** (`renderScanTrustModules`) - bullet list only (active scans).
 4. **What this scan does not prove** (`renderLimitsSettings`) - single collapsible `<details id="scan-limits-settings">` directly under (3); no separate `scan-does-not-prove` warning card.
 5. **Check at scan time** (`renderTrustGroups`) - Card status, Human trust, This QR, Live control in thick `<details class="scan-trust-details">` rows: colored list icon, title, one-line peek (e.g. `Active`, `Registered`, `QR active`), chevron; inner `<ul class="list">` unchanged. Vouch block follows when eligible.
@@ -76,7 +76,7 @@ Track with [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Resolver UI 
 | **5** | Omit empty trust groups; M5 showcase seed + landing row | **Shipped** (`pass-v24`) - `pushTrustGroup`, `site:seed-showcase-live-object` |
 | **6** | Trust-tool emphasis (icons, peek, section kicker, layout) | **Shipped** (`pass-v25`) - `scan-trust-tools`, `scan-group-summary` |
 | **7** | Dot-only page chrome (remove white top bar + duplicate wordmark) | **Shipped** (`pass-v26`) - `renderScanPageChrome`, `.scan-page-chrome` |
-| **8** | Progressive device dot + scan glance (viewer state in chrome) | **Shipped** (`pass-v30`) - [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) Phases 8.1–8.3 |
+| **8** | Progressive device dot + scan glance (viewer state in chrome) | **Shipped** (`pass-v31`) - [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) Phases 8.1–8.4 |
 
 After `scan-pass.css` changes: `npm run worker:bundle-scan`.
 
@@ -102,7 +102,7 @@ After `scan-pass.css` changes: `npm run worker:bundle-scan`.
 
 **Out of scope (Phase 7):** Full device-shell `#brand-status-dot-btn` + hub sheet on Worker HTML.
 
-**Phase 8 (planned):** Progressive **viewer device** semantics on the same chrome dot — static brand for strangers; hollow ring / steward green / overlays for vouch-ready viewers; tap opens **scan glance** (not hub). Canonical spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md). Shell dot remains on `/`, `/created/`, `/wallet/`.
+**Phase 8 (shipped `pass-v31`):** Progressive **viewer device** dot + scan glance; hero host is text-only wordmark (no in-card dot). Canonical spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md). Shell dot remains on `/`, `/created/`, `/wallet/`.
 
 ---
 

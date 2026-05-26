@@ -1,6 +1,6 @@
 # Scan page device dot (progressive chrome)
 
-**Status:** Phase 8.1–8.3 shipped (`pass-v30`); Phase 8.4 optional  
+**Status:** Phase 8.1–8.4 shipped (`pass-v31`)  
 **Audience:** Product, design, frontend implementers  
 **Scope:** Page chrome on public scan HTML (`GET /c/{profile_id}?q={qr_id}`) — `#scan-page-dot` in `renderScanPageChrome()`  
 **Related:** [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) · [`SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md)
@@ -212,7 +212,7 @@ Today `site/js/scan-tab-keys.mjs` starts `device-chrome-refresh.mjs` but **does 
 | **1** | Eligibility gate + dynamic classes + `aria-label` only; tap still home | **Shipped** (`pass-v28`) — `scan-page-dot.mjs`, `scan-page-dot-core.mjs`, `worker/tests/scan-page-dot-core.test.ts` |
 | **2** | Scan glance + primary actions (scroll / use keys) | **Shipped** (`pass-v29`) — `scan-page-dot-glance-core.mjs`, glance markup in `scan-html.ts`; `npm run worker:test:scan-page-dot` |
 | **3** | Hollow ring + one-shot pulse; overlay sync with banner | **Shipped** (`pass-v30`) — `shouldScanNoneEligibleAttentionPulse`, `scanCrossTabOverlayCount`, `scan-none-dot-attention` CSS |
-| **4** | Hero host demotion (optional): text-only wordmark inside card to reduce triple-dot confusion | Snapshot / manual M5 |
+| **4** | Hero host demotion: text-only wordmark inside card (chrome dot only) | **Shipped** (`pass-v31`) — `renderScanHeroHost()`, `.scan-hero-wordmark`; `scan-hero-snapshot.test.ts` |
 
 Worker/API: **no change** — all state is client-side.
 
@@ -259,7 +259,7 @@ Worker/API: **no change** — all state is client-side.
 
 1. **Eligibility privacy gate** — Require prior wallet save on origin before dynamic mode?
 2. **Home default** — For eligible users, is tap glance-first with home inside, or long-press home?
-3. **Hero host dot** — Phase 4: remove inner `pass-dot` from `scan-hero-host` to leave one brand dot in chrome only?
+3. **Hero host dot** — **Resolved (`pass-v31`):** text-only `<p class="scan-hero-wordmark">` in card; brand dot in page chrome only.
 4. **`card_disabled_since_visit` on scan** — Show overlay when viewer has saved cards with since-visit alerts, or inbox-only on shell pages?
 
 ---
@@ -271,6 +271,7 @@ Worker/API: **no change** — all state is client-side.
 | 2026-05-26 | Spec authored: progressive scan chrome, hollow ring for `ok`+`none` when eligible, scan glance not hub, reuse shell dot model |
 | 2026-05-26 | Phase 8.1–8.2 implemented: `scan-page-dot.mjs`, glance popover, `pass-v29` |
 | 2026-05-26 | Phase 8.3: one-shot hollow-ring pulse, cross-tab overlay aligned with scan banner, `pass-v30` |
+| 2026-05-26 | Phase 8.4: hero host text-only wordmark; brand dot in page chrome only, `pass-v31` |
 
 ---
 

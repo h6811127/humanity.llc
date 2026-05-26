@@ -98,6 +98,8 @@ describe("scan hero HTML snapshots", () => {
   it("live object manifesto-first hero", async () => {
     const snippet = await heroForManifesto(LIVE_OBJECT_MANIFESTO);
     expect(snippet).toMatchSnapshot();
+    expect(snippet).toContain("scan-hero-wordmark");
+    expect(snippet).not.toMatch(/scan-hero-host[^>]*>[\s\S]*?pass-dot/);
     expect(snippet).toContain(LIVE_OBJECT_MANIFESTO);
     expect(snippet).not.toContain("@river_example</h1>");
   });

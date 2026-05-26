@@ -10,16 +10,27 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
 describe("scan page device dot contract", () => {
   it("ships progressive dot UI version", () => {
-    expect(SCAN_UI_VERSION).toBe("pass-v30");
+    expect(SCAN_UI_VERSION).toBe("pass-v31");
   });
 
   it("bundles glance popover CSS from site/scan-pass.css", () => {
     expect(SCAN_PASS_CSS).toContain(".scan-page-dot-glance");
     expect(SCAN_PASS_CSS).toContain("scan-none-dot-attention");
     expect(SCAN_PASS_CSS).toContain("steward-dot-celebrate");
+    expect(SCAN_PASS_CSS).toContain(".scan-hero-wordmark");
+    expect(SCAN_PASS_CSS).toContain(".scan-page-dot-glance-now");
     expect(SCAN_PASS_CSS).toContain("--surface-popover-bg");
     const src = readFileSync(join(root, "site/scan-pass.css"), "utf8");
     expect(src).toContain(".scan-page-dot-glance");
+  });
+
+  it("hero host is text-only wordmark (dot in page chrome only)", () => {
+    const src = readFileSync(join(root, "worker/src/resolver/scan-html.ts"), "utf8");
+    expect(src).toContain("renderScanHeroHost()");
+    expect(src).toContain("scan-hero-wordmark");
+    expect(src).not.toMatch(
+      /scan-hero-host"><span class="pass-dot"/
+    );
   });
 
   it("loads versioned scan-tab-keys bundle", () => {
@@ -30,6 +41,6 @@ describe("scan page device dot contract", () => {
 
   it("scan-tab-keys imports scan-page-dot module", () => {
     const src = readFileSync(join(root, "site/js/scan-tab-keys.mjs"), "utf8");
-    expect(src).toContain("./scan-page-dot.mjs?v=4");
+    expect(src).toContain("./scan-page-dot.mjs?v=5");
   });
 });

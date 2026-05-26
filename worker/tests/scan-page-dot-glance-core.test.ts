@@ -1,27 +1,33 @@
 import { describe, expect, it } from "vitest";
 
+import { scanOverlayQuickAction } from "../../site/js/device-dot-state-core.mjs";
 import {
   renderScanDotExplainerHtml,
   scanGlancePrimaryAction,
+  scanPageDotAriaLabel,
 } from "../../site/js/scan-page-dot-glance-core.mjs";
 
-describe("scanGlancePrimaryAction", () => {
-  it("maps overlays to in-page scan actions", () => {
-    expect(scanGlancePrimaryAction(null, "proof_waiting")).toEqual({
-      kind: "scan_scroll_live_proof",
-      label: "Go to live proof",
-    });
-    expect(scanGlancePrimaryAction(null, "cross_tab_keys")).toEqual({
+describe("scanOverlayQuickAction", () => {
+  it("returns in-page scan actions for overlays", () => {
+    expect(scanOverlayQuickAction("cross_tab_keys")).toEqual({
       kind: "scan_focus_other_tab",
       label: "Open that tab",
     });
-    expect(scanGlancePrimaryAction(null, "card_disabled_since_visit")).toEqual({
-      kind: "scan_scroll_notice",
-      label: "Review notice",
+    expect(scanOverlayQuickAction("proof_waiting")).toEqual({
+      kind: "scan_scroll_live_proof",
+      label: "Go to live proof",
     });
   });
+});
 
-  it("maps hub-style actions to scan scroll / use keys", () => {
+describe("scanGlancePrimaryAction", () => {
+  it("prefers overlay actions over device defaults", () => {
+    expect(
+      scanGlancePrimaryAction({ kind: "open_controls", label: "Open controls" }, "cross_tab_keys")
+    ).toEqual({ kind: "scan_focus_other_tab", label: "Open that tab" });
+  });
+
+  it("maps hub-style controls to scan vouch navigation", () => {
     expect(
       scanGlancePrimaryAction({ kind: "open_controls", label: "Open controls" }, "none")
     ).toEqual({ kind: "scan_go_vouch", label: "Go to vouch" });
@@ -32,18 +38,44 @@ describe("scanGlancePrimaryAction", () => {
 });
 
 describe("renderScanDotExplainerHtml", () => {
-  it("renders Now/Why/Next and a primary button", () => {
+  it("renders lead copy and a primary button without duplicating next", () => {
     const html = renderScanDotExplainerHtml(
       {
-        now: "No saved keys.",
-        why: "Resolver online.",
-        next: "Use keys here.",
+        now: "No signing keys in this tab.",
+        why: "Resolver is online.",
+        next: "Use keys here to vouch.",
       },
       { kind: "scan_use_keys_here", label: "Use keys here" }
     );
-    expect(html).toContain("Your device on this scan");
-    expect(html).toContain("<strong>Now:</strong>");
+    expect(html).toContain("scan-page-dot-glance-now");
+    expect(html).toContain("No signing keys in this tab.");
     expect(html).toContain('data-scan-dot-action="scan_use_keys_here"');
-    expect(html).not.toContain("<script");
+    expect(html).not.toContain("scan-page-dot-glance-next");
+  });
+});
+
+describe("scanPageDotAriaLabel", () => {
+  it("uses checking copy while resolver health is in flight", () => {
+    expect(
+      scanPageDotAriaLabel({
+        networkResolved: false,
+        online: true,
+        network: "ok",
+        device: "none",
+        overlay: "none",
+      })
+    ).toBe("Your device: checking connection. Tap for details.");
+  });
+
+  it("describes steward readiness when resolved", () => {
+    expect(
+      scanPageDotAriaLabel({
+        networkResolved: true,
+        online: true,
+        network: "ok",
+        device: "steward",
+        overlay: "none",
+      })
+    ).toBe("Your device: steward keys ready in this tab. Tap for details.");
   });
 });

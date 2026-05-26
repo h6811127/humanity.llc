@@ -12,7 +12,6 @@ import {
   dotTransitionKey,
   hasStewardVerification,
   shouldCelebrateStewardTransition,
-  statusAriaLabel,
 } from "./device-dot-state-core.mjs?v=38";
 import { fetchResolverHealth } from "./device-network-health.mjs";
 import { activateWalletEntry, getTabSession } from "./device-keys.mjs";
@@ -30,6 +29,7 @@ import { actOnOtherTabKeys, walletEntryForProfile } from "./device-notice-nav.mj
 import {
   renderScanDotExplainerHtml,
   scanGlancePrimaryAction,
+  scanPageDotAriaLabel,
 } from "./scan-page-dot-glance-core.mjs";
 
 const NETWORK_CLASSES = [
@@ -314,7 +314,7 @@ function bindScanGlanceOnce() {
 
   root.addEventListener("click", (e) => {
     if (!(e.target instanceof Element)) return;
-    const link = e.target.closest(".scan-page-dot-explainer-action[href]");
+    const link = e.target.closest(".scan-page-dot-glance-action[href]");
     if (link instanceof HTMLAnchorElement) {
       closeScanGlance();
       return;
@@ -461,7 +461,13 @@ export function refreshScanPageDot() {
   dot.dataset.dotOverlay = overlay;
   btn.setAttribute(
     "aria-label",
-    `${statusAriaLabel(network, device, overlay, { pageKind: "scan" })} Tap for details.`
+    scanPageDotAriaLabel({
+      networkResolved,
+      online: navigator.onLine !== false,
+      network,
+      device,
+      overlay,
+    })
   );
 
   renderScanGlanceContent(network, device, overlay);

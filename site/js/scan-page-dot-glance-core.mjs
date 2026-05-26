@@ -50,13 +50,50 @@ export function scanGlancePrimaryAction(descriptorAction, overlay) {
 export function renderScanDotExplainerHtml(descriptor, primaryAction) {
   const actionHtml = primaryAction
     ? primaryAction.href
-      ? `<a class="device-dot-explainer-action scan-page-dot-explainer-action" href="${escapeHtml(primaryAction.href)}">${escapeHtml(primaryAction.label || "")}</a>`
-      : `<button type="button" class="device-dot-explainer-action scan-page-dot-explainer-action" data-scan-dot-action="${escapeHtml(primaryAction.kind || "")}">${escapeHtml(primaryAction.label || "")}</button>`
+      ? `<a class="scan-page-dot-glance-action" href="${escapeHtml(primaryAction.href)}">${escapeHtml(primaryAction.label || "")}</a>`
+      : `<button type="button" class="scan-page-dot-glance-action" data-scan-dot-action="${escapeHtml(primaryAction.kind || "")}">${escapeHtml(primaryAction.label || "")}</button>`
     : "";
-  return `
-    <p class="device-dot-explainer-kicker">Your device on this scan</p>
-    <p class="device-dot-explainer-line"><strong>Now:</strong> ${escapeHtml(descriptor.now)}</p>
-    <p class="device-dot-explainer-line"><strong>Why:</strong> ${escapeHtml(descriptor.why)}</p>
-    <p class="device-dot-explainer-line"><strong>Next:</strong> ${escapeHtml(descriptor.next)}</p>
-    ${actionHtml}`;
+  const nextHtml =
+    !primaryAction && descriptor.next
+      ? `<p class="scan-page-dot-glance-next">${escapeHtml(descriptor.next)}</p>`
+      : "";
+  return `<div class="scan-page-dot-glance-body">
+    <p class="scan-page-dot-glance-eyebrow">Your device</p>
+    <p class="scan-page-dot-glance-now">${escapeHtml(descriptor.now)}</p>
+    <p class="scan-page-dot-glance-why">${escapeHtml(descriptor.why)}</p>
+    ${nextHtml}
+    ${actionHtml}
+  </div>`;
+}
+
+/**
+ * @param {{
+ *   networkResolved: boolean,
+ *   online: boolean,
+ *   network: "ok" | "degraded" | "offline",
+ *   device: "none" | "keys" | "unsaved" | "steward",
+ *   overlay: import("./device-dot-state-core.mjs").DotInboxOverlay,
+ * }} input
+ */
+export function scanPageDotAriaLabel(input) {
+  if (!input.networkResolved && input.online) {
+    return "Your device: checking connection. Tap for details.";
+  }
+  return `Your device: ${scanDeviceAriaPhrase(input.network, input.device, input.overlay)}. Tap for details.`;
+}
+
+/**
+ * @param {"ok" | "degraded" | "offline"} network
+ * @param {"none" | "keys" | "unsaved" | "steward"} device
+ * @param {import("./device-dot-state-core.mjs").DotInboxOverlay} overlay
+ */
+function scanDeviceAriaPhrase(network, device, overlay) {
+  if (network === "offline") return "offline";
+  if (network === "degraded") return "resolver limited";
+  if (overlay === "proof_waiting") return "live proof waiting";
+  if (overlay === "cross_tab_keys") return "keys in another tab";
+  if (device === "steward") return "steward keys ready in this tab";
+  if (device === "unsaved") return "tab keys not saved";
+  if (device === "keys") return "keys saved on this device";
+  return "no signing keys in this tab";
 }
