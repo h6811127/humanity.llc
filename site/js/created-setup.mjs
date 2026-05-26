@@ -6,6 +6,7 @@
 import { isWalletSaved } from "./device-wallet.mjs";
 import { clearFreshUrlParam } from "./created-workspace.mjs";
 import { markSetupDone } from "./created-mode.mjs";
+import { stewardFocusKeyFromHash } from "./created-tabs.mjs";
 
 const STEPS = ["save", "qr", "test", "done"];
 
@@ -16,6 +17,7 @@ const STEPS = ["save", "qr", "test", "done"];
  *   refreshSave?: () => void,
  *   getScanUrl?: () => string | null,
  *   onComplete: () => void,
+ *   onStewardDeepLink?: () => void,
  *   triggerDownloadQr?: () => void,
  * }} opts
  */
@@ -26,11 +28,18 @@ export function initCreatedSetup(opts) {
     refreshSave,
     getScanUrl,
     onComplete,
+    onStewardDeepLink,
     triggerDownloadQr,
   } = opts;
 
   const root = document.getElementById("created-setup-root");
   if (!root) return;
+
+  const stewardFocus = stewardFocusKeyFromHash();
+  if (stewardFocus && isWalletSaved(profileId) && onStewardDeepLink) {
+    onStewardDeepLink();
+    return;
+  }
 
   const panels = [...root.querySelectorAll("[data-setup-panel]")];
   const indicators = [...root.querySelectorAll("[data-setup-step]")];

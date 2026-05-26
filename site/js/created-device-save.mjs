@@ -1,3 +1,4 @@
+import { markSetupDone } from "./created-mode.mjs";
 import { isAutoSaveEnabled } from "./device-auto-save.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
 import {
@@ -86,6 +87,7 @@ export function initCreatedDeviceSave(getSession) {
         qr_id: session.qr_id ?? null,
       });
     }
+    if (result.ok) markSetupDone(session.profile_id);
     refresh();
     window.dispatchEvent(new Event("hc-device-hub-changed"));
     return true;

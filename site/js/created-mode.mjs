@@ -15,7 +15,6 @@ export const SETUP_DONE_KEY = "hc_setup_done";
  *   freshParam?: boolean,
  *   hasSigningKeys?: boolean,
  *   walletSaved?: boolean,
- *   setupDone?: boolean,
  * }} input
  * @returns {CreatedMode}
  */
@@ -25,13 +24,14 @@ export function resolveCreatedMode(input) {
     freshParam = false,
     hasSigningKeys = false,
     walletSaved = false,
-    setupDone = false,
   } = input;
 
   if (!profileId) return "view";
   if (!hasSigningKeys) return "view";
 
-  if (freshParam || !setupDone || !walletSaved) return "setup";
+  // Post-create wizard only while fresh or keys not yet on this device.
+  // Returning stewards (hub Open controls / #revoke) skip setup even if hc_setup_done unset.
+  if (freshParam || !walletSaved) return "setup";
   return "control";
 }
 
@@ -59,12 +59,20 @@ export function markSetupDone(profileId) {
   localStorage.setItem(SETUP_DONE_KEY, JSON.stringify(map));
 }
 
+/** Backfill hc_setup_done when the card is already saved on this device. */
+export function syncSetupDoneForSavedProfile(profileId) {
+  if (!profileId || isSetupDone(profileId)) return;
+  if (isWalletSaved(profileId)) markSetupDone(profileId);
+}
+
 /**
  * @param {string | null | undefined} profileId
  * @param {boolean} freshParam
  * @param {() => Record<string, unknown> | null} getSession
  */
 export function modeFromPage(profileId, freshParam, getSession) {
+  if (profileId) syncSetupDoneForSavedProfile(profileId);
+
   const session = getSession();
   const hasSigningKeys = !!(
     session?.owner_private_key_b58 || session?.recovery_private_key_b58
@@ -75,6 +83,5 @@ export function modeFromPage(profileId, freshParam, getSession) {
     freshParam,
     hasSigningKeys,
     walletSaved,
-    setupDone: profileId ? isSetupDone(profileId) : false,
   });
 }

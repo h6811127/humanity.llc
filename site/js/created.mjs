@@ -22,7 +22,7 @@ import {
   syncUpdateStatusTaskGate,
 } from "./created-first-revoke-gate.mjs";
 import { initCreatedDeviceSave } from "./created-device-save.mjs";
-import { modeFromPage } from "./created-mode.mjs";
+import { markSetupDone, modeFromPage } from "./created-mode.mjs";
 import { initCreatedSetup } from "./created-setup.mjs";
 import {
   applyCreatedWorkspaceMode,
@@ -185,6 +185,7 @@ function getWorkspaceMode() {
 
 function enterControlWorkspace() {
   workspaceMode = "control";
+  if (profileId) markSetupDone(profileId);
   clearFreshUrlParam();
   applyCreatedWorkspaceMode("control");
   restoreKeysStripToControlPanel();
@@ -689,6 +690,7 @@ if (workspaceMode === "setup" && profileId && activeQrId) {
       return href && href.startsWith("http") ? href : null;
     },
     onComplete: enterControlWorkspace,
+    onStewardDeepLink: () => enterControlWorkspace(),
     triggerDownloadQr: () => downloadQrClick?.(),
   });
 } else if (workspaceMode === "control" && profileId && activeQrId) {
@@ -761,7 +763,11 @@ if (activeScanUrl) {
 async function bootstrapOwnerTools() {
   if (!profileId || !activeQrId) return;
 
-  await hydrateSessionFromNetwork();
+  try {
+    await hydrateSessionFromNetwork();
+  } catch (err) {
+    console.error(err);
+  }
   void refreshNetworkStatus();
 
   const revokeCtx = {

@@ -5,7 +5,7 @@
 const TAB_IDS = ["now", "advanced"];
 
 /** Hash → panel id on /created/ (hub deep-links). */
-const CREATED_PANEL_FOCUS = {
+export const CREATED_PANEL_FOCUS = {
   "update-status": "manifesto-update-panel",
   revoke: "revoke-details",
   "rotate-qr": "qr-rotate-panel",
@@ -13,6 +13,14 @@ const CREATED_PANEL_FOCUS = {
   "live-proof": "live-control-proof",
   manage: "manifesto-update-panel",
 };
+
+/** @param {string} [hash] location.hash or bare key */
+export function stewardFocusKeyFromHash(hash = location.hash) {
+  const key = hash.replace(/^#/, "");
+  return Object.prototype.hasOwnProperty.call(CREATED_PANEL_FOCUS, key)
+    ? key
+    : null;
+}
 
 /**
  * @param {(tabId: string) => void} select

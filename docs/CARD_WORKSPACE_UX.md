@@ -16,7 +16,9 @@
 
 Resolver: `site/js/created-mode.mjs` · `modeFromPage()`.
 
-Storage: `localStorage.hc_setup_done` — map of `profile_id → true` after wizard finish.
+**Mode gate (May 2026):** **control** when this tab has signing keys and the card is **saved on this device**, unless `?fresh=1` (post-create wizard). `hc_setup_done` is set when the wizard finishes, on wallet save, or when reopening a saved card (`syncSetupDoneForSavedProfile`). Hub **Open controls** / `#revoke` deep-links require control mode — see `docs/HUB_REVOKE_AND_CONTROLS_NAVIGATION.md`.
+
+Storage: `localStorage.hc_setup_done` — map of `profile_id → true` after wizard finish, save, or saved-card backfill.
 
 ---
 
