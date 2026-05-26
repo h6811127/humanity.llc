@@ -53,6 +53,16 @@ test.describe("status dot steward green", () => {
     await expect(dot).toHaveClass(/pass-dot-status-network-degraded/);
   });
 
+  test("suppresses green when resolver is offline", async ({ page }) => {
+    await page.route("**/.well-known/hc/v1/health**", (route) => route.abort("failed"));
+
+    await page.goto("/wallet/");
+    const dot = page.locator("#brand-status-dot");
+    await expect(dot).toHaveAttribute("data-dot-state", "offline:steward");
+    await expect(dot).not.toHaveClass(/pass-dot-status-network-ok/);
+    await expect(dot).toHaveClass(/pass-dot-status-network-offline/);
+  });
+
   test("shows steward green on landing when resolver is healthy", async ({ page }) => {
     await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
 
@@ -60,6 +70,17 @@ test.describe("status dot steward green", () => {
     const dot = page.locator("#brand-status-dot");
     await expect(dot).toHaveAttribute("data-dot-state", "ok:steward");
     await expect(dot).toHaveClass(/pass-dot-status-device-steward/);
+  });
+
+  test("shows steward green on created and create pages", async ({ page }) => {
+    await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
+
+    for (const path of ["/created/", "/create/"]) {
+      await page.goto(path);
+      const dot = page.locator("#brand-status-dot");
+      await expect(dot).toHaveAttribute("data-dot-state", "ok:steward");
+      await expect(dot).toHaveClass(/pass-dot-status-device-steward/);
+    }
   });
 
   test("dot click opens hub sheet on landing", async ({ page }) => {
@@ -70,6 +91,53 @@ test.describe("status dot steward green", () => {
     await page.locator("#brand-status-dot-btn").click();
     await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/);
     await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
+  });
+
+  test("dot click opens hub after scroll hides chrome bar", async ({ page }) => {
+    await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
+    await page.addInitScript(() => {
+      document.documentElement.style.minHeight = "300vh";
+    });
+
+    await page.goto("/");
+    await expect(page.locator("#brand-status-dot")).toHaveAttribute("data-dot-state", /.+/);
+    await page.evaluate(() => {
+      document.documentElement.style.minHeight = "300vh";
+      window.scrollTo(0, 400);
+    });
+    await page.waitForFunction(() =>
+      document.getElementById("top-chrome")?.classList.contains("top-chrome--edge-hidden")
+    );
+    await page.locator("#brand-status-dot-btn").click();
+    await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/);
+  });
+
+  test("status bootstrap loads and records dot_click in diagnostics", async ({ page }) => {
+    await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
+    await page.addInitScript(() => {
+      localStorage.setItem("hc_dot_diagnostics", "1");
+    });
+
+    await page.goto("/");
+    await expect(page.locator("#top-chrome")).not.toHaveAttribute("data-device-status-error");
+    await page.locator("#brand-status-dot-btn").click();
+    const log = await page.evaluate(() => {
+      try {
+        return JSON.parse(sessionStorage.getItem("hc_dot_diag_log") || "[]");
+      } catch {
+        return [];
+      }
+    });
+    expect(log.some((entry: { type?: string }) => entry.type === "dot_click")).toBe(true);
+  });
+
+  test("wallet dot scrolls saved cards into view", async ({ page }) => {
+    await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
+
+    await page.goto("/wallet/");
+    const saved = page.locator("#device-hub-saved-group");
+    await page.locator("#brand-status-dot-btn").click();
+    await expect(saved).toBeInViewport();
   });
 });
 
@@ -104,5 +172,16 @@ test.describe("status dot accessibility", () => {
     await expect(explainer).toContainText("Why:");
     await expect(explainer).toContainText("Next:");
     await expect(explainer.getByRole("button", { name: "Open controls" })).toBeVisible();
+  });
+
+  test("uses glance steward subtitle in landing popover explainer", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("#brand-status-dot-btn").click();
+    const popoverExplainer = page.locator(
+      "#device-hub-glance-popover .device-dot-explainer--popover"
+    );
+    await expect(popoverExplainer).toContainText(
+      "Steward ready: you can review and sign steward actions now."
+    );
   });
 });

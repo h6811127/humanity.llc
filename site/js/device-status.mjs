@@ -142,7 +142,12 @@ export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
   }
   if (haptic) {
     hapticTap();
-    logDotDiagnostic({ type: "hub_toggle", open });
+    logDotDiagnostic({
+      type: "hub_toggle",
+      open,
+      bodyOpen: document.body.classList.contains("device-hub-sheet-open"),
+      hubCollapsed: hub?.classList.contains("device-hub-collapsed") ?? null,
+    });
   }
   refreshHubGlance();
 }

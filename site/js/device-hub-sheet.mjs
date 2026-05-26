@@ -55,6 +55,25 @@ export function setHubSheetOpen(open) {
   }
 }
 
+/** Clear body/backdrop when hub DOM is collapsed but sheet-open classes stuck (bfcache, etc.). */
+export function reconcileHubSheetState() {
+  if (!isHubSheet() || !hub) return;
+  if (!hub.classList.contains("device-hub-collapsed")) return;
+
+  const bodyOpen = document.body.classList.contains("device-hub-sheet-open");
+  const locked = chrome?.classList.contains("top-chrome--hub-locked");
+  if (bodyOpen || locked) {
+    setHubSheetOpen(false);
+    return;
+  }
+
+  ensureBackdrop();
+  if (backdrop && (!backdrop.hidden || backdrop.classList.contains("is-visible"))) {
+    backdrop.hidden = true;
+    backdrop.classList.remove("is-visible");
+  }
+}
+
 function bindHubSheetUi() {
   if (!isHubSheet()) return;
   ensureBackdrop();
@@ -77,5 +96,9 @@ function bindHubSheetUi() {
 }
 
 bindHubSheetUi();
+reconcileHubSheetState();
 
 window.addEventListener("pagehide", closeHubBeforeNavigation);
+window.addEventListener("pageshow", (e) => {
+  if (e.persisted) reconcileHubSheetState();
+});
