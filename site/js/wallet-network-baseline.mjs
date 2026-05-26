@@ -26,6 +26,21 @@ export function alertStateFromScanKind(scanKind, cardStatus) {
   return "active";
 }
 
+/** Chip / cache statuses that do not carry resolver card truth (DH-13). */
+const UNREACHABLE_CHIP_STATUSES = new Set(["error", "offline", "checking"]);
+
+/**
+ * Alert baseline for a poll result — null when the network was not reached.
+ * @param {string | null | undefined} scanKind
+ * @param {string | null | undefined} [chipOrCardStatus]
+ * @returns {string | null}
+ */
+export function alertStateForNetworkPoll(scanKind, chipOrCardStatus) {
+  const chip = String(chipOrCardStatus || "").toLowerCase();
+  if (UNREACHABLE_CHIP_STATUSES.has(chip)) return null;
+  return alertStateFromScanKind(scanKind, chipOrCardStatus);
+}
+
 /**
  * @param {string | null | undefined} value
  */

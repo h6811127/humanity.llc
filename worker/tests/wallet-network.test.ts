@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  alertStateForNetworkPoll,
   alertStateFromScanKind,
   CARD_DISABLED_SINCE_VISIT_ALERT_TEXT,
   CARD_REVOKED_ALERT_STATE,
@@ -8,11 +9,33 @@ import {
   normalizeBaselineState,
   shouldShowCardDisabledSinceVisitAlert,
 } from "../../site/js/wallet-network-baseline.mjs";
+import { mergeLastSeenFromNetworkMap } from "../../site/js/device-wallet-network-core.mjs";
 
 describe("card-disabled since-visit copy", () => {
   it("uses card-disabled wording, not generic revoked", () => {
     expect(CARD_DISABLED_SINCE_VISIT_ALERT_TEXT).toMatch(/card disabled/i);
     expect(CARD_DISABLED_SINCE_VISIT_ALERT_TEXT).not.toMatch(/revoked since last visit/i);
+  });
+});
+
+describe("alertStateForNetworkPoll (DH-13)", () => {
+  it("returns null for unreachable chip statuses", () => {
+    expect(alertStateForNetworkPoll(null, "error")).toBe(null);
+    expect(alertStateForNetworkPoll(null, "offline")).toBe(null);
+    expect(alertStateForNetworkPoll("active", "checking")).toBe(null);
+  });
+
+  it("returns card_revoked or active only from resolver truth", () => {
+    expect(alertStateForNetworkPoll("card_revoked", "active")).toBe(
+      CARD_REVOKED_ALERT_STATE
+    );
+    expect(alertStateForNetworkPoll("active", "active")).toBe("active");
+  });
+
+  it("leaves baseline unchanged when poll omits alert state (failed fetch)", () => {
+    const prior = { p1: "card_revoked" };
+    const next = mergeLastSeenFromNetworkMap({}, prior);
+    expect(next).toEqual(prior);
   });
 });
 

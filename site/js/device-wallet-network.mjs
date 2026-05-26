@@ -5,6 +5,7 @@
 import { walletEntryQrId, loadWallet, saveWallet, normalizeWalletQrIds } from "./device-wallet.mjs";
 import { getCardStatusUrl } from "./hc-sign.mjs";
 import {
+  alertStateForNetworkPoll,
   alertStateFromScanKind,
   CARD_REVOKED_ALERT_STATE,
   isRevokedSinceLastVisitFromBaseline,
@@ -81,7 +82,7 @@ export function getCachedNetworkStatus(profileId) {
 export function getCachedNetworkAlertState(profileId) {
   const entry = readCachedEntry(profileId);
   if (!entry) return null;
-  return alertStateFromScanKind(entry.scanKind, entry.status);
+  return alertStateForNetworkPoll(entry.scanKind, entry.status);
 }
 
 /** Fresh resolver-backed alert state map from the latest wallet poll. */
@@ -120,7 +121,7 @@ function parseNetworkFetchBody(body) {
   return {
     status,
     scanKind,
-    alertState: alertStateFromScanKind(scanKind, status),
+    alertState: alertStateForNetworkPoll(scanKind, status),
     verificationLabel,
     verificationState,
   };
@@ -149,7 +150,8 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
     const cached = cache[pid];
     if (shouldUseCachedNetworkStatus(lastSeen, pid, cached, now, WALLET_NETWORK_CACHE_TTL_MS)) {
       statusMap[pid] = cached.status;
-      alertStateMap[pid] = alertStateFromScanKind(cached.scanKind, cached.status);
+      const cachedAlert = alertStateForNetworkPoll(cached.scanKind, cached.status);
+      if (cachedAlert != null) alertStateMap[pid] = cachedAlert;
       scanKindMap[pid] = cached.scanKind ?? null;
       continue;
     }
@@ -161,9 +163,7 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
           });
           if (!res.ok) {
             statusMap[pid] = "error";
-            alertStateMap[pid] = "active";
             scanKindMap[pid] = null;
-            resolverConfirmedAlertStateMap[pid] = "active";
             cache[pid] = {
               status: "error",
               scanKind: null,
@@ -176,9 +176,11 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
           const body = await res.json();
           const parsed = parseNetworkFetchBody(body);
           statusMap[pid] = parsed.status;
-          alertStateMap[pid] = parsed.alertState;
           scanKindMap[pid] = parsed.scanKind;
-          resolverConfirmedAlertStateMap[pid] = parsed.alertState;
+          if (parsed.alertState != null) {
+            alertStateMap[pid] = parsed.alertState;
+            resolverConfirmedAlertStateMap[pid] = parsed.alertState;
+          }
           cache[pid] = {
             status: parsed.status,
             scanKind: parsed.scanKind,
@@ -188,9 +190,7 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
           };
         } catch {
           statusMap[pid] = "offline";
-          alertStateMap[pid] = "active";
           scanKindMap[pid] = null;
-          resolverConfirmedAlertStateMap[pid] = "active";
           cache[pid] = {
             status: "offline",
             scanKind: null,

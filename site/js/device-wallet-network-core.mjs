@@ -1,4 +1,5 @@
 import {
+  alertStateForNetworkPoll,
   alertStateFromScanKind,
   isRevokedSinceLastVisitFromBaseline,
 } from "./wallet-network-baseline.mjs";
@@ -70,7 +71,7 @@ export function shouldUseCachedNetworkStatus(
   }
   const cachedStatus = String(cachedEntry?.status || "").toLowerCase();
   const lastSeen = lastSeenMap[profileId];
-  const cachedAlert = alertStateFromScanKind(cachedEntry?.scanKind, cachedStatus);
+  const cachedAlert = alertStateForNetworkPoll(cachedEntry?.scanKind, cachedStatus);
   if (
     cachedAlert === "card_revoked" &&
     isRevokedSinceLastVisitFromBaseline(lastSeen, cachedAlert)
