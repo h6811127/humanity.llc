@@ -149,7 +149,7 @@ Merge layers 1–2 into one **Live check** hero for active scans, then progressi
 
 | Zone | Content | Notes |
 |------|---------|--------|
-| **A. Page chrome** | **Status dot only** (link home) | No frosted top bar; no `humanity.llc` wordmark above the card (`pass-v26`) |
+| **A. Page chrome** | **Status dot only** | No frosted top bar; no wordmark above the card (`pass-v26`). **Strangers:** static brand dot → home. **Vouch-ready viewers (`pass-v29`–`pass-v31`):** progressive device dot + scan glance — [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) |
 | **B. Live check hero** | Single status + object message (H1) + one limit line + resolver verified line | Replaces separate safety header + status panel for typical active scans |
 | **C. Steward strip** | `Controlled by @handle` · optional expiry | One muted line |
 | **D. What this proves** | Up to three bullets (live, signed, revocable) | Only signals that are true for this scan |
@@ -249,7 +249,7 @@ Align with [`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md)
 | **Typography** | H1 (message): 22–26px semibold; status: one pill or bar; meta/chips: 13–14px muted |
 | **Color** | Brand red: dot, frame accent, primary CTA—not every badge; green **only** for active / verified-now |
 | **QR** | Max ~88–96px beside message on wide viewports; full-width but subordinate on narrow; optional collapse behind “Show QR” |
-| **Motion** | One-shot hero border pulse on load; no decorative loops |
+| **Motion** | One-shot hero border pulse on load; no decorative loops on hero. Chrome dot: static for strangers; operator pulse only per [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) |
 
 ### Trust blocks (alignment)
 
@@ -359,7 +359,7 @@ Phases **A–F** are shipped for the reference network. **E** remains mandatory 
 
 ### Resolver UI refresh
 
-Implementation detail: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) § UI refresh phases. Current header: `X-HC-Scan-UI: pass-v26`.
+Implementation detail: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) § UI refresh phases. Current header: `X-HC-Scan-UI: pass-v31`.
 
 | Phase | Deliverable | Outcome |
 |-------|-------------|---------|
