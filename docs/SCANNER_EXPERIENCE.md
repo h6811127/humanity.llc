@@ -356,7 +356,7 @@ Phases **A–F** are shipped for the reference network. **E** remains mandatory 
 
 ### Resolver UI refresh
 
-Implementation detail: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) § UI refresh phases. Current header: `X-HC-Scan-UI: pass-v22`.
+Implementation detail: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) § UI refresh phases. Current header: `X-HC-Scan-UI: pass-v23`.
 
 | Phase | Deliverable | Outcome |
 |-------|-------------|---------|
@@ -364,7 +364,7 @@ Implementation detail: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) § UI ref
 | **1** | **Hero consolidation** for active scans: single Live check card; dedupe status/limits/brand; demote QR; CSS spacing pass | **Shipped** |
 | **2** | Scan-type templates: status plate, lost item relay, personal card heroes | **Shipped** — `buildScanHeroMain()` |
 | **3** | Below-fold: collapsible trust groups; “proves / does not prove” modules | **Shipped** — `renderScanTrustModules()`, `scan-trust-details` |
-| **4** | M5 stranger test + live object fixture; HTML snapshot tests; `X-HC-Scan-UI` bump | Exit validation |
+| **4** | M5 stranger test + live object fixture; HTML snapshot tests; `X-HC-Scan-UI` bump | **Shipped** (`pass-v23`) — automated hero template tests; M5 strangers still manual |
 
 ---
 
@@ -396,7 +396,7 @@ Show mixed QRs at phone distance; target &lt;1s Humanity identification without 
 ### Automated checks
 
 ```bash
-npm run worker:test -- worker/tests/scan-qr-branding.test.ts worker/tests/scan.test.ts worker/tests/scan-safety.test.ts worker/tests/qr-scan-url-lock.test.ts worker/tests/qr-print-sticker.test.ts worker/tests/qr-credential-code.test.ts worker/tests/scan-out.test.ts worker/tests/qr-credential-code.test.ts
+npm run worker:test -- worker/tests/scan-qr-branding.test.ts worker/tests/scan.test.ts worker/tests/scan-safety.test.ts worker/tests/scan-m5-live-object.test.ts worker/tests/scan-hero-snapshot.test.ts worker/tests/qr-scan-url-lock.test.ts worker/tests/qr-print-sticker.test.ts worker/tests/qr-credential-code.test.ts worker/tests/scan-out.test.ts
 ```
 
 ---

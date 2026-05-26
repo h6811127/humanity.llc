@@ -1,5 +1,8 @@
 import type { ScanViewModel } from "./scan-state";
-import { parseManifestoDisplay } from "./manifesto-display";
+import {
+  parseManifestoDisplay,
+  scanHeroTemplate,
+} from "./manifesto-display";
 import { publicReasonLabel } from "./revocation-display";
 import { scanListIcon, type ScanIconId } from "./scan-icons";
 import { BEARER_WARNING } from "./trust-copy";
@@ -25,7 +28,7 @@ import {
 } from "./scan-safety";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v22";
+export const SCAN_UI_VERSION = "pass-v23";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -153,6 +156,12 @@ function renderScanHeroSection(
     ? `<p class="scan-hero-foot">${escapeHtml(foot)}</p>`
     : "";
   const qrBlock = scanHeroQrBlock(vm, qrMarkup);
+  const qrSection = qrBlock
+    ? `<details class="scan-hero-qr-details">
+  <summary class="scan-hero-qr-summary">QR on this page</summary>
+  ${qrBlock}
+</details>`
+    : "";
 
   return `<div class="scan-pass-layer">
 <article class="scan-hero scan-status-panel scan-safety-header" id="scan-safety-header" aria-label="Live check"${profileAttr}${qrAttr}>
@@ -168,7 +177,7 @@ function renderScanHeroSection(
   ${chipsBlock}
   <p class="scan-safety-first-seen" id="scan-safety-first-seen" hidden></p>
   ${footBlock}
-  ${qrBlock}
+  ${qrSection}
 </article>
 </div>`;
 }
@@ -219,9 +228,12 @@ function formatQrExpiryLabel(expiresAt: string | null): string | null {
   }).format(new Date(t));
 }
 
-function renderStewardStrip(vm: ScanViewModel): string {
+function renderStewardStrip(
+  vm: ScanViewModel,
+  opts: { omitHandle?: boolean } = {}
+): string {
   const parts: string[] = [];
-  if (vm.handle) {
+  if (vm.handle && !opts.omitHandle) {
     parts.push(`Controlled by @${vm.handle}`);
   }
   const expiry = formatQrExpiryLabel(vm.qrExpiresAt);
@@ -306,9 +318,10 @@ function buildScanHeroMain(
   }
 
   const display = parseManifestoDisplay(vm.manifestoLine);
-  const steward = renderStewardStrip(vm);
+  const template = scanHeroTemplate(display, vm.qrScope);
 
-  if (display.kind === "status_plate") {
+  if (template === "status_plate" && display.kind === "status_plate") {
+    const steward = renderStewardStrip(vm);
     return {
       main: `<h1 class="scan-hero-title">${escapeHtml(display.objectLabel)}</h1>
     <p class="scan-hero-line">${escapeHtml(display.statusLine)}</p>
@@ -317,8 +330,9 @@ function buildScanHeroMain(
     };
   }
 
-  if (display.kind === "lost_item_relay") {
+  if (template === "lost_item_relay" && display.kind === "lost_item_relay") {
     const meta = scanStatusMetaLine(vm);
+    const steward = renderStewardStrip(vm);
     return {
       main: `<p class="scan-hero-eyebrow">Lost item relay</p>
     <h1 class="scan-hero-title">${escapeHtml(display.objectLabel)}</h1>
@@ -329,6 +343,20 @@ function buildScanHeroMain(
     };
   }
 
+  if (template === "live_object") {
+    const line =
+      display.kind === "general" && display.line
+        ? display.line
+        : "Live on the network";
+    const steward = renderStewardStrip(vm);
+    return {
+      main: `<h1 class="scan-hero-title">${escapeHtml(line)}</h1>
+    ${steward}`,
+      foot: "Scan shows live object state.",
+    };
+  }
+
+  const title = vm.handle ? `@${escapeHtml(vm.handle)}` : "Unknown card";
   const manifesto =
     display.kind === "general" && display.line
       ? `<p class="scan-hero-line">${escapeHtml(display.line)}</p>`
@@ -337,17 +365,13 @@ function buildScanHeroMain(
   const pillsBlock = pills
     ? `<ul class="scan-hero-trust" aria-label="Status at a glance">${pills}</ul>`
     : "";
-  const title = vm.handle
-    ? `@${escapeHtml(vm.handle)}`
-    : display.kind === "general" && display.line
-      ? escapeHtml(display.line)
-      : "Live on the network";
+  const steward = renderStewardStrip(vm, { omitHandle: true });
   return {
     main: `<h1 class="scan-hero-title">${title}</h1>
     ${manifesto}
     ${pillsBlock}
     ${steward}`,
-    foot: "Scan shows live object state.",
+    foot: "Scan shows current card state at scan time.",
   };
 }
 

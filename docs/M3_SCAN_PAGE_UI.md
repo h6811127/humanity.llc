@@ -13,13 +13,13 @@
 
 The scan page is **live resolver output** (Cloudflare Worker), not the static Pages site. Deploy with `npm run worker:deploy`. Pages deploy alone does not change `/c/…`.
 
-Response header when the new UI is live: `X-HC-Scan-UI: pass-v22` (or later). **`pass-v22`:** Live check hero (phases 1–3) — merged safety + status panel, scan-type H1s, proves/does-not-prove modules, collapsible trust groups.
+Response header when the new UI is live: `X-HC-Scan-UI: pass-v23` (or later). **`pass-v23`:** scan-type hero templates (`scanHeroTemplate`), collapsible hero QR, Phase 4 tests. **`pass-v22`:** phases 1–3 baseline.
 
 ---
 
 ## Layout
 
-### Shipped today (`pass-v22`)
+### Shipped today (`pass-v23`)
 
 `scan-html.ts` renders, top to bottom:
 
@@ -74,7 +74,7 @@ Track with [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Resolver UI 
 | **1** | Hero consolidation, dedupe status/limits, QR demotion, spacing | **Shipped** — `scan-html.ts`, `scan-safety.ts`, `scan-pass.css` |
 | **2** | Scan-type hero templates | **Shipped** — `buildScanHeroMain()` |
 | **3** | Collapsible groups + proves/does-not-prove modules | **Shipped** — `renderScanTrustModules()`, `scan-trust-details` |
-| **4** | M5 live-object path + tests + `X-HC-Scan-UI` bump | `worker/tests/scan*.ts`, [`docs/M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) |
+| **4** | M5 live-object path + tests + `X-HC-Scan-UI` bump | **Shipped** (`pass-v23`) — `scan.test.ts`, `manifesto-display.test.ts`; M5 runbook still manual |
 
 After `scan-pass.css` changes: `npm run worker:bundle-scan`.
 

@@ -214,7 +214,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).not.toContain("HUMAN TRUST");
     expect(html).not.toContain("This QR is active");
     expect(html).not.toContain('class="section-kicker">Network status');
-    expect(html).toContain("Controlled by");
+    expect(html).toContain("Valid until");
     expect(html).not.toContain('class="scan-state-row"');
     expect(html).not.toContain("pass-badge badge-live");
     expect(html).toContain("@river_example");
@@ -225,6 +225,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("scan-proves");
     expect(html).toContain("scan-does-not-prove");
     expect(html).toContain("scan-trust-details");
+    expect(html).toContain("scan-hero-qr-details");
     expect(html).toContain("scan-limits-settings");
     expect(html).toContain("What this scan does not prove");
     const bearerCount = html.split(BEARER_WARNING).length - 1;
@@ -240,6 +241,49 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("list-icon-tone-red");
     expect(html).not.toContain('class="pass-qr"><img src="https://humanity.llc/assets/red_qr');
     expect(html).not.toContain("HUMAN TRUST");
+  });
+
+  it("uses @handle as H1 for personal card with short manifesto", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card({ manifesto_line: "Open studio" }),
+        qr: qr({ scope: "card" }),
+        verification: summary(),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toMatch(
+      /<h1 class="scan-hero-title">@river_example<\/h1>/
+    );
+    expect(html).toContain("scan-hero-trust");
+    expect(html).toContain("Open studio");
+    expect(html).not.toContain("Controlled by @river_example");
+  });
+
+  it("uses manifesto as H1 for live object print QR", async () => {
+    const manifesto =
+      "Live object demo. Scan from another phone, then revoke this QR.";
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card({ manifesto_line: manifesto }),
+        qr: qr({ scope: "print_artifact" }),
+        verification: summary(),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain(
+      `<h1 class="scan-hero-title">${manifesto}</h1>`
+    );
+    expect(html).toContain("Controlled by @river_example");
+    expect(html).not.toMatch(/<ul class="scan-hero-trust"/);
   });
 
   it("puts spec trust blocks in iOS groups below the card", async () => {

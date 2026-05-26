@@ -1267,6 +1267,28 @@ a {
   height: 88px;
 }
 
+.scan-hero-qr-details {
+  margin-top: 14px;
+  border-top: 0.5px solid rgba(60, 60, 67, 0.1);
+  padding-top: 10px;
+}
+
+.scan-hero-qr-summary {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(60, 60, 67, 0.62);
+  cursor: pointer;
+  list-style: none;
+}
+
+.scan-hero-qr-summary::-webkit-details-marker {
+  display: none;
+}
+
+.scan-hero-qr-details[open] .scan-hero-qr {
+  margin-top: 10px;
+}
+
 .scan-hero-trust {
   display: flex;
   flex-wrap: wrap;
