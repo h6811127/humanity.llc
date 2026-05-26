@@ -4,6 +4,7 @@
  */
 
 import { isWalletSaved } from "./device-wallet.mjs";
+import { syncUpdateStatusTaskGate } from "./created-first-revoke-gate.mjs";
 
 const DONE_STORAGE_KEY = "hc_created_task_done";
 
@@ -110,6 +111,7 @@ export function initCreatedDashboard({
     });
 
     if (saveRequiredBadge) saveRequiredBadge.hidden = saved;
+    syncUpdateStatusTaskGate(pid);
   }
 
   const actions = {

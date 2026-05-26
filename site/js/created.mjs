@@ -17,6 +17,10 @@ import { initQrExtend } from "./created-qr-extend.mjs";
 import { inferPilotTemplate } from "./manifesto-display.mjs";
 import { initCreatedTabs } from "./created-tabs.mjs";
 import { initCreatedDashboard } from "./created-dashboard.mjs?v=2";
+import {
+  markFirstRevokeDone,
+  syncUpdateStatusTaskGate,
+} from "./created-first-revoke-gate.mjs";
 import { initCreatedDeviceSave } from "./created-device-save.mjs";
 import { modeFromPage } from "./created-mode.mjs";
 import { initCreatedSetup } from "./created-setup.mjs";
@@ -691,6 +695,11 @@ if (workspaceMode === "setup" && profileId && activeQrId) {
   createdTabs = initCreatedTabs();
   setupCreatedDashboard();
   dashboardWired = true;
+  const session = loadSession();
+  if (session?.revoke_state?.target_kind) {
+    markFirstRevokeDone(profileId);
+  }
+  syncUpdateStatusTaskGate(profileId);
 }
 
 if (activeScanUrl) {
@@ -764,6 +773,10 @@ async function bootstrapOwnerTools() {
     showError,
     onRevoked(kind) {
       revealOwnerActions();
+      if (kind === "qr_credential" || kind === "card") {
+        markFirstRevokeDone(profileId);
+        syncUpdateStatusTaskGate(profileId);
+      }
       if (openScanBtn && activeScanUrl) {
         openScanBtn.textContent = "Scan again (see revoked state)";
       }

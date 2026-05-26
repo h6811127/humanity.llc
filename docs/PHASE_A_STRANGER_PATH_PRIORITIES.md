@@ -48,7 +48,7 @@ These tighten Phase A for the chosen vertical without a new “product tab”:
 |------|-----------|
 | **Create / scan copy** | Name the **object** (“Studio door”, “Keys tag”) on scan UI where helpful; keep “what this does not prove” visible. **Shipped:** scanner safety chips (`Object · …` / `Item · …`) on `/c/…` per `docs/SCANNER_EXPERIENCE.md` Phase B. |
 | **Scan page** | Active vs revoked in &lt;30s; **Live check** hero (manifesto/plate as H1, one status, one limit) per [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) and [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) UI refresh phases. |
-| **`/created/`** | Recovery gate stays; consider tucking **More options** until after first successful revoke in-session (`docs/M4_CREATED_REVOKE_UI.md`). |
+| **`/created/`** | Recovery gate stays; **Update status** unlocks after first in-session revoke (`created-first-revoke-gate.mjs`). |
 | **Print path** | Download QR PNG + phone print steps on `/created/` (shipped); validate strangers actually print before testing revoke in the wild. |
 | **Landing** | Physical software objects framing + demo revoke animation are **marketing only**  -  not resolver behavior. |
 

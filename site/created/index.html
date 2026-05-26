@@ -319,7 +319,10 @@
               <li><button type="button" class="created-primary-action" data-created-action="download-qr"><span class="created-primary-action-title">Download QR</span><span class="created-primary-action-sub">Jump to QR image for print or share</span></button></li>
               <li><button type="button" class="created-primary-action" data-created-action="print-qr"><span class="created-primary-action-title">Print instructions</span><span class="created-primary-action-sub">Steps from your phone</span></button></li>
               <li><button type="button" class="created-primary-action" data-created-action="test-scan"><span class="created-primary-action-title">Test scan</span><span class="created-primary-action-sub">Open what scanners see</span></button></li>
-              <li><button type="button" class="created-primary-action" data-created-action="update-status"><span class="created-primary-action-title">Update status</span><span class="created-primary-action-sub">Change public line on the network</span></button></li>
+              <li id="created-task-update-status" hidden>
+                <button type="button" class="created-primary-action" data-created-action="update-status"><span class="created-primary-action-title">Update status</span><span class="created-primary-action-sub">Change public line on the network</span></button>
+              </li>
+              <p class="created-task-hint" id="created-task-update-status-hint" role="note">Revoke this QR once (below) to unlock status updates on the network.</p>
               <li><button type="button" class="created-primary-action created-primary-action--danger" data-created-action="revoke-qr"><span class="created-primary-action-title">Revoke QR</span><span class="created-primary-action-sub">Turn off this scan pointer</span></button></li>
             </ul>
           </section>

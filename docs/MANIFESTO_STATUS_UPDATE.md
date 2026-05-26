@@ -81,12 +81,17 @@ Deep link: `/created/?profile_id=…&qr_id=…`  -  hydrates handle/manifesto fr
 
 | Step | Pass? |
 |------|-------|
-| Owner updates status plate line 2; second device scan shows new text | ☐ |
-| Owner updates lost-item return message without reprint | ☐ |
-| Revoked card cannot update (`410`) | ☐ |
-| Wrong key cannot update (`401`) | ☐ |
-| `updated_at` replay rejected (`422`) | ☐ |
-| Scan cache: new line visible within active TTL (~5 min) or hard refresh | ☐ |
+| Owner updates status plate line 2; second device scan shows new text | ☐ manual |
+| Owner updates lost-item return message without reprint | ☐ manual |
+| Revoked card cannot update (`410`) | ✅ `update-card.test.ts` |
+| Wrong key cannot update (`401`) | ✅ `update-card.test.ts` |
+| `updated_at` replay rejected (`422`) | ✅ `update-card.test.ts` |
+| Scan cache: new line visible within active TTL (~5 min) or hard refresh | ☐ manual |
+| Lost-item relay scan shows updated line 2 | ✅ `update-card.test.ts` |
+| Status plate scan shows updated line 2 | ✅ `update-card.test.ts` |
+| Recovery key may sign update | ✅ `update-card.test.ts` |
+
+**Owner UX:** **Update status** on Tasks stays hidden until first in-session QR or card revoke (`site/js/created-first-revoke-gate.mjs`).
 
 ---
 

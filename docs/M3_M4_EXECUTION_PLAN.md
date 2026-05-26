@@ -154,6 +154,7 @@ Do these **in order**. Each step has an exit test before moving on.
 - [x] `/created/` **Update public line** UI (`site/js/created-manifesto-update.mjs`)
 - [x] Status plate + lost-item relay field layouts; infer pilot from stored manifesto on return visit
 - [x] Scan HTML shows updated two-line copy (`update-card.test.ts`)
+- [x] Exit checklist API cases (wrong key, revoked card, relay layout) + update-status gate after first revoke
 
 ---
 
