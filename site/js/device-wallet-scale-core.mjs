@@ -1,7 +1,11 @@
 /**
- * Large-wallet rules for poll / network fan-out (request budget Phase 8).
+ * Large-wallet rules for poll / network fan-out (request budget Phases 8–8c).
  * @see docs/DEVICE_OS_REQUEST_BUDGET.md
  */
+
+import { orderEntriesVisibleFirst } from "./device-hub-visible-rows-core.mjs";
+
+export { orderEntriesVisibleFirst } from "./device-hub-visible-rows-core.mjs";
 
 /** Cards at or above this count use narrowed auto-poll and capped network parallelism. */
 export const LARGE_WALLET_THRESHOLD = 10;
@@ -84,6 +88,7 @@ export function walletNetworkMaxParallel(savedCardCount, opts = {}) {
  *   walletSize: number,
  *   staleEntries: T[],
  *   activeProfileId?: string | null,
+ *   visibleProfileIds?: Iterable<string>,
  *   cursor: number,
  * }} ctx
  * @returns {{ entries: T[], nextCursor: number }}
@@ -93,7 +98,10 @@ export function selectNetworkRefreshEntries(entries, ctx) {
     return { entries: ctx.staleEntries, nextCursor: 0 };
   }
 
-  const stale = ctx.staleEntries;
+  const stale = orderEntriesVisibleFirst(
+    ctx.staleEntries,
+    ctx.visibleProfileIds ?? []
+  );
   const active = ctx.activeProfileId;
   if (active) {
     const activeStale = stale.find((e) => e.profile_id === active);

@@ -26,6 +26,7 @@ import {
  *   roundRobinCursor?: number,
  *   pollSlots?: Record<string, import("./js/device-live-control-inbox-core.mjs").LiveControlPendingItem>,
  *   resolverHealth?: 'ok' | 'degraded' | 'offline',
+ *   watchLiveProofEnabled?: boolean,
  *   pollBackoffUntil?: number,
  * }} SwState */
 
@@ -60,6 +61,7 @@ async function pollAndMaybeNotify() {
     !state.pageOrigin ||
     !swLiveProofPollingShouldRun({
       enabled: state.enabled,
+      watchLiveProofEnabled: state.watchLiveProofEnabled !== false,
       resolverHealth: state.resolverHealth,
     })
   ) {
@@ -140,8 +142,10 @@ self.addEventListener("message", (event) => {
     (async () => {
       const prev = await readState();
       const enabled = !!msg.enabled;
+      const watchLiveProofEnabled = msg.watchLiveProofEnabled !== false && enabled;
       const state = {
         enabled,
+        watchLiveProofEnabled,
         apiOrigin: String(msg.apiOrigin || ""),
         pageOrigin: String(msg.pageOrigin || self.location.origin),
         entries: Array.isArray(msg.entries) ? msg.entries : [],
@@ -159,7 +163,14 @@ self.addEventListener("message", (event) => {
       };
 
       await writeState(state);
-      if (msg.pollNow && swLiveProofPollingShouldRun(state)) {
+      if (
+        msg.pollNow &&
+        swLiveProofPollingShouldRun({
+          enabled: state.enabled,
+          watchLiveProofEnabled: state.watchLiveProofEnabled,
+          resolverHealth: state.resolverHealth,
+        })
+      ) {
         await pollAndMaybeNotify();
       }
     })()

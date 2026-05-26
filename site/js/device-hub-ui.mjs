@@ -113,6 +113,10 @@ import {
   isDeviceHubExpanded,
   walletNetworkVisibilityRefreshAllowed,
 } from "./device-live-control-poll-scheduler.mjs";
+import {
+  orderEntriesVisibleFirst,
+  profileIdsWithVisibleRows,
+} from "./device-hub-visible-rows-core.mjs";
 
 function escapeHtml(s) {
   return String(s)
@@ -620,6 +624,28 @@ function applyCachedNetworkChipsOnly() {
   );
 }
 
+/**
+ * Profile IDs for saved-card rows visible in the hub list viewport (Phase 8c).
+ * @returns {string[]}
+ */
+function visibleHubCardProfileIds() {
+  if (!savedList) return [];
+  const scrollRoot =
+    savedList.closest(".device-hub-scroll") ||
+    savedList.closest("#device-hub") ||
+    savedList;
+  const viewportRect = scrollRoot.getBoundingClientRect();
+  const viewport = { top: viewportRect.top, bottom: viewportRect.bottom };
+  const rowRects = [];
+  savedList.querySelectorAll(".hub-card-item").forEach((li) => {
+    const profileId = li.dataset.profileId;
+    if (!profileId) return;
+    const rect = li.getBoundingClientRect();
+    rowRects.push({ profileId, top: rect.top, bottom: rect.bottom });
+  });
+  return profileIdsWithVisibleRows(rowRects, viewport);
+}
+
 function scheduleWalletNetworkFetch() {
   if (walletNetworkFetchTimer != null) {
     clearTimeout(walletNetworkFetchTimer);
@@ -649,9 +675,11 @@ async function fetchAndApplyNetworkChips(opts = {}) {
   );
 
   const staleEntries = listWalletEntriesNeedingNetworkFetch(entries);
+  const visibleProfileIds = visibleHubCardProfileIds();
   let entriesToFetch = entries;
   if (manual) {
-    entriesToFetch = staleEntries.length > 0 ? staleEntries : entries;
+    const manualPool = staleEntries.length > 0 ? staleEntries : entries;
+    entriesToFetch = orderEntriesVisibleFirst(manualPool, visibleProfileIds);
   } else if (isLargeWallet(entries.length)) {
     if (staleEntries.length === 0) {
       window.dispatchEvent(
@@ -667,12 +695,13 @@ async function fetchAndApplyNetworkChips(opts = {}) {
       staleEntries,
       activeProfileId:
         session && typeof session.profile_id === "string" ? session.profile_id : null,
+      visibleProfileIds,
       cursor: walletNetworkRefreshCursor,
     });
     walletNetworkRefreshCursor = picked.nextCursor;
     entriesToFetch = picked.entries;
   } else if (staleEntries.length > 0) {
-    entriesToFetch = staleEntries;
+    entriesToFetch = orderEntriesVisibleFirst(staleEntries, visibleProfileIds);
   } else {
     return;
   }

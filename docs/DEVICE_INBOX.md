@@ -196,7 +196,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 - **Limits:** Browsers may throttle or deny periodic sync; fully force-quit browsers may not wake the SW. Hidden-tab alerts still use the page path first (`maybeNotifyLiveProof`).
 - **Request budget Phase 4:** SW polls only when alerts are on + permission granted + resolver health is `ok`; **one** challenge GET per wake (round-robin); **15 min** minimum `periodicSync` interval ([`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)).
 
-**Request budget (ops):** Live proof was the main Worker cost driver (**legacy:** N cards × 5s × parallel `GET`). **Shipped mitigations:** hub/inbox scope, round-robin **one GET per tick**, 60s idle / 5s pending, watch **default off**, SW 15 min + alerts-only. Residual risk: large wallets + watch on + long hub sessions + parallel **Check network** fan-out. See **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)** for math, operating modes, and Phases 7–9.
+**Request budget (ops):** Live proof was the main Worker cost driver (**legacy:** N cards × 5s × parallel `GET`). **Shipped mitigations:** hub/inbox scope, round-robin **one GET per tick**, 60s idle / 5s pending, watch **default off**, SW 15 min + alerts-only + **watch on** (Phase 8c), visible-row-first network refresh (Phase 8c). Residual risk: large wallets + watch on + long hub sessions + parallel **Check network** fan-out. See **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)** for math, operating modes, and Phases 7–9.
 
 ---
 

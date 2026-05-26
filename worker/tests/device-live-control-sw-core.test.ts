@@ -29,12 +29,23 @@ describe("pendingLiveControlChallengeUrl", () => {
 });
 
 describe("swLiveProofPollingShouldRun", () => {
-  it("requires alerts enabled and resolver ok", () => {
+  it("requires alerts enabled, watch on, and resolver ok", () => {
     expect(
-      swLiveProofPollingShouldRun({ enabled: true, resolverHealth: "ok" })
+      swLiveProofPollingShouldRun({
+        enabled: true,
+        watchLiveProofEnabled: true,
+        resolverHealth: "ok",
+      })
     ).toBe(true);
     expect(
       swLiveProofPollingShouldRun({ enabled: false, resolverHealth: "ok" })
+    ).toBe(false);
+    expect(
+      swLiveProofPollingShouldRun({
+        enabled: true,
+        watchLiveProofEnabled: false,
+        resolverHealth: "ok",
+      })
     ).toBe(false);
     expect(
       swLiveProofPollingShouldRun({ enabled: true, resolverHealth: "degraded" })

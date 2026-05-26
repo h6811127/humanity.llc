@@ -98,6 +98,20 @@ describe("selectNetworkRefreshEntries", () => {
     });
     expect(picked.entries[0].profile_id).toBe(PROFILE_B);
   });
+
+  it("prefers visible stale row before round-robin cursor", () => {
+    const stale = [
+      { profile_id: PROFILE_A },
+      { profile_id: PROFILE_B },
+    ];
+    const picked = selectNetworkRefreshEntries(entries, {
+      walletSize: LARGE_WALLET_THRESHOLD,
+      staleEntries: stale,
+      visibleProfileIds: [PROFILE_B],
+      cursor: 0,
+    });
+    expect(picked.entries[0].profile_id).toBe(PROFILE_B);
+  });
 });
 
 describe("walletNetworkMaxParallel", () => {

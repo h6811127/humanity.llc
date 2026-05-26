@@ -14,6 +14,7 @@ import {
   SW_PERIODIC_TAG,
   SW_SYNC_TAG,
 } from "./device-live-control-sw-core.mjs";
+import { isWatchLiveProofEnabled } from "./device-hub-network-tools-core.mjs";
 
 export const SW_SCRIPT_URL = "/sw-live-proof.mjs";
 
@@ -90,22 +91,24 @@ export async function syncLiveProofServiceWorkerState(opts = {}) {
     /* ignore */
   }
 
+  const watchOn = isWatchLiveProofEnabled();
   const pending = getLiveControlPending();
   const message = {
     type: "HC_SW_SYNC_STATE",
-    enabled: true,
+    enabled: watchOn,
+    watchLiveProofEnabled: watchOn,
     apiOrigin: resolverApiOrigin(),
     pageOrigin: location.origin,
     entries: liveProofPollTargetsFromWallet(loadWallet()),
     lastSig: liveControlPendingSignature(pending),
     interactShown,
     resolverHealth: getResolverHealthStatus(),
-    pollNow: !!opts.pollNow,
+    pollNow: !!opts.pollNow && watchOn,
   };
 
   active.postMessage(message);
 
-  if ("sync" in reg && opts.pollNow) {
+  if ("sync" in reg && opts.pollNow && watchOn) {
     try {
       await reg.sync.register(SW_SYNC_TAG);
     } catch {
@@ -115,9 +118,13 @@ export async function syncLiveProofServiceWorkerState(opts = {}) {
 
   if ("periodicSync" in reg) {
     try {
-      await reg.periodicSync.register(SW_PERIODIC_TAG, {
-        minInterval: SW_PERIODIC_MIN_INTERVAL_MS,
-      });
+      if (watchOn) {
+        await reg.periodicSync.register(SW_PERIODIC_TAG, {
+          minInterval: SW_PERIODIC_MIN_INTERVAL_MS,
+        });
+      } else {
+        await reg.periodicSync.unregister(SW_PERIODIC_TAG);
+      }
     } catch {
       /* Periodic sync requires permission / engagement; optional */
     }

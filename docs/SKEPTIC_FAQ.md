@@ -323,6 +323,8 @@ No.
 
 **Public launch** means anyone can create a card when Phase A ships. An optional early tester pool may help stress-test copy and support - it is not a gate, paid tier, or fake democracy.
 
+**Future “hosted steward” plans** (optional higher poll limits and live-proof alerts for power users) are **not** required to create a card, do **not** change verification labels, and must **not** add scan analytics. Planning only: [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md).
+
 ---
 
 ## How Does This Get "Power" Without Surveillance?

@@ -68,11 +68,13 @@ export function liveProofPollTargetsFromWallet(wallet) {
 /**
  * @param {{
  *   enabled: boolean,
+ *   watchLiveProofEnabled?: boolean,
  *   resolverHealth?: 'ok' | 'degraded' | 'offline',
  * }} input
  */
 export function swLiveProofPollingShouldRun(input) {
   if (!input.enabled) return false;
+  if (input.watchLiveProofEnabled === false) return false;
   return liveControlPollAllowedByResolverHealth(input.resolverHealth ?? "offline");
 }
 

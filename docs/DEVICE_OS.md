@@ -190,7 +190,7 @@ Full spec: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 | Browser background alerts | v2 A–D: contextual opt-in, sign deep link, OS policy, live-proof service worker |
 | Status dot | Overlays for proof / cross-tab; `open_notifications` action (no numeric count on dot) |
 
-**Do not:** server push, OS alerts for resolver health, or permission prompt on first visit.
+**Do not (free tier):** server push, OS alerts for resolver health, or permission prompt on first visit. **Hosted paid tier** may add optional server-mediated live-proof notify per [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) — not shipped.
 
 ### Optional hub polish
 

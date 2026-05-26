@@ -198,7 +198,7 @@ Client budgets are necessary; they are **not** sufficient against bugs, old cach
 | **60s** idle / **5s** when pending | **Shipped** | `LIVE_CONTROL_POLL_MS_*` in `device-live-control-poll-scheduler.mjs` |
 | Network refresh: capped parallelism on large wallet | **Shipped** (Phase 8) | `walletNetworkMaxParallel` (2 auto, 1 manual) |
 | Network refresh: round-robin one stale row per debounced hub refresh (large wallet) | **Shipped** (Phase 8b) | `selectNetworkRefreshEntries` + `listWalletEntriesNeedingNetworkFetch` |
-| Network refresh: visible-row only | **Planned** (Phase 8c) | Refresh DOM-visible saved rows first |
+| Network refresh: visible-row priority | **Shipped** (Phase 8c) | `device-hub-visible-rows-core.mjs` + `orderEntriesVisibleFirst` |
 | `If-None-Match` / short TTL on Worker | **Shipped** (Phase 9) | `conditional-json.ts`; client `resolver-conditional-fetch-core.mjs` |
 
 ### C. Scope *who* polls
@@ -217,7 +217,7 @@ Client budgets are necessary; they are **not** sufficient against bugs, old cach
 | **Watch for live proof** default **off** | **Shipped** | Only `hc_watch_live_proof === "1"` enables auto poll |
 | **Hard per-tab/day GET budget** | **Shipped** (Phase 7) | 400 auto GETs/UTC day; hub status line when paused |
 | Large-wallet UI warning (10+ cards) | **Shipped** (Phase 8) | `#device-hub-large-wallet-hint` in hub network tools |
-| Paid tier for continuous watch + push (hosted operator) | **Future** | Reference operator stays manual / opt-in |
+| Paid tier for continuous watch + push (hosted operator) | **Planning** | [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) |
 
 ### E. Longer term (only if phases 7–9 miss SLA)
 
@@ -243,8 +243,9 @@ Do **not** rip out the device OS. **Retire the default “poll every card every 
 | **7 - Session budget & leader tab** (P1) | **Shipped:** `hc_live_control_auto_poll_budget` (**400**/UTC day/tab); leader lock `hc_live_control_poll_leader` + `BroadcastChannel` snapshot; manual check bypasses cap | Prevents runaway 8h hub sessions | Auto poll pauses with hub message; manual check remains |
 | **8 - Wallet scale & network fan-out** (P1) | **Shipped:** large-wallet hint (≥10 cards); live-control poll set = active `hc_created` + pending; network `maxParallel` 2 (auto) or 1 (manual) | Cuts N-parallel status storms | Full-wallet live proof scan slower when large |
 | **8b - Presence & chrome** (P1) | **Shipped:** skip presence heartbeat when alone with keys (`shouldSkipPresenceHeartbeat`) | Less cross-tab churn when single tab | Heartbeat resumes when second tab opens |
+| **8c - Visible rows + SW watch** (P1) | **Shipped:** network refresh prefers hub-visible `.hub-card-item` rows; SW polls only when `hc_watch_live_proof === "1"` (alerts still required) | On-screen chips refresh first | Background polls off when watch off |
 | **9 - Edge cache** (P2) | ETag / short TTL on status + challenge endpoints | Fewer D1 reads on repeat polls | **Shipped** |
-| **10 - Push / paid** (future) | Hosted continuous watch + server push | Best UX at scale | Product + billing |
+| **10 - Hosted tier + push** (planning) | Entitlements, higher caps, optional server push — **no code yet** | Best UX at scale | See [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) |
 
 **Tests (shipped):** Vitest in `device-live-control-poll-scheduler.test.ts`, `device-live-control-round-robin.test.ts`, `device-hub-network-tools-core.test.ts`; Playwright in `e2e/device-inbox.spec.ts` (collapsed hub idle 10s, one challenge per tick, degraded health, watch off + manual check).
 
@@ -283,7 +284,7 @@ Before merging shell changes that touch network I/O:
 
 Manual **Check for live proof** always runs one round-robin pass when watch is off. Opening the inbox sheet does **not** start auto poll without watch (scope may be active, but the timer requires `hc_watch_live_proof === "1"`).
 
-**Paid / hosted operator (future):** Continuous watch + background OS alerts may map to a paid tier (higher Worker budget, optional push). Free/reference use should assume **manual check** or short hub sessions with watch enabled.
+**Paid / hosted operator (planning):** Product definition in [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md). Free/reference use remains **manual check**, opt-in watch, and shipped caps (400 auto live-proof GETs/day/device). Paid may raise caps and add optional server push — not implemented.
 
 ---
 
@@ -298,7 +299,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 | P1 | **Do all QRs need a saved profile + keys?** | **No.** Scan is public. Signing needs `hc_created` in tab only. `hc_wallet` is optional convenience. | Docs + UX never imply “save every card.” Pins ≠ keys. | Ongoing |
 | P2 | **Does saving a card turn on monitoring?** | **No.** Watch default off; save ≠ `hc_watch_live_proof`. | Same; optional per-card watch later. | 5 ✅ |
 | P3 | **Auto-save vs auto-watch** | Auto-save (`hc_auto_save_device`) separate from watch. | Keep independent; auto-save does not enable poll. | Ongoing |
-| P4 | **Paid / hosted operator** | Reference site: manual + opt-in watch. | Continuous watch + push + higher caps as **paid tier**; Free stays intent-based. | 10 |
+| P4 | **Paid / hosted operator** | Reference site: manual + opt-in watch. | Continuous watch + push + higher caps as **paid tier**; Free stays intent-based. | 10 — see [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) |
 
 ### Live proof (steward)
 
@@ -315,7 +316,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 | L9 | Large wallet: poll **active + pending** only | Yes (`selectLiveControlPollEntries`, ≥10 cards) | Per-card “watch this card” flag | 8 ✅ |
 | L10 | **Stranger pays urgency** | Scan page polls one QR while waiting | Steward inbox optional; OS alert path | Scan + SW |
 | L11 | `/created/` polls **active card only** | ~3s while proving | Stop when hidden (shipped in `created-live-proof-poll-core`) | Created ✅ |
-| L12 | Server push for live proof | — | WebSocket/SSE; steward notified without wallet round-robin | 10 |
+| L12 | Server push for live proof | — | WebSocket/SSE; steward notified without wallet round-robin | 10 — [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) |
 
 ### Network status (wallet chips)
 
@@ -325,7 +326,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 | N2 | Debounced hub fetch (300ms) | Yes | — | P1 ✅ |
 | N3 | Large wallet: cap parallel status GETs | Yes (2 auto, 1 manual via `walletNetworkMaxParallel`) | — | 8 ✅ |
 | N3b | Large wallet: round-robin **one stale status GET** per hub debounce | Yes (`selectNetworkRefreshEntries`) | Visible-row priority | 8b ✅ |
-| N4 | Visible-row-only status refresh | — | Refresh DOM-visible saved rows first | 8b |
+| N4 | Visible-row-first status refresh | Yes (`profileIdsWithVisibleRows`, `orderEntriesVisibleFirst`) | Intersection-based hub list | 8c ✅ |
 | N5 | Worker **ETag** / 304 on `status` | Yes | Fewer D1 reads on repeat polls | 9 ✅ |
 | N6 | Longer session cache TTL when idle | 5 min session cache | Tiered TTL (idle vs attending) | 9 |
 
@@ -347,7 +348,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 |---|------|---------------|-------------------|-------|
 | B1 | SW polls only with browser alerts on | Yes | — | 4 ✅ |
 | B2 | SW **15 min** periodic + round-robin | Yes | Align with watch opt-in only | 4 ✅ |
-| B3 | SW respects watch + resolver health | Partial | Read `hc_watch_live_proof` in SW explicitly | 8b |
+| B3 | SW respects watch + resolver health | Yes | `syncLiveProofServiceWorkerState` sets `enabled` from watch; periodic unregistered when watch off | 8c ✅ |
 
 ### Ops / edge
 
@@ -357,11 +358,11 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 | O2 | Per-IP rate limits on hot routes | — | Cap burst **Check network** | Server |
 | O3 | Fail closed on 1027 | Yes | User-visible degraded state | 3 ✅ |
 
-### Implementer order (after Phases 1–8)
+### Implementer order (after Phases 1–9 + 8c)
 
-1. **Phase 8c** - Visible-row network refresh; SW watch gate.
-3. **Phase 10** - Push + paid tier product definition.  
-4. **Shell P2** - Lazy inbox loader ([`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md)).
+1. **Phase 10 (planning → build)** — M2 done: [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md). Next: M3–M6 in [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) before code.  
+2. **Shell P2** - Lazy inbox loader ([`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md)).  
+3. **Ops O2** - Per-IP rate limits on hot routes.
 
 See also [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) and [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
 
@@ -389,6 +390,9 @@ Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). 
 
 | Date | Note |
 |------|------|
+| 2026-05-26 | **M2 entitlements:** [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) |
+| 2026-05-26 | **Phase 10 planning:** [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) (hosted tier + push; no implementation) |
+| 2026-05-26 | **Phase 8c shipped:** visible-row-first hub network refresh; SW background polls require **Watch for live proof** on |
 | 2026-05-26 | **Phase 8b:** network status round-robin for large wallets; skip presence heartbeat when alone with keys |
 | 2026-05-26 | **Phases 7–8 shipped:** auto-poll daily cap, leader tab + BC snapshot, large-wallet hint, narrowed live-control poll set, network `maxParallel` cap; Vitest for budget/scale/leader |
 | 2026-05-26 | **Phase 7–8 shipped** in client: leader tab, daily auto-poll budget, large-wallet hint, narrowed poll entries, network `maxParallel`; **8b:** skip presence heartbeat when alone with keys |

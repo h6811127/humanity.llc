@@ -20,6 +20,7 @@ import {
 } from "./device-live-control-poll-leader.mjs";
 import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs";
 import { selectLiveControlPollEntries } from "./device-wallet-scale-core.mjs";
+import { syncLiveProofServiceWorkerState } from "./device-browser-notifications-sw.mjs";
 import { getPendingLiveControlChallengeUrl } from "./hc-sign.mjs";
 import { fetchResolverJson } from "./resolver-conditional-fetch-core.mjs";
 import { activateWalletEntry } from "./device-keys.mjs";
@@ -380,9 +381,10 @@ export async function checkLiveProofNow() {
 export function applyLiveControlWatchPreference() {
   if (!isWatchLiveProofEnabled()) {
     clearPollTimer();
-    return;
+  } else if (pollFeatureEnabled) {
+    syncLiveControlInboxPolling();
   }
-  if (pollFeatureEnabled) syncLiveControlInboxPolling();
+  void syncLiveProofServiceWorkerState();
 }
 
 /** Notify hub/inbox sheet open state changed (also dispatched by shell). */
