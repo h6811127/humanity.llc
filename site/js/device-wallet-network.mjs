@@ -32,6 +32,24 @@ let latestResolvedAt = 0;
 /** Profile IDs with at least one resolver-confirmed fetch this page visit. */
 const resolverConfirmedProfileIdsThisVisit = new Set();
 
+// bfcache / fast navigation can keep JS context alive. If we restore from bfcache,
+// clear resolver-confirmed in-memory state so we don't re-light banners based on
+// a previous visit's confirmed poll.
+if (
+  typeof window !== "undefined" &&
+  typeof window.addEventListener === "function"
+) {
+  window.addEventListener("pageshow", (e) => {
+    /** @type {{ persisted?: boolean } | undefined} */
+    const detail = e;
+    if (!detail?.persisted) return;
+    latestResolvedAlertStateMap = {};
+    latestResolvedScanKindMap = {};
+    latestResolvedAt = 0;
+    resolverConfirmedProfileIdsThisVisit.clear();
+  });
+}
+
 /** @param {string} profileId */
 function clearResolverConfirmedForProfile(profileId) {
   if (!profileId) return;
@@ -382,6 +400,13 @@ export function snapshotNetworkSeenOnExit() {
   }
   saveLastSeen(seen);
   notifyBaselineChanged();
+
+  // Prevent stale in-memory resolver-confirmed state from being re-applied when the
+  // browser keeps the JS context (bfcache / fast navigation).
+  latestResolvedAlertStateMap = {};
+  latestResolvedScanKindMap = {};
+  latestResolvedAt = 0;
+  resolverConfirmedProfileIdsThisVisit.clear();
 }
 
 /**

@@ -1190,7 +1190,9 @@ export function initDeviceHub(config = {}) {
       return;
     }
     if (document.visibilityState === "visible") {
-      void fetchAndApplyNetworkChips();
+      const hubEl = document.getElementById("device-hub");
+      const hubCollapsed = hubEl?.classList.contains("device-hub-collapsed") ?? false;
+      if (!hubCollapsed) void fetchAndApplyNetworkChips();
     }
   });
 

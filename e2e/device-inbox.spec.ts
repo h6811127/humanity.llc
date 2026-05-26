@@ -47,9 +47,11 @@ const WALLET_ENTRY = {
 
 const CHALLENGE_ID = "e2e_live_proof_challenge";
 
-function mockHealth(route: Route, status: "ok" | "offline") {
+function mockHealth(route: Route, status: "ok" | "offline" | "degraded") {
+  // The client treats non-2xx as "offline". It treats body.status === "degraded" as "degraded".
+  const httpStatus = status === "offline" ? 503 : 200;
   return route.fulfill({
-    status: 200,
+    status: httpStatus,
     contentType: "application/json",
     body: JSON.stringify({ status, database: "ok" }),
   });
@@ -395,5 +397,61 @@ test.describe("device inbox — resolver offline", () => {
 
     await page.goto("/wallet/");
     await expect(page.locator("#shell-notif-badge")).toBeHidden({ timeout: 8_000 });
+  });
+});
+
+test.describe("device inbox — card disabled since visit suppressed when resolver offline/degraded", () => {
+  async function setup(page, resolverHealth: "offline" | "degraded") {
+    await page.addInitScript((entry) => {
+      localStorage.setItem("hc_wallet", JSON.stringify([entry]));
+      localStorage.setItem(
+        "hc_wallet_last_seen_network",
+        JSON.stringify({ [entry.profile_id]: "active" })
+      );
+      sessionStorage.removeItem("hc_wallet_network_cache");
+    }, WALLET_ENTRY);
+
+    await page.route("**/.well-known/hc/v1/health**", (route) =>
+      mockHealth(route, resolverHealth)
+    );
+    await page.route("**/.well-known/hc/v1/cards/**/status**", mockCardRevokedSinceVisit);
+    await page.route(
+      "**/.well-known/hc/v1/cards/**/live-control/challenges**",
+      mockNoChallenge
+    );
+  }
+
+  test("hides since-visit UI when resolver is offline", async ({ page }) => {
+    await setup(page, "offline");
+    await page.goto("/wallet/");
+
+    await expect(page.locator("#shell-notif-badge")).toBeHidden({ timeout: 8_000 });
+    await expect(page.locator("#device-hub-card-disabled-group")).toBeHidden();
+    await expect(page.locator("#brand-status-dot")).not.toHaveAttribute(
+      "data-dot-overlay",
+      "card_disabled_since_visit"
+    );
+    await expect(
+      page.getByText("Card disabled on the network since your last visit.")
+    ).toBeHidden();
+    await expect(page.locator(".hub-card-status-alert:not([hidden])")).toHaveCount(0);
+  });
+
+  test("hides since-visit UI when resolver is degraded (resolver limited)", async ({
+    page,
+  }) => {
+    await setup(page, "degraded");
+    await page.goto("/wallet/");
+
+    await expect(page.locator("#shell-notif-badge")).toBeHidden({ timeout: 8_000 });
+    await expect(page.locator("#device-hub-card-disabled-group")).toBeHidden();
+    await expect(page.locator("#brand-status-dot")).not.toHaveAttribute(
+      "data-dot-overlay",
+      "card_disabled_since_visit"
+    );
+    await expect(
+      page.getByText("Card disabled on the network since your last visit.")
+    ).toBeHidden();
+    await expect(page.locator(".hub-card-status-alert:not([hidden])")).toHaveCount(0);
   });
 });

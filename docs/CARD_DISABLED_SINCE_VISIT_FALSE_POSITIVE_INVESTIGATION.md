@@ -331,6 +331,7 @@ Slices 1–8 prevent **cache-only** banners (`resolverConfirmed: false`). A bann
 | `cardDisabledSinceVisitVisible` requires `scan.kind === card_revoked` (not null / stale fallback) | `wallet-network-baseline.mjs` |
 | Health changes dispatch `hc-resolver-health-changed` to re-hide banners | `device-status.mjs`, `device-hub-ui.mjs` |
 | Live-control 429 → 60s backoff; stop re-fetching all card rows on every live-proof tick | `device-live-control-inbox.mjs`, `device-hub-ui.mjs` |
+| Clear resolver-confirmed in-memory maps on `pageshow` restore (bfcache) | `device-wallet-network.mjs` |
 
 **Why cache clear alone did not help:** With **Resolver limited** at the top, the page is already in a **degraded** poll window. An earlier in-flight status read could still poison `latestResolved*` before rate limits landed, and row banners were re-applied from that state. Clearing `sessionStorage` does not stop live-proof polling or reset in-memory confirmed state until reload — and reload immediately re-starts **N cards × live-control challenges every 5s**, which reproduces **429** and the split-brain UI.
 
