@@ -132,6 +132,7 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
   const statusMap = {};
   const alertStateMap = {};
   const scanKindMap = {};
+  const resolverConfirmedAlertStateMap = {};
   const fetches = [];
   const now = Date.now();
   const lastSeen = loadLastSeen();
@@ -155,6 +156,7 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
             statusMap[pid] = "error";
             alertStateMap[pid] = "active";
             scanKindMap[pid] = null;
+            resolverConfirmedAlertStateMap[pid] = "active";
             cache[pid] = {
               status: "error",
               scanKind: null,
@@ -169,6 +171,7 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
           statusMap[pid] = parsed.status;
           alertStateMap[pid] = parsed.alertState;
           scanKindMap[pid] = parsed.scanKind;
+          resolverConfirmedAlertStateMap[pid] = parsed.alertState;
           cache[pid] = {
             status: parsed.status,
             scanKind: parsed.scanKind,
@@ -180,6 +183,7 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
           statusMap[pid] = "offline";
           alertStateMap[pid] = "active";
           scanKindMap[pid] = null;
+          resolverConfirmedAlertStateMap[pid] = "active";
           cache[pid] = {
             status: "offline",
             scanKind: null,
@@ -194,8 +198,13 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
 
   await Promise.all(fetches);
   saveCache(cache);
-  latestResolvedAlertStateMap = { ...alertStateMap };
-  latestResolvedAt = Date.now();
+  if (Object.keys(resolverConfirmedAlertStateMap).length > 0) {
+    latestResolvedAlertStateMap = {
+      ...latestResolvedAlertStateMap,
+      ...resolverConfirmedAlertStateMap,
+    };
+    latestResolvedAt = Date.now();
+  }
   notifyNetworkRefreshed(statusMap, alertStateMap, scanKindMap);
   onDone?.({ statusMap, alertStateMap, scanKindMap });
 }
@@ -239,10 +248,12 @@ export function recordNetworkSeen(profileId, alertState) {
 
 /** Snapshot current cached alert states when leaving the site (end of visit). */
 export function snapshotNetworkSeenOnExit() {
+  // DH-4: Only persist baselines from resolver-confirmed reads in this visit.
+  if (!latestResolvedAt) return;
   const seen = loadLastSeen();
   for (const entry of loadWallet()) {
     const pid = entry.profile_id;
-    const alertState = getCachedNetworkAlertState(pid);
+    const alertState = latestResolvedAlertStateMap[pid] ?? null;
     if (!alertState) continue;
     seen[pid] = String(alertState).toLowerCase();
   }
