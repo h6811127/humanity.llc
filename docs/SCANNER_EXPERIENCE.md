@@ -149,7 +149,7 @@ Merge layers 1–2 into one **Live check** hero for active scans, then progressi
 
 | Zone | Content | Notes |
 |------|---------|--------|
-| **A. Minimal header** | Dot + `humanity.llc` only | No second brand row inside the hero card |
+| **A. Page chrome** | **Status dot only** (link home) | No frosted top bar; no `humanity.llc` wordmark above the card (`pass-v26`) |
 | **B. Live check hero** | Single status + object message (H1) + one limit line + resolver verified line | Replaces separate safety header + status panel for typical active scans |
 | **C. Steward strip** | `Controlled by @handle` · optional expiry | One muted line |
 | **D. What this proves** | Up to three bullets (live, signed, revocable) | Only signals that are true for this scan |
@@ -214,7 +214,7 @@ These were tracked during the interim dual-card layout; **fixed** in the Live ch
 | Gap | Resolution |
 |-----|------------|
 | Duplicate status | Single `scan-safety-strip` in hero (`pass-v21`) |
-| Duplicate brand | Top header + hero host row only (`pass-v21`) |
+| Duplicate brand | Page chrome = dot only; wordmark only in hero (`pass-v26`; was top bar + hero until `pass-v21` consolidated hero) |
 | Duplicate limits | One `scan-hero-limit` + modules / settings (`pass-v21`–`pass-v23`) |
 | Hierarchy inversion | Manifesto/plate H1; collapsible `scan-hero-qr-details` (`pass-v23`) |
 | “Network status” kicker | Removed (`pass-v21`) |
@@ -359,7 +359,7 @@ Phases **A–F** are shipped for the reference network. **E** remains mandatory 
 
 ### Resolver UI refresh
 
-Implementation detail: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) § UI refresh phases. Current header: `X-HC-Scan-UI: pass-v25`.
+Implementation detail: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) § UI refresh phases. Current header: `X-HC-Scan-UI: pass-v26`.
 
 | Phase | Deliverable | Outcome |
 |-------|-------------|---------|
