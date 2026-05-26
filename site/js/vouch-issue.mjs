@@ -97,6 +97,10 @@ function clearVouchStopButton() {
   document.getElementById("vouch-stop-keys")?.remove();
 }
 
+function clearVouchSwitchDefault() {
+  document.getElementById("vouch-switch-default")?.remove();
+}
+
 function mountVouchStopButton(voucherLabel) {
   const panel = statusEl?.parentElement;
   if (!panel) return;
@@ -193,12 +197,14 @@ function showIneligible(message) {
   if (ineligible) ineligible.hidden = false;
   if (ineligibleCopy) ineligibleCopy.textContent = message;
   clearVouchStopButton();
+  clearVouchSwitchDefault();
 }
 
 function showSuccess(verification) {
   if (interactive) interactive.hidden = true;
   if (ineligible) ineligible.hidden = true;
   clearVouchStopButton();
+  clearVouchSwitchDefault();
   if (success) success.hidden = false;
   if (successCopy) {
     const count = verification?.vouch_count ?? 0;
@@ -221,6 +227,7 @@ function hideExplainer() {
   if (explainer) explainer.hidden = true;
   clearExplainerActions();
   clearVouchStopButton();
+  clearVouchSwitchDefault();
 }
 
 /**
@@ -401,15 +408,99 @@ async function showNoKeysExplainer(voucheeProfileId) {
     (e) => e.entry?.owner_private_key_b58 && e.entry?.owner_public_key_b58
   );
 
-  showExplainerHtml(
-    `${lines}${more} — but <strong>signing keys are not active in this browser tab</strong>. ` +
+  const multiple = eligible.length > 1;
+  const defaultSet = !!getDefaultVouchProfileId();
+  let lead;
+  if (multiple) {
+    lead =
+      `<strong>Choose which card signs this vouch.</strong> Signing keys are not active in this tab. ` +
+      (hasActivatable
+        ? `Tap a <strong>Use keys here</strong> button below. `
+        : `Re-save a card with keys on <a href="${walletUrl}">Saved cards</a>, then return here. `) +
+      (!defaultSet
+        ? `Or <a href="${walletUrl}">set a default for vouching</a> so future scans load one card automatically. `
+        : "");
+  } else {
+    lead =
+      `${lines}${more} — but <strong>signing keys are not active in this browser tab</strong>. ` +
       (hasActivatable
         ? `Tap <strong>Use keys here</strong> below to load keys and vouch on this page. `
-        : `Re-save your card with keys on <a href="${walletUrl}">Saved cards</a>, then return here. `) +
-      loadKeysHelpHtml(walletUrl) +
+        : `Re-save your card with keys on <a href="${walletUrl}">Saved cards</a>, then return here. `);
+  }
+
+  showExplainerHtml(
+    lead + loadKeysHelpHtml(walletUrl) +
       ` (<a href="${location.origin}/features/vouching.html">how vouching works</a>).`,
     eligible
   );
+}
+
+/**
+ * When keys are active for a different card than the user's vouch default.
+ * @param {Record<string, unknown>} session
+ */
+async function mountVouchSwitchDefault(session) {
+  clearVouchSwitchDefault();
+  if (!interactive) return;
+
+  const defaultId = getDefaultVouchProfileId();
+  if (!defaultId || !isVouchAutoActivateEnabled()) return;
+  if (session.profile_id === defaultId) return;
+
+  const defaultEntry = loadWallet().find((e) => e.profile_id === defaultId);
+  if (!defaultEntry?.owner_private_key_b58 || !defaultEntry?.owner_public_key_b58) {
+    return;
+  }
+
+  try {
+    const res = await fetch(
+      getCardStatusUrl(String(defaultEntry.profile_id), defaultEntry.qr_id ?? null),
+      { cache: "no-store" }
+    );
+    if (!res.ok) return;
+    const body = await res.json();
+    if (!isEligibleVoucherState(body?.scan?.verification?.state)) return;
+    if (body?.scan?.card?.status !== "active") return;
+  } catch {
+    return;
+  }
+
+  const currentLabel = session.handle
+    ? `@${session.handle}`
+    : cardLabel({
+        profile_id: session.profile_id,
+        label: session.wallet_label,
+        handle: session.handle,
+      });
+  const defaultLabel = cardLabel(defaultEntry);
+
+  const box = document.createElement("div");
+  box.id = "vouch-switch-default";
+  box.className = "vouch-card vouch-card-hint vouch-switch-default";
+  box.setAttribute("role", "note");
+
+  const copy = document.createElement("p");
+  copy.className = "vouch-lead";
+  copy.innerHTML =
+    `Keys in this tab are for <strong>${currentLabel}</strong>. ` +
+    `Your default for vouching is <strong>${defaultLabel}</strong>.`;
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "vouch-cta vouch-switch-default-btn";
+  btn.textContent = `Switch to ${defaultLabel}`;
+  btn.addEventListener("click", () => {
+    try {
+      sessionStorage.removeItem(VOUCH_SKIP_AUTO_KEY);
+    } catch {
+      /* ignore */
+    }
+    activateWalletEntry(defaultEntry);
+    runVouchFlow({ autoActivateAttempted: true });
+  });
+
+  box.append(copy, btn);
+  interactive.insertBefore(box, interactive.firstChild);
 }
 
 function bindSubmitHandler(voucheeProfileId) {
@@ -576,6 +667,8 @@ async function runVouchFlow(opts = {}) {
       ? `Vouching as ${voucherDisplay} (auto-loaded)`
       : `Keys active · ${toneHint}`
   );
+
+  await mountVouchSwitchDefault(session);
 
   bindSubmitHandler(voucheeProfileId);
 }

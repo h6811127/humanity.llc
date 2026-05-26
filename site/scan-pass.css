@@ -1067,6 +1067,19 @@ a {
   background: rgba(60, 60, 67, 0.06);
 }
 
+.vouch-switch-default {
+  margin-bottom: 12px;
+}
+
+.vouch-switch-default .vouch-lead {
+  margin-bottom: 10px;
+}
+
+.vouch-switch-default-btn {
+  background: #0a84ff;
+  margin-bottom: 0;
+}
+
 .scan-cross-tab-banner {
   margin: 0 var(--pad) 12px;
   padding: 12px 14px;

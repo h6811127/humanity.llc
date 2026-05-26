@@ -1,6 +1,6 @@
 # Vouch-ready keys (design draft)
 
-**Status:** Phases 1–4 shipped (Use keys here, wallet default, scan auto-activate, Stop, cross-tab vouch notice on scan)  
+**Status:** Phases 1–5 shipped; PIN/unlock gate (option E) deferred  
 **Audience:** Product, security review, implementers  
 **Related:** [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md), [`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md), [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)
 
@@ -165,8 +165,9 @@ Network eligibility should reuse `getCardStatusUrl` + `isEligibleVoucherState` (
 | **2** | Wallet **Default for vouching** + `hc_default_vouch_profile_id` | Shipped (`vouch-ready-keys.mjs`, hub ⋯ menu) |
 | **3** | Opt-in auto-activate on scan when default set | Shipped (`vouch-issue.mjs?v=7`) |
 | **4** | “Stop” on scan + cross-tab notice when auto-activated | Shipped (`scan-tab-keys.mjs`, `scan-cross-tab-banner`) |
+| **5** | Multi-card picker copy + **Switch to default** when wrong keys active | Shipped (`vouch-issue.mjs?v=10`) |
 
-Worker/API: **no change** for phases 1–3.
+Worker/API: **no change** for vouch-ready keys.
 
 ---
 

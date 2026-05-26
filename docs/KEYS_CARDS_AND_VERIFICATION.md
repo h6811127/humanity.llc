@@ -109,6 +109,8 @@ Per **device**, storage:
 3. **This phone/browser:** Set **Default for vouching** on your steward card in **Saved cards** (⋯ menu) so scans auto-load keys, or tap **Use keys here** on the scan page. Fallback: **Use keys** on `/wallet/` then **Return to scan to vouch** on `/created/`.
 4. Submit the vouch on the vouchee’s **active** scan page.
 
+**iPhone tip:** Open the scan in **Safari** (same browser where you saved the card). QR opens from Camera often start a new tab — that is fine if **Default for vouching** is set or you tap **Use keys here**. Keys do not sync across Chrome and Safari.
+
 If step 3 is skipped, you will see **“keys not active on this device”** even when the network says Steward.
 
 **Vouch-ready keys (optional):** On **Saved cards**, set **Default for vouching** (⋯ menu). Scan pages then auto-load that card’s keys in this tab. If keys are active in another tab, the scan shows a cross-tab notice with **Open that tab** or **Use keys here**. See [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md).
