@@ -1,6 +1,6 @@
 # Safe UI/UX rebuild — implementation plan
 
-**Status:** Step 1 complete · Step 2 complete · Step 3 complete · Step 4 complete  
+**Status:** Steps 1–5 complete (safe rebuild plan)  
 **Audience:** Engineers restoring May 25–26 shell work without landing lag or rate limits  
 **Related:** [`UI_UX_REVERTED_FEATURES_CATALOG.md`](UI_UX_REVERTED_FEATURES_CATALOG.md) · [`UI_UX_REVERT_PLAN.md`](UI_UX_REVERT_PLAN.md) · [`SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md`](SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md)
 
@@ -154,9 +154,19 @@ Shipped (2026-05-26):
 
 ---
 
-## Step 5 — Optional chrome inset floor (planned)
+## Step 5 — Chrome inset floor (implemented)
 
-Only if iPhone reports scroll jump at page bottom **without** scroll-edge chrome: monotonic `--shell-chrome-h` in `syncShellChromeInset` only.
+**Intent:** Prevent layout jump when measured bar height shrinks, without reintroducing scroll-edge chrome.
+
+Shipped (2026-05-26):
+
+- `chromeInsetFloor` in `site/js/device-shell-chrome.mjs` — `syncShellChromeInset()` only increases `--shell-chrome-h`, never shrinks.
+- No `scroll` listener, no `top-chrome--edge-hidden`, no `device-shell-chrome-core.mjs`.
+- `DEVICE_SHELL_ASSET_VERSION` → **34**; Vitest `worker/tests/device-shell-chrome-inset.test.ts`.
+
+### Forbidden
+
+- Document scroll-edge chrome or fixed cluster on `top-chrome--edge-hidden` (pairs with shrinking inset — see catalog §5–§6).
 
 ---
 
@@ -188,3 +198,4 @@ Only if iPhone reports scroll jump at page bottom **without** scroll-edge chrome
 |------|--------|
 | 2026-05-26 | Initial plan; Step 1 implementation |
 | 2026-05-26 | Step 4: dot `touch-action`, collapsed inbox hit-test, coarse backdrop blur-off only |
+| 2026-05-26 | Step 5: monotonic `chromeInsetFloor` in `syncShellChromeInset` only |

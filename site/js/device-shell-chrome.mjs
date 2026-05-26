@@ -1,16 +1,20 @@
 /**
  * Floating shell chrome inset (minimal dot + Create bar).
  * Document scroll-edge hide/show removed — caused landing jank and layout thrash on WebKit.
- * @see docs/UI_UX_REVERT_PLAN.md step 1
- * @see docs/SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md
+ * @see docs/UI_UX_SAFE_REBUILD_IMPLEMENTATION.md Step 5
+ * @see docs/UI_UX_REVERTED_FEATURES_CATALOG.md §5
  */
 const chrome = document.getElementById("top-chrome");
+
+/** Largest measured chrome bar height — never shrink (avoids scroll jump). */
+let chromeInsetFloor = 0;
 
 export function syncShellChromeInset() {
   if (!chrome) return;
   const bar = chrome.querySelector(".top-chrome-bar");
-  const h = (bar || chrome).getBoundingClientRect().height;
-  document.documentElement.style.setProperty("--shell-chrome-h", `${Math.ceil(h)}px`);
+  const h = Math.ceil((bar || chrome).getBoundingClientRect().height);
+  if (h > chromeInsetFloor) chromeInsetFloor = h;
+  document.documentElement.style.setProperty("--shell-chrome-h", `${chromeInsetFloor}px`);
 }
 
 export function initShellChrome() {
