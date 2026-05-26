@@ -9,9 +9,9 @@
 
 ## Purpose
 
-Vouch abuse is mitigated by **cryptographic rules** (quota, threshold, signatures) and **human triage** of operator-only graph heuristics. This runbook is step 1 of M6 Step 4: expose flags, review manually, act under published rules—no public graph on scan pages.
+Vouch abuse is mitigated by **cryptographic rules** (quota, threshold, signatures) and **human triage** of operator-only graph heuristics. This runbook covers the shipped M6 Step 4 controls: operator review queue plus steward-specific issuance guardrails.
 
-**Not in v1 step 1:** automated suspension, dismiss tracking in D1, steward UI. Actions remain manual (DB, support, future operator tools).
+**Still manual in v1:** automated suspension. Review actions remain manual (DB, support, operator workflow).
 
 ---
 
@@ -189,7 +189,7 @@ Always document **cause** and **appeal path** per Human Verification HV-FR-40.
 | **1 (this doc + API)** | Runbook + `GET …/operator/vouch-audit-flags` |
 | 2 | Dismiss/notes table + operator UI |
 | 3 | Directed-cycle / clique detection (**G-02**) |
-| 4 | Per-steward issuance cap policy |
+| 4 | Per-steward issuance cap policy (**shipped**) |
 
 ---
 

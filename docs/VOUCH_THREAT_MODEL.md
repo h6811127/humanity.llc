@@ -90,7 +90,7 @@ Impact: **L** low · **M** medium · **H** high (trust in network / harm to vouc
 |----|--------|------|---|---|-------------|-----------------|
 | R-01 | **Card farm** | Mass `create` → registered cards | H | M | Waitlist/rate limits (policy; partial) | Registration ≠ VH; farms still pollute namespace |
 | R-02 | **Clique elevation** | ≥4 sybil profiles, each vouches the other 3 → all reach VH | M | H | Threshold=3; quota; 90d wait between waves | **Minimum 4-node clique** can self-elevate; audit may not flag if not closed-loop-only |
-| R-03 | **Steward-backed farm** | Steward vouches many fresh cards quickly | M | H | Steward bypasses 90d wait; quota still 5/yr | **Steward concentration**; no per-steward vouch cap in v1 |
+| R-03 | **Steward-backed farm** | Steward vouches many fresh cards quickly | M | H | Steward bypasses 90d wait; steward cap 3/yr; burst audit | **Steward concentration** remains; manual review still required |
 | R-04 | **Multi-card same human** | One person, many `profile_id`s | H | M | No uniqueness claim | Honest copy; cross-card linking out of scope v1 |
 | R-05 | **Purchased “verified” account** | Buy wallet backup with VH keys | L | H | Keys not sold by protocol | Social market for compromised backups |
 
@@ -125,7 +125,7 @@ Impact: **L** low · **M** medium · **H** high (trust in network / harm to vouc
 | ID | Threat | Path | L | I | V1 controls | Gaps / residual |
 |----|--------|------|---|---|-------------|-----------------|
 | S-01 | **Steward capture** | Operator never sunsets bootstrap keys | M | H | Documented bootstrap | **A-012G** federation / governance |
-| S-02 | **Malicious steward vouch** | Fast-path bad actors | M | H | 5/yr quota; public statement | No steward-specific lower quota |
+| S-02 | **Malicious steward vouch** | Fast-path bad actors | M | H | Steward quota cap 3/yr; public statement; burst audit | Key compromise still high-leverage |
 | S-03 | **Steward credential theft** | Stolen steward keys | L | H | Same as V-04/V-05 | High leverage account |
 | S-04 | **Suspension lag** | Bad actor stays active until manual review | M | M | `suspended` overrides display | Playbook not fully automated |
 
@@ -195,7 +195,7 @@ Mitigate: Ask live control (M7); limitations copy
 
 ```text
 Steal backup / session (V-04, V-05)
-  → Up to 5 vouches/year each target (quota)
+  → Up to 3 vouches/year per steward key (quota cap)
   → No 90d wait
 Detect: burst_at_quota_boundary, new voucher→unknown vouchee edges
 Respond: suspend steward, rotate keys, revoke batch
@@ -213,6 +213,7 @@ Respond: suspend steward, rotate keys, revoke batch
 | `burst_at_quota_boundary` | ≥5 issuances in 24h in quota window | Legitimate burst possible |
 | `shared_voucher_set` | Two vouchees share ≥3 vouchers, Jaccard ≥0.75 | Heuristic |
 | `directed_cycle_cluster` | SCC cycle cluster with density threshold | Heuristic; can include benign cohorts |
+| `steward_issuance_burst` | Steward issued N vouches in burst window (default 3/24h) | Event onboarding can look similar |
 
 **Steward review queue:** Step 1+2 shipped — runbook + operator API + dismiss notes API + operator UI prototype with steward entry point from `/created/` Advanced. See [`VOUCH_STEWARD_REVIEW_RUNBOOK.md`](VOUCH_STEWARD_REVIEW_RUNBOOK.md).
 
@@ -239,7 +240,7 @@ Respond: suspend steward, rotate keys, revoke batch
 | P0 | Steward review queue + runbook | G-01–G-08, S-01 | **Step 1+2 shipped** (read API + dismiss API + UI prototype) |
 | P0 | Card creation rate limits + launch monitoring | R-01, A-012F |
 | P1 | Graph flag: **directed cycle** / clique suspicion (≥4 mutual VH set) | R-02, G-02 | **Shipped** (`directed_cycle_cluster`) |
-| P1 | Per-steward vouch cap or enhanced audit for steward issuances | R-03, S-02 | Enhanced audit shipped (`steward_issuance_burst`); hard cap policy pending |
+| P1 | Per-steward vouch cap or enhanced audit for steward issuances | R-03, S-02 | **Shipped** (steward cap policy + `steward_issuance_burst`) |
 | P1 | Integrator guide: recency + live control + not KYC | I-02, I-03 |
 | P2 | Optional PIN / WebAuthn before `Sign and submit` | V-04, A-02 |
 | P2 | Vouchee-initiated dispute / steward revoke | H-01 |

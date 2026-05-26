@@ -136,6 +136,7 @@ function plainVouchError(code, fallback) {
       "Your card must be Vouched Human or Steward before you can vouch.",
     VOUCHER_TOO_NEW: `Wait ${VOUCHER_WAIT_DAYS} days after verification before vouching.`,
     VOUCH_QUOTA_EXCEEDED: "Annual limit: 5 vouches per voucher.",
+    STEWARD_VOUCH_QUOTA_EXCEEDED: "Steward annual limit: 3 vouches per voucher.",
     VOUCH_ALREADY_ACTIVE: "You already have an active vouch for this profile.",
     VOUCH_ALREADY_EXISTS: "This vouch is already on the network.",
     VOUCHER_INACTIVE: "Your card is inactive.",

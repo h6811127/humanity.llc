@@ -1,6 +1,6 @@
 # M6  -  Vouching design
 
-**Status:** Step 1 (V-001) shipped in repo  -  verify on production; Steps 2–3 shipped; Step 4 step 1+2 shipped (audit API, dismiss API, steward workflow entry, operator UI prototype)
+**Status:** Step 1 (V-001) shipped in repo  -  verify on production; Steps 2–3 shipped; Step 4 shipped (audit API, dismiss API, steward workflow entry, operator UI prototype, steward issuance cap policy)
 **Canonical refs:** [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md) (product framing), [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) (adversarial catalog), `docs/V1_PRODUCT_TRUST_MODEL.md` § Level 2, `docs/V1_ADVERSARIAL_REVIEW.md` § Perspective 1, `docs/features/Human Verification v1.0.md`, `docs/V1_IMPLEMENTATION_BACKLOG.md` (V-001, V-002)  
 **Product thesis:** Live control proves recent key possession. Vouching proves **accountable humans staked public, revocable attestations** on this card under published rules—not legal ID, not global biometric uniqueness, not liveness at every click.
 
@@ -114,7 +114,8 @@ Design for hostile actors, not only happy-path founders. **Full threat catalog:*
 | Control | V1 status |
 |---|---|
 | 3 distinct vouchers required | Enforced in summary recalc |
-| 5 active vouches per voucher per year | **Enforced** (`VOUCHER_ACTIVE_QUOTA_PER_YEAR`) |
+| 5 yearly issuances per verified-human voucher | **Enforced** (`VOUCHER_ACTIVE_QUOTA_PER_YEAR`) |
+| 3 yearly issuances per steward voucher | **Enforced** (`STEWARD_VOUCHER_ISSUANCE_CAP_PER_YEAR`) |
 | 90-day wait after voucher becomes verified | **Enforced** (`VOUCHER_WAIT_DAYS`) |
 | One active vouch per voucher→vouchee pair | **Unique index** |
 | Steward audit hooks for suspicious clusters | **Shipped** (`closed_loop_only`, `shared_voucher_set`, `directed_cycle_cluster`, `steward_issuance_burst`) |

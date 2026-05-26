@@ -290,6 +290,60 @@ describe("handlePostVouch", () => {
     expect(res.status).toBe(201);
   });
 
+  it("enforces steward yearly issuance cap", async () => {
+    const db = new FakeVerificationDb();
+    const voucheeKeys = await keypair();
+    db.addCard(VOUCHEE, voucheeKeys.publicKeyBase58);
+
+    const stewardProfileId = "8Ym8nQ3pR5sU7wX9zA2bC4dE6";
+    const stewardKeys = await keypair();
+    db.addCard(stewardProfileId, stewardKeys.publicKeyBase58);
+    db.setSummary(stewardProfileId, {
+      state: "steward",
+      level: 3,
+      label: "Steward",
+      method: "governance",
+      updated_at: "2026-05-20T00:00:00.000Z",
+    });
+
+    for (let i = 0; i < 3; i++) {
+      const target = `7Xk9mP2nQ4rT6vW8yZ1aB3cD${i + 1}`;
+      const targetKeys = await keypair();
+      db.addCard(target, targetKeys.publicKeyBase58);
+      const ok = await post(
+        db,
+        await signedVouch({
+          voucherProfileId: stewardProfileId,
+          voucheeProfileId: target,
+          vouchId: `vouch_steward_cap_${i}`,
+          nonce: `nonce_steward_cap_${i}`,
+          createdAt: `2026-05-${20 + i}T17:00:00.000Z`,
+          ...stewardKeys,
+        })
+      );
+      expect(ok.status).toBe(201);
+    }
+
+    const extraTarget = "7Xk9mP2nQ4rT6vW8yZ1aB3cD9";
+    const extraTargetKeys = await keypair();
+    db.addCard(extraTarget, extraTargetKeys.publicKeyBase58);
+    const blocked = await post(
+      db,
+      await signedVouch({
+        voucherProfileId: stewardProfileId,
+        voucheeProfileId: extraTarget,
+        vouchId: "vouch_steward_cap_blocked",
+        nonce: "nonce_steward_cap_blocked",
+        createdAt: "2026-05-24T17:00:00.000Z",
+        ...stewardKeys,
+      })
+    );
+    expect(blocked.status).toBe(403);
+    expect((await blocked.json()) as { error: string }).toMatchObject({
+      error: "STEWARD_VOUCH_QUOTA_EXCEEDED",
+    });
+  });
+
   it("enforces the 90 day wait period", async () => {
     const db = new FakeVerificationDb();
     const voucherKeys = await keypair();
