@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildInboxItems,
+  buildInboxSheetRows,
   inboxBadgeAriaLabel,
   inboxBadgeCountText,
   inboxCountFromItems,
@@ -125,5 +126,53 @@ describe("inboxBadgeCountText", () => {
   it("caps display at 9+", () => {
     expect(inboxBadgeCountText(10)).toBe("9+");
     expect(inboxBadgeCountText(3)).toBe("3");
+  });
+});
+
+describe("buildInboxSheetRows", () => {
+  it("expands live proof into one row per pending challenge", () => {
+    const items = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 2,
+      crossTabEntries: [],
+    });
+    const rows = buildInboxSheetRows(items, {
+      liveProofPending: [
+        {
+          challenge_id: "c1",
+          entry: { label: "Card A", profile_id: "p1" },
+          expires_at: "2026-01-01T00:00:00Z",
+        },
+        {
+          challenge_id: "c2",
+          entry: { handle: "bob", profile_id: "p2" },
+        },
+      ],
+      formatProofExpiry: () => "5m left",
+    });
+    expect(rows).toHaveLength(2);
+    expect(rows[0].title).toBe("Card A");
+    expect(rows[0].subtitle).toContain("5m left");
+    expect(rows[1].title).toBe("@bob");
+  });
+
+  it("lists each cross-tab entry as its own row", () => {
+    const items = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 0,
+      crossTabEntries: [
+        { profile_id: "a", tabId: "t1", handle: "one" },
+        { profile_id: "b", tabId: "t2", label: "Two" },
+      ],
+    });
+    const rows = buildInboxSheetRows(items, {
+      crossTabEntries: [
+        { profile_id: "a", tabId: "t1", handle: "one" },
+        { profile_id: "b", tabId: "t2", label: "Two" },
+      ],
+    });
+    expect(rows).toHaveLength(2);
+    expect(rows[0].subtitle).toBe("@one");
+    expect(rows[1].subtitle).toBe("Two");
   });
 });

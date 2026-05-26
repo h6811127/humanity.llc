@@ -84,6 +84,20 @@ html[data-theme="dark"] .device-hub.device-hub--sheet {
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.55);
 }
 
+html[data-theme="dark"] .device-inbox-sheet {
+  background: #1c1c1e;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.55);
+}
+
+html[data-theme="dark"] .device-inbox-sheet-handle {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+html[data-theme="dark"] .device-inbox-sheet-close {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--shell-label);
+}
+
 html[data-theme="dark"] .device-hub-sheet-handle {
   background: rgba(255, 255, 255, 0.22);
 }

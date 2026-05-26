@@ -110,14 +110,14 @@ See [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 
 - Visible when `notificationCount() > 0` (`device-inbox.mjs` → `inboxCountFromItems(getInboxItems())`).
 - `aria-label` from `inboxBadgeAriaLabel()` (shipped phase 2).
-- Tap: on wallet → scroll `#wallet-alerts-top`; elsewhere → expand hub + scroll `#device-hub-alerts-top`.
+- Tap → **`openInboxFromChrome()`** opens compact inbox sheet (`device-inbox-sheet.mjs`); one row per live proof / cross-tab / tab notice with same CTAs as hub alerts.
+- On wallet, badge opens the same sheet (no hub expand + scroll).
+- `aria-label` from `inboxBadgeAriaLabel()` (phase 2).
 - Styled in `site/css/device-shell.css` (red ring + count).
 
 **Planned:**
 
-- Rich `aria-label`: e.g. “3 items need attention: 2 live proofs, keys in another tab”.
-- **Dedicated inbox sheet** on badge tap (lighter than full hub)—same actions as alert stack.
-- Ring color matches `topInboxKind()` (amber proof, blue cross-tab).
+- Ring color matches `topInboxKind()` (amber proof, blue cross-tab) — phase 5.
 
 ### Hub alerts stack (`#device-hub-alerts-top`)
 
@@ -229,7 +229,7 @@ See [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 | 0 | This document + cross-links in DEVICE_OS / STATUS_INDICATOR | ✅ |
 | 1 | `device-inbox-core.mjs` — `buildInboxItems()`, `inboxCountFromItems()`, `topInboxKind()` | ✅ |
 | 2 | Refactor `notificationCount()`, glance, dot overlay, badge ARIA to use core | ✅ (hub alert DOM still in `device-hub-ui.mjs`; same scroll targets) |
-| 3 | Inbox sheet from `#shell-notif-badge`; shared `openInboxFromChrome()` | Planned |
+| 3 | Inbox sheet from `#shell-notif-badge`; shared `openInboxFromChrome()` | ✅ |
 | 4 | Contextual browser-alert prompt + OS click deep link | Planned |
 | 5 | Badge/dot chroma sync to `topInboxKind()` | Planned |
 | 6 | E2E: proof → badge → row; Playwright `Notification` permission | Planned |
@@ -276,6 +276,7 @@ Confusion signal: repeated `inbox_open` without `inbox_item_action` → copy or 
 
 | `site/js/device-inbox-core.mjs` | Pure inbox model |
 | `site/js/device-inbox.mjs` | Browser facade (`getInboxItems`, `notificationCount`) |
+| `site/js/device-inbox-sheet.mjs` | Inbox bottom sheet + `openInboxFromChrome()` |
 | `worker/tests/device-inbox.test.ts` | Vitest for inbox core |
 
 ---

@@ -26,6 +26,7 @@ import "./device-shell-motion.mjs";
 import "./device-shell-chrome.mjs";
 import "./device-theme.mjs";
 import "./device-browser-notifications.mjs";
+import { openInboxFromChrome, setInboxSheetOpen, isInboxSheetOpen } from "./device-inbox-sheet.mjs";
 import { isHubSheet, setHubSheetOpen } from "./device-hub-sheet.mjs";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 import {
@@ -123,7 +124,10 @@ function isWalletPage() {
 
 export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
   if (!hub) return;
-  if (open) closeGlancePopover();
+  if (open) {
+    closeGlancePopover();
+    setInboxSheetOpen(false);
+  }
   if (isHubSheet()) {
     setHubSheetOpen(open);
   } else {
@@ -347,15 +351,11 @@ function renderNotifBadge() {
   }
 }
 
-function scrollToFirstNotification() {
-  const alerts =
-    document.getElementById("wallet-alerts-top") ||
-    document.getElementById("device-hub-alerts-top");
-  alerts?.scrollIntoView({
-    behavior: prefersReducedMotion() ? "auto" : "smooth",
-    block: "nearest",
-  });
-}
+const INBOX_HUB_TARGETS = new Set([
+  "device-hub-live-control-group",
+  "device-hub-notice-group",
+  "device-hub-crosstab-notice",
+]);
 
 function renderSystemBanner() {
   if (!systemBanner) return;
@@ -410,20 +410,7 @@ function openWalletFromChrome() {
   hapticTap();
 }
 
-function openNotificationsFromChrome() {
-  if (isWalletPage()) {
-    hapticTap();
-    scrollToFirstNotification();
-    return;
-  }
-  if (!hub) {
-    location.href = "/";
-    return;
-  }
-  closeGlancePopover();
-  setHubExpanded(true, { haptic: true, persist: false });
-  window.setTimeout(scrollToFirstNotification, 120);
-}
+export { openInboxFromChrome };
 
 function openHubFromChrome() {
   closeGlancePopover();
@@ -461,13 +448,17 @@ dotBtn?.addEventListener("click", (e) => {
 notifBtn?.addEventListener("click", (e) => {
   e.preventDefault();
   e.stopPropagation();
-  openNotificationsFromChrome();
+  openInboxFromChrome();
 });
 
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
   if (isGlancePopoverOpen()) {
     closeGlancePopover();
+    return;
+  }
+  if (isInboxSheetOpen()) {
+    setInboxSheetOpen(false);
     return;
   }
   if (hub && !hub.classList.contains("device-hub-collapsed")) {
@@ -507,6 +498,10 @@ window.addEventListener("hc-tab-presence-changed", refreshSummary);
 
 window.addEventListener("hc-hub-expand-request", (e) => {
   const targetId = e.detail?.targetId;
+  if (targetId && INBOX_HUB_TARGETS.has(targetId)) {
+    openInboxFromChrome();
+    return;
+  }
   if (isWalletPage()) {
     if (targetId) {
       document.getElementById(targetId)?.scrollIntoView({
@@ -514,7 +509,7 @@ window.addEventListener("hc-hub-expand-request", (e) => {
         block: "nearest",
       });
     } else {
-      scrollToFirstNotification();
+      openInboxFromChrome();
     }
     return;
   }
@@ -553,6 +548,6 @@ document.addEventListener("click", (e) => {
     return;
   }
   if (action === "open_notifications") {
-    openNotificationsFromChrome();
+    openInboxFromChrome();
   }
 });

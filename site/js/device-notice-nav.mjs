@@ -46,6 +46,7 @@ export function walletEntryForProfile(profileId) {
 function closeHubOverlays() {
   window.dispatchEvent(new CustomEvent("hc-hub-sheet-close"));
   window.dispatchEvent(new CustomEvent("hc-glance-popover-close"));
+  window.dispatchEvent(new CustomEvent("hc-inbox-sheet-close"));
 }
 
 /**

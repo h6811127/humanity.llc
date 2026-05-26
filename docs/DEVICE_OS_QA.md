@@ -131,8 +131,8 @@ Spec: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 |------|--------|----------|
 | 1 | Unsaved tab keys | Pulsing red dot; badge may show `1` |
 | 2 | Live proof pending (saved card) | Amber overlay on dot; badge includes proof count |
-| 3 | Tap dot | Opens hub (not same as badge-only inbox sheet — until inbox sheet ships) |
-| 4 | Tap badge | Hub expands (landing) or scrolls alerts (wallet) |
+| 3 | Tap dot | Opens hub (wallet: scrolls to saved) |
+| 4 | Tap badge | Inbox sheet opens (`device-inbox-sheet`); one row per actionable item |
 
 ---
 

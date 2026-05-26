@@ -162,3 +162,101 @@ export function inboxBadgeCountText(n) {
   if (n <= 0) return "0";
   return n > 9 ? "9+" : String(n);
 }
+
+/**
+ * @typedef {'gold' | 'blue' | 'notice'} InboxSheetTone
+ */
+
+/**
+ * @typedef {object} InboxSheetRow
+ * @property {InboxKind} kind
+ * @property {string} title
+ * @property {string} subtitle
+ * @property {InboxSheetTone} tone
+ * @property {{ entry: Record<string, unknown>, challenge_id: string, expires_at?: string }} [proofItem]
+ * @property {InboxCrossTabEntry} [crossTabEntry]
+ */
+
+/**
+ * @param {Record<string, unknown>} entry
+ */
+export function inboxWalletEntryLabel(entry) {
+  if (typeof entry?.label === "string" && entry.label) return entry.label;
+  if (typeof entry?.handle === "string" && entry.handle) return `@${entry.handle}`;
+  const id = typeof entry?.profile_id === "string" ? entry.profile_id : "";
+  return id ? `${id.slice(0, 12)}…` : "Saved card";
+}
+
+/**
+ * @param {InboxCrossTabEntry} entry
+ */
+export function inboxCrossTabLabel(entry) {
+  if (entry.label) return entry.label;
+  if (entry.handle) return `@${entry.handle}`;
+  return `${entry.profile_id.slice(0, 12)}…`;
+}
+
+/**
+ * Expand aggregate inbox items into one sheet row per actionable target.
+ * @param {InboxItem[]} items
+ * @param {{
+ *   liveProofPending?: Array<{ entry: Record<string, unknown>, challenge_id: string, expires_at?: string }>,
+ *   crossTabEntries?: InboxCrossTabEntry[],
+ *   formatProofExpiry?: (iso: string) => string,
+ * }} ctx
+ * @returns {InboxSheetRow[]}
+ */
+export function buildInboxSheetRows(items, ctx = {}) {
+  const {
+    liveProofPending = [],
+    crossTabEntries = [],
+    formatProofExpiry = (iso) => iso,
+  } = ctx;
+
+  /** @type {InboxSheetRow[]} */
+  const rows = [];
+
+  for (const item of items) {
+    if (item.kind === "live_proof") {
+      for (const proof of liveProofPending) {
+        const label = inboxWalletEntryLabel(proof.entry);
+        const expiry =
+          typeof proof.expires_at === "string" && proof.expires_at
+            ? formatProofExpiry(proof.expires_at)
+            : "";
+        rows.push({
+          kind: "live_proof",
+          title: label,
+          subtitle: expiry ? `Someone is waiting · ${expiry}` : "Someone is waiting",
+          tone: "gold",
+          proofItem: proof,
+        });
+      }
+      continue;
+    }
+
+    if (item.kind === "cross_tab_keys") {
+      for (const entry of crossTabEntries) {
+        rows.push({
+          kind: "cross_tab_keys",
+          title: "Keys in another tab",
+          subtitle: inboxCrossTabLabel(entry),
+          tone: "blue",
+          crossTabEntry: entry,
+        });
+      }
+      continue;
+    }
+
+    if (item.kind === "tab_keys_unsaved") {
+      rows.push({
+        kind: "tab_keys_unsaved",
+        title: item.title,
+        subtitle: item.subtitle ?? "",
+        tone: "notice",
+      });
+    }
+  }
+
+  return rows;
+}

@@ -2,6 +2,7 @@
  * Compact hub summary: landing when sheet is collapsed; /wallet/ always when non-empty.
  */
 import { getInboxItems } from "./device-inbox.mjs";
+import { openInboxFromChrome } from "./device-inbox-sheet.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
 import {
@@ -75,7 +76,7 @@ function appendInboxGlanceRow(item, list, copy) {
         <span class="device-hub-glance-sub">${escapeHtml(copy.liveProofSub)}</span>
       </button>`;
     li.querySelector("button")?.addEventListener("click", () => {
-      expandHub(item.hubScrollTarget ?? "device-hub-live-control-group");
+      openInboxFromChrome();
     });
     list.appendChild(li);
     return;

@@ -1440,6 +1440,141 @@ body.device-hub-sheet-open {
   overflow: hidden;
 }
 
+/* Inbox sheet (needs attention) */
+.device-inbox-sheet {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 57;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 430px;
+  max-height: min(72dvh, 520px);
+  margin: 0;
+  padding: 0;
+  transform: translateX(-50%) translateY(100%);
+  transition: transform 0.45s var(--shell-spring);
+  border-radius: var(--shell-radius-sheet) var(--shell-radius-sheet) 0 0;
+  background: rgba(250, 250, 252, 0.92);
+  color: var(--shell-label-strong);
+  box-shadow: var(--shell-shadow-sheet);
+  -webkit-backdrop-filter: var(--shell-blur);
+  backdrop-filter: var(--shell-blur);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+.device-inbox-sheet:not(.device-inbox-sheet--collapsed) {
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+.device-inbox-sheet-body {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px var(--pad) calc(16px + env(safe-area-inset-bottom, 0px));
+  flex: 1;
+  min-height: 0;
+}
+
+.device-inbox-sheet--collapsed .device-inbox-sheet-body {
+  display: none;
+}
+
+.device-inbox-sheet-handle {
+  width: 36px;
+  height: 5px;
+  margin: 8px auto 4px;
+  border-radius: 3px;
+  background: rgba(60, 60, 67, 0.22);
+  flex-shrink: 0;
+}
+
+.device-inbox-sheet-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  z-index: 4;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(120, 120, 128, 0.14);
+  font-size: 22px;
+  line-height: 1;
+  color: var(--shell-label);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.device-inbox-sheet-title {
+  margin: 0 0 10px;
+  padding: 0 4px;
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+}
+
+.device-inbox-sheet-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.device-inbox-sheet-empty {
+  padding: 12px 4px;
+  font-size: 15px;
+  color: var(--shell-label);
+}
+
+.device-inbox-sheet-row-btn {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.device-inbox-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 56;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: rgba(0, 0, 0, 0.22);
+  -webkit-backdrop-filter: saturate(160%) blur(28px);
+  backdrop-filter: saturate(160%) blur(28px);
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.35s var(--shell-ease),
+    visibility 0.35s var(--shell-ease);
+}
+
+.device-inbox-backdrop.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+body.device-inbox-sheet-open {
+  overflow: hidden;
+}
+
+body.device-inbox-sheet-open .top-chrome--inbox-locked .shell-status-dot-btn,
+body.device-inbox-sheet-open .top-chrome--inbox-locked .shell-notif-badge {
+  pointer-events: auto;
+}
+
 body.device-hub-sheet-open .shell-status-dot {
   view-transition-name: none;
 }
