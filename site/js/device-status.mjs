@@ -20,17 +20,16 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeCountText,
   notificationCount,
-} from "./device-inbox.mjs?v=31";
+} from "./device-inbox.mjs?v=33";
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import {
-  hideHubIntroCoachmark,
   initHubIntroCoachmark,
   onHubOpenedFromIntro,
 } from "./device-hub-intro-coachmark.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=31";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=33";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
