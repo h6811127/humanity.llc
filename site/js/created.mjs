@@ -1,6 +1,4 @@
 import {
-  getCardJsonUrl,
-  getCardStatusUrl,
   getPendingLiveControlChallengeUrl,
   postLiveControlResponseUrl,
   qrScanUrl,
@@ -35,6 +33,12 @@ import { verificationRecordFromStatusBody } from "./device-wallet-network-core.m
 import { activateWalletEntry } from "./device-keys.mjs";
 import { isWalletSaved, loadWallet, saveSessionToWallet } from "./device-wallet.mjs";
 import { applyHumanTrustIconToElement } from "./human-trust-ui.mjs";
+import {
+  applyCreatedRoutePendingShell,
+  applyCreatedRouteShell,
+  gateCreatedRoute,
+} from "./created-route-gate.mjs";
+import { getCardJsonUrl, getCardStatusUrl } from "./hc-sign.mjs";
 
 const params = new URLSearchParams(location.search);
 const profileIdParam = params.get("profile_id")?.trim() || null;
@@ -119,19 +123,61 @@ if (profileIdParam && !data?.owner_private_key_b58) {
   }
 }
 
+const noSessionEl = document.getElementById("no-session");
+
+applyCreatedRoutePendingShell();
+
+const routeGate = await gateCreatedRoute({
+  profileIdParam,
+  qrIdParam,
+  loadSession,
+  fetchCard: (profileId) =>
+    fetch(getCardJsonUrl(profileId), {
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    }),
+  fetchStatus: (profileId, qrId) =>
+    fetch(getCardStatusUrl(profileId, qrId), { cache: "no-store" }),
+});
+
+if (routeGate.action === "redirect_wallet") {
+  location.replace("/wallet/");
+} else {
+  applyCreatedRouteShell(routeGate);
+  if (routeGate.action === "invalid_link") {
+    showError(routeGate.message ?? "This link is not valid.");
+  } else if (routeGate.action === "incomplete_link") {
+    setNoSessionNotice(routeGate.message ?? "");
+  } else if (routeGate.action === "session_mismatch") {
+    setNoSessionNotice(routeGate.noticeHtml ?? "");
+  }
+
+  if (routeGate.action === "ok") {
+    await bootCreatedMain(routeGate);
+  } else if (routeGate.profileId) {
+    const profileIdElEarly = document.getElementById("profile-id");
+    if (profileIdElEarly) profileIdElEarly.textContent = routeGate.profileId;
+    const jsonLinkEarly = document.getElementById("card-json-link");
+    if (jsonLinkEarly) jsonLinkEarly.href = getCardJsonUrl(routeGate.profileId);
+  }
+}
+
+/**
+ * @param {{ profileId: string, qrId: string, card?: Record<string, unknown> }} gate
+ */
+async function bootCreatedMain(gate) {
 const apiOrigin = resolverApiOrigin();
 const scanOrigin =
   apiOrigin.includes("127.0.0.1") || apiOrigin.includes("localhost")
     ? apiOrigin
     : location.origin;
 
-const profileId = data?.profile_id || profileIdParam;
-let activeQrId = data?.qr_id || qrIdParam;
+const profileId = gate.profileId;
+let activeQrId = gate.qrId;
 let activeScanUrl =
   data?.scan_url ||
   (profileId && activeQrId ? qrScanUrl(profileId, activeQrId, scanOrigin) : null);
 
-const noSessionEl = document.getElementById("no-session");
 const handleEl = document.getElementById("created-handle");
 const manifestoEl = document.getElementById("created-manifesto");
 const scanUrlEl = document.getElementById("scan-url");
@@ -649,21 +695,23 @@ function applyOrganizerHandoffUi(session) {
   });
 }
 
-if (!profileId && !activeQrId && !data) {
-  // Route contextless visits to the My cards home.
-  location.replace("/wallet/");
-} else if (!profileId || !activeQrId) {
-  setNoSessionNotice(
-    "Missing profile or QR in this link. Create a new card, or open the full URL from your create confirmation."
-  );
-} else if (
-  profileIdParam &&
-  data?.profile_id &&
-  profileIdParam !== data.profile_id
-) {
-  setNoSessionNotice(
-    'This link is for a different card than the keys in this tab. Open <a href="/wallet/">My cards</a> and tap <strong>Open controls</strong> on the card you want.'
-  );
+if (gate.card?.handle && gate.card?.manifesto_line) {
+  const existing = loadSession() || {};
+  if (!existing.handle || !existing.manifesto_line) {
+    const next = {
+      ...existing,
+      profile_id: profileId,
+      qr_id: activeQrId,
+      handle: gate.card.handle,
+      manifesto_line: gate.card.manifesto_line,
+      created_at: gate.card.created_at ?? existing.created_at,
+      status: gate.card.status || existing.status || "active",
+      pilot_template:
+        existing.pilot_template || inferPilotTemplate(String(gate.card.manifesto_line)),
+    };
+    saveSession(next);
+    data = next;
+  }
 }
 
 if (data?.handle) {
@@ -747,9 +795,10 @@ if (data?.verification?.label) {
 }
 
 if (networkCardStatusEl) {
-  const cardState = data?.status || "active";
-  networkCardStatusEl.textContent =
-    cardState.charAt(0).toUpperCase() + cardState.slice(1);
+  const cardState = data?.status || gate.card?.status;
+  networkCardStatusEl.textContent = cardState
+    ? cardState.charAt(0).toUpperCase() + String(cardState).slice(1)
+    : "Checking…";
 }
 
 function formatNetworkExpiry(iso) {
@@ -1111,4 +1160,5 @@ async function bootstrapOwnerTools() {
 
 if (profileId && activeQrId) {
   void bootstrapOwnerTools();
+}
 }

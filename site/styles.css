@@ -7476,6 +7476,22 @@ body[data-created-mode="setup"] #created-setup-keys-mount .flow-keys-panel {
   margin: 20px var(--pad) 24px;
 }
 
+/* /created/ route gate — hide live workspace until resolver confirms card + QR (P0-1) */
+body[data-created-route="pending"] #created-setup-root,
+body[data-created-route="pending"] #created-control-root,
+body[data-created-route="invalid"] #created-setup-root,
+body[data-created-route="invalid"] #created-control-root,
+body[data-created-route="blocked"] #created-setup-root,
+body[data-created-route="blocked"] #created-control-root {
+  display: none !important;
+}
+
+body[data-created-route="pending"] .created-hero-meta,
+body[data-created-route="invalid"] .created-hero-meta,
+body[data-created-route="blocked"] .created-hero-meta {
+  color: var(--shell-label-muted, rgba(60, 60, 67, 0.72));
+}
+
 body.device-shell-created .flow-keys-group .list-row {
   background: var(--shell-fill, #fff);
   border-radius: 12px;
