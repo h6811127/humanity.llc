@@ -103,7 +103,7 @@ The header **shell status cluster** has two controls:
 
 | Control | Job | Module |
 |---------|-----|--------|
-| **Status dot** | Network + custody + urgent **overlay** (`proof_waiting`, `cross_tab_keys`) | `device-status.mjs`, `device-dot-state-core.mjs` |
+| **Status dot** | Network + custody + urgent **overlay** (`proof_waiting`, `cross_tab_keys`, `card_disabled_since_visit`) | `device-status.mjs`, `device-dot-state-core.mjs` |
 | **Inbox badge** (`#shell-notif-badge`) | Count of **action items** (live proof, unsaved tab keys, cross-tab keys) | `notificationCount()` in `device-status.mjs` |
 
 **Rules:**
@@ -159,7 +159,7 @@ No third-party analytics requirement; this can remain local/dev diagnostics init
 Implementation snapshot:
 - Phase 1: `site/js/device-status.mjs` + `site/styles.css` — steward green (`#22c55e`), ARIA, status key legend.
 - Phase 2: `describeDotState()` in `site/js/device-dot-state-core.mjs` — **Now / Why / Next** in hub status key and glance popover; steward queue link when present.
-- Phase 3: overlay axis (`proof_waiting`, `cross_tab_keys`), `::after` notch in `site/styles.css`, `data-dot-state` / `data-dot-overlay`, Vitest in `worker/tests/device-dot-state.test.ts`.
+- Phase 3: overlay axis (`proof_waiting`, `cross_tab_keys`, `card_disabled_since_visit`), `::after` notch in `site/styles.css`, `data-dot-state` / `data-dot-overlay`, Vitest in `worker/tests/device-dot-state.test.ts`.
 - Phase 4: steward celebration pulse (`pass-dot-steward-celebrate`), `hc-dot-state-changed` + optional `hc_dot_diag_log`, E2E in `e2e/device-status-dot.spec.ts`, CI via `test-site.yml`.
 - Phase 5 (diagnostics UX): popover/action/hub telemetry in `device-dot-diagnostics.mjs` when `localStorage.hc_dot_diagnostics === "1"`.
 - Phase 6 (A11y E2E): reduced-motion skips celebration class; hub explainer **Now / Why / Next** + `aria-label` covered in `e2e/device-status-dot.spec.ts`.

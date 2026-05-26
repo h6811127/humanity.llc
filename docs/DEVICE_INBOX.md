@@ -1,6 +1,6 @@
 # Device inbox & background alerts
 
-**Status:** Unified inbox shipped (phases 1–10) · browser alerts v2 A–C shipped (contextual opt-in, sign deep link, OS policy matrix)  
+**Status:** Unified inbox shipped (phases 1–11) · browser alerts v2 A–D shipped (contextual opt-in, sign deep link, OS policy matrix, live-proof service worker)  
 **Audience:** Product, frontend  
 **Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)
 
@@ -232,6 +232,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 | 9 | Hub card-disabled group (`#device-hub-card-disabled-group`) | ✅ |
 | 10 | `buildGlanceRowPlan()` — glance popover order from inbox + saved-card peek | ✅ |
 | 11 | Dot soft overlay for `card_disabled_since_visit` (`inboxOverlayCountsFromItems` + `dotOverlayFromCounts`) | ✅ |
+| 12 | `topInboxKind()` + `inboxDotOverlayFromItems()` aligned with overlay priority; hub sheet reconcile core + Vitest | ✅ |
 
 **Do not:**
 
@@ -296,6 +297,8 @@ Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox 
 | `site/js/device-inbox-diagnostics.mjs` | Browser inbox diag log (`hc_inbox_diagnostics`) |
 | `site/js/device-inbox-diagnostics-core.mjs` | Pure diag helpers (ring buffer, confusion counts) |
 | `worker/tests/device-inbox-diagnostics.test.ts` | Vitest for inbox diagnostics core |
+| `site/js/device-hub-sheet-core.mjs` | Pure hub sheet reconcile rules (`hubSheetReconcileAction`) |
+| `worker/tests/device-hub-sheet-core.test.ts` | Vitest for hub sheet reconcile |
 
 ---
 

@@ -8,6 +8,7 @@ import {
   inboxBadgeAriaLabel,
   inboxBadgeCountText,
   inboxCountFromItems,
+  inboxDotOverlayFromItems,
   inboxOverlayCountsFromItems,
   topInboxKind,
   inboxBadgeChromaKind,
@@ -181,6 +182,55 @@ describe("topInboxKind", () => {
       crossTabEntries: [{ profile_id: "x", tabId: "t" }],
     });
     expect(topInboxKind(items)).toBe("cross_tab_keys");
+  });
+
+  it("returns card_disabled_since_visit when only since-visit cards present", () => {
+    const items = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 0,
+      crossTabEntries: [],
+      cardDisabledSinceVisit: [{ profile_id: "p1" }],
+    });
+    expect(topInboxKind(items)).toBe("card_disabled_since_visit");
+  });
+});
+
+describe("inboxDotOverlayFromItems", () => {
+  it("matches topInboxKind priority for overlay-driving kinds", () => {
+    const proof = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 1,
+      crossTabEntries: [{ profile_id: "x", tabId: "t" }],
+      cardDisabledSinceVisit: [{ profile_id: "p1" }],
+    });
+    expect(topInboxKind(proof)).toBe("live_proof");
+    expect(inboxDotOverlayFromItems(proof)).toBe("proof_waiting");
+
+    const cross = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 0,
+      crossTabEntries: [{ profile_id: "x", tabId: "t" }],
+      cardDisabledSinceVisit: [{ profile_id: "p1" }],
+    });
+    expect(topInboxKind(cross)).toBe("cross_tab_keys");
+    expect(inboxDotOverlayFromItems(cross)).toBe("cross_tab_keys");
+
+    const disabled = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 0,
+      crossTabEntries: [],
+      cardDisabledSinceVisit: [{ profile_id: "p1" }],
+    });
+    expect(topInboxKind(disabled)).toBe("card_disabled_since_visit");
+    expect(inboxDotOverlayFromItems(disabled)).toBe("card_disabled_since_visit");
+
+    const tabOnly = buildInboxItems({
+      tabNoticeCount: 1,
+      liveProofCount: 0,
+      crossTabEntries: [],
+    });
+    expect(topInboxKind(tabOnly)).toBe(null);
+    expect(inboxDotOverlayFromItems(tabOnly)).toBe("none");
   });
 });
 

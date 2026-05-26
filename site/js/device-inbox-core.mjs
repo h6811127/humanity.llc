@@ -3,6 +3,7 @@
  * @see docs/DEVICE_INBOX.md
  */
 import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs";
+import { dotOverlayFromCounts } from "./device-dot-state-core.mjs";
 
 /** @typedef {'live_proof' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'card_disabled_since_visit'} InboxKind */
 
@@ -231,7 +232,18 @@ export function inboxCountFromItems(items) {
 export function topInboxKind(items) {
   if (items.some((i) => i.kind === "live_proof")) return "live_proof";
   if (items.some((i) => i.kind === "cross_tab_keys")) return "cross_tab_keys";
+  if (items.some((i) => i.kind === "card_disabled_since_visit")) {
+    return "card_disabled_since_visit";
+  }
   return null;
+}
+
+/**
+ * Dot overlay for inbox items (same priority as `dotOverlayFromCounts`).
+ * @param {InboxItem[]} items
+ */
+export function inboxDotOverlayFromItems(items) {
+  return dotOverlayFromCounts(inboxOverlayCountsFromItems(items));
 }
 
 /** @typedef {'live_proof' | 'cross_tab_keys' | 'default'} InboxBadgeChroma */

@@ -2,6 +2,7 @@
  * Bottom sheet host for #device-hub on shell pages.
  */
 import { prefersReducedMotion } from "./device-shell-motion.mjs";
+import { hubSheetReconcileAction } from "./device-hub-sheet-core.mjs";
 
 const HUB_OPEN_KEY = "hc_hub_open";
 
@@ -58,17 +59,21 @@ export function setHubSheetOpen(open) {
 /** Clear body/backdrop when hub DOM is collapsed but sheet-open classes stuck (bfcache, etc.). */
 export function reconcileHubSheetState() {
   if (!isHubSheet() || !hub) return;
-  if (!hub.classList.contains("device-hub-collapsed")) return;
 
-  const bodyOpen = document.body.classList.contains("device-hub-sheet-open");
-  const locked = chrome?.classList.contains("top-chrome--hub-locked");
-  if (bodyOpen || locked) {
+  ensureBackdrop();
+  const action = hubSheetReconcileAction({
+    hubCollapsed: hub.classList.contains("device-hub-collapsed"),
+    bodySheetOpen: document.body.classList.contains("device-hub-sheet-open"),
+    chromeHubLocked: chrome?.classList.contains("top-chrome--hub-locked") ?? false,
+    backdropHidden: backdrop?.hidden !== false,
+    backdropVisibleClass: backdrop?.classList.contains("is-visible") ?? false,
+  });
+
+  if (action === "close_sheet") {
     setHubSheetOpen(false);
     return;
   }
-
-  ensureBackdrop();
-  if (backdrop && (!backdrop.hidden || backdrop.classList.contains("is-visible"))) {
+  if (action === "hide_backdrop" && backdrop) {
     backdrop.hidden = true;
     backdrop.classList.remove("is-visible");
   }
