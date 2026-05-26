@@ -224,7 +224,10 @@ function applyDot() {
     dot.dataset.dotOverlay = overlay;
     dotBtn?.setAttribute("data-dot-state", dotState);
     dotBtn?.setAttribute("data-dot-overlay", overlay);
-    dotBtn?.setAttribute("aria-label", statusAriaLabel(networkStatus, device, overlay));
+    dotBtn?.setAttribute(
+      "aria-label",
+      statusAriaLabel(networkStatus, device, overlay, { pageKind: dotPageKind() })
+    );
     renderDotExplainability(networkStatus, device, overlay);
     applyStewardCelebrate(previousDevice, device);
     maybeEmitDotTransition(networkStatus, device, overlay);

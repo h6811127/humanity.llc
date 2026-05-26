@@ -42,8 +42,10 @@ export function overlayAriaText(overlay) {
  * @param {"ok" | "degraded" | "offline"} network
  * @param {"none" | "keys" | "unsaved" | "steward"} device
  * @param {"none" | "proof_waiting" | "cross_tab_keys"} overlay
+ * @param {{ pageKind?: string }} [opts]
  */
-export function statusAriaLabel(network, device, overlay) {
+export function statusAriaLabel(network, device, overlay, opts = {}) {
+  const pageKind = opts.pageKind || "landing";
   const networkText =
     network === "ok"
       ? "resolver online"
@@ -59,9 +61,13 @@ export function statusAriaLabel(network, device, overlay) {
           ? "saved keys on device"
           : "no saved keys on device";
   const overlayText = overlayAriaText(overlay);
-  return overlayText
+  const base = overlayText
     ? `Status: ${networkText}, ${deviceText}, ${overlayText}.`
     : `Status: ${networkText}, ${deviceText}.`;
+  if (pageKind === "wallet") {
+    return `${base} Tap to scroll to saved cards.`;
+  }
+  return base;
 }
 
 /**

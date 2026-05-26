@@ -129,7 +129,8 @@ Full inbox taxonomy, browser-alert roadmap, and implementation phases: [`DEVICE_
 - Steward green should reinforce that this is the trusted place for privileged signing.
 
 ### Wallet (`/wallet/`)
-- Dot explains local capability and network readiness.
+- Dot explains local capability and network readiness in `aria-label`; always ends with **Tap to scroll to saved cards** (no hub sheet on this page).
+- Tap scrolls to `#device-hub-saved-group`, not `openHubFromChrome()` hub toggle.
 - If user has steward keys but no active steward tasks, copy emphasizes readiness rather than urgency.
 
 ---
@@ -319,10 +320,10 @@ Keep and regression-test in `site/css/device-shell.css`:
 
 **E2E (shipped):** `dot click opens hub after scroll hides chrome bar` in `e2e/device-status-dot.spec.ts`.
 
-### 4. Wallet clarity (product + test) — ✅ E2E
+### 4. Wallet clarity (product + test) — ✅ shipped
 
-- Copy: keep `aria-label` / hint that wallet dot scrolls to saved cards, not the hub sheet.
-- **E2E (shipped):** `wallet dot scrolls saved cards into view` in `e2e/device-status-dot.spec.ts`.
+- **Copy (shipped):** `statusAriaLabel(..., { pageKind: "wallet" })` appends “Tap to scroll to saved cards.” so `applyDot()` does not replace wallet HTML with hub-only semantics.
+- **E2E (shipped):** `wallet dot scrolls saved cards into view`, `wallet dot aria-label mentions scroll to saved cards` in `e2e/device-status-dot.spec.ts`.
 
 ### 5. QA doc alignment — ✅ shipped
 

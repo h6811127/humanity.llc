@@ -161,6 +161,20 @@ test.describe("status dot steward green", () => {
     await page.locator("#brand-status-dot-btn").click();
     await expect(saved).toBeInViewport();
   });
+
+  test("wallet dot aria-label mentions scroll to saved cards", async ({ page }) => {
+    await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
+
+    await page.goto("/wallet/");
+    await expect(page.locator("#brand-status-dot-btn")).toHaveAttribute(
+      "aria-label",
+      /tap to scroll to saved cards/i
+    );
+    await expect(page.locator("#brand-status-dot-btn")).toHaveAttribute(
+      "aria-label",
+      /resolver online/i
+    );
+  });
 });
 
 test.describe("status dot accessibility", () => {

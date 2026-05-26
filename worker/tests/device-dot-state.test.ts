@@ -145,6 +145,19 @@ describe("dotExplainerKicker", () => {
   });
 });
 
+describe("statusAriaLabel wallet", () => {
+  it("appends scroll hint on wallet page", () => {
+    const label = statusAriaLabel("ok", "steward", "none", { pageKind: "wallet" });
+    expect(label).toMatch(/tap to scroll to saved cards/i);
+    expect(label).toMatch(/steward keys ready/i);
+  });
+
+  it("does not append scroll hint on landing", () => {
+    const label = statusAriaLabel("ok", "steward", "none", { pageKind: "landing" });
+    expect(label).not.toMatch(/scroll to saved cards/i);
+  });
+});
+
 describe("shouldCelebrateStewardTransition", () => {
   it("fires only on first steward transition with healthy network", () => {
     expect(
