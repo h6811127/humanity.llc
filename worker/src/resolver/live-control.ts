@@ -23,7 +23,6 @@ import {
   type ScanPageKind,
 } from "./scan-state";
 import type { Env } from "../index";
-import { notifyLiveProofPending } from "../steward/push";
 import { enforceStewardAutoPollQuota } from "../steward/quota";
 import {
   generateLiveControlChallengeId,
@@ -48,8 +47,7 @@ interface SubmitResponseBody {
 export async function handlePostLiveControlChallenge(
   request: Request,
   db: D1Database,
-  profileId: string,
-  opts?: { env?: Env; executionCtx?: ExecutionContext }
+  profileId: string
 ): Promise<Response> {
   if (!PROFILE_ID_REGEX.test(profileId)) {
     return errorResponse(CRYPTO_ERROR.INVALID_PROFILE_ID, "Invalid profile_id.", 422);
@@ -111,23 +109,6 @@ export async function handlePostLiveControlChallenge(
     throw e;
   }
 
-  const issuedAtIso = issuedAt.toISOString();
-  const expiresAtIso = expiresAt.toISOString();
-
-  if (opts?.env && opts?.executionCtx) {
-    opts.executionCtx.waitUntil(
-      notifyLiveProofPending(opts.env, db, {
-        profile_id: profileId,
-        qr_id: qrId,
-        challenge_id: challengeId,
-        issued_at: issuedAtIso,
-        expires_at: expiresAtIso,
-      }).catch((err) => {
-        console.error("steward_push_notify_failed", err);
-      })
-    );
-  }
-
   return jsonResponse(
     challengeBody(
       {
@@ -137,8 +118,8 @@ export async function handlePostLiveControlChallenge(
         nonce,
         verifier_session_id: verifierSessionId,
         status: "pending",
-        issued_at: issuedAtIso,
-        expires_at: expiresAtIso,
+        issued_at: issuedAt.toISOString(),
+        expires_at: expiresAt.toISOString(),
         proven_at: null,
         signer_public_key: null,
         response_document_json: null,

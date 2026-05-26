@@ -75,7 +75,7 @@ export default {
   async fetch(
     request: Request,
     env: Env,
-    ctx: ExecutionContext
+    _ctx: ExecutionContext
   ): Promise<Response> {
     if (request.method === "OPTIONS") {
       return new Response(null, {
@@ -343,8 +343,7 @@ export default {
       const res = await handlePostLiveControlChallenge(
         request,
         env.DB,
-        liveChallengeMatch[1]!,
-        { env, executionCtx: ctx }
+        liveChallengeMatch[1]!
       );
       return withCors(request, res);
     }
