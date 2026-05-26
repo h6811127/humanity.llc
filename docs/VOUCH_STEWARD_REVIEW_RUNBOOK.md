@@ -164,3 +164,13 @@ Always document **cause** and **appeal path** per Human Verification HV-FR-40.
 - [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) §5–§9
 - [`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md) Step 4
 - [`V1_ASSUMPTION_REGISTER.md`](V1_ASSUMPTION_REGISTER.md) VT-01–VT-04
+
+## UI prototype (step 2)
+
+- Internal page: `/operator/vouch-audit.html`
+- Script: `site/js/operator-vouch-audit.mjs`
+- Uses Bearer token input + operator API to:
+  - load flags
+  - save dismissal notes
+  - clear dismissals
+  - hide/show reviewed items
