@@ -1,6 +1,6 @@
 # Cross-tab keys - rebuild plan (restart)
 
-**Status:** Phases 1–5 shipped · Phase 6 pending  
+**Status:** Phases 1–6 shipped  
 **Audience:** Engineering  
 **Canonical spec:** [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md)  
 **Context:** Paths B, F, G shipped ([`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md)) but reports continue: random flashes, glitchy card labels, notices persisting after save or tab close, scroll jank with many tabs.
@@ -155,12 +155,14 @@ stateDiagram-v2
 
 **Shipped:** `beginDeviceChromeRefreshTick()` / `endDeviceChromeRefreshTick()` in `runChromeRefresh()`; badge uses one `getInboxItems()` per refresh; `PRESENCE_HEARTBEAT_MS` **5s**; `shouldTouchPresenceRow()` skips redundant `localStorage` writes when metadata is unchanged; dot overlay snapshot computed once per `applyDot()`.
 
-### Phase 6 - E2E & QA
+### Phase 6 - E2E & QA ✅
 
 - Playwright: two tabs, keys in tab B, tab A badge stable label, close tab B → badge clears ≤10s.
 - Playwright: save wallet in tab A, other tab same profile → no generic cross-tab for that profile.
 - Playwright: remove from device + orphan copy path.
 - Manual **P0-3**, **P0-W** if touch status graph.
+
+**Shipped:** `e2e/device-cross-tab-keys.spec.ts` (three two-tab scenarios). Manual P0-3 / P0-W unchanged when status graph is not modified.
 
 ---
 

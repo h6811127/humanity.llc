@@ -1,6 +1,6 @@
 # Cross-tab keys notification system
 
-**Status:** Spec (canonical) - Phases 1–5 shipped; Phase 6 pending ([`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md))  
+**Status:** Spec (canonical) - Phases 1–6 shipped ([`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md))  
 **Audience:** Product, frontend  
 **Related:** [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`DEVICE_OS.md`](DEVICE_OS.md) § Cross-tab keys · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md) · [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md)
 
@@ -255,7 +255,7 @@ CTAs: **Open that tab** · **Open controls here** (when wallet has keys) · **Cl
 
 ```bash
 npm run worker:test -- worker/tests/device-cross-tab-state.test.ts worker/tests/device-cross-tab.test.ts worker/tests/device-presence-inbox-stability.test.ts worker/tests/device-inbox.test.ts
-npm run e2e -- e2e/device-inbox.spec.ts e2e/device-status-dot.spec.ts
+npm run e2e -- e2e/device-cross-tab-keys.spec.ts e2e/device-inbox.spec.ts e2e/device-status-dot.spec.ts
 ```
 
 Manual: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) - cross-tab / multi-tab rows when present.
