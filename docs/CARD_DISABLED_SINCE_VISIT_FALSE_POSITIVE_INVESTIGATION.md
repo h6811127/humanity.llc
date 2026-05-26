@@ -187,14 +187,14 @@ Per-card banner: `.hub-card-status-alert` inside each `.hub-card-item` (`device-
 
 Hub top group: **Disabled since your last visit** rows from `renderHubInboxAlerts()` → `getInboxItems()` → `gatherCardDisabledSinceVisitForInbox()` (`device-hub-inbox-alerts.mjs`, added `0a9d6b5`). Same underlying rules; both should clear when resolver-confirmed state is `active`.
 
-### 5. Residual architecture gaps (not the original DH-1 bug, but worth knowing)
+### 5. Follow-up fixes (post-investigation, shipped)
 
-| Gap | Effect |
-|-----|--------|
-| `device-os-coordinator.mjs` and `fetchAndApplyNetworkChips()` both call `refreshWalletNetworkStatuses()` | Shared `latestResolvedAlertStateMap`; last poll wins. Unlikely to sustain “all cards” if fetches return `active`. |
-| `NETWORK_REFRESHED` / `hc-device-os-refreshed` do **not** call `applyRevokedSinceVisitAlerts` | Hub row banners only update from `fetchAndApplyNetworkChips` or `hc-wallet-network-baseline-changed`. Coordinator-only poll may update cache/`latestResolved` without refreshing row DOM until the next hub fetch. |
-| `acknowledgeNetworkSeenForEntry()` falls back to `getCachedNetworkAlertState()` when `getLatestResolvedAlertState()` is null | Clicking **Open controls** before the first poll completes can write a **stale** baseline for that one card; should not by itself light **all** cards on fixed code. |
-| `gatherCardDisabledSinceVisitForInbox()` sets `resolverConfirmedMap[pid] = (alert != null)` | Treats any value in `latestResolvedAlertStateMap` as “confirmed”; correct only if `latestResolved` itself is trustworthy. |
+| Gap | Fix |
+|-----|-----|
+| `NETWORK_REFRESHED` / `DEVICE_OS_REFRESHED` did not refresh hub row banners | `device-hub-ui.mjs` re-applies via `reapplyRevokedSinceVisitFromLatestResolved()` and poll `detail.resolverConfirmedMap` on `NETWORK_REFRESHED`. |
+| `gatherCardDisabledSinceVisitForInbox()` treated `alert != null` as resolver-confirmed | Uses `isResolverConfirmedProfile()` — only profiles with a network fetch this visit. |
+| `acknowledgeNetworkSeenForEntry()` used stale session cache for baseline | Records `getLatestResolvedAlertState() ?? "active"` only (no `getCachedNetworkAlertState`). |
+| `isResolverConfirmedProfile()` | Tracks profile IDs in `resolverConfirmedProfileIdsThisVisit` on each successful status fetch. |
 
 ---
 
@@ -216,6 +216,7 @@ Production observation proved resolver **`active`** while banner showed — **cl
 | Test | File |
 |------|------|
 | Baseline transition, legacy `revoked`, resolverConfirmed gate | `worker/tests/wallet-network.test.ts` |
+| `resolverConfirmed: false` despite `card_revoked` alert state | `worker/tests/wallet-network.test.ts` § `listCardDisabledSinceVisit` |
 | Stale cache + active fetch integration | `worker/tests/wallet-network.test.ts` § `stale cache + active fetch` |
 | Hub pipeline → inbox | `worker/tests/device-hub-frontend-pipeline.test.ts` |
 | E2E active resolver, stale cache, multi-card Got it | `e2e/device-os-wallet.spec.ts` |
@@ -241,6 +242,10 @@ npm run e2e -- e2e/device-os-wallet.spec.ts
 
 ---
 
-## AI / follow-up fix prompt (when implementing — out of scope for this doc)
+## Follow-up implementation (shipped)
 
-> Reproduce with `hc_wallet_last_seen_network: { "*": "active" }` and poisoned `hc_wallet_network_cache` (`scanKind: "card_revoked"`), then trigger `recordNetworkSeen` on one card. On commit `a5f34a7+`, zero `.hub-card-status-alert:not([hidden])`. If failing, ensure baseline-changed never uses `getCachedNetworkAlertState` for bulk re-apply; wire `DEVICE_OS_REFRESHED` to re-run `applyRevokedSinceVisitAlerts` from `latestResolved` maps.
+Per the AI prompt at the bottom of the first investigation draft:
+
+- `reapplyRevokedSinceVisitFromLatestResolved()` + `isResolverConfirmedProfile()` in `device-wallet-network.mjs`
+- Hub listens to `NETWORK_REFRESHED` (with poll `resolverConfirmedMap` in `detail`) and `DEVICE_OS_REFRESHED`
+- Inbox gather + **Open controls** baseline ack no longer trust session cache alone

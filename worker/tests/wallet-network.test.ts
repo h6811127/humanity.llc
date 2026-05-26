@@ -101,6 +101,17 @@ describe("normalizeBaselineState", () => {
 });
 
 describe("listCardDisabledSinceVisit", () => {
+  it("returns no rows when alert looks revoked but resolverConfirmed is false", () => {
+    const hits = listCardDisabledSinceVisit(
+      [{ profile_id: "a", label: "Door" }],
+      { a: CARD_REVOKED_ALERT_STATE },
+      { a: CARD_REVOKED_ALERT_STATE },
+      { a: "active" },
+      { a: false }
+    );
+    expect(hits).toHaveLength(0);
+  });
+
   it("returns only wallet rows with resolver-confirmed since-visit transition", () => {
     const wallet = [
       { profile_id: "a", label: "Door" },

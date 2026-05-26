@@ -29,6 +29,8 @@ let latestResolvedAlertStateMap = {};
 /** @type {Record<string, string | null>} */
 let latestResolvedScanKindMap = {};
 let latestResolvedAt = 0;
+/** Profile IDs with at least one resolver-confirmed fetch this page visit. */
+const resolverConfirmedProfileIdsThisVisit = new Set();
 
 /** @type {string} Fired when hc_wallet_last_seen_network changes (snapshot, Got it, Manage). */
 export const NETWORK_BASELINE_CHANGED = "hc-wallet-network-baseline-changed";
@@ -40,11 +42,11 @@ function notifyBaselineChanged() {
   window.dispatchEvent(new Event(NETWORK_BASELINE_CHANGED));
 }
 
-function notifyNetworkRefreshed(statusMap, alertStateMap, scanKindMap) {
+function notifyNetworkRefreshed(statusMap, alertStateMap, scanKindMap, resolverConfirmedMap) {
   if (typeof window === "undefined") return;
   window.dispatchEvent(
     new CustomEvent(NETWORK_REFRESHED, {
-      detail: { statusMap, alertStateMap, scanKindMap },
+      detail: { statusMap, alertStateMap, scanKindMap, resolverConfirmedMap },
     })
   );
 }
@@ -91,6 +93,12 @@ export function getCachedNetworkAlertState(profileId) {
 /** True after at least one resolver-confirmed status read this page visit. */
 export function hasLatestResolverNetworkPoll() {
   return latestResolvedAt > 0;
+}
+
+/** True when this profile had a resolver-confirmed status read this visit (not cache-only). */
+export function isResolverConfirmedProfile(profileId) {
+  if (!profileId || !latestResolvedAt) return false;
+  return resolverConfirmedProfileIdsThisVisit.has(profileId);
 }
 
 /** Fresh resolver-backed alert state map from the latest wallet poll. */
@@ -242,13 +250,16 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
       ...latestResolvedScanKindMap,
       ...resolverConfirmedScanKindMap,
     };
+    for (const pid of Object.keys(resolverConfirmedAlertStateMap)) {
+      resolverConfirmedProfileIdsThisVisit.add(pid);
+    }
     latestResolvedAt = Date.now();
   }
   const resolverConfirmedMap = Object.fromEntries(
     Object.keys(resolverConfirmedAlertStateMap).map((pid) => [pid, true])
   );
   persistWalletFromNetworkPoll({ statusMap, alertStateMap, scanKindMap });
-  notifyNetworkRefreshed(statusMap, alertStateMap, scanKindMap);
+  notifyNetworkRefreshed(statusMap, alertStateMap, scanKindMap, resolverConfirmedMap);
   onDone?.({ statusMap, alertStateMap, scanKindMap, resolverConfirmedMap });
 }
 

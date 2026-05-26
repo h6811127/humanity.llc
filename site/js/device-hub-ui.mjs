@@ -37,7 +37,6 @@ import {
   walletEntryQrId,
 } from "./device-wallet.mjs";
 import {
-  getCachedNetworkAlertState,
   getCachedNetworkSeenAt,
   getCachedNetworkScanKind,
   getCachedNetworkStatus,
@@ -46,6 +45,7 @@ import {
   getLatestResolvedScanKind,
   getNetworkLastSeenBaseline,
   hasLatestResolverNetworkPoll,
+  isResolverConfirmedProfile,
   CARD_REVOKED_ALERT_STATE,
   recordNetworkSeen,
   refreshWalletNetworkStatuses,
@@ -53,6 +53,7 @@ import {
   syncLastSeenFromNetworkMap,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
+import { DEVICE_OS_REFRESHED } from "./device-os-coordinator.mjs";
 import { getCardStatusUrl } from "./hc-sign.mjs";
 import {
   hubCardIdentityLine,
@@ -504,9 +505,47 @@ function acknowledgeNetworkSeenForEntry(entry) {
   if (!entry?.profile_id) return;
   recordNetworkSeen(
     entry.profile_id,
-    getLatestResolvedAlertState(entry.profile_id) ??
-      getCachedNetworkAlertState(entry.profile_id) ??
-      "active"
+    getLatestResolvedAlertState(entry.profile_id) ?? "active"
+  );
+}
+
+/**
+ * Maps for since-visit alerts from resolver-confirmed reads this visit only.
+ * @returns {{
+ *   alertStateMap: Record<string, string>,
+ *   scanKindMap: Record<string, string | null>,
+ *   resolverConfirmedMap: Record<string, boolean>,
+ * } | null}
+ */
+function buildLatestResolvedPollMaps() {
+  if (!hasLatestResolverNetworkPoll()) return null;
+  const alertStateMap = {};
+  const scanKindMap = {};
+  const resolverConfirmedMap = {};
+  for (const entry of loadWallet()) {
+    const pid = entry.profile_id;
+    if (!pid || !isResolverConfirmedProfile(pid)) continue;
+    const resolved = getLatestResolvedAlertState(pid);
+    if (resolved == null) continue;
+    alertStateMap[pid] = resolved;
+    scanKindMap[pid] = getLatestResolvedScanKind(pid);
+    resolverConfirmedMap[pid] = true;
+  }
+  return { alertStateMap, scanKindMap, resolverConfirmedMap };
+}
+
+function reapplyRevokedSinceVisitFromLatestResolved() {
+  if (!savedList || !hubConfig.fetchNetworkStatus) return;
+  const maps = buildLatestResolvedPollMaps();
+  if (!maps) {
+    applyRevokedSinceVisitAlerts({}, null);
+    return;
+  }
+  applyRevokedSinceVisitAlerts(
+    {},
+    maps.alertStateMap,
+    maps.scanKindMap,
+    maps.resolverConfirmedMap
   );
 }
 
@@ -1167,33 +1206,37 @@ export function initDeviceHub(config = {}) {
   window.addEventListener("pagehide", () => snapshotNetworkSeenOnExit());
 
   window.addEventListener("hc-wallet-network-baseline-changed", () => {
-    // Re-apply from resolver-confirmed poll only (e.g. Got it); never session cache alone (DH-1).
-    if (!savedList || !hubConfig.fetchNetworkStatus) return;
-    if (!hasLatestResolverNetworkPoll()) {
-      applyRevokedSinceVisitAlerts({}, null);
-      notifyHubChanged();
-      return;
-    }
-    const alertStateMap = {};
-    const scanKindMap = {};
-    const resolverConfirmedMap = {};
-    for (const entry of loadWallet()) {
-      const pid = entry.profile_id;
-      if (!pid) continue;
-      const resolved = getLatestResolvedAlertState(pid);
-      if (resolved == null) continue;
-      alertStateMap[pid] = resolved;
-      scanKindMap[pid] = getLatestResolvedScanKind(pid);
-      resolverConfirmedMap[pid] = true;
-    }
-    applyRevokedSinceVisitAlerts({}, alertStateMap, scanKindMap, resolverConfirmedMap);
+    reapplyRevokedSinceVisitFromLatestResolved();
     syncHubInboxAlertGroups();
     notifyHubChanged();
   });
 
-  window.addEventListener(NETWORK_REFRESHED, () => {
+  window.addEventListener(NETWORK_REFRESHED, (e) => {
+    const detail = e?.detail;
+    if (
+      detail?.alertStateMap &&
+      detail?.resolverConfirmedMap &&
+      hubConfig.fetchNetworkStatus
+    ) {
+      applyRevokedSinceVisitAlerts(
+        detail.statusMap ?? {},
+        detail.alertStateMap,
+        detail.scanKindMap ?? {},
+        detail.resolverConfirmedMap
+      );
+    } else {
+      reapplyRevokedSinceVisitFromLatestResolved();
+    }
     syncHubInboxAlertGroups();
     refreshEmptyHint();
+    notifyHubChanged();
+  });
+
+  window.addEventListener(DEVICE_OS_REFRESHED, () => {
+    reapplyRevokedSinceVisitFromLatestResolved();
+    syncHubInboxAlertGroups();
+    refreshEmptyHint();
+    notifyHubChanged();
   });
 
   window.addEventListener("hc-tab-presence-changed", () => {

@@ -9,6 +9,7 @@ import {
   getLatestResolvedScanKind,
   getNetworkLastSeenBaseline,
   hasLatestResolverNetworkPoll,
+  isResolverConfirmedProfile,
 } from "./device-wallet-network.mjs";
 
 /** @returns {ReturnType<typeof loadWallet>} */
@@ -28,11 +29,12 @@ export function gatherCardDisabledSinceVisitForInbox() {
   for (const entry of wallet) {
     const pid = entry.profile_id;
     if (!pid) continue;
+    if (!isResolverConfirmedProfile(pid)) continue;
     const alert = getLatestResolvedAlertState(pid);
     alertStateMap[pid] = alert;
     scanKindMap[pid] = getLatestResolvedScanKind(pid);
     lastSeenMap[pid] = getNetworkLastSeenBaseline(pid);
-    resolverConfirmedMap[pid] = alert != null;
+    resolverConfirmedMap[pid] = true;
   }
 
   const hits = listCardDisabledSinceVisit(
