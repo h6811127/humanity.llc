@@ -71,7 +71,7 @@ Full inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md). This doc owns **cross
 | Constant | Value | Meaning |
 |----------|-------|---------|
 | `PRESENCE_HEARTBEAT_MS` | 5000 | Visible tab writes while keys in `hc_created` (metadata unchanged: skip until keep-alive) |
-| `PRESENCE_SHOW_MS` | 7000 | UI lists row only if `now - updatedAt ≤ showMs` |
+| `PRESENCE_SHOW_MS` | 7000 | UI lists row only if `now - updatedAt <= showMs` |
 | `PRESENCE_STALE_MS` | 10000 | Pruned from map on read |
 
 **Rules:**
@@ -121,7 +121,13 @@ getCrossTabNotificationState()  [device-cross-tab-state.mjs]
 
 gatherInboxInput()  [device-inbox.mjs]
   ├─ getCrossTabNotificationState()
-  └─ 50ms gather cache
+  └─ one snapshot per chrome refresh tick (+ 50ms coalesce outside ticks)
+
+getCrossTabScanSnapshot()  [device-cross-tab-state.mjs]
+  └─ fingerprint streak for scan (includes saved profiles for vouch)
+
+refreshDeviceChrome()  [device-chrome-refresh.mjs]
+  └─ shell + scan-tab-keys.mjs
 
 getInboxItems() → buildInboxItems(gatherInboxInput())
 ```
@@ -140,47 +146,43 @@ getInboxItems() → buildInboxItems(gatherInboxInput())
 
 | Surface | Module | Input today | Notes |
 |---------|--------|-------------|-------|
-| Inbox badge + chroma | `device-status.mjs` | `notificationCount()` → `getInboxItems()` | Debounced on `hc-tab-presence-changed` (300ms) |
+| Inbox badge + chroma | `device-status.mjs` | `getInboxItems()` (one gather per chrome tick) | Via `device-chrome-refresh.mjs` (hide immediate, show debounced 300ms) |
 | Dot overlay | `device-status.mjs` | `getInboxDotOverlay()` | May skip view transition for cross-tab-only flap |
-| Hub `#device-hub-crosstab-notice` | `device-cross-tab-banner.mjs` | `gatherInboxInput()` / `getInboxItems()` | **Immediate** on `hc-tab-presence-changed` |
-| Glance rows | `device-hub-glance.mjs` | `buildGlanceRowPlan(getInboxItems(), …)` | Immediate listener |
-| Hub alert groups | `device-hub-inbox-alerts.mjs` | `getInboxItems()` | Immediate listener |
-| Inbox sheet | `device-inbox-sheet.mjs` | `gatherInboxInput()` + `buildInboxSheetRows` | Immediate listener |
+| Hub `#device-hub-crosstab-notice` | `device-cross-tab-banner.mjs` | `gatherInboxInput()` / `getInboxItems()` | Same coordinator tick as badge |
+| Glance rows | `device-hub-glance.mjs` | `getInboxItems()` | Coordinator tick |
+| Hub alert groups | `device-hub-inbox-alerts.mjs` | `getInboxItems()` | Coordinator tick |
+| Inbox sheet | `device-inbox-sheet.mjs` | `gatherInboxInput()` + `buildInboxSheetRows` | Coordinator tick when open |
 | Landing/wallet banner | `device-cross-tab-banner.mjs` | `gatherInboxInput()` when no shell badge | Legacy |
-| Scan banner | `device-cross-tab-banner.mjs` | **`getOtherTabsWithKeys({ includeSavedProfiles: true })`** | **Bypasses stabilization** |
-| Wallet tab hint | `wallet-page.mjs`, `card-wallet.mjs` | `gatherInboxInput()` | |
+| Scan banner | `device-cross-tab-banner.mjs` | **`getCrossTabScanSnapshot()`** | Fingerprint streak; `scan-tab-keys.mjs` uses coordinator |
+| Wallet tab hint | `wallet-page-chrome.mjs` | `gatherInboxInput()` | Coordinator tick on `/wallet/` |
 
 **Navigation CTAs:** `device-notice-nav.mjs` (`actOnOtherTabKeys`), `device-orphan-keys-nav.mjs` (orphan focus / clear).
 
 ---
 
-## Event fan-out (why chrome feels “random”)
+## Event fan-out (shipped architecture)
 
-On each presence write, **multiple listeners** run at different times:
+On each qualifying `storage` / `hc-tab-presence-changed` event, **one coordinator** runs:
 
 | Listener | Handler | Debounced? |
 |----------|---------|------------|
-| `device-status.mjs` | `schedulePresenceRefreshSummary` → `refreshSummary()` | Yes (300ms) |
-| `device-cross-tab-banner.mjs` | `renderCrossTabKeysBanner()` | **No** |
-| `device-hub-glance.mjs` | `refreshHubGlance()` | **No** |
-| `device-hub-ui.mjs` | `syncHubInboxAlertGroups()` | **No** |
-| `device-inbox-sheet.mjs` | `refresh()` | **No** |
-| `wallet-page.mjs` | `updateContextBanners()` | **No** |
+| `device-chrome-refresh.mjs` | `refreshDeviceChrome()` → badge, dot, banner, glance, hub alerts, sheet, wallet hint | Hide **immediate**; show **300ms** debounce |
+| `device-tab-presence.mjs` | `storage` on `hc_tab_keys_presence` re-dispatches `hc-tab-presence-changed` | N/A (writer + readers) |
 
-`refreshSummary()` also calls `renderCrossTabKeysBanner()` again - **duplicate hub/banner work** per debounced tick.
+Shell pages load the coordinator from `device-status.mjs`. Scan pages load it from `scan-tab-keys.mjs`. Surfaces must not register their own `hc-tab-presence-changed` handlers (Phase 2).
 
-See [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md).
+Historical fan-out (pre-rebuild): [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md).
 
 ---
 
 ## Invariants (target contract)
 
-These should hold after rebuild; today some are **violated** (marked ⚠️).
+These should hold after rebuild (Phases 1–6).
 
-1. **Single snapshot** - All chrome surfaces read one `CrossTabNotificationSnapshot` per refresh tick. ⚠️ Scan banner and timing splits violate this.
-2. **Show stability** - Cross-tab chrome appears only after presence is stable (see rebuild plan: identity-stable streak). ⚠️ Count-only streak allows label flicker.
-3. **Fast hide** - When qualifying presence drops to zero, badge/dot/hub/sheet hide on the **same** tick. ⚠️ Debounced badge can lag behind immediate hub render.
-4. **Custody reset** - On `hc_wallet`, `hc_created`, `hc_wallet_removed_profile_ids`, or successful “keys loaded in this tab” for a profile, reset streak + gather cache. ⚠️ Cache reset only on orphan clear today.
+1. **Single snapshot** - All shell surfaces read one `gatherInboxInput()` per `refreshDeviceChrome()` tick; scan uses `getCrossTabScanSnapshot()` with the same fingerprint streak rules.
+2. **Show stability** - Cross-tab/orphan chrome appears only after **two** reads with the same `tabId:profile_id` fingerprint.
+3. **Fast hide** - When qualifying presence drops to zero, coordinator runs **immediate** refresh (no debounce on hide).
+4. **Custody reset** - On `hc_wallet`, `hc_created`, hub change, denylist, dismiss, or `invalidateCrossTabInboxState()`, reset streak + gather cache.
 5. **No OS alert** - `cross_tab_keys` / `orphan_keys_removed` never call `Notification` API.
 6. **Saved profile** - After save to `hc_wallet`, generic cross-tab must not reference that `profile_id` (filter in `listOtherTabsWithKeys`).
 7. **Removed profile** - Denylisted profiles use `orphan_keys_removed` copy, not generic cross-tab ([`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md)).
@@ -198,7 +200,7 @@ These should hold after rebuild; today some are **violated** (marked ⚠️).
 | Notice after “deleted” card | Keys still in another tab; remove from wallet **increases** cross-tab until denylist/orphan path | Flash investigation |
 | Notice after save on this device | Other tab still holds **different** profile keys (expected) OR stale streak/cache (bug) | Invariant 4 |
 | Notice after closing other tab | `pagehide` not run (crash, force-quit) until row ages out ~6–10s | Presence protocol |
-| Scan page ≠ inbox | Scan uses unstabilized `getOtherTabsWithKeys` | `renderScanCrossTabNotice` |
+| Scan page ≠ inbox | Scan snapshot stale vs shell | Rare if scan page not on coordinator (fixed: `scan-tab-keys.mjs`) |
 | Scroll jank with many tabs | N tabs × M listeners × `refreshSummary` / view transitions | Lag investigation |
 | Hub shows cross-tab, badge hidden | `tabNoticeCount` flipped between reads; or mid-streak first read | Stabilization |
 
@@ -238,7 +240,9 @@ CTAs: **Open that tab** · **Open controls here** (when wallet has keys) · **Cl
 | `site/js/device-cross-tab-state-core.mjs` | Fingerprint + `computeCrossTabNotificationState()` |
 | `site/js/device-cross-tab-state.mjs` | Browser snapshot + custody invalidation |
 | `site/js/device-presence-inbox-stability-core.mjs` | Dot view-transition skip only |
-| `site/js/device-inbox.mjs` | `gatherInboxInput`, streak state |
+| `site/js/device-inbox.mjs` | `gatherInboxInput`, chrome refresh tick cache |
+| `site/js/device-chrome-refresh.mjs` | Single coordinator for presence/custody chrome |
+| `site/js/scan-tab-keys.mjs` | Scan page presence + coordinator bootstrap |
 | `site/js/device-inbox-core.mjs` | `buildInboxItems`, `buildInboxSheetRows` |
 | `site/js/device-cross-tab-visibility.mjs` | `tabNoticeCount` gate |
 | `site/js/device-cross-tab-banner.mjs` | Hub slot, legacy banner, scan |
@@ -246,15 +250,17 @@ CTAs: **Open that tab** · **Open controls here** (when wallet has keys) · **Cl
 | `site/js/device-orphan-keys-nav.mjs` | Orphan clear / focus |
 | `site/js/device-wallet-removed-profiles.mjs` | Denylist |
 | `worker/tests/device-cross-tab.test.ts` | Presence + denylist |
+| `worker/tests/device-cross-tab-scan-snapshot.test.ts` | Scan fingerprint streak |
 | `worker/tests/device-presence-inbox-stability.test.ts` | Streak |
 | `worker/tests/device-inbox.test.ts` | Inbox rows |
+| `e2e/device-cross-tab-keys.spec.ts` | Two-tab badge, save filter, orphan copy |
 
 ---
 
 ## Tests (regression)
 
 ```bash
-npm run worker:test -- worker/tests/device-cross-tab-state.test.ts worker/tests/device-cross-tab.test.ts worker/tests/device-presence-inbox-stability.test.ts worker/tests/device-inbox.test.ts
+npm run worker:test -- worker/tests/device-cross-tab-state.test.ts worker/tests/device-cross-tab-scan-snapshot.test.ts worker/tests/device-cross-tab.test.ts worker/tests/device-presence-inbox-stability.test.ts worker/tests/device-inbox.test.ts
 npm run e2e -- e2e/device-cross-tab-keys.spec.ts e2e/device-inbox.spec.ts e2e/device-status-dot.spec.ts
 ```
 

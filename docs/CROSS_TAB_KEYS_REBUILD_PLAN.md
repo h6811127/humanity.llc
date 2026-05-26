@@ -117,7 +117,7 @@ stateDiagram-v2
 
 **Shipped:** `device-chrome-refresh.mjs` coordinator, removed duplicate `hc-tab-presence-changed` listeners from hub/banner/glance/sheet/wallet, and wired `device-status.mjs` to delegate cross-tab chrome refresh.
 
-### Phase 3 - Wire all surfaces to snapshot
+### Phase 3 - Wire all surfaces to snapshot ✅
 
 | Surface | Change |
 |---------|--------|
@@ -127,6 +127,8 @@ stateDiagram-v2
 | `wallet-page.mjs` / `card-wallet.mjs` | Hint from snapshot |
 
 **Acceptance:** Two-tab Vitest + manual: scan banner label matches inbox sheet primary row.
+
+**Shipped:** `getCrossTabScanSnapshot()` for scan banner; hub/legacy/wallet read `gatherInboxInput()`; `scan-tab-keys.mjs` uses `startDeviceChromeRefresh()` so scan pages debounce/hide like the shell.
 
 ### Phase 4 - Custody invalidation & clear semantics ✅
 
@@ -163,6 +165,8 @@ stateDiagram-v2
 - Manual **P0-3**, **P0-W** if touch status graph.
 
 **Shipped:** `e2e/device-cross-tab-keys.spec.ts` (three two-tab scenarios). Manual P0-3 / P0-W unchanged when status graph is not modified.
+
+**Rebuild complete (engineering).** Optional product follow-ups remain in [Open product questions](#open-product-questions-decide-before-phase-4) (e.g. presence-only broadcast after save). Do not re-open duplicate per-surface listeners.
 
 ---
 
