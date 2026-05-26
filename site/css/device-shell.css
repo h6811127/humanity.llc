@@ -508,6 +508,23 @@ body.page-wallet .device-keys-custody--wallet {
   letter-spacing: -0.02em;
 }
 
+/* Inbox badge chroma — matches status-dot overlay tokens (DEVICE_INBOX phase 5) */
+.shell-notif-badge--live-proof .shell-notif-badge-ring {
+  border-color: #f59e0b;
+}
+
+.shell-notif-badge--live-proof .shell-notif-badge-count {
+  color: #d97706;
+}
+
+.shell-notif-badge--cross-tab .shell-notif-badge-ring {
+  border-color: #2563eb;
+}
+
+.shell-notif-badge--cross-tab .shell-notif-badge-count {
+  color: #2563eb;
+}
+
 .top-create--outline {
   pointer-events: auto;
   flex-shrink: 0;

@@ -80,7 +80,7 @@ These map to the #1 documented confusion: **keys in one tab vs saved on device**
 | Step | Action | Expected |
 |------|--------|----------|
 | 1 | Saved card + collapsed hub | Glance popover or expand shows card label |
-| 2 | Tap status dot | Glance first if content exists; else sheet opens |
+| 2 | Tap status dot | Hub sheet opens on first tap (toggle on second); glance is not glance-first on dot (`77816d1`) |
 | 3 | Escape | Closes glance or sheet |
 
 **Note:** `/wallet/` uses scroll-to-saved, not a separate glance popover (see [`DEVICE_OS.md`](DEVICE_OS.md)).
@@ -145,9 +145,17 @@ Spec: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 | 3 | Tap **Not now** | Strip hidden; `hc_browser_notif_prompt_dismissed` set |
 | 4 | Hide tab with proof still pending | OS notification title = card label; tap opens `/created/` sign URL |
 
-## P4 — Device inbox unification (planned — not yet QA)
+## P3b — Inbox badge chroma (phase 5)
 
-When [`DEVICE_INBOX.md`](DEVICE_INBOX.md) phase 5–6 ship, add:
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Live proof pending | `#shell-notif-badge` has `data-inbox-chroma="live_proof"` and amber ring |
+| 2 | Cross-tab only (no tab notice) | `data-inbox-chroma="cross_tab_keys"` and blue ring |
+| 3 | Unsaved tab keys only | `data-inbox-chroma="default"` and red ring |
+
+## P4 — Device inbox E2E (planned — phase 6)
+
+When [`DEVICE_INBOX.md`](DEVICE_INBOX.md) phase 6 ships, add:
 
 | Step | Action | Expected |
 |------|--------|----------|

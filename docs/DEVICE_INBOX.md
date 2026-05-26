@@ -97,9 +97,10 @@ Canonical `kind` values (target: one module `device-inbox-core.mjs`, Vitest-cove
 - **Now / Why / Next** explainer in hub status key + glance popover.
 - Quick action `open_notifications` when overlay is `proof_waiting`.
 
+- Badge ring/count chroma follows `inboxBadgeChromaKind()` (amber live proof, blue cross-tab, red default).
+
 **Planned:**
 
-- Overlay/badge **chroma sync** (e.g. amber ring on badge when proof overlay active).
 - Do **not** add a numeric count on the dot.
 
 See [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
@@ -113,11 +114,7 @@ See [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 - Tap → **`openInboxFromChrome()`** opens compact inbox sheet (`device-inbox-sheet.mjs`); one row per live proof / cross-tab / tab notice with same CTAs as hub alerts.
 - On wallet, badge opens the same sheet (no hub expand + scroll).
 - `aria-label` from `inboxBadgeAriaLabel()` (phase 2).
-- Styled in `site/css/device-shell.css` (red ring + count).
-
-**Planned:**
-
-- Ring color matches `topInboxKind()` (amber proof, blue cross-tab) — phase 5.
+- Ring/count chroma in `site/css/device-shell.css`: `--live-proof` (#f59e0b), `--cross-tab` (#2563eb), default red — synced via `data-inbox-chroma` on `#shell-notif-badge`.
 
 ### Hub alerts stack (`#device-hub-alerts-top`)
 
@@ -231,7 +228,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 | 2 | Refactor `notificationCount()`, glance, dot overlay, badge ARIA to use core | ✅ (hub alert DOM still in `device-hub-ui.mjs`; same scroll targets) |
 | 3 | Inbox sheet from `#shell-notif-badge`; shared `openInboxFromChrome()` | ✅ |
 | 4 | Contextual browser-alert prompt + OS click deep link | ✅ |
-| 5 | Badge/dot chroma sync to `topInboxKind()` | Planned |
+| 5 | Badge/dot chroma sync to `topInboxKind()` | ✅ |
 | 6 | E2E: proof → badge → row; Playwright `Notification` permission | Planned |
 
 **Do not:**
@@ -258,11 +255,19 @@ Confusion signal: repeated `inbox_open` without `inbox_item_action` → copy or 
 
 ---
 
+## Troubleshooting: dot vs inbox (cross-link)
+
+The **status dot** and **inbox badge** are separate controls. Dot tap → hub sheet (`openHubFromChrome` in `device-status.mjs`). Badge tap → inbox sheet (`openInboxFromChrome` in `device-inbox-sheet.mjs`).
+
+Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox sheet module at load time. If that import graph fails (404, syntax error, missing deploy artifact), the dot can look normal in HTML but **never bind its click handler**. Diagnosis and engineering fix directions: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) — sections **Troubleshooting: dot tap appears dead** and **Fix directions (engineering)**.
+
+---
+
 ## Files (current)
 
 | Path | Role |
 |------|------|
-| `site/js/device-status.mjs` | Dot, badge count, `openNotificationsFromChrome()` |
+| `site/js/device-status.mjs` | Dot (`openHubFromChrome()`), badge count; imports inbox sheet for hub coordination |
 | `site/js/device-dot-state-core.mjs` | Dot overlay priority, explainers, `open_notifications` action |
 | `site/js/device-browser-notifications.mjs` | OS alerts, contextual prompt, toggle sync |
 | `site/js/device-browser-notifications-core.mjs` | Pure prompt + OS copy helpers |

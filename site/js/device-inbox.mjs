@@ -9,6 +9,9 @@ import {
   inboxCountFromItems,
   inboxOverlayCountsFromItems,
   topInboxKind,
+  inboxBadgeChromaKind,
+  inboxBadgeChromaClass,
+  inboxBadgeChromaClassNames,
 } from "./device-inbox-core.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
 import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
@@ -22,6 +25,9 @@ export {
   inboxCountFromItems,
   inboxOverlayCountsFromItems,
   topInboxKind,
+  inboxBadgeChromaKind,
+  inboxBadgeChromaClass,
+  inboxBadgeChromaClassNames,
 } from "./device-inbox-core.mjs";
 
 function tabSessionLabel() {

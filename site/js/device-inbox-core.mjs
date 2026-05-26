@@ -112,6 +112,36 @@ export function topInboxKind(items) {
   return null;
 }
 
+/** @typedef {'live_proof' | 'cross_tab_keys' | 'default'} InboxBadgeChroma */
+
+const BADGE_CHROMA_CLASSES = {
+  live_proof: "shell-notif-badge--live-proof",
+  cross_tab_keys: "shell-notif-badge--cross-tab",
+  default: "shell-notif-badge--default",
+};
+
+/**
+ * Badge ring/count color aligned with dot overlay priority (phase 5).
+ * @param {InboxItem[]} items
+ * @returns {InboxBadgeChroma}
+ */
+export function inboxBadgeChromaKind(items) {
+  const top = topInboxKind(items);
+  if (top === "live_proof") return "live_proof";
+  if (top === "cross_tab_keys") return "cross_tab_keys";
+  return "default";
+}
+
+/** @param {InboxBadgeChroma} kind */
+export function inboxBadgeChromaClass(kind) {
+  return BADGE_CHROMA_CLASSES[kind] ?? BADGE_CHROMA_CLASSES.default;
+}
+
+/** @returns {string[]} */
+export function inboxBadgeChromaClassNames() {
+  return Object.values(BADGE_CHROMA_CLASSES);
+}
+
 /**
  * Dot overlay inputs derived from inbox items (must match dotOverlayFromCounts).
  * @param {InboxItem[]} items

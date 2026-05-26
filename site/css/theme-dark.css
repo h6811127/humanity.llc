@@ -162,6 +162,22 @@ html[data-theme="dark"] .shell-notif-badge-ring {
   box-shadow: none;
 }
 
+html[data-theme="dark"] .shell-notif-badge--live-proof .shell-notif-badge-ring {
+  border-color: #f59e0b;
+}
+
+html[data-theme="dark"] .shell-notif-badge--live-proof .shell-notif-badge-count {
+  color: #fbbf24;
+}
+
+html[data-theme="dark"] .shell-notif-badge--cross-tab .shell-notif-badge-ring {
+  border-color: #3b82f6;
+}
+
+html[data-theme="dark"] .shell-notif-badge--cross-tab .shell-notif-badge-count {
+  color: #60a5fa;
+}
+
 /* Notices */
 html[data-theme="dark"] .hc-notice {
   background: var(--shell-fill);

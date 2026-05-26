@@ -15,6 +15,9 @@ import {
   getInboxItems,
   getInboxOverlayCounts,
   inboxBadgeAriaLabel,
+  inboxBadgeChromaClass,
+  inboxBadgeChromaClassNames,
+  inboxBadgeChromaKind,
   inboxBadgeCountText,
   notificationCount,
 } from "./device-inbox.mjs";
@@ -346,6 +349,10 @@ function renderNotifBadge() {
   const n = notificationCount();
   notifBtn.hidden = n === 0;
   notifBtn.setAttribute("aria-label", inboxBadgeAriaLabel(items));
+  notifBtn.classList.remove(...inboxBadgeChromaClassNames());
+  const chroma = inboxBadgeChromaKind(items);
+  notifBtn.classList.add(inboxBadgeChromaClass(chroma));
+  notifBtn.setAttribute("data-inbox-chroma", chroma);
   if (notifCountEl) {
     notifCountEl.textContent = inboxBadgeCountText(n);
   }

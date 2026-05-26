@@ -8,6 +8,8 @@ import {
   inboxCountFromItems,
   inboxOverlayCountsFromItems,
   topInboxKind,
+  inboxBadgeChromaKind,
+  inboxBadgeChromaClass,
 } from "../../site/js/device-inbox-core.mjs";
 
 describe("buildInboxItems", () => {
@@ -119,6 +121,33 @@ describe("inboxBadgeAriaLabel", () => {
 
   it("returns Inbox when empty", () => {
     expect(inboxBadgeAriaLabel([])).toBe("Inbox");
+  });
+});
+
+describe("inboxBadgeChromaKind", () => {
+  it("matches top inbox overlay priority", () => {
+    const proof = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 1,
+      crossTabEntries: [{ profile_id: "x", tabId: "t" }],
+    });
+    expect(inboxBadgeChromaKind(proof)).toBe("live_proof");
+    expect(inboxBadgeChromaClass("live_proof")).toBe("shell-notif-badge--live-proof");
+
+    const cross = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 0,
+      crossTabEntries: [{ profile_id: "x", tabId: "t" }],
+    });
+    expect(inboxBadgeChromaKind(cross)).toBe("cross_tab_keys");
+    expect(inboxBadgeChromaClass("cross_tab_keys")).toBe("shell-notif-badge--cross-tab");
+
+    const tabOnly = buildInboxItems({
+      tabNoticeCount: 1,
+      liveProofCount: 0,
+      crossTabEntries: [],
+    });
+    expect(inboxBadgeChromaKind(tabOnly)).toBe("default");
   });
 });
 

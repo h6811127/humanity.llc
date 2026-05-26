@@ -183,7 +183,7 @@ Full spec: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 
 | Piece | Shipped | Planned |
 |-------|---------|---------|
-| Inbox badge (`#shell-notif-badge`) | Aggregate count; tap → inbox sheet (`openInboxFromChrome`) | Chroma sync with dot overlay (phase 5) |
+| Inbox badge (`#shell-notif-badge`) | Count, chroma, tap → inbox sheet | — |
 | Hub / glance rows | Live proof, cross-tab, tab keys, card-disabled in glance | Single `buildInboxItems()` source |
 | Browser background alerts | Live proof only; toggle on landing settings | Contextual opt-in; deep link to `/created/` sign URL |
 | Status dot | Overlays for proof / cross-tab; `open_notifications` action | — (dot stays non-numeric) |
