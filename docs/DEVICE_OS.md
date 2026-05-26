@@ -26,7 +26,7 @@ Before shipping UI, answer:
 |----------|-------------|
 | Save, search, relabel, import backup, activity log, collapsed glance | **Device hub** (`#device-hub`) + glance strip |
 | Live proof **inbox** (pending challenges for saved cards) | **Device hub**  -  tap opens `/created/` to sign |
-| Manifesto, revoke, QR, backup export | **Network object** + `/created/` Manage tab |
+| Manifesto, revoke, QR, backup export | **Network object** + `/created/` More options tab |
 | Live proof **signing** | **`/created/`** only (existing proof panel + poll) |
 | What a stranger sees | **Scan page only**  -  never a second homepage demo |
 | Protocol essays, threat models, case study walkthrough | **Reference** (full docs in intro mode; Help & protocol footer in focus mode) |

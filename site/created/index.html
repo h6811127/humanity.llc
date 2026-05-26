@@ -80,7 +80,7 @@
           <h2 class="device-hub-title" id="device-hub-title">This browser</h2>
           <p class="device-hub-lead">Saved in this browser — cards, keys, and pins you choose to keep here.</p>
           <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint" hidden>
-            Tap <strong>Save control key</strong> on the Tasks tab to keep keys after you close this tab.
+            Tap <strong>Save control key</strong> during setup to keep keys after you close this tab.
           </p>
 
           <div class="device-hub-search-block" id="device-hub-search-block" role="search">
@@ -245,6 +245,95 @@
           >
         </div>
 
+        <section
+          class="created-setup"
+          id="created-setup-root"
+          hidden
+          aria-labelledby="created-setup-title"
+        >
+          <p class="created-setup-kicker">Four steps · keys stay in this browser</p>
+          <ol class="created-setup-progress" aria-label="Setup progress">
+            <li class="created-setup-progress-item" data-setup-step="save">
+              <span class="created-setup-progress-num" aria-hidden="true">1</span>
+              <span class="created-setup-progress-label">Save</span>
+            </li>
+            <li class="created-setup-progress-item" data-setup-step="qr">
+              <span class="created-setup-progress-num" aria-hidden="true">2</span>
+              <span class="created-setup-progress-label">Print</span>
+            </li>
+            <li class="created-setup-progress-item" data-setup-step="test">
+              <span class="created-setup-progress-num" aria-hidden="true">3</span>
+              <span class="created-setup-progress-label">Test scan</span>
+            </li>
+            <li class="created-setup-progress-item" data-setup-step="done">
+              <span class="created-setup-progress-num" aria-hidden="true">4</span>
+              <span class="created-setup-progress-label">Live</span>
+            </li>
+          </ol>
+
+          <div class="created-setup-panel" data-setup-panel="save" id="created-setup-panel-save">
+            <h2 class="created-setup-panel-title" id="created-setup-title">Save control on this device</h2>
+            <p class="created-setup-panel-lead">
+              Your signing key stays in this browser until you save it here. Without save, closing
+              this tab means you cannot update or revoke later.
+            </p>
+            <div id="created-setup-keys-mount"></div>
+            <button type="button" class="btn-secondary created-setup-inline-action" data-setup-action="save">
+              Save control key
+            </button>
+          </div>
+
+          <div class="created-setup-panel" data-setup-panel="qr" id="created-setup-panel-qr" hidden>
+            <h2 class="created-setup-panel-title">Get your QR</h2>
+            <p class="created-setup-panel-lead">
+              Download the image to print or share. The same code stays valid when you update status
+              on the network.
+            </p>
+            <div class="created-setup-qr-preview" id="created-setup-qr-preview" hidden>
+              <img id="created-setup-qr-img" width="160" height="160" alt="" />
+            </div>
+            <button type="button" class="btn-primary created-setup-inline-action" data-setup-action="download-qr">
+              Download QR image
+            </button>
+            <p class="form-hint created-setup-print-hint">
+              On iPhone: save to Photos → Share → Print. On Android: ⋮ → Print, or use label paper.
+            </p>
+          </div>
+
+          <div class="created-setup-panel" data-setup-panel="test" id="created-setup-panel-test" hidden>
+            <h2 class="created-setup-panel-title">Test from another device</h2>
+            <p class="created-setup-panel-lead">
+              Open what scanners see on the network. Use a friend’s camera or a second phone — no
+              app required.
+            </p>
+            <button type="button" class="btn-primary created-setup-inline-action" data-setup-action="test-scan">
+              Open scan page
+            </button>
+          </div>
+
+          <div class="created-setup-panel" data-setup-panel="done" id="created-setup-panel-done" hidden>
+            <h2 class="created-setup-panel-title">You’re live</h2>
+            <p class="created-setup-panel-lead">
+              Your QR resolves to current status on the network. You can update, revoke, and manage
+              advanced options anytime.
+            </p>
+            <button type="button" class="btn-primary" id="created-setup-finish">
+              Open card controls
+            </button>
+            <p class="form-hint">
+              <a href="/wallet/">Saved cards</a> ·
+              <a href="/case-study/">See the full loop</a>
+            </p>
+          </div>
+
+          <p class="created-setup-feedback" id="created-setup-feedback" hidden role="status"></p>
+          <div class="created-setup-nav">
+            <button type="button" class="btn-secondary" id="created-setup-back" hidden>Back</button>
+            <button type="button" class="btn-primary" id="created-setup-continue">Continue</button>
+          </div>
+        </section>
+
+        <div id="created-control-root" hidden>
         <nav class="created-tabs" role="tablist" aria-label="Owner tools">
           <button
             type="button"
@@ -264,7 +353,7 @@
             data-created-tab="manage"
             id="created-tab-btn-manage"
           >
-            Manage
+            More options
           </button>
           <button
             type="button"
@@ -532,7 +621,7 @@
           <p class="created-tab-lead">
             Update copy, revoke, or unlock keys. Same printed QR  -  you change resolver state, not
             the sticker.
-            Use <strong>Save on this device</strong> on the Now tab (or
+            Use <strong>Save control key</strong> on the Tasks tab (or
             <a href="/wallet/">Saved cards</a> in the same tab) before switching tabs.
           </p>
 
@@ -1024,6 +1113,8 @@
           </ul>
         </div>
 
+        </div><!-- /#created-control-root -->
+
         <div class="hc-notice hc-notice--error hc-notice--plain form-warning" id="created-error" hidden role="alert"></div>
         <div class="hc-notice hc-notice--warning hc-notice--plain form-warning" id="no-session" hidden role="status">
           <p class="hc-notice-body">
@@ -1037,6 +1128,6 @@
     </div>
     <script src="/js/device-status.mjs?v=20" type="module"></script>
     <script src="/js/created-hub.mjs?v=2" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=41"></script>
+    <script type="module" src="/js/created.mjs?v=42"></script>
   </body>
 </html>

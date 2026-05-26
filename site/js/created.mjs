@@ -18,12 +18,20 @@ import { inferPilotTemplate } from "./manifesto-display.mjs";
 import { initCreatedTabs } from "./created-tabs.mjs";
 import { initCreatedDashboard } from "./created-dashboard.mjs?v=2";
 import { initCreatedDeviceSave } from "./created-device-save.mjs";
+import { modeFromPage } from "./created-mode.mjs";
+import { initCreatedSetup } from "./created-setup.mjs";
+import {
+  applyCreatedWorkspaceMode,
+  clearFreshUrlParam,
+  restoreKeysStripToControlPanel,
+} from "./created-workspace.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
 import { applyHumanTrustIconToElement } from "./human-trust-ui.mjs";
 
 const params = new URLSearchParams(location.search);
 const profileIdParam = params.get("profile_id")?.trim() || null;
 const qrIdParam = params.get("qr_id")?.trim() || null;
+const freshParam = params.get("fresh") === "1";
 const liveChallengeParam = params.get("live_challenge")?.trim() || null;
 const liveReturnUrlParam = params.get("return_url")?.trim() || null;
 const vouchIntentParam = params.get("intent") === "vouch";
@@ -160,6 +168,27 @@ function syncQrPreview() {
 let deviceSaveCtl = null;
 /** @type {{ select: (tabId: string) => void } | undefined} */
 let createdTabs;
+let workspaceMode = "view";
+let dashboardWired = false;
+let downloadQrClick = null;
+
+function getWorkspaceMode() {
+  return modeFromPage(profileId, freshParam, loadSession);
+}
+
+function enterControlWorkspace() {
+  workspaceMode = "control";
+  clearFreshUrlParam();
+  applyCreatedWorkspaceMode("control");
+  restoreKeysStripToControlPanel();
+  if (!createdTabs) {
+    createdTabs = initCreatedTabs();
+  }
+  if (!dashboardWired) {
+    setupCreatedDashboard();
+    dashboardWired = true;
+  }
+}
 
 function revealOwnerActions() {
   createdTabs?.select("manage");
@@ -613,11 +642,32 @@ function setupCreatedDashboard() {
 
 initVouchReturnBanner();
 
-createdTabs = initCreatedTabs();
-setupCreatedDashboard();
+workspaceMode = getWorkspaceMode();
+applyCreatedWorkspaceMode(workspaceMode);
 
 if (profileId && activeQrId) {
   deviceSaveCtl = initCreatedDeviceSave(loadSession);
+}
+
+if (workspaceMode === "setup" && profileId && activeQrId) {
+  initCreatedSetup({
+    profileId,
+    runSave: () => {
+      if (!deviceSaveCtl?.runSave) return null;
+      return deviceSaveCtl.runSave() === true;
+    },
+    refreshSave: () => deviceSaveCtl?.refresh?.(),
+    getScanUrl: () => {
+      const href = openScanBtn?.getAttribute("href");
+      return href && href.startsWith("http") ? href : null;
+    },
+    onComplete: enterControlWorkspace,
+    triggerDownloadQr: () => downloadQrClick?.(),
+  });
+} else if (workspaceMode === "control" && profileId && activeQrId) {
+  createdTabs = initCreatedTabs();
+  setupCreatedDashboard();
+  dashboardWired = true;
 }
 
 if (activeScanUrl) {
@@ -628,7 +678,10 @@ if (activeScanUrl) {
   if (openScanBtn) {
     openScanBtn.hidden = false;
     openScanBtn.href = activeScanUrl;
-    openScanBtn.addEventListener("click", () => {
+    openScanBtn.addEventListener("click", (e) => {
+      if (workspaceMode === "setup") return;
+      if (openScanBtn.getAttribute("target") === "_blank") return;
+      e.preventDefault();
       createdTabs?.select("manage");
       if (revokeDetails && !revokeDetails.open) {
         revokeDetails.open = true;
@@ -640,10 +693,11 @@ if (activeScanUrl) {
     const { renderQrToImage, downloadQrPng } = await import("./qr-render.mjs");
     await renderQrToImage(qrImg, activeScanUrl);
     syncQrPreview();
+    window.dispatchEvent(new Event("hc-created-qr-ready"));
     if (downloadQrBtn) {
       downloadQrBtn.disabled = false;
       const slug = data?.handle ? String(data.handle) : activeQrId?.slice(0, 8) || "scan";
-      downloadQrBtn.onclick = async () => {
+      const runDownload = async () => {
         const prev = downloadQrBtn.textContent;
         downloadQrBtn.disabled = true;
         try {
@@ -658,6 +712,8 @@ if (activeScanUrl) {
           downloadQrBtn.disabled = false;
         }
       };
+      downloadQrBtn.onclick = () => void runDownload();
+      downloadQrClick = () => void runDownload();
     }
   } catch (err) {
     console.error(err);
