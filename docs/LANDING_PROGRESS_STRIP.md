@@ -1,6 +1,6 @@
 # Landing progress strip
 
-**Status:** Phase 1 shipped (May 2026) · Phase 2 deeplinks not started  
+**Status:** Phase 1–2 shipped (May 2026)  
 **Scope:** `/` (`site/index.html`) · `.landing-progress` · `site/js/landing-progress.mjs`  
 **Companion:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) · [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`CARD_WORKSPACE_PHASE0.md`](CARD_WORKSPACE_PHASE0.md)
 
@@ -143,11 +143,11 @@ Share resolution logic with hub where possible (`openCardControlPage`, `openCard
 5. Four peer step links removed (no contextless `/created/` hops).
 6. **QA:** manual **P1-LP** below; Playwright `e2e/landing-progress.spec.ts`.
 
-### Phase 2 — Deeplinks (follow-up PR)
+### Phase 2 — Deeplinks (shipped)
 
-1. Continue `href`s open the screen that performs Save / Print for the resolved card.
-2. Optional: shared helper imported by hub + landing.
-3. Revisit legend `is-done` granularity using `hc_setup_done` per profile.
+1. Continue `href`s target the verb: **Save** → `/created/?…&fresh=1#setup`, **Print** → `/created/?…#setup-qr`, **My cards** → `/wallet/`.
+2. URL helpers in `landing-progress-core.mjs` (`createdPageHref`, `pickResumeWalletEntry`).
+3. `hc_setup_done` gates print vs manage; resume card prefers session profile, then incomplete setup, then last saved.
 
 ### Explicit non-goals
 

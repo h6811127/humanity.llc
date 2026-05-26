@@ -30,8 +30,33 @@ test.describe("landing progress strip", () => {
     await expect(page.locator("#landing-progress-continue")).toHaveText(
       "Save keys on this device"
     );
-    await expect(page.locator("#landing-progress-continue")).toHaveAttribute("href", "/wallet/");
-    await expect(page.locator(".landing-progress-step.is-next")).toHaveCount(0);
+    await expect(page.locator("#landing-progress-continue")).toHaveAttribute(
+      "href",
+      /\/created\/\?profile_id=p_e2e_unsaved&fresh=1#setup$/
+    );
+    await expect(page.locator('.landing-progress-step[data-legend-step="2"]')).toHaveClass(
+      /is-next/
+    );
+  });
+
+  test("saved wallet without pin deeplinks to print setup", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        "hc_wallet",
+        JSON.stringify([
+          { profile_id: "p_e2e_print", qr_id: "qr_e2e_print123456789", label: "E2E" },
+        ])
+      );
+      localStorage.setItem("hc_setup_done", JSON.stringify({}));
+      localStorage.removeItem("hc_device_pins");
+      sessionStorage.clear();
+    });
+    await page.goto("/");
+    await expect(page.locator("#landing-progress-continue")).toHaveText("Print your QR");
+    await expect(page.locator("#landing-progress-continue")).toHaveAttribute(
+      "href",
+      /\/created\/\?profile_id=p_e2e_print&qr_id=qr_e2e_print123456789#setup-qr$/
+    );
   });
 
   test("saved wallet with pin shows My cards continue and step highlight", async ({

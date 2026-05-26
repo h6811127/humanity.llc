@@ -39,19 +39,21 @@ function loadSetupDone() {
   }
 }
 
-/** Tab has signing keys not yet in `hc_wallet` (same rule as device-status). */
-function hasUnsavedTabKeys() {
+function loadTabSession() {
   try {
     const raw = sessionStorage.getItem("hc_created");
-    if (!raw) return false;
-    const session = JSON.parse(raw);
-    const profileId =
-      typeof session?.profile_id === "string" ? session.profile_id.trim() : "";
-    if (!profileId || !session?.owner_private_key_b58) return false;
-    return !loadWallet().some((e) => e.profile_id === profileId);
+    return raw ? JSON.parse(raw) : null;
   } catch {
-    return false;
+    return null;
   }
+}
+
+/** Tab has signing keys not yet in `hc_wallet` (same rule as device-status). */
+function hasUnsavedTabKeys(session) {
+  const profileId =
+    typeof session?.profile_id === "string" ? session.profile_id.trim() : "";
+  if (!profileId || !session?.owner_private_key_b58) return false;
+  return !loadWallet().some((e) => e.profile_id === profileId);
 }
 
 function applyProgressState() {
@@ -60,11 +62,22 @@ function applyProgressState() {
   if (!steps.length || !continueEl) return;
 
   const wallet = loadWallet();
+  const session = loadTabSession();
+  const unsaved = hasUnsavedTabKeys(session);
   const state = resolveLandingContinue({
     wallet,
     pins: loadPins(),
     setupDone: loadSetupDone(),
-    unsavedTabKeys: hasUnsavedTabKeys(),
+    unsavedTabKeys: unsaved,
+    session: unsaved
+      ? {
+          profile_id: session?.profile_id ?? null,
+          qr_id: session?.qr_id ?? null,
+          scan_url: session?.scan_url ?? null,
+        }
+      : session
+        ? { profile_id: session.profile_id ?? null, qr_id: session.qr_id ?? null }
+        : null,
   });
 
   for (const step of steps) {
@@ -76,7 +89,7 @@ function applyProgressState() {
     step?.classList.add("is-done");
   }
 
-  if (state.legendStep && (wallet.length > 0 || hasUnsavedTabKeys())) {
+  if (state.legendStep && (wallet.length > 0 || unsaved)) {
     const active = document.querySelector(
       `.landing-progress-step[data-legend-step="${state.legendStep}"]`
     );
@@ -90,7 +103,12 @@ function applyProgressState() {
 applyProgressState();
 
 window.addEventListener("storage", (e) => {
-  if (e.key === WALLET_KEY || e.key === PINS_KEY || e.key === SETUP_DONE_KEY) {
+  if (
+    e.key === WALLET_KEY ||
+    e.key === PINS_KEY ||
+    e.key === SETUP_DONE_KEY ||
+    e.key === "hc_created"
+  ) {
     applyProgressState();
   }
 });
