@@ -1,4 +1,4 @@
-/* Pure-black dark mode — load after styles.css and device-shell.css.
+/* Pure-black dark mode - load after styles.css and device-shell.css.
    Notice tokens live on :root in styles.css; do not redefine them on .hc-notice
    or dark text falls back to light-mode greys on tinted banners. */
 
@@ -173,7 +173,7 @@ html[data-theme="dark"] .btn-secondary {
   color: var(--shell-label-strong);
 }
 
-/* Floating chrome — dot and badge only, no bar */
+/* Floating chrome - dot and badge only, no bar */
 html[data-theme="dark"] .top-chrome--float,
 html[data-theme="dark"] .top-chrome-bar,
 html[data-theme="dark"] .top-chrome-bar--minimal,
@@ -787,7 +787,7 @@ html[data-theme="dark"] .landing-final-cta {
   background: linear-gradient(180deg, rgba(255, 77, 109, 0.12) 0%, rgba(28, 28, 30, 0) 72%);
 }
 
-/* Landing — object model strip + trust/docs cards */
+/* Landing - object model strip + trust/docs cards */
 html[data-theme="dark"] .flow-strip {
   background: var(--shell-fill);
   border-color: var(--shell-separator);
@@ -876,7 +876,7 @@ html[data-theme="dark"] .landing-disclosure-card-body .list-action > button:acti
   background: rgba(255, 255, 255, 0.06);
 }
 
-/* Create / created flow — bordered field cards */
+/* Create / created flow - bordered field cards */
 html[data-theme="dark"] .flow-segmented.create-template-row {
   background: rgba(255, 255, 255, 0.08);
   border-color: var(--shell-separator);

@@ -24,7 +24,7 @@ These notes are captured as individual product refinements so implementation can
 2. **Rename “Use keys”**
    - Shipped as **Open controls** (hub/wallet/tests).
 3. **Make cards feel alive**
-   - Unified status line with **checked** recency (device resolver poll — not scan logging). See [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) § Recency wording and data policy.
+   - Unified status line with **checked** recency (device resolver poll - not scan logging). See [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) § Recency wording and data policy.
 4. **Refine top status pills**
    - Hub **segmented status line** (landing/wallet chrome) uses **Network reachable** semantics; saved **rows** no longer duplicate network + liveliness pills (Phase 1 row consolidation).
 5. **Strengthen object identity visuals**
@@ -67,7 +67,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Landing trust UI:** Intro mode shows **Design choices**, **Clear limits**, and **Documentation** as stacked `.landing-disclosure-card` rows (icon + title + subtitle + chevron). The status-plate **flow strip** (plate → scan → live state) uses `.flow-strip--model` and picks up dark surfaces from `site/css/theme-dark.css` when `hc_theme` is dark.
 
-**Shortcuts & settings (shipped):** On the **homepage** (`/`) only — section after the studio example (unified list rows: Appearance, **Browser alerts** (background OS notifications for live proof), saved cards, manage, auto-save, focus). Hub sheet on all routes has **home icon** (left), status line (center), **Create +** (right); no shortcuts block in the hub.
+**Shortcuts & settings (shipped):** On the **homepage** (`/`) only - section after the studio example (unified list rows: Appearance, **Browser alerts** (background OS notifications for live proof), saved cards, manage, auto-save, focus). Hub sheet on all routes has **home icon** (left), status line (center), **Create +** (right); no shortcuts block in the hub.
 
 **Chrome inbox (shipped):** Floating **inbox badge** next to the status dot when action items exist; hub `#device-hub-alerts-top` holds full rows. Spec and roadmap: [`DEVICE_INBOX.md`](DEVICE_INBOX.md). Status dot semantics: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 
@@ -77,7 +77,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **`/wallet/` (Phase 5–6):** Uses the same hub renderer as landing. Each saved row shows **title**, **identity line**, **status line**, optional **card disabled since last visit** alert, **Details**, **Open controls / Open scan**, and steward actions under ⋯ **QR & lifecycle** (see [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md)). Row icon tone follows verification (green shield = Steward). Page is hub-expanded by default; help disclosure hides when cards exist.
 
-**Card status line (Row Phase 1):** Single line replaces separate network + verification pills and the old liveliness row. Recency uses **checked** (this device’s last successful `GET …/status?q=…` poll), not **seen** — not a scan log. Full copy table: [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md).
+**Card status line (Row Phase 1):** Single line replaces separate network + verification pills and the old liveliness row. Recency uses **checked** (this device’s last successful `GET …/status?q=…` poll), not **seen** - not a scan log. Full copy table: [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md).
 
 **Object identity visuals (Step 5):** Object type appears on the identity line; left accent bar per type from `classifyObjectType()` (Membership, Status plate, Live demo, …).
 
@@ -85,7 +85,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Keys vs verification:** See [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md). **Open controls** loads signing material into `hc_created`; verification on the identity line is read-only network state.
 
-**Card-disabled-since-visit alert:** Only appears when this device previously recorded a **non-revoked** baseline and the resolver now reports **card disabled** (`scan.kind === card_revoked`). Copy is **“Card disabled on the network since your last visit.”** (not generic “revoked”) so it is not confused with QR-only revoke. The row **status line** uses the same `scan.kind`: **Disabled on network** for `card_revoked`, **QR revoked** for `qr_revoked`, **Reachable** when active. QR-only revoke does **not** trigger the since-visit alert. First sight of a disabled card shows the status line only, not “since your last visit.” Dismiss **Got it** stores acknowledged state; `hc-wallet-network-baseline-changed` re-applies hub/glance/inbox from the **latest resolver-confirmed** poll (not session cache alone). Leaving the tab (`pagehide` / hidden) snapshots resolver-confirmed alert states from this visit when a poll has completed. Returning to the tab (`visibilitychange` → visible) re-fetches resolver status for saved rows so alerts and status can clear without a full reload. Session cache (~5 min) is **not** used for alerts when it says `card_revoked` but the device baseline still says non-revoked — the hub re-fetches from the resolver first. A fresh fetch that returns non-revoked always updates the device baseline (self-heal after stale cache). Glance shows one card-disabled inbox row (not a duplicate suffix on the same saved card row).
+**Card-disabled-since-visit alert:** Only appears when this device previously recorded a **non-revoked** baseline and the resolver now reports **card disabled** (`scan.kind === card_revoked`). Copy is **“Card disabled on the network since your last visit.”** (not generic “revoked”) so it is not confused with QR-only revoke. The row **status line** uses the same `scan.kind`: **Disabled on network** for `card_revoked`, **QR revoked** for `qr_revoked`, **Reachable** when active. QR-only revoke does **not** trigger the since-visit alert. First sight of a disabled card shows the status line only, not “since your last visit.” Dismiss **Got it** stores acknowledged state; `hc-wallet-network-baseline-changed` re-applies hub/glance/inbox from the **latest resolver-confirmed** poll (not session cache alone). Leaving the tab (`pagehide` / hidden) snapshots resolver-confirmed alert states from this visit when a poll has completed. Returning to the tab (`visibilitychange` → visible) re-fetches resolver status for saved rows so alerts and status can clear without a full reload. Session cache (~5 min) is **not** used for alerts when it says `card_revoked` but the device baseline still says non-revoked - the hub re-fetches from the resolver first. A fresh fetch that returns non-revoked always updates the device baseline (self-heal after stale cache). Glance shows one card-disabled inbox row (not a duplicate suffix on the same saved card row).
 
 **Copy alignment (shipped):** Shared strings live in `wallet-network-baseline.mjs`; row status uses `hubCardStatusLine()` in `device-hub-card-row-core.mjs` (prefers `scan.kind`). Verified: `npm run worker:test`; hub row shows matching **Disabled on network** status + banner only on real card-level transitions.
 
@@ -153,11 +153,11 @@ See [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 
 No backend required:
 
-- ~~Browser notifications when a live proof is waiting~~ — ✅ v1 shipped; v2 in [`DEVICE_INBOX.md`](DEVICE_INBOX.md)
-- ~~Hub glance on `/wallet/`~~ — landing popover only; wallet scrolls from dot
-- ~~Light frontend tests for tab presence, live-control inbox, wallet network, and status counts~~ — ✅ `worker/tests/device-hub-frontend-pipeline.test.ts` + `npm run worker:test:device`; Playwright `e2e/device-{status-dot,inbox,os-wallet}.spec.ts` in CI
-- ~~Inbox unification phases 1–10~~ — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) (glance via `buildGlanceRowPlan()`)
-- ~~Hub saved card row UX phases 1–3~~ — [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md)
+- ~~Browser notifications when a live proof is waiting~~ - ✅ v1 shipped; v2 in [`DEVICE_INBOX.md`](DEVICE_INBOX.md)
+- ~~Hub glance on `/wallet/`~~ - landing popover only; wallet scrolls from dot
+- ~~Light frontend tests for tab presence, live-control inbox, wallet network, and status counts~~ - ✅ `worker/tests/device-hub-frontend-pipeline.test.ts` + `npm run worker:test:device`; Playwright `e2e/device-{status-dot,inbox,os-wallet}.spec.ts` in CI
+- ~~Inbox unification phases 1–10~~ - [`DEVICE_INBOX.md`](DEVICE_INBOX.md) (glance via `buildGlanceRowPlan()`)
+- ~~Hub saved card row UX phases 1–3~~ - [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md)
 
 ### Deferred
 
@@ -217,11 +217,11 @@ Inline notices (hub **Your browser holds the private key**, system/cross-tab ban
 
 The private-key notice on landing hub + `/wallet/` includes a small **Acknowledge** button. Dismissing stores `hc_keys_custody_notice_dismissed` in `localStorage` and keeps the notice hidden until you clear site data. For consolidated guides, use `/help/` (not scattered per-feature warnings).
 
-**Do not** redefine those variables on `.hc-notice` itself — each notice box would pin light-mode greys and body copy becomes unreadable on tinted dark backgrounds (especially `.hc-notice--info`).
+**Do not** redefine those variables on `.hc-notice` itself - each notice box would pin light-mode greys and body copy becomes unreadable on tinted dark backgrounds (especially `.hc-notice--info`).
 
 Dark mode sets base tokens on `html[data-theme="dark"]`, then **per-variant** tokens on `.hc-notice--info` / `--warning` / `--error` so title and body stay high-contrast on blue, amber, and red fills. Titles use `--hc-notice-title-fg` (white on tinted banners); body uses `--hc-notice-fg` (slightly softer off-white).
 
-**Create flow (`/create/`):** Field groups use `.flow-inset-fields` with a visible `border: 0.5px solid var(--shell-separator)` and bordered inputs (not borderless grey-on-grey). The pre-submit custody warning is a structured `.hc-notice--warning` (icon + title + body) so it inherits the same tokens — avoid pairing `.form-warning` hardcoded greys with `.hc-notice`.
+**Create flow (`/create/`):** Field groups use `.flow-inset-fields` with a visible `border: 0.5px solid var(--shell-separator)` and bordered inputs (not borderless grey-on-grey). The pre-submit custody warning is a structured `.hc-notice--warning` (icon + title + body) so it inherits the same tokens - avoid pairing `.form-warning` hardcoded greys with `.hc-notice`.
 
 | `site/js/device-hub-search.mjs` | Shared filter |
 | `site/js/device-hub-import.mjs` | Hub backup import |

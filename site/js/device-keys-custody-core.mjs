@@ -1,4 +1,4 @@
-/** @see docs/DEVICE_HUB_AND_LOCAL_SEARCH.md — signing key custody notices */
+/** @see docs/DEVICE_HUB_AND_LOCAL_SEARCH.md - signing key custody notices */
 
 export const KEYS_CUSTODY_DISMISS_STORAGE_KEY = "hc_keys_custody_notice_dismissed";
 
