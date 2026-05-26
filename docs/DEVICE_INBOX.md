@@ -192,7 +192,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 - **`/sw-live-proof.mjs`** - polls pending live-proof challenges when **no visible Humanity tab** and background alerts are on.
 - Page sync: `device-browser-notifications-sw.mjs` mirrors wallet poll targets + resolver origin via `postMessage`; triggers poll on tab hide / `pagehide` and **Background Sync** / **Periodic Background Sync** when the browser grants them.
 - OS notification via `registration.showNotification()` (same copy + sign deep link as Phase B); click handled in the SW.
-- **No server push** - device-only polling, `live_proof` policy only (Phase C).
+- **No server push (shipped)** - device-only polling, `live_proof` policy only (Phase C). **Hosted paid (planning):** server SSE push per [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md); SW remains fallback.
 - **Limits:** Browsers may throttle or deny periodic sync; fully force-quit browsers may not wake the SW. Hidden-tab alerts still use the page path first (`maybeNotifyLiveProof`).
 - **Request budget Phase 4:** SW polls only when alerts are on + permission granted + resolver health is `ok`; **one** challenge GET per wake (round-robin); **15 min** minimum `periodicSync` interval ([`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)).
 

@@ -316,7 +316,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 | L9 | Large wallet: poll **active + pending** only | Yes (`selectLiveControlPollEntries`, ≥10 cards) | Per-card “watch this card” flag | 8 ✅ |
 | L10 | **Stranger pays urgency** | Scan page polls one QR while waiting | Steward inbox optional; OS alert path | Scan + SW |
 | L11 | `/created/` polls **active card only** | ~3s while proving | Stop when hidden (shipped in `created-live-proof-poll-core`) | Created ✅ |
-| L12 | Server push for live proof | — | WebSocket/SSE; steward notified without wallet round-robin | 10 — [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) |
+| L12 | Server push for live proof | — | SSE P1 then DO P2; steward notified without wallet round-robin | 10 — [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) |
 
 ### Network status (wallet chips)
 
@@ -360,7 +360,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 
 ### Implementer order (after Phases 1–9 + 8c)
 
-1. **Phase 10 (planning → build)** — M2 done: [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md). Next: M3–M6 in [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) before code.  
+1. **Phase 10 (planning → build)** — M2 [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md), M3 [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) done. Next: M4–M6 in [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) before code.  
 2. **Shell P2** - Lazy inbox loader ([`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md)).  
 3. **Ops O2** - Per-IP rate limits on hot routes.
 
@@ -390,6 +390,7 @@ Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). 
 
 | Date | Note |
 |------|------|
+| 2026-05-26 | **M3 push RFC:** [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) |
 | 2026-05-26 | **M2 entitlements:** [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) |
 | 2026-05-26 | **Phase 10 planning:** [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) (hosted tier + push; no implementation) |
 | 2026-05-26 | **Phase 8c shipped:** visible-row-first hub network refresh; SW background polls require **Watch for live proof** on |

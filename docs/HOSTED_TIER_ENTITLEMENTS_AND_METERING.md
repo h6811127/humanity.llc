@@ -18,7 +18,7 @@ Goals:
 3. **Meter without surveilling** — count infrastructure events, not scans, strangers, or locations.
 4. **Federation-ready** — same schema per `operator_id`; reference operator is first consumer.
 
-**Out of scope (M2):** Stripe webhooks, push wire protocol (M3), UI copy (M5), prices (M4), D1 table DDL.
+**Out of scope (M2):** Stripe webhooks, push wire protocol (see M3 [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md)), UI copy (M5), prices (M4), D1 table DDL.
 
 ---
 
@@ -27,7 +27,7 @@ Goals:
 | Not in M2 | Where |
 |-----------|--------|
 | Payment provider integration | M4 / E5 |
-| WebSocket / SSE message shapes | M3 |
+| WebSocket / SSE message shapes | [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) (M3) |
 | New trust labels or scan analytics | Forbidden in parent plan |
 | Entitlements that gate **card create** or **public scan** | [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md) |
 | Per-stranger metering | Policy violation |
@@ -277,7 +277,7 @@ Base: `/.well-known/hc/v1/` (same origin as resolver). All JSON; CORS for browse
 | `resolver.status.get` | `GET …/cards/{id}/status` | 1 per request (after cache miss at edge) |
 | `resolver.live_control.challenges.get` | `GET …/live-control/challenges` | 1 |
 | `resolver.live_control.challenges.post` | Stranger creates challenge | 1 (stranger; not steward account) |
-| `notify.push.delivered` | Push fan-out (M3) | 1 per device endpoint |
+| `notify.push.delivered` | Push fan-out — [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) | 1 per device endpoint |
 | `steward.entitlements.get` | Entitlement fetch | 0 (excluded from fair-use) |
 
 ### Aggregation windows

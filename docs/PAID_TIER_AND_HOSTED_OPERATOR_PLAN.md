@@ -100,9 +100,11 @@ Summary:
 
 ---
 
-## Server push (companion to paid — planning only)
+## Server push (companion to paid)
 
-[`DEVICE_INBOX.md`](DEVICE_INBOX.md) Phase D explicitly: **no server push** today; SW + tab polling only.
+[`DEVICE_INBOX.md`](DEVICE_INBOX.md) Phase D: **no server push** in production today; SW + tab polling only.
+
+**M3 RFC:** [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) — SSE MVP, DO scale path, event types, threat model, client integration.
 
 ### Why push belongs with paid
 
@@ -221,7 +223,7 @@ When implementation nears, add a **Hosted tier** section to [`SKEPTIC_FAQ.md`](S
 | Q2 | Sell on reference only or white-label for operator #2? | Governance |
 | Q3 | Per-device vs per-account entitlements? | **Planning default:** account + device-scoped counters — see M2 § Identity model |
 | Q4 | Can orgs force watch on for members? (consent) | Governance |
-| Q5 | Push MVP: SSE vs Durable Object? | Engineering |
+| Q5 | Push MVP: SSE vs Durable Object? | **RFC default:** P1 SSE, P2 DO — see M3 |
 | Q6 | Fair-use definition for “unlimited” polls | Ops |
 | Q7 | Refund / downgrade behavior when subscription lapses | Product |
 | Q8 | Export/portability if user leaves paid but keeps cards | Federation |
@@ -236,7 +238,7 @@ When implementation nears, add a **Hosted tier** section to [`SKEPTIC_FAQ.md`](S
 |------|-------------|--------|
 | M1 | This plan (product + boundaries) | **This doc** |
 | M2 | **Entitlement & metering spec** (fields, APIs, no UI) | **[`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md)** |
-| M3 | **Push architecture RFC** (threat model + protocol messages) | Not started |
+| M3 | **Push architecture RFC** (threat model + protocol messages) | **[`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md)** |
 | M4 | **Pricing & SLA one-pager** (governance-approved) | Not started |
 | M5 | **Skeptic FAQ + launch language** updates | Not started |
 | M6 | **Technical Standards** delta (optional hosted extensions) | Not started |
@@ -275,5 +277,6 @@ In [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md), **Phase 10** is
 
 | Date | Note |
 |------|------|
+| 2026-05-26 | **M3:** [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) |
 | 2026-05-26 | **M2:** [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) |
 | 2026-05-26 | Initial planning doc (no implementation) |
