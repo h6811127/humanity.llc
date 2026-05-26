@@ -35,6 +35,8 @@
   --hub-card-identity-size: 12px;
   --hub-card-status-size: 12px;
   --hub-card-meta-size: 11px;
+  /* Minimal bar: 8px + safe-area + 44px dot tap target + 4px (see .top-chrome-bar--minimal) */
+  --shell-chrome-h: calc(56px + env(safe-area-inset-top, 0px));
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -68,7 +70,7 @@ body {
 
 /* Floating chrome - dot + optional notif badge + outline Create */
 body.has-shell-chrome .page {
-  padding-top: var(--shell-chrome-h, 52px);
+  padding-top: var(--shell-chrome-h);
 }
 
 .top-chrome--float {
@@ -172,7 +174,7 @@ body.device-hub-sheet-open .shell-status-cluster,
   display: none !important;
 }
 
-/* First-visit coachmark — anchored to status dot */
+/* First-visit coachmark - anchored to status dot */
 .device-hub-intro-coachmark {
   position: absolute;
   left: 0;
@@ -387,7 +389,7 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   opacity: 0.85;
 }
 
-/* Glance notifications — status tints on popover control surface */
+/* Glance notifications - status tints on popover control surface */
 .device-hub-glance-popover .device-hub-glance-row--notice .device-hub-glance-btn {
   border-color: var(--surface-popover-notice-border);
   background: var(--surface-popover-notice-bg);
@@ -442,7 +444,7 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   color: var(--grey);
 }
 
-/* Inset settings group — do not combine with .list (double padding/borders break button rows) */
+/* Inset settings group - do not combine with .list (double padding/borders break button rows) */
 .landing-device-settings-list {
   margin: 0;
   padding: 0;
@@ -588,7 +590,7 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   display: none !important;
 }
 
-/* Signing key custody (tab vs saved on device) — uses .hc-notice */
+/* Signing key custody (tab vs saved on device) - uses .hc-notice */
 .device-keys-custody {
   margin: 0 0 16px;
 }
@@ -720,7 +722,7 @@ body.page-wallet .device-keys-custody--wallet {
   letter-spacing: -0.02em;
 }
 
-/* Inbox badge chroma — matches status-dot overlay tokens (DEVICE_INBOX phase 5) */
+/* Inbox badge chroma - matches status-dot overlay tokens (DEVICE_INBOX phase 5) */
 .shell-notif-badge--live-proof .shell-notif-badge-ring {
   border-color: #f59e0b;
 }
@@ -1442,7 +1444,7 @@ button.device-hub-notice-banner {
     box-shadow 0.35s var(--shell-ease);
 }
 
-/* Row Phase 3 — shell tokens align with styles.css ladder */
+/* Row Phase 3 - shell tokens align with styles.css ladder */
 .hub-card-head .list-title {
   color: var(--shell-label-strong, var(--black));
 }
@@ -2202,7 +2204,7 @@ body.device-shell-created .created-screen {
   letter-spacing: -0.02em;
 }
 
-/* Created — keys group */
+/* Created - keys group */
 .flow-keys-group {
   margin-bottom: var(--shell-space-group);
 }
@@ -2330,7 +2332,7 @@ body.device-shell-created .flow-disclosure-body #recovery-reveal-dismiss {
   color: var(--shell-label);
 }
 
-/* Setup wizard — scoped on /created/ so progress + panels always render correctly */
+/* Setup wizard - scoped on /created/ so progress + panels always render correctly */
 body.device-shell-created .created-setup {
   display: flex;
   flex-direction: column;

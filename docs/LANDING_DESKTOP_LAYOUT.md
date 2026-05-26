@@ -1,8 +1,8 @@
 # Landing desktop layout
 
 **Status:** Retired (mobile-only layout restored May 2026)  
-**Scope:** Was `/` (`site/index.html`) · `body.has-device-hub-search`  
-**Companion:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)
+**Scope:** `/` (`site/index.html`) · `body.has-shell-chrome.has-device-hub-search`  
+**Companion:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) · [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md)
 
 ---
 
@@ -27,7 +27,19 @@ The site uses a **430px** centered `.page` column (mobile-first “device frame�
 | **Right** | `.landing-framing` (aligned to top of hero) |
 | **Full width** | All other `main.screen-landing` children (studio, trust, docs, etc.) |
 
-Hub chrome (`#device-hub`, status dot, banners) stays full width above `main`—device OS first, marketing second.
+Hub chrome (`#device-hub`, status dot, banners) stays full width above `main`-device OS first, marketing second.
+
+---
+
+## Chrome inset on first paint (May 2026)
+
+The landing hero kicker (`.hero-headline-kicker`) sits directly under the fixed status dot. Before May 2026, `/` omitted `has-shell-chrome` on `<body>` until `device-shell-chrome.mjs` ran, so the hero loaded under the dot and jumped down when JS set `--shell-chrome-h`.
+
+**Fix:** `site/index.html` ships `has-shell-chrome` on `<body>` (same as `/create/` and `/wallet/`). `:root` in `device-shell.css` sets `--shell-chrome-h: calc(56px + env(safe-area-inset-top, 0px))` so `.page` padding matches the minimal chrome bar on first paint. `device-shell-chrome.mjs` only raises the inset when measurement exceeds that value (monotonic floor; no inline override when already tall enough).
+
+Do not rely on extra `<br>` or hero-only spacer hacks - they double-offset after JS runs.
+
+**Verify:** Hard refresh `/` - red kicker line should not overlap the status dot before or after the status module loads.
 
 ---
 
