@@ -235,7 +235,7 @@ Base: `/.well-known/hc/v1/` (same origin as resolver). All JSON; CORS for browse
 ```
 
 **Response:** `{ "token": "…", "expires_in": 86400 }`  
-**Detail:** Signature message format belongs in M6 Technical Standards delta.
+**Detail:** [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) § Signed payload: `steward_account_link_v1`.
 
 ### `POST /.well-known/hc/v1/steward/usage/report` (optional)
 
@@ -397,7 +397,7 @@ Reference implementation ships first; second operator copies schema with own `pl
 
 | # | Question | Blocks |
 |---|----------|--------|
-| E1 | Exact `steward_account_link_v1` signed message bytes | M6 standards |
+| E1 | Exact `steward_account_link_v1` signed message bytes | **M6** — [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) |
 | E2 | Is `device_id` client-honor system sufficient or install attestation needed? | Security review |
 | E3 | Server 429 on auto poll vs trust client only | E1 scope |
 | E4 | Include `usage` in every entitlement GET vs separate endpoint | Payload size |
@@ -410,4 +410,5 @@ Reference implementation ships first; second operator copies schema with own `pl
 
 | Date | Note |
 |------|------|
+| 2026-05-26 | Link to M6 `steward_account_link_v1` — [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) |
 | 2026-05-26 | M2 initial entitlement & metering spec (planning only) |

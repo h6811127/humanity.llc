@@ -31,6 +31,8 @@ Any network, client, scanner, Printify Fulfillment Middleware, or verification s
 
 **Federation:** Multiple operators MAY implement this standard. See §9.6–9.7 and `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
 
+**Optional hosted steward extensions (planning, not v1.0):** [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) — `steward_account_link_v1`, operator capabilities discovery; ratification target v1.1.
+
 ---
 
 ## 2. Terminology
@@ -815,6 +817,7 @@ All signed payloads MUST include:
 | Version | Date | Changes |
 |---|---|---|
 | 1.0-draft | 2026-05-16 | Initial v1.0 technical standards draft. |
+| 1.0-draft | 2026-05-26 | Pointer to hosted-tier planning annex (M6) — no normative v1.0 change. |
 
 ---
 

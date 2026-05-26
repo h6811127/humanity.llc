@@ -360,7 +360,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 
 ### Implementer order (after Phases 1–9 + 8c)
 
-1. **Phase 10 (planning → build)** — M2–M5 done. Next: **M6** Technical Standards delta in [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md), then M4 governance sign-off before code.  
+1. **Phase 10 (planning → build)** — M2–M6 done. Next: **M7** paid-tier test plan row in [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md), **M4 governance sign-off**, then M8 implementation epics.  
 2. **Shell P2** - Lazy inbox loader ([`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md)).  
 3. **Ops O2** - Per-IP rate limits on hot routes.
 
@@ -390,6 +390,7 @@ Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). 
 
 | Date | Note |
 |------|------|
+| 2026-05-26 | **M6 standards delta:** [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) |
 | 2026-05-26 | **M5 FAQ/launch copy:** [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md), [`LAUNCH_LANGUAGE_KIT.md`](LAUNCH_LANGUAGE_KIT.md) |
 | 2026-05-26 | **M4 pricing/SLA:** [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) |
 | 2026-05-26 | **M3 push RFC:** [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) |

@@ -211,7 +211,7 @@ Document options; **do not pick** in this planning pass without governance.
 
 - **Hosted tier** is a **product packaging** on top of any compatible operator.
 - Reference operator may be the **first** seller; co-op / union operators may set their own prices and caps.
-- Technical Standards must gain a **optional** `operator.capabilities` or entitlement document — **future standards revision**, not v1.0 silent change.
+- Technical Standards gain an **optional hosted extension** via [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) — **v1.1 ratification**, not v1.0 silent change.
 
 ---
 
@@ -241,7 +241,7 @@ Document options; **do not pick** in this planning pass without governance.
 | M3 | **Push architecture RFC** (threat model + protocol messages) | **[`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md)** |
 | M4 | **Pricing & SLA one-pager** (governance-approved) | **[`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md)** (draft — sign-off pending) |
 | M5 | **Skeptic FAQ + launch language** updates | **[`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md)** § Is There A Paid Tier? · **[`LAUNCH_LANGUAGE_KIT.md`](LAUNCH_LANGUAGE_KIT.md)** § Hosted steward tier |
-| M6 | **Technical Standards** delta (optional hosted extensions) | Not started |
+| M6 | **Technical Standards** delta (optional hosted extensions) | **[`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md)** |
 | M7 | **DEVICE_OS_REQUEST_BUDGET** paid-tier row + test plan | Partial (link from budget doc) |
 | M8 | Implementation epics (only after M2–M6) | Not started |
 
@@ -277,6 +277,7 @@ In [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md), **Phase 10** is
 
 | Date | Note |
 |------|------|
+| 2026-05-26 | **M6:** [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) |
 | 2026-05-26 | **M5:** Skeptic FAQ + launch language ([`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md), [`LAUNCH_LANGUAGE_KIT.md`](LAUNCH_LANGUAGE_KIT.md)) |
 | 2026-05-26 | **M4:** [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) |
 | 2026-05-26 | **M3:** [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) |
