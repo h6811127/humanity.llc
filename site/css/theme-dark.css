@@ -717,6 +717,11 @@ html[data-theme="dark"] .landing-trust-chip {
   color: var(--shell-label-strong);
 }
 
+html[data-theme="dark"] .landing-progress {
+  border-color: var(--shell-separator);
+  background: var(--shell-fill);
+}
+
 html[data-theme="dark"] .landing-how-it-works-title,
 html[data-theme="dark"] .landing-final-cta-title {
   color: var(--shell-label-strong);
