@@ -3,11 +3,15 @@
  */
 const chrome = document.getElementById("top-chrome");
 
+/** Largest measured chrome bar height — never shrink (avoids scroll jump). */
+let chromeInsetFloor = 0;
+
 export function syncShellChromeInset() {
   if (!chrome) return;
   const bar = chrome.querySelector(".top-chrome-bar");
-  const h = (bar || chrome).getBoundingClientRect().height;
-  document.documentElement.style.setProperty("--shell-chrome-h", `${Math.ceil(h)}px`);
+  const h = Math.ceil((bar || chrome).getBoundingClientRect().height);
+  if (h > chromeInsetFloor) chromeInsetFloor = h;
+  document.documentElement.style.setProperty("--shell-chrome-h", `${chromeInsetFloor}px`);
 }
 
 function initScrollEdgeChrome() {
@@ -18,8 +22,12 @@ function initScrollEdgeChrome() {
   let lastY = window.scrollY;
   let ticking = false;
   let scrollIdleTimer = null;
+  let edgeHidden = false;
   const threshold = 36;
   const scrollIdleMs = 120;
+  const hideDeltaPx = 10;
+  const showDeltaPx = 10;
+  const bottomGuardPx = 72;
 
   const markScrolling = () => {
     document.body.classList.add("shell-is-scrolling");
@@ -30,6 +38,15 @@ function initScrollEdgeChrome() {
     }, scrollIdleMs);
   };
 
+  const setEdgeHidden = (next) => {
+    if (edgeHidden === next) return;
+    edgeHidden = next;
+    chrome.classList.toggle("top-chrome--edge-hidden", next);
+  };
+
+  const maxScrollY = () =>
+    Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+
   const update = () => {
     ticking = false;
     if (
@@ -39,14 +56,17 @@ function initScrollEdgeChrome() {
       return;
     }
     const y = window.scrollY;
-    const scrollingDown = y > lastY && y > threshold;
     const nearTop = y <= threshold;
+    const nearBottom = y >= maxScrollY() - bottomGuardPx;
+
     if (nearTop) {
-      chrome.classList.remove("top-chrome--edge-hidden");
-    } else if (scrollingDown) {
-      chrome.classList.add("top-chrome--edge-hidden");
-    } else {
-      chrome.classList.remove("top-chrome--edge-hidden");
+      setEdgeHidden(false);
+    } else if (!nearBottom) {
+      if (!edgeHidden && y > lastY + hideDeltaPx && y > threshold) {
+        setEdgeHidden(true);
+      } else if (edgeHidden && y < lastY - showDeltaPx) {
+        setEdgeHidden(false);
+      }
     }
     lastY = y;
   };

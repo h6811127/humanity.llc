@@ -3500,11 +3500,8 @@ body.landing-focus-mode .screen-landing > .hero.hero-tight {
   margin: 12px 0 0;
 }
 
-/* Landing scroll perf + de-explain (VISUAL_DEVICE_SHELL Phase A #3) */
-.screen-landing > [data-landing-tutorial]:not(.hero):not(.landing-progress):not(.landing-framing) {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 280px;
-}
+/* Landing de-explain (VISUAL_DEVICE_SHELL Phase A #3).
+   content-visibility:auto was removed — it caused layout thrash and jumpy scroll on mobile. */
 
 body.shell-is-scrolling .shell-status-dot {
   animation-play-state: paused;

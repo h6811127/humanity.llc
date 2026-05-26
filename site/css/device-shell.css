@@ -126,10 +126,11 @@ body.device-hub-sheet-open .top-chrome--float .top-chrome-bar--minimal,
   pointer-events: none;
 }
 
-/* Status dot stays reachable: open/close hub while sheet is up, and after scroll */
+/* Status dot stays reachable while hub sheet is open (bar is hidden).
+   Do NOT fix the cluster on scroll-edge-hidden — that removed it from the bar,
+   shrank --shell-chrome-h, and caused scroll jump / bottom rubber-band glitch. */
 body.device-hub-sheet-open .shell-status-cluster,
-.top-chrome--float.top-chrome--hub-locked .shell-status-cluster,
-.top-chrome--float.top-chrome--edge-hidden .shell-status-cluster {
+.top-chrome--float.top-chrome--hub-locked .shell-status-cluster {
   pointer-events: auto;
   opacity: 1;
   position: fixed;
