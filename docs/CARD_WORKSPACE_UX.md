@@ -11,7 +11,7 @@
 | Mode | When | UI |
 |------|------|-----|
 | **setup** | Keys in tab and (`fresh=1` or setup not done or not saved to device) | Linear wizard — no tabs |
-| **control** | Keys in tab, setup complete, saved on device | Tasks · More options · Help |
+| **control** | Keys in tab, setup complete, saved on device | Tasks · Advanced |
 | **view** | No signing keys in this tab | Read-only notice + unlock paths |
 
 Resolver: `site/js/created-mode.mjs` · `modeFromPage()`.
@@ -50,9 +50,7 @@ Post-setup hierarchy (unchanged intent from `docs/CREATED_TASK_DASHBOARD.md`):
 3. **More tasks** — download, print, test scan, update, revoke (advanced entry)
 4. Network status (collapsed) · full QR block
 
-**More options** tab (formerly Manage): revoke, rotate, backup, manifesto update.
-
-**Help** tab: lifecycle + doc links (not shown during setup).
+**Advanced** tab (formerly Manage/Help): revoke, rotate, backup, manifesto update, lifecycle notes, and doc links.
 
 ---
 

@@ -152,7 +152,7 @@
               </summary>
               <form class="device-hub-import-form" id="hub-import-form">
                 <p class="form-hint">
-                  Encrypted .hcbackup.json from More options  -  never uploaded.
+                  Encrypted .hcbackup.json from Advanced  -  never uploaded.
                 </p>
                 <input type="file" accept=".json,application/json" required />
                 <label class="form-label" for="hub-import-passphrase">Passphrase</label>
@@ -354,19 +354,6 @@
             id="created-tab-btn-manage"
           >
             Advanced
-          </button>
-          <button
-            type="button"
-            class="created-tab-btn"
-            role="tab"
-            aria-selected="false"
-            data-created-tab="help"
-            id="created-tab-btn-help"
-            hidden
-            aria-hidden="true"
-            tabindex="-1"
-          >
-            Help
           </button>
         </nav>
 
@@ -1084,83 +1071,6 @@
           </section>
         </div>
 
-        <!--  -  -  -  Help: concepts & limits  -  -  -  -->
-        <div class="created-tab-panel" data-created-panel="help" id="created-tab-help" role="tabpanel" aria-labelledby="created-tab-btn-help" hidden>
-          <p class="created-primitive">
-            This QR resolves to <strong>current object state</strong> on the network  -  active,
-            expired, revoked, or disabled. Printing deploys the object; you change its rules later.
-          </p>
-
-          <section class="created-revoke-rules" id="revoke-rules" aria-labelledby="revoke-rules-title">
-            <h2 class="created-revoke-rules-title" id="revoke-rules-title">Object lifecycle</h2>
-            <p class="created-revoke-rules-lead">
-              Revoke is a <strong>state transition</strong>, not deleting the sticker. Humanity stores
-              object state, not who scanned.
-            </p>
-            <ul class="created-revoke-rules-list">
-              <li><strong>Active</strong>  -  live manifesto or pilot layout.</li>
-              <li><strong>Expiry</strong>  -  credential time runs out; scan shows expired.</li>
-              <li><strong>Revoke this QR</strong>  -  one pointer off; siblings can stay active.</li>
-              <li>
-                <strong>Scan display</strong>  -  minimal headline (default) or show @handle on scan
-                (tombstone).
-              </li>
-              <li><strong>Disable card</strong>  -  whole profile offline.</li>
-              <li>
-                <strong>Organizer revoke</strong>  - 
-                <a id="organizer-revoke-link" href="/organizer-revoke/">coalition key</a> from create.
-              </li>
-            </ul>
-            <p class="hc-notice hc-notice--warning revoke-id-warning">
-              Printed URLs keep profile ID and QR ID. Transitions change what the resolver returns.
-            </p>
-          </section>
-
-          <section class="group created-help-keys">
-            <h2 class="group-label">Your signing key</h2>
-            <div class="settings-panel settings-panel-flat">
-              <p>
-                Generated in this browser. It never uploads to humanity.llc  -  the network only sees
-                <strong>signed</strong> actions.
-              </p>
-              <ul class="settings-list">
-                <li>
-                  <strong>This tab</strong> holds the key until you close it or clear site data.
-                </li>
-                <li>
-                  <strong>Recovery key</strong> or <strong>encrypted backup</strong> (Manage tab) unlock
-                  revoke and updates on another device.
-                </li>
-                <li>
-                  Save backup passphrases in a password manager as
-                  <code>humanity.llc backup</code>.
-                </li>
-              </ul>
-            </div>
-          </section>
-
-          <ul class="list list-compact created-help-links">
-            <li class="list-row list-action">
-              <a href="/what-can-a-qr-do.html">
-                <span class="list-content">
-                  <span class="list-title">What can a QR do?</span>
-                  <span class="list-sub">Ideas for plates, relays, civic nodes</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-            <li class="list-row list-action">
-              <a href="/architecture.html">
-                <span class="list-content">
-                  <span class="list-title">Architecture &amp; security</span>
-                  <span class="list-sub">Threat model, tests, failure modes</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </a>
-            </li>
-          </ul>
-        </div>
-
         </div><!-- /#created-control-root -->
 
         <div class="hc-notice hc-notice--error hc-notice--plain form-warning" id="created-error" hidden role="alert"></div>
@@ -1169,7 +1079,7 @@
             No signing keys in <strong>this tab</strong>. Finish create in the tab where you clicked
             Create, then tap <strong>Save on this device</strong> there — or open
             <a href="/wallet/">Saved cards</a> in that same tab. Later: recovery key or encrypted
-            backup under <strong>More options</strong> on this card page.
+            backup under <strong>Advanced</strong> on this card page.
           </p>
         </div>
       </main>
