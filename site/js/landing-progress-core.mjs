@@ -161,11 +161,15 @@ export function resolveLandingContinue(input = {}) {
   if (needsSetup || !hasPins) {
     const profileId =
       typeof resume?.profile_id === "string" ? resume.profile_id.trim() : "";
+    const qrId = walletEntryQrId(resume);
+    const href = profileId
+      ? needsSetup
+        ? createdPageHref(profileId, qrId, { fresh: true, hash: "setup-qr" })
+        : createdPageHref(profileId, qrId, { hash: "deploy-print" })
+      : "/wallet/";
     return {
       label: "Print your QR",
-      href: profileId
-        ? createdPageHref(profileId, walletEntryQrId(resume), { hash: "setup-qr" })
-        : "/wallet/",
+      href,
       legendStep: 3,
       legendDone,
     };

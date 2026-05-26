@@ -145,9 +145,15 @@ Share resolution logic with hub where possible (`openCardControlPage`, `openCard
 
 ### Phase 2 — Deeplinks (shipped)
 
-1. Continue `href`s target the verb: **Save** → `/created/?…&fresh=1#setup`, **Print** → `/created/?…#setup-qr`, **My cards** → `/wallet/`.
+1. Continue `href`s target the verb:
+   - **Save** → `/created/?…&fresh=1#setup` (tab keys or wallet resume)
+   - **Print** (setup incomplete) → `/created/?…&fresh=1#setup-qr` (setup wizard print step)
+   - **Print** (setup done, no pin) → `/created/?…#deploy-print` (Live tab deploy disclosure)
+   - **My cards** → `/wallet/`
 2. URL helpers in `landing-progress-core.mjs` (`createdPageHref`, `pickResumeWalletEntry`).
-3. `hc_setup_done` gates print vs manage; resume card prefers session profile, then incomplete setup, then last saved.
+3. `/created/` loads wallet keys when `profile_id` is in the query (`created.mjs`).
+4. Setup wizard honors `#setup` / `#setup-qr` on entry (`created-setup-hash.mjs`, `created-setup.mjs`).
+5. Control mode honors `#deploy-print` via `CREATED_PANEL_FOCUS` (`created-tabs.mjs`).
 
 ### Explicit non-goals
 
@@ -165,6 +171,8 @@ Share resolution logic with hub where possible (`openCardControlPage`, `openCard
 | `site/index.html` | Legend steps + `#landing-progress-continue` |
 | `site/js/landing-progress-core.mjs` | `resolveLandingContinue()` |
 | `site/js/landing-progress.mjs` | DOM apply + storage listeners |
+| `site/js/created-setup-hash.mjs` | Setup wizard hash → step index |
+| `worker/tests/created-setup-hash.test.ts` | Setup hash unit tests |
 | `site/styles.css` | `.landing-progress-legend`, `.landing-progress-continue` |
 | `worker/tests/landing-progress.test.ts` | Resolver unit tests |
 

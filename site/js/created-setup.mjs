@@ -7,8 +7,9 @@ import { isWalletSaved } from "./device-wallet.mjs";
 import { clearFreshUrlParam } from "./created-workspace.mjs";
 import { markSetupDone } from "./created-mode.mjs";
 import { stewardFocusKeyFromHash } from "./created-tabs.mjs";
+import { SETUP_STEP_IDS, setupStepIndexFromHash } from "./created-setup-hash.mjs";
 
-const STEPS = ["save", "qr", "test", "done"];
+const STEPS = SETUP_STEP_IDS;
 
 /**
  * @param {{
@@ -186,7 +187,7 @@ export function initCreatedSetup(opts) {
         return;
       }
       window.open(url, "_blank", "noopener,noreferrer");
-      showFeedback("Opened scan page — check it from another device, then continue.");
+      showFeedback("Opened scan page - check it from another device, then continue.");
       goToStep(stepIndex + 1, { pushHistory: true });
       return;
     }
@@ -266,7 +267,10 @@ export function initCreatedSetup(opts) {
   });
   window.addEventListener("hc-created-qr-ready", syncSetupQrPreview);
 
-  if (canLeaveSaveStep()) {
+  const hashStep = setupStepIndexFromHash(location.hash);
+  if (hashStep != null) {
+    stepIndex = hashStep > 0 && !canLeaveSaveStep() ? 0 : hashStep;
+  } else if (canLeaveSaveStep()) {
     stepIndex = 1;
   }
   syncIndicators();

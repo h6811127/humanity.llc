@@ -32,7 +32,8 @@ import {
 } from "./created-workspace.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
 import { verificationRecordFromStatusBody } from "./device-wallet-network-core.mjs";
-import { isWalletSaved, saveSessionToWallet } from "./device-wallet.mjs";
+import { activateWalletEntry } from "./device-keys.mjs";
+import { isWalletSaved, loadWallet, saveSessionToWallet } from "./device-wallet.mjs";
 import { applyHumanTrustIconToElement } from "./human-trust-ui.mjs";
 
 const params = new URLSearchParams(location.search);
@@ -95,6 +96,14 @@ function initVouchReturnBanner() {
 }
 
 let data = loadSession();
+
+if (profileIdParam && !data?.owner_private_key_b58) {
+  const walletEntry = loadWallet().find((e) => e.profile_id === profileIdParam);
+  if (walletEntry?.owner_private_key_b58) {
+    activateWalletEntry(walletEntry);
+    data = loadSession();
+  }
+}
 
 const apiOrigin = resolverApiOrigin();
 const scanOrigin =

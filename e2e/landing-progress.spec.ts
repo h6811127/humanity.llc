@@ -55,7 +55,7 @@ test.describe("landing progress strip", () => {
     await expect(page.locator("#landing-progress-continue")).toHaveText("Print your QR");
     await expect(page.locator("#landing-progress-continue")).toHaveAttribute(
       "href",
-      /\/created\/\?profile_id=p_e2e_print&qr_id=qr_e2e_print123456789#setup-qr$/
+      /\/created\/\?profile_id=p_e2e_print&qr_id=qr_e2e_print123456789&fresh=1#setup-qr$/
     );
   });
 

@@ -56,26 +56,28 @@ describe("resolveLandingContinue", () => {
     expect(r.legendDone).toEqual([1]);
   });
 
-  it("wallet without setup done → Print on setup-qr panel", () => {
+  it("wallet without setup done → Print on setup wizard (fresh + setup-qr)", () => {
     const r = resolveLandingContinue({
       wallet: [{ profile_id: "p1", qr_id: "qr_7Xk9mP2nQ4rT6vW8" }],
       pins: [],
       setupDone: {},
     });
     expect(r.label).toBe("Print your QR");
-    expect(r.href).toBe("/created/?profile_id=p1&qr_id=qr_7Xk9mP2nQ4rT6vW8#setup-qr");
+    expect(r.href).toBe(
+      "/created/?profile_id=p1&qr_id=qr_7Xk9mP2nQ4rT6vW8&fresh=1#setup-qr"
+    );
     expect(r.legendStep).toBe(3);
     expect(r.legendDone).toEqual([1, 2]);
   });
 
-  it("wallet with setup done but no pins → Print deeplink", () => {
+  it("wallet with setup done but no pins → Print on Live deploy panel", () => {
     const r = resolveLandingContinue({
       wallet: [{ profile_id: "p1", qr_id: "qr_1" }],
       pins: [],
       setupDone: { p1: true },
     });
     expect(r.label).toBe("Print your QR");
-    expect(r.href).toContain("#setup-qr");
+    expect(r.href).toBe("/created/?profile_id=p1&qr_id=qr_1#deploy-print");
     expect(r.legendStep).toBe(3);
   });
 

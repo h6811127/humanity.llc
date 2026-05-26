@@ -12,6 +12,8 @@ export const CREATED_PANEL_FOCUS = {
   "extend-qr": "qr-extend-panel",
   "live-proof": "live-control-proof",
   manage: "created-live-scanners-see",
+  /** Landing Continue (Phase 2) when setup is done but card not pinned. */
+  "deploy-print": "created-deploy-print",
 };
 
 /** @param {string} [hash] location.hash or bare key */
