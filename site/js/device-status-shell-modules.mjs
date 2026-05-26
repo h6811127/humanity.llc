@@ -10,7 +10,7 @@
  * Bump on all shell HTML (`device-status-bootstrap.mjs?v=N`) and on every
  * `./peer.mjs?v=N` import between files in DEVICE_STATUS_SHELL_JS_FILES.
  */
-export const DEVICE_SHELL_ASSET_VERSION = 25;
+export const DEVICE_SHELL_ASSET_VERSION = 26;
 
 /** @deprecated Use DEVICE_SHELL_ASSET_VERSION */
 export const DEVICE_STATUS_BOOTSTRAP_CACHE_BUST = DEVICE_SHELL_ASSET_VERSION;
@@ -23,7 +23,8 @@ export const DEVICE_STATUS_SHELL_JS_FILES = [
   "device-status-bootstrap.mjs",
   "device-status.mjs",
   "device-dot-state-core.mjs",
-  /** Lazy-loaded from device-status.mjs; must still deploy with shell pages. */
+  "device-inbox-sheet-loader.mjs",
+  /** Lazy-loaded via device-inbox-sheet-loader.mjs; must still deploy with shell pages. */
   "device-inbox-sheet.mjs",
   "device-inbox-sheet-core.mjs",
   "device-inbox-card-disabled.mjs",

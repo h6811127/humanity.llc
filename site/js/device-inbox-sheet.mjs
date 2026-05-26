@@ -2,8 +2,8 @@
  * Compact inbox bottom sheet — badge tap and open_notifications.
  * @see docs/DEVICE_INBOX.md phase 3
  */
-import { buildInboxSheetRows } from "./device-inbox-core.mjs?v=25";
-import { getInboxItems, notificationCount } from "./device-inbox.mjs?v=25";
+import { buildInboxSheetRows } from "./device-inbox-core.mjs?v=26";
+import { getInboxItems, notificationCount } from "./device-inbox.mjs?v=26";
 import {
   formatLiveControlExpiry,
   getLiveControlPending,
@@ -12,7 +12,7 @@ import {
 import { openCardNowPage } from "./device-keys.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
-import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=25";
+import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=26";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
@@ -22,13 +22,13 @@ import { tabNoticeCount } from "./device-counts.mjs";
 import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { prefersReducedMotion } from "./device-shell-motion.mjs";
 import { closeGlancePopover } from "./device-hub-glance-popover.mjs";
-import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs?v=25";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=25";
-import { inboxSheetReconcileAction } from "./device-inbox-sheet-core.mjs?v=25";
+import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs?v=26";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=26";
+import { inboxSheetReconcileAction } from "./device-inbox-sheet-core.mjs?v=26";
 import {
   bindSheetLifecycleReconcile,
   syncSheetBackdropClosed,
-} from "./device-sheet-backdrop-sync.mjs?v=25";
+} from "./device-sheet-backdrop-sync.mjs?v=26";
 
 const SHEET_ID = "device-inbox-sheet";
 const LIST_ID = "device-inbox-sheet-list";

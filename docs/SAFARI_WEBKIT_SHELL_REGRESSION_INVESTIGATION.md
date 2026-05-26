@@ -257,7 +257,15 @@ Only if iPhone still fails Phase 1 acceptance:
 })();
 ```
 
-**Kill scroll chrome for one session (after Phase 1 ships a flag, or devtools):**
+**Kill scroll chrome (Phase 3C — persists until cleared):**
+
+```js
+localStorage.setItem("hc_shell_scroll_chrome", "0");
+location.reload();
+// Re-enable: localStorage.removeItem("hc_shell_scroll_chrome"); location.reload();
+```
+
+**One-off devtools cleanup (without reload):**
 
 ```js
 document.getElementById("top-chrome")?.classList.remove("top-chrome--edge-hidden");
@@ -285,6 +293,8 @@ document.body.classList.remove("shell-is-scrolling");
 
 | Date | Decision |
 |------|----------|
+| 2026-05-26 | **Phase 3C shipped:** `localStorage hc_shell_scroll_chrome=0` disables desktop scroll-edge chrome after reload |
+| 2026-05-26 | **Phase 2.2b shipped:** `device-inbox-sheet-loader.mjs`; glance no longer static-imports inbox sheet; graph `v=26` |
 | 2026-05-26 | **Phase 2.3 shipped:** Vitest for `shouldAttachDocumentScrollChromeEffects` + `bindSheetLifecycleReconcile` |
 | 2026-05-26 | **Phase 2.4 shipped:** cross-link from `STATUS_INDICATOR_STEWARD_GREEN.md` troubleshooting (already present) |
 | 2026-05-26 | **Phase 2.2 shipped:** `device-inbox-sheet.mjs` lazy `import()` from `device-status.mjs` (badge/hub/explainer only); graph `v=25` |
@@ -314,3 +324,5 @@ document.body.classList.remove("shell-is-scrolling");
 | 2026-05-26 | Phase 2.2 implemented (lazy inbox sheet import from device-status) |
 | 2026-05-26 | Phase 2.3 implemented (Vitest scroll chrome + backdrop lifecycle) |
 | 2026-05-26 | Phase 2.4 implemented (STATUS_INDICATOR troubleshooting link) |
+| 2026-05-26 | Phase 2.2b implemented (shared inbox loader; glance off static inbox graph) |
+| 2026-05-26 | Phase 3C implemented (scroll chrome localStorage kill switch) |

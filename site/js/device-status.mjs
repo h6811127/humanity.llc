@@ -3,7 +3,7 @@
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  * @see docs/SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md — Phase 2.2 (lazy inbox sheet)
  */
-import { DEVICE_SHELL_ASSET_VERSION } from "./device-status-shell-modules.mjs";
+import { openInboxFromChrome, closeInboxSheet } from "./device-inbox-sheet-loader.mjs";
 import { buildStatusSegments } from "./device-counts.mjs";
 import {
   DEVICE_OS_REFRESHED,
@@ -22,25 +22,25 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeCountText,
   notificationCount,
-} from "./device-inbox.mjs?v=25";
+} from "./device-inbox.mjs?v=26";
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=25";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=26";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import "./device-shell-motion.mjs";
-import "./device-shell-chrome.mjs?v=25";
+import "./device-shell-chrome.mjs?v=26";
 import "./device-theme.mjs";
-import "./device-browser-notifications.mjs?v=25";
+import "./device-browser-notifications.mjs?v=26";
 import {
   isHubSheet,
   reconcileHubSheetState,
   setHubSheetOpen,
-} from "./device-hub-sheet.mjs?v=25";
+} from "./device-hub-sheet.mjs?v=26";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 import {
   describeDotState,
@@ -52,7 +52,7 @@ import {
   hasStewardVerification,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=25";
+} from "./device-dot-state-core.mjs?v=26";
 
 export const DOT_STATE_CHANGED = "hc-dot-state-changed";
 
@@ -90,26 +90,7 @@ let networkStatus = "offline";
 let lastDotSnapshot = null;
 let stewardCelebrateTimer = null;
 
-/** @type {Promise<typeof import("./device-inbox-sheet.mjs")> | null} */
-let inboxSheetModulePromise = null;
-
-function loadInboxSheetModule() {
-  if (!inboxSheetModulePromise) {
-    inboxSheetModulePromise = import(
-      `./device-inbox-sheet.mjs?v=${DEVICE_SHELL_ASSET_VERSION}`
-    );
-  }
-  return inboxSheetModulePromise;
-}
-
-function closeInboxSheet() {
-  void loadInboxSheetModule().then((mod) => mod.setInboxSheetOpen(false));
-}
-
-/** Opens inbox sheet; loads inbox module on first use (badge, hub targets, explainer). */
-export function openInboxFromChrome(source) {
-  void loadInboxSheetModule().then((mod) => mod.openInboxFromChrome(source));
-}
+export { openInboxFromChrome };
 
 function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -507,7 +488,7 @@ document.addEventListener("keydown", (e) => {
     return;
   }
   if (document.body.classList.contains("device-inbox-sheet-open")) {
-    void loadInboxSheetModule().then((mod) => mod.setInboxSheetOpen(false));
+    closeInboxSheet();
     return;
   }
   if (hub && !hub.classList.contains("device-hub-collapsed")) {

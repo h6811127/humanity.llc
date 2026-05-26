@@ -3,7 +3,7 @@
  */
 import { buildGlanceRowPlan } from "./device-inbox-core.mjs";
 import { getInboxItems } from "./device-inbox.mjs";
-import { openInboxFromChrome } from "./device-inbox-sheet.mjs";
+import { openInboxFromChrome } from "./device-inbox-sheet-loader.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
 import {

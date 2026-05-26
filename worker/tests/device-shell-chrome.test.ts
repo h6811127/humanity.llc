@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { shouldAttachDocumentScrollChromeEffects } from "../../site/js/device-shell-chrome-core.mjs";
+import {
+  isShellScrollChromeForceDisabled,
+  shouldAttachDocumentScrollChromeEffects,
+} from "../../site/js/device-shell-chrome-core.mjs";
 
 /** @param {Record<string, boolean>} queries */
 function mockMatchMedia(queries) {
@@ -51,5 +54,24 @@ describe("device-shell-chrome-core", () => {
     });
     expect(shouldAttachDocumentScrollChromeEffects()).toBe(false);
     restore();
+  });
+
+  it("disables scroll-edge chrome when localStorage kill switch is set (Phase 3C)", () => {
+    const restoreMedia = mockMatchMedia({
+      "(pointer: fine)": true,
+      "(hover: hover)": true,
+    });
+    const storage = { hc_shell_scroll_chrome: "0" };
+    const prev = globalThis.localStorage;
+    // @ts-expect-error test mock
+    globalThis.localStorage = {
+      getItem(key) {
+        return storage[key] ?? null;
+      },
+    };
+    expect(isShellScrollChromeForceDisabled()).toBe(true);
+    expect(shouldAttachDocumentScrollChromeEffects()).toBe(false);
+    globalThis.localStorage = prev;
+    restoreMedia();
   });
 });
