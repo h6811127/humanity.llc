@@ -5,6 +5,33 @@
 
 export const STORAGE_WATCH_LIVE_PROOF = "hc_watch_live_proof";
 
+/** Debounce hub wallet status fetches (Safari P1 / request budget). */
+export const WALLET_NETWORK_HUB_FETCH_DEBOUNCE_MS = 300;
+
+/**
+ * Network poll runs when wallet page is open or hub sheet is expanded (not collapsed landing).
+ *
+ * @param {{ onWalletPage: boolean, hubExpanded: boolean }} scope
+ */
+export function walletHubNetworkFetchScopeActive(scope) {
+  return scope.onWalletPage === true || scope.hubExpanded === true;
+}
+
+/**
+ * @param {{
+ *   fetchNetworkStatus: boolean,
+ *   onWalletPage: boolean,
+ *   hubExpanded: boolean,
+ * }} input
+ */
+export function shouldScheduleWalletNetworkFetchAfterHubRender(input) {
+  if (!input.fetchNetworkStatus) return false;
+  return walletHubNetworkFetchScopeActive({
+    onWalletPage: input.onWalletPage,
+    hubExpanded: input.hubExpanded,
+  });
+}
+
 /**
  * @param {() => string | null} [readStorage]
  */

@@ -249,7 +249,7 @@ document.getElementById("top-chrome")?.dataset?.deviceStatusError
 |---|--------|-----------|--------|
 | **P0** | Presence `storage` → **immediate** chrome refresh on all tabs | Presence storage no longer triggers immediate chrome refresh; `hc-tab-presence-changed` uses debounced path only | **Shipped 2026-05-26** - `device-chrome-refresh-core.mjs`, `device-chrome-refresh.mjs`; Vitest `device-chrome-refresh-storage.test.ts` |
 | **P0** | Heartbeat writes every ~4.5s when metadata unchanged | `shouldTouchPresenceRow` keep-alive only near `PRESENCE_SHOW_MS` | **Shipped 2026-05-26** - `device-tab-presence-core.mjs`; Vitest `device-tab-presence-heartbeat.test.ts` |
-| **P1** | `renderSavedRows` → full network refresh | Debounce `fetchAndApplyNetworkChips`; hub-expand-only; rely on 60s visibility debounce | Open |
+| **P1** | `renderSavedRows` → full network refresh | Debounced `scheduleWalletNetworkFetch`; cache-only DOM on re-render; fetch only when hub expanded or `/wallet/` | **Shipped 2026-05-26** - `device-hub-ui.mjs`, `device-hub-network-tools-core.mjs` |
 | **P1** | Wallet page always in live-control poll scope | Consider poll only when wallet scrolls live-proof section into view or user enables watch | Open |
 | **P2** | Heavy module graph on every shell page | Lazy-load inbox sheet / notifications; smaller bootstrap graph | Open |
 | **P2** | Safari cache / version drift | Enforce `DEVICE_SHELL_ASSET_VERSION` on all peer imports in CI | Open |
@@ -257,7 +257,7 @@ document.getElementById("top-chrome")?.dataset?.deviceStatusError
 
 **Shell cache bust:** `DEVICE_SHELL_ASSET_VERSION` **38** (P0 ship).
 
-**Product guidance (ops, until P1 ships):**
+**Product guidance (ops, until P2 ships):**
 
 - Close Humanity tabs you are not using (especially tabs with signing keys).
 - Prefer **one** steward tab for daily use.
@@ -303,3 +303,4 @@ Yes. The device shell is doing **continuous cross-tab synchronization** and, on 
 |------|------|
 | 2026-05-26 | Initial investigation - Safari refresh slowness, accumulation, long-session expectations |
 | 2026-05-26 | **P0 shipped:** presence storage debounce + heartbeat keep-alive spacing; shell `?v=38` |
+| 2026-05-26 | **P1 shipped:** hub wallet network fetch debounced + hub-expand/wallet scope only |

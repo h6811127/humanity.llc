@@ -475,11 +475,19 @@ function applyNetworkChipsToDom(
   applyRevokedSinceVisitAlerts(statusMap, alertStateMap, scanKindMap, resolverConfirmedMap);
 }
 
+/**
+ * @param {Record<string, string | undefined>} _statusMap
+ * @param {Record<string, string> | null} alertStateMap
+ * @param {Record<string, string | null>} scanKindMap
+ * @param {Record<string, boolean> | null} resolverConfirmedMap
+ * @param {{ allowShow?: boolean }} [options] A5: map-only re-apply may hide, never show.
+ */
 function applyRevokedSinceVisitAlerts(
   _statusMap = {},
   alertStateMap = null,
   scanKindMap = {},
-  resolverConfirmedMap = null
+  resolverConfirmedMap = null,
+  { allowShow = true } = {}
 ) {
   if (!savedList || !hubConfig.fetchNetworkStatus) return;
 
@@ -524,7 +532,11 @@ function applyRevokedSinceVisitAlerts(
       scanKind,
       resolverConfirmed
     );
-    setRevokedSinceVisitAlertVisible(li, pid, show);
+    if (show && allowShow) {
+      setRevokedSinceVisitAlertVisible(li, pid, true);
+    } else if (!show) {
+      setRevokedSinceVisitAlertVisible(li, pid, false);
+    }
   });
 }
 
@@ -555,14 +567,15 @@ function reapplyRevokedSinceVisitFromLatestResolved() {
   if (!savedList || !hubConfig.fetchNetworkStatus) return;
   const maps = buildResolverConfirmedWalletPollMaps();
   if (!maps) {
-    applyRevokedSinceVisitAlerts({}, null);
+    applyRevokedSinceVisitAlerts({}, null, {}, null, { allowShow: false });
     return;
   }
   applyRevokedSinceVisitAlerts(
     lastWalletNetworkStatusMap,
     maps.alertStateMap,
     maps.scanKindMap,
-    maps.resolverConfirmedMap
+    maps.resolverConfirmedMap,
+    { allowShow: false }
   );
 }
 
