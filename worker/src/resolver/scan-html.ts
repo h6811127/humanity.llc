@@ -28,7 +28,7 @@ import {
 } from "./scan-safety";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v23";
+export const SCAN_UI_VERSION = "pass-v24";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -646,52 +646,41 @@ function renderTrustGroups(vm: ScanViewModel, origin: string): string {
   const sections: string[] = [];
 
   if (vm.showCardBlock) {
-    sections.push(
-      trustGroup(
-        "Card status",
-        cardGroupRows(vm),
-        "card"
-      )
-    );
+    pushTrustGroup(sections, "Card status", cardGroupRows(vm), "card");
   }
 
   if (vm.showHumanTrustBlock) {
-    sections.push(
-      trustGroup(
-        "Human trust",
-        humanGroupRows(vm),
-        "human"
-      )
-    );
+    pushTrustGroup(sections, "Human trust", humanGroupRows(vm), "human");
   }
 
   if (vm.showArtifactBlock) {
-    sections.push(
-      trustGroup(
-        "This QR",
-        qrGroupRows(vm),
-        "qr"
-      )
-    );
+    pushTrustGroup(sections, "This QR", qrGroupRows(vm), "qr");
   }
 
   if (vm.showLiveControlBlock) {
-    sections.push(
-      trustGroup(
-        "Live control",
-        liveControlGroupRows(vm),
-        "live"
-      )
-    );
+    pushTrustGroup(sections, "Live control", liveControlGroupRows(vm), "live");
   }
 
   if (vm.kind === "active" && vm.profileId && vm.showHumanTrustBlock) {
-    sections.push(renderVouchSection(vm, origin));
+    const vouch = renderVouchSection(vm, origin);
+    if (vouch.trim()) sections.push(vouch);
   }
+
+  if (!sections.length) return "";
 
   return `<div class="scan-trust-stack" aria-label="Trust details at scan time">
 ${sections.join("\n")}
 </div>`;
+}
+
+function pushTrustGroup(
+  sections: string[],
+  label: string,
+  rows: string,
+  mod: string
+): void {
+  if (!rows.trim()) return;
+  sections.push(trustGroup(label, rows, mod));
 }
 
 function trustGroup(

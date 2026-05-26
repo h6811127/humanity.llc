@@ -13,13 +13,13 @@
 
 The scan page is **live resolver output** (Cloudflare Worker), not the static Pages site. Deploy with `npm run worker:deploy`. Pages deploy alone does not change `/c/…`.
 
-Response header when the new UI is live: `X-HC-Scan-UI: pass-v23` (or later). **`pass-v23`:** scan-type hero templates (`scanHeroTemplate`), collapsible hero QR, Phase 4 tests. **`pass-v22`:** phases 1–3 baseline.
+Response header when the new UI is live: `X-HC-Scan-UI: pass-v24` (or later). **`pass-v24`:** omit empty trust groups; M5 live-object showcase seed + landing. **`pass-v23`:** scan-type heroes, trust modules, Phase 4 tests.
 
 ---
 
 ## Layout
 
-### Shipped today (`pass-v23`)
+### Shipped today (`pass-v24`)
 
 `scan-html.ts` renders, top to bottom:
 
@@ -32,21 +32,18 @@ Response header when the new UI is live: `X-HC-Scan-UI: pass-v23` (or later). **
 
 Legacy flippable pass card markup remains in `scan-html.ts` for reference; active scan HTML uses the **Live check hero** (not the flip scene). Standalone `renderScannerSafetyHeader()` remains for unit tests.
 
-### Target layout (remaining phases)
+### Layout zones (reference)
 
-**Principle:** one **Live check** hero replaces the separate safety header + status panel for typical active scans. Subtract duplicate status, brand, and limit copy. See [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § First-scan hero.
+All zones **A–H** shipped through `pass-v24`. See [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § First-scan hero for principles.
 
-| Zone | Implementation notes |
-|------|----------------------|
-| **A. Minimal header** | Existing `renderTopHeader` only—no duplicate brand inside hero |
-| **B. Live check hero** | New `scan-hero` (or equivalent): merge `renderScannerSafetyHeader` + panel primary content; **one** status; H1 from scan type (§ Scan type heroes) |
-| **C. Steward strip** | Single line: controlled by, optional `valid until` |
-| **D–E. Proves / does not prove** | Optional modules (Nerd mock pattern); Level 0 in hero **and** expandable detail OK if not duplicated in a facts grid |
-| **F. This QR** | Existing `scanStatusQrBlock`; smaller default; credential code; consider `<details>` on narrow viewports |
-| **G. Trust groups** | Existing `renderTrustGroups`; omit sections with no rows |
-| **H. Footer** | Existing `renderFooter` + limits settings |
-
-**QR rule (unchanged):** payload and branding per § Pass card QR below; visual size is subordinate to status in CSS.
+| Zone | Shipped in |
+|------|------------|
+| **A–B** Live check hero | `pass-v21`–`pass-v23` |
+| **C** Steward strip | `pass-v23` |
+| **D–E** Proves / does not prove modules | `pass-v23` |
+| **F** Collapsible hero QR | `pass-v23` |
+| **G** Trust groups omit empty sections | `pass-v24` (`pushTrustGroup`) |
+| **H** Footer + limits settings | M3 baseline |
 
 ### Scan type heroes
 
@@ -74,7 +71,8 @@ Track with [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Resolver UI 
 | **1** | Hero consolidation, dedupe status/limits, QR demotion, spacing | **Shipped** — `scan-html.ts`, `scan-safety.ts`, `scan-pass.css` |
 | **2** | Scan-type hero templates | **Shipped** — `buildScanHeroMain()` |
 | **3** | Collapsible groups + proves/does-not-prove modules | **Shipped** — `renderScanTrustModules()`, `scan-trust-details` |
-| **4** | M5 live-object path + tests + `X-HC-Scan-UI` bump | **Shipped** (`pass-v23`) — `scan.test.ts`, `manifesto-display.test.ts`; M5 runbook still manual |
+| **4** | M5 live-object path + tests + `X-HC-Scan-UI` bump | **Shipped** (`pass-v23`) — `scan-m5-live-object.test.ts`, hero snapshots; M5 strangers still manual |
+| **5** | Omit empty trust groups; M5 showcase seed + landing row | **Shipped** (`pass-v24`) — `pushTrustGroup`, `site:seed-showcase-live-object` |
 
 After `scan-pass.css` changes: `npm run worker:bundle-scan`.
 
@@ -155,7 +153,7 @@ After changing `scan-pass.css` or `pass-flip.js`, run `npm run worker:bundle-sca
 
 **Limits copy (target):** exactly **one** prominent Level 0 sentence in the hero (`trust-copy.ts` bearer). No duplicate “Limits” row in `renderObjectStateFacts` when the hero already shows it. Full “does not prove” detail in module E and/or `scan-limits-settings`. Status groups remain **facts only**.
 
-**Interim (shipped):** bearer line above status panel **plus** limits row in facts grid—treat as debt per [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Known UX gaps.
+**Hero limits (shipped):** one Level 0 line in `scan-hero-limit`; full detail in modules + `scan-limits-settings`.
 
 ---
 

@@ -30,6 +30,7 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 - **Build check**: `npm run build` (validates static site exists)
 - **Worker dev**: `npm run worker:dev`
 - **Pages dev**: `npm run pages:dev`
+- **Showcase scan URLs** (M5 / landing): `npm run site:seed-showcase` (status plate), `npm run site:seed-showcase-live-object` (live object; needs `API_ORIGIN`)
 
 ### Non-obvious notes
 

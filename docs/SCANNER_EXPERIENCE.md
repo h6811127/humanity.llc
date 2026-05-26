@@ -207,18 +207,19 @@ Foot copy per type (examples):
 - Status plate: “Scan shows current status for this place—not who owns the door.”
 - Lost item relay: “This scan does not prove who holds the item.”
 
-### Known UX gaps (shipped interim layout)
+### Known UX gaps (resolved pass-v21–v24)
 
-Track these when judging scan screenshots or planning UI work—**not** product bugs in trust logic:
+These were tracked during the interim dual-card layout; **fixed** in the Live check hero refresh:
 
-| Gap | Symptom | Target fix |
-|-----|---------|------------|
-| Duplicate status | “Active” in safety strip, panel badge, eyebrow (“This QR is active”), and facts grid | **One** status signal in hero |
-| Duplicate brand | `humanity.llc` in top header, safety badge, and panel head | Header + hero host row only |
-| Duplicate limits | Bearer line above panel + “Limits” row in grid + panel foot | **One** limit line in hero; detail in module E |
-| Hierarchy inversion | Large QR right column; manifesto competes with chrome | QR in zone F; message is H1 |
-| Bureaucratic kicker | “Network status” between two cards | Remove or replace with human copy (or none) |
-| Compliance density | Many uppercase chips on first open | Chips in Details / steward strip |
+| Gap | Resolution |
+|-----|------------|
+| Duplicate status | Single `scan-safety-strip` in hero (`pass-v21`) |
+| Duplicate brand | Top header + hero host row only (`pass-v21`) |
+| Duplicate limits | One `scan-hero-limit` + modules / settings (`pass-v21`–`pass-v23`) |
+| Hierarchy inversion | Manifesto/plate H1; collapsible `scan-hero-qr-details` (`pass-v23`) |
+| “Network status” kicker | Removed (`pass-v21`) |
+| Compliance density | Chips in `scan-hero-details` (`pass-v21`) |
+| Empty trust group shells | `pushTrustGroup` skips empty rows (`pass-v24`) |
 
 ### Scanner safety header (spec — interim + merged target)
 
@@ -356,7 +357,7 @@ Phases **A–F** are shipped for the reference network. **E** remains mandatory 
 
 ### Resolver UI refresh
 
-Implementation detail: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) § UI refresh phases. Current header: `X-HC-Scan-UI: pass-v23`.
+Implementation detail: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) § UI refresh phases. Current header: `X-HC-Scan-UI: pass-v24`.
 
 | Phase | Deliverable | Outcome |
 |-------|-------------|---------|
@@ -365,6 +366,7 @@ Implementation detail: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) § UI ref
 | **2** | Scan-type templates: status plate, lost item relay, personal card heroes | **Shipped** — `buildScanHeroMain()` |
 | **3** | Below-fold: collapsible trust groups; “proves / does not prove” modules | **Shipped** — `renderScanTrustModules()`, `scan-trust-details` |
 | **4** | M5 stranger test + live object fixture; HTML snapshot tests; `X-HC-Scan-UI` bump | **Shipped** (`pass-v23`) — automated hero template tests; M5 strangers still manual |
+| **5** | Omit empty trust groups; M5 showcase seed + landing | **Shipped** (`pass-v24`) — [`docs/M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) step 10 |
 
 ---
 

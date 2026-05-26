@@ -74,6 +74,12 @@ API_ORIGIN=https://humanity.llc npm run site:seed-showcase
 
 Writes `data/showcase-status-plate.json` with a live scan URL for the status-plate pilot block on the landing page.
 
+```bash
+API_ORIGIN=https://humanity.llc npm run site:seed-showcase-live-object
+```
+
+Writes `data/showcase-live-object.json` with a **print_artifact** scan URL for M5 stranger tests and the landing “Try a live object scan” row (`landing-showcase-live-object.mjs`). Re-run after rotating showcase cards.
+
 ### Device OS (browser shell)
 
 Landing, **`/created/`**, and **`/wallet/`** share status line + **On this device** hub (saved keys, pins, activity, backup import). **`/created/` Tasks tab** layout and copy: `docs/CREATED_TASK_DASHBOARD.md`. See also `docs/DEVICE_OS.md` and `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md`.
