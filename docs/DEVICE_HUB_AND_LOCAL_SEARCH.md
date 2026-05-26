@@ -43,7 +43,7 @@ These notes are captured as individual product refinements so implementation can
 - **Step 3 (now):** add network liveliness indicators and wording pass.
 - **Step 4 (now):** status-pill terminology pass (`pins`, `online` semantics).
 - **Step 5 (now):** object identity visual system (types, glyph/color cues).
-- **Step 6:** modal/shell visual polish pass.
+- **Step 6 (now):** modal/shell visual polish pass.
 - **Step 7:** action-forward card IA and command surface.
 
 ---
@@ -73,6 +73,8 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 **Card liveliness (Step 3):** Saved rows also show a compact liveliness line (e.g., **Network reachable · seen 2m ago**, **Pending sync**, **Offline**) derived from the same wallet network cache and resolver fetch cycle used for chips/alerts.
 
 **Object identity visuals (Step 5):** Saved rows include a lightweight object-type chip (e.g., Membership, Status plate, Lost item, Event pass, Wearable, Live demo, Tool, Civic object) inferred from local card metadata (`pilot_template`, label, manifesto text), plus subtle type color accents to reduce visual sameness at larger card counts.
+
+**Shell polish (Step 6):** Hub sheet and glance popover use stronger frosted materials (higher blur, softer layered shadows, 20px top sheet radius). Saved cards drop grey outline borders in favor of elevation fills; spacing in hub sections and card rows is slightly tighter. See `site/css/device-shell.css` tokens (`--shell-blur`, `--shell-shadow-sheet`, `--shell-radius-card`).
 
 **Keys vs verification:** See [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md). **Open controls** loads signing material into `hc_created`; the verification chip is read-only network state.
 
