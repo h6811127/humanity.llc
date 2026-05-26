@@ -54,7 +54,24 @@ Official generators apply the center logo **only on top of brand-red modules** (
 | Canvas (created page PNG) | `drawMaskedCenterLogoOnCanvas()` — alpha punch-out from QR raster |
 | Fallback | If no brand-red stroke paths are found, unmasked circles (legacy) |
 
-Frame corner **network glyph** reuses the same fill constants (`networkGlyphSvgFragment`) so corner mark and center bullseye stay aligned.
+Frame corner **brand mark** is a miniature transparent brand-red QR finder (`brandMarkGlyphSvgFragment`) in the white margin only - same optical family as the favicon mark, never stacked on data modules.
+
+---
+
+## Passers-by legitimacy cues (read at a glance)
+
+Official framed QRs combine cues that a generic pink QR cannot copy without encoding a Humanity scan URL:
+
+| Cue | What people see | Why it matters |
+|-----|-----------------|----------------|
+| Red frame + rounded card | Thin `#db1b43` border around the whole sticker | Matches scan-page / pass-card chrome |
+| `LIVE OBJECT` band | Uppercase label under the code | Signals network-backed status, not a static sticker |
+| `humanity.llc` footer | Grey microtype host line | Ties the object to the resolver origin |
+| `HC-XXXX-XXXX` credential | Monospace code under the footer | Humans can compare sticker to on-screen status |
+| Corner finder fingerprint | Faint brand-red 7x7 finder in the margin | Same red module language as the code (not a separate logo plate) |
+| Center bullseye | Module-masked rose + ink core | Visible brand without washing out QR whitespace |
+
+Tune corner mark opacity via `QR_FRAME_BRAND_MARK_OPACITY` in `site/js/qr-branding.mjs`.
 
 ---
 
@@ -118,7 +135,7 @@ All official generators wrap the branded QR in `renderHumanityQrFrameSvg` (Worke
 | Element | Implementation |
 |---------|----------------|
 | Brand border | Rounded rect stroke `#db1b43` (`qrFrameMetrics` + frame SVG/canvas) |
-| Network glyph | Concentric circles top-left (`networkGlyphSvgFragment` / `drawNetworkGlyphOnCanvas`) |
+| Brand mark | Transparent brand-red finder in top-left margin (`brandMarkGlyphSvgFragment` / `drawBrandMarkGlyphOnCanvas`) |
 | `LIVE OBJECT` | Uppercase label below modules (`QR_FRAME_LIVE_OBJECT_TEXT`) |
 | Footer | `humanity.llc` (`QR_FRAME_FOOTER_TEXT`) |
 | Layout tuning | Edit `qrFrameMetrics()` in `site/js/qr-branding.mjs` |

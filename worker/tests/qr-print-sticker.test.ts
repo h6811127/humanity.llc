@@ -78,7 +78,7 @@ describe("renderPrintStickerFromScanUrl", () => {
       "qr_7Xk9mP2nQ4rT6vW8"
     );
     expect(sheet).toContain('class="hc-print-sticker-svg"');
-    expect(sheet).toContain('class="hc-qr-network-glyph"');
+    expect(sheet).toContain('class="hc-qr-brand-mark"');
     expect(sheet).toContain('class="hc-print-credential-code"');
     expect(sheet).toContain(code);
     expect(sheet).not.toContain("scale(NaN)");
