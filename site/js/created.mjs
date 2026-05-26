@@ -15,6 +15,7 @@ import { initManifestoUpdate } from "./created-manifesto-update.mjs";
 import { initQrRotate } from "./created-qr-rotate.mjs";
 import { initQrExtend } from "./created-qr-extend.mjs";
 import { inferPilotTemplate } from "./manifesto-display.mjs";
+import { createdLiveProofPollShouldRun } from "./created-live-proof-poll-core.mjs";
 import { initCreatedTabs } from "./created-tabs.mjs";
 import { initCreatedDashboard } from "./created-dashboard.mjs?v=2";
 import {
@@ -236,9 +237,19 @@ function initLiveControlProof() {
   let activeChallengeId = liveChallengeParam;
   let activeReturnUrl = liveReturnUrlParam;
   let pollTimer = null;
+  let pollLifecycleBound = false;
+
+  function pollScopeActive() {
+    return createdLiveProofPollShouldRun({
+      documentVisible:
+        typeof document === "undefined" ||
+        document.visibilityState === "visible",
+      hasSigningKeys: !!currentSigningKeys(),
+    });
+  }
 
   function startPolling() {
-    if (pollTimer) return;
+    if (!pollScopeActive() || pollTimer) return;
     pollTimer = window.setInterval(pollPendingChallenge, 3000);
   }
 
@@ -247,6 +258,21 @@ function initLiveControlProof() {
       window.clearInterval(pollTimer);
       pollTimer = null;
     }
+  }
+
+  function bindPollLifecycle() {
+    if (pollLifecycleBound || typeof document === "undefined") return;
+    pollLifecycleBound = true;
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
+        stopPolling();
+        return;
+      }
+      refresh();
+    });
+    window.addEventListener("pagehide", () => {
+      stopPolling();
+    });
   }
 
   function clearProofUrlParams() {
@@ -319,12 +345,15 @@ function initLiveControlProof() {
     ) {
       showListeningState(LISTENING_STATUS);
     }
-    if (keys && !pollTimer) {
+    if (keys && pollScopeActive()) {
       startPolling();
+    } else {
+      stopPolling();
     }
   }
 
   async function pollPendingChallenge() {
+    if (!pollScopeActive()) return;
     if (activeChallengeId) return;
     const keys = currentSigningKeys();
     if (!keys) return;
@@ -349,9 +378,11 @@ function initLiveControlProof() {
     }
   }
 
+  bindPollLifecycle();
+
   if (liveChallengeParam) {
     revealPanel(true);
-  } else if (currentSigningKeys()) {
+  } else if (pollScopeActive()) {
     startPolling();
     void pollPendingChallenge();
   }

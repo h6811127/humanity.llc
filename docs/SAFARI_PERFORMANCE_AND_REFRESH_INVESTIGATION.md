@@ -253,7 +253,7 @@ document.getElementById("top-chrome")?.dataset?.deviceStatusError
 | **P1** | Wallet page always in live-control poll scope | Auto poll on `/wallet/` only when **Watch for live proof** is on; manual **Check for live proof** when off | **Shipped 2026-05-26** - `device-live-control-poll-scheduler.mjs`, `device-live-control-inbox.mjs` |
 | **P2** | Heavy module graph on every shell page | Lazy-load inbox sheet / notifications; smaller bootstrap graph | Open |
 | **P2** | Safari cache / version drift | Enforce `DEVICE_SHELL_ASSET_VERSION` on all peer imports in CI | Open |
-| **P3** | Week-long `/created/` session | Ensure `created.mjs` clears 3s poll on panel hide/navigation | Open |
+| **P3** | Week-long `/created/` session | Stop 3s live-proof poll when tab hidden or on `pagehide`; resume on visible + keys | **Shipped 2026-05-26** - `created.mjs`, `created-live-proof-poll-core.mjs` |
 
 **Shell cache bust:** `DEVICE_SHELL_ASSET_VERSION` **38** (P0 ship).
 
