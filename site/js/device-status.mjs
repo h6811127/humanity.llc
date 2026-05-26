@@ -28,9 +28,13 @@ import {
   dotClassList,
   dotOverlayFromCounts,
   dotStateKey,
+  dotTransitionKey,
   hasStewardVerification,
+  shouldCelebrateStewardTransition,
   statusAriaLabel,
 } from "./device-dot-state-core.mjs";
+
+export const DOT_STATE_CHANGED = "hc-dot-state-changed";
 
 const HUB_OPEN_KEY = "hc_hub_open";
 
@@ -61,6 +65,9 @@ const walletPage = document.getElementById("wallet-page");
 const systemBanner = document.getElementById("device-system-banner");
 
 let networkStatus = "offline";
+/** @type {{ network: string, device: string, overlay: string } | null} */
+let lastDotSnapshot = null;
+let stewardCelebrateTimer = null;
 
 function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -135,9 +142,67 @@ function hubSheetOpen() {
   );
 }
 
+function maybeEmitDotTransition(network, device, overlay) {
+  const key = dotTransitionKey(network, device, overlay);
+  const prevKey = lastDotSnapshot
+    ? dotTransitionKey(
+        lastDotSnapshot.network,
+        lastDotSnapshot.device,
+        lastDotSnapshot.overlay
+      )
+    : null;
+  if (key === prevKey) return;
+
+  const detail = {
+    from: prevKey,
+    to: key,
+    at: new Date().toISOString(),
+    page: location.pathname,
+  };
+  window.dispatchEvent(new CustomEvent(DOT_STATE_CHANGED, { detail }));
+
+  try {
+    if (localStorage.getItem("hc_dot_diagnostics") === "1") {
+      const raw = sessionStorage.getItem("hc_dot_diag_log");
+      const log = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(log)) {
+        log.unshift(detail);
+        sessionStorage.setItem("hc_dot_diag_log", JSON.stringify(log.slice(0, 20)));
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
+function applyStewardCelebrate(previousDevice, nextDevice) {
+  if (!dot) return;
+  dot.classList.remove("pass-dot-steward-celebrate");
+  if (stewardCelebrateTimer != null) {
+    clearTimeout(stewardCelebrateTimer);
+    stewardCelebrateTimer = null;
+  }
+  if (
+    !shouldCelebrateStewardTransition({
+      network: networkStatus,
+      previousDevice,
+      nextDevice,
+      reducedMotion: prefersReducedMotion(),
+    })
+  ) {
+    return;
+  }
+  dot.classList.add("pass-dot-steward-celebrate");
+  stewardCelebrateTimer = window.setTimeout(() => {
+    dot?.classList.remove("pass-dot-steward-celebrate");
+    stewardCelebrateTimer = null;
+  }, 900);
+}
+
 function applyDot() {
   if (!dot) return;
   const run = () => {
+    const previousDevice = lastDotSnapshot?.device ?? null;
     const device = deviceState();
     const overlay = dotOverlayState();
     dot.classList.remove(...NETWORK_CLASSES, ...DEVICE_CLASSES, ...OVERLAY_CLASSES);
@@ -151,6 +216,9 @@ function applyDot() {
     dotBtn?.setAttribute("data-dot-overlay", overlay);
     dotBtn?.setAttribute("aria-label", statusAriaLabel(networkStatus, device, overlay));
     renderDotExplainability(networkStatus, device, overlay);
+    applyStewardCelebrate(previousDevice, device);
+    maybeEmitDotTransition(networkStatus, device, overlay);
+    lastDotSnapshot = { network: networkStatus, device, overlay };
   };
   if (
     !prefersReducedMotion() &&
@@ -316,28 +384,8 @@ function refreshSummary() {
   refreshHubGlance();
 }
 
-async function fetchNetworkStatus() {
-  const url = new URL("/.well-known/hc/v1/health", resolverApiOrigin()).href;
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 5000);
-  try {
-    const res = await fetch(url, {
-      signal: controller.signal,
-      headers: { Accept: "application/json" },
-    });
-    const body = await res.json().catch(() => ({}));
-    if (!res.ok || body.status === "degraded") return "degraded";
-    return "ok";
-  } catch {
-    return "offline";
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
 async function refreshNetwork() {
-  networkStatus = await fetchNetworkStatus();
-  refreshSummary();
+  await requestDeviceOsRefresh("manual", { immediate: true });
 }
 
 function scrollWalletToSaved() {
@@ -434,20 +482,19 @@ window.addEventListener("hc-focus-hub-search", () => {
   document.getElementById("device-hub-search")?.focus({ preventScroll: true });
 });
 
+initDeviceOsCoordinator();
 startTabKeysPresence();
-refreshNetwork();
+networkStatus = getCoordinatorNetworkStatus();
+refreshSummary();
 
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible") refreshNetwork();
-});
-
-window.addEventListener("storage", (e) => {
-  if (e.key === "hc_wallet" || e.key === "hc_device_pins" || e.key === "hc_created") {
-    refreshSummary();
+window.addEventListener(DEVICE_OS_REFRESHED, (e) => {
+  const next = e.detail?.networkStatus;
+  if (next === "ok" || next === "degraded" || next === "offline") {
+    networkStatus = next;
   }
+  refreshSummary();
 });
 
-window.addEventListener("hc-device-hub-changed", refreshSummary);
 window.addEventListener("hc-live-control-inbox-changed", refreshSummary);
 window.addEventListener("hc-tab-presence-changed", refreshSummary);
 

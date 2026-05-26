@@ -1,8 +1,8 @@
 # Status Indicator: Steward Green + Intelligent Trust Dot
 
-**Status:** Proposed  
+**Status:** Implemented (Phases 1–4)  
 **Owners:** Device shell + resolver trust UX  
-**Scope:** `site/js/device-status.mjs`, `site/styles.css`, `site/js/device-counts.mjs`, status key copy in hub/wallet/created
+**Scope:** `site/js/device-status.mjs`, `site/js/device-dot-state-core.mjs`, `site/styles.css`, `site/css/device-shell.css`, status key copy in hub/wallet/created
 
 ---
 
@@ -99,9 +99,9 @@ This gives users confidence and direction without turning the header into a dash
 ## UX behavior by context
 
 ### Landing (`/`)
-- Dot opens hub glance/popover.
-- Popover first row explains current dot state in plain language.
-- If steward-ready, primary quick action becomes "Open steward queue" (if queue exists), otherwise "Open controls."
+- Dot toggles the device hub sheet (first tap opens, second tap closes); chrome keeps the dot clickable while the sheet is open.
+- Hub status key and glance popover show **Now / Why / Next** explainability for the current dot state.
+- If steward-ready, primary quick action becomes "Open steward queue" when `#steward-review-details` exposes a link; otherwise "Open controls."
 
 ### Created (`/created/`)
 - Dot remains global status entry point.
@@ -135,16 +135,19 @@ No third-party analytics requirement; this can remain local/dev diagnostics init
 ## Technical implementation plan
 
 Implementation snapshot:
-- Phase 1 shipped in `site/js/device-status.mjs` + `site/styles.css` (steward green + ARIA + legend).
-- Phase 2 basic explainability shipped: `describeDotState()` + "Now / Why / Next" surfaced in hub status key and dot popover with state-aware quick actions.
-- Phase 3 basic overlays shipped: `dotOverlayState()` for `proof_waiting` / `cross_tab_keys`, visual overlay marker on the dot, `data-dot-overlay` hooks, and overlay text in ARIA/explainer copy.
-- Phase 3 tests shipped: pure helpers in `site/js/device-dot-state-core.mjs` with Vitest coverage in `worker/tests/device-dot-state.test.ts` (priority, overlay, ARIA, steward detection).
+- Phase 1: `site/js/device-status.mjs` + `site/styles.css` — steward green (`#22c55e`), ARIA, status key legend.
+- Phase 2: `describeDotState()` in `site/js/device-dot-state-core.mjs` — **Now / Why / Next** in hub status key and glance popover; steward queue link when present.
+- Phase 3: overlay axis (`proof_waiting`, `cross_tab_keys`), `::after` notch in `site/styles.css`, `data-dot-state` / `data-dot-overlay`, Vitest in `worker/tests/device-dot-state.test.ts`.
+- Phase 4: steward celebration pulse (`pass-dot-steward-celebrate`), `hc-dot-state-changed` + optional `hc_dot_diag_log`, E2E in `e2e/device-status-dot.spec.ts`.
+- Clickability: `site/css/device-shell.css` + `site/js/device-hub-sheet.mjs` — dot stays fixed/clickable when hub is open or chrome is edge-hidden; dot opens hub on first tap (not glance-first).
 
-### Phase 4 - Hardening (optional next)
+### Phase 4 - Hardening
 
-1. Steward celebration pulse on non-steward → steward transition (respect `prefers-reduced-motion`).
-2. E2E: seeded steward wallet shows green; degraded/offline suppresses green.
-3. Local diagnostics hooks for dot state transitions (dev-only).
+1. **Celebration pulse** — one-time 900ms bloom on non-steward → steward when network is `ok`; disabled under `prefers-reduced-motion`. CSS: `pass-dot-steward-celebrate` in `site/styles.css`; logic: `shouldCelebrateStewardTransition()` in `device-dot-state-core.mjs`, applied from `device-status.mjs`.
+2. **E2E** — `e2e/device-status-dot.spec.ts`: steward wallet + healthy resolver → green on `/wallet/` and `/`; degraded suppresses green; landing dot opens hub sheet.
+3. **Diagnostics (dev-only)** — `window` event `hc-dot-state-changed` with `{ from, to, at, page }`; ring buffer `sessionStorage.hc_dot_diag_log` when `localStorage.hc_dot_diagnostics === "1"`.
+
+Network refresh for dot coloring uses `device-os-coordinator.mjs` (`DEVICE_OS_REFRESHED`) so steward green tracks resolver health consistently with wallet/hub.
 
 ### Phase 1 - Steward green foundation
 
@@ -173,8 +176,8 @@ Implementation snapshot:
 - Unit: state priority resolver (network overrides, steward precedence among healthy states).
 - Unit: role detection helper for steward readiness.
 - UI unit: class + aria output for each state.
-- E2E: seeded steward wallet shows bright green on landing and wallet.
-- E2E: degraded/offline suppresses green even with steward keys.
+- E2E: seeded steward wallet shows `data-dot-state` `ok:steward` on landing and wallet (class hooks, not computed color).
+- E2E: degraded/offline suppresses network-ok even with steward keys.
 - A11y: reduced-motion behavior and text alternatives validated.
 
 ---
@@ -188,12 +191,17 @@ Implementation snapshot:
 
 ---
 
-## Open questions before build
+## Resolved decisions (v1)
 
-- Exact steward-role source in local key metadata: existing wallet shape vs derived resolver call?
-- Should steward green appear for unsaved in-tab steward keys, or only saved keys?
-- Should "Open steward queue" deep-link to a dedicated review page now or later?
-- Final green token selection to maintain brand consistency and contrast in light/dark surfaces.
+- **Steward detection:** `verification.state === "steward"` or `verification.label === "Steward"` on tab session (`hc_created`) or wallet entries (`hc_wallet`), via `hasStewardVerification()` / `hasStewardReadyKeys()` in the device shell.
+- **Unsaved vs steward:** `deviceStateFromContext` prioritizes `unsaved` over `steward` (tab keys not saved wins).
+- **Steward queue action:** deep-link from `#steward-review-details a[href]` on `/created/` when visible; otherwise "Open controls."
+- **Green token:** `#22c55e` (`pass-dot-status-device-steward` under network-ok).
+
+## Optional follow-up
+
+- Run `e2e/device-status-dot.spec.ts` in CI alongside `npm run worker:test`.
+- Popover open/click telemetry (local diagnostics only; see Telemetry section).
 
 ---
 

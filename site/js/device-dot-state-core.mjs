@@ -193,3 +193,34 @@ export function primaryDotTone(network, device) {
   if (device === "unsaved" || device === "none") return "unsaved";
   return "keys";
 }
+
+/**
+ * @param {"ok" | "degraded" | "offline"} network
+ * @param {"none" | "keys" | "unsaved" | "steward"} device
+ * @param {"none" | "proof_waiting" | "cross_tab_keys"} overlay
+ */
+export function dotTransitionKey(network, device, overlay) {
+  return `${network}:${device}:${overlay}`;
+}
+
+/**
+ * One-time steward bloom when device becomes steward while network is healthy.
+ * @param {{
+ *   network: "ok" | "degraded" | "offline",
+ *   previousDevice: "none" | "keys" | "unsaved" | "steward" | null,
+ *   nextDevice: "none" | "keys" | "unsaved" | "steward",
+ *   reducedMotion?: boolean,
+ * }}
+ */
+export function shouldCelebrateStewardTransition({
+  network,
+  previousDevice,
+  nextDevice,
+  reducedMotion = false,
+}) {
+  if (reducedMotion) return false;
+  if (network !== "ok") return false;
+  if (nextDevice !== "steward") return false;
+  if (previousDevice === "steward") return false;
+  return true;
+}

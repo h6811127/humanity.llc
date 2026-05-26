@@ -9,6 +9,8 @@ import {
   hasStewardVerification,
   overlayAriaText,
   primaryDotTone,
+  shouldCelebrateStewardTransition,
+  dotTransitionKey,
   statusAriaLabel,
 } from "../../site/js/device-dot-state-core.mjs";
 
@@ -121,6 +123,48 @@ describe("describeDotState", () => {
       kind: "open_notifications",
       label: "Open proof requests",
     });
+  });
+});
+
+describe("shouldCelebrateStewardTransition", () => {
+  it("fires only on first steward transition with healthy network", () => {
+    expect(
+      shouldCelebrateStewardTransition({
+        network: "ok",
+        previousDevice: "keys",
+        nextDevice: "steward",
+      })
+    ).toBe(true);
+    expect(
+      shouldCelebrateStewardTransition({
+        network: "ok",
+        previousDevice: "steward",
+        nextDevice: "steward",
+      })
+    ).toBe(false);
+    expect(
+      shouldCelebrateStewardTransition({
+        network: "degraded",
+        previousDevice: "keys",
+        nextDevice: "steward",
+      })
+    ).toBe(false);
+    expect(
+      shouldCelebrateStewardTransition({
+        network: "ok",
+        previousDevice: "keys",
+        nextDevice: "steward",
+        reducedMotion: true,
+      })
+    ).toBe(false);
+  });
+});
+
+describe("dotTransitionKey", () => {
+  it("includes network, device, and overlay", () => {
+    expect(dotTransitionKey("ok", "steward", "proof_waiting")).toBe(
+      "ok:steward:proof_waiting"
+    );
   });
 });
 
