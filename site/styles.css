@@ -550,6 +550,29 @@ body.page-flow.has-shell-chrome .page > main.screen {
   margin-bottom: 8px;
 }
 
+.device-hub-body .device-dot-explainer:not(.device-dot-explainer--popover) {
+  border: 0.5px solid var(--surface-popover-border);
+  background: var(--surface-popover-control-bg);
+}
+
+.device-hub-body .device-dot-explainer:not(.device-dot-explainer--popover) .device-dot-explainer-kicker {
+  color: var(--surface-popover-fg-muted);
+}
+
+.device-hub-body .device-dot-explainer:not(.device-dot-explainer--popover) .device-dot-explainer-line {
+  color: var(--surface-popover-fg);
+}
+
+.device-hub-body .device-dot-explainer:not(.device-dot-explainer--popover) .device-dot-explainer-action {
+  border: 0.5px solid var(--surface-popover-border);
+  background: var(--surface-popover-control-bg);
+  color: var(--surface-popover-accent);
+}
+
+.device-hub-body .device-dot-explainer:not(.device-dot-explainer--popover) .device-dot-explainer-action:active {
+  opacity: 0.85;
+}
+
 .device-dot-explainer-kicker {
   margin: 0 0 4px;
   font-size: 12px;

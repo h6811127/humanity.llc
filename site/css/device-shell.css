@@ -555,6 +555,16 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   text-decoration: none;
 }
 
+.device-hub-glance-popover .device-hub-glance-help {
+  border: 0.5px solid var(--surface-popover-border, rgba(60, 60, 67, 0.12));
+  background: var(--surface-popover-control-bg, rgba(120, 120, 128, 0.12));
+  color: var(--surface-popover-accent, var(--red, #db1b43));
+}
+
+.device-hub-glance-popover .device-hub-glance-help .list-chevron {
+  color: var(--surface-popover-fg-muted, rgba(60, 60, 67, 0.72));
+}
+
 .device-hub-glance-help:active {
   opacity: 0.75;
 }

@@ -90,6 +90,9 @@ When touching legacy components, migrate them incrementally to this token family
 | Hub card warning alert | `.hub-card-status-alert`, `.hub-card-status-alert-text`, `.hub-card-alert-dismiss`, `.hub-card-alert-view-scan` | Surface/text on popover tokens; action links use `--hc-notice-link` (dark override in `theme-dark.css`). |
 | Glance popover chrome | `.brand-status-popover` | Legacy class on `#device-hub-glance-popover`; aligned panel bg/border with popover tokens. |
 | Dot explainer (glance) | `.device-hub-glance-popover .device-dot-explainer*` | Status-dot Now/Why/Next block inside glance popover uses popover fg/muted/accent and control surface (not `--black` / `--grey` on a nested light wash). |
+| Intro coachmark | `.device-hub-intro-coachmark`, `.device-hub-intro-*` | First-visit status-dot coachmark; base styles in `device-shell.css` with popover tokens (dark overrides in `theme-dark.css`). |
+| Glance popover help | `.device-hub-glance-popover .device-hub-glance-help` | Contact row at bottom of glance popover; uses control surface + accent (not `--shell-surface-elevated` white chip). |
+| Dot explainer (hub sheet) | `.device-hub-body .device-dot-explainer:not(.device-dot-explainer--popover)` | Expanded hub status-key explainer; same popover token family as glance variant. |
 
 ### QA (hub card menu)
 
@@ -98,4 +101,9 @@ After migrating `.hub-card-menu-*`, run the standard contrast checklist on a sav
 ### QA (warning alert + glance explainer)
 
 1. Trigger a **disabled since visit** (or similar) hub card alert; confirm body and **Dismiss** / **View scan** links in light and dark.
-2. Open the status-dot **glance popover** with the dot explainer visible; confirm kicker, three lines, and quick-action button/readability in both themes.
+2. Open the status-dot **glance popover** with the dot explainer visible; confirm kicker, three lines, quick-action button, and **info@humanity.llc** help row in both themes.
+3. Expand the **device hub sheet** and confirm the status-key dot explainer (Now/Why/Next) in both themes.
+
+### QA (intro coachmark)
+
+Clear `localStorage` key for hub intro dismissal (see `device-hub-intro-coachmark.mjs`), reload `/`, confirm coachmark title/body/dismiss in light and dark.
