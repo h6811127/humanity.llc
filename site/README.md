@@ -11,6 +11,8 @@ npm run pages:dev
 
 Open the URL Wrangler prints (usually `http://localhost:8788`).
 
+**Trust UI prototype (Path 2 brainstorm):** [`/prototypes/scan-trust-ui-demo.html`](prototypes/scan-trust-ui-demo.html) — interactive scan hero + corner dot timeline; see [`docs/SCAN_PAGE_TRUST_UI.md`](../docs/SCAN_PAGE_TRUST_UI.md).
+
 Run `npm run worker:dev` on port **8787** before using `/create/` locally  -  the UI signs in the browser and POSTs to the resolver.
 
 **Pages preview URLs** (`*.pages.dev` after `npm run pages:deploy`) are static-only. Create/revoke/vouch calls use the production resolver at `https://humanity.llc` automatically. Override with `?api=http://127.0.0.1:8787` when testing against a local worker.

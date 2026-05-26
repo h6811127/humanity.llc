@@ -27,6 +27,7 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 - **E2E**: `npm run e2e:install` once, then `npm run e2e` (Playwright; starts `pages:dev` unless `PLAYWRIGHT_SKIP_WEBSERVER=1`)
 - **Orphan purge**: Daily cron purges abandoned cards per `docs/CARD_RETENTION_AND_ORPHAN_CLEANUP.md`
 - **Landing desktop**: Wider two-column intro at ≥880px per `docs/LANDING_DESKTOP_LAYOUT.md`
+- **Scan Path 2 UI (`pass-v32`)**: Live check data-arriving + dot sync — `docs/SCAN_PAGE_TRUST_UI.md`, motion in `docs/VISUAL_IDENTITY_PRINCIPLES.md`. After `site/scan-pass.css` changes: `npm run worker:bundle-scan`. Tests: `npm run worker:test:scan-live-check-arrive`. Prototype: `/prototypes/scan-trust-ui-demo.html` on Pages dev.
 - **Build check**: `npm run build` (validates static site exists)
 - **Worker dev**: `npm run worker:dev`
 - **Pages dev**: `npm run pages:dev`

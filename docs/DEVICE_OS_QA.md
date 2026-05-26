@@ -63,12 +63,12 @@ Spec: [`docs/QR_BRANDING.md`](QR_BRANDING.md) § Verification. Automated: `npm r
 
 ### P1-SD · Scan page device dot + glance (`/c/…`)
 
-Spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md). Automated: `npm run worker:test:scan-page-dot` · `npm run e2e:scan-page-dot` (static fixture on Pages :8788; regen `npm run site:generate-scan-e2e-fixture`).
+Spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · Path 2 arrive [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md). Automated: `npm run worker:test:scan-page-dot` · `npm run worker:test:scan-live-check-arrive` · `npm run e2e:scan-page-dot`.
 
 | Step | Action | Expected |
 |------|--------|----------|
-| 1 | Incognito active scan URL | Static brand dot; tap goes home; no glance |
-| 2 | Steward / saved wallet on same device | Dot shows viewer state (hollow ring, solid red, green, or overlay notch); tap opens glance, not hub |
+| 1 | Incognito active scan URL | Hero: **Checking live status…** then **Active** (or kind label) with stagger + one card pulse; corner dot **one-shot settle** (no loop); tap home |
+| 2 | Steward / saved wallet on same device | Same L2 arrive; dot may show viewer state (Phase 8); tap opens glance, not hub |
 | 3 | Glance primary action | Scrolls to vouch / live proof / cross-tab banner action in-page |
 | 4 | Cross-tab keys banner visible | Dot overlay matches banner (`cross_tab_keys`) |
 | 5 | Escape / outside tap | Glance closes; dot `aria-expanded` false |

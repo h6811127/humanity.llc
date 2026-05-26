@@ -125,6 +125,10 @@ describe("scan-safety", () => {
     expect(html).not.toContain('class="section-kicker">Network status');
     expect(html).toContain("scan-safety-first-seen");
     expect(html).toContain("scan-hero-limit");
+    expect(html).toContain("scan-live-check--pending");
+    expect(html).toContain("scan-live-check-arrive.mjs");
+    expect(html).toContain("data-arrive-label");
+    expect(html).toContain("Checking live status…");
   });
 
   it("buildScanSafetyModel reports steward when verification state is steward", async () => {

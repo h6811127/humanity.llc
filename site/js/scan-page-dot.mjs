@@ -509,6 +509,19 @@ void refreshResolverHealth();
 
 window.addEventListener("online", onConnectivityChange);
 window.addEventListener("offline", onConnectivityChange);
+
+/** Path 2: one-shot mark Settle synced with live check (docs/SCAN_PAGE_TRUST_UI.md). */
+window.addEventListener("hc-scan-live-check-settled", (event) => {
+  if (event.detail?.instant || prefersReducedMotion()) return;
+  const btn = scanDotBtn();
+  if (!btn) return;
+  btn.classList.add("scan-page-dot--settle");
+  btn.addEventListener(
+    "animationend",
+    () => btn.classList.remove("scan-page-dot--settle"),
+    { once: true }
+  );
+});
 window.addEventListener("hc-vouch-ready-changed", refreshScanPageDot);
 window.addEventListener("hc-device-hub-changed", refreshScanPageDot);
 window.addEventListener("storage", (e) => {

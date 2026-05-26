@@ -1,8 +1,9 @@
 # Visual Identity Principles
 
-**Status:** Design strategy draft  
+**Status:** Design strategy draft (motion § updated for Path 2 `pass-v32`)  
 **Purpose:** Define the visual direction for Humanity Commons v1.0, especially the mobile web card and scan experience.  
-**Scanner product contract (safety header, external links, recognition):** [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md)
+**Scanner product contract (safety header, external links, recognition):** [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md)  
+**Scan trust UI (layers, arrive sequence, dot sync):** [`docs/SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md)
 
 ---
 
@@ -171,11 +172,65 @@ Resolver HTML (`scan-pass.css`, bundled to Worker). Product rules: [`docs/SCANNE
 | **Spacing** | One primary hero card: 24–28px padding; 28–32px before secondary modules; no back-to-back equal-weight bordered cards |
 | **Typography** | H1 message 22–26px semibold; status one pill or bar; meta 13–14px at `rgba(60,60,67,0.72)` |
 | **Brand red** | Dot, QR frame accent, primary CTA-not every badge or status duplicate |
-| **Page chrome** | Status dot only above the hero card (`pass-v26`); host wordmark lives inside the card |
+| **Page chrome** | Status dot only above the hero card (`pass-v26`); host wordmark lives inside the card. Progressive **viewer device** dot for operators: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) |
 | **Green** | Active / “signed object verified by resolver” only |
-| **Motion** | One-shot hero border pulse on load; respect `prefers-reduced-motion` |
+| **Motion** | **Data arriving** in hero (`pass-v32`); see § Motion & data arriving |
 | **Section kickers** | Avoid “Network status” for strangers; use human copy or omit |
-| **Anti-pattern** | Four “Active” labels; passport styling; QR larger than the message |
+| **Anti-pattern** | Four “Active” labels; passport styling; QR larger than the message; **looping corner-dot pulse** on scan |
+
+---
+
+## Motion & data arriving
+
+**Principle:** Motion explains **evidence showing up** (L2 object), not “the website is nervous.” The corner red dot is a **mark** (L1 site), not the scan result.
+
+**Canonical spec:** [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md)
+
+### Three motion types (site-wide)
+
+| Type | Word | Use | Do not use for |
+|------|------|-----|----------------|
+| **Settle** | Proof landed | Hero border pulse once; status strip copy change; row stagger; limits reveal | Looping decoration |
+| **Settle (mark)** | Site acknowledges | One-shot corner dot scale/fade (`scan-page-dot--settle`) synced with hero Settle | Object active/revoked semantics |
+| **Breathe** | Brand alive | Optional low-amplitude mark (prototype / landing experiments) | Scan stranger default |
+| **Urgent** | Act now | Shell status dot pulse (unsaved keys, critical inbox) | Scan corner dot |
+
+### Scan page sequence (`pass-v32`)
+
+1. **First paint:** Hero `scan-live-check--pending`; strip reads **Checking live status…**; hero body rows visually hidden. Corner dot **static** (no loop).
+2. **Checking (~380ms minimum):** Resolver truth already in HTML; client performs readable “check” beat.
+3. **Settle:** Strip label → resolver state (e.g. **Active**); `.scan-arrive-item` rows stagger (~90ms); hero `scan-safety--pulse` once; **limits** line appears; corner dot **one-shot Settle** (same moment).
+4. **After:** Everything still until state changes.
+
+**Event:** `hc-scan-live-check-settled` (detail `{ instant }` when reduced motion).
+
+### Motion budget (scan)
+
+| Rule | Limit |
+|------|--------|
+| Primary channel | L2 hero only |
+| Secondary | L1 dot one-shot Settle (synced) |
+| Infinite loops on stranger scan | **0** |
+| `prefers-reduced-motion` | Instant text + visibility; no pulse |
+
+### Shell pages (`/`, `/created/`, …)
+
+- **Status line text** is the primary global indicator (network · saved · notices).
+- **Dot** opens hub (control); urgent pulse = custody, not resolver reachability.
+- Do not reuse scan **Settle** on shell dot for “network OK.”
+
+### Design lab prototype
+
+Tune timing and copy without Figma:
+
+`npm run pages:dev` → `/prototypes/scan-trust-ui-demo.html`
+
+### Anti-patterns
+
+- Looping red pulse on scan corner dot (reads as sticker status or notification bell).
+- Green scan dot for strangers (“object verified”).
+- Hero + dot both pulsing independently (double heartbeat).
+- Animation without copy change on the status strip.
 
 ---
 

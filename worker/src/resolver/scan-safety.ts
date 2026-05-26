@@ -195,16 +195,16 @@ export function renderScannerSafetyHeader(
 </section>`;
 }
 
-/** One status strip for the Live check hero (docs/SCANNER_EXPERIENCE.md § First-scan hero). */
+/** One status strip for the Live check hero (Path 2 data-arriving — docs/SCAN_PAGE_TRUST_UI.md). */
 export function renderHeroStatusStrip(vm: ScanViewModel): string {
   const status = safetyStatusDisplay(vm);
-  return `<div class="scan-safety-strip ${status.stripClass}" role="status">
+  return `<div class="scan-safety-strip ${status.stripClass} scan-arrive-strip" role="status" data-arrive-label="${escapeHtml(status.label)}">
       <span class="scan-safety-strip-icon" aria-hidden="true"></span>
-      <span class="scan-safety-strip-label">${escapeHtml(status.label)}</span>
+      <span class="scan-safety-strip-label scan-arrive-status-label">Checking live status…</span>
     </div>`;
 }
 
-/** Phase B: device-local first-open disclosure + one-shot border pulse. */
+/** Phase B: device-local first-open disclosure (border pulse → scan-live-check-arrive.mjs). */
 export function renderScanSafetyHeaderScript(): string {
   return `<script>
 (function () {
@@ -224,13 +224,6 @@ export function renderScanSafetyHeaderScript(): string {
     if (!seen) {
       try { sessionStorage.setItem(key, "1"); } catch (e) {}
     }
-  }
-  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    header.classList.add("scan-safety--pulse");
-    header.addEventListener("animationend", function onEnd() {
-      header.classList.remove("scan-safety--pulse");
-      header.removeEventListener("animationend", onEnd);
-    });
   }
 })();
 </script>`;

@@ -1,9 +1,9 @@
 # Scan page device dot (progressive chrome)
 
-**Status:** Phase 8.1–8.7 shipped (`pass-v31`)  
+**Status:** Phase 8.1–8.7 shipped (`pass-v31`) + Path 2 arrive/sync (`pass-v32`) — [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md)  
 **Audience:** Product, design, frontend implementers  
 **Scope:** Page chrome on public scan HTML (`GET /c/{profile_id}?q={qr_id}`) — `#scan-page-dot` in `renderScanPageChrome()`  
-**Related:** [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) · [`SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md)
+**Related:** [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) (constitution + [`site/prototypes/scan-trust-ui-demo.html`](../site/prototypes/scan-trust-ui-demo.html)) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) · [`SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md)
 
 ---
 

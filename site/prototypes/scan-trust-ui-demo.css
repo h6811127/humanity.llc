@@ -1,0 +1,296 @@
+/* Path 2 trust UI prototype — demo-only (not production scan HTML) */
+
+.trust-demo-dev {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  max-height: 42vh;
+  overflow: auto;
+  padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+  font-size: 13px;
+  line-height: 1.35;
+  color: #f5f5f7;
+  background: rgba(28, 28, 30, 0.94);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+}
+
+.trust-demo-dev h2 {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  letter-spacing: -0.02em;
+}
+
+.trust-demo-dev p {
+  margin: 0 0 10px;
+  color: rgba(235, 235, 245, 0.72);
+}
+
+.trust-demo-dev-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.trust-demo-dev button,
+.trust-demo-dev label {
+  font: inherit;
+}
+
+.trust-demo-dev-btn {
+  min-height: 36px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(120, 120, 128, 0.35);
+  color: #fff;
+  cursor: pointer;
+}
+
+.trust-demo-dev-btn[aria-pressed="true"] {
+  border-color: var(--red);
+  background: rgba(219, 27, 67, 0.35);
+}
+
+.trust-demo-dev-btn--bad {
+  border-color: #f59e0b;
+}
+
+.trust-demo-dev-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 8px;
+  color: rgba(235, 235, 245, 0.9);
+}
+
+.trust-demo-dev-test {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.trust-demo-dev-test ol {
+  margin: 6px 0 0;
+  padding-left: 1.2em;
+  color: rgba(235, 235, 245, 0.85);
+}
+
+.trust-demo-page {
+  padding-bottom: 220px;
+}
+
+.trust-demo-chrome {
+  padding: 14px var(--pad) 8px;
+}
+
+.trust-demo-status-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.trust-demo-status-line.is-checking {
+  color: rgba(60, 60, 67, 0.72);
+}
+
+.trust-demo-status-line.is-resolved {
+  color: var(--black);
+}
+
+.trust-demo-skeleton {
+  display: block;
+  height: 14px;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    rgba(120, 120, 128, 0.14) 0%,
+    rgba(120, 120, 128, 0.28) 50%,
+    rgba(120, 120, 128, 0.14) 100%
+  );
+  background-size: 200% 100%;
+  animation: trust-demo-shimmer 1.2s ease-in-out infinite;
+}
+
+.trust-demo-trust-row {
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.trust-demo-trust-row.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.trust-demo-limits {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition:
+    opacity 0.4s ease,
+    max-height 0.4s ease;
+}
+
+.trust-demo-limits.is-visible {
+  opacity: 1;
+  max-height: 120px;
+}
+
+.trust-demo-actor-band {
+  margin: 0 var(--pad) 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 0.5px solid rgba(219, 27, 67, 0.22);
+  background: rgba(219, 27, 67, 0.06);
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.trust-demo-actor-band.is-visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.trust-demo-actor-band h2 {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.trust-demo-actor-band p {
+  font-size: 14px;
+  color: rgba(60, 60, 67, 0.85);
+  margin: 0 0 10px;
+}
+
+.trust-demo-actor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.trust-demo-actor-actions a,
+.trust-demo-actor-actions button {
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.trust-demo-actor-actions .primary {
+  background: var(--red);
+  color: #fff;
+}
+
+.trust-demo-actor-actions .secondary {
+  background: rgba(120, 120, 128, 0.14);
+  color: var(--black);
+}
+
+/* Dot modes (L1 mark) */
+.trust-demo-dot-settle .pass-dot {
+  animation: trust-demo-dot-settle 0.55s ease forwards;
+}
+
+@keyframes trust-demo-dot-settle {
+  0% {
+    opacity: 0.35;
+    transform: scale(0.88);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.trust-demo-dot-loop .pass-dot {
+  animation: trust-demo-dot-loop 1.4s ease-in-out infinite;
+}
+
+@keyframes trust-demo-dot-loop {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(219, 27, 67, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(219, 27, 67, 0);
+  }
+}
+
+.trust-demo-dot-breathe .pass-dot {
+  animation: trust-demo-dot-breathe 2.8s ease-in-out infinite;
+}
+
+@keyframes trust-demo-dot-breathe {
+  0%,
+  100% {
+    opacity: 0.82;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes trust-demo-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trust-demo-skeleton {
+    animation: none;
+    background: rgba(120, 120, 128, 0.2);
+  }
+
+  .trust-demo-trust-row,
+  .trust-demo-limits,
+  .trust-demo-actor-band {
+    transition: none;
+  }
+
+  .trust-demo-dot-settle .pass-dot,
+  .trust-demo-dot-loop .pass-dot,
+  .trust-demo-dot-breathe .pass-dot,
+  .scan-hero.scan-safety--pulse {
+    animation: none !important;
+  }
+}
+
+body.trust-demo-force-reduced-motion .trust-demo-skeleton,
+body.trust-demo-force-reduced-motion .trust-demo-dot-settle .pass-dot,
+body.trust-demo-force-reduced-motion .trust-demo-dot-loop .pass-dot,
+body.trust-demo-force-reduced-motion .trust-demo-dot-breathe .pass-dot,
+body.trust-demo-force-reduced-motion .scan-hero.scan-safety--pulse {
+  animation: none !important;
+}
+
+body.trust-demo-force-reduced-motion .trust-demo-trust-row,
+body.trust-demo-force-reduced-motion .trust-demo-limits,
+body.trust-demo-force-reduced-motion .trust-demo-actor-band {
+  transition: none;
+}

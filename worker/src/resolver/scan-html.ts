@@ -28,7 +28,7 @@ import {
 } from "./scan-safety";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v31";
+export const SCAN_UI_VERSION = "pass-v32";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -80,8 +80,18 @@ export async function renderScanPage(
   ${renderQrFallbackScript(origin, vm.scanUrl)}
   ${renderScanOfflineBannerScript()}
   ${renderScanSafetyHeaderScript()}
+  ${renderScanLiveCheckArriveScript(origin)}
 </body>
 </html>`;
+}
+
+/** Tag hero body blocks for staggered data-arriving reveal. */
+function tagScanArriveItems(main: string): string {
+  const hidden = "scan-arrive-item scan-arrive-item--hidden";
+  return main
+    .replace(/<h1 class="/g, `<h1 class="${hidden} `)
+    .replace(/<p class="/g, `<p class="${hidden} `)
+    .replace(/<ul class="/g, `<ul class="${hidden} `);
 }
 
 /** Flow 2 F2-2: disclose stale resolver HTML when the browser is offline. */
@@ -152,20 +162,22 @@ function renderScanHeroSection(
   origin: string,
   qrMarkup: string
 ): string {
-  const { main, foot } = buildScanHeroMain(vm, origin);
+  const { main: rawMain, foot } = buildScanHeroMain(vm, origin);
+  const main = tagScanArriveItems(rawMain);
   const profileAttr = vm.profileId
     ? ` data-profile-id="${escapeHtml(vm.profileId)}"`
     : "";
   const qrAttr = vm.qrId ? ` data-qr-id="${escapeHtml(vm.qrId)}"` : "";
   const resolverRow = safety.objectSignatureVerified
-    ? `<p class="scan-safety-resolver">${escapeHtml(SCAN_SAFETY_RESOLVER_VERIFIED_COPY)}</p>`
+    ? `<p class="scan-safety-resolver scan-arrive-item scan-arrive-item--hidden">${escapeHtml(SCAN_SAFETY_RESOLVER_VERIFIED_COPY)}</p>`
     : "";
   const chips = renderSafetyChips(vm, safety);
   const chipsBlock = chips
-    ? chips.replace(
-        'class="scan-safety-chips"',
-        'class="scan-safety-chips scan-hero-details"'
-      )
+    ? chips
+        .replace(
+          'class="scan-safety-chips"',
+          'class="scan-safety-chips scan-hero-details scan-arrive-item scan-arrive-item--hidden"'
+        )
     : "";
   const footBlock = foot
     ? `<p class="scan-hero-foot">${escapeHtml(foot)}</p>`
@@ -179,7 +191,7 @@ function renderScanHeroSection(
     : "";
 
   return `<div class="scan-pass-layer">
-<article class="scan-hero scan-status-panel scan-safety-header" id="scan-safety-header" aria-label="Live check"${profileAttr}${qrAttr}>
+<article class="scan-hero scan-status-panel scan-safety-header scan-live-check--pending" id="scan-safety-header" aria-label="Live check"${profileAttr}${qrAttr}>
   <header class="scan-hero-head">
     ${renderScanHeroHost()}
     ${renderHeroStatusStrip(vm)}
@@ -188,7 +200,7 @@ function renderScanHeroSection(
     ${main}
   </div>
   ${resolverRow}
-  <p class="scan-hero-limit" role="note">${escapeHtml(BEARER_WARNING)}</p>
+  <p class="scan-hero-limit scan-arrive-limits scan-arrive-limits--hidden" role="note">${escapeHtml(BEARER_WARNING)}</p>
   ${chipsBlock}
   <p class="scan-safety-first-seen" id="scan-safety-first-seen" hidden></p>
   ${footBlock}
@@ -930,6 +942,12 @@ function renderScanTabKeysScript(vm: ScanViewModel, origin: string): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
   const assetOrigin = pagesJsOrigin(origin);
   const mod = JSON.stringify(`${assetOrigin}/js/scan-tab-keys.mjs?v=6`);
+  return `<script type="module" src=${mod}></script>`;
+}
+
+function renderScanLiveCheckArriveScript(origin: string): string {
+  const assetOrigin = pagesJsOrigin(origin);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-live-check-arrive.mjs?v=1`);
   return `<script type="module" src=${mod}></script>`;
 }
 

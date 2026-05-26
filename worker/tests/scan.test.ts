@@ -280,7 +280,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
     );
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).toMatch(
-      /<h1 class="scan-hero-title">@river_example<\/h1>/
+      /<h1 class="[^"]*scan-hero-title[^"]*">@river_example<\/h1>/
     );
     expect(html).toContain("scan-hero-trust");
     expect(html).toContain("Open studio");
@@ -302,9 +302,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
       "https://humanity.llc"
     );
     const html = await renderScanPage(vm, "https://humanity.llc");
-    expect(html).toContain(
-      `<h1 class="scan-hero-title">${manifesto}</h1>`
-    );
+    expect(html).toContain(`scan-hero-title">${manifesto}</h1>`);
     expect(html).toContain("Controlled by @river_example");
     expect(html).not.toMatch(/<ul class="scan-hero-trust"/);
   });

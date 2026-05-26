@@ -359,7 +359,7 @@ Phases **A–F** are shipped for the reference network. **E** remains mandatory 
 
 ### Resolver UI refresh
 
-Implementation detail: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) § UI refresh phases. Current header: `X-HC-Scan-UI: pass-v31`.
+Implementation detail: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) § UI refresh phases. Current header: `X-HC-Scan-UI: pass-v32` (Path 2 data arriving — [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md)).
 
 | Phase | Deliverable | Outcome |
 |-------|-------------|---------|

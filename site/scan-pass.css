@@ -1557,6 +1557,72 @@ a {
   }
 }
 
+/* Path 2 — live check data arriving (docs/SCAN_PAGE_TRUST_UI.md, pass-v32) */
+.scan-live-check--pending .scan-arrive-item--hidden {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.scan-arrive-item--visible {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.scan-live-check--pending .scan-arrive-limits--hidden {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  margin-top: 0;
+  padding-top: 0;
+  border-top-width: 0;
+}
+
+.scan-arrive-limits--visible {
+  opacity: 1;
+  max-height: none;
+  transition: opacity 0.4s ease;
+}
+
+.scan-live-check--pending .scan-arrive-strip .scan-safety-strip-label {
+  color: rgba(60, 60, 67, 0.72);
+}
+
+.scan-page-dot--settle .pass-dot {
+  animation: scan-page-dot-settle 0.55s ease forwards;
+}
+
+@keyframes scan-page-dot-settle {
+  0% {
+    opacity: 0.35;
+    transform: scale(0.88);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan-arrive-item--hidden,
+  .scan-arrive-limits--hidden {
+    opacity: 1;
+    transform: none;
+    max-height: none;
+  }
+
+  .scan-arrive-item--visible,
+  .scan-arrive-limits--visible {
+    transition: none;
+  }
+
+  .scan-page-dot--settle .pass-dot {
+    animation: none;
+  }
+}
+
 .scan-safety-top {
   display: flex;
   flex-direction: column;
