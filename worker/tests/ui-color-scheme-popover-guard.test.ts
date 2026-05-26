@@ -115,8 +115,9 @@ describe("UI color scheme popover guard", () => {
     assertGuardedRule("site/styles.css", ".brand-status-popover", {
       require: ["--surface-popover-bg", "--surface-popover-fg"],
     });
-    assertGuardedRule("site/styles.css", ".hub-card-status-alert", {
-      require: ["--surface-popover-bg", "--surface-popover-fg"],
+    assertGuardedRule("site/styles.css", ".hub-card-status-alert.hc-emphasis-card", {
+      require: ["margin: 0 10px 6px"],
+      forbid: ["rgba(255, 59, 48, 0.35)", "--surface-popover-bg", "border: 0.5px"],
     });
     assertGuardedRule("site/styles.css", ".device-dot-explainer", {
       require: ["--surface-popover-control-bg", "--surface-popover-border"],

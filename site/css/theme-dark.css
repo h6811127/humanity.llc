@@ -299,16 +299,6 @@ html[data-theme="dark"] .hc-notice--info .hc-notice-icon {
   color: #64b5ff;
 }
 
-html[data-theme="dark"] .hub-card-status-alert {
-  background: var(--surface-popover-bg);
-  border-color: rgba(255, 69, 58, 0.45);
-  color: var(--surface-popover-fg);
-}
-
-html[data-theme="dark"] .hub-card-status-alert-text {
-  color: var(--surface-popover-fg);
-}
-
 html[data-theme="dark"] .hub-card-details-body {
   color: var(--shell-label);
 }

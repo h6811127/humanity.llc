@@ -1063,61 +1063,41 @@ body.page-flow.has-shell-chrome .page > main.screen {
   line-height: 1.35;
 }
 
-.hub-card-status-alert {
-  display: flex;
+/* Hub card row — disabled-since-visit inset (docs/HC_EMPHASIS_CARD_ROLLOUT.md Phase 5) */
+.hub-card-status-alert.hc-emphasis-card {
+  margin: 0 10px 6px;
+  padding: 10px 12px;
   flex-direction: column;
   align-items: stretch;
   gap: 8px;
-  margin: 0 10px 6px;
-  padding: 9px 11px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.4;
-  color: var(--surface-popover-fg);
-  background: var(--surface-popover-bg);
-  border: 0.5px solid rgba(255, 59, 48, 0.35);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .hub-card-status-alert[hidden] {
   display: none !important;
 }
 
+.hub-card-status-alert .hc-emphasis-card__main {
+  width: 100%;
+}
+
+.hub-card-status-alert .hc-emphasis-card__detail,
 .hub-card-status-alert-text {
   margin: 0;
-  flex: 1;
-  min-width: 0;
-  font-weight: 600;
-  color: var(--surface-popover-fg);
-}
-
-.hub-card-status-alert-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 16px;
-}
-
-.hub-card-alert-dismiss,
-.hub-card-alert-view-scan {
-  flex-shrink: 0;
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: none;
-  font: inherit;
   font-size: 13px;
   font-weight: 600;
-  color: var(--hc-notice-link);
-  text-decoration: none;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
+  line-height: 1.4;
 }
 
-.hub-card-alert-view-scan:active,
-.hub-card-alert-dismiss:active {
-  opacity: 0.7;
+.hub-card-status-alert .hc-emphasis-card__actions {
+  width: 100%;
+  max-width: none;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.hub-card-status-alert .hc-emphasis-card__cta {
+  padding: 6px 10px;
+  font-size: 12px;
 }
 
 .device-system-banner[hidden],

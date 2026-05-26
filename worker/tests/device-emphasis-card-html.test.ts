@@ -29,6 +29,16 @@ describe("device-emphasis-card-html", () => {
     expect(html).toContain("data-cross-tab-action");
   });
 
+  it("hub card disabled-since-visit alert uses warn emphasis card", () => {
+    const src = readFileSync(join(root, "site/js/device-hub-ui.mjs"), "utf8");
+    expect(src).toContain("hc-emphasis-card--warn hub-card-status-alert");
+    expect(src).toContain("hub-card-status-alert-text");
+    expect(src).toContain("hub-card-alert-dismiss");
+    expect(src).not.toMatch(
+      /hub-card-status-alert"[^>]*>\s*<p class="hub-card-status-alert-text"/
+    );
+  });
+
   it("phase 4 surfaces use emphasis card markup", () => {
     const created = readFileSync(join(root, "site/created/index.html"), "utf8");
     expect(created).toContain('id="no-session-detail"');

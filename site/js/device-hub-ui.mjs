@@ -886,11 +886,17 @@ function renderSavedRows() {
       ? hubCardIconHtml(entry.profile_id)
       : `<span class="list-icon list-icon-tone-trust" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>`;
     const revokedAlert = hubConfig.fetchNetworkStatus
-      ? `<div class="hub-card-status-alert" data-hub-searchable="${escapeHtml(CARD_DISABLED_SINCE_VISIT_SEARCH_SNIPPET)} network" hidden role="status">
-          <p class="hub-card-status-alert-text">${escapeHtml(CARD_DISABLED_SINCE_VISIT_ALERT_TEXT)}</p>
-          <div class="hub-card-status-alert-actions">
-            <button type="button" class="hub-card-alert-dismiss">Got it</button>
-            <a class="hub-card-alert-view-scan" href="${escapeHtml(scan)}" target="_blank" rel="noopener noreferrer">View scan</a>
+      ? `<div class="hc-emphasis-card hc-emphasis-card--warn hub-card-status-alert" data-hub-searchable="${escapeHtml(CARD_DISABLED_SINCE_VISIT_SEARCH_SNIPPET)} network" hidden role="status">
+          <div class="hc-emphasis-card__main">
+            <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
+            <div class="hc-emphasis-card__copy">
+              <p class="hc-emphasis-card__eyebrow">Card status</p>
+              <p class="hc-emphasis-card__detail hub-card-status-alert-text">${escapeHtml(CARD_DISABLED_SINCE_VISIT_ALERT_TEXT)}</p>
+            </div>
+          </div>
+          <div class="hc-emphasis-card__actions hub-card-status-alert-actions">
+            <button type="button" class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary hub-card-alert-dismiss">Got it</button>
+            <a class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary hub-card-alert-view-scan" href="${escapeHtml(scan)}" target="_blank" rel="noopener noreferrer">View scan</a>
           </div>
         </div>`
       : "";

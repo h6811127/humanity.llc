@@ -201,7 +201,7 @@ Prioritized places that could adopt the same **raised card** pattern. Extraction
 
 | Surface | Selector / ID | Today | Fit |
 |---------|----------------|-------|-----|
-| Disabled since visit | `.hub-card-status-alert` | Popover tokens + red border | Could become inset `--warn` card **inside** the card row |
+| Disabled since visit | `.hub-card-status-alert` | **Shipped** — inset `hc-emphasis-card--warn` inside card row (Phase 5) |
 | Live proof / card-disabled lists | `#device-hub-live-control-group`, `#device-hub-card-disabled-group` | List rows | Keep list pattern; optional **summary** emphasis card above list |
 
 #### Out of scope (different UX tier)
@@ -213,7 +213,7 @@ Prioritized places that could adopt the same **raised card** pattern. Extraction
 
 #### Suggested rollout order
 
-Tracked in [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md): **Phases 0–4** shipped · **Phase 5** (hub card alerts) optional. Full backlog: that doc § Further optimization backlog.
+Tracked in [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md): **Phases 0–5** shipped. Further work: that doc § Further optimization backlog.
 
 ---
 
@@ -259,7 +259,7 @@ When touching legacy components, migrate them incrementally to this token family
 | Component | Selectors | Notes |
 |-----------|-----------|--------|
 | Hub card ⋯ menu | `.hub-card-menu-panel`, `.hub-card-menu-item`, `.hub-card-menu-section-label`, `.hub-card-menu-divider` | Replaced hardcoded `rgba(255,255,255,0.96)` panel and `--black` / `--red` menu text with popover tokens; removed translucent backdrop blur on panel. |
-| Hub card warning alert | `.hub-card-status-alert`, `.hub-card-status-alert-text`, `.hub-card-alert-dismiss`, `.hub-card-alert-view-scan` | Surface/text on popover tokens; action links use `--hc-notice-link` (dark override in `theme-dark.css`). |
+| Hub card warning alert | `.hub-card-status-alert.hc-emphasis-card--warn` | Phase 5: inset emphasis card; secondary pill **Got it** / **View scan** (see `HC_EMPHASIS_CARD_ROLLOUT.md`). |
 | Glance popover chrome | `.brand-status-popover` | Legacy class on `#device-hub-glance-popover`; aligned panel bg/border with popover tokens. |
 | Dot explainer (glance) | `.device-hub-glance-popover .device-dot-explainer*` | Status-dot Now/Why/Next block inside glance popover uses popover fg/muted/accent and control surface (not `--black` / `--grey` on a nested light wash). |
 | Intro coachmark | `.device-hub-intro-coachmark`, `.device-hub-intro-*` | First-visit status-dot coachmark; base styles in `device-shell.css` with popover tokens (dark overrides in `theme-dark.css`). |

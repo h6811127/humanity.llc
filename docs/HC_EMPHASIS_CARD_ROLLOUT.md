@@ -1,6 +1,6 @@
 # Emphasis card rollout (`hc-emphasis-card`)
 
-**Status:** Phase 0–4 shipped · Phase 5 next  
+**Status:** Phases 0–5 shipped  
 **Visual standard:** [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Emphasis notice cards  
 **Primary CSS:** `site/css/hc-emphasis-card.css` (imported by `site/styles.css`; bundled into scan via `worker:bundle-scan`), `site/css/theme-dark.css`
 
@@ -78,7 +78,7 @@ See [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Typography c
 | **2** | `#scan-cross-tab-banner` (scan bundle + `device-cross-tab-banner.mjs`) | **Shipped** |
 | **3** | `#live-control-proof` on `/created/` → `--urgent` | **Shipped** |
 | **4** | Create custody + revoke gates + `#no-session` / `#created-error` / `#owner-revoked-banner` | **Shipped** |
-| **5** | `.hub-card-status-alert` inset `--warn` (optional) | Planned |
+| **5** | `.hub-card-status-alert` inset `--warn` | **Shipped** |
 
 ### Phase 0–3 — shipped
 
@@ -97,12 +97,15 @@ See git history (`3eab136` Phase 3, `1f0c517` Phase 2). Acceptance: shadow-only 
 
 **Acceptance:** No flat orange/red `hc-notice` tinted boxes on these surfaces; pill CTAs where actions exist; revoke banner never empty when shown.
 
-### Phase 5 — hub card context (optional)
+### Phase 5 — shipped (hub card disabled-since-visit)
 
-| Surface | Notes |
-|---------|--------|
-| `.hub-card-status-alert` | Inset `--warn` inside card row (disabled-since-visit) |
-| Live proof / card-disabled list summaries | Optional emphasis card **above** list; keep row pattern |
+| Surface | File(s) | Shipped as |
+|---------|---------|------------|
+| `.hub-card-status-alert` | `site/js/device-hub-ui.mjs`, `site/styles.css` | Inset `hc-emphasis-card--warn` per saved card row; eyebrow **Card status**; **Got it** / **View scan** secondary pills |
+
+**Acceptance:** No red popover border rim inside hub rows; shadow-only depth; e2e selectors `.hub-card-status-alert` unchanged.
+
+**Backlog (not Phase 5):** Optional emphasis summary **above** `#device-hub-live-control-group` / `#device-hub-card-disabled-group` lists — keep list row pattern.
 
 ---
 
