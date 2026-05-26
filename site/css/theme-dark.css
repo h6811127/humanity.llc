@@ -711,6 +711,26 @@ html[data-theme="dark"] .landing-device-settings-list .list-action > button:acti
   background: rgba(255, 255, 255, 0.06);
 }
 
+html[data-theme="dark"] .landing-trust-chip {
+  border-color: rgba(255, 77, 109, 0.28);
+  background: rgba(255, 77, 109, 0.1);
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .landing-how-it-works-title,
+html[data-theme="dark"] .landing-final-cta-title {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .landing-how-it-works-lead strong {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .landing-final-cta {
+  border-color: rgba(255, 77, 109, 0.28);
+  background: linear-gradient(180deg, rgba(255, 77, 109, 0.12) 0%, rgba(28, 28, 30, 0) 72%);
+}
+
 /* Landing — object model strip + trust/docs cards */
 html[data-theme="dark"] .flow-strip {
   background: var(--shell-fill);

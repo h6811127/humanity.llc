@@ -5569,6 +5569,139 @@ a.wallet-pin-open {
   transform: scale(0.99);
 }
 
+.landing-hero-sub-links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.landing-hero-sub-link {
+  display: inline-block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--red);
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-color: rgba(219, 27, 67, 0.55);
+  text-underline-offset: 3px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.landing-hero-sub-link--muted {
+  color: var(--grey);
+  text-decoration-color: rgba(60, 60, 67, 0.35);
+}
+
+.landing-hero-sub-link:active {
+  opacity: 0.72;
+}
+
+.landing-trust-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  max-width: 22em;
+}
+
+.landing-trust-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 5px 11px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(219, 27, 67, 0.2);
+  background: rgba(219, 27, 67, 0.06);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.landing-how-it-works {
+  margin: 0;
+}
+
+.landing-how-it-works-title {
+  margin: 0 0 6px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--black);
+}
+
+.landing-how-it-works-lead {
+  margin: 0 0 14px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--grey);
+  max-width: 34em;
+}
+
+.landing-how-it-works-lead strong {
+  font-weight: 600;
+  color: var(--black);
+}
+
+.landing-how-it-works .flow-strip--model {
+  margin-top: 0;
+}
+
+.landing-how-it-works-note {
+  margin: 12px 2px 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+.landing-final-cta {
+  margin: 0;
+  padding: 22px 18px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(219, 27, 67, 0.22);
+  background: linear-gradient(180deg, rgba(219, 27, 67, 0.06) 0%, rgba(255, 255, 255, 0) 72%);
+  text-align: left;
+}
+
+.landing-final-cta-title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--black);
+}
+
+.landing-final-cta-lead {
+  margin: 0 0 16px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--grey);
+  max-width: 34em;
+}
+
+.landing-final-cta-btn {
+  max-width: 22em;
+}
+
+.landing-final-cta-foot {
+  margin: 14px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--grey);
+}
+
+.landing-final-cta-foot a {
+  color: var(--red);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* iOS-style inline notices (warnings, info, errors) */
 .hc-notice {
   display: flex;

@@ -53,7 +53,7 @@ These notes are captured as individual product refinements so implementation can
 
 We kept the landing funnel (hero → device hub → long-form content) and **enriched** it rather than replacing it with a full dashboard.
 
-**Landing story (shipped):** Hero one-liner, a **four-step progress strip** (Create → Save → Print → **My cards**), and **On this device** below the status line (inline search, no floating help pill). Homepage pass-card demo removed; strangers see real scan pages and the case study.
+**Landing story (shipped):** Hero one-liner + trust chips (no account · keys in browser · no scan tracking), **four-step progress strip** (Create → Save → Print → **My cards**), **How it works** flow strip (print → scan → verify), then framing and studio example. **On this device** is the hub sheet below the status line (inline search, no floating help pill). **Shortcuts & settings** sit after the studio block (not directly under the progress strip) so first scroll stays product narrative. Closing **Ready to try it?** CTA before documentation. Homepage pass-card demo removed; strangers see real scan pages and the case study.
 
 **Landing layout:** Mobile-first single column only (no desktop widening grid). See [`LANDING_DESKTOP_LAYOUT.md`](LANDING_DESKTOP_LAYOUT.md) for retired desktop experiment notes.
 
@@ -67,7 +67,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Landing trust UI:** Intro mode shows **Design choices**, **Clear limits**, and **Documentation** as stacked `.landing-disclosure-card` rows (icon + title + subtitle + chevron). The status-plate **flow strip** (plate → scan → live state) uses `.flow-strip--model` and picks up dark surfaces from `site/css/theme-dark.css` when `hc_theme` is dark.
 
-**Shortcuts & settings (shipped):** On the **homepage** (`/`) only — section under the progress strip (unified list rows: Appearance, **Browser alerts** (background OS notifications for live proof), saved cards, manage, auto-save, focus). Hub sheet on all routes has **home icon** (left), status line (center), **Create +** (right); no shortcuts block in the hub.
+**Shortcuts & settings (shipped):** On the **homepage** (`/`) only — section after the studio example (unified list rows: Appearance, **Browser alerts** (background OS notifications for live proof), saved cards, manage, auto-save, focus). Hub sheet on all routes has **home icon** (left), status line (center), **Create +** (right); no shortcuts block in the hub.
 
 **Chrome inbox (shipped):** Floating **inbox badge** next to the status dot when action items exist; hub `#device-hub-alerts-top` holds full rows. Spec and roadmap: [`DEVICE_INBOX.md`](DEVICE_INBOX.md). Status dot semantics: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 
