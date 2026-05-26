@@ -22,9 +22,9 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="/styles.css?v=102" />
+    <link rel="stylesheet" href="/styles.css?v=108" />
     <link rel="stylesheet" href="/css/device-shell.css?v=48" />
-    <link rel="stylesheet" href="/css/theme-dark.css?v=16" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=18" />
   </head>
   <body class="page-flow has-shell-chrome has-device-hub-search flow-shell flow-shell-create">
     <div class="page">
@@ -422,20 +422,22 @@
           </section>
 
           <div
-            class="hc-notice hc-notice--warning form-warning flow-form-warning"
+            class="hc-emphasis-card hc-emphasis-card--warn form-warning flow-form-warning"
+            id="create-public-card-notice"
             role="note"
           >
-            <span class="hc-notice-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-            </span>
-            <div class="hc-notice-content">
-              <p class="hc-notice-title">Create registers a public card on the network</p>
-              <p class="hc-notice-body">
-                Handle, QR, and status are stored on the network. Private keys stay in this tab until
-                you save on this device, export a backup, or keep a recovery key. Without save or
-                backup, closing this tab means you cannot revoke or update from the web UI.
-                humanity.llc cannot recover lost keys or revoke on your behalf.
-              </p>
+            <div class="hc-emphasis-card__main">
+              <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
+              <div class="hc-emphasis-card__copy">
+                <p class="hc-emphasis-card__eyebrow">Before you create</p>
+                <p class="hc-emphasis-card__title">Create registers a public card on the network</p>
+                <p class="hc-emphasis-card__detail">
+                  Handle, QR, and status are stored on the network. Private keys stay in this tab until
+                  you save on this device, export a backup, or keep a recovery key. Without save or
+                  backup, closing this tab means you cannot revoke or update from the web UI.
+                  humanity.llc cannot recover lost keys or revoke on your behalf.
+                </p>
+              </div>
             </div>
           </div>
 

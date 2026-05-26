@@ -1,8 +1,8 @@
 # Emphasis card rollout (`hc-emphasis-card`)
 
-**Status:** Phase 0–3 shipped · Phase 4 next  
+**Status:** Phase 0–4 shipped · Phase 5 next  
 **Visual standard:** [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Emphasis notice cards  
-**Primary CSS:** `site/styles.css`, `site/css/theme-dark.css`
+**Primary CSS:** `site/css/hc-emphasis-card.css` (imported by `site/styles.css`; bundled into scan via `worker:bundle-scan`), `site/css/theme-dark.css`
 
 ---
 
@@ -43,9 +43,11 @@ Replaces over time: flat `.hc-notice` strips, plain `<p>` cross-tab lines, and a
 | `--warn` | Reversible risk, setup gates | Amber | `--warn` | Warm gray neutral |
 | `--urgent` | Live proof, revoke, errors | Red | `--urgent` | Warm gray neutral |
 
-**IDs:** Keep stable `id`s for JS (`#wallet-active-banner`, `#wallet-active-label`, etc.) even when classes migrate.
+**IDs:** Keep stable `id`s for JS (`#wallet-active-banner`, `#live-control-proof-lead`, `#no-session-detail`, etc.) even when classes migrate.
 
-**Legacy aliases:** `.wallet-active-banner` and `.wallet-active-*` remain valid aliases to `.hc-emphasis-card` / `__*` through Phase 1 (do not remove until call sites migrate).
+**Legacy aliases:** `.wallet-active-banner` and `.wallet-active-*` remain valid aliases to `.hc-emphasis-card` / `__*` until all call sites migrate (do not remove until Phase 5+ cleanup).
+
+**Helpers:** `site/js/device-emphasis-card-html.mjs` · **Tests:** `worker/tests/device-emphasis-card-html.test.ts`
 
 ---
 
@@ -63,7 +65,7 @@ Default CTA: `.hc-emphasis-card__cta` uses `var(--red)` pill (brand primary acti
 
 ### Typography contrast (global)
 
-See [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Typography contrast — implementation checklist. **Step 1:** set title/detail fg tokens on `:root` + dark `html` block. **Never** style one card’s detail in isolation.
+See [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Typography contrast — implementation checklist. **Never** style one card’s detail in isolation.
 
 ---
 
@@ -71,51 +73,81 @@ See [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Typography c
 
 | Phase | Scope | Status |
 |-------|--------|--------|
-| **0** | Extract `.hc-emphasis-card` + four modifiers; migrate `#wallet-active-banner` markup/classes; Vitest guard | **Shipped** |
-| **1** | `#wallet-tab-hint` → `--info` / `--warn` card; `#device-cross-tab-banner` on `/wallet/` + `/` (`device-cross-tab-banner.mjs`) | **Shipped** |
-| **2** | `#scan-cross-tab-banner` (`scan-pass.css` + `device-cross-tab-banner.mjs`) | **Shipped** |
-| **3** | `.live-control-notification` on `/created/` → `--urgent` | **Shipped** |
-| **4** | Create custody + revoke / no-session `hc-notice` → `--warn` / `--urgent` | Planned |
+| **0** | Extract `.hc-emphasis-card` + four modifiers; migrate `#wallet-active-banner` | **Shipped** |
+| **1** | `#wallet-tab-hint`, `#device-cross-tab-banner` (wallet + `/`) | **Shipped** |
+| **2** | `#scan-cross-tab-banner` (scan bundle + `device-cross-tab-banner.mjs`) | **Shipped** |
+| **3** | `#live-control-proof` on `/created/` → `--urgent` | **Shipped** |
+| **4** | Create custody + revoke gates + `#no-session` / `#created-error` / `#owner-revoked-banner` | **Shipped** |
 | **5** | `.hub-card-status-alert` inset `--warn` (optional) | Planned |
 
-### Phase 0 — shipped
+### Phase 0–3 — shipped
 
-- Shared block in `site/styles.css` (`.hc-emphasis-card`, `__main`, `__dot`, `__copy`, `__eyebrow`, `__title`, `__detail`, `__cta`)
-- Modifiers `--active`, `--info`, `--warn`, `--urgent` (fills + eyebrow tokens; dots per semantic)
-- `site/wallet/index.html` uses `hc-emphasis-card hc-emphasis-card--active` (+ legacy `wallet-active-*` classes)
-- Dark overrides for fills and typography in `theme-dark.css`
-- `worker/tests/ui-color-scheme-popover-guard.test.ts` guards `.hc-emphasis-card`
+See git history (`3eab136` Phase 3, `1f0c517` Phase 2). Acceptance: shadow-only depth, no translucent semantic rims, dark mode via shared tokens, Vitest guards on `site/css/hc-emphasis-card.css`.
 
-### Phase 1 — shipped (wallet + landing cross-tab)
+### Phase 4 — shipped (create + revoke + session gates)
 
 | Surface | File(s) | Shipped as |
 |---------|---------|------------|
-| `#wallet-tab-hint` | `site/wallet/index.html`, `wallet-page-chrome.mjs` | `hc-emphasis-card--info` (cross-tab) or `--warn` (orphan removed); pill CTAs **Open that tab** / **Open controls here** / **Clear keys on this device** |
-| `#device-cross-tab-banner` | `site/index.html`, `site/wallet/index.html`, `device-cross-tab-banner.mjs` | `hc-emphasis-card--info` via `device-emphasis-card-html.mjs` (legacy pages without shell badge) |
+| Public create warning | `site/create/index.html` | `#create-public-card-notice` · `hc-emphasis-card--warn` |
+| Keys custody (created) | `site/js/device-keys-custody.mjs` | `emphasisCardShellHtml` · `--warn` · Acknowledge secondary pill |
+| No session | `site/created/index.html`, `created.mjs` | `--warn` · `#no-session-detail` · **My cards** secondary pill |
+| Created error | `site/created/index.html`, `created.mjs` | `--urgent` · `#created-error-detail` |
+| Owner revoked | `site/created/index.html`, `created-revoke-banner-core.mjs` | `--urgent` · `#owner-revoked-banner-detail` |
+| Revoke ID warnings | `site/created/index.html`, `site/organizer-revoke/index.html` | `--warn` compact cards (no CTA) |
 
-**Helpers:** `site/js/device-emphasis-card-html.mjs` · **Tests:** `worker/tests/device-emphasis-card-html.test.ts`
+**Acceptance:** No flat orange/red `hc-notice` tinted boxes on these surfaces; pill CTAs where actions exist; revoke banner never empty when shown.
 
-**Acceptance:** Cross-tab on wallet/landing matches active banner depth; no blue rim; CTAs as pills.
+### Phase 5 — hub card context (optional)
 
-### Phase 2 — shipped (scan cross-tab)
+| Surface | Notes |
+|---------|--------|
+| `.hub-card-status-alert` | Inset `--warn` inside card row (disabled-since-visit) |
+| Live proof / card-disabled list summaries | Optional emphasis card **above** list; keep row pattern |
 
-| Surface | File(s) | Shipped as |
-|---------|---------|------------|
-| `#scan-cross-tab-banner` | `worker/src/resolver/scan-html.ts`, `site/scan-pass.css`, `site/css/hc-emphasis-card.css` (bundled via `worker:bundle-scan`), `device-cross-tab-banner.mjs` | `hc-emphasis-card--info` with pill CTAs; host `<div>`; **Open controls here** uses `stayOnPage: true` on scan |
+---
 
-**Acceptance:** Scan cross-tab banner matches wallet/landing raised card; blue bordered box removed; dot overlay still synced with banner visibility.
+## Further optimization backlog
 
-### Phase 3 — shipped (created live proof)
+Prioritized follow-ups after Phases 0–5. Full tier tables: [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Rollout candidates.
 
-| Surface | File(s) | Shipped as |
-|---------|---------|------------|
-| `#live-control-proof` | `site/created/index.html`, `site/styles.css` | `hc-emphasis-card hc-emphasis-card--urgent`; eyebrow **Live proof**, title **Prove live control**, pill **Prove control now**; `live-control-proof-requested` highlights urgent dot |
+### High value (device chrome consistency)
 
-**Acceptance:** No red-tinted bordered box or lock icon tile; shadow-only depth; dark mode uses shared emphasis tokens.
+| Item | Surface | Modifier | Notes |
+|------|---------|----------|-------|
+| Hub keys custody | `#device-keys-custody-hub` (`device-keys-custody.mjs` `--hub`) | `--info` | Replace flat `hc-notice--info` + icon tile; keep Acknowledge |
+| Wallet keys custody | `#device-keys-custody-wallet` (`--wallet`) | `--info` | Same as hub |
+| Compact custody strip | `device-keys-custody--compact` | `--warn` | Landing/create inline strip |
+| Hub cross-tab slot | `#device-hub-crosstab-notice` | `--info` | Optional: match page banner or keep solid hub-blue tap target (product choice) |
+| Vouch return | `#created-vouch-return-banner` | `--active` or `--info` | Post-vouch continuity; green/neutral vs success dot |
 
-### Phase 4–5
+### Medium value (workspace + flows)
 
-See tier tables in [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Rollout candidates.
+| Item | Surface | Modifier | Notes |
+|------|---------|----------|-------|
+| Legacy `.form-warning` (non-notice) | Create advanced blocks | `--warn` | Migrate when touching create UX |
+| `#created-error` dynamic paths | Already Phase 4 if shipped | `--urgent` | Ensure `showError()` only updates `__detail` |
+| System / resolver banner | `#device-system-banner` | Minimal or `--urgent` | Only if copy gains a CTA; else keep plain line |
+| Scan vouch explainer blocks | `scan-pass.css` | Case-by-case | Single-action cards only; do not compete with trust-tool rows |
+
+### Low priority / explicit out of scope
+
+| Item | Reason |
+|------|--------|
+| Glance popover rows | List controls, not page-level cards |
+| Inbox sheet rows | Dense list UX |
+| Solid `.device-hub-notice-banner` full-bleed | Intentional high-contrast hub taps |
+| `.research-live-banner` | Separate marketing language |
+| Remove `.wallet-active-*` aliases | After all consumers use `hc-emphasis-card__*` only |
+
+### Engineering hygiene
+
+| Item | Notes |
+|------|-------|
+| Single CSS source | `site/css/hc-emphasis-card.css`; scan via `npm run worker:bundle-scan` |
+| Token sync | Keep `:root` emphasis tokens in `scan-pass.css` aligned with `site/styles.css` when tokens change |
+| Regression | `npm run worker:test:ui-color-scheme` + `device-emphasis-card-html.test.ts` after each phase |
+| Dark cache bust | Bump `theme-dark.css?v=` on shell pages when changing `theme-dark.css` |
+| No per-card fg hacks | Title/detail always `--hc-emphasis-card-title-fg` / `--hc-emphasis-card-detail-fg` |
 
 ---
 
@@ -126,7 +158,8 @@ See tier tables in [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) 
 | 0–1 | This file, `UI_COLOR_SCHEME_STANDARD.md`, `CARD_WORKSPACE_UX.md` |
 | 1 | `CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`, `DEVICE_INBOX.md` |
 | 2 | `SCAN_PAGE_DEVICE_DOT.md`, `M3_SCAN_PAGE_UI.md` |
-| 3–4 | `CARD_WORKSPACE_UX.md`, `CREATED_TASK_DASHBOARD.md`, `DEVICE_HUB_REPAIR_SPEC.md` |
+| 3–4 | `CARD_WORKSPACE_UX.md`, `CREATED_TASK_DASHBOARD.md`, `CREATED_UI_SAFARI_HELP_REVOKE_INVESTIGATION.md` |
+| 5 | `DEVICE_HUB_REPAIR_SPEC.md`, `CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md` |
 
 ---
 
@@ -135,9 +168,10 @@ See tier tables in [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) 
 1. Light + dark theme on target page.
 2. No blue (or semantic) **rim** from translucent fill—only shadow depth.
 3. Eyebrow, title, detail, CTA readable; tap targets ≥44px where buttons.
-4. **Dark mode:** card fill must switch to dark gradient; title + detail use `--hc-emphasis-card-title-fg` / `--hc-emphasis-card-detail-fg` (detail ≥ ~90% opacity off-white on dark fills).
+4. **Dark mode:** explicit `background: var(--hc-emphasis-card-fill-*)` per modifier in `theme-dark.css`.
 5. `npm run worker:test:ui-color-scheme`
 6. Wallet/cross-tab: `npm run e2e -- e2e/device-os-wallet.spec.ts` when touching wallet chrome.
+7. Created/revoke: manual Manage tab revoke banner + no-session paths on `/created/`.
 
 ---
 

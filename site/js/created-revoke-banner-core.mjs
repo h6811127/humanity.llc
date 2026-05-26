@@ -31,11 +31,18 @@ export function ownerRevokedBannerShouldShow(kind) {
 export function applyOwnerRevokedBanner(el, kind) {
   if (!el) return;
   const message = ownerRevokedBannerMessage(kind);
+  const detail =
+    typeof el.querySelector === "function"
+      ? (el.querySelector("#owner-revoked-banner-detail") ??
+          el.querySelector(".hc-emphasis-card__detail"))
+      : null;
   if (!message) {
     el.hidden = true;
-    el.textContent = "";
+    if (detail) detail.textContent = "";
+    else el.textContent = "";
     return;
   }
-  el.textContent = message;
+  if (detail) detail.textContent = message;
+  else el.textContent = message;
   el.hidden = false;
 }

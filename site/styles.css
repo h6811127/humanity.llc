@@ -6207,17 +6207,6 @@ p.hc-notice:not(:has(.hc-notice-content)) a {
   border: 0.5px solid rgba(255, 149, 0, 0.22);
 }
 
-.hc-notice--error.form-warning:not(.owner-revoked-banner),
-.hc-notice--error.owner-revoked-banner:not([hidden]) {
-  display: flex;
-  margin: 8px 0;
-  padding: 12px 14px;
-  border-radius: 12px;
-  font-size: 14px;
-  line-height: 1.45;
-  border: none;
-}
-
 .owner-revoked-banner[hidden] {
   display: none !important;
   margin: 0 !important;
@@ -6738,12 +6727,51 @@ button.btn-danger {
   margin-top: 14px;
 }
 
-.revoke-id-warning {
+.revoke-id-warning.hc-emphasis-card {
   margin: 0 0 12px;
+  flex-direction: column;
+  align-items: stretch;
 }
 
-.revoke-id-warning.hc-notice {
-  display: flex;
+.device-keys-custody--created.hc-emphasis-card {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.device-keys-custody--created .hc-emphasis-card__actions {
+  width: 100%;
+  max-width: none;
+  justify-content: flex-start;
+}
+
+.device-keys-custody--created .device-keys-custody-note,
+.device-keys-custody--created .hc-notice-foot {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--hc-emphasis-card-detail-fg);
+}
+
+.device-keys-custody--created .hc-notice-foot a {
+  color: var(--hc-notice-link);
+}
+
+#no-session.hc-emphasis-card,
+#created-error.hc-emphasis-card {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+#no-session .hc-emphasis-card__actions {
+  width: 100%;
+  max-width: none;
+  justify-content: stretch;
+}
+
+#no-session .hc-emphasis-card__cta {
+  flex: 1;
+  min-width: 100%;
+  text-align: center;
 }
 
 .research-live-banner {

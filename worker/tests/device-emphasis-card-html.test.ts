@@ -29,6 +29,20 @@ describe("device-emphasis-card-html", () => {
     expect(html).toContain("data-cross-tab-action");
   });
 
+  it("phase 4 surfaces use emphasis card markup", () => {
+    const created = readFileSync(join(root, "site/created/index.html"), "utf8");
+    expect(created).toContain('id="no-session-detail"');
+    expect(created).toContain('id="owner-revoked-banner-detail"');
+    expect(created).toContain('id="created-error-detail"');
+    expect(created).toContain("hc-emphasis-card--warn revoke-id-warning");
+    expect(created).not.toContain("live-control-notification-inner");
+
+    const createHtml = readFileSync(join(root, "site/create/index.html"), "utf8");
+    expect(createHtml).toContain('id="create-public-card-notice"');
+    expect(createHtml).toContain("hc-emphasis-card--warn");
+    expect(createHtml).not.toContain("hc-notice--warning form-warning flow-form-warning");
+  });
+
   it("created live proof panel uses urgent emphasis card markup", () => {
     const html = readFileSync(join(root, "site/created/index.html"), "utf8");
     expect(html).toContain('id="live-control-proof"');

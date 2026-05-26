@@ -73,10 +73,18 @@
             <code>organizer_revoked</code>.
           </p>
 
-          <p class="hc-notice hc-notice--warning revoke-id-warning">
-            Printed QRs still contain profile and QR IDs in the URL. Revoking changes live network
-            status, not the physical object.
-          </p>
+          <div class="hc-emphasis-card hc-emphasis-card--warn revoke-id-warning" role="note">
+            <div class="hc-emphasis-card__main">
+              <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
+              <div class="hc-emphasis-card__copy">
+                <p class="hc-emphasis-card__eyebrow">Before you continue</p>
+                <p class="hc-emphasis-card__detail">
+                  Printed QRs still contain profile and QR IDs in the URL. Revoking changes live network
+                  status, not the physical object.
+                </p>
+              </div>
+            </div>
+          </div>
 
           <label class="revoke-confirm">
             <input type="checkbox" id="org-confirm-qr" />

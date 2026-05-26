@@ -175,10 +175,11 @@ Prioritized places that could adopt the same **raised card** pattern. Extraction
 | Surface | Selector / ID | Today | Fit |
 |---------|----------------|-------|-----|
 | Live proof waiting | `#live-control-proof` | **Shipped** — `hc-emphasis-card--urgent` + pill **Prove control now** (Phase 3) |
-| No session / view mode | `#no-session` `.hc-notice--warning` | Flat hc-notice | Setup/unlock path benefits from raised card + CTA |
-| Owner revoked | `#owner-revoked-banner` | Flat `hc-notice--error` | `--urgent`; ensure never empty (see revoke investigations) |
-| Vouch return | `#created-vouch-return-banner` | (check markup) | Post-vouch continuity message |
-| Revoke warnings | `.revoke-id-warning` | Flat `hc-notice--warning` inside Manage | `--warn` for irreversible-action gates |
+| No session / view mode | `#no-session` | **Shipped** — `hc-emphasis-card--warn` + **My cards** pill (Phase 4) |
+| Owner revoked | `#owner-revoked-banner` | **Shipped** — `hc-emphasis-card--urgent` (Phase 4) |
+| Created error | `#created-error` | **Shipped** — `hc-emphasis-card--urgent` (Phase 4) |
+| Vouch return | `#created-vouch-return-banner` | Backlog — post-vouch continuity (`HC_EMPHASIS_CARD_ROLLOUT.md`) |
+| Revoke warnings | `.revoke-id-warning` | **Shipped** — `hc-emphasis-card--warn` (Phase 4) |
 
 #### Tier 4 — Scan resolver pages
 
@@ -191,8 +192,10 @@ Prioritized places that could adopt the same **raised card** pattern. Extraction
 
 | Surface | Selector / ID | Today | Fit |
 |---------|----------------|-------|-----|
-| Public card warning | `.hc-notice--warning` on `/create/` | Flat notice + icon | Pre-submit custody gate — good `--warn` candidate |
-| Flow warnings | `.form-warning` legacy | Orange flat | Migrate when touching create UX |
+| Public card warning | `#create-public-card-notice` on `/create/` | **Shipped** — `hc-emphasis-card--warn` (Phase 4) |
+| Keys custody (created) | `device-keys-custody--created` | **Shipped** — `hc-emphasis-card--warn` (Phase 4) |
+| Keys custody (hub/wallet) | `#device-keys-custody-hub`, `-wallet` | Backlog — `--info` emphasis cards |
+| Flow warnings | `.form-warning` legacy (non-notice) | Backlog | Migrate when touching create UX |
 
 #### Tier 6 — Hub card context (use with care)
 
@@ -210,7 +213,7 @@ Prioritized places that could adopt the same **raised card** pattern. Extraction
 
 #### Suggested rollout order
 
-Tracked in [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md): **Phases 0–1** shipped · **Phase 2** (scan cross-tab banner) next.
+Tracked in [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md): **Phases 0–4** shipped · **Phase 5** (hub card alerts) optional. Full backlog: that doc § Further optimization backlog.
 
 ---
 

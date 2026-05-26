@@ -11,7 +11,7 @@ export function escapeEmphasisHtml(s) {
 }
 
 /**
- * @param {{ eyebrow: string, title?: string, detail: string, dot?: 'success'|'info'|'warn'|'urgent', actionsHtml?: string }} opts
+ * @param {{ eyebrow: string, title?: string, detail: string, dot?: 'success'|'info'|'warn'|'urgent', actionsHtml?: string, extraCopyHtml?: string, detailId?: string }} opts
  */
 export function emphasisCardBodyHtml(opts) {
   const dot = opts.dot ?? "info";
@@ -19,16 +19,40 @@ export function emphasisCardBodyHtml(opts) {
     ? `<p class="hc-emphasis-card__title">${opts.title}</p>`
     : "";
   const actions = opts.actionsHtml ?? "";
+  const detailId = opts.detailId
+    ? ` id="${escapeEmphasisHtml(opts.detailId)}"`
+    : "";
+  const extraCopy = opts.extraCopyHtml ?? "";
   return `
     <div class="hc-emphasis-card__main">
       <span class="hc-emphasis-card__dot hc-emphasis-card__dot--${dot}" aria-hidden="true"></span>
       <div class="hc-emphasis-card__copy">
         <p class="hc-emphasis-card__eyebrow">${opts.eyebrow}</p>
         ${titleBlock}
-        <p class="hc-emphasis-card__detail">${opts.detail}</p>
+        <p class="hc-emphasis-card__detail"${detailId}>${opts.detail}</p>
+        ${extraCopy}
       </div>
     </div>
     ${actions}`;
+}
+
+/**
+ * @param {{ modifier?: 'active'|'info'|'warn'|'urgent', className?: string, id?: string, role?: string, hidden?: boolean, ariaLive?: string } & Parameters<typeof emphasisCardBodyHtml>[0]} opts
+ */
+export function emphasisCardShellHtml(opts) {
+  const mod = opts.modifier ?? "info";
+  const classes = ["hc-emphasis-card", `hc-emphasis-card--${mod}`, opts.className]
+    .filter(Boolean)
+    .join(" ");
+  const attrs = [
+    opts.id ? `id="${escapeEmphasisHtml(opts.id)}"` : "",
+    opts.role ? `role="${opts.role}"` : "",
+    opts.ariaLive ? `aria-live="${escapeEmphasisHtml(opts.ariaLive)}"` : "",
+    opts.hidden ? "hidden" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  return `<div class="${classes}" ${attrs}>${emphasisCardBodyHtml(opts)}</div>`;
 }
 
 /**

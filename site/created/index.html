@@ -18,9 +18,9 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="/styles.css?v=107" />
+    <link rel="stylesheet" href="/styles.css?v=108" />
     <link rel="stylesheet" href="/css/device-shell.css?v=48" />
-    <link rel="stylesheet" href="/css/theme-dark.css?v=17" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=18" />
   </head>
   <body class="has-device-hub-search device-shell-created">
     <div class="page">
@@ -815,7 +815,21 @@
                   Open scan page
                 </a>
               </div>
-              <p class="hc-notice hc-notice--error form-warning owner-revoked-banner" id="owner-revoked-banner" hidden></p>
+              <div
+                class="hc-emphasis-card hc-emphasis-card--urgent owner-revoked-banner"
+                id="owner-revoked-banner"
+                hidden
+                role="status"
+              >
+                <div class="hc-emphasis-card__main">
+                  <span class="hc-emphasis-card__dot hc-emphasis-card__dot--urgent" aria-hidden="true"></span>
+                  <div class="hc-emphasis-card__copy">
+                    <p class="hc-emphasis-card__eyebrow">Network status</p>
+                    <p class="hc-emphasis-card__title">Revoked</p>
+                    <p class="hc-emphasis-card__detail" id="owner-revoked-banner-detail"></p>
+                  </div>
+                </div>
+              </div>
               <p class="form-hint" id="owner-no-key">
                 Unlock a saved backup or recovery key below, or create again on
                 <a href="/create/">/create/</a>. humanity.llc cannot revoke for you.
@@ -823,9 +837,17 @@
 
               <div id="revoke-actions" hidden>
                 <div id="revoke-qr-block">
-                  <p class="hc-notice hc-notice--warning revoke-id-warning">
-                    Revoking changes live network status, not the physical sticker.
-                  </p>
+                  <div class="hc-emphasis-card hc-emphasis-card--warn revoke-id-warning" role="note">
+                    <div class="hc-emphasis-card__main">
+                      <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
+                      <div class="hc-emphasis-card__copy">
+                        <p class="hc-emphasis-card__eyebrow">Before you continue</p>
+                        <p class="hc-emphasis-card__detail">
+                          Revoking changes live network status, not the physical sticker.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                   <label class="revoke-confirm">
                     <input type="checkbox" id="confirm-revoke-qr" />
                     <span>I understand  -  revoke this scan QR only</span>
@@ -864,9 +886,20 @@
                       <summary>Disable entire card (advanced)</summary>
                       <div class="created-advanced-body">
                         <div id="revoke-card-block">
-                          <p class="hc-notice hc-notice--warning revoke-id-warning revoke-confirm-spaced">
-                            Disabling the card stops every active QR on this profile.
-                          </p>
+                          <div
+                            class="hc-emphasis-card hc-emphasis-card--warn revoke-id-warning revoke-confirm-spaced"
+                            role="note"
+                          >
+                            <div class="hc-emphasis-card__main">
+                              <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
+                              <div class="hc-emphasis-card__copy">
+                                <p class="hc-emphasis-card__eyebrow">Before you continue</p>
+                                <p class="hc-emphasis-card__detail">
+                                  Disabling the card stops every active QR on this profile.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
                           <label class="revoke-confirm revoke-confirm-spaced">
                             <input type="checkbox" id="confirm-revoke-card" />
                             <span>I understand  -  disable this card</span>
@@ -1157,14 +1190,41 @@
 
         </div><!-- /#created-control-root -->
 
-        <div class="hc-notice hc-notice--error hc-notice--plain form-warning" id="created-error" hidden role="alert"></div>
-        <div class="hc-notice hc-notice--warning hc-notice--plain form-warning" id="no-session" hidden role="status">
-          <p class="hc-notice-body">
-            No signing keys in <strong>this tab</strong>. Finish create in the tab where you clicked
-            Create, then tap <strong>Save on this device</strong> there — or open
-            <a href="/wallet/">My cards</a> in that same tab. Later: recovery key or encrypted
-            backup under <strong>Manage</strong> on this card page.
-          </p>
+        <div
+          class="hc-emphasis-card hc-emphasis-card--urgent form-warning"
+          id="created-error"
+          hidden
+          role="alert"
+        >
+          <div class="hc-emphasis-card__main">
+            <span class="hc-emphasis-card__dot hc-emphasis-card__dot--urgent" aria-hidden="true"></span>
+            <div class="hc-emphasis-card__copy">
+              <p class="hc-emphasis-card__eyebrow">Error</p>
+              <p class="hc-emphasis-card__detail" id="created-error-detail"></p>
+            </div>
+          </div>
+        </div>
+        <div
+          class="hc-emphasis-card hc-emphasis-card--warn form-warning"
+          id="no-session"
+          hidden
+          role="status"
+        >
+          <div class="hc-emphasis-card__main">
+            <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
+            <div class="hc-emphasis-card__copy">
+              <p class="hc-emphasis-card__eyebrow">View only</p>
+              <p class="hc-emphasis-card__title">No signing keys in this tab</p>
+              <p class="hc-emphasis-card__detail" id="no-session-detail">
+                Finish create in the tab where you clicked Create, then tap
+                <strong>Save on this device</strong> there. Later: recovery key or encrypted backup
+                under <strong>Manage</strong> on this card page.
+              </p>
+            </div>
+          </div>
+          <div class="hc-emphasis-card__actions">
+            <a class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary" href="/wallet/">My cards</a>
+          </div>
         </div>
       </main>
     </div>

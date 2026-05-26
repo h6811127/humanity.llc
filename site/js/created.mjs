@@ -48,6 +48,13 @@ const errorEl = document.getElementById("created-error");
 function showError(msg) {
   if (!errorEl) return;
   errorEl.hidden = false;
+  const detail =
+    errorEl.querySelector("#created-error-detail") ??
+    errorEl.querySelector(".hc-emphasis-card__detail");
+  if (detail) {
+    detail.textContent = String(msg);
+    return;
+  }
   errorEl.innerHTML = `<p class="hc-notice-body">${escapeHtml(String(msg))}</p>`;
 }
 
@@ -61,6 +68,13 @@ function escapeHtml(s) {
 function setNoSessionNotice(html) {
   if (!noSessionEl) return;
   noSessionEl.hidden = false;
+  const detail =
+    noSessionEl.querySelector("#no-session-detail") ??
+    noSessionEl.querySelector(".hc-emphasis-card__detail");
+  if (detail) {
+    detail.innerHTML = html;
+    return;
+  }
   noSessionEl.innerHTML = `<p class="hc-notice-body">${html}</p>`;
 }
 

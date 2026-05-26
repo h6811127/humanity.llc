@@ -2,6 +2,12 @@
  * Shared copy for where signing keys live (tab vs saved on device).
  */
 
+import {
+  emphasisCardActionsHtml,
+  emphasisCardCtaSecondary,
+  emphasisCardShellHtml,
+  escapeEmphasisHtml,
+} from "./device-emphasis-card-html.mjs";
 import { HC_CAUTION_ICON, HC_INFO_ICON } from "./hc-notice-icons.mjs";
 import {
   dismissKeysCustodyNotice,
@@ -11,10 +17,7 @@ import {
 /** @typedef {'hub' | 'wallet' | 'created' | 'compact'} CustodyVariant */
 
 function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+  return escapeEmphasisHtml(s);
 }
 
 function noticeFoot(importHref, learnHref) {
@@ -29,6 +32,10 @@ function noticeFoot(importHref, learnHref) {
 }
 
 function custodyAckButton() {
+  return emphasisCardCtaSecondary("Acknowledge", "data-keys-custody-ack");
+}
+
+function custodyAckButtonLegacy() {
   return `<button type="button" class="hc-notice-ack" data-keys-custody-ack>Acknowledge</button>`;
 }
 
@@ -67,26 +74,25 @@ export function keysCustodyHtml(variant, opts = {}) {
             That is what lets you update, revoke, and prove control. The network never receives it.
           </p>
           <div class="hc-notice-actions">
-            ${custodyAckButton()}
+            ${custodyAckButtonLegacy()}
           </div>
         </div>
       </div>`;
   }
 
   if (variant === "created") {
-    return `
-      <div class="hc-notice hc-notice--warning device-keys-custody device-keys-custody--created" role="note">
-        <span class="hc-notice-icon">${HC_CAUTION_ICON}</span>
-        <div class="hc-notice-content">
-          <p class="hc-notice-title">Save your key on this device</p>
-          <p class="hc-notice-body">
-            You can sign from this tab now. Tap <strong>Save on this device</strong> below to keep that ability after you close the tab.
-          </p>
-          ${tiersDl}
-          ${networkNote}
-          ${foot}
-        </div>
-      </div>`;
+    return emphasisCardShellHtml({
+      modifier: "warn",
+      className: "device-keys-custody device-keys-custody--created",
+      role: "note",
+      dot: "warn",
+      eyebrow: "Keys on this device",
+      title: "Save your key on this device",
+      detail:
+        "You can sign from this tab now. Tap <strong>Save on this device</strong> below to keep that ability after you close the tab.",
+      extraCopyHtml: `${tiersDl}${networkNote}${foot}`,
+      actionsHtml: emphasisCardActionsHtml([custodyAckButton()]),
+    });
   }
 
   if (variant === "wallet") {
@@ -99,7 +105,7 @@ export function keysCustodyHtml(variant, opts = {}) {
             That is what lets you update, revoke, and prove control. The network never receives it.
           </p>
           <div class="hc-notice-actions">
-            ${custodyAckButton()}
+            ${custodyAckButtonLegacy()}
           </div>
           ${foot}
         </div>
