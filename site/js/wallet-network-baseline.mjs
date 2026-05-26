@@ -79,3 +79,23 @@ export function shouldShowCardDisabledSinceVisitAlert(
   if (current !== CARD_REVOKED_ALERT_STATE) return false;
   return isRevokedSinceLastVisitFromBaseline(lastSeenStatus, current);
 }
+
+/**
+ * Hub row visibility: resolver-confirmed card_revoked + baseline transition + scan.kind guard.
+ * @param {string | null | undefined} alertState
+ * @param {string | null | undefined} lastSeenStatus
+ * @param {string | null | undefined} scanKind
+ * @param {boolean} resolverConfirmed
+ */
+export function cardDisabledSinceVisitVisible(
+  alertState,
+  lastSeenStatus,
+  scanKind,
+  resolverConfirmed
+) {
+  const kind = String(scanKind || "").toLowerCase();
+  if (kind && kind !== CARD_REVOKED_ALERT_STATE) return false;
+  return shouldShowCardDisabledSinceVisitAlert(alertState, lastSeenStatus, {
+    resolverConfirmed,
+  });
+}

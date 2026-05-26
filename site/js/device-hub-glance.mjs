@@ -7,10 +7,14 @@ import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
 import {
   getLatestResolvedAlertState,
-  isRevokedSinceLastVisit,
+  getLatestResolvedScanKind,
+  getNetworkLastSeenBaseline,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
-import { CARD_DISABLED_SINCE_VISIT_GLANCE_SUFFIX } from "./wallet-network-baseline.mjs";
+import {
+  CARD_DISABLED_SINCE_VISIT_GLANCE_SUFFIX,
+  cardDisabledSinceVisitVisible,
+} from "./wallet-network-baseline.mjs";
 import { loadWallet, walletEntrySubtitle } from "./device-wallet.mjs";
 
 const GLANCE_MAX_CARDS = 3;
@@ -140,9 +144,14 @@ function refreshGlanceTarget(target) {
   for (const entry of shown) {
     const li = document.createElement("li");
     const alertState = getLatestResolvedAlertState(entry.profile_id);
-    const revokedSince = alertState
-      ? isRevokedSinceLastVisit(entry.profile_id, alertState)
-      : false;
+    const revokedSince =
+      alertState != null &&
+      cardDisabledSinceVisitVisible(
+        alertState,
+        getNetworkLastSeenBaseline(entry.profile_id),
+        getLatestResolvedScanKind(entry.profile_id),
+        true
+      );
     li.className = revokedSince
       ? "device-hub-glance-row device-hub-glance-row--revoked"
       : "device-hub-glance-row";

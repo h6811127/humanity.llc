@@ -5,6 +5,7 @@ import {
   alertStateFromScanKind,
   CARD_DISABLED_SINCE_VISIT_ALERT_TEXT,
   CARD_REVOKED_ALERT_STATE,
+  cardDisabledSinceVisitVisible,
   isRevokedSinceLastVisitFromBaseline,
   normalizeBaselineState,
   shouldShowCardDisabledSinceVisitAlert,
@@ -114,5 +115,30 @@ describe("shouldShowCardDisabledSinceVisitAlert (DH-1)", () => {
         resolverConfirmed: true,
       })
     ).toBe(false);
+  });
+});
+
+describe("cardDisabledSinceVisitVisible (DH-1 + Slice 1)", () => {
+  it("hides when session cache says card_revoked but scan.kind is active", () => {
+    expect(
+      cardDisabledSinceVisitVisible("card_revoked", "active", "active", true)
+    ).toBe(false);
+  });
+
+  it("hides stale cache card_revoked without resolver confirmation", () => {
+    expect(
+      cardDisabledSinceVisitVisible("card_revoked", "active", "card_revoked", false)
+    ).toBe(false);
+  });
+
+  it("shows on confirmed card_revoked transition with matching scan.kind", () => {
+    expect(
+      cardDisabledSinceVisitVisible(
+        CARD_REVOKED_ALERT_STATE,
+        "active",
+        "card_revoked",
+        true
+      )
+    ).toBe(true);
   });
 });

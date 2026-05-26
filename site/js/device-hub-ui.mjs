@@ -39,7 +39,10 @@ import {
   getCachedNetworkScanKind,
   getCachedNetworkStatus,
   getCachedVerification,
-  isRevokedSinceLastVisit,
+  getLatestResolvedAlertState,
+  getLatestResolvedScanKind,
+  getNetworkLastSeenBaseline,
+  hasLatestResolverNetworkPoll,
   CARD_REVOKED_ALERT_STATE,
   networkStatusChip,
   recordNetworkSeen,
@@ -61,6 +64,7 @@ import {
 import {
   CARD_DISABLED_SINCE_VISIT_ALERT_TEXT,
   CARD_DISABLED_SINCE_VISIT_SEARCH_SNIPPET,
+  cardDisabledSinceVisitVisible,
 } from "./wallet-network-baseline.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
 import {
@@ -343,7 +347,12 @@ function currentNetworkScanKind(profileId, scanKindMap = {}) {
   return scanKindMap[profileId] ?? getCachedNetworkScanKind(profileId) ?? null;
 }
 
-function applyNetworkChipsToDom(statusMap = {}, alertStateMap = null, scanKindMap = {}) {
+function applyNetworkChipsToDom(
+  statusMap = {},
+  alertStateMap = null,
+  scanKindMap = {},
+  resolverConfirmedMap = null
+) {
   if (!savedList) return;
   savedList.querySelectorAll(".hub-card-item").forEach((li) => {
     const pid = li.dataset.profileId;
@@ -382,10 +391,15 @@ function applyNetworkChipsToDom(statusMap = {}, alertStateMap = null, scanKindMa
       iconEl.innerHTML = meta.svg;
     }
   });
-  applyRevokedSinceVisitAlerts(statusMap, alertStateMap);
+  applyRevokedSinceVisitAlerts(statusMap, alertStateMap, scanKindMap, resolverConfirmedMap);
 }
 
-function applyRevokedSinceVisitAlerts(_statusMap = {}, alertStateMap = null) {
+function applyRevokedSinceVisitAlerts(
+  _statusMap = {},
+  alertStateMap = null,
+  scanKindMap = {},
+  resolverConfirmedMap = null
+) {
   if (!savedList || !hubConfig.fetchNetworkStatus) return;
 
   savedList.querySelectorAll(".hub-card-item").forEach((li) => {
@@ -396,8 +410,17 @@ function applyRevokedSinceVisitAlerts(_statusMap = {}, alertStateMap = null) {
       setRevokedSinceVisitAlertVisible(li, pid, false);
       return;
     }
-    const alertState = alertStateMap[pid];
-    const show = isRevokedSinceLastVisit(pid, alertState);
+    const resolverConfirmed = resolverConfirmedMap?.[pid] === true;
+    const scanKind =
+      scanKindMap[pid] !== undefined
+        ? scanKindMap[pid]
+        : getLatestResolvedScanKind(pid) ?? getCachedNetworkScanKind(pid);
+    const show = cardDisabledSinceVisitVisible(
+      alertStateMap[pid],
+      getNetworkLastSeenBaseline(pid),
+      scanKind,
+      resolverConfirmed
+    );
     setRevokedSinceVisitAlertVisible(li, pid, show);
   });
 }
@@ -421,7 +444,9 @@ function acknowledgeNetworkSeenForEntry(entry) {
   if (!entry?.profile_id) return;
   recordNetworkSeen(
     entry.profile_id,
-    getCachedNetworkAlertState(entry.profile_id) ?? "active"
+    getLatestResolvedAlertState(entry.profile_id) ??
+      getCachedNetworkAlertState(entry.profile_id) ??
+      "active"
   );
 }
 
@@ -437,9 +462,14 @@ async function fetchAndApplyNetworkChips() {
       entries.map((e) => [e.profile_id, getCachedNetworkStatus(e.profile_id) ?? "checking"])
     )
   );
-  await refreshWalletNetworkStatuses(entries, ({ statusMap, alertStateMap, scanKindMap }) => {
+  await refreshWalletNetworkStatuses(entries, ({
+    statusMap,
+    alertStateMap,
+    scanKindMap,
+    resolverConfirmedMap,
+  }) => {
     if (gen !== walletNetworkApplyGen) return;
-    applyNetworkChipsToDom(statusMap, alertStateMap, scanKindMap);
+    applyNetworkChipsToDom(statusMap, alertStateMap, scanKindMap, resolverConfirmedMap);
     syncLastSeenFromNetworkMap(alertStateMap);
     const stored = loadWallet();
     let changed = false;
@@ -1085,16 +1115,26 @@ export function initDeviceHub(config = {}) {
   window.addEventListener("pagehide", () => snapshotNetworkSeenOnExit());
 
   window.addEventListener("hc-wallet-network-baseline-changed", () => {
-    // Re-apply from cache + baseline only (e.g. Got it); never invent alerts without fetch.
+    // Re-apply from resolver-confirmed poll only (e.g. Got it); never session cache alone (DH-1).
     if (!savedList || !hubConfig.fetchNetworkStatus) return;
-    const alertStateMap = Object.fromEntries(
-      loadWallet()
-        .map((e) => e.profile_id)
-        .filter(Boolean)
-        .map((pid) => [pid, getCachedNetworkAlertState(pid)])
-        .filter(([, state]) => state != null)
-    );
-    applyRevokedSinceVisitAlerts({}, alertStateMap);
+    if (!hasLatestResolverNetworkPoll()) {
+      applyRevokedSinceVisitAlerts({}, null);
+      notifyHubChanged();
+      return;
+    }
+    const alertStateMap = {};
+    const scanKindMap = {};
+    const resolverConfirmedMap = {};
+    for (const entry of loadWallet()) {
+      const pid = entry.profile_id;
+      if (!pid) continue;
+      const resolved = getLatestResolvedAlertState(pid);
+      if (resolved == null) continue;
+      alertStateMap[pid] = resolved;
+      scanKindMap[pid] = getLatestResolvedScanKind(pid);
+      resolverConfirmedMap[pid] = true;
+    }
+    applyRevokedSinceVisitAlerts({}, alertStateMap, scanKindMap, resolverConfirmedMap);
     notifyHubChanged();
   });
 }

@@ -26,6 +26,8 @@ export { readCachedVerification };
 const CACHE_KEY = "hc_wallet_network_cache";
 const LAST_SEEN_KEY = "hc_wallet_last_seen_network";
 let latestResolvedAlertStateMap = {};
+/** @type {Record<string, string | null>} */
+let latestResolvedScanKindMap = {};
 let latestResolvedAt = 0;
 
 /** @type {string} Fired when hc_wallet_last_seen_network changes (snapshot, Got it, Manage). */
@@ -86,11 +88,33 @@ export function getCachedNetworkAlertState(profileId) {
   return alertStateForNetworkPoll(entry.scanKind, entry.status);
 }
 
+/** True after at least one resolver-confirmed status read this page visit. */
+export function hasLatestResolverNetworkPoll() {
+  return latestResolvedAt > 0;
+}
+
 /** Fresh resolver-backed alert state map from the latest wallet poll. */
 export function getLatestResolvedAlertState(profileId) {
   if (!profileId) return null;
   if (!latestResolvedAt) return null;
   return latestResolvedAlertStateMap[profileId] ?? null;
+}
+
+/** @param {string} profileId */
+export function getLatestResolvedScanKind(profileId) {
+  if (!profileId) return null;
+  if (!latestResolvedAt) return null;
+  if (!Object.prototype.hasOwnProperty.call(latestResolvedScanKindMap, profileId)) {
+    return null;
+  }
+  return latestResolvedScanKindMap[profileId] ?? null;
+}
+
+/** @param {string} profileId */
+export function getNetworkLastSeenBaseline(profileId) {
+  if (!profileId) return null;
+  const last = loadLastSeen()[profileId];
+  return last == null ? null : String(last);
 }
 
 /** @param {string} profileId */
@@ -134,6 +158,7 @@ function parseNetworkFetchBody(body) {
  *   statusMap: Record<string, string>,
  *   alertStateMap: Record<string, string>,
  *   scanKindMap: Record<string, string | null>,
+ *   resolverConfirmedMap: Record<string, boolean>,
  * }) => void} [onDone]
  */
 export async function refreshWalletNetworkStatuses(entries, onDone) {
@@ -142,6 +167,7 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
   const alertStateMap = {};
   const scanKindMap = {};
   const resolverConfirmedAlertStateMap = {};
+  const resolverConfirmedScanKindMap = {};
   const fetches = [];
   const now = Date.now();
   const lastSeen = loadLastSeen();
@@ -181,6 +207,7 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
           if (parsed.alertState != null) {
             alertStateMap[pid] = parsed.alertState;
             resolverConfirmedAlertStateMap[pid] = parsed.alertState;
+            resolverConfirmedScanKindMap[pid] = parsed.scanKind;
           }
           cache[pid] = {
             status: parsed.status,
@@ -211,11 +238,18 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
       ...latestResolvedAlertStateMap,
       ...resolverConfirmedAlertStateMap,
     };
+    latestResolvedScanKindMap = {
+      ...latestResolvedScanKindMap,
+      ...resolverConfirmedScanKindMap,
+    };
     latestResolvedAt = Date.now();
   }
+  const resolverConfirmedMap = Object.fromEntries(
+    Object.keys(resolverConfirmedAlertStateMap).map((pid) => [pid, true])
+  );
   persistWalletFromNetworkPoll({ statusMap, alertStateMap, scanKindMap });
   notifyNetworkRefreshed(statusMap, alertStateMap, scanKindMap);
-  onDone?.({ statusMap, alertStateMap, scanKindMap });
+  onDone?.({ statusMap, alertStateMap, scanKindMap, resolverConfirmedMap });
 }
 
 function loadLastSeen() {
