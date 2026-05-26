@@ -2,8 +2,8 @@
  * Compact inbox bottom sheet — badge tap and open_notifications.
  * @see docs/DEVICE_INBOX.md phase 3
  */
-import { buildInboxSheetRows } from "./device-inbox-core.mjs?v=29";
-import { getInboxItems, notificationCount } from "./device-inbox.mjs?v=29";
+import { buildInboxSheetRows } from "./device-inbox-core.mjs";
+import { getInboxItems, notificationCount } from "./device-inbox.mjs";
 import {
   formatLiveControlExpiry,
   getLiveControlPending,
@@ -12,7 +12,7 @@ import {
 import { openCardNowPage } from "./device-keys.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
-import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=29";
+import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
@@ -22,13 +22,9 @@ import { tabNoticeCount } from "./device-counts.mjs";
 import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { prefersReducedMotion } from "./device-shell-motion.mjs";
 import { closeGlancePopover } from "./device-hub-glance-popover.mjs";
-import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs?v=29";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=29";
-import { inboxSheetReconcileAction } from "./device-inbox-sheet-core.mjs?v=29";
-import {
-  bindSheetLifecycleReconcile,
-  syncSheetBackdropClosed,
-} from "./device-sheet-backdrop-sync.mjs?v=29";
+import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs";
+import { inboxSheetReconcileAction } from "./device-inbox-sheet-core.mjs";
 
 const SHEET_ID = "device-inbox-sheet";
 const LIST_ID = "device-inbox-sheet-list";
@@ -67,7 +63,6 @@ function ensureInboxSheetDom() {
   backdrop.id = BACKDROP_ID;
   backdrop.className = "device-inbox-backdrop";
   backdrop.setAttribute("aria-label", "Close inbox");
-  backdrop.setAttribute("aria-hidden", "true");
   backdrop.hidden = true;
   backdrop.addEventListener("click", () => {
     setInboxSheetOpen(false);
@@ -121,15 +116,11 @@ export function setInboxSheetOpen(open) {
   }
   backdrop.hidden = !open;
   backdrop.classList.toggle("is-visible", open);
-  backdrop.setAttribute("aria-hidden", open ? "false" : "true");
-  if (!open) syncSheetBackdropClosed(backdrop);
   document.body.classList.toggle("device-inbox-sheet-open", open);
   chrome?.classList.toggle("top-chrome--inbox-locked", open);
 
   if (open && !prefersReducedMotion()) {
     sheet.scrollTop = 0;
-  } else if (!open) {
-    reconcileInboxSheetState();
   }
 }
 
@@ -155,7 +146,8 @@ export function reconcileInboxSheetState() {
     return;
   }
   if (action === "hide_backdrop" && backdrop) {
-    syncSheetBackdropClosed(backdrop);
+    backdrop.hidden = true;
+    backdrop.classList.remove("is-visible");
   }
 }
 
@@ -315,7 +307,10 @@ function bindInboxSheetRefresh() {
 ensureInboxSheetDom();
 reconcileInboxSheetState();
 bindInboxSheetRefresh();
-bindSheetLifecycleReconcile(reconcileInboxSheetState);
+
+window.addEventListener("pageshow", (e) => {
+  if (e.persisted) reconcileInboxSheetState();
+});
 
 window.addEventListener("hc-inbox-sheet-close", () => {
   setInboxSheetOpen(false);

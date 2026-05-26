@@ -126,11 +126,10 @@ body.device-hub-sheet-open .top-chrome--float .top-chrome-bar--minimal,
   pointer-events: none;
 }
 
-/* Status dot stays reachable while hub sheet is open (bar is hidden).
-   Do NOT fix the cluster on scroll-edge-hidden — that removed it from the bar,
-   shrank --shell-chrome-h, and caused scroll jump / bottom rubber-band glitch. */
+/* Status dot stays reachable: open/close hub while sheet is up, and after scroll */
 body.device-hub-sheet-open .shell-status-cluster,
-.top-chrome--float.top-chrome--hub-locked .shell-status-cluster {
+.top-chrome--float.top-chrome--hub-locked .shell-status-cluster,
+.top-chrome--float.top-chrome--edge-hidden .shell-status-cluster {
   pointer-events: auto;
   opacity: 1;
   position: fixed;
@@ -472,7 +471,6 @@ body.page-wallet .device-keys-custody--wallet {
   background: transparent;
   box-shadow: none;
   cursor: pointer;
-  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.25s var(--shell-spring);
 }
@@ -1395,7 +1393,6 @@ button.hub-card-action.hub-use-keys {
 }
 
 .device-hub.device-hub--sheet:not(.device-hub-collapsed) {
-  visibility: visible;
   transform: translateX(-50%) translateY(0);
   pointer-events: auto;
 }
@@ -1414,28 +1411,8 @@ button.hub-card-action.hub-use-keys {
   background: transparent;
 }
 
-/* WebKit: visibility:hidden keeps transformed sheet off the hit-test plane (Phase 1.5). */
 .device-hub.device-hub--sheet.device-hub-collapsed {
   pointer-events: none;
-  visibility: hidden;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  contain: strict;
-}
-
-/* Collapsed/off-screen sheet: skip GPU blur during document scroll (WebKit landing jank). */
-@media (pointer: coarse) {
-  .device-hub.device-hub--sheet {
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    background: rgba(250, 250, 252, 0.98);
-  }
-
-  .device-hub-glance-popover {
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    background: rgba(255, 255, 255, 0.98);
-  }
 }
 
 .device-hub.device-hub--sheet.device-hub-collapsed .device-hub-body {
@@ -1500,11 +1477,6 @@ button.hub-card-action.hub-use-keys {
   pointer-events: auto;
 }
 
-.device-hub-backdrop[hidden] {
-  pointer-events: none;
-  visibility: hidden;
-}
-
 body.device-hub-sheet-open {
   overflow: hidden;
 }
@@ -1536,14 +1508,8 @@ body.device-hub-sheet-open {
 }
 
 .device-inbox-sheet:not(.device-inbox-sheet--collapsed) {
-  visibility: visible;
   transform: translateX(-50%) translateY(0);
   pointer-events: auto;
-}
-
-.device-inbox-sheet.device-inbox-sheet--collapsed {
-  pointer-events: none;
-  visibility: hidden;
 }
 
 .device-inbox-sheet-body {
@@ -1639,21 +1605,6 @@ body.device-hub-sheet-open {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
-}
-
-.device-inbox-backdrop[hidden] {
-  pointer-events: none;
-  visibility: hidden;
-}
-
-/* Phase 1.6: full-screen sheet backdrops — skip GPU blur on touch (scroll jank on WebKit). */
-@media (pointer: coarse) {
-  .device-hub-backdrop,
-  .device-inbox-backdrop {
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    background: rgba(0, 0, 0, 0.38);
-  }
 }
 
 body.device-inbox-sheet-open {
