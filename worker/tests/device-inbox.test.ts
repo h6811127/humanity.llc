@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildGlanceRowPlan,
   buildInboxItems,
   buildInboxSheetRows,
   cardDisabledProfileIdsFromInbox,
@@ -75,6 +76,56 @@ describe("buildInboxItems", () => {
     expect(items.map((i) => i.kind)).toEqual(["card_disabled_since_visit"]);
     expect(items[0].count).toBe(2);
     expect(items[0].hubScrollTarget).toBe("device-hub-saved-group");
+  });
+});
+
+describe("buildGlanceRowPlan", () => {
+  it("orders inbox rows before wallet peek and more", () => {
+    const inboxItems = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 1,
+      crossTabEntries: [],
+    });
+    const walletEntries = [
+      { profile_id: "w1", label: "One" },
+      { profile_id: "w2", label: "Two" },
+      { profile_id: "w3", label: "Three" },
+      { profile_id: "w4", label: "Four" },
+    ];
+    const plan = buildGlanceRowPlan(inboxItems, walletEntries, { maxSavedCards: 2 });
+    expect(plan.map((r) => r.type)).toEqual([
+      "inbox",
+      "wallet",
+      "wallet",
+      "more",
+    ]);
+    expect(plan[0].type === "inbox" && plan[0].item.kind).toBe("live_proof");
+    expect(plan[3].type === "more" && plan[3].remainingCount).toBe(2);
+  });
+
+  it("omits revoked hint on saved row when card_disabled inbox row covers profile", () => {
+    const inboxItems = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 0,
+      crossTabEntries: [],
+      cardDisabledSinceVisit: [{ profile_id: "w1", label: "One" }],
+    });
+    const plan = buildGlanceRowPlan(
+      inboxItems,
+      [{ profile_id: "w1", label: "One" }],
+      { revokedHintProfileIds: new Set(["w1"]) }
+    );
+    const walletRow = plan.find((r) => r.type === "wallet");
+    expect(walletRow?.type === "wallet" && walletRow.revokedHint).toBe(false);
+  });
+
+  it("sets revoked hint on saved row when not in card_disabled inbox item", () => {
+    const plan = buildGlanceRowPlan(
+      [],
+      [{ profile_id: "w9", label: "Nine" }],
+      { revokedHintProfileIds: new Set(["w9"]) }
+    );
+    expect(plan[0].type === "wallet" && plan[0].revokedHint).toBe(true);
   });
 });
 

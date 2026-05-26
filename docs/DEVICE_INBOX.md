@@ -123,20 +123,16 @@ See [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 - Groups: cross-tab notice, tab keys notice, **Live proof waiting** (`device-live-control-inbox.mjs`).
 - Card-disabled-since-visit on saved rows, glance suffix, and inbox badge/sheet (`device-inbox-card-disabled.mjs`).
 
-**Shipped (phase 8):** Live proof, tab-keys notice, and cross-tab hub slots visibility follow `getInboxItems()` via `device-hub-inbox-alerts.mjs` (row detail still from live-control poll / session / presence modules).
+**Shipped (phase 8–9):** Live proof, tab-keys notice, cross-tab slot, and **card-disabled-since-visit** list (`#device-hub-card-disabled-group`) follow `getInboxItems()` via `device-hub-inbox-alerts.mjs` (row detail from live-control poll / session / presence / network modules).
 
 ### Glance popover (`device-hub-glance.mjs`)
 
 **Shipped (landing):**
 
 - Rows for live proof, cross-tab keys, unsaved tab keys, saved cards (+ revoked hint), “N more”.
-- Live proof tap → `expandHub('device-hub-live-control-group')`.
+- Live proof tap → `openInboxFromChrome('glance')`.
 
-**Shipped (card-disabled):** Inbox row from `buildInboxItems()`; glance skips duplicate “since last visit” suffix on saved-card rows when that profile is already in the inbox item (`cardDisabledProfileIdsFromInbox`).
-
-**Planned:**
-
-- Remaining glance rows (saved-card peek list) may move fully under `buildInboxItems()` later.
+**Shipped (phase 10):** `buildGlanceRowPlan()` in `device-inbox-core.mjs` orders inbox actionable rows, saved-card peek (max 3), and “N more”. Glance renders from that plan; since-visit suffix on saved rows uses `revokedHintProfileIds` and is suppressed when the profile is already on the `card_disabled_since_visit` inbox item.
 
 ### Landing settings — Browser alerts
 
@@ -204,7 +200,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 2. Inbox badge shows count (e.g. `1`).
 3. Tab hidden + background alerts on → OS notification with card label.
 4. User returns to tab → no OS spam; hub row + badge sufficient.
-5. Tap badge (planned: inbox sheet) or hub row → sign on `/created/`.
+5. Tap badge or inbox sheet row → sign on `/created/`.
 
 ### Keys in tab, not saved
 
@@ -232,6 +228,8 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 | 6 | E2E: proof → badge → row; Playwright `Notification` permission | ✅ |
 | 7 | Inbox diagnostics (`hc_inbox_diagnostics`, session log + confusion signals) | ✅ |
 | 8 | Hub alert groups gated on `getInboxItems()` (live proof, tab keys, cross-tab slot) | ✅ |
+| 9 | Hub card-disabled group (`#device-hub-card-disabled-group`) | ✅ |
+| 10 | `buildGlanceRowPlan()` — glance popover order from inbox + saved-card peek | ✅ |
 
 **Do not:**
 
@@ -284,7 +282,7 @@ Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox 
 | `site/css/device-shell.css` | `.shell-notif-badge*` styles |
 | `docs/DEVICE_INBOX.md` | This spec |
 
-| `site/js/device-inbox-core.mjs` | Pure inbox model |
+| `site/js/device-inbox-core.mjs` | Pure inbox model + `buildGlanceRowPlan()` |
 | `site/js/device-inbox-card-disabled.mjs` | Since-visit disabled cards for inbox input |
 | `site/js/device-inbox.mjs` | Browser facade (`getInboxItems`, `notificationCount`) |
 | `site/js/device-inbox-sheet.mjs` | Inbox bottom sheet + `openInboxFromChrome()` |
@@ -298,9 +296,9 @@ Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox 
 
 ## Acceptance criteria (inbox unification)
 
-- One `buildInboxItems()` drives hub alerts, glance actionable rows, and badge count/label. ✅ (phase 8 hub groups; saved-card glance peek list remains separate)
-- Badge tap opens inbox sheet with one primary CTA per row (not only hub expand + scroll).
-- Dot overlay always matches `topInboxKind()` when overlays apply.
-- Background alerts: contextual opt-in + deep link to sign flow for first pending proof.
-- Resolver degraded/offline never increments badge count.
+- One `buildInboxItems()` drives hub alerts, glance actionable rows, and badge count/label; saved-card peek order comes from `buildGlanceRowPlan()` fed by the same inbox items. ✅
+- Badge tap opens inbox sheet with one primary CTA per row (not only hub expand + scroll). ✅
+- Dot overlay always matches `topInboxKind()` when overlays apply. ✅
+- Background alerts: contextual opt-in + deep link to sign flow for first pending proof. ✅
+- Resolver degraded/offline never increments badge count. ✅
 - No new resolver APIs required for phases 1–5.

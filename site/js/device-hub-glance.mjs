@@ -1,7 +1,7 @@
 /**
  * Compact hub summary: landing when sheet is collapsed; /wallet/ always when non-empty.
  */
-import { cardDisabledProfileIdsFromInbox } from "./device-inbox-core.mjs";
+import { buildGlanceRowPlan } from "./device-inbox-core.mjs";
 import { getInboxItems } from "./device-inbox.mjs";
 import { openInboxFromChrome } from "./device-inbox-sheet.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
@@ -61,7 +61,7 @@ function glanceCopy(wallet) {
         moreSub: "Tap to view all saved",
       }
     : {
-        liveProofSub: "Tap to open hub and sign",
+        liveProofSub: "Tap to open inbox",
         moreSub: "Tap to open hub",
       };
 }
@@ -135,17 +135,88 @@ function appendInboxGlanceRow(item, list, copy) {
 }
 
 /**
+ * Profile ids that should show the since-visit suffix on saved-card glance rows
+ * (resolver-confirmed; skipped when card_disabled inbox row exists).
+ * @param {Array<{ profile_id: string }>} entries
+ * @returns {Set<string>}
+ */
+function revokedHintProfileIdsFromEntries(entries) {
+  const ids = new Set();
+  for (const entry of entries) {
+    const alertState = getLatestResolvedAlertState(entry.profile_id);
+    if (
+      alertState != null &&
+      cardDisabledSinceVisitVisible(
+        alertState,
+        getNetworkLastSeenBaseline(entry.profile_id),
+        getLatestResolvedScanKind(entry.profile_id),
+        true
+      )
+    ) {
+      ids.add(entry.profile_id);
+    }
+  }
+  return ids;
+}
+
+/**
+ * @param {import("./device-inbox-core.mjs").GlanceWalletEntry} entry
+ * @param {boolean} revokedHint
+ * @param {HTMLElement} list
+ */
+function appendWalletGlanceRow(entry, revokedHint, list) {
+  const li = document.createElement("li");
+  li.className = revokedHint
+    ? "device-hub-glance-row device-hub-glance-row--revoked"
+    : "device-hub-glance-row";
+  const sub = walletEntrySubtitle(entry);
+  const subLine = revokedHint ? `${sub} · ${CARD_DISABLED_SINCE_VISIT_GLANCE_SUFFIX}` : sub;
+  li.innerHTML = `
+    <button type="button" class="device-hub-glance-btn">
+      <span class="device-hub-glance-title">${escapeHtml(entry.label)}</span>
+      <span class="device-hub-glance-sub">${escapeHtml(subLine)} · Saved on device</span>
+    </button>`;
+  li.querySelector("button")?.addEventListener("click", () => {
+    closeGlancePopoverEvent();
+    openCardNowPage(entry);
+  });
+  list.appendChild(li);
+}
+
+/**
+ * @param {number} remaining
+ * @param {HTMLElement} list
+ * @param {{ moreSub: string }} copy
+ * @param {boolean} wallet
+ */
+function appendMoreGlanceRow(remaining, list, copy, wallet) {
+  const li = document.createElement("li");
+  li.className = "device-hub-glance-row device-hub-glance-row--more";
+  li.innerHTML = `
+    <button type="button" class="device-hub-glance-btn device-hub-glance-btn--muted">
+      <span class="device-hub-glance-title">${remaining} more saved on this device</span>
+      <span class="device-hub-glance-sub">${escapeHtml(copy.moreSub)}</span>
+    </button>`;
+  li.querySelector("button")?.addEventListener("click", () => {
+    expandHub(wallet ? "device-hub-saved-group" : null);
+  });
+  list.appendChild(li);
+}
+
+/**
  * @param {{ root: HTMLElement, list: HTMLElement, hub: HTMLElement | null, wallet: boolean }} target
  */
 function refreshGlanceTarget(target) {
   const { root, list, wallet } = target;
   const copy = glanceCopy(wallet);
   const inboxItems = getInboxItems();
-  const cardDisabledPids = cardDisabledProfileIdsFromInbox(inboxItems);
   const entries = loadWallet();
-  const hasCards = entries.length > 0;
+  const plan = buildGlanceRowPlan(inboxItems, entries, {
+    maxSavedCards: GLANCE_MAX_CARDS,
+    revokedHintProfileIds: revokedHintProfileIdsFromEntries(entries),
+  });
 
-  if (!hasCards && inboxItems.length === 0) {
+  if (plan.length === 0) {
     root.hidden = true;
     return;
   }
@@ -153,53 +224,14 @@ function refreshGlanceTarget(target) {
   glanceHasRenderableContent = true;
   list.innerHTML = "";
 
-  for (const item of inboxItems) {
-    appendInboxGlanceRow(item, list, copy);
-  }
-
-  const shown = entries.slice(0, GLANCE_MAX_CARDS);
-  for (const entry of shown) {
-    const li = document.createElement("li");
-    const alertState = getLatestResolvedAlertState(entry.profile_id);
-    const revokedSince =
-      !cardDisabledPids.has(entry.profile_id) &&
-      alertState != null &&
-      cardDisabledSinceVisitVisible(
-        alertState,
-        getNetworkLastSeenBaseline(entry.profile_id),
-        getLatestResolvedScanKind(entry.profile_id),
-        true
-      );
-    li.className = revokedSince
-      ? "device-hub-glance-row device-hub-glance-row--revoked"
-      : "device-hub-glance-row";
-    const sub = walletEntrySubtitle(entry);
-    const subLine = revokedSince ? `${sub} · ${CARD_DISABLED_SINCE_VISIT_GLANCE_SUFFIX}` : sub;
-    li.innerHTML = `
-      <button type="button" class="device-hub-glance-btn">
-        <span class="device-hub-glance-title">${escapeHtml(entry.label)}</span>
-        <span class="device-hub-glance-sub">${escapeHtml(subLine)} · Saved on device</span>
-      </button>`;
-    li.querySelector("button")?.addEventListener("click", () => {
-      closeGlancePopoverEvent();
-      openCardNowPage(entry);
-    });
-    list.appendChild(li);
-  }
-
-  const remaining = entries.length - shown.length;
-  if (remaining > 0) {
-    const li = document.createElement("li");
-    li.className = "device-hub-glance-row device-hub-glance-row--more";
-    li.innerHTML = `
-      <button type="button" class="device-hub-glance-btn device-hub-glance-btn--muted">
-        <span class="device-hub-glance-title">${remaining} more saved on this device</span>
-        <span class="device-hub-glance-sub">${escapeHtml(copy.moreSub)}</span>
-      </button>`;
-    li.querySelector("button")?.addEventListener("click", () => {
-      expandHub(wallet ? "device-hub-saved-group" : null);
-    });
-    list.appendChild(li);
+  for (const row of plan) {
+    if (row.type === "inbox") {
+      appendInboxGlanceRow(row.item, list, copy);
+    } else if (row.type === "wallet") {
+      appendWalletGlanceRow(row.entry, row.revokedHint, list);
+    } else {
+      appendMoreGlanceRow(row.remainingCount, list, copy, wallet);
+    }
   }
 }
 

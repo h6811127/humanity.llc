@@ -144,6 +144,80 @@ export function cardDisabledProfileIdsFromInbox(items) {
 }
 
 /**
+ * @typedef {object} GlanceWalletEntry
+ * @property {string} profile_id
+ * @property {string} [label]
+ * @property {string} [handle]
+ */
+
+/**
+ * @typedef {object} GlanceRowInbox
+ * @property {'inbox'} type
+ * @property {InboxItem} item
+ */
+
+/**
+ * @typedef {object} GlanceRowWallet
+ * @property {'wallet'} type
+ * @property {GlanceWalletEntry} entry
+ * @property {boolean} revokedHint Suffix on saved row (not when card_disabled inbox row exists)
+ */
+
+/**
+ * @typedef {object} GlanceRowMore
+ * @property {'more'} type
+ * @property {number} remainingCount
+ */
+
+/** @typedef {GlanceRowInbox | GlanceRowWallet | GlanceRowMore} GlanceRowPlanEntry */
+
+/**
+ * Ordered glance popover rows: inbox actionable items, then saved-card peek, then “N more”.
+ * @param {InboxItem[]} inboxItems
+ * @param {GlanceWalletEntry[]} walletEntries
+ * @param {{
+ *   maxSavedCards?: number,
+ *   cardDisabledProfileIds?: Set<string>,
+ *   revokedHintProfileIds?: Set<string>,
+ * }} [options]
+ * @returns {GlanceRowPlanEntry[]}
+ */
+export function buildGlanceRowPlan(inboxItems, walletEntries, options = {}) {
+  const maxSavedCards = options.maxSavedCards ?? 3;
+  const cardDisabledPids =
+    options.cardDisabledProfileIds ?? cardDisabledProfileIdsFromInbox(inboxItems);
+  const revokedHintPids = options.revokedHintProfileIds ?? new Set();
+
+  /** @type {GlanceRowPlanEntry[]} */
+  const rows = [];
+
+  for (const item of inboxItems) {
+    rows.push({ type: "inbox", item });
+  }
+
+  const shown = walletEntries.slice(0, maxSavedCards);
+  for (const entry of shown) {
+    const pid = entry?.profile_id;
+    const revokedHint =
+      pid &&
+      !cardDisabledPids.has(pid) &&
+      revokedHintPids.has(pid);
+    rows.push({
+      type: "wallet",
+      entry,
+      revokedHint: !!revokedHint,
+    });
+  }
+
+  const remaining = walletEntries.length - shown.length;
+  if (remaining > 0) {
+    rows.push({ type: "more", remainingCount: remaining });
+  }
+
+  return rows;
+}
+
+/**
  * @param {InboxItem[]} items
  */
 export function inboxCountFromItems(items) {

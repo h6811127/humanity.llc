@@ -217,7 +217,7 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 **Banner:** `#device-cross-tab-banner` on landing and `/wallet/` when another tab holds keys **this device has not saved yet**, and this tab does not show the unsaved-keys notice row (`tabNoticeCount === 0`). Saved cards use **Open controls** from the hub/wallet instead. Presence rows must heartbeat within ~6s (ghost entries drop from UI sooner than the 10s storage prune).
 
-**Glance:** Collapsed hub shows **Keys in another tab** and **N live proof waiting** rows (same items as inbox badge when counts &gt; 0; unification planned in [`DEVICE_INBOX.md`](DEVICE_INBOX.md)).
+**Glance:** Collapsed hub shows inbox actionable rows (live proof, cross-tab, tab keys, card-disabled-since-visit) plus saved-card peek via `buildGlanceRowPlan()` — see [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 
 ### Live-control inbox (Phase 7)
 
