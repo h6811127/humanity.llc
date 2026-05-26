@@ -1,7 +1,7 @@
 /**
  * Poll resolver for pending live-control challenges on saved wallet cards.
  * Signing stays on /created/  -  inbox only surfaces waiting requests.
- * @see docs/DEVICE_OS_REQUEST_BUDGET.md (Phases 1–4 — scoped polling; Phase 5 — watch toggle)
+ * @see docs/DEVICE_OS_REQUEST_BUDGET.md (Phases 1–4 - scoped polling; Phase 5 - watch toggle)
  */
 import { isWatchLiveProofEnabled } from "./device-hub-network-tools-core.mjs";
 import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs";
@@ -96,12 +96,14 @@ function readPollScope() {
       hubEl: null,
       inboxSheetOpen: false,
       walletPage: false,
+      watchEnabled: false,
     });
   }
   return resolveLiveControlPollScope({
     hubEl: document.getElementById("device-hub"),
     inboxSheetOpen: document.body.classList.contains("device-inbox-sheet-open"),
     walletPage: document.body.classList.contains("page-wallet"),
+    watchEnabled: isWatchLiveProofEnabled(),
   });
 }
 

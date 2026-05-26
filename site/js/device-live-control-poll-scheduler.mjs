@@ -23,12 +23,14 @@ export function liveControlPollIntervalMs(pendingCount) {
  *   hubExpanded: boolean,
  *   inboxSheetOpen: boolean,
  *   walletPage: boolean,
+ *   watchEnabled?: boolean,
  * }} scope
  */
 export function liveControlPollingShouldRun(scope) {
   if (scope.inboxSheetOpen) return true;
-  if (scope.walletPage) return true;
-  return scope.hubExpanded;
+  if (scope.hubExpanded) return true;
+  if (scope.walletPage && scope.watchEnabled === true) return true;
+  return false;
 }
 
 /**
@@ -100,6 +102,7 @@ export function isDeviceHubExpanded(hubEl) {
  *   hubEl?: HTMLElement | null,
  *   inboxSheetOpen?: boolean,
  *   walletPage?: boolean,
+ *   watchEnabled?: boolean,
  * }} input
  */
 export function resolveLiveControlPollScope(input) {
@@ -107,6 +110,7 @@ export function resolveLiveControlPollScope(input) {
     hubExpanded: isDeviceHubExpanded(input.hubEl ?? null),
     inboxSheetOpen: input.inboxSheetOpen === true,
     walletPage: input.walletPage === true,
+    watchEnabled: input.watchEnabled === true,
   });
 }
 

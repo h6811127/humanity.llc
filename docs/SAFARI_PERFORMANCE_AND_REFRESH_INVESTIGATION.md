@@ -250,7 +250,7 @@ document.getElementById("top-chrome")?.dataset?.deviceStatusError
 | **P0** | Presence `storage` → **immediate** chrome refresh on all tabs | Presence storage no longer triggers immediate chrome refresh; `hc-tab-presence-changed` uses debounced path only | **Shipped 2026-05-26** - `device-chrome-refresh-core.mjs`, `device-chrome-refresh.mjs`; Vitest `device-chrome-refresh-storage.test.ts` |
 | **P0** | Heartbeat writes every ~4.5s when metadata unchanged | `shouldTouchPresenceRow` keep-alive only near `PRESENCE_SHOW_MS` | **Shipped 2026-05-26** - `device-tab-presence-core.mjs`; Vitest `device-tab-presence-heartbeat.test.ts` |
 | **P1** | `renderSavedRows` → full network refresh | Debounced `scheduleWalletNetworkFetch`; cache-only DOM on re-render; fetch only when hub expanded or `/wallet/` | **Shipped 2026-05-26** - `device-hub-ui.mjs`, `device-hub-network-tools-core.mjs` |
-| **P1** | Wallet page always in live-control poll scope | Consider poll only when wallet scrolls live-proof section into view or user enables watch | Open |
+| **P1** | Wallet page always in live-control poll scope | Auto poll on `/wallet/` only when **Watch for live proof** is on; manual **Check for live proof** when off | **Shipped 2026-05-26** - `device-live-control-poll-scheduler.mjs`, `device-live-control-inbox.mjs` |
 | **P2** | Heavy module graph on every shell page | Lazy-load inbox sheet / notifications; smaller bootstrap graph | Open |
 | **P2** | Safari cache / version drift | Enforce `DEVICE_SHELL_ASSET_VERSION` on all peer imports in CI | Open |
 | **P3** | Week-long `/created/` session | Ensure `created.mjs` clears 3s poll on panel hide/navigation | Open |
