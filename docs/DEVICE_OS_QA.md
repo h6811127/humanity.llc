@@ -63,7 +63,7 @@ Spec: [`docs/QR_BRANDING.md`](QR_BRANDING.md) § Verification. Automated: `npm r
 
 ### P1-SD · Scan page device dot + glance (`/c/…`)
 
-Spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · Path 2 arrive [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md). Automated: `npm run worker:test:scan-page-dot` · `npm run worker:test:scan-live-check-arrive` · `npm run e2e:scan-page-dot`.
+Spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · Path 2 arrive [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) · Hero plate [`SCAN_HERO_CARD_VISUAL_SPEC.md`](SCAN_HERO_CARD_VISUAL_SPEC.md). Automated: `npm run worker:test:scan-page-dot` · `npm run worker:test:scan-live-check-arrive` · `npm run worker:test -- worker/tests/scan-hero-visual-contract.test.ts` · `npm run e2e:scan-page-dot`.
 
 | Step | Action | Expected |
 |------|--------|----------|
@@ -75,8 +75,10 @@ Spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · Path 2 arrive [`SC
 | 5 | Escape / outside tap | Glance closes; dot `aria-expanded` false |
 | 6 | Hero card header | `humanity.llc` wordmark only — **no** second red dot inside the live-check card |
 | 7 | Tab keys only (never saved a card on this origin) | Dot stays **static** brand red; no `data-dot-state`, no glance |
+| 8 | Active scan hero (light) | Raised tier-4 plate (`--hc-scan-hero-shadow`); neutral fill; **Active** only in status strip (not duplicated on whole card) |
+| 9 | Same URL with `localStorage.hc_theme = "dark"` (reload) | Hero dark gradient plate; title readable; settle pulse still visible once; scan-out / trust rows remain usable below hero |
 
-**Fail signals:** Stranger sees pulsing or green dot; glance opens hub sheet; dot contradicts cross-tab banner; two brand dots on screen (chrome + hero); borrowed-phone flash of steward green before first wallet save.
+**Fail signals:** Stranger sees pulsing or green dot; glance opens hub sheet; dot contradicts cross-tab banner; two brand dots on screen (chrome + hero); borrowed-phone flash of steward green before first wallet save; flat white hero in dark mode; whole hero tinted green/red for active state.
 
 ### P1-8 · Open controls: status dot vs hub row
 

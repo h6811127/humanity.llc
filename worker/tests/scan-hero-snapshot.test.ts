@@ -12,6 +12,7 @@ import {
   SHOWCASE_QR,
   STATUS_PLATE_MANIFESTO,
 } from "./fixtures/scan-showcase-fixtures";
+import { normalizeScanHeroSnippet } from "./scan-hero-snippet";
 
 function card(overrides: Partial<CardRow> = {}): CardRow {
   return {
@@ -62,22 +63,6 @@ function summary(): VerificationSummaryRow {
   };
 }
 
-/** Normalize hero markup for stable snapshots (Phase 4). */
-export function normalizeScanHeroSnippet(html: string): string {
-  const match = html.match(
-    /<article class="scan-hero[\s\S]*?<\/article>/
-  );
-  if (!match) return "";
-  return match[0]
-    .replace(/data-profile-id="[^"]+"/g, 'data-profile-id="PROFILE"')
-    .replace(/data-qr-id="[^"]+"/g, 'data-qr-id="QR"')
-    .replace(/data-scan-url="[^"]+"/g, 'data-scan-url="SCAN_URL"')
-    .replace(/HC-[0-9A-HJKMNP-TV-Z]{4}-[0-9A-HJKMNP-TV-Z]{4}/g, "HC-XXXX-XXXX")
-    .replace(/<svg[\s\S]*?<\/svg>/g, "<svg><!-- qr --></svg>")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
 async function heroForManifesto(manifestoLine: string | null) {
   const vm = buildScanViewModel(
     SHOWCASE_PROFILE,
@@ -122,5 +107,46 @@ describe("scan hero HTML snapshots", () => {
     expect(snippet).toMatchSnapshot();
     expect(snippet).toContain("@river_example");
     expect(snippet).toContain(PERSONAL_CARD_MANIFESTO);
+  });
+
+  it("qr revoked minimal hero", async () => {
+    const vm = buildScanViewModel(
+      SHOWCASE_PROFILE,
+      "qr_revoked_snap",
+      {
+        card: card({ manifesto_line: PERSONAL_CARD_MANIFESTO }),
+        qr: qr({ qr_id: "qr_revoked_snap", status: "revoked" }),
+        verification: summary(),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    const snippet = normalizeScanHeroSnippet(html);
+    expect(snippet).toMatchSnapshot();
+    expect(snippet).toContain("scan-safety-strip--bad");
+    expect(snippet).not.toContain('data-scan-active="1"');
+  });
+
+  it("qr expired minimal hero", async () => {
+    const vm = buildScanViewModel(
+      SHOWCASE_PROFILE,
+      "qr_expired_snap",
+      {
+        card: card({ manifesto_line: PERSONAL_CARD_MANIFESTO }),
+        qr: qr({
+          qr_id: "qr_expired_snap",
+          expires_at: "2020-01-01T00:00:00Z",
+        }),
+        verification: summary(),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    const snippet = normalizeScanHeroSnippet(html);
+    expect(snippet).toMatchSnapshot();
+    expect(snippet).toContain("scan-safety-strip--warn");
+    expect(snippet).not.toContain('data-scan-active="1"');
   });
 });
