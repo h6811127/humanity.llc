@@ -66,7 +66,7 @@ Stickers and cards are part of the protocol aesthetic (like NFC tap marks or pay
 
 | Placement | Element |
 |-----------|---------|
-| QR zone | White inset, brand border (`#DB1B43`), fixed aspect (specify mm in print template) |
+| QR zone | White inset, brand border (`#DB1B43`), **50.8 mm** trim (2 in) — `site/js/qr-print-sticker.mjs` |
 | Below QR | `humanity.llc` in consistent type scale |
 | Optional band | `LIVE OBJECT` (teaches that status is online, not frozen on the sticker) |
 | Corner / edge | Tiny Humanity mark (same family as site header) |
@@ -205,6 +205,8 @@ Scanners should learn:
 
 **Forbidden in official generators:** homepage-only QR, marketing placeholder PNG as QR, black modules, non-Q correction with center logo, arbitrary external URLs in encoded string.
 
+**Enforcement (Phase C):** `validateOfficialScanUrl` / `assertOfficialScanUrl` in `site/js/qr-scan-url-lock.mjs`; wired into `qr-render.mjs`, `qr-branding.mjs` (`renderHumanityQrFrameToCanvas`), `scan-qr.ts`, and `resolveScanUrl()`. Tests: `worker/tests/qr-scan-url-lock.test.ts`.
+
 ---
 
 ## Visual anti-patterns (scan surface)
@@ -227,12 +229,12 @@ From [`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md)—do 
 |-------|-------------|---------|
 | **A** | `renderHumanityQrFrame()` + footer + `LIVE OBJECT` + update [`docs/QR_BRANDING.md`](QR_BRANDING.md) | Lookalike QRs — **shipped** |
 | **B** | Scanner safety header, session “first seen,” status strip reorder | Over-trust, unclear revoke — **shipped** |
-| **C** | Host-lock lint in tests + generator docs | Malicious payloads — **next** |
-| **D** | Print sticker SVG/PDF template (physical marks) | Physical impersonation |
+| **C** | Host-lock lint in tests + generator docs | Malicious payloads — **shipped** (`site/js/qr-scan-url-lock.mjs`) |
+| **D** | Print sticker SVG template (50.8 mm trim + bleed) | Physical impersonation — **shipped** (`site/js/qr-print-sticker.mjs`) |
 | **E** | `/c/…/out` interstitial + redirect ban in Worker | Weaponized branding |
 | **F** | Short credential code on print + optional verifier app | Supply-chain / advanced fakes |
 
-Phases **A–C** are the immediate win; **E** is mandatory before any external destination feature.
+Phases **A–D** are shipped; **E** (`/c/…/out` interstitial + redirect ban) is next. **E** is mandatory before any external destination feature.
 
 ---
 
@@ -251,7 +253,7 @@ Show mixed QRs at phone distance; target &lt;1s Humanity identification without 
 ### Automated checks
 
 ```bash
-npm run worker:test -- worker/tests/scan-qr-branding.test.ts worker/tests/scan.test.ts worker/tests/scan-safety.test.ts
+npm run worker:test -- worker/tests/scan-qr-branding.test.ts worker/tests/scan.test.ts worker/tests/scan-safety.test.ts worker/tests/qr-scan-url-lock.test.ts worker/tests/qr-print-sticker.test.ts
 ```
 
 ---
@@ -261,6 +263,8 @@ npm run worker:test -- worker/tests/scan-qr-branding.test.ts worker/tests/scan.t
 | Concern | Path |
 |---------|------|
 | Scan HTML | `worker/src/resolver/scan-html.ts` |
+| Scan URL host lock | `site/js/qr-scan-url-lock.mjs` |
+| Print sticker template | `site/js/qr-print-sticker.mjs`, `renderPrintStickerFromScanUrl` in `scan-qr.ts` |
 | Scanner safety header | `worker/src/resolver/scan-safety.ts` |
 | View model | `worker/src/resolver/scan-state.ts` |
 | Status JSON | `worker/src/resolver/scan-status.ts` |

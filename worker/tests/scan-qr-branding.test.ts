@@ -65,8 +65,16 @@ describe("renderHumanityQrFrameSvg", () => {
 });
 
 describe("renderScanQrMarkup", () => {
+  it("rejects URLs that fail host lock", async () => {
+    await expect(renderScanQrMarkup("https://humanity.llc/")).rejects.toThrow(
+      /Official scan URL required/
+    );
+  });
+
   it("returns branded framed SVG with vector center logo", async () => {
-    const html = await renderScanQrMarkup("https://humanity.llc/c/abc?q=qr_xyz");
+    const html = await renderScanQrMarkup(
+      "https://humanity.llc/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_7Xk9mP2nQ4rT6vW8"
+    );
     expect(html).toContain('class="hc-qr-frame pass-qr-svg"');
     expect(html).toContain('class="hc-qr-frame-svg"');
     expect(html).toContain('class="hc-qr-center-logo"');
@@ -76,7 +84,7 @@ describe("renderScanQrMarkup", () => {
   });
 
   it("uses error correction Q in generated QR", async () => {
-    const scanUrl = "https://humanity.llc/c/abc?q=qr_xyz";
+    const scanUrl = "https://humanity.llc/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_7Xk9mP2nQ4rT6vW8";
     const html = await renderScanQrMarkup(scanUrl);
     const plain = await QRCode.toString(scanUrl, {
       type: "svg",

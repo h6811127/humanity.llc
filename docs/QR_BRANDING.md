@@ -37,12 +37,27 @@ To tune the look, edit `QR_CENTER_LOGO_OUTER_FILL`, `QR_CENTER_LOGO_INNER_RADIUS
 
 ---
 
+## Host lock (Phase C)
+
+Official generators **must** encode only URLs that pass `validateOfficialScanUrl` in `site/js/qr-scan-url-lock.mjs`:
+
+- Host: `humanity.llc` (or `*.humanity.llc`), plus `localhost` / `127.0.0.1` for local dev
+- Path: `/c/{profile_id}` with **only** `?q={qr_id}` (no homepage, no extra query params)
+- Wired in: `hc-sign.mjs` (`qrScanUrl`), `qr-render.mjs`, `qr-branding.mjs`, `worker/src/resolver/scan-qr.ts`, `worker/src/resolver/scan-state.ts` (`resolveScanUrl`)
+
+```bash
+npm run worker:test -- worker/tests/qr-scan-url-lock.test.ts
+```
+
+---
+
 ## Engineering rules
 
 - **Do not** composite a full rectangular logo image with `globalAlpha` / `<image opacity>` — opaque white backdrops will show on the QR.
 - **Do not** use the old brand placeholder `red_qr_transparent_bg.png` as the QR itself — that file is favicon/marketing only.
 - **Do** keep quiet zone (`margin` ≥ 1).
 - **Do** use correction **Q** whenever the center logo is enabled (default in `qr-branding.mjs`).
+- **Do** call `buildOfficialScanUrl` / `assertOfficialScanUrl` before encoding any scan payload (see Host lock above).
 - **QA:** Scan with iOS Camera and Android at intended print size after any opacity/size change.
 
 ---
@@ -86,3 +101,25 @@ All official generators wrap the branded QR in `renderHumanityQrFrameSvg` (Worke
 | Layout tuning | Edit `qrFrameMetrics()` in `site/js/qr-branding.mjs` |
 
 Official outputs must not bypass the frame helpers in `qr-branding.mjs`.
+
+---
+
+## Print sticker template (Phase D)
+
+Fulfillment and DIY print use `renderPrintStickerSvg()` in `site/js/qr-print-sticker.mjs`, wrapping the signed frame in a mm-based sheet:
+
+| Spec | Value |
+|------|--------|
+| Trim | **50.8 mm** (2 in square) — `STICKER_TRIM_MM` |
+| Bleed | **1.5 mm** per edge |
+| Safe inset | **2 mm** from trim |
+| Guides | Trim/safe dashed rects + corner crop marks (omit with `showGuides: false` for production RIP) |
+| Worker entry | `renderPrintStickerFromScanUrl(scanUrl)` in `worker/src/resolver/scan-qr.ts` |
+
+**PDF:** Export SVG via browser Print → PDF or vendor RIP; no separate PDF generator in v1.
+
+**Do not** print mutable trust claims on the sticker (status belongs on the resolver only).
+
+```bash
+npm run worker:test -- worker/tests/qr-print-sticker.test.ts
+```

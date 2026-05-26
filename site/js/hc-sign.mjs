@@ -4,6 +4,7 @@
 import * as ed from "https://esm.sh/@noble/ed25519@2.3.0";
 import { base58 } from "https://esm.sh/@scure/base@1.2.6";
 import canonicalize from "https://esm.sh/canonicalize@2.1.0";
+import { buildOfficialScanUrl } from "./qr-scan-url-lock.mjs";
 
 const PROTOCOL_VERSION = "1.0";
 const SIGNATURE_ALG = "Ed25519";
@@ -249,7 +250,7 @@ export function postVouchRevokeUrl(vouchId) {
 }
 
 export function qrScanUrl(profileId, qrId, origin = "https://humanity.llc") {
-  return `${origin}/c/${profileId}?q=${qrId}`;
+  return buildOfficialScanUrl(profileId, qrId, origin);
 }
 
 /** @param {string} issuedAt ISO timestamp @param {number} days valid from issue */

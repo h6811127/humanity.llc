@@ -313,6 +313,8 @@ export function drawCenterLogoOnCanvas(
  * @param {number} qrWidth module square size in px
  */
 export async function renderHumanityQrFrameToCanvas(text, qrWidth) {
+  const { assertOfficialScanUrl } = await import("./qr-scan-url-lock.mjs");
+  assertOfficialScanUrl(text);
   const qrCanvas = document.createElement("canvas");
   const QRCode = (await import("./vendor/qrcode.mjs")).default;
   await QRCode.toCanvas(qrCanvas, text, { ...QR_BRANDED_RENDER_OPTIONS, width: qrWidth });

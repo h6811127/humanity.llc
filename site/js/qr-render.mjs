@@ -17,6 +17,8 @@ async function qrToBrandedCanvas(text, width) {
  */
 export async function qrToDataUrl(text, width = 200) {
   if (!text?.trim()) throw new Error("No scan URL");
+  const { assertOfficialScanUrl } = await import("./qr-scan-url-lock.mjs");
+  assertOfficialScanUrl(text);
   const canvas = await qrToBrandedCanvas(text, width);
   return canvas.toDataURL("image/png");
 }

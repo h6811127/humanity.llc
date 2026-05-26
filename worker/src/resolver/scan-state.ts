@@ -1,7 +1,9 @@
+import { validateOfficialScanUrl } from "../../../site/js/qr-scan-url-lock.mjs";
 import type { ScanContext } from "../db/scan";
 import type { CardStatus, QrScope, QrStatus } from "../db/types";
 import {
   publicReasonLabel,
+  scanLayoutForMinimalFailureTrust,
   scanLayoutForRevocationDisplay,
   type RevocationDisplayMeta,
 } from "./revocation-display";
@@ -83,10 +85,25 @@ export function resolveScanUrl(
   qrId: string | null,
   payload: string | null | undefined
 ): string | null {
-  if (payload?.trim()) return payload.trim();
-  if (!profileId || !qrId) return null;
-  const base = origin.replace(/\/$/, "");
-  return `${base}/c/${encodeURIComponent(profileId)}?q=${encodeURIComponent(qrId)}`;
+  const built =
+    profileId && qrId
+      ? `${origin.replace(/\/$/, "")}/c/${encodeURIComponent(profileId)}?q=${encodeURIComponent(qrId)}`
+      : null;
+
+  const stored = payload?.trim() || null;
+  if (stored) {
+    const check = validateOfficialScanUrl(stored, { profileId, qrId });
+    if (check.ok) return stored;
+    if (built) {
+      const builtCheck = validateOfficialScanUrl(built, { profileId, qrId });
+      if (builtCheck.ok) return built;
+    }
+    return null;
+  }
+
+  if (!built) return null;
+  const builtCheck = validateOfficialScanUrl(built, { profileId, qrId });
+  return builtCheck.ok ? built : null;
 }
 
 export function buildScanViewModel(
@@ -196,16 +213,15 @@ export function buildScanViewModel(
     });
   }
   if (qr.status === "expired" || isQrPastExpiry(qr.expires_at, now)) {
-    return statusView("qr_expired", card, qr, ctx.verification, origin, {
-      label: "QR expired",
-      tone: "warn",
-    }, {
-      minimalScan: true,
-      showCardBlock: false,
-      showHumanTrustBlock: false,
-      showArtifactBlock: false,
-      showLiveControlBlock: false,
-    });
+    return statusView(
+      "qr_expired",
+      card,
+      qr,
+      ctx.verification,
+      origin,
+      { label: "QR expired", tone: "warn" },
+      scanLayoutForMinimalFailureTrust()
+    );
   }
 
   return baseView(
