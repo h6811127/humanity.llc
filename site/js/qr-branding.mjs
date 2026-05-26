@@ -12,7 +12,7 @@ export const QR_BRAND_LIGHT = "#ffffff";
 /** Dusty rose outer ring (matches brand lockup). */
 export const QR_CENTER_LOGO_OUTER_FILL = "#c9979f";
 
-/** Warm ink inner core — contrasts with brand-red modules and dusty outer wash. */
+/** Warm ink inner core - contrasts with brand-red modules and dusty outer wash. */
 export const QR_CENTER_LOGO_INNER_FILL = "#141414";
 
 /** Inner radius as fraction of outer radius (small brand core on large soft wash). */
@@ -21,7 +21,7 @@ export const QR_CENTER_LOGO_INNER_RADIUS_RATIO = 0.46;
 /** Soft dusty-rose wash on dark modules only (docs/QR_BRANDING.md). */
 export const QR_CENTER_LOGO_OUTER_OPACITY = 0.52;
 
-/** Ink core on dark modules — higher opacity so the bullseye reads at a glance. */
+/** Ink core on dark modules - higher opacity so the bullseye reads at a glance. */
 export const QR_CENTER_LOGO_INNER_OPACITY = 0.9;
 
 /** @deprecated Prefer {@link QR_CENTER_LOGO_OUTER_OPACITY} / {@link QR_CENTER_LOGO_INNER_OPACITY}. */
@@ -121,7 +121,7 @@ export function extractSvgInner(svg) {
 }
 
 /**
- * Network glyph — concentric circles in a fixed frame corner (not in data modules).
+ * Network glyph - concentric circles in a fixed frame corner (not in data modules).
  * @param {number} size
  * @param {number} cx
  * @param {number} cy
@@ -474,11 +474,19 @@ export async function renderHumanityQrFrameToCanvas(text, qrWidth) {
   const m = qrFrameMetrics(qrWidth, {
     credentialCode: credentialCodeFromScanUrl(text),
   });
+  // The created-page preview rounds the `<img>` element with a fixed border-radius,
+  // which can clip artwork that touches the canvas edges. Add "quiet padding"
+  // around the whole frame so the red stroke + corner glyph remain fully visible.
+  const outerPadding = Math.max(8, Math.round(qrWidth * 0.09));
   const out = document.createElement("canvas");
-  out.width = m.totalWidth;
-  out.height = m.totalHeight;
+  out.width = m.totalWidth + 2 * outerPadding;
+  out.height = m.totalHeight + 2 * outerPadding;
   const ctx = out.getContext("2d");
   if (!ctx) throw new Error("Canvas not available");
+  ctx.save();
+  ctx.fillStyle = QR_BRAND_LIGHT;
+  ctx.fillRect(0, 0, out.width, out.height);
+  ctx.translate(outerPadding, outerPadding);
   drawHumanityQrFrameCanvas(ctx, m, () => {
     ctx.drawImage(qrCanvas, m.qrX, m.qrY);
     drawMaskedCenterLogoOnCanvas(
@@ -492,5 +500,6 @@ export async function renderHumanityQrFrameToCanvas(text, qrWidth) {
       QR_CENTER_LOGO_INNER_OPACITY
     );
   });
+  ctx.restore();
   return out;
 }
