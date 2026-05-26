@@ -143,7 +143,11 @@ function applyDot() {
     dot.classList.remove(...NETWORK_CLASSES, ...DEVICE_CLASSES);
     dot.classList.add(`pass-dot-status-network-${networkStatus}`);
     dot.classList.add(`pass-dot-status-device-${device}`);
+    const dotState = `${networkStatus}:${device}`;
+    dot.dataset.dotState = dotState;
+    dotBtn?.setAttribute("data-dot-state", dotState);
     dotBtn?.setAttribute("aria-label", statusAriaLabel(networkStatus, device));
+    renderDotExplainability(networkStatus, device);
   };
   if (
     !prefersReducedMotion() &&
@@ -168,6 +172,119 @@ function statusKeyDot(fill, ring = false) {
     ? `<circle cx="5" cy="5" r="5" fill="${fill}"/><circle cx="5" cy="5" r="5" fill="none" stroke="${fill}" stroke-width="2" opacity="0.45"/>`
     : `<circle cx="5" cy="5" r="5" fill="${fill}"/>`;
   return `<svg class="device-hub-status-key-dot" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">${inner}</svg>`;
+}
+
+function getStewardQueueUrl() {
+  const link = document.querySelector("#steward-review-details a[href]");
+  if (!(link instanceof HTMLAnchorElement)) return null;
+  return link.getAttribute("href") || null;
+}
+
+function describeDotState(network, device) {
+  const stewardReady = hasStewardReadyKeys();
+  const queueUrl = getStewardQueueUrl();
+  if (network === "offline") {
+    return {
+      id: "offline",
+      now: "Resolver offline.",
+      why: stewardReady
+        ? "Steward keys are ready locally, but network is unreachable."
+        : "Health check failed and signing actions need a connection.",
+      next: "Retry resolver check.",
+      action: { kind: "retry", label: "Retry status check" },
+    };
+  }
+  if (network === "degraded") {
+    return {
+      id: "degraded",
+      now: "Resolver limited.",
+      why: stewardReady
+        ? "Steward keys are ready locally; network responses are currently limited."
+        : "Resolver reported degraded health.",
+      next: "Retry status check or wait for recovery.",
+      action: { kind: "retry", label: "Retry status check" },
+    };
+  }
+  if (device === "unsaved") {
+    return {
+      id: "unsaved",
+      now: "Tab keys not saved.",
+      why: "This tab has signing keys that are not yet saved to this device.",
+      next: "Open controls and save keys.",
+      action: { kind: "open_controls", label: "Open controls" },
+    };
+  }
+  if (device === "steward") {
+    return {
+      id: "steward",
+      now: "Steward ready, resolver online.",
+      why: "Steward-capable signing keys are available in this browser context.",
+      next: queueUrl ? "Open steward review queue." : "Open controls for steward actions.",
+      action: queueUrl
+        ? { kind: "open_steward_queue", label: "Open steward queue", href: queueUrl }
+        : { kind: "open_controls", label: "Open controls" },
+    };
+  }
+  if (device === "keys") {
+    return {
+      id: "keys",
+      now: "Saved keys ready.",
+      why: "Signing keys are saved on this device and resolver is online.",
+      next: "Open controls to manage a saved card.",
+      action: { kind: "open_controls", label: "Open controls" },
+    };
+  }
+  return {
+    id: "none",
+    now: "No saved keys on this device.",
+    why: "Resolver is online, but this browser has no saved signing keys.",
+    next: "Create a card or save keys from this tab.",
+    action: { kind: "create_card", label: "Create a card", href: "/create/" },
+  };
+}
+
+function renderDotExplainer(container, descriptor, compact = false) {
+  if (!container) return;
+  const action = descriptor.action;
+  const actionHtml = action
+    ? action.href
+      ? `<a class="device-dot-explainer-action" href="${escapeHtml(action.href)}">${escapeHtml(action.label)}</a>`
+      : `<button type="button" class="device-dot-explainer-action" data-dot-action="${escapeHtml(action.kind)}">${escapeHtml(action.label)}</button>`
+    : "";
+  container.innerHTML = `
+    <p class="device-dot-explainer-kicker">${compact ? "Status now" : "Status explainer"}</p>
+    <p class="device-dot-explainer-line"><strong>Now:</strong> ${escapeHtml(descriptor.now)}</p>
+    <p class="device-dot-explainer-line"><strong>Why:</strong> ${escapeHtml(descriptor.why)}</p>
+    <p class="device-dot-explainer-line"><strong>Next:</strong> ${escapeHtml(descriptor.next)}</p>
+    ${actionHtml}`;
+}
+
+function renderDotExplainability(network, device) {
+  const descriptor = describeDotState(network, device);
+  const keyRoot = document.getElementById("device-hub-status-key");
+  if (keyRoot) {
+    let panel = keyRoot.querySelector(".device-dot-explainer");
+    if (!panel) {
+      panel = document.createElement("div");
+      panel.className = "device-dot-explainer";
+      keyRoot.prepend(panel);
+    }
+    renderDotExplainer(panel, descriptor, false);
+  }
+
+  const popover =
+    document.getElementById("device-hub-glance-popover") ||
+    document.getElementById("wallet-hub-glance-popover");
+  if (popover) {
+    let panel = popover.querySelector(".device-dot-explainer");
+    if (!panel) {
+      panel = document.createElement("div");
+      panel.className = "device-dot-explainer device-dot-explainer--popover";
+      const list = popover.querySelector(".device-hub-glance-list");
+      if (list?.parentNode) list.parentNode.insertBefore(panel, list);
+    }
+    renderDotExplainer(panel, descriptor, true);
+  }
 }
 
 function renderStatusKey() {
@@ -413,5 +530,18 @@ window.addEventListener("hc-hub-expand-request", (e) => {
       behavior: prefersReducedMotion() ? "auto" : "smooth",
       block: "nearest",
     });
+  }
+});
+
+document.addEventListener("click", (e) => {
+  const actionEl = e.target instanceof Element ? e.target.closest("[data-dot-action]") : null;
+  if (!actionEl) return;
+  const action = actionEl.getAttribute("data-dot-action");
+  if (action === "retry") {
+    refreshNetwork();
+    return;
+  }
+  if (action === "open_controls") {
+    openHubFromChrome();
   }
 });

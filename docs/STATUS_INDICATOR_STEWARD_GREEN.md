@@ -134,6 +134,10 @@ No third-party analytics requirement; this can remain local/dev diagnostics init
 
 ## Technical implementation plan
 
+Implementation snapshot:
+- Phase 1 shipped in `site/js/device-status.mjs` + `site/styles.css` (steward green + ARIA + legend).
+- Phase 2 basic explainability shipped: `describeDotState()` + "Now / Why / Next" surfaced in hub status key and dot popover with state-aware quick actions.
+
 ### Phase 1 - Steward green foundation
 
 1. Extend `deviceState()` model to return `steward`.

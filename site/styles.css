@@ -464,6 +464,59 @@ body.page-flow.has-shell-chrome .page > main.screen {
   color: var(--grey);
 }
 
+.device-dot-explainer {
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.device-dot-explainer--popover {
+  margin-bottom: 8px;
+}
+
+.device-dot-explainer-kicker {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--grey);
+}
+
+.device-dot-explainer-line {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--black);
+}
+
+.device-dot-explainer-line + .device-dot-explainer-line {
+  margin-top: 3px;
+}
+
+.device-dot-explainer-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 1px solid rgba(219, 27, 67, 0.25);
+  border-radius: 999px;
+  background: rgba(219, 27, 67, 0.05);
+  color: var(--red);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.device-dot-explainer-action:active {
+  background: rgba(219, 27, 67, 0.1);
+}
+
 .device-hub-glance-btn--muted .device-hub-glance-title {
   font-weight: 500;
   color: var(--grey);
