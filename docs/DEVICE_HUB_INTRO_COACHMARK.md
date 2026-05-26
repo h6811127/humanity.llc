@@ -64,6 +64,8 @@ This prevents repeat popups on refresh for users who already encountered it.
 
 ## QA checklist
 
+Manual runbook: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-4**. Automated: `e2e/device-status-dot.spec.ts` (hub intro coachmark).
+
 1. Clear keys:
    - `localStorage.removeItem("hc_device_hub_intro_seen")`
    - `localStorage.removeItem("hc_device_hub_intro_dismissed")`

@@ -106,4 +106,4 @@ After migrating `.hub-card-menu-*`, run the standard contrast checklist on a sav
 
 ### QA (intro coachmark)
 
-Clear `localStorage` key for hub intro dismissal (see `device-hub-intro-coachmark.mjs`), reload `/`, confirm coachmark title/body/dismiss in light and dark.
+Per [`DEVICE_HUB_INTRO_COACHMARK.md`](DEVICE_HUB_INTRO_COACHMARK.md): clear `hc_device_hub_intro_seen` and `hc_device_hub_intro_dismissed`, reload `/`, confirm title/body/**Got it** in light and dark; refresh without interaction must not re-show (`seen` gate).

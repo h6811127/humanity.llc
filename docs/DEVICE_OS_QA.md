@@ -71,7 +71,26 @@ Run on **production** (or staging with full Pages deploy) after `site/` ships. M
 
 **Fail signals:** Laggy landing scroll with hub closed; dot dead; full-page taps blocked (stuck backdrop — use unstick snippet in Safari investigation doc). If W1–W4 fail, consider Phase 3A/3B in that doc (do not ship without triage).
 
-**Automated gate (CI/local):** `npm run e2e:safari` (WebKit + iPhone 13 Pro projects).
+**Automated gate:** Chromium device shell E2E in CI (`e2e/device-status-dot.spec.ts`, `device-inbox`, `device-os-wallet`). **P0-W** WebKit sign-off is manual on real devices (Safari-specific E2E removed in UI revert step 3).
+
+### P1-4 · Hub intro coachmark (first visit)
+
+Spec: [`DEVICE_HUB_INTRO_COACHMARK.md`](DEVICE_HUB_INTRO_COACHMARK.md). Automated: `e2e/device-status-dot.spec.ts` (hub intro coachmark block).
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | DevTools → clear `hc_device_hub_intro_seen` and `hc_device_hub_intro_dismissed` | Fresh visitor state |
+| 2 | Open `/` (hub closed) | `#device-hub-intro-coachmark` visible; copy mentions status dot |
+| 3 | Reload without tapping **Got it** or the dot | Coachmark stays hidden (`seen` gate) |
+| 4 | Clear both keys; tap **Got it**; reload | Still hidden (`dismissed` gate) |
+| 5 | Open `/wallet/` | No coachmark markup |
+| 6 | Repeat steps 1–2 with `localStorage.hc_theme = "dark"` | Readable title, body, dismiss button ([`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § QA intro coachmark) |
+
+**Fail signals:** Coachmark on every refresh; coachmark on wallet; unreadable dark-mode text.
+
+### P1-5 · Popover surfaces (contrast)
+
+Per [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § QA (warning alert + glance explainer): hub card alert links, glance dot explainer + **info@humanity.llc** row, expanded hub status-key explainer — legible in light and dark.
 
 ### P0-3 · Auto-save (default on)
 
@@ -265,9 +284,7 @@ npm run worker:test -- worker/tests/device-os-frontend.test.ts worker/tests/devi
 Playwright (requires pages dev):
 
 ```bash
-npm run e2e -- e2e/device-os-wallet.spec.ts
-npm run e2e -- e2e/device-inbox.spec.ts
-npm run e2e:safari
+npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device-os-wallet.spec.ts
 ```
 
 ---
