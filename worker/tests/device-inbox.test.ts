@@ -45,6 +45,21 @@ describe("buildInboxItems", () => {
     expect(items[0].title).toContain("save");
   });
 
+  it("includes orphan_keys_removed when removed profile has tab presence", () => {
+    const items = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 0,
+      crossTabEntries: [],
+      orphanRemovedEntries: [
+        { profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD6", tabId: "t-orphan", label: "Old card" },
+      ],
+    });
+    expect(items.map((i) => i.kind)).toEqual(["orphan_keys_removed"]);
+    expect(items[0].title).toContain("still open");
+    expect(inboxDotOverlayFromItems(items)).toBe("cross_tab_keys");
+    expect(inboxBadgeAriaLabel(items)).toContain("removed card");
+  });
+
   it("suppresses cross-tab when tab keys notice is active", () => {
     const items = buildInboxItems({
       tabNoticeCount: 1,

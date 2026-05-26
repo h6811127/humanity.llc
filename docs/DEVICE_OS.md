@@ -222,7 +222,7 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 **Banner:** `#device-cross-tab-banner` on landing and `/wallet/` when another tab holds keys **this device has not saved yet**, and this tab does not show the unsaved-keys notice row (`tabNoticeCount === 0`). Saved cards use **Open controls** from the hub/wallet instead. Presence rows must heartbeat within ~6s (ghost entries drop from UI sooner than the 10s storage prune).
 
-**Removed from device:** Profiles in `localStorage` `hc_wallet_removed_profile_ids` (set on hub/wallet remove) are excluded from cross-tab inbox/banner even if another tab still heartbeats keys; presence rows for that profile are purged on remove. Re-saving the card to `hc_wallet` clears the denylist entry. See [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md).
+**Removed from device:** Profiles in `localStorage` `hc_wallet_removed_profile_ids` (set on hub/wallet remove) do not use generic cross-tab copy. If another tab still heartbeats those keys, inbox shows **`orphan_keys_removed`** (“Keys still open in another tab · for a card you removed from this device”) with **Open that tab** and **Clear keys on this device** (broadcast to all tabs). Re-saving to `hc_wallet` clears the denylist. See [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md).
 
 **Glance:** Collapsed hub shows inbox actionable rows (live proof, cross-tab, tab keys, card-disabled-since-visit) plus saved-card peek via `buildGlanceRowPlan()` — see [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 

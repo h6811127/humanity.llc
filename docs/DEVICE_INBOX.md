@@ -74,6 +74,7 @@ Canonical `kind` values (target: one module `device-inbox-core.mjs`, Vitest-cove
 | `live_proof` | **High** (time-sensitive) | Yes (pending count) | `proof_waiting` (highest overlay) | Yes (opt-in) | Open `/created/` to sign (`live_challenge`) |
 | `tab_keys_unsaved` | Medium | Yes (0 or 1) | Via device axis (`unsaved` pulsing red), not overlay | No | Save keys on device |
 | `cross_tab_keys` | Medium | Yes when tab notice = 0 | `cross_tab_keys` | No | Focus other tab / save here |
+| `orphan_keys_removed` | Medium | Yes when tab notice = 0 | `cross_tab_keys` (same notch) | No | Open other tab / clear keys on device |
 | `card_disabled_since_visit` | Medium | **Yes** (resolver-confirmed since-visit cards) | `card_disabled_since_visit` (soft notch; below proof/cross-tab) | No | Open card from inbox sheet |
 | `resolver_degraded` | Low | **No** | Via network color on dot | No | System banner only |
 

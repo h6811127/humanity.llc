@@ -99,6 +99,7 @@ export function removePresenceRowsForProfile(map, profileId) {
  *   thisProfile: string | null,
  *   savedProfileIds?: Set<string> | string[],
  *   removedProfileIds?: Set<string> | string[],
+ *   orphanRemovedOnly?: boolean
  *   now?: number,
  *   staleMs?: number,
  *   showMs?: number,
@@ -108,6 +109,7 @@ export function listOtherTabsWithKeys(input) {
   const now = input.now ?? Date.now();
   const staleMs = input.staleMs ?? PRESENCE_STALE_MS;
   const showMs = input.showMs ?? PRESENCE_SHOW_MS;
+  const orphanRemovedOnly = Boolean(input.orphanRemovedOnly);
   const saved =
     input.savedProfileIds instanceof Set
       ? input.savedProfileIds
@@ -126,8 +128,12 @@ export function listOtherTabsWithKeys(input) {
     if (!normalized) continue;
     if (now - normalized.updatedAt > showMs) continue;
     if (input.thisProfile && normalized.profile_id === input.thisProfile) continue;
-    if (saved.has(normalized.profile_id)) continue;
-    if (removed.has(normalized.profile_id)) continue;
+    if (orphanRemovedOnly) {
+      if (!removed.has(normalized.profile_id)) continue;
+    } else {
+      if (saved.has(normalized.profile_id)) continue;
+      if (removed.has(normalized.profile_id)) continue;
+    }
     others.push({ tabId: id, ...normalized });
   }
   others.sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0));

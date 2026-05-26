@@ -2,10 +2,17 @@
  * Pure device inbox model — badge count, dot overlay inputs, glance copy.
  * @see docs/DEVICE_INBOX.md
  */
-import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs";
+import {
+  shouldShowCrossTabKeysNotice,
+  shouldShowOrphanRemovedKeysNotice,
+} from "./device-cross-tab-visibility.mjs";
+import {
+  ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX,
+  ORPHAN_KEYS_INBOX_TITLE,
+} from "./device-orphan-keys-nav-core.mjs";
 import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=34";
 
-/** @typedef {'live_proof' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'card_disabled_since_visit'} InboxKind */
+/** @typedef {'live_proof' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'orphan_keys_removed' | 'card_disabled_since_visit'} InboxKind */
 
 /**
  * @param {InboxItem[]} items
@@ -45,6 +52,7 @@ export function inboxItemsIncludeKind(items, kind) {
  *   tabNoticeCount: number,
  *   liveProofCount: number,
  *   crossTabEntries?: InboxCrossTabEntry[],
+ *   orphanRemovedEntries?: InboxCrossTabEntry[],
  *   tabSessionLabel?: string,
  *   cardDisabledSinceVisit?: InboxCardDisabledEntry[],
  * }} input
@@ -55,6 +63,7 @@ export function buildInboxItems(input) {
     tabNoticeCount = 0,
     liveProofCount = 0,
     crossTabEntries = [],
+    orphanRemovedEntries = [],
     tabSessionLabel = "This tab",
     cardDisabledSinceVisit = [],
   } = input;
@@ -92,6 +101,33 @@ export function buildInboxItems(input) {
       count: crossTabCount,
       title: "Keys in another tab",
       subtitle: extra > 0 ? `${label} (+${extra} more)` : label,
+      hubScrollTarget: "device-hub-crosstab-notice",
+      meta: { crossTabEntry: entry, crossTabExtra: extra },
+    });
+  }
+
+  const orphanCount = shouldShowOrphanRemovedKeysNotice(
+    orphanRemovedEntries.length,
+    tabNoticeCount
+  )
+    ? orphanRemovedEntries.length
+    : 0;
+
+  if (orphanCount > 0) {
+    const entry = orphanRemovedEntries[0];
+    const label =
+      entry?.label ||
+      (entry?.handle ? `@${entry.handle}` : `${entry?.profile_id?.slice(0, 12) ?? ""}…`);
+    const extra = orphanCount > 1 ? orphanCount - 1 : 0;
+    items.push({
+      kind: "orphan_keys_removed",
+      urgency: "medium",
+      count: orphanCount,
+      title: ORPHAN_KEYS_INBOX_TITLE,
+      subtitle:
+        extra > 0
+          ? `${ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX} · ${label} (+${extra} more)`
+          : `${ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX} · ${label}`,
       hubScrollTarget: "device-hub-crosstab-notice",
       meta: { crossTabEntry: entry, crossTabExtra: extra },
     });
@@ -232,6 +268,7 @@ export function inboxCountFromItems(items) {
 export function topInboxKind(items) {
   if (items.some((i) => i.kind === "live_proof")) return "live_proof";
   if (items.some((i) => i.kind === "cross_tab_keys")) return "cross_tab_keys";
+  if (items.some((i) => i.kind === "orphan_keys_removed")) return "orphan_keys_removed";
   if (items.some((i) => i.kind === "card_disabled_since_visit")) {
     return "card_disabled_since_visit";
   }
@@ -246,7 +283,7 @@ export function inboxDotOverlayFromItems(items) {
   return dotOverlayFromCounts(inboxOverlayCountsFromItems(items));
 }
 
-/** @typedef {'live_proof' | 'cross_tab_keys' | 'default'} InboxBadgeChroma */
+/** @typedef {'live_proof' | 'cross_tab_keys' | 'orphan_keys_removed' | 'default'} InboxBadgeChroma */
 
 const BADGE_CHROMA_CLASSES = {
   live_proof: "shell-notif-badge--live-proof",
@@ -262,7 +299,7 @@ const BADGE_CHROMA_CLASSES = {
 export function inboxBadgeChromaKind(items) {
   const top = topInboxKind(items);
   if (top === "live_proof") return "live_proof";
-  if (top === "cross_tab_keys") return "cross_tab_keys";
+  if (top === "cross_tab_keys" || top === "orphan_keys_removed") return "cross_tab_keys";
   return "default";
 }
 
@@ -285,7 +322,7 @@ export function inboxOverlayCountsFromItems(items) {
     .filter((i) => i.kind === "live_proof")
     .reduce((s, i) => s + i.count, 0);
   const crossTabNotice = items
-    .filter((i) => i.kind === "cross_tab_keys")
+    .filter((i) => i.kind === "cross_tab_keys" || i.kind === "orphan_keys_removed")
     .reduce((s, i) => s + i.count, 0);
   const cardDisabledSinceVisit = items
     .filter((i) => i.kind === "card_disabled_since_visit")
@@ -305,6 +342,11 @@ function describeItemForAria(item) {
   }
   if (item.kind === "cross_tab_keys") {
     return item.count > 1 ? `keys in ${item.count} other tabs` : "keys in another tab";
+  }
+  if (item.kind === "orphan_keys_removed") {
+    return item.count > 1
+      ? `keys for ${item.count} removed cards in other tabs`
+      : "keys for a removed card in another tab";
   }
   if (item.kind === "card_disabled_since_visit") {
     return item.count === 1
@@ -375,6 +417,7 @@ export function inboxCrossTabLabel(entry) {
  * @param {{
  *   liveProofPending?: Array<{ entry: Record<string, unknown>, challenge_id: string, expires_at?: string }>,
  *   crossTabEntries?: InboxCrossTabEntry[],
+ *   orphanRemovedEntries?: InboxCrossTabEntry[],
  *   cardDisabledSinceVisit?: InboxCardDisabledEntry[],
  *   formatProofExpiry?: (iso: string) => string,
  * }} ctx
@@ -384,6 +427,7 @@ export function buildInboxSheetRows(items, ctx = {}) {
   const {
     liveProofPending = [],
     crossTabEntries = [],
+    orphanRemovedEntries = [],
     cardDisabledSinceVisit = [],
     formatProofExpiry = (iso) => iso,
   } = ctx;
@@ -416,6 +460,19 @@ export function buildInboxSheetRows(items, ctx = {}) {
           kind: "cross_tab_keys",
           title: "Keys in another tab",
           subtitle: inboxCrossTabLabel(entry),
+          tone: "blue",
+          crossTabEntry: entry,
+        });
+      }
+      continue;
+    }
+
+    if (item.kind === "orphan_keys_removed") {
+      for (const entry of orphanRemovedEntries) {
+        rows.push({
+          kind: "orphan_keys_removed",
+          title: ORPHAN_KEYS_INBOX_TITLE,
+          subtitle: `${ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX} · ${inboxCrossTabLabel(entry)}`,
           tone: "blue",
           crossTabEntry: entry,
         });

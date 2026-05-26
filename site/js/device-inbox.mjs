@@ -19,7 +19,8 @@ import {
 import { tabNoticeCount } from "./device-counts.mjs";
 import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
 import { getTabSession } from "./device-keys.mjs";
-import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
+import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys } from "./device-tab-presence.mjs";
+import { shouldShowCrossTabKeysNotice, shouldShowOrphanRemovedKeysNotice } from "./device-cross-tab-visibility.mjs";
 import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=34";
 
 export {
@@ -51,10 +52,18 @@ export function gatherInboxInput() {
     label: entry.label,
     handle: entry.handle,
   }));
+  const notices = tabNoticeCount();
+  const crossTabRaw = getOtherTabsWithKeys();
+  const orphanRaw = getOrphanRemovedTabsWithKeys();
   return {
-    tabNoticeCount: tabNoticeCount(),
+    tabNoticeCount: notices,
     liveProofCount: getLiveControlPendingCount(),
-    crossTabEntries: getOtherTabsWithKeys(),
+    crossTabEntries: shouldShowCrossTabKeysNotice(crossTabRaw.length, notices)
+      ? crossTabRaw
+      : [],
+    orphanRemovedEntries: shouldShowOrphanRemovedKeysNotice(orphanRaw.length, notices)
+      ? orphanRaw
+      : [],
     tabSessionLabel: tabSessionLabel(),
     cardDisabledSinceVisit: cardDisabled,
   };

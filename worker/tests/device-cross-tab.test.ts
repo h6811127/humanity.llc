@@ -112,6 +112,25 @@ describe("listOtherTabsWithKeys", () => {
     expect(others).toHaveLength(0);
   });
 
+  it("lists only removed-profile tabs when orphanRemovedOnly", () => {
+    const removedProfile = "7Xk9mP2nQ4rT6vW8yZ1aB3cD6";
+    const map = {
+      self: { profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5", updatedAt: now },
+      orphan: { profile_id: removedProfile, updatedAt: now },
+      other: { profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD7", updatedAt: now },
+    };
+    const { others } = listOtherTabsWithKeys({
+      map,
+      tabId: "self",
+      thisProfile: null,
+      removedProfileIds: [removedProfile],
+      orphanRemovedOnly: true,
+      now,
+    });
+    expect(others).toHaveLength(1);
+    expect(others[0]?.profile_id).toBe(removedProfile);
+  });
+
   it("hides other tabs for profiles removed from this device", () => {
     const removedProfile = "7Xk9mP2nQ4rT6vW8yZ1aB3cD6";
     const map = {

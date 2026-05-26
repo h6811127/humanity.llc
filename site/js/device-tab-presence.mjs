@@ -3,8 +3,11 @@
  * Stores only public metadata in localStorage  -  never private keys.
  */
 import { tabNoticeCount } from "./device-counts.mjs";
-import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs";
-import { getTabSession } from "./device-keys.mjs";
+import {
+  shouldShowCrossTabKeysNotice,
+  shouldShowOrphanRemovedKeysNotice,
+} from "./device-cross-tab-visibility.mjs";
+import { clearTabSessionKeys, getTabSession } from "./device-keys.mjs";
 import { loadRemovedProfileIds } from "./device-wallet-removed-profiles.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import {
@@ -18,9 +21,11 @@ import {
 
 const PRESENCE_KEY = "hc_tab_keys_presence";
 const FOCUS_CHANNEL = "hc-tab-focus";
+const CUSTODY_CHANNEL = "hc-tab-keys-custody";
 
 let heartbeatTimer = null;
 let focusChannel = null;
+let custodyChannel = null;
 
 function getTabId() {
   let id = sessionStorage.getItem("hc_tab_id");
@@ -134,6 +139,26 @@ export function getOtherTabsWithKeys(opts = {}) {
 }
 
 /**
+ * Other tabs still heartbeating keys for a profile removed from this device.
+ * @returns {ReturnType<typeof getOtherTabsWithKeys>}
+ */
+export function getOrphanRemovedTabsWithKeys() {
+  const removed = loadRemovedProfileIds();
+  if (removed.size === 0) return [];
+  const tabId = getTabId();
+  const map = readPrunedPresence();
+  const session = getTabSession();
+  return listOtherTabsWithKeys({
+    map,
+    tabId,
+    thisProfile: session?.profile_id ?? null,
+    savedProfileIds: [],
+    removedProfileIds: removed,
+    orphanRemovedOnly: true,
+  }).others;
+}
+
+/**
  * Drop presence rows for a profile (e.g. after remove from device).
  * @param {string} profileId
  */
@@ -149,6 +174,20 @@ export function purgePresenceForProfile(profileId) {
 export function crossTabNoticeCount() {
   const others = getOtherTabsWithKeys();
   return shouldShowCrossTabKeysNotice(others.length, tabNoticeCount()) ? others.length : 0;
+}
+
+/** Ask other tabs to drop session keys for a profile (remove-from-device cleanup). */
+export function broadcastClearProfileKeys(profileId) {
+  const pid = typeof profileId === "string" ? profileId.trim() : "";
+  if (!pid) return false;
+  try {
+    const ch = new BroadcastChannel(CUSTODY_CHANNEL);
+    ch.postMessage({ type: "clear-profile-keys", profile_id: pid });
+    ch.close();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /** Ask another tab (same origin) to bring itself to the front. */
@@ -185,6 +224,23 @@ function bindFocusChannel() {
   }
 }
 
+function bindCustodyChannel() {
+  if (custodyChannel) return;
+  try {
+    custodyChannel = new BroadcastChannel(CUSTODY_CHANNEL);
+    custodyChannel.onmessage = (ev) => {
+      const data = ev.data;
+      if (data?.type !== "clear-profile-keys" || !data.profile_id) return;
+      const session = getTabSession();
+      if (session?.profile_id !== data.profile_id) return;
+      clearTabSessionKeys();
+      clearTabKeysPresence();
+    };
+  } catch {
+    custodyChannel = null;
+  }
+}
+
 function onPageShowPresence(ev) {
   if (ev.persisted) {
     syncTabKeysPresence();
@@ -194,6 +250,7 @@ function onPageShowPresence(ev) {
 export function startTabKeysPresence() {
   if (heartbeatTimer != null) return;
   bindFocusChannel();
+  bindCustodyChannel();
   syncTabKeysPresence();
   heartbeatTimer = window.setInterval(() => {
     if (document.visibilityState === "visible") {

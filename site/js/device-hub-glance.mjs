@@ -5,6 +5,7 @@ import { buildGlanceRowPlan } from "./device-inbox-core.mjs";
 import { getInboxItems } from "./device-inbox.mjs";
 import { openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=34";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
+import { actOnOrphanRemovedTabKeys } from "./device-orphan-keys-nav.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
 import {
   getLatestResolvedAlertState,
@@ -103,6 +104,22 @@ function appendInboxGlanceRow(item, list, copy) {
       if (!actOnOtherTabKeys(entry)) {
         refreshHubGlance();
       }
+    });
+    list.appendChild(li);
+    return;
+  }
+
+  if (item.kind === "orphan_keys_removed") {
+    const entry = item.meta?.crossTabEntry;
+    if (!entry) return;
+    li.className = "device-hub-glance-row device-hub-glance-row--crosstab device-hub-glance-row--orphan";
+    li.innerHTML = `
+      <button type="button" class="device-hub-glance-btn">
+        <span class="device-hub-glance-title">${escapeHtml(item.title)}</span>
+        <span class="device-hub-glance-sub">${escapeHtml(item.subtitle ?? "")}</span>
+      </button>`;
+    li.querySelector("button")?.addEventListener("click", () => {
+      actOnOrphanRemovedTabKeys(entry);
     });
     list.appendChild(li);
     return;

@@ -2,8 +2,19 @@
  * Banner when signing keys are active in another tab on this device.
  */
 import { activateWalletEntry, getTabSession, openCardNowPage } from "./device-keys.mjs";
-import { getOtherTabsWithKeys, requestFocusTab } from "./device-tab-presence.mjs";
-import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs";
+import {
+  ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX,
+  ORPHAN_KEYS_INBOX_TITLE,
+} from "./device-orphan-keys-nav-core.mjs";
+import {
+  actOnOrphanRemovedTabKeys,
+  clearOrphanKeysOnDevice,
+} from "./device-orphan-keys-nav.mjs";
+import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys, requestFocusTab } from "./device-tab-presence.mjs";
+import {
+  shouldShowCrossTabKeysNotice,
+  shouldShowOrphanRemovedKeysNotice,
+} from "./device-cross-tab-visibility.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
 import { getInboxItems } from "./device-inbox.mjs";
 import { inboxItemsIncludeKind } from "./device-hub-inbox-alerts.mjs";
@@ -28,10 +39,19 @@ function labelForPresence(entry) {
 }
 
 function shouldShowCrossTabNotice() {
+  if (shouldShowOrphanHubNotice()) return false;
   if (document.getElementById("shell-notif-badge")) {
     return inboxItemsIncludeKind(getInboxItems(), "cross_tab_keys");
   }
   return shouldShowCrossTabKeysNotice(getOtherTabsWithKeys().length, tabNoticeCount());
+}
+
+function shouldShowOrphanHubNotice() {
+  const notices = tabNoticeCount();
+  if (document.getElementById("shell-notif-badge")) {
+    return inboxItemsIncludeKind(getInboxItems(), "orphan_keys_removed");
+  }
+  return shouldShowOrphanRemovedKeysNotice(getOrphanRemovedTabsWithKeys().length, notices);
 }
 
 function crossTabMessage(others) {
@@ -103,8 +123,53 @@ function walletEntryForVouchHere(primaryProfileId) {
   return walletEntryForProfile(primaryProfileId);
 }
 
+function bindOrphanClearKeys(root, entry) {
+  const btn = root.querySelector("[data-orphan-clear-keys]");
+  if (!btn || !entry?.profile_id) return;
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (clearOrphanKeysOnDevice(entry)) {
+      renderCrossTabKeysBanner();
+    }
+  });
+}
+
+function renderHubOrphanRemovedNotice() {
+  if (!hubSlot) return;
+  if (!shouldShowOrphanHubNotice()) {
+    return false;
+  }
+  const others = getOrphanRemovedTabsWithKeys();
+  const msg = crossTabMessage(others);
+  if (!msg) {
+    return false;
+  }
+
+  hubSlot.hidden = false;
+  hubSlot.innerHTML = `
+    <div class="device-hub-crosstab-card device-hub-crosstab-card--orphan" data-hub-searchable="keys removed card another tab">
+      <button type="button" class="device-hub-notice-banner device-hub-notice-banner--info" data-orphan-focus-tab>
+        <span class="device-hub-notice-title">${escapeHtml(ORPHAN_KEYS_INBOX_TITLE)}</span>
+        <span class="device-hub-notice-sub">${escapeHtml(ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX)} · ${msg.label}${msg.extra}</span>
+        <span class="device-hub-notice-chevron" aria-hidden="true">›</span>
+      </button>
+      <button type="button" class="device-hub-notice-secondary" data-orphan-clear-keys>Clear keys on this device</button>
+    </div>`;
+
+  hubSlot.querySelector("[data-orphan-focus-tab]")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    actOnOrphanRemovedTabKeys(msg.primary);
+  });
+  bindOrphanClearKeys(hubSlot, msg.primary);
+  return true;
+}
+
 function renderHubCrossTabNotice() {
   if (!hubSlot) return;
+  if (renderHubOrphanRemovedNotice()) {
+    return;
+  }
   if (!shouldShowCrossTabNotice()) {
     hubSlot.hidden = true;
     hubSlot.innerHTML = "";

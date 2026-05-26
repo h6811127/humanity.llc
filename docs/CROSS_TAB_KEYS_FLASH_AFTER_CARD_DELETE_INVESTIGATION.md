@@ -2,7 +2,7 @@
 
 **Reported:** 2026-05-26 — Laptop instance shows “Keys in another tab” for ~1–2s then it disappears, for a card deleted the previous day.
 
-**Status:** **Path B (step 1) shipped** — `hc_wallet_removed_profile_ids` denylist + presence purge on remove; see § Implementation.
+**Status:** **Path B (step 1)** and **path F (step 2)** shipped — denylist + orphan-specific inbox/hub copy and “Clear keys on this device” (broadcast); see § Implementation.
 
 Related: [`DEVICE_INBOX.md`](DEVICE_INBOX.md) counting rule 5, [`DEVICE_OS.md`](DEVICE_OS.md) § Cross-tab keys, [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) § Cross-tab badge.
 
@@ -213,9 +213,27 @@ So “I deleted the card” on device or network is **orthogonal** to cross-tab 
 | Re-save clears denylist for that profile | `saveWallet` → `reconcileRemovedProfilesAfterWalletSave` |
 | Wallet remove confirm (aligned with hub) | `card-wallet.mjs` |
 
-**Not in step 1:** Path D (clear `hc_created` in other tabs), path F (dedicated orphan copy), path G (debounce).
+**Not in step 1:** Path D (full revoke flow), path G (debounce).
 
 **Tests:** `worker/tests/device-cross-tab.test.ts` (denylist + presence purge core).
+
+---
+
+## Implementation (path F — step 2)
+
+| Piece | Module |
+|-------|--------|
+| Inbox kind `orphan_keys_removed` | `device-inbox-core.mjs`, `device-inbox.mjs` |
+| List only denylisted presence rows | `listOtherTabsWithKeys({ orphanRemovedOnly: true })` |
+| Hub / glance / sheet / wallet hint copy | `device-cross-tab-banner.mjs`, `device-hub-glance.mjs`, `device-inbox-sheet.mjs`, `wallet-page.mjs`, `card-wallet.mjs` |
+| **Clear keys on this device** (confirm + `BroadcastChannel` `hc-tab-keys-custody`) | `device-orphan-keys-nav.mjs`, `device-tab-presence.mjs` |
+| Open that tab CTA | `actOnOrphanRemovedTabKeys()` → `requestFocusTab` |
+
+Generic `cross_tab_keys` remains for unsaved create tabs; removed profiles surface as `orphan_keys_removed` (blue badge/dot chroma unchanged).
+
+**Not in step 2:** Path G (debounce), path D as mandatory on every remove (clear is opt-in via hub CTA).
+
+**Tests:** `worker/tests/device-inbox.test.ts`, `worker/tests/device-orphan-keys-nav.test.ts`, `device-cross-tab.test.ts` (orphan-only list).
 
 ---
 
