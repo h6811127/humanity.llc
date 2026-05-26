@@ -901,6 +901,12 @@ html[data-theme="dark"] .landing-framing-more-title {
   color: var(--shell-label-strong);
 }
 
+html[data-theme="dark"] .landing-framing-more-link {
+  background: var(--shell-fill-secondary);
+  border-color: var(--shell-separator);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
 @media (prefers-reduced-transparency: reduce) {
   html[data-theme="dark"] .landing-cta-glass {
     background: rgba(44, 44, 46, 0.96);

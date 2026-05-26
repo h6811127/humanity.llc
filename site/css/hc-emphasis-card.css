@@ -4,9 +4,9 @@
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 12px 16px;
-  margin: 0 0 14px;
-  padding: 14px 16px;
+  gap: 10px 12px;
+  margin: 0 0 12px;
+  padding: 12px 14px;
   border-radius: 14px;
   border: none;
   outline: none;
@@ -33,7 +33,7 @@
 .wallet-active-main {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
   flex: 1 1 12rem;
 }
@@ -83,7 +83,7 @@
 
 .hc-emphasis-card__detail,
 .wallet-active-detail {
-  margin: 4px 0 0;
+  margin: 2px 0 0;
   font-size: 13px;
   font-weight: 500;
   line-height: 1.35;

@@ -32,7 +32,8 @@ describe("device-emphasis-card-html", () => {
   it("landing final CTA uses urgent emphasis card and glass button", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain("hc-emphasis-card--urgent landing-final-cta");
-    expect(html).toContain("landing-cta-glass");
+    expect(html).toContain("landing-hero-btn-primary landing-final-cta-btn");
+    expect(html).not.toContain("landing-cta-glass");
     expect(html).not.toMatch(
       /landing-final-cta[^>]*>\s*<h2 class="landing-final-cta-title"/
     );
@@ -41,7 +42,8 @@ describe("device-emphasis-card-html", () => {
   it("landing framing uses info emphasis card and glass row link", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain("hc-emphasis-card--info landing-framing");
-    expect(html).toContain("landing-cta-glass--row landing-framing-more-link");
+    expect(html).toContain('class="landing-framing-more-link"');
+    expect(html).not.toContain("landing-cta-glass");
     expect(html).not.toContain('class="landing-framing-tab"');
   });
 

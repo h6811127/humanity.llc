@@ -40,13 +40,11 @@
   /* Emphasis notice cards — docs/HC_EMPHASIS_CARD_ROLLOUT.md · UI_COLOR_SCHEME_STANDARD.md */
   --hc-emphasis-card-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    inset 0 2px 5px rgba(255, 255, 255, 0.38),
-    inset 0 -1px 2px rgba(60, 60, 67, 0.1),
-    inset 0 -3px 8px rgba(60, 60, 67, 0.07),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.58),
-    0 1px 2px rgba(0, 0, 0, 0.05),
-    0 5px 18px rgba(0, 0, 0, 0.1),
-    0 12px 32px rgba(0, 0, 0, 0.06);
+    inset 0 2px 4px rgba(255, 255, 255, 0.32),
+    inset 0 -1px 2px rgba(60, 60, 67, 0.08),
+    inset 0 0 0 1px rgba(60, 60, 67, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 4px 12px rgba(0, 0, 0, 0.06);
   --hc-emphasis-card-fill-active: linear-gradient(
     160deg,
     #f6f8f7 0%,
@@ -67,9 +65,9 @@
   );
   --hc-emphasis-card-fill-urgent: linear-gradient(
     160deg,
-    #faf6f7 0%,
-    #f5f0f2 48%,
-    #f0e9ec 100%
+    #f7f6f6 0%,
+    #f3f2f2 48%,
+    #eeeded 100%
   );
   --hc-emphasis-card-eyebrow-active: #248a3d;
   --hc-emphasis-card-eyebrow-info: #007aff;
@@ -1510,6 +1508,12 @@ a.hub-card-menu-item {
   align-items: stretch;
   text-align: left;
   margin-top: 8px;
+  padding: 10px 12px;
+  gap: 8px;
+}
+
+.landing-framing .hc-emphasis-card__main {
+  gap: 8px;
 }
 
 .landing-framing .hc-emphasis-card__title.landing-framing-title {
@@ -1537,7 +1541,53 @@ a.hub-card-menu-item {
 }
 
 .landing-framing-more-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 0.5px solid rgba(60, 60, 67, 0.12);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+  text-align: left;
+  color: var(--hc-emphasis-card-title-fg);
   flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.landing-framing-more-link:active {
+  opacity: 0.88;
+}
+
+.landing-framing-more-link .landing-framing-more-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.landing-framing-more-title {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--hc-emphasis-card-title-fg);
+}
+
+.landing-framing-more-sub {
+  display: block;
+  margin-top: 1px;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--hc-emphasis-card-detail-fg);
+}
+
+.landing-framing-more-chevron {
+  flex-shrink: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--hc-emphasis-card-detail-fg);
 }
 
 .landing-framing-list {
@@ -6009,15 +6059,15 @@ a.wallet-pin-open {
 /* Landing final CTA — hc-emphasis-card (docs/LANDING_FINAL_CTA_EMPHASIS_CARD.md) */
 .landing-final-cta.hc-emphasis-card {
   margin: 0;
-  padding: 7px 12px;
-  gap: 6px 8px;
+  padding: 10px 12px;
+  gap: 8px;
   flex-direction: column;
   align-items: stretch;
   text-align: left;
 }
 
 .landing-final-cta .hc-emphasis-card__main {
-  gap: 10px;
+  gap: 8px;
 }
 
 .landing-final-cta .hc-emphasis-card__title.landing-final-cta-title {
@@ -6039,25 +6089,12 @@ a.wallet-pin-open {
   justify-content: stretch;
 }
 
-.landing-final-cta-btn {
-  flex: 1;
-  min-width: 100%;
+.landing-final-cta-actions .landing-final-cta-btn {
   max-width: 22em;
-  min-height: 46px;
-  padding: 11px 16px;
-  font-size: 16px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  text-align: center;
-  text-decoration: none;
-}
-
-.landing-final-cta .landing-cta-glass {
-  color: var(--red);
 }
 
 .landing-final-cta-foot {
-  margin: 7px 0 0;
+  margin: 4px 0 0;
   font-size: 13px;
   line-height: 1.4;
   color: var(--grey);

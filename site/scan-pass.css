@@ -20,13 +20,11 @@
   /* Emphasis notice cards — keep in sync with site/styles.css :root */
   --hc-emphasis-card-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    inset 0 2px 5px rgba(255, 255, 255, 0.38),
-    inset 0 -1px 2px rgba(60, 60, 67, 0.1),
-    inset 0 -3px 8px rgba(60, 60, 67, 0.07),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.58),
-    0 1px 2px rgba(0, 0, 0, 0.05),
-    0 5px 18px rgba(0, 0, 0, 0.1),
-    0 12px 32px rgba(0, 0, 0, 0.06);
+    inset 0 2px 4px rgba(255, 255, 255, 0.32),
+    inset 0 -1px 2px rgba(60, 60, 67, 0.08),
+    inset 0 0 0 1px rgba(60, 60, 67, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 4px 12px rgba(0, 0, 0, 0.06);
   --hc-emphasis-card-fill-active: linear-gradient(
     160deg,
     #f6f8f7 0%,
@@ -47,9 +45,9 @@
   );
   --hc-emphasis-card-fill-urgent: linear-gradient(
     160deg,
-    #faf6f7 0%,
-    #f5f0f2 48%,
-    #f0e9ec 100%
+    #f7f6f6 0%,
+    #f3f2f2 48%,
+    #eeeded 100%
   );
   --hc-emphasis-card-eyebrow-active: #248a3d;
   --hc-emphasis-card-eyebrow-info: #007aff;
@@ -1192,6 +1190,19 @@ a {
 
 .scan-cross-tab-banner.hc-emphasis-card {
   margin: 0 var(--pad) 12px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.scan-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__main {
+  flex: none;
+  width: 100%;
+}
+
+.scan-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__actions {
+  width: 100%;
+  justify-content: flex-start;
 }
 
 .scan-offline-banner {
