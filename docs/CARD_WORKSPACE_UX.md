@@ -1,6 +1,6 @@
 # Card workspace UX (`/created/`)
 
-**Status:** Phase 0–1 shipped · Phase 2 in progress (compact hub + Advanced tab)  
+**Status:** Phase 0–3 shipped  
 **Pages:** `site/created/index.html` · `site/wallet/` (My cards)  
 **Related:** `docs/CARD_WORKSPACE_PHASE0.md`, `docs/KEYS_CARDS_AND_VERIFICATION.md`, `docs/DEVICE_OS.md`
 
@@ -60,12 +60,22 @@ See `docs/CARD_WORKSPACE_PHASE0.md` — Open card loads keys, auto-save default 
 
 ---
 
-## Planned (Phase 2+)
+## Phase 2 shipped
 
-- **My cards** as primary home for multi-card users — shipped (`/created/` redirects contextless visits to `/wallet/` and points local hub home to `/wallet/`)
-- Compact hub on `/created/` (switcher only) — shipped
-- Single **Advanced** stack in control (collapse Manage panels) — shipped
-- Vouch-ready keys on scan (`docs/VOUCH_READY_KEYS_DESIGN.md`)
+- **My cards** as primary home for multi-card users (`/created/` redirects contextless visits to `/wallet/` and points local hub home to `/wallet/`)
+- Compact hub on `/created/` (switcher only)
+- Single **Advanced** stack in control (collapsed Manage/Help surface)
+- Vouch-ready keys on scan (see `docs/VOUCH_READY_KEYS_DESIGN.md` for shipped phases 1–5)
+
+---
+
+## Phase 3 shipped — My cards home (`/wallet/`)
+
+- `/wallet/` page title and H1: **My cards on this device** (keys still local-only; URL unchanged)
+- Landing path step 4 → **My cards** (`/wallet/`)
+- Landing shortcut **My cards** (was “All saved cards”)
+- Cross-links from `/created/` hub and error copy use **My cards** for `/wallet/`
+- Active-session banner on wallet: **Open controls** (not “Open card page”)
 
 ---
 
@@ -90,6 +100,7 @@ See `docs/CARD_WORKSPACE_PHASE0.md` — Open card loads keys, auto-save default 
 4. **Open card controls** → tabs visible, `fresh` removed, hero **Live QR ready**.
 5. Revisit `/created/?profile_id&qr_id` (no fresh) → control mode directly.
 6. Hub **Open card** on saved row → control with revoke available.
+7. Visit `/created/` with no query → lands on `/wallet/` with **My cards on this device**.
 
 ---
 

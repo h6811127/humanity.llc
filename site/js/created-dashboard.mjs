@@ -119,7 +119,7 @@ export function initCreatedDashboard({
 
       if (!runSave) {
         showFeedback(
-          "No signing keys in this tab. Finish create in this tab, or tap Open controls on Saved cards.",
+          "No signing keys in this tab. Finish create in this tab, or tap Open controls on My cards.",
           true
         );
         return;
@@ -130,7 +130,7 @@ export function initCreatedDashboard({
 
       if (saved === null) {
         showFeedback(
-          "No signing keys in this tab. Finish create in this tab, or tap Open controls on Saved cards.",
+          "No signing keys in this tab. Finish create in this tab, or tap Open controls on My cards.",
           true
         );
         return;
@@ -178,14 +178,14 @@ export function initCreatedDashboard({
       }
     },
     "update-status": () => {
-      selectTab("manage");
+      selectTab("advanced");
       manifestoPanel?.removeAttribute("hidden");
       manifestoPanel?.setAttribute("open", "");
       manifestoPanel?.scrollIntoView({ behavior: "smooth", block: "nearest" });
       markDone("update-status");
     },
     "revoke-qr": () => {
-      selectTab("manage");
+      selectTab("advanced");
       revokeDetails?.setAttribute("open", "");
       revokeDetails?.scrollIntoView({ behavior: "smooth", block: "nearest" });
     },

@@ -1,7 +1,7 @@
 # Card workspace — Phase 0 (footguns)
 
 **Status:** Shipped  
-**Next:** Phase 2 — My cards home — see `docs/CARD_WORKSPACE_UX.md`  
+**Next:** Card workspace Phase 0–3 complete — see `docs/CARD_WORKSPACE_UX.md` · product verticals in `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`  
 **Related:** `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md`, `docs/DEVICE_OS.md`, `docs/REVOKE_UI_INVESTIGATION.md`, `docs/KEYS_CARDS_AND_VERIFICATION.md`
 
 ---

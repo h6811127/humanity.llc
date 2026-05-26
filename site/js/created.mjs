@@ -295,7 +295,7 @@ function initLiveControlProof() {
     btn.disabled = !keys || !activeChallengeId;
     if (!keys) {
       status.textContent =
-        "Open this proof link in the original created tab, or unlock a saved recovery key / encrypted backup in More options. humanity.llc cannot prove control for you.";
+        "Open this proof link in the original created tab, or unlock a saved recovery key / encrypted backup in Advanced. humanity.llc cannot prove control for you.";
       btn.disabled = true;
     } else if (activeChallengeId) {
       btn.textContent = PROVE_BTN_LABEL;
@@ -484,7 +484,7 @@ if (!profileId && !activeQrId && !data) {
   profileIdParam !== data.profile_id
 ) {
   setNoSessionNotice(
-    'This link is for a different card than the keys in this tab. Open <a href="/wallet/">Saved cards</a> and tap <strong>Open controls</strong> on the card you want.'
+    'This link is for a different card than the keys in this tab. Open <a href="/wallet/">My cards</a> and tap <strong>Open controls</strong> on the card you want.'
   );
 }
 
