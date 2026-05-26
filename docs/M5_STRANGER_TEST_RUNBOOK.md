@@ -22,13 +22,15 @@ Run this yourself once (5 minutes):
 7. **Status JSON**  -  replace `PROFILE` and `QR` below:
 
 ```bash
-curl -sS "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status?q=QR" | jq '.scan.kind, .scan.qr.status'
-# After revoke: kind should be "qr_revoked", qr.status "revoked"
+curl -sS "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status?q=QR" | jq '.scan.kind, .scan.error, .scan.qr.status, .scan.limits.scan_analytics'
+# After revoke: kind "qr_revoked", error "QR_REVOKED", qr.status "revoked", scan_analytics false
 ```
 
-8. **No analytics**  -  confirm scan HTML has no third-party trackers (view source / Network tab once).
+8. **No analytics**  -  confirm scan HTML has no third-party trackers (view source / Network tab once); status JSON `scan.limits.scan_analytics` is `false`.
 
-**Deploy check:** scan response header `X-HC-Scan-UI: pass-v5` on an active scan.
+9. **Minimal failure layout** (optional) — revoke card or expire QR; confirm **Card status** + **This QR** groups still appear below the compact panel (human trust hidden).
+
+**Deploy check:** scan response header `X-HC-Scan-UI: pass-v20` (or later) on an active scan.
 
 ---
 

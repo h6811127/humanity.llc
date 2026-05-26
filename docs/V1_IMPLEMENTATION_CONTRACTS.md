@@ -90,7 +90,7 @@ Optional but high-leverage for v1.1 or a strong private alpha:
 | Anonymized scan access log | **Not in v1** | Operator | Data policy default: no scan logging; audit step 2 reconciled (F2-1 / Slice 5 option B) |
 | Status JSON `error` contract codes | **Shipped** | Integrators | Optional `scan.error` alongside `scan.kind` on `…/status?q=` (F2-8) |
 
-Revoked card: `GET …/cards/{id}` returns JSON **410**; `GET /c/…` returns HTML **410** — intentional human vs integrator split (F2-7; document only until aligned).
+**F2-7 integrator vs scanner (v1, intentional):** Phone QR opens `GET /c/…` → HTML scan UI (410 when card revoked). Integrators calling `GET …/cards/{id}` without scan `?q=` receive JSON **410** `{ "error": "CARD_REVOKED" }`, not HTML. Machine scan state: `GET …/status?q=` (see repair spec § Integrator vs scanner HTTP).
 
 ### Verification API
 

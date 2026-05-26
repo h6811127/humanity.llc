@@ -1,7 +1,7 @@
 # Flow 2 — Public QR Scan repair spec
 
 **Date:** 2026-05-25  
-**Status:** Repair backlog (read-only audit complete)  
+**Status:** Repair slices 1–8 complete; F2-5 / F2-6 / F2-10 explicitly deferred  
 **Scope:** `docs/V1_FLOW_AUDIT.md` Flow 2 + `docs/V1_IMPLEMENTATION_CONTRACTS.md` § API (Network + Public Shortcut)  
 **Out of scope:** Storefront, Printify, ceremony credentials, device hub, `/created/` owner UX
 
@@ -47,7 +47,7 @@ Use the right endpoint for the job. Do not treat `GET …/cards/{id}` as a scan 
 
 **UI shape:** Production scan is a **flat status panel** with grouped trust blocks below (see M3). There is no “flippable pass” product mode on `/c/…`; pass-card front/back in M3 refers to visual layout on one page, not a separate Pages route.
 
-**Deferred (documented, not scan substitutes):** `GET /v1/verification/status/{profile_id}`, `POST …/export`, anonymized scan access log (Slice 5 — product decision pending). See mismatch table F2-5, F2-10, F2-1.
+**Deferred (documented, not scan substitutes):** `GET /v1/verification/status/{profile_id}`, `POST …/export`. Scan access logging is **not in v1** (Slice 5 option B). See mismatch table F2-5, F2-10.
 
 ---
 
@@ -77,7 +77,7 @@ Use the right endpoint for the job. Do not treat `GET …/cards/{id}` as a scan 
 | F2-4 | ✅ Fixed: `GET /.well-known/hc/v1/qr/{qr_id}` returns contract-shaped QR metadata (`qr-metadata.ts`). |
 | F2-5 | `GET /v1/verification/status/{profile_id}` not implemented | § API Verification table |
 | F2-6 | Card GET HTML is raw JSON `<pre>`, not public card view | § API: “HTML or JSON public card” |
-| F2-7 | Revoked card: GET card returns JSON 410; scan returns HTML 410 | Integrators vs humans split (document or align) |
+| F2-7 | ✅ Documented: card GET JSON 410 vs scan HTML 410 — intentional v1 split (§ Integrator vs scanner HTTP) |
 | F2-8 | ✅ Fixed: status JSON adds optional `scan.error` contract code alongside `scan.kind` (`scan-contract-error.ts`) |
 | F2-9 | ✅ Fixed: minimal failure scans show compact Card status + This QR groups; human trust hidden (`scanLayoutForMinimalFailureTrust`) |
 | F2-10 | `POST …/export` not routed | § API (defer unless export needed for scan) |
@@ -177,12 +177,37 @@ Use the right endpoint for the job. Do not treat `GET …/cards/{id}` as a scan 
 
 ---
 
+### Slice 8 — Flow 2 closure (F2-7 + regression gates) ✅
+
+**Goal:** Close the repair spec with documented integrator boundaries and automated regression gates.
+
+- [x] Document F2-7 integrator vs scanner HTTP split (below + contracts table).
+- [x] `worker/tests/flow-2-regression.test.ts` — bearer on minimal failures, `scan_analytics: false`, card GET 410 JSON vs scan HTML 410.
+- [x] `docs/M5_STRANGER_TEST_RUNBOOK.md` — `pass-v20` deploy check; optional `scan.error` in curl example.
+
+**Out of scope (explicit deferral):** F2-5 verification status route, F2-6 public card HTML view, F2-10 export route.
+
+---
+
+## Integrator vs scanner HTTP (F2-7)
+
+| Audience | Route | Revoked card | Format |
+|----------|-------|--------------|--------|
+| **Scanner (human)** | `GET /c/{profile_id}?q={qr_id}` | HTTP **410** | HTML trust UI (`scan-html.ts`) |
+| **Integrator (machine)** | `GET …/cards/{profile_id}` | HTTP **410** | JSON `{ "error": "CARD_REVOKED", … }` (`create-card.ts`) |
+| **Integrator (machine)** | `GET …/cards/{profile_id}/status?q=` | HTTP **200** or **410** per `scan.kind` | JSON with `scan.kind` + optional `scan.error` |
+
+Do not point phone QR payloads at `…/cards/{id}` expecting a scan page. Do not expect HTML from the card document GET when `Accept` is default JSON.
+
+---
+
 ## Done when (Flow 2 overall)
 
 - [x] All **P0** slices (2–3) shipped; Slice 1 contract clarity shipped.
-- [ ] `npm run worker:test` green; stranger runbook scan section passes on production.
-- [ ] `curl` checks in `docs/M5_STRANGER_TEST_RUNBOOK.md` still valid for `scan.kind` paths.
-- [ ] No regression: bearer warning on every scan HTML; `scan_analytics: false` in status JSON.
+- [x] Repair slices 4–8 shipped or explicitly deferred (F2-5, F2-6, F2-10).
+- [x] `npm run worker:test` green for `scan*.test.ts`, `scan-status.test.ts`, `qr-metadata.test.ts`, `flow-2-regression.test.ts`, `revocation-display.test.ts`.
+- [x] `curl` checks in `docs/M5_STRANGER_TEST_RUNBOOK.md` updated for `scan.kind` / optional `scan.error`.
+- [x] Regression tests: bearer warning on failure scan HTML; `scan_analytics: false` in status JSON.
 
 ---
 
@@ -217,6 +242,10 @@ Manual:
 
 ## Related next audits
 
-- **Device hub (Phase 10):** owner-side network sync, false “card disabled” notices — see production homepage with saved cards.
-- **M6 vouching:** return-to-scan flow (`hc_vouch_return_url`, `/created/?intent=vouch`).
+Flow 2 repair slices **1–8** are complete. Follow-on work (outside this spec):
+
+- **Scanner Phase F:** credential code on print + scan — see [`SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) (shipped).
+- **Device hub (Phase 10):** [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md) (slices complete).
+- **M6 vouching:** return-to-scan (`hc_vouch_return_url`) — shipped in client; production smoke per [`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md).
 - **Flow 4 artifact intent:** after QR resolution stable.
+- **Deferred API:** F2-5, F2-6, F2-10 per § Reference network — Flow 2 routes in contracts.
