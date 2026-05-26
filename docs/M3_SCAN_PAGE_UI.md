@@ -79,6 +79,7 @@ Below-card rows use **colored tile + white stroke SVG** (same visual language as
 | `site/assets/qr-center-logo.svg` | Design reference for center mark (runtime uses `qr-branding.mjs`) |
 | `docs/QR_BRANDING.md` | Branding spec + QA checklist |
 | `site/js/hc-sign.mjs` | `qrScanUrl(profileId, qrId, origin)` |
+| `site/js/qr-scan-url-lock.mjs` | Host lock for official QR payloads |
 
 After changing `scan-pass.css` or `pass-flip.js`, run `npm run worker:bundle-scan` (included in `worker:deploy`).
 
@@ -93,6 +94,8 @@ After changing `scan-pass.css` or `pass-flip.js`, run `npm run worker:bundle-sca
 | This QR | Pill | Group: QR status, scope, credential id, scan link, bearer warning |
 | Live control |  -  | Group: not shown / proven (M7) |
 | Limitations | Back face summary | Group: not ID, no analytics, data policy link |
+
+**Minimal failure scans** (`qr_revoked`, `qr_expired`, `card_revoked` with `display_mode: minimal`): status panel stays compact; grouped **Card status** and **This QR** rows still render below (human trust hidden). Bearer line remains above the panel.
 
 **Limits copy:** one line above the status panel (`scan-bearer-line`, Level 0 canonical sentence). Status groups are **facts only** (card, human trust, QR, live control). All “does not prove” detail lives in one **settings-style** `<details>` row at the bottom (`scan-limits-settings`). Response header `X-HC-Scan-UI: pass-v20`.
 

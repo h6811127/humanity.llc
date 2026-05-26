@@ -54,6 +54,23 @@ export function parseRevocationDisplayFields(
   return { ok: true, meta: { display_mode: displayMode, public_reason: publicReason } };
 }
 
+/** Flow 2 F2-9: compact status panel + separated card / QR rows; no human trust on minimal failures. */
+export function scanLayoutForMinimalFailureTrust(): {
+  minimalScan: boolean;
+  showCardBlock: boolean;
+  showHumanTrustBlock: boolean;
+  showArtifactBlock: boolean;
+  showLiveControlBlock: boolean;
+} {
+  return {
+    minimalScan: true,
+    showCardBlock: true,
+    showHumanTrustBlock: false,
+    showArtifactBlock: true,
+    showLiveControlBlock: false,
+  };
+}
+
 export function scanLayoutForRevocationDisplay(
   meta: RevocationDisplayMeta | null | undefined
 ): {
@@ -73,13 +90,7 @@ export function scanLayoutForRevocationDisplay(
       showLiveControlBlock: false,
     };
   }
-  return {
-    minimalScan: true,
-    showCardBlock: false,
-    showHumanTrustBlock: false,
-    showArtifactBlock: false,
-    showLiveControlBlock: false,
-  };
+  return scanLayoutForMinimalFailureTrust();
 }
 
 export function publicReasonLabel(reason: string | null | undefined): string | null {

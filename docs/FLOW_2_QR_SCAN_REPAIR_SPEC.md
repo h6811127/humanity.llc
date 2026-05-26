@@ -79,7 +79,7 @@ Use the right endpoint for the job. Do not treat `GET …/cards/{id}` as a scan 
 | F2-6 | Card GET HTML is raw JSON `<pre>`, not public card view | § API: “HTML or JSON public card” |
 | F2-7 | Revoked card: GET card returns JSON 410; scan returns HTML 410 | Integrators vs humans split (document or align) |
 | F2-8 | ✅ Fixed: status JSON adds optional `scan.error` contract code alongside `scan.kind` (`scan-contract-error.ts`) |
-| F2-9 | Minimal scan layouts hide trust blocks | Acceptance “separates … statuses” not met on `qr_expired` / some revoked layouts |
+| F2-9 | ✅ Fixed: minimal failure scans show compact Card status + This QR groups; human trust hidden (`scanLayoutForMinimalFailureTrust`) |
 | F2-10 | `POST …/export` not routed | § API (defer unless export needed for scan) |
 
 ---
@@ -164,14 +164,16 @@ Use the right endpoint for the job. Do not treat `GET …/cards/{id}` as a scan 
 
 ---
 
-### Slice 7 — Minimal layouts vs trust separation (P2)
+### Slice 7 — Minimal layouts vs trust separation (P2) ✅
 
 **Goal:** Acceptance test parity on failure states.
 
-- [ ] For `qr_revoked` / `qr_expired` / `card_revoked` (minimal): still show compact rows for card status + QR status + bearer (even if human trust hidden).
-- [ ] Or update acceptance tests in contracts doc to exempt minimal layouts.
+- [x] For `qr_revoked` / `qr_expired` / `card_revoked` (minimal): compact **Card status** + **This QR** groups + bearer line; human trust and live control hidden.
+- [x] Tombstone revocation display unchanged (richer status panel, no artifact group).
 
 **Done when:** Product sign-off + tests updated consistently.
+
+**Files:** `revocation-display.ts`, `scan-state.ts`, `worker/tests/scan.test.ts`, `worker/tests/revocation-display.test.ts`.
 
 ---
 

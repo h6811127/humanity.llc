@@ -424,23 +424,32 @@ describe("renderScanPage M3.2 trust blocks", () => {
     );
     expect(vm.kind).toBe("card_revoked");
     expect(vm.minimalScan).toBe(true);
+    expect(vm.showCardBlock).toBe(true);
+    expect(vm.showArtifactBlock).toBe(true);
+    expect(vm.showHumanTrustBlock).toBe(false);
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).toContain("This card has been disabled");
     expect(html).toContain("Show link");
     expect(html).toContain("scan-safety-header");
     expect(html).toContain("scan-safety-strip--bad");
+    expect(html).toContain("Card status");
+    expect(html).toContain("This QR");
     expect(html).not.toContain("Human trust");
   });
 
   it("renders QR expired minimal while card stays active (M4.6)", async () => {
-    const expiredQr = "qr_expired_test_001";
+    const expiredQr = "qr_expiredtest999";
     const past = new Date(Date.now() - 86_400_000).toISOString();
     const vm = buildScanViewModel(
       PROFILE,
       expiredQr,
       {
         card: card(),
-        qr: qr({ qr_id: expiredQr, expires_at: past }),
+        qr: qr({
+          qr_id: expiredQr,
+          expires_at: past,
+          payload: `https://humanity.llc/c/${PROFILE}?q=${expiredQr}`,
+        }),
         verification: summary(),
         revocationDisplay: null,
       },
@@ -448,21 +457,31 @@ describe("renderScanPage M3.2 trust blocks", () => {
     );
     expect(vm.kind).toBe("qr_expired");
     expect(vm.minimalScan).toBe(true);
+    expect(vm.showCardBlock).toBe(true);
+    expect(vm.showArtifactBlock).toBe(true);
+    expect(vm.showHumanTrustBlock).toBe(false);
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).toContain("This QR has expired");
     expect(html).toContain("scan-safety-header");
     expect(html).toContain("scan-safety-strip--warn");
+    expect(html).toContain("Card status");
+    expect(html).toContain("This QR");
+    expect(html).not.toContain("Human trust");
     expect(html).not.toContain('id="pass-flip-btn"');
   });
 
   it("renders QR revoked minimal while card stays active (M4.5)", async () => {
-    const revokedQr = "qr_revoked_sibling_test";
+    const revokedQr = "qr_revokedsibtest99";
     const vmRevoked = buildScanViewModel(
       PROFILE,
       revokedQr,
       {
         card: card(),
-        qr: qr({ qr_id: revokedQr, status: "revoked" }),
+        qr: qr({
+          qr_id: revokedQr,
+          status: "revoked",
+          payload: `https://humanity.llc/c/${PROFILE}?q=${revokedQr}`,
+        }),
         verification: summary(),
         revocationDisplay: null,
       },
@@ -470,11 +489,16 @@ describe("renderScanPage M3.2 trust blocks", () => {
     );
     expect(vmRevoked.kind).toBe("qr_revoked");
     expect(vmRevoked.minimalScan).toBe(true);
+    expect(vmRevoked.showCardBlock).toBe(true);
+    expect(vmRevoked.showArtifactBlock).toBe(true);
+    expect(vmRevoked.showHumanTrustBlock).toBe(false);
     const htmlRevoked = await renderScanPage(vmRevoked, "https://humanity.llc");
     expect(htmlRevoked).toContain("This QR is no longer valid");
     expect(htmlRevoked).toContain("Show link");
     expect(htmlRevoked).toContain("scan-safety-header");
     expect(htmlRevoked).toContain("scan-safety-strip--bad");
+    expect(htmlRevoked).toContain("Card status");
+    expect(htmlRevoked).toContain("This QR");
     expect(htmlRevoked).not.toContain("Human trust");
     expect(htmlRevoked).not.toContain('id="pass-flip-btn"');
 
@@ -483,7 +507,11 @@ describe("renderScanPage M3.2 trust blocks", () => {
       revokedQr,
       {
         card: card(),
-        qr: qr({ qr_id: revokedQr, status: "revoked" }),
+        qr: qr({
+          qr_id: revokedQr,
+          status: "revoked",
+          payload: `https://humanity.llc/c/${PROFILE}?q=${revokedQr}`,
+        }),
         verification: summary(),
         revocationDisplay: {
           display_mode: "tombstone",
