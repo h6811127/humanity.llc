@@ -2,7 +2,7 @@
 
 **Status:** Implementation contract for Worker HTML  
 **Product spec (scanner safety, recognition, external-link policy, hero IA):** [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md)  
-**Visual direction:** [`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) § Scan page visual spec  
+**Visual direction:** [`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) § Scan page visual spec · **Hero card styling:** [`SCAN_HERO_CARD_VISUAL_SPEC.md`](SCAN_HERO_CARD_VISUAL_SPEC.md)  
 **Design reference (target):** `assets/Nerd Mobile Post Scan Render.png`  
 **Route map (scan vs card JSON vs status vs qr metadata):** [`docs/FLOW_2_QR_SCAN_REPAIR_SPEC.md`](FLOW_2_QR_SCAN_REPAIR_SPEC.md) § Public scan surfaces  
 **Related:** `docs/V1_PRODUCT_TRUST_MODEL.md`, `docs/V1_0_ARCHITECTURE_ROADMAP.md` §7, `docs/V1_IMPLEMENTATION_CONTRACTS.md` (QR payload + § Reference network - Flow 2 routes)
@@ -24,7 +24,7 @@ Response header when the new UI is live: `X-HC-Scan-UI: pass-v33` (or later). **
 `scan-html.ts` renders, top to bottom:
 
 1. **Page chrome** (`renderScanPageChrome` + `scan-page-dot.mjs`) - **status dot only** for strangers (home link). **Progressive viewer device** dot when vouch-ready (`scan-page-dot--dynamic`); tap opens **scan glance** — not the hub sheet. **Hero card** (`renderScanHeroHost`) shows a muted `humanity.llc` wordmark only (`pass-v31`); no second dot inside the card.
-2. **Live check hero** (`renderScanHeroSection`) - quiet text-only `humanity.llc` host label (no dot in card; `pass-v31`), single status strip, H1 (manifesto / plate / `@handle` / failure copy), steward strip, trust pills on personal cards, resolver line, **Level 0 bearer line** (`scan-hero-limit`), detail chips, first-seen footnote, demoted QR (`scan-hero-qr`).
+2. **Live check hero** (`renderScanHeroSection`) - quiet text-only `humanity.llc` host label (no dot in card; `pass-v31`), single status strip, H1 (manifesto / plate / `@handle` / failure copy), steward strip, trust pills on personal cards, resolver line, **Level 0 bearer line** (`scan-hero-limit`), detail chips, first-seen footnote, demoted QR (`scan-hero-qr`). Visual rules: [`SCAN_HERO_CARD_VISUAL_SPEC.md`](SCAN_HERO_CARD_VISUAL_SPEC.md).
 3. **What this scan shows** (`renderScanTrustModules`) - bullet list only (active scans).
 4. **What this scan does not prove** (`renderLimitsSettings`) - single collapsible `<details id="scan-limits-settings">` directly under (3); no separate `scan-does-not-prove` warning card.
 5. **Check at scan time** (`renderTrustGroups`) - Card status, Human trust, This QR, Live control in thick `<details class="scan-trust-details">` rows: colored list icon, title, one-line peek (e.g. `Active`, `Registered`, `QR active`), chevron; inner `<ul class="list">` unchanged. Vouch block follows when eligible.
@@ -164,6 +164,7 @@ Below-card rows use **colored tile + white stroke SVG** (same visual language as
 | `site/js/qr-scan-url-lock.mjs` | Host lock for official QR payloads |
 | `site/js/scan-tab-keys.mjs` | Cross-tab + chrome refresh on scan (today: banner only) |
 | `docs/SCAN_PAGE_DEVICE_DOT.md` | Phase 8: progressive device dot + scan glance (spec) |
+| `docs/SCAN_HERO_CARD_VISUAL_SPEC.md` | Hero surface, depth tiers, typography, motion |
 
 After changing `scan-pass.css` or `pass-flip.js`, run `npm run worker:bundle-scan` (included in `worker:deploy`).
 

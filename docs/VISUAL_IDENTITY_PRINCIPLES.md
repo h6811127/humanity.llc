@@ -164,7 +164,7 @@ Most important:
 
 ## Scan page visual spec
 
-Resolver HTML (`scan-pass.css`, bundled to Worker). Product rules: [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md).
+Resolver HTML (`scan-pass.css`, bundled to Worker). Product rules: [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md). **Hero card (surface, depth tiers, anatomy):** [`SCAN_HERO_CARD_VISUAL_SPEC.md`](SCAN_HERO_CARD_VISUAL_SPEC.md).
 
 | Topic | Spec |
 |-------|------|
