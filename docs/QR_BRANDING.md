@@ -132,6 +132,21 @@ Official framed QRs include a short **HC-XXXX-XXXX** line under `humanity.llc`, 
 
 Optional verifier: [`/verify/`](https://humanity.llc/verify/).
 
+---
+
+## Print QA watermark (Phase G)
+
+Fulfillment / operator proof sheets add a diagonal **HUMANITY PRINT PROOF** / **DO NOT SHIP** overlay (`site/js/qr-print-qa-watermark.mjs`). Customer DIY exports omit it.
+
+| Entry | Use |
+|-------|-----|
+| `renderPrintStickerSvg(framed, { qaWatermark: true })` | Browser or tooling |
+| `renderPrintProofStickerFromScanUrl(scanUrl)` | Worker proof export |
+
+```bash
+npm run worker:test -- worker/tests/qr-print-qa-watermark.test.ts
+```
+
 ```bash
 npm run worker:test -- worker/tests/qr-credential-code.test.ts
 ```

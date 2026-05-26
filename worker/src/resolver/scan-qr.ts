@@ -47,6 +47,21 @@ export async function renderPrintStickerFromScanUrl(scanUrl: string): Promise<st
   });
 }
 
+/**
+ * Fulfillment / operator proof sheet with QA watermark (do not ship to production).
+ */
+export async function renderPrintProofStickerFromScanUrl(
+  scanUrl: string
+): Promise<string> {
+  const framed = await renderFramedScanQrSvg(scanUrl);
+  const credentialCode = credentialCodeFromScanUrl(scanUrl);
+  return buildPrintStickerSheetSvg(framed, {
+    credentialCode: credentialCode ?? undefined,
+    qaWatermark: true,
+    showGuides: true,
+  });
+}
+
 /** @deprecated Use renderScanQrMarkup — kept for tests that expect data URLs */
 export async function scanQrDataUrl(scanUrl: string): Promise<string> {
   assertOfficialScanUrl(scanUrl);

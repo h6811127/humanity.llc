@@ -101,7 +101,9 @@ Third parties must not ship lookalike “Humanity pink” QRs that encode non-Hu
 
 **Engineering rule:** Do not fork frame styling in product pages; tune `qrFrameMetrics()` in `qr-branding.mjs` only.
 
-**Shipped (Phase F):** Short credential code (`HC-XXXX-XXXX`) under on-page QR and on print stickers; same value in `scan.qr.credential_code` on status JSON. Derived in `site/js/qr-credential-code.mjs` (not secret). **Optional later:** print QA watermark for fulfillment pipeline.
+**Shipped (Phase F):** Short credential code (`HC-XXXX-XXXX`) under on-page QR and on print stickers; same value in `scan.qr.credential_code` on status JSON. Derived in `site/js/qr-credential-code.mjs` (not secret).
+
+**Shipped (Phase G):** Print QA watermark for fulfillment proofs — diagonal `HUMANITY PRINT PROOF` / `DO NOT SHIP` overlay via `site/js/qr-print-qa-watermark.mjs`; `renderPrintStickerSvg(..., { qaWatermark: true })` or Worker `renderPrintProofStickerFromScanUrl`. Customer DIY print sheets omit the watermark; operator proof exports include it.
 
 ---
 

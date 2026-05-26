@@ -61,6 +61,13 @@ describe("renderPrintStickerSvg", () => {
     expect(sheet).not.toContain("hc-print-crop-marks");
     expect(sheet).not.toContain("hc-print-trim-guide");
   });
+
+  it("adds QA watermark when qaWatermark is true", async () => {
+    const framed = await sampleFramedSvg();
+    const sheet = renderPrintStickerSvg(framed, { qaWatermark: true });
+    expect(sheet).toContain("hc-print-qa-watermark");
+    expect(sheet).toContain("HUMANITY PRINT PROOF");
+  });
 });
 
 describe("renderPrintStickerFromScanUrl", () => {
