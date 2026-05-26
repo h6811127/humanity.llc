@@ -493,4 +493,55 @@ test.describe("device inbox — live proof poll scope (request budget phase 1)",
     await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
     await expect.poll(() => challengeFetches, { timeout: 15_000 }).toBeGreaterThan(0);
   });
+
+  test("expanded hub fetches one live-control challenge per tick (3 cards)", async ({
+    page,
+  }) => {
+    const entries = [0, 1, 2].map((i) => ({
+      ...WALLET_ENTRY,
+      id: `e2e_inbox_rr_${i}`,
+      label: `E2E Card ${i}`,
+      profile_id: `7Xk9mP2nQ4rT6vW8yZ1aB3cD${i}`,
+      qr_id: `qr_E2eWakketTest${i + 7}`,
+      scan_url: `http://127.0.0.1:8787/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD${i}?q=qr_E2eWakketTest${i + 7}`,
+    }));
+
+    await page.addInitScript((wallet) => {
+      localStorage.setItem("hc_wallet", JSON.stringify(wallet));
+      sessionStorage.setItem("hc_hub_open", "0");
+    }, entries);
+
+    let challengeFetches = 0;
+    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", (route) => {
+      challengeFetches += 1;
+      return mockNoChallenge(route);
+    });
+
+    await page.goto("/");
+    await page.locator("#brand-status-dot-btn").click();
+    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
+    await expect.poll(() => challengeFetches, { timeout: 15_000 }).toBe(1);
+    await page.waitForTimeout(2000);
+    expect(challengeFetches).toBe(1);
+  });
+
+  test("expanded hub does not poll live-control when resolver health is degraded", async ({
+    page,
+  }) => {
+    await page.route("**/.well-known/hc/v1/health**", (route) =>
+      mockHealth(route, "degraded")
+    );
+
+    let challengeFetches = 0;
+    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", (route) => {
+      challengeFetches += 1;
+      return mockNoChallenge(route);
+    });
+
+    await page.goto("/");
+    await page.locator("#brand-status-dot-btn").click();
+    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
+    await page.waitForTimeout(5000);
+    expect(challengeFetches).toBe(0);
+  });
 });

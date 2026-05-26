@@ -88,7 +88,12 @@ import {
   refreshLiveControlInbox,
   enableLiveControlInboxPolling,
   isLiveControlInboxPollingActive,
+  LIVE_CONTROL_POLL_SCOPE_CHANGED,
 } from "./device-live-control-inbox.mjs";
+import {
+  isDeviceHubExpanded,
+  walletNetworkVisibilityRefreshAllowed,
+} from "./device-live-control-poll-scheduler.mjs";
 
 function escapeHtml(s) {
   return String(s)
@@ -536,8 +541,11 @@ function reapplyRevokedSinceVisitFromLatestResolved() {
   );
 }
 
+let lastWalletNetworkFetchAt = 0;
+
 async function fetchAndApplyNetworkChips() {
   if (!hubConfig.fetchNetworkStatus || !savedList) return;
+  lastWalletNetworkFetchAt = Date.now();
   const stored = loadWallet();
   if (stored.length === 0) return;
   const { entries, changed: qrBackfill } = normalizeWalletQrIds(stored);
@@ -1190,7 +1198,21 @@ export function initDeviceHub(config = {}) {
     if (document.visibilityState === "visible") {
       const hubEl = document.getElementById("device-hub");
       const hubCollapsed = hubEl?.classList.contains("device-hub-collapsed") ?? false;
-      if (!hubCollapsed) void fetchAndApplyNetworkChips();
+      if (
+        !hubCollapsed &&
+        walletNetworkVisibilityRefreshAllowed(lastWalletNetworkFetchAt)
+      ) {
+        void fetchAndApplyNetworkChips();
+      }
+    }
+  });
+
+  window.addEventListener(LIVE_CONTROL_POLL_SCOPE_CHANGED, () => {
+    if (!hubConfig.fetchNetworkStatus) return;
+    const hubEl = document.getElementById("device-hub");
+    const onWalletPage = document.body.classList.contains("page-wallet");
+    if (onWalletPage || isDeviceHubExpanded(hubEl)) {
+      void fetchAndApplyNetworkChips();
     }
   });
 

@@ -7,6 +7,11 @@ import { getLiveControlPollHealth } from "./device-live-control-inbox-core.mjs";
 /** @type {'ok' | 'degraded' | 'offline'} */
 let resolverHealthStatus = "offline";
 
+/** @returns {'ok' | 'degraded' | 'offline'} */
+export function getResolverHealthStatus() {
+  return resolverHealthStatus;
+}
+
 /** @param {'ok' | 'degraded' | 'offline'} status */
 export function setResolverHealthStatusForSinceVisit(status) {
   resolverHealthStatus = status === "ok" || status === "degraded" || status === "offline" ? status : "offline";

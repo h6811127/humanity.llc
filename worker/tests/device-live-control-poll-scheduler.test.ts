@@ -3,11 +3,17 @@ import { describe, expect, it } from "vitest";
 import {
   LIVE_CONTROL_POLL_MS_ACTIVE,
   LIVE_CONTROL_POLL_MS_IDLE,
+  WALLET_NETWORK_VISIBILITY_REFRESH_MS,
   isDeviceHubExpanded,
   liveControlPollIntervalMs,
+  liveControlPollAllowedByResolverHealth,
+  liveControlPollLoopShouldRun,
   liveControlPollTickShouldFetch,
   liveControlPollingShouldRun,
+  nextRoundRobinIndex,
+  pickRoundRobinPollIndex,
   resolveLiveControlPollScope,
+  walletNetworkVisibilityRefreshAllowed,
 } from "../../site/js/device-live-control-poll-scheduler.mjs";
 
 describe("liveControlPollIntervalMs", () => {
@@ -62,6 +68,37 @@ describe("liveControlPollingShouldRun", () => {
   });
 });
 
+describe("liveControlPollAllowedByResolverHealth", () => {
+  it("allows polling only when resolver health is ok", () => {
+    expect(liveControlPollAllowedByResolverHealth("ok")).toBe(true);
+    expect(liveControlPollAllowedByResolverHealth("degraded")).toBe(false);
+    expect(liveControlPollAllowedByResolverHealth("offline")).toBe(false);
+  });
+});
+
+describe("liveControlPollLoopShouldRun", () => {
+  it("requires scope and resolver ok", () => {
+    expect(
+      liveControlPollLoopShouldRun({
+        scopeActive: true,
+        resolverHealth: "ok",
+      })
+    ).toBe(true);
+    expect(
+      liveControlPollLoopShouldRun({
+        scopeActive: true,
+        resolverHealth: "degraded",
+      })
+    ).toBe(false);
+    expect(
+      liveControlPollLoopShouldRun({
+        scopeActive: false,
+        resolverHealth: "ok",
+      })
+    ).toBe(false);
+  });
+});
+
 describe("liveControlPollTickShouldFetch", () => {
   it("skips when tab hidden or in backoff", () => {
     expect(
@@ -104,6 +141,35 @@ describe("isDeviceHubExpanded", () => {
       classList: { contains: () => false },
     };
     expect(isDeviceHubExpanded(expanded)).toBe(true);
+  });
+});
+
+describe("round-robin poll index", () => {
+  it("picks one index per tick and advances cursor", () => {
+    expect(pickRoundRobinPollIndex(0, 3)).toBe(0);
+    expect(nextRoundRobinIndex(0, 3)).toBe(1);
+    expect(pickRoundRobinPollIndex(2, 3)).toBe(2);
+    expect(nextRoundRobinIndex(2, 3)).toBe(0);
+    expect(pickRoundRobinPollIndex(0, 0)).toBe(-1);
+    expect(nextRoundRobinIndex(0, 0)).toBe(0);
+  });
+});
+
+describe("walletNetworkVisibilityRefreshAllowed", () => {
+  it("allows first fetch and blocks until min interval", () => {
+    expect(walletNetworkVisibilityRefreshAllowed(0, 1000)).toBe(true);
+    expect(
+      walletNetworkVisibilityRefreshAllowed(
+        1000,
+        1000 + WALLET_NETWORK_VISIBILITY_REFRESH_MS - 1
+      )
+    ).toBe(false);
+    expect(
+      walletNetworkVisibilityRefreshAllowed(
+        1000,
+        1000 + WALLET_NETWORK_VISIBILITY_REFRESH_MS
+      )
+    ).toBe(true);
   });
 });
 

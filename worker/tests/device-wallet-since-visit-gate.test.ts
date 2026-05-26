@@ -1,6 +1,7 @@
 import { describe, expect, it, beforeEach } from "vitest";
 
 import {
+  getResolverHealthStatus,
   setResolverHealthStatusForSinceVisit,
   shouldSuppressCardDisabledSinceVisitAlerts,
 } from "../../site/js/device-wallet-since-visit-gate.mjs";
@@ -9,6 +10,15 @@ import {
   getLiveControlPollHealth,
   setLiveControlPollHealth,
 } from "../../site/js/device-live-control-inbox-core.mjs";
+
+describe("getResolverHealthStatus", () => {
+  it("returns the last resolver health written for since-visit gating", () => {
+    setResolverHealthStatusForSinceVisit("degraded");
+    expect(getResolverHealthStatus()).toBe("degraded");
+    setResolverHealthStatusForSinceVisit("ok");
+    expect(getResolverHealthStatus()).toBe("ok");
+  });
+});
 
 describe("shouldSuppressCardDisabledSinceVisitAlerts", () => {
   beforeEach(() => {

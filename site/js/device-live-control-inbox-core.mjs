@@ -70,6 +70,73 @@ export function isPollableWalletEntry(entry) {
 }
 
 /**
+ * Stable key for round-robin live-control poll slots.
+ * @param {WalletPollEntry | null | undefined} entry
+ */
+export function liveControlPollEntryKey(entry) {
+  if (!isPollableWalletEntry(entry)) return "";
+  return `${entry.profile_id}:${walletEntryQrId(entry)}`;
+}
+
+/**
+ * @param {LiveControlPollHealth} currentHealth
+ * @param {LiveControlPollKind} resultKind result from a single-card poll tick
+ * @returns {LiveControlPollHealth}
+ */
+export function applySingleCardPollHealth(currentHealth, resultKind) {
+  if (resultKind === "rate_limited") return currentHealth;
+  if (resultKind === "unreachable") {
+    return currentHealth === "ok" ? "degraded" : currentHealth;
+  }
+  return "ok";
+}
+
+/**
+ * @param {Map<string, LiveControlPendingItem | null>} slots
+ * @param {WalletPollEntry} entry
+ * @param {{ kind: LiveControlPollKind, item?: LiveControlPendingItem }} result
+ */
+export function updateLiveControlPollSlot(slots, entry, result) {
+  const key = liveControlPollEntryKey(entry);
+  if (!key) return;
+  if (result.kind === "pending" && result.item) {
+    slots.set(key, result.item);
+    return;
+  }
+  if (result.kind === "none") {
+    slots.delete(key);
+  }
+}
+
+/**
+ * @param {WalletPollEntry[]} entries
+ * @param {Map<string, LiveControlPendingItem | null>} slots
+ */
+export function pendingItemsFromPollSlots(entries, slots) {
+  const next = [];
+  for (const entry of entries) {
+    const key = liveControlPollEntryKey(entry);
+    if (!key) continue;
+    const item = slots.get(key);
+    if (item) next.push(item);
+  }
+  return next;
+}
+
+/**
+ * @param {Map<string, LiveControlPendingItem | null>} slots
+ * @param {WalletPollEntry[]} entries
+ */
+export function pruneLiveControlPollSlots(slots, entries) {
+  const valid = new Set(
+    entries.map((e) => liveControlPollEntryKey(e)).filter(Boolean)
+  );
+  for (const key of slots.keys()) {
+    if (!valid.has(key)) slots.delete(key);
+  }
+}
+
+/**
  * @param {unknown} body
  * @param {Record<string, unknown>} entry
  * @returns {LiveControlPendingItem | null}

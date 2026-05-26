@@ -1,10 +1,13 @@
 /**
- * Pure scheduling rules for live-control inbox polling (request budget Phase 1).
+ * Pure scheduling rules for live-control inbox polling (request budget Phases 1–3).
  * @see docs/DEVICE_OS_REQUEST_BUDGET.md
  */
 
 export const LIVE_CONTROL_POLL_MS_ACTIVE = 5000;
 export const LIVE_CONTROL_POLL_MS_IDLE = 30_000;
+
+/** Minimum gap between wallet network refreshes on tab visibility (Phase 2). */
+export const WALLET_NETWORK_VISIBILITY_REFRESH_MS = 60_000;
 
 /**
  * @param {number} pendingCount
@@ -43,6 +46,28 @@ export function liveControlPollTickShouldFetch(input) {
 }
 
 /**
+ * Phase 3: do not poll live-control while resolver health is degraded/offline.
+ *
+ * @param {'ok' | 'degraded' | 'offline'} resolverHealth
+ */
+export function liveControlPollAllowedByResolverHealth(resolverHealth) {
+  return resolverHealth === "ok";
+}
+
+/**
+ * @param {{
+ *   scopeActive: boolean,
+ *   resolverHealth: 'ok' | 'degraded' | 'offline',
+ * }} input
+ */
+export function liveControlPollLoopShouldRun(input) {
+  return (
+    input.scopeActive &&
+    liveControlPollAllowedByResolverHealth(input.resolverHealth)
+  );
+}
+
+/**
  * Resolve hub-expanded from DOM (sheet hub only).
  * @param {HTMLElement | null} hubEl `#device-hub` when present
  */
@@ -64,4 +89,36 @@ export function resolveLiveControlPollScope(input) {
     inboxSheetOpen: input.inboxSheetOpen === true,
     walletPage: input.walletPage === true,
   });
+}
+
+/**
+ * @param {number} cursor
+ * @param {number} length pollable wallet rows
+ */
+export function pickRoundRobinPollIndex(cursor, length) {
+  if (length <= 0) return -1;
+  return cursor % length;
+}
+
+/**
+ * @param {number} cursor index used on the last tick
+ * @param {number} length pollable wallet rows
+ */
+export function nextRoundRobinIndex(cursor, length) {
+  if (length <= 0) return 0;
+  return (cursor + 1) % length;
+}
+
+/**
+ * @param {number} lastFetchAt epoch ms; 0 = never
+ * @param {number} [now]
+ * @param {number} [minMs]
+ */
+export function walletNetworkVisibilityRefreshAllowed(
+  lastFetchAt,
+  now = Date.now(),
+  minMs = WALLET_NETWORK_VISIBILITY_REFRESH_MS
+) {
+  if (!lastFetchAt || lastFetchAt <= 0) return true;
+  return now - lastFetchAt >= minMs;
 }
