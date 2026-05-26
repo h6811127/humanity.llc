@@ -278,10 +278,5 @@ if (glanceTargets.length > 0) {
   window.addEventListener(NETWORK_REFRESHED, refreshHubGlance);
   window.addEventListener(NETWORK_BASELINE_CHANGED, refreshHubGlance);
   window.addEventListener("hc-live-control-inbox-changed", refreshHubGlance);
-  window.addEventListener("hc-tab-presence-changed", refreshHubGlance);
-  window.addEventListener("storage", (e) => {
-    if (e.key === "hc_wallet" || e.key === "hc_created" || e.key === "hc_tab_keys_presence") {
-      refreshHubGlance();
-    }
-  });
+  // Phase 2: device-chrome-refresh owns cross-tab and storage-driven refresh scheduling.
 }

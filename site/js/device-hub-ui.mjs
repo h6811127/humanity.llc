@@ -618,6 +618,15 @@ function syncHubInboxAlertGroups() {
   });
 }
 
+/**
+ * Refresh only inbox-derived hub alert groups.
+ * Called by the chrome refresh coordinator to avoid re-rendering the full hub.
+ */
+export function refreshHubInboxAlertsFromChrome() {
+  syncHubInboxAlertGroups();
+  refreshEmptyHint();
+}
+
 function renderActivityRows() {
   const entries = loadActivity().slice(0, HUB_RECENT_DISPLAY_LIMIT);
   if (!activityList || !activityGroup) return;
@@ -1280,10 +1289,7 @@ export function initDeviceHub(config = {}) {
     notifyHubChanged();
   });
 
-  window.addEventListener("hc-tab-presence-changed", () => {
-    syncHubInboxAlertGroups();
-    refreshEmptyHint();
-  });
+  // Phase 2: device-chrome-refresh owns cross-tab refresh scheduling.
 }
 
 window.addEventListener("hc-focus-hub-search", () => focusHubSearch());

@@ -102,7 +102,7 @@ stateDiagram-v2
 
 **Shipped modules:** `device-cross-tab-state-core.mjs`, `device-cross-tab-state.mjs`; `gatherInboxInput()` wired; custody invalidation on `hc_wallet` / `hc_created` / hub / denylist; shell manifest + `DEVICE_SHELL_ASSET_VERSION` **36**.
 
-### Phase 2 — Single chrome refresh coordinator
+### Phase 2 — Single chrome refresh coordinator ✅
 
 **Deliverable:**
 
@@ -114,6 +114,8 @@ stateDiagram-v2
 - Remove duplicate listeners listed in spec § Event fan-out.
 
 **Acceptance:** One presence heartbeat → one coalesced refresh; no `renderCrossTabKeysBanner` registered twice.
+
+**Shipped:** `device-chrome-refresh.mjs` coordinator, removed duplicate `hc-tab-presence-changed` listeners from hub/banner/glance/sheet/wallet, and wired `device-status.mjs` to delegate cross-tab chrome refresh.
 
 ### Phase 3 — Wire all surfaces to snapshot
 

@@ -303,8 +303,7 @@ let crossTabListenersBound = false;
 function ensureCrossTabListeners() {
   if (crossTabListenersBound) return;
   crossTabListenersBound = true;
-  window.addEventListener("hc-tab-presence-changed", renderCrossTabKeysBanner);
-  window.addEventListener("hc-device-hub-changed", renderCrossTabKeysBanner);
+  // Phase 2: device-chrome-refresh owns cross-tab refresh scheduling.
 }
 
 if (banner || hubSlot || scanBanner) {

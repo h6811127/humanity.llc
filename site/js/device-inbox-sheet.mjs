@@ -2,8 +2,8 @@
  * Compact inbox bottom sheet — badge tap and open_notifications.
  * @see docs/DEVICE_INBOX.md phase 3
  */
-import { buildInboxItems, buildInboxSheetRows } from "./device-inbox-core.mjs?v=36";
-import { gatherInboxInput, getInboxItems, notificationCount } from "./device-inbox.mjs?v=36";
+import { buildInboxItems, buildInboxSheetRows } from "./device-inbox-core.mjs?v=37";
+import { gatherInboxInput, getInboxItems, notificationCount } from "./device-inbox.mjs?v=37";
 import {
   formatLiveControlExpiry,
   getLiveControlPending,
@@ -16,20 +16,20 @@ import {
   actOnOrphanRemovedTabKeys,
 } from "./device-orphan-keys-nav.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
-import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=36";
+import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=37";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import { prefersReducedMotion } from "./device-shell-motion.mjs";
 import { closeGlancePopover } from "./device-hub-glance-popover.mjs";
-import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs?v=36";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=36";
-import { inboxSheetReconcileAction } from "./device-inbox-sheet-core.mjs?v=36";
+import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs?v=37";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=37";
+import { inboxSheetReconcileAction } from "./device-inbox-sheet-core.mjs?v=37";
 import {
   bindSheetLifecycleReconcile,
   syncSheetBackdropClosed,
-} from "./device-sheet-backdrop-sync.mjs?v=36";
+} from "./device-sheet-backdrop-sync.mjs?v=37";
 
 const SHEET_ID = "device-inbox-sheet";
 const LIST_ID = "device-inbox-sheet-list";
@@ -300,6 +300,9 @@ export function openInboxFromChrome(source) {
 }
 
 function bindInboxSheetRefresh() {
+  // Phase 2: device-chrome-refresh owns cross-tab and inbox refresh scheduling.
+  // Keep only live-proof and network baseline updates here so the sheet stays fresh
+  // even when cross-tab listeners are consolidated.
   const refresh = () => {
     if (!sheetOpen) return;
     renderInboxSheet();
@@ -308,14 +311,8 @@ function bindInboxSheetRefresh() {
     }
   };
   window.addEventListener("hc-live-control-inbox-changed", refresh);
-  window.addEventListener("hc-tab-presence-changed", refresh);
   window.addEventListener(NETWORK_BASELINE_CHANGED, refresh);
   window.addEventListener(NETWORK_REFRESHED, refresh);
-  window.addEventListener("storage", (e) => {
-    if (e.key === "hc_created" || e.key === "hc_wallet" || e.key === "hc_tab_keys_presence") {
-      refresh();
-    }
-  });
 }
 
 ensureInboxSheetDom();

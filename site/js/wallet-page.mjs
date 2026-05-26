@@ -6,7 +6,7 @@ import { isAutoSaveEnabled, initAutoSaveToggle } from "./device-auto-save.mjs";
 import { initDeviceHub, refreshDeviceHub } from "./device-hub-ui.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
-import { gatherInboxInput } from "./device-inbox.mjs";
+import { refreshWalletContextFromChrome } from "./wallet-page-chrome.mjs";
 import { createPinEntry, loadPins, savePins } from "./device-pins.mjs";
 import { mountKeysCustody } from "./device-keys-custody.mjs";
 import {
@@ -22,7 +22,6 @@ const saveLabel = document.getElementById("wallet-save-label");
 const activeBanner = document.getElementById("wallet-active-banner");
 const activeText = document.getElementById("wallet-active-text");
 const activeLink = document.getElementById("wallet-active-link");
-const tabHint = document.getElementById("wallet-tab-hint");
 const autoSaveLine = document.getElementById("wallet-auto-save-line");
 const helpDetails = document.getElementById("wallet-help-details");
 const pinForm = document.getElementById("pin-save-form");
@@ -53,31 +52,11 @@ function refreshHelpVisibility() {
   helpDetails.hidden = loadWallet().length > 0;
 }
 
-function updateTabHint() {
-  if (!tabHint) return;
-  const input = gatherInboxInput();
-  if (input.orphanRemovedEntries.length > 0) {
-    tabHint.hidden = false;
-    tabHint.textContent =
-      "Keys for a card you removed are still open in another tab. " +
-      "Open that tab to close it, or clear keys from the device hub.";
-    return;
-  }
-  if (input.crossTabEntries.length > 0) {
-    tabHint.hidden = false;
-    tabHint.innerHTML =
-      "Keys are in another tab. " +
-      "Save or manage in that tab’s card workspace, or tap <strong>Open controls</strong> below.";
-    return;
-  }
-  tabHint.hidden = true;
-}
-
 function updateContextBanners() {
   const session = getTabSession();
   const hasKeys = !!(session?.profile_id && session?.owner_private_key_b58);
 
-  updateTabHint();
+  refreshWalletContextFromChrome();
 
   if (!activeBanner || !activeText) return;
   if (!hasKeys) {
@@ -192,9 +171,10 @@ window.addEventListener("hc-device-hub-changed", () => {
 });
 
 window.addEventListener("storage", (e) => {
-  if (e.key === "hc_created" || e.key === "hc_tab_keys_presence") updateContextBanners();
+  // Phase 2: device-chrome-refresh owns cross-tab refresh scheduling.
+  if (e.key === "hc_created") updateContextBanners();
 });
 
-window.addEventListener("hc-tab-presence-changed", updateContextBanners);
+// Phase 2: device-chrome-refresh owns cross-tab refresh scheduling.
 
 window.addEventListener("hc-auto-save-changed", refreshAutoSaveLine);
