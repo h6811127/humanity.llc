@@ -5888,17 +5888,19 @@ a.wallet-pin-open {
 
 .landing-hero-btn-primary {
   background: var(--red);
-  border: 1px solid var(--red);
+  border: none;
   color: var(--white);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 4px 14px rgba(219, 27, 67, 0.32);
 }
 
 .landing-hero-btn-primary:active {
-  opacity: 0.85;
+  opacity: 0.9;
   transform: scale(0.99);
-}
-
-.landing-hero-btn.landing-cta-glass {
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.05),
+    0 2px 8px rgba(219, 27, 67, 0.22);
 }
 
 .landing-hero-btn-secondary {
