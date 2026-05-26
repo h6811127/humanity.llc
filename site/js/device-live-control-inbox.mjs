@@ -23,6 +23,13 @@ import {
   stewardQuotaUsageFromBody,
 } from "./device-steward-quota-core.mjs";
 import {
+  initStewardPushClient,
+  stewardPushSuppressesAutoPoll,
+  syncStewardPushConnection,
+  STEWARD_PUSH_LIVE_PROOF_EVENT,
+  STEWARD_PUSH_STATE_CHANGED,
+} from "./device-steward-push.mjs";
+import {
   bindLiveControlPollLeaderSnapshot,
   broadcastLiveControlPollSnapshot,
   claimLiveControlPollLeader,
@@ -175,6 +182,7 @@ function readPollLoopShouldRun() {
     resolverHealth: getResolverHealthStatus(),
     budgetExhausted: isLiveControlAutoPollBudgetPaused(),
     isPollLeader: isLiveControlPollLeaderTab(),
+    stewardPushHealthy: stewardPushSuppressesAutoPoll(),
   });
 }
 
@@ -349,12 +357,13 @@ async function fetchPendingForEntry(entry, opts = {}) {
   if (!qrId) return { kind: "none" };
 
   const manual = opts.manual === true;
+  const pushTriggered = opts.pushTriggered === true;
 
   try {
     const url = getPendingLiveControlChallengeUrl(profileId, qrId);
     const { status, body, notModified } = await fetchResolverJson(
       url,
-      liveControlChallengeFetchInit(manual)
+      liveControlChallengeFetchInit(manual && !pushTriggered)
     );
     const httpKind = classifyChallengeHttpStatus(status);
     if (httpKind === "unchanged" || notModified) return { kind: "unchanged" };
@@ -443,6 +452,46 @@ export async function refreshLiveControlInbox(opts = {}) {
   return pending;
 }
 
+/**
+ * Apply a server push hint with one targeted challenge GET (E4c).
+ *
+ * @param {{
+ *   profile_id?: string,
+ *   qr_id?: string,
+ *   expires_at?: string,
+ * }} hint
+ */
+export async function applyLiveProofPendingFromPush(hint) {
+  const profileId =
+    typeof hint.profile_id === "string" ? hint.profile_id.trim() : "";
+  if (!profileId) return pending;
+
+  if (hint.expires_at) {
+    const exp = Date.parse(hint.expires_at);
+    if (Number.isFinite(exp) && exp <= Date.now()) return pending;
+  }
+
+  const entry = loadWallet().find((e) => e.profile_id === profileId);
+  if (!entry || !isPollableWalletEntry(entry)) return pending;
+
+  const result = await fetchPendingForEntry(entry, { pushTriggered: true });
+  const allPollable = loadWallet().filter((e) => isPollableWalletEntry(e));
+  updateLiveControlPollSlot(pollSlots, entry, result);
+  const next = pendingItemsFromPollSlots(allPollable, pollSlots);
+  const prevHealth = getLiveControlPollHealth();
+  setLiveControlPollHealth(applySingleCardPollHealth(prevHealth, result.kind));
+  const changed =
+    liveControlInboxChanged(pending, next) || prevHealth !== getLiveControlPollHealth();
+  pending = next;
+  lastLiveProofCheckAt = Date.now();
+  if (changed) {
+    window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
+  }
+  window.dispatchEvent(new Event(LIVE_PROOF_CHECKED_EVENT));
+  if (isLiveControlPollLeaderTab()) publishLeaderSnapshot();
+  return pending;
+}
+
 /** One live-proof round-robin check (manual hub control when watch is off). */
 export async function checkLiveProofNow() {
   return refreshLiveControlInbox({ manual: true });
@@ -461,6 +510,8 @@ export function applyLiveControlWatchPreference() {
 /** Notify hub/inbox sheet open state changed (also dispatched by shell). */
 export function syncLiveControlInboxPolling() {
   if (!pollFeatureEnabled) return;
+
+  syncStewardPushConnection();
 
   if (!readPollScope()) {
     clearPollTimer();
@@ -516,6 +567,18 @@ function bindLiveControlPollScopeListeners() {
     syncLiveControlInboxPolling();
     void syncLiveProofServiceWorkerState();
   });
+
+  window.addEventListener(STEWARD_PUSH_STATE_CHANGED, () => {
+    syncLiveControlInboxPolling();
+  });
+
+  window.addEventListener(STEWARD_PUSH_LIVE_PROOF_EVENT, (e) => {
+    const detail =
+      e instanceof CustomEvent && e.detail && typeof e.detail === "object"
+        ? e.detail
+        : null;
+    if (detail) void applyLiveProofPendingFromPush(detail);
+  });
 }
 
 /**
@@ -523,6 +586,7 @@ function bindLiveControlPollScopeListeners() {
  */
 export function enableLiveControlInboxPolling() {
   pollFeatureEnabled = true;
+  initStewardPushClient();
   bindLiveControlPollScopeListeners();
   bindLiveControlPollLeaderSnapshot(applyLiveControlInboxSnapshot);
   syncLiveControlInboxPolling();

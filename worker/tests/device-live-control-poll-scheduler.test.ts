@@ -150,6 +150,17 @@ describe("liveControlAutoPollShouldRun", () => {
       })
     ).toBe(false);
   });
+
+  it("pauses auto poll while steward push stream is healthy", () => {
+    expect(
+      liveControlAutoPollShouldRun({
+        watchEnabled: true,
+        scopeActive: true,
+        resolverHealth: "ok",
+        stewardPushHealthy: true,
+      })
+    ).toBe(false);
+  });
 });
 
 describe("liveControlPollLoopShouldRun", () => {

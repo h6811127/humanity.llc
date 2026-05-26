@@ -87,6 +87,8 @@ Resolver health at test time: `GET /.well-known/hc/v1/health` → `{"status":"ok
 
 ### P1-1 · Create form: `novalidate` + weak client checks → resolver round-trip for bad handles
 
+**Status (2026-05-26):** Fix shipped — client handle validation before submit (`create-handle-validation-core.mjs`, `create-card.mjs?v=13`); resolver errors sanitized (`create-resolver-error-core.mjs`, covers P1-4 create path).
+
 **Steps**
 
 1. `/create/` → handle `AB` (2 chars) + manifesto → submit.
@@ -136,6 +138,8 @@ Resolver health at test time: `GET /.well-known/hc/v1/health` → `{"status":"ok
 ---
 
 ### P1-4 · Error strings expose internal API URLs
+
+**Status (2026-05-26):** Partial — create POST errors sanitized in `create-resolver-error-core.mjs`; other flows may still append URLs.
 
 Examples seen in create flow:
 

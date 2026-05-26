@@ -1,3 +1,5 @@
+import { validateCreateHandle } from "./create-handle-validation-core.mjs";
+import { formatCreateResolverError } from "./create-resolver-error-core.mjs";
 import {
   qrExpiryFromIssued,
   encodePrivateKeyBase58,
@@ -215,6 +217,7 @@ export async function runCreateCard(input) {
   const card = await signDocument(cardUnsigned, privateKey, publicKeyBase58);
   const qr_credential = await signDocument(qrUnsigned, privateKey, publicKeyBase58);
 
+  setStatus("Submitting to resolver…");
   const res = await fetch(postCardsUrl(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -223,18 +226,18 @@ export async function runCreateCard(input) {
 
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const msg = data.message || data.error || `HTTP ${res.status}`;
-    if (String(msg).includes("recovery_public_key")) {
+    const msg = formatCreateResolverError(data, res.status);
+    if (String(data.message || data.error || "").includes("recovery_public_key")) {
       throw new Error(
         "Resolver database needs an update (recovery key column). Try again in a minute or contact support."
       );
     }
-    if (String(msg).includes("issuer_public_key")) {
+    if (String(data.message || data.error || "").includes("issuer_public_key")) {
       throw new Error(
         "Resolver database needs an update (organizer key column). Apply migration 0005 and redeploy."
       );
     }
-    throw new Error(`${msg} (${postCardsUrl()})`);
+    throw new Error(msg);
   }
 
   sessionStorage.setItem(
@@ -276,27 +279,48 @@ export async function runCreateCard(input) {
   location.replace(created.href);
 }
 
+function readValidatedCreateInput() {
+  const handleEl = document.getElementById("handle");
+  const handleResult = validateCreateHandle(handleEl?.value ?? "");
+  if (!handleResult.ok) {
+    if (handleEl) {
+      handleEl.setCustomValidity(handleResult.message);
+      handleEl.reportValidity();
+    }
+    throw new Error(handleResult.message);
+  }
+  if (handleEl) {
+    handleEl.setCustomValidity("");
+    if (handleEl.value !== handleResult.normalized) {
+      handleEl.value = handleResult.normalized;
+    }
+  }
+  const { manifesto, pilotTemplate } = buildManifestoLine();
+  return {
+    handle: handleResult.normalized,
+    manifesto,
+    pilotTemplate,
+    wantRecovery: document.getElementById("generate-recovery")?.checked ?? true,
+    qrValidityDays: readQrValidityDays(),
+    organizer: readOrganizerKeyConfig(),
+  };
+}
+
 async function submitCreate(e, opts = {}) {
   e?.preventDefault();
   if (submitBtn) submitBtn.disabled = true;
   if (demoBtn) demoBtn.disabled = true;
-  setStatus("Generating keys and signing…");
 
   try {
-    const handle = document.getElementById("handle")?.value?.trim();
-    const wantRecovery = document.getElementById("generate-recovery")?.checked ?? true;
-    if (!handle) throw new Error("Handle is required.");
-    const { manifesto, pilotTemplate } = buildManifestoLine();
-    const qrValidityDays = readQrValidityDays();
-    const organizer = readOrganizerKeyConfig();
-    setStatus("Submitting to resolver…");
+    const input = readValidatedCreateInput();
+    setStatus("Generating keys and signing…");
     await runCreateCard({
-      handle,
-      manifesto,
-      wantRecovery,
-      pilotTemplate,
-      qrValidityDays,
-      organizer,
+      handle: input.handle,
+      manifesto: input.manifesto,
+      wantRecovery: input.wantRecovery,
+      pilotTemplate: input.pilotTemplate,
+      qrValidityDays: input.qrValidityDays,
+      organizer: input.organizer,
       sampleCard: !!opts.sampleCard,
     });
   } catch (err) {
@@ -307,6 +331,11 @@ async function submitCreate(e, opts = {}) {
 }
 
 form?.addEventListener("submit", submitCreate);
+
+document.getElementById("handle")?.addEventListener("input", (ev) => {
+  const el = ev.currentTarget;
+  if (el instanceof HTMLInputElement) el.setCustomValidity("");
+});
 
 const enableOrganizerEl = document.getElementById("enable-organizer-revoke");
 const organizerFieldsEl = document.getElementById("organizer-key-fields");
