@@ -2,7 +2,7 @@
 
 **Status:** Retired (mobile-only layout restored May 2026)  
 **Scope:** `/` (`site/index.html`) · `body.has-shell-chrome.has-device-hub-search`  
-**Companion:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) · [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md)
+**Companion:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) · [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md) · [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md)
 
 ---
 
@@ -23,7 +23,7 @@ The site uses a **430px** centered `.page` column (mobile-first “device frame�
 
 | Column | Blocks |
 |--------|--------|
-| **Left** | `.hero.hero-tight`, `.landing-progress` |
+| **Left** | `.hero.hero-tight`, `.landing-progress` (UX contract: [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md)) |
 | **Right** | `.landing-framing` (aligned to top of hero) |
 | **Full width** | All other `main.screen-landing` children (studio, trust, docs, etc.) |
 

@@ -2,7 +2,7 @@
 
 **Status:** Phase 1–4 shipped · shared hub · activity log · returning-user desktop · **landing desktop layout**  
 **Scope:** Browser-local personalization only  -  not resolver-wide discovery  
-**Companion:** [`DEVICE_OS.md`](DEVICE_OS.md)  -  two-layer model, placement rule, landing story · [`LANDING_DESKTOP_LAYOUT.md`](LANDING_DESKTOP_LAYOUT.md)
+**Companion:** [`DEVICE_OS.md`](DEVICE_OS.md)  -  two-layer model, placement rule, landing story · [`LANDING_DESKTOP_LAYOUT.md`](LANDING_DESKTOP_LAYOUT.md) · [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md)
 
 ---
 
@@ -53,7 +53,9 @@ These notes are captured as individual product refinements so implementation can
 
 We kept the landing funnel (hero → device hub → long-form content) and **enriched** it rather than replacing it with a full dashboard.
 
-**Landing story (shipped):** Hero one-liner + trust chips (no account · keys in browser · no scan tracking), **four-step progress strip** (Create → Save → Print → **My cards**) in a soft inset card, **How it works** flow strip (print → scan → verify), then framing and studio example. **On this device** is the hub sheet below the status line (inline search, no floating help pill). **Shortcuts & settings** sit after the studio block (not directly under the progress strip) so first scroll stays product narrative. Closing **Ready to try it?** CTA before documentation. Intro band uses tighter hero→progress→flow spacing and a shared 22px section-title ladder for **How it works** / **Ready to try it?** Homepage pass-card demo removed; strangers see real scan pages and the case study.
+**Landing story (shipped):** Hero one-liner + trust chips (no account · keys in browser · no scan tracking), **four-step progress inset** (Create → Save → Print → **My cards**), **How it works** flow strip (print → scan → verify), then framing and studio example. **On this device** is the hub sheet below the status line (inline search, no floating help pill). **Shortcuts & settings** sit after the studio block (not directly under the progress strip) so first scroll stays product narrative. Closing **Ready to try it?** CTA before documentation. Intro band uses tighter hero→progress→flow spacing and a shared 22px section-title ladder for **How it works** / **Ready to try it?** Homepage pass-card demo removed; strangers see real scan pages and the case study.
+
+**Landing progress strip (planned refactor):** The inset still ships four peer links and `localStorage`-driven `is-next` highlighting; steps 2–3 often resolve to **My cards** via contextless `/created/` redirect. Target UX is **read-only legend + one Continue CTA** (strangers neutral; returning users resume from wallet/setup signals). Phase 1 = honest Continue; Phase 2 = step-specific deeplinks. Full contract: [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md).
 
 **Landing layout:** Mobile-first single column only (no desktop widening grid). See [`LANDING_DESKTOP_LAYOUT.md`](LANDING_DESKTOP_LAYOUT.md) for retired desktop experiment notes.
 
@@ -195,6 +197,8 @@ No backend required:
 | `docs/DEVICE_INBOX.md` | Inbox badge, alerts, background alerts roadmap |
 | `site/js/device-browser-notifications.mjs` | OS notifications v1 |
 | `site/index.html` | Landing hub + progress strip |
+| `docs/LANDING_PROGRESS_STRIP.md` | Landing legend + Continue spec (Phase 1/2) |
+| `site/js/landing-progress.mjs` | Landing progress state (to be refactored per spec) |
 | `site/created/index.html` | Created hub shell |
 | `docs/HUB_CARD_ROW_UX.md` | Saved row IA, status copy, data-policy wording |
 | `site/js/device-hub-card-row-core.mjs` | Row title, identity line, status line (pure helpers) |
