@@ -1,8 +1,9 @@
 /**
- * Pure steward entitlement → client policy (hosted tier E2).
+ * Pure steward entitlement → client policy (hosted tier E2/E3).
  * @see docs/HOSTED_TIER_ENTITLEMENTS_AND_METERING.md
  * @see docs/DEVICE_OS_REQUEST_BUDGET.md § Phase 10
  */
+import { STEWARD_NULL_DEVICE_CAP_FALLBACK } from "./device-steward-quota-core.mjs";
 
 export const STEWARD_SESSION_STORAGE_KEY = "hc_steward_session";
 export const STEWARD_DEVICE_ID_STORAGE_KEY = "hc_device_id";
@@ -53,6 +54,15 @@ function numberEntitlement(value, fallback) {
 }
 
 /**
+ * @param {unknown} value
+ * @param {number} fallback
+ */
+function autoPollDailyCapEntitlement(value, fallback) {
+  if (value === null) return STEWARD_NULL_DEVICE_CAP_FALLBACK;
+  return numberEntitlement(value, fallback);
+}
+
+/**
  * @param {string} key
  * @param {Record<string, unknown>} entitlements
  * @param {boolean} fallback
@@ -77,7 +87,7 @@ export function entitlementsMapToPolicy(entitlements, base = REFERENCE_FREE_POLI
       entitlements,
       base.notifyPushLiveProof
     ),
-    pollLiveProofAutoDailyCap: numberEntitlement(
+    pollLiveProofAutoDailyCap: autoPollDailyCapEntitlement(
       entitlements["poll.live_proof.auto_daily_cap"],
       base.pollLiveProofAutoDailyCap
     ),

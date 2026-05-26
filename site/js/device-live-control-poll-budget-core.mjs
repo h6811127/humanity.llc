@@ -49,6 +49,19 @@ export function serializeLiveControlAutoPollBudget(record) {
 }
 
 /**
+ * Mark local auto-poll budget exhausted for today (sync with server 429).
+ *
+ * @param {number} cap
+ * @param {number} [now]
+ */
+export function liveControlAutoPollBudgetSerializedAtCap(cap, now = Date.now()) {
+  return serializeLiveControlAutoPollBudget({
+    day: liveControlAutoPollUtcDayKey(now),
+    count: cap,
+  });
+}
+
+/**
  * @param {string | null | undefined} raw
  * @param {number} [now]
  * @returns {number} count for current UTC day

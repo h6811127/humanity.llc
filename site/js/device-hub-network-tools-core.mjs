@@ -4,6 +4,7 @@
  */
 
 import { liveControlAutoPollBudgetPausedMessage } from "./device-live-control-poll-budget-core.mjs";
+import { stewardServerQuotaPausedMessage } from "./device-steward-quota-core.mjs";
 
 export const STORAGE_WATCH_LIVE_PROOF = "hc_watch_live_proof";
 
@@ -83,10 +84,14 @@ export function formatLastCheckedRel(checkedAt, now = Date.now()) {
  *   liveProofCheckedAt?: number,
  *   now?: number,
  *   autoPollBudgetPaused?: boolean,
+ *   stewardQuotaPaused?: boolean,
  *   liveProofWatchOn?: boolean,
  * }} input
  */
 export function formatHubNetworkStatusLine(input) {
+  if (input.stewardQuotaPaused && input.liveProofWatchOn) {
+    return stewardServerQuotaPausedMessage();
+  }
   if (input.autoPollBudgetPaused && input.liveProofWatchOn) {
     return liveControlAutoPollBudgetPausedMessage();
   }

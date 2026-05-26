@@ -8,12 +8,20 @@ import { getTabSession } from "./device-keys.mjs";
 import {
   isLiveControlAutoPollBudgetExhausted,
   LIVE_CONTROL_AUTO_POLL_STORAGE_KEY,
+  liveControlAutoPollBudgetSerializedAtCap,
   recordLiveControlAutoPoll,
 } from "./device-live-control-poll-budget-core.mjs";
 import {
   getStewardEntitlementsPolicy,
+  stewardResolverRequestHeaders,
   STEWARD_ENTITLEMENTS_CHANGED,
+  STEWARD_MANUAL_POLL_HEADER,
+  STEWARD_QUOTA_CHANGED,
 } from "./device-steward-entitlements.mjs";
+import {
+  isStewardQuotaExceededBody,
+  stewardQuotaUsageFromBody,
+} from "./device-steward-quota-core.mjs";
 import {
   bindLiveControlPollLeaderSnapshot,
   broadcastLiveControlPollSnapshot,
@@ -74,6 +82,11 @@ export const LIVE_CONTROL_POLL_SCOPE_CHANGED = "hc-live-control-poll-scope-chang
 const RESOLVER_HEALTH_CHANGED = "hc-resolver-health-changed";
 
 let pollBackoffUntil = 0;
+let stewardServerQuotaPaused = false;
+
+export function isStewardServerQuotaPaused() {
+  return stewardServerQuotaPaused;
+}
 
 /** @type {import("./device-live-control-inbox-core.mjs").LiveControlPendingItem[]} */
 let pending = [];
@@ -206,6 +219,38 @@ function recordAutoPollBudgetUse() {
 }
 
 /**
+ * @param {unknown} body
+ */
+function applyStewardServerQuotaPause(body) {
+  stewardServerQuotaPaused = true;
+  const usage = stewardQuotaUsageFromBody(body);
+  const cap =
+    usage?.limit ?? getStewardEntitlementsPolicy().pollLiveProofAutoDailyCap;
+  try {
+    localStorage.setItem(
+      LIVE_CONTROL_AUTO_POLL_STORAGE_KEY,
+      liveControlAutoPollBudgetSerializedAtCap(cap)
+    );
+  } catch {
+    /* ignore */
+  }
+  window.dispatchEvent(new Event(LIVE_CONTROL_BUDGET_CHANGED));
+  window.dispatchEvent(new Event(STEWARD_QUOTA_CHANGED));
+}
+
+/**
+ * @param {boolean} manual
+ * @returns {RequestInit}
+ */
+function liveControlChallengeFetchInit(manual) {
+  const headers = new Headers(stewardResolverRequestHeaders());
+  if (manual) {
+    headers.set(STEWARD_MANUAL_POLL_HEADER, "1");
+  }
+  return { headers };
+}
+
+/**
  * Apply inbox state from the leader tab (no Worker fetch on this tab).
  * @param {LiveControlLeaderSnapshot} snapshot
  */
@@ -293,22 +338,33 @@ async function runPollTick() {
 
 /**
  * @param {Record<string, unknown>} entry
+ * @param {{ manual?: boolean }} [opts]
  * @returns {Promise<{ kind: import("./device-live-control-inbox-core.mjs").LiveControlPollKind, item?: import("./device-live-control-inbox-core.mjs").LiveControlPendingItem }>}
  */
-async function fetchPendingForEntry(entry) {
+async function fetchPendingForEntry(entry, opts = {}) {
   if (!isPollableWalletEntry(entry)) return { kind: "none" };
 
   const profileId = entry.profile_id;
   const qrId = walletEntryQrId(entry);
   if (!qrId) return { kind: "none" };
 
+  const manual = opts.manual === true;
+
   try {
     const url = getPendingLiveControlChallengeUrl(profileId, qrId);
-    const { status, body, notModified } = await fetchResolverJson(url);
+    const { status, body, notModified } = await fetchResolverJson(
+      url,
+      liveControlChallengeFetchInit(manual)
+    );
     const httpKind = classifyChallengeHttpStatus(status);
     if (httpKind === "unchanged" || notModified) return { kind: "unchanged" };
     if (httpKind === "none") return { kind: "none" };
-    if (httpKind === "rate_limited") return { kind: "rate_limited" };
+    if (httpKind === "rate_limited") {
+      if (!manual && isStewardQuotaExceededBody(body)) {
+        applyStewardServerQuotaPause(body);
+      }
+      return { kind: "rate_limited" };
+    }
     if (httpKind === "unreachable") return { kind: "unreachable" };
     const item = parsePendingChallengeBody(body, entry);
     return item ? { kind: "pending", item } : { kind: "none" };
@@ -362,7 +418,7 @@ export async function refreshLiveControlInbox(opts = {}) {
 
   const pollIndex = pickRoundRobinPollIndex(roundRobinCursor, entries.length);
   const entry = entries[pollIndex];
-  const result = await fetchPendingForEntry(entry);
+  const result = await fetchPendingForEntry(entry, { manual });
   if (!manual) recordAutoPollBudgetUse();
   roundRobinCursor = nextRoundRobinIndex(roundRobinCursor, entries.length);
 

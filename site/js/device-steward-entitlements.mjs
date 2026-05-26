@@ -23,8 +23,12 @@ export {
   hostedTierHubIndicatorLine,
   stewardPushSubscribeAllowed,
 } from "./device-steward-entitlements-core.mjs";
+export {
+  STEWARD_MANUAL_POLL_HEADER,
+} from "./device-steward-quota-core.mjs";
 
 export const STEWARD_ENTITLEMENTS_CHANGED = "hc-steward-entitlements-changed";
+export const STEWARD_QUOTA_CHANGED = "hc-steward-quota-changed";
 
 /** @type {import("./device-steward-entitlements-core.mjs").StewardEntitlementsPolicy} */
 let activePolicy = { ...REFERENCE_FREE_POLICY };
@@ -77,6 +81,19 @@ export function clearStewardSession() {
  * Stable per-browser install id for metering headers.
  * @returns {string}
  */
+/**
+ * Optional bearer + device headers for authenticated resolver GETs.
+ * @returns {Record<string, string>}
+ */
+export function stewardResolverRequestHeaders() {
+  const token = readStewardSessionToken();
+  if (!token) return {};
+  return {
+    Authorization: `Bearer ${token}`,
+    "X-HC-Device-Id": getOrCreateStewardDeviceId(),
+  };
+}
+
 export function getOrCreateStewardDeviceId() {
   try {
     const existing = localStorage.getItem(STEWARD_DEVICE_ID_STORAGE_KEY);

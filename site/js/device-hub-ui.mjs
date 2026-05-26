@@ -96,6 +96,7 @@ import {
   getLastLiveProofCheckAt,
   enableLiveControlInboxPolling,
   isLiveControlAutoPollBudgetPaused,
+  isStewardServerQuotaPaused,
   isLiveControlInboxPollingActive,
   LIVE_CONTROL_POLL_SCOPE_CHANGED,
 } from "./device-live-control-inbox.mjs";
@@ -1357,6 +1358,7 @@ export function initDeviceHub(config = {}) {
       getNetworkCheckedAt: getLastWalletNetworkCheckedAt,
       getLiveProofCheckedAt: getLastLiveProofCheckAt,
       getAutoPollBudgetPaused: () => isLiveControlAutoPollBudgetPaused(),
+      getStewardQuotaPaused: () => isStewardServerQuotaPaused(),
       getLargeWalletHint: () =>
         largeWalletHint(loadWallet().length, getStewardEntitlementsPolicy()),
       getHostedTierLine: () =>

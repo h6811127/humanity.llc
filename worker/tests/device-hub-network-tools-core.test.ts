@@ -86,4 +86,14 @@ describe("formatHubNetworkStatusLine", () => {
     });
     expect(line).toContain("paused for today");
   });
+
+  it("prefers server steward quota message over client budget", () => {
+    const line = formatHubNetworkStatusLine({
+      stewardQuotaPaused: true,
+      autoPollBudgetPaused: true,
+      liveProofWatchOn: true,
+    });
+    expect(line).toContain("Operator daily");
+    expect(line).toContain("Check for live proof");
+  });
 });

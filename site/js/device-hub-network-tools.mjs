@@ -20,6 +20,7 @@ const WATCH_INPUT_ID = "device-hub-watch-live-proof";
  *   getNetworkCheckedAt: () => number,
  *   getLiveProofCheckedAt: () => number,
  *   getAutoPollBudgetPaused?: () => boolean,
+ *   getStewardQuotaPaused?: () => boolean,
  *   getLargeWalletHint?: () => string | null,
  *   getHostedTierLine?: () => string | null,
  *   onCheckNetwork: () => void | Promise<void>,
@@ -118,6 +119,7 @@ export function mountHubNetworkTools(config) {
       networkCheckedAt: config.showNetwork ? config.getNetworkCheckedAt() : 0,
       liveProofCheckedAt: config.showLiveProof ? config.getLiveProofCheckedAt() : 0,
       autoPollBudgetPaused: config.getAutoPollBudgetPaused?.() === true,
+      stewardQuotaPaused: config.getStewardQuotaPaused?.() === true,
       liveProofWatchOn: isWatchLiveProofEnabled(),
     });
     if (hostedLineEl instanceof HTMLElement) {
@@ -151,6 +153,7 @@ export function mountHubNetworkTools(config) {
     window.addEventListener("hc-live-proof-checked", refresh);
     window.addEventListener("hc-live-control-poll-budget-changed", refresh);
     window.addEventListener("hc-steward-entitlements-changed", refresh);
+    window.addEventListener("hc-steward-quota-changed", refresh);
     window.addEventListener("storage", (e) => {
       if (e.key === STORAGE_WATCH_LIVE_PROOF && watchInput instanceof HTMLInputElement) {
         watchInput.checked = isWatchLiveProofEnabled();
