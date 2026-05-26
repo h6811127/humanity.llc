@@ -34,7 +34,7 @@ test.describe("device OS wallet flow", () => {
     expect(sessionRaw).toContain("privkeyfortestonlyxxxxxxxxx");
   });
 
-  test("Revoke QR from hub opens Advanced revoke panel (not setup Print)", async ({
+  test("Revoke QR from hub opens Manage revoke panel (not setup Print)", async ({
     page,
   }) => {
     await page.route("**/.well-known/hc/v1/health**", (route) =>
@@ -105,7 +105,7 @@ test.describe("device OS wallet flow", () => {
     await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
     await expect(page.locator("#created-setup-root")).toBeHidden();
 
-    await expect(page.locator("#created-tab-advanced")).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Manage", selected: true })).toBeVisible();
     await expect(page.locator("#revoke-details")).toBeVisible();
     await expect(page.locator("#revoke-details")).toHaveAttribute("open");
   });
@@ -124,6 +124,29 @@ test.describe("device OS wallet flow", () => {
     await expect(page.locator("#created-setup-root")).toBeHidden();
     await expect(page.locator("#created-control-root")).toBeVisible();
     await expect(page.locator("#created-tab-now")).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
+  });
+
+  test("control mode shows Live tab, setup memory chips, and primary CTA", async ({
+    page,
+  }) => {
+    await page.addInitScript((profileId) => {
+      localStorage.setItem("hc_setup_done", JSON.stringify({ [profileId]: true }));
+      const done = JSON.stringify({
+        [profileId]: ["save-keys", "download-qr", "test-scan"],
+      });
+      sessionStorage.setItem("hc_created_task_done", done);
+    }, SAMPLE_WALLET_ENTRY.profile_id);
+
+    await page.goto("/wallet/");
+    await page.getByRole("button", { name: "Open controls" }).click();
+
+    await expect(page.locator("#created-control-root")).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Manage" })).toBeVisible();
+    await expect(page.locator("#created-live-setup-memory-wrap")).toBeVisible();
+    await expect(page.locator("#created-live-primary-btn")).toBeVisible();
+    await expect(page.getByText("You already finished setup")).toBeVisible();
   });
 
   test("fresh=1 shows post-create setup wizard (not control tabs)", async ({ page }) => {
@@ -194,7 +217,8 @@ test.describe("device OS wallet flow", () => {
     await expect(page).toHaveURL(/#update-status/);
     const sessionRaw = await page.evaluate(() => sessionStorage.getItem("hc_created"));
     expect(sessionRaw).toContain("privkeyfortestonlyxxxxxxxxx");
-    await expect(page.locator("#created-tab-advanced")).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
+    await expect(page.locator("#created-live-scanners-see")).toBeVisible();
   });
 
   test("does not show card-disabled-since-visit banner when resolver reports active", async ({

@@ -17,7 +17,7 @@ import { initQrExtend } from "./created-qr-extend.mjs";
 import { inferPilotTemplate, parseManifestoDisplay } from "./manifesto-display.mjs";
 import { createdLiveProofPollShouldRun } from "./created-live-proof-poll-core.mjs";
 import { initCreatedTabs } from "./created-tabs.mjs";
-import { initCreatedDashboard } from "./created-dashboard.mjs?v=4";
+import { initCreatedDashboard } from "./created-dashboard.mjs?v=5";
 import {
   markFirstRevokeDone,
   syncUpdateStatusTaskGate,

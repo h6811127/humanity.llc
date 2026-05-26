@@ -45,7 +45,7 @@ On entering step 4, setup now includes a subtle "goes live" transition and confi
 
 ## Control mode (Live tab)
 
-**T1-T3 shipped:** [`CREATED_TASKS_TAB_REDESIGN.md`](CREATED_TASKS_TAB_REDESIGN.md) - page hero **Your object is live**; **Live** tab has status strip, live object card with **one contextual primary CTA** (prove live, save keys, test scan, check network, or open scan), **What scanners see**, deploy disclosures, custody keys, collapsed full-size QR. Revoke only on **Manage**.
+**T1-T4 shipped:** [`CREATED_TASKS_TAB_REDESIGN.md`](CREATED_TASKS_TAB_REDESIGN.md) - page hero **Your object is live**; **Live** tab has status strip, read-only **setup memory** chips (Save · Print · Test · Live), live object card with contextual primary CTA, **What scanners see**, deploy disclosures, custody keys, collapsed full-size QR. Revoke only on **Manage**.
 
 **Manage** tab: revoke, rotate, backup, lifecycle notes, and doc links (icon + disclosure pattern). Public copy publishes on **Live** (**What scanners see**).
 

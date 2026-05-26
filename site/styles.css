@@ -5149,6 +5149,77 @@ body.page-wallet .device-hub-status-key {
   color: var(--grey);
 }
 
+.created-live-setup-memory-wrap {
+  margin: 0 0 14px;
+  padding: 0 4px;
+}
+
+.created-live-setup-memory-wrap[hidden] {
+  display: none !important;
+}
+
+.created-live-setup-memory-kicker {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.created-live-setup-memory {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.created-live-setup-memory-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 48px;
+  padding: 8px 4px;
+  border-radius: 10px;
+  background: var(--shell-fill, rgba(0, 0, 0, 0.04));
+  border: 0.5px solid var(--shell-separator, rgba(60, 60, 67, 0.12));
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--grey);
+}
+
+.created-live-setup-memory-item.is-done {
+  color: var(--text, #1c1c1e);
+  border-color: rgba(52, 199, 89, 0.35);
+  background: rgba(52, 199, 89, 0.1);
+}
+
+.created-live-setup-memory-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #248a3d;
+  background: rgba(52, 199, 89, 0.16);
+}
+
+.created-live-setup-memory-item:not(.is-done) .created-live-setup-memory-mark {
+  width: 8px;
+  height: 8px;
+  background: rgba(120, 120, 128, 0.28);
+  color: transparent;
+}
+
 .created-live-object-card {
   padding: 16px 14px 14px;
   border-radius: 16px;

@@ -715,6 +715,22 @@ html[data-theme="dark"] .created-live-primary-sub {
   color: var(--shell-label);
 }
 
+html[data-theme="dark"] .created-live-setup-memory-kicker {
+  color: var(--shell-label);
+}
+
+html[data-theme="dark"] .created-live-setup-memory-item {
+  background: var(--shell-fill);
+  border-color: var(--shell-separator);
+  color: var(--shell-label);
+}
+
+html[data-theme="dark"] .created-live-setup-memory-item.is-done {
+  color: var(--shell-label-strong);
+  border-color: rgba(52, 199, 89, 0.35);
+  background: rgba(52, 199, 89, 0.14);
+}
+
 html[data-theme="dark"] .created-primitive {
   background: rgba(255, 77, 109, 0.12);
   border-color: rgba(255, 77, 109, 0.28);

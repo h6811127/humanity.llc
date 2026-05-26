@@ -6,6 +6,8 @@
 import { isWalletSaved } from "./device-wallet.mjs";
 import { syncUpdateStatusTaskGate } from "./created-first-revoke-gate.mjs";
 import { initCreatedLivePrimaryCta } from "./created-live-primary-cta.mjs";
+import { initCreatedLiveSetupMemory } from "./created-live-setup-memory.mjs";
+import { isSetupDone } from "./created-mode.mjs";
 
 const DONE_STORAGE_KEY = "hc_created_task_done";
 
@@ -112,6 +114,7 @@ export function initCreatedDashboard({
   function markDone(actionId) {
     persistDoneAction(profileId(), actionId);
     syncDoneStates();
+    window.dispatchEvent(new Event("hc-created-live-setup-memory-sync"));
   }
 
   function syncCustodySummary(saved) {
@@ -240,6 +243,14 @@ export function initCreatedDashboard({
     },
   };
 
+  initCreatedLiveSetupMemory({
+    getProfileId: profileId,
+    setupComplete: () => {
+      const pid = profileId();
+      return pid ? isSetupDone(pid) : true;
+    },
+  });
+
   initCreatedLivePrimaryCta({
     getProfileId: profileId,
     hasSigningKeys: () => hasSigningKeys?.() ?? false,
@@ -268,4 +279,5 @@ export function initCreatedDashboard({
 
   syncDoneStates();
   window.dispatchEvent(new Event("hc-created-live-cta-sync"));
+  window.dispatchEvent(new Event("hc-created-live-setup-memory-sync"));
 }

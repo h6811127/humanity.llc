@@ -18,7 +18,7 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="/styles.css?v=105" />
+    <link rel="stylesheet" href="/styles.css?v=106" />
     <link rel="stylesheet" href="/css/device-shell.css?v=48" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=14" />
   </head>
@@ -291,6 +291,32 @@
             <div class="created-live-status-strip" id="created-live-status-strip" role="status">
               <span class="created-live-status-chip" id="created-live-network-chip" hidden>Live on network</span>
               <p class="created-live-status-meta" id="created-live-status-meta"></p>
+            </div>
+
+            <div class="created-live-setup-memory-wrap" id="created-live-setup-memory-wrap" hidden>
+              <p class="created-live-setup-memory-kicker">Setup complete</p>
+              <ol
+                class="created-live-setup-memory"
+                id="created-live-setup-memory"
+                aria-label="Setup you completed"
+              >
+                <li class="created-live-setup-memory-item" data-memory-step="save">
+                  <span class="created-live-setup-memory-mark" aria-hidden="true"></span>
+                  <span class="created-live-setup-memory-label">Save</span>
+                </li>
+                <li class="created-live-setup-memory-item" data-memory-step="print">
+                  <span class="created-live-setup-memory-mark" aria-hidden="true"></span>
+                  <span class="created-live-setup-memory-label">Print</span>
+                </li>
+                <li class="created-live-setup-memory-item" data-memory-step="test">
+                  <span class="created-live-setup-memory-mark" aria-hidden="true"></span>
+                  <span class="created-live-setup-memory-label">Test scan</span>
+                </li>
+                <li class="created-live-setup-memory-item" data-memory-step="live">
+                  <span class="created-live-setup-memory-mark" aria-hidden="true"></span>
+                  <span class="created-live-setup-memory-label">Live</span>
+                </li>
+              </ol>
             </div>
 
             <article class="created-live-object-card" id="created-live-object-card">
@@ -658,10 +684,10 @@
         <!--  -  -  -  Advanced: update, revoke, keys  -  -  -  -->
         <div class="created-tab-panel" data-created-panel="advanced" id="created-tab-advanced" role="tabpanel" aria-labelledby="created-tab-btn-advanced" hidden>
           <p class="created-tab-lead">
-            Update copy, revoke, or unlock keys. Same printed QR  -  you change resolver state, not
-            the sticker.
-            Use <strong>Save control key</strong> on the <strong>Live</strong> tab (or
-            <a href="/wallet/">My cards</a> in the same tab) before switching tabs.
+            Rotate, revoke, backup, and unlock keys. Same printed QR  -  you change resolver state,
+            not the sticker. Public copy publishes on <strong>Live</strong>. Open
+            <strong>Keys on this device</strong> on Live (or
+            <a href="/wallet/">My cards</a>) before switching tabs.
           </p>
 
           <details
@@ -1142,6 +1168,6 @@
     </div>
     <script src="/js/device-status-bootstrap.mjs?v=38" type="module"></script>
     <script src="/js/created-hub.mjs?v=3" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=48"></script>
+    <script type="module" src="/js/created.mjs?v=49"></script>
   </body>
 </html>
