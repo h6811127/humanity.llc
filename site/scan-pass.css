@@ -1912,11 +1912,28 @@ body {
   background: transparent;
 }
 
-.scan-page .top {
-  background: rgba(255, 255, 255, 0.82);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  backdrop-filter: saturate(180%) blur(20px);
-  border-bottom: 0.5px solid rgba(60, 60, 67, 0.11);
+.scan-page-chrome {
+  padding: 10px var(--pad) 4px;
+}
+
+.scan-page-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  margin: -8px 0 0 -12px;
+  border-radius: 22px;
+}
+
+.scan-page-dot:active {
+  opacity: 0.72;
+}
+
+.scan-page-dot .pass-dot {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
 }
 
 .scan-screen {

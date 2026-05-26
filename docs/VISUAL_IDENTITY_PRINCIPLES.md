@@ -46,7 +46,7 @@ The mobile card page should answer:
 5. *(personal card depth)* Is the person vouched? Was live control proven? Is this QR active?
 6. Where can I read more?
 
-For **live object** stickers, (2) is usually the manifesto or plate message—not the steward `@handle`. See [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Scan type templates.
+For **live object** stickers, (2) is usually the manifesto or plate message-not the steward `@handle`. See [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Scan type templates.
 
 **Design reference:** `assets/Nerd Mobile Post Scan Render.png` (single hero, status bar, proof/limit modules, QR secondary).
 
@@ -112,16 +112,16 @@ Preferred direction:
 
 **Target structure** (matches Nerd mock + [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md)):
 
-1. Minimal web header — dot + `humanity.llc` only.
-2. **Live check hero** — one status + primary message (H1) + resolver verified line + one limit line.
-3. Steward strip — `Controlled by @handle`, optional expiry (muted).
-4. **What this proves** — up to three bullets (only true signals).
-5. **What this does not prove** — warm module; link to full policy.
-6. **This QR** — smaller code + credential code; collapsible on mobile when possible.
-7. Primary CTA when relevant — `Ask owner to prove control` / `Prove live control`.
-8. Footer — trust model, no analytics.
+1. Minimal web header - dot + `humanity.llc` only.
+2. **Live check hero** - one status + primary message (H1) + resolver verified line + one limit line.
+3. Steward strip - `Controlled by @handle`, optional expiry (muted).
+4. **What this proves** - up to three bullets (only true signals).
+5. **What this does not prove** - warm module; link to full policy.
+6. **This QR** - smaller code + credential code; collapsible on mobile when possible.
+7. Primary CTA when relevant - `Ask owner to prove control` / `Prove live control`.
+8. Footer - trust model, no analytics.
 
-**Interim shipped layout** stacks a separate scanner safety header and status panel—see [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Known UX gaps. Implementation should converge on the structure above.
+**Interim shipped layout** stacks a separate scanner safety header and status panel-see [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Known UX gaps. Implementation should converge on the structure above.
 
 ---
 
@@ -146,7 +146,7 @@ Most important:
 
 - Steward handle (when not the H1).
 - Vouch count and recency.
-- Revocable / issued / steward chips — prefer **Details**, not hero.
+- Revocable / issued / steward chips - prefer **Details**, not hero.
 - Governance links.
 
 ### Tertiary
@@ -167,10 +167,11 @@ Resolver HTML (`scan-pass.css`, bundled to Worker). Product rules: [`docs/SCANNE
 
 | Topic | Spec |
 |-------|------|
-| **Feel** | Enticing through competence—calm, precise, spacious—not loud marketing |
+| **Feel** | Enticing through competence-calm, precise, spacious-not loud marketing |
 | **Spacing** | One primary hero card: 24–28px padding; 28–32px before secondary modules; no back-to-back equal-weight bordered cards |
 | **Typography** | H1 message 22–26px semibold; status one pill or bar; meta 13–14px at `rgba(60,60,67,0.72)` |
-| **Brand red** | Dot, QR frame accent, primary CTA—not every badge or status duplicate |
+| **Brand red** | Dot, QR frame accent, primary CTA-not every badge or status duplicate |
+| **Page chrome** | Status dot only above the hero card (`pass-v26`); host wordmark lives inside the card |
 | **Green** | Active / “signed object verified by resolver” only |
 | **Motion** | One-shot hero border pulse on load; respect `prefers-reduced-motion` |
 | **Section kickers** | Avoid “Network status” for strangers; use human copy or omit |

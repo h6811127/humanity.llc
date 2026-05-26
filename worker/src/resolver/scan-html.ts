@@ -28,7 +28,7 @@ import {
 } from "./scan-safety";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v25";
+export const SCAN_UI_VERSION = "pass-v26";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -62,7 +62,7 @@ export async function renderScanPage(
 </head>
 <body>
   <div class="page scan-page">
-    ${renderTopHeader(origin)}
+    ${renderScanPageChrome(origin)}
     <p class="scan-cross-tab-banner" id="scan-cross-tab-banner" role="status" hidden></p>
     <p class="scan-offline-banner" id="scan-offline-banner" role="status" hidden>${escapeHtml(SCAN_OFFLINE_BANNER_TEXT)}</p>
     <main class="screen scan-screen">
@@ -121,13 +121,13 @@ if (slot && !slot.querySelector("svg") && slot.dataset.scanUrl) {
 </script>`;
 }
 
-function renderTopHeader(origin: string): string {
-  return `<header class="top">
-  <a class="top-brand" href="${escapeHtml(origin)}/">
+/** Page chrome: status dot only (docs/M3_SCAN_PAGE_UI.md Phase 7). */
+function renderScanPageChrome(origin: string): string {
+  return `<div class="scan-page-chrome">
+  <a class="scan-page-dot" href="${escapeHtml(origin)}/" aria-label="humanity.llc home">
     <span class="pass-dot" aria-hidden="true"></span>
-    <span>humanity.llc</span>
   </a>
-</header>`;
+</div>`;
 }
 
 /** Live check hero — merges scanner safety + status panel (docs/M3_SCAN_PAGE_UI.md Phase 1). */

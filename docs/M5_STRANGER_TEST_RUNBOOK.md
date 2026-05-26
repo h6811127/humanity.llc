@@ -7,7 +7,7 @@
 
 **Goal:** Three people **outside your network** complete the loop **without you explaining the UI**. Each can say in one sentence what scan **proves** and what it **does not**.
 
-**Coverage:** At least one stranger should scan a **live object** or pilot sticker (pre-made scan URL)—not only a card they created themselves. Success criteria: [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Success criteria (first scan).
+**Coverage:** At least one stranger should scan a **live object** or pilot sticker (pre-made scan URL)-not only a card they created themselves. Success criteria: [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Success criteria (first scan).
 
 ---
 
@@ -30,16 +30,16 @@ curl -sS "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status?q=QR" | jq
 
 8. **No analytics**  -  confirm scan HTML has no third-party trackers (view source / Network tab once); status JSON `scan.limits.scan_analytics` is `false`.
 
-9. **Minimal failure layout** (optional) — revoke card or expire QR; confirm **Card status** + **This QR** groups still appear below the compact panel (human trust hidden).
+9. **Minimal failure layout** (optional) - revoke card or expire QR; confirm **Card status** + **This QR** groups still appear below the compact panel (human trust hidden).
 
-10. **Live object scan** (recommended) — open a pilot or demo live-object scan URL on phone; confirm within ~30s they can state host trust, live status, what the **message** says, and that holding the sticker does not prove ownership. They should **not** need to reconcile multiple “Active” labels.
+10. **Live object scan** (recommended) - open a pilot or demo live-object scan URL on phone; confirm within ~30s they can state host trust, live status, what the **message** says, and that holding the sticker does not prove ownership. They should **not** need to reconcile multiple “Active” labels.
 
-    - Status plate: `site/data/showcase-status-plate.json` — `npm run site:seed-showcase`
-    - Live object: `site/data/showcase-live-object.json` — `npm run site:seed-showcase-live-object`
-    - Lost item relay: `site/data/showcase-lost-item.json` — `npm run site:seed-showcase-lost-item`
+    - Status plate: `site/data/showcase-status-plate.json` - `npm run site:seed-showcase`
+    - Live object: `site/data/showcase-live-object.json` - `npm run site:seed-showcase-live-object`
+    - Lost item relay: `site/data/showcase-lost-item.json` - `npm run site:seed-showcase-lost-item`
     - CI fixtures: `worker/tests/scan-m5-showcase-paths.test.ts`, `worker/tests/site-showcase-data.test.ts`
 
-**Deploy check:** scan response header `X-HC-Scan-UI: pass-v25` (or later) on an active scan.
+**Deploy check:** scan response header `X-HC-Scan-UI: pass-v26` (or later) on an active scan.
 
 **UX reference (target):** `assets/Nerd Mobile Post Scan Render.png`; gap list: [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Known UX gaps.
 
@@ -85,7 +85,7 @@ Do **not** send the data policy or research page unless they ask.
 
 **Proves:** “The card/QR is still active or revoked **right now** on humanity’s resolver.” / “It’s a live status check, not a permanent profile.”
 
-**Live object (good):** “It’s an active live object on humanity.llc—the network just checked it.” / “The page says [manifesto message] and it’s still valid.”
+**Live object (good):** “It’s an active live object on humanity.llc-the network just checked it.” / “The page says [manifesto message] and it’s still valid.”
 
 **Does not prove:** “That the person showing me the sticker owns the card.” / “Government ID or employment.” / “That they’re a good person.”
 
