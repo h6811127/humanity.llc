@@ -5,12 +5,8 @@
  */
 import { openInboxFromChrome, closeInboxSheet } from "./device-inbox-sheet-loader.mjs";
 import { buildStatusSegments } from "./device-counts.mjs";
-import {
-  DEVICE_OS_REFRESHED,
-  getCoordinatorNetworkStatus,
-  initDeviceOsCoordinator,
-  requestDeviceOsRefresh,
-} from "./device-os-coordinator.mjs";
+import { fetchResolverHealth } from "./device-network-health.mjs";
+import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
 import {
@@ -22,25 +18,25 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeCountText,
   notificationCount,
-} from "./device-inbox.mjs?v=28";
+} from "./device-inbox.mjs?v=29";
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=28";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=29";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import "./device-shell-motion.mjs";
-import "./device-shell-chrome.mjs?v=28";
+import "./device-shell-chrome.mjs?v=29";
 import "./device-theme.mjs";
-import "./device-browser-notifications.mjs?v=28";
+import "./device-browser-notifications.mjs?v=29";
 import {
   isHubSheet,
   reconcileHubSheetState,
   setHubSheetOpen,
-} from "./device-hub-sheet.mjs?v=28";
+} from "./device-hub-sheet.mjs?v=29";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 import {
   describeDotState,
@@ -52,7 +48,7 @@ import {
   hasStewardVerification,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=28";
+} from "./device-dot-state-core.mjs?v=29";
 
 export const DOT_STATE_CHANGED = "hc-dot-state-changed";
 
@@ -421,7 +417,8 @@ function refreshSummary() {
 }
 
 async function refreshNetwork() {
-  await requestDeviceOsRefresh("manual", { immediate: true });
+  networkStatus = await fetchResolverHealth(resolverApiOrigin());
+  refreshSummary();
 }
 
 function scrollWalletToSaved() {
@@ -510,19 +507,25 @@ window.addEventListener("hc-focus-hub-search", () => {
   document.getElementById("device-hub-search")?.focus({ preventScroll: true });
 });
 
-initDeviceOsCoordinator();
 startTabKeysPresence();
-networkStatus = getCoordinatorNetworkStatus();
-refreshSummary();
+void refreshNetwork();
 
-window.addEventListener(DEVICE_OS_REFRESHED, (e) => {
-  const next = e.detail?.networkStatus;
-  if (next === "ok" || next === "degraded" || next === "offline") {
-    networkStatus = next;
-  }
-  refreshSummary();
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") void refreshNetwork();
 });
 
+window.addEventListener("storage", (e) => {
+  if (
+    e.key === "hc_wallet" ||
+    e.key === "hc_device_pins" ||
+    e.key === "hc_created" ||
+    e.key === "hc_device_activity"
+  ) {
+    refreshSummary();
+  }
+});
+
+window.addEventListener("hc-device-hub-changed", refreshSummary);
 window.addEventListener("hc-live-control-inbox-changed", refreshSummary);
 window.addEventListener("hc-tab-presence-changed", refreshSummary);
 window.addEventListener(NETWORK_BASELINE_CHANGED, refreshSummary);

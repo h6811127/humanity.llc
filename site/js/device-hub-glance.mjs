@@ -14,7 +14,6 @@ import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
-import { DEVICE_OS_REFRESHED } from "./device-os-coordinator.mjs";
 import {
   CARD_DISABLED_SINCE_VISIT_GLANCE_SUFFIX,
   cardDisabledSinceVisitVisible,
@@ -258,7 +257,6 @@ if (glanceTargets.length > 0) {
   refreshHubGlance();
   window.addEventListener("hc-device-hub-changed", refreshHubGlance);
   window.addEventListener(NETWORK_REFRESHED, refreshHubGlance);
-  window.addEventListener(DEVICE_OS_REFRESHED, refreshHubGlance);
   window.addEventListener(NETWORK_BASELINE_CHANGED, refreshHubGlance);
   window.addEventListener("hc-live-control-inbox-changed", refreshHubGlance);
   window.addEventListener("hc-tab-presence-changed", refreshHubGlance);

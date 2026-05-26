@@ -1,5 +1,7 @@
 /**
  * Single debounced refresh pipeline for device OS: health, tab presence, wallet network, live proof.
+ * Not auto-started from device-status (UI revert step 2) — hub/wallet poll via `device-hub-ui.mjs`.
+ * @see docs/UI_UX_REVERT_PLAN.md
  * @see docs/DEVICE_OS_QA.md § P1-1
  */
 import { resolverApiOrigin } from "./hc-sign.mjs";

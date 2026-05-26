@@ -146,7 +146,7 @@ See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` for storage and search.
 
 ## Refresh coordinator (Phase 1 hardening)
 
-Resolver health, wallet status polls, tab presence sync, and live-proof inbox refresh are batched in **`site/js/device-os-coordinator.mjs`** (300ms debounce). Pages with device chrome import it via `device-status.mjs`.
+Resolver health for the status dot is fetched in **`site/js/device-status.mjs`** (`fetchResolverHealth`). Wallet status polls and live-proof inbox refresh run from **`site/js/device-hub-ui.mjs`** when the hub is mounted. **`site/js/device-os-coordinator.mjs`** (300ms debounce) remains for tests and optional use but is not auto-started from the status bootstrap (see `docs/UI_UX_REVERT_PLAN.md` step 2).
 
 | Event | Role |
 |-------|------|

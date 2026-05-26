@@ -53,7 +53,6 @@ import {
   syncLastSeenFromNetworkMap,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
-import { DEVICE_OS_REFRESHED } from "./device-os-coordinator.mjs";
 import { getCardStatusUrl } from "./hc-sign.mjs";
 import {
   hubCardIdentityLine,
@@ -1202,13 +1201,6 @@ export function initDeviceHub(config = {}) {
     } else {
       reapplyRevokedSinceVisitFromLatestResolved();
     }
-    syncHubInboxAlertGroups();
-    refreshEmptyHint();
-    notifyHubChanged();
-  });
-
-  window.addEventListener(DEVICE_OS_REFRESHED, () => {
-    reapplyRevokedSinceVisitFromLatestResolved();
     syncHubInboxAlertGroups();
     refreshEmptyHint();
     notifyHubChanged();

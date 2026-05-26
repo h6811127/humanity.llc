@@ -37,7 +37,7 @@ The rate-limit screen is **Cloudflare edge** (not our Worker 429 JSON). It appea
 | Step | Action | Primary paths | Status |
 |------|--------|---------------|--------|
 | **1** | **Remove document scroll-edge chrome entirely** — no `scroll` listener, delete `device-shell-chrome-core.mjs`, inset-only chrome; bump `DEVICE_SHELL_ASSET_VERSION` | `site/js/device-shell-chrome.mjs`, `worker/tests/device-shell-chrome.test.ts` | **Done** |
-| **2** | **Stop global OS coordinator refresh** — remove `initDeviceOsCoordinator()` from status bootstrap; hub/wallet keep scoped refresh only | `site/js/device-status.mjs`, `device-os-coordinator*.mjs` | Pending |
+| **2** | **Stop global OS coordinator refresh** — remove `initDeviceOsCoordinator()` from status bootstrap; hub/wallet keep scoped refresh only | `site/js/device-status.mjs`, `device-os-coordinator*.mjs` | **Done** |
 | **3** | **Revert May 26 Safari fix commits** (newest first): `88d5d01` … `c1e1751`, skip `7aa04bc` (wrangler tmp junk) | shell CSS, backdrop sync, lazy inbox loader, safari e2e | Pending |
 | **4** | **Roll back device inbox v2** to pre-`7590e79` — remove inbox modules, restore status dot without inbox sheet | `site/js/device-inbox*.mjs`, HTML script tags | Pending |
 | **5** | **Restore shell graph from `4d1e965`** for `device-status.mjs`, hub UI, `device-shell.css` | `git checkout 4d1e965 -- <paths>` + manual merge | Pending |

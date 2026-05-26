@@ -3,7 +3,7 @@
 **Status:** Active (Phase 0 hardening)  
 **Canonical product model:** [`DEVICE_OS.md`](DEVICE_OS.md)  
 **Storage & hub detail:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)  
-**Refresh pipeline:** `site/js/device-os-coordinator.mjs` (debounced resolver + wallet sync)
+**Refresh pipeline:** Status dot — resolver health only (`device-status.mjs` + `device-network-health.mjs`). Hub/wallet — scoped polls in `device-hub-ui.mjs` (`fetchAndApplyNetworkChips`, live-control inbox). `device-os-coordinator.mjs` is retained but not auto-started (see `docs/UI_UX_REVERT_PLAN.md` step 2).
 
 **Purpose:** Repeatable checks before M5 stranger tests and after device-shell changes. Log failures in the triage table at the bottom.
 

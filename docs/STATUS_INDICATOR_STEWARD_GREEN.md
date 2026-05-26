@@ -195,7 +195,7 @@ Playwright (`e2e/device-status-dot.spec.ts`, `status dot accessibility`):
 1. **`prefers-reduced-motion: reduce`** — steward dot loads without `pass-dot-steward-celebrate` (JS + CSS both respect reduced motion).
 2. **Text alternatives** — `#brand-status-dot-btn` `aria-label` mentions steward readiness and resolver state; opening the hub shows `.device-dot-explainer` with **Now / Why / Next** lines and the state quick action.
 
-Network refresh for dot coloring uses `device-os-coordinator.mjs` (`DEVICE_OS_REFRESHED`) so steward green tracks resolver health consistently with wallet/hub.
+Network refresh for dot coloring uses `device-status.mjs` (`fetchResolverHealth` on load, tab visible, and retry). Wallet/hub card chips poll via `device-hub-ui.mjs` (`NETWORK_REFRESHED`).
 
 ### Phase 1 - Steward green foundation
 
