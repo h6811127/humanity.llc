@@ -1,8 +1,14 @@
 /**
- * Landing progress strip  -  highlight the next step from local wallet/pins.
+ * Landing progress strip — legend + single Continue CTA.
+ * @see docs/LANDING_PROGRESS_STRIP.md
  */
-const WALLET_KEY = "hc_wallet";
-const PINS_KEY = "hc_device_pins";
+import {
+  PINS_KEY,
+  resolveLandingContinue,
+  SETUP_DONE_KEY,
+  WALLET_KEY,
+  parseSetupDoneMap,
+} from "./landing-progress-core.mjs";
 
 function loadWallet() {
   try {
@@ -24,38 +30,71 @@ function loadPins() {
   }
 }
 
+function loadSetupDone() {
+  try {
+    const raw = localStorage.getItem(SETUP_DONE_KEY);
+    return parseSetupDoneMap(raw ? JSON.parse(raw) : {});
+  } catch {
+    return {};
+  }
+}
+
+/** Tab has signing keys not yet in `hc_wallet` (same rule as device-status). */
+function hasUnsavedTabKeys() {
+  try {
+    const raw = sessionStorage.getItem("hc_created");
+    if (!raw) return false;
+    const session = JSON.parse(raw);
+    const profileId =
+      typeof session?.profile_id === "string" ? session.profile_id.trim() : "";
+    if (!profileId || !session?.owner_private_key_b58) return false;
+    return !loadWallet().some((e) => e.profile_id === profileId);
+  } catch {
+    return false;
+  }
+}
+
 function applyProgressState() {
   const steps = document.querySelectorAll(".landing-progress-step");
-  if (!steps.length) return;
+  const continueEl = document.getElementById("landing-progress-continue");
+  if (!steps.length || !continueEl) return;
 
-  const hasWallet = loadWallet().length > 0;
-  const hasPins = loadPins().length > 0;
+  const wallet = loadWallet();
+  const state = resolveLandingContinue({
+    wallet,
+    pins: loadPins(),
+    setupDone: loadSetupDone(),
+    unsavedTabKeys: hasUnsavedTabKeys(),
+  });
 
   for (const step of steps) {
     step.classList.remove("is-next", "is-done");
   }
 
-  if (!hasWallet) {
-    steps[1]?.classList.add("is-next");
-    return;
+  for (const n of state.legendDone) {
+    const step = document.querySelector(`.landing-progress-step[data-legend-step="${n}"]`);
+    step?.classList.add("is-done");
   }
 
-  steps[0]?.classList.add("is-done");
-  steps[1]?.classList.add("is-done");
-
-  if (hasPins) {
-    steps[2]?.classList.add("is-done");
-    steps[3]?.classList.add("is-next");
-    return;
+  if (state.legendStep && (wallet.length > 0 || hasUnsavedTabKeys())) {
+    const active = document.querySelector(
+      `.landing-progress-step[data-legend-step="${state.legendStep}"]`
+    );
+    active?.classList.add("is-next");
   }
 
-  steps[2]?.classList.add("is-next");
+  continueEl.href = state.href;
+  continueEl.textContent = state.label;
 }
 
 applyProgressState();
 
 window.addEventListener("storage", (e) => {
-  if (e.key === WALLET_KEY || e.key === PINS_KEY) applyProgressState();
+  if (e.key === WALLET_KEY || e.key === PINS_KEY || e.key === SETUP_DONE_KEY) {
+    applyProgressState();
+  }
 });
 
 window.addEventListener("hc-device-hub-changed", applyProgressState);
+window.addEventListener("pageshow", applyProgressState);
+window.addEventListener("focus", applyProgressState);

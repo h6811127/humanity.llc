@@ -1,6 +1,6 @@
 # Landing progress strip
 
-**Status:** Spec agreed (May 2026) · **Phase 1 not shipped** · Phase 2 after Phase 1  
+**Status:** Phase 1 shipped (May 2026) · Phase 2 deeplinks not started  
 **Scope:** `/` (`site/index.html`) · `.landing-progress` · `site/js/landing-progress.mjs`  
 **Companion:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) · [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`CARD_WORKSPACE_PHASE0.md`](CARD_WORKSPACE_PHASE0.md)
 
@@ -134,14 +134,14 @@ Share resolution logic with hub where possible (`openCardControlPage`, `openCard
 
 ## Implementation phases
 
-### Phase 1 — Honest UX (ship first)
+### Phase 1 — Honest UX (shipped)
 
 1. Documented contract (this file).
-2. Extract **`resolveLandingContinue()`** + Vitest fixtures for storage snapshots.
-3. **HTML/CSS:** legend (non-link or disabled styling) + single Continue control.
-4. **Remove** misleading `is-next` on strangers; tie any `is-done` to resolver `legendDone` only when wallet non-empty.
-5. **Stop** pointing steps 2–3 at contextless `/created/` in markup (or remove step links entirely).
-6. **QA:** manual cases below; optional Playwright on `/` (incognito vs seeded `localStorage`).
+2. **`resolveLandingContinue()`** in `site/js/landing-progress-core.mjs` + `worker/tests/landing-progress.test.ts`.
+3. **HTML/CSS:** read-only legend + single Continue (`site/index.html`, `.landing-progress-continue`).
+4. Strangers: neutral legend (no `is-next`); returning users: `is-done` / `is-next` from resolver only.
+5. Four peer step links removed (no contextless `/created/` hops).
+6. **QA:** manual **P1-LP** below; Playwright `e2e/landing-progress.spec.ts`.
 
 ### Phase 2 — Deeplinks (follow-up PR)
 
@@ -158,13 +158,15 @@ Share resolution logic with hub where possible (`openCardControlPage`, `openCard
 
 ---
 
-## Current shipped files (pre-refactor)
+## Shipped files
 
 | Path | Role |
 |------|------|
-| `site/index.html` | Markup: four `<a>` steps |
-| `site/js/landing-progress.mjs` | `is-done` / `is-next` from wallet + pins only |
-| `site/styles.css` | `.landing-progress-*` |
+| `site/index.html` | Legend steps + `#landing-progress-continue` |
+| `site/js/landing-progress-core.mjs` | `resolveLandingContinue()` |
+| `site/js/landing-progress.mjs` | DOM apply + storage listeners |
+| `site/styles.css` | `.landing-progress-legend`, `.landing-progress-continue` |
+| `worker/tests/landing-progress.test.ts` | Resolver unit tests |
 
 ---
 
@@ -172,13 +174,18 @@ Share resolution logic with hub where possible (`openCardControlPage`, `openCard
 
 ### Vitest (Phase 1)
 
-Add tests for `resolveLandingContinue()` (or equivalent) with mocked storage:
+```bash
+npm run worker:test:landing-progress
+```
+
+Tests for `resolveLandingContinue()` with mocked storage:
 
 - Empty wallet → Create, neutral legend.
-- Wallet, no pins → Save or Print per contract table.
-- Wallet + pins → My cards or Print per contract.
+- Unsaved tab keys (`unsavedTabKeys`) → Save keys on this device.
+- Wallet, no pins / incomplete setup → Print.
+- Wallet + setup done + pins → My cards.
 
-### Manual (`docs/DEVICE_OS_QA.md` — add when Phase 1 ships)
+### Manual (`docs/DEVICE_OS_QA.md` — **P1-LP**)
 
 | Case | Expect |
 |------|--------|

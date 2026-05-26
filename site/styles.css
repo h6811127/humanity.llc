@@ -4198,7 +4198,7 @@ body.landing-focus-mode .screen-landing {
   gap: 8px;
 }
 
-.landing-progress-step a {
+.landing-progress-legend {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -4207,13 +4207,24 @@ body.landing-focus-mode .screen-landing {
   border: 1px solid rgba(0, 0, 0, 0.1);
   background: var(--white);
   color: inherit;
-  text-decoration: none;
   font-size: 14px;
   font-weight: 600;
 }
 
-.landing-progress-step a:active {
-  background: #f2f2f7;
+.landing-progress-actions {
+  margin: 12px 0 0;
+  padding: 0 2px;
+}
+
+.landing-progress-continue {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  text-align: center;
+  text-decoration: none;
+  box-sizing: border-box;
 }
 
 .landing-progress-num {
@@ -4233,11 +4244,11 @@ body.landing-focus-mode .screen-landing {
   letter-spacing: -0.02em;
 }
 
-.landing-progress-step.is-done a {
+.landing-progress-step.is-done .landing-progress-legend {
   opacity: 0.65;
 }
 
-.landing-progress-step.is-next a {
+.landing-progress-step.is-next .landing-progress-legend {
   border-color: rgba(219, 27, 67, 0.45);
   box-shadow: 0 0 0 1px rgba(219, 27, 67, 0.12);
 }
