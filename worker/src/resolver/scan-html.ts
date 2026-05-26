@@ -11,16 +11,23 @@ import {
 import { governanceProcessUrls, originFromScanUrl } from "./scan-governance";
 import { SCAN_OFFLINE_BANNER_TEXT } from "./scan-offline";
 import { renderScanQrMarkup } from "./scan-qr";
+import {
+  EMPTY_SCAN_SAFETY,
+  renderScanSafetyHeaderScript,
+  renderScannerSafetyHeader,
+  type ScanSafetyModel,
+} from "./scan-safety";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v19";
+export const SCAN_UI_VERSION = "pass-v20";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
  */
 export async function renderScanPage(
   vm: ScanViewModel,
-  origin: string
+  origin: string,
+  safety: ScanSafetyModel = EMPTY_SCAN_SAFETY
 ): Promise<string> {
   const title = pageTitle(vm);
   let qrMarkup = "";
@@ -50,6 +57,7 @@ export async function renderScanPage(
     <p class="scan-cross-tab-banner" id="scan-cross-tab-banner" role="status" hidden></p>
     <p class="scan-offline-banner" id="scan-offline-banner" role="status" hidden>${escapeHtml(SCAN_OFFLINE_BANNER_TEXT)}</p>
     <main class="screen scan-screen">
+      ${renderScannerSafetyHeader(vm, safety)}
       <p class="section-kicker">Network status</p>
       ${renderPassSection(vm, origin, qrMarkup)}
       ${renderScanUrlControl(vm)}
@@ -63,6 +71,7 @@ export async function renderScanPage(
   ${renderScanTabKeysScript(vm, origin)}
   ${renderQrFallbackScript(origin, vm.scanUrl)}
   ${renderScanOfflineBannerScript()}
+  ${renderScanSafetyHeaderScript()}
 </body>
 </html>`;
 }

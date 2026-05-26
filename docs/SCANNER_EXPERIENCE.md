@@ -109,15 +109,15 @@ Third parties must not ship lookalike “Humanity pink” QRs that encode non-Hu
 
 The scan page is **live Worker HTML** at `GET /c/{profile_id}?q={qr_id}`—not the static Pages site. Implementation layout: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md).
 
-Deploy check: response header `X-HC-Scan-UI` (e.g. `pass-v5`).
+Deploy check: response header `X-HC-Scan-UI` (e.g. `pass-v20`).
 
 ### Information architecture (target order)
 
 Optimize for **strangers scanning in the wild**, then depth for the curious.
 
-1. **Scanner safety header** (above the pass card) — *planned; not all rows shipped*
-2. **Pass card (front)** — handle, manifesto, trust pills, this object’s QR, bearer foot
-3. **Pass card (back)** — short limits only (no long copy; clips)
+1. **Scanner safety header** — **shipped** (`scan-safety.ts`, `scan-pass.css`)
+2. **Status panel** — handle or object label, facts, QR, bearer line
+3. **Pass card (back)** — unused on shipped scan HTML (limits in settings row)
 4. **Grouped lists** — Card status, Human trust, This QR, Live control, Limitations
 5. **Limits `<details>`** — full “does not prove” copy at bottom
 
@@ -137,7 +137,7 @@ Aggressive, calm trust chrome—**safer than opening a random URL**.
 | Subtle open animation | One brand pulse on border, then settle to status color | Signals live check completed—not decorative loop |
 | Offline | “Offline — status may be stale; refresh when connected.” | Client banner when `navigator.onLine === false` ([`docs/FLOW_2_QR_SCAN_REPAIR_SPEC.md`](FLOW_2_QR_SCAN_REPAIR_SPEC.md) slice 3) |
 
-**Shipped today (M3):** bearer line above card; grouped trust blocks; limits in `scan-limits-settings`; live control interactive block; governance links on suspension.
+**Shipped (M3 + Phase B):** scanner safety header; bearer line above status panel; grouped trust blocks; limits in `scan-limits-settings`; live control interactive block; governance links on suspension; offline banner (F2-2).
 
 ### Trust blocks (alignment)
 
@@ -226,8 +226,8 @@ From [`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md)—do 
 | Phase | Deliverable | Reduces |
 |-------|-------------|---------|
 | **A** | `renderHumanityQrFrame()` + footer + `LIVE OBJECT` + update [`docs/QR_BRANDING.md`](QR_BRANDING.md) | Lookalike QRs — **shipped** |
-| **B** | Scanner safety header, session “first seen,” status strip reorder | Over-trust, unclear revoke — **next** |
-| **C** | Host-lock lint in tests + generator docs | Malicious payloads |
+| **B** | Scanner safety header, session “first seen,” status strip reorder | Over-trust, unclear revoke — **shipped** |
+| **C** | Host-lock lint in tests + generator docs | Malicious payloads — **next** |
 | **D** | Print sticker SVG/PDF template (physical marks) | Physical impersonation |
 | **E** | `/c/…/out` interstitial + redirect ban in Worker | Weaponized branding |
 | **F** | Short credential code on print + optional verifier app | Supply-chain / advanced fakes |
@@ -251,7 +251,7 @@ Show mixed QRs at phone distance; target &lt;1s Humanity identification without 
 ### Automated checks
 
 ```bash
-npm run worker:test -- worker/tests/scan-qr-branding.test.ts worker/tests/scan.test.ts
+npm run worker:test -- worker/tests/scan-qr-branding.test.ts worker/tests/scan.test.ts worker/tests/scan-safety.test.ts
 ```
 
 ---
@@ -261,6 +261,7 @@ npm run worker:test -- worker/tests/scan-qr-branding.test.ts worker/tests/scan.t
 | Concern | Path |
 |---------|------|
 | Scan HTML | `worker/src/resolver/scan-html.ts` |
+| Scanner safety header | `worker/src/resolver/scan-safety.ts` |
 | View model | `worker/src/resolver/scan-state.ts` |
 | Status JSON | `worker/src/resolver/scan-status.ts` |
 | Branded QR (resolver) | `worker/src/resolver/scan-qr.ts` |

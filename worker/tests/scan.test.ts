@@ -217,6 +217,8 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("@river_example");
     expect(html).toContain("Card active");
     expect(html).toContain("QR active");
+    expect(html).toContain("scan-safety-header");
+    expect(html).toContain("Humanity object");
     expect(html).toContain("scan-bearer-line");
     expect(html).toContain("scan-limits-settings");
     expect(html).toContain("What this scan does not prove");
@@ -425,7 +427,8 @@ describe("renderScanPage M3.2 trust blocks", () => {
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).toContain("This card has been disabled");
     expect(html).toContain("Show link");
-    expect(html).not.toContain("@river_example");
+    expect(html).toContain("scan-safety-header");
+    expect(html).toContain("scan-safety-strip--bad");
     expect(html).not.toContain("Human trust");
   });
 
@@ -447,7 +450,8 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(vm.minimalScan).toBe(true);
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).toContain("This QR has expired");
-    expect(html).not.toContain("@river_example");
+    expect(html).toContain("scan-safety-header");
+    expect(html).toContain("scan-safety-strip--warn");
     expect(html).not.toContain('id="pass-flip-btn"');
   });
 
@@ -469,7 +473,8 @@ describe("renderScanPage M3.2 trust blocks", () => {
     const htmlRevoked = await renderScanPage(vmRevoked, "https://humanity.llc");
     expect(htmlRevoked).toContain("This QR is no longer valid");
     expect(htmlRevoked).toContain("Show link");
-    expect(htmlRevoked).not.toContain("@river_example");
+    expect(htmlRevoked).toContain("scan-safety-header");
+    expect(htmlRevoked).toContain("scan-safety-strip--bad");
     expect(htmlRevoked).not.toContain("Human trust");
     expect(htmlRevoked).not.toContain('id="pass-flip-btn"');
 

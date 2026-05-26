@@ -46,7 +46,7 @@ These tighten Phase A for the chosen vertical without a new “product tab”:
 
 | Area | Direction |
 |------|-----------|
-| **Create / scan copy** | Name the **object** (“Studio door”, “Keys tag”) on scan UI where helpful; keep “what this does not prove” visible. |
+| **Create / scan copy** | Name the **object** (“Studio door”, “Keys tag”) on scan UI where helpful; keep “what this does not prove” visible. **Shipped:** scanner safety chips (`Object · …` / `Item · …`) on `/c/…` per `docs/SCANNER_EXPERIENCE.md` Phase B. |
 | **Scan page** | Active vs revoked must read in &lt;30s for non-technical scanners (`docs/M3_SCAN_PAGE_UI.md`). |
 | **`/created/`** | Recovery gate stays; consider tucking **More options** until after first successful revoke in-session (`docs/M4_CREATED_REVOKE_UI.md`). |
 | **Print path** | Download QR PNG + phone print steps on `/created/` (shipped); validate strangers actually print before testing revoke in the wild. |

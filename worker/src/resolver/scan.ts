@@ -3,6 +3,7 @@ import { getLiveControlChallenge, getRecentLiveControlProof } from "../db/live-c
 import { PROFILE_ID_REGEX } from "../crypto";
 import { htmlResponse, requestOrigin } from "../http/resolver";
 import { renderScanPage, SCAN_UI_VERSION } from "./scan-html";
+import { buildScanSafetyModel } from "./scan-safety";
 import {
   buildScanViewModel,
   httpStatusForScanKind,
@@ -64,10 +65,16 @@ export async function handleGetScan(
   );
   await applyRecentLiveControlProof(env, vm, profileId, qrId, now);
 
-  return htmlResponse(await renderScanPage(vm, origin), httpStatusForScanKind(vm.kind), {
-    "Cache-Control": vm.cacheControl,
-    "X-HC-Scan-UI": SCAN_UI_VERSION,
-  });
+  const safety = await buildScanSafetyModel(ctx, vm);
+
+  return htmlResponse(
+    await renderScanPage(vm, origin, safety),
+    httpStatusForScanKind(vm.kind),
+    {
+      "Cache-Control": vm.cacheControl,
+      "X-HC-Scan-UI": SCAN_UI_VERSION,
+    }
+  );
 }
 
 async function applyLiveControlProofIfPresent(
