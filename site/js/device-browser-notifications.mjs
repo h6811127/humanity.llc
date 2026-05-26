@@ -12,6 +12,11 @@ import {
 import { buildLiveControlProofHref } from "./device-live-control-inbox-core.mjs";
 import { getLiveControlPending, getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
 import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs";
+import {
+  registerLiveProofServiceWorker,
+  syncLiveProofServiceWorkerState,
+  teardownLiveProofServiceWorker,
+} from "./device-browser-notifications-sw.mjs";
 
 const TAG_LIVE_PROOF = "hc-live-proof";
 const SESSION_OS_INTERACT = "hc_browser_notif_os_interact";
@@ -31,6 +36,11 @@ export function setBrowserNotifEnabled(on) {
     localStorage.setItem(STORAGE_BROWSER_NOTIF, on ? "on" : "off");
   } catch {
     /* ignore */
+  }
+  if (on) {
+    void registerLiveProofServiceWorker();
+  } else {
+    void teardownLiveProofServiceWorker();
   }
   syncBrowserNotifToggleButtons();
   syncBrowserNotifPrompts();
@@ -80,6 +90,8 @@ export async function enableBrowserAlerts() {
   const perm = await ensurePermission();
   if (perm === "granted") {
     setBrowserNotifEnabled(true);
+    await registerLiveProofServiceWorker();
+    await syncLiveProofServiceWorkerState({ pollNow: false });
     logInboxDiagnostic({ type: "browser_alert_opt_in" });
     return true;
   }
@@ -279,6 +291,9 @@ export function maybeNotifyLiveProof() {
   } catch {
     /* ignore */
   }
+  if (document.visibilityState === "hidden") {
+    void syncLiveProofServiceWorkerState({ pollNow: true });
+  }
 }
 
 export function mountBrowserNotifToggles() {
@@ -302,13 +317,20 @@ export function initBrowserNotifications() {
   window.addEventListener("hc-live-control-inbox-changed", () => {
     maybeNotifyLiveProof();
     syncBrowserNotifPrompts();
+    if (document.visibilityState === "hidden") {
+      void syncLiveProofServiceWorkerState({ pollNow: true });
+    }
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") {
       maybeNotifyLiveProof();
+      void syncLiveProofServiceWorkerState({ pollNow: true });
     } else {
       syncBrowserNotifPrompts();
     }
+  });
+  window.addEventListener("pagehide", () => {
+    void syncLiveProofServiceWorkerState({ pollNow: true });
   });
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {

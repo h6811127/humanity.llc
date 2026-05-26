@@ -168,6 +168,17 @@ Spec: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 
 Playwright: `e2e/device-inbox.spec.ts` (CI via `test-site.yml`). Manual spot-check still useful on real Worker + pending challenge.
 
+## P5d — Live-proof service worker (Phase D)
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Enable **Browser alerts** on `/` with notification permission granted | `navigator.serviceWorker.getRegistration()` shows `/sw-live-proof.mjs` |
+| 2 | Save a card; simulate pending live proof; hide or close all Humanity tabs | OS notification may appear from SW when no visible client (browser-dependent) |
+| 3 | Click SW notification | Opens `/created/` sign URL for pending challenge |
+| 4 | With a visible Humanity tab and pending proof | Page path handles alert; SW does not duplicate while tab visible |
+
+See [`DEVICE_INBOX.md`](DEVICE_INBOX.md) — v2 Phase D limits (no server push; periodic sync may be throttled).
+
 ## P5c — Hub saved card row visuals (Row Phase 3)
 
 | Step | Action | Expected |

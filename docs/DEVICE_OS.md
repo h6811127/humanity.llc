@@ -185,7 +185,7 @@ Full spec: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 |-------|---------|
 | Inbox badge (`#shell-notif-badge`) | Count, chroma, tap → inbox sheet |
 | Hub / glance rows | `buildInboxItems()` + `buildGlanceRowPlan()`; hub groups via `device-hub-inbox-alerts.mjs` |
-| Browser background alerts | v2 A–C: contextual opt-in, sign deep link, OS policy matrix |
+| Browser background alerts | v2 A–D: contextual opt-in, sign deep link, OS policy, live-proof service worker |
 | Status dot | Overlays for proof / cross-tab; `open_notifications` action (no numeric count on dot) |
 
 **Do not:** server push, OS alerts for resolver health, or permission prompt on first visit.
