@@ -55,7 +55,7 @@
 | F2-1 | No scan access log (anonymized IP) | Flow 2 step 2: “Access log with anonymized IP only” |
 | F2-2 | ✅ Fixed: scan HTML shows offline banner when `navigator.onLine === false` (`scan-offline.ts`, `scan-offline-banner`). |
 | F2-3 | ✅ Fixed: suspended scan HTML + status JSON include links to data policy and architecture (`scan-governance.ts`). |
-| F2-4 | `GET /.well-known/hc/v1/qr/{qr_id}` not implemented | § API Network table |
+| F2-4 | ✅ Fixed: `GET /.well-known/hc/v1/qr/{qr_id}` returns contract-shaped QR metadata (`qr-metadata.ts`). |
 | F2-5 | `GET /v1/verification/status/{profile_id}` not implemented | § API Verification table |
 | F2-6 | Card GET HTML is raw JSON `<pre>`, not public card view | § API: “HTML or JSON public card” |
 | F2-7 | Revoked card: GET card returns JSON 410; scan returns HTML 410 | Integrators vs humans split (document or align) |
@@ -106,13 +106,15 @@
 
 ---
 
-### Slice 4 — `GET …/qr/{qr_id}` (P1 API)
+### Slice 4 — `GET …/qr/{qr_id}` (P1 API) ✅
 
 **Goal:** QR metadata without requiring profile_id in path.
 
-- [ ] Route in `worker/src/index.ts`.
-- [ ] Handler: load `qr_credentials` by id; return credential JSON; 404 if missing; no PII beyond contract fields.
-- [ ] Do **not** log scan analytics unless Slice 5 defines anonymized log.
+- [x] Route in `worker/src/index.ts`.
+- [x] Handler: load `qr_credentials` by id; return credential JSON; 404 if missing; no PII beyond contract fields.
+- [x] Do **not** log scan analytics unless Slice 5 defines anonymized log.
+
+**Files:** `worker/src/resolver/qr-metadata.ts`, `worker/src/db/qr-metadata.ts`, `worker/tests/qr-metadata.test.ts`.
 
 **Done when:** `curl GET …/qr/{qr_id}` returns contract-shaped JSON; Vitest covers active/revoked/unknown.
 

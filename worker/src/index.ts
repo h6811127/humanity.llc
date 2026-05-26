@@ -27,6 +27,7 @@ import { handlePostCardUpdate } from "./resolver/update-card";
 import { handlePostRotateQr } from "./resolver/rotate-qr";
 import { handlePostExtendQr } from "./resolver/extend-qr";
 import { handleGetScan } from "./resolver/scan";
+import { handleGetQrMetadata } from "./resolver/qr-metadata";
 import { handleGetScanStatus } from "./resolver/scan-status";
 import { handlePostVouch } from "./resolver/vouch";
 import { handleGetVouch, handlePostVouchRevoke } from "./resolver/vouch-revoke";
@@ -166,6 +167,14 @@ export default {
         return jsonResponse({ error: "database_unconfigured" }, 503);
       }
       return handleGetScanStatus(request, env.DB, statusMatch[1]!);
+    }
+
+    const qrMetadataMatch = path.match(/^\/\.well-known\/hc\/v1\/qr\/([^/]+)$/);
+    if (qrMetadataMatch && request.method === "GET") {
+      if (!env.DB) {
+        return jsonResponse({ error: "database_unconfigured" }, 503);
+      }
+      return handleGetQrMetadata(request, env.DB, qrMetadataMatch[1]!);
     }
 
     const revokeMatch = path.match(
