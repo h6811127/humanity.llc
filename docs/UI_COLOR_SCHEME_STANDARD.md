@@ -54,12 +54,15 @@ Use these for:
 ## Emphasis notice cards (`hc-emphasis-card` pattern)
 
 **Status:** Shared component shipped (Phase 0) — see [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md)  
+**Planned visual reset (docs only):** [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) — keys-notification baseline + translucent blur, hairline border, tighter eyebrows, precise CTAs; **revert** landing Liquid Glass.  
 **Files:** `site/css/hc-emphasis-card.css` (imported by `site/styles.css` and bundled into scan via `worker:bundle-scan`), `site/css/theme-dark.css`  
 **Regression:** `worker/tests/ui-color-scheme-popover-guard.test.ts` (`.hc-emphasis-card`, `.hc-emphasis-card--active`)
 
 Raised, card-shaped callouts for **high-salience device state** on page chrome (keys active, cross-tab, live proof, setup gates). They sit between flat `.hc-notice` strips and full-bleed hub tap banners (`.device-hub-notice-banner`).
 
-### Design rules (required)
+**Reference instances:** `#wallet-active-banner` (`--active`, green) · `#wallet-tab-hint` / `#device-cross-tab-banner` (`--info`, blue).
+
+### Design rules (shipped — May 2026)
 
 | Rule | Why |
 |------|-----|
@@ -68,6 +71,16 @@ Raised, card-shaped callouts for **high-salience device state** on page chrome (
 | **Semantic color in copy, not the frame** | Eyebrow + optional status dot carry blue/amber/red/green meaning; the card surface stays neutral. |
 | **Typography ladder** | Eyebrow (12px uppercase) → title (17px bold, optional) → detail (13px muted) → optional pill CTA (brand red or contextual). |
 | **14px corner radius** | Matches wallet / grouped UI; shadow stack is tuned for this radius. |
+
+### Design rules (planned — see alignment doc)
+
+| Rule | Target |
+|------|--------|
+| **Border + shadow** | Subtle hairline (`0.5px`–`1px`) **plus** existing `--hc-emphasis-card-shadow` |
+| **Translucent fill** | Modifier-tinted wash + `backdrop-filter` blur; opaque fallback when reduced transparency |
+| **Eyebrow** | `letter-spacing: 0.025em` (down from `0.04em`) |
+| **CTA** | `border-radius: 10px`, tighter padding — not full pill (`999px`) |
+| **Landing CTAs** | Same as wallet — **no** `landing-liquid-glass.css` |
 
 ### Token: `--hc-emphasis-card-shadow`
 

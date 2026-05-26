@@ -46,7 +46,7 @@ flowchart TB
     BANNER["#device-cross-tab-banner legacy"]
     SCAN["#scan-cross-tab-banner"]
     SCAN_DOT["#scan-page-dot overlay"]
-    WALLET_HINT["#wallet-tab-hint hc-emphasis-card"]
+    WALLET_HINT["#wallet-tab-hint hc-emphasis-card (visual ref)"]
   end
 
   truth --> RAW --> GATE --> STAB --> SNAP
@@ -257,6 +257,12 @@ CTAs: **Open that tab** · **Open controls here** (when wallet has keys) · **Cl
 | `worker/tests/device-presence-inbox-stability.test.ts` | Streak |
 | `worker/tests/device-inbox.test.ts` | Inbox rows |
 | `e2e/device-cross-tab-keys.spec.ts` | Two-tab badge, save filter, orphan copy |
+
+---
+
+## Visual chrome (emphasis cards)
+
+Page banners and `#wallet-tab-hint` render as **`hc-emphasis-card--info`** (blue eyebrow + blue dot halo). They are the **reference look** for all emphasis cards, including landing blocks — see [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) (planned: translucent fill, subtle border, precise CTAs; revert landing Liquid Glass).
 
 ---
 

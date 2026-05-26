@@ -1,14 +1,17 @@
 # Emphasis card rollout (`hc-emphasis-card`)
 
-**Status:** Phases 0–5 shipped  
-**Visual standard:** [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Emphasis notice cards  
+**Status:** Phases 0–5 shipped · **Visual alignment v2 planned** (docs only)  
+**Visual standard:** [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Emphasis notice cards · **planned reset:** [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md)  
 **Primary CSS:** `site/css/hc-emphasis-card.css` (imported by `site/styles.css`; bundled into scan via `worker:bundle-scan`), `site/css/theme-dark.css`
 
 ---
 
 ## What this is
 
-Shared **raised notice cards** for high-salience device warnings and actions: shadow-only 3D depth, opaque neutral fills, semantic color in eyebrow/dot/CTA—not a painted rim.
+Shared **raised notice cards** for high-salience device warnings and actions: layered shadow depth, semantic color in eyebrow/dot/CTA, status-dot glow.
+
+**Shipped (May 2026):** Opaque neutral fills, `border: none`, pill CTAs (`border-radius: 999px`).  
+**Planned:** Align all surfaces to **keys-notification** reference styling with translucent blurred fills, subtle hairline border, tighter eyebrow tracking, and precise in-card CTAs — see [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md). Landing **Liquid Glass** buttons revert in phase A of that doc.
 
 Replaces over time: flat `.hc-notice` strips, plain `<p>` cross-tab lines, and amber bordered `.wallet-strip-hint` boxes where a card + CTA is appropriate.
 
@@ -139,8 +142,9 @@ Prioritized follow-ups after Phases 0–5. Full tier tables: [`UI_COLOR_SCHEME_S
 | Glance popover rows | List controls, not page-level cards |
 | Inbox sheet rows | Dense list UX |
 | Solid `.device-hub-notice-banner` full-bleed | Intentional high-contrast hub taps |
-| `.research-live-banner` | Separate visual language (landing final CTA uses emphasis card — [`LANDING_FINAL_CTA_EMPHASIS_CARD.md`](LANDING_FINAL_CTA_EMPHASIS_CARD.md)) |
+| `.research-live-banner` | Separate visual language (landing blocks — [`LANDING_FINAL_CTA_EMPHASIS_CARD.md`](LANDING_FINAL_CTA_EMPHASIS_CARD.md), alignment — [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md)) |
 | Remove `.wallet-active-*` aliases | After all consumers use `hc-emphasis-card__*` only |
+| Landing Liquid Glass CTAs | Revert per visual alignment doc phase A |
 
 ### Engineering hygiene
 
@@ -173,10 +177,23 @@ Prioritized follow-ups after Phases 0–5. Full tier tables: [`UI_COLOR_SCHEME_S
 
 ---
 
+## Visual alignment v2 (planned — docs only)
+
+| Step | Doc |
+|------|-----|
+| Canonical spec | [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) |
+| Revert landing glass | Phase A — remove `landing-liquid-glass.css` |
+| Global token/CSS | Phase B — `hc-emphasis-card.css`, `:root`, `theme-dark.css` |
+| Surface rollout | Phases C–E — shell, created, scan bundle, hub, landing |
+
+Do **not** start implementation until product signs off on translucent fills + hairline border on wallet reference cards.
+
+---
+
 ## QA (every phase)
 
 1. Light + dark theme on target page.
-2. No blue (or semantic) **rim** from translucent fill—only shadow depth.
+2. No blue (or semantic) **rim** from translucent fill alone—hairline border uses neutral/semantic tint per alignment doc (shipped rollout: shadow-only, no stroke).
 3. Eyebrow, title, detail, CTA readable; tap targets ≥44px where buttons.
 4. **Dark mode:** explicit `background: var(--hc-emphasis-card-fill-*)` per modifier in `theme-dark.css`.
 5. `npm run worker:test:ui-color-scheme`
