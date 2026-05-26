@@ -974,6 +974,52 @@ button.device-hub-notice-banner {
   opacity: 0.92;
 }
 
+.device-hub-network-tools {
+  margin: 0 0 12px 4px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--shell-surface-elevated, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--shell-border-subtle, rgba(255, 255, 255, 0.08));
+}
+
+.device-hub-network-tools-status {
+  margin: 0 0 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--shell-label);
+  opacity: 0.9;
+}
+
+.device-hub-network-tools-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.device-hub-network-tools-btn {
+  font-size: 12px;
+  padding: 6px 12px;
+  min-height: 32px;
+}
+
+.device-hub-watch-live-proof {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--shell-label);
+  cursor: pointer;
+  user-select: none;
+}
+
+.device-hub-watch-live-proof input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--shell-accent, #6ee7b7);
+}
+
 .device-hub-section--secondary .device-hub-section-lead {
   display: none;
 }

@@ -1,0 +1,66 @@
+/**
+ * Pure helpers for hub network / live-proof manual checks (request budget Phase 5).
+ * @see docs/DEVICE_OS_REQUEST_BUDGET.md
+ */
+
+export const STORAGE_WATCH_LIVE_PROOF = "hc_watch_live_proof";
+
+/**
+ * @param {() => string | null} [readStorage]
+ */
+export function isWatchLiveProofEnabled(readStorage) {
+  const read =
+    readStorage ??
+    (() => {
+      try {
+        return localStorage.getItem(STORAGE_WATCH_LIVE_PROOF);
+      } catch {
+        return null;
+      }
+    });
+  const value = read();
+  if (value === "0") return false;
+  return true;
+}
+
+/**
+ * @param {number} checkedAt epoch ms; 0 = never
+ * @param {number} [now]
+ */
+export function formatLastCheckedRel(checkedAt, now = Date.now()) {
+  if (!checkedAt || checkedAt <= 0) return null;
+  const secs = Math.max(0, Math.floor((now - checkedAt) / 1000));
+  if (secs < 45) return "just now";
+  const mins = Math.floor(secs / 60);
+  if (mins < 60) return mins === 1 ? "1 min ago" : `${mins} min ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return hours === 1 ? "1 hr ago" : `${hours} hr ago`;
+  try {
+    return new Date(checkedAt).toLocaleString(undefined, {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * @param {{
+ *   networkCheckedAt?: number,
+ *   liveProofCheckedAt?: number,
+ *   now?: number,
+ * }} input
+ */
+export function formatHubNetworkStatusLine(input) {
+  const now = input.now ?? Date.now();
+  const parts = [];
+  const networkRel = formatLastCheckedRel(input.networkCheckedAt ?? 0, now);
+  const proofRel = formatLastCheckedRel(input.liveProofCheckedAt ?? 0, now);
+  if (networkRel) parts.push(`Network checked ${networkRel}`);
+  if (proofRel) parts.push(`Live proof checked ${proofRel}`);
+  if (parts.length === 0) return "Not checked yet this visit";
+  return parts.join(" · ");
+}

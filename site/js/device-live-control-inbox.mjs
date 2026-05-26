@@ -1,8 +1,9 @@
 /**
  * Poll resolver for pending live-control challenges on saved wallet cards.
  * Signing stays on /created/  -  inbox only surfaces waiting requests.
- * @see docs/DEVICE_OS_REQUEST_BUDGET.md (Phases 1–3 — scoped polling + round-robin + health gate)
+ * @see docs/DEVICE_OS_REQUEST_BUDGET.md (Phases 1–4 — scoped polling; Phase 5 — watch toggle)
  */
+import { isWatchLiveProofEnabled } from "./device-hub-network-tools-core.mjs";
 import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs";
 import { getPendingLiveControlChallengeUrl } from "./hc-sign.mjs";
 import { activateWalletEntry } from "./device-keys.mjs";
@@ -66,8 +67,15 @@ const pollSlots = new Map();
 
 let roundRobinCursor = 0;
 let pollSyncInFlight = false;
+let lastLiveProofCheckAt = 0;
+
+export const LIVE_PROOF_CHECKED_EVENT = "hc-live-proof-checked";
 
 export { formatLiveControlExpiry };
+
+export function getLastLiveProofCheckAt() {
+  return lastLiveProofCheckAt;
+}
 
 export function getLiveControlPending() {
   return [...pending];
@@ -97,10 +105,13 @@ function readPollScope() {
 }
 
 function readPollLoopShouldRun() {
-  return liveControlPollLoopShouldRun({
-    scopeActive: readPollScope(),
-    resolverHealth: getResolverHealthStatus(),
-  });
+  return (
+    isWatchLiveProofEnabled() &&
+    liveControlPollLoopShouldRun({
+      scopeActive: readPollScope(),
+      resolverHealth: getResolverHealthStatus(),
+    })
+  );
 }
 
 function clearPollTimer() {
@@ -177,7 +188,14 @@ async function fetchPendingForEntry(entry) {
   }
 }
 
-export async function refreshLiveControlInbox() {
+/**
+ * @param {{ manual?: boolean }} [opts] manual=true runs one check even when watch is off
+ */
+export async function refreshLiveControlInbox(opts = {}) {
+  const manual = opts.manual === true;
+  if (!manual && !isWatchLiveProofEnabled()) {
+    return pending;
+  }
   if (!liveControlPollAllowedByResolverHealth(getResolverHealthStatus())) {
     return pending;
   }
@@ -196,6 +214,8 @@ export async function refreshLiveControlInbox() {
     if (changed) {
       window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
     }
+    lastLiveProofCheckAt = Date.now();
+    window.dispatchEvent(new Event(LIVE_PROOF_CHECKED_EVENT));
     return pending;
   }
 
@@ -216,10 +236,26 @@ export async function refreshLiveControlInbox() {
   const changed =
     liveControlInboxChanged(pending, next) || prevHealth !== getLiveControlPollHealth();
   pending = next;
+  lastLiveProofCheckAt = Date.now();
   if (changed) {
     window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
   }
+  window.dispatchEvent(new Event(LIVE_PROOF_CHECKED_EVENT));
   return pending;
+}
+
+/** One live-proof round-robin check (manual hub control when watch is off). */
+export async function checkLiveProofNow() {
+  return refreshLiveControlInbox({ manual: true });
+}
+
+/** Apply watch toggle without re-registering listeners. */
+export function applyLiveControlWatchPreference() {
+  if (!isWatchLiveProofEnabled()) {
+    clearPollTimer();
+    return;
+  }
+  if (pollFeatureEnabled) syncLiveControlInboxPolling();
 }
 
 /** Notify hub/inbox sheet open state changed (also dispatched by shell). */

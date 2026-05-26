@@ -82,10 +82,14 @@ import {
   normalizeBaselineState,
 } from "./wallet-network-baseline.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
+import { mountHubNetworkTools } from "./device-hub-network-tools.mjs";
 import {
   getLiveControlPending,
   openLiveControlProof,
   refreshLiveControlInbox,
+  checkLiveProofNow,
+  applyLiveControlWatchPreference,
+  getLastLiveProofCheckAt,
   enableLiveControlInboxPolling,
   isLiveControlInboxPollingActive,
   LIVE_CONTROL_POLL_SCOPE_CHANGED,
@@ -543,6 +547,12 @@ function reapplyRevokedSinceVisitFromLatestResolved() {
 
 let lastWalletNetworkFetchAt = 0;
 
+export const HUB_NETWORK_CHECKED_EVENT = "hc-hub-network-checked";
+
+export function getLastWalletNetworkCheckedAt() {
+  return lastWalletNetworkFetchAt;
+}
+
 async function fetchAndApplyNetworkChips() {
   if (!hubConfig.fetchNetworkStatus || !savedList) return;
   lastWalletNetworkFetchAt = Date.now();
@@ -583,6 +593,11 @@ async function fetchAndApplyNetworkChips() {
       if (changed) saveWallet(next);
       syncHubInboxAlertGroups();
       notifyHubChanged();
+      window.dispatchEvent(
+        new CustomEvent(HUB_NETWORK_CHECKED_EVENT, {
+          detail: { at: lastWalletNetworkFetchAt },
+        })
+      );
     },
     {
       generation: gen,
@@ -1150,8 +1165,22 @@ export function initDeviceHub(config = {}) {
   refreshDeviceHub();
   notifyHubChanged();
 
+  if (hubConfig.fetchNetworkStatus || hubConfig.showLiveControlInbox) {
+    mountHubNetworkTools({
+      hubRoot: hubQueryRoot ?? document,
+      showNetwork: hubConfig.fetchNetworkStatus,
+      showLiveProof: hubConfig.showLiveControlInbox,
+      getNetworkCheckedAt: getLastWalletNetworkCheckedAt,
+      getLiveProofCheckedAt: getLastLiveProofCheckAt,
+      onCheckNetwork: () => fetchAndApplyNetworkChips(),
+      onCheckLiveProof: () => checkLiveProofNow(),
+      onWatchChange: () => applyLiveControlWatchPreference(),
+    });
+  }
+
   if (hubConfig.showLiveControlInbox) {
     enableLiveControlInboxPolling();
+    applyLiveControlWatchPreference();
     window.addEventListener("hc-live-control-inbox-changed", () => {
       reapplyRevokedSinceVisitFromLatestResolved();
       syncHubInboxAlertGroups();

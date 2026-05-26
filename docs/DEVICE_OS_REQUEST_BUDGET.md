@@ -128,7 +128,7 @@ Do **not** rip out the device OS. **Retire the default “poll every card every 
 | **2 — Cap fan-out** (P0) | **Shipped:** round-robin **one** `live-control` GET per tick; wallet status on hub open + manual refresh + **≥60s** visibility debounce | Bounded **~1,440–2,880/day/tab** at 30–60s | Full wallet scan for live proof takes `N × interval`; network chips refresh on expand not every visibility |
 | **3 — Degraded = silent** (P1) | **Shipped:** no live-control poll timer/fetch unless resolver health is `ok` (`getResolverHealthStatus`); resumes on `hc-resolver-health-changed`; **60s** backoff after challenge **429** | Stops inbox poll storms during 1027/degraded | Live proof inbox may lag until health recovers |
 | **4 — SW policy** (P1) | **Shipped:** SW polls only when browser alerts on + permission granted + resolver `ok`; **15 min** `periodicSync`; round-robin **one** challenge GET per wake; 60s backoff on 429 | Cuts hidden-tab burn | Slower background alerts; full wallet scan takes N wakes |
-| **5 — Product polish** (P2) | “Check network” on hub; show last-checked time; optional “Watch for live proof” toggle | User-visible cost | More honest UX |
+| **5 — Product polish** (P2) | **Shipped:** hub **Check network** + last-checked line; **Watch for live proof** toggle (default on); **Check for live proof** when watch off | User-visible cost | More honest UX; turn off watch to stop auto polls |
 | **6 — Evaluate push** (future) | Only if phases 1–4 cannot meet “stranger waiting” SLA | Best at scale | Engineering cost |
 
 **Tests to add when implementing:** Vitest for “poll scheduler” pure functions; Playwright: collapsed hub does not fire live-control fetch for 10s; expanded hub fires at most one challenge URL per tick.
@@ -165,3 +165,4 @@ Before merging shell changes that touch network I/O:
 | 2026-05-26 | **Phase 2 shipped:** round-robin live-control poll slots; hub-expand network refresh; 60s visibility debounce for wallet status |
 | 2026-05-26 | **Phase 3 shipped:** live-control poll loop gated on resolver health `ok` only; listen for `hc-resolver-health-changed` |
 | 2026-05-26 | **Phase 4 shipped:** SW round-robin poll, 15 min periodic sync, alerts-only + resolver health gate |
+| 2026-05-26 | **Phase 5 shipped:** hub network tools — Check network, last-checked status, Watch for live proof toggle |
