@@ -858,6 +858,29 @@
           </details>
 
           <div class="created-manage-tools" id="created-owner-actions">
+            <details class="settings-disclosure settings-disclosure-action" id="steward-review-details" hidden>
+              <summary class="settings-summary">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+                </span>
+                <span class="settings-summary-text">
+                  <span class="settings-summary-title">Steward review queue</span>
+                  <span class="settings-summary-sub">Operator-only vouch audit triage</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="settings-panel settings-panel-action">
+                <p class="form-hint">
+                  Review collusion-risk flags, save dismissal notes, and clear reviewed items.
+                  Requires <code>OPERATOR_AUDIT_TOKEN</code>.
+                </p>
+                <a class="btn-secondary" href="/operator/vouch-audit.html">Open steward review queue</a>
+                <p class="form-hint">
+                  Follow <code>docs/VOUCH_STEWARD_REVIEW_RUNBOOK.md</code> for cadence and escalation.
+                </p>
+              </div>
+            </details>
+
             <details class="settings-disclosure settings-disclosure-action" id="vouch-revoke-details" hidden>
               <summary class="settings-summary">
                 <span class="list-icon list-icon-tone-orange" aria-hidden="true">

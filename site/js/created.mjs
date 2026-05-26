@@ -121,6 +121,7 @@ const qrPreviewImg = document.getElementById("created-qr-preview-img");
 const saveRequiredBadge = document.getElementById("created-save-required-badge");
 const jsonLink = document.getElementById("card-json-link");
 const revokeDetails = document.getElementById("revoke-details");
+const stewardReviewDetails = document.getElementById("steward-review-details");
 const copyProfileIdBtn = document.getElementById("copy-profile-id");
 const statusPlateTipEl = document.getElementById("created-status-plate-tip");
 const lostItemTipEl = document.getElementById("created-lost-item-tip");
@@ -542,6 +543,11 @@ function applyHumanTrustDisplay(ht, verification) {
     subtitle: ht.subtitle,
     state: verification?.state ?? null,
   });
+  const state = verification?.state ?? null;
+  if (stewardReviewDetails) {
+    // Operator workflow entry appears only for stewards in this tab.
+    stewardReviewDetails.hidden = state !== "steward";
+  }
 }
 
 if (data?.verification?.label) {

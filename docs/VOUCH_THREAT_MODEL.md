@@ -213,7 +213,7 @@ Respond: suspend steward, rotate keys, revoke batch
 | `burst_at_quota_boundary` | ≥5 issuances in 24h in quota window | Legitimate burst possible |
 | `shared_voucher_set` | Two vouchees share ≥3 vouchers, Jaccard ≥0.75 | Heuristic |
 
-**Steward review queue:** Step 1 shipped — runbook + operator API. Step 2 backend shipped (dismiss notes API + D1); operator UI pending. See [`VOUCH_STEWARD_REVIEW_RUNBOOK.md`](VOUCH_STEWARD_REVIEW_RUNBOOK.md).
+**Steward review queue:** Step 1+2 shipped — runbook + operator API + dismiss notes API + operator UI prototype with steward entry point from `/created/` Advanced. See [`VOUCH_STEWARD_REVIEW_RUNBOOK.md`](VOUCH_STEWARD_REVIEW_RUNBOOK.md).
 
 `GET /.well-known/hc/v1/operator/vouch-audit-flags` (Bearer `OPERATOR_AUDIT_TOKEN`) — **not exposed on public scan**.
 
@@ -235,7 +235,7 @@ Respond: suspend steward, rotate keys, revoke batch
 
 | Priority | Item | Addresses |
 |----------|------|-----------|
-| P0 | Steward review queue + runbook | G-01–G-08, S-01 | **Step 1 shipped** (runbook + read API); step 2 UI pending |
+| P0 | Steward review queue + runbook | G-01–G-08, S-01 | **Step 1+2 shipped** (read API + dismiss API + UI prototype) |
 | P0 | Card creation rate limits + launch monitoring | R-01, A-012F |
 | P1 | Graph flag: **directed cycle** / clique suspicion (≥4 mutual VH set) | R-02, G-02 |
 | P1 | Per-steward vouch cap or enhanced audit for steward issuances | R-03, S-02 |

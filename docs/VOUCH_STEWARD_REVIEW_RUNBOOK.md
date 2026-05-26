@@ -169,6 +169,7 @@ Always document **cause** and **appeal path** per Human Verification HV-FR-40.
 
 - Internal page: `/operator/vouch-audit.html`
 - Script: `site/js/operator-vouch-audit.mjs`
+- Steward workflow entry: `/created/` → **Advanced** → **Steward review queue** (shown when card is `steward`)
 - Uses Bearer token input + operator API to:
   - load flags
   - save dismissal notes

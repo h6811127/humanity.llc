@@ -407,7 +407,7 @@ Canonical analysis: [`VOUCH_THREAT_MODEL.md`](../VOUCH_THREAT_MODEL.md).
 |---|---|---|---|
 | Users think merch equals verification | Medium | High | Product copy and scan pages explicitly separate purchases from verification. |
 | Users think holding a sticker proves identity | Medium | High | Scan page says the QR resolves to a card but does not prove the holder is the card owner. |
-| Social vouch collusion (4-clique, rings) | Medium | High | Quotas, waiting periods, operator audit flags, revocation; steward review queue (pending). |
+| Social vouch collusion (4-clique, rings) | Medium | High | Quotas, waiting periods, operator audit flags, revocation; steward review queue step 1+2 shipped (runbook + APIs + UI prototype). |
 | Rotating vouch cycles undetected | Medium | High | Manual graph review; P1 clique/cycle detection (see **G-02**). |
 | Remote / dishonest vouch | High | Medium | In-person UX; revocable statements; no liveness at sign time (documented limit). |
 | Stolen voucher or steward keys | Medium | High | User custody; quota; burst flags; suspend + batch revoke playbook. |

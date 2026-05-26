@@ -52,7 +52,7 @@
 - Add explicit artifact-intent authorization: only the card owner or authorized session can create personalized artifacts for a `profile_id`.
 - Add unique item-scoped QR credentials for personalized physical items.
 - Add signed payload `type` and nonce to every vouch, QR rotation, revocation, and badge record.
-- **Ship steward review queue** for `listVouchAuditFlags` — **step 1 shipped** (runbook + `GET …/operator/vouch-audit-flags`); step 2 UI pending.
+- **Ship steward review queue** for `listVouchAuditFlags` — **step 1+2 shipped** (runbook + read/dismiss APIs + operator UI prototype).
 - Add graph detection for **cliques and directed cycles** (see `VOUCH_THREAT_MODEL.md` §9 P1).
 - Avoid printing "Verified Human" as static text on artifacts in V1.
 

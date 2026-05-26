@@ -1,6 +1,6 @@
 # M6  -  Vouching design
 
-**Status:** Step 1 (V-001) shipped in repo  -  verify on production; Steps 2–3 shipped; Step 4 audit flags + review API step 1 shipped; review UI pending
+**Status:** Step 1 (V-001) shipped in repo  -  verify on production; Steps 2–3 shipped; Step 4 step 1+2 shipped (audit API, dismiss API, steward workflow entry, operator UI prototype)
 **Canonical refs:** [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md) (product framing), [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) (adversarial catalog), `docs/V1_PRODUCT_TRUST_MODEL.md` § Level 2, `docs/V1_ADVERSARIAL_REVIEW.md` § Perspective 1, `docs/features/Human Verification v1.0.md`, `docs/V1_IMPLEMENTATION_BACKLOG.md` (V-001, V-002)  
 **Product thesis:** Live control proves recent key possession. Vouching proves **accountable humans staked public, revocable attestations** on this card under published rules—not legal ID, not global biometric uniqueness, not liveness at every click.
 
@@ -314,7 +314,7 @@ Revoked/suspended card states must **override** positive verification on scan (a
 
 - [x] Internal cluster flags (no public graph UI).
 - [x] Steward review **step 1:** runbook + operator `GET …/vouch-audit-flags` ([`VOUCH_STEWARD_REVIEW_RUNBOOK.md`](VOUCH_STEWARD_REVIEW_RUNBOOK.md)).
-- [~] Steward review **step 2:** dismiss notes in D1 API shipped (`POST/DELETE …/vouch-audit-flags/dismiss`); operator UI prototype shipped at `/operator/vouch-audit.html`, integration into steward workflow pending.
+- [x] Steward review **step 2:** dismiss notes in D1 API (`POST/DELETE …/vouch-audit-flags/dismiss`) + operator UI prototype (`/operator/vouch-audit.html`) + steward entry point on `/created/` Advanced for `steward` cards.
 
 **Deferred**
 
