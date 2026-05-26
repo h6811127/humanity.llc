@@ -184,9 +184,10 @@ describe("renderScanPage M3.2 trust blocks", () => {
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).toContain("Studio door");
     expect(html).toContain("Open · Thu–Sun until 9 PM");
-    expect(html).toContain("This QR is active");
+    expect(html).not.toContain("This QR is active");
     expect(html).toContain("Controlled by");
-    expect(html).toContain("scan-state-facts");
+    expect(html).toContain("scan-hero-title");
+    expect(html).not.toContain('class="scan-state-row"');
   });
 
   it("renders flat status panel with shared styles (no ID-style flip card)", async () => {
@@ -202,6 +203,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
       "https://humanity.llc"
     );
     const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain("scan-hero");
     expect(html).toContain("scan-status-panel");
     expect(html).not.toMatch(/id="pass-scene"/);
     expect(html).not.toMatch(/class="pass-scene/);
@@ -210,16 +212,19 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).not.toContain('getElementById("pass-scene")');
     expect(html).not.toContain('class="block"');
     expect(html).not.toContain("HUMAN TRUST");
-    expect(html).toContain("This QR is active");
+    expect(html).not.toContain("This QR is active");
+    expect(html).not.toContain('class="section-kicker">Network status');
     expect(html).toContain("Controlled by");
-    expect(html).toContain("scan-state-facts");
-    expect(html).toContain("This does not prove ownership or legal identity");
+    expect(html).not.toContain('class="scan-state-row"');
+    expect(html).not.toContain("pass-badge badge-live");
     expect(html).toContain("@river_example");
     expect(html).toContain("Card active");
     expect(html).toContain("QR active");
     expect(html).toContain("scan-safety-header");
-    expect(html).toContain("Humanity object");
-    expect(html).toContain("scan-bearer-line");
+    expect(html).toContain("scan-hero-limit");
+    expect(html).toContain("scan-proves");
+    expect(html).toContain("scan-does-not-prove");
+    expect(html).toContain("scan-trust-details");
     expect(html).toContain("scan-limits-settings");
     expect(html).toContain("What this scan does not prove");
     const bearerCount = html.split(BEARER_WARNING).length - 1;

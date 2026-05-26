@@ -7,6 +7,8 @@
 
 **Goal:** Three people **outside your network** complete the loop **without you explaining the UI**. Each can say in one sentence what scan **proves** and what it **does not**.
 
+**Coverage:** At least one stranger should scan a **live object** or pilot sticker (pre-made scan URL)—not only a card they created themselves. Success criteria: [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Success criteria (first scan).
+
 ---
 
 ## Before you invite strangers
@@ -30,7 +32,11 @@ curl -sS "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status?q=QR" | jq
 
 9. **Minimal failure layout** (optional) — revoke card or expire QR; confirm **Card status** + **This QR** groups still appear below the compact panel (human trust hidden).
 
+10. **Live object scan** (recommended) — open a pilot or demo live-object scan URL on phone; confirm within ~30s they can state host trust, live status, what the **message** says, and that holding the sticker does not prove ownership. They should **not** need to reconcile multiple “Active” labels.
+
 **Deploy check:** scan response header `X-HC-Scan-UI: pass-v20` (or later) on an active scan.
+
+**UX reference (target):** `assets/Nerd Mobile Post Scan Render.png`; gap list: [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Known UX gaps.
 
 ---
 
@@ -60,13 +66,13 @@ Do **not** send the data policy or research page unless they ask.
 
 ## Per-stranger scorecard
 
-| # | Name (optional) | Created unassisted? | Scan understandable &lt;30s? | One-sentence proves | One-sentence does not prove | Revoked + re-scan OK? | Notes |
-|---|-----------------|--------------------|-----------------------------|---------------------|----------------------------|------------------------|-------|
-| 1 | | ☐ | ☐ | | | ☐ | |
-| 2 | | | ☐ | | | ☐ | |
-| 3 | | | ☐ | | | ☐ | |
+| # | Name (optional) | Created unassisted? | Scan understandable &lt;30s? | Live object scan? | One-sentence proves | One-sentence does not prove | Revoked + re-scan OK? | Notes |
+|---|-----------------|--------------------|-----------------------------|-------------------|---------------------|----------------------------|------------------------|-------|
+| 1 | | ☐ | ☐ | ☐ | | | ☐ | |
+| 2 | | | ☐ | ☐ | | | ☐ | |
+| 3 | | | ☐ | ☐ | | | ☐ | |
 
-**Pass line for M5:** all three rows checked for create + scan understanding; **at least one** completes revoke + re-scan; none think it proves legal ID or “holder owns the sticker” without reading limits.
+**Pass line for M5:** all three rows checked for create + scan understanding; **at least one** live-object (or pilot sticker) scan checked; **at least one** completes revoke + re-scan; none think it proves legal ID or “holder owns the sticker” without reading limits.
 
 ---
 
@@ -74,9 +80,11 @@ Do **not** send the data policy or research page unless they ask.
 
 **Proves:** “The card/QR is still active or revoked **right now** on humanity’s resolver.” / “It’s a live status check, not a permanent profile.”
 
+**Live object (good):** “It’s an active live object on humanity.llc—the network just checked it.” / “The page says [manifesto message] and it’s still valid.”
+
 **Does not prove:** “That the person showing me the sticker owns the card.” / “Government ID or employment.” / “That they’re a good person.”
 
-**Yellow flags:** “It verified they’re human.” “It’s like Instagram.” “The QR proves identity.” → copy or UX fix before public announce.
+**Yellow flags (copy or UX):** “It verified they’re human.” “It’s like Instagram.” “The QR proves identity.” “Which Active is real?” “The @handle is the name of the thing.” → fix before public announce; see [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Known UX gaps.
 
 ---
 
@@ -100,6 +108,8 @@ Do **not** send the data policy or research page unless they ask.
 | Closed tab, no saved key | Expected by design; use the saved recovery key or encrypted backup, otherwise create again |
 | “Wrong passphrase” on backup import | Re-export; type passphrase manually; see `docs/M5_5_OWNER_KEY_PORTABILITY.md` |
 | Stranger confused | Shorten scan lead copy; watch them screen-share once, then reset count |
+| Multiple “Active” labels | Hero consolidation ([`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) Phase 1) |
+| Thinks @handle is the object name on live object | Hero H1 = manifesto; handle in steward strip ([`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Scan type templates) |
 
 ---
 

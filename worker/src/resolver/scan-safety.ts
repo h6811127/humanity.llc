@@ -140,7 +140,7 @@ function escapeHtml(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function renderSafetyChips(vm: ScanViewModel, safety: ScanSafetyModel): string {
+export function renderSafetyChips(vm: ScanViewModel, safety: ScanSafetyModel): string {
   const chips: string[] = [];
   const display = parseManifestoDisplay(vm.manifestoLine);
   if (display.kind === "status_plate" && display.objectLabel) {
@@ -193,6 +193,15 @@ export function renderScannerSafetyHeader(
   ${resolverRow}
   <p class="scan-safety-first-seen" id="scan-safety-first-seen" hidden></p>
 </section>`;
+}
+
+/** One status strip for the Live check hero (docs/SCANNER_EXPERIENCE.md § First-scan hero). */
+export function renderHeroStatusStrip(vm: ScanViewModel): string {
+  const status = safetyStatusDisplay(vm);
+  return `<div class="scan-safety-strip ${status.stripClass}" role="status">
+      <span class="scan-safety-strip-icon" aria-hidden="true"></span>
+      <span class="scan-safety-strip-label">${escapeHtml(status.label)}</span>
+    </div>`;
 }
 
 /** Phase B: device-local first-open disclosure + one-shot border pulse. */

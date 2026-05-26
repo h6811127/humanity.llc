@@ -1,7 +1,9 @@
 # M3  -  Public scan page UI (`GET /c/{profile_id}?q={qr_id}`)
 
 **Status:** Implementation contract for Worker HTML  
-**Product spec (scanner safety, recognition, external-link policy):** [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md)  
+**Product spec (scanner safety, recognition, external-link policy, hero IA):** [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md)  
+**Visual direction:** [`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) § Scan page visual spec  
+**Design reference (target):** `assets/Nerd Mobile Post Scan Render.png`  
 **Route map (scan vs card JSON vs status vs qr metadata):** [`docs/FLOW_2_QR_SCAN_REPAIR_SPEC.md`](FLOW_2_QR_SCAN_REPAIR_SPEC.md) § Public scan surfaces  
 **Related:** `docs/V1_PRODUCT_TRUST_MODEL.md`, `docs/V1_0_ARCHITECTURE_ROADMAP.md` §7, `docs/V1_IMPLEMENTATION_CONTRACTS.md` (QR payload + § Reference network — Flow 2 routes)
 
@@ -11,17 +13,70 @@
 
 The scan page is **live resolver output** (Cloudflare Worker), not the static Pages site. Deploy with `npm run worker:deploy`. Pages deploy alone does not change `/c/…`.
 
-Response header when the new UI is live: `X-HC-Scan-UI: pass-v20` (or later).
+Response header when the new UI is live: `X-HC-Scan-UI: pass-v22` (or later). **`pass-v22`:** Live check hero (phases 1–3) — merged safety + status panel, scan-type H1s, proves/does-not-prove modules, collapsible trust groups.
 
 ---
 
-## Layout (scanner-first)
+## Layout
 
-1. **Scanner safety header** — Humanity object badge, large status strip, fact chips, optional resolver signature line, device-local first-seen (`docs/SCANNER_EXPERIENCE.md` Phase B; `scan-safety.ts`).
-2. **Status panel** — At-a-glance identity: handle or object label, manifesto/status facts, **this object’s scan QR**, bearer line above panel.
-3. **Grouped lists below** — iOS-style sections per trust model: Card status, Human trust, This QR, Live control, Limitations.
+### Shipped today (`pass-v22`)
 
-Legacy flippable pass card markup remains in `scan-html.ts` for reference; active scan HTML uses the flat **status panel** only.
+`scan-html.ts` renders, top to bottom:
+
+1. **Top header** — `humanity.llc` brand link.
+2. **Live check hero** (`renderScanHeroSection`) — host + single status strip, H1 (manifesto / plate / `@handle` / failure copy), steward strip, trust pills on personal cards, resolver line, Level 0 limit, detail chips, first-seen footnote, demoted QR (`scan-hero-qr`).
+3. **Proves / does not prove** (`renderScanTrustModules`) — compact modules linking to full limits.
+4. **Show link** — collapsible scan URL + credential code.
+5. **Grouped lists** — Card status, Human trust, This QR, Live control in `<details class="scan-trust-details">`.
+6. **Limits `<details>`** — `scan-limits-settings` (`id="scan-limits-settings"`).
+
+Legacy flippable pass card markup remains in `scan-html.ts` for reference; active scan HTML uses the **Live check hero** (not the flip scene). Standalone `renderScannerSafetyHeader()` remains for unit tests.
+
+### Target layout (remaining phases)
+
+**Principle:** one **Live check** hero replaces the separate safety header + status panel for typical active scans. Subtract duplicate status, brand, and limit copy. See [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § First-scan hero.
+
+| Zone | Implementation notes |
+|------|----------------------|
+| **A. Minimal header** | Existing `renderTopHeader` only—no duplicate brand inside hero |
+| **B. Live check hero** | New `scan-hero` (or equivalent): merge `renderScannerSafetyHeader` + panel primary content; **one** status; H1 from scan type (§ Scan type heroes) |
+| **C. Steward strip** | Single line: controlled by, optional `valid until` |
+| **D–E. Proves / does not prove** | Optional modules (Nerd mock pattern); Level 0 in hero **and** expandable detail OK if not duplicated in a facts grid |
+| **F. This QR** | Existing `scanStatusQrBlock`; smaller default; credential code; consider `<details>` on narrow viewports |
+| **G. Trust groups** | Existing `renderTrustGroups`; omit sections with no rows |
+| **H. Footer** | Existing `renderFooter` + limits settings |
+
+**QR rule (unchanged):** payload and branding per § Pass card QR below; visual size is subordinate to status in CSS.
+
+### Scan type heroes
+
+Branch in `buildScanStatusPanelBody` / new hero builder using `parseManifestoDisplay()` (`manifesto-display.ts`):
+
+| `display.kind` / context | H1 | Secondary |
+|--------------------------|-----|-----------|
+| `general` (live object manifesto) | `manifestoLine` (full text) | `Controlled by @handle` |
+| `status_plate` | `objectLabel` | `statusLine` |
+| `lost_item_relay` | `objectLabel` (after `[relay]` strip) | `statusLine` |
+| Personal card (handle-forward) | `@handle` | manifesto + `renderTrustPills` |
+| `minimalScan` / revoke / expire | `minimalScanHeadline` | compact; groups below unchanged |
+
+Do **not** use eyebrow “This QR is active” **and** a facts grid “Status: Active” **and** a safety strip “Active” in the same viewport.
+
+---
+
+## UI refresh phases
+
+Track with [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Resolver UI refresh.
+
+| Phase | Work | Primary files |
+|-------|------|----------------|
+| **0** | Design alignment (fixtures + Nerd mock) | Docs only |
+| **1** | Hero consolidation, dedupe status/limits, QR demotion, spacing | **Shipped** — `scan-html.ts`, `scan-safety.ts`, `scan-pass.css` |
+| **2** | Scan-type hero templates | **Shipped** — `buildScanHeroMain()` |
+| **3** | Collapsible groups + proves/does-not-prove modules | **Shipped** — `renderScanTrustModules()`, `scan-trust-details` |
+| **4** | M5 live-object path + tests + `X-HC-Scan-UI` bump | `worker/tests/scan*.ts`, [`docs/M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) |
+
+After `scan-pass.css` changes: `npm run worker:bundle-scan`.
 
 ---
 
@@ -88,17 +143,19 @@ After changing `scan-pass.css` or `pass-flip.js`, run `npm run worker:bundle-sca
 
 ## Spec alignment (M3.2 / §7)
 
-| Block | On card | Below card |
-|-------|---------|------------|
-| Card status | Pill + badge | Group: status, profile id, does not prove |
-| Human trust | Pill | Group: label, vouches, does not prove |
-| This QR | Pill | Group: QR status, scope, credential id, scan link, bearer warning |
+| Block | Target hero / card | Below hero |
+|-------|-------------------|------------|
+| Card status | Single status strip (not badge + strip + grid) | Group: status, profile id, does not prove |
+| Human trust | Pills on personal-card type only | Group: label, vouches, does not prove |
+| This QR | Optional compact QR in zone F | Group: QR status, scope, credential id, scan link |
 | Live control |  -  | Group: not shown / proven (M7) |
-| Limitations | Back face summary | Group: not ID, no analytics, data policy link |
+| Limitations | **One** Level 0 line in hero | Group + `scan-limits-settings` `<details>` |
 
-**Minimal failure scans** (`qr_revoked`, `qr_expired`, `card_revoked` with `display_mode: minimal`): status panel stays compact; grouped **Card status** and **This QR** rows still render below (human trust hidden). Bearer line remains above the panel.
+**Minimal failure scans** (`qr_revoked`, `qr_expired`, `card_revoked` with `display_mode: minimal`): compact hero or panel; grouped **Card status** and **This QR** rows still render below (human trust hidden). Level 0 limit visible without opening `<details>`.
 
-**Limits copy:** one line above the status panel (`scan-bearer-line`, Level 0 canonical sentence). Status groups are **facts only** (card, human trust, QR, live control). All “does not prove” detail lives in one **settings-style** `<details>` row at the bottom (`scan-limits-settings`). Response header `X-HC-Scan-UI: pass-v20`.
+**Limits copy (target):** exactly **one** prominent Level 0 sentence in the hero (`trust-copy.ts` bearer). No duplicate “Limits” row in `renderObjectStateFacts` when the hero already shows it. Full “does not prove” detail in module E and/or `scan-limits-settings`. Status groups remain **facts only**.
+
+**Interim (shipped):** bearer line above status panel **plus** limits row in facts grid—treat as debt per [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Known UX gaps.
 
 ---
 

@@ -17,13 +17,15 @@ import {
 import { renderScanQrMarkup } from "./scan-qr";
 import {
   EMPTY_SCAN_SAFETY,
+  renderHeroStatusStrip,
+  renderSafetyChips,
   renderScanSafetyHeaderScript,
-  renderScannerSafetyHeader,
+  SCAN_SAFETY_RESOLVER_VERIFIED_COPY,
   type ScanSafetyModel,
 } from "./scan-safety";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v20";
+export const SCAN_UI_VERSION = "pass-v22";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -61,9 +63,8 @@ export async function renderScanPage(
     <p class="scan-cross-tab-banner" id="scan-cross-tab-banner" role="status" hidden></p>
     <p class="scan-offline-banner" id="scan-offline-banner" role="status" hidden>${escapeHtml(SCAN_OFFLINE_BANNER_TEXT)}</p>
     <main class="screen scan-screen">
-      ${renderScannerSafetyHeader(vm, safety)}
-      <p class="section-kicker">Network status</p>
-      ${renderPassSection(vm, origin, qrMarkup)}
+      ${renderScanHeroSection(vm, safety, origin, qrMarkup)}
+      ${renderScanTrustModules(vm, safety, origin)}
       ${renderScanUrlControl(vm)}
       ${renderLimitsSettings(origin)}
       ${renderTrustGroups(vm, origin)}
@@ -117,11 +118,6 @@ if (slot && !slot.querySelector("svg") && slot.dataset.scanUrl) {
 </script>`;
 }
 
-/** M3.3  -  one line above the card (full detail in limits settings below). */
-function renderBearerLine(): string {
-  return `<p class="scan-bearer-line" role="note">${escapeHtml(BEARER_WARNING)}</p>`;
-}
-
 function renderTopHeader(origin: string): string {
   return `<header class="top">
   <a class="top-brand" href="${escapeHtml(origin)}/">
@@ -131,26 +127,57 @@ function renderTopHeader(origin: string): string {
 </header>`;
 }
 
-function renderPassSection(
+/** Live check hero — merges scanner safety + status panel (docs/M3_SCAN_PAGE_UI.md Phase 1). */
+function renderScanHeroSection(
   vm: ScanViewModel,
-  _origin: string,
+  safety: ScanSafetyModel,
+  origin: string,
   qrMarkup: string
 ): string {
-  const badgeClass = `pass-badge badge-${vm.primaryBadge.tone}`;
-  const body = buildScanStatusPanelBody(vm, badgeClass, qrMarkup, _origin);
+  const { main, foot } = buildScanHeroMain(vm, origin);
+  const profileAttr = vm.profileId
+    ? ` data-profile-id="${escapeHtml(vm.profileId)}"`
+    : "";
+  const qrAttr = vm.qrId ? ` data-qr-id="${escapeHtml(vm.qrId)}"` : "";
+  const resolverRow = safety.objectSignatureVerified
+    ? `<p class="scan-safety-resolver">${escapeHtml(SCAN_SAFETY_RESOLVER_VERIFIED_COPY)}</p>`
+    : "";
+  const chips = renderSafetyChips(vm, safety);
+  const chipsBlock = chips
+    ? chips.replace(
+        'class="scan-safety-chips"',
+        'class="scan-safety-chips scan-hero-details"'
+      )
+    : "";
+  const footBlock = foot
+    ? `<p class="scan-hero-foot">${escapeHtml(foot)}</p>`
+    : "";
+  const qrBlock = scanHeroQrBlock(vm, qrMarkup);
+
   return `<div class="scan-pass-layer">
-${renderBearerLine()}
-<article class="scan-status-panel" aria-label="Public scan result at this moment">
-${body}
+<article class="scan-hero scan-status-panel scan-safety-header" id="scan-safety-header" aria-label="Live check"${profileAttr}${qrAttr}>
+  <header class="scan-hero-head">
+    <div class="scan-hero-host"><span class="pass-dot" aria-hidden="true"></span><span>humanity.llc</span></div>
+    ${renderHeroStatusStrip(vm)}
+  </header>
+  <div class="scan-hero-body">
+    ${main}
+  </div>
+  ${resolverRow}
+  <p class="scan-hero-limit" role="note">${escapeHtml(BEARER_WARNING)}</p>
+  ${chipsBlock}
+  <p class="scan-safety-first-seen" id="scan-safety-first-seen" hidden></p>
+  ${footBlock}
+  ${qrBlock}
 </article>
 </div>`;
 }
 
-function scanStatusHead(vm: ScanViewModel, badgeClass: string): string {
-  return `<header class="scan-status-head">
-  <div class="scan-status-brand"><span class="pass-dot" aria-hidden="true"></span><span>humanity.llc</span></div>
-  <span class="${badgeClass}">${escapeHtml(vm.primaryBadge.label)}</span>
-</header>`;
+function scanHeroQrBlock(vm: ScanViewModel, qrMarkup: string): string {
+  if (!vm.scanUrl) return "";
+  const qrSlotAttr = ` id="pass-qr-slot" data-scan-url="${escapeHtml(vm.scanUrl)}"`;
+  const codeLine = renderCredentialCodeLine(credentialCodeForVm(vm));
+  return `<div class="scan-hero-qr pass-qr scan-status-qr"${qrSlotAttr}>${qrMarkup}${codeLine}</div>`;
 }
 
 function credentialCodeForVm(vm: ScanViewModel): string | null {
@@ -170,17 +197,6 @@ function credentialCodeForVm(vm: ScanViewModel): string | null {
 function renderCredentialCodeLine(code: string | null): string {
   if (!code) return "";
   return `<p class="pass-credential-code mono" aria-label="Credential code for print verification">${escapeHtml(code)}</p>`;
-}
-
-function scanStatusQrBlock(vm: ScanViewModel, qrMarkup: string): string {
-  if (!vm.scanUrl) return "";
-  const qrSlotAttr = ` id="pass-qr-slot" data-scan-url="${escapeHtml(vm.scanUrl)}"`;
-  const codeLine = renderCredentialCodeLine(credentialCodeForVm(vm));
-  return `<div class="scan-status-qr pass-qr"${qrSlotAttr}>${qrMarkup}${codeLine}</div>`;
-}
-
-function scanStatusFoot(text: string): string {
-  return `<p class="scan-status-foot">${escapeHtml(text)}</p>`;
 }
 
 function scanStatusMetaLine(vm: ScanViewModel): string {
@@ -203,30 +219,17 @@ function formatQrExpiryLabel(expiresAt: string | null): string | null {
   }).format(new Date(t));
 }
 
-function objectStateHeadline(vm: ScanViewModel): string {
-  if (vm.kind === "active") return "This QR is active";
-  return minimalScanHeadline(vm.kind);
-}
-
-function renderObjectStateFacts(vm: ScanViewModel, statusText: string): string {
-  const rows: string[] = [
-    `<p class="scan-state-row"><span class="scan-state-label">Status</span><span class="scan-state-value">${escapeHtml(statusText)}</span></p>`,
-  ];
+function renderStewardStrip(vm: ScanViewModel): string {
+  const parts: string[] = [];
   if (vm.handle) {
-    rows.push(
-      `<p class="scan-state-row"><span class="scan-state-label">Controlled by</span><span class="scan-state-value">@${escapeHtml(vm.handle)}</span></p>`
-    );
+    parts.push(`Controlled by @${vm.handle}`);
   }
   const expiry = formatQrExpiryLabel(vm.qrExpiresAt);
   if (expiry && vm.kind === "active") {
-    rows.push(
-      `<p class="scan-state-row"><span class="scan-state-label">Valid until</span><span class="scan-state-value">${escapeHtml(expiry)}</span></p>`
-    );
+    parts.push(`Valid until ${expiry}`);
   }
-  rows.push(
-    `<p class="scan-state-row scan-state-limits"><span class="scan-state-label">Limits</span><span class="scan-state-value">This does not prove ownership or legal identity.</span></p>`
-  );
-  return `<div class="scan-state-facts">${rows.join("")}</div>`;
+  if (!parts.length) return "";
+  return `<p class="scan-hero-steward">${escapeHtml(parts.join(" · "))}</p>`;
 }
 
 function renderGovernanceProcessLinks(origin: string): string {
@@ -234,42 +237,31 @@ function renderGovernanceProcessLinks(origin: string): string {
   return `<p class="scan-governance-links">Read the <a href="${escapeHtml(links.data_policy_url)}">operator data policy</a> and <a href="${escapeHtml(links.architecture_url)}">architecture overview</a> for published suspension rules and appeals.</p>`;
 }
 
-function buildScanStatusPanelBody(
+function buildScanHeroMain(
   vm: ScanViewModel,
-  badgeClass: string,
-  qrMarkup: string,
   origin: string
-): string {
-  const head = scanStatusHead(vm, badgeClass);
-
+): { main: string; foot: string } {
   if (vm.kind === "card_suspended") {
     const title = vm.handle
       ? `@${escapeHtml(vm.handle)}`
       : "Card suspended";
-    return `${head}
-<div class="scan-status-body">
-  <div class="scan-status-main">
-    <p class="scan-status-eyebrow">Scan result</p>
-    <h1 class="scan-status-title">${title}</h1>
-    <p class="scan-status-sub">${escapeHtml(scanLead(vm))}</p>
-    ${renderGovernanceProcessLinks(origin)}
-  </div>
-  ${scanStatusQrBlock(vm, qrMarkup)}
-</div>
-${scanStatusFoot("Suspension is a network governance action under published rules.")}`;
+    return {
+      main: `<p class="scan-hero-eyebrow">Scan result</p>
+    <h1 class="scan-hero-title">${title}</h1>
+    <p class="scan-hero-sub">${escapeHtml(scanLead(vm))}</p>
+    ${renderGovernanceProcessLinks(origin)}`,
+      foot: "Suspension is a network governance action under published rules.",
+    };
   }
 
   if (vm.minimalScan) {
     const headline = minimalScanHeadline(vm.kind);
-    return `${head}
-<div class="scan-status-body">
-  <div class="scan-status-main">
-    <p class="scan-status-eyebrow">Scan result</p>
-    <h1 class="scan-status-title">${escapeHtml(headline)}</h1>
-    <p class="scan-status-sub">${escapeHtml(scanLead(vm))}</p>
-  </div>
-</div>
-${scanStatusFoot("This is network state for a QR, not proof of who is holding it.")}`;
+    return {
+      main: `<p class="scan-hero-eyebrow">Scan result</p>
+    <h1 class="scan-hero-title">${escapeHtml(headline)}</h1>
+    <p class="scan-hero-sub">${escapeHtml(scanLead(vm))}</p>`,
+      foot: "This is network state for a QR, not proof of who is holding it.",
+    };
   }
 
   if (
@@ -281,26 +273,22 @@ ${scanStatusFoot("This is network state for a QR, not proof of who is holding it
       ? `@${escapeHtml(vm.handle)}`
       : escapeHtml(headline);
     const statusLine = vm.handle
-      ? `<p class="scan-status-line">${escapeHtml(headline)}</p>`
+      ? `<p class="scan-hero-line">${escapeHtml(headline)}</p>`
       : "";
     const manifesto =
       vm.manifestoLine && vm.handle
-        ? `<p class="scan-status-sub">${escapeHtml(vm.manifestoLine)}</p>`
+        ? `<p class="scan-hero-sub">${escapeHtml(vm.manifestoLine)}</p>`
         : "";
     const meta = scanStatusMetaLine(vm);
-    return `${head}
-<div class="scan-status-body">
-  <div class="scan-status-main">
-    <p class="scan-status-eyebrow">Scan result</p>
-    <h1 class="scan-status-title">${title}</h1>
+    return {
+      main: `<p class="scan-hero-eyebrow">Scan result</p>
+    <h1 class="scan-hero-title">${title}</h1>
     ${statusLine}
     ${manifesto}
-    ${meta ? `<p class="scan-status-meta">${escapeHtml(meta)}</p>` : ""}
-    <p class="scan-status-sub">${escapeHtml(scanLead(vm))}</p>
-  </div>
-  ${scanStatusQrBlock(vm, qrMarkup)}
-</div>
-${scanStatusFoot("Holding a printed object does not prove ownership.")}`;
+    ${meta ? `<p class="scan-hero-meta">${escapeHtml(meta)}</p>` : ""}
+    <p class="scan-hero-sub">${escapeHtml(scanLead(vm))}</p>`,
+      foot: "Holding a printed object does not prove ownership.",
+    };
   }
 
   const isError =
@@ -309,60 +297,104 @@ ${scanStatusFoot("Holding a printed object does not prove ownership.")}`;
     !vm.kind.startsWith("card_");
 
   if (isError) {
-    return `${head}
-<div class="scan-status-body">
-  <div class="scan-status-main">
-    <p class="scan-status-eyebrow">Scan result</p>
-    <h1 class="scan-status-title">${escapeHtml(vm.primaryBadge.label)}</h1>
-    <p class="scan-status-sub">${escapeHtml(scanLead(vm))}</p>
-  </div>
-</div>
-${scanStatusFoot("This page shows resolver state only.")}`;
+    return {
+      main: `<p class="scan-hero-eyebrow">Scan result</p>
+    <h1 class="scan-hero-title">${escapeHtml(vm.primaryBadge.label)}</h1>
+    <p class="scan-hero-sub">${escapeHtml(scanLead(vm))}</p>`,
+      foot: "This page shows resolver state only.",
+    };
   }
 
   const display = parseManifestoDisplay(vm.manifestoLine);
-  const meta = scanStatusMetaLine(vm);
-  const qrBlock = scanStatusQrBlock(vm, qrMarkup);
+  const steward = renderStewardStrip(vm);
 
   if (display.kind === "status_plate") {
-    return `${head}
-<div class="scan-status-body">
-  <div class="scan-status-main">
-    <p class="scan-status-eyebrow">${escapeHtml(objectStateHeadline(vm))}</p>
-    <h1 class="scan-status-title">${escapeHtml(display.objectLabel)}</h1>
-    ${renderObjectStateFacts(vm, display.statusLine)}
-  </div>
-  ${qrBlock}
-</div>
-${scanStatusFoot("Scan shows current status for this place.")}`;
+    return {
+      main: `<h1 class="scan-hero-title">${escapeHtml(display.objectLabel)}</h1>
+    <p class="scan-hero-line">${escapeHtml(display.statusLine)}</p>
+    ${steward}`,
+      foot: "Scan shows current status for this place.",
+    };
   }
 
   if (display.kind === "lost_item_relay") {
-    return `${head}
-<div class="scan-status-body">
-  <div class="scan-status-main">
-    <p class="scan-status-eyebrow">Lost item relay</p>
-    <h1 class="scan-status-title">${escapeHtml(display.objectLabel)}</h1>
-    <p class="scan-status-line">${escapeHtml(display.statusLine)}</p>
-    ${meta ? `<p class="scan-status-meta">${escapeHtml(meta)}</p>` : ""}
-  </div>
-  ${qrBlock}
-</div>
-${scanStatusFoot("This scan does not prove who holds the item.")}`;
+    const meta = scanStatusMetaLine(vm);
+    return {
+      main: `<p class="scan-hero-eyebrow">Lost item relay</p>
+    <h1 class="scan-hero-title">${escapeHtml(display.objectLabel)}</h1>
+    <p class="scan-hero-line">${escapeHtml(display.statusLine)}</p>
+    ${meta ? `<p class="scan-hero-meta">${escapeHtml(meta)}</p>` : ""}
+    ${steward}`,
+      foot: "This scan does not prove who holds the item.",
+    };
   }
 
-  const statusText = vm.manifestoLine || "Live on the network";
+  const manifesto =
+    display.kind === "general" && display.line
+      ? `<p class="scan-hero-line">${escapeHtml(display.line)}</p>`
+      : "";
+  const pills = renderTrustPills(vm);
+  const pillsBlock = pills
+    ? `<ul class="scan-hero-trust" aria-label="Status at a glance">${pills}</ul>`
+    : "";
+  const title = vm.handle
+    ? `@${escapeHtml(vm.handle)}`
+    : display.kind === "general" && display.line
+      ? escapeHtml(display.line)
+      : "Live on the network";
+  return {
+    main: `<h1 class="scan-hero-title">${title}</h1>
+    ${manifesto}
+    ${pillsBlock}
+    ${steward}`,
+    foot: "Scan shows live object state.",
+  };
+}
 
-  return `${head}
-<div class="scan-status-body">
-  <div class="scan-status-main">
-    <p class="scan-status-eyebrow">${escapeHtml(objectStateHeadline(vm))}</p>
-    <h1 class="scan-status-title">${escapeHtml(statusText)}</h1>
-    ${renderObjectStateFacts(vm, vm.kind === "active" ? "Active" : vm.primaryBadge.label)}
-  </div>
-  ${qrBlock}
-</div>
-${scanStatusFoot("Scan shows live object state.")}`;
+/** Zones D–E below hero (docs/M3_SCAN_PAGE_UI.md Phase 3). */
+function renderScanTrustModules(
+  vm: ScanViewModel,
+  safety: ScanSafetyModel,
+  origin: string
+): string {
+  if (vm.kind !== "active" || vm.minimalScan) return "";
+  const proves = renderScanProvesModule(vm, safety);
+  const limits = renderScanDoesNotProveModule(origin);
+  if (!proves && !limits) return "";
+  return `<div class="scan-trust-modules scan-trust-layer">${proves}${limits}</div>`;
+}
+
+function renderScanProvesModule(
+  vm: ScanViewModel,
+  safety: ScanSafetyModel
+): string {
+  const items: string[] = [];
+  if (vm.kind === "active") {
+    items.push("Live status returned from humanity.llc at scan time");
+  }
+  if (safety.objectSignatureVerified) {
+    items.push(SCAN_SAFETY_RESOLVER_VERIFIED_COPY);
+  }
+  if (vm.profileId && vm.qrId) {
+    items.push("Revocable per card and per printed-item QR on the network");
+  }
+  if (!items.length) return "";
+  const rows = items
+    .map((line) => `<li>${escapeHtml(line)}</li>`)
+    .join("");
+  return `<section class="scan-proves" aria-label="What this scan shows">
+  <h2 class="scan-module-label">What this scan shows</h2>
+  <ul class="scan-proves-list">${rows}</ul>
+</section>`;
+}
+
+function renderScanDoesNotProveModule(origin: string): string {
+  const policy = `${origin}/data-policy.html`;
+  return `<section class="scan-does-not-prove" aria-label="What this scan does not prove">
+  <h2 class="scan-module-label">What this does not prove</h2>
+  <p class="scan-does-not-prove-lead">This scan does not prove ownership, legal identity, or that the person holding the item owns the card.</p>
+  <p class="scan-does-not-prove-more">See <a href="#scan-limits-settings">full limits</a> or the <a href="${escapeHtml(policy)}">operator data policy</a>.</p>
+</section>`;
 }
 
 function minimalScanHeadline(kind: ScanViewModel["kind"]): string {
@@ -633,7 +665,7 @@ function renderTrustGroups(vm: ScanViewModel, origin: string): string {
     sections.push(renderVouchSection(vm, origin));
   }
 
-  return `<div class="scan-trust-stack" aria-label="Network status at scan time">
+  return `<div class="scan-trust-stack" aria-label="Trust details at scan time">
 ${sections.join("\n")}
 </div>`;
 }
@@ -643,12 +675,12 @@ function trustGroup(
   rows: string,
   mod: string
 ): string {
-  return `<section class="group scan-group scan-group-${mod} scan-trust-layer">
-  <h2 class="group-label">${escapeHtml(label)}</h2>
+  return `<details class="group scan-group scan-group-${mod} scan-trust-layer scan-trust-details">
+  <summary class="group-label">${escapeHtml(label)}</summary>
   <ul class="list">
     ${rows}
   </ul>
-</section>`;
+</details>`;
 }
 
 function listRow(
@@ -1259,7 +1291,7 @@ function liveControlApiOrigin(vm: ScanViewModel, fallback: string): string {
 function renderLimitsSettings(origin: string): string {
   const policy = `${origin}/data-policy.html`;
   const architecture = `${origin}/architecture.html`;
-  return `<details class="scan-limits-settings scan-trust-layer scan-limits-layer">
+  return `<details class="scan-limits-settings scan-trust-layer scan-limits-layer" id="scan-limits-settings">
   <summary class="scan-limits-summary">
     ${scanListIcon("orange", "shield")}
     <span class="scan-limits-summary-text">
@@ -1380,7 +1412,7 @@ function scanLead(vm: ScanViewModel): string {
     case "qr_replaced":
       return "This QR was replaced by a newer credential.";
     default:
-      return "Network status at scan time.";
+      return "Trust details at scan time.";
   }
 }
 

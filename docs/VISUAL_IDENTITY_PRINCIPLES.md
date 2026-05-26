@@ -39,12 +39,16 @@ Movement energy can live in the homepage, artifacts, launch materials, and commu
 
 The mobile card page should answer:
 
-1. Is the card active?
-2. Is the person vouched?
-3. Was live control proven?
-4. Is this QR active?
-5. What does this not prove?
+1. Is this a real Humanity check on `humanity.llc` right now?
+2. What is this object or card saying **at this moment**?
+3. Is it active, revoked, expired, or unknown?
+4. What does this **not** prove? (one honest line above the fold)
+5. *(personal card depth)* Is the person vouched? Was live control proven? Is this QR active?
 6. Where can I read more?
+
+For **live object** stickers, (2) is usually the manifesto or plate message—not the steward `@handle`. See [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Scan type templates.
+
+**Design reference:** `assets/Nerd Mobile Post Scan Render.png` (single hero, status bar, proof/limit modules, QR secondary).
 
 ---
 
@@ -106,52 +110,71 @@ Preferred direction:
 
 > Sleek mobile Safari trust card.
 
-Structure:
+**Target structure** (matches Nerd mock + [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md)):
 
-1. Minimal web header with Humanity Commons brand.
-2. Profile hero with handle, manifesto, and active card state.
-3. Trust-at-a-glance module:
-   - Vouched Human.
-   - Live Control.
-   - QR Active.
-4. Large QR/status card.
-5. Primary CTA:
-   - `Ask owner to prove control`
-   - or `Prove live control` depending on scanner/owner context.
-6. Warning module:
-   - `Holding a printed QR does not prove identity or ownership.`
-7. Footer links:
-   - Trust Model.
-   - Constitution.
-   - Privacy / No scan analytics.
+1. Minimal web header — dot + `humanity.llc` only.
+2. **Live check hero** — one status + primary message (H1) + resolver verified line + one limit line.
+3. Steward strip — `Controlled by @handle`, optional expiry (muted).
+4. **What this proves** — up to three bullets (only true signals).
+5. **What this does not prove** — warm module; link to full policy.
+6. **This QR** — smaller code + credential code; collapsible on mobile when possible.
+7. Primary CTA when relevant — `Ask owner to prove control` / `Prove live control`.
+8. Footer — trust model, no analytics.
+
+**Interim shipped layout** stacks a separate scanner safety header and status panel—see [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Known UX gaps. Implementation should converge on the structure above.
 
 ---
 
 ## Hierarchy
 
+### Universal (all scan types)
+
 Most important:
 
-- Card status.
-- Handle.
-- Human trust label.
+1. **Trusted host** (`humanity.llc`) and **single live status** (active / revoked / expired / …).
+2. **Object or card message** (manifesto, status plate lines, or `@handle` for personal cards).
+3. **One Level 0 limit** (“does not prove who holds this”).
+4. **Resolver verified** when signatures validate.
+
+### Personal card (additional)
+
+- Human trust label (e.g. Vouched Human).
 - Live control status.
-- QR status.
+- QR active (as pill, not a second hero status).
 
-Secondary:
+### Secondary
 
+- Steward handle (when not the H1).
 - Vouch count and recency.
-- Manifesto line.
-- Export/revocation/no-phone/no-analytics chips.
+- Revocable / issued / steward chips — prefer **Details**, not hero.
 - Governance links.
 
-Tertiary:
+### Tertiary
 
 - Full technical details.
-- Badge trail.
-- Constitution.
-- Roadmap.
+- Credential code, profile id, JSON links.
+- Constitution, roadmap.
 
-Do not make the QR visually dominate at the cost of trust interpretation. The QR is a doorway; the current status is the point.
+**QR:** subordinate. The sticker already says `LIVE OBJECT`; the on-page QR is for re-scan and print match, not the primary trust signal. Max visual weight ~88–96px beside copy on wide phones; below message on narrow.
+
+**Color:** use green only for active / verified-now. Do not show red **ACTIVE** badge and green **Active** strip for the same state.
+
+---
+
+## Scan page visual spec
+
+Resolver HTML (`scan-pass.css`, bundled to Worker). Product rules: [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md).
+
+| Topic | Spec |
+|-------|------|
+| **Feel** | Enticing through competence—calm, precise, spacious—not loud marketing |
+| **Spacing** | One primary hero card: 24–28px padding; 28–32px before secondary modules; no back-to-back equal-weight bordered cards |
+| **Typography** | H1 message 22–26px semibold; status one pill or bar; meta 13–14px at `rgba(60,60,67,0.72)` |
+| **Brand red** | Dot, QR frame accent, primary CTA—not every badge or status duplicate |
+| **Green** | Active / “signed object verified by resolver” only |
+| **Motion** | One-shot hero border pulse on load; respect `prefers-reduced-motion` |
+| **Section kickers** | Avoid “Network status” for strangers; use human copy or omit |
+| **Anti-pattern** | Four “Active” labels; passport styling; QR larger than the message |
 
 ---
 
@@ -292,6 +315,8 @@ A v1 mobile scan page is successful if testers say:
 - "This feels like a real product."
 - "I would scan/share this."
 
+For **live object** first scans, also: they name the **message on the page**, not only `@handle`, without prompting.
+
 It is failing if testers say:
 
 - "This looks like Linktree."
@@ -300,4 +325,8 @@ It is failing if testers say:
 - "This seems like a political flyer."
 - "I thought the sticker proved identity."
 - "I thought this was legal ID."
+- "Which Active is the real one?"
+- "The big QR means it's more verified."
+
+Stranger test protocol: [`docs/M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md).
 

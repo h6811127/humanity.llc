@@ -43,7 +43,19 @@ Movement/marketing surfaces may be louder; the **scan page stays calm, precise, 
 
 ## What a scanner must understand in under five seconds
 
-Aligned with [`docs/V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md):
+Aligned with [`docs/V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md). Order matters for **strangers** scanning an unfamiliar artifact (especially a **live object** sticker):
+
+| Priority | Question | Wrong takeaway to prevent |
+|----------|----------|---------------------------|
+| 1 | **Is this a real Humanity check right now?** | “Cool pink QR” with no host trust |
+| 2 | **What is this object saying *at this moment*?** | Steward `@handle` treated as the headline |
+| 3 | **Is it still valid or dead?** | Multiple conflicting “Active” labels |
+| 4 | **What does this *not* prove?** | Limits buried under chips and fact grids |
+| 5 | *(optional)* Who operates it / can I go deeper? | Handle, issued date, credential code as hero content |
+
+**Personal card scans** still surface handle and human trust (vouch, live control) prominently once the five-second gate is clear. **Live object** and **status plate** scans should put the **object message** (manifesto or plate lines) ahead of the steward handle—see § Scan type templates.
+
+Full trust-model checklist (depth for the curious):
 
 1. Card / QR status: active, revoked, suspended, expired, or unknown.
 2. Human trust evidence (e.g. vouched) when present—without overclaiming “verified identity.”
@@ -111,21 +123,104 @@ Third parties must not ship lookalike “Humanity pink” QRs that encode non-Hu
 
 The scan page is **live Worker HTML** at `GET /c/{profile_id}?q={qr_id}`—not the static Pages site. Implementation layout: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md).
 
-Deploy check: response header `X-HC-Scan-UI` (e.g. `pass-v20`).
+Deploy check: response header `X-HC-Scan-UI` (e.g. `pass-v21` for Live check hero).
 
-### Information architecture (target order)
+**Design reference (target density and hierarchy):** `assets/Nerd Mobile Post Scan Render.png` — single hero, one status bar, proof/limit modules below, QR secondary.
+
+### Product principle (resolver UI)
+
+**Subtract and reorder; do not add more chrome.** The most important first-scan moment—especially for a **live object** sticker—is:
+
+> **Trusted host + live status + the object’s message + one honest limit.**
+
+Everything else is credibility garnish for the curious minority. Emotional target: *competent and unusual*, not marketing-loud ([`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md)).
+
+### Information architecture
 
 Optimize for **strangers scanning in the wild**, then depth for the curious.
 
-1. **Scanner safety header** — **shipped** (`scan-safety.ts`, `scan-pass.css`)
-2. **Status panel** — handle or object label, facts, QR, bearer line
-3. **Pass card (back)** — unused on shipped scan HTML (limits in settings row)
-4. **Grouped lists** — Card status, Human trust, This QR, Live control, Limitations
-5. **Limits `<details>`** — full “does not prove” copy at bottom
+#### Shipped today (`pass-v21` — Phase 1)
 
-**Hierarchy** (from visual identity): card status and handle first; QR is a doorway, current status is the point—do not let the QR dominate trust interpretation.
+Single **Live check** hero (`renderScanHeroSection` in `scan-html.ts`) plus grouped lists and limits `<details>`. Phase 1 removed the dual-card stack, “Network status” kicker, duplicate ACTIVE badge, “This QR is active” eyebrow, and facts-grid status/limits rows.
 
-### Scanner safety header (spec)
+#### Target order (Phases 2–3)
+
+Merge layers 1–2 into one **Live check** hero for active scans, then progressive disclosure:
+
+| Zone | Content | Notes |
+|------|---------|--------|
+| **A. Minimal header** | Dot + `humanity.llc` only | No second brand row inside the hero card |
+| **B. Live check hero** | Single status + object message (H1) + one limit line + resolver verified line | Replaces separate safety header + status panel for typical active scans |
+| **C. Steward strip** | `Controlled by @handle` · optional expiry | One muted line |
+| **D. What this proves** | Up to three bullets (live, signed, revocable) | Only signals that are true for this scan |
+| **E. What this does not prove** | Warm limit module + link to policy | Match Nerd mock; canonical Level 0 copy |
+| **F. This QR** | Small QR, credential code, copy link | Collapsible on mobile; subordinate to status |
+| **G. Trust groups** | Card / Human / This QR / Live control | Hide or collapse empty sections |
+| **H. Footer** | Trust model, no analytics | Quiet |
+
+**Hierarchy** (from visual identity): **current status and object message first**; steward handle and human trust next for personal cards; QR is a doorway, not the trust signal—do not let the on-page QR dominate interpretation.
+
+Pass card (flip) markup remains in `scan-html.ts` for reference only; target shipped HTML is a **flat hero + modules** ([`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md)).
+
+### First-scan hero (“Live check”)
+
+The hero answers four questions in one calm block (ASCII layout is illustrative):
+
+```text
+┌─────────────────────────────────────┐
+│  ● humanity.llc          [Active]   │  host + single status (color + word)
+│                                     │
+│  {object message — H1}              │  manifesto or plate headline
+│                                     │
+│  Signed & checked just now          │  resolver verified (subtle; once)
+│  Does not prove who holds this      │  one Level 0 limit line, always visible
+└─────────────────────────────────────┘
+```
+
+| Hero row | Copy / behavior |
+|----------|-----------------|
+| Host + status | `humanity.llc` + **one** status treatment (Active / Revoked / Expired / …) |
+| H1 | Scan-type-specific (see § Scan type templates) |
+| Resolver | “Signed object verified by resolver” when signatures validate—**object** verified, not person |
+| Limit | Single canonical bearer line in hero; no duplicate “Limits” row in a fact grid |
+| Motion | One brand border pulse on hero load, then settle—`prefers-reduced-motion` respected |
+| First open | “First time you opened this object on this device” as **footnote**, not competing with status |
+| Offline | “Offline — status may be stale; refresh when connected.” (F2-2 banner) |
+
+Chips (revocable, issued date, steward registered) move to **Details** or steward strip—not the hero.
+
+### Scan type templates
+
+Branch on `parseManifestoDisplay()` (`worker/src/resolver/manifesto-display.ts`) and scan kind. Same shell; different hero emphasis:
+
+| Scan type | H1 (primary) | Subhero / secondary |
+|-----------|--------------|---------------------|
+| **Live object** (general manifesto, single line or prose) | Manifesto text | `Controlled by @handle` |
+| **Status plate** (`{label}\n{status line}`) | Object label (e.g. “Studio door”) | Status line (e.g. “Open until 9 PM”) |
+| **Lost item relay** (`[relay] {label}\n{line}`) | Item label | Relay status line |
+| **Personal card** | `@handle` | Manifesto + trust pills (vouched, live control, QR active) |
+| **Failure / minimal** | Compact headline (revoked, expired, unknown) | Facts only; grouped Card status + This QR below |
+
+Foot copy per type (examples):
+
+- Live object: “Scan shows live object state.”
+- Status plate: “Scan shows current status for this place—not who owns the door.”
+- Lost item relay: “This scan does not prove who holds the item.”
+
+### Known UX gaps (shipped interim layout)
+
+Track these when judging scan screenshots or planning UI work—**not** product bugs in trust logic:
+
+| Gap | Symptom | Target fix |
+|-----|---------|------------|
+| Duplicate status | “Active” in safety strip, panel badge, eyebrow (“This QR is active”), and facts grid | **One** status signal in hero |
+| Duplicate brand | `humanity.llc` in top header, safety badge, and panel head | Header + hero host row only |
+| Duplicate limits | Bearer line above panel + “Limits” row in grid + panel foot | **One** limit line in hero; detail in module E |
+| Hierarchy inversion | Large QR right column; manifesto competes with chrome | QR in zone F; message is H1 |
+| Bureaucratic kicker | “Network status” between two cards | Remove or replace with human copy (or none) |
+| Compliance density | Many uppercase chips on first open | Chips in Details / steward strip |
+
+### Scanner safety header (spec — interim + merged target)
 
 Aggressive, calm trust chrome—**safer than opening a random URL**.
 
@@ -140,6 +235,20 @@ Aggressive, calm trust chrome—**safer than opening a random URL**.
 | Offline | “Offline — status may be stale; refresh when connected.” | Client banner when `navigator.onLine === false` ([`docs/FLOW_2_QR_SCAN_REPAIR_SPEC.md`](FLOW_2_QR_SCAN_REPAIR_SPEC.md) slice 3) |
 
 **Shipped (M3 + Phase B):** scanner safety header; bearer line above status panel; grouped trust blocks; limits in `scan-limits-settings`; live control interactive block; governance links on suspension; offline banner (F2-2).
+
+**Target:** safety header content **folds into** the Live check hero (§ First-scan hero); no second bordered card above the message.
+
+### Visual direction (resolver)
+
+Align with [`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) § Scan page visual spec:
+
+| Topic | Direction |
+|-------|-----------|
+| **Spacing** | One primary card: 24–28px internal padding; 28–32px gap before secondary modules; avoid back-to-back bordered cards |
+| **Typography** | H1 (message): 22–26px semibold; status: one pill or bar; meta/chips: 13–14px muted |
+| **Color** | Brand red: dot, frame accent, primary CTA—not every badge; green **only** for active / verified-now |
+| **QR** | Max ~88–96px beside message on wide viewports; full-width but subordinate on narrow; optional collapse behind “Show QR” |
+| **Motion** | One-shot hero border pulse on load; no decorative loops |
 
 ### Trust blocks (alignment)
 
@@ -224,10 +333,15 @@ From [`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md)—do 
 - Red alarm overload for normal limits
 - Hidden fine print for “does not prove”
 - Implying sticker possession = identity or ownership
+- **Duplicate status chrome** (e.g. green Active strip + red ACTIVE badge + grid “Status: Active”)
+- **QR larger than the object message** on live object scans
+- **Infrastructure kickers** (“Network status”) between two trust cards on first paint
 
 ---
 
 ## Roadmap
+
+### Recognition, safety, and print (shipped)
 
 | Phase | Deliverable | Reduces |
 |-------|-------------|---------|
@@ -240,15 +354,40 @@ From [`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md)—do 
 
 Phases **A–F** are shipped for the reference network. **E** remains mandatory before any external destination product feature ships.
 
+### Resolver UI refresh
+
+Implementation detail: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) § UI refresh phases. Current header: `X-HC-Scan-UI: pass-v22`.
+
+| Phase | Deliverable | Outcome |
+|-------|-------------|---------|
+| **0** | Fixtures + sketches: live object demo, status plate, revoked QR; compare to Nerd mock | Align design before code |
+| **1** | **Hero consolidation** for active scans: single Live check card; dedupe status/limits/brand; demote QR; CSS spacing pass | **Shipped** |
+| **2** | Scan-type templates: status plate, lost item relay, personal card heroes | **Shipped** — `buildScanHeroMain()` |
+| **3** | Below-fold: collapsible trust groups; “proves / does not prove” modules | **Shipped** — `renderScanTrustModules()`, `scan-trust-details` |
+| **4** | M5 stranger test + live object fixture; HTML snapshot tests; `X-HC-Scan-UI` bump | Exit validation |
+
 ---
 
 ## Validation
 
 ### Stranger test (exit gate)
 
-[`docs/M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md): three outsiders explain proves / does-not-prove in one sentence; at least one revokes QR and re-scans.
+[`docs/M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md): three outsiders explain proves / does-not-prove in one sentence; at least one revokes QR and re-scans. Include at least one **live object** or pilot sticker scan—not only self-created cards.
 
-**Pass signals:** “Live status on humanity.llc.” **Fail signals:** “It verified they’re human.” “Sticker proves identity.”
+### Success criteria (first scan)
+
+A stranger scanning a **live object** demo or pilot sticker should be able to say:
+
+| | Example good answer |
+|---|---------------------|
+| **Proves** | “It’s an active live object on humanity.llc—the network just checked it.” |
+| **Does not prove** | “Not that the person holding it owns it or is government-verified.” |
+
+They should **not** need to reconcile multiple “Active” labels or read a disclaimer sandwiched between two cards.
+
+**Pass signals:** “Live status on humanity.llc.” **Fail signals:** “It verified they’re human.” “Sticker proves identity.” “Like Instagram.”
+
+**UX yellow flags (copy or layout fix):** tester asks which “Active” is authoritative; thinks `@handle` is the object’s name when manifesto carries the message; believes the on-page QR size implies stronger proof.
 
 ### Recognition test (when frame ships)
 

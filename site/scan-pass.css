@@ -1155,7 +1155,218 @@ a {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
 }
 
-.scan-safety-header.scan-safety--pulse {
+/* Live check hero (docs/M3_SCAN_PAGE_UI.md Phase 1) */
+.scan-hero.scan-safety-header {
+  margin: 0 0 18px;
+  padding: 22px 20px 18px;
+  border: 0.5px solid rgba(60, 60, 67, 0.14);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 10px 28px rgba(0, 0, 0, 0.07);
+}
+
+.scan-hero-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.scan-hero-host {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--black);
+}
+
+.scan-hero-body {
+  display: block;
+}
+
+.scan-hero-eyebrow {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(60, 60, 67, 0.5);
+}
+
+.scan-hero-title {
+  margin: 0 0 8px;
+  font-size: clamp(22px, 5.8vw, 26px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--black);
+  word-break: break-word;
+}
+
+.scan-hero-line {
+  margin: 0 0 10px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--black);
+}
+
+.scan-hero-steward {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: rgba(60, 60, 67, 0.72);
+}
+
+.scan-hero-limit {
+  margin: 16px 0 0;
+  padding-top: 14px;
+  border-top: 0.5px solid rgba(60, 60, 67, 0.1);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: rgba(60, 60, 67, 0.78);
+}
+
+.scan-hero-foot {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(60, 60, 67, 0.55);
+}
+
+.scan-hero-meta,
+.scan-hero-sub {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(60, 60, 67, 0.62);
+}
+
+.scan-hero-meta + .scan-hero-sub,
+.scan-hero-sub + .scan-hero-sub {
+  margin-top: 6px;
+}
+
+.scan-hero-details {
+  margin-top: 12px;
+}
+
+.scan-hero-qr {
+  margin-top: 16px;
+  max-width: 96px;
+}
+
+.scan-hero-qr svg,
+.scan-hero-qr img {
+  display: block;
+  width: 88px;
+  height: 88px;
+}
+
+.scan-hero-trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.scan-hero-trust li {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(60, 60, 67, 0.08);
+  color: rgba(60, 60, 67, 0.72);
+}
+
+.scan-hero-trust li.trust-on {
+  background: rgba(52, 199, 89, 0.14);
+  color: #1a7f37;
+}
+
+.scan-trust-modules {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 var(--pad) 18px;
+}
+
+.scan-module-label {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: rgba(60, 60, 67, 0.62);
+}
+
+.scan-proves-list {
+  margin: 0;
+  padding-left: 1.15rem;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(60, 60, 67, 0.88);
+}
+
+.scan-proves-list li + li {
+  margin-top: 6px;
+}
+
+.scan-does-not-prove {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 149, 0, 0.08);
+  border: 0.5px solid rgba(255, 149, 0, 0.28);
+}
+
+.scan-does-not-prove-lead {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(60, 60, 67, 0.88);
+}
+
+.scan-does-not-prove-more {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.scan-does-not-prove-more a {
+  color: var(--red);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.scan-trust-details {
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 0.5px solid rgba(60, 60, 67, 0.12);
+  padding: 0 12px 4px;
+}
+
+.scan-trust-details > summary.group-label {
+  cursor: pointer;
+  padding: 12px 4px 10px;
+  list-style: none;
+}
+
+.scan-trust-details > summary.group-label::-webkit-details-marker {
+  display: none;
+}
+
+.scan-trust-details[open] > summary.group-label {
+  margin-bottom: 4px;
+}
+
+.scan-safety-header.scan-safety--pulse,
+.scan-hero.scan-safety-header.scan-safety--pulse {
   animation: scan-safety-border-pulse 0.85s ease;
 }
 
@@ -1642,6 +1853,10 @@ body {
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.04),
     0 10px 28px rgba(0, 0, 0, 0.07);
+}
+
+.scan-hero.scan-status-panel {
+  padding: 22px 20px 18px;
 }
 
 .scan-status-head {

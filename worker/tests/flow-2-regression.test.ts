@@ -100,7 +100,7 @@ describe("Flow 2 closure regression", () => {
     expect(httpStatusForScanKind(vm.kind)).toBe(410);
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).toContain("<!DOCTYPE html>");
-    expect(html).toContain("scan-bearer-line");
+    expect(html).toContain("scan-hero-limit");
     expect(html).toContain("Card status");
   });
 
@@ -141,7 +141,7 @@ describe("Flow 2 closure regression", () => {
         "https://humanity.llc"
       );
       const html = await renderScanPage(vm, "https://humanity.llc");
-      expect(html).toContain("scan-bearer-line");
+      expect(html).toContain("scan-hero-limit");
       expect(html.split(BEARER_WARNING).length - 1).toBe(1);
     }
   });

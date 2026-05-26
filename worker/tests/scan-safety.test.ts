@@ -109,7 +109,7 @@ describe("scan-safety", () => {
     expect(renderScanSafetyHeaderScript()).toContain(SCAN_SAFETY_FIRST_SEEN_NEW);
   });
 
-  it("embeds safety header in scan page above network status", async () => {
+  it("embeds Live check hero with first-seen script hooks", async () => {
     const vm = buildScanViewModel(
       PROFILE,
       QR,
@@ -120,11 +120,11 @@ describe("scan-safety", () => {
       objectSignatureVerified: false,
       stewardRegistered: false,
     });
-    const safetyIdx = html.indexOf("scan-safety-header");
-    const kickerIdx = html.indexOf("Network status");
-    expect(safetyIdx).toBeGreaterThan(-1);
-    expect(kickerIdx).toBeGreaterThan(safetyIdx);
+    expect(html).toContain('class="scan-hero');
+    expect(html).toContain('id="scan-safety-header"');
+    expect(html).not.toContain('class="section-kicker">Network status');
     expect(html).toContain("scan-safety-first-seen");
+    expect(html).toContain("scan-hero-limit");
   });
 
   it("buildScanSafetyModel reports steward when verification state is steward", async () => {
