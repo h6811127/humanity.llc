@@ -1,5 +1,8 @@
 import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
 
+import { resolverJsonResponse } from "./helpers/resolver-fetch-response.mjs";
+import { resetWalletNetworkTruth } from "../../site/js/device-wallet-network-truth.mjs";
+
 vi.mock("../../site/js/hc-sign.mjs", () => ({
   getCardStatusUrl: (profileId, qrId) =>
     `https://example.test/.well-known/hc/v1/cards/${profileId}/status?q=${qrId}`,
@@ -32,6 +35,7 @@ describe("isResolverConfirmedProfile", () => {
   let localStore;
 
   beforeEach(() => {
+    resetWalletNetworkTruth();
     sessionStore = new Map();
     localStore = new Map([
       [
@@ -62,13 +66,7 @@ describe("isResolverConfirmedProfile", () => {
     vi.stubGlobal("window", { dispatchEvent: vi.fn() });
     setResolverHealthStatusForSinceVisit("ok");
     setLiveControlPollHealth("ok");
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async () => ({
-        ok: true,
-        json: async () => ACTIVE_BODY,
-      }))
-    );
+    vi.stubGlobal("fetch", vi.fn(async () => resolverJsonResponse(ACTIVE_BODY)));
   });
 
   afterEach(() => {
@@ -105,15 +103,14 @@ describe("isResolverConfirmedProfile", () => {
     );
     const fetchMock = vi.mocked(fetch);
     fetchMock
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
+      .mockResolvedValueOnce(
+        resolverJsonResponse({
           scan: {
             kind: "card_revoked",
             card: { status: "revoked", handle: "e2e", manifesto_line: "Test" },
           },
-        }),
-      } as Response)
+        })
+      )
       .mockRejectedValueOnce(new Error("offline"));
 
     await refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }]);
@@ -130,15 +127,14 @@ describe("isResolverConfirmedProfile", () => {
       JSON.stringify({ [PROFILE_A]: "active" })
     );
     const fetchMock = vi.mocked(fetch);
-    fetchMock.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
+    fetchMock.mockResolvedValueOnce(
+      resolverJsonResponse({
         scan: {
           kind: "card_revoked",
           card: { status: "revoked", handle: "e2e", manifesto_line: "Test" },
         },
-      }),
-    } as Response);
+      })
+    );
 
     await refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }]);
     expect(buildResolverConfirmedWalletPollMaps()?.scanKindMap[PROFILE_A]).toBe(

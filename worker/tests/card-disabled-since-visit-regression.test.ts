@@ -42,6 +42,18 @@ describe("card-disabled since-visit regression gates (Slice 8)", () => {
     ).toBe(false);
   });
 
+  it("refuses session cache with card_revoked scanKind when baseline is unset (forces refetch)", () => {
+    const now = 1_000_000;
+    const cached = {
+      status: "active",
+      scanKind: "card_revoked",
+      at: now,
+    };
+    expect(
+      shouldUseCachedNetworkStatus({}, PROFILE, cached, now, WALLET_NETWORK_CACHE_TTL_MS)
+    ).toBe(false);
+  });
+
   it("does not list inbox/hub targets from cache-only card_revoked", () => {
     const wallet = [{ profile_id: PROFILE, label: "Test" }];
     const staleAlert = CARD_REVOKED_ALERT_STATE;

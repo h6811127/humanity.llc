@@ -546,6 +546,10 @@ function applyRevokedSinceVisitAlerts(
       setRevokedSinceVisitAlertVisible(li, pid, false);
       return;
     }
+    if (netStatus === "active") {
+      setRevokedSinceVisitAlertVisible(li, pid, false);
+      return;
+    }
     const resolverConfirmed = resolverConfirmedMap?.[pid] === true;
     const scanKind = scanKindMap[pid] !== undefined ? scanKindMap[pid] : null;
     if (resolverConfirmed) {

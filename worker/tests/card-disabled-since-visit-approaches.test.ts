@@ -4,6 +4,9 @@
  */
 import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
 
+import { resolverJsonResponse } from "./helpers/resolver-fetch-response.mjs";
+import { resetWalletNetworkTruth } from "../../site/js/device-wallet-network-truth.mjs";
+
 vi.mock("../../site/js/hc-sign.mjs", () => ({
   getCardStatusUrl: (profileId, qrId) =>
     `https://example.test/.well-known/hc/v1/cards/${profileId}/status?q=${qrId}`,
@@ -45,6 +48,9 @@ function hubWouldShowSinceVisitBanner(
   if (netStatus === "checking" || netStatus === "offline" || netStatus === "error") {
     return false;
   }
+  if (netStatus === "active") {
+    return false;
+  }
   return cardDisabledSinceVisitVisible(
     alertStateMap[profileId],
     "active",
@@ -67,6 +73,9 @@ function hubWouldShowWithStatusSnapshot(profileId, lastStatusMap, maps) {
   if (netStatus === "checking" || netStatus === "offline" || netStatus === "error") {
     return false;
   }
+  if (netStatus === "active") {
+    return false;
+  }
   return cardDisabledSinceVisitVisible(
     maps.alertStateMap[profileId],
     "active",
@@ -82,6 +91,7 @@ describe("fourth pass: is G1+G2 still a live false-positive path?", () => {
   let localStore;
 
   beforeEach(() => {
+    resetWalletNetworkTruth();
     sessionStore = new Map();
     localStore = new Map([
       [
@@ -107,15 +117,14 @@ describe("fourth pass: is G1+G2 still a live false-positive path?", () => {
     setLiveControlPollHealth("ok");
     vi.stubGlobal(
       "fetch",
-      vi.fn(async () => ({
-        ok: true,
-        json: async () => ({
+      vi.fn(async () =>
+        resolverJsonResponse({
           scan: {
             kind: "card_revoked",
             card: { status: "revoked", handle: "e2e", manifesto_line: "Test" },
           },
-        }),
-      }))
+        })
+      )
     );
   });
 
@@ -123,7 +132,7 @@ describe("fourth pass: is G1+G2 still a live false-positive path?", () => {
     vi.unstubAllGlobals();
   });
 
-  it("G1 repro: empty statusMap + stale session active + stale latestResolved shows banner", async () => {
+  it("G1 closed: active cache chip hides banner despite stale poll maps on empty statusMap", async () => {
     await refreshWalletNetworkStatuses([{ profile_id: PROFILE, qr_id: QR }]);
     const maps = buildResolverConfirmedWalletPollMaps();
     expect(maps?.scanKindMap[PROFILE]).toBe("card_revoked");
@@ -142,21 +151,20 @@ describe("fourth pass: is G1+G2 still a live false-positive path?", () => {
 
     expect(
       hubWouldShowSinceVisitBanner(PROFILE, {}, maps.alertStateMap, maps.scanKindMap, maps.resolverConfirmedMap)
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it("second-pass still clears inbox after offline poll (contradicts old doc § stale latestResolved)", async () => {
     const fetchMock = vi.mocked(fetch);
     fetchMock
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
+      .mockResolvedValueOnce(
+        resolverJsonResponse({
           scan: {
             kind: "card_revoked",
             card: { status: "revoked", handle: "e2e", manifesto_line: "Test" },
           },
-        }),
-      } as Response)
+        })
+      )
       .mockRejectedValueOnce(new Error("offline"));
 
     await refreshWalletNetworkStatuses([{ profile_id: PROFILE, qr_id: QR }]);
@@ -235,7 +243,7 @@ describe("fix approach invariants (mechanism verification)", () => {
     ).toBe(false);
   });
 
-  it("A1+A4 (shipped): status snapshot offline hides even if G1 empty-map path would show", () => {
+  it("A1+A4 (shipped): status snapshot offline hides; active cache chip blocks empty-map G1 re-apply", () => {
     const now = Date.now();
     sessionStore.set(
       "hc_wallet_network_cache",
@@ -252,7 +260,7 @@ describe("fix approach invariants (mechanism verification)", () => {
     expect(hubWouldShowWithStatusSnapshot(PROFILE, lastStatusMap, maps)).toBe(false);
     expect(
       hubWouldShowSinceVisitBanner(PROFILE, {}, maps.alertStateMap, maps.scanKindMap, maps.resolverConfirmedMap)
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it("Approach 5 (global gate): degraded health suppresses gather path", () => {

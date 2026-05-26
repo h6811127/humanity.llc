@@ -71,12 +71,14 @@ export function shouldUseCachedNetworkStatus(
     return false;
   }
   const cachedStatus = String(cachedEntry?.status || "").toLowerCase();
+  const cachedScanKind = String(cachedEntry?.scanKind || "").toLowerCase();
   const lastSeen = lastSeenMap[profileId];
   const cachedAlert = alertStateForNetworkPoll(cachedEntry?.scanKind, cachedStatus);
-  if (
-    cachedAlert === "card_revoked" &&
-    isRevokedSinceLastVisitFromBaseline(lastSeen, cachedAlert)
-  ) {
+  // Never trust session cache for card-level revoke without a resolver poll this visit.
+  if (cachedScanKind === "card_revoked" || cachedAlert === "card_revoked") {
+    return false;
+  }
+  if (isRevokedSinceLastVisitFromBaseline(lastSeen, cachedAlert)) {
     return false;
   }
   return true;

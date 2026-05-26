@@ -56,6 +56,8 @@ Resolver health at test time: `GET /.well-known/hc/v1/health` → `{"status":"ok
 
 ### P0-2 · “Card disabled on the network since your last visit” on active cards (reproduced)
 
+**Status (2026-05-26):** Fix shipped — never trust session cache for `scanKind: card_revoked` without a poll; G2 truth clear on cache/poll mismatch; hub hides since-visit banner when chip status is `active`. Re-verify on production after deploy.
+
 **Steps**
 
 1. Open `/`, `/create/`, or `/wallet/` with saved cards (including public showcase `@studio_door_showcase`).

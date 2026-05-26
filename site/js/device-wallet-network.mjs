@@ -24,6 +24,7 @@ import {
 import {
   buildSinceVisitPollMapsFromTruth,
   clearWalletNetworkTruthForProfile,
+  getWalletNetworkTruth,
   getWalletNetworkTruthPollAlertState,
   getWalletNetworkTruthPollScanKind,
   hasWalletNetworkTruthPoll,
@@ -86,6 +87,16 @@ function syncWalletNetworkTruthFromPoll(
         clearWalletNetworkTruthForProfile(pid);
       }
     } else {
+      const prior = getWalletNetworkTruth(pid);
+      const cachedKind = scanKindMap[pid] ?? null;
+      if (
+        prior?.source === "poll" &&
+        prior.resolverConfirmed &&
+        (prior.scanKind !== cachedKind ||
+          (prior.alertState === CARD_REVOKED_ALERT_STATE && cachedKind === "active"))
+      ) {
+        clearWalletNetworkTruthForProfile(pid);
+      }
       setWalletNetworkTruthFromCacheOnly(pid, { chipStatus, scanKind });
     }
   }

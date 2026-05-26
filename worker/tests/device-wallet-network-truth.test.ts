@@ -66,4 +66,18 @@ describe("device-wallet-network-truth (A3 SSOT)", () => {
     expect(shouldSuppressCardDisabledSinceVisitFromTruth(PROFILE)).toBe(true);
     expect(buildSinceVisitPollMapsFromTruth([{ profile_id: PROFILE }])).not.toBeNull();
   });
+
+  it("cache-only with active scanKind clears prior poll card_revoked maps (G2)", () => {
+    setWalletNetworkTruthFromPoll(PROFILE, {
+      chipStatus: "active",
+      scanKind: "card_revoked",
+      alertState: CARD_REVOKED_ALERT_STATE,
+    });
+    expect(buildSinceVisitPollMapsFromTruth([{ profile_id: PROFILE }])).not.toBeNull();
+    setWalletNetworkTruthFromCacheOnly(PROFILE, {
+      chipStatus: "active",
+      scanKind: "active",
+    });
+    expect(buildSinceVisitPollMapsFromTruth([{ profile_id: PROFILE }])).toBeNull();
+  });
 });
