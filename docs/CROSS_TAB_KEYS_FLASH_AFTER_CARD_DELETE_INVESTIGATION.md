@@ -2,7 +2,7 @@
 
 **Reported:** 2026-05-26 — Laptop instance shows “Keys in another tab” for ~1–2s then it disappears, for a card deleted the previous day.
 
-**Status:** **Path B (step 1)**, **path F (step 2)**, and **path G (step 3)** shipped — see § Implementation.
+**Status:** **Path B (step 1)**, **path F (step 2)**, and **path G (step 3)** shipped — see § Implementation. Ongoing UX bugs (flash, wrong card label, stuck badge) → [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) + restart plan [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md).
 
 Related: [`DEVICE_INBOX.md`](DEVICE_INBOX.md) counting rule 5, [`DEVICE_OS.md`](DEVICE_OS.md) § Cross-tab keys, [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) § Cross-tab badge.
 

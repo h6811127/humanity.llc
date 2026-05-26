@@ -2,7 +2,7 @@
  * Floating status dot, notification badge, hub sheet host.
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
-import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=35";
+import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=36";
 import { buildStatusSegments } from "./device-counts.mjs";
 import { DEVICE_OS_DEBOUNCE_MS } from "./device-os-coordinator-core.mjs";
 import { shouldSkipCrossTabOverlayViewTransition } from "./device-presence-inbox-stability-core.mjs";
@@ -22,7 +22,7 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeCountText,
   notificationCount,
-} from "./device-inbox.mjs?v=35";
+} from "./device-inbox.mjs?v=36";
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
@@ -31,20 +31,21 @@ import {
   onHubOpenedFromIntro,
 } from "./device-hub-intro-coachmark.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=35";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=36";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import "./device-shell-motion.mjs";
-import "./device-shell-chrome.mjs?v=35";
+import "./device-shell-chrome.mjs?v=36";
 import "./device-theme.mjs";
-import "./device-browser-notifications.mjs?v=35";
+import "./device-browser-notifications.mjs?v=36";
 import {
   isHubSheet,
   reconcileHubSheetState,
   setHubSheetOpen,
-} from "./device-hub-sheet.mjs?v=35";
+} from "./device-hub-sheet.mjs?v=36";
+import { startCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 import {
   describeDotState,
@@ -56,7 +57,7 @@ import {
   hasStewardVerification,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=35";
+} from "./device-dot-state-core.mjs?v=36";
 
 export const DOT_STATE_CHANGED = "hc-dot-state-changed";
 
@@ -530,6 +531,7 @@ window.addEventListener("hc-focus-hub-search", () => {
 });
 
 startTabKeysPresence();
+startCrossTabNotificationState();
 void refreshNetwork();
 
 document.addEventListener("visibilitychange", () => {

@@ -15,22 +15,21 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeChromaClass,
   inboxBadgeChromaClassNames,
-} from "./device-inbox-core.mjs?v=35";
+} from "./device-inbox-core.mjs?v=36";
 import { tabNoticeCount } from "./device-counts.mjs";
 import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
 import { getTabSession } from "./device-keys.mjs";
-import { stablePresenceInboxEntries } from "./device-presence-inbox-stability-core.mjs";
-import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys } from "./device-tab-presence.mjs";
-import { shouldShowCrossTabKeysNotice, shouldShowOrphanRemovedKeysNotice } from "./device-cross-tab-visibility.mjs";
-import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=35";
+import {
+  getCrossTabNotificationState,
+  invalidateCrossTabNotificationState,
+} from "./device-cross-tab-state.mjs";
+import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=36";
 
 /** Coalesce multiple gather reads in one chrome refresh (Path G). */
 const GATHER_COALESCE_MS = 50;
 let lastGatherMs = 0;
 /** @type {ReturnType<typeof gatherInboxInput> | null} */
 let gatherCache = null;
-let crossTabShowStreak = 0;
-let orphanShowStreak = 0;
 
 export {
   buildGlanceRowPlan,
@@ -45,7 +44,7 @@ export {
   inboxBadgeChromaKind,
   inboxBadgeChromaClass,
   inboxBadgeChromaClassNames,
-} from "./device-inbox-core.mjs?v=35";
+} from "./device-inbox-core.mjs?v=36";
 
 function tabSessionLabel() {
   const session = getTabSession();
@@ -58,8 +57,7 @@ function tabSessionLabel() {
 export function resetPresenceInboxGatherCache() {
   gatherCache = null;
   lastGatherMs = 0;
-  crossTabShowStreak = 0;
-  orphanShowStreak = 0;
+  invalidateCrossTabNotificationState();
 }
 
 /** @returns {Parameters<typeof buildInboxItems>[0]} */
@@ -75,30 +73,13 @@ export function gatherInboxInput() {
     handle: entry.handle,
   }));
   const notices = tabNoticeCount();
-  const crossTabRaw = getOtherTabsWithKeys();
-  const orphanRaw = getOrphanRemovedTabsWithKeys();
-
-  const crossTabStable = stablePresenceInboxEntries(
-    crossTabRaw,
-    notices,
-    shouldShowCrossTabKeysNotice,
-    crossTabShowStreak
-  );
-  crossTabShowStreak = crossTabStable.streak;
-
-  const orphanStable = stablePresenceInboxEntries(
-    orphanRaw,
-    notices,
-    shouldShowOrphanRemovedKeysNotice,
-    orphanShowStreak
-  );
-  orphanShowStreak = orphanStable.streak;
+  const crossTab = getCrossTabNotificationState();
 
   gatherCache = {
     tabNoticeCount: notices,
     liveProofCount: getLiveControlPendingCount(),
-    crossTabEntries: crossTabStable.entries,
-    orphanRemovedEntries: orphanStable.entries,
+    crossTabEntries: crossTab.genericEntries,
+    orphanRemovedEntries: crossTab.orphanEntries,
     tabSessionLabel: tabSessionLabel(),
     cardDisabledSinceVisit: cardDisabled,
   };

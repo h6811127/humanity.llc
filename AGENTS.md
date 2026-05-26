@@ -35,6 +35,7 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 ### Non-obvious notes
 
 - **Cards vs keys vs verification:** `docs/KEYS_CARDS_AND_VERIFICATION.md` — steward status is on the resolver; vouch signing needs `hc_created` keys on the same browser tab.
+- **Cross-tab keys / inbox chrome:** `docs/CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md` (spec) · `docs/CROSS_TAB_KEYS_REBUILD_PLAN.md` (restart plan) — not OS notifications; one snapshot + coordinator target architecture.
 - **Status dot vs inbox vs OS alerts:** `docs/DEVICE_INBOX.md` (action items, badge, background alerts) vs `docs/STATUS_INDICATOR_STEWARD_GREEN.md` (trust dot only).
 - **Safari / iPhone shell regression (scroll, dead taps):** `docs/SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md` — fix plan; hub scroll smooth / landing lag implicates `device-shell-chrome.mjs` document scroll listener. **Reverted features catalog:** `docs/UI_UX_REVERTED_FEATURES_CATALOG.md` (safe rebuild without lag/rate-limit paths). **Phased implementation:** `docs/UI_UX_SAFE_REBUILD_IMPLEMENTATION.md`.
 - **Card disabled since visit:** Banner, hub `#device-hub-card-disabled-group`, and inbox badge must use **resolver-confirmed** poll maps only — never `sessionStorage.hc_wallet_network_cache` alone. Incident **closed** (no Slice 9); see `docs/CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`. After hub/inbox network changes: `npm run worker:test:card-disabled-since-visit` and `npm run e2e:card-disabled-since-visit`.

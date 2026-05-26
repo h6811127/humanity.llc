@@ -2,7 +2,7 @@
 
 **Status:** Unified inbox shipped (phases 1–14) · browser alerts v2 A–D shipped (contextual opt-in, sign deep link, OS policy matrix, live-proof service worker)  
 **Audience:** Product, frontend  
-**Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)
+**Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) (cross-tab / orphan chrome spec)
 
 ---
 
@@ -84,7 +84,7 @@ Canonical `kind` values (target: one module `device-inbox-core.mjs`, Vitest-cove
 2. **Dot overlay = highest-priority inbox kind** — `proof_waiting` → `cross_tab_keys` → `card_disabled_since_visit` (see `dotOverlayFromCounts()` in `device-dot-state-core.mjs`).
 3. **No double-counting** — e.g. cross-tab banner/glance only when `tabNoticeCount === 0` (`device-cross-tab-visibility.mjs`).
 4. **Live proof** — N pending challenges may show as one inbox group with quantity N; badge may show total count or “1” per product choice; document in tests when unified.
-5. **Cross-tab keys (`cross_tab_keys`)** — Badge contribution = **count of other tabs with a fresh presence heartbeat**, not “every create tab you ever opened.” Only tabs that are **open**, hold `hc_created` signing keys, and have heartbeated within ~**6s** while **visible** appear (`device-tab-presence.mjs`, `PRESENCE_SHOW_MS` in `device-tab-presence-core.mjs`). Closing a tab clears its row on `pagehide`; background tabs do not heartbeat. Profiles in `hc_wallet_removed_profile_ids` (after **Remove from device**) do not count toward cross-tab. **Path G:** cross-tab and orphan inbox rows require **two** stabilized presence reads before showing (fast hide when presence clears). The numeric badge is the **sum of all inbox item counts** (live proof + cross-tab + unsaved-this-tab + card-disabled), so **3** does not necessarily mean three key tabs — see [`DEVICE_OS.md`](DEVICE_OS.md) § Cross-tab keys and [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md).
+5. **Cross-tab keys (`cross_tab_keys`)** — Badge contribution = **count of other tabs with a fresh presence heartbeat**, not “every create tab you ever opened.” Only tabs that are **open**, hold `hc_created` signing keys, and have heartbeated within ~**6s** while **visible** appear (`device-tab-presence.mjs`, `PRESENCE_SHOW_MS` in `device-tab-presence-core.mjs`). Closing a tab clears its row on `pagehide`; background tabs do not heartbeat. Profiles in `hc_wallet_removed_profile_ids` (after **Remove from device**) surface as **`orphan_keys_removed`**, not generic cross-tab. **Phase 1 (shipped):** fingerprint-stable two-read show via `device-cross-tab-state-core.mjs`; known gaps (split listeners, scan banner bypass) — [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md), [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md). The numeric badge is the **sum of all inbox item counts** (live proof + cross-tab + unsaved-this-tab + card-disabled), so **3** does not necessarily mean three key tabs — see [`DEVICE_OS.md`](DEVICE_OS.md) § Cross-tab keys and [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md).
 
 ---
 
@@ -219,6 +219,8 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 1. Blue `cross_tab_keys` overlay + badge (when this tab has no unsaved notice).
 2. Glance/hub row → `actOnOtherTabKeys()` (`device-notice-nav.mjs`).
 
+**Not OS push** — cross-tab is in-app chrome only. See [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) for surfaces, presence protocol, and failure modes.
+
 ---
 
 ## Implementation roadmap
@@ -294,7 +296,12 @@ Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox 
 | `site/js/device-hub-ui.mjs` | Hub saved rows, search, coordinates inbox alert sync |
 | `site/js/device-hub-inbox-alerts.mjs` | Hub live-proof + tab-keys groups from `getInboxItems()` |
 | `site/js/device-tab-presence.mjs` | Cross-tab presence + `crossTabNoticeCount()` |
+| `site/js/device-cross-tab-state-core.mjs` | Fingerprint-stable cross-tab snapshot |
+| `site/js/device-cross-tab-state.mjs` | Browser `getCrossTabNotificationState()` |
+| `site/js/device-presence-inbox-stability-core.mjs` | Dot view-transition skip |
 | `site/js/device-cross-tab-banner.mjs` | Landing/wallet banner |
+| `docs/CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md` | Cross-tab / orphan notification spec |
+| `docs/CROSS_TAB_KEYS_REBUILD_PLAN.md` | Restart implementation plan |
 | `site/css/device-shell.css` | `.shell-notif-badge*` styles |
 | `docs/DEVICE_INBOX.md` | This spec |
 | `site/js/device-inbox-core.mjs` | Pure inbox model + `buildGlanceRowPlan()` |
