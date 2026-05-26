@@ -152,7 +152,7 @@ export function renderHumanityQrFrameSvg(brandedQrSvg, opts = {}) {
   const codeText = m.credentialCode
     ? `<text class="hc-qr-frame-code-text" x="${m.innerW / 2}" y="${m.codeY + m.codeH * 0.72}" text-anchor="middle" font-family="ui-monospace,monospace" font-size="${m.codeFont}" font-weight="600" letter-spacing="0.08em" fill="${QR_BRAND_RED}">${m.credentialCode}</text>`
     : "";
-  return `<svg class="hc-qr-frame-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${m.totalWidth} ${m.totalHeight}" role="presentation" aria-hidden="true"><rect width="${m.totalWidth}" height="${m.totalHeight}" rx="${m.cornerR}" fill="${QR_BRAND_LIGHT}"/><rect x="${m.border / 2}" y="${m.border / 2}" width="${m.totalWidth - m.border}" height="${m.totalHeight - m.border}" rx="${m.cornerR - 1}" fill="none" stroke="${QR_BRAND_RED}" stroke-width="${m.border}"/>${glyph}<g transform="translate(${m.qrX} ${m.qrY})">${inner}</g>${pillText}${footerText}${codeText}</svg>`;
+  return `<svg class="hc-qr-frame-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${m.totalWidth} ${m.totalHeight}" role="presentation" aria-hidden="true"><rect width="${m.totalWidth}" height="${m.totalHeight}" rx="${m.cornerR}" fill="${QR_BRAND_LIGHT}"/><rect x="${m.border / 2}" y="${m.border / 2}" width="${m.totalWidth - m.border}" height="${m.totalHeight - m.border}" rx="${m.cornerR}" fill="none" stroke="${QR_BRAND_RED}" stroke-width="${m.border}"/>${glyph}<g transform="translate(${m.qrX} ${m.qrY})">${inner}</g>${pillText}${footerText}${codeText}</svg>`;
 }
 
 /**
@@ -209,7 +209,7 @@ export function drawHumanityQrFrameCanvas(ctx, m, drawQr) {
     border / 2,
     totalWidth - border,
     totalHeight - border,
-    Math.max(1, cornerR - 1)
+    Math.max(1, cornerR)
   );
   ctx.stroke();
   drawNetworkGlyphOnCanvas(ctx, m.glyphCx, m.glyphCy, m.glyphSize);
@@ -297,8 +297,21 @@ export function overlayCenterLogoOnSvg(svg, opts = {}) {
       ? Number(widthMatch[1])
       : 0;
   if (!size) return svg;
-  const fragment = centerLogoSvgFragment(size, outerOpacity, sizeRatio, innerOpacity);
-  return svg.replace("</svg>", `${fragment}</svg>`);
+  // Mask the center mark so it only renders on top of the dark QR modules
+  // (leaves QR whitespace / negative space intact).
+  const maskId = `hc-qr-center-logo-mask-${Math.random().toString(36).slice(2)}`;
+  const inner = extractSvgInner(svg);
+  const darkModulePaths = inner.match(new RegExp(`<path[^>]*stroke="${QR_BRAND_RED}"[^>]*/>`, "g")) ?? [];
+  if (!darkModulePaths.length) {
+    const fragment = centerLogoSvgFragment(size, outerOpacity, sizeRatio, innerOpacity);
+    return svg.replace("</svg>", `${fragment}</svg>`);
+  }
+
+  const { cx, cy, outerR, innerR } = centerLogoMetrics(size, sizeRatio);
+  const circleFragment = `<g class="hc-qr-center-logo" aria-hidden="true" mask="url(#${maskId})"><circle class="hc-qr-center-logo-outer" cx="${cx}" cy="${cy}" r="${outerR}" fill="${QR_CENTER_LOGO_OUTER_FILL}" opacity="${outerOpacity}"/><circle class="hc-qr-center-logo-inner" cx="${cx}" cy="${cy}" r="${innerR}" fill="${QR_CENTER_LOGO_INNER_FILL}" opacity="${innerOpacity}"/></g>`;
+
+  const defs = `<defs><mask id="${maskId}" maskUnits="userSpaceOnUse" mask-type="alpha">${darkModulePaths.join("")}</mask></defs>`;
+  return svg.replace("</svg>", `${defs}${circleFragment}</svg>`);
 }
 
 /**
@@ -335,6 +348,96 @@ export function drawCenterLogoOnCanvas(
 }
 
 /**
+ * Like drawCenterLogoOnCanvas, but masks the mark to only render over dark QR modules.
+ *
+ * This keeps the "circle silhouette" while leaving QR whitespace modules unchanged,
+ * improving visual contrast and scan robustness.
+ * @param {CanvasRenderingContext2D} ctx Output canvas context
+ * @param {HTMLCanvasElement} qrCanvas QR canvas (must already contain rendered modules)
+ * @param {number} qrWidth
+ * @param {number} offsetX
+ * @param {number} offsetY
+ * @param {number} [outerOpacity]
+ * @param {number} [sizeRatio]
+ * @param {number} [innerOpacity]
+ */
+export function drawMaskedCenterLogoOnCanvas(
+  ctx,
+  qrCanvas,
+  qrWidth,
+  offsetX = 0,
+  offsetY = 0,
+  outerOpacity = QR_CENTER_LOGO_OUTER_OPACITY,
+  sizeRatio = QR_CENTER_LOGO_SIZE_RATIO,
+  innerOpacity = QR_CENTER_LOGO_INNER_OPACITY
+) {
+  const qrCtx = qrCanvas.getContext("2d");
+  if (!qrCtx) return;
+
+  const { cx, cy, outerR, innerR } = centerLogoMetrics(qrWidth, sizeRatio);
+
+  // Build a mask from "dark module" pixels in the QR canvas.
+  const qrImage = qrCtx.getImageData(0, 0, qrWidth, qrWidth);
+  const qrData = qrImage.data;
+
+  const red = hexToRgb(QR_BRAND_RED);
+  const circleCanvas = document.createElement("canvas");
+  circleCanvas.width = qrWidth;
+  circleCanvas.height = qrWidth;
+  const circleCtx = circleCanvas.getContext("2d");
+  if (!circleCtx) return;
+
+  // Draw the full circles first; we will then punch holes using the QR-mask.
+  circleCtx.save();
+  circleCtx.globalAlpha = outerOpacity;
+  circleCtx.beginPath();
+  circleCtx.arc(cx, cy, outerR, 0, Math.PI * 2);
+  circleCtx.fillStyle = QR_CENTER_LOGO_OUTER_FILL;
+  circleCtx.fill();
+  circleCtx.globalAlpha = innerOpacity;
+  circleCtx.beginPath();
+  circleCtx.arc(cx, cy, innerR, 0, Math.PI * 2);
+  circleCtx.fillStyle = QR_CENTER_LOGO_INNER_FILL;
+  circleCtx.fill();
+  circleCtx.restore();
+
+  const circleImage = circleCtx.getImageData(0, 0, qrWidth, qrWidth);
+  const circleData = circleImage.data;
+
+  // Threshold based on distance to the exact brand red.
+  // (QR code rasterization is crispEdges so this is usually exact, but we allow minor anti-aliasing.)
+  const maxDistSq = 1800; // empirically tolerant for edge pixels
+  for (let i = 0; i < qrWidth * qrWidth; i++) {
+    const p = i * 4;
+    const r = qrData[p];
+    const g = qrData[p + 1];
+    const b = qrData[p + 2];
+    const a = qrData[p + 3];
+
+    const dr = r - red.r;
+    const dg = g - red.g;
+    const db = b - red.b;
+    const distSq = dr * dr + dg * dg + db * db;
+
+    const isDarkModule = a > 0 && distSq <= maxDistSq;
+    if (!isDarkModule) {
+      // Keep RGB, but fully hide outside-module pixels.
+      circleData[p + 3] = 0;
+    }
+  }
+
+  circleCtx.putImageData(circleImage, 0, 0);
+  ctx.drawImage(circleCanvas, offsetX, offsetY);
+}
+
+function hexToRgb(hex) {
+  const h = String(hex).replace("#", "").trim();
+  const v = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const n = parseInt(v, 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+
+/**
  * Branded QR with signed visual frame on one canvas (browser PNG export).
  * @param {string} text
  * @param {number} qrWidth module square size in px
@@ -345,6 +448,16 @@ export async function renderHumanityQrFrameToCanvas(text, qrWidth) {
   const qrCanvas = document.createElement("canvas");
   const QRCode = (await import("./vendor/qrcode.mjs")).default;
   await QRCode.toCanvas(qrCanvas, text, { ...QR_BRANDED_RENDER_OPTIONS, width: qrWidth });
+  // Ensure we never render transparent "quiet zone" pixels through the network glyph.
+  // (qrcode's light background behavior can differ across renderers, and we want opacity.)
+  const qrCtx = qrCanvas.getContext("2d");
+  if (qrCtx) {
+    qrCtx.save();
+    qrCtx.globalCompositeOperation = "destination-over";
+    qrCtx.fillStyle = QR_BRAND_LIGHT;
+    qrCtx.fillRect(0, 0, qrWidth, qrWidth);
+    qrCtx.restore();
+  }
   const { credentialCodeFromScanUrl } = await import("./qr-credential-code.mjs");
   const m = qrFrameMetrics(qrWidth, {
     credentialCode: credentialCodeFromScanUrl(text),
@@ -356,13 +469,14 @@ export async function renderHumanityQrFrameToCanvas(text, qrWidth) {
   if (!ctx) throw new Error("Canvas not available");
   drawHumanityQrFrameCanvas(ctx, m, () => {
     ctx.drawImage(qrCanvas, m.qrX, m.qrY);
-    drawCenterLogoOnCanvas(
+    drawMaskedCenterLogoOnCanvas(
       ctx,
+      qrCanvas,
       qrWidth,
-      QR_CENTER_LOGO_OUTER_OPACITY,
-      QR_CENTER_LOGO_SIZE_RATIO,
       m.qrX,
       m.qrY,
+      QR_CENTER_LOGO_OUTER_OPACITY,
+      QR_CENTER_LOGO_SIZE_RATIO,
       QR_CENTER_LOGO_INNER_OPACITY
     );
   });

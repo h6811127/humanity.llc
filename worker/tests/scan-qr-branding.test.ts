@@ -38,10 +38,14 @@ describe("overlayCenterLogoOnSvg", () => {
       type: "svg",
       margin: 1,
       errorCorrectionLevel: "Q",
+      color: { dark: QR_BRAND_RED, light: "#ffffff" },
     });
     const out = overlayCenterLogoOnSvg(svg);
     expect(out).toContain('class="hc-qr-center-logo"');
     expect(out).not.toContain("<image");
+    // Mask ensures the center logo only renders over dark QR modules.
+    expect(out).toMatch(/hc-qr-center-logo-mask-/);
+    expect(out).toMatch(/mask="url\(#hc-qr-center-logo-mask-/);
     const viewBoxMatch = svg.match(/viewBox="0 0 (\d+(?:\.\d+)?)/);
     const size = viewBoxMatch ? Number(viewBoxMatch[1]) : 0;
     const logoSize = size * QR_CENTER_LOGO_SIZE_RATIO;
