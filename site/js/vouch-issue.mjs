@@ -23,6 +23,8 @@ import {
 const VOUCHER_WAIT_DAYS = 90;
 const VOUCH_THRESHOLD = 3;
 const VOUCH_RETURN_KEY = "hc_vouch_return_url";
+/** Set when user taps Stop on this scan; blocks auto-activate until scan URL changes. */
+const VOUCH_SKIP_AUTO_KEY = "hc_vouch_skip_auto_scan";
 const MAX_USE_KEYS_HERE = 5;
 
 let submitHandlerBound = false;
@@ -107,9 +109,14 @@ function mountVouchStopButton(voucherLabel) {
     stop.className = "vouch-stop-keys";
     stop.textContent = "Stop using keys in this tab";
     stop.addEventListener("click", () => {
+      try {
+        sessionStorage.setItem(VOUCH_SKIP_AUTO_KEY, location.href);
+      } catch {
+        /* ignore */
+      }
       clearTabSessionKeys();
       clearVouchStopButton();
-      runVouchFlow();
+      runVouchFlow({ skipAutoActivate: true });
     });
     panel.appendChild(stop);
   }
@@ -311,7 +318,16 @@ async function findEligibleWalletVouchers(voucheeProfileId) {
  * @param {string} voucheeProfileId
  * @returns {Promise<boolean>}
  */
-async function tryAutoActivateDefaultVouchKeys(voucheeProfileId) {
+function userSkippedAutoActivateOnThisScan() {
+  try {
+    return sessionStorage.getItem(VOUCH_SKIP_AUTO_KEY) === location.href;
+  } catch {
+    return false;
+  }
+}
+
+async function tryAutoActivateDefaultVouchKeys(voucheeProfileId, opts = {}) {
+  if (opts.skipAutoActivate || userSkippedAutoActivateOnThisScan()) return false;
   if (!isVouchAutoActivateEnabled()) return false;
 
   const defaultId = getDefaultVouchProfileId();
@@ -487,8 +503,8 @@ async function runVouchFlow(opts = {}) {
     session?.owner_private_key_b58 &&
     session?.owner_public_key_b58;
 
-  if (!hasKeys && !opts.autoActivateAttempted) {
-    const activated = await tryAutoActivateDefaultVouchKeys(voucheeProfileId);
+  if (!hasKeys && !opts.autoActivateAttempted && !opts.skipAutoActivate) {
+    const activated = await tryAutoActivateDefaultVouchKeys(voucheeProfileId, opts);
     if (activated) {
       return runVouchFlow({ autoActivateAttempted: true });
     }
@@ -567,5 +583,9 @@ async function runVouchFlow(opts = {}) {
 runVouchFlow();
 
 window.addEventListener("hc-device-hub-changed", () => {
+  if (!loadSession()?.owner_private_key_b58 && userSkippedAutoActivateOnThisScan()) {
+    runVouchFlow({ skipAutoActivate: true });
+    return;
+  }
   runVouchFlow();
 });
