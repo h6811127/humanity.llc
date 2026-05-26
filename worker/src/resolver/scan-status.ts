@@ -15,6 +15,11 @@ import {
   type ScanPageKind,
   type ScanViewModel,
 } from "./scan-state";
+import {
+  governanceProcessUrls,
+  originFromScanUrl,
+  type GovernanceProcessUrls,
+} from "./scan-governance";
 import { BEARER_WARNING } from "./trust-copy";
 import { humanTrustDisplay } from "./verification-display";
 
@@ -57,11 +62,17 @@ export interface ScanStatusBody {
       bearer_warning: string;
       scan_analytics: false;
     };
+    governance?: GovernanceProcessUrls;
   };
 }
 
+export type { GovernanceProcessUrls };
+
 export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
   const humanTrust = humanTrustDisplay(vm);
+  const origin = originFromScanUrl(vm.scanUrl);
+  const governance =
+    vm.kind === "card_suspended" ? governanceProcessUrls(origin) : undefined;
   return {
     version: PROTOCOL_VERSION,
     resolver: {
@@ -110,6 +121,7 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
         bearer_warning: BEARER_WARNING,
         scan_analytics: false,
       },
+      ...(governance ? { governance } : {}),
     },
   };
 }

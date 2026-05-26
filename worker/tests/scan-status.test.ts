@@ -126,6 +126,28 @@ describe("scan status JSON (M3.4)", () => {
     expect(httpStatusForScanKind(vm.kind)).toBe(404);
   });
 
+  it("card suspended includes governance process URLs (F2-3)", () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card({ status: "suspended" }),
+        qr: qr(),
+        verification: summary(),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+    expect(vm.kind).toBe("card_suspended");
+    const body = scanStatusBodyFromViewModel(vm);
+    expect(body.scan.governance?.data_policy_url).toBe(
+      "https://humanity.llc/data-policy.html"
+    );
+    expect(body.scan.governance?.architecture_url).toBe(
+      "https://humanity.llc/architecture.html"
+    );
+  });
+
   it("card revoked returns 410", () => {
     const vm = buildScanViewModel(
       PROFILE,

@@ -53,7 +53,7 @@
 |----|-----|---------------------------|
 | F2-1 | No scan access log (anonymized IP) | Flow 2 step 2: “Access log with anonymized IP only” |
 | F2-2 | No stale/offline banner on scan page | Flow 2 step 4; acceptance: “Active card cache shows stale/offline banner when offline” |
-| F2-3 | Suspension lacks public process reference | Required failure state: suspension + “public process reference” |
+| F2-3 | ✅ Fixed: suspended scan HTML + status JSON include links to data policy and architecture (`scan-governance.ts`). |
 | F2-4 | `GET /.well-known/hc/v1/qr/{qr_id}` not implemented | § API Network table |
 | F2-5 | `GET /v1/verification/status/{profile_id}` not implemented | § API Verification table |
 | F2-6 | Card GET HTML is raw JSON `<pre>`, not public card view | § API: “HTML or JSON public card” |
@@ -78,14 +78,14 @@
 
 ---
 
-### Slice 2 — Suspension + governance links (P0 UX)
+### Slice 2 — Suspension + governance links (P0 UX) ✅
 
 **Goal:** Meet required failure state for suspended scans.
 
-- [ ] On `card_suspended` scan HTML + status JSON, add link(s) to published process (e.g. `/data-policy.html`, governance anchor in standards).
-- [ ] Copy audit: “suspended under published rules” → include clickable “published rules” / process.
+- [x] On `card_suspended` scan HTML + status JSON, add link(s) to published process (e.g. `/data-policy.html`, governance anchor in standards).
+- [x] Copy audit: “suspended under published rules” → include clickable “published rules” / process.
 
-**Files:** `worker/src/resolver/scan-html.ts`, `scan-status.ts` (optional `scan.governance` field).
+**Files:** `worker/src/resolver/scan-html.ts`, `scan-status.ts`, `scan-governance.ts` (`scan.governance` field).
 
 **Done when:** Stranger-test checklist item for suspended card includes visible process link; `worker/tests/scan.test.ts` asserts link href.
 

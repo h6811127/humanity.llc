@@ -230,7 +230,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("vouch-explainer-actions");
     expect(html).toContain('id="scan-cross-tab-banner"');
     expect(html).toContain("scan-tab-keys.mjs?v=1");
-    expect(html).toContain("vouch-issue.mjs?v=11");
+    expect(html).toContain("vouch-issue.mjs?v=12");
     expect(html).not.toContain("Limitations");
     expect(html).toContain("scan-limits-settings");
     expect(html).toContain('class="list"');
@@ -355,6 +355,26 @@ describe("renderScanPage M3.2 trust blocks", () => {
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).toContain("Verification revoked");
     expect(html).not.toContain(">Vouched Human<");
+  });
+
+  it("renders suspended card with governance process links (F2-3)", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card({ status: "suspended" }),
+        qr: qr(),
+        verification: summary(),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+    expect(vm.kind).toBe("card_suspended");
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain("suspended under published rules");
+    expect(html).toContain('href="https://humanity.llc/data-policy.html"');
+    expect(html).toContain('href="https://humanity.llc/architecture.html"');
+    expect(html).toContain("operator data policy");
   });
 
   it("renders card disabled state (M4.5)", async () => {

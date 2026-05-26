@@ -8,6 +8,7 @@ import {
   humanTrustDisplay,
   humanTrustListIcon,
 } from "./verification-display";
+import { governanceProcessUrls, originFromScanUrl } from "./scan-governance";
 import { renderScanQrMarkup } from "./scan-qr";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
@@ -104,7 +105,7 @@ function renderPassSection(
   qrMarkup: string
 ): string {
   const badgeClass = `pass-badge badge-${vm.primaryBadge.tone}`;
-  const body = buildScanStatusPanelBody(vm, badgeClass, qrMarkup);
+  const body = buildScanStatusPanelBody(vm, badgeClass, qrMarkup, _origin);
   return `<div class="scan-pass-layer">
 ${renderBearerLine()}
 <article class="scan-status-panel" aria-label="Public scan result at this moment">
@@ -176,12 +177,35 @@ function renderObjectStateFacts(vm: ScanViewModel, statusText: string): string {
   return `<div class="scan-state-facts">${rows.join("")}</div>`;
 }
 
+function renderGovernanceProcessLinks(origin: string): string {
+  const links = governanceProcessUrls(origin);
+  return `<p class="scan-governance-links">Read the <a href="${escapeHtml(links.data_policy_url)}">operator data policy</a> and <a href="${escapeHtml(links.architecture_url)}">architecture overview</a> for published suspension rules and appeals.</p>`;
+}
+
 function buildScanStatusPanelBody(
   vm: ScanViewModel,
   badgeClass: string,
-  qrMarkup: string
+  qrMarkup: string,
+  origin: string
 ): string {
   const head = scanStatusHead(vm, badgeClass);
+
+  if (vm.kind === "card_suspended") {
+    const title = vm.handle
+      ? `@${escapeHtml(vm.handle)}`
+      : "Card suspended";
+    return `${head}
+<div class="scan-status-body">
+  <div class="scan-status-main">
+    <p class="scan-status-eyebrow">Scan result</p>
+    <h1 class="scan-status-title">${title}</h1>
+    <p class="scan-status-sub">${escapeHtml(scanLead(vm))}</p>
+    ${renderGovernanceProcessLinks(origin)}
+  </div>
+  ${scanStatusQrBlock(vm, qrMarkup)}
+</div>
+${scanStatusFoot("Suspension is a network governance action under published rules.")}`;
+  }
 
   if (vm.minimalScan) {
     const headline = minimalScanHeadline(vm.kind);
@@ -723,7 +747,7 @@ function vouchIssuanceGroupRows(vm: ScanViewModel): string {
 function renderVouchIssuanceScript(vm: ScanViewModel, origin: string): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
   const assetOrigin = pagesJsOrigin(origin);
-  const mod = JSON.stringify(`${assetOrigin}/js/vouch-issue.mjs?v=11`);
+  const mod = JSON.stringify(`${assetOrigin}/js/vouch-issue.mjs?v=12`);
   return `<script type="module" src=${mod}></script>`;
 }
 
@@ -1275,7 +1299,7 @@ function scanLead(vm: ScanViewModel): string {
       return reason ? `${base} ${reason}.` : base;
     }
     case "card_suspended":
-      return "This card is suspended under published rules.";
+      return "This card is suspended under published rules. See the process links below.";
     case "card_expired":
       return "This card has expired.";
     case "qr_revoked": {
