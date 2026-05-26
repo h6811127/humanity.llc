@@ -41,6 +41,7 @@ Use these for:
 - Warning cards (`.hub-card-status-alert*`)
 - Glance popover surfaces and text
 - Hub card overflow menu (`.hub-card-menu-panel`, `.hub-card-menu-item*`)
+- Device hub and inbox bottom sheets (`.device-hub--sheet`, `.device-inbox-sheet`)
 - Any new floating panel or popup-style shell component
 
 ---
@@ -93,6 +94,7 @@ When touching legacy components, migrate them incrementally to this token family
 | Intro coachmark | `.device-hub-intro-coachmark`, `.device-hub-intro-*` | First-visit status-dot coachmark; base styles in `device-shell.css` with popover tokens (dark overrides in `theme-dark.css`). |
 | Glance popover help | `.device-hub-glance-popover .device-hub-glance-help` | Contact row at bottom of glance popover; uses control surface + accent (not `--shell-surface-elevated` white chip). |
 | Dot explainer (hub sheet) | `.device-hub-body .device-dot-explainer:not(.device-dot-explainer--popover)` | Expanded hub status-key explainer; same popover token family as glance variant. |
+| Hub + inbox bottom sheets | `.device-hub.device-hub--sheet`, `.device-inbox-sheet`, sheet chrome (handle/close/title/list) | Opaque `--surface-popover-bg` / fg; removed translucent sheet blur; inbox row title/sub on popover tokens. |
 
 ### QA (hub card menu)
 
@@ -107,3 +109,9 @@ After migrating `.hub-card-menu-*`, run the standard contrast checklist on a sav
 ### QA (intro coachmark)
 
 Per [`DEVICE_HUB_INTRO_COACHMARK.md`](DEVICE_HUB_INTRO_COACHMARK.md): clear `hc_device_hub_intro_seen` and `hc_device_hub_intro_dismissed`, reload `/`, confirm title/body/**Got it** in light and dark; refresh without interaction must not re-show (`seen` gate).
+
+### QA (hub + inbox sheets)
+
+1. Open **device hub** sheet (status dot) in light and dark; confirm sheet surface, handle, close control, and card list text.
+2. With inbox badge visible, open **Needs attention** sheet; confirm title, row titles/subtitles, empty state, and footer border in both themes.
+3. With `prefers-reduced-transparency: reduce`, confirm sheets stay opaque (no frosted wash) and backdrops use solid dimming only.

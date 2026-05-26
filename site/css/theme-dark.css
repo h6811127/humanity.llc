@@ -88,37 +88,41 @@ html[data-theme="dark"] .live-control-notification-copy {
   color: var(--shell-label-strong);
 }
 
-html[data-theme="dark"] .device-hub.device-hub--sheet {
-  background: #1c1c1e;
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.55);
-}
-
+html[data-theme="dark"] .device-hub.device-hub--sheet,
 html[data-theme="dark"] .device-inbox-sheet {
-  background: #1c1c1e;
+  background: var(--surface-popover-bg);
+  color: var(--surface-popover-fg);
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.55);
 }
 
-html[data-theme="dark"] .device-inbox-sheet-handle {
-  background: rgba(255, 255, 255, 0.22);
+html[data-theme="dark"] .device-inbox-sheet-handle,
+html[data-theme="dark"] .device-hub-sheet-handle {
+  background: var(--surface-popover-border);
 }
 
-html[data-theme="dark"] .device-inbox-sheet-close {
-  background: rgba(255, 255, 255, 0.12);
-  color: var(--shell-label);
+html[data-theme="dark"] .device-inbox-sheet-close,
+html[data-theme="dark"] .device-hub-sheet-close {
+  background: var(--surface-popover-control-bg);
+  color: var(--surface-popover-control-fg);
+}
+
+html[data-theme="dark"] .device-inbox-sheet-title,
+html[data-theme="dark"] .device-inbox-sheet .list-title {
+  color: var(--surface-popover-fg);
+}
+
+html[data-theme="dark"] .device-inbox-sheet-empty,
+html[data-theme="dark"] .device-inbox-sheet .list-sub {
+  color: var(--surface-popover-fg-muted);
+}
+
+html[data-theme="dark"] .device-inbox-sheet-footer {
+  border-top-color: var(--surface-popover-border);
 }
 
 html[data-theme="dark"] .device-browser-notif-prompt {
   background: rgba(255, 255, 255, 0.06);
   border: 0.5px solid var(--shell-separator);
-}
-
-html[data-theme="dark"] .device-hub-sheet-handle {
-  background: rgba(255, 255, 255, 0.22);
-}
-
-html[data-theme="dark"] .device-hub-sheet-close {
-  background: rgba(255, 255, 255, 0.12);
-  color: var(--shell-label);
 }
 
 html[data-theme="dark"] .device-hub .list-action button,
