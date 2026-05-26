@@ -63,7 +63,7 @@ See `docs/CARD_WORKSPACE_PHASE0.md` — Open card loads keys, auto-save default 
 ## Planned (Phase 2+)
 
 - **My cards** as primary home for multi-card users — in progress (`/created/` now redirects contextless visits to `/wallet/` and points local hub home to `/wallet/`)
-- Compact hub on `/created/` (switcher only) — in progress
+- Compact hub on `/created/` (switcher only) — shipped
 - Single **Advanced** stack in control (collapse Manage panels) — in progress
 - Vouch-ready keys on scan (`docs/VOUCH_READY_KEYS_DESIGN.md`)
 

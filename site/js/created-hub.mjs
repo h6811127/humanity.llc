@@ -6,21 +6,8 @@ import { initDeviceHub } from "./device-hub-ui.mjs";
 initDeviceHub({
   noticeMode: "keys-strip",
   showLiveControlInbox: false,
-  showActivity: false,
-  showImport: false,
   savedLabel: "My cards",
 });
-
-const compactHiddenIds = [
-  "device-hub-pins-group",
-  "device-hub-actions-section",
-  "device-hub-shortcuts-group",
-];
-
-for (const id of compactHiddenIds) {
-  const el = document.getElementById(id);
-  if (el) el.hidden = true;
-}
 
 document.getElementById("created-hub-manage-tab")?.addEventListener("click", () => {
   document.getElementById("created-tab-btn-manage")?.click();
