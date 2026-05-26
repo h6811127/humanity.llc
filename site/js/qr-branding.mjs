@@ -12,17 +12,17 @@ export const QR_BRAND_LIGHT = "#ffffff";
 /** Dusty rose outer ring (matches brand lockup). */
 export const QR_CENTER_LOGO_OUTER_FILL = "#c9979f";
 
-/** Inner disc uses brand red. */
-export const QR_CENTER_LOGO_INNER_FILL = QR_BRAND_RED;
+/** Warm ink inner core — contrasts with brand-red modules and dusty outer wash. */
+export const QR_CENTER_LOGO_INNER_FILL = "#141414";
 
 /** Inner radius as fraction of outer radius (small brand core on large soft wash). */
 export const QR_CENTER_LOGO_INNER_RADIUS_RATIO = 0.46;
 
-/** Soft dusty-rose wash — large circle, modules show through (docs/QR_BRANDING.md). */
-export const QR_CENTER_LOGO_OUTER_OPACITY = 0.36;
+/** Soft dusty-rose wash on dark modules only (docs/QR_BRANDING.md). */
+export const QR_CENTER_LOGO_OUTER_OPACITY = 0.52;
 
-/** Brand-red core disc — slightly more opaque than the outer wash. */
-export const QR_CENTER_LOGO_INNER_OPACITY = 0.58;
+/** Ink core on dark modules — higher opacity so the bullseye reads at a glance. */
+export const QR_CENTER_LOGO_INNER_OPACITY = 0.9;
 
 /** @deprecated Prefer {@link QR_CENTER_LOGO_OUTER_OPACITY} / {@link QR_CENTER_LOGO_INNER_OPACITY}. */
 export const QR_CENTER_LOGO_OPACITY = QR_CENTER_LOGO_OUTER_OPACITY;

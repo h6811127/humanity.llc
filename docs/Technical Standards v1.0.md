@@ -424,12 +424,12 @@ Printed-item QR scan pages MUST state that the QR resolves to a Humanity Card bu
 For print artifacts:
 
 - Minimum error correction level: M (no center logo).
-- **Shipped generator default:** error correction level **Q** with a small **mostly transparent** vector center mark (concentric circles in `site/js/qr-branding.mjs`, ~48% opacity, ~22% of QR width). See [`docs/QR_BRANDING.md`](QR_BRANDING.md).
+- **Shipped generator default:** error correction level **Q** with a module-masked vector center bullseye (dusty rose + warm ink, ~78% of QR width). See [`docs/QR_BRANDING.md`](QR_BRANDING.md).
 - Recommended error correction level: Q for stickers and apparel (required when center logo is enabled).
 - Quiet zone MUST be preserved.
 - Minimum physical QR size MUST be defined per artifact template.
 - QR MUST pass scan QA before print submission.
-- Center logo MUST NOT obscure finder patterns; opacity MUST stay low enough that red modules remain scannable on white substrate.
+- Center logo MUST NOT obscure finder patterns; tints apply to dark modules only so whitespace stays scannable on white substrate.
 
 ### 8.6 Live Control Proof
 

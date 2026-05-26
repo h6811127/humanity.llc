@@ -13,12 +13,12 @@ All Humanity scan QRs (creation page, download PNG, scan pass card) MUST match t
 | Property | Value |
 |----------|--------|
 | Modules | Brand red `#db1b43` on white `#ffffff` |
-| Center mark | Large soft outer wash `#c9979f` (~36% opacity) + smaller brand-red core `#db1b43` (~58% opacity) |
+| Center mark | Module-masked bullseye: dusty-rose wash `#c9979f` (~52% opacity) + warm-ink core `#141414` (~90% opacity) |
 | Logo size | ~78% of QR width (fills the code area; EC **Q** required) |
 | Error correction | **Q** (required for center overlay; stickers/apparel per §8.5) |
 | Payload | Unchanged — still the HTTPS scan URL for this card + `qr_id` |
 
-The mark is drawn as **vector circles** only — no raster plate, no white JPEG backdrop. Modules remain underneath; scanners recover hidden data via error correction.
+The mark is drawn as **vector circles** only — no raster plate, no white JPEG backdrop. **Only dark (brand-red) modules inside each circle receive the tint**; QR whitespace stays pure white so contrast stays high. Scanners recover hidden data via error correction **Q**.
 
 ---
 
@@ -33,7 +33,28 @@ The mark is drawn as **vector circles** only — no raster plate, no white JPEG 
 
 Both generators import the same opacity, size ratio, colors, and correction level so `/created/` and `/c/…` stay aligned.
 
-To tune the look, edit `QR_CENTER_LOGO_OUTER_FILL`, `QR_CENTER_LOGO_INNER_RADIUS_RATIO`, or opacity in `site/js/qr-branding.mjs`.
+To tune the look, edit `QR_CENTER_LOGO_OUTER_FILL`, `QR_CENTER_LOGO_INNER_FILL`, `QR_CENTER_LOGO_INNER_RADIUS_RATIO`, or opacity in `site/js/qr-branding.mjs`.
+
+---
+
+## Center mark (module-masked bullseye)
+
+Official generators apply the center logo **only on top of brand-red modules** (not on white quiet-zone cells):
+
+| Layer | Color | Opacity | Effect on modules |
+|-------|--------|---------|-------------------|
+| Outer | `#c9979f` (dusty rose) | ~0.52 | Soft pink wash — reads as a halo against surrounding `#db1b43` |
+| Inner | `#141414` (warm ink) | ~0.90 | Dark core — modules in the center read nearly black for a clear bullseye |
+
+**Why ink instead of a second red:** With module masking, two reds on the same module pixels barely separate; a warm charcoal core gives a visible “eye” without painting over whitespace.
+
+| Implementation | Entry |
+|----------------|--------|
+| SVG (scan pass, Worker) | `overlayCenterLogoOnSvg()` — SVG `<mask>` from dark-module paths |
+| Canvas (created page PNG) | `drawMaskedCenterLogoOnCanvas()` — alpha punch-out from QR raster |
+| Fallback | If no brand-red stroke paths are found, unmasked circles (legacy) |
+
+Frame corner **network glyph** reuses the same fill constants (`networkGlyphSvgFragment`) so corner mark and center bullseye stay aligned.
 
 ---
 
@@ -64,7 +85,7 @@ npm run worker:test -- worker/tests/qr-scan-url-lock.test.ts
 
 ## Verification checklist
 
-- [ ] `/created/` preview QR shows red modules + faint concentric circles (no white square).
+- [ ] `/created/` preview QR shows red modules + dusty-rose / ink bullseye (no white square in the mark).
 - [ ] Download PNG matches preview.
 - [x] `/c/{profile_id}?q=…` pass card QR matches (Worker SVG) — `scan-pass.css` + `scan-qr-branding.test.ts`.
 - [ ] Phone scan succeeds at 220px display size and at downloaded 512px PNG.
@@ -81,7 +102,8 @@ npm run worker:test -- worker/tests/scan-qr-branding.test.ts
 
 | Opacity | Effect |
 |---------|--------|
-| Outer ~0.36 / inner ~0.58 (shipped) | Large soft wash with a visible core; modules show through |
+| Outer ~0.52 / inner ~0.90 (shipped) | Rose halo + ink core on modules only; whitespace untouched |
+| Outer &lt; 0.40 | Bullseye may disappear on print — raise outer opacity before enlarging logo |
 | &gt; 0.85 size ratio | Risk of scan failures on some cameras — stay at **Q** and test phones |
 | Opaque + full bleed | Needs Q/H; not the chosen design |
 
