@@ -98,6 +98,23 @@ Response includes `flags[]` with `triage` hints (priority, suggested action, thr
 
 ---
 
+### `steward_issuance_burst` (S-02, R-03, A-02)
+
+**Meaning:** A steward account issued at least N vouches in the burst window (default 3 in 24h).
+
+**Often benign:** Scheduled onboarding event by known steward.
+
+**Suspicious when:** Steward identity cannot confirm issuance, unknown vouchee cluster, or copied key indicators.
+
+| Step | Action |
+|------|--------|
+| 1 | Verify steward identity out-of-band (same day) |
+| 2 | Review vouchee set for shared edges/cycles |
+| 3 | If suspicious: pause steward operations + begin key rotation |
+| 4 | If expected event: dismiss with event note |
+
+---
+
 ### `shared_voucher_set` (G-04, G-07)
 
 **Meaning:** Two vouchees share **≥3** of the same active vouchers with Jaccard similarity **≥0.75**.

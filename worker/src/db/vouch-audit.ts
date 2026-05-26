@@ -23,6 +23,15 @@ type QuotaBurstFlag = {
   last_created_at: string;
 };
 
+type StewardIssuanceBurstFlag = {
+  kind: "steward_issuance_burst";
+  voucher_profile_id: string;
+  issuance_count: number;
+  window_hours: number;
+  first_created_at: string;
+  last_created_at: string;
+};
+
 type SharedVoucherSetFlag = {
   kind: "shared_voucher_set";
   vouchee_profile_ids: [string, string];
@@ -40,6 +49,7 @@ type DirectedCycleClusterFlag = {
 export type VouchAuditFlag =
   | ClosedLoopFlag
   | QuotaBurstFlag
+  | StewardIssuanceBurstFlag
   | SharedVoucherSetFlag
   | DirectedCycleClusterFlag;
 
@@ -51,6 +61,7 @@ export interface ListVouchAuditFlagsOptions {
   sharedSetSimilarityThreshold?: number;
   directedCycleMinNodes?: number;
   directedCycleMinDensity?: number;
+  stewardBurstMinIssuances?: number;
   now?: string;
 }
 
@@ -61,6 +72,7 @@ const DEFAULT_SHARED_SET_MIN_OVERLAP = 3;
 const DEFAULT_SHARED_SET_SIMILARITY_THRESHOLD = 0.75;
 const DEFAULT_DIRECTED_CYCLE_MIN_NODES = 3;
 const DEFAULT_DIRECTED_CYCLE_MIN_DENSITY = 0.5;
+const DEFAULT_STEWARD_BURST_MIN_ISSUANCES = 3;
 
 /**
  * Operator-only M6 abuse hooks. These aggregate public vouch rows for manual
@@ -78,11 +90,21 @@ export async function listVouchAuditFlags(
     const t = Date.parse(row.created_at);
     return Number.isFinite(t) && Number.isFinite(now) && now - t <= quotaWindowMs;
   });
+  const stewardProfileIds = await listStewardProfiles(
+    db,
+    [...new Set(quotaRows.map((row) => row.voucher_profile_id))]
+  );
 
   return [
     ...flagClosedLoops(rows),
     ...flagQuotaBursts(quotaRows, {
       burstWindowHours: options.burstWindowHours ?? DEFAULT_BURST_WINDOW_HOURS,
+    }),
+    ...flagStewardBursts(quotaRows, {
+      burstWindowHours: options.burstWindowHours ?? DEFAULT_BURST_WINDOW_HOURS,
+      minIssuances:
+        options.stewardBurstMinIssuances ?? DEFAULT_STEWARD_BURST_MIN_ISSUANCES,
+      stewardProfileIds,
     }),
     ...flagSharedVoucherSets(rows, {
       minOverlap: options.sharedSetMinOverlap ?? DEFAULT_SHARED_SET_MIN_OVERLAP,
@@ -110,6 +132,23 @@ async function listRecentVouches(
     .bind(maxRows)
     .all<VouchAuditRow>();
   return result.results ?? [];
+}
+
+async function listStewardProfiles(
+  db: D1Database,
+  profileIds: string[]
+): Promise<Set<string>> {
+  if (profileIds.length === 0) return new Set<string>();
+  const placeholders = profileIds.map(() => "?").join(", ");
+  const result = await db
+    .prepare(
+      `SELECT profile_id FROM verification_summaries
+       WHERE state = 'steward'
+         AND profile_id IN (${placeholders})`
+    )
+    .bind(...profileIds)
+    .all<{ profile_id: string }>();
+  return new Set((result.results ?? []).map((row) => row.profile_id));
 }
 
 function flagClosedLoops(rows: VouchAuditRow[]): ClosedLoopFlag[] {
@@ -166,6 +205,49 @@ function flagQuotaBursts(
     ) {
       flags.push({
         kind: "burst_at_quota_boundary",
+        voucher_profile_id: voucher,
+        issuance_count: group.length,
+        window_hours: options.burstWindowHours,
+        first_created_at: first.created_at,
+        last_created_at: last.created_at,
+      });
+    }
+  }
+  return flags.sort((a, b) => a.voucher_profile_id.localeCompare(b.voucher_profile_id));
+}
+
+function flagStewardBursts(
+  rows: VouchAuditRow[],
+  options: {
+    burstWindowHours: number;
+    minIssuances: number;
+    stewardProfileIds: Set<string>;
+  }
+): StewardIssuanceBurstFlag[] {
+  const byVoucher = new Map<string, VouchAuditRow[]>();
+  for (const row of rows) {
+    if (!options.stewardProfileIds.has(row.voucher_profile_id)) continue;
+    const group = byVoucher.get(row.voucher_profile_id) ?? [];
+    group.push(row);
+    byVoucher.set(row.voucher_profile_id, group);
+  }
+
+  const burstWindowMs = options.burstWindowHours * 60 * 60 * 1000;
+  const flags: StewardIssuanceBurstFlag[] = [];
+  for (const [voucher, group] of byVoucher.entries()) {
+    if (group.length < options.minIssuances) continue;
+    const sorted = [...group].sort((a, b) => a.created_at.localeCompare(b.created_at));
+    const first = sorted[0]!;
+    const last = sorted[sorted.length - 1]!;
+    const firstMs = Date.parse(first.created_at);
+    const lastMs = Date.parse(last.created_at);
+    if (
+      Number.isFinite(firstMs) &&
+      Number.isFinite(lastMs) &&
+      lastMs - firstMs <= burstWindowMs
+    ) {
+      flags.push({
+        kind: "steward_issuance_burst",
         voucher_profile_id: voucher,
         issuance_count: group.length,
         window_hours: options.burstWindowHours,

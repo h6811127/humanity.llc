@@ -117,7 +117,7 @@ Design for hostile actors, not only happy-path founders. **Full threat catalog:*
 | 5 active vouches per voucher per year | **Enforced** (`VOUCHER_ACTIVE_QUOTA_PER_YEAR`) |
 | 90-day wait after voucher becomes verified | **Enforced** (`VOUCHER_WAIT_DAYS`) |
 | One active vouch per voucher→vouchee pair | **Unique index** |
-| Steward audit hooks for suspicious clusters | **Design now, build later** |
+| Steward audit hooks for suspicious clusters | **Shipped** (`closed_loop_only`, `shared_voucher_set`, `directed_cycle_cluster`, `steward_issuance_burst`) |
 
 **Ring detection (operator-only, not public)** — implemented in `worker/src/db/vouch-audit.ts`:
 

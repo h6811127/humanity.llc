@@ -25,6 +25,14 @@ export function vouchAuditFlagKey(flag: VouchAuditFlag): string {
         flag.first_created_at,
         flag.last_created_at,
       ].join("|");
+    case "steward_issuance_burst":
+      return [
+        flag.kind,
+        flag.voucher_profile_id,
+        String(flag.issuance_count),
+        flag.first_created_at,
+        flag.last_created_at,
+      ].join("|");
     case "shared_voucher_set":
       return [
         flag.kind,

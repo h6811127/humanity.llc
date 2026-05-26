@@ -23,6 +23,7 @@ class FakeAuditDb {
       flag_kind:
         | "closed_loop_only"
         | "burst_at_quota_boundary"
+        | "steward_issuance_burst"
         | "shared_voucher_set"
         | "directed_cycle_cluster";
       note: string;
@@ -44,6 +45,9 @@ class FakeAuditDb {
             if (sql.includes("FROM vouches")) {
               return { results: rows as T[] };
             }
+            if (sql.includes("FROM verification_summaries")) {
+              return { results: [] as T[] };
+            }
             if (sql.includes("FROM vouch_audit_dismissals")) {
               const keys = args as string[];
               const found = keys
@@ -58,7 +62,11 @@ class FakeAuditDb {
               const [flag_key, flag_kind, note, dismissed_by, dismissed_at, updated_at] =
                 args as [
                   string,
-                  "closed_loop_only" | "burst_at_quota_boundary" | "shared_voucher_set" | "directed_cycle_cluster",
+                  | "closed_loop_only"
+                  | "burst_at_quota_boundary"
+                  | "steward_issuance_burst"
+                  | "shared_voucher_set"
+                  | "directed_cycle_cluster",
                   string,
                   string,
                   string,

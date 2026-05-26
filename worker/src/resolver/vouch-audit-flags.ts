@@ -52,6 +52,13 @@ function triageForFlag(flag: VouchAuditFlag): TriageHint {
           "Confirm steward legitimacy or possible stolen keys; inspect all five vouchees before dismiss.",
         threat_ids: ["G-03", "S-02", "V-04", "A-02"],
       };
+    case "steward_issuance_burst":
+      return {
+        priority: "high",
+        action:
+          "High steward issuance velocity; verify event legitimacy and check for key compromise or trust laundering.",
+        threat_ids: ["S-02", "R-03", "A-02"],
+      };
     case "shared_voucher_set":
       return {
         priority: "medium",
@@ -173,6 +180,7 @@ export async function handlePostVouchAuditFlagDismiss(
   if (
     flagKind !== "closed_loop_only" &&
     flagKind !== "burst_at_quota_boundary" &&
+    flagKind !== "steward_issuance_burst" &&
     flagKind !== "shared_voucher_set" &&
     flagKind !== "directed_cycle_cluster"
   ) {

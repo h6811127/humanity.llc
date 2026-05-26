@@ -239,7 +239,7 @@ Respond: suspend steward, rotate keys, revoke batch
 | P0 | Steward review queue + runbook | G-01–G-08, S-01 | **Step 1+2 shipped** (read API + dismiss API + UI prototype) |
 | P0 | Card creation rate limits + launch monitoring | R-01, A-012F |
 | P1 | Graph flag: **directed cycle** / clique suspicion (≥4 mutual VH set) | R-02, G-02 | **Shipped** (`directed_cycle_cluster`) |
-| P1 | Per-steward vouch cap or enhanced audit for steward issuances | R-03, S-02 |
+| P1 | Per-steward vouch cap or enhanced audit for steward issuances | R-03, S-02 | Enhanced audit shipped (`steward_issuance_burst`); hard cap policy pending |
 | P1 | Integrator guide: recency + live control + not KYC | I-02, I-03 |
 | P2 | Optional PIN / WebAuthn before `Sign and submit` | V-04, A-02 |
 | P2 | Vouchee-initiated dispute / steward revoke | H-01 |
