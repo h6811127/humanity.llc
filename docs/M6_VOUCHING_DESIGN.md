@@ -314,7 +314,7 @@ Revoked/suspended card states must **override** positive verification on scan (a
 
 - [x] Internal cluster flags (no public graph UI).
 - [x] Steward review **step 1:** runbook + operator `GET …/vouch-audit-flags` ([`VOUCH_STEWARD_REVIEW_RUNBOOK.md`](VOUCH_STEWARD_REVIEW_RUNBOOK.md)).
-- [ ] Steward review **step 2:** dismiss notes in D1 + operator UI.
+- [~] Steward review **step 2:** dismiss notes in D1 API shipped (`POST/DELETE …/vouch-audit-flags/dismiss`); operator UI pending.
 
 **Deferred**
 

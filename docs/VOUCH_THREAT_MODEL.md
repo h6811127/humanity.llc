@@ -213,7 +213,7 @@ Respond: suspend steward, rotate keys, revoke batch
 | `burst_at_quota_boundary` | ≥5 issuances in 24h in quota window | Legitimate burst possible |
 | `shared_voucher_set` | Two vouchees share ≥3 vouchers, Jaccard ≥0.75 | Heuristic |
 
-**Steward review queue:** Step 1 shipped — runbook + operator API. Step 2 (dismiss UI) pending. See [`VOUCH_STEWARD_REVIEW_RUNBOOK.md`](VOUCH_STEWARD_REVIEW_RUNBOOK.md).
+**Steward review queue:** Step 1 shipped — runbook + operator API. Step 2 backend shipped (dismiss notes API + D1); operator UI pending. See [`VOUCH_STEWARD_REVIEW_RUNBOOK.md`](VOUCH_STEWARD_REVIEW_RUNBOOK.md).
 
 `GET /.well-known/hc/v1/operator/vouch-audit-flags` (Bearer `OPERATOR_AUDIT_TOKEN`) — **not exposed on public scan**.
 

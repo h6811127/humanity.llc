@@ -30,7 +30,11 @@ import { handleGetScan } from "./resolver/scan";
 import { handleGetScanStatus } from "./resolver/scan-status";
 import { handlePostVouch } from "./resolver/vouch";
 import { handleGetVouch, handlePostVouchRevoke } from "./resolver/vouch-revoke";
-import { handleGetVouchAuditFlags } from "./resolver/vouch-audit-flags";
+import {
+  handleDeleteVouchAuditFlagDismiss,
+  handleGetVouchAuditFlags,
+  handlePostVouchAuditFlagDismiss,
+} from "./resolver/vouch-audit-flags";
 
 export interface Env {
   DB: D1Database;
@@ -84,6 +88,40 @@ export default {
         );
       }
       const res = await handleGetVouchAuditFlags(
+        request,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
+    }
+    if (
+      path === "/.well-known/hc/v1/operator/vouch-audit-flags/dismiss" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostVouchAuditFlagDismiss(
+        request,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
+    }
+    if (
+      path === "/.well-known/hc/v1/operator/vouch-audit-flags/dismiss" &&
+      request.method === "DELETE"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleDeleteVouchAuditFlagDismiss(
         request,
         env.DB,
         env.OPERATOR_AUDIT_TOKEN

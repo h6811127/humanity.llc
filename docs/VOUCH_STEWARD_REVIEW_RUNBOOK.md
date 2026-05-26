@@ -49,6 +49,15 @@ curl -sS \
 
 Response includes `flags[]` with `triage` hints (priority, suggested action, threat IDs).
 
+### Record review decision (step 2 backend)
+
+- `POST /.well-known/hc/v1/operator/vouch-audit-flags/dismiss`
+  - Body: `{ flag_key, flag_kind, note, dismissed_by? }`
+- `DELETE /.well-known/hc/v1/operator/vouch-audit-flags/dismiss`
+  - Body: `{ flag_key }`
+
+`GET` now returns each flag with `dismissal` (or `null`) so a future UI can hide/annotate previously reviewed items.
+
 ---
 
 ## Flag types and triage
