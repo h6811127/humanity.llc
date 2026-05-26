@@ -1,7 +1,7 @@
 # Device hub (Phase 10) — repair spec
 
 **Date:** 2026-05-25  
-**Status:** Audit complete · repair backlog  
+**Status:** Audit complete · repair slices 1–5 implemented  
 **Scope:** `docs/DEVICE_OS.md`, `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md`, shared hub on `/`, `/wallet/`, `/created/`  
 **Out of scope:** Flow 2 public scan (see `docs/FLOW_2_QR_SCAN_REPAIR_SPEC.md`), storefront, Worker resolver logic except status JSON consumed by hub
 
@@ -43,7 +43,7 @@
 |------|--------|--------|
 | `/` | `landing-device-hub.mjs` | `noticeMode: created-url`, `showLiveControlInbox: true` |
 | `/wallet/` | `wallet-page.mjs` | `showShortcuts: false`, hub expanded by default |
-| `/created/` | `create-hub.mjs` | `noticeMode: created-url`, `showLiveControlInbox: true` |
+| `/created/` | `create-hub.mjs` | `noticeMode: created-url`, `showLiveControlInbox: false` |
 
 ---
 
@@ -126,8 +126,8 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 | ID | Gap |
 |----|-----|
-| **DH-5** | `DEVICE_OS.md` § Live-control inbox: **not on `/created/`**. `create-hub.mjs` and `landing-device-hub.mjs` set `showLiveControlInbox: true` on `/created/` — duplicate surface vs **Prove live control** panel. |
-| **DH-6** | `site/features/scan-ui.html` subline still says “flippable pass card”; scan UI is flat status panel (`worker/tests/scan.test.ts`) — feature marketing drift (hurts trust in docs map). |
+| **DH-5** | ✅ Fixed: `/created/` now initializes hub with `showLiveControlInbox: false`; signing stays in the page proof panel. |
+| **DH-6** | ✅ Fixed: `site/features/scan-ui.html` subline now says “flat status panel + grouped trust blocks.” |
 
 ---
 
@@ -135,8 +135,8 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 | ID | Gap |
 |----|-----|
-| **DH-7** | `e2e/device-os-wallet.spec.ts` clicks **“Control card”** — button no longer exists (UI: **Use keys**). E2E does not cover since-visit alert, live-control inbox, or cross-tab banner. |
-| **DH-8** | Vitest (`device-os-frontend.test.ts`, `wallet-network.test.ts`) covers pure helpers only — **no test** for `applyRevokedSinceVisitAlerts` / `applyNetworkChipsToDom` coupling or post-fetch chip `scanKind`. |
+| **DH-7** | ✅ Fixed: `e2e/device-os-wallet.spec.ts` uses current **Open controls** action and passes. |
+| **DH-8** | ✅ Addressed with E2E guardrail for active-status/no-alert and helper-level coverage in wallet-network tests; monitor for future DOM-level unit tests if regressions recur. |
 
 ---
 
@@ -153,8 +153,8 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 | ID | Gap |
 |----|-----|
-| **DH-11** | `DEVICE_HUB_AND_LOCAL_SEARCH.md` still mentions **“New here?” help drawer** and floating help pill — removed per `DEVICE_OS.md` checklist. |
-| **DH-12** | `DEVICE_OS.md` checklist marks browser notifications as optional; `device-browser-notifications.mjs` is mounted on landing — doc should say **shipped** or gate behind setting only. |
+| **DH-11** | ✅ Fixed: `DEVICE_HUB_AND_LOCAL_SEARCH.md` now reflects current landing layout without floating help pill language. |
+| **DH-12** | ✅ Fixed: `DEVICE_OS.md` optional polish table now marks browser notifications as shipped. |
 
 ---
 
@@ -182,13 +182,13 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 ## Repair slices (ordered)
 
-### Slice 1 — Network UI single source of truth (P0)
+### Slice 1 — Network UI single source of truth (P0) ✅
 
 **Goal:** Chip + alert always use the same post-fetch `{ status, scanKind }`.
 
-- [ ] Extend `fetchAndApplyNetworkChips` to pass `scanKind` from cache entry or fresh parse into `applyNetworkChipsToDom` / `networkChipHtml`.
-- [ ] Do not call `applyRevokedSinceVisitAlerts()` until first fetch completes **or** explicitly mark row “checking” without since-visit alert.
-- [ ] Hide since-visit alert when `scanKind !== card_revoked` even if cache stale (defense in depth).
+- [x] Extend `fetchAndApplyNetworkChips` to pass `scanKind` from cache entry or fresh parse into `applyNetworkChipsToDom` / `networkChipHtml`.
+- [x] Do not call `applyRevokedSinceVisitAlerts()` until first fetch completes **or** explicitly mark row “checking” without since-visit alert.
+- [x] Hide since-visit alert when `scanKind !== card_revoked` even if cache stale (defense in depth).
 
 **Files:** `device-hub-ui.mjs`, optionally `device-wallet-network.mjs`.
 
@@ -196,31 +196,31 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 ---
 
-### Slice 2 — Glance + snapshot safety (P0)
+### Slice 2 — Glance + snapshot safety (P0) ✅
 
-- [ ] Glance rows: use same post-fetch state as hub (listen to `hc-wallet-network-baseline-changed` / hub refresh, don’t infer from stale cache alone).
-- [ ] `snapshotNetworkSeenOnExit`: only snapshot after fresh fetch timestamp or skip if cache `at` older than last successful fetch.
+- [x] Glance rows: use same post-fetch state as hub (listen to `hc-wallet-network-baseline-changed` / hub refresh, don’t infer from stale cache alone).
+- [x] `snapshotNetworkSeenOnExit`: only snapshot after fresh fetch timestamp or skip if cache `at` older than last successful fetch.
 
 **Files:** `device-hub-glance.mjs`, `device-wallet-network.mjs`.
 
 ---
 
-### Slice 3 — Live-control inbox placement (P0 product)
+### Slice 3 — Live-control inbox placement (P0 product) ✅
 
-- [ ] Set `showLiveControlInbox: false` in `create-hub.mjs` **or** update `DEVICE_OS.md` if product wants inbox on created.
+- [x] Set `showLiveControlInbox: false` in `create-hub.mjs` **or** update `DEVICE_OS.md` if product wants inbox on created.
 
 **Done when:** One surface for owner signing on `/created/`.
 
 ---
 
-### Slice 4 — E2E + integration tests (P1)
+### Slice 4 — E2E + integration tests (P1) ✅
 
 - [x] Fix `e2e/device-os-wallet.spec.ts` to click **Use keys** (or role name from `device-hub-ui.mjs`).
 - [x] Add Playwright or Vitest case: saved card + mocked status `active` → no since-visit banner.
 
 ---
 
-### Slice 5 — Doc hygiene (P2)
+### Slice 5 — Doc hygiene (P2) ✅
 
 - [x] Sync `DEVICE_HUB_AND_LOCAL_SEARCH.md` with removed help pill / current landing layout.
 - [x] Update `site/features/scan-ui.html` (regenerate via `generate-feature-pages.mjs` if needed).
@@ -230,10 +230,10 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 ## Done when (Device hub overall)
 
-- [ ] No false “card disabled since last visit” on active cards (production + e2e).
-- [ ] Chip label matches resolver `scan.kind` after sync.
-- [ ] Live-control inbox scope matches `DEVICE_OS.md`.
-- [ ] `npm run worker:test` + `npm run e2e` green for device-os specs.
+- [x] No false “card disabled since last visit” on active cards (production + e2e).
+- [x] Chip label matches resolver `scan.kind` after sync.
+- [x] Live-control inbox scope matches `DEVICE_OS.md`.
+- [x] `npm run worker:test` + `npm run e2e` green for device-os specs.
 
 ---
 
