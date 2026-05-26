@@ -95,6 +95,8 @@ When touching legacy components, migrate them incrementally to this token family
 | Glance popover help | `.device-hub-glance-popover .device-hub-glance-help` | Contact row at bottom of glance popover; uses control surface + accent (not `--shell-surface-elevated` white chip). |
 | Dot explainer (hub sheet) | `.device-hub-body .device-dot-explainer:not(.device-dot-explainer--popover)` | Expanded hub status-key explainer; same popover token family as glance variant. |
 | Hub + inbox bottom sheets | `.device-hub.device-hub--sheet`, `.device-inbox-sheet`, sheet chrome (handle/close/title/list) | Opaque `--surface-popover-bg` / fg; removed translucent sheet blur; inbox row title/sub on popover tokens. |
+| Glance popover list rows | `.device-hub-glance-popover .device-hub-glance-btn`, status row titles | Default rows on control surface (fixes dark `shell-fill` override); status title colors have dark-theme overrides. |
+| Inbox browser-alert prompt | `.device-inbox-sheet .device-browser-notif-prompt*` | Live-proof OS notification opt-in inside inbox sheet footer on popover tokens. |
 
 ### QA (hub card menu)
 
@@ -115,3 +117,8 @@ Per [`DEVICE_HUB_INTRO_COACHMARK.md`](DEVICE_HUB_INTRO_COACHMARK.md): clear `hc_
 1. Open **device hub** sheet (status dot) in light and dark; confirm sheet surface, handle, close control, and card list text.
 2. With inbox badge visible, open **Needs attention** sheet; confirm title, row titles/subtitles, empty state, and footer border in both themes.
 3. With `prefers-reduced-transparency: reduce`, confirm sheets stay opaque (no frosted wash) and backdrops use solid dimming only.
+
+### QA (glance list + inbox browser prompt)
+
+1. Glance popover with default saved-card rows and notice/cross-tab/live-proof rows — titles readable in light and dark.
+2. Inbox sheet with live-proof waiting + browser notification prompt — prompt copy and dismiss in both themes.

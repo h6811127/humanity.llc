@@ -348,9 +348,9 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   text-align: left;
   padding: 10px 12px;
   border-radius: var(--shell-radius-control);
-  border: none;
-  background: var(--shell-fill-secondary);
-  box-shadow: var(--shell-shadow-sm);
+  border: 0.5px solid var(--surface-popover-border, rgba(60, 60, 67, 0.12));
+  background: var(--surface-popover-control-bg, rgba(120, 120, 128, 0.12));
+  box-shadow: none;
 }
 
 .device-hub-glance-popover .device-hub-glance-title {
@@ -416,7 +416,8 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   color: #0060df;
 }
 
-.device-hub-glance-popover .device-hub-glance-row--liveproof .device-hub-glance-title {
+.device-hub-glance-popover .device-hub-glance-row--liveproof .device-hub-glance-title,
+.device-hub-glance-popover .device-hub-glance-row--revoked .device-hub-glance-title {
   color: #a16207;
 }
 
@@ -1850,11 +1851,24 @@ body.device-inbox-sheet-open .top-chrome--inbox-locked .shell-notif-badge {
   border-radius: 12px;
 }
 
+.device-inbox-sheet .device-browser-notif-prompt {
+  background: var(--surface-popover-control-bg, rgba(120, 120, 128, 0.12));
+  border: 0.5px solid var(--surface-popover-border, rgba(60, 60, 67, 0.12));
+}
+
+.device-inbox-sheet .device-browser-notif-prompt-copy {
+  color: var(--surface-popover-fg, #1c1c1e);
+}
+
 .device-browser-notif-prompt-copy {
   margin: 0 0 10px;
   font-size: 14px;
   line-height: 1.4;
   color: var(--shell-label-strong, #1c1c1e);
+}
+
+.device-inbox-sheet .device-browser-notif-prompt-copy--denied {
+  color: var(--surface-popover-fg-muted, rgba(60, 60, 67, 0.72));
 }
 
 .device-browser-notif-prompt-copy--denied {
@@ -1884,6 +1898,10 @@ body.device-inbox-sheet-open .top-chrome--inbox-locked .shell-notif-badge {
   color: var(--shell-label, rgba(60, 60, 67, 0.72));
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+}
+
+.device-inbox-sheet .device-browser-notif-prompt-dismiss {
+  color: var(--surface-popover-fg-muted, rgba(60, 60, 67, 0.72));
 }
 
 .device-inbox-sheet-footer {

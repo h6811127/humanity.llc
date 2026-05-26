@@ -120,9 +120,36 @@ html[data-theme="dark"] .device-inbox-sheet-footer {
   border-top-color: var(--surface-popover-border);
 }
 
-html[data-theme="dark"] .device-browser-notif-prompt {
-  background: rgba(255, 255, 255, 0.06);
-  border: 0.5px solid var(--shell-separator);
+html[data-theme="dark"] .device-inbox-sheet .device-browser-notif-prompt {
+  background: var(--surface-popover-control-bg);
+  border-color: var(--surface-popover-border);
+}
+
+html[data-theme="dark"] .device-inbox-sheet .device-browser-notif-prompt-copy {
+  color: var(--surface-popover-fg);
+}
+
+html[data-theme="dark"] .device-inbox-sheet .device-browser-notif-prompt-copy--denied,
+html[data-theme="dark"] .device-inbox-sheet .device-browser-notif-prompt-dismiss {
+  color: var(--surface-popover-fg-muted);
+}
+
+html[data-theme="dark"] .device-hub-glance-popover .device-hub-glance-btn {
+  background: var(--surface-popover-control-bg);
+  border-color: var(--surface-popover-border);
+}
+
+html[data-theme="dark"] .device-hub-glance-popover .device-hub-glance-row--notice .device-hub-glance-title {
+  color: #ff6961;
+}
+
+html[data-theme="dark"] .device-hub-glance-popover .device-hub-glance-row--crosstab .device-hub-glance-title {
+  color: #64b5ff;
+}
+
+html[data-theme="dark"] .device-hub-glance-popover .device-hub-glance-row--liveproof .device-hub-glance-title,
+html[data-theme="dark"] .device-hub-glance-popover .device-hub-glance-row--revoked .device-hub-glance-title {
+  color: #ffb340;
 }
 
 html[data-theme="dark"] .device-hub .list-action button,

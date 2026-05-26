@@ -90,7 +90,7 @@ Spec: [`DEVICE_HUB_INTRO_COACHMARK.md`](DEVICE_HUB_INTRO_COACHMARK.md). Automate
 
 ### P1-5 · Popover surfaces (contrast)
 
-Per [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § QA (warning alert + glance explainer): hub card alert links, glance dot explainer + **info@humanity.llc** row, expanded hub status-key explainer — legible in light and dark.
+Per [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md): hub card alert links; glance dot explainer + **info@humanity.llc** row; expanded hub status-key explainer; **hub + inbox bottom sheets** (§ QA hub + inbox sheets) — legible in light and dark; sheets opaque under `prefers-reduced-transparency: reduce`.
 
 ### P0-3 · Auto-save (default on)
 
