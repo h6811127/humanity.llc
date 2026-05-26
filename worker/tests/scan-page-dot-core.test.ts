@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   scanCrossTabOverlayCount,
+  scanDotOverlayFromCounts,
   scanPageDotEligible,
   shouldScanNoneEligibleAttentionPulse,
 } from "../../site/js/scan-page-dot-core.mjs";
@@ -15,6 +16,7 @@ describe("scanPageDotEligible", () => {
     hasDefaultVouchProfile: false,
     crossTabNotice: 0,
     liveProofPending: 0,
+    operatorDeviceFamiliar: true,
   };
 
   it("requires active scan profile and qr", () => {
@@ -31,6 +33,46 @@ describe("scanPageDotEligible", () => {
     );
     expect(scanPageDotEligible({ ...base, crossTabNotice: 1 })).toBe(true);
     expect(scanPageDotEligible({ ...base, liveProofPending: 1 })).toBe(true);
+  });
+
+  it("privacy gate blocks dynamic dot until origin is operator-familiar", () => {
+    expect(
+      scanPageDotEligible({
+        ...base,
+        operatorDeviceFamiliar: false,
+        savedWalletCount: 1,
+      })
+    ).toBe(false);
+    expect(
+      scanPageDotEligible({
+        ...base,
+        operatorDeviceFamiliar: false,
+        hasCreatedKeys: true,
+      })
+    ).toBe(false);
+  });
+});
+
+describe("scanDotOverlayFromCounts", () => {
+  it("omits card_disabled_since_visit on scan (inbox-only on shell)", () => {
+    expect(
+      scanDotOverlayFromCounts(
+        { liveProofPending: 0, cardDisabledSinceVisit: 2 },
+        0
+      )
+    ).toBe("none");
+    expect(
+      scanDotOverlayFromCounts(
+        { liveProofPending: 1, cardDisabledSinceVisit: 2 },
+        0
+      )
+    ).toBe("proof_waiting");
+    expect(
+      scanDotOverlayFromCounts(
+        { liveProofPending: 0, cardDisabledSinceVisit: 2 },
+        1
+      )
+    ).toBe("cross_tab_keys");
   });
 });
 

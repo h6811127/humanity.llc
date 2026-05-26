@@ -1,3 +1,5 @@
+import { markScanOperatorFamiliar } from "./scan-operator-familiar.mjs";
+
 /**
  * Device-local saved cards with signing keys (`hc_wallet`).
  * @see docs/DEVICE_HUB_AND_LOCAL_SEARCH.md
@@ -26,7 +28,7 @@ export function qrIdFromScanUrl(scanUrl) {
 }
 
 /**
- * QR id for status fetch / live-control poll — stored field or `scan_url?q=`.
+ * QR id for status fetch / live-control poll - stored field or `scan_url?q=`.
  * @param {{ qr_id?: string | null, scan_url?: string | null } | null | undefined} entry
  * @returns {string | null}
  */
@@ -67,6 +69,7 @@ export function loadWallet() {
 
 export function saveWallet(entries) {
   localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify(entries));
+  if (entries.length > 0) markScanOperatorFamiliar();
   reconcileRemovedProfilesAfterWalletSave(entries);
   window.dispatchEvent(new Event("hc-device-hub-changed"));
 }

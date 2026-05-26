@@ -7,7 +7,6 @@ import {
   describeDotState,
   deviceStateFromContext,
   dotClassList,
-  dotOverlayFromCounts,
   dotStateKey,
   dotTransitionKey,
   hasStewardVerification,
@@ -21,9 +20,14 @@ import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
 import {
   scanCrossTabOverlayCount,
+  scanDotOverlayFromCounts,
   scanPageDotEligible,
   shouldScanNoneEligibleAttentionPulse,
 } from "./scan-page-dot-core.mjs";
+import {
+  isScanOperatorFamiliar,
+  syncScanOperatorFamiliarFromWallet,
+} from "./scan-operator-familiar.mjs";
 import { getCrossTabScanSnapshot } from "./device-cross-tab-state.mjs";
 import { actOnOtherTabKeys, walletEntryForProfile } from "./device-notice-nav.mjs";
 import {
@@ -124,16 +128,19 @@ function scanCrossTabNoticeCount() {
 
 function computeEligible() {
   const { profileId, qrId } = readScanContext();
+  const wallet = loadWallet();
+  syncScanOperatorFamiliarFromWallet(wallet.length);
   const overlayCounts = getInboxOverlayCounts();
   const crossTabNotice = scanCrossTabNoticeCount();
   return scanPageDotEligible({
     profileId,
     qrId,
     hasCreatedKeys: hasCreatedKeys(),
-    savedWalletCount: loadWallet().length,
+    savedWalletCount: wallet.length,
     hasDefaultVouchProfile: Boolean(getDefaultVouchProfileId()),
     crossTabNotice,
     liveProofPending: overlayCounts.liveProofPending,
+    operatorDeviceFamiliar: isScanOperatorFamiliar(),
   });
 }
 
@@ -145,11 +152,7 @@ function resolveNetworkForDot() {
 function dotOverlayState() {
   const counts = getInboxOverlayCounts();
   const crossTabNotice = scanCrossTabNoticeCount();
-  return dotOverlayFromCounts({
-    liveProofPending: counts.liveProofPending,
-    crossTabNotice,
-    cardDisabledSinceVisit: counts.cardDisabledSinceVisit,
-  });
+  return scanDotOverlayFromCounts(counts, crossTabNotice);
 }
 
 function deviceState() {

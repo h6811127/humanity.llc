@@ -3,6 +3,8 @@
  * @see docs/SCAN_PAGE_DEVICE_DOT.md
  */
 
+import { dotOverlayFromCounts } from "./device-dot-state-core.mjs";
+
 /**
  * Dynamic dot activates only when the viewer may sign / vouch on this scan.
  * @param {{
@@ -13,16 +15,31 @@
  *   hasDefaultVouchProfile: boolean,
  *   crossTabNotice: number,
  *   liveProofPending: number,
+ *   operatorDeviceFamiliar: boolean,
  * }} input
  */
 export function scanPageDotEligible(input) {
   if (!input.profileId || !input.qrId) return false;
+  if (!input.operatorDeviceFamiliar) return false;
   if (input.hasCreatedKeys) return true;
   if (input.savedWalletCount > 0) return true;
   if (input.hasDefaultVouchProfile) return true;
   if (input.crossTabNotice > 0) return true;
   if (input.liveProofPending > 0) return true;
   return false;
+}
+
+/**
+ * Scan overlays: proof_waiting + cross_tab_keys only (since-visit stays on shell/inbox).
+ * @param {{ liveProofPending: number, cardDisabledSinceVisit: number }} counts
+ * @param {number} crossTabNotice
+ */
+export function scanDotOverlayFromCounts(counts, crossTabNotice) {
+  return dotOverlayFromCounts({
+    liveProofPending: counts.liveProofPending,
+    crossTabNotice,
+    cardDisabledSinceVisit: 0,
+  });
 }
 
 /**

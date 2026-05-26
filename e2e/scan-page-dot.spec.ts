@@ -80,6 +80,29 @@ async function stabilizeCrossTabChrome(page: Page) {
 }
 
 test.describe("scan page device dot", () => {
+  test("privacy gate: tab keys without ever saving wallet stay static", async ({ page }) => {
+    await page.addInitScript((session) => {
+      localStorage.removeItem("hc_wallet");
+      localStorage.removeItem("hc_scan_operator_familiar");
+      sessionStorage.setItem("hc_created", JSON.stringify(session));
+    }, {
+      profile_id: SHOWCASE_PROFILE,
+      qr_id: SHOWCASE_QR,
+      handle: "river_example",
+      owner_private_key_b58: "privkeyfortestonlyxxxxxxxxx",
+      owner_public_key_b58: "pubkeyfortestonlyxxxxxxxxxxxx",
+    });
+
+    await gotoScanFixture(page);
+
+    const btn = page.locator("#scan-page-dot-btn");
+    await expect(btn).not.toHaveClass(/scan-page-dot--dynamic/);
+    await expect(page.locator("#scan-page-dot")).not.toHaveAttribute(
+      "data-dot-state",
+      /.+/
+    );
+  });
+
   test("stranger sees static home dot without dynamic state", async ({ page }) => {
     await gotoScanFixture(page);
 
@@ -156,6 +179,7 @@ test.describe("scan page device dot cross-tab", () => {
     await page.addInitScript(() => {
       localStorage.removeItem("hc_wallet");
       localStorage.removeItem("hc_created");
+      localStorage.setItem("hc_scan_operator_familiar", "1");
       localStorage.setItem("hc_device_hub_intro_dismissed", "1");
     });
     await gotoScanFixture(page);

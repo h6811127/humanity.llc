@@ -42,7 +42,7 @@ describe("scan page device dot contract", () => {
 
   it("scan-tab-keys imports scan-page-dot module", () => {
     const src = readFileSync(join(root, "site/js/scan-tab-keys.mjs"), "utf8");
-    expect(src).toContain("./scan-page-dot.mjs?v=5");
+    expect(src).toContain("./scan-page-dot.mjs?v=6");
   });
 
   it("ships Playwright scan fixture with progressive dot markup", () => {

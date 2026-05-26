@@ -73,8 +73,9 @@ Spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md). Automated: `npm run 
 | 4 | Cross-tab keys banner visible | Dot overlay matches banner (`cross_tab_keys`) |
 | 5 | Escape / outside tap | Glance closes; dot `aria-expanded` false |
 | 6 | Hero card header | `humanity.llc` wordmark only — **no** second red dot inside the live-check card |
+| 7 | Tab keys only (never saved a card on this origin) | Dot stays **static** brand red; no `data-dot-state`, no glance |
 
-**Fail signals:** Stranger sees pulsing or green dot; glance opens hub sheet; dot contradicts cross-tab banner; two brand dots on screen (chrome + hero).
+**Fail signals:** Stranger sees pulsing or green dot; glance opens hub sheet; dot contradicts cross-tab banner; two brand dots on screen (chrome + hero); borrowed-phone flash of steward green before first wallet save.
 
 ### P1-8 · Open controls: status dot vs hub row
 

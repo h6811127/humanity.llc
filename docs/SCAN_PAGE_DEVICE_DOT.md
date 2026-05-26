@@ -1,6 +1,6 @@
 # Scan page device dot (progressive chrome)
 
-**Status:** Phase 8.1–8.5 shipped (`pass-v31`)  
+**Status:** Phase 8.1–8.7 shipped (`pass-v31`)  
 **Audience:** Product, design, frontend implementers  
 **Scope:** Page chrome on public scan HTML (`GET /c/{profile_id}?q={qr_id}`) — `#scan-page-dot` in `renderScanPageChrome()`  
 **Related:** [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) · [`SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md)
@@ -67,7 +67,7 @@ Dynamic dot behavior turns on only when **at least one** is true (exact helpers 
 - No saved wallet rows and no `hc_created` keys, **and** no cross-tab / live-proof signals, **and** scan is not an active vouch surface (e.g. inactive scan kinds).
 - First paint before local read completes: show static dot until eligibility is known (avoid flash of “no keys” for strangers).
 
-**Privacy:** Optional tightening — only enable dynamic mode after this origin has ever had a saved wallet row (reduces “steward in the corner” on a borrowed phone for a one-off view). Document in implementation if product chooses this.
+**Privacy (shipped Phase 8.6):** Dynamic mode requires `hc_scan_operator_familiar` on the origin (set on first wallet save; backfilled when `hc_wallet` already has rows). Tab-only keys or vouch-ready prefs without a saved wallet stay **static** until the user has saved at least once on this device.
 
 ---
 
@@ -77,7 +77,7 @@ Use the same axes as `site/js/device-dot-state-core.mjs`:
 
 - **Network:** `ok` | `degraded` | `offline` (resolver health gate; respect `navigator.onLine` vs stale HTML — align with `#scan-offline-banner`)
 - **Device:** `none` | `keys` | `unsaved` | `steward` (from tab session + wallet + steward verification on active profile)
-- **Overlay:** `none` | `proof_waiting` | `cross_tab_keys` | `card_disabled_since_visit` (same priority as shell: proof beats cross-tab beats since-visit)
+- **Overlay:** `none` | `proof_waiting` | `cross_tab_keys` on scan (`card_disabled_since_visit` is **shell/inbox only** — Phase 8.7)
 
 Apply classes via `dotClassList(network, device, overlay)` and expose `data-dot-state` / `data-dot-overlay` on the dot element for tests.
 
@@ -214,6 +214,8 @@ Today `site/js/scan-tab-keys.mjs` starts `device-chrome-refresh.mjs` but **does 
 | **3** | Hollow ring + one-shot pulse; overlay sync with banner | **Shipped** (`pass-v30`) — `shouldScanNoneEligibleAttentionPulse`, `scanCrossTabOverlayCount`, `scan-none-dot-attention` CSS |
 | **4** | Hero host demotion: text-only wordmark inside card (chrome dot only) | **Shipped** (`pass-v31`) — `renderScanHeroHost()`, `.scan-hero-wordmark`; `scan-hero-snapshot.test.ts` |
 | **5** | Playwright E2E (stranger static, steward glance, cross-tab overlay) | **Shipped** — `e2e/scan-page-dot.spec.ts`, `site/e2e-fixtures/scan-active.html`; `npm run e2e:scan-page-dot` |
+| **6** | Operator-familiar privacy gate (`hc_scan_operator_familiar`) | **Shipped** — `scan-operator-familiar.mjs`, `scanPageDotEligible` + wallet save hook |
+| **7** | `card_disabled_since_visit` overlay inbox-only on scan | **Shipped** — `scanDotOverlayFromCounts()` drops since-visit; shell/inbox unchanged |
 
 Worker/API: **no change** — all state is client-side.
 
@@ -258,10 +260,10 @@ Worker/API: **no change** — all state is client-side.
 
 ## Open questions
 
-1. **Eligibility privacy gate** — Require prior wallet save on origin before dynamic mode?
-2. **Home default** — For eligible users, is tap glance-first with home inside, or long-press home?
+1. **Eligibility privacy gate** — **Resolved (Phase 8.6):** yes — `hc_scan_operator_familiar` after first wallet save.
+2. **Home default** — **Resolved (Phase 8.2):** glance-first for eligible viewers; **humanity.llc home** link inside glance.
 3. **Hero host dot** — **Resolved (`pass-v31`):** text-only `<p class="scan-hero-wordmark">` in card; brand dot in page chrome only.
-4. **`card_disabled_since_visit` on scan** — Show overlay when viewer has saved cards with since-visit alerts, or inbox-only on shell pages?
+4. **`card_disabled_since_visit` on scan** — **Resolved (Phase 8.7):** inbox-only on shell pages; scan dot uses `proof_waiting` + `cross_tab_keys` overlays only.
 
 ---
 
@@ -274,6 +276,8 @@ Worker/API: **no change** — all state is client-side.
 | 2026-05-26 | Phase 8.3: one-shot hollow-ring pulse, cross-tab overlay aligned with scan banner, `pass-v30` |
 | 2026-05-26 | Phase 8.4: hero host text-only wordmark; brand dot in page chrome only, `pass-v31` |
 | 2026-05-26 | Phase 8.5: Playwright E2E + generated scan fixture for Pages-only CI |
+| 2026-05-26 | Phase 8.6: operator-familiar privacy gate before progressive dot |
+| 2026-05-26 | Phase 8.7: since-visit overlay suppressed on scan (shell/inbox only) |
 
 ---
 
