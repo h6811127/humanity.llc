@@ -1,4 +1,6 @@
-/* Pure-black dark mode — load after styles.css and device-shell.css */
+/* Pure-black dark mode — load after styles.css and device-shell.css.
+   Notice tokens live on :root in styles.css; do not redefine them on .hc-notice
+   or dark text falls back to light-mode greys on tinted banners. */
 
 html[data-theme="dark"] {
   color-scheme: dark;
@@ -11,15 +13,15 @@ html[data-theme="dark"] {
   --shell-fill-secondary: #2c2c2e;
   --shell-surface-elevated: #3a3a3c;
   --shell-separator: rgba(255, 255, 255, 0.12);
-  --shell-label: rgba(235, 235, 245, 0.62);
+  --shell-label: rgba(235, 235, 245, 0.72);
   --shell-label-strong: #f5f5f7;
   --shell-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45);
   --shell-shadow-md: 0 12px 32px rgba(0, 0, 0, 0.55);
-  --hc-notice-fg: rgba(235, 235, 245, 0.88);
-  --hc-notice-title-fg: #f5f5f7;
+  --hc-notice-fg: rgba(235, 235, 245, 0.94);
+  --hc-notice-title-fg: #ffffff;
   --hc-notice-strong-fg: #ffffff;
-  --hc-notice-link: #0a84ff;
-  --hc-notice-foot-border: rgba(255, 255, 255, 0.14);
+  --hc-notice-link: #64b5ff;
+  --hc-notice-foot-border: rgba(255, 255, 255, 0.18);
 }
 
 html[data-theme="dark"] body {
@@ -185,30 +187,45 @@ html[data-theme="dark"] .hc-notice {
 }
 
 html[data-theme="dark"] .hc-notice--warning {
-  background: rgba(255, 159, 10, 0.14);
-  border-color: rgba(255, 159, 10, 0.28);
+  --hc-notice-fg: rgba(255, 244, 230, 0.96);
+  --hc-notice-title-fg: #ffffff;
+  --hc-notice-strong-fg: #ffffff;
+  --hc-notice-link: #ffd60a;
+  --hc-notice-foot-border: rgba(255, 214, 10, 0.28);
+  background: rgba(255, 159, 10, 0.2);
+  border-color: rgba(255, 159, 10, 0.36);
 }
 
 html[data-theme="dark"] .hc-notice--warning .hc-notice-icon {
-  color: #ff9f0a;
+  color: #ffb340;
 }
 
 html[data-theme="dark"] .hc-notice--error {
-  background: rgba(255, 69, 58, 0.16);
-  border-color: rgba(255, 69, 58, 0.32);
+  --hc-notice-fg: rgba(255, 236, 234, 0.96);
+  --hc-notice-title-fg: #ffffff;
+  --hc-notice-strong-fg: #ffffff;
+  --hc-notice-link: #ff9f9a;
+  --hc-notice-foot-border: rgba(255, 159, 154, 0.28);
+  background: rgba(255, 69, 58, 0.22);
+  border-color: rgba(255, 69, 58, 0.4);
 }
 
 html[data-theme="dark"] .hc-notice--error .hc-notice-icon {
-  color: #ff453a;
+  color: #ff6961;
 }
 
 html[data-theme="dark"] .hc-notice--info {
-  background: rgba(10, 132, 255, 0.18);
-  border-color: rgba(10, 132, 255, 0.32);
+  --hc-notice-fg: rgba(232, 244, 255, 0.96);
+  --hc-notice-title-fg: #ffffff;
+  --hc-notice-strong-fg: #ffffff;
+  --hc-notice-link: #7ec8ff;
+  --hc-notice-foot-border: rgba(126, 200, 255, 0.28);
+  background: rgba(10, 132, 255, 0.22);
+  border-color: rgba(10, 132, 255, 0.38);
 }
 
 html[data-theme="dark"] .hc-notice--info .hc-notice-icon {
-  color: #0a84ff;
+  color: #64b5ff;
 }
 
 html[data-theme="dark"] .hub-card-status-alert {
@@ -378,7 +395,10 @@ html[data-theme="dark"] .hub-card-status-alert {
   border-color: rgba(255, 69, 58, 0.45);
 }
 
-html[data-theme="dark"] .hc-notice-title,
+html[data-theme="dark"] .hc-notice-title {
+  color: var(--hc-notice-title-fg);
+}
+
 html[data-theme="dark"] .hc-notice-body,
 html[data-theme="dark"] .hc-notice-foot,
 html[data-theme="dark"] .form-warning {

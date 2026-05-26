@@ -11,6 +11,12 @@
   --radius-lg: 26px;
   --radius-pill: 100px;
   --pad: 20px;
+  /* hc-notice — global tokens (dark mode overrides on html[data-theme="dark"]) */
+  --hc-notice-fg: rgba(60, 60, 67, 0.88);
+  --hc-notice-title-fg: #1c1c1e;
+  --hc-notice-strong-fg: #1c1c1e;
+  --hc-notice-link: #007aff;
+  --hc-notice-foot-border: rgba(60, 60, 67, 0.12);
 }
 
 *,
@@ -5557,11 +5563,6 @@ a.wallet-pin-open {
 
 /* iOS-style inline notices (warnings, info, errors) */
 .hc-notice {
-  --hc-notice-fg: rgba(60, 60, 67, 0.88);
-  --hc-notice-title-fg: #1c1c1e;
-  --hc-notice-strong-fg: #1c1c1e;
-  --hc-notice-link: #007aff;
-  --hc-notice-foot-border: rgba(60, 60, 67, 0.12);
   display: flex;
   gap: 10px;
   align-items: flex-start;
