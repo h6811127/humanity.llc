@@ -2,6 +2,7 @@
  * /created/ device hub init.
  */
 import { initDeviceHub } from "./device-hub-ui.mjs";
+import "./device-help-fab.mjs";
 
 initDeviceHub({
   noticeMode: "keys-strip",

@@ -215,6 +215,8 @@ No backend required:
 
 Inline notices (hub **Your browser holds the private key**, system/cross-tab banners, form warnings) use shared tokens `--hc-notice-fg`, `--hc-notice-title-fg`, etc. defined on **`:root`** in `site/styles.css` and overridden on `html[data-theme="dark"]` in `site/css/theme-dark.css`.
 
+The private-key notice on landing hub + `/wallet/` includes a small **Acknowledge** button. Dismissing stores `hc_keys_custody_notice_dismissed` in `localStorage` and keeps the notice hidden until you clear site data. For consolidated guides, use `/help/` (not scattered per-feature warnings).
+
 **Do not** redefine those variables on `.hc-notice` itself — each notice box would pin light-mode greys and body copy becomes unreadable on tinted dark backgrounds (especially `.hc-notice--info`).
 
 Dark mode sets base tokens on `html[data-theme="dark"]`, then **per-variant** tokens on `.hc-notice--info` / `--warning` / `--error` so title and body stay high-contrast on blue, amber, and red fills. Titles use `--hc-notice-title-fg` (white on tinted banners); body uses `--hc-notice-fg` (slightly softer off-white).

@@ -465,6 +465,46 @@ html[data-theme="dark"] .device-keys-custody-note {
   color: var(--shell-label);
 }
 
+html[data-theme="dark"] .hc-notice-ack {
+  background: rgba(0, 0, 0, 0.35);
+  border-color: var(--shell-separator);
+  color: var(--hc-notice-fg);
+}
+
+html[data-theme="dark"] .wallet-active-banner {
+  background: linear-gradient(
+    135deg,
+    rgba(10, 132, 255, 0.18) 0%,
+    rgba(48, 209, 88, 0.12) 100%
+  );
+  border-color: rgba(10, 132, 255, 0.35);
+  box-shadow: none;
+}
+
+html[data-theme="dark"] .wallet-active-eyebrow {
+  color: #64d2ff;
+}
+
+html[data-theme="dark"] .wallet-active-label {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .wallet-active-detail {
+  color: var(--shell-label);
+}
+
+html[data-theme="dark"] .device-help-fab {
+  color: var(--shell-label);
+  background: rgba(28, 28, 30, 0.92);
+  border-color: var(--shell-separator);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme="dark"] .help-page-tip {
+  color: var(--shell-label);
+  background: rgba(120, 120, 128, 0.16);
+}
+
 /* Try the loop */
 html[data-theme="dark"] .created-loop-step {
   background: var(--shell-fill);

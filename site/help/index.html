@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Help · humanity.llc</title>
+    <meta
+      name="description"
+      content="Guides for keys, this browser hub, wallet, status notices, and creating live cards on humanity.llc."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem("hc_theme") === "dark") {
+            document.documentElement.dataset.theme = "dark";
+            document.documentElement.style.colorScheme = "dark";
+          }
+        } catch (e) {
+          /* ignore */
+        }
+      })();
+    </script>
+    <link rel="stylesheet" href="/styles.css?v=102" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=14" />
+  </head>
+  <body class="page-help">
+    <div class="page feature-page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+      <main class="screen">
+        <section class="hero">
+          <p class="hero-eyebrow">Help</p>
+          <h1>How this works</h1>
+          <p class="hero-line">
+            One place for the guides scattered across warnings, hub copy, and feature pages.
+            Your signing keys never leave this browser unless you export a backup.
+          </p>
+        </section>
+
+        <section class="group" id="keys">
+          <h2 class="group-label">Keys &amp; custody</h2>
+          <ul class="list">
+            <li class="list-row list-action">
+              <a href="/features/card-creation.html#keys-custody">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true"
+                  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span
+                >
+                <span class="list-content">
+                  <span class="list-title">Where keys live</span>
+                  <span class="list-sub">This tab only vs saved on this device</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/features/encrypted-backups.html">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true"
+                  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/><path d="m21 2-9.6 9.6"/><circle cx="7.5" cy="15.5" r="5.5"/></svg></span
+                >
+                <span class="list-content">
+                  <span class="list-title">Backups &amp; recovery keys</span>
+                  <span class="list-sub">Encrypted export and recovery</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/features/vouching.html">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true"
+                  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg></span
+                >
+                <span class="list-content">
+                  <span class="list-title">Keys vs steward status</span>
+                  <span class="list-sub">Signing in this tab vs what scans show</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        <section class="group" id="device">
+          <h2 class="group-label">This browser</h2>
+          <ul class="list">
+            <li class="list-row list-action">
+              <a href="/features/device-hub.html">
+                <span class="list-icon list-icon-tone-trust" aria-hidden="true"
+                  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></span
+                >
+                <span class="list-content">
+                  <span class="list-title">On this device hub</span>
+                  <span class="list-sub">Saved cards, pins, search, import</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/wallet/">
+                <span class="list-icon list-icon-tone-trust" aria-hidden="true"
+                  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span
+                >
+                <span class="list-content">
+                  <span class="list-title">My cards</span>
+                  <span class="list-sub">Wallet page and Open controls</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/features/live-control.html">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true"
+                  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span
+                >
+                <span class="list-content">
+                  <span class="list-title">Status dot &amp; live proof</span>
+                  <span class="list-sub">Trust indicator, inbox, background checks</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        <section class="group" id="create">
+          <h2 class="group-label">Create &amp; manage</h2>
+          <ul class="list">
+            <li class="list-row list-action">
+              <a href="/create/">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true"
+                  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span
+                >
+                <span class="list-content">
+                  <span class="list-title">Create a live card</span>
+                  <span class="list-sub">QR, handle, and first save</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/features/card-creation.html">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true"
+                  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg></span
+                >
+                <span class="list-content">
+                  <span class="list-title">Card creation (technical)</span>
+                  <span class="list-sub">Resolver, signed payloads, privacy</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/features/revoke.html">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true"
+                  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h4"/><path d="M7 13h6"/><path d="m4 4 16 16"/></svg></span
+                >
+                <span class="list-content">
+                  <span class="list-title">Revoke &amp; lifecycle</span>
+                  <span class="list-sub">Disable QR, card off network</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/features/vouching.html">
+                <span class="list-icon list-icon-tone-purple" aria-hidden="true"
+                  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span
+                >
+                <span class="list-content">
+                  <span class="list-title">Vouching</span>
+                  <span class="list-sub">Sign from scan pages with saved keys</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        <section class="group" id="more">
+          <h2 class="group-label">More</h2>
+          <ul class="list">
+            <li class="list-row list-action">
+              <a href="/features-available-now.html">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true"
+                  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg></span
+                >
+                <span class="list-content">
+                  <span class="list-title">All features</span>
+                  <span class="list-sub">Everything shipping today</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/data-policy.html">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true"
+                  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></span
+                >
+                <span class="list-content">
+                  <span class="list-title">Data policy</span>
+                  <span class="list-sub">What the network stores</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="mailto:info@humanity.llc">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true"
+                  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span
+                >
+                <span class="list-content">
+                  <span class="list-title">info@humanity.llc</span>
+                  <span class="list-sub">Questions we have not documented yet</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        <p class="help-page-tip">
+          On landing, wallet, and card pages, use the small
+          <strong>?</strong>
+          at the bottom corner to return here.
+        </p>
+      </main>
+    </div>
+  </body>
+</html>

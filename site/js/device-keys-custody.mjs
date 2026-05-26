@@ -3,6 +3,10 @@
  */
 
 import { HC_CAUTION_ICON, HC_INFO_ICON } from "./hc-notice-icons.mjs";
+import {
+  dismissKeysCustodyNotice,
+  isKeysCustodyNoticeDismissed,
+} from "./device-keys-custody-core.mjs";
 
 /** @typedef {'hub' | 'wallet' | 'created' | 'compact'} CustodyVariant */
 
@@ -18,8 +22,14 @@ function noticeFoot(importHref, learnHref) {
     <p class="hc-notice-foot">
       <a href="${escapeHtml(learnHref)}">How keys work</a>
       <span aria-hidden="true"> · </span>
+      <a href="/help/#keys">All help</a>
+      <span aria-hidden="true"> · </span>
       <a href="${escapeHtml(importHref)}">Import backup</a>
     </p>`;
+}
+
+function custodyAckButton() {
+  return `<button type="button" class="hc-notice-ack" data-keys-custody-ack>Acknowledge</button>`;
 }
 
 /**
@@ -28,7 +38,7 @@ function noticeFoot(importHref, learnHref) {
  */
 export function keysCustodyHtml(variant, opts = {}) {
   const importHref = opts.importHref ?? "#hub-import-form";
-  const learnHref = "/features/card-creation.html#keys-custody";
+  const learnHref = "/help/#keys";
 
   const tiersDl = `
     <dl class="device-keys-custody-dl">
@@ -54,8 +64,11 @@ export function keysCustodyHtml(variant, opts = {}) {
         <div class="hc-notice-content">
           <p class="hc-notice-title">Your browser holds the private key</p>
           <p class="hc-notice-body">
-            This lets you update, revoke, and prove control. The network never receives it.
+            That is what lets you update, revoke, and prove control. The network never receives it.
           </p>
+          <div class="hc-notice-actions">
+            ${custodyAckButton()}
+          </div>
         </div>
       </div>`;
   }
@@ -83,8 +96,11 @@ export function keysCustodyHtml(variant, opts = {}) {
         <div class="hc-notice-content">
           <p class="hc-notice-title">Your browser holds the private key</p>
           <p class="hc-notice-body">
-            This lets you update, revoke, and prove control. The network never receives it.
+            That is what lets you update, revoke, and prove control. The network never receives it.
           </p>
+          <div class="hc-notice-actions">
+            ${custodyAckButton()}
+          </div>
           ${foot}
         </div>
       </div>`;
@@ -100,6 +116,18 @@ export function keysCustodyHtml(variant, opts = {}) {
     </div>`;
 }
 
+function bindCustodyAck(el) {
+  const btn = el.querySelector("[data-keys-custody-ack]");
+  if (!btn) return;
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    dismissKeysCustodyNotice();
+    const notice = el.querySelector(".device-keys-custody");
+    if (notice) notice.remove();
+    else el.innerHTML = "";
+  });
+}
+
 /**
  * @param {string | HTMLElement | null} target
  * @param {CustodyVariant} [variant]
@@ -109,5 +137,10 @@ export function mountKeysCustody(target, variant = "hub", opts = {}) {
   const el =
     typeof target === "string" ? document.querySelector(target) : target;
   if (!el) return;
+  if ((variant === "hub" || variant === "wallet") && isKeysCustodyNoticeDismissed()) {
+    el.innerHTML = "";
+    return;
+  }
   el.innerHTML = keysCustodyHtml(variant, opts);
+  bindCustodyAck(el);
 }

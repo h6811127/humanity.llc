@@ -37,7 +37,7 @@ function setTabHint(tabHint, input) {
     tabHint.hidden = false;
     tabHint.innerHTML =
       "Keys are in another tab. " +
-      "Save or manage in that tab’s card workspace, or tap <strong>Open controls</strong> below.";
+      "Save or manage in that tab’s card workspace, or tap <strong>Open workspace</strong> below.";
     return;
   }
   tabHint.hidden = true;
@@ -45,11 +45,13 @@ function setTabHint(tabHint, input) {
 
 function refreshWalletActiveBanner() {
   const activeBanner = document.getElementById("wallet-active-banner");
-  const activeText = document.getElementById("wallet-active-text");
+  const activeEyebrow = document.getElementById("wallet-active-eyebrow");
+  const activeLabel = document.getElementById("wallet-active-label");
+  const activeDetail = document.getElementById("wallet-active-detail");
   const activeLink = document.getElementById("wallet-active-link");
   const session = getTabSession();
   const hasKeys = !!(session?.profile_id && session?.owner_private_key_b58);
-  if (!activeBanner || !activeText) return;
+  if (!activeBanner || !activeLabel || !activeDetail) return;
   if (!hasKeys) {
     activeBanner.hidden = true;
     return;
@@ -59,7 +61,9 @@ function refreshWalletActiveBanner() {
     session.wallet_label ||
     (session.handle ? `@${session.handle}` : session.profile_id.slice(0, 12));
   activeBanner.hidden = false;
-  activeText.textContent = `Managing in this tab: ${label}`;
+  if (activeEyebrow) activeEyebrow.textContent = "Active in this tab";
+  activeLabel.textContent = label;
+  activeDetail.textContent = "Signing keys stay here until you close this tab.";
   const entry = walletEntryForSession(session);
   if (activeLink && entry) {
     activeLink.href = createdUrlForEntry(entry);

@@ -18,7 +18,7 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="/styles.css?v=101" />
+    <link rel="stylesheet" href="/styles.css?v=102" />
     <link rel="stylesheet" href="/css/device-shell.css?v=48" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=14" />
   </head>
@@ -108,14 +108,20 @@
         <p class="wallet-context-line" id="wallet-auto-save-line" hidden></p>
 
         <div class="wallet-active-banner" id="wallet-active-banner" hidden role="status">
-          <span class="wallet-active-dot" aria-hidden="true"></span>
-          <span class="wallet-active-text" id="wallet-active-text"></span>
-          <a class="wallet-active-link" id="wallet-active-link" href="/created/">Open controls</a>
+          <div class="wallet-active-main">
+            <span class="wallet-active-dot" aria-hidden="true"></span>
+            <div class="wallet-active-copy">
+              <p class="wallet-active-eyebrow">Active in this tab</p>
+              <p class="wallet-active-label" id="wallet-active-label"></p>
+              <p class="wallet-active-detail">Signing keys stay here until you close this tab.</p>
+            </div>
+          </div>
+          <a class="wallet-active-link" id="wallet-active-link" href="/created/">Open workspace</a>
         </div>
 
         <p class="wallet-strip-hint" id="wallet-tab-hint" hidden>
           Keys are in another tab.
-          Save or manage in that tab’s card workspace, or tap <strong>Open controls</strong> below.
+          Save or manage in that tab’s card workspace, or tap <strong>Open workspace</strong> below.
         </p>
 
         <div class="device-hub-search-block" id="device-hub-search-block" role="search">
@@ -273,6 +279,12 @@
           </div>
         </section>
 
+        <p class="wallet-help-hub-link">
+          <a href="/help/">Full help guide</a>
+          <span aria-hidden="true"> · </span>
+          <a href="/help/#keys">Keys &amp; custody</a>
+        </p>
+
         <details
           class="settings-disclosure wallet-help-details"
           id="wallet-help-details"
@@ -298,6 +310,6 @@
     </div>
 
     <script src="/js/device-status-bootstrap.mjs?v=37" type="module"></script>
-    <script src="/js/wallet-page.mjs?v=4" type="module"></script>
+    <script src="/js/wallet-page.mjs?v=5" type="module"></script>
   </body>
 </html>
