@@ -110,7 +110,7 @@ The header **shell status cluster** has two controls:
 
 - The dot is **never** a numeric notification bell.
 - Overlay priority on the dot matches inbox urgency: live proof beats cross-tab (`dotOverlayFromCounts()`).
-- When overlay is `proof_waiting`, dot explainer quick action is `open_notifications` (scrolls hub/wallet alerts today; inbox sheet planned — see [`DEVICE_INBOX.md`](DEVICE_INBOX.md)).
+- When overlay is `proof_waiting`, dot explainer quick action is `open_notifications` → `openInboxFromChrome()` (inbox sheet — see [`DEVICE_INBOX.md`](DEVICE_INBOX.md)).
 - **Background alerts** (OS `Notification` API) are a third channel for live proof only when the tab is hidden; configured separately from dot color.
 
 Full inbox taxonomy, browser-alert roadmap, and implementation phases: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
@@ -249,8 +249,85 @@ Network refresh for dot coloring uses `device-os-coordinator.mjs` (`DEVICE_OS_RE
 - **CI (shipped):** `.github/workflows/test-site.yml` runs `npm run worker:test` and `e2e/device-status-dot.spec.ts` on `site/` / `e2e/` changes.
 - **Interaction telemetry (shipped):** Phase 5 dev-only log; see Telemetry section and Phase 5 above.
 - **A11y E2E (shipped):** Phase 6 Playwright checks in `e2e/device-status-dot.spec.ts`.
-- **Inbox chroma sync:** badge ring color matches top inbox kind — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) phase 5.
+- **Inbox chroma sync (shipped):** badge ring/count match dot overlay urgency — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) phase 5.
 - **Unified inbox core:** `buildInboxItems()` shared by badge, glance, and hub alerts — keeps overlay and counts aligned.
+
+---
+
+## Troubleshooting: dot tap appears dead
+
+Use this when users report “the status dot does nothing” on every page. On current `main`, Playwright (`e2e/device-status-dot.spec.ts`, Pixel 5 viewport) passes hub-open on landing; a total failure usually means the handler never ran or the UI did not change visibly.
+
+### Expected behavior by page
+
+| Page | `#brand-status-dot-btn` tap |
+|------|-----------------------------|
+| `/`, `/create/`, `/created/` | Toggles hub bottom sheet (`#device-hub.device-hub--sheet`) — first tap opens, second closes |
+| `/wallet/` (`body.page-wallet`) | **Does not open a hub sheet** — scrolls to `#device-hub-saved-group` only (wallet has no `#device-hub` host) |
+
+Handler chain: `dotBtn` click → `openHubFromChrome()` → `setHubExpanded()` → `setHubSheetOpen()` when `device-hub--sheet` is present (`site/js/device-status.mjs`, `site/js/device-hub-sheet.mjs`). Glance-first-on-dot was removed in commit `77816d1`; `toggleGlancePopover()` is not wired to the dot.
+
+### Diagnosis checklist (device under test)
+
+1. **Console on first load** — Red errors loading `device-status.mjs` or any import (`device-inbox-sheet.mjs`, `device-inbox-core.mjs`, `device-browser-notifications.mjs`, etc.) mean the module aborted and **no click listener was registered** (dot still renders from HTML).
+2. **Network** — Confirm `/js/device-status.mjs?v=…` and `/js/device-inbox-sheet.mjs` return **200** (partial deploy or CDN cache after inbox sheet landed in `2b5d105` is a common cause).
+3. **After one tap** — In console: `document.body.classList.contains('device-hub-sheet-open')` and `document.getElementById('device-hub')?.className`. If body says “open” but the sheet looks closed, the next tap only **closes** (toggle trap) — see fix direction 2 below.
+4. **Pointer hit-testing** — In DevTools, inspect `#brand-status-dot-btn`: another element on top, or `pointer-events: none` on `#top-chrome` / `.top-chrome-bar` without the `.shell-status-cluster` override (regression of `77816d1` CSS).
+5. **Diagnostics** — `localStorage.setItem('hc_dot_diagnostics', '1')`, reload, tap dot, read `JSON.parse(sessionStorage.getItem('hc_dot_diag_log'))`. Missing `{ type: 'dot_click' }` → handler did not run; present with no sheet motion → open/toggle or CSS issue.
+6. **Hard refresh / private window** — Rule out stale `device-shell.css` vs `device-status.mjs` version mismatch.
+
+### Likely causes (priority order)
+
+| Priority | Cause | Symptom |
+|----------|--------|---------|
+| 1 | **`device-status.mjs` module load failure** | Dead on all shell pages; console import/404 errors; no `dot_click` in diag log |
+| 2 | **Hub state desync** | Tap seems dead; `device-hub-sheet-open` on `body` while `#device-hub` still has `device-hub-collapsed` |
+| 3 | **CSS hit-testing** | Dead when scrolled (`top-chrome--edge-hidden`) or when hub was open; works at page top after fresh load |
+| 4 | **Wallet UX** | “No hub” on `/wallet/` — only scroll; subtle if already at saved section |
+| 5 | **Stuck inbox backdrop** | Unlikely to block dot (backdrop z-index 56 vs chrome 60–65); verify `device-inbox-backdrop` not `.is-visible` when sheet closed |
+
+---
+
+## Fix directions (engineering)
+
+Do not ship a blind “click fix” without matching the failure mode above. Preferred work, in order:
+
+### 1. Harden module load (inbox dependency)
+
+Since `2b5d105`, `device-status.mjs` imports `device-inbox-sheet.mjs` at top level. Any missing file or throw in that graph prevents **all** dot behavior.
+
+- **Deploy:** Ensure Pages deploy includes every new `site/js/device-inbox*.mjs` (and `device-browser-notifications-core.mjs`) alongside HTML; bump cache-bust query on `device-status.mjs` when adding imports.
+- **Runtime:** Consider a thin `device-status-bootstrap.mjs` that `import()`s the main module and surfaces a one-line `console.error` + optional `data-device-status-error` on `#top-chrome` when load fails (dot visible but inert).
+- **CI:** Extend `test-site.yml` or E2E with a smoke step that fetches the full import graph (or loads `/` and asserts `dot_click` diag after enabling diagnostics).
+
+### 2. Hub open-state single source of truth
+
+`hubSheetOpen()` is true if `body.device-hub-sheet-open` **or** `#device-hub` lacks `device-hub-collapsed` (`device-status.mjs`). Desync makes the first tap call `setHubExpanded(false)` with no visible change.
+
+- Route **all** open/close paths through `setHubSheetOpen()` / `setHubExpanded()` (no direct `classList` on `body` elsewhere).
+- On `pageshow` / init, reconcile: if hub has `device-hub-collapsed`, clear `device-hub-sheet-open` and hide `#device-hub-backdrop`.
+- Optional: log `hub_toggle` with `{ open, bodyClass, hubClass }` when diagnostics enabled.
+
+### 3. Preserve clickability CSS (`77816d1`)
+
+Keep and regression-test in `site/css/device-shell.css`:
+
+- `.top-chrome--float { pointer-events: none }` with `.top-chrome-bar--*` `auto`.
+- `body.device-hub-sheet-open .shell-status-cluster` (and hub-locked / edge-hidden variants) `pointer-events: auto` + fixed position + `z-index: 65`.
+- `#device-hub-backdrop` / `#device-inbox-backdrop`: `pointer-events: none` when closed; `hidden` + no `.is-visible` when closed (`device-hub-sheet.mjs`, `device-inbox-sheet.mjs`).
+
+Add Playwright: scroll landing past threshold (`top-chrome--edge-hidden`), tap `#brand-status-dot-btn`, expect `device-hub-sheet-open`.
+
+### 4. Wallet clarity (product + test)
+
+- Copy: keep `aria-label` / hint that wallet dot scrolls to saved cards, not the hub sheet.
+- E2E: `/wallet/` dot tap scrolls `#device-hub-saved-group` into view (or `aria-expanded` / scroll position assertion).
+
+### 5. QA doc alignment
+
+Update manual QA so dot tap is **hub toggle on first tap**, not glance-first — see [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) P1-3 / P2-3.
+
+**Cross-link:** Inbox sheet and badge paths share `openInboxFromChrome()`; dot path remains `openHubFromChrome()` — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) troubleshooting cross-link.
 
 ---
 
