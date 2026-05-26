@@ -17,6 +17,7 @@ import {
   readCachedNetworkStatus,
   readCachedVerification,
   shouldUseCachedNetworkStatus,
+  verificationRecordFromLabelState,
   WALLET_NETWORK_CACHE_TTL_MS,
 } from "./device-wallet-network-core.mjs";
 
@@ -290,22 +291,34 @@ export function persistWalletFromNetworkPoll(poll) {
   if (poll.alertStateMap) syncLastSeenFromNetworkMap(poll.alertStateMap);
 
   const stored = loadWallet();
+  const cache = loadCache();
   const { entries, changed: qrBackfill } = normalizeWalletQrIds(stored);
   let changed = qrBackfill;
   const next = entries.map((e) => {
-    const net = statusMap[e.profile_id];
-    const scanKind = scanKindMap[e.profile_id] ?? null;
+    const pid = e.profile_id;
+    const net = statusMap[pid];
+    const scanKind = scanKindMap[pid] ?? null;
     const resolvedQr = walletEntryQrId(e);
     const hadScanKind = Object.prototype.hasOwnProperty.call(e, "scan_kind");
     const currentScanKind = hadScanKind ? e.scan_kind ?? null : null;
     const qrChanged = resolvedQr && e.qr_id !== resolvedQr;
-    if (net && (e.status !== net || currentScanKind !== scanKind || qrChanged)) {
+    const cached = cache[pid];
+    const verification = cached
+      ? verificationRecordFromLabelState(cached.verificationLabel, cached.verificationState)
+      : e.verification;
+    const verificationDirty =
+      verification &&
+      JSON.stringify(verification) !== JSON.stringify(e.verification ?? null);
+    if (
+      (net && (e.status !== net || currentScanKind !== scanKind || qrChanged)) ||
+      verificationDirty
+    ) {
       changed = true;
       return {
         ...e,
         ...(qrChanged ? { qr_id: resolvedQr } : {}),
-        status: net,
-        scan_kind: scanKind,
+        ...(net ? { status: net, scan_kind: scanKind } : {}),
+        ...(verification ? { verification } : {}),
       };
     }
     return e;

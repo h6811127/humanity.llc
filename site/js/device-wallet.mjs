@@ -2,6 +2,8 @@
  * Device-local saved cards with signing keys (`hc_wallet`).
  * @see docs/DEVICE_HUB_AND_LOCAL_SEARCH.md
  */
+import { verificationRecordFromLabelState } from "./device-wallet-network-core.mjs";
+
 export const WALLET_STORAGE_KEY = "hc_wallet";
 
 /** Matches resolver / pin parsing (`device-pins.mjs`). */
@@ -84,7 +86,11 @@ export function walletEntryFromSession(session, label) {
     recovery_private_key_b58: session.recovery_private_key_b58,
     qr_expires_at: session.qr_expires_at,
     status: session.status,
-    verification: session.verification,
+    verification:
+      verificationRecordFromLabelState(
+        session.verification?.label,
+        session.verification?.state
+      ) ?? session.verification,
     issued_vouches: session.issued_vouches,
   };
 }
@@ -173,7 +179,13 @@ export function mergeWalletEntryFromSession(existing, session, label = "") {
       session.recovery_private_key_b58 ?? existing.recovery_private_key_b58,
     qr_expires_at: session.qr_expires_at ?? existing.qr_expires_at,
     status: session.status ?? existing.status,
-    verification: session.verification ?? existing.verification,
+    verification:
+      verificationRecordFromLabelState(
+        session.verification?.label ?? existing.verification?.label,
+        session.verification?.state ?? existing.verification?.state
+      ) ??
+      session.verification ??
+      existing.verification,
     issued_vouches: session.issued_vouches ?? existing.issued_vouches,
     saved_at: new Date().toISOString(),
   };

@@ -26,6 +26,7 @@ import {
   restoreKeysStripToControlPanel,
 } from "./created-workspace.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
+import { verificationRecordFromStatusBody } from "./device-wallet-network-core.mjs";
 import { isWalletSaved, saveSessionToWallet } from "./device-wallet.mjs";
 import { applyHumanTrustIconToElement } from "./human-trust-ui.mjs";
 
@@ -611,11 +612,12 @@ async function refreshNetworkStatus() {
     if (scan.human_trust) {
       applyHumanTrustDisplay(scan.human_trust, scan.verification);
     }
+    const verification = verificationRecordFromStatusBody(body);
     if (data) {
       const next = {
         ...data,
         ...(qrExpires ? { qr_expires_at: qrExpires } : {}),
-        ...(scan.verification ? { verification: scan.verification } : {}),
+        ...(verification ? { verification } : {}),
       };
       if (
         next.qr_expires_at !== data.qr_expires_at ||

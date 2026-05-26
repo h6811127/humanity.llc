@@ -111,6 +111,47 @@ export function parseNetworkVerification(body) {
 }
 
 /**
+ * Wallet/session verification row aligned with scan human_trust + verification.
+ * @param {string | null | undefined} label
+ * @param {string | null | undefined} state
+ * @returns {{ label?: string, state?: string } | null}
+ */
+export function verificationRecordFromLabelState(label, state) {
+  const nextLabel = typeof label === "string" && label.trim() ? label.trim() : null;
+  let nextState = typeof state === "string" && state.trim() ? state.trim() : null;
+  if (nextLabel === "Steward") {
+    nextState = "steward";
+  } else if (nextLabel === "Vouched Human" && !nextState) {
+    nextState = "verified_human";
+  } else if (nextLabel === "Verification revoked") {
+    nextState = "revoked";
+  }
+  if (!nextLabel && !nextState) return null;
+  return {
+    ...(nextLabel ? { label: nextLabel } : {}),
+    ...(nextState ? { state: nextState } : {}),
+  };
+}
+
+/**
+ * @param {unknown} body Resolver GET .../status JSON
+ * @returns {{ label?: string, state?: string } | null}
+ */
+export function verificationRecordFromStatusBody(body) {
+  const parsed = parseNetworkVerification(body);
+  const base =
+    body?.scan?.verification && typeof body.scan.verification === "object"
+      ? body.scan.verification
+      : null;
+  return (
+    verificationRecordFromLabelState(
+      parsed.verificationLabel || base?.label,
+      parsed.verificationState || base?.state
+    ) ?? (base ? { ...base } : null)
+  );
+}
+
+/**
  * @param {Record<string, { verificationLabel?: string | null, verificationState?: string | null, at?: number }>} cache
  * @param {string} profileId
  * @param {number} now
