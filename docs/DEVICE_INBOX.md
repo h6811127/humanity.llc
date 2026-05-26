@@ -1,6 +1,6 @@
 # Device inbox & background alerts
 
-**Status:** Unified inbox shipped (phases 1–11) · browser alerts v2 A–D shipped (contextual opt-in, sign deep link, OS policy matrix, live-proof service worker)  
+**Status:** Unified inbox shipped (phases 1–14) · browser alerts v2 A–D shipped (contextual opt-in, sign deep link, OS policy matrix, live-proof service worker)  
 **Audience:** Product, frontend  
 **Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)
 
@@ -235,6 +235,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 | 12 | `topInboxKind()` + `inboxDotOverlayFromItems()` aligned with overlay priority; hub sheet reconcile core + Vitest | ✅ |
 | 13 | Inbox sheet reconcile core + Vitest; `getInboxDotOverlay()` on status dot; E2E card-disabled dot overlay | ✅ |
 | 14 | E2E inbox sheet backdrop close + `pageshow` bfcache reconcile (`DEVICE_OS_QA` P5e) | ✅ |
+| 15 | Shared status-dot module manifest + Vitest `existsSync` guard (`device-status-shell-modules.mjs`) | ✅ |
 
 **Do not:**
 
@@ -303,6 +304,8 @@ Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox 
 | `worker/tests/device-hub-sheet-core.test.ts` | Vitest for hub sheet reconcile |
 | `site/js/device-inbox-sheet-core.mjs` | Pure inbox sheet reconcile rules (`inboxSheetReconcileAction`) |
 | `worker/tests/device-inbox-sheet-core.test.ts` | Vitest for inbox sheet reconcile |
+| `site/js/device-status-shell-modules.mjs` | Shared manifest for status-dot import graph (E2E + Vitest) |
+| `worker/tests/device-status-shell-modules.test.ts` | Vitest: every manifest file exists under `site/js/` |
 
 ---
 

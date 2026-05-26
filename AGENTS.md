@@ -42,7 +42,7 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 
 The floating **status dot** (`#brand-status-dot-btn`) is the hub opener on `/`, `/create/`, and `/created/`. On `/wallet/` it only scrolls to saved cards. Do not wire glance-first on dot tap.
 
-**Red outline ring + dead dot on all pages** = `device-status.mjs` import graph failed (`data-device-status-error`). See `docs/STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`. Never merge a new `./device-*.mjs` import without the file in the same PR; update `SHELL_STATUS_MODULE_PATHS` in `e2e/device-status-dot.spec.ts` and bump bootstrap `?v=` on shell HTML when adding imports.
+**Red outline ring + dead dot on all pages** = `device-status.mjs` import graph failed (`data-device-status-error`). See `docs/STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`. Never merge a new `./device-*.mjs` import on the status graph without the file in the same PR; add the filename to `DEVICE_STATUS_SHELL_JS_FILES` in `site/js/device-status-shell-modules.mjs` and bump bootstrap `?v=` on shell HTML when adding imports. Run `npm run worker:test -- worker/tests/device-status-shell-modules.test.ts`.
 
 When you touch any of these, run the regression suite before finishing:
 
@@ -58,7 +58,7 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device
 
 **Contracts (do not break without updating docs + tests):**
 
-1. **Module graph** — `device-status-bootstrap.mjs` dynamically imports `device-status.mjs`; a failed import leaves the dot dead with no click handler. New imports must ship in the same deploy and stay listed in `SHELL_STATUS_MODULE_PATHS` inside `e2e/device-status-dot.spec.ts`.
+1. **Module graph** — `device-status-bootstrap.mjs` dynamically imports `device-status.mjs`; a failed import leaves the dot dead with no click handler. New imports must ship in the same deploy and stay listed in `site/js/device-status-shell-modules.mjs` (Vitest + `e2e/device-status-dot.spec.ts`).
 2. **Hub open state** — Open/close only through `setHubSheetOpen()` / `setHubExpanded()`. `hubSheetOpen()` treats a collapsed `#device-hub` as closed even if `body.device-hub-sheet-open` is stuck (toggle-trap fix).
 3. **Clickability CSS** — `.top-chrome--float { pointer-events: none }` with `.shell-status-cluster` (and dot/badge) at `pointer-events: auto` when `top-chrome--edge-hidden` or hub/inbox locked. See `docs/STATUS_INDICATOR_STEWARD_GREEN.md` troubleshooting.
 

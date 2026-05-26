@@ -117,7 +117,7 @@ Check these in order (module may be fixed in git but not in the environment you 
 | Guard | Owner | Action |
 |-------|--------|--------|
 | **Import graph E2E** | CI | Keep `e2e/device-status-dot.spec.ts` → `shell status modules are reachable` and `status bootstrap loads and records dot_click in diagnostics`. Workflow: `.github/workflows/test-site.yml` on `site/**` / `e2e/**`. |
-| **Module list hygiene** | Author | When adding `import "./device-*.mjs"` from `device-status.mjs` or any file in `SHELL_STATUS_MODULE_PATHS`, **add the URL to that array** in the same PR. |
+| **Module list hygiene** | Author | When adding `import "./device-*.mjs"` on the status graph, **add the filename** to `DEVICE_STATUS_SHELL_JS_FILES` in `site/js/device-status-shell-modules.mjs` in the same PR. |
 | **File + import same PR** | Author | Never merge an import of a new `./foo.mjs` without `site/js/foo.mjs` in the same commit. |
 | **Cache bust** | Author | Bump `device-status-bootstrap.mjs?v=N` on all shell HTML (`site/index.html`, `create/`, `created/`, `wallet/`) when adding or reordering critical imports. |
 | **Deploy pairing** | Release | Ship **Pages (static `site/`)** and verify `/js/device-inbox-card-disabled.mjs` (and siblings) return **200** before announcing inbox/dot changes. Worker-only deploy is insufficient. |
@@ -134,7 +134,7 @@ Check these in order (module may be fixed in git but not in the environment you 
 
 | Idea | Benefit |
 |------|---------|
-| **Vitest import-graph smoke** | Node can't fully evaluate browser modules, but a maintained manifest + `fs.existsSync` per path catches “import without file” in CI without Playwright. |
+| **Vitest import-graph smoke** | ✅ Shipped: `site/js/device-status-shell-modules.mjs` + `worker/tests/device-status-shell-modules.test.ts`; Playwright uses the same manifest via `deviceStatusShellModulePaths()`. |
 | **Lazy inbox sheet import** | `device-status.mjs` dynamically imports `device-inbox-sheet.mjs` only when opening inbox from dot/badge; dot click/hub path works if inbox sheet fails (reduced blast radius). Product decision: dot explainer “open inbox” would need a fallback message. |
 | **Split `device-status-core.mjs`** | Pure dot state + hub opener in a minimal module; inbox/notifications as plugins. Larger refactor; only if graph keeps growing. |
 
@@ -170,6 +170,6 @@ Check these in order (module may be fixed in git but not in the environment you 
 
 - Red outline CSS: `site/css/device-shell.css` (`#top-chrome[data-device-status-error]`)
 - Bootstrap: `site/js/device-status-bootstrap.mjs`
-- E2E module list: `e2e/device-status-dot.spec.ts` → `SHELL_STATUS_MODULE_PATHS`
+- Module manifest: `site/js/device-status-shell-modules.mjs` (E2E + Vitest)
 - Fix commit for missing file: `3c303c3` — *Ship missing inbox card-disabled module to restore status dot*
 - Introduced bad import: `8ec6a33` — *Add inbox diagnostics for device inbox phase 7*

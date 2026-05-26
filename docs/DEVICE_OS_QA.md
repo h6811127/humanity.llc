@@ -240,7 +240,7 @@ Vitest: `worker/tests/device-inbox-sheet-core.test.ts`, `worker/tests/device-inb
 ## Regression smoke (automated)
 
 ```bash
-npm run worker:test -- worker/tests/device-os-frontend.test.ts worker/tests/device-cross-tab.test.ts worker/tests/device-os-coordinator.test.ts worker/tests/device-inbox-sheet-core.test.ts
+npm run worker:test -- worker/tests/device-os-frontend.test.ts worker/tests/device-cross-tab.test.ts worker/tests/device-os-coordinator.test.ts worker/tests/device-inbox-sheet-core.test.ts worker/tests/device-status-shell-modules.test.ts
 ```
 
 Playwright (requires pages dev):

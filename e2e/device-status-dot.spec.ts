@@ -1,4 +1,5 @@
 import { test, expect, type Route } from "@playwright/test";
+import { deviceStatusShellModulePaths } from "../site/js/device-status-shell-modules.mjs";
 
 const STEWARD_WALLET_ENTRY = {
   id: "e2e_steward_1",
@@ -24,20 +25,7 @@ function mockHealth(route: Route, status: "ok" | "degraded") {
 }
 
 /** Critical static imports for device-status bootstrap (partial deploy guard). */
-const SHELL_STATUS_MODULE_PATHS = [
-  "/js/device-status-bootstrap.mjs?v=21",
-  "/js/device-status.mjs",
-  "/js/device-dot-state-core.mjs",
-  "/js/device-inbox-sheet.mjs",
-  "/js/device-inbox-card-disabled.mjs",
-  "/js/device-inbox-diagnostics.mjs",
-  "/js/device-inbox-diagnostics-core.mjs",
-  "/js/device-inbox-core.mjs",
-  "/js/device-inbox.mjs",
-  "/js/device-hub-sheet.mjs",
-  "/js/device-browser-notifications.mjs",
-  "/js/device-browser-notifications-core.mjs",
-];
+const SHELL_STATUS_MODULE_PATHS = deviceStatusShellModulePaths();
 
 test.describe("status dot module graph", () => {
   test("shell status modules are reachable", async ({ page, baseURL }) => {
