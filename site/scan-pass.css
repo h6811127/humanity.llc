@@ -17,6 +17,46 @@
   --surface-popover-border: rgba(60, 60, 67, 0.12);
   --surface-popover-control-bg: rgba(120, 120, 128, 0.12);
   --surface-popover-control-fg: #1c1c1e;
+  /* Emphasis notice cards — keep in sync with site/styles.css :root */
+  --hc-emphasis-card-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    inset 0 2px 5px rgba(255, 255, 255, 0.38),
+    inset 0 -1px 2px rgba(60, 60, 67, 0.1),
+    inset 0 -3px 8px rgba(60, 60, 67, 0.07),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.58),
+    0 1px 2px rgba(0, 0, 0, 0.05),
+    0 5px 18px rgba(0, 0, 0, 0.1),
+    0 12px 32px rgba(0, 0, 0, 0.06);
+  --hc-emphasis-card-fill-active: linear-gradient(
+    160deg,
+    #f6f8f7 0%,
+    #f1f4f2 48%,
+    #ecf1ee 100%
+  );
+  --hc-emphasis-card-fill-info: linear-gradient(
+    160deg,
+    #f6f7f8 0%,
+    #f2f3f5 48%,
+    #eceef1 100%
+  );
+  --hc-emphasis-card-fill-warn: linear-gradient(
+    160deg,
+    #faf8f5 0%,
+    #f5f2ed 48%,
+    #f0ebe5 100%
+  );
+  --hc-emphasis-card-fill-urgent: linear-gradient(
+    160deg,
+    #faf6f7 0%,
+    #f5f0f2 48%,
+    #f0e9ec 100%
+  );
+  --hc-emphasis-card-eyebrow-active: #248a3d;
+  --hc-emphasis-card-eyebrow-info: #007aff;
+  --hc-emphasis-card-eyebrow-warn: #a16207;
+  --hc-emphasis-card-eyebrow-urgent: #c9342a;
+  --hc-emphasis-card-title-fg: #1c1c1e;
+  --hc-emphasis-card-detail-fg: rgba(60, 60, 67, 0.88);
 }
 
 *,
@@ -1146,19 +1186,12 @@ a {
   margin-bottom: 0;
 }
 
-.scan-cross-tab-banner {
-  margin: 0 var(--pad) 12px;
-  padding: 12px 14px;
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--black);
-  background: rgba(10, 132, 255, 0.08);
-  border: 1px solid rgba(10, 132, 255, 0.22);
-  border-radius: 14px;
-}
-
 .scan-cross-tab-banner[hidden] {
   display: none;
+}
+
+.scan-cross-tab-banner.hc-emphasis-card {
+  margin: 0 var(--pad) 12px;
 }
 
 .scan-offline-banner {
@@ -1826,38 +1859,6 @@ a {
 
 .scan-safety-first-seen[hidden] {
   display: none;
-}
-
-.scan-cross-tab-sub {
-  display: block;
-  margin-top: 4px;
-  color: rgba(60, 60, 67, 0.85);
-}
-
-.scan-cross-tab-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.scan-cross-tab-focus-btn,
-.scan-cross-tab-use-keys {
-  padding: 8px 14px;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: var(--radius-pill);
-  cursor: pointer;
-  border: 1px solid rgba(10, 132, 255, 0.35);
-  background: var(--white);
-  color: #0a84ff;
-}
-
-.scan-cross-tab-use-keys {
-  background: #248a3d;
-  border-color: #248a3d;
-  color: var(--white);
 }
 
 .vouch-card-hint a {

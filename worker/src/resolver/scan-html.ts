@@ -63,7 +63,7 @@ export async function renderScanPage(
 <body>
   <div class="page scan-page">
     ${renderScanPageChrome(origin)}
-    <p class="scan-cross-tab-banner" id="scan-cross-tab-banner" role="status" hidden></p>
+    <div class="scan-cross-tab-banner" id="scan-cross-tab-banner" role="status" hidden></div>
     <p class="scan-offline-banner" id="scan-offline-banner" role="status" hidden>${escapeHtml(SCAN_OFFLINE_BANNER_TEXT)}</p>
     <main class="screen scan-screen">
       ${renderScanHeroSection(vm, safety, origin, qrMarkup)}

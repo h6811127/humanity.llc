@@ -10,7 +10,6 @@ import {
   actOnOrphanRemovedTabKeys,
   clearOrphanKeysOnDevice,
 } from "./device-orphan-keys-nav.mjs";
-import { requestFocusTab } from "./device-tab-presence.mjs";
 import {
   shouldShowCrossTabKeysNotice,
   shouldShowOrphanRemovedKeysNotice,
@@ -41,6 +40,14 @@ function clearPageCrossTabBanner() {
   banner.hidden = true;
   banner.innerHTML = "";
   banner.classList.remove("hc-emphasis-card", "hc-emphasis-card--info", "hc-notice", "hc-notice--info");
+}
+
+function clearScanCrossTabBanner() {
+  if (!scanBanner) return;
+  scanBanner.hidden = true;
+  scanBanner.innerHTML = "";
+  scanBanner.classList.remove("hc-emphasis-card", "hc-emphasis-card--info");
+  scanBanner.className = "scan-cross-tab-banner";
 }
 
 function renderPageCrossTabBanner() {
@@ -256,45 +263,43 @@ function renderScanCrossTabNotice() {
 
   const session = getTabSession();
   if (session?.owner_private_key_b58) {
-    scanBanner.hidden = true;
-    scanBanner.innerHTML = "";
+    clearScanCrossTabBanner();
     return;
   }
 
   const snap = getCrossTabScanSnapshot();
   if (!snap.show || snap.entries.length === 0) {
-    scanBanner.hidden = true;
-    scanBanner.innerHTML = "";
+    clearScanCrossTabBanner();
     return;
   }
 
   const msg = crossTabMessage(snap.entries);
   if (!msg) {
-    scanBanner.hidden = true;
-    scanBanner.innerHTML = "";
+    clearScanCrossTabBanner();
     return;
   }
 
   const walletEntry = walletEntryForVouchHere(msg.primary.profile_id);
-  const useKeysBtn = walletEntry
-    ? `<button type="button" class="scan-cross-tab-use-keys" data-cross-tab-use-keys>Open controls here</button>`
-    : "";
+  const subtext = vouchCrossTabSubtext().replace(/^\s*-\s*/, "").trim();
+  const detail = subtext
+    ? `${subtext.charAt(0).toUpperCase()}${subtext.slice(1)}`
+    : "Open that tab to vouch.";
+
+  const actions = [emphasisCardCtaButton("Open that tab", "data-cross-tab-action")];
+  if (walletEntry) {
+    actions.push(emphasisCardCtaButton("Open controls here", "data-cross-tab-use-keys"));
+  }
 
   scanBanner.hidden = false;
-  scanBanner.innerHTML = `
-    <strong>Signing keys in another tab</strong>
-    <span class="scan-cross-tab-sub">${msg.label}${msg.extra} - open that tab to vouch${walletEntry ? ", or:" : "."}</span>
-    <div class="scan-cross-tab-actions">
-      <button type="button" class="scan-cross-tab-focus-btn" data-cross-tab-action>Open that tab</button>
-      ${useKeysBtn}
-    </div>`;
-
-  const focusBtn = scanBanner.querySelector("[data-cross-tab-action]");
-  focusBtn?.addEventListener("click", (e) => {
-    e.preventDefault();
-    requestFocusTab(msg.primary.tabId);
+  scanBanner.className = "hc-emphasis-card hc-emphasis-card--info scan-cross-tab-banner";
+  scanBanner.innerHTML = emphasisCardBodyHtml({
+    eyebrow: "Keys in another tab",
+    title: `${msg.label}${msg.extra}`,
+    detail,
+    dot: "info",
+    actionsHtml: emphasisCardActionsHtml(actions),
   });
-
+  bindCrossTabAction(scanBanner, msg.primary);
   bindUseKeysHere(scanBanner, walletEntry?.profile_id ?? msg.primary.profile_id, {
     stayOnPage: true,
   });

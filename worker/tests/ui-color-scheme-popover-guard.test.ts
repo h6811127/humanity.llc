@@ -174,18 +174,22 @@ describe("UI color scheme popover guard", () => {
         require: ["--surface-popover-fg"],
       }
     );
-    assertGuardedRule("site/styles.css", ".hc-emphasis-card", {
+    assertGuardedRule("site/css/hc-emphasis-card.css", ".hc-emphasis-card", {
       require: ["--hc-emphasis-card-shadow", "border: none"],
       forbid: ["--hc-emphasis-card-border", "rgba(10, 132, 255, 0.44)"],
     });
-    assertGuardedRule("site/styles.css", ".hc-emphasis-card--active", {
+    assertGuardedRule("site/css/hc-emphasis-card.css", ".hc-emphasis-card--active", {
       require: ["--hc-emphasis-card-fill-active"],
       forbid: ["rgba(10, 132, 255, 0.1)"],
     });
-    assertGuardedRule("site/styles.css", ".hc-emphasis-card__title,\n.wallet-active-label", {
-      require: ["--hc-emphasis-card-title-fg"],
-      forbid: ["color: var(--black)"],
-    });
+    assertGuardedRule(
+      "site/css/hc-emphasis-card.css",
+      ".hc-emphasis-card__title,\n.wallet-active-label",
+      {
+        require: ["--hc-emphasis-card-title-fg"],
+        forbid: ["color: var(--black)"],
+      }
+    );
     assertGuardedRule("site/css/theme-dark.css", "html[data-theme=\"dark\"] .hc-emphasis-card--active", {
       require: ["--hc-emphasis-card-fill-active"],
     });

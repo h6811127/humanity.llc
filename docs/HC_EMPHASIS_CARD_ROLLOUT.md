@@ -1,6 +1,6 @@
 # Emphasis card rollout (`hc-emphasis-card`)
 
-**Status:** Phase 0–1 shipped · Phase 2 next  
+**Status:** Phase 0–2 shipped · Phase 3 next  
 **Visual standard:** [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Emphasis notice cards  
 **Primary CSS:** `site/styles.css`, `site/css/theme-dark.css`
 
@@ -73,7 +73,7 @@ See [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Typography c
 |-------|--------|--------|
 | **0** | Extract `.hc-emphasis-card` + four modifiers; migrate `#wallet-active-banner` markup/classes; Vitest guard | **Shipped** |
 | **1** | `#wallet-tab-hint` → `--info` / `--warn` card; `#device-cross-tab-banner` on `/wallet/` + `/` (`device-cross-tab-banner.mjs`) | **Shipped** |
-| **2** | `#scan-cross-tab-banner` (`scan-pass.css` + `device-cross-tab-banner.mjs`) | Planned |
+| **2** | `#scan-cross-tab-banner` (`scan-pass.css` + `device-cross-tab-banner.mjs`) | **Shipped** |
 | **3** | `.live-control-notification` on `/created/` → `--urgent` | Planned |
 | **4** | Create custody + revoke / no-session `hc-notice` → `--warn` / `--urgent` | Planned |
 | **5** | `.hub-card-status-alert` inset `--warn` (optional) | Planned |
@@ -97,7 +97,15 @@ See [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Typography c
 
 **Acceptance:** Cross-tab on wallet/landing matches active banner depth; no blue rim; CTAs as pills.
 
-### Phase 2–5
+### Phase 2 — shipped (scan cross-tab)
+
+| Surface | File(s) | Shipped as |
+|---------|---------|------------|
+| `#scan-cross-tab-banner` | `worker/src/resolver/scan-html.ts`, `site/scan-pass.css`, `site/css/hc-emphasis-card.css` (bundled via `worker:bundle-scan`), `device-cross-tab-banner.mjs` | `hc-emphasis-card--info` with pill CTAs; host `<div>`; **Open controls here** uses `stayOnPage: true` on scan |
+
+**Acceptance:** Scan cross-tab banner matches wallet/landing raised card; blue bordered box removed; dot overlay still synced with banner visibility.
+
+### Phase 3–5
 
 See tier tables in [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Rollout candidates.
 

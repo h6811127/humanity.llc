@@ -54,7 +54,7 @@ Use these for:
 ## Emphasis notice cards (`hc-emphasis-card` pattern)
 
 **Status:** Shared component shipped (Phase 0) — see [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md)  
-**Files:** `site/styles.css` (`.hc-emphasis-card*`, legacy `.wallet-active-*` aliases), `site/css/theme-dark.css`  
+**Files:** `site/css/hc-emphasis-card.css` (imported by `site/styles.css` and bundled into scan via `worker:bundle-scan`), `site/css/theme-dark.css`  
 **Regression:** `worker/tests/ui-color-scheme-popover-guard.test.ts` (`.hc-emphasis-card`, `.hc-emphasis-card--active`)
 
 Raised, card-shaped callouts for **high-salience device state** on page chrome (keys active, cross-tab, live proof, setup gates). They sit between flat `.hc-notice` strips and full-bleed hub tap banners (`.device-hub-notice-banner`).
@@ -184,7 +184,7 @@ Prioritized places that could adopt the same **raised card** pattern. Extraction
 
 | Surface | Selector / ID | Today | Fit |
 |---------|----------------|-------|-----|
-| Cross-tab on scan | `#scan-cross-tab-banner` `.scan-cross-tab-banner` | Inline `<p>` + text buttons | High visibility; pair with scan dot overlay (`SCAN_PAGE_DEVICE_DOT.md`) |
+| Cross-tab on scan | `#scan-cross-tab-banner` | **Shipped** — `hc-emphasis-card--info` (Phase 2); pair with scan dot overlay (`SCAN_PAGE_DEVICE_DOT.md`) |
 | Vouch / signing blocks | Vouch explainer areas in `scan-pass.css` | Mixed | Only where a **single** action card is needed; avoid competing with trust-tool rows |
 
 #### Tier 5 — Create flow

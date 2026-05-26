@@ -27,6 +27,46 @@
   --surface-popover-border: rgba(60, 60, 67, 0.12);
   --surface-popover-control-bg: rgba(120, 120, 128, 0.12);
   --surface-popover-control-fg: #1c1c1e;
+  /* Emphasis notice cards — keep in sync with site/styles.css :root */
+  --hc-emphasis-card-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    inset 0 2px 5px rgba(255, 255, 255, 0.38),
+    inset 0 -1px 2px rgba(60, 60, 67, 0.1),
+    inset 0 -3px 8px rgba(60, 60, 67, 0.07),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.58),
+    0 1px 2px rgba(0, 0, 0, 0.05),
+    0 5px 18px rgba(0, 0, 0, 0.1),
+    0 12px 32px rgba(0, 0, 0, 0.06);
+  --hc-emphasis-card-fill-active: linear-gradient(
+    160deg,
+    #f6f8f7 0%,
+    #f1f4f2 48%,
+    #ecf1ee 100%
+  );
+  --hc-emphasis-card-fill-info: linear-gradient(
+    160deg,
+    #f6f7f8 0%,
+    #f2f3f5 48%,
+    #eceef1 100%
+  );
+  --hc-emphasis-card-fill-warn: linear-gradient(
+    160deg,
+    #faf8f5 0%,
+    #f5f2ed 48%,
+    #f0ebe5 100%
+  );
+  --hc-emphasis-card-fill-urgent: linear-gradient(
+    160deg,
+    #faf6f7 0%,
+    #f5f0f2 48%,
+    #f0e9ec 100%
+  );
+  --hc-emphasis-card-eyebrow-active: #248a3d;
+  --hc-emphasis-card-eyebrow-info: #007aff;
+  --hc-emphasis-card-eyebrow-warn: #a16207;
+  --hc-emphasis-card-eyebrow-urgent: #c9342a;
+  --hc-emphasis-card-title-fg: #1c1c1e;
+  --hc-emphasis-card-detail-fg: rgba(60, 60, 67, 0.88);
 }
 
 *,
@@ -1156,19 +1196,12 @@ a {
   margin-bottom: 0;
 }
 
-.scan-cross-tab-banner {
-  margin: 0 var(--pad) 12px;
-  padding: 12px 14px;
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--black);
-  background: rgba(10, 132, 255, 0.08);
-  border: 1px solid rgba(10, 132, 255, 0.22);
-  border-radius: 14px;
-}
-
 .scan-cross-tab-banner[hidden] {
   display: none;
+}
+
+.scan-cross-tab-banner.hc-emphasis-card {
+  margin: 0 var(--pad) 12px;
 }
 
 .scan-offline-banner {
@@ -1567,6 +1600,160 @@ a {
   }
 }
 
+/* Path 2 — live check data arriving (docs/SCAN_PAGE_TRUST_UI.md, pass-v32) */
+.scan-live-check--pending .scan-arrive-item--hidden {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.scan-arrive-item--visible {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.scan-live-check--pending .scan-arrive-limits--hidden {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  margin-top: 0;
+  padding-top: 0;
+  border-top-width: 0;
+}
+
+.scan-arrive-limits--visible {
+  opacity: 1;
+  max-height: none;
+  transition: opacity 0.4s ease;
+}
+
+.scan-live-check--pending .scan-arrive-strip .scan-safety-strip-label {
+  color: rgba(60, 60, 67, 0.72);
+}
+
+.scan-page-dot--settle .pass-dot {
+  animation: scan-page-dot-settle 0.55s ease forwards;
+}
+
+@keyframes scan-page-dot-settle {
+  0% {
+    opacity: 0.35;
+    transform: scale(0.88);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan-arrive-item--hidden,
+  .scan-arrive-limits--hidden {
+    opacity: 1;
+    transform: none;
+    max-height: none;
+  }
+
+  .scan-arrive-item--visible,
+  .scan-arrive-limits--visible {
+    transition: none;
+  }
+
+  .scan-page-dot--settle .pass-dot {
+    animation: none;
+  }
+
+  .scan-actor-band--hidden {
+    opacity: 1;
+    transform: none;
+  }
+
+  .scan-actor-band--visible {
+    transition: none;
+  }
+}
+
+/* L3 actor band after live check settles (docs/SCAN_PAGE_TRUST_UI.md S3, pass-v33) */
+.scan-actor-band {
+  margin: 0 var(--pad) 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 0.5px solid rgba(219, 27, 67, 0.22);
+  background: rgba(219, 27, 67, 0.06);
+}
+
+.scan-actor-band--hidden {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+}
+
+.scan-actor-band--visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.scan-actor-band-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 4px;
+}
+
+.scan-actor-band-lead {
+  font-size: 14px;
+  line-height: 1.35;
+  color: rgba(60, 60, 67, 0.85);
+  margin: 0 0 10px;
+}
+
+.scan-actor-band-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.scan-actor-band-primary,
+.scan-actor-band-secondary {
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.scan-actor-band-primary {
+  border: none;
+  background: var(--red);
+  color: #fff;
+}
+
+.scan-actor-band-primary:active {
+  opacity: 0.88;
+}
+
+.scan-actor-band-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(120, 120, 128, 0.14);
+  color: var(--black);
+  text-decoration: none;
+}
+
+.scan-actor-band-secondary:active {
+  opacity: 0.72;
+}
+
 .scan-safety-top {
   display: flex;
   flex-direction: column;
@@ -1682,38 +1869,6 @@ a {
 
 .scan-safety-first-seen[hidden] {
   display: none;
-}
-
-.scan-cross-tab-sub {
-  display: block;
-  margin-top: 4px;
-  color: rgba(60, 60, 67, 0.85);
-}
-
-.scan-cross-tab-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.scan-cross-tab-focus-btn,
-.scan-cross-tab-use-keys {
-  padding: 8px 14px;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: var(--radius-pill);
-  cursor: pointer;
-  border: 1px solid rgba(10, 132, 255, 0.35);
-  background: var(--white);
-  color: #0a84ff;
-}
-
-.scan-cross-tab-use-keys {
-  background: #248a3d;
-  border-color: #248a3d;
-  color: var(--white);
 }
 
 .vouch-card-hint a {
@@ -2473,6 +2628,171 @@ body.scan-page-dot-glance-open {
 .dock-btn-primary {
   box-shadow: 0 4px 16px rgba(219, 27, 67, 0.28);
 }
+
+/* hc-emphasis-card — raised device notices (docs/HC_EMPHASIS_CARD_ROLLOUT.md) */
+.hc-emphasis-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 16px;
+  margin: 0 0 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: none;
+  outline: none;
+  box-shadow: var(--hc-emphasis-card-shadow);
+}
+
+.hc-emphasis-card--active {
+  background: var(--hc-emphasis-card-fill-active);
+}
+
+.hc-emphasis-card--info {
+  background: var(--hc-emphasis-card-fill-info);
+}
+
+.hc-emphasis-card--warn {
+  background: var(--hc-emphasis-card-fill-warn);
+}
+
+.hc-emphasis-card--urgent {
+  background: var(--hc-emphasis-card-fill-urgent);
+}
+
+.hc-emphasis-card__main,
+.wallet-active-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  flex: 1 1 12rem;
+}
+
+.hc-emphasis-card__copy,
+.wallet-active-copy {
+  min-width: 0;
+}
+
+.hc-emphasis-card__eyebrow,
+.wallet-active-eyebrow {
+  margin: 0 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.hc-emphasis-card--active .hc-emphasis-card__eyebrow,
+.hc-emphasis-card--active .wallet-active-eyebrow,
+.wallet-active-banner .hc-emphasis-card__eyebrow,
+.wallet-active-banner .wallet-active-eyebrow {
+  color: var(--hc-emphasis-card-eyebrow-active);
+}
+
+.hc-emphasis-card--info .hc-emphasis-card__eyebrow {
+  color: var(--hc-emphasis-card-eyebrow-info);
+}
+
+.hc-emphasis-card--warn .hc-emphasis-card__eyebrow {
+  color: var(--hc-emphasis-card-eyebrow-warn);
+}
+
+.hc-emphasis-card--urgent .hc-emphasis-card__eyebrow {
+  color: var(--hc-emphasis-card-eyebrow-urgent);
+}
+
+.hc-emphasis-card__title,
+.wallet-active-label {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--hc-emphasis-card-title-fg);
+  line-height: 1.2;
+}
+
+.hc-emphasis-card__detail,
+.wallet-active-detail {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--hc-emphasis-card-detail-fg);
+}
+
+.hc-emphasis-card__cta,
+.wallet-active-link {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  background: var(--red);
+  box-shadow: 0 1px 2px rgba(219, 27, 67, 0.25);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hc-emphasis-card__cta:active,
+.wallet-active-link:active {
+  opacity: 0.88;
+  transform: scale(0.98);
+}
+
+.hc-emphasis-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+  max-width: 100%;
+}
+
+.hc-emphasis-card__cta--secondary {
+  color: var(--hc-emphasis-card-title-fg);
+  background: rgba(255, 255, 255, 0.72);
+  border: 0.5px solid rgba(60, 60, 67, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.hc-emphasis-card__cta--secondary:active {
+  opacity: 0.82;
+}
+
+.hc-emphasis-card__dot {
+  width: 9px;
+  height: 9px;
+  margin-top: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.hc-emphasis-card__dot--success,
+.wallet-active-dot {
+  background: #34c759;
+  box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.22);
+}
+
+.hc-emphasis-card__dot--info {
+  background: #007aff;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+}
+
+.hc-emphasis-card__dot--warn {
+  background: #ff9500;
+  box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.22);
+}
+
+.hc-emphasis-card__dot--urgent {
+  background: #ff3b30;
+  box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.22);
+}
 </style>
 </head>
 <body>
@@ -2488,37 +2808,45 @@ body.scan-page-dot-glance-open {
     </div>
   </div>
 </div>
-    <p class="scan-cross-tab-banner" id="scan-cross-tab-banner" role="status" hidden></p>
+    <div class="scan-cross-tab-banner" id="scan-cross-tab-banner" role="status" hidden></div>
     <p class="scan-offline-banner" id="scan-offline-banner" role="status" hidden>Offline - status may be stale; refresh when connected.</p>
     <main class="screen scan-screen">
       <div class="scan-pass-layer">
-<article class="scan-hero scan-status-panel scan-safety-header" id="scan-safety-header" aria-label="Live check" data-profile-id="7Xk9mP2nQ4rT6vW8yZ1aB3cD5" data-qr-id="qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5">
+<article class="scan-hero scan-status-panel scan-safety-header scan-live-check--pending" id="scan-safety-header" aria-label="Live check" data-profile-id="7Xk9mP2nQ4rT6vW8yZ1aB3cD5" data-qr-id="qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5" data-scan-active="1">
   <header class="scan-hero-head">
     <p class="scan-hero-host scan-hero-wordmark" translate="no">humanity.llc</p>
-    <div class="scan-safety-strip scan-safety-strip--live" role="status">
+    <div class="scan-safety-strip scan-safety-strip--live scan-arrive-strip" role="status" data-arrive-label="Active">
       <span class="scan-safety-strip-icon" aria-hidden="true"></span>
-      <span class="scan-safety-strip-label">Active</span>
+      <span class="scan-safety-strip-label scan-arrive-status-label">Checking live status…</span>
     </div>
   </header>
   <div class="scan-hero-body">
-    <h1 class="scan-hero-title">@river_example</h1>
-    <p class="scan-hero-line">Open studio</p>
-    <ul class="scan-hero-trust" aria-label="Status at a glance"><li class="trust-on">Card active</li>
+    <h1 class="scan-arrive-item scan-arrive-item--hidden scan-hero-title">@river_example</h1>
+    <p class="scan-arrive-item scan-arrive-item--hidden scan-hero-line">Open studio</p>
+    <ul class="scan-arrive-item scan-arrive-item--hidden scan-hero-trust" aria-label="Status at a glance"><li class="trust-on">Card active</li>
 <li class="trust-on">Registered</li>
 <li class="trust-on">QR active</li></ul>
-    <p class="scan-hero-steward">Valid until May 16, 2027, 12:00 PM</p>
+    <p class="scan-arrive-item scan-arrive-item--hidden scan-hero-steward">Valid until May 16, 2027, 12:00 PM</p>
   </div>
   
-  <p class="scan-hero-limit" role="note">This QR resolves to a Humanity Card. It does not prove the person holding this item is the card owner.</p>
-  <ul class="scan-safety-chips scan-hero-details"><li>Revocable</li><li>Issued May 16, 2026</li><li>On Humanity network</li></ul>
+  <p class="scan-hero-limit scan-arrive-limits scan-arrive-limits--hidden" role="note">This QR resolves to a Humanity Card. It does not prove the person holding this item is the card owner.</p>
+  <ul class="scan-safety-chips scan-hero-details scan-arrive-item scan-arrive-item--hidden"><li>Revocable</li><li>Issued May 16, 2026</li><li>On Humanity network</li></ul>
   <p class="scan-safety-first-seen" id="scan-safety-first-seen" hidden></p>
   <p class="scan-hero-foot">Scan shows current card state at scan time.</p>
   <details class="scan-hero-qr-details">
   <summary class="scan-hero-qr-summary">QR on this page</summary>
-  <div class="scan-hero-qr pass-qr scan-status-qr" id="pass-qr-slot" data-scan-url="http://127.0.0.1:8788/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5"><div class="hc-qr-frame pass-qr-svg" role="img" aria-label="QR code for this Humanity live object scan link"><svg class="hc-qr-frame-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 91.5" role="presentation" aria-hidden="true"><rect width="60" height="91.5" rx="3" fill="#ffffff"/><rect x="1.275" y="1.275" width="57.45" height="88.95" rx="2.475" fill="none" stroke="#db1b43" stroke-width="1.5"/><g transform="translate(5.5 5.5)"><path fill="#ffffff" d="M0 0h49v49H0z"/><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/><defs><mask id="hc-qr-finder-logo-mask-fr380ygax7v" maskUnits="userSpaceOnUse" mask-type="alpha"><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/></mask></defs><g class="hc-qr-finder-logo" aria-hidden="true" mask="url(#hc-qr-finder-logo-mask-fr380ygax7v)"><circle class="hc-qr-finder-logo-outer" cx="5.5" cy="5.5" r="5.145" fill="#c9979f" opacity="0.52"/><circle class="hc-qr-finder-logo-inner" cx="5.5" cy="5.5" r="2.3667" fill="#141414" opacity="0.9"/></g></g><text class="hc-qr-frame-pill-text" x="30" y="62.98" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5.5" font-weight="600" letter-spacing="0.14em" fill="#db1b43">LIVE OBJECT</text><text class="hc-qr-frame-footer-text" x="30" y="75" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5" font-weight="500" fill="#8a8a8a">humanity.llc</text><text class="hc-qr-frame-code-text" x="30" y="85.26" text-anchor="middle" font-family="ui-monospace,monospace" font-size="5" font-weight="600" letter-spacing="0.08em" fill="#db1b43">HC-CWWX-HPK0</text></svg></div><p class="pass-credential-code mono" aria-label="Credential code for print verification">HC-CWWX-HPK0</p></div>
+  <div class="scan-hero-qr pass-qr scan-status-qr" id="pass-qr-slot" data-scan-url="http://127.0.0.1:8788/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5"><div class="hc-qr-frame pass-qr-svg" role="img" aria-label="QR code for this Humanity live object scan link"><svg class="hc-qr-frame-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 91.5" role="presentation" aria-hidden="true"><rect width="60" height="91.5" rx="3" fill="#ffffff"/><rect x="1.275" y="1.275" width="57.45" height="88.95" rx="2.475" fill="none" stroke="#db1b43" stroke-width="1.5"/><g transform="translate(5.5 5.5)"><path fill="#ffffff" d="M0 0h49v49H0z"/><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/><defs><mask id="hc-qr-finder-logo-mask-lcw5i59s44" maskUnits="userSpaceOnUse" mask-type="alpha"><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/></mask></defs><g class="hc-qr-finder-logo" aria-hidden="true" mask="url(#hc-qr-finder-logo-mask-lcw5i59s44)"><circle class="hc-qr-finder-logo-outer" cx="5.5" cy="5.5" r="5.145" fill="#c9979f" opacity="0.52"/><circle class="hc-qr-finder-logo-inner" cx="5.5" cy="5.5" r="2.3667" fill="#141414" opacity="0.9"/></g></g><text class="hc-qr-frame-pill-text" x="30" y="62.98" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5.5" font-weight="600" letter-spacing="0.14em" fill="#db1b43">LIVE OBJECT</text><text class="hc-qr-frame-footer-text" x="30" y="75" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5" font-weight="500" fill="#8a8a8a">humanity.llc</text><text class="hc-qr-frame-code-text" x="30" y="85.26" text-anchor="middle" font-family="ui-monospace,monospace" font-size="5" font-weight="600" letter-spacing="0.08em" fill="#db1b43">HC-CWWX-HPK0</text></svg></div><p class="pass-credential-code mono" aria-label="Credential code for print verification">HC-CWWX-HPK0</p></div>
 </details>
 </article>
 </div>
+      <section id="scan-actor-band" class="scan-actor-band scan-actor-band--hidden" hidden aria-label="Your device on this scan">
+  <h2 class="scan-actor-band-title">Keys on this device</h2>
+  <p class="scan-actor-band-lead">You can vouch or open your cards from here.</p>
+  <div class="scan-actor-band-actions">
+    <button type="button" class="scan-actor-band-primary" id="scan-actor-band-vouch">Go to vouch</button>
+    <a class="scan-actor-band-secondary" href="http://127.0.0.1:8788/wallet/">My cards</a>
+  </div>
+</section>
       <div class="scan-trust-modules scan-trust-layer"><section class="scan-proves" aria-label="What this scan shows">
   <h2 class="scan-module-label">What this scan shows</h2>
   <ul class="scan-proves-list"><li>Live status returned from humanity.llc at scan time</li><li>Revocable per card and per printed-item QR on the network</li></ul>
@@ -3118,14 +3446,9 @@ if (slot && !slot.querySelector("svg") && slot.dataset.scanUrl) {
       try { sessionStorage.setItem(key, "1"); } catch (e) {}
     }
   }
-  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    header.classList.add("scan-safety--pulse");
-    header.addEventListener("animationend", function onEnd() {
-      header.classList.remove("scan-safety--pulse");
-      header.removeEventListener("animationend", onEnd);
-    });
-  }
 })();
 </script>
+  <script type="module" src="http://127.0.0.1:8788/js/scan-live-check-arrive.mjs?v=1"></script>
+  <script type="module" src="http://127.0.0.1:8788/js/scan-actor-band.mjs?v=1"></script>
 </body>
 </html>
