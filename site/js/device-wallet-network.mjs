@@ -2,8 +2,8 @@
  * Fetch resolver card status for saved-wallet rows (cached in sessionStorage).
  * Tracks last-seen network status per card for card-disabled-since-visit alerts.
  */
+import { walletEntryQrId, loadWallet, saveWallet, normalizeWalletQrIds } from "./device-wallet.mjs";
 import { getCardStatusUrl } from "./hc-sign.mjs";
-import { loadWallet } from "./device-wallet.mjs";
 import {
   alertStateFromScanKind,
   CARD_REVOKED_ALERT_STATE,
@@ -156,7 +156,7 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
     fetches.push(
       (async () => {
         try {
-          const res = await fetch(getCardStatusUrl(pid, entry.qr_id ?? null), {
+          const res = await fetch(getCardStatusUrl(pid, walletEntryQrId(entry)), {
             cache: "no-store",
           });
           if (!res.ok) {
@@ -212,6 +212,7 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
     };
     latestResolvedAt = Date.now();
   }
+  persistWalletFromNetworkPoll({ statusMap, alertStateMap, scanKindMap });
   notifyNetworkRefreshed(statusMap, alertStateMap, scanKindMap);
   onDone?.({ statusMap, alertStateMap, scanKindMap });
 }
@@ -274,4 +275,40 @@ export function snapshotNetworkSeenOnExit() {
  */
 export function syncLastSeenFromNetworkMap(alertStateMap) {
   saveLastSeen(mergeLastSeenFromNetworkMap(alertStateMap, loadLastSeen()));
+}
+
+/**
+ * Mirror resolver poll into hc_wallet (status, scan_kind, qr_id backfill). Alerts use scan.kind + baseline.
+ * @param {{
+ *   statusMap?: Record<string, string>,
+ *   alertStateMap?: Record<string, string>,
+ *   scanKindMap?: Record<string, string | null>,
+ * }} poll
+ */
+export function persistWalletFromNetworkPoll(poll) {
+  const { statusMap = {}, scanKindMap = {} } = poll;
+  if (poll.alertStateMap) syncLastSeenFromNetworkMap(poll.alertStateMap);
+
+  const stored = loadWallet();
+  const { entries, changed: qrBackfill } = normalizeWalletQrIds(stored);
+  let changed = qrBackfill;
+  const next = entries.map((e) => {
+    const net = statusMap[e.profile_id];
+    const scanKind = scanKindMap[e.profile_id] ?? null;
+    const resolvedQr = walletEntryQrId(e);
+    const hadScanKind = Object.prototype.hasOwnProperty.call(e, "scan_kind");
+    const currentScanKind = hadScanKind ? e.scan_kind ?? null : null;
+    const qrChanged = resolvedQr && e.qr_id !== resolvedQr;
+    if (net && (e.status !== net || currentScanKind !== scanKind || qrChanged)) {
+      changed = true;
+      return {
+        ...e,
+        ...(qrChanged ? { qr_id: resolvedQr } : {}),
+        status: net,
+        scan_kind: scanKind,
+      };
+    }
+    return e;
+  });
+  if (changed) saveWallet(next);
 }

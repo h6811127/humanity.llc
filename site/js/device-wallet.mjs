@@ -4,6 +4,54 @@
  */
 export const WALLET_STORAGE_KEY = "hc_wallet";
 
+/** Matches resolver / pin parsing (`device-pins.mjs`). */
+const QR_ID_RE = /^qr_[1-9A-HJ-NP-Za-km-z_]{8,64}$/;
+
+/**
+ * @param {string | null | undefined} scanUrl
+ * @returns {string | null}
+ */
+export function qrIdFromScanUrl(scanUrl) {
+  if (!scanUrl || typeof scanUrl !== "string") return null;
+  try {
+    const q = new URL(scanUrl).searchParams.get("q");
+    if (q && QR_ID_RE.test(q)) return q;
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
+/**
+ * QR id for status fetch / live-control poll — stored field or `scan_url?q=`.
+ * @param {{ qr_id?: string | null, scan_url?: string | null } | null | undefined} entry
+ * @returns {string | null}
+ */
+export function walletEntryQrId(entry) {
+  if (!entry) return null;
+  const direct = typeof entry.qr_id === "string" ? entry.qr_id.trim() : "";
+  if (direct && QR_ID_RE.test(direct)) return direct;
+  return qrIdFromScanUrl(entry.scan_url);
+}
+
+/**
+ * Backfill `qr_id` from `scan_url` when missing (DH-10).
+ * @param {Array<Record<string, unknown>>} entries
+ * @returns {{ entries: Array<Record<string, unknown>>, changed: boolean }}
+ */
+export function normalizeWalletQrIds(entries) {
+  let changed = false;
+  const next = entries.map((e) => {
+    const resolved = walletEntryQrId(e);
+    if (resolved && e.qr_id !== resolved) {
+      changed = true;
+      return { ...e, qr_id: resolved };
+    }
+    return e;
+  });
+  return { entries: next, changed };
+}
+
 export function loadWallet() {
   try {
     const raw = localStorage.getItem(WALLET_STORAGE_KEY);

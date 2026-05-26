@@ -1,3 +1,5 @@
+import { walletEntryQrId } from "./device-wallet.mjs";
+
 /** @typedef {'none' | 'pending' | 'unreachable'} LiveControlPollKind */
 
 /** @typedef {'ok' | 'degraded' | 'offline'} LiveControlPollHealth */
@@ -42,17 +44,13 @@ export function summarizeLiveControlPoll(results, pollableCount) {
  *   expires_at: string,
  * }} LiveControlPendingItem */
 
-/** @typedef {{ profile_id?: unknown, qr_id?: unknown }} WalletPollEntry */
+/** @typedef {{ profile_id?: unknown, qr_id?: unknown, scan_url?: unknown }} WalletPollEntry */
 
 /**
  * @param {WalletPollEntry | null | undefined} entry
  */
 export function isPollableWalletEntry(entry) {
-  return (
-    typeof entry?.profile_id === "string" &&
-    typeof entry?.qr_id === "string" &&
-    entry.qr_id.length > 0
-  );
+  return typeof entry?.profile_id === "string" && !!walletEntryQrId(entry);
 }
 
 /**
@@ -120,8 +118,8 @@ export function buildLiveControlProofHref(item, origin = "https://humanity.llc")
   if (item.owner_url) return item.owner_url;
   const url = new URL("/created/", origin);
   url.searchParams.set("profile_id", String(item.entry.profile_id));
-  const qrId = item.entry.qr_id;
-  if (qrId) url.searchParams.set("qr_id", String(qrId));
+  const qrId = walletEntryQrId(item.entry);
+  if (qrId) url.searchParams.set("qr_id", qrId);
   url.searchParams.set("live_challenge", item.challenge_id);
   return url.href;
 }

@@ -9,7 +9,7 @@ import {
   postVouchUrl,
   signVouch,
 } from "./hc-sign.mjs";
-import { loadWallet } from "./device-wallet.mjs";
+import { loadWallet, walletEntryQrId } from "./device-wallet.mjs";
 import {
   humanTrustIconMeta,
   isEligibleVoucherState,
@@ -297,7 +297,7 @@ async function findEligibleWalletVouchers(voucheeProfileId) {
       if (!entry?.profile_id || entry.profile_id === voucheeProfileId) return;
       try {
         const res = await fetch(
-          getCardStatusUrl(String(entry.profile_id), entry.qr_id ?? null),
+          getCardStatusUrl(String(entry.profile_id), walletEntryQrId(entry)),
           { cache: "no-store" }
         );
         if (!res.ok) return;
@@ -348,7 +348,7 @@ async function tryAutoActivateDefaultVouchKeys(voucheeProfileId, opts = {}) {
 
   try {
     const res = await fetch(
-      getCardStatusUrl(String(entry.profile_id), entry.qr_id ?? null),
+      getCardStatusUrl(String(entry.profile_id), walletEntryQrId(entry)),
       { cache: "no-store" }
     );
     if (!res.ok) return false;
@@ -364,7 +364,7 @@ async function tryAutoActivateDefaultVouchKeys(voucheeProfileId, opts = {}) {
   logDeviceActivity(
     "auto_activate_vouch_keys",
     entry.label || entry.handle || String(entry.profile_id).slice(0, 12),
-    { profile_id: entry.profile_id, qr_id: entry.qr_id ?? null }
+    { profile_id: entry.profile_id, qr_id: walletEntryQrId(entry) }
   );
   return true;
 }
@@ -456,7 +456,7 @@ async function mountVouchSwitchDefault(session) {
 
   try {
     const res = await fetch(
-      getCardStatusUrl(String(defaultEntry.profile_id), defaultEntry.qr_id ?? null),
+      getCardStatusUrl(String(defaultEntry.profile_id), walletEntryQrId(defaultEntry)),
       { cache: "no-store" }
     );
     if (!res.ok) return;

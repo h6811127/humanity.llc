@@ -145,7 +145,7 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 | ID | Gap |
 |----|-----|
 | **DH-9** | ✅ Fixed: wallet persistence now stores both `status` and `scan_kind` from resolver sync (`device-hub-ui.mjs`), so saved state tracks both card status and `scan.kind` dimensions. |
-| **DH-10** | Saved rows without `qr_id` skip live-control poll (`isPollableWalletEntry`) but still fetch status — if `q` omitted, status is **card-only** (`buildCardOnlyScanViewModel`), which may disagree with full scan URL on row. |
+| **DH-10** | ✅ Fixed: `walletEntryQrId()` resolves `q` from `scan_url` when `qr_id` is missing; status fetch, live-control poll, and `/created/` links use the same QR; hub backfills `qr_id` into `hc_wallet` on sync. |
 
 ---
 

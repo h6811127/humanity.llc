@@ -23,9 +23,11 @@ import {
 import { loadPins, pinHaystack } from "./device-pins.mjs";
 import {
   loadWallet,
+  normalizeWalletQrIds,
   saveWallet,
   formatSavedAt,
   walletEntryKeyPreview,
+  walletEntryQrId,
   walletEntrySubtitle,
 } from "./device-wallet.mjs";
 import {
@@ -280,7 +282,8 @@ function networkLivelinessMeta(profileId) {
 function scanUrlForEntry(entry) {
   if (entry.scan_url) return entry.scan_url;
   const base = `${location.origin}/c/${encodeURIComponent(entry.profile_id)}`;
-  return entry.qr_id ? `${base}?q=${encodeURIComponent(entry.qr_id)}` : base;
+  const qrId = walletEntryQrId(entry);
+  return qrId ? `${base}?q=${encodeURIComponent(qrId)}` : base;
 }
 
 function networkChipHtml(profileId, statusOverride, scanKindOverride) {
@@ -403,8 +406,10 @@ function acknowledgeNetworkSeenForEntry(entry) {
 
 async function fetchAndApplyNetworkChips() {
   if (!hubConfig.fetchNetworkStatus || !savedList) return;
-  const entries = loadWallet();
-  if (entries.length === 0) return;
+  const stored = loadWallet();
+  if (stored.length === 0) return;
+  const { entries, changed: qrBackfill } = normalizeWalletQrIds(stored);
+  if (qrBackfill) saveWallet(entries);
   const gen = bumpWalletNetworkApplyGen();
   applyNetworkChipsToDom(
     Object.fromEntries(
@@ -725,7 +730,7 @@ function renderSavedRows() {
       if (!isEligibleVoucherState(state)) {
         try {
           const res = await fetch(
-            getCardStatusUrl(String(entry.profile_id), entry.qr_id ?? null),
+            getCardStatusUrl(String(entry.profile_id), walletEntryQrId(entry)),
             { cache: "no-store" }
           );
           if (res.ok) {

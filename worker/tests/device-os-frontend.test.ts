@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+const TEST_QR_ID = "qr_xBZTq7M27tueCzBY";
+
 import {
   buildDeviceCountsLabel,
   buildStatusSegmentsFromCounts,
@@ -15,6 +17,10 @@ import {
   parsePendingChallengeBody,
   summarizeLiveControlPoll,
 } from "../../site/js/device-live-control-inbox-core.mjs";
+import {
+  qrIdFromScanUrl,
+  walletEntryQrId,
+} from "../../site/js/device-wallet.mjs";
 import {
   isNetworkCacheFresh,
   mergeLastSeenFromNetworkMap,
@@ -78,17 +84,47 @@ describe("isEligibleVoucherState", () => {
   });
 });
 
+describe("walletEntryQrId (DH-10)", () => {
+  it("prefers stored qr_id over scan_url", () => {
+    expect(
+      walletEntryQrId({
+        qr_id: "qr_xBZTq7M27tueCzBY",
+        scan_url: "https://humanity.llc/c/p1?q=qr_Abcdefghijkmnop",
+      })
+    ).toBe("qr_xBZTq7M27tueCzBY");
+  });
+
+  it("reads q from scan_url when qr_id missing", () => {
+    const url = "https://humanity.llc/c/nSVXWPqgRFEhGPjxyRzidF6s?q=qr_xBZTq7M27tueCzBY";
+    expect(qrIdFromScanUrl(url)).toBe("qr_xBZTq7M27tueCzBY");
+    expect(walletEntryQrId({ profile_id: "p1", scan_url: url })).toBe(
+      "qr_xBZTq7M27tueCzBY"
+    );
+  });
+});
+
 describe("isPollableWalletEntry", () => {
   it("requires profile_id and qr_id strings", () => {
-    expect(isPollableWalletEntry({ profile_id: "p1", qr_id: "q1" })).toBe(true);
+    expect(isPollableWalletEntry({ profile_id: "p1", qr_id: TEST_QR_ID })).toBe(
+      true
+    );
     expect(isPollableWalletEntry({ profile_id: "p1" })).toBe(false);
     expect(isPollableWalletEntry({ profile_id: "p1", qr_id: "" })).toBe(false);
     expect(isPollableWalletEntry(null)).toBe(false);
   });
+
+  it("accepts scan_url with q when qr_id field is missing (DH-10)", () => {
+    expect(
+      isPollableWalletEntry({
+        profile_id: "nSVXWPqgRFEhGPjxyRzidF6s",
+        scan_url: "https://humanity.llc/c/nSVXWPqgRFEhGPjxyRzidF6s?q=qr_xBZTq7M27tueCzBY",
+      })
+    ).toBe(true);
+  });
 });
 
 describe("parsePendingChallengeBody", () => {
-  const entry = { profile_id: "p1", qr_id: "q1" };
+  const entry = { profile_id: "p1", qr_id: TEST_QR_ID };
 
   it("accepts pending challenges with optional urls", () => {
     expect(
@@ -160,7 +196,7 @@ describe("buildLiveControlProofHref", () => {
   it("prefers owner_url when provided", () => {
     expect(
       buildLiveControlProofHref({
-        entry: { profile_id: "p1", qr_id: "q1" },
+        entry: { profile_id: "p1", qr_id: TEST_QR_ID },
         challenge_id: "c1",
         owner_url: "https://humanity.llc/created/?profile_id=p1&live_challenge=c1",
       })
@@ -170,10 +206,12 @@ describe("buildLiveControlProofHref", () => {
   it("builds /created/ url with live_challenge when owner_url is absent", () => {
     expect(
       buildLiveControlProofHref(
-        { entry: { profile_id: "p1", qr_id: "q1" }, challenge_id: "c1" },
+        { entry: { profile_id: "p1", qr_id: TEST_QR_ID }, challenge_id: "c1" },
         "https://humanity.llc"
       )
-    ).toBe("https://humanity.llc/created/?profile_id=p1&qr_id=q1&live_challenge=c1");
+    ).toBe(
+      `https://humanity.llc/created/?profile_id=p1&qr_id=${TEST_QR_ID}&live_challenge=c1`
+    );
   });
 });
 
@@ -290,7 +328,7 @@ describe("classifyChallengeHttpStatus", () => {
 
 describe("summarizeLiveControlPoll", () => {
   const item = {
-    entry: { profile_id: "p1", qr_id: "q1" },
+    entry: { profile_id: "p1", qr_id: TEST_QR_ID },
     challenge_id: "c1",
     return_url: null,
     owner_url: null,

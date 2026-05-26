@@ -13,7 +13,7 @@ import {
   parsePendingChallengeBody,
   summarizeLiveControlPoll,
 } from "./device-live-control-inbox-core.mjs";
-import { loadWallet } from "./device-wallet.mjs";
+import { loadWallet, walletEntryQrId } from "./device-wallet.mjs";
 
 const POLL_MS = 5000;
 
@@ -48,7 +48,8 @@ async function fetchPendingForEntry(entry) {
   if (!isPollableWalletEntry(entry)) return { kind: "none" };
 
   const profileId = entry.profile_id;
-  const qrId = entry.qr_id;
+  const qrId = walletEntryQrId(entry);
+  if (!qrId) return { kind: "none" };
 
   try {
     const res = await fetch(getPendingLiveControlChallengeUrl(profileId, qrId), {
