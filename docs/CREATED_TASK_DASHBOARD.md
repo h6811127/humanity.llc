@@ -3,7 +3,7 @@
 **Status:** Superseded by shipped redesign - see [`CREATED_TASKS_TAB_REDESIGN.md`](CREATED_TASKS_TAB_REDESIGN.md) (T1-T5 complete)  
 **See:** [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md)  
 **Page:** `site/created/index.html` · `site/js/created-dashboard.mjs` · `site/js/created.mjs`  
-**E2E:** `e2e/created-control.spec.ts` · `e2e/device-os-wallet.spec.ts`
+**E2E:** `e2e/created-control.spec.ts` · `npm run e2e:created-control` · `e2e/device-os-wallet.spec.ts`
 
 ---
 
@@ -77,6 +77,18 @@ When a pending live-proof challenge becomes active on `/created/`, the steward m
 
 When `.live-control-proof-requested` is active, hide `#live-control-proof-lead` and show only `#live-control-proof-status` (*Someone nearby is asking…*). Listening state shows lead + idle status (*Keep this tab open…*).
 
+### Automated QA (E2E)
+
+**Spec:** `e2e/created-control.spec.ts` · **Command:** `npm run e2e:created-control`
+
+| Manual QA # | E2E case | Assertion |
+|-------------|----------|-----------|
+| 2 | `live_challenge` deep link | Panel visible, `.live-control-proof-requested`, lead hidden, status line only, primary **Prove control now** |
+| 3 | Poll discovers pending challenge while scrolled down | Panel unhidden with requested state; `scrollIntoView` called once when off-screen |
+| 4 | Deeplink off-screen scroll gating | Vitest `shouldScrollLiveProofPanelIntoView` (`deeplink` reason) — bootstrap timing makes this unreliable in Playwright |
+
+Vitest covers pure visibility/scroll gating in `worker/tests/created-live-proof-poll-core.test.ts`. E2E asserts DOM state + `scrollIntoView` on poll discovery (smooth scroll completion is browser-dependent).
+
 ---
 
 ## Files
@@ -97,8 +109,8 @@ When `.live-control-proof-requested` is active, hide `#live-control-proof-lead` 
 
 1. Finish setup wizard - control mode shows **Your object is live**, no step-1 Save theater when wallet saved.
 2. Live proof pending - primary is **Prove control now**; banner still visible; only one body line (no duplicate lead + status).
-3. Scroll Live tab below fold; trigger live proof from scan page - panel smooth-scrolls into view once.
-4. Open `/created/?…&live_challenge=…` with panel off-screen - panel scrolls into view once after load.
+3. Scroll Live tab below fold; trigger live proof from scan page - panel smooth-scrolls into view once (`npm run e2e:created-control`).
+4. Open `/created/?…&live_challenge=…` - requested state visible; off-screen scroll gating covered by Vitest.
 5. Deploy disclosures use Manage-style icon + chevron pattern.
 6. iPhone Safari: live object card fits viewport; tap targets >= 44px.
 7. Dark mode: shell fill on card and disclosures.
