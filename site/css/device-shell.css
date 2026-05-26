@@ -137,6 +137,11 @@ body.device-hub-sheet-open .shell-status-cluster,
   gap: 10px;
 }
 
+#top-chrome[data-device-status-error] .shell-status-dot-btn {
+  outline: 2px solid var(--red, #db1b43);
+  outline-offset: 2px;
+}
+
 /* Glance menu anchored to status dot */
 .device-hub-glance-popover {
   position: absolute;

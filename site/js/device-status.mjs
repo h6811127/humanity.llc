@@ -30,7 +30,11 @@ import "./device-shell-chrome.mjs";
 import "./device-theme.mjs";
 import "./device-browser-notifications.mjs";
 import { openInboxFromChrome, setInboxSheetOpen, isInboxSheetOpen } from "./device-inbox-sheet.mjs";
-import { isHubSheet, setHubSheetOpen } from "./device-hub-sheet.mjs";
+import {
+  isHubSheet,
+  reconcileHubSheetState,
+  setHubSheetOpen,
+} from "./device-hub-sheet.mjs";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 import {
   describeDotState,
@@ -445,6 +449,7 @@ function openHubFromChrome() {
 if (hub) {
   sessionStorage.setItem(HUB_OPEN_KEY, "0");
   setHubExpanded(false, { persist: false });
+  reconcileHubSheetState();
   renderStatusKey();
 } else if (isWalletPage()) {
   renderStatusKey();

@@ -43,6 +43,17 @@ These map to the #1 documented confusion: **keys in one tab vs saved on device**
 | 2 | Tap **Open controls** | Navigates to `/created/?profile_id=…` |
 | 3 | DevTools → Application → sessionStorage `hc_created` | Contains `owner_private_key_b58` |
 
+### P0-3 · Status dot opens hub (not dead)
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Open `/` with saved card | `#brand-status-dot-btn` visible |
+| 2 | Tap status dot | Hub sheet opens on first tap (`body.device-hub-sheet-open`) |
+| 3 | Scroll down, tap dot again | Hub still opens (edge-hidden chrome) |
+| 4 | `/wallet/` tap dot | Scrolls to saved cards (no hub sheet) |
+
+**Fail signals:** Dot does nothing; console module 404; `#top-chrome[data-device-status-error]`. Full diagnosis: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) troubleshooting.
+
 **Fail signals:** `/created/` without signing keys; revoke panel stuck on “Checking…” (see [`REVOKE_UI_INVESTIGATION.md`](REVOKE_UI_INVESTIGATION.md)).
 
 ### P0-3 · Auto-save (default on)
@@ -153,9 +164,9 @@ Spec: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 | 2 | Cross-tab only (no tab notice) | `data-inbox-chroma="cross_tab_keys"` and blue ring |
 | 3 | Unsaved tab keys only | `data-inbox-chroma="default"` and red ring |
 
-## P4 — Device inbox E2E (planned — phase 6)
+## P4 — Device inbox E2E (automated — phase 6)
 
-When [`DEVICE_INBOX.md`](DEVICE_INBOX.md) phase 6 ships, add:
+Playwright: `e2e/device-inbox.spec.ts` (CI via `test-site.yml`). Manual spot-check still useful on real Worker + pending challenge.
 
 | Step | Action | Expected |
 |------|--------|----------|
@@ -187,6 +198,7 @@ Playwright (requires pages dev):
 
 ```bash
 npm run e2e -- e2e/device-os-wallet.spec.ts
+npm run e2e -- e2e/device-inbox.spec.ts
 ```
 
 ---

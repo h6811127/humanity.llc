@@ -115,6 +115,20 @@ export function setInboxSheetOpen(open) {
   }
 }
 
+/** Clear stuck inbox-open classes when the sheet is collapsed (bfcache, etc.). */
+export function reconcileInboxSheetState() {
+  const sheet = getSheet();
+  if (!sheet || !sheet.classList.contains("device-inbox-sheet--collapsed")) return;
+
+  const bodyOpen = document.body.classList.contains("device-inbox-sheet-open");
+  const locked = document.getElementById("top-chrome")?.classList.contains(
+    "top-chrome--inbox-locked"
+  );
+  if (bodyOpen || locked || sheetOpen) {
+    setInboxSheetOpen(false);
+  }
+}
+
 function crossTabEntriesForSheet() {
   const notices = tabNoticeCount();
   const raw = getOtherTabsWithKeys();
@@ -238,7 +252,12 @@ function bindInboxSheetRefresh() {
 }
 
 ensureInboxSheetDom();
+reconcileInboxSheetState();
 bindInboxSheetRefresh();
+
+window.addEventListener("pageshow", (e) => {
+  if (e.persisted) reconcileInboxSheetState();
+});
 
 window.addEventListener("hc-inbox-sheet-close", () => {
   setInboxSheetOpen(false);

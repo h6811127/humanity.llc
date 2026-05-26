@@ -65,14 +65,39 @@ export function statusAriaLabel(network, device, overlay) {
 }
 
 /**
+ * @param {{ overlayText: string, queueUrl: string | null, pageKind: string }} ctx
+ */
+function stewardNextLine({ overlayText, queueUrl, pageKind }) {
+  if (overlayText) return overlayText;
+  if (pageKind === "wallet") {
+    return "Steward keys are ready on this device; open a saved card when you need to sign.";
+  }
+  if (queueUrl) return "Open steward review queue.";
+  return "Open controls for steward actions.";
+}
+
+/**
+ * Glance popover kicker copy (compact) vs hub status key (full legend).
+ * @param {{ id?: string }} descriptor
+ * @param {boolean} compact
+ */
+export function dotExplainerKicker(descriptor, compact) {
+  if (compact && descriptor?.id === "steward") {
+    return "Steward ready: you can review and sign steward actions now.";
+  }
+  return compact ? "Status now" : "Status explainer";
+}
+
+/**
  * @param {"ok" | "degraded" | "offline"} network
  * @param {"none" | "keys" | "unsaved" | "steward"} device
  * @param {"none" | "proof_waiting" | "cross_tab_keys"} overlay
- * @param {{ stewardReady?: boolean, queueUrl?: string | null }} [opts]
+ * @param {{ stewardReady?: boolean, queueUrl?: string | null, pageKind?: string }} [opts]
  */
 export function describeDotState(network, device, overlay, opts = {}) {
   const stewardReady = Boolean(opts.stewardReady);
   const queueUrl = opts.queueUrl || null;
+  const pageKind = opts.pageKind || "landing";
   const overlayText =
     overlay === "proof_waiting"
       ? "Live proof requests are waiting."
@@ -125,9 +150,7 @@ export function describeDotState(network, device, overlay, opts = {}) {
       id: "steward",
       now: "Steward ready, resolver online.",
       why: "Steward-capable signing keys are available in this browser context.",
-      next:
-        overlayText ||
-        (queueUrl ? "Open steward review queue." : "Open controls for steward actions."),
+      next: stewardNextLine({ overlayText, queueUrl, pageKind }),
       action:
         overlay === "proof_waiting"
           ? { kind: "open_notifications", label: "Open proof requests" }

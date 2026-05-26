@@ -4,6 +4,7 @@ import {
   describeDotState,
   deviceStateFromContext,
   dotClassList,
+  dotExplainerKicker,
   dotOverlayFromCounts,
   dotStateKey,
   hasStewardVerification,
@@ -103,6 +104,15 @@ describe("describeDotState", () => {
     expect(offline.id).toBe("offline");
   });
 
+  it("uses readiness-focused next copy on wallet", () => {
+    const steward = describeDotState("ok", "steward", "none", {
+      stewardReady: true,
+      pageKind: "wallet",
+    });
+    expect(steward.next).toContain("ready on this device");
+    expect(steward.next).not.toContain("Open steward review queue");
+  });
+
   it("offers steward queue action when url is available", () => {
     const steward = describeDotState("ok", "steward", "none", {
       stewardReady: true,
@@ -123,6 +133,15 @@ describe("describeDotState", () => {
       kind: "open_notifications",
       label: "Open proof requests",
     });
+  });
+});
+
+describe("dotExplainerKicker", () => {
+  it("uses glance subtitle for compact steward state", () => {
+    expect(dotExplainerKicker({ id: "steward" }, true)).toBe(
+      "Steward ready: you can review and sign steward actions now."
+    );
+    expect(dotExplainerKicker({ id: "keys" }, true)).toBe("Status now");
   });
 });
 

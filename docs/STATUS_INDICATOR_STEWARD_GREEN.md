@@ -298,15 +298,15 @@ Do not ship a blind “click fix” without matching the failure mode above. Pre
 Since `2b5d105`, `device-status.mjs` imports `device-inbox-sheet.mjs` at top level. Any missing file or throw in that graph prevents **all** dot behavior.
 
 - **Deploy:** Ensure Pages deploy includes every new `site/js/device-inbox*.mjs` (and `device-browser-notifications-core.mjs`) alongside HTML; bump cache-bust query on shell scripts when adding imports.
-- **Runtime (shipped):** `site/js/device-status-bootstrap.mjs` dynamically imports `device-status.mjs`; on failure sets `data-device-status-error` on `#top-chrome` and logs to console. Shell pages load bootstrap (`?v=21`), not `device-status.mjs` directly.
-- **CI (shipped):** `e2e/device-status-dot.spec.ts` — `status bootstrap loads and records dot_click in diagnostics`.
+- **Runtime (shipped):** `site/js/device-status-bootstrap.mjs` dynamically imports `device-status.mjs`; on failure sets `data-device-status-error` on `#top-chrome` (red outline on dot via `device-shell.css`) and logs to console. Shell pages load bootstrap (`?v=21`), not `device-status.mjs` directly.
+- **CI (shipped):** `e2e/device-status-dot.spec.ts` — `shell status modules are reachable` (import graph smoke), `status bootstrap loads and records dot_click in diagnostics`.
 
 ### 2. Hub open-state single source of truth — ✅ shipped
 
 `hubSheetOpen()` is true if `body.device-hub-sheet-open` **or** `#device-hub` lacks `device-hub-collapsed` (`device-status.mjs`). Desync makes the first tap call `setHubExpanded(false)` with no visible change.
 
 - Route **all** open/close paths through `setHubSheetOpen()` / `setHubExpanded()` (no direct `classList` on `body` elsewhere).
-- **Reconcile (shipped):** `reconcileHubSheetState()` in `device-hub-sheet.mjs` on init and `pageshow` (bfcache) clears stuck `device-hub-sheet-open` / backdrop when hub is collapsed.
+- **Reconcile (shipped):** `reconcileHubSheetState()` in `device-hub-sheet.mjs` on init and `pageshow` (bfcache); `device-status.mjs` calls it after initial `setHubExpanded(false)`. `reconcileInboxSheetState()` in `device-inbox-sheet.mjs` for stuck inbox backdrop/classes.
 - **Diagnostics (shipped):** `hub_toggle` log entries include `bodyOpen` and `hubCollapsed`.
 
 ### 3. Preserve clickability CSS (`77816d1`) — ✅ regression E2E
@@ -324,11 +324,17 @@ Keep and regression-test in `site/css/device-shell.css`:
 - Copy: keep `aria-label` / hint that wallet dot scrolls to saved cards, not the hub sheet.
 - **E2E (shipped):** `wallet dot scrolls saved cards into view` in `e2e/device-status-dot.spec.ts`.
 
-### 5. QA doc alignment
+### 5. QA doc alignment — ✅ shipped
 
-Update manual QA so dot tap is **hub toggle on first tap**, not glance-first — see [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) P1-3 / P2-3.
+Manual QA: dot tap is **hub toggle on first tap**, not glance-first — [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) P1-3 / P2-3. Dead-dot diagnosis: same doc **P0** + [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) troubleshooting.
 
 **Cross-link:** Inbox sheet and badge paths share `openInboxFromChrome()`; dot path remains `openHubFromChrome()` — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) troubleshooting cross-link.
+
+### 6. Steward explainer copy (Phase 2 polish) — ✅ shipped
+
+- `dotExplainerKicker()` — glance popover uses steward-specific kicker; hub status key keeps full legend title.
+- `describeDotState(..., { pageKind })` — wallet steward **Next** line is readiness-focused (no false “open queue” when N/A).
+- Vitest: `worker/tests/device-dot-state.test.ts` (`dotExplainerKicker`, wallet `pageKind`).
 
 ---
 

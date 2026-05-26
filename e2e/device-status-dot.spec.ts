@@ -23,6 +23,28 @@ function mockHealth(route: Route, status: "ok" | "degraded") {
   });
 }
 
+/** Critical static imports for device-status bootstrap (partial deploy guard). */
+const SHELL_STATUS_MODULE_PATHS = [
+  "/js/device-status-bootstrap.mjs?v=21",
+  "/js/device-status.mjs",
+  "/js/device-dot-state-core.mjs",
+  "/js/device-inbox-sheet.mjs",
+  "/js/device-inbox-core.mjs",
+  "/js/device-inbox.mjs",
+  "/js/device-hub-sheet.mjs",
+  "/js/device-browser-notifications.mjs",
+  "/js/device-browser-notifications-core.mjs",
+];
+
+test.describe("status dot module graph", () => {
+  test("shell status modules are reachable", async ({ page, baseURL }) => {
+    for (const path of SHELL_STATUS_MODULE_PATHS) {
+      const res = await page.request.get(`${baseURL}${path}`);
+      expect(res.status(), `expected 200 for ${path}`).toBe(200);
+    }
+  });
+});
+
 test.describe("status dot steward green", () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript((entry) => {
