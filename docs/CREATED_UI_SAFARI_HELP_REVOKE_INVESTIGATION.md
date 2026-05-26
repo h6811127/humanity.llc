@@ -181,12 +181,12 @@ Between "Inspect on network" (Architecture · public JSON) and "Lifecycle & help
 3. After revoke: banner should show one of the two strings above.
 4. If bar shows on active card, trace `refreshLiveStatus()` / `showRevokedUi()` and session `revoke_state`.
 
-### Fix directions (document only - not implemented)
+### Fix (step 2 - shipped 2026-05-26)
 
-- Prefer `hidden` + class toggle: do not rely on empty notice for layout; use `.owner-revoked-banner:not([hidden])` or `.is-visible` for `display`.
-- Add project-wide `[hidden] { display: none !important; }` if Safari confirms attribute fight.
-- Hide with `hidden` until `textContent` is non-empty (single `showRevokedUi` path).
-- E2E: open `#revoke-details` with active fixture - assert `#owner-revoked-banner` not visible or has text.
+- CSS: layout only when `.owner-revoked-banner:not([hidden])`; `[hidden]` forces `display: none !important` (WebKit vs `display: flex` fight).
+- JS: `applyOwnerRevokedBanner()` sets copy before unhide; hides on active resolver status (`created-revoke-banner-core.mjs`, `created-revoke.mjs`).
+- Vitest: `worker/tests/created-revoke-banner-core.test.ts`.
+- `/created/`: `styles.css?v=103`.
 
 ---
 
@@ -272,7 +272,7 @@ That doc's other findings (missing buttons without keys, stuck "Checking…" whe
 ## 6. QA checklist (after fixes)
 
 - [ ] Mac Safari: `#device-help-fab` <= 40px box on `/`, `/created/`, `/create/`, `/wallet/` (fix shipped - confirm on device)
-- [ ] Mac Safari: open `#revoke-details` on active card - no empty pink bar
+- [ ] Mac Safari: open `#revoke-details` on active card - no empty pink bar (fix shipped - confirm on device)
 - [ ] Mac Safari: after revoke QR - banner shows full sentence
 - [ ] Chromium regression: `e2e/device-status-dot.spec.ts` + created/revoke paths if added
 - [ ] Manual: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) Manage revoke flow with keys

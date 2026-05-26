@@ -1,6 +1,7 @@
 /**
  * Owner revoke controls on /created/ (M4.2 + M5.5 import).
  */
+import { applyOwnerRevokedBanner } from "./created-revoke-banner-core.mjs";
 import { getCardStatusUrl, postRevokeUrl, signRevocation } from "./hc-sign.mjs";
 
 const ICON_TONE = {
@@ -174,13 +175,7 @@ export function initOwnerRevoke(ctx) {
   }
 
   function showRevokedUi(kind) {
-    if (revokedBannerEl) {
-      revokedBannerEl.hidden = false;
-      revokedBannerEl.textContent =
-        kind === "card"
-          ? "Card disabled. Scans may take up to a minute to update."
-          : "This QR is revoked. You can still disable the whole card below.";
-    }
+    applyOwnerRevokedBanner(revokedBannerEl, kind);
     if (kind === "card") {
       if (revokeActions) revokeActions.hidden = true;
       applyNetworkStatus(
@@ -243,6 +238,7 @@ export function initOwnerRevoke(ctx) {
 
       if (kind === "qr_revoked") showRevokedUi("qr_credential");
       else if (kind === "card_revoked") showRevokedUi("card");
+      else applyOwnerRevokedBanner(revokedBannerEl, undefined);
     } catch {
       if (statusCardEl) statusCardEl.textContent = "Unreachable";
       if (statusQrEl) statusQrEl.textContent = "Unreachable";

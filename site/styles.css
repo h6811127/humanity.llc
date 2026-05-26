@@ -6070,8 +6070,8 @@ p.hc-notice:not(:has(.hc-notice-content)) a {
   border: 0.5px solid rgba(255, 149, 0, 0.22);
 }
 
-.hc-notice--error.form-warning,
-.hc-notice--error.owner-revoked-banner {
+.hc-notice--error.form-warning:not(.owner-revoked-banner),
+.hc-notice--error.owner-revoked-banner:not([hidden]) {
   display: flex;
   margin: 8px 0;
   padding: 12px 14px;
@@ -6079,6 +6079,14 @@ p.hc-notice:not(:has(.hc-notice-content)) a {
   font-size: 14px;
   line-height: 1.45;
   border: none;
+}
+
+.owner-revoked-banner[hidden] {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+  border: none !important;
 }
 
 .form-status {
