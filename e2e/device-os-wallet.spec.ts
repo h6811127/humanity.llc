@@ -34,6 +34,79 @@ test.describe("device OS wallet flow", () => {
     expect(sessionRaw).toContain("privkeyfortestonlyxxxxxxxxx");
   });
 
+  test("Revoke QR from hub opens Advanced revoke panel (not setup Print)", async ({
+    page,
+  }) => {
+    await page.route("**/.well-known/hc/v1/health**", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ status: "ok", database: "ok" }),
+      })
+    );
+
+    await page.route(
+      "**/.well-known/hc/v1/cards/**/status**",
+      async (route) => {
+        const url = new URL(route.request().url());
+        const parts = url.pathname.split("/");
+        const profileId = parts[parts.indexOf("cards") + 1] ?? "";
+        const qrId = url.searchParams.get("q") ?? SAMPLE_WALLET_ENTRY.qr_id;
+
+        // Minimal resolver truth needed for row + revoke panel initialization.
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            version: "1.0",
+            resolver: { operator: "humanity.llc", version: "1.0" },
+            scan: {
+              kind: "active",
+              profile_id: profileId || SAMPLE_WALLET_ENTRY.profile_id,
+              qr_id: qrId,
+              card: {
+                status: "active",
+                handle: SAMPLE_WALLET_ENTRY.handle,
+                manifesto_line: SAMPLE_WALLET_ENTRY.manifesto_line,
+              },
+              verification: { state: "registered", label: "Registered" },
+              human_trust: { label: "Registered", subtitle: "", pill_active: false },
+            },
+          }),
+        });
+      }
+    );
+
+    await page.route(
+      `**/.well-known/hc/v1/cards/${SAMPLE_WALLET_ENTRY.profile_id}`,
+      (route) =>
+        route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            handle: SAMPLE_WALLET_ENTRY.handle,
+            manifesto_line: SAMPLE_WALLET_ENTRY.manifesto_line,
+            created_at: "2026-05-25T12:00:00.000Z",
+            status: "active",
+          }),
+        })
+    );
+
+    await page.goto("/wallet/");
+    await expect(page.getByText("Reachable")).toBeVisible({ timeout: 15_000 });
+
+    const cardRow = page.locator(".hub-card-item").first();
+    await cardRow.locator(".hub-card-menu summary").click();
+    await cardRow.getByRole("button", { name: "Revoke QR" }).click();
+
+    await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
+    await expect(page.locator("#created-setup-root")).toBeHidden();
+
+    await expect(page.locator("#created-tab-advanced")).toBeVisible();
+    await expect(page.locator("#revoke-details")).toBeVisible();
+    await expect(page.locator("#revoke-details")).toHaveAttribute("open");
+  });
+
   test("Update status opens /created/ with keys and update panel focus", async ({ page }) => {
     await page.addInitScript((profileId) => {
       localStorage.setItem("hc_setup_done", JSON.stringify({ [profileId]: true }));
