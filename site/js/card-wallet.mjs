@@ -10,16 +10,9 @@ import {
   savePins,
 } from "./device-pins.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
-import {
-  shouldShowCrossTabKeysNotice,
-  shouldShowOrphanRemovedKeysNotice,
-} from "./device-cross-tab-visibility.mjs";
+import { gatherInboxInput } from "./device-inbox.mjs";
 import { openCardNowPage, getTabSession } from "./device-keys.mjs";
-import {
-  getOrphanRemovedTabsWithKeys,
-  getOtherTabsWithKeys,
-  purgePresenceForProfile,
-} from "./device-tab-presence.mjs";
+import { purgePresenceForProfile } from "./device-tab-presence.mjs";
 import { markProfileRemovedFromDevice } from "./device-wallet-removed-profiles.mjs";
 import {
   defaultWalletLabel,
@@ -242,15 +235,13 @@ function updateActiveBanner() {
   const hasKeys = !!(session?.profile_id && session?.owner_private_key_b58);
 
   if (tabHint) {
-    const notices = tabNoticeCount();
-    const orphan = getOrphanRemovedTabsWithKeys();
-    const cross = getOtherTabsWithKeys();
-    if (shouldShowOrphanRemovedKeysNotice(orphan.length, notices)) {
+    const input = gatherInboxInput();
+    if (input.orphanRemovedEntries.length > 0) {
       tabHint.hidden = false;
       tabHint.innerHTML =
         "Keys for a card you removed are still open in another tab. " +
         "Open that tab to close it, or clear keys from the device hub.";
-    } else if (shouldShowCrossTabKeysNotice(cross.length, notices)) {
+    } else if (input.crossTabEntries.length > 0) {
       tabHint.hidden = false;
       tabHint.innerHTML =
         "Keys are in another tab. " +

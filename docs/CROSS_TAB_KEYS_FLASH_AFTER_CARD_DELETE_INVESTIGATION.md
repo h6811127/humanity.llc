@@ -2,7 +2,7 @@
 
 **Reported:** 2026-05-26 — Laptop instance shows “Keys in another tab” for ~1–2s then it disappears, for a card deleted the previous day.
 
-**Status:** **Path B (step 1)** and **path F (step 2)** shipped — denylist + orphan-specific inbox/hub copy and “Clear keys on this device” (broadcast); see § Implementation.
+**Status:** **Path B (step 1)**, **path F (step 2)**, and **path G (step 3)** shipped — see § Implementation.
 
 Related: [`DEVICE_INBOX.md`](DEVICE_INBOX.md) counting rule 5, [`DEVICE_OS.md`](DEVICE_OS.md) § Cross-tab keys, [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) § Cross-tab badge.
 
@@ -234,6 +234,23 @@ Generic `cross_tab_keys` remains for unsaved create tabs; removed profiles surfa
 **Not in step 2:** Path G (debounce), path D as mandatory on every remove (clear is opt-in via hub CTA).
 
 **Tests:** `worker/tests/device-inbox.test.ts`, `worker/tests/device-orphan-keys-nav.test.ts`, `device-cross-tab.test.ts` (orphan-only list).
+
+---
+
+## Implementation (path G — step 3)
+
+| Piece | Module |
+|-------|--------|
+| Two consecutive presence reads before showing cross-tab/orphan inbox | `device-presence-inbox-stability-core.mjs` → `gatherInboxInput()` |
+| Fast hide when presence drops (streak resets on zero) | same |
+| Coalesce duplicate `gatherInboxInput()` per chrome refresh (~50ms) | `device-inbox.mjs` |
+| Debounce `hc-tab-presence-changed` → `refreshSummary` (300ms) | `device-status.mjs` |
+| Skip dot `startViewTransition` for cross-tab overlay-only flaps | `shouldSkipCrossTabOverlayViewTransition` in `device-status.mjs` |
+| Wallet / banner / sheet use stabilized `gatherInboxInput()` | `device-cross-tab-banner.mjs`, `device-inbox-sheet.mjs`, `wallet-page.mjs`, `card-wallet.mjs` |
+
+**Not in step 3:** Mandatory broadcast clear on every remove (path D); E2E two-tab remove (listed below).
+
+**Tests:** `worker/tests/device-presence-inbox-stability.test.ts`.
 
 ---
 

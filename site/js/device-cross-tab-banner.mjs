@@ -10,13 +10,12 @@ import {
   actOnOrphanRemovedTabKeys,
   clearOrphanKeysOnDevice,
 } from "./device-orphan-keys-nav.mjs";
-import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys, requestFocusTab } from "./device-tab-presence.mjs";
+import { getOtherTabsWithKeys, requestFocusTab } from "./device-tab-presence.mjs";
 import {
   shouldShowCrossTabKeysNotice,
   shouldShowOrphanRemovedKeysNotice,
 } from "./device-cross-tab-visibility.mjs";
-import { tabNoticeCount } from "./device-counts.mjs";
-import { getInboxItems } from "./device-inbox.mjs";
+import { gatherInboxInput, getInboxItems } from "./device-inbox.mjs";
 import { inboxItemsIncludeKind } from "./device-hub-inbox-alerts.mjs";
 import { actOnOtherTabKeys, walletEntryForProfile } from "./device-notice-nav.mjs";
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
@@ -43,15 +42,14 @@ function shouldShowCrossTabNotice() {
   if (document.getElementById("shell-notif-badge")) {
     return inboxItemsIncludeKind(getInboxItems(), "cross_tab_keys");
   }
-  return shouldShowCrossTabKeysNotice(getOtherTabsWithKeys().length, tabNoticeCount());
+  return gatherInboxInput().crossTabEntries.length > 0;
 }
 
 function shouldShowOrphanHubNotice() {
-  const notices = tabNoticeCount();
   if (document.getElementById("shell-notif-badge")) {
     return inboxItemsIncludeKind(getInboxItems(), "orphan_keys_removed");
   }
-  return shouldShowOrphanRemovedKeysNotice(getOrphanRemovedTabsWithKeys().length, notices);
+  return gatherInboxInput().orphanRemovedEntries.length > 0;
 }
 
 function crossTabMessage(others) {
@@ -140,7 +138,7 @@ function renderHubOrphanRemovedNotice() {
   if (!shouldShowOrphanHubNotice()) {
     return false;
   }
-  const others = getOrphanRemovedTabsWithKeys();
+  const others = gatherInboxInput().orphanRemovedEntries;
   const msg = crossTabMessage(others);
   if (!msg) {
     return false;
@@ -175,7 +173,7 @@ function renderHubCrossTabNotice() {
     hubSlot.innerHTML = "";
     return;
   }
-  const others = getOtherTabsWithKeys();
+  const others = gatherInboxInput().crossTabEntries;
   const msg = crossTabMessage(others);
   if (!msg) {
     hubSlot.hidden = true;
@@ -272,7 +270,7 @@ export function renderCrossTabKeysBanner() {
     return;
   }
 
-  const others = getOtherTabsWithKeys();
+  const others = gatherInboxInput().crossTabEntries;
   const msg = crossTabMessage(others);
   if (!msg) {
     banner.hidden = true;

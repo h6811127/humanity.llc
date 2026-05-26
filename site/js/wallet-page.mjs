@@ -6,11 +6,7 @@ import { isAutoSaveEnabled, initAutoSaveToggle } from "./device-auto-save.mjs";
 import { initDeviceHub, refreshDeviceHub } from "./device-hub-ui.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
-import {
-  shouldShowCrossTabKeysNotice,
-  shouldShowOrphanRemovedKeysNotice,
-} from "./device-cross-tab-visibility.mjs";
-import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys } from "./device-tab-presence.mjs";
+import { gatherInboxInput } from "./device-inbox.mjs";
 import { createPinEntry, loadPins, savePins } from "./device-pins.mjs";
 import { mountKeysCustody } from "./device-keys-custody.mjs";
 import {
@@ -59,17 +55,15 @@ function refreshHelpVisibility() {
 
 function updateTabHint() {
   if (!tabHint) return;
-  const notices = tabNoticeCount();
-  const orphan = getOrphanRemovedTabsWithKeys();
-  const cross = getOtherTabsWithKeys();
-  if (shouldShowOrphanRemovedKeysNotice(orphan.length, notices)) {
+  const input = gatherInboxInput();
+  if (input.orphanRemovedEntries.length > 0) {
     tabHint.hidden = false;
     tabHint.textContent =
       "Keys for a card you removed are still open in another tab. " +
       "Open that tab to close it, or clear keys from the device hub.";
     return;
   }
-  if (shouldShowCrossTabKeysNotice(cross.length, notices)) {
+  if (input.crossTabEntries.length > 0) {
     tabHint.hidden = false;
     tabHint.innerHTML =
       "Keys are in another tab. " +

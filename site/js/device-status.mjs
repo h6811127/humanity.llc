@@ -2,8 +2,10 @@
  * Floating status dot, notification badge, hub sheet host.
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
-import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=34";
+import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=35";
 import { buildStatusSegments } from "./device-counts.mjs";
+import { DEVICE_OS_DEBOUNCE_MS } from "./device-os-coordinator-core.mjs";
+import { shouldSkipCrossTabOverlayViewTransition } from "./device-presence-inbox-stability-core.mjs";
 import { fetchResolverHealth } from "./device-network-health.mjs";
 import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visit-gate.mjs";
 
@@ -20,7 +22,7 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeCountText,
   notificationCount,
-} from "./device-inbox.mjs?v=34";
+} from "./device-inbox.mjs?v=35";
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
@@ -29,20 +31,20 @@ import {
   onHubOpenedFromIntro,
 } from "./device-hub-intro-coachmark.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=34";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=35";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import "./device-shell-motion.mjs";
-import "./device-shell-chrome.mjs?v=34";
+import "./device-shell-chrome.mjs?v=35";
 import "./device-theme.mjs";
-import "./device-browser-notifications.mjs?v=34";
+import "./device-browser-notifications.mjs?v=35";
 import {
   isHubSheet,
   reconcileHubSheetState,
   setHubSheetOpen,
-} from "./device-hub-sheet.mjs?v=34";
+} from "./device-hub-sheet.mjs?v=35";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 import {
   describeDotState,
@@ -54,7 +56,7 @@ import {
   hasStewardVerification,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=34";
+} from "./device-dot-state-core.mjs?v=35";
 
 export const DOT_STATE_CHANGED = "hc-dot-state-changed";
 
@@ -91,6 +93,7 @@ let networkStatus = "offline";
 /** @type {{ network: string, device: string, overlay: string } | null} */
 let lastDotSnapshot = null;
 let stewardCelebrateTimer = null;
+let presenceRefreshTimer = null;
 
 export { openInboxFromChrome };
 
@@ -150,6 +153,7 @@ export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
     setHubSheetOpen(open);
   } else {
     hub.classList.toggle("device-hub-collapsed", !open);
+    window.dispatchEvent(new Event("hc-live-control-poll-scope-changed"));
   }
   if (dotBtn) dotBtn.setAttribute("aria-expanded", open ? "true" : "false");
   if (persist) {
@@ -165,7 +169,6 @@ export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
     });
   }
   refreshHubGlance();
-  window.dispatchEvent(new Event("hc-live-control-poll-scope-changed"));
 }
 
 function hubSheetOpen() {
@@ -248,14 +251,20 @@ function applyDot() {
     maybeEmitDotTransition(networkStatus, device, overlay);
     lastDotSnapshot = { network: networkStatus, device, overlay };
   };
-  if (
-    !prefersReducedMotion() &&
-    !hubSheetOpen() &&
-    typeof document.startViewTransition === "function"
-  ) {
-    document.startViewTransition(run);
-  } else {
+  const skipTransition =
+    prefersReducedMotion() ||
+    hubSheetOpen() ||
+    typeof document.startViewTransition !== "function" ||
+    shouldSkipCrossTabOverlayViewTransition(lastDotSnapshot, {
+      network: networkStatus,
+      device: deviceState(),
+      overlay: dotOverlayState(),
+    });
+
+  if (skipTransition) {
     run();
+  } else {
+    document.startViewTransition(run);
   }
 }
 
@@ -540,7 +549,17 @@ window.addEventListener("storage", (e) => {
 
 window.addEventListener("hc-device-hub-changed", refreshSummary);
 window.addEventListener("hc-live-control-inbox-changed", refreshSummary);
-window.addEventListener("hc-tab-presence-changed", refreshSummary);
+function schedulePresenceRefreshSummary() {
+  if (presenceRefreshTimer != null) {
+    clearTimeout(presenceRefreshTimer);
+  }
+  presenceRefreshTimer = window.setTimeout(() => {
+    presenceRefreshTimer = null;
+    refreshSummary();
+  }, DEVICE_OS_DEBOUNCE_MS);
+}
+
+window.addEventListener("hc-tab-presence-changed", schedulePresenceRefreshSummary);
 window.addEventListener(NETWORK_BASELINE_CHANGED, refreshSummary);
 window.addEventListener(NETWORK_REFRESHED, refreshSummary);
 

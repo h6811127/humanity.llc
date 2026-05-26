@@ -4,6 +4,7 @@
 import { clearTabSessionKeys } from "./device-keys.mjs";
 import { orphanKeysClearConfirmMessage } from "./device-orphan-keys-nav-core.mjs";
 import { inboxCrossTabLabel } from "./device-inbox-core.mjs";
+import { resetPresenceInboxGatherCache } from "./device-inbox.mjs";
 import {
   broadcastClearProfileKeys,
   purgePresenceForProfile,
@@ -32,6 +33,7 @@ export function clearOrphanKeysOnDevice(entry) {
   broadcastClearProfileKeys(entry.profile_id);
   const session = clearTabSessionKeysIfProfile(entry.profile_id);
   purgePresenceForProfile(entry.profile_id);
+  resetPresenceInboxGatherCache();
   if (session) {
     window.dispatchEvent(new Event("hc-device-hub-changed"));
   }

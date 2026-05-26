@@ -30,7 +30,7 @@ These map to the #1 documented confusion: **keys in one tab vs saved on device**
 |------|--------|----------|
 | 1 | Tab A: open `/` | Hub/status shows no unsaved notice if empty |
 | 2 | Tab B: `/create/` → create card → land on `/created/` | Keys in tab B session |
-| 3 | Tab A: reload `/` (do not close tab B) | Notice: keys in this tab / save (or cross-tab banner if B still open) |
+| 3 | Tab A: reload `/` (do not close tab B) | Notice: keys in this tab / save (or cross-tab banner if B still open; may appear after ~8s — two presence heartbeats, Path G) |
 | 4 | Tab A: follow notice → save or open controls | After save, notice clears; card appears under saved |
 
 **Fail signals:** Silent empty hub; no notice; save does nothing.

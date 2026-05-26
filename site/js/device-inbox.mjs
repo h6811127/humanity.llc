@@ -15,13 +15,22 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeChromaClass,
   inboxBadgeChromaClassNames,
-} from "./device-inbox-core.mjs?v=34";
+} from "./device-inbox-core.mjs?v=35";
 import { tabNoticeCount } from "./device-counts.mjs";
 import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
 import { getTabSession } from "./device-keys.mjs";
+import { stablePresenceInboxEntries } from "./device-presence-inbox-stability-core.mjs";
 import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { shouldShowCrossTabKeysNotice, shouldShowOrphanRemovedKeysNotice } from "./device-cross-tab-visibility.mjs";
-import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=34";
+import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=35";
+
+/** Coalesce multiple gather reads in one chrome refresh (Path G). */
+const GATHER_COALESCE_MS = 50;
+let lastGatherMs = 0;
+/** @type {ReturnType<typeof gatherInboxInput> | null} */
+let gatherCache = null;
+let crossTabShowStreak = 0;
+let orphanShowStreak = 0;
 
 export {
   buildGlanceRowPlan,
@@ -36,7 +45,7 @@ export {
   inboxBadgeChromaKind,
   inboxBadgeChromaClass,
   inboxBadgeChromaClassNames,
-} from "./device-inbox-core.mjs?v=34";
+} from "./device-inbox-core.mjs?v=35";
 
 function tabSessionLabel() {
   const session = getTabSession();
@@ -45,8 +54,21 @@ function tabSessionLabel() {
   return "This tab";
 }
 
+/** Invalidate gather cache (tests). */
+export function resetPresenceInboxGatherCache() {
+  gatherCache = null;
+  lastGatherMs = 0;
+  crossTabShowStreak = 0;
+  orphanShowStreak = 0;
+}
+
 /** @returns {Parameters<typeof buildInboxItems>[0]} */
 export function gatherInboxInput() {
+  const now = Date.now();
+  if (gatherCache && now - lastGatherMs <= GATHER_COALESCE_MS) {
+    return gatherCache;
+  }
+
   const cardDisabled = gatherCardDisabledSinceVisitForInbox().map((entry) => ({
     profile_id: entry.profile_id,
     label: entry.label,
@@ -55,18 +77,33 @@ export function gatherInboxInput() {
   const notices = tabNoticeCount();
   const crossTabRaw = getOtherTabsWithKeys();
   const orphanRaw = getOrphanRemovedTabsWithKeys();
-  return {
+
+  const crossTabStable = stablePresenceInboxEntries(
+    crossTabRaw,
+    notices,
+    shouldShowCrossTabKeysNotice,
+    crossTabShowStreak
+  );
+  crossTabShowStreak = crossTabStable.streak;
+
+  const orphanStable = stablePresenceInboxEntries(
+    orphanRaw,
+    notices,
+    shouldShowOrphanRemovedKeysNotice,
+    orphanShowStreak
+  );
+  orphanShowStreak = orphanStable.streak;
+
+  gatherCache = {
     tabNoticeCount: notices,
     liveProofCount: getLiveControlPendingCount(),
-    crossTabEntries: shouldShowCrossTabKeysNotice(crossTabRaw.length, notices)
-      ? crossTabRaw
-      : [],
-    orphanRemovedEntries: shouldShowOrphanRemovedKeysNotice(orphanRaw.length, notices)
-      ? orphanRaw
-      : [],
+    crossTabEntries: crossTabStable.entries,
+    orphanRemovedEntries: orphanStable.entries,
     tabSessionLabel: tabSessionLabel(),
     cardDisabledSinceVisit: cardDisabled,
   };
+  lastGatherMs = now;
+  return gatherCache;
 }
 
 /**
