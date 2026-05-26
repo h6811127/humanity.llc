@@ -167,6 +167,10 @@ body.page-flow.has-shell-chrome .page > main.screen {
   animation: brand-dot-pulse 2s ease-in-out infinite;
 }
 
+.pass-dot-status-network-ok.pass-dot-status-device-steward {
+  background: #22c55e;
+}
+
 @keyframes brand-dot-pulse {
   0%,
   100% {
@@ -628,6 +632,27 @@ body.page-flow.has-shell-chrome .page > main.screen {
   display: block;
   font-size: 12px;
   line-height: 1.25;
+}
+
+.hub-card-live {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.25;
+  color: var(--grey);
+}
+
+.hub-card-live--ok {
+  color: #1a6b32;
+}
+
+.hub-card-live--warn {
+  color: var(--red);
+}
+
+.hub-card-live--offline,
+.hub-card-live--muted {
+  color: var(--grey);
 }
 
 .hub-card-details {

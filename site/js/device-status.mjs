@@ -1,5 +1,6 @@
 /**
  * Floating status dot, notification badge, hub sheet host.
+ * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { buildStatusSegments, tabNoticeCount } from "./device-counts.mjs";
@@ -32,6 +33,7 @@ const DEVICE_CLASSES = [
   "pass-dot-status-device-none",
   "pass-dot-status-device-keys",
   "pass-dot-status-device-unsaved",
+  "pass-dot-status-device-steward",
 ];
 
 const dotBtn = document.getElementById("brand-status-dot-btn");
@@ -63,10 +65,43 @@ function hasUnsavedTabKeys() {
   return !isWalletSaved(session.profile_id);
 }
 
+function hasStewardVerification(record) {
+  const state = String(record?.verification?.state || "").toLowerCase();
+  const label = String(record?.verification?.label || "").toLowerCase();
+  return state === "steward" || label === "steward";
+}
+
+function hasStewardReadyKeys() {
+  const session = getTabSession();
+  if (session?.owner_private_key_b58 && hasStewardVerification(session)) return true;
+  return loadWallet().some(
+    (entry) => Boolean(entry?.owner_private_key_b58) && hasStewardVerification(entry)
+  );
+}
+
 function deviceState() {
   if (hasUnsavedTabKeys()) return "unsaved";
+  if (hasStewardReadyKeys()) return "steward";
   if (loadWallet().length > 0) return "keys";
   return "none";
+}
+
+function statusAriaLabel(network, device) {
+  const networkText =
+    network === "ok"
+      ? "resolver online"
+      : network === "degraded"
+        ? "resolver limited"
+        : "resolver offline";
+  const deviceText =
+    device === "unsaved"
+      ? "tab keys not saved"
+      : device === "steward"
+        ? "steward keys ready"
+        : device === "keys"
+          ? "saved keys on device"
+          : "no saved keys on device";
+  return `Status: ${networkText}, ${deviceText}.`;
 }
 
 export function notificationCount() {
@@ -108,6 +143,7 @@ function applyDot() {
     dot.classList.remove(...NETWORK_CLASSES, ...DEVICE_CLASSES);
     dot.classList.add(`pass-dot-status-network-${networkStatus}`);
     dot.classList.add(`pass-dot-status-device-${device}`);
+    dotBtn?.setAttribute("aria-label", statusAriaLabel(networkStatus, device));
   };
   if (
     !prefersReducedMotion() &&
@@ -142,6 +178,7 @@ function renderStatusKey() {
     <ul class="device-hub-status-key-list">
       <li>${statusKeyDot("#db1b43", true)} Pulsing red — default; tab keys not saved</li>
       <li>${statusKeyDot("#db1b43")} Solid red — saved keys on device</li>
+      <li>${statusKeyDot("#22c55e")} Bright green — steward keys ready on this device</li>
       <li>${statusKeyDot("#d97706")} Amber — resolver limited</li>
       <li>${statusKeyDot("#9ca3af")} Gray — resolver offline</li>
     </ul>`;
