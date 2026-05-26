@@ -13,17 +13,17 @@
 
 The scan page is **live resolver output** (Cloudflare Worker), not the static Pages site. Deploy with `npm run worker:deploy`. Pages deploy alone does not change `/c/…`.
 
-Response header when the new UI is live: `X-HC-Scan-UI: pass-v29` (or later). **`pass-v29`:** scan glance on page chrome dot (Phase 8.2) — eligible viewers tap for Now/Why/Next + in-page actions; strangers unchanged. **`pass-v28`:** progressive **viewer device** dot when vouch-ready (Phase 8.1). **`pass-v27`:** one “does not prove” disclosure (under “What this scan shows”); removed duplicate warning module; inbox sheet does not mount on scan pages. **`pass-v26`:** page chrome is **status dot only** (no frosted top bar, no `humanity.llc` text above the card). **`pass-v25`:** emphasized trust-tool rows (icon + peek + thicker summaries), “Check at scan time” section, trust groups above show-link/limits, shorter vouch explainer. **`pass-v24`:** omit empty trust groups; M5 live-object showcase seed + landing. **`pass-v23`:** scan-type heroes, trust modules, Phase 4 tests.
+Response header when the new UI is live: `X-HC-Scan-UI: pass-v30` (or later). **`pass-v30`:** scan dot motion polish (Phase 8.3) — one-shot hollow-ring attention, cross-tab overlay synced with `#scan-cross-tab-banner`, gray resolving ring, steward celebrate; reduced-motion safe. **`pass-v29`:** scan glance on page chrome dot (Phase 8.2). **`pass-v28`:** progressive **viewer device** dot when vouch-ready (Phase 8.1). **`pass-v27`:** one “does not prove” disclosure (under “What this scan shows”); removed duplicate warning module; inbox sheet does not mount on scan pages. **`pass-v26`:** page chrome is **status dot only** (no frosted top bar, no `humanity.llc` text above the card). **`pass-v25`:** emphasized trust-tool rows (icon + peek + thicker summaries), “Check at scan time” section, trust groups above show-link/limits, shorter vouch explainer. **`pass-v24`:** omit empty trust groups; M5 live-object showcase seed + landing. **`pass-v23`:** scan-type heroes, trust modules, Phase 4 tests.
 
 ---
 
 ## Layout
 
-### Shipped today (`pass-v29`)
+### Shipped today (`pass-v30`)
 
 `scan-html.ts` renders, top to bottom:
 
-1. **Page chrome** (`renderScanPageChrome` + `scan-page-dot.mjs`) - **status dot only** for strangers (home link). **Progressive viewer device** dot when vouch-ready (`scan-page-dot--dynamic`); tap opens **scan glance** (`#scan-page-dot-glance`) with scroll/use-keys actions — not the hub sheet. No frosted bar or `humanity.llc` wordmark in page chrome.
+1. **Page chrome** (`renderScanPageChrome` + `scan-page-dot.mjs`) - **status dot only** for strangers (home link). **Progressive viewer device** dot when vouch-ready (`scan-page-dot--dynamic`): hollow red ring for `ok`+`none`, one-shot attention pulse on enter, cross-tab overlay aligned with `#scan-cross-tab-banner`; tap opens **scan glance** (`#scan-page-dot-glance`) with scroll/use-keys actions — not the hub sheet. No frosted bar or `humanity.llc` wordmark in page chrome.
 2. **Live check hero** (`renderScanHeroSection`) - host + single status strip, H1 (manifesto / plate / `@handle` / failure copy), steward strip, trust pills on personal cards, resolver line, **Level 0 bearer line** (`scan-hero-limit`), detail chips, first-seen footnote, demoted QR (`scan-hero-qr`).
 3. **What this scan shows** (`renderScanTrustModules`) - bullet list only (active scans).
 4. **What this scan does not prove** (`renderLimitsSettings`) - single collapsible `<details id="scan-limits-settings">` directly under (3); no separate `scan-does-not-prove` warning card.
@@ -76,7 +76,7 @@ Track with [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Resolver UI 
 | **5** | Omit empty trust groups; M5 showcase seed + landing row | **Shipped** (`pass-v24`) - `pushTrustGroup`, `site:seed-showcase-live-object` |
 | **6** | Trust-tool emphasis (icons, peek, section kicker, layout) | **Shipped** (`pass-v25`) - `scan-trust-tools`, `scan-group-summary` |
 | **7** | Dot-only page chrome (remove white top bar + duplicate wordmark) | **Shipped** (`pass-v26`) - `renderScanPageChrome`, `.scan-page-chrome` |
-| **8** | Progressive device dot + scan glance (viewer state in chrome) | **Shipped** (`pass-v29`) - [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) |
+| **8** | Progressive device dot + scan glance (viewer state in chrome) | **Shipped** (`pass-v30`) - [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) Phases 8.1–8.3 |
 
 After `scan-pass.css` changes: `npm run worker:bundle-scan`.
 

@@ -133,6 +133,12 @@ Full inbox taxonomy, browser-alert roadmap, and implementation phases: [`DEVICE_
 - Tap scrolls to `#device-hub-saved-group`, not `openHubFromChrome()` hub toggle.
 - If user has steward keys but no active steward tasks, copy emphasizes readiness rather than urgency.
 
+### Public scan (`/c/…` Worker HTML)
+- **Not** the shell `#brand-status-dot-btn` graph. Page chrome uses `#scan-page-dot` (see [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md)).
+- **Shipped (`pass-v26`):** static brand-red dot → site home; hero describes the **scanned object**.
+- **Shipped (Phase 8, `pass-v30`):** same network × device × overlay model as this doc, but **progressive** (static for strangers). Eligible viewers: hollow red ring for `ok` + `none` with one-shot attention pulse, solid/green/steward per table above, overlays synced with `#scan-cross-tab-banner`, steward celebrate on transition. Tap opens **scan glance** (Now / Why / Next) — **not** hub sheet. See [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md).
+- Copy must distinguish **your device** vs hero **Live check** (object state).
+
 ---
 
 ## Accessibility and trust requirements

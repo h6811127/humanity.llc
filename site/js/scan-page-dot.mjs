@@ -2,10 +2,7 @@
  * Progressive viewer device dot on public scan pages (Phase 8).
  * @see docs/SCAN_PAGE_DEVICE_DOT.md
  */
-import {
-  crossTabPresenceActiveRaw,
-  setRefreshStatusSurfaces,
-} from "./device-chrome-refresh.mjs?v=38";
+import { setRefreshStatusSurfaces } from "./device-chrome-refresh.mjs?v=38";
 import {
   describeDotState,
   deviceStateFromContext,
@@ -14,6 +11,7 @@ import {
   dotStateKey,
   dotTransitionKey,
   hasStewardVerification,
+  shouldCelebrateStewardTransition,
   statusAriaLabel,
 } from "./device-dot-state-core.mjs?v=38";
 import { fetchResolverHealth } from "./device-network-health.mjs";
@@ -53,14 +51,19 @@ const OVERLAY_CLASSES = [
 ];
 const SCAN_DOT_MODIFIER = "scan-page-dot-device-none-eligible";
 const SCAN_NONE_ATTENTION_CLASS = "scan-page-dot-none-attention";
+const STEWARD_CELEBRATE_CLASS = "pass-dot-steward-celebrate";
 
 /** @type {"ok" | "degraded" | "offline"} */
 let networkStatus = "ok";
 let healthFetchInFlight = false;
+let networkResolved = false;
 let glanceBound = false;
 /** @type {string | null} */
 let lastDotTransitionKey = null;
+/** @type {{ device: "none" | "keys" | "unsaved" | "steward" } | null} */
+let lastDotSnapshot = null;
 let noneAttentionTimer = null;
+let stewardCelebrateTimer = null;
 
 function scanDotEl() {
   return document.getElementById("scan-page-dot");
@@ -366,11 +369,42 @@ function applyNoneAttentionPulse(dot, network, device, overlay) {
   }, 900);
 }
 
+function clearStewardCelebrate(dot) {
+  dot.classList.remove(STEWARD_CELEBRATE_CLASS);
+  if (stewardCelebrateTimer != null) {
+    clearTimeout(stewardCelebrateTimer);
+    stewardCelebrateTimer = null;
+  }
+}
+
+function applyStewardCelebrate(dot, network, device) {
+  clearStewardCelebrate(dot);
+  const previousDevice = lastDotSnapshot?.device ?? null;
+  if (
+    !shouldCelebrateStewardTransition({
+      network,
+      previousDevice,
+      nextDevice: device,
+      reducedMotion: prefersReducedMotion(),
+    })
+  ) {
+    return;
+  }
+  dot.classList.add(STEWARD_CELEBRATE_CLASS);
+  stewardCelebrateTimer = window.setTimeout(() => {
+    dot?.classList.remove(STEWARD_CELEBRATE_CLASS);
+    stewardCelebrateTimer = null;
+  }, 900);
+}
+
 function resetScanDotStatic(btn, dot) {
   closeScanGlance();
   lastDotTransitionKey = null;
+  lastDotSnapshot = null;
+  networkResolved = false;
   clearNoneAttentionPulse(dot);
-  btn.classList.remove("scan-page-dot--dynamic");
+  clearStewardCelebrate(dot);
+  btn.classList.remove("scan-page-dot--dynamic", "scan-page-dot--resolving");
   btn.removeAttribute("aria-expanded");
   btn.removeAttribute("aria-haspopup");
   btn.removeAttribute("aria-controls");
@@ -398,6 +432,10 @@ export function refreshScanPageDot() {
   const overlay = dotOverlayState();
 
   btn.classList.add("scan-page-dot--dynamic");
+  btn.classList.toggle(
+    "scan-page-dot--resolving",
+    !networkResolved && navigator.onLine !== false
+  );
   btn.setAttribute("aria-haspopup", "dialog");
   btn.setAttribute("aria-controls", "scan-page-dot-glance");
   btn.setAttribute("aria-expanded", isScanGlanceOpen() ? "true" : "false");
@@ -414,7 +452,9 @@ export function refreshScanPageDot() {
   }
 
   applyNoneAttentionPulse(dot, network, device, overlay);
+  applyStewardCelebrate(dot, network, device);
   lastDotTransitionKey = dotTransitionKey(network, device, overlay);
+  lastDotSnapshot = { device };
 
   const stateKey = dotStateKey(network, device);
   dot.dataset.dotState = stateKey;
@@ -438,6 +478,7 @@ async function refreshResolverHealth() {
     }
   } finally {
     healthFetchInFlight = false;
+    networkResolved = true;
     refreshScanPageDot();
   }
 }
@@ -445,9 +486,11 @@ async function refreshResolverHealth() {
 function onConnectivityChange() {
   if (navigator.onLine === false) {
     networkStatus = "offline";
+    networkResolved = true;
     refreshScanPageDot();
     return;
   }
+  networkResolved = false;
   void refreshResolverHealth();
 }
 

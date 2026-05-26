@@ -85,7 +85,7 @@ async function renderActiveShowcaseScan(
 
 /** M5 / SCANNER_EXPERIENCE - shared stranger-path invariants. */
 function expectM5StrangerScanBasics(html: string) {
-  expect(SCAN_UI_VERSION).toMatch(/^pass-v2\d+$/);
+  expect(SCAN_UI_VERSION).toMatch(/^pass-v\d+$/);
   expect(html).not.toContain("This QR is active");
   expect(html).not.toContain('class="section-kicker">Network status');
   expect(html).toContain("scan-proves");
