@@ -4,7 +4,9 @@
  */
 import { getInboxItems } from "./device-inbox.mjs";
 import { inboxItemsIncludeKind, inboxWalletEntryLabel } from "./device-inbox-core.mjs";
-import { getTabSession } from "./device-keys.mjs";
+import { getTabSession, openCardNowPage } from "./device-keys.mjs";
+import { loadWallet } from "./device-wallet.mjs";
+import { CARD_DISABLED_SINCE_VISIT_ALERT_TEXT } from "./wallet-network-baseline.mjs";
 import { openSaveKeysForThisTab } from "./device-notice-nav.mjs";
 import {
   formatLiveControlExpiry,
@@ -24,6 +26,8 @@ function escapeHtml(s) {
  *   noticeGroup: HTMLElement | null,
  *   liveControlGroup: HTMLElement | null,
  *   liveControlList: HTMLElement | null,
+ *   cardDisabledGroup: HTMLElement | null,
+ *   cardDisabledList: HTMLElement | null,
  *   noticeMode: 'created-url' | 'keys-strip',
  *   showLiveControlInbox: boolean,
  * }} ctx
@@ -33,6 +37,8 @@ export function renderHubInboxAlerts(ctx) {
     noticeGroup,
     liveControlGroup,
     liveControlList,
+    cardDisabledGroup,
+    cardDisabledList,
     noticeMode,
     showLiveControlInbox,
   } = ctx;
@@ -48,6 +54,72 @@ export function renderHubInboxAlerts(ctx) {
     inboxItemsIncludeKind(items, "tab_keys_unsaved"),
     noticeMode
   );
+  renderCardDisabledHubGroup(
+    cardDisabledGroup,
+    cardDisabledList,
+    inboxItemsIncludeKind(items, "card_disabled_since_visit"),
+    items
+  );
+}
+
+/**
+ * @param {import("./device-inbox-core.mjs").InboxItem[]} items
+ */
+function cardDisabledEntriesFromItems(items) {
+  const item = items.find((i) => i.kind === "card_disabled_since_visit");
+  return item?.meta?.cardDisabledEntries ?? [];
+}
+
+/**
+ * @param {HTMLElement | null} group
+ * @param {HTMLElement | null} list
+ * @param {boolean} show
+ * @param {import("./device-inbox-core.mjs").InboxItem[]} items
+ */
+function renderCardDisabledHubGroup(group, list, show, items) {
+  if (!group || !list) {
+    if (group) group.hidden = true;
+    return;
+  }
+
+  list.innerHTML = "";
+  if (!show) {
+    group.hidden = true;
+    return;
+  }
+
+  const entries = cardDisabledEntriesFromItems(items);
+  if (entries.length === 0) {
+    group.hidden = true;
+    return;
+  }
+
+  group.hidden = false;
+  const sub = CARD_DISABLED_SINCE_VISIT_ALERT_TEXT;
+
+  for (const card of entries) {
+    const label = inboxWalletEntryLabel(card);
+    const li = document.createElement("li");
+    li.className = "list-row list-action device-hub-card-disabled-row";
+    li.dataset.hubSearchable =
+      `card disabled since last visit ${label} ${card.profile_id || ""}`.toLowerCase();
+    li.innerHTML = `
+      <button type="button" class="device-hub-card-disabled-open">
+        <span class="list-icon list-icon-tone-red" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/></svg>
+        </span>
+        <span class="list-content">
+          <span class="list-title">${escapeHtml(label)}</span>
+          <span class="list-sub">${escapeHtml(sub)}</span>
+        </span>
+        <span class="list-chevron" aria-hidden="true">›</span>
+      </button>`;
+    li.querySelector(".device-hub-card-disabled-open")?.addEventListener("click", () => {
+      const entry = loadWallet().find((e) => e.profile_id === card.profile_id);
+      if (entry) openCardNowPage(entry);
+    });
+    list.appendChild(li);
+  }
 }
 
 /**

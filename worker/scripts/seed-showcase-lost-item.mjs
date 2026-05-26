@@ -1,12 +1,9 @@
 /**
- * Creates a public live-object showcase card and writes site/data/showcase-live-object.json
- *
- * Initial QR uses scope `card` (create API rule). Live-object hero comes from a long
- * single-line manifesto (`manifesto-display.ts`), not print_artifact scope.
+ * Creates a public lost-item relay showcase card and writes site/data/showcase-lost-item.json
  *
  * Usage:
- *   API_ORIGIN=https://humanity.llc npm run site:seed-showcase-live-object
- *   API_ORIGIN=http://127.0.0.1:8787 npm run site:seed-showcase-live-object
+ *   API_ORIGIN=https://humanity.llc npm run site:seed-showcase-lost-item
+ *   API_ORIGIN=http://127.0.0.1:8787 npm run site:seed-showcase-lost-item
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -20,7 +17,7 @@ const PROTOCOL_VERSION = "1.0";
 const apiOrigin = process.env.API_ORIGIN || "https://humanity.llc";
 const outPath = join(
   dirname(fileURLToPath(import.meta.url)),
-  "../../site/data/showcase-live-object.json"
+  "../../site/data/showcase-lost-item.json"
 );
 
 function encodeBase58(bytes) {
@@ -61,9 +58,8 @@ async function main() {
   const profileId = randomBase58(24);
   const qrId = `qr_${randomBase58(16)}`;
   const now = new Date().toISOString();
-  const handle = "tool_library_showcase";
-  const manifesto =
-    "Neighborhood tool library · Closed for inventory until Tuesday";
+  const handle = "keys_relay_showcase";
+  const manifesto = "[relay] House keys\nLost — contact owner through relay";
   const scanUrl = `${apiOrigin.replace(/\/$/, "")}/c/${profileId}?q=${qrId}`;
   const expiresAt = new Date(now);
   expiresAt.setUTCFullYear(expiresAt.getUTCFullYear() + 2);
@@ -131,11 +127,11 @@ async function main() {
     profile_id: profileId,
     qr_id: qrId,
     handle,
-    label: "Live object · tool library hours",
+    label: "Lost item · House keys relay",
     manifesto_line: manifesto,
     scan_url: scanUrl,
     created_at: now,
-    note: "M5 stranger-test live object showcase — owner key not stored.",
+    note: "M5 stranger-test lost-item relay showcase — owner key not stored.",
   };
 
   mkdirSync(dirname(outPath), { recursive: true });

@@ -2723,20 +2723,25 @@ a.hub-card-menu-item {
   content: "● ";
 }
 
-/* QR  -  tight neutral frame, no glow */
+/* QR  -  signed Humanity frame (see docs/QR_BRANDING.md) */
 .pass-qr {
   flex-shrink: 0;
   line-height: 0;
-  padding: 5px;
-  background: var(--white);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
 }
 
-.pass-qr img {
+.pass-qr img,
+.hc-qr-frame-svg {
   width: 88px;
-  height: 88px;
+  height: auto;
   display: block;
+}
+
+.hc-qr-frame {
+  line-height: 0;
 }
 
 .pass-foot {

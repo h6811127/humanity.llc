@@ -66,9 +66,10 @@ npm run worker:test -- worker/tests/qr-scan-url-lock.test.ts
 
 - [ ] `/created/` preview QR shows red modules + faint concentric circles (no white square).
 - [ ] Download PNG matches preview.
-- [ ] `/c/{profile_id}?q=…` pass card QR matches (Worker SVG).
+- [x] `/c/{profile_id}?q=…` pass card QR matches (Worker SVG) — `scan-pass.css` + `scan-qr-branding.test.ts`.
 - [ ] Phone scan succeeds at 220px display size and at downloaded 512px PNG.
-- [ ] `npm run worker:test` — `scan-qr-branding.test.ts` passes.
+- [x] `npm run worker:test` — `scan-qr-branding.test.ts` passes.
+- [x] Site pass preview CSS (`styles.css` `.pass-qr`) accepts `hc-qr-frame-svg` markup (aligned with `scan-pass.css`).
 
 ```bash
 npm run worker:test -- worker/tests/scan-qr-branding.test.ts

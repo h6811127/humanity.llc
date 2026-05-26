@@ -179,6 +179,8 @@ function setRevokedSinceVisitAlertVisible(li, profileId, show) {
 let savedGroup;
 let liveControlGroup;
 let liveControlList;
+let cardDisabledGroup;
+let cardDisabledList;
 let savedList;
 let pinsGroup;
 let pinsList;
@@ -502,6 +504,8 @@ function syncHubInboxAlertGroups() {
     noticeGroup,
     liveControlGroup,
     liveControlList,
+    cardDisabledGroup,
+    cardDisabledList,
     noticeMode: hubConfig.noticeMode,
     showLiveControlInbox: hubConfig.showLiveControlInbox,
   });
@@ -962,8 +966,14 @@ function notifyHubChanged() {
 function applySearchFilter() {
   const q = searchInput?.value ?? "";
   const { matchCount } = applyDeviceHubSearch(deviceHub, q);
-  if (hubConfig.showLiveControlInbox && liveControlGroup && !q.trim()) {
-    liveControlGroup.hidden = !inboxItemsIncludeKind(getInboxItems(), "live_proof");
+  if (!q.trim()) {
+    const items = getInboxItems();
+    if (hubConfig.showLiveControlInbox && liveControlGroup) {
+      liveControlGroup.hidden = !inboxItemsIncludeKind(items, "live_proof");
+    }
+    if (cardDisabledGroup) {
+      cardDisabledGroup.hidden = !inboxItemsIncludeKind(items, "card_disabled_since_visit");
+    }
   }
   refreshEmptyHint();
 
@@ -1010,6 +1020,8 @@ function bindDom() {
   noticeGroup = hubEl("device-hub-notice-group");
   liveControlGroup = hubEl("device-hub-live-control-group");
   liveControlList = hubEl("device-hub-live-control-list");
+  cardDisabledGroup = hubEl("device-hub-card-disabled-group");
+  cardDisabledList = hubEl("device-hub-card-disabled-list");
   activityGroup = hubEl("device-hub-activity-group");
   activityList = hubEl("device-hub-activity-list");
   searchInput = hubEl("device-hub-search");
