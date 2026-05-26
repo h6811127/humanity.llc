@@ -53,6 +53,7 @@ npm run deploy
 | `js/card-wallet.mjs` | Wallet CRUD + pin form |
 | `case-study/index.html` | Recruiter walkthrough: create → scan → update → revoke → live control |
 | `data/showcase-status-plate.json` | Live public status-plate scan for homepage pilot |
+| `data/showcase-live-object.json` | Live public live-object scan for M5 / landing (seed script) |
 | `create/index.html` | Create card UI at `/create/` |
 | `created/index.html` | Post-create QR + scan link + owner revoke (session key) |
 | `js/create-card.mjs`, `js/hc-sign.mjs` | Browser signing + POST to resolver |

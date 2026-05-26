@@ -1,0 +1,10 @@
+{
+  "profile_id": "",
+  "qr_id": "",
+  "handle": "tool_library_showcase",
+  "label": "Live object · tool library hours",
+  "manifesto_line": "Neighborhood tool library · Closed for inventory until Tuesday",
+  "scan_url": "",
+  "created_at": "",
+  "note": "Run npm run site:seed-showcase-live-object to publish a live scan URL for M5 / landing."
+}

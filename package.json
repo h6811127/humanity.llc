@@ -19,7 +19,8 @@
     "e2e": "playwright test",
     "e2e:install": "playwright install chromium",
     "site:vendor-qr": "esbuild node_modules/qrcode/lib/browser.js --bundle --format=esm --platform=browser --outfile=site/js/vendor/qrcode.mjs",
-    "site:seed-showcase": "node worker/scripts/seed-showcase-status-plate.mjs"
+    "site:seed-showcase": "node worker/scripts/seed-showcase-status-plate.mjs",
+    "site:seed-showcase-live-object": "node worker/scripts/seed-showcase-live-object.mjs"
   },
   "dependencies": {
     "@noble/ed25519": "^2.3.0",

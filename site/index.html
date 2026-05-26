@@ -27,7 +27,7 @@
       })();
     </script>
     <link rel="stylesheet" href="/styles.css?v=88" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=30" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=33" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=4" />
     <meta property="og:title" content="humanity.llc" />
     <meta
@@ -551,8 +551,20 @@
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
                 </span>
                 <span class="list-content">
-                  <span class="list-title">Try a live scan</span>
+                  <span class="list-title">Try a status plate scan</span>
                   <span class="list-sub" id="one-use-live-scan-sub">Public status plate on the network</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action" id="one-use-live-object-scan-row" hidden>
+              <a id="one-use-live-object-scan-link" href="#">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Try a live object scan</span>
+                  <span class="list-sub" id="one-use-live-object-scan-sub">Public live object on the network</span>
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </a>
@@ -865,5 +877,6 @@
     <script src="/js/landing-progress.mjs?v=2" type="module"></script>
     <script src="/js/landing-device-hub.mjs?v=13" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=2" type="module"></script>
+    <script src="/js/landing-showcase-live-object.mjs?v=1" type="module"></script>
   </body>
 </html>
