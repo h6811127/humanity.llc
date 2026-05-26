@@ -3,7 +3,7 @@
 **Date:** 2026-05-25  
 **Status:** **Closed** — root cause confirmed (client-side); fixes + regression gates shipped (Slices 1–8 in [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md))  
 **Scope:** Saved-card hub rows on `/`, `/wallet/`, `/created/` — not Worker resolver logic unless `scan.kind` truly disagrees  
-**Related audits:** [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md) (DH-1–DH-4), [`DEVICE_OS.md`](DEVICE_OS.md) § Card disabled since last visit, [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P1  
+**Related audits:** [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md) (DH-1–DH-15, Slices 1–8), [`DEVICE_OS.md`](DEVICE_OS.md) § Card disabled since last visit, [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P1 / P5b  
 
 ---
 
@@ -220,6 +220,7 @@ Production observation proved resolver **`active`** while banner showed — **cl
 | `resolverConfirmed: false` despite `card_revoked` alert state | `worker/tests/wallet-network.test.ts` § `listCardDisabledSinceVisit` |
 | Stale cache + active fetch integration | `worker/tests/wallet-network.test.ts` § `stale cache + active fetch` |
 | Hub pipeline → inbox | `worker/tests/device-hub-frontend-pipeline.test.ts` |
+| Slice 8 closure regression gates | `worker/tests/card-disabled-since-visit-regression.test.ts` |
 | `buildResolverConfirmedWalletPollMaps` | `worker/tests/device-wallet-network-confirmed.test.ts` |
 | E2E active resolver, stale cache, multi-card Got it / Open controls | `e2e/device-os-wallet.spec.ts` |
 | E2E stale cache + active resolver → no inbox badge/hub group | `e2e/device-inbox.spec.ts` |
@@ -227,9 +228,11 @@ Production observation proved resolver **`active`** while banner showed — **cl
 Run:
 
 ```bash
-npm run worker:test -- worker/tests/wallet-network.test.ts worker/tests/device-wallet-network-confirmed.test.ts worker/tests/card-disabled-since-visit-regression.test.ts
-npm run e2e -- e2e/device-os-wallet.spec.ts e2e/device-inbox.spec.ts
+npm run worker:test:card-disabled-since-visit
+npm run e2e:card-disabled-since-visit
 ```
+
+CI: `.github/workflows/test-site.yml` runs full `npm run worker:test` and device shell E2E (includes the files above).
 
 ---
 
@@ -270,3 +273,17 @@ Per the AI prompt at the bottom of the first investigation draft:
 - `worker/tests/card-disabled-since-visit-regression.test.ts` documents end-to-end client gates (cache bypass, inbox list, glance suffix).
 - Vitest: `gatherCardDisabledSinceVisitForInbox()` empty after active poll with stale `hc_wallet_network_cache`.
 - **Production verify:** hard-refresh; confirm `scan.kind === active` on status fetches; clear `hc_wallet_network_cache` if a device still shows stale UI.
+
+---
+
+## Post-closure (no further repair slices)
+
+Engineering for this incident is **complete** (Slices 1–8 in [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md)). Do not add Slice 9 unless production reproduces the false positive on current `main`.
+
+| Step | Action |
+|------|--------|
+| 1 | Run `npm run worker:test:card-disabled-since-visit` and `npm run e2e:card-disabled-since-visit` before release. |
+| 2 | After deploy, hard-refresh; use § “If you still see the bug” (resolver `scan.kind`, storage keys). |
+| 3 | New false positive on fixed bundle → file regression in Vitest/E2E, then reopen investigation (do not patch without repro). |
+
+**Unrelated optional hardening:** status-dot load blast radius — [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) P2 (lazy inbox sheet import).

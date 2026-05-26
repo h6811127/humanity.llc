@@ -263,6 +263,8 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 **Out of scope:** Worker resolver changes; server-side mass revoke investigation (per-card `GET …/status?q=` only).
 
+**Post-closure:** No Slice 9. Production verify + `npm run worker:test:card-disabled-since-visit` / `npm run e2e:card-disabled-since-visit` per [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) § Post-closure.
+
 ---
 
 ## Done when (Device hub overall)
