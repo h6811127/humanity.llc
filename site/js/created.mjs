@@ -26,6 +26,7 @@ import {
   restoreKeysStripToControlPanel,
 } from "./created-workspace.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
+import { isWalletSaved, saveSessionToWallet } from "./device-wallet.mjs";
 import { applyHumanTrustIconToElement } from "./human-trust-ui.mjs";
 
 const params = new URLSearchParams(location.search);
@@ -610,10 +611,23 @@ async function refreshNetworkStatus() {
     if (scan.human_trust) {
       applyHumanTrustDisplay(scan.human_trust, scan.verification);
     }
-    if (data && qrExpires) {
-      const next = { ...data, qr_expires_at: qrExpires };
-      saveSession(next);
-      data = next;
+    if (data) {
+      const next = {
+        ...data,
+        ...(qrExpires ? { qr_expires_at: qrExpires } : {}),
+        ...(scan.verification ? { verification: scan.verification } : {}),
+      };
+      if (
+        next.qr_expires_at !== data.qr_expires_at ||
+        JSON.stringify(next.verification) !== JSON.stringify(data.verification)
+      ) {
+        saveSession(next);
+        data = next;
+        if (profileId && isWalletSaved(profileId)) {
+          saveSessionToWallet(data, "");
+        }
+        deviceSaveCtl?.refresh?.();
+      }
     }
   } catch {
     /* keep session copy if fetch fails */

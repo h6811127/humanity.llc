@@ -218,7 +218,7 @@ Network refresh for dot coloring uses `device-os-coordinator.mjs` (`DEVICE_OS_RE
 
 ## Resolved decisions (v1)
 
-- **Steward detection:** `verification.state === "steward"` or `verification.label === "Steward"` on tab session (`hc_created`) or wallet entries (`hc_wallet`), via `hasStewardVerification()` / `hasStewardReadyKeys()` in the device shell.
+- **Steward detection:** `verification.state === "steward"` or `verification.label === "Steward"` on tab session (`hc_created`) or wallet entries (`hc_wallet`), via `hasStewardVerification()` / `hasStewardReadyKeys()` in the device shell. Re-saving merges fresh `verification` from the tab session (`mergeWalletEntryFromSession`); `/created/` syncs resolver verification into session and wallet on status refresh.
 - **Unsaved vs steward:** `deviceStateFromContext` prioritizes `unsaved` over `steward` (tab keys not saved wins).
 - **Steward queue action:** deep-link from `#steward-review-details a[href]` on `/created/` when visible; otherwise "Open controls."
 - **Green token:** `#22c55e` (`pass-dot-status-device-steward` under network-ok).

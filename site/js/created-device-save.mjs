@@ -40,6 +40,12 @@ export function initCreatedDeviceSave(getSession) {
       }
     }
     const saved = isWalletSaved(session.profile_id);
+    if (saved) {
+      const sync = saveSessionToWallet(session, labelInput?.value ?? "");
+      if (sync.ok && sync.updated) {
+        window.dispatchEvent(new Event("hc-device-hub-changed"));
+      }
+    }
     if (saved && form && doneEl) {
       form.hidden = true;
       doneEl.hidden = false;
@@ -65,7 +71,11 @@ export function initCreatedDeviceSave(getSession) {
       return false;
     }
     setStatus(
-      result.already ? "Already saved on this device." : "Saved on this device.",
+      result.already
+        ? "Already saved on this device."
+        : result.updated
+          ? "Updated saved keys on this device."
+          : "Saved on this device.",
       false
     );
     if (!result.already) {

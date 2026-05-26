@@ -134,9 +134,55 @@ export function defaultWalletLabel(session) {
 }
 
 /**
+ * @param {Record<string, unknown>} entry
+ */
+function walletEntrySyncSignature(entry) {
+  return JSON.stringify({
+    verification: entry.verification ?? null,
+    owner_private_key_b58: entry.owner_private_key_b58 ?? null,
+    owner_public_key_b58: entry.owner_public_key_b58 ?? null,
+    status: entry.status ?? null,
+    qr_id: walletEntryQrId(entry),
+    scan_url: entry.scan_url ?? null,
+    handle: entry.handle ?? null,
+  });
+}
+
+/**
+ * Refresh an existing wallet row from the active tab session (keys, verification, scan metadata).
+ * @param {Record<string, unknown>} existing
  * @param {Record<string, unknown>} session
  * @param {string} [label]
- * @returns {{ ok: true } | { error: string }}
+ */
+export function mergeWalletEntryFromSession(existing, session, label = "") {
+  const trimmed = label.trim();
+  const qrId = session.qr_id ?? walletEntryQrId(session) ?? existing.qr_id;
+  return {
+    ...existing,
+    label: trimmed || existing.label,
+    handle: session.handle ?? existing.handle,
+    manifesto_line: session.manifesto_line ?? existing.manifesto_line,
+    pilot_template: session.pilot_template ?? existing.pilot_template,
+    scan_url: session.scan_url ?? existing.scan_url,
+    qr_id: qrId,
+    owner_public_key_b58: session.owner_public_key_b58 ?? existing.owner_public_key_b58,
+    owner_private_key_b58: session.owner_private_key_b58 ?? existing.owner_private_key_b58,
+    recovery_public_key_b58:
+      session.recovery_public_key_b58 ?? existing.recovery_public_key_b58,
+    recovery_private_key_b58:
+      session.recovery_private_key_b58 ?? existing.recovery_private_key_b58,
+    qr_expires_at: session.qr_expires_at ?? existing.qr_expires_at,
+    status: session.status ?? existing.status,
+    verification: session.verification ?? existing.verification,
+    issued_vouches: session.issued_vouches ?? existing.issued_vouches,
+    saved_at: new Date().toISOString(),
+  };
+}
+
+/**
+ * @param {Record<string, unknown>} session
+ * @param {string} [label]
+ * @returns {{ ok: true, already?: boolean, updated?: boolean } | { error: string }}
  */
 export function saveSessionToWallet(session, label = "") {
   if (!session?.profile_id || !session?.owner_private_key_b58) {
@@ -145,20 +191,14 @@ export function saveSessionToWallet(session, label = "") {
   const entries = loadWallet();
   const idx = entries.findIndex((e) => e.profile_id === session.profile_id);
   if (idx >= 0) {
-    const trimmed = label.trim();
-    if (trimmed && trimmed !== entries[idx].label) {
-      entries[idx] = {
-        ...entries[idx],
-        label: trimmed,
-        handle: session.handle ?? entries[idx].handle,
-        manifesto_line: session.manifesto_line ?? entries[idx].manifesto_line,
-        pilot_template: session.pilot_template ?? entries[idx].pilot_template,
-        saved_at: new Date().toISOString(),
-      };
-      saveWallet(entries);
-      return { ok: true, updated: true };
+    const before = walletEntrySyncSignature(entries[idx]);
+    const merged = mergeWalletEntryFromSession(entries[idx], session, label);
+    if (walletEntrySyncSignature(merged) === before) {
+      return { ok: true, already: true };
     }
-    return { ok: true, already: true };
+    entries[idx] = merged;
+    saveWallet(entries);
+    return { ok: true, updated: true };
   }
   entries.unshift(walletEntryFromSession(session, label));
   saveWallet(entries);
