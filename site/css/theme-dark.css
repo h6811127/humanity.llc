@@ -278,14 +278,6 @@ html[data-theme="dark"] .hub-card-status--warn .hub-card-status-dot {
   box-shadow: 0 0 0 2px rgba(255, 69, 58, 0.28);
 }
 
-html[data-theme="dark"] .hub-card-menu-section-label {
-  color: var(--shell-label);
-}
-
-html[data-theme="dark"] .hub-card-menu-divider {
-  background: var(--shell-separator);
-}
-
 html[data-theme="dark"] .hub-card-details-summary {
   color: #0a84ff;
 }

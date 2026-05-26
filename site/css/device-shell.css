@@ -1387,12 +1387,11 @@ button.hub-card-action.hub-use-keys {
 }
 
 .hub-card-menu-panel {
-  border: none;
   border-radius: var(--shell-radius-control);
-  background: rgba(255, 255, 255, 0.96);
+  background: var(--surface-popover-bg, #ffffff);
+  color: var(--surface-popover-fg, #1c1c1e);
+  border: 0.5px solid var(--surface-popover-border, rgba(60, 60, 67, 0.12));
   box-shadow: var(--shell-shadow-md);
-  -webkit-backdrop-filter: var(--shell-chrome-blur);
-  backdrop-filter: var(--shell-chrome-blur);
 }
 
 .device-hub-glance-btn {
