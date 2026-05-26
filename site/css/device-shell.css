@@ -1418,6 +1418,24 @@ button.hub-card-action.hub-use-keys {
 .device-hub.device-hub--sheet.device-hub-collapsed {
   pointer-events: none;
   visibility: hidden;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  contain: strict;
+}
+
+/* Collapsed/off-screen sheet: skip GPU blur during document scroll (WebKit landing jank). */
+@media (pointer: coarse) {
+  .device-hub.device-hub--sheet {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(250, 250, 252, 0.98);
+  }
+
+  .device-hub-glance-popover {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(255, 255, 255, 0.98);
+  }
 }
 
 .device-hub.device-hub--sheet.device-hub-collapsed .device-hub-body {

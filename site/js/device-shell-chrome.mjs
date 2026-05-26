@@ -92,8 +92,11 @@ function initScrollEdgeChrome() {
 export function initShellChrome() {
   if (!chrome) return;
   document.body.classList.add("has-shell-chrome");
-  if (!shouldAttachDocumentScrollChromeEffects()) {
+  const scrollEffects = shouldAttachDocumentScrollChromeEffects();
+  if (!scrollEffects) {
     document.body.classList.add("shell-scroll-chrome-off");
+    syncShellChromeInset();
+    return;
   }
   syncShellChromeInset();
   initScrollEdgeChrome();

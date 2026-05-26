@@ -222,8 +222,8 @@ Only if **[`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P0-W** fails after P0–P2 + 3
 
 | Option | Status | Description |
 |--------|--------|-------------|
-| **C. Feature flag** | ✅ Shipped | `localStorage hc_shell_scroll_chrome=0` disables desktop scroll-edge chrome after reload |
-| **A. CSS-only chrome** | Pending | Drop `scroll` listener; use `position: sticky` bar without `edge-hidden` JS |
+| **C. Feature flag** | ✅ Shipped (inverted) | Scroll-edge chrome **off** unless `hc_shell_scroll_chrome=1`; default is no document scroll listener |
+| **A. CSS-only chrome** | Partial ✅ | Scroll listener removed by default (3A); sticky bar polish optional later |
 | **B. Separate scroll roots** | Pending | Move landing into a scroll container; keep chrome outside (like hub body) |
 
 ---
@@ -260,12 +260,15 @@ Only if **[`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P0-W** fails after P0–P2 + 3
 })();
 ```
 
-**Kill scroll chrome (Phase 3C — persists until cleared):**
+**Scroll-edge chrome (Phase 3A — off by default):** No document `scroll` listener unless opted in. Landing should scroll without `shell-is-scrolling` / `top-chrome--edge-hidden` toggling.
 
 ```js
-localStorage.setItem("hc_shell_scroll_chrome", "0");
+// Re-enable desktop scroll-edge experiment (not recommended on WebKit):
+localStorage.setItem("hc_shell_scroll_chrome", "1");
 location.reload();
-// Re-enable: localStorage.removeItem("hc_shell_scroll_chrome"); location.reload();
+// Default: remove key or set "0"
+localStorage.removeItem("hc_shell_scroll_chrome");
+location.reload();
 ```
 
 **One-off devtools cleanup (without reload):**

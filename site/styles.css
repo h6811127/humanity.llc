@@ -4114,6 +4114,14 @@ body.landing-focus-mode .screen-landing {
   -webkit-backdrop-filter: blur(14px);
 }
 
+@media (pointer: coarse) {
+  .device-hub-search-drawer {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: #fff;
+  }
+}
+
 .device-hub-search-float--landing:not(.is-expanded) .device-hub-search-drawer {
   display: none !important;
 }

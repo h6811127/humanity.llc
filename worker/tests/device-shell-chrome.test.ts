@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  isShellScrollChromeForceDisabled,
+  isShellScrollChromeOptInEnabled,
   shouldAttachDocumentScrollChromeEffects,
 } from "../../site/js/device-shell-chrome-core.mjs";
 
@@ -20,58 +20,76 @@ function mockMatchMedia(queries) {
   };
 }
 
+function mockLocalStorage(value) {
+  const prev = globalThis.localStorage;
+  // @ts-expect-error test mock
+  globalThis.localStorage = {
+    getItem(key) {
+      return value[key] ?? null;
+    },
+  };
+  return () => {
+    globalThis.localStorage = prev;
+  };
+}
+
 describe("device-shell-chrome-core", () => {
   it("shouldAttachDocumentScrollChromeEffects is false without matchMedia", () => {
+    const restoreStorage = mockLocalStorage({ hc_shell_scroll_chrome: "1" });
     const prev = globalThis.matchMedia;
     // @ts-expect-error test override
     globalThis.matchMedia = undefined;
     expect(shouldAttachDocumentScrollChromeEffects()).toBe(false);
     globalThis.matchMedia = prev;
+    restoreStorage();
   });
 
-  it("enables scroll-edge chrome only for fine pointer + hover", () => {
-    const restore = mockMatchMedia({
-      "(pointer: fine)": true,
-      "(hover: hover)": true,
-    });
-    expect(shouldAttachDocumentScrollChromeEffects()).toBe(true);
-    restore();
-  });
-
-  it("disables scroll-edge chrome for coarse pointer (touch / iOS)", () => {
-    const restore = mockMatchMedia({
-      "(pointer: fine)": false,
-      "(hover: hover)": true,
-    });
-    expect(shouldAttachDocumentScrollChromeEffects()).toBe(false);
-    restore();
-  });
-
-  it("disables scroll-edge chrome when hover is not available", () => {
-    const restore = mockMatchMedia({
-      "(pointer: fine)": true,
-      "(hover: hover)": false,
-    });
-    expect(shouldAttachDocumentScrollChromeEffects()).toBe(false);
-    restore();
-  });
-
-  it("disables scroll-edge chrome when localStorage kill switch is set (Phase 3C)", () => {
+  it("scroll-edge chrome is off by default (Phase 3A)", () => {
+    const restoreStorage = mockLocalStorage({});
     const restoreMedia = mockMatchMedia({
       "(pointer: fine)": true,
       "(hover: hover)": true,
+      "(pointer: coarse)": false,
     });
-    const storage = { hc_shell_scroll_chrome: "0" };
-    const prev = globalThis.localStorage;
-    // @ts-expect-error test mock
-    globalThis.localStorage = {
-      getItem(key) {
-        return storage[key] ?? null;
-      },
-    };
-    expect(isShellScrollChromeForceDisabled()).toBe(true);
+    expect(isShellScrollChromeOptInEnabled()).toBe(false);
     expect(shouldAttachDocumentScrollChromeEffects()).toBe(false);
-    globalThis.localStorage = prev;
     restoreMedia();
+    restoreStorage();
+  });
+
+  it("enables scroll-edge chrome only when opt-in and fine pointer + hover", () => {
+    const restoreStorage = mockLocalStorage({ hc_shell_scroll_chrome: "1" });
+    const restoreMedia = mockMatchMedia({
+      "(pointer: fine)": true,
+      "(hover: hover)": true,
+      "(pointer: coarse)": false,
+    });
+    expect(shouldAttachDocumentScrollChromeEffects()).toBe(true);
+    restoreMedia();
+    restoreStorage();
+  });
+
+  it("disables scroll-edge chrome for coarse pointer even when opt-in", () => {
+    const restoreStorage = mockLocalStorage({ hc_shell_scroll_chrome: "1" });
+    const restoreMedia = mockMatchMedia({
+      "(pointer: fine)": false,
+      "(hover: hover)": true,
+      "(pointer: coarse)": true,
+    });
+    expect(shouldAttachDocumentScrollChromeEffects()).toBe(false);
+    restoreMedia();
+    restoreStorage();
+  });
+
+  it("disables scroll-edge chrome when hover is not available", () => {
+    const restoreStorage = mockLocalStorage({ hc_shell_scroll_chrome: "1" });
+    const restoreMedia = mockMatchMedia({
+      "(pointer: fine)": true,
+      "(hover: hover)": false,
+      "(pointer: coarse)": false,
+    });
+    expect(shouldAttachDocumentScrollChromeEffects()).toBe(false);
+    restoreMedia();
+    restoreStorage();
   });
 });
