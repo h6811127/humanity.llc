@@ -2,8 +2,13 @@
  * Floating status dot, notification badge, hub sheet host.
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
-import { resolverApiOrigin } from "./hc-sign.mjs";
 import { buildStatusSegments, tabNoticeCount } from "./device-counts.mjs";
+import {
+  DEVICE_OS_REFRESHED,
+  getCoordinatorNetworkStatus,
+  initDeviceOsCoordinator,
+  requestDeviceOsRefresh,
+} from "./device-os-coordinator.mjs";
 import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
@@ -21,6 +26,15 @@ import "./device-theme.mjs";
 import "./device-browser-notifications.mjs";
 import { isHubSheet, setHubSheetOpen } from "./device-hub-sheet.mjs";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
+import {
+  describeDotState,
+  deviceStateFromContext,
+  dotClassList,
+  dotOverlayFromCounts,
+  dotStateKey,
+  hasStewardVerification,
+  statusAriaLabel,
+} from "./device-dot-state-core.mjs";
 
 const HUB_OPEN_KEY = "hc_hub_open";
 
@@ -70,12 +84,6 @@ function hasUnsavedTabKeys() {
   return !isWalletSaved(session.profile_id);
 }
 
-function hasStewardVerification(record) {
-  const state = String(record?.verification?.state || "").toLowerCase();
-  const label = String(record?.verification?.label || "").toLowerCase();
-  return state === "steward" || label === "steward";
-}
-
 function hasStewardReadyKeys() {
   const session = getTabSession();
   if (session?.owner_private_key_b58 && hasStewardVerification(session)) return true;
@@ -85,43 +93,18 @@ function hasStewardReadyKeys() {
 }
 
 function deviceState() {
-  if (hasUnsavedTabKeys()) return "unsaved";
-  if (hasStewardReadyKeys()) return "steward";
-  if (loadWallet().length > 0) return "keys";
-  return "none";
+  return deviceStateFromContext({
+    unsavedTabKeys: hasUnsavedTabKeys(),
+    stewardReady: hasStewardReadyKeys(),
+    savedWalletCount: loadWallet().length,
+  });
 }
 
 function dotOverlayState() {
-  if (getLiveControlPendingCount() > 0) return "proof_waiting";
-  if (crossTabNoticeCount() > 0) return "cross_tab_keys";
-  return "none";
-}
-
-function overlayAriaText(overlay) {
-  if (overlay === "proof_waiting") return "live proof waiting";
-  if (overlay === "cross_tab_keys") return "keys active in another tab";
-  return "";
-}
-
-function statusAriaLabel(network, device, overlay) {
-  const networkText =
-    network === "ok"
-      ? "resolver online"
-      : network === "degraded"
-        ? "resolver limited"
-        : "resolver offline";
-  const deviceText =
-    device === "unsaved"
-      ? "tab keys not saved"
-      : device === "steward"
-        ? "steward keys ready"
-        : device === "keys"
-          ? "saved keys on device"
-          : "no saved keys on device";
-  const overlayText = overlayAriaText(overlay);
-  return overlayText
-    ? `Status: ${networkText}, ${deviceText}, ${overlayText}.`
-    : `Status: ${networkText}, ${deviceText}.`;
+  return dotOverlayFromCounts({
+    liveProofPending: getLiveControlPendingCount(),
+    crossTabNotice: crossTabNoticeCount(),
+  });
 }
 
 export function notificationCount() {
@@ -162,10 +145,10 @@ function applyDot() {
     const device = deviceState();
     const overlay = dotOverlayState();
     dot.classList.remove(...NETWORK_CLASSES, ...DEVICE_CLASSES, ...OVERLAY_CLASSES);
-    dot.classList.add(`pass-dot-status-network-${networkStatus}`);
-    dot.classList.add(`pass-dot-status-device-${device}`);
-    dot.classList.add(`pass-dot-overlay-${overlay}`);
-    const dotState = `${networkStatus}:${device}`;
+    for (const cls of dotClassList(networkStatus, device, overlay)) {
+      dot.classList.add(cls);
+    }
+    const dotState = dotStateKey(networkStatus, device);
     dot.dataset.dotState = dotState;
     dot.dataset.dotOverlay = overlay;
     dotBtn?.setAttribute("data-dot-state", dotState);
@@ -204,95 +187,6 @@ function getStewardQueueUrl() {
   return link.getAttribute("href") || null;
 }
 
-function describeDotState(network, device, overlay) {
-  const stewardReady = hasStewardReadyKeys();
-  const queueUrl = getStewardQueueUrl();
-  const overlayText =
-    overlay === "proof_waiting"
-      ? "Live proof requests are waiting."
-      : overlay === "cross_tab_keys"
-        ? "Keys are active in another tab."
-        : "";
-  if (network === "offline") {
-    return {
-      id: "offline",
-      now: "Resolver offline.",
-      why: stewardReady
-        ? "Steward keys are ready locally, but network is unreachable."
-        : "Health check failed and signing actions need a connection.",
-      next: overlayText || "Retry resolver check.",
-      action:
-        overlay === "proof_waiting"
-          ? { kind: "open_notifications", label: "Open proof requests" }
-          : { kind: "retry", label: "Retry status check" },
-    };
-  }
-  if (network === "degraded") {
-    return {
-      id: "degraded",
-      now: "Resolver limited.",
-      why: stewardReady
-        ? "Steward keys are ready locally; network responses are currently limited."
-        : "Resolver reported degraded health.",
-      next: overlayText || "Retry status check or wait for recovery.",
-      action:
-        overlay === "proof_waiting"
-          ? { kind: "open_notifications", label: "Open proof requests" }
-          : { kind: "retry", label: "Retry status check" },
-    };
-  }
-  if (device === "unsaved") {
-    return {
-      id: "unsaved",
-      now: "Tab keys not saved.",
-      why: "This tab has signing keys that are not yet saved to this device.",
-      next: overlayText || "Open controls and save keys.",
-      action:
-        overlay === "proof_waiting"
-          ? { kind: "open_notifications", label: "Open proof requests" }
-          : { kind: "open_controls", label: "Open controls" },
-    };
-  }
-  if (device === "steward") {
-    return {
-      id: "steward",
-      now: "Steward ready, resolver online.",
-      why: "Steward-capable signing keys are available in this browser context.",
-      next:
-        overlayText ||
-        (queueUrl ? "Open steward review queue." : "Open controls for steward actions."),
-      action:
-        overlay === "proof_waiting"
-          ? { kind: "open_notifications", label: "Open proof requests" }
-          : queueUrl
-            ? { kind: "open_steward_queue", label: "Open steward queue", href: queueUrl }
-            : { kind: "open_controls", label: "Open controls" },
-    };
-  }
-  if (device === "keys") {
-    return {
-      id: "keys",
-      now: "Saved keys ready.",
-      why: "Signing keys are saved on this device and resolver is online.",
-      next: overlayText || "Open controls to manage a saved card.",
-      action:
-        overlay === "proof_waiting"
-          ? { kind: "open_notifications", label: "Open proof requests" }
-          : { kind: "open_controls", label: "Open controls" },
-    };
-  }
-  return {
-    id: "none",
-    now: "No saved keys on this device.",
-    why: "Resolver is online, but this browser has no saved signing keys.",
-    next: overlayText || "Create a card or save keys from this tab.",
-    action:
-      overlay === "proof_waiting"
-        ? { kind: "open_notifications", label: "Open proof requests" }
-        : { kind: "create_card", label: "Create a card", href: "/create/" },
-  };
-}
-
 function renderDotExplainer(container, descriptor, compact = false) {
   if (!container) return;
   const action = descriptor.action;
@@ -310,7 +204,10 @@ function renderDotExplainer(container, descriptor, compact = false) {
 }
 
 function renderDotExplainability(network, device, overlay) {
-  const descriptor = describeDotState(network, device, overlay);
+  const descriptor = describeDotState(network, device, overlay, {
+    stewardReady: hasStewardReadyKeys(),
+    queueUrl: getStewardQueueUrl(),
+  });
   const keyRoot = document.getElementById("device-hub-status-key");
   if (keyRoot) {
     let panel = keyRoot.querySelector(".device-dot-explainer");
@@ -348,6 +245,8 @@ function renderStatusKey() {
       <li>${statusKeyDot("#22c55e")} Bright green — steward keys ready on this device</li>
       <li>${statusKeyDot("#d97706")} Amber — resolver limited</li>
       <li>${statusKeyDot("#9ca3af")} Gray — resolver offline</li>
+      <li>${statusKeyDot("#f59e0b")} Amber notch — live proof waiting</li>
+      <li>${statusKeyDot("#2563eb")} Blue notch — keys in another tab</li>
     </ul>`;
 }
 

@@ -138,6 +138,13 @@ Implementation snapshot:
 - Phase 1 shipped in `site/js/device-status.mjs` + `site/styles.css` (steward green + ARIA + legend).
 - Phase 2 basic explainability shipped: `describeDotState()` + "Now / Why / Next" surfaced in hub status key and dot popover with state-aware quick actions.
 - Phase 3 basic overlays shipped: `dotOverlayState()` for `proof_waiting` / `cross_tab_keys`, visual overlay marker on the dot, `data-dot-overlay` hooks, and overlay text in ARIA/explainer copy.
+- Phase 3 tests shipped: pure helpers in `site/js/device-dot-state-core.mjs` with Vitest coverage in `worker/tests/device-dot-state.test.ts` (priority, overlay, ARIA, steward detection).
+
+### Phase 4 - Hardening (optional next)
+
+1. Steward celebration pulse on non-steward → steward transition (respect `prefers-reduced-motion`).
+2. E2E: seeded steward wallet shows green; degraded/offline suppresses green.
+3. Local diagnostics hooks for dot state transitions (dev-only).
 
 ### Phase 1 - Steward green foundation
 

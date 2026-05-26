@@ -1,0 +1,195 @@
+/**
+ * Pure status-dot state helpers (testable).
+ * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
+ */
+
+/**
+ * @param {{ verification?: { state?: string, label?: string } } | null | undefined} record
+ */
+export function hasStewardVerification(record) {
+  const state = String(record?.verification?.state || "").toLowerCase();
+  const label = String(record?.verification?.label || "").toLowerCase();
+  return state === "steward" || label === "steward";
+}
+
+/**
+ * @param {{ unsavedTabKeys: boolean, stewardReady: boolean, savedWalletCount: number }}
+ */
+export function deviceStateFromContext({ unsavedTabKeys, stewardReady, savedWalletCount }) {
+  if (unsavedTabKeys) return "unsaved";
+  if (stewardReady) return "steward";
+  if (savedWalletCount > 0) return "keys";
+  return "none";
+}
+
+/**
+ * @param {{ liveProofPending: number, crossTabNotice: number }}
+ */
+export function dotOverlayFromCounts({ liveProofPending, crossTabNotice }) {
+  if (liveProofPending > 0) return "proof_waiting";
+  if (crossTabNotice > 0) return "cross_tab_keys";
+  return "none";
+}
+
+/** @param {"proof_waiting" | "cross_tab_keys" | "none"} overlay */
+export function overlayAriaText(overlay) {
+  if (overlay === "proof_waiting") return "live proof waiting";
+  if (overlay === "cross_tab_keys") return "keys active in another tab";
+  return "";
+}
+
+/**
+ * @param {"ok" | "degraded" | "offline"} network
+ * @param {"none" | "keys" | "unsaved" | "steward"} device
+ * @param {"none" | "proof_waiting" | "cross_tab_keys"} overlay
+ */
+export function statusAriaLabel(network, device, overlay) {
+  const networkText =
+    network === "ok"
+      ? "resolver online"
+      : network === "degraded"
+        ? "resolver limited"
+        : "resolver offline";
+  const deviceText =
+    device === "unsaved"
+      ? "tab keys not saved"
+      : device === "steward"
+        ? "steward keys ready"
+        : device === "keys"
+          ? "saved keys on device"
+          : "no saved keys on device";
+  const overlayText = overlayAriaText(overlay);
+  return overlayText
+    ? `Status: ${networkText}, ${deviceText}, ${overlayText}.`
+    : `Status: ${networkText}, ${deviceText}.`;
+}
+
+/**
+ * @param {"ok" | "degraded" | "offline"} network
+ * @param {"none" | "keys" | "unsaved" | "steward"} device
+ * @param {"none" | "proof_waiting" | "cross_tab_keys"} overlay
+ * @param {{ stewardReady?: boolean, queueUrl?: string | null }} [opts]
+ */
+export function describeDotState(network, device, overlay, opts = {}) {
+  const stewardReady = Boolean(opts.stewardReady);
+  const queueUrl = opts.queueUrl || null;
+  const overlayText =
+    overlay === "proof_waiting"
+      ? "Live proof requests are waiting."
+      : overlay === "cross_tab_keys"
+        ? "Keys are active in another tab."
+        : "";
+
+  if (network === "offline") {
+    return {
+      id: "offline",
+      now: "Resolver offline.",
+      why: stewardReady
+        ? "Steward keys are ready locally, but network is unreachable."
+        : "Health check failed and signing actions need a connection.",
+      next: overlayText || "Retry resolver check.",
+      action:
+        overlay === "proof_waiting"
+          ? { kind: "open_notifications", label: "Open proof requests" }
+          : { kind: "retry", label: "Retry status check" },
+    };
+  }
+  if (network === "degraded") {
+    return {
+      id: "degraded",
+      now: "Resolver limited.",
+      why: stewardReady
+        ? "Steward keys are ready locally; network responses are currently limited."
+        : "Resolver reported degraded health.",
+      next: overlayText || "Retry status check or wait for recovery.",
+      action:
+        overlay === "proof_waiting"
+          ? { kind: "open_notifications", label: "Open proof requests" }
+          : { kind: "retry", label: "Retry status check" },
+    };
+  }
+  if (device === "unsaved") {
+    return {
+      id: "unsaved",
+      now: "Tab keys not saved.",
+      why: "This tab has signing keys that are not yet saved to this device.",
+      next: overlayText || "Open controls and save keys.",
+      action:
+        overlay === "proof_waiting"
+          ? { kind: "open_notifications", label: "Open proof requests" }
+          : { kind: "open_controls", label: "Open controls" },
+    };
+  }
+  if (device === "steward") {
+    return {
+      id: "steward",
+      now: "Steward ready, resolver online.",
+      why: "Steward-capable signing keys are available in this browser context.",
+      next:
+        overlayText ||
+        (queueUrl ? "Open steward review queue." : "Open controls for steward actions."),
+      action:
+        overlay === "proof_waiting"
+          ? { kind: "open_notifications", label: "Open proof requests" }
+          : queueUrl
+            ? { kind: "open_steward_queue", label: "Open steward queue", href: queueUrl }
+            : { kind: "open_controls", label: "Open controls" },
+    };
+  }
+  if (device === "keys") {
+    return {
+      id: "keys",
+      now: "Saved keys ready.",
+      why: "Signing keys are saved on this device and resolver is online.",
+      next: overlayText || "Open controls to manage a saved card.",
+      action:
+        overlay === "proof_waiting"
+          ? { kind: "open_notifications", label: "Open proof requests" }
+          : { kind: "open_controls", label: "Open controls" },
+    };
+  }
+  return {
+    id: "none",
+    now: "No saved keys on this device.",
+    why: "Resolver is online, but this browser has no saved signing keys.",
+    next: overlayText || "Create a card or save keys from this tab.",
+    action:
+      overlay === "proof_waiting"
+        ? { kind: "open_notifications", label: "Open proof requests" }
+        : { kind: "create_card", label: "Create a card", href: "/create/" },
+  };
+}
+
+/**
+ * @param {"ok" | "degraded" | "offline"} network
+ * @param {"none" | "keys" | "unsaved" | "steward"} device
+ */
+export function dotStateKey(network, device) {
+  return `${network}:${device}`;
+}
+
+/**
+ * @param {"ok" | "degraded" | "offline"} network
+ * @param {"none" | "keys" | "unsaved" | "steward"} device
+ * @param {"none" | "proof_waiting" | "cross_tab_keys"} overlay
+ */
+export function dotClassList(network, device, overlay) {
+  return [
+    `pass-dot-status-network-${network}`,
+    `pass-dot-status-device-${device}`,
+    `pass-dot-overlay-${overlay}`,
+  ];
+}
+
+/**
+ * Visible dot color follows network first, then device (when network is ok).
+ * @param {"ok" | "degraded" | "offline"} network
+ * @param {"none" | "keys" | "unsaved" | "steward"} device
+ */
+export function primaryDotTone(network, device) {
+  if (network === "offline") return "offline";
+  if (network === "degraded") return "degraded";
+  if (device === "steward") return "steward";
+  if (device === "unsaved" || device === "none") return "unsaved";
+  return "keys";
+}
