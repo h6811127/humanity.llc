@@ -622,21 +622,20 @@ function humanGroupRows(vm: ScanViewModel): string {
 function renderVouchSection(vm: ScanViewModel, origin: string): string {
   const walletUrl = `${origin.replace(/\/$/, "")}/wallet/`;
   const createUrl = `${origin.replace(/\/$/, "")}/create/`;
-  return `<section class="group scan-group scan-group-vouch scan-trust-layer" aria-label="Vouch for this person">
+  return `<section class="group scan-group scan-group-vouch scan-trust-layer" aria-label="Issue vouch">
   <h2 class="group-label">Vouch</h2>
   <div id="vouch-explainer" class="vouch-card vouch-card-hint">
     <div class="vouch-card-head">
       ${scanListIcon("slate", "key")}
       <div class="vouch-card-head-text">
-        <span class="vouch-eyebrow">Your keys on this device</span>
-        <span class="vouch-title">Vouch from a saved card</span>
+        <span class="vouch-eyebrow">Device signing</span>
+        <span class="vouch-title">Keys required in this tab</span>
       </div>
     </div>
     <p class="vouch-lead" id="vouch-explainer-copy">
-      Checking this device for your signing keys… Steward on the network is not enough —
-      use <strong>Use keys here</strong> below when available, or
-      <a href="${escapeHtml(walletUrl)}">Saved cards</a>.
-      Your private key never uploads  -  only the signed vouch does.
+      Checking for your card’s signing key in this browser tab. Network verification (Steward, Vouched Human) is separate.
+      Use <strong>Sign as…</strong> below or open <a href="${escapeHtml(walletUrl)}">Saved cards</a>.
+      Only the signed vouch is sent—the private key stays on device.
     </p>
     <div id="vouch-explainer-actions" class="vouch-explainer-actions" hidden></div>
   </div>
@@ -679,20 +678,20 @@ function vouchIssuanceGroupRows(vm: ScanViewModel): string {
       <div class="vouch-card-head">
         ${scanListIcon("green", "people")}
         <div class="vouch-card-head-text">
-          <span class="vouch-eyebrow">Human attestation</span>
-          <span class="vouch-title">Vouch for this person</span>
+          <span class="vouch-eyebrow">Signed attestation</span>
+          <span class="vouch-title">Issue vouch</span>
         </div>
       </div>
       <p class="vouch-lead">
-        Sign a public statement that this is a distinct human you know in person. This is not legal ID.
+        Publish a signed statement that you know this person as a distinct human. Not government ID; visible on this network and revocable by you.
       </p>
-      <label class="vouch-field-label" for="vouch-statement">Public statement</label>
+      <label class="vouch-field-label" for="vouch-statement">Statement (public, max 280)</label>
       <textarea class="vouch-statement" id="vouch-statement" maxlength="280" rows="4"></textarea>
       <label class="vouch-confirm-label">
         <input type="checkbox" id="vouch-confirm" />
-        <span>I understand this vouch is public, revocable, and does not prove legal identity.</span>
+        <span>I met them in person. This vouch is public, revocable, and not legal identity proof.</span>
       </label>
-      <button type="button" class="vouch-cta" id="vouch-submit">Submit vouch</button>
+      <button type="button" class="vouch-cta" id="vouch-submit">Sign and submit</button>
       <div class="vouch-status-panel">
         <p class="vouch-status" id="vouch-status" aria-live="polite"></p>
       </div>
@@ -701,8 +700,8 @@ function vouchIssuanceGroupRows(vm: ScanViewModel): string {
       <div class="vouch-card-head">
         ${scanListIcon("orange", "warning")}
         <div class="vouch-card-head-text">
-          <span class="vouch-eyebrow">Not available yet</span>
-          <span class="vouch-title">Can't vouch from this device</span>
+          <span class="vouch-eyebrow">Unavailable</span>
+          <span class="vouch-title">Cannot issue vouch</span>
         </div>
       </div>
       <p class="vouch-lead" id="vouch-ineligible-copy"></p>
@@ -711,11 +710,11 @@ function vouchIssuanceGroupRows(vm: ScanViewModel): string {
       <div class="vouch-card-head">
         ${scanListIcon("green", "people")}
         <div class="vouch-card-head-text">
-          <span class="vouch-eyebrow">Vouch recorded</span>
-          <span class="vouch-title">Thank you</span>
+          <span class="vouch-eyebrow">Accepted</span>
+          <span class="vouch-title">Vouch recorded</span>
         </div>
       </div>
-      <p class="vouch-lead" id="vouch-success-copy">Your vouch was accepted.</p>
+      <p class="vouch-lead" id="vouch-success-copy">The signed vouch is on the network.</p>
     </div>
   </span>
 </li>`;
@@ -724,7 +723,7 @@ function vouchIssuanceGroupRows(vm: ScanViewModel): string {
 function renderVouchIssuanceScript(vm: ScanViewModel, origin: string): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
   const assetOrigin = pagesJsOrigin(origin);
-  const mod = JSON.stringify(`${assetOrigin}/js/vouch-issue.mjs?v=10`);
+  const mod = JSON.stringify(`${assetOrigin}/js/vouch-issue.mjs?v=11`);
   return `<script type="module" src=${mod}></script>`;
 }
 

@@ -15,7 +15,7 @@ const PAYLOAD_TYPE_VOUCH_REVOCATION = "vouch_revocation";
 
 /** Default public vouch statement (M6 copy kit  -  max 280 chars). */
 export const DEFAULT_VOUCH_STATEMENT =
-  "I attest this is a distinct human I know. This is not legal ID. My vouch is public and revocable.";
+  "I know this person as a distinct human. This vouch is public, revocable, and not legal identity proof.";
 
 /** Level 0 bearer copy (V1_PRODUCT_TRUST_MODEL.md)  -  keep in sync with worker trust-copy.ts */
 export const BEARER_WARNING =

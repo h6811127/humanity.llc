@@ -39,11 +39,11 @@ function rememberVouchReturnUrl() {
 
 function loadKeysHelpHtml(walletUrl) {
   const defaultHint = getDefaultVouchProfileId()
-    ? ` Set or change your default on <a href="${walletUrl}">Saved cards</a> (⋯ menu → <strong>Default for vouching</strong>).`
+    ? ` Change default on <a href="${walletUrl}">Saved cards</a> (⋯ → <strong>Default for vouching</strong>).`
     : "";
   return (
-    `You can also open <a href="${walletUrl}">Saved cards</a> and tap <strong>Use keys</strong> ` +
-    `(opens <code>/created/</code>), then return to this scan in the same tab.${defaultHint}`
+    ` Or open <a href="${walletUrl}">Saved cards</a>, tap <strong>Use keys</strong> (` +
+    `<code>/created/</code>), and return here in the same tab.${defaultHint}`
   );
 }
 
@@ -111,7 +111,7 @@ function mountVouchStopButton(voucherLabel) {
     stop.type = "button";
     stop.id = "vouch-stop-keys";
     stop.className = "vouch-stop-keys";
-    stop.textContent = "Stop using keys in this tab";
+    stop.textContent = "Clear keys from this tab";
     stop.addEventListener("click", () => {
       try {
         sessionStorage.setItem(VOUCH_SKIP_AUTO_KEY, location.href);
@@ -126,32 +126,32 @@ function mountVouchStopButton(voucherLabel) {
   }
 
   const hint = voucherLabel ? ` · ${voucherLabel}` : "";
-  setStatus(`Keys active on this device${hint}. Ready when you've met this person in person.`);
+  setStatus(`Signing key loaded${hint}. Confirm in-person contact before signing.`);
 }
 
 function plainVouchError(code, fallback) {
   const map = {
-    SELF_VOUCH_NOT_ALLOWED: "You can't vouch for your own card.",
+    SELF_VOUCH_NOT_ALLOWED: "Cannot vouch for your own profile.",
     VOUCHER_NOT_VERIFIED:
-      "Your card must be a Vouched Human or steward before you can vouch for others.",
-    VOUCHER_TOO_NEW: `You need to wait ${VOUCHER_WAIT_DAYS} days after becoming verified before vouching.`,
-    VOUCH_QUOTA_EXCEEDED: "You've reached your limit of 5 vouches this year.",
-    VOUCH_ALREADY_ACTIVE: "You already have an active vouch for this person.",
-    VOUCH_ALREADY_EXISTS: "This vouch was already recorded.",
-    VOUCHER_INACTIVE: "Your card is not active.",
-    VOUCHEE_INACTIVE: "This person's card is not active.",
-    VOUCHER_NOT_FOUND: "Your card wasn't found on this network.",
-    VOUCHEE_NOT_FOUND: "This card wasn't found on this network.",
+      "Your card must be Vouched Human or Steward before you can vouch.",
+    VOUCHER_TOO_NEW: `Wait ${VOUCHER_WAIT_DAYS} days after verification before vouching.`,
+    VOUCH_QUOTA_EXCEEDED: "Annual limit: 5 vouches per voucher.",
+    VOUCH_ALREADY_ACTIVE: "You already have an active vouch for this profile.",
+    VOUCH_ALREADY_EXISTS: "This vouch is already on the network.",
+    VOUCHER_INACTIVE: "Your card is inactive.",
+    VOUCHEE_INACTIVE: "This card is inactive.",
+    VOUCHER_NOT_FOUND: "Your card was not found on this network.",
+    VOUCHEE_NOT_FOUND: "This card was not found on this network.",
     INVALID_VOUCH_STATEMENT: "Statement must be 1–280 characters.",
     INVALID_VOUCH_METHOD: "Unsupported vouch method.",
-    PRIVATE_NOTE_NOT_ALLOWED: "Private notes can't be sent to the resolver.",
-    REPLAYED_NONCE: "That request was already used. Try again.",
-    INVALID_SIGNATURE: "Signature check failed. Use the keys from your create session.",
+    PRIVATE_NOTE_NOT_ALLOWED: "Only public statements are accepted.",
+    REPLAYED_NONCE: "Nonce already used. Sign again.",
+    INVALID_SIGNATURE: "Signature invalid. Reload keys from your create session.",
     CARD_INVALID_SIGNATURE:
-      "Signature check failed. Use keys from Saved cards (Use keys here) for this steward card.",
+      "Signature invalid. Load steward keys via Saved cards → Sign as…",
     SIGNATURE_MISMATCH: "Signature does not match your card keys.",
   };
-  return map[code] || fallback || "Could not record vouch. Try again.";
+  return map[code] || fallback || "Vouch not recorded. Try again.";
 }
 
 function formatRecency(iso) {
@@ -211,8 +211,8 @@ function showSuccess(verification) {
     const label = verification?.label || "Registered";
     successCopy.textContent =
       count >= VOUCH_THRESHOLD
-        ? `Vouch recorded. This card is now ${label}.`
-        : `Vouch recorded. ${count} of ${VOUCH_THRESHOLD} active vouches on this card.`;
+        ? `Signed vouch accepted. This card is now ${label}.`
+        : `Signed vouch accepted. ${count} of ${VOUCH_THRESHOLD} active vouches toward Vouched Human.`;
   }
   updateHumanTrustRow(verification);
 }
@@ -251,10 +251,10 @@ function mountUseKeysHereButtons(eligible) {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "vouch-cta vouch-use-keys-here";
-    btn.textContent = `Use keys here · ${item.label} (${item.verificationLabel})`;
+    btn.textContent = `Sign as ${item.label} · ${item.verificationLabel}`;
     btn.addEventListener("click", async () => {
       btn.disabled = true;
-      setStatus("Loading signing keys…", "waiting");
+      setStatus("Loading signing key…", "waiting");
       activateWalletEntry(item.entry);
       await runVouchFlow();
     });
@@ -377,9 +377,9 @@ async function showNoKeysExplainer(voucheeProfileId) {
 
   if (wallet.length === 0) {
     showExplainerHtml(
-      `To vouch, this browser needs <strong>your</strong> card’s signing keys in this tab — not just Steward on the network. ` +
-        `Create a card or open ${walletLinksHtml()}, then save it and use <strong>Use keys here</strong> on this scan. ` +
-        `Your private key never uploads — only the signed vouch does.`
+      `Vouching requires your card’s Ed25519 signing key in <strong>this tab</strong>—network Steward status alone is not enough. ` +
+        `Create a card or open ${walletLinksHtml()}, then tap <strong>Sign as…</strong> on this scan. ` +
+        `Only the signed document is transmitted; the private key stays on device.`
     );
     return;
   }
@@ -388,7 +388,7 @@ async function showNoKeysExplainer(voucheeProfileId) {
 
   if (eligible.length === 0) {
     showExplainerHtml(
-      `You have ${wallet.length} saved card${wallet.length === 1 ? "" : "s"} on this device, but none are <strong>Vouched Human</strong> or <strong>Steward</strong> on the network yet — or keys are for the same person you’re scanning. ` +
+      `${wallet.length} saved card${wallet.length === 1 ? "" : "s"} on this device, but none qualify as <strong>Vouched Human</strong> or <strong>Steward</strong> on the network—or the saved profile matches this scan. ` +
         loadKeysHelpHtml(walletUrl)
     );
     return;
@@ -413,24 +413,25 @@ async function showNoKeysExplainer(voucheeProfileId) {
   let lead;
   if (multiple) {
     lead =
-      `<strong>Choose which card signs this vouch.</strong> Signing keys are not active in this tab. ` +
+      `<strong>Select a signing card.</strong> No signing key is active in this tab. ` +
       (hasActivatable
-        ? `Tap a <strong>Use keys here</strong> button below. `
-        : `Re-save a card with keys on <a href="${walletUrl}">Saved cards</a>, then return here. `) +
+        ? `Tap <strong>Sign as…</strong> below. `
+        : `Re-save a card with keys on <a href="${walletUrl}">Saved cards</a>, then return. `) +
       (!defaultSet
-        ? `Or <a href="${walletUrl}">set a default for vouching</a> so future scans load one card automatically. `
+        ? `<a href="${walletUrl}">Set a default for vouching</a> to auto-load one card on future scans. `
         : "");
   } else {
     lead =
-      `${lines}${more} — but <strong>signing keys are not active in this browser tab</strong>. ` +
+      `${lines}${more} — <strong>signing key not loaded in this tab</strong>. ` +
       (hasActivatable
-        ? `Tap <strong>Use keys here</strong> below to load keys and vouch on this page. `
-        : `Re-save your card with keys on <a href="${walletUrl}">Saved cards</a>, then return here. `);
+        ? `Tap <strong>Sign as…</strong> below to load the key and sign. `
+        : `Re-save your card with keys on <a href="${walletUrl}">Saved cards</a>, then return. `);
   }
 
   showExplainerHtml(
-    lead + loadKeysHelpHtml(walletUrl) +
-      ` (<a href="${location.origin}/features/vouching.html">how vouching works</a>).`,
+    lead +
+      loadKeysHelpHtml(walletUrl) +
+      ` <a href="${location.origin}/features/vouching.html">How vouching works</a>.`,
     eligible
   );
 }
@@ -482,8 +483,8 @@ async function mountVouchSwitchDefault(session) {
   const copy = document.createElement("p");
   copy.className = "vouch-lead";
   copy.innerHTML =
-    `Keys in this tab are for <strong>${currentLabel}</strong>. ` +
-    `Your default for vouching is <strong>${defaultLabel}</strong>.`;
+    `Active signing key: <strong>${currentLabel}</strong>. ` +
+    `Default for vouching: <strong>${defaultLabel}</strong>.`;
 
   const btn = document.createElement("button");
   btn.type = "button";
@@ -514,7 +515,7 @@ function bindSubmitHandler(voucheeProfileId) {
       !session.owner_private_key_b58 ||
       !session.owner_public_key_b58
     ) {
-      setStatus("Signing keys are not active in this tab.", "error");
+      setStatus("No signing key in this tab.", "error");
       return;
     }
     const voucherProfileId = session.profile_id;
@@ -525,7 +526,7 @@ function bindSubmitHandler(voucheeProfileId) {
       return;
     }
     if (!confirmEl.checked) {
-      setStatus("Confirm the attestation before submitting.", "error");
+      setStatus("Confirm in-person attestation before signing.", "error");
       return;
     }
 
@@ -611,7 +612,7 @@ async function runVouchFlow(opts = {}) {
   const voucherProfileId = session.profile_id;
   if (voucherProfileId === voucheeProfileId) {
     showExplainerHtml(
-      "You can't vouch for your own card. Open someone else's scan link while <strong>your</strong> keys are active in this browser."
+      "Cannot vouch for your own profile. Open another person’s scan while <strong>your</strong> signing key is loaded in this tab."
     );
     return;
   }
@@ -628,7 +629,7 @@ async function runVouchFlow(opts = {}) {
     const res = await fetch(getCardStatusUrl(voucherProfileId));
     voucherStatus = await res.json();
   } catch {
-    showIneligible("Could not load your card status. Check your connection and refresh.");
+    showIneligible("Could not load your card status. Check connection and refresh.");
     return;
   }
 
@@ -639,13 +640,13 @@ async function runVouchFlow(opts = {}) {
     voucherStatus?.scan?.verification?.label;
 
   if (cardStatus !== "active") {
-    showIneligible("Your card must be active before you can vouch for someone else.");
+    showIneligible("Your card must be active before you can issue a vouch.");
     return;
   }
 
   if (!isEligibleVoucherState(voucherState)) {
     showIneligible(
-      "Your card must reach Vouched Human status (or steward) before you can vouch for others."
+      "Your card must be Vouched Human or Steward on this network before you can vouch."
     );
     return;
   }
@@ -664,8 +665,8 @@ async function runVouchFlow(opts = {}) {
     session.handle ? `@${session.handle}` : session.wallet_label || toneHint;
   mountVouchStopButton(
     autoLoaded
-      ? `Vouching as ${voucherDisplay} (auto-loaded)`
-      : `Keys active · ${toneHint}`
+      ? `Signing as ${voucherDisplay} (default, auto-loaded)`
+      : `Signing as ${voucherDisplay} · ${toneHint}`
   );
 
   await mountVouchSwitchDefault(session);
