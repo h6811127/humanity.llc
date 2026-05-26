@@ -12,7 +12,7 @@
 | Doc | Use for |
 |-----|---------|
 | `docs/DEVICE_OS.md` | Placement rules, layers, live-control inbox scope, baseline/alert behavior |
-| `docs/DEVICE_INBOX.md` | Inbox badge, hub alerts, background alerts (phases 1–10 + v2 A–C shipped) |
+| `docs/DEVICE_INBOX.md` | Inbox badge, hub alerts, background alerts (phases 1–11 + v2 A–D shipped) |
 | `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` | Storage keys, search, glance, wallet row chips, copy alignment |
 | `docs/STATUS_INDICATOR_STEWARD_GREEN.md` | Status dot only (not inbox badge) |
 | `docs/CREATED_TASK_DASHBOARD.md` | `/created/` Tasks tab (separate from hub shell, shares chrome) |

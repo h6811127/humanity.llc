@@ -216,6 +216,7 @@ Production observation proved resolver **`active`** while banner showed — **cl
 | Test | File |
 |------|------|
 | Baseline transition, legacy `revoked`, resolverConfirmed gate | `worker/tests/wallet-network.test.ts` |
+| `isResolverConfirmedProfile` after wallet poll | `worker/tests/device-wallet-network-confirmed.test.ts` |
 | `resolverConfirmed: false` despite `card_revoked` alert state | `worker/tests/wallet-network.test.ts` § `listCardDisabledSinceVisit` |
 | Stale cache + active fetch integration | `worker/tests/wallet-network.test.ts` § `stale cache + active fetch` |
 | Hub pipeline → inbox | `worker/tests/device-hub-frontend-pipeline.test.ts` |
@@ -224,7 +225,7 @@ Production observation proved resolver **`active`** while banner showed — **cl
 Run:
 
 ```bash
-npm run worker:test -- worker/tests/wallet-network.test.ts
+npm run worker:test -- worker/tests/wallet-network.test.ts worker/tests/device-wallet-network-confirmed.test.ts
 npm run e2e -- e2e/device-os-wallet.spec.ts
 ```
 
