@@ -3,4 +3,5 @@
  */
 import { initDeviceHub } from "./device-hub-ui.mjs";
 
-initDeviceHub({ noticeMode: "created-url", showLiveControlInbox: true });
+// DEVICE_OS: keep live-proof inbox on landing + /wallet only; /created signs in-panel.
+initDeviceHub({ noticeMode: "created-url", showLiveControlInbox: false });
