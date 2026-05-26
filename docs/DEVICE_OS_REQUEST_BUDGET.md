@@ -245,9 +245,11 @@ Do **not** rip out the device OS. **Retire the default “poll every card every 
 | **8b - Presence & chrome** (P1) | **Shipped:** skip presence heartbeat when alone with keys (`shouldSkipPresenceHeartbeat`) | Less cross-tab churn when single tab | Heartbeat resumes when second tab opens |
 | **8c - Visible rows + SW watch** (P1) | **Shipped:** network refresh prefers hub-visible `.hub-card-item` rows; SW polls only when `hc_watch_live_proof === "1"` (alerts still required) | On-screen chips refresh first | Background polls off when watch off |
 | **9 - Edge cache** (P2) | ETag / short TTL on status + challenge endpoints | Fewer D1 reads on repeat polls | **Shipped** |
-| **10 - Hosted tier + push** (planning) | Entitlements, higher caps, optional server push — **no code yet** | Best UX at scale | See [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) |
+| **10 - Hosted tier + push** (planning) | Entitlements, higher caps, optional server push — **no code yet** | Best UX at scale | [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md); M7 rows + test plan: § Phase 10 — hosted tier rows (M7) |
 
-**Tests (shipped):** Vitest in `device-live-control-poll-scheduler.test.ts`, `device-live-control-round-robin.test.ts`, `device-hub-network-tools-core.test.ts`; Playwright in `e2e/device-inbox.spec.ts` (collapsed hub idle 10s, one challenge per tick, degraded health, watch off + manual check).
+**Tests (shipped, Phases 1–9):** Vitest in `device-live-control-poll-scheduler.test.ts`, `device-live-control-round-robin.test.ts`, `device-live-control-poll-budget-core.test.ts`, `device-live-control-poll-leader-core.test.ts`, `device-live-control-sw-core.test.ts`, `device-hub-visible-rows-core.test.ts`, `device-wallet-scale-core.test.ts` (if present); Playwright in `e2e/device-inbox.spec.ts`, `e2e/created-control.spec.ts` (collapsed hub idle, one challenge per tick, degraded health, watch off + manual check).
+
+**Tests (Phase 10, planning):** § Phase 10 test plan (M7) — run **free-tier regression** on every hosted-tier PR; hosted-specific suites when E1–E4 land.
 
 ---
 
@@ -284,7 +286,111 @@ Before merging shell changes that touch network I/O:
 
 Manual **Check for live proof** always runs one round-robin pass when watch is off. Opening the inbox sheet does **not** start auto poll without watch (scope may be active, but the timer requires `hc_watch_live_proof === "1"`).
 
-**Paid / hosted operator (planning):** Product definition in [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md). Free/reference use remains **manual check**, opt-in watch, and shipped caps (400 auto live-proof GETs/day/device). Paid may raise caps and add optional server push — not implemented.
+**Paid / hosted operator (planning):** Product definition in [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md). Free/reference use remains **manual check**, opt-in watch, and shipped caps (400 auto live-proof GETs/day/device). Paid may raise caps and add optional server push — not implemented. Full entitlement rows and test plan: § Phase 10 — hosted tier rows (M7) below.
+
+---
+
+## Phase 10 — hosted tier rows (M7)
+
+**Status:** Planning complete (May 2026) — **no client or Worker implementation** until M4 governance sign-off + M8 epics  
+**Sources:** [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) · [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) · [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md)
+
+When build begins (M8 **E2**–**E4**), shipped free-tier constants in poll modules MUST resolve from **`GET …/steward/entitlements`** (or fall back to `reference_free` when unauthenticated). This section is the **request-budget contract** for that migration.
+
+### Entitlement rows (free vs hosted)
+
+| Entitlement key | Free (`reference_free`, shipped) | Hosted (`hosted_steward_v1`, planning) | Client module(s) |
+|-----------------|----------------------------------|----------------------------------------|------------------|
+| `steward.hosted` | `false` | `true` | Master gate (hub settings, entitlement probe) |
+| `notify.push.live_proof` | `false` | `true` | `device-browser-notifications*.mjs`, `sw-live-proof.mjs` |
+| `watch.default_on` | `false` | `false` | `device-hub-network-tools-core.mjs` (org override only) |
+| `poll.live_proof.auto_daily_cap` | **400** / UTC day / `device_id` | **4000** (fair-use; account soft cap 50k/day per M4) | `device-live-control-poll-budget-core.mjs` |
+| `poll.live_proof.idle_ms` | **60000** | **30000** | `device-live-control-poll-scheduler.mjs` |
+| `poll.live_proof.active_ms` | **5000** | **5000** | same |
+| `poll.network.max_parallel` | **2** (large wallet auto) | **5** | `device-wallet-network.mjs` / `walletNetworkMaxParallel` |
+| `poll.network.manual_max_parallel` | **1** (large manual) | **3** | same |
+| `wallet.large_threshold` | **10** | **25** | `device-wallet-scale-core.mjs` |
+| `sw.periodic_min_ms` | **900000** (15 min) | **300000** (5 min) | `device-live-control-sw-core.mjs` |
+
+**Unchanged on every tier:** round-robin **one** live-proof GET per tick; poll only when hub expanded or inbox open (unless push replaces poll — M3); manual **Check for live proof** and **Check network** uncapped by daily auto cap; resolver health gate; leader tab; stranger scan page polls **their** session only.
+
+**Server push (hosted only):** When `notify.push.live_proof === true` and steward subscribes, push **reduces** wallet round-robin need; SW remains fallback ([`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md)). Free tier keeps device-only polling + OS alerts path ([`DEVICE_INBOX.md`](DEVICE_INBOX.md)).
+
+### Request math (planning)
+
+| Mode | Free reference (20 cards, watch on, hub 8h) | Hosted steward (same, caps raised) |
+|------|---------------------------------------------|-------------------------------------|
+| Auto live-proof GETs | Hits **400/day** cap → pause + manual check | **4000/day** cap; 30s idle interval → ~960/day before cap |
+| Network status (large wallet) | Max **2** parallel auto | Max **5** parallel auto |
+| SW wake | 15 min min + alerts on + watch on | 5 min min (still alerts + watch gated) |
+
+Ops MUST NOT treat hosted as unlimited polling — M4 fair-use and account soft caps still apply.
+
+### Test plan (run when M8 ships E2–E4)
+
+**Free-tier regression (run today on every hosted-tier PR — must stay green):**
+
+```bash
+npm run worker:test -- \
+  worker/tests/device-live-control-poll-scheduler.test.ts \
+  worker/tests/device-live-control-round-robin.test.ts \
+  worker/tests/device-live-control-poll-budget-core.test.ts \
+  worker/tests/device-live-control-poll-leader-core.test.ts \
+  worker/tests/device-live-control-sw-core.test.ts \
+  worker/tests/device-hub-visible-rows-core.test.ts \
+  worker/tests/device-wallet-scale-core.test.ts \
+  worker/tests/device-hub-network-tools-core.test.ts \
+  worker/tests/conditional-json.test.ts
+
+npm run e2e -- e2e/device-inbox.spec.ts e2e/created-control.spec.ts
+```
+
+**Vitest (extend existing modules when E2 reads entitlements):**
+
+| Case | Module | Assert |
+|------|--------|--------|
+| Free fallback | `device-live-control-poll-budget-core` | Cap **400** when no session / `reference_free` policy |
+| Hosted cap | same | Cap **4000** when mocked `hosted_steward_v1` policy |
+| Idle interval | `device-live-control-poll-scheduler` | **60s** free vs **30s** hosted from policy |
+| Large threshold | `device-wallet-scale-core` | **10** vs **25** card narrowing |
+| Network parallel | `device-wallet-network` / scale helpers | **2/1** free vs **5/3** hosted |
+| SW periodic floor | `device-live-control-sw-core` | **15 min** vs **5 min** |
+| Manual check bypass | `device-live-control-poll-budget-core` | Manual **Check for live proof** does not increment auto budget (both tiers) |
+| Push gate | `device-browser-notifications-core` | `notify.push.live_proof` required for server subscribe path (hosted only) |
+
+**Playwright (add to `e2e/device-inbox.spec.ts` or new `e2e/hosted-tier-budget.spec.ts`):**
+
+| Case | Setup | Assert |
+|------|-------|--------|
+| H1 Free default | No steward session; watch on; hub expanded | Auto poll pauses at **400** simulated ticks; hub budget message visible |
+| H2 Hosted session | Mock `GET …/steward/entitlements` → `hosted_steward_v1` | Cap **4000** before pause; idle tick uses 30s (mock timers) |
+| H3 Downgrade | Session returns `reference_free` mid-session | Client re-applies **400** cap on next entitlement fetch |
+| H4 Push opt-in | Hosted + `notify.push.live_proof`; subscribe mock | Wallet round-robin interval may widen; SW still respects watch + alerts |
+| H5 Free unchanged | No billing code paths on reference operator | Anonymous scan + create flows unchanged; no paywall on hub |
+
+**Manual QA ([`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — add **P1-8 Hosted tier budget** when E2 ships):**
+
+1. Free steward: **400** auto cap message unchanged (P1-7 baseline).
+2. Hosted test account: hub shows raised cap in diagnostics (`hc_inbox_diagnostics` / entitlement debug).
+3. Cancel hosted: returns to free caps without clearing wallet or keys.
+4. Stranger scan poll unchanged — no steward session on scan page.
+
+**Epic exit criteria (M8):**
+
+| Epic | Exit tests |
+|------|------------|
+| **E1** Account + entitlement API | Worker link-signature + entitlements routes; free scan/create unchanged |
+| **E2** Client tier probe | Vitest policy merge; E2E H3 downgrade; hub `steward.hosted` gate |
+| **E3** Raised caps | Vitest rows above; server 429 `steward_quota_exceeded` |
+| **E4** Push channel | M3 interoperability; E2E H4; poll fallback when SSE down |
+| **E5** Billing webhooks | Lifecycle `active` / `expired` → entitlement status |
+| **E6** Ops dashboards | Runbook only |
+
+### M8 implementation gates (do not start E2–E4 until)
+
+1. **M4 governance sign-off** on [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md).
+2. This M7 section reviewed against shipped module constants (table above).
+3. Vitest rows above added in the same PR as first entitlement probe (E2).
 
 ---
 
@@ -299,7 +405,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 | P1 | **Do all QRs need a saved profile + keys?** | **No.** Scan is public. Signing needs `hc_created` in tab only. `hc_wallet` is optional convenience. | Docs + UX never imply “save every card.” Pins ≠ keys. | Ongoing |
 | P2 | **Does saving a card turn on monitoring?** | **No.** Watch default off; save ≠ `hc_watch_live_proof`. | Same; optional per-card watch later. | 5 ✅ |
 | P3 | **Auto-save vs auto-watch** | Auto-save (`hc_auto_save_device`) separate from watch. | Keep independent; auto-save does not enable poll. | Ongoing |
-| P4 | **Paid / hosted operator** | Reference site: manual + opt-in watch. | Continuous watch + push + higher caps as **paid tier**; Free stays intent-based. | 10 — see [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) |
+| P4 | **Paid / hosted operator** | Reference site: manual + opt-in watch. | Higher caps + optional push; **free defaults unchanged** for anonymous + no session | 10 — [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md); tests § Phase 10 |
 
 ### Live proof (steward)
 
@@ -317,6 +423,20 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 | L10 | **Stranger pays urgency** | Scan page polls one QR while waiting | Steward inbox optional; OS alert path | Scan + SW |
 | L11 | `/created/` polls **active card only** | ~3s while proving | Stop when hidden (shipped in `created-live-proof-poll-core`) | Created ✅ |
 | L12 | Server push for live proof | — | SSE P1 then DO P2; steward notified without wallet round-robin | 10 — [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) |
+| L13 | **Entitlement-driven poll cap** | Fixed 400/day in client | Resolve `poll.live_proof.auto_daily_cap` from `GET …/steward/entitlements` | 10 — M7 § E2/E3 |
+| L14 | **Server 429** on over-cap auto poll | Client cap only | Double enforcement when session + linked profile | 10 — M2 |
+| L15 | **Push replaces round-robin** when healthy | SW/tab poll fallback | Leader tab holds SSE; poll only on push miss | 10 — M3 + M7 § E4 |
+
+### Hosted tier / entitlements (Phase 10 — planning tests)
+
+| # | Idea | Shipped today | Test when built | Phase |
+|---|------|---------------|-----------------|-------|
+| H1 | `reference_free` when no session | Yes (implicit) | 401/ absent session → 400 cap | 10 |
+| H2 | `hosted_steward_v1` caps from API | — | Mock entitlements → 4000 cap, 5 parallel | 10 |
+| H3 | `steward_account_link_v1` verify | — | Worker rejects bad sig / replay nonce | 10 |
+| H4 | Push `live_proof.pending` → one GET | — | E2E: no wallet round-robin while SSE up | 10 |
+| H5 | Downgrade to free on `expired` | — | Session cleared; 400 cap; push unsub | 10 |
+| H6 | Merch order does not grant hosted | — | Policy test / fixture | 10 |
 
 ### Network status (wallet chips)
 
@@ -360,7 +480,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 
 ### Implementer order (after Phases 1–9 + 8c)
 
-1. **Phase 10 (planning → build)** — M2–M6 done. Next: **M7** paid-tier test plan row in [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md), **M4 governance sign-off**, then M8 implementation epics.  
+1. **Phase 10 (planning → build)** — M2–M7 done. Next: **M4 governance sign-off**, then **M8** implementation epics (E1–E6).  
 2. **Shell P2** - Lazy inbox loader ([`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md)).  
 3. **Ops O2** - Per-IP rate limits on hot routes.
 
@@ -390,6 +510,7 @@ Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). 
 
 | Date | Note |
 |------|------|
+| 2026-05-26 | **M7:** Phase 10 entitlement rows + test plan (§ Phase 10 — hosted tier rows) |
 | 2026-05-26 | **M6 standards delta:** [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) |
 | 2026-05-26 | **M5 FAQ/launch copy:** [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md), [`LAUNCH_LANGUAGE_KIT.md`](LAUNCH_LANGUAGE_KIT.md) |
 | 2026-05-26 | **M4 pricing/SLA:** [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) |

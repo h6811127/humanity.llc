@@ -3,7 +3,7 @@
 **Status:** **Planning spec** — defines fields, APIs, and enforcement points; **no implementation**  
 **Milestone:** M2 of [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md)  
 **Audience:** Engineering, ops, governance (billing M4 consumes this)  
-**Parent:** [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)
+**Parent:** [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7)
 
 ---
 
@@ -386,7 +386,7 @@ Reference implementation ships first; second operator copies schema with own `pl
 | Epic | M2 sections used |
 |------|------------------|
 | E1 Account + entitlement API | § HTTP API, § Storage |
-| E2 Client tier probe | § Effective policy, § Client enforcement |
+| E2 Client tier probe | § Effective policy, § Client enforcement; M7 test plan |
 | E3 Raised caps | § Entitlement registry |
 | E5 Billing webhooks | § Lifecycle, § `steward_accounts` |
 | E6 Ops dashboards | § Metering event types |
@@ -410,5 +410,6 @@ Reference implementation ships first; second operator copies schema with own `pl
 
 | Date | Note |
 |------|------|
+| 2026-05-26 | M7 cross-link — request-budget rows + test plan in [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 |
 | 2026-05-26 | Link to M6 `steward_account_link_v1` — [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) |
 | 2026-05-26 | M2 initial entitlement & metering spec (planning only) |

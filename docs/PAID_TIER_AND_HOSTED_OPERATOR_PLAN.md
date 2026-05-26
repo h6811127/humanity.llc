@@ -242,8 +242,8 @@ Document options; **do not pick** in this planning pass without governance.
 | M4 | **Pricing & SLA one-pager** (governance-approved) | **[`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md)** (draft — sign-off pending) |
 | M5 | **Skeptic FAQ + launch language** updates | **[`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md)** § Is There A Paid Tier? · **[`LAUNCH_LANGUAGE_KIT.md`](LAUNCH_LANGUAGE_KIT.md)** § Hosted steward tier |
 | M6 | **Technical Standards** delta (optional hosted extensions) | **[`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md)** |
-| M7 | **DEVICE_OS_REQUEST_BUDGET** paid-tier row + test plan | Partial (link from budget doc) |
-| M8 | Implementation epics (only after M2–M6) | Not started |
+| M7 | **DEVICE_OS_REQUEST_BUDGET** paid-tier row + test plan | **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)** § Phase 10 — hosted tier rows (M7) |
+| M8 | Implementation epics (only after M2–M7 + M4 sign-off) | Not started — see § Future implementation map |
 
 ---
 
@@ -254,7 +254,7 @@ For traceability when build begins — **not scheduled**:
 | Epic | Depends on | Touches (expected) |
 |------|------------|-------------------|
 | E1 Account + entitlement API | M2 | Worker auth, D1 |
-| E2 Client tier probe + UI gates | M2, M7 | `device-hub-*`, budget modules |
+| E2 Client tier probe + UI gates | M2, M7 | `device-hub-*`, budget modules; tests § Phase 10 — hosted tier rows (M7) |
 | E3 Raised caps / config per tier | M2 | `device-live-control-poll-budget-core`, scale core |
 | E4 Push channel | M3 | Worker DO or SSE, `device-inbox`, SW |
 | E5 Billing webhooks | M4, M9 | External Stripe, operator admin |
@@ -277,6 +277,7 @@ In [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md), **Phase 10** is
 
 | Date | Note |
 |------|------|
+| 2026-05-26 | **M7:** Paid-tier entitlement rows + test plan in [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) |
 | 2026-05-26 | **M6:** [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) |
 | 2026-05-26 | **M5:** Skeptic FAQ + launch language ([`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md), [`LAUNCH_LANGUAGE_KIT.md`](LAUNCH_LANGUAGE_KIT.md)) |
 | 2026-05-26 | **M4:** [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) |
