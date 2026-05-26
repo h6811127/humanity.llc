@@ -1,6 +1,7 @@
 /**
- * Pure live-proof polling for the background service worker (Phase D).
+ * Pure live-proof polling for the background service worker (Phase D + request budget Phase 4).
  * @see docs/DEVICE_INBOX.md — v2 Phase D
+ * @see docs/DEVICE_OS_REQUEST_BUDGET.md — Phase 4
  */
 import { osNotificationContentForLiveProof } from "./device-browser-notifications-core.mjs";
 import {
@@ -9,7 +10,15 @@ import {
   isPollableWalletEntry,
   liveControlPendingSignature,
   parsePendingChallengeBody,
+  pendingItemsFromPollSlots,
+  pruneLiveControlPollSlots,
+  updateLiveControlPollSlot,
 } from "./device-live-control-inbox-core.mjs";
+import {
+  liveControlPollAllowedByResolverHealth,
+  nextRoundRobinIndex,
+  pickRoundRobinPollIndex,
+} from "./device-live-control-poll-scheduler.mjs";
 import { walletEntryQrId } from "./device-wallet.mjs";
 
 export const SW_STATE_CACHE = "hc-live-proof-sw-v1";
@@ -17,6 +26,12 @@ export const SW_STATE_CACHE_KEY = "/__hc_sw_live_proof_state__";
 export const SW_SYNC_TAG = "hc-live-proof-poll";
 export const SW_PERIODIC_TAG = "hc-live-proof-poll";
 export const SW_NOTIFICATION_TAG = "hc-live-proof";
+
+/** Minimum periodicSync interval (request budget Phase 4: 5–15 min; use 15). */
+export const SW_PERIODIC_MIN_INTERVAL_MS = 15 * 60 * 1000;
+
+/** Back off SW polls after challenge 429 (align with tab inbox). */
+export const SW_RATE_LIMIT_BACKOFF_MS = 60_000;
 
 /**
  * @param {string} apiOrigin
@@ -50,34 +65,86 @@ export function liveProofPollTargetsFromWallet(wallet) {
 }
 
 /**
+ * @param {{
+ *   enabled: boolean,
+ *   resolverHealth?: 'ok' | 'degraded' | 'offline',
+ * }} input
+ */
+export function swLiveProofPollingShouldRun(input) {
+  if (!input.enabled) return false;
+  return liveControlPollAllowedByResolverHealth(input.resolverHealth ?? "offline");
+}
+
+/**
+ * @param {Record<string, unknown>} entry
+ * @param {string} apiOrigin
+ * @param {(url: string) => Promise<{ ok: boolean, status: number, body: unknown }>} fetchFn
+ * @returns {Promise<{ kind: import("./device-live-control-inbox-core.mjs").LiveControlPollKind, item?: import("./device-live-control-inbox-core.mjs").LiveControlPendingItem }>}
+ */
+async function fetchLiveProofChallengeForEntry(entry, apiOrigin, fetchFn) {
+  const profileId = String(entry.profile_id);
+  const qrId = walletEntryQrId(entry);
+  if (!qrId) return { kind: "none" };
+  const url = pendingLiveControlChallengeUrl(apiOrigin, profileId, qrId);
+  try {
+    const { status, body } = await fetchFn(url);
+    const httpKind = classifyChallengeHttpStatus(status);
+    if (httpKind === "none") return { kind: "none" };
+    if (httpKind === "rate_limited") return { kind: "rate_limited" };
+    if (httpKind === "unreachable") return { kind: "unreachable" };
+    const item = parsePendingChallengeBody(body, entry);
+    return item ? { kind: "pending", item } : { kind: "none" };
+  } catch {
+    return { kind: "unreachable" };
+  }
+}
+
+/**
+ * One challenge GET per call (round-robin). Accumulates pending in pollSlots across SW ticks.
+ *
  * @param {Array<Record<string, unknown>>} entries
  * @param {string} apiOrigin
  * @param {(url: string) => Promise<{ ok: boolean, status: number, body: unknown }>} [fetchFn]
+ * @param {number} [roundRobinCursor]
+ * @param {Record<string, import("./device-live-control-inbox-core.mjs").LiveControlPendingItem>} [pollSlotsRecord]
  */
-export async function pollWalletEntriesForLiveProof(entries, apiOrigin, fetchFn = defaultFetch) {
+export async function pollWalletEntriesForLiveProof(
+  entries,
+  apiOrigin,
+  fetchFn = defaultFetch,
+  roundRobinCursor = 0,
+  pollSlotsRecord = {}
+) {
   const pollable = entries.filter((e) => isPollableWalletEntry(e));
-  /** @type {import("./device-live-control-inbox-core.mjs").LiveControlPendingItem[]} */
-  const pending = [];
+  /** @type {Map<string, import("./device-live-control-inbox-core.mjs").LiveControlPendingItem>} */
+  const slots = new Map(Object.entries(pollSlotsRecord));
+  pruneLiveControlPollSlots(slots, pollable);
 
-  for (const entry of pollable) {
-    const profileId = String(entry.profile_id);
-    const qrId = walletEntryQrId(entry);
-    if (!qrId) continue;
-    const url = pendingLiveControlChallengeUrl(apiOrigin, profileId, qrId);
-    try {
-      const { status, body } = await fetchFn(url);
-      const httpKind = classifyChallengeHttpStatus(status);
-      if (httpKind !== "ok") continue;
-      const item = parsePendingChallengeBody(body, entry);
-      if (item) pending.push(item);
-    } catch {
-      /* unreachable — skip row */
-    }
+  if (pollable.length === 0) {
+    return {
+      pending: [],
+      signature: "",
+      nextCursor: 0,
+      pollSlots: {},
+      rateLimited: false,
+    };
   }
 
+  const pollIndex = pickRoundRobinPollIndex(roundRobinCursor, pollable.length);
+  const entry = pollable[pollIndex];
+  const result = await fetchLiveProofChallengeForEntry(entry, apiOrigin, fetchFn);
+
+  if (result.kind !== "rate_limited") {
+    updateLiveControlPollSlot(slots, entry, result);
+  }
+
+  const pending = pendingItemsFromPollSlots(pollable, slots);
   return {
     pending,
     signature: liveControlPendingSignature(pending),
+    nextCursor: nextRoundRobinIndex(roundRobinCursor, pollable.length),
+    pollSlots: Object.fromEntries(slots),
+    rateLimited: result.kind === "rate_limited",
   };
 }
 

@@ -192,6 +192,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 - OS notification via `registration.showNotification()` (same copy + sign deep link as Phase B); click handled in the SW.
 - **No server push** — device-only polling, `live_proof` policy only (Phase C).
 - **Limits:** Browsers may throttle or deny periodic sync; fully force-quit browsers may not wake the SW. Hidden-tab alerts still use the page path first (`maybeNotifyLiveProof`).
+- **Request budget Phase 4:** SW polls only when alerts are on + permission granted + resolver health is `ok`; **one** challenge GET per wake (round-robin); **15 min** minimum `periodicSync` interval ([`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)).
 
 **Request budget (ops):** Live proof is the main Worker cost driver (N saved cards × 5s × parallel `GET` while a tab is visible). A single tab can burn **100k+ requests/day** without viral traffic. Background SW polls add more when opted in. See **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)** for math, targets, and phased plan to scope polling.
 

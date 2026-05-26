@@ -51,7 +51,7 @@ These are guidelines until we ship coded budgets in the client.
 | **Wallet network status** | `device-wallet-network.mjs` + `device-hub-ui.mjs` | Hub init, hub expand, manual/`NETWORK_REFRESHED`, baseline events; **≥60s** debounce on `visibilitychange` | Up to **N per refresh** (on demand) |
 | **Resolver health** | `device-status.mjs` | Shell bootstrap + visible tab | **1** per refresh |
 | **Created / live panel** | `created.mjs` | ~3s while proving on `/created/` | **1** per open card (appropriate) |
-| **Service worker** | `/sw-live-proof.mjs` | Tab hidden + background alerts opt-in | Additional polls (see [`DEVICE_INBOX.md`](DEVICE_INBOX.md) Phase D) |
+| **Service worker** | `/sw-live-proof.mjs` | Tab hidden + background alerts opt-in; **Phase 4:** round-robin **one** GET per wake, **15 min** `periodicSync`, resolver `ok` only | Bounded when opted in (see [`DEVICE_INBOX.md`](DEVICE_INBOX.md) Phase D) |
 | **Cross-tab presence** | `device-tab-presence.mjs` | Heartbeat to **localStorage** only | **No Worker** |
 
 The dominant cost is **live-control inbox polling all saved cards on a timer**, not “having a status dot.”
@@ -127,7 +127,7 @@ Do **not** rip out the device OS. **Retire the default “poll every card every 
 | **1 — Stop the bleed** (P0) | Start live-control polling **only** when hub is **expanded** or inbox sheet is open; **stop** on collapse/close. Increase idle interval to **30s** when no pending proof. | ~**95%** cut on **landing** (collapsed hub); **~6×** cut on **`/wallet/`** (30s idle vs 5s) | Proof badge may lag until hub/inbox opened on landing; wallet still polls while visible |
 | **2 — Cap fan-out** (P0) | **Shipped:** round-robin **one** `live-control` GET per tick; wallet status on hub open + manual refresh + **≥60s** visibility debounce | Bounded **~1,440–2,880/day/tab** at 30–60s | Full wallet scan for live proof takes `N × interval`; network chips refresh on expand not every visibility |
 | **3 — Degraded = silent** (P1) | **Shipped:** no live-control poll timer/fetch unless resolver health is `ok` (`getResolverHealthStatus`); resumes on `hc-resolver-health-changed`; **60s** backoff after challenge **429** | Stops inbox poll storms during 1027/degraded | Live proof inbox may lag until health recovers |
-| **4 — SW policy** (P1) | Background polls **only** if notifications enabled; minimum **5–15 min** interval; no parallel N-card | Cuts hidden-tab burn | Slower background alerts |
+| **4 — SW policy** (P1) | **Shipped:** SW polls only when browser alerts on + permission granted + resolver `ok`; **15 min** `periodicSync`; round-robin **one** challenge GET per wake; 60s backoff on 429 | Cuts hidden-tab burn | Slower background alerts; full wallet scan takes N wakes |
 | **5 — Product polish** (P2) | “Check network” on hub; show last-checked time; optional “Watch for live proof” toggle | User-visible cost | More honest UX |
 | **6 — Evaluate push** (future) | Only if phases 1–4 cannot meet “stranger waiting” SLA | Best at scale | Engineering cost |
 
@@ -164,3 +164,4 @@ Before merging shell changes that touch network I/O:
 | 2026-05-26 | **Phase 1 shipped:** `device-live-control-poll-scheduler.mjs`, scoped polling in `device-live-control-inbox.mjs` |
 | 2026-05-26 | **Phase 2 shipped:** round-robin live-control poll slots; hub-expand network refresh; 60s visibility debounce for wallet status |
 | 2026-05-26 | **Phase 3 shipped:** live-control poll loop gated on resolver health `ok` only; listen for `hc-resolver-health-changed` |
+| 2026-05-26 | **Phase 4 shipped:** SW round-robin poll, 15 min periodic sync, alerts-only + resolver health gate |

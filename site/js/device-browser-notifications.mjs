@@ -329,6 +329,11 @@ export function initBrowserNotifications() {
   window.addEventListener("pagehide", () => {
     void syncLiveProofServiceWorkerState({ pollNow: true });
   });
+  window.addEventListener("hc-resolver-health-changed", () => {
+    if (isBrowserNotifEnabled() && notificationPermission() === "granted") {
+      void syncLiveProofServiceWorkerState({ pollNow: false });
+    }
+  });
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
       mountBrowserNotifToggles();

@@ -7,8 +7,10 @@ import {
   buildLiveProofSwNotification,
   pollWalletEntriesForLiveProof,
   shouldShowSwLiveProofNotification,
+  swLiveProofPollingShouldRun,
   SW_NOTIFICATION_TAG,
   SW_PERIODIC_TAG,
+  SW_RATE_LIMIT_BACKOFF_MS,
   SW_STATE_CACHE,
   SW_STATE_CACHE_KEY,
   SW_SYNC_TAG,
@@ -21,6 +23,10 @@ import {
  *   entries: Array<Record<string, unknown>>,
  *   lastSig: string,
  *   interactShown: boolean,
+ *   roundRobinCursor?: number,
+ *   pollSlots?: Record<string, import("./js/device-live-control-inbox-core.mjs").LiveControlPendingItem>,
+ *   resolverHealth?: 'ok' | 'degraded' | 'offline',
+ *   pollBackoffUntil?: number,
  * }} SwState */
 
 /** @returns {Promise<SwState | null>} */
@@ -48,7 +54,19 @@ async function writeState(state) {
 
 async function pollAndMaybeNotify() {
   const state = await readState();
-  if (!state?.enabled || !state.apiOrigin || !state.pageOrigin) return;
+  if (
+    !state?.enabled ||
+    !state.apiOrigin ||
+    !state.pageOrigin ||
+    !swLiveProofPollingShouldRun({
+      enabled: state.enabled,
+      resolverHealth: state.resolverHealth,
+    })
+  ) {
+    return;
+  }
+
+  if (Date.now() < (state.pollBackoffUntil ?? 0)) return;
 
   const clients = await self.clients.matchAll({
     type: "window",
@@ -56,14 +74,34 @@ async function pollAndMaybeNotify() {
   });
   if (anyClientVisible(clients)) return;
 
-  const { pending, signature } = await pollWalletEntriesForLiveProof(
+  const {
+    pending,
+    signature,
+    nextCursor,
+    pollSlots,
+    rateLimited,
+  } = await pollWalletEntriesForLiveProof(
     state.entries,
-    state.apiOrigin
+    state.apiOrigin,
+    undefined,
+    state.roundRobinCursor ?? 0,
+    state.pollSlots ?? {}
   );
+
+  const nextState = {
+    ...state,
+    roundRobinCursor: nextCursor,
+    pollSlots,
+    pollBackoffUntil: rateLimited
+      ? Date.now() + SW_RATE_LIMIT_BACKOFF_MS
+      : state.pollBackoffUntil ?? 0,
+  };
 
   if (!shouldShowSwLiveProofNotification(state.lastSig, signature, pending.length)) {
     if (pending.length === 0 && state.lastSig) {
-      await writeState({ ...state, lastSig: "" });
+      await writeState({ ...nextState, lastSig: "" });
+    } else {
+      await writeState(nextState);
     }
     return;
   }
@@ -80,7 +118,7 @@ async function pollAndMaybeNotify() {
   });
 
   await writeState({
-    ...state,
+    ...nextState,
     lastSig: signature,
     interactShown: state.interactShown || requireInteraction,
   });
@@ -98,19 +136,33 @@ self.addEventListener("message", (event) => {
   const msg = event.data;
   if (!msg || msg.type !== "HC_SW_SYNC_STATE") return;
 
-  const state = {
-    enabled: !!msg.enabled,
-    apiOrigin: String(msg.apiOrigin || ""),
-    pageOrigin: String(msg.pageOrigin || self.location.origin),
-    entries: Array.isArray(msg.entries) ? msg.entries : [],
-    lastSig: String(msg.lastSig || ""),
-    interactShown: !!msg.interactShown,
-  };
-
   event.waitUntil(
-    writeState(state).then(() => {
-      if (msg.pollNow && state.enabled) return pollAndMaybeNotify();
-    })
+    (async () => {
+      const prev = await readState();
+      const enabled = !!msg.enabled;
+      const state = {
+        enabled,
+        apiOrigin: String(msg.apiOrigin || ""),
+        pageOrigin: String(msg.pageOrigin || self.location.origin),
+        entries: Array.isArray(msg.entries) ? msg.entries : [],
+        lastSig: String(msg.lastSig || ""),
+        interactShown: !!msg.interactShown,
+        resolverHealth:
+          msg.resolverHealth === "ok" ||
+          msg.resolverHealth === "degraded" ||
+          msg.resolverHealth === "offline"
+            ? msg.resolverHealth
+            : "offline",
+        roundRobinCursor: enabled ? (prev?.roundRobinCursor ?? 0) : 0,
+        pollSlots: enabled ? (prev?.pollSlots ?? {}) : {},
+        pollBackoffUntil: enabled ? (prev?.pollBackoffUntil ?? 0) : 0,
+      };
+
+      await writeState(state);
+      if (msg.pollNow && swLiveProofPollingShouldRun(state)) {
+        await pollAndMaybeNotify();
+      }
+    })()
   );
 });
 

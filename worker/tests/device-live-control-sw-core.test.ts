@@ -7,10 +7,13 @@ import {
   pendingLiveControlChallengeUrl,
   pollWalletEntriesForLiveProof,
   shouldShowSwLiveProofNotification,
+  swLiveProofPollingShouldRun,
+  SW_PERIODIC_MIN_INTERVAL_MS,
 } from "../../site/js/device-live-control-sw-core.mjs";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const QR_ID = "qr_xBZTq7M27tueCzBY";
+const QR_ID_B = "qr_E2eWakketTest8";
 
 describe("pendingLiveControlChallengeUrl", () => {
   it("builds resolver challenge URL with qr_id", () => {
@@ -22,6 +25,26 @@ describe("pendingLiveControlChallengeUrl", () => {
     expect(url).toContain("/live-control/challenges");
     expect(url).toContain(encodeURIComponent(PROFILE));
     expect(url).toContain(`qr_id=${encodeURIComponent(QR_ID)}`);
+  });
+});
+
+describe("swLiveProofPollingShouldRun", () => {
+  it("requires alerts enabled and resolver ok", () => {
+    expect(
+      swLiveProofPollingShouldRun({ enabled: true, resolverHealth: "ok" })
+    ).toBe(true);
+    expect(
+      swLiveProofPollingShouldRun({ enabled: false, resolverHealth: "ok" })
+    ).toBe(false);
+    expect(
+      swLiveProofPollingShouldRun({ enabled: true, resolverHealth: "degraded" })
+    ).toBe(false);
+  });
+});
+
+describe("SW_PERIODIC_MIN_INTERVAL_MS", () => {
+  it("uses at least 15 minutes for periodic background polls", () => {
+    expect(SW_PERIODIC_MIN_INTERVAL_MS).toBeGreaterThanOrEqual(15 * 60 * 1000);
   });
 });
 
@@ -57,6 +80,36 @@ describe("pollWalletEntriesForLiveProof", () => {
       async () => ({ ok: false, status: 503, body: null })
     );
     expect(pending).toHaveLength(0);
+  });
+
+  it("round-robins one GET per poll call", async () => {
+    const entries = [
+      { profile_id: PROFILE, qr_id: QR_ID, label: "A" },
+      { profile_id: `${PROFILE}2`, qr_id: QR_ID_B, label: "B" },
+    ];
+    const fetched = [];
+    let cursor = 0;
+    let slots = {};
+    for (let i = 0; i < 2; i += 1) {
+      const result = await pollWalletEntriesForLiveProof(
+        entries,
+        "http://127.0.0.1:8787",
+        async (url) => {
+          fetched.push(url);
+          return {
+            ok: true,
+            status: 200,
+            body: { status: "none" },
+          };
+        },
+        cursor,
+        slots
+      );
+      cursor = result.nextCursor;
+      slots = result.pollSlots;
+    }
+    expect(fetched).toHaveLength(2);
+    expect(fetched[0]).not.toBe(fetched[1]);
   });
 });
 
