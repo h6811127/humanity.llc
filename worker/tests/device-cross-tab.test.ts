@@ -74,6 +74,22 @@ describe("listOtherTabsWithKeys", () => {
     expect(others.map((o) => o.tabId)).toEqual(["b", "a"]);
   });
 
+  it("can include other tabs even when profile is saved on device (scan vouch)", () => {
+    const otherProfile = "7Xk9mP2nQ4rT6vW8yZ1aB3cD6";
+    const map = {
+      self: { profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5", updatedAt: now },
+      other: { profile_id: otherProfile, updatedAt: now },
+    };
+    const { others } = listOtherTabsWithKeys({
+      map,
+      tabId: "self",
+      thisProfile: null,
+      savedProfileIds: [],
+      now,
+    });
+    expect(others).toHaveLength(1);
+  });
+
   it("hides other tabs when that profile is already saved on this device", () => {
     const otherProfile = "7Xk9mP2nQ4rT6vW8yZ1aB3cD6";
     const map = {

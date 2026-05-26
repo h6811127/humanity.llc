@@ -1067,6 +1067,53 @@ a {
   background: rgba(60, 60, 67, 0.06);
 }
 
+.scan-cross-tab-banner {
+  margin: 0 var(--pad) 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--black);
+  background: rgba(10, 132, 255, 0.08);
+  border: 1px solid rgba(10, 132, 255, 0.22);
+  border-radius: 14px;
+}
+
+.scan-cross-tab-banner[hidden] {
+  display: none;
+}
+
+.scan-cross-tab-sub {
+  display: block;
+  margin-top: 4px;
+  color: rgba(60, 60, 67, 0.85);
+}
+
+.scan-cross-tab-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.scan-cross-tab-focus-btn,
+.scan-cross-tab-use-keys {
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  border: 1px solid rgba(10, 132, 255, 0.35);
+  background: var(--white);
+  color: #0a84ff;
+}
+
+.scan-cross-tab-use-keys {
+  background: #248a3d;
+  border-color: #248a3d;
+  color: var(--white);
+}
+
 .vouch-card-hint a {
   color: #0a84ff;
   font-weight: 600;

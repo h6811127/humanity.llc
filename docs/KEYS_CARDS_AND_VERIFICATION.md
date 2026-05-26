@@ -111,7 +111,7 @@ Per **device**, storage:
 
 If step 3 is skipped, you will see **“keys not active on this device”** even when the network says Steward.
 
-**Vouch-ready keys (optional):** On **Saved cards**, set **Default for vouching** (⋯ menu). Scan pages then auto-load that card’s keys in this tab. See [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md).
+**Vouch-ready keys (optional):** On **Saved cards**, set **Default for vouching** (⋯ menu). Scan pages then auto-load that card’s keys in this tab. If keys are active in another tab, the scan shows a cross-tab notice with **Open that tab** or **Use keys here**. See [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md).
 
 ---
 

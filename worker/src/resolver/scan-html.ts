@@ -45,6 +45,7 @@ export async function renderScanPage(
 <body>
   <div class="page scan-page">
     ${renderTopHeader(origin)}
+    <p class="scan-cross-tab-banner" id="scan-cross-tab-banner" role="status" hidden></p>
     <main class="screen scan-screen">
       <p class="section-kicker">Network status</p>
       ${renderPassSection(vm, origin, qrMarkup)}
@@ -56,6 +57,7 @@ export async function renderScanPage(
   </div>
   ${renderLiveControlScript(vm, origin)}
   ${renderVouchIssuanceScript(vm, origin)}
+  ${renderScanTabKeysScript(vm, origin)}
   ${renderQrFallbackScript(origin, vm.scanUrl)}
 </body>
 </html>`;
@@ -722,7 +724,14 @@ function vouchIssuanceGroupRows(vm: ScanViewModel): string {
 function renderVouchIssuanceScript(vm: ScanViewModel, origin: string): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
   const assetOrigin = pagesJsOrigin(origin);
-  const mod = JSON.stringify(`${assetOrigin}/js/vouch-issue.mjs?v=7`);
+  const mod = JSON.stringify(`${assetOrigin}/js/vouch-issue.mjs?v=8`);
+  return `<script type="module" src=${mod}></script>`;
+}
+
+function renderScanTabKeysScript(vm: ScanViewModel, origin: string): string {
+  if (vm.kind !== "active" || !vm.profileId) return "";
+  const assetOrigin = pagesJsOrigin(origin);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-tab-keys.mjs?v=1`);
   return `<script type="module" src=${mod}></script>`;
 }
 

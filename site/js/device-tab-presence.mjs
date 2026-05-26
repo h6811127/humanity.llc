@@ -109,16 +109,24 @@ function savedProfileIdsOnDevice() {
  *   updatedAt: number,
  * }>}
  */
-export function getOtherTabsWithKeys() {
+/**
+ * @param {{ includeSavedProfiles?: boolean }} [opts]
+ * When `includeSavedProfiles` is true, other tabs are listed even if that card is
+ * saved on this device (scan vouch surfaces need “keys in another tab” + Use keys here).
+ */
+export function getOtherTabsWithKeys(opts = {}) {
   const tabId = getTabId();
   const map = readPrunedPresence();
   const session = getTabSession();
   const thisProfile = session?.profile_id ?? null;
+  const savedProfileIds = opts.includeSavedProfiles
+    ? []
+    : savedProfileIdsOnDevice();
   return listOtherTabsWithKeys({
     map,
     tabId,
     thisProfile,
-    savedProfileIds: savedProfileIdsOnDevice(),
+    savedProfileIds,
   }).others;
 }
 

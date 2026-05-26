@@ -565,3 +565,7 @@ async function runVouchFlow(opts = {}) {
 }
 
 runVouchFlow();
+
+window.addEventListener("hc-device-hub-changed", () => {
+  runVouchFlow();
+});
