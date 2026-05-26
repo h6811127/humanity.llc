@@ -169,14 +169,6 @@ function bindFocusChannel() {
   }
 }
 
-function onVisibilityPresence() {
-  if (document.visibilityState === "visible") {
-    syncTabKeysPresence();
-  }
-  // Background tabs stop heartbeating; stale/show windows retire the row.
-  // Do not clear on hidden — that breaks multi-window (other tabs need the last heartbeat).
-}
-
 function onPageShowPresence(ev) {
   if (ev.persisted) {
     syncTabKeysPresence();
@@ -194,7 +186,6 @@ export function startTabKeysPresence() {
   }, PRESENCE_HEARTBEAT_MS);
   window.addEventListener("pagehide", clearTabKeysPresence);
   window.addEventListener("pageshow", onPageShowPresence);
-  window.addEventListener("visibilitychange", onVisibilityPresence);
   window.addEventListener("hc-device-hub-changed", syncTabKeysPresence);
   window.addEventListener("storage", (e) => {
     if (e.key === PRESENCE_KEY) {

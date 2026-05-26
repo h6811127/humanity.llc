@@ -1,6 +1,6 @@
 # Device OS  -  browser shell + physical network
 
-**Status:** Phase 8 shipped (device hub) · **Active vertical:** merch Tier 0 shop (`/shop/`)  
+**Status:** Phase 8 shipped (device hub) · Phase 1 refresh coordinator shipped · **Active vertical:** merch Tier 0 shop (`/shop/`)  
 **Audience:** Product, frontend, and anyone extending Pages without accounts
 
 ---
@@ -140,6 +140,21 @@ See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` for storage and search.
 
 ---
 
+## Refresh coordinator (Phase 1 hardening)
+
+Resolver health, wallet status polls, tab presence sync, and live-proof inbox refresh are batched in **`site/js/device-os-coordinator.mjs`** (300ms debounce). Pages with device chrome import it via `device-status.mjs`.
+
+| Event | Role |
+|-------|------|
+| `hc-device-os-refreshed` | Health + inbox cycle finished; status chrome updates |
+| `hc-wallet-network-refreshed` | Saved-row chips / alerts after wallet poll (`device-wallet-network.mjs`) |
+
+Manual regression: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) (especially **P1-1** — no duplicate fetches on tab focus).
+
+**Glance:** Landing uses `#device-hub-glance-popover` only. `/wallet/` scrolls to saved cards from the status dot; there is no separate wallet glance popover in HTML.
+
+---
+
 ## Implementation checklist
 
 | Step | Item | Status |
@@ -165,7 +180,7 @@ Small TLC items that need **no new resolver APIs**:
 | Item | Notes |
 |------|--------|
 | Browser notifications when live proof is waiting | ✅ Shipped (device-only; `Notification` API after inbox poll finds pending) |
-| Glance on `/wallet/` | ✅ `#wallet-hub-glance` mirrors landing glance (`device-hub-glance.mjs`) |
+| Glance on `/wallet/` | Landing popover only; wallet uses scroll-to-saved chrome |
 | Light frontend tests | Vitest (`worker/tests/device-*`) + Playwright smoke (`e2e/device-os-wallet.spec.ts`) |
 
 ### Owner key portability (shipped  -  see M5.5)
@@ -218,6 +233,9 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 |------|------|
 | `docs/DEVICE_OS.md` | This document |
 | `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` | Storage, search, focus mode |
+| `docs/DEVICE_OS_QA.md` | Manual QA runbook + bug triage |
+| `site/js/device-os-coordinator.mjs` | Debounced device OS refresh pipeline |
+| `site/js/device-network-health.mjs` | Shared resolver `/.well-known/hc/v1/health` fetch |
 | `site/js/device-tab-presence.mjs` | Cross-tab signing-key heartbeat |
 | `site/js/device-cross-tab-banner.mjs` | Cross-tab keys banner copy |
 | `site/js/device-live-control-inbox.mjs` | Poll pending challenges for saved cards |

@@ -89,13 +89,6 @@ export function startLiveControlInboxPolling() {
       void refreshLiveControlInbox();
     }
   }, POLL_MS);
-  document.addEventListener("visibilitychange", onVisibilityLiveControl);
-}
-
-function onVisibilityLiveControl() {
-  if (document.visibilityState === "visible") {
-    void refreshLiveControlInbox();
-  }
 }
 
 export function stopLiveControlInboxPolling() {
@@ -103,7 +96,6 @@ export function stopLiveControlInboxPolling() {
     window.clearInterval(pollTimer);
     pollTimer = null;
   }
-  document.removeEventListener("visibilitychange", onVisibilityLiveControl);
 }
 
 /**
