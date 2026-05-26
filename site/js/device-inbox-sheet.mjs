@@ -9,13 +9,17 @@ import {
   getLiveControlPending,
   openLiveControlProof,
 } from "./device-live-control-inbox.mjs";
+import { openCardNowPage } from "./device-keys.mjs";
+import { loadWallet } from "./device-wallet.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
+import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs";
 import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
 import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { prefersReducedMotion } from "./device-shell-motion.mjs";
 import { closeGlancePopover } from "./device-hub-glance-popover.mjs";
 import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs";
 
 const SHEET_ID = "device-inbox-sheet";
 const LIST_ID = "device-inbox-sheet-list";
@@ -136,9 +140,15 @@ function crossTabEntriesForSheet() {
 }
 
 function sheetRows() {
+  const cardDisabled = gatherCardDisabledSinceVisitForInbox().map((entry) => ({
+    profile_id: entry.profile_id,
+    label: entry.label,
+    handle: entry.handle,
+  }));
   return buildInboxSheetRows(getInboxItems(), {
     liveProofPending: getLiveControlPending(),
     crossTabEntries: crossTabEntriesForSheet(),
+    cardDisabledSinceVisit: cardDisabled,
     formatProofExpiry: formatLiveControlExpiry,
   });
 }
@@ -155,6 +165,9 @@ function rowIconSvg(kind) {
   }
   if (kind === "cross_tab_keys") {
     return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>`;
+  }
+  if (kind === "card_disabled_since_visit") {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/></svg>`;
   }
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
 }
@@ -196,15 +209,30 @@ export function renderInboxSheet() {
       window.dispatchEvent(new CustomEvent("hc-glance-popover-close"));
 
       if (row.kind === "live_proof" && row.proofItem) {
+        logInboxDiagnostic({ type: "inbox_item_action", kind: row.kind, outcome: "open_sign" });
         openLiveControlProof(row.proofItem);
         return;
       }
       if (row.kind === "cross_tab_keys" && row.crossTabEntry) {
+        logInboxDiagnostic({
+          type: "inbox_item_action",
+          kind: row.kind,
+          outcome: "focus_other_tab",
+        });
         actOnOtherTabKeys(row.crossTabEntry);
         return;
       }
       if (row.kind === "tab_keys_unsaved") {
+        logInboxDiagnostic({ type: "inbox_item_action", kind: row.kind, outcome: "save_keys" });
         openSaveKeysForThisTab();
+        return;
+      }
+      if (row.kind === "card_disabled_since_visit" && row.cardDisabledEntry) {
+        logInboxDiagnostic({ type: "inbox_item_action", kind: row.kind, outcome: "open_card" });
+        const entry = loadWallet().find(
+          (e) => e.profile_id === row.cardDisabledEntry?.profile_id
+        );
+        if (entry) openCardNowPage(entry);
       }
     });
 
@@ -220,10 +248,15 @@ export function renderInboxSheet() {
   }
 }
 
-/** Open the inbox sheet (closes hub glance). */
-export function openInboxFromChrome() {
+/**
+ * Open the inbox sheet (closes hub glance).
+ * @param {import("./device-inbox-diagnostics-core.mjs").InboxOpenSource} [source]
+ */
+export function openInboxFromChrome(source) {
   if (!document.getElementById("shell-notif-badge")) return;
   if (notificationCount() === 0) return;
+
+  logInboxDiagnostic({ type: "inbox_open", source: source ?? "hub" });
 
   closeGlancePopover();
   window.dispatchEvent(new CustomEvent("hc-hub-sheet-close"));

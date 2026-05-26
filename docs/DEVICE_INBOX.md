@@ -230,6 +230,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 | 4 | Contextual browser-alert prompt + OS click deep link | ✅ |
 | 5 | Badge/dot chroma sync to `topInboxKind()` | ✅ |
 | 6 | E2E: proof → badge → row; Playwright `Notification` permission | ✅ |
+| 7 | Inbox diagnostics (`hc_inbox_diagnostics`, session log + confusion signals) | ✅ |
 
 **Do not:**
 
@@ -240,9 +241,9 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 
 ---
 
-## Diagnostics (planned)
+## Diagnostics (shipped — phase 7)
 
-Enable: `localStorage.setItem("hc_inbox_diagnostics", "1")` (mirror dot diagnostics pattern).
+Enable: `localStorage.setItem("hc_inbox_diagnostics", "1")` (mirror dot diagnostics pattern). Log ring: `sessionStorage.hc_inbox_diag_log`.
 
 | Event | Use |
 |-------|-----|
@@ -286,6 +287,9 @@ Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox 
 | `site/js/device-inbox-sheet.mjs` | Inbox bottom sheet + `openInboxFromChrome()` |
 | `worker/tests/device-inbox.test.ts` | Vitest for inbox core |
 | `e2e/device-inbox.spec.ts` | Playwright: badge, inbox sheet, chroma, background alerts, OS notification |
+| `site/js/device-inbox-diagnostics.mjs` | Browser inbox diag log (`hc_inbox_diagnostics`) |
+| `site/js/device-inbox-diagnostics-core.mjs` | Pure diag helpers (ring buffer, confusion counts) |
+| `worker/tests/device-inbox-diagnostics.test.ts` | Vitest for inbox diagnostics core |
 
 ---
 

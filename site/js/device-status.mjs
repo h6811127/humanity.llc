@@ -25,6 +25,7 @@ import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs";
 import "./device-shell-motion.mjs";
 import "./device-shell-chrome.mjs";
 import "./device-theme.mjs";
@@ -468,7 +469,8 @@ dotBtn?.addEventListener("click", (e) => {
 notifBtn?.addEventListener("click", (e) => {
   e.preventDefault();
   e.stopPropagation();
-  openInboxFromChrome();
+  logInboxDiagnostic({ type: "badge_click" });
+  openInboxFromChrome("badge");
 });
 
 document.addEventListener("keydown", (e) => {
@@ -519,7 +521,7 @@ window.addEventListener("hc-tab-presence-changed", refreshSummary);
 window.addEventListener("hc-hub-expand-request", (e) => {
   const targetId = e.detail?.targetId;
   if (targetId && INBOX_HUB_TARGETS.has(targetId)) {
-    openInboxFromChrome();
+    openInboxFromChrome("hub");
     return;
   }
   if (isWalletPage()) {
@@ -529,7 +531,7 @@ window.addEventListener("hc-hub-expand-request", (e) => {
         block: "nearest",
       });
     } else {
-      openInboxFromChrome();
+      openInboxFromChrome("hub");
     }
     return;
   }
@@ -568,6 +570,6 @@ document.addEventListener("click", (e) => {
     return;
   }
   if (action === "open_notifications") {
-    openInboxFromChrome();
+    openInboxFromChrome("dot_explainer");
   }
 });

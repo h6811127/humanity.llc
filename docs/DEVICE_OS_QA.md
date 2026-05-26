@@ -168,6 +168,14 @@ Spec: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 
 Playwright: `e2e/device-inbox.spec.ts` (CI via `test-site.yml`). Manual spot-check still useful on real Worker + pending challenge.
 
+## P5 — Inbox diagnostics (dev — phase 7)
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | `localStorage.hc_inbox_diagnostics = "1"` | — |
+| 2 | Open inbox from badge; tap a live-proof row | `sessionStorage.hc_inbox_diag_log` has `inbox_open` + `inbox_item_action` |
+| 3 | Open inbox 3× without row tap | Console: `[hc-inbox-diag] Repeated inbox opens without row action` |
+
 | Step | Action | Expected |
 |------|--------|----------|
 | 1 | First live proof while tab visible | Contextual “background alerts” strip (not on first visit globally) |

@@ -10,6 +10,7 @@ import {
 } from "./device-browser-notifications-core.mjs";
 import { buildLiveControlProofHref } from "./device-live-control-inbox-core.mjs";
 import { getLiveControlPending, getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs";
 
 const TAG_LIVE_PROOF = "hc-live-proof";
 const SESSION_OS_INTERACT = "hc_browser_notif_os_interact";
@@ -48,6 +49,7 @@ export function dismissBrowserNotifPrompt() {
   } catch {
     /* ignore */
   }
+  logInboxDiagnostic({ type: "browser_alert_dismissed_prompt" });
   syncBrowserNotifPrompts();
 }
 
@@ -77,9 +79,13 @@ export async function enableBrowserAlerts() {
   const perm = await ensurePermission();
   if (perm === "granted") {
     setBrowserNotifEnabled(true);
+    logInboxDiagnostic({ type: "browser_alert_opt_in" });
     return true;
   }
   setBrowserNotifEnabled(false);
+  if (perm === "denied") {
+    logInboxDiagnostic({ type: "browser_alert_denied" });
+  }
   syncBrowserNotifPrompts();
   return false;
 }
@@ -263,6 +269,7 @@ export function maybeNotifyLiveProof() {
       }
     }
     ntf.onclick = () => {
+      logInboxDiagnostic({ type: "os_notification_click" });
       window.focus();
       ntf.close();
       location.href = href;

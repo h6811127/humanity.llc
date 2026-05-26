@@ -80,7 +80,7 @@ function appendInboxGlanceRow(item, list, copy) {
         <span class="device-hub-glance-sub">${escapeHtml(copy.liveProofSub)}</span>
       </button>`;
     li.querySelector("button")?.addEventListener("click", () => {
-      openInboxFromChrome();
+      openInboxFromChrome("glance");
     });
     list.appendChild(li);
     return;
