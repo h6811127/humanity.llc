@@ -1,6 +1,6 @@
 # Scan hero card — visual spec (live check)
 
-**Status:** Active (documents **shipped** `pass-v33`; depth tier **v1 flat**, **v2 raised** planned)  
+**Status:** Active (documents **shipped** `pass-v33`; depth **v2 step 3** — dark hero fill/shadow + `hc_theme` bootstrap on Worker scan HTML; step 4 snapshot QA pending)  
 **Audience:** Product, design, frontend  
 **Component name:** **Live check hero** (resolver plate)  
 **Related:** [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) (motion) · [`M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) (layout) · [`SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) (copy IA) · [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Emphasis notice cards · [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md)
@@ -87,30 +87,30 @@ Below the hero (not part of this component): L3 `.scan-actor-band`, then “What
 
 ## Surface & depth
 
-### Shipped (v1 — flat plate)
+### Shipped (v2 — resolver plate depth)
 
 | Property | Value | Notes |
 |----------|-------|-------|
-| Background | `var(--white)` / `rgba(255,255,255,0.96)` | Opaque; not glass on hero |
-| Border | `0.5px solid rgba(60, 60, 67, 0.14)` | Hairline; settle pulse temporarily tints red |
+| Background | `var(--hc-scan-hero-fill)` | Neutral gradient plate; opaque |
+| Border | `0.5px solid rgba(60, 60, 67, 0.14)` | Hairline; settle pulse tints red briefly |
 | Radius | **18px** (`.scan-status-panel`) | Larger than emphasis card (14px) |
-| Padding | **22px 20px 18px** (`.scan-hero.scan-safety-header`) | Per [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) 24–28px intent |
-| Shadow | `0 1px 2px …`, `0 10px 28px rgba(0,0,0,0.07)` | Soft lift; **not** full emphasis stack yet |
-| Margin below hero | **18px** | Before actor band or trust modules |
+| Padding | **22px 20px 18px** (`.scan-hero.scan-status-panel`) | Per [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) 24–28px intent |
+| Shadow | `var(--hc-scan-hero-shadow)` | Tier 4 inset + outer stack — see `:root` in `scan-pass.css` |
+| Settle motion | `scan-hero-settle-pulse` | Ring layers **on top of** hero shadow; returns to rest stack at 100% |
+| Margin below hero | **18px** (`.scan-hero.scan-safety-header`) | Before actor band or trust modules |
 
-CSS: `site/scan-pass.css` (`.scan-hero.scan-safety-header`, `.scan-status-panel`). Bundled via `npm run worker:bundle-scan`.
+CSS: `site/scan-pass.css` (`.scan-hero.scan-status-panel`). Bundled via `npm run worker:bundle-scan`.
 
-### Target (v2 — resolver plate / “full 3D” depth)
+Non-hero `.scan-status-panel` (e.g. scan-out) keeps the lighter v1 shadow stack.
 
-Align hero elevation with the **emphasis-card shadow language** at **tier 4** scale — without copying wallet markup or semantic fills.
+### Dark mode (shipped step 3)
 
-| Property | Target |
-|----------|--------|
-| Depth | `box-shadow: var(--hc-scan-hero-shadow)` (new token; may derive from `--hc-emphasis-card-shadow` with stronger outer drops) |
-| Border | Prefer **shadow-only** rim at rest; optional `0.5px` hairline only if needed for AA on tinted fills |
-| Fill | Neutral gradient plate (not `--active` green wash) — semantic color stays in **strip** and **resolver** line |
-| Radius | Keep **18px** (hero) vs **14px** (emphasis) |
-| Dark mode | Explicit hero fill + shadow overrides in `theme-dark.css` (scan bundle today is light-first; track gap in QA) |
+| Property | Value |
+|----------|-------|
+| Preference | `localStorage.hc_theme` = `dark` (inline bootstrap in Worker scan HTML; same as shell pages) |
+| Tokens | `--hc-scan-hero-fill`, `--hc-scan-hero-border`, dark `--hc-scan-hero-shadow` on `html[data-theme="dark"]` |
+| CSS | `site/css/theme-dark.css` (Pages + prototype with theme sheet) · mirrored in bundled `scan-pass.css` |
+| Copy | Hero title/line → `--hc-emphasis-card-title-fg`; steward/limit/foot → `--hc-emphasis-card-detail-fg` |
 
 **Differentiation from `.hc-emphasis-card`:**
 
@@ -190,7 +190,7 @@ Canonical timeline: [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md). Implementa
 | **Settle** | Strip label → resolver state; rows stagger (~90ms); `scan-safety--pulse` on article **once**; limits fade in |
 | **After** | Static until navigation or state change |
 
-**Settle pulse** (`.scan-safety--pulse`): ~0.85s border + shadow keyframes — brief red accent, returns to rest shadow. Must remain visible when moving to v2 depth (resting shadow shallower than pulse peak).
+**Settle pulse** (`.scan-hero.scan-safety--pulse` → `scan-hero-settle-pulse`): ~0.85s — red border + `0 0 0 4px` ring **layered on** `var(--hc-scan-hero-shadow)` at peak; 100% returns to hero shadow only. Legacy non-hero `.scan-safety-header` keeps `scan-safety-border-pulse`.
 
 **Reduced motion:** Instant visibility; no pulse, stagger, or actor-band slide (`prefers-reduced-motion`).
 
@@ -247,9 +247,9 @@ Prototype (timing tune): `npm run pages:dev` → `/prototypes/scan-trust-ui-demo
 
 When raising the hero to tier 4:
 
-1. Add `--hc-scan-hero-shadow` (+ dark override) in `site/styles.css` and `scan-pass.css` `:root` block (keep bundles in sync).
-2. Apply to `.scan-hero.scan-status-panel` at rest; ensure `scan-safety--pulse` still has headroom above resting shadow.
-3. Add dark hero fill overrides in `theme-dark.css` (scan pages that honor `data-theme`).
+1. ~~Add `--hc-scan-hero-shadow` (+ dark override) in `site/styles.css` and `scan-pass.css` `:root` block (keep bundles in sync).~~ **Done**
+2. ~~Apply to `.scan-hero.scan-status-panel` at rest; ensure `scan-safety--pulse` still has headroom above resting shadow.~~ **Done** (`scan-hero-settle-pulse`)
+3. ~~Add dark hero fill overrides in `theme-dark.css` (scan pages that honor `data-theme`).~~ **Done** (+ bundled `scan-pass.css` dark block, `SCAN_PAGE_THEME_BOOTSTRAP`)
 4. Update this doc **Status** line and snapshot tests if class list or tokens change.
 5. Manual: light + dark, active + revoked, reduced motion, first paint → settle on mobile Safari.
 
@@ -260,3 +260,6 @@ When raising the hero to tier 4:
 | Date | Change |
 |------|--------|
 | 2026-05-26 | Initial spec: anatomy, tier system, shipped v1 + target v2 depth, motion cross-ref |
+| 2026-05-26 | v2 step 1: `--hc-scan-hero-shadow` on `:root` (`styles.css`, `scan-pass.css`) + dark in `theme-dark.css` |
+| 2026-05-26 | v2 step 2: `.scan-hero.scan-status-panel` uses token at rest; `scan-hero-settle-pulse` for Path 2 settle |
+| 2026-05-26 | v2 step 3: `--hc-scan-hero-fill` / dark overrides; Worker `hc_theme` bootstrap; bundled scan dark CSS |

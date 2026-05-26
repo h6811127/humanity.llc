@@ -60,7 +60,7 @@ Use these for:
 
 Raised, card-shaped callouts for **high-salience device state** on page chrome (keys active, cross-tab, live proof, setup gates). They sit between flat `.hc-notice` strips and full-bleed hub tap banners (`.device-hub-notice-banner`).
 
-**Scan hero (tier above emphasis cards):** Public resolver **live check hero** uses the same shadow *language* at larger scale — not the `.hc-emphasis-card` component. See [`SCAN_HERO_CARD_VISUAL_SPEC.md`](SCAN_HERO_CARD_VISUAL_SPEC.md) § Visual tier.
+**Scan hero (tier above emphasis cards):** Public resolver **live check hero** uses the same shadow *language* at larger scale — not the `.hc-emphasis-card` component. Token: `--hc-scan-hero-shadow` on `:root` (`site/styles.css`, `site/scan-pass.css`; dark override in `theme-dark.css`). See [`SCAN_HERO_CARD_VISUAL_SPEC.md`](SCAN_HERO_CARD_VISUAL_SPEC.md) § Visual tier.
 
 **Reference instances:** `#wallet-active-banner` (`--active`, green) · `#wallet-tab-hint` / `#device-cross-tab-banner` (`--info`, blue).
 

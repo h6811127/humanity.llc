@@ -25,6 +25,18 @@
     inset 0 0 0 1px rgba(60, 60, 67, 0.08),
     0 1px 2px rgba(0, 0, 0, 0.04),
     0 4px 12px rgba(0, 0, 0, 0.06);
+  /* Scan live-check hero (tier 4) — keep in sync with site/styles.css :root */
+  --hc-scan-hero-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
+    inset 0 2px 5px rgba(255, 255, 255, 0.38),
+    inset 0 -1px 3px rgba(60, 60, 67, 0.1),
+    inset 0 -3px 8px rgba(60, 60, 67, 0.06),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.85),
+    0 2px 4px rgba(0, 0, 0, 0.05),
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 18px 44px rgba(0, 0, 0, 0.1);
+  --hc-scan-hero-fill: linear-gradient(160deg, #ffffff 0%, #fafafa 50%, #f5f5f7 100%);
+  --hc-scan-hero-border: rgba(60, 60, 67, 0.14);
   --hc-emphasis-card-fill-active: linear-gradient(
     160deg,
     #f6f8f7 0%,
@@ -1239,14 +1251,9 @@ a {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
 }
 
-/* Live check hero (docs/M3_SCAN_PAGE_UI.md Phase 1) */
+/* Live check hero (docs/M3_SCAN_PAGE_UI.md · SCAN_HERO_CARD_VISUAL_SPEC.md v2) */
 .scan-hero.scan-safety-header {
   margin: 0 0 18px;
-  padding: 22px 20px 18px;
-  border: 0.5px solid rgba(60, 60, 67, 0.14);
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    0 10px 28px rgba(0, 0, 0, 0.07);
 }
 
 .scan-hero-head {
@@ -1590,9 +1597,12 @@ a {
   margin: 0 0 10px 2px;
 }
 
-.scan-safety-header.scan-safety--pulse,
-.scan-hero.scan-safety-header.scan-safety--pulse {
+.scan-safety-header.scan-safety--pulse:not(.scan-hero) {
   animation: scan-safety-border-pulse 0.85s ease;
+}
+
+.scan-hero.scan-safety-header.scan-safety--pulse {
+  animation: scan-hero-settle-pulse 0.85s ease;
 }
 
 @keyframes scan-safety-border-pulse {
@@ -1607,6 +1617,25 @@ a {
   100% {
     border-color: rgba(219, 27, 67, 0.22);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  }
+}
+
+@keyframes scan-hero-settle-pulse {
+  0% {
+    border-color: rgba(219, 27, 67, 0.25);
+    box-shadow:
+      var(--hc-scan-hero-shadow),
+      0 0 0 0 rgba(219, 27, 67, 0.2);
+  }
+  40% {
+    border-color: var(--red);
+    box-shadow:
+      var(--hc-scan-hero-shadow),
+      0 0 0 4px rgba(219, 27, 67, 0.14);
+  }
+  100% {
+    border-color: var(--hc-scan-hero-border);
+    box-shadow: var(--hc-scan-hero-shadow);
   }
 }
 
@@ -2457,7 +2486,7 @@ body.scan-page-dot-glance-open {
   font-weight: 600;
 }
 
-/* Flat status panel (not a flippable ID-style card) */
+/* Status panel (not a flippable ID-style card); hero uses tier-4 depth */
 .scan-status-panel {
   border-radius: 18px;
   padding: 16px 16px 14px;
@@ -2470,6 +2499,9 @@ body.scan-page-dot-glance-open {
 
 .scan-hero.scan-status-panel {
   padding: 22px 20px 18px;
+  background: var(--hc-scan-hero-fill);
+  border: 0.5px solid var(--hc-scan-hero-border);
+  box-shadow: var(--hc-scan-hero-shadow);
 }
 
 .scan-status-head {
@@ -2637,4 +2669,70 @@ body.scan-page-dot-glance-open {
 
 .dock-btn-primary {
   box-shadow: 0 4px 16px rgba(219, 27, 67, 0.28);
+}
+
+/* Dark mode — bundled scan pages; keep in sync with site/css/theme-dark.css */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --red: #ff4d6d;
+  --black: #f5f5f7;
+  --white: #000000;
+  --grey: #98989d;
+  --hc-scan-hero-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    inset 0 2px 6px rgba(255, 255, 255, 0.08),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.46),
+    inset 0 -5px 12px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    0 3px 8px rgba(0, 0, 0, 0.34),
+    0 10px 28px rgba(0, 0, 0, 0.52),
+    0 20px 52px rgba(0, 0, 0, 0.36);
+  --hc-scan-hero-fill: linear-gradient(160deg, #2c2c2e 0%, #1c1c1e 55%, #1a1a1c 100%);
+  --hc-scan-hero-border: rgba(255, 255, 255, 0.12);
+  --hc-emphasis-card-title-fg: #f5f5f7;
+  --hc-emphasis-card-detail-fg: rgba(235, 235, 245, 0.9);
+}
+
+html[data-theme="dark"] body {
+  background: #000000;
+  color: var(--black);
+}
+
+html[data-theme="dark"] .scan-status-panel:not(.scan-hero) {
+  background: #1c1c1e;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+html[data-theme="dark"] .scan-hero.scan-status-panel {
+  background: var(--hc-scan-hero-fill);
+  border-color: var(--hc-scan-hero-border);
+  box-shadow: var(--hc-scan-hero-shadow);
+}
+
+html[data-theme="dark"] .scan-hero .scan-hero-title,
+html[data-theme="dark"] .scan-hero .scan-hero-line {
+  color: var(--hc-emphasis-card-title-fg);
+}
+
+html[data-theme="dark"] .scan-hero .scan-hero-wordmark {
+  color: rgba(235, 235, 245, 0.48);
+}
+
+html[data-theme="dark"] .scan-hero .scan-hero-steward,
+html[data-theme="dark"] .scan-hero .scan-hero-limit,
+html[data-theme="dark"] .scan-hero .scan-hero-foot,
+html[data-theme="dark"] .scan-hero .scan-safety-first-seen,
+html[data-theme="dark"] .scan-hero .scan-hero-meta,
+html[data-theme="dark"] .scan-hero .scan-hero-sub,
+html[data-theme="dark"] .scan-hero .scan-hero-qr-summary {
+  color: var(--hc-emphasis-card-detail-fg);
+}
+
+html[data-theme="dark"] .scan-hero .scan-hero-eyebrow {
+  color: rgba(235, 235, 245, 0.55);
+}
+
+html[data-theme="dark"] .scan-hero .scan-safety-chips li {
+  color: rgba(235, 235, 245, 0.62);
+  background: rgba(255, 255, 255, 0.08);
 }

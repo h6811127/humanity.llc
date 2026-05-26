@@ -26,6 +26,15 @@ describe("scan page device dot contract", () => {
     expect(SCAN_PASS_CSS).toContain("--surface-popover-bg");
     expect(SCAN_PASS_CSS).toContain(".hc-emphasis-card");
     expect(SCAN_PASS_CSS).toContain("--hc-emphasis-card-shadow");
+    expect(SCAN_PASS_CSS).toContain("--hc-scan-hero-shadow");
+    expect(SCAN_PASS_CSS).toContain("scan-hero-settle-pulse");
+    expect(SCAN_PASS_CSS).toMatch(
+      /\.scan-hero\.scan-status-panel[\s\S]*box-shadow:\s*var\(--hc-scan-hero-shadow\)/
+    );
+    expect(SCAN_PASS_CSS).toContain("--hc-scan-hero-fill");
+    expect(SCAN_PASS_CSS).toMatch(
+      /html\[data-theme="dark"\] \.scan-hero\.scan-status-panel[\s\S]*var\(--hc-scan-hero-fill\)/
+    );
     expect(SCAN_PASS_CSS).not.toContain("rgba(10, 132, 255, 0.08)");
     const src = readFileSync(join(root, "site/scan-pass.css"), "utf8");
     expect(src).toContain(".scan-page-dot-glance");

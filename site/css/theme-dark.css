@@ -47,6 +47,17 @@ html[data-theme="dark"] {
     0 2px 6px rgba(0, 0, 0, 0.32),
     0 8px 24px rgba(0, 0, 0, 0.48),
     0 16px 40px rgba(0, 0, 0, 0.32);
+  --hc-scan-hero-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    inset 0 2px 6px rgba(255, 255, 255, 0.08),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.46),
+    inset 0 -5px 12px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    0 3px 8px rgba(0, 0, 0, 0.34),
+    0 10px 28px rgba(0, 0, 0, 0.52),
+    0 20px 52px rgba(0, 0, 0, 0.36);
+  --hc-scan-hero-fill: linear-gradient(160deg, #2c2c2e 0%, #1c1c1e 55%, #1a1a1c 100%);
+  --hc-scan-hero-border: rgba(255, 255, 255, 0.12);
   --hc-emphasis-card-fill-active: linear-gradient(
     160deg,
     #1e2421 0%,
@@ -1052,9 +1063,43 @@ html[data-theme="dark"] .flow-form-warning.hc-notice--warning {
   border-color: rgba(255, 159, 10, 0.36);
 }
 
-html[data-theme="dark"] .scan-status-panel,
+html[data-theme="dark"] .scan-status-panel:not(.scan-hero),
 html[data-theme="dark"] .pass-scene {
   background: var(--shell-fill);
+}
+
+html[data-theme="dark"] .scan-hero.scan-status-panel {
+  background: var(--hc-scan-hero-fill);
+  border-color: var(--hc-scan-hero-border);
+  box-shadow: var(--hc-scan-hero-shadow);
+}
+
+html[data-theme="dark"] .scan-hero .scan-hero-title,
+html[data-theme="dark"] .scan-hero .scan-hero-line {
+  color: var(--hc-emphasis-card-title-fg);
+}
+
+html[data-theme="dark"] .scan-hero .scan-hero-wordmark {
+  color: rgba(235, 235, 245, 0.48);
+}
+
+html[data-theme="dark"] .scan-hero .scan-hero-steward,
+html[data-theme="dark"] .scan-hero .scan-hero-limit,
+html[data-theme="dark"] .scan-hero .scan-hero-foot,
+html[data-theme="dark"] .scan-hero .scan-safety-first-seen,
+html[data-theme="dark"] .scan-hero .scan-hero-meta,
+html[data-theme="dark"] .scan-hero .scan-hero-sub,
+html[data-theme="dark"] .scan-hero .scan-hero-qr-summary {
+  color: var(--hc-emphasis-card-detail-fg);
+}
+
+html[data-theme="dark"] .scan-hero .scan-hero-eyebrow {
+  color: rgba(235, 235, 245, 0.55);
+}
+
+html[data-theme="dark"] .scan-hero .scan-safety-chips li {
+  color: rgba(235, 235, 245, 0.62);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 @media (min-width: 500px) {

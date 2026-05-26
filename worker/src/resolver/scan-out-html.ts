@@ -1,4 +1,5 @@
 import { SCAN_PASS_CSS } from "./scan-pass-styles";
+import { SCAN_PAGE_THEME_BOOTSTRAP } from "./scan-page-theme";
 import type { ScanViewModel } from "./scan-state";
 
 export interface ScanOutInterstitialModel {
@@ -40,10 +41,11 @@ export function renderScanOutInterstitialPage(
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="color-scheme" content="light" />
+  <meta name="color-scheme" content="light dark" />
   <meta name="robots" content="noindex" />
   <title>Leave humanity.llc? · ${escapeHtml(model.domain)}</title>
   <link rel="icon" href="${escapeHtml(origin)}/assets/red_qr_transparent_bg.png" type="image/png" />
+  ${SCAN_PAGE_THEME_BOOTSTRAP}
   <style>${SCAN_PASS_CSS}</style>
 </head>
 <body>
@@ -77,8 +79,11 @@ export function renderScanOutErrorPage(
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#ffffff" />
   <title>Link unavailable · humanity.llc</title>
   <link rel="icon" href="${escapeHtml(origin)}/assets/red_qr_transparent_bg.png" type="image/png" />
+  ${SCAN_PAGE_THEME_BOOTSTRAP}
   <style>${SCAN_PASS_CSS}</style>
 </head>
 <body>

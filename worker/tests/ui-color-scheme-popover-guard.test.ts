@@ -203,6 +203,13 @@ describe("UI color scheme popover guard", () => {
     assertGuardedRule("site/css/theme-dark.css", "html[data-theme=\"dark\"] .hc-emphasis-card--active", {
       require: ["--hc-emphasis-card-fill-active"],
     });
+    assertGuardedRule(
+      "site/css/theme-dark.css",
+      'html[data-theme="dark"] .scan-hero.scan-status-panel',
+      {
+        require: ["--hc-scan-hero-fill", "--hc-scan-hero-shadow"],
+      }
+    );
     assertGuardedRule("site/css/theme-dark.css", "html[data-theme=\"dark\"] .hc-emphasis-card--urgent", {
       require: ["--hc-emphasis-card-fill-urgent"],
     });

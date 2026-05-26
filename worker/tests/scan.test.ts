@@ -222,6 +222,8 @@ describe("renderScanPage M3.2 trust blocks", () => {
       /class="scan-hero-host[^"]*"[^>]*>[\s\S]*?<span class="pass-dot"/
     );
     expect(html).toContain("scan-hero");
+    expect(html).toContain('content="light dark"');
+    expect(html).toContain('localStorage.getItem("hc_theme")');
     expect(html).toContain("scan-status-panel");
     expect(html).not.toMatch(/id="pass-scene"/);
     expect(html).not.toMatch(/class="pass-scene/);

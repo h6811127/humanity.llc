@@ -26,6 +26,11 @@ import {
   SCAN_SAFETY_RESOLVER_VERIFIED_COPY,
   type ScanSafetyModel,
 } from "./scan-safety";
+import { SCAN_PAGE_THEME_BOOTSTRAP } from "./scan-page-theme";
+import {
+  scanMalformedLead,
+  scanMalformedPageTitle,
+} from "./scan-malformed-hint";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
 export const SCAN_UI_VERSION = "pass-v33";
@@ -53,11 +58,12 @@ export async function renderScanPage(
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="color-scheme" content="light" />
+  <meta name="color-scheme" content="light dark" />
   <meta name="theme-color" content="#ffffff" />
   <title>${escapeHtml(title)} · humanity.llc</title>
   <meta name="description" content="${escapeHtml(scanLead(vm))}" />
   <link rel="icon" href="${escapeHtml(origin)}/assets/red_qr_transparent_bg.png" type="image/png" />
+  ${SCAN_PAGE_THEME_BOOTSTRAP}
   <style>${SCAN_PASS_CSS}</style>
 </head>
 <body>
@@ -1508,7 +1514,7 @@ function scanLead(vm: ScanViewModel): string {
     case "profile_qr_mismatch":
       return "This QR does not belong to the profile in the URL.";
     case "malformed":
-      return "This scan link is missing a valid profile or QR id.";
+      return scanMalformedLead(vm.malformedReason ?? "invalid_profile_id");
     case "card_revoked": {
       const base =
         "Object state: card disabled. Printed QRs still exist; card details are hidden.";
@@ -1546,6 +1552,9 @@ function pageTitle(vm: ScanViewModel): string {
       default:
         return "Scan result";
     }
+  }
+  if (vm.kind === "malformed") {
+    return scanMalformedPageTitle(vm.malformedReason ?? "invalid_profile_id");
   }
   if (vm.handle) return `@${vm.handle}`;
   return vm.primaryBadge.label;
