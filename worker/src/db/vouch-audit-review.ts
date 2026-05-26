@@ -31,6 +31,8 @@ export function vouchAuditFlagKey(flag: VouchAuditFlag): string {
         ...[...flag.vouchee_profile_ids].sort(),
         ...[...flag.shared_voucher_profile_ids].sort(),
       ].join("|");
+    case "directed_cycle_cluster":
+      return [flag.kind, ...[...flag.profile_ids].sort()].join("|");
     default: {
       const _exhaustive: never = flag;
       return _exhaustive;

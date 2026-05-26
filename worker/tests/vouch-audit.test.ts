@@ -133,4 +133,31 @@ describe("listVouchAuditFlags", () => {
       )
     ).toBe(false);
   });
+
+  it("flags directed cycle clusters (G-02) for review", async () => {
+    const flags = await listVouchAuditFlags(
+      db(
+        [
+          ["a", "b"],
+          ["b", "c"],
+          ["c", "a"], // rotating 3-cycle
+          ["a", "d"],
+          ["d", "a"], // extra reciprocal edge (clique suspicion)
+        ].map(([voucher, vouchee], index) => ({
+          voucher_profile_id: voucher,
+          vouchee_profile_id: vouchee,
+          status: "active" as const,
+          created_at: `2026-05-02T0${index}:00:00.000Z`,
+        }))
+      ),
+      { directedCycleMinNodes: 3, directedCycleMinDensity: 0.4 }
+    );
+
+    expect(flags).toContainEqual({
+      kind: "directed_cycle_cluster",
+      profile_ids: ["a", "b", "c", "d"],
+      active_edge_count: 5,
+      density: 5 / 12,
+    });
+  });
 });

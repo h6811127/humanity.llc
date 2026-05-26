@@ -115,6 +115,23 @@ Response includes `flags[]` with `triage` hints (priority, suggested action, thr
 
 ---
 
+### `directed_cycle_cluster` (G-02, R-02)
+
+**Meaning:** Strongly connected directed cluster with cycle structure and minimum edge density.
+
+**Often benign:** Small cohorts who cross-vouch naturally.
+
+**Suspicious when:** Rotating 3-cycles or dense 4+ cliques rapidly gaining **Vouched Human**.
+
+| Step | Action |
+|------|--------|
+| 1 | Inspect `profile_ids` as one cluster, not isolated pairs |
+| 2 | Check if edges are concentrated in short time window |
+| 3 | Correlate with `shared_voucher_set` and burst flags |
+| 4 | If synthetic: suspend cluster + request revocations |
+
+---
+
 ## Response actions (manual v1)
 
 | Action | When | How (v1) |

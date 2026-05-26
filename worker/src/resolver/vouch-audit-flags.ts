@@ -59,6 +59,13 @@ function triageForFlag(flag: VouchAuditFlag): TriageHint {
           "Compare overlapping vouchees; check for Sybil laundry (G-07). May be benign cohort.",
         threat_ids: ["G-04", "G-07"],
       };
+    case "directed_cycle_cluster":
+      return {
+        priority: "high",
+        action:
+          "Review directed cycle cluster; inspect clique suspicion and batch-vouch edges before dismissing.",
+        threat_ids: ["G-02", "R-02", "G-07"],
+      };
     default: {
       const _exhaustive: never = flag;
       return _exhaustive;
@@ -166,7 +173,8 @@ export async function handlePostVouchAuditFlagDismiss(
   if (
     flagKind !== "closed_loop_only" &&
     flagKind !== "burst_at_quota_boundary" &&
-    flagKind !== "shared_voucher_set"
+    flagKind !== "shared_voucher_set" &&
+    flagKind !== "directed_cycle_cluster"
   ) {
     return errorResponse("INVALID_FLAG_KIND", "flag_kind is invalid.", 422);
   }

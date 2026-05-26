@@ -30,10 +30,18 @@ type SharedVoucherSetFlag = {
   similarity: number;
 };
 
+type DirectedCycleClusterFlag = {
+  kind: "directed_cycle_cluster";
+  profile_ids: string[];
+  active_edge_count: number;
+  density: number;
+};
+
 export type VouchAuditFlag =
   | ClosedLoopFlag
   | QuotaBurstFlag
-  | SharedVoucherSetFlag;
+  | SharedVoucherSetFlag
+  | DirectedCycleClusterFlag;
 
 export interface ListVouchAuditFlagsOptions {
   maxRows?: number;
@@ -41,6 +49,8 @@ export interface ListVouchAuditFlagsOptions {
   burstWindowHours?: number;
   sharedSetMinOverlap?: number;
   sharedSetSimilarityThreshold?: number;
+  directedCycleMinNodes?: number;
+  directedCycleMinDensity?: number;
   now?: string;
 }
 
@@ -49,6 +59,8 @@ const DEFAULT_QUOTA_WINDOW_DAYS = 365;
 const DEFAULT_BURST_WINDOW_HOURS = 24;
 const DEFAULT_SHARED_SET_MIN_OVERLAP = 3;
 const DEFAULT_SHARED_SET_SIMILARITY_THRESHOLD = 0.75;
+const DEFAULT_DIRECTED_CYCLE_MIN_NODES = 3;
+const DEFAULT_DIRECTED_CYCLE_MIN_DENSITY = 0.5;
 
 /**
  * Operator-only M6 abuse hooks. These aggregate public vouch rows for manual
@@ -76,6 +88,10 @@ export async function listVouchAuditFlags(
       minOverlap: options.sharedSetMinOverlap ?? DEFAULT_SHARED_SET_MIN_OVERLAP,
       similarityThreshold:
         options.sharedSetSimilarityThreshold ?? DEFAULT_SHARED_SET_SIMILARITY_THRESHOLD,
+    }),
+    ...flagDirectedCycleClusters(rows, {
+      minNodes: options.directedCycleMinNodes ?? DEFAULT_DIRECTED_CYCLE_MIN_NODES,
+      minDensity: options.directedCycleMinDensity ?? DEFAULT_DIRECTED_CYCLE_MIN_DENSITY,
     }),
   ];
 }
@@ -198,4 +214,92 @@ function flagSharedVoucherSets(
   return flags.sort((a, b) =>
     a.vouchee_profile_ids.join(":").localeCompare(b.vouchee_profile_ids.join(":"))
   );
+}
+
+function flagDirectedCycleClusters(
+  rows: VouchAuditRow[],
+  options: { minNodes: number; minDensity: number }
+): DirectedCycleClusterFlag[] {
+  const outgoing = new Map<string, Set<string>>();
+  const nodes = new Set<string>();
+  for (const row of rows) {
+    if (row.status !== "active") continue;
+    if (row.voucher_profile_id === row.vouchee_profile_id) continue;
+    const targets = outgoing.get(row.voucher_profile_id) ?? new Set<string>();
+    targets.add(row.vouchee_profile_id);
+    outgoing.set(row.voucher_profile_id, targets);
+    nodes.add(row.voucher_profile_id);
+    nodes.add(row.vouchee_profile_id);
+  }
+
+  // Tarjan strongly connected components over active-vouch graph.
+  const indexByNode = new Map<string, number>();
+  const lowByNode = new Map<string, number>();
+  const stack: string[] = [];
+  const onStack = new Set<string>();
+  let index = 0;
+  const components: string[][] = [];
+
+  const strongConnect = (node: string): void => {
+    indexByNode.set(node, index);
+    lowByNode.set(node, index);
+    index += 1;
+    stack.push(node);
+    onStack.add(node);
+
+    for (const neighbor of outgoing.get(node) ?? []) {
+      if (!indexByNode.has(neighbor)) {
+        strongConnect(neighbor);
+        lowByNode.set(
+          node,
+          Math.min(lowByNode.get(node) ?? Number.MAX_SAFE_INTEGER, lowByNode.get(neighbor) ?? 0)
+        );
+      } else if (onStack.has(neighbor)) {
+        lowByNode.set(
+          node,
+          Math.min(lowByNode.get(node) ?? Number.MAX_SAFE_INTEGER, indexByNode.get(neighbor) ?? 0)
+        );
+      }
+    }
+
+    if (lowByNode.get(node) === indexByNode.get(node)) {
+      const component: string[] = [];
+      while (stack.length > 0) {
+        const top = stack.pop()!;
+        onStack.delete(top);
+        component.push(top);
+        if (top === node) break;
+      }
+      components.push(component);
+    }
+  };
+
+  for (const node of nodes) {
+    if (!indexByNode.has(node)) strongConnect(node);
+  }
+
+  const flags: DirectedCycleClusterFlag[] = [];
+  for (const component of components) {
+    const members = [...component].sort();
+    if (members.length < options.minNodes) continue;
+    const memberSet = new Set(members);
+    let edgeCount = 0;
+    for (const from of members) {
+      for (const to of outgoing.get(from) ?? []) {
+        if (memberSet.has(to)) edgeCount += 1;
+      }
+    }
+    const maxEdges = members.length * (members.length - 1);
+    if (maxEdges <= 0) continue;
+    const density = edgeCount / maxEdges;
+    if (density < options.minDensity) continue;
+    flags.push({
+      kind: "directed_cycle_cluster",
+      profile_ids: members,
+      active_edge_count: edgeCount,
+      density,
+    });
+  }
+
+  return flags.sort((a, b) => a.profile_ids.join(":").localeCompare(b.profile_ids.join(":")));
 }

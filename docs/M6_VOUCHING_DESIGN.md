@@ -126,6 +126,7 @@ Design for hostile actors, not only happy-path founders. **Full threat catalog:*
 | `closed_loop_only` | Mutual-only pairs | **G-02** rotating 3-cycles (see threat model) |
 | `burst_at_quota_boundary` | 5 issuances in 24h | Legitimate event bursts |
 | `shared_voucher_set` | Overlapping voucher sets on two vouchees | Cliques spread across many vouchees |
+| `directed_cycle_cluster` | Rotating cycles + dense SCC clusters | Large sparse laundering graphs |
 
 Do **not** publish graph analytics on scan pages. Audits are for stewards/operators, with minimal PII and documented appeal. Response playbook: [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) §8.
 

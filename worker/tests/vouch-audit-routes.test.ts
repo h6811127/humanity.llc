@@ -20,7 +20,11 @@ class FakeAuditDb {
     string,
     {
       flag_key: string;
-      flag_kind: "closed_loop_only" | "burst_at_quota_boundary" | "shared_voucher_set";
+      flag_kind:
+        | "closed_loop_only"
+        | "burst_at_quota_boundary"
+        | "shared_voucher_set"
+        | "directed_cycle_cluster";
       note: string;
       dismissed_by: string;
       dismissed_at: string;
@@ -52,7 +56,14 @@ class FakeAuditDb {
           async run() {
             if (sql.includes("INSERT INTO vouch_audit_dismissals")) {
               const [flag_key, flag_kind, note, dismissed_by, dismissed_at, updated_at] =
-                args as [string, "closed_loop_only" | "burst_at_quota_boundary" | "shared_voucher_set", string, string, string, string];
+                args as [
+                  string,
+                  "closed_loop_only" | "burst_at_quota_boundary" | "shared_voucher_set" | "directed_cycle_cluster",
+                  string,
+                  string,
+                  string,
+                  string,
+                ];
               dismissals.set(flag_key, {
                 flag_key,
                 flag_kind,

@@ -53,7 +53,7 @@
 - Add unique item-scoped QR credentials for personalized physical items.
 - Add signed payload `type` and nonce to every vouch, QR rotation, revocation, and badge record.
 - **Ship steward review queue** for `listVouchAuditFlags` — **step 1+2 shipped** (runbook + read/dismiss APIs + operator UI prototype).
-- Add graph detection for **cliques and directed cycles** (see `VOUCH_THREAT_MODEL.md` §9 P1).
+- Add graph detection for **cliques and directed cycles** (see `VOUCH_THREAT_MODEL.md` §9 P1). `directed_cycle_cluster` shipped; tune thresholds with steward feedback.
 - Avoid printing "Verified Human" as static text on artifacts in V1.
 
 ---

@@ -212,6 +212,7 @@ Respond: suspend steward, rotate keys, revoke batch
 | `closed_loop_only` | Every active vouchee of V also actively vouches V back | Misses **G-02** rotating cycles |
 | `burst_at_quota_boundary` | ≥5 issuances in 24h in quota window | Legitimate burst possible |
 | `shared_voucher_set` | Two vouchees share ≥3 vouchers, Jaccard ≥0.75 | Heuristic |
+| `directed_cycle_cluster` | SCC cycle cluster with density threshold | Heuristic; can include benign cohorts |
 
 **Steward review queue:** Step 1+2 shipped — runbook + operator API + dismiss notes API + operator UI prototype with steward entry point from `/created/` Advanced. See [`VOUCH_STEWARD_REVIEW_RUNBOOK.md`](VOUCH_STEWARD_REVIEW_RUNBOOK.md).
 
@@ -237,7 +238,7 @@ Respond: suspend steward, rotate keys, revoke batch
 |----------|------|-----------|
 | P0 | Steward review queue + runbook | G-01–G-08, S-01 | **Step 1+2 shipped** (read API + dismiss API + UI prototype) |
 | P0 | Card creation rate limits + launch monitoring | R-01, A-012F |
-| P1 | Graph flag: **directed cycle** / clique suspicion (≥4 mutual VH set) | R-02, G-02 |
+| P1 | Graph flag: **directed cycle** / clique suspicion (≥4 mutual VH set) | R-02, G-02 | **Shipped** (`directed_cycle_cluster`) |
 | P1 | Per-steward vouch cap or enhanced audit for steward issuances | R-03, S-02 |
 | P1 | Integrator guide: recency + live control + not KYC | I-02, I-03 |
 | P2 | Optional PIN / WebAuthn before `Sign and submit` | V-04, A-02 |
