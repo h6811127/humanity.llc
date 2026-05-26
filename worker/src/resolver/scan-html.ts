@@ -106,7 +106,7 @@ function renderQrFallbackScript(
   scanUrl: string | null
 ): string {
   if (!scanUrl) return "";
-  const mod = JSON.stringify(`${origin}/js/qr-render.mjs?v=4`);
+  const mod = JSON.stringify(`${origin}/js/qr-render.mjs?v=5`);
   return `<script type="module">
 import { renderQrToImage } from ${mod};
 var slot = document.getElementById("pass-qr-slot");

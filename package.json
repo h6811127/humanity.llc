@@ -19,6 +19,7 @@
     "worker:test:card-disabled-since-visit": "vitest run worker/tests/wallet-network.test.ts worker/tests/device-wallet-network-confirmed.test.ts worker/tests/card-disabled-since-visit-regression.test.ts worker/tests/card-disabled-since-visit-approaches.test.ts worker/tests/device-hub-frontend-pipeline.test.ts",
     "worker:test:ui-color-scheme": "vitest run worker/tests/ui-color-scheme-popover-guard.test.ts",
     "worker:test:landing-progress": "vitest run worker/tests/landing-progress.test.ts worker/tests/created-setup-hash.test.ts",
+    "worker:test:qr-branding": "vitest run worker/tests/scan-qr-branding.test.ts worker/tests/qr-render-contract.test.ts worker/tests/qr-print-sticker.test.ts",
     "worker:test:watch": "vitest",
     "e2e": "playwright test",
     "e2e:card-disabled-since-visit": "playwright test e2e/device-os-wallet.spec.ts e2e/device-inbox.spec.ts",

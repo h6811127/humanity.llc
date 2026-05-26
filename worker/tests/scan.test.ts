@@ -205,6 +205,9 @@ describe("renderScanPage M3.2 trust blocks", () => {
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).toContain("scan-page-chrome");
     expect(html).toContain("scan-page-dot");
+    expect(html).toContain('class="hc-qr-finder-logo"');
+    expect(html).not.toContain('class="hc-qr-brand-mark"');
+    expect(html).not.toContain('class="hc-qr-center-logo"');
     expect(html).not.toContain('class="top-brand"');
     expect(html).not.toContain('<header class="top">');
     expect(html.match(/class="scan-hero-host"/g)?.length ?? 0).toBe(1);

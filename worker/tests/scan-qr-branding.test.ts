@@ -111,6 +111,20 @@ describe("renderHumanityQrFrameSvg", () => {
   });
 });
 
+describe("renderScanQrMarkup production finder placement", () => {
+  it("centers finder mark at margin + 3.5 in viewBox units", async () => {
+    const scanUrl = "https://humanity.llc/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_7Xk9mP2nQ4rT6vW8";
+    const html = await renderScanQrMarkup(scanUrl);
+    const { cx, cy } = finderLogoMetrics(37);
+    const outer = html.match(
+      /class="hc-qr-finder-logo-outer"[^>]*cx="([^"]+)"[^>]*cy="([^"]+)"/
+    );
+    expect(outer?.[1]).toBe(String(cx));
+    expect(outer?.[2]).toBe(String(cy));
+    expect(cx).toBe(QR_BRANDED_RENDER_OPTIONS.margin + 3.5);
+  });
+});
+
 describe("renderScanQrMarkup", () => {
   it("rejects URLs that fail host lock", async () => {
     await expect(renderScanQrMarkup("https://humanity.llc/")).rejects.toThrow(

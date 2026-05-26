@@ -27,8 +27,8 @@ The mark is drawn as **vector circles** only — no raster plate, no white JPEG 
 | Step | File | What it does |
 |------|------|----------------|
 | 1 | `site/js/qr-branding.mjs` | Colors, center logo, **`renderHumanityQrFrameSvg` / `renderHumanityQrFrameMarkup` / `renderHumanityQrFrameToCanvas`** |
-| 2 | `site/js/qr-render.mjs` | Browser PNG via `renderHumanityQrFrameToCanvas` |
-| 3 | `worker/src/resolver/scan-qr.ts` | SVG QR + center logo + frame markup |
+| 2 | `site/js/qr-render.mjs` | Browser PNG via `renderHumanityQrFrameToCanvas` (preview **220** px, download **512** px) |
+| 3 | `worker/src/resolver/scan-qr.ts` | SVG QR + finder mark + frame markup |
 | 4 | `site/assets/qr-center-logo.svg` | Optional reference for designers (not loaded at runtime) |
 
 Both generators import the same opacity, size ratio, colors, and correction level so `/created/` and `/c/…` stay aligned.
@@ -99,17 +99,33 @@ npm run worker:test -- worker/tests/qr-scan-url-lock.test.ts
 
 ---
 
+## `/created/` browser path
+
+| Output | Width (module px) | Entry |
+|--------|-------------------|--------|
+| Hero + inline preview | `QR_PREVIEW_RENDER_WIDTH` (**220**) | `renderQrToImage()` |
+| Download PNG | `QR_DOWNLOAD_RENDER_WIDTH` (**512**) | `downloadQrPng()` |
+
+Both call `renderHumanityQrFrameToCanvas()` with the same branding flags as the Worker SVG path (finder mark + frame; no frame-margin dot).
+
+```bash
+npm run worker:test:qr-branding
+```
+
+---
+
 ## Verification checklist
 
-- [ ] `/created/` preview QR shows red modules + dusty-rose / ink mark on the **top-left finder** (not on the card border).
-- [ ] Download PNG matches preview.
+- [x] `/created/` encoder contract — `qr-render.mjs` → `renderHumanityQrFrameToCanvas` at 220 / 512 (`qr-render-contract.test.ts`).
+- [ ] `/created/` preview QR shows red modules + dusty-rose / ink mark on the **top-left finder** (manual: [`docs/DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P0-QR**).
+- [ ] Download PNG matches preview (manual: **P0-QR** steps 1–3).
 - [x] `/c/{profile_id}?q=…` pass card QR matches (Worker SVG) — `scan-pass.css` + `scan-qr-branding.test.ts`.
-- [ ] Phone scan succeeds at 220px display size and at downloaded 512px PNG.
-- [x] `npm run worker:test` — `scan-qr-branding.test.ts` passes.
+- [ ] Phone scan succeeds at 220px display size and at downloaded 512px PNG (manual: **P0-QR** step 5).
+- [x] `npm run worker:test` — `scan-qr-branding.test.ts` + `qr-render-contract.test.ts` pass.
 - [x] Site pass preview CSS (`styles.css` `.pass-qr`) accepts `hc-qr-frame-svg` markup (aligned with `scan-pass.css`).
 
 ```bash
-npm run worker:test -- worker/tests/scan-qr-branding.test.ts
+npm run worker:test:qr-branding
 ```
 
 ---

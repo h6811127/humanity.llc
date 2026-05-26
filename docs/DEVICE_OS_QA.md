@@ -47,6 +47,20 @@ These map to the #1 documented confusion: **keys in one tab vs saved on device**
 
 Hub ⋯ **Revoke QR** only navigates to `/created/#revoke` to confirm; it does not revoke on the network in one tap ([`HUB_REVOKE_AND_CONTROLS_NAVIGATION.md`](HUB_REVOKE_AND_CONTROLS_NAVIGATION.md)).
 
+### P0-QR · Branded QR finder mark (`/created/` + scan page)
+
+Spec: [`docs/QR_BRANDING.md`](QR_BRANDING.md) § Verification. Automated: `npm run worker:test:qr-branding`.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | `/created/` with active card | Brand-red modules; rose + ink two-tone circle on **top-left finder** only |
+| 2 | Same page | **No** tiny red dot on card frame border; **no** large bullseye in code center |
+| 3 | **Download QR image** | Same finder placement as preview; `LIVE OBJECT` + `humanity.llc` + `HC-…` footer |
+| 4 | Open `/c/{profile_id}?q=…` scan page | Hero QR matches `/created/`; page source includes `hc-qr-finder-logo` |
+| 5 | iOS Camera + one Android device | Scan succeeds from on-screen ~220px preview and downloaded PNG |
+
+**Fail signals:** Black modules; mark on frame margin; center-only disk; download uses different layout than preview; scan fails at print size.
+
 ### P1-8 · Open controls: status dot vs hub row
 
 | Control | Where | Expected |
