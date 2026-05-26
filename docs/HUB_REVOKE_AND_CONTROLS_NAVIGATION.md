@@ -1,7 +1,7 @@
-# Hub revoke & Open controls navigation — architecture and fix proposal
+# Hub revoke & Open controls navigation - architecture and fix proposal
 
 **Date:** 2026-05-26  
-**Status:** P0–P2 shipped (mode gate, setup backfill, steward hash bailout, hydrate guard, hub menu hints, wallet active link, QA P1-8)  
+**Status:** P0–P2 shipped; verification checklist items 1–3, 5–6 covered by automated tests (item 4 manual revoke POST)  
 **Scope:** Investigation + implementation reference  
 **Reported symptoms:** Hub ⋯ **Revoke QR** and row **Open controls** land on the **Print** setup step on `/created/`; card stays **active** on the network.  
 **Related:** `docs/CARD_WORKSPACE_UX.md`, `docs/REVOKE_UI_INVESTIGATION.md`, `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md`, `docs/M4_CREATED_REVOKE_UI.md`
@@ -12,7 +12,7 @@
 
 | Observation | Explanation |
 |---------------|-------------|
-| Lands on “print page” | `/created/` is in **setup** mode (post-create wizard), not **control** mode. Saved cards skip step 1 and open **step 2 — Print** (`#setup-qr`). That is the setup QR panel, not the Advanced revoke UI. |
+| Lands on “print page” | `/created/` is in **setup** mode (post-create wizard), not **control** mode. Saved cards skip step 1 and open **step 2 - Print** (`#setup-qr`). That is the setup QR panel, not the Advanced revoke UI. |
 | Card stays active | Hub **Revoke QR** only **navigates** to `/created/#revoke`. It does **not** POST a revocation. If setup mode blocks the revoke panel, the user never reaches confirm + submit. |
 | **Open controls** same destination | `openCardNowPage()` uses the same URL builder and the same mode gate; without `hc_setup_done[profile_id]`, setup mode wins again (usually Print step when the card is already saved). |
 
@@ -144,7 +144,7 @@ Same path explains **Open controls** opening the print step instead of Tasks/Adv
 
 ### Why the card “stays active”
 
-No bug in resolver revoke from hub click — **revoke was never submitted**. The user was on the wrong surface (setup Print), not `#revoke-details` with confirm + POST.
+No bug in resolver revoke from hub click - **revoke was never submitted**. The user was on the wrong surface (setup Print), not `#revoke-details` with confirm + POST.
 
 ### When deep links work
 
@@ -186,7 +186,7 @@ sequenceDiagram
 
 **Principle:** First-time post-create keeps the setup wizard; **returning stewards** with saved keys should land in **control** mode and honor steward hashes. Do not move revoke signing into the hub (keeps confirm-before-submit and `created-revoke.mjs` single owner).
 
-### Recommended (P0) — “Returning steward” mode gate
+### Recommended (P0) - “Returning steward” mode gate
 
 **Change `resolveCreatedMode()`** (and document in `CARD_WORKSPACE_UX.md`):
 
@@ -199,7 +199,7 @@ sequenceDiagram
 
 **One-time hygiene:** on hub or `/created/` load, if `isWalletSaved(profileId)` and no `hc_setup_done` entry, set it (migration in JS, no D1).
 
-### Recommended (P0) — Steward hash must not be clobbered
+### Recommended (P0) - Steward hash must not be clobbered
 
 In `initCreatedSetup()`, **before** `writeStepHistory()`:
 
@@ -207,11 +207,11 @@ In `initCreatedSetup()`, **before** `writeStepHistory()`:
 
 Alternatively, skip `initCreatedSetup` entirely when `openCardControlPage` used a steward focus (could pass `?focus=revoke` query param if hash race is a concern; hash is sufficient if setup does not overwrite it).
 
-### Recommended (P1) — `bootstrapOwnerTools` resilience
+### Recommended (P1) - `bootstrapOwnerTools` resilience
 
 Per `REVOKE_UI_INVESTIGATION.md`: try/catch around `hydrateSessionFromNetwork`; always `initOwnerRevoke` when `profileId` + `qrId` exist so resolver rows update even if card JSON fetch fails.
 
-### Recommended (P2) — UX clarity (no behavior change)
+### Recommended (P2) - UX clarity (no behavior change)
 
 | Issue | Direction |
 |-------|-----------|
@@ -232,12 +232,14 @@ Per `REVOKE_UI_INVESTIGATION.md`: try/catch around `hydrateSessionFromNetwork`; 
 
 ## Verification checklist (after implementation)
 
-1. **Saved card, no `hc_setup_done`:** Hub **Revoke QR** → Advanced, `#revoke-details` open, not setup Print.
-2. **Same card:** **Open controls** → control Tasks tab (Now), not setup Print.
-3. **Fresh create** `?fresh=1`:** Still shows setup wizard (regression).
-4. **Complete revoke:** Checkbox + **Revoke this QR** → `POST` 200, scan `qr_revoked`, hub status line updates after poll.
-5. **Legacy wallet-only:** Card saved before workspace shipped → hub actions reach control after migration/backfill.
-6. **Tests:** extend `worker/tests/created-mode.test.ts`; e2e hub row → `#revoke` visible (e.g. `device-os-wallet.spec.ts`).
+| # | Check | Automated |
+|---|--------|-----------|
+| 1 | Saved card, no `hc_setup_done`: hub **Revoke QR** → Advanced `#revoke-details`, not setup Print | `e2e/device-os-wallet.spec.ts` |
+| 2 | **Open controls** → control Tasks (Now), not setup Print | `e2e/device-os-wallet.spec.ts` |
+| 3 | **Fresh create** `?fresh=1` still shows setup wizard | `e2e/device-os-wallet.spec.ts` |
+| 4 | Complete revoke: checkbox + **Revoke this QR** → `POST` 200, `qr_revoked` on scan | Manual (`docs/M4_CREATED_REVOKE_UI.md` exit test) |
+| 5 | Legacy wallet: saved card reaches control (`syncSetupDoneForSavedProfile`) | `worker/tests/created-mode.test.ts` |
+| 6 | Mode + hub deep-link unit/e2e | `created-mode.test.ts`, `device-os-wallet.spec.ts` |
 
 ```bash
 npm run worker:test -- worker/tests/created-mode.test.ts
@@ -268,4 +270,4 @@ Manual: `docs/DEVICE_OS_QA.md` P0-2 (Open controls → `/created/` with keys), r
 
 ## Answer: is a compatible fix possible?
 
-**Yes.** The architecture already separates **navigation** (hub + `openCardControlPage`) from **revocation** (`created-revoke.mjs`). The bug is a **mode-routing** mismatch after card workspace Phase 1, not a broken revoke API. Adjusting when **setup** vs **control** runs—and not letting setup overwrite steward hashes—restores the documented hub → `/created/#revoke` flow without redesigning revoke or moving signing into the hub.
+**Yes.** The architecture already separates **navigation** (hub + `openCardControlPage`) from **revocation** (`created-revoke.mjs`). The bug is a **mode-routing** mismatch after card workspace Phase 1, not a broken revoke API. Adjusting when **setup** vs **control** runs-and not letting setup overwrite steward hashes-restores the documented hub → `/created/#revoke` flow without redesigning revoke or moving signing into the hub.

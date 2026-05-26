@@ -110,6 +110,48 @@ test.describe("device OS wallet flow", () => {
     await expect(page.locator("#revoke-details")).toHaveAttribute("open");
   });
 
+  test("Open controls opens control workspace when hc_setup_done unset (not setup Print)", async ({
+    page,
+  }) => {
+    await page.addInitScript((profileId) => {
+      localStorage.removeItem("hc_setup_done");
+    }, SAMPLE_WALLET_ENTRY.profile_id);
+
+    await page.goto("/wallet/");
+    await page.getByRole("button", { name: "Open controls" }).click();
+
+    await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
+    await expect(page.locator("#created-setup-root")).toBeHidden();
+    await expect(page.locator("#created-control-root")).toBeVisible();
+    await expect(page.locator("#created-tab-now")).toBeVisible();
+  });
+
+  test("fresh=1 shows post-create setup wizard (not control tabs)", async ({ page }) => {
+    await page.addInitScript((entry) => {
+      localStorage.removeItem("hc_setup_done");
+      localStorage.setItem("hc_wallet", JSON.stringify([entry]));
+      sessionStorage.setItem(
+        "hc_created",
+        JSON.stringify({
+          profile_id: entry.profile_id,
+          qr_id: entry.qr_id,
+          owner_private_key_b58: entry.owner_private_key_b58,
+          owner_public_key_b58: entry.owner_public_key_b58,
+          handle: entry.handle,
+          manifesto_line: entry.manifesto_line,
+          scan_url: entry.scan_url,
+        })
+      );
+    }, SAMPLE_WALLET_ENTRY);
+
+    const url = `/created/?profile_id=${SAMPLE_WALLET_ENTRY.profile_id}&qr_id=${SAMPLE_WALLET_ENTRY.qr_id}&fresh=1`;
+    await page.goto(url);
+
+    await expect(page.locator("#created-setup-root")).toBeVisible();
+    await expect(page.locator("#created-control-root")).toBeHidden();
+    await expect(page.getByText("Four steps · keys stay in this browser")).toBeVisible();
+  });
+
   test("Update status opens /created/ with keys and update panel focus", async ({ page }) => {
     await page.addInitScript((profileId) => {
       localStorage.setItem("hc_setup_done", JSON.stringify({ [profileId]: true }));
