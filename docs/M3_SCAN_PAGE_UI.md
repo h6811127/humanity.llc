@@ -76,7 +76,7 @@ Track with [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Resolver UI 
 | **5** | Omit empty trust groups; M5 showcase seed + landing row | **Shipped** (`pass-v24`) - `pushTrustGroup`, `site:seed-showcase-live-object` |
 | **6** | Trust-tool emphasis (icons, peek, section kicker, layout) | **Shipped** (`pass-v25`) - `scan-trust-tools`, `scan-group-summary` |
 | **7** | Dot-only page chrome (remove white top bar + duplicate wordmark) | **Shipped** (`pass-v26`) - `renderScanPageChrome`, `.scan-page-chrome` |
-| **8** | Progressive device dot + scan glance (viewer state in chrome) | **Shipped** (`pass-v31`) - [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) Phases 8.1–8.5 (incl. Playwright `e2e/scan-page-dot.spec.ts`) |
+| **8** | Progressive device dot + scan glance (viewer state in chrome) | **Shipped** (`pass-v31`) - [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) Phases 8.1–8.7 |
 
 After `scan-pass.css` changes: `npm run worker:bundle-scan`.
 
