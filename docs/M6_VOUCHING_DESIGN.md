@@ -364,6 +364,7 @@ Vouching confuses people when these are mixed up. Full guide: [`docs/KEYS_CARDS_
 
 - **Steward / Vouched Human** = resolver state for a `profile_id` (visible on scan, `/created/`, `/wallet/` chips).
 - **Signing keys** = owner keypair in **`hc_created`** for this tab (loaded via create or **Use keys** from `hc_wallet`).
+- **Vouch-ready keys (draft):** [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) — scan-first activation without weakening signed-vouch rules.
 - **iPhone vs laptop** = separate devices unless you import a backup or save + Use keys on each.
 
 Scan vouch UI (shipped): if keys are missing but a saved card is Steward on the network, the explainer names that card and tells you to **Use keys** on this device.

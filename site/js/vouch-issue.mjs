@@ -1,6 +1,7 @@
 /**
  * V-002  -  vouch issuance on scan page when viewer has hc_created keys.
  */
+import { activateWalletEntry } from "./device-keys.mjs";
 import {
   DEFAULT_VOUCH_STATEMENT,
   getCardStatusUrl,
@@ -16,6 +17,9 @@ import {
 const VOUCHER_WAIT_DAYS = 90;
 const VOUCH_THRESHOLD = 3;
 const VOUCH_RETURN_KEY = "hc_vouch_return_url";
+const MAX_USE_KEYS_HERE = 5;
+
+let submitHandlerBound = false;
 
 function rememberVouchReturnUrl() {
   try {
@@ -27,15 +31,15 @@ function rememberVouchReturnUrl() {
 
 function loadKeysHelpHtml(walletUrl) {
   return (
-    `On <a href="${walletUrl}">Saved cards</a>, tap <strong>Use keys</strong> on your steward card. ` +
-    `That copies your signing keys into this browser tab and opens <code>/created/</code> — ` +
-    `then use the <strong>Return to scan to vouch</strong> link there, or come back to this page in the same tab.`
+    `You can also open <a href="${walletUrl}">Saved cards</a> and tap <strong>Use keys</strong> ` +
+    `(opens <code>/created/</code>), then return to this scan in the same tab.`
   );
 }
 
 const row = document.getElementById("vouch-row");
 const explainer = document.getElementById("vouch-explainer");
 const explainerCopy = document.getElementById("vouch-explainer-copy");
+const explainerActions = document.getElementById("vouch-explainer-actions");
 const interactive = document.getElementById("vouch-interactive");
 const ineligible = document.getElementById("vouch-ineligible");
 const ineligibleCopy = document.getElementById("vouch-ineligible-copy");
@@ -97,7 +101,7 @@ function plainVouchError(code, fallback) {
     REPLAYED_NONCE: "That request was already used. Try again.",
     INVALID_SIGNATURE: "Signature check failed. Use the keys from your create session.",
     CARD_INVALID_SIGNATURE:
-      "Signature check failed. Use keys from Saved cards (Use keys) for this steward card.",
+      "Signature check failed. Use keys from Saved cards (Use keys here) for this steward card.",
     SIGNATURE_MISMATCH: "Signature does not match your card keys.",
   };
   return map[code] || fallback || "Could not record vouch. Try again.";
@@ -162,14 +166,54 @@ function showSuccess(verification) {
   updateHumanTrustRow(verification);
 }
 
-function hideExplainer() {
-  if (explainer) explainer.hidden = true;
+function clearExplainerActions() {
+  if (!explainerActions) return;
+  explainerActions.innerHTML = "";
+  explainerActions.hidden = true;
 }
 
-function showExplainerHtml(html) {
+function hideExplainer() {
+  if (explainer) explainer.hidden = true;
+  clearExplainerActions();
+}
+
+/**
+ * @param {Array<{ entry: Record<string, unknown>, label: string, verificationLabel: string }>} eligible
+ */
+function mountUseKeysHereButtons(eligible) {
+  if (!explainerActions) return;
+
+  clearExplainerActions();
+  const withKeys = eligible
+    .filter((e) => e.entry?.owner_private_key_b58 && e.entry?.owner_public_key_b58)
+    .slice(0, MAX_USE_KEYS_HERE);
+
+  if (withKeys.length === 0) {
+    return;
+  }
+
+  explainerActions.hidden = false;
+
+  for (const item of withKeys) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "vouch-cta vouch-use-keys-here";
+    btn.textContent = `Use keys here · ${item.label} (${item.verificationLabel})`;
+    btn.addEventListener("click", async () => {
+      btn.disabled = true;
+      setStatus("Loading signing keys…", "waiting");
+      activateWalletEntry(item.entry);
+      await runVouchFlow();
+    });
+    explainerActions.appendChild(btn);
+  }
+}
+
+function showExplainerHtml(html, eligible = []) {
   if (explainer) explainer.hidden = false;
   if (explainerCopy) explainerCopy.innerHTML = html;
   if (row) row.hidden = true;
+  mountUseKeysHereButtons(eligible);
 }
 
 function walletLinksHtml() {
@@ -186,22 +230,11 @@ function cardLabel(entry) {
 }
 
 /**
- * No signing keys in this tab — explain network vs device and detect saved eligible cards.
+ * @param {string} voucheeProfileId
+ * @returns {Promise<Array<{ entry: Record<string, unknown>, label: string, verificationLabel: string }>>}
  */
-async function showNoKeysExplainer(voucheeProfileId) {
+async function findEligibleWalletVouchers(voucheeProfileId) {
   const wallet = loadWallet();
-  const walletUrl = `${location.origin}/wallet/`;
-  const createUrl = `${location.origin}/create/`;
-
-  if (wallet.length === 0) {
-    showExplainerHtml(
-      `To vouch, this browser needs <strong>your</strong> card’s signing keys in this tab — not just Steward on the network. ` +
-        `Create a card or open ${walletLinksHtml()}, then ${loadKeysHelpHtml(walletUrl)} ` +
-        `Your private key never uploads — only the signed vouch does.`
-    );
-    return;
-  }
-
   /** @type {Array<{ entry: Record<string, unknown>, label: string, verificationLabel: string }>} */
   const eligible = [];
 
@@ -232,6 +265,27 @@ async function showNoKeysExplainer(voucheeProfileId) {
     })
   );
 
+  return eligible;
+}
+
+/**
+ * No signing keys in this tab — explain network vs device and detect saved eligible cards.
+ */
+async function showNoKeysExplainer(voucheeProfileId) {
+  const wallet = loadWallet();
+  const walletUrl = `${location.origin}/wallet/`;
+
+  if (wallet.length === 0) {
+    showExplainerHtml(
+      `To vouch, this browser needs <strong>your</strong> card’s signing keys in this tab — not just Steward on the network. ` +
+        `Create a card or open ${walletLinksHtml()}, then save it and use <strong>Use keys here</strong> on this scan. ` +
+        `Your private key never uploads — only the signed vouch does.`
+    );
+    return;
+  }
+
+  const eligible = await findEligibleWalletVouchers(voucheeProfileId);
+
   if (eligible.length === 0) {
     showExplainerHtml(
       `You have ${wallet.length} saved card${wallet.length === 1 ? "" : "s"} on this device, but none are <strong>Vouched Human</strong> or <strong>Steward</strong> on the network yet — or keys are for the same person you’re scanning. ` +
@@ -250,92 +304,37 @@ async function showNoKeysExplainer(voucheeProfileId) {
   const more =
     eligible.length > 3 ? ` (+${eligible.length - 3} more saved)` : "";
 
-  const pick = eligible[0];
-  const pickLabel = cardLabel(pick.entry);
+  const hasActivatable = eligible.some(
+    (e) => e.entry?.owner_private_key_b58 && e.entry?.owner_public_key_b58
+  );
+
   showExplainerHtml(
     `${lines}${more} — but <strong>signing keys are not active in this browser tab</strong>. ` +
+      (hasActivatable
+        ? `Tap <strong>Use keys here</strong> below to load keys and vouch on this page. `
+        : `Re-save your card with keys on <a href="${walletUrl}">Saved cards</a>, then return here. `) +
       loadKeysHelpHtml(walletUrl) +
-      ` (Try <strong>Use keys</strong> on <strong>${pickLabel}</strong>.) ` +
-      `Network verification and device keys are separate (<a href="${location.origin}/features/vouching.html">how vouching works</a>).`
+      ` (<a href="${location.origin}/features/vouching.html">how vouching works</a>).`,
+    eligible
   );
 }
 
-async function init() {
-  if (!row) return;
-
-  const voucheeProfileId = row.dataset.voucheeProfileId?.trim();
-  if (!voucheeProfileId) return;
-
-  rememberVouchReturnUrl();
-
-  const session = loadSession();
-  const hasKeys =
-    session?.profile_id &&
-    session?.owner_private_key_b58 &&
-    session?.owner_public_key_b58;
-
-  if (!hasKeys) {
-    await showNoKeysExplainer(voucheeProfileId);
-    return;
-  }
-
-  const voucherProfileId = session.profile_id;
-  if (voucherProfileId === voucheeProfileId) {
-    showExplainerHtml(
-      "You can't vouch for your own card. Open someone else's scan link while <strong>your</strong> keys are active in this browser."
-    );
-    return;
-  }
-
-  hideExplainer();
-  row.hidden = false;
-
-  if (statementEl && !statementEl.value) {
-    statementEl.value = DEFAULT_VOUCH_STATEMENT;
-  }
-
-  let voucherStatus;
-  try {
-    const res = await fetch(getCardStatusUrl(voucherProfileId));
-    voucherStatus = await res.json();
-  } catch {
-    showIneligible("Could not load your card status. Check your connection and refresh.");
-    return;
-  }
-
-  const cardStatus = voucherStatus?.scan?.card?.status;
-  const voucherState = voucherStatus?.scan?.verification?.state;
-  const voucherLabel =
-    voucherStatus?.scan?.human_trust?.label ||
-    voucherStatus?.scan?.verification?.label;
-
-  if (cardStatus !== "active") {
-    showIneligible("Your card must be active before you can vouch for someone else.");
-    return;
-  }
-
-  if (!isEligibleVoucherState(voucherState)) {
-    showIneligible(
-      "Your card must reach Vouched Human status (or steward) before you can vouch for others."
-    );
-    return;
-  }
-
-  if (interactive) interactive.hidden = false;
-  if (ineligible) ineligible.hidden = true;
-  const meta = humanTrustIconMeta({
-    label: voucherLabel,
-    state: voucherState,
-  });
-  const toneHint =
-    voucherState === "steward" ? "Steward on the network" : "Vouched Human on the network";
-  setStatus(
-    `Keys active on this device · ${toneHint}. Ready when you've met this person in person.`
-  );
-
-  if (!submitBtn || !statementEl || !confirmEl) return;
+function bindSubmitHandler(voucheeProfileId) {
+  if (!submitBtn || !statementEl || !confirmEl || submitHandlerBound) return;
+  submitHandlerBound = true;
 
   submitBtn.addEventListener("click", async () => {
+    const session = loadSession();
+    if (
+      !session?.profile_id ||
+      !session.owner_private_key_b58 ||
+      !session.owner_public_key_b58
+    ) {
+      setStatus("Signing keys are not active in this tab.", "error");
+      return;
+    }
+    const voucherProfileId = session.profile_id;
+
     const statement = statementEl.value.trim();
     if (!statement || statement.length > 280) {
       setStatus("Statement must be 1–280 characters.", "error");
@@ -394,4 +393,83 @@ async function init() {
   });
 }
 
-init();
+async function runVouchFlow() {
+  if (!row) return;
+
+  const voucheeProfileId = row.dataset.voucheeProfileId?.trim();
+  if (!voucheeProfileId) return;
+
+  rememberVouchReturnUrl();
+
+  if (success) success.hidden = true;
+  if (ineligible) ineligible.hidden = true;
+
+  const session = loadSession();
+  const hasKeys =
+    session?.profile_id &&
+    session?.owner_private_key_b58 &&
+    session?.owner_public_key_b58;
+
+  if (!hasKeys) {
+    await showNoKeysExplainer(voucheeProfileId);
+    return;
+  }
+
+  const voucherProfileId = session.profile_id;
+  if (voucherProfileId === voucheeProfileId) {
+    showExplainerHtml(
+      "You can't vouch for your own card. Open someone else's scan link while <strong>your</strong> keys are active in this browser."
+    );
+    return;
+  }
+
+  hideExplainer();
+  row.hidden = false;
+
+  if (statementEl && !statementEl.value) {
+    statementEl.value = DEFAULT_VOUCH_STATEMENT;
+  }
+
+  let voucherStatus;
+  try {
+    const res = await fetch(getCardStatusUrl(voucherProfileId));
+    voucherStatus = await res.json();
+  } catch {
+    showIneligible("Could not load your card status. Check your connection and refresh.");
+    return;
+  }
+
+  const cardStatus = voucherStatus?.scan?.card?.status;
+  const voucherState = voucherStatus?.scan?.verification?.state;
+  const voucherLabel =
+    voucherStatus?.scan?.human_trust?.label ||
+    voucherStatus?.scan?.verification?.label;
+
+  if (cardStatus !== "active") {
+    showIneligible("Your card must be active before you can vouch for someone else.");
+    return;
+  }
+
+  if (!isEligibleVoucherState(voucherState)) {
+    showIneligible(
+      "Your card must reach Vouched Human status (or steward) before you can vouch for others."
+    );
+    return;
+  }
+
+  if (interactive) interactive.hidden = false;
+  if (ineligible) ineligible.hidden = true;
+  humanTrustIconMeta({
+    label: voucherLabel,
+    state: voucherState,
+  });
+  const toneHint =
+    voucherState === "steward" ? "Steward on the network" : "Vouched Human on the network";
+  setStatus(
+    `Keys active on this device · ${toneHint}. Ready when you've met this person in person.`
+  );
+
+  bindSubmitHandler(voucheeProfileId);
+}
+
+runVouchFlow();

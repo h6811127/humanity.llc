@@ -106,11 +106,12 @@ Per **device**, storage:
 
 1. **Vouchee:** active scan link (`/c/{profile}?q={active_qr}`), not revoked QR, not your own `profile_id`.
 2. **Voucher (you):** Steward or Vouched Human on the **network** (curl or `/created/` on a device with your keys).
-3. **This phone/browser:** `/wallet/` → **Use keys** on **your** steward card (loads `hc_created`, opens `/created/`).
-4. On `/created/`, tap **Return to scan to vouch** (or use the browser back button to the scan tab).
-5. Submit the vouch on the vouchee’s **active** scan page.
+3. **This phone/browser:** On the vouchee’s scan page, tap **Use keys here** for your steward card (loads `hc_created` in this tab, stays on scan). Or `/wallet/` → **Use keys** → **Return to scan to vouch** on `/created/`.
+4. Submit the vouch on the vouchee’s **active** scan page.
 
 If step 3 is skipped, you will see **“keys not active on this device”** even when the network says Steward.
+
+**Proposed UX improvement (draft):** [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) — opt-in auto-activation of saved keys on scan so stewards need not round-trip through **Use keys** and `/created/` every time.
 
 ---
 
