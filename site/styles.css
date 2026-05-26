@@ -523,7 +523,7 @@ body.page-flow.has-shell-chrome .page > main.screen {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  padding: 10px 12px 6px;
+  padding: 9px 12px 4px;
   flex-wrap: nowrap;
 }
 
@@ -620,19 +620,25 @@ body.page-flow.has-shell-chrome .page > main.screen {
   gap: 2px;
 }
 
+.hub-card-sub--compact {
+  gap: 0;
+}
+
 .hub-card-sub-line {
   display: block;
+  font-size: 12px;
+  line-height: 1.25;
 }
 
 .hub-card-details {
-  margin: 0;
-  font-size: 13px;
+  margin: 2px 0 0;
+  font-size: 12px;
 }
 
 .hub-card-details-summary {
   color: #007aff;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
   list-style: none;
 }
 
@@ -642,7 +648,7 @@ body.page-flow.has-shell-chrome .page > main.screen {
 
 .hub-card-details-body {
   display: block;
-  margin-top: 4px;
+  margin-top: 3px;
   color: var(--grey);
   line-height: 1.35;
 }
@@ -758,8 +764,8 @@ body.page-flow.has-shell-chrome .page > main.screen {
 .hub-card-action {
   display: inline-flex;
   align-items: center;
-  min-height: 32px;
-  padding: 6px 12px;
+  min-height: 30px;
+  padding: 5px 11px;
   border-radius: var(--radius-pill);
   border: 1px solid rgba(0, 0, 0, 0.12);
   background: rgba(0, 0, 0, 0.03);

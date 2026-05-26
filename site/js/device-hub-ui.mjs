@@ -195,10 +195,10 @@ function hubCardSubHtml(entry, lastUsed) {
   const savedLabel = formatSavedAt(entry.saved_at) || lastUsed;
   const keyPreview = walletEntryKeyPreview(entry);
   const handle = entry.handle ? `@${entry.handle}` : "";
-  const idPreview =
-    entry.profile_id && entry.handle ? `${entry.profile_id.slice(0, 10)}…` : "";
+  const idPreview = entry.profile_id ? `${entry.profile_id.slice(0, 10)}…` : "";
 
   const detailParts = [];
+  if (savedLabel) detailParts.push(`Last saved: ${escapeHtml(savedLabel)}`);
   if (keyPreview) detailParts.push(`Key: ${escapeHtml(keyPreview)}`);
   if (handle) detailParts.push(escapeHtml(handle));
   if (idPreview) detailParts.push(escapeHtml(idPreview));
@@ -206,23 +206,17 @@ function hubCardSubHtml(entry, lastUsed) {
     detailParts.push("Default for vouching");
   }
 
-  if (!savedLabel && detailParts.length === 0) {
-    return `<span class="list-sub">${escapeHtml(walletEntrySubtitle(entry))}</span>`;
+  const primarySub = handle || walletEntrySubtitle(entry);
+  if (!primarySub && detailParts.length === 0) {
+    return "";
   }
 
-  const lines = [];
-  if (savedLabel) {
-    lines.push(
-      `<span class="hub-card-sub-line">Last saved: ${escapeHtml(savedLabel)}</span>`
-    );
-  }
-  if (detailParts.length > 0) {
-    lines.push(
-      `<details class="hub-card-details"><summary class="hub-card-details-summary">Details</summary><span class="hub-card-details-body">${detailParts.join("<br>")}</span></details>`
-    );
-  }
+  const detailsHtml =
+    detailParts.length > 0
+      ? `<details class="hub-card-details"><summary class="hub-card-details-summary">More</summary><span class="hub-card-details-body">${detailParts.join("<br>")}</span></details>`
+      : "";
 
-  return `<span class="list-sub hub-card-sub">${lines.join("")}</span>`;
+  return `<span class="list-sub hub-card-sub hub-card-sub--compact"><span class="hub-card-sub-line">${escapeHtml(primarySub)}</span></span>${detailsHtml}`;
 }
 
 function scanUrlForEntry(entry) {

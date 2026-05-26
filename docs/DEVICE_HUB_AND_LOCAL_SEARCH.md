@@ -14,6 +14,40 @@ The landing page, **`/created/`**, and **`/wallet/`** share an **“on this devi
 
 ---
 
+## Hub UX refinement notes (May 2026)
+
+These notes are captured as individual product refinements so implementation can happen in small slices without losing intent.
+
+1. **Reduce text density inside each card**
+   - Collapse key preview, last saved, and metadata behind expansion.
+   - Primary card view should stay focused on identity, live state, and quick actions.
+2. **Rename “Use keys”**
+   - Current label reads cryptographic, not operational.
+   - Candidate replacements: **Open controls**, **Manage**, **Control object**, **Update state**.
+3. **Make cards feel alive**
+   - Add subtle recency/reachability language and indicators (seen recently, reachable, offline, pending sync, revoked).
+4. **Refine top status pills**
+   - Revisit **Pins** label (`Pinned` or `Favorites` unless pins become a deeper primitive).
+   - Replace generic `Online` wording with semantically richer status (`Local vault online`, `Sync active`, `Network reachable`).
+5. **Strengthen object identity visuals**
+   - Add stronger differentiation via color/glyph/type cues so large lists remain scannable.
+6. **Push shell further toward iOS-native feel**
+   - Increase blur, soften shadows, round cards slightly more, tighten spacing, and reduce border noise.
+7. **Make object actions primary**
+   - Shift from storage-first to control-first actions (revoke, rotate, ping, transfer, delegate, lock, expiration, event mode).
+
+### Implementation slices from these notes
+
+- **Step 1 (now):** reduce card text density with progressive disclosure.
+- **Step 2:** rename `Use keys` across hub/wallet and tests.
+- **Step 3:** add network liveliness indicators and wording pass.
+- **Step 4:** status-pill terminology pass (`pins`, `online` semantics).
+- **Step 5:** object identity visual system (types, glyph/color cues).
+- **Step 6:** modal/shell visual polish pass.
+- **Step 7:** action-forward card IA and command surface.
+
+---
+
 ## Personalization route (decision)
 
 We kept the landing funnel (hero → device hub → long-form content) and **enriched** it rather than replacing it with a full dashboard.
