@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { SCAN_PASS_CSS } from "../src/resolver/scan-pass-styles";
 import { SCAN_UI_VERSION } from "../src/resolver/scan-html";
+import { SHOWCASE_PROFILE } from "./fixtures/scan-showcase-fixtures";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -42,5 +43,17 @@ describe("scan page device dot contract", () => {
   it("scan-tab-keys imports scan-page-dot module", () => {
     const src = readFileSync(join(root, "site/js/scan-tab-keys.mjs"), "utf8");
     expect(src).toContain("./scan-page-dot.mjs?v=5");
+  });
+
+  it("ships Playwright scan fixture with progressive dot markup", () => {
+    const html = readFileSync(
+      join(root, "site/e2e-fixtures/scan-active.html"),
+      "utf8"
+    );
+    expect(html).toContain('id="scan-page-dot"');
+    expect(html).toContain('id="scan-page-dot-glance"');
+    expect(html).toContain('class="scan-hero-host scan-hero-wordmark"');
+    expect(html).toContain("scan-tab-keys.mjs?v=6");
+    expect(html).toContain(`data-profile-id="${SHOWCASE_PROFILE}"`);
   });
 });
