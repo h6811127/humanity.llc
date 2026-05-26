@@ -1,15 +1,19 @@
 # Investigation: Safari / WebKit shell regression (scroll, dot, hub)
 
 **Date opened:** 2026-05-26  
-**Status:** P0–P2 + Phase 3C **shipped** — pending manual **P0-W** sign-off on production ([`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P0-W); Phase 3A/3B only if acceptance fails  
+**Status:** **Resolved** for primary UX/rate-limit incident — production sign-off after [`277d08e`](https://github.com/h6811127/humanity.llc/commit/277d08e35f78316948a4dcb866c5902231d73a80) (reverts global `initDeviceOsCoordinator()` auto-start). See [`UI_UX_REVERT_PLAN.md`](UI_UX_REVERT_PLAN.md) § Resolution. Remaining WebKit polish (scroll, dot flake) tracked separately if needed.  
 **Owners:** Device shell UX  
-**Related:** [`IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md`](IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md) · [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md)
+**Related:** [`UI_UX_REVERT_PLAN.md`](UI_UX_REVERT_PLAN.md) · [`IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md`](IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md) · [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md)
 
 ---
 
 ## Executive summary
 
-After the May 25–26 device-inbox + scroll-chrome landing, **production is healthy for clean profiles** (Tor Mac, Tor Android first visit, iPad Safari) but **broken or flaky on WebKit profiles that stress the new shell** (iPhone Safari, Mac Safari).
+After the May 25–26 device-inbox + scroll-chrome landing, **production was broken or flaky on WebKit profiles that stress the new shell** (iPhone Safari, Mac Safari) — lag, dead taps, and Cloudflare **“temporarily rate limited”** under multi-tab use.
+
+**Production fix (2026-05-26):** commit **`277d08e`** — stop auto-starting `initDeviceOsCoordinator()` from `device-status.mjs`. That **reverts the request storm** from coordinator wiring ([`7ef219d`](https://github.com/h6811127/humanity.llc/commit/7ef219d) pipeline + [`d520c9b`](https://github.com/h6811127/humanity.llc/commit/d520c9b) status bootstrap). Later commit `733ae5e` (sheet/CSS pre-cascade restore) was **not** the confirmed fix.
+
+Earlier investigation themes still apply for secondary issues:
 
 This is **not** a “rewrite the hub” problem. It is a **convergence of**:
 
@@ -314,6 +318,7 @@ document.body.classList.remove("shell-is-scrolling");
 | 2026-05-26 | Document opened; private iPhone failure elevates priority of scroll-chrome gating over cache-only narrative |
 | 2026-05-26 | Hub-smooth / landing-jank clue → treat `device-shell-chrome.mjs` document scroll listener as primary perf suspect |
 | 2026-05-26 | No ground-up rearchitecture; phased P0–P2 plan |
+| 2026-05-26 | **Incident closed:** fix **`277d08e`** — disable global OS coordinator auto-refresh (reverts **`7ef219d`** + **`d520c9b`** wiring) |
 
 ---
 
@@ -334,3 +339,4 @@ document.body.classList.remove("shell-is-scrolling");
 | 2026-05-26 | Phase 2.2b implemented (shared inbox loader; glance off static inbox graph) |
 | 2026-05-26 | Phase 3C implemented (scroll chrome localStorage kill switch) |
 | 2026-05-26 | P0-W manual acceptance added to `DEVICE_OS_QA.md`; doc status/architecture updated; 3A/3B gated on P0-W |
+| 2026-05-26 | **Incident closed:** production fix **`277d08e`** (revert global `initDeviceOsCoordinator`); reverts coordinator auto-start from **`7ef219d`** / **`d520c9b`**. `733ae5e` not the confirmed fix — see `UI_UX_REVERT_PLAN.md` § Resolution |
