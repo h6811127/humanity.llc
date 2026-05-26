@@ -22,14 +22,51 @@ test.describe("device OS wallet flow", () => {
     }, SAMPLE_WALLET_ENTRY);
   });
 
-  test("shows saved card and Control card opens /created/ with session keys", async ({
+  test("shows saved card and Use keys opens /created/ with session keys", async ({
     page,
   }) => {
     await page.goto("/wallet/");
     await expect(page.getByText("E2E Test Card")).toBeVisible();
-    await page.getByRole("button", { name: "Control card" }).click();
+    await page.getByRole("button", { name: "Use keys" }).click();
     await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
     const sessionRaw = await page.evaluate(() => sessionStorage.getItem("hc_created"));
     expect(sessionRaw).toContain("privkeyfortestonlyxxxxxxxxx");
+  });
+
+  test("does not show card-disabled-since-visit banner when resolver reports active", async ({
+    page,
+  }) => {
+    await page.addInitScript((profileId) => {
+      localStorage.setItem(
+        "hc_wallet_last_seen_network",
+        JSON.stringify({ [profileId]: "active" })
+      );
+      sessionStorage.removeItem("hc_wallet_network_cache");
+    }, SAMPLE_WALLET_ENTRY.profile_id);
+
+    await page.route("**/.well-known/hc/v1/cards/**/status**", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          version: "1.0",
+          resolver: { operator: "humanity.llc", version: "1.0" },
+          scan: {
+            kind: "active",
+            profile_id: SAMPLE_WALLET_ENTRY.profile_id,
+            qr_id: SAMPLE_WALLET_ENTRY.qr_id,
+            card: { status: "active", handle: "e2etest", manifesto_line: "Test line" },
+            verification: { state: "registered", label: "Registered" },
+            human_trust: { label: "Registered", subtitle: "", pill_active: false },
+          },
+        }),
+      });
+    });
+
+    await page.goto("/wallet/");
+    await expect(page.getByText("Live State Active")).toBeVisible();
+    await expect(
+      page.getByText("Card disabled on the network since your last visit.")
+    ).toBeHidden();
   });
 });
