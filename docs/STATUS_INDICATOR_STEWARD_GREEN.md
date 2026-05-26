@@ -258,6 +258,8 @@ Network refresh for dot coloring uses `device-os-coordinator.mjs` (`DEVICE_OS_RE
 
 ## Troubleshooting: dot tap appears dead
 
+**Red outline ring on the dot button:** that is `data-device-status-error` (module load failure), not custody red. See [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) for the 2026-05-25 regression (import without file), timeline, and prevention plan.
+
 Use this when users report “the status dot does nothing” on every page. On current `main`, Playwright (`e2e/device-status-dot.spec.ts`, Pixel 5 viewport) passes hub-open on landing; a total failure usually means the handler never ran or the UI did not change visibly.
 
 ### Expected behavior by page

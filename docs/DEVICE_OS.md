@@ -197,7 +197,7 @@ Small TLC items that need **no new resolver APIs**:
 | Item | Notes |
 |------|--------|
 | Browser notifications when live proof is waiting | ✅ v2 A–C — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
-| Unified device inbox + glance plan | ✅ phases 1–10 — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
+| Unified device inbox + glance plan | ✅ phases 1–13 — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
 | Hub saved card row UX | ✅ phases 1–3 — [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) |
 | Glance on `/wallet/` | Landing popover only; wallet uses scroll-to-saved chrome |
 | Light frontend tests | ✅ `npm run worker:test:device` + device shell E2E in CI |

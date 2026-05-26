@@ -6,6 +6,7 @@ vi.mock("../../site/js/hc-sign.mjs", () => ({
 }));
 
 import {
+  buildResolverConfirmedWalletPollMaps,
   isResolverConfirmedProfile,
   refreshWalletNetworkStatuses,
 } from "../../site/js/device-wallet-network.mjs";
@@ -71,6 +72,7 @@ describe("isResolverConfirmedProfile", () => {
 
   it("is false before any resolver fetch this visit", () => {
     expect(isResolverConfirmedProfile(PROFILE_A)).toBe(false);
+    expect(buildResolverConfirmedWalletPollMaps()).toBeNull();
   });
 
   it("is true only for profiles fetched this visit", async () => {
@@ -78,5 +80,16 @@ describe("isResolverConfirmedProfile", () => {
 
     expect(isResolverConfirmedProfile(PROFILE_A)).toBe(true);
     expect(isResolverConfirmedProfile(PROFILE_B)).toBe(false);
+  });
+
+  it("buildResolverConfirmedWalletPollMaps includes only resolver-confirmed profiles after poll", async () => {
+    await refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }]);
+
+    const maps = buildResolverConfirmedWalletPollMaps();
+    expect(maps).not.toBeNull();
+    expect(maps?.alertStateMap[PROFILE_A]).toBe("active");
+    expect(maps?.scanKindMap[PROFILE_A]).toBe("active");
+    expect(maps?.resolverConfirmedMap[PROFILE_A]).toBe(true);
+    expect(maps?.resolverConfirmedMap[PROFILE_B]).toBeUndefined();
   });
 });

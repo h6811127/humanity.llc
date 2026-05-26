@@ -220,7 +220,9 @@ Production observation proved resolver **`active`** while banner showed — **cl
 | `resolverConfirmed: false` despite `card_revoked` alert state | `worker/tests/wallet-network.test.ts` § `listCardDisabledSinceVisit` |
 | Stale cache + active fetch integration | `worker/tests/wallet-network.test.ts` § `stale cache + active fetch` |
 | Hub pipeline → inbox | `worker/tests/device-hub-frontend-pipeline.test.ts` |
-| E2E active resolver, stale cache, multi-card Got it | `e2e/device-os-wallet.spec.ts` |
+| `buildResolverConfirmedWalletPollMaps` | `worker/tests/device-wallet-network-confirmed.test.ts` |
+| E2E active resolver, stale cache, multi-card Got it / Open controls | `e2e/device-os-wallet.spec.ts` |
+| E2E stale cache + active resolver → no inbox badge/hub group | `e2e/device-inbox.spec.ts` |
 
 Run:
 
@@ -257,3 +259,8 @@ Per the AI prompt at the bottom of the first investigation draft:
 - Glance listens to `DEVICE_OS_REFRESHED` after coordinator wallet poll.
 - E2E: `device-os-wallet.spec.ts` — **Open controls** after stale cache + active resolver must not show banners on all cards.
 - Tracked as **DH-15** in [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md).
+
+### Slice 7 — inbox parity (shipped)
+
+- `buildResolverConfirmedWalletPollMaps()` shared by hub re-apply and `gatherCardDisabledSinceVisitForInbox()`.
+- E2E: `device-inbox.spec.ts` — stale cache + active resolver must not show badge, dot overlay, hub card-disabled group, or row banner copy.

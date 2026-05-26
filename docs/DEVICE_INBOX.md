@@ -234,6 +234,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 | 11 | Dot soft overlay for `card_disabled_since_visit` (`inboxOverlayCountsFromItems` + `dotOverlayFromCounts`) | ✅ |
 | 12 | `topInboxKind()` + `inboxDotOverlayFromItems()` aligned with overlay priority; hub sheet reconcile core + Vitest | ✅ |
 | 13 | Inbox sheet reconcile core + Vitest; `getInboxDotOverlay()` on status dot; E2E card-disabled dot overlay | ✅ |
+| 14 | E2E inbox sheet backdrop close + `pageshow` bfcache reconcile (`DEVICE_OS_QA` P5e) | ✅ |
 
 **Do not:**
 

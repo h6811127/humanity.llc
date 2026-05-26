@@ -139,7 +139,7 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 | ID | Gap |
 |----|-----|
 | **DH-7** | ✅ Fixed: `e2e/device-os-wallet.spec.ts` uses current **Open controls** action and passes. |
-| **DH-8** | ✅ Addressed with E2E guardrail for active-status/no-alert and helper-level coverage in wallet-network tests; monitor for future DOM-level unit tests if regressions recur. |
+| **DH-8** | ✅ E2E: wallet row banners + inbox badge/hub group with stale cache + active resolver (`device-os-wallet.spec.ts`, `device-inbox.spec.ts`); Vitest `buildResolverConfirmedWalletPollMaps` + `isResolverConfirmedProfile`. |
 
 ---
 
@@ -240,6 +240,16 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 - [x] E2E: stale cache + active resolver + **Open controls** does not re-light all row banners.
 
 **Files:** `device-wallet-network.mjs`, `device-hub-ui.mjs`, `device-hub-glance.mjs`, `device-inbox-card-disabled.mjs`, `e2e/device-os-wallet.spec.ts`.
+
+---
+
+### Slice 7 — Inbox parity + shared poll maps (P1) ✅
+
+**Goal:** DH-8 — same stale-cache false positive must not light inbox badge, dot overlay, or `#device-hub-card-disabled-group`.
+
+- [x] `buildResolverConfirmedWalletPollMaps()` in `device-wallet-network.mjs` (hub + `gatherCardDisabledSinceVisitForInbox`).
+- [x] E2E: `device-inbox.spec.ts` — stale `hc_wallet_network_cache` + active resolver → no inbox/hub card-disabled UI.
+- [x] Vitest: `buildResolverConfirmedWalletPollMaps` in `device-wallet-network-confirmed.test.ts`.
 
 ---
 

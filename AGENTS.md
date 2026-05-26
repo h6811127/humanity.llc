@@ -36,10 +36,13 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 
 - **Cards vs keys vs verification:** `docs/KEYS_CARDS_AND_VERIFICATION.md` — steward status is on the resolver; vouch signing needs `hc_created` keys on the same browser tab.
 - **Status dot vs inbox vs OS alerts:** `docs/DEVICE_INBOX.md` (action items, badge, background alerts) vs `docs/STATUS_INDICATOR_STEWARD_GREEN.md` (trust dot only).
+- **Card disabled since visit:** Banner, hub `#device-hub-card-disabled-group`, and inbox badge must use **resolver-confirmed** poll maps only — never `sessionStorage.hc_wallet_network_cache` alone. See `docs/CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`. After hub/inbox network changes: `npm run worker:test -- worker/tests/wallet-network.test.ts worker/tests/device-wallet-network-confirmed.test.ts` and `npm run e2e -- e2e/device-os-wallet.spec.ts e2e/device-inbox.spec.ts`.
 
 ### Status dot / hub opener (agent guardrails)
 
 The floating **status dot** (`#brand-status-dot-btn`) is the hub opener on `/`, `/create/`, and `/created/`. On `/wallet/` it only scrolls to saved cards. Do not wire glance-first on dot tap.
+
+**Red outline ring + dead dot on all pages** = `device-status.mjs` import graph failed (`data-device-status-error`). See `docs/STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`. Never merge a new `./device-*.mjs` import without the file in the same PR; update `SHELL_STATUS_MODULE_PATHS` in `e2e/device-status-dot.spec.ts` and bump bootstrap `?v=` on shell HTML when adding imports.
 
 When you touch any of these, run the regression suite before finishing:
 

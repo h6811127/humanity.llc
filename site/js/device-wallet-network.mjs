@@ -118,6 +118,36 @@ export function getLatestResolvedScanKind(profileId) {
   return latestResolvedScanKindMap[profileId] ?? null;
 }
 
+/**
+ * Maps for since-visit UI from resolver-confirmed reads this visit only.
+ * @param {Array<{ profile_id?: string }>} [entries] defaults to {@link loadWallet}
+ * @returns {{
+ *   alertStateMap: Record<string, string>,
+ *   scanKindMap: Record<string, string | null>,
+ *   resolverConfirmedMap: Record<string, boolean>,
+ * } | null}
+ */
+export function buildResolverConfirmedWalletPollMaps(entries) {
+  if (!hasLatestResolverNetworkPoll()) return null;
+  const wallet = entries ?? loadWallet();
+  /** @type {Record<string, string>} */
+  const alertStateMap = {};
+  /** @type {Record<string, string | null>} */
+  const scanKindMap = {};
+  /** @type {Record<string, boolean>} */
+  const resolverConfirmedMap = {};
+  for (const entry of wallet) {
+    const pid = entry.profile_id;
+    if (!pid || !isResolverConfirmedProfile(pid)) continue;
+    const resolved = getLatestResolvedAlertState(pid);
+    if (resolved == null) continue;
+    alertStateMap[pid] = resolved;
+    scanKindMap[pid] = getLatestResolvedScanKind(pid);
+    resolverConfirmedMap[pid] = true;
+  }
+  return { alertStateMap, scanKindMap, resolverConfirmedMap };
+}
+
 /** @param {string} profileId */
 export function getNetworkLastSeenBaseline(profileId) {
   if (!profileId) return null;

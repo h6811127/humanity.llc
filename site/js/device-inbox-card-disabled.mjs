@@ -5,44 +5,30 @@
 import { loadWallet } from "./device-wallet.mjs";
 import { listCardDisabledSinceVisit } from "./wallet-network-baseline.mjs";
 import {
-  getLatestResolvedAlertState,
-  getLatestResolvedScanKind,
+  buildResolverConfirmedWalletPollMaps,
   getNetworkLastSeenBaseline,
-  hasLatestResolverNetworkPoll,
-  isResolverConfirmedProfile,
 } from "./device-wallet-network.mjs";
 
 /** @returns {ReturnType<typeof loadWallet>} */
 export function gatherCardDisabledSinceVisitForInbox() {
-  if (!hasLatestResolverNetworkPoll()) return [];
-
   const wallet = loadWallet();
-  /** @type {Record<string, string | null>} */
-  const alertStateMap = {};
-  /** @type {Record<string, string | null>} */
-  const scanKindMap = {};
+  const maps = buildResolverConfirmedWalletPollMaps(wallet);
+  if (!maps) return [];
+
   /** @type {Record<string, string | null>} */
   const lastSeenMap = {};
-  /** @type {Record<string, boolean>} */
-  const resolverConfirmedMap = {};
-
   for (const entry of wallet) {
     const pid = entry.profile_id;
-    if (!pid) continue;
-    if (!isResolverConfirmedProfile(pid)) continue;
-    const alert = getLatestResolvedAlertState(pid);
-    alertStateMap[pid] = alert;
-    scanKindMap[pid] = getLatestResolvedScanKind(pid);
+    if (!pid || !maps.resolverConfirmedMap[pid]) continue;
     lastSeenMap[pid] = getNetworkLastSeenBaseline(pid);
-    resolverConfirmedMap[pid] = true;
   }
 
   const hits = listCardDisabledSinceVisit(
     wallet,
-    alertStateMap,
-    scanKindMap,
+    maps.alertStateMap,
+    maps.scanKindMap,
     lastSeenMap,
-    resolverConfirmedMap
+    maps.resolverConfirmedMap
   );
 
   return hits

@@ -199,6 +199,16 @@ See [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md).
 | 2 | Card disabled since visit (resolver-confirmed) | Inbox `card_disabled` row in glance; saved row for same card has no duplicate “since last visit” suffix |
 | 3 | Tap live-proof glance row | Opens inbox sheet (`openInboxFromChrome('glance')`), not hub expand only |
 
+## P5e — Inbox sheet reconcile + dot overlay (phase 13)
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Open inbox sheet from badge; close via backdrop | `body` loses `device-inbox-sheet-open`; `#device-inbox-backdrop` hidden |
+| 2 | Card disabled since visit (resolver-confirmed) | `#brand-status-dot` has `data-dot-overlay="card_disabled_since_visit"`; badge chroma `default` |
+| 3 | bfcache: open inbox → browser back → forward | Inbox not stuck open; backdrop not `.is-visible` when sheet collapsed |
+
+Vitest: `worker/tests/device-inbox-sheet-core.test.ts`, `worker/tests/device-inbox.test.ts` (`inboxDotOverlayFromItems`). Playwright: `e2e/device-inbox.spec.ts` § card disabled since visit; § sheet reconcile (P5e steps 1 and 3, phase 14).
+
 ## P5 — Inbox diagnostics (dev — phase 7)
 
 | Step | Action | Expected |
@@ -230,7 +240,7 @@ See [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md).
 ## Regression smoke (automated)
 
 ```bash
-npm run worker:test -- worker/tests/device-os-frontend.test.ts worker/tests/device-cross-tab.test.ts worker/tests/device-os-coordinator.test.ts
+npm run worker:test -- worker/tests/device-os-frontend.test.ts worker/tests/device-cross-tab.test.ts worker/tests/device-os-coordinator.test.ts worker/tests/device-inbox-sheet-core.test.ts
 ```
 
 Playwright (requires pages dev):

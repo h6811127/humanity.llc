@@ -41,11 +41,11 @@ import {
   getCachedNetworkScanKind,
   getCachedNetworkStatus,
   getCachedVerification,
+  buildResolverConfirmedWalletPollMaps,
   getLatestResolvedAlertState,
   getLatestResolvedScanKind,
   getNetworkLastSeenBaseline,
   hasLatestResolverNetworkPoll,
-  isResolverConfirmedProfile,
   CARD_REVOKED_ALERT_STATE,
   recordNetworkSeen,
   refreshWalletNetworkStatuses,
@@ -509,34 +509,9 @@ function acknowledgeNetworkSeenForEntry(entry) {
   );
 }
 
-/**
- * Maps for since-visit alerts from resolver-confirmed reads this visit only.
- * @returns {{
- *   alertStateMap: Record<string, string>,
- *   scanKindMap: Record<string, string | null>,
- *   resolverConfirmedMap: Record<string, boolean>,
- * } | null}
- */
-function buildLatestResolvedPollMaps() {
-  if (!hasLatestResolverNetworkPoll()) return null;
-  const alertStateMap = {};
-  const scanKindMap = {};
-  const resolverConfirmedMap = {};
-  for (const entry of loadWallet()) {
-    const pid = entry.profile_id;
-    if (!pid || !isResolverConfirmedProfile(pid)) continue;
-    const resolved = getLatestResolvedAlertState(pid);
-    if (resolved == null) continue;
-    alertStateMap[pid] = resolved;
-    scanKindMap[pid] = getLatestResolvedScanKind(pid);
-    resolverConfirmedMap[pid] = true;
-  }
-  return { alertStateMap, scanKindMap, resolverConfirmedMap };
-}
-
 function reapplyRevokedSinceVisitFromLatestResolved() {
   if (!savedList || !hubConfig.fetchNetworkStatus) return;
-  const maps = buildLatestResolvedPollMaps();
+  const maps = buildResolverConfirmedWalletPollMaps();
   if (!maps) {
     applyRevokedSinceVisitAlerts({}, null);
     return;

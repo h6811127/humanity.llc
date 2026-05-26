@@ -108,6 +108,17 @@ function mockNoChallenge(route: Route) {
   return route.fulfill({ status: 404, contentType: "application/json", body: "{}" });
 }
 
+async function waitForLiveProofChrome(page: import("@playwright/test").Page) {
+  const badge = page.locator("#shell-notif-badge");
+  await expect(badge).toBeVisible({ timeout: 15_000 });
+  await expect(badge).toHaveAttribute("data-inbox-chroma", "live_proof");
+  await expect(page.locator("#brand-status-dot")).toHaveAttribute(
+    "data-dot-overlay",
+    "proof_waiting"
+  );
+  return badge;
+}
+
 test.describe("device inbox — live proof", () => {
   test.beforeEach(async ({ page, context }) => {
     await grantBrowserNotifications(context);
@@ -120,17 +131,6 @@ test.describe("device inbox — live proof", () => {
     await page.route("**/.well-known/hc/v1/cards/**/status**", mockCardStatus);
     await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", mockPendingChallenge);
   });
-
-  async function waitForLiveProofChrome(page: import("@playwright/test").Page) {
-    const badge = page.locator("#shell-notif-badge");
-    await expect(badge).toBeVisible({ timeout: 15_000 });
-    await expect(badge).toHaveAttribute("data-inbox-chroma", "live_proof");
-    await expect(page.locator("#brand-status-dot")).toHaveAttribute(
-      "data-dot-overlay",
-      "proof_waiting"
-    );
-    return badge;
-  }
 
   test("shows badge chroma and descriptive aria-label when proof pending", async ({ page }) => {
     await page.goto("/wallet/");
@@ -185,6 +185,59 @@ test.describe("device inbox — live proof", () => {
     expect(
       await page.evaluate(() => localStorage.getItem("hc_browser_notif_prompt_dismissed"))
     ).toBe("1");
+  });
+});
+
+test.describe("device inbox — sheet reconcile (P5e / phase 14)", () => {
+  test.beforeEach(async ({ page, context }) => {
+    await grantBrowserNotifications(context);
+    await page.addInitScript((entry) => {
+      localStorage.setItem("hc_wallet", JSON.stringify([entry]));
+    }, WALLET_ENTRY);
+    await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
+    await page.route("**/.well-known/hc/v1/cards/**/status**", mockCardStatus);
+    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", mockPendingChallenge);
+  });
+
+  test("backdrop close clears body class and hides backdrop", async ({ page }) => {
+    await page.goto("/wallet/");
+    await waitForLiveProofChrome(page);
+    await page.locator("#shell-notif-badge").click();
+    const sheet = page.locator("#device-inbox-sheet");
+    const backdrop = page.locator("#device-inbox-backdrop");
+    await expect(sheet).not.toHaveClass(/device-inbox-sheet--collapsed/);
+    await expect(backdrop).toBeVisible();
+    await backdrop.click();
+    await expect(page.locator("body")).not.toHaveClass(/device-inbox-sheet-open/);
+    await expect(sheet).toHaveClass(/device-inbox-sheet--collapsed/);
+    await expect(backdrop).toBeHidden();
+  });
+
+  test("pageshow bfcache reconcile clears stuck inbox-open chrome", async ({ page }) => {
+    await page.goto("/wallet/");
+    await waitForLiveProofChrome(page);
+    await page.locator("#shell-notif-badge").click();
+    await expect(page.locator("#device-inbox-sheet")).not.toHaveClass(
+      /device-inbox-sheet--collapsed/
+    );
+
+    await page.evaluate(() => {
+      const sheet = document.getElementById("device-inbox-sheet");
+      sheet?.classList.add("device-inbox-sheet--collapsed");
+      document.body.classList.add("device-inbox-sheet-open");
+      document.getElementById("top-chrome")?.classList.add("top-chrome--inbox-locked");
+      const backdrop = document.getElementById("device-inbox-backdrop");
+      if (backdrop) {
+        backdrop.hidden = false;
+        backdrop.classList.add("is-visible");
+      }
+      window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true }));
+    });
+
+    await expect(page.locator("body")).not.toHaveClass(/device-inbox-sheet-open/);
+    await expect(page.locator("#top-chrome")).not.toHaveClass(/top-chrome--inbox-locked/);
+    await expect(page.locator("#device-inbox-backdrop")).toBeHidden();
+    await expect(page.locator("#device-inbox-backdrop")).not.toHaveClass(/is-visible/);
   });
 });
 
@@ -295,6 +348,39 @@ test.describe("device inbox — card disabled since visit", () => {
     await expect(row.getByText(/since your last visit/i)).toBeVisible();
     await row.locator("button").click();
     await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
+  });
+
+  test("does not surface inbox or hub card-disabled UI when stale cache says card_revoked but resolver is active", async ({
+    page,
+  }) => {
+    await page.addInitScript((entry) => {
+      const now = Date.now();
+      sessionStorage.setItem(
+        "hc_wallet_network_cache",
+        JSON.stringify({
+          [entry.profile_id]: {
+            status: "active",
+            scanKind: "card_revoked",
+            verificationLabel: null,
+            verificationState: null,
+            at: now,
+          },
+        })
+      );
+    }, WALLET_ENTRY);
+    await page.route("**/.well-known/hc/v1/cards/**/status**", mockCardStatus);
+
+    await page.goto("/wallet/");
+    await expect(page.getByText("Reachable")).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator("#shell-notif-badge")).toBeHidden({ timeout: 8_000 });
+    await expect(page.locator("#brand-status-dot")).not.toHaveAttribute(
+      "data-dot-overlay",
+      "card_disabled_since_visit"
+    );
+    await expect(page.locator("#device-hub-card-disabled-group")).toBeHidden();
+    await expect(
+      page.getByText("Card disabled on the network since your last visit.")
+    ).toBeHidden();
   });
 });
 
