@@ -8,8 +8,10 @@ import {
   pollWalletEntriesForLiveProof,
   shouldShowSwLiveProofNotification,
   swLiveProofPollingShouldRun,
+  resolveSwPeriodicMinIntervalMs,
   SW_PERIODIC_MIN_INTERVAL_MS,
 } from "../../site/js/device-live-control-sw-core.mjs";
+import { REFERENCE_FREE_POLICY } from "../../site/js/device-steward-entitlements-core.mjs";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const QR_ID = "qr_xBZTq7M27tueCzBY";
@@ -56,6 +58,21 @@ describe("swLiveProofPollingShouldRun", () => {
 describe("SW_PERIODIC_MIN_INTERVAL_MS", () => {
   it("uses at least 15 minutes for periodic background polls", () => {
     expect(SW_PERIODIC_MIN_INTERVAL_MS).toBeGreaterThanOrEqual(15 * 60 * 1000);
+  });
+});
+
+describe("resolveSwPeriodicMinIntervalMs", () => {
+  it("defaults to free tier floor", () => {
+    expect(resolveSwPeriodicMinIntervalMs()).toBe(SW_PERIODIC_MIN_INTERVAL_MS);
+  });
+
+  it("uses hosted policy interval when provided", () => {
+    expect(
+      resolveSwPeriodicMinIntervalMs({
+        ...REFERENCE_FREE_POLICY,
+        swPeriodicMinMs: 300_000,
+      })
+    ).toBe(300_000);
   });
 });
 

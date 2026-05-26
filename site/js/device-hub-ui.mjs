@@ -106,6 +106,12 @@ import {
   walletNetworkMaxParallel,
 } from "./device-wallet-scale-core.mjs";
 import {
+  getStewardEntitlementsPolicy,
+  hostedTierHubIndicatorLine,
+  initStewardEntitlementsHubHook,
+  refreshStewardEntitlementsOnHubContext,
+} from "./device-steward-entitlements.mjs";
+import {
   shouldScheduleWalletNetworkFetchAfterHubRender,
   WALLET_NETWORK_HUB_FETCH_DEBOUNCE_MS,
 } from "./device-hub-network-tools-core.mjs";
@@ -676,11 +682,12 @@ async function fetchAndApplyNetworkChips(opts = {}) {
 
   const staleEntries = listWalletEntriesNeedingNetworkFetch(entries);
   const visibleProfileIds = visibleHubCardProfileIds();
+  const policy = getStewardEntitlementsPolicy();
   let entriesToFetch = entries;
   if (manual) {
     const manualPool = staleEntries.length > 0 ? staleEntries : entries;
     entriesToFetch = orderEntriesVisibleFirst(manualPool, visibleProfileIds);
-  } else if (isLargeWallet(entries.length)) {
+  } else if (isLargeWallet(entries.length, policy)) {
     if (staleEntries.length === 0) {
       window.dispatchEvent(
         new CustomEvent(HUB_NETWORK_CHECKED_EVENT, {
@@ -690,14 +697,18 @@ async function fetchAndApplyNetworkChips(opts = {}) {
       return;
     }
     const session = getTabSession();
-    const picked = selectNetworkRefreshEntries(entries, {
-      walletSize: entries.length,
-      staleEntries,
-      activeProfileId:
-        session && typeof session.profile_id === "string" ? session.profile_id : null,
-      visibleProfileIds,
-      cursor: walletNetworkRefreshCursor,
-    });
+    const picked = selectNetworkRefreshEntries(
+      entries,
+      {
+        walletSize: entries.length,
+        staleEntries,
+        activeProfileId:
+          session && typeof session.profile_id === "string" ? session.profile_id : null,
+        visibleProfileIds,
+        cursor: walletNetworkRefreshCursor,
+      },
+      policy
+    );
     walletNetworkRefreshCursor = picked.nextCursor;
     entriesToFetch = picked.entries;
   } else if (staleEntries.length > 0) {
@@ -742,7 +753,7 @@ async function fetchAndApplyNetworkChips(opts = {}) {
     {
       generation: gen,
       isCurrentGeneration: () => gen === walletNetworkApplyGen,
-      maxParallel: walletNetworkMaxParallel(entries.length, { manual }),
+      maxParallel: walletNetworkMaxParallel(entries.length, { manual }, policy),
     }
   );
 }
@@ -1147,6 +1158,9 @@ function renderSavedRows() {
 
   const hubEl = document.getElementById("device-hub");
   const hubExpanded = isDeviceHubExpanded(hubEl);
+  if (hubExpanded) {
+    refreshStewardEntitlementsOnHubContext();
+  }
   const onWalletPage = document.body.classList.contains("page-wallet");
   if (
     shouldScheduleWalletNetworkFetchAfterHubRender({
@@ -1333,6 +1347,7 @@ export function initDeviceHub(config = {}) {
 
   refreshDeviceHub();
   notifyHubChanged();
+  initStewardEntitlementsHubHook();
 
   if (hubConfig.fetchNetworkStatus || hubConfig.showLiveControlInbox) {
     mountHubNetworkTools({
@@ -1342,7 +1357,10 @@ export function initDeviceHub(config = {}) {
       getNetworkCheckedAt: getLastWalletNetworkCheckedAt,
       getLiveProofCheckedAt: getLastLiveProofCheckAt,
       getAutoPollBudgetPaused: () => isLiveControlAutoPollBudgetPaused(),
-      getLargeWalletHint: () => largeWalletHint(loadWallet().length),
+      getLargeWalletHint: () =>
+        largeWalletHint(loadWallet().length, getStewardEntitlementsPolicy()),
+      getHostedTierLine: () =>
+        hostedTierHubIndicatorLine(getStewardEntitlementsPolicy()),
       onCheckNetwork: () => fetchAndApplyNetworkChips({ manual: true }),
       onCheckLiveProof: () => checkLiveProofNow(),
       onWatchChange: () => applyLiveControlWatchPreference(),

@@ -16,15 +16,25 @@ import {
   resolveLiveControlPollScope,
   walletNetworkVisibilityRefreshAllowed,
 } from "../../site/js/device-live-control-poll-scheduler.mjs";
+import { REFERENCE_FREE_POLICY } from "../../site/js/device-steward-entitlements-core.mjs";
 
 describe("liveControlPollIntervalMs", () => {
   it("uses 5s when pending proof exists", () => {
     expect(liveControlPollIntervalMs(1)).toBe(LIVE_CONTROL_POLL_MS_ACTIVE);
   });
 
-  it("uses 60s when idle", () => {
+  it("uses 60s when idle on free tier", () => {
     expect(liveControlPollIntervalMs(0)).toBe(LIVE_CONTROL_POLL_MS_IDLE);
     expect(LIVE_CONTROL_POLL_MS_IDLE).toBe(60_000);
+  });
+
+  it("uses hosted idle interval from policy", () => {
+    expect(
+      liveControlPollIntervalMs(0, {
+        ...REFERENCE_FREE_POLICY,
+        pollLiveProofIdleMs: 30_000,
+      })
+    ).toBe(30_000);
   });
 });
 

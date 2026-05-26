@@ -12,16 +12,19 @@ export const LARGE_WALLET_THRESHOLD = 10;
 
 /**
  * @param {number} savedCardCount
+ * @param {import("./device-steward-entitlements-core.mjs").StewardEntitlementsPolicy} [policy]
  */
-export function isLargeWallet(savedCardCount) {
-  return savedCardCount >= LARGE_WALLET_THRESHOLD;
+export function isLargeWallet(savedCardCount, policy) {
+  const threshold = policy?.walletLargeThreshold ?? LARGE_WALLET_THRESHOLD;
+  return savedCardCount >= threshold;
 }
 
 /**
  * @param {number} savedCardCount
+ * @param {import("./device-steward-entitlements-core.mjs").StewardEntitlementsPolicy} [policy]
  */
-export function largeWalletHint(savedCardCount) {
-  if (!isLargeWallet(savedCardCount)) return null;
+export function largeWalletHint(savedCardCount, policy) {
+  if (!isLargeWallet(savedCardCount, policy)) return null;
   return `Large wallet (${savedCardCount} saved) - automatic checks focus on your active card and any waiting live proof. Use Check network or Check for live proof for a full refresh.`;
 }
 
@@ -45,8 +48,8 @@ function addProfileId(set, profileId) {
  * }} ctx
  * @returns {T[]}
  */
-export function selectLiveControlPollEntries(entries, ctx) {
-  if (!isLargeWallet(ctx.walletSize) || entries.length === 0) {
+export function selectLiveControlPollEntries(entries, ctx, policy) {
+  if (!isLargeWallet(ctx.walletSize, policy) || entries.length === 0) {
     return entries;
   }
 
@@ -73,10 +76,12 @@ export function selectLiveControlPollEntries(entries, ctx) {
  * @param {number} savedCardCount
  * @param {{ manual?: boolean }} [opts]
  */
-export function walletNetworkMaxParallel(savedCardCount, opts = {}) {
-  if (!isLargeWallet(savedCardCount)) return Number.POSITIVE_INFINITY;
-  if (opts.manual === true) return 1;
-  return 2;
+export function walletNetworkMaxParallel(savedCardCount, opts = {}, policy) {
+  if (!isLargeWallet(savedCardCount, policy)) return Number.POSITIVE_INFINITY;
+  if (opts.manual === true) {
+    return policy?.pollNetworkManualMaxParallel ?? 1;
+  }
+  return policy?.pollNetworkMaxParallel ?? 2;
 }
 
 /**
@@ -93,8 +98,8 @@ export function walletNetworkMaxParallel(savedCardCount, opts = {}) {
  * }} ctx
  * @returns {{ entries: T[], nextCursor: number }}
  */
-export function selectNetworkRefreshEntries(entries, ctx) {
-  if (!isLargeWallet(ctx.walletSize) || ctx.staleEntries.length === 0) {
+export function selectNetworkRefreshEntries(entries, ctx, policy) {
+  if (!isLargeWallet(ctx.walletSize, policy) || ctx.staleEntries.length === 0) {
     return { entries: ctx.staleEntries, nextCursor: 0 };
   }
 

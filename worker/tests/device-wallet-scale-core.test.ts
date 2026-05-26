@@ -8,6 +8,14 @@ import {
   selectNetworkRefreshEntries,
   walletNetworkMaxParallel,
 } from "../../site/js/device-wallet-scale-core.mjs";
+import { REFERENCE_FREE_POLICY } from "../../site/js/device-steward-entitlements-core.mjs";
+
+const HOSTED_POLICY = {
+  ...REFERENCE_FREE_POLICY,
+  walletLargeThreshold: 25,
+  pollNetworkMaxParallel: 5,
+  pollNetworkManualMaxParallel: 3,
+};
 
 const PROFILE_A = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const PROFILE_B = "7Xk9mP2nQ4rT6vW8yZ1aB3cD6";
@@ -19,6 +27,11 @@ describe("isLargeWallet", () => {
 
   it("is true at threshold", () => {
     expect(isLargeWallet(LARGE_WALLET_THRESHOLD)).toBe(true);
+  });
+
+  it("uses hosted threshold from policy", () => {
+    expect(isLargeWallet(20, HOSTED_POLICY)).toBe(false);
+    expect(isLargeWallet(25, HOSTED_POLICY)).toBe(true);
   });
 });
 
@@ -119,6 +132,11 @@ describe("walletNetworkMaxParallel", () => {
     expect(walletNetworkMaxParallel(12)).toBe(2);
     expect(walletNetworkMaxParallel(12, { manual: true })).toBe(1);
     expect(walletNetworkMaxParallel(3)).toBe(Number.POSITIVE_INFINITY);
+  });
+
+  it("uses hosted parallel limits from policy", () => {
+    expect(walletNetworkMaxParallel(30, {}, HOSTED_POLICY)).toBe(5);
+    expect(walletNetworkMaxParallel(30, { manual: true }, HOSTED_POLICY)).toBe(3);
   });
 });
 

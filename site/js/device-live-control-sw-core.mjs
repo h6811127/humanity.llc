@@ -31,6 +31,14 @@ export const SW_NOTIFICATION_TAG = "hc-live-proof";
 /** Minimum periodicSync interval (request budget Phase 4: 5–15 min; use 15). */
 export const SW_PERIODIC_MIN_INTERVAL_MS = 15 * 60 * 1000;
 
+/**
+ * @param {import("./device-steward-entitlements-core.mjs").StewardEntitlementsPolicy} [policy]
+ */
+export function resolveSwPeriodicMinIntervalMs(policy) {
+  const ms = policy?.swPeriodicMinMs;
+  return typeof ms === "number" && ms > 0 ? ms : SW_PERIODIC_MIN_INTERVAL_MS;
+}
+
 /** Back off SW polls after challenge 429 (align with tab inbox). */
 export const SW_RATE_LIMIT_BACKOFF_MS = 60_000;
 

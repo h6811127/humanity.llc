@@ -10,11 +10,15 @@ import { isBrowserNotifEnabled } from "./device-browser-notifications-core.mjs";
 import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs";
 import {
   liveProofPollTargetsFromWallet,
-  SW_PERIODIC_MIN_INTERVAL_MS,
+  resolveSwPeriodicMinIntervalMs,
   SW_PERIODIC_TAG,
   SW_SYNC_TAG,
 } from "./device-live-control-sw-core.mjs";
 import { isWatchLiveProofEnabled } from "./device-hub-network-tools-core.mjs";
+import {
+  getStewardEntitlementsPolicy,
+  stewardPushSubscribeAllowed,
+} from "./device-steward-entitlements.mjs";
 
 export const SW_SCRIPT_URL = "/sw-live-proof.mjs";
 
@@ -104,6 +108,7 @@ export async function syncLiveProofServiceWorkerState(opts = {}) {
     interactShown,
     resolverHealth: getResolverHealthStatus(),
     pollNow: !!opts.pollNow && watchOn,
+    stewardPushEntitled: stewardPushSubscribeAllowed(getStewardEntitlementsPolicy()),
   };
 
   active.postMessage(message);
@@ -119,8 +124,9 @@ export async function syncLiveProofServiceWorkerState(opts = {}) {
   if ("periodicSync" in reg) {
     try {
       if (watchOn) {
+        const policy = getStewardEntitlementsPolicy();
         await reg.periodicSync.register(SW_PERIODIC_TAG, {
-          minInterval: SW_PERIODIC_MIN_INTERVAL_MS,
+          minInterval: resolveSwPeriodicMinIntervalMs(policy),
         });
       } else {
         await reg.periodicSync.unregister(SW_PERIODIC_TAG);

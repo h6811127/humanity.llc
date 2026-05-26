@@ -11,6 +11,10 @@ import {
   recordLiveControlAutoPoll,
 } from "./device-live-control-poll-budget-core.mjs";
 import {
+  getStewardEntitlementsPolicy,
+  STEWARD_ENTITLEMENTS_CHANGED,
+} from "./device-steward-entitlements.mjs";
+import {
   bindLiveControlPollLeaderSnapshot,
   broadcastLiveControlPollSnapshot,
   claimLiveControlPollLeader,
@@ -141,7 +145,8 @@ function readAutoPollBudgetRaw() {
 }
 
 export function isLiveControlAutoPollBudgetPaused() {
-  return isLiveControlAutoPollBudgetExhausted(readAutoPollBudgetRaw());
+  const cap = getStewardEntitlementsPolicy().pollLiveProofAutoDailyCap;
+  return isLiveControlAutoPollBudgetExhausted(readAutoPollBudgetRaw(), Date.now(), cap);
 }
 
 function ensurePollLeaderClaim() {
@@ -179,11 +184,15 @@ function resolvePollEntries(allPollable) {
   const session = getTabSession();
   const activeProfileId =
     session && typeof session.profile_id === "string" ? session.profile_id : null;
-  return selectLiveControlPollEntries(allPollable, {
-    walletSize: allPollable.length,
-    activeProfileId,
-    pendingProfileIds: collectPendingProfileIds(),
-  });
+  return selectLiveControlPollEntries(
+    allPollable,
+    {
+      walletSize: allPollable.length,
+      activeProfileId,
+      pendingProfileIds: collectPendingProfileIds(),
+    },
+    getStewardEntitlementsPolicy()
+  );
 }
 
 function recordAutoPollBudgetUse() {
@@ -240,7 +249,7 @@ function clearPollTimer() {
 function armPollTimer() {
   clearPollTimer();
   if (!pollFeatureEnabled || !readPollLoopShouldRun()) return;
-  const ms = liveControlPollIntervalMs(pending.length);
+  const ms = liveControlPollIntervalMs(pending.length, getStewardEntitlementsPolicy());
   scheduledIntervalMs = ms;
   pollTimer = window.setTimeout(() => {
     pollTimer = null;
@@ -262,13 +271,19 @@ async function runPollTick() {
     armPollTimer();
     return;
   }
-  const prevInterval = liveControlPollIntervalMs(pending.length);
+  const prevInterval = liveControlPollIntervalMs(
+    pending.length,
+    getStewardEntitlementsPolicy()
+  );
   await refreshLiveControlInbox();
   if (!pollFeatureEnabled || !readPollLoopShouldRun()) {
     clearPollTimer();
     return;
   }
-  const nextInterval = liveControlPollIntervalMs(pending.length);
+  const nextInterval = liveControlPollIntervalMs(
+    pending.length,
+    getStewardEntitlementsPolicy()
+  );
   if (nextInterval !== prevInterval || scheduledIntervalMs === 0) {
     armPollTimer();
     return;
@@ -415,7 +430,7 @@ export function syncLiveControlInboxPolling() {
     return;
   }
 
-  const ms = liveControlPollIntervalMs(pending.length);
+  const ms = liveControlPollIntervalMs(pending.length, getStewardEntitlementsPolicy());
   if (ms !== scheduledIntervalMs) {
     armPollTimer();
   }
@@ -439,6 +454,11 @@ function bindLiveControlPollScopeListeners() {
       return;
     }
     syncLiveControlInboxPolling();
+  });
+
+  window.addEventListener(STEWARD_ENTITLEMENTS_CHANGED, () => {
+    syncLiveControlInboxPolling();
+    void syncLiveProofServiceWorkerState();
   });
 }
 

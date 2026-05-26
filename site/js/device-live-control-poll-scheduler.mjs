@@ -11,9 +11,12 @@ export const WALLET_NETWORK_VISIBILITY_REFRESH_MS = 60_000;
 
 /**
  * @param {number} pendingCount
+ * @param {import("./device-steward-entitlements-core.mjs").StewardEntitlementsPolicy} [policy]
  */
-export function liveControlPollIntervalMs(pendingCount) {
-  return pendingCount > 0 ? LIVE_CONTROL_POLL_MS_ACTIVE : LIVE_CONTROL_POLL_MS_IDLE;
+export function liveControlPollIntervalMs(pendingCount, policy) {
+  const active = policy?.pollLiveProofActiveMs ?? LIVE_CONTROL_POLL_MS_ACTIVE;
+  const idle = policy?.pollLiveProofIdleMs ?? LIVE_CONTROL_POLL_MS_IDLE;
+  return pendingCount > 0 ? active : idle;
 }
 
 /**
