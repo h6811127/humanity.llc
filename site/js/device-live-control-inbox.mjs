@@ -21,6 +21,7 @@ import {
 import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs";
 import { selectLiveControlPollEntries } from "./device-wallet-scale-core.mjs";
 import { getPendingLiveControlChallengeUrl } from "./hc-sign.mjs";
+import { fetchResolverJson } from "./resolver-conditional-fetch-core.mjs";
 import { activateWalletEntry } from "./device-keys.mjs";
 import {
   buildLiveControlProofHref,
@@ -286,14 +287,13 @@ async function fetchPendingForEntry(entry) {
   if (!qrId) return { kind: "none" };
 
   try {
-    const res = await fetch(getPendingLiveControlChallengeUrl(profileId, qrId), {
-      cache: "no-store",
-    });
-    const httpKind = classifyChallengeHttpStatus(res.status);
+    const url = getPendingLiveControlChallengeUrl(profileId, qrId);
+    const { status, body, notModified } = await fetchResolverJson(url);
+    const httpKind = classifyChallengeHttpStatus(status);
+    if (httpKind === "unchanged" || notModified) return { kind: "unchanged" };
     if (httpKind === "none") return { kind: "none" };
     if (httpKind === "rate_limited") return { kind: "rate_limited" };
     if (httpKind === "unreachable") return { kind: "unreachable" };
-    const body = await res.json();
     const item = parsePendingChallengeBody(body, entry);
     return item ? { kind: "pending", item } : { kind: "none" };
   } catch {

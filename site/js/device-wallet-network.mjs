@@ -4,6 +4,7 @@
  */
 import { walletEntryQrId, loadWallet, saveWallet, normalizeWalletQrIds } from "./device-wallet.mjs";
 import { getCardStatusUrl } from "./hc-sign.mjs";
+import { fetchResolverJson } from "./resolver-conditional-fetch-core.mjs";
 import {
   alertStateForNetworkPoll,
   alertStateFromScanKind,
@@ -290,10 +291,15 @@ export async function refreshWalletNetworkStatuses(entries, onDone, options = {}
     fetches.push(
       (async () => {
         try {
-          const res = await fetch(getCardStatusUrl(pid, walletEntryQrId(entry)), {
-            cache: "no-store",
-          });
-          if (!res.ok) {
+          const statusUrl = getCardStatusUrl(pid, walletEntryQrId(entry));
+          const { status, body, notModified } = await fetchResolverJson(statusUrl);
+          if (notModified && cached) {
+            statusMap[pid] = cached.status;
+            scanKindMap[pid] = cached.scanKind ?? null;
+            cache[pid] = { ...cached, at: now };
+            return;
+          }
+          if (status < 200 || status >= 300) {
             statusMap[pid] = "error";
             scanKindMap[pid] = null;
             cache[pid] = {
@@ -305,7 +311,6 @@ export async function refreshWalletNetworkStatuses(entries, onDone, options = {}
             };
             return;
           }
-          const body = await res.json();
           const parsed = parseNetworkFetchBody(body);
           statusMap[pid] = parsed.status;
           scanKindMap[pid] = parsed.scanKind;

@@ -172,7 +172,7 @@ Client budgets are necessary; they are **not** sufficient against bugs, old cach
 |---------|---------|--------|
 | **429 + Retry-After** on hot routes | Client backs off (60s live proof; health degraded) | Partially shipped client-side |
 | **Per-IP / per-device rate limits** | Cap burst “Check network” fan-out | Planned |
-| **Short TTL / ETag** on `status` and challenge list | Cheap 304s for repeat polls | Planned |
+| **Short TTL / ETag** on `status` and challenge list | Cheap 304s for repeat polls | **Shipped** (Phase 9) |
 | **Workers Paid + dashboard alerts** | Production reference operator survives organic use | Ops (Phase 0) |
 | **Fail closed on 1027** | Site down until quota resets | Shipped behavior |
 
@@ -199,7 +199,7 @@ Client budgets are necessary; they are **not** sufficient against bugs, old cach
 | Network refresh: capped parallelism on large wallet | **Shipped** (Phase 8) | `walletNetworkMaxParallel` (2 auto, 1 manual) |
 | Network refresh: round-robin one stale row per debounced hub refresh (large wallet) | **Shipped** (Phase 8b) | `selectNetworkRefreshEntries` + `listWalletEntriesNeedingNetworkFetch` |
 | Network refresh: visible-row only | **Planned** (Phase 8c) | Refresh DOM-visible saved rows first |
-| `If-None-Match` / short TTL on Worker | **Planned** (Phase 9) | |
+| `If-None-Match` / short TTL on Worker | **Shipped** (Phase 9) | `conditional-json.ts`; client `resolver-conditional-fetch-core.mjs` |
 
 ### C. Scope *who* polls
 
@@ -243,7 +243,7 @@ Do **not** rip out the device OS. **Retire the default “poll every card every 
 | **7 - Session budget & leader tab** (P1) | **Shipped:** `hc_live_control_auto_poll_budget` (**400**/UTC day/tab); leader lock `hc_live_control_poll_leader` + `BroadcastChannel` snapshot; manual check bypasses cap | Prevents runaway 8h hub sessions | Auto poll pauses with hub message; manual check remains |
 | **8 - Wallet scale & network fan-out** (P1) | **Shipped:** large-wallet hint (≥10 cards); live-control poll set = active `hc_created` + pending; network `maxParallel` 2 (auto) or 1 (manual) | Cuts N-parallel status storms | Full-wallet live proof scan slower when large |
 | **8b - Presence & chrome** (P1) | **Shipped:** skip presence heartbeat when alone with keys (`shouldSkipPresenceHeartbeat`) | Less cross-tab churn when single tab | Heartbeat resumes when second tab opens |
-| **9 - Edge cache** (P2) | ETag / short TTL on status + challenge endpoints | Fewer D1 reads on repeat polls | API design |
+| **9 - Edge cache** (P2) | ETag / short TTL on status + challenge endpoints | Fewer D1 reads on repeat polls | **Shipped** |
 | **10 - Push / paid** (future) | Hosted continuous watch + server push | Best UX at scale | Product + billing |
 
 **Tests (shipped):** Vitest in `device-live-control-poll-scheduler.test.ts`, `device-live-control-round-robin.test.ts`, `device-hub-network-tools-core.test.ts`; Playwright in `e2e/device-inbox.spec.ts` (collapsed hub idle 10s, one challenge per tick, degraded health, watch off + manual check).
@@ -326,7 +326,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 | N3 | Large wallet: cap parallel status GETs | Yes (2 auto, 1 manual via `walletNetworkMaxParallel`) | — | 8 ✅ |
 | N3b | Large wallet: round-robin **one stale status GET** per hub debounce | Yes (`selectNetworkRefreshEntries`) | Visible-row priority | 8b ✅ |
 | N4 | Visible-row-only status refresh | — | Refresh DOM-visible saved rows first | 8b |
-| N5 | Worker **ETag** / 304 on `status` | — | Fewer D1 reads on repeat polls | 9 |
+| N5 | Worker **ETag** / 304 on `status` | Yes | Fewer D1 reads on repeat polls | 9 ✅ |
 | N6 | Longer session cache TTL when idle | 5 min session cache | Tiered TTL (idle vs attending) | 9 |
 
 ### Shell performance (no Worker)
@@ -359,8 +359,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 
 ### Implementer order (after Phases 1–8)
 
-1. **Phase 9** - Worker ETag/TTL (server).  
-2. **Phase 8c** - Visible-row network refresh; SW watch gate.  
+1. **Phase 8c** - Visible-row network refresh; SW watch gate.
 3. **Phase 10** - Push + paid tier product definition.  
 4. **Shell P2** - Lazy inbox loader ([`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md)).
 
@@ -374,7 +373,7 @@ Phases 1–5 improved polling, but **N saved cards** on one browser is still an 
 
 ### 1. Worker / inbox budget (this doc)
 
-**~10+ saved cards** with **watch on**, **hub expanded for hours**, and **browser alerts** can still stress Free-tier quota if the daily cap is not hit first. Phases **7–8** add a **400 auto-poll/day** cap, leader tab, narrowed large-wallet live-proof set, and capped network parallelism. Remaining: **Phase 9** edge cache; shell perf at large N ([`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md)).
+**~10+ saved cards** with **watch on**, **hub expanded for hours**, and **browser alerts** can still stress Free-tier quota if the daily cap is not hit first. Phases **7–8** add a **400 auto-poll/day** cap, leader tab, narrowed large-wallet live-proof set, and capped network parallelism. Remaining: shell perf at large N ([`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md)).
 
 ### 2. Shell performance (must fix)
 

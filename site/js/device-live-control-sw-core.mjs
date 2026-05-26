@@ -20,6 +20,7 @@ import {
   pickRoundRobinPollIndex,
 } from "./device-live-control-poll-scheduler.mjs";
 import { walletEntryQrId } from "./device-wallet.mjs";
+import { fetchResolverJson } from "./resolver-conditional-fetch-core.mjs";
 
 export const SW_STATE_CACHE = "hc-live-proof-sw-v1";
 export const SW_STATE_CACHE_KEY = "/__hc_sw_live_proof_state__";
@@ -87,8 +88,9 @@ async function fetchLiveProofChallengeForEntry(entry, apiOrigin, fetchFn) {
   if (!qrId) return { kind: "none" };
   const url = pendingLiveControlChallengeUrl(apiOrigin, profileId, qrId);
   try {
-    const { status, body } = await fetchFn(url);
+    const { status, body, notModified } = await fetchFn(url);
     const httpKind = classifyChallengeHttpStatus(status);
+    if (httpKind === "unchanged" || notModified) return { kind: "unchanged" };
     if (httpKind === "none") return { kind: "none" };
     if (httpKind === "rate_limited") return { kind: "rate_limited" };
     if (httpKind === "unreachable") return { kind: "unreachable" };
@@ -180,14 +182,26 @@ export function shouldShowSwLiveProofNotification(prevSig, nextSig, pendingCount
   return prevSig !== nextSig;
 }
 
+/** In-memory etag store (service worker has no sessionStorage). */
+const swResolverEtagStore = {
+  /** @type {Map<string, string>} */
+  values: new Map(),
+  /** @param {string} key */
+  get(key) {
+    return this.values.get(key) ?? null;
+  },
+  /** @param {string} key @param {string} value */
+  set(key, value) {
+    this.values.set(key, value);
+  },
+};
+
 /** @param {string} url */
 async function defaultFetch(url) {
-  const res = await fetch(url, { cache: "no-store" });
-  let body = null;
-  try {
-    body = await res.json();
-  } catch {
-    body = null;
-  }
-  return { ok: res.ok, status: res.status, body };
+  const { status, body, notModified } = await fetchResolverJson(
+    url,
+    {},
+    swResolverEtagStore
+  );
+  return { ok: status >= 200 && status < 300, status, body, notModified };
 }

@@ -54,7 +54,7 @@ export function corsHeaders(request: Request): HeadersInit {
   const headers: Record<string, string> = {
     "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Headers": "Content-Type, If-None-Match",
     "Access-Control-Max-Age": "86400",
   };
   if (request.headers.get("Access-Control-Request-Private-Network") === "true") {

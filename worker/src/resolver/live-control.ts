@@ -15,6 +15,7 @@ import {
   markLiveControlProven,
   type LiveControlChallengeRow,
 } from "../db/live-control";
+import { jsonResponseWithWeakEtag } from "../http/conditional-json";
 import { errorResponse, jsonResponse, requestOrigin } from "../http/resolver";
 import {
   buildScanViewModel,
@@ -193,8 +194,8 @@ export async function handleGetPendingLiveControlChallenge(
     );
   }
 
-  return jsonResponse(challengeBody(current, request), 200, {
-    "Cache-Control": "no-store",
+  return jsonResponseWithWeakEtag(request, challengeBody(current, request), 200, {
+    "Cache-Control": "private, max-age=15",
   });
 }
 

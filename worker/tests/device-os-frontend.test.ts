@@ -395,6 +395,7 @@ describe("tabNoticeCountFromState", () => {
 
 describe("classifyChallengeHttpStatus", () => {
   it("maps 404 to none, 429 to rate_limited, and 5xx to unreachable", () => {
+    expect(classifyChallengeHttpStatus(304)).toBe("unchanged");
     expect(classifyChallengeHttpStatus(404)).toBe("none");
     expect(classifyChallengeHttpStatus(429)).toBe("rate_limited");
     expect(classifyChallengeHttpStatus(200)).toBe("ok");

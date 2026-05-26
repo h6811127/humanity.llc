@@ -1,6 +1,6 @@
 import { walletEntryQrId } from "./device-wallet.mjs";
 
-/** @typedef {'none' | 'pending' | 'unreachable' | 'rate_limited'} LiveControlPollKind */
+/** @typedef {'none' | 'pending' | 'unchanged' | 'unreachable' | 'rate_limited'} LiveControlPollKind */
 
 /** @typedef {'ok' | 'degraded' | 'offline'} LiveControlPollHealth */
 
@@ -21,6 +21,7 @@ export function setLiveControlPollHealth(health) {
  * @param {number} status HTTP status from challenge poll
  */
 export function classifyChallengeHttpStatus(status) {
+  if (status === 304) return "unchanged";
   if (status === 404) return "none";
   if (status === 429) return "rate_limited";
   if (status >= 200 && status < 300) return "ok";

@@ -298,6 +298,42 @@ describe("scan status JSON (M3.4)", () => {
     expect(httpStatusForScanKind(vm.kind)).toBe(404);
   });
 
+  it("active status returns ETag and 304 when If-None-Match matches", async () => {
+    const ctx: ScanContext = {
+      card: card(),
+      qr: qr(),
+      verification: summary(),
+      revocationDisplay: null,
+    };
+    const db = {
+      prepare: (sql: string) => ({
+        bind: () => ({
+          first: async () => {
+            if (sql.includes("FROM cards")) return ctx.card;
+            if (sql.includes("FROM qr_credentials")) return ctx.qr;
+            if (sql.includes("verification_summaries")) return ctx.verification;
+            return null;
+          },
+        }),
+      }),
+    } as unknown as D1Database;
+
+    const { handleGetScanStatus } = await import("../src/resolver/scan-status");
+    const url = `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/status?q=${QR}`;
+    const first = await handleGetScanStatus(new Request(url), db, PROFILE);
+    const etag = first.headers.get("ETag");
+    expect(first.status).toBe(200);
+    expect(etag).toBeTruthy();
+
+    const second = await handleGetScanStatus(
+      new Request(url, { headers: { "If-None-Match": etag! } }),
+      db,
+      PROFILE
+    );
+    expect(second.status).toBe(304);
+    expect(second.headers.get("Cache-Control")).toContain("max-age=300");
+  });
+
   it("GET status through worker.fetch includes CORS for Pages dev origin", async () => {
     const db = {
       prepare: () => ({

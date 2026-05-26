@@ -1,5 +1,6 @@
 import { loadScanContext, type ScanContext } from "../db/scan";
 import { PROFILE_ID_REGEX } from "../crypto";
+import { jsonResponseWithWeakEtag } from "../http/conditional-json";
 import {
   jsonResponse,
   OPERATOR_ID,
@@ -162,14 +163,14 @@ export async function handleGetScanStatus(
   if (scanRedirectQueryBlocked(url)) {
     return guardScanResponse(
       request,
-      statusResponse(malformedScanView(profileId, qrId, origin))
+      await statusResponse(request, malformedScanView(profileId, qrId, origin))
     );
   }
 
   if (!PROFILE_ID_REGEX.test(profileId)) {
     return guardScanResponse(
       request,
-      statusResponse(malformedScanView(profileId, qrId, origin))
+      await statusResponse(request, malformedScanView(profileId, qrId, origin))
     );
   }
 
@@ -177,18 +178,18 @@ export async function handleGetScanStatus(
     if (!qrId) {
       return guardScanResponse(
         request,
-        statusResponse(malformedScanView(profileId, null, origin))
+        await statusResponse(request, malformedScanView(profileId, null, origin))
       );
     }
     if (!QR_ID_REGEX.test(qrId)) {
       return guardScanResponse(
         request,
-        statusResponse(malformedScanView(profileId, qrId, origin))
+        await statusResponse(request, malformedScanView(profileId, qrId, origin))
       );
     }
     const ctx = await loadScanContext(db, profileId, qrId);
     const vm = buildScanViewModel(profileId, qrId, ctx, origin);
-    return guardScanResponse(request, statusResponse(vm));
+    return guardScanResponse(request, await statusResponse(request, vm));
   }
 
   const card = await db
@@ -214,19 +215,27 @@ export async function handleGetScanStatus(
   }
 
   const vm = buildCardOnlyScanViewModel(profileId, card ?? null, verification, origin);
-  return guardScanResponse(request, statusResponse(vm));
+  return guardScanResponse(request, await statusResponse(request, vm));
 }
 
 const MALFORMED_HINT =
   "Use your real profile_id (20–32 base58 characters) and qr_id (qr_ plus base58). Copy both from /created/ or the scan URL.";
 
-function statusResponse(vm: ScanViewModel): Response {
+async function statusResponse(
+  request: Request,
+  vm: ScanViewModel
+): Promise<Response> {
   const status = httpStatusForScanKind(vm.kind);
   const body = scanStatusBodyFromViewModel(vm);
   const payload =
     vm.kind === "malformed"
       ? { ...body, hint: MALFORMED_HINT }
       : body;
+  if (status >= 200 && status < 300) {
+    return jsonResponseWithWeakEtag(request, payload, status, {
+      "Cache-Control": vm.cacheControl,
+    });
+  }
   return jsonResponse(payload, status, {
     "Cache-Control": vm.cacheControl,
   });
