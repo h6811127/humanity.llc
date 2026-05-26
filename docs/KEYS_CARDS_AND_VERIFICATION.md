@@ -35,6 +35,20 @@ Typical patterns:
 
 There is no “main account.” The **active card** is whichever profile’s keys are in **`sessionStorage` → `hc_created`** in **this tab**.
 
+### Realistic scale on one browser
+
+There is **no coded maximum** on saved cards in `hc_wallet` (`device-wallet.mjs`). Browser `localStorage` quota (typically ~5–10 MB per origin) can hold far more full key bundles than the product is designed to steward. **Comfortable day-to-day use is roughly 1–5 saved cards**; treat **~10+** as out of spec until the open issues below are fixed.
+
+The following **must be addressed** before we treat large wallets as supported. They bite **before** storage quota, not after:
+
+| Area | What happens today | Why it must be fixed |
+|------|-------------------|----------------------|
+| **Worker / inbox budget** | With live-proof polling, **~10+ saved cards** on an open tab can exhaust Cloudflare’s **Workers Free daily cap (100k/day)** in minutes. Phases 1–4 shipped scoped polling, round-robin **one GET per tick**, resolver health gating, and a 15 min SW cadence - but **more saved cards still means more poll slots** when background alerts and hub refresh run. | Reference operator and stewards cannot safely leave the shell open at scale; see [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md). |
+| **Shell performance** | Every hub/inbox pass calls `loadWallet()` and parses the full `hc_wallet` array; `sessionStorage.hc_wallet_network_cache` grows **per saved card** per session. | Hub, glance, and inbox get slower and noisier as N grows; see [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md) § persistence table. |
+| **Multi-tab** | Extra tabs with `hc_created` add cross-tab presence churn (`hc_tab_keys_presence`, capped at **20 tab rows**). That is separate from wallet size but **feels worse with many saved cards + many tabs** (storage events → chrome refresh). | Lag and false-positive inbox paths; see [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) and [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md). |
+
+**Engineering status:** Documented constraints only - **not** resolved by wallet UI or backup import alone.
+
 ---
 
 ## How many keys?
@@ -146,3 +160,5 @@ Steward is **not** earned by vouch count. It is set on the resolver (bootstrap o
 - [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) — wallet, Open controls, backup import
 - [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) — saved row layout, **checked** recency vs scan policy
 - [`DEVICE_OS.md`](DEVICE_OS.md) — two-layer product model
+- [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) - resolver polling vs saved-card count (must fix at ~10+)
+- [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md) - `hc_wallet` parse/cache growth on hub paths

@@ -34,7 +34,7 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 
 ### Non-obvious notes
 
-- **Cards vs keys vs verification:** `docs/KEYS_CARDS_AND_VERIFICATION.md` — steward status is on the resolver; vouch signing needs `hc_created` keys on the same browser tab.
+- **Cards vs keys vs verification:** `docs/KEYS_CARDS_AND_VERIFICATION.md` - steward status is on the resolver; vouch signing needs `hc_created` keys on the same browser tab. **Large wallets (~10+ saved cards):** same doc § Realistic scale; open issues (poll budget, shell perf, multi-tab) in `docs/DEVICE_OS_REQUEST_BUDGET.md` § Open issues at large wallet size - must fix before treating as supported.
 - **Cross-tab keys / inbox chrome:** `docs/CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md` (spec) · `docs/CROSS_TAB_KEYS_REBUILD_PLAN.md` (Phases 1–6 shipped) — not OS notifications; `device-chrome-refresh.mjs` coordinator + fingerprint snapshot. After changes: `npm run worker:test -- worker/tests/device-cross-tab-state.test.ts worker/tests/device-cross-tab-scan-snapshot.test.ts worker/tests/device-cross-tab.test.ts` and `npm run e2e -- e2e/device-cross-tab-keys.spec.ts`.
 - **Status dot vs inbox vs OS alerts:** `docs/DEVICE_INBOX.md` (action items, badge, background alerts) vs `docs/STATUS_INDICATOR_STEWARD_GREEN.md` (trust dot only).
 - **Safari / iPhone shell regression (scroll, dead taps):** `docs/SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md` — fix plan; hub scroll smooth / landing lag implicates `device-shell-chrome.mjs` document scroll listener. **Reverted features catalog:** `docs/UI_UX_REVERTED_FEATURES_CATALOG.md` (safe rebuild without lag/rate-limit paths). **Phased implementation:** `docs/UI_UX_SAFE_REBUILD_IMPLEMENTATION.md`.

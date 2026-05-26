@@ -3,7 +3,7 @@
 **Opened:** 2026-05-26  
 **Status:** **Active** — product/ops constraint; client polling must change before production scale  
 **Audience:** Product, frontend, operators  
-**Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`UI_UX_REVERT_PLAN.md`](UI_UX_REVERT_PLAN.md) · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md)
+**Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) (saved-card scale) · [`UI_UX_REVERT_PLAN.md`](UI_UX_REVERT_PLAN.md) · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md)
 
 ---
 
@@ -156,10 +156,29 @@ Before merging shell changes that touch network I/O:
 
 ---
 
+## Open issues at large wallet size (must fix)
+
+Phases 1–5 improved polling, but **N saved cards** on one browser is still an open product/engineering problem. The items below **need dedicated fixes** (not documentation-only). Full table and comfortable scale guidance: [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) § Realistic scale on one browser.
+
+### 1. Worker / inbox budget (this doc)
+
+With live-proof polling, **~10+ saved cards** on an open tab can blow through the **Workers Free daily request cap in minutes**. Phases 1–4 removed blind **5s × N** parallel polling; shipped behavior uses scoped timers, round-robin **one GET per tick**, resolver health gating, and SW **15 min** periodic sync. **More saved cards still means more poll slots** when background alerts and hub refresh run. Remaining work: hard per-tab/day budgets, idle = zero polls, and product copy when N is high.
+
+### 2. Shell performance (must fix)
+
+Every hub/inbox pass calls `loadWallet()` and `JSON.parse`s the full `hc_wallet` array. `hc_wallet_network_cache` grows per saved card per session. **Must address:** avoid full-wallet parse on hot paths, bound or shard cache entries, lazy row hydration. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
+
+### 3. Multi-tab presence (must fix)
+
+Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). That traffic is local-only (no Worker), but `storage` events drive `refreshDeviceChrome` on **all** tabs. **Must address:** debounce/coalesce with large wallets and many tabs; align with [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md). See [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md).
+
+---
+
 ## Changelog
 
 | Date | Note |
 |------|------|
+| 2026-05-26 | § Open issues at large wallet size - worker budget, shell perf, multi-tab (must fix) |
 | 2026-05-26 | Initial doc after production 1027 + false-positive investigation |
 | 2026-05-26 | **Phase 1 shipped:** `device-live-control-poll-scheduler.mjs`, scoped polling in `device-live-control-inbox.mjs` |
 | 2026-05-26 | **Phase 2 shipped:** round-robin live-control poll slots; hub-expand network refresh; 60s visibility debounce for wallet status |
