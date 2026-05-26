@@ -162,6 +162,9 @@ export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
 }
 
 function hubSheetOpen() {
+  if (hub?.classList.contains("device-hub-collapsed")) {
+    return false;
+  }
   return (
     document.body.classList.contains("device-hub-sheet-open") ||
     (hub && !hub.classList.contains("device-hub-collapsed"))
