@@ -3,6 +3,10 @@ import { describe, expect, it } from "vitest";
 import type { ScanContext } from "../src/db/scan";
 import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
 import { renderScanPage } from "../src/resolver/scan-html";
+import {
+  SCAN_OFFLINE_BANNER_TEXT,
+  shouldShowScanOfflineBanner,
+} from "../src/resolver/scan-offline";
 import { BEARER_WARNING } from "../src/resolver/trust-copy";
 import { buildScanViewModel } from "../src/resolver/scan-state";
 import { handleGetScan } from "../src/resolver/scan";
@@ -90,6 +94,33 @@ function scanDbFor(challenge: Record<string, unknown> | null = null): D1Database
     }),
   } as unknown as D1Database;
 }
+
+describe("scan offline banner (F2-2)", () => {
+  it("shows only when navigator reports offline", () => {
+    expect(shouldShowScanOfflineBanner(false)).toBe(true);
+    expect(shouldShowScanOfflineBanner(true)).toBe(false);
+    expect(shouldShowScanOfflineBanner(undefined)).toBe(false);
+  });
+
+  it("renders offline banner markup and disclosure script on scan HTML", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: summary(),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain('id="scan-offline-banner"');
+    expect(html).toContain(SCAN_OFFLINE_BANNER_TEXT);
+    expect(html).toContain("navigator.onLine");
+    expect(html).toContain('addEventListener("offline"');
+  });
+});
 
 describe("buildScanViewModel", () => {
   it("active scan includes all trust blocks", () => {

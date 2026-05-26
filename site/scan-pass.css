@@ -1080,6 +1080,25 @@ a {
   margin-bottom: 0;
 }
 
+.vouch-sign-lock {
+  margin-bottom: 12px;
+}
+
+.vouch-unlock-pin {
+  display: block;
+  width: 100%;
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  font-size: 16px;
+  border: 1px solid rgba(60, 60, 67, 0.24);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.vouch-unlock-btn {
+  margin-bottom: 0;
+}
+
 .scan-cross-tab-banner {
   margin: 0 var(--pad) 12px;
   padding: 12px 14px;
@@ -1092,6 +1111,21 @@ a {
 }
 
 .scan-cross-tab-banner[hidden] {
+  display: none;
+}
+
+.scan-offline-banner {
+  margin: 0 var(--pad) 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--black);
+  background: rgba(255, 149, 0, 0.1);
+  border: 1px solid rgba(255, 149, 0, 0.35);
+  border-radius: 14px;
+}
+
+.scan-offline-banner[hidden] {
   display: none;
 }
 

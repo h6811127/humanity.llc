@@ -13,6 +13,7 @@
 |-----|---------|
 | `docs/V1_FLOW_AUDIT.md` | Flow 2 steps, required failure states, cross-boundary table |
 | `docs/V1_IMPLEMENTATION_CONTRACTS.md` | API routes, QR/card contracts, error codes, acceptance tests |
+| `docs/SCANNER_EXPERIENCE.md` | Scanner product spec (safety, recognition, external-link policy) |
 | `docs/M3_SCAN_PAGE_UI.md` | Scan HTML layout, QR payload rules, status JSON parity |
 | `docs/V1_PRODUCT_TRUST_MODEL.md` | Bearer warning, trust block separation |
 | `docs/Technical Standards v1.0.md` | Cache-Control, profile_id length, scan logging policy |
@@ -52,7 +53,7 @@
 | ID | Gap | Contract / audit reference |
 |----|-----|---------------------------|
 | F2-1 | No scan access log (anonymized IP) | Flow 2 step 2: “Access log with anonymized IP only” |
-| F2-2 | No stale/offline banner on scan page | Flow 2 step 4; acceptance: “Active card cache shows stale/offline banner when offline” |
+| F2-2 | ✅ Fixed: scan HTML shows offline banner when `navigator.onLine === false` (`scan-offline.ts`, `scan-offline-banner`). |
 | F2-3 | ✅ Fixed: suspended scan HTML + status JSON include links to data policy and architecture (`scan-governance.ts`). |
 | F2-4 | `GET /.well-known/hc/v1/qr/{qr_id}` not implemented | § API Network table |
 | F2-5 | `GET /v1/verification/status/{profile_id}` not implemented | § API Verification table |
@@ -91,15 +92,15 @@
 
 ---
 
-### Slice 3 — Stale / offline disclosure (P0 trust)
+### Slice 3 — Stale / offline disclosure (P0 trust) ✅
 
 **Goal:** Meet Flow 2 step 4 and acceptance test without false “active” claims offline.
 
-- [ ] Client-side: on scan page load, if `navigator.onLine === false`, show banner: “Offline — status may be stale; refresh when connected.”
-- [ ] Optional: if response served from cache (hard on Worker HTML); or shorten reliance on CDN for active scans after revoke (already `max-age=60` on inactive).
-- [ ] Align `site/features/scan-ui.html` “future” bullet with shipped behavior.
+- [x] Client-side: on scan page load, if `navigator.onLine === false`, show banner: “Offline — status may be stale; refresh when connected.”
+- [x] Optional: CDN cache nuance deferred — Worker HTML already uses shorter cache on inactive scans (`max-age=60`).
+- [x] Align `site/features/scan-ui.html` “future” bullet with shipped behavior.
 
-**Files:** `worker/src/resolver/scan-html.ts` (inline script or small module), tests in `scan.test.ts`.
+**Files:** `worker/src/resolver/scan-html.ts`, `scan-offline.ts`, `site/scan-pass.css` (bundle via `npm run worker:bundle-scan`), tests in `scan.test.ts`.
 
 **Done when:** Manual: DevTools offline → scan page shows banner; test asserts banner string when `onLine` mocked false.
 

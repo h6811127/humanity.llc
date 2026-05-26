@@ -9,6 +9,7 @@ import {
   humanTrustListIcon,
 } from "./verification-display";
 import { governanceProcessUrls, originFromScanUrl } from "./scan-governance";
+import { SCAN_OFFLINE_BANNER_TEXT } from "./scan-offline";
 import { renderScanQrMarkup } from "./scan-qr";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
@@ -47,6 +48,7 @@ export async function renderScanPage(
   <div class="page scan-page">
     ${renderTopHeader(origin)}
     <p class="scan-cross-tab-banner" id="scan-cross-tab-banner" role="status" hidden></p>
+    <p class="scan-offline-banner" id="scan-offline-banner" role="status" hidden>${escapeHtml(SCAN_OFFLINE_BANNER_TEXT)}</p>
     <main class="screen scan-screen">
       <p class="section-kicker">Network status</p>
       ${renderPassSection(vm, origin, qrMarkup)}
@@ -60,8 +62,25 @@ export async function renderScanPage(
   ${renderVouchIssuanceScript(vm, origin)}
   ${renderScanTabKeysScript(vm, origin)}
   ${renderQrFallbackScript(origin, vm.scanUrl)}
+  ${renderScanOfflineBannerScript()}
 </body>
 </html>`;
+}
+
+/** Flow 2 F2-2: disclose stale resolver HTML when the browser is offline. */
+function renderScanOfflineBannerScript(): string {
+  return `<script>
+(function () {
+  var el = document.getElementById("scan-offline-banner");
+  if (!el) return;
+  function apply() {
+    el.hidden = navigator.onLine !== false;
+  }
+  apply();
+  window.addEventListener("online", apply);
+  window.addEventListener("offline", apply);
+})();
+</script>`;
 }
 
 /** Client fallback  -  same encoder as /created/ (`qr-render.mjs`). Never use brand PNG. */
