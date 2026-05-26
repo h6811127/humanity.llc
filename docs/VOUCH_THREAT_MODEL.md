@@ -238,10 +238,10 @@ Respond: suspend steward, rotate keys, revoke batch
 | Priority | Item | Addresses |
 |----------|------|-----------|
 | P0 | Steward review queue + runbook | G-01–G-08, S-01 | **Step 1+2 shipped** (read API + dismiss API + UI prototype) |
-| P0 | Card creation rate limits + launch monitoring | R-01, A-012F |
+| P0 | Card creation rate limits + launch monitoring | R-01, A-012F | **Shipped** (create rate limit + operator monitor API + launch runbook) |
 | P1 | Graph flag: **directed cycle** / clique suspicion (≥4 mutual VH set) | R-02, G-02 | **Shipped** (`directed_cycle_cluster`) |
 | P1 | Per-steward vouch cap or enhanced audit for steward issuances | R-03, S-02 | **Shipped** (steward cap policy + `steward_issuance_burst`) |
-| P1 | Integrator guide: recency + live control + not KYC | I-02, I-03 |
+| P1 | Integrator guide: recency + live control + not KYC | I-02, I-03 | **Shipped** (`VOUCH_INTEGRATOR_POLICY_GUIDE.md`) |
 | P2 | Optional PIN / WebAuthn before `Sign and submit` | V-04, A-02 |
 | P2 | Vouchee-initiated dispute / steward revoke | H-01 |
 | P2 | Statement report + moderation policy | V-08 |
@@ -261,7 +261,7 @@ Third parties can **create** harm without attacking the protocol:
 | Ignore possession | Trust QR holder | Require live control for handoff |
 | Single global boolean | Over-trust one vendor | Inspect `vouch_count`, `method`, credentials |
 
-See [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md) § Own the trust-policy layer.
+See [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md) § Own the trust-policy layer and [`VOUCH_INTEGRATOR_POLICY_GUIDE.md`](VOUCH_INTEGRATOR_POLICY_GUIDE.md).
 
 ---
 
@@ -285,4 +285,5 @@ Add to program register: `docs/V1_ASSUMPTION_REGISTER.md` (VT-* series).
 - [`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md) — UX, privacy, implementation map
 - [`V1_ADVERSARIAL_REVIEW.md`](V1_ADVERSARIAL_REVIEW.md) § Perspective 1 — cross-cutting abuser
 - [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) — Level 2 boundaries
+- [`VOUCH_INTEGRATOR_POLICY_GUIDE.md`](VOUCH_INTEGRATOR_POLICY_GUIDE.md) — integrator policy object, recency, live control
 - [`features/Human Verification v1.0.md`](features/Human%20Verification%20v1.0.md) — requirements & risks

@@ -138,7 +138,7 @@ or:
 
 Avoid vague claims such as "real person verified" or "bot-proof" unless the mechanism is shown next to the claim. Prefer **Vouched Human** and show count + recency.
 
-**Integrator note:** Gate **accountable participation** (e.g. comments, cohort access) with policy on `vouch_count`, card status, and recency—not a single outsourced biometric boolean. Documented knobs: `docs/VOUCH_TRUST_POSITIONING.md` § Own the trust-policy layer.
+**Integrator note:** Gate **accountable participation** (e.g. comments, cohort access) with policy on `vouch_count`, card status, recency, and live-control requirements for high-risk actions - not a single outsourced biometric boolean. Use `docs/VOUCH_INTEGRATOR_POLICY_GUIDE.md`.
 
 ### Level 3: Live Control Proof
 

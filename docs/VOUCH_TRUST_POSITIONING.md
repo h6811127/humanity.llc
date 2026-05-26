@@ -203,6 +203,7 @@ Worldcoin owns the Orb line. Humanity owns **meet → load signing key → sign 
 | [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) | Deep threats, controls, gaps, operator playbook |
 | [`VOUCH_STEWARD_REVIEW_RUNBOOK.md`](VOUCH_STEWARD_REVIEW_RUNBOOK.md) | Operator triage cadence and API |
 | [`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md) | Rules, quotas, UX, abuse hooks, implementation map |
+| [`VOUCH_INTEGRATOR_POLICY_GUIDE.md`](VOUCH_INTEGRATOR_POLICY_GUIDE.md) | Integrator policy knobs: recency, live control, anti-KYC framing |
 | [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) | Network vs device keys; Sign as… on scan |
 | [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) | Default for vouching, auto-load, Stop |
 | [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) | Levels 0–4; scan blocks |

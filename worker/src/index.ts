@@ -35,6 +35,7 @@ import {
   handleGetVouchAuditFlags,
   handlePostVouchAuditFlagDismiss,
 } from "./resolver/vouch-audit-flags";
+import { handleGetCreateRateMonitor } from "./resolver/create-monitoring";
 
 export interface Env {
   DB: D1Database;
@@ -77,6 +78,23 @@ export default {
       return healthResponse(env);
     }
 
+    if (
+      path === "/.well-known/hc/v1/operator/create-rate-monitor" &&
+      request.method === "GET"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetCreateRateMonitor(
+        request,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
+    }
     if (
       path === "/.well-known/hc/v1/operator/vouch-audit-flags" &&
       request.method === "GET"

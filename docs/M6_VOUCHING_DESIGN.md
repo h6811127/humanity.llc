@@ -102,7 +102,7 @@ Design for hostile actors, not only happy-path founders. **Full threat catalog:*
 
 | Control | V1 status |
 |---|---|
-| Card creation rate limits | Planned / partial |
+| Card creation rate limits + launch monitor | **Shipped** (`checkCreateRateLimit` + `/.well-known/hc/v1/operator/create-rate-monitor`) |
 | Invite or waitlist at launch | Policy (HV-FR-08) |
 | Vouch threshold before trust label | **3 active vouches** (`VOUCH_THRESHOLD`) |
 | No device-proof-only path in v1 slice | Deferred |
