@@ -29,6 +29,9 @@ const SHELL_STATUS_MODULE_PATHS = [
   "/js/device-status.mjs",
   "/js/device-dot-state-core.mjs",
   "/js/device-inbox-sheet.mjs",
+  "/js/device-inbox-card-disabled.mjs",
+  "/js/device-inbox-diagnostics.mjs",
+  "/js/device-inbox-diagnostics-core.mjs",
   "/js/device-inbox-core.mjs",
   "/js/device-inbox.mjs",
   "/js/device-hub-sheet.mjs",
@@ -41,6 +44,8 @@ test.describe("status dot module graph", () => {
     for (const path of SHELL_STATUS_MODULE_PATHS) {
       const res = await page.request.get(`${baseURL}${path}`);
       expect(res.status(), `expected 200 for ${path}`).toBe(200);
+      const type = res.headers()["content-type"] ?? "";
+      expect(type, `expected JavaScript for ${path}, got ${type}`).toMatch(/javascript/);
     }
   });
 });
@@ -110,6 +115,24 @@ test.describe("status dot steward green", () => {
 
     await page.goto("/");
     await expect(page.locator("body")).not.toHaveClass(/device-hub-sheet-open/);
+    await page.locator("#brand-status-dot-btn").click();
+    await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/);
+    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
+  });
+
+  test("dot click opens hub when body class desynced from collapsed hub", async ({
+    page,
+  }) => {
+    await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
+
+    await page.goto("/");
+    await page.evaluate(() => {
+      document.body.classList.add("device-hub-sheet-open");
+      document.getElementById("device-hub")?.classList.add("device-hub-collapsed");
+    });
+    await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/);
+    await expect(page.locator("#device-hub")).toHaveClass(/device-hub-collapsed/);
+
     await page.locator("#brand-status-dot-btn").click();
     await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/);
     await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
