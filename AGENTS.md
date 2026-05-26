@@ -23,7 +23,7 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 
 - **Install deps**: `npm install`
 - **Migrations**: `npm run worker:migrate:local` (idempotent, required before worker:dev)
-- **Tests**: `npm run worker:test` (Vitest, worker tests under `worker/tests/`)
+- **Tests**: `npm run worker:test` (Vitest, all `worker/tests/`) · device-only: `npm run worker:test:device` (`worker/tests/device*`)
 - **E2E**: `npm run e2e:install` once, then `npm run e2e` (Playwright; starts `pages:dev` unless `PLAYWRIGHT_SKIP_WEBSERVER=1`)
 - **Orphan purge**: Daily cron purges abandoned cards per `docs/CARD_RETENTION_AND_ORPHAN_CLEANUP.md`
 - **Landing desktop**: Wider two-column intro at ≥880px per `docs/LANDING_DESKTOP_LAYOUT.md`
@@ -50,7 +50,7 @@ When you touch any of these, run the regression suite before finishing:
 ```bash
 npm run worker:test
 npm run e2e:install   # once per machine
-npm run e2e -- e2e/device-status-dot.spec.ts
+npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device-os-wallet.spec.ts
 ```
 
 **Contracts (do not break without updating docs + tests):**

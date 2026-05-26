@@ -123,7 +123,7 @@ Implementation: `getCachedNetworkSeenAt()` → `entry.at` set in `refreshWalletN
 When touching row markup or status copy:
 
 ```bash
-npm run worker:test
+npm run worker:test:device
 npm run e2e -- e2e/device-os-wallet.spec.ts
 ```
 

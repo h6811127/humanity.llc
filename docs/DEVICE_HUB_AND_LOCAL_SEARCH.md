@@ -32,7 +32,7 @@ These notes are captured as individual product refinements so implementation can
 6. **Push shell further toward iOS-native feel**
    - Frosted hub sheet, elevation cards (shipped); row typography pass shipped (Row Phase 3).
 7. **Make object actions primary**
-   - Object control pills shipped; grouping into ⋯ planned (Phase 2).
+   - Object control pills grouped under ⋯ **QR & lifecycle** (Row Phase 2 shipped).
 
 ### Implementation slices from these notes
 
@@ -67,7 +67,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Shortcuts & settings (shipped):** On the **homepage** (`/`) only — section under the progress strip (unified list rows: Appearance, **Browser alerts** (background OS notifications for live proof), saved cards, manage, auto-save, focus). Hub sheet on all routes has **home icon** (left), status line (center), **Create +** (right); no shortcuts block in the hub.
 
-**Chrome inbox (shipped + planned):** Floating **inbox badge** next to the status dot when action items exist; hub `#device-hub-alerts-top` holds full rows. Spec and roadmap: [`DEVICE_INBOX.md`](DEVICE_INBOX.md). Status dot semantics: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
+**Chrome inbox (shipped):** Floating **inbox badge** next to the status dot when action items exist; hub `#device-hub-alerts-top` holds full rows. Spec and roadmap: [`DEVICE_INBOX.md`](DEVICE_INBOX.md). Status dot semantics: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 
 **Hub glance (landing):** When the hub is collapsed, `#device-hub-glance` shows notice (if any) and up to three saved card labels; tap expands the hub. Quick-look popover rows use **light pastel** fills (red / blue / orange by notice type). Glance **Card disabled since last visit** copy follows the latest resolver-confirmed alert state from the wallet network poll (not stale cache and not the persisted `hc_wallet[].status` field).
 
@@ -140,19 +140,20 @@ See [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 | Item | Status |
 |------|--------|
 | Inbox badge + hub alert stack + glance rows | ✅ `device-inbox-core.mjs` + `device-hub-inbox-alerts.mjs` |
-| Browser background alerts (live proof, tab hidden) | ✅ v2 A–B + Phase C policy in core |
+| Browser background alerts (live proof, tab hidden) | ✅ v2 A–C (`inboxKindAllowsOsNotification`) |
 | Unified `device-inbox-core.mjs` | ✅ |
 | Inbox sheet from badge tap | ✅ |
 | Contextual opt-in + OS click deep link to `/created/` sign URL | ✅ |
 
-### Optional hub polish (remaining)
+### Optional hub polish
 
 No backend required:
 
 - ~~Browser notifications when a live proof is waiting~~ — ✅ v1 shipped; v2 in [`DEVICE_INBOX.md`](DEVICE_INBOX.md)
 - ~~Hub glance on `/wallet/`~~ — landing popover only; wallet scrolls from dot
-- Light frontend tests for tab presence, live-control inbox, wallet network, and status counts
+- ~~Light frontend tests for tab presence, live-control inbox, wallet network, and status counts~~ — ✅ `worker/tests/device-hub-frontend-pipeline.test.ts` + `npm run worker:test:device`; Playwright `e2e/device-{status-dot,inbox,os-wallet}.spec.ts` in CI
 - ~~Inbox unification phases 1–10~~ — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) (glance via `buildGlanceRowPlan()`)
+- ~~Hub saved card row UX phases 1–3~~ — [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md)
 
 ### Deferred
 
@@ -207,4 +208,5 @@ No backend required:
 | `site/js/device-hub-import.mjs` | Hub backup import |
 | `site/wallet/index.html` | Saved cards device shell |
 | `site/js/wallet-page.mjs` | Wallet page + tab save + pins |
+| `worker/tests/device-hub-frontend-pipeline.test.ts` | Cross-module hub pipeline Vitest (presence, live proof, network, counts) |
 | `site/js/device-wallet-network.mjs` | Network status chips |

@@ -86,7 +86,7 @@ Canonical `kind` values (target: one module `device-inbox-core.mjs`, Vitest-cove
 
 ---
 
-## Chrome surfaces (shipped vs planned)
+## Chrome surfaces (shipped)
 
 ### Status dot (`device-status.mjs`, `device-dot-state-core.mjs`)
 
@@ -99,11 +99,7 @@ Canonical `kind` values (target: one module `device-inbox-core.mjs`, Vitest-cove
 
 - Badge ring/count chroma follows `inboxBadgeChromaKind()` (amber live proof, blue cross-tab, red default).
 
-**Planned:**
-
-- Do **not** add a numeric count on the dot.
-
-See [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
+**Constraint (unchanged):** Do **not** add a numeric count on the dot — see [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 
 ### Inbox badge (`#shell-notif-badge`)
 

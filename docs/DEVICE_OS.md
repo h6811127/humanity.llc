@@ -107,7 +107,7 @@ Same chrome on **landing**, **`/created/`**, and **`/wallet/`**:
 
 | Piece | Module | Notes |
 |-------|--------|-------|
-| Status line + dot + inbox badge | `device-status.mjs` | Dot → hub; badge → alerts (planned: inbox sheet). See [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
+| Status line + dot + inbox badge | `device-status.mjs` | Dot → hub sheet; badge → inbox sheet (`openInboxFromChrome`). See [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
 | Background alerts (live proof) | `device-browser-notifications.mjs` | Contextual opt-in strip + OS notify when tab hidden; click → `/created/` sign URL |
 | Hub body | `device-hub-ui.mjs` | Saved, pins, notice, activity, search, import |
 | Hub glance | `device-hub-glance.mjs` | Landing only; visible when hub collapsed |
@@ -181,12 +181,12 @@ Manual regression: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) (especially **P1-1** —
 
 Full spec: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 
-| Piece | Shipped | Planned |
-|-------|---------|---------|
-| Inbox badge (`#shell-notif-badge`) | Count, chroma, tap → inbox sheet | — |
-| Hub / glance rows | Live proof, cross-tab, tab keys, card-disabled in glance | Single `buildInboxItems()` source |
-| Browser background alerts | Live proof only; toggle on landing settings | Contextual opt-in; deep link to `/created/` sign URL |
-| Status dot | Overlays for proof / cross-tab; `open_notifications` action | — (dot stays non-numeric) |
+| Piece | Shipped |
+|-------|---------|
+| Inbox badge (`#shell-notif-badge`) | Count, chroma, tap → inbox sheet |
+| Hub / glance rows | `buildInboxItems()` + `buildGlanceRowPlan()`; hub groups via `device-hub-inbox-alerts.mjs` |
+| Browser background alerts | v2 A–C: contextual opt-in, sign deep link, OS policy matrix |
+| Status dot | Overlays for proof / cross-tab; `open_notifications` action (no numeric count on dot) |
 
 **Do not:** server push, OS alerts for resolver health, or permission prompt on first visit.
 
@@ -196,10 +196,11 @@ Small TLC items that need **no new resolver APIs**:
 
 | Item | Notes |
 |------|--------|
-| Browser notifications when live proof is waiting | ✅ v2 phases A–B — see [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
-| Unified device inbox core + inbox sheet | Planned — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) phases 1–3 |
+| Browser notifications when live proof is waiting | ✅ v2 A–C — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
+| Unified device inbox + glance plan | ✅ phases 1–10 — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
+| Hub saved card row UX | ✅ phases 1–3 — [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) |
 | Glance on `/wallet/` | Landing popover only; wallet uses scroll-to-saved chrome |
-| Light frontend tests | Vitest (`worker/tests/device-*`) + Playwright smoke (`e2e/device-os-wallet.spec.ts`) |
+| Light frontend tests | ✅ `npm run worker:test:device` + device shell E2E in CI |
 
 ### Owner key portability (shipped  -  see M5.5)
 
