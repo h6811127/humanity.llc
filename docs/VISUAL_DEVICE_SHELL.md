@@ -45,7 +45,7 @@ Principles:
 
 1. **Scroll-edge chrome**  -  fixed `top-chrome`, content inset via `--shell-chrome-h`, single-row bar; status collapses on scroll down (`device-shell-chrome.mjs`).
 2. **Hub as sheet**  -  `/` and `/created/` use `device-hub--sheet` + backdrop (`device-hub-sheet.mjs`). **`/wallet/`** is a **dedicated page** (`#wallet-page`, `wallet-page.mjs`) that reuses hub list renderers via `initDeviceHub({ hubRoot })` — not the bottom sheet.
-3. **Landing de-explain**  -  shorter hero + compact framing on `/` (more trimming possible).
+3. **Landing de-explain**  -  shorter hero + compact framing on `/` (**v2 shipped:** studio example uses, **Design choices**, and **Clear limits** default closed in `<details>`; below-fold tutorial blocks use `content-visibility: auto`; status-dot pulse and chrome blur pause while scrolling via `shell-is-scrolling` in `device-shell-chrome.mjs`).
 
 **Flow pages** (`/create/`, etc.) use `body.page-flow` with no header chrome  -  rely on the browser back gesture/button for home, not a floating dot or Create pill.
 

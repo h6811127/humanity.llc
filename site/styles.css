@@ -3350,6 +3350,64 @@ body.landing-focus-mode .screen-landing > .hero.hero-tight {
   margin: 12px 0 0;
 }
 
+/* Landing scroll perf + de-explain (VISUAL_DEVICE_SHELL Phase A #3) */
+.screen-landing > [data-landing-tutorial]:not(.hero):not(.landing-progress):not(.landing-framing) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 280px;
+}
+
+body.shell-is-scrolling .shell-status-dot {
+  animation-play-state: paused;
+}
+
+body.shell-is-scrolling .top-chrome--float .top-chrome-bar--minimal,
+body.shell-is-scrolling .top-chrome--float .top-chrome-bar--wallet {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.landing-disclosure {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.landing-disclosure-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  list-style: none;
+  cursor: pointer;
+  margin: 0 0 12px 2px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.landing-disclosure-summary::-webkit-details-marker {
+  display: none;
+}
+
+.landing-disclosure-summary::after {
+  content: "›";
+  font-size: 18px;
+  line-height: 1;
+  color: var(--grey);
+  transform: rotate(90deg);
+  transition: transform 0.18s ease;
+}
+
+.landing-disclosure[open] .landing-disclosure-summary::after {
+  transform: rotate(-90deg);
+}
+
+.landing-disclosure .group-intro {
+  margin-top: 0;
+}
+
 /* Landing focus mode */
 body.landing-focus-mode [data-landing-tutorial] {
   display: none !important;

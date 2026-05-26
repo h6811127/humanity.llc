@@ -17,7 +17,18 @@ function initScrollEdgeChrome() {
 
   let lastY = window.scrollY;
   let ticking = false;
+  let scrollIdleTimer = null;
   const threshold = 36;
+  const scrollIdleMs = 120;
+
+  const markScrolling = () => {
+    document.body.classList.add("shell-is-scrolling");
+    if (scrollIdleTimer) clearTimeout(scrollIdleTimer);
+    scrollIdleTimer = window.setTimeout(() => {
+      document.body.classList.remove("shell-is-scrolling");
+      scrollIdleTimer = null;
+    }, scrollIdleMs);
+  };
 
   const update = () => {
     ticking = false;
@@ -43,6 +54,7 @@ function initScrollEdgeChrome() {
   window.addEventListener(
     "scroll",
     () => {
+      markScrolling();
       if (!ticking) {
         ticking = true;
         requestAnimationFrame(update);
