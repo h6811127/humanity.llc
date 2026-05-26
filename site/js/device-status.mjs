@@ -10,7 +10,7 @@ import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visi
 
 export const RESOLVER_HEALTH_CHANGED = "hc-resolver-health-changed";
 import { resolverApiOrigin } from "./hc-sign.mjs";
-import { getTabSession } from "./device-keys.mjs";
+import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
 import {
   getInboxItems,
@@ -59,7 +59,7 @@ import {
   hasStewardVerification,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=37";
+} from "./device-dot-state-core.mjs?v=38";
 
 export const DOT_STATE_CHANGED = "hc-dot-state-changed";
 
@@ -123,6 +123,10 @@ function hasStewardReadyKeys() {
   return loadWallet().some(
     (entry) => Boolean(entry?.owner_private_key_b58) && hasStewardVerification(entry)
   );
+}
+
+function savedCardsWithSigningKeys() {
+  return loadWallet().filter((entry) => Boolean(entry?.owner_private_key_b58));
 }
 
 function deviceState() {
@@ -320,6 +324,7 @@ function renderDotExplainability(network, device, overlay) {
     stewardReady: hasStewardReadyKeys(),
     queueUrl: getStewardQueueUrl(),
     pageKind: dotPageKind(),
+    singleSavedCardWithKeys: savedCardsWithSigningKeys().length === 1,
   });
   const keyRoot = document.getElementById("device-hub-status-key");
   if (keyRoot) {
@@ -353,13 +358,13 @@ function renderStatusKey() {
   el.innerHTML = `
     <p class="device-hub-status-key-label">Status dot reference</p>
     <ul class="device-hub-status-key-list">
-      <li>${statusKeyDot("#db1b43", true)} Pulsing red — default; tab keys not saved</li>
-      <li>${statusKeyDot("#db1b43")} Solid red — saved keys on device</li>
-      <li>${statusKeyDot("#22c55e")} Bright green — steward keys ready on this device</li>
-      <li>${statusKeyDot("#d97706")} Amber — resolver limited</li>
-      <li>${statusKeyDot("#9ca3af")} Gray — resolver offline</li>
-      <li>${statusKeyDot("#f59e0b")} Amber notch — live proof waiting</li>
-      <li>${statusKeyDot("#2563eb")} Blue notch — keys in another tab</li>
+      <li>${statusKeyDot("#db1b43", true)} Pulsing red - default; tab keys not saved</li>
+      <li>${statusKeyDot("#db1b43")} Solid red - saved keys on device</li>
+      <li>${statusKeyDot("#22c55e")} Bright green - steward keys ready on this device</li>
+      <li>${statusKeyDot("#d97706")} Amber - resolver limited</li>
+      <li>${statusKeyDot("#9ca3af")} Gray - resolver offline</li>
+      <li>${statusKeyDot("#f59e0b")} Amber notch - live proof waiting</li>
+      <li>${statusKeyDot("#2563eb")} Blue notch - keys in another tab</li>
     </ul>`;
 }
 
@@ -593,6 +598,15 @@ document.addEventListener("click", (e) => {
     return;
   }
   if (action === "open_controls") {
+    openHubFromChrome();
+    return;
+  }
+  if (action === "open_card_controls") {
+    const entries = savedCardsWithSigningKeys();
+    if (entries.length === 1) {
+      openCardNowPage(entries[0]);
+      return;
+    }
     openHubFromChrome();
     return;
   }

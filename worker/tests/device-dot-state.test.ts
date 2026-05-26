@@ -165,6 +165,40 @@ describe("describeDotState", () => {
     });
     expect(disabled.action).toEqual(inboxOverlayQuickAction("card_disabled_since_visit"));
   });
+
+  it("opens card workspace directly when one saved card has keys", () => {
+    const keys = describeDotState("ok", "keys", "none", {
+      singleSavedCardWithKeys: true,
+      pageKind: "landing",
+    });
+    expect(keys.action).toEqual({
+      kind: "open_card_controls",
+      label: "Open controls",
+    });
+    expect(keys.next).toContain("Open your saved card");
+  });
+
+  it("keeps hub open_controls when multiple saved cards have keys", () => {
+    const keys = describeDotState("ok", "keys", "none", {
+      singleSavedCardWithKeys: false,
+      pageKind: "landing",
+    });
+    expect(keys.action).toEqual({
+      kind: "open_controls",
+      label: "Open controls",
+    });
+  });
+
+  it("keeps hub open_controls on wallet page even with one saved card", () => {
+    const keys = describeDotState("ok", "keys", "none", {
+      singleSavedCardWithKeys: true,
+      pageKind: "wallet",
+    });
+    expect(keys.action).toEqual({
+      kind: "open_controls",
+      label: "Open controls",
+    });
+  });
 });
 
 describe("dotExplainerKicker", () => {

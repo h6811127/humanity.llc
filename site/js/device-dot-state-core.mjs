@@ -117,12 +117,22 @@ export function dotExplainerKicker(descriptor, compact) {
  * @param {"ok" | "degraded" | "offline"} network
  * @param {"none" | "keys" | "unsaved" | "steward"} device
  * @param {DotInboxOverlay} overlay
- * @param {{ stewardReady?: boolean, queueUrl?: string | null, pageKind?: string }} [opts]
+ * @param {{
+ *   stewardReady?: boolean,
+ *   queueUrl?: string | null,
+ *   pageKind?: string,
+ *   singleSavedCardWithKeys?: boolean,
+ * }} [opts]
  */
 export function describeDotState(network, device, overlay, opts = {}) {
   const stewardReady = Boolean(opts.stewardReady);
   const queueUrl = opts.queueUrl || null;
   const pageKind = opts.pageKind || "landing";
+  const singleSavedCardWithKeys = opts.singleSavedCardWithKeys === true;
+  const openControlsAction =
+    singleSavedCardWithKeys && pageKind !== "wallet"
+      ? { kind: "open_card_controls", label: "Open controls" }
+      : { kind: "open_controls", label: "Open controls" };
   const overlayText =
     overlay === "proof_waiting"
       ? "Live proof requests are waiting."
@@ -190,11 +200,12 @@ export function describeDotState(network, device, overlay, opts = {}) {
       id: "keys",
       now: "Saved keys ready.",
       why: "Signing keys are saved on this device and resolver is online.",
-      next: overlayText || "Open controls to manage a saved card.",
-      action: inboxOverlayQuickAction(overlay) ?? {
-        kind: "open_controls",
-        label: "Open controls",
-      },
+      next:
+        overlayText ||
+        (singleSavedCardWithKeys && pageKind !== "wallet"
+          ? "Open your saved card to update or revoke."
+          : "Open controls to manage a saved card."),
+      action: inboxOverlayQuickAction(overlay) ?? openControlsAction,
     };
   }
   return {

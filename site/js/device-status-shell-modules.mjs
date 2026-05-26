@@ -1,9 +1,9 @@
 /**
  * Static filenames under site/js/ required for device-status bootstrap.
- * Playwright and Vitest share this list — add a file here when merging a new
+ * Playwright and Vitest share this list - add a file here when merging a new
  * import on the status-dot graph (same PR as the .mjs file).
  * @see docs/STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md
- * @see docs/SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md — Phase 1.1
+ * @see docs/SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md - Phase 1.1
  */
 
 /**
