@@ -44,7 +44,7 @@ Per **card**, at creation time:
 | Key | Role |
 |-----|------|
 | **Owner key** | Signs vouches, revokes, QR rotation, live control, card updates |
-| **Recovery key** | Break-glass; can sign some operations if you configure it |
+| **Recovery key** | Advanced recovery option; can sign some operations if you configure it |
 
 So **two keypairs per card**, but vouching uses the **owner** keypair in normal flows.
 

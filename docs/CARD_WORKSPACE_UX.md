@@ -22,16 +22,22 @@ Storage: `localStorage.hc_setup_done` — map of `profile_id → true` after wiz
 
 ## Setup wizard (Phase 1)
 
+Kicker copy in setup: **"Four steps · keys stay in this browser"** to reinforce local-first key custody.
+
 | Step | User action | Gate |
 |------|-------------|------|
 | 1 Save | Save control key to this device | Cannot continue until `isWalletSaved(profile_id)` |
 | 2 Print | Download QR PNG | — |
-| 3 Test scan | Open public scan page (another device) | — |
+| 3 Test scan | Preview what anyone scanning the QR sees (another device) | — |
 | 4 Live | **Open card controls** | Marks setup done, clears `fresh` from URL, enters **control** |
 
 Modules: `created-setup.mjs`, `created-workspace.mjs`.
 
 Keys strip is moved into the wizard for step 1, then restored to the Tasks panel in control mode.
+
+Recovery disclosure label in setup now uses **"Recovery key (advanced, optional)"** (replacing "Break-glass recovery key") to keep the option discoverable without security-jargon friction.
+
+On entering step 4, setup now includes a subtle "goes live" transition and confirmation copy ("Object now resolves live on the network.").
 
 ---
 
@@ -82,7 +88,7 @@ See `docs/CARD_WORKSPACE_PHASE0.md` — Open card loads keys, auto-save default 
 
 1. Create card → setup wizard, URL has `fresh=1`, hero says **Set up your live QR**.
 2. Cannot skip step 1 without save (auto-save may complete step 1 immediately).
-3. Download QR on step 2; test scan opens new tab on step 3.
+3. Download QR on step 2; step 3 copy reads "Preview what anyone scanning this QR will see," and test scan opens new tab.
 4. **Open card controls** → tabs visible, `fresh` removed, hero **Live QR ready**.
 5. Revisit `/created/?profile_id&qr_id` (no fresh) → control mode directly.
 6. Hub **Open card** on saved row → control with revoke available.

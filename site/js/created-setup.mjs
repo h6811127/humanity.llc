@@ -60,6 +60,7 @@ export function initCreatedSetup(opts) {
 
   let stepIndex = 0;
   let feedbackTimer = null;
+  let liveTransitionTimer = null;
 
   function showFeedback(message, isError = false) {
     if (!feedbackEl) return;
@@ -117,12 +118,24 @@ export function initCreatedSetup(opts) {
   }
 
   function goToStep(index, { pushHistory = false } = {}) {
+    const prevStep = currentStep();
     stepIndex = Math.max(0, Math.min(index, STEPS.length - 1));
     syncIndicators();
     if (currentStep() === "save" && keysStrip) {
       keysStrip.hidden = false;
     }
     if (currentStep() === "qr") syncSetupQrPreview();
+    if (currentStep() === "done" && prevStep !== "done") {
+      const donePanel = root.querySelector('[data-setup-panel="done"]');
+      if (donePanel) {
+        donePanel.classList.add("is-live-transition");
+        if (liveTransitionTimer) window.clearTimeout(liveTransitionTimer);
+        liveTransitionTimer = window.setTimeout(() => {
+          donePanel.classList.remove("is-live-transition");
+        }, 950);
+      }
+      showFeedback("Object now resolves live on the network.");
+    }
     scrollToCurrentPanel();
     writeStepHistory(!pushHistory);
   }
