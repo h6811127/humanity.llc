@@ -113,10 +113,10 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 | ID | Gap |
 |----|-----|
-| **DH-1** | `renderSavedRows` → `applyRevokedSinceVisitAlerts()` runs on **cached** `getCachedNetworkAlertState` before `fetchAndApplyNetworkChips` completes. Stale `scanKind: card_revoked` in `sessionStorage.hc_wallet_network_cache` + baseline `active` → alert visible while resolver is `active`. |
-| **DH-2** | `applyNetworkChipsToDom` sets chip with `networkStatusChip(status, getCachedNetworkScanKind(pid))` — **does not pass fresh `scanKind` from fetch** (`alertStateMap` / cache entry). Can show **Card disabled** chip while `status` is `active` or `checking`. |
-| **DH-3** | `device-hub-glance.mjs` uses cache-only alert state (no fetch gate) — glance can show **Card disabled since last visit** when hub row would clear after fetch. |
-| **DH-4** | `snapshotNetworkSeenOnExit()` writes `getCachedNetworkAlertState` to `hc_wallet_last_seen_network` on tab hide. Stale cache can **poison baseline** to `card_revoked` without a resolver transition (self-heal on next successful fetch may be delayed). |
+| **DH-1** | ✅ Fixed: `applyRevokedSinceVisitAlerts` uses `cardDisabledSinceVisitVisible` + `resolverConfirmedMap`; baseline-changed handler uses `getLatestResolvedAlertState` only (not session cache). |
+| **DH-2** | ✅ Fixed: `applyNetworkChipsToDom` passes `scanKindMap` from poll into `networkStatusChip`. |
+| **DH-3** | ✅ Fixed: glance uses resolver-confirmed state + inbox row for card-disabled; saved-row suffix skipped when card is already in `buildInboxItems()`. |
+| **DH-4** | ✅ Fixed: `snapshotNetworkSeenOnExit` snapshots `latestResolvedAlertStateMap` only after a resolver-confirmed poll this visit. |
 
 **Files:** `device-hub-ui.mjs`, `device-wallet-network.mjs`, `device-hub-glance.mjs`.
 
@@ -175,7 +175,7 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 - Pins are bookmarks only (`device-pins.mjs`).
 - Search is client-side over wallet/pins/activity (`device-hub-search.mjs`).
 - Baseline semantics (`card_revoked` only, not `qr_revoked`) match `wallet-network-baseline.mjs` tests.
-- Cache bypass when cached `card_revoked` disagrees with baseline (`shouldUseCachedNetworkStatus`) — implemented; undermined by DH-1/DH-2 UI applying cache before fetch finishes.
+- Cache bypass when cached `card_revoked` disagrees with baseline (`shouldUseCachedNetworkStatus`) — implemented; hub/inbox alerts honor resolver-confirmed poll (Slices 1–4).
 - Cross-tab presence + banner wiring exists per DEVICE_OS § Phase 8.
 - Wallet page hub expanded by default; landing focus mode hides intro sections.
 - Return-to-scan vouch: `hc_vouch_return_url` + hub **Use keys** passes `returnUrl` (recent commits).

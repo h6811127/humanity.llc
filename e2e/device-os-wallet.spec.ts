@@ -136,6 +136,86 @@ test.describe("device OS wallet flow", () => {
     ).toBeHidden();
   });
 
+  test("does not re-show banner on other cards after Got it (baseline-changed guard)", async ({
+    page,
+  }) => {
+    const profileA = SAMPLE_WALLET_ENTRY.profile_id;
+    const profileB = "8Ym2nP3oR5sU7wX9zA1bC4dE6";
+    const entryB = {
+      ...SAMPLE_WALLET_ENTRY,
+      id: "e2e_test_2",
+      label: "E2E Second Card",
+      profile_id: profileB,
+      qr_id: "qr_E2eWalletTestSecond",
+      scan_url: `http://127.0.0.1:8787/c/${profileB}?q=qr_E2eWalletTestSecond`,
+    };
+
+    await page.addInitScript(
+      ({ a, b }) => {
+        const now = Date.now();
+        const stale = (pid) => ({
+          status: "active",
+          scanKind: "card_revoked",
+          verificationLabel: null,
+          verificationState: null,
+          at: now,
+        });
+        sessionStorage.setItem(
+          "hc_wallet_network_cache",
+          JSON.stringify({ [a]: stale(a), [b]: stale(b) })
+        );
+        localStorage.setItem(
+          "hc_wallet_last_seen_network",
+          JSON.stringify({ [a]: "active", [b]: "active" })
+        );
+      },
+      { a: profileA, b: profileB }
+    );
+
+    await page.route("**/.well-known/hc/v1/cards/**/status**", async (route) => {
+      const url = new URL(route.request().url());
+      const parts = url.pathname.split("/");
+      const profileId = parts[parts.indexOf("cards") + 1] ?? SAMPLE_WALLET_ENTRY.profile_id;
+      const qrId =
+        url.searchParams.get("q") ??
+        (profileId === entryB.profile_id ? entryB.qr_id : SAMPLE_WALLET_ENTRY.qr_id);
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          version: "1.0",
+          resolver: { operator: "humanity.llc", version: "1.0" },
+          scan: {
+            kind: "active",
+            profile_id: profileId,
+            qr_id: qrId,
+            card: { status: "active", handle: "e2etest", manifesto_line: "Test line" },
+            verification: { state: "registered", label: "Registered" },
+            human_trust: { label: "Registered", subtitle: "", pill_active: false },
+          },
+        }),
+      });
+    });
+
+    await page.addInitScript((entries) => {
+      localStorage.setItem("hc_wallet", JSON.stringify(entries));
+    }, [SAMPLE_WALLET_ENTRY, entryB]);
+
+    await page.goto("/wallet/");
+    await expect(page.getByText("Live State Active").first()).toBeVisible();
+    await expect(
+      page.getByText("Card disabled on the network since your last visit.")
+    ).toHaveCount(0);
+
+    const dismiss = page.getByRole("button", { name: "Got it" }).first();
+    if (await dismiss.isVisible().catch(() => false)) {
+      await dismiss.click();
+      await expect(
+        page.getByText("Card disabled on the network since your last visit.")
+      ).toHaveCount(0);
+    }
+  });
+
   test("contextless /created/ redirects to My cards home", async ({ page }) => {
     await page.goto("/created/");
     await expect(page).toHaveURL(/\/wallet\/$/);
