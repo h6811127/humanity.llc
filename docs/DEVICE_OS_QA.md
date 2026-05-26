@@ -92,6 +92,20 @@ Spec: [`DEVICE_HUB_INTRO_COACHMARK.md`](DEVICE_HUB_INTRO_COACHMARK.md). Automate
 
 Per [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md): hub card alert links; glance dot explainer + **info@humanity.llc** row; expanded hub status-key explainer; **hub + inbox bottom sheets** (§ QA hub + inbox sheets) — legible in light and dark; sheets opaque under `prefers-reduced-transparency: reduce`.
 
+**Automated gate:** `npm run worker:test:ui-color-scheme` (CSS token tripwires on migrated popover selectors).
+
+### P1-6 · Hub card ⋯ menu (contrast)
+
+Per [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § QA (hub card menu). Saved card with keys on `/` or `/wallet/`.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Expand hub; open a saved card **⋯** menu | Panel uses dark/light surface (not a fixed white wash in dark theme) |
+| 2 | Read section label, default items, **Revoke QR**, **Remove from device** | All readable; danger rows use accent, not low-contrast pink-on-white |
+| 3 | Repeat with `localStorage.hc_theme = "dark"` | Same checks in dark theme |
+
+**Fail signals:** White menu panel in dark mode; washed-out or pink-on-white danger labels.
+
 ### P0-3 · Auto-save (default on)
 
 | Step | Action | Expected |

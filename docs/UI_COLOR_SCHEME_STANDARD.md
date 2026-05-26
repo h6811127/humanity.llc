@@ -107,6 +107,21 @@ When touching legacy components, migrate them incrementally to this token family
 
 All surfaces listed under **Use these for** are migrated as of this standard. New floating shell UI must use `--surface-popover-*` (and status tint tokens when applicable) from the first PR — do not add hardcoded `rgba(255,255,255,…)` panel fills without dark overrides.
 
+### Regression guard
+
+Vitest **`worker/tests/ui-color-scheme-popover-guard.test.ts`** asserts:
+
+- `:root` and `html[data-theme="dark"]` define the full `--surface-popover-*` token set (including notice / cross-tab / warn tints).
+- Migrated selectors (hub ⋯ menu, glance popover, sheets, coachmark, card alert, dot explainer, glance rows) keep semantic tokens and avoid known regressions (e.g. `rgba(255,255,255,0.96)` menu panels, `--black` / `--red` menu text, `backdrop-filter` on opaque sheets).
+
+When adding a new popover surface, extend that test’s guarded selector list in the same PR.
+
+```bash
+npm run worker:test:ui-color-scheme
+```
+
+Manual contrast QA remains in the sections below and in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-5** / **P1-6**.
+
 ### QA (hub card menu)
 
 After migrating `.hub-card-menu-*`, run the standard contrast checklist on a saved card with keys: open ⋯ menu in **light** and **dark** (`localStorage.hc_theme = "dark"`), confirm section label, default items, and danger rows (`Revoke QR`, `Remove from device`).
