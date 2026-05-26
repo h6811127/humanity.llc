@@ -1,7 +1,7 @@
 # Investigation: Safari / WebKit shell regression (scroll, dot, hub)
 
 **Date opened:** 2026-05-26  
-**Status:** Active — reproduction confirmed across reporter devices; fix plan below  
+**Status:** P0–P2 + Phase 3C **shipped** — pending manual **P0-W** sign-off on production ([`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P0-W); Phase 3A/3B only if acceptance fails  
 **Owners:** Device shell UX  
 **Related:** [`IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md`](IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md) · [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md)
 
@@ -16,7 +16,7 @@ This is **not** a “rewrite the hub” problem. It is a **convergence of**:
 1. **Document scroll + scroll-edge chrome** — global `scroll` listener, `top-chrome--edge-hidden`, and `body.shell-is-scrolling` run on the **landing document** and cause jank/strobe on iOS; **hub inner scroll does not use that path** and feels smooth when open.
 2. **Fragile status module graph** — one failed static import bricks the dot; only bootstrap has `?v=` cache-bust; Mac Safari shows **intermittent red error outline** across hard refreshes.
 3. **Sheet / pointer-events stack** — hub + inbox backdrops, float chrome `pointer-events` lace, fixed `transform` sheets; intermittent dead taps on iPhone and **dead dot after hard refresh on Mac Safari** even when the red ring is gone.
-4. **Test gap** — CI uses **Pixel 5 Chromium only**; WebKit iPhone was never gated.
+4. **Test gap (mitigated)** — CI now runs **Chromium + WebKit** (`e2e/safari-shell-scroll.spec.ts`); manual iPhone sign-off still required ([`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P0-W).
 
 **Private tab + cleared website data on iPhone still broken** rules out “stale cache only.” The remaining causes are **runtime WebKit behavior + shell scroll architecture**, possibly amplified by iOS **advanced privacy** warnings.
 
@@ -133,21 +133,24 @@ Record whether behavior changes. If it only works with protections off, document
 ## Architecture (relevant paths)
 
 ```text
-device-status-bootstrap.mjs?v=21
+device-status-bootstrap.mjs?v=N
   └─ dynamic import → device-status.mjs
-       ├─ device-hub-sheet.mjs      (backdrop, body classes)
-       ├─ device-inbox-sheet.mjs      (second backdrop)
-       ├─ device-shell-chrome.mjs     (scroll listener — landing only)
-       └─ device-os-coordinator.mjs   (debounced refresh → applyDot)
+       ├─ device-hub-sheet.mjs           (backdrop, body classes)
+       ├─ device-inbox-sheet-loader.mjs  (lazy import → inbox sheet)
+       ├─ device-hub-glance.mjs          (glance; inbox via loader)
+       ├─ device-shell-chrome.mjs        (scroll listener — desktop fine pointer only)
+       └─ device-os-coordinator.mjs        (debounced refresh → applyDot)
 
-Landing scroll (painful):
-  window scroll → device-shell-chrome.mjs → edge-hidden + shell-is-scrolling
+Landing scroll (touch): body.shell-scroll-chrome-off — no document scroll listener
+
+Landing scroll (desktop): window scroll → edge-hidden + shell-is-scrolling
+  (kill switch: localStorage hc_shell_scroll_chrome = "0")
 
 Hub scroll (smooth):
   body overflow hidden → hub-body overflow-y auto (no document scroll listener work)
 ```
 
-**Module cache-bust gap:** Only bootstrap URL has `?v=`; graph siblings are bare `/js/device-*.mjs` ([`device-status-shell-modules.mjs`](../site/js/device-status-shell-modules.mjs)).
+**Cache-bust:** `DEVICE_SHELL_ASSET_VERSION` in [`device-status-shell-modules.mjs`](../site/js/device-status-shell-modules.mjs); bootstrap + graph peer imports use `?v=N`.
 
 ---
 
@@ -215,13 +218,13 @@ On **broken** iPhone Safari (normal tab), Mac Safari (dot dead after hard refres
 
 ### Phase 3 — P2 (shell UX rethink if P1 insufficient)
 
-Only if iPhone still fails Phase 1 acceptance:
+Only if **[`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P0-W** fails after P0–P2 + 3C deploy:
 
-| Option | Description |
-|--------|-------------|
-| **A. CSS-only chrome** | Drop `scroll` listener; use `position: sticky` bar without `edge-hidden` JS |
-| **B. Separate scroll roots** | Move landing into a scroll container; keep chrome outside (like hub body) |
-| **C. Feature flag** | `localStorage hc_shell_scroll_chrome=0` kill switch for support |
+| Option | Status | Description |
+|--------|--------|-------------|
+| **C. Feature flag** | ✅ Shipped | `localStorage hc_shell_scroll_chrome=0` disables desktop scroll-edge chrome after reload |
+| **A. CSS-only chrome** | Pending | Drop `scroll` listener; use `position: sticky` bar without `edge-hidden` JS |
+| **B. Separate scroll roots** | Pending | Move landing into a scroll container; keep chrome outside (like hub body) |
 
 ---
 
@@ -285,7 +288,8 @@ document.body.classList.remove("shell-is-scrolling");
 | Pointer-events / sheets | `site/css/device-shell.css` |
 | Scroll class side effects | `site/styles.css` (`shell-is-scrolling`) |
 | Module manifest | `site/js/device-status-shell-modules.mjs` |
-| E2E | `e2e/device-status-dot.spec.ts`, `playwright.config.ts` |
+| Lazy inbox loader | `site/js/device-inbox-sheet-loader.mjs` |
+| E2E | `e2e/device-status-dot.spec.ts`, `e2e/safari-shell-scroll.spec.ts`, `playwright.config.ts` |
 
 ---
 
@@ -326,3 +330,4 @@ document.body.classList.remove("shell-is-scrolling");
 | 2026-05-26 | Phase 2.4 implemented (STATUS_INDICATOR troubleshooting link) |
 | 2026-05-26 | Phase 2.2b implemented (shared inbox loader; glance off static inbox graph) |
 | 2026-05-26 | Phase 3C implemented (scroll chrome localStorage kill switch) |
+| 2026-05-26 | P0-W manual acceptance added to `DEVICE_OS_QA.md`; doc status/architecture updated; 3A/3B gated on P0-W |

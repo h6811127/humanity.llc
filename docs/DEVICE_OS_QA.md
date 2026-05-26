@@ -43,18 +43,35 @@ These map to the #1 documented confusion: **keys in one tab vs saved on device**
 | 2 | Tap **Open controls** | Navigates to `/created/?profile_id=…` |
 | 3 | DevTools → Application → sessionStorage `hc_created` | Contains `owner_private_key_b58` |
 
+**Fail signals:** `/created/` without signing keys; revoke panel stuck on “Checking…” (see [`REVOKE_UI_INVESTIGATION.md`](REVOKE_UI_INVESTIGATION.md)).
+
 ### P0-3 · Status dot opens hub (not dead)
 
 | Step | Action | Expected |
 |------|--------|----------|
 | 1 | Open `/` with saved card | `#brand-status-dot-btn` visible |
 | 2 | Tap status dot | Hub sheet opens on first tap (`body.device-hub-sheet-open`) |
-| 3 | Scroll down, tap dot again | Hub still opens (edge-hidden chrome) |
+| 3 | Scroll down, tap dot again | Hub still opens (desktop: edge-hidden chrome; touch: no edge-hidden) |
 | 4 | `/wallet/` tap dot | Scrolls to saved cards (no hub sheet) |
 
-**Fail signals:** Dot does nothing; console module 404; `#top-chrome[data-device-status-error]`. Full diagnosis: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) troubleshooting.
+**Fail signals:** Dot does nothing; console module 404; `#top-chrome[data-device-status-error]`. Full diagnosis: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) troubleshooting · Safari matrix: [`SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md`](SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md).
 
-**Fail signals:** `/created/` without signing keys; revoke panel stuck on “Checking…” (see [`REVOKE_UI_INVESTIGATION.md`](REVOKE_UI_INVESTIGATION.md)).
+### P0-W · WebKit shell acceptance (post 2026-05-26 fix)
+
+Run on **production** (or staging with full Pages deploy) after `site/` ships. Maps to Phase 1 acceptance in the Safari investigation doc.
+
+| Step | Device | Action | Pass |
+|------|--------|--------|------|
+| W1 | iPhone Safari (normal) | Scroll landing ~10s | Scroll usable; no severe strobe |
+| W2 | iPhone Safari (normal) | Tap status dot 5× (hub closed) | Hub opens 5/5 |
+| W3 | iPhone Safari (normal) | Tap a landing settings / hero control after scroll | Control responds |
+| W4 | Mac Safari | Hard refresh 5× | No red outline ring on dot; dot opens hub each time |
+| W5 | iPad Safari or Tor Mac | Smoke: dot + scroll | No regression vs prior good report |
+| W6 | Optional | Private iPhone tab + cleared website data | Repeat W1–W3 |
+
+**Fail signals:** Laggy landing scroll with hub closed; dot dead; full-page taps blocked (stuck backdrop — use unstick snippet in Safari investigation doc). If W1–W4 fail, consider Phase 3A/3B in that doc (do not ship without triage).
+
+**Automated gate (CI/local):** `npm run e2e:safari` (WebKit + iPhone 13 Pro projects).
 
 ### P0-3 · Auto-save (default on)
 
@@ -242,7 +259,7 @@ Vitest: `worker/tests/device-inbox-sheet-core.test.ts`, `worker/tests/device-inb
 ## Regression smoke (automated)
 
 ```bash
-npm run worker:test -- worker/tests/device-os-frontend.test.ts worker/tests/device-cross-tab.test.ts worker/tests/device-os-coordinator.test.ts worker/tests/device-inbox-sheet-core.test.ts worker/tests/device-status-shell-modules.test.ts
+npm run worker:test -- worker/tests/device-os-frontend.test.ts worker/tests/device-cross-tab.test.ts worker/tests/device-os-coordinator.test.ts worker/tests/device-inbox-sheet-core.test.ts worker/tests/device-status-shell-modules.test.ts worker/tests/device-shell-chrome.test.ts worker/tests/device-sheet-backdrop-sync.test.ts worker/tests/device-status-lazy-inbox.test.ts
 ```
 
 Playwright (requires pages dev):
@@ -250,6 +267,7 @@ Playwright (requires pages dev):
 ```bash
 npm run e2e -- e2e/device-os-wallet.spec.ts
 npm run e2e -- e2e/device-inbox.spec.ts
+npm run e2e:safari
 ```
 
 ---
@@ -271,3 +289,4 @@ Copy a row per finding. **P0** blocks M5 strangers; fix before public announce.
 | [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) | End-to-end stranger gate after OS QA |
 | [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) | Backup import / second device |
 | [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md) | Chrome / sheet / motion |
+| [`SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md`](SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md) | WebKit scroll/dot fix plan + P0-W acceptance |

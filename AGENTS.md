@@ -48,13 +48,14 @@ The floating **status dot** (`#brand-status-dot-btn`) is the hub opener on `/`, 
 When you touch any of these, run the regression suite before finishing:
 
 - `site/js/device-status.mjs`, `device-status-bootstrap.mjs`, `device-dot-state-core.mjs`
-- `site/js/device-hub-sheet.mjs`, `device-inbox-sheet.mjs`, `device-hub-glance-popover.mjs`
+- `site/js/device-hub-sheet.mjs`, `device-inbox-sheet.mjs`, `device-inbox-sheet-loader.mjs`, `device-hub-glance.mjs`, `device-shell-chrome.mjs`, `device-hub-glance-popover.mjs`
 - `site/css/device-shell.css` (especially `pointer-events` on `.top-chrome--float` / `.shell-status-cluster`)
 
 ```bash
 npm run worker:test
 npm run e2e:install   # once per machine
 npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device-os-wallet.spec.ts
+npm run e2e:safari   # WebKit + iPhone 13 Pro shell smoke
 ```
 
 **Contracts (do not break without updating docs + tests):**
@@ -63,7 +64,7 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device
 2. **Hub open state** — Open/close only through `setHubSheetOpen()` / `setHubExpanded()`. `hubSheetOpen()` treats a collapsed `#device-hub` as closed even if `body.device-hub-sheet-open` is stuck (toggle-trap fix).
 3. **Clickability CSS** — `.top-chrome--float { pointer-events: none }` with `.shell-status-cluster` (and dot/badge) at `pointer-events: auto` when `top-chrome--edge-hidden` or hub/inbox locked. See `docs/STATUS_INDICATOR_STEWARD_GREEN.md` troubleshooting.
 
-Manual smoke: `docs/DEVICE_OS_QA.md` **P0-3** (dot opens hub; scroll + tap again).
+Manual smoke: `docs/DEVICE_OS_QA.md` **P0-3** (dot opens hub; scroll + tap again). After Safari shell changes: **P0-W** on production WebKit devices.
 - The Worker health endpoint is at `/.well-known/hc/v1/health`. If `database` shows `schema_missing`, run migrations.
 - The D1 database is emulated locally by Wrangler  -  no external SQLite or Cloudflare account needed for dev.
 - Card creation requires Ed25519-signed JSON documents (card + qr_credential). Test fixtures in `worker/tests/fixtures/` provide valid signed payloads.
