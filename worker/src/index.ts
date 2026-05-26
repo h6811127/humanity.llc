@@ -30,9 +30,12 @@ import { handleGetScan } from "./resolver/scan";
 import { handleGetScanStatus } from "./resolver/scan-status";
 import { handlePostVouch } from "./resolver/vouch";
 import { handleGetVouch, handlePostVouchRevoke } from "./resolver/vouch-revoke";
+import { handleGetVouchAuditFlags } from "./resolver/vouch-audit-flags";
 
 export interface Env {
   DB: D1Database;
+  /** Bearer token for operator-only audit routes; set via wrangler secret. */
+  OPERATOR_AUDIT_TOKEN?: string;
 }
 
 export default {
@@ -68,6 +71,24 @@ export default {
 
     if (path === "/.well-known/hc/v1/health" && request.method === "GET") {
       return healthResponse(env);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/operator/vouch-audit-flags" &&
+      request.method === "GET"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetVouchAuditFlags(
+        request,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
     }
 
     if (path === "/.well-known/hc/v1/cards" && request.method === "POST") {

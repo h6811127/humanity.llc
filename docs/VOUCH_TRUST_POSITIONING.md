@@ -73,7 +73,7 @@ Full analysis: [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) — adversaries,
 
 | Class | Examples | Primary v1 response |
 |-------|----------|---------------------|
-| **Sybil / graph** | 4-person clique mutual vouch, steward farm | Threshold, quota, 90d wait; operator flags; steward review (pending) |
+| **Sybil / graph** | 4-person clique mutual vouch, steward farm | Threshold, quota, 90d wait; operator flags; steward review API + runbook |
 | **Crypto** | Forged/replayed vouch | Signatures, nonces, pair uniqueness |
 | **Device** | Stolen keys / backup | User custody; optional future PIN before sign |
 | **Social** | Remote vouch, coercion, defamation | In-person ritual; revoke; governance |
@@ -201,6 +201,7 @@ Worldcoin owns the Orb line. Humanity owns **meet → load signing key → sign 
 | Doc | Role |
 |-----|------|
 | [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) | Deep threats, controls, gaps, operator playbook |
+| [`VOUCH_STEWARD_REVIEW_RUNBOOK.md`](VOUCH_STEWARD_REVIEW_RUNBOOK.md) | Operator triage cadence and API |
 | [`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md) | Rules, quotas, UX, abuse hooks, implementation map |
 | [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) | Network vs device keys; Sign as… on scan |
 | [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) | Default for vouching, auto-load, Stop |
