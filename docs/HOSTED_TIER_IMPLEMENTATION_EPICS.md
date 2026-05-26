@@ -1,0 +1,321 @@
+# Hosted tier — implementation epics (M8)
+
+**Status:** **Planning only** — ordered build map; **no code until gates pass**  
+**Milestone:** M8 of [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md)  
+**Depends on:** M2–M7 complete; **M4 governance sign-off** before E1 merge to production  
+**Audience:** Engineering, ops
+
+---
+
+## Summary
+
+M1–M7 defined product boundaries, entitlements, push, pricing/SLA, public copy, standards, and test plan. **M8** turns that into **shippable epics** with build order, file touch lists, exit tests, and rollout rules.
+
+**Recommended v1 scope:** E1 → E2+E3 → E4a–c (SSE push MVP) → E5 (billing) → E6 (ops). Defer E4d (SW bridge) and E4e (Durable Object) until push metrics justify cost.
+
+---
+
+## Hard gates (do not skip)
+
+| # | Gate | Doc |
+|---|------|-----|
+| G0 | M4 governance checklist signed | [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) § Governance checklist |
+| G1 | Free-tier regression green before/after each epic PR | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) |
+| G2 | No change to watch default (`hc_watch_live_proof` unset = off) | Request budget doc |
+| G3 | Card create / public scan / stranger poll unchanged without session | M2, M5 |
+| G4 | Merch/commerce does not grant `steward.hosted` | M4, M6, data policy |
+
+**Staging:** Ship Worker APIs behind feature flag `HOSTED_STEWARD_ENABLED` (planning name) until E5 billing + ops runbook exist.
+
+---
+
+## Build order
+
+```mermaid
+flowchart LR
+  G0[M4 sign-off] --> E1[E1 API + D1]
+  E1 --> E2[E2 Client probe]
+  E2 --> E3[E3 Server caps]
+  E3 --> E4[E4 Push SSE]
+  E4 --> E5[E5 Billing]
+  E5 --> E6[E6 Ops]
+```
+
+| Order | Epic | Can parallel? | Notes |
+|-------|------|---------------|-------|
+| 1 | **E1** Account + entitlement API | — | Foundation |
+| 2 | **E2** Client tier probe | After E1 stub | May merge with E3 in one PR |
+| 3 | **E3** Server enforcement + raised caps | With E2 | Double enforcement on authenticated challenge GET |
+| 4 | **E4** Push (P1 SSE) | After E2 | E4a–c required for v1; E4d–e optional |
+| 5 | **E5** Billing webhooks | After E1; needs G0 | Stripe or approved provider |
+| 6 | **E6** Ops dashboards | After E1 metering | Runbook + alerts |
+
+---
+
+## Epic E1 — Account + entitlement API
+
+**Goal:** Operator can store steward accounts, verify profile links, issue sessions, return effective entitlements.
+
+**Specs:** M2 § HTTP API, § Storage · M6 § `steward_account_link_v1`, § capabilities
+
+### Deliverables
+
+| # | Item |
+|---|------|
+| E1.1 | D1 migrations: `steward_accounts`, `steward_account_profiles`, `steward_sessions`, `usage_counters`, `plan_definitions` (M2 conceptual) |
+| E1.2 | `GET /.well-known/hc/v1/operator/capabilities` |
+| E1.3 | `GET /.well-known/hc/v1/operator/plans` (optional v1; can ship with E5) |
+| E1.4 | `POST /.well-known/hc/v1/steward/session` — verify link proof, issue bearer token |
+| E1.5 | `GET /.well-known/hc/v1/steward/entitlements` — ETag/304, `usage` counters |
+| E1.6 | Meter increment on authenticated `GET …/live-control/challenges` + `GET …/status` |
+| E1.7 | `429` body `steward_quota_exceeded` at cap (M2) |
+
+### Touch (expected)
+
+| Area | Paths |
+|------|--------|
+| Worker routes | `worker/src/http/steward-*.ts` (new), router registration |
+| Auth | `worker/src/http/operator-auth.ts` or steward session middleware |
+| Crypto | Reuse JCS verify from card/revoke paths |
+| Tests | `worker/tests/steward-account-link.test.ts`, `steward-entitlements-routes.test.ts`, `steward-quota.test.ts`, `operator-capabilities.test.ts` |
+
+### Exit tests (M7)
+
+- Link signature valid/invalid/expired/replay
+- Entitlements 200/304/401
+- Public `POST …/cards` and scan unchanged
+- Free tier implicit when no session
+
+### Out of scope
+
+- Push (E4), Stripe (E5), client UI (E2)
+
+---
+
+## Epic E2 — Client tier probe + UI gates
+
+**Goal:** Device shell resolves policy from server (or `reference_free` fallback) and gates hosted UX.
+
+**Specs:** M2 § Effective policy, § Client enforcement · M7 test plan
+
+### Deliverables
+
+| # | Item |
+|---|------|
+| E2.1 | `device-steward-entitlements-core.mjs` — fetch, cache ≤300s, merge policy |
+| E2.2 | `sessionStorage` `hc_steward_session` + `hc_device_id` (first visit UUID) |
+| E2.3 | Hub expand / visibility: fetch entitlements when keys present |
+| E2.4 | Wire `device-live-control-poll-budget-core`, scheduler, scale, SW modules to **resolved policy** not hard-coded 400 |
+| E2.5 | Hub UI: hosted indicator line (no “premium verified” copy — M5) |
+| E2.6 | `steward.hosted` master gate — hide subscribe/push UI when false |
+
+### Touch (expected)
+
+| Module | Change |
+|--------|--------|
+| `device-steward-entitlements.mjs` | Loader + hub hook |
+| `device-live-control-poll-budget-core.mjs` | Policy-driven cap |
+| `device-live-control-poll-scheduler.mjs` | idle/active ms |
+| `device-wallet-scale-core.mjs` | threshold + parallel |
+| `device-live-control-sw-core.mjs` | `sw.periodic_min_ms` |
+| `device-hub-network-tools.mjs` / UI | hosted line, diagnostics |
+| Shell `?v=` bump | Per AGENTS.md if new imports |
+
+### Exit tests
+
+- Vitest: 400 vs 4000 cap; 401 → free fallback
+- E2E H1–H3, H5 (M7)
+- Manual P1-8 when enabled
+
+### Out of scope
+
+- Server 429 (E3), push subscribe (E4)
+
+---
+
+## Epic E3 — Server caps + client/server alignment
+
+**Goal:** Double enforcement — buggy or malicious clients cannot exceed account/device caps.
+
+**Specs:** M2 § Double enforcement · M4 fair-use
+
+### Deliverables
+
+| # | Item |
+|---|------|
+| E3.1 | Server counter `poll.live_proof.auto` per M2 windows |
+| E3.2 | Reject authenticated challenge GET when over cap (even if client continues) |
+| E3.3 | Account-level soft/hard caps (50k / 100k per M4) for `null` unlimited key |
+| E3.4 | Hub message when server returns 429 (sync with client pause state) |
+
+### Touch
+
+- E1 meter paths (extend)
+- `device-live-control-inbox.mjs` — handle 429, backoff
+- `device-hub-network-tools` — show quota line from response body
+
+### Exit tests
+
+- Integration: force 429, client pauses auto poll, manual check works
+- Vitest server quota tests
+
+**Note:** Often shipped in **same PR as E2** once E1 is in staging.
+
+---
+
+## Epic E4 — Push channel (SSE MVP)
+
+**Goal:** Hosted stewards receive `live_proof.pending` without wallet round-robin when push healthy.
+
+**Specs:** M3 full RFC · E4a–e below
+
+### Sub-epics
+
+| Sub | Deliverable | v1 required? |
+|-----|-------------|--------------|
+| **E4a** | `notifyLiveProofPending()` on successful challenge POST (`waitUntil`) | Yes |
+| **E4b** | `GET …/steward/push` SSE + connection registry + limits | Yes |
+| **E4c** | `device-steward-push.mjs` — leader tab only; parse events; trigger inbox + optional GET | Yes |
+| **E4d** | Page → SW `postMessage` for OS notify when tab hidden | No (P1b) |
+| **E4e** | Durable Object fan-out (P2) | No |
+
+### Touch (expected)
+
+| Area | Paths |
+|------|--------|
+| Worker | `live-control.ts` POST hook, `steward-push.ts`, connection store |
+| Client | `device-steward-push.mjs`, `device-live-control-inbox.mjs`, leader integration |
+| SW | `sw-live-proof.mjs` — fallback when SSE down; gate on `notify.push.live_proof` |
+| Tests | `device-steward-push-core.test.ts`, `e2e/hosted-tier-push.spec.ts` (M7 planning name) |
+
+### Exit tests
+
+- M3 interoperability table
+- E2E H4: SSE up → challenge GET count ≪ round-robin baseline
+- Fallback: SSE down 60s → resumes Phase 7–9 poll behavior
+- Free tier: no SSE connection attempted
+
+### Out of scope
+
+- Web Push VAPID (M3 Q5)
+- Cross-tab / marketing events
+
+---
+
+## Epic E5 — Billing webhooks
+
+**Goal:** Subscription lifecycle updates `plan_id` / `status` on `steward_accounts`.
+
+**Specs:** M2 § Lifecycle · M4 commercial model
+
+**Depends on:** G0 (M4 sign-off), E1 tables
+
+### Deliverables
+
+| # | Item |
+|---|------|
+| E5.1 | Stripe (or approved) webhook endpoint — verify signature |
+| E5.2 | Map events → `active`, `trialing`, `past_due`, `canceled`, `expired` |
+| E5.3 | 7-day `past_due` grace at hosted caps (M4) |
+| E5.4 | On `expired`: revoke sessions, clear push subs within 24h (M4) |
+| E5.5 | Admin/support: manual `account_overrides` (out of band v1) |
+| E5.6 | Checkout / customer portal (minimal — link only in v1) |
+
+### Touch
+
+- `worker/src/http/billing-webhook.ts` (new)
+- Wrangler secrets: Stripe keys
+- No client change except entitlements reflect new status on fetch
+
+### Exit tests
+
+- Fixture webhooks → entitlement JSON status
+- Downgrade E2E H3
+- Commerce orders do **not** call webhook grant path (H6)
+
+### Out of scope
+
+- Org seat packs `hosted_org_v1` (Commons Pass)
+- Member-governed billing alternative (unless governance picks before build)
+
+---
+
+## Epic E6 — Ops dashboards + runbook
+
+**Goal:** Ops can see quota, fair-use, push health, and SLA inputs.
+
+**Specs:** M4 SLA · M2 metering events
+
+### Deliverables
+
+| # | Item |
+|---|------|
+| E6.1 | Cloudflare Workers analytics dashboard (requests, 429 rate, SSE connections) |
+| E6.2 | Daily alert: account over soft cap, push p95 latency (M4 targets) |
+| E6.3 | Runbook: suspend `status`, 1027, fair-use 429, downgrade |
+| E6.4 | Support doc: link M5 FAQ for customer-facing answers |
+
+### Exit tests
+
+- Runbook reviewed by ops
+- Tabletop: expired subscription → free tier behavior
+
+### Out of scope
+
+- Per-tenant billing UI in product (v1 = Stripe dashboard)
+
+---
+
+## PR checklist (every epic)
+
+1. Run M7 **free-tier regression** commands.
+2. Update `DEVICE_OS_REQUEST_BUDGET.md` phase table if behavior changes.
+3. Bump shell asset version if module graph changes ([`AGENTS.md`](../AGENTS.md)).
+4. No new trust labels or scan analytics.
+5. Cross-link PR to this epic id (E1–E6).
+
+---
+
+## Definition of done — hosted steward v1
+
+| Criterion | Met by |
+|-----------|--------|
+| Paying steward gets 4000/day/device auto cap (with fair-use) | E2+E3+E5 |
+| Free users unchanged | G1–G3, all epics |
+| Optional SSE live-proof notify | E4a–c |
+| Public copy matches M5 | No “premium verified” UI |
+| M4 SLA measurable | E6 |
+| Governance signed | G0 |
+
+---
+
+## Deferred / v2
+
+| Item | Reason |
+|------|--------|
+| E4e Durable Object push | Cost/complexity; SSE first (M3) |
+| `hosted_org_v1` | Commons Pass |
+| Per-card watch flags | Product scope |
+| Client `usage/report` endpoint | M2 prefers server-side metering |
+| Technical Standards v1.1 ratification | M6 — merge after E1 stable |
+
+---
+
+## Cross-references
+
+| Doc | Use |
+|-----|-----|
+| [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) | Product boundaries |
+| [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) | APIs + keys |
+| [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) | E4 detail |
+| [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) | Wire formats |
+| [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) | G0, lifecycle |
+| [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) | M7 tests |
+
+---
+
+## Changelog
+
+| Date | Note |
+|------|------|
+| 2026-05-26 | M8 initial implementation epics (planning only) |

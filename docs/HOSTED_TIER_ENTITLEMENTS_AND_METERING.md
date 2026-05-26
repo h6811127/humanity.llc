@@ -381,15 +381,18 @@ Reference implementation ships first; second operator copies schema with own `pl
 
 ---
 
-## Mapping to implementation epics (future)
+## Mapping to implementation epics (M8)
 
 | Epic | M2 sections used |
 |------|------------------|
 | E1 Account + entitlement API | § HTTP API, § Storage |
 | E2 Client tier probe | § Effective policy, § Client enforcement; M7 test plan |
-| E3 Raised caps | § Entitlement registry |
+| E3 Raised caps | § Entitlement registry, § Double enforcement |
+| E4 Push | M3 RFC |
 | E5 Billing webhooks | § Lifecycle, § `steward_accounts` |
 | E6 Ops dashboards | § Metering event types |
+
+**Build order and deliverables:** [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md).
 
 ---
 
@@ -410,6 +413,7 @@ Reference implementation ships first; second operator copies schema with own `pl
 
 | Date | Note |
 |------|------|
+| 2026-05-26 | M8 — [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) |
 | 2026-05-26 | M7 cross-link — request-budget rows + test plan in [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 |
 | 2026-05-26 | Link to M6 `steward_account_link_v1` — [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) |
 | 2026-05-26 | M2 initial entitlement & metering spec (planning only) |

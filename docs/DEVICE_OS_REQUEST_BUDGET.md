@@ -390,7 +390,7 @@ npm run e2e -- e2e/device-inbox.spec.ts e2e/created-control.spec.ts
 
 1. **M4 governance sign-off** on [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md).
 2. This M7 section reviewed against shipped module constants (table above).
-3. Vitest rows above added in the same PR as first entitlement probe (E2).
+3. Vitest rows above added in the same PR as first entitlement probe (E2) — see [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md).
 
 ---
 
@@ -480,7 +480,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 
 ### Implementer order (after Phases 1–9 + 8c)
 
-1. **Phase 10 (planning → build)** — M2–M7 done. Next: **M4 governance sign-off**, then **M8** implementation epics (E1–E6).  
+1. **Phase 10 (planning → build)** — M2–M8 done. **Start code:** [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) **E1** after **M4 governance sign-off**.  
 2. **Shell P2** - Lazy inbox loader ([`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md)).  
 3. **Ops O2** - Per-IP rate limits on hot routes.
 
@@ -510,6 +510,7 @@ Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). 
 
 | Date | Note |
 |------|------|
+| 2026-05-26 | **M8 epics:** [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) |
 | 2026-05-26 | **M7:** Phase 10 entitlement rows + test plan (§ Phase 10 — hosted tier rows) |
 | 2026-05-26 | **M6 standards delta:** [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) |
 | 2026-05-26 | **M5 FAQ/launch copy:** [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md), [`LAUNCH_LANGUAGE_KIT.md`](LAUNCH_LANGUAGE_KIT.md) |

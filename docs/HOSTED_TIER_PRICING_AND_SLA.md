@@ -24,7 +24,7 @@ This one-pager locks **planning defaults** for governance review: commercial mod
 | **Commons operator plan** | B2B / second operator | Confuses with Commons Pass (Phase D) |
 | **Pro steward** | Marketing only if vetted | Sounds like paid verification |
 
-**Decision needed:** pick one customer-facing name before M5 FAQ copy. **Do not** use “Premium verification,” “Pro human,” or “Verified+.”
+**Decision needed:** pick one customer-facing name before public launch billing. **Planning default locked for M5/M8 copy:** **Hosted steward**. **Do not** use “Premium verification,” “Pro human,” or “Verified+.”
 
 ---
 
@@ -191,6 +191,10 @@ Hosted fees fund:
 
 **Sign-off:** `[ ]` Governance · `[ ]` Ops · `[ ]` Legal — date: _________
 
+**After sign-off:** Engineering may start **E1** per [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md). Do **not** merge billing (E5) until **G8** payment provider is checked.
+
+**Sign-off packet (read order):** this doc → [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) → [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) → [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md) § Is There A Paid Tier?
+
 ---
 
 ## Cross-references
@@ -200,6 +204,7 @@ Hosted fees fund:
 | [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) | Product boundaries |
 | [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) | Caps, lifecycle, metering |
 | [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) | Push SLA dependency |
+| [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) | M8 build order (after sign-off) |
 | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) | Free-tier ceiling unchanged |
 | [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md) | M5 public copy |
 | [`LAUNCH_LANGUAGE_KIT.md`](LAUNCH_LANGUAGE_KIT.md) | M5 lines |

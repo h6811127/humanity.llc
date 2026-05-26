@@ -379,7 +379,9 @@ notifyLiveProofPending({ profile_id, qr_id, challenge_id, expires_at })
 
 ---
 
-## Implementation map (do not start until M4–M6 approved)
+## Implementation map (do not start until M4 sign-off + M8)
+
+**Canonical:** [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) (E1–E6, E4a–e).
 
 | Epic | Deliverable |
 |------|-------------|
