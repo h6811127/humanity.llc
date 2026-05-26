@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { buildHubCardControls } from "../../site/js/device-hub-controls-core.mjs";
+import {
+  buildHubCardControls,
+  partitionHubCardControls,
+} from "../../site/js/device-hub-controls-core.mjs";
 
 describe("buildHubCardControls", () => {
   it("returns prove live when a challenge is waiting", () => {
@@ -41,5 +44,29 @@ describe("buildHubCardControls", () => {
       scanKind: "card_revoked",
     });
     expect(controls.map((c) => c.id)).toEqual(["revoke-state"]);
+  });
+});
+
+describe("partitionHubCardControls", () => {
+  it("keeps prove live inline and moves steward actions to the menu", () => {
+    const controls = buildHubCardControls({
+      hasKeys: true,
+      pendingLiveProof: true,
+      scanKind: "active",
+    });
+    const { inline, menu } = partitionHubCardControls(controls);
+    expect(inline.map((c) => c.id)).toEqual(["prove-live"]);
+    expect(menu.map((c) => c.id)).toEqual(["update-status", "revoke-qr", "new-qr"]);
+  });
+
+  it("puts all signed controls in the menu when no live proof is pending", () => {
+    const controls = buildHubCardControls({
+      hasKeys: true,
+      pendingLiveProof: false,
+      scanKind: "active",
+    });
+    const { inline, menu } = partitionHubCardControls(controls);
+    expect(inline).toEqual([]);
+    expect(menu.map((c) => c.id)).toEqual(["update-status", "revoke-qr", "new-qr"]);
   });
 });

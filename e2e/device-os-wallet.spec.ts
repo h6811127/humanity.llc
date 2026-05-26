@@ -39,6 +39,7 @@ test.describe("device OS wallet flow", () => {
       localStorage.setItem("hc_setup_done", JSON.stringify({ [profileId]: true }));
     }, SAMPLE_WALLET_ENTRY.profile_id);
     await page.goto("/wallet/");
+    await page.getByRole("button", { name: "More options" }).click();
     await page.getByRole("button", { name: "Update status" }).click();
     await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
     await expect(page).toHaveURL(/#update-status/);
@@ -205,16 +206,12 @@ test.describe("device OS wallet flow", () => {
 
     await page.goto("/wallet/");
     await expect(page.getByText("Reachable").first()).toBeVisible();
-    await expect(
-      page.getByText("Card disabled on the network since your last visit.")
-    ).toBeHidden();
+    await expect(page.locator(".hub-card-status-alert:not([hidden])")).toHaveCount(0);
 
     const dismiss = page.getByRole("button", { name: "Got it" }).first();
     if (await dismiss.isVisible().catch(() => false)) {
       await dismiss.click();
-      await expect(
-        page.getByText("Card disabled on the network since your last visit.")
-      ).toBeHidden();
+      await expect(page.locator(".hub-card-status-alert:not([hidden])")).toHaveCount(0);
     }
   });
 

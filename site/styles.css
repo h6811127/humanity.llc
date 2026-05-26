@@ -1169,6 +1169,41 @@ a.hub-card-menu-item {
   color: var(--red);
 }
 
+.hub-card-menu-section-label {
+  margin: 0;
+  padding: 8px 12px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.hub-card-menu-divider {
+  height: 0.5px;
+  margin: 4px 0;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.hub-card-menu-item.hub-card-menu-steward {
+  min-height: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.hub-card-menu-item.hub-card-menu-item--danger {
+  color: var(--red);
+}
+
+.hub-card-menu-item.hub-card-menu-steward:active {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.05);
+}
+
 
 #device-hub-live-control-group .device-hub-group-label {
   color: var(--gold-dark, #8a6d1f);

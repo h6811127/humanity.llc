@@ -16,7 +16,10 @@ import { mountThemeToggles } from "./device-theme.mjs";
 import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs";
 import { renderHubInboxAlerts, inboxItemsIncludeKind } from "./device-hub-inbox-alerts.mjs";
 import { getInboxItems, notificationCount } from "./device-inbox.mjs";
-import { buildHubCardControls } from "./device-hub-controls-core.mjs";
+import {
+  buildHubCardControls,
+  partitionHubCardControls,
+} from "./device-hub-controls-core.mjs";
 import {
   activateWalletEntry,
   getTabSession,
@@ -74,6 +77,7 @@ import {
   CARD_DISABLED_SINCE_VISIT_ALERT_TEXT,
   CARD_DISABLED_SINCE_VISIT_SEARCH_SNIPPET,
   cardDisabledSinceVisitVisible,
+  normalizeBaselineState,
 } from "./wallet-network-baseline.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
 import {
@@ -305,12 +309,84 @@ function hubCardControlsHtml(entry, controls) {
     return "";
   }
   const buttons = controls
-    .map(
-      (c) =>
-        `<button type="button" class="hub-card-control hub-card-control--${c.variant} hub-card-control--${c.id}" data-id="${escapeHtml(entry.id)}" data-focus="${escapeHtml(c.focus)}">${escapeHtml(c.label)}</button>`
-    )
+    .map((c) => hubCardControlButtonHtml(entry, c))
     .join("");
-  return `<div class="hub-card-controls" role="group" aria-label="Object controls">${buttons}</div>`;
+  return `<div class="hub-card-controls" role="group" aria-label="Card actions">${buttons}</div>`;
+}
+
+/**
+ * @param {import("./device-wallet.mjs").WalletEntry} entry
+ * @param {import("./device-hub-controls-core.mjs").HubCardControl} control
+ * @param {{ menu?: boolean }} [opts]
+ */
+function hubCardControlButtonHtml(entry, control, opts = {}) {
+  if (opts.menu === true) {
+    return `<button type="button" class="hub-card-menu-item hub-card-menu-item--${control.variant} hub-card-menu-steward hub-card-control--${control.id}" data-id="${escapeHtml(entry.id)}" data-focus="${escapeHtml(control.focus)}">${escapeHtml(control.label)}</button>`;
+  }
+  return `<button type="button" class="hub-card-control hub-card-control--${control.variant} hub-card-control--${control.id}" data-id="${escapeHtml(entry.id)}" data-focus="${escapeHtml(control.focus)}">${escapeHtml(control.label)}</button>`;
+}
+
+/**
+ * @param {import("./device-wallet.mjs").WalletEntry} entry
+ * @param {import("./device-hub-controls-core.mjs").HubCardControl[]} menuControls
+ */
+function hubCardMenuLifecycleHtml(entry, menuControls) {
+  if (menuControls.length === 0) return "";
+  const items = menuControls.map((c) => hubCardControlButtonHtml(entry, c, { menu: true })).join("");
+  return `<p class="hub-card-menu-section-label" role="presentation">QR &amp; lifecycle</p>${items}`;
+}
+
+/**
+ * @param {import("./device-wallet.mjs").WalletEntry} entry
+ * @param {import("./device-hub-controls-core.mjs").HubCardControl[]} menuControls
+ */
+function hubCardMenuHtml(entry, menuControls) {
+  const lifecycle = hubCardMenuLifecycleHtml(entry, menuControls);
+  const lifecycleBlock = lifecycle
+    ? `<div class="hub-card-menu-section" role="group" aria-label="QR and lifecycle">${lifecycle}</div><div class="hub-card-menu-divider" role="separator"></div>`
+    : "";
+  return `
+        <details class="hub-card-menu">
+          <summary class="hub-card-menu-btn" aria-label="More options">⋯</summary>
+          <div class="hub-card-menu-panel">
+            <button type="button" class="hub-card-menu-item hub-open-card" data-id="${escapeHtml(entry.id)}">Open card</button>
+            <button type="button" class="hub-card-menu-item hub-relabel" data-id="${escapeHtml(entry.id)}">Relabel</button>
+            ${lifecycleBlock}
+            ${
+              entry.owner_private_key_b58
+                ? `<button type="button" class="hub-card-menu-item hub-default-vouch" data-id="${escapeHtml(entry.id)}">${
+                    isDefaultVouchProfile(entry.profile_id)
+                      ? "Default for vouching ✓"
+                      : "Set as default for vouching"
+                  }</button>`
+                : ""
+            }
+            ${
+              entry.owner_private_key_b58
+                ? `<button type="button" class="hub-card-menu-item hub-sign-lock-pin" data-id="${escapeHtml(entry.id)}">${
+                    getSignLock(entry.profile_id)?.mode === "pin"
+                      ? "Change PIN before sign"
+                      : "Require PIN before sign"
+                  }</button>`
+                : ""
+            }
+            ${
+              entry.owner_private_key_b58 && isWebAuthnUnlockAvailable()
+                ? `<button type="button" class="hub-card-menu-item hub-sign-lock-webauthn" data-id="${escapeHtml(entry.id)}">${
+                    getSignLock(entry.profile_id)?.mode === "webauthn"
+                      ? "Change device unlock before sign"
+                      : "Require device unlock before sign"
+                  }</button>`
+                : ""
+            }
+            ${
+              entry.owner_private_key_b58 && isSignLockEnabled(entry.profile_id)
+                ? `<button type="button" class="hub-card-menu-item hub-sign-lock-clear" data-id="${escapeHtml(entry.id)}">Remove sign unlock requirement</button>`
+                : ""
+            }
+            <button type="button" class="hub-card-menu-item hub-remove" data-id="${escapeHtml(entry.id)}">Remove from device</button>
+          </div>
+        </details>`;
 }
 
 function currentNetworkStatus(profileId, statusMap = {}) {
@@ -391,6 +467,14 @@ function applyRevokedSinceVisitAlerts(
       scanKindMap[pid] !== undefined
         ? scanKindMap[pid]
         : getLatestResolvedScanKind(pid) ?? getCachedNetworkScanKind(pid);
+    if (resolverConfirmed) {
+      const alertNorm = normalizeBaselineState(alertStateMap[pid]);
+      const kind = String(scanKind || "").toLowerCase();
+      if (alertNorm !== CARD_REVOKED_ALERT_STATE || kind === "active") {
+        setRevokedSinceVisitAlertVisible(li, pid, false);
+        return;
+      }
+    }
     const show = cardDisabledSinceVisitVisible(
       alertStateMap[pid],
       getNetworkLastSeenBaseline(pid),
@@ -461,6 +545,8 @@ async function fetchAndApplyNetworkChips() {
       return e;
     });
     if (changed) saveWallet(next);
+    syncHubInboxAlertGroups();
+    notifyHubChanged();
   });
 }
 
@@ -536,7 +622,6 @@ function renderActivityRows() {
 }
 
 function renderSavedRows() {
-  bumpWalletNetworkApplyGen();
   const entries = loadWallet();
   if (!savedList || !savedGroup) return;
 
@@ -568,8 +653,10 @@ function renderSavedRows() {
         ? getCachedNetworkScanKind(entry.profile_id)
         : null,
     });
+    const { inline: inlineControls, menu: menuControls } =
+      partitionHubCardControls(cardControls);
     li.className = `hub-card-item hub-card-item--${objectType.tone}${
-      cardControls.length > 0 ? " hub-card-item--has-controls" : ""
+      inlineControls.length > 0 ? " hub-card-item--has-controls" : ""
     }`;
     li.dataset.hubSearchable = walletHaystack(entry);
     li.dataset.profileId = entry.profile_id;
@@ -602,47 +689,7 @@ function renderSavedRows() {
         </div>`
       : "";
 
-    const menuBlock = `
-        <details class="hub-card-menu">
-          <summary class="hub-card-menu-btn" aria-label="More">⋯</summary>
-          <div class="hub-card-menu-panel">
-            <button type="button" class="hub-card-menu-item hub-open-card" data-id="${escapeHtml(entry.id)}">Open card</button>
-            <button type="button" class="hub-card-menu-item hub-relabel" data-id="${escapeHtml(entry.id)}">Relabel</button>
-            ${
-              entry.owner_private_key_b58
-                ? `<button type="button" class="hub-card-menu-item hub-default-vouch" data-id="${escapeHtml(entry.id)}">${
-                    isDefaultVouchProfile(entry.profile_id)
-                      ? "Default for vouching ✓"
-                      : "Set as default for vouching"
-                  }</button>`
-                : ""
-            }
-            ${
-              entry.owner_private_key_b58
-                ? `<button type="button" class="hub-card-menu-item hub-sign-lock-pin" data-id="${escapeHtml(entry.id)}">${
-                    getSignLock(entry.profile_id)?.mode === "pin"
-                      ? "Change PIN before sign"
-                      : "Require PIN before sign"
-                  }</button>`
-                : ""
-            }
-            ${
-              entry.owner_private_key_b58 && isWebAuthnUnlockAvailable()
-                ? `<button type="button" class="hub-card-menu-item hub-sign-lock-webauthn" data-id="${escapeHtml(entry.id)}">${
-                    getSignLock(entry.profile_id)?.mode === "webauthn"
-                      ? "Change device unlock before sign"
-                      : "Require device unlock before sign"
-                  }</button>`
-                : ""
-            }
-            ${
-              entry.owner_private_key_b58 && isSignLockEnabled(entry.profile_id)
-                ? `<button type="button" class="hub-card-menu-item hub-sign-lock-clear" data-id="${escapeHtml(entry.id)}">Remove sign unlock requirement</button>`
-                : ""
-            }
-            <button type="button" class="hub-card-menu-item hub-remove" data-id="${escapeHtml(entry.id)}">Remove from device</button>
-          </div>
-        </details>`;
+    const menuBlock = hubCardMenuHtml(entry, menuControls);
 
     li.innerHTML = `
       <div class="hub-card-head">
@@ -658,7 +705,7 @@ function renderSavedRows() {
         </div>
       </div>
       ${revokedAlert}
-      ${hubCardControlsHtml(entry, cardControls)}
+      ${hubCardControlsHtml(entry, inlineControls)}
       <div class="hub-card-actions">
         <div class="hub-card-actions-primary">
           <button type="button" class="hub-card-action hub-use-keys" data-id="${escapeHtml(entry.id)}" title="Load signing keys into this tab, then open your card page">Open controls</button>
@@ -670,7 +717,7 @@ function renderSavedRows() {
 
   bindRevokedAlertHandlers();
 
-  savedList.querySelectorAll(".hub-card-control").forEach((btn) => {
+  savedList.querySelectorAll(".hub-card-control, .hub-card-menu-steward").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-id");
       const focus = btn.getAttribute("data-focus");

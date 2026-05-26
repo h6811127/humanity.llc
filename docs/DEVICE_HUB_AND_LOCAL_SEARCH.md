@@ -44,7 +44,7 @@ These notes are captured as individual product refinements so implementation can
 - **Step 6 (shipped):** shell polish pass.
 - **Step 7 (shipped):** action-forward controls → `openCardControlPage()`.
 - **Row Phase 1 (shipped):** information consolidation per [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md).
-- **Row Phase 2 (planned):** slim action pills into ⋯ groups.
+- **Row Phase 2 (shipped):** steward actions in ⋯ **QR & lifecycle**; **Prove live** stays inline when pending ([`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md)).
 - **Row Phase 3 (planned):** typography and spacing polish on rows.
 
 ---
@@ -61,7 +61,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **`/created/` hub (shipped):** Same groups as landing except: notice links to **`#created-keys-strip`**; shortcuts are **Manage this card**, **All saved cards**, **Homepage** (no focus toggle).
 
-**Hub rows (shipped):** Saved cards show **object controls** when signing keys are on device (**Update status**, **Revoke QR**, **New QR**; **Prove live** when a challenge is waiting). Controls call `openCardControlPage()` → `/created/#…` with keys loaded. **Open controls** and **Open scan** remain for full workspace and public scan. **⋯** (Open card, Relabel, Remove). **Open card** and **Open controls** both call `openCardNowPage()` when you need the full Tasks tab. Phase 0: removed ⋯ **Manage** link that opened `/created/` without keys (`docs/CARD_WORKSPACE_PHASE0.md`). **Import backup file** decrypts `.hcbackup.json` into `hc_wallet`.
+**Hub rows (shipped):** Saved cards show **Open controls** and **Open scan** on the row; **Prove live** inline when a challenge is waiting. Steward actions (**Update status**, **Revoke QR**, **New QR**, **Revoke options**) live under ⋯ → **QR & lifecycle** and call `openCardControlPage()` → `/created/#…` with keys loaded. **⋯** also has Open card, Relabel, vouch default, sign lock, Remove. **Open card** and **Open controls** both call `openCardNowPage()` when you need the full Tasks tab. See [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md). **Import backup file** decrypts `.hcbackup.json` into `hc_wallet`.
 
 **Landing focus mode:** `localStorage.hc_landing_focus` hides intro (`[data-landing-tutorial]`). Keeps **hub**, **hub glance**, **system banner** (if unhealthy), **Help & protocol** list (not full Documentation), and **contact**. No bottom Create dock or “New here?” float. **Auto-save** on by default via `hc_auto_save_device` (opt out in hub shortcuts).
 
@@ -71,7 +71,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Hub glance (landing):** When the hub is collapsed, `#device-hub-glance` shows notice (if any) and up to three saved card labels; tap expands the hub. Quick-look popover rows use **light pastel** fills (red / blue / orange by notice type). Glance **Card disabled since last visit** copy follows the latest resolver-confirmed alert state from the wallet network poll (not stale cache and not the persisted `hc_wallet[].status` field).
 
-**`/wallet/` (Phase 5–6):** Uses the same hub renderer as landing. Each saved row shows **title** (custom label or `@handle`), **identity line** (`{object type} · {verification}`), **one status line** (e.g. **Reachable · checked 2m ago**), optional **card disabled since last visit** alert (`hc_wallet_last_seen_network`), **Details** for keys/profile metadata, and **Open controls / Open scan** plus object controls. Row icon tone follows verification (green shield = Steward). Page is hub-expanded by default; help disclosure hides when cards exist.
+**`/wallet/` (Phase 5–6):** Uses the same hub renderer as landing. Each saved row shows **title**, **identity line**, **status line**, optional **card disabled since last visit** alert, **Details**, **Open controls / Open scan**, and steward actions under ⋯ **QR & lifecycle** (see [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md)). Row icon tone follows verification (green shield = Steward). Page is hub-expanded by default; help disclosure hides when cards exist.
 
 **Card status line (Row Phase 1):** Single line replaces separate network + verification pills and the old liveliness row. Recency uses **checked** (this device’s last successful `GET …/status?q=…` poll), not **seen** — not a scan log. Full copy table: [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md).
 

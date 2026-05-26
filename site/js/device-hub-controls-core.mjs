@@ -7,6 +7,25 @@
 
 /** @typedef {{ id: string, label: string, focus: string, variant: HubControlVariant }} HubCardControl */
 
+/** Controls that stay on the collapsed row (inbox-driven). @see docs/HUB_CARD_ROW_UX.md Phase 2 */
+const INLINE_HUB_CONTROL_IDS = new Set(["prove-live"]);
+
+/**
+ * @param {HubCardControl[]} controls
+ * @returns {{ inline: HubCardControl[], menu: HubCardControl[] }}
+ */
+export function partitionHubCardControls(controls) {
+  /** @type {HubCardControl[]} */
+  const inline = [];
+  /** @type {HubCardControl[]} */
+  const menu = [];
+  for (const c of controls) {
+    if (INLINE_HUB_CONTROL_IDS.has(c.id)) inline.push(c);
+    else menu.push(c);
+  }
+  return { inline, menu };
+}
+
 /**
  * @param {{
  *   hasKeys?: boolean,

@@ -1,6 +1,6 @@
 # Hub saved card row UX
 
-**Status:** Phase 1 shipped (information consolidation, May 2026) · Phases 2–3 planned  
+**Status:** Phases 1–2 shipped (May 2026) · Phase 3 planned  
 **Scope:** Saved card rows in the device hub (`/`, `/wallet/`, `/created/`) — `renderSavedRows()` in `site/js/device-hub-ui.mjs`  
 **Companions:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md), [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)
 
@@ -16,20 +16,20 @@ Saved card rows accumulated overlapping UI: handle repeated in title, sub-line, 
 
 1. **One glance** — identity, trust + object type, unified network status, primary actions.
 2. **Progressive depth** — keys, profile id, last saved, vouch default only in **Details** (collapsed by default).
-3. **Control-first** (later phases) — fewer equal-weight pills; steward actions grouped when possible.
+3. **Control-first** — steward actions grouped under ⋯ **QR & lifecycle**; **Prove live** stays inline when pending (Phase 2).
 4. **Semantic copy** — operational language, not cryptographic jargon.
 5. **Policy-aligned** — never imply operator scan logging or stranger scan trails.
 
 ---
 
-## Collapsed row anatomy (Phase 1 shipped)
+## Collapsed row anatomy (Phases 1–2 shipped)
 
 ```text
 ┌─────────────────────────────────────────────────┐
 │ [trust icon]  Title (@handle or custom label)  [⋯]
 │               Object type · Verification label
 │               ● Reachable · checked 2m ago      ← single status line
-│  [object controls when keys exist — unchanged]
+│  [ Prove live ]  (inline when inbox pending)
 │  [ Open controls ]  [ Open scan ↗ ]
 └─────────────────────────────────────────────────┘
 ```
@@ -40,7 +40,7 @@ Saved card rows accumulated overlapping UI: handle repeated in title, sub-line, 
 | **Identity line** | `{object type} · {Registered \| Steward \| …}` | Trust paired with type, not with network |
 | **Status line** | One phrase: reachability + recency | Replaces separate network pill + liveliness line |
 | **Details** | Last saved, key preview, `@handle`, profile id snippet, default-for-vouching | `<details>` summary **Details** (not **More**) |
-| **Actions** | Open controls, Open scan, ⋯ menu, object control pills | Phase 2 may slim control pills |
+| **Actions** | Open controls, Open scan, ⋯ menu (QR & lifecycle), inline **Prove live** when pending | Steward pills moved to ⋯ (Phase 2) |
 
 ---
 
@@ -104,10 +104,10 @@ Implementation: `getCachedNetworkSeenAt()` → `entry.at` set in `refreshWalletN
 - [x] Docs — this file, hub doc, keys doc, data policy cross-link.
 - [x] Tests — `device-hub-card-row-core` unit tests; update wallet e2e expectations.
 
-### Phase 2 — Action slimming (planned)
+### Phase 2 — Action slimming (shipped)
 
-- Move **Update status** / **Revoke QR** / **New QR** into ⋯ groups (keep **Prove live** inline when inbox pending).
-- Target ≤2 prominent buttons on collapsed row.
+- [x] `partitionHubCardControls()` — **Prove live** inline; **Update status** / **Revoke QR** / **New QR** (and revoke-state) under ⋯ **QR & lifecycle**.
+- [x] Collapsed row shows **Open controls** + **Open scan** (+ inline prove live when pending).
 
 ### Phase 3 — Visual polish (planned)
 
@@ -133,6 +133,7 @@ Manual: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — revoked since visit, QR-only re
 | Piece | Location |
 |-------|----------|
 | Row copy + status line | `site/js/device-hub-card-row-core.mjs` |
+| Control list + inline/menu split | `site/js/device-hub-controls-core.mjs` |
 | DOM render + poll apply | `site/js/device-hub-ui.mjs` |
 | Network cache + `entry.at` | `site/js/device-wallet-network.mjs` |
 | Chip labels (hub status line only; not row pills) | `site/js/device-wallet-network-core.mjs` — `networkStatusChip()` still used elsewhere |
