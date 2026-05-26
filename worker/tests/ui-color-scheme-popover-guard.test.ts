@@ -95,6 +95,15 @@ describe("UI color scheme popover guard", () => {
     expect(darkRoot).toContain("rgba(235, 235, 245, 0.9)");
   });
 
+  it("loads hc-emphasis-card.css via valid top-of-file @import in styles.css", () => {
+    const styles = readSiteCss("site/styles.css");
+    const importIdx = styles.indexOf('@import url("./css/hc-emphasis-card.css")');
+    const rootIdx = styles.indexOf(":root {");
+    expect(importIdx).toBeGreaterThanOrEqual(0);
+    expect(rootIdx).toBeGreaterThan(importIdx);
+    expect(styles.slice(0, rootIdx)).not.toMatch(/^\s*[^{@/][^{]*\{/m);
+  });
+
   it("keeps migrated shell popover surfaces on semantic tokens", () => {
     assertGuardedRule("site/styles.css", ".hub-card-menu-panel", {
       require: ["--surface-popover-bg", "--surface-popover-fg"],

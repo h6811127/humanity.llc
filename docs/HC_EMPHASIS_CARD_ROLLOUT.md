@@ -149,12 +149,19 @@ Prioritized follow-ups after Phases 0–5. Full tier tables: [`UI_COLOR_SCHEME_S
 | Single CSS source | `site/css/hc-emphasis-card.css`; scan via `npm run worker:bundle-scan` |
 | Token sync | Keep `:root` emphasis tokens in `scan-pass.css` aligned with `site/styles.css` when tokens change |
 | Regression | `npm run worker:test:ui-color-scheme` + `device-emphasis-card-html.test.ts` after each phase |
+| Shell delivery | `@import` for `hc-emphasis-card.css` must be **first** in `styles.css` — see [`HC_EMPHASIS_CARD_IMPORT_REGRESSION.md`](HC_EMPHASIS_CARD_IMPORT_REGRESSION.md) |
 | Dark cache bust | Bump `theme-dark.css?v=` on shell pages when changing `theme-dark.css` |
 | No per-card fg hacks | Title/detail always `--hc-emphasis-card-title-fg` / `--hc-emphasis-card-detail-fg` |
 
 ---
 
-## Related docs (update per phase)
+## Post-rollout fix — shell CSS delivery (May 2026)
+
+**Incident:** Mid-file `@import` in `styles.css` (Phase 2) caused all emphasis cards on shell pages to lose base styles.  
+**Doc:** [`HC_EMPHASIS_CARD_IMPORT_REGRESSION.md`](HC_EMPHASIS_CARD_IMPORT_REGRESSION.md)  
+**Step 1 (shipped in this branch):** Move `@import url("./css/hc-emphasis-card.css")` to top of `styles.css`; Vitest guard; bump `styles.css?v=` on shell pages.
+
+---
 
 | Phase | Docs |
 |-------|------|

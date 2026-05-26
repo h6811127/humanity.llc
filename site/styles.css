@@ -1,4 +1,5 @@
 /* humanity.llc  -  iOS grouped UI, light. #DB1B43 · #000 · #fff · #b8b8b8 */
+@import url("./css/hc-emphasis-card.css");
 
 :root {
   --red: #db1b43;
@@ -5622,8 +5623,6 @@ details[open] > .created-advanced-summary::after {
   font-weight: 500;
   color: var(--red);
 }
-
-@import url("./css/hc-emphasis-card.css");
 
 .device-cross-tab-banner.hc-emphasis-card,
 #wallet-tab-hint.hc-emphasis-card {
