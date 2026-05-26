@@ -37,6 +37,7 @@ Defined in `site/styles.css` and overridden in `site/css/theme-dark.css`:
 - `--surface-popover-notice-bg` / `--surface-popover-notice-border` / `--surface-popover-notice-fg`
 - `--surface-popover-crosstab-bg` / `--surface-popover-crosstab-border` / `--surface-popover-crosstab-fg`
 - `--surface-popover-warn-bg` / `--surface-popover-warn-border` / `--surface-popover-warn-fg` (live proof, revoked)
+- `--hc-emphasis-card-shadow` — layered inset + outer lift for **raised** notice cards (no painted stroke)
 
 Use these for:
 
@@ -46,6 +47,41 @@ Use these for:
 - Hub card overflow menu (`.hub-card-menu-panel`, `.hub-card-menu-item*`)
 - Device hub and inbox bottom sheets (`.device-hub--sheet`, `.device-inbox-sheet`)
 - Any new floating panel or popup-style shell component
+- Wallet **Active in this tab** banner (`.wallet-active-banner` on `/wallet/`)
+
+---
+
+## Emphasis notice cards (wallet active tab)
+
+**Component:** `.wallet-active-banner` on `/wallet/` (“Active in this tab” + **Open workspace**).  
+**Files:** `site/styles.css` (`:root` token + rule), `site/css/theme-dark.css` (dark token override + gradient).
+
+### History
+
+| Stage | Border | Depth |
+|-------|--------|--------|
+| Pre–May 2026 | `0.5px` blue at low opacity | Single top inset highlight (`inset 0 1px 0 white`) — soft 3D, no heavy stroke |
+| May 2026 (`b68aff2`) | `1px solid` blue via `--hc-emphasis-card-border` | Layered inset + blue-tinted outer glow — **reads as a blue outline** (user feedback: too much stroke, not enough dimensional edge) |
+
+### Target (May 2026 revision)
+
+Depth comes from **shadow only**, not a visible border color:
+
+1. **Remove painted stroke** — `.wallet-active-banner` uses `border: none` (do not use a blue `border` or `--hc-emphasis-card-border`).
+2. **Stronger dimensional stack** on `--hc-emphasis-card-shadow`:
+   - **Top** — bright inset highlight (convex top edge).
+   - **Bottom** — neutral inset shade (rounded bottom lip).
+   - **Inner ring** — `inset 0 0 0 1px` neutral/white rim for crisp rounded corners (not blue).
+   - **Outer lift** — neutral drop shadow so the card separates from the page background.
+3. **Keep** the blue→green gradient fill and eyebrow accent color; only the **frame** loses blue paint.
+4. **Dark mode** — same rules with stronger bottom inset and deeper outer shadow on black.
+
+### Implementation checklist
+
+1. Update `--hc-emphasis-card-shadow` on `:root` in `site/styles.css` (remove `--hc-emphasis-card-border` or leave unused).
+2. Override `--hc-emphasis-card-shadow` in `html[data-theme="dark"]` in `site/css/theme-dark.css`.
+3. Set `.wallet-active-banner` to `border: none; box-shadow: var(--hc-emphasis-card-shadow);`.
+4. Manual QA: `/wallet/` with an active signing session — light + dark; confirm no blue ring, card reads raised at 14px radius.
 
 ---
 
@@ -102,10 +138,11 @@ When touching legacy components, migrate them incrementally to this token family
 | Inbox browser-alert prompt | `.device-inbox-sheet .device-browser-notif-prompt*` | Live-proof OS notification opt-in inside inbox sheet footer on popover tokens. |
 | Glance status row tints | `.device-hub-glance-row--notice/crosstab/liveproof/revoked` | Notice/cross-tab/warn bg, border, and title fg tokens (light + dark on `:root`). |
 | Dot explainer (base) | `.device-dot-explainer*` | Default explainer block uses popover tokens; hub/glance scopes retain explicit rules. |
+| Wallet active-tab banner | `.wallet-active-banner` | Tinted gradient fill; **no** blue border stroke; depth via `--hc-emphasis-card-shadow` only (see **Emphasis notice cards** above). |
 
 ### Migration complete (shell popovers)
 
-All surfaces listed under **Use these for** are migrated as of this standard. New floating shell UI must use `--surface-popover-*` (and status tint tokens when applicable) from the first PR — do not add hardcoded `rgba(255,255,255,…)` panel fills without dark overrides.
+All surfaces listed under **Use these for** are migrated as of this standard. New floating shell UI must use `--surface-popover-*` (and status tint tokens when applicable) from the first PR - do not add hardcoded `rgba(255,255,255,…)` panel fills without dark overrides.
 
 ### Regression guard
 
@@ -144,5 +181,11 @@ Per [`DEVICE_HUB_INTRO_COACHMARK.md`](DEVICE_HUB_INTRO_COACHMARK.md): clear `hc_
 
 ### QA (glance list + inbox browser prompt)
 
-1. Glance popover with default saved-card rows and notice/cross-tab/live-proof rows — titles readable in light and dark.
-2. Inbox sheet with live-proof waiting + browser notification prompt — prompt copy and dismiss in both themes.
+1. Glance popover with default saved-card rows and notice/cross-tab/live-proof rows - titles readable in light and dark.
+2. Inbox sheet with live-proof waiting + browser notification prompt - prompt copy and dismiss in both themes.
+
+### QA (wallet active-tab banner)
+
+1. On `/wallet/` with signing keys in this tab, confirm **Active in this tab** banner shows gradient fill, green dot, and **Open workspace** CTA.
+2. Confirm **no blue outline** around the card; edges read as raised/beveled (highlight top, shade bottom) in light and dark.
+3. Compare against page background — card should feel lifted (outer shadow), not flat or stroked.
