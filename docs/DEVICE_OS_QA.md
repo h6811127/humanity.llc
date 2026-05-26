@@ -106,11 +106,11 @@ Requires a saved card and ability to disable it on the network (owner revoke **c
 |------|--------|----------|
 | 1 | Save card; visit `/wallet/`; leave | Baseline recorded |
 | 2 | Disable card on network (another session) | — |
-| 3 | Return to `/wallet/` | Banner **Card disabled on the network since your last visit** + chip **Card disabled** |
+| 3 | Return to `/wallet/` | Banner **Card disabled on the network since your last visit** + status **Disabled on network** |
 | 4 | Tap **Got it** | Banner hides; baseline acknowledged |
 | 5 | Re-enable or refresh if test card restored | Alert does not stick incorrectly |
 
-**Fail signals:** Alert with chip still “Live State Active”; alert on QR-only revoke.
+**Fail signals:** Alert with status still **Reachable** while card is disabled; alert on QR-only revoke; row copy implying stranger scan logs (**seen** / **last scan**).
 
 ---
 
@@ -167,6 +167,14 @@ Spec: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 ## P4 — Device inbox E2E (automated — phase 6)
 
 Playwright: `e2e/device-inbox.spec.ts` (CI via `test-site.yml`). Manual spot-check still useful on real Worker + pending challenge.
+
+## P5b — Glance row plan (phase 10)
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Save 4+ cards; trigger live proof on one | Glance popover: inbox row(s) first, then up to 3 saved cards, then “N more” |
+| 2 | Card disabled since visit (resolver-confirmed) | Inbox `card_disabled` row in glance; saved row for same card has no duplicate “since last visit” suffix |
+| 3 | Tap live-proof glance row | Opens inbox sheet (`openInboxFromChrome('glance')`), not hub expand only |
 
 ## P5 — Inbox diagnostics (dev — phase 7)
 

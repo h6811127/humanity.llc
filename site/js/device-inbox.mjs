@@ -3,7 +3,9 @@
  * @see docs/DEVICE_INBOX.md
  */
 import {
+  buildGlanceRowPlan,
   buildInboxItems,
+  cardDisabledProfileIdsFromInbox,
   inboxBadgeAriaLabel,
   inboxBadgeCountText,
   inboxCountFromItems,
@@ -20,7 +22,9 @@ import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs";
 
 export {
+  buildGlanceRowPlan,
   buildInboxItems,
+  cardDisabledProfileIdsFromInbox,
   inboxBadgeAriaLabel,
   inboxBadgeCountText,
   inboxCountFromItems,

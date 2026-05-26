@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  inboxKindAllowsOsNotification,
   osNotificationContentForLiveProof,
   shouldShowBrowserNotifPrompt,
 } from "../../site/js/device-browser-notifications-core.mjs";
@@ -42,6 +43,15 @@ describe("shouldShowBrowserNotifPrompt", () => {
     expect(shouldShowBrowserNotifPrompt({ pendingCount: 0, tabVisible: true })).toBe(
       false
     );
+  });
+});
+
+describe("inboxKindAllowsOsNotification (v2 Phase C)", () => {
+  it("allows only live_proof", () => {
+    expect(inboxKindAllowsOsNotification("live_proof")).toBe(true);
+    expect(inboxKindAllowsOsNotification("tab_keys_unsaved")).toBe(false);
+    expect(inboxKindAllowsOsNotification("cross_tab_keys")).toBe(false);
+    expect(inboxKindAllowsOsNotification("card_disabled_since_visit")).toBe(false);
   });
 });
 

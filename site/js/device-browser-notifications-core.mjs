@@ -7,6 +7,16 @@ import { inboxWalletEntryLabel } from "./device-inbox-core.mjs";
 export const STORAGE_BROWSER_NOTIF = "hc_browser_notif";
 export const STORAGE_PROMPT_DISMISS = "hc_browser_notif_prompt_dismissed";
 
+/** @typedef {'live_proof' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'card_disabled_since_visit'} InboxAlertKind */
+
+/**
+ * v2 Phase C policy — only live proof may trigger OS notifications when the tab is hidden.
+ * @param {InboxAlertKind} kind
+ */
+export function inboxKindAllowsOsNotification(kind) {
+  return kind === "live_proof";
+}
+
 /**
  * @param {{
  *   supported?: boolean,

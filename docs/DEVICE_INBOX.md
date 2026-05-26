@@ -1,6 +1,6 @@
 # Device inbox & background alerts
 
-**Status:** Unified inbox shipped (badge, sheet, glance, live proof + card-disabled-since-visit) · browser alerts v2 contextual opt-in shipped  
+**Status:** Unified inbox shipped (phases 1–10) · browser alerts v2 A–C shipped (contextual opt-in, sign deep link, OS policy matrix)  
 **Audience:** Product, frontend  
 **Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)
 
@@ -175,14 +175,16 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 - Click → `buildLiveControlProofHref()` for first pending challenge (sign on `/created/`, not `/wallet/`).
 - First OS notification per session may use `requireInteraction` (`sessionStorage.hc_browser_notif_os_interact`).
 
-### v2 Phase C — Policy matrix
+### v2 Phase C — Policy matrix (shipped)
+
+`inboxKindAllowsOsNotification()` in `device-browser-notifications-core.mjs`; `maybeNotifyLiveProof()` in `device-browser-notifications.mjs` gates OS alerts on `live_proof` only.
 
 | Event | OS alert | Rationale |
 |-------|----------|-----------|
 | Live proof pending | Yes (opt-in) | Stranger waiting; time-sensitive |
 | Tab keys unsaved | No | User usually in create flow |
 | Cross-tab keys | No | Multi-tab confusion |
-| Card disabled since visit | Maybe later | Batch/digest, not instant |
+| Card disabled since visit | No (defer digest) | Batch/digest, not instant |
 | Resolver offline/degraded | No | `#device-system-banner` |
 
 ### v2 Phase D — Service Worker (optional, defer)
@@ -270,7 +272,7 @@ Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox 
 | `site/js/device-status.mjs` | Dot (`openHubFromChrome()`), badge count; imports inbox sheet for hub coordination |
 | `site/js/device-dot-state-core.mjs` | Dot overlay priority, explainers, `open_notifications` action |
 | `site/js/device-browser-notifications.mjs` | OS alerts, contextual prompt, toggle sync |
-| `site/js/device-browser-notifications-core.mjs` | Pure prompt + OS copy helpers |
+| `site/js/device-browser-notifications-core.mjs` | Pure prompt + OS copy + `inboxKindAllowsOsNotification()` (Phase C) |
 | `worker/tests/device-browser-notifications.test.ts` | Vitest for alert core |
 | `site/js/device-counts.mjs` / `device-counts-core.mjs` | `tabNoticeCount`, status segments |
 | `site/js/device-live-control-inbox.mjs` | Live proof poll + hub list |
@@ -281,7 +283,6 @@ Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox 
 | `site/js/device-cross-tab-banner.mjs` | Landing/wallet banner |
 | `site/css/device-shell.css` | `.shell-notif-badge*` styles |
 | `docs/DEVICE_INBOX.md` | This spec |
-
 | `site/js/device-inbox-core.mjs` | Pure inbox model + `buildGlanceRowPlan()` |
 | `site/js/device-inbox-card-disabled.mjs` | Since-visit disabled cards for inbox input |
 | `site/js/device-inbox.mjs` | Browser facade (`getInboxItems`, `notificationCount`) |

@@ -279,6 +279,11 @@ test.describe("device inbox — card disabled since visit", () => {
     await expect(badge).toHaveAttribute("data-inbox-chroma", "default");
     await expect(badge).toHaveAttribute("aria-label", /card disabled since last visit/i);
 
+    const hubGroup = page.locator("#device-hub-card-disabled-group");
+    await expect(hubGroup).toBeVisible();
+    await expect(hubGroup.getByText("E2E Test Card")).toBeVisible();
+    await expect(hubGroup.locator(".list-sub")).toContainText(/since your last visit/i);
+
     await badge.click();
     const row = page.locator(".device-inbox-sheet-row--card_disabled_since_visit");
     await expect(row).toBeVisible();

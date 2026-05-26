@@ -3,6 +3,7 @@
  * @see docs/DEVICE_INBOX.md phases 4+
  */
 import {
+  inboxKindAllowsOsNotification,
   osNotificationContentForLiveProof,
   shouldShowBrowserNotifPrompt,
   STORAGE_BROWSER_NOTIF,
@@ -233,6 +234,7 @@ function syncBrowserNotifToggleButtons() {
 let lastLiveProofSig = "";
 
 export function maybeNotifyLiveProof() {
+  if (!inboxKindAllowsOsNotification("live_proof")) return;
   if (!isBrowserNotifEnabled()) return;
   if (!notificationSupported() || notificationPermission() !== "granted") return;
   if (document.visibilityState === "visible") return;
