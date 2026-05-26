@@ -264,6 +264,32 @@ describe("handlePostVouch", () => {
     });
   });
 
+  it("lets stewards vouch without the 90 day wait", async () => {
+    const db = new FakeVerificationDb();
+    const voucherKeys = await keypair();
+    const voucheeKeys = await keypair();
+    const voucherProfileId = "8Ym8nQ3pR5sU7wX9zA2bC4dE6";
+    db.addCard(voucherProfileId, voucherKeys.publicKeyBase58);
+    db.addCard(VOUCHEE, voucheeKeys.publicKeyBase58);
+    db.setSummary(voucherProfileId, {
+      state: "steward",
+      level: 3,
+      label: "Steward",
+      method: "governance",
+      updated_at: "2026-05-20T00:00:00.000Z",
+    });
+
+    const res = await post(
+      db,
+      await signedVouch({
+        voucherProfileId,
+        createdAt: "2026-05-21T17:00:00.000Z",
+        ...voucherKeys,
+      })
+    );
+    expect(res.status).toBe(201);
+  });
+
   it("enforces the 90 day wait period", async () => {
     const db = new FakeVerificationDb();
     const voucherKeys = await keypair();

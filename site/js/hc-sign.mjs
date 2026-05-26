@@ -231,19 +231,19 @@ export function getCardJsonUrl(profileId) {
 }
 
 export function postVouchUrl() {
-  return new URL("/v1/verification/vouches", resolverApiOrigin()).href;
+  return new URL("/.well-known/hc/v1/verification/vouches", resolverApiOrigin()).href;
 }
 
 export function getVouchUrl(vouchId) {
   return new URL(
-    `/v1/verification/vouches/${encodeURIComponent(vouchId)}`,
+    `/.well-known/hc/v1/verification/vouches/${encodeURIComponent(vouchId)}`,
     resolverApiOrigin()
   ).href;
 }
 
 export function postVouchRevokeUrl(vouchId) {
   return new URL(
-    `/v1/verification/vouches/${encodeURIComponent(vouchId)}/revoke`,
+    `/.well-known/hc/v1/verification/vouches/${encodeURIComponent(vouchId)}/revoke`,
     resolverApiOrigin()
   ).href;
 }

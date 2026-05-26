@@ -96,6 +96,8 @@ function plainVouchError(code, fallback) {
     PRIVATE_NOTE_NOT_ALLOWED: "Private notes can't be sent to the resolver.",
     REPLAYED_NONCE: "That request was already used. Try again.",
     INVALID_SIGNATURE: "Signature check failed. Use the keys from your create session.",
+    CARD_INVALID_SIGNATURE:
+      "Signature check failed. Use keys from Saved cards (Use keys) for this steward card.",
     SIGNATURE_MISMATCH: "Signature does not match your card keys.",
   };
   return map[code] || fallback || "Could not record vouch. Try again.";
@@ -362,13 +364,23 @@ async function init() {
         body: JSON.stringify({ vouch: signed }),
       });
 
-      const body = await res.json().catch(() => ({}));
+      const raw = await res.text();
+      let body = {};
+      try {
+        body = raw ? JSON.parse(raw) : {};
+      } catch {
+        body = {};
+      }
 
       if (!res.ok) {
-        setStatus(
-          plainVouchError(body?.error, body?.message),
-          "error"
-        );
+        const fallback =
+          body?.message ||
+          (res.status === 405
+            ? "Vouch service is not reachable on this URL."
+            : res.status >= 500
+              ? "Server error. Try again shortly."
+              : undefined);
+        setStatus(plainVouchError(body?.error, fallback), "error");
         submitBtn.disabled = false;
         return;
       }

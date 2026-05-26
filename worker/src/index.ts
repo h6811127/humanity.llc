@@ -217,7 +217,11 @@ export default {
       return withCors(request, res);
     }
 
-    if (path === "/v1/verification/vouches" && request.method === "POST") {
+    const vouchPostPaths = new Set([
+      "/v1/verification/vouches",
+      "/.well-known/hc/v1/verification/vouches",
+    ]);
+    if (vouchPostPaths.has(path) && request.method === "POST") {
       if (!env.DB) {
         return withCors(
           request,
@@ -228,7 +232,9 @@ export default {
       return withCors(request, res);
     }
 
-    const vouchMatch = path.match(/^\/v1\/verification\/vouches\/([^/]+)$/);
+    const vouchMatch = path.match(
+      /^(?:\/v1\/verification\/vouches|\/\.well-known\/hc\/v1\/verification\/vouches)\/([^/]+)$/
+    );
     if (vouchMatch && request.method === "GET") {
       if (!env.DB) {
         return withCors(
@@ -241,7 +247,7 @@ export default {
     }
 
     const vouchRevokeMatch = path.match(
-      /^\/v1\/verification\/vouches\/([^/]+)\/revoke$/
+      /^(?:\/v1\/verification\/vouches|\/\.well-known\/hc\/v1\/verification\/vouches)\/([^/]+)\/revoke$/
     );
     if (vouchRevokeMatch && request.method === "POST") {
       if (!env.DB) {

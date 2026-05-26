@@ -227,7 +227,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain('id="vouch-explainer"');
     expect(html).toContain("Saved cards");
     expect(html).toContain("Vouch for this person");
-    expect(html).toContain("vouch-issue.mjs?v=4");
+    expect(html).toContain("vouch-issue.mjs?v=5");
     expect(html).not.toContain("Limitations");
     expect(html).toContain("scan-limits-settings");
     expect(html).toContain('class="list"');

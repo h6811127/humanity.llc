@@ -166,13 +166,15 @@ export async function handlePostVouch(
     );
   }
 
-  const eligibleSince = minusDaysIso(createdAt, VOUCHER_WAIT_DAYS);
-  if (summary.updated_at > eligibleSince) {
-    return errorResponse(
-      "VOUCHER_TOO_NEW",
-      `Voucher must wait ${VOUCHER_WAIT_DAYS} days after verification before vouching.`,
-      403
-    );
+  if (summary.state !== "steward") {
+    const eligibleSince = minusDaysIso(createdAt, VOUCHER_WAIT_DAYS);
+    if (summary.updated_at > eligibleSince) {
+      return errorResponse(
+        "VOUCHER_TOO_NEW",
+        `Voucher must wait ${VOUCHER_WAIT_DAYS} days after verification before vouching.`,
+        403
+      );
+    }
   }
 
   if (await activeVouchPairExists(db, voucherProfileId, voucheeProfileId)) {
