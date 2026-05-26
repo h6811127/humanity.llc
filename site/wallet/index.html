@@ -107,16 +107,33 @@
 
         <p class="wallet-context-line" id="wallet-auto-save-line" hidden></p>
 
-        <div class="wallet-active-banner" id="wallet-active-banner" hidden role="status">
-          <div class="wallet-active-main">
-            <span class="wallet-active-dot" aria-hidden="true"></span>
-            <div class="wallet-active-copy">
-              <p class="wallet-active-eyebrow">Active in this tab</p>
-              <p class="wallet-active-label" id="wallet-active-label"></p>
-              <p class="wallet-active-detail">Signing keys stay here until you close this tab.</p>
+        <div
+          class="hc-emphasis-card hc-emphasis-card--active wallet-active-banner"
+          id="wallet-active-banner"
+          hidden
+          role="status"
+        >
+          <div class="hc-emphasis-card__main wallet-active-main">
+            <span
+              class="hc-emphasis-card__dot hc-emphasis-card__dot--success wallet-active-dot"
+              aria-hidden="true"
+            ></span>
+            <div class="hc-emphasis-card__copy wallet-active-copy">
+              <p class="hc-emphasis-card__eyebrow wallet-active-eyebrow" id="wallet-active-eyebrow">
+                Active in this tab
+              </p>
+              <p class="hc-emphasis-card__title wallet-active-label" id="wallet-active-label"></p>
+              <p class="hc-emphasis-card__detail wallet-active-detail" id="wallet-active-detail">
+                Signing keys stay here until you close this tab.
+              </p>
             </div>
           </div>
-          <a class="wallet-active-link" id="wallet-active-link" href="/created/">Open workspace</a>
+          <a
+            class="hc-emphasis-card__cta wallet-active-link"
+            id="wallet-active-link"
+            href="/created/"
+            >Open workspace</a
+          >
         </div>
 
         <p class="wallet-strip-hint" id="wallet-tab-hint" hidden>
@@ -309,7 +326,7 @@
       </main>
     </div>
 
-    <script src="/js/device-status-bootstrap.mjs?v=38" type="module"></script>
+    <script src="/js/device-status-bootstrap.mjs?v=39" type="module"></script>
     <script src="/js/wallet-page.mjs?v=5" type="module"></script>
   </body>
 </html>

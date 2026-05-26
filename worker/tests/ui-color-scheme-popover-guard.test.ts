@@ -165,9 +165,13 @@ describe("UI color scheme popover guard", () => {
         require: ["--surface-popover-fg"],
       }
     );
-    assertGuardedRule("site/styles.css", ".wallet-active-banner", {
+    assertGuardedRule("site/styles.css", ".hc-emphasis-card", {
       require: ["--hc-emphasis-card-shadow", "border: none"],
       forbid: ["--hc-emphasis-card-border", "rgba(10, 132, 255, 0.44)"],
+    });
+    assertGuardedRule("site/styles.css", ".hc-emphasis-card--active", {
+      require: ["--hc-emphasis-card-fill-active"],
+      forbid: ["rgba(10, 132, 255, 0.1)"],
     });
   });
 });

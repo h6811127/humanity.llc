@@ -72,7 +72,7 @@ See `docs/CARD_WORKSPACE_PHASE0.md` - Open card loads keys, auto-save default on
 - Landing **My cards** entry → `/wallet/` (homepage four-step progress strip retired — [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md))
 - Landing shortcut **My cards** (was “All saved cards”)
 - Cross-links from `/created/` hub and error copy use **My cards** for `/wallet/`
-- Active-session banner on wallet: **Open controls** (not “Open card page”)
+- Active-session banner on wallet: **Open controls** (not “Open card page”); `.hc-emphasis-card--active` on `#wallet-active-banner` — [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) Phase 0
 
 ---
 

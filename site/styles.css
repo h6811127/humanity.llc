@@ -35,7 +35,7 @@
   --surface-popover-warn-bg: rgba(255, 149, 0, 0.14);
   --surface-popover-warn-border: rgba(255, 149, 0, 0.32);
   --surface-popover-warn-fg: #a16207;
-  /* Emphasis notice cards — depth via shadow only (see docs/UI_COLOR_SCHEME_STANDARD.md) */
+  /* Emphasis notice cards — docs/HC_EMPHASIS_CARD_ROLLOUT.md · UI_COLOR_SCHEME_STANDARD.md */
   --hc-emphasis-card-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.96),
     inset 0 2px 5px rgba(255, 255, 255, 0.38),
@@ -45,6 +45,34 @@
     0 1px 2px rgba(0, 0, 0, 0.05),
     0 5px 18px rgba(0, 0, 0, 0.1),
     0 12px 32px rgba(0, 0, 0, 0.06);
+  --hc-emphasis-card-fill-active: linear-gradient(
+    160deg,
+    #f6f8f7 0%,
+    #f1f4f2 48%,
+    #ecf1ee 100%
+  );
+  --hc-emphasis-card-fill-info: linear-gradient(
+    160deg,
+    #f6f7f8 0%,
+    #f2f3f5 48%,
+    #eceef1 100%
+  );
+  --hc-emphasis-card-fill-warn: linear-gradient(
+    160deg,
+    #faf8f5 0%,
+    #f5f2ed 48%,
+    #f0ebe5 100%
+  );
+  --hc-emphasis-card-fill-urgent: linear-gradient(
+    160deg,
+    #faf6f7 0%,
+    #f5f0f2 48%,
+    #f0e9ec 100%
+  );
+  --hc-emphasis-card-eyebrow-active: #248a3d;
+  --hc-emphasis-card-eyebrow-info: #007aff;
+  --hc-emphasis-card-eyebrow-warn: #a16207;
+  --hc-emphasis-card-eyebrow-urgent: #c9342a;
 }
 
 *,
@@ -4885,7 +4913,7 @@ body.landing-focus-mode .screen-landing {
   margin-bottom: 6px;
 }
 
-.screen-wallet-sleek .wallet-active-banner {
+.screen-wallet-sleek .hc-emphasis-card.wallet-active-banner {
   margin-bottom: 4px;
 }
 
@@ -5613,7 +5641,8 @@ details[open] > .created-advanced-summary::after {
   color: var(--red);
 }
 
-.wallet-active-banner {
+/* hc-emphasis-card — raised device notices (docs/HC_EMPHASIS_CARD_ROLLOUT.md) */
+.hc-emphasis-card {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
@@ -5622,15 +5651,28 @@ details[open] > .created-advanced-summary::after {
   margin: 0 0 14px;
   padding: 14px 16px;
   border-radius: 14px;
-  background: linear-gradient(
-    135deg,
-    rgba(10, 132, 255, 0.1) 0%,
-    rgba(52, 199, 89, 0.08) 100%
-  );
   border: none;
+  outline: none;
   box-shadow: var(--hc-emphasis-card-shadow);
 }
 
+.hc-emphasis-card--active {
+  background: var(--hc-emphasis-card-fill-active);
+}
+
+.hc-emphasis-card--info {
+  background: var(--hc-emphasis-card-fill-info);
+}
+
+.hc-emphasis-card--warn {
+  background: var(--hc-emphasis-card-fill-warn);
+}
+
+.hc-emphasis-card--urgent {
+  background: var(--hc-emphasis-card-fill-urgent);
+}
+
+.hc-emphasis-card__main,
 .wallet-active-main {
   display: flex;
   align-items: flex-start;
@@ -5639,19 +5681,40 @@ details[open] > .created-advanced-summary::after {
   flex: 1 1 12rem;
 }
 
+.hc-emphasis-card__copy,
 .wallet-active-copy {
   min-width: 0;
 }
 
+.hc-emphasis-card__eyebrow,
 .wallet-active-eyebrow {
   margin: 0 0 2px;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgba(10, 132, 255, 0.95);
 }
 
+.hc-emphasis-card--active .hc-emphasis-card__eyebrow,
+.hc-emphasis-card--active .wallet-active-eyebrow,
+.wallet-active-banner .hc-emphasis-card__eyebrow,
+.wallet-active-banner .wallet-active-eyebrow {
+  color: var(--hc-emphasis-card-eyebrow-active);
+}
+
+.hc-emphasis-card--info .hc-emphasis-card__eyebrow {
+  color: var(--hc-emphasis-card-eyebrow-info);
+}
+
+.hc-emphasis-card--warn .hc-emphasis-card__eyebrow {
+  color: var(--hc-emphasis-card-eyebrow-warn);
+}
+
+.hc-emphasis-card--urgent .hc-emphasis-card__eyebrow {
+  color: var(--hc-emphasis-card-eyebrow-urgent);
+}
+
+.hc-emphasis-card__title,
 .wallet-active-label {
   margin: 0;
   font-size: 17px;
@@ -5661,6 +5724,7 @@ details[open] > .created-advanced-summary::after {
   line-height: 1.2;
 }
 
+.hc-emphasis-card__detail,
 .wallet-active-detail {
   margin: 4px 0 0;
   font-size: 13px;
@@ -5669,31 +5733,56 @@ details[open] > .created-advanced-summary::after {
   color: rgba(60, 60, 67, 0.78);
 }
 
+.hc-emphasis-card__cta,
 .wallet-active-link {
   flex-shrink: 0;
   padding: 8px 12px;
+  border: none;
   border-radius: 999px;
+  font: inherit;
   font-size: 13px;
   font-weight: 600;
   color: #fff;
   text-decoration: none;
   background: var(--red);
   box-shadow: 0 1px 2px rgba(219, 27, 67, 0.25);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
+.hc-emphasis-card__cta:active,
 .wallet-active-link:active {
   opacity: 0.88;
   transform: scale(0.98);
 }
 
-.wallet-active-dot {
+.hc-emphasis-card__dot {
   width: 9px;
   height: 9px;
   margin-top: 5px;
   border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.hc-emphasis-card__dot--success,
+.wallet-active-dot {
   background: #34c759;
   box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.22);
-  flex-shrink: 0;
+}
+
+.hc-emphasis-card__dot--info {
+  background: #007aff;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+}
+
+.hc-emphasis-card__dot--warn {
+  background: #ff9500;
+  box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.22);
+}
+
+.hc-emphasis-card__dot--urgent {
+  background: #ff3b30;
+  box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.22);
 }
 
 .hc-notice-actions {

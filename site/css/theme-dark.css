@@ -47,6 +47,34 @@ html[data-theme="dark"] {
     0 2px 6px rgba(0, 0, 0, 0.32),
     0 8px 24px rgba(0, 0, 0, 0.48),
     0 16px 40px rgba(0, 0, 0, 0.32);
+  --hc-emphasis-card-fill-active: linear-gradient(
+    160deg,
+    #1e2421 0%,
+    #1c1c1e 55%,
+    #1a211d 100%
+  );
+  --hc-emphasis-card-fill-info: linear-gradient(
+    160deg,
+    #1e2226 0%,
+    #1c1c1e 55%,
+    #1a1f24 100%
+  );
+  --hc-emphasis-card-fill-warn: linear-gradient(
+    160deg,
+    #24211c 0%,
+    #1c1c1e 55%,
+    #211e1a 100%
+  );
+  --hc-emphasis-card-fill-urgent: linear-gradient(
+    160deg,
+    #241c1f 0%,
+    #1c1c1e 55%,
+    #211a1d 100%
+  );
+  --hc-emphasis-card-eyebrow-active: #30d158;
+  --hc-emphasis-card-eyebrow-info: #64b5ff;
+  --hc-emphasis-card-eyebrow-warn: #ffb340;
+  --hc-emphasis-card-eyebrow-urgent: #ff6961;
 }
 
 html[data-theme="dark"] body {
@@ -480,22 +508,12 @@ html[data-theme="dark"] .hc-notice-ack {
   color: var(--hc-notice-fg);
 }
 
-html[data-theme="dark"] .wallet-active-banner {
-  background: linear-gradient(
-    135deg,
-    rgba(10, 132, 255, 0.18) 0%,
-    rgba(48, 209, 88, 0.12) 100%
-  );
-}
-
-html[data-theme="dark"] .wallet-active-eyebrow {
-  color: #64d2ff;
-}
-
+html[data-theme="dark"] .hc-emphasis-card__title,
 html[data-theme="dark"] .wallet-active-label {
   color: var(--shell-label-strong);
 }
 
+html[data-theme="dark"] .hc-emphasis-card__detail,
 html[data-theme="dark"] .wallet-active-detail {
   color: var(--shell-label);
 }
