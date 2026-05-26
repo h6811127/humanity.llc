@@ -224,6 +224,82 @@ html[data-theme="dark"] .hub-card-details-body {
   color: var(--shell-label);
 }
 
+html[data-theme="dark"] .hub-card-head .list-title {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .hub-card-identity {
+  color: var(--shell-label);
+}
+
+html[data-theme="dark"] .hub-card-identity--steward {
+  color: #30d158;
+}
+
+html[data-theme="dark"] .hub-card-identity--vouched {
+  color: #64b5ff;
+}
+
+html[data-theme="dark"] .hub-card-status--ok {
+  color: #30d158;
+}
+
+html[data-theme="dark"] .hub-card-status--ok .hub-card-status-dot {
+  background: #30d158;
+  box-shadow: 0 0 0 2px rgba(48, 209, 88, 0.28);
+}
+
+html[data-theme="dark"] .hub-card-status--warn .hub-card-status-dot {
+  box-shadow: 0 0 0 2px rgba(255, 69, 58, 0.28);
+}
+
+html[data-theme="dark"] .hub-card-menu-section-label {
+  color: var(--shell-label);
+}
+
+html[data-theme="dark"] .hub-card-menu-divider {
+  background: var(--shell-separator);
+}
+
+html[data-theme="dark"] .hub-card-details-summary {
+  color: #0a84ff;
+}
+
+html[data-theme="dark"] .hub-card-identity--steward {
+  color: #30d158;
+}
+
+html[data-theme="dark"] .hub-card-identity--vouched {
+  color: #64d2ff;
+}
+
+html[data-theme="dark"] .hub-card-identity--warn {
+  color: #ff6961;
+}
+
+html[data-theme="dark"] .hub-card-status--ok {
+  color: #30d158;
+}
+
+html[data-theme="dark"] .hub-card-status--ok .hub-card-status-dot {
+  background: #30d158;
+  box-shadow: 0 0 0 2px rgba(48, 209, 88, 0.28);
+}
+
+html[data-theme="dark"] .hub-card-status--warn {
+  color: #ff6961;
+}
+
+html[data-theme="dark"] .hub-card-status--warn .hub-card-status-dot {
+  background: #ff6961;
+  box-shadow: 0 0 0 2px rgba(255, 105, 97, 0.22);
+}
+
+html[data-theme="dark"] .hub-card-status--offline,
+html[data-theme="dark"] .hub-card-status--muted {
+  color: var(--shell-label);
+}
+
 html[data-theme="dark"] .created-primary-actions {
   background: var(--shell-fill);
   border-color: var(--shell-separator);

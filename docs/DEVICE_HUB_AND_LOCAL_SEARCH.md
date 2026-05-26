@@ -30,7 +30,7 @@ These notes are captured as individual product refinements so implementation can
 5. **Strengthen object identity visuals**
    - Object type on **identity line** (`Live demo · Registered`); left accent bar per type (shipped).
 6. **Push shell further toward iOS-native feel**
-   - Frosted hub sheet, elevation cards (shipped); further typography pass planned (Phase 3).
+   - Frosted hub sheet, elevation cards (shipped); row typography pass shipped (Row Phase 3).
 7. **Make object actions primary**
    - Object control pills shipped; grouping into ⋯ planned (Phase 2).
 
@@ -45,7 +45,7 @@ These notes are captured as individual product refinements so implementation can
 - **Step 7 (shipped):** action-forward controls → `openCardControlPage()`.
 - **Row Phase 1 (shipped):** information consolidation per [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md).
 - **Row Phase 2 (shipped):** steward actions in ⋯ **QR & lifecycle**; **Prove live** stays inline when pending ([`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md)).
-- **Row Phase 3 (planned):** typography and spacing polish on rows.
+- **Row Phase 3 (shipped):** typography ladder, status dot rings, tightened spacing ([`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md)).
 
 ---
 

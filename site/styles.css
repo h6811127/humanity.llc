@@ -612,8 +612,19 @@ body.page-flow.has-shell-chrome .page > main.screen {
 }
 
 .hub-card-item {
+  /* Row Phase 3 — typography ladder (see docs/HUB_CARD_ROW_UX.md) */
+  --hub-row-title-size: var(--hub-card-title-size, 15px);
+  --hub-row-title-line: 1.22;
+  --hub-row-title-weight: var(--hub-card-title-weight, 600);
+  --hub-row-identity-size: var(--hub-card-identity-size, 12px);
+  --hub-row-identity-line: 1.3;
+  --hub-row-status-size: var(--hub-card-status-size, 12px);
+  --hub-row-status-line: 1.2;
+  --hub-row-detail-size: var(--hub-card-meta-size, 11px);
+  --hub-row-detail-body-size: 12px;
+  --hub-row-stack: var(--hub-card-row-gap, 2px);
   list-style: none;
-  margin: 0 0 6px;
+  margin: 0 0 5px;
   padding: 0;
   border-radius: var(--shell-radius-card, 14px);
   background: var(--shell-fill, var(--white));
@@ -663,9 +674,37 @@ body.page-flow.has-shell-chrome .page > main.screen {
 .hub-card-head {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  padding: 8px 12px 3px;
+  gap: 10px;
+  padding: 10px 12px 4px;
   flex-wrap: nowrap;
+}
+
+.hub-card-head .list-icon {
+  width: 34px;
+  height: 34px;
+  margin-top: 1px;
+  border-radius: 9px;
+}
+
+.hub-card-head .list-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.hub-card-head .list-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hub-row-stack);
+  flex: 1;
+  min-width: 0;
+}
+
+.hub-card-head .list-title {
+  margin: 0;
+  font-size: var(--hub-row-title-size);
+  font-weight: var(--hub-row-title-weight);
+  line-height: var(--hub-row-title-line);
+  letter-spacing: -0.02em;
 }
 
 .hub-card-head-meta {
@@ -827,9 +866,9 @@ body.page-flow.has-shell-chrome .page > main.screen {
 
 .hub-card-identity {
   display: block;
-  margin-top: 2px;
-  font-size: 12px;
-  line-height: 1.3;
+  margin-top: 0;
+  font-size: var(--hub-row-identity-size);
+  line-height: var(--hub-row-identity-line);
   font-weight: 500;
   color: var(--grey);
 }
@@ -849,21 +888,22 @@ body.page-flow.has-shell-chrome .page > main.screen {
 .hub-card-status {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 3px;
-  font-size: 11px;
-  line-height: 1.25;
+  gap: 5px;
+  margin-top: 0;
+  font-size: var(--hub-row-status-size);
+  line-height: var(--hub-row-status-line);
   font-weight: 500;
   color: var(--grey);
 }
 
 .hub-card-status-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   flex-shrink: 0;
   background: currentColor;
-  opacity: 0.5;
+  opacity: 0.45;
+  box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 18%, transparent);
 }
 
 .hub-card-status-label {
@@ -877,6 +917,7 @@ body.page-flow.has-shell-chrome .page > main.screen {
 .hub-card-status--ok .hub-card-status-dot {
   opacity: 1;
   background: #1a6b32;
+  box-shadow: 0 0 0 2px rgba(26, 107, 50, 0.22);
 }
 
 .hub-card-status--warn {
@@ -886,6 +927,7 @@ body.page-flow.has-shell-chrome .page > main.screen {
 .hub-card-status--warn .hub-card-status-dot {
   opacity: 1;
   background: var(--red);
+  box-shadow: 0 0 0 2px rgba(219, 27, 67, 0.18);
 }
 
 .hub-card-status--offline,
@@ -893,15 +935,23 @@ body.page-flow.has-shell-chrome .page > main.screen {
   color: var(--grey);
 }
 
+.hub-card-status--offline .hub-card-status-dot,
+.hub-card-status--muted .hub-card-status-dot {
+  opacity: 0.55;
+  box-shadow: none;
+}
+
 .hub-card-details {
-  margin: 2px 0 0;
-  font-size: 12px;
+  margin: 1px 0 0;
+  font-size: var(--hub-row-detail-size);
 }
 
 .hub-card-details-summary {
   color: #007aff;
   cursor: pointer;
   font-weight: 600;
+  font-size: var(--hub-row-detail-size);
+  letter-spacing: 0.01em;
   list-style: none;
 }
 
@@ -911,7 +961,8 @@ body.page-flow.has-shell-chrome .page > main.screen {
 
 .hub-card-details-body {
   display: block;
-  margin-top: 3px;
+  margin-top: 2px;
+  font-size: var(--hub-row-detail-body-size, 12px);
   color: var(--grey);
   line-height: 1.35;
 }
@@ -920,9 +971,9 @@ body.page-flow.has-shell-chrome .page > main.screen {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 10px;
-  margin: 0 8px 8px;
-  padding: 10px 12px;
+  gap: 8px;
+  margin: 0 10px 6px;
+  padding: 9px 11px;
   border-radius: 10px;
   font-size: 13px;
   font-weight: 500;
@@ -996,15 +1047,15 @@ body.page-flow.has-shell-chrome .page > main.screen {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
-  padding: 0 8px 6px 12px;
+  gap: 5px;
+  padding: 0 10px 4px 12px;
 }
 
 .hub-card-control {
   display: inline-flex;
   align-items: center;
-  min-height: 32px;
-  padding: 6px 12px;
+  min-height: 30px;
+  padding: 5px 11px;
   border-radius: var(--radius-pill);
   border: none;
   background: var(--shell-fill-secondary, rgba(0, 0, 0, 0.05));
@@ -1045,15 +1096,15 @@ body.page-flow.has-shell-chrome .page > main.screen {
 .hub-card-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 0 8px 7px 12px;
+  gap: 5px;
+  padding: 0 10px 9px 12px;
 }
 
 .hub-card-actions-primary {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   flex: 1;
   min-width: 0;
 }
@@ -1078,7 +1129,7 @@ body.page-flow.has-shell-chrome .page > main.screen {
   display: inline-flex;
   align-items: center;
   min-height: 30px;
-  padding: 5px 11px;
+  padding: 5px 10px;
   border-radius: var(--radius-pill);
   border: none;
   background: var(--shell-fill-secondary, rgba(0, 0, 0, 0.05));

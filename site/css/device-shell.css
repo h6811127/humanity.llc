@@ -27,6 +27,14 @@
   --shell-radius-sheet: 20px;
   --shell-radius-card: 14px;
   --shell-radius-control: 12px;
+  /* Hub saved-card row typography (HUB_CARD_ROW_UX Phase 3) */
+  --hub-card-row-gap: 5px;
+  --hub-card-title-size: 15px;
+  --hub-card-title-weight: 600;
+  --hub-card-title-tracking: -0.025em;
+  --hub-card-identity-size: 12px;
+  --hub-card-status-size: 12px;
+  --hub-card-meta-size: 11px;
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -1187,6 +1195,17 @@ button.device-hub-notice-banner {
   transition:
     transform 0.35s var(--shell-spring),
     box-shadow 0.35s var(--shell-ease);
+}
+
+/* Row Phase 3 — shell tokens align with styles.css ladder */
+.hub-card-head .list-title {
+  color: var(--shell-label-strong, var(--black));
+}
+
+.hub-card-identity,
+.hub-card-status--offline,
+.hub-card-status--muted {
+  color: var(--shell-label, var(--grey));
 }
 
 .hub-card-item:active {

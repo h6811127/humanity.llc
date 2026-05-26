@@ -69,7 +69,7 @@ test.describe("device OS wallet flow", () => {
     );
     await page.goto("/wallet/");
     await expect(page.getByText("Reachable")).toBeVisible({ timeout: 15_000 });
-    await page.getByRole("button", { name: "More options" }).click();
+    await page.getByLabel("More options").click();
     await page.getByRole("button", { name: "Update status" }).click();
     await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
     await expect(page).toHaveURL(/#update-status/);

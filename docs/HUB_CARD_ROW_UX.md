@@ -1,6 +1,6 @@
 # Hub saved card row UX
 
-**Status:** Phases 1–2 shipped (May 2026) · Phase 3 planned  
+**Status:** Phases 1–3 shipped (May 2026)  
 **Scope:** Saved card rows in the device hub (`/`, `/wallet/`, `/created/`) — `renderSavedRows()` in `site/js/device-hub-ui.mjs`  
 **Companions:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md), [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)
 
@@ -22,7 +22,7 @@ Saved card rows accumulated overlapping UI: handle repeated in title, sub-line, 
 
 ---
 
-## Collapsed row anatomy (Phases 1–2 shipped)
+## Collapsed row anatomy (Phases 1–3 shipped)
 
 ```text
 ┌─────────────────────────────────────────────────┐
@@ -109,9 +109,12 @@ Implementation: `getCachedNetworkSeenAt()` → `entry.at` set in `refreshWalletN
 - [x] `partitionHubCardControls()` — **Prove live** inline; **Update status** / **Revoke QR** / **New QR** (and revoke-state) under ⋯ **QR & lifecycle**.
 - [x] Collapsed row shows **Open controls** + **Open scan** (+ inline prove live when pending).
 
-### Phase 3 — Visual polish (planned)
+### Phase 3 — Visual polish (shipped)
 
-- Typography ladder, status dot, tightened spacing (`styles.css`, `device-shell.css`, `theme-dark.css`).
+- [x] Typography ladder — title 15px / identity 12px / status 12px / Details summary 11px (`--hub-row-*` on `.hub-card-item`, `--hub-card-*` in `device-shell.css`).
+- [x] Status dot — 7px with soft ring on ok/warn; flat dot for muted/offline.
+- [x] Tighter row rhythm — 5px card gap, compact head/controls/actions padding; 34px trust icon.
+- [x] Shell + dark theme — label tokens in `device-shell.css`; identity/status/menu in `theme-dark.css`.
 
 ---
 
@@ -137,4 +140,4 @@ Manual: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — revoked since visit, QR-only re
 | DOM render + poll apply | `site/js/device-hub-ui.mjs` |
 | Network cache + `entry.at` | `site/js/device-wallet-network.mjs` |
 | Chip labels (hub status line only; not row pills) | `site/js/device-wallet-network-core.mjs` — `networkStatusChip()` still used elsewhere |
-| Row CSS | `site/styles.css` (`.hub-card-status`, `.hub-card-identity`) |
+| Row CSS + tokens | `site/styles.css`, `site/css/device-shell.css`, `site/css/theme-dark.css` |

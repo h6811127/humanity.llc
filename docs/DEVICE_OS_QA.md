@@ -168,6 +168,18 @@ Spec: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 
 Playwright: `e2e/device-inbox.spec.ts` (CI via `test-site.yml`). Manual spot-check still useful on real Worker + pending challenge.
 
+## P5c — Hub saved card row visuals (Row Phase 3)
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Open `/wallet/` with 2+ saved cards | Each row: title → identity line → status dot + line; no duplicate network/verification pills |
+| 2 | Check status copy | **Reachable · checked …** (not **seen** / **Live State Active** on row) |
+| 3 | Expand **Details** | Keys/profile metadata only; handle not repeated in title when title is `@handle` |
+| 4 | Open ⋯ menu | **QR & lifecycle** section holds steward actions; **Open controls** + **Open scan** remain primary |
+| 5 | Toggle dark theme | Identity/status tones readable; status dot rings visible on ok/warn |
+
+See [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md).
+
 ## P5b — Glance row plan (phase 10)
 
 | Step | Action | Expected |
