@@ -1,6 +1,7 @@
 /**
  * Compact hub summary: landing when sheet is collapsed; /wallet/ always when non-empty.
  */
+import { cardDisabledProfileIdsFromInbox } from "./device-inbox-core.mjs";
 import { getInboxItems } from "./device-inbox.mjs";
 import { openInboxFromChrome } from "./device-inbox-sheet.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
@@ -9,6 +10,7 @@ import {
   getLatestResolvedAlertState,
   getLatestResolvedScanKind,
   getNetworkLastSeenBaseline,
+  NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import {
@@ -139,6 +141,7 @@ function refreshGlanceTarget(target) {
   const { root, list, wallet } = target;
   const copy = glanceCopy(wallet);
   const inboxItems = getInboxItems();
+  const cardDisabledPids = cardDisabledProfileIdsFromInbox(inboxItems);
   const entries = loadWallet();
   const hasCards = entries.length > 0;
 
@@ -159,6 +162,7 @@ function refreshGlanceTarget(target) {
     const li = document.createElement("li");
     const alertState = getLatestResolvedAlertState(entry.profile_id);
     const revokedSince =
+      !cardDisabledPids.has(entry.profile_id) &&
       alertState != null &&
       cardDisabledSinceVisitVisible(
         alertState,
@@ -218,6 +222,7 @@ if (glanceTargets.length > 0) {
   refreshHubGlance();
   window.addEventListener("hc-device-hub-changed", refreshHubGlance);
   window.addEventListener(NETWORK_REFRESHED, refreshHubGlance);
+  window.addEventListener(NETWORK_BASELINE_CHANGED, refreshHubGlance);
   window.addEventListener("hc-live-control-inbox-changed", refreshHubGlance);
   window.addEventListener("hc-tab-presence-changed", refreshHubGlance);
   window.addEventListener("storage", (e) => {

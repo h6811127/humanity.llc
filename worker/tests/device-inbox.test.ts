@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildInboxItems,
   buildInboxSheetRows,
+  cardDisabledProfileIdsFromInbox,
   inboxBadgeAriaLabel,
   inboxBadgeCountText,
   inboxCountFromItems,
@@ -74,6 +75,30 @@ describe("buildInboxItems", () => {
     expect(items.map((i) => i.kind)).toEqual(["card_disabled_since_visit"]);
     expect(items[0].count).toBe(2);
     expect(items[0].hubScrollTarget).toBe("device-hub-saved-group");
+  });
+});
+
+describe("cardDisabledProfileIdsFromInbox", () => {
+  it("collects profile ids from card_disabled_since_visit meta", () => {
+    const items = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 0,
+      crossTabEntries: [],
+      cardDisabledSinceVisit: [
+        { profile_id: "p1", label: "A" },
+        { profile_id: "p2", label: "B" },
+      ],
+    });
+    expect([...cardDisabledProfileIdsFromInbox(items)].sort()).toEqual(["p1", "p2"]);
+  });
+
+  it("returns empty when no card-disabled inbox row", () => {
+    const items = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 1,
+      crossTabEntries: [],
+    });
+    expect(cardDisabledProfileIdsFromInbox(items).size).toBe(0);
   });
 });
 

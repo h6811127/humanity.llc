@@ -118,6 +118,24 @@ export function buildInboxItems(input) {
 }
 
 /**
+ * Profile ids listed on card_disabled_since_visit inbox item(s).
+ * @param {InboxItem[]} items
+ * @returns {Set<string>}
+ */
+export function cardDisabledProfileIdsFromInbox(items) {
+  const ids = new Set();
+  for (const item of items) {
+    if (item.kind !== "card_disabled_since_visit") continue;
+    const entries = item.meta?.cardDisabledEntries;
+    if (!Array.isArray(entries)) continue;
+    for (const entry of entries) {
+      if (entry?.profile_id) ids.add(String(entry.profile_id));
+    }
+  }
+  return ids;
+}
+
+/**
  * @param {InboxItem[]} items
  */
 export function inboxCountFromItems(items) {

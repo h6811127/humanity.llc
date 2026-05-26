@@ -134,9 +134,11 @@ See [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 - Rows for live proof, cross-tab keys, unsaved tab keys, saved cards (+ revoked hint), “N more”.
 - Live proof tap → `expandHub('device-hub-live-control-group')`.
 
+**Shipped (card-disabled):** Inbox row from `buildInboxItems()`; glance skips duplicate “since last visit” suffix on saved-card rows when that profile is already in the inbox item (`cardDisabledProfileIdsFromInbox`).
+
 **Planned:**
 
-- Rows generated from `buildInboxItems()` only (no parallel logic).
+- Remaining glance rows (saved-card peek list) may move fully under `buildInboxItems()` later.
 
 ### Landing settings — Browser alerts
 
