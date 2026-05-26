@@ -33,9 +33,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run worker:test
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium webkit
       - name: Device shell E2E
-        run: npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device-os-wallet.spec.ts
+        run: npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device-os-wallet.spec.ts e2e/safari-shell-scroll.spec.ts
         env:
           CI: "true"

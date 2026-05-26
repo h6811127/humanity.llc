@@ -2,11 +2,11 @@
  * Bottom sheet host for #device-hub on shell pages.
  */
 import { prefersReducedMotion } from "./device-shell-motion.mjs";
-import { hubSheetReconcileAction } from "./device-hub-sheet-core.mjs?v=23";
+import { hubSheetReconcileAction } from "./device-hub-sheet-core.mjs?v=24";
 import {
   bindSheetLifecycleReconcile,
   syncSheetBackdropClosed,
-} from "./device-sheet-backdrop-sync.mjs?v=23";
+} from "./device-sheet-backdrop-sync.mjs?v=24";
 
 const HUB_OPEN_KEY = "hc_hub_open";
 

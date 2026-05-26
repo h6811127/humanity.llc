@@ -11,7 +11,6 @@ export default defineConfig({
   reporter: "list",
   timeout: 30_000,
   use: {
-    ...devices["Pixel 5"],
     baseURL,
   },
   webServer: process.env.PLAYWRIGHT_SKIP_WEBSERVER
@@ -22,4 +21,21 @@ export default defineConfig({
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
       },
+  projects: [
+    {
+      name: "chromium",
+      use: { ...devices["Pixel 5"] },
+      testIgnore: /safari-shell-scroll\.spec\.ts/,
+    },
+    {
+      name: "webkit",
+      use: { ...devices["Desktop Safari"] },
+      testMatch: /safari-shell-scroll\.spec\.ts/,
+    },
+    {
+      name: "iphone-13-pro",
+      use: { ...devices["iPhone 13 Pro"] },
+      testMatch: /safari-shell-scroll\.spec\.ts/,
+    },
+  ],
 });
