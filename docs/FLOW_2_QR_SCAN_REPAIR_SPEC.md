@@ -30,6 +30,25 @@
 
 **Note:** Static UI is under `site/` (Pages). Public scan is **Worker-only** (`GET /c/…`), not Pages.
 
+**HTML contract for `/c/…`:** [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) (layout, QR payload, status JSON parity, deploy). **Shipped vs deferred routes:** [`docs/V1_IMPLEMENTATION_CONTRACTS.md`](V1_IMPLEMENTATION_CONTRACTS.md) § Reference network — Flow 2 routes.
+
+---
+
+## Public scan surfaces (integrators)
+
+Use the right endpoint for the job. Do not treat `GET …/cards/{id}` as a scan page or `GET /c/…` as the signed card document.
+
+| Surface | Route | Response | When to use |
+|---------|-------|----------|-------------|
+| **Trust UI (humans)** | `GET /c/{profile_id}?q={qr_id}` | HTML pass + grouped trust lists (`X-HC-Scan-UI`) | Phone-camera QR; strangers; acceptance demos |
+| **Signed card document** | `GET /.well-known/hc/v1/cards/{profile_id}` | `application/json` by default; `Accept: text/html` returns JSON in `<pre>` (not a scan layout) | Integrators verifying or caching the signed card payload |
+| **Scan state (machines)** | `GET /.well-known/hc/v1/cards/{profile_id}/status?q={qr_id}` | JSON: `scan.kind`, card/human/QR/live blocks; same resolver truth as `/c/…` | Device hub poll, curl checks, automation with `profile_id` |
+| **QR credential metadata** | `GET /.well-known/hc/v1/qr/{qr_id}` | JSON credential fields only; 404 if unknown | Lookup when only `qr_id` is known (shipped; see `qr-metadata.ts`) |
+
+**UI shape:** Production scan is a **flat status panel** with grouped trust blocks below (see M3). There is no “flippable pass” product mode on `/c/…`; pass-card front/back in M3 refers to visual layout on one page, not a separate Pages route.
+
+**Deferred (documented, not scan substitutes):** `GET /v1/verification/status/{profile_id}`, `POST …/export`, anonymized scan access log (Slice 5 — product decision pending). See mismatch table F2-5, F2-10, F2-1.
+
 ---
 
 ## What works today
@@ -52,14 +71,14 @@
 
 | ID | Gap | Contract / audit reference |
 |----|-----|---------------------------|
-| F2-1 | No scan access log (anonymized IP) | Flow 2 step 2: “Access log with anonymized IP only” |
+| F2-1 | ✅ Resolved (v1): no scan access log — audit + data policy aligned (Slice 5 option B) |
 | F2-2 | ✅ Fixed: scan HTML shows offline banner when `navigator.onLine === false` (`scan-offline.ts`, `scan-offline-banner`). |
 | F2-3 | ✅ Fixed: suspended scan HTML + status JSON include links to data policy and architecture (`scan-governance.ts`). |
 | F2-4 | ✅ Fixed: `GET /.well-known/hc/v1/qr/{qr_id}` returns contract-shaped QR metadata (`qr-metadata.ts`). |
 | F2-5 | `GET /v1/verification/status/{profile_id}` not implemented | § API Verification table |
 | F2-6 | Card GET HTML is raw JSON `<pre>`, not public card view | § API: “HTML or JSON public card” |
 | F2-7 | Revoked card: GET card returns JSON 410; scan returns HTML 410 | Integrators vs humans split (document or align) |
-| F2-8 | Status JSON uses `scan.kind`, not `Error Contracts` codes | e.g. `QR_REVOKED` vs `qr_revoked` |
+| F2-8 | ✅ Fixed: status JSON adds optional `scan.error` contract code alongside `scan.kind` (`scan-contract-error.ts`) |
 | F2-9 | Minimal scan layouts hide trust blocks | Acceptance “separates … statuses” not met on `qr_expired` / some revoked layouts |
 | F2-10 | `POST …/export` not routed | § API (defer unless export needed for scan) |
 
@@ -67,15 +86,15 @@
 
 ## Repair slices (ordered)
 
-### Slice 1 — Contract clarity (no behavior change)
+### Slice 1 — Contract clarity (no behavior change) ✅
 
 **Goal:** Stop AI and integrators from guessing wrong endpoints.
 
-- [ ] Add `docs/FLOW_2_QR_SCAN_REPAIR_SPEC.md` cross-links to `M3_SCAN_PAGE_UI.md` as the HTML contract for `/c/…`.
-- [ ] Document intentional split: `/c/…` = trust UI; `GET …/cards/{id}` = signed document JSON; `GET …/status?q=` = scan state.
-- [ ] Decide: implement `GET …/qr/{qr_id}` **or** mark deferred in `V1_IMPLEMENTATION_CONTRACTS.md` with redirect note to status endpoint.
+- [x] Cross-links: this spec ↔ `M3_SCAN_PAGE_UI.md` (HTML contract) ↔ `V1_IMPLEMENTATION_CONTRACTS.md` (shipped vs deferred).
+- [x] Document intentional split in § Public scan surfaces (integrators) above.
+- [x] `GET …/qr/{qr_id}` **shipped** (Slice 4); listed in contracts § Reference network — Flow 2 routes (not deferred).
 
-**Done when:** Contract doc lists which routes are shipped vs deferred; no contradictory “flippable pass” copy in feature page vs flat scan UI (update `site/features/scan-ui.html` subline if needed).
+**Done when:** Contract doc lists which routes are shipped vs deferred; no contradictory “flippable pass” copy in feature page vs flat scan UI (`site/features/scan-ui.html` subline + design decisions aligned).
 
 ---
 
@@ -120,31 +139,26 @@
 
 ---
 
-### Slice 5 — Anonymized scan access log (P1 policy)
+### Slice 5 — Anonymized scan access log (P1 policy) ✅
 
 **Goal:** Reconcile Flow 2 step 2 with “no scan analytics by default.”
 
-**Decision required (product):**
+**Decision (data policy):** **B** — no access log in v1. [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) forbids scan analytics and defaults to no scan request logging; governance approval would be required before option A.
 
-- **A)** Implement minimal log: `profile_id`, `qr_id`, `ip_hash`, `resolved_kind`, `ts` (no raw IP retention).
-- **B)** Update `V1_FLOW_AUDIT.md` Flow 2 step 2 to “no access log in v1” and keep zero logging.
-
-If **A:**
-
-- [ ] Migration `scan_access_log` or reuse rate-limit hash pattern (`worker/src/db/rate-limit.ts`).
-- [ ] Call from `handleGetScan` / `handleGetScanStatus` after resolve (not on malformed).
-- [ ] Document retention in `docs/REFERENCE_OPERATOR_DATA_POLICY.md`.
+- [x] `V1_FLOW_AUDIT.md` Flow 2 validate step: persisted record = none (v1).
+- [x] `REFERENCE_OPERATOR_DATA_POLICY.md` + contracts table: reference network does not access-log scan routes.
+- [x] No `scan_access_log` migration or handler instrumentation.
 
 **Done when:** Policy doc + code match; health/docs do not claim logging that does not exist.
 
 ---
 
-### Slice 6 — Status JSON error codes (P2 integrators)
+### Slice 6 — Status JSON error codes (P2 integrators) ✅
 
 **Goal:** Optional `error` field for machine clients without breaking `scan.kind`.
 
-- [ ] Map `scan.kind` → contract codes (`CARD_SUSPENDED`, `QR_REVOKED`, …) in `scan-status.ts`.
-- [ ] Keep `scan.kind` for backward compatibility.
+- [x] Map `scan.kind` → contract codes (`CARD_SUSPENDED`, `QR_REVOKED`, …) in `scan-contract-error.ts` + `scan-status.ts`.
+- [x] Keep `scan.kind` for backward compatibility.
 
 **Done when:** `scan-status.test.ts` asserts code mapping for revoked/suspended/expired.
 
@@ -163,7 +177,7 @@ If **A:**
 
 ## Done when (Flow 2 overall)
 
-- [ ] All **P0** slices (2–3) shipped or explicitly deferred in contract with user-visible copy.
+- [x] All **P0** slices (2–3) shipped; Slice 1 contract clarity shipped.
 - [ ] `npm run worker:test` green; stranger runbook scan section passes on production.
 - [ ] `curl` checks in `docs/M5_STRANGER_TEST_RUNBOOK.md` still valid for `scan.kind` paths.
 - [ ] No regression: bearer warning on every scan HTML; `scan_analytics: false` in status JSON.

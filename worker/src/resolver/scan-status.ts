@@ -20,6 +20,7 @@ import {
   originFromScanUrl,
   type GovernanceProcessUrls,
 } from "./scan-governance";
+import { scanContractErrorForKind } from "./scan-contract-error";
 import { BEARER_WARNING } from "./trust-copy";
 import { humanTrustDisplay } from "./verification-display";
 
@@ -30,6 +31,8 @@ export interface ScanStatusBody {
   resolver: { operator: string; version: string };
   scan: {
     kind: ScanPageKind;
+    /** Contract error code when kind is a failure state; omitted for `active`. */
+    error?: string;
     profile_id: string | null;
     qr_id: string | null;
     scan_url: string | null;
@@ -73,6 +76,7 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
   const origin = originFromScanUrl(vm.scanUrl);
   const governance =
     vm.kind === "card_suspended" ? governanceProcessUrls(origin) : undefined;
+  const error = scanContractErrorForKind(vm.kind, vm.qrScope);
   return {
     version: PROTOCOL_VERSION,
     resolver: {
@@ -81,6 +85,7 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
     },
     scan: {
       kind: vm.kind,
+      ...(error ? { error } : {}),
       profile_id: vm.profileId,
       qr_id: vm.qrId,
       scan_url: vm.scanUrl,

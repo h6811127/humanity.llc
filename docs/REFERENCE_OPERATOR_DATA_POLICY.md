@@ -26,6 +26,7 @@ Minimize stored data so the network is not a surveillance honeypot. Publish what
 ## Access logs
 
 - **Default:** no logging of scan requests.
+- **Reference network v1:** `GET /c/…`, `GET …/status?q=…`, and `GET …/qr/{qr_id}` are **not** access-logged. Status JSON exposes `scan.limits.scan_analytics: false`.
 - If minimal access logs are ever required for abuse response, that MUST be a **governance-approved** policy with published retention - not a silent product default.
 
 ## Commerce firewall

@@ -50,7 +50,7 @@ Hardening finding: card creation is rebuild-ready if the first slice uses only p
 | Step | Owner | Persisted Record | Failure State | Privacy Boundary |
 |---|---|---|---|---|
 | Scan HTTPS fallback QR | Scanner browser | None required | Malformed URL, unknown profile, unknown QR | No scan analytics by default. |
-| Validate profile and QR IDs | Network API | Access log with anonymized IP only | Invalid ID, QR not linked to card | QR payload must not contain order/PII data. |
+| Validate profile and QR IDs | Network API | None (v1; no scan access logs per [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)) | Invalid ID, QR not linked to card | QR payload must not contain order/PII data. |
 | Resolve status | Network API | Card status, QR status | Revoked, suspended, expired, unknown | Public data only. |
 | Render HTML/JSON | Network/API frontend | None required beyond cache | Stale cached card | UI must show stale/offline state and bearer warning for printed-item QR. |
 

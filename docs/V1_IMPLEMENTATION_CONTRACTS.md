@@ -75,6 +75,23 @@ Optional but high-leverage for v1.1 or a strong private alpha:
 |---|---|
 | `GET /c/{profile_id}?q={qr_id}` | Phone-camera QR fallback. Must render public card or status page. |
 
+### Reference network — Flow 2 routes (shipped vs deferred)
+
+**Repair spec:** [`docs/FLOW_2_QR_SCAN_REPAIR_SPEC.md`](FLOW_2_QR_SCAN_REPAIR_SPEC.md). **Scan HTML contract:** [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md).
+
+| Route | Status | Audience | Response / notes |
+|---|---|---|---|
+| `GET /c/{profile_id}?q={qr_id}` | **Shipped** | Humans (phone QR) | Worker HTML trust UI; not the signed card document |
+| `GET /.well-known/hc/v1/cards/{profile_id}/status?q={qr_id}` | **Shipped** | Machines | JSON scan state (`scan.kind`); parity with `/c/…` HTML |
+| `GET /.well-known/hc/v1/cards/{profile_id}` | **Shipped** (partial HTML) | Integrators | Default JSON signed card; `Accept: text/html` is JSON-in-`<pre>` only (F2-6 backlog for a real public card HTML view) |
+| `GET /.well-known/hc/v1/qr/{qr_id}` | **Shipped** | Integrators | QR credential metadata without `profile_id` in path |
+| `GET /v1/verification/status/{profile_id}` | **Deferred** | Integrators | Use `…/status?q=` for scan/card/QR state in v1 (F2-5) |
+| `POST /.well-known/hc/v1/cards/{profile_id}/export` | **Deferred** | Owner | Not routed (F2-10) |
+| Anonymized scan access log | **Not in v1** | Operator | Data policy default: no scan logging; audit step 2 reconciled (F2-1 / Slice 5 option B) |
+| Status JSON `error` contract codes | **Shipped** | Integrators | Optional `scan.error` alongside `scan.kind` on `…/status?q=` (F2-8) |
+
+Revoked card: `GET …/cards/{id}` returns JSON **410**; `GET /c/…` returns HTML **410** — intentional human vs integrator split (F2-7; document only until aligned).
+
 ### Verification API
 
 | Endpoint | Method | Auth | Contract |

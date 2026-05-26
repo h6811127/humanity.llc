@@ -2,7 +2,8 @@
 
 **Status:** Implementation contract for Worker HTML  
 **Product spec (scanner safety, recognition, external-link policy):** [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md)  
-**Related:** `docs/V1_PRODUCT_TRUST_MODEL.md`, `docs/V1_0_ARCHITECTURE_ROADMAP.md` §7, `docs/V1_IMPLEMENTATION_CONTRACTS.md` (QR payload)
+**Route map (scan vs card JSON vs status vs qr metadata):** [`docs/FLOW_2_QR_SCAN_REPAIR_SPEC.md`](FLOW_2_QR_SCAN_REPAIR_SPEC.md) § Public scan surfaces  
+**Related:** `docs/V1_PRODUCT_TRUST_MODEL.md`, `docs/V1_0_ARCHITECTURE_ROADMAP.md` §7, `docs/V1_IMPLEMENTATION_CONTRACTS.md` (QR payload + § Reference network — Flow 2 routes)
 
 ---
 
@@ -10,11 +11,21 @@
 
 The scan page is **live resolver output** (Cloudflare Worker), not the static Pages site. Deploy with `npm run worker:deploy`. Pages deploy alone does not change `/c/…`.
 
-Response header when the new UI is live: `X-HC-Scan-UI: pass-v4` (or later).
+Response header when the new UI is live: `X-HC-Scan-UI: pass-v20` (or later).
 
 ---
 
-## Layout (three layers)
+## Layout (scanner-first)
+
+1. **Scanner safety header** — Humanity object badge, large status strip, fact chips, optional resolver signature line, device-local first-seen (`docs/SCANNER_EXPERIENCE.md` Phase B; `scan-safety.ts`).
+2. **Status panel** — At-a-glance identity: handle or object label, manifesto/status facts, **this object’s scan QR**, bearer line above panel.
+3. **Grouped lists below** — iOS-style sections per trust model: Card status, Human trust, This QR, Live control, Limitations.
+
+Legacy flippable pass card markup remains in `scan-html.ts` for reference; active scan HTML uses the flat **status panel** only.
+
+---
+
+## Layout (historical pass card — reference)
 
 1. **Pass card (front)**  -  At-a-glance identity: handle, manifesto, trust pills, **this card’s scan QR**, one-line bearer foot.
 2. **Pass card (back)**  -  Short limits only (same pattern as landing preview): bearer, not ID, revocable, link to data policy.
@@ -58,6 +69,7 @@ Below-card rows use **colored tile + white stroke SVG** (same visual language as
 | Path | Role |
 |------|------|
 | `worker/src/resolver/scan-html.ts` | HTML template |
+| `worker/src/resolver/scan-safety.ts` | Scanner safety header + first-seen script |
 | `worker/src/resolver/scan-state.ts` | View model + `scanUrl` |
 | `worker/src/resolver/scan-qr.ts` | Branded SVG QR + center logo overlay |
 | `worker/src/resolver/scan-icons.ts` | List row SVGs |
@@ -82,11 +94,13 @@ After changing `scan-pass.css` or `pass-flip.js`, run `npm run worker:bundle-sca
 | Live control |  -  | Group: not shown / proven (M7) |
 | Limitations | Back face summary | Group: not ID, no analytics, data policy link |
 
-**Limits copy:** one line above the card (`scan-bearer-line`, Level 0 canonical sentence). Status groups are **facts only** (card, human trust, QR, live control). All “does not prove” detail lives in one **settings-style** `<details>` row at the bottom (`scan-limits-settings`). Response header `X-HC-Scan-UI: pass-v5`.
+**Limits copy:** one line above the status panel (`scan-bearer-line`, Level 0 canonical sentence). Status groups are **facts only** (card, human trust, QR, live control). All “does not prove” detail lives in one **settings-style** `<details>` row at the bottom (`scan-limits-settings`). Response header `X-HC-Scan-UI: pass-v20`.
 
 ---
 
 ## Machine-readable status (M3.4)
+
+Prefer this endpoint (with `profile_id`) for the same trust state as `/c/…`. When only `qr_id` is known, use `GET /.well-known/hc/v1/qr/{qr_id}` (credential metadata; see `worker/src/resolver/qr-metadata.ts`).
 
 `GET /.well-known/hc/v1/cards/{profile_id}/status`
 
@@ -96,6 +110,8 @@ After changing `scan-pass.css` or `pass-flip.js`, run `npm run worker:bundle-sca
 | (none) | Card-level status only; no QR artifact fields |
 
 Implementation: `worker/src/resolver/scan-status.ts`. HTTP status codes match scan HTML (`404` unknown, `400` malformed/mismatch, `410` card revoked). `Cache-Control` matches the scan view model.
+
+Failure states also include optional `scan.error` (contract code, e.g. `QR_REVOKED`) while `scan.kind` stays the stable snake_case key (`scan-contract-error.ts`).
 
 ```bash
 curl -s "https://humanity.llc/.well-known/hc/v1/cards/{profile_id}/status?q={qr_id}" | jq .scan.kind

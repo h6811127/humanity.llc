@@ -75,6 +75,7 @@ describe("scan status JSON (M3.4)", () => {
     );
     const body = scanStatusBodyFromViewModel(vm);
     expect(body.scan.kind).toBe("active");
+    expect(body.scan.error).toBeUndefined();
     expect(body.scan.scan_url).toBe(`https://humanity.llc/c/${PROFILE}?q=${QR}`);
     expect(body.scan.qr?.status).toBe("active");
     expect(body.scan.limits.bearer_warning).toBe(BEARER_WARNING);
@@ -124,6 +125,81 @@ describe("scan status JSON (M3.4)", () => {
     );
     expect(vm.kind).toBe("unknown_profile");
     expect(httpStatusForScanKind(vm.kind)).toBe(404);
+  });
+
+  it("maps scan.kind to contract error codes (F2-8)", () => {
+    const suspended = scanStatusBodyFromViewModel(
+      buildScanViewModel(
+        PROFILE,
+        QR,
+        {
+          card: card({ status: "suspended" }),
+          qr: qr(),
+          verification: summary(),
+          revocationDisplay: null,
+        },
+        "https://humanity.llc"
+      )
+    );
+    expect(suspended.scan.kind).toBe("card_suspended");
+    expect(suspended.scan.error).toBe("CARD_SUSPENDED");
+
+    const cardRevoked = scanStatusBodyFromViewModel(
+      buildScanViewModel(
+        PROFILE,
+        QR,
+        {
+          card: card({ status: "revoked" }),
+          qr: qr(),
+          verification: summary(),
+          revocationDisplay: null,
+        },
+        "https://humanity.llc"
+      )
+    );
+    expect(cardRevoked.scan.error).toBe("CARD_REVOKED");
+
+    const qrRevoked = scanStatusBodyFromViewModel(
+      buildScanViewModel(
+        PROFILE,
+        QR,
+        { card: card(), qr: qr({ status: "revoked" }), verification: summary(), revocationDisplay: null },
+        "https://humanity.llc"
+      )
+    );
+    expect(qrRevoked.scan.kind).toBe("qr_revoked");
+    expect(qrRevoked.scan.error).toBe("QR_REVOKED");
+
+    const printRevoked = scanStatusBodyFromViewModel(
+      buildScanViewModel(
+        PROFILE,
+        QR,
+        {
+          card: card(),
+          qr: qr({ status: "revoked", scope: "print_artifact" }),
+          verification: summary(),
+          revocationDisplay: null,
+        },
+        "https://humanity.llc"
+      )
+    );
+    expect(printRevoked.scan.error).toBe("PRINT_QR_REVOKED");
+
+    const qrExpired = scanStatusBodyFromViewModel(
+      buildScanViewModel(
+        PROFILE,
+        QR,
+        {
+          card: card(),
+          qr: qr({ status: "expired", expires_at: "2020-01-01T00:00:00Z" }),
+          verification: summary(),
+          revocationDisplay: null,
+        },
+        "https://humanity.llc"
+      )
+    );
+    expect(qrExpired.scan.kind).toBe("qr_expired");
+    expect(qrExpired.scan.error).toBe("QR_EXPIRED");
   });
 
   it("card suspended includes governance process URLs (F2-3)", () => {
