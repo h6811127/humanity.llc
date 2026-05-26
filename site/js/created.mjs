@@ -473,7 +473,7 @@ function applyOrganizerHandoffUi(session) {
 
 if (!profileId && !activeQrId && !data) {
   setNoSessionNotice(
-    'No active card in this tab. Open <a href="/wallet/">Saved cards</a> to pick a card, then tap <strong>Use keys</strong> or <strong>Open card</strong>.'
+    'No active card in this tab. Open <a href="/wallet/">Saved cards</a> to pick a card, then tap <strong>Open controls</strong> or <strong>Open card</strong>.'
   );
 } else if (!profileId || !activeQrId) {
   setNoSessionNotice(
@@ -485,7 +485,7 @@ if (!profileId && !activeQrId && !data) {
   profileIdParam !== data.profile_id
 ) {
   setNoSessionNotice(
-    'This link is for a different card than the keys in this tab. Open <a href="/wallet/">Saved cards</a> and tap <strong>Use keys</strong> on the card you want.'
+    'This link is for a different card than the keys in this tab. Open <a href="/wallet/">Saved cards</a> and tap <strong>Open controls</strong> on the card you want.'
   );
 }
 
