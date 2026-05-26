@@ -16,7 +16,6 @@ import { mountThemeToggles } from "./device-theme.mjs";
 import { openSaveKeysForThisTab } from "./device-notice-nav.mjs";
 import {
   activateWalletEntry,
-  createdUrlForEntry,
   getTabSession,
   openActivityNow,
   openCardNowPage,
@@ -264,10 +263,6 @@ function currentNetworkStatus(profileId, statusMap = {}) {
   return statusMap[profileId] ?? getCachedNetworkStatus(profileId) ?? "checking";
 }
 
-function currentNetworkAlertState(profileId, alertStateMap = {}) {
-  return alertStateMap[profileId] ?? getCachedNetworkAlertState(profileId) ?? "checking";
-}
-
 function applyNetworkChipsToDom(statusMap = {}, alertStateMap = null) {
   if (!savedList) return;
   savedList.querySelectorAll(".hub-card-item").forEach((li) => {
@@ -304,16 +299,19 @@ function applyNetworkChipsToDom(statusMap = {}, alertStateMap = null) {
   applyRevokedSinceVisitAlerts(statusMap, alertStateMap);
 }
 
-function applyRevokedSinceVisitAlerts(statusMap = {}, alertStateMap = null) {
+function applyRevokedSinceVisitAlerts(_statusMap = {}, alertStateMap = null) {
   if (!savedList || !hubConfig.fetchNetworkStatus) return;
 
   savedList.querySelectorAll(".hub-card-item").forEach((li) => {
     const pid = li.dataset.profileId;
     if (!pid) return;
-    const alertState = currentNetworkAlertState(pid, alertStateMap ?? {});
-    const show =
-      String(alertState || "").toLowerCase() === CARD_REVOKED_ALERT_STATE &&
-      isRevokedSinceLastVisit(pid, alertState);
+    // DH-1: never show since-visit alert from session cache before fetch resolves.
+    if (alertStateMap == null || alertStateMap[pid] === undefined) {
+      setRevokedSinceVisitAlertVisible(li, pid, false);
+      return;
+    }
+    const alertState = alertStateMap[pid];
+    const show = isRevokedSinceLastVisit(pid, alertState);
     setRevokedSinceVisitAlertVisible(li, pid, show);
   });
 }
@@ -540,7 +538,6 @@ function renderSavedRows() {
     li.dataset.profileId = entry.profile_id;
     const lastUsed = lastActivityForEntry(entry);
     const scan = scanUrlForEntry(entry);
-    const manage = createdUrlForEntry(entry);
     const netChip = hubConfig.fetchNetworkStatus
       ? networkChipHtml(entry.profile_id, getCachedNetworkStatus(entry.profile_id) ?? "checking")
       : "";
@@ -562,7 +559,7 @@ function renderSavedRows() {
         <details class="hub-card-menu">
           <summary class="hub-card-menu-btn" aria-label="More">⋯</summary>
           <div class="hub-card-menu-panel">
-            <a class="hub-card-menu-item hub-manage" href="${escapeHtml(manage)}">Manage</a>
+            <button type="button" class="hub-card-menu-item hub-open-card" data-id="${escapeHtml(entry.id)}">Open card</button>
             <button type="button" class="hub-card-menu-item hub-relabel" data-id="${escapeHtml(entry.id)}">Relabel</button>
             ${
               entry.owner_private_key_b58
@@ -593,7 +590,7 @@ function renderSavedRows() {
       ${revokedAlert}
       <div class="hub-card-actions">
         <div class="hub-card-actions-primary">
-          <button type="button" class="hub-card-action hub-use-keys" data-id="${escapeHtml(entry.id)}" title="Load signing keys into this tab, then open /created/">Use keys</button>
+          <button type="button" class="hub-card-action hub-use-keys" data-id="${escapeHtml(entry.id)}" title="Load signing keys into this tab, then open your card page">Use keys</button>
           <a class="hub-card-action hub-open-scan" href="${escapeHtml(scan)}" target="_blank" rel="noopener noreferrer">Open scan</a>
         </div>
       </div>`;
@@ -601,7 +598,6 @@ function renderSavedRows() {
   }
 
   bindRevokedAlertHandlers();
-  applyRevokedSinceVisitAlerts();
 
   savedList.querySelectorAll(".hub-use-keys").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -619,12 +615,19 @@ function renderSavedRows() {
     });
   });
 
-  savedList.querySelectorAll(".hub-manage").forEach((link) => {
-    link.addEventListener("click", () => {
-      const li = link.closest(".hub-card-item");
-      const pid = li?.dataset.profileId;
-      const entry = loadWallet().find((e) => e.profile_id === pid);
-      if (entry) acknowledgeNetworkSeenForEntry(entry);
+  savedList.querySelectorAll(".hub-open-card").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-id");
+      const entry = loadWallet().find((e) => e.id === id);
+      if (!entry) return;
+      acknowledgeNetworkSeenForEntry(entry);
+      let returnUrl = null;
+      try {
+        returnUrl = sessionStorage.getItem("hc_vouch_return_url");
+      } catch {
+        /* ignore */
+      }
+      openCardNowPage(entry, { returnUrl });
     });
   });
 
@@ -946,7 +949,16 @@ export function initDeviceHub(config = {}) {
   window.addEventListener("pagehide", () => snapshotNetworkSeenOnExit());
 
   window.addEventListener("hc-wallet-network-baseline-changed", () => {
-    applyRevokedSinceVisitAlerts();
+    // Re-apply from cache + baseline only (e.g. Got it); never invent alerts without fetch.
+    if (!savedList || !hubConfig.fetchNetworkStatus) return;
+    const alertStateMap = Object.fromEntries(
+      loadWallet()
+        .map((e) => e.profile_id)
+        .filter(Boolean)
+        .map((pid) => [pid, getCachedNetworkAlertState(pid)])
+        .filter(([, state]) => state != null)
+    );
+    applyRevokedSinceVisitAlerts({}, alertStateMap);
     notifyHubChanged();
   });
 }

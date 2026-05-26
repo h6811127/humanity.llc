@@ -2,7 +2,7 @@
 
 **Status:** Shipped layout contract (Tasks tab)  
 **Page:** `site/created/index.html` · `site/js/created-dashboard.mjs` · `site/js/created.mjs`  
-**Related:** `docs/M4_CREATED_REVOKE_UI.md`, `docs/DEVICE_OS.md`, `docs/M3_M4_EXECUTION_PLAN.md`
+**Related:** `docs/M4_CREATED_REVOKE_UI.md`, `docs/DEVICE_OS.md`, `docs/M3_M4_EXECUTION_PLAN.md`, `docs/CARD_WORKSPACE_PHASE0.md`
 
 ---
 

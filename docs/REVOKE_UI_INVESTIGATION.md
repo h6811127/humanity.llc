@@ -1,6 +1,7 @@
 # Revoke UI investigation — `/created/` Manage tab
 
 **Date:** 2026-05-25  
+**Phase 0 fix (2026-05-26):** Hub ⋯ **Open card** loads keys via `openCardNowPage()` — see `docs/CARD_WORKSPACE_PHASE0.md`.  
 **Scope:** Read-only investigation (no code changes)  
 **Reported symptoms:** Revoke / Disable card buttons missing; Resolver check rows stuck on “Checking…”  
 **Surface:** `/created/` → Manage → “Revoke this QR” disclosure (matches `site/created/index.html` and screenshot)
@@ -139,11 +140,11 @@ Any thrown network error **aborts the entire bootstrap**, including `initOwnerRe
 | How user opens Manage | Keys in tab? | `#revoke-actions` | `#owner-no-key` |
 |----------------------|--------------|-------------------|-----------------|
 | Fresh link `/created/?profile_id=…&qr_id=…` after closing create tab | No | Hidden | Visible |
-| Wallet → **Manage** (menu link) | No* | Hidden | Visible |
-| Wallet → **Control card** | Yes (if saved with keys) | Visible | Hidden |
+| Wallet → **Open card** / **Use keys** (Phase 0) | Yes when saved | Visible | Hidden |
+| Wallet → **Manage** (removed; was menu link only) | No* | Hidden | Visible |
 | Import encrypted backup / recovery key | Yes (after unlock) | Visible | Hidden |
 
-\* **Manage does not load wallet keys.** `device-hub-ui.mjs` sets `href` to `/created/?profile_id&qr_id` only. Only **Control card** calls `activateWalletEntry()` (`device-keys.mjs`), which writes `owner_private_key_b58` into `sessionStorage`.
+\* **Pre–Phase 0:** ⋯ **Manage** was a plain link without `activateWalletEntry()`. **Shipped fix:** ⋯ **Open card** calls `openCardNowPage()` (`device-keys.mjs`), same as **Use keys**.
 
 This matches the screenshot footer: *“Unlock a saved backup or recovery key below…”* — that string is exactly `owner-no-key` in `site/created/index.html`.
 

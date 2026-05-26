@@ -80,7 +80,7 @@ Hides `[data-landing-tutorial]` (hero, progress, One use, design choices, dock, 
 
 ### Auto-save (`hc_auto_save_device`)
 
-Optional hub toggle (off by default): after create, write tab keys to `hc_wallet` without tapping **Save on this device**. For returning users on a trusted browser  -  not a substitute for recovery key or encrypted backup.
+Hub toggle (**on by default** until set to `"0"`): after create, write tab keys to `hc_wallet` without tapping **Save control key**. For returning users on a trusted browser  -  not a substitute for recovery key or encrypted backup. See `docs/CARD_WORKSPACE_PHASE0.md`.
 
 ### Global information on the desktop (now vs later)
 
@@ -94,7 +94,7 @@ Optional hub toggle (off by default): after create, write tab keys to `hc_wallet
 | Recent activity on device |  -  |
 | **Live proof waiting** inbox (hub group; prove on `/created/`) |  -  |
 
-Do **not** add per-pin revoke on the homepage  -  pins have no keys; use **Use keys → Manage**.
+Do **not** add per-pin revoke on the homepage  -  pins have no keys; use **Use keys** or **Open card** (⋯ menu) → `/created/`.
 
 ---
 

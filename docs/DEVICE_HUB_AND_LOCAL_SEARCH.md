@@ -26,9 +26,9 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **`/created/` hub (shipped):** Same groups as landing except: notice links to **`#created-keys-strip`**; shortcuts are **Manage this card**, **All saved cards**, **Homepage** (no focus toggle).
 
-**Hub rows (shipped):** Saved cards  -  **Use keys**, **Open scan**, **⋯** (Relabel, Remove). **Import backup file** decrypts `.hcbackup.json` into `hc_wallet`.
+**Hub rows (shipped):** Saved cards  -  **Use keys**, **Open scan**, **⋯** (Open card, Relabel, Remove). **Open card** and **Use keys** both call `openCardNowPage()` (load keys when saved). Phase 0: removed ⋯ **Manage** link that opened `/created/` without keys (`docs/CARD_WORKSPACE_PHASE0.md`). **Import backup file** decrypts `.hcbackup.json` into `hc_wallet`.
 
-**Landing focus mode:** `localStorage.hc_landing_focus` hides intro (`[data-landing-tutorial]`). Keeps **hub**, **hub glance**, **system banner** (if unhealthy), **Help & protocol** list (not full Documentation), and **contact**. No bottom Create dock or “New here?” float. **Auto-save** optional via `hc_auto_save_device` in hub shortcuts.
+**Landing focus mode:** `localStorage.hc_landing_focus` hides intro (`[data-landing-tutorial]`). Keeps **hub**, **hub glance**, **system banner** (if unhealthy), **Help & protocol** list (not full Documentation), and **contact**. No bottom Create dock or “New here?” float. **Auto-save** on by default via `hc_auto_save_device` (opt out in hub shortcuts).
 
 **Shortcuts & settings (shipped):** On the **homepage** (`/`) only — section under the progress strip (unified list rows: Appearance, browser alerts, saved cards, manage, auto-save, focus). Hub sheet on all routes has **home icon** (left), status line (center), **Create +** (right); no shortcuts block in the hub.
 

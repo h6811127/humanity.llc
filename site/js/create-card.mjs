@@ -272,6 +272,7 @@ export async function runCreateCard(input) {
   const created = new URL("/created/", location.origin);
   created.searchParams.set("profile_id", profileId);
   created.searchParams.set("qr_id", qrId);
+  created.searchParams.set("fresh", "1");
   location.replace(created.href);
 }
 
