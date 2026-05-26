@@ -285,7 +285,7 @@ Worker/API: **no change** — all state is client-side.
 
 - `worker/src/resolver/scan-html.ts` — `renderScanPageChrome()`
 - `site/js/scan-tab-keys.mjs` — chrome refresh entry on scan
-- `site/js/device-cross-tab-banner.mjs` — `#scan-cross-tab-banner`
+- `site/js/device-cross-tab-banner.mjs` — `#scan-cross-tab-banner` (Safari layout: [`SCAN_CROSS_TAB_BANNER_SAFARI_LAYOUT_INVESTIGATION.md`](SCAN_CROSS_TAB_BANNER_SAFARI_LAYOUT_INVESTIGATION.md))
 - `site/js/vouch-issue.mjs` — vouch gate and “Use keys here”
 - `site/js/device-dot-state-core.mjs` — canonical dot semantics
 - `docs/M3_SCAN_PAGE_UI.md` — Phase 7 (static dot shipped); Phase 8 (this spec)

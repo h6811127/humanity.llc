@@ -24,6 +24,7 @@ import {
   emphasisCardBodyHtml,
   emphasisCardCtaButton,
   emphasisCardCtaLinkSecondary,
+  emphasisCardCtaSecondary,
   escapeEmphasisHtml,
 } from "./device-emphasis-card-html.mjs";
 
@@ -73,7 +74,9 @@ function renderPageCrossTabBanner() {
 
   const actions = [emphasisCardCtaButton("Open that tab", "data-cross-tab-action")];
   if (walletEntry) {
-    actions.push(emphasisCardCtaButton("Open controls here", "data-cross-tab-use-keys"));
+    actions.push(
+      emphasisCardCtaSecondary("Open controls here", "data-cross-tab-use-keys")
+    );
   }
   actions.push(emphasisCardCtaLinkSecondary("My cards", "/wallet/"));
 
@@ -287,7 +290,9 @@ function renderScanCrossTabNotice() {
 
   const actions = [emphasisCardCtaButton("Open that tab", "data-cross-tab-action")];
   if (walletEntry) {
-    actions.push(emphasisCardCtaButton("Open controls here", "data-cross-tab-use-keys"));
+    actions.push(
+      emphasisCardCtaSecondary("Open controls here", "data-cross-tab-use-keys")
+    );
   }
 
   scanBanner.hidden = false;

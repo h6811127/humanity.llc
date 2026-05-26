@@ -92,6 +92,9 @@
 
 .hc-emphasis-card__cta,
 .wallet-active-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   padding: 8px 12px;
   border: none;
@@ -104,6 +107,8 @@
   background: var(--red);
   box-shadow: 0 1px 2px rgba(219, 27, 67, 0.25);
   cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -118,9 +123,14 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
   flex-shrink: 0;
   max-width: 100%;
+  /* Wrap-safe spacing (Safari flex gap + overflow); 4px + 4px = 8px between pills */
+  margin: -4px;
+}
+
+.hc-emphasis-card__actions > * {
+  margin: 4px;
 }
 
 .hc-emphasis-card__cta--secondary {

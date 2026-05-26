@@ -71,6 +71,7 @@ Spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · Path 2 arrive [`SC
 | 2 | Steward / saved wallet on same device | Same L2 arrive; **Keys on this device** band after settle; dot may show viewer state (Phase 8); tap opens glance, not hub |
 | 3 | Glance primary action | Scrolls to vouch / live proof / cross-tab banner action in-page |
 | 4 | Cross-tab keys banner visible | Dot overlay matches banner (`cross_tab_keys`) |
+| 4b | Safari (macOS + iPhone): cross-tab banner CTAs | Red **Open that tab** + secondary **Open controls here**; pills not touching; not gray system buttons — [`SCAN_CROSS_TAB_BANNER_SAFARI_LAYOUT_INVESTIGATION.md`](SCAN_CROSS_TAB_BANNER_SAFARI_LAYOUT_INVESTIGATION.md) |
 | 5 | Escape / outside tap | Glance closes; dot `aria-expanded` false |
 | 6 | Hero card header | `humanity.llc` wordmark only — **no** second red dot inside the live-check card |
 | 7 | Tab keys only (never saved a card on this origin) | Dot stays **static** brand red; no `data-dot-state`, no glance |
@@ -97,6 +98,18 @@ Spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · Path 2 arrive [`SC
 | 4 | `/wallet/` tap dot | Scrolls to saved cards (no hub sheet) |
 
 **Fail signals:** Dot does nothing; console module 404; `#top-chrome[data-device-status-error]`. Full diagnosis: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) troubleshooting · Safari matrix: [`SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md`](SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md).
+
+### P1-CT · Cross-tab keys banner (Safari layout)
+
+Spec: [`SCAN_CROSS_TAB_BANNER_SAFARI_LAYOUT_INVESTIGATION.md`](SCAN_CROSS_TAB_BANNER_SAFARI_LAYOUT_INVESTIGATION.md). Automated: `npm run worker:test -- worker/tests/device-emphasis-card-html.test.ts`.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Safari iPhone or Mac: active scan URL; keys open in another tab on same device | `#scan-cross-tab-banner`: stacked copy + actions; spaced pills; primary + secondary CTAs |
+| 2 | Safari: `/` with `#device-cross-tab-banner` visible (no inbox badge path) | Same pill layout as scan; **My cards** link when shown |
+| 3 | Safari: `/wallet/` `#wallet-tab-hint` or page cross-tab banner | Same; matches scan spacing |
+
+**Fail signals:** Gray native-looking buttons; CTAs flush/overlapping; action row clipped on card bottom.
 
 ### P0-W · WebKit shell acceptance (post 2026-05-26 fix)
 
