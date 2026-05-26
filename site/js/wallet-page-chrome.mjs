@@ -3,7 +3,7 @@
  * Click handler for Open controls: `bindWalletActiveOpenControls()` from wallet-page.mjs.
  */
 
-import { gatherInboxInput } from "./device-inbox.mjs?v=37";
+import { gatherInboxInput } from "./device-inbox.mjs?v=38";
 import { createdUrlForEntry, getTabSession } from "./device-keys.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 

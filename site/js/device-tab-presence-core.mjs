@@ -39,10 +39,12 @@ export function shouldTouchPresenceRow(existing, next, now, opts = {}) {
     return true;
   }
   const age = now - (existingNorm.updatedAt ?? 0);
-  const keepAliveMs = showMs - Math.ceil(heartbeatMs / 2);
-  if (age >= keepAliveMs) return true;
+  // Skip keep-alive rewrites for one heartbeat (cuts cross-tab storage + chrome churn).
   if (age < heartbeatMs) return false;
-  return true;
+  // Refresh updatedAt before listOtherTabsWithKeys hides the row (PRESENCE_SHOW_MS).
+  const refreshBeforeHideMs = Math.max(heartbeatMs, showMs - 1000);
+  if (age >= refreshBeforeHideMs) return true;
+  return false;
 }
 export const MAX_PRESENCE_ENTRIES = 20;
 /** Matches worker PROFILE_ID (base58, 20–32 chars). */

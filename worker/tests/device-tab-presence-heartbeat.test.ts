@@ -45,6 +45,12 @@ describe("shouldTouchPresenceRow", () => {
     expect(shouldTouchPresenceRow(existing, next, 3000)).toBe(false);
   });
 
+  it("skips keep-alive rewrite mid show window (no 4.5s storage churn)", () => {
+    const existing = entry({ updatedAt: 1000 });
+    const next = entry({ updatedAt: 5500 });
+    expect(shouldTouchPresenceRow(existing, next, 5500)).toBe(false);
+  });
+
   it("touches before show window would expire", () => {
     const existing = entry({ updatedAt: 0 });
     const next = entry({ updatedAt: PRESENCE_SHOW_MS });

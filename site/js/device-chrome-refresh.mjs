@@ -5,6 +5,7 @@
 import { DEVICE_OS_DEBOUNCE_MS } from "./device-os-coordinator-core.mjs";
 import {
   presenceChromeRefreshScheduleAction,
+  shouldChromeRefreshStorageImmediately,
   shouldRunChromeRefreshImmediate,
 } from "./device-chrome-refresh-core.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
@@ -20,12 +21,9 @@ import {
   beginDeviceChromeRefreshTick,
   endDeviceChromeRefreshTick,
   resetPresenceInboxGatherCache,
-} from "./device-inbox.mjs?v=37";
+} from "./device-inbox.mjs?v=38";
 import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys } from "./device-tab-presence.mjs";
-import { REMOVED_PROFILES_STORAGE_KEY } from "./device-wallet-removed-profiles-core.mjs";
 import { refreshWalletContextFromChrome } from "./wallet-page-chrome.mjs";
-
-const PRESENCE_STORAGE_KEY = "hc_tab_keys_presence";
 
 /** @type {(() => void) | null} */
 let refreshStatusSurfaces = null;
@@ -118,17 +116,8 @@ function onImmediateChromeEvent() {
 }
 
 function onStorageKey(e) {
-  const key = e.key;
-  if (
-    key === "hc_wallet" ||
-    key === "hc_created" ||
-    key === PRESENCE_STORAGE_KEY ||
-    key === REMOVED_PROFILES_STORAGE_KEY ||
-    key === "hc_device_pins" ||
-    key === "hc_device_activity"
-  ) {
-    onImmediateChromeEvent();
-  }
+  if (!shouldChromeRefreshStorageImmediately(e.key)) return;
+  onImmediateChromeEvent();
 }
 
 /** Subscribe once - presence, hub, wallet custody, network-adjacent storage. */

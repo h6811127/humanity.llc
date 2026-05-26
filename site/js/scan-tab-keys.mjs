@@ -6,7 +6,7 @@
 import {
   refreshDeviceChrome,
   startDeviceChromeRefresh,
-} from "./device-chrome-refresh.mjs?v=37";
+} from "./device-chrome-refresh.mjs?v=38";
 import { startCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 

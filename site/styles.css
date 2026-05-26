@@ -5549,8 +5549,11 @@ details[open] > .created-advanced-summary::after {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   width: 36px;
   height: 36px;
+  overflow: hidden;
+  contain: layout;
   border-radius: 50%;
   color: rgba(60, 60, 67, 0.72);
   text-decoration: none;
@@ -5564,8 +5567,12 @@ details[open] > .created-advanced-summary::after {
 }
 
 .device-help-fab svg {
+  display: block;
+  flex-shrink: 0;
   width: 18px;
   height: 18px;
+  max-width: 18px;
+  max-height: 18px;
 }
 
 .device-help-fab:hover,
