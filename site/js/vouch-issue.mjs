@@ -15,6 +15,23 @@ import {
 
 const VOUCHER_WAIT_DAYS = 90;
 const VOUCH_THRESHOLD = 3;
+const VOUCH_RETURN_KEY = "hc_vouch_return_url";
+
+function rememberVouchReturnUrl() {
+  try {
+    sessionStorage.setItem(VOUCH_RETURN_KEY, location.href);
+  } catch {
+    /* ignore */
+  }
+}
+
+function loadKeysHelpHtml(walletUrl) {
+  return (
+    `On <a href="${walletUrl}">Saved cards</a>, tap <strong>Use keys</strong> on your steward card. ` +
+    `That copies your signing keys into this browser tab and opens <code>/created/</code> — ` +
+    `then use the <strong>Return to scan to vouch</strong> link there, or come back to this page in the same tab.`
+  );
+}
 
 const row = document.getElementById("vouch-row");
 const explainer = document.getElementById("vouch-explainer");
@@ -176,8 +193,8 @@ async function showNoKeysExplainer(voucheeProfileId) {
 
   if (wallet.length === 0) {
     showExplainerHtml(
-      `To vouch, this browser needs <strong>your</strong> card’s signing keys — not just steward status on the network. ` +
-        `Create a card or open ${walletLinksHtml()}, tap <strong>Use keys</strong>, then return here. ` +
+      `To vouch, this browser needs <strong>your</strong> card’s signing keys in this tab — not just Steward on the network. ` +
+        `Create a card or open ${walletLinksHtml()}, then ${loadKeysHelpHtml(walletUrl)} ` +
         `Your private key never uploads — only the signed vouch does.`
     );
     return;
@@ -216,7 +233,7 @@ async function showNoKeysExplainer(voucheeProfileId) {
   if (eligible.length === 0) {
     showExplainerHtml(
       `You have ${wallet.length} saved card${wallet.length === 1 ? "" : "s"} on this device, but none are <strong>Vouched Human</strong> or <strong>Steward</strong> on the network yet — or keys are for the same person you’re scanning. ` +
-        `Open <a href="${walletUrl}">Saved cards</a>, tap <strong>Use keys</strong> on an eligible card, then return here.`
+        loadKeysHelpHtml(walletUrl)
     );
     return;
   }
@@ -231,9 +248,12 @@ async function showNoKeysExplainer(voucheeProfileId) {
   const more =
     eligible.length > 3 ? ` (+${eligible.length - 3} more saved)` : "";
 
+  const pick = eligible[0];
+  const pickLabel = cardLabel(pick.entry);
   showExplainerHtml(
     `${lines}${more} — but <strong>signing keys are not active in this browser tab</strong>. ` +
-      `Open <a href="${walletUrl}">Saved cards</a> → <strong>Use keys</strong> on the card you want to vouch with, then return to this scan page. ` +
+      loadKeysHelpHtml(walletUrl) +
+      ` (Try <strong>Use keys</strong> on <strong>${pickLabel}</strong>.) ` +
       `Network verification and device keys are separate (<a href="${location.origin}/features/vouching.html">how vouching works</a>).`
   );
 }
@@ -243,6 +263,8 @@ async function init() {
 
   const voucheeProfileId = row.dataset.voucheeProfileId?.trim();
   if (!voucheeProfileId) return;
+
+  rememberVouchReturnUrl();
 
   const session = loadSession();
   const hasKeys =

@@ -53,8 +53,9 @@ export function createdUrlForEntry(entry) {
 /**
  * Load saved keys when available and open /created/ (Now tab by default).
  * @param {Record<string, unknown>} entry
+ * @param {{ returnUrl?: string | null }} [opts]
  */
-export function openCardNowPage(entry) {
+export function openCardNowPage(entry, opts = {}) {
   if (!entry?.profile_id) return false;
 
   const saved =
@@ -66,7 +67,20 @@ export function openCardNowPage(entry) {
   if (saved?.owner_private_key_b58) {
     activateWalletEntry(saved);
   }
-  navigateTo(createdUrlForEntry(target));
+  const url = new URL(createdUrlForEntry(target));
+  let returnUrl = opts.returnUrl ?? null;
+  if (!returnUrl) {
+    try {
+      returnUrl = sessionStorage.getItem("hc_vouch_return_url");
+    } catch {
+      /* ignore */
+    }
+  }
+  if (returnUrl) {
+    url.searchParams.set("return_url", returnUrl);
+    url.searchParams.set("intent", "vouch");
+  }
+  navigateTo(url.href);
   return true;
 }
 

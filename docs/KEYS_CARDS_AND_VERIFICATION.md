@@ -75,8 +75,8 @@ Per **device**, storage:
 │ THIS DEVICE (browser)                                       │
 │  • hc_created = keys loaded NOW (can sign)                  │
 │  • hc_wallet = saved cards (keys on disk, not always active)│
-│  • “Use keys” / “Control card” copies one wallet row →      │
-│    hc_created                                               │
+│  • **Use keys** (Saved cards) copies one wallet row →       │
+│    hc_created, then opens /created/                         │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -87,7 +87,7 @@ Per **device**, storage:
 | **View** someone’s scan | Active scan URL (`?q=qr_…` when QR-scoped) | Nothing |
 | **Vouch** for someone | Voucher is Steward or Vouched Human | Voucher owner keys in `hc_created` |
 | **See your Steward label** on `/created/` | `verification_summaries.state = steward` | Keys for **your** profile in this tab + status fetch |
-| **See Steward on iPhone** | Same (resolver) | Save card on iPhone → **Use keys** → open `/created/` or wallet chip |
+| **See Steward on iPhone** | Same (resolver) | Save card on iPhone → **Use keys** (opens `/created/`) → **Return to scan to vouch** |
 
 ---
 
@@ -106,8 +106,9 @@ Per **device**, storage:
 
 1. **Vouchee:** active scan link (`/c/{profile}?q={active_qr}`), not revoked QR, not your own `profile_id`.
 2. **Voucher (you):** Steward or Vouched Human on the **network** (curl or `/created/` on a device with your keys).
-3. **This phone/browser:** `/wallet/` → **Use keys** on **your** steward card (loads `hc_created`).
-4. Return to vouchee scan in the **same tab** → Vouch section → submit.
+3. **This phone/browser:** `/wallet/` → **Use keys** on **your** steward card (loads `hc_created`, opens `/created/`).
+4. On `/created/`, tap **Return to scan to vouch** (or use the browser back button to the scan tab).
+5. Submit the vouch on the vouchee’s **active** scan page.
 
 If step 3 is skipped, you will see **“keys not active on this device”** even when the network says Steward.
 

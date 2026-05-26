@@ -26,6 +26,7 @@ const profileIdParam = params.get("profile_id")?.trim() || null;
 const qrIdParam = params.get("qr_id")?.trim() || null;
 const liveChallengeParam = params.get("live_challenge")?.trim() || null;
 const liveReturnUrlParam = params.get("return_url")?.trim() || null;
+const vouchIntentParam = params.get("intent") === "vouch";
 
 const errorEl = document.getElementById("created-error");
 function showError(msg) {
@@ -58,6 +59,24 @@ function loadSession() {
 
 function saveSession(next) {
   sessionStorage.setItem("hc_created", JSON.stringify(next));
+}
+
+function initVouchReturnBanner() {
+  const banner = document.getElementById("created-vouch-return-banner");
+  const link = document.getElementById("created-vouch-return-link");
+  const returnUrl = liveReturnUrlParam;
+  if (!banner || !link || !returnUrl || liveChallengeParam) return;
+  if (!loadSession()?.owner_private_key_b58) return;
+  if (!vouchIntentParam && !returnUrl.includes("/c/")) return;
+  banner.hidden = false;
+  link.href = returnUrl;
+  link.addEventListener("click", () => {
+    try {
+      sessionStorage.removeItem("hc_vouch_return_url");
+    } catch {
+      /* ignore */
+    }
+  });
 }
 
 let data = loadSession();
@@ -434,7 +453,7 @@ if (!profileId && !activeQrId && !data) {
   profileIdParam !== data.profile_id
 ) {
   setNoSessionNotice(
-    'This link is for a different card than the keys in this tab. Open <a href="/wallet/">Saved cards</a> and tap <strong>Control card</strong> on the card you want.'
+    'This link is for a different card than the keys in this tab. Open <a href="/wallet/">Saved cards</a> and tap <strong>Use keys</strong> on the card you want.'
   );
 }
 
@@ -591,6 +610,8 @@ function setupCreatedDashboard() {
     getProfileId: () => profileId,
   });
 }
+
+initVouchReturnBanner();
 
 createdTabs = initCreatedTabs();
 setupCreatedDashboard();

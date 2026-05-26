@@ -119,7 +119,7 @@ export function initCreatedDashboard({
 
       if (!runSave) {
         showFeedback(
-          "No signing keys in this tab. Open /created/ from create, or use Control card from Saved cards.",
+          "No signing keys in this tab. Open /created/ from create, or tap Use keys from Saved cards.",
           true
         );
         return;
@@ -130,7 +130,7 @@ export function initCreatedDashboard({
 
       if (saved === null) {
         showFeedback(
-          "No signing keys in this tab. Open /created/ from create, or use Control card from Saved cards.",
+          "No signing keys in this tab. Open /created/ from create, or tap Use keys from Saved cards.",
           true
         );
         return;

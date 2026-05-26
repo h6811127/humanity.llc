@@ -574,7 +574,7 @@ function renderSavedRows() {
       ${revokedAlert}
       <div class="hub-card-actions">
         <div class="hub-card-actions-primary">
-          <button type="button" class="hub-card-action hub-use-keys" data-id="${escapeHtml(entry.id)}">Control card</button>
+          <button type="button" class="hub-card-action hub-use-keys" data-id="${escapeHtml(entry.id)}" title="Load signing keys into this tab, then open /created/">Use keys</button>
           <a class="hub-card-action hub-open-scan" href="${escapeHtml(scan)}" target="_blank" rel="noopener noreferrer">Open scan</a>
         </div>
       </div>`;
@@ -590,7 +590,13 @@ function renderSavedRows() {
       const entry = loadWallet().find((e) => e.id === id);
       if (!entry) return;
       acknowledgeNetworkSeenForEntry(entry);
-      openCardNowPage(entry);
+      let returnUrl = null;
+      try {
+        returnUrl = sessionStorage.getItem("hc_vouch_return_url");
+      } catch {
+        /* ignore */
+      }
+      openCardNowPage(entry, { returnUrl });
     });
   });
 
