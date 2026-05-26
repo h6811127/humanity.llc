@@ -62,6 +62,11 @@ export const PAYLOAD_FIELD_RULES: Record<PayloadType, PayloadFieldRules> = {
     timestampFields: ["signed_at"],
     uniqueIdFields: ["challenge_id", "nonce"],
   },
+  [PAYLOAD_TYPES.STEWARD_ACCOUNT_LINK]: {
+    subjectProfileField: "profile_id",
+    timestampFields: ["issued_at", "expires_at"],
+    uniqueIdFields: ["nonce"],
+  },
 };
 
 export function isPayloadType(value: string): value is PayloadType {

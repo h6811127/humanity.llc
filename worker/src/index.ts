@@ -38,6 +38,13 @@ import {
   handlePostVouchAuditFlagDismiss,
 } from "./resolver/vouch-audit-flags";
 import { handleGetCreateRateMonitor } from "./resolver/create-monitoring";
+import {
+  handleGetOperatorCapabilities,
+  handleGetOperatorPlans,
+  handleGetStewardEntitlements,
+  handleGetStewardPush,
+  handlePostStewardSession,
+} from "./resolver/steward-hosted";
 
 export interface Env {
   DB: D1Database;
@@ -45,6 +52,8 @@ export interface Env {
   OPERATOR_AUDIT_TOKEN?: string;
   /** HMAC secret for /c/…/out interstitial tokens; defaults to local dev key only. */
   SCAN_OUT_HMAC_SECRET?: string;
+  /** E1 hosted steward API (`1` / `true` to enable). */
+  HOSTED_STEWARD_ENABLED?: string;
 }
 
 export default {
@@ -80,6 +89,67 @@ export default {
 
     if (path === "/.well-known/hc/v1/health" && request.method === "GET") {
       return healthResponse(env);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/operator/capabilities" &&
+      request.method === "GET"
+    ) {
+      const res = await handleGetOperatorCapabilities(request, env);
+      return withCors(request, res);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/operator/plans" &&
+      request.method === "GET"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetOperatorPlans(request, env, env.DB);
+      return withCors(request, res);
+    }
+    if (
+      path === "/.well-known/hc/v1/steward/session" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostStewardSession(request, env, env.DB);
+      return withCors(request, res);
+    }
+    if (
+      path === "/.well-known/hc/v1/steward/entitlements" &&
+      request.method === "GET"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetStewardEntitlements(request, env, env.DB);
+      return withCors(request, res);
+    }
+    if (
+      path === "/.well-known/hc/v1/steward/push" &&
+      request.method === "GET"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetStewardPush(request, env, env.DB);
+      return withCors(request, res);
     }
 
     if (

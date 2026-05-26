@@ -18,6 +18,7 @@ export const PAYLOAD_TYPES = {
   SUSPENSION: "suspension",
   EXPORT_MANIFEST: "export_manifest",
   LIVE_CONTROL_RESPONSE: "live_control_response",
+  STEWARD_ACCOUNT_LINK: "steward_account_link_v1",
 } as const;
 
 export type PayloadType = (typeof PAYLOAD_TYPES)[keyof typeof PAYLOAD_TYPES];
