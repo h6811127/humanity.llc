@@ -10,6 +10,7 @@ import {
   isResolverConfirmedProfile,
   refreshWalletNetworkStatuses,
 } from "../../site/js/device-wallet-network.mjs";
+import { gatherCardDisabledSinceVisitForInbox } from "../../site/js/device-inbox-card-disabled.mjs";
 
 const PROFILE_A = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const PROFILE_B = "8Ym2nP3oR5sU7wX9zA1bC4dE6";
@@ -91,5 +92,29 @@ describe("isResolverConfirmedProfile", () => {
     expect(maps?.scanKindMap[PROFILE_A]).toBe("active");
     expect(maps?.resolverConfirmedMap[PROFILE_A]).toBe(true);
     expect(maps?.resolverConfirmedMap[PROFILE_B]).toBeUndefined();
+  });
+
+  it("gatherCardDisabledSinceVisitForInbox is empty after active poll despite stale cache", async () => {
+    const now = Date.now();
+    sessionStore.set(
+      "hc_wallet_network_cache",
+      JSON.stringify({
+        [PROFILE_A]: {
+          status: "active",
+          scanKind: "card_revoked",
+          verificationLabel: null,
+          verificationState: null,
+          at: now,
+        },
+      })
+    );
+    localStore.set(
+      "hc_wallet_last_seen_network",
+      JSON.stringify({ [PROFILE_A]: "active" })
+    );
+
+    await refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }]);
+
+    expect(gatherCardDisabledSinceVisitForInbox()).toEqual([]);
   });
 });

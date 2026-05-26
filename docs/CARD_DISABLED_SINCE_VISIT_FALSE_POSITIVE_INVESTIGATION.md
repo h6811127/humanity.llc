@@ -1,7 +1,7 @@
 # Investigation: “Card disabled on the network since your last visit” on every saved card
 
 **Date:** 2026-05-25  
-**Status:** Root cause confirmed (client-side alert pipeline + session baseline); fixes shipped in `main` (see below)  
+**Status:** **Closed** — root cause confirmed (client-side); fixes + regression gates shipped (Slices 1–8 in [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md))  
 **Scope:** Saved-card hub rows on `/`, `/wallet/`, `/created/` — not Worker resolver logic unless `scan.kind` truly disagrees  
 **Related audits:** [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md) (DH-1–DH-4), [`DEVICE_OS.md`](DEVICE_OS.md) § Card disabled since last visit, [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P1  
 
@@ -227,8 +227,8 @@ Production observation proved resolver **`active`** while banner showed — **cl
 Run:
 
 ```bash
-npm run worker:test -- worker/tests/wallet-network.test.ts worker/tests/device-wallet-network-confirmed.test.ts
-npm run e2e -- e2e/device-os-wallet.spec.ts
+npm run worker:test -- worker/tests/wallet-network.test.ts worker/tests/device-wallet-network-confirmed.test.ts worker/tests/card-disabled-since-visit-regression.test.ts
+npm run e2e -- e2e/device-os-wallet.spec.ts e2e/device-inbox.spec.ts
 ```
 
 ---
@@ -264,3 +264,9 @@ Per the AI prompt at the bottom of the first investigation draft:
 
 - `buildResolverConfirmedWalletPollMaps()` shared by hub re-apply and `gatherCardDisabledSinceVisitForInbox()`.
 - E2E: `device-inbox.spec.ts` — stale cache + active resolver must not show badge, dot overlay, hub card-disabled group, or row banner copy.
+
+### Slice 8 — incident closure (shipped)
+
+- `worker/tests/card-disabled-since-visit-regression.test.ts` documents end-to-end client gates (cache bypass, inbox list, glance suffix).
+- Vitest: `gatherCardDisabledSinceVisitForInbox()` empty after active poll with stale `hc_wallet_network_cache`.
+- **Production verify:** hard-refresh; confirm `scan.kind === active` on status fetches; clear `hc_wallet_network_cache` if a device still shows stale UI.

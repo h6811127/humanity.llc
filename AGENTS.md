@@ -36,7 +36,7 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 
 - **Cards vs keys vs verification:** `docs/KEYS_CARDS_AND_VERIFICATION.md` — steward status is on the resolver; vouch signing needs `hc_created` keys on the same browser tab.
 - **Status dot vs inbox vs OS alerts:** `docs/DEVICE_INBOX.md` (action items, badge, background alerts) vs `docs/STATUS_INDICATOR_STEWARD_GREEN.md` (trust dot only).
-- **Card disabled since visit:** Banner, hub `#device-hub-card-disabled-group`, and inbox badge must use **resolver-confirmed** poll maps only — never `sessionStorage.hc_wallet_network_cache` alone. See `docs/CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`. After hub/inbox network changes: `npm run worker:test -- worker/tests/wallet-network.test.ts worker/tests/device-wallet-network-confirmed.test.ts` and `npm run e2e -- e2e/device-os-wallet.spec.ts e2e/device-inbox.spec.ts`.
+- **Card disabled since visit:** Banner, hub `#device-hub-card-disabled-group`, and inbox badge must use **resolver-confirmed** poll maps only — never `sessionStorage.hc_wallet_network_cache` alone. See `docs/CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md` (incident closed; Slice 8 gates). After hub/inbox network changes: `npm run worker:test -- worker/tests/wallet-network.test.ts worker/tests/device-wallet-network-confirmed.test.ts worker/tests/card-disabled-since-visit-regression.test.ts` and `npm run e2e -- e2e/device-os-wallet.spec.ts e2e/device-inbox.spec.ts`.
 
 ### Status dot / hub opener (agent guardrails)
 

@@ -253,12 +253,25 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 ---
 
+### Slice 8 — Incident closure + regression gates (P1) ✅
+
+**Goal:** Close the false-positive incident with documented regression gates (mirrors Flow 2 Slice 8).
+
+- [x] `worker/tests/card-disabled-since-visit-regression.test.ts` — stale cache bypass, cache-only inbox guard, active poll + glance suffix, documented in investigation doc.
+- [x] `gatherCardDisabledSinceVisitForInbox()` integration: stale cache + active resolver poll → `[]` (`device-wallet-network-confirmed.test.ts`).
+- [x] Investigation status **Closed**; production verify steps remain in troubleshooting section.
+
+**Out of scope:** Worker resolver changes; server-side mass revoke investigation (per-card `GET …/status?q=` only).
+
+---
+
 ## Done when (Device hub overall)
 
 - [x] No false “card disabled since last visit” on active cards (production + e2e).
 - [x] Chip label matches resolver `scan.kind` after sync.
 - [x] Live-control inbox scope matches `DEVICE_OS.md`.
 - [x] `npm run worker:test` + `npm run e2e` green for device-os specs.
+- [x] `npm run worker:test -- worker/tests/card-disabled-since-visit-regression.test.ts` green (Slice 8 gates).
 
 ---
 
