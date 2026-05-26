@@ -24,9 +24,10 @@ export function networkStatusChip(status, scanKind) {
   const kind = String(scanKind || "").toLowerCase();
   if (kind === "card_revoked") return { label: "Card disabled", tone: "warn" };
   if (kind === "qr_revoked") return { label: "QR revoked", tone: "warn" };
+  if (kind === "active") return { label: "Live State Active", tone: "ok" };
   const s = String(status || "").toLowerCase();
   if (s === "active") return { label: "Live State Active", tone: "ok" };
-  if (s === "revoked") return { label: "Revoked on Network", tone: "warn" };
+  if (s === "revoked") return { label: "Card disabled", tone: "warn" };
   if (s === "offline" || s === "error") return { label: "Resolver Unreachable", tone: "offline" };
   if (s === "checking") return { label: "Sync Checking…", tone: "muted" };
   return { label: s ? s.charAt(0).toUpperCase() + s.slice(1) : "Unknown", tone: "muted" };

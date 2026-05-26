@@ -163,7 +163,7 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 | ID | Gap |
 |----|-----|
 | **DH-13** | ✅ Fixed: unreachable poll results (`error` / `offline` / `checking`) omit `alertStateMap` and resolver confirmation; `alertStateForNetworkPoll()` avoids false `active` baselines while chips still show unreachable. |
-| **DH-14** | `networkStatusChip` maps legacy `status: "revoked"` to “Revoked on Network” but `alertStateFromScanKind` ignores card.status — only `scan.kind === card_revoked` drives alerts (documented, but confusing if card JSON status diverges). |
+| **DH-14** | ✅ Fixed: `networkStatusChip` prefers `scan.kind` (including `active`) before legacy `card.status`; legacy `revoked` alone maps to **Card disabled** to match alert copy, not “Revoked on Network”. |
 
 ---
 

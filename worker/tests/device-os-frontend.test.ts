@@ -222,7 +222,7 @@ describe("networkStatusChip", () => {
       tone: "ok",
     });
     expect(networkStatusChip("revoked")).toEqual({
-      label: "Revoked on Network",
+      label: "Card disabled",
       tone: "warn",
     });
     expect(networkStatusChip("offline")).toEqual({
@@ -239,6 +239,17 @@ describe("networkStatusChip", () => {
     });
     expect(networkStatusChip("active", "qr_revoked")).toEqual({
       label: "QR revoked",
+      tone: "warn",
+    });
+  });
+
+  it("prefers scan.kind over legacy card.status (DH-14)", () => {
+    expect(networkStatusChip("revoked", "active")).toEqual({
+      label: "Live State Active",
+      tone: "ok",
+    });
+    expect(networkStatusChip("active", "card_revoked")).toEqual({
+      label: "Card disabled",
       tone: "warn",
     });
   });
