@@ -194,6 +194,21 @@ describe("inboxOverlayCountsFromItems", () => {
     expect(inboxOverlayCountsFromItems(items)).toEqual({
       liveProofPending: 2,
       crossTabNotice: 1,
+      cardDisabledSinceVisit: 0,
+    });
+  });
+
+  it("counts card-disabled since-visit for dot overlay", () => {
+    const items = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 0,
+      crossTabEntries: [],
+      cardDisabledSinceVisit: [{ profile_id: "p1" }, { profile_id: "p2" }],
+    });
+    expect(inboxOverlayCountsFromItems(items)).toEqual({
+      liveProofPending: 0,
+      crossTabNotice: 0,
+      cardDisabledSinceVisit: 2,
     });
   });
 });

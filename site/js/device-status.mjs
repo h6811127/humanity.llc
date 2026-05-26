@@ -73,6 +73,7 @@ const OVERLAY_CLASSES = [
   "pass-dot-overlay-none",
   "pass-dot-overlay-proof_waiting",
   "pass-dot-overlay-cross_tab_keys",
+  "pass-dot-overlay-card_disabled_since_visit",
 ];
 
 const dotBtn = document.getElementById("brand-status-dot-btn");

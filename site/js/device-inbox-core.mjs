@@ -275,7 +275,10 @@ export function inboxOverlayCountsFromItems(items) {
   const crossTabNotice = items
     .filter((i) => i.kind === "cross_tab_keys")
     .reduce((s, i) => s + i.count, 0);
-  return { liveProofPending, crossTabNotice };
+  const cardDisabledSinceVisit = items
+    .filter((i) => i.kind === "card_disabled_since_visit")
+    .reduce((s, i) => s + i.count, 0);
+  return { liveProofPending, crossTabNotice, cardDisabledSinceVisit };
 }
 
 /**

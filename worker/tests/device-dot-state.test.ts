@@ -8,6 +8,7 @@ import {
   dotOverlayFromCounts,
   dotStateKey,
   hasStewardVerification,
+  inboxOverlayQuickAction,
   overlayAriaText,
   primaryDotTone,
   shouldCelebrateStewardTransition,
@@ -69,6 +70,23 @@ describe("dotOverlayFromCounts", () => {
     );
     expect(dotOverlayFromCounts({ liveProofPending: 0, crossTabNotice: 0 })).toBe("none");
   });
+
+  it("shows card-disabled overlay only when higher overlays are absent", () => {
+    expect(
+      dotOverlayFromCounts({
+        liveProofPending: 0,
+        crossTabNotice: 0,
+        cardDisabledSinceVisit: 2,
+      })
+    ).toBe("card_disabled_since_visit");
+    expect(
+      dotOverlayFromCounts({
+        liveProofPending: 0,
+        crossTabNotice: 1,
+        cardDisabledSinceVisit: 2,
+      })
+    ).toBe("cross_tab_keys");
+  });
 });
 
 describe("statusAriaLabel", () => {
@@ -86,6 +104,9 @@ describe("overlayAriaText", () => {
   it("maps overlay ids to phrases", () => {
     expect(overlayAriaText("proof_waiting")).toBe("live proof waiting");
     expect(overlayAriaText("cross_tab_keys")).toBe("keys active in another tab");
+    expect(overlayAriaText("card_disabled_since_visit")).toBe(
+      "card disabled since last visit"
+    );
     expect(overlayAriaText("none")).toBe("");
   });
 });
@@ -133,6 +154,16 @@ describe("describeDotState", () => {
       kind: "open_notifications",
       label: "Open proof requests",
     });
+  });
+
+  it("routes card-disabled overlay to open device inbox", () => {
+    const disabled = describeDotState("ok", "keys", "card_disabled_since_visit");
+    expect(disabled.next).toContain("disabled on the network");
+    expect(inboxOverlayQuickAction("card_disabled_since_visit")).toEqual({
+      kind: "open_notifications",
+      label: "Open device inbox",
+    });
+    expect(disabled.action).toEqual(inboxOverlayQuickAction("card_disabled_since_visit"));
   });
 });
 

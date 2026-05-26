@@ -173,6 +173,14 @@ body.page-flow.has-shell-chrome .page > main.screen {
   background: #2563eb;
 }
 
+.pass-dot-overlay-card_disabled_since_visit::after {
+  opacity: 1;
+  width: 8px;
+  height: 4px;
+  border-radius: 2px;
+  background: #e11d48;
+}
+
 .pass-dot-status-network-offline {
   background: #9ca3af;
 }

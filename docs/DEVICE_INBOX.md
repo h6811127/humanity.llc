@@ -74,13 +74,13 @@ Canonical `kind` values (target: one module `device-inbox-core.mjs`, Vitest-cove
 | `live_proof` | **High** (time-sensitive) | Yes (pending count) | `proof_waiting` (highest overlay) | Yes (opt-in) | Open `/created/` to sign (`live_challenge`) |
 | `tab_keys_unsaved` | Medium | Yes (0 or 1) | Via device axis (`unsaved` pulsing red), not overlay | No | Save keys on device |
 | `cross_tab_keys` | Medium | Yes when tab notice = 0 | `cross_tab_keys` | No | Focus other tab / save here |
-| `card_disabled_since_visit` | Medium | **Yes** (resolver-confirmed since-visit cards) | No (optional soft overlay later) | No | Open card from inbox sheet |
+| `card_disabled_since_visit` | Medium | **Yes** (resolver-confirmed since-visit cards) | `card_disabled_since_visit` (soft notch; below proof/cross-tab) | No | Open card from inbox sheet |
 | `resolver_degraded` | Low | **No** | Via network color on dot | No | System banner only |
 
 **Counting rules (codify in inbox core):**
 
 1. **Badge count = actionable inbox items only** — exclude informational resolver state (`resolver_degraded`).
-2. **Dot overlay = highest-priority inbox kind** — `proof_waiting` beats `cross_tab_keys` (see `dotOverlayFromCounts()` in `device-dot-state-core.mjs`).
+2. **Dot overlay = highest-priority inbox kind** — `proof_waiting` → `cross_tab_keys` → `card_disabled_since_visit` (see `dotOverlayFromCounts()` in `device-dot-state-core.mjs`).
 3. **No double-counting** — e.g. cross-tab banner/glance only when `tabNoticeCount === 0` (`device-cross-tab-visibility.mjs`).
 4. **Live proof** — N pending challenges may show as one inbox group with quantity N; badge may show total count or “1” per product choice; document in tests when unified.
 
@@ -92,10 +92,10 @@ Canonical `kind` values (target: one module `device-inbox-core.mjs`, Vitest-cove
 
 **Shipped:**
 
-- Network + device color + overlay notch (`proof_waiting`, `cross_tab_keys`).
+- Network + device color + overlay notch (`proof_waiting`, `cross_tab_keys`, `card_disabled_since_visit`).
 - Tap opens hub sheet (landing/created) or scrolls wallet on `/wallet/`.
 - **Now / Why / Next** explainer in hub status key + glance popover.
-- Quick action `open_notifications` when overlay is `proof_waiting`.
+- Quick action `open_notifications` when overlay is `proof_waiting` or `card_disabled_since_visit` (opens inbox sheet).
 
 - Badge ring/count chroma follows `inboxBadgeChromaKind()` (amber live proof, blue cross-tab, red default).
 
@@ -155,7 +155,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 | Trigger | `hc-live-control-inbox-changed`, `visibilitychange` → hidden |
 | Dedup | Signature of pending `challenge_id` list |
 | Permission | Requested on toggle enable in settings |
-| Limitation | Requires a background tab; **no Service Worker** — fully closed browser may not alert |
+| Limitation (v1) | Required a background tab before Phase D service worker |
 
 ### v2 Phase A — Contextual opt-in (shipped)
 
@@ -183,10 +183,13 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 | Card disabled since visit | No (defer digest) | Batch/digest, not instant |
 | Resolver offline/degraded | No | `#device-system-banner` |
 
-### v2 Phase D — Service Worker (optional, defer)
+### v2 Phase D — Service Worker (shipped)
 
-- Minimal SW + inbox poll when all tabs closed — only if contextual opt-in proves demand.
-- **No server push** — stays device-only per threat model.
+- **`/sw-live-proof.mjs`** — polls pending live-proof challenges when **no visible Humanity tab** and background alerts are on.
+- Page sync: `device-browser-notifications-sw.mjs` mirrors wallet poll targets + resolver origin via `postMessage`; triggers poll on tab hide / `pagehide` and **Background Sync** / **Periodic Background Sync** when the browser grants them.
+- OS notification via `registration.showNotification()` (same copy + sign deep link as Phase B); click handled in the SW.
+- **No server push** — device-only polling, `live_proof` policy only (Phase C).
+- **Limits:** Browsers may throttle or deny periodic sync; fully force-quit browsers may not wake the SW. Hidden-tab alerts still use the page path first (`maybeNotifyLiveProof`).
 
 ---
 
@@ -228,6 +231,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 | 8 | Hub alert groups gated on `getInboxItems()` (live proof, tab keys, cross-tab slot) | ✅ |
 | 9 | Hub card-disabled group (`#device-hub-card-disabled-group`) | ✅ |
 | 10 | `buildGlanceRowPlan()` — glance popover order from inbox + saved-card peek | ✅ |
+| 11 | Dot soft overlay for `card_disabled_since_visit` (`inboxOverlayCountsFromItems` + `dotOverlayFromCounts`) | ✅ |
 
 **Do not:**
 
@@ -268,7 +272,11 @@ Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox 
 | `site/js/device-status.mjs` | Dot (`openHubFromChrome()`), badge count; imports inbox sheet for hub coordination |
 | `site/js/device-dot-state-core.mjs` | Dot overlay priority, explainers, `open_notifications` action |
 | `site/js/device-browser-notifications.mjs` | OS alerts, contextual prompt, toggle sync |
+| `site/js/device-browser-notifications-sw.mjs` | SW register + state sync (Phase D) |
+| `site/js/device-live-control-sw-core.mjs` | Pure SW poll + notification payload |
+| `site/sw-live-proof.mjs` | Service worker script (module) |
 | `site/js/device-browser-notifications-core.mjs` | Pure prompt + OS copy + `inboxKindAllowsOsNotification()` (Phase C) |
+| `worker/tests/device-live-control-sw-core.test.ts` | Vitest for SW poll core |
 | `worker/tests/device-browser-notifications.test.ts` | Vitest for alert core |
 | `site/js/device-counts.mjs` / `device-counts-core.mjs` | `tabNoticeCount`, status segments |
 | `site/js/device-live-control-inbox.mjs` | Live proof poll + hub list |

@@ -23,25 +23,44 @@ export function deviceStateFromContext({ unsavedTabKeys, stewardReady, savedWall
 }
 
 /**
- * @param {{ liveProofPending: number, crossTabNotice: number }}
+ * @param {{ liveProofPending: number, crossTabNotice: number, cardDisabledSinceVisit?: number }}
  */
-export function dotOverlayFromCounts({ liveProofPending, crossTabNotice }) {
+export function dotOverlayFromCounts({
+  liveProofPending,
+  crossTabNotice,
+  cardDisabledSinceVisit = 0,
+}) {
   if (liveProofPending > 0) return "proof_waiting";
   if (crossTabNotice > 0) return "cross_tab_keys";
+  if (cardDisabledSinceVisit > 0) return "card_disabled_since_visit";
   return "none";
 }
 
-/** @param {"proof_waiting" | "cross_tab_keys" | "none"} overlay */
+/** @typedef {"none" | "proof_waiting" | "cross_tab_keys" | "card_disabled_since_visit"} DotInboxOverlay */
+
+/** @param {DotInboxOverlay} overlay */
 export function overlayAriaText(overlay) {
   if (overlay === "proof_waiting") return "live proof waiting";
   if (overlay === "cross_tab_keys") return "keys active in another tab";
+  if (overlay === "card_disabled_since_visit") return "card disabled since last visit";
   return "";
+}
+
+/** @param {DotInboxOverlay} overlay */
+export function inboxOverlayQuickAction(overlay) {
+  if (overlay === "proof_waiting") {
+    return { kind: "open_notifications", label: "Open proof requests" };
+  }
+  if (overlay === "card_disabled_since_visit") {
+    return { kind: "open_notifications", label: "Open device inbox" };
+  }
+  return null;
 }
 
 /**
  * @param {"ok" | "degraded" | "offline"} network
  * @param {"none" | "keys" | "unsaved" | "steward"} device
- * @param {"none" | "proof_waiting" | "cross_tab_keys"} overlay
+ * @param {DotInboxOverlay} overlay
  * @param {{ pageKind?: string }} [opts]
  */
 export function statusAriaLabel(network, device, overlay, opts = {}) {
@@ -97,7 +116,7 @@ export function dotExplainerKicker(descriptor, compact) {
 /**
  * @param {"ok" | "degraded" | "offline"} network
  * @param {"none" | "keys" | "unsaved" | "steward"} device
- * @param {"none" | "proof_waiting" | "cross_tab_keys"} overlay
+ * @param {DotInboxOverlay} overlay
  * @param {{ stewardReady?: boolean, queueUrl?: string | null, pageKind?: string }} [opts]
  */
 export function describeDotState(network, device, overlay, opts = {}) {
@@ -109,7 +128,9 @@ export function describeDotState(network, device, overlay, opts = {}) {
       ? "Live proof requests are waiting."
       : overlay === "cross_tab_keys"
         ? "Keys are active in another tab."
-        : "";
+        : overlay === "card_disabled_since_visit"
+          ? "A saved card was disabled on the network since your last visit."
+          : "";
 
   if (network === "offline") {
     return {
@@ -119,10 +140,10 @@ export function describeDotState(network, device, overlay, opts = {}) {
         ? "Steward keys are ready locally, but network is unreachable."
         : "Health check failed and signing actions need a connection.",
       next: overlayText || "Retry resolver check.",
-      action:
-        overlay === "proof_waiting"
-          ? { kind: "open_notifications", label: "Open proof requests" }
-          : { kind: "retry", label: "Retry status check" },
+      action: inboxOverlayQuickAction(overlay) ?? {
+        kind: "retry",
+        label: "Retry status check",
+      },
     };
   }
   if (network === "degraded") {
@@ -133,10 +154,10 @@ export function describeDotState(network, device, overlay, opts = {}) {
         ? "Steward keys are ready locally; network responses are currently limited."
         : "Resolver reported degraded health.",
       next: overlayText || "Retry status check or wait for recovery.",
-      action:
-        overlay === "proof_waiting"
-          ? { kind: "open_notifications", label: "Open proof requests" }
-          : { kind: "retry", label: "Retry status check" },
+      action: inboxOverlayQuickAction(overlay) ?? {
+        kind: "retry",
+        label: "Retry status check",
+      },
     };
   }
   if (device === "unsaved") {
@@ -145,10 +166,10 @@ export function describeDotState(network, device, overlay, opts = {}) {
       now: "Tab keys not saved.",
       why: "This tab has signing keys that are not yet saved to this device.",
       next: overlayText || "Open controls and save keys.",
-      action:
-        overlay === "proof_waiting"
-          ? { kind: "open_notifications", label: "Open proof requests" }
-          : { kind: "open_controls", label: "Open controls" },
+      action: inboxOverlayQuickAction(overlay) ?? {
+        kind: "open_controls",
+        label: "Open controls",
+      },
     };
   }
   if (device === "steward") {
@@ -158,11 +179,10 @@ export function describeDotState(network, device, overlay, opts = {}) {
       why: "Steward-capable signing keys are available in this browser context.",
       next: stewardNextLine({ overlayText, queueUrl, pageKind }),
       action:
-        overlay === "proof_waiting"
-          ? { kind: "open_notifications", label: "Open proof requests" }
-          : queueUrl
-            ? { kind: "open_steward_queue", label: "Open steward queue", href: queueUrl }
-            : { kind: "open_controls", label: "Open controls" },
+        inboxOverlayQuickAction(overlay) ??
+        (queueUrl
+          ? { kind: "open_steward_queue", label: "Open steward queue", href: queueUrl }
+          : { kind: "open_controls", label: "Open controls" }),
     };
   }
   if (device === "keys") {
@@ -171,10 +191,10 @@ export function describeDotState(network, device, overlay, opts = {}) {
       now: "Saved keys ready.",
       why: "Signing keys are saved on this device and resolver is online.",
       next: overlayText || "Open controls to manage a saved card.",
-      action:
-        overlay === "proof_waiting"
-          ? { kind: "open_notifications", label: "Open proof requests" }
-          : { kind: "open_controls", label: "Open controls" },
+      action: inboxOverlayQuickAction(overlay) ?? {
+        kind: "open_controls",
+        label: "Open controls",
+      },
     };
   }
   return {
@@ -182,10 +202,11 @@ export function describeDotState(network, device, overlay, opts = {}) {
     now: "No saved keys on this device.",
     why: "Resolver is online, but this browser has no saved signing keys.",
     next: overlayText || "Create a card or save keys from this tab.",
-    action:
-      overlay === "proof_waiting"
-        ? { kind: "open_notifications", label: "Open proof requests" }
-        : { kind: "create_card", label: "Create a card", href: "/create/" },
+    action: inboxOverlayQuickAction(overlay) ?? {
+      kind: "create_card",
+      label: "Create a card",
+      href: "/create/",
+    },
   };
 }
 
@@ -200,7 +221,7 @@ export function dotStateKey(network, device) {
 /**
  * @param {"ok" | "degraded" | "offline"} network
  * @param {"none" | "keys" | "unsaved" | "steward"} device
- * @param {"none" | "proof_waiting" | "cross_tab_keys"} overlay
+ * @param {DotInboxOverlay} overlay
  */
 export function dotClassList(network, device, overlay) {
   return [
@@ -226,7 +247,7 @@ export function primaryDotTone(network, device) {
 /**
  * @param {"ok" | "degraded" | "offline"} network
  * @param {"none" | "keys" | "unsaved" | "steward"} device
- * @param {"none" | "proof_waiting" | "cross_tab_keys"} overlay
+ * @param {DotInboxOverlay} overlay
  */
 export function dotTransitionKey(network, device, overlay) {
   return `${network}:${device}:${overlay}`;
