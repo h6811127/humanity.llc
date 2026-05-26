@@ -78,11 +78,9 @@ export function liveControlPollLoopShouldRun(input) {
  *   watchEnabled: boolean,
  *   scopeActive: boolean,
  *   resolverHealth: 'ok' | 'degraded' | 'offline',
- *   stewardPushHealthy?: boolean,
  * }} input
  */
 export function liveControlAutoPollShouldRun(input) {
-  if (input.stewardPushHealthy === true) return false;
   if (input.budgetExhausted === true) return false;
   if (input.isPollLeader === false) return false;
   return (
