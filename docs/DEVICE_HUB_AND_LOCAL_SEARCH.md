@@ -40,7 +40,7 @@ These notes are captured as individual product refinements so implementation can
 
 - **Step 1 (now):** reduce card text density with progressive disclosure.
 - **Step 2 (now):** rename `Use keys` to `Open controls` across hub/wallet and tests.
-- **Step 3:** add network liveliness indicators and wording pass.
+- **Step 3 (now):** add network liveliness indicators and wording pass.
 - **Step 4:** status-pill terminology pass (`pins`, `online` semantics).
 - **Step 5:** object identity visual system (types, glyph/color cues).
 - **Step 6:** modal/shell visual polish pass.
@@ -69,6 +69,8 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 **Hub glance (landing):** When the hub is collapsed, `#device-hub-glance` shows notice (if any) and up to three saved card labels; tap expands the hub. Quick-look popover rows use **light pastel** fills (red / blue / orange by notice type). Glance **Card disabled since last visit** copy follows the latest resolver-confirmed alert state from the wallet network poll (not stale cache and not the persisted `hc_wallet[].status` field).
 
 **`/wallet/` (Phase 5–6):** Uses the same hub renderer as landing. Each saved row shows a **verification chip** (Steward / Vouched Human / Registered from resolver, ~5 min cache), a **network chip** (card/QR live state), optional **card disabled since last visit** alert (`hc_wallet_last_seen_network`), **Last on device** from activity, and **Open controls / Open scan / Manage**. Row icon tone follows verification (green shield = Steward). Page is hub-expanded by default; help disclosure hides when cards exist.
+
+**Card liveliness (Step 3):** Saved rows also show a compact liveliness line (e.g., **Network reachable · seen 2m ago**, **Pending sync**, **Offline**) derived from the same wallet network cache and resolver fetch cycle used for chips/alerts.
 
 **Keys vs verification:** See [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md). **Open controls** loads signing material into `hc_created`; the verification chip is read-only network state.
 

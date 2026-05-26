@@ -98,6 +98,13 @@ export function getCachedNetworkScanKind(profileId) {
 }
 
 /** @param {string} profileId */
+export function getCachedNetworkSeenAt(profileId) {
+  const cache = loadCache();
+  const entry = cache?.[profileId];
+  return typeof entry?.at === "number" ? entry.at : null;
+}
+
+/** @param {string} profileId */
 export function getCachedVerification(profileId) {
   return readCachedVerification(loadCache(), profileId, Date.now(), WALLET_NETWORK_CACHE_TTL_MS);
 }

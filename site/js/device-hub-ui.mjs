@@ -30,6 +30,7 @@ import {
 } from "./device-wallet.mjs";
 import {
   getCachedNetworkAlertState,
+  getCachedNetworkSeenAt,
   getCachedNetworkScanKind,
   getCachedNetworkStatus,
   getCachedVerification,
@@ -219,6 +220,40 @@ function hubCardSubHtml(entry, lastUsed) {
   return `<span class="list-sub hub-card-sub hub-card-sub--compact"><span class="hub-card-sub-line">${escapeHtml(primarySub)}</span></span>${detailsHtml}`;
 }
 
+function formatSeenAgo(at) {
+  if (typeof at !== "number" || !Number.isFinite(at)) return "";
+  const deltaMs = Math.max(0, Date.now() - at);
+  const mins = Math.floor(deltaMs / 60000);
+  if (mins < 1) return "seen just now";
+  if (mins < 60) return `seen ${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `seen ${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `seen ${days}d ago`;
+}
+
+function networkLivelinessMeta(profileId) {
+  const status = getCachedNetworkStatus(profileId) ?? "checking";
+  const scanKind = getCachedNetworkScanKind(profileId);
+  const seen = formatSeenAgo(getCachedNetworkSeenAt(profileId));
+  if (scanKind === "card_revoked") {
+    return { label: seen ? `Revoked on network · ${seen}` : "Revoked on network", tone: "warn" };
+  }
+  if (scanKind === "qr_revoked") {
+    return { label: seen ? `QR revoked · ${seen}` : "QR revoked", tone: "warn" };
+  }
+  if (status === "active") {
+    return { label: seen ? `Network reachable · ${seen}` : "Network reachable", tone: "ok" };
+  }
+  if (status === "checking") {
+    return { label: "Pending sync", tone: "muted" };
+  }
+  if (status === "offline" || status === "error") {
+    return { label: seen ? `Offline · ${seen}` : "Offline", tone: "offline" };
+  }
+  return { label: seen || "Network unknown", tone: "muted" };
+}
+
 function scanUrlForEntry(entry) {
   if (entry.scan_url) return entry.scan_url;
   const base = `${location.origin}/c/${encodeURIComponent(entry.profile_id)}`;
@@ -272,6 +307,12 @@ function applyNetworkChipsToDom(statusMap = {}, alertStateMap = null, scanKindMa
       const chip = networkStatusChip(status, currentNetworkScanKind(pid, scanKindMap));
       chipEl.className = `hub-card-network hub-card-network--${chip.tone}`;
       chipEl.textContent = chip.label;
+    }
+    const liveEl = li.querySelector(".hub-card-live");
+    if (liveEl) {
+      const live = networkLivelinessMeta(pid);
+      liveEl.className = `hub-card-live hub-card-live--${live.tone}`;
+      liveEl.textContent = live.label;
     }
     const verifyEl = li.querySelector(".hub-card-verification");
     if (verifyEl) {
@@ -540,6 +581,7 @@ function renderSavedRows() {
       ? networkChipHtml(entry.profile_id, getCachedNetworkStatus(entry.profile_id) ?? "checking")
       : "";
     const verifyChip = verificationChipHtml(entry.profile_id);
+    const liveMeta = networkLivelinessMeta(entry.profile_id);
     const cardIcon = hubConfig.fetchNetworkStatus
       ? hubCardIconHtml(entry.profile_id)
       : `<span class="list-icon list-icon-tone-trust" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>`;
@@ -578,6 +620,7 @@ function renderSavedRows() {
         <span class="list-content">
           <span class="list-title">${escapeHtml(entry.label)}</span>
           ${hubCardSubHtml(entry, lastUsed)}
+          <span class="hub-card-live hub-card-live--${liveMeta.tone}">${escapeHtml(liveMeta.label)}</span>
         </span>
         <div class="hub-card-head-meta">
           ${verifyChip}
