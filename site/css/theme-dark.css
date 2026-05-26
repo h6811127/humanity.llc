@@ -22,6 +22,13 @@ html[data-theme="dark"] {
   --hc-notice-strong-fg: #ffffff;
   --hc-notice-link: #64b5ff;
   --hc-notice-foot-border: rgba(255, 255, 255, 0.18);
+  --surface-popover-bg: #1c1c1e;
+  --surface-popover-fg: #f5f5f7;
+  --surface-popover-fg-muted: rgba(235, 235, 245, 0.78);
+  --surface-popover-accent: #ff4d6d;
+  --surface-popover-border: rgba(255, 255, 255, 0.14);
+  --surface-popover-control-bg: #2c2c2e;
+  --surface-popover-control-fg: #f5f5f7;
 }
 
 html[data-theme="dark"] body {
@@ -229,12 +236,13 @@ html[data-theme="dark"] .hc-notice--info .hc-notice-icon {
 }
 
 html[data-theme="dark"] .hub-card-status-alert {
-  background: rgba(28, 28, 30, 0.96);
+  background: var(--surface-popover-bg);
   border-color: rgba(255, 69, 58, 0.45);
+  color: var(--surface-popover-fg);
 }
 
 html[data-theme="dark"] .hub-card-status-alert-text {
-  color: var(--shell-label-strong);
+  color: var(--surface-popover-fg);
 }
 
 html[data-theme="dark"] .hub-card-details-body {
@@ -391,7 +399,7 @@ html[data-theme="dark"] .created-dashboard-feedback--error {
 }
 
 html[data-theme="dark"] .hub-card-status-alert {
-  background: var(--shell-fill-secondary);
+  background: var(--surface-popover-bg);
   border-color: rgba(255, 69, 58, 0.45);
 }
 
@@ -628,8 +636,40 @@ html[data-theme="dark"] .created-revoke-rules-list {
 }
 
 html[data-theme="dark"] .device-hub-glance-popover {
-  background: #1c1c1e;
-  border-color: var(--shell-separator);
+  background: var(--surface-popover-bg);
+  border-color: var(--surface-popover-border);
+  color: var(--surface-popover-fg);
+}
+
+html[data-theme="dark"] .device-hub-intro-coachmark {
+  background: var(--surface-popover-bg);
+  border-color: var(--surface-popover-border);
+  color: var(--surface-popover-fg);
+}
+
+html[data-theme="dark"] .device-hub-intro-caret::before {
+  background: var(--surface-popover-bg);
+  border-top-color: var(--surface-popover-border);
+  border-left-color: var(--surface-popover-border);
+  box-shadow: -1px -1px 0 rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme="dark"] .device-hub-intro-title {
+  color: var(--surface-popover-fg);
+}
+
+html[data-theme="dark"] .device-hub-intro-body {
+  color: var(--surface-popover-fg-muted);
+}
+
+html[data-theme="dark"] .device-hub-intro-eyebrow,
+html[data-theme="dark"] .device-hub-intro-cta {
+  color: var(--surface-popover-accent);
+}
+
+html[data-theme="dark"] .device-hub-intro-dismiss {
+  background: var(--surface-popover-control-bg);
+  color: var(--surface-popover-control-fg);
 }
 
 html[data-theme="dark"] .device-hub-glance-popover .device-hub-glance-row--notice .device-hub-glance-btn {

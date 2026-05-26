@@ -10,7 +10,7 @@
  * Bump on all shell HTML (`device-status-bootstrap.mjs?v=N`) and on every
  * `./peer.mjs?v=N` import between files in DEVICE_STATUS_SHELL_JS_FILES.
  */
-export const DEVICE_SHELL_ASSET_VERSION = 31;
+export const DEVICE_SHELL_ASSET_VERSION = 33;
 
 /** @deprecated Use DEVICE_SHELL_ASSET_VERSION */
 export const DEVICE_STATUS_BOOTSTRAP_CACHE_BUST = DEVICE_SHELL_ASSET_VERSION;
@@ -22,7 +22,9 @@ export const DEVICE_STATUS_BOOTSTRAP_CACHE_BUST = DEVICE_SHELL_ASSET_VERSION;
 export const DEVICE_STATUS_SHELL_JS_FILES = [
   "device-status-bootstrap.mjs",
   "device-status.mjs",
+  "device-hub-intro-coachmark.mjs",
   "device-dot-state-core.mjs",
+  "device-inbox-sheet-loader.mjs",
   "device-inbox-sheet.mjs",
   "device-inbox-sheet-core.mjs",
   "device-inbox-card-disabled.mjs",

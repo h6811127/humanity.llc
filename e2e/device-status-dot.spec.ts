@@ -232,3 +232,49 @@ test.describe("status dot accessibility", () => {
     );
   });
 });
+
+test.describe("hub intro coachmark", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.removeItem("hc_device_hub_intro_dismissed");
+    });
+    await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
+  });
+
+  test("shows first-visit coachmark on landing", async ({ page }) => {
+    await page.goto("/");
+    const intro = page.locator("#device-hub-intro-coachmark");
+    await expect(intro).toBeVisible({ timeout: 5000 });
+    await expect(intro).toContainText(/meet your device hub/i);
+    await expect(intro).toContainText(/status dot/i);
+    await expect(page.locator(".shell-status-cluster--hub-intro")).toBeVisible();
+  });
+
+  test("hides coachmark after Got it and stays dismissed on reload", async ({ page }) => {
+    await page.goto("/");
+    const intro = page.locator("#device-hub-intro-coachmark");
+    await expect(intro).toBeVisible({ timeout: 5000 });
+    await page.locator("#device-hub-intro-dismiss").click();
+    await expect(intro).toBeHidden();
+    await page.reload();
+    await expect(intro).toBeHidden();
+    await expect(page.locator("body")).not.toHaveClass(/device-hub-intro-visible/);
+  });
+
+  test("dismisses coachmark when dot opens hub", async ({ page }) => {
+    await page.goto("/");
+    const intro = page.locator("#device-hub-intro-coachmark");
+    await expect(intro).toBeVisible({ timeout: 5000 });
+    await page.locator("#brand-status-dot-btn").click();
+    await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/);
+    await expect(intro).toBeHidden();
+    await page.reload();
+    await expect(intro).toBeHidden();
+  });
+
+  test("does not show coachmark on wallet", async ({ page }) => {
+    await page.goto("/wallet/");
+    await page.waitForTimeout(1200);
+    await expect(page.locator("#device-hub-intro-coachmark")).toHaveCount(0);
+  });
+});
