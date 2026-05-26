@@ -472,7 +472,9 @@ function applyOrganizerHandoffUi(session) {
 }
 
 if (!profileId && !activeQrId && !data) {
-  noSessionEl.hidden = false;
+  setNoSessionNotice(
+    'No active card in this tab. Open <a href="/wallet/">Saved cards</a> to pick a card, then tap <strong>Use keys</strong> or <strong>Open card</strong>.'
+  );
 } else if (!profileId || !activeQrId) {
   setNoSessionNotice(
     "Missing profile or QR in this link. Create a new card, or open the full URL from your create confirmation."
