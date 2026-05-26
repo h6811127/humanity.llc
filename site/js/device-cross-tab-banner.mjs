@@ -86,7 +86,7 @@ function bindUseKeysHere(root, profileId, opts = {}) {
 function vouchCrossTabSubtext() {
   return getDefaultVouchProfileId()
     ? " — open that tab to vouch, or load keys here"
-    : " — open that tab to sign, or load keys from Saved cards";
+    : " — open that tab to sign, or load keys from My cards";
 }
 
 function walletEntryForVouchHere(primaryProfileId) {
@@ -225,7 +225,7 @@ export function renderCrossTabKeysBanner() {
     <button type="button" class="device-cross-tab-focus-btn" data-cross-tab-action>Open that tab</button>
     <span class="device-cross-tab-or">or</span>
     ${useKeysInline}
-    <a href="/wallet/">Saved cards</a>.`;
+    <a href="/wallet/">My cards</a>.`;
   bindCrossTabAction(banner, msg.primary);
   bindUseKeysHere(banner, walletEntry?.profile_id ?? msg.primary.profile_id);
 }

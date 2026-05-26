@@ -26,7 +26,7 @@ Before shipping UI, answer:
 |----------|-------------|
 | Save, search, relabel, import backup, activity log, collapsed glance | **Device hub** (`#device-hub`) + glance strip |
 | Live proof **inbox** (pending challenges for saved cards) | **Device hub**  -  tap opens `/created/` to sign |
-| Manifesto, revoke, QR, backup export | **Network object** + `/created/` More options tab |
+| Manifesto, revoke, QR, backup export | **Network object** + `/created/` **Advanced** tab |
 | Live proof **signing** | **`/created/`** only (existing proof panel + poll) |
 | What a stranger sees | **Scan page only**  -  never a second homepage demo |
 | Protocol essays, threat models, case study walkthrough | **Reference** (full docs in intro mode; Help & protocol footer in focus mode) |
@@ -242,7 +242,7 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 | `site/js/device-wallet-network.mjs` | Resolver status cache for saved rows |
 | `site/js/wallet-page.mjs` | Wallet page init |
 | `site/js/device-hub-glance.mjs` | Collapsed-hub summary (landing) |
-| `site/wallet/index.html` | Saved cards device shell |
+| `site/wallet/index.html` | **My cards** device shell (`/wallet/`) |
 | `site/js/device-status.mjs` | Status, banner, popover Help row |
 | `site/css/device-shell.css` | Shell materials, motion, system status chrome |
 | `docs/VISUAL_DEVICE_SHELL.md` | Visual / interaction philosophy + OSification roadmap |

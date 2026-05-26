@@ -1,6 +1,6 @@
 # Card workspace UX (`/created/`)
 
-**Status:** Phase 0–3 shipped  
+**Status:** Phase 0–4 shipped  
 **Pages:** `site/created/index.html` · `site/wallet/` (My cards)  
 **Related:** `docs/CARD_WORKSPACE_PHASE0.md`, `docs/KEYS_CARDS_AND_VERIFICATION.md`, `docs/DEVICE_OS.md`
 
@@ -79,6 +79,14 @@ See `docs/CARD_WORKSPACE_PHASE0.md` — Open card loads keys, auto-save default 
 
 ---
 
+## Phase 4 shipped — My cards naming consistency
+
+- Scan/vouch and cross-tab banners link to `/wallet/` as **My cards** (not “Saved cards”)
+- Landing status dot aria-label uses **My cards**
+- `docs/CREATED_TASK_DASHBOARD.md` and `docs/DEVICE_OS.md` aligned with **Tasks · Advanced** (not Manage / More options)
+
+---
+
 ## Files
 
 | Path | Role |
@@ -108,3 +116,4 @@ See `docs/CARD_WORKSPACE_PHASE0.md` — Open card loads keys, auto-save default 
 
 - `worker/tests/created-mode.test.ts`
 - `worker/tests/device-auto-save.test.ts`
+- `e2e/device-os-wallet.spec.ts` — My cards home heading, contextless `/created/` redirect

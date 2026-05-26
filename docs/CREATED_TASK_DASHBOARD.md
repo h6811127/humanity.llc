@@ -59,8 +59,8 @@ Top to bottom:
 | Download QR | Smooth scroll to full QR | Green tint after scroll |
 | Print instructions | Scroll to QR + open print `<details>` | Green tint |
 | Test scan | Open scan URL (same as primary) | Green tint |
-| Update status | Manage tab + open manifesto panel | Green tint |
-| Revoke QR | Manage tab + open revoke `<details>` | No done tint (destructive) |
+| Update status | Advanced tab + open manifesto panel | Green tint |
+| Revoke QR | Advanced tab + open revoke `<details>` | No done tint (destructive) |
 | QR preview tap | Scroll to full QR | — |
 
 Done states persist per card in `sessionStorage` (`hc_created_task_done`).

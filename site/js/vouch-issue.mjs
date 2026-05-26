@@ -39,10 +39,10 @@ function rememberVouchReturnUrl() {
 
 function loadKeysHelpHtml(walletUrl) {
   const defaultHint = getDefaultVouchProfileId()
-    ? ` Change default on <a href="${walletUrl}">Saved cards</a> (⋯ → <strong>Default for vouching</strong>).`
+    ? ` Change default on <a href="${walletUrl}">My cards</a> (⋯ → <strong>Default for vouching</strong>).`
     : "";
   return (
-    ` Or open <a href="${walletUrl}">Saved cards</a>, tap <strong>Open controls</strong> (` +
+    ` Or open <a href="${walletUrl}">My cards</a>, tap <strong>Open controls</strong> (` +
     `<code>/created/</code>), and return here in the same tab.${defaultHint}`
   );
 }
@@ -149,7 +149,7 @@ function plainVouchError(code, fallback) {
     REPLAYED_NONCE: "Nonce already used. Sign again.",
     INVALID_SIGNATURE: "Signature invalid. Reload keys from your create session.",
     CARD_INVALID_SIGNATURE:
-      "Signature invalid. Load steward keys via Saved cards → Sign as…",
+      "Signature invalid. Load steward keys via My cards → Sign as…",
     SIGNATURE_MISMATCH: "Signature does not match your card keys.",
   };
   return map[code] || fallback || "Vouch not recorded. Try again.";
@@ -273,7 +273,7 @@ function showExplainerHtml(html, eligible = []) {
 function walletLinksHtml() {
   const walletUrl = `${location.origin}/wallet/`;
   const createUrl = `${location.origin}/create/`;
-  return `<a href="${walletUrl}">Saved cards</a> (or <a href="${createUrl}">create one</a>)`;
+  return `<a href="${walletUrl}">My cards</a> (or <a href="${createUrl}">create one</a>)`;
 }
 
 function cardLabel(entry) {
@@ -417,7 +417,7 @@ async function showNoKeysExplainer(voucheeProfileId) {
       `<strong>Select a signing card.</strong> No signing key is active in this tab. ` +
       (hasActivatable
         ? `Tap <strong>Sign as…</strong> below. `
-        : `Re-save a card with keys on <a href="${walletUrl}">Saved cards</a>, then return. `) +
+        : `Re-save a card with keys on <a href="${walletUrl}">My cards</a>, then return. `) +
       (!defaultSet
         ? `<a href="${walletUrl}">Set a default for vouching</a> to auto-load one card on future scans. `
         : "");
@@ -426,7 +426,7 @@ async function showNoKeysExplainer(voucheeProfileId) {
       `${lines}${more} — <strong>signing key not loaded in this tab</strong>. ` +
       (hasActivatable
         ? `Tap <strong>Sign as…</strong> below to load the key and sign. `
-        : `Re-save your card with keys on <a href="${walletUrl}">Saved cards</a>, then return. `);
+        : `Re-save your card with keys on <a href="${walletUrl}">My cards</a>, then return. `);
   }
 
   showExplainerHtml(

@@ -1,7 +1,7 @@
 # Card workspace — Phase 0 (footguns)
 
 **Status:** Shipped  
-**Next:** Card workspace Phase 0–3 complete — see `docs/CARD_WORKSPACE_UX.md` · product verticals in `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`  
+**Next:** Card workspace Phase 0–4 complete — see `docs/CARD_WORKSPACE_UX.md` · product verticals in `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`  
 **Related:** `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md`, `docs/DEVICE_OS.md`, `docs/REVOKE_UI_INVESTIGATION.md`, `docs/KEYS_CARDS_AND_VERIFICATION.md`
 
 ---
@@ -13,7 +13,7 @@
 | **Open card = load keys** | Hub ⋯ **Open card** calls `openCardNowPage()` (same as **Use keys** when keys are saved). No more dead link to `/created/` without `hc_created`. | `site/js/device-hub-ui.mjs` |
 | **Auto-save default on** | `isAutoSaveEnabled()` is true unless `localStorage.hc_auto_save_device === "0"`. User can turn off in hub shortcuts. | `site/js/device-auto-save.mjs`, `site/js/created-device-save.mjs` |
 | **Post-create `fresh=1`** | Create redirect adds `?fresh=1` for Phase 1 setup mode detection. | `site/js/create-card.mjs` |
-| **User-facing copy** | Prefer **card page** / **Saved cards** over raw `/created/` in hints (URLs unchanged). | `site/index.html`, `site/wallet/index.html`, `site/create/index.html`, `site/created/index.html`, `site/js/created-dashboard.mjs`, `site/js/device-hub-import.mjs` |
+| **User-facing copy** | Prefer **card page** / **My cards** (`/wallet/`) over raw `/created/` in hints (URLs unchanged). | `site/index.html`, `site/wallet/index.html`, `site/create/index.html`, `site/created/index.html`, `site/js/created-dashboard.mjs`, `site/js/device-hub-import.mjs` |
 
 ---
 

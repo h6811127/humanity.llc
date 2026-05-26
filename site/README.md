@@ -44,7 +44,7 @@ npm run deploy
 |------|---------|
 | `index.html` | Landing (four-step progress, device hub, status plate pilot  -  no pass demo) |
 | `created/index.html` | Post-create owner UI + shared device hub |
-| `wallet/index.html` | Saved cards on this device (`hc_wallet` in localStorage) |
+| `wallet/index.html` | My cards on this device (`/wallet/`, `hc_wallet` in localStorage) |
 | `shop/index.html` | Tier 0 drop  -  config-driven Shopify checkout handoff |
 | `data/shop-config.json` | Set `checkout_url` + `checkout_open` to enable Buy |
 | `shop/thanks/index.html` | Post-checkout guidance (Tier 0 email copy) |
