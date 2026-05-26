@@ -55,14 +55,14 @@
   --hc-emphasis-card-eyebrow-urgent: #c9342a;
   --hc-emphasis-card-title-fg: #1c1c1e;
   --hc-emphasis-card-detail-fg: rgba(60, 60, 67, 0.88);
-  --hc-emphasis-card-padding-block: 14px;
-  --hc-emphasis-card-padding-inline: 16px;
-  --hc-emphasis-card-gap-dot: 12px;
-  --hc-emphasis-card-gap-eyebrow: 4px;
-  --hc-emphasis-card-gap-copy: 6px;
-  --hc-emphasis-card-gap-section: 12px;
-  --hc-emphasis-card-gap-row: 12px;
-  --hc-emphasis-card-gap-foot: 8px;
+  --hc-emphasis-card-padding-block: 20px;
+  --hc-emphasis-card-padding-inline: 20px;
+  --hc-emphasis-card-gap-dot: 14px;
+  --hc-emphasis-card-gap-eyebrow: 8px;
+  --hc-emphasis-card-gap-copy: 12px;
+  --hc-emphasis-card-gap-section: 24px;
+  --hc-emphasis-card-gap-row: 16px;
+  --hc-emphasis-card-gap-foot: 12px;
 }
 
 *,

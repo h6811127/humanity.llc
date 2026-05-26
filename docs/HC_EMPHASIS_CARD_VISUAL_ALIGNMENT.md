@@ -63,27 +63,33 @@ Marketing landing blocks pick the modifier by **state**, not by section aestheti
 
 ## Internal spacing ladder (May 2026)
 
-**Problem:** After the stacked-layout fix (`flex: none` on `__main`), landing cards felt **too tight** — copy, dot, and CTAs ran together. Spacing must come from **tokens and gap**, never from `flex-grow` on `__main`.
+**Problem:** After the stacked-layout fix (`flex: none` on `__main`), landing cards felt **too tight** — copy, dot, and CTAs ran together. An interim `12px` section gap (+4px over the old `8px` landing override) was **not perceptible** in production and read as “nothing changed.”
 
-**Rule:** One source of truth on `:root`; `hc-emphasis-card.css` consumes `var(--hc-emphasis-card-gap-*)`. Stacked cards share the same section gap between flex children.
+**Rule:** One source of truth on `:root`; `hc-emphasis-card.css` consumes `var(--hc-emphasis-card-gap-*)`. Stacked cards share the same section gap between flex children. **No ad-hoc margins** on `.hc-emphasis-card__title` / `__detail` inside emphasis cards — use tokens only (legacy `.landing-final-cta-title { margin-bottom: 6px }` fights the ladder).
+
+**Comfort target:** Marketing/stacked cards should feel like **grouped iOS inset rows** — clear separation between status block, body copy, and CTA, not “tight notification strip.”
 
 | Token | Value (default) | Zone |
 |-------|-----------------|------|
-| `--hc-emphasis-card-padding-block` | `14px` | Card inset top/bottom |
-| `--hc-emphasis-card-padding-inline` | `16px` | Card inset left/right |
-| `--hc-emphasis-card-gap-dot` | `12px` | Status dot ↔ copy column (`__main` flex `gap`) |
-| `--hc-emphasis-card-gap-eyebrow` | `4px` | Eyebrow ↔ title (`margin-bottom` on eyebrow) |
-| `--hc-emphasis-card-gap-copy` | `6px` | Title ↔ detail (`margin-top` on detail) |
-| `--hc-emphasis-card-gap-section` | `12px` | Stacked flex children: **copy block ↔ actions/secondary row ↔ footer** (card `gap`) |
-| `--hc-emphasis-card-gap-row` | `12px` | Horizontal (side-by-side) wrap gap between `__main` and CTA column |
-| `--hc-emphasis-card-gap-foot` | `8px` | Extra inset before disclaimer line when card `gap` is not used between actions and foot |
+| `--hc-emphasis-card-padding-block` | `20px` | Card inset top/bottom |
+| `--hc-emphasis-card-padding-inline` | `20px` | Card inset left/right |
+| `--hc-emphasis-card-gap-dot` | `14px` | Status dot ↔ copy column (`__main` flex `gap`) |
+| `--hc-emphasis-card-gap-eyebrow` | `8px` | Eyebrow ↔ title (`margin-bottom` on eyebrow) |
+| `--hc-emphasis-card-gap-copy` | `12px` | Title ↔ detail (`margin-top` on detail) |
+| `--hc-emphasis-card-gap-section` | `24px` | Stacked flex children: **copy block ↔ actions/secondary row ↔ footer** (card `gap`) — primary “breathing room” rhythm |
+| `--hc-emphasis-card-gap-row` | `16px` | Horizontal (side-by-side) wrap gap between `__main` and CTA column |
+| `--hc-emphasis-card-gap-foot` | `12px` | Extra inset before disclaimer line when card `gap` is not used between actions and foot |
+
+**Prior values (deprecated):** padding `14/16`, section `12px`, eyebrow `4px`, copy `6px` — too incremental; do not revert without product review.
 
 **Stacked surfaces** (column + `flex: none` on `__main` + `justify-content: flex-start`):
 
 - `.landing-framing`, `.landing-final-cta`
 - `#device-cross-tab-banner`, `#wallet-tab-hint`, `#scan-cross-tab-banner`
 
-**Do not** reduce `--hc-emphasis-card-gap-section` below `12px` on landing without product review — that value is the “main text ↔ button” rhythm users asked for.
+**Do not** reduce `--hc-emphasis-card-gap-section` below `20px` on landing without product review.
+
+**Deploy:** Bump `styles.css?v=` on `site/index.html` (and shell pages when cross-tab/wallet cards change) whenever tokens change; version `hc-emphasis-card.css` on the `@import` query. See [`LANDING_EMPHASIS_CARD_SPACING_DEPLOY_INVESTIGATION.md`](LANDING_EMPHASIS_CARD_SPACING_DEPLOY_INVESTIGATION.md).
 
 ---
 
@@ -182,7 +188,11 @@ All rows use the **same token set** after implementation.
 
 **Shipped F1–F4:** Spacing tokens on `:root`, wired in `hc-emphasis-card.css`, stacked surfaces use `gap-section`; landing `8px` overrides removed.
 
-**Execute F1 → F4 in order** when tightening or loosening card rhythm later; change tokens on `:root` first, not one-off selectors.
+**Shipped F5 (comfort ladder, May 2026):** Tokens raised to table above (`section` **24px**, padding **20px**); landing title margins zeroed inside emphasis cards; `styles.css?v=118` + `@import` `hc-emphasis-card.css?v=2`.
+
+**Deploy / cache:** If production looks unchanged after deploy, see [`LANDING_EMPHASIS_CARD_SPACING_DEPLOY_INVESTIGATION.md`](LANDING_EMPHASIS_CARD_SPACING_DEPLOY_INVESTIGATION.md) (Worker vs Pages, cache bust, `@import`).
+
+**Execute F1 → F4 in order** when tightening or loosening card rhythm later; change tokens on `:root` first, not one-off selectors. **Bump `styles.css?v=`** on `site/index.html` whenever spacing tokens change.
 
 ---
 

@@ -1,5 +1,5 @@
 /* humanity.llc  -  iOS grouped UI, light. #DB1B43 · #000 · #fff · #b8b8b8 */
-@import url("./css/hc-emphasis-card.css");
+@import url("./css/hc-emphasis-card.css?v=2");
 @import url("./css/landing-liquid-glass.css");
 
 :root {
@@ -76,14 +76,14 @@
   --hc-emphasis-card-title-fg: #1c1c1e;
   --hc-emphasis-card-detail-fg: rgba(60, 60, 67, 0.88);
   /* Internal spacing — docs/HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md § Internal spacing ladder */
-  --hc-emphasis-card-padding-block: 14px;
-  --hc-emphasis-card-padding-inline: 16px;
-  --hc-emphasis-card-gap-dot: 12px;
-  --hc-emphasis-card-gap-eyebrow: 4px;
-  --hc-emphasis-card-gap-copy: 6px;
-  --hc-emphasis-card-gap-section: 12px;
-  --hc-emphasis-card-gap-row: 12px;
-  --hc-emphasis-card-gap-foot: 8px;
+  --hc-emphasis-card-padding-block: 20px;
+  --hc-emphasis-card-padding-inline: 20px;
+  --hc-emphasis-card-gap-dot: 14px;
+  --hc-emphasis-card-gap-eyebrow: 8px;
+  --hc-emphasis-card-gap-copy: 12px;
+  --hc-emphasis-card-gap-section: 24px;
+  --hc-emphasis-card-gap-row: 16px;
+  --hc-emphasis-card-gap-foot: 12px;
 }
 
 *,
@@ -1537,6 +1537,7 @@ a.hub-card-menu-item {
 }
 
 .landing-framing .hc-emphasis-card__title.landing-framing-title {
+  margin: 0;
   font-size: 22px;
   letter-spacing: -0.03em;
   line-height: 1.15;
@@ -6080,6 +6081,7 @@ a.wallet-pin-open {
 }
 
 .landing-final-cta .hc-emphasis-card__title.landing-final-cta-title {
+  margin: 0;
   font-size: 22px;
   letter-spacing: -0.03em;
   line-height: 1.15;

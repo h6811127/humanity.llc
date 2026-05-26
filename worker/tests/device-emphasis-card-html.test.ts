@@ -29,6 +29,11 @@ describe("device-emphasis-card-html", () => {
     expect(html).toContain("data-cross-tab-action");
   });
 
+  it("landing index busts styles.css cache when spacing changes", () => {
+    const html = readFileSync(join(root, "site/index.html"), "utf8");
+    expect(html).toContain("styles.css?v=118");
+  });
+
   it("landing final CTA uses urgent emphasis card and glass button", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain("hc-emphasis-card--urgent landing-final-cta");
@@ -41,8 +46,9 @@ describe("device-emphasis-card-html", () => {
 
   it("emphasis card spacing tokens on :root and component css", () => {
     const styles = readFileSync(join(root, "site/styles.css"), "utf8");
-    expect(styles).toContain("--hc-emphasis-card-gap-section: 12px");
-    expect(styles).toContain("--hc-emphasis-card-gap-dot: 12px");
+    expect(styles).toContain("--hc-emphasis-card-gap-section: 24px");
+    expect(styles).toContain("--hc-emphasis-card-gap-dot: 14px");
+    expect(styles).toContain('hc-emphasis-card.css?v=2');
     const emphasis = readFileSync(join(root, "site/css/hc-emphasis-card.css"), "utf8");
     expect(emphasis).toContain("var(--hc-emphasis-card-gap-dot)");
     expect(emphasis).toContain("var(--hc-emphasis-card-gap-copy)");
