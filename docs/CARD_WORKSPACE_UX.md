@@ -1,6 +1,6 @@
 # Card workspace UX (`/created/`)
 
-**Status:** Phase 0–1 shipped · Phase 2+ planned  
+**Status:** Phase 0–1 shipped · Phase 2 in progress (compact hub + Advanced tab)  
 **Pages:** `site/created/index.html` · `site/wallet/` (My cards)  
 **Related:** `docs/CARD_WORKSPACE_PHASE0.md`, `docs/KEYS_CARDS_AND_VERIFICATION.md`, `docs/DEVICE_OS.md`
 
@@ -59,8 +59,8 @@ See `docs/CARD_WORKSPACE_PHASE0.md` — Open card loads keys, auto-save default 
 ## Planned (Phase 2+)
 
 - **My cards** as primary home for multi-card users
-- Compact hub on `/created/` (switcher only)
-- Single **Advanced** stack in control (collapse Manage panels)
+- Compact hub on `/created/` (switcher only) — in progress
+- Single **Advanced** stack in control (collapse Manage panels) — in progress
 - Vouch-ready keys on scan (`docs/VOUCH_READY_KEYS_DESIGN.md`)
 
 ---

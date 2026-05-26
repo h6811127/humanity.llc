@@ -77,8 +77,8 @@
             <a class="device-hub-create-btn" href="/create/" aria-label="Create a live card"><span class="device-hub-create-glyph" aria-hidden="true">+</span></a>
           </div>
 
-          <h2 class="device-hub-title" id="device-hub-title">This browser</h2>
-          <p class="device-hub-lead">Saved in this browser — cards, keys, and pins you choose to keep here.</p>
+          <h2 class="device-hub-title" id="device-hub-title">My cards on this device</h2>
+          <p class="device-hub-lead">Quick switcher for saved cards in this browser. Use Saved cards for pins, backup, and full history.</p>
           <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint" hidden>
             Tap <strong>Save control key</strong> during setup to keep keys after you close this tab.
           </p>
@@ -92,7 +92,7 @@
                 type="search"
                 id="device-hub-search"
                 class="device-hub-search-input"
-                placeholder="Search saved cards, pins, shortcuts"
+                placeholder="Search my saved cards"
                 autocomplete="off"
                 enterkeyhint="search"
               />
@@ -105,7 +105,7 @@
             id="device-hub-saved-items-section"
             aria-labelledby="device-hub-saved-items-title"
           >
-            <h3 class="device-hub-section-title" id="device-hub-saved-items-title">Saved items</h3>
+            <h3 class="device-hub-section-title" id="device-hub-saved-items-title">My cards</h3>
             <p class="device-hub-section-lead">
               Cards, keys, scans, and shortcuts stored in this browser.
             </p>
@@ -353,7 +353,7 @@
             data-created-tab="manage"
             id="created-tab-btn-manage"
           >
-            More options
+            Advanced
           </button>
           <button
             type="button"
@@ -362,6 +362,9 @@
             aria-selected="false"
             data-created-tab="help"
             id="created-tab-btn-help"
+            hidden
+            aria-hidden="true"
+            tabindex="-1"
           >
             Help
           </button>
@@ -601,7 +604,7 @@
             <h2 class="created-what-now-title">Status plate</h2>
             <p class="created-what-now-body">
               Mount on a door or wall. Scanners see <strong>object name</strong> and
-              <strong>status line</strong>. Change the line under <strong>Manage</strong> without
+              <strong>status line</strong>. Change the line under <strong>Advanced</strong> without
               reprinting.
             </p>
           </section>
@@ -610,13 +613,13 @@
             <h2 class="created-what-now-title">Lost item relay</h2>
             <p class="created-what-now-body">
               Tag the item. Finders see what it is and your return message  -  not your phone number.
-              Revoke when recovered under <strong>Manage</strong>.
+              Revoke when recovered under <strong>Advanced</strong>.
             </p>
           </section>
 
         </div>
 
-        <!--  -  -  -  Manage: update, revoke, keys  -  -  -  -->
+        <!--  -  -  -  Advanced: update, revoke, keys  -  -  -  -->
         <div class="created-tab-panel" data-created-panel="manage" id="created-tab-manage" role="tabpanel" aria-labelledby="created-tab-btn-manage" hidden>
           <p class="created-tab-lead">
             Update copy, revoke, or unlock keys. Same printed QR  -  you change resolver state, not
@@ -1016,6 +1019,51 @@
                 </ul>
               </div>
             </details>
+
+            <details class="settings-disclosure settings-disclosure-info" id="revoke-rules">
+              <summary class="settings-summary">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                </span>
+                <span class="settings-summary-text">
+                  <span class="settings-summary-title">Lifecycle & help</span>
+                  <span class="settings-summary-sub">How revoke, keys, and scan behavior work</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="settings-panel settings-panel-info-body">
+                <p class="settings-panel-lead">
+                  Revoke is a <strong>state transition</strong>, not deleting the sticker. Printed URLs keep
+                  profile ID and QR ID while transitions change what the resolver returns.
+                </p>
+                <ul class="created-revoke-rules-list">
+                  <li><strong>Active</strong>  -  live manifesto or pilot layout.</li>
+                  <li><strong>Expiry</strong>  -  credential time runs out; scan shows expired.</li>
+                  <li><strong>Revoke this QR</strong>  -  one pointer off; siblings can stay active.</li>
+                  <li><strong>Disable card</strong>  -  whole profile offline.</li>
+                </ul>
+                <ul class="list list-compact created-help-links">
+                  <li class="list-row list-action">
+                    <a href="/what-can-a-qr-do.html">
+                      <span class="list-content">
+                        <span class="list-title">What can a QR do?</span>
+                        <span class="list-sub">Ideas for plates, relays, civic nodes</span>
+                      </span>
+                      <span class="list-chevron" aria-hidden="true">›</span>
+                    </a>
+                  </li>
+                  <li class="list-row list-action">
+                    <a href="/architecture.html">
+                      <span class="list-content">
+                        <span class="list-title">Architecture &amp; security</span>
+                        <span class="list-sub">Threat model, tests, failure modes</span>
+                      </span>
+                      <span class="list-chevron" aria-hidden="true">›</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </details>
           </div>
 
           <section class="recovery-reveal-card" id="organizer-reveal" hidden>
@@ -1127,7 +1175,7 @@
       </main>
     </div>
     <script src="/js/device-status.mjs?v=20" type="module"></script>
-    <script src="/js/created-hub.mjs?v=2" type="module"></script>
+    <script src="/js/created-hub.mjs?v=3" type="module"></script>
     <script type="module" src="/js/created.mjs?v=43"></script>
   </body>
 </html>
