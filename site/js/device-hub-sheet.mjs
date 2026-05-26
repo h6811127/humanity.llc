@@ -7,6 +7,7 @@ import {
   bindSheetLifecycleReconcile,
   syncSheetBackdropClosed,
 } from "./device-sheet-backdrop-sync.mjs?v=34";
+import { LIVE_CONTROL_POLL_SCOPE_CHANGED } from "./device-live-control-inbox.mjs";
 
 const HUB_OPEN_KEY = "hc_hub_open";
 
@@ -61,6 +62,7 @@ export function setHubSheetOpen(open) {
   if (open && !prefersReducedMotion()) {
     hub.scrollTop = 0;
   }
+  window.dispatchEvent(new Event(LIVE_CONTROL_POLL_SCOPE_CHANGED));
 }
 
 /** Clear body/backdrop when hub DOM is collapsed but sheet-open classes stuck (bfcache, etc.). */

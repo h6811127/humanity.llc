@@ -165,6 +165,7 @@ export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
     });
   }
   refreshHubGlance();
+  window.dispatchEvent(new Event("hc-live-control-poll-scope-changed"));
 }
 
 function hubSheetOpen() {

@@ -455,3 +455,42 @@ test.describe("device inbox — card disabled since visit suppressed when resolv
     await expect(page.locator(".hub-card-status-alert:not([hidden])")).toHaveCount(0);
   });
 });
+
+test.describe("device inbox — live proof poll scope (request budget phase 1)", () => {
+  test.beforeEach(async ({ page, context }) => {
+    await grantBrowserNotifications(context);
+    await page.addInitScript((entry) => {
+      localStorage.setItem("hc_wallet", JSON.stringify([entry]));
+      sessionStorage.setItem("hc_hub_open", "0");
+    }, WALLET_ENTRY);
+    await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
+    await page.route("**/.well-known/hc/v1/cards/**/status**", mockCardStatus);
+    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", mockNoChallenge);
+  });
+
+  test("landing with collapsed hub does not poll live-control for 10s", async ({ page }) => {
+    let challengeFetches = 0;
+    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", (route) => {
+      challengeFetches += 1;
+      return mockNoChallenge(route);
+    });
+
+    await page.goto("/");
+    await expect(page.locator("#device-hub")).toHaveClass(/device-hub-collapsed/);
+    await page.waitForTimeout(10_000);
+    expect(challengeFetches).toBe(0);
+  });
+
+  test("landing polls live-control after hub expands", async ({ page }) => {
+    let challengeFetches = 0;
+    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", (route) => {
+      challengeFetches += 1;
+      return mockNoChallenge(route);
+    });
+
+    await page.goto("/");
+    await page.locator("#brand-status-dot-btn").click();
+    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
+    await expect.poll(() => challengeFetches, { timeout: 15_000 }).toBeGreaterThan(0);
+  });
+});

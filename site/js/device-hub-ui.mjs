@@ -86,7 +86,8 @@ import {
   getLiveControlPending,
   openLiveControlProof,
   refreshLiveControlInbox,
-  startLiveControlInboxPolling,
+  enableLiveControlInboxPolling,
+  isLiveControlInboxPollingActive,
 } from "./device-live-control-inbox.mjs";
 
 function escapeHtml(s) {
@@ -1142,13 +1143,7 @@ export function initDeviceHub(config = {}) {
   notifyHubChanged();
 
   if (hubConfig.showLiveControlInbox) {
-    startLiveControlInboxPolling();
-    void refreshLiveControlInbox().then(() => {
-      syncHubInboxAlertGroups();
-      applySearchFilter();
-      refreshEmptyHint();
-      notifyHubChanged();
-    });
+    enableLiveControlInboxPolling();
     window.addEventListener("hc-live-control-inbox-changed", () => {
       reapplyRevokedSinceVisitFromLatestResolved();
       syncHubInboxAlertGroups();
@@ -1174,7 +1169,7 @@ export function initDeviceHub(config = {}) {
     ) {
       refreshDeviceHub();
       notifyHubChanged();
-      if (hubConfig.showLiveControlInbox) {
+      if (hubConfig.showLiveControlInbox && isLiveControlInboxPollingActive()) {
         void refreshLiveControlInbox();
       }
     }

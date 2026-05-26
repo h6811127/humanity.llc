@@ -1,6 +1,7 @@
 /**
  * Poll resolver for pending live-control challenges on saved wallet cards.
  * Signing stays on /created/  -  inbox only surfaces waiting requests.
+ * @see docs/DEVICE_OS_REQUEST_BUDGET.md (Phase 1 — scoped polling + idle interval)
  */
 import { getPendingLiveControlChallengeUrl } from "./hc-sign.mjs";
 import { activateWalletEntry } from "./device-keys.mjs";
@@ -15,20 +16,37 @@ import {
   setLiveControlPollHealth,
   summarizeLiveControlPoll,
 } from "./device-live-control-inbox-core.mjs";
+import {
+  liveControlPollIntervalMs,
+  liveControlPollTickShouldFetch,
+  resolveLiveControlPollScope,
+} from "./device-live-control-poll-scheduler.mjs";
 import { loadWallet, walletEntryQrId } from "./device-wallet.mjs";
 
 export { getLiveControlPollHealth } from "./device-live-control-inbox-core.mjs";
+export {
+  LIVE_CONTROL_POLL_MS_ACTIVE,
+  LIVE_CONTROL_POLL_MS_IDLE,
+  liveControlPollIntervalMs,
+  liveControlPollingShouldRun,
+  resolveLiveControlPollScope,
+} from "./device-live-control-poll-scheduler.mjs";
 
-const POLL_MS = 5000;
 /** Back off live-control polls after Worker/edge 429 (see investigation doc). */
 const RATE_LIMIT_BACKOFF_MS = 60_000;
+
+export const LIVE_CONTROL_POLL_SCOPE_CHANGED = "hc-live-control-poll-scope-changed";
 
 let pollBackoffUntil = 0;
 
 /** @type {import("./device-live-control-inbox-core.mjs").LiveControlPendingItem[]} */
 let pending = [];
 
+/** @type {ReturnType<typeof setTimeout> | null} */
 let pollTimer = null;
+let pollFeatureEnabled = false;
+let scopeListenersBound = false;
+let scheduledIntervalMs = 0;
 
 export { formatLiveControlExpiry };
 
@@ -38,6 +56,72 @@ export function getLiveControlPending() {
 
 export function getLiveControlPendingCount() {
   return pending.length;
+}
+
+export function isLiveControlInboxPollingActive() {
+  return pollTimer != null;
+}
+
+function readPollScope() {
+  if (typeof document === "undefined") {
+    return resolveLiveControlPollScope({
+      hubEl: null,
+      inboxSheetOpen: false,
+      walletPage: false,
+    });
+  }
+  return resolveLiveControlPollScope({
+    hubEl: document.getElementById("device-hub"),
+    inboxSheetOpen: document.body.classList.contains("device-inbox-sheet-open"),
+    walletPage: document.body.classList.contains("page-wallet"),
+  });
+}
+
+function clearPollTimer() {
+  if (pollTimer != null) {
+    window.clearTimeout(pollTimer);
+    pollTimer = null;
+  }
+  scheduledIntervalMs = 0;
+}
+
+function armPollTimer() {
+  clearPollTimer();
+  if (!pollFeatureEnabled || !readPollScope()) return;
+  const ms = liveControlPollIntervalMs(pending.length);
+  scheduledIntervalMs = ms;
+  pollTimer = window.setTimeout(() => {
+    pollTimer = null;
+    void runPollTick();
+  }, ms);
+}
+
+async function runPollTick() {
+  if (!pollFeatureEnabled || !readPollScope()) {
+    clearPollTimer();
+    return;
+  }
+  if (
+    !liveControlPollTickShouldFetch({
+      documentVisible: document.visibilityState === "visible",
+      backoffUntil: pollBackoffUntil,
+    })
+  ) {
+    armPollTimer();
+    return;
+  }
+  const prevInterval = liveControlPollIntervalMs(pending.length);
+  await refreshLiveControlInbox();
+  if (!pollFeatureEnabled || !readPollScope()) {
+    clearPollTimer();
+    return;
+  }
+  const nextInterval = liveControlPollIntervalMs(pending.length);
+  if (nextInterval !== prevInterval || scheduledIntervalMs === 0) {
+    armPollTimer();
+    return;
+  }
+  armPollTimer();
 }
 
 /**
@@ -87,22 +171,62 @@ export async function refreshLiveControlInbox() {
   return pending;
 }
 
+/** Notify hub/inbox sheet open state changed (also dispatched by shell). */
+export function syncLiveControlInboxPolling() {
+  if (!pollFeatureEnabled) return;
+
+  if (!readPollScope()) {
+    clearPollTimer();
+    return;
+  }
+
+  if (pollTimer == null) {
+    void refreshLiveControlInbox().finally(() => {
+      if (pollFeatureEnabled && readPollScope()) armPollTimer();
+    });
+    return;
+  }
+
+  const ms = liveControlPollIntervalMs(pending.length);
+  if (ms !== scheduledIntervalMs) {
+    armPollTimer();
+  }
+}
+
+function bindLiveControlPollScopeListeners() {
+  if (scopeListenersBound || typeof window === "undefined") return;
+  scopeListenersBound = true;
+
+  window.addEventListener(LIVE_CONTROL_POLL_SCOPE_CHANGED, () => {
+    syncLiveControlInboxPolling();
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      clearPollTimer();
+      return;
+    }
+    syncLiveControlInboxPolling();
+  });
+}
+
+/**
+ * Enable live-control polling for this tab (landing / wallet). Does not start until scope is active.
+ */
+export function enableLiveControlInboxPolling() {
+  pollFeatureEnabled = true;
+  bindLiveControlPollScopeListeners();
+  syncLiveControlInboxPolling();
+}
+
+/** @deprecated Use enableLiveControlInboxPolling + scope events. */
 export function startLiveControlInboxPolling() {
-  if (pollTimer != null) return;
-  const tick = () => {
-    if (document.visibilityState !== "visible") return;
-    if (Date.now() < pollBackoffUntil) return;
-    void refreshLiveControlInbox();
-  };
-  void tick();
-  pollTimer = window.setInterval(tick, POLL_MS);
+  enableLiveControlInboxPolling();
 }
 
 export function stopLiveControlInboxPolling() {
-  if (pollTimer != null) {
-    window.clearInterval(pollTimer);
-    pollTimer = null;
-  }
+  pollFeatureEnabled = false;
+  clearPollTimer();
 }
 
 /**

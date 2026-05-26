@@ -230,7 +230,7 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 **Scope:** Device hub only on **landing** and **`/wallet/`**  -  not duplicated on `/created/` (that page keeps the existing **Prove live control** panel for the open card).
 
-**Poll (shipped — under review):** Every 5s while the tab is visible, `GET /.well-known/hc/v1/cards/{profile_id}/live-control/challenges?qr_id=…` for **each** saved wallet row that has a `qr_id` (parallel). This can exceed the **entire Workers Free daily quota** with a modest wallet and one open tab — see **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)**. Planned direction: poll only when hub/inbox needs it, round-robin one card per tick, longer idle interval — **not** remove network awareness entirely.
+**Poll (Phase 1 shipped):** `GET …/live-control/challenges` runs only when the hub sheet is **expanded**, the **inbox sheet** is open, or the user is on **`/wallet/`** (dedicated hub page). Interval is **30s** when no pending proof, **5s** when proof is waiting; tab must be **visible**. Still **parallel per saved row** per tick — see **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)** Phase 2 for round-robin. Scheduler: `device-live-control-poll-scheduler.mjs`.
 
 **UI:**
 

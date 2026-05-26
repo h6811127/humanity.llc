@@ -36,6 +36,8 @@ Steps 4–8 below remain optional cleanup; do not block the incident as closed f
 
 The rate-limit screen is **Cloudflare edge** (not our Worker 429 JSON). It appears when a profile opens many tabs or refreshes aggressively while the shell fires **health + per-card status + live-proof** fetches on `init`, `visibilitychange`, `storage` (cross-tab), and `hc-device-hub-changed`.
 
+**Follow-up (2026-05-26):** Production **Error 1027** (`workers_daily_limit`) confirmed the free daily cap, not just burst limits. Ongoing client work belongs in **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)** (scope/stop N×5s live-proof polling; do not re-expand global coordinator without a budget).
+
 ---
 
 ## Root-cause layers (remove in this order)

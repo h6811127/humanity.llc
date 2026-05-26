@@ -38,6 +38,7 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 - **Status dot vs inbox vs OS alerts:** `docs/DEVICE_INBOX.md` (action items, badge, background alerts) vs `docs/STATUS_INDICATOR_STEWARD_GREEN.md` (trust dot only).
 - **Safari / iPhone shell regression (scroll, dead taps):** `docs/SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md` — fix plan; hub scroll smooth / landing lag implicates `device-shell-chrome.mjs` document scroll listener. **Reverted features catalog:** `docs/UI_UX_REVERTED_FEATURES_CATALOG.md` (safe rebuild without lag/rate-limit paths). **Phased implementation:** `docs/UI_UX_SAFE_REBUILD_IMPLEMENTATION.md`.
 - **Card disabled since visit:** Banner, hub `#device-hub-card-disabled-group`, and inbox badge must use **resolver-confirmed** poll maps only — never `sessionStorage.hc_wallet_network_cache` alone. Incident **closed** (no Slice 9); see `docs/CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`. After hub/inbox network changes: `npm run worker:test:card-disabled-since-visit` and `npm run e2e:card-disabled-since-visit`.
+- **Worker request budget / polling:** Do not add per-card interval polling without reading `docs/DEVICE_OS_REQUEST_BUDGET.md`. Live-control Phase 1: poll only when hub expanded, inbox open, or on `/wallet/`; 30s idle / 5s when proof pending. Prefer on-demand and round-robin (Phase 2) when changing shell network I/O.
 
 ### Status dot / hub opener (agent guardrails)
 

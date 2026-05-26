@@ -11,15 +11,22 @@ import {
 } from "./device-live-control-inbox.mjs";
 import { openCardNowPage } from "./device-keys.mjs";
 import { loadWallet } from "./device-wallet.mjs";
+import {
+  actOnOrphanRemovedTabKeys,
+  clearOrphanKeysOnDevice,
+} from "./device-orphan-keys-nav.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
 import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=34";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
-import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs";
+import {
+  shouldShowCrossTabKeysNotice,
+  shouldShowOrphanRemovedKeysNotice,
+} from "./device-cross-tab-visibility.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
-import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
+import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { prefersReducedMotion } from "./device-shell-motion.mjs";
 import { closeGlancePopover } from "./device-hub-glance-popover.mjs";
 import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs?v=34";
@@ -29,6 +36,7 @@ import {
   bindSheetLifecycleReconcile,
   syncSheetBackdropClosed,
 } from "./device-sheet-backdrop-sync.mjs?v=34";
+import { LIVE_CONTROL_POLL_SCOPE_CHANGED } from "./device-live-control-inbox.mjs";
 
 const SHEET_ID = "device-inbox-sheet";
 const LIST_ID = "device-inbox-sheet-list";
@@ -130,6 +138,7 @@ export function setInboxSheetOpen(open) {
   } else if (!open) {
     reconcileInboxSheetState();
   }
+  window.dispatchEvent(new Event(LIVE_CONTROL_POLL_SCOPE_CHANGED));
 }
 
 /** Clear stuck inbox-open classes when the sheet is collapsed (bfcache, etc.). */
@@ -164,6 +173,12 @@ function crossTabEntriesForSheet() {
   return shouldShowCrossTabKeysNotice(raw.length, notices) ? raw : [];
 }
 
+function orphanRemovedEntriesForSheet() {
+  const notices = tabNoticeCount();
+  const raw = getOrphanRemovedTabsWithKeys();
+  return shouldShowOrphanRemovedKeysNotice(raw.length, notices) ? raw : [];
+}
+
 function sheetRows() {
   const cardDisabled = gatherCardDisabledSinceVisitForInbox().map((entry) => ({
     profile_id: entry.profile_id,
@@ -173,6 +188,7 @@ function sheetRows() {
   return buildInboxSheetRows(getInboxItems(), {
     liveProofPending: getLiveControlPending(),
     crossTabEntries: crossTabEntriesForSheet(),
+    orphanRemovedEntries: orphanRemovedEntriesForSheet(),
     cardDisabledSinceVisit: cardDisabled,
     formatProofExpiry: formatLiveControlExpiry,
   });
@@ -188,7 +204,7 @@ function rowIconSvg(kind) {
   if (kind === "live_proof") {
     return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="M12 18v4"/><circle cx="12" cy="12" r="4"/></svg>`;
   }
-  if (kind === "cross_tab_keys") {
+  if (kind === "cross_tab_keys" || kind === "orphan_keys_removed") {
     return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>`;
   }
   if (kind === "card_disabled_since_visit") {
@@ -245,6 +261,15 @@ export function renderInboxSheet() {
           outcome: "focus_other_tab",
         });
         actOnOtherTabKeys(row.crossTabEntry);
+        return;
+      }
+      if (row.kind === "orphan_keys_removed" && row.crossTabEntry) {
+        logInboxDiagnostic({
+          type: "inbox_item_action",
+          kind: row.kind,
+          outcome: "focus_other_tab",
+        });
+        actOnOrphanRemovedTabKeys(row.crossTabEntry);
         return;
       }
       if (row.kind === "tab_keys_unsaved") {
