@@ -152,7 +152,15 @@ export function renderHumanityQrFrameSvg(brandedQrSvg, opts = {}) {
   const codeText = m.credentialCode
     ? `<text class="hc-qr-frame-code-text" x="${m.innerW / 2}" y="${m.codeY + m.codeH * 0.72}" text-anchor="middle" font-family="ui-monospace,monospace" font-size="${m.codeFont}" font-weight="600" letter-spacing="0.08em" fill="${QR_BRAND_RED}">${m.credentialCode}</text>`
     : "";
-  return `<svg class="hc-qr-frame-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${m.totalWidth} ${m.totalHeight}" role="presentation" aria-hidden="true"><rect width="${m.totalWidth}" height="${m.totalHeight}" rx="${m.cornerR}" fill="${QR_BRAND_LIGHT}"/><rect x="${m.border / 2}" y="${m.border / 2}" width="${m.totalWidth - m.border}" height="${m.totalHeight - m.border}" rx="${m.cornerR}" fill="none" stroke="${QR_BRAND_RED}" stroke-width="${m.border}"/>${glyph}<g transform="translate(${m.qrX} ${m.qrY})">${inner}</g>${pillText}${footerText}${codeText}</svg>`;
+  // Slightly inset the stroke so parent containers with rounded corners don't clip.
+  const strokeInset = Math.max(0.25, m.border * 0.35);
+  const strokeX = m.border / 2 + strokeInset;
+  const strokeY = m.border / 2 + strokeInset;
+  const strokeW = m.totalWidth - m.border - 2 * strokeInset;
+  const strokeH = m.totalHeight - m.border - 2 * strokeInset;
+  const strokeR = Math.max(0, m.cornerR - strokeInset);
+
+  return `<svg class="hc-qr-frame-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${m.totalWidth} ${m.totalHeight}" role="presentation" aria-hidden="true"><rect width="${m.totalWidth}" height="${m.totalHeight}" rx="${m.cornerR}" fill="${QR_BRAND_LIGHT}"/><rect x="${strokeX}" y="${strokeY}" width="${strokeW}" height="${strokeH}" rx="${strokeR}" fill="none" stroke="${QR_BRAND_RED}" stroke-width="${m.border}"/><g transform="translate(${m.qrX} ${m.qrY})">${inner}</g>${glyph}${pillText}${footerText}${codeText}</svg>`;
 }
 
 /**
@@ -203,17 +211,21 @@ export function drawHumanityQrFrameCanvas(ctx, m, drawQr) {
   ctx.fill();
   ctx.strokeStyle = QR_BRAND_RED;
   ctx.lineWidth = border;
+
+  // Slightly inset the stroke so parent rounded containers don't clip the outermost pixels.
+  const strokeInset = Math.max(0.25, border * 0.35);
   roundRect(
     ctx,
-    border / 2,
-    border / 2,
-    totalWidth - border,
-    totalHeight - border,
-    Math.max(1, cornerR)
+    border / 2 + strokeInset,
+    border / 2 + strokeInset,
+    totalWidth - border - 2 * strokeInset,
+    totalHeight - border - 2 * strokeInset,
+    Math.max(1, cornerR - strokeInset)
   );
   ctx.stroke();
-  drawNetworkGlyphOnCanvas(ctx, m.glyphCx, m.glyphCy, m.glyphSize);
   drawQr();
+  // Draw glyph on top of the QR modules to avoid any "shadow" leftovers from QR background compositing.
+  drawNetworkGlyphOnCanvas(ctx, m.glyphCx, m.glyphCy, m.glyphSize);
   ctx.fillStyle = QR_BRAND_RED;
   ctx.font = `600 ${m.pillFont}px system-ui,sans-serif`;
   ctx.textAlign = "center";
