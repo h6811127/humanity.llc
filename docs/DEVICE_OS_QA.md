@@ -72,8 +72,9 @@ Spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md). Automated: `npm run 
 | 3 | Glance primary action | Scrolls to vouch / live proof / cross-tab banner action in-page |
 | 4 | Cross-tab keys banner visible | Dot overlay matches banner (`cross_tab_keys`) |
 | 5 | Escape / outside tap | Glance closes; dot `aria-expanded` false |
+| 6 | Hero card header | `humanity.llc` wordmark only — **no** second red dot inside the live-check card |
 
-**Fail signals:** Stranger sees pulsing or green dot; glance opens hub sheet; dot contradicts cross-tab banner.
+**Fail signals:** Stranger sees pulsing or green dot; glance opens hub sheet; dot contradicts cross-tab banner; two brand dots on screen (chrome + hero).
 
 ### P1-8 · Open controls: status dot vs hub row
 
