@@ -229,7 +229,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 | 3 | Inbox sheet from `#shell-notif-badge`; shared `openInboxFromChrome()` | ✅ |
 | 4 | Contextual browser-alert prompt + OS click deep link | ✅ |
 | 5 | Badge/dot chroma sync to `topInboxKind()` | ✅ |
-| 6 | E2E: proof → badge → row; Playwright `Notification` permission | Planned |
+| 6 | E2E: proof → badge → row; Playwright `Notification` permission | ✅ |
 
 **Do not:**
 
@@ -285,6 +285,7 @@ Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox 
 | `site/js/device-inbox.mjs` | Browser facade (`getInboxItems`, `notificationCount`) |
 | `site/js/device-inbox-sheet.mjs` | Inbox bottom sheet + `openInboxFromChrome()` |
 | `worker/tests/device-inbox.test.ts` | Vitest for inbox core |
+| `e2e/device-inbox.spec.ts` | Playwright: badge, inbox sheet, chroma, background alerts, OS notification |
 
 ---
 

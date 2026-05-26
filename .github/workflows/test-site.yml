@@ -35,7 +35,7 @@ jobs:
       - run: npm run worker:test
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
-      - name: Status dot E2E
-        run: npm run e2e -- e2e/device-status-dot.spec.ts
+      - name: Device shell E2E
+        run: npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts
         env:
           CI: "true"
