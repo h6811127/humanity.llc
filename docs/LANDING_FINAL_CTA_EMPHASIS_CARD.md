@@ -1,6 +1,6 @@
 # Landing “Ready to try it?” emphasis card
 
-**Status:** Shipped (emphasis card markup) · **Stacked layout fix** (`flex: none` on `__main`, `justify-content: flex-start`) · **Glass CTAs withdrawn** — see [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md)  
+**Status:** Shipped (emphasis card markup) · **Stacked layout + spacing ladder** (`--hc-emphasis-card-gap-*` tokens) · **Glass CTAs withdrawn** — see [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md)  
 **Scope:** `.landing-final-cta`, `.landing-framing` on `/` (`site/index.html`)  
 **Pattern:** [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md)
 

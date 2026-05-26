@@ -1,6 +1,6 @@
 # Emphasis card visual alignment (keys-notification standard)
 
-**Status:** In progress — landing stacked layout fix shipped (`flex: none` on `__main`); full token pass (translucent fill, border, CTA radius) still planned  
+**Status:** In progress — stacked layout + **internal spacing ladder** (phases F1–F3); translucent fill, border, CTA radius still planned  
 **Canonical for:** All `.hc-emphasis-card` surfaces, including landing (`/`) marketing blocks that adopted the component in May 2026  
 **Supersedes (when implemented):** Opaque-fill + shadow-only-only rules in [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Emphasis notice cards · glass landing CTAs in [`LANDING_FINAL_CTA_EMPHASIS_CARD.md`](LANDING_FINAL_CTA_EMPHASIS_CARD.md)  
 **Related:** [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md)
@@ -58,6 +58,32 @@ These are the **visual source of truth** for markup, hierarchy, and state color:
 | `--urgent` | Red + halo | `#c9342a` / `#ff6961` | Warm pink-gray neutral | Live proof, revoke, errors |
 
 Marketing landing blocks pick the modifier by **state**, not by section aesthetics (e.g. “Physical software objects” → `--info` if informational; “Ready to try it?” → `--urgent` only if copy is truly urgent — product may choose `--info` for calmer close).
+
+---
+
+## Internal spacing ladder (May 2026)
+
+**Problem:** After the stacked-layout fix (`flex: none` on `__main`), landing cards felt **too tight** — copy, dot, and CTAs ran together. Spacing must come from **tokens and gap**, never from `flex-grow` on `__main`.
+
+**Rule:** One source of truth on `:root`; `hc-emphasis-card.css` consumes `var(--hc-emphasis-card-gap-*)`. Stacked cards share the same section gap between flex children.
+
+| Token | Value (default) | Zone |
+|-------|-----------------|------|
+| `--hc-emphasis-card-padding-block` | `14px` | Card inset top/bottom |
+| `--hc-emphasis-card-padding-inline` | `16px` | Card inset left/right |
+| `--hc-emphasis-card-gap-dot` | `12px` | Status dot ↔ copy column (`__main` flex `gap`) |
+| `--hc-emphasis-card-gap-eyebrow` | `4px` | Eyebrow ↔ title (`margin-bottom` on eyebrow) |
+| `--hc-emphasis-card-gap-copy` | `6px` | Title ↔ detail (`margin-top` on detail) |
+| `--hc-emphasis-card-gap-section` | `12px` | Stacked flex children: **copy block ↔ actions/secondary row ↔ footer** (card `gap`) |
+| `--hc-emphasis-card-gap-row` | `12px` | Horizontal (side-by-side) wrap gap between `__main` and CTA column |
+| `--hc-emphasis-card-gap-foot` | `8px` | Extra inset before disclaimer line when card `gap` is not used between actions and foot |
+
+**Stacked surfaces** (column + `flex: none` on `__main` + `justify-content: flex-start`):
+
+- `.landing-framing`, `.landing-final-cta`
+- `#device-cross-tab-banner`, `#wallet-tab-hint`, `#scan-cross-tab-banner`
+
+**Do not** reduce `--hc-emphasis-card-gap-section` below `12px` on landing without product review — that value is the “main text ↔ button” rhythm users asked for.
 
 ---
 
@@ -147,6 +173,16 @@ All rows use the **same token set** after implementation.
 | **C** | Propagate to shell, created, create, scan bundle, hub inset | Visual parity light/dark; reduced-transparency fallback |
 | **D** | Landing markup polish | Framing + final CTA use standard CTAs; modifier choice documented |
 | **E** | Docs + tests | `ui-color-scheme-popover-guard`, `device-emphasis-card-html`, update rollout doc status |
+| **F1** | Add spacing tokens on `:root` in `site/styles.css` | All `--hc-emphasis-card-gap-*` and padding tokens defined once |
+| **F2** | Wire tokens in `site/css/hc-emphasis-card.css` | Dot, eyebrow, detail, card padding/gap use `var()` — no magic numbers in component file |
+| **F3** | Stacked surfaces: `gap: var(--hc-emphasis-card-gap-section)` + keep `flex: none` on `__main` | Landing, cross-tab shell, scan bundle; remove landing-only `8px` overrides |
+| **F4** | Vitest: tokens present + `hc-emphasis-card` references `gap-section` | `device-emphasis-card-html.test.ts`; bump `styles.css?v=` on `/` |
+
+**Shipped before F:** Stacked layout fix (`flex: none`, `justify-content: flex-start`) — commit `a136505`.
+
+**Shipped F1–F4:** Spacing tokens on `:root`, wired in `hc-emphasis-card.css`, stacked surfaces use `gap-section`; landing `8px` overrides removed.
+
+**Execute F1 → F4 in order** when tightening or loosening card rhythm later; change tokens on `:root` first, not one-off selectors.
 
 ---
 

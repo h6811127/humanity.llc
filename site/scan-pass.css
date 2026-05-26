@@ -55,6 +55,14 @@
   --hc-emphasis-card-eyebrow-urgent: #c9342a;
   --hc-emphasis-card-title-fg: #1c1c1e;
   --hc-emphasis-card-detail-fg: rgba(60, 60, 67, 0.88);
+  --hc-emphasis-card-padding-block: 14px;
+  --hc-emphasis-card-padding-inline: 16px;
+  --hc-emphasis-card-gap-dot: 12px;
+  --hc-emphasis-card-gap-eyebrow: 4px;
+  --hc-emphasis-card-gap-copy: 6px;
+  --hc-emphasis-card-gap-section: 12px;
+  --hc-emphasis-card-gap-row: 12px;
+  --hc-emphasis-card-gap-foot: 8px;
 }
 
 *,
@@ -1192,7 +1200,8 @@ a {
   margin: 0 var(--pad) 12px;
   flex-direction: column;
   align-items: stretch;
-  gap: 12px;
+  justify-content: flex-start;
+  gap: var(--hc-emphasis-card-gap-section);
 }
 
 .scan-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__main {

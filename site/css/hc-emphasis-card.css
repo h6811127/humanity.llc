@@ -4,9 +4,9 @@
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 10px 12px;
+  gap: var(--hc-emphasis-card-gap-row) var(--hc-emphasis-card-gap-section);
   margin: 0 0 12px;
-  padding: 12px 14px;
+  padding: var(--hc-emphasis-card-padding-block) var(--hc-emphasis-card-padding-inline);
   border-radius: 14px;
   border: none;
   outline: none;
@@ -33,7 +33,7 @@
 .wallet-active-main {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: var(--hc-emphasis-card-gap-dot);
   min-width: 0;
   flex: 1 1 12rem;
 }
@@ -45,7 +45,7 @@
 
 .hc-emphasis-card__eyebrow,
 .wallet-active-eyebrow {
-  margin: 0 0 2px;
+  margin: 0 0 var(--hc-emphasis-card-gap-eyebrow);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -83,7 +83,7 @@
 
 .hc-emphasis-card__detail,
 .wallet-active-detail {
-  margin: 2px 0 0;
+  margin: var(--hc-emphasis-card-gap-copy) 0 0;
   font-size: 13px;
   font-weight: 500;
   line-height: 1.35;

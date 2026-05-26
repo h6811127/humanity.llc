@@ -75,6 +75,15 @@
   --hc-emphasis-card-eyebrow-urgent: #c9342a;
   --hc-emphasis-card-title-fg: #1c1c1e;
   --hc-emphasis-card-detail-fg: rgba(60, 60, 67, 0.88);
+  /* Internal spacing — docs/HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md § Internal spacing ladder */
+  --hc-emphasis-card-padding-block: 14px;
+  --hc-emphasis-card-padding-inline: 16px;
+  --hc-emphasis-card-gap-dot: 12px;
+  --hc-emphasis-card-gap-eyebrow: 4px;
+  --hc-emphasis-card-gap-copy: 6px;
+  --hc-emphasis-card-gap-section: 12px;
+  --hc-emphasis-card-gap-row: 12px;
+  --hc-emphasis-card-gap-foot: 8px;
 }
 
 *,
@@ -1502,30 +1511,29 @@ a.hub-card-menu-item {
   margin-top: 10px;
 }
 
-/* Landing stacked emphasis cards — flex:none on __main (docs/HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) */
+/* Stacked emphasis cards — flex:none + section gap (docs/HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md F3) */
 .landing-framing.hc-emphasis-card,
-.landing-final-cta.hc-emphasis-card {
+.landing-final-cta.hc-emphasis-card,
+.device-cross-tab-banner.hc-emphasis-card,
+#wallet-tab-hint.hc-emphasis-card {
+  flex-direction: column;
+  align-items: stretch;
   justify-content: flex-start;
+  gap: var(--hc-emphasis-card-gap-section);
 }
 
 .landing-framing.hc-emphasis-card .hc-emphasis-card__main,
-.landing-final-cta.hc-emphasis-card .hc-emphasis-card__main {
+.landing-final-cta.hc-emphasis-card .hc-emphasis-card__main,
+.device-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__main,
+#wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__main {
   flex: none;
   width: 100%;
 }
 
 /* Landing framing — hc-emphasis-card--info (see docs/LANDING_FINAL_CTA_EMPHASIS_CARD.md) */
 .landing-framing.hc-emphasis-card {
-  flex-direction: column;
-  align-items: stretch;
   text-align: left;
   margin-top: 8px;
-  padding: 10px 12px;
-  gap: 8px;
-}
-
-.landing-framing .hc-emphasis-card__main {
-  gap: 8px;
 }
 
 .landing-framing .hc-emphasis-card__title.landing-framing-title {
@@ -5690,9 +5698,6 @@ details[open] > .created-advanced-summary::after {
 .device-cross-tab-banner.hc-emphasis-card,
 #wallet-tab-hint.hc-emphasis-card {
   margin: 0 0 14px;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 12px;
 }
 
 .device-cross-tab-banner.hc-emphasis-card {
@@ -6071,15 +6076,7 @@ a.wallet-pin-open {
 /* Landing final CTA — hc-emphasis-card (docs/LANDING_FINAL_CTA_EMPHASIS_CARD.md) */
 .landing-final-cta.hc-emphasis-card {
   margin: 0;
-  padding: 10px 12px;
-  gap: 8px;
-  flex-direction: column;
-  align-items: stretch;
   text-align: left;
-}
-
-.landing-final-cta .hc-emphasis-card__main {
-  gap: 8px;
 }
 
 .landing-final-cta .hc-emphasis-card__title.landing-final-cta-title {
@@ -6111,7 +6108,7 @@ a.wallet-pin-open {
 }
 
 .landing-final-cta-foot {
-  margin: 4px 0 0;
+  margin: 0;
   font-size: 13px;
   line-height: 1.4;
   color: var(--grey);

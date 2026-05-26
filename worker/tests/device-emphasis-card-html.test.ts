@@ -39,6 +39,18 @@ describe("device-emphasis-card-html", () => {
     );
   });
 
+  it("emphasis card spacing tokens on :root and component css", () => {
+    const styles = readFileSync(join(root, "site/styles.css"), "utf8");
+    expect(styles).toContain("--hc-emphasis-card-gap-section: 12px");
+    expect(styles).toContain("--hc-emphasis-card-gap-dot: 12px");
+    const emphasis = readFileSync(join(root, "site/css/hc-emphasis-card.css"), "utf8");
+    expect(emphasis).toContain("var(--hc-emphasis-card-gap-dot)");
+    expect(emphasis).toContain("var(--hc-emphasis-card-gap-copy)");
+    expect(styles).toMatch(
+      /\.landing-final-cta\.hc-emphasis-card[\s\S]*gap:\s*var\(--hc-emphasis-card-gap-section\)/
+    );
+  });
+
   it("landing emphasis cards use stacked flex:none on __main", () => {
     const styles = readFileSync(join(root, "site/styles.css"), "utf8");
     expect(styles).toMatch(
