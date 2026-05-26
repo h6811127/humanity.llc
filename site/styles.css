@@ -5210,6 +5210,22 @@ body.page-wallet .device-hub-status-key {
   gap: 8px;
 }
 
+.created-live-primary-block {
+  width: 100%;
+}
+
+.created-live-primary-sub {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: center;
+  color: var(--grey);
+}
+
+.created-live-primary-sub[hidden] {
+  display: none !important;
+}
+
 .created-live-object-actions .btn-primary,
 .created-live-object-actions .btn-secondary {
   width: 100%;

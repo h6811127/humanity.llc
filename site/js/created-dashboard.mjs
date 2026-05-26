@@ -5,6 +5,7 @@
 
 import { isWalletSaved } from "./device-wallet.mjs";
 import { syncUpdateStatusTaskGate } from "./created-first-revoke-gate.mjs";
+import { initCreatedLivePrimaryCta } from "./created-live-primary-cta.mjs";
 
 const DONE_STORAGE_KEY = "hc_created_task_done";
 
@@ -41,6 +42,7 @@ function persistDoneAction(profileId, actionId) {
  *   refreshSave?: () => void,
  *   getScanUrl?: () => string | null,
  *   getProfileId?: () => string | null,
+ *   hasSigningKeys?: () => boolean,
  * }} opts
  */
 export function initCreatedDashboard({
@@ -49,6 +51,7 @@ export function initCreatedDashboard({
   refreshSave,
   getScanUrl,
   getProfileId,
+  hasSigningKeys,
 }) {
   const keysStrip = document.getElementById("created-keys-strip");
   const qrSection = document.getElementById("created-qr-section");
@@ -136,6 +139,7 @@ export function initCreatedDashboard({
     syncUpdateStatusTaskGate(pid);
   }
 
+  /** @type {Record<string, () => void>} */
   const actions = {
     "save-keys": () => {
       selectTab("now");
@@ -219,7 +223,36 @@ export function initCreatedDashboard({
       revokeDetails?.setAttribute("open", "");
       revokeDetails?.scrollIntoView({ behavior: "smooth", block: "nearest" });
     },
+    "prove-live": () => {
+      selectTab("now");
+      const panel = document.getElementById("live-control-proof");
+      const proveBtn = document.getElementById("live-control-proof-btn");
+      panel?.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (proveBtn && !proveBtn.disabled) {
+        proveBtn.click();
+        return;
+      }
+      showFeedback("Live proof is not ready yet. Keep this tab open with your signing key.");
+    },
+    "check-network": () => {
+      document.getElementById("brand-status-dot-btn")?.click();
+      showFeedback("Check system status in the hub.");
+    },
   };
+
+  initCreatedLivePrimaryCta({
+    getProfileId: profileId,
+    hasSigningKeys: () => hasSigningKeys?.() ?? false,
+    resolverReachable: () =>
+      document.body.dataset.createdResolverReachable !== "offline",
+    scanUrlReady: () => {
+      const href = getScanUrl?.() || openScan?.href;
+      return !!(href && href.startsWith("http"));
+    },
+    onMode(mode) {
+      if (actions[mode]) actions[mode]();
+    },
+  });
 
   document.querySelectorAll("[data-created-action]").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -228,7 +261,11 @@ export function initCreatedDashboard({
     });
   });
 
-  window.addEventListener("hc-device-hub-changed", syncDoneStates);
+  window.addEventListener("hc-device-hub-changed", () => {
+    syncDoneStates();
+    window.dispatchEvent(new Event("hc-created-live-cta-sync"));
+  });
 
   syncDoneStates();
+  window.dispatchEvent(new Event("hc-created-live-cta-sync"));
 }

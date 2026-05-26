@@ -17,7 +17,7 @@ import { initQrExtend } from "./created-qr-extend.mjs";
 import { inferPilotTemplate, parseManifestoDisplay } from "./manifesto-display.mjs";
 import { createdLiveProofPollShouldRun } from "./created-live-proof-poll-core.mjs";
 import { initCreatedTabs } from "./created-tabs.mjs";
-import { initCreatedDashboard } from "./created-dashboard.mjs?v=3";
+import { initCreatedDashboard } from "./created-dashboard.mjs?v=4";
 import {
   markFirstRevokeDone,
   syncUpdateStatusTaskGate,
@@ -129,7 +129,6 @@ const liveQrHitEl = document.getElementById("created-live-qr-hit");
 const liveQrImgEl = document.getElementById("created-live-qr-img");
 const liveManifestoTeaserEl = document.getElementById("created-live-manifesto-teaser");
 const liveObjectMetaEl = document.getElementById("created-live-object-meta");
-const liveOpenScanEl = document.getElementById("created-live-open-scan");
 const liveCopyScanEl = document.getElementById("created-live-copy-scan");
 const qrPreviewWrap = document.getElementById("created-qr-preview-wrap");
 const qrPreviewImg = document.getElementById("created-qr-preview-img");
@@ -225,21 +224,16 @@ function syncLiveCockpit() {
     }
   }
 
-  if (liveOpenScanEl && openScanBtn) {
-    const href = openScanBtn.getAttribute("href");
-    if (href && href.startsWith("http")) {
-      liveOpenScanEl.href = href;
-      liveOpenScanEl.hidden = false;
-    } else {
-      liveOpenScanEl.hidden = true;
-    }
-  }
-
   if (liveCopyScanEl && copyBtn) {
     liveCopyScanEl.disabled = copyBtn.disabled;
   }
 
   syncQrPreview();
+  window.dispatchEvent(new Event("hc-created-live-cta-sync"));
+}
+
+function setResolverReachable(reachable) {
+  document.body.dataset.createdResolverReachable = reachable ? "ok" : "offline";
 }
 
 function syncQrPreview() {
@@ -372,6 +366,7 @@ function initLiveControlProof() {
   function revealPanel(fromPoll = false) {
     panel.hidden = false;
     panel.classList.toggle("live-control-proof-requested", !!fromPoll || !!activeChallengeId);
+    window.dispatchEvent(new Event("hc-created-live-cta-sync"));
     if (activeChallengeId && loggedChallengeId !== activeChallengeId) {
       loggedChallengeId = activeChallengeId;
       const lcLabel =
@@ -455,6 +450,7 @@ function initLiveControlProof() {
       status.textContent =
         "Someone nearby is asking for live proof. Tap below to sign from this device.";
       refresh();
+      window.dispatchEvent(new Event("hc-created-live-cta-sync"));
     } catch {
       /* ignore transient poll errors */
     }
@@ -714,7 +710,12 @@ async function refreshNetworkStatus() {
   if (!profileId || !activeQrId) return;
   try {
     const res = await fetch(getCardStatusUrl(profileId, activeQrId), { cache: "no-store" });
-    if (!res.ok) return;
+    if (!res.ok) {
+      setResolverReachable(false);
+      updateHeroMeta();
+      return;
+    }
+    setResolverReachable(true);
     const body = await res.json();
     const scan = body.scan ?? {};
     const cardStatus = scan.card?.status;
@@ -752,10 +753,12 @@ async function refreshNetworkStatus() {
       }
     }
   } catch {
-    /* keep session copy if fetch fails */
+    setResolverReachable(false);
   }
   updateHeroMeta();
 }
+
+setResolverReachable(true);
 
 if (networkQrExpiresEl) {
   const expiresAt = data?.qr_expires_at;
@@ -780,6 +783,7 @@ function setupCreatedDashboard() {
       return href && href.startsWith("http") ? href : null;
     },
     getProfileId: () => profileId,
+    hasSigningKeys: () => !!currentSigningKeys(),
   });
 }
 
@@ -954,10 +958,6 @@ async function bootstrapOwnerTools() {
           copyBtn.onclick = () => navigator.clipboard.writeText(newScanUrl);
         }
         if (openScanBtn) openScanBtn.href = newScanUrl;
-        if (liveOpenScanEl) {
-          liveOpenScanEl.href = newScanUrl;
-          liveOpenScanEl.hidden = false;
-        }
         if (liveCopyScanEl) {
           liveCopyScanEl.disabled = false;
           liveCopyScanEl.onclick = () => {

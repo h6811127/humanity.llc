@@ -711,6 +711,10 @@ html[data-theme="dark"] .created-live-scanners-see-title {
   color: var(--shell-label-strong);
 }
 
+html[data-theme="dark"] .created-live-primary-sub {
+  color: var(--shell-label);
+}
+
 html[data-theme="dark"] .created-primitive {
   background: rgba(255, 77, 109, 0.12);
   border-color: rgba(255, 77, 109, 0.28);
