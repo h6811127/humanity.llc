@@ -115,6 +115,20 @@ function appendInboxGlanceRow(item, list, copy) {
       openSaveKeysForThisTab();
     });
     list.appendChild(li);
+    return;
+  }
+
+  if (item.kind === "card_disabled_since_visit") {
+    li.className = "device-hub-glance-row device-hub-glance-row--revoked";
+    li.innerHTML = `
+      <button type="button" class="device-hub-glance-btn">
+        <span class="device-hub-glance-title">${escapeHtml(item.title)}</span>
+        <span class="device-hub-glance-sub">Tap to open inbox</span>
+      </button>`;
+    li.querySelector("button")?.addEventListener("click", () => {
+      openInboxFromChrome("glance");
+    });
+    list.appendChild(li);
   }
 }
 

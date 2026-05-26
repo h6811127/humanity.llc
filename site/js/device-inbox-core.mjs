@@ -16,6 +16,11 @@ import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs"
  */
 
 /**
+ * @typedef {object} InboxCardDisabledEntry
+ * @property {string} profile_id
+ * @property {string} [label]
+ * @property {string} [handle]
+ *
  * @typedef {object} InboxItem
  * @property {InboxKind} kind
  * @property {InboxUrgency} urgency
@@ -23,7 +28,7 @@ import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs"
  * @property {string} title Glance / inbox sheet headline
  * @property {string} [subtitle]
  * @property {string} [hubScrollTarget] Hub element id to scroll into view
- * @property {{ crossTabEntry?: InboxCrossTabEntry, crossTabExtra?: number }} [meta]
+ * @property {{ crossTabEntry?: InboxCrossTabEntry, crossTabExtra?: number, cardDisabledEntries?: InboxCardDisabledEntry[] }} [meta]
  */
 
 /**
@@ -32,6 +37,7 @@ import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs"
  *   liveProofCount: number,
  *   crossTabEntries?: InboxCrossTabEntry[],
  *   tabSessionLabel?: string,
+ *   cardDisabledSinceVisit?: InboxCardDisabledEntry[],
  * }} input
  * @returns {InboxItem[]}
  */
@@ -41,6 +47,7 @@ export function buildInboxItems(input) {
     liveProofCount = 0,
     crossTabEntries = [],
     tabSessionLabel = "This tab",
+    cardDisabledSinceVisit = [],
   } = input;
 
   /** @type {InboxItem[]} */
@@ -89,6 +96,21 @@ export function buildInboxItems(input) {
       title: "Keys in this tab · save",
       subtitle: tabSessionLabel,
       hubScrollTarget: "device-hub-notice-group",
+    });
+  }
+
+  if (cardDisabledSinceVisit.length > 0) {
+    const n = cardDisabledSinceVisit.length;
+    items.push({
+      kind: "card_disabled_since_visit",
+      urgency: "medium",
+      count: n,
+      title:
+        n === 1
+          ? "Card disabled since your last visit"
+          : `${n} cards disabled since your last visit`,
+      hubScrollTarget: "device-hub-saved-group",
+      meta: { cardDisabledEntries: cardDisabledSinceVisit },
     });
   }
 
@@ -169,6 +191,11 @@ function describeItemForAria(item) {
   if (item.kind === "cross_tab_keys") {
     return item.count > 1 ? `keys in ${item.count} other tabs` : "keys in another tab";
   }
+  if (item.kind === "card_disabled_since_visit") {
+    return item.count === 1
+      ? "card disabled since last visit"
+      : `${item.count} cards disabled since last visit`;
+  }
   return "";
 }
 
@@ -205,6 +232,7 @@ export function inboxBadgeCountText(n) {
  * @property {InboxSheetTone} tone
  * @property {{ entry: Record<string, unknown>, challenge_id: string, expires_at?: string }} [proofItem]
  * @property {InboxCrossTabEntry} [crossTabEntry]
+ * @property {InboxCardDisabledEntry} [cardDisabledEntry]
  */
 
 /**
@@ -232,6 +260,7 @@ export function inboxCrossTabLabel(entry) {
  * @param {{
  *   liveProofPending?: Array<{ entry: Record<string, unknown>, challenge_id: string, expires_at?: string }>,
  *   crossTabEntries?: InboxCrossTabEntry[],
+ *   cardDisabledSinceVisit?: InboxCardDisabledEntry[],
  *   formatProofExpiry?: (iso: string) => string,
  * }} ctx
  * @returns {InboxSheetRow[]}
@@ -240,6 +269,7 @@ export function buildInboxSheetRows(items, ctx = {}) {
   const {
     liveProofPending = [],
     crossTabEntries = [],
+    cardDisabledSinceVisit = [],
     formatProofExpiry = (iso) => iso,
   } = ctx;
 
@@ -285,6 +315,23 @@ export function buildInboxSheetRows(items, ctx = {}) {
         subtitle: item.subtitle ?? "",
         tone: "notice",
       });
+      continue;
+    }
+
+    if (item.kind === "card_disabled_since_visit") {
+      const entries =
+        item.meta?.cardDisabledEntries?.length > 0
+          ? item.meta.cardDisabledEntries
+          : cardDisabledSinceVisit;
+      for (const card of entries) {
+        rows.push({
+          kind: "card_disabled_since_visit",
+          title: inboxWalletEntryLabel(card),
+          subtitle: "Disabled on the network since your last visit",
+          tone: "notice",
+          cardDisabledEntry: card,
+        });
+      }
     }
   }
 

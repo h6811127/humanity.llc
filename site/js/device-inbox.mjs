@@ -17,6 +17,7 @@ import { tabNoticeCount } from "./device-counts.mjs";
 import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
+import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs";
 
 export {
   buildInboxItems,
@@ -39,11 +40,17 @@ function tabSessionLabel() {
 
 /** @returns {Parameters<typeof buildInboxItems>[0]} */
 export function gatherInboxInput() {
+  const cardDisabled = gatherCardDisabledSinceVisitForInbox().map((entry) => ({
+    profile_id: entry.profile_id,
+    label: entry.label,
+    handle: entry.handle,
+  }));
   return {
     tabNoticeCount: tabNoticeCount(),
     liveProofCount: getLiveControlPendingCount(),
     crossTabEntries: getOtherTabsWithKeys(),
     tabSessionLabel: tabSessionLabel(),
+    cardDisabledSinceVisit: cardDisabled,
   };
 }
 

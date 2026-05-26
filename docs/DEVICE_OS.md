@@ -44,7 +44,7 @@ Before shipping UI, answer:
 | Tier | What | Where |
 |------|------|--------|
 | **Glance** | Network live / limited / offline, saved · pinned · notice counts | Status line + brand dot sheet |
-| **Inbox** | Action items: live proof, unsaved tab keys, cross-tab keys (+ planned: card disabled since visit in badge) | `#shell-notif-badge`, hub alerts, glance rows — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
+| **Inbox** | Action items: live proof, unsaved tab keys, cross-tab keys, card disabled since visit | `#shell-notif-badge`, hub alerts, glance rows — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
 | **Act** | Hub: cards, pins, search, activity, shortcuts, import | `#device-hub` (expand to work) |
 | **Glance (collapsed hub)** | Notice + up to 3 saved labels (+ “N more”) | `#device-hub-glance` (landing only) |
 | **System** | Resolver degraded or offline (actionable) | `#device-system-banner` (landing only, hidden when ok) |

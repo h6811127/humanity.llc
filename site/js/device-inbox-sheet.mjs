@@ -13,6 +13,10 @@ import { openCardNowPage } from "./device-keys.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
 import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs";
+import {
+  NETWORK_BASELINE_CHANGED,
+  NETWORK_REFRESHED,
+} from "./device-wallet-network.mjs";
 import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
 import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
@@ -277,6 +281,8 @@ function bindInboxSheetRefresh() {
   };
   window.addEventListener("hc-live-control-inbox-changed", refresh);
   window.addEventListener("hc-tab-presence-changed", refresh);
+  window.addEventListener(NETWORK_BASELINE_CHANGED, refresh);
+  window.addEventListener(NETWORK_REFRESHED, refresh);
   window.addEventListener("storage", (e) => {
     if (e.key === "hc_created" || e.key === "hc_wallet" || e.key === "hc_tab_keys_presence") {
       refresh();

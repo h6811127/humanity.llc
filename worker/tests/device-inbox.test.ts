@@ -60,6 +60,21 @@ describe("buildInboxItems", () => {
       })
     ).toEqual([]);
   });
+
+  it("includes card disabled since visit after keys notices", () => {
+    const items = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 0,
+      crossTabEntries: [],
+      cardDisabledSinceVisit: [
+        { profile_id: "p1", label: "Studio door" },
+        { profile_id: "p2", handle: "keys" },
+      ],
+    });
+    expect(items.map((i) => i.kind)).toEqual(["card_disabled_since_visit"]);
+    expect(items[0].count).toBe(2);
+    expect(items[0].hubScrollTarget).toBe("device-hub-saved-group");
+  });
 });
 
 describe("inboxCountFromItems", () => {
@@ -183,6 +198,21 @@ describe("buildInboxSheetRows", () => {
     expect(rows[0].title).toBe("Card A");
     expect(rows[0].subtitle).toContain("5m left");
     expect(rows[1].title).toBe("@bob");
+  });
+
+  it("expands card disabled since visit into one row per card", () => {
+    const items = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 0,
+      crossTabEntries: [],
+      cardDisabledSinceVisit: [{ profile_id: "p1", label: "Studio door" }],
+    });
+    const rows = buildInboxSheetRows(items, {
+      cardDisabledSinceVisit: [{ profile_id: "p1", label: "Studio door" }],
+    });
+    expect(rows).toHaveLength(1);
+    expect(rows[0].title).toBe("Studio door");
+    expect(rows[0].subtitle).toMatch(/since your last visit/i);
   });
 
   it("lists each cross-tab entry as its own row", () => {

@@ -99,3 +99,41 @@ export function cardDisabledSinceVisitVisible(
     resolverConfirmed,
   });
 }
+
+/**
+ * Wallet rows that should surface the since-visit card-disabled alert (inbox + hub).
+ * @param {Array<{ profile_id: string, label?: string, handle?: string }>} walletEntries
+ * @param {Record<string, string | null | undefined>} alertStateMap
+ * @param {Record<string, string | null | undefined>} scanKindMap
+ * @param {Record<string, string | null | undefined>} lastSeenMap
+ * @param {Record<string, boolean>} resolverConfirmedMap
+ */
+export function listCardDisabledSinceVisit(
+  walletEntries,
+  alertStateMap,
+  scanKindMap,
+  lastSeenMap,
+  resolverConfirmedMap
+) {
+  /** @type {Array<{ profile_id: string, label?: string, handle?: string }>} */
+  const out = [];
+  for (const entry of walletEntries) {
+    const pid = entry.profile_id;
+    if (!pid) continue;
+    if (alertStateMap[pid] === undefined) continue;
+    const show = cardDisabledSinceVisitVisible(
+      alertStateMap[pid],
+      lastSeenMap[pid],
+      scanKindMap[pid],
+      resolverConfirmedMap[pid] === true
+    );
+    if (show) {
+      out.push({
+        profile_id: pid,
+        label: entry.label,
+        handle: entry.handle,
+      });
+    }
+  }
+  return out;
+}

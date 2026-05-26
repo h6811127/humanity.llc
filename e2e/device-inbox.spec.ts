@@ -234,6 +234,61 @@ test.describe("device inbox — background OS notification", () => {
   });
 });
 
+function mockCardRevokedSinceVisit(route: Route) {
+  return route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({
+      version: "1.0",
+      resolver: { operator: "humanity.llc", version: "1.0" },
+      scan: {
+        kind: "card_revoked",
+        profile_id: WALLET_ENTRY.profile_id,
+        qr_id: WALLET_ENTRY.qr_id,
+        card: {
+          status: "revoked",
+          handle: WALLET_ENTRY.handle,
+          manifesto_line: WALLET_ENTRY.manifesto_line,
+        },
+        verification: { state: "registered", label: "Registered" },
+        human_trust: { label: "Registered", subtitle: "", pill_active: false },
+      },
+    }),
+  });
+}
+
+test.describe("device inbox — card disabled since visit", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript((entry) => {
+      localStorage.setItem("hc_wallet", JSON.stringify([entry]));
+      localStorage.setItem(
+        "hc_wallet_last_seen_network",
+        JSON.stringify({ [entry.profile_id]: "active" })
+      );
+      sessionStorage.removeItem("hc_wallet_network_cache");
+    }, WALLET_ENTRY);
+    await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
+    await page.route("**/.well-known/hc/v1/cards/**/status**", mockCardRevokedSinceVisit);
+    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", mockNoChallenge);
+  });
+
+  test("badge and inbox sheet surface card disabled since last visit", async ({ page }) => {
+    await page.goto("/wallet/");
+    const badge = page.locator("#shell-notif-badge");
+    await expect(badge).toBeVisible({ timeout: 15_000 });
+    await expect(badge).toHaveAttribute("data-inbox-chroma", "default");
+    await expect(badge).toHaveAttribute("aria-label", /card disabled since last visit/i);
+
+    await badge.click();
+    const row = page.locator(".device-inbox-sheet-row--card_disabled_since_visit");
+    await expect(row).toBeVisible();
+    await expect(row.getByText("E2E Test Card")).toBeVisible();
+    await expect(row.getByText(/since your last visit/i)).toBeVisible();
+    await row.locator("button").click();
+    await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
+  });
+});
+
 test.describe("device inbox — resolver offline", () => {
   test.beforeEach(async ({ page }) => {
     await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "offline"));

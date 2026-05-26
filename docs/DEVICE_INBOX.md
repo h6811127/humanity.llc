@@ -1,6 +1,6 @@
 # Device inbox & background alerts
 
-**Status:** v1 shipped (aggregate badge + hub alerts + browser alerts for live proof) · **Planned:** unified inbox core, inbox sheet, contextual opt-in, deep-link OS notifications  
+**Status:** Unified inbox shipped (badge, sheet, glance, live proof + card-disabled-since-visit) · browser alerts v2 contextual opt-in shipped  
 **Audience:** Product, frontend  
 **Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)
 
@@ -74,7 +74,7 @@ Canonical `kind` values (target: one module `device-inbox-core.mjs`, Vitest-cove
 | `live_proof` | **High** (time-sensitive) | Yes (pending count) | `proof_waiting` (highest overlay) | Yes (opt-in) | Open `/created/` to sign (`live_challenge`) |
 | `tab_keys_unsaved` | Medium | Yes (0 or 1) | Via device axis (`unsaved` pulsing red), not overlay | No | Save keys on device |
 | `cross_tab_keys` | Medium | Yes when tab notice = 0 | `cross_tab_keys` | No | Focus other tab / save here |
-| `card_disabled_since_visit` | Medium | **Planned** (today: hub row + glance only) | No (optional soft overlay later) | No | Open card / Got it |
+| `card_disabled_since_visit` | Medium | **Yes** (resolver-confirmed since-visit cards) | No (optional soft overlay later) | No | Open card from inbox sheet |
 | `resolver_degraded` | Low | **No** | Via network color on dot | No | System banner only |
 
 **Counting rules (codify in inbox core):**
@@ -121,7 +121,7 @@ See [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 **Shipped:**
 
 - Groups: cross-tab notice, tab keys notice, **Live proof waiting** (`device-live-control-inbox.mjs`).
-- Card-disabled-since-visit on saved rows + glance (not yet in badge aggregate).
+- Card-disabled-since-visit on saved rows, glance suffix, and inbox badge/sheet (`device-inbox-card-disabled.mjs`).
 
 **Planned:**
 
@@ -283,6 +283,7 @@ Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox 
 | `docs/DEVICE_INBOX.md` | This spec |
 
 | `site/js/device-inbox-core.mjs` | Pure inbox model |
+| `site/js/device-inbox-card-disabled.mjs` | Since-visit disabled cards for inbox input |
 | `site/js/device-inbox.mjs` | Browser facade (`getInboxItems`, `notificationCount`) |
 | `site/js/device-inbox-sheet.mjs` | Inbox bottom sheet + `openInboxFromChrome()` |
 | `worker/tests/device-inbox.test.ts` | Vitest for inbox core |

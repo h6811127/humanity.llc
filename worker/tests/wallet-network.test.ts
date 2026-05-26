@@ -6,6 +6,7 @@ import {
   CARD_DISABLED_SINCE_VISIT_ALERT_TEXT,
   CARD_REVOKED_ALERT_STATE,
   cardDisabledSinceVisitVisible,
+  listCardDisabledSinceVisit,
   isRevokedSinceLastVisitFromBaseline,
   normalizeBaselineState,
   shouldShowCardDisabledSinceVisitAlert,
@@ -96,6 +97,32 @@ describe("isRevokedSinceLastVisitFromBaseline", () => {
 describe("normalizeBaselineState", () => {
   it("maps legacy revoked to card_revoked", () => {
     expect(normalizeBaselineState("revoked")).toBe(CARD_REVOKED_ALERT_STATE);
+  });
+});
+
+describe("listCardDisabledSinceVisit", () => {
+  it("returns only wallet rows with resolver-confirmed since-visit transition", () => {
+    const wallet = [
+      { profile_id: "a", label: "Door" },
+      { profile_id: "b", handle: "keys" },
+      { profile_id: "c", label: "Skip" },
+    ];
+    const hits = listCardDisabledSinceVisit(
+      wallet,
+      {
+        a: CARD_REVOKED_ALERT_STATE,
+        b: "active",
+        c: CARD_REVOKED_ALERT_STATE,
+      },
+      {
+        a: CARD_REVOKED_ALERT_STATE,
+        b: "active",
+        c: CARD_REVOKED_ALERT_STATE,
+      },
+      { a: "active", b: "active", c: CARD_REVOKED_ALERT_STATE },
+      { a: true, b: true, c: true }
+    );
+    expect(hits.map((h) => h.profile_id)).toEqual(["a"]);
   });
 });
 

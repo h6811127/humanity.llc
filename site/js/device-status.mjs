@@ -26,6 +26,10 @@ import { refreshHubGlance } from "./device-hub-glance.mjs";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
 import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs";
+import {
+  NETWORK_BASELINE_CHANGED,
+  NETWORK_REFRESHED,
+} from "./device-wallet-network.mjs";
 import "./device-shell-motion.mjs";
 import "./device-shell-chrome.mjs";
 import "./device-theme.mjs";
@@ -517,6 +521,8 @@ window.addEventListener(DEVICE_OS_REFRESHED, (e) => {
 
 window.addEventListener("hc-live-control-inbox-changed", refreshSummary);
 window.addEventListener("hc-tab-presence-changed", refreshSummary);
+window.addEventListener(NETWORK_BASELINE_CHANGED, refreshSummary);
+window.addEventListener(NETWORK_REFRESHED, refreshSummary);
 
 window.addEventListener("hc-hub-expand-request", (e) => {
   const targetId = e.detail?.targetId;
