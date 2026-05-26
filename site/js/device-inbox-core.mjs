@@ -5,6 +5,14 @@
 import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs";
 
 /** @typedef {'live_proof' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'card_disabled_since_visit'} InboxKind */
+
+/**
+ * @param {InboxItem[]} items
+ * @param {InboxKind} kind
+ */
+export function inboxItemsIncludeKind(items, kind) {
+  return items.some((item) => item.kind === kind);
+}
 /** @typedef {'high' | 'medium' | 'low'} InboxUrgency */
 
 /**

@@ -5,6 +5,8 @@ import { activateWalletEntry, getTabSession, openCardNowPage } from "./device-ke
 import { getOtherTabsWithKeys, requestFocusTab } from "./device-tab-presence.mjs";
 import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
+import { getInboxItems } from "./device-inbox.mjs";
+import { inboxItemsIncludeKind } from "./device-hub-inbox-alerts.mjs";
 import { actOnOtherTabKeys, walletEntryForProfile } from "./device-notice-nav.mjs";
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
 
@@ -26,6 +28,9 @@ function labelForPresence(entry) {
 }
 
 function shouldShowCrossTabNotice() {
+  if (document.getElementById("shell-notif-badge")) {
+    return inboxItemsIncludeKind(getInboxItems(), "cross_tab_keys");
+  }
   return shouldShowCrossTabKeysNotice(getOtherTabsWithKeys().length, tabNoticeCount());
 }
 

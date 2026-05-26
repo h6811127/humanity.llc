@@ -123,9 +123,7 @@ See [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 - Groups: cross-tab notice, tab keys notice, **Live proof waiting** (`device-live-control-inbox.mjs`).
 - Card-disabled-since-visit on saved rows, glance suffix, and inbox badge/sheet (`device-inbox-card-disabled.mjs`).
 
-**Planned:**
-
-- Render from shared `buildInboxItems()` — same data as glance and badge.
+**Shipped (phase 8):** Live proof, tab-keys notice, and cross-tab hub slots visibility follow `getInboxItems()` via `device-hub-inbox-alerts.mjs` (row detail still from live-control poll / session / presence modules).
 
 ### Glance popover (`device-hub-glance.mjs`)
 
@@ -233,6 +231,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 | 5 | Badge/dot chroma sync to `topInboxKind()` | ✅ |
 | 6 | E2E: proof → badge → row; Playwright `Notification` permission | ✅ |
 | 7 | Inbox diagnostics (`hc_inbox_diagnostics`, session log + confusion signals) | ✅ |
+| 8 | Hub alert groups gated on `getInboxItems()` (live proof, tab keys, cross-tab slot) | ✅ |
 
 **Do not:**
 
@@ -278,7 +277,8 @@ Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox 
 | `site/js/device-counts.mjs` / `device-counts-core.mjs` | `tabNoticeCount`, status segments |
 | `site/js/device-live-control-inbox.mjs` | Live proof poll + hub list |
 | `site/js/device-hub-glance.mjs` | Collapsed peek rows |
-| `site/js/device-hub-ui.mjs` | Hub notice groups |
+| `site/js/device-hub-ui.mjs` | Hub saved rows, search, coordinates inbox alert sync |
+| `site/js/device-hub-inbox-alerts.mjs` | Hub live-proof + tab-keys groups from `getInboxItems()` |
 | `site/js/device-tab-presence.mjs` | Cross-tab presence + `crossTabNoticeCount()` |
 | `site/js/device-cross-tab-banner.mjs` | Landing/wallet banner |
 | `site/css/device-shell.css` | `.shell-notif-badge*` styles |
@@ -296,9 +296,9 @@ Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox 
 
 ---
 
-## Acceptance criteria (inbox unification — when implemented)
+## Acceptance criteria (inbox unification)
 
-- One `buildInboxItems()` drives hub alerts, glance actionable rows, and badge count/label.
+- One `buildInboxItems()` drives hub alerts, glance actionable rows, and badge count/label. ✅ (phase 8 hub groups; saved-card glance peek list remains separate)
 - Badge tap opens inbox sheet with one primary CTA per row (not only hub expand + scroll).
 - Dot overlay always matches `topInboxKind()` when overlays apply.
 - Background alerts: contextual opt-in + deep link to sign flow for first pending proof.

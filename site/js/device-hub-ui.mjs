@@ -14,7 +14,8 @@ import { applyDeviceHubSearch } from "./device-hub-search.mjs";
 import { initHubBackupImport } from "./device-hub-import.mjs";
 import { mountThemeToggles } from "./device-theme.mjs";
 import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs";
-import { openSaveKeysForThisTab } from "./device-notice-nav.mjs";
+import { renderHubInboxAlerts, inboxItemsIncludeKind } from "./device-hub-inbox-alerts.mjs";
+import { getInboxItems, notificationCount } from "./device-inbox.mjs";
 import { buildHubCardControls } from "./device-hub-controls-core.mjs";
 import {
   activateWalletEntry,
@@ -49,6 +50,7 @@ import {
   refreshWalletNetworkStatuses,
   snapshotNetworkSeenOnExit,
   syncLastSeenFromNetworkMap,
+  NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import { getCardStatusUrl } from "./hc-sign.mjs";
 import {
@@ -76,7 +78,6 @@ import {
 } from "./wallet-network-baseline.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
 import {
-  formatLiveControlExpiry,
   getLiveControlPending,
   openLiveControlProof,
   refreshLiveControlInbox,
@@ -496,86 +497,14 @@ async function fetchAndApplyNetworkChips() {
   });
 }
 
-function renderLiveControlInbox() {
-  if (!liveControlGroup || !liveControlList || !hubConfig.showLiveControlInbox) {
-    if (liveControlGroup) liveControlGroup.hidden = true;
-    return;
-  }
-
-  const pending = getLiveControlPending();
-  liveControlList.innerHTML = "";
-  if (pending.length === 0) {
-    liveControlGroup.hidden = true;
-    return;
-  }
-
-  liveControlGroup.hidden = false;
-  for (const item of pending) {
-    const entry = item.entry;
-    const label =
-      typeof entry.label === "string" && entry.label
-        ? entry.label
-        : typeof entry.handle === "string" && entry.handle
-          ? `@${entry.handle}`
-          : "Saved card";
-    const expiry = item.expires_at ? formatLiveControlExpiry(item.expires_at) : "";
-    const sub = expiry ? `Someone is waiting · ${expiry}` : "Someone is waiting";
-
-    const li = document.createElement("li");
-    li.className = "list-row list-action device-live-control-row";
-    li.dataset.hubSearchable = `live proof waiting ${label} ${entry.profile_id || ""}`.toLowerCase();
-    li.innerHTML = `
-      <button type="button" class="device-live-control-open">
-        <span class="list-icon list-icon-tone-gold" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="M12 18v4"/><circle cx="12" cy="12" r="4"/><path d="m4.93 4.93 2.83 2.83"/><path d="m16.24 16.24 2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="m16.24 7.76 2.83-2.83"/></svg>
-        </span>
-        <span class="list-content">
-          <span class="list-title">${escapeHtml(label)}</span>
-          <span class="list-sub">${escapeHtml(sub)}</span>
-        </span>
-        <span class="list-chevron" aria-hidden="true">›</span>
-      </button>`;
-    li.querySelector(".device-live-control-open")?.addEventListener("click", () => {
-      openLiveControlProof(item);
-    });
-    liveControlList.appendChild(li);
-  }
-}
-
-function renderNoticeRow() {
-  if (!noticeGroup) return;
-  const show = tabNoticeCount() > 0;
-  noticeGroup.hidden = !show;
-  if (!show) return;
-
-  const session = getTabSession();
-  const label = session?.handle
-    ? `@${session.handle}`
-    : session?.profile_id?.slice(0, 12) || "This tab";
-
-  if (hubConfig.noticeMode === "keys-strip") {
-    noticeGroup.innerHTML = `
-    <button type="button" class="device-hub-notice-banner" data-hub-go-now-tab data-hub-searchable="notice save tab keys strip">
-      <span class="device-hub-notice-title">Keys in this tab · Save on this device</span>
-      <span class="device-hub-notice-sub">${escapeHtml(label)} · open the Now tab to save</span>
-      <span class="device-hub-notice-chevron" aria-hidden="true">›</span>
-    </button>`;
-    noticeGroup.querySelector("[data-hub-go-now-tab]")?.addEventListener("click", () => {
-      openSaveKeysForThisTab();
-    });
-    return;
-  }
-
-  const url = new URL("/created/", location.origin);
-  if (session?.profile_id) url.searchParams.set("profile_id", session.profile_id);
-  if (session?.qr_id) url.searchParams.set("qr_id", session.qr_id);
-
-  noticeGroup.innerHTML = `
-    <a class="device-hub-notice-banner" href="${escapeHtml(url.href)}" data-hub-searchable="notice save tab keys">
-      <span class="device-hub-notice-title">Keys in this tab · Save on this device</span>
-      <span class="device-hub-notice-sub">${escapeHtml(label)} · tab only until you save on this device</span>
-      <span class="device-hub-notice-chevron" aria-hidden="true">›</span>
-    </a>`;
+function syncHubInboxAlertGroups() {
+  renderHubInboxAlerts({
+    noticeGroup,
+    liveControlGroup,
+    liveControlList,
+    noticeMode: hubConfig.noticeMode,
+    showLiveControlInbox: hubConfig.showLiveControlInbox,
+  });
 }
 
 function renderActivityRows() {
@@ -974,7 +903,7 @@ function renderSavedRows() {
       }
       saveWallet(loadWallet().filter((e) => e.id !== id));
       renderSavedRows();
-      renderNoticeRow();
+      syncHubInboxAlertGroups();
       applySearchFilter();
       notifyHubChanged();
     });
@@ -1021,9 +950,8 @@ function refreshEmptyHint() {
   const hasData =
     loadWallet().length > 0 ||
     loadPins().length > 0 ||
-    tabNoticeCount() > 0 ||
-    loadActivity().slice(0, HUB_RECENT_DISPLAY_LIMIT).length > 0 ||
-    (hubConfig.showLiveControlInbox && getLiveControlPending().length > 0);
+    notificationCount() > 0 ||
+    loadActivity().slice(0, HUB_RECENT_DISPLAY_LIMIT).length > 0;
   emptyHint.hidden = hasData;
 }
 
@@ -1035,7 +963,7 @@ function applySearchFilter() {
   const q = searchInput?.value ?? "";
   const { matchCount } = applyDeviceHubSearch(deviceHub, q);
   if (hubConfig.showLiveControlInbox && liveControlGroup && !q.trim()) {
-    liveControlGroup.hidden = getLiveControlPending().length === 0;
+    liveControlGroup.hidden = !inboxItemsIncludeKind(getInboxItems(), "live_proof");
   }
   refreshEmptyHint();
 
@@ -1094,8 +1022,7 @@ function bindDom() {
 }
 
 export function refreshDeviceHub() {
-  renderNoticeRow();
-  renderLiveControlInbox();
+  syncHubInboxAlertGroups();
   syncBrowserNotifPrompts();
   renderActivityRows();
   renderSavedRows();
@@ -1153,13 +1080,13 @@ export function initDeviceHub(config = {}) {
   if (hubConfig.showLiveControlInbox) {
     startLiveControlInboxPolling();
     void refreshLiveControlInbox().then(() => {
-      renderLiveControlInbox();
+      syncHubInboxAlertGroups();
       applySearchFilter();
       refreshEmptyHint();
       notifyHubChanged();
     });
     window.addEventListener("hc-live-control-inbox-changed", () => {
-      renderLiveControlInbox();
+      syncHubInboxAlertGroups();
       syncBrowserNotifPrompts();
       renderSavedRows();
       applySearchFilter();
@@ -1229,7 +1156,18 @@ export function initDeviceHub(config = {}) {
       resolverConfirmedMap[pid] = true;
     }
     applyRevokedSinceVisitAlerts({}, alertStateMap, scanKindMap, resolverConfirmedMap);
+    syncHubInboxAlertGroups();
     notifyHubChanged();
+  });
+
+  window.addEventListener(NETWORK_REFRESHED, () => {
+    syncHubInboxAlertGroups();
+    refreshEmptyHint();
+  });
+
+  window.addEventListener("hc-tab-presence-changed", () => {
+    syncHubInboxAlertGroups();
+    refreshEmptyHint();
   });
 }
 
