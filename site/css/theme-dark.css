@@ -390,9 +390,9 @@ html[data-theme="dark"] .created-dashboard-feedback--error {
   border-color: rgba(255, 69, 58, 0.35);
 }
 
-html[data-theme="dark"] .hub-card-status-alert {
-  background: var(--surface-popover-bg);
-  border-color: rgba(255, 69, 58, 0.45);
+html[data-theme="dark"] .hub-card-alert-dismiss,
+html[data-theme="dark"] .hub-card-alert-view-scan {
+  color: var(--hc-notice-link);
 }
 
 html[data-theme="dark"] .hc-notice-title {

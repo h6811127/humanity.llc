@@ -87,7 +87,15 @@ When touching legacy components, migrate them incrementally to this token family
 | Component | Selectors | Notes |
 |-----------|-----------|--------|
 | Hub card ⋯ menu | `.hub-card-menu-panel`, `.hub-card-menu-item`, `.hub-card-menu-section-label`, `.hub-card-menu-divider` | Replaced hardcoded `rgba(255,255,255,0.96)` panel and `--black` / `--red` menu text with popover tokens; removed translucent backdrop blur on panel. |
+| Hub card warning alert | `.hub-card-status-alert`, `.hub-card-status-alert-text`, `.hub-card-alert-dismiss`, `.hub-card-alert-view-scan` | Surface/text on popover tokens; action links use `--hc-notice-link` (dark override in `theme-dark.css`). |
+| Glance popover chrome | `.brand-status-popover` | Legacy class on `#device-hub-glance-popover`; aligned panel bg/border with popover tokens. |
+| Dot explainer (glance) | `.device-hub-glance-popover .device-dot-explainer*` | Status-dot Now/Why/Next block inside glance popover uses popover fg/muted/accent and control surface (not `--black` / `--grey` on a nested light wash). |
 
 ### QA (hub card menu)
 
 After migrating `.hub-card-menu-*`, run the standard contrast checklist on a saved card with keys: open ⋯ menu in **light** and **dark** (`localStorage.hc_theme = "dark"`), confirm section label, default items, and danger rows (`Revoke QR`, `Remove from device`).
+
+### QA (warning alert + glance explainer)
+
+1. Trigger a **disabled since visit** (or similar) hub card alert; confirm body and **Dismiss** / **View scan** links in light and dark.
+2. Open the status-dot **glance popover** with the dot explainer visible; confirm kicker, three lines, and quick-action button/readability in both themes.

@@ -361,6 +361,32 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   color: var(--surface-popover-fg-muted, var(--grey));
 }
 
+.device-hub-glance-popover .device-dot-explainer {
+  margin: 0 0 8px;
+  padding: 10px 12px;
+  border: 0.5px solid var(--surface-popover-border, rgba(60, 60, 67, 0.12));
+  border-radius: 12px;
+  background: var(--surface-popover-control-bg, rgba(120, 120, 128, 0.12));
+}
+
+.device-hub-glance-popover .device-dot-explainer-kicker {
+  color: var(--surface-popover-fg-muted, rgba(60, 60, 67, 0.72));
+}
+
+.device-hub-glance-popover .device-dot-explainer-line {
+  color: var(--surface-popover-fg, #1c1c1e);
+}
+
+.device-hub-glance-popover .device-dot-explainer-action {
+  border: 0.5px solid var(--surface-popover-border, rgba(60, 60, 67, 0.12));
+  background: var(--surface-popover-control-bg, rgba(120, 120, 128, 0.12));
+  color: var(--surface-popover-accent, var(--red, #db1b43));
+}
+
+.device-hub-glance-popover .device-dot-explainer-action:active {
+  opacity: 0.85;
+}
+
 /* Glance notifications — light pastel fills (hub quick look) */
 .device-hub-glance-popover .device-hub-glance-row--notice .device-hub-glance-btn {
   border-color: rgba(255, 59, 48, 0.22);
