@@ -39,6 +39,19 @@ describe("device-emphasis-card-html", () => {
     );
   });
 
+  it("landing emphasis cards use stacked flex:none on __main", () => {
+    const styles = readFileSync(join(root, "site/styles.css"), "utf8");
+    expect(styles).toMatch(
+      /\.landing-framing\.hc-emphasis-card \.hc-emphasis-card__main[\s\S]*flex:\s*none/
+    );
+    expect(styles).toMatch(
+      /\.landing-final-cta\.hc-emphasis-card \.hc-emphasis-card__main[\s\S]*flex:\s*none/
+    );
+    expect(styles).toMatch(
+      /\.landing-final-cta\.hc-emphasis-card[\s\S]*justify-content:\s*flex-start/
+    );
+  });
+
   it("landing framing uses info emphasis card and glass row link", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain("hc-emphasis-card--info landing-framing");

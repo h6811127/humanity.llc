@@ -1502,6 +1502,18 @@ a.hub-card-menu-item {
   margin-top: 10px;
 }
 
+/* Landing stacked emphasis cards — flex:none on __main (docs/HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) */
+.landing-framing.hc-emphasis-card,
+.landing-final-cta.hc-emphasis-card {
+  justify-content: flex-start;
+}
+
+.landing-framing.hc-emphasis-card .hc-emphasis-card__main,
+.landing-final-cta.hc-emphasis-card .hc-emphasis-card__main {
+  flex: none;
+  width: 100%;
+}
+
 /* Landing framing — hc-emphasis-card--info (see docs/LANDING_FINAL_CTA_EMPHASIS_CARD.md) */
 .landing-framing.hc-emphasis-card {
   flex-direction: column;
@@ -6081,6 +6093,11 @@ a.wallet-pin-open {
   font-size: 15px;
   line-height: 1.45;
   max-width: 34em;
+}
+
+.landing-final-cta.hc-emphasis-card .hc-emphasis-card__actions {
+  width: 100%;
+  justify-content: flex-start;
 }
 
 .landing-final-cta-actions {
