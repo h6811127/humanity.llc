@@ -1,6 +1,6 @@
 # Hosted tier — implementation epics (M8)
 
-**Status:** **Planning only** — ordered build map; **no code until gates pass**  
+**Status:** **E1 foundation shipped** (behind `HOSTED_STEWARD_ENABLED`; push/billing in E4/E5)  
 **Milestone:** M8 of [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md)  
 **Depends on:** M2–M7 complete; **M4 governance sign-off** before E1 merge to production  
 **Audience:** Engineering, ops
@@ -89,6 +89,17 @@ flowchart LR
 ### Out of scope
 
 - Push (E4), Stripe (E5), client UI (E2)
+
+### Implementation status (2026-05-26)
+
+| Deliverable | Status |
+|-------------|--------|
+| E1.1–E1.5 | **Staging** — migration `0012_steward_hosted.sql`, routes in `worker/src/resolver/steward-hosted.ts` |
+| E1.6–E1.7 | **Staging** — `worker/src/steward/quota.ts` on authenticated `GET …/live-control/challenges` (+ challenge by id) |
+| Tests | `worker/tests/steward-hosted.test.ts`, `worker/tests/steward-quota.test.ts` |
+| Flag | `HOSTED_STEWARD_ENABLED` default **`0`** in `worker/wrangler.toml`; set **`1`** locally after `npm run worker:migrate:local` |
+
+**Next after G0:** merge E1 to production with flag off; start **E2** client probe (`device-steward-entitlements-core.mjs`).
 
 ---
 
@@ -318,4 +329,5 @@ flowchart LR
 
 | Date | Note |
 |------|------|
+| 2026-05-26 | **E1 foundation:** migration `0012_steward_hosted.sql`, steward routes behind `HOSTED_STEWARD_ENABLED` |
 | 2026-05-26 | M8 initial implementation epics (planning only) |

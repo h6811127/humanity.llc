@@ -23,8 +23,8 @@ preview_database_id = "f16391f9-613a-4506-9ad7-35d19178b8b6"
 port = 8787
 
 [vars]
-# Local E1 testing only — keep unset in production until M4 sign-off.
-HOSTED_STEWARD_ENABLED = "1"
+# E1 staging: set to "1" locally to exercise steward routes; production off until M4 sign-off.
+HOSTED_STEWARD_ENABLED = "0"
 
 # Daily orphan card purge (04:00 UTC). See docs/CARD_RETENTION_AND_ORPHAN_CLEANUP.md
 [triggers]

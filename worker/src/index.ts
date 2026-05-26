@@ -324,7 +324,8 @@ export default {
         request,
         env.DB,
         liveChallengeStatusMatch[1]!,
-        liveChallengeStatusMatch[2]!
+        liveChallengeStatusMatch[2]!,
+        env
       );
       return withCors(request, res);
     }
@@ -357,7 +358,8 @@ export default {
       const res = await handleGetPendingLiveControlChallenge(
         request,
         env.DB,
-        liveChallengeMatch[1]!
+        liveChallengeMatch[1]!,
+        env
       );
       return withCors(request, res);
     }

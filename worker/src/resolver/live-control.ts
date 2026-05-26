@@ -22,6 +22,8 @@ import {
   QR_ID_REGEX,
   type ScanPageKind,
 } from "./scan-state";
+import type { Env } from "../index";
+import { enforceStewardAutoPollQuota } from "../steward/quota";
 import {
   generateLiveControlChallengeId,
   generateVerifierSessionId,
@@ -135,8 +137,14 @@ export async function handleGetLiveControlChallenge(
   request: Request,
   db: D1Database,
   profileId: string,
-  challengeId: string
+  challengeId: string,
+  env?: Env
 ): Promise<Response> {
+  if (env) {
+    const quota = await enforceStewardAutoPollQuota(request, env, db, profileId);
+    if (quota) return quota;
+  }
+
   if (!PROFILE_ID_REGEX.test(profileId)) {
     return errorResponse(CRYPTO_ERROR.INVALID_PROFILE_ID, "Invalid profile_id.", 422);
   }
@@ -158,8 +166,14 @@ export async function handleGetLiveControlChallenge(
 export async function handleGetPendingLiveControlChallenge(
   request: Request,
   db: D1Database,
-  profileId: string
+  profileId: string,
+  env?: Env
 ): Promise<Response> {
+  if (env) {
+    const quota = await enforceStewardAutoPollQuota(request, env, db, profileId);
+    if (quota) return quota;
+  }
+
   if (!PROFILE_ID_REGEX.test(profileId)) {
     return errorResponse(CRYPTO_ERROR.INVALID_PROFILE_ID, "Invalid profile_id.", 422);
   }

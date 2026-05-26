@@ -61,6 +61,7 @@ function stewardDb(ownerPublicKey: string) {
   const profiles = new Map<string, string>();
   const sessions = new Map<string, Record<string, unknown>>();
   const nonces = new Set<string>();
+  const usageCounters = new Map<string, number>();
   const plans = [
     {
       plan_id: "reference_free",
@@ -110,14 +111,28 @@ function stewardDb(ownerPublicKey: string) {
           if (sql.includes("FROM steward_sessions WHERE token_hash")) {
             return sessions.get(String(params[0])) ?? null;
           }
+          if (
+            sql.includes("FROM steward_account_profiles") &&
+            sql.includes("profile_id")
+          ) {
+            const accountId = profiles.get(String(params[0]));
+            return accountId ? { account_id: accountId } : null;
+          }
           if (sql.includes("steward_usage_counters") && sql.includes("SELECT count")) {
-            return { count: 0 };
+            const [accountId, deviceId, event, windowKey] = params as string[];
+            const key = `${accountId}:${deviceId}:${event}:${windowKey}`;
+            return { count: usageCounters.get(key) ?? 0 };
           }
           return null;
         },
         run: async () => {
           if (sql.includes("INSERT INTO steward_link_nonces")) {
             nonces.add(String(params[0]));
+          }
+          if (sql.includes("INSERT INTO steward_usage_counters")) {
+            const [accountId, deviceId, event, windowKey] = params as string[];
+            const key = `${accountId}:${deviceId}:${event}:${windowKey}`;
+            usageCounters.set(key, (usageCounters.get(key) ?? 0) + 1);
           }
           if (sql.includes("INSERT INTO steward_accounts")) {
             accounts.set(String(params[0]), {
