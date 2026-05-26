@@ -250,3 +250,10 @@ Per the AI prompt at the bottom of the first investigation draft:
 - `reapplyRevokedSinceVisitFromLatestResolved()` + `isResolverConfirmedProfile()` in `device-wallet-network.mjs`
 - Hub listens to `NETWORK_REFRESHED` (with poll `resolverConfirmedMap` in `detail`) and `DEVICE_OS_REFRESHED`
 - Inbox gather + **Open controls** baseline ack no longer trust session cache alone
+
+### Slice 6 hardening (shipped)
+
+- Glance since-visit suffix uses `isResolverConfirmedProfile()` (aligned with hub/inbox).
+- Glance listens to `DEVICE_OS_REFRESHED` after coordinator wallet poll.
+- E2E: `device-os-wallet.spec.ts` — **Open controls** after stale cache + active resolver must not show banners on all cards.
+- Tracked as **DH-15** in [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md).

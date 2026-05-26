@@ -117,8 +117,9 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 | **DH-2** | ✅ Fixed: `applyNetworkChipsToDom` passes `scanKindMap` from poll into `networkStatusChip`. |
 | **DH-3** | ✅ Fixed: glance uses resolver-confirmed state + inbox row for card-disabled; saved-row suffix skipped when card is already in `buildInboxItems()`. |
 | **DH-4** | ✅ Fixed: `snapshotNetworkSeenOnExit` snapshots `latestResolvedAlertStateMap` only after a resolver-confirmed poll this visit. |
+| **DH-15** | ✅ Fixed: `isResolverConfirmedProfile()`; hub re-applies banners on `NETWORK_REFRESHED` + `DEVICE_OS_REFRESHED`; inbox/glance skip unconfirmed profiles; Open controls baseline no longer uses session cache. See [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md). |
 
-**Files:** `device-hub-ui.mjs`, `device-wallet-network.mjs`, `device-hub-glance.mjs`.
+**Files:** `device-hub-ui.mjs`, `device-wallet-network.mjs`, `device-hub-glance.mjs`, `device-inbox-card-disabled.mjs`.
 
 **Done when:** Active card on production never shows since-visit alert; chip label matches `scan.kind` after fetch; Vitest integration case for “stale cache + fresh active fetch hides alert.”
 
@@ -227,6 +228,18 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 - [x] Sync `DEVICE_HUB_AND_LOCAL_SEARCH.md` with removed help pill / current landing layout.
 - [x] Update `site/features/scan-ui.html` (regenerate via `generate-feature-pages.mjs` if needed).
 - [x] Note browser notifications as shipped in `DEVICE_OS.md`.
+
+---
+
+### Slice 6 — Post-investigation hardening (P1) ✅
+
+**Goal:** Close residual gaps after [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) (DH-15).
+
+- [x] `isResolverConfirmedProfile()` + hub `reapplyRevokedSinceVisitFromLatestResolved()` on coordinator/network refresh events.
+- [x] Glance `revokedHintProfileIdsFromEntries` requires resolver-confirmed profile (not `latestResolved` alone).
+- [x] E2E: stale cache + active resolver + **Open controls** does not re-light all row banners.
+
+**Files:** `device-wallet-network.mjs`, `device-hub-ui.mjs`, `device-hub-glance.mjs`, `device-inbox-card-disabled.mjs`, `e2e/device-os-wallet.spec.ts`.
 
 ---
 
