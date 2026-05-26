@@ -139,6 +139,7 @@ Implementation snapshot:
 - Phase 2: `describeDotState()` in `site/js/device-dot-state-core.mjs` — **Now / Why / Next** in hub status key and glance popover; steward queue link when present.
 - Phase 3: overlay axis (`proof_waiting`, `cross_tab_keys`), `::after` notch in `site/styles.css`, `data-dot-state` / `data-dot-overlay`, Vitest in `worker/tests/device-dot-state.test.ts`.
 - Phase 4: steward celebration pulse (`pass-dot-steward-celebrate`), `hc-dot-state-changed` + optional `hc_dot_diag_log`, E2E in `e2e/device-status-dot.spec.ts`, CI via `test-site.yml`.
+- Phase 5 (diagnostics UX): popover/action/hub telemetry in `device-dot-diagnostics.mjs` when `localStorage.hc_dot_diagnostics === "1"`.
 - Clickability: `site/css/device-shell.css` + `site/js/device-hub-sheet.mjs` — dot stays fixed/clickable when hub is open or chrome is edge-hidden; dot opens hub on first tap (not glance-first).
 
 ### Phase 4 - Hardening
@@ -146,6 +147,22 @@ Implementation snapshot:
 1. **Celebration pulse** — one-time 900ms bloom on non-steward → steward when network is `ok`; disabled under `prefers-reduced-motion`. CSS: `pass-dot-steward-celebrate` in `site/styles.css`; logic: `shouldCelebrateStewardTransition()` in `device-dot-state-core.mjs`, applied from `device-status.mjs`.
 2. **E2E** — `e2e/device-status-dot.spec.ts`: steward wallet + healthy resolver → green on `/wallet/` and `/`; degraded suppresses green; landing dot opens hub sheet.
 3. **Diagnostics (dev-only)** — `window` event `hc-dot-state-changed` with `{ from, to, at, page }`; ring buffer `sessionStorage.hc_dot_diag_log` when `localStorage.hc_dot_diagnostics === "1"`.
+
+### Phase 5 - Interaction telemetry (dev-only)
+
+Enable: `localStorage.setItem("hc_dot_diagnostics", "1")` then reload. Read log: `JSON.parse(sessionStorage.getItem("hc_dot_diag_log"))`.
+
+Logged entry types in `hc_dot_diag_log` (newest first, max 20):
+
+| Type | When |
+|------|------|
+| `state_transition` | Dot network/device/overlay changes (`from` / `to`) |
+| `dot_click` | Status dot tapped |
+| `hub_toggle` | Hub sheet opened/closed from a haptic user action |
+| `popover_open` | Glance popover shown |
+| `quick_action` | Explainer button (`data-dot-action`) or link (`.device-dot-explainer-action[href]`) |
+
+Confusion hints (console.info when thresholds hit): ≥3 glance opens without a follow-up action; ≥3 state transitions within 15s. Helpers: `device-dot-diagnostics-core.mjs`; Vitest: `worker/tests/device-dot-diagnostics.test.ts`.
 
 Network refresh for dot coloring uses `device-os-coordinator.mjs` (`DEVICE_OS_REFRESHED`) so steward green tracks resolver health consistently with wallet/hub.
 
@@ -201,7 +218,8 @@ Network refresh for dot coloring uses `device-os-coordinator.mjs` (`DEVICE_OS_RE
 ## Optional follow-up
 
 - **CI (shipped):** `.github/workflows/test-site.yml` runs `npm run worker:test` and `e2e/device-status-dot.spec.ts` on `site/` / `e2e/` changes.
-- Popover open/click telemetry (local diagnostics only; see Telemetry section).
+- **Interaction telemetry (shipped):** Phase 5 dev-only log; see Telemetry section and Phase 5 above.
+- **A11y E2E:** reduced-motion celebration off + explainer text present (not yet automated).
 
 ---
 

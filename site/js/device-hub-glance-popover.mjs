@@ -2,6 +2,7 @@
  * Glance menu anchored to the status dot (compact menu before full hub sheet).
  */
 import { hubGlanceHasContent } from "./device-hub-glance.mjs";
+import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
 
 function getPopoverRoot() {
   return (
@@ -53,6 +54,7 @@ export function setGlancePopoverOpen(open) {
   document.body.classList.add("device-glance-popover-open");
   const btn = getDotBtn();
   if (btn) btn.setAttribute("aria-expanded", "true");
+  logDotDiagnostic({ type: "popover_open" });
 }
 
 export function toggleGlancePopover() {

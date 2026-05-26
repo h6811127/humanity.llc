@@ -16,6 +16,7 @@ import { crossTabNoticeCount } from "./device-tab-presence.mjs";
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
+import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
 import "./device-shell-motion.mjs";
 import "./device-shell-chrome.mjs";
 import "./device-theme.mjs";
@@ -131,7 +132,10 @@ export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
   if (persist) {
     sessionStorage.setItem(HUB_OPEN_KEY, open ? "1" : "0");
   }
-  if (haptic) hapticTap();
+  if (haptic) {
+    hapticTap();
+    logDotDiagnostic({ type: "hub_toggle", open });
+  }
   refreshHubGlance();
 }
 
@@ -154,25 +158,14 @@ function maybeEmitDotTransition(network, device, overlay) {
   if (key === prevKey) return;
 
   const detail = {
+    type: "state_transition",
     from: prevKey,
     to: key,
     at: new Date().toISOString(),
     page: location.pathname,
   };
   window.dispatchEvent(new CustomEvent(DOT_STATE_CHANGED, { detail }));
-
-  try {
-    if (localStorage.getItem("hc_dot_diagnostics") === "1") {
-      const raw = sessionStorage.getItem("hc_dot_diag_log");
-      const log = raw ? JSON.parse(raw) : [];
-      if (Array.isArray(log)) {
-        log.unshift(detail);
-        sessionStorage.setItem("hc_dot_diag_log", JSON.stringify(log.slice(0, 20)));
-      }
-    }
-  } catch {
-    /* ignore */
-  }
+  logDotDiagnostic(detail);
 }
 
 function applyStewardCelebrate(previousDevice, nextDevice) {
@@ -448,6 +441,7 @@ if (hub) {
 dotBtn?.addEventListener("click", (e) => {
   e.preventDefault();
   e.stopPropagation();
+  logDotDiagnostic({ type: "dot_click" });
   openHubFromChrome();
 });
 
@@ -522,9 +516,21 @@ window.addEventListener("hc-hub-expand-request", (e) => {
 });
 
 document.addEventListener("click", (e) => {
-  const actionEl = e.target instanceof Element ? e.target.closest("[data-dot-action]") : null;
+  if (!(e.target instanceof Element)) return;
+  const linkEl = e.target.closest(".device-dot-explainer-action[href]");
+  if (linkEl instanceof HTMLAnchorElement) {
+    logDotDiagnostic({
+      type: "quick_action",
+      action: "link",
+      href: linkEl.getAttribute("href") || "",
+    });
+    return;
+  }
+  const actionEl = e.target.closest("[data-dot-action]");
   if (!actionEl) return;
   const action = actionEl.getAttribute("data-dot-action");
+  if (!action) return;
+  logDotDiagnostic({ type: "quick_action", action });
   if (action === "retry") {
     refreshNetwork();
     return;
