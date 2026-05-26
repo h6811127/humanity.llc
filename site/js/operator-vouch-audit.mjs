@@ -1,3 +1,5 @@
+import { resolverErrorMessage } from "./resolver-user-error-core.mjs";
+
 const TOKEN_KEY = "hc_operator_audit_token";
 const HIDE_REVIEWED_KEY = "hc_operator_audit_hide_reviewed";
 const ENDPOINT = `${location.origin}/.well-known/hc/v1/operator/vouch-audit-flags`;
@@ -82,7 +84,13 @@ async function postDismiss(flag, note, dismissedBy) {
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body?.message || body?.error || "Dismiss failed");
+    throw new Error(
+      resolverErrorMessage(body, {
+        status: res.status,
+        requestUrl: DISMISS_ENDPOINT,
+        fallback: "Dismiss failed.",
+      })
+    );
   }
 }
 
@@ -97,7 +105,13 @@ async function clearDismiss(flag) {
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body?.message || body?.error || "Clear failed");
+    throw new Error(
+      resolverErrorMessage(body, {
+        status: res.status,
+        requestUrl: DISMISS_ENDPOINT,
+        fallback: "Clear failed.",
+      })
+    );
   }
 }
 
@@ -206,7 +220,13 @@ async function refreshFlags() {
   });
   const body = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw new Error(body?.message || body?.error || `Request failed (${res.status})`);
+    throw new Error(
+      resolverErrorMessage(body, {
+        status: res.status,
+        requestUrl: ENDPOINT,
+        fallback: "Failed to load flags.",
+      })
+    );
   }
   currentFlags = Array.isArray(body.flags) ? body.flags : [];
   const reviewed = currentFlags.filter((f) => f.dismissal).length;

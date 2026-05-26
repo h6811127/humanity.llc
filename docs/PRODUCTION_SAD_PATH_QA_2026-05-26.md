@@ -141,7 +141,7 @@ Resolver health at test time: `GET /.well-known/hc/v1/health` → `{"status":"ok
 
 ### P1-4 · Error strings expose internal API URLs
 
-**Status (2026-05-26):** Partial — create POST errors sanitized in `create-resolver-error-core.mjs`; other flows may still append URLs.
+**Status (2026-05-26):** Fix shipped — shared `resolver-user-error-core.mjs` strips API URLs from UI errors and logs request URLs to console; applied to create, created owner flows, organizer revoke, vouch, and operator audit.
 
 Examples seen in create flow:
 

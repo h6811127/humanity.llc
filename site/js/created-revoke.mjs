@@ -3,6 +3,7 @@
  */
 import { applyOwnerRevokedBanner } from "./created-revoke-banner-core.mjs";
 import { getCardStatusUrl, postRevokeUrl, signRevocation } from "./hc-sign.mjs";
+import { resolverErrorMessage } from "./resolver-user-error-core.mjs";
 
 const ICON_TONE = {
   active: "green",
@@ -292,7 +293,14 @@ export function initOwnerRevoke(ctx) {
       });
       const payload = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(payload.message || payload.error || `HTTP ${res.status}`);
+        const url = postRevokeUrl(ctx.profileId);
+        throw new Error(
+          resolverErrorMessage(payload, {
+            status: res.status,
+            requestUrl: url,
+            fallback: "Could not revoke on the network.",
+          })
+        );
       }
 
       const session = ctx.getSession() || {};

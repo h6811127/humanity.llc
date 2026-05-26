@@ -1,18 +1,22 @@
 import { CREATE_HANDLE_INVALID_MESSAGE } from "./create-handle-validation-core.mjs";
+import {
+  logResolverRequestFailure,
+  stripResolverUrlsFromMessage,
+} from "./resolver-user-error-core.mjs";
 
 /**
  * Plain-language create POST errors (P1-4: no resolver URLs in UI).
  * @param {{ message?: string, error?: string }} payload
  * @param {number} status
+ * @param {string} [requestUrl]
  */
-export function formatCreateResolverError(payload, status) {
+export function formatCreateResolverError(payload, status, requestUrl) {
   const code = String(payload?.error || "").trim();
   const raw = String(payload?.message || payload?.error || "").trim();
-  const stripped = raw
-    .replace(/\s*\(https?:\/\/[^)]+\)/gi, "")
-    .replace(/\s*\([^)]*\.well-known\/[^)]*\)/gi, "")
-    .replace(/\s+https?:\/\/\S+/gi, "")
-    .trim();
+  if (requestUrl) {
+    logResolverRequestFailure(requestUrl, { status, error: code, message: raw });
+  }
+  const stripped = stripResolverUrlsFromMessage(raw);
 
   if (code === "HANDLE_TAKEN" || /already taken/i.test(stripped)) {
     return "Handle is already taken.";

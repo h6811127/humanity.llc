@@ -39,6 +39,7 @@ import {
   gateCreatedRoute,
 } from "./created-route-gate.mjs";
 import { getCardJsonUrl, getCardStatusUrl } from "./hc-sign.mjs";
+import { resolverErrorMessage } from "./resolver-user-error-core.mjs";
 
 const params = new URLSearchParams(location.search);
 const profileIdParam = params.get("profile_id")?.trim() || null;
@@ -600,7 +601,14 @@ function initLiveControlProof() {
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(body.message || body.error || `HTTP ${res.status}`);
+        const url = postLiveControlResponseUrl(profileId);
+        throw new Error(
+          resolverErrorMessage(body, {
+            status: res.status,
+            requestUrl: url,
+            fallback: "Could not prove control.",
+          })
+        );
       }
       resetAfterProof();
     } catch (err) {

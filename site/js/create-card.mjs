@@ -226,7 +226,7 @@ export async function runCreateCard(input) {
 
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const msg = formatCreateResolverError(data, res.status);
+    const msg = formatCreateResolverError(data, res.status, postCardsUrl());
     if (String(data.message || data.error || "").includes("recovery_public_key")) {
       throw new Error(
         "Resolver database needs an update (recovery key column). Try again in a minute or contact support."

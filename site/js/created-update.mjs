@@ -1,3 +1,4 @@
+import { resolverErrorMessage } from "./resolver-user-error-core.mjs";
 import {
   decodePrivateKeyBase58,
   postCardUpdateUrl,
@@ -56,7 +57,14 @@ export async function postCardUpdate(profileId, signedCard) {
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw new Error(data.message || data.error || `HTTP ${res.status}`);
+    const url = postCardUpdateUrl(profileId);
+    throw new Error(
+      resolverErrorMessage(data, {
+        status: res.status,
+        requestUrl: url,
+        fallback: "Could not update card.",
+      })
+    );
   }
   return data;
 }

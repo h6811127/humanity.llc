@@ -5,6 +5,7 @@ import {
   signDocument,
   withProtocolFields,
 } from "./hc-sign.mjs";
+import { resolverErrorMessage } from "./resolver-user-error-core.mjs";
 
 function randomNonce() {
   const bytes = crypto.getRandomValues(new Uint8Array(16));
@@ -83,7 +84,14 @@ export async function postQrExtend(profileId, qr_credential) {
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw new Error(data.message || data.error || `HTTP ${res.status}`);
+    const url = postQrExtendUrl(profileId);
+    throw new Error(
+      resolverErrorMessage(data, {
+        status: res.status,
+        requestUrl: url,
+        fallback: "Could not extend QR.",
+      })
+    );
   }
   return data;
 }

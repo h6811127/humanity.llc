@@ -9,6 +9,7 @@ import {
   signDocument,
   withProtocolFields,
 } from "./hc-sign.mjs";
+import { resolverErrorMessage } from "./resolver-user-error-core.mjs";
 
 function randomNonce() {
   const bytes = crypto.getRandomValues(new Uint8Array(16));
@@ -104,7 +105,14 @@ export async function postQrRotation(profileId, payload) {
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    throw new Error(data.message || data.error || `HTTP ${res.status}`);
+    const url = postQrRotateUrl(profileId);
+    throw new Error(
+      resolverErrorMessage(data, {
+        status: res.status,
+        requestUrl: url,
+        fallback: "Could not rotate QR.",
+      })
+    );
   }
   return data;
 }

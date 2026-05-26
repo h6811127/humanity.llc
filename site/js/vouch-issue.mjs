@@ -9,6 +9,7 @@ import {
   postVouchUrl,
   signVouch,
 } from "./hc-sign.mjs";
+import { stripResolverUrlsFromMessage } from "./resolver-user-error-core.mjs";
 import { loadWallet, walletEntryQrId } from "./device-wallet.mjs";
 import {
   humanTrustIconMeta,
@@ -270,7 +271,8 @@ function plainVouchError(code, fallback) {
       "Signature invalid. Load steward keys via My cards → Sign as…",
     SIGNATURE_MISMATCH: "Signature does not match your card keys.",
   };
-  return map[code] || fallback || "Vouch not recorded. Try again.";
+  const plain = map[code] || stripResolverUrlsFromMessage(fallback);
+  return plain || "Vouch not recorded. Try again.";
 }
 
 function formatRecency(iso) {
