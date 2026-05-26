@@ -1478,6 +1478,11 @@ button.hub-card-action.hub-use-keys {
   pointer-events: auto;
 }
 
+.device-hub-backdrop[hidden] {
+  pointer-events: none;
+  visibility: hidden;
+}
+
 body.device-hub-sheet-open {
   overflow: hidden;
 }
@@ -1606,6 +1611,11 @@ body.device-hub-sheet-open {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
+}
+
+.device-inbox-backdrop[hidden] {
+  pointer-events: none;
+  visibility: hidden;
 }
 
 body.device-inbox-sheet-open {

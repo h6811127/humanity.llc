@@ -285,6 +285,7 @@ document.body.classList.remove("shell-is-scrolling");
 
 | Date | Decision |
 |------|----------|
+| 2026-05-26 | **Phase 1.4 shipped:** `device-sheet-backdrop-sync.mjs`; reconcile on visibility/focus/pageshow; `syncSheetBackdropClosed` after close |
 | 2026-05-26 | **Phase 1.2–1.3 shipped:** document scroll-edge chrome + `shell-is-scrolling` gated to `(pointer: fine)` + `(hover: hover)`; `body.shell-scroll-chrome-off` on touch |
 | 2026-05-26 | **Phase 1.1 shipped:** `DEVICE_SHELL_ASSET_VERSION=22`; all manifest URLs and graph peer imports use `?v=22`; shell HTML bootstrap bumped |
 | 2026-05-26 | Document opened; private iPhone failure elevates priority of scroll-chrome gating over cache-only narrative |
@@ -300,3 +301,4 @@ document.body.classList.remove("shell-is-scrolling");
 | 2026-05-26 | Initial investigation doc + fix plan from cross-device reporter matrix |
 | 2026-05-26 | Phase 1.1 implemented (unified graph cache-bust v22) |
 | 2026-05-26 | Phase 1.2–1.3 implemented (scroll-edge chrome off on touch; `styles.css?v=92` on shell pages) |
+| 2026-05-26 | Phase 1.4 implemented (backdrop lifecycle reconcile) |
