@@ -48,9 +48,11 @@ Before shipping UI, answer:
 | **Act** | Hub: cards, pins, search, activity, shortcuts, import | `#device-hub` (expand to work) |
 | **Glance (collapsed hub)** | Notice + up to 3 saved labels (+ “N more”) | `#device-hub-glance` (landing only) |
 | **System** | Resolver degraded or offline (actionable) | `#device-system-banner` (landing only, hidden when ok) |
-| **Reference** | Features map, studio, case study, architecture, data policy | Full **Documentation** section (intro mode) or **Help & protocol** `<details>` (focus mode) |
+| **Reference** | Features map, studio, case study, architecture, data policy | Full **Documentation** disclosure card (intro mode) or **Help & protocol** list (focus mode) |
 
 Documentation is **trust and onboarding**, not **state**. Returning users need what changed on **this device** and **network health**, not architecture every visit.
+
+On `/`, **Design choices**, **Clear limits**, and **Documentation** are collapsed **icon cards** (`.landing-disclosure-card`) below the studio pilot — tap the row to expand; the chevron rotates like hub/settings disclosures.
 
 ---
 

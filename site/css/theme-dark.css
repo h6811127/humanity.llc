@@ -659,6 +659,95 @@ html[data-theme="dark"] .landing-device-settings-list .list-action > button:acti
   background: rgba(255, 255, 255, 0.06);
 }
 
+/* Landing — object model strip + trust/docs cards */
+html[data-theme="dark"] .flow-strip {
+  background: var(--shell-fill);
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .flow-label {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .flow-caption,
+html[data-theme="dark"] .flow-arrow {
+  color: var(--shell-label);
+}
+
+html[data-theme="dark"] .flow-door {
+  background: linear-gradient(160deg, #3a3a3c, #2c2c2e);
+  border-color: var(--shell-separator);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme="dark"] .flow-plaque,
+html[data-theme="dark"] .flow-sticker {
+  background: var(--shell-fill-secondary);
+  border-color: var(--shell-separator);
+  box-shadow: var(--shell-shadow-sm);
+}
+
+html[data-theme="dark"] .flow-phone {
+  background: var(--shell-fill-secondary);
+  border-color: var(--shell-separator);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="dark"] .flow-phone-notch {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+html[data-theme="dark"] .example-note {
+  color: var(--shell-label);
+}
+
+html[data-theme="dark"] .example-note em {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .studio-use-cases-list .studio-use-case-row {
+  border-bottom-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .landing-disclosure-card {
+  background: var(--shell-fill);
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .landing-disclosure-card-title,
+html[data-theme="dark"] .group-label,
+html[data-theme="dark"] .section-kicker {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .landing-disclosure-card-sub,
+html[data-theme="dark"] .group-intro,
+html[data-theme="dark"] .group-intro strong {
+  color: var(--shell-label);
+}
+
+html[data-theme="dark"] .group-intro strong {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .landing-disclosure-card-body {
+  border-top-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .landing-disclosure-card-summary .list-chevron {
+  color: var(--shell-label);
+}
+
+html[data-theme="dark"] .landing-disclosure-card-body .list-row {
+  background: transparent;
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .landing-disclosure-card-body .list-action > a:active,
+html[data-theme="dark"] .landing-disclosure-card-body .list-action > button:active {
+  background: rgba(255, 255, 255, 0.06);
+}
+
 html[data-theme="dark"] .scan-status-panel,
 html[data-theme="dark"] .pass-scene {
   background: var(--shell-fill);

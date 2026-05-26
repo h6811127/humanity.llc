@@ -26,9 +26,9 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="/styles.css?v=94" />
+    <link rel="stylesheet" href="/styles.css?v=95" />
     <link rel="stylesheet" href="/css/device-shell.css?v=37" />
-    <link rel="stylesheet" href="/css/theme-dark.css?v=4" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=5" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
@@ -465,8 +465,18 @@
             The same primitive works on shops, booths, and rehearsal rooms.
           </p>
 
-          <details class="landing-disclosure studio-use-cases-disclosure">
-            <summary class="landing-disclosure-summary">Example uses on a door plate</summary>
+          <details class="landing-disclosure-card studio-use-cases-disclosure">
+            <summary class="landing-disclosure-card-summary">
+              <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+              </span>
+              <span class="landing-disclosure-card-text">
+                <span class="landing-disclosure-card-title">Example uses on a door plate</span>
+                <span class="landing-disclosure-card-sub">Door scan, run state, hours, revoke visibility</span>
+              </span>
+              <span class="list-chevron" aria-hidden="true">›</span>
+            </summary>
+            <div class="landing-disclosure-card-body">
             <ul class="list list-compact studio-use-cases-list">
             <li class="list-row studio-use-case-row">
               <span class="list-icon list-icon-tone-red" aria-hidden="true">
@@ -514,9 +524,10 @@
               </span>
             </li>
             </ul>
+            </div>
           </details>
 
-          <div class="flow-strip">
+          <div class="flow-strip flow-strip--model">
             <div class="flow-step">
               <div class="flow-object" aria-hidden="true">
                 <div class="flow-door">
@@ -620,8 +631,22 @@
           </ul>
         </section>
 
-        <details class="group landing-disclosure trust-posture" aria-label="Trust posture" data-landing-tutorial>
-          <summary class="landing-disclosure-summary">Design choices</summary>
+        <details
+          class="landing-disclosure-card trust-posture"
+          aria-label="Trust posture"
+          data-landing-tutorial
+        >
+          <summary class="landing-disclosure-card-summary">
+            <span class="list-icon list-icon-tone-green" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            <span class="landing-disclosure-card-text">
+              <span class="landing-disclosure-card-title">Design choices</span>
+              <span class="landing-disclosure-card-sub">Optional, revocable, no scan tracking, not legal ID</span>
+            </span>
+            <span class="list-chevron" aria-hidden="true">›</span>
+          </summary>
+          <div class="landing-disclosure-card-body">
           <p class="group-intro short">
             Engineering decisions  -  each tag names a concrete mechanism, not marketing copy.
           </p>
@@ -688,10 +713,21 @@
               </a>
             </li>
           </ul>
+          </div>
         </details>
 
-        <details class="group landing-disclosure" id="limits" data-landing-tutorial>
-          <summary class="landing-disclosure-summary">Clear limits</summary>
+        <details class="landing-disclosure-card" id="limits" data-landing-tutorial>
+          <summary class="landing-disclosure-card-summary">
+            <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            </span>
+            <span class="landing-disclosure-card-text">
+              <span class="landing-disclosure-card-title">Clear limits</span>
+              <span class="landing-disclosure-card-sub">What a scan does not prove or guarantee</span>
+            </span>
+            <span class="list-chevron" aria-hidden="true">›</span>
+          </summary>
+          <div class="landing-disclosure-card-body">
           <ul class="list list-compact">
             <li class="list-row">
               <span class="list-icon list-icon-tone-orange" aria-hidden="true">
@@ -737,6 +773,7 @@
               </a>
             </li>
           </ul>
+          </div>
         </details>
 
         <section class="group pilot-more-ideas" aria-label="More ideas" data-landing-tutorial>
@@ -747,8 +784,18 @@
           </p>
         </section>
 
-        <details class="group group-muted landing-essentials landing-docs-full landing-disclosure" id="landing-docs-full">
-          <summary class="landing-disclosure-summary">Documentation</summary>
+        <details class="landing-disclosure-card landing-essentials landing-docs-full" id="landing-docs-full">
+          <summary class="landing-disclosure-card-summary">
+            <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+            </span>
+            <span class="landing-disclosure-card-text">
+              <span class="landing-disclosure-card-title">Documentation</span>
+              <span class="landing-disclosure-card-sub">Features map, case study, architecture, data policy</span>
+            </span>
+            <span class="list-chevron" aria-hidden="true">›</span>
+          </summary>
+          <div class="landing-disclosure-card-body">
           <ul class="list list-compact">
             <li class="list-row list-action">
               <a href="/features-available-now.html">
@@ -811,6 +858,7 @@
               </a>
             </li>
           </ul>
+          </div>
         </details>
 
         <section class="group landing-essentials landing-docs-footer" id="landing-docs-footer" hidden>
