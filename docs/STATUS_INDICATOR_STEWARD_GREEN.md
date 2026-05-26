@@ -137,6 +137,7 @@ No third-party analytics requirement; this can remain local/dev diagnostics init
 Implementation snapshot:
 - Phase 1 shipped in `site/js/device-status.mjs` + `site/styles.css` (steward green + ARIA + legend).
 - Phase 2 basic explainability shipped: `describeDotState()` + "Now / Why / Next" surfaced in hub status key and dot popover with state-aware quick actions.
+- Phase 3 basic overlays shipped: `dotOverlayState()` for `proof_waiting` / `cross_tab_keys`, visual overlay marker on the dot, `data-dot-overlay` hooks, and overlay text in ARIA/explainer copy.
 
 ### Phase 1 - Steward green foundation
 

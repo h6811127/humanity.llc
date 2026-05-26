@@ -35,6 +35,11 @@ const DEVICE_CLASSES = [
   "pass-dot-status-device-unsaved",
   "pass-dot-status-device-steward",
 ];
+const OVERLAY_CLASSES = [
+  "pass-dot-overlay-none",
+  "pass-dot-overlay-proof_waiting",
+  "pass-dot-overlay-cross_tab_keys",
+];
 
 const dotBtn = document.getElementById("brand-status-dot-btn");
 const dot = document.getElementById("brand-status-dot");
@@ -86,7 +91,19 @@ function deviceState() {
   return "none";
 }
 
-function statusAriaLabel(network, device) {
+function dotOverlayState() {
+  if (getLiveControlPendingCount() > 0) return "proof_waiting";
+  if (crossTabNoticeCount() > 0) return "cross_tab_keys";
+  return "none";
+}
+
+function overlayAriaText(overlay) {
+  if (overlay === "proof_waiting") return "live proof waiting";
+  if (overlay === "cross_tab_keys") return "keys active in another tab";
+  return "";
+}
+
+function statusAriaLabel(network, device, overlay) {
   const networkText =
     network === "ok"
       ? "resolver online"
@@ -101,7 +118,10 @@ function statusAriaLabel(network, device) {
         : device === "keys"
           ? "saved keys on device"
           : "no saved keys on device";
-  return `Status: ${networkText}, ${deviceText}.`;
+  const overlayText = overlayAriaText(overlay);
+  return overlayText
+    ? `Status: ${networkText}, ${deviceText}, ${overlayText}.`
+    : `Status: ${networkText}, ${deviceText}.`;
 }
 
 export function notificationCount() {
@@ -140,14 +160,18 @@ function applyDot() {
   if (!dot) return;
   const run = () => {
     const device = deviceState();
-    dot.classList.remove(...NETWORK_CLASSES, ...DEVICE_CLASSES);
+    const overlay = dotOverlayState();
+    dot.classList.remove(...NETWORK_CLASSES, ...DEVICE_CLASSES, ...OVERLAY_CLASSES);
     dot.classList.add(`pass-dot-status-network-${networkStatus}`);
     dot.classList.add(`pass-dot-status-device-${device}`);
+    dot.classList.add(`pass-dot-overlay-${overlay}`);
     const dotState = `${networkStatus}:${device}`;
     dot.dataset.dotState = dotState;
+    dot.dataset.dotOverlay = overlay;
     dotBtn?.setAttribute("data-dot-state", dotState);
-    dotBtn?.setAttribute("aria-label", statusAriaLabel(networkStatus, device));
-    renderDotExplainability(networkStatus, device);
+    dotBtn?.setAttribute("data-dot-overlay", overlay);
+    dotBtn?.setAttribute("aria-label", statusAriaLabel(networkStatus, device, overlay));
+    renderDotExplainability(networkStatus, device, overlay);
   };
   if (
     !prefersReducedMotion() &&
@@ -180,9 +204,15 @@ function getStewardQueueUrl() {
   return link.getAttribute("href") || null;
 }
 
-function describeDotState(network, device) {
+function describeDotState(network, device, overlay) {
   const stewardReady = hasStewardReadyKeys();
   const queueUrl = getStewardQueueUrl();
+  const overlayText =
+    overlay === "proof_waiting"
+      ? "Live proof requests are waiting."
+      : overlay === "cross_tab_keys"
+        ? "Keys are active in another tab."
+        : "";
   if (network === "offline") {
     return {
       id: "offline",
@@ -190,8 +220,11 @@ function describeDotState(network, device) {
       why: stewardReady
         ? "Steward keys are ready locally, but network is unreachable."
         : "Health check failed and signing actions need a connection.",
-      next: "Retry resolver check.",
-      action: { kind: "retry", label: "Retry status check" },
+      next: overlayText || "Retry resolver check.",
+      action:
+        overlay === "proof_waiting"
+          ? { kind: "open_notifications", label: "Open proof requests" }
+          : { kind: "retry", label: "Retry status check" },
     };
   }
   if (network === "degraded") {
@@ -201,8 +234,11 @@ function describeDotState(network, device) {
       why: stewardReady
         ? "Steward keys are ready locally; network responses are currently limited."
         : "Resolver reported degraded health.",
-      next: "Retry status check or wait for recovery.",
-      action: { kind: "retry", label: "Retry status check" },
+      next: overlayText || "Retry status check or wait for recovery.",
+      action:
+        overlay === "proof_waiting"
+          ? { kind: "open_notifications", label: "Open proof requests" }
+          : { kind: "retry", label: "Retry status check" },
     };
   }
   if (device === "unsaved") {
@@ -210,8 +246,11 @@ function describeDotState(network, device) {
       id: "unsaved",
       now: "Tab keys not saved.",
       why: "This tab has signing keys that are not yet saved to this device.",
-      next: "Open controls and save keys.",
-      action: { kind: "open_controls", label: "Open controls" },
+      next: overlayText || "Open controls and save keys.",
+      action:
+        overlay === "proof_waiting"
+          ? { kind: "open_notifications", label: "Open proof requests" }
+          : { kind: "open_controls", label: "Open controls" },
     };
   }
   if (device === "steward") {
@@ -219,10 +258,15 @@ function describeDotState(network, device) {
       id: "steward",
       now: "Steward ready, resolver online.",
       why: "Steward-capable signing keys are available in this browser context.",
-      next: queueUrl ? "Open steward review queue." : "Open controls for steward actions.",
-      action: queueUrl
-        ? { kind: "open_steward_queue", label: "Open steward queue", href: queueUrl }
-        : { kind: "open_controls", label: "Open controls" },
+      next:
+        overlayText ||
+        (queueUrl ? "Open steward review queue." : "Open controls for steward actions."),
+      action:
+        overlay === "proof_waiting"
+          ? { kind: "open_notifications", label: "Open proof requests" }
+          : queueUrl
+            ? { kind: "open_steward_queue", label: "Open steward queue", href: queueUrl }
+            : { kind: "open_controls", label: "Open controls" },
     };
   }
   if (device === "keys") {
@@ -230,16 +274,22 @@ function describeDotState(network, device) {
       id: "keys",
       now: "Saved keys ready.",
       why: "Signing keys are saved on this device and resolver is online.",
-      next: "Open controls to manage a saved card.",
-      action: { kind: "open_controls", label: "Open controls" },
+      next: overlayText || "Open controls to manage a saved card.",
+      action:
+        overlay === "proof_waiting"
+          ? { kind: "open_notifications", label: "Open proof requests" }
+          : { kind: "open_controls", label: "Open controls" },
     };
   }
   return {
     id: "none",
     now: "No saved keys on this device.",
     why: "Resolver is online, but this browser has no saved signing keys.",
-    next: "Create a card or save keys from this tab.",
-    action: { kind: "create_card", label: "Create a card", href: "/create/" },
+    next: overlayText || "Create a card or save keys from this tab.",
+    action:
+      overlay === "proof_waiting"
+        ? { kind: "open_notifications", label: "Open proof requests" }
+        : { kind: "create_card", label: "Create a card", href: "/create/" },
   };
 }
 
@@ -259,8 +309,8 @@ function renderDotExplainer(container, descriptor, compact = false) {
     ${actionHtml}`;
 }
 
-function renderDotExplainability(network, device) {
-  const descriptor = describeDotState(network, device);
+function renderDotExplainability(network, device, overlay) {
+  const descriptor = describeDotState(network, device, overlay);
   const keyRoot = document.getElementById("device-hub-status-key");
   if (keyRoot) {
     let panel = keyRoot.querySelector(".device-dot-explainer");
@@ -411,6 +461,21 @@ function openWalletFromChrome() {
   hapticTap();
 }
 
+function openNotificationsFromChrome() {
+  if (isWalletPage()) {
+    hapticTap();
+    scrollToFirstNotification();
+    return;
+  }
+  if (!hub) {
+    location.href = "/";
+    return;
+  }
+  closeGlancePopover();
+  setHubExpanded(true, { haptic: true, persist: false });
+  window.setTimeout(scrollToFirstNotification, 120);
+}
+
 function openHubFromChrome() {
   if (isWalletPage()) {
     openWalletFromChrome();
@@ -454,18 +519,7 @@ dotBtn?.addEventListener("click", (e) => {
 notifBtn?.addEventListener("click", (e) => {
   e.preventDefault();
   e.stopPropagation();
-  if (isWalletPage()) {
-    hapticTap();
-    scrollToFirstNotification();
-    return;
-  }
-  if (!hub) {
-    location.href = "/";
-    return;
-  }
-  closeGlancePopover();
-  setHubExpanded(true, { haptic: true, persist: false });
-  window.setTimeout(scrollToFirstNotification, 120);
+  openNotificationsFromChrome();
 });
 
 document.addEventListener("keydown", (e) => {
@@ -543,5 +597,9 @@ document.addEventListener("click", (e) => {
   }
   if (action === "open_controls") {
     openHubFromChrome();
+    return;
+  }
+  if (action === "open_notifications") {
+    openNotificationsFromChrome();
   }
 });
