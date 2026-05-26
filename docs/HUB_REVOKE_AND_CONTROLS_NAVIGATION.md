@@ -1,7 +1,7 @@
 # Hub revoke & Open controls navigation - architecture and fix proposal
 
 **Date:** 2026-05-26  
-**Status:** P0–P2 shipped; verification checklist items 1–3, 5–6 covered by automated tests (item 4 manual revoke POST)  
+**Status:** P0–P2 shipped; status GET CORS fixed (`REVOKE_UI_INVESTIGATION` P2); verification items 1–3, 5–6 automated (item 4 manual revoke POST)  
 **Scope:** Investigation + implementation reference  
 **Reported symptoms:** Hub ⋯ **Revoke QR** and row **Open controls** land on the **Print** setup step on `/created/`; card stays **active** on the network.  
 **Related:** `docs/CARD_WORKSPACE_UX.md`, `docs/REVOKE_UI_INVESTIGATION.md`, `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md`, `docs/M4_CREATED_REVOKE_UI.md`

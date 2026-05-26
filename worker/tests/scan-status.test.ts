@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import worker from "../src";
 import type { ScanContext } from "../src/db/scan";
 import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
 import {
@@ -295,5 +296,23 @@ describe("scan status JSON (M3.4)", () => {
     );
     expect(vm.kind).toBe("unknown_profile");
     expect(httpStatusForScanKind(vm.kind)).toBe(404);
+  });
+
+  it("GET status through worker.fetch includes CORS for Pages dev origin", async () => {
+    const db = {
+      prepare: () => ({
+        bind: () => ({ first: async () => null }),
+      }),
+    } as unknown as D1Database;
+    const res = await worker.fetch(
+      new Request(
+        `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/status?q=${QR}`,
+        { headers: { Origin: "http://localhost:8788" } }
+      ),
+      { DB: db } as import("../src").Env
+    );
+    expect(res.headers.get("Access-Control-Allow-Origin")).toBe(
+      "http://localhost:8788"
+    );
   });
 });

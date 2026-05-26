@@ -162,13 +162,13 @@ This matches the screenshot footer: *“Unlock a saved backup or recovery key be
 
 **Note:** If `refreshLiveStatus()` runs but status `fetch` fails, UI should show **“Unreachable”**, not “Checking…”. Persistent “Checking…” strongly implies **init never ran**, not a failed status poll.
 
-### 3. CORS gap on status GET (medium confidence — dev / preview; not primary for production)
+### 3. CORS gap on status GET (fixed 2026-05-26)
 
-In `worker/src/index.ts`, `GET …/status` returns `handleGetScanStatus(...)` **without** `withCors()`, unlike POST revoke/create routes.
+**Was:** In `worker/src/index.ts`, `GET …/status` returned `handleGetScanStatus(...)` **without** `withCors()`, unlike POST revoke/create routes.
 
-On **local dev** (Pages `localhost:8788` → Worker `127.0.0.1:8787`), cross-origin status requests fail CORS. That normally triggers the `catch` branch (**Unreachable**), **if** `initOwnerRevoke` ran.
+On **local dev** (Pages `localhost:8788` → Worker `127.0.0.1:8787`), cross-origin status requests failed CORS. That normally triggered the `catch` branch (**Unreachable**), **if** `initOwnerRevoke` ran.
 
-Still worth fixing for dev; also ensures status works from `*.pages.dev` previews calling production resolver.
+**Now:** Status responses are wrapped with `withCors(request, res)` (including 503 when DB is missing). Covered by `worker/tests/scan-status.test.ts`.
 
 ### 4. Empty pink/red bar (low confidence — visual)
 
@@ -240,14 +240,14 @@ sequenceDiagram
 
 ---
 
-## Recommended fixes (documentation only — not implemented)
+## Recommended fixes
 
-| Priority | Issue | Suggested direction |
-|----------|--------|---------------------|
-| P0 | Stuck Checking when hydrate throws | Wrap `hydrateSessionFromNetwork` in try/catch inside `bootstrapOwnerTools`, or call `initOwnerRevoke` before/without awaiting hydrate; ensure `refreshLiveStatus()` always runs when `profileId` + `qrId` exist. |
-| P1 | Manage link without keys | On **Manage** click, call `activateWalletEntry(entry)` when wallet has keys (same as Control card), or show inline CTA “Load keys to revoke”. |
-| P2 | Status GET CORS | Wrap `handleGetScanStatus` response with `withCors(request, res)` in `worker/src/index.ts`. |
-| P3 | UX clarity | When `#revoke-actions` is hidden, avoid layout that looks like a broken empty button; ensure hint explicitly says “Import backup below” (already partial). |
+| Priority | Issue | Status |
+|----------|--------|--------|
+| P0 | Stuck Checking when hydrate throws | **Shipped** — `bootstrapOwnerTools()` try/catch around `hydrateSessionFromNetwork`; `initOwnerRevoke()` still runs when `profileId` + `qrId` exist (`site/js/created.mjs`). |
+| P1 | Manage link without keys | **Shipped (hub)** — `openCardNowPage()` activates wallet keys; see `docs/CARD_WORKSPACE_PHASE0.md`. |
+| P2 | Status GET CORS | **Shipped** — `withCors(request, res)` on GET `…/status` in `worker/src/index.ts`; test in `scan-status.test.ts`. |
+| P3 | UX clarity | Open — empty-button chrome when `#revoke-actions` is hidden. |
 
 ---
 

@@ -167,9 +167,13 @@ export default {
     );
     if (statusMatch && request.method === "GET") {
       if (!env.DB) {
-        return jsonResponse({ error: "database_unconfigured" }, 503);
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
       }
-      return handleGetScanStatus(request, env.DB, statusMatch[1]!);
+      const res = await handleGetScanStatus(request, env.DB, statusMatch[1]!);
+      return withCors(request, res);
     }
 
     const qrMetadataMatch = path.match(/^\/\.well-known\/hc\/v1\/qr\/([^/]+)$/);
