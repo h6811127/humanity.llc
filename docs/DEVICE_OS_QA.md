@@ -194,12 +194,14 @@ Removed May 2026. See [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md). 
 
 ### P1-7 · Watch for live proof (request budget Phase 5)
 
+**Product check:** Steward understands checks are **on demand** unless watch is on — not “the site monitors my wallet.” See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § How we want people to receive this.
+
 | Step | Action | Expected |
 |------|--------|----------|
-| 1 | Saved card; expand hub on `/` | Hub shows **Watch for live proof** (checked by default) and last-checked line |
-| 2 | Uncheck **Watch for live proof**; wait ~15s | No repeating `live-control/challenges` in Network tab |
+| 1 | Saved card; expand hub on `/` | **Watch for live proof** **unchecked** by default; **Check for live proof** visible; last-checked line present |
+| 2 | Wait ~15s with watch off | No repeating `live-control/challenges` in Network tab |
 | 3 | Tap **Check for live proof** | One challenge request; status line updates |
-| 4 | Re-check watch | Auto polling resumes while hub expanded (one challenge per tick at idle interval) |
+| 4 | Check **Watch for live proof** | Auto polling resumes while hub expanded (one challenge per tick at idle interval) |
 
 See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 

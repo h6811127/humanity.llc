@@ -1,5 +1,5 @@
 /**
- * Pure cross-tab notification state — fingerprint-stable show, immediate hide.
+ * Pure cross-tab notification state - fingerprint-stable show, immediate hide.
  * @see docs/CROSS_TAB_KEYS_REBUILD_PLAN.md Phase 1
  */
 

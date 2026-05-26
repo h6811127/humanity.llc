@@ -1,5 +1,5 @@
 /**
- * Browser background alerts — live proof when tab hidden (device-only).
+ * Browser background alerts - live proof when tab hidden (device-only).
  * @see docs/DEVICE_INBOX.md phases 4+
  */
 import {

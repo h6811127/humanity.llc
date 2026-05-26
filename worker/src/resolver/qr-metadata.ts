@@ -1,5 +1,5 @@
 /**
- * GET /.well-known/hc/v1/qr/{qr_id} — QR credential metadata (Flow 2 F2-4).
+ * GET /.well-known/hc/v1/qr/{qr_id} - QR credential metadata (Flow 2 F2-4).
  */
 import { loadQrCredentialById } from "../db/qr-metadata";
 import type { QrCredentialRow } from "../db/types";

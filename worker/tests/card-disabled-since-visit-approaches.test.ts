@@ -42,7 +42,9 @@ function hubWouldShowSinceVisitBanner(
   const netStatus = String(
     statusMap[profileId] ?? getCachedNetworkStatus(profileId) ?? "checking"
   ).toLowerCase();
-  if (netStatus === "offline" || netStatus === "error") return false;
+  if (netStatus === "checking" || netStatus === "offline" || netStatus === "error") {
+    return false;
+  }
   return cardDisabledSinceVisitVisible(
     alertStateMap[profileId],
     "active",
@@ -51,13 +53,20 @@ function hubWouldShowSinceVisitBanner(
   );
 }
 
+/** Mirrors applyRevokedSinceVisitAlerts allowShow (A5): hide-only never sets visible. */
+function hubBannerVisibleAfterApply(show, allowShow) {
+  return Boolean(show && allowShow);
+}
+
 /** Approach 1: re-apply carries last poll statusMap snapshot. */
 function hubWouldShowWithStatusSnapshot(profileId, lastStatusMap, maps) {
   if (!maps) return false;
   const netStatus = String(
     lastStatusMap[profileId] ?? getCachedNetworkStatus(profileId) ?? "checking"
   ).toLowerCase();
-  if (netStatus === "offline" || netStatus === "error") return false;
+  if (netStatus === "checking" || netStatus === "offline" || netStatus === "error") {
+    return false;
+  }
   return cardDisabledSinceVisitVisible(
     maps.alertStateMap[profileId],
     "active",
@@ -215,6 +224,17 @@ describe("fix approach invariants (mechanism verification)", () => {
     expect(shouldSuppressCardDisabledSinceVisitForProfile(PROFILE)).toBe(true);
   });
 
+  it("A3: checking chip hides banner even when poll maps say card_revoked", () => {
+    const maps = {
+      alertStateMap: { [PROFILE]: CARD_REVOKED_ALERT_STATE },
+      scanKindMap: { [PROFILE]: "card_revoked" },
+      resolverConfirmedMap: { [PROFILE]: true },
+    };
+    expect(
+      hubWouldShowSinceVisitBanner(PROFILE, { [PROFILE]: "checking" }, maps.alertStateMap, maps.scanKindMap, maps.resolverConfirmedMap)
+    ).toBe(false);
+  });
+
   it("A1+A4 (shipped): status snapshot offline hides even if G1 empty-map path would show", () => {
     const now = Date.now();
     sessionStore.set(
@@ -238,5 +258,21 @@ describe("fix approach invariants (mechanism verification)", () => {
   it("Approach 5 (global gate): degraded health suppresses gather path", () => {
     setResolverHealthStatusForSinceVisit("degraded");
     expect(shouldSuppressCardDisabledSinceVisitAlerts()).toBe(true);
+  });
+
+  it("Approach 5 (shipped): hide-only re-apply does not show from stale maps", () => {
+    const maps = {
+      alertStateMap: { [PROFILE]: CARD_REVOKED_ALERT_STATE },
+      scanKindMap: { [PROFILE]: "card_revoked" },
+      resolverConfirmedMap: { [PROFILE]: true },
+    };
+    const show = cardDisabledSinceVisitVisible(
+      maps.alertStateMap[PROFILE],
+      "active",
+      maps.scanKindMap[PROFILE],
+      true
+    );
+    expect(show).toBe(true);
+    expect(hubBannerVisibleAfterApply(show, false)).toBe(false);
   });
 });

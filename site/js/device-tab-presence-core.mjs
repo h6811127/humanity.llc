@@ -1,10 +1,14 @@
 /** @typedef {{ profile_id?: string, qr_id?: string | null, handle?: string | null, label?: string | null, updatedAt?: number }} PresenceEntry */
 
 export const PRESENCE_STALE_MS = 10000;
-/** Visible-tab heartbeat interval (Phase 5: 5s to cut cross-tab storage churn). */
-export const PRESENCE_HEARTBEAT_MS = 5000;
+/** Visible-tab heartbeat interval (10s - cuts cross-tab chrome churn vs 5s). */
+export const PRESENCE_HEARTBEAT_MS = 10_000;
+
+/** Coalesce burst `hc-tab-presence-changed` events (multi-tab storage fan-out). */
+export const PRESENCE_CHANGE_COALESCE_MS = 400;
 /** UI only - must have heartbeated recently (avoids ghost rows before prune). */
-export const PRESENCE_SHOW_MS = PRESENCE_HEARTBEAT_MS + 2000;
+/** UI stale threshold - must exceed heartbeat so rows stay visible between ticks. */
+export const PRESENCE_SHOW_MS = PRESENCE_HEARTBEAT_MS + 3000;
 
 /**
  * Public metadata only - used to skip redundant localStorage writes.
@@ -147,6 +151,24 @@ export function removePresenceRowsForProfile(map, profileId) {
  *   showMs?: number,
  * }} input
  */
+/**
+ * Skip visible-tab presence heartbeats when this tab has keys but no other live tabs.
+ * Still sync when clearing keys (session empty) so stale rows are removed.
+ *
+ * @param {Record<string, PresenceEntry>} map
+ * @param {string} tabId
+ * @param {boolean} sessionHasSigningKeys
+ * @param {number} [now]
+ */
+export function shouldSkipPresenceHeartbeat(map, tabId, sessionHasSigningKeys, now = Date.now()) {
+  if (!sessionHasSigningKeys) return false;
+  const normalized = normalizePresenceMap(map, now);
+  for (const id of Object.keys(normalized)) {
+    if (id !== tabId) return false;
+  }
+  return true;
+}
+
 export function listOtherTabsWithKeys(input) {
   const now = input.now ?? Date.now();
   const staleMs = input.staleMs ?? PRESENCE_STALE_MS;

@@ -45,12 +45,15 @@ flowchart TB
     SHEET["Inbox sheet rows"]
     BANNER["#device-cross-tab-banner legacy"]
     SCAN["#scan-cross-tab-banner"]
-    WALLET_HINT["#wallet-tab-hint"]
+    SCAN_DOT["#scan-page-dot overlay"]
+    WALLET_HINT["#wallet-tab-hint hc-emphasis-card"]
   end
 
   truth --> RAW --> GATE --> STAB --> SNAP
   SNAP --> chrome
 ```
+
+On scan pages, `#scan-page-dot` should show the `cross_tab_keys` overlay when the banner is shown (planned — [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md)); banner remains the primary sentence + actions.
 
 | Layer | Question | Must not |
 |-------|----------|----------|

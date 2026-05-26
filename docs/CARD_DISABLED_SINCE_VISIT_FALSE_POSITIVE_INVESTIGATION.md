@@ -120,7 +120,7 @@ flowchart TB
 | Item | Detail |
 |------|--------|
 | **Code** | `device-hub-ui.mjs` **1197–1198** |
-| **Effect** | Live-proof tick (5s when pending, 30s idle · `device-live-control-poll-scheduler.mjs` **6–7**, **15–16**) can resurrect banners from **G1** + **G2** without re-validating `GET …/status?q=` |
+| **Effect** | Live-proof tick (5s when pending, 60s idle · `device-live-control-poll-scheduler.mjs`) can resurrect banners from **G1** + **G2** without re-validating `GET …/status?q=` |
 
 #### G4 - Since-visit gate is global health only, not per-card status
 
@@ -202,13 +202,15 @@ Run: `npm run worker:test:card-disabled-since-visit` · `npm run e2e:card-disabl
 
 ---
 
-### Recommended fix directions (future PR - not implemented here)
+### Recommended fix directions (status)
 
-1. **G1:** Pass last known `statusMap` into `reapplyRevokedSinceVisitFromLatestResolved` (module-level snapshot updated in `applyNetworkChipsToDom` / `NETWORK_REFRESHED`), or treat `getCachedNetworkStatus` as unreachable when `!isResolverConfirmedProfile(pid)` after failed fetch.
-2. **G2:** On cache-only poll, either skip `buildResolverConfirmedWalletPollMaps` entries older than cache `at`, or clear `latestResolved` when cache `scanKind` / `status` disagrees with confirmed maps.
-3. **G3:** Remove `reapplyRevokedSinceVisitFromLatestResolved` from `hc-live-control-inbox-changed`, or only call `syncHubInboxAlertGroups` there.
-4. **G4:** Extend gate: suppress when **any** saved row last poll was `offline`/`error`, or when wallet poll health is degraded (new module-level flag set in `refreshWalletNetworkStatuses`).
-5. **G6:** Update stale docs; optional scoped wallet poll on tab visible when wallet non-empty (without restoring global coordinator).
+1. **G1 / A1:** **Shipped** - `lastWalletNetworkStatusMap` on re-apply.
+2. **G2:** **Shipped** - cache-only poll clears confirmed state when cache `scanKind` disagrees with `latestResolved*`.
+3. **G3 / A2:** **Shipped** - no `reapplyRevokedSinceVisitFromLatestResolved` on `hc-live-control-inbox-changed`.
+4. **A5:** **Shipped** - re-apply uses `allowShow: false`; show only from wallet poll / `NETWORK_REFRESHED` with maps.
+5. **G4:** Optional - extend gate when any saved row last poll was `offline`/`error` (partially covered by A4 per-profile gate).
+6. **G6:** Optional - scoped wallet poll on tab visible when wallet non-empty (without restoring global coordinator).
+7. **A3:** **Shipped** - `device-wallet-network-truth.mjs`; see `worker/tests/device-wallet-network-truth.test.ts`.
 
 ---
 
@@ -376,14 +378,14 @@ Each approach targets a different layer. **“Verified”** means an automated t
 |----|----------|------|------|------|----------------|
 | **A1** | **Status snapshot on re-apply** | Keep `lastWalletStatusMap` from last `applyNetworkChipsToDom` / `NETWORK_REFRESHED`; pass it into `reapplyRevokedSinceVisitFromLatestResolved` instead of `{}` | Small diff; fixes G1 split-brain directly | Does not stop stale `latestResolved` existing (G2) | **VERIFIED** - `card-disabled-since-visit-approaches.test.ts` “Approach 1: last statusMap snapshot with offline hides” |
 | **A2** | **Stop re-apply on live-control ticks** | On `hc-live-control-inbox-changed`, only `syncHubInboxAlertGroups()` / badge - **do not** call `reapplyRevokedSinceVisitFromLatestResolved` | Removes G3 amplifier; fewer DOM writes | Inbox row list may lag until next wallet poll; glance suffix may lag | **PLANNED** - remove **1197–1198** re-apply; run `npm run e2e:card-disabled-since-visit` |
-| **A3** | **Single source of truth (SSOT)** | One module owns per-PID `{ scanKind, alertState, chipStatus, fetchedAt, source }`; drop parallel `latestResolved*` + ad hoc cache reads for banners | Fixes G1+G2 structurally; easier to reason | Larger refactor; touch hub, inbox, glance | **PARTIAL** - offline poll clears SSOT equivalent today (`buildResolverConfirmedWalletPollMaps` null); full SSOT not built |
+| **A3** | **Single source of truth (SSOT)** | One module owns per-PID `{ scanKind, alertState, chipStatus, fetchedAt, source }`; drop parallel `latestResolved*` + ad hoc cache reads for banners | Fixes G1+G2 structurally; easier to reason | Larger refactor; touch hub, inbox, glance | **SHIPPED** - `device-wallet-network-truth.mjs`; poll writes truth; hub applies chip+banner only in `fetchAndApplyNetworkChips` onDone; `checking` blocks banner |
 | **A4** | **Per-row trust gate** | Extend suppress: no since-visit UI if `!isResolverConfirmedProfile(pid)` **or** `getCachedNetworkStatus(pid)` is `offline`/`error` **or** global gate | Closes G1 cache fallback hole; works with degraded health | Stricter: may hide legitimate alert until next successful poll | **VERIFIED** - approaches test “Approach 4: per-row trust gate hides when cache is offline” |
-| **A5** | **Apply banners only from `NETWORK_REFRESHED`** | `reapplyRevokedSinceVisitFromLatestResolved` only **hides**; never **shows** without `detail.statusMap` from a wallet poll | Eliminates map-only show paths | Baseline-changed / health-changed would not re-show after hide without poll | **PLANNED** - refactor `applyRevokedSinceVisitAlerts` call sites; Vitest + E2E |
+| **A5** | **Apply banners only from `NETWORK_REFRESHED`** | `reapplyRevokedSinceVisitFromLatestResolved` only **hides**; never **shows** without `detail.statusMap` from a wallet poll | Eliminates map-only show paths | Baseline-changed / health-changed would not re-show after hide without poll | **VERIFIED** - `applyRevokedSinceVisitAlerts(..., { allowShow: false })` on re-apply; approaches test + E2E live-control tick |
 | **A6** | **Product: “unverified network” state** | Replace banner with muted “Could not verify card status” when health ok but row poll failed | Honest UX under 429 | Not the current product spec; copy change | **N/A** - design review only |
 
 **Recommended combination for a fix PR:** **A1 + A2 + A4** (minimal, complementary). Consider **A3** if incidents continue after A1+A2+A4.
 
-**Shipped (2026-05-26):** A1 + A2 + A4 implemented in `device-hub-ui.mjs`, `device-wallet-since-visit-gate.mjs`, `device-inbox-card-disabled.mjs`, `device-hub-glance.mjs`. Tests: `card-disabled-since-visit-approaches.test.ts`, `device-wallet-since-visit-gate.test.ts`.
+**Shipped (2026-05-26):** A1 + A2 + A4 in `device-hub-ui.mjs`, `device-wallet-network.mjs`, `device-inbox-card-disabled.mjs`, `device-hub-glance.mjs`. **Shipped (follow-up):** A5 hide-only re-apply; G2 cache-only clears poll authority via SSOT. **Shipped (A3, 2026-05-26):** `device-wallet-network-truth.mjs` replaces parallel `latestResolved*` for since-visit; hub `NETWORK_REFRESHED` no longer applies banners before chips update. Tests: `device-wallet-network-truth.test.ts`, `card-disabled-since-visit-approaches.test.ts`, `device-wallet-network-confirmed.test.ts`; run `npm run e2e:card-disabled-since-visit` before release.
 
 ### How to verify approaches in CI (runbook)
 

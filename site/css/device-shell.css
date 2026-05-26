@@ -984,6 +984,13 @@ button.device-hub-notice-banner {
   border: 1px solid var(--shell-border-subtle, rgba(255, 255, 255, 0.08));
 }
 
+.device-hub-network-tools-hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--text-muted, rgba(255, 255, 255, 0.65));
+}
+
 .device-hub-network-tools-status {
   margin: 0 0 8px;
   font-size: 12px;
@@ -1328,8 +1335,7 @@ button.device-hub-notice-banner {
   opacity: 0.55;
 }
 
-.device-system-banner.hc-notice,
-.device-cross-tab-banner.hc-notice {
+.device-system-banner.hc-notice {
   margin-left: 0;
   margin-right: 0;
   box-shadow: none;

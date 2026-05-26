@@ -1,5 +1,5 @@
 /**
- * Stabilize cross-tab / orphan inbox surfaces — fast hide, delayed show.
+ * Stabilize cross-tab / orphan inbox surfaces - fast hide, delayed show.
  * @see docs/CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md path G
  */
 

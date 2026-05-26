@@ -75,7 +75,7 @@ Optional but high-leverage for v1.1 or a strong private alpha:
 |---|---|
 | `GET /c/{profile_id}?q={qr_id}` | Phone-camera QR fallback. Must render public card or status page. |
 
-### Reference network — Flow 2 routes (shipped vs deferred)
+### Reference network - Flow 2 routes (shipped vs deferred)
 
 **Repair spec:** [`docs/FLOW_2_QR_SCAN_REPAIR_SPEC.md`](FLOW_2_QR_SCAN_REPAIR_SPEC.md). **Scan HTML contract:** [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md).
 

@@ -4,9 +4,12 @@
  */
 import { DEVICE_OS_DEBOUNCE_MS } from "./device-os-coordinator-core.mjs";
 import {
+  PRESENCE_CHROME_DEBOUNCE_MS,
+  presenceChromeFingerprint,
   presenceChromeRefreshScheduleAction,
   shouldChromeRefreshStorageImmediately,
   shouldRunChromeRefreshImmediate,
+  shouldSkipPresenceChromeRefresh,
 } from "./device-chrome-refresh-core.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
 import {
@@ -21,7 +24,7 @@ import {
   beginDeviceChromeRefreshTick,
   endDeviceChromeRefreshTick,
   resetPresenceInboxGatherCache,
-} from "./device-inbox.mjs?v=38";
+} from "./device-inbox.mjs?v=40";
 import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { refreshWalletContextFromChrome } from "./wallet-page-chrome.mjs";
 
@@ -29,7 +32,21 @@ import { refreshWalletContextFromChrome } from "./wallet-page-chrome.mjs";
 let refreshStatusSurfaces = null;
 
 let presenceDebounceTimer = null;
+/** @type {ReturnType<typeof setTimeout> | null} */
+let presenceChromeCoalesceTimer = null;
+let lastPresenceChromeFingerprint = "";
 let listenersBound = false;
+
+function readPresenceChromeFingerprint() {
+  const tabNotice = tabNoticeCount();
+  const generic = getOtherTabsWithKeys().length;
+  const orphan = getOrphanRemovedTabsWithKeys().length;
+  return presenceChromeFingerprint({
+    tabNotice,
+    genericCount: generic,
+    orphanCount: orphan,
+  });
+}
 
 /**
  * Register status dot / badge / hub panel refresh (device-status.mjs).
@@ -103,12 +120,45 @@ function runChromeRefresh() {
     }
     refreshWalletContextFromChrome();
   } finally {
+    lastPresenceChromeFingerprint = readPresenceChromeFingerprint();
     endDeviceChromeRefreshTick();
   }
 }
 
+function schedulePresenceChromeRefresh() {
+  const nextFp = readPresenceChromeFingerprint();
+  if (shouldSkipPresenceChromeRefresh(lastPresenceChromeFingerprint, nextFp)) {
+    return;
+  }
+
+  if (presenceChromeCoalesceTimer != null) {
+    clearTimeout(presenceChromeCoalesceTimer);
+  }
+
+  presenceChromeCoalesceTimer = window.setTimeout(() => {
+    presenceChromeCoalesceTimer = null;
+    const fpNow = readPresenceChromeFingerprint();
+    if (shouldSkipPresenceChromeRefresh(lastPresenceChromeFingerprint, fpNow)) {
+      return;
+    }
+    if (presenceDebounceTimer != null) {
+      clearTimeout(presenceDebounceTimer);
+      presenceDebounceTimer = null;
+    }
+    runChromeRefresh();
+  }, PRESENCE_CHROME_DEBOUNCE_MS);
+}
+
 function onPresenceChanged() {
-  refreshDeviceChrome();
+  if (!crossTabPresenceActiveRaw()) {
+    if (presenceChromeCoalesceTimer != null) {
+      clearTimeout(presenceChromeCoalesceTimer);
+      presenceChromeCoalesceTimer = null;
+    }
+    refreshDeviceChrome();
+    return;
+  }
+  schedulePresenceChromeRefresh();
 }
 
 function onImmediateChromeEvent() {

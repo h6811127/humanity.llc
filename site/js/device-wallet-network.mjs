@@ -20,17 +20,28 @@ import {
   verificationRecordFromLabelState,
   WALLET_NETWORK_CACHE_TTL_MS,
 } from "./device-wallet-network-core.mjs";
+import {
+  buildSinceVisitPollMapsFromTruth,
+  clearWalletNetworkTruthForProfile,
+  getWalletNetworkTruthPollAlertState,
+  getWalletNetworkTruthPollScanKind,
+  hasWalletNetworkTruthPoll,
+  isWalletNetworkTruthPollConfirmed,
+  resetWalletNetworkTruth,
+  setWalletNetworkTruthFromCacheOnly,
+  setWalletNetworkTruthFromPoll,
+  shouldSuppressCardDisabledSinceVisitFromTruth,
+} from "./device-wallet-network-truth.mjs";
 
 export { readCachedVerification };
+export {
+  getWalletNetworkTruthChipStatus,
+  isSinceVisitBlockedChipStatus,
+  shouldSuppressCardDisabledSinceVisitFromTruth,
+} from "./device-wallet-network-truth.mjs";
 
 const CACHE_KEY = "hc_wallet_network_cache";
 const LAST_SEEN_KEY = "hc_wallet_last_seen_network";
-let latestResolvedAlertStateMap = {};
-/** @type {Record<string, string | null>} */
-let latestResolvedScanKindMap = {};
-let latestResolvedAt = 0;
-/** Profile IDs with at least one resolver-confirmed fetch this page visit. */
-const resolverConfirmedProfileIdsThisVisit = new Set();
 
 // bfcache / fast navigation can keep JS context alive. If we restore from bfcache,
 // clear resolver-confirmed in-memory state so we don't re-light banners based on
@@ -43,35 +54,40 @@ if (
     /** @type {{ persisted?: boolean } | undefined} */
     const detail = e;
     if (!detail?.persisted) return;
-    latestResolvedAlertStateMap = {};
-    latestResolvedScanKindMap = {};
-    latestResolvedAt = 0;
-    resolverConfirmedProfileIdsThisVisit.clear();
+    resetWalletNetworkTruth();
   });
 }
 
-/** @param {string} profileId */
-function clearResolverConfirmedForProfile(profileId) {
-  if (!profileId) return;
-  delete latestResolvedAlertStateMap[profileId];
-  delete latestResolvedScanKindMap[profileId];
-  resolverConfirmedProfileIdsThisVisit.delete(profileId);
-  if (resolverConfirmedProfileIdsThisVisit.size === 0) {
-    latestResolvedAt = 0;
-  }
-}
-
 /**
- * @param {string} profileId
- * @param {string} alertState
- * @param {string | null | undefined} scanKind
+ * @param {Array<{ profile_id?: string }>} entries
+ * @param {Record<string, string>} statusMap
+ * @param {Record<string, string | null>} scanKindMap
+ * @param {Set<string>} networkFetchedProfileIds
+ * @param {Record<string, string>} resolverConfirmedAlertStateMap
  */
-function setResolverConfirmedForProfile(profileId, alertState, scanKind) {
-  if (!profileId || !alertState) return;
-  latestResolvedAlertStateMap[profileId] = alertState;
-  latestResolvedScanKindMap[profileId] = scanKind ?? null;
-  resolverConfirmedProfileIdsThisVisit.add(profileId);
-  latestResolvedAt = Date.now();
+function syncWalletNetworkTruthFromPoll(
+  entries,
+  statusMap,
+  scanKindMap,
+  networkFetchedProfileIds,
+  resolverConfirmedAlertStateMap
+) {
+  for (const entry of entries) {
+    const pid = entry.profile_id;
+    if (!pid) continue;
+    const chipStatus = statusMap[pid] ?? "checking";
+    const scanKind = scanKindMap[pid] ?? null;
+    if (networkFetchedProfileIds.has(pid)) {
+      const alertState = resolverConfirmedAlertStateMap[pid];
+      if (alertState != null) {
+        setWalletNetworkTruthFromPoll(pid, { chipStatus, scanKind, alertState });
+      } else {
+        clearWalletNetworkTruthForProfile(pid);
+      }
+    } else {
+      setWalletNetworkTruthFromCacheOnly(pid, { chipStatus, scanKind });
+    }
+  }
 }
 
 /** @type {string} Fired when hc_wallet_last_seen_network changes (snapshot, Got it, Manage). */
@@ -134,71 +150,39 @@ export function getCachedNetworkAlertState(profileId) {
 
 /** True after at least one resolver-confirmed status read this page visit. */
 export function hasLatestResolverNetworkPoll() {
-  return latestResolvedAt > 0;
+  return hasWalletNetworkTruthPoll();
 }
 
 /** True when this profile had a resolver-confirmed status read this visit (not cache-only). */
 export function isResolverConfirmedProfile(profileId) {
-  if (!profileId || !latestResolvedAt) return false;
-  return resolverConfirmedProfileIdsThisVisit.has(profileId);
+  return isWalletNetworkTruthPollConfirmed(profileId);
 }
 
 /**
- * Per-profile since-visit suppress (A4): no confirmed read this visit, or cache chip unreachable.
+ * Per-profile since-visit suppress (A3/A4): SSOT chip must be poll-confirmed and reachable.
  * Global health gate is separate (`device-wallet-since-visit-gate.mjs`).
  * @param {string} profileId
  */
 export function shouldSuppressCardDisabledSinceVisitForProfile(profileId) {
-  if (!profileId || !isResolverConfirmedProfile(profileId)) return true;
-  const chip = String(getCachedNetworkStatus(profileId) || "").toLowerCase();
-  return chip === "offline" || chip === "error";
+  return shouldSuppressCardDisabledSinceVisitFromTruth(profileId);
 }
 
-/** Fresh resolver-backed alert state map from the latest wallet poll. */
+/** Fresh resolver-backed alert state from the latest wallet poll (SSOT). */
 export function getLatestResolvedAlertState(profileId) {
-  if (!profileId) return null;
-  if (!latestResolvedAt) return null;
-  return latestResolvedAlertStateMap[profileId] ?? null;
+  return getWalletNetworkTruthPollAlertState(profileId);
 }
 
 /** @param {string} profileId */
 export function getLatestResolvedScanKind(profileId) {
-  if (!profileId) return null;
-  if (!latestResolvedAt) return null;
-  if (!Object.prototype.hasOwnProperty.call(latestResolvedScanKindMap, profileId)) {
-    return null;
-  }
-  return latestResolvedScanKindMap[profileId] ?? null;
+  return getWalletNetworkTruthPollScanKind(profileId);
 }
 
 /**
- * Maps for since-visit UI from resolver-confirmed reads this visit only.
+ * Maps for since-visit UI from resolver-confirmed reads this visit only (SSOT).
  * @param {Array<{ profile_id?: string }>} [entries] defaults to {@link loadWallet}
- * @returns {{
- *   alertStateMap: Record<string, string>,
- *   scanKindMap: Record<string, string | null>,
- *   resolverConfirmedMap: Record<string, boolean>,
- * } | null}
  */
 export function buildResolverConfirmedWalletPollMaps(entries) {
-  if (!hasLatestResolverNetworkPoll()) return null;
-  const wallet = entries ?? loadWallet();
-  /** @type {Record<string, string>} */
-  const alertStateMap = {};
-  /** @type {Record<string, string | null>} */
-  const scanKindMap = {};
-  /** @type {Record<string, boolean>} */
-  const resolverConfirmedMap = {};
-  for (const entry of wallet) {
-    const pid = entry.profile_id;
-    if (!pid || !isResolverConfirmedProfile(pid)) continue;
-    const resolved = getLatestResolvedAlertState(pid);
-    if (resolved == null) continue;
-    alertStateMap[pid] = resolved;
-    scanKindMap[pid] = getLatestResolvedScanKind(pid);
-    resolverConfirmedMap[pid] = true;
-  }
-  return { alertStateMap, scanKindMap, resolverConfirmedMap };
+  return buildSinceVisitPollMapsFromTruth(entries ?? loadWallet());
 }
 
 /** @param {string} profileId */
@@ -244,6 +228,29 @@ function parseNetworkFetchBody(body) {
 }
 
 /**
+ * Wallet rows that would trigger a resolver GET on the next full refresh.
+ *
+ * @param {Array<{ profile_id: string, qr_id?: string | null }>} entries
+ * @param {number} [now]
+ */
+export function listWalletEntriesNeedingNetworkFetch(entries, now = Date.now()) {
+  const cache = loadCache();
+  const lastSeen = loadLastSeen();
+  return entries.filter((entry) => {
+    const pid = entry.profile_id;
+    if (!pid) return false;
+    const cached = cache[pid];
+    return !shouldUseCachedNetworkStatus(
+      lastSeen,
+      pid,
+      cached,
+      now,
+      WALLET_NETWORK_CACHE_TTL_MS
+    );
+  });
+}
+
+/**
  * @param {Array<{ profile_id: string, qr_id?: string | null }>} entries
  * @param {(result: {
  *   statusMap: Record<string, string>,
@@ -251,7 +258,7 @@ function parseNetworkFetchBody(body) {
  *   scanKindMap: Record<string, string | null>,
  *   resolverConfirmedMap: Record<string, boolean>,
  * }) => void} [onDone]
- * @param {{ generation?: number, isCurrentGeneration?: () => boolean }} [options]
+ * @param {{ generation?: number, isCurrentGeneration?: () => boolean, maxParallel?: number }} [options]
  */
 export async function refreshWalletNetworkStatuses(entries, onDone, options = {}) {
   const { generation, isCurrentGeneration } = options;
@@ -266,6 +273,10 @@ export async function refreshWalletNetworkStatuses(entries, onDone, options = {}
   const networkFetchedProfileIds = new Set();
   const now = Date.now();
   const lastSeen = loadLastSeen();
+  const maxParallel =
+    typeof options.maxParallel === "number" && options.maxParallel > 0
+      ? options.maxParallel
+      : Number.POSITIVE_INFINITY;
 
   for (const entry of entries) {
     const pid = entry.profile_id;
@@ -325,7 +336,17 @@ export async function refreshWalletNetworkStatuses(entries, onDone, options = {}
     );
   }
 
-  await Promise.all(fetches);
+  if (fetches.length > 0 && Number.isFinite(maxParallel)) {
+    for (let i = 0; i < fetches.length; i += maxParallel) {
+      await Promise.all(fetches.slice(i, i + maxParallel));
+      if (generation != null && isCurrentGeneration && !isCurrentGeneration()) {
+        onDone?.();
+        return;
+      }
+    }
+  } else if (fetches.length > 0) {
+    await Promise.all(fetches);
+  }
 
   if (generation != null && isCurrentGeneration && !isCurrentGeneration()) {
     onDone?.();
@@ -333,14 +354,13 @@ export async function refreshWalletNetworkStatuses(entries, onDone, options = {}
   }
 
   saveCache(cache);
-  for (const pid of networkFetchedProfileIds) {
-    const alertState = resolverConfirmedAlertStateMap[pid];
-    if (alertState != null) {
-      setResolverConfirmedForProfile(pid, alertState, resolverConfirmedScanKindMap[pid]);
-    } else {
-      clearResolverConfirmedForProfile(pid);
-    }
-  }
+  syncWalletNetworkTruthFromPoll(
+    entries,
+    statusMap,
+    scanKindMap,
+    networkFetchedProfileIds,
+    resolverConfirmedAlertStateMap
+  );
   const resolverConfirmedMap = Object.fromEntries(
     Object.keys(resolverConfirmedAlertStateMap).map((pid) => [pid, true])
   );
@@ -401,11 +421,11 @@ export function recordNetworkSeen(profileId, alertState) {
 /** Snapshot current cached alert states when leaving the site (end of visit). */
 export function snapshotNetworkSeenOnExit() {
   // DH-4: Only persist baselines from resolver-confirmed reads in this visit.
-  if (!latestResolvedAt) return;
+  if (!hasWalletNetworkTruthPoll()) return;
   const seen = loadLastSeen();
   for (const entry of loadWallet()) {
     const pid = entry.profile_id;
-    const alertState = latestResolvedAlertStateMap[pid] ?? null;
+    const alertState = getWalletNetworkTruthPollAlertState(pid);
     if (!alertState) continue;
     seen[pid] = String(alertState).toLowerCase();
   }
@@ -414,10 +434,7 @@ export function snapshotNetworkSeenOnExit() {
 
   // Prevent stale in-memory resolver-confirmed state from being re-applied when the
   // browser keeps the JS context (bfcache / fast navigation).
-  latestResolvedAlertStateMap = {};
-  latestResolvedScanKindMap = {};
-  latestResolvedAt = 0;
-  resolverConfirmedProfileIdsThisVisit.clear();
+  resetWalletNetworkTruth();
 }
 
 /**

@@ -44,7 +44,7 @@ Saved card rows on `/wallet/` and the device hub may show **checked … ago**. T
 | Data class | Retention |
 |------------|-----------|
 | Public card + credential state (active, maintained) | Until owner revoke/disable, user-initiated delete (future), or operator suspension |
-| **Orphan registrations** (active, never updated, no vouches, no live QR, older than 90 days) | **Automatic purge** daily via Worker cron — see [`CARD_RETENTION_AND_ORPHAN_CLEANUP.md`](CARD_RETENTION_AND_ORPHAN_CLEANUP.md) |
+| **Orphan registrations** (active, never updated, no vouches, no live QR, older than 90 days) | **Automatic purge** daily via Worker cron - see [`CARD_RETENTION_AND_ORPHAN_CLEANUP.md`](CARD_RETENTION_AND_ORPHAN_CLEANUP.md) |
 | Revocation / suspension records | Retained while status matters for trust; public notice fields follow governance |
 | Live-control challenges | Minutes (TTL); not kept as long-term history |
 | Access logs (if ever enabled) | Short, published maximum; governance-approved only |

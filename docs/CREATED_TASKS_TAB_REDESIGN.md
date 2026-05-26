@@ -1,8 +1,8 @@
 # Card controls - Tasks tab redesign (brainstorm)
 
-**Status:** In progress - **T1** through **T4** shipped. **T5** next (E2E smoke).  
+**Status:** **Complete** (T0-T5 shipped May 2026).  
 **Audience:** Product, design, frontend  
-**Scope:** `/created/` **control mode**, **Live** tab (rename from Tasks) - redesign. **Manage** tab (rename from Advanced) - layout/copy only, same disclosure pattern; remove duplicate public-line editor when Live ships inline publish.  
+**Scope:** `/created/` **control mode**, **Live** tab (renamed from Tasks) and **Manage** tab (renamed from Advanced). Canonical UX: [`CREATED_TASK_DASHBOARD.md`](CREATED_TASK_DASHBOARD.md).  
 **Related:** [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`CREATED_TASK_DASHBOARD.md`](CREATED_TASK_DASHBOARD.md) · [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) · [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) · setup wizard in [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md)
 
 ---
@@ -317,7 +317,7 @@ flowchart LR
 | Status | Topic |
 |--------|--------|
 | **Locked** | **Live · Manage**; no revoke on Live; phone-only v1; all scanner-facing fields on Live |
-| **Open** | Hero QR size - 160px vs larger pass-card preview |
+| **Locked** | Hero QR on Live card: **160px** (phone-first v1; full-size in disclosure) |
 | **Locked** | Lost-item relay on Live: **textarea** for return message (same as create/Manage today; finders need room) |
 
 ---
@@ -334,14 +334,9 @@ flowchart LR
 
 ---
 
-## Manual QA (when implemented)
+## Manual QA
 
-1. Complete setup wizard → Tasks shows **no** step-1 Save theater; custody shows saved.
-2. Live proof pending → primary is **Prove control now**; Advanced unchanged.
-3. Deploy disclosures match Advanced visual language (icon, chevron, expand).
-4. iPhone Safari: hero fits viewport without horizontal scroll; QR tap targets ≥ 44px.
-5. Dark mode: hero card and disclosures readable (`--shell-fill`, popover tokens).
-6. Hub **Open controls** deep link still lands control mode with correct card.
+See [`CREATED_TASK_DASHBOARD.md`](CREATED_TASK_DASHBOARD.md) and `e2e/created-control.spec.ts`. Automated: `npm run e2e:created-control`.
 
 ---
 
@@ -373,11 +368,8 @@ flowchart LR
 
 ---
 
-## Next steps
+## Next steps (post-ship)
 
-1. Review this draft with operator feedback (M5 runbook steward interviews).
-2. Pick **open questions** (especially inline edit vs Advanced-only).
-3. Optional: Figma or screenshot mock on top of `settings-disclosure` CSS already in `site/styles.css`.
-4. Implement **T1-T3** in a focused PR; keep Advanced tab diff empty.
-
-When implementation starts, update [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) control mode section and supersede [`CREATED_TASK_DASHBOARD.md`](CREATED_TASK_DASHBOARD.md) hierarchy with a link here.
+1. Operator feedback from M5 runbook interviews (qualitative success metrics).
+2. Optional: larger hero QR on Live card if operators want pass-card scale without opening full-size disclosure.
+3. Optional: remove `hc_created_task_done` session tint entirely (spec deferred gamification).

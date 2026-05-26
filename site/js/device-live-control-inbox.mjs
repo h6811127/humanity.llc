@@ -1,10 +1,25 @@
 /**
  * Poll resolver for pending live-control challenges on saved wallet cards.
  * Signing stays on /created/  -  inbox only surfaces waiting requests.
- * @see docs/DEVICE_OS_REQUEST_BUDGET.md (Phases 1–4 - scoped polling; Phase 5 - watch toggle)
+ * @see docs/DEVICE_OS_REQUEST_BUDGET.md (Phases 1–5 shipped; 7–8 budget, leader, large wallet)
  */
 import { isWatchLiveProofEnabled } from "./device-hub-network-tools-core.mjs";
+import { getTabSession } from "./device-keys.mjs";
+import {
+  isLiveControlAutoPollBudgetExhausted,
+  LIVE_CONTROL_AUTO_POLL_STORAGE_KEY,
+  recordLiveControlAutoPoll,
+} from "./device-live-control-poll-budget-core.mjs";
+import {
+  bindLiveControlPollLeaderSnapshot,
+  broadcastLiveControlPollSnapshot,
+  claimLiveControlPollLeader,
+  getLiveControlPollTabId,
+  isLiveControlPollLeaderTab,
+  touchLiveControlPollLeader,
+} from "./device-live-control-poll-leader.mjs";
 import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs";
+import { selectLiveControlPollEntries } from "./device-wallet-scale-core.mjs";
 import { getPendingLiveControlChallengeUrl } from "./hc-sign.mjs";
 import { activateWalletEntry } from "./device-keys.mjs";
 import {
@@ -71,6 +86,14 @@ let pollSyncInFlight = false;
 let lastLiveProofCheckAt = 0;
 
 export const LIVE_PROOF_CHECKED_EVENT = "hc-live-proof-checked";
+export const LIVE_CONTROL_BUDGET_CHANGED = "hc-live-control-poll-budget-changed";
+
+/** @typedef {{
+ *   pending: import("./device-live-control-inbox-core.mjs").LiveControlPendingItem[],
+ *   health: import("./device-live-control-inbox-core.mjs").LiveControlPollHealth,
+ *   at: number,
+ *   tabId?: string,
+ * }} LiveControlLeaderSnapshot */
 
 export { formatLiveControlExpiry };
 
@@ -107,11 +130,100 @@ function readPollScope() {
   });
 }
 
+function readAutoPollBudgetRaw() {
+  try {
+    return localStorage.getItem(LIVE_CONTROL_AUTO_POLL_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function isLiveControlAutoPollBudgetPaused() {
+  return isLiveControlAutoPollBudgetExhausted(readAutoPollBudgetRaw());
+}
+
+function ensurePollLeaderClaim() {
+  if (isLiveControlPollLeaderTab()) return true;
+  claimLiveControlPollLeader();
+  return isLiveControlPollLeaderTab();
+}
+
 function readPollLoopShouldRun() {
   return liveControlAutoPollShouldRun({
     watchEnabled: isWatchLiveProofEnabled(),
     scopeActive: readPollScope(),
     resolverHealth: getResolverHealthStatus(),
+    budgetExhausted: isLiveControlAutoPollBudgetPaused(),
+    isPollLeader: isLiveControlPollLeaderTab(),
+  });
+}
+
+function collectPendingProfileIds() {
+  /** @type {Set<string>} */
+  const ids = new Set();
+  for (const item of pending) {
+    const pid = item?.entry?.profile_id;
+    if (typeof pid === "string" && pid) ids.add(pid);
+  }
+  for (const [key, slot] of pollSlots) {
+    if (!slot) continue;
+    const pid = key.split(":")[0];
+    if (pid) ids.add(pid);
+  }
+  return ids;
+}
+
+function resolvePollEntries(allPollable) {
+  const session = getTabSession();
+  const activeProfileId =
+    session && typeof session.profile_id === "string" ? session.profile_id : null;
+  return selectLiveControlPollEntries(allPollable, {
+    walletSize: allPollable.length,
+    activeProfileId,
+    pendingProfileIds: collectPendingProfileIds(),
+  });
+}
+
+function recordAutoPollBudgetUse() {
+  try {
+    const next = recordLiveControlAutoPoll(readAutoPollBudgetRaw());
+    localStorage.setItem(LIVE_CONTROL_AUTO_POLL_STORAGE_KEY, next);
+    window.dispatchEvent(new Event(LIVE_CONTROL_BUDGET_CHANGED));
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * Apply inbox state from the leader tab (no Worker fetch on this tab).
+ * @param {LiveControlLeaderSnapshot} snapshot
+ */
+export function applyLiveControlInboxSnapshot(snapshot) {
+  const next = Array.isArray(snapshot.pending) ? [...snapshot.pending] : [];
+  const prevHealth = getLiveControlPollHealth();
+  setLiveControlPollHealth(
+    snapshot.health === "degraded" || snapshot.health === "offline"
+      ? snapshot.health
+      : "ok"
+  );
+  const changed =
+    liveControlInboxChanged(pending, next) || prevHealth !== getLiveControlPollHealth();
+  pending = next;
+  lastLiveProofCheckAt = snapshot.at || Date.now();
+  if (changed) {
+    window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
+  }
+  window.dispatchEvent(new Event(LIVE_PROOF_CHECKED_EVENT));
+}
+
+function publishLeaderSnapshot() {
+  if (!isLiveControlPollLeaderTab()) return;
+  touchLiveControlPollLeader();
+  broadcastLiveControlPollSnapshot({
+    pending: getLiveControlPending(),
+    health: getLiveControlPollHealth(),
+    at: lastLiveProofCheckAt,
+    tabId: getLiveControlPollTabId(),
   });
 }
 
@@ -201,8 +313,19 @@ export async function refreshLiveControlInbox(opts = {}) {
     return pending;
   }
   if (Date.now() < pollBackoffUntil) return pending;
-  const entries = loadWallet().filter((e) => isPollableWalletEntry(e));
-  pruneLiveControlPollSlots(pollSlots, entries);
+
+  if (!manual) {
+    if (!ensurePollLeaderClaim() || !isLiveControlPollLeaderTab()) {
+      return pending;
+    }
+    if (isLiveControlAutoPollBudgetPaused()) {
+      return pending;
+    }
+  }
+
+  const allPollable = loadWallet().filter((e) => isPollableWalletEntry(e));
+  const entries = resolvePollEntries(allPollable);
+  pruneLiveControlPollSlots(pollSlots, allPollable);
 
   if (entries.length === 0) {
     pollSlots.clear();
@@ -217,12 +340,14 @@ export async function refreshLiveControlInbox(opts = {}) {
     }
     lastLiveProofCheckAt = Date.now();
     window.dispatchEvent(new Event(LIVE_PROOF_CHECKED_EVENT));
+    if (!manual) publishLeaderSnapshot();
     return pending;
   }
 
   const pollIndex = pickRoundRobinPollIndex(roundRobinCursor, entries.length);
   const entry = entries[pollIndex];
   const result = await fetchPendingForEntry(entry);
+  if (!manual) recordAutoPollBudgetUse();
   roundRobinCursor = nextRoundRobinIndex(roundRobinCursor, entries.length);
 
   if (result.kind === "rate_limited") {
@@ -242,6 +367,7 @@ export async function refreshLiveControlInbox(opts = {}) {
     window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
   }
   window.dispatchEvent(new Event(LIVE_PROOF_CHECKED_EVENT));
+  if (!manual) publishLeaderSnapshot();
   return pending;
 }
 
@@ -271,6 +397,10 @@ export function syncLiveControlInboxPolling() {
   if (!liveControlPollAllowedByResolverHealth(getResolverHealthStatus())) {
     clearPollTimer();
     return;
+  }
+
+  if (isWatchLiveProofEnabled()) {
+    ensurePollLeaderClaim();
   }
 
   if (pollTimer == null) {
@@ -316,6 +446,7 @@ function bindLiveControlPollScopeListeners() {
 export function enableLiveControlInboxPolling() {
   pollFeatureEnabled = true;
   bindLiveControlPollScopeListeners();
+  bindLiveControlPollLeaderSnapshot(applyLiveControlInboxSnapshot);
   syncLiveControlInboxPolling();
 }
 

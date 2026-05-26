@@ -1,6 +1,6 @@
 /**
  * Bearer auth for operator-only resolver routes (vouch audit, future ops tools).
- * Token: OPERATOR_AUDIT_TOKEN Worker secret — never commit.
+ * Token: OPERATOR_AUDIT_TOKEN Worker secret - never commit.
  */
 
 export function operatorAuditAuthorized(

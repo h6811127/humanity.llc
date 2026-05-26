@@ -76,7 +76,7 @@ function defaultQrExpiry(issuedAt: string): string {
 
 /**
  * POST /.well-known/hc/v1/cards/{profile_id}/qr
- * Body: { card, qr_credential } — rotates card-scoped QR (A.6).
+ * Body: { card, qr_credential } - rotates card-scoped QR (A.6).
  */
 export async function handlePostRotateQr(
   request: Request,

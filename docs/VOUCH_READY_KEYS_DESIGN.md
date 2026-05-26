@@ -41,9 +41,9 @@ Auto-loading keys into the tab is **not a new trust claim**. It is the same oper
 
 | Threat | Today (manual Use keys) | With vouch-ready keys |
 |--------|-------------------------|------------------------|
-| **XSS on humanity.llc** | Steals `hc_created` / `hc_wallet` if present | Same — keys already in storage when saved |
-| **Malicious scan URL** | Cannot read wallet without same-origin JS | Same — scan HTML is our origin; vouch script only activates from local wallet |
-| **Wrong person vouched** | User still confirms statement + checkbox | Same — submit is manual |
+| **XSS on humanity.llc** | Steals `hc_created` / `hc_wallet` if present | Same - keys already in storage when saved |
+| **Malicious scan URL** | Cannot read wallet without same-origin JS | Same - scan HTML is our origin; vouch script only activates from local wallet |
+| **Wrong person vouched** | User still confirms statement + checkbox | Same - submit is manual |
 | **Network impersonation** | Status fetch is HTTPS to resolver | Same |
 
 ### Risks that need **design care**
@@ -69,11 +69,11 @@ Auto-loading keys into the tab is **not a new trust claim**. It is the same oper
 
 ## Design principles
 
-1. **Scan-first** — Prefer activating keys **on the scan page** (or inline panel), not routing through `/created/` unless the user wants to manage the card.
-2. **Explicit opt-in** — Default off; steward sets “use this card when I vouch” once per device (or per saved row).
-3. **Transparent state** — Always show *which* `profile_id` / handle will sign; same strip as today’s “Keys active on this device · Steward”.
-4. **Fail closed on ambiguity** — 0 eligible → current explainer; 2+ eligible → picker, not silent pick-first.
-5. **Reversible** — “Stop using keys in this tab” clears `hc_created` without deleting wallet.
+1. **Scan-first** - Prefer activating keys **on the scan page** (or inline panel), not routing through `/created/` unless the user wants to manage the card.
+2. **Explicit opt-in** - Default off; steward sets “use this card when I vouch” once per device (or per saved row).
+3. **Transparent state** - Always show *which* `profile_id` / handle will sign; same strip as today’s “Keys active on this device · Steward”.
+4. **Fail closed on ambiguity** - 0 eligible → current explainer; 2+ eligible → picker, not silent pick-first.
+5. **Reversible** - “Stop using keys in this tab” clears `hc_created` without deleting wallet.
 
 ---
 
@@ -155,6 +155,7 @@ Network eligibility should reuse `getCardStatusUrl` + `isEligibleVoucherState` (
 | Scan (activated) | Keys ready · Vouching as **@steward_handle** · [Stop] |
 | Scan (ambiguous) | Choose which card signs this vouch: [@a] [@b] |
 | Scan (opt-in off) | **Use keys here** for **@handle** (no redirect) |
+| Scan page chrome dot (planned) | At-a-glance **your device** state; tap → scan glance — [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) |
 
 ---
 
@@ -167,6 +168,7 @@ Network eligibility should reuse `getCardStatusUrl` + `isEligibleVoucherState` (
 | **3** | Opt-in auto-activate on scan when default set | Shipped (`vouch-issue.mjs?v=7`) |
 | **4** | “Stop” on scan + cross-tab notice when auto-activated | Shipped (`scan-tab-keys.mjs`, `scan-cross-tab-banner`) |
 | **5** | Multi-card picker copy + **Switch to default** when wrong keys active | Shipped (`vouch-issue.mjs?v=10`) |
+| **6** | Progressive device dot + scan glance in page chrome | Shipped (`pass-v29`) — [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) |
 
 Worker/API: **no change** for vouch-ready keys.
 
@@ -176,9 +178,9 @@ Worker/API: **no change** for vouch-ready keys.
 
 1. **Steward-only auto?** Restrict opt-in to `steward` network state first, or include `verified_human` after 90-day wait?
 2. **Auto-activate when keys are for a *different* saved card?** Replace session or show “Switch to @default for vouching?”
-3. **iOS Safari / IT PWA** — `sessionStorage` per tab is reliable; document “same tab” for QR opens from Camera app.
-4. **Audit log** — Log `auto_activate_vouch_keys` in `hc_device_activity` for support/debug?
-5. **Founding / governance** — Any policy that stewards must confirm identity on `/created/` before first vouch on a new device? (Could require one manual **Use keys** before enabling auto.)
+3. **iOS Safari / IT PWA** - `sessionStorage` per tab is reliable; document “same tab” for QR opens from Camera app.
+4. **Audit log** - Log `auto_activate_vouch_keys` in `hc_device_activity` for support/debug?
+5. **Founding / governance** - Any policy that stewards must confirm identity on `/created/` before first vouch on a new device? (Could require one manual **Use keys** before enabling auto.)
 
 ---
 
@@ -203,6 +205,6 @@ Worker/API: **no change** for vouch-ready keys.
 
 ## References
 
-- `site/js/device-keys.mjs` — `activateWalletEntry`, `openCardNowPage`
-- `site/js/vouch-issue.mjs` — scan vouch gate
-- `docs/KEYS_CARDS_AND_VERIFICATION.md` — network vs device layers
+- `site/js/device-keys.mjs` - `activateWalletEntry`, `openCardNowPage`
+- `site/js/vouch-issue.mjs` - scan vouch gate
+- `docs/KEYS_CARDS_AND_VERIFICATION.md` - network vs device layers

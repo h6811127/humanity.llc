@@ -1,9 +1,9 @@
 /**
- * Shared QR branding: red modules, vector center logo, correction Q.
+ * Shared QR branding: red modules, module-masked finder mark, correction Q.
  * Used by site/js/qr-render.mjs and worker/src/resolver/scan-qr.ts.
  *
- * The center mark is drawn as SVG/canvas circles (no raster plate) so a white
- * JPEG/PNG backdrop is never composited onto the code.
+ * Two-tone rose + ink circles sit on the top-left finder (not the frame border).
+ * Optional center bullseye: `QR_CENTER_LOGO_ENABLED`. Drawn as vectors only (no raster plate).
  */
 
 export const QR_BRAND_RED = "#db1b43";

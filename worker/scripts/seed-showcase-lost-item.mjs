@@ -59,7 +59,7 @@ async function main() {
   const qrId = `qr_${randomBase58(16)}`;
   const now = new Date().toISOString();
   const handle = "keys_relay_showcase";
-  const manifesto = "[relay] House keys\nLost — contact owner through relay";
+  const manifesto = "[relay] House keys\nLost - contact owner through relay";
   const scanUrl = `${apiOrigin.replace(/\/$/, "")}/c/${profileId}?q=${qrId}`;
   const expiresAt = new Date(now);
   expiresAt.setUTCFullYear(expiresAt.getUTCFullYear() + 2);
@@ -131,7 +131,7 @@ async function main() {
     manifesto_line: manifesto,
     scan_url: scanUrl,
     created_at: now,
-    note: "M5 stranger-test lost-item relay showcase — owner key not stored.",
+    note: "M5 stranger-test lost-item relay showcase - owner key not stored.",
   };
 
   mkdirSync(dirname(outPath), { recursive: true });

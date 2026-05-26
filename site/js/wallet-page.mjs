@@ -1,5 +1,5 @@
 /**
- * /wallet/ — dedicated saved-cards page (not the hub bottom sheet).
+ * /wallet/ - dedicated saved-cards page (not the hub bottom sheet).
  */
 import { logDeviceActivity } from "./device-activity.mjs";
 import { isAutoSaveEnabled, initAutoSaveToggle } from "./device-auto-save.mjs";

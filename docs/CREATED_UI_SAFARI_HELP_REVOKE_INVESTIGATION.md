@@ -221,13 +221,17 @@ When keys are absent, user still sees resolver check + `#owner-no-key` but not `
 4. **Advanced card disable nested** - good hierarchy, but the outer panel already has many labels in all caps (kicker styling).
 5. **Sibling "Lifecycle & help"** - third place for revoke education.
 
-### Simplification options (product / design - not implemented)
+### Fix (step 3 - shipped 2026-05-26)
+
+**Idea A:** Primary revoke flow first (warning, confirm checkbox, **Revoke this QR**). **What scanners see** radios and optional reason moved under **Advanced**; **Disable entire card** stays nested inside Advanced. API defaults unchanged (`minimal`, no reason). `site/created/index.html`.
+
+### Simplification options (product / design - remaining)
 
 Prioritized by impact vs contract risk:
 
 | Idea | Effort | Risk to M4 / trust |
 |------|--------|---------------------|
-| **A. Collapse "What scanners see" + reason into Advanced** - default minimal, no reason | Low | Low if API defaults unchanged |
+| **A. Collapse "What scanners see" + reason into Advanced** - default minimal, no reason | Low | **Shipped** (step 3) |
 | **B. Move resolver check to Now tab** - revoke panel = confirm + button only | Medium | Low if status still reachable before revoke |
 | **C. Progressive revoke** - step 1 checkbox, step 2 button; hide prefs until "Customize scan message" | Medium | Low |
 | **D. Single warning line** - merge orange notice with resolver footer hint | Low | Low |

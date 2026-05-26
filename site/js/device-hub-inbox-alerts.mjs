@@ -1,6 +1,6 @@
 /**
  * Hub alert groups driven by unified device inbox (`getInboxItems()`).
- * @see docs/DEVICE_INBOX.md — hub alerts unification (phase 8)
+ * @see docs/DEVICE_INBOX.md - hub alerts unification (phase 8)
  */
 import { getInboxItems } from "./device-inbox.mjs";
 import { inboxItemsIncludeKind, inboxWalletEntryLabel } from "./device-inbox-core.mjs";

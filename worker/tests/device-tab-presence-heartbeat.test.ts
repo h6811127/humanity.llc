@@ -61,6 +61,6 @@ describe("shouldTouchPresenceRow", () => {
 describe("presence timing constants", () => {
   it("keeps show window wider than heartbeat", () => {
     expect(PRESENCE_SHOW_MS).toBeGreaterThan(PRESENCE_HEARTBEAT_MS);
-    expect(PRESENCE_HEARTBEAT_MS).toBe(5000);
+    expect(PRESENCE_HEARTBEAT_MS).toBe(10_000);
   });
 });

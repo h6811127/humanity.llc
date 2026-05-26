@@ -9,11 +9,11 @@ import {
 } from "../../site/js/device-hub-network-tools-core.mjs";
 
 describe("isWatchLiveProofEnabled", () => {
-  it("defaults to on when storage unset", () => {
-    expect(isWatchLiveProofEnabled(() => null)).toBe(true);
+  it("defaults to off when storage unset", () => {
+    expect(isWatchLiveProofEnabled(() => null)).toBe(false);
   });
 
-  it("respects explicit off", () => {
+  it("requires explicit opt-in", () => {
     expect(isWatchLiveProofEnabled(() => "0")).toBe(false);
     expect(isWatchLiveProofEnabled(() => "1")).toBe(true);
   });
@@ -77,5 +77,13 @@ describe("formatHubNetworkStatusLine", () => {
 
   it("shows placeholder when nothing checked", () => {
     expect(formatHubNetworkStatusLine({})).toBe("Not checked yet this visit");
+  });
+
+  it("shows budget paused copy when watch on and cap hit", () => {
+    const line = formatHubNetworkStatusLine({
+      autoPollBudgetPaused: true,
+      liveProofWatchOn: true,
+    });
+    expect(line).toContain("paused for today");
   });
 });

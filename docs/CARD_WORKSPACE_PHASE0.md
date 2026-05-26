@@ -1,8 +1,8 @@
-# Card workspace — Phase 0 (footguns)
+# Card workspace - Phase 0 (footguns)
 
 **Status:** Shipped  
-**Next:** Card workspace Phase 0–4 complete — see `docs/CARD_WORKSPACE_UX.md` · product verticals in `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`  
-**Related:** `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md`, `docs/DEVICE_OS.md`, `docs/REVOKE_UI_INVESTIGATION.md`, `docs/KEYS_CARDS_AND_VERIFICATION.md`
+**Next:** Card workspace Phase 0–4 complete - see `docs/CARD_WORKSPACE_UX.md` · product verticals in `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`  
+**Related:** `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md`, `docs/DEVICE_OS.md`, `docs/LANDING_PROGRESS_STRIP.md`, `docs/REVOKE_UI_INVESTIGATION.md`, `docs/KEYS_CARDS_AND_VERIFICATION.md`
 
 ---
 
@@ -35,7 +35,7 @@ After create, `initCreatedDeviceSave` runs `runSave()` in a microtask when auto-
 |---------|--------|
 | **Use keys** | `openCardNowPage(entry)` |
 | **Open scan** | Public scan URL (new tab) |
-| **⋯ Open card** | `openCardNowPage(entry)` — loads keys when saved |
+| **⋯ Open card** | `openCardNowPage(entry)` - loads keys when saved |
 
 **Deprecated footgun:** ⋯ **Manage** as plain `<a href="/created/?profile_id&qr_id">` without `activateWalletEntry`.
 
@@ -52,4 +52,4 @@ After create, `initCreatedDeviceSave` runs `runSave()` in a microtask when auto-
 
 ## Tests
 
-`worker/tests/device-auto-save.test.ts` — `autoSaveEnabledFromStorage()` (default on / explicit off).
+`worker/tests/device-auto-save.test.ts` - `autoSaveEnabledFromStorage()` (default on / explicit off).

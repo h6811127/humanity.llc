@@ -488,7 +488,7 @@ async function tryAutoActivateDefaultVouchKeys(voucheeProfileId, opts = {}) {
 }
 
 /**
- * No signing keys in this tab — explain network vs device and detect saved eligible cards.
+ * No signing keys in this tab - explain network vs device and detect saved eligible cards.
  */
 async function showNoKeysExplainer(voucheeProfileId) {
   const wallet = loadWallet();
@@ -496,7 +496,7 @@ async function showNoKeysExplainer(voucheeProfileId) {
 
   if (wallet.length === 0) {
     showExplainerHtml(
-      `Vouching requires your card’s Ed25519 signing key in <strong>this tab</strong>—network Steward status alone is not enough. ` +
+      `Vouching requires your card’s Ed25519 signing key in <strong>this tab</strong>-network Steward status alone is not enough. ` +
         `Create a card or open ${walletLinksHtml()}, then tap <strong>Sign as…</strong> on this scan. ` +
         `Only the signed document is transmitted; the private key stays on device.`
     );
@@ -507,7 +507,7 @@ async function showNoKeysExplainer(voucheeProfileId) {
 
   if (eligible.length === 0) {
     showExplainerHtml(
-      `${wallet.length} saved card${wallet.length === 1 ? "" : "s"} on this device, but none qualify as <strong>Vouched Human</strong> or <strong>Steward</strong> on the network—or the saved profile matches this scan. ` +
+      `${wallet.length} saved card${wallet.length === 1 ? "" : "s"} on this device, but none qualify as <strong>Vouched Human</strong> or <strong>Steward</strong> on the network-or the saved profile matches this scan. ` +
         loadKeysHelpHtml(walletUrl)
     );
     return;
@@ -541,7 +541,7 @@ async function showNoKeysExplainer(voucheeProfileId) {
         : "");
   } else {
     lead =
-      `${lines}${more} — <strong>signing key not loaded in this tab</strong>. ` +
+      `${lines}${more} - <strong>signing key not loaded in this tab</strong>. ` +
       (hasActivatable
         ? `Tap <strong>Sign as…</strong> below to load the key and sign. `
         : `Re-save your card with keys on <a href="${walletUrl}">My cards</a>, then return. `);

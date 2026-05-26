@@ -1,4 +1,4 @@
-# Flow 2 — Public QR Scan repair spec
+# Flow 2 - Public QR Scan repair spec
 
 **Date:** 2026-05-25  
 **Status:** Repair slices 1–8 complete; F2-5 / F2-6 / F2-10 explicitly deferred  
@@ -30,7 +30,7 @@
 
 **Note:** Static UI is under `site/` (Pages). Public scan is **Worker-only** (`GET /c/…`), not Pages.
 
-**HTML contract for `/c/…`:** [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) (layout, QR payload, status JSON parity, deploy). **Shipped vs deferred routes:** [`docs/V1_IMPLEMENTATION_CONTRACTS.md`](V1_IMPLEMENTATION_CONTRACTS.md) § Reference network — Flow 2 routes.
+**HTML contract for `/c/…`:** [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) (layout, QR payload, status JSON parity, deploy). **Shipped vs deferred routes:** [`docs/V1_IMPLEMENTATION_CONTRACTS.md`](V1_IMPLEMENTATION_CONTRACTS.md) § Reference network - Flow 2 routes.
 
 ---
 
@@ -71,13 +71,13 @@ Use the right endpoint for the job. Do not treat `GET …/cards/{id}` as a scan 
 
 | ID | Gap | Contract / audit reference |
 |----|-----|---------------------------|
-| F2-1 | ✅ Resolved (v1): no scan access log — audit + data policy aligned (Slice 5 option B) |
+| F2-1 | ✅ Resolved (v1): no scan access log - audit + data policy aligned (Slice 5 option B) |
 | F2-2 | ✅ Fixed: scan HTML shows offline banner when `navigator.onLine === false` (`scan-offline.ts`, `scan-offline-banner`). |
 | F2-3 | ✅ Fixed: suspended scan HTML + status JSON include links to data policy and architecture (`scan-governance.ts`). |
 | F2-4 | ✅ Fixed: `GET /.well-known/hc/v1/qr/{qr_id}` returns contract-shaped QR metadata (`qr-metadata.ts`). |
 | F2-5 | `GET /v1/verification/status/{profile_id}` not implemented | § API Verification table |
 | F2-6 | Card GET HTML is raw JSON `<pre>`, not public card view | § API: “HTML or JSON public card” |
-| F2-7 | ✅ Documented: card GET JSON 410 vs scan HTML 410 — intentional v1 split (§ Integrator vs scanner HTTP) |
+| F2-7 | ✅ Documented: card GET JSON 410 vs scan HTML 410 - intentional v1 split (§ Integrator vs scanner HTTP) |
 | F2-8 | ✅ Fixed: status JSON adds optional `scan.error` contract code alongside `scan.kind` (`scan-contract-error.ts`) |
 | F2-9 | ✅ Fixed: minimal failure scans show compact Card status + This QR groups; human trust hidden (`scanLayoutForMinimalFailureTrust`) |
 | F2-10 | `POST …/export` not routed | § API (defer unless export needed for scan) |
@@ -86,19 +86,19 @@ Use the right endpoint for the job. Do not treat `GET …/cards/{id}` as a scan 
 
 ## Repair slices (ordered)
 
-### Slice 1 — Contract clarity (no behavior change) ✅
+### Slice 1 - Contract clarity (no behavior change) ✅
 
 **Goal:** Stop AI and integrators from guessing wrong endpoints.
 
 - [x] Cross-links: this spec ↔ `M3_SCAN_PAGE_UI.md` (HTML contract) ↔ `V1_IMPLEMENTATION_CONTRACTS.md` (shipped vs deferred).
 - [x] Document intentional split in § Public scan surfaces (integrators) above.
-- [x] `GET …/qr/{qr_id}` **shipped** (Slice 4); listed in contracts § Reference network — Flow 2 routes (not deferred).
+- [x] `GET …/qr/{qr_id}` **shipped** (Slice 4); listed in contracts § Reference network - Flow 2 routes (not deferred).
 
 **Done when:** Contract doc lists which routes are shipped vs deferred; no contradictory “flippable pass” copy in feature page vs flat scan UI (`site/features/scan-ui.html` subline + design decisions aligned).
 
 ---
 
-### Slice 2 — Suspension + governance links (P0 UX) ✅
+### Slice 2 - Suspension + governance links (P0 UX) ✅
 
 **Goal:** Meet required failure state for suspended scans.
 
@@ -111,12 +111,12 @@ Use the right endpoint for the job. Do not treat `GET …/cards/{id}` as a scan 
 
 ---
 
-### Slice 3 — Stale / offline disclosure (P0 trust) ✅
+### Slice 3 - Stale / offline disclosure (P0 trust) ✅
 
 **Goal:** Meet Flow 2 step 4 and acceptance test without false “active” claims offline.
 
-- [x] Client-side: on scan page load, if `navigator.onLine === false`, show banner: “Offline — status may be stale; refresh when connected.”
-- [x] Optional: CDN cache nuance deferred — Worker HTML already uses shorter cache on inactive scans (`max-age=60`).
+- [x] Client-side: on scan page load, if `navigator.onLine === false`, show banner: “Offline - status may be stale; refresh when connected.”
+- [x] Optional: CDN cache nuance deferred - Worker HTML already uses shorter cache on inactive scans (`max-age=60`).
 - [x] Align `site/features/scan-ui.html` “future” bullet with shipped behavior.
 
 **Files:** `worker/src/resolver/scan-html.ts`, `scan-offline.ts`, `site/scan-pass.css` (bundle via `npm run worker:bundle-scan`), tests in `scan.test.ts`.
@@ -125,7 +125,7 @@ Use the right endpoint for the job. Do not treat `GET …/cards/{id}` as a scan 
 
 ---
 
-### Slice 4 — `GET …/qr/{qr_id}` (P1 API) ✅
+### Slice 4 - `GET …/qr/{qr_id}` (P1 API) ✅
 
 **Goal:** QR metadata without requiring profile_id in path.
 
@@ -139,11 +139,11 @@ Use the right endpoint for the job. Do not treat `GET …/cards/{id}` as a scan 
 
 ---
 
-### Slice 5 — Anonymized scan access log (P1 policy) ✅
+### Slice 5 - Anonymized scan access log (P1 policy) ✅
 
 **Goal:** Reconcile Flow 2 step 2 with “no scan analytics by default.”
 
-**Decision (data policy):** **B** — no access log in v1. [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) forbids scan analytics and defaults to no scan request logging; governance approval would be required before option A.
+**Decision (data policy):** **B** - no access log in v1. [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) forbids scan analytics and defaults to no scan request logging; governance approval would be required before option A.
 
 - [x] `V1_FLOW_AUDIT.md` Flow 2 validate step: persisted record = none (v1).
 - [x] `REFERENCE_OPERATOR_DATA_POLICY.md` + contracts table: reference network does not access-log scan routes.
@@ -153,7 +153,7 @@ Use the right endpoint for the job. Do not treat `GET …/cards/{id}` as a scan 
 
 ---
 
-### Slice 6 — Status JSON error codes (P2 integrators) ✅
+### Slice 6 - Status JSON error codes (P2 integrators) ✅
 
 **Goal:** Optional `error` field for machine clients without breaking `scan.kind`.
 
@@ -164,7 +164,7 @@ Use the right endpoint for the job. Do not treat `GET …/cards/{id}` as a scan 
 
 ---
 
-### Slice 7 — Minimal layouts vs trust separation (P2) ✅
+### Slice 7 - Minimal layouts vs trust separation (P2) ✅
 
 **Goal:** Acceptance test parity on failure states.
 
@@ -177,13 +177,13 @@ Use the right endpoint for the job. Do not treat `GET …/cards/{id}` as a scan 
 
 ---
 
-### Slice 8 — Flow 2 closure (F2-7 + regression gates) ✅
+### Slice 8 - Flow 2 closure (F2-7 + regression gates) ✅
 
 **Goal:** Close the repair spec with documented integrator boundaries and automated regression gates.
 
 - [x] Document F2-7 integrator vs scanner HTTP split (below + contracts table).
-- [x] `worker/tests/flow-2-regression.test.ts` — bearer on minimal failures, `scan_analytics: false`, card GET 410 JSON vs scan HTML 410.
-- [x] `docs/M5_STRANGER_TEST_RUNBOOK.md` — `pass-v20` deploy check; optional `scan.error` in curl example.
+- [x] `worker/tests/flow-2-regression.test.ts` - bearer on minimal failures, `scan_analytics: false`, card GET 410 JSON vs scan HTML 410.
+- [x] `docs/M5_STRANGER_TEST_RUNBOOK.md` - `pass-v20` deploy check; optional `scan.error` in curl example.
 
 **Out of scope (explicit deferral):** F2-5 verification status route, F2-6 public card HTML view, F2-10 export route.
 
@@ -244,8 +244,8 @@ Manual:
 
 Flow 2 repair slices **1–8** are complete. Follow-on work (outside this spec):
 
-- **Scanner Phase F:** credential code on print + scan — see [`SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) (shipped).
+- **Scanner Phase F:** credential code on print + scan - see [`SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) (shipped).
 - **Device hub (Phase 10):** [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md) (slices complete).
-- **M6 vouching:** return-to-scan (`hc_vouch_return_url`) — shipped in client; production smoke per [`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md).
+- **M6 vouching:** return-to-scan (`hc_vouch_return_url`) - shipped in client; production smoke per [`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md).
 - **Flow 4 artifact intent:** after QR resolution stable.
-- **Deferred API:** F2-5, F2-6, F2-10 per § Reference network — Flow 2 routes in contracts.
+- **Deferred API:** F2-5, F2-6, F2-10 per § Reference network - Flow 2 routes in contracts.

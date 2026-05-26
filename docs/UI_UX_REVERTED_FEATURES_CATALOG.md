@@ -16,7 +16,7 @@
 
 **Step 3 cleanup (Safari cascade JS/tests):** Marked done in the revert plan; may exist as **uncommitted** local deletes (`device-inbox-sheet-loader.mjs`, `device-sheet-backdrop-sync.mjs`, `e2e/safari-shell-scroll.spec.ts`). See [§7–§9](#7-lazy-inbox-sheet-loader-phase-22--22b) below.
 
-**Not reverted by this incident:** Device inbox v2 (badge, sheet, dot overlays, live-proof SW), resolver-confirmed card-disabled correctness, module manifest, steward E2E — still shipped. Optional steps 4–6 in the revert plan are **future** rollbacks, not done here.
+**Not reverted by this incident:** Device inbox v2 (badge, sheet, dot overlays, live-proof SW), resolver-confirmed card-disabled correctness, module manifest, steward E2E - still shipped. Optional steps 4–6 in the revert plan are **future** rollbacks, not done here.
 
 ---
 
@@ -50,7 +50,7 @@ Supporting logic lived in `device-shell-chrome.mjs` + `device-shell-chrome-core.
 
 ### Reverted by
 
-**`6bcef6b`** — listener and `device-shell-chrome-core.mjs` removed; `body.shell-scroll-chrome-off` always set; inset sync only (`syncShellChromeInset` + `ResizeObserver`).
+**`6bcef6b`** - listener and `device-shell-chrome-core.mjs` removed; `body.shell-scroll-chrome-off` always set; inset sync only (`syncShellChromeInset` + `ResizeObserver`).
 
 ### Lag link
 
@@ -60,12 +60,12 @@ Supporting logic lived in `device-shell-chrome.mjs` + `device-shell-chrome-core.
 
 | Area | Effect of reversion |
 |------|---------------------|
-| Landing scroll | **Improved** — main fix target |
-| Status dot / hub open | **Unchanged** — dot still opens hub |
+| Landing scroll | **Improved** - main fix target |
+| Status dot / hub open | **Unchanged** - dot still opens hub |
 | Chrome inset (`--shell-chrome-h`) | **Still updated** on resize; no scroll-hide animation |
-| Create / wallet / created shell | Same — no edge-hide on scroll |
+| Create / wallet / created shell | Same - no edge-hide on scroll |
 | Focus mode / landing layout | **Unchanged** |
-| Dead taps | **Indirect** — less scroll-driven layout churn; not a substitute for backdrop fixes |
+| Dead taps | **Indirect** - less scroll-driven layout churn; not a substitute for backdrop fixes |
 
 Leftover CSS for `.top-chrome--edge-hidden` and `body.shell-is-scrolling` remains but **nothing sets those classes** today (inert rules).
 
@@ -75,10 +75,10 @@ Leftover CSS for `.top-chrome--edge-hidden` and `body.shell-is-scrolling` remain
 
 Acceptable directions:
 
-1. **Static chrome** — current state; optional subtle opacity via CSS only (no scroll JS).
-2. **Hub-inner scroll only** — if “hide chrome while reading hub,” key off `#device-hub .device-hub-body` scroll, not `window`.
-3. **Desktop-only, opt-in** — if ever restored, gate with explicit user setting + `(pointer: fine)` and **never** on `(pointer: coarse)`; cover with Vitest + manual P0-W, not production default.
-4. **IntersectionObserver** — observe a sentinel at top of main column instead of per-scroll `rAF` (one threshold crossing vs continuous updates).
+1. **Static chrome** - current state; optional subtle opacity via CSS only (no scroll JS).
+2. **Hub-inner scroll only** - if “hide chrome while reading hub,” key off `#device-hub .device-hub-body` scroll, not `window`.
+3. **Desktop-only, opt-in** - if ever restored, gate with explicit user setting + `(pointer: fine)` and **never** on `(pointer: coarse)`; cover with Vitest + manual P0-W, not production default.
+4. **IntersectionObserver** - observe a sentinel at top of main column instead of per-scroll `rAF` (one threshold crossing vs continuous updates).
 
 **Do not rebuild:** `initScrollEdgeChrome()` + `markScrolling()` + `top-chrome--edge-hidden` on landing document scroll as shipped May 26.
 
@@ -104,7 +104,7 @@ Only existed to re-enable feature (1); opt-in still risked accidental enablement
 
 ### Cross-feature impact
 
-None operational — feature (1) is gone.
+None operational - feature (1) is gone.
 
 ### Safe rebuild
 
@@ -134,7 +134,7 @@ Dispatched `hc-device-os-refreshed` (`DEVICE_OS_REFRESHED`) with `networkStatus`
 
 ### Reverted by
 
-**`277d08e`** — removed `initDeviceOsCoordinator()` call and `DEVICE_OS_REFRESHED` wiring from `device-status.mjs`, `device-hub-ui.mjs`, `device-hub-glance.mjs`. Status bootstrap now:
+**`277d08e`** - removed `initDeviceOsCoordinator()` call and `DEVICE_OS_REFRESHED` wiring from `device-status.mjs`, `device-hub-ui.mjs`, `device-hub-glance.mjs`. Status bootstrap now:
 
 - `fetchResolverHealth` only on init + tab visible
 - `refreshSummary()` on storage / hub-changed / inbox / network events (UI only, no full wallet poll from dot path)
@@ -149,15 +149,15 @@ Dispatched `hc-device-os-refreshed` (`DEVICE_OS_REFRESHED`) with `networkStatus`
 
 | Area | After reversion |
 |------|-----------------|
-| Status dot network color | **OK** — health-only poll on visible |
-| Resolver degraded banner | **OK** — tied to health |
-| Hub card rows / network badges | **OK** — `device-hub-ui.mjs` still calls `refreshWalletNetworkStatuses` when hub runs |
-| Card-disabled-since-visit (hub/inbox/dot) | **Weaker on landing when hub collapsed** — glance/dot refresh on `NETWORK_REFRESHED`, which hub emits when it polls; no global poll on tab focus unless hub/network path runs |
-| Live proof inbox badge | **OK on landing/wallet** — `startLiveControlInboxPolling()` in hub-ui (interval + visible), not coordinator |
-| `/create/`, `/created/` | **Fewer background polls** — intentional (`create-hub.mjs` disables live-control inbox on create) |
-| Background OS notifications SW | **Unchanged** — separate SW path |
-| Cross-tab wallet sync UI | **OK** — storage → `refreshSummary()`; hub still refreshes on storage when mounted |
-| Docs mentioning `DEVICE_OS_REFRESHED` | **Stale** — update when rebuilding (e.g. `CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`, `DEVICE_HUB_REPAIR_SPEC.md`) |
+| Status dot network color | **OK** - health-only poll on visible |
+| Resolver degraded banner | **OK** - tied to health |
+| Hub card rows / network badges | **OK** - `device-hub-ui.mjs` still calls `refreshWalletNetworkStatuses` when hub runs |
+| Card-disabled-since-visit (hub/inbox/dot) | **Weaker on landing when hub collapsed** - glance/dot refresh on `NETWORK_REFRESHED`, which hub emits when it polls; no global poll on tab focus unless hub/network path runs |
+| Live proof inbox badge | **OK on landing/wallet** - `startLiveControlInboxPolling()` in hub-ui (interval + visible), not coordinator |
+| `/create/`, `/created/` | **Fewer background polls** - intentional (`create-hub.mjs` disables live-control inbox on create) |
+| Background OS notifications SW | **Unchanged** - separate SW path |
+| Cross-tab wallet sync UI | **OK** - storage → `refreshSummary()`; hub still refreshes on storage when mounted |
+| Docs mentioning `DEVICE_OS_REFRESHED` | **Stale** - update when rebuilding (e.g. `CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`, `DEVICE_HUB_REPAIR_SPEC.md`) |
 
 ### Safe rebuild
 
@@ -165,10 +165,10 @@ Dispatched `hc-device-os-refreshed` (`DEVICE_OS_REFRESHED`) with `networkStatus`
 
 Acceptable patterns:
 
-1. **Scoped entry points** — start coordinator (or equivalent) only from `initDeviceHub()` when `showLiveControlInbox` / wallet present, or when hub expands.
-2. **Split pipelines** — health-only on status dot; wallet network poll only when hub visible or user opens inbox; live-proof only via existing `startLiveControlInboxPolling`.
-3. **Throttle storage** — ignore `storage` for full wallet poll; debounce per-tab leader election if cross-tab sync is required.
-4. **Explicit manual refresh** — “Retry” on dot already calls `refreshNetwork()`; extend hub actions instead of global auto-batch.
+1. **Scoped entry points** - start coordinator (or equivalent) only from `initDeviceHub()` when `showLiveControlInbox` / wallet present, or when hub expands.
+2. **Split pipelines** - health-only on status dot; wallet network poll only when hub visible or user opens inbox; live-proof only via existing `startLiveControlInboxPolling`.
+3. **Throttle storage** - ignore `storage` for full wallet poll; debounce per-tab leader election if cross-tab sync is required.
+4. **Explicit manual refresh** - “Retry” on dot already calls `refreshNetwork()`; extend hub actions instead of global auto-batch.
 
 Re-enabling coordinator globally without scoping repeats the rate-limit incident.
 
@@ -194,7 +194,7 @@ Card-disabled glance lines may update **one poll later** until hub triggers `NET
 
 ### Safe rebuild
 
-On `NETWORK_REFRESHED`, hub already passes `resolverConfirmedMap` in event detail — prefer **that** event only. If adding coordinator back, scope it to hub-initiated polls so one event path remains.
+On `NETWORK_REFRESHED`, hub already passes `resolverConfirmedMap` in event detail - prefer **that** event only. If adding coordinator back, scope it to hub-initiated polls so one event path remains.
 
 ---
 
@@ -202,7 +202,7 @@ On `NETWORK_REFRESHED`, hub already passes `resolverConfirmedMap` in event detai
 
 ### What it was
 
-`chromeInsetFloor` — only increase measured bar height, never shrink, to avoid scroll jump when cluster positioning changed (`a1ab3fa`).
+`chromeInsetFloor` - only increase measured bar height, never shrink, to avoid scroll jump when cluster positioning changed (`a1ab3fa`).
 
 ### Introduced by
 
@@ -210,7 +210,7 @@ On `NETWORK_REFRESHED`, hub already passes `resolverConfirmedMap` in event detai
 
 ### Reverted by
 
-**`6bcef6b`** — inset uses live measured height each sync (no floor).
+**`6bcef6b`** - inset uses live measured height each sync (no floor).
 
 ### Lag link
 
@@ -238,7 +238,7 @@ While scroll-edge hid the bar, status dot cluster used `position: fixed` + `poin
 
 ### Cross-feature impact
 
-**None today** — class never toggled. If scroll-edge returns, dot reachability must be redesigned (hub-inner or inset-only).
+**None today** - class never toggled. If scroll-edge returns, dot reachability must be redesigned (hub-inner or inset-only).
 
 ### Safe rebuild
 
@@ -250,7 +250,7 @@ Never combine fixed cluster + shrinking `--shell-chrome-h` + document scroll (ro
 
 ### What it was
 
-`device-inbox-sheet-loader.mjs` — dynamic `import()` of `device-inbox-sheet.mjs` so `device-status.mjs` did not static-import the full inbox sheet graph at dot bootstrap. `openInboxFromChrome` / `closeInboxSheet` proxied through loader. Glance stopped static-importing inbox sheet (`189c3a3`).
+`device-inbox-sheet-loader.mjs` - dynamic `import()` of `device-inbox-sheet.mjs` so `device-status.mjs` did not static-import the full inbox sheet graph at dot bootstrap. `openInboxFromChrome` / `closeInboxSheet` proxied through loader. Glance stopped static-importing inbox sheet (`189c3a3`).
 
 ### Introduced by
 
@@ -262,14 +262,14 @@ Never combine fixed cluster + shrinking `--shell-chrome-h` + document scroll (ro
 
 ### Lag link
 
-**Not landing scroll lag** — aimed at **dot bootstrap failures** (large graph, Safari flaky import). Tradeoff: first badge tap pays import cost; smaller initial graph.
+**Not landing scroll lag** - aimed at **dot bootstrap failures** (large graph, Safari flaky import). Tradeoff: first badge tap pays import cost; smaller initial graph.
 
 ### Cross-feature impact
 
 | Area | Effect |
 |------|--------|
-| Status dot load reliability | **Slightly worse** on slow networks — heavier initial `device-status` graph |
-| First inbox open | **Faster** — no extra dynamic import |
+| Status dot load reliability | **Slightly worse** on slow networks - heavier initial `device-status` graph |
+| First inbox open | **Faster** - no extra dynamic import |
 | Module manifest / E2E | Simpler graph; manifest must list all static imports |
 | Red error ring on dot | Theoretically more likely if inbox sheet import fails at bootstrap |
 
@@ -289,9 +289,9 @@ Alternative: split `device-inbox-sheet-core.mjs` (DOM + open/close) from heavy r
 
 ### What it was
 
-`syncSheetBackdropClosed(backdrop)` — force `hidden`, remove `is-visible`, set `aria-hidden`.
+`syncSheetBackdropClosed(backdrop)` - force `hidden`, remove `is-visible`, set `aria-hidden`.
 
-`bindSheetLifecycleReconcile(reconcile)` — run hub/inbox `reconcile*SheetState` on `visibilitychange` (visible), `window` `focus`, and `pageshow`.
+`bindSheetLifecycleReconcile(reconcile)` - run hub/inbox `reconcile*SheetState` on `visibilitychange` (visible), `window` `focus`, and `pageshow`.
 
 Called from hub/inbox sheet modules after close and on init; replaced bfcache-only `pageshow` in hub sheet.
 
@@ -307,7 +307,7 @@ Called from hub/inbox sheet modules after close and on init; replaced bfcache-on
 
 ### Lag link
 
-**Not scroll lag** — fixed **dead taps** from stuck `.is-visible` backdrops. Extra listeners run rarely (tab focus), negligible perf.
+**Not scroll lag** - fixed **dead taps** from stuck `.is-visible` backdrops. Extra listeners run rarely (tab focus), negligible perf.
 
 ### Cross-feature impact
 
@@ -323,7 +323,7 @@ Reintroduce **only** the pure helpers + lifecycle binds:
 
 1. No scroll listeners.
 2. Call `syncSheetBackdropClosed` in `set*SheetOpen(false)` (idempotent).
-3. Keep `pageshow` + `persisted` **and** `bindSheetLifecycleReconcile` — low cost.
+3. Keep `pageshow` + `persisted` **and** `bindSheetLifecycleReconcile` - low cost.
 4. Vitest `device-sheet-backdrop-sync.test.ts` (restore from `c8004d8`).
 
 Do not bundle with WebKit `visibility:hidden` sheet CSS unless hit-testing is validated on iPhone.
@@ -357,9 +357,9 @@ Do not bundle with WebKit `visibility:hidden` sheet CSS unless hit-testing is va
 
 | Area | Effect |
 |------|--------|
-| Dead dot after hard refresh | May **return** intermittently — investigate before re-adding |
-| Collapsed sheet blocking taps | **Risk** — invisible sheet intercepting hits if classes desync |
-| GPU / scroll | **Improved** on touch — less full-screen blur |
+| Dead dot after hard refresh | May **return** intermittently - investigate before re-adding |
+| Collapsed sheet blocking taps | **Risk** - invisible sheet intercepting hits if classes desync |
+| GPU / scroll | **Improved** on touch - less full-screen blur |
 
 ### Safe rebuild
 
@@ -375,7 +375,7 @@ One change at a time on real iPhone (P0-W):
 
 ### What it was
 
-`@media (pointer: coarse)` — hub sheet, glance popover, and sheet backdrops use solid rgba backgrounds; `backdrop-filter: none`.
+`@media (pointer: coarse)` - hub sheet, glance popover, and sheet backdrops use solid rgba backgrounds; `backdrop-filter: none`.
 
 ### Introduced by
 
@@ -429,7 +429,7 @@ After any shell scroll or backdrop change:
 
 ---
 
-## 12. `88d5d01` — scroll chrome default-off (superseded)
+## 12. `88d5d01` - scroll chrome default-off (superseded)
 
 ### What it was
 
@@ -441,11 +441,11 @@ Intermediate state: scroll chrome behind opt-in + `shell-scroll-chrome-off` by d
 
 ### Safe rebuild
 
-N/A — use §1 instead.
+N/A - use §1 instead.
 
 ---
 
-## Still shipped (not reverted) — do not confuse with this catalog
+## Still shipped (not reverted) - do not confuse with this catalog
 
 These landed in the same timeframe but **were not removed** by `6bcef6b` / `277d08e` / `733ae5e` / step 3:
 
@@ -468,13 +468,13 @@ When bringing behavior back, use this order (safest first):
 
 | Priority | Feature | Risk if restored naïvely |
 |----------|---------|---------------------------|
-| 1 | Backdrop reconcile (§8) | Low — dead taps |
+| 1 | Backdrop reconcile (§8) | Low - dead taps |
 | 2 | `[hidden]` backdrop pointer-events (§9, partial) | Low–medium |
-| 3 | Lazy inbox loader (§7) | Medium — graph size |
-| 4 | Touch blur-off (§10) | Low–medium — visuals/scroll |
+| 3 | Lazy inbox loader (§7) | Medium - graph size |
+| 4 | Touch blur-off (§10) | Low–medium - visuals/scroll |
 | 5 | Chrome inset floor (§5) | Low |
-| 6 | Scoped coordinator (§3) | **High** — rate limits |
-| 7 | Document scroll-edge chrome (§1) | **High** — landing lag |
+| 6 | Scoped coordinator (§3) | **High** - rate limits |
+| 7 | Document scroll-edge chrome (§1) | **High** - landing lag |
 
 ---
 

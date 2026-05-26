@@ -7,7 +7,7 @@ import { extractQrSvgViewBoxSize, extractSvgInner } from "./qr-branding.mjs";
 import { CREDENTIAL_CODE_PATTERN } from "./qr-credential-code.mjs";
 import { applyPrintQaWatermark } from "./qr-print-qa-watermark.mjs";
 
-/** Finished sticker trim — 2 in square (founding drop default). */
+/** Finished sticker trim - 2 in square (founding drop default). */
 export const STICKER_TRIM_MM = 50.8;
 
 /** Bleed beyond trim for die-cut / full-bleed print. */

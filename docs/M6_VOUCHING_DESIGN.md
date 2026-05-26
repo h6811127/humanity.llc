@@ -2,7 +2,7 @@
 
 **Status:** Step 1 (V-001) shipped in repo  -  verify on production; Steps 2–3 shipped; Step 4 shipped (audit API, dismiss API, steward workflow entry, operator UI prototype, steward issuance cap policy)
 **Canonical refs:** [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md) (product framing), [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) (adversarial catalog), `docs/V1_PRODUCT_TRUST_MODEL.md` § Level 2, `docs/V1_ADVERSARIAL_REVIEW.md` § Perspective 1, `docs/features/Human Verification v1.0.md`, `docs/V1_IMPLEMENTATION_BACKLOG.md` (V-001, V-002)  
-**Product thesis:** Live control proves recent key possession. Vouching proves **accountable humans staked public, revocable attestations** on this card under published rules—not legal ID, not global biometric uniqueness, not liveness at every click.
+**Product thesis:** Live control proves recent key possession. Vouching proves **accountable humans staked public, revocable attestations** on this card under published rules-not legal ID, not global biometric uniqueness, not liveness at every click.
 
 ---
 
@@ -20,7 +20,7 @@ The scanner-facing sentence is:
 
 > Three humans on this network vouched for this card under published rules.
 
-Do not lead with graph theory, “sybil solved,” or “bot-proof.” In 2026 the honest claim is **accountability**: who signed, under what rules, revocable how. Adversarial detail stays in [`V1_ADVERSARIAL_REVIEW.md`](V1_ADVERSARIAL_REVIEW.md) and operator audit hooks—not the first scan screen.
+Do not lead with graph theory, “sybil solved,” or “bot-proof.” In 2026 the honest claim is **accountability**: who signed, under what rules, revocable how. Adversarial detail stays in [`V1_ADVERSARIAL_REVIEW.md`](V1_ADVERSARIAL_REVIEW.md) and operator audit hooks-not the first scan screen.
 
 ---
 
@@ -96,7 +96,7 @@ Keep vouching **visually separate** from:
 
 Design for hostile actors, not only happy-path founders. **Full threat catalog:** [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) (IDs **R-***, **V-***, **G-***, **S-***, **H-***, **I-***, **A-***, **O-***).
 
-**Critical graph insight:** A **4-account clique** (each vouches the other three) is the minimum mutual ring that can elevate every member to **Vouched Human** without outsiders. A 3-person cycle cannot satisfy “3 distinct vouchers” per node. Rotating **A→B→C→A** rings evade the `closed_loop_only` audit flag—triage must use shared-set flags and manual review.
+**Critical graph insight:** A **4-account clique** (each vouches the other three) is the minimum mutual ring that can elevate every member to **Vouched Human** without outsiders. A 3-person cycle cannot satisfy “3 distinct vouchers” per node. Rotating **A→B→C→A** rings evade the `closed_loop_only` audit flag-triage must use shared-set flags and manual review.
 
 ### Threat: many registered cards (sybil farm)
 
@@ -120,7 +120,7 @@ Design for hostile actors, not only happy-path founders. **Full threat catalog:*
 | One active vouch per voucher→vouchee pair | **Unique index** |
 | Steward audit hooks for suspicious clusters | **Shipped** (`closed_loop_only`, `shared_voucher_set`, `directed_cycle_cluster`, `steward_issuance_burst`) |
 
-**Ring detection (operator-only, not public)** — implemented in `worker/src/db/vouch-audit.ts`:
+**Ring detection (operator-only, not public)** - implemented in `worker/src/db/vouch-audit.ts`:
 
 | Flag | Catches | Misses |
 |------|---------|--------|
@@ -394,7 +394,7 @@ Vouching confuses people when these are mixed up. Full guide: [`docs/KEYS_CARDS_
 
 - **Steward / Vouched Human** = resolver state for a `profile_id` (visible on scan, `/created/`, `/wallet/` chips).
 - **Signing keys** = owner keypair in **`hc_created`** for this tab (loaded via create or **Use keys** from `hc_wallet`).
-- **Vouch-ready keys:** [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) — scan-first activation (Sign as…, default for vouching, auto-load, clear keys from tab).
+- **Vouch-ready keys:** [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) - scan-first activation (Sign as…, default for vouching, auto-load, clear keys from tab).
 - **iPhone vs laptop** = separate devices unless you import a backup or save + Use keys on each.
 
 Scan vouch UI (shipped): if keys are missing but a saved card is Steward on the network, the explainer names that card and offers **Sign as…** (or Saved cards → Use keys).

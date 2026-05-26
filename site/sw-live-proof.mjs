@@ -1,6 +1,6 @@
 /**
  * Live-proof background alerts when no Humanity tab is running (inbox v2 Phase D).
- * Device-only polling — no server push.
+ * Device-only polling - no server push.
  */
 import {
   anyClientVisible,

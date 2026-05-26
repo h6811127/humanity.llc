@@ -1,7 +1,7 @@
 /**
  * Dev-only inbox interaction log (sessionStorage ring buffer).
  * Enable with localStorage.hc_inbox_diagnostics = "1"
- * @see docs/DEVICE_INBOX.md — Diagnostics
+ * @see docs/DEVICE_INBOX.md - Diagnostics
  */
 import {
   appendInboxDiagLog,

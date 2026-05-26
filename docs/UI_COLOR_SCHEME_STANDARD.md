@@ -182,7 +182,7 @@ Prioritized places that could adopt the same **raised card** pattern. Extraction
 
 #### Suggested rollout order
 
-Tracked in [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md): **Phase 0** (extract component) shipped · **Phase 1** (wallet tab hint + cross-tab banners) next.
+Tracked in [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md): **Phases 0–1** shipped · **Phase 2** (scan cross-tab banner) next.
 
 ---
 

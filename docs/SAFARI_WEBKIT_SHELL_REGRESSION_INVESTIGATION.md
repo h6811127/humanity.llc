@@ -1,7 +1,7 @@
 # Investigation: Safari / WebKit shell regression (scroll, dot, hub)
 
 **Date opened:** 2026-05-26  
-**Status:** **Resolved** for primary UX/rate-limit incident — production sign-off after [`277d08e`](https://github.com/h6811127/humanity.llc/commit/277d08e35f78316948a4dcb866c5902231d73a80) (reverts global `initDeviceOsCoordinator()` auto-start). See [`UI_UX_REVERT_PLAN.md`](UI_UX_REVERT_PLAN.md) § Resolution. Remaining WebKit polish (scroll, dot flake) tracked separately if needed.  
+**Status:** **Resolved** for primary UX/rate-limit incident - production sign-off after [`277d08e`](https://github.com/h6811127/humanity.llc/commit/277d08e35f78316948a4dcb866c5902231d73a80) (reverts global `initDeviceOsCoordinator()` auto-start). See [`UI_UX_REVERT_PLAN.md`](UI_UX_REVERT_PLAN.md) § Resolution. Remaining WebKit polish (scroll, dot flake) tracked separately if needed.  
 **Owners:** Device shell UX  
 **Related:** [`UI_UX_REVERT_PLAN.md`](UI_UX_REVERT_PLAN.md) · [`IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md`](IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md) · [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md)
 
@@ -9,18 +9,18 @@
 
 ## Executive summary
 
-After the May 25–26 device-inbox + scroll-chrome landing, **production was broken or flaky on WebKit profiles that stress the new shell** (iPhone Safari, Mac Safari) — lag, dead taps, and Cloudflare **“temporarily rate limited”** under multi-tab use.
+After the May 25–26 device-inbox + scroll-chrome landing, **production was broken or flaky on WebKit profiles that stress the new shell** (iPhone Safari, Mac Safari) - lag, dead taps, and Cloudflare **“temporarily rate limited”** under multi-tab use.
 
-**Production fix (2026-05-26):** commit **`277d08e`** — stop auto-starting `initDeviceOsCoordinator()` from `device-status.mjs`. That **reverts the request storm** from coordinator wiring ([`7ef219d`](https://github.com/h6811127/humanity.llc/commit/7ef219d) pipeline + [`d520c9b`](https://github.com/h6811127/humanity.llc/commit/d520c9b) status bootstrap). Later commit `733ae5e` (sheet/CSS pre-cascade restore) was **not** the confirmed fix.
+**Production fix (2026-05-26):** commit **`277d08e`** - stop auto-starting `initDeviceOsCoordinator()` from `device-status.mjs`. That **reverts the request storm** from coordinator wiring ([`7ef219d`](https://github.com/h6811127/humanity.llc/commit/7ef219d) pipeline + [`d520c9b`](https://github.com/h6811127/humanity.llc/commit/d520c9b) status bootstrap). Later commit `733ae5e` (sheet/CSS pre-cascade restore) was **not** the confirmed fix.
 
 Earlier investigation themes still apply for secondary issues:
 
 This is **not** a “rewrite the hub” problem. It is a **convergence of**:
 
-1. **Document scroll + scroll-edge chrome** — global `scroll` listener, `top-chrome--edge-hidden`, and `body.shell-is-scrolling` run on the **landing document** and cause jank/strobe on iOS; **hub inner scroll does not use that path** and feels smooth when open.
-2. **Fragile status module graph** — one failed static import bricks the dot; only bootstrap has `?v=` cache-bust; Mac Safari shows **intermittent red error outline** across hard refreshes.
-3. **Sheet / pointer-events stack** — hub + inbox backdrops, float chrome `pointer-events` lace, fixed `transform` sheets; intermittent dead taps on iPhone and **dead dot after hard refresh on Mac Safari** even when the red ring is gone.
-4. **Test gap (mitigated)** — CI now runs **Chromium + WebKit** (`e2e/safari-shell-scroll.spec.ts`); manual iPhone sign-off still required ([`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P0-W).
+1. **Document scroll + scroll-edge chrome** - global `scroll` listener, `top-chrome--edge-hidden`, and `body.shell-is-scrolling` run on the **landing document** and cause jank/strobe on iOS; **hub inner scroll does not use that path** and feels smooth when open.
+2. **Fragile status module graph** - one failed static import bricks the dot; only bootstrap has `?v=` cache-bust; Mac Safari shows **intermittent red error outline** across hard refreshes.
+3. **Sheet / pointer-events stack** - hub + inbox backdrops, float chrome `pointer-events` lace, fixed `transform` sheets; intermittent dead taps on iPhone and **dead dot after hard refresh on Mac Safari** even when the red ring is gone.
+4. **Test gap (mitigated)** - CI now runs **Chromium + WebKit** (`e2e/safari-shell-scroll.spec.ts`); manual iPhone sign-off still required ([`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P0-W).
 
 **Private tab + cleared website data on iPhone still broken** rules out “stale cache only.” The remaining causes are **runtime WebKit behavior + shell scroll architecture**, possibly amplified by iOS **advanced privacy** warnings.
 
@@ -33,11 +33,11 @@ This is **not** a “rewrite the hub” problem. It is a **convergence of**:
 | **Tor Browser, Mac** (hard refresh) | Good | Good | Clean profile |
 | **Tor Browser, Android** (first visit) | Good | Good | Never visited before |
 | **iPad Safari** | Good | Good | Hard refresh method unknown |
-| **Mac Safari** (hard refresh) | — | **Dot not clickable** | Red ring **sometimes** on 1st refresh, gone on 2nd |
+| **Mac Safari** (hard refresh) | - | **Dot not clickable** | Red ring **sometimes** on 1st refresh, gone on 2nd |
 | **iPhone Safari** (normal) | **Very laggy** | **Sometimes** opens hub | Buttons often dead |
 | **iPhone Safari** (private) | **Still laggy** | Still broken | **Not** cache-only |
 | **iPhone Safari** (after clear website data) | **Still laggy** | Still flaky | **Not** storage-only |
-| **iPhone Safari** | — | Safari banner: *reduce advanced privacy protections* | See § Safari privacy banner |
+| **iPhone Safari** | - | Safari banner: *reduce advanced privacy protections* | See § Safari privacy banner |
 
 **Critical UX clue:** When the hub **is** open, **scrolling inside the hub is smooth**, but **scrolling the landing page remains painful**.
 
@@ -89,9 +89,9 @@ document.getElementById("top-chrome")?.dataset?.deviceStatusError
 
 | Property | Detail |
 |----------|--------|
-| **Mechanism** | `site/js/device-shell-chrome.mjs` — `scroll` listener → `shell-is-scrolling` + `top-chrome--edge-hidden` |
+| **Mechanism** | `site/js/device-shell-chrome.mjs` - `scroll` listener → `shell-is-scrolling` + `top-chrome--edge-hidden` |
 | **CSS** | Bar opacity 0.45 when edge-hidden; blur removed while `shell-is-scrolling` (`site/styles.css`) |
-| **Partial fix shipped** | `a1ab3fa` — inset floor, hysteresis, bottom guard; removed `content-visibility: auto` on landing |
+| **Partial fix shipped** | `a1ab3fa` - inset floor, hysteresis, bottom guard; removed `content-visibility: auto` on landing |
 | **Still reported** | iPhone still “laggy as fuck” after data clear + private tab |
 
 ### C. Dead buttons site-wide
@@ -142,10 +142,10 @@ device-status-bootstrap.mjs?v=N
        ├─ device-hub-sheet.mjs           (backdrop, body classes)
        ├─ device-inbox-sheet-loader.mjs  (lazy import → inbox sheet)
        ├─ device-hub-glance.mjs          (glance; inbox via loader)
-       ├─ device-shell-chrome.mjs        (scroll listener — desktop fine pointer only)
+       ├─ device-shell-chrome.mjs        (scroll listener - desktop fine pointer only)
        └─ device-os-coordinator.mjs        (debounced refresh → applyDot)
 
-Landing scroll (touch): body.shell-scroll-chrome-off — no document scroll listener
+Landing scroll (touch): body.shell-scroll-chrome-off - no document scroll listener
 
 Landing scroll (desktop): window scroll → edge-hidden + shell-is-scrolling
   (kill switch: localStorage hc_shell_scroll_chrome = "0")
@@ -160,7 +160,7 @@ Hub scroll (smooth):
 
 ## Fix plan
 
-### Phase 0 — Confirm failure mode (1 session, no code)
+### Phase 0 - Confirm failure mode (1 session, no code)
 
 On **broken** iPhone Safari (normal tab), Mac Safari (dot dead after hard refresh):
 
@@ -186,32 +186,32 @@ On **broken** iPhone Safari (normal tab), Mac Safari (dot dead after hard refres
 
 ---
 
-### Phase 1 — P0 ship (stop the bleeding)
+### Phase 1 - P0 ship (stop the bleeding)
 
 **Goal:** Reliable dot + hub on WebKit; landing scroll acceptable on iPhone.
 
 | # | Change | Files | Rationale |
 |---|--------|-------|-----------|
-| 1.1 | **Unified cache-bust for entire status graph** — single `DEVICE_SHELL_ASSET_VERSION`; append `?v=` to every path from `deviceStatusShellModulePaths()`; bump on all shell HTML | `device-status-shell-modules.mjs`, `index.html`, `create/`, `created/`, `wallet/` | Mac Safari intermittent red ring; postmortem P0 |
-| 1.2 | **Disable or heavily gate scroll-edge chrome on coarse pointer / iOS** — e.g. skip `initScrollEdgeChrome()` when `matchMedia('(pointer: coarse)')` or `navigator.userAgent` WebKit mobile; OR only enable after `matchMedia('(prefers-reduced-motion: no-preference)')` + desktop | `device-shell-chrome.mjs` | Private iPhone still laggy; hub-open smooth implicates document scroll listener |
+| 1.1 | **Unified cache-bust for entire status graph** - single `DEVICE_SHELL_ASSET_VERSION`; append `?v=` to every path from `deviceStatusShellModulePaths()`; bump on all shell HTML | `device-status-shell-modules.mjs`, `index.html`, `create/`, `created/`, `wallet/` | Mac Safari intermittent red ring; postmortem P0 |
+| 1.2 | **Disable or heavily gate scroll-edge chrome on coarse pointer / iOS** - e.g. skip `initScrollEdgeChrome()` when `matchMedia('(pointer: coarse)')` or `navigator.userAgent` WebKit mobile; OR only enable after `matchMedia('(prefers-reduced-motion: no-preference)')` + desktop | `device-shell-chrome.mjs` | Private iPhone still laggy; hub-open smooth implicates document scroll listener |
 | 1.3 | **Remove `shell-is-scrolling` blur/animation suppression on touch** (or entirely until reworked) | `site/styles.css`, `device-shell-chrome.mjs` | Strobe on scroll |
-| 1.4 | **Harden backdrop reconcile** — run on `visibilitychange` (visible), `focus`, and after `setHubSheetOpen(false)`; assert `pointer-events: none` when `hidden` | `device-hub-sheet.mjs`, `device-inbox-sheet.mjs` | Dead buttons / intermittent taps |
-| 1.5 | **iOS hit-test hardening** — `touch-action: manipulation` on `.shell-status-dot-btn`; `visibility: hidden` on collapsed hub/inbox sheets (in addition to `pointer-events: none`) | `device-shell.css` | WebKit fixed/transform hit testing per iPhone investigation doc |
-| 1.6 | **Reduce mobile backdrop cost** — `@media (pointer: coarse)` disable or lighten `backdrop-filter` on hub/inbox backdrops | `device-shell.css` | Main-thread GPU load on scroll |
+| 1.4 | **Harden backdrop reconcile** - run on `visibilitychange` (visible), `focus`, and after `setHubSheetOpen(false)`; assert `pointer-events: none` when `hidden` | `device-hub-sheet.mjs`, `device-inbox-sheet.mjs` | Dead buttons / intermittent taps |
+| 1.5 | **iOS hit-test hardening** - `touch-action: manipulation` on `.shell-status-dot-btn`; `visibility: hidden` on collapsed hub/inbox sheets (in addition to `pointer-events: none`) | `device-shell.css` | WebKit fixed/transform hit testing per iPhone investigation doc |
+| 1.6 | **Reduce mobile backdrop cost** - `@media (pointer: coarse)` disable or lighten `backdrop-filter` on hub/inbox backdrops | `device-shell.css` | Main-thread GPU load on scroll |
 
 **Acceptance (manual):**
 
 - iPhone Safari normal profile: landing scroll usable; dot opens hub 5/5 taps; landing settings row taps work.
-- Mac Safari: hard refresh 5× — no red ring; dot opens hub every time.
+- Mac Safari: hard refresh 5× - no red ring; dot opens hub every time.
 - Tor / iPad: no regression.
 
 ---
 
-### Phase 2 — P1 (confidence + regression gates)
+### Phase 2 - P1 (confidence + regression gates)
 
 | # | Change | Files |
 |---|--------|-------|
-| 2.1 | Playwright project **`webkit` + `iPhone 13 Pro`** — dot opens hub, `elementFromPoint` on dot, backdrop closed when collapsed, scroll + tap | `playwright.config.ts`, `e2e/device-status-dot.spec.ts`, new `e2e/safari-shell-scroll.spec.ts` |
+| 2.1 | Playwright project **`webkit` + `iPhone 13 Pro`** - dot opens hub, `elementFromPoint` on dot, backdrop closed when collapsed, scroll + tap | `playwright.config.ts`, `e2e/device-status-dot.spec.ts`, new `e2e/safari-shell-scroll.spec.ts` |
 | 2.2 | **Lazy dynamic import** of `device-inbox-sheet.mjs` from dot/inbox paths only | `device-status.mjs` | Shrinks blast radius of import failure (postmortem P2) |
 | 2.3 | **Vitest** for scroll chrome gating flag / backdrop reconcile | `worker/tests/` | |
 | 2.4 | Link this doc from [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) troubleshooting | docs | |
@@ -220,7 +220,7 @@ On **broken** iPhone Safari (normal tab), Mac Safari (dot dead after hard refres
 
 ---
 
-### Phase 3 — P2 (shell UX rethink if P1 insufficient)
+### Phase 3 - P2 (shell UX rethink if P1 insufficient)
 
 Only if **[`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P0-W** fails after P0–P2 + 3C deploy:
 
@@ -237,11 +237,11 @@ Only if **[`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P0-W** fails after P0–P2 + 3
 | Device | Landing scroll | Dot → hub | Landing buttons | Red ring after 5 reloads |
 |--------|----------------|-----------|-----------------|-------------------------|
 | iPhone Safari normal | smooth enough | 5/5 | 5/5 | 0/5 |
-| iPhone Safari private | — | 5/5 | — | — |
-| Mac Safari | — | 5/5 | — | 0/5 |
-| iPad Safari | — | 5/5 | — | — |
-| Tor Mac / Android | no regression | 5/5 | — | — |
-| Pixel 5 CI | — | E2E green | — | — |
+| iPhone Safari private | - | 5/5 | - | - |
+| Mac Safari | - | 5/5 | - | 0/5 |
+| iPad Safari | - | 5/5 | - | - |
+| Tor Mac / Android | no regression | 5/5 | - | - |
+| Pixel 5 CI | - | E2E green | - | - |
 
 ---
 
@@ -264,7 +264,7 @@ Only if **[`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P0-W** fails after P0–P2 + 3
 })();
 ```
 
-**Scroll-edge chrome (Phase 3A — off by default):** No document `scroll` listener unless opted in. Landing should scroll without `shell-is-scrolling` / `top-chrome--edge-hidden` toggling.
+**Scroll-edge chrome (Phase 3A - off by default):** No document `scroll` listener unless opted in. Landing should scroll without `shell-is-scrolling` / `top-chrome--edge-hidden` toggling.
 
 ```js
 // Re-enable desktop scroll-edge experiment (not recommended on WebKit):
@@ -318,7 +318,7 @@ document.body.classList.remove("shell-is-scrolling");
 | 2026-05-26 | Document opened; private iPhone failure elevates priority of scroll-chrome gating over cache-only narrative |
 | 2026-05-26 | Hub-smooth / landing-jank clue → treat `device-shell-chrome.mjs` document scroll listener as primary perf suspect |
 | 2026-05-26 | No ground-up rearchitecture; phased P0–P2 plan |
-| 2026-05-26 | **Incident closed:** fix **`277d08e`** — disable global OS coordinator auto-refresh (reverts **`7ef219d`** + **`d520c9b`** wiring) |
+| 2026-05-26 | **Incident closed:** fix **`277d08e`** - disable global OS coordinator auto-refresh (reverts **`7ef219d`** + **`d520c9b`** wiring) |
 
 ---
 
@@ -339,4 +339,4 @@ document.body.classList.remove("shell-is-scrolling");
 | 2026-05-26 | Phase 2.2b implemented (shared inbox loader; glance off static inbox graph) |
 | 2026-05-26 | Phase 3C implemented (scroll chrome localStorage kill switch) |
 | 2026-05-26 | P0-W manual acceptance added to `DEVICE_OS_QA.md`; doc status/architecture updated; 3A/3B gated on P0-W |
-| 2026-05-26 | **Incident closed:** production fix **`277d08e`** (revert global `initDeviceOsCoordinator`); reverts coordinator auto-start from **`7ef219d`** / **`d520c9b`**. `733ae5e` not the confirmed fix — see `UI_UX_REVERT_PLAN.md` § Resolution |
+| 2026-05-26 | **Incident closed:** production fix **`277d08e`** (revert global `initDeviceOsCoordinator`); reverts coordinator auto-start from **`7ef219d`** / **`d520c9b`**. `733ae5e` not the confirmed fix - see `UI_UX_REVERT_PLAN.md` § Resolution |

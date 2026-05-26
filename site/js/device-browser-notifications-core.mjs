@@ -1,6 +1,6 @@
 /**
  * Pure browser-alert helpers (testable).
- * @see docs/DEVICE_INBOX.md — background alerts v2
+ * @see docs/DEVICE_INBOX.md - background alerts v2
  */
 import { inboxWalletEntryLabel } from "./device-inbox-core.mjs?v=34";
 
@@ -27,7 +27,7 @@ export function isBrowserNotifEnabled(readStorage) {
 /** @typedef {'live_proof' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'card_disabled_since_visit'} InboxAlertKind */
 
 /**
- * v2 Phase C policy — only live proof may trigger OS notifications when the tab is hidden.
+ * v2 Phase C policy - only live proof may trigger OS notifications when the tab is hidden.
  * @param {InboxAlertKind} kind
  */
 export function inboxKindAllowsOsNotification(kind) {

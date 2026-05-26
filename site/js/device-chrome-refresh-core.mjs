@@ -4,6 +4,9 @@
  * @see docs/SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md P0
  */
 
+/** Debounce for cross-tab presence-driven chrome (longer than DEVICE_OS_DEBOUNCE_MS). */
+export const PRESENCE_CHROME_DEBOUNCE_MS = 1200;
+
 /** localStorage keys that must refresh chrome immediately (custody / wallet). */
 export const CHROME_REFRESH_IMMEDIATE_STORAGE_KEYS = new Set([
   "hc_wallet",
@@ -38,6 +41,22 @@ export function shouldRunChromeRefreshImmediate(rawPresenceActive, immediateRefr
  * @param {number | null} pendingTimerId
  * @returns {{ action: 'run_now' | 'schedule' | 'noop', clearTimer: boolean }}
  */
+/**
+ * @param {{ tabNotice: number, genericCount: number, orphanCount: number }} input
+ */
+export function presenceChromeFingerprint(input) {
+  return `${input.tabNotice}|${input.genericCount}|${input.orphanCount}`;
+}
+
+/**
+ * @param {string} previousFp
+ * @param {string} nextFp
+ */
+export function shouldSkipPresenceChromeRefresh(previousFp, nextFp) {
+  if (!previousFp || !nextFp) return false;
+  return previousFp === nextFp;
+}
+
 export function presenceChromeRefreshScheduleAction(rawPresenceActive, pendingTimerId) {
   if (!rawPresenceActive) {
     return { action: "run_now", clearTimer: true };

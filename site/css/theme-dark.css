@@ -518,6 +518,13 @@ html[data-theme="dark"] .wallet-active-detail {
   color: var(--shell-label);
 }
 
+html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
+  color: var(--shell-label-strong);
+  background: rgba(0, 0, 0, 0.28);
+  border-color: var(--shell-separator);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
 html[data-theme="dark"] .device-help-fab {
   color: var(--shell-label);
   background: rgba(28, 28, 30, 0.92);

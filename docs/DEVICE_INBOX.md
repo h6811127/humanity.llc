@@ -18,13 +18,15 @@ Three layers, one story:
 
 **Product sentence:** *Status dot = truth about device and network. Inbox badge = ordered actions on this device. Background alerts = high-urgency inbox items when the tab isn’t visible.*
 
-Do **not** collapse dot and badge into one control—they answer different questions.
+Do **not** collapse dot and badge into one control-they answer different questions.
+
+**Request budget (how inbox should feel):** Inbox items like `live_proof` may require Worker polls, but the product is **not** a 24/7 monitoring dashboard. Automatic live-proof discovery runs only when the steward **opts in** (**Watch for live proof**) and hub/inbox scope is active; otherwise use manual **Check for live proof** or open `/created/`. Strangers waiting on a scan page poll **their** session; stewards get OS alerts only when background alerts are on. Full policy: [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) (north star: *stranger pays urgency, steward pays intent*).
 
 ---
 
 ## Mental model (own the category)
 
-Treat actionable device state as a single **Device inbox** with three presentation tiers—not three unrelated features.
+Treat actionable device state as a single **Device inbox** with three presentation tiers-not three unrelated features.
 
 ```mermaid
 flowchart TB
@@ -80,11 +82,11 @@ Canonical `kind` values (target: one module `device-inbox-core.mjs`, Vitest-cove
 
 **Counting rules (codify in inbox core):**
 
-1. **Badge count = actionable inbox items only** — exclude informational resolver state (`resolver_degraded`).
-2. **Dot overlay = highest-priority inbox kind** — `proof_waiting` → `cross_tab_keys` → `card_disabled_since_visit` (see `dotOverlayFromCounts()` in `device-dot-state-core.mjs`).
-3. **No double-counting** — e.g. cross-tab banner/glance only when `tabNoticeCount === 0` (`device-cross-tab-visibility.mjs`).
-4. **Live proof** — N pending challenges may show as one inbox group with quantity N; badge may show total count or “1” per product choice; document in tests when unified.
-5. **Cross-tab keys (`cross_tab_keys`)** — Badge contribution = **count of other tabs with a fresh presence heartbeat**, not “every create tab you ever opened.” Only tabs that are **open**, hold `hc_created` signing keys, and have heartbeated within ~**6s** while **visible** appear (`device-tab-presence.mjs`, `PRESENCE_SHOW_MS` in `device-tab-presence-core.mjs`). Closing a tab clears its row on `pagehide`; background tabs do not heartbeat. Profiles in `hc_wallet_removed_profile_ids` (after **Remove from device**) surface as **`orphan_keys_removed`**, not generic cross-tab. **Phase 1 (shipped):** fingerprint-stable two-read show via `device-cross-tab-state-core.mjs`; known gaps (split listeners, scan banner bypass) — [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md), [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md). The numeric badge is the **sum of all inbox item counts** (live proof + cross-tab + unsaved-this-tab + card-disabled), so **3** does not necessarily mean three key tabs — see [`DEVICE_OS.md`](DEVICE_OS.md) § Cross-tab keys and [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md).
+1. **Badge count = actionable inbox items only** - exclude informational resolver state (`resolver_degraded`).
+2. **Dot overlay = highest-priority inbox kind** - `proof_waiting` → `cross_tab_keys` → `card_disabled_since_visit` (see `dotOverlayFromCounts()` in `device-dot-state-core.mjs`).
+3. **No double-counting** - e.g. cross-tab banner/glance only when `tabNoticeCount === 0` (`device-cross-tab-visibility.mjs`).
+4. **Live proof** - N pending challenges may show as one inbox group with quantity N; badge may show total count or “1” per product choice; document in tests when unified.
+5. **Cross-tab keys (`cross_tab_keys`)** - Badge contribution = **count of other tabs with a fresh presence heartbeat**, not “every create tab you ever opened.” Only tabs that are **open**, hold `hc_created` signing keys, and have heartbeated within ~**6s** while **visible** appear (`device-tab-presence.mjs`, `PRESENCE_SHOW_MS` in `device-tab-presence-core.mjs`). Closing a tab clears its row on `pagehide`; background tabs do not heartbeat. Profiles in `hc_wallet_removed_profile_ids` (after **Remove from device**) surface as **`orphan_keys_removed`**, not generic cross-tab. **Phase 1 (shipped):** fingerprint-stable two-read show via `device-cross-tab-state-core.mjs`; known gaps (split listeners, scan banner bypass) - [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md), [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md). The numeric badge is the **sum of all inbox item counts** (live proof + cross-tab + unsaved-this-tab + card-disabled), so **3** does not necessarily mean three key tabs - see [`DEVICE_OS.md`](DEVICE_OS.md) § Cross-tab keys and [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md).
 
 ---
 
@@ -101,7 +103,7 @@ Canonical `kind` values (target: one module `device-inbox-core.mjs`, Vitest-cove
 
 - Badge ring/count chroma follows `inboxBadgeChromaKind()` (amber live proof, blue cross-tab, red default).
 
-**Constraint (unchanged):** Do **not** add a numeric count on the dot — see [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
+**Constraint (unchanged):** Do **not** add a numeric count on the dot - see [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 
 ### Inbox badge (`#shell-notif-badge`)
 
@@ -112,7 +114,7 @@ Canonical `kind` values (target: one module `device-inbox-core.mjs`, Vitest-cove
 - Tap → **`openInboxFromChrome()`** opens compact inbox sheet (`device-inbox-sheet.mjs`); one row per live proof / cross-tab / tab notice with same CTAs as hub alerts.
 - On wallet, badge opens the same sheet (no hub expand + scroll).
 - `aria-label` from `inboxBadgeAriaLabel()` (phase 2).
-- Ring/count chroma in `site/css/device-shell.css`: `--live-proof` (#f59e0b), `--cross-tab` (#2563eb), default red — synced via `data-inbox-chroma` on `#shell-notif-badge`.
+- Ring/count chroma in `site/css/device-shell.css`: `--live-proof` (#f59e0b), `--cross-tab` (#2563eb), default red - synced via `data-inbox-chroma` on `#shell-notif-badge`.
 
 ### Hub alerts stack (`#device-hub-alerts-top`)
 
@@ -132,7 +134,7 @@ Canonical `kind` values (target: one module `device-inbox-core.mjs`, Vitest-cove
 
 **Shipped (phase 10):** `buildGlanceRowPlan()` in `device-inbox-core.mjs` orders inbox actionable rows, saved-card peek (max 3), and “N more”. Glance renders from that plan; since-visit suffix on saved rows uses `revokedHintProfileIds` and is suppressed when the profile is already on the `card_disabled_since_visit` inbox item.
 
-### Landing settings — Browser alerts
+### Landing settings - Browser alerts
 
 **Shipped:**
 
@@ -159,7 +161,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 | Permission | Requested on toggle enable in settings |
 | Limitation (v1) | Required a background tab before Phase D service worker |
 
-### v2 Phase A — Contextual opt-in (shipped)
+### v2 Phase A - Contextual opt-in (shipped)
 
 - While tab visible and live proof pending (not already opted in): inline strip at top of `#device-hub-alerts-top` / `#wallet-alerts-top`, plus compact copy in inbox sheet footer (`device-browser-notifications.mjs`).
 - Copy: *“Someone is waiting for live proof. Get an alert when this tab is in the background?”* · `[Turn on background alerts]` · `[Not now]`
@@ -167,13 +169,13 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 - If permission denied: blocked copy; inbox badge remains fallback.
 - Landing **Browser alerts** toggle unchanged (`data-device-browser-notif-toggle`).
 
-### v2 Phase B — Smarter payload (shipped)
+### v2 Phase B - Smarter payload (shipped)
 
 - OS notification **title** = card label; **body** = “Live proof waiting · tap to sign”.
 - Click → `buildLiveControlProofHref()` for first pending challenge (sign on `/created/`, not `/wallet/`).
 - First OS notification per session may use `requireInteraction` (`sessionStorage.hc_browser_notif_os_interact`).
 
-### v2 Phase C — Policy matrix (shipped)
+### v2 Phase C - Policy matrix (shipped)
 
 `inboxKindAllowsOsNotification()` in `device-browser-notifications-core.mjs`; `maybeNotifyLiveProof()` in `device-browser-notifications.mjs` gates OS alerts on `live_proof` only.
 
@@ -185,16 +187,16 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 | Card disabled since visit | No (defer digest) | Batch/digest, not instant |
 | Resolver offline/degraded | No | `#device-system-banner` |
 
-### v2 Phase D — Service Worker (shipped)
+### v2 Phase D - Service Worker (shipped)
 
-- **`/sw-live-proof.mjs`** — polls pending live-proof challenges when **no visible Humanity tab** and background alerts are on.
+- **`/sw-live-proof.mjs`** - polls pending live-proof challenges when **no visible Humanity tab** and background alerts are on.
 - Page sync: `device-browser-notifications-sw.mjs` mirrors wallet poll targets + resolver origin via `postMessage`; triggers poll on tab hide / `pagehide` and **Background Sync** / **Periodic Background Sync** when the browser grants them.
 - OS notification via `registration.showNotification()` (same copy + sign deep link as Phase B); click handled in the SW.
-- **No server push** — device-only polling, `live_proof` policy only (Phase C).
+- **No server push** - device-only polling, `live_proof` policy only (Phase C).
 - **Limits:** Browsers may throttle or deny periodic sync; fully force-quit browsers may not wake the SW. Hidden-tab alerts still use the page path first (`maybeNotifyLiveProof`).
 - **Request budget Phase 4:** SW polls only when alerts are on + permission granted + resolver health is `ok`; **one** challenge GET per wake (round-robin); **15 min** minimum `periodicSync` interval ([`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)).
 
-**Request budget (ops):** Live proof is the main Worker cost driver (N saved cards × 5s × parallel `GET` while a tab is visible). A single tab can burn **100k+ requests/day** without viral traffic. Background SW polls add more when opted in. See **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)** for math, targets, and phased plan to scope polling.
+**Request budget (ops):** Live proof was the main Worker cost driver (**legacy:** N cards × 5s × parallel `GET`). **Shipped mitigations:** hub/inbox scope, round-robin **one GET per tick**, 60s idle / 5s pending, watch **default off**, SW 15 min + alerts-only. Residual risk: large wallets + watch on + long hub sessions + parallel **Check network** fan-out. See **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)** for math, operating modes, and Phases 7–9.
 
 ---
 
@@ -219,7 +221,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 1. Blue `cross_tab_keys` overlay + badge (when this tab has no unsaved notice).
 2. Glance/hub row → `actOnOtherTabKeys()` (`device-notice-nav.mjs`).
 
-**Not OS push** — cross-tab is in-app chrome only. See [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) for surfaces, presence protocol, and failure modes.
+**Not OS push** - cross-tab is in-app chrome only. See [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) for surfaces, presence protocol, and failure modes.
 
 ---
 
@@ -228,7 +230,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 | Phase | Deliverable | Status |
 |-------|-------------|--------|
 | 0 | This document + cross-links in DEVICE_OS / STATUS_INDICATOR | ✅ |
-| 1 | `device-inbox-core.mjs` — `buildInboxItems()`, `inboxCountFromItems()`, `topInboxKind()` | ✅ |
+| 1 | `device-inbox-core.mjs` - `buildInboxItems()`, `inboxCountFromItems()`, `topInboxKind()` | ✅ |
 | 2 | Refactor `notificationCount()`, glance, dot overlay, badge ARIA to use core | ✅ (hub alert DOM still in `device-hub-ui.mjs`; same scroll targets) |
 | 3 | Inbox sheet from `#shell-notif-badge`; shared `openInboxFromChrome()` | ✅ |
 | 4 | Contextual browser-alert prompt + OS click deep link | ✅ |
@@ -237,7 +239,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 | 7 | Inbox diagnostics (`hc_inbox_diagnostics`, session log + confusion signals) | ✅ |
 | 8 | Hub alert groups gated on `getInboxItems()` (live proof, tab keys, cross-tab slot) | ✅ |
 | 9 | Hub card-disabled group (`#device-hub-card-disabled-group`) | ✅ |
-| 10 | `buildGlanceRowPlan()` — glance popover order from inbox + saved-card peek | ✅ |
+| 10 | `buildGlanceRowPlan()` - glance popover order from inbox + saved-card peek | ✅ |
 | 11 | Dot soft overlay for `card_disabled_since_visit` (`inboxOverlayCountsFromItems` + `dotOverlayFromCounts`) | ✅ |
 | 12 | `topInboxKind()` + `inboxDotOverlayFromItems()` aligned with overlay priority; hub sheet reconcile core + Vitest | ✅ |
 | 13 | Inbox sheet reconcile core + Vitest; `getInboxDotOverlay()` on status dot; E2E card-disabled dot overlay | ✅ |
@@ -254,7 +256,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 
 ---
 
-## Diagnostics (shipped — phase 7)
+## Diagnostics (shipped - phase 7)
 
 Enable: `localStorage.setItem("hc_inbox_diagnostics", "1")` (mirror dot diagnostics pattern). Log ring: `sessionStorage.hc_inbox_diag_log`.
 
@@ -273,7 +275,7 @@ Confusion signal: repeated `inbox_open` without `inbox_item_action` → copy or 
 
 The **status dot** and **inbox badge** are separate controls. Dot tap → hub sheet (`openHubFromChrome` in `device-status.mjs`). Badge tap → inbox sheet (`openInboxFromChrome` in `device-inbox-sheet.mjs`).
 
-Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox sheet module at load time. If that import graph fails (404, syntax error, missing deploy artifact), the dot can look normal in HTML but **never bind its click handler**. Diagnosis and engineering fix directions: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) — sections **Troubleshooting: dot tap appears dead** and **Fix directions (engineering)**.
+Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox sheet module at load time. If that import graph fails (404, syntax error, missing deploy artifact), the dot can look normal in HTML but **never bind its click handler**. Diagnosis and engineering fix directions: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) - sections **Troubleshooting: dot tap appears dead** and **Fix directions (engineering)**.
 
 ---
 
@@ -319,7 +321,7 @@ Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox 
 | `worker/tests/device-inbox-sheet-core.test.ts` | Vitest for inbox sheet reconcile |
 | `site/js/device-status-shell-modules.mjs` | Shared manifest for status-dot import graph (E2E + Vitest) |
 | `worker/tests/device-status-shell-modules.test.ts` | Vitest: every manifest file exists under `site/js/` |
-| `device-browser-notifications-core.mjs` | `isBrowserNotifEnabled()` — shared by page UI and `device-browser-notifications-sw.mjs` (phase 16) |
+| `device-browser-notifications-core.mjs` | `isBrowserNotifEnabled()` - shared by page UI and `device-browser-notifications-sw.mjs` (phase 16) |
 
 ---
 

@@ -1,7 +1,9 @@
 /**
- * Pure helpers for hub network / live-proof manual checks (request budget Phase 5).
+ * Pure helpers for hub network / live-proof manual checks (request budget Phases 5–8).
  * @see docs/DEVICE_OS_REQUEST_BUDGET.md
  */
+
+import { liveControlAutoPollBudgetPausedMessage } from "./device-live-control-poll-budget-core.mjs";
 
 export const STORAGE_WATCH_LIVE_PROOF = "hc_watch_live_proof";
 
@@ -33,6 +35,9 @@ export function shouldScheduleWalletNetworkFetchAfterHubRender(input) {
 }
 
 /**
+ * Opt-in automatic live-control polling (`localStorage.hc_watch_live_proof === "1"`).
+ * Unset or `"0"` is off (request budget / long-session default).
+ *
  * @param {() => string | null} [readStorage]
  */
 export function isWatchLiveProofEnabled(readStorage) {
@@ -45,9 +50,7 @@ export function isWatchLiveProofEnabled(readStorage) {
         return null;
       }
     });
-  const value = read();
-  if (value === "0") return false;
-  return true;
+  return read() === "1";
 }
 
 /**
@@ -79,9 +82,14 @@ export function formatLastCheckedRel(checkedAt, now = Date.now()) {
  *   networkCheckedAt?: number,
  *   liveProofCheckedAt?: number,
  *   now?: number,
+ *   autoPollBudgetPaused?: boolean,
+ *   liveProofWatchOn?: boolean,
  * }} input
  */
 export function formatHubNetworkStatusLine(input) {
+  if (input.autoPollBudgetPaused && input.liveProofWatchOn) {
+    return liveControlAutoPollBudgetPausedMessage();
+  }
   const now = input.now ?? Date.now();
   const parts = [];
   const networkRel = formatLastCheckedRel(input.networkCheckedAt ?? 0, now);

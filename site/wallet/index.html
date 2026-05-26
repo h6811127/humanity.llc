@@ -58,12 +58,12 @@
         hidden
       ></p>
 
-      <p
+      <div
         class="device-cross-tab-banner"
         id="device-cross-tab-banner"
         role="status"
         hidden
-      ></p>
+      ></div>
 
       <main
         class="screen screen-wallet screen-wallet-sleek wallet-hub"
@@ -136,10 +136,47 @@
           >
         </div>
 
-        <p class="wallet-strip-hint" id="wallet-tab-hint" hidden>
-          Keys are in another tab.
-          Save or manage in that tab’s card workspace, or tap <strong>Open workspace</strong> below.
-        </p>
+        <div
+          class="hc-emphasis-card hc-emphasis-card--info"
+          id="wallet-tab-hint"
+          hidden
+          role="status"
+        >
+          <div class="hc-emphasis-card__main">
+            <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
+            <div class="hc-emphasis-card__copy">
+              <p class="hc-emphasis-card__eyebrow" id="wallet-tab-hint-eyebrow">Keys in another tab</p>
+              <p class="hc-emphasis-card__title" id="wallet-tab-hint-title" hidden></p>
+              <p class="hc-emphasis-card__detail" id="wallet-tab-hint-detail"></p>
+            </div>
+          </div>
+          <div class="hc-emphasis-card__actions">
+            <button
+              type="button"
+              class="hc-emphasis-card__cta"
+              id="wallet-tab-hint-focus"
+              hidden
+            >
+              Open that tab
+            </button>
+            <button
+              type="button"
+              class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary"
+              id="wallet-tab-hint-use-keys"
+              hidden
+            >
+              Open controls here
+            </button>
+            <button
+              type="button"
+              class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary"
+              id="wallet-tab-hint-clear"
+              hidden
+            >
+              Clear keys on this device
+            </button>
+          </div>
+        </div>
 
         <div class="device-hub-search-block" id="device-hub-search-block" role="search">
           <label class="device-hub-search device-hub-search--inline" for="device-hub-search">
@@ -326,7 +363,7 @@
       </main>
     </div>
 
-    <script src="/js/device-status-bootstrap.mjs?v=39" type="module"></script>
+    <script src="/js/device-status-bootstrap.mjs?v=40" type="module"></script>
     <script src="/js/wallet-page.mjs?v=5" type="module"></script>
   </body>
 </html>

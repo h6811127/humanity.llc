@@ -4,7 +4,7 @@
  */
 
 export const LIVE_CONTROL_POLL_MS_ACTIVE = 5000;
-export const LIVE_CONTROL_POLL_MS_IDLE = 30_000;
+export const LIVE_CONTROL_POLL_MS_IDLE = 60_000;
 
 /** Minimum gap between wallet network refreshes on tab visibility (Phase 2). */
 export const WALLET_NETWORK_VISIBILITY_REFRESH_MS = 60_000;
@@ -29,7 +29,6 @@ export function liveControlPollIntervalMs(pendingCount) {
 export function liveControlPollingShouldRun(scope) {
   if (scope.inboxSheetOpen) return true;
   if (scope.hubExpanded) return true;
-  if (scope.walletPage && scope.watchEnabled === true) return true;
   return false;
 }
 
@@ -79,6 +78,8 @@ export function liveControlPollLoopShouldRun(input) {
  * }} input
  */
 export function liveControlAutoPollShouldRun(input) {
+  if (input.budgetExhausted === true) return false;
+  if (input.isPollLeader === false) return false;
   return (
     input.watchEnabled &&
     liveControlPollLoopShouldRun({

@@ -19,6 +19,8 @@ const WATCH_INPUT_ID = "device-hub-watch-live-proof";
  *   showLiveProof: boolean,
  *   getNetworkCheckedAt: () => number,
  *   getLiveProofCheckedAt: () => number,
+ *   getAutoPollBudgetPaused?: () => boolean,
+ *   getLargeWalletHint?: () => string | null,
  *   onCheckNetwork: () => void | Promise<void>,
  *   onCheckLiveProof: () => void | Promise<void>,
  *   onWatchChange: (enabled: boolean) => void,
@@ -38,6 +40,7 @@ export function mountHubNetworkTools(config) {
     toolbar.className = "device-hub-network-tools";
     toolbar.innerHTML = `
       <p class="device-hub-network-tools-status" id="${STATUS_ID}" role="status"></p>
+      <p class="device-hub-network-tools-hint" id="device-hub-large-wallet-hint" role="note" hidden></p>
       <div class="device-hub-network-tools-actions">
         <button type="button" class="btn-secondary device-hub-network-tools-btn" id="${CHECK_NETWORK_ID}" hidden>
           Check network
@@ -104,12 +107,26 @@ export function mountHubNetworkTools(config) {
     }
   }
 
+  const hintEl = toolbar.querySelector("#device-hub-large-wallet-hint");
+
   const renderStatus = () => {
     if (!statusEl) return;
     statusEl.textContent = formatHubNetworkStatusLine({
       networkCheckedAt: config.showNetwork ? config.getNetworkCheckedAt() : 0,
       liveProofCheckedAt: config.showLiveProof ? config.getLiveProofCheckedAt() : 0,
+      autoPollBudgetPaused: config.getAutoPollBudgetPaused?.() === true,
+      liveProofWatchOn: isWatchLiveProofEnabled(),
     });
+    if (hintEl instanceof HTMLElement) {
+      const hint = config.getLargeWalletHint?.() ?? null;
+      if (hint) {
+        hintEl.textContent = hint;
+        hintEl.hidden = false;
+      } else {
+        hintEl.textContent = "";
+        hintEl.hidden = true;
+      }
+    }
   };
 
   renderStatus();
@@ -119,6 +136,7 @@ export function mountHubNetworkTools(config) {
     const refresh = () => renderStatus();
     window.addEventListener("hc-hub-network-checked", refresh);
     window.addEventListener("hc-live-proof-checked", refresh);
+    window.addEventListener("hc-live-control-poll-budget-changed", refresh);
     window.addEventListener("storage", (e) => {
       if (e.key === STORAGE_WATCH_LIVE_PROOF && watchInput instanceof HTMLInputElement) {
         watchInput.checked = isWatchLiveProofEnabled();

@@ -1,7 +1,7 @@
 # Investigation: Laggy landing scroll after cross-tab inbox work (May 26)
 
 **Date:** 2026-05-26  
-**Status:** Root cause identified — fix tracked in [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md) Phase 2/5  
+**Status:** Root cause identified - fix tracked in [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md) Phase 2/5  
 **Related:** [`SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md`](SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md) · [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)
 
 ---
@@ -10,7 +10,7 @@
 
 **Laggy landing scroll returned after the May 26 cross-tab commits, not because document scroll-edge chrome was re-enabled** (`body.shell-scroll-chrome-off` is still on; `device-shell-chrome.mjs` has no `scroll` listener).
 
-The regression is **main-thread churn from inter-tab keys presence** (`localStorage` `hc_tab_keys_presence`, ~4s heartbeats) fanning out to **every open Humanity tab**, each running **multiple synchronous chrome refreshes** — especially `refreshSummary()` in `device-status.mjs`, which calls `applyDot()` with **`document.startViewTransition`** on every tick when the hub is closed.
+The regression is **main-thread churn from inter-tab keys presence** (`localStorage` `hc_tab_keys_presence`, ~4s heartbeats) fanning out to **every open Humanity tab**, each running **multiple synchronous chrome refreshes** - especially `refreshSummary()` in `device-status.mjs`, which calls `applyDot()` with **`document.startViewTransition`** on every tick when the hub is closed.
 
 **Your “6 keys in 6 tabs” setup is a strong match:** each tab with an active signing session heartbeats when visible; writes hit all other tabs via the `storage` event. More tabs ⇒ more events ⇒ more duplicate DOM/inbox work per second on the tab you are trying to scroll.
 
@@ -18,11 +18,11 @@ The regression is **main-thread churn from inter-tab keys presence** (`localStor
 
 | Commit | Role |
 |--------|------|
-| **`0f80ede`** | **Primary regressor** — orphan-keys inbox path, extra presence reads (`getOrphanRemovedTabsWithKeys`), heavier hub banner DOM, more `getInboxItems()` work per refresh. |
-| **`918c4ab`** | **Amplifier** — denylist reads on every `getOtherTabsWithKeys()`, extra `hc-tab-presence-changed` from `hc-wallet-removed-profiles-changed` / `purgePresenceForProfile`. |
-| **`b3ed164`** (May 24) | **Latent architecture** — wired `hc-tab-presence-changed` → full `refreshSummary()`; tolerable with fewer tabs / lighter inbox, not the May 26 trigger alone. |
+| **`0f80ede`** | **Primary regressor** - orphan-keys inbox path, extra presence reads (`getOrphanRemovedTabsWithKeys`), heavier hub banner DOM, more `getInboxItems()` work per refresh. |
+| **`918c4ab`** | **Amplifier** - denylist reads on every `getOtherTabsWithKeys()`, extra `hc-tab-presence-changed` from `hc-wallet-removed-profiles-changed` / `purgePresenceForProfile`. |
+| **`b3ed164`** (May 24) | **Latent architecture** - wired `hc-tab-presence-changed` → full `refreshSummary()`; tolerable with fewer tabs / lighter inbox, not the May 26 trigger alone. |
 
-**Not the cause:** `b8cfb11` (live-control poll scoped to hub/inbox/wallet — polling should **stop** on closed-hub landing). `14a9df8` (chrome inset floor + `ResizeObserver` only — no scroll-edge hide/show).
+**Not the cause:** `b8cfb11` (live-control poll scoped to hub/inbox/wallet - polling should **stop** on closed-hub landing). `14a9df8` (chrome inset floor + `ResizeObserver` only - no scroll-edge hide/show).
 
 ---
 
@@ -79,7 +79,7 @@ So one heartbeat on one machine with **six open tabs** can mean **six tabs × se
 On HEAD (`0f80ede`), each `refreshSummary()`:
 
 1. Calls **`applyDot()`** → often **`document.startViewTransition`** when hub is collapsed (no skip for presence-only overlay churn). Console may show `AbortError: Old view transition aborted…` under churn ([`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) § view transition noise).
-2. Calls **`getInboxItems()`** multiple times indirectly (`dotOverlayState`, `notificationCount`, banner `shouldShow*` paths, glance) — each **`gatherInboxInput()`** on HEAD runs card-disabled gather + **`getOtherTabsWithKeys()`** + **`getOrphanRemovedTabsWithKeys()`** (added in `0f80ede`) + live-control count.
+2. Calls **`getInboxItems()`** multiple times indirectly (`dotOverlayState`, `notificationCount`, banner `shouldShow*` paths, glance) - each **`gatherInboxInput()`** on HEAD runs card-disabled gather + **`getOtherTabsWithKeys()`** + **`getOrphanRemovedTabsWithKeys()`** (added in `0f80ede`) + live-control count.
 3. Re-renders cross-tab / orphan hub banner HTML.
 
 When the user scrolls the landing document for several seconds, a **visible-tab heartbeat can land mid-gesture** → single-frame jank spike. With many tabs, **background tabs also refresh** when any tab writes presence (wakes layout/badge paths if that tab is later focused).
@@ -99,10 +99,10 @@ When the user scrolls the landing document for several seconds, a **visible-tab 
 
 ## Reproduction hints
 
-1. Open **5–6** Humanity tabs on the same origin, each with **active signing keys** (different profiles or same — presence is per tab id).
+1. Open **5–6** Humanity tabs on the same origin, each with **active signing keys** (different profiles or same - presence is per tab id).
 2. Focus landing `/`, hub **closed**, scroll the main document for 10+ s.
-3. In Performance or logging, count `hc-tab-presence-changed` / `refreshSummary` — expect roughly **one burst per ~4s per visible tab**, plus bursts when **switching tabs** (new tab heartbeats immediately).
-4. Close all but one tab — scroll should feel **materially lighter** if presence fan-out is the dominant cost.
+3. In Performance or logging, count `hc-tab-presence-changed` / `refreshSummary` - expect roughly **one burst per ~4s per visible tab**, plus bursts when **switching tabs** (new tab heartbeats immediately).
+4. Close all but one tab - scroll should feel **materially lighter** if presence fan-out is the dominant cost.
 
 ---
 
@@ -113,7 +113,7 @@ Priority order aligned with cross-tab investigation **Path G** (partially presen
 1. **Debounce** `hc-tab-presence-changed` → `refreshSummary()` (`DEVICE_OS_DEBOUNCE_MS`, e.g. 300ms).
 2. **Coalesce** `gatherInboxInput()` within one refresh (50ms cache) so banner/dot/badge share one read.
 3. **Skip `startViewTransition`** when only cross-tab/orphan overlay changes (`shouldSkipCrossTabOverlayViewTransition`).
-4. **Single chrome coordinator** for presence (one listener → one `refreshSummary`, drop duplicate banner/glance passes) — longer term.
+4. **Single chrome coordinator** for presence (one listener → one `refreshSummary`, drop duplicate banner/glance passes) - longer term.
 5. **Operational:** reduce open Humanity tabs with keys during heavy landing use; use **Clear keys on this device** / close orphan tabs after remove (`0f80ede` UX).
 
 ---

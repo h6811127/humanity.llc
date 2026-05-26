@@ -517,11 +517,11 @@ body.page-flow.has-shell-chrome .page > main.screen {
   margin: 0 var(--pad) 8px;
 }
 
-.device-cross-tab-banner {
+.device-cross-tab-banner:not(.hc-emphasis-card) {
   margin: 0 var(--pad) 8px;
 }
 
-.device-cross-tab-banner a {
+.device-cross-tab-banner:not(.hc-emphasis-card) a {
   color: inherit;
   font-weight: 600;
 }
@@ -5754,6 +5754,37 @@ details[open] > .created-advanced-summary::after {
 .wallet-active-link:active {
   opacity: 0.88;
   transform: scale(0.98);
+}
+
+.hc-emphasis-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+  max-width: 100%;
+}
+
+.hc-emphasis-card__cta--secondary {
+  color: var(--black);
+  background: rgba(255, 255, 255, 0.72);
+  border: 0.5px solid rgba(60, 60, 67, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.hc-emphasis-card__cta--secondary:active {
+  opacity: 0.82;
+}
+
+.device-cross-tab-banner.hc-emphasis-card,
+#wallet-tab-hint.hc-emphasis-card {
+  margin: 0 0 14px;
+}
+
+.device-cross-tab-banner.hc-emphasis-card {
+  margin-left: var(--pad);
+  margin-right: var(--pad);
 }
 
 .hc-emphasis-card__dot {

@@ -177,7 +177,7 @@ Always document **cause** and **appeal path** per Human Verification HV-FR-40.
 
 - Publish flag output on scan pages or public APIs
 - Auto-suspend from heuristics alone (**O-04**)
-- Treat flags as proof of guilt—they are **review queue items**
+- Treat flags as proof of guilt-they are **review queue items**
 - Share raw graph exports with PII in public channels
 
 ---

@@ -1,5 +1,5 @@
 /**
- * Hub frontend pipeline — tab presence, live-control inbox, wallet network, status counts.
+ * Hub frontend pipeline - tab presence, live-control inbox, wallet network, status counts.
  * @see docs/DEVICE_HUB_AND_LOCAL_SEARCH.md § Optional hub polish
  */
 import { describe, expect, it } from "vitest";

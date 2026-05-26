@@ -59,7 +59,7 @@ function resolveExtendSigner(
 
 /**
  * POST /.well-known/hc/v1/cards/{profile_id}/qr/extend
- * Body: { qr_credential } — extends active card-scoped QR expiry (M4.6).
+ * Body: { qr_credential } - extends active card-scoped QR expiry (M4.6).
  */
 export async function handlePostExtendQr(
   request: Request,

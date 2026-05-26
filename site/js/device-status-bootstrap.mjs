@@ -1,6 +1,6 @@
 /**
  * Loads device-status.mjs; surfaces load failures on #top-chrome.
- * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md — Fix directions §1
+ * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md - Fix directions §1
  */
 import { DEVICE_SHELL_ASSET_VERSION } from "./device-status-shell-modules.mjs";
 

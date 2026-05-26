@@ -1,4 +1,4 @@
-# Device hub (Phase 10) — repair spec
+# Device hub (Phase 10) - repair spec
 
 **Date:** 2026-05-25  
 **Status:** Audit complete · repair slices 1–5 implemented  
@@ -82,7 +82,7 @@
 |------|----------|----------------|
 | Poll pending | Every 5s, saved rows with `qr_id` | `device-live-control-inbox.mjs` |
 | Open sign | `/created/?…&live_challenge=` | `openLiveControlProof` |
-| **Not on `/created/`** | DEVICE_OS § Live-control inbox | **Violated** — `create-hub.mjs` enables inbox |
+| **Not on `/created/`** | DEVICE_OS § Live-control inbox | **Violated** - `create-hub.mjs` enables inbox |
 
 ### 5. Vouch return-to-scan (recent)
 
@@ -109,7 +109,7 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 ## Mismatches only
 
-### P0 — False or sticky “card disabled since last visit”
+### P0 - False or sticky “card disabled since last visit”
 
 | ID | Gap |
 |----|-----|
@@ -125,7 +125,7 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 ---
 
-### P0 — Placement / doc violations
+### P0 - Placement / doc violations
 
 | ID | Gap |
 |----|-----|
@@ -134,7 +134,7 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 ---
 
-### P1 — Tests and CI drift
+### P1 - Tests and CI drift
 
 | ID | Gap |
 |----|-----|
@@ -143,7 +143,7 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 ---
 
-### P1 — Data model drift
+### P1 - Data model drift
 
 | ID | Gap |
 |----|-----|
@@ -152,7 +152,7 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 ---
 
-### P2 — Doc drift (DEVICE_HUB_AND_LOCAL_SEARCH vs DEVICE_OS)
+### P2 - Doc drift (DEVICE_HUB_AND_LOCAL_SEARCH vs DEVICE_OS)
 
 | ID | Gap |
 |----|-----|
@@ -161,7 +161,7 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 ---
 
-### P2 — Resolver / status edge cases
+### P2 - Resolver / status edge cases
 
 | ID | Gap |
 |----|-----|
@@ -176,7 +176,7 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 - Pins are bookmarks only (`device-pins.mjs`).
 - Search is client-side over wallet/pins/activity (`device-hub-search.mjs`).
 - Baseline semantics (`card_revoked` only, not `qr_revoked`) match `wallet-network-baseline.mjs` tests.
-- Cache bypass when cached `card_revoked` disagrees with baseline (`shouldUseCachedNetworkStatus`) — implemented; hub/inbox alerts honor resolver-confirmed poll (Slices 1–4).
+- Cache bypass when cached `card_revoked` disagrees with baseline (`shouldUseCachedNetworkStatus`) - implemented; hub/inbox alerts honor resolver-confirmed poll (Slices 1–4).
 - Cross-tab presence + banner wiring exists per DEVICE_OS § Phase 8.
 - Wallet page hub expanded by default; landing focus mode hides intro sections.
 - Return-to-scan vouch: `hc_vouch_return_url` + hub **Use keys** passes `returnUrl` (recent commits).
@@ -185,7 +185,7 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 ## Repair slices (ordered)
 
-### Slice 1 — Network UI single source of truth (P0) ✅
+### Slice 1 - Network UI single source of truth (P0) ✅
 
 **Goal:** Chip + alert always use the same post-fetch `{ status, scanKind }`.
 
@@ -199,7 +199,7 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 ---
 
-### Slice 2 — Glance + snapshot safety (P0) ✅
+### Slice 2 - Glance + snapshot safety (P0) ✅
 
 - [x] Glance rows: use same post-fetch state as hub (listen to `hc-wallet-network-baseline-changed` / hub refresh, don’t infer from stale cache alone).
 - [x] `snapshotNetworkSeenOnExit`: only snapshot after fresh fetch timestamp or skip if cache `at` older than last successful fetch.
@@ -208,7 +208,7 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 ---
 
-### Slice 3 — Live-control inbox placement (P0 product) ✅
+### Slice 3 - Live-control inbox placement (P0 product) ✅
 
 - [x] Set `showLiveControlInbox: false` in `create-hub.mjs` **or** update `DEVICE_OS.md` if product wants inbox on created.
 
@@ -216,14 +216,14 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 ---
 
-### Slice 4 — E2E + integration tests (P1) ✅
+### Slice 4 - E2E + integration tests (P1) ✅
 
 - [x] Fix `e2e/device-os-wallet.spec.ts` to click **Use keys** (or role name from `device-hub-ui.mjs`).
 - [x] Add Playwright or Vitest case: saved card + mocked status `active` → no since-visit banner.
 
 ---
 
-### Slice 5 — Doc hygiene (P2) ✅
+### Slice 5 - Doc hygiene (P2) ✅
 
 - [x] Sync `DEVICE_HUB_AND_LOCAL_SEARCH.md` with removed help pill / current landing layout.
 - [x] Update `site/features/scan-ui.html` (regenerate via `generate-feature-pages.mjs` if needed).
@@ -231,7 +231,7 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 ---
 
-### Slice 6 — Post-investigation hardening (P1) ✅
+### Slice 6 - Post-investigation hardening (P1) ✅
 
 **Goal:** Close residual gaps after [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) (DH-15).
 
@@ -243,21 +243,21 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 ---
 
-### Slice 7 — Inbox parity + shared poll maps (P1) ✅
+### Slice 7 - Inbox parity + shared poll maps (P1) ✅
 
-**Goal:** DH-8 — same stale-cache false positive must not light inbox badge, dot overlay, or `#device-hub-card-disabled-group`.
+**Goal:** DH-8 - same stale-cache false positive must not light inbox badge, dot overlay, or `#device-hub-card-disabled-group`.
 
 - [x] `buildResolverConfirmedWalletPollMaps()` in `device-wallet-network.mjs` (hub + `gatherCardDisabledSinceVisitForInbox`).
-- [x] E2E: `device-inbox.spec.ts` — stale `hc_wallet_network_cache` + active resolver → no inbox/hub card-disabled UI.
+- [x] E2E: `device-inbox.spec.ts` - stale `hc_wallet_network_cache` + active resolver → no inbox/hub card-disabled UI.
 - [x] Vitest: `buildResolverConfirmedWalletPollMaps` in `device-wallet-network-confirmed.test.ts`.
 
 ---
 
-### Slice 8 — Incident closure + regression gates (P1) ✅
+### Slice 8 - Incident closure + regression gates (P1) ✅
 
 **Goal:** Close the false-positive incident with documented regression gates (mirrors Flow 2 Slice 8).
 
-- [x] `worker/tests/card-disabled-since-visit-regression.test.ts` — stale cache bypass, cache-only inbox guard, active poll + glance suffix, documented in investigation doc.
+- [x] `worker/tests/card-disabled-since-visit-regression.test.ts` - stale cache bypass, cache-only inbox guard, active poll + glance suffix, documented in investigation doc.
 - [x] `gatherCardDisabledSinceVisitForInbox()` integration: stale cache + active resolver poll → `[]` (`device-wallet-network-confirmed.test.ts`).
 - [x] Investigation status **Closed**; production verify steps remain in troubleshooting section.
 

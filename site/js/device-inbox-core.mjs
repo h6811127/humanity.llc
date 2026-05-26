@@ -1,5 +1,5 @@
 /**
- * Pure device inbox model — badge count, dot overlay inputs, glance copy.
+ * Pure device inbox model - badge count, dot overlay inputs, glance copy.
  * @see docs/DEVICE_INBOX.md
  */
 import {

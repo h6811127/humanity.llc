@@ -4,8 +4,18 @@
  */
 
 import { gatherInboxInput } from "./device-inbox.mjs?v=38";
-import { createdUrlForEntry, getTabSession } from "./device-keys.mjs";
+import { activateWalletEntry, createdUrlForEntry, getTabSession } from "./device-keys.mjs";
 import { loadWallet } from "./device-wallet.mjs";
+import {
+  ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX,
+  ORPHAN_KEYS_INBOX_TITLE,
+} from "./device-orphan-keys-nav-core.mjs";
+import {
+  actOnOrphanRemovedTabKeys,
+  clearOrphanKeysOnDevice,
+} from "./device-orphan-keys-nav.mjs";
+import { actOnOtherTabKeys, walletEntryForProfile } from "./device-notice-nav.mjs";
+import { escapeEmphasisHtml } from "./device-emphasis-card-html.mjs";
 
 /** @param {Record<string, unknown> | null} session */
 export function walletEntryForSession(session) {
@@ -24,23 +34,137 @@ export function walletEntryForSession(session) {
   };
 }
 
+/** @param {{ label?: string, handle?: string, profile_id: string }} entry */
+function labelForPresence(entry) {
+  if (entry.label) return entry.label;
+  if (entry.handle) return `@${entry.handle}`;
+  return `${String(entry.profile_id).slice(0, 12)}…`;
+}
+
+const TAB_HINT_MODIFIERS = ["active", "info", "warn", "urgent"];
+
+/** @param {HTMLElement} card @param {'active'|'info'|'warn'|'urgent'} modifier */
+function setTabHintModifier(card, modifier) {
+  card.classList.add("hc-emphasis-card");
+  for (const name of TAB_HINT_MODIFIERS) {
+    card.classList.remove(`hc-emphasis-card--${name}`);
+  }
+  card.classList.add(`hc-emphasis-card--${modifier}`);
+  const dot = card.querySelector(".hc-emphasis-card__dot");
+  if (dot) {
+    dot.className = `hc-emphasis-card__dot hc-emphasis-card__dot--${modifier === "active" ? "success" : modifier}`;
+  }
+}
+
+function hideTabHintActions() {
+  for (const id of ["wallet-tab-hint-focus", "wallet-tab-hint-use-keys", "wallet-tab-hint-clear"]) {
+    const el = document.getElementById(id);
+    if (el) el.hidden = true;
+  }
+}
+
+/** @param {HTMLElement | null} tabHint @param {ReturnType<typeof gatherInboxInput>} input */
 function setTabHint(tabHint, input) {
   if (!tabHint) return;
+
+  const eyebrow = document.getElementById("wallet-tab-hint-eyebrow");
+  const title = document.getElementById("wallet-tab-hint-title");
+  const detail = document.getElementById("wallet-tab-hint-detail");
+  const focusBtn = document.getElementById("wallet-tab-hint-focus");
+  const useKeysBtn = document.getElementById("wallet-tab-hint-use-keys");
+  const clearBtn = document.getElementById("wallet-tab-hint-clear");
+
+  hideTabHintActions();
+
   if (input.orphanRemovedEntries.length > 0) {
+    const entry = input.orphanRemovedEntries[0];
+    const label = escapeEmphasisHtml(labelForPresence(entry));
+    const extra =
+      input.orphanRemovedEntries.length > 1
+        ? ` (+${input.orphanRemovedEntries.length - 1} other tab${input.orphanRemovedEntries.length === 2 ? "" : "s"})`
+        : "";
+
+    setTabHintModifier(tabHint, "warn");
+    if (eyebrow) eyebrow.textContent = ORPHAN_KEYS_INBOX_TITLE;
+    if (title) {
+      title.hidden = false;
+      title.innerHTML = `${label}${extra}`;
+    }
+    if (detail) {
+      detail.textContent =
+        `${ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX} Open that tab to close it, or clear keys on this device.`;
+    }
+    if (focusBtn) focusBtn.hidden = false;
+    if (clearBtn) clearBtn.hidden = false;
     tabHint.hidden = false;
-    tabHint.textContent =
-      "Keys for a card you removed are still open in another tab. " +
-      "Open that tab to close it, or clear keys from the device hub.";
     return;
   }
+
   if (input.crossTabEntries.length > 0) {
+    const entry = input.crossTabEntries[0];
+    const label = escapeEmphasisHtml(labelForPresence(entry));
+    const extra =
+      input.crossTabEntries.length > 1
+        ? ` (+${input.crossTabEntries.length - 1} other tab${input.crossTabEntries.length === 2 ? "" : "s"})`
+        : "";
+    const walletEntry = walletEntryForProfile(entry.profile_id);
+
+    setTabHintModifier(tabHint, "info");
+    if (eyebrow) eyebrow.textContent = "Keys in another tab";
+    if (title) {
+      title.hidden = false;
+      title.innerHTML = `${label}${extra}`;
+    }
+    if (detail) {
+      detail.textContent =
+        "Save or manage in that tab’s card workspace, or open controls here on this page.";
+    }
+    if (focusBtn) focusBtn.hidden = false;
+    if (useKeysBtn) useKeysBtn.hidden = !walletEntry?.owner_private_key_b58;
     tabHint.hidden = false;
-    tabHint.innerHTML =
-      "Keys are in another tab. " +
-      "Save or manage in that tab’s card workspace, or tap <strong>Open workspace</strong> below.";
     return;
   }
+
+  if (title) title.hidden = true;
   tabHint.hidden = true;
+}
+
+let tabHintListenersBound = false;
+
+function ensureTabHintListeners() {
+  if (tabHintListenersBound) return;
+  tabHintListenersBound = true;
+
+  document.getElementById("wallet-tab-hint-focus")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    const input = gatherInboxInput();
+    if (input.orphanRemovedEntries.length > 0) {
+      actOnOrphanRemovedTabKeys(input.orphanRemovedEntries[0]);
+      return;
+    }
+    if (input.crossTabEntries.length > 0) {
+      actOnOtherTabKeys(input.crossTabEntries[0]);
+    }
+  });
+
+  document.getElementById("wallet-tab-hint-use-keys")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    const entry = gatherInboxInput().crossTabEntries[0];
+    if (!entry) return;
+    const walletEntry = walletEntryForProfile(entry.profile_id);
+    if (walletEntry?.owner_private_key_b58) {
+      activateWalletEntry(walletEntry);
+      window.dispatchEvent(new Event("hc-device-hub-changed"));
+    }
+  });
+
+  document.getElementById("wallet-tab-hint-clear")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    const entry = gatherInboxInput().orphanRemovedEntries[0];
+    if (entry && clearOrphanKeysOnDevice(entry)) {
+      window.dispatchEvent(new Event("hc-device-hub-changed"));
+    }
+  });
 }
 
 function refreshWalletActiveBanner() {
@@ -73,6 +197,7 @@ function refreshWalletActiveBanner() {
 export function refreshWalletContextFromChrome() {
   if (!document.getElementById("wallet-page")) return;
 
+  ensureTabHintListeners();
   const tabHint = document.getElementById("wallet-tab-hint");
   setTabHint(tabHint, gatherInboxInput());
   refreshWalletActiveBanner();

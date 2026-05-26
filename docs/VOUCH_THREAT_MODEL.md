@@ -10,7 +10,7 @@
 
 ## 1. Scope
 
-This document analyzes threats to **social vouch trust** on a single Humanity operator network in v1—not legal identity, not global biometric uniqueness, not commerce fulfillment.
+This document analyzes threats to **social vouch trust** on a single Humanity operator network in v1-not legal identity, not global biometric uniqueness, not commerce fulfillment.
 
 **In scope**
 
@@ -24,7 +24,7 @@ This document analyzes threats to **social vouch trust** on a single Humanity op
 
 **Security goal (realistic)**
 
-> Make **fraudulent or mistaken elevation to Vouched Human** expensive, visible, and reversible—not impossible.
+> Make **fraudulent or mistaken elevation to Vouched Human** expensive, visible, and reversible-not impossible.
 
 ---
 
@@ -53,7 +53,7 @@ This document analyzes threats to **social vouch trust** on a single Humanity op
 | **Coercer** | Force victim to seek vouches / stay vouched | Social, workplace, domestic (non-technical) |
 | **Integrator / scanner** | Over-trust label (treat as KYC) | Misread UI; omit live control |
 | **Platform attacker** | Forge/replay vouches, enumerate cards | Network MITM (TLS), endpoint abuse |
-| **AI operator** | Scale synthetic participation | LLM content; agents with stolen keys—not iris bypass |
+| **AI operator** | Scale synthetic participation | LLM content; agents with stolen keys-not iris bypass |
 
 ---
 
@@ -98,8 +98,8 @@ Impact: **L** low · **M** medium · **H** high (trust in network / harm to vouc
 
 | ID | Threat | Path | L | I | V1 controls | Gaps / residual |
 |----|--------|------|---|---|-------------|-----------------|
-| V-01 | **Forged vouch** | POST without valid signature | L | H | `verifySignedDocument` | — |
-| V-02 | **Replay nonce** | Re-submit same document | L | H | Nonce uniqueness | — |
+| V-01 | **Forged vouch** | POST without valid signature | L | H | `verifySignedDocument` | - |
+| V-02 | **Replay nonce** | Re-submit same document | L | H | Nonce uniqueness | - |
 | V-03 | **Wrong key signed** | Attacker uses another user's key material | M | H | Match voucher `public_key` | User must protect `hc_created` / backup |
 | V-04 | **Stolen session keys** | XSS/malware reads `sessionStorage` | M | H | Session tab scope; optional PIN/device unlock before sign | **auto-activate default** still increases blast radius on shared device if unlock not enabled |
 | V-05 | **Backup exfiltration** | `.hcbackup` stolen | M | H | User-held export | No HSM; steward keys high value |
@@ -115,7 +115,7 @@ Impact: **L** low · **M** medium · **H** high (trust in network / harm to vouc
 | G-02 | **Rotating 3-cycle** | A→B→C→A acyclic ring | M | H | Distinct vouchers per vouchee | **Does not trigger closed_loop_only**; needs clique review / shared-set flags |
 | G-03 | **Quota burst** | 5 issuances in 24h | M | M | `burst_at_quota_boundary` | Legitimate events possible; triage |
 | G-04 | **Shared voucher set** | Two vouchees, ≥75% same vouchers | M | M | `shared_voucher_set` flag | Heuristic; false positives |
-| G-05 | **Revoke–re-vouch quota reset** | Revoke to free slot | L | M | Quota counts **all** issuances in window | — (mitigated) |
+| G-05 | **Revoke–re-vouch quota reset** | Revoke to free slot | L | M | Quota counts **all** issuances in window | - (mitigated) |
 | G-06 | **Revoke–re-vouch trust swing** | Revoke drops vouchee below VH | M | M | Summary recalc | Vouchee can re-seek vouches; churn |
 | G-07 | **Outsider laundries** | Ring vouches “clean” fourth party | M | H | Need 3 distinct per target | Hard to detect without broader graph analytics |
 | G-08 | **Steward ring** | Stewards only vouch each other's alts | L | H | Audit + governance | Bootstrap trust is concentrated |
@@ -143,7 +143,7 @@ Impact: **L** low · **M** medium · **H** high (trust in network / harm to vouc
 | ID | Threat | Path | L | I | V1 controls | Gaps / residual |
 |----|--------|------|---|---|-------------|-----------------|
 | I-01 | **Sticker bearer = owner** | Show VH QR on merch | H | H | Bearer warning; limitations | Users skip copy |
-| I-02 | **VH = KYC** | Gate banking/hiring on label | M | H | Copy + trust model | **Integrator misuse**—policy docs only v1 |
+| I-02 | **VH = KYC** | Gate banking/hiring on label | M | H | Copy + trust model | **Integrator misuse**-policy docs only v1 |
 | I-03 | **Stale trust** | Old vouches, active card | M | M | `latest_accepted_vouch_at` | Integrators must set recency policy |
 | I-04 | **Cached scan** | Show old VH after revoke | M | M | Short TTL / status fetch | CDN/browser cache discipline |
 | I-05 | **Profile enumeration** | Probe `profile_id` existence | M | L | Public scan URLs | By design for public cards |
@@ -205,7 +205,7 @@ Respond: suspend steward, rotate keys, revoke batch
 
 ## 7. Operator audit hooks (shipped)
 
-`listVouchAuditFlags` (`worker/src/db/vouch-audit.ts`) — **not exposed on public scan**.
+`listVouchAuditFlags` (`worker/src/db/vouch-audit.ts`) - **not exposed on public scan**.
 
 | Flag | Meaning | Limitation |
 |------|---------|------------|
@@ -215,9 +215,9 @@ Respond: suspend steward, rotate keys, revoke batch
 | `directed_cycle_cluster` | SCC cycle cluster with density threshold | Heuristic; can include benign cohorts |
 | `steward_issuance_burst` | Steward issued N vouches in burst window (default 3/24h) | Event onboarding can look similar |
 
-**Steward review queue:** Step 1+2 shipped — runbook + operator API + dismiss notes API + operator UI prototype with steward entry point from `/created/` Advanced. See [`VOUCH_STEWARD_REVIEW_RUNBOOK.md`](VOUCH_STEWARD_REVIEW_RUNBOOK.md).
+**Steward review queue:** Step 1+2 shipped - runbook + operator API + dismiss notes API + operator UI prototype with steward entry point from `/created/` Advanced. See [`VOUCH_STEWARD_REVIEW_RUNBOOK.md`](VOUCH_STEWARD_REVIEW_RUNBOOK.md).
 
-`GET /.well-known/hc/v1/operator/vouch-audit-flags` (Bearer `OPERATOR_AUDIT_TOKEN`) — **not exposed on public scan**.
+`GET /.well-known/hc/v1/operator/vouch-audit-flags` (Bearer `OPERATOR_AUDIT_TOKEN`) - **not exposed on public scan**.
 
 ---
 
@@ -227,7 +227,7 @@ Respond: suspend steward, rotate keys, revoke batch
 |--------|--------------|------------|
 | `closed_loop_only` | Review voucher + related IDs | Suspend if farm; request revocations |
 | `burst_at_quota_boundary` | Confirm steward legitimacy | Freeze steward POST if stolen keys suspected |
-| `shared_voucher_set` | Check for clique or duplicate humans | Cross-check creation IP/time (if logged—policy) |
+| `shared_voucher_set` | Check for clique or duplicate humans | Cross-check creation IP/time (if logged-policy) |
 | User report wrongful vouch | Guide voucher to revoke | Governance appeal if voucher refuses |
 | Integrator KYC misuse | Document denial; publish policy snippet | No protocol change |
 
@@ -281,9 +281,9 @@ Add to program register: `docs/V1_ASSUMPTION_REGISTER.md` (VT-* series).
 
 ## 12. Related docs
 
-- [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md) — product promise, what we own
-- [`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md) — UX, privacy, implementation map
-- [`V1_ADVERSARIAL_REVIEW.md`](V1_ADVERSARIAL_REVIEW.md) § Perspective 1 — cross-cutting abuser
-- [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) — Level 2 boundaries
-- [`VOUCH_INTEGRATOR_POLICY_GUIDE.md`](VOUCH_INTEGRATOR_POLICY_GUIDE.md) — integrator policy object, recency, live control
-- [`features/Human Verification v1.0.md`](features/Human%20Verification%20v1.0.md) — requirements & risks
+- [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md) - product promise, what we own
+- [`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md) - UX, privacy, implementation map
+- [`V1_ADVERSARIAL_REVIEW.md`](V1_ADVERSARIAL_REVIEW.md) § Perspective 1 - cross-cutting abuser
+- [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) - Level 2 boundaries
+- [`VOUCH_INTEGRATOR_POLICY_GUIDE.md`](VOUCH_INTEGRATOR_POLICY_GUIDE.md) - integrator policy object, recency, live control
+- [`features/Human Verification v1.0.md`](features/Human%20Verification%20v1.0.md) - requirements & risks

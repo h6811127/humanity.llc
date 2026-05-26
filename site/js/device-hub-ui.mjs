@@ -45,9 +45,12 @@ import {
   buildResolverConfirmedWalletPollMaps,
   getLatestResolvedAlertState,
   getNetworkLastSeenBaseline,
+  getWalletNetworkTruthChipStatus,
   hasLatestResolverNetworkPoll,
   CARD_REVOKED_ALERT_STATE,
+  isSinceVisitBlockedChipStatus,
   recordNetworkSeen,
+  listWalletEntriesNeedingNetworkFetch,
   refreshWalletNetworkStatuses,
   shouldSuppressCardDisabledSinceVisitForProfile,
   snapshotNetworkSeenOnExit,
@@ -92,9 +95,20 @@ import {
   applyLiveControlWatchPreference,
   getLastLiveProofCheckAt,
   enableLiveControlInboxPolling,
+  isLiveControlAutoPollBudgetPaused,
   isLiveControlInboxPollingActive,
   LIVE_CONTROL_POLL_SCOPE_CHANGED,
 } from "./device-live-control-inbox.mjs";
+import {
+  isLargeWallet,
+  largeWalletHint,
+  selectNetworkRefreshEntries,
+  walletNetworkMaxParallel,
+} from "./device-wallet-scale-core.mjs";
+import {
+  shouldScheduleWalletNetworkFetchAfterHubRender,
+  WALLET_NETWORK_HUB_FETCH_DEBOUNCE_MS,
+} from "./device-hub-network-tools-core.mjs";
 import {
   isDeviceHubExpanded,
   walletNetworkVisibilityRefreshAllowed,
@@ -418,7 +432,12 @@ function hubCardMenuHtml(entry, menuControls) {
 }
 
 function currentNetworkStatus(profileId, statusMap = {}) {
-  return statusMap[profileId] ?? getCachedNetworkStatus(profileId) ?? "checking";
+  if (statusMap[profileId] != null && statusMap[profileId] !== "") {
+    return statusMap[profileId];
+  }
+  const truthChip = getWalletNetworkTruthChipStatus(profileId);
+  if (truthChip != null && truthChip !== "") return truthChip;
+  return getCachedNetworkStatus(profileId) ?? "checking";
 }
 
 function currentNetworkScanKind(profileId, scanKindMap = {}) {
@@ -512,7 +531,7 @@ function applyRevokedSinceVisitAlerts(
       return;
     }
     const netStatus = String(currentNetworkStatus(pid, _statusMap) || "").toLowerCase();
-    if (netStatus === "offline" || netStatus === "error") {
+    if (isSinceVisitBlockedChipStatus(netStatus)) {
       setRevokedSinceVisitAlertVisible(li, pid, false);
       return;
     }
@@ -534,7 +553,7 @@ function applyRevokedSinceVisitAlerts(
     );
     if (show && allowShow) {
       setRevokedSinceVisitAlertVisible(li, pid, true);
-    } else if (!show) {
+    } else {
       setRevokedSinceVisitAlertVisible(li, pid, false);
     }
   });
@@ -580,6 +599,9 @@ function reapplyRevokedSinceVisitFromLatestResolved() {
 }
 
 let lastWalletNetworkFetchAt = 0;
+/** @type {ReturnType<typeof setTimeout> | null} */
+let walletNetworkFetchTimer = null;
+let walletNetworkRefreshCursor = 0;
 
 export const HUB_NETWORK_CHECKED_EVENT = "hc-hub-network-checked";
 
@@ -587,11 +609,36 @@ export function getLastWalletNetworkCheckedAt() {
   return lastWalletNetworkFetchAt;
 }
 
-async function fetchAndApplyNetworkChips() {
+function applyCachedNetworkChipsOnly() {
+  if (!savedList) return;
+  const entries = loadWallet();
+  if (entries.length === 0) return;
+  applyNetworkChipsToDom(
+    Object.fromEntries(
+      entries.map((e) => [e.profile_id, getCachedNetworkStatus(e.profile_id) ?? "checking"])
+    )
+  );
+}
+
+function scheduleWalletNetworkFetch() {
+  if (walletNetworkFetchTimer != null) {
+    clearTimeout(walletNetworkFetchTimer);
+  }
+  walletNetworkFetchTimer = window.setTimeout(() => {
+    walletNetworkFetchTimer = null;
+    void fetchAndApplyNetworkChips();
+  }, WALLET_NETWORK_HUB_FETCH_DEBOUNCE_MS);
+}
+
+/**
+ * @param {{ manual?: boolean }} [opts]
+ */
+async function fetchAndApplyNetworkChips(opts = {}) {
   if (!hubConfig.fetchNetworkStatus || !savedList) return;
   lastWalletNetworkFetchAt = Date.now();
   const stored = loadWallet();
   if (stored.length === 0) return;
+  const manual = opts.manual === true;
   const { entries, changed: qrBackfill } = normalizeWalletQrIds(stored);
   if (qrBackfill) saveWallet(entries);
   const gen = bumpWalletNetworkApplyGen();
@@ -600,8 +647,38 @@ async function fetchAndApplyNetworkChips() {
       entries.map((e) => [e.profile_id, getCachedNetworkStatus(e.profile_id) ?? "checking"])
     )
   );
+
+  const staleEntries = listWalletEntriesNeedingNetworkFetch(entries);
+  let entriesToFetch = entries;
+  if (manual) {
+    entriesToFetch = staleEntries.length > 0 ? staleEntries : entries;
+  } else if (isLargeWallet(entries.length)) {
+    if (staleEntries.length === 0) {
+      window.dispatchEvent(
+        new CustomEvent(HUB_NETWORK_CHECKED_EVENT, {
+          detail: { at: lastWalletNetworkFetchAt },
+        })
+      );
+      return;
+    }
+    const session = getTabSession();
+    const picked = selectNetworkRefreshEntries(entries, {
+      walletSize: entries.length,
+      staleEntries,
+      activeProfileId:
+        session && typeof session.profile_id === "string" ? session.profile_id : null,
+      cursor: walletNetworkRefreshCursor,
+    });
+    walletNetworkRefreshCursor = picked.nextCursor;
+    entriesToFetch = picked.entries;
+  } else if (staleEntries.length > 0) {
+    entriesToFetch = staleEntries;
+  } else {
+    return;
+  }
+
   await refreshWalletNetworkStatuses(
-    entries,
+    entriesToFetch,
     ({
       statusMap,
       alertStateMap,
@@ -636,6 +713,7 @@ async function fetchAndApplyNetworkChips() {
     {
       generation: gen,
       isCurrentGeneration: () => gen === walletNetworkApplyGen,
+      maxParallel: walletNetworkMaxParallel(entries.length, { manual }),
     }
   );
 }
@@ -1032,7 +1110,20 @@ function renderSavedRows() {
     });
   });
 
-  void fetchAndApplyNetworkChips();
+  const hubEl = document.getElementById("device-hub");
+  const hubExpanded = isDeviceHubExpanded(hubEl);
+  const onWalletPage = document.body.classList.contains("page-wallet");
+  if (
+    shouldScheduleWalletNetworkFetchAfterHubRender({
+      fetchNetworkStatus: hubConfig.fetchNetworkStatus,
+      onWalletPage,
+      hubExpanded,
+    })
+  ) {
+    scheduleWalletNetworkFetch();
+  } else {
+    applyCachedNetworkChipsOnly();
+  }
 }
 
 function renderPinRows() {
@@ -1215,7 +1306,9 @@ export function initDeviceHub(config = {}) {
       showLiveProof: hubConfig.showLiveControlInbox,
       getNetworkCheckedAt: getLastWalletNetworkCheckedAt,
       getLiveProofCheckedAt: getLastLiveProofCheckAt,
-      onCheckNetwork: () => fetchAndApplyNetworkChips(),
+      getAutoPollBudgetPaused: () => isLiveControlAutoPollBudgetPaused(),
+      getLargeWalletHint: () => largeWalletHint(loadWallet().length),
+      onCheckNetwork: () => fetchAndApplyNetworkChips({ manual: true }),
       onCheckLiveProof: () => checkLiveProofNow(),
       onWatchChange: () => applyLiveControlWatchPreference(),
     });
@@ -1301,22 +1394,9 @@ export function initDeviceHub(config = {}) {
     notifyHubChanged();
   });
 
-  window.addEventListener(NETWORK_REFRESHED, (e) => {
-    const detail = e?.detail;
-    if (
-      detail?.alertStateMap &&
-      detail?.resolverConfirmedMap &&
-      hubConfig.fetchNetworkStatus
-    ) {
-      applyRevokedSinceVisitAlerts(
-        detail.statusMap ?? {},
-        detail.alertStateMap,
-        detail.scanKindMap ?? {},
-        detail.resolverConfirmedMap
-      );
-    } else {
-      reapplyRevokedSinceVisitFromLatestResolved();
-    }
+  // A3/A5: chip + row banner apply together in fetchAndApplyNetworkChips onDone only.
+  // Do not apply banners here (NETWORK_REFRESHED fires before onDone; caused checking + banner split-brain).
+  window.addEventListener(NETWORK_REFRESHED, () => {
     syncHubInboxAlertGroups();
     refreshEmptyHint();
     notifyHubChanged();

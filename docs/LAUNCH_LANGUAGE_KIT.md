@@ -29,7 +29,7 @@ A signed card, a real vouch, and a right to revoke.
 
 ### Vouch positioning (do not overclaim)
 
-Vouch means **accountable humans signed a public, revocable attestation** under published rules—not iris proof, not legal ID, not “verified forever.” Do not say bot-proof or global personhood. Say **Vouched Human**, show count and recency, and link mechanism when challenged. Canonical doc: `docs/VOUCH_TRUST_POSITIONING.md`. Adversarial detail: `docs/VOUCH_THREAT_MODEL.md`.
+Vouch means **accountable humans signed a public, revocable attestation** under published rules-not iris proof, not legal ID, not “verified forever.” Do not say bot-proof or global personhood. Say **Vouched Human**, show count and recency, and link mechanism when challenged. Canonical doc: `docs/VOUCH_TRUST_POSITIONING.md`. Adversarial detail: `docs/VOUCH_THREAT_MODEL.md`.
 
 ---
 
@@ -388,6 +388,8 @@ A Humanity sticker does not prove who you are.
 That is the point.
 
 It is only a pointer to a live card status. Scan it, inspect it, and request live proof when the context needs more trust.
+
+**Steward devices:** Saving a card on a phone does not put the reference operator on the hook to poll that card forever. Network and live-proof checks are **when you look** or **when you opt in** — see [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 
 Static objects should not pretend to be identity.
 

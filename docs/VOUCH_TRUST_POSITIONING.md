@@ -10,7 +10,7 @@
 
 ## One-line promise
 
-> **Vouch** means accountable humans signed a public, revocable attestation under published rules—not a biometric proof that you are the only human on Earth.
+> **Vouch** means accountable humans signed a public, revocable attestation under published rules-not a biometric proof that you are the only human on Earth.
 
 Humanity Commons optimizes for **accountability at interaction time**, not a central **uniqueness registry**. In an age of cheap synthetic agents, deepfakes, and bot farms, that is the right trade for most community and high-trust workflows.
 
@@ -30,7 +30,7 @@ Biometric “proof of personhood” products (e.g. iris scanning at scale) rough
 - That anyone **knows** the person in a socially meaningful way
 - That the attestation is **revocable** without a central appeals desk
 
-Vouching answers a different question: *which already-trusted humans signed a public statement that they know this card as a distinct human—and can take it back?*
+Vouching answers a different question: *which already-trusted humans signed a public statement that they know this card as a distinct human-and can take it back?*
 
 ---
 
@@ -67,9 +67,9 @@ Do not lead with “bot-proof,” “sybil solved,” or graph-theory on the fir
 
 ## Threat model (summary)
 
-Full analysis: [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) — adversaries, 40+ threats with controls/gaps, attack trees, audit flags, steward playbook, integrator misuse.
+Full analysis: [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) - adversaries, 40+ threats with controls/gaps, attack trees, audit flags, steward playbook, integrator misuse.
 
-**Core insight (AI era):** Cheap synthetic personas raise the cost of **accountable, signed, revocable** attestations—they do not replace the need for biometrics at every interaction. The protocol’s job is to make **gaming Vouched Human** expensive and visible, not to prove global uniqueness.
+**Core insight (AI era):** Cheap synthetic personas raise the cost of **accountable, signed, revocable** attestations-they do not replace the need for biometrics at every interaction. The protocol’s job is to make **gaming Vouched Human** expensive and visible, not to prove global uniqueness.
 
 | Class | Examples | Primary v1 response |
 |-------|----------|---------------------|
@@ -88,7 +88,7 @@ Vouching is **sufficient** for **accountable participation** gates. It is **not 
 
 ## How Humanity owns “vouch”
 
-Own the category by making the **verb**, **artifact**, and **policy** precise—not by claiming to out-biometric Worldcoin.
+Own the category by making the **verb**, **artifact**, and **policy** precise-not by claiming to out-biometric Worldcoin.
 
 ### 1. Own the verb
 
@@ -141,7 +141,7 @@ Worldcoin owns the Orb line. Humanity owns **meet → load signing key → sign 
 
 - No iris warehouse, no phone/email/government ID required to create a card.
 - Trust from **humans willing to sign their name** (cryptographically) when they mean it.
-- Closer to how communities already work—with better receipts.
+- Closer to how communities already work-with better receipts.
 
 ---
 
@@ -189,10 +189,10 @@ Worldcoin owns the Orb line. Humanity owns **meet → load signing key → sign 
 
 ## Honest limits (say out loud)
 
-1. **No liveness at vouch time** — Policy and ritual; not a lab scan.
-2. **Cold start** — Early network needs stewards and founding vouches.
-3. **Sybil at scale** — Corruptible steward/vouch rings require audit and governance, not biometrics alone.
-4. **Trust ≠ character** — Vouch means humans backed the profile under rules, not “good actor.”
+1. **No liveness at vouch time** - Policy and ritual; not a lab scan.
+2. **Cold start** - Early network needs stewards and founding vouches.
+3. **Sybil at scale** - Corruptible steward/vouch rings require audit and governance, not biometrics alone.
+4. **Trust ≠ character** - Vouch means humans backed the profile under rules, not “good actor.”
 
 ---
 

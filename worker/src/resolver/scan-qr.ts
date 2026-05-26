@@ -28,7 +28,7 @@ export async function renderFramedScanQrSvg(scanUrl: string): Promise<string> {
 
 /**
  * Encodes the card scan URL as a branded red-on-white QR with a vector center logo.
- * Uses inline SVG — works in Cloudflare Workers (no node-canvas).
+ * Uses inline SVG - works in Cloudflare Workers (no node-canvas).
  */
 export async function renderScanQrMarkup(scanUrl: string): Promise<string> {
   const framed = await renderFramedScanQrSvg(scanUrl);
@@ -62,7 +62,7 @@ export async function renderPrintProofStickerFromScanUrl(
   });
 }
 
-/** @deprecated Use renderScanQrMarkup — kept for tests that expect data URLs */
+/** @deprecated Use renderScanQrMarkup - kept for tests that expect data URLs */
 export async function scanQrDataUrl(scanUrl: string): Promise<string> {
   assertOfficialScanUrl(scanUrl);
   return QRCode.toDataURL(scanUrl, {

@@ -9,6 +9,11 @@ import { reconcileRemovedProfilesAfterWalletSave } from "./device-wallet-removed
 
 export const WALLET_STORAGE_KEY = "hc_wallet";
 
+/** @type {string | null} */
+let walletCacheRaw = null;
+/** @type {Array<Record<string, unknown>> | null} */
+let walletCache = null;
+
 /** Matches resolver / pin parsing (`device-pins.mjs`). */
 const QR_ID_RE = /^qr_[1-9A-HJ-NP-Za-km-z_]{8,64}$/;
 
@@ -60,15 +65,26 @@ export function normalizeWalletQrIds(entries) {
 export function loadWallet() {
   try {
     const raw = localStorage.getItem(WALLET_STORAGE_KEY);
+    if (raw === walletCacheRaw && walletCache) {
+      return walletCache.slice();
+    }
     const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
+    const entries = Array.isArray(parsed) ? parsed : [];
+    walletCacheRaw = raw;
+    walletCache = entries;
+    return entries.slice();
   } catch {
+    walletCacheRaw = null;
+    walletCache = [];
     return [];
   }
 }
 
 export function saveWallet(entries) {
-  localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify(entries));
+  const serialized = JSON.stringify(entries);
+  walletCacheRaw = serialized;
+  walletCache = entries;
+  localStorage.setItem(WALLET_STORAGE_KEY, serialized);
   if (entries.length > 0) markScanOperatorFamiliar();
   reconcileRemovedProfilesAfterWalletSave(entries);
   window.dispatchEvent(new Event("hc-device-hub-changed"));

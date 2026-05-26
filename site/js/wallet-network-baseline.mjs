@@ -5,7 +5,7 @@
 /** Baseline / alert value when the card profile is disabled on the network. */
 export const CARD_REVOKED_ALERT_STATE = "card_revoked";
 
-/** Hub row alert (card-level disable only — not QR-only revoke). */
+/** Hub row alert (card-level disable only - not QR-only revoke). */
 export const CARD_DISABLED_SINCE_VISIT_ALERT_TEXT =
   "Card disabled on the network since your last visit.";
 
@@ -30,7 +30,7 @@ export function alertStateFromScanKind(scanKind, cardStatus) {
 const UNREACHABLE_CHIP_STATUSES = new Set(["error", "offline", "checking"]);
 
 /**
- * Alert baseline for a poll result — null when the network was not reached.
+ * Alert baseline for a poll result - null when the network was not reached.
  * @param {string | null | undefined} scanKind
  * @param {string | null | undefined} [chipOrCardStatus]
  * @returns {string | null}

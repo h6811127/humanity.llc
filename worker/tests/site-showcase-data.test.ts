@@ -11,7 +11,7 @@ const SHOWCASE_FILES = [
   "showcase-lost-item.json",
 ] as const;
 
-/** M5 runbook step 10 — landing showcase JSON must stay link-complete. */
+/** M5 runbook step 10 - landing showcase JSON must stay link-complete. */
 describe("site showcase data (M5 landing)", () => {
   for (const file of SHOWCASE_FILES) {
     it(`${file} has public scan_url for profile + qr`, () => {

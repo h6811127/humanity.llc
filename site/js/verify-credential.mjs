@@ -93,19 +93,19 @@ form?.addEventListener("submit", async (e) => {
 
     if (matchesPrint && matchesNetwork) {
       resultLead.textContent =
-        "Match — the printed code matches this object on the network.";
+        "Match - the printed code matches this object on the network.";
     } else if (matchesPrint && !networkCode) {
       resultLead.textContent =
         "Printed code matches this URL, but status JSON did not include credential_code (update resolver).";
     } else {
       resultLead.textContent =
-        "Mismatch — do not trust this sticker. The code does not match network status.";
+        "Mismatch - do not trust this sticker. The code does not match network status.";
     }
 
     addFact("Your code", code);
-    addFact("Expected from URL", expectedFromUrl ?? "—");
-    addFact("Network credential_code", networkCode ?? "—");
-    addFact("Scan kind", body?.scan?.kind ?? "—");
+    addFact("Expected from URL", expectedFromUrl ?? "-");
+    addFact("Network credential_code", networkCode ?? "-");
+    addFact("Scan kind", body?.scan?.kind ?? "-");
     if (body?.scan?.card?.handle) {
       addFact("Steward", `@${body.scan.card.handle}`);
     }

@@ -1,6 +1,6 @@
 /** Copy for Flow 2 F2-2 offline disclosure on public scan HTML. */
 export const SCAN_OFFLINE_BANNER_TEXT =
-  "Offline — status may be stale; refresh when connected.";
+  "Offline - status may be stale; refresh when connected.";
 
 /**
  * @param {boolean | undefined} isOnline `navigator.onLine`

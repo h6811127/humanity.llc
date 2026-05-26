@@ -55,7 +55,7 @@ This prevents repeat popups on refresh for users who already encountered it.
 - Copy:
   - Eyebrow: `Welcome`
   - Title: `Meet your device hub`
-  - Body: `One tap on the status dot opens everything saved on this device—cards, keys, and notices.`
+  - Body: `One tap on the status dot opens everything saved on this device-cards, keys, and notices.`
   - CTA hint: `Tap the dot above`
   - Button: `Got it`
 - Uses shared popover surface tokens from `docs/UI_COLOR_SCHEME_STANDARD.md` for light/dark contrast

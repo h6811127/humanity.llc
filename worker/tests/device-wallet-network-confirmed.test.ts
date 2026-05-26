@@ -124,6 +124,48 @@ describe("isResolverConfirmedProfile", () => {
     expect(isResolverConfirmedProfile(PROFILE_A)).toBe(false);
   });
 
+  it("G2: cache-only poll clears stale latestResolved when cache scanKind disagrees", async () => {
+    localStore.set(
+      "hc_wallet_last_seen_network",
+      JSON.stringify({ [PROFILE_A]: "active" })
+    );
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        scan: {
+          kind: "card_revoked",
+          card: { status: "revoked", handle: "e2e", manifesto_line: "Test" },
+        },
+      }),
+    } as Response);
+
+    await refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }]);
+    expect(buildResolverConfirmedWalletPollMaps()?.scanKindMap[PROFILE_A]).toBe(
+      "card_revoked"
+    );
+
+    const now = Date.now();
+    sessionStore.set(
+      "hc_wallet_network_cache",
+      JSON.stringify({
+        [PROFILE_A]: {
+          status: "active",
+          scanKind: "active",
+          verificationLabel: null,
+          verificationState: null,
+          at: now,
+        },
+      })
+    );
+    fetchMock.mockClear();
+
+    await refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }]);
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(buildResolverConfirmedWalletPollMaps()).toBeNull();
+    expect(gatherCardDisabledSinceVisitForInbox()).toEqual([]);
+  });
+
   it("gatherCardDisabledSinceVisitForInbox is empty after active poll despite stale cache", async () => {
     const now = Date.now();
     sessionStore.set(

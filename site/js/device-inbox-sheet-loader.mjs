@@ -1,6 +1,6 @@
 /**
- * Lazy loader for inbox sheet — shared by device-status and hub glance.
- * @see docs/UI_UX_SAFE_REBUILD_IMPLEMENTATION.md — Step 2
+ * Lazy loader for inbox sheet - shared by device-status and hub glance.
+ * @see docs/UI_UX_SAFE_REBUILD_IMPLEMENTATION.md - Step 2
  */
 import { DEVICE_SHELL_ASSET_VERSION } from "./device-status-shell-modules.mjs";
 

@@ -56,7 +56,7 @@ A profile is eligible for **automatic purge** when:
 
 ### Scan copy after purge
 
-Strangers scanning an old printed URL see the resolver’s normal **unknown / not found** path—not “revoked by owner.” Physical stickers may outlive network rows; that is acceptable for abandoned, never-maintained registrations.
+Strangers scanning an old printed URL see the resolver’s normal **unknown / not found** path-not “revoked by owner.” Physical stickers may outlive network rows; that is acceptable for abandoned, never-maintained registrations.
 
 ---
 

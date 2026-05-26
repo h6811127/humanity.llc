@@ -334,7 +334,7 @@ describe("handlePostCardUpdate", () => {
     const owner = await getTestKeypair();
     const recovery = await getTestKeypair();
     const updatedAt = "2026-05-17T12:00:00.000Z";
-    const manifesto = "[relay] House keys\nFound — thank you";
+    const manifesto = "[relay] House keys\nFound - thank you";
 
     const signed = await signDocument(
       withProtocolFields(
@@ -384,7 +384,7 @@ describe("handlePostCardUpdate", () => {
   });
 
   it("scan HTML reflects updated lost-item relay manifesto", async () => {
-    const manifesto = "[relay] House keys\nFound — thank you";
+    const manifesto = "[relay] House keys\nFound - thank you";
     const vm = buildScanViewModel(
       PROFILE,
       "qr_test",
@@ -421,7 +421,7 @@ describe("handlePostCardUpdate", () => {
     );
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).toContain("House keys");
-    expect(html).toContain("Found — thank you");
+    expect(html).toContain("Found - thank you");
     expect(html).not.toContain("[relay]");
   });
 

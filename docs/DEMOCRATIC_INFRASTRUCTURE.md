@@ -33,7 +33,7 @@ The product is not “Linktree with a red QR.” The product is a **live trust o
 ### What a scan is supposed to answer (in seconds)
 
 1. **Is this card or printed QR still valid right now?** (active, revoked, suspended, expired, unknown)
-2. **What social trust is attached?** (e.g. signed, revocable vouches under published rules—not a hidden score or biometric personhood registry; see `docs/VOUCH_TRUST_POSITIONING.md`)
+2. **What social trust is attached?** (e.g. signed, revocable vouches under published rules-not a hidden score or biometric personhood registry; see `docs/VOUCH_TRUST_POSITIONING.md`)
 3. **Did the person nearby just prove control of the key?** (live control - optional, short-lived)
 4. **What does this scan explicitly not prove?** (no legal ID, no “holder owns this sticker” from QR alone)
 

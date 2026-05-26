@@ -1,6 +1,6 @@
 /**
- * Fulfillment print-proof watermark (docs/SCANNER_EXPERIENCE.md — post Phase F).
- * Marks artwork as internal QA / proof — not for customer-facing DIY print.
+ * Fulfillment print-proof watermark (docs/SCANNER_EXPERIENCE.md - post Phase F).
+ * Marks artwork as internal QA / proof - not for customer-facing DIY print.
  */
 
 export const PRINT_QA_WATERMARK_HEADLINE = "HUMANITY PRINT PROOF";

@@ -25,7 +25,7 @@
 
 | Path | Role |
 |------|------|
-| `site/created/index.html` | Owner controls section |
+| `site/created/index.html` | Owner controls section (primary **Revoke this QR** first; display prefs under **Advanced**) |
 | `site/js/created-revoke.mjs` | Sign + POST + UI state |
 | `site/js/created.mjs` | Wires session + revoke init |
 | `site/js/hc-sign.mjs` | `signRevocation`, URLs, `BEARER_WARNING` |
@@ -45,8 +45,8 @@
 
 ## Not in scope (Phase A / M4)
 
-- QR rotation UI (A.6) — shipped
-- Post-create QR expiry extension (M4.6b) — shipped
+- QR rotation UI (A.6) - shipped
+- Post-create QR expiry extension (M4.6b) - shipped
 - Revoke from scan page (owner must use `/created/`)
 
 ## Follow-up: revoke from any device (M5.5)

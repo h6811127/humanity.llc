@@ -27,7 +27,7 @@ Not proof of ownership. Not a phone number printed in plain sight. Item name + r
    - **What should finders see?**  -  return message (e.g. `Lost  -  contact owner through relay`)
 4. Save recovery key on `/created/`, print QR, scan from another phone, revoke when recovered.
 
-Public showcase scan (homepage pilot): see `site/data/showcase-lost-item.json` — refresh with `npm run site:seed-showcase-lost-item`.
+Public showcase scan (homepage pilot): see `site/data/showcase-lost-item.json` - refresh with `npm run site:seed-showcase-lost-item`.
 
 ### Storage format (no new API field)
 

@@ -1,4 +1,4 @@
-# Safe UI/UX rebuild — implementation plan
+# Safe UI/UX rebuild - implementation plan
 
 **Status:** Steps 1–5 complete (safe rebuild plan)  
 **Audience:** Engineers restoring May 25–26 shell work without landing lag or rate limits  
@@ -38,7 +38,7 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device
 
 ---
 
-## Step 1 — Backdrop reconcile + closed backdrop hit-test (current)
+## Step 1 - Backdrop reconcile + closed backdrop hit-test (current)
 
 **Intent:** Fix stuck hub/inbox backdrops blocking taps after bfcache or fast navigation. **No** scroll listeners, **no** network polling.
 
@@ -49,7 +49,7 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device
 | `site/js/device-sheet-backdrop-sync.mjs` | `visibility:hidden` on collapsed sheets (Step 4) |
 | `syncSheetBackdropClosed`, `bindSheetLifecycleReconcile` | Touch blur-off (Step 4) |
 | Wire into `device-hub-sheet.mjs`, `device-inbox-sheet.mjs` | Lazy inbox loader (Step 2) |
-| CSS: `[hidden] { pointer-events: none }` on hub/inbox backdrops only | Global OS coordinator (Step 5 — scoped only) |
+| CSS: `[hidden] { pointer-events: none }` on hub/inbox backdrops only | Global OS coordinator (Step 5 - scoped only) |
 | `worker/tests/device-sheet-backdrop-sync.test.ts` | `visibility: hidden` on `[hidden]` backdrops (avoid unless Step 4 proves need) |
 
 ### Implementation checklist
@@ -93,7 +93,7 @@ npm run worker:test -- worker/tests/device-safe-rebuild-tripwires.test.ts
 
 ---
 
-## Step 2 — Lazy inbox sheet loader (implemented)
+## Step 2 - Lazy inbox sheet loader (implemented)
 
 **Intent:** Shrink `device-status.mjs` static import graph so Safari is less likely to brick the dot on first load.
 
@@ -115,7 +115,7 @@ Same as Step 1 E2E + lazy-inbox Vitest; dot loads on cold navigation in Playwrig
 
 ---
 
-## Step 3 — Hub-scoped network freshness (implemented)
+## Step 3 - Hub-scoped network freshness (implemented)
 
 **Intent:** Card-disabled glance/inbox timeliness without global polling.
 
@@ -140,7 +140,7 @@ Multi-tab: no Cloudflare interstitial under normal use; card-disabled row appear
 
 ---
 
-## Step 4 — Safari sheet CSS (implemented)
+## Step 4 - Safari sheet CSS (implemented)
 
 **Intent:** Reduce dead taps without scroll jank.
 
@@ -148,8 +148,8 @@ Shipped (2026-05-26):
 
 1. `touch-action: manipulation` on `#brand-status-dot-btn` only (`site/css/device-shell.css`).
 2. Collapsed hub `pointer-events: none` (existing); explicit `.device-inbox-sheet--collapsed { pointer-events: none }`.
-3. `@media (pointer: coarse)` — `backdrop-filter: none` on `.device-hub-backdrop` and `.device-inbox-backdrop` only (not hub sheet body, not glance popover).
-4. **Deferred:** `visibility: hidden` on collapsed sheets — add only if P0-W still shows dead taps after Step 1–3 on iPhone.
+3. `@media (pointer: coarse)` - `backdrop-filter: none` on `.device-hub-backdrop` and `.device-inbox-backdrop` only (not hub sheet body, not glance popover).
+4. **Deferred:** `visibility: hidden` on collapsed sheets - add only if P0-W still shows dead taps after Step 1–3 on iPhone.
 
 `device-shell.css?v=42` on shell pages (`index`, `create`, `created`, `wallet`).
 
@@ -161,23 +161,24 @@ Shipped (2026-05-26):
 
 ---
 
-## Step 5 — Chrome inset floor (implemented)
+## Step 5 - Chrome inset floor (implemented)
 
 **Intent:** Prevent layout jump when measured bar height shrinks, without reintroducing scroll-edge chrome.
 
 Shipped (2026-05-26):
 
-- `chromeInsetFloor` in `site/js/device-shell-chrome.mjs` — `syncShellChromeInset()` only increases `--shell-chrome-h`, never shrinks.
+- `chromeInsetFloor` in `site/js/device-shell-chrome.mjs` - `syncShellChromeInset()` only increases `--shell-chrome-h`, never shrinks.
+- Landing `/` ships `has-shell-chrome` on `<body>` in HTML (May 2026) so hero copy clears the fixed status dot on first paint; JS measurement still runs after load.
 - No `scroll` listener, no `top-chrome--edge-hidden`, no `device-shell-chrome-core.mjs`.
 - `DEVICE_SHELL_ASSET_VERSION` → **34**; Vitest `worker/tests/device-shell-chrome-inset.test.ts`.
 
 ### Forbidden
 
-- Document scroll-edge chrome or fixed cluster on `top-chrome--edge-hidden` (pairs with shrinking inset — see catalog §5–§6).
+- Document scroll-edge chrome or fixed cluster on `top-chrome--edge-hidden` (pairs with shrinking inset - see catalog §5–§6).
 
 ---
 
-## Post-plan — verification & conditional follow-ups
+## Post-plan - verification & conditional follow-ups
 
 **Scheduled rebuild (Steps 1–5) is complete.** Do not add Step 6 for banned items in the table below.
 
@@ -185,7 +186,7 @@ Shipped (2026-05-26):
 |-----------|------|
 | **P0-3 / P0-W** manual sign-off | After any shell sheet, backdrop, or chrome inset change ([`DEVICE_OS_QA.md`](DEVICE_OS_QA.md)) |
 | Step 4 knob 4: `visibility: hidden` on **collapsed hub only** | Only if iPhone still shows dead taps after Steps 1–4 |
-| Safari Playwright smoke (catalog §11) | Optional CI — assert dot/hub/backdrop invariants, not scroll-edge classes |
+| Safari Playwright smoke (catalog §11) | Optional CI - assert dot/hub/backdrop invariants, not scroll-edge classes |
 | Hub-scoped coordinator (catalog §3) | **Do not** restore global `initDeviceOsCoordinator()` from status bootstrap |
 
 ### Post-plan checklist

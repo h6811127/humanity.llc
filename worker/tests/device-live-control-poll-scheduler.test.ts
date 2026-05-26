@@ -22,8 +22,9 @@ describe("liveControlPollIntervalMs", () => {
     expect(liveControlPollIntervalMs(1)).toBe(LIVE_CONTROL_POLL_MS_ACTIVE);
   });
 
-  it("uses 30s when idle", () => {
+  it("uses 60s when idle", () => {
     expect(liveControlPollIntervalMs(0)).toBe(LIVE_CONTROL_POLL_MS_IDLE);
+    expect(LIVE_CONTROL_POLL_MS_IDLE).toBe(60_000);
   });
 });
 
@@ -69,7 +70,7 @@ describe("liveControlPollingShouldRun", () => {
     ).toBe(false);
   });
 
-  it("runs on wallet page when watch is on and hub collapsed", () => {
+  it("does not run on wallet page when hub collapsed (manual check / expand hub)", () => {
     expect(
       liveControlPollingShouldRun({
         hubExpanded: false,
@@ -77,7 +78,7 @@ describe("liveControlPollingShouldRun", () => {
         walletPage: true,
         watchEnabled: true,
       })
-    ).toBe(true);
+    ).toBe(false);
   });
 });
 
@@ -117,6 +118,25 @@ describe("liveControlAutoPollShouldRun", () => {
         watchEnabled: true,
         scopeActive: true,
         resolverHealth: "degraded",
+      })
+    ).toBe(false);
+  });
+
+  it("blocks when budget exhausted or not poll leader", () => {
+    expect(
+      liveControlAutoPollShouldRun({
+        watchEnabled: true,
+        scopeActive: true,
+        resolverHealth: "ok",
+        budgetExhausted: true,
+      })
+    ).toBe(false);
+    expect(
+      liveControlAutoPollShouldRun({
+        watchEnabled: true,
+        scopeActive: true,
+        resolverHealth: "ok",
+        isPollLeader: false,
       })
     ).toBe(false);
   });
@@ -220,7 +240,7 @@ describe("walletNetworkVisibilityRefreshAllowed", () => {
 });
 
 describe("resolveLiveControlPollScope", () => {
-  it("wallet page requires watch for scope when hub collapsed", () => {
+  it("does not scope poll on wallet page when hub collapsed", () => {
     /** @type {HTMLElement} */
     const collapsed = {
       classList: { contains: (c) => c === "device-hub-collapsed" },
@@ -240,7 +260,7 @@ describe("resolveLiveControlPollScope", () => {
         walletPage: true,
         watchEnabled: true,
       })
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it("combines hub, inbox, and wallet flags", () => {

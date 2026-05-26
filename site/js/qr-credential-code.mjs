@@ -1,6 +1,6 @@
 /**
  * Short human-readable credential fingerprint (SCANNER_EXPERIENCE Phase F).
- * Derived from profile_id + qr_id — not secret; for print QA and verifier comparison.
+ * Derived from profile_id + qr_id - not secret; for print QA and verifier comparison.
  */
 
 import { validateOfficialScanUrl } from "./qr-scan-url-lock.mjs";

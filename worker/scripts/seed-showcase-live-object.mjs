@@ -135,7 +135,7 @@ async function main() {
     manifesto_line: manifesto,
     scan_url: scanUrl,
     created_at: now,
-    note: "M5 stranger-test live object showcase — owner key not stored.",
+    note: "M5 stranger-test live object showcase - owner key not stored.",
   };
 
   mkdirSync(dirname(outPath), { recursive: true });

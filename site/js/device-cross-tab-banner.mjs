@@ -20,16 +20,67 @@ import { inboxItemsIncludeKind } from "./device-hub-inbox-alerts.mjs";
 import { actOnOtherTabKeys, walletEntryForProfile } from "./device-notice-nav.mjs";
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
 import { getCrossTabScanSnapshot } from "./device-cross-tab-state.mjs";
+import {
+  emphasisCardActionsHtml,
+  emphasisCardBodyHtml,
+  emphasisCardCtaButton,
+  emphasisCardCtaLinkSecondary,
+  escapeEmphasisHtml,
+} from "./device-emphasis-card-html.mjs";
 
 const banner = document.getElementById("device-cross-tab-banner");
 const hubSlot = document.getElementById("device-hub-crosstab-notice");
 const scanBanner = document.getElementById("scan-cross-tab-banner");
 
 function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+  return escapeEmphasisHtml(s);
+}
+
+function clearPageCrossTabBanner() {
+  if (!banner) return;
+  banner.hidden = true;
+  banner.innerHTML = "";
+  banner.classList.remove("hc-emphasis-card", "hc-emphasis-card--info", "hc-notice", "hc-notice--info");
+}
+
+function renderPageCrossTabBanner() {
+  if (!banner) return;
+
+  if (!shouldShowCrossTabNotice()) {
+    clearPageCrossTabBanner();
+    return;
+  }
+
+  const others = gatherInboxInput().crossTabEntries;
+  const msg = crossTabMessage(others);
+  if (!msg) {
+    clearPageCrossTabBanner();
+    return;
+  }
+
+  const walletEntry = walletEntryForVouchHere(msg.primary.profile_id);
+  const subtext = vouchCrossTabSubtext().replace(/^\s*-\s*/, "").trim();
+  const detail = subtext
+    ? `${subtext.charAt(0).toUpperCase()}${subtext.slice(1)}`
+    : "Open that tab to continue.";
+
+  const actions = [emphasisCardCtaButton("Open that tab", "data-cross-tab-action")];
+  if (walletEntry) {
+    actions.push(emphasisCardCtaButton("Open controls here", "data-cross-tab-use-keys"));
+  }
+  actions.push(emphasisCardCtaLinkSecondary("My cards", "/wallet/"));
+
+  banner.hidden = false;
+  banner.className = "hc-emphasis-card hc-emphasis-card--info device-cross-tab-banner";
+  banner.innerHTML = emphasisCardBodyHtml({
+    eyebrow: "Keys in another tab",
+    title: `${msg.label}${msg.extra}`,
+    detail,
+    dot: "info",
+    actionsHtml: emphasisCardActionsHtml(actions),
+  });
+  bindCrossTabAction(banner, msg.primary);
+  bindUseKeysHere(banner, walletEntry?.profile_id ?? msg.primary.profile_id);
 }
 
 function labelForPresence(entry) {
@@ -254,49 +305,11 @@ export function renderCrossTabKeysBanner() {
 
   if (document.getElementById("shell-notif-badge")) {
     renderHubCrossTabNotice();
-    if (banner) {
-      banner.hidden = true;
-      banner.innerHTML = "";
-      banner.classList.remove("hc-notice", "hc-notice--info");
-    }
+    clearPageCrossTabBanner();
     return;
   }
 
-  if (!banner) return;
-
-  if (!shouldShowCrossTabNotice()) {
-    banner.hidden = true;
-    banner.innerHTML = "";
-    banner.classList.remove("hc-notice", "hc-notice--info");
-    return;
-  }
-
-  const others = gatherInboxInput().crossTabEntries;
-  const msg = crossTabMessage(others);
-  if (!msg) {
-    banner.hidden = true;
-    banner.innerHTML = "";
-    banner.classList.remove("hc-notice", "hc-notice--info");
-    return;
-  }
-
-  const walletEntry = walletEntryForVouchHere(msg.primary.profile_id);
-  const useKeysInline = walletEntry
-    ? `<button type="button" class="device-cross-tab-focus-btn" data-cross-tab-use-keys>Open controls here</button>
-    <span class="device-cross-tab-or">or</span>`
-    : "";
-
-  banner.hidden = false;
-  banner.classList.add("hc-notice", "hc-notice--info");
-  banner.innerHTML = `
-    <strong>Signing keys in another tab</strong>
-    <span class="device-cross-tab-sub">${msg.label}${msg.extra}${vouchCrossTabSubtext()}</span>
-    <button type="button" class="device-cross-tab-focus-btn" data-cross-tab-action>Open that tab</button>
-    <span class="device-cross-tab-or">or</span>
-    ${useKeysInline}
-    <a href="/wallet/">My cards</a>.`;
-  bindCrossTabAction(banner, msg.primary);
-  bindUseKeysHere(banner, walletEntry?.profile_id ?? msg.primary.profile_id);
+  renderPageCrossTabBanner();
 }
 
 let crossTabListenersBound = false;

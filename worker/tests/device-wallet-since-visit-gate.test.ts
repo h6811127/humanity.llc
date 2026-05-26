@@ -5,7 +5,6 @@ import {
   setResolverHealthStatusForSinceVisit,
   shouldSuppressCardDisabledSinceVisitAlerts,
 } from "../../site/js/device-wallet-since-visit-gate.mjs";
-
 import {
   getLiveControlPollHealth,
   setLiveControlPollHealth,

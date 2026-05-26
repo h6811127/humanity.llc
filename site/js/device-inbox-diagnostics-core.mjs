@@ -1,6 +1,6 @@
 /**
  * Pure inbox diagnostics helpers (testable).
- * @see docs/DEVICE_INBOX.md — Diagnostics
+ * @see docs/DEVICE_INBOX.md - Diagnostics
  */
 
 export const INBOX_DIAG_MAX_ENTRIES = 20;

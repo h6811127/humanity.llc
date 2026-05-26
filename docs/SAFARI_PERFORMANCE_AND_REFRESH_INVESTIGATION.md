@@ -16,7 +16,7 @@ Safari feeling "extremely slow to refresh" is **real and expected under certain 
 | **Heavy work on every navigation** | Slow first paint after reload on `/`, `/wallet/`, `/created/` | No (restarts each full navigation) |
 | **Cross-tab presence + chrome refresh** | Scroll/tap jank, sluggish UI with multiple Humanity tabs open | **Persists** while tabs stay open (not unbounded growth) |
 | **Wallet / hub network I/O** | Long "refresh" when many saved cards; Worker quota / rate limits | Data in `localStorage` grows with saved cards |
-| **Live-control polling** (scoped but active on `/wallet/`) | Background CPU + network; worse with "Watch for live proof" on | Timer restarts per page; **SW** can poll when tab hidden |
+| **Live-control polling** (hub expanded / inbox + watch on) | Background CPU + network when steward opted in | Timer restarts per page; **SW** can poll when tab hidden + alerts on |
 | **Stale or mixed JS cache** | Broken or flaky shell until hard refresh | Until cache bust aligns (`?v=` on shell graph) |
 | **Safari / iOS privacy** | Extra throttling, ITP, storage partitioning | Environment-specific |
 
@@ -119,8 +119,8 @@ Any `refreshDeviceHub()` (storage on `hc_wallet`, hub changes, etc.) re-triggers
 
 | Source | When it runs | Safari impact |
 |--------|----------------|---------------|
-| Live-control inbox | Hub expanded, inbox open, or **`/wallet/`** (`page-wallet`); **30s** idle / **5s** if pending; round-robin **1 GET/tick** | Steady background work on wallet |
-| Watch for live proof | Default **on** (`hc_watch_live_proof` absent = on) | User must opt off to stop auto poll |
+| Live-control inbox | Hub expanded or inbox open only (not collapsed landing); **60s** idle / **5s** if pending; round-robin **1 GET/tick**; requires **Watch** on (`hc_watch_live_proof === "1"`) | Steady work only when user opted in + scope active |
+| Watch for live proof | Default **off** (only `hc_watch_live_proof === "1"` enables auto poll) | User opts in when waiting for strangers |
 | Resolver health | Every tab show + bootstrap | 1 GET per visibility |
 | Service worker | Tab hidden + browser alerts enabled; **15 min** periodic | Extra work Safari schedules |
 | Coordinator | **`initDeviceOsCoordinator()` NOT auto-started** (reverted `277d08e`) | Good - avoids worst storm |
@@ -261,7 +261,7 @@ document.getElementById("top-chrome")?.dataset?.deviceStatusError
 
 - Close Humanity tabs you are not using (especially tabs with signing keys).
 - Prefer **one** steward tab for daily use.
-- On `/wallet/`, use hub **Check network** manually if auto-refresh feels heavy; turn off **Watch for live proof** when not waiting for strangers.
+- On `/wallet/`, use hub **Check network** manually if auto-refresh feels heavy; enable **Watch for live proof** only when actively waiting for strangers.
 - After deploy, one **hard refresh** per device if dot/chrome looks wrong - not every visit.
 
 ---

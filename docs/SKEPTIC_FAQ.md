@@ -80,7 +80,7 @@ That is why vouching should be:
 
 Vouching is not perfect proof. It is **accountable social trust**: humans put their cryptographic name on a public statement they can take back. The UI should say `Vouched Human`, not overclaim legal identity, global uniqueness, or “bot-proof.”
 
-**Deeper threats we document honestly:** minimum **4-account cliques** can mutual-vouch to VH; rotating rings may evade simple loop detection; stewards skip the 90-day wait; remote vouching is policy-only (no liveness scan). Mitigations: quotas, audit flags, revocation, steward review—not iris. See `docs/VOUCH_THREAT_MODEL.md`.
+**Deeper threats we document honestly:** minimum **4-account cliques** can mutual-vouch to VH; rotating rings may evade simple loop detection; stewards skip the 90-day wait; remote vouching is policy-only (no liveness scan). Mitigations: quotas, audit flags, revocation, steward review-not iris. See `docs/VOUCH_THREAT_MODEL.md`.
 
 Full framing (AI era, vs biometric ID, integrator policy): `docs/VOUCH_TRUST_POSITIONING.md`.
 

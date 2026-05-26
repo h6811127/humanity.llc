@@ -29,6 +29,8 @@ The product is trustworthy when a normal scanner can understand, in under five s
 4. Whether the physical object being scanned is merely a pointer to a card.
 5. What the scan explicitly does not prove.
 
+**Steward device vs resolver (ops):** Trust labels come from the **resolver at scan or refresh time**. A steward’s phone does **not** continuously guarantee fresh network state for every saved card — that would imply a monitoring product the reference operator does not offer. Live proof while someone waits is driven by the **scanner’s session** and the steward’s **signing tab** or **opt-in** hub checks. See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
+
 ---
 
 ## Core Product Rule
@@ -103,7 +105,7 @@ Do not print mutable verification claims such as "Verified Human" on v1 artifact
 
 ### Level 2: Social Vouch Trust
 
-**Strategic frame:** Vouch answers *who put their name on this profile under published rules—and can revoke it?* It does **not** answer *is this the only human body on Earth?* Biometric global-ID products and Humanity vouch solve different problems; see `docs/VOUCH_TRUST_POSITIONING.md`.
+**Strategic frame:** Vouch answers *who put their name on this profile under published rules-and can revoke it?* It does **not** answer *is this the only human body on Earth?* Biometric global-ID products and Humanity vouch solve different problems; see `docs/VOUCH_TRUST_POSITIONING.md`.
 
 **Examples:**
 

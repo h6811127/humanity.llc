@@ -1,6 +1,6 @@
 # Emphasis card rollout (`hc-emphasis-card`)
 
-**Status:** Phase 0 shipped · Phase 1 next  
+**Status:** Phase 0–1 shipped · Phase 2 next  
 **Visual standard:** [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Emphasis notice cards  
 **Primary CSS:** `site/styles.css`, `site/css/theme-dark.css`
 
@@ -66,7 +66,7 @@ Default CTA: `.hc-emphasis-card__cta` uses `var(--red)` pill (brand primary acti
 | Phase | Scope | Status |
 |-------|--------|--------|
 | **0** | Extract `.hc-emphasis-card` + four modifiers; migrate `#wallet-active-banner` markup/classes; Vitest guard | **Shipped** |
-| **1** | `#wallet-tab-hint` → `--info` card; `#device-cross-tab-banner` on `/wallet/` + `/` (`device-cross-tab-banner.mjs`) | Next |
+| **1** | `#wallet-tab-hint` → `--info` / `--warn` card; `#device-cross-tab-banner` on `/wallet/` + `/` (`device-cross-tab-banner.mjs`) | **Shipped** |
 | **2** | `#scan-cross-tab-banner` (`scan-pass.css` + `device-cross-tab-banner.mjs`) | Planned |
 | **3** | `.live-control-notification` on `/created/` → `--urgent` | Planned |
 | **4** | Create custody + revoke / no-session `hc-notice` → `--warn` / `--urgent` | Planned |
@@ -80,14 +80,16 @@ Default CTA: `.hc-emphasis-card__cta` uses `var(--red)` pill (brand primary acti
 - Dark overrides for fills and typography in `theme-dark.css`
 - `worker/tests/ui-color-scheme-popover-guard.test.ts` guards `.hc-emphasis-card`
 
-### Phase 1 — next (wallet + landing cross-tab)
+### Phase 1 — shipped (wallet + landing cross-tab)
 
-| Surface | File(s) | Target |
-|---------|---------|--------|
-| `#wallet-tab-hint` | `site/wallet/index.html`, `wallet-page-chrome.mjs` | `hc-emphasis-card--info` with **Open that tab** / copy from inbox |
-| `#device-cross-tab-banner` | `site/index.html`, `site/wallet/index.html`, `device-cross-tab-banner.mjs` | Render card HTML instead of flat `hc-notice--info` paragraph |
+| Surface | File(s) | Shipped as |
+|---------|---------|------------|
+| `#wallet-tab-hint` | `site/wallet/index.html`, `wallet-page-chrome.mjs` | `hc-emphasis-card--info` (cross-tab) or `--warn` (orphan removed); pill CTAs **Open that tab** / **Open controls here** / **Clear keys on this device** |
+| `#device-cross-tab-banner` | `site/index.html`, `site/wallet/index.html`, `device-cross-tab-banner.mjs` | `hc-emphasis-card--info` via `device-emphasis-card-html.mjs` (legacy pages without shell badge) |
 
-**Acceptance:** Cross-tab visible on wallet/landing matches active banner depth; no blue rim; CTAs as pills where applicable.
+**Helpers:** `site/js/device-emphasis-card-html.mjs` · **Tests:** `worker/tests/device-emphasis-card-html.test.ts`
+
+**Acceptance:** Cross-tab on wallet/landing matches active banner depth; no blue rim; CTAs as pills.
 
 ### Phase 2–5
 

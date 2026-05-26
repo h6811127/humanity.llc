@@ -1,4 +1,4 @@
-# Investigation: iPhone — status dot / hub / shortcuts feel dead
+# Investigation: iPhone - status dot / hub / shortcuts feel dead
 
 **Date:** 2026-05-26  
 **Reporter symptom:** On iPhone (Safari and Chrome), the status indicator (`#brand-status-dot-btn`) does not open the hub; “Shortcuts” and “Settings” cannot be tapped. Same site works on iPad and laptop.  
@@ -13,10 +13,10 @@ The device shell is built around a **floating top chrome** (status dot) and a **
 
 iPhone and iPad both use **WebKit** for Safari and for “Chrome” on iOS, so a true engine split (Safari vs Chrome) is unlikely. The more plausible iPhone-specific angles are:
 
-1. **Stale cached CSS vs fresh JS** (classic mobile cache skew) — especially the `shell-status-cluster` override that keeps the dot clickable when `body.device-hub-sheet-open` is set.
-2. **Stuck hub/backdrop open state** — invisible dimmer at `z-index: 54` blocking the page; dot also dead if the cluster override CSS is missing.
-3. **`device-status.mjs` never loads** — no click listener; red error ring on dot if bootstrap ran.
-4. **Test gap** — CI emulates **Pixel 5 (Chromium)** only, not iPhone WebKit viewports.
+1. **Stale cached CSS vs fresh JS** (classic mobile cache skew) - especially the `shell-status-cluster` override that keeps the dot clickable when `body.device-hub-sheet-open` is set.
+2. **Stuck hub/backdrop open state** - invisible dimmer at `z-index: 54` blocking the page; dot also dead if the cluster override CSS is missing.
+3. **`device-status.mjs` never loads** - no click listener; red error ring on dot if bootstrap ran.
+4. **Test gap** - CI emulates **Pixel 5 (Chromium)** only, not iPhone WebKit viewports.
 
 ---
 
@@ -40,7 +40,7 @@ If only the **hub row** fails but landing settings work, suspect **hub sheet `po
 | Page | Dot tap |
 |------|---------|
 | `/`, `/create/`, `/created/` | Toggles `#device-hub.device-hub--sheet` (open / close) |
-| `/wallet/` | Scrolls to saved cards — **no** bottom sheet |
+| `/wallet/` | Scrolls to saved cards - **no** bottom sheet |
 
 Handler chain: `#brand-status-dot-btn` `click` → `openHubFromChrome()` → `setHubExpanded()` → `setHubSheetOpen()` (`site/js/device-status.mjs`, `site/js/device-hub-sheet.mjs`).
 
@@ -70,7 +70,7 @@ z-index ≤3  main content (.screen-landing, #landing-device-settings, …)
 - Collapsed hub → `pointer-events: none`; open hub → `pointer-events: auto`.
 - Closed backdrops → `pointer-events: none`; `.is-visible` → `pointer-events: auto` (full-screen tap target to dismiss).
 
-This design shipped after commit `77816d1` (see status-dot postmortem). **If an iPhone has old `device-shell.css` cached but new JS**, the body can get `device-hub-sheet-open` while the dot cluster never regains `pointer-events: auto` — the dot and most of the page feel dead.
+This design shipped after commit `77816d1` (see status-dot postmortem). **If an iPhone has old `device-shell.css` cached but new JS**, the body can get `device-hub-sheet-open` while the dot cluster never regains `pointer-events: auto` - the dot and most of the page feel dead.
 
 ### Module load
 
@@ -160,13 +160,13 @@ Missing `{ type: 'dot_click' }` after tap → handler never ran.
 
 ---
 
-### 5. iOS hit-testing edge cases (lower — needs WebKit repro)
+### 5. iOS hit-testing edge cases (lower - needs WebKit repro)
 
 Theoretical WebKit issues worth validating in **WebKit** (not Chromium):
 
 - Transformed `position: fixed` hub sheet (`translateY(100%)`) still participating in hit-testing when `pointer-events: none` is missing on an old build.
 - `click`-only handler on the dot without `touch-action: manipulation` (legacy 300ms less common on current iOS but still a cheap hardening).
-- `content-visibility: auto` on landing tutorial sections — **does not** apply to `#landing-device-settings` (no `data-landing-tutorial`), so unlikely for that block.
+- `content-visibility: auto` on landing tutorial sections - **does not** apply to `#landing-device-settings` (no `data-landing-tutorial`), so unlikely for that block.
 
 ---
 
@@ -178,9 +178,9 @@ On `/wallet/`, the dot **scrolls** to saved cards; it does not open a sheet. Unl
 
 ## What does *not* explain iPhone-only failure
 
-- **Safari vs Chrome on iPhone** — same WebKit; both failing supports environmental/cache/state, not “wrong browser.”
-- **Pass card tilt** — landing `/` has no `#pass-scene` in `index.html`; pass handlers are not in play on the homepage.
-- **Separate iPhone wallet sync** — keys do not sync between devices; that affects steward state, not whether the dot opens the hub.
+- **Safari vs Chrome on iPhone** - same WebKit; both failing supports environmental/cache/state, not “wrong browser.”
+- **Pass card tilt** - landing `/` has no `#pass-scene` in `index.html`; pass handlers are not in play on the homepage.
+- **Separate iPhone wallet sync** - keys do not sync between devices; that affects steward state, not whether the dot opens the hub.
 
 ---
 
@@ -190,7 +190,7 @@ On `/wallet/`, the dot **scrolls** to saved cards; it does not open a sheet. Unl
 |-------|----------------|
 | `e2e/device-status-dot.spec.ts` | Passes on **Pixel 5** (Chromium) |
 | WebKit / iPhone 13 Pro profile | **Not in** default `playwright.config.ts` |
-| Real device QA | [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) P0-3 — manual |
+| Real device QA | [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) P0-3 - manual |
 
 **Recommendation:** Add a Playwright project using `devices['iPhone 13 Pro']` and `webkit` for at least: dot opens hub, dot works with `top-chrome--edge-hidden`, `elementFromPoint` at dot center hits `#brand-status-dot-btn`, backdrop closed when hub collapsed.
 
@@ -200,13 +200,13 @@ On `/wallet/`, the dot **scrolls** to saved cards; it does not open a sheet. Unl
 
 Do these in order (~2 minutes):
 
-1. **Visual** — Red ring on status dot? → module load failure (§3). See postmortem doc.
-2. **Hard refresh / clear site data** — If fixed → cache skew (§1).
-3. **Private tab** — If fixed → cache or extension/content blocker on normal profile.
-4. **Console state** — Run the stuck-state snippet in §2.
-5. **Diagnostics** — `hc_dot_diagnostics` + tap dot; confirm `dot_click` and `hub_toggle` entries.
-6. **Which page** — `/` vs `/created/` vs `/wallet/`; note whether **landing** settings rows (scroll down on `/`) work when the dot does not.
-7. **Optional** — Mac Safari → Develop → [iPhone] → inspect; Network tab for 404 on `/js/device-*.mjs`.
+1. **Visual** - Red ring on status dot? → module load failure (§3). See postmortem doc.
+2. **Hard refresh / clear site data** - If fixed → cache skew (§1).
+3. **Private tab** - If fixed → cache or extension/content blocker on normal profile.
+4. **Console state** - Run the stuck-state snippet in §2.
+5. **Diagnostics** - `hc_dot_diagnostics` + tap dot; confirm `dot_click` and `hub_toggle` entries.
+6. **Which page** - `/` vs `/created/` vs `/wallet/`; note whether **landing** settings rows (scroll down on `/`) work when the dot does not.
+7. **Optional** - Mac Safari → Develop → [iPhone] → inspect; Network tab for 404 on `/js/device-*.mjs`.
 
 ---
 
@@ -217,7 +217,7 @@ Prioritized by leverage:
 1. **CI:** WebKit + iPhone viewport smoke for dot, backdrop closed, `elementFromPoint` on dot.
 2. **Cache bust:** When touching `device-shell.css` pointer-events section, bump `device-shell.css?v=` on **all** shell HTML (`/`, `/create/`, `/created/`, `/wallet/`) in the same deploy.
 3. **Runtime hardening (if WebKit repro):** `touch-action: manipulation` on `.shell-status-dot-btn`; optional `pointerdown` → `openHubFromChrome` guard; consider `visibility: hidden` on collapsed hub sheet in addition to `pointer-events: none` for iOS hit-testing.
-4. **UX:** Hub link `href="#landing-device-settings"` scrolls content **behind** an open backdrop — on phone, close sheet first or navigate in-sheet; document or close-on-hash.
+4. **UX:** Hub link `href="#landing-device-settings"` scrolls content **behind** an open backdrop - on phone, close sheet first or navigate in-sheet; document or close-on-hash.
 5. **Support doc:** Link this file from [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) troubleshooting for “works on iPad, not iPhone.”
 
 ---
@@ -236,7 +236,7 @@ Prioritized by leverage:
 
 ---
 
-## Update (2026-05-26) — scroll jank on all devices
+## Update (2026-05-26) - scroll jank on all devices
 
 Follow-up report: laggy/jumpy scroll on `/` and `/created/`, rapid up/down glitch at the **bottom** of the page on Android and iPhone (all devices).
 
@@ -244,9 +244,9 @@ Follow-up report: laggy/jumpy scroll on `/` and `/created/`, rapid up/down glitc
 
 **Fix shipped:**
 
-- `site/css/device-shell.css` — fixed positioning for status cluster only when hub sheet open / hub-locked, **not** on scroll-edge-hidden.
-- `site/js/device-shell-chrome.mjs` — chrome inset **floor** (never shrink measured height); scroll **hysteresis** + **bottom guard** (no edge-hidden toggling near max scroll).
-- `site/styles.css` — removed `content-visibility: auto` on landing tutorial blocks.
+- `site/css/device-shell.css` - fixed positioning for status cluster only when hub sheet open / hub-locked, **not** on scroll-edge-hidden.
+- `site/js/device-shell-chrome.mjs` - chrome inset **floor** (never shrink measured height); scroll **hysteresis** + **bottom guard** (no edge-hidden toggling near max scroll).
+- `site/styles.css` - removed `content-visibility: auto` on landing tutorial blocks.
 - Cache-bust: `device-shell.css?v=34`, `styles.css?v=91` on `/`.
 
 ---

@@ -24,7 +24,7 @@ ES module scripts run in **strict mode**. Assigning to an undeclared binding thr
 - Scan link copy / download handlers
 - `void bootstrapOwnerTools()` (revoke, live proof, etc.)
 
-Previously, the same bad assignment ran **after** the QR block. Top-level `await` on the QR import meant the QR path executed first; the script only crashed at the end when tabs initialized — so the QR still appeared.
+Previously, the same bad assignment ran **after** the QR block. Top-level `await` on the QR import meant the QR path executed first; the script only crashed at the end when tabs initialized - so the QR still appeared.
 
 ---
 

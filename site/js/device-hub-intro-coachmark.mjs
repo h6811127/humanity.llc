@@ -97,7 +97,7 @@ function ensureCoachmarkMarkup() {
     <p class="device-hub-intro-eyebrow">Welcome</p>
     <p class="device-hub-intro-title" id="device-hub-intro-title">Meet your device hub</p>
     <p class="device-hub-intro-body">
-      One tap on the status dot opens everything saved on this device—cards, keys, and notices.
+      One tap on the status dot opens everything saved on this device-cards, keys, and notices.
     </p>
     <p class="device-hub-intro-cta" aria-hidden="true">Tap the dot above</p>
     <button type="button" class="device-hub-intro-dismiss" id="${DISMISS_ID}">

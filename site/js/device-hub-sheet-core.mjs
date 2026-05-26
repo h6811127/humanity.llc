@@ -1,6 +1,6 @@
 /**
  * Pure hub sheet reconcile rules (Vitest-covered).
- * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md — Fix directions §2
+ * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md - Fix directions §2
  */
 
 /**

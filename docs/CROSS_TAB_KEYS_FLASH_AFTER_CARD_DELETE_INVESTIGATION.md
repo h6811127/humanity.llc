@@ -1,8 +1,8 @@
-# Cross-tab “Keys in another tab” flash after card delete — investigation
+# Cross-tab “Keys in another tab” flash after card delete - investigation
 
-**Reported:** 2026-05-26 — Laptop instance shows “Keys in another tab” for ~1–2s then it disappears, for a card deleted the previous day.
+**Reported:** 2026-05-26 - Laptop instance shows “Keys in another tab” for ~1–2s then it disappears, for a card deleted the previous day.
 
-**Status:** **Path B (step 1)**, **path F (step 2)**, and **path G (step 3)** shipped — see § Implementation. Ongoing UX bugs (flash, wrong card label, stuck badge) → [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) + restart plan [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md).
+**Status:** **Path B (step 1)**, **path F (step 2)**, and **path G (step 3)** shipped - see § Implementation. Ongoing UX bugs (flash, wrong card label, stuck badge) → [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) + restart plan [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md).
 
 Related: [`DEVICE_INBOX.md`](DEVICE_INBOX.md) counting rule 5, [`DEVICE_OS.md`](DEVICE_OS.md) § Cross-tab keys, [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md) § Cross-tab badge.
 
@@ -54,11 +54,11 @@ flowchart TD
 
 **Important behaviors:**
 
-1. **Presence ≠ “card exists on network”** — Only “another tab currently has `hc_created` signing keys and heartbeated while **visible** within ~6s” (`PRESENCE_SHOW_MS` in `device-tab-presence-core.mjs`).
-2. **Deleting from wallet does not clear keys in other tabs** — Hub remove copy: *“Keys stay in any other tab until you close it.”* (`device-hub-ui.mjs`). Revoke on network also **does not** remove `hc_created` or stop heartbeats (`created-revoke.mjs` only sets `revoke_state`).
-3. **Removing from wallet re-enables cross-tab for that profile** — `listOtherTabsWithKeys` **skips** other tabs whose `profile_id` is in `hc_wallet`. After remove, that profile is no longer saved → other tabs holding those keys **start counting** toward cross-tab (previously suppressed).
-4. **Same profile in this tab hides the other tab** — Other tabs with the **same** `profile_id` as this tab’s session are excluded (`device-tab-presence-core.mjs`), so the notice is for **different** profile keys elsewhere.
-5. **Unsaved keys in this tab hide cross-tab** — `shouldShowCrossTabKeysNotice` requires `tabNoticeCount === 0`. Any unsaved `hc_created` in **this** tab shows `tab_keys_unsaved` instead.
+1. **Presence ≠ “card exists on network”** - Only “another tab currently has `hc_created` signing keys and heartbeated while **visible** within ~6s” (`PRESENCE_SHOW_MS` in `device-tab-presence-core.mjs`).
+2. **Deleting from wallet does not clear keys in other tabs** - Hub remove copy: *“Keys stay in any other tab until you close it.”* (`device-hub-ui.mjs`). Revoke on network also **does not** remove `hc_created` or stop heartbeats (`created-revoke.mjs` only sets `revoke_state`).
+3. **Removing from wallet re-enables cross-tab for that profile** - `listOtherTabsWithKeys` **skips** other tabs whose `profile_id` is in `hc_wallet`. After remove, that profile is no longer saved → other tabs holding those keys **start counting** toward cross-tab (previously suppressed).
+4. **Same profile in this tab hides the other tab** - Other tabs with the **same** `profile_id` as this tab’s session are excluded (`device-tab-presence-core.mjs`), so the notice is for **different** profile keys elsewhere.
+5. **Unsaved keys in this tab hide cross-tab** - `shouldShowCrossTabKeysNotice` requires `tabNoticeCount === 0`. Any unsaved `hc_created` in **this** tab shows `tab_keys_unsaved` instead.
 
 ---
 
@@ -72,15 +72,15 @@ Why it **flashes** instead of staying on:
 |-----------|---------------------|
 | **Visibility-gated heartbeat** | Only tabs with `document.visibilityState === "visible"` heartbeat every 4s. A background tab stops refreshing `updatedAt`; UI drops it after **~6s** (`PRESENCE_SHOW_MS`). |
 | **Tab focus churn** | User switches tabs, Cmd+`, Mission Control, or Safari tab preview focuses another Humanity tab for a moment → one heartbeat → sibling tab shows notice → focus leaves → row goes stale within ~6s (user may perceive 1–2s if they look right as overlay/badge animates). |
-| **bfcache / back-forward** | `pageshow` with `persisted` calls `syncTabKeysPresence()` (`device-tab-presence.mjs`) — can re-insert a row for one cycle after navigation. |
-| **Mutual exclusion with tab keys** | If this tab briefly has unsaved `hc_created` (`tabNoticeCount === 1`), cross-tab is **hidden**; when session clears, cross-tab can **appear** for one stale-other-tab window — feels like a flash of “another tab”. |
+| **bfcache / back-forward** | `pageshow` with `persisted` calls `syncTabKeysPresence()` (`device-tab-presence.mjs`) - can re-insert a row for one cycle after navigation. |
+| **Mutual exclusion with tab keys** | If this tab briefly has unsaved `hc_created` (`tabNoticeCount === 1`), cross-tab is **hidden**; when session clears, cross-tab can **appear** for one stale-other-tab window - feels like a flash of “another tab”. |
 | **Dot view transitions** | `applyDot()` uses `document.startViewTransition` when overlay changes (`device-status.mjs`), which can make the blue notch feel like a short “notification” even when inbox state is stable for a few seconds. |
 
 **Not the root cause:**
 
-- **OS notifications** — cross-tab is inbox-only (see `inboxKindAllowsOsNotification`).
-- **“Card deleted on server” alone** — no server signal drives cross-tab; only local tab session + presence map.
-- **Stale `hc_default_vouch_profile_id` after wallet remove** — `card-wallet.mjs` remove does not call `clearDefaultVouchIfProfile` (hub remove does). Stale default can confuse vouch UX but does not by itself write presence; auto-activate only runs on scan and requires wallet entry (`vouch-issue.mjs`).
+- **OS notifications** - cross-tab is inbox-only (see `inboxKindAllowsOsNotification`).
+- **“Card deleted on server” alone** - no server signal drives cross-tab; only local tab session + presence map.
+- **Stale `hc_default_vouch_profile_id` after wallet remove** - `card-wallet.mjs` remove does not call `clearDefaultVouchIfProfile` (hub remove does). Stale default can confuse vouch UX but does not by itself write presence; auto-activate only runs on scan and requires wallet entry (`vouch-issue.mjs`).
 
 ---
 
@@ -88,7 +88,7 @@ Why it **flashes** instead of staying on:
 
 | User action | Clears `hc_created` in all tabs? | Clears `hc_tab_keys_presence`? | Suppresses cross-tab for that profile? |
 |-------------|----------------------------------|--------------------------------|----------------------------------------|
-| Remove from device (`hc_wallet`) | No | No | **No** (suppression removed — cross-tab can **increase**) |
+| Remove from device (`hc_wallet`) | No | No | **No** (suppression removed - cross-tab can **increase**) |
 | Revoke card/QR on network | No | No | No |
 | Close tab / navigate away | That tab only (`pagehide` → `clearTabKeysPresence`) | That `tabId` row removed | Yes, when no other tab heartbeats |
 | Clear site data | Yes | Yes | Yes |
@@ -99,14 +99,14 @@ So “I deleted the card” on device or network is **orthogonal** to cross-tab 
 
 ## How to confirm on the laptop (no code)
 
-1. **Find orphan tabs** — Look for open Humanity tabs: `/created/`, `/create/`, scan pages, old PWA windows. Close all except the one you use; wait ~10s. Flash should stop if this was the cause.
+1. **Find orphan tabs** - Look for open Humanity tabs: `/created/`, `/create/`, scan pages, old PWA windows. Close all except the one you use; wait ~10s. Flash should stop if this was the cause.
 2. **Inspect storage (DevTools → Application)**  
-   - `localStorage.hc_tab_keys_presence` — JSON of `tabId → { profile_id, updatedAt, … }`. Note `profile_id` of the deleted card and whether `updatedAt` jumps when the flash happens.  
-   - `sessionStorage.hc_created` **per tab** — keys may still exist on a tab you forgot.  
-   - `localStorage.hc_wallet` — confirm profile is gone.  
-   - `localStorage.hc_default_vouch_profile_id` — optional stale pointer.
-3. **Enable inbox diagnostics** — `localStorage.hc_inbox_diagnostics = "1"`, reproduce, read `sessionStorage.hc_inbox_diag_log` after flash (`device-inbox-diagnostics.mjs`).
-4. **Dot diagnostics** — `localStorage.hc_dot_diagnostics = "1"` — watch console for overlay flapping `…:cross_tab_keys` vs `…:none` (`device-dot-diagnostics.mjs`).
+   - `localStorage.hc_tab_keys_presence` - JSON of `tabId → { profile_id, updatedAt, … }`. Note `profile_id` of the deleted card and whether `updatedAt` jumps when the flash happens.  
+   - `sessionStorage.hc_created` **per tab** - keys may still exist on a tab you forgot.  
+   - `localStorage.hc_wallet` - confirm profile is gone.  
+   - `localStorage.hc_default_vouch_profile_id` - optional stale pointer.
+3. **Enable inbox diagnostics** - `localStorage.hc_inbox_diagnostics = "1"`, reproduce, read `sessionStorage.hc_inbox_diag_log` after flash (`device-inbox-diagnostics.mjs`).
+4. **Dot diagnostics** - `localStorage.hc_dot_diagnostics = "1"` - watch console for overlay flapping `…:cross_tab_keys` vs `…:none` (`device-dot-diagnostics.mjs`).
 
 ---
 
@@ -123,7 +123,7 @@ So “I deleted the card” on device or network is **orthogonal** to cross-tab 
 
 ---
 
-### B. On wallet remove / hub remove — broadcast “profile retired on device”
+### B. On wallet remove / hub remove - broadcast “profile retired on device”
 
 **Action:** On remove, write a short-lived or durable `localStorage` denylist of `profile_id`s; `listOtherTabsWithKeys` ignores presence rows for retired profiles. Optionally `BroadcastChannel` ask other tabs to `clearTabSessionKeys()` + `clearTabKeysPresence()`.
 
@@ -134,18 +134,18 @@ So “I deleted the card” on device or network is **orthogonal** to cross-tab 
 
 ---
 
-### C. On wallet remove — clear presence rows for that `profile_id` globally
+### C. On wallet remove - clear presence rows for that `profile_id` globally
 
 **Action:** Scan `hc_tab_keys_presence` and delete entries matching removed `profile_id` (does not clear `hc_created` in other tabs).
 
 | Pros | Cons |
 |------|------|
 | Stops cross-tab UI until another tab heartbeats again | Misleading if keys still exist (user thinks device is clean) |
-| Small, localized change | Heartbeat from orphan tab brings notice back — same root cause |
+| Small, localized change | Heartbeat from orphan tab brings notice back - same root cause |
 
 ---
 
-### D. On wallet remove / revoke — proactively clear other tabs’ sessions
+### D. On wallet remove / revoke - proactively clear other tabs’ sessions
 
 **Action:** `BroadcastChannel` message `{ type: "clear-profile", profile_id }`; listeners call `clearTabSessionKeys()` when session matches.
 
@@ -198,11 +198,11 @@ So “I deleted the card” on device or network is **orthogonal** to cross-tab 
 | **Avoid as sole fix** | C or G alone | Hides or smooths symptom; keys may remain in another tab |
 | **Align copy** | Hub already warns on remove; extend to wallet remove in `card-wallet.mjs` | Same gap: wallet remove has no confirm about other tabs |
 
-**Chosen:** Path **B** — best balance of user clarity, zero server cost, and security honesty (keys may remain in other tabs; we stop false “active card elsewhere” inbox noise). Path **F** (orphan-specific copy) and **D** (broadcast clear keys) remain optional follow-ups.
+**Chosen:** Path **B** - best balance of user clarity, zero server cost, and security honesty (keys may remain in other tabs; we stop false “active card elsewhere” inbox noise). Path **F** (orphan-specific copy) and **D** (broadcast clear keys) remain optional follow-ups.
 
 ---
 
-## Implementation (path B — step 1)
+## Implementation (path B - step 1)
 
 | Piece | Module |
 |-------|--------|
@@ -219,7 +219,7 @@ So “I deleted the card” on device or network is **orthogonal** to cross-tab 
 
 ---
 
-## Implementation (path F — step 2)
+## Implementation (path F - step 2)
 
 | Piece | Module |
 |-------|--------|
@@ -237,7 +237,7 @@ Generic `cross_tab_keys` remains for unsaved create tabs; removed profiles surfa
 
 ---
 
-## Implementation (path G — step 3)
+## Implementation (path G - step 3)
 
 | Piece | Module |
 |-------|--------|
@@ -311,5 +311,5 @@ Wallet remove (no other-tab warning, no presence cleanup):
 
 ## Related docs
 
-- [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) — `hc_created` vs `hc_wallet`
-- [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) — cross-tab on scan surfaces (`includeSavedProfiles: true`)
+- [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) - `hc_created` vs `hc_wallet`
+- [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) - cross-tab on scan surfaces (`includeSavedProfiles: true`)

@@ -15,8 +15,10 @@ import {
   listOtherTabsWithKeys,
   normalizePresenceEntry,
   normalizePresenceMap,
+  PRESENCE_CHANGE_COALESCE_MS,
   PRESENCE_HEARTBEAT_MS,
   removePresenceRowsForProfile,
+  shouldSkipPresenceHeartbeat,
   shouldTouchPresenceRow,
 } from "./device-tab-presence-core.mjs";
 
@@ -27,6 +29,16 @@ const CUSTODY_CHANNEL = "hc-tab-keys-custody";
 let heartbeatTimer = null;
 let focusChannel = null;
 let custodyChannel = null;
+/** @type {ReturnType<typeof setTimeout> | null} */
+let presenceNotifyCoalesceTimer = null;
+
+function emitTabPresenceChanged() {
+  if (presenceNotifyCoalesceTimer != null) return;
+  presenceNotifyCoalesceTimer = window.setTimeout(() => {
+    presenceNotifyCoalesceTimer = null;
+    window.dispatchEvent(new Event("hc-tab-presence-changed"));
+  }, PRESENCE_CHANGE_COALESCE_MS);
+}
 
 function getTabId() {
   let id = sessionStorage.getItem("hc_tab_id");
@@ -93,7 +105,7 @@ export function syncTabKeysPresence() {
   map = capPresenceMap(map);
   const changed = writePresenceIfChanged(map);
   if (changed) {
-    window.dispatchEvent(new Event("hc-tab-presence-changed"));
+    emitTabPresenceChanged();
   }
 }
 
@@ -103,7 +115,7 @@ export function clearTabKeysPresence() {
   if (!(tabId in map)) return;
   delete map[tabId];
   if (writePresenceIfChanged(map)) {
-    window.dispatchEvent(new Event("hc-tab-presence-changed"));
+    emitTabPresenceChanged();
   }
 }
 
@@ -172,7 +184,7 @@ export function purgePresenceForProfile(profileId) {
   const { map: next, changed } = removePresenceRowsForProfile({ ...map }, profileId);
   if (!changed) return;
   if (writePresenceIfChanged(next)) {
-    window.dispatchEvent(new Event("hc-tab-presence-changed"));
+    emitTabPresenceChanged();
   }
 }
 
@@ -258,19 +270,25 @@ export function startTabKeysPresence() {
   bindCustodyChannel();
   syncTabKeysPresence();
   heartbeatTimer = window.setInterval(() => {
-    if (document.visibilityState === "visible") {
-      syncTabKeysPresence();
+    if (document.visibilityState !== "visible") return;
+    const session = getTabSession();
+    const hasKeys = Boolean(session?.profile_id && session?.owner_private_key_b58);
+    if (
+      shouldSkipPresenceHeartbeat(readPrunedPresence(), getTabId(), hasKeys)
+    ) {
+      return;
     }
+    syncTabKeysPresence();
   }, PRESENCE_HEARTBEAT_MS);
   window.addEventListener("pagehide", clearTabKeysPresence);
   window.addEventListener("pageshow", onPageShowPresence);
   window.addEventListener("hc-device-hub-changed", syncTabKeysPresence);
   window.addEventListener("storage", (e) => {
     if (e.key === PRESENCE_KEY) {
-      window.dispatchEvent(new Event("hc-tab-presence-changed"));
+      emitTabPresenceChanged();
     }
   });
   window.addEventListener("hc-wallet-removed-profiles-changed", () => {
-    window.dispatchEvent(new Event("hc-tab-presence-changed"));
+    emitTabPresenceChanged();
   });
 }

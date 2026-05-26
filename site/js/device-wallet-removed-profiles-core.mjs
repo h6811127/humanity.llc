@@ -1,5 +1,5 @@
 /**
- * Profiles removed from hc_wallet — suppress cross-tab inbox for orphan tab keys.
+ * Profiles removed from hc_wallet - suppress cross-tab inbox for orphan tab keys.
  * @see docs/CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md path B
  */
 

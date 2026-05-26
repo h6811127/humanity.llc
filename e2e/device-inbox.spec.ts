@@ -121,7 +121,18 @@ async function waitForLiveProofChrome(page: import("@playwright/test").Page) {
   return badge;
 }
 
-test.describe("device inbox — live proof", () => {
+async function openHubViaStatusDot(page: import("@playwright/test").Page) {
+  // Sometimes the first-visit coachmark overlays the status dot; dismiss it first
+  // so the click reliably opens the hub sheet.
+  const dismiss = page.locator("#device-hub-intro-dismiss");
+  // Coachmark has a small show delay, so give it a moment to appear.
+  if (await dismiss.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await dismiss.click();
+  }
+  await page.locator("#brand-status-dot-btn").click();
+}
+
+test.describe("device inbox - live proof", () => {
   test.beforeEach(async ({ page, context }) => {
     await grantBrowserNotifications(context);
     await page.addInitScript((entry) => {
@@ -197,7 +208,7 @@ async function openInboxSheetForE2e(page: import("@playwright/test").Page) {
   });
 }
 
-test.describe("device inbox — sheet reconcile (P5e / phase 14)", () => {
+test.describe("device inbox - sheet reconcile (P5e / phase 14)", () => {
   test("backdrop close clears body class and hides backdrop", async ({ page }) => {
     await page.goto("/wallet/");
     await openInboxSheetForE2e(page);
@@ -240,7 +251,7 @@ test.describe("device inbox — sheet reconcile (P5e / phase 14)", () => {
   });
 });
 
-test.describe("device inbox — background OS notification", () => {
+test.describe("device inbox - background OS notification", () => {
   test.beforeEach(async ({ page, context }) => {
     await grantBrowserNotifications(context);
     await page.addInitScript((entry) => {
@@ -309,7 +320,7 @@ function mockCardRevokedSinceVisit(route: Route) {
   });
 }
 
-test.describe("device inbox — card disabled since visit", () => {
+test.describe("device inbox - card disabled since visit", () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript((entry) => {
       localStorage.setItem("hc_wallet", JSON.stringify([entry]));
@@ -383,7 +394,7 @@ test.describe("device inbox — card disabled since visit", () => {
   });
 });
 
-test.describe("device inbox — resolver offline", () => {
+test.describe("device inbox - resolver offline", () => {
   test.beforeEach(async ({ page }) => {
     await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "offline"));
     await page.route("**/.well-known/hc/v1/cards/**/status**", mockCardStatus);
@@ -400,7 +411,7 @@ test.describe("device inbox — resolver offline", () => {
   });
 });
 
-test.describe("device inbox — card disabled since visit suppressed when resolver offline/degraded", () => {
+test.describe("device inbox - card disabled since visit suppressed when resolver offline/degraded", () => {
   async function setup(page, resolverHealth: "offline" | "degraded") {
     await page.addInitScript((entry) => {
       localStorage.setItem("hc_wallet", JSON.stringify([entry]));
@@ -456,7 +467,7 @@ test.describe("device inbox — card disabled since visit suppressed when resolv
   });
 });
 
-test.describe("device inbox — live proof poll scope (request budget phases 1–3)", () => {
+test.describe("device inbox - live proof poll scope (request budget phases 1–3)", () => {
   test.beforeEach(async ({ page, context }) => {
     await grantBrowserNotifications(context);
     await page.addInitScript((entry) => {
@@ -481,7 +492,11 @@ test.describe("device inbox — live proof poll scope (request budget phases 1�
     expect(challengeFetches).toBe(0);
   });
 
-  test("landing polls live-control after hub expands", async ({ page }) => {
+  test("landing polls live-control after hub expands when watch is on", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("hc_watch_live_proof", "1");
+    });
+
     let challengeFetches = 0;
     await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", (route) => {
       challengeFetches += 1;
@@ -489,8 +504,8 @@ test.describe("device inbox — live proof poll scope (request budget phases 1�
     });
 
     await page.goto("/");
-    await page.locator("#brand-status-dot-btn").click();
-    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
+    await openHubViaStatusDot(page);
+    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/, { timeout: 15_000 });
     await expect.poll(() => challengeFetches, { timeout: 15_000 }).toBeGreaterThan(0);
   });
 
@@ -513,6 +528,7 @@ test.describe("device inbox — live proof poll scope (request budget phases 1�
 
     await page.addInitScript((wallet) => {
       localStorage.setItem("hc_wallet", JSON.stringify(wallet));
+      localStorage.setItem("hc_watch_live_proof", "1");
       sessionStorage.setItem("hc_hub_open", "0");
     }, entries);
 
@@ -523,8 +539,8 @@ test.describe("device inbox — live proof poll scope (request budget phases 1�
     });
 
     await page.goto("/");
-    await page.locator("#brand-status-dot-btn").click();
-    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
+    await openHubViaStatusDot(page);
+    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/, { timeout: 15_000 });
     await expect.poll(() => challengeFetches, { timeout: 15_000 }).toBe(1);
     await page.waitForTimeout(2000);
     expect(challengeFetches).toBe(1);
@@ -544,9 +560,9 @@ test.describe("device inbox — live proof poll scope (request budget phases 1�
     });
 
     await page.goto("/");
-    await page.locator("#brand-status-dot-btn").click();
-    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
-    await expect(page.locator("#device-hub-check-live-proof-btn")).toBeVisible();
+    await openHubViaStatusDot(page);
+    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/, { timeout: 15_000 });
+    await expect(page.locator("#device-hub-check-live-proof-btn")).toBeVisible({ timeout: 15_000 });
     await page.waitForTimeout(10_000);
     expect(challengeFetches).toBe(0);
   });
@@ -565,14 +581,38 @@ test.describe("device inbox — live proof poll scope (request budget phases 1�
     });
 
     await page.goto("/");
-    await page.locator("#brand-status-dot-btn").click();
-    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
+    await openHubViaStatusDot(page);
+    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/, { timeout: 15_000 });
     await page.waitForTimeout(5000);
     expect(challengeFetches).toBe(0);
   });
 });
 
-test.describe("device inbox — live proof watch toggle (request budget phase 5)", () => {
+test.describe("device inbox - live proof watch toggle (request budget phase 5)", () => {
+  test("expanded hub does not auto-poll until watch is enabled (default off)", async ({
+    page,
+  }) => {
+    await page.addInitScript((entry) => {
+      localStorage.setItem("hc_wallet", JSON.stringify([entry]));
+      sessionStorage.setItem("hc_hub_open", "0");
+    }, WALLET_ENTRY);
+    await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
+    await page.route("**/.well-known/hc/v1/cards/**/status**", mockCardStatus);
+
+    let challengeFetches = 0;
+    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", (route) => {
+      challengeFetches += 1;
+      return mockNoChallenge(route);
+    });
+
+    await page.goto("/");
+    await openHubViaStatusDot(page);
+    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/, { timeout: 15_000 });
+    await expect(page.locator("#device-hub-watch-live-proof")).not.toBeChecked();
+    await page.waitForTimeout(10_000);
+    expect(challengeFetches).toBe(0);
+  });
+
   test.beforeEach(async ({ page, context }) => {
     await grantBrowserNotifications(context);
     await page.addInitScript((entry) => {
@@ -593,8 +633,9 @@ test.describe("device inbox — live proof watch toggle (request budget phase 5)
     });
 
     await page.goto("/");
-    await page.locator("#brand-status-dot-btn").click();
-    await expect(page.locator("#device-hub-check-live-proof-btn")).toBeVisible();
+    await openHubViaStatusDot(page);
+    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/, { timeout: 15_000 });
+    await expect(page.locator("#device-hub-check-live-proof-btn")).toBeVisible({ timeout: 15_000 });
     await page.locator("#device-hub-check-live-proof-btn").click();
     await expect.poll(() => challengeFetches, { timeout: 10_000 }).toBe(1);
   });

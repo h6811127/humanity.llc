@@ -16,7 +16,7 @@ Human Verification v1.0 defines how Humanity Commons represents trust that a car
 
 Verification is expressed through the Humanity Card. The card may show a public verification state, badge trail, vouch count, ceremony credential, or steward status. Verification is never purchased, never inferred from buying merchandise, and never delegated to Shopify, Printify, or fulfillment providers.
 
-**Vouch (primary path):** Eligible humans sign **public, revocable** attestations under published rules (threshold, quotas, wait). The product optimizes **accountable participation**—who staked their name on this profile—not global iris-style uniqueness. See [`VOUCH_TRUST_POSITIONING.md`](../VOUCH_TRUST_POSITIONING.md).
+**Vouch (primary path):** Eligible humans sign **public, revocable** attestations under published rules (threshold, quotas, wait). The product optimizes **accountable participation**-who staked their name on this profile-not global iris-style uniqueness. See [`VOUCH_TRUST_POSITIONING.md`](../VOUCH_TRUST_POSITIONING.md).
 
 The goal is portable, mechanism-visible human trust with sybil *mitigation*, not surveillance. V1 should be honest about what it can prove:
 

@@ -1,7 +1,7 @@
 # Hub saved card row UX
 
 **Status:** Phases 1–3 shipped (May 2026)  
-**Scope:** Saved card rows in the device hub (`/`, `/wallet/`, `/created/`) — `renderSavedRows()` in `site/js/device-hub-ui.mjs`  
+**Scope:** Saved card rows in the device hub (`/`, `/wallet/`, `/created/`) - `renderSavedRows()` in `site/js/device-hub-ui.mjs`  
 **Companions:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md), [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)
 
 ---
@@ -14,11 +14,12 @@ Saved card rows accumulated overlapping UI: handle repeated in title, sub-line, 
 
 ## Design goals
 
-1. **One glance** — identity, trust + object type, unified network status, primary actions.
-2. **Progressive depth** — keys, profile id, last saved, vouch default only in **Details** (collapsed by default).
-3. **Control-first** — steward actions grouped under ⋯ **QR & lifecycle**; **Prove live** stays inline when pending (Phase 2).
-4. **Semantic copy** — operational language, not cryptographic jargon.
-5. **Policy-aligned** — never imply operator scan logging or stranger scan trails.
+1. **One glance** - identity, trust + object type, unified network status, primary actions.
+2. **Progressive depth** - keys, profile id, last saved, vouch default only in **Details** (collapsed by default).
+3. **Control-first** - steward actions grouped under ⋯ **QR & lifecycle**; **Prove live** stays inline when pending (Phase 2).
+4. **Semantic copy** - operational language, not cryptographic jargon.
+5. **Policy-aligned** - never imply operator scan logging or stranger scan trails.
+6. **Budget-aligned** - **Reachable · checked … ago** reflects the last **device-initiated** status fetch (hub expand, **Check network**, or cache TTL), not continuous operator monitoring. Multi-card auto-polling is opt-in (**Watch for live proof**); see [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 
 ---
 
@@ -57,7 +58,7 @@ Built by `hubCardStatusLine()` in `site/js/device-hub-card-row-core.mjs`. Uses r
 | Fetch error / offline | `Can't reach resolver` (optional `· checked …` if a prior check exists) |
 | No successful check yet | `Not checked yet` (no recency suffix) |
 
-Recency suffix uses **checked**, not **seen** — see [Recency wording and data policy](#recency-wording-and-data-policy).
+Recency suffix uses **checked**, not **seen** - see [Recency wording and data policy](#recency-wording-and-data-policy).
 
 ---
 
@@ -68,8 +69,8 @@ Recency suffix uses **checked**, not **seen** — see [Recency wording and data 
 | User might think | What it actually is |
 |------------------|---------------------|
 | Someone scanned my QR 1m ago | **This browser** last successfully called `GET …/cards/{profile_id}/status?q=…` for that saved card |
-| Operator scan log | **No** — reference network v1 does not access-log scan routes ([`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md), [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md)) |
-| Synced across devices | **No** — timestamp lives in session `hc_wallet_network_cache` (~5 min TTL) |
+| Operator scan log | **No** - reference network v1 does not access-log scan routes ([`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md), [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md)) |
+| Synced across devices | **No** - timestamp lives in session `hc_wallet_network_cache` (~5 min TTL) |
 
 Implementation: `getCachedNetworkSeenAt()` → `entry.at` set in `refreshWalletNetworkStatuses()` when this device stores a poll result (`site/js/device-wallet-network.mjs`).
 
@@ -94,27 +95,27 @@ Implementation: `getCachedNetworkSeenAt()` → `entry.at` set in `refreshWalletN
 
 ## Phased delivery
 
-### Phase 1 — Information consolidation (shipped)
+### Phase 1 - Information consolidation (shipped)
 
-- [x] `hubCardStatusLine()` — one status line; remove header network + verification pills and `.hub-card-live`.
-- [x] `hubCardTitle()` — dedupe handle vs label.
-- [x] Identity line — object type · verification.
-- [x] `hubCardSubHtml()` — **Details** only; handle only inside expanded body when needed.
-- [x] Recency copy — **checked** not **seen**.
-- [x] Docs — this file, hub doc, keys doc, data policy cross-link.
-- [x] Tests — `device-hub-card-row-core` unit tests; update wallet e2e expectations.
+- [x] `hubCardStatusLine()` - one status line; remove header network + verification pills and `.hub-card-live`.
+- [x] `hubCardTitle()` - dedupe handle vs label.
+- [x] Identity line - object type · verification.
+- [x] `hubCardSubHtml()` - **Details** only; handle only inside expanded body when needed.
+- [x] Recency copy - **checked** not **seen**.
+- [x] Docs - this file, hub doc, keys doc, data policy cross-link.
+- [x] Tests - `device-hub-card-row-core` unit tests; update wallet e2e expectations.
 
-### Phase 2 — Action slimming (shipped)
+### Phase 2 - Action slimming (shipped)
 
-- [x] `partitionHubCardControls()` — **Prove live** inline; **Update status** / **Revoke QR** / **New QR** (and revoke-state) under ⋯ **QR & lifecycle**.
+- [x] `partitionHubCardControls()` - **Prove live** inline; **Update status** / **Revoke QR** / **New QR** (and revoke-state) under ⋯ **QR & lifecycle**.
 - [x] Collapsed row shows **Open controls** + **Open scan** (+ inline prove live when pending).
 
-### Phase 3 — Visual polish (shipped)
+### Phase 3 - Visual polish (shipped)
 
-- [x] Typography ladder — title 15px / identity 12px / status 12px / Details summary 11px (`--hub-row-*` on `.hub-card-item`, `--hub-card-*` in `device-shell.css`).
-- [x] Status dot — 7px with soft ring on ok/warn; flat dot for muted/offline.
-- [x] Tighter row rhythm — 5px card gap, compact head/controls/actions padding; 34px trust icon.
-- [x] Shell + dark theme — label tokens in `device-shell.css`; identity/status/menu in `theme-dark.css`.
+- [x] Typography ladder - title 15px / identity 12px / status 12px / Details summary 11px (`--hub-row-*` on `.hub-card-item`, `--hub-card-*` in `device-shell.css`).
+- [x] Status dot - 7px with soft ring on ok/warn; flat dot for muted/offline.
+- [x] Tighter row rhythm - 5px card gap, compact head/controls/actions padding; 34px trust icon.
+- [x] Shell + dark theme - label tokens in `device-shell.css`; identity/status/menu in `theme-dark.css`.
 
 ---
 
@@ -127,7 +128,7 @@ npm run worker:test:device
 npm run e2e -- e2e/device-os-wallet.spec.ts
 ```
 
-Manual: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — revoked since visit, QR-only revoke, multi-card wallet.
+Manual: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) - revoked since visit, QR-only revoke, multi-card wallet.
 
 ---
 
@@ -139,5 +140,5 @@ Manual: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — revoked since visit, QR-only re
 | Control list + inline/menu split | `site/js/device-hub-controls-core.mjs` |
 | DOM render + poll apply | `site/js/device-hub-ui.mjs` |
 | Network cache + `entry.at` | `site/js/device-wallet-network.mjs` |
-| Chip labels (hub status line only; not row pills) | `site/js/device-wallet-network-core.mjs` — `networkStatusChip()` still used elsewhere |
+| Chip labels (hub status line only; not row pills) | `site/js/device-wallet-network-core.mjs` - `networkStatusChip()` still used elsewhere |
 | Row CSS + tokens | `site/styles.css`, `site/css/device-shell.css`, `site/css/theme-dark.css` |

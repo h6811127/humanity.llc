@@ -1,7 +1,7 @@
 /**
  * Pure live-proof polling for the background service worker (Phase D + request budget Phase 4).
- * @see docs/DEVICE_INBOX.md — v2 Phase D
- * @see docs/DEVICE_OS_REQUEST_BUDGET.md — Phase 4
+ * @see docs/DEVICE_INBOX.md - v2 Phase D
+ * @see docs/DEVICE_OS_REQUEST_BUDGET.md - Phase 4
  */
 import { osNotificationContentForLiveProof } from "./device-browser-notifications-core.mjs";
 import {
