@@ -42,7 +42,7 @@ npm run deploy
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Landing (four-step progress inset — refactor spec: `docs/LANDING_PROGRESS_STRIP.md`; device hub; status plate pilot — no pass demo) |
+| `index.html` | Landing (hero, **How it works**, device hub; status plate pilot — no pass demo) |
 | `created/index.html` | Post-create owner UI + shared device hub |
 | `wallet/index.html` | My cards on this device (`/wallet/`, `hc_wallet` in localStorage) |
 | `shop/index.html` | Tier 0 drop  -  config-driven Shopify checkout handoff |

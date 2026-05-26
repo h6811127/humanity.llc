@@ -2,7 +2,7 @@
 
 **Status:** Phase 0–4 shipped  
 **Pages:** `site/created/index.html` · `site/wallet/` (My cards)  
-**Related:** `docs/CARD_WORKSPACE_PHASE0.md`, `docs/KEYS_CARDS_AND_VERIFICATION.md`, `docs/DEVICE_OS.md`
+**Related:** `docs/CARD_WORKSPACE_PHASE0.md`, `docs/KEYS_CARDS_AND_VERIFICATION.md`, `docs/DEVICE_OS.md`, [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md)
 
 ---
 
@@ -69,7 +69,7 @@ See `docs/CARD_WORKSPACE_PHASE0.md` - Open card loads keys, auto-save default on
 ## Phase 3 shipped - My cards home (`/wallet/`)
 
 - `/wallet/` page title and H1: **My cards on this device** (keys still local-only; URL unchanged)
-- Landing path step 4 → **My cards** (`/wallet/`)
+- Landing **My cards** entry → `/wallet/` (homepage four-step progress strip retired — [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md))
 - Landing shortcut **My cards** (was “All saved cards”)
 - Cross-links from `/created/` hub and error copy use **My cards** for `/wallet/`
 - Active-session banner on wallet: **Open controls** (not “Open card page”)

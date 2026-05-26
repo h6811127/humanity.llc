@@ -23,7 +23,7 @@ The site uses a **430px** centered `.page` column (mobile-first “device frame�
 
 | Column | Blocks |
 |--------|--------|
-| **Left** | `.hero.hero-tight`, `.landing-progress` (UX contract: [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md)) |
+| **Left** | `.hero.hero-tight` (progress strip retired — [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md)) |
 | **Right** | `.landing-framing` (aligned to top of hero) |
 | **Full width** | All other `main.screen-landing` children (studio, trust, docs, etc.) |
 

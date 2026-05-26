@@ -172,20 +172,9 @@ Per [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § QA (hub card
 
 **Note:** `/wallet/` uses scroll-to-saved, not a separate glance popover (see [`DEVICE_OS.md`](DEVICE_OS.md)).
 
-### P1-LP · Landing progress strip (legend + Continue)
+### P1-LP · Landing progress strip — retired
 
-Spec: [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md). Automated: `npm run worker:test:landing-progress`, `npm run e2e -- e2e/landing-progress.spec.ts`.
-
-| Step | Action | Expected |
-|------|--------|----------|
-| 1 | Incognito `/` (empty `hc_wallet`) | Four legend chips are not links; none use `is-next`; **Continue** → Create |
-| 2 | Create in tab; return to `/` before saving to device | **Continue** → `/created/?…&fresh=1#setup` (Save keys); step 2 may show `is-next` |
-| 3 | Saved card(s), setup incomplete | **Continue** → `/created/?…&fresh=1#setup-qr` (Print wizard step) |
-| 4 | Saved + setup done, no pin | **Continue** → `/created/?…#deploy-print` (Live Print QR row) |
-| 5 | Saved + setup done + pin | **Continue** → `/wallet/` (Open My cards); step 4 may show `is-next` |
-| 6 | Tap legend chips | No navigation (typography only) |
-
-**Fail signals:** Four peer links on legend chips; step 2 highlighted on cold incognito load; Print opens `/wallet/` or ignores hash (stuck on save step).
+Removed May 2026. See [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md). Steward resume: hub + `/created/` setup wizard; strangers: hero Create + **How it works**.
 
 ### P1-7 · Watch for live proof (request budget Phase 5)
 

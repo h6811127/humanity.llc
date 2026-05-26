@@ -69,7 +69,7 @@ On `/`, **Design choices**, **Clear limits**, and **Documentation** are collapse
 
 ### Focus mode (`hc_landing_focus`)
 
-Hides `[data-landing-tutorial]` (hero, progress, One use, design choices, dock, help pill).
+Hides `[data-landing-tutorial]` (hero, **How it works**, One use, design choices, dock, help pill).
 
 **Stays visible:**
 

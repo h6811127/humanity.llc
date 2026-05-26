@@ -3451,6 +3451,10 @@ body.landing-focus-mode .screen-landing > .hero.hero-tight {
   margin-top: 18px;
 }
 
+.screen-landing > .hero.hero-tight + .landing-how-it-works {
+  margin-top: 4px;
+}
+
 .device-hub-title {
   font-size: 22px;
   font-weight: 700;
@@ -4161,101 +4165,6 @@ body.landing-focus-mode .screen-landing {
 
 .landing-new-here-label {
   white-space: nowrap;
-}
-
-.screen-landing > .hero.hero-tight + .landing-progress {
-  margin-top: -4px;
-}
-
-.screen-landing > .landing-progress + .landing-how-it-works {
-  margin-top: -8px;
-}
-
-.landing-progress {
-  margin: 0;
-  padding: 14px 12px 12px;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(60, 60, 67, 0.1);
-  background: rgba(242, 242, 247, 0.72);
-}
-
-.landing-progress-kicker {
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--grey);
-  margin: 0 0 8px;
-  padding-left: 2px;
-}
-
-.landing-progress-steps {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.landing-progress-legend {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px 8px 8px;
-  border-radius: var(--radius-pill);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  background: var(--white);
-  color: inherit;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.landing-progress-actions {
-  margin: 12px 0 0;
-  padding: 0 2px;
-}
-
-.landing-progress-continue {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 100%;
-  text-align: center;
-  text-decoration: none;
-  box-sizing: border-box;
-}
-
-.landing-progress-num {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: rgba(219, 27, 67, 0.1);
-  color: var(--red);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.landing-progress-label {
-  letter-spacing: -0.02em;
-}
-
-.landing-progress-step.is-done .landing-progress-legend {
-  opacity: 0.65;
-}
-
-.landing-progress-step.is-next .landing-progress-legend {
-  border-color: rgba(219, 27, 67, 0.45);
-  box-shadow: 0 0 0 1px rgba(219, 27, 67, 0.12);
-}
-
-.landing-progress-step.is-next .landing-progress-num {
-  background: var(--red);
-  color: var(--white);
 }
 
 .device-hub-search-float--landing.is-expanded {
