@@ -36,7 +36,7 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 
 - **Cards vs keys vs verification:** `docs/KEYS_CARDS_AND_VERIFICATION.md` — steward status is on the resolver; vouch signing needs `hc_created` keys on the same browser tab.
 - **Status dot vs inbox vs OS alerts:** `docs/DEVICE_INBOX.md` (action items, badge, background alerts) vs `docs/STATUS_INDICATOR_STEWARD_GREEN.md` (trust dot only).
-- **Safari / iPhone shell regression (scroll, dead taps):** `docs/SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md` — fix plan; hub scroll smooth / landing lag implicates `device-shell-chrome.mjs` document scroll listener.
+- **Safari / iPhone shell regression (scroll, dead taps):** `docs/SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md` — fix plan; hub scroll smooth / landing lag implicates `device-shell-chrome.mjs` document scroll listener. **Reverted features catalog:** `docs/UI_UX_REVERTED_FEATURES_CATALOG.md` (safe rebuild without lag/rate-limit paths). **Phased implementation:** `docs/UI_UX_SAFE_REBUILD_IMPLEMENTATION.md`.
 - **Card disabled since visit:** Banner, hub `#device-hub-card-disabled-group`, and inbox badge must use **resolver-confirmed** poll maps only — never `sessionStorage.hc_wallet_network_cache` alone. Incident **closed** (no Slice 9); see `docs/CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`. After hub/inbox network changes: `npm run worker:test:card-disabled-since-visit` and `npm run e2e:card-disabled-since-visit`.
 
 ### Status dot / hub opener (agent guardrails)
@@ -48,14 +48,13 @@ The floating **status dot** (`#brand-status-dot-btn`) is the hub opener on `/`, 
 When you touch any of these, run the regression suite before finishing:
 
 - `site/js/device-status.mjs`, `device-status-bootstrap.mjs`, `device-dot-state-core.mjs`
-- `site/js/device-hub-sheet.mjs`, `device-inbox-sheet.mjs`, `device-inbox-sheet-loader.mjs`, `device-hub-glance.mjs`, `device-shell-chrome.mjs`, `device-hub-glance-popover.mjs`
+- `site/js/device-hub-sheet.mjs`, `device-inbox-sheet.mjs`, `device-hub-glance.mjs`, `device-shell-chrome.mjs`, `device-hub-glance-popover.mjs`
 - `site/css/device-shell.css` (especially `pointer-events` on `.top-chrome--float` / `.shell-status-cluster`)
 
 ```bash
 npm run worker:test
 npm run e2e:install   # once per machine
 npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device-os-wallet.spec.ts
-npm run e2e:safari   # WebKit + iPhone 13 Pro shell smoke
 ```
 
 **Contracts (do not break without updating docs + tests):**

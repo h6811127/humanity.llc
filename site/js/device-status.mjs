@@ -1,9 +1,8 @@
 /**
  * Floating status dot, notification badge, hub sheet host.
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
- * @see docs/SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md — Phase 2.2 (lazy inbox sheet)
  */
-import { openInboxFromChrome, closeInboxSheet } from "./device-inbox-sheet-loader.mjs";
+import { openInboxFromChrome, setInboxSheetOpen } from "./device-inbox-sheet.mjs?v=31";
 import { buildStatusSegments } from "./device-counts.mjs";
 import { fetchResolverHealth } from "./device-network-health.mjs";
 import { resolverApiOrigin } from "./hc-sign.mjs";
@@ -18,25 +17,25 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeCountText,
   notificationCount,
-} from "./device-inbox.mjs?v=29";
+} from "./device-inbox.mjs?v=31";
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=29";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=31";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import "./device-shell-motion.mjs";
-import "./device-shell-chrome.mjs?v=29";
+import "./device-shell-chrome.mjs?v=31";
 import "./device-theme.mjs";
-import "./device-browser-notifications.mjs?v=29";
+import "./device-browser-notifications.mjs?v=31";
 import {
   isHubSheet,
   reconcileHubSheetState,
   setHubSheetOpen,
-} from "./device-hub-sheet.mjs?v=29";
+} from "./device-hub-sheet.mjs?v=31";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 import {
   describeDotState,
@@ -48,7 +47,7 @@ import {
   hasStewardVerification,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=29";
+} from "./device-dot-state-core.mjs?v=31";
 
 export const DOT_STATE_CHANGED = "hc-dot-state-changed";
 
@@ -137,7 +136,7 @@ export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
   if (!hub) return;
   if (open) {
     closeGlancePopover();
-    closeInboxSheet();
+    setInboxSheetOpen(false);
   }
   if (isHubSheet()) {
     setHubSheetOpen(open);
@@ -485,7 +484,7 @@ document.addEventListener("keydown", (e) => {
     return;
   }
   if (document.body.classList.contains("device-inbox-sheet-open")) {
-    closeInboxSheet();
+    setInboxSheetOpen(false);
     return;
   }
   if (hub && !hub.classList.contains("device-hub-collapsed")) {

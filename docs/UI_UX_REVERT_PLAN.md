@@ -3,7 +3,7 @@
 **Opened:** 2026-05-26  
 **Status:** **Resolved** (production sign-off 2026-05-26) — see [Resolution](#resolution) below.  
 **Baseline commit:** `4d1e965` (2026-05-25 20:59 CDT) — last good state before the device-inbox wave (`7590e79`, 22:24).  
-**Related:** [`SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md`](SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md)
+**Related:** [`UI_UX_SAFE_REBUILD_IMPLEMENTATION.md`](UI_UX_SAFE_REBUILD_IMPLEMENTATION.md) (phased restore) · [`UI_UX_REVERTED_FEATURES_CATALOG.md`](UI_UX_REVERTED_FEATURES_CATALOG.md) (per-feature impact & safe rebuild) · [`SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md`](SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md)
 
 ---
 

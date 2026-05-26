@@ -1,6 +1,7 @@
 /**
  * Shared backdrop + lifecycle reconcile for hub and inbox sheets.
- * @see docs/SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md — Phase 1.4
+ * @see docs/UI_UX_SAFE_REBUILD_IMPLEMENTATION.md — Step 1
+ * @see docs/UI_UX_REVERTED_FEATURES_CATALOG.md §8
  */
 
 /**

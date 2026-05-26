@@ -2,7 +2,11 @@
  * Bottom sheet host for #device-hub on shell pages.
  */
 import { prefersReducedMotion } from "./device-shell-motion.mjs";
-import { hubSheetReconcileAction } from "./device-hub-sheet-core.mjs";
+import { hubSheetReconcileAction } from "./device-hub-sheet-core.mjs?v=31";
+import {
+  bindSheetLifecycleReconcile,
+  syncSheetBackdropClosed,
+} from "./device-sheet-backdrop-sync.mjs?v=31";
 
 const HUB_OPEN_KEY = "hc_hub_open";
 
@@ -42,6 +46,8 @@ export function setHubSheetOpen(open) {
   if (backdrop) {
     backdrop.hidden = !open;
     backdrop.classList.toggle("is-visible", open);
+    backdrop.setAttribute("aria-hidden", open ? "false" : "true");
+    if (!open) syncSheetBackdropClosed(backdrop);
   }
   document.body.classList.toggle("device-hub-sheet-open", open);
   chrome?.classList.toggle("top-chrome--hub-locked", open);
@@ -50,6 +56,7 @@ export function setHubSheetOpen(open) {
     hub.removeAttribute("inert");
   } else {
     hub.setAttribute("inert", "");
+    reconcileHubSheetState();
   }
   if (open && !prefersReducedMotion()) {
     hub.scrollTop = 0;
@@ -74,8 +81,7 @@ export function reconcileHubSheetState() {
     return;
   }
   if (action === "hide_backdrop" && backdrop) {
-    backdrop.hidden = true;
-    backdrop.classList.remove("is-visible");
+    syncSheetBackdropClosed(backdrop);
   }
 }
 
@@ -102,8 +108,6 @@ function bindHubSheetUi() {
 
 bindHubSheetUi();
 reconcileHubSheetState();
+bindSheetLifecycleReconcile(reconcileHubSheetState);
 
 window.addEventListener("pagehide", closeHubBeforeNavigation);
-window.addEventListener("pageshow", (e) => {
-  if (e.persisted) reconcileHubSheetState();
-});
