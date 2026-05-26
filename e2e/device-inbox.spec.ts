@@ -456,7 +456,7 @@ test.describe("device inbox — card disabled since visit suppressed when resolv
   });
 });
 
-test.describe("device inbox — live proof poll scope (request budget phase 1)", () => {
+test.describe("device inbox — live proof poll scope (request budget phases 1–3)", () => {
   test.beforeEach(async ({ page, context }) => {
     await grantBrowserNotifications(context);
     await page.addInitScript((entry) => {
@@ -497,13 +497,18 @@ test.describe("device inbox — live proof poll scope (request budget phase 1)",
   test("expanded hub fetches one live-control challenge per tick (3 cards)", async ({
     page,
   }) => {
+    const profileIds = [
+      "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+      "7Xk9mP2nQ4rT6vW8yZ1aB3cD6",
+      "7Xk9mP2nQ4rT6vW8yZ1aB3cD7",
+    ];
     const entries = [0, 1, 2].map((i) => ({
       ...WALLET_ENTRY,
       id: `e2e_inbox_rr_${i}`,
       label: `E2E Card ${i}`,
-      profile_id: `7Xk9mP2nQ4rT6vW8yZ1aB3cD${i}`,
+      profile_id: profileIds[i],
       qr_id: `qr_E2eWakketTest${i + 7}`,
-      scan_url: `http://127.0.0.1:8787/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD${i}?q=qr_E2eWakketTest${i + 7}`,
+      scan_url: `http://127.0.0.1:8787/c/${profileIds[i]}?q=qr_E2eWakketTest${i + 7}`,
     }));
 
     await page.addInitScript((wallet) => {

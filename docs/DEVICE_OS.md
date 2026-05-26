@@ -230,7 +230,7 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 **Scope:** Device hub only on **landing** and **`/wallet/`**  -  not duplicated on `/created/` (that page keeps the existing **Prove live control** panel for the open card).
 
-**Poll (Phase 1 shipped):** `GET …/live-control/challenges` runs only when the hub sheet is **expanded**, the **inbox sheet** is open, or the user is on **`/wallet/`** (dedicated hub page). Interval is **30s** when no pending proof, **5s** when proof is waiting; tab must be **visible**. Still **parallel per saved row** per tick — see **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)** Phase 2 for round-robin. Scheduler: `device-live-control-poll-scheduler.mjs`.
+**Poll (Phases 1–3 shipped):** `GET …/live-control/challenges` runs only when the hub sheet is **expanded**, the **inbox sheet** is open, or the user is on **`/wallet/`**; resolver health must be **`ok`**; **one card per tick** (round-robin); **30s** idle / **5s** when proof is waiting. Wallet status chips refresh on hub expand (not every tab focus; **≥60s** debounce on `visibilitychange`). See **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)**. Modules: `device-live-control-poll-scheduler.mjs`, `device-live-control-inbox.mjs`.
 
 **UI:**
 
