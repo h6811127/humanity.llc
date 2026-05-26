@@ -1,6 +1,6 @@
 # `/created/` task dashboard UX
 
-**Status:** Superseded for new visits by setup wizard — control Tasks tab unchanged  
+**Status:** Shipped baseline; **Tasks tab redesign drafted** in [`CREATED_TASKS_TAB_REDESIGN.md`](CREATED_TASKS_TAB_REDESIGN.md) (setup wizard supersedes first visit only)  
 **See:** `docs/CARD_WORKSPACE_UX.md`  
 **Page:** `site/created/index.html` · `site/js/created-dashboard.mjs` · `site/js/created.mjs`  
 **Related:** `docs/M4_CREATED_REVOKE_UI.md`, `docs/DEVICE_OS.md`, `docs/M3_M4_EXECUTION_PLAN.md`, `docs/CARD_WORKSPACE_PHASE0.md`
@@ -11,7 +11,7 @@
 
 After create, `/created/` is a **task dashboard**, not a settings dump. The user just made a **live object** (QR). The page should show that object immediately, then guide them through control setup.
 
-**Verdict (target):** Portfolio-quality UI — intentional, usable, technically serious without overwhelming. The main remaining product risk is users who never **save the control key** and lose revoke/update ability when the tab closes.
+**Verdict (target):** Portfolio-quality UI - intentional, usable, technically serious without overwhelming. The main remaining product risk is users who never **save the control key** and lose revoke/update ability when the tab closes.
 
 ---
 
@@ -19,10 +19,10 @@ After create, `/created/` is a **task dashboard**, not a settings dump. The user
 
 Top to bottom:
 
-1. **Hero** — `@handle` · **Live QR ready** · status meta (`Card active · QR expires …`)
-2. **Small QR preview** — tap scrolls to full QR block (emotional “here’s the thing you made”)
+1. **Hero** - `@handle` · **Live QR ready** · status meta (`Card active · QR expires …`)
+2. **Small QR preview** - tap scrolls to full QR block (emotional “here’s the thing you made”)
 3. **Primary actions** (prominent)
-   - **1. Save control key** — `Required` badge; first setup step
+   - **1. Save control key** - `Required` badge; first setup step
    - **Open scan page**
 4. **More tasks** (grouped list)
    - Download QR → scrolls to full QR section (download button lives there)
@@ -30,9 +30,9 @@ Top to bottom:
    - Test scan
    - Update status
    - Revoke QR
-5. **Keys strip** — custody notice + save form (revealed when saving)
-6. **Network status & IDs** — collapsed `<details>` with icons
-7. **Full QR section** — large QR, download, copy link, print steps
+5. **Keys strip** - custody notice + save form (revealed when saving)
+6. **Network status & IDs** - collapsed `<details>` with icons
+7. **Full QR section** - large QR, download, copy link, print steps
 
 ---
 
@@ -61,7 +61,7 @@ Top to bottom:
 | Test scan | Open scan URL (same as primary) | Green tint |
 | Update status | Advanced tab + open manifesto panel | Green tint |
 | Revoke QR | Advanced tab + open revoke `<details>` | No done tint (destructive) |
-| QR preview tap | Scroll to full QR | — |
+| QR preview tap | Scroll to full QR | - |
 
 Done states persist per card in `sessionStorage` (`hc_created_task_done`).
 
@@ -69,10 +69,10 @@ Done states persist per card in `sessionStorage` (`hc_created_task_done`).
 
 ## Visual notes
 
-- **Save control key** uses setup styling (step number, `Required` badge, stronger border) — not error/warning colors.
+- **Save control key** uses setup styling (step number, `Required` badge, stronger border) - not error/warning colors.
 - **Primary pair** (save + open scan) sits above the task list with larger tap targets.
 - **Dark mode:** shell fill tokens for lists; advanced blocks use icon + chevron summaries (`created-advanced-summary`).
-- **Hub sheet (mobile):** `var(--shell-fill)` — no hardcoded white sheet background.
+- **Hub sheet (mobile):** `var(--shell-fill)` - no hardcoded white sheet background.
 
 ---
 
@@ -80,10 +80,10 @@ Done states persist per card in `sessionStorage` (`hc_created_task_done`).
 
 Dashboard actions must wire **before** the top-level QR render so **Save control key** can call `runSave()` without waiting for `bootstrapOwnerTools()`. That ordering requires a declared tab handle:
 
-1. `let createdTabs` — ES modules are strict; undeclared assignment throws and blocks QR render.
+1. `let createdTabs` - ES modules are strict; undeclared assignment throws and blocks QR render.
 2. `createdTabs = initCreatedTabs()` + `setupCreatedDashboard()` + `initCreatedDeviceSave()`.
 3. QR block (`renderQrToImage`, preview sync, copy/download handlers).
-4. `void bootstrapOwnerTools()` (revoke, rotate, backup — async).
+4. `void bootstrapOwnerTools()` (revoke, rotate, backup - async).
 
 See `docs/CREATED_QR_BOOTSTRAP_FIX.md` for the 2026-05-25 regression (commit `69f4d6c` moved dashboard init up without adding the declaration).
 

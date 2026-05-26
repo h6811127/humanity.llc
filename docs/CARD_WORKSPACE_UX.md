@@ -10,15 +10,15 @@
 
 | Mode | When | UI |
 |------|------|-----|
-| **setup** | Keys in tab and (`fresh=1` or setup not done or not saved to device) | Linear wizard — no tabs |
-| **control** | Keys in tab, setup complete, saved on device | Tasks · Advanced |
+| **setup** | Keys in tab and (`fresh=1` or setup not done or not saved to device) | Linear wizard - no tabs |
+| **control** | Keys in tab, setup complete, saved on device | Tasks · Advanced (planned: **Live · Manage** - [`CREATED_TASKS_TAB_REDESIGN.md`](CREATED_TASKS_TAB_REDESIGN.md)) |
 | **view** | No signing keys in this tab | Read-only notice + unlock paths |
 
 Resolver: `site/js/created-mode.mjs` · `modeFromPage()`.
 
-**Mode gate (May 2026):** **control** when this tab has signing keys and the card is **saved on this device**, unless `?fresh=1` (post-create wizard). `hc_setup_done` is set when the wizard finishes, on wallet save, or when reopening a saved card (`syncSetupDoneForSavedProfile`). Hub **Open controls** / `#revoke` deep-links require control mode — see `docs/HUB_REVOKE_AND_CONTROLS_NAVIGATION.md`.
+**Mode gate (May 2026):** **control** when this tab has signing keys and the card is **saved on this device**, unless `?fresh=1` (post-create wizard). `hc_setup_done` is set when the wizard finishes, on wallet save, or when reopening a saved card (`syncSetupDoneForSavedProfile`). Hub **Open controls** / `#revoke` deep-links require control mode - see `docs/HUB_REVOKE_AND_CONTROLS_NAVIGATION.md`.
 
-Storage: `localStorage.hc_setup_done` — map of `profile_id → true` after wizard finish, save, or saved-card backfill.
+Storage: `localStorage.hc_setup_done` - map of `profile_id → true` after wizard finish, save, or saved-card backfill.
 
 ---
 
@@ -29,8 +29,8 @@ Kicker copy in setup: **"Four steps · keys stay in this browser"** to reinforce
 | Step | User action | Gate |
 |------|-------------|------|
 | 1 Save | Save control key to this device | Cannot continue until `isWalletSaved(profile_id)` |
-| 2 Print | Download QR PNG | — |
-| 3 Test scan | Preview what anyone scanning the QR sees (another device) | — |
+| 2 Print | Download QR PNG | - |
+| 3 Test scan | Preview what anyone scanning the QR sees (another device) | - |
 | 4 Live | **Open card controls** | Marks setup done, clears `fresh` from URL, enters **control** |
 
 Modules: `created-setup.mjs`, `created-workspace.mjs`.
@@ -45,20 +45,22 @@ On entering step 4, setup now includes a subtle "goes live" transition and confi
 
 ## Control mode (Tasks tab)
 
-Post-setup hierarchy (unchanged intent from `docs/CREATED_TASK_DASHBOARD.md`):
+**Redesign in progress (draft):** [`CREATED_TASKS_TAB_REDESIGN.md`](CREATED_TASKS_TAB_REDESIGN.md) - operator cockpit for one live object; **Advanced** tab unchanged.
 
-1. Hero — `@handle` · **Live QR ready**
+**Shipped today** (see [`CREATED_TASK_DASHBOARD.md`](CREATED_TASK_DASHBOARD.md)):
+
+1. Hero - `@handle` · **Live QR ready**
 2. Primary: Save (if needed) · Open scan
-3. **More tasks** — download, print, test scan, update, revoke (advanced entry)
+3. **More tasks** - download, print, test scan, update, revoke (advanced entry)
 4. Network status (collapsed) · full QR block
 
-**Advanced** tab (formerly Manage/Help): revoke, rotate, backup, manifesto update, lifecycle notes, and doc links.
+**Advanced** tab: revoke, rotate, backup, manifesto update, lifecycle notes, and doc links (icon + disclosure pattern - keep as reference).
 
 ---
 
 ## Phase 0 recap
 
-See `docs/CARD_WORKSPACE_PHASE0.md` — Open card loads keys, auto-save default on, `fresh=1` redirect.
+See `docs/CARD_WORKSPACE_PHASE0.md` - Open card loads keys, auto-save default on, `fresh=1` redirect.
 
 ---
 
@@ -71,7 +73,7 @@ See `docs/CARD_WORKSPACE_PHASE0.md` — Open card loads keys, auto-save default 
 
 ---
 
-## Phase 3 shipped — My cards home (`/wallet/`)
+## Phase 3 shipped - My cards home (`/wallet/`)
 
 - `/wallet/` page title and H1: **My cards on this device** (keys still local-only; URL unchanged)
 - Landing path step 4 → **My cards** (`/wallet/`)
@@ -81,7 +83,7 @@ See `docs/CARD_WORKSPACE_PHASE0.md` — Open card loads keys, auto-save default 
 
 ---
 
-## Phase 4 shipped — My cards naming consistency
+## Phase 4 shipped - My cards naming consistency
 
 - Scan/vouch and cross-tab banners link to `/wallet/` as **My cards** (not “Saved cards”)
 - Landing status dot aria-label uses **My cards**
@@ -118,4 +120,4 @@ See `docs/CARD_WORKSPACE_PHASE0.md` — Open card loads keys, auto-save default 
 
 - `worker/tests/created-mode.test.ts`
 - `worker/tests/device-auto-save.test.ts`
-- `e2e/device-os-wallet.spec.ts` — My cards home heading, contextless `/created/` redirect
+- `e2e/device-os-wallet.spec.ts` - My cards home heading, contextless `/created/` redirect
