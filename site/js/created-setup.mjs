@@ -76,20 +76,38 @@ export function initCreatedSetup(opts) {
     return STEPS[stepIndex] ?? "save";
   }
 
+  function scrollToCurrentPanel() {
+    const panel = root.querySelector(`[data-setup-panel="${currentStep()}"]`);
+    panel?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function writeStepHistory(replace = true) {
+    const state = { setup: true, setupStep: stepIndex };
+    const url = new URL(location.href);
+    url.hash = stepIndex === 0 ? "setup" : `setup-${currentStep()}`;
+    const nextUrl = `${url.pathname}${url.search}${url.hash}`;
+    if (replace) {
+      history.replaceState(state, "", nextUrl);
+    } else {
+      history.pushState(state, "", nextUrl);
+    }
+  }
+
   function syncIndicators() {
     const step = currentStep();
     indicators.forEach((el) => {
       const id = el.getAttribute("data-setup-step");
+      const idx = STEPS.indexOf(id);
       el.classList.toggle("is-current", id === step);
-      el.classList.toggle(
-        "is-done",
-        STEPS.indexOf(id) >= 0 && STEPS.indexOf(id) < stepIndex
-      );
+      el.classList.toggle("is-done", idx >= 0 && idx < stepIndex);
     });
     panels.forEach((panel) => {
       panel.hidden = panel.dataset.setupPanel !== step;
     });
-    if (backBtn) backBtn.hidden = stepIndex === 0;
+    if (backBtn) {
+      backBtn.hidden = stepIndex === 0;
+      backBtn.disabled = stepIndex === 0;
+    }
     if (continueBtn) continueBtn.hidden = step === "done";
     if (doneBtn) doneBtn.hidden = step !== "done";
   }
@@ -98,13 +116,15 @@ export function initCreatedSetup(opts) {
     return isWalletSaved(profileId);
   }
 
-  function goToStep(index) {
+  function goToStep(index, { pushHistory = false } = {}) {
     stepIndex = Math.max(0, Math.min(index, STEPS.length - 1));
     syncIndicators();
     if (currentStep() === "save" && keysStrip) {
       keysStrip.hidden = false;
     }
     if (currentStep() === "qr") syncSetupQrPreview();
+    scrollToCurrentPanel();
+    writeStepHistory(!pushHistory);
   }
 
   syncSetupQrPreview();
@@ -120,7 +140,7 @@ export function initCreatedSetup(opts) {
           refreshSave?.();
           if (saved) {
             showFeedback("Saved on this device.");
-            goToStep(stepIndex + 1);
+            goToStep(stepIndex + 1, { pushHistory: true });
             return;
           }
         }
@@ -130,11 +150,11 @@ export function initCreatedSetup(opts) {
         );
         return;
       }
-      goToStep(stepIndex + 1);
+      goToStep(stepIndex + 1, { pushHistory: true });
       return;
     }
     if (step === "qr") {
-      goToStep(stepIndex + 1);
+      goToStep(stepIndex + 1, { pushHistory: true });
       return;
     }
     if (step === "test") {
@@ -145,7 +165,7 @@ export function initCreatedSetup(opts) {
       }
       window.open(url, "_blank", "noopener,noreferrer");
       showFeedback("Opened scan page — check it from another device, then continue.");
-      goToStep(stepIndex + 1);
+      goToStep(stepIndex + 1, { pushHistory: true });
       return;
     }
   }
@@ -156,10 +176,27 @@ export function initCreatedSetup(opts) {
     onComplete();
   }
 
-  continueBtn?.addEventListener("click", () => advance());
+  continueBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    advance();
+  });
 
-  backBtn?.addEventListener("click", () => {
-    if (stepIndex > 0) goToStep(stepIndex - 1);
+  backBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (stepIndex <= 0) return;
+    goToStep(stepIndex - 1);
+  });
+
+  window.addEventListener("popstate", (event) => {
+    if (root.hidden) return;
+    const nextStep = event.state?.setupStep;
+    if (typeof nextStep === "number" && event.state?.setup) {
+      stepIndex = Math.max(0, Math.min(nextStep, STEPS.length - 1));
+      syncIndicators();
+      if (currentStep() === "qr") syncSetupQrPreview();
+      scrollToCurrentPanel();
+    }
   });
 
   doneBtn?.addEventListener("click", () => complete());
@@ -211,4 +248,6 @@ export function initCreatedSetup(opts) {
     stepIndex = 1;
   }
   syncIndicators();
+  if (currentStep() === "qr") syncSetupQrPreview();
+  writeStepHistory(true);
 }

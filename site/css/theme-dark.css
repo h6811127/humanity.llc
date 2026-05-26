@@ -352,6 +352,29 @@ html[data-theme="dark"] .flow-disclosure.created-recovery-details {
   box-shadow: none;
 }
 
+html[data-theme="dark"] body.device-shell-created .flow-disclosure-body #copy-recovery-key,
+html[data-theme="dark"] body.device-shell-created .flow-disclosure-body #recovery-reveal-dismiss {
+  border: 1.5px solid rgba(255, 77, 109, 0.58);
+  background: var(--shell-fill-secondary);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+html[data-theme="dark"] body.device-shell-created .created-setup .created-setup-progress-item {
+  background: var(--shell-fill);
+  color: var(--shell-label);
+}
+
+html[data-theme="dark"] body.device-shell-created .created-setup .created-setup-progress-item.is-current {
+  background: rgba(255, 77, 109, 0.14);
+  color: var(--red);
+  box-shadow: inset 0 0 0 1px rgba(255, 77, 109, 0.35);
+}
+
+html[data-theme="dark"] body.device-shell-created .created-setup .created-setup-inline-action,
+html[data-theme="dark"] body.device-shell-created .created-setup-nav .btn-secondary {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
 html[data-theme="dark"] body.device-shell-created .flow-keys-group .list-row {
   background: var(--shell-fill);
   border-color: var(--shell-separator);
