@@ -480,7 +480,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 
 ### Implementer order (after Phases 1–9 + 8c)
 
-1. **Phase 10 (planning → build)** — M2–M8 done. **Start code:** [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) **E1** after **M4 governance sign-off**.  
+1. **Phase 10 (planning → build)** — M2–M8 done. **Next:** M4 governance sign-off ([`HOSTED_TIER_M4_GOVERNANCE_BRIEF.md`](HOSTED_TIER_M4_GOVERNANCE_BRIEF.md)) → **E1** per [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md).  
 2. **Shell P2** - Lazy inbox loader ([`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md)).  
 3. **Ops O2** - Per-IP rate limits on hot routes.
 

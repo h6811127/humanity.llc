@@ -19,7 +19,7 @@ M1–M7 defined product boundaries, entitlements, push, pricing/SLA, public copy
 
 | # | Gate | Doc |
 |---|------|-----|
-| G0 | M4 governance checklist signed | [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) § Governance checklist |
+| G0 | M4 governance checklist signed | [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) § Governance checklist · [`HOSTED_TIER_M4_GOVERNANCE_BRIEF.md`](HOSTED_TIER_M4_GOVERNANCE_BRIEF.md) |
 | G1 | Free-tier regression green before/after each epic PR | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) |
 | G2 | No change to watch default (`hc_watch_live_proof` unset = off) | Request budget doc |
 | G3 | Card create / public scan / stranger poll unchanged without session | M2, M5 |

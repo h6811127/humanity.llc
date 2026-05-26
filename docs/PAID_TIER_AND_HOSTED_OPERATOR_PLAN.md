@@ -239,7 +239,7 @@ Document options; **do not pick** in this planning pass without governance.
 | M1 | This plan (product + boundaries) | **This doc** |
 | M2 | **Entitlement & metering spec** (fields, APIs, no UI) | **[`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md)** |
 | M3 | **Push architecture RFC** (threat model + protocol messages) | **[`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md)** |
-| M4 | **Pricing & SLA one-pager** (governance-approved) | **[`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md)** (draft — sign-off pending) |
+| M4 | **Pricing & SLA one-pager** (governance-approved) | **[`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md)** — sign-off pending · brief: [`HOSTED_TIER_M4_GOVERNANCE_BRIEF.md`](HOSTED_TIER_M4_GOVERNANCE_BRIEF.md) |
 | M5 | **Skeptic FAQ + launch language** updates | **[`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md)** § Is There A Paid Tier? · **[`LAUNCH_LANGUAGE_KIT.md`](LAUNCH_LANGUAGE_KIT.md)** § Hosted steward tier |
 | M6 | **Technical Standards** delta (optional hosted extensions) | **[`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md)** |
 | M7 | **DEVICE_OS_REQUEST_BUDGET** paid-tier row + test plan | **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)** § Phase 10 — hosted tier rows (M7) |
