@@ -54,7 +54,7 @@ Per **device**, storage:
 |---------|----------|----------|
 | **`hc_created`** (session) | Active card’s keys + metadata for **this tab** | Until tab closes / you clear site data |
 | **`hc_wallet`** (local) | Zero or more **saved** cards with keys (labels, `profile_id`, …) | Until you remove or clear site data |
-| **`hc_wallet_network_cache`** (session) | Cached resolver status + **verification label** per saved card | ~5 minutes |
+| **`hc_wallet_network_cache`** (session) | Cached resolver status + **verification label** per saved card; `at` = when **this device** last polled `GET …/status?q=…` (used for **checked … ago** on hub rows — not scan logging) | ~5 minutes |
 
 **No sync between devices.** Chrome and iPhone are separate wallets unless you **export/import** a backup (`.hcbackup.json`) or create/save again on each device.
 
@@ -98,7 +98,7 @@ Per **device**, storage:
 | Surface | What you see |
 |---------|----------------|
 | **`/created/` → On the network** | Row title = label (e.g. **Steward**). Icon: **green shield** for Steward, trust-blue shield for Vouched Human, purple people if vouches in progress, blue people for Registered. |
-| **`/wallet/` saved card row** | Pills: **network** (Active / QR revoked / …) + **verification** (Steward / Vouched Human / Registered / …). |
+| **`/wallet/` saved card row** | **Title** (label or `@handle`); **identity line** (`Object type · Steward / Vouched Human / Registered`); **one status line** (e.g. **Reachable · checked 2m ago**, **QR revoked**, **Disabled on network**). Technical fields in collapsed **Details**. See [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md). |
 | **Scan page → Human trust** | **Scanned card’s** label (not yours). Steward = green shield. |
 | **Scan page → Vouch** | **Your** ability to sign. If keys missing: explains network vs keys; if saved Steward exists, names the card. |
 
@@ -132,7 +132,8 @@ Steward is **not** earned by vouch count. It is set on the resolver (bootstrap o
 | Human trust copy + icon tones | `worker/src/resolver/verification-display.ts` |
 | Shared browser helpers | `site/js/human-trust-ui.mjs` |
 | `/created/` icon + labels | `site/js/created.mjs`, `site/created/index.html` |
-| Wallet verification chip | `site/js/device-wallet-network*.mjs`, `site/js/device-hub-ui.mjs` |
+| Hub saved row copy | `site/js/device-hub-card-row-core.mjs`, `site/js/device-hub-ui.mjs` |
+| Wallet network cache + poll | `site/js/device-wallet-network*.mjs` |
 | Scan vouch explainer | `site/js/vouch-issue.mjs`, `worker/src/resolver/scan-html.ts` |
 
 ---
@@ -142,5 +143,6 @@ Steward is **not** earned by vouch count. It is set on the resolver (bootstrap o
 - [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md) — what vouch proves, positioning, integrator policy
 - [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) — adversarial catalog, gaps, operator playbook
 - [`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md) — vouch rules, quotas, scan UX
-- [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) — wallet, Use keys, backup import
+- [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) — wallet, Open controls, backup import
+- [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) — saved row layout, **checked** recency vs scan policy
 - [`DEVICE_OS.md`](DEVICE_OS.md) — two-layer product model

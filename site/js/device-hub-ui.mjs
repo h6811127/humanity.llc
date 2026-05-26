@@ -32,7 +32,6 @@ import {
   formatSavedAt,
   walletEntryKeyPreview,
   walletEntryQrId,
-  walletEntrySubtitle,
 } from "./device-wallet.mjs";
 import {
   getCachedNetworkAlertState,
@@ -45,7 +44,6 @@ import {
   getNetworkLastSeenBaseline,
   hasLatestResolverNetworkPoll,
   CARD_REVOKED_ALERT_STATE,
-  networkStatusChip,
   recordNetworkSeen,
   refreshWalletNetworkStatuses,
   snapshotNetworkSeenOnExit,
@@ -54,10 +52,11 @@ import {
 } from "./device-wallet-network.mjs";
 import { getCardStatusUrl } from "./hc-sign.mjs";
 import {
-  humanTrustIconMeta,
-  isEligibleVoucherState,
-  verificationTrustChip,
-} from "./human-trust-ui.mjs";
+  hubCardIdentityLine,
+  hubCardStatusLine,
+  hubCardTitle,
+} from "./device-hub-card-row-core.mjs";
+import { humanTrustIconMeta, isEligibleVoucherState } from "./human-trust-ui.mjs";
 import {
   clearDefaultVouchIfProfile,
   isDefaultVouchProfile,
@@ -240,61 +239,44 @@ function hubCardSubHtml(entry, lastUsed) {
   const keyPreview = walletEntryKeyPreview(entry);
   const handle = entry.handle ? `@${entry.handle}` : "";
   const idPreview = entry.profile_id ? `${entry.profile_id.slice(0, 10)}…` : "";
+  const title = hubCardTitle(entry);
+  const handleInTitle =
+    handle && title.replace(/^@/, "").toLowerCase() === handle.replace(/^@/, "").toLowerCase();
 
   const detailParts = [];
   if (savedLabel) detailParts.push(`Last saved: ${escapeHtml(savedLabel)}`);
   if (keyPreview) detailParts.push(`Key: ${escapeHtml(keyPreview)}`);
-  if (handle) detailParts.push(escapeHtml(handle));
+  if (handle && !handleInTitle) detailParts.push(escapeHtml(handle));
   if (idPreview) detailParts.push(escapeHtml(idPreview));
   if (entry.profile_id && isDefaultVouchProfile(entry.profile_id)) {
     detailParts.push("Default for vouching");
   }
 
-  const primarySub = handle || walletEntrySubtitle(entry);
-  if (!primarySub && detailParts.length === 0) {
+  if (detailParts.length === 0) {
     return "";
   }
 
-  const detailsHtml =
-    detailParts.length > 0
-      ? `<details class="hub-card-details"><summary class="hub-card-details-summary">More</summary><span class="hub-card-details-body">${detailParts.join("<br>")}</span></details>`
-      : "";
-
-  return `<span class="list-sub hub-card-sub hub-card-sub--compact"><span class="hub-card-sub-line">${escapeHtml(primarySub)}</span></span>${detailsHtml}`;
+  return `<details class="hub-card-details"><summary class="hub-card-details-summary">Details</summary><span class="hub-card-details-body">${detailParts.join("<br>")}</span></details>`;
 }
 
-function formatSeenAgo(at) {
-  if (typeof at !== "number" || !Number.isFinite(at)) return "";
-  const deltaMs = Math.max(0, Date.now() - at);
-  const mins = Math.floor(deltaMs / 60000);
-  if (mins < 1) return "seen just now";
-  if (mins < 60) return `seen ${mins}m ago`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `seen ${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `seen ${days}d ago`;
+function hubCardStatusMeta(profileId, statusOverride, scanKindOverride) {
+  if (!hubConfig.fetchNetworkStatus) {
+    return { label: "", tone: "muted" };
+  }
+  const status =
+    statusOverride ?? getCachedNetworkStatus(profileId) ?? "checking";
+  const scanKind = scanKindOverride ?? getCachedNetworkScanKind(profileId);
+  return hubCardStatusLine({
+    status,
+    scanKind,
+    checkedAt: getCachedNetworkSeenAt(profileId),
+  });
 }
 
-function networkLivelinessMeta(profileId) {
-  const status = getCachedNetworkStatus(profileId) ?? "checking";
-  const scanKind = getCachedNetworkScanKind(profileId);
-  const seen = formatSeenAgo(getCachedNetworkSeenAt(profileId));
-  if (scanKind === "card_revoked") {
-    return { label: seen ? `Revoked on network · ${seen}` : "Revoked on network", tone: "warn" };
-  }
-  if (scanKind === "qr_revoked") {
-    return { label: seen ? `QR revoked · ${seen}` : "QR revoked", tone: "warn" };
-  }
-  if (status === "active") {
-    return { label: seen ? `Network reachable · ${seen}` : "Network reachable", tone: "ok" };
-  }
-  if (status === "checking") {
-    return { label: "Pending sync", tone: "muted" };
-  }
-  if (status === "offline" || status === "error") {
-    return { label: seen ? `Offline · ${seen}` : "Offline", tone: "offline" };
-  }
-  return { label: seen || "Network unknown", tone: "muted" };
+function hubCardStatusHtml(profileId, statusOverride, scanKindOverride) {
+  const status = hubCardStatusMeta(profileId, statusOverride, scanKindOverride);
+  if (!status.label) return "";
+  return `<span class="hub-card-status hub-card-status--${status.tone}" role="status"><span class="hub-card-status-dot" aria-hidden="true"></span><span class="hub-card-status-label">${escapeHtml(status.label)}</span></span>`;
 }
 
 function scanUrlForEntry(entry) {
@@ -302,25 +284,6 @@ function scanUrlForEntry(entry) {
   const base = `${location.origin}/c/${encodeURIComponent(entry.profile_id)}`;
   const qrId = walletEntryQrId(entry);
   return qrId ? `${base}?q=${encodeURIComponent(qrId)}` : base;
-}
-
-function networkChipHtml(profileId, statusOverride, scanKindOverride) {
-  const raw =
-    statusOverride ?? getCachedNetworkStatus(profileId) ?? (hubConfig.fetchNetworkStatus ? "checking" : null);
-  if (!raw) return "";
-  const scanKind = scanKindOverride ?? getCachedNetworkScanKind(profileId);
-  const chip = networkStatusChip(raw, scanKind);
-  return `<span class="hub-card-network hub-card-network--${chip.tone}">${escapeHtml(chip.label)}</span>`;
-}
-
-function verificationChipHtml(profileId) {
-  if (!hubConfig.fetchNetworkStatus) return "";
-  const cached = getCachedVerification(profileId);
-  const chip = verificationTrustChip({
-    label: cached?.label,
-    state: cached?.state,
-  });
-  return `<span class="hub-card-verification hub-card-verification--${chip.tone}">${escapeHtml(chip.label)}</span>`;
 }
 
 function hubCardIconHtml(profileId) {
@@ -368,28 +331,30 @@ function applyNetworkChipsToDom(
   savedList.querySelectorAll(".hub-card-item").forEach((li) => {
     const pid = li.dataset.profileId;
     if (!pid) return;
-    const chipEl = li.querySelector(".hub-card-network");
-    if (chipEl) {
-      const status = currentNetworkStatus(pid, statusMap);
-      const chip = networkStatusChip(status, currentNetworkScanKind(pid, scanKindMap));
-      chipEl.className = `hub-card-network hub-card-network--${chip.tone}`;
-      chipEl.textContent = chip.label;
+    const statusEl = li.querySelector(".hub-card-status");
+    if (statusEl) {
+      const meta = hubCardStatusMeta(
+        pid,
+        currentNetworkStatus(pid, statusMap),
+        currentNetworkScanKind(pid, scanKindMap)
+      );
+      statusEl.className = `hub-card-status hub-card-status--${meta.tone}`;
+      const labelEl = statusEl.querySelector(".hub-card-status-label");
+      if (labelEl) labelEl.textContent = meta.label;
     }
-    const liveEl = li.querySelector(".hub-card-live");
-    if (liveEl) {
-      const live = networkLivelinessMeta(pid);
-      liveEl.className = `hub-card-live hub-card-live--${live.tone}`;
-      liveEl.textContent = live.label;
-    }
-    const verifyEl = li.querySelector(".hub-card-verification");
-    if (verifyEl) {
+    const identityEl = li.querySelector(".hub-card-identity");
+    if (identityEl) {
+      const entry = loadWallet().find((e) => e.profile_id === pid);
+      const objectType = entry ? classifyObjectType(entry) : { label: "Object", tone: "general" };
       const cached = getCachedVerification(pid);
-      const vChip = verificationTrustChip({
-        label: cached?.label,
-        state: cached?.state,
+      const identity = hubCardIdentityLine({
+        objectTypeLabel: objectType.label,
+        verificationLabel: cached?.label,
+        verificationState: cached?.state,
+        includeVerification: hubConfig.fetchNetworkStatus,
       });
-      verifyEl.className = `hub-card-verification hub-card-verification--${vChip.tone}`;
-      verifyEl.textContent = vChip.label;
+      identityEl.className = `hub-card-identity hub-card-identity--${identity.verifyTone}`;
+      identityEl.textContent = identity.text;
     }
     const iconEl = li.querySelector(".hub-card-head .list-icon");
     if (iconEl) {
@@ -610,11 +575,20 @@ function renderSavedRows() {
     li.dataset.profileId = entry.profile_id;
     const lastUsed = lastActivityForEntry(entry);
     const scan = scanUrlForEntry(entry);
-    const netChip = hubConfig.fetchNetworkStatus
-      ? networkChipHtml(entry.profile_id, getCachedNetworkStatus(entry.profile_id) ?? "checking")
-      : "";
-    const verifyChip = verificationChipHtml(entry.profile_id);
-    const liveMeta = networkLivelinessMeta(entry.profile_id);
+    const cachedVerification = hubConfig.fetchNetworkStatus
+      ? getCachedVerification(entry.profile_id)
+      : null;
+    const identity = hubCardIdentityLine({
+      objectTypeLabel: objectType.label,
+      verificationLabel: cachedVerification?.label,
+      verificationState: cachedVerification?.state,
+      includeVerification: hubConfig.fetchNetworkStatus,
+    });
+    const statusHtml = hubCardStatusHtml(
+      entry.profile_id,
+      getCachedNetworkStatus(entry.profile_id) ?? "checking",
+      getCachedNetworkScanKind(entry.profile_id)
+    );
     const cardIcon = hubConfig.fetchNetworkStatus
       ? hubCardIconHtml(entry.profile_id)
       : `<span class="list-icon list-icon-tone-trust" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>`;
@@ -674,14 +648,12 @@ function renderSavedRows() {
       <div class="hub-card-head">
         ${cardIcon}
         <span class="list-content">
-          <span class="list-title">${escapeHtml(entry.label)}</span>
-          <span class="hub-card-type hub-card-type--${objectType.tone}">${escapeHtml(objectType.label)}</span>
+          <span class="list-title">${escapeHtml(hubCardTitle(entry))}</span>
+          <span class="hub-card-identity hub-card-identity--${identity.verifyTone}">${escapeHtml(identity.text)}</span>
+          ${statusHtml}
           ${hubCardSubHtml(entry, lastUsed)}
-          <span class="hub-card-live hub-card-live--${liveMeta.tone}">${escapeHtml(liveMeta.label)}</span>
         </span>
         <div class="hub-card-head-meta">
-          ${verifyChip}
-          ${netChip}
           ${menuBlock}
         </div>
       </div>

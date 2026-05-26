@@ -1,0 +1,139 @@
+# Hub saved card row UX
+
+**Status:** Phase 1 shipped (information consolidation, May 2026) · Phases 2–3 planned  
+**Scope:** Saved card rows in the device hub (`/`, `/wallet/`, `/created/`) — `renderSavedRows()` in `site/js/device-hub-ui.mjs`  
+**Companions:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md), [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)
+
+---
+
+## Problem (May 2026)
+
+Saved card rows accumulated overlapping UI: handle repeated in title, sub-line, and **Details**; separate **network** and **verification** pills plus a **liveliness** line; two button rows. The list read as cluttered and implied scan surveillance when copy said **seen**.
+
+---
+
+## Design goals
+
+1. **One glance** — identity, trust + object type, unified network status, primary actions.
+2. **Progressive depth** — keys, profile id, last saved, vouch default only in **Details** (collapsed by default).
+3. **Control-first** (later phases) — fewer equal-weight pills; steward actions grouped when possible.
+4. **Semantic copy** — operational language, not cryptographic jargon.
+5. **Policy-aligned** — never imply operator scan logging or stranger scan trails.
+
+---
+
+## Collapsed row anatomy (Phase 1 shipped)
+
+```text
+┌─────────────────────────────────────────────────┐
+│ [trust icon]  Title (@handle or custom label)  [⋯]
+│               Object type · Verification label
+│               ● Reachable · checked 2m ago      ← single status line
+│  [object controls when keys exist — unchanged]
+│  [ Open controls ]  [ Open scan ↗ ]
+└─────────────────────────────────────────────────┘
+```
+
+| Zone | Content | Notes |
+|------|---------|--------|
+| **Title** | Custom `label` if distinct from `handle`; else `@handle` | No duplicate handle on the default row |
+| **Identity line** | `{object type} · {Registered \| Steward \| …}` | Trust paired with type, not with network |
+| **Status line** | One phrase: reachability + recency | Replaces separate network pill + liveliness line |
+| **Details** | Last saved, key preview, `@handle`, profile id snippet, default-for-vouching | `<details>` summary **Details** (not **More**) |
+| **Actions** | Open controls, Open scan, ⋯ menu, object control pills | Phase 2 may slim control pills |
+
+---
+
+## Unified status line (copy)
+
+Built by `hubCardStatusLine()` in `site/js/device-hub-card-row-core.mjs`. Uses resolver `scan.kind` / `card.status` the same way as `networkStatusChip()`, but **does not** show **Live State Active** on the row (that label was redundant with reachability).
+
+| Condition | Status line (examples) |
+|-----------|-------------------------|
+| `scan.kind === active` (or network active) | `Reachable · checked 2m ago` |
+| `scan.kind === qr_revoked` | `QR revoked · checked 1m ago` |
+| `scan.kind === card_revoked` | `Disabled on network · checked 1m ago` |
+| Poll in flight / unknown | `Checking network…` |
+| Fetch error / offline | `Can't reach resolver` (optional `· checked …` if a prior check exists) |
+| No successful check yet | `Not checked yet` (no recency suffix) |
+
+Recency suffix uses **checked**, not **seen** — see [Recency wording and data policy](#recency-wording-and-data-policy).
+
+---
+
+## Recency wording and data policy
+
+### What “checked Xm ago” means
+
+| User might think | What it actually is |
+|------------------|---------------------|
+| Someone scanned my QR 1m ago | **This browser** last successfully called `GET …/cards/{profile_id}/status?q=…` for that saved card |
+| Operator scan log | **No** — reference network v1 does not access-log scan routes ([`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md), [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md)) |
+| Synced across devices | **No** — timestamp lives in session `hc_wallet_network_cache` (~5 min TTL) |
+
+Implementation: `getCachedNetworkSeenAt()` → `entry.at` set in `refreshWalletNetworkStatuses()` when this device stores a poll result (`site/js/device-wallet-network.mjs`).
+
+### What would violate policy
+
+| Feature | Risk |
+|---------|------|
+| **Last scanned** from resolver/D1 | Implies operator per-scan storage without governance |
+| Scan counts / unique scanners | Scan analytics |
+| UI copy **Last scan 1m ago** | False claim even if storage were innocent |
+| **Seen 1m ago** on saved rows | Misleading; reads as stranger scan activity |
+
+### Separate from device activity
+
+`hc_device_activity` logs **your** actions on this browser (Open controls, save, pin, …). **Checked** recency is **network poll** time only. Do not merge the two in copy or UI.
+
+### Storage name note
+
+`hc_wallet_last_seen_network` is a **device alert baseline** (card-disabled-since-visit), not “last time someone scanned.” Do not rename the key without a migration plan; document intent in [`DEVICE_OS.md`](DEVICE_OS.md) hub checklist.
+
+---
+
+## Phased delivery
+
+### Phase 1 — Information consolidation (shipped)
+
+- [x] `hubCardStatusLine()` — one status line; remove header network + verification pills and `.hub-card-live`.
+- [x] `hubCardTitle()` — dedupe handle vs label.
+- [x] Identity line — object type · verification.
+- [x] `hubCardSubHtml()` — **Details** only; handle only inside expanded body when needed.
+- [x] Recency copy — **checked** not **seen**.
+- [x] Docs — this file, hub doc, keys doc, data policy cross-link.
+- [x] Tests — `device-hub-card-row-core` unit tests; update wallet e2e expectations.
+
+### Phase 2 — Action slimming (planned)
+
+- Move **Update status** / **Revoke QR** / **New QR** into ⋯ groups (keep **Prove live** inline when inbox pending).
+- Target ≤2 prominent buttons on collapsed row.
+
+### Phase 3 — Visual polish (planned)
+
+- Typography ladder, status dot, tightened spacing (`styles.css`, `device-shell.css`, `theme-dark.css`).
+
+---
+
+## Regression
+
+When touching row markup or status copy:
+
+```bash
+npm run worker:test
+npm run e2e -- e2e/device-os-wallet.spec.ts
+```
+
+Manual: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — revoked since visit, QR-only revoke, multi-card wallet.
+
+---
+
+## Implementation map
+
+| Piece | Location |
+|-------|----------|
+| Row copy + status line | `site/js/device-hub-card-row-core.mjs` |
+| DOM render + poll apply | `site/js/device-hub-ui.mjs` |
+| Network cache + `entry.at` | `site/js/device-wallet-network.mjs` |
+| Chip labels (hub status line only; not row pills) | `site/js/device-wallet-network-core.mjs` — `networkStatusChip()` still used elsewhere |
+| Row CSS | `site/styles.css` (`.hub-card-status`, `.hub-card-identity`) |

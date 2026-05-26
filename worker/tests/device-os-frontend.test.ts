@@ -22,6 +22,12 @@ import {
   walletEntryQrId,
 } from "../../site/js/device-wallet.mjs";
 import {
+  formatCheckedAgo,
+  hubCardIdentityLine,
+  hubCardStatusLine,
+  hubCardTitle,
+} from "../../site/js/device-hub-card-row-core.mjs";
+import {
   isNetworkCacheFresh,
   mergeLastSeenFromNetworkMap,
   networkStatusChip,
@@ -212,6 +218,64 @@ describe("buildLiveControlProofHref", () => {
     ).toBe(
       `https://humanity.llc/created/?profile_id=p1&qr_id=${TEST_QR_ID}&live_challenge=c1`
     );
+  });
+});
+
+describe("hubCardTitle", () => {
+  it("uses @handle when label matches handle", () => {
+    expect(hubCardTitle({ handle: "demo", label: "@demo" })).toBe("@demo");
+  });
+
+  it("uses custom label when distinct from handle", () => {
+    expect(hubCardTitle({ handle: "demo", label: "Field kit" })).toBe("Field kit");
+  });
+});
+
+describe("formatCheckedAgo", () => {
+  it("uses checked not seen", () => {
+    const now = 1_000_000;
+    expect(formatCheckedAgo(now - 30_000, now)).toBe("checked just now");
+    expect(formatCheckedAgo(now - 120_000, now)).toBe("checked 2m ago");
+  });
+});
+
+describe("hubCardStatusLine", () => {
+  const now = 1_000_000;
+  const checkedAt = now - 120_000;
+
+  it("unifies reachability and recency for active cards", () => {
+    expect(
+      hubCardStatusLine({ status: "active", scanKind: "active", checkedAt, now })
+    ).toEqual({
+      label: "Reachable · checked 2m ago",
+      tone: "ok",
+    });
+  });
+
+  it("does not use Live State Active on rows", () => {
+    const row = hubCardStatusLine({ status: "active", scanKind: "active", checkedAt, now });
+    expect(row.label).not.toContain("Live State Active");
+  });
+
+  it("maps card and QR revoke", () => {
+    expect(
+      hubCardStatusLine({ status: "active", scanKind: "qr_revoked", checkedAt, now })
+    ).toMatchObject({ tone: "warn" });
+    expect(
+      hubCardStatusLine({ status: "active", scanKind: "card_revoked", checkedAt, now }).label
+    ).toContain("Disabled on network");
+  });
+});
+
+describe("hubCardIdentityLine", () => {
+  it("joins object type and verification", () => {
+    expect(
+      hubCardIdentityLine({
+        objectTypeLabel: "Live demo",
+        verificationLabel: "Registered",
+        verificationState: "registered",
+      })
+    ).toEqual({ text: "Live demo · Registered", verifyTone: "muted" });
   });
 });
 

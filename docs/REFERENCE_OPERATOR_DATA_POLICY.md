@@ -29,6 +29,10 @@ Minimize stored data so the network is not a surveillance honeypot. Publish what
 - **Reference network v1:** `GET /c/…`, `GET …/status?q=…`, and `GET …/qr/{qr_id}` are **not** access-logged. Status JSON exposes `scan.limits.scan_analytics: false`.
 - If minimal access logs are ever required for abuse response, that MUST be a **governance-approved** policy with published retention - not a silent product default.
 
+## Client UI (not operator storage)
+
+Saved card rows on `/wallet/` and the device hub may show **checked … ago**. That timestamp is **only** when **this browser** last successfully polled `GET …/cards/{profile_id}/status?q=…` for a saved card (`hc_wallet_network_cache` in session storage). It is **not** a log of who scanned the QR, and the operator does not receive or retain that client timestamp. Product copy MUST NOT use **seen** or **last scan** on saved rows in ways that imply stranger scan trails. Spec: [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) § Recency wording and data policy.
+
 ## Commerce firewall
 
 - QR payloads MUST NOT embed order IDs, emails, or shipping fields.

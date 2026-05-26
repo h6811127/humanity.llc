@@ -78,7 +78,8 @@ test.describe("device OS wallet flow", () => {
     });
 
     await page.goto("/wallet/");
-    await expect(page.getByText("Live State Active")).toBeVisible();
+    await expect(page.getByText("Reachable")).toBeVisible();
+    await expect(page.getByText("Registered")).toBeVisible();
     await expect(
       page.getByText("Card disabled on the network since your last visit.")
     ).toBeHidden();
@@ -130,7 +131,8 @@ test.describe("device OS wallet flow", () => {
     });
 
     await page.goto("/wallet/");
-    await expect(page.getByText("Live State Active")).toBeVisible();
+    await expect(page.getByText("Reachable")).toBeVisible();
+    await expect(page.getByText("Registered")).toBeVisible();
     await expect(
       page.getByText("Card disabled on the network since your last visit.")
     ).toBeHidden();
@@ -202,17 +204,17 @@ test.describe("device OS wallet flow", () => {
     }, [SAMPLE_WALLET_ENTRY, entryB]);
 
     await page.goto("/wallet/");
-    await expect(page.getByText("Live State Active").first()).toBeVisible();
+    await expect(page.getByText("Reachable").first()).toBeVisible();
     await expect(
       page.getByText("Card disabled on the network since your last visit.")
-    ).toHaveCount(0);
+    ).toBeHidden();
 
     const dismiss = page.getByRole("button", { name: "Got it" }).first();
     if (await dismiss.isVisible().catch(() => false)) {
       await dismiss.click();
       await expect(
         page.getByText("Card disabled on the network since your last visit.")
-      ).toHaveCount(0);
+      ).toBeHidden();
     }
   });
 

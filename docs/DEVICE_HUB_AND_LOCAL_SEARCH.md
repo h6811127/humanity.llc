@@ -16,35 +16,36 @@ The landing page, **`/created/`**, and **`/wallet/`** share an **“on this devi
 
 ## Hub UX refinement notes (May 2026)
 
-These notes are captured as individual product refinements so implementation can happen in small slices without losing intent.
+These notes are captured as individual product refinements so implementation can happen in small slices without losing intent. **Authoritative row spec:** [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md).
 
 1. **Reduce text density inside each card**
-   - Collapse key preview, last saved, and metadata behind expansion.
+   - Collapse key preview, last saved, and metadata behind **Details** expansion.
    - Primary card view should stay focused on identity, live state, and quick actions.
 2. **Rename “Use keys”**
-   - Current label reads cryptographic, not operational.
-   - Candidate replacements: **Open controls**, **Manage**, **Control object**, **Update state**.
+   - Shipped as **Open controls** (hub/wallet/tests).
 3. **Make cards feel alive**
-   - Add subtle recency/reachability language and indicators (seen recently, reachable, offline, pending sync, revoked).
+   - Unified status line with **checked** recency (device resolver poll — not scan logging). See [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) § Recency wording and data policy.
 4. **Refine top status pills**
-   - Revisit **Pins** label (`Pinned` or `Favorites` unless pins become a deeper primitive).
-   - Replace generic `Online` wording with semantically richer status (`Local vault online`, `Sync active`, `Network reachable`).
+   - Hub **segmented status line** (landing/wallet chrome) uses **Network reachable** semantics; saved **rows** no longer duplicate network + liveliness pills (Phase 1 row consolidation).
 5. **Strengthen object identity visuals**
-   - Add stronger differentiation via color/glyph/type cues so large lists remain scannable.
+   - Object type on **identity line** (`Live demo · Registered`); left accent bar per type (shipped).
 6. **Push shell further toward iOS-native feel**
-   - Increase blur, soften shadows, round cards slightly more, tighten spacing, and reduce border noise.
+   - Frosted hub sheet, elevation cards (shipped); further typography pass planned (Phase 3).
 7. **Make object actions primary**
-   - Shift from storage-first to control-first actions (revoke, rotate, ping, transfer, delegate, lock, expiration, event mode).
+   - Object control pills shipped; grouping into ⋯ planned (Phase 2).
 
 ### Implementation slices from these notes
 
-- **Step 1 (now):** reduce card text density with progressive disclosure.
-- **Step 2 (now):** rename `Use keys` to `Open controls` across hub/wallet and tests.
-- **Step 3 (now):** add network liveliness indicators and wording pass.
-- **Step 4 (now):** status-pill terminology pass (`pins`, `online` semantics).
-- **Step 5 (now):** object identity visual system (types, glyph/color cues).
-- **Step 6 (now):** modal/shell visual polish pass.
-- **Step 7 (shipped):** action-forward card IA and command surface (`device-hub-controls-core.mjs`, hub row **Update status** / **Revoke QR** / **New QR** / **Prove live** → `openCardControlPage()`).
+- **Step 1 (shipped):** progressive disclosure (**Details**).
+- **Step 2 (shipped):** **Open controls** rename.
+- **Step 3 (shipped):** unified status line + **checked** wording (`device-hub-card-row-core.mjs`).
+- **Step 4 (shipped):** hub chrome status segments; row pills removed in Phase 1.
+- **Step 5 (shipped):** object identity line + type accents.
+- **Step 6 (shipped):** shell polish pass.
+- **Step 7 (shipped):** action-forward controls → `openCardControlPage()`.
+- **Row Phase 1 (shipped):** information consolidation per [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md).
+- **Row Phase 2 (planned):** slim action pills into ⋯ groups.
+- **Row Phase 3 (planned):** typography and spacing polish on rows.
 
 ---
 
@@ -70,19 +71,19 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Hub glance (landing):** When the hub is collapsed, `#device-hub-glance` shows notice (if any) and up to three saved card labels; tap expands the hub. Quick-look popover rows use **light pastel** fills (red / blue / orange by notice type). Glance **Card disabled since last visit** copy follows the latest resolver-confirmed alert state from the wallet network poll (not stale cache and not the persisted `hc_wallet[].status` field).
 
-**`/wallet/` (Phase 5–6):** Uses the same hub renderer as landing. Each saved row shows a **verification chip** (Steward / Vouched Human / Registered from resolver, ~5 min cache), a **network chip** (card/QR live state), optional **card disabled since last visit** alert (`hc_wallet_last_seen_network`), **Last on device** from activity, and **Open controls / Open scan / Manage**. Row icon tone follows verification (green shield = Steward). Page is hub-expanded by default; help disclosure hides when cards exist.
+**`/wallet/` (Phase 5–6):** Uses the same hub renderer as landing. Each saved row shows **title** (custom label or `@handle`), **identity line** (`{object type} · {verification}`), **one status line** (e.g. **Reachable · checked 2m ago**), optional **card disabled since last visit** alert (`hc_wallet_last_seen_network`), **Details** for keys/profile metadata, and **Open controls / Open scan** plus object controls. Row icon tone follows verification (green shield = Steward). Page is hub-expanded by default; help disclosure hides when cards exist.
 
-**Card liveliness (Step 3):** Saved rows also show a compact liveliness line (e.g., **Network reachable · seen 2m ago**, **Pending sync**, **Offline**) derived from the same wallet network cache and resolver fetch cycle used for chips/alerts.
+**Card status line (Row Phase 1):** Single line replaces separate network + verification pills and the old liveliness row. Recency uses **checked** (this device’s last successful `GET …/status?q=…` poll), not **seen** — not a scan log. Full copy table: [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md).
 
-**Object identity visuals (Step 5):** Saved rows include a lightweight object-type chip (e.g., Membership, Status plate, Lost item, Event pass, Wearable, Live demo, Tool, Civic object) inferred from local card metadata (`pilot_template`, label, manifesto text), plus subtle type color accents to reduce visual sameness at larger card counts.
+**Object identity visuals (Step 5):** Object type appears on the identity line; left accent bar per type from `classifyObjectType()` (Membership, Status plate, Live demo, …).
 
 **Shell polish (Step 6):** Hub sheet and glance popover use stronger frosted materials (higher blur, softer layered shadows, 20px top sheet radius). Saved cards drop grey outline borders in favor of elevation fills; spacing in hub sections and card rows is slightly tighter. See `site/css/device-shell.css` tokens (`--shell-blur`, `--shell-shadow-sheet`, `--shell-radius-card`).
 
-**Keys vs verification:** See [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md). **Open controls** loads signing material into `hc_created`; the verification chip is read-only network state.
+**Keys vs verification:** See [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md). **Open controls** loads signing material into `hc_created`; verification on the identity line is read-only network state.
 
-**Card-disabled-since-visit alert:** Only appears when this device previously recorded a **non-revoked** baseline and the resolver now reports **card disabled** (`scan.kind === card_revoked`). Copy is **“Card disabled on the network since your last visit.”** (not generic “revoked”) so it is not confused with QR-only revoke. The network chip uses the same `scan.kind`: **Card disabled** for `card_revoked`, **QR revoked** for `qr_revoked`, **Live State Active** when the card is active. QR-only revoke does **not** trigger the since-visit alert. First sight of a disabled card shows the chip only, not “since your last visit.” Dismiss **Got it** stores acknowledged state; `hc-wallet-network-baseline-changed` re-applies hub/glance/inbox from the **latest resolver-confirmed** poll (not session cache alone). Leaving the tab (`pagehide` / hidden) snapshots resolver-confirmed alert states from this visit when a poll has completed. Returning to the tab (`visibilitychange` → visible) re-fetches resolver status for saved rows so alerts and chips can clear without a full reload. Session cache (~5 min) is **not** used for alerts when it says `card_revoked` but the device baseline still says non-revoked — the hub re-fetches from the resolver first. A fresh fetch that returns non-revoked always updates the device baseline (self-heal after stale cache). Glance shows one card-disabled inbox row (not a duplicate suffix on the same saved card row).
+**Card-disabled-since-visit alert:** Only appears when this device previously recorded a **non-revoked** baseline and the resolver now reports **card disabled** (`scan.kind === card_revoked`). Copy is **“Card disabled on the network since your last visit.”** (not generic “revoked”) so it is not confused with QR-only revoke. The row **status line** uses the same `scan.kind`: **Disabled on network** for `card_revoked`, **QR revoked** for `qr_revoked`, **Reachable** when active. QR-only revoke does **not** trigger the since-visit alert. First sight of a disabled card shows the status line only, not “since your last visit.” Dismiss **Got it** stores acknowledged state; `hc-wallet-network-baseline-changed` re-applies hub/glance/inbox from the **latest resolver-confirmed** poll (not session cache alone). Leaving the tab (`pagehide` / hidden) snapshots resolver-confirmed alert states from this visit when a poll has completed. Returning to the tab (`visibilitychange` → visible) re-fetches resolver status for saved rows so alerts and status can clear without a full reload. Session cache (~5 min) is **not** used for alerts when it says `card_revoked` but the device baseline still says non-revoked — the hub re-fetches from the resolver first. A fresh fetch that returns non-revoked always updates the device baseline (self-heal after stale cache). Glance shows one card-disabled inbox row (not a duplicate suffix on the same saved card row).
 
-**Copy alignment (shipped):** Earlier UI said “revoked since last visit” while the chip could still read **Live State Active** when `scan.card.status` was `active` but the alert fired on `scan.kind === card_revoked`. Shared strings live in `wallet-network-baseline.mjs`; `networkStatusChip(status, scanKind)` prefers `scan.kind` for labels. Verified: `npm run worker:test` (`wallet-network.test.ts`, `device-os-frontend.test.ts`); hub row shows matching **Card disabled** chip + banner only on real card-level transitions.
+**Copy alignment (shipped):** Shared strings live in `wallet-network-baseline.mjs`; row status uses `hubCardStatusLine()` in `device-hub-card-row-core.mjs` (prefers `scan.kind`). Verified: `npm run worker:test`; hub row shows matching **Disabled on network** status + banner only on real card-level transitions.
 
 **Created keys strip:** On `/created/` **Now** tab, **Keys on this device** first; recovery in **Break-glass** `<details>` below.
 
@@ -138,11 +139,11 @@ See [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 
 | Item | Status |
 |------|--------|
-| Inbox badge + hub alert stack + glance rows | ✅ Shipped (parallel logic today) |
-| Browser background alerts (live proof, tab hidden) | ✅ Shipped v1 — `device-browser-notifications.mjs`, `hc_browser_notif` |
-| Unified `device-inbox-core.mjs` | Planned |
-| Inbox sheet from badge tap | Planned |
-| Contextual opt-in + OS click deep link to `/created/` sign URL | Planned |
+| Inbox badge + hub alert stack + glance rows | ✅ `device-inbox-core.mjs` + `device-hub-inbox-alerts.mjs` |
+| Browser background alerts (live proof, tab hidden) | ✅ v2 A–B + Phase C policy in core |
+| Unified `device-inbox-core.mjs` | ✅ |
+| Inbox sheet from badge tap | ✅ |
+| Contextual opt-in + OS click deep link to `/created/` sign URL | ✅ |
 
 ### Optional hub polish (remaining)
 
@@ -151,7 +152,7 @@ No backend required:
 - ~~Browser notifications when a live proof is waiting~~ — ✅ v1 shipped; v2 in [`DEVICE_INBOX.md`](DEVICE_INBOX.md)
 - ~~Hub glance on `/wallet/`~~ — landing popover only; wallet scrolls from dot
 - Light frontend tests for tab presence, live-control inbox, wallet network, and status counts
-- Inbox unification phases 1–6 — [`DEVICE_INBOX.md`](DEVICE_INBOX.md)
+- ~~Inbox unification phases 1–10~~ — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) (glance via `buildGlanceRowPlan()`)
 
 ### Deferred
 
@@ -177,6 +178,7 @@ No backend required:
 - Wallet, pins, and activity stay in **browser storage**.
 - Search and activity run entirely in the client.
 - Pins are bookmarks only; vouching needs saved keys (**Open controls**).
+- Saved row **checked … ago** is **this device’s resolver poll time** (`hc_wallet_network_cache`), not stranger scan activity. See [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) and [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md).
 
 ---
 
@@ -189,6 +191,8 @@ No backend required:
 | `site/js/device-browser-notifications.mjs` | OS notifications v1 |
 | `site/index.html` | Landing hub + progress strip |
 | `site/created/index.html` | Created hub shell |
+| `docs/HUB_CARD_ROW_UX.md` | Saved row IA, status copy, data-policy wording |
+| `site/js/device-hub-card-row-core.mjs` | Row title, identity line, status line (pure helpers) |
 | `site/js/device-hub-ui.mjs` | Shared hub render + init |
 | `site/js/device-activity.mjs` | Activity log API |
 | `site/js/device-live-control-inbox.mjs` | Live proof inbox poll + open |
