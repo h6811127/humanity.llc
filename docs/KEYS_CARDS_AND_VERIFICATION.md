@@ -2,7 +2,7 @@
 
 **Status:** Shipped (UI + this doc)  
 **Audience:** Anyone using Humanity Cards, vouching, or multi-device flows  
-**Related:** [`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md), [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md)
+**Related:** [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md), [`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md), [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md)
 
 ---
 
@@ -19,6 +19,8 @@ You do **not** need multiple accounts. You **do** need to understand three separ
 **Vouching requires both:** your card must be **Steward or Vouched Human on the network**, and **that card’s keys must be active in this browser tab**.
 
 Steward on the network does **not** automatically appear on a phone that never loaded those keys.
+
+**What a vouch means (product):** A signed, public, revocable human attestation—not legal ID, not iris proof, not “verified forever.” Full framing: [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md).
 
 ---
 
@@ -106,14 +108,14 @@ Per **device**, storage:
 
 1. **Vouchee:** active scan link (`/c/{profile}?q={active_qr}`), not revoked QR, not your own `profile_id`.
 2. **Voucher (you):** Steward or Vouched Human on the **network** (curl or `/created/` on a device with your keys).
-3. **This phone/browser:** Set **Default for vouching** on your steward card in **Saved cards** (⋯ menu) so scans auto-load keys, or tap **Use keys here** on the scan page. Fallback: **Use keys** on `/wallet/` then **Return to scan to vouch** on `/created/`.
+3. **This phone/browser:** Set **Default for vouching** on your steward card in **Saved cards** (⋯ menu) so scans auto-load keys, or tap **Sign as…** on the scan page. Fallback: **Use keys** on `/wallet/` then **Return to scan to vouch** on `/created/`.
 4. Submit the vouch on the vouchee’s **active** scan page.
 
-**iPhone tip:** Open the scan in **Safari** (same browser where you saved the card). QR opens from Camera often start a new tab — that is fine if **Default for vouching** is set or you tap **Use keys here**. Keys do not sync across Chrome and Safari.
+**iPhone tip:** Open the scan in **Safari** (same browser where you saved the card). QR opens from Camera often start a new tab — that is fine if **Default for vouching** is set or you tap **Sign as…**. Keys do not sync across Chrome and Safari.
 
 If step 3 is skipped, you will see **“keys not active on this device”** even when the network says Steward.
 
-**Vouch-ready keys (optional):** On **Saved cards**, set **Default for vouching** (⋯ menu). Scan pages then auto-load that card’s keys in this tab. If keys are active in another tab, the scan shows a cross-tab notice with **Open that tab** or **Use keys here**. See [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md).
+**Vouch-ready keys (optional):** On **Saved cards**, set **Default for vouching** (⋯ menu). Scan pages then auto-load that card’s keys in this tab. If keys are active in another tab, the scan shows a cross-tab notice with **Open that tab** or **Use keys here** (wallet/scan banner; vouch card uses **Sign as…**). See [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md).
 
 ---
 
@@ -137,6 +139,8 @@ Steward is **not** earned by vouch count. It is set on the resolver (bootstrap o
 
 ## Related docs
 
+- [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md) — what vouch proves, positioning, integrator policy
+- [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) — adversarial catalog, gaps, operator playbook
 - [`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md) — vouch rules, quotas, scan UX
 - [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) — wallet, Use keys, backup import
 - [`DEVICE_OS.md`](DEVICE_OS.md) — two-layer product model

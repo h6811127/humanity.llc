@@ -10,7 +10,7 @@
 | Severity | Finding | Required Action |
 |---|---|---|
 | Critical | Shopify artifact-intent metadata is a single point of failure for personalized fulfillment. | Validate with an integration spike before building broad Storefront features. |
-| Critical | "Verified Human" can overclaim if vouching is socially weak. | Use `Vouched Human` for launch copy unless stronger language passes comprehension testing. |
+| Critical | "Verified Human" can overclaim if vouching is socially weak. | Use `Vouched Human` for launch copy unless stronger language passes comprehension testing. Frame vouch as accountable attestation, not biometric personhood (`docs/VOUCH_TRUST_POSITIONING.md`). |
 | High | Physical QR revocation is easy to misunderstand. | Show warnings before purchase and explicit status pages after revocation. |
 | High | Duplicate webhooks/retries can create duplicate Printify orders. | Idempotency must be built before live orders. |
 | High | Print QA failure after payment creates refunds/support pain. | Perform QR scan QA before checkout and again before Printify submission. |
@@ -26,24 +26,34 @@
 
 ## Perspective 1: Abuser Trying To Fake Verification
 
+**Deep dive:** `docs/VOUCH_THREAT_MODEL.md` (threat IDs, attack trees, operator playbook).
+
 ### Attack Paths
 
 | Attack | Likelihood | Impact | Current Defense | Gap |
 |---|---|---|---|---|
 | Create many registered cards. | High | Medium | Rate limits, invite/waitlist controls. | Abuse-control policy is not fully specified. |
-| Collusive vouch ring. | Medium | High | 3-vouch threshold, 5/year quota, 90-day wait. | Graph audit rules and steward response process need more detail. |
+| **4-person clique** mutual vouch (all reach VH). | Medium | High | Threshold=3, quota, 90d wait. | No automated clique detection; manual triage. |
+| **Rotating vouch cycle** (A→B→C→A). | Medium | High | Distinct vouchers per vouchee. | `closed_loop_only` flag does not catch; see **G-02**. |
+| Collusive vouch ring (mutual-only). | Medium | High | 3-vouch threshold, 5/year quota, 90-day wait; `closed_loop_only`. | Steward review queue not shipped. |
+| **Steward fast-path farm** (no 90d wait). | Medium | High | 5/year quota; audit burst flag. | No per-steward cap; bootstrap concentration. |
+| Stolen voucher keys / backup. | Medium | High | User custody; signed POST. | No PIN before sign; auto-activate increases shared-device risk. |
+| Remote vouch (never met in person). | High | Medium | UX checkbox only. | No liveness at vouch time (**V-06**). |
 | Print QR artifact and imply it proves the wearer is verified. | High | High | Copy says artifacts do not grant verification. | Physical artifact design must avoid stale/mutable verification labels. |
-| Replay or forge vouch payloads. | Medium | High | Ed25519 signatures and canonical payloads. | Payload type/nonce requirements must be enforced everywhere. |
+| Replay or forge vouch payloads. | Medium | High | Ed25519 signatures and canonical payloads. | Enforced on vouch POST. |
+| Integrator treats **Vouched Human** as KYC. | Medium | High | Trust model + limitations copy. | Integrator policy not enforceable in protocol. |
 | Use someone else's QR on merchandise. | Medium | Medium | Personalization requires active QR and owner context. | Need authorization check tying `profile_id` to buyer/session before artifact intent. |
 | Steal or copy someone's printed sticker and present it as proof of identity. | Medium | High | Scan page resolves current card status. | Printed-item QR must be individually revocable and scan page must warn that possession does not prove identity. |
 | Continue using revoked printed QR. | High | Medium | Revoked status page. | Scanner UI must be unmistakable. |
+| AI-scaled personas + stolen keys. | Medium | High | Same crypto/quota bar. | Indistinguishable from legitimate use if keys compromised. |
 
 ### Required Hardening
 
 - Add explicit artifact-intent authorization: only the card owner or authorized session can create personalized artifacts for a `profile_id`.
 - Add unique item-scoped QR credentials for personalized physical items.
 - Add signed payload `type` and nonce to every vouch, QR rotation, revocation, and badge record.
-- Add vouch abuse audit hooks without publicizing private social graph details.
+- **Ship steward review queue** for `listVouchAuditFlags` (closed loop, burst, shared set).
+- Add graph detection for **cliques and directed cycles** (see `VOUCH_THREAT_MODEL.md` §9 P1).
 - Avoid printing "Verified Human" as static text on artifacts in V1.
 
 ---

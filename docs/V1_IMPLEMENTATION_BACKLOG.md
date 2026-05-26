@@ -388,7 +388,7 @@ Goal: make the card meaningful without overclaiming.
 
 ### V-002: Vouching
 
-**Design:** `docs/M6_VOUCHING_DESIGN.md`
+**Design:** `docs/M6_VOUCHING_DESIGN.md` · **Positioning:** `docs/VOUCH_TRUST_POSITIONING.md` · **Threat model:** `docs/VOUCH_THREAT_MODEL.md`
 
 **Build:**
 

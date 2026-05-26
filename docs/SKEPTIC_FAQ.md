@@ -76,8 +76,13 @@ That is why vouching should be:
 - Visible enough to audit.
 - Separated from private notes.
 - Governed by public rules.
+- Backed by operator audit hooks for collusive rings (not public graph drama on scan).
 
-Vouching is not perfect proof. It is accountable social trust. The UI should say `Vouched Human`, not overclaim legal or universal verification.
+Vouching is not perfect proof. It is **accountable social trust**: humans put their cryptographic name on a public statement they can take back. The UI should say `Vouched Human`, not overclaim legal identity, global uniqueness, or “bot-proof.”
+
+**Deeper threats we document honestly:** minimum **4-account cliques** can mutual-vouch to VH; rotating rings may evade simple loop detection; stewards skip the 90-day wait; remote vouching is policy-only (no liveness scan). Mitigations: quotas, audit flags, revocation, steward review—not iris. See `docs/VOUCH_THREAT_MODEL.md`.
+
+Full framing (AI era, vs biometric ID, integrator policy): `docs/VOUCH_TRUST_POSITIONING.md`.
 
 ---
 
@@ -201,15 +206,15 @@ Revenue should fund operations, development, support, security, accessibility, g
 
 These solve different problems.
 
-Worldcoin and biometric systems raise major privacy, coercion, and governance concerns.
+**Worldcoin / iris and biometric global ID** optimize for *one person, one slot* at enrollment. That is a different question from *who signed a revocable attestation on this profile under published rules?* Biometric warehouses raise privacy, coercion, and governance concerns Humanity avoids by design. We do not claim to replace iris for every platform Sybil gate; we claim **vouch** is the right primitive for communities that need accountable humans on the record. See `docs/VOUCH_TRUST_POSITIONING.md`.
 
-LinkedIn is platform-owned reputation.
+**LinkedIn** is platform-owned reputation.
 
-Passkeys are useful authentication primitives, but they do not by themselves create a public, vouched, revocable trust card.
+**Passkeys** are useful authentication primitives, but they do not by themselves create a public, vouched, revocable trust card.
 
-Microsoft Authenticator proves access for a platform login. Humanity live control proof should prove recent control of a Humanity Card key to another person or community, without requiring a Microsoft/Google account.
+**Microsoft Authenticator** proves access for a platform login. Humanity live control proof should prove recent control of a Humanity Card key to another person or community, without requiring a Microsoft/Google account.
 
-Humanity Commons should use good cryptographic primitives without becoming dependent on platform identity.
+Humanity Commons should use good cryptographic primitives without becoming dependent on platform identity or a central proof-of-personhood database.
 
 ---
 

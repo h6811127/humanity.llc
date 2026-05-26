@@ -27,6 +27,10 @@ No phone. No ID. No ads. No tracking.
 
 A signed card, a real vouch, and a right to revoke.
 
+### Vouch positioning (do not overclaim)
+
+Vouch means **accountable humans signed a public, revocable attestation** under published rules—not iris proof, not legal ID, not “verified forever.” Do not say bot-proof or global personhood. Say **Vouched Human**, show count and recency, and link mechanism when challenged. Canonical doc: `docs/VOUCH_TRUST_POSITIONING.md`. Adversarial detail: `docs/VOUCH_THREAT_MODEL.md`.
+
 ---
 
 ## Primary Launch Lines

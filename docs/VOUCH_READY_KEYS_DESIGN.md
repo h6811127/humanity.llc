@@ -2,6 +2,7 @@
 
 **Status:** Phases 1–5 shipped; PIN/unlock gate (option E) deferred  
 **Audience:** Product, security review, implementers  
+**Vouch positioning:** [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md) · **Threat model:** [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md)  
 **Related:** [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md), [`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md), [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)
 
 ---

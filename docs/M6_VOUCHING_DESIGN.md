@@ -1,24 +1,26 @@
 # M6  -  Vouching design
 
 **Status:** Step 1 (V-001) shipped in repo  -  verify on production; Steps 2–3 shipped; Step 4 internal cluster flags shipped; steward review queue pending
-**Canonical refs:** `docs/V1_PRODUCT_TRUST_MODEL.md` § Level 2, `docs/V1_ADVERSARIAL_REVIEW.md` § Perspective 1, `docs/features/Human Verification v1.0.md`, `docs/V1_IMPLEMENTATION_BACKLOG.md` (V-001, V-002)  
-**Product thesis:** Live control proves recent key possession. Vouching proves that other accountable humans attested this card belongs to a distinct person  -  under published rules, not under legal-ID assumptions.
+**Canonical refs:** [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md) (product framing), [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) (adversarial catalog), `docs/V1_PRODUCT_TRUST_MODEL.md` § Level 2, `docs/V1_ADVERSARIAL_REVIEW.md` § Perspective 1, `docs/features/Human Verification v1.0.md`, `docs/V1_IMPLEMENTATION_BACKLOG.md` (V-001, V-002)  
+**Product thesis:** Live control proves recent key possession. Vouching proves **accountable humans staked public, revocable attestations** on this card under published rules—not legal ID, not global biometric uniqueness, not liveness at every click.
 
 ---
 
 ## Mental model
 
-Humanity Commons v1 does not try to be a government ID. It tries to make **mechanism-visible social trust** portable:
+Read [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md) first for AI-era framing, integrator policy, and positioning vs biometric global ID.
+
+Humanity Commons v1 does not try to be a government ID or a central proof-of-personhood warehouse. It makes **mechanism-visible social trust** portable:
 
 - A scan shows **current resolver state** (card active, QR active, verification summary).
-- **Vouches** are signed statements from eligible humans: “I attest this is a distinct human I know.”
-- When enough **active, accepted** vouches exist, the card earns the public label **Vouched Human**  -  not “Verified Human” unless copy testing says otherwise.
+- **Vouch** (verb) = an eligible human **signs and publishes** a revocable attestation: they know this profile as a distinct human, in person, on the record.
+- When enough **active, accepted** vouches exist, the card earns **Vouched Human**  -  not “Verified Human” unless copy testing says otherwise.
 
 The scanner-facing sentence is:
 
 > Three humans on this network vouched for this card under published rules.
 
-Do not lead with graph theory, sybil resistance claims, or “bot-proof.” Those belong in adversarial review and governance docs, not the first interaction.
+Do not lead with graph theory, “sybil solved,” or “bot-proof.” In 2026 the honest claim is **accountability**: who signed, under what rules, revocable how. Adversarial detail stays in [`V1_ADVERSARIAL_REVIEW.md`](V1_ADVERSARIAL_REVIEW.md) and operator audit hooks—not the first scan screen.
 
 ---
 
@@ -33,8 +35,10 @@ Do not lead with graph theory, sybil resistance claims, or “bot-proof.” Thos
 | The voucher was honest or correct | No |
 | Legal name, age, immigration status, employment eligibility | No |
 | Global uniqueness (one human, one card) | No |
+| Real-time liveness at vouch time (lab / iris / continuous) | No  -  in-person ritual + policy; pair with live control when possession matters |
 | The person holding a printed QR is the card owner | No |
 | Recent key control | No  -  that is live control (M7), separate block |
+| That synthetic agents cannot exist on the internet | No  -  vouch is sufficient for **accountable participation** gates, not all AI abuse |
 
 ---
 
@@ -76,9 +80,9 @@ Keep vouching **visually separate** from:
 
 1. Voucher opens vouchee card (scan or profile link).
 2. Voucher confirms eligibility (already Vouched Human or steward, past 90-day wait, quota remaining).
-3. Voucher signs a **standardized public statement** (editable within 280 chars; default template provided).
+3. Voucher signs a **standardized public statement** (editable within 280 chars; default template in copy kit below).
 4. Optional **private note** stays on device only  -  never POSTed to resolver (server rejects `private_note` in body today).
-5. Success: “Vouch recorded.” Vouchee summary updates when threshold met.
+5. Success: signed vouch accepted; vouchee summary updates when threshold met.
 
 ### Vouchee flow
 
@@ -90,7 +94,9 @@ Keep vouching **visually separate** from:
 
 ## Abuse prevention
 
-Design for hostile actors, not only happy-path founders.
+Design for hostile actors, not only happy-path founders. **Full threat catalog:** [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) (IDs **R-***, **V-***, **G-***, **S-***, **H-***, **I-***, **A-***, **O-***).
+
+**Critical graph insight:** A **4-account clique** (each vouches the other three) is the minimum mutual ring that can elevate every member to **Vouched Human** without outsiders. A 3-person cycle cannot satisfy “3 distinct vouchers” per node. Rotating **A→B→C→A** rings evade the `closed_loop_only` audit flag—triage must use shared-set flags and manual review.
 
 ### Threat: many registered cards (sybil farm)
 
@@ -113,13 +119,15 @@ Design for hostile actors, not only happy-path founders.
 | One active vouch per voucher→vouchee pair | **Unique index** |
 | Steward audit hooks for suspicious clusters | **Design now, build later** |
 
-**Ring detection (operator-only, not public):**
+**Ring detection (operator-only, not public)** — implemented in `worker/src/db/vouch-audit.ts`:
 
-- Flag vouchers who only vouch each other in closed loops.
-- Flag burst vouching at quota boundary.
-- Flag vouchees who share voucher sets above a similarity threshold.
+| Flag | Catches | Misses |
+|------|---------|--------|
+| `closed_loop_only` | Mutual-only pairs | **G-02** rotating 3-cycles (see threat model) |
+| `burst_at_quota_boundary` | 5 issuances in 24h | Legitimate event bursts |
+| `shared_voucher_set` | Overlapping voucher sets on two vouchees | Cliques spread across many vouchees |
 
-Do **not** publish graph analytics on scan pages. Audits are for stewards/operators, with minimal PII and documented appeal.
+Do **not** publish graph analytics on scan pages. Audits are for stewards/operators, with minimal PII and documented appeal. Response playbook: [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) §8.
 
 ### Threat: replay or forged vouch payloads
 
@@ -140,9 +148,11 @@ Do **not** publish graph analytics on scan pages. Audits are for stewards/operat
 | Standardized statement template | UX + validation |
 | Appeal path for wrongful suspension | Governance (HV-FR-40) |
 
-**Copy for voucher at sign time:**
+**Copy for voucher at sign time (checkbox + default statement):**
 
-> You are attesting you know this person as a distinct human. This is not legal ID. You can revoke this vouch if you made a mistake.
+> I met them in person. This vouch is public, revocable, and not legal identity proof.
+
+Default statement text: see **Copy kit** below and [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md).
 
 ### Threat: impersonation via stolen QR / merch
 
@@ -275,7 +285,7 @@ Revoked/suspended card states must **override** positive verification on scan (a
 
 **Step 2  -  Vouch issuance UX (V-002)**
 
-- [x] Card client: “Vouch for this person” for eligible vouchers.
+- [x] Card client: **Issue vouch** on scan for eligible vouchers (`vouch-issue.mjs?v=11`).
 - [x] Sign + POST flow with default statement template.
 - [x] Eligibility errors surfaced in plain language (quota, wait period, not verified).
 - [x] Scan explainer distinguishes network verification vs keys on this device (saved Steward detection).
@@ -314,6 +324,21 @@ Revoked/suspended card states must **override** positive verification on scan (a
 
 ## Copy kit (launch)
 
+Canonical framing: [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md). Shipped scan strings below.
+
+**Vouch card (explainer / interactive / success):**
+
+| Surface | Eyebrow | Title |
+|---------|---------|-------|
+| Explainer | Device signing | Keys required in this tab |
+| Interactive | Signed attestation | Issue vouch |
+| Success | Accepted | Vouch recorded |
+| Ineligible | Unavailable | Cannot issue vouch |
+
+**Default public statement:**
+
+> I know this person as a distinct human. This vouch is public, revocable, and not legal identity proof.
+
 **Vouched Human (scan subtitle):**
 
 > {n} humans vouched for this card on this network. Latest vouch {recency}. This does not prove legal identity.
@@ -322,11 +347,11 @@ Revoked/suspended card states must **override** positive verification on scan (a
 
 > {n} of 3 vouches accepted. This card is not yet a Vouched Human.
 
-**Voucher confirmation:**
+**CTA on explainer (when keys not loaded):**
 
-> I attest this is a distinct human I know. This is not legal ID. My vouch is public and revocable.
+> Sign as {label} · {Steward | Vouched Human}
 
-**What scan does not prove (unchanged intent):**
+**What scan does not prove:**
 
 > That vouches were honest, that this person is globally unique, or that the holder of a printed QR is the card owner.
 
@@ -364,15 +389,17 @@ Vouching confuses people when these are mixed up. Full guide: [`docs/KEYS_CARDS_
 
 - **Steward / Vouched Human** = resolver state for a `profile_id` (visible on scan, `/created/`, `/wallet/` chips).
 - **Signing keys** = owner keypair in **`hc_created`** for this tab (loaded via create or **Use keys** from `hc_wallet`).
-- **Vouch-ready keys:** [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) — scan-first activation (Use keys here, default for vouching, auto-load, Stop).
+- **Vouch-ready keys:** [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) — scan-first activation (Sign as…, default for vouching, auto-load, clear keys from tab).
 - **iPhone vs laptop** = separate devices unless you import a backup or save + Use keys on each.
 
-Scan vouch UI (shipped): if keys are missing but a saved card is Steward on the network, the explainer names that card and tells you to **Use keys** on this device.
+Scan vouch UI (shipped): if keys are missing but a saved card is Steward on the network, the explainer names that card and offers **Sign as…** (or Saved cards → Use keys).
 
 ---
 
 ## Related docs
 
+- [`docs/VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md)  -  AI-era framing, what we own, integrator policy
+- [`docs/VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md)  -  deep threats, gaps, operator playbook
 - [`docs/KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md)  -  cards, keys, verification, multi-device
 - `docs/M7_LIVE_CONTROL_ALPHA.md`  -  ephemeral key control (build before vouch UI polish is done)
 - `docs/V1_DECISION_LOCK.md`  -  launch copy locks

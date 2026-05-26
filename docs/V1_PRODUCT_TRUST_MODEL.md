@@ -7,6 +7,9 @@
 
 **Why scans matter (not a static profile):** `docs/DEMOCRATIC_INFRASTRUCTURE.md` §2  -  live status, revoke, vouches, live control, then Commons Pass.
 
+**Vouch positioning (AI era):** `docs/VOUCH_TRUST_POSITIONING.md`  -  accountability over global biometric uniqueness; what vouch proves for integrators.  
+**Vouch threat model:** `docs/VOUCH_THREAT_MODEL.md`  -  adversarial catalog and operator playbook.
+
 ---
 
 ## V1 Product Promise
@@ -15,7 +18,7 @@ Humanity Commons v1.0 should make one clear promise:
 
 > Create a signed public Humanity Card, get vouched for by real people, prove live control when needed, and carry a QR that always resolves to current status.
 
-V1 must not promise government identity, bot-proof uniqueness, legal identity, KYC, background checks, age verification, or absolute proof that a person is unique across the world.
+V1 must not promise government identity, bot-proof uniqueness, legal identity, KYC, background checks, age verification, iris/biometric personhood registries, or absolute proof that a person is unique across the world.
 
 The product is trustworthy when a normal scanner can understand, in under five seconds:
 
@@ -99,6 +102,8 @@ Do not print mutable verification claims such as "Verified Human" on v1 artifact
 
 ### Level 2: Social Vouch Trust
 
+**Strategic frame:** Vouch answers *who put their name on this profile under published rules—and can revoke it?* It does **not** answer *is this the only human body on Earth?* Biometric global-ID products and Humanity vouch solve different problems; see `docs/VOUCH_TRUST_POSITIONING.md`.
+
 **Examples:**
 
 - Three accepted vouches from eligible humans.
@@ -107,9 +112,10 @@ Do not print mutable verification claims such as "Verified Human" on v1 artifact
 
 **What it proves:**
 
-- Other accountable participants have attested that this card belongs to a distinct human under the published rules.
-- Vouches or credentials are active, signed, and not revoked.
+- Other accountable participants signed **public, revocable** attestations that this card belongs to a distinct human under published rules.
+- Vouches or credentials are active, signed, replay-protected, and not revoked.
 - The latest accepted vouch recency is visible when available.
+- Enough independent vouchers met the threshold (default: 3) with quotas and wait rules applied.
 
 **What it does not prove:**
 
@@ -117,8 +123,10 @@ Do not print mutable verification claims such as "Verified Human" on v1 artifact
 - Government identity.
 - Age.
 - Immigration, employment, or financial eligibility.
-- Absolute sybil resistance.
+- Absolute sybil resistance or global uniqueness.
 - That every voucher was correct or honest.
+- Real-time liveness at vouch time (use live control when possession or fresh key proof matters).
+- That the person holding a printed QR is the card owner.
 
 **Required copy pattern:**
 
@@ -128,7 +136,9 @@ or:
 
 > Founding credential issued under bootstrap rules.
 
-Avoid vague claims such as "real person verified" unless the mechanism is shown next to the claim.
+Avoid vague claims such as "real person verified" or "bot-proof" unless the mechanism is shown next to the claim. Prefer **Vouched Human** and show count + recency.
+
+**Integrator note:** Gate **accountable participation** (e.g. comments, cohort access) with policy on `vouch_count`, card status, and recency—not a single outsourced biometric boolean. Documented knobs: `docs/VOUCH_TRUST_POSITIONING.md` § Own the trust-policy layer.
 
 ### Level 3: Live Control Proof
 

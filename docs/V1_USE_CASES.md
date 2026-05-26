@@ -5,7 +5,7 @@
 
 **Direction:** `docs/DEMOCRATIC_INFRASTRUCTURE.md`  -  scan must deliver live status, vouches, revoke, and (later) org tools - not “another link in bio.”
 
-**Trust boundaries:** `docs/V1_PRODUCT_TRUST_MODEL.md`  -  what scans prove and do not prove at each level.
+**Trust boundaries:** `docs/V1_PRODUCT_TRUST_MODEL.md`  -  what scans prove and do not prove at each level. **Vouch framing:** `docs/VOUCH_TRUST_POSITIONING.md`.
 
 **Build phases:** `docs/V1_0_ARCHITECTURE_ROADMAP.md`  -  Phase A (digital trust) before commerce and Commons Pass.
 
