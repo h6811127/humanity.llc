@@ -768,6 +768,52 @@ html[data-theme="dark"] .landing-disclosure-card-body .list-action > button:acti
   background: rgba(255, 255, 255, 0.06);
 }
 
+/* Create / created flow — bordered field cards */
+html[data-theme="dark"] .flow-segmented.create-template-row {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .flow-inset-fields,
+html[data-theme="dark"] .flow-keys-panel {
+  border-color: var(--shell-separator);
+  box-shadow: var(--shell-shadow-sm);
+}
+
+html[data-theme="dark"] .flow-inset-fields .form-input,
+html[data-theme="dark"] .flow-inset-fields .form-textarea,
+html[data-theme="dark"] .flow-inset-fields select.form-input {
+  border-color: var(--shell-separator);
+  background: var(--shell-fill-secondary);
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .flow-inset-fields .form-input::placeholder,
+html[data-theme="dark"] .flow-inset-fields .form-textarea::placeholder {
+  color: rgba(235, 235, 245, 0.42);
+}
+
+html[data-theme="dark"] .flow-inset-fields .form-hint {
+  color: rgba(235, 235, 245, 0.78);
+}
+
+html[data-theme="dark"] .flow-inset-fields .form-hint strong {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .flow-inset-fields .form-hint a {
+  color: var(--hc-notice-link);
+}
+
+html[data-theme="dark"] .flow-disclosure.create-organizer-opt {
+  border-color: var(--shell-separator);
+  background: var(--shell-fill-secondary);
+}
+
+html[data-theme="dark"] .flow-form-warning.hc-notice--warning {
+  border-color: rgba(255, 159, 10, 0.36);
+}
+
 html[data-theme="dark"] .scan-status-panel,
 html[data-theme="dark"] .pass-scene {
   background: var(--shell-fill);

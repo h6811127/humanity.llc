@@ -1786,6 +1786,7 @@ body.device-shell-created .created-screen {
   padding: 3px;
   border-radius: 10px;
   background: rgba(118, 118, 128, 0.12);
+  border: 0.5px solid var(--shell-separator);
 }
 
 .flow-segmented .create-template-btn {
@@ -1815,6 +1816,7 @@ body.device-shell-created .created-screen {
   padding: 4px 14px 14px;
   border-radius: 12px;
   background: var(--shell-fill);
+  border: 0.5px solid var(--shell-separator);
   box-shadow: var(--shell-shadow-sm);
 }
 
@@ -1834,10 +1836,11 @@ body.device-shell-created .created-screen {
 .flow-inset-fields .form-input,
 .flow-inset-fields .form-textarea,
 .flow-inset-fields select.form-input {
-  border: none;
+  border: 0.5px solid var(--shell-separator);
   border-radius: 10px;
   background: var(--shell-fill-secondary);
   padding: 12px 14px;
+  color: var(--shell-label-strong);
 }
 
 .flow-inset-fields .form-input:focus,
@@ -1849,12 +1852,25 @@ body.device-shell-created .created-screen {
 
 .flow-inset-fields .form-hint {
   margin-bottom: 4px;
+  color: var(--shell-label);
+}
+
+.flow-inset-fields .form-hint strong {
+  color: var(--shell-label-strong);
+  font-weight: 600;
+}
+
+.flow-inset-fields .form-hint a {
+  color: var(--red);
+  font-weight: 600;
+  text-decoration: none;
 }
 
 .flow-disclosure.create-organizer-opt {
   margin: 12px 0 0;
   border-radius: 10px;
   background: var(--shell-fill-secondary);
+  border: 0.5px solid var(--shell-separator);
   overflow: hidden;
 }
 
@@ -1881,6 +1897,11 @@ body.device-shell-created .created-screen {
 .flow-form-warning {
   margin-top: 12px;
   margin-bottom: 12px;
+}
+
+.flow-form-warning.hc-notice {
+  border-width: 0.5px;
+  border-style: solid;
 }
 
 .flow-submit {

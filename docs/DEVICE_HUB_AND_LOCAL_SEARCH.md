@@ -214,6 +214,9 @@ Inline notices (hub **Your browser holds the private key**, system/cross-tab ban
 **Do not** redefine those variables on `.hc-notice` itself — each notice box would pin light-mode greys and body copy becomes unreadable on tinted dark backgrounds (especially `.hc-notice--info`).
 
 Dark mode sets base tokens on `html[data-theme="dark"]`, then **per-variant** tokens on `.hc-notice--info` / `--warning` / `--error` so title and body stay high-contrast on blue, amber, and red fills. Titles use `--hc-notice-title-fg` (white on tinted banners); body uses `--hc-notice-fg` (slightly softer off-white).
+
+**Create flow (`/create/`):** Field groups use `.flow-inset-fields` with a visible `border: 0.5px solid var(--shell-separator)` and bordered inputs (not borderless grey-on-grey). The pre-submit custody warning is a structured `.hc-notice--warning` (icon + title + body) so it inherits the same tokens — avoid pairing `.form-warning` hardcoded greys with `.hc-notice`.
+
 | `site/js/device-hub-search.mjs` | Shared filter |
 | `site/js/device-hub-import.mjs` | Hub backup import |
 | `site/wallet/index.html` | Saved cards device shell |
