@@ -13,8 +13,8 @@ All Humanity scan QRs (creation page, download PNG, scan pass card) MUST match t
 | Property | Value |
 |----------|--------|
 | Modules | Brand red `#db1b43` on white `#ffffff` |
-| Center mark | Module-masked bullseye: dusty-rose wash `#c9979f` (~52% opacity) + warm-ink core `#141414` (~90% opacity) |
-| Logo size | ~78% of QR width (fills the code area; EC **Q** required) |
+| Finder mark | Module-masked two-tone circle on the **top-left finder**: dusty-rose `#c9979f` (~52%) + warm-ink core `#141414` (~90%) |
+| Mark size | ~21% of QR width, centered on finder (`margin + 3.5` modules); EC **Q** required |
 | Error correction | **Q** (required for center overlay; stickers/apparel per §8.5) |
 | Payload | Unchanged — still the HTTPS scan URL for this card + `qr_id` |
 
@@ -37,9 +37,9 @@ To tune the look, edit `QR_CENTER_LOGO_OUTER_FILL`, `QR_CENTER_LOGO_INNER_FILL`,
 
 ---
 
-## Center mark (module-masked bullseye)
+## Finder mark (module-masked two-tone circle)
 
-Official generators apply the center logo **only on top of brand-red modules** (not on white quiet-zone cells):
+Official generators place the original rose + ink concentric circles **on the top-left QR finder**, not on the card border and not in the code center. The mark renders **only on brand-red modules** (not on white quiet-zone cells):
 
 | Layer | Color | Opacity | Effect on modules |
 |-------|--------|---------|-------------------|
@@ -50,11 +50,11 @@ Official generators apply the center logo **only on top of brand-red modules** (
 
 | Implementation | Entry |
 |----------------|--------|
-| SVG (scan pass, Worker) | `overlayCenterLogoOnSvg()` — SVG `<mask>` from dark-module paths |
-| Canvas (created page PNG) | `drawMaskedCenterLogoOnCanvas()` — alpha punch-out from QR raster |
-| Fallback | If no brand-red stroke paths are found, unmasked circles (legacy) |
+| SVG (scan pass, Worker) | `overlayFinderLogoOnSvg()` via `overlayCenterLogoOnSvg()` — SVG `<mask>` from dark-module paths |
+| Canvas (created page PNG) | `drawMaskedFinderLogoOnCanvas()` — alpha punch-out from QR raster |
+| Fallback | If no brand-red stroke paths are found, unmasked circles at finder center |
 
-Frame corner **brand mark** is one soft transparent **brand-red** circle in the white margin (`brandMarkGlyphSvgFragment`) - same cue as `site/assets/red_qr_transparent_bg.png`, not salmon/ink rings and not a miniature finder.
+`QR_FRAME_BRAND_MARK_ENABLED` is **false** — do not paint a separate dot on the frame margin. Optional center bullseye: set `QR_CENTER_LOGO_ENABLED` to `true` (off by default).
 
 ---
 
@@ -68,10 +68,9 @@ Official framed QRs combine cues that a generic pink QR cannot copy without enco
 | `LIVE OBJECT` band | Uppercase label under the code | Signals network-backed status, not a static sticker |
 | `humanity.llc` footer | Grey microtype host line | Ties the object to the resolver origin |
 | `HC-XXXX-XXXX` credential | Monospace code under the footer | Humans can compare sticker to on-screen status |
-| Transparent red corner dot | Soft `#db1b43` circle in the margin | Matches favicon / reference red QR mark |
-| Center bullseye | Module-masked rose + ink core | Visible brand without washing out QR whitespace |
+| Finder two-tone mark | Rose + ink bullseye on top-left finder | Same palette as the legacy center glyph; module-masked |
 
-Tune corner dot via `QR_FRAME_BRAND_MARK_OPACITY` (default ~0.34). Set `QR_FRAME_BRAND_MARK_ENABLED` to `false` to omit it.
+Tune finder size via `QR_FINDER_LOGO_SIZE_RATIO` (default ~0.21). Tune opacities via `QR_CENTER_LOGO_OUTER_OPACITY` / `QR_CENTER_LOGO_INNER_OPACITY`.
 
 ---
 
@@ -102,7 +101,7 @@ npm run worker:test -- worker/tests/qr-scan-url-lock.test.ts
 
 ## Verification checklist
 
-- [ ] `/created/` preview QR shows red modules + dusty-rose / ink bullseye (no white square in the mark).
+- [ ] `/created/` preview QR shows red modules + dusty-rose / ink mark on the **top-left finder** (not on the card border).
 - [ ] Download PNG matches preview.
 - [x] `/c/{profile_id}?q=…` pass card QR matches (Worker SVG) — `scan-pass.css` + `scan-qr-branding.test.ts`.
 - [ ] Phone scan succeeds at 220px display size and at downloaded 512px PNG.
@@ -135,7 +134,7 @@ All official generators wrap the branded QR in `renderHumanityQrFrameSvg` (Worke
 | Element | Implementation |
 |---------|----------------|
 | Brand border | Rounded rect stroke `#db1b43` (`qrFrameMetrics` + frame SVG/canvas) |
-| Brand mark | Transparent brand-red dot top-left margin (`brandMarkGlyphSvgFragment`) |
+| Finder mark | Two-tone circle on top-left finder (`finderLogoSvgFragment` / `overlayFinderLogoOnSvg`) |
 | `LIVE OBJECT` | Uppercase label below modules (`QR_FRAME_LIVE_OBJECT_TEXT`) |
 | Footer | `humanity.llc` (`QR_FRAME_FOOTER_TEXT`) |
 | Layout tuning | Edit `qrFrameMetrics()` in `site/js/qr-branding.mjs` |

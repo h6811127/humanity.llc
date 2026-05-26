@@ -27,8 +27,14 @@ export const QR_CENTER_LOGO_INNER_OPACITY = 0.9;
 /** @deprecated Prefer {@link QR_CENTER_LOGO_OUTER_OPACITY} / {@link QR_CENTER_LOGO_INNER_OPACITY}. */
 export const QR_CENTER_LOGO_OPACITY = QR_CENTER_LOGO_OUTER_OPACITY;
 
-/** Outer circle diameter as fraction of QR width (~fills code, stays inside frame). */
+/** Outer circle diameter as fraction of QR width (center mark; off when using finder mark). */
 export const QR_CENTER_LOGO_SIZE_RATIO = 0.78;
+
+/** Two-tone mark over the top-left finder (~7 modules). */
+export const QR_FINDER_LOGO_SIZE_RATIO = 0.21;
+
+/** Center bullseye off; two-tone mark sits on the top-left finder only. */
+export const QR_CENTER_LOGO_ENABLED = false;
 
 /** Required when center logo is enabled (Technical Standards §8.5). */
 export const QR_BRANDED_ERROR_CORRECTION = "Q";
@@ -48,11 +54,11 @@ export const QR_FRAME_LIVE_OBJECT_TEXT = "LIVE OBJECT";
 /** Grey for footer microtype on frame. */
 export const QR_FRAME_FOOTER_FILL = "#8a8a8a";
 
-/** Soft transparent brand-red corner dot (same family as `red_qr_transparent_bg.png`). */
+/** @deprecated Frame-margin dot removed; mark is on the QR finder. */
 export const QR_FRAME_BRAND_MARK_OPACITY = 0.34;
 
-/** Single filled circle in the frame margin - not salmon/ink rings, not a second finder. */
-export const QR_FRAME_BRAND_MARK_ENABLED = true;
+/** Do not paint on the card border margin. */
+export const QR_FRAME_BRAND_MARK_ENABLED = false;
 
 /**
  * Layout around the QR modules (not including outer canvas margin).
@@ -297,6 +303,81 @@ export function centerLogoMetrics(qrSize, sizeRatio = QR_CENTER_LOGO_SIZE_RATIO)
 }
 
 /**
+ * Top-left finder center in QR viewBox units (ISO 7x7 finder at quiet zone + 3.5).
+ * @param {number} viewBoxSize
+ * @param {number} [sizeRatio]
+ * @param {number} [marginModules]
+ */
+export function finderLogoMetrics(
+  viewBoxSize,
+  sizeRatio = QR_FINDER_LOGO_SIZE_RATIO,
+  marginModules = QR_BRANDED_RENDER_OPTIONS.margin
+) {
+  const logoSize = viewBoxSize * sizeRatio;
+  const cx = marginModules + 3.5;
+  const cy = marginModules + 3.5;
+  const outerR = logoSize / 2;
+  const innerR = outerR * QR_CENTER_LOGO_INNER_RADIUS_RATIO;
+  return { logoSize, cx, cy, outerR, innerR, viewBoxSize };
+}
+
+/**
+ * Finder mark position scaled to canvas pixels.
+ * @param {number} canvasSize
+ * @param {number} viewBoxSize
+ * @param {number} [sizeRatio]
+ */
+export function finderLogoMetricsPixels(
+  canvasSize,
+  viewBoxSize,
+  sizeRatio = QR_FINDER_LOGO_SIZE_RATIO
+) {
+  const m = finderLogoMetrics(viewBoxSize, sizeRatio);
+  const scale = canvasSize / viewBoxSize;
+  return {
+    cx: m.cx * scale,
+    cy: m.cy * scale,
+    outerR: m.outerR * scale,
+    innerR: m.innerR * scale,
+  };
+}
+
+/**
+ * Dusty-rose + ink concentric circles (original two-tone mark).
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} outerR
+ * @param {number} innerR
+ * @param {string} className
+ * @param {number} outerOpacity
+ * @param {number} innerOpacity
+ */
+export function twoToneLogoSvgFragment(
+  cx,
+  cy,
+  outerR,
+  innerR,
+  className,
+  outerOpacity = QR_CENTER_LOGO_OUTER_OPACITY,
+  innerOpacity = QR_CENTER_LOGO_INNER_OPACITY
+) {
+  return `<g class="${className}" aria-hidden="true"><circle class="${className}-outer" cx="${cx}" cy="${cy}" r="${outerR}" fill="${QR_CENTER_LOGO_OUTER_FILL}" opacity="${outerOpacity}"/><circle class="${className}-inner" cx="${cx}" cy="${cy}" r="${innerR}" fill="${QR_CENTER_LOGO_INNER_FILL}" opacity="${innerOpacity}"/></g>`;
+}
+
+/**
+ * @param {number} qrSize
+ */
+export function finderLogoSvgFragment(
+  qrSize,
+  outerOpacity = QR_CENTER_LOGO_OUTER_OPACITY,
+  innerOpacity = QR_CENTER_LOGO_INNER_OPACITY,
+  sizeRatio = QR_FINDER_LOGO_SIZE_RATIO
+) {
+  const { cx, cy, outerR, innerR } = finderLogoMetrics(qrSize, sizeRatio);
+  return twoToneLogoSvgFragment(cx, cy, outerR, innerR, "hc-qr-finder-logo", outerOpacity, innerOpacity);
+}
+
+/**
  * Inline SVG fragment: two concentric circles, transparent outside the rings.
  * @param {number} qrSize
  * @param {number} [opacity]
@@ -309,19 +390,20 @@ export function centerLogoSvgFragment(
   innerOpacity = QR_CENTER_LOGO_INNER_OPACITY
 ) {
   const { cx, cy, outerR, innerR } = centerLogoMetrics(qrSize, sizeRatio);
-  return `<g class="hc-qr-center-logo" aria-hidden="true"><circle class="hc-qr-center-logo-outer" cx="${cx}" cy="${cy}" r="${outerR}" fill="${QR_CENTER_LOGO_OUTER_FILL}" opacity="${outerOpacity}"/><circle class="hc-qr-center-logo-inner" cx="${cx}" cy="${cy}" r="${innerR}" fill="${QR_CENTER_LOGO_INNER_FILL}" opacity="${innerOpacity}"/></g>`;
+  return twoToneLogoSvgFragment(cx, cy, outerR, innerR, "hc-qr-center-logo", outerOpacity, innerOpacity);
 }
 
 /**
- * Insert centered vector logo into a QR SVG string.
+ * Module-masked two-tone mark on the top-left QR finder.
  * @param {string} svg
- * @param {{ opacity?: number, sizeRatio?: number }} [opts]
+ * @param {{ opacity?: number, sizeRatio?: number, outerOpacity?: number, innerOpacity?: number }} [opts]
  */
-export function overlayCenterLogoOnSvg(svg, opts = {}) {
+export function overlayFinderLogoOnSvg(svg, opts = {}) {
   if (!svg?.includes("</svg>")) return svg;
   const outerOpacity = opts.outerOpacity ?? opts.opacity ?? QR_CENTER_LOGO_OUTER_OPACITY;
   const innerOpacity = opts.innerOpacity ?? QR_CENTER_LOGO_INNER_OPACITY;
-  const sizeRatio = opts.sizeRatio ?? QR_CENTER_LOGO_SIZE_RATIO;
+  const sizeRatio = opts.sizeRatio ?? QR_FINDER_LOGO_SIZE_RATIO;
+  const marginModules = opts.margin ?? QR_BRANDED_RENDER_OPTIONS.margin;
   const viewBoxMatch = svg.match(/viewBox="0 0 (\d+(?:\.\d+)?) (\d+(?:\.\d+)?)"/);
   const widthMatch = svg.match(/\bwidth="(\d+(?:\.\d+)?)"/);
   const size = viewBoxMatch
@@ -330,21 +412,62 @@ export function overlayCenterLogoOnSvg(svg, opts = {}) {
       ? Number(widthMatch[1])
       : 0;
   if (!size) return svg;
-  // Mask the center mark so it only renders on top of the dark QR modules
-  // (leaves QR whitespace / negative space intact).
-  const maskId = `hc-qr-center-logo-mask-${Math.random().toString(36).slice(2)}`;
+
+  const maskId = `hc-qr-finder-logo-mask-${Math.random().toString(36).slice(2)}`;
   const inner = extractSvgInner(svg);
   const darkModulePaths = inner.match(new RegExp(`<path[^>]*stroke="${QR_BRAND_RED}"[^>]*/>`, "g")) ?? [];
+  const { cx, cy, outerR, innerR } = finderLogoMetrics(size, sizeRatio, marginModules);
+
   if (!darkModulePaths.length) {
-    const fragment = centerLogoSvgFragment(size, outerOpacity, sizeRatio, innerOpacity);
+    const { cx: fcx, cy: fcy, outerR: outerRf, innerR: innerRf } = finderLogoMetrics(
+      size,
+      sizeRatio,
+      marginModules
+    );
+    const fragment = twoToneLogoSvgFragment(
+      fcx,
+      fcy,
+      outerRf,
+      innerRf,
+      "hc-qr-finder-logo",
+      outerOpacity,
+      innerOpacity
+    );
     return svg.replace("</svg>", `${fragment}</svg>`);
   }
 
-  const { cx, cy, outerR, innerR } = centerLogoMetrics(size, sizeRatio);
-  const circleFragment = `<g class="hc-qr-center-logo" aria-hidden="true" mask="url(#${maskId})"><circle class="hc-qr-center-logo-outer" cx="${cx}" cy="${cy}" r="${outerR}" fill="${QR_CENTER_LOGO_OUTER_FILL}" opacity="${outerOpacity}"/><circle class="hc-qr-center-logo-inner" cx="${cx}" cy="${cy}" r="${innerR}" fill="${QR_CENTER_LOGO_INNER_FILL}" opacity="${innerOpacity}"/></g>`;
-
+  const circleFragment = `<g class="hc-qr-finder-logo" aria-hidden="true" mask="url(#${maskId})"><circle class="hc-qr-finder-logo-outer" cx="${cx}" cy="${cy}" r="${outerR}" fill="${QR_CENTER_LOGO_OUTER_FILL}" opacity="${outerOpacity}"/><circle class="hc-qr-finder-logo-inner" cx="${cx}" cy="${cy}" r="${innerR}" fill="${QR_CENTER_LOGO_INNER_FILL}" opacity="${innerOpacity}"/></g>`;
   const defs = `<defs><mask id="${maskId}" maskUnits="userSpaceOnUse" mask-type="alpha">${darkModulePaths.join("")}</mask></defs>`;
   return svg.replace("</svg>", `${defs}${circleFragment}</svg>`);
+}
+
+/**
+ * Branded QR overlay: two-tone finder mark (module-masked). Center mark optional via flag.
+ * @param {string} svg
+ * @param {{ opacity?: number, sizeRatio?: number }} [opts]
+ */
+export function overlayCenterLogoOnSvg(svg, opts = {}) {
+  if (!svg?.includes("</svg>")) return svg;
+  let out = overlayFinderLogoOnSvg(svg, opts);
+  if (!QR_CENTER_LOGO_ENABLED) return out;
+
+  const outerOpacity = opts.outerOpacity ?? opts.opacity ?? QR_CENTER_LOGO_OUTER_OPACITY;
+  const innerOpacity = opts.innerOpacity ?? QR_CENTER_LOGO_INNER_OPACITY;
+  const sizeRatio = opts.sizeRatio ?? QR_CENTER_LOGO_SIZE_RATIO;
+  const viewBoxMatch = svg.match(/viewBox="0 0 (\d+(?:\.\d+)?) (\d+(?:\.\d+)?)"/);
+  const size = viewBoxMatch ? Number(viewBoxMatch[1]) : 0;
+  if (!size) return out;
+
+  const maskId = `hc-qr-center-logo-mask-${Math.random().toString(36).slice(2)}`;
+  const inner = extractSvgInner(svg);
+  const darkModulePaths = inner.match(new RegExp(`<path[^>]*stroke="${QR_BRAND_RED}"[^>]*/>`, "g")) ?? [];
+  const { cx, cy, outerR, innerR } = centerLogoMetrics(size, sizeRatio);
+  const circleFragment = `<g class="hc-qr-center-logo" aria-hidden="true" mask="url(#${maskId})"><circle class="hc-qr-center-logo-outer" cx="${cx}" cy="${cy}" r="${outerR}" fill="${QR_CENTER_LOGO_OUTER_FILL}" opacity="${outerOpacity}"/><circle class="hc-qr-center-logo-inner" cx="${cx}" cy="${cy}" r="${innerR}" fill="${QR_CENTER_LOGO_INNER_FILL}" opacity="${innerOpacity}"/></g>`;
+  if (!darkModulePaths.length) {
+    return out.replace("</svg>", `${centerLogoSvgFragment(size, outerOpacity, sizeRatio, innerOpacity)}</svg>`);
+  }
+  const defs = `<defs><mask id="${maskId}" maskUnits="userSpaceOnUse" mask-type="alpha">${darkModulePaths.join("")}</mask></defs>`;
+  return out.replace("</svg>", `${defs}${circleFragment}</svg>`);
 }
 
 /**
@@ -381,35 +504,27 @@ export function drawCenterLogoOnCanvas(
 }
 
 /**
- * Like drawCenterLogoOnCanvas, but masks the mark to only render over dark QR modules.
- *
- * This keeps the "circle silhouette" while leaving QR whitespace modules unchanged,
- * improving visual contrast and scan robustness.
- * @param {CanvasRenderingContext2D} ctx Output canvas context
- * @param {HTMLCanvasElement} qrCanvas QR canvas (must already contain rendered modules)
- * @param {number} qrWidth
+ * Module-masked two-tone circles at a given center (finder or code center).
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {HTMLCanvasElement} qrCanvas
  * @param {number} offsetX
  * @param {number} offsetY
- * @param {number} [outerOpacity]
- * @param {number} [sizeRatio]
- * @param {number} [innerOpacity]
+ * @param {{ cx: number, cy: number, outerR: number, innerR: number, outerOpacity?: number, innerOpacity?: number }} mark
  */
-export function drawMaskedCenterLogoOnCanvas(
-  ctx,
-  qrCanvas,
-  qrWidth,
-  offsetX = 0,
-  offsetY = 0,
-  outerOpacity = QR_CENTER_LOGO_OUTER_OPACITY,
-  sizeRatio = QR_CENTER_LOGO_SIZE_RATIO,
-  innerOpacity = QR_CENTER_LOGO_INNER_OPACITY
-) {
+export function drawMaskedTwoToneLogoOnCanvas(ctx, qrCanvas, offsetX, offsetY, mark) {
   const qrCtx = qrCanvas.getContext("2d");
   if (!qrCtx) return;
 
   const w = qrCanvas.width;
   const h = qrCanvas.height;
-  const { cx, cy, outerR, innerR } = centerLogoMetrics(w, sizeRatio);
+  const {
+    cx,
+    cy,
+    outerR,
+    innerR,
+    outerOpacity = QR_CENTER_LOGO_OUTER_OPACITY,
+    innerOpacity = QR_CENTER_LOGO_INNER_OPACITY,
+  } = mark;
 
   const circleCanvas = document.createElement("canvas");
   circleCanvas.width = w;
@@ -469,6 +584,40 @@ export function drawMaskedCenterLogoOnCanvas(
   ctx.drawImage(circleCanvas, offsetX, offsetY);
 }
 
+/**
+ * @deprecated Use {@link drawMaskedTwoToneLogoOnCanvas} on the finder.
+ */
+export function drawMaskedCenterLogoOnCanvas(
+  ctx,
+  qrCanvas,
+  qrWidth,
+  offsetX = 0,
+  offsetY = 0,
+  outerOpacity = QR_CENTER_LOGO_OUTER_OPACITY,
+  sizeRatio = QR_CENTER_LOGO_SIZE_RATIO,
+  innerOpacity = QR_CENTER_LOGO_INNER_OPACITY
+) {
+  const { cx, cy, outerR, innerR } = centerLogoMetrics(qrCanvas.width, sizeRatio);
+  drawMaskedTwoToneLogoOnCanvas(ctx, qrCanvas, offsetX, offsetY, {
+    cx,
+    cy,
+    outerR,
+    innerR,
+    outerOpacity,
+    innerOpacity,
+  });
+}
+
+/**
+ * Two-tone mark on the top-left finder (module-masked).
+ */
+export function drawMaskedFinderLogoOnCanvas(ctx, qrCanvas, offsetX, offsetY, viewBoxSize) {
+  const w = qrCanvas.width;
+  const vb = viewBoxSize ?? w;
+  const mark = finderLogoMetricsPixels(w, vb);
+  drawMaskedTwoToneLogoOnCanvas(ctx, qrCanvas, offsetX, offsetY, mark);
+}
+
 function hexToRgb(hex) {
   const h = String(hex).replace("#", "").trim();
   const v = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
@@ -514,18 +663,22 @@ export async function renderHumanityQrFrameToCanvas(text, qrWidth) {
   ctx.fillStyle = QR_BRAND_LIGHT;
   ctx.fillRect(0, 0, out.width, out.height);
   ctx.translate(outerPadding, outerPadding);
+  const viewBoxSize = extractQrSvgViewBoxSize(
+    await QRCode.toString(text, { type: "svg", ...QR_BRANDED_RENDER_OPTIONS, width: qrWidth })
+  );
+
   drawHumanityQrFrameCanvas(ctx, m, () => {
     ctx.drawImage(qrCanvas, m.qrX, m.qrY);
-    drawMaskedCenterLogoOnCanvas(
-      ctx,
-      qrCanvas,
-      qrWidth,
-      m.qrX,
-      m.qrY,
-      QR_CENTER_LOGO_OUTER_OPACITY,
-      QR_CENTER_LOGO_SIZE_RATIO,
-      QR_CENTER_LOGO_INNER_OPACITY
-    );
+    drawMaskedFinderLogoOnCanvas(ctx, qrCanvas, m.qrX, m.qrY, viewBoxSize || qrWidth);
+    if (QR_CENTER_LOGO_ENABLED) {
+      const { cx, cy, outerR, innerR } = centerLogoMetrics(qrWidth);
+      drawMaskedTwoToneLogoOnCanvas(ctx, qrCanvas, m.qrX, m.qrY, {
+        cx,
+        cy,
+        outerR,
+        innerR,
+      });
+    }
   });
   ctx.restore();
   return out;
