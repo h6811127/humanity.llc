@@ -215,16 +215,16 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 ### Slice 4 — E2E + integration tests (P1)
 
-- [ ] Fix `e2e/device-os-wallet.spec.ts` to click **Use keys** (or role name from `device-hub-ui.mjs`).
-- [ ] Add Playwright or Vitest case: saved card + mocked status `active` → no since-visit banner.
+- [x] Fix `e2e/device-os-wallet.spec.ts` to click **Use keys** (or role name from `device-hub-ui.mjs`).
+- [x] Add Playwright or Vitest case: saved card + mocked status `active` → no since-visit banner.
 
 ---
 
 ### Slice 5 — Doc hygiene (P2)
 
-- [ ] Sync `DEVICE_HUB_AND_LOCAL_SEARCH.md` with removed help pill / current landing layout.
-- [ ] Update `site/features/scan-ui.html` (regenerate via `generate-feature-pages.mjs` if needed).
-- [ ] Note browser notifications as shipped in `DEVICE_OS.md`.
+- [x] Sync `DEVICE_HUB_AND_LOCAL_SEARCH.md` with removed help pill / current landing layout.
+- [x] Update `site/features/scan-ui.html` (regenerate via `generate-feature-pages.mjs` if needed).
+- [x] Note browser notifications as shipped in `DEVICE_OS.md`.
 
 ---
 
