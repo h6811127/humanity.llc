@@ -34,6 +34,9 @@ Defined in `site/styles.css` and overridden in `site/css/theme-dark.css`:
 - `--surface-popover-border`
 - `--surface-popover-control-bg`
 - `--surface-popover-control-fg`
+- `--surface-popover-notice-bg` / `--surface-popover-notice-border` / `--surface-popover-notice-fg`
+- `--surface-popover-crosstab-bg` / `--surface-popover-crosstab-border` / `--surface-popover-crosstab-fg`
+- `--surface-popover-warn-bg` / `--surface-popover-warn-border` / `--surface-popover-warn-fg` (live proof, revoked)
 
 Use these for:
 
@@ -97,6 +100,12 @@ When touching legacy components, migrate them incrementally to this token family
 | Hub + inbox bottom sheets | `.device-hub.device-hub--sheet`, `.device-inbox-sheet`, sheet chrome (handle/close/title/list) | Opaque `--surface-popover-bg` / fg; removed translucent sheet blur; inbox row title/sub on popover tokens. |
 | Glance popover list rows | `.device-hub-glance-popover .device-hub-glance-btn`, status row titles | Default rows on control surface (fixes dark `shell-fill` override); status title colors have dark-theme overrides. |
 | Inbox browser-alert prompt | `.device-inbox-sheet .device-browser-notif-prompt*` | Live-proof OS notification opt-in inside inbox sheet footer on popover tokens. |
+| Glance status row tints | `.device-hub-glance-row--notice/crosstab/liveproof/revoked` | Notice/cross-tab/warn bg, border, and title fg tokens (light + dark on `:root`). |
+| Dot explainer (base) | `.device-dot-explainer*` | Default explainer block uses popover tokens; hub/glance scopes retain explicit rules. |
+
+### Migration complete (shell popovers)
+
+All surfaces listed under **Use these for** are migrated as of this standard. New floating shell UI must use `--surface-popover-*` (and status tint tokens when applicable) from the first PR — do not add hardcoded `rgba(255,255,255,…)` panel fills without dark overrides.
 
 ### QA (hub card menu)
 

@@ -29,6 +29,15 @@ html[data-theme="dark"] {
   --surface-popover-border: rgba(255, 255, 255, 0.14);
   --surface-popover-control-bg: #2c2c2e;
   --surface-popover-control-fg: #f5f5f7;
+  --surface-popover-notice-bg: rgba(255, 59, 48, 0.16);
+  --surface-popover-notice-border: rgba(255, 59, 48, 0.28);
+  --surface-popover-notice-fg: #ff6961;
+  --surface-popover-crosstab-bg: rgba(0, 122, 255, 0.2);
+  --surface-popover-crosstab-border: rgba(0, 122, 255, 0.32);
+  --surface-popover-crosstab-fg: #64b5ff;
+  --surface-popover-warn-bg: rgba(255, 149, 0, 0.18);
+  --surface-popover-warn-border: rgba(255, 149, 0, 0.3);
+  --surface-popover-warn-fg: #ffb340;
 }
 
 html[data-theme="dark"] body {
@@ -137,19 +146,6 @@ html[data-theme="dark"] .device-inbox-sheet .device-browser-notif-prompt-dismiss
 html[data-theme="dark"] .device-hub-glance-popover .device-hub-glance-btn {
   background: var(--surface-popover-control-bg);
   border-color: var(--surface-popover-border);
-}
-
-html[data-theme="dark"] .device-hub-glance-popover .device-hub-glance-row--notice .device-hub-glance-title {
-  color: #ff6961;
-}
-
-html[data-theme="dark"] .device-hub-glance-popover .device-hub-glance-row--crosstab .device-hub-glance-title {
-  color: #64b5ff;
-}
-
-html[data-theme="dark"] .device-hub-glance-popover .device-hub-glance-row--liveproof .device-hub-glance-title,
-html[data-theme="dark"] .device-hub-glance-popover .device-hub-glance-row--revoked .device-hub-glance-title {
-  color: #ffb340;
 }
 
 html[data-theme="dark"] .device-hub .list-action button,
@@ -693,22 +689,6 @@ html[data-theme="dark"] .device-hub-intro-cta {
 html[data-theme="dark"] .device-hub-intro-dismiss {
   background: var(--surface-popover-control-bg);
   color: var(--surface-popover-control-fg);
-}
-
-html[data-theme="dark"] .device-hub-glance-popover .device-hub-glance-row--notice .device-hub-glance-btn {
-  background: rgba(255, 59, 48, 0.16);
-  border-color: rgba(255, 59, 48, 0.28);
-}
-
-html[data-theme="dark"] .device-hub-glance-popover .device-hub-glance-row--crosstab .device-hub-glance-btn {
-  background: rgba(0, 122, 255, 0.2);
-  border-color: rgba(0, 122, 255, 0.32);
-}
-
-html[data-theme="dark"] .device-hub-glance-popover .device-hub-glance-row--liveproof .device-hub-glance-btn,
-html[data-theme="dark"] .device-hub-glance-popover .device-hub-glance-row--revoked .device-hub-glance-btn {
-  background: rgba(255, 149, 0, 0.18);
-  border-color: rgba(255, 149, 0, 0.3);
 }
 
 html[data-theme="dark"] .device-hub-notice-banner--info {

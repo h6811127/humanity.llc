@@ -25,6 +25,16 @@
   --surface-popover-border: rgba(60, 60, 67, 0.12);
   --surface-popover-control-bg: rgba(120, 120, 128, 0.12);
   --surface-popover-control-fg: #1c1c1e;
+  /* Glance / inbox status row tints (on popover control surface) */
+  --surface-popover-notice-bg: rgba(255, 59, 48, 0.1);
+  --surface-popover-notice-border: rgba(255, 59, 48, 0.22);
+  --surface-popover-notice-fg: #c9342a;
+  --surface-popover-crosstab-bg: rgba(0, 122, 255, 0.12);
+  --surface-popover-crosstab-border: rgba(0, 122, 255, 0.28);
+  --surface-popover-crosstab-fg: #0060df;
+  --surface-popover-warn-bg: rgba(255, 149, 0, 0.14);
+  --surface-popover-warn-border: rgba(255, 149, 0, 0.32);
+  --surface-popover-warn-fg: #a16207;
 }
 
 *,
@@ -541,9 +551,9 @@ body.page-flow.has-shell-chrome .page > main.screen {
 .device-dot-explainer {
   margin: 0 0 10px;
   padding: 10px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 0.5px solid var(--surface-popover-border);
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--surface-popover-control-bg);
 }
 
 .device-dot-explainer--popover {
@@ -577,14 +587,14 @@ body.page-flow.has-shell-chrome .page > main.screen {
   margin: 0 0 4px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--grey);
+  color: var(--surface-popover-fg-muted);
 }
 
 .device-dot-explainer-line {
   margin: 0;
   font-size: 13px;
   line-height: 1.35;
-  color: var(--black);
+  color: var(--surface-popover-fg);
 }
 
 .device-dot-explainer-line + .device-dot-explainer-line {
@@ -598,10 +608,10 @@ body.page-flow.has-shell-chrome .page > main.screen {
   margin-top: 8px;
   min-height: 32px;
   padding: 6px 10px;
-  border: 1px solid rgba(219, 27, 67, 0.25);
+  border: 0.5px solid var(--surface-popover-border);
   border-radius: 999px;
-  background: rgba(219, 27, 67, 0.05);
-  color: var(--red);
+  background: var(--surface-popover-control-bg);
+  color: var(--surface-popover-accent);
   font: inherit;
   font-size: 13px;
   font-weight: 600;
@@ -611,7 +621,7 @@ body.page-flow.has-shell-chrome .page > main.screen {
 }
 
 .device-dot-explainer-action:active {
-  background: rgba(219, 27, 67, 0.1);
+  opacity: 0.85;
 }
 
 .device-hub-glance-btn--muted .device-hub-glance-title {

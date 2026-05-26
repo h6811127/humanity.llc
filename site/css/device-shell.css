@@ -387,38 +387,38 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   opacity: 0.85;
 }
 
-/* Glance notifications — light pastel fills (hub quick look) */
+/* Glance notifications — status tints on popover control surface */
 .device-hub-glance-popover .device-hub-glance-row--notice .device-hub-glance-btn {
-  border-color: rgba(255, 59, 48, 0.22);
-  background: rgba(255, 59, 48, 0.1);
+  border-color: var(--surface-popover-notice-border);
+  background: var(--surface-popover-notice-bg);
 }
 
 .device-hub-glance-popover .device-hub-glance-row--crosstab .device-hub-glance-btn {
-  border-color: rgba(0, 122, 255, 0.28);
-  background: rgba(0, 122, 255, 0.12);
+  border-color: var(--surface-popover-crosstab-border);
+  background: var(--surface-popover-crosstab-bg);
 }
 
-.device-hub-glance-popover .device-hub-glance-row--liveproof .device-hub-glance-btn {
-  border-color: rgba(255, 149, 0, 0.32);
-  background: rgba(255, 149, 0, 0.14);
-}
-
+.device-hub-glance-popover .device-hub-glance-row--liveproof .device-hub-glance-btn,
 .device-hub-glance-popover .device-hub-glance-row--revoked .device-hub-glance-btn {
-  border-color: rgba(255, 149, 0, 0.28);
-  background: rgba(255, 149, 0, 0.12);
+  border-color: var(--surface-popover-warn-border);
+  background: var(--surface-popover-warn-bg);
 }
 
 .device-hub-glance-popover .device-hub-glance-row--notice .device-hub-glance-title {
-  color: #c9342a;
+  color: var(--surface-popover-notice-fg);
 }
 
 .device-hub-glance-popover .device-hub-glance-row--crosstab .device-hub-glance-title {
-  color: #0060df;
+  color: var(--surface-popover-crosstab-fg);
 }
 
 .device-hub-glance-popover .device-hub-glance-row--liveproof .device-hub-glance-title,
 .device-hub-glance-popover .device-hub-glance-row--revoked .device-hub-glance-title {
-  color: #a16207;
+  color: var(--surface-popover-warn-fg);
+}
+
+.device-hub-glance-popover .device-hub-glance-btn--muted .device-hub-glance-title {
+  color: var(--surface-popover-fg-muted, rgba(60, 60, 67, 0.72));
 }
 
 .device-hub-group--shortcuts-top {
@@ -564,6 +564,10 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
 
 .device-hub-glance-popover .device-hub-glance-help .list-chevron {
   color: var(--surface-popover-fg-muted, rgba(60, 60, 67, 0.72));
+}
+
+.device-hub-glance-popover .brand-status-sheet-link:active {
+  background: var(--surface-popover-control-bg, rgba(120, 120, 128, 0.12));
 }
 
 .device-hub-glance-help:active {
