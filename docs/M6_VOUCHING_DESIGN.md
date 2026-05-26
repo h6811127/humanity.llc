@@ -335,7 +335,7 @@ Canonical framing: [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md). S
 
 | Surface | Eyebrow | Title |
 |---------|---------|-------|
-| Explainer | Device signing | Keys required in this tab |
+| Explainer | Device signing | Signing key in this tab |
 | Interactive | Signed attestation | Issue vouch |
 | Success | Accepted | Vouch recorded |
 | Ineligible | Unavailable | Cannot issue vouch |

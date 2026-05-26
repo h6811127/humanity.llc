@@ -37,9 +37,9 @@ curl -sS "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status?q=QR" | jq
     - Status plate: `site/data/showcase-status-plate.json` — `npm run site:seed-showcase`
     - Live object: `site/data/showcase-live-object.json` — `npm run site:seed-showcase-live-object`
     - Lost item relay: `site/data/showcase-lost-item.json` — `npm run site:seed-showcase-lost-item`
-    - CI fixture: `worker/tests/scan-m5-live-object.test.ts`
+    - CI fixtures: `worker/tests/scan-m5-showcase-paths.test.ts`, `worker/tests/site-showcase-data.test.ts`
 
-**Deploy check:** scan response header `X-HC-Scan-UI: pass-v24` (or later) on an active scan.
+**Deploy check:** scan response header `X-HC-Scan-UI: pass-v25` (or later) on an active scan.
 
 **UX reference (target):** `assets/Nerd Mobile Post Scan Render.png`; gap list: [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Known UX gaps.
 

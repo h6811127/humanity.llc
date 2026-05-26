@@ -309,6 +309,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("live-control-cta");
     expect(html).toContain('id="vouch-row"');
     expect(html).toContain('id="vouch-explainer"');
+    expect(html).toContain("Signing key in this tab");
     expect(html).toContain("Saved cards");
     expect(html).toContain("Issue vouch");
     expect(html).toContain("vouch-explainer-actions");

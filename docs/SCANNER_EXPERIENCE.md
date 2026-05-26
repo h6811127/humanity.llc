@@ -253,6 +253,8 @@ Align with [`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md)
 
 ### Trust blocks (alignment)
 
+Below the hero, **Check at scan time** (`pass-v25`) surfaces four thick disclosure rows—each with a colored icon, title, and one-line peek (e.g. `Active`, `Registered`) before the full grouped list inside. Vouch follows when the scan is active and human trust is shown.
+
 | Block | Scanner takeaway |
 |-------|------------------|
 | Card status | Is this card active, revoked, or suspended? |
@@ -357,7 +359,7 @@ Phases **A–F** are shipped for the reference network. **E** remains mandatory 
 
 ### Resolver UI refresh
 
-Implementation detail: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) § UI refresh phases. Current header: `X-HC-Scan-UI: pass-v24`.
+Implementation detail: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) § UI refresh phases. Current header: `X-HC-Scan-UI: pass-v25`.
 
 | Phase | Deliverable | Outcome |
 |-------|-------------|---------|
@@ -367,6 +369,7 @@ Implementation detail: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) § UI ref
 | **3** | Below-fold: collapsible trust groups; “proves / does not prove” modules | **Shipped** — `renderScanTrustModules()`, `scan-trust-details` |
 | **4** | M5 stranger test + live object fixture; HTML snapshot tests; `X-HC-Scan-UI` bump | **Shipped** (`pass-v23`) — automated hero template tests; M5 strangers still manual |
 | **5** | Omit empty trust groups; M5 showcase seed + landing | **Shipped** (`pass-v24`) — [`docs/M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) step 10 |
+| **6** | Trust-tool rows: icon + peek summaries, “Check at scan time” section, above show-link | **Shipped** (`pass-v25`) — `scan-group-summary` in `scan-html.ts` |
 
 ---
 
@@ -398,7 +401,7 @@ Show mixed QRs at phone distance; target &lt;1s Humanity identification without 
 ### Automated checks
 
 ```bash
-npm run worker:test -- worker/tests/scan-qr-branding.test.ts worker/tests/scan.test.ts worker/tests/scan-safety.test.ts worker/tests/scan-m5-live-object.test.ts worker/tests/scan-hero-snapshot.test.ts worker/tests/qr-scan-url-lock.test.ts worker/tests/qr-print-sticker.test.ts worker/tests/qr-credential-code.test.ts worker/tests/scan-out.test.ts
+npm run worker:test -- worker/tests/scan-qr-branding.test.ts worker/tests/scan.test.ts worker/tests/scan-safety.test.ts worker/tests/scan-m5-showcase-paths.test.ts worker/tests/site-showcase-data.test.ts worker/tests/scan-hero-snapshot.test.ts worker/tests/qr-scan-url-lock.test.ts worker/tests/qr-print-sticker.test.ts worker/tests/qr-credential-code.test.ts worker/tests/scan-out.test.ts
 ```
 
 ---

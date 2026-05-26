@@ -93,6 +93,9 @@ describe("scan trust groups (M3 zone G)", () => {
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).toContain('aria-label="Trust details at scan time"');
     expect(html).toContain("scan-trust-details");
+    expect(html).toContain("scan-group-summary");
+    expect(html).toContain("scan-trust-tools");
+    expect(html).toContain("Check at scan time");
     expect(html).toContain("Card status");
     expect(html).toContain("This QR");
   });

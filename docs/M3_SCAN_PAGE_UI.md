@@ -13,21 +13,21 @@
 
 The scan page is **live resolver output** (Cloudflare Worker), not the static Pages site. Deploy with `npm run worker:deploy`. Pages deploy alone does not change `/c/…`.
 
-Response header when the new UI is live: `X-HC-Scan-UI: pass-v24` (or later). **`pass-v24`:** omit empty trust groups; M5 live-object showcase seed + landing. **`pass-v23`:** scan-type heroes, trust modules, Phase 4 tests.
+Response header when the new UI is live: `X-HC-Scan-UI: pass-v25` (or later). **`pass-v25`:** emphasized trust-tool rows (icon + peek + thicker summaries), “Check at scan time” section, trust groups above show-link/limits, shorter vouch explainer. **`pass-v24`:** omit empty trust groups; M5 live-object showcase seed + landing. **`pass-v23`:** scan-type heroes, trust modules, Phase 4 tests.
 
 ---
 
 ## Layout
 
-### Shipped today (`pass-v24`)
+### Shipped today (`pass-v25`)
 
 `scan-html.ts` renders, top to bottom:
 
 1. **Top header** — `humanity.llc` brand link.
 2. **Live check hero** (`renderScanHeroSection`) — host + single status strip, H1 (manifesto / plate / `@handle` / failure copy), steward strip, trust pills on personal cards, resolver line, Level 0 limit, detail chips, first-seen footnote, demoted QR (`scan-hero-qr`).
 3. **Proves / does not prove** (`renderScanTrustModules`) — compact modules linking to full limits.
-4. **Show link** — collapsible scan URL + credential code.
-5. **Grouped lists** — Card status, Human trust, This QR, Live control in `<details class="scan-trust-details">`.
+4. **Check at scan time** (`scan-trust-tools`) — Card status, Human trust, This QR, Live control in thick `<details class="scan-trust-details">` rows: colored list icon, title, one-line peek (e.g. `Active`, `Registered`, `QR active`), chevron; inner `<ul class="list">` unchanged. Vouch block follows when eligible.
+5. **Show link** — collapsible scan URL + credential code.
 6. **Limits `<details>`** — `scan-limits-settings` (`id="scan-limits-settings"`).
 
 Legacy flippable pass card markup remains in `scan-html.ts` for reference; active scan HTML uses the **Live check hero** (not the flip scene). Standalone `renderScannerSafetyHeader()` remains for unit tests.
@@ -42,7 +42,7 @@ All zones **A–H** shipped through `pass-v24`. See [`docs/SCANNER_EXPERIENCE.md
 | **C** Steward strip | `pass-v23` |
 | **D–E** Proves / does not prove modules | `pass-v23` |
 | **F** Collapsible hero QR | `pass-v23` |
-| **G** Trust groups omit empty sections | `pass-v24` (`pushTrustGroup`) |
+| **G** Trust groups omit empty sections; icon + peek summaries | `pass-v24`–`pass-v25` (`pushTrustGroup`, `scan-group-summary`) |
 | **H** Footer + limits settings | M3 baseline |
 
 ### Scan type heroes
@@ -71,8 +71,9 @@ Track with [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Resolver UI 
 | **1** | Hero consolidation, dedupe status/limits, QR demotion, spacing | **Shipped** — `scan-html.ts`, `scan-safety.ts`, `scan-pass.css` |
 | **2** | Scan-type hero templates | **Shipped** — `buildScanHeroMain()` |
 | **3** | Collapsible groups + proves/does-not-prove modules | **Shipped** — `renderScanTrustModules()`, `scan-trust-details` |
-| **4** | M5 live-object path + tests + `X-HC-Scan-UI` bump | **Shipped** (`pass-v23`) — `scan-m5-live-object.test.ts`, hero snapshots; M5 strangers still manual |
+| **4** | M5 showcase paths + tests + `X-HC-Scan-UI` bump | **Shipped** (`pass-v23`) — `scan-m5-showcase-paths.test.ts`, hero snapshots; M5 strangers still manual |
 | **5** | Omit empty trust groups; M5 showcase seed + landing row | **Shipped** (`pass-v24`) — `pushTrustGroup`, `site:seed-showcase-live-object` |
+| **6** | Trust-tool emphasis (icons, peek, section kicker, layout) | **Shipped** (`pass-v25`) — `scan-trust-tools`, `scan-group-summary` |
 
 After `scan-pass.css` changes: `npm run worker:bundle-scan`.
 

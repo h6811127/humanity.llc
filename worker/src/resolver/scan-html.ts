@@ -28,7 +28,7 @@ import {
 } from "./scan-safety";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v24";
+export const SCAN_UI_VERSION = "pass-v25";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -68,9 +68,9 @@ export async function renderScanPage(
     <main class="screen scan-screen">
       ${renderScanHeroSection(vm, safety, origin, qrMarkup)}
       ${renderScanTrustModules(vm, safety, origin)}
+      ${renderTrustGroups(vm, origin)}
       ${renderScanUrlControl(vm)}
       ${renderLimitsSettings(origin)}
-      ${renderTrustGroups(vm, origin)}
       ${renderFooter(vm, origin)}
     </main>
   </div>
@@ -326,7 +326,7 @@ function buildScanHeroMain(
       main: `<h1 class="scan-hero-title">${escapeHtml(display.objectLabel)}</h1>
     <p class="scan-hero-line">${escapeHtml(display.statusLine)}</p>
     ${steward}`,
-      foot: "Scan shows current status for this place.",
+      foot: "Scan shows current status for this place - not who owns the door.",
     };
   }
 
@@ -646,19 +646,19 @@ function renderTrustGroups(vm: ScanViewModel, origin: string): string {
   const sections: string[] = [];
 
   if (vm.showCardBlock) {
-    pushTrustGroup(sections, "Card status", cardGroupRows(vm), "card");
+    pushTrustGroup(sections, "Card status", cardGroupRows(vm), "card", vm);
   }
 
   if (vm.showHumanTrustBlock) {
-    pushTrustGroup(sections, "Human trust", humanGroupRows(vm), "human");
+    pushTrustGroup(sections, "Human trust", humanGroupRows(vm), "human", vm);
   }
 
   if (vm.showArtifactBlock) {
-    pushTrustGroup(sections, "This QR", qrGroupRows(vm), "qr");
+    pushTrustGroup(sections, "This QR", qrGroupRows(vm), "qr", vm);
   }
 
   if (vm.showLiveControlBlock) {
-    pushTrustGroup(sections, "Live control", liveControlGroupRows(vm), "live");
+    pushTrustGroup(sections, "Live control", liveControlGroupRows(vm), "live", vm);
   }
 
   if (vm.kind === "active" && vm.profileId && vm.showHumanTrustBlock) {
@@ -668,28 +668,87 @@ function renderTrustGroups(vm: ScanViewModel, origin: string): string {
 
   if (!sections.length) return "";
 
-  return `<div class="scan-trust-stack" aria-label="Trust details at scan time">
+  return `<section class="scan-trust-tools" aria-labelledby="scan-trust-tools-heading">
+  <header class="scan-trust-tools-head">
+    <h2 id="scan-trust-tools-heading" class="scan-trust-tools-title">Check at scan time</h2>
+    <p class="scan-trust-tools-lead">Open a row for card, human trust, this QR, or live control.</p>
+  </header>
+  <div class="scan-trust-stack" aria-label="Trust details at scan time">
 ${sections.join("\n")}
-</div>`;
+  </div>
+</section>`;
 }
 
 function pushTrustGroup(
   sections: string[],
   label: string,
   rows: string,
-  mod: string
+  mod: string,
+  vm: ScanViewModel
 ): void {
   if (!rows.trim()) return;
-  sections.push(trustGroup(label, rows, mod));
+  const icon = trustGroupIcon(mod, vm);
+  sections.push(
+    trustGroup(label, rows, mod, trustGroupPeek(vm, mod), icon.tone, icon.id)
+  );
+}
+
+function trustGroupIcon(
+  mod: string,
+  vm: ScanViewModel
+): { id: ScanIconId; tone: string } {
+  switch (mod) {
+    case "card":
+      return { id: "status", tone: cardStatusIconTone(vm) };
+    case "human":
+      return humanTrustListIcon(humanTrustDisplay(vm));
+    case "qr":
+      return { id: "qr", tone: qrStatusIconTone(vm) };
+    case "live":
+      return vm.liveControlProvenAt
+        ? { id: "key", tone: "green" }
+        : { id: "lock", tone: "red" };
+    default:
+      return { id: "shield", tone: "slate" };
+  }
+}
+
+function trustGroupPeek(vm: ScanViewModel, mod: string): string {
+  switch (mod) {
+    case "card":
+      return vm.cardStatus ? formatCardStatus(vm.cardStatus) : "Unknown";
+    case "human":
+      return humanTrustDisplay(vm).label;
+    case "qr":
+      return vm.qrStatus ? `QR ${formatQrStatus(vm.qrStatus)}` : "Credential";
+    case "live":
+      if (vm.liveControlProvenAt) return "Control proven";
+      if (vm.kind === "active" && vm.profileId && vm.qrId) {
+        return "In-person check available";
+      }
+      return "Not shown on this scan";
+    default:
+      return "";
+  }
 }
 
 function trustGroup(
   label: string,
   rows: string,
-  mod: string
+  mod: string,
+  peek: string,
+  iconTone: string,
+  iconId: ScanIconId
 ): string {
   return `<details class="group scan-group scan-group-${mod} scan-trust-layer scan-trust-details">
-  <summary class="group-label">${escapeHtml(label)}</summary>
+  <summary class="scan-group-summary">
+    ${scanListIcon(iconTone, iconId)}
+    <span class="scan-group-summary-text">
+      <span class="scan-group-summary-title">${escapeHtml(label)}</span>
+      <span class="scan-group-summary-peek">${escapeHtml(peek)}</span>
+    </span>
+    <span class="scan-group-chevron" aria-hidden="true">›</span>
+  </summary>
   <ul class="list">
     ${rows}
   </ul>
@@ -754,13 +813,13 @@ function renderVouchSection(vm: ScanViewModel, origin: string): string {
       ${scanListIcon("slate", "key")}
       <div class="vouch-card-head-text">
         <span class="vouch-eyebrow">Device signing</span>
-        <span class="vouch-title">Keys required in this tab</span>
+        <span class="vouch-title">Signing key in this tab</span>
       </div>
     </div>
     <p class="vouch-lead" id="vouch-explainer-copy">
-      Checking for your card’s signing key in this browser tab. Network verification (Steward, Vouched Human) is separate.
-      Use <strong>Sign as…</strong> below or open <a href="${escapeHtml(walletUrl)}">Saved cards</a>.
-      Only the signed vouch is sent—the private key stays on device.
+      Checking this tab for your card’s signing key. Steward and Vouched Human are network checks—separate from signing.
+      Use <strong>Sign as…</strong> or <a href="${escapeHtml(walletUrl)}">Saved cards</a>.
+      Only the signed vouch is sent; your private key stays here.
     </p>
     <div id="vouch-explainer-actions" class="vouch-explainer-actions" hidden></div>
   </div>
