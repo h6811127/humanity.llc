@@ -101,7 +101,7 @@ Impact: **L** low · **M** medium · **H** high (trust in network / harm to vouc
 | V-01 | **Forged vouch** | POST without valid signature | L | H | `verifySignedDocument` | — |
 | V-02 | **Replay nonce** | Re-submit same document | L | H | Nonce uniqueness | — |
 | V-03 | **Wrong key signed** | Attacker uses another user's key material | M | H | Match voucher `public_key` | User must protect `hc_created` / backup |
-| V-04 | **Stolen session keys** | XSS/malware reads `sessionStorage` | M | H | Session tab scope | No PIN before sign (deferred); **auto-activate default** increases blast radius on shared device |
+| V-04 | **Stolen session keys** | XSS/malware reads `sessionStorage` | M | H | Session tab scope; optional PIN/device unlock before sign | **auto-activate default** still increases blast radius on shared device if unlock not enabled |
 | V-05 | **Backup exfiltration** | `.hcbackup` stolen | M | H | User-held export | No HSM; steward keys high value |
 | V-06 | **Remote / never met** | Voucher signs without in-person contact | H | M | Checkbox + UX copy only | **No liveness proof** at vouch time |
 | V-07 | **LLM statement spam** | Automated generic statements | M | L | Same crypto bar | Statements not semantically verified |
@@ -242,7 +242,7 @@ Respond: suspend steward, rotate keys, revoke batch
 | P1 | Graph flag: **directed cycle** / clique suspicion (≥4 mutual VH set) | R-02, G-02 | **Shipped** (`directed_cycle_cluster`) |
 | P1 | Per-steward vouch cap or enhanced audit for steward issuances | R-03, S-02 | **Shipped** (steward cap policy + `steward_issuance_burst`) |
 | P1 | Integrator guide: recency + live control + not KYC | I-02, I-03 | **Shipped** (`VOUCH_INTEGRATOR_POLICY_GUIDE.md`) |
-| P2 | Optional PIN / WebAuthn before `Sign and submit` | V-04, A-02 |
+| P2 | Optional PIN / WebAuthn before `Sign and submit` | V-04, A-02 | **Shipped** (opt-in PIN or device unlock per saved card; scan gate before submit) |
 | P2 | Vouchee-initiated dispute / steward revoke | H-01 |
 | P2 | Statement report + moderation policy | V-08 |
 | Deferred | Ceremony path; cross-operator federation | bootstrap diversity |

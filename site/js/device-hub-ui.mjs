@@ -62,6 +62,14 @@ import {
   setDefaultVouchProfile,
 } from "./vouch-ready-keys.mjs";
 import {
+  clearSignLock,
+  getSignLock,
+  isSignLockEnabled,
+  isWebAuthnUnlockAvailable,
+  setPinSignLock,
+  setWebAuthnSignLock,
+} from "./vouch-sign-lock.mjs";
+import {
   CARD_DISABLED_SINCE_VISIT_ALERT_TEXT,
   CARD_DISABLED_SINCE_VISIT_SEARCH_SNIPPET,
   cardDisabledSinceVisitVisible,
@@ -702,6 +710,29 @@ function renderSavedRows() {
                   }</button>`
                 : ""
             }
+            ${
+              entry.owner_private_key_b58
+                ? `<button type="button" class="hub-card-menu-item hub-sign-lock-pin" data-id="${escapeHtml(entry.id)}">${
+                    getSignLock(entry.profile_id)?.mode === "pin"
+                      ? "Change PIN before sign"
+                      : "Require PIN before sign"
+                  }</button>`
+                : ""
+            }
+            ${
+              entry.owner_private_key_b58 && isWebAuthnUnlockAvailable()
+                ? `<button type="button" class="hub-card-menu-item hub-sign-lock-webauthn" data-id="${escapeHtml(entry.id)}">${
+                    getSignLock(entry.profile_id)?.mode === "webauthn"
+                      ? "Change device unlock before sign"
+                      : "Require device unlock before sign"
+                  }</button>`
+                : ""
+            }
+            ${
+              entry.owner_private_key_b58 && isSignLockEnabled(entry.profile_id)
+                ? `<button type="button" class="hub-card-menu-item hub-sign-lock-clear" data-id="${escapeHtml(entry.id)}">Remove sign unlock requirement</button>`
+                : ""
+            }
             <button type="button" class="hub-card-menu-item hub-remove" data-id="${escapeHtml(entry.id)}">Remove from device</button>
           </div>
         </details>`;
@@ -794,6 +825,68 @@ function renderSavedRows() {
     });
   });
 
+  savedList.querySelectorAll(".hub-sign-lock-pin").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-id");
+      const entry = loadWallet().find((e) => e.id === id);
+      if (!entry?.profile_id) return;
+      const first = window.prompt("Choose a 4–32 character PIN for signing on this device:");
+      if (first == null) return;
+      const second = window.prompt("Confirm PIN:");
+      if (second == null) return;
+      if (first !== second) {
+        window.alert("PIN entries did not match.");
+        return;
+      }
+      const result = await setPinSignLock(entry.profile_id, first);
+      if (!result.ok) {
+        window.alert(result.error || "Could not save PIN lock.");
+        return;
+      }
+      logDeviceActivity("sign_lock_pin_set", entry.label, {
+        profile_id: entry.profile_id,
+      });
+      renderSavedRows();
+      notifyHubChanged();
+    });
+  });
+
+  savedList.querySelectorAll(".hub-sign-lock-webauthn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-id");
+      const entry = loadWallet().find((e) => e.id === id);
+      if (!entry?.profile_id) return;
+      const result = await setWebAuthnSignLock(
+        entry.profile_id,
+        entry.label || entry.handle
+      );
+      if (!result.ok) {
+        window.alert(result.error || "Could not enable device unlock.");
+        return;
+      }
+      logDeviceActivity("sign_lock_webauthn_set", entry.label, {
+        profile_id: entry.profile_id,
+      });
+      renderSavedRows();
+      notifyHubChanged();
+    });
+  });
+
+  savedList.querySelectorAll(".hub-sign-lock-clear").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-id");
+      const entry = loadWallet().find((e) => e.id === id);
+      if (!entry?.profile_id) return;
+      if (!window.confirm("Remove PIN/device unlock requirement for this card?")) return;
+      clearSignLock(entry.profile_id);
+      logDeviceActivity("sign_lock_cleared", entry.label, {
+        profile_id: entry.profile_id,
+      });
+      renderSavedRows();
+      notifyHubChanged();
+    });
+  });
+
   savedList.querySelectorAll(".hub-default-vouch").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const id = btn.getAttribute("data-id");
@@ -873,6 +966,7 @@ function renderSavedRows() {
       }
       if (entry) {
         clearDefaultVouchIfProfile(entry.profile_id);
+        clearSignLock(entry.profile_id);
         logDeviceActivity("remove_card", entry.label, {
           profile_id: entry.profile_id,
           qr_id: entry.qr_id ?? null,

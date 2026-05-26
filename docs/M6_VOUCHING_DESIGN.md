@@ -288,7 +288,8 @@ Revoked/suspended card states must **override** positive verification on scan (a
 
 **Step 2  -  Vouch issuance UX (V-002)**
 
-- [x] Card client: **Issue vouch** on scan for eligible vouchers (`vouch-issue.mjs?v=11`).
+- [x] Card client: **Issue vouch** on scan for eligible vouchers (`vouch-issue.mjs?v=12`).
+- [x] Optional PIN/device unlock before sign (saved-card setting; `vouch-sign-lock.mjs`).
 - [x] Sign + POST flow with default statement template.
 - [x] Eligibility errors surfaced in plain language (quota, wait period, not verified).
 - [x] Scan explainer distinguishes network verification vs keys on this device (saved Steward detection).

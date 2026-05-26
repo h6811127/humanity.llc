@@ -19,6 +19,14 @@ import {
   isDefaultVouchProfile,
   isVouchAutoActivateEnabled,
 } from "./vouch-ready-keys.mjs";
+import {
+  clearSignUnlock,
+  getSignLock,
+  isSignLockEnabled,
+  isSignUnlocked,
+  unlockSignLock,
+  verifyPinSignLock,
+} from "./vouch-sign-lock.mjs";
 
 const VOUCHER_WAIT_DAYS = 90;
 const VOUCH_THRESHOLD = 3;
@@ -101,6 +109,113 @@ function clearVouchSwitchDefault() {
   document.getElementById("vouch-switch-default")?.remove();
 }
 
+function clearVouchSignLockUi() {
+  document.getElementById("vouch-sign-lock")?.remove();
+}
+
+function syncSubmitEnabledForSignLock(profileId) {
+  if (!submitBtn) return;
+  if (!isSignLockEnabled(profileId) || isSignUnlocked(profileId)) {
+    submitBtn.disabled = false;
+    return;
+  }
+  submitBtn.disabled = true;
+}
+
+function mountVouchSignLockUi(profileId) {
+  clearVouchSignLockUi();
+  if (!interactive || !profileId || !isSignLockEnabled(profileId)) {
+    syncSubmitEnabledForSignLock(profileId);
+    return;
+  }
+
+  const lock = getSignLock(profileId);
+  const box = document.createElement("div");
+  box.id = "vouch-sign-lock";
+  box.className = "vouch-card vouch-card-hint vouch-sign-lock";
+
+  const lead = document.createElement("p");
+  lead.className = "vouch-lead";
+  lead.textContent =
+    lock?.mode === "webauthn"
+      ? "Device unlock is required before signing in this tab."
+      : "PIN required before signing in this tab.";
+  box.appendChild(lead);
+
+  if (isSignUnlocked(profileId)) {
+    const ok = document.createElement("p");
+    ok.className = "vouch-lead";
+    ok.textContent = "Signing unlocked for this tab.";
+    box.appendChild(ok);
+  } else if (lock?.mode === "pin") {
+    const label = document.createElement("label");
+    label.className = "vouch-field-label";
+    label.htmlFor = "vouch-unlock-pin";
+    label.textContent = "Unlock PIN";
+
+    const input = document.createElement("input");
+    input.type = "password";
+    input.id = "vouch-unlock-pin";
+    input.className = "vouch-unlock-pin";
+    input.autocomplete = "current-password";
+    input.inputMode = "numeric";
+    input.maxLength = 32;
+
+    const unlockBtn = document.createElement("button");
+    unlockBtn.type = "button";
+    unlockBtn.className = "vouch-cta vouch-unlock-btn";
+    unlockBtn.textContent = "Unlock signing";
+    unlockBtn.addEventListener("click", async () => {
+      const pin = input.value;
+      if (!pin.trim()) {
+        setStatus("Enter your PIN to unlock signing.", "error");
+        return;
+      }
+      unlockBtn.disabled = true;
+      const result = await verifyPinSignLock(profileId, pin);
+      if (!result.ok) {
+        setStatus(result.error || "Could not unlock signing.", "error");
+        unlockBtn.disabled = false;
+        return;
+      }
+      setStatus("Signing unlocked for this tab.", "neutral");
+      mountVouchSignLockUi(profileId);
+    });
+
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") unlockBtn.click();
+    });
+
+    box.append(label, input, unlockBtn);
+  } else if (lock?.mode === "webauthn") {
+    const unlockBtn = document.createElement("button");
+    unlockBtn.type = "button";
+    unlockBtn.className = "vouch-cta vouch-unlock-btn";
+    unlockBtn.textContent = "Unlock with device";
+    unlockBtn.addEventListener("click", async () => {
+      unlockBtn.disabled = true;
+      const result = await unlockSignLock(profileId);
+      if (!result.ok) {
+        setStatus(result.error || "Could not unlock signing.", "error");
+        unlockBtn.disabled = false;
+        return;
+      }
+      setStatus("Signing unlocked for this tab.", "neutral");
+      mountVouchSignLockUi(profileId);
+    });
+    box.appendChild(unlockBtn);
+  }
+
+  const submitParent = submitBtn?.parentElement;
+  if (submitParent && submitBtn) {
+    submitParent.insertBefore(box, submitBtn);
+  } else {
+    interactive.appendChild(box);
+  }
+
+  syncSubmitEnabledForSignLock(profileId);
+}
+
 function mountVouchStopButton(voucherLabel) {
   const panel = statusEl?.parentElement;
   if (!panel) return;
@@ -113,13 +228,16 @@ function mountVouchStopButton(voucherLabel) {
     stop.className = "vouch-stop-keys";
     stop.textContent = "Clear keys from this tab";
     stop.addEventListener("click", () => {
+      const active = loadSession();
       try {
         sessionStorage.setItem(VOUCH_SKIP_AUTO_KEY, location.href);
       } catch {
         /* ignore */
       }
+      if (active?.profile_id) clearSignUnlock(active.profile_id);
       clearTabSessionKeys();
       clearVouchStopButton();
+      clearVouchSignLockUi();
       runVouchFlow({ skipAutoActivate: true });
     });
     panel.appendChild(stop);
@@ -530,6 +648,11 @@ function bindSubmitHandler(voucheeProfileId) {
       setStatus("Confirm in-person attestation before signing.", "error");
       return;
     }
+    if (isSignLockEnabled(voucherProfileId) && !isSignUnlocked(voucherProfileId)) {
+      setStatus("Unlock signing before you submit this vouch.", "error");
+      mountVouchSignLockUi(voucherProfileId);
+      return;
+    }
 
     submitBtn.disabled = true;
     setStatus("Signing vouch…", "waiting");
@@ -566,7 +689,7 @@ function bindSubmitHandler(voucheeProfileId) {
               ? "Server error. Try again shortly."
               : undefined);
         setStatus(plainVouchError(body?.error, fallback), "error");
-        submitBtn.disabled = false;
+        syncSubmitEnabledForSignLock(voucherProfileId);
         return;
       }
 
@@ -574,7 +697,7 @@ function bindSubmitHandler(voucheeProfileId) {
       saveIssuedVouch(signed);
     } catch (err) {
       setStatus(err instanceof Error ? err.message : "Could not sign vouch.", "error");
-      submitBtn.disabled = false;
+      syncSubmitEnabledForSignLock(voucherProfileId);
     }
   });
 }
@@ -669,6 +792,7 @@ async function runVouchFlow(opts = {}) {
       ? `Signing as ${voucherDisplay} (default, auto-loaded)`
       : `Signing as ${voucherDisplay} · ${toneHint}`
   );
+  mountVouchSignLockUi(voucherProfileId);
 
   await mountVouchSwitchDefault(session);
 
@@ -682,5 +806,9 @@ window.addEventListener("hc-device-hub-changed", () => {
     runVouchFlow({ skipAutoActivate: true });
     return;
   }
+  runVouchFlow();
+});
+
+window.addEventListener("hc-vouch-sign-lock-changed", () => {
   runVouchFlow();
 });

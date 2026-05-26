@@ -37,7 +37,7 @@
 | **Rotating vouch cycle** (A→B→C→A). | Medium | High | Distinct vouchers per vouchee. | `closed_loop_only` flag does not catch; see **G-02**. |
 | Collusive vouch ring (mutual-only). | Medium | High | 3-vouch threshold, 5/year quota, 90-day wait; `closed_loop_only`. | Steward review queue not shipped. |
 | **Steward fast-path farm** (no 90d wait). | Medium | High | 3/year steward cap; audit burst flag. | Bootstrap concentration; manual steward review burden. |
-| Stolen voucher keys / backup. | Medium | High | User custody; signed POST. | No PIN before sign; auto-activate increases shared-device risk. |
+| Stolen voucher keys / backup. | Medium | High | User custody; signed POST; optional PIN/device unlock before sign. | Auto-activate increases shared-device risk when unlock not enabled. |
 | Remote vouch (never met in person). | High | Medium | UX checkbox only. | No liveness at vouch time (**V-06**). |
 | Print QR artifact and imply it proves the wearer is verified. | High | High | Copy says artifacts do not grant verification. | Physical artifact design must avoid stale/mutable verification labels. |
 | Replay or forge vouch payloads. | Medium | High | Ed25519 signatures and canonical payloads. | Enforced on vouch POST. |

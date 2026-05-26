@@ -1,6 +1,6 @@
 # Vouch-ready keys (design draft)
 
-**Status:** Phases 1–5 shipped; PIN/unlock gate (option E) deferred  
+**Status:** Phases 1–5 shipped; optional PIN/device unlock before sign shipped (option E, opt-in per card)  
 **Audience:** Product, security review, implementers  
 **Vouch positioning:** [`VOUCH_TRUST_POSITIONING.md`](VOUCH_TRUST_POSITIONING.md) · **Threat model:** [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md)  
 **Related:** [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md), [`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md), [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)
@@ -50,7 +50,7 @@ Auto-loading keys into the tab is **not a new trust claim**. It is the same oper
 
 | Threat | Concern | Mitigations |
 |--------|---------|-------------|
-| **Shared / borrowed device** | Keys sit in `sessionStorage` until tab closes; auto-activate happens sooner | Opt-in per device; show “Keys active for @steward” on scan; optional **lock vouch keys** (clear session); future: PIN before activate (no PIN gate today) |
+| **Shared / borrowed device** | Keys sit in `sessionStorage` until tab closes; auto-activate happens sooner | Opt-in per device; show “Keys active for @steward” on scan; optional **lock vouch keys** (clear session); optional **PIN/device unlock before sign** on saved card |
 | **Wrong card auto-selected** | Multiple eligible saved cards → vouch signed as wrong `profile_id` | **Default vouch card** setting; if ambiguous, inline picker on scan (no silent guess) |
 | **Accidental activation** | User only wanted to *view* a scan, not sign | Only activate when opening scan **and** user opted in, or single eligible steward card; never activate on passive embeds |
 | **Cross-tab surprise** | Tab A has keys; Tab B auto-activates duplicate | Reuse `device-tab-presence` / cross-tab copy: “Keys already active in another tab” |
@@ -89,7 +89,7 @@ Auto-loading keys into the tab is **not a new trust claim**. It is the same oper
 
 **Recommendation for v1:** ship **B** quickly, then **C** behind a wallet toggle **“Default card for vouching”** (stores `profile_id` in `localStorage`, e.g. `hc_default_vouch_profile_id`).
 
-Defer **E** until a device-unlock story exists beyond hub PIN bookmarks.
+**E** shipped as opt-in per saved card: PIN or device WebAuthn unlock required before `Sign and submit` (not before auto-activate).
 
 ---
 
