@@ -20,6 +20,7 @@ import {
   inboxBadgeChromaClassNames,
   inboxBadgeChromaKind,
   inboxBadgeCountText,
+  inboxCountFromItems,
   notificationCount,
 } from "./device-inbox.mjs?v=37";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
@@ -235,10 +236,11 @@ function applyStewardCelebrate(previousDevice, nextDevice) {
 
 function applyDot() {
   if (!dot) return;
+  const device = deviceState();
+  const overlay = dotOverlayState();
+  const nextSnapshot = { network: networkStatus, device, overlay };
   const run = () => {
     const previousDevice = lastDotSnapshot?.device ?? null;
-    const device = deviceState();
-    const overlay = dotOverlayState();
     dot.classList.remove(...NETWORK_CLASSES, ...DEVICE_CLASSES, ...OVERLAY_CLASSES);
     for (const cls of dotClassList(networkStatus, device, overlay)) {
       dot.classList.add(cls);
@@ -261,11 +263,7 @@ function applyDot() {
     prefersReducedMotion() ||
     hubSheetOpen() ||
     typeof document.startViewTransition !== "function" ||
-    shouldSkipCrossTabOverlayViewTransition(lastDotSnapshot, {
-      network: networkStatus,
-      device: deviceState(),
-      overlay: dotOverlayState(),
-    });
+    shouldSkipCrossTabOverlayViewTransition(lastDotSnapshot, nextSnapshot);
 
   if (skipTransition) {
     run();
@@ -389,7 +387,7 @@ function renderHubStatusPanel(segments) {
 function renderNotifBadge() {
   if (!notifBtn) return;
   const items = getInboxItems();
-  const n = notificationCount();
+  const n = inboxCountFromItems(items);
   notifBtn.hidden = n === 0;
   notifBtn.setAttribute("aria-label", inboxBadgeAriaLabel(items));
   notifBtn.classList.remove(...inboxBadgeChromaClassNames());

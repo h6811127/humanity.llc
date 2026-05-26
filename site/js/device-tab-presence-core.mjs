@@ -1,9 +1,49 @@
 /** @typedef {{ profile_id?: string, qr_id?: string | null, handle?: string | null, label?: string | null, updatedAt?: number }} PresenceEntry */
 
 export const PRESENCE_STALE_MS = 10000;
-export const PRESENCE_HEARTBEAT_MS = 4000;
-/** UI only — must have heartbeated recently (avoids ghost rows before prune). */
+/** Visible-tab heartbeat interval (Phase 5: 5s to cut cross-tab storage churn). */
+export const PRESENCE_HEARTBEAT_MS = 5000;
+/** UI only - must have heartbeated recently (avoids ghost rows before prune). */
 export const PRESENCE_SHOW_MS = PRESENCE_HEARTBEAT_MS + 2000;
+
+/**
+ * Public metadata only - used to skip redundant localStorage writes.
+ * @param {PresenceEntry | null | undefined} entry
+ */
+export function presenceMetadataFingerprint(entry) {
+  if (!entry) return "";
+  return [
+    String(entry.profile_id ?? ""),
+    entry.qr_id ?? "",
+    entry.handle ?? "",
+    entry.label ?? "",
+  ].join("\0");
+}
+
+/**
+ * Whether to rewrite this tab's presence row (and fan out storage).
+ * @param {PresenceEntry | null | undefined} existing
+ * @param {PresenceEntry | null | undefined} next
+ * @param {number} now
+ * @param {{ heartbeatMs?: number, showMs?: number }} [opts]
+ */
+export function shouldTouchPresenceRow(existing, next, now, opts = {}) {
+  const heartbeatMs = opts.heartbeatMs ?? PRESENCE_HEARTBEAT_MS;
+  const showMs = opts.showMs ?? PRESENCE_SHOW_MS;
+  const nextNorm = normalizePresenceEntry(next, now);
+  if (!nextNorm) return true;
+  if (!existing) return true;
+  const existingNorm = normalizePresenceEntry(existing, now);
+  if (!existingNorm) return true;
+  if (presenceMetadataFingerprint(existingNorm) !== presenceMetadataFingerprint(nextNorm)) {
+    return true;
+  }
+  const age = now - (existingNorm.updatedAt ?? 0);
+  const keepAliveMs = showMs - Math.ceil(heartbeatMs / 2);
+  if (age >= keepAliveMs) return true;
+  if (age < heartbeatMs) return false;
+  return true;
+}
 export const MAX_PRESENCE_ENTRIES = 20;
 /** Matches worker PROFILE_ID (base58, 20–32 chars). */
 export const PRESENCE_PROFILE_ID_PATTERN = /^[1-9A-HJ-NP-Za-km-z]{20,32}$/;

@@ -1,6 +1,6 @@
 # Cross-tab keys - rebuild plan (restart)
 
-**Status:** Phase 1 shipped · Phase 2+ pending  
+**Status:** Phases 1–5 shipped · Phase 6 pending  
 **Audience:** Engineering  
 **Canonical spec:** [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md)  
 **Context:** Paths B, F, G shipped ([`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md)) but reports continue: random flashes, glitchy card labels, notices persisting after save or tab close, scroll jank with many tabs.
@@ -145,13 +145,15 @@ stateDiagram-v2
 
 **Shipped:** `invalidateCrossTabInboxState()` and custody invalidation event wiring (`hc-device-hub-changed`, `hc-wallet-removed-profiles-changed`, `hc-cross-tab-custody-invalidated`), plus `actOnOtherTabKeys()` dismiss invalidation.
 
-### Phase 5 - Performance hardening
+### Phase 5 - Performance hardening ✅
 
 - Ensure `gatherInboxInput` / inbox items computed **once** per `refreshDeviceChrome`.
 - Keep `shouldSkipCrossTabOverlayViewTransition` when only cross-tab overlay flaps.
 - Consider slowing heartbeat to 5s or writing presence only when fingerprint changes (reduces `storage` storms) - measure against [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 
 **Acceptance:** Repro from [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md) - 6 tabs, landing scroll acceptable.
+
+**Shipped:** `beginDeviceChromeRefreshTick()` / `endDeviceChromeRefreshTick()` in `runChromeRefresh()`; badge uses one `getInboxItems()` per refresh; `PRESENCE_HEARTBEAT_MS` **5s**; `shouldTouchPresenceRow()` skips redundant `localStorage` writes when metadata is unchanged; dot overlay snapshot computed once per `applyDot()`.
 
 ### Phase 6 - E2E & QA
 

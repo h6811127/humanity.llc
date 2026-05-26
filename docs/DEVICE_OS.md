@@ -26,8 +26,8 @@ Before shipping UI, answer:
 |----------|-------------|
 | Save, search, relabel, import backup, activity log, collapsed glance | **Device hub** (`#device-hub`) + glance strip |
 | Live proof **inbox** (pending challenges for saved cards) | **Device hub**  -  tap opens `/created/` to sign |
-| Actionable **device inbox** (badge, alerts, glance) | **Chrome** + hub `#device-hub-alerts-top` — see [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
-| **Background alerts** (OS notifications, opt-in) | Device-only; live proof when tab hidden — see [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
+| Actionable **device inbox** (badge, alerts, glance) | **Chrome** + hub `#device-hub-alerts-top` - see [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
+| **Background alerts** (OS notifications, opt-in) | Device-only; live proof when tab hidden - see [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
 | Manifesto, revoke, QR, backup export | **Network object** + `/created/` **Advanced** tab |
 | Live proof **signing** | **`/created/`** only (existing proof panel + poll) |
 | What a stranger sees | **Scan page only**  -  never a second homepage demo |
@@ -44,7 +44,7 @@ Before shipping UI, answer:
 | Tier | What | Where |
 |------|------|--------|
 | **Glance** | Network live / limited / offline, saved · pinned · notice counts | Status line + brand dot sheet |
-| **Inbox** | Action items: live proof, unsaved tab keys, cross-tab keys, card disabled since visit | `#shell-notif-badge`, hub alerts, glance rows — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
+| **Inbox** | Action items: live proof, unsaved tab keys, cross-tab keys, card disabled since visit | `#shell-notif-badge`, hub alerts, glance rows - [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
 | **Act** | Hub: cards, pins, search, activity, shortcuts, import | `#device-hub` (expand to work) |
 | **Glance (collapsed hub)** | Notice + up to 3 saved labels (+ “N more”) | `#device-hub-glance` (landing only) |
 | **System** | Resolver degraded or offline (actionable) | `#device-system-banner` (landing only, hidden when ok) |
@@ -52,7 +52,7 @@ Before shipping UI, answer:
 
 Documentation is **trust and onboarding**, not **state**. Returning users need what changed on **this device** and **network health**, not architecture every visit.
 
-On `/`, **Design choices**, **Clear limits**, and **Documentation** are collapsed **icon cards** (`.landing-disclosure-card`) below the studio pilot — tap the row to expand; the chevron rotates like hub/settings disclosures.
+On `/`, **Design choices**, **Clear limits**, and **Documentation** are collapsed **icon cards** (`.landing-disclosure-card`) below the studio pilot - tap the row to expand; the chevron rotates like hub/settings disclosures.
 
 ---
 
@@ -155,7 +155,7 @@ Resolver health for the status dot is fetched in **`site/js/device-status.mjs`**
 | `hc-device-os-refreshed` | Health + inbox cycle finished; status chrome updates |
 | `hc-wallet-network-refreshed` | Saved-row chips / alerts after wallet poll (`device-wallet-network.mjs`) |
 
-Manual regression: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) (especially **P1-1** — no duplicate fetches on tab focus).
+Manual regression: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) (especially **P1-1** - no duplicate fetches on tab focus).
 
 **Glance:** Landing uses `#device-hub-glance-popover` only. `/wallet/` scrolls to saved cards from the status dot; there is no separate wallet glance popover in HTML.
 
@@ -198,9 +198,9 @@ Small TLC items that need **no new resolver APIs**:
 
 | Item | Notes |
 |------|--------|
-| Browser notifications when live proof is waiting | ✅ v2 A–C — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
-| Unified device inbox + glance plan | ✅ phases 1–13 — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
-| Hub saved card row UX | ✅ phases 1–3 — [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) |
+| Browser notifications when live proof is waiting | ✅ v2 A–C - [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
+| Unified device inbox + glance plan | ✅ phases 1–13 - [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
+| Hub saved card row UX | ✅ phases 1–3 - [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) |
 | Glance on `/wallet/` | Landing popover only; wallet uses scroll-to-saved chrome |
 | Light frontend tests | ✅ `npm run worker:test:device` + device shell E2E in CI |
 
@@ -216,17 +216,17 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 ### Cross-tab keys (Phase 8)
 
-**Presence:** `localStorage` `hc_tab_keys_presence`  -  each tab heartbeats every 4s **while that tab is visible** with `profile_id` / handle / label only (never private keys). Rows age out of the UI after ~6s without a heartbeat and are pruned from storage after 10s. Cleared on `pagehide` (tab close/navigation away). Background tabs do not heartbeat but leave a recent row until stale.
+**Presence:** `localStorage` `hc_tab_keys_presence`  -  each tab heartbeats every 5s **while that tab is visible** with `profile_id` / handle / label only (never private keys). Unchanged metadata skips redundant writes between keep-alive ticks. Rows age out of the UI after ~7s without a heartbeat and are pruned from storage after 10s. Cleared on `pagehide` (tab close/navigation away). Background tabs do not heartbeat but leave a recent row until stale.
 
-**Count semantics (inbox badge / banner):** The shell badge number is the **total actionable inbox count** (live proof + cross-tab + unsaved-this-tab + card-disabled), not “number of create tabs.” For cross-tab only: the count is **other open tabs with keys that heartbeated while visible in the last ~6s** — not a historical total of tabs you opened or closed. Six create tabs in the background typically contribute **0–1** to cross-tab until you focus each tab; closing a tab removes it from presence immediately. See [`DEVICE_INBOX.md`](DEVICE_INBOX.md) counting rule 5.
+**Count semantics (inbox badge / banner):** The shell badge number is the **total actionable inbox count** (live proof + cross-tab + unsaved-this-tab + card-disabled), not “number of create tabs.” For cross-tab only: the count is **other open tabs with keys that heartbeated while visible in the last ~7s** - not a historical total of tabs you opened or closed. Six create tabs in the background typically contribute **0–1** to cross-tab until you focus each tab; closing a tab removes it from presence immediately. See [`DEVICE_INBOX.md`](DEVICE_INBOX.md) counting rule 5.
 
-**Banner:** `#device-cross-tab-banner` on landing and `/wallet/` when another tab holds keys **this device has not saved yet**, and this tab does not show the unsaved-keys notice row (`tabNoticeCount === 0`). Saved cards use **Open controls** from the hub/wallet instead. Presence rows must heartbeat within ~6s (ghost entries drop from UI sooner than the 10s storage prune).
+**Banner:** `#device-cross-tab-banner` on landing and `/wallet/` when another tab holds keys **this device has not saved yet**, and this tab does not show the unsaved-keys notice row (`tabNoticeCount === 0`). Saved cards use **Open controls** from the hub/wallet instead. Presence rows must heartbeat within ~7s (ghost entries drop from UI sooner than the 10s storage prune).
 
 **Removed from device:** Profiles in `localStorage` `hc_wallet_removed_profile_ids` (set on hub/wallet remove) do not use generic cross-tab copy. If another tab still heartbeats those keys, inbox shows **`orphan_keys_removed`** (“Keys still open in another tab · for a card you removed from this device”) with **Open that tab** and **Clear keys on this device** (broadcast to all tabs). Re-saving to `hc_wallet` clears the denylist. See [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md).
 
 **Canonical cross-tab notification spec + rebuild:** [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md).
 
-**Glance:** Collapsed hub shows inbox actionable rows (live proof, cross-tab, tab keys, card-disabled-since-visit) plus saved-card peek via `buildGlanceRowPlan()` — see [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
+**Glance:** Collapsed hub shows inbox actionable rows (live proof, cross-tab, tab keys, card-disabled-since-visit) plus saved-card peek via `buildGlanceRowPlan()` - see [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 
 ### Live-control inbox (Phase 7)
 
@@ -248,7 +248,7 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 **When:** On fetch, if last seen ≠ `card_revoked` and resolver now reports **`scan.kind === card_revoked`**, show alert on the saved row and highlight in hub glance. Banner copy: **Card disabled on the network since your last visit.** Chip label: **Card disabled**. QR-only revoke (`qr_revoked`) updates the chip to **QR revoked** but does not trigger this alert.
 
-**Cache:** Session cache (~5 min, `sessionStorage.hc_wallet_network_cache`, includes `scanKind`) is bypassed when it says `card_revoked` but the device baseline still says non-revoked — the hub re-fetches from the resolver before showing the alert. A fresh non-revoked fetch always updates the baseline (self-heal).
+**Cache:** Session cache (~5 min, `sessionStorage.hc_wallet_network_cache`, includes `scanKind`) is bypassed when it says `card_revoked` but the device baseline still says non-revoked - the hub re-fetches from the resolver before showing the alert. A fresh non-revoked fetch always updates the baseline (self-heal).
 
 **Clear:** **Got it**, **Open controls**, or **Manage** records the current alert baseline (`active` or `card_revoked`) as seen and dispatches `hc-wallet-network-baseline-changed` so hub rows and glance re-apply from the **latest resolver-confirmed** poll (not session cache alone). Leaving the page (`pagehide` / tab hidden) snapshots resolver-confirmed alert states from this visit when a poll has completed. Returning to the tab re-fetches network status for saved rows so stale alerts can clear.
 

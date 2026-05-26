@@ -25,11 +25,23 @@ import {
 } from "./device-cross-tab-state.mjs";
 import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=37";
 
-/** Coalesce multiple gather reads in one chrome refresh (Path G). */
+/** Coalesce gather reads outside a chrome refresh tick (Path G). */
 const GATHER_COALESCE_MS = 50;
 let lastGatherMs = 0;
 /** @type {ReturnType<typeof gatherInboxInput> | null} */
 let gatherCache = null;
+let chromeRefreshGatherLock = false;
+
+/** Start one inbox gather snapshot for the current chrome refresh tick (Phase 5). */
+export function beginDeviceChromeRefreshTick() {
+  chromeRefreshGatherLock = true;
+  gatherCache = null;
+}
+
+/** End chrome refresh tick; short coalesce window still applies afterward. */
+export function endDeviceChromeRefreshTick() {
+  chromeRefreshGatherLock = false;
+}
 
 export {
   buildGlanceRowPlan,
@@ -76,8 +88,9 @@ window.addEventListener("hc-cross-tab-custody-invalidated", invalidateCrossTabIn
 /** @returns {Parameters<typeof buildInboxItems>[0]} */
 export function gatherInboxInput() {
   const now = Date.now();
-  if (gatherCache && now - lastGatherMs <= GATHER_COALESCE_MS) {
-    return gatherCache;
+  if (gatherCache) {
+    if (chromeRefreshGatherLock) return gatherCache;
+    if (now - lastGatherMs <= GATHER_COALESCE_MS) return gatherCache;
   }
 
   const cardDisabled = gatherCardDisabledSinceVisitForInbox().map((entry) => ({

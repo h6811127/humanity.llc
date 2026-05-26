@@ -17,6 +17,7 @@ import {
   normalizePresenceMap,
   PRESENCE_HEARTBEAT_MS,
   removePresenceRowsForProfile,
+  shouldTouchPresenceRow,
 } from "./device-tab-presence-core.mjs";
 
 const PRESENCE_KEY = "hc_tab_keys_presence";
@@ -67,6 +68,7 @@ export function syncTabKeysPresence() {
   let map = readPrunedPresence();
   const session = getTabSession();
 
+  const now = Date.now();
   if (session?.profile_id && session?.owner_private_key_b58) {
     const row =
       normalizePresenceEntry({
@@ -74,10 +76,13 @@ export function syncTabKeysPresence() {
         qr_id: session.qr_id ?? null,
         handle: session.handle ?? null,
         label: session.wallet_label ?? null,
-        updatedAt: Date.now(),
+        updatedAt: now,
       }) ?? null;
     if (row) {
-      map[tabId] = row;
+      const existing = map[tabId];
+      if (shouldTouchPresenceRow(existing, row, now)) {
+        map[tabId] = row;
+      }
     } else {
       delete map[tabId];
     }

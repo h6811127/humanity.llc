@@ -16,7 +16,11 @@ import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
 import { refreshHubInboxAlertsFromChrome } from "./device-hub-ui.mjs";
 import { renderInboxSheet, isInboxSheetOpen, setInboxSheetOpen } from "./device-inbox-sheet.mjs";
-import { notificationCount } from "./device-inbox.mjs?v=37";
+import {
+  beginDeviceChromeRefreshTick,
+  endDeviceChromeRefreshTick,
+  resetPresenceInboxGatherCache,
+} from "./device-inbox.mjs?v=37";
 import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { REMOVED_PROFILES_STORAGE_KEY } from "./device-wallet-removed-profiles-core.mjs";
 import { refreshWalletContextFromChrome } from "./wallet-page-chrome.mjs";
@@ -37,7 +41,7 @@ export function setRefreshStatusSurfaces(fn) {
   refreshStatusSurfaces = fn;
 }
 
-/** Raw presence before fingerprint streak — used for immediate hide. */
+/** Raw presence before fingerprint streak - used for immediate hide. */
 export function crossTabPresenceActiveRaw() {
   const tabNotice = tabNoticeCount();
   const generic = getOtherTabsWithKeys().length;
@@ -90,17 +94,19 @@ export function refreshDeviceChrome(opts = {}) {
 }
 
 function runChromeRefresh() {
-  refreshStatusSurfaces?.();
-  renderCrossTabKeysBanner();
-  refreshHubGlance();
-  refreshHubInboxAlertsFromChrome();
-  if (isInboxSheetOpen()) {
-    renderInboxSheet();
-    if (notificationCount() === 0) {
-      setInboxSheetOpen(false);
+  beginDeviceChromeRefreshTick();
+  try {
+    refreshStatusSurfaces?.();
+    renderCrossTabKeysBanner();
+    refreshHubGlance();
+    refreshHubInboxAlertsFromChrome();
+    if (isInboxSheetOpen()) {
+      renderInboxSheet();
     }
+    refreshWalletContextFromChrome();
+  } finally {
+    endDeviceChromeRefreshTick();
   }
-  refreshWalletContextFromChrome();
 }
 
 function onPresenceChanged() {
@@ -125,14 +131,19 @@ function onStorageKey(e) {
   }
 }
 
-/** Subscribe once — presence, hub, wallet custody, network-adjacent storage. */
+/** Subscribe once - presence, hub, wallet custody, network-adjacent storage. */
 export function startDeviceChromeRefresh() {
   if (listenersBound) return;
   listenersBound = true;
 
   window.addEventListener("hc-tab-presence-changed", onPresenceChanged);
   window.addEventListener("hc-device-hub-changed", onImmediateChromeEvent);
-  window.addEventListener("hc-live-control-inbox-changed", onImmediateChromeEvent);
+  // Live-proof / inbox updates change `getInboxItems()`; invalidate gather cache so
+  // the shell badge and inbox sheet reflect the new pending set immediately.
+  window.addEventListener("hc-live-control-inbox-changed", () => {
+    resetPresenceInboxGatherCache();
+    onImmediateChromeEvent();
+  });
   window.addEventListener("hc-wallet-removed-profiles-changed", onImmediateChromeEvent);
   window.addEventListener("storage", onStorageKey);
 }

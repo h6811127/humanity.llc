@@ -1,6 +1,6 @@
 # Cross-tab keys notification system
 
-**Status:** Spec (canonical) — Phase 1 snapshot core shipped; coordinator + surface wiring pending ([`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md))  
+**Status:** Spec (canonical) - Phases 1–5 shipped; Phase 6 pending ([`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md))  
 **Audience:** Product, frontend  
 **Related:** [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`DEVICE_OS.md`](DEVICE_OS.md) § Cross-tab keys · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md) · [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md)
 
@@ -13,9 +13,9 @@
 | “Notification” / “alert popped up” | Inbox badge, blue dot notch, hub card, banner, glance row, inbox sheet row | **In-app chrome** driven by inbox kinds `cross_tab_keys` or `orphan_keys_removed` |
 | “Random notification” | Brief flash of badge/dot/banner with wrong or changing card label | **Presence churn** + **split refresh paths** (see [Failure modes](#failure-modes)) |
 | “Notification won’t go away” | Badge/dot after save or closing the other tab | **Stale presence**, **streak not reset on custody change**, or **another tab still heartbeating** |
-| OS push / browser alert | System `Notification` | **Never** for cross-tab — `inboxKindAllowsOsNotification()` allows `live_proof` only ([`DEVICE_INBOX.md`](DEVICE_INBOX.md)) |
+| OS push / browser alert | System `Notification` | **Never** for cross-tab - `inboxKindAllowsOsNotification()` allows `live_proof` only ([`DEVICE_INBOX.md`](DEVICE_INBOX.md)) |
 
-**Product sentence:** *Cross-tab keys tell you that **another open, visible browser tab** on this device is holding signing keys you may care about — not that a card exists on the network, and not via OS push.*
+**Product sentence:** *Cross-tab keys tell you that **another open, visible browser tab** on this device is holding signing keys you may care about - not that a card exists on the network, and not via OS push.*
 
 ---
 
@@ -64,14 +64,14 @@ Full inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md). This doc owns **cross
 
 ## Presence protocol
 
-**Storage:** `localStorage.hc_tab_keys_presence` — map `tabId → { profile_id, qr_id?, handle?, label?, updatedAt }` (public metadata only).
+**Storage:** `localStorage.hc_tab_keys_presence` - map `tabId → { profile_id, qr_id?, handle?, label?, updatedAt }` (public metadata only).
 
 **Writer:** `device-tab-presence.mjs` (`startTabKeysPresence()` from `device-status.mjs`).
 
 | Constant | Value | Meaning |
 |----------|-------|---------|
-| `PRESENCE_HEARTBEAT_MS` | 4000 | Visible tab writes while keys in `hc_created` |
-| `PRESENCE_SHOW_MS` | 6000 | UI lists row only if `now - updatedAt ≤ showMs` |
+| `PRESENCE_HEARTBEAT_MS` | 5000 | Visible tab writes while keys in `hc_created` (metadata unchanged: skip until keep-alive) |
+| `PRESENCE_SHOW_MS` | 7000 | UI lists row only if `now - updatedAt ≤ showMs` |
 | `PRESENCE_STALE_MS` | 10000 | Pruned from map on read |
 
 **Rules:**
@@ -106,8 +106,8 @@ Full inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md). This doc owns **cross
 
 **Aggregate vs per-tab UI:**
 
-- `buildInboxItems()` — one inbox item; subtitle uses **first** entry by `updatedAt`; `count` = number of tabs.
-- `buildInboxSheetRows()` — **one row per** entry in stabilized `crossTabEntries` / `orphanRemovedEntries`.
+- `buildInboxItems()` - one inbox item; subtitle uses **first** entry by `updatedAt`; `count` = number of tabs.
+- `buildInboxSheetRows()` - **one row per** entry in stabilized `crossTabEntries` / `orphanRemovedEntries`.
 
 ---
 
@@ -132,7 +132,7 @@ getInboxItems() → buildInboxItems(gatherInboxInput())
 - Hide immediately when gate fails, `raw.length === 0`, or fingerprint changes.
 - `invalidateCrossTabNotificationState()` on `hc_wallet` / `hc_created` storage, hub change, denylist change, and `resetPresenceInboxGatherCache()`.
 
-**Legacy:** `device-presence-inbox-stability-core.mjs` — `shouldSkipCrossTabOverlayViewTransition` only (dot view transitions).
+**Legacy:** `device-presence-inbox-stability-core.mjs` - `shouldSkipCrossTabOverlayViewTransition` only (dot view transitions).
 
 ---
 
@@ -167,7 +167,7 @@ On each presence write, **multiple listeners** run at different times:
 | `device-inbox-sheet.mjs` | `refresh()` | **No** |
 | `wallet-page.mjs` | `updateContextBanners()` | **No** |
 
-`refreshSummary()` also calls `renderCrossTabKeysBanner()` again — **duplicate hub/banner work** per debounced tick.
+`refreshSummary()` also calls `renderCrossTabKeysBanner()` again - **duplicate hub/banner work** per debounced tick.
 
 See [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md).
 
@@ -177,14 +177,14 @@ See [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_
 
 These should hold after rebuild; today some are **violated** (marked ⚠️).
 
-1. **Single snapshot** — All chrome surfaces read one `CrossTabNotificationSnapshot` per refresh tick. ⚠️ Scan banner and timing splits violate this.
-2. **Show stability** — Cross-tab chrome appears only after presence is stable (see rebuild plan: identity-stable streak). ⚠️ Count-only streak allows label flicker.
-3. **Fast hide** — When qualifying presence drops to zero, badge/dot/hub/sheet hide on the **same** tick. ⚠️ Debounced badge can lag behind immediate hub render.
-4. **Custody reset** — On `hc_wallet`, `hc_created`, `hc_wallet_removed_profile_ids`, or successful “keys loaded in this tab” for a profile, reset streak + gather cache. ⚠️ Cache reset only on orphan clear today.
-5. **No OS alert** — `cross_tab_keys` / `orphan_keys_removed` never call `Notification` API.
-6. **Saved profile** — After save to `hc_wallet`, generic cross-tab must not reference that `profile_id` (filter in `listOtherTabsWithKeys`).
-7. **Removed profile** — Denylisted profiles use `orphan_keys_removed` copy, not generic cross-tab ([`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md)).
-8. **Tab unsaved wins** — When `tabNoticeCount > 0`, no cross-tab/orphan chrome.
+1. **Single snapshot** - All chrome surfaces read one `CrossTabNotificationSnapshot` per refresh tick. ⚠️ Scan banner and timing splits violate this.
+2. **Show stability** - Cross-tab chrome appears only after presence is stable (see rebuild plan: identity-stable streak). ⚠️ Count-only streak allows label flicker.
+3. **Fast hide** - When qualifying presence drops to zero, badge/dot/hub/sheet hide on the **same** tick. ⚠️ Debounced badge can lag behind immediate hub render.
+4. **Custody reset** - On `hc_wallet`, `hc_created`, `hc_wallet_removed_profile_ids`, or successful “keys loaded in this tab” for a profile, reset streak + gather cache. ⚠️ Cache reset only on orphan clear today.
+5. **No OS alert** - `cross_tab_keys` / `orphan_keys_removed` never call `Notification` API.
+6. **Saved profile** - After save to `hc_wallet`, generic cross-tab must not reference that `profile_id` (filter in `listOtherTabsWithKeys`).
+7. **Removed profile** - Denylisted profiles use `orphan_keys_removed` copy, not generic cross-tab ([`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md)).
+8. **Tab unsaved wins** - When `tabNoticeCount > 0`, no cross-tab/orphan chrome.
 
 ---
 
@@ -221,7 +221,7 @@ CTAs: **Open that tab** · **Open controls here** (when wallet has keys) · **Cl
 
 | Enable | Log / signal |
 |--------|----------------|
-| `localStorage.hc_inbox_diagnostics = "1"` | `sessionStorage.hc_inbox_diag_log` — badge opens, actions |
+| `localStorage.hc_inbox_diagnostics = "1"` | `sessionStorage.hc_inbox_diag_log` - badge opens, actions |
 | `localStorage.hc_dot_diagnostics = "1"` | Console overlay flapping |
 | DevTools → Application | `hc_tab_keys_presence`, per-tab `hc_created`, `hc_wallet`, `hc_wallet_removed_profile_ids` |
 
@@ -258,4 +258,4 @@ npm run worker:test -- worker/tests/device-cross-tab-state.test.ts worker/tests/
 npm run e2e -- e2e/device-inbox.spec.ts e2e/device-status-dot.spec.ts
 ```
 
-Manual: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — cross-tab / multi-tab rows when present.
+Manual: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) - cross-tab / multi-tab rows when present.
