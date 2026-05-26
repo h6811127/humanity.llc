@@ -15,14 +15,20 @@ export const QR_CENTER_LOGO_OUTER_FILL = "#c9979f";
 /** Inner disc uses brand red. */
 export const QR_CENTER_LOGO_INNER_FILL = QR_BRAND_RED;
 
-/** Inner radius as fraction of outer radius. */
-export const QR_CENTER_LOGO_INNER_RADIUS_RATIO = 0.52;
+/** Inner radius as fraction of outer radius (small brand core on large soft wash). */
+export const QR_CENTER_LOGO_INNER_RADIUS_RATIO = 0.46;
 
-/** Mostly transparent center mark — modules show through (docs/QR_BRANDING.md). */
-export const QR_CENTER_LOGO_OPACITY = 0.48;
+/** Soft dusty-rose wash — large circle, modules show through (docs/QR_BRANDING.md). */
+export const QR_CENTER_LOGO_OUTER_OPACITY = 0.36;
 
-/** Logo width as fraction of QR width — keep small (~5 modules on typical versions). */
-export const QR_CENTER_LOGO_SIZE_RATIO = 0.22;
+/** Brand-red core disc — slightly more opaque than the outer wash. */
+export const QR_CENTER_LOGO_INNER_OPACITY = 0.58;
+
+/** @deprecated Prefer {@link QR_CENTER_LOGO_OUTER_OPACITY} / {@link QR_CENTER_LOGO_INNER_OPACITY}. */
+export const QR_CENTER_LOGO_OPACITY = QR_CENTER_LOGO_OUTER_OPACITY;
+
+/** Outer circle diameter as fraction of QR width (~fills code, stays inside frame). */
+export const QR_CENTER_LOGO_SIZE_RATIO = 0.78;
 
 /** Required when center logo is enabled (Technical Standards §8.5). */
 export const QR_BRANDED_ERROR_CORRECTION = "Q";
@@ -45,8 +51,9 @@ export const QR_FRAME_FOOTER_FILL = "#8a8a8a";
 /**
  * Layout around the QR modules (not including outer canvas margin).
  * @param {number} qrSize
+ * @param {{ credentialCode?: string | null }} [opts]
  */
-export function qrFrameMetrics(qrSize) {
+export function qrFrameMetrics(qrSize, opts = {}) {
   const pad = Math.max(4, Math.round(qrSize * 0.045));
   const border = Math.max(1.5, qrSize * 0.011);
   const gap = Math.max(2, Math.round(qrSize * 0.022));
@@ -58,11 +65,15 @@ export function qrFrameMetrics(qrSize) {
   const innerW = qrSize + 2 * (pad + border);
   const pillY = qrY + qrSize + gap;
   const footerY = pillY + pillH + gap;
-  const totalHeight = footerY + footerH + pad;
+  const hasCode = Boolean(opts.credentialCode);
+  const codeH = hasCode ? Math.max(8, Math.round(qrSize * 0.06)) : 0;
+  const codeY = footerY + footerH + gap;
+  const totalHeight = (hasCode ? codeY + codeH : footerY + footerH) + pad;
   const glyphCx = pad + glyphSize / 2 + 1;
   const glyphCy = pad + glyphSize / 2 + 1;
   const pillFont = Math.max(5.5, qrSize * 0.062);
   const footerFont = Math.max(5, qrSize * 0.058);
+  const codeFont = Math.max(5, qrSize * 0.056);
   const cornerR = Math.max(3, qrSize * 0.04);
   return {
     qrSize,
@@ -71,6 +82,9 @@ export function qrFrameMetrics(qrSize) {
     gap,
     pillH,
     footerH,
+    codeH,
+    codeY,
+    credentialCode: opts.credentialCode ?? null,
     glyphSize,
     qrX,
     qrY,
@@ -83,6 +97,7 @@ export function qrFrameMetrics(qrSize) {
     glyphCy,
     pillFont,
     footerFont,
+    codeFont,
     cornerR,
   };
 }
@@ -121,12 +136,12 @@ export function networkGlyphSvgFragment(size, cx, cy, opacity = 0.88) {
 /**
  * Wrap branded QR SVG in the signed visual frame (border, glyph, LIVE OBJECT, footer).
  * @param {string} brandedQrSvg QR SVG with center logo already applied
- * @param {{ showLiveObject?: boolean }} [opts]
+ * @param {{ showLiveObject?: boolean, credentialCode?: string | null }} [opts]
  */
 export function renderHumanityQrFrameSvg(brandedQrSvg, opts = {}) {
   const qrSize = extractQrSvgViewBoxSize(brandedQrSvg);
   if (!qrSize || !brandedQrSvg?.includes("</svg>")) return brandedQrSvg;
-  const m = qrFrameMetrics(qrSize);
+  const m = qrFrameMetrics(qrSize, { credentialCode: opts.credentialCode });
   const inner = extractSvgInner(brandedQrSvg);
   const showLiveObject = opts.showLiveObject !== false;
   const glyph = networkGlyphSvgFragment(m.glyphSize, m.glyphCx, m.glyphCy);
@@ -134,7 +149,10 @@ export function renderHumanityQrFrameSvg(brandedQrSvg, opts = {}) {
     ? `<text class="hc-qr-frame-pill-text" x="${m.innerW / 2}" y="${m.pillY + m.pillH * 0.72}" text-anchor="middle" font-family="system-ui,sans-serif" font-size="${m.pillFont}" font-weight="600" letter-spacing="0.14em" fill="${QR_BRAND_RED}">${QR_FRAME_LIVE_OBJECT_TEXT}</text>`
     : "";
   const footerText = `<text class="hc-qr-frame-footer-text" x="${m.innerW / 2}" y="${m.footerY + m.footerH * 0.75}" text-anchor="middle" font-family="system-ui,sans-serif" font-size="${m.footerFont}" font-weight="500" fill="${QR_FRAME_FOOTER_FILL}">${QR_FRAME_FOOTER_TEXT}</text>`;
-  return `<svg class="hc-qr-frame-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${m.totalWidth} ${m.totalHeight}" role="presentation" aria-hidden="true"><rect width="${m.totalWidth}" height="${m.totalHeight}" rx="${m.cornerR}" fill="${QR_BRAND_LIGHT}"/><rect x="${m.border / 2}" y="${m.border / 2}" width="${m.totalWidth - m.border}" height="${m.totalHeight - m.border}" rx="${m.cornerR - 1}" fill="none" stroke="${QR_BRAND_RED}" stroke-width="${m.border}"/>${glyph}<g transform="translate(${m.qrX} ${m.qrY})">${inner}</g>${pillText}${footerText}</svg>`;
+  const codeText = m.credentialCode
+    ? `<text class="hc-qr-frame-code-text" x="${m.innerW / 2}" y="${m.codeY + m.codeH * 0.72}" text-anchor="middle" font-family="ui-monospace,monospace" font-size="${m.codeFont}" font-weight="600" letter-spacing="0.08em" fill="${QR_BRAND_RED}">${m.credentialCode}</text>`
+    : "";
+  return `<svg class="hc-qr-frame-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${m.totalWidth} ${m.totalHeight}" role="presentation" aria-hidden="true"><rect width="${m.totalWidth}" height="${m.totalHeight}" rx="${m.cornerR}" fill="${QR_BRAND_LIGHT}"/><rect x="${m.border / 2}" y="${m.border / 2}" width="${m.totalWidth - m.border}" height="${m.totalHeight - m.border}" rx="${m.cornerR - 1}" fill="none" stroke="${QR_BRAND_RED}" stroke-width="${m.border}"/>${glyph}<g transform="translate(${m.qrX} ${m.qrY})">${inner}</g>${pillText}${footerText}${codeText}</svg>`;
 }
 
 /**
@@ -205,6 +223,11 @@ export function drawHumanityQrFrameCanvas(ctx, m, drawQr) {
   ctx.fillStyle = QR_FRAME_FOOTER_FILL;
   ctx.font = `500 ${m.footerFont}px system-ui,sans-serif`;
   ctx.fillText(QR_FRAME_FOOTER_TEXT, m.innerW / 2, m.footerY + m.footerH / 2);
+  if (m.credentialCode) {
+    ctx.fillStyle = QR_BRAND_RED;
+    ctx.font = `600 ${m.codeFont}px ui-monospace,monospace`;
+    ctx.fillText(m.credentialCode, m.innerW / 2, m.codeY + m.codeH / 2);
+  }
 }
 
 /**
@@ -248,11 +271,12 @@ export function centerLogoMetrics(qrSize, sizeRatio = QR_CENTER_LOGO_SIZE_RATIO)
  */
 export function centerLogoSvgFragment(
   qrSize,
-  opacity = QR_CENTER_LOGO_OPACITY,
-  sizeRatio = QR_CENTER_LOGO_SIZE_RATIO
+  outerOpacity = QR_CENTER_LOGO_OUTER_OPACITY,
+  sizeRatio = QR_CENTER_LOGO_SIZE_RATIO,
+  innerOpacity = QR_CENTER_LOGO_INNER_OPACITY
 ) {
   const { cx, cy, outerR, innerR } = centerLogoMetrics(qrSize, sizeRatio);
-  return `<g class="hc-qr-center-logo" opacity="${opacity}" aria-hidden="true"><circle cx="${cx}" cy="${cy}" r="${outerR}" fill="${QR_CENTER_LOGO_OUTER_FILL}"/><circle cx="${cx}" cy="${cy}" r="${innerR}" fill="${QR_CENTER_LOGO_INNER_FILL}"/></g>`;
+  return `<g class="hc-qr-center-logo" aria-hidden="true"><circle class="hc-qr-center-logo-outer" cx="${cx}" cy="${cy}" r="${outerR}" fill="${QR_CENTER_LOGO_OUTER_FILL}" opacity="${outerOpacity}"/><circle class="hc-qr-center-logo-inner" cx="${cx}" cy="${cy}" r="${innerR}" fill="${QR_CENTER_LOGO_INNER_FILL}" opacity="${innerOpacity}"/></g>`;
 }
 
 /**
@@ -262,7 +286,8 @@ export function centerLogoSvgFragment(
  */
 export function overlayCenterLogoOnSvg(svg, opts = {}) {
   if (!svg?.includes("</svg>")) return svg;
-  const opacity = opts.opacity ?? QR_CENTER_LOGO_OPACITY;
+  const outerOpacity = opts.outerOpacity ?? opts.opacity ?? QR_CENTER_LOGO_OUTER_OPACITY;
+  const innerOpacity = opts.innerOpacity ?? QR_CENTER_LOGO_INNER_OPACITY;
   const sizeRatio = opts.sizeRatio ?? QR_CENTER_LOGO_SIZE_RATIO;
   const viewBoxMatch = svg.match(/viewBox="0 0 (\d+(?:\.\d+)?) (\d+(?:\.\d+)?)"/);
   const widthMatch = svg.match(/\bwidth="(\d+(?:\.\d+)?)"/);
@@ -272,7 +297,7 @@ export function overlayCenterLogoOnSvg(svg, opts = {}) {
       ? Number(widthMatch[1])
       : 0;
   if (!size) return svg;
-  const fragment = centerLogoSvgFragment(size, opacity, sizeRatio);
+  const fragment = centerLogoSvgFragment(size, outerOpacity, sizeRatio, innerOpacity);
   return svg.replace("</svg>", `${fragment}</svg>`);
 }
 
@@ -286,20 +311,22 @@ export function overlayCenterLogoOnSvg(svg, opts = {}) {
 export function drawCenterLogoOnCanvas(
   ctx,
   qrWidth,
-  opacity = QR_CENTER_LOGO_OPACITY,
+  outerOpacity = QR_CENTER_LOGO_OUTER_OPACITY,
   sizeRatio = QR_CENTER_LOGO_SIZE_RATIO,
   offsetX = 0,
-  offsetY = 0
+  offsetY = 0,
+  innerOpacity = QR_CENTER_LOGO_INNER_OPACITY
 ) {
   const { cx, cy, outerR, innerR } = centerLogoMetrics(qrWidth, sizeRatio);
   const drawCx = cx + offsetX;
   const drawCy = cy + offsetY;
   ctx.save();
-  ctx.globalAlpha = opacity;
+  ctx.globalAlpha = outerOpacity;
   ctx.beginPath();
   ctx.arc(drawCx, drawCy, outerR, 0, Math.PI * 2);
   ctx.fillStyle = QR_CENTER_LOGO_OUTER_FILL;
   ctx.fill();
+  ctx.globalAlpha = innerOpacity;
   ctx.beginPath();
   ctx.arc(drawCx, drawCy, innerR, 0, Math.PI * 2);
   ctx.fillStyle = QR_CENTER_LOGO_INNER_FILL;
@@ -318,7 +345,10 @@ export async function renderHumanityQrFrameToCanvas(text, qrWidth) {
   const qrCanvas = document.createElement("canvas");
   const QRCode = (await import("./vendor/qrcode.mjs")).default;
   await QRCode.toCanvas(qrCanvas, text, { ...QR_BRANDED_RENDER_OPTIONS, width: qrWidth });
-  const m = qrFrameMetrics(qrWidth);
+  const { credentialCodeFromScanUrl } = await import("./qr-credential-code.mjs");
+  const m = qrFrameMetrics(qrWidth, {
+    credentialCode: credentialCodeFromScanUrl(text),
+  });
   const out = document.createElement("canvas");
   out.width = m.totalWidth;
   out.height = m.totalHeight;
@@ -326,7 +356,15 @@ export async function renderHumanityQrFrameToCanvas(text, qrWidth) {
   if (!ctx) throw new Error("Canvas not available");
   drawHumanityQrFrameCanvas(ctx, m, () => {
     ctx.drawImage(qrCanvas, m.qrX, m.qrY);
-    drawCenterLogoOnCanvas(ctx, qrWidth, QR_CENTER_LOGO_OPACITY, QR_CENTER_LOGO_SIZE_RATIO, m.qrX, m.qrY);
+    drawCenterLogoOnCanvas(
+      ctx,
+      qrWidth,
+      QR_CENTER_LOGO_OUTER_OPACITY,
+      QR_CENTER_LOGO_SIZE_RATIO,
+      m.qrX,
+      m.qrY,
+      QR_CENTER_LOGO_INNER_OPACITY
+    );
   });
   return out;
 }

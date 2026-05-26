@@ -13,8 +13,8 @@ All Humanity scan QRs (creation page, download PNG, scan pass card) MUST match t
 | Property | Value |
 |----------|--------|
 | Modules | Brand red `#db1b43` on white `#ffffff` |
-| Center mark | Two concentric circles (dusty rose outer `#c9979f`, brand red inner `#db1b43`), **mostly transparent** (~48% opacity on the group) |
-| Logo size | ~22% of QR width (does not cover finder patterns) |
+| Center mark | Large soft outer wash `#c9979f` (~36% opacity) + smaller brand-red core `#db1b43` (~58% opacity) |
+| Logo size | ~78% of QR width (fills the code area; EC **Q** required) |
 | Error correction | **Q** (required for center overlay; stickers/apparel per §8.5) |
 | Payload | Unchanged — still the HTTPS scan URL for this card + `qr_id` |
 
@@ -80,11 +80,11 @@ npm run worker:test -- worker/tests/scan-qr-branding.test.ts
 
 | Opacity | Effect |
 |---------|--------|
-| ~0.45–0.50 (shipped) | Logo more visible; modules still show through on white |
-| &gt; 0.5 | Risk of muddy contrast over red modules |
-| Opaque + large pad | Needs Q/H; hides more modules — not the chosen design |
+| Outer ~0.36 / inner ~0.58 (shipped) | Large soft wash with a visible core; modules show through |
+| &gt; 0.85 size ratio | Risk of scan failures on some cameras — stay at **Q** and test phones |
+| Opaque + full bleed | Needs Q/H; not the chosen design |
 
-If scan QA fails in the field, reduce `QR_CENTER_LOGO_SIZE_RATIO` before lowering correction below Q.
+If scan QA fails in the field, reduce `QR_CENTER_LOGO_SIZE_RATIO` (e.g. to `0.72`) before lowering correction below Q.
 
 ---
 

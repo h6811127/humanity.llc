@@ -7,8 +7,10 @@ import {
   QR_BRANDED_ERROR_CORRECTION,
   QR_BRAND_RED,
   QR_CENTER_LOGO_INNER_FILL,
+  QR_CENTER_LOGO_INNER_OPACITY,
   QR_CENTER_LOGO_OPACITY,
   QR_CENTER_LOGO_OUTER_FILL,
+  QR_CENTER_LOGO_OUTER_OPACITY,
   QR_CENTER_LOGO_SIZE_RATIO,
   QR_FRAME_FOOTER_TEXT,
   QR_FRAME_LIVE_OBJECT_TEXT,
@@ -18,12 +20,14 @@ import { renderScanQrMarkup } from "../src/resolver/scan-qr";
 
 describe("centerLogoSvgFragment", () => {
   it("draws concentric circles without a raster image plate", () => {
-    const frag = centerLogoSvgFragment(37, QR_CENTER_LOGO_OPACITY);
+    const frag = centerLogoSvgFragment(37);
     expect(frag).toContain("<circle");
     expect(frag).toContain(QR_CENTER_LOGO_OUTER_FILL);
     expect(frag).toContain(QR_CENTER_LOGO_INNER_FILL);
     expect(frag).not.toContain("<image");
-    expect(frag).toContain(`opacity="${QR_CENTER_LOGO_OPACITY}"`);
+    expect(frag).toContain(`opacity="${QR_CENTER_LOGO_OUTER_OPACITY}"`);
+    expect(frag).toContain(`opacity="${QR_CENTER_LOGO_INNER_OPACITY}"`);
+    expect(frag).toContain('class="hc-qr-center-logo-outer"');
   });
 });
 
