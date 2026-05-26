@@ -68,6 +68,25 @@ export function liveControlPollLoopShouldRun(input) {
 }
 
 /**
+ * Phase 5: automatic poll timer runs only when watch is on and loop would run.
+ *
+ * @param {{
+ *   watchEnabled: boolean,
+ *   scopeActive: boolean,
+ *   resolverHealth: 'ok' | 'degraded' | 'offline',
+ * }} input
+ */
+export function liveControlAutoPollShouldRun(input) {
+  return (
+    input.watchEnabled &&
+    liveControlPollLoopShouldRun({
+      scopeActive: input.scopeActive,
+      resolverHealth: input.resolverHealth,
+    })
+  );
+}
+
+/**
  * Resolve hub-expanded from DOM (sheet hub only).
  * @param {HTMLElement | null} hubEl `#device-hub` when present
  */

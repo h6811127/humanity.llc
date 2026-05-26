@@ -24,6 +24,7 @@ import {
 import {
   liveControlPollIntervalMs,
   liveControlPollAllowedByResolverHealth,
+  liveControlAutoPollShouldRun,
   liveControlPollLoopShouldRun,
   liveControlPollTickShouldFetch,
   nextRoundRobinIndex,
@@ -105,13 +106,11 @@ function readPollScope() {
 }
 
 function readPollLoopShouldRun() {
-  return (
-    isWatchLiveProofEnabled() &&
-    liveControlPollLoopShouldRun({
-      scopeActive: readPollScope(),
-      resolverHealth: getResolverHealthStatus(),
-    })
-  );
+  return liveControlAutoPollShouldRun({
+    watchEnabled: isWatchLiveProofEnabled(),
+    scopeActive: readPollScope(),
+    resolverHealth: getResolverHealthStatus(),
+  });
 }
 
 function clearPollTimer() {

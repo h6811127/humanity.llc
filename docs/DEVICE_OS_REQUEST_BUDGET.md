@@ -131,7 +131,7 @@ Do **not** rip out the device OS. **Retire the default “poll every card every 
 | **5 — Product polish** (P2) | **Shipped:** hub **Check network** + last-checked line; **Watch for live proof** toggle (default on); **Check for live proof** when watch off | User-visible cost | More honest UX; turn off watch to stop auto polls |
 | **6 — Evaluate push** (future) | Only if phases 1–4 cannot meet “stranger waiting” SLA | Best at scale | Engineering cost |
 
-**Tests to add when implementing:** Vitest for “poll scheduler” pure functions; Playwright: collapsed hub does not fire live-control fetch for 10s; expanded hub fires at most one challenge URL per tick.
+**Tests (shipped):** Vitest in `device-live-control-poll-scheduler.test.ts`, `device-live-control-round-robin.test.ts`, `device-hub-network-tools-core.test.ts`; Playwright in `e2e/device-inbox.spec.ts` (collapsed hub idle 10s, one challenge per tick, degraded health, watch off + manual check).
 
 ---
 
@@ -166,3 +166,4 @@ Before merging shell changes that touch network I/O:
 | 2026-05-26 | **Phase 3 shipped:** live-control poll loop gated on resolver health `ok` only; listen for `hc-resolver-health-changed` |
 | 2026-05-26 | **Phase 4 shipped:** SW round-robin poll, 15 min periodic sync, alerts-only + resolver health gate |
 | 2026-05-26 | **Phase 5 shipped:** hub network tools — Check network, last-checked status, Watch for live proof toggle |
+| 2026-05-26 | **Test coverage:** Vitest `liveControlAutoPollShouldRun`; E2E watch-off idle + manual **Check for live proof** |

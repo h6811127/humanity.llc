@@ -224,13 +224,15 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 **Removed from device:** Profiles in `localStorage` `hc_wallet_removed_profile_ids` (set on hub/wallet remove) do not use generic cross-tab copy. If another tab still heartbeats those keys, inbox shows **`orphan_keys_removed`** (“Keys still open in another tab · for a card you removed from this device”) with **Open that tab** and **Clear keys on this device** (broadcast to all tabs). Re-saving to `hc_wallet` clears the denylist. See [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md).
 
+**Canonical cross-tab notification spec + rebuild:** [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md).
+
 **Glance:** Collapsed hub shows inbox actionable rows (live proof, cross-tab, tab keys, card-disabled-since-visit) plus saved-card peek via `buildGlanceRowPlan()` — see [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 
 ### Live-control inbox (Phase 7)
 
 **Scope:** Device hub only on **landing** and **`/wallet/`**  -  not duplicated on `/created/` (that page keeps the existing **Prove live control** panel for the open card).
 
-**Poll (Phases 1–3 shipped):** `GET …/live-control/challenges` runs only when the hub sheet is **expanded**, the **inbox sheet** is open, or the user is on **`/wallet/`**; resolver health must be **`ok`**; **one card per tick** (round-robin); **30s** idle / **5s** when proof is waiting. Wallet status chips refresh on hub expand (not every tab focus; **≥60s** debounce on `visibilitychange`). See **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)**. Modules: `device-live-control-poll-scheduler.mjs`, `device-live-control-inbox.mjs`.
+**Poll (Phases 1–5 shipped):** `GET …/live-control/challenges` runs only when **Watch for live proof** is on (`hc_watch_live_proof`, default on) and the hub sheet is **expanded**, the **inbox sheet** is open, or the user is on **`/wallet/`**; resolver health must be **`ok`**; **one card per tick** (round-robin); **30s** idle / **5s** when proof is waiting. **Check for live proof** on the hub runs one round-robin check when watch is off. Wallet status chips refresh on hub expand (not every tab focus; **≥60s** debounce on `visibilitychange`). See **[`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)**. Modules: `device-live-control-poll-scheduler.mjs`, `device-live-control-inbox.mjs`, `device-hub-network-tools.mjs`.
 
 **UI:**
 

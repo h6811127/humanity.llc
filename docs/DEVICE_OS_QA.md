@@ -146,7 +146,16 @@ Per [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § QA (hub card
 
 **Note:** `/wallet/` uses scroll-to-saved, not a separate glance popover (see [`DEVICE_OS.md`](DEVICE_OS.md)).
 
----
+### P1-7 · Watch for live proof (request budget Phase 5)
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Saved card; expand hub on `/` | Hub shows **Watch for live proof** (checked by default) and last-checked line |
+| 2 | Uncheck **Watch for live proof**; wait ~15s | No repeating `live-control/challenges` in Network tab |
+| 3 | Tap **Check for live proof** | One challenge request; status line updates |
+| 4 | Re-check watch | Auto polling resumes while hub expanded (one challenge per tick at idle interval) |
+
+See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 
 ## P1 — Card disabled since last visit
 

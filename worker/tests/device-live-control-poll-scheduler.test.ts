@@ -7,6 +7,7 @@ import {
   isDeviceHubExpanded,
   liveControlPollIntervalMs,
   liveControlPollAllowedByResolverHealth,
+  liveControlAutoPollShouldRun,
   liveControlPollLoopShouldRun,
   liveControlPollTickShouldFetch,
   liveControlPollingShouldRun,
@@ -73,6 +74,39 @@ describe("liveControlPollAllowedByResolverHealth", () => {
     expect(liveControlPollAllowedByResolverHealth("ok")).toBe(true);
     expect(liveControlPollAllowedByResolverHealth("degraded")).toBe(false);
     expect(liveControlPollAllowedByResolverHealth("offline")).toBe(false);
+  });
+});
+
+describe("liveControlAutoPollShouldRun", () => {
+  it("requires watch on plus scope and resolver ok", () => {
+    expect(
+      liveControlAutoPollShouldRun({
+        watchEnabled: true,
+        scopeActive: true,
+        resolverHealth: "ok",
+      })
+    ).toBe(true);
+    expect(
+      liveControlAutoPollShouldRun({
+        watchEnabled: false,
+        scopeActive: true,
+        resolverHealth: "ok",
+      })
+    ).toBe(false);
+    expect(
+      liveControlAutoPollShouldRun({
+        watchEnabled: true,
+        scopeActive: false,
+        resolverHealth: "ok",
+      })
+    ).toBe(false);
+    expect(
+      liveControlAutoPollShouldRun({
+        watchEnabled: true,
+        scopeActive: true,
+        resolverHealth: "degraded",
+      })
+    ).toBe(false);
   });
 });
 

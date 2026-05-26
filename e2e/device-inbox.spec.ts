@@ -530,6 +530,27 @@ test.describe("device inbox â€” live proof poll scope (request budget phases 1â€
     expect(challengeFetches).toBe(1);
   });
 
+  test("expanded hub does not auto-poll when Watch for live proof is off", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("hc_watch_live_proof", "0");
+    });
+
+    let challengeFetches = 0;
+    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", (route) => {
+      challengeFetches += 1;
+      return mockNoChallenge(route);
+    });
+
+    await page.goto("/");
+    await page.locator("#brand-status-dot-btn").click();
+    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
+    await expect(page.locator("#device-hub-check-live-proof-btn")).toBeVisible();
+    await page.waitForTimeout(10_000);
+    expect(challengeFetches).toBe(0);
+  });
+
   test("expanded hub does not poll live-control when resolver health is degraded", async ({
     page,
   }) => {
@@ -548,5 +569,33 @@ test.describe("device inbox â€” live proof poll scope (request budget phases 1â€
     await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
     await page.waitForTimeout(5000);
     expect(challengeFetches).toBe(0);
+  });
+});
+
+test.describe("device inbox â€” live proof watch toggle (request budget phase 5)", () => {
+  test.beforeEach(async ({ page, context }) => {
+    await grantBrowserNotifications(context);
+    await page.addInitScript((entry) => {
+      localStorage.setItem("hc_wallet", JSON.stringify([entry]));
+      localStorage.setItem("hc_watch_live_proof", "0");
+      sessionStorage.setItem("hc_hub_open", "0");
+    }, WALLET_ENTRY);
+    await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
+    await page.route("**/.well-known/hc/v1/cards/**/status**", mockCardStatus);
+    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", mockNoChallenge);
+  });
+
+  test("Check for live proof runs one challenge fetch when watch is off", async ({ page }) => {
+    let challengeFetches = 0;
+    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", (route) => {
+      challengeFetches += 1;
+      return mockNoChallenge(route);
+    });
+
+    await page.goto("/");
+    await page.locator("#brand-status-dot-btn").click();
+    await expect(page.locator("#device-hub-check-live-proof-btn")).toBeVisible();
+    await page.locator("#device-hub-check-live-proof-btn").click();
+    await expect.poll(() => challengeFetches, { timeout: 10_000 }).toBe(1);
   });
 });
