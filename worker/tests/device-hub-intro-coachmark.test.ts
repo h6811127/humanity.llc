@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   HUB_INTRO_STORAGE_KEY,
+  HUB_INTRO_SEEN_STORAGE_KEY,
   shouldShowHubIntro,
 } from "../../site/js/device-hub-intro-coachmark.mjs";
 
@@ -15,6 +16,7 @@ describe("device hub intro coachmark", () => {
         hubSheetOpen: false,
         inboxOpen: false,
         dismissed: false,
+        seen: false,
       })
     ).toBe(true);
   });
@@ -50,6 +52,13 @@ describe("device hub intro coachmark", () => {
     expect(
       shouldShowHubIntro({
         hasHub: true,
+        seen: true,
+        dismissed: false,
+      })
+    ).toBe(false);
+    expect(
+      shouldShowHubIntro({
+        hasHub: true,
         dismissed: true,
       })
     ).toBe(false);
@@ -57,5 +66,6 @@ describe("device hub intro coachmark", () => {
 
   it("uses a stable localStorage key", () => {
     expect(HUB_INTRO_STORAGE_KEY).toBe("hc_device_hub_intro_dismissed");
+    expect(HUB_INTRO_SEEN_STORAGE_KEY).toBe("hc_device_hub_intro_seen");
   });
 });

@@ -1,9 +1,10 @@
 /**
  * First-visit coachmark: points new users at the status dot to open the device hub.
- * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
+ * @see docs/DEVICE_HUB_INTRO_COACHMARK.md
  */
 
 export const HUB_INTRO_STORAGE_KEY = "hc_device_hub_intro_dismissed";
+export const HUB_INTRO_SEEN_STORAGE_KEY = "hc_device_hub_intro_seen";
 
 const INTRO_ID = "device-hub-intro-coachmark";
 const DISMISS_ID = "device-hub-intro-dismiss";
@@ -19,6 +20,22 @@ export function isHubIntroDismissed() {
     return localStorage.getItem(HUB_INTRO_STORAGE_KEY) === "1";
   } catch {
     return true;
+  }
+}
+
+export function hasSeenHubIntro() {
+  try {
+    return localStorage.getItem(HUB_INTRO_SEEN_STORAGE_KEY) === "1";
+  } catch {
+    return true;
+  }
+}
+
+export function markHubIntroSeen() {
+  try {
+    localStorage.setItem(HUB_INTRO_SEEN_STORAGE_KEY, "1");
+  } catch {
+    /* ignore */
   }
 }
 
@@ -39,11 +56,13 @@ export function dismissHubIntro() {
  *   hubSheetOpen?: boolean,
  *   inboxOpen?: boolean,
  *   dismissed?: boolean,
+ *   seen?: boolean,
  * }} ctx
  */
 export function shouldShowHubIntro(ctx) {
   if (!ctx.hasHub || ctx.isWalletPage || ctx.statusLoadError) return false;
   if (ctx.dismissed ?? isHubIntroDismissed()) return false;
+  if (ctx.seen ?? hasSeenHubIntro()) return false;
   if (ctx.hubSheetOpen || ctx.inboxOpen) return false;
   return true;
 }
@@ -109,6 +128,8 @@ export function hideHubIntroCoachmark() {
 export function showHubIntroCoachmark() {
   root = document.getElementById(INTRO_ID);
   if (!root || !shouldShowHubIntro(readVisibilityContext())) return;
+  // First-visit means show once even if user does not tap "Got it".
+  markHubIntroSeen();
   root.hidden = false;
   document.body.classList.add("device-hub-intro-visible");
   document.querySelector(".shell-status-cluster")?.classList.add("shell-status-cluster--hub-intro");

@@ -237,6 +237,7 @@ test.describe("hub intro coachmark", () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.removeItem("hc_device_hub_intro_dismissed");
+      localStorage.removeItem("hc_device_hub_intro_seen");
     });
     await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
   });
@@ -248,6 +249,15 @@ test.describe("hub intro coachmark", () => {
     await expect(intro).toContainText(/meet your device hub/i);
     await expect(intro).toContainText(/status dot/i);
     await expect(page.locator(".shell-status-cluster--hub-intro")).toBeVisible();
+  });
+
+  test("does not show coachmark again after refresh without interaction", async ({ page }) => {
+    await page.goto("/");
+    const intro = page.locator("#device-hub-intro-coachmark");
+    await expect(intro).toBeVisible({ timeout: 5000 });
+    await page.reload();
+    await expect(intro).toBeHidden();
+    await expect(page.locator("body")).not.toHaveClass(/device-hub-intro-visible/);
   });
 
   test("hides coachmark after Got it and stays dismissed on reload", async ({ page }) => {

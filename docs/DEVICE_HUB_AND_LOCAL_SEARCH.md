@@ -71,6 +71,8 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Chrome inbox (shipped):** Floating **inbox badge** next to the status dot when action items exist; hub `#device-hub-alerts-top` holds full rows. Spec and roadmap: [`DEVICE_INBOX.md`](DEVICE_INBOX.md). Status dot semantics: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 
+**Hub intro coachmark (shipped):** First visit on `/`, `/create/`, and `/created/` points at the status dot; `hc_device_hub_intro_seen` prevents repeat on refresh, `hc_device_hub_intro_dismissed` after **Got it** or opening the hub. Not on `/wallet/`. Spec: [`DEVICE_HUB_INTRO_COACHMARK.md`](DEVICE_HUB_INTRO_COACHMARK.md).
+
 **Hub glance (landing):** When the hub is collapsed, `#device-hub-glance` shows notice (if any) and up to three saved card labels; tap expands the hub. Quick-look popover rows use **light pastel** fills (red / blue / orange by notice type). Glance **Card disabled since last visit** copy follows the latest resolver-confirmed alert state from the wallet network poll (not stale cache and not the persisted `hc_wallet[].status` field).
 
 **`/wallet/` (Phase 5–6):** Uses the same hub renderer as landing. Each saved row shows **title**, **identity line**, **status line**, optional **card disabled since last visit** alert, **Details**, **Open controls / Open scan**, and steward actions under ⋯ **QR & lifecycle** (see [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md)). Row icon tone follows verification (green shield = Steward). Page is hub-expanded by default; help disclosure hides when cards exist.
@@ -199,7 +201,9 @@ No backend required:
 | `site/js/device-hub-ui.mjs` | Shared hub render + init |
 | `site/js/device-activity.mjs` | Activity log API |
 | `site/js/device-live-control-inbox.mjs` | Live proof inbox poll + open |
+| `site/js/device-hub-intro-coachmark.mjs` | First-visit status-dot coachmark |
 | `site/js/device-hub-glance.mjs` | Collapsed-hub summary (landing) |
+| `docs/DEVICE_HUB_INTRO_COACHMARK.md` | Coachmark show/dismiss/seen contract |
 | `site/js/landing-device-hub.mjs` | Landing init wrapper |
 | `site/js/created-hub.mjs` | Created init wrapper |
 | `site/js/landing-focus.mjs` | Focus mode + intro toggle |
