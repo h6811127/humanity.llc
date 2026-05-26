@@ -14,6 +14,18 @@
  */
 
 /**
+ * Inbox sheet is shell chrome only (status dot / badge). Scan pages load tab-keys
+ * but must not inject the bottom "Needs attention" sheet without device-shell.css.
+ * @param {{ getElementById: (id: string) => Element | null, body?: { classList: { contains: (c: string) => boolean } } }} doc
+ * @returns {boolean}
+ */
+export function inboxSheetMountAllowed(doc) {
+  if (!doc?.getElementById) return false;
+  if (doc.getElementById("top-chrome")) return true;
+  return doc.body?.classList?.contains("has-shell-chrome") === true;
+}
+
+/**
  * When the inbox sheet is collapsed but body/chrome/backdrop still reflect open state.
  * @param {InboxSheetReconcileInput} input
  * @returns {'close_sheet' | 'hide_backdrop' | 'none'}

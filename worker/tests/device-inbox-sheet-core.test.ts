@@ -1,6 +1,38 @@
 import { describe, expect, it } from "vitest";
 
-import { inboxSheetReconcileAction } from "../../site/js/device-inbox-sheet-core.mjs";
+import {
+  inboxSheetMountAllowed,
+  inboxSheetReconcileAction,
+} from "../../site/js/device-inbox-sheet-core.mjs";
+
+describe("inboxSheetMountAllowed", () => {
+  it("allows mount when top-chrome exists", () => {
+    expect(
+      inboxSheetMountAllowed({
+        getElementById: (id) => (id === "top-chrome" ? {} : null),
+        body: { classList: { contains: () => false } },
+      })
+    ).toBe(true);
+  });
+
+  it("allows mount when body has shell chrome class", () => {
+    expect(
+      inboxSheetMountAllowed({
+        getElementById: () => null,
+        body: { classList: { contains: (c) => c === "has-shell-chrome" } },
+      })
+    ).toBe(true);
+  });
+
+  it("blocks mount on scan-only pages", () => {
+    expect(
+      inboxSheetMountAllowed({
+        getElementById: () => null,
+        body: { classList: { contains: () => false } },
+      })
+    ).toBe(false);
+  });
+});
 
 describe("inboxSheetReconcileAction", () => {
   it("does nothing when inbox sheet is expanded", () => {

@@ -28,7 +28,7 @@ import {
 } from "./scan-safety";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v26";
+export const SCAN_UI_VERSION = "pass-v27";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -67,10 +67,10 @@ export async function renderScanPage(
     <p class="scan-offline-banner" id="scan-offline-banner" role="status" hidden>${escapeHtml(SCAN_OFFLINE_BANNER_TEXT)}</p>
     <main class="screen scan-screen">
       ${renderScanHeroSection(vm, safety, origin, qrMarkup)}
-      ${renderScanTrustModules(vm, safety, origin)}
+      ${renderScanTrustModules(vm, safety)}
+      ${renderLimitsSettings(origin)}
       ${renderTrustGroups(vm, origin)}
       ${renderScanUrlControl(vm)}
-      ${renderLimitsSettings(origin)}
       ${renderFooter(vm, origin)}
     </main>
   </div>
@@ -375,17 +375,15 @@ function buildScanHeroMain(
   };
 }
 
-/** Zones D–E below hero (docs/M3_SCAN_PAGE_UI.md Phase 3). */
+/** Zone D below hero — what this scan shows (limits live in `renderLimitsSettings`). */
 function renderScanTrustModules(
   vm: ScanViewModel,
-  safety: ScanSafetyModel,
-  origin: string
+  safety: ScanSafetyModel
 ): string {
   if (vm.kind !== "active" || vm.minimalScan) return "";
   const proves = renderScanProvesModule(vm, safety);
-  const limits = renderScanDoesNotProveModule(origin);
-  if (!proves && !limits) return "";
-  return `<div class="scan-trust-modules scan-trust-layer">${proves}${limits}</div>`;
+  if (!proves) return "";
+  return `<div class="scan-trust-modules scan-trust-layer">${proves}</div>`;
 }
 
 function renderScanProvesModule(
@@ -409,15 +407,6 @@ function renderScanProvesModule(
   return `<section class="scan-proves" aria-label="What this scan shows">
   <h2 class="scan-module-label">What this scan shows</h2>
   <ul class="scan-proves-list">${rows}</ul>
-</section>`;
-}
-
-function renderScanDoesNotProveModule(origin: string): string {
-  const policy = `${origin}/data-policy.html`;
-  return `<section class="scan-does-not-prove" aria-label="What this scan does not prove">
-  <h2 class="scan-module-label">What this does not prove</h2>
-  <p class="scan-does-not-prove-lead">This scan does not prove ownership, legal identity, or that the person holding the item owns the card.</p>
-  <p class="scan-does-not-prove-more">See <a href="#scan-limits-settings">full limits</a> or the <a href="${escapeHtml(policy)}">operator data policy</a>.</p>
 </section>`;
 }
 
@@ -925,7 +914,7 @@ function renderVouchIssuanceScript(vm: ScanViewModel, origin: string): string {
 function renderScanTabKeysScript(vm: ScanViewModel, origin: string): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
   const assetOrigin = pagesJsOrigin(origin);
-  const mod = JSON.stringify(`${assetOrigin}/js/scan-tab-keys.mjs?v=2`);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-tab-keys.mjs?v=3`);
   return `<script type="module" src=${mod}></script>`;
 }
 

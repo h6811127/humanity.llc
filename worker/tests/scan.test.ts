@@ -228,11 +228,16 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("scan-safety-header");
     expect(html).toContain("scan-hero-limit");
     expect(html).toContain("scan-proves");
-    expect(html).toContain("scan-does-not-prove");
+    expect(html).not.toMatch(/class="scan-does-not-prove"/);
     expect(html).toContain("scan-trust-details");
     expect(html).toContain("scan-hero-qr-details");
     expect(html).toContain("scan-limits-settings");
     expect(html).toContain("What this scan does not prove");
+    const limitsIdx = html.indexOf('id="scan-limits-settings"');
+    const provesIdx = html.indexOf('class="scan-proves"');
+    expect(limitsIdx).toBeGreaterThan(-1);
+    expect(provesIdx).toBeGreaterThan(-1);
+    expect(limitsIdx).toBeGreaterThan(provesIdx);
     const bearerCount = html.split(BEARER_WARNING).length - 1;
     expect(bearerCount).toBe(1);
     expect(html).not.toContain("Does not prove");

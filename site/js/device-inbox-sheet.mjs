@@ -25,7 +25,10 @@ import { prefersReducedMotion } from "./device-shell-motion.mjs";
 import { closeGlancePopover } from "./device-hub-glance-popover.mjs";
 import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs?v=38";
 import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=38";
-import { inboxSheetReconcileAction } from "./device-inbox-sheet-core.mjs?v=38";
+import {
+  inboxSheetMountAllowed,
+  inboxSheetReconcileAction,
+} from "./device-inbox-sheet-core.mjs?v=38";
 import {
   bindSheetLifecycleReconcile,
   syncSheetBackdropClosed,
@@ -61,6 +64,7 @@ function getList() {
 }
 
 function ensureInboxSheetDom() {
+  if (!inboxSheetMountAllowed(document)) return;
   if (document.getElementById(SHEET_ID)) return;
 
   const backdrop = document.createElement("button");
@@ -315,10 +319,12 @@ function bindInboxSheetRefresh() {
   window.addEventListener(NETWORK_REFRESHED, refresh);
 }
 
-ensureInboxSheetDom();
-reconcileInboxSheetState();
-bindInboxSheetRefresh();
-bindSheetLifecycleReconcile(reconcileInboxSheetState);
+if (inboxSheetMountAllowed(document)) {
+  ensureInboxSheetDom();
+  reconcileInboxSheetState();
+  bindInboxSheetRefresh();
+  bindSheetLifecycleReconcile(reconcileInboxSheetState);
+}
 
 window.addEventListener("hc-inbox-sheet-close", () => {
   setInboxSheetOpen(false);

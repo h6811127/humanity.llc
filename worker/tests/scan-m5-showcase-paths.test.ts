@@ -83,18 +83,21 @@ async function renderActiveShowcaseScan(
   });
 }
 
-/** M5 / SCANNER_EXPERIENCE — shared stranger-path invariants. */
+/** M5 / SCANNER_EXPERIENCE - shared stranger-path invariants. */
 function expectM5StrangerScanBasics(html: string) {
   expect(SCAN_UI_VERSION).toMatch(/^pass-v2\d+$/);
   expect(html).not.toContain("This QR is active");
   expect(html).not.toContain('class="section-kicker">Network status');
   expect(html).toContain("scan-proves");
-  expect(html).toContain("scan-does-not-prove");
+  expect(html).not.toMatch(/class="scan-does-not-prove"/);
+  expect(html).toContain('id="scan-limits-settings"');
   expect(html.split(BEARER_WARNING).length - 1).toBe(1);
   const bearerIdx = html.indexOf(BEARER_WARNING);
   const provesIdx = html.indexOf('class="scan-proves"');
+  const limitsIdx = html.indexOf('id="scan-limits-settings"');
   expect(bearerIdx).toBeGreaterThan(-1);
   expect(provesIdx).toBeGreaterThan(bearerIdx);
+  expect(limitsIdx).toBeGreaterThan(provesIdx);
 }
 
 describe("M5 showcase scan paths", () => {
