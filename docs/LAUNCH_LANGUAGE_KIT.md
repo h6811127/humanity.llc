@@ -7,6 +7,8 @@
 
 **Merch-led tiers:** Tier 0 = proof of curiosity (open drop). Tier 1 = proof of belonging (personalized for card holders - not a protocol invite gate). See `docs/MERCH_LED_V1.md` and `docs/FOUNDING_DROP_BRIEF.md`.
 
+**Hosted steward (planning):** Optional paid steward infrastructure - not merch, not verification. Copy: § Hosted steward tier (planning copy) below; FAQ: [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md) § Is There A Paid Tier?
+
 ---
 
 ## Message Hierarchy
@@ -62,8 +64,43 @@ Do not use:
 - A decentralized passport.
 - A social credit alternative.
 - Verified forever.
+- Upgrade to see who scanned you.
+- Premium verification / Pro human / Verified+.
+- Always-on monitoring included.
+- Pay to get vouched faster or look more verified.
 
-These either overclaim, confuse the legal boundary, or attract the wrong expectations.
+These either overclaim, confuse the legal boundary, attract the wrong expectations, or misstate the hosted tier (capacity only, not surveillance).
+
+---
+
+## Hosted steward tier (planning copy)
+
+**Status:** Planning only - use when describing optional paid steward infrastructure, **not** at public launch unless the product is offered. Canonical product: [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md). Public answers: [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md) § Is There A Paid Tier?
+
+**Not the same as merch tiers:** Tier 0 / Tier 1 (founding drop) = curiosity and belonging on stickers. **Hosted steward** = optional subscription for higher automatic check budgets and live-proof alerts on cards you already own.
+
+### One-liners (approved)
+
+- Resolver truth when you look; automatic checks are opt-in and capped on the free reference network.
+- Hosted steward: higher limits and optional live-proof alerts for stewards who run many cards or events - not more surveillance, not stronger identity claims.
+- Pay for capacity and alerts, not for a verified badge.
+- Stranger pays urgency; steward pays intent - optional hosted plans add bounded automation, not wallet surveillance.
+
+### Short explainer (support / product page draft)
+
+> **Hosted steward** is optional infrastructure for people who steward many Humanity Cards or run events. It raises automatic check budgets and can notify you when someone nearby requests live proof. It does **not** change your verification label, show who scanned you, or require payment to create a card. Manual checks stay available on every tier.
+
+### Lines to avoid (hosted)
+
+Do not use:
+
+- Premium verification.
+- Upgrade to see who scanned your QR.
+- Always-on monitoring included.
+- Pro human / Verified+ / pay to prove you're real.
+- Unlimited surveillance for your wallet.
+
+See also [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) § What we never say.
 
 ---
 
@@ -389,7 +426,7 @@ That is the point.
 
 It is only a pointer to a live card status. Scan it, inspect it, and request live proof when the context needs more trust.
 
-**Steward devices:** Saving a card on a phone does not put the reference operator on the hook to poll that card forever. Network and live-proof checks are **when you look** or **when you opt in** — see [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
+**Steward devices:** Saving a card on a phone does not put the reference operator on the hook to poll that card forever. Network and live-proof checks are **when you look** or **when you opt in** — see [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md). Optional **hosted steward** plans (planning) add higher caps and alerts for power stewards only — not pay-to-verify; see [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md) § Is There A Paid Tier?
 
 Static objects should not pretend to be identity.
 
@@ -430,6 +467,14 @@ Yes, if it is careless. That is why vouches are limited, signed, revocable, dela
 ### "Is this political?"
 
 The card is practical. The politics live in the infrastructure commitments: no surveillance business model, user export, revocation rights, transparent governance, and limits on capital control.
+
+### "Is there a paid tier? Do I have to pay to be verified?"
+
+No paywall on creating a card. Optional **hosted steward** (when offered) is infrastructure for higher automatic check budgets and live-proof alerts - not stronger verification labels or scan analytics. Merch does not unlock it. See [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md) § Is There A Paid Tier?
+
+### "Isn't saving cards on my phone 24/7 monitoring?"
+
+No. Automatic checks are opt-in (watch for live proof), capped on the free reference network, and scoped to cards you open in the hub. Paid hosted raises caps for stewards who choose it - still not "who scanned you."
 
 ---
 

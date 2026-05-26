@@ -4,7 +4,8 @@
 **Purpose:** Prepare clear answers to the objections people are likely to raise when Humanity Commons is shared publicly.
 
 **Architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  
-**Direction:** `docs/DEMOCRATIC_INFRASTRUCTURE.md`
+**Direction:** `docs/DEMOCRATIC_INFRASTRUCTURE.md`  
+**Hosted tier (planning):** [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) · § Is There A Paid Tier? (this doc)
 
 ---
 
@@ -323,7 +324,55 @@ No.
 
 **Public launch** means anyone can create a card when Phase A ships. An optional early tester pool may help stress-test copy and support - it is not a gate, paid tier, or fake democracy.
 
-**Future “hosted steward” plans** (optional higher poll limits and live-proof alerts for power users) are **not** required to create a card, do **not** change verification labels, and must **not** add scan analytics. Planning only: [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md).
+For optional **hosted steward** plans (infrastructure for power stewards, not identity), see the next section.
+
+---
+
+## Is There A Paid Tier? What Does It Change?
+
+**Planning only** - not required to create a card, scan, vouch, or revoke. See [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md).
+
+### Short answer
+
+**No.** Paying does **not** buy a stronger human label, legal verification, or scan analytics. It is optional **steward infrastructure** on the reference operator: higher automatic check budgets, optional live-proof alerts, and published availability targets for people who run many cards or events.
+
+### What stays free forever (reference operator)
+
+- Create a signed card and QR credentials.
+- Public scan, vouch, revoke, live control when a stranger asks.
+- Manual **Check network** and **Check for live proof** in the device hub.
+- Same trust grammar and scan page for everyone.
+
+### What hosted steward adds (optional, when offered)
+
+- Higher caps on **opt-in** automatic checks (watch must still be on).
+- Optional **server notify** when a stranger requests live proof (not "who scanned you").
+- Published fair-use and SLA for paying stewards - not a 24/7 surveillance product.
+
+Pricing and governance defaults: [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md). Technical limits: [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md).
+
+### What we refuse to sell
+
+| Fear | Reality |
+|------|---------|
+| Paywall on identity | Card create stays public |
+| "Premium verified human" | Same labels; money buys capacity, not trust theater |
+| Scan analytics / "who viewed my QR" | Forbidden on every tier |
+| Always-on wallet monitoring | Even paid is bounded automation + fair use |
+| Merch unlocks hosted features | Shopify/Printify purchases do **not** grant hosted entitlements |
+
+### If I cancel hosted, do I lose my card?
+
+**No.** Cards, keys, vouches, and public scan keep working. You return to **free-tier** automatic check caps; manual checks remain. See M4 downgrade rules in [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) § Downgrade.
+
+### How is this different from founding cohort or merch tiers?
+
+| | Founding cohort / merch | Hosted steward |
+|---|-------------------------|----------------|
+| Purpose | Early testing, belonging, physical wedge | Steward ops at scale |
+| Required? | No | No |
+| Changes verification label? | No | No |
+| Tied to sticker purchase? | Merch is a pointer, not verification | No - separate subscription |
 
 ---
 
