@@ -38,6 +38,19 @@ describe("device-emphasis-card-html", () => {
     );
   });
 
+  it("landing framing uses info emphasis card and glass row link", () => {
+    const html = readFileSync(join(root, "site/index.html"), "utf8");
+    expect(html).toContain("hc-emphasis-card--info landing-framing");
+    expect(html).toContain("landing-cta-glass--row landing-framing-more-link");
+    expect(html).not.toContain('class="landing-framing-tab"');
+  });
+
+  it("styles import landing liquid glass near top", () => {
+    const styles = readFileSync(join(root, "site/styles.css"), "utf8");
+    const head = styles.slice(0, 400);
+    expect(head).toContain('@import url("./css/landing-liquid-glass.css")');
+  });
+
   it("hub card disabled-since-visit alert uses warn emphasis card", () => {
     const src = readFileSync(join(root, "site/js/device-hub-ui.mjs"), "utf8");
     expect(src).toContain("hc-emphasis-card--warn hub-card-status-alert");
@@ -69,5 +82,24 @@ describe("device-emphasis-card-html", () => {
     expect(html).toContain('class="hc-emphasis-card__cta" id="live-control-proof-btn"');
     expect(html).not.toContain("live-control-notification-inner");
     expect(html).not.toContain("live-control-notification-icon");
+  });
+
+  it("cross-tab banners use stacked layout for Safari (shell + scan)", () => {
+    const styles = readFileSync(join(root, "site/styles.css"), "utf8");
+    expect(styles).toMatch(
+      /\.device-cross-tab-banner\.hc-emphasis-card[\s\S]*flex-direction:\s*column/
+    );
+    expect(styles).toMatch(
+      /#wallet-tab-hint\.hc-emphasis-card[\s\S]*flex-direction:\s*column/
+    );
+
+    const scanPass = readFileSync(join(root, "site/scan-pass.css"), "utf8");
+    expect(scanPass).toMatch(
+      /\.scan-cross-tab-banner\.hc-emphasis-card[\s\S]*flex-direction:\s*column/
+    );
+
+    const emphasis = readFileSync(join(root, "site/css/hc-emphasis-card.css"), "utf8");
+    expect(emphasis).toContain("-webkit-appearance: none");
+    expect(emphasis).toContain(".hc-emphasis-card__actions > *");
   });
 });

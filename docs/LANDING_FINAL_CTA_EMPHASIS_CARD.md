@@ -23,7 +23,9 @@ The closing landing CTA (`.landing-final-cta`) used a **flat** pink wash + **1px
 | Fallback | `@supports not (backdrop-filter: blur(1px))` | Opaque white + red text — no invisible button |
 | Dark mode | Card via `theme-dark` emphasis fills; glass via scoped overrides | No per-card `color: var(--black)` hacks |
 
-**Out of scope:** Hero primary buttons, trust chips, disclosure cards — only the final CTA block.
+**Also shipped:** **Physical software objects** (`.landing-framing`) as `hc-emphasis-card--info` with a nested **What else can a QR do?** glass row (`.landing-cta-glass--row`). Hero primary uses `.landing-cta-glass--prominent`. Shared tokens: `site/css/landing-liquid-glass.css` (iOS 26 Liquid Glass–inspired: gradient fill, `blur(20px) saturate(180%)`, specular inset rim).
+
+**Out of scope:** Trust chips, disclosure cards, `what-can-a-qr-do.html` tab rows (still flat `.landing-framing-tab`).
 
 ---
 
@@ -64,16 +66,24 @@ Footer line stays **outside** `__actions` (muted disclaimer, not a card CTA).
 
 ---
 
-## Glass CTA tokens (landing-only)
+## Glass CTA tokens (`landing-liquid-glass.css`)
 
-| Layer | Light | Dark |
-|-------|-------|------|
-| Fill | `rgba(255, 255, 255, 0.42)` + `backdrop-filter: blur(14px)` | `rgba(255, 255, 255, 0.14)` + blur |
-| Rim | `inset 0 1px 0 rgba(255,255,255,0.75)` | softer inset |
-| Lift | `0 2px 4px rgba(219,27,67,0.12)`, `0 6px 16px rgba(219,27,67,0.18)` | reduced opacity |
-| Label | `var(--red)` | `var(--red)` |
+| Modifier | Use |
+|----------|-----|
+| `.landing-cta-glass` | Base frost + specular `::before` / rim `::after` |
+| `.landing-cta-glass--prominent` | Hero **Create a live object** (red wash, white label) |
+| `.landing-cta-glass--row` | Framing **What else can a QR do?** link row |
 
-`prefers-reduced-transparency: reduce` — disable blur; use opaque fallback.
+| Layer | Light | Dark (`theme-dark.css`) |
+|-------|-------|-------------------------|
+| Fill | White gradient + `blur(20px) saturate(180%)` | Low-alpha white gradient |
+| Rim | `inset` highlight + `0.5px` border | Softer inset |
+| Lift | Brand-tinted outer shadow | Deeper neutral shadow |
+| Label | `var(--red)` (pill) / title fg (row) | Same |
+
+`prefers-reduced-transparency: reduce` and no `backdrop-filter` — opaque fallback in `landing-liquid-glass.css`.
+
+**Final CTA spacing:** `.landing-final-cta.hc-emphasis-card` uses ~half default card padding/gap (`7px 12px`, `gap: 6px 8px`; foot `margin-top: 7px`).
 
 ---
 

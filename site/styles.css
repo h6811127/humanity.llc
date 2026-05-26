@@ -1,5 +1,6 @@
 /* humanity.llc  -  iOS grouped UI, light. #DB1B43 · #000 · #fff · #b8b8b8 */
 @import url("./css/hc-emphasis-card.css");
+@import url("./css/landing-liquid-glass.css");
 
 :root {
   --red: #db1b43;
@@ -1093,7 +1094,6 @@ body.page-flow.has-shell-chrome .page > main.screen {
   width: 100%;
   max-width: none;
   justify-content: flex-end;
-  gap: 8px;
 }
 
 .hub-card-status-alert .hc-emphasis-card__cta {
@@ -1504,39 +1504,40 @@ a.hub-card-menu-item {
   margin-top: 10px;
 }
 
-.landing-framing {
-  padding: 18px 20px;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(219, 27, 67, 0.32);
-  background: var(--white);
-  box-shadow:
-    0 10px 32px rgba(219, 27, 67, 0.1),
-    0 1px 4px rgba(0, 0, 0, 0.04);
+/* Landing framing — hc-emphasis-card--info (see docs/LANDING_FINAL_CTA_EMPHASIS_CARD.md) */
+.landing-framing.hc-emphasis-card {
+  flex-direction: column;
+  align-items: stretch;
+  text-align: left;
+  margin-top: 8px;
 }
 
-.landing-framing .section-kicker {
-  margin-bottom: 8px;
-}
-
-.landing-framing-title {
-  margin: 0 0 10px;
+.landing-framing .hc-emphasis-card__title.landing-framing-title {
   font-size: 22px;
-  font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.15;
-  color: var(--black);
 }
 
-.landing-framing-lead {
-  margin: 0 0 14px;
+.landing-framing .hc-emphasis-card__detail.landing-framing-lead {
+  margin: 0;
   font-size: 15px;
   line-height: 1.5;
-  color: var(--grey);
 }
 
 .landing-framing-lead strong {
   font-weight: 600;
-  color: var(--black);
+  color: var(--hc-emphasis-card-title-fg);
+}
+
+.landing-framing-lead a {
+  color: var(--red);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.landing-framing-more-link {
+  flex-shrink: 0;
 }
 
 .landing-framing-list {
@@ -5627,11 +5628,27 @@ details[open] > .created-advanced-summary::after {
 .device-cross-tab-banner.hc-emphasis-card,
 #wallet-tab-hint.hc-emphasis-card {
   margin: 0 0 14px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
 }
 
 .device-cross-tab-banner.hc-emphasis-card {
   margin-left: var(--pad);
   margin-right: var(--pad);
+}
+
+/* Safari flex-wrap + narrow column — match scan (docs/SCAN_CROSS_TAB_BANNER_SAFARI_LAYOUT_INVESTIGATION.md) */
+.device-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__main,
+#wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__main {
+  flex: none;
+  width: 100%;
+}
+
+.device-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__actions,
+#wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__actions {
+  width: 100%;
+  justify-content: flex-start;
 }
 
 .hc-notice-actions {
@@ -5880,6 +5897,10 @@ a.wallet-pin-open {
   transform: scale(0.99);
 }
 
+.landing-hero-btn.landing-cta-glass {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
 .landing-hero-btn-secondary {
   background: var(--white);
   border: 1px solid rgba(0, 0, 0, 0.14);
@@ -5986,9 +6007,15 @@ a.wallet-pin-open {
 /* Landing final CTA — hc-emphasis-card (docs/LANDING_FINAL_CTA_EMPHASIS_CARD.md) */
 .landing-final-cta.hc-emphasis-card {
   margin: 0;
+  padding: 7px 12px;
+  gap: 6px 8px;
   flex-direction: column;
   align-items: stretch;
   text-align: left;
+}
+
+.landing-final-cta .hc-emphasis-card__main {
+  gap: 10px;
 }
 
 .landing-final-cta .hc-emphasis-card__title.landing-final-cta-title {
@@ -6014,8 +6041,8 @@ a.wallet-pin-open {
   flex: 1;
   min-width: 100%;
   max-width: 22em;
-  min-height: 50px;
-  padding: 14px 18px;
+  min-height: 46px;
+  padding: 11px 16px;
   font-size: 16px;
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -6025,43 +6052,10 @@ a.wallet-pin-open {
 
 .landing-final-cta .landing-cta-glass {
   color: var(--red);
-  background: rgba(255, 255, 255, 0.42);
-  border: 0.5px solid rgba(255, 255, 255, 0.72);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.82),
-    inset 0 -1px 2px rgba(219, 27, 67, 0.08),
-    0 2px 4px rgba(219, 27, 67, 0.1),
-    0 8px 22px rgba(219, 27, 67, 0.16);
-  -webkit-backdrop-filter: blur(14px) saturate(1.2);
-  backdrop-filter: blur(14px) saturate(1.2);
-}
-
-.landing-final-cta .landing-cta-glass:active {
-  opacity: 0.92;
-  transform: scale(0.98);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.7),
-    0 1px 3px rgba(219, 27, 67, 0.12);
-}
-
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .landing-final-cta .landing-cta-glass {
-    background: rgba(255, 255, 255, 0.94);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .landing-final-cta .landing-cta-glass {
-    background: rgba(255, 255, 255, 0.94);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
 }
 
 .landing-final-cta-foot {
-  margin: 14px 0 0;
+  margin: 7px 0 0;
   font-size: 13px;
   line-height: 1.4;
   color: var(--grey);

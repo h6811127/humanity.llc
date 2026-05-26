@@ -867,19 +867,47 @@ html[data-theme="dark"] .landing-how-it-works-lead strong {
   color: var(--shell-label-strong);
 }
 
-html[data-theme="dark"] .landing-final-cta .landing-cta-glass {
+html[data-theme="dark"] .landing-cta-glass {
   color: var(--red);
-  background: rgba(255, 255, 255, 0.14);
+  background: linear-gradient(
+    155deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.08) 48%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
   border-color: rgba(255, 255, 255, 0.22);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.2),
-    0 4px 14px rgba(0, 0, 0, 0.35);
+    inset 0 -1px 2px rgba(0, 0, 0, 0.22),
+    0 4px 16px rgba(0, 0, 0, 0.38);
+}
+
+html[data-theme="dark"] .landing-cta-glass--prominent {
+  color: #fff;
+  background: linear-gradient(
+    155deg,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(219, 27, 67, 0.55) 55%,
+    rgba(180, 20, 52, 0.72) 100%
+  );
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+html[data-theme="dark"] .landing-cta-glass--row {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .landing-framing-more-title {
+  color: var(--shell-label-strong);
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  html[data-theme="dark"] .landing-final-cta .landing-cta-glass {
+  html[data-theme="dark"] .landing-cta-glass {
     background: rgba(44, 44, 46, 0.96);
+  }
+
+  html[data-theme="dark"] .landing-cta-glass--prominent {
+    background: var(--red);
   }
 }
 

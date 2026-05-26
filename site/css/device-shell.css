@@ -1990,22 +1990,12 @@ body.device-hub-sheet-open .shell-status-dot {
   }
 }
 
-.landing-framing--compact {
-  margin-top: 8px;
-}
-
-.landing-framing--compact .landing-framing-title {
+.landing-framing--compact .hc-emphasis-card__title.landing-framing-title {
   font-size: 17px;
-  margin-bottom: 6px;
 }
 
-.landing-framing--compact .landing-framing-lead {
+.landing-framing--compact .hc-emphasis-card__detail.landing-framing-lead {
   font-size: 15px;
-  margin-bottom: 12px;
-}
-
-.landing-framing--compact .landing-framing-actions {
-  margin-top: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
