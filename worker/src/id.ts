@@ -29,3 +29,7 @@ export function generateLiveControlChallengeId(): string {
 export function generateVerifierSessionId(): string {
   return `vs_${randomBase58(18)}`;
 }
+
+export function generateStewardPushConnectionId(): string {
+  return `conn_${randomBase58(16)}`;
+}

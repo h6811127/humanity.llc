@@ -109,6 +109,19 @@ export async function profileLinkedAccount(
   return row?.account_id ?? null;
 }
 
+export async function accountHasLinkedProfile(
+  db: D1Database,
+  accountId: string
+): Promise<boolean> {
+  const row = await db
+    .prepare(
+      `SELECT 1 AS ok FROM steward_account_profiles WHERE account_id = ? LIMIT 1`
+    )
+    .bind(accountId)
+    .first();
+  return !!row;
+}
+
 export async function stewardLinkNonceUsed(
   db: D1Database,
   nonce: string

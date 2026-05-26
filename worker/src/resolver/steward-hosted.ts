@@ -1,11 +1,17 @@
 import { jsonResponseWithWeakEtag } from "../http/conditional-json";
-import { errorResponse, jsonResponse, OPERATOR_ID } from "../http/resolver";
+import {
+  clientIp,
+  errorResponse,
+  jsonResponse,
+  OPERATOR_ID,
+} from "../http/resolver";
 import type { Env } from "../index";
 import {
   hostedStewardEnabled,
   STEWARD_SESSION_TTL_MS,
 } from "../steward/config";
 import {
+  accountHasLinkedProfile,
   getSessionByTokenHash,
   insertSession,
   linkProfileToAccount,
@@ -16,6 +22,12 @@ import {
   upsertAccount,
   getUsageCount,
 } from "../steward/db";
+import {
+  createStewardPushSseResponse,
+  STEWARD_PUSH_MAX_CONNECTIONS_PER_ACCOUNT,
+  stewardPushConnectionCount,
+  stewardPushIpAtLimit,
+} from "../steward/push";
 import { verifyStewardAccountLink } from "../steward/link-proof";
 import { parseEntitlementsJson, utcDayKey } from "../steward/plans";
 import {
@@ -328,8 +340,13 @@ export async function handleGetStewardEntitlements(
   });
 }
 
+function acceptsStewardPushSse(request: Request): boolean {
+  const accept = request.headers.get("Accept") ?? "";
+  return accept.includes("text/event-stream");
+}
+
 /**
- * GET /.well-known/hc/v1/steward/push — E4 (not implemented).
+ * GET /.well-known/hc/v1/steward/push — E4b SSE subscribe.
  */
 export async function handleGetStewardPush(
   request: Request,
@@ -339,11 +356,38 @@ export async function handleGetStewardPush(
   const gate = await requireStewardReady(env, db);
   if (gate) return gate;
 
+  if (!acceptsStewardPushSse(request)) {
+    return errorResponse(
+      "NOT_ACCEPTABLE",
+      "Accept must include text/event-stream.",
+      406
+    );
+  }
+
   const auth = await authenticateSession(db, request);
   if (!auth.ok) return auth.response;
 
   const resolved = await resolveEffectiveEntitlements(db, auth.account_id);
-  if (!resolved?.entitlements["notify.push.live_proof"]) {
+  if (!resolved) {
+    return errorResponse("NOT_FOUND", "Account not found.", 404);
+  }
+
+  const { account, entitlements } = resolved;
+  if (account.status !== "active" && account.status !== "trialing") {
+    return errorResponse(
+      "FORBIDDEN",
+      "Push not available for this account status.",
+      403
+    );
+  }
+  if (entitlements["steward.hosted"] !== true) {
+    return errorResponse(
+      "FORBIDDEN",
+      "Hosted steward plan required for push.",
+      403
+    );
+  }
+  if (entitlements["notify.push.live_proof"] !== true) {
     return errorResponse(
       "FORBIDDEN",
       "Push not entitled for this account.",
@@ -351,9 +395,39 @@ export async function handleGetStewardPush(
     );
   }
 
-  return errorResponse(
-    "not_implemented",
-    "Steward push (SSE) ships in epic E4.",
-    501
-  );
+  if (!(await accountHasLinkedProfile(db, auth.account_id))) {
+    return errorResponse(
+      "FORBIDDEN",
+      "Link at least one card profile before subscribing to push.",
+      403
+    );
+  }
+
+  if (
+    stewardPushConnectionCount(auth.account_id) >=
+    STEWARD_PUSH_MAX_CONNECTIONS_PER_ACCOUNT
+  ) {
+    return errorResponse(
+      "steward_push_connection_limit",
+      "Too many concurrent push connections for this account.",
+      429,
+      { "Retry-After": "60" }
+    );
+  }
+
+  const ip = clientIp(request);
+  if (stewardPushIpAtLimit(ip)) {
+    return errorResponse(
+      "steward_push_ip_limit",
+      "Too many concurrent push connections from this network.",
+      429,
+      { "Retry-After": "60" }
+    );
+  }
+
+  return createStewardPushSseResponse(request, {
+    accountId: auth.account_id,
+    deviceId: auth.device_id,
+    clientIp: ip,
+  });
 }
