@@ -21,6 +21,7 @@ import {
   type GovernanceProcessUrls,
 } from "./scan-governance";
 import { scanContractErrorForKind } from "./scan-contract-error";
+import { guardScanResponse, scanRedirectQueryBlocked } from "./scan-redirect-guard";
 import { BEARER_WARNING } from "./trust-copy";
 import { humanTrustDisplay } from "./verification-display";
 
@@ -147,20 +148,36 @@ export async function handleGetScanStatus(
   const qrRaw = url.searchParams.get("q");
   const qrId = qrRaw?.trim() ?? null;
 
+  if (scanRedirectQueryBlocked(url)) {
+    return guardScanResponse(
+      request,
+      statusResponse(malformedScanView(profileId, qrId, origin))
+    );
+  }
+
   if (!PROFILE_ID_REGEX.test(profileId)) {
-    return statusResponse(malformedScanView(profileId, qrId, origin));
+    return guardScanResponse(
+      request,
+      statusResponse(malformedScanView(profileId, qrId, origin))
+    );
   }
 
   if (qrRaw !== null) {
     if (!qrId) {
-      return statusResponse(malformedScanView(profileId, null, origin));
+      return guardScanResponse(
+        request,
+        statusResponse(malformedScanView(profileId, null, origin))
+      );
     }
     if (!QR_ID_REGEX.test(qrId)) {
-      return statusResponse(malformedScanView(profileId, qrId, origin));
+      return guardScanResponse(
+        request,
+        statusResponse(malformedScanView(profileId, qrId, origin))
+      );
     }
     const ctx = await loadScanContext(db, profileId, qrId);
     const vm = buildScanViewModel(profileId, qrId, ctx, origin);
-    return statusResponse(vm);
+    return guardScanResponse(request, statusResponse(vm));
   }
 
   const card = await db
@@ -186,7 +203,7 @@ export async function handleGetScanStatus(
   }
 
   const vm = buildCardOnlyScanViewModel(profileId, card ?? null, verification, origin);
-  return statusResponse(vm);
+  return guardScanResponse(request, statusResponse(vm));
 }
 
 const MALFORMED_HINT =

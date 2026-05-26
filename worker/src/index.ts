@@ -27,6 +27,7 @@ import { handlePostCardUpdate } from "./resolver/update-card";
 import { handlePostRotateQr } from "./resolver/rotate-qr";
 import { handlePostExtendQr } from "./resolver/extend-qr";
 import { handleGetScan } from "./resolver/scan";
+import { handleGetScanOut } from "./resolver/scan-out";
 import { handleGetQrMetadata } from "./resolver/qr-metadata";
 import { handleGetScanStatus } from "./resolver/scan-status";
 import { handlePostVouch } from "./resolver/vouch";
@@ -42,6 +43,8 @@ export interface Env {
   DB: D1Database;
   /** Bearer token for operator-only audit routes; set via wrangler secret. */
   OPERATOR_AUDIT_TOKEN?: string;
+  /** HMAC secret for /c/…/out interstitial tokens; defaults to local dev key only. */
+  SCAN_OUT_HMAC_SECRET?: string;
 }
 
 export default {
@@ -369,6 +372,18 @@ export default {
         return jsonResponse({ error: "database_unconfigured" }, 503);
       }
       return handleGetCard(env.DB, cardMatch[1]!, request);
+    }
+
+    const scanOutMatch = path.match(/^\/c\/([^/]+)\/out$/);
+    if (scanOutMatch && request.method === "GET") {
+      if (!env.DB) {
+        return htmlResponse(
+          "<!DOCTYPE html><html><body><p>Resolver database unavailable.</p></body></html>",
+          503,
+          { "Cache-Control": "no-store" }
+        );
+      }
+      return handleGetScanOut(request, env.DB, scanOutMatch[1]!, env);
     }
 
     const scanMatch = path.match(/^\/c\/([^/]+)$/);

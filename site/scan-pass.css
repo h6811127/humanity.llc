@@ -1570,6 +1570,48 @@ body {
   padding: 0;
 }
 
+/* Phase E: external link interstitial (/c/…/out) */
+.scan-out-panel {
+  max-width: 28rem;
+  margin: 1.5rem auto 0;
+}
+
+.scan-out-domain {
+  color: var(--brand, #db1b43);
+}
+
+.scan-out-warning {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: rgba(60, 60, 67, 0.88);
+  background: rgba(255, 193, 7, 0.12);
+  border: 0.5px solid rgba(255, 149, 0, 0.35);
+}
+
+.scan-out-target {
+  margin: 10px 0 0;
+  font-size: 12px;
+  word-break: break-all;
+  color: rgba(60, 60, 67, 0.55);
+}
+
+.scan-out-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.scan-out-actions .dock-btn-primary,
+.scan-out-actions .dock-btn-secondary {
+  flex: 1 1 8rem;
+  text-align: center;
+  text-decoration: none;
+}
+
 /* Flat status panel (not a flippable ID-style card) */
 .scan-status-panel {
   border-radius: 18px;

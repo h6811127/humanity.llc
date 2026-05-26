@@ -11,6 +11,7 @@ import {
   QR_ID_REGEX,
   type ScanViewModel,
 } from "./scan-state";
+import { guardScanResponse, scanRedirectQueryBlocked } from "./scan-redirect-guard";
 
 const CHALLENGE_ID_REGEX =
   /^lc_[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{12,40}$/;
@@ -24,32 +25,59 @@ export async function handleGetScan(
 ): Promise<Response> {
   const origin = requestOrigin(request);
   const url = new URL(request.url);
+
+  if (scanRedirectQueryBlocked(url)) {
+    const qrRaw = url.searchParams.get("q");
+    const vm = malformedScanView(
+      profileId,
+      qrRaw?.trim() ?? null,
+      origin
+    );
+    return guardScanResponse(
+      request,
+      htmlResponse(await renderScanPage(vm, origin), 400, {
+        "Cache-Control": vm.cacheControl,
+        "X-HC-Scan-UI": SCAN_UI_VERSION,
+        "X-HC-Scan-Redirect-Blocked": "query",
+      })
+    );
+  }
+
   const qrRaw = url.searchParams.get("q");
   const qrId = qrRaw?.trim() ?? null;
   const liveChallengeId = url.searchParams.get("live_challenge")?.trim() ?? null;
 
   if (!PROFILE_ID_REGEX.test(profileId)) {
     const vm = malformedScanView(profileId, qrId, origin);
-    return htmlResponse(await renderScanPage(vm, origin), 400, {
-      "Cache-Control": vm.cacheControl,
-      "X-HC-Scan-UI": SCAN_UI_VERSION,
-    });
+    return guardScanResponse(
+      request,
+      htmlResponse(await renderScanPage(vm, origin), 400, {
+        "Cache-Control": vm.cacheControl,
+        "X-HC-Scan-UI": SCAN_UI_VERSION,
+      })
+    );
   }
 
   if (!qrId) {
     const vm = malformedScanView(profileId, null, origin);
-    return htmlResponse(await renderScanPage(vm, origin), 400, {
-      "Cache-Control": vm.cacheControl,
-      "X-HC-Scan-UI": SCAN_UI_VERSION,
-    });
+    return guardScanResponse(
+      request,
+      htmlResponse(await renderScanPage(vm, origin), 400, {
+        "Cache-Control": vm.cacheControl,
+        "X-HC-Scan-UI": SCAN_UI_VERSION,
+      })
+    );
   }
 
   if (!QR_ID_REGEX.test(qrId)) {
     const vm = malformedScanView(profileId, qrId, origin);
-    return htmlResponse(await renderScanPage(vm, origin), 400, {
-      "Cache-Control": vm.cacheControl,
-      "X-HC-Scan-UI": SCAN_UI_VERSION,
-    });
+    return guardScanResponse(
+      request,
+      htmlResponse(await renderScanPage(vm, origin), 400, {
+        "Cache-Control": vm.cacheControl,
+        "X-HC-Scan-UI": SCAN_UI_VERSION,
+      })
+    );
   }
 
   const ctx = await loadScanContext(env, profileId, qrId);
@@ -67,13 +95,16 @@ export async function handleGetScan(
 
   const safety = await buildScanSafetyModel(ctx, vm);
 
-  return htmlResponse(
-    await renderScanPage(vm, origin, safety),
-    httpStatusForScanKind(vm.kind),
-    {
-      "Cache-Control": vm.cacheControl,
-      "X-HC-Scan-UI": SCAN_UI_VERSION,
-    }
+  return guardScanResponse(
+    request,
+    htmlResponse(
+      await renderScanPage(vm, origin, safety),
+      httpStatusForScanKind(vm.kind),
+      {
+        "Cache-Control": vm.cacheControl,
+        "X-HC-Scan-UI": SCAN_UI_VERSION,
+      }
+    )
   );
 }
 

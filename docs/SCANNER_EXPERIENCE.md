@@ -207,6 +207,8 @@ Scanners should learn:
 
 **Enforcement (Phase C):** `validateOfficialScanUrl` / `assertOfficialScanUrl` in `site/js/qr-scan-url-lock.mjs`; wired into `qr-render.mjs`, `qr-branding.mjs` (`renderHumanityQrFrameToCanvas`), `scan-qr.ts`, and `resolveScanUrl()`. Tests: `worker/tests/qr-scan-url-lock.test.ts`.
 
+**Enforcement (Phase E):** `GET /c/{profile_id}/out?t=…` interstitial (`worker/src/resolver/scan-out.ts`); HMAC tokens in `scan-out-token.ts`; `guardScanResponse` + blocked redirect query params in `scan-redirect-guard.ts`. Continue only via `&go=1` after explicit tap. Tests: `worker/tests/scan-out.test.ts`.
+
 ---
 
 ## Visual anti-patterns (scan surface)
@@ -231,10 +233,10 @@ From [`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md)—do 
 | **B** | Scanner safety header, session “first seen,” status strip reorder | Over-trust, unclear revoke — **shipped** |
 | **C** | Host-lock lint in tests + generator docs | Malicious payloads — **shipped** (`site/js/qr-scan-url-lock.mjs`) |
 | **D** | Print sticker SVG template (50.8 mm trim + bleed) | Physical impersonation — **shipped** (`site/js/qr-print-sticker.mjs`) |
-| **E** | `/c/…/out` interstitial + redirect ban in Worker | Weaponized branding |
+| **E** | `/c/…/out` interstitial + redirect ban in Worker | Weaponized branding — **shipped** (`scan-out.ts`, `scan-redirect-guard.ts`) |
 | **F** | Short credential code on print + optional verifier app | Supply-chain / advanced fakes |
 
-Phases **A–D** are shipped; **E** (`/c/…/out` interstitial + redirect ban) is next. **E** is mandatory before any external destination feature.
+Phases **A–E** are shipped; **F** (short credential code on print) is next. **E** remains mandatory before any external destination product feature ships.
 
 ---
 
@@ -253,7 +255,7 @@ Show mixed QRs at phone distance; target &lt;1s Humanity identification without 
 ### Automated checks
 
 ```bash
-npm run worker:test -- worker/tests/scan-qr-branding.test.ts worker/tests/scan.test.ts worker/tests/scan-safety.test.ts worker/tests/qr-scan-url-lock.test.ts worker/tests/qr-print-sticker.test.ts
+npm run worker:test -- worker/tests/scan-qr-branding.test.ts worker/tests/scan.test.ts worker/tests/scan-safety.test.ts worker/tests/qr-scan-url-lock.test.ts worker/tests/qr-print-sticker.test.ts worker/tests/scan-out.test.ts
 ```
 
 ---
@@ -265,6 +267,8 @@ npm run worker:test -- worker/tests/scan-qr-branding.test.ts worker/tests/scan.t
 | Scan HTML | `worker/src/resolver/scan-html.ts` |
 | Scan URL host lock | `site/js/qr-scan-url-lock.mjs` |
 | Print sticker template | `site/js/qr-print-sticker.mjs`, `renderPrintStickerFromScanUrl` in `scan-qr.ts` |
+| External link interstitial | `worker/src/resolver/scan-out.ts`, `scan-out-token.ts`, `scan-out-html.ts` |
+| Redirect ban | `worker/src/resolver/scan-redirect-guard.ts` |
 | Scanner safety header | `worker/src/resolver/scan-safety.ts` |
 | View model | `worker/src/resolver/scan-state.ts` |
 | Status JSON | `worker/src/resolver/scan-status.ts` |
