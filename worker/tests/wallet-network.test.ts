@@ -10,7 +10,11 @@ import {
   normalizeBaselineState,
   shouldShowCardDisabledSinceVisitAlert,
 } from "../../site/js/wallet-network-baseline.mjs";
-import { mergeLastSeenFromNetworkMap } from "../../site/js/device-wallet-network-core.mjs";
+import {
+  mergeLastSeenFromNetworkMap,
+  shouldUseCachedNetworkStatus,
+  WALLET_NETWORK_CACHE_TTL_MS,
+} from "../../site/js/device-wallet-network-core.mjs";
 
 describe("card-disabled since-visit copy", () => {
   it("uses card-disabled wording, not generic revoked", () => {
@@ -114,6 +118,52 @@ describe("shouldShowCardDisabledSinceVisitAlert (DH-1)", () => {
       shouldShowCardDisabledSinceVisitAlert("active", "active", {
         resolverConfirmed: true,
       })
+    ).toBe(false);
+  });
+});
+
+describe("stale cache + active fetch (Slice 4 integration)", () => {
+  const profileId = "p_stale_cache";
+
+  it("bypasses stale card_revoked cache when baseline is active, then hides since-visit alert", () => {
+    const now = 1_000_000;
+    const cached = {
+      status: "active",
+      scanKind: "card_revoked",
+      at: now,
+    };
+    const lastSeen = { [profileId]: "active" };
+
+    expect(
+      shouldUseCachedNetworkStatus(lastSeen, profileId, cached, now, WALLET_NETWORK_CACHE_TTL_MS)
+    ).toBe(false);
+
+    const pollAlertState = alertStateForNetworkPoll("active", "active");
+    const pollScanKind = "active";
+    const resolverConfirmed = true;
+
+    expect(pollAlertState).toBe("active");
+    expect(
+      cardDisabledSinceVisitVisible(
+        pollAlertState,
+        lastSeen[profileId],
+        pollScanKind,
+        resolverConfirmed
+      )
+    ).toBe(false);
+
+    const nextBaseline = mergeLastSeenFromNetworkMap(
+      { [profileId]: pollAlertState },
+      lastSeen
+    );
+    expect(nextBaseline[profileId]).toBe("active");
+  });
+
+  it("does not show alert from stale cache alone (pre-fetch / baseline-changed guard)", () => {
+    const staleAlert = alertStateForNetworkPoll("card_revoked", "active");
+    expect(staleAlert).toBe(CARD_REVOKED_ALERT_STATE);
+    expect(
+      cardDisabledSinceVisitVisible(staleAlert, "active", "card_revoked", false)
     ).toBe(false);
   });
 });

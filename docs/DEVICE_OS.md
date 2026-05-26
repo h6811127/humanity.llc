@@ -241,7 +241,7 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 **Cache:** Session cache (~5 min, `sessionStorage.hc_wallet_network_cache`, includes `scanKind`) is bypassed when it says `card_revoked` but the device baseline still says non-revoked — the hub re-fetches from the resolver before showing the alert. A fresh non-revoked fetch always updates the baseline (self-heal).
 
-**Clear:** **Got it**, **Open controls**, or **Manage** records the current alert baseline (`active` or `card_revoked`) as seen and dispatches `hc-wallet-network-baseline-changed` so hub rows and glance re-apply without a full re-render. Leaving the page (`pagehide` / tab hidden) snapshots all cached alert states for the next visit. Returning to the tab re-fetches network status for saved rows so stale alerts can clear.
+**Clear:** **Got it**, **Open controls**, or **Manage** records the current alert baseline (`active` or `card_revoked`) as seen and dispatches `hc-wallet-network-baseline-changed` so hub rows and glance re-apply from the **latest resolver-confirmed** poll (not session cache alone). Leaving the page (`pagehide` / tab hidden) snapshots resolver-confirmed alert states from this visit when a poll has completed. Returning to the tab re-fetches network status for saved rows so stale alerts can clear.
 
 ---
 

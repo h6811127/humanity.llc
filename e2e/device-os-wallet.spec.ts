@@ -84,6 +84,58 @@ test.describe("device OS wallet flow", () => {
     ).toBeHidden();
   });
 
+  test("does not show banner when stale session cache says card_revoked but resolver is active", async ({
+    page,
+  }) => {
+    await page.addInitScript(({ profileId, qrId }) => {
+      const now = Date.now();
+      localStorage.setItem(
+        "hc_wallet_last_seen_network",
+        JSON.stringify({ [profileId]: "active" })
+      );
+      sessionStorage.setItem(
+        "hc_wallet_network_cache",
+        JSON.stringify({
+          [profileId]: {
+            status: "active",
+            scanKind: "card_revoked",
+            verificationLabel: null,
+            verificationState: null,
+            at: now,
+          },
+        })
+      );
+    }, {
+      profileId: SAMPLE_WALLET_ENTRY.profile_id,
+      qrId: SAMPLE_WALLET_ENTRY.qr_id,
+    });
+
+    await page.route("**/.well-known/hc/v1/cards/**/status**", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          version: "1.0",
+          resolver: { operator: "humanity.llc", version: "1.0" },
+          scan: {
+            kind: "active",
+            profile_id: SAMPLE_WALLET_ENTRY.profile_id,
+            qr_id: SAMPLE_WALLET_ENTRY.qr_id,
+            card: { status: "active", handle: "e2etest", manifesto_line: "Test line" },
+            verification: { state: "registered", label: "Registered" },
+            human_trust: { label: "Registered", subtitle: "", pill_active: false },
+          },
+        }),
+      });
+    });
+
+    await page.goto("/wallet/");
+    await expect(page.getByText("Live State Active")).toBeVisible();
+    await expect(
+      page.getByText("Card disabled on the network since your last visit.")
+    ).toBeHidden();
+  });
+
   test("contextless /created/ redirects to My cards home", async ({ page }) => {
     await page.goto("/created/");
     await expect(page).toHaveURL(/\/wallet\/$/);
