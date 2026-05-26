@@ -42,10 +42,17 @@ import {
   snapshotNetworkSeenOnExit,
   syncLastSeenFromNetworkMap,
 } from "./device-wallet-network.mjs";
+import { getCardStatusUrl } from "./hc-sign.mjs";
 import {
   humanTrustIconMeta,
+  isEligibleVoucherState,
   verificationTrustChip,
 } from "./human-trust-ui.mjs";
+import {
+  clearDefaultVouchIfProfile,
+  isDefaultVouchProfile,
+  setDefaultVouchProfile,
+} from "./vouch-ready-keys.mjs";
 import {
   CARD_DISABLED_SINCE_VISIT_ALERT_TEXT,
   CARD_DISABLED_SINCE_VISIT_SEARCH_SNIPPET,
@@ -196,6 +203,9 @@ function hubCardSubHtml(entry, lastUsed) {
   if (keyPreview) detailParts.push(`Key: ${escapeHtml(keyPreview)}`);
   if (handle) detailParts.push(escapeHtml(handle));
   if (idPreview) detailParts.push(escapeHtml(idPreview));
+  if (entry.profile_id && isDefaultVouchProfile(entry.profile_id)) {
+    detailParts.push("Default for vouching");
+  }
 
   if (!savedLabel && detailParts.length === 0) {
     return `<span class="list-sub">${escapeHtml(walletEntrySubtitle(entry))}</span>`;
@@ -554,6 +564,15 @@ function renderSavedRows() {
           <div class="hub-card-menu-panel">
             <a class="hub-card-menu-item hub-manage" href="${escapeHtml(manage)}">Manage</a>
             <button type="button" class="hub-card-menu-item hub-relabel" data-id="${escapeHtml(entry.id)}">Relabel</button>
+            ${
+              entry.owner_private_key_b58
+                ? `<button type="button" class="hub-card-menu-item hub-default-vouch" data-id="${escapeHtml(entry.id)}">${
+                    isDefaultVouchProfile(entry.profile_id)
+                      ? "Default for vouching ✓"
+                      : "Set as default for vouching"
+                  }</button>`
+                : ""
+            }
             <button type="button" class="hub-card-menu-item hub-remove" data-id="${escapeHtml(entry.id)}">Remove from device</button>
           </div>
         </details>`;
@@ -609,6 +628,59 @@ function renderSavedRows() {
     });
   });
 
+  savedList.querySelectorAll(".hub-default-vouch").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-id");
+      const entry = loadWallet().find((e) => e.id === id);
+      if (!entry?.profile_id) return;
+
+      if (isDefaultVouchProfile(entry.profile_id)) {
+        setDefaultVouchProfile(null);
+        logDeviceActivity("default_vouch_clear", entry.label, {
+          profile_id: entry.profile_id,
+        });
+        renderSavedRows();
+        notifyHubChanged();
+        return;
+      }
+
+      if (!entry.owner_private_key_b58) {
+        window.alert("This saved card has no signing keys on this device.");
+        return;
+      }
+
+      let state = getCachedVerification(entry.profile_id)?.state ?? null;
+      if (!isEligibleVoucherState(state)) {
+        try {
+          const res = await fetch(
+            getCardStatusUrl(String(entry.profile_id), entry.qr_id ?? null),
+            { cache: "no-store" }
+          );
+          if (res.ok) {
+            const body = await res.json();
+            state = body?.scan?.verification?.state ?? null;
+          }
+        } catch {
+          /* ignore */
+        }
+      }
+
+      if (!isEligibleVoucherState(state)) {
+        window.alert(
+          "Only Steward or Vouched Human cards can be set as default for vouching."
+        );
+        return;
+      }
+
+      setDefaultVouchProfile(entry.profile_id);
+      logDeviceActivity("default_vouch_set", entry.label, {
+        profile_id: entry.profile_id,
+      });
+      renderSavedRows();
+      notifyHubChanged();
+    });
+  });
+
   savedList.querySelectorAll(".hub-relabel").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-id");
@@ -634,6 +706,7 @@ function renderSavedRows() {
         return;
       }
       if (entry) {
+        clearDefaultVouchIfProfile(entry.profile_id);
         logDeviceActivity("remove_card", entry.label, {
           profile_id: entry.profile_id,
           qr_id: entry.qr_id ?? null,

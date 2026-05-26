@@ -1,7 +1,8 @@
 /**
  * V-002  -  vouch issuance on scan page when viewer has hc_created keys.
  */
-import { activateWalletEntry } from "./device-keys.mjs";
+import { logDeviceActivity } from "./device-activity.mjs";
+import { activateWalletEntry, clearTabSessionKeys } from "./device-keys.mjs";
 import {
   DEFAULT_VOUCH_STATEMENT,
   getCardStatusUrl,
@@ -13,6 +14,11 @@ import {
   humanTrustIconMeta,
   isEligibleVoucherState,
 } from "./human-trust-ui.mjs";
+import {
+  getDefaultVouchProfileId,
+  isDefaultVouchProfile,
+  isVouchAutoActivateEnabled,
+} from "./vouch-ready-keys.mjs";
 
 const VOUCHER_WAIT_DAYS = 90;
 const VOUCH_THRESHOLD = 3;
@@ -30,9 +36,12 @@ function rememberVouchReturnUrl() {
 }
 
 function loadKeysHelpHtml(walletUrl) {
+  const defaultHint = getDefaultVouchProfileId()
+    ? ` Set or change your default on <a href="${walletUrl}">Saved cards</a> (⋯ menu → <strong>Default for vouching</strong>).`
+    : "";
   return (
     `You can also open <a href="${walletUrl}">Saved cards</a> and tap <strong>Use keys</strong> ` +
-    `(opens <code>/created/</code>), then return to this scan in the same tab.`
+    `(opens <code>/created/</code>), then return to this scan in the same tab.${defaultHint}`
   );
 }
 
@@ -80,6 +89,33 @@ function setStatus(msg, tone = "neutral") {
   if (!statusEl) return;
   statusEl.textContent = msg;
   statusEl.dataset.tone = tone;
+}
+
+function clearVouchStopButton() {
+  document.getElementById("vouch-stop-keys")?.remove();
+}
+
+function mountVouchStopButton(voucherLabel) {
+  const panel = statusEl?.parentElement;
+  if (!panel) return;
+
+  let stop = document.getElementById("vouch-stop-keys");
+  if (!stop) {
+    stop = document.createElement("button");
+    stop.type = "button";
+    stop.id = "vouch-stop-keys";
+    stop.className = "vouch-stop-keys";
+    stop.textContent = "Stop using keys in this tab";
+    stop.addEventListener("click", () => {
+      clearTabSessionKeys();
+      clearVouchStopButton();
+      runVouchFlow();
+    });
+    panel.appendChild(stop);
+  }
+
+  const hint = voucherLabel ? ` · ${voucherLabel}` : "";
+  setStatus(`Keys active on this device${hint}. Ready when you've met this person in person.`);
 }
 
 function plainVouchError(code, fallback) {
@@ -149,11 +185,13 @@ function showIneligible(message) {
   if (success) success.hidden = true;
   if (ineligible) ineligible.hidden = false;
   if (ineligibleCopy) ineligibleCopy.textContent = message;
+  clearVouchStopButton();
 }
 
 function showSuccess(verification) {
   if (interactive) interactive.hidden = true;
   if (ineligible) ineligible.hidden = true;
+  clearVouchStopButton();
   if (success) success.hidden = false;
   if (successCopy) {
     const count = verification?.vouch_count ?? 0;
@@ -175,6 +213,7 @@ function clearExplainerActions() {
 function hideExplainer() {
   if (explainer) explainer.hidden = true;
   clearExplainerActions();
+  clearVouchStopButton();
 }
 
 /**
@@ -266,6 +305,44 @@ async function findEligibleWalletVouchers(voucheeProfileId) {
   );
 
   return eligible;
+}
+
+/**
+ * @param {string} voucheeProfileId
+ * @returns {Promise<boolean>}
+ */
+async function tryAutoActivateDefaultVouchKeys(voucheeProfileId) {
+  if (!isVouchAutoActivateEnabled()) return false;
+
+  const defaultId = getDefaultVouchProfileId();
+  if (!defaultId || defaultId === voucheeProfileId) return false;
+
+  const entry = loadWallet().find((e) => e.profile_id === defaultId);
+  if (!entry?.owner_private_key_b58 || !entry?.owner_public_key_b58) {
+    return false;
+  }
+
+  try {
+    const res = await fetch(
+      getCardStatusUrl(String(entry.profile_id), entry.qr_id ?? null),
+      { cache: "no-store" }
+    );
+    if (!res.ok) return false;
+    const body = await res.json();
+    const state = body?.scan?.verification?.state;
+    if (!isEligibleVoucherState(state)) return false;
+    if (body?.scan?.card?.status !== "active") return false;
+  } catch {
+    return false;
+  }
+
+  activateWalletEntry(entry);
+  logDeviceActivity(
+    "auto_activate_vouch_keys",
+    entry.label || entry.handle || String(entry.profile_id).slice(0, 12),
+    { profile_id: entry.profile_id, qr_id: entry.qr_id ?? null }
+  );
+  return true;
 }
 
 /**
@@ -393,7 +470,7 @@ function bindSubmitHandler(voucheeProfileId) {
   });
 }
 
-async function runVouchFlow() {
+async function runVouchFlow(opts = {}) {
   if (!row) return;
 
   const voucheeProfileId = row.dataset.voucheeProfileId?.trim();
@@ -404,11 +481,20 @@ async function runVouchFlow() {
   if (success) success.hidden = true;
   if (ineligible) ineligible.hidden = true;
 
-  const session = loadSession();
-  const hasKeys =
+  let session = loadSession();
+  let hasKeys =
     session?.profile_id &&
     session?.owner_private_key_b58 &&
     session?.owner_public_key_b58;
+
+  if (!hasKeys && !opts.autoActivateAttempted) {
+    const activated = await tryAutoActivateDefaultVouchKeys(voucheeProfileId);
+    if (activated) {
+      return runVouchFlow({ autoActivateAttempted: true });
+    }
+    await showNoKeysExplainer(voucheeProfileId);
+    return;
+  }
 
   if (!hasKeys) {
     await showNoKeysExplainer(voucheeProfileId);
@@ -465,8 +551,14 @@ async function runVouchFlow() {
   });
   const toneHint =
     voucherState === "steward" ? "Steward on the network" : "Vouched Human on the network";
-  setStatus(
-    `Keys active on this device · ${toneHint}. Ready when you've met this person in person.`
+  const autoLoaded =
+    opts.autoActivateAttempted && isDefaultVouchProfile(voucherProfileId);
+  const voucherDisplay =
+    session.handle ? `@${session.handle}` : session.wallet_label || toneHint;
+  mountVouchStopButton(
+    autoLoaded
+      ? `Vouching as ${voucherDisplay} (auto-loaded)`
+      : `Keys active · ${toneHint}`
   );
 
   bindSubmitHandler(voucheeProfileId);

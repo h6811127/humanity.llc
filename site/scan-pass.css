@@ -1049,6 +1049,24 @@ a {
   text-align: center;
 }
 
+.vouch-stop-keys {
+  display: block;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #3a3a3c;
+  background: transparent;
+  border: 1px solid rgba(60, 60, 67, 0.2);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.vouch-stop-keys:hover {
+  background: rgba(60, 60, 67, 0.06);
+}
+
 .vouch-card-hint a {
   color: #0a84ff;
   font-weight: 600;

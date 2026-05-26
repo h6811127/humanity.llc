@@ -722,7 +722,7 @@ function vouchIssuanceGroupRows(vm: ScanViewModel): string {
 function renderVouchIssuanceScript(vm: ScanViewModel, origin: string): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
   const assetOrigin = pagesJsOrigin(origin);
-  const mod = JSON.stringify(`${assetOrigin}/js/vouch-issue.mjs?v=6`);
+  const mod = JSON.stringify(`${assetOrigin}/js/vouch-issue.mjs?v=7`);
   return `<script type="module" src=${mod}></script>`;
 }
 

@@ -1,6 +1,6 @@
 # Vouch-ready keys (design draft)
 
-**Status:** Phase 1 shipped (Use keys here on scan); Phases 2–4 not implemented  
+**Status:** Phases 1–3 shipped (Use keys here, wallet default, scan auto-activate, Stop); Phase 4 cross-tab polish deferred  
 **Audience:** Product, security review, implementers  
 **Related:** [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md), [`M6_VOUCHING_DESIGN.md`](M6_VOUCHING_DESIGN.md), [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)
 
@@ -162,9 +162,9 @@ Network eligibility should reuse `getCardStatusUrl` + `isEligibleVoucherState` (
 | Phase | Deliverable | Tests |
 |-------|-------------|-------|
 | **1** | **Use keys here** on scan explainer (`activateWalletEntry` + re-init, no `navigateTo`) | Shipped (`vouch-issue.mjs?v=6`, `vouch-explainer-actions`) |
-| **2** | Wallet toggle + `hc_default_vouch_profile_id` | device-wallet unit tests |
-| **3** | Opt-in auto-activate on scan init | vouch-issue integration; no activate when 2+ eligible without default |
-| **4** | “Stop” + cross-tab notice when auto-activated | device-cross-tab-banner cases |
+| **2** | Wallet **Default for vouching** + `hc_default_vouch_profile_id` | Shipped (`vouch-ready-keys.mjs`, hub ⋯ menu) |
+| **3** | Opt-in auto-activate on scan when default set | Shipped (`vouch-issue.mjs?v=7`) |
+| **4** | “Stop” on scan + cross-tab notice when auto-activated | Stop shipped; cross-tab notice deferred |
 
 Worker/API: **no change** for phases 1–3.
 

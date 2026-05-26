@@ -14,6 +14,16 @@ export function getTabSession() {
   }
 }
 
+/** Clear signing keys from this tab only (saved wallet rows unchanged). */
+export function clearTabSessionKeys() {
+  try {
+    sessionStorage.removeItem("hc_created");
+  } catch {
+    /* ignore */
+  }
+  window.dispatchEvent(new Event("hc-device-hub-changed"));
+}
+
 /** @param {Record<string, unknown>} entry */
 export function activateWalletEntry(entry) {
   sessionStorage.setItem(

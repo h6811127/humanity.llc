@@ -21,7 +21,7 @@ function isRepeatOfLatest(entries, entry) {
   return prev.label === entry.label;
 }
 
-/** @typedef {'saved'|'use_keys'|'remove_card'|'pin_added'|'backup_import'|'live_control'} ActivityType */
+/** @typedef {'saved'|'use_keys'|'remove_card'|'pin_added'|'backup_import'|'live_control'|'auto_activate_vouch_keys'|'default_vouch_set'|'default_vouch_clear'} ActivityType */
 
 /**
  * @param {ActivityType} type
@@ -96,6 +96,9 @@ export function activityTypeLabel(type) {
     pin_added: "Pinned scan link",
     backup_import: "Imported backup",
     live_control: "Signed live proof",
+    auto_activate_vouch_keys: "Auto-loaded vouch keys",
+    default_vouch_set: "Default for vouching",
+    default_vouch_clear: "Cleared vouch default",
   };
   return labels[type] ?? "Action on device";
 }
