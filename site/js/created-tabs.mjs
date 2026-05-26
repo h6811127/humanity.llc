@@ -2,7 +2,7 @@
  * Segmented tabs for /created/ (Tasks · Advanced).
  */
 
-const TAB_IDS = ["now", "manage"];
+const TAB_IDS = ["now", "advanced"];
 
 /**
  * @returns {{ select: (tabId: string) => void }}
@@ -41,12 +41,14 @@ export function initCreatedTabs() {
 
   const hash = location.hash.replace(/^#/, "");
   if (hash === "revoke-rules") {
-    select("manage");
+    select("advanced");
     requestAnimationFrame(() => {
       document.getElementById("revoke-rules")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   } else {
-    select(TAB_IDS.includes(hash) ? hash : "now");
+    // Keep old #manage links working.
+    const normalized = hash === "manage" ? "advanced" : hash;
+    select(TAB_IDS.includes(normalized) ? normalized : "now");
   }
 
   return { select };

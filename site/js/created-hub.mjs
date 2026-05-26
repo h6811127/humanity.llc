@@ -10,8 +10,8 @@ initDeviceHub({
 });
 
 document.getElementById("created-hub-manage-tab")?.addEventListener("click", () => {
-  document.getElementById("created-tab-btn-manage")?.click();
-  document.getElementById("created-tab-manage")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  document.getElementById("created-tab-btn-advanced")?.click();
+  document.getElementById("created-tab-advanced")?.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
 window.addEventListener("hc-created-go-now-tab", () => {

@@ -192,7 +192,7 @@ function enterControlWorkspace() {
 }
 
 function revealOwnerActions() {
-  createdTabs?.select("manage");
+  createdTabs?.select("advanced");
   if (revokeDetails && !revokeDetails.open) revokeDetails.open = true;
 }
 
@@ -472,9 +472,8 @@ function applyOrganizerHandoffUi(session) {
 }
 
 if (!profileId && !activeQrId && !data) {
-  setNoSessionNotice(
-    'No active card in this tab. Open <a href="/wallet/">Saved cards</a> to pick a card, then tap <strong>Open controls</strong> or <strong>Open card</strong>.'
-  );
+  // Route contextless visits to the My cards home.
+  location.replace("/wallet/");
 } else if (!profileId || !activeQrId) {
   setNoSessionNotice(
     "Missing profile or QR in this link. Create a new card, or open the full URL from your create confirmation."
@@ -690,7 +689,7 @@ if (activeScanUrl) {
       if (workspaceMode === "setup") return;
       if (openScanBtn.getAttribute("target") === "_blank") return;
       e.preventDefault();
-      createdTabs?.select("manage");
+      createdTabs?.select("advanced");
       if (revokeDetails && !revokeDetails.open) {
         revokeDetails.open = true;
       }
