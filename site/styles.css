@@ -7494,12 +7494,6 @@ body.device-shell-created .flow-keys-group .list-row {
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
 }
 
-.live-control-proof-requested {
-  border-color: rgba(219, 27, 67, 0.35);
-  background: rgba(219, 27, 67, 0.06);
-  box-shadow: 0 10px 32px rgba(219, 27, 67, 0.12);
-}
-
 .created-vouch-return {
   margin: 0 0 12px;
   padding: 14px 16px;
@@ -7529,60 +7523,31 @@ body.device-shell-created .flow-keys-group .list-row {
   text-decoration: none;
 }
 
-.live-control-notification {
+/* Live proof panel — hc-emphasis-card--urgent (docs/HC_EMPHASIS_CARD_ROLLOUT.md Phase 3) */
+#live-control-proof.hc-emphasis-card {
   margin-bottom: 4px;
+  flex-direction: column;
+  align-items: stretch;
 }
 
-.live-control-notification-inner {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 14px 16px;
-  border-radius: 16px;
-  border: 1px solid rgba(219, 27, 67, 0.22);
-  background: rgba(219, 27, 67, 0.05);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-}
-
-.live-control-notification-icon {
-  flex-shrink: 0;
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--white);
-  background: var(--red);
-}
-
-.live-control-notification-icon svg {
-  width: 18px;
-  height: 18px;
-}
-
-.live-control-notification-body {
-  flex: 1;
-  min-width: 0;
-}
-
-.live-control-notification-title {
-  margin: 0 0 6px;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--black);
-}
-
-.live-control-notification-copy {
-  margin: 0 0 12px;
-  font-size: 15px;
-  line-height: 1.45;
-  color: var(--black);
-}
-
-.live-control-notification-btn {
+#live-control-proof .hc-emphasis-card__actions {
   width: 100%;
+  max-width: none;
+  justify-content: stretch;
+}
+
+#live-control-proof .hc-emphasis-card__cta {
+  flex: 1;
+  min-width: 100%;
+  text-align: center;
+}
+
+#live-control-proof .live-control-notification-status {
+  margin: 8px 0 0;
+}
+
+#live-control-proof.live-control-proof-requested .hc-emphasis-card__dot--urgent {
+  box-shadow: 0 0 0 4px rgba(255, 59, 48, 0.32);
 }
 
 .created-what-now-title {

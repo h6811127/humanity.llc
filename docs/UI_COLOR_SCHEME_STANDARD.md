@@ -174,7 +174,7 @@ Prioritized places that could adopt the same **raised card** pattern. Extraction
 
 | Surface | Selector / ID | Today | Fit |
 |---------|----------------|-------|-----|
-| Live proof waiting | `.live-control-notification` | Red-tinted box + border + icon tile | Strong candidate for `--urgent` variant + pill **Prove live** |
+| Live proof waiting | `#live-control-proof` | **Shipped** — `hc-emphasis-card--urgent` + pill **Prove control now** (Phase 3) |
 | No session / view mode | `#no-session` `.hc-notice--warning` | Flat hc-notice | Setup/unlock path benefits from raised card + CTA |
 | Owner revoked | `#owner-revoked-banner` | Flat `hc-notice--error` | `--urgent`; ensure never empty (see revoke investigations) |
 | Vouch return | `#created-vouch-return-banner` | (check markup) | Post-vouch continuity message |

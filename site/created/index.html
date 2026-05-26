@@ -18,9 +18,9 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="/styles.css?v=106" />
+    <link rel="stylesheet" href="/styles.css?v=107" />
     <link rel="stylesheet" href="/css/device-shell.css?v=48" />
-    <link rel="stylesheet" href="/css/theme-dark.css?v=16" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=17" />
   </head>
   <body class="has-device-hub-search device-shell-created">
     <div class="page">
@@ -136,26 +136,28 @@
         </section>
 
         <section
-          class="live-control-notification"
+          class="hc-emphasis-card hc-emphasis-card--urgent live-control-notification"
           id="live-control-proof"
           hidden
           aria-live="polite"
+          role="status"
         >
-          <div class="live-control-notification-inner">
-            <span class="live-control-notification-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            </span>
-            <div class="live-control-notification-body">
-              <p class="live-control-notification-title">Prove live control</p>
-              <p class="live-control-notification-copy" id="live-control-proof-lead">
+          <div class="hc-emphasis-card__main">
+            <span class="hc-emphasis-card__dot hc-emphasis-card__dot--urgent" aria-hidden="true"></span>
+            <div class="hc-emphasis-card__copy">
+              <p class="hc-emphasis-card__eyebrow">Live proof</p>
+              <p class="hc-emphasis-card__title">Prove live control</p>
+              <p class="hc-emphasis-card__detail" id="live-control-proof-lead">
                 Someone nearby scanned your QR and asked for live proof. Sign once from this
                 key-holding device  -  it does not reveal legal identity or create a badge.
               </p>
-              <button type="button" class="btn-primary live-control-notification-btn" id="live-control-proof-btn">
-                Prove control now
-              </button>
-              <p class="form-status" id="live-control-proof-status" role="status"></p>
+              <p class="form-status live-control-notification-status" id="live-control-proof-status" role="status"></p>
             </div>
+          </div>
+          <div class="hc-emphasis-card__actions">
+            <button type="button" class="hc-emphasis-card__cta" id="live-control-proof-btn">
+              Prove control now
+            </button>
           </div>
         </section>
 

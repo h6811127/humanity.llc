@@ -1,6 +1,6 @@
 # Emphasis card rollout (`hc-emphasis-card`)
 
-**Status:** Phase 0–2 shipped · Phase 3 next  
+**Status:** Phase 0–3 shipped · Phase 4 next  
 **Visual standard:** [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Emphasis notice cards  
 **Primary CSS:** `site/styles.css`, `site/css/theme-dark.css`
 
@@ -74,7 +74,7 @@ See [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Typography c
 | **0** | Extract `.hc-emphasis-card` + four modifiers; migrate `#wallet-active-banner` markup/classes; Vitest guard | **Shipped** |
 | **1** | `#wallet-tab-hint` → `--info` / `--warn` card; `#device-cross-tab-banner` on `/wallet/` + `/` (`device-cross-tab-banner.mjs`) | **Shipped** |
 | **2** | `#scan-cross-tab-banner` (`scan-pass.css` + `device-cross-tab-banner.mjs`) | **Shipped** |
-| **3** | `.live-control-notification` on `/created/` → `--urgent` | Planned |
+| **3** | `.live-control-notification` on `/created/` → `--urgent` | **Shipped** |
 | **4** | Create custody + revoke / no-session `hc-notice` → `--warn` / `--urgent` | Planned |
 | **5** | `.hub-card-status-alert` inset `--warn` (optional) | Planned |
 
@@ -105,7 +105,15 @@ See [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Typography c
 
 **Acceptance:** Scan cross-tab banner matches wallet/landing raised card; blue bordered box removed; dot overlay still synced with banner visibility.
 
-### Phase 3–5
+### Phase 3 — shipped (created live proof)
+
+| Surface | File(s) | Shipped as |
+|---------|---------|------------|
+| `#live-control-proof` | `site/created/index.html`, `site/styles.css` | `hc-emphasis-card hc-emphasis-card--urgent`; eyebrow **Live proof**, title **Prove live control**, pill **Prove control now**; `live-control-proof-requested` highlights urgent dot |
+
+**Acceptance:** No red-tinted bordered box or lock icon tile; shadow-only depth; dark mode uses shared emphasis tokens.
+
+### Phase 4–5
 
 See tier tables in [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Rollout candidates.
 

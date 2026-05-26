@@ -130,9 +130,7 @@ html[data-theme="dark"] .created-print-steps {
 html[data-theme="dark"] .device-hub-title,
 html[data-theme="dark"] .wallet-page-title,
 html[data-theme="dark"] .landing-device-settings-title,
-html[data-theme="dark"] .created-loop-label,
-html[data-theme="dark"] .live-control-notification-title,
-html[data-theme="dark"] .live-control-notification-copy {
+html[data-theme="dark"] .created-loop-label {
   color: var(--shell-label-strong);
 }
 
@@ -632,12 +630,6 @@ html[data-theme="dark"] .created-copy-id {
   background: rgba(255, 77, 109, 0.12);
   border-color: rgba(255, 77, 109, 0.35);
   color: var(--red);
-}
-
-html[data-theme="dark"] .live-control-notification-inner {
-  background: rgba(255, 77, 109, 0.1);
-  border-color: rgba(255, 77, 109, 0.28);
-  box-shadow: none;
 }
 
 html[data-theme="dark"] .created-what-now-compact {
