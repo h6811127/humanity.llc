@@ -2,6 +2,10 @@
  * Tier 0 shop  -  checkout handoff or local interest until Shopify URL is set.
  */
 import { isTier0CheckoutOpen, loadShopConfig, tier0Display } from "./shop-config.mjs";
+import {
+  SHOP_CHECKOUT_READY_LEAD,
+  shopPriceLabelWhenCheckoutClosed,
+} from "./shop-copy-core.mjs";
 
 const INTEREST_KEY = "hc_shop_drop_interest";
 
@@ -12,6 +16,7 @@ const buyBtn = document.getElementById("shop-buy-btn");
 const buyBtnFooter = document.getElementById("shop-buy-btn-footer");
 const notifyBtn = document.getElementById("shop-notify-btn");
 const checkoutNote = document.getElementById("shop-checkout-note");
+const checkoutLead = document.getElementById("shop-checkout-lead");
 const heroPrimary = document.getElementById("shop-hero-primary");
 const interestForm = document.getElementById("shop-interest-form");
 const emailInput = document.getElementById("shop-interest-email");
@@ -95,13 +100,17 @@ function showCheckout(display, checkoutUrl) {
     heroPrimary.classList.add("landing-hero-btn-primary");
     heroPrimary.classList.remove("landing-hero-btn-secondary");
   }
+  if (checkoutLead) {
+    checkoutLead.textContent = SHOP_CHECKOUT_READY_LEAD;
+    checkoutLead.hidden = false;
+  }
   if (checkoutSection) checkoutSection.hidden = false;
   if (interestSection) interestSection.hidden = true;
 }
 
 function showInterestPending(display) {
   if (priceEl) {
-    priceEl.textContent = display.price ? `${display.price} · checkout soon` : "Checkout opening soon";
+    priceEl.textContent = shopPriceLabelWhenCheckoutClosed(display.price);
     priceEl.classList.remove("shop-product-price--live");
   }
   setBuyButtonsVisible(false);
@@ -114,6 +123,10 @@ function showInterestPending(display) {
     heroPrimary.removeAttribute("rel");
     heroPrimary.classList.add("landing-hero-btn-primary");
     heroPrimary.classList.remove("landing-hero-btn-secondary");
+  }
+  if (checkoutLead) {
+    checkoutLead.textContent = "";
+    checkoutLead.hidden = true;
   }
   if (checkoutSection) checkoutSection.hidden = true;
   if (interestSection) interestSection.hidden = false;

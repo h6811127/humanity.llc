@@ -107,6 +107,8 @@ Resolver health at test time: `GET /.well-known/hc/v1/health` → `{"status":"ok
 
 ### P1-2 · Shop: contradictory checkout messaging
 
+**Status (2026-05-26):** Fix shipped — “Ready to order” copy injected only when checkout is open (`shop-copy-core.mjs`, `shop.mjs?v=3`); pending HTML shell has no stale checkout-ready text.
+
 **Config:** `site/data/shop-config.json` → `checkout_open: false`, `checkout_url: ""`.
 
 **Actual (JS correct, HTML stale)**
