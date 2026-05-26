@@ -15,6 +15,7 @@ import { tabNoticeCount } from "./device-counts.mjs";
 import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { prefersReducedMotion } from "./device-shell-motion.mjs";
 import { closeGlancePopover } from "./device-hub-glance-popover.mjs";
+import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs";
 
 const SHEET_ID = "device-inbox-sheet";
 const LIST_ID = "device-inbox-sheet-list";
@@ -71,6 +72,7 @@ function ensureInboxSheetDom() {
       <button type="button" class="device-inbox-sheet-close" aria-label="Close">×</button>
       <h2 class="device-inbox-sheet-title">Needs attention</h2>
       <ul class="device-inbox-sheet-list list list-compact" id="${LIST_ID}"></ul>
+      <div class="device-inbox-sheet-footer" id="device-inbox-sheet-footer" hidden></div>
     </div>`;
 
   sheet.querySelector(".device-inbox-sheet-close")?.addEventListener("click", () => {
@@ -151,11 +153,13 @@ export function renderInboxSheet() {
   const rows = sheetRows();
   list.innerHTML = "";
 
+  const footer = document.getElementById("device-inbox-sheet-footer");
   if (rows.length === 0) {
     const empty = document.createElement("li");
     empty.className = "device-inbox-sheet-empty";
     empty.textContent = "Nothing needs attention right now.";
     list.appendChild(empty);
+    if (footer) footer.hidden = true;
     return;
   }
 
@@ -191,6 +195,14 @@ export function renderInboxSheet() {
     });
 
     list.appendChild(li);
+  }
+
+  if (footer) {
+    const hasLiveProof = rows.some((r) => r.kind === "live_proof");
+    footer.hidden = !hasLiveProof;
+    if (hasLiveProof) {
+      syncBrowserNotifPrompts();
+    }
   }
 }
 

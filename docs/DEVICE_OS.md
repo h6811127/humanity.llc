@@ -108,7 +108,7 @@ Same chrome on **landing**, **`/created/`**, and **`/wallet/`**:
 | Piece | Module | Notes |
 |-------|--------|-------|
 | Status line + dot + inbox badge | `device-status.mjs` | Dot → hub; badge → alerts (planned: inbox sheet). See [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
-| Background alerts (live proof) | `device-browser-notifications.mjs` | Opt-in `hc_browser_notif`; OS notify when tab hidden |
+| Background alerts (live proof) | `device-browser-notifications.mjs` | Contextual opt-in strip + OS notify when tab hidden; click → `/created/` sign URL |
 | Hub body | `device-hub-ui.mjs` | Saved, pins, notice, activity, search, import |
 | Hub glance | `device-hub-glance.mjs` | Landing only; visible when hub collapsed |
 | Wallet / activity / keys | `device-wallet.mjs`, `device-activity.mjs`, `device-keys.mjs` | |
@@ -196,7 +196,7 @@ Small TLC items that need **no new resolver APIs**:
 
 | Item | Notes |
 |------|--------|
-| Browser notifications when live proof is waiting | ✅ Shipped v1 — see [`DEVICE_INBOX.md`](DEVICE_INBOX.md) for v2 roadmap |
+| Browser notifications when live proof is waiting | ✅ v2 phases A–B — see [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
 | Unified device inbox core + inbox sheet | Planned — [`DEVICE_INBOX.md`](DEVICE_INBOX.md) phases 1–3 |
 | Glance on `/wallet/` | Landing popover only; wallet uses scroll-to-saved chrome |
 | Light frontend tests | Vitest (`worker/tests/device-*`) + Playwright smoke (`e2e/device-os-wallet.spec.ts`) |

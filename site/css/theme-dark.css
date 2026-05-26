@@ -98,6 +98,11 @@ html[data-theme="dark"] .device-inbox-sheet-close {
   color: var(--shell-label);
 }
 
+html[data-theme="dark"] .device-browser-notif-prompt {
+  background: rgba(255, 255, 255, 0.06);
+  border: 0.5px solid var(--shell-separator);
+}
+
 html[data-theme="dark"] .device-hub-sheet-handle {
   background: rgba(255, 255, 255, 0.22);
 }

@@ -136,9 +136,18 @@ Spec: [`DEVICE_INBOX.md`](DEVICE_INBOX.md).
 
 ---
 
-## P3 — Device inbox unification (planned — not yet QA)
+## P3 — Background alerts (phase 4)
 
-When [`DEVICE_INBOX.md`](DEVICE_INBOX.md) phases 1–4 ship, add:
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Saved card + pending live proof, tab visible, alerts not enabled | Opt-in strip in hub/wallet alerts; compact strip in inbox sheet footer |
+| 2 | Tap **Turn on background alerts** | Permission prompt; `hc_browser_notif` on when granted |
+| 3 | Tap **Not now** | Strip hidden; `hc_browser_notif_prompt_dismissed` set |
+| 4 | Hide tab with proof still pending | OS notification title = card label; tap opens `/created/` sign URL |
+
+## P4 — Device inbox unification (planned — not yet QA)
+
+When [`DEVICE_INBOX.md`](DEVICE_INBOX.md) phase 5–6 ship, add:
 
 | Step | Action | Expected |
 |------|--------|----------|

@@ -152,7 +152,7 @@ See [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 - Tag: `hc-live-proof` (replaces prior notification).
 - Click: focus window → `/wallet/`.
 
-**Planned:** see [Background alerts roadmap](#background-alerts-roadmap) below.
+See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shipped).
 
 ---
 
@@ -168,19 +168,19 @@ See [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 | Permission | Requested on toggle enable in settings |
 | Limitation | Requires a background tab; **no Service Worker** — fully closed browser may not alert |
 
-### v2 Phase A — Contextual opt-in (highest ROI)
+### v2 Phase A — Contextual opt-in (shipped)
 
-- On **first** live proof while tab visible: inline strip in hub alerts (not modal):  
-  *“Someone is waiting for live proof. Get an alert when this tab is in the background?”*  
-  `[Turn on background alerts]` · `[Not now]`
-- Permission tied to understood benefit; if denied, link to browser settings + rely on inbox badge.
-- Duplicate control in inbox sheet footer (same toggle semantics).
+- While tab visible and live proof pending (not already opted in): inline strip at top of `#device-hub-alerts-top` / `#wallet-alerts-top`, plus compact copy in inbox sheet footer (`device-browser-notifications.mjs`).
+- Copy: *“Someone is waiting for live proof. Get an alert when this tab is in the background?”* · `[Turn on background alerts]` · `[Not now]`
+- **Not now** sets `localStorage.hc_browser_notif_prompt_dismissed`.
+- If permission denied: blocked copy; inbox badge remains fallback.
+- Landing **Browser alerts** toggle unchanged (`data-device-browser-notif-toggle`).
 
-### v2 Phase B — Smarter payload
+### v2 Phase B — Smarter payload (shipped)
 
-- Title: card label; body: “Live proof waiting · tap to sign”.
-- `notificationclick` → deep link to `/created/?profile_id&qr_id&live_challenge&return_url` for **first** pending item (not generic `/wallet/`).
-- Optional `requireInteraction: true` only for first proof in a session.
+- OS notification **title** = card label; **body** = “Live proof waiting · tap to sign”.
+- Click → `buildLiveControlProofHref()` for first pending challenge (sign on `/created/`, not `/wallet/`).
+- First OS notification per session may use `requireInteraction` (`sessionStorage.hc_browser_notif_os_interact`).
 
 ### v2 Phase C — Policy matrix
 
@@ -230,7 +230,7 @@ See [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 | 1 | `device-inbox-core.mjs` — `buildInboxItems()`, `inboxCountFromItems()`, `topInboxKind()` | ✅ |
 | 2 | Refactor `notificationCount()`, glance, dot overlay, badge ARIA to use core | ✅ (hub alert DOM still in `device-hub-ui.mjs`; same scroll targets) |
 | 3 | Inbox sheet from `#shell-notif-badge`; shared `openInboxFromChrome()` | ✅ |
-| 4 | Contextual browser-alert prompt + OS click deep link | Planned |
+| 4 | Contextual browser-alert prompt + OS click deep link | ✅ |
 | 5 | Badge/dot chroma sync to `topInboxKind()` | Planned |
 | 6 | E2E: proof → badge → row; Playwright `Notification` permission | Planned |
 
@@ -264,7 +264,9 @@ Confusion signal: repeated `inbox_open` without `inbox_item_action` → copy or 
 |------|------|
 | `site/js/device-status.mjs` | Dot, badge count, `openNotificationsFromChrome()` |
 | `site/js/device-dot-state-core.mjs` | Dot overlay priority, explainers, `open_notifications` action |
-| `site/js/device-browser-notifications.mjs` | OS notifications v1, toggle sync |
+| `site/js/device-browser-notifications.mjs` | OS alerts, contextual prompt, toggle sync |
+| `site/js/device-browser-notifications-core.mjs` | Pure prompt + OS copy helpers |
+| `worker/tests/device-browser-notifications.test.ts` | Vitest for alert core |
 | `site/js/device-counts.mjs` / `device-counts-core.mjs` | `tabNoticeCount`, status segments |
 | `site/js/device-live-control-inbox.mjs` | Live proof poll + hub list |
 | `site/js/device-hub-glance.mjs` | Collapsed peek rows |

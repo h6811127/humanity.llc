@@ -13,6 +13,7 @@ import {
 import { applyDeviceHubSearch } from "./device-hub-search.mjs";
 import { initHubBackupImport } from "./device-hub-import.mjs";
 import { mountThemeToggles } from "./device-theme.mjs";
+import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs";
 import { openSaveKeysForThisTab } from "./device-notice-nav.mjs";
 import { buildHubCardControls } from "./device-hub-controls-core.mjs";
 import {
@@ -971,6 +972,7 @@ function bindDom() {
 export function refreshDeviceHub() {
   renderNoticeRow();
   renderLiveControlInbox();
+  syncBrowserNotifPrompts();
   renderActivityRows();
   renderSavedRows();
   renderPinRows();
@@ -1034,6 +1036,7 @@ export function initDeviceHub(config = {}) {
     });
     window.addEventListener("hc-live-control-inbox-changed", () => {
       renderLiveControlInbox();
+      syncBrowserNotifPrompts();
       renderSavedRows();
       applySearchFilter();
       refreshEmptyHint();
