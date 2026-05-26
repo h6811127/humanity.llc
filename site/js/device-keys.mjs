@@ -63,12 +63,12 @@ export function createdUrlForEntry(entry) {
 }
 
 /**
- * Load saved keys when available and open /created/ (Now tab by default).
  * @param {Record<string, unknown>} entry
  * @param {{ returnUrl?: string | null }} [opts]
+ * @returns {URL | null}
  */
-export function openCardNowPage(entry, opts = {}) {
-  if (!entry?.profile_id) return false;
+function createdPageUrlForEntry(entry, opts = {}) {
+  if (!entry?.profile_id) return null;
 
   const saved =
     entry.owner_private_key_b58 != null
@@ -91,6 +91,33 @@ export function openCardNowPage(entry, opts = {}) {
   if (returnUrl) {
     url.searchParams.set("return_url", returnUrl);
     url.searchParams.set("intent", "vouch");
+  }
+  return url;
+}
+
+/**
+ * Load saved keys when available and open /created/ (Now tab by default).
+ * @param {Record<string, unknown>} entry
+ * @param {{ returnUrl?: string | null }} [opts]
+ */
+export function openCardNowPage(entry, opts = {}) {
+  const url = createdPageUrlForEntry(entry, opts);
+  if (!url) return false;
+  navigateTo(url.href);
+  return true;
+}
+
+/**
+ * Open /created/ focused on a control panel (Advanced tab or live-proof strip).
+ * @param {Record<string, unknown>} entry
+ * @param {string} focus Panel hash without # (e.g. update-status, revoke, rotate-qr, live-proof)
+ * @param {{ returnUrl?: string | null }} [opts]
+ */
+export function openCardControlPage(entry, focus, opts = {}) {
+  const url = createdPageUrlForEntry(entry, opts);
+  if (!url) return false;
+  if (focus && focus !== "now") {
+    url.hash = focus;
   }
   navigateTo(url.href);
   return true;

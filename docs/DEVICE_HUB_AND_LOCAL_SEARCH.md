@@ -44,7 +44,7 @@ These notes are captured as individual product refinements so implementation can
 - **Step 4 (now):** status-pill terminology pass (`pins`, `online` semantics).
 - **Step 5 (now):** object identity visual system (types, glyph/color cues).
 - **Step 6 (now):** modal/shell visual polish pass.
-- **Step 7:** action-forward card IA and command surface.
+- **Step 7 (shipped):** action-forward card IA and command surface (`device-hub-controls-core.mjs`, hub row **Update status** / **Revoke QR** / **New QR** / **Prove live** → `openCardControlPage()`).
 
 ---
 
@@ -52,7 +52,7 @@ These notes are captured as individual product refinements so implementation can
 
 We kept the landing funnel (hero → device hub → long-form content) and **enriched** it rather than replacing it with a full dashboard.
 
-**Landing story (shipped):** Hero one-liner, a **four-step progress strip** (Create → Save → Print → Manage), and **On this device** below the status line (inline search, no floating help pill). Homepage pass-card demo removed; strangers see real scan pages and the case study.
+**Landing story (shipped):** Hero one-liner, a **four-step progress strip** (Create → Save → Print → **My cards**), and **On this device** below the status line (inline search, no floating help pill). Homepage pass-card demo removed; strangers see real scan pages and the case study.
 
 **Landing layout:** Mobile-first single column only (no desktop widening grid). See [`LANDING_DESKTOP_LAYOUT.md`](LANDING_DESKTOP_LAYOUT.md) for retired desktop experiment notes.
 
@@ -60,7 +60,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **`/created/` hub (shipped):** Same groups as landing except: notice links to **`#created-keys-strip`**; shortcuts are **Manage this card**, **All saved cards**, **Homepage** (no focus toggle).
 
-**Hub rows (shipped):** Saved cards  -  **Open controls**, **Open scan**, **⋯** (Open card, Relabel, Remove). **Open card** and **Open controls** both call `openCardNowPage()` (load keys when saved). Phase 0: removed ⋯ **Manage** link that opened `/created/` without keys (`docs/CARD_WORKSPACE_PHASE0.md`). **Import backup file** decrypts `.hcbackup.json` into `hc_wallet`.
+**Hub rows (shipped):** Saved cards show **object controls** when signing keys are on device (**Update status**, **Revoke QR**, **New QR**; **Prove live** when a challenge is waiting). Controls call `openCardControlPage()` → `/created/#…` with keys loaded. **Open controls** and **Open scan** remain for full workspace and public scan. **⋯** (Open card, Relabel, Remove). **Open card** and **Open controls** both call `openCardNowPage()` when you need the full Tasks tab. Phase 0: removed ⋯ **Manage** link that opened `/created/` without keys (`docs/CARD_WORKSPACE_PHASE0.md`). **Import backup file** decrypts `.hcbackup.json` into `hc_wallet`.
 
 **Landing focus mode:** `localStorage.hc_landing_focus` hides intro (`[data-landing-tutorial]`). Keeps **hub**, **hub glance**, **system banner** (if unhealthy), **Help & protocol** list (not full Documentation), and **contact**. No bottom Create dock or “New here?” float. **Auto-save** on by default via `hc_auto_save_device` (opt out in hub shortcuts).
 

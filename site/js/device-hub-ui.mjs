@@ -14,10 +14,12 @@ import { applyDeviceHubSearch } from "./device-hub-search.mjs";
 import { initHubBackupImport } from "./device-hub-import.mjs";
 import { mountThemeToggles } from "./device-theme.mjs";
 import { openSaveKeysForThisTab } from "./device-notice-nav.mjs";
+import { buildHubCardControls } from "./device-hub-controls-core.mjs";
 import {
   activateWalletEntry,
   getTabSession,
   openActivityNow,
+  openCardControlPage,
   openCardNowPage,
 } from "./device-keys.mjs";
 import { loadPins, pinHaystack } from "./device-pins.mjs";
@@ -314,6 +316,24 @@ function hubCardIconHtml(profileId) {
   return `<span class="list-icon ${meta.toneClass}" aria-hidden="true">${meta.svg}</span>`;
 }
 
+function liveControlPendingForEntry(entry) {
+  return getLiveControlPending().find((p) => p.entry.profile_id === entry.profile_id) ?? null;
+}
+
+/** @param {import("./device-hub-controls-core.mjs").HubCardControl[]} controls */
+function hubCardControlsHtml(entry, controls) {
+  if (controls.length === 0) {
+    return "";
+  }
+  const buttons = controls
+    .map(
+      (c) =>
+        `<button type="button" class="hub-card-control hub-card-control--${c.variant} hub-card-control--${c.id}" data-id="${escapeHtml(entry.id)}" data-focus="${escapeHtml(c.focus)}">${escapeHtml(c.label)}</button>`
+    )
+    .join("");
+  return `<div class="hub-card-controls" role="group" aria-label="Object controls">${buttons}</div>`;
+}
+
 function currentNetworkStatus(profileId, statusMap = {}) {
   return statusMap[profileId] ?? getCachedNetworkStatus(profileId) ?? "checking";
 }
@@ -604,7 +624,16 @@ function renderSavedRows() {
   for (const entry of entries) {
     const li = document.createElement("li");
     const objectType = classifyObjectType(entry);
-    li.className = `hub-card-item hub-card-item--${objectType.tone}`;
+    const cardControls = buildHubCardControls({
+      hasKeys: !!entry.owner_private_key_b58,
+      pendingLiveProof: !!liveControlPendingForEntry(entry),
+      scanKind: hubConfig.fetchNetworkStatus
+        ? getCachedNetworkScanKind(entry.profile_id)
+        : null,
+    });
+    li.className = `hub-card-item hub-card-item--${objectType.tone}${
+      cardControls.length > 0 ? " hub-card-item--has-controls" : ""
+    }`;
     li.dataset.hubSearchable = walletHaystack(entry);
     li.dataset.profileId = entry.profile_id;
     const lastUsed = lastActivityForEntry(entry);
@@ -662,6 +691,7 @@ function renderSavedRows() {
         </div>
       </div>
       ${revokedAlert}
+      ${hubCardControlsHtml(entry, cardControls)}
       <div class="hub-card-actions">
         <div class="hub-card-actions-primary">
           <button type="button" class="hub-card-action hub-use-keys" data-id="${escapeHtml(entry.id)}" title="Load signing keys into this tab, then open your card page">Open controls</button>
@@ -672,6 +702,34 @@ function renderSavedRows() {
   }
 
   bindRevokedAlertHandlers();
+
+  savedList.querySelectorAll(".hub-card-control").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-id");
+      const focus = btn.getAttribute("data-focus");
+      const entry = loadWallet().find((e) => e.id === id);
+      if (!entry || !focus) return;
+      acknowledgeNetworkSeenForEntry(entry);
+      if (focus === "live-proof") {
+        const pending = liveControlPendingForEntry(entry);
+        if (pending) {
+          openLiveControlProof(pending);
+          return;
+        }
+      }
+      if (!entry.owner_private_key_b58) {
+        window.alert("This saved card has no signing keys on this device.");
+        return;
+      }
+      let returnUrl = null;
+      try {
+        returnUrl = sessionStorage.getItem("hc_vouch_return_url");
+      } catch {
+        /* ignore */
+      }
+      openCardControlPage(entry, focus, { returnUrl });
+    });
+  });
 
   savedList.querySelectorAll(".hub-use-keys").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -976,6 +1034,7 @@ export function initDeviceHub(config = {}) {
     });
     window.addEventListener("hc-live-control-inbox-changed", () => {
       renderLiveControlInbox();
+      renderSavedRows();
       applySearchFilter();
       refreshEmptyHint();
       notifyHubChanged();

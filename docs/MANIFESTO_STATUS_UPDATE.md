@@ -71,6 +71,8 @@ Same as create  -  one `manifesto_line` field, layout parsed at scan time (`work
 3. Requires owner or recovery key (session, backup import, or recovery unlock).
 4. Success: *Updated. Next scan shows the new line.*
 
+**Hub shortcut (shipped):** On `/wallet/` and landing hub, saved rows with keys show **Update status** → `/created/#update-status` (Advanced tab, manifesto panel open). See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` Step 7.
+
 Deep link: `/created/?profile_id=…&qr_id=…`  -  hydrates handle/manifesto from network when session is empty; infers pilot layout from stored `manifesto_line`.
 
 ---

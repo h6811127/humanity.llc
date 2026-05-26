@@ -945,6 +945,56 @@ body.page-flow.has-shell-chrome .page > main.screen {
   font-weight: 600;
 }
 
+.hub-card-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px 6px 12px;
+}
+
+.hub-card-control {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: var(--shell-fill-secondary, rgba(0, 0, 0, 0.05));
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--black);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hub-card-control:active {
+  opacity: 0.85;
+}
+
+.hub-card-control--primary {
+  background: var(--red);
+  color: var(--white);
+  box-shadow: 0 2px 8px rgba(219, 27, 67, 0.22);
+}
+
+.hub-card-control--danger {
+  background: rgba(219, 27, 67, 0.1);
+  color: var(--red);
+}
+
+.hub-card-control--secondary {
+  background: var(--shell-fill-secondary, rgba(0, 0, 0, 0.05));
+  color: var(--black);
+}
+
+.hub-card-item--has-controls .hub-card-actions button.hub-card-action.hub-use-keys {
+  background: var(--shell-fill-secondary, rgba(0, 0, 0, 0.05));
+  color: var(--black);
+  box-shadow: none;
+}
+
 .hub-card-actions {
   display: flex;
   align-items: center;

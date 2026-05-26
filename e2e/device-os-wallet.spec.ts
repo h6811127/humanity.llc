@@ -34,6 +34,19 @@ test.describe("device OS wallet flow", () => {
     expect(sessionRaw).toContain("privkeyfortestonlyxxxxxxxxx");
   });
 
+  test("Update status opens /created/ with keys and update panel focus", async ({ page }) => {
+    await page.addInitScript((profileId) => {
+      localStorage.setItem("hc_setup_done", JSON.stringify({ [profileId]: true }));
+    }, SAMPLE_WALLET_ENTRY.profile_id);
+    await page.goto("/wallet/");
+    await page.getByRole("button", { name: "Update status" }).click();
+    await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
+    await expect(page).toHaveURL(/#update-status/);
+    const sessionRaw = await page.evaluate(() => sessionStorage.getItem("hc_created"));
+    expect(sessionRaw).toContain("privkeyfortestonlyxxxxxxxxx");
+    await expect(page.locator("#created-tab-advanced")).toBeVisible();
+  });
+
   test("does not show card-disabled-since-visit banner when resolver reports active", async ({
     page,
   }) => {
