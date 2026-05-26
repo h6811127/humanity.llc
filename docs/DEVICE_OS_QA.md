@@ -63,7 +63,7 @@ Spec: [`docs/QR_BRANDING.md`](QR_BRANDING.md) § Verification. Automated: `npm r
 
 ### P1-SD · Scan page device dot + glance (`/c/…`)
 
-Spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md). Automated: `npm run worker:test:scan-page-dot`.
+Spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md). Automated: `npm run worker:test:scan-page-dot` · `npm run e2e:scan-page-dot` (static fixture on Pages :8788; regen `npm run site:generate-scan-e2e-fixture`).
 
 | Step | Action | Expected |
 |------|--------|----------|

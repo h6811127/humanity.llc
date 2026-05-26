@@ -1,6 +1,6 @@
 # Scan page device dot (progressive chrome)
 
-**Status:** Phase 8.1–8.4 shipped (`pass-v31`)  
+**Status:** Phase 8.1–8.5 shipped (`pass-v31`)  
 **Audience:** Product, design, frontend implementers  
 **Scope:** Page chrome on public scan HTML (`GET /c/{profile_id}?q={qr_id}`) — `#scan-page-dot` in `renderScanPageChrome()`  
 **Related:** [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) · [`SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md)
@@ -213,6 +213,7 @@ Today `site/js/scan-tab-keys.mjs` starts `device-chrome-refresh.mjs` but **does 
 | **2** | Scan glance + primary actions (scroll / use keys) | **Shipped** (`pass-v29`) — `scan-page-dot-glance-core.mjs`, glance markup in `scan-html.ts`; `npm run worker:test:scan-page-dot` |
 | **3** | Hollow ring + one-shot pulse; overlay sync with banner | **Shipped** (`pass-v30`) — `shouldScanNoneEligibleAttentionPulse`, `scanCrossTabOverlayCount`, `scan-none-dot-attention` CSS |
 | **4** | Hero host demotion: text-only wordmark inside card (chrome dot only) | **Shipped** (`pass-v31`) — `renderScanHeroHost()`, `.scan-hero-wordmark`; `scan-hero-snapshot.test.ts` |
+| **5** | Playwright E2E (stranger static, steward glance, cross-tab overlay) | **Shipped** — `e2e/scan-page-dot.spec.ts`, `site/e2e-fixtures/scan-active.html`; `npm run e2e:scan-page-dot` |
 
 Worker/API: **no change** — all state is client-side.
 
@@ -239,7 +240,7 @@ Worker/API: **no change** — all state is client-side.
 
 **Worker HTML:** `scan.test.ts` asserts `#scan-page-dot`, glance container present; optional fixture session injects `data-dot-state`.
 
-**E2E (Playwright):** Active scan + saved steward wallet → green or hollow→solid after “Use keys here”; cross-tab fixture → overlay + banner together; stranger incognito → static dot, no `data-dot-state` churn.
+**E2E (Playwright):** `npm run e2e:scan-page-dot` — static fixture `site/e2e-fixtures/scan-active.html` (regenerate: `npm run site:generate-scan-e2e-fixture`). Covers stranger static dot, steward dynamic + glance (no hub), hero wordmark-only, cross-tab overlay + banner agreement.
 
 **Manual:** M5 stranger path — dot must stay static. Steward path — dot matches vouch strip; tap glance does not navigate away until user chooses home.
 
@@ -272,6 +273,7 @@ Worker/API: **no change** — all state is client-side.
 | 2026-05-26 | Phase 8.1–8.2 implemented: `scan-page-dot.mjs`, glance popover, `pass-v29` |
 | 2026-05-26 | Phase 8.3: one-shot hollow-ring pulse, cross-tab overlay aligned with scan banner, `pass-v30` |
 | 2026-05-26 | Phase 8.4: hero host text-only wordmark; brand dot in page chrome only, `pass-v31` |
+| 2026-05-26 | Phase 8.5: Playwright E2E + generated scan fixture for Pages-only CI |
 
 ---
 
