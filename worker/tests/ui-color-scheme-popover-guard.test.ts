@@ -91,6 +91,8 @@ describe("UI color scheme popover guard", () => {
     ]) {
       expect(darkRoot).toContain(`${token}:`);
     }
+    expect(darkRoot).not.toContain("--hc-emphasis-card-detail-fg: var(--shell-label)");
+    expect(darkRoot).toContain("rgba(235, 235, 245, 0.9)");
   });
 
   it("keeps migrated shell popover surfaces on semantic tokens", () => {

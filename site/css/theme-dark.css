@@ -75,8 +75,8 @@ html[data-theme="dark"] {
   --hc-emphasis-card-eyebrow-info: #64b5ff;
   --hc-emphasis-card-eyebrow-warn: #ffb340;
   --hc-emphasis-card-eyebrow-urgent: #ff6961;
-  --hc-emphasis-card-title-fg: var(--shell-label-strong);
-  --hc-emphasis-card-detail-fg: var(--shell-label);
+  --hc-emphasis-card-title-fg: #f5f5f7;
+  --hc-emphasis-card-detail-fg: rgba(235, 235, 245, 0.9);
 }
 
 html[data-theme="dark"] body {

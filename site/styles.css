@@ -73,8 +73,8 @@
   --hc-emphasis-card-eyebrow-info: #007aff;
   --hc-emphasis-card-eyebrow-warn: #a16207;
   --hc-emphasis-card-eyebrow-urgent: #c9342a;
-  --hc-emphasis-card-title-fg: var(--black);
-  --hc-emphasis-card-detail-fg: rgba(60, 60, 67, 0.78);
+  --hc-emphasis-card-title-fg: #1c1c1e;
+  --hc-emphasis-card-detail-fg: rgba(60, 60, 67, 0.88);
 }
 
 *,

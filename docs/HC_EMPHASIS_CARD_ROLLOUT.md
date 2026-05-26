@@ -56,8 +56,14 @@ Replaces over time: flat `.hc-notice` strips, plain `<p>` cross-tab lines, and a
 | `--hc-emphasis-card-shadow` | Shared inset + outer lift (light/dark override) |
 | `--hc-emphasis-card-fill-{active,info,warn,urgent}` | Opaque gradients per modifier |
 | `--hc-emphasis-card-eyebrow-{active,info,warn,urgent}` | Eyebrow text color per modifier |
+| `--hc-emphasis-card-title-fg` | `.hc-emphasis-card__title` — all instances |
+| `--hc-emphasis-card-detail-fg` | `.hc-emphasis-card__detail` — all instances (explicit literals; not `shell-label`) |
 
 Default CTA: `.hc-emphasis-card__cta` uses `var(--red)` pill (brand primary action).
+
+### Typography contrast (global)
+
+See [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Typography contrast — implementation checklist. **Step 1:** set title/detail fg tokens on `:root` + dark `html` block. **Never** style one card’s detail in isolation.
 
 ---
 
@@ -113,7 +119,7 @@ See tier tables in [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) 
 1. Light + dark theme on target page.
 2. No blue (or semantic) **rim** from translucent fill—only shadow depth.
 3. Eyebrow, title, detail, CTA readable; tap targets ≥44px where buttons.
-4. **Dark mode:** card fill must switch to dark gradient (not light surface + light text). See [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Dark mode (emphasis cards).
+4. **Dark mode:** card fill must switch to dark gradient; title + detail use `--hc-emphasis-card-title-fg` / `--hc-emphasis-card-detail-fg` (detail ≥ ~90% opacity off-white on dark fills).
 5. `npm run worker:test:ui-color-scheme`
 6. Wallet/cross-tab: `npm run e2e -- e2e/device-os-wallet.spec.ts` when touching wallet chrome.
 

@@ -91,15 +91,23 @@ Future variants may add `--hc-emphasis-card-fill-*` and `--hc-emphasis-card-eyeb
 
 Fill and eyebrow tokens: `--hc-emphasis-card-fill-*`, `--hc-emphasis-card-eyebrow-*` on `:root` (dark overrides in `theme-dark.css`).
 
-Typography tokens (required for dark mode — do not use `var(--black)` or fixed light greys on card copy):
+Typography tokens — **single source of truth** for every `.hc-emphasis-card` instance (wallet active, cross-tab, scan when migrated). Set on `:root` in `site/styles.css` and overridden on `html[data-theme="dark"]` in `theme-dark.css`. **Do not** point card copy at `var(--black)`, `var(--shell-label)`, or per-page selectors.
 
-- `--hc-emphasis-card-title-fg` — title line (`__title`)
-- `--hc-emphasis-card-detail-fg` — body line (`__detail`)
+| Token | Used by | Light (`:root`) | Dark (`html[data-theme="dark"]`) |
+|-------|---------|-----------------|-------------------------------------|
+| `--hc-emphasis-card-title-fg` | `.hc-emphasis-card__title` | `#1c1c1e` | `#f5f5f7` |
+| `--hc-emphasis-card-detail-fg` | `.hc-emphasis-card__detail` | `rgba(60, 60, 67, 0.88)` | `rgba(235, 235, 245, 0.9)` |
 
-Light: title → `var(--black)`; detail → `rgba(60, 60, 67, 0.78)`.  
-Dark (`html[data-theme="dark"]`): both → `--shell-label-strong` / `--shell-label`.
+Eyebrow colors stay on `--hc-emphasis-card-eyebrow-{active,info,warn,urgent}` per modifier. Detail is **one step softer than title**, not hub `shell-label` (too dim on tinted card fills).
 
-### Dark mode (emphasis cards)
+### Typography contrast — implementation checklist
+
+1. **Tokens** — Assign explicit `--hc-emphasis-card-title-fg` and `--hc-emphasis-card-detail-fg` on `:root` and `html[data-theme="dark"]` (no `var(--shell-label)` alias for detail in dark).
+2. **Selectors** — `.hc-emphasis-card__title` and `.hc-emphasis-card__detail` (and legacy `.wallet-active-label` / `.wallet-active-detail` aliases) use **only** these tokens for `color`.
+3. **Regression** — Extend `worker/tests/ui-color-scheme-popover-guard.test.ts` so dark `:root` block forbids `--hc-emphasis-card-detail-fg: var(--shell-label)`.
+4. **QA** — `/wallet/` dark: title and detail both readable on every modifier fill; bump `theme-dark.css?v=` on shell pages when CSS changes.
+
+### Dark mode (emphasis cards — surfaces)
 
 **Symptom (May 2026):** Card stayed **light** while copy used dark-theme shell colors → detail looked invisible; **Home** pill on `/wallet/` inherited `color: inherit` from `html[data-theme="dark"] a` (white on white).
 
@@ -121,8 +129,8 @@ Dark (`html[data-theme="dark"]`): both → `--shell-label-strong` / `--shell-lab
 | Card | `.hc-emphasis-card--active` | `--hc-emphasis-card-fill-active` | dark gradient override |
 | Dot | `.hc-emphasis-card__dot--success` | Green + halo | (unchanged) |
 | Eyebrow | `.hc-emphasis-card__eyebrow` | `--hc-emphasis-card-eyebrow-active` | `#30d158` |
-| Title | `.hc-emphasis-card__title` | `--hc-emphasis-card-title-fg` | `--shell-label-strong` |
-| Detail | `.hc-emphasis-card__detail` | `--hc-emphasis-card-detail-fg` | `--shell-label` |
+| Title | `.hc-emphasis-card__title` | `--hc-emphasis-card-title-fg` | `#f5f5f7` |
+| Detail | `.hc-emphasis-card__detail` | `--hc-emphasis-card-detail-fg` | `rgba(235, 235, 245, 0.9)` |
 | CTA | `.hc-emphasis-card__cta` | Pill, `var(--red)` | (unchanged) |
 
 ### Semantic modifiers (CSS shipped; rollout per phase doc)
