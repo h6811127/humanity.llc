@@ -22,25 +22,25 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeCountText,
   notificationCount,
-} from "./device-inbox.mjs?v=27";
+} from "./device-inbox.mjs?v=28";
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=27";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=28";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import "./device-shell-motion.mjs";
-import "./device-shell-chrome.mjs?v=27";
+import "./device-shell-chrome.mjs?v=28";
 import "./device-theme.mjs";
-import "./device-browser-notifications.mjs?v=27";
+import "./device-browser-notifications.mjs?v=28";
 import {
   isHubSheet,
   reconcileHubSheetState,
   setHubSheetOpen,
-} from "./device-hub-sheet.mjs?v=27";
+} from "./device-hub-sheet.mjs?v=28";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 import {
   describeDotState,
@@ -52,7 +52,7 @@ import {
   hasStewardVerification,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=27";
+} from "./device-dot-state-core.mjs?v=28";
 
 export const DOT_STATE_CHANGED = "hc-dot-state-changed";
 
