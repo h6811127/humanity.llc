@@ -8,9 +8,11 @@ import {
   buildResolverConfirmedWalletPollMaps,
   getNetworkLastSeenBaseline,
 } from "./device-wallet-network.mjs";
+import { shouldSuppressCardDisabledSinceVisitAlerts } from "./device-wallet-since-visit-gate.mjs";
 
 /** @returns {ReturnType<typeof loadWallet>} */
 export function gatherCardDisabledSinceVisitForInbox() {
+  if (shouldSuppressCardDisabledSinceVisitAlerts()) return [];
   const wallet = loadWallet();
   const maps = buildResolverConfirmedWalletPollMaps(wallet);
   if (!maps) return [];

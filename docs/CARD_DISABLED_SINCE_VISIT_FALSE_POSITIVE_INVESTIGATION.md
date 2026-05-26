@@ -1,7 +1,7 @@
 # Investigation: “Card disabled on the network since your last visit” on every saved card
 
-**Date:** 2026-05-25  
-**Status:** **Closed** — root cause confirmed (client-side); fixes + regression gates shipped (Slices 1–8 in [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md))  
+**Date:** 2026-05-25 (updated 2026-05-26)  
+**Status:** **Reopened (client gap)** — Slices 1–8 fixed the session-cache / baseline-changed false positive; a **second gap** remains (stale in-visit resolver-confirmed state). See [§ Follow-up 2026-05-26](#follow-up-2026-05-26-stale-in-visit-resolver-confirmed-state).  
 **Scope:** Saved-card hub rows on `/`, `/wallet/`, `/created/` — not Worker resolver logic unless `scan.kind` truly disagrees  
 **Related audits:** [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md) (DH-1–DH-15, Slices 1–8), [`DEVICE_OS.md`](DEVICE_OS.md) § Card disabled since last visit, [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P1 / P5b  
 
@@ -244,7 +244,7 @@ CI: `.github/workflows/test-site.yml` runs full `npm run worker:test` and device
 | **Confirmed root cause of false “every card” alerts?** | **Yes:** pre-`a5f34a7`, `hc-wallet-network-baseline-changed` re-applied **stale session cache** (`scanKind: card_revoked`) across **all** saved rows whenever any baseline write occurred, without `resolverConfirmed` or fresh `scan.kind`. |
 | **Is the server revoking all cards?** | **No** for the documented production repro (resolver returned `active`). Verify per card with `GET …/status?q=`. |
 | **Are fixes in repo?** | **Yes** — DH-1–DH-4 per [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md); regression tests in Vitest/E2E. |
-| **If it still happens for you?** | Verify bundle age, network `scan.kind`, and storage keys above; clear `hc_wallet_network_cache` and reload. |
+| **If it still happens for you?** | See [§ Follow-up 2026-05-26](#follow-up-2026-05-26-stale-in-visit-resolver-confirmed-state): likely stale `latestResolved*` + unreachable resolver; clear cache and hard-reload; verify `scan.kind` on status fetches. |
 
 ---
 
@@ -276,9 +276,76 @@ Per the AI prompt at the bottom of the first investigation draft:
 
 ---
 
-## Post-closure (no further repair slices)
+## Follow-up 2026-05-26: stale in-visit resolver-confirmed state
 
-Engineering for this incident is **complete** (Slices 1–8 in [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md)). Do not add Slice 9 unless production reproduces the false positive on current `main`.
+### Symptom (matches production screenshot)
+
+Saved hub rows on `/wallet/` (or expanded hub) show **both**:
+
+- Status line: **Can't reach resolver · checked just now** (`hubCardStatusLine` — `status` is `offline` / `error`, `scanKind` is not `card_revoked`)
+- Red alert: **Card disabled on the network since your last visit.**
+
+That combination is **internally inconsistent**: the row chip reflects the **latest poll** (unreachable), while the since-visit banner reflects **`latestResolvedAlertStateMap` from an earlier successful poll in the same page visit** (still `card_revoked`).
+
+### Additional evidence (from console)
+
+The page console shows repeated **429** responses for:
+
+`GET /.well-known/hc/v1/cards/{profile_id}/live-control/challenges?qr_id=...`
+
+This is the live-proof inbox poll (see `device-live-control-inbox.mjs`). A 429 does not directly set `scan.kind`, but it is strong evidence the page is in a **rate-limited / request-amplified** state where other resolver calls may also degrade or arrive out-of-order.
+
+### Root cause (confirmed in repo)
+
+| Layer | Behavior |
+|-------|----------|
+| **`device-wallet-network.mjs`** | `latestResolvedAlertStateMap`, `latestResolvedScanKindMap`, and `resolverConfirmedProfileIdsThisVisit` are **merged on successful HTTP parses only** and are **never cleared or downgraded** when a later poll fails (`offline` / `error`) or returns `active`. |
+| **`buildResolverConfirmedWalletPollMaps()`** | Re-reads stale `card_revoked` from `latestResolved*` even after the session cache was overwritten with `{ status: "offline", scanKind: null }`. |
+| **`reapplyRevokedSinceVisitFromLatestResolved()`** | Called on `hc-wallet-network-baseline-changed` and on `NETWORK_REFRESHED` fallback — re-lights banners from stale maps. |
+| **`cardDisabledSinceVisitVisible()`** | When `scanKind` is `null` (offline poll) but `resolverConfirmed` is still true, the `scan.kind === "active"` guard does not run; banner can stay visible. |
+| **`device-hub-ui.mjs` `walletNetworkApplyGen`** | Supersedes **DOM** updates from stale polls but does **not** gate writes to `latestResolved*` or `NETWORK_REFRESHED` banner application — a slower, superseded fetch can still fire `NETWORK_REFRESHED` with `card_revoked` after a newer poll set chips to **Can't reach resolver**. |
+
+**Reproduced in Vitest (manual, 2026-05-26):** with `hc_wallet_last_seen_network[profile] = "active"`, `refreshWalletNetworkStatuses` first returning `scan.kind: "card_revoked"`, then a second call failing offline → `gatherCardDisabledSinceVisitForInbox()` still returns one row while the session cache shows `offline`.
+
+This is **not** the pre-`a5f34a7` session-cache / `baseline-changed` bug (that path is fixed). It is a **post-fix gap** for **in-visit** state.
+
+### How the first `card_revoked` confirmation can be wrong
+
+Slices 1–8 prevent **cache-only** banners (`resolverConfirmed: false`). A banner still requires at least one **successful** status fetch that parsed `scan.kind === "card_revoked"`. False positives therefore also need one of:
+
+1. **Stale session cache forcing refetch, then a slow/out-of-order response** — an older in-flight request completes after a newer offline poll; `NETWORK_REFRESHED` from the old request re-applies banners while chips stay on **Can't reach resolver** (`walletNetworkApplyGen` does not guard `latestResolved*`).
+2. **Resolver actually returning `card_revoked`** for those profiles (verify in Network tab). Unlikely for “all saved cards” unless DB rows are revoked or the wrong API origin is used.
+3. **Old static bundle** without Slices 1–8 (session-cache / baseline-changed regression). Hard-refresh and confirm `device-hub-ui.mjs` uses `buildResolverConfirmedWalletPollMaps` on baseline change, not `getCachedNetworkAlertState` for all PIDs.
+
+### Environmental note (2026-05-26)
+
+`curl https://humanity.llc/.well-known/hc/v1/health` returned **Cloudflare error 1027** from this environment. If the browser sees the same, status fetches fail → **Can't reach resolver** is expected. The since-visit banner should still **hide** when there is no trustworthy current `card_revoked` read; today it can remain visible due to stale `latestResolved*` (above).
+
+### Fix shipped (2026-05-26, second pass)
+
+| Change | File |
+|--------|------|
+| Clear / set `latestResolved*` only at end of a **current** wallet poll for profiles that **network-fetched** (not session-cache short circuit); failed fetches clear confirmed state | `device-wallet-network.mjs` |
+| `NETWORK_REFRESHED` banner maps use **resolver-confirmed poll results only** (no cache-only `card_revoked` in `alertStateMap`) | `device-wallet-network.mjs` |
+| Suppress all since-visit UI when resolver health is **degraded/offline** or live-proof poll health is **degraded/offline** (429 storm) | `device-wallet-since-visit-gate.mjs`, hub / inbox / glance |
+| `cardDisabledSinceVisitVisible` requires `scan.kind === card_revoked` (not null / stale fallback) | `wallet-network-baseline.mjs` |
+| Health changes dispatch `hc-resolver-health-changed` to re-hide banners | `device-status.mjs`, `device-hub-ui.mjs` |
+| Live-control 429 → 60s backoff; stop re-fetching all card rows on every live-proof tick | `device-live-control-inbox.mjs`, `device-hub-ui.mjs` |
+
+**Why cache clear alone did not help:** With **Resolver limited** at the top, the page is already in a **degraded** poll window. An earlier in-flight status read could still poison `latestResolved*` before rate limits landed, and row banners were re-applied from that state. Clearing `sessionStorage` does not stop live-proof polling or reset in-memory confirmed state until reload — and reload immediately re-starts **N cards × live-control challenges every 5s**, which reproduces **429** and the split-brain UI.
+
+### Immediate user mitigation
+
+1. Hard refresh after deploy of the fix above.
+2. If still rate-limited: close extra tabs, wait ~60s (live-control backoff), then refresh once.
+3. Optional: `sessionStorage.removeItem("hc_wallet_network_cache"); location.reload();`
+4. In DevTools → Network, confirm `GET …/status?q=` returns `"scan": { "kind": "active" }` when the resolver is reachable — only then should the since-visit banner be legitimate.
+
+---
+
+## Post-closure (Slices 1–8 only)
+
+Slices 1–8 in [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md) remain shipped for the **session-cache / baseline-changed** false positive. The **in-visit stale `latestResolved*` gap** above is tracked as follow-up (not Slice 9 in the repair spec yet).
 
 | Step | Action |
 |------|--------|

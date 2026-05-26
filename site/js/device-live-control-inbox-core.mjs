@@ -1,14 +1,28 @@
 import { walletEntryQrId } from "./device-wallet.mjs";
 
-/** @typedef {'none' | 'pending' | 'unreachable'} LiveControlPollKind */
+/** @typedef {'none' | 'pending' | 'unreachable' | 'rate_limited'} LiveControlPollKind */
 
 /** @typedef {'ok' | 'degraded' | 'offline'} LiveControlPollHealth */
+
+/** @type {LiveControlPollHealth} */
+let liveControlPollHealth = "ok";
+
+/** @returns {LiveControlPollHealth} */
+export function getLiveControlPollHealth() {
+  return liveControlPollHealth;
+}
+
+/** @param {LiveControlPollHealth} health */
+export function setLiveControlPollHealth(health) {
+  liveControlPollHealth = health;
+}
 
 /**
  * @param {number} status HTTP status from challenge poll
  */
 export function classifyChallengeHttpStatus(status) {
   if (status === 404) return "none";
+  if (status === 429) return "rate_limited";
   if (status >= 200 && status < 300) return "ok";
   return "unreachable";
 }
@@ -22,7 +36,9 @@ export function summarizeLiveControlPoll(results, pollableCount) {
   const pending = results
     .filter((r) => r.kind === "pending" && r.item)
     .map((r) => r.item);
-  const unreachable = results.filter((r) => r.kind === "unreachable").length;
+  const unreachable = results.filter(
+    (r) => r.kind === "unreachable" || r.kind === "rate_limited"
+  ).length;
 
   if (pollableCount === 0) {
     return { pending, health: "ok" };

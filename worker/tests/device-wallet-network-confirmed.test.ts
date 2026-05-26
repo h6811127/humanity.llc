@@ -11,6 +11,8 @@ import {
   refreshWalletNetworkStatuses,
 } from "../../site/js/device-wallet-network.mjs";
 import { gatherCardDisabledSinceVisitForInbox } from "../../site/js/device-inbox-card-disabled.mjs";
+import { setResolverHealthStatusForSinceVisit } from "../../site/js/device-wallet-since-visit-gate.mjs";
+import { setLiveControlPollHealth } from "../../site/js/device-live-control-inbox-core.mjs";
 
 const PROFILE_A = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const PROFILE_B = "8Ym2nP3oR5sU7wX9zA1bC4dE6";
@@ -58,6 +60,8 @@ describe("isResolverConfirmedProfile", () => {
       clear: () => localStore.clear(),
     });
     vi.stubGlobal("window", { dispatchEvent: vi.fn() });
+    setResolverHealthStatusForSinceVisit("ok");
+    setLiveControlPollHealth("ok");
     vi.stubGlobal(
       "fetch",
       vi.fn(async () => ({
@@ -92,6 +96,32 @@ describe("isResolverConfirmedProfile", () => {
     expect(maps?.scanKindMap[PROFILE_A]).toBe("active");
     expect(maps?.resolverConfirmedMap[PROFILE_A]).toBe(true);
     expect(maps?.resolverConfirmedMap[PROFILE_B]).toBeUndefined();
+  });
+
+  it("clears since-visit after offline poll following resolver-confirmed card_revoked", async () => {
+    localStore.set(
+      "hc_wallet_last_seen_network",
+      JSON.stringify({ [PROFILE_A]: "active" })
+    );
+    const fetchMock = vi.mocked(fetch);
+    fetchMock
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          scan: {
+            kind: "card_revoked",
+            card: { status: "revoked", handle: "e2e", manifesto_line: "Test" },
+          },
+        }),
+      } as Response)
+      .mockRejectedValueOnce(new Error("offline"));
+
+    await refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }]);
+    expect(gatherCardDisabledSinceVisitForInbox()).toHaveLength(1);
+
+    await refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }]);
+    expect(gatherCardDisabledSinceVisitForInbox()).toEqual([]);
+    expect(isResolverConfirmedProfile(PROFILE_A)).toBe(false);
   });
 
   it("gatherCardDisabledSinceVisitForInbox is empty after active poll despite stale cache", async () => {

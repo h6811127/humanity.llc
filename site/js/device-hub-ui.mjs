@@ -36,6 +36,7 @@ import {
   walletEntryKeyPreview,
   walletEntryQrId,
 } from "./device-wallet.mjs";
+import { shouldSuppressCardDisabledSinceVisitAlerts } from "./device-wallet-since-visit-gate.mjs";
 import {
   getCachedNetworkSeenAt,
   getCachedNetworkScanKind,
@@ -43,7 +44,6 @@ import {
   getCachedVerification,
   buildResolverConfirmedWalletPollMaps,
   getLatestResolvedAlertState,
-  getLatestResolvedScanKind,
   getNetworkLastSeenBaseline,
   hasLatestResolverNetworkPoll,
   CARD_REVOKED_ALERT_STATE,
@@ -454,6 +454,14 @@ function applyRevokedSinceVisitAlerts(
 ) {
   if (!savedList || !hubConfig.fetchNetworkStatus) return;
 
+  if (shouldSuppressCardDisabledSinceVisitAlerts()) {
+    savedList.querySelectorAll(".hub-card-item").forEach((li) => {
+      const pid = li.dataset.profileId;
+      if (pid) setRevokedSinceVisitAlertVisible(li, pid, false);
+    });
+    return;
+  }
+
   savedList.querySelectorAll(".hub-card-item").forEach((li) => {
     const pid = li.dataset.profileId;
     if (!pid) return;
@@ -462,11 +470,13 @@ function applyRevokedSinceVisitAlerts(
       setRevokedSinceVisitAlertVisible(li, pid, false);
       return;
     }
+    const netStatus = String(currentNetworkStatus(pid, _statusMap) || "").toLowerCase();
+    if (netStatus === "offline" || netStatus === "error") {
+      setRevokedSinceVisitAlertVisible(li, pid, false);
+      return;
+    }
     const resolverConfirmed = resolverConfirmedMap?.[pid] === true;
-    const scanKind =
-      scanKindMap[pid] !== undefined
-        ? scanKindMap[pid]
-        : getLatestResolvedScanKind(pid) ?? getCachedNetworkScanKind(pid);
+    const scanKind = scanKindMap[pid] !== undefined ? scanKindMap[pid] : null;
     if (resolverConfirmed) {
       const alertNorm = normalizeBaselineState(alertStateMap[pid]);
       const kind = String(scanKind || "").toLowerCase();
@@ -535,32 +545,39 @@ async function fetchAndApplyNetworkChips() {
       entries.map((e) => [e.profile_id, getCachedNetworkStatus(e.profile_id) ?? "checking"])
     )
   );
-  await refreshWalletNetworkStatuses(entries, ({
-    statusMap,
-    alertStateMap,
-    scanKindMap,
-    resolverConfirmedMap,
-  }) => {
-    if (gen !== walletNetworkApplyGen) return;
-    applyNetworkChipsToDom(statusMap, alertStateMap, scanKindMap, resolverConfirmedMap);
-    syncLastSeenFromNetworkMap(alertStateMap);
-    const stored = loadWallet();
-    let changed = false;
-    const next = stored.map((e) => {
-      const net = statusMap[e.profile_id];
-      const scanKind = scanKindMap[e.profile_id] ?? null;
-      const hadScanKind = Object.prototype.hasOwnProperty.call(e, "scan_kind");
-      const currentScanKind = hadScanKind ? e.scan_kind ?? null : null;
-      if (net && (e.status !== net || currentScanKind !== scanKind)) {
-        changed = true;
-        return { ...e, status: net, scan_kind: scanKind };
-      }
-      return e;
-    });
-    if (changed) saveWallet(next);
-    syncHubInboxAlertGroups();
-    notifyHubChanged();
-  });
+  await refreshWalletNetworkStatuses(
+    entries,
+    ({
+      statusMap,
+      alertStateMap,
+      scanKindMap,
+      resolverConfirmedMap,
+    }) => {
+      if (gen !== walletNetworkApplyGen) return;
+      applyNetworkChipsToDom(statusMap, alertStateMap, scanKindMap, resolverConfirmedMap);
+      syncLastSeenFromNetworkMap(alertStateMap);
+      const stored = loadWallet();
+      let changed = false;
+      const next = stored.map((e) => {
+        const net = statusMap[e.profile_id];
+        const scanKind = scanKindMap[e.profile_id] ?? null;
+        const hadScanKind = Object.prototype.hasOwnProperty.call(e, "scan_kind");
+        const currentScanKind = hadScanKind ? e.scan_kind ?? null : null;
+        if (net && (e.status !== net || currentScanKind !== scanKind)) {
+          changed = true;
+          return { ...e, status: net, scan_kind: scanKind };
+        }
+        return e;
+      });
+      if (changed) saveWallet(next);
+      syncHubInboxAlertGroups();
+      notifyHubChanged();
+    },
+    {
+      generation: gen,
+      isCurrentGeneration: () => gen === walletNetworkApplyGen,
+    }
+  );
 }
 
 function syncHubInboxAlertGroups() {
@@ -1130,9 +1147,9 @@ export function initDeviceHub(config = {}) {
       notifyHubChanged();
     });
     window.addEventListener("hc-live-control-inbox-changed", () => {
+      reapplyRevokedSinceVisitFromLatestResolved();
       syncHubInboxAlertGroups();
       syncBrowserNotifPrompts();
-      renderSavedRows();
       applySearchFilter();
       refreshEmptyHint();
       notifyHubChanged();
@@ -1180,6 +1197,12 @@ export function initDeviceHub(config = {}) {
   window.addEventListener("pagehide", () => snapshotNetworkSeenOnExit());
 
   window.addEventListener("hc-wallet-network-baseline-changed", () => {
+    reapplyRevokedSinceVisitFromLatestResolved();
+    syncHubInboxAlertGroups();
+    notifyHubChanged();
+  });
+
+  window.addEventListener("hc-resolver-health-changed", () => {
     reapplyRevokedSinceVisitFromLatestResolved();
     syncHubInboxAlertGroups();
     notifyHubChanged();

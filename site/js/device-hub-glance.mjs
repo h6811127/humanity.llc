@@ -3,7 +3,7 @@
  */
 import { buildGlanceRowPlan } from "./device-inbox-core.mjs";
 import { getInboxItems } from "./device-inbox.mjs";
-import { openInboxFromChrome } from "./device-inbox-sheet.mjs?v=31";
+import { openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=33";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
 import {
@@ -14,6 +14,7 @@ import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
+import { shouldSuppressCardDisabledSinceVisitAlerts } from "./device-wallet-since-visit-gate.mjs";
 import {
   CARD_DISABLED_SINCE_VISIT_GLANCE_SUFFIX,
   cardDisabledSinceVisitVisible,
@@ -142,6 +143,7 @@ function appendInboxGlanceRow(item, list, copy) {
  * @returns {Set<string>}
  */
 function revokedHintProfileIdsFromEntries(entries) {
+  if (shouldSuppressCardDisabledSinceVisitAlerts()) return new Set();
   const ids = new Set();
   for (const entry of entries) {
     const pid = entry.profile_id;

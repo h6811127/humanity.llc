@@ -32,6 +32,30 @@ let latestResolvedAt = 0;
 /** Profile IDs with at least one resolver-confirmed fetch this page visit. */
 const resolverConfirmedProfileIdsThisVisit = new Set();
 
+/** @param {string} profileId */
+function clearResolverConfirmedForProfile(profileId) {
+  if (!profileId) return;
+  delete latestResolvedAlertStateMap[profileId];
+  delete latestResolvedScanKindMap[profileId];
+  resolverConfirmedProfileIdsThisVisit.delete(profileId);
+  if (resolverConfirmedProfileIdsThisVisit.size === 0) {
+    latestResolvedAt = 0;
+  }
+}
+
+/**
+ * @param {string} profileId
+ * @param {string} alertState
+ * @param {string | null | undefined} scanKind
+ */
+function setResolverConfirmedForProfile(profileId, alertState, scanKind) {
+  if (!profileId || !alertState) return;
+  latestResolvedAlertStateMap[profileId] = alertState;
+  latestResolvedScanKindMap[profileId] = scanKind ?? null;
+  resolverConfirmedProfileIdsThisVisit.add(profileId);
+  latestResolvedAt = Date.now();
+}
+
 /** @type {string} Fired when hc_wallet_last_seen_network changes (snapshot, Got it, Manage). */
 export const NETWORK_BASELINE_CHANGED = "hc-wallet-network-baseline-changed";
 export const NETWORK_REFRESHED = "hc-wallet-network-refreshed";
@@ -198,8 +222,10 @@ function parseNetworkFetchBody(body) {
  *   scanKindMap: Record<string, string | null>,
  *   resolverConfirmedMap: Record<string, boolean>,
  * }) => void} [onDone]
+ * @param {{ generation?: number, isCurrentGeneration?: () => boolean }} [options]
  */
-export async function refreshWalletNetworkStatuses(entries, onDone) {
+export async function refreshWalletNetworkStatuses(entries, onDone, options = {}) {
+  const { generation, isCurrentGeneration } = options;
   const cache = loadCache();
   const statusMap = {};
   const alertStateMap = {};
@@ -207,6 +233,8 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
   const resolverConfirmedAlertStateMap = {};
   const resolverConfirmedScanKindMap = {};
   const fetches = [];
+  /** Profile IDs that took a network fetch this poll (not session-cache short circuit). */
+  const networkFetchedProfileIds = new Set();
   const now = Date.now();
   const lastSeen = loadLastSeen();
 
@@ -215,11 +243,10 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
     const cached = cache[pid];
     if (shouldUseCachedNetworkStatus(lastSeen, pid, cached, now, WALLET_NETWORK_CACHE_TTL_MS)) {
       statusMap[pid] = cached.status;
-      const cachedAlert = alertStateForNetworkPoll(cached.scanKind, cached.status);
-      if (cachedAlert != null) alertStateMap[pid] = cachedAlert;
       scanKindMap[pid] = cached.scanKind ?? null;
       continue;
     }
+    networkFetchedProfileIds.add(pid);
     fetches.push(
       (async () => {
         try {
@@ -270,27 +297,39 @@ export async function refreshWalletNetworkStatuses(entries, onDone) {
   }
 
   await Promise.all(fetches);
+
+  if (generation != null && isCurrentGeneration && !isCurrentGeneration()) {
+    onDone?.();
+    return;
+  }
+
   saveCache(cache);
-  if (Object.keys(resolverConfirmedAlertStateMap).length > 0) {
-    latestResolvedAlertStateMap = {
-      ...latestResolvedAlertStateMap,
-      ...resolverConfirmedAlertStateMap,
-    };
-    latestResolvedScanKindMap = {
-      ...latestResolvedScanKindMap,
-      ...resolverConfirmedScanKindMap,
-    };
-    for (const pid of Object.keys(resolverConfirmedAlertStateMap)) {
-      resolverConfirmedProfileIdsThisVisit.add(pid);
+  for (const pid of networkFetchedProfileIds) {
+    const alertState = resolverConfirmedAlertStateMap[pid];
+    if (alertState != null) {
+      setResolverConfirmedForProfile(pid, alertState, resolverConfirmedScanKindMap[pid]);
+    } else {
+      clearResolverConfirmedForProfile(pid);
     }
-    latestResolvedAt = Date.now();
   }
   const resolverConfirmedMap = Object.fromEntries(
     Object.keys(resolverConfirmedAlertStateMap).map((pid) => [pid, true])
   );
+  const bannerAlertStateMap = { ...resolverConfirmedAlertStateMap };
+  const bannerScanKindMap = { ...resolverConfirmedScanKindMap };
   persistWalletFromNetworkPoll({ statusMap, alertStateMap, scanKindMap });
-  notifyNetworkRefreshed(statusMap, alertStateMap, scanKindMap, resolverConfirmedMap);
-  onDone?.({ statusMap, alertStateMap, scanKindMap, resolverConfirmedMap });
+  notifyNetworkRefreshed(
+    statusMap,
+    bannerAlertStateMap,
+    bannerScanKindMap,
+    resolverConfirmedMap
+  );
+  onDone?.({
+    statusMap,
+    alertStateMap: bannerAlertStateMap,
+    scanKindMap: bannerScanKindMap,
+    resolverConfirmedMap,
+  });
 }
 
 function loadLastSeen() {

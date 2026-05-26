@@ -229,4 +229,10 @@ describe("cardDisabledSinceVisitVisible (DH-1 + Slice 1)", () => {
       )
     ).toBe(true);
   });
+
+  it("hides when scan.kind is null even if alert state is card_revoked", () => {
+    expect(
+      cardDisabledSinceVisitVisible(CARD_REVOKED_ALERT_STATE, "active", null, true)
+    ).toBe(false);
+  });
 });

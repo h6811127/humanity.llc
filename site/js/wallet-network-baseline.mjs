@@ -94,7 +94,7 @@ export function cardDisabledSinceVisitVisible(
   resolverConfirmed
 ) {
   const kind = String(scanKind || "").toLowerCase();
-  if (kind && kind !== CARD_REVOKED_ALERT_STATE) return false;
+  if (kind !== CARD_REVOKED_ALERT_STATE) return false;
   return shouldShowCardDisabledSinceVisitAlert(alertState, lastSeenStatus, {
     resolverConfirmed,
   });
