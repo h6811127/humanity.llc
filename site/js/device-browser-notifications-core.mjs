@@ -7,6 +7,23 @@ import { inboxWalletEntryLabel } from "./device-inbox-core.mjs";
 export const STORAGE_BROWSER_NOTIF = "hc_browser_notif";
 export const STORAGE_PROMPT_DISMISS = "hc_browser_notif_prompt_dismissed";
 
+/**
+ * @param {() => string | null} [readStorage]
+ * @returns {boolean}
+ */
+export function isBrowserNotifEnabled(readStorage) {
+  const read =
+    readStorage ??
+    (() => {
+      try {
+        return localStorage.getItem(STORAGE_BROWSER_NOTIF);
+      } catch {
+        return null;
+      }
+    });
+  return read() === "on";
+}
+
 /** @typedef {'live_proof' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'card_disabled_since_visit'} InboxAlertKind */
 
 /**

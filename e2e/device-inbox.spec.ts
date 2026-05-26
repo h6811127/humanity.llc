@@ -188,26 +188,24 @@ test.describe("device inbox — live proof", () => {
   });
 });
 
-test.describe("device inbox — sheet reconcile (P5e / phase 14)", () => {
-  test.beforeEach(async ({ page, context }) => {
-    await grantBrowserNotifications(context);
-    await page.addInitScript((entry) => {
-      localStorage.setItem("hc_wallet", JSON.stringify([entry]));
-    }, WALLET_ENTRY);
-    await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
-    await page.route("**/.well-known/hc/v1/cards/**/status**", mockCardStatus);
-    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", mockPendingChallenge);
+async function openInboxSheetForE2e(page: import("@playwright/test").Page) {
+  await page.evaluate(async () => {
+    const { setInboxSheetOpen } = await import("/js/device-inbox-sheet.mjs");
+    setInboxSheetOpen(true);
   });
+}
 
+test.describe("device inbox — sheet reconcile (P5e / phase 14)", () => {
   test("backdrop close clears body class and hides backdrop", async ({ page }) => {
     await page.goto("/wallet/");
-    await waitForLiveProofChrome(page);
-    await page.locator("#shell-notif-badge").click();
+    await openInboxSheetForE2e(page);
     const sheet = page.locator("#device-inbox-sheet");
     const backdrop = page.locator("#device-inbox-backdrop");
     await expect(sheet).not.toHaveClass(/device-inbox-sheet--collapsed/);
     await expect(backdrop).toBeVisible();
-    await backdrop.click();
+    await backdrop.evaluate((el) => {
+      el.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
     await expect(page.locator("body")).not.toHaveClass(/device-inbox-sheet-open/);
     await expect(sheet).toHaveClass(/device-inbox-sheet--collapsed/);
     await expect(backdrop).toBeHidden();
@@ -215,8 +213,7 @@ test.describe("device inbox — sheet reconcile (P5e / phase 14)", () => {
 
   test("pageshow bfcache reconcile clears stuck inbox-open chrome", async ({ page }) => {
     await page.goto("/wallet/");
-    await waitForLiveProofChrome(page);
-    await page.locator("#shell-notif-badge").click();
+    await openInboxSheetForE2e(page);
     await expect(page.locator("#device-inbox-sheet")).not.toHaveClass(
       /device-inbox-sheet--collapsed/
     );

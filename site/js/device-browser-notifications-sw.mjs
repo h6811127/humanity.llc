@@ -4,7 +4,8 @@
  */
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { loadWallet } from "./device-wallet.mjs";
-import { getLiveControlPending, liveControlPendingSignature } from "./device-live-control-inbox.mjs";
+import { getLiveControlPending } from "./device-live-control-inbox.mjs";
+import { liveControlPendingSignature } from "./device-live-control-inbox-core.mjs";
 import { isBrowserNotifEnabled } from "./device-browser-notifications-core.mjs";
 import {
   liveProofPollTargetsFromWallet,

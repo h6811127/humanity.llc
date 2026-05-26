@@ -2,9 +2,18 @@ import { describe, expect, it } from "vitest";
 
 import {
   inboxKindAllowsOsNotification,
+  isBrowserNotifEnabled,
   osNotificationContentForLiveProof,
   shouldShowBrowserNotifPrompt,
 } from "../../site/js/device-browser-notifications-core.mjs";
+
+describe("isBrowserNotifEnabled", () => {
+  it("reads hc_browser_notif storage", () => {
+    expect(isBrowserNotifEnabled(() => "on")).toBe(true);
+    expect(isBrowserNotifEnabled(() => "off")).toBe(false);
+    expect(isBrowserNotifEnabled(() => null)).toBe(false);
+  });
+});
 
 describe("shouldShowBrowserNotifPrompt", () => {
   it("shows when live proof pending, tab visible, not enabled or dismissed", () => {

@@ -4,6 +4,7 @@
  */
 import {
   inboxKindAllowsOsNotification,
+  isBrowserNotifEnabled as readBrowserNotifEnabled,
   osNotificationContentForLiveProof,
   shouldShowBrowserNotifPrompt,
   STORAGE_BROWSER_NOTIF,
@@ -23,11 +24,7 @@ const SESSION_OS_INTERACT = "hc_browser_notif_os_interact";
 
 /** @returns {boolean} */
 export function isBrowserNotifEnabled() {
-  try {
-    return localStorage.getItem(STORAGE_BROWSER_NOTIF) === "on";
-  } catch {
-    return false;
-  }
+  return readBrowserNotifEnabled();
 }
 
 /** @param {boolean} on */

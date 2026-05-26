@@ -170,6 +170,8 @@ Playwright: `e2e/device-inbox.spec.ts` (CI via `test-site.yml`). Manual spot-che
 
 ## P5d — Live-proof service worker (Phase D)
 
+`device-browser-notifications-sw.mjs` imports `isBrowserNotifEnabled` from `device-browser-notifications-core.mjs` only (not the page module). Vitest: `worker/tests/device-browser-notifications.test.ts`.
+
 | Step | Action | Expected |
 |------|--------|----------|
 | 1 | Enable **Browser alerts** on `/` with notification permission granted | `navigator.serviceWorker.getRegistration()` shows `/sw-live-proof.mjs` |
@@ -207,7 +209,7 @@ See [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md).
 | 2 | Card disabled since visit (resolver-confirmed) | `#brand-status-dot` has `data-dot-overlay="card_disabled_since_visit"`; badge chroma `default` |
 | 3 | bfcache: open inbox → browser back → forward | Inbox not stuck open; backdrop not `.is-visible` when sheet collapsed |
 
-Vitest: `worker/tests/device-inbox-sheet-core.test.ts`, `worker/tests/device-inbox.test.ts` (`inboxDotOverlayFromItems`). Playwright: `e2e/device-inbox.spec.ts` § card disabled since visit; § sheet reconcile (P5e steps 1 and 3, phase 14).
+Vitest: `worker/tests/device-inbox-sheet-core.test.ts`, `worker/tests/device-inbox.test.ts` (`inboxDotOverlayFromItems`). Playwright: `e2e/device-inbox.spec.ts` § card disabled since visit; § sheet reconcile (P5e — opens sheet via `setInboxSheetOpen`, phase 16).
 
 ## P5 — Inbox diagnostics (dev — phase 7)
 
