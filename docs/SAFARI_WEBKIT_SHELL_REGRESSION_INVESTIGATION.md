@@ -285,6 +285,7 @@ document.body.classList.remove("shell-is-scrolling");
 
 | Date | Decision |
 |------|----------|
+| 2026-05-26 | **Phase 1.6 shipped:** `@media (pointer: coarse)` removes `backdrop-filter` on hub/inbox backdrops (solid dim); `device-shell.css?v=36` |
 | 2026-05-26 | **Phase 1.5 shipped:** `touch-action: manipulation` on status dot; `visibility: hidden` on collapsed hub/inbox sheets; `device-shell.css?v=35` |
 | 2026-05-26 | **Phase 1.4 shipped:** `device-sheet-backdrop-sync.mjs`; reconcile on visibility/focus/pageshow; `syncSheetBackdropClosed` after close |
 | 2026-05-26 | **Phase 1.2–1.3 shipped:** document scroll-edge chrome + `shell-is-scrolling` gated to `(pointer: fine)` + `(hover: hover)`; `body.shell-scroll-chrome-off` on touch |
@@ -304,3 +305,4 @@ document.body.classList.remove("shell-is-scrolling");
 | 2026-05-26 | Phase 1.2–1.3 implemented (scroll-edge chrome off on touch; `styles.css?v=92` on shell pages) |
 | 2026-05-26 | Phase 1.4 implemented (backdrop lifecycle reconcile) |
 | 2026-05-26 | Phase 1.5 implemented (WebKit hit-test hardening) |
+| 2026-05-26 | Phase 1.6 implemented (coarse-pointer backdrop blur off) |

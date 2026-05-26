@@ -1628,6 +1628,16 @@ body.device-hub-sheet-open {
   visibility: hidden;
 }
 
+/* Phase 1.6: full-screen sheet backdrops — skip GPU blur on touch (scroll jank on WebKit). */
+@media (pointer: coarse) {
+  .device-hub-backdrop,
+  .device-inbox-backdrop {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(0, 0, 0, 0.38);
+  }
+}
+
 body.device-inbox-sheet-open {
   overflow: hidden;
 }
