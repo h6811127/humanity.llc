@@ -233,6 +233,7 @@ See [Background alerts roadmap](#background-alerts-roadmap) (v2 phases A–B shi
 | 10 | `buildGlanceRowPlan()` — glance popover order from inbox + saved-card peek | ✅ |
 | 11 | Dot soft overlay for `card_disabled_since_visit` (`inboxOverlayCountsFromItems` + `dotOverlayFromCounts`) | ✅ |
 | 12 | `topInboxKind()` + `inboxDotOverlayFromItems()` aligned with overlay priority; hub sheet reconcile core + Vitest | ✅ |
+| 13 | Inbox sheet reconcile core + Vitest; `getInboxDotOverlay()` on status dot; E2E card-disabled dot overlay | ✅ |
 
 **Do not:**
 
@@ -299,6 +300,8 @@ Since phase 3 (`device-inbox-sheet.mjs`), `device-status.mjs` imports the inbox 
 | `worker/tests/device-inbox-diagnostics.test.ts` | Vitest for inbox diagnostics core |
 | `site/js/device-hub-sheet-core.mjs` | Pure hub sheet reconcile rules (`hubSheetReconcileAction`) |
 | `worker/tests/device-hub-sheet-core.test.ts` | Vitest for hub sheet reconcile |
+| `site/js/device-inbox-sheet-core.mjs` | Pure inbox sheet reconcile rules (`inboxSheetReconcileAction`) |
+| `worker/tests/device-inbox-sheet-core.test.ts` | Vitest for inbox sheet reconcile |
 
 ---
 

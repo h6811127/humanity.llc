@@ -278,6 +278,10 @@ test.describe("device inbox — card disabled since visit", () => {
     await expect(badge).toBeVisible({ timeout: 15_000 });
     await expect(badge).toHaveAttribute("data-inbox-chroma", "default");
     await expect(badge).toHaveAttribute("aria-label", /card disabled since last visit/i);
+    await expect(page.locator("#brand-status-dot")).toHaveAttribute(
+      "data-dot-overlay",
+      "card_disabled_since_visit"
+    );
 
     const hubGroup = page.locator("#device-hub-card-disabled-group");
     await expect(hubGroup).toBeVisible();

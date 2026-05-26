@@ -24,6 +24,7 @@ import { prefersReducedMotion } from "./device-shell-motion.mjs";
 import { closeGlancePopover } from "./device-hub-glance-popover.mjs";
 import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs";
 import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs";
+import { inboxSheetReconcileAction } from "./device-inbox-sheet-core.mjs";
 
 const SHEET_ID = "device-inbox-sheet";
 const LIST_ID = "device-inbox-sheet-list";
@@ -126,14 +127,27 @@ export function setInboxSheetOpen(open) {
 /** Clear stuck inbox-open classes when the sheet is collapsed (bfcache, etc.). */
 export function reconcileInboxSheetState() {
   const sheet = getSheet();
-  if (!sheet || !sheet.classList.contains("device-inbox-sheet--collapsed")) return;
+  if (!sheet) return;
 
-  const bodyOpen = document.body.classList.contains("device-inbox-sheet-open");
-  const locked = document.getElementById("top-chrome")?.classList.contains(
-    "top-chrome--inbox-locked"
-  );
-  if (bodyOpen || locked || sheetOpen) {
+  const backdrop = document.getElementById(BACKDROP_ID);
+  const action = inboxSheetReconcileAction({
+    sheetCollapsed: sheet.classList.contains("device-inbox-sheet--collapsed"),
+    bodySheetOpen: document.body.classList.contains("device-inbox-sheet-open"),
+    chromeInboxLocked:
+      document.getElementById("top-chrome")?.classList.contains("top-chrome--inbox-locked") ??
+      false,
+    sheetOpenFlag: sheetOpen,
+    backdropHidden: backdrop?.hidden !== false,
+    backdropVisibleClass: backdrop?.classList.contains("is-visible") ?? false,
+  });
+
+  if (action === "close_sheet") {
     setInboxSheetOpen(false);
+    return;
+  }
+  if (action === "hide_backdrop" && backdrop) {
+    backdrop.hidden = true;
+    backdrop.classList.remove("is-visible");
   }
 }
 

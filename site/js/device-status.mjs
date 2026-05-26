@@ -13,7 +13,7 @@ import { getTabSession } from "./device-keys.mjs";
 import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
 import {
   getInboxItems,
-  getInboxOverlayCounts,
+  getInboxDotOverlay,
   inboxBadgeAriaLabel,
   inboxBadgeChromaClass,
   inboxBadgeChromaClassNames,
@@ -46,7 +46,6 @@ import {
   deviceStateFromContext,
   dotClassList,
   dotExplainerKicker,
-  dotOverlayFromCounts,
   dotStateKey,
   dotTransitionKey,
   hasStewardVerification,
@@ -125,7 +124,7 @@ function deviceState() {
 }
 
 function dotOverlayState() {
-  return dotOverlayFromCounts(getInboxOverlayCounts());
+  return getInboxDotOverlay();
 }
 
 export { notificationCount };

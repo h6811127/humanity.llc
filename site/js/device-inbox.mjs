@@ -9,6 +9,7 @@ import {
   inboxBadgeAriaLabel,
   inboxBadgeCountText,
   inboxCountFromItems,
+  inboxDotOverlayFromItems,
   inboxOverlayCountsFromItems,
   topInboxKind,
   inboxBadgeChromaKind,
@@ -28,6 +29,7 @@ export {
   inboxBadgeAriaLabel,
   inboxBadgeCountText,
   inboxCountFromItems,
+  inboxDotOverlayFromItems,
   inboxOverlayCountsFromItems,
   topInboxKind,
   inboxBadgeChromaKind,
@@ -71,8 +73,13 @@ export function notificationCount() {
 }
 
 /**
- * @returns {{ liveProofPending: number, crossTabNotice: number }}
+ * @returns {{ liveProofPending: number, crossTabNotice: number, cardDisabledSinceVisit: number }}
  */
 export function getInboxOverlayCounts() {
   return inboxOverlayCountsFromItems(getInboxItems());
+}
+
+/** @returns {import("./device-dot-state-core.mjs").DotInboxOverlay} */
+export function getInboxDotOverlay() {
+  return inboxDotOverlayFromItems(getInboxItems());
 }
