@@ -285,6 +285,7 @@ document.body.classList.remove("shell-is-scrolling");
 
 | Date | Decision |
 |------|----------|
+| 2026-05-26 | **Phase 2.2 shipped:** `device-inbox-sheet.mjs` lazy `import()` from `device-status.mjs` (badge/hub/explainer only); graph `v=25` |
 | 2026-05-26 | **Phase 2.1 shipped:** Playwright `webkit` + `iPhone 13 Pro` projects; `e2e/safari-shell-scroll.spec.ts`; CI installs WebKit; graph `v=24` (inbox backdrop `aria-hidden` on create) |
 | 2026-05-26 | **Phase 1.6 shipped:** `@media (pointer: coarse)` removes `backdrop-filter` on hub/inbox backdrops (solid dim); `device-shell.css?v=36` |
 | 2026-05-26 | **Phase 1.5 shipped:** `touch-action: manipulation` on status dot; `visibility: hidden` on collapsed hub/inbox sheets; `device-shell.css?v=35` |
@@ -308,3 +309,4 @@ document.body.classList.remove("shell-is-scrolling");
 | 2026-05-26 | Phase 1.5 implemented (WebKit hit-test hardening) |
 | 2026-05-26 | Phase 1.6 implemented (coarse-pointer backdrop blur off) |
 | 2026-05-26 | Phase 2.1 implemented (WebKit Playwright smoke) |
+| 2026-05-26 | Phase 2.2 implemented (lazy inbox sheet import from device-status) |

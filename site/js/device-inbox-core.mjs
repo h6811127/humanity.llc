@@ -3,7 +3,7 @@
  * @see docs/DEVICE_INBOX.md
  */
 import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs";
-import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=24";
+import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=25";
 
 /** @typedef {'live_proof' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'card_disabled_since_visit'} InboxKind */
 

@@ -1,7 +1,9 @@
 /**
  * Floating status dot, notification badge, hub sheet host.
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
+ * @see docs/SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md — Phase 2.2 (lazy inbox sheet)
  */
+import { DEVICE_SHELL_ASSET_VERSION } from "./device-status-shell-modules.mjs";
 import { buildStatusSegments } from "./device-counts.mjs";
 import {
   DEVICE_OS_REFRESHED,
@@ -20,26 +22,25 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeCountText,
   notificationCount,
-} from "./device-inbox.mjs?v=24";
+} from "./device-inbox.mjs?v=25";
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=24";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=25";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import "./device-shell-motion.mjs";
-import "./device-shell-chrome.mjs?v=24";
+import "./device-shell-chrome.mjs?v=25";
 import "./device-theme.mjs";
-import "./device-browser-notifications.mjs?v=24";
-import { openInboxFromChrome, setInboxSheetOpen, isInboxSheetOpen } from "./device-inbox-sheet.mjs?v=24";
+import "./device-browser-notifications.mjs?v=25";
 import {
   isHubSheet,
   reconcileHubSheetState,
   setHubSheetOpen,
-} from "./device-hub-sheet.mjs?v=24";
+} from "./device-hub-sheet.mjs?v=25";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 import {
   describeDotState,
@@ -51,7 +52,7 @@ import {
   hasStewardVerification,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=24";
+} from "./device-dot-state-core.mjs?v=25";
 
 export const DOT_STATE_CHANGED = "hc-dot-state-changed";
 
@@ -88,6 +89,27 @@ let networkStatus = "offline";
 /** @type {{ network: string, device: string, overlay: string } | null} */
 let lastDotSnapshot = null;
 let stewardCelebrateTimer = null;
+
+/** @type {Promise<typeof import("./device-inbox-sheet.mjs")> | null} */
+let inboxSheetModulePromise = null;
+
+function loadInboxSheetModule() {
+  if (!inboxSheetModulePromise) {
+    inboxSheetModulePromise = import(
+      `./device-inbox-sheet.mjs?v=${DEVICE_SHELL_ASSET_VERSION}`
+    );
+  }
+  return inboxSheetModulePromise;
+}
+
+function closeInboxSheet() {
+  void loadInboxSheetModule().then((mod) => mod.setInboxSheetOpen(false));
+}
+
+/** Opens inbox sheet; loads inbox module on first use (badge, hub targets, explainer). */
+export function openInboxFromChrome(source) {
+  void loadInboxSheetModule().then((mod) => mod.openInboxFromChrome(source));
+}
 
 function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -138,7 +160,7 @@ export function setHubExpanded(open, { persist = true, haptic = false } = {}) {
   if (!hub) return;
   if (open) {
     closeGlancePopover();
-    setInboxSheetOpen(false);
+    closeInboxSheet();
   }
   if (isHubSheet()) {
     setHubSheetOpen(open);
@@ -437,8 +459,6 @@ function openWalletFromChrome() {
   hapticTap();
 }
 
-export { openInboxFromChrome };
-
 function openHubFromChrome() {
   closeGlancePopover();
   if (isWalletPage()) {
@@ -486,8 +506,8 @@ document.addEventListener("keydown", (e) => {
     closeGlancePopover();
     return;
   }
-  if (isInboxSheetOpen()) {
-    setInboxSheetOpen(false);
+  if (document.body.classList.contains("device-inbox-sheet-open")) {
+    void loadInboxSheetModule().then((mod) => mod.setInboxSheetOpen(false));
     return;
   }
   if (hub && !hub.classList.contains("device-hub-collapsed")) {
