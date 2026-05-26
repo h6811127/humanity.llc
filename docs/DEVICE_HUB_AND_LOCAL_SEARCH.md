@@ -41,7 +41,7 @@ These notes are captured as individual product refinements so implementation can
 - **Step 1 (now):** reduce card text density with progressive disclosure.
 - **Step 2 (now):** rename `Use keys` to `Open controls` across hub/wallet and tests.
 - **Step 3 (now):** add network liveliness indicators and wording pass.
-- **Step 4:** status-pill terminology pass (`pins`, `online` semantics).
+- **Step 4 (now):** status-pill terminology pass (`pins`, `online` semantics).
 - **Step 5:** object identity visual system (types, glyph/color cues).
 - **Step 6:** modal/shell visual polish pass.
 - **Step 7:** action-forward card IA and command surface.
@@ -56,7 +56,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Landing layout:** Mobile-first single column only (no desktop widening grid). See [`LANDING_DESKTOP_LAYOUT.md`](LANDING_DESKTOP_LAYOUT.md) for retired desktop experiment notes.
 
-**Status line (shipped):** Segmented grey text (`Network live · 2 saved · 0 pinned · 1 notice`). Hub open state in `sessionStorage`; first unsaved-tab notice auto-expands hub once. On **`/created/`**, hub auto-opens when this tab has signing keys and hub state was never set.
+**Status line (shipped):** Segmented grey text (`Network reachable · 2 saved · 0 pinned · 1 notice`). Hub open state in `sessionStorage`; first unsaved-tab notice auto-expands hub once. On **`/created/`**, hub auto-opens when this tab has signing keys and hub state was never set.
 
 **`/created/` hub (shipped):** Same groups as landing except: notice links to **`#created-keys-strip`**; shortcuts are **Manage this card**, **All saved cards**, **Homepage** (no focus toggle).
 

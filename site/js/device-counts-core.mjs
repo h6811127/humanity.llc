@@ -36,7 +36,11 @@ export function buildStatusSegmentsFromCounts(input) {
         ? "Resolver Limited"
         : "Resolver Offline";
   const networkChip =
-    network === "ok" ? "Online" : network === "degraded" ? "Limited" : "Offline";
+    network === "ok"
+      ? "Network reachable"
+      : network === "degraded"
+        ? "Sync limited"
+        : "Offline";
 
   /** @type {Array<{ id: string, label: string, chipLabel: string, detail: string, zero: boolean, highlight: boolean, chipTone?: string }>} */
   const segments = [
@@ -63,7 +67,7 @@ export function buildStatusSegmentsFromCounts(input) {
     {
       id: "pinned",
       label: pins === 0 ? "No Pinned Scans" : `${pins} Pinned`,
-      chipLabel: pins === 0 ? "0 pins" : `${pins} pin${pins === 1 ? "" : "s"}`,
+      chipLabel: pins === 0 ? "0 pinned" : `${pins} pinned`,
       detail: `${pins} pinned scan${pins === 1 ? "" : "s"} on this device`,
       zero: pins === 0,
       highlight: false,

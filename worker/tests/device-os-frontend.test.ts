@@ -360,7 +360,9 @@ describe("buildStatusSegmentsFromCounts", () => {
       liveProof: 0,
     });
     expect(segments.find((s) => s.id === "notices")).toBeUndefined();
-    expect(segments.find((s) => s.id === "network")?.chipLabel).toBe("Online");
+    expect(segments.find((s) => s.id === "network")?.chipLabel).toBe(
+      "Network reachable"
+    );
   });
 
   it("shows proof check limited when poll health is degraded", () => {
