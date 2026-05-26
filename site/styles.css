@@ -7558,6 +7558,10 @@ body.device-shell-created .flow-keys-group .list-row {
   box-shadow: 0 0 0 4px rgba(255, 59, 48, 0.32);
 }
 
+#live-control-proof.live-control-proof-requested #live-control-proof-lead {
+  display: none;
+}
+
 .created-what-now-title {
   font-size: 20px;
   font-weight: 700;

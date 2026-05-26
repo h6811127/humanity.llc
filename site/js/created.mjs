@@ -328,8 +328,12 @@ function initLiveControlProof() {
   }
 
   const PROVE_BTN_LABEL = "Prove control now";
+  const LISTENING_LEAD =
+    "Someone nearby scanned your QR and asked for live proof. Sign once from this key-holding device  -  it does not reveal legal identity or create a badge.";
   const LISTENING_STATUS =
     "Keep this tab open while someone scans. The next live proof request will appear here automatically.";
+  const REQUESTED_STATUS =
+    "Someone nearby is asking for live proof. Tap below to sign from this device.";
   const AFTER_PROOF_STATUS =
     "Control proven. Keep this tab open  -  the next request will appear here automatically.";
 
@@ -386,9 +390,22 @@ function initLiveControlProof() {
 
   let loggedChallengeId = null;
 
+  function showRequestedState() {
+    panel.classList.add("live-control-proof-requested");
+    if (lead) lead.hidden = true;
+    btn.textContent = PROVE_BTN_LABEL;
+    status.textContent = REQUESTED_STATUS;
+  }
+
   function revealPanel(fromPoll = false) {
     panel.hidden = false;
-    panel.classList.toggle("live-control-proof-requested", !!fromPoll || !!activeChallengeId);
+    const requested = !!fromPoll || !!activeChallengeId;
+    panel.classList.toggle("live-control-proof-requested", requested);
+    if (requested) {
+      showRequestedState();
+    } else if (lead) {
+      lead.hidden = false;
+    }
     window.dispatchEvent(new Event("hc-created-live-cta-sync"));
     if (activeChallengeId && loggedChallengeId !== activeChallengeId) {
       loggedChallengeId = activeChallengeId;
@@ -405,8 +422,7 @@ function initLiveControlProof() {
     panel.classList.remove("live-control-proof-requested");
     if (lead) {
       lead.hidden = false;
-      lead.textContent =
-        "Someone nearby scanned your QR and asked for live proof. Sign once from this key-holding device  -  it does not reveal legal identity or create a badge.";
+      lead.textContent = LISTENING_LEAD;
     }
     btn.textContent = PROVE_BTN_LABEL;
     status.textContent = message;
@@ -431,13 +447,15 @@ function initLiveControlProof() {
         "Open this proof link in the original created tab, or unlock a saved recovery key / encrypted backup in Advanced. humanity.llc cannot prove control for you.";
       btn.disabled = true;
     } else if (activeChallengeId) {
+      if (lead) lead.hidden = true;
+      panel.classList.add("live-control-proof-requested");
       btn.textContent = PROVE_BTN_LABEL;
       if (
         !status.textContent ||
         status.textContent === LISTENING_STATUS ||
         status.textContent === AFTER_PROOF_STATUS
       ) {
-        status.textContent = "Ready to prove live control.";
+        status.textContent = REQUESTED_STATUS;
       }
     } else if (
       status.textContent !== AFTER_PROOF_STATUS &&
@@ -469,9 +487,6 @@ function initLiveControlProof() {
       activeReturnUrl =
         typeof body.return_url === "string" ? body.return_url : liveReturnUrlParam;
       revealPanel(true);
-      btn.textContent = PROVE_BTN_LABEL;
-      status.textContent =
-        "Someone nearby is asking for live proof. Tap below to sign from this device.";
       refresh();
       window.dispatchEvent(new Event("hc-created-live-cta-sync"));
     } catch {
@@ -522,9 +537,6 @@ function initLiveControlProof() {
     }
   });
 
-  if (liveChallengeParam) {
-    revealPanel(true);
-  }
   refresh();
   return {
     refresh,
