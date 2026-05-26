@@ -28,7 +28,7 @@ import {
 } from "./scan-safety";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v27";
+export const SCAN_UI_VERSION = "pass-v29";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -121,12 +121,19 @@ if (slot && !slot.querySelector("svg") && slot.dataset.scanUrl) {
 </script>`;
 }
 
-/** Page chrome: status dot only (docs/M3_SCAN_PAGE_UI.md Phase 7). */
+/** Page chrome: status dot only (docs/M3_SCAN_PAGE_UI.md Phase 7; progressive dot Phase 8). */
 function renderScanPageChrome(origin: string): string {
+  const home = `${escapeHtml(origin)}/`;
   return `<div class="scan-page-chrome">
-  <a class="scan-page-dot" href="${escapeHtml(origin)}/" aria-label="humanity.llc home">
-    <span class="pass-dot" aria-hidden="true"></span>
-  </a>
+  <div class="scan-page-status-cluster">
+    <a class="scan-page-dot" id="scan-page-dot-btn" href="${home}" aria-label="humanity.llc home">
+      <span class="pass-dot" id="scan-page-dot" aria-hidden="true"></span>
+    </a>
+    <div class="scan-page-dot-glance" id="scan-page-dot-glance" role="dialog" aria-label="Your device on this scan" hidden>
+      <div class="scan-page-dot-explainer device-dot-explainer device-dot-explainer--popover" id="scan-page-dot-explainer"></div>
+      <a class="scan-page-dot-home" id="scan-page-dot-home" href="${home}">humanity.llc home</a>
+    </div>
+  </div>
 </div>`;
 }
 
@@ -914,7 +921,7 @@ function renderVouchIssuanceScript(vm: ScanViewModel, origin: string): string {
 function renderScanTabKeysScript(vm: ScanViewModel, origin: string): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
   const assetOrigin = pagesJsOrigin(origin);
-  const mod = JSON.stringify(`${assetOrigin}/js/scan-tab-keys.mjs?v=3`);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-tab-keys.mjs?v=6`);
   return `<script type="module" src=${mod}></script>`;
 }
 

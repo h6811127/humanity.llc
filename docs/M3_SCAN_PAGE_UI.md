@@ -13,22 +13,23 @@
 
 The scan page is **live resolver output** (Cloudflare Worker), not the static Pages site. Deploy with `npm run worker:deploy`. Pages deploy alone does not change `/c/…`.
 
-Response header when the new UI is live: `X-HC-Scan-UI: pass-v26` (or later). **`pass-v26`:** page chrome is **status dot only** (no frosted top bar, no `humanity.llc` text above the card). **`pass-v25`:** emphasized trust-tool rows (icon + peek + thicker summaries), “Check at scan time” section, trust groups above show-link/limits, shorter vouch explainer. **`pass-v24`:** omit empty trust groups; M5 live-object showcase seed + landing. **`pass-v23`:** scan-type heroes, trust modules, Phase 4 tests.
+Response header when the new UI is live: `X-HC-Scan-UI: pass-v29` (or later). **`pass-v29`:** scan glance on page chrome dot (Phase 8.2) — eligible viewers tap for Now/Why/Next + in-page actions; strangers unchanged. **`pass-v28`:** progressive **viewer device** dot when vouch-ready (Phase 8.1). **`pass-v27`:** one “does not prove” disclosure (under “What this scan shows”); removed duplicate warning module; inbox sheet does not mount on scan pages. **`pass-v26`:** page chrome is **status dot only** (no frosted top bar, no `humanity.llc` text above the card). **`pass-v25`:** emphasized trust-tool rows (icon + peek + thicker summaries), “Check at scan time” section, trust groups above show-link/limits, shorter vouch explainer. **`pass-v24`:** omit empty trust groups; M5 live-object showcase seed + landing. **`pass-v23`:** scan-type heroes, trust modules, Phase 4 tests.
 
 ---
 
 ## Layout
 
-### Shipped today (`pass-v26`)
+### Shipped today (`pass-v29`)
 
 `scan-html.ts` renders, top to bottom:
 
-1. **Page chrome** (`renderScanPageChrome`) - **status dot only**: brand-red `pass-dot` link to site home; no frosted bar, no `humanity.llc` wordmark in page chrome (brand text stays on the hero card).
-2. **Live check hero** (`renderScanHeroSection`) - host + single status strip, H1 (manifesto / plate / `@handle` / failure copy), steward strip, trust pills on personal cards, resolver line, Level 0 limit, detail chips, first-seen footnote, demoted QR (`scan-hero-qr`).
-3. **Proves / does not prove** (`renderScanTrustModules`) - compact modules linking to full limits.
-4. **Check at scan time** (`scan-trust-tools`) - Card status, Human trust, This QR, Live control in thick `<details class="scan-trust-details">` rows: colored list icon, title, one-line peek (e.g. `Active`, `Registered`, `QR active`), chevron; inner `<ul class="list">` unchanged. Vouch block follows when eligible.
-5. **Show link** - collapsible scan URL + credential code.
-6. **Limits `<details>`** - `scan-limits-settings` (`id="scan-limits-settings"`).
+1. **Page chrome** (`renderScanPageChrome` + `scan-page-dot.mjs`) - **status dot only** for strangers (home link). **Progressive viewer device** dot when vouch-ready (`scan-page-dot--dynamic`); tap opens **scan glance** (`#scan-page-dot-glance`) with scroll/use-keys actions — not the hub sheet. No frosted bar or `humanity.llc` wordmark in page chrome.
+2. **Live check hero** (`renderScanHeroSection`) - host + single status strip, H1 (manifesto / plate / `@handle` / failure copy), steward strip, trust pills on personal cards, resolver line, **Level 0 bearer line** (`scan-hero-limit`), detail chips, first-seen footnote, demoted QR (`scan-hero-qr`).
+3. **What this scan shows** (`renderScanTrustModules`) - bullet list only (active scans).
+4. **What this scan does not prove** (`renderLimitsSettings`) - single collapsible `<details id="scan-limits-settings">` directly under (3); no separate `scan-does-not-prove` warning card.
+5. **Check at scan time** (`renderTrustGroups`) - Card status, Human trust, This QR, Live control in thick `<details class="scan-trust-details">` rows: colored list icon, title, one-line peek (e.g. `Active`, `Registered`, `QR active`), chevron; inner `<ul class="list">` unchanged. Vouch block follows when eligible.
+6. **Show link** - collapsible scan URL + credential code.
+7. **Footer** - quiet links / CTA.
 
 Legacy flippable pass card markup remains in `scan-html.ts` for reference; active scan HTML uses the **Live check hero** (not the flip scene). Standalone `renderScannerSafetyHeader()` remains for unit tests.
 
@@ -75,6 +76,7 @@ Track with [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Resolver UI 
 | **5** | Omit empty trust groups; M5 showcase seed + landing row | **Shipped** (`pass-v24`) - `pushTrustGroup`, `site:seed-showcase-live-object` |
 | **6** | Trust-tool emphasis (icons, peek, section kicker, layout) | **Shipped** (`pass-v25`) - `scan-trust-tools`, `scan-group-summary` |
 | **7** | Dot-only page chrome (remove white top bar + duplicate wordmark) | **Shipped** (`pass-v26`) - `renderScanPageChrome`, `.scan-page-chrome` |
+| **8** | Progressive device dot + scan glance (viewer state in chrome) | **Shipped** (`pass-v29`) - [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) |
 
 After `scan-pass.css` changes: `npm run worker:bundle-scan`.
 
@@ -98,7 +100,9 @@ After `scan-pass.css` changes: `npm run worker:bundle-scan`.
 3. **Bundle:** `npm run worker:bundle-scan`
 4. **Tests:** `npm run worker:test -- worker/tests/scan.test.ts worker/tests/scan-m5-showcase-paths.test.ts worker/tests/scan-hero-snapshot.test.ts`; assert full page HTML has `scan-page-chrome`, **no** `class="top-brand"`, and exactly **one** `class="scan-hero-host"` wordmark row.
 
-**Out of scope:** Wiring full device-shell `#brand-status-dot-btn` + hub sheet on Worker HTML (stewards still use hero + vouch blocks; shell dot remains on `/`, `/created/`, `/wallet/`).
+**Out of scope (Phase 7):** Full device-shell `#brand-status-dot-btn` + hub sheet on Worker HTML.
+
+**Phase 8 (planned):** Progressive **viewer device** semantics on the same chrome dot — static brand for strangers; hollow ring / steward green / overlays for vouch-ready viewers; tap opens **scan glance** (not hub). Canonical spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md). Shell dot remains on `/`, `/created/`, `/wallet/`.
 
 ---
 
@@ -120,10 +124,10 @@ Do **not** put full trust copy on the card back (it clips). Spec blocks live in 
 | **Source of truth** | `qr_credentials.payload` from D1 when present; otherwise build from request origin + ids (`resolveScanUrl` in `scan-state.ts`) |
 | **Not allowed** | Brand placeholder `red_qr_transparent_bg.png`, homepage URL, or generic `humanity.llc` QR |
 | **Color** | Modules `#db1b43`, background `#ffffff` (same as creation flow brand red) |
-| **Center logo** | Small mostly transparent concentric circles (vector, ~48% opacity, ~22% width) - see [`docs/QR_BRANDING.md`](QR_BRANDING.md) |
-| **Error correction** | **Q** (required with center logo) |
+| **Finder mark** | Module-masked two-tone circle on top-left finder (~21% width; rose + ink) - see [`docs/QR_BRANDING.md`](QR_BRANDING.md) |
+| **Error correction** | **Q** (required with finder overlay) |
 | **Creation page** | `/created/` renders the same payload client-side via `site/js/qr-render.mjs` + `qrScanUrl()` in `hc-sign.mjs` |
-| **Scan page** | Worker renders the same payload server-side via `worker/src/resolver/scan-qr.ts` (`QRCode.toString`, type `svg` + centered vector circles) |
+| **Scan page** | Worker renders the same payload server-side via `worker/src/resolver/scan-qr.ts` (`QRCode.toString`, type `svg` + finder overlay) |
 | **Fallback** | If server SVG fails, inline module script loads `/js/qr-render.mjs` and fills `#pass-qr-slot[data-scan-url]` (never the brand PNG) |
 | **Visible URL** | Red monospace line under QR on card front: full scan URL (confirms payload for humans) |
 | **Credential code** | `HC-XXXX-XXXX` under QR (Phase F); matches `scan.qr.credential_code` in status JSON and print sticker |
@@ -132,7 +136,7 @@ Do **not** put full trust copy on the card back (it clips). Spec blocks live in 
 
 - [ ] Scan the on-card QR with a phone → opens **this** profile’s `/c/…?q=…` URL, not the marketing homepage.
 - [ ] QR on `/created/` and on `/c/…` scan page encode the **same** string for a given card.
-- [ ] QR modules are red, not black; faint center logo visible (see `docs/QR_BRANDING.md`).
+- [ ] QR modules are red, not black; two-tone mark on **top-left finder** (not frame border or code center) - see `docs/QR_BRANDING.md` § Verification.
 
 ---
 
@@ -149,15 +153,17 @@ Below-card rows use **colored tile + white stroke SVG** (same visual language as
 | `worker/src/resolver/scan-html.ts` | HTML template |
 | `worker/src/resolver/scan-safety.ts` | Scanner safety header + first-seen script |
 | `worker/src/resolver/scan-state.ts` | View model + `scanUrl` |
-| `worker/src/resolver/scan-qr.ts` | Branded SVG QR + center logo overlay |
+| `worker/src/resolver/scan-qr.ts` | Branded SVG QR + finder mark overlay |
 | `worker/src/resolver/scan-icons.ts` | List row SVGs |
 | `site/scan-pass.css` | Bundled styles → `scan-pass-styles.ts` |
 | `site/js/qr-branding.mjs` | Shared logo opacity, size, correction Q |
 | `site/js/qr-render.mjs` | Browser QR for `/created/` (+ scan fallback) |
-| `site/assets/qr-center-logo.svg` | Design reference for center mark (runtime uses `qr-branding.mjs`) |
+| `site/assets/qr-center-logo.svg` | Design reference for two-tone mark (runtime uses `qr-branding.mjs`) |
 | `docs/QR_BRANDING.md` | Branding spec + QA checklist |
 | `site/js/hc-sign.mjs` | `qrScanUrl(profileId, qrId, origin)` |
 | `site/js/qr-scan-url-lock.mjs` | Host lock for official QR payloads |
+| `site/js/scan-tab-keys.mjs` | Cross-tab + chrome refresh on scan (today: banner only) |
+| `docs/SCAN_PAGE_DEVICE_DOT.md` | Phase 8: progressive device dot + scan glance (spec) |
 
 After changing `scan-pass.css` or `pass-flip.js`, run `npm run worker:bundle-scan` (included in `worker:deploy`).
 

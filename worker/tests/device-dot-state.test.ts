@@ -14,6 +14,7 @@ import {
   shouldCelebrateStewardTransition,
   dotTransitionKey,
   statusAriaLabel,
+  scanOverlayQuickAction,
 } from "../../site/js/device-dot-state-core.mjs";
 
 describe("hasStewardVerification", () => {
@@ -98,6 +99,12 @@ describe("statusAriaLabel", () => {
       "Status: resolver online, saved keys on device."
     );
   });
+
+  it("uses Your device prefix on scan pages", () => {
+    expect(statusAriaLabel("ok", "none", "cross_tab_keys", { pageKind: "scan" })).toBe(
+      "Your device: resolver online, no signing keys in this tab, keys active in another tab."
+    );
+  });
 });
 
 describe("overlayAriaText", () => {
@@ -156,6 +163,13 @@ describe("describeDotState", () => {
     });
   });
 
+  it("routes proof overlay to scan live-proof scroll on scan pages", () => {
+    const withProof = describeDotState("ok", "keys", "proof_waiting", {
+      pageKind: "scan",
+    });
+    expect(withProof.action).toEqual(scanOverlayQuickAction("proof_waiting"));
+  });
+
   it("routes card-disabled overlay to open device inbox", () => {
     const disabled = describeDotState("ok", "keys", "card_disabled_since_visit");
     expect(disabled.next).toContain("disabled on the network");
@@ -198,6 +212,16 @@ describe("describeDotState", () => {
       kind: "open_controls",
       label: "Open controls",
     });
+  });
+
+  it("uses scan-specific next copy for eligible viewers", () => {
+    const none = describeDotState("ok", "none", "none", { pageKind: "scan" });
+    expect(none.next).toContain("Use keys here");
+    const steward = describeDotState("ok", "steward", "none", {
+      pageKind: "scan",
+      stewardReady: true,
+    });
+    expect(steward.next).toContain("Scroll to vouch");
   });
 });
 

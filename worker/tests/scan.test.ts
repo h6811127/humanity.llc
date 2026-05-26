@@ -204,7 +204,11 @@ describe("renderScanPage M3.2 trust blocks", () => {
     );
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).toContain("scan-page-chrome");
-    expect(html).toContain("scan-page-dot");
+    expect(html).toContain('id="scan-page-dot-btn"');
+    expect(html).toContain('id="scan-page-dot"');
+    expect(html).toContain('id="scan-page-dot-glance"');
+    expect(html).toContain('id="scan-page-dot-explainer"');
+    expect(html).toContain('id="scan-page-dot-home"');
     expect(html).toContain('class="hc-qr-finder-logo"');
     expect(html).not.toContain('class="hc-qr-brand-mark"');
     expect(html).not.toContain('class="hc-qr-center-logo"');
@@ -327,7 +331,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("Issue vouch");
     expect(html).toContain("vouch-explainer-actions");
     expect(html).toContain('id="scan-cross-tab-banner"');
-    expect(html).toContain("scan-tab-keys.mjs?v=2");
+    expect(html).toContain("scan-tab-keys.mjs?v=6");
     expect(html).toContain("vouch-issue.mjs?v=12");
     expect(html).not.toContain("Limitations");
     expect(html).toContain("scan-limits-settings");

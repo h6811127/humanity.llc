@@ -61,6 +61,20 @@ Spec: [`docs/QR_BRANDING.md`](QR_BRANDING.md) § Verification. Automated: `npm r
 
 **Fail signals:** Black modules; mark on frame margin; center-only disk; download uses different layout than preview; scan fails at print size.
 
+### P1-SD · Scan page device dot + glance (`/c/…`)
+
+Spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md). Automated: `npm run worker:test:scan-page-dot`.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Incognito active scan URL | Static brand dot; tap goes home; no glance |
+| 2 | Steward / saved wallet on same device | Dot shows viewer state (hollow ring, solid red, green, or overlay notch); tap opens glance, not hub |
+| 3 | Glance primary action | Scrolls to vouch / live proof / cross-tab banner action in-page |
+| 4 | Cross-tab keys banner visible | Dot overlay matches banner (`cross_tab_keys`) |
+| 5 | Escape / outside tap | Glance closes; dot `aria-expanded` false |
+
+**Fail signals:** Stranger sees pulsing or green dot; glance opens hub sheet; dot contradicts cross-tab banner.
+
 ### P1-8 · Open controls: status dot vs hub row
 
 | Control | Where | Expected |
