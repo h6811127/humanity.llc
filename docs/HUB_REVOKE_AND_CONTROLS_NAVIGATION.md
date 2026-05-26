@@ -1,7 +1,7 @@
 # Hub revoke & Open controls navigation — architecture and fix proposal
 
 **Date:** 2026-05-26  
-**Status:** P0–P1 fixes shipped (mode gate, setup backfill, steward hash bailout, `bootstrapOwnerTools` hydrate guard)  
+**Status:** P0–P2 shipped (mode gate, setup backfill, steward hash bailout, hydrate guard, hub menu hints, wallet active link, QA P1-8)  
 **Scope:** Investigation + implementation reference  
 **Reported symptoms:** Hub ⋯ **Revoke QR** and row **Open controls** land on the **Print** setup step on `/created/`; card stays **active** on the network.  
 **Related:** `docs/CARD_WORKSPACE_UX.md`, `docs/REVOKE_UI_INVESTIGATION.md`, `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md`, `docs/M4_CREATED_REVOKE_UI.md`

@@ -97,6 +97,9 @@ test.describe("device OS wallet flow", () => {
 
     const cardRow = page.locator(".hub-card-item").first();
     await cardRow.locator(".hub-card-menu summary").click();
+    await expect(
+      cardRow.getByText("Opens card page to confirm")
+    ).toBeVisible();
     await cardRow.getByRole("button", { name: "Revoke QR" }).click();
 
     await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);

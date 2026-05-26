@@ -35,6 +35,9 @@ describe("buildHubCardControls", () => {
       "revoke-qr",
       "new-qr",
     ]);
+    expect(controls.find((c) => c.id === "revoke-qr")?.menuHint).toBe(
+      "Opens card page to confirm"
+    );
   });
 
   it("narrows controls when the card is revoked on the network", () => {

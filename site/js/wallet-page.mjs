@@ -4,11 +4,11 @@
 import { logDeviceActivity } from "./device-activity.mjs";
 import { isAutoSaveEnabled, initAutoSaveToggle } from "./device-auto-save.mjs";
 import { initDeviceHub, refreshDeviceHub } from "./device-hub-ui.mjs";
-import { getTabSession } from "./device-keys.mjs";
-import { tabNoticeCount } from "./device-counts.mjs";
-import { refreshWalletContextFromChrome } from "./wallet-page-chrome.mjs";
+import { getTabSession, openCardNowPage } from "./device-keys.mjs";
+import { refreshWalletContextFromChrome, walletEntryForSession } from "./wallet-page-chrome.mjs";
 import { createPinEntry, loadPins, savePins } from "./device-pins.mjs";
 import { mountKeysCustody } from "./device-keys-custody.mjs";
+import "./device-help-fab.mjs";
 import {
   defaultWalletLabel,
   loadWallet,
@@ -19,8 +19,6 @@ const saveForm = document.getElementById("wallet-save-form");
 const saveGroup = document.getElementById("device-hub-save-tab-group");
 const saveStatus = document.getElementById("wallet-save-status");
 const saveLabel = document.getElementById("wallet-save-label");
-const activeBanner = document.getElementById("wallet-active-banner");
-const activeText = document.getElementById("wallet-active-text");
 const activeLink = document.getElementById("wallet-active-link");
 const autoSaveLine = document.getElementById("wallet-auto-save-line");
 const helpDetails = document.getElementById("wallet-help-details");
@@ -52,29 +50,18 @@ function refreshHelpVisibility() {
   helpDetails.hidden = loadWallet().length > 0;
 }
 
+function bindWalletActiveLink() {
+  if (!activeLink || activeLink.dataset.bound === "1") return;
+  activeLink.dataset.bound = "1";
+  activeLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    const entry = walletEntryForSession(getTabSession());
+    if (entry) openCardNowPage(entry);
+  });
+}
+
 function updateContextBanners() {
-  const session = getTabSession();
-  const hasKeys = !!(session?.profile_id && session?.owner_private_key_b58);
-
   refreshWalletContextFromChrome();
-
-  if (!activeBanner || !activeText) return;
-  if (!hasKeys) {
-    activeBanner.hidden = true;
-    return;
-  }
-
-  const label =
-    session.wallet_label ||
-    (session.handle ? `@${session.handle}` : session.profile_id.slice(0, 12));
-  activeBanner.hidden = false;
-  activeText.textContent = `Managing in this tab: ${label}`;
-  if (activeLink) {
-    const url = new URL("/created/", location.origin);
-    url.searchParams.set("profile_id", session.profile_id);
-    if (session.qr_id) url.searchParams.set("qr_id", session.qr_id);
-    activeLink.href = url.href;
-  }
 }
 
 function initTabSave() {
@@ -160,6 +147,7 @@ mountKeysCustody("#device-keys-custody-wallet", "wallet", {
 
 initAutoSaveToggle();
 initTabSave();
+bindWalletActiveLink();
 refreshAutoSaveLine();
 updateContextBanners();
 refreshHelpVisibility();

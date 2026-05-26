@@ -333,7 +333,11 @@ function hubCardControlsHtml(entry, controls) {
  */
 function hubCardControlButtonHtml(entry, control, opts = {}) {
   if (opts.menu === true) {
-    return `<button type="button" class="hub-card-menu-item hub-card-menu-item--${control.variant} hub-card-menu-steward hub-card-control--${control.id}" data-id="${escapeHtml(entry.id)}" data-focus="${escapeHtml(control.focus)}">${escapeHtml(control.label)}</button>`;
+    const stacked = control.menuHint ? " hub-card-menu-item--stacked" : "";
+    const hint = control.menuHint
+      ? `<span class="hub-card-menu-item-hint">${escapeHtml(control.menuHint)}</span>`
+      : "";
+    return `<button type="button" class="hub-card-menu-item hub-card-menu-item--${control.variant} hub-card-menu-steward hub-card-control--${control.id}${stacked}" data-id="${escapeHtml(entry.id)}" data-focus="${escapeHtml(control.focus)}"><span class="hub-card-menu-item-label">${escapeHtml(control.label)}</span>${hint}</button>`;
   }
   return `<button type="button" class="hub-card-control hub-card-control--${control.variant} hub-card-control--${control.id}" data-id="${escapeHtml(entry.id)}" data-focus="${escapeHtml(control.focus)}">${escapeHtml(control.label)}</button>`;
 }

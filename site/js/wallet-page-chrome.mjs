@@ -1,11 +1,28 @@
 /**
  * /wallet/ chrome refresh adapter (tab hint + active banner).
- * This lets the shared device chrome coordinator update wallet-only UI without
- * importing wallet-page.mjs (which has page-init side effects).
+ * Click handler for Open controls: `bindWalletActiveOpenControls()` from wallet-page.mjs.
  */
 
 import { gatherInboxInput } from "./device-inbox.mjs?v=37";
-import { getTabSession } from "./device-keys.mjs";
+import { createdUrlForEntry, getTabSession } from "./device-keys.mjs";
+import { loadWallet } from "./device-wallet.mjs";
+
+/** @param {Record<string, unknown> | null} session */
+export function walletEntryForSession(session) {
+  if (!session?.profile_id) return null;
+  const saved = loadWallet().find((e) => e.profile_id === session.profile_id);
+  if (saved) return saved;
+  if (!session.owner_private_key_b58) return null;
+  return {
+    profile_id: session.profile_id,
+    qr_id: session.qr_id ?? null,
+    owner_private_key_b58: session.owner_private_key_b58,
+    owner_public_key_b58: session.owner_public_key_b58,
+    handle: session.handle,
+    manifesto_line: session.manifesto_line,
+    scan_url: session.scan_url,
+  };
+}
 
 function setTabHint(tabHint, input) {
   if (!tabHint) return;
@@ -26,17 +43,10 @@ function setTabHint(tabHint, input) {
   tabHint.hidden = true;
 }
 
-export function refreshWalletContextFromChrome() {
-  if (!document.getElementById("wallet-page")) return;
-
-  const tabHint = document.getElementById("wallet-tab-hint");
+function refreshWalletActiveBanner() {
   const activeBanner = document.getElementById("wallet-active-banner");
   const activeText = document.getElementById("wallet-active-text");
   const activeLink = document.getElementById("wallet-active-link");
-
-  const input = gatherInboxInput();
-  setTabHint(tabHint, input);
-
   const session = getTabSession();
   const hasKeys = !!(session?.profile_id && session?.owner_private_key_b58);
   if (!activeBanner || !activeText) return;
@@ -50,11 +60,16 @@ export function refreshWalletContextFromChrome() {
     (session.handle ? `@${session.handle}` : session.profile_id.slice(0, 12));
   activeBanner.hidden = false;
   activeText.textContent = `Managing in this tab: ${label}`;
-  if (activeLink) {
-    const url = new URL("/created/", location.origin);
-    url.searchParams.set("profile_id", session.profile_id);
-    if (session.qr_id) url.searchParams.set("qr_id", session.qr_id);
-    activeLink.href = url.href;
+  const entry = walletEntryForSession(session);
+  if (activeLink && entry) {
+    activeLink.href = createdUrlForEntry(entry);
   }
 }
 
+export function refreshWalletContextFromChrome() {
+  if (!document.getElementById("wallet-page")) return;
+
+  const tabHint = document.getElementById("wallet-tab-hint");
+  setTabHint(tabHint, gatherInboxInput());
+  refreshWalletActiveBanner();
+}

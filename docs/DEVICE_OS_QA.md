@@ -45,6 +45,18 @@ These map to the #1 documented confusion: **keys in one tab vs saved on device**
 
 **Fail signals:** `/created/` without signing keys; revoke panel stuck on “Checking…” (see [`REVOKE_UI_INVESTIGATION.md`](REVOKE_UI_INVESTIGATION.md)).
 
+Hub ⋯ **Revoke QR** only navigates to `/created/#revoke` to confirm; it does not revoke on the network in one tap ([`HUB_REVOKE_AND_CONTROLS_NAVIGATION.md`](HUB_REVOKE_AND_CONTROLS_NAVIGATION.md)).
+
+### P1-8 · Open controls: status dot vs hub row
+
+| Control | Where | Expected |
+|---------|-------|----------|
+| Status dot explainer **Open controls** | Floating dot on `/`, `/create/`, `/created/` | Opens the **hub sheet**, not `/created/` directly |
+| Row **Open controls** | Hub or `/wallet/` saved card row | `openCardNowPage()` → `/created/?profile_id=…` with `hc_created` keys |
+| Wallet banner **Open controls** | `/wallet/` when this tab holds keys | Same as row (`activateWalletEntry` when a saved row exists) |
+
+**Fail signals:** Dot jumps to `/created/` without opening hub; banner link opens `/created/` with empty `hc_created`.
+
 ### P0-3 · Status dot opens hub (not dead)
 
 | Step | Action | Expected |

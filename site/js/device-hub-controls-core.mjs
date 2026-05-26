@@ -5,7 +5,7 @@
 
 /** @typedef {'primary' | 'secondary' | 'danger'} HubControlVariant */
 
-/** @typedef {{ id: string, label: string, focus: string, variant: HubControlVariant }} HubCardControl */
+/** @typedef {{ id: string, label: string, focus: string, variant: HubControlVariant, menuHint?: string }} HubCardControl */
 
 /** Controls that stay on the collapsed row (inbox-driven). @see docs/HUB_CARD_ROW_UX.md Phase 2 */
 const INLINE_HUB_CONTROL_IDS = new Set(["prove-live"]);
@@ -77,6 +77,7 @@ export function buildHubCardControls(ctx) {
       label: "Revoke QR",
       focus: "revoke",
       variant: "danger",
+      menuHint: "Opens card page to confirm",
     });
     controls.push({
       id: "new-qr",
@@ -90,6 +91,7 @@ export function buildHubCardControls(ctx) {
       label: "Revoke card",
       focus: "revoke",
       variant: "danger",
+      menuHint: "Opens card page to confirm",
     });
     controls.push({
       id: "new-qr",
