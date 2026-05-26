@@ -144,7 +144,7 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 
 | ID | Gap |
 |----|-----|
-| **DH-9** | `hc_wallet[].status` updated from `statusMap` card.status string (`device-hub-ui.mjs` after fetch), not from `scan.kind`. Can read `active` while alert/chip logic uses different dimensions. |
+| **DH-9** | ✅ Fixed: wallet persistence now stores both `status` and `scan_kind` from resolver sync (`device-hub-ui.mjs`), so saved state tracks both card status and `scan.kind` dimensions. |
 | **DH-10** | Saved rows without `qr_id` skip live-control poll (`isPollableWalletEntry`) but still fetch status — if `q` omitted, status is **card-only** (`buildCardOnlyScanViewModel`), which may disagree with full scan URL on row. |
 
 ---
