@@ -1,6 +1,6 @@
 # Safe UI/UX rebuild — implementation plan
 
-**Status:** Step 1 complete · Step 2+ planned  
+**Status:** Step 1 complete · Step 2 complete · Step 3 complete · Step 4 complete  
 **Audience:** Engineers restoring May 25–26 shell work without landing lag or rate limits  
 **Related:** [`UI_UX_REVERTED_FEATURES_CATALOG.md`](UI_UX_REVERTED_FEATURES_CATALOG.md) · [`UI_UX_REVERT_PLAN.md`](UI_UX_REVERT_PLAN.md) · [`SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md`](SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md)
 
@@ -86,7 +86,7 @@ CI grep (manual until scripted): no new `addEventListener("scroll"` in `site/js/
 
 ---
 
-## Step 2 — Lazy inbox sheet loader (planned)
+## Step 2 — Lazy inbox sheet loader (implemented)
 
 **Intent:** Shrink `device-status.mjs` static import graph so Safari is less likely to brick the dot on first load.
 
@@ -108,7 +108,7 @@ Same as Step 1 E2E + lazy-inbox Vitest; dot loads on cold navigation in Playwrig
 
 ---
 
-## Step 3 — Hub-scoped network freshness (planned)
+## Step 3 — Hub-scoped network freshness (implemented)
 
 **Intent:** Card-disabled glance/inbox timeliness without global polling.
 
@@ -116,6 +116,11 @@ Same as Step 1 E2E + lazy-inbox Vitest; dot loads on cold navigation in Playwrig
 
 - On `NETWORK_REFRESHED` from hub wallet poll only, ensure `refreshHubGlance` + hub banners already run (verify; add hub-only `requestDeviceOsRefresh('hub-changed')` **only inside** `device-hub-ui.mjs` if gaps found).
 - Optional: debounced refresh when hub **expands**, not on every landing `visibilitychange`.
+  
+### Implementation checklist
+
+- [x] In `site/js/device-hub-ui.mjs`, gate `fetchAndApplyNetworkChips()` on `visibilitychange` so it only runs when `#device-hub` is **not** `.device-hub-collapsed`.
+- [x] Keep the init-time hub poll (`fetchAndApplyNetworkChips()` on hub init) so card-disabled rows update immediately when hub loads.
 
 ### Forbidden
 
@@ -128,21 +133,24 @@ Multi-tab: no Cloudflare interstitial under normal use; card-disabled row appear
 
 ---
 
-## Step 4 — Safari sheet CSS, one knob per deploy (planned)
+## Step 4 — Safari sheet CSS (implemented)
 
 **Intent:** Reduce dead taps without scroll jank.
 
-Order (stop if P0-W fails):
+Shipped (2026-05-26):
 
-1. `touch-action: manipulation` on `#brand-status-dot-btn` only.
-2. Collapsed hub/inbox `pointer-events: none` (already partially present).
-3. `@media (pointer: coarse)` backdrop blur-off **only** (not hub body).
-4. `visibility: hidden` on collapsed sheets **only** if Step 1–3 insufficient on iPhone.
+1. `touch-action: manipulation` on `#brand-status-dot-btn` only (`site/css/device-shell.css`).
+2. Collapsed hub `pointer-events: none` (existing); explicit `.device-inbox-sheet--collapsed { pointer-events: none }`.
+3. `@media (pointer: coarse)` — `backdrop-filter: none` on `.device-hub-backdrop` and `.device-inbox-backdrop` only (not hub sheet body, not glance popover).
+4. **Deferred:** `visibility: hidden` on collapsed sheets — add only if P0-W still shows dead taps after Step 1–3 on iPhone.
+
+`device-shell.css?v=42` on shell pages (`index`, `create`, `created`, `wallet`).
 
 ### Forbidden per knob
 
 - No `top-chrome--edge-hidden` cluster fixes bundled with sheet visibility.
 - No document scroll listener.
+- No coarse-pointer blur strip on `.device-hub.device-hub--sheet` (reverted jank path).
 
 ---
 
@@ -179,3 +187,4 @@ Only if iPhone reports scroll jump at page bottom **without** scroll-edge chrome
 | Date | Change |
 |------|--------|
 | 2026-05-26 | Initial plan; Step 1 implementation |
+| 2026-05-26 | Step 4: dot `touch-action`, collapsed inbox hit-test, coarse backdrop blur-off only |

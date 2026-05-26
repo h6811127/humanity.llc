@@ -629,6 +629,10 @@ body.page-wallet .device-keys-custody--wallet {
   transition: transform 0.25s var(--shell-spring);
 }
 
+#brand-status-dot-btn {
+  touch-action: manipulation;
+}
+
 .shell-status-dot-btn:active {
   transform: scale(0.94);
 }
@@ -1670,6 +1674,10 @@ body.device-hub-sheet-open {
   pointer-events: auto;
 }
 
+.device-inbox-sheet.device-inbox-sheet--collapsed {
+  pointer-events: none;
+}
+
 .device-inbox-sheet-body {
   display: flex;
   flex-direction: column;
@@ -1767,6 +1775,15 @@ body.device-hub-sheet-open {
 
 .device-inbox-backdrop[hidden] {
   pointer-events: none;
+}
+
+@media (pointer: coarse) {
+  .device-hub-backdrop,
+  .device-inbox-backdrop {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(0, 0, 0, 0.38);
+  }
 }
 
 body.device-inbox-sheet-open {
