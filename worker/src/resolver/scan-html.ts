@@ -28,7 +28,7 @@ import {
 } from "./scan-safety";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v32";
+export const SCAN_UI_VERSION = "pass-v33";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -67,6 +67,7 @@ export async function renderScanPage(
     <p class="scan-offline-banner" id="scan-offline-banner" role="status" hidden>${escapeHtml(SCAN_OFFLINE_BANNER_TEXT)}</p>
     <main class="screen scan-screen">
       ${renderScanHeroSection(vm, safety, origin, qrMarkup)}
+      ${renderScanActorBand(vm, origin)}
       ${renderScanTrustModules(vm, safety)}
       ${renderLimitsSettings(origin)}
       ${renderTrustGroups(vm, origin)}
@@ -81,6 +82,7 @@ export async function renderScanPage(
   ${renderScanOfflineBannerScript()}
   ${renderScanSafetyHeaderScript()}
   ${renderScanLiveCheckArriveScript(origin)}
+  ${renderScanActorBandScript(vm, origin)}
 </body>
 </html>`;
 }
@@ -168,6 +170,7 @@ function renderScanHeroSection(
     ? ` data-profile-id="${escapeHtml(vm.profileId)}"`
     : "";
   const qrAttr = vm.qrId ? ` data-qr-id="${escapeHtml(vm.qrId)}"` : "";
+  const scanActiveAttr = vm.kind === "active" ? ` data-scan-active="1"` : "";
   const resolverRow = safety.objectSignatureVerified
     ? `<p class="scan-safety-resolver scan-arrive-item scan-arrive-item--hidden">${escapeHtml(SCAN_SAFETY_RESOLVER_VERIFIED_COPY)}</p>`
     : "";
@@ -191,7 +194,7 @@ function renderScanHeroSection(
     : "";
 
   return `<div class="scan-pass-layer">
-<article class="scan-hero scan-status-panel scan-safety-header scan-live-check--pending" id="scan-safety-header" aria-label="Live check"${profileAttr}${qrAttr}>
+<article class="scan-hero scan-status-panel scan-safety-header scan-live-check--pending" id="scan-safety-header" aria-label="Live check"${profileAttr}${qrAttr}${scanActiveAttr}>
   <header class="scan-hero-head">
     ${renderScanHeroHost()}
     ${renderHeroStatusStrip(vm)}
@@ -948,6 +951,27 @@ function renderScanTabKeysScript(vm: ScanViewModel, origin: string): string {
 function renderScanLiveCheckArriveScript(origin: string): string {
   const assetOrigin = pagesJsOrigin(origin);
   const mod = JSON.stringify(`${assetOrigin}/js/scan-live-check-arrive.mjs?v=1`);
+  return `<script type="module" src=${mod}></script>`;
+}
+
+/** L3 actor band — markup only on active scans (docs/SCAN_PAGE_TRUST_UI.md S3). */
+function renderScanActorBand(vm: ScanViewModel, origin: string): string {
+  if (vm.kind !== "active" || !vm.profileId || !vm.qrId) return "";
+  const walletUrl = `${escapeHtml(origin)}/wallet/`;
+  return `<section id="scan-actor-band" class="scan-actor-band scan-actor-band--hidden" hidden aria-label="Your device on this scan">
+  <h2 class="scan-actor-band-title">Keys on this device</h2>
+  <p class="scan-actor-band-lead">You can vouch or open your cards from here.</p>
+  <div class="scan-actor-band-actions">
+    <button type="button" class="scan-actor-band-primary" id="scan-actor-band-vouch">Go to vouch</button>
+    <a class="scan-actor-band-secondary" href="${walletUrl}">My cards</a>
+  </div>
+</section>`;
+}
+
+function renderScanActorBandScript(vm: ScanViewModel, origin: string): string {
+  if (vm.kind !== "active" || !vm.profileId) return "";
+  const assetOrigin = pagesJsOrigin(origin);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-actor-band.mjs?v=1`);
   return `<script type="module" src=${mod}></script>`;
 }
 

@@ -68,7 +68,7 @@ Spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · Path 2 arrive [`SC
 | Step | Action | Expected |
 |------|--------|----------|
 | 1 | Incognito active scan URL | Hero: **Checking live status…** then **Active** (or kind label) with stagger + one card pulse; corner dot **one-shot settle** (no loop); tap home |
-| 2 | Steward / saved wallet on same device | Same L2 arrive; dot may show viewer state (Phase 8); tap opens glance, not hub |
+| 2 | Steward / saved wallet on same device | Same L2 arrive; **Keys on this device** band after settle; dot may show viewer state (Phase 8); tap opens glance, not hub |
 | 3 | Glance primary action | Scrolls to vouch / live proof / cross-tab banner action in-page |
 | 4 | Cross-tab keys banner visible | Dot overlay matches banner (`cross_tab_keys`) |
 | 5 | Escape / outside tap | Glance closes; dot `aria-expanded` false |

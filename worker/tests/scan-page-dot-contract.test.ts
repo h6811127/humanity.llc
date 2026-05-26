@@ -11,7 +11,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
 describe("scan page device dot contract", () => {
   it("ships progressive dot UI version", () => {
-    expect(SCAN_UI_VERSION).toBe("pass-v32");
+    expect(SCAN_UI_VERSION).toBe("pass-v33");
   });
 
   it("bundles glance popover CSS from site/scan-pass.css", () => {
@@ -22,6 +22,7 @@ describe("scan page device dot contract", () => {
     expect(SCAN_PASS_CSS).toContain(".scan-page-dot-glance-now");
     expect(SCAN_PASS_CSS).toContain("scan-live-check--pending");
     expect(SCAN_PASS_CSS).toContain("scan-page-dot--settle");
+    expect(SCAN_PASS_CSS).toContain("scan-actor-band");
     expect(SCAN_PASS_CSS).toContain("--surface-popover-bg");
     const src = readFileSync(join(root, "site/scan-pass.css"), "utf8");
     expect(src).toContain(".scan-page-dot-glance");

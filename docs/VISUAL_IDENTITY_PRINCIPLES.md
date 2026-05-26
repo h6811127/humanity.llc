@@ -201,6 +201,7 @@ Resolver HTML (`scan-pass.css`, bundled to Worker). Product rules: [`docs/SCANNE
 2. **Checking (~380ms minimum):** Resolver truth already in HTML; client performs readable “check” beat.
 3. **Settle:** Strip label → resolver state (e.g. **Active**); `.scan-arrive-item` rows stagger (~90ms); hero `scan-safety--pulse` once; **limits** line appears; corner dot **one-shot Settle** (same moment).
 4. **After:** Everything still until state changes.
+5. **L3 (operators, active scan):** `#scan-actor-band` slides in ~220ms after settle when keys or saved wallet exist on this origin.
 
 **Event:** `hc-scan-live-check-settled` (detail `{ instant }` when reduced motion).
 

@@ -1,7 +1,7 @@
 # Scan & global status UI — Path 2 (shipped direction)
 
 **Status:** **Approved** — Path 2 with **Option 2** (hero data-arriving + corner dot one-shot sync)  
-**Shipped slice:** **S1 + S2** (`pass-v32`) — production scan HTML + `scan-live-check-arrive.mjs`  
+**Shipped slices:** **S1 + S2** (`pass-v32`) · **S3** (`pass-v33`) L3 actor band  
 **Date:** 2026-05-26  
 **Audience:** Product, design, frontend  
 **Related:** [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · [`SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) · [`M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md)
@@ -45,7 +45,7 @@ Full animation rules: [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPL
 
 ---
 
-## Production behavior (`pass-v32`)
+## Production behavior (`pass-v33`)
 
 ### Timeline (stranger, active scan)
 
@@ -56,6 +56,16 @@ Full animation rules: [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPL
 | **Settle** | One-shot `scan-page-dot--settle` | Strip → resolver label (e.g. **Active**) · `.scan-arrive-item` stagger · `scan-safety--pulse` on card · limits fade in |
 | **After** | Static | All motion stopped |
 
+### Operator (L3, after settle)
+
+| Phase | Band |
+|-------|------|
+| Before settle | Hidden (`#scan-actor-band`) |
+| ~220ms after settle | Slides in when viewer has keys / saved wallet / default vouch profile on **active** scan |
+| Actions | **Go to vouch** (scroll to vouch block) · **My cards** → `/wallet/` |
+
+Strangers and non-active scans: no band markup.
+
 ### Modules
 
 | Path | Role |
@@ -65,9 +75,11 @@ Full animation rules: [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPL
 | `site/js/scan-page-dot.mjs` | Listens for settled → dot sync |
 | `worker/src/resolver/scan-html.ts` | `scan-live-check--pending` hero, `data-arrive-label`, arrive classes |
 | `worker/src/resolver/scan-safety.ts` | Initial strip copy **Checking…**; first-seen script (no duplicate pulse) |
-| `site/scan-pass.css` | Arrive + dot settle CSS (bundled to Worker) |
+| `site/scan-pass.css` | Arrive + dot settle + actor band CSS (bundled to Worker) |
+| `site/js/scan-actor-band.mjs` | L3 band reveal after `hc-scan-live-check-settled` |
+| `site/js/scan-actor-band-core.mjs` | Band eligibility (Vitest) |
 
-**Header:** `X-HC-Scan-UI: pass-v32`
+**Header:** `X-HC-Scan-UI: pass-v33`
 
 **Reduced motion:** Instant reveal; no hero pulse; no dot settle.
 
@@ -94,11 +106,13 @@ See dev panel + [`site/prototypes/scan-trust-ui-demo.mjs`](../site/prototypes/sc
 | Resolved | Resolver strip label (`Active`, revoked labels, etc.) from `data-arrive-label` |
 | Limits | `BEARER_WARNING` under hero (`scan-hero-limit`) |
 
-### L3 (not in S1/S2 — slice S3)
+### L3 (S3 shipped)
 
 | String |
 |--------|
-| **Keys on this device** · **You can vouch or open your cards from here.** |
+| **Keys on this device** |
+| **You can vouch or open your cards from here.** |
+| Primary: **Go to vouch** · Secondary: **My cards** |
 
 ---
 
@@ -128,7 +142,7 @@ Manual: `docs/DEVICE_OS_QA.md` **P1-SD** (update for arrive sequence).
 |-------|--------|--------|
 | **S1** | **Shipped** (`pass-v32`) | L2 data-arriving |
 | **S2** | **Shipped** (`pass-v32`) | L1 dot one-shot sync |
-| **S3** | Planned | L3 operator band after settle |
+| **S3** | **Shipped** (`pass-v33`) | L3 operator band after settle |
 | **S4** | Planned | Shell status line primary; neutral dot when empty wallet |
 
 ---
@@ -158,7 +172,7 @@ Use prototype or production scan URL. Record in table below.
 | 2026-05-26 | Path 2 + Option 2 (hero arrive + dot sync) approved |
 | 2026-05-26 | S1+S2 implemented `pass-v32`; pulse removed from first-seen inline script |
 | 2026-05-26 | Functional prototype for design review (no Figma) |
-| TBD | S3 operator band |
+| 2026-05-26 | S3 operator band after settle (`pass-v33`) |
 | TBD | Demote Phase 8 custody colors on scan dot for strangers (mark-first) |
 
 ---
@@ -169,3 +183,4 @@ Use prototype or production scan URL. Record in table below.
 |------|------|
 | 2026-05-26 | Brainstorm + prototype |
 | 2026-05-26 | **Approved Path 2 Option 2; S1+S2 shipped `pass-v32`** |
+| 2026-05-26 | **S3 shipped `pass-v33`** — L3 actor band |

@@ -1621,6 +1621,94 @@ a {
   .scan-page-dot--settle .pass-dot {
     animation: none;
   }
+
+  .scan-actor-band--hidden {
+    opacity: 1;
+    transform: none;
+  }
+
+  .scan-actor-band--visible {
+    transition: none;
+  }
+}
+
+/* L3 actor band after live check settles (docs/SCAN_PAGE_TRUST_UI.md S3, pass-v33) */
+.scan-actor-band {
+  margin: 0 var(--pad) 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 0.5px solid rgba(219, 27, 67, 0.22);
+  background: rgba(219, 27, 67, 0.06);
+}
+
+.scan-actor-band--hidden {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+}
+
+.scan-actor-band--visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.scan-actor-band-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 4px;
+}
+
+.scan-actor-band-lead {
+  font-size: 14px;
+  line-height: 1.35;
+  color: rgba(60, 60, 67, 0.85);
+  margin: 0 0 10px;
+}
+
+.scan-actor-band-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.scan-actor-band-primary,
+.scan-actor-band-secondary {
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.scan-actor-band-primary {
+  border: none;
+  background: var(--red);
+  color: #fff;
+}
+
+.scan-actor-band-primary:active {
+  opacity: 0.88;
+}
+
+.scan-actor-band-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(120, 120, 128, 0.14);
+  color: var(--black);
+  text-decoration: none;
+}
+
+.scan-actor-band-secondary:active {
+  opacity: 0.72;
 }
 
 .scan-safety-top {
