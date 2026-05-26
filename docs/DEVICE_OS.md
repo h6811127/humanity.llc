@@ -31,7 +31,7 @@ Before shipping UI, answer:
 | What a stranger sees | **Scan page only**  -  never a second homepage demo |
 | Protocol essays, threat models, case study walkthrough | **Reference** (full docs in intro mode; Help & protocol footer in focus mode) |
 
-**Do not put on the landing hub:** per-pin revoke, disable QR, or any signed network mutation without **Use keys → /created/**. Pins are public bookmarks only.
+**Do not put on the landing hub:** per-pin revoke, disable QR, or any signed network mutation without **Open controls → /created/**. Pins are public bookmarks only.
 
 ---
 
@@ -94,7 +94,7 @@ Hub toggle (**on by default** until set to `"0"`): after create, write tab keys 
 | Recent activity on device |  -  |
 | **Live proof waiting** inbox (hub group; prove on `/created/`) |  -  |
 
-Do **not** add per-pin revoke on the homepage  -  pins have no keys; use **Use keys** or **Open card** (⋯ menu) → `/created/`.
+Do **not** add per-pin revoke on the homepage  -  pins have no keys; use **Open controls** or **Open card** (⋯ menu) → `/created/`.
 
 ---
 
@@ -164,7 +164,7 @@ Small TLC items that need **no new resolver APIs**:
 
 | Item | Notes |
 |------|--------|
-| Browser notifications when live proof is waiting | Device-only; `Notification` API after inbox poll finds pending |
+| Browser notifications when live proof is waiting | ✅ Shipped (device-only; `Notification` API after inbox poll finds pending) |
 | Glance on `/wallet/` | ✅ `#wallet-hub-glance` mirrors landing glance (`device-hub-glance.mjs`) |
 | Light frontend tests | Vitest (`worker/tests/device-*`) + Playwright smoke (`e2e/device-os-wallet.spec.ts`) |
 
@@ -182,7 +182,7 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 **Presence:** `localStorage` `hc_tab_keys_presence`  -  each tab heartbeats every 4s **while that tab is visible** with `profile_id` / handle / label only (never private keys). Rows age out of the UI after ~6s without a heartbeat and are pruned from storage after 10s. Cleared on `pagehide` (tab close/navigation away). Background tabs do not heartbeat but leave a recent row until stale.
 
-**Banner:** `#device-cross-tab-banner` on landing and `/wallet/` when another tab holds keys **this device has not saved yet**, and this tab does not show the unsaved-keys notice row (`tabNoticeCount === 0`). Saved cards use **Use keys** from the hub/wallet instead. Presence rows must heartbeat within ~6s (ghost entries drop from UI sooner than the 10s storage prune).
+**Banner:** `#device-cross-tab-banner` on landing and `/wallet/` when another tab holds keys **this device has not saved yet**, and this tab does not show the unsaved-keys notice row (`tabNoticeCount === 0`). Saved cards use **Open controls** from the hub/wallet instead. Presence rows must heartbeat within ~6s (ghost entries drop from UI sooner than the 10s storage prune).
 
 **Glance:** Collapsed hub shows **Keys in another tab** and **N live proof waiting** rows.
 
@@ -196,7 +196,7 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 - Hub group **Live proof waiting**  -  one row per pending challenge (card label, “Someone is waiting”).
 - Status line adds **`N proof waiting`** (highlighted) when N &gt; 0.
-- Row tap → **Use keys** for that card → `/created/?profile_id&qr_id&live_challenge&return_url` (from resolver `owner_url`).
+- Row tap → **Open controls** for that card → `/created/?profile_id&qr_id&live_challenge&return_url` (from resolver `owner_url`).
 
 **Not in inbox:** Pins (no keys), saved rows without `qr_id`, signing (stays on `/created/`).
 
@@ -208,7 +208,7 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 
 **Cache:** Session cache (~5 min, `sessionStorage.hc_wallet_network_cache`, includes `scanKind`) is bypassed when it says `card_revoked` but the device baseline still says non-revoked — the hub re-fetches from the resolver before showing the alert. A fresh non-revoked fetch always updates the baseline (self-heal).
 
-**Clear:** **Got it**, **Use keys**, or **Manage** records the current alert baseline (`active` or `card_revoked`) as seen and dispatches `hc-wallet-network-baseline-changed` so hub rows and glance re-apply without a full re-render. Leaving the page (`pagehide` / tab hidden) snapshots all cached alert states for the next visit. Returning to the tab re-fetches network status for saved rows so stale alerts can clear.
+**Clear:** **Got it**, **Open controls**, or **Manage** records the current alert baseline (`active` or `card_revoked`) as seen and dispatches `hc-wallet-network-baseline-changed` so hub rows and glance re-apply without a full re-render. Leaving the page (`pagehide` / tab hidden) snapshots all cached alert states for the next visit. Returning to the tab re-fetches network status for saved rows so stale alerts can clear.
 
 ---
 

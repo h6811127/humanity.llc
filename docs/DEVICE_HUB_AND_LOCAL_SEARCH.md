@@ -39,7 +39,7 @@ These notes are captured as individual product refinements so implementation can
 ### Implementation slices from these notes
 
 - **Step 1 (now):** reduce card text density with progressive disclosure.
-- **Step 2:** rename `Use keys` across hub/wallet and tests.
+- **Step 2 (now):** rename `Use keys` to `Open controls` across hub/wallet and tests.
 - **Step 3:** add network liveliness indicators and wording pass.
 - **Step 4:** status-pill terminology pass (`pins`, `online` semantics).
 - **Step 5:** object identity visual system (types, glyph/color cues).
@@ -52,7 +52,7 @@ These notes are captured as individual product refinements so implementation can
 
 We kept the landing funnel (hero → device hub → long-form content) and **enriched** it rather than replacing it with a full dashboard.
 
-**Landing story (shipped):** Hero one-liner, a **four-step progress strip** (Create → Save → Print → Manage), **On this device** below the status line (inline search  -  no floating FAB), and a **New here?** help drawer. Homepage pass-card demo removed; strangers see real scan pages and the case study.
+**Landing story (shipped):** Hero one-liner, a **four-step progress strip** (Create → Save → Print → Manage), and **On this device** below the status line (inline search, no floating help pill). Homepage pass-card demo removed; strangers see real scan pages and the case study.
 
 **Landing layout:** Mobile-first single column only (no desktop widening grid). See [`LANDING_DESKTOP_LAYOUT.md`](LANDING_DESKTOP_LAYOUT.md) for retired desktop experiment notes.
 
@@ -60,17 +60,17 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **`/created/` hub (shipped):** Same groups as landing except: notice links to **`#created-keys-strip`**; shortcuts are **Manage this card**, **All saved cards**, **Homepage** (no focus toggle).
 
-**Hub rows (shipped):** Saved cards  -  **Use keys**, **Open scan**, **⋯** (Open card, Relabel, Remove). **Open card** and **Use keys** both call `openCardNowPage()` (load keys when saved). Phase 0: removed ⋯ **Manage** link that opened `/created/` without keys (`docs/CARD_WORKSPACE_PHASE0.md`). **Import backup file** decrypts `.hcbackup.json` into `hc_wallet`.
+**Hub rows (shipped):** Saved cards  -  **Open controls**, **Open scan**, **⋯** (Open card, Relabel, Remove). **Open card** and **Open controls** both call `openCardNowPage()` (load keys when saved). Phase 0: removed ⋯ **Manage** link that opened `/created/` without keys (`docs/CARD_WORKSPACE_PHASE0.md`). **Import backup file** decrypts `.hcbackup.json` into `hc_wallet`.
 
 **Landing focus mode:** `localStorage.hc_landing_focus` hides intro (`[data-landing-tutorial]`). Keeps **hub**, **hub glance**, **system banner** (if unhealthy), **Help & protocol** list (not full Documentation), and **contact**. No bottom Create dock or “New here?” float. **Auto-save** on by default via `hc_auto_save_device` (opt out in hub shortcuts).
 
 **Shortcuts & settings (shipped):** On the **homepage** (`/`) only — section under the progress strip (unified list rows: Appearance, browser alerts, saved cards, manage, auto-save, focus). Hub sheet on all routes has **home icon** (left), status line (center), **Create +** (right); no shortcuts block in the hub.
 
-**Hub glance (landing):** When the hub is collapsed, `#device-hub-glance` shows notice (if any) and up to three saved card labels; tap expands the hub. Quick-look popover rows use **light pastel** fills (red / blue / orange by notice type). Glance **Card disabled since last visit** copy uses the same session cache and baseline as hub rows — not the persisted `hc_wallet[].status` field.
+**Hub glance (landing):** When the hub is collapsed, `#device-hub-glance` shows notice (if any) and up to three saved card labels; tap expands the hub. Quick-look popover rows use **light pastel** fills (red / blue / orange by notice type). Glance **Card disabled since last visit** copy follows the latest resolver-confirmed alert state from the wallet network poll (not stale cache and not the persisted `hc_wallet[].status` field).
 
-**`/wallet/` (Phase 5–6):** Uses the same hub renderer as landing. Each saved row shows a **verification chip** (Steward / Vouched Human / Registered from resolver, ~5 min cache), a **network chip** (card/QR live state), optional **card disabled since last visit** alert (`hc_wallet_last_seen_network`), **Last on device** from activity, and **Use keys / Open scan / Manage**. Row icon tone follows verification (green shield = Steward). Page is hub-expanded by default; help disclosure hides when cards exist.
+**`/wallet/` (Phase 5–6):** Uses the same hub renderer as landing. Each saved row shows a **verification chip** (Steward / Vouched Human / Registered from resolver, ~5 min cache), a **network chip** (card/QR live state), optional **card disabled since last visit** alert (`hc_wallet_last_seen_network`), **Last on device** from activity, and **Open controls / Open scan / Manage**. Row icon tone follows verification (green shield = Steward). Page is hub-expanded by default; help disclosure hides when cards exist.
 
-**Keys vs verification:** See [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md). **Use keys** loads signing material into `hc_created`; the verification chip is read-only network state.
+**Keys vs verification:** See [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md). **Open controls** loads signing material into `hc_created`; the verification chip is read-only network state.
 
 **Card-disabled-since-visit alert:** Only appears when this device previously recorded a **non-revoked** baseline and the resolver now reports **card disabled** (`scan.kind === card_revoked`). Copy is **“Card disabled on the network since your last visit.”** (not generic “revoked”) so it is not confused with QR-only revoke. The network chip uses the same `scan.kind`: **Card disabled** for `card_revoked`, **QR revoked** for `qr_revoked`, **Live State Active** when the card is active. QR-only revoke does **not** trigger the since-visit alert. First sight of a disabled card shows the chip only, not “since your last visit.” Dismiss **Got it** stores acknowledged state and re-applies alert visibility. Leaving the tab snapshots baselines and re-applies alerts so the DOM stays in sync. Returning to the tab (`visibilitychange` → visible) re-fetches resolver status for saved rows so alerts and chips can clear without a full reload. Session cache (~5 min) is **not** used for alerts when it says `card_revoked` but the device baseline still says non-revoked — the hub re-fetches from the resolver first. A fresh fetch that returns non-revoked always updates the device baseline (self-heal after stale cache).
 
@@ -155,7 +155,7 @@ No backend required:
 
 - Wallet, pins, and activity stay in **browser storage**.
 - Search and activity run entirely in the client.
-- Pins are bookmarks only; vouching needs saved keys (**Use keys**).
+- Pins are bookmarks only; vouching needs saved keys (**Open controls**).
 
 ---
 
