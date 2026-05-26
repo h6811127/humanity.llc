@@ -140,6 +140,7 @@ Implementation snapshot:
 - Phase 3: overlay axis (`proof_waiting`, `cross_tab_keys`), `::after` notch in `site/styles.css`, `data-dot-state` / `data-dot-overlay`, Vitest in `worker/tests/device-dot-state.test.ts`.
 - Phase 4: steward celebration pulse (`pass-dot-steward-celebrate`), `hc-dot-state-changed` + optional `hc_dot_diag_log`, E2E in `e2e/device-status-dot.spec.ts`, CI via `test-site.yml`.
 - Phase 5 (diagnostics UX): popover/action/hub telemetry in `device-dot-diagnostics.mjs` when `localStorage.hc_dot_diagnostics === "1"`.
+- Phase 6 (A11y E2E): reduced-motion skips celebration class; hub explainer **Now / Why / Next** + `aria-label` covered in `e2e/device-status-dot.spec.ts`.
 - Clickability: `site/css/device-shell.css` + `site/js/device-hub-sheet.mjs` — dot stays fixed/clickable when hub is open or chrome is edge-hidden; dot opens hub on first tap (not glance-first).
 
 ### Phase 4 - Hardening
@@ -163,6 +164,13 @@ Logged entry types in `hc_dot_diag_log` (newest first, max 20):
 | `quick_action` | Explainer button (`data-dot-action`) or link (`.device-dot-explainer-action[href]`) |
 
 Confusion hints (console.info when thresholds hit): ≥3 glance opens without a follow-up action; ≥3 state transitions within 15s. Helpers: `device-dot-diagnostics-core.mjs`; Vitest: `worker/tests/device-dot-diagnostics.test.ts`.
+
+### Phase 6 - Accessibility E2E
+
+Playwright (`e2e/device-status-dot.spec.ts`, `status dot accessibility`):
+
+1. **`prefers-reduced-motion: reduce`** — steward dot loads without `pass-dot-steward-celebrate` (JS + CSS both respect reduced motion).
+2. **Text alternatives** — `#brand-status-dot-btn` `aria-label` mentions steward readiness and resolver state; opening the hub shows `.device-dot-explainer` with **Now / Why / Next** lines and the state quick action.
 
 Network refresh for dot coloring uses `device-os-coordinator.mjs` (`DEVICE_OS_REFRESHED`) so steward green tracks resolver health consistently with wallet/hub.
 
@@ -195,7 +203,7 @@ Network refresh for dot coloring uses `device-os-coordinator.mjs` (`DEVICE_OS_RE
 - UI unit: class + aria output for each state.
 - E2E: seeded steward wallet shows `data-dot-state` `ok:steward` on landing and wallet (class hooks, not computed color).
 - E2E: degraded/offline suppresses network-ok even with steward keys.
-- A11y: reduced-motion behavior and text alternatives validated.
+- A11y: reduced-motion celebration off + explainer/ARIA text (`e2e/device-status-dot.spec.ts`, Phase 6).
 
 ---
 
@@ -219,7 +227,7 @@ Network refresh for dot coloring uses `device-os-coordinator.mjs` (`DEVICE_OS_RE
 
 - **CI (shipped):** `.github/workflows/test-site.yml` runs `npm run worker:test` and `e2e/device-status-dot.spec.ts` on `site/` / `e2e/` changes.
 - **Interaction telemetry (shipped):** Phase 5 dev-only log; see Telemetry section and Phase 5 above.
-- **A11y E2E:** reduced-motion celebration off + explainer text present (not yet automated).
+- **A11y E2E (shipped):** Phase 6 Playwright checks in `e2e/device-status-dot.spec.ts`.
 
 ---
 

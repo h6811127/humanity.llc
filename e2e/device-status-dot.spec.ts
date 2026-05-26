@@ -49,7 +49,6 @@ test.describe("status dot steward green", () => {
     await page.goto("/wallet/");
     const dot = page.locator("#brand-status-dot");
     await expect(dot).toHaveAttribute("data-dot-state", "degraded:steward");
-    await expect(dot).toHaveAttribute("data-dot-state", "degraded:steward");
     await expect(dot).not.toHaveClass(/pass-dot-status-network-ok/);
     await expect(dot).toHaveClass(/pass-dot-status-network-degraded/);
   });
@@ -71,5 +70,39 @@ test.describe("status dot steward green", () => {
     await page.locator("#brand-status-dot-btn").click();
     await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/);
     await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
+  });
+});
+
+test.describe("status dot accessibility", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript((entry) => {
+      localStorage.setItem("hc_wallet", JSON.stringify([entry]));
+    }, STEWARD_WALLET_ENTRY);
+    await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
+  });
+
+  test("skips steward celebration when reduced motion is preferred", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/wallet/");
+    const dot = page.locator("#brand-status-dot");
+    await expect(dot).toHaveAttribute("data-dot-state", "ok:steward");
+    await expect(dot).not.toHaveClass(/pass-dot-steward-celebrate/);
+  });
+
+  test("exposes steward readiness in aria-label and hub explainer", async ({ page }) => {
+    await page.goto("/");
+    const dotBtn = page.locator("#brand-status-dot-btn");
+    await expect(dotBtn).toHaveAttribute("aria-label", /steward keys ready/i);
+    await expect(dotBtn).toHaveAttribute("aria-label", /resolver online/i);
+
+    await dotBtn.click();
+    const explainer = page.locator("#device-hub-status-key .device-dot-explainer");
+    await expect(explainer).toBeVisible();
+    await expect(explainer.locator(".device-dot-explainer-line")).toHaveCount(3);
+    await expect(explainer).toContainText("Now:");
+    await expect(explainer).toContainText("Steward ready, resolver online.");
+    await expect(explainer).toContainText("Why:");
+    await expect(explainer).toContainText("Next:");
+    await expect(explainer.getByRole("button", { name: "Open controls" })).toBeVisible();
   });
 });
