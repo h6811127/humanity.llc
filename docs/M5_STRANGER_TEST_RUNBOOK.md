@@ -100,6 +100,7 @@ Do **not** send the data policy or research page unless they ask.
 3. **Do not** start merch (M8) or Commons Pass until M5 is checked.
 4. **Recommended next:** finish M5.5 backup confidence (import on second device) if strangers struggled with “revoke later.”
 5. **Then:** harden the stranger path with **one vertical pilot**  -  see `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` (status plate, lost-item relay, organizer-signed revoke; not more hub pages).
+6. **Before live merch checkout:** read `docs/MERCH_QR_LIFECYCLE_POLICY.md` (no calendar expiry on artifacts, hardening sequence, reprint/revoke macros).
 
 ---
 
@@ -127,3 +128,4 @@ Do **not** send the data policy or research page unless they ask.
 | `docs/V1_PRODUCT_TRUST_MODEL.md` | What to listen for in answers |
 | `docs/SKEPTIC_FAQ.md` | If they push back on “just a QR” |
 | `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` | Post-M5: which vertical to prove on real objects |
+| `docs/MERCH_QR_LIFECYCLE_POLICY.md` | Before Shopify checkout: artifact QR policy + creative roadmap |

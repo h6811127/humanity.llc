@@ -2,7 +2,8 @@
 
 **Status:** Checkout handoff wired (config-driven) · set `shop-config.json` when Shopify product exists  
 **Canonical strategy:** `docs/MERCH_LED_V1.md` Phase B, `docs/FOUNDING_DROP_BRIEF.md` Tier 0  
-**Copy:** `docs/LAUNCH_LANGUAGE_KIT.md` § Tier 0
+**Merch QR policy:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` (defer `checkout_open: true` until M5 + policy gates)  
+**Copy:** `docs/LAUNCH_LANGUAGE_KIT.md` § Tier 0 · Sticker FAQ
 
 ---
 
@@ -40,7 +41,7 @@ The interest form records **optional email** on this browser only (no server upl
 
 4. In Shopify checkout settings, set **Order status page** or post-purchase link to `https://humanity.llc/shop/thanks/` (optional).
 5. Deploy Pages. `/shop/` shows **Buy** and hides the interest form.
-6. Run `FOUNDING_DROP_BRIEF.md` gates before `checkout_open: true` on production.
+6. Run `FOUNDING_DROP_BRIEF.md` and `MERCH_QR_LIFECYCLE_POLICY.md` launch gates before `checkout_open: true` on production.
 
 ---
 
@@ -83,3 +84,4 @@ The interest form records **optional email** on this browser only (no server upl
 | Owner revoke from second device | `docs/M5_5_OWNER_KEY_PORTABILITY.md` (shipped in repo) |
 | Device hub (save keys, inbox) | `docs/DEVICE_OS.md` |
 | Drop ops checklist | `docs/FOUNDING_DROP_BRIEF.md` |
+| Merch QR lifecycle | `docs/MERCH_QR_LIFECYCLE_POLICY.md` |

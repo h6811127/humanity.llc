@@ -61,6 +61,7 @@ Rights-affecting retention changes require published notice and member governanc
 
 ## Related documents
 
+- `docs/MERCH_QR_LIFECYCLE_POLICY.md` (printed artifact QRs: no calendar expiry, fulfillment mint rules)
 - `docs/CARD_RETENTION_AND_ORPHAN_CLEANUP.md` (orphan eligibility + cron purge)
 - `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` §5 (normative minimization rules)
 - `docs/Technical Standards v1.0.md`

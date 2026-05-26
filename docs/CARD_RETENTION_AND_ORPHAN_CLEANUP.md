@@ -58,6 +58,8 @@ A profile is eligible for **automatic purge** when:
 
 Strangers scanning an old printed URL see the resolver’s normal **unknown / not found** path-not “revoked by owner.” Physical stickers may outlive network rows; that is acceptable for abandoned, never-maintained registrations.
 
+**Merch / `print_artifact` QRs:** Founding physical items use **`expires_at: null`** so they count as “live QR” for orphan eligibility and do not calendar-expire on scan. Paid fulfillment must mint only on linked owner profiles so purged orphans do not strand buyers. Policy: [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md).
+
 ---
 
 ## Implementation checklist

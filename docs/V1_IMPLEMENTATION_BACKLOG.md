@@ -3,7 +3,7 @@
 **Status:** Build planning artifact  
 **Purpose:** Convert the v1.0 contracts, flow audit, decision lock, and assumption register into an execution backlog.
 
-**Build order:** Follow `docs/V1_0_ARCHITECTURE_ROADMAP.md` (canonical milestones M0–M10 and master steps). **Direction:** `docs/DEMOCRATIC_INFRASTRUCTURE.md`. **GTM framing:** `docs/MERCH_LED_V1.md`. Task IDs below map to roadmap steps.
+**Build order:** Follow `docs/V1_0_ARCHITECTURE_ROADMAP.md` (canonical milestones M0–M10 and master steps). **Direction:** `docs/DEMOCRATIC_INFRASTRUCTURE.md`. **GTM framing:** `docs/MERCH_LED_V1.md`. **Merch QR policy:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` (fulfillment mint, no calendar expiry on `print_artifact`, creative roadmap). Task IDs below map to roadmap steps.
 
 ---
 

@@ -48,6 +48,7 @@
 | `docs/V1_DECISION_LOCK.md` | Locked vs deferred product decisions |
 | `docs/V1_IMPLEMENTATION_BACKLOG.md` | Task IDs (R-001, SF-002, …) mapped to milestones below |
 | `docs/MERCH_LED_V1.md` | GTM framing: curiosity + belonging |
+| `docs/MERCH_QR_LIFECYCLE_POLICY.md` | Printed artifact QR: no calendar expiry, revoke/reprint, experiments |
 | `docs/REFERENCE_OPERATOR_DATA_POLICY.md` | What the reference operator stores |
 | `docs/features/*.md` | Feature-level requirements |
 

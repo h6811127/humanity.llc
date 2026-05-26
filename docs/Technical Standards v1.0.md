@@ -396,7 +396,7 @@ The QR payload references a network-stored QR credential:
   "print_artifact_id": "pa_123",
   "resolver_hint": "https://humanity.llc",
   "issued_at": "2026-05-16T17:00:00Z",
-  "expires_at": "2026-06-15T17:00:00Z",
+  "expires_at": null,
   "status": "active",
   "signature": {
     "alg": "Ed25519",
@@ -406,6 +406,8 @@ The QR payload references a network-stored QR credential:
   }
 }
 ```
+
+For `scope: "print_artifact"` (founding physical merch), `expires_at` SHOULD be `null` unless the SKU is an explicit timed-event product. Digital `scope: "card"` credentials MAY use `expires_at`. Product policy: [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md).
 
 ### 8.4 Printed QR Codes
 

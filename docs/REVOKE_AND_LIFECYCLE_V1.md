@@ -4,7 +4,7 @@
 **Purpose:** Define **Revoke QR**, **Disable card**, **Suspend**, and **Delete** as distinct owner/governance actions; what scanners see; what stays in the URL; and what is shipped vs planned.  
 **Supersedes:** Informal “revoke” wording in UI copy only  -  crypto/API field names may still use `revoked` until a labeled migration.
 
-**Related:** `docs/Technical Standards v1.0.md` §10–11, `docs/V1_PRODUCT_TRUST_MODEL.md`, `docs/M4_CREATED_REVOKE_UI.md`, `docs/M5_5_OWNER_KEY_PORTABILITY.md`, `docs/V1_IMPLEMENTATION_CONTRACTS.md`
+**Related:** `docs/Technical Standards v1.0.md` §10–11, `docs/V1_PRODUCT_TRUST_MODEL.md`, `docs/M4_CREATED_REVOKE_UI.md`, `docs/M5_5_OWNER_KEY_PORTABILITY.md`, `docs/V1_IMPLEMENTATION_CONTRACTS.md`, `docs/MERCH_QR_LIFECYCLE_POLICY.md` (printed artifacts)
 
 ---
 
@@ -134,7 +134,7 @@ The resolver cannot erase what is **printed**. Disable/revoke changes **what the
 |---------|-----------|
 | **Scheduled end** | `expires_at` on `qr_credential` (schema exists)  -  UI for “valid until Sunday 11pm” |
 | **Replace / rotate** | New epoch; old QR → `replaced` (`A.6`) |
-| **Item-scoped QR** | `scope: print_artifact`  -  revoke one merch sticker (`Phase C`) |
+| **Item-scoped QR** | `scope: print_artifact`  -  revoke one merch sticker; **no calendar `expires_at` on founding merch** ([`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md)) |
 
 ### Way future (explicit non-goals for v1)
 

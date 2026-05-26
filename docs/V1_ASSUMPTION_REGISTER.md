@@ -39,6 +39,7 @@
 | A-012D | Users will invite others because vouching/live proof creates value, not just because they like the mission. | Growth | Unverified, High product risk | Track public launch vouch requests, repeated scans, stranger create rate, and whether users can name a real use case. | Reposition around a sharper job-to-be-done or pause growth work. |
 | A-012E | A minimal reference network plus published spec can grow institutional power without a public blockchain core. | Strategy/Engineering | Medium | Ship Phase A; document second-network-operator path; avoid positioning as crypto identity. | Reframe around federation or accept chain-based tradeoffs explicitly. |
 | A-012F | Public launch without cohort gate will not cause unmanageable abuse before rate limits and suspension policy exist. | Security/Ops | Unverified, Medium risk | Monitor create rate (`/.well-known/hc/v1/operator/create-rate-monitor`), impersonation reports, and support load first 30 days. | Temporary stricter rate limits - not permanent invite-only product gate. |
+| A-012G | Buyers expect founding **physical** sticker QRs **not** to calendar-expire; they accept **revoked / replaced** scan pages when status changes. | Product | Unverified, Medium risk | Comprehension test (≥5): “Will this sticker stop working in a year?” + policy gates in [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md). Fulfillment must mint `print_artifact` with `expires_at: null`. | Do not ship Printify SKUs until policy implemented; fix scan copy if users confuse expiry with revoke. |
 
 ---
 

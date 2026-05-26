@@ -7,7 +7,8 @@
 
 **Merch-led tiers:** Tier 0 = proof of curiosity (open drop). Tier 1 = proof of belonging (personalized for card holders - not a protocol invite gate). See `docs/MERCH_LED_V1.md` and `docs/FOUNDING_DROP_BRIEF.md`.
 
-**Hosted steward (planning):** Optional paid steward infrastructure - not merch, not verification. Copy: § Hosted steward tier (planning copy) below; FAQ: [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md) § Is There A Paid Tier?
+**Hosted steward (planning):** Optional paid steward infrastructure - not merch, not verification. Copy: § Hosted steward tier (planning copy) below; FAQ: [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md) § Is There A Paid Tier?  
+**Merch stickers:** Lifecycle policy + Sticker FAQ — [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) · § Sticker FAQ in this doc.
 
 ---
 
@@ -261,6 +262,21 @@ Use for the **open** founding sticker/card: spread, scans, card creation. No vou
 - "Prove you're human" (too broad  -  prefer "see what we prove")
 - "Limited verified edition"
 - Any print copy that says Verified Human, KYC-free ID, or bot-proof
+
+### Sticker FAQ (customer-facing · Tier 0 / Tier 1)
+
+Canonical policy: [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md). Use on product page, packaging insert, or support macros.
+
+| Question | Answer (short) |
+|----------|----------------|
+| **Will my sticker stop working after a year?** | No. Founding artifact QRs do not **calendar-expire**. The link always opens a current status page. |
+| **Can you turn off my sticker?** | You can **revoke this QR** from your card if it’s lost or gifted. That changes what scanners see; it does not erase the ink. |
+| **Does buying the sticker verify me?** | **No.** Merch is curiosity and belonging on an object — not vouching or legal ID. |
+| **Does the QR prove I own the card?** | **No.** Anyone holding the item can be scanned. See bearer warning on scan. |
+| **What if Humanity ends the drop?** | Old stickers may show **replaced** or campaign-ended copy; the URL should still resolve honestly (not a dead link). |
+| **Misprint or bad QR in the mail?** | Contact support for reprint/refund per published policy — not “extend expiry.” |
+
+**Comprehension test (add to founding brief):** After reading the FAQ, ≥5 testers agree: sticker ≠ verified; sticker ≠ owner proof; sticker does not expire on a calendar.
 
 ---
 
@@ -530,4 +546,5 @@ Before public launch, ask testers:
 9. After scanning, do you know what to do if you're **curious** vs if you're the **owner**?
 10. Would you wear this if you were **not** yet vouched? Why or why not?
 11. Which tier message would you forward  -  curiosity post or belonging invite?
+12. Do you believe the **sticker QR stops working after a fixed date**? (Correct: no calendar expiry; revoke is separate.)
 

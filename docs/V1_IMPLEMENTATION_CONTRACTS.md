@@ -197,6 +197,8 @@ Allowed `scope`: `card`, `print_artifact`.
 
 For personalized physical products, each printed item MUST receive a distinct `qr_id` with `scope: "print_artifact"` even when multiple items are ordered together. All item QR credentials MAY resolve to the same `profile_id`, but each item QR MUST be individually revocable. Card-level revocation or suspension still overrides every linked QR credential.
 
+**Merch calendar expiry:** `print_artifact` credentials for founding physical SKUs MUST use `expires_at: null` unless the SKU is an explicit timed-event product (storefront + scan copy). Digital `scope: card` QRs MAY use `expires_at` per create UI. Policy: [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md).
+
 ### Live Control Challenge
 
 ```json

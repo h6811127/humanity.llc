@@ -3,7 +3,8 @@
 **Status:** Canonical wedge (v1 GTM) · **Phase B in progress**  -  Tier 0 story shop at `/shop/`  
 **Purpose:** Lead with physical artifacts as viral distribution while pairing **proof of curiosity** (spread) with **proof of belonging** (retention). Commons Pass and organizer tooling follow once people already wear the object.
 
-**Implementation tracker:** `docs/SHOP_TIER0_IMPLEMENTATION.md` (Pages UI, waitlist interest, Shopify handoff checklist).
+**Implementation tracker:** `docs/SHOP_TIER0_IMPLEMENTATION.md` (Pages UI, waitlist interest, Shopify handoff checklist).  
+**Merch QR lifecycle:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` (no calendar expiry on printed artifacts, revoke/reprint, optional experiments).
 
 **Architecture and launch gate:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  -  public card creation when Phase A ships; federated networks long-term; founding cohort is optional feedback only.
 
@@ -135,7 +136,7 @@ Prove walking ads work:
 
 1. One flagship artifact (sticker recommended first for scan QA; flat card second).
 2. Story-row storefront  -  one narrative, not a 50-SKU grid. **Shipped (UI):** [`/shop/`](../site/shop/index.html)  -  Shopify URL via `site/data/shop-config.json` when operator enables.
-3. Non-personalized or lightly personalized QR pointing at network (personalized per-item QR only after Printify spike passes  -  see `docs/V1_ASSUMPTION_REGISTER.md`).
+3. Non-personalized or lightly personalized QR pointing at network (personalized per-item QR only after Printify spike passes  -  see `docs/V1_ASSUMPTION_REGISTER.md`). **Lifecycle:** [`docs/MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) (batch QR, no time expiry, rotate via `replaced`).
 4. Packaging / product page with bearer warning and “merch ≠ vouched” line.
 
 **Exit:** Orders from outside founder network; scan→create conversion tracked; at least one organic reshare.
@@ -227,7 +228,7 @@ Curiosity and belonging share one URL pattern; content adapts by network status,
 | M-01 | First artifact | One sticker; add flat card after scan QA |
 | M-02 | Drop order | Phase A digital → Tier 0 curiosity drop → Tier 1 belonging personalize |
 | M-03 | Open vs closed Tier 0 | Open curiosity drop; Tier 1 personalized for card holders (no protocol invite gate) |
-| M-04 | Batch vs unique QR on Tier 0 | Batch QR acceptable for Tier 0; unique item QR for Tier 1 |
+| M-04 | Batch vs unique QR on Tier 0 | Batch QR acceptable for Tier 0; unique item QR for Tier 1 — **policy:** [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) |
 | M-05 | Public labels | `Vouched Human` not `Verified Human` on UI and print |
 | M-06 | Live control | Private alpha in Phase A; public when comprehension test passes |
 
@@ -243,6 +244,7 @@ Curiosity and belonging share one URL pattern; content adapts by network status,
 | Implementation shapes | `docs/V1_IMPLEMENTATION_CONTRACTS.md`, `docs/V1_IMPLEMENTATION_BACKLOG.md` (reorder phases to match this doc) |
 | Copy and slogans | `docs/LAUNCH_LANGUAGE_KIT.md`, `docs/SKEPTIC_FAQ.md` |
 | Founding drop ops | `docs/FOUNDING_DROP_BRIEF.md` |
+| **Merch QR lifecycle (expiry, revoke, reprint, experiments)** | `docs/MERCH_QR_LIFECYCLE_POLICY.md` |
 | Optional early testers | `docs/FOUNDING_COHORT_PLAYBOOK.md` (non-gating) |
 | Protocol / federation | `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` |
 | Community pass (later) | `docs/COMMONS_PASS_V1_SPEC.md` |
