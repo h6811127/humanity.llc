@@ -18,7 +18,7 @@ Goals:
 3. **Meter without surveilling** — count infrastructure events, not scans, strangers, or locations.
 4. **Federation-ready** — same schema per `operator_id`; reference operator is first consumer.
 
-**Out of scope (M2):** Stripe webhooks, push wire protocol (see M3 [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md)), UI copy (M5), prices (M4), D1 table DDL.
+**Out of scope (M2):** Stripe webhooks, push wire protocol (see M3 [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md)), UI copy (M5), prices and SLA ([`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) M4), D1 table DDL.
 
 ---
 
@@ -103,7 +103,7 @@ Canonical keys. Values are typed; missing key → use **`reference_free` default
 | `wallet.large_threshold` | int | **10** | **25** | `LARGE_WALLET_THRESHOLD` |
 | `sw.periodic_min_ms` | int | **900000** (15 min) | **300000** (5 min) | SW periodic sync minimum |
 
-Use **`null`** in API JSON for “unlimited within fair use” only when ops defines fair-use in M4; client treats `null` as high cap (e.g. 50_000/day) until M4 locks behavior.
+Use **`null`** in API JSON for “unlimited within fair use” per [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) § Fair use; client uses **4,000/day/device** until server account soft cap (50k/day).
 
 ### Policy flags (org-only, future)
 
@@ -298,7 +298,7 @@ When `poll.live_proof.auto_daily_cap` is `null` (unlimited):
 | Hard cap | 429 + `Retry-After`; ops review |
 | Per-IP cap | Independent of account (O2) |
 
-Exact numbers require M4 ops sign-off.
+Normative caps: [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) § Fair use (governance sign-off pending).
 
 ### Storage (conceptual tables — no DDL)
 

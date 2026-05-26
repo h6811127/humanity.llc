@@ -224,11 +224,11 @@ When implementation nears, add a **Hosted tier** section to [`SKEPTIC_FAQ.md`](S
 | Q3 | Per-device vs per-account entitlements? | **Planning default:** account + device-scoped counters — see M2 § Identity model |
 | Q4 | Can orgs force watch on for members? (consent) | Governance |
 | Q5 | Push MVP: SSE vs Durable Object? | **RFC default:** P1 SSE, P2 DO — see M3 |
-| Q6 | Fair-use definition for “unlimited” polls | Ops |
-| Q7 | Refund / downgrade behavior when subscription lapses | Product |
+| Q6 | Fair-use definition for “unlimited” polls | **M4 defaults** — [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) § Fair use |
+| Q7 | Refund / downgrade behavior when subscription lapses | **M4 defaults** — same doc § Downgrade |
 | Q8 | Export/portability if user leaves paid but keeps cards | Federation |
-| Q9 | Stripe vs member-governed billing | Ops |
-| Q10 | SLA numbers (uptime, notify latency) | Ops + legal |
+| Q9 | Stripe vs member-governed billing | **M4 recommendation:** Stripe pending governance — same doc § Commercial model |
+| Q10 | SLA numbers (uptime, notify latency) | **M4 draft:** 99.5% uptime, push p95 ≤ 5s — same doc § SLA |
 
 ---
 
@@ -239,7 +239,7 @@ When implementation nears, add a **Hosted tier** section to [`SKEPTIC_FAQ.md`](S
 | M1 | This plan (product + boundaries) | **This doc** |
 | M2 | **Entitlement & metering spec** (fields, APIs, no UI) | **[`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md)** |
 | M3 | **Push architecture RFC** (threat model + protocol messages) | **[`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md)** |
-| M4 | **Pricing & SLA one-pager** (governance-approved) | Not started |
+| M4 | **Pricing & SLA one-pager** (governance-approved) | **[`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md)** (draft — sign-off pending) |
 | M5 | **Skeptic FAQ + launch language** updates | Not started |
 | M6 | **Technical Standards** delta (optional hosted extensions) | Not started |
 | M7 | **DEVICE_OS_REQUEST_BUDGET** paid-tier row + test plan | Partial (link from budget doc) |
@@ -277,6 +277,7 @@ In [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md), **Phase 10** is
 
 | Date | Note |
 |------|------|
+| 2026-05-26 | **M4:** [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) |
 | 2026-05-26 | **M3:** [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) |
 | 2026-05-26 | **M2:** [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) |
 | 2026-05-26 | Initial planning doc (no implementation) |
