@@ -42,7 +42,7 @@ function loadKeysHelpHtml(walletUrl) {
     ? ` Change default on <a href="${walletUrl}">Saved cards</a> (⋯ → <strong>Default for vouching</strong>).`
     : "";
   return (
-    ` Or open <a href="${walletUrl}">Saved cards</a>, tap <strong>Use keys</strong> (` +
+    ` Or open <a href="${walletUrl}">Saved cards</a>, tap <strong>Open controls</strong> (` +
     `<code>/created/</code>), and return here in the same tab.${defaultHint}`
   );
 }

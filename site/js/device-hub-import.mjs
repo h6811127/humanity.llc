@@ -69,7 +69,7 @@ export function initHubBackupImport(form, statusEl) {
         entries.unshift(walletEntryFromSession(session, unlocked.profileId.slice(0, 12)));
         saveWallet(entries);
       }
-      setStatus("Imported to this device. Tap Use keys or Open card to manage.");
+      setStatus("Imported to this device. Tap Open controls or Open card to manage.");
       const savedEntry =
         idx >= 0 ? entries[idx] : walletEntryFromSession(session, unlocked.profileId.slice(0, 12));
       logDeviceActivity("backup_import", savedEntry.label || "Imported backup", {

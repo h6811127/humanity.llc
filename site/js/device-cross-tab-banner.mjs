@@ -114,7 +114,7 @@ function renderHubCrossTabNotice() {
   }
   const walletEntry = walletEntryForVouchHere(msg.primary.profile_id);
   const useKeysBtn = walletEntry
-    ? `<button type="button" class="device-hub-notice-secondary" data-cross-tab-use-keys>Use keys here</button>`
+    ? `<button type="button" class="device-hub-notice-secondary" data-cross-tab-use-keys>Open controls here</button>`
     : "";
 
   hubSlot.hidden = false;
@@ -157,7 +157,7 @@ function renderScanCrossTabNotice() {
 
   const walletEntry = walletEntryForVouchHere(msg.primary.profile_id);
   const useKeysBtn = walletEntry
-    ? `<button type="button" class="scan-cross-tab-use-keys" data-cross-tab-use-keys>Use keys here</button>`
+    ? `<button type="button" class="scan-cross-tab-use-keys" data-cross-tab-use-keys>Open controls here</button>`
     : "";
 
   scanBanner.hidden = false;
@@ -213,7 +213,7 @@ export function renderCrossTabKeysBanner() {
 
   const walletEntry = walletEntryForVouchHere(msg.primary.profile_id);
   const useKeysInline = walletEntry
-    ? `<button type="button" class="device-cross-tab-focus-btn" data-cross-tab-use-keys>Use keys here</button>
+    ? `<button type="button" class="device-cross-tab-focus-btn" data-cross-tab-use-keys>Open controls here</button>
     <span class="device-cross-tab-or">or</span>`
     : "";
 
