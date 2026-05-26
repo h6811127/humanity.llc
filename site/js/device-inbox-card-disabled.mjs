@@ -7,6 +7,7 @@ import { listCardDisabledSinceVisit } from "./wallet-network-baseline.mjs";
 import {
   buildResolverConfirmedWalletPollMaps,
   getNetworkLastSeenBaseline,
+  shouldSuppressCardDisabledSinceVisitForProfile,
 } from "./device-wallet-network.mjs";
 import { shouldSuppressCardDisabledSinceVisitAlerts } from "./device-wallet-since-visit-gate.mjs";
 
@@ -35,5 +36,9 @@ export function gatherCardDisabledSinceVisitForInbox() {
 
   return hits
     .map((hit) => wallet.find((e) => e.profile_id === hit.profile_id))
-    .filter((e) => e != null);
+    .filter(
+      (e) =>
+        e != null &&
+        !shouldSuppressCardDisabledSinceVisitForProfile(e.profile_id)
+    );
 }

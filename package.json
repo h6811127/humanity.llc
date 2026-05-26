@@ -16,7 +16,7 @@
     "worker:fixtures": "tsx worker/scripts/generate-fixtures.ts",
     "worker:test": "vitest run",
     "worker:test:device": "vitest run worker/tests/device",
-    "worker:test:card-disabled-since-visit": "vitest run worker/tests/wallet-network.test.ts worker/tests/device-wallet-network-confirmed.test.ts worker/tests/card-disabled-since-visit-regression.test.ts worker/tests/device-hub-frontend-pipeline.test.ts",
+    "worker:test:card-disabled-since-visit": "vitest run worker/tests/wallet-network.test.ts worker/tests/device-wallet-network-confirmed.test.ts worker/tests/card-disabled-since-visit-regression.test.ts worker/tests/card-disabled-since-visit-approaches.test.ts worker/tests/device-hub-frontend-pipeline.test.ts",
     "worker:test:ui-color-scheme": "vitest run worker/tests/ui-color-scheme-popover-guard.test.ts",
     "worker:test:watch": "vitest",
     "e2e": "playwright test",

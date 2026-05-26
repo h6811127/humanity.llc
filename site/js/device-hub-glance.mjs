@@ -11,7 +11,7 @@ import {
   getLatestResolvedAlertState,
   getLatestResolvedScanKind,
   getNetworkLastSeenBaseline,
-  isResolverConfirmedProfile,
+  shouldSuppressCardDisabledSinceVisitForProfile,
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
@@ -164,7 +164,7 @@ function revokedHintProfileIdsFromEntries(entries) {
   const ids = new Set();
   for (const entry of entries) {
     const pid = entry.profile_id;
-    if (!pid || !isResolverConfirmedProfile(pid)) continue;
+    if (!pid || shouldSuppressCardDisabledSinceVisitForProfile(pid)) continue;
     const alertState = getLatestResolvedAlertState(pid);
     if (
       alertState != null &&

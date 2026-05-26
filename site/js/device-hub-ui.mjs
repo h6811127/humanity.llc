@@ -49,6 +49,7 @@ import {
   CARD_REVOKED_ALERT_STATE,
   recordNetworkSeen,
   refreshWalletNetworkStatuses,
+  shouldSuppressCardDisabledSinceVisitForProfile,
   snapshotNetworkSeenOnExit,
   syncLastSeenFromNetworkMap,
   NETWORK_REFRESHED,
@@ -151,6 +152,17 @@ let hubConfig = {
 
 /** Bumped when saved-card DOM is replaced or a new network fetch starts; stale fetches must not apply. */
 let walletNetworkApplyGen = 0;
+
+/** Last chip status per profile from wallet poll (A1: re-apply must not rely on session cache alone). */
+let lastWalletNetworkStatusMap = {};
+
+/** @param {Record<string, string | undefined>} statusMap */
+function rememberWalletNetworkStatusMap(statusMap = {}) {
+  for (const [pid, status] of Object.entries(statusMap)) {
+    if (!pid || status == null || status === "") continue;
+    lastWalletNetworkStatusMap[pid] = String(status);
+  }
+}
 
 function bumpWalletNetworkApplyGen() {
   walletNetworkApplyGen += 1;
@@ -420,6 +432,7 @@ function applyNetworkChipsToDom(
   resolverConfirmedMap = null
 ) {
   if (!savedList) return;
+  rememberWalletNetworkStatusMap(statusMap);
   savedList.querySelectorAll(".hub-card-item").forEach((li) => {
     const pid = li.dataset.profileId;
     if (!pid) return;
@@ -486,6 +499,10 @@ function applyRevokedSinceVisitAlerts(
       setRevokedSinceVisitAlertVisible(li, pid, false);
       return;
     }
+    if (shouldSuppressCardDisabledSinceVisitForProfile(pid)) {
+      setRevokedSinceVisitAlertVisible(li, pid, false);
+      return;
+    }
     const netStatus = String(currentNetworkStatus(pid, _statusMap) || "").toLowerCase();
     if (netStatus === "offline" || netStatus === "error") {
       setRevokedSinceVisitAlertVisible(li, pid, false);
@@ -542,7 +559,7 @@ function reapplyRevokedSinceVisitFromLatestResolved() {
     return;
   }
   applyRevokedSinceVisitAlerts(
-    {},
+    lastWalletNetworkStatusMap,
     maps.alertStateMap,
     maps.scanKindMap,
     maps.resolverConfirmedMap
@@ -1195,7 +1212,6 @@ export function initDeviceHub(config = {}) {
     enableLiveControlInboxPolling();
     applyLiveControlWatchPreference();
     window.addEventListener("hc-live-control-inbox-changed", () => {
-      reapplyRevokedSinceVisitFromLatestResolved();
       syncHubInboxAlertGroups();
       syncBrowserNotifPrompts();
       applySearchFilter();

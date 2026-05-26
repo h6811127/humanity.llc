@@ -143,6 +143,17 @@ export function isResolverConfirmedProfile(profileId) {
   return resolverConfirmedProfileIdsThisVisit.has(profileId);
 }
 
+/**
+ * Per-profile since-visit suppress (A4): no confirmed read this visit, or cache chip unreachable.
+ * Global health gate is separate (`device-wallet-since-visit-gate.mjs`).
+ * @param {string} profileId
+ */
+export function shouldSuppressCardDisabledSinceVisitForProfile(profileId) {
+  if (!profileId || !isResolverConfirmedProfile(profileId)) return true;
+  const chip = String(getCachedNetworkStatus(profileId) || "").toLowerCase();
+  return chip === "offline" || chip === "error";
+}
+
 /** Fresh resolver-backed alert state map from the latest wallet poll. */
 export function getLatestResolvedAlertState(profileId) {
   if (!profileId) return null;
