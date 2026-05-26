@@ -49,6 +49,36 @@ See `site/js/created-live-primary-cta-core.mjs`: live proof pending, keys not sa
 
 ---
 
+## Live proof panel — scroll-into-view
+
+**Status:** Shipped (May 2026)  
+**Module:** `site/js/created-live-proof-poll-core.mjs` (pure rules) · `site/js/created.mjs` (`initLiveControlProof`)
+
+When a pending live-proof challenge becomes active on `/created/`, the steward may be scrolled down the Live tab (deploy disclosures, keys strip, etc.). The urgent `#live-control-proof` card must read as an **in-page alert**, not only update copy off-screen.
+
+### When scroll runs
+
+| Trigger | Scroll? | Rationale |
+|---------|---------|-----------|
+| Poll discovers a **new** pending challenge (`poll_discovered`) | Yes, if panel not mostly visible | Steward stayed on page but moved away from hero |
+| Arrival via `live_challenge` deep link (`deeplink`) | Yes, if panel not mostly visible | Inbox / hub row opened controls; panel may be below fold after layout |
+| Page reload with challenge already in URL | Same as deeplink | One-shot after `revealPanel` |
+| Challenge already active; repeat poll ticks | No | Avoid scroll jank |
+| After successful proof (`resetAfterProof`) | No | Returns to listening copy only |
+| Panel already mostly visible | No | Top ≥ 0, top ≤ 55% viewport height, ≥ 72px of panel visible |
+
+### Scroll behavior
+
+- `panel.scrollIntoView({ behavior: 'smooth', block: 'start' })`
+- Runs on the next animation frame after the panel is unhidden so layout is settled
+- Does **not** replace inbox badge, dot overlay, or OS background alerts — `/created/` echo only
+
+### Copy states (requested vs listening)
+
+When `.live-control-proof-requested` is active, hide `#live-control-proof-lead` and show only `#live-control-proof-status` (*Someone nearby is asking…*). Listening state shows lead + idle status (*Keep this tab open…*).
+
+---
+
 ## Files
 
 | Path | Role |
@@ -58,6 +88,7 @@ See `site/js/created-live-primary-cta-core.mjs`: live proof pending, keys not sa
 | `site/js/created-live-primary-cta*.mjs` | Contextual primary button |
 | `site/js/created-live-setup-memory*.mjs` | Setup memory chips |
 | `site/js/created-manifesto-update.mjs` | What scanners see publish |
+| `site/js/created-live-proof-poll-core.mjs` | Poll scope + scroll-into-view visibility rules |
 | `site/js/created.mjs` | Hero meta, QR, live proof, network poll |
 
 ---
@@ -65,8 +96,10 @@ See `site/js/created-live-primary-cta-core.mjs`: live proof pending, keys not sa
 ## Manual QA
 
 1. Finish setup wizard - control mode shows **Your object is live**, no step-1 Save theater when wallet saved.
-2. Live proof pending - primary is **Prove control now**; banner still visible.
-3. Deploy disclosures use Manage-style icon + chevron pattern.
-4. iPhone Safari: live object card fits viewport; tap targets >= 44px.
-5. Dark mode: shell fill on card and disclosures.
-6. Hub **Open controls** and `#revoke` / `#update-status` deep links land correct tab/panel.
+2. Live proof pending - primary is **Prove control now**; banner still visible; only one body line (no duplicate lead + status).
+3. Scroll Live tab below fold; trigger live proof from scan page - panel smooth-scrolls into view once.
+4. Open `/created/?…&live_challenge=…` with panel off-screen - panel scrolls into view once after load.
+5. Deploy disclosures use Manage-style icon + chevron pattern.
+6. iPhone Safari: live object card fits viewport; tap targets >= 44px.
+7. Dark mode: shell fill on card and disclosures.
+8. Hub **Open controls** and `#revoke` / `#update-status` deep links land correct tab/panel.

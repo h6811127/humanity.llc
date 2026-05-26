@@ -15,7 +15,7 @@ import { initManifestoUpdate } from "./created-manifesto-update.mjs";
 import { initQrRotate } from "./created-qr-rotate.mjs";
 import { initQrExtend } from "./created-qr-extend.mjs";
 import { inferPilotTemplate, parseManifestoDisplay } from "./manifesto-display.mjs";
-import { createdLiveProofPollShouldRun } from "./created-live-proof-poll-core.mjs";
+import { createdLiveProofPollShouldRun, liveProofPanelMostlyVisible, shouldScrollLiveProofPanelIntoView } from "./created-live-proof-poll-core.mjs";
 import { initCreatedTabs } from "./created-tabs.mjs";
 import { initCreatedDashboard } from "./created-dashboard.mjs?v=5";
 import {
@@ -390,6 +390,31 @@ function initLiveControlProof() {
 
   let loggedChallengeId = null;
 
+  function maybeScrollPanelIntoView(reason) {
+    if (typeof panel.scrollIntoView !== "function") return;
+    const rect = panel.getBoundingClientRect();
+    const panelMostlyVisible = liveProofPanelMostlyVisible({
+      panelTop: rect.top,
+      panelBottom: rect.bottom,
+      viewportHeight:
+        window.innerHeight || document.documentElement.clientHeight || 0,
+    });
+    if (!shouldScrollLiveProofPanelIntoView({ reason, panelMostlyVisible })) {
+      return;
+    }
+    panel.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function scheduleScrollPanelIntoView(reason) {
+    if (typeof requestAnimationFrame === "undefined") {
+      maybeScrollPanelIntoView(reason);
+      return;
+    }
+    requestAnimationFrame(() => {
+      maybeScrollPanelIntoView(reason);
+    });
+  }
+
   function showRequestedState() {
     panel.classList.add("live-control-proof-requested");
     if (lead) lead.hidden = true;
@@ -487,6 +512,7 @@ function initLiveControlProof() {
       activeReturnUrl =
         typeof body.return_url === "string" ? body.return_url : liveReturnUrlParam;
       revealPanel(true);
+      scheduleScrollPanelIntoView("poll_discovered");
       refresh();
       window.dispatchEvent(new Event("hc-created-live-cta-sync"));
     } catch {
@@ -498,6 +524,7 @@ function initLiveControlProof() {
 
   if (liveChallengeParam) {
     revealPanel(true);
+    scheduleScrollPanelIntoView("deeplink");
   } else if (pollScopeActive()) {
     startPolling();
     void pollPendingChallenge();

@@ -60,7 +60,7 @@ Ranked by frequency and revenue-to-trust impact for reference operators:
 |---|-----|----------------|
 | P0 | **Confirm the object is live** | Resolver status + scan preview without leaving the page |
 | P0 | **Deploy the QR** | Download / print path obvious; test scan on second device |
-| P0 | **Respond to live proof** | Pending challenge is impossible to miss (inbox already handles push; Tasks must echo it) |
+| P0 | **Respond to live proof** | Pending challenge is impossible to miss (inbox for push; Live tab echoes via panel + scroll — [`CREATED_TASK_DASHBOARD.md`](CREATED_TASK_DASHBOARD.md) § Live proof panel — scroll-into-view) |
 | P1 | **Update what scanners read** | Clear path to Advanced *or* shallow inline edit for status line only |
 | P1 | **Maintain custody** | Keys saved on device; no "Required" badge theater after wizard |
 | P2 | **Share proof of seriousness** | Open scan, copy link, vouch state visible |
