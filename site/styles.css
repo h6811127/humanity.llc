@@ -5983,17 +5983,81 @@ a.wallet-pin-open {
   color: var(--grey);
 }
 
-.landing-final-cta {
+/* Landing final CTA — hc-emphasis-card (docs/LANDING_FINAL_CTA_EMPHASIS_CARD.md) */
+.landing-final-cta.hc-emphasis-card {
   margin: 0;
-  padding: 22px 18px 20px;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(219, 27, 67, 0.22);
-  background: linear-gradient(180deg, rgba(219, 27, 67, 0.06) 0%, rgba(255, 255, 255, 0) 72%);
+  flex-direction: column;
+  align-items: stretch;
   text-align: left;
 }
 
+.landing-final-cta .hc-emphasis-card__title.landing-final-cta-title {
+  font-size: 22px;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.landing-final-cta .hc-emphasis-card__detail.landing-final-cta-lead {
+  margin-bottom: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  max-width: 34em;
+}
+
+.landing-final-cta-actions {
+  width: 100%;
+  max-width: none;
+  justify-content: stretch;
+}
+
 .landing-final-cta-btn {
+  flex: 1;
+  min-width: 100%;
   max-width: 22em;
+  min-height: 50px;
+  padding: 14px 18px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-align: center;
+  text-decoration: none;
+}
+
+.landing-final-cta .landing-cta-glass {
+  color: var(--red);
+  background: rgba(255, 255, 255, 0.42);
+  border: 0.5px solid rgba(255, 255, 255, 0.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    inset 0 -1px 2px rgba(219, 27, 67, 0.08),
+    0 2px 4px rgba(219, 27, 67, 0.1),
+    0 8px 22px rgba(219, 27, 67, 0.16);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+}
+
+.landing-final-cta .landing-cta-glass:active {
+  opacity: 0.92;
+  transform: scale(0.98);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 1px 3px rgba(219, 27, 67, 0.12);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .landing-final-cta .landing-cta-glass {
+    background: rgba(255, 255, 255, 0.94);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .landing-final-cta .landing-cta-glass {
+    background: rgba(255, 255, 255, 0.94);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 .landing-final-cta-foot {

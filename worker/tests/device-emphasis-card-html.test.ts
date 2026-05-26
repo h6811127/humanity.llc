@@ -29,6 +29,15 @@ describe("device-emphasis-card-html", () => {
     expect(html).toContain("data-cross-tab-action");
   });
 
+  it("landing final CTA uses urgent emphasis card and glass button", () => {
+    const html = readFileSync(join(root, "site/index.html"), "utf8");
+    expect(html).toContain("hc-emphasis-card--urgent landing-final-cta");
+    expect(html).toContain("landing-cta-glass");
+    expect(html).not.toMatch(
+      /landing-final-cta[^>]*>\s*<h2 class="landing-final-cta-title"/
+    );
+  });
+
   it("hub card disabled-since-visit alert uses warn emphasis card", () => {
     const src = readFileSync(join(root, "site/js/device-hub-ui.mjs"), "utf8");
     expect(src).toContain("hc-emphasis-card--warn hub-card-status-alert");

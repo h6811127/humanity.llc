@@ -139,7 +139,7 @@ Prioritized follow-ups after Phases 0–5. Full tier tables: [`UI_COLOR_SCHEME_S
 | Glance popover rows | List controls, not page-level cards |
 | Inbox sheet rows | Dense list UX |
 | Solid `.device-hub-notice-banner` full-bleed | Intentional high-contrast hub taps |
-| `.research-live-banner` | Separate marketing language |
+| `.research-live-banner` | Separate visual language (landing final CTA uses emphasis card — [`LANDING_FINAL_CTA_EMPHASIS_CARD.md`](LANDING_FINAL_CTA_EMPHASIS_CARD.md)) |
 | Remove `.wallet-active-*` aliases | After all consumers use `hc-emphasis-card__*` only |
 
 ### Engineering hygiene
