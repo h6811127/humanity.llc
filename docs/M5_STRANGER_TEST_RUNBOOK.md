@@ -36,6 +36,7 @@ curl -sS "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status?q=QR" | jq
 
     - Status plate: `site/data/showcase-status-plate.json` — `npm run site:seed-showcase`
     - Live object: `site/data/showcase-live-object.json` — `npm run site:seed-showcase-live-object`
+    - Lost item relay: `site/data/showcase-lost-item.json` — `npm run site:seed-showcase-lost-item`
     - CI fixture: `worker/tests/scan-m5-live-object.test.ts`
 
 **Deploy check:** scan response header `X-HC-Scan-UI: pass-v24` (or later) on an active scan.
