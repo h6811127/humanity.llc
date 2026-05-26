@@ -304,7 +304,7 @@ Since `2b5d105`, `device-status.mjs` imports `device-inbox-sheet.mjs` at top lev
 
 ### 2. Hub open-state single source of truth — ✅ shipped
 
-`hubSheetOpen()` is true if `body.device-hub-sheet-open` **or** `#device-hub` lacks `device-hub-collapsed` (`device-status.mjs`). Desync makes the first tap call `setHubExpanded(false)` with no visible change.
+`hubSheetOpen()` is true only when `#device-hub` lacks `device-hub-collapsed` (`device-status.mjs`). A stuck `body.device-hub-sheet-open` while the hub is collapsed used to make the first tap call `setHubExpanded(false)` with no visible change; the opener now treats a collapsed hub as closed and reconciles on each dot tap.
 
 - Route **all** open/close paths through `setHubSheetOpen()` / `setHubExpanded()` (no direct `classList` on `body` elsewhere).
 - **Reconcile (shipped):** `reconcileHubSheetState()` in `device-hub-sheet.mjs` on init and `pageshow` (bfcache); `device-status.mjs` calls it after initial `setHubExpanded(false)`. `reconcileInboxSheetState()` in `device-inbox-sheet.mjs` for stuck inbox backdrop/classes.

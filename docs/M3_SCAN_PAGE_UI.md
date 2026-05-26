@@ -47,7 +47,7 @@ All zones **A–H** shipped through `pass-v24`. See [`docs/SCANNER_EXPERIENCE.md
 
 ### Scan type heroes
 
-Branch in `buildScanStatusPanelBody` / new hero builder using `parseManifestoDisplay()` (`manifesto-display.ts`):
+Branch in `buildScanHeroMain()` using `parseManifestoDisplay()` (`manifesto-display.ts`):
 
 | `display.kind` / context | H1 | Secondary |
 |--------------------------|-----|-----------|

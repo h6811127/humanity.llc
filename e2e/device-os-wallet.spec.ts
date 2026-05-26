@@ -38,7 +38,37 @@ test.describe("device OS wallet flow", () => {
     await page.addInitScript((profileId) => {
       localStorage.setItem("hc_setup_done", JSON.stringify({ [profileId]: true }));
     }, SAMPLE_WALLET_ENTRY.profile_id);
+    await page.route("**/.well-known/hc/v1/health**", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ status: "ok", database: "ok" }),
+      })
+    );
+    await page.route("**/.well-known/hc/v1/cards/**/status**", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          version: "1.0",
+          resolver: { operator: "humanity.llc", version: "1.0" },
+          scan: {
+            kind: "active",
+            profile_id: SAMPLE_WALLET_ENTRY.profile_id,
+            qr_id: SAMPLE_WALLET_ENTRY.qr_id,
+            card: {
+              status: "active",
+              handle: SAMPLE_WALLET_ENTRY.handle,
+              manifesto_line: SAMPLE_WALLET_ENTRY.manifesto_line,
+            },
+            verification: { state: "registered", label: "Registered" },
+            human_trust: { label: "Registered", subtitle: "", pill_active: false },
+          },
+        }),
+      })
+    );
     await page.goto("/wallet/");
+    await expect(page.getByText("Reachable")).toBeVisible({ timeout: 15_000 });
     await page.getByRole("button", { name: "More options" }).click();
     await page.getByRole("button", { name: "Update status" }).click();
     await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);

@@ -36,6 +36,30 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 
 - **Cards vs keys vs verification:** `docs/KEYS_CARDS_AND_VERIFICATION.md` — steward status is on the resolver; vouch signing needs `hc_created` keys on the same browser tab.
 - **Status dot vs inbox vs OS alerts:** `docs/DEVICE_INBOX.md` (action items, badge, background alerts) vs `docs/STATUS_INDICATOR_STEWARD_GREEN.md` (trust dot only).
+
+### Status dot / hub opener (agent guardrails)
+
+The floating **status dot** (`#brand-status-dot-btn`) is the hub opener on `/`, `/create/`, and `/created/`. On `/wallet/` it only scrolls to saved cards. Do not wire glance-first on dot tap.
+
+When you touch any of these, run the regression suite before finishing:
+
+- `site/js/device-status.mjs`, `device-status-bootstrap.mjs`, `device-dot-state-core.mjs`
+- `site/js/device-hub-sheet.mjs`, `device-inbox-sheet.mjs`, `device-hub-glance-popover.mjs`
+- `site/css/device-shell.css` (especially `pointer-events` on `.top-chrome--float` / `.shell-status-cluster`)
+
+```bash
+npm run worker:test
+npm run e2e:install   # once per machine
+npm run e2e -- e2e/device-status-dot.spec.ts
+```
+
+**Contracts (do not break without updating docs + tests):**
+
+1. **Module graph** — `device-status-bootstrap.mjs` dynamically imports `device-status.mjs`; a failed import leaves the dot dead with no click handler. New imports must ship in the same deploy and stay listed in `SHELL_STATUS_MODULE_PATHS` inside `e2e/device-status-dot.spec.ts`.
+2. **Hub open state** — Open/close only through `setHubSheetOpen()` / `setHubExpanded()`. `hubSheetOpen()` treats a collapsed `#device-hub` as closed even if `body.device-hub-sheet-open` is stuck (toggle-trap fix).
+3. **Clickability CSS** — `.top-chrome--float { pointer-events: none }` with `.shell-status-cluster` (and dot/badge) at `pointer-events: auto` when `top-chrome--edge-hidden` or hub/inbox locked. See `docs/STATUS_INDICATOR_STEWARD_GREEN.md` troubleshooting.
+
+Manual smoke: `docs/DEVICE_OS_QA.md` **P0-3** (dot opens hub; scroll + tap again).
 - The Worker health endpoint is at `/.well-known/hc/v1/health`. If `database` shows `schema_missing`, run migrations.
 - The D1 database is emulated locally by Wrangler  -  no external SQLite or Cloudflare account needed for dev.
 - Card creation requires Ed25519-signed JSON documents (card + qr_credential). Test fixtures in `worker/tests/fixtures/` provide valid signed payloads.
