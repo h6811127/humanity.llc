@@ -472,6 +472,7 @@ body.page-wallet .device-keys-custody--wallet {
   background: transparent;
   box-shadow: none;
   cursor: pointer;
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.25s var(--shell-spring);
 }
@@ -1394,6 +1395,7 @@ button.hub-card-action.hub-use-keys {
 }
 
 .device-hub.device-hub--sheet:not(.device-hub-collapsed) {
+  visibility: visible;
   transform: translateX(-50%) translateY(0);
   pointer-events: auto;
 }
@@ -1412,8 +1414,10 @@ button.hub-card-action.hub-use-keys {
   background: transparent;
 }
 
+/* WebKit: visibility:hidden keeps transformed sheet off the hit-test plane (Phase 1.5). */
 .device-hub.device-hub--sheet.device-hub-collapsed {
   pointer-events: none;
+  visibility: hidden;
 }
 
 .device-hub.device-hub--sheet.device-hub-collapsed .device-hub-body {
@@ -1514,8 +1518,14 @@ body.device-hub-sheet-open {
 }
 
 .device-inbox-sheet:not(.device-inbox-sheet--collapsed) {
+  visibility: visible;
   transform: translateX(-50%) translateY(0);
   pointer-events: auto;
+}
+
+.device-inbox-sheet.device-inbox-sheet--collapsed {
+  pointer-events: none;
+  visibility: hidden;
 }
 
 .device-inbox-sheet-body {
