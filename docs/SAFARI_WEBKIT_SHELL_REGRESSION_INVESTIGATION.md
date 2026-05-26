@@ -285,6 +285,8 @@ document.body.classList.remove("shell-is-scrolling");
 
 | Date | Decision |
 |------|----------|
+| 2026-05-26 | **Phase 2.3 shipped:** Vitest for `shouldAttachDocumentScrollChromeEffects` + `bindSheetLifecycleReconcile` |
+| 2026-05-26 | **Phase 2.4 shipped:** cross-link from `STATUS_INDICATOR_STEWARD_GREEN.md` troubleshooting (already present) |
 | 2026-05-26 | **Phase 2.2 shipped:** `device-inbox-sheet.mjs` lazy `import()` from `device-status.mjs` (badge/hub/explainer only); graph `v=25` |
 | 2026-05-26 | **Phase 2.1 shipped:** Playwright `webkit` + `iPhone 13 Pro` projects; `e2e/safari-shell-scroll.spec.ts`; CI installs WebKit; graph `v=24` (inbox backdrop `aria-hidden` on create) |
 | 2026-05-26 | **Phase 1.6 shipped:** `@media (pointer: coarse)` removes `backdrop-filter` on hub/inbox backdrops (solid dim); `device-shell.css?v=36` |
@@ -310,3 +312,5 @@ document.body.classList.remove("shell-is-scrolling");
 | 2026-05-26 | Phase 1.6 implemented (coarse-pointer backdrop blur off) |
 | 2026-05-26 | Phase 2.1 implemented (WebKit Playwright smoke) |
 | 2026-05-26 | Phase 2.2 implemented (lazy inbox sheet import from device-status) |
+| 2026-05-26 | Phase 2.3 implemented (Vitest scroll chrome + backdrop lifecycle) |
+| 2026-05-26 | Phase 2.4 implemented (STATUS_INDICATOR troubleshooting link) |
