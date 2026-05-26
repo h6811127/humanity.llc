@@ -39,7 +39,7 @@ export function setHubSheetOpen(open) {
   ensureBackdrop();
   hub.classList.toggle("device-hub-collapsed", !open);
   if (backdrop) {
-    backdrop.hidden = false;
+    backdrop.hidden = !open;
     backdrop.classList.toggle("is-visible", open);
   }
   document.body.classList.toggle("device-hub-sheet-open", open);

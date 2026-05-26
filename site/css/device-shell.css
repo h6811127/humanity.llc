@@ -104,23 +104,30 @@ body.has-shell-chrome .page {
 
 .top-chrome--float.top-chrome--edge-hidden .top-chrome-bar--minimal,
 .top-chrome--float.top-chrome--edge-hidden .top-chrome-bar--wallet {
-  transform: translateY(calc(-100% - env(safe-area-inset-top, 0px)));
-  opacity: 0;
-  pointer-events: none;
+  opacity: 0.45;
 }
 
 body.device-hub-sheet-open .top-chrome--float,
 .top-chrome--float.top-chrome--hub-locked {
-  visibility: hidden;
   pointer-events: none;
 }
 
 body.device-hub-sheet-open .top-chrome--float .top-chrome-bar--minimal,
 .top-chrome--float.top-chrome--hub-locked .top-chrome-bar--minimal {
-  transition: none;
-  transform: translateY(calc(-100% - env(safe-area-inset-top, 0px)));
   opacity: 0;
   pointer-events: none;
+}
+
+/* Status dot stays reachable: open/close hub while sheet is up, and after scroll */
+body.device-hub-sheet-open .shell-status-cluster,
+.top-chrome--float.top-chrome--hub-locked .shell-status-cluster,
+.top-chrome--float.top-chrome--edge-hidden .shell-status-cluster {
+  pointer-events: auto;
+  opacity: 1;
+  position: fixed;
+  top: calc(8px + env(safe-area-inset-top, 0px));
+  left: var(--pad, 20px);
+  z-index: 65;
 }
 
 .shell-status-cluster {

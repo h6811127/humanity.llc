@@ -14,12 +14,8 @@ import { getTabSession } from "./device-keys.mjs";
 import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
 import { crossTabNoticeCount } from "./device-tab-presence.mjs";
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
-import { hubGlanceHasContent, refreshHubGlance } from "./device-hub-glance.mjs";
-import {
-  closeGlancePopover,
-  isGlancePopoverOpen,
-  setGlancePopoverOpen,
-} from "./device-hub-glance-popover.mjs";
+import { refreshHubGlance } from "./device-hub-glance.mjs";
+import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import "./device-shell-motion.mjs";
 import "./device-shell-chrome.mjs";
 import "./device-theme.mjs";
@@ -376,6 +372,7 @@ function openNotificationsFromChrome() {
 }
 
 function openHubFromChrome() {
+  closeGlancePopover();
   if (isWalletPage()) {
     openWalletFromChrome();
     return;
@@ -384,18 +381,9 @@ function openHubFromChrome() {
     location.href = "/";
     return;
   }
+  hapticTap();
   if (hubSheetOpen()) {
     setHubExpanded(false, { haptic: true, persist: false });
-    return;
-  }
-  if (isGlancePopoverOpen()) {
-    closeGlancePopover();
-    setHubExpanded(true, { haptic: true, persist: false });
-    return;
-  }
-  if (hubGlanceHasContent()) {
-    setGlancePopoverOpen(true);
-    hapticTap();
     return;
   }
   setHubExpanded(true, { haptic: true, persist: false });
