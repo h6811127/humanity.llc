@@ -3,7 +3,7 @@
 **Date:** 2026-05-26  
 **Reporter symptom:** On iPhone (Safari and Chrome), the status indicator (`#brand-status-dot-btn`) does not open the hub; “Shortcuts” and “Settings” cannot be tapped. Same site works on iPad and laptop.  
 **Scope:** Read-only code + docs review (no device lab in this session; Playwright WebKit not installed locally).  
-**Related:** [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) (troubleshooting), [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md), [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) P0-3
+**Related:** [`SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md`](SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md) (master doc + fix plan), [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) (troubleshooting), [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md), [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) P0-3
 
 ---
 
@@ -254,3 +254,5 @@ Follow-up report: laggy/jumpy scroll on `/` and `/created/`, rapid up/down glitc
 ## Conclusion
 
 The codebase already documents “dead dot” failures; **stale CSS/JS** and **stuck hub backdrop** remain valid checks. The **all-device scroll glitch** was a separate layout bug in scroll-edge chrome + landing `content-visibility`, fixed as above. After deploy, hard-refresh once on each device to pick up `?v=34` / `?v=91`.
+
+**Update (2026-05-26):** Follow-up testing showed **iPhone Safari still broken after private tab and cleared website data** (not cache-only). Mac Safari intermittent red ring; hub smooth when open but landing scroll laggy. See **[`SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md`](SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md)** for the consolidated fix plan.

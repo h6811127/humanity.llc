@@ -2,7 +2,7 @@
  * Bottom sheet host for #device-hub on shell pages.
  */
 import { prefersReducedMotion } from "./device-shell-motion.mjs";
-import { hubSheetReconcileAction } from "./device-hub-sheet-core.mjs";
+import { hubSheetReconcileAction } from "./device-hub-sheet-core.mjs?v=22";
 
 const HUB_OPEN_KEY = "hc_hub_open";
 

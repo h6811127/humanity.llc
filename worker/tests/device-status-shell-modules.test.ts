@@ -4,6 +4,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
+  DEVICE_SHELL_ASSET_VERSION,
+  DEVICE_STATUS_BOOTSTRAP_CACHE_BUST,
   DEVICE_STATUS_SHELL_JS_FILES,
   deviceStatusShellModulePaths,
 } from "../../site/js/device-status-shell-modules.mjs";
@@ -18,10 +20,18 @@ describe("device status shell module manifest", () => {
     }
   });
 
-  it("maps bootstrap with cache-bust query for Playwright", () => {
-    const paths = deviceStatusShellModulePaths(21);
-    expect(paths[0]).toBe("/js/device-status-bootstrap.mjs?v=21");
-    expect(paths).toContain("/js/device-inbox-sheet-core.mjs");
-    expect(paths).toContain("/js/device-hub-sheet-core.mjs");
+  it("aliases bootstrap cache-bust to shell asset version", () => {
+    expect(DEVICE_STATUS_BOOTSTRAP_CACHE_BUST).toBe(DEVICE_SHELL_ASSET_VERSION);
+  });
+
+  it("maps every manifest entry with cache-bust query for Playwright", () => {
+    const paths = deviceStatusShellModulePaths();
+    expect(paths).toHaveLength(DEVICE_STATUS_SHELL_JS_FILES.length);
+    for (const file of DEVICE_STATUS_SHELL_JS_FILES) {
+      expect(paths).toContain(`/js/${file}?v=${DEVICE_SHELL_ASSET_VERSION}`);
+    }
+    expect(paths[0]).toBe(
+      `/js/device-status-bootstrap.mjs?v=${DEVICE_SHELL_ASSET_VERSION}`
+    );
   });
 });

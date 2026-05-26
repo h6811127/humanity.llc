@@ -2,7 +2,12 @@
  * Loads device-status.mjs; surfaces load failures on #top-chrome.
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md — Fix directions §1
  */
-const STATUS_MODULE = "./device-status.mjs";
+import { DEVICE_SHELL_ASSET_VERSION } from "./device-status-shell-modules.mjs";
+
+const statusModuleUrl = new URL(
+  `./device-status.mjs?v=${DEVICE_SHELL_ASSET_VERSION}`,
+  import.meta.url
+);
 
 function markChromeLoadError(message) {
   const chrome = document.getElementById("top-chrome");
@@ -16,7 +21,7 @@ function markChromeLoadError(message) {
   console.error("[humanity] Device status module failed to load:", message);
 }
 
-import(STATUS_MODULE)
+import(statusModuleUrl.href)
   .then(() => {
     document.getElementById("top-chrome")?.removeAttribute("data-device-status-error");
   })

@@ -15,12 +15,12 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeChromaClass,
   inboxBadgeChromaClassNames,
-} from "./device-inbox-core.mjs";
+} from "./device-inbox-core.mjs?v=22";
 import { tabNoticeCount } from "./device-counts.mjs";
 import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
-import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs";
+import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=22";
 
 export {
   buildGlanceRowPlan,
@@ -35,7 +35,7 @@ export {
   inboxBadgeChromaKind,
   inboxBadgeChromaClass,
   inboxBadgeChromaClassNames,
-} from "./device-inbox-core.mjs";
+} from "./device-inbox-core.mjs?v=22";
 
 function tabSessionLabel() {
   const session = getTabSession();

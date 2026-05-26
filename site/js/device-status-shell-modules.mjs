@@ -3,10 +3,17 @@
  * Playwright and Vitest share this list — add a file here when merging a new
  * import on the status-dot graph (same PR as the .mjs file).
  * @see docs/STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md
+ * @see docs/SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md — Phase 1.1
  */
 
-/** Bump on all shell HTML when bootstrap query changes. */
-export const DEVICE_STATUS_BOOTSTRAP_CACHE_BUST = 21;
+/**
+ * Bump on all shell HTML (`device-status-bootstrap.mjs?v=N`) and on every
+ * `./peer.mjs?v=N` import between files in DEVICE_STATUS_SHELL_JS_FILES.
+ */
+export const DEVICE_SHELL_ASSET_VERSION = 22;
+
+/** @deprecated Use DEVICE_SHELL_ASSET_VERSION */
+export const DEVICE_STATUS_BOOTSTRAP_CACHE_BUST = DEVICE_SHELL_ASSET_VERSION;
 
 /**
  * Filenames relative to site/js/ (not URLs).
@@ -33,8 +40,16 @@ export const DEVICE_STATUS_SHELL_JS_FILES = [
  * @param {number} [cacheBust]
  * @returns {string[]}
  */
-export function deviceStatusShellModulePaths(cacheBust = DEVICE_STATUS_BOOTSTRAP_CACHE_BUST) {
-  return DEVICE_STATUS_SHELL_JS_FILES.map((file) =>
-    file === "device-status-bootstrap.mjs" ? `/js/${file}?v=${cacheBust}` : `/js/${file}`
-  );
+export function deviceStatusShellModulePaths(cacheBust = DEVICE_SHELL_ASSET_VERSION) {
+  return DEVICE_STATUS_SHELL_JS_FILES.map((file) => `/js/${file}?v=${cacheBust}`);
+}
+
+/**
+ * Relative import specifier for graph peers (static import paths must be literals).
+ * @param {string} filename e.g. `device-inbox-sheet.mjs`
+ * @param {number} [cacheBust]
+ * @returns {string}
+ */
+export function deviceShellGraphImport(filename, cacheBust = DEVICE_SHELL_ASSET_VERSION) {
+  return `./${filename}?v=${cacheBust}`;
 }

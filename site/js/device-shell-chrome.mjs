@@ -1,6 +1,9 @@
 /**
  * Floating shell chrome inset (minimal dot + Create bar).
+ * @see docs/SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md — Phase 1.2–1.3
  */
+import { shouldAttachDocumentScrollChromeEffects } from "./device-shell-chrome-core.mjs";
+
 const chrome = document.getElementById("top-chrome");
 
 /** Largest measured chrome bar height — never shrink (avoids scroll jump). */
@@ -16,6 +19,8 @@ export function syncShellChromeInset() {
 
 function initScrollEdgeChrome() {
   if (!chrome) return;
+  if (!shouldAttachDocumentScrollChromeEffects()) return;
+
   const bar = chrome.querySelector(".top-chrome-bar");
   if (!bar) return;
 
@@ -87,6 +92,9 @@ function initScrollEdgeChrome() {
 export function initShellChrome() {
   if (!chrome) return;
   document.body.classList.add("has-shell-chrome");
+  if (!shouldAttachDocumentScrollChromeEffects()) {
+    document.body.classList.add("shell-scroll-chrome-off");
+  }
   syncShellChromeInset();
   initScrollEdgeChrome();
   window.addEventListener("resize", syncShellChromeInset);

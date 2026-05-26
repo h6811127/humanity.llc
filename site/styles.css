@@ -3503,14 +3503,18 @@ body.landing-focus-mode .screen-landing > .hero.hero-tight {
 /* Landing de-explain (VISUAL_DEVICE_SHELL Phase A #3).
    content-visibility:auto was removed — it caused layout thrash and jumpy scroll on mobile. */
 
-body.shell-is-scrolling .shell-status-dot {
-  animation-play-state: paused;
-}
+/* Scroll-edge chrome effects — desktop fine pointer only (Phase 1.3).
+   Touch devices use body.shell-scroll-chrome-off; no shell-is-scrolling toggling. */
+@media (pointer: fine) and (hover: hover) {
+  body.shell-is-scrolling .shell-status-dot {
+    animation-play-state: paused;
+  }
 
-body.shell-is-scrolling .top-chrome--float .top-chrome-bar--minimal,
-body.shell-is-scrolling .top-chrome--float .top-chrome-bar--wallet {
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
+  body.shell-is-scrolling .top-chrome--float .top-chrome-bar--minimal,
+  body.shell-is-scrolling .top-chrome--float .top-chrome-bar--wallet {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 .landing-disclosure {
