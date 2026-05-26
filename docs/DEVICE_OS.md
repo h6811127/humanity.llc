@@ -253,6 +253,8 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 | `docs/DEVICE_INBOX.md` | Inbox taxonomy, badge, background alerts roadmap |
 | `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` | Storage, search, focus mode |
 | `site/js/device-browser-notifications.mjs` | OS notifications v1 + settings toggle |
+| `site/js/device-inbox-core.mjs` | Pure inbox model (badge count, overlay inputs, ARIA) |
+| `site/js/device-inbox.mjs` | Browser facade for inbox items |
 | `docs/DEVICE_OS_QA.md` | Manual QA runbook + bug triage |
 | `site/js/device-os-coordinator.mjs` | Debounced device OS refresh pipeline |
 | `site/js/device-network-health.mjs` | Shared resolver `/.well-known/hc/v1/health` fetch |

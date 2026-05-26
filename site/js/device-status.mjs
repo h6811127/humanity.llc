@@ -2,17 +2,22 @@
  * Floating status dot, notification badge, hub sheet host.
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
-import { buildStatusSegments, tabNoticeCount } from "./device-counts.mjs";
+import { buildStatusSegments } from "./device-counts.mjs";
 import {
   DEVICE_OS_REFRESHED,
   getCoordinatorNetworkStatus,
   initDeviceOsCoordinator,
   requestDeviceOsRefresh,
 } from "./device-os-coordinator.mjs";
-import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
-import { crossTabNoticeCount } from "./device-tab-presence.mjs";
+import {
+  getInboxItems,
+  getInboxOverlayCounts,
+  inboxBadgeAriaLabel,
+  inboxBadgeCountText,
+  notificationCount,
+} from "./device-inbox.mjs";
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
@@ -27,6 +32,7 @@ import {
   describeDotState,
   deviceStateFromContext,
   dotClassList,
+  dotExplainerKicker,
   dotOverlayFromCounts,
   dotStateKey,
   dotTransitionKey,
@@ -105,15 +111,10 @@ function deviceState() {
 }
 
 function dotOverlayState() {
-  return dotOverlayFromCounts({
-    liveProofPending: getLiveControlPendingCount(),
-    crossTabNotice: crossTabNoticeCount(),
-  });
+  return dotOverlayFromCounts(getInboxOverlayCounts());
 }
 
-export function notificationCount() {
-  return tabNoticeCount() + getLiveControlPendingCount() + crossTabNoticeCount();
-}
+export { notificationCount };
 
 function isWalletPage() {
   return document.body.classList.contains("page-wallet");
@@ -244,6 +245,14 @@ function getStewardQueueUrl() {
   return link.getAttribute("href") || null;
 }
 
+function dotPageKind() {
+  if (isWalletPage()) return "wallet";
+  const path = location.pathname;
+  if (path.startsWith("/created")) return "created";
+  if (path.startsWith("/create")) return "create";
+  return "landing";
+}
+
 function renderDotExplainer(container, descriptor, compact = false) {
   if (!container) return;
   const action = descriptor.action;
@@ -252,8 +261,9 @@ function renderDotExplainer(container, descriptor, compact = false) {
       ? `<a class="device-dot-explainer-action" href="${escapeHtml(action.href)}">${escapeHtml(action.label)}</a>`
       : `<button type="button" class="device-dot-explainer-action" data-dot-action="${escapeHtml(action.kind)}">${escapeHtml(action.label)}</button>`
     : "";
+  const kicker = dotExplainerKicker(descriptor, compact);
   container.innerHTML = `
-    <p class="device-dot-explainer-kicker">${compact ? "Status now" : "Status explainer"}</p>
+    <p class="device-dot-explainer-kicker">${escapeHtml(kicker)}</p>
     <p class="device-dot-explainer-line"><strong>Now:</strong> ${escapeHtml(descriptor.now)}</p>
     <p class="device-dot-explainer-line"><strong>Why:</strong> ${escapeHtml(descriptor.why)}</p>
     <p class="device-dot-explainer-line"><strong>Next:</strong> ${escapeHtml(descriptor.next)}</p>
@@ -264,6 +274,7 @@ function renderDotExplainability(network, device, overlay) {
   const descriptor = describeDotState(network, device, overlay, {
     stewardReady: hasStewardReadyKeys(),
     queueUrl: getStewardQueueUrl(),
+    pageKind: dotPageKind(),
   });
   const keyRoot = document.getElementById("device-hub-status-key");
   if (keyRoot) {
@@ -327,10 +338,12 @@ function renderHubStatusPanel(segments) {
 
 function renderNotifBadge() {
   if (!notifBtn) return;
+  const items = getInboxItems();
   const n = notificationCount();
   notifBtn.hidden = n === 0;
+  notifBtn.setAttribute("aria-label", inboxBadgeAriaLabel(items));
   if (notifCountEl) {
-    notifCountEl.textContent = n > 9 ? "9+" : String(n);
+    notifCountEl.textContent = inboxBadgeCountText(n);
   }
 }
 

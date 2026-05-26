@@ -1,11 +1,8 @@
 /**
  * Compact hub summary: landing when sheet is collapsed; /wallet/ always when non-empty.
  */
-import { tabNoticeCount } from "./device-counts.mjs";
-import { shouldShowCrossTabKeysNotice } from "./device-cross-tab-visibility.mjs";
+import { getInboxItems } from "./device-inbox.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
-import { getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
-import { getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
 import {
   getLatestResolvedAlertState,
@@ -63,24 +60,70 @@ function glanceCopy(wallet) {
 }
 
 /**
+ * @param {import("./device-inbox-core.mjs").InboxItem} item
+ * @param {HTMLElement} list
+ * @param {{ liveProofSub: string }} copy
+ */
+function appendInboxGlanceRow(item, list, copy) {
+  const li = document.createElement("li");
+
+  if (item.kind === "live_proof") {
+    li.className = "device-hub-glance-row device-hub-glance-row--liveproof";
+    li.innerHTML = `
+      <button type="button" class="device-hub-glance-btn">
+        <span class="device-hub-glance-title">${escapeHtml(item.title)}</span>
+        <span class="device-hub-glance-sub">${escapeHtml(copy.liveProofSub)}</span>
+      </button>`;
+    li.querySelector("button")?.addEventListener("click", () => {
+      expandHub(item.hubScrollTarget ?? "device-hub-live-control-group");
+    });
+    list.appendChild(li);
+    return;
+  }
+
+  if (item.kind === "cross_tab_keys") {
+    const entry = item.meta?.crossTabEntry;
+    if (!entry) return;
+    li.className = "device-hub-glance-row device-hub-glance-row--crosstab";
+    li.innerHTML = `
+      <button type="button" class="device-hub-glance-btn">
+        <span class="device-hub-glance-title">${escapeHtml(item.title)}</span>
+        <span class="device-hub-glance-sub">${escapeHtml(item.subtitle ?? "")}</span>
+      </button>`;
+    li.querySelector("button")?.addEventListener("click", () => {
+      if (!actOnOtherTabKeys(entry)) {
+        refreshHubGlance();
+      }
+    });
+    list.appendChild(li);
+    return;
+  }
+
+  if (item.kind === "tab_keys_unsaved") {
+    li.className = "device-hub-glance-row device-hub-glance-row--notice";
+    li.innerHTML = `
+      <button type="button" class="device-hub-glance-btn">
+        <span class="device-hub-glance-title">${escapeHtml(item.title)}</span>
+        <span class="device-hub-glance-sub">${escapeHtml(item.subtitle ?? "")}</span>
+      </button>`;
+    li.querySelector("button")?.addEventListener("click", () => {
+      openSaveKeysForThisTab();
+    });
+    list.appendChild(li);
+  }
+}
+
+/**
  * @param {{ root: HTMLElement, list: HTMLElement, hub: HTMLElement | null, wallet: boolean }} target
  */
 function refreshGlanceTarget(target) {
-  const { root, list, hub, wallet } = target;
+  const { root, list, wallet } = target;
   const copy = glanceCopy(wallet);
-
+  const inboxItems = getInboxItems();
   const entries = loadWallet();
-  const notices = tabNoticeCount();
-  const liveProof = getLiveControlPendingCount();
-  const session = getTabSession();
-  const thisHasKeys = !!(session?.profile_id && session?.owner_private_key_b58);
-  const otherTabsRaw = getOtherTabsWithKeys();
-  const otherTabs = shouldShowCrossTabKeysNotice(otherTabsRaw.length, notices)
-    ? otherTabsRaw
-    : [];
   const hasCards = entries.length > 0;
 
-  if (!hasCards && notices === 0 && liveProof === 0 && otherTabs.length === 0) {
+  if (!hasCards && inboxItems.length === 0) {
     root.hidden = true;
     return;
   }
@@ -88,64 +131,13 @@ function refreshGlanceTarget(target) {
   glanceHasRenderableContent = true;
   list.innerHTML = "";
 
-  if (liveProof > 0) {
-    const li = document.createElement("li");
-    li.className = "device-hub-glance-row device-hub-glance-row--liveproof";
-    const n = liveProof;
-    li.innerHTML = `
-      <button type="button" class="device-hub-glance-btn">
-        <span class="device-hub-glance-title">${n} live proof waiting</span>
-        <span class="device-hub-glance-sub">${escapeHtml(copy.liveProofSub)}</span>
-      </button>`;
-    li.querySelector("button")?.addEventListener("click", () => {
-      expandHub("device-hub-live-control-group");
-    });
-    list.appendChild(li);
-  }
-
-  if (otherTabs.length > 0) {
-    const entry = otherTabs[0];
-    const label =
-      entry.label || (entry.handle ? `@${entry.handle}` : `${entry.profile_id.slice(0, 12)}…`);
-    const extra = otherTabs.length > 1 ? ` (+${otherTabs.length - 1} more)` : "";
-    const li = document.createElement("li");
-    li.className = "device-hub-glance-row device-hub-glance-row--crosstab";
-    li.innerHTML = `
-      <button type="button" class="device-hub-glance-btn">
-        <span class="device-hub-glance-title">Keys in another tab</span>
-        <span class="device-hub-glance-sub">${escapeHtml(label)}${escapeHtml(extra)}</span>
-      </button>`;
-    li.querySelector("button")?.addEventListener("click", () => {
-      if (!actOnOtherTabKeys(entry)) {
-        refreshHubGlance();
-        return;
-      }
-    });
-    list.appendChild(li);
-  }
-
-  if (notices > 0) {
-    const tabSession = getTabSession();
-    const label = tabSession?.handle
-      ? `@${tabSession.handle}`
-      : tabSession?.profile_id?.slice(0, 12) || "This tab";
-    const li = document.createElement("li");
-    li.className = "device-hub-glance-row device-hub-glance-row--notice";
-    li.innerHTML = `
-      <button type="button" class="device-hub-glance-btn">
-        <span class="device-hub-glance-title">Keys in this tab · save</span>
-        <span class="device-hub-glance-sub">${escapeHtml(label)}</span>
-      </button>`;
-    li.querySelector("button")?.addEventListener("click", () => {
-      openSaveKeysForThisTab();
-    });
-    list.appendChild(li);
+  for (const item of inboxItems) {
+    appendInboxGlanceRow(item, list, copy);
   }
 
   const shown = entries.slice(0, GLANCE_MAX_CARDS);
   for (const entry of shown) {
     const li = document.createElement("li");
-    // DH-3: only trust fresh resolver poll state, never stale session cache.
     const alertState = getLatestResolvedAlertState(entry.profile_id);
     const revokedSince = alertState
       ? isRevokedSinceLastVisit(entry.profile_id, alertState)

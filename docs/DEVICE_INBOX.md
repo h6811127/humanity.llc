@@ -108,8 +108,8 @@ See [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 
 **Shipped:**
 
-- Visible when `notificationCount() > 0` in `device-status.mjs`:
-  - `tabNoticeCount()` + `getLiveControlPendingCount()` + `crossTabNoticeCount()`.
+- Visible when `notificationCount() > 0` (`device-inbox.mjs` → `inboxCountFromItems(getInboxItems())`).
+- `aria-label` from `inboxBadgeAriaLabel()` (shipped phase 2).
 - Tap: on wallet → scroll `#wallet-alerts-top`; elsewhere → expand hub + scroll `#device-hub-alerts-top`.
 - Styled in `site/css/device-shell.css` (red ring + count).
 
@@ -227,8 +227,8 @@ See [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 | Phase | Deliverable | Status |
 |-------|-------------|--------|
 | 0 | This document + cross-links in DEVICE_OS / STATUS_INDICATOR | ✅ |
-| 1 | `device-inbox-core.mjs` — `buildInboxItems()`, `inboxCount()`, `topInboxKind()` | Planned |
-| 2 | Refactor `notificationCount()`, glance, hub alerts to use core | Planned |
+| 1 | `device-inbox-core.mjs` — `buildInboxItems()`, `inboxCountFromItems()`, `topInboxKind()` | ✅ |
+| 2 | Refactor `notificationCount()`, glance, dot overlay, badge ARIA to use core | ✅ (hub alert DOM still in `device-hub-ui.mjs`; same scroll targets) |
 | 3 | Inbox sheet from `#shell-notif-badge`; shared `openInboxFromChrome()` | Planned |
 | 4 | Contextual browser-alert prompt + OS click deep link | Planned |
 | 5 | Badge/dot chroma sync to `topInboxKind()` | Planned |
@@ -274,7 +274,9 @@ Confusion signal: repeated `inbox_open` without `inbox_item_action` → copy or 
 | `site/css/device-shell.css` | `.shell-notif-badge*` styles |
 | `docs/DEVICE_INBOX.md` | This spec |
 
-**Planned:** `site/js/device-inbox-core.mjs`, tests in `worker/tests/device-inbox*.test.ts`.
+| `site/js/device-inbox-core.mjs` | Pure inbox model |
+| `site/js/device-inbox.mjs` | Browser facade (`getInboxItems`, `notificationCount`) |
+| `worker/tests/device-inbox.test.ts` | Vitest for inbox core |
 
 ---
 
