@@ -73,6 +73,8 @@
   --hc-emphasis-card-eyebrow-info: #007aff;
   --hc-emphasis-card-eyebrow-warn: #a16207;
   --hc-emphasis-card-eyebrow-urgent: #c9342a;
+  --hc-emphasis-card-title-fg: var(--black);
+  --hc-emphasis-card-detail-fg: rgba(60, 60, 67, 0.78);
 }
 
 *,
@@ -5720,7 +5722,7 @@ details[open] > .created-advanced-summary::after {
   font-size: 17px;
   font-weight: 700;
   letter-spacing: -0.03em;
-  color: var(--black);
+  color: var(--hc-emphasis-card-title-fg);
   line-height: 1.2;
 }
 
@@ -5730,7 +5732,7 @@ details[open] > .created-advanced-summary::after {
   font-size: 13px;
   font-weight: 500;
   line-height: 1.35;
-  color: rgba(60, 60, 67, 0.78);
+  color: var(--hc-emphasis-card-detail-fg);
 }
 
 .hc-emphasis-card__cta,
@@ -5767,7 +5769,7 @@ details[open] > .created-advanced-summary::after {
 }
 
 .hc-emphasis-card__cta--secondary {
-  color: var(--black);
+  color: var(--hc-emphasis-card-title-fg);
   background: rgba(255, 255, 255, 0.72);
   border: 0.5px solid rgba(60, 60, 67, 0.2);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);

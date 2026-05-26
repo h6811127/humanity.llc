@@ -113,8 +113,9 @@ See tier tables in [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) 
 1. Light + dark theme on target page.
 2. No blue (or semantic) **rim** from translucent fill—only shadow depth.
 3. Eyebrow, title, detail, CTA readable; tap targets ≥44px where buttons.
-4. `npm run worker:test:ui-color-scheme`
-5. Wallet/cross-tab: `npm run e2e -- e2e/device-os-wallet.spec.ts` when touching wallet chrome.
+4. **Dark mode:** card fill must switch to dark gradient (not light surface + light text). See [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Dark mode (emphasis cards).
+5. `npm run worker:test:ui-color-scheme`
+6. Wallet/cross-tab: `npm run e2e -- e2e/device-os-wallet.spec.ts` when touching wallet chrome.
 
 ---
 

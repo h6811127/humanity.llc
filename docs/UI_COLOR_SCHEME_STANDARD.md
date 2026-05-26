@@ -91,6 +91,26 @@ Future variants may add `--hc-emphasis-card-fill-*` and `--hc-emphasis-card-eyeb
 
 Fill and eyebrow tokens: `--hc-emphasis-card-fill-*`, `--hc-emphasis-card-eyebrow-*` on `:root` (dark overrides in `theme-dark.css`).
 
+Typography tokens (required for dark mode — do not use `var(--black)` or fixed light greys on card copy):
+
+- `--hc-emphasis-card-title-fg` — title line (`__title`)
+- `--hc-emphasis-card-detail-fg` — body line (`__detail`)
+
+Light: title → `var(--black)`; detail → `rgba(60, 60, 67, 0.78)`.  
+Dark (`html[data-theme="dark"]`): both → `--shell-label-strong` / `--shell-label`.
+
+### Dark mode (emphasis cards)
+
+**Symptom (May 2026):** Card stayed **light** while copy used dark-theme shell colors → detail looked invisible; **Home** pill on `/wallet/` inherited `color: inherit` from `html[data-theme="dark"] a` (white on white).
+
+**Fix (shipped):**
+
+1. Title/detail use `--hc-emphasis-card-title-fg` and `--hc-emphasis-card-detail-fg` (not `var(--black)` alone).
+2. `theme-dark.css` sets **explicit** `background: var(--hc-emphasis-card-fill-*)` per modifier (`--active`, `--info`, `--warn`, `--urgent`) — do not rely on token swap alone.
+3. `a.wallet-chrome-home` keeps `color: var(--red)` and `background: var(--shell-fill)` in dark mode.
+
+**QA:** `/wallet/` with `localStorage.hc_theme = "dark"` — active card surface is dark gray-green; title, detail, and eyebrow readable; **Home** pill shows red label on elevated shell fill.
+
 ### Reference instance: wallet active tab (`--active`)
 
 **When shown:** `/wallet/` when this tab holds signing keys (`wallet-page-chrome.mjs`).  
@@ -101,8 +121,8 @@ Fill and eyebrow tokens: `--hc-emphasis-card-fill-*`, `--hc-emphasis-card-eyebro
 | Card | `.hc-emphasis-card--active` | `--hc-emphasis-card-fill-active` | dark gradient override |
 | Dot | `.hc-emphasis-card__dot--success` | Green + halo | (unchanged) |
 | Eyebrow | `.hc-emphasis-card__eyebrow` | `--hc-emphasis-card-eyebrow-active` | `#30d158` |
-| Title | `.hc-emphasis-card__title` | `var(--black)` | `var(--shell-label-strong)` |
-| Detail | `.hc-emphasis-card__detail` | muted gray | `var(--shell-label)` |
+| Title | `.hc-emphasis-card__title` | `--hc-emphasis-card-title-fg` | `--shell-label-strong` |
+| Detail | `.hc-emphasis-card__detail` | `--hc-emphasis-card-detail-fg` | `--shell-label` |
 | CTA | `.hc-emphasis-card__cta` | Pill, `var(--red)` | (unchanged) |
 
 ### Semantic modifiers (CSS shipped; rollout per phase doc)

@@ -84,6 +84,13 @@ describe("UI color scheme popover guard", () => {
     for (const token of POPOVER_ROOT_TOKENS) {
       expect(darkRoot).toContain(`${token}:`);
     }
+    for (const token of [
+      "--hc-emphasis-card-fill-active",
+      "--hc-emphasis-card-title-fg",
+      "--hc-emphasis-card-detail-fg",
+    ]) {
+      expect(darkRoot).toContain(`${token}:`);
+    }
   });
 
   it("keeps migrated shell popover surfaces on semantic tokens", () => {
@@ -172,6 +179,16 @@ describe("UI color scheme popover guard", () => {
     assertGuardedRule("site/styles.css", ".hc-emphasis-card--active", {
       require: ["--hc-emphasis-card-fill-active"],
       forbid: ["rgba(10, 132, 255, 0.1)"],
+    });
+    assertGuardedRule("site/styles.css", ".hc-emphasis-card__title,\n.wallet-active-label", {
+      require: ["--hc-emphasis-card-title-fg"],
+      forbid: ["color: var(--black)"],
+    });
+    assertGuardedRule("site/css/theme-dark.css", "html[data-theme=\"dark\"] .hc-emphasis-card--active", {
+      require: ["--hc-emphasis-card-fill-active"],
+    });
+    assertGuardedRule("site/css/theme-dark.css", "a.wallet-chrome-home", {
+      require: ["color: var(--red)", "--shell-fill"],
     });
   });
 });
