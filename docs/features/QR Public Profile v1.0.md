@@ -3,6 +3,7 @@
 **Constitution Reference:** Humanity Commons Constitution (Articles I-VII)
 **Technical Standards Reference:** Technical Standards v1.0
 **Product Trust Reference:** V1 Product Trust Model  
+**Scanner experience:** `docs/SCANNER_EXPERIENCE.md`  
 **Lifecycle (Revoke QR / Disable card):** `docs/REVOKE_AND_LIFECYCLE_V1.md`
 **Dependencies:** Humanity Card v1.0, Human Verification v1.0
 

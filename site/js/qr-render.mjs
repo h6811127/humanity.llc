@@ -1,23 +1,14 @@
 /**
  * Render scan URLs as branded QR images in the browser (same-origin bundle, no CDN).
  */
-import QRCode from "./vendor/qrcode.mjs";
-import {
-  drawCenterLogoOnCanvas,
-  QR_BRANDED_RENDER_OPTIONS,
-} from "./qr-branding.mjs";
+import { renderHumanityQrFrameToCanvas } from "./qr-branding.mjs";
 
 /**
  * @param {string} text
  * @param {number} width
  */
 async function qrToBrandedCanvas(text, width) {
-  const canvas = document.createElement("canvas");
-  await QRCode.toCanvas(canvas, text, { ...QR_BRANDED_RENDER_OPTIONS, width });
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Canvas not available");
-  drawCenterLogoOnCanvas(ctx, width);
-  return canvas;
+  return renderHumanityQrFrameToCanvas(text, width);
 }
 
 /**

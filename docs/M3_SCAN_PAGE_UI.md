@@ -1,7 +1,8 @@
 # M3  -  Public scan page UI (`GET /c/{profile_id}?q={qr_id}`)
 
 **Status:** Implementation contract for Worker HTML  
-**Related:** `docs/V1_PRODUCT_TRUST_MODEL.md` §7, `docs/V1_0_ARCHITECTURE_ROADMAP.md` §7, `docs/V1_IMPLEMENTATION_CONTRACTS.md` (QR payload)
+**Product spec (scanner safety, recognition, external-link policy):** [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md)  
+**Related:** `docs/V1_PRODUCT_TRUST_MODEL.md`, `docs/V1_0_ARCHITECTURE_ROADMAP.md` §7, `docs/V1_IMPLEMENTATION_CONTRACTS.md` (QR payload)
 
 ---
 

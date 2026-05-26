@@ -3,6 +3,7 @@ import {
   overlayCenterLogoOnSvg,
   QR_BRANDED_RENDER_OPTIONS,
   QR_BRAND_RED,
+  renderHumanityQrFrameMarkup,
 } from "../../../site/js/qr-branding.mjs";
 
 /**
@@ -17,7 +18,9 @@ export async function renderScanQrMarkup(scanUrl: string): Promise<string> {
     color: { dark: QR_BRAND_RED, light: QR_BRANDED_RENDER_OPTIONS.color.light },
   });
   svg = overlayCenterLogoOnSvg(svg);
-  return `<div class="pass-qr-svg" role="img" aria-label="QR code for this card scan link">${svg}</div>`;
+  return renderHumanityQrFrameMarkup(svg, {
+    ariaLabel: "QR code for this Humanity live object scan link",
+  });
 }
 
 /** @deprecated Use renderScanQrMarkup — kept for tests that expect data URLs */

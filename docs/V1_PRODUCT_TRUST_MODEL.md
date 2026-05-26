@@ -8,7 +8,8 @@
 **Why scans matter (not a static profile):** `docs/DEMOCRATIC_INFRASTRUCTURE.md` §2  -  live status, revoke, vouches, live control, then Commons Pass.
 
 **Vouch positioning (AI era):** `docs/VOUCH_TRUST_POSITIONING.md`  -  accountability over global biometric uniqueness; what vouch proves for integrators.  
-**Vouch threat model:** `docs/VOUCH_THREAT_MODEL.md`  -  adversarial catalog and operator playbook.
+**Vouch threat model:** `docs/VOUCH_THREAT_MODEL.md`  -  adversarial catalog and operator playbook.  
+**Scanner UX (recognition, safety chrome, redirects):** `docs/SCANNER_EXPERIENCE.md`
 
 ---
 

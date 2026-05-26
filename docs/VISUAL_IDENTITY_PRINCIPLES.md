@@ -1,7 +1,8 @@
 # Visual Identity Principles
 
 **Status:** Design strategy draft  
-**Purpose:** Define the visual direction for Humanity Commons v1.0, especially the mobile web card and scan experience.
+**Purpose:** Define the visual direction for Humanity Commons v1.0, especially the mobile web card and scan experience.  
+**Scanner product contract (safety header, external links, recognition):** [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md)
 
 ---
 

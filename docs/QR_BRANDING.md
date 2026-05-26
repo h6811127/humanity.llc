@@ -2,7 +2,7 @@
 
 **Status:** Shipped (generator + docs)  
 **Reference asset:** `site/assets/qr-center-logo.svg` (design reference only; generators draw vectors in code)  
-**Related:** `docs/M3_SCAN_PAGE_UI.md`, `docs/Technical Standards v1.0.md` §8.5, `site/js/qr-render.mjs`, `worker/src/resolver/scan-qr.ts`
+**Related:** [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) (optical layer + planned frame), `docs/M3_SCAN_PAGE_UI.md`, `docs/Technical Standards v1.0.md` §8.5, `site/js/qr-render.mjs`, `worker/src/resolver/scan-qr.ts`
 
 ---
 
@@ -26,9 +26,9 @@ The mark is drawn as **vector circles** only — no raster plate, no white JPEG 
 
 | Step | File | What it does |
 |------|------|----------------|
-| 1 | `site/js/qr-branding.mjs` | Colors, metrics, `centerLogoSvgFragment`, `drawCenterLogoOnCanvas`, `overlayCenterLogoOnSvg` |
-| 2 | `site/js/qr-render.mjs` | Canvas QR (`toCanvas`) + `drawCenterLogoOnCanvas` |
-| 3 | `worker/src/resolver/scan-qr.ts` | SVG QR (`toString`) + inline `<circle>` overlay |
+| 1 | `site/js/qr-branding.mjs` | Colors, center logo, **`renderHumanityQrFrameSvg` / `renderHumanityQrFrameMarkup` / `renderHumanityQrFrameToCanvas`** |
+| 2 | `site/js/qr-render.mjs` | Browser PNG via `renderHumanityQrFrameToCanvas` |
+| 3 | `worker/src/resolver/scan-qr.ts` | SVG QR + center logo + frame markup |
 | 4 | `site/assets/qr-center-logo.svg` | Optional reference for designers (not loaded at runtime) |
 
 Both generators import the same opacity, size ratio, colors, and correction level so `/created/` and `/c/…` stay aligned.
@@ -70,3 +70,19 @@ npm run worker:test -- worker/tests/scan-qr-branding.test.ts
 | Opaque + large pad | Needs Q/H; hides more modules — not the chosen design |
 
 If scan QA fails in the field, reduce `QR_CENTER_LOGO_SIZE_RATIO` before lowering correction below Q.
+
+---
+
+## Signed visual frame (shipped)
+
+All official generators wrap the branded QR in `renderHumanityQrFrameSvg` (Worker) or `renderHumanityQrFrameToCanvas` (browser PNG). Product spec: [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Optical layer.
+
+| Element | Implementation |
+|---------|----------------|
+| Brand border | Rounded rect stroke `#db1b43` (`qrFrameMetrics` + frame SVG/canvas) |
+| Network glyph | Concentric circles top-left (`networkGlyphSvgFragment` / `drawNetworkGlyphOnCanvas`) |
+| `LIVE OBJECT` | Uppercase label below modules (`QR_FRAME_LIVE_OBJECT_TEXT`) |
+| Footer | `humanity.llc` (`QR_FRAME_FOOTER_TEXT`) |
+| Layout tuning | Edit `qrFrameMetrics()` in `site/js/qr-branding.mjs` |
+
+Official outputs must not bypass the frame helpers in `qr-branding.mjs`.

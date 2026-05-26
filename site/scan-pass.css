@@ -423,21 +423,28 @@ a {
 .pass-qr {
   flex-shrink: 0;
   line-height: 0;
-  padding: 5px;
-  background: var(--white);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
 }
 
-.pass-qr img,
-.pass-qr-svg svg {
+.pass-qr img {
   width: 88px;
-  height: 88px;
+  height: auto;
   display: block;
 }
 
-.pass-qr-svg {
+.pass-qr-svg,
+.hc-qr-frame {
   line-height: 0;
+}
+
+.pass-qr-svg svg,
+.hc-qr-frame-svg {
+  width: 88px;
+  height: auto;
+  display: block;
 }
 
 .pass-foot {

@@ -2,6 +2,7 @@
 
 **Status:** Active checklist  
 **Canonical gate:** `docs/V1_0_ARCHITECTURE_ROADMAP.md` §12 Phase A exit; `docs/M3_M4_EXECUTION_PLAN.md` § M5  
+**Scanner spec:** `docs/SCANNER_EXPERIENCE.md`  
 **Prerequisite:** Worker + Pages deployed; you can create → scan → revoke in one browser session.
 
 **Goal:** Three people **outside your network** complete the loop **without you explaining the UI**. Each can say in one sentence what scan **proves** and what it **does not**.
