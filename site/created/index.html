@@ -18,7 +18,7 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="/styles.css?v=103" />
+    <link rel="stylesheet" href="/styles.css?v=104" />
     <link rel="stylesheet" href="/css/device-shell.css?v=48" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=14" />
   </head>
@@ -263,7 +263,7 @@
         </section>
 
         <div id="created-control-root" hidden>
-        <nav class="created-tabs" role="tablist" aria-label="Owner tools">
+        <nav class="created-tabs" role="tablist" aria-label="Live object controls">
           <button
             type="button"
             class="created-tab-btn is-active"
@@ -272,7 +272,7 @@
             data-created-tab="now"
             id="created-tab-btn-now"
           >
-            Tasks
+            Live
           </button>
           <button
             type="button"
@@ -282,12 +282,94 @@
             data-created-tab="advanced"
             id="created-tab-btn-advanced"
           >
-            Advanced
+            Manage
           </button>
         </nav>
 
         <div class="created-tab-panel" data-created-panel="now" id="created-tab-now" role="tabpanel" aria-labelledby="created-tab-btn-now">
-          <section class="created-dashboard" aria-label="Your live QR tasks">
+          <section class="created-live-cockpit" aria-label="Live object">
+            <div class="created-live-status-strip" id="created-live-status-strip" role="status">
+              <span class="created-live-status-chip" id="created-live-network-chip" hidden>Live on network</span>
+              <p class="created-live-status-meta" id="created-live-status-meta"></p>
+            </div>
+
+            <article class="created-live-object-card" id="created-live-object-card">
+              <button
+                type="button"
+                class="created-live-object-qr-hit"
+                data-created-action="scroll-qr"
+                id="created-live-qr-hit"
+                aria-label="View full QR"
+                hidden
+              >
+                <img id="created-live-qr-img" width="160" height="160" alt="" />
+              </button>
+              <p class="created-live-object-quote" id="created-live-manifesto-teaser" hidden></p>
+              <p class="created-live-object-meta" id="created-live-object-meta"></p>
+              <div class="created-live-object-actions">
+                <a
+                  class="btn-primary"
+                  id="created-live-open-scan"
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  hidden
+                >
+                  Open scan page
+                </a>
+                <button type="button" class="btn-secondary" id="created-live-copy-scan" disabled>
+                  Copy scan link
+                </button>
+              </div>
+            </article>
+
+            <section
+              class="created-live-scanners-see"
+              id="created-live-scanners-see"
+              aria-labelledby="created-live-scanners-see-title"
+            >
+              <h3 class="created-live-scanners-see-title" id="created-live-scanners-see-title">
+                What scanners see
+              </h3>
+              <p class="form-hint created-live-scanners-see-lead">
+                Same QR. Updates on the next scan.
+              </p>
+              <form id="manifesto-update-form" class="compact-form" novalidate>
+                <div id="update-fields-status-plate" hidden>
+                  <label class="form-label" for="update-object-label">Object name</label>
+                  <input class="form-input" id="update-object-label" type="text" maxlength="120" />
+                  <label class="form-label" for="update-status-line">Status line</label>
+                  <input class="form-input" id="update-status-line" type="text" maxlength="160" />
+                </div>
+                <div id="update-fields-lost-item" hidden>
+                  <label class="form-label" for="update-relay-item">What is lost?</label>
+                  <input class="form-input" id="update-relay-item" type="text" maxlength="120" />
+                  <label class="form-label" for="update-relay-message">Return message</label>
+                  <textarea
+                    class="form-input form-textarea"
+                    id="update-relay-message"
+                    rows="3"
+                    maxlength="160"
+                  ></textarea>
+                </div>
+                <div id="update-fields-general">
+                  <label class="form-label" for="update-manifesto-general">Public line</label>
+                  <textarea
+                    class="form-input form-textarea"
+                    id="update-manifesto-general"
+                    rows="3"
+                    maxlength="280"
+                  ></textarea>
+                </div>
+                <button type="submit" class="btn-primary" id="manifesto-update-submit">
+                  Publish update
+                </button>
+              </form>
+              <p class="form-status" id="manifesto-update-status" hidden role="status"></p>
+            </section>
+          </section>
+
+          <section class="created-dashboard" aria-label="Deploy and custody">
             <div class="created-qr-preview-wrap" id="created-qr-preview-wrap" hidden>
               <button type="button" class="created-qr-preview-hit" data-created-action="scroll-qr" aria-label="Scroll to full QR">
                 <img id="created-qr-preview-img" width="96" height="96" alt="" />
@@ -523,7 +605,7 @@
             <h2 class="created-what-now-title">Status plate</h2>
             <p class="created-what-now-body">
               Mount on a door or wall. Scanners see <strong>object name</strong> and
-              <strong>status line</strong>. Change the line under <strong>Advanced</strong> without
+              <strong>status line</strong>. Change both on the <strong>Live</strong> tab without
               reprinting.
             </p>
           </section>
@@ -531,8 +613,8 @@
           <section class="created-what-now created-what-now-compact" id="created-lost-item-tip" hidden>
             <h2 class="created-what-now-title">Lost item relay</h2>
             <p class="created-what-now-body">
-              Tag the item. Finders see what it is and your return message  -  not your phone number.
-              Revoke when recovered under <strong>Advanced</strong>.
+              Tag the item. Finders see what is lost and your return message  -  not your phone number.
+              Update copy on <strong>Live</strong>; revoke when recovered under <strong>Manage</strong>.
             </p>
           </section>
 
@@ -543,7 +625,7 @@
           <p class="created-tab-lead">
             Update copy, revoke, or unlock keys. Same printed QR  -  you change resolver state, not
             the sticker.
-            Use <strong>Save control key</strong> on the Tasks tab (or
+            Use <strong>Save control key</strong> on the <strong>Live</strong> tab (or
             <a href="/wallet/">My cards</a> in the same tab) before switching tabs.
           </p>
 
@@ -619,61 +701,6 @@
             </div>
           </details>
 
-          <details
-            class="settings-disclosure settings-disclosure-action"
-            id="manifesto-update-panel"
-            hidden
-          >
-            <summary class="settings-summary">
-              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              </span>
-              <span class="settings-summary-text">
-                <span class="settings-summary-title">Update public line</span>
-                <span class="settings-summary-sub">Same QR  -  new text on the network</span>
-              </span>
-              <span class="list-chevron" aria-hidden="true">›</span>
-            </summary>
-            <div class="settings-panel settings-panel-action">
-              <p class="form-hint">
-                Sign an updated card with your owner or recovery key. Scanners see the new line on
-                the next fetch.
-              </p>
-              <form id="manifesto-update-form" class="compact-form" novalidate>
-                <div id="update-fields-status-plate" hidden>
-                  <label class="form-label" for="update-object-label">Object name</label>
-                  <input class="form-input" id="update-object-label" type="text" maxlength="120" />
-                  <label class="form-label" for="update-status-line">Status line</label>
-                  <input class="form-input" id="update-status-line" type="text" maxlength="160" />
-                </div>
-                <div id="update-fields-lost-item" hidden>
-                  <label class="form-label" for="update-relay-item">What is lost?</label>
-                  <input class="form-input" id="update-relay-item" type="text" maxlength="120" />
-                  <label class="form-label" for="update-relay-message">Return message</label>
-                  <textarea
-                    class="form-input form-textarea"
-                    id="update-relay-message"
-                    rows="3"
-                    maxlength="160"
-                  ></textarea>
-                </div>
-                <div id="update-fields-general">
-                  <label class="form-label" for="update-manifesto-general">Public line</label>
-                  <textarea
-                    class="form-input form-textarea"
-                    id="update-manifesto-general"
-                    rows="3"
-                    maxlength="280"
-                  ></textarea>
-                </div>
-                <button type="submit" class="btn-primary" id="manifesto-update-submit">
-                  Publish update
-                </button>
-              </form>
-              <p class="form-status" id="manifesto-update-status" hidden role="status"></p>
-            </div>
-          </details>
-
           <details class="settings-disclosure settings-disclosure-action" id="revoke-details">
             <summary class="settings-summary">
               <span class="list-icon list-icon-tone-red" aria-hidden="true">
@@ -732,28 +759,6 @@
               </p>
 
               <div id="revoke-actions" hidden>
-                <fieldset class="revoke-display-prefs" id="revoke-display-prefs">
-                  <legend class="form-label">What scanners see</legend>
-                  <label class="revoke-display-opt">
-                    <input type="radio" name="revoke-display-mode" value="minimal" checked />
-                    <span>Minimal  -  headline only (default)</span>
-                  </label>
-                  <label class="revoke-display-opt">
-                    <input type="radio" name="revoke-display-mode" value="tombstone" />
-                    <span>Show @handle and public line</span>
-                  </label>
-                  <label class="form-label" for="revoke-public-reason">Optional reason on scan</label>
-                  <select class="form-input" id="revoke-public-reason" name="revoke_public_reason">
-                    <option value="">None</option>
-                    <option value="event_ended">Event ended</option>
-                    <option value="rotated">QR rotated</option>
-                    <option value="lost_item">Lost item recovered</option>
-                    <option value="owner_revoked">Revoked by owner</option>
-                    <option value="compromised">Compromised or abused</option>
-                    <option value="other">Other</option>
-                  </select>
-                </fieldset>
-
                 <div id="revoke-qr-block">
                   <p class="hc-notice hc-notice--warning revoke-id-warning">
                     Revoking changes live network status, not the physical sticker.
@@ -767,21 +772,48 @@
                   </button>
                 </div>
 
-                <details class="created-advanced-block created-advanced-inline">
-                  <summary>Disable entire card (advanced)</summary>
+                <details class="created-advanced-block" id="revoke-advanced">
+                  <summary class="created-advanced-summary">Advanced</summary>
                   <div class="created-advanced-body">
-                <div id="revoke-card-block">
-                  <p class="hc-notice hc-notice--warning revoke-id-warning revoke-confirm-spaced">
-                    Disabling the card stops every active QR on this profile.
-                  </p>
-                  <label class="revoke-confirm revoke-confirm-spaced">
-                    <input type="checkbox" id="confirm-revoke-card" />
-                    <span>I understand  -  disable this card</span>
-                  </label>
-                  <button type="button" class="btn-danger btn-danger-solid" id="revoke-card-btn" disabled>
-                    Disable card
-                  </button>
-                </div>
+                    <fieldset class="revoke-display-prefs" id="revoke-display-prefs">
+                      <legend class="form-label">What scanners see</legend>
+                      <label class="revoke-display-opt">
+                        <input type="radio" name="revoke-display-mode" value="minimal" checked />
+                        <span>Minimal  -  headline only (default)</span>
+                      </label>
+                      <label class="revoke-display-opt">
+                        <input type="radio" name="revoke-display-mode" value="tombstone" />
+                        <span>Show @handle and public line</span>
+                      </label>
+                      <label class="form-label" for="revoke-public-reason">Optional reason on scan</label>
+                      <select class="form-input" id="revoke-public-reason" name="revoke_public_reason">
+                        <option value="">None</option>
+                        <option value="event_ended">Event ended</option>
+                        <option value="rotated">QR rotated</option>
+                        <option value="lost_item">Lost item recovered</option>
+                        <option value="owner_revoked">Revoked by owner</option>
+                        <option value="compromised">Compromised or abused</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </fieldset>
+
+                    <details class="created-advanced-block created-advanced-inline">
+                      <summary>Disable entire card (advanced)</summary>
+                      <div class="created-advanced-body">
+                        <div id="revoke-card-block">
+                          <p class="hc-notice hc-notice--warning revoke-id-warning revoke-confirm-spaced">
+                            Disabling the card stops every active QR on this profile.
+                          </p>
+                          <label class="revoke-confirm revoke-confirm-spaced">
+                            <input type="checkbox" id="confirm-revoke-card" />
+                            <span>I understand  -  disable this card</span>
+                          </label>
+                          <button type="button" class="btn-danger btn-danger-solid" id="revoke-card-btn" disabled>
+                            Disable card
+                          </button>
+                        </div>
+                      </div>
+                    </details>
                   </div>
                 </details>
               </div>
@@ -1034,13 +1066,13 @@
             No signing keys in <strong>this tab</strong>. Finish create in the tab where you clicked
             Create, then tap <strong>Save on this device</strong> there — or open
             <a href="/wallet/">My cards</a> in that same tab. Later: recovery key or encrypted
-            backup under <strong>Advanced</strong> on this card page.
+            backup under <strong>Manage</strong> on this card page.
           </p>
         </div>
       </main>
     </div>
     <script src="/js/device-status-bootstrap.mjs?v=38" type="module"></script>
     <script src="/js/created-hub.mjs?v=3" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=44"></script>
+    <script type="module" src="/js/created.mjs?v=46"></script>
   </body>
 </html>

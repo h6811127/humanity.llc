@@ -69,7 +69,7 @@
 
 ```javascript
 const CREATED_PANEL_FOCUS = {
-  "update-status": "manifesto-update-panel",
+  "update-status": "created-live-scanners-see",
   revoke: "revoke-details",
   "rotate-qr": "qr-rotate-panel",
   "extend-qr": "qr-extend-panel",

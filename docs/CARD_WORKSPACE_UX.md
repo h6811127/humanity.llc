@@ -11,7 +11,7 @@
 | Mode | When | UI |
 |------|------|-----|
 | **setup** | Keys in tab and (`fresh=1` or setup not done or not saved to device) | Linear wizard - no tabs |
-| **control** | Keys in tab, setup complete, saved on device | Tasks · Advanced (planned: **Live · Manage** - [`CREATED_TASKS_TAB_REDESIGN.md`](CREATED_TASKS_TAB_REDESIGN.md)) |
+| **control** | Keys in tab, setup complete, saved on device | **Live · Manage** ([`CREATED_TASKS_TAB_REDESIGN.md`](CREATED_TASKS_TAB_REDESIGN.md) T1 shipped) |
 | **view** | No signing keys in this tab | Read-only notice + unlock paths |
 
 Resolver: `site/js/created-mode.mjs` · `modeFromPage()`.
@@ -43,18 +43,11 @@ On entering step 4, setup now includes a subtle "goes live" transition and confi
 
 ---
 
-## Control mode (Tasks tab)
+## Control mode (Live tab)
 
-**Redesign in progress (draft):** [`CREATED_TASKS_TAB_REDESIGN.md`](CREATED_TASKS_TAB_REDESIGN.md) - operator cockpit for one live object; **Advanced** tab unchanged.
+**T1 shipped:** [`CREATED_TASKS_TAB_REDESIGN.md`](CREATED_TASKS_TAB_REDESIGN.md) - page hero **Your object is live**; **Live** tab has status strip + live object card (160px QR, manifesto teaser, open scan / copy link). Deploy checklist and custody rows remain below until T2-T3.
 
-**Shipped today** (see [`CREATED_TASK_DASHBOARD.md`](CREATED_TASK_DASHBOARD.md)):
-
-1. Hero - `@handle` · **Live QR ready**
-2. Primary: Save (if needed) · Open scan
-3. **More tasks** - download, print, test scan, update, revoke (advanced entry)
-4. Network status (collapsed) · full QR block
-
-**Advanced** tab: revoke, rotate, backup, manifesto update, lifecycle notes, and doc links (icon + disclosure pattern - keep as reference).
+**Manage** tab: revoke, rotate, backup, lifecycle notes, and doc links (icon + disclosure pattern). Public copy publishes on **Live** (**What scanners see**).
 
 ---
 

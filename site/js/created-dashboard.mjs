@@ -52,8 +52,9 @@ export function initCreatedDashboard({
 }) {
   const keysStrip = document.getElementById("created-keys-strip");
   const qrSection = document.getElementById("created-qr-section");
+  const liveObjectCard = document.getElementById("created-live-object-card");
   const openScan = document.getElementById("open-scan");
-  const manifestoPanel = document.getElementById("manifesto-update-panel");
+  const scannersSeeSection = document.getElementById("created-live-scanners-see");
   const revokeDetails = document.getElementById("revoke-details");
   const printTip = document.querySelector("#created-qr-section .created-print-tip");
   const saveRequiredBadge = document.getElementById("created-save-required-badge");
@@ -86,7 +87,8 @@ export function initCreatedDashboard({
 
   function scrollToQr() {
     selectTab("now");
-    qrSection?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const target = liveObjectCard || qrSection;
+    target?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function revealKeysStrip() {
@@ -143,7 +145,7 @@ export function initCreatedDashboard({
         showFeedback("Saved on this device. You can update and revoke from this browser.");
       } else {
         showFeedback(
-          "Could not save yet. Keys must be in this tab — finish create here or import a backup below.",
+          "Could not save yet. Keys must be in this tab - finish create here or import a backup below.",
           true
         );
       }
@@ -163,7 +165,7 @@ export function initCreatedDashboard({
     "download-qr": () => {
       scrollToQr();
       markDone("download-qr");
-      showFeedback("Full QR below — use Download QR image to save the PNG.");
+      showFeedback("Full QR below - use Download QR image to save the PNG.");
     },
     "print-qr": () => {
       scrollToQr();
@@ -180,10 +182,8 @@ export function initCreatedDashboard({
       }
     },
     "update-status": () => {
-      selectTab("advanced");
-      manifestoPanel?.removeAttribute("hidden");
-      manifestoPanel?.setAttribute("open", "");
-      manifestoPanel?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      selectTab("now");
+      scannersSeeSection?.scrollIntoView({ behavior: "smooth", block: "nearest" });
       markDone("update-status");
     },
     "revoke-qr": () => {

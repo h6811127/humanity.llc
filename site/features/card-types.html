@@ -25,7 +25,7 @@
         </section>
         <div class="feature">
           <p class="feature-lead">One primitive  -  many physical roles.</p>
-          <p class="feature-sub"><span class="ship-badge ship-badge-partial">Partial</span> <a href="/create/?template=status_plate">status plate</a> template live; basic card live; lost-item relay is research</p>
+          <p class="feature-sub"><span class="ship-badge ship-badge-partial">Partial</span> <a href="/create/?template=status_plate">status plate</a>, <a href="/create/?template=lost_item">lost-item relay</a>, and basic card live on create</p>
         </div>
         <section class="group feature-aspects">
           <h2 class="group-label">About this feature</h2>
@@ -50,7 +50,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead"><strong>Status plate (shipped pilot)</strong>  -  object name + live status line for doors and booths; homepage <strong>One use</strong> section + <a href="/studio/">Studio blog</a>. <strong>Basic card</strong>  -  handle + manifesto + verification summary. <strong>Lost item relay</strong>  -  design only (<a href="/what-can-a-qr-do/lost-item-relay/">research</a>). <strong>Print artifact</strong>  -  unique <code>qr_id</code> per unit via artifact intent.</p>
+    <p class="settings-panel-lead"><strong>Status plate (shipped pilot)</strong>  -  object name + live status line for doors and booths; homepage <strong>One use</strong> section + <a href="/studio/">Studio blog</a>. <strong>Lost item relay (shipped pilot)</strong>  -  item headline + return message on scan; create at <a href="/create/?template=lost_item">/create/</a>; showcase via <code>npm run site:seed-showcase-lost-item</code>. <strong>Basic card</strong>  -  handle + manifesto + verification summary. <strong>Print artifact</strong>  -  unique <code>qr_id</code> per unit via artifact intent.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -74,7 +74,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Lost-item relay UI and contact routing not shipped. Storefront → Printify personalization path still in build.</p>
+    <p class="settings-panel-lead">Storefront → Printify personalization path still in build. Relay has no separate contact-routing API beyond signed manifesto updates.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">

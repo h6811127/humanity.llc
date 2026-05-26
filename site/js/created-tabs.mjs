@@ -1,17 +1,17 @@
 /**
- * Segmented tabs for /created/ (Tasks · Advanced).
+ * Segmented tabs for /created/ (Live · Manage; ids remain now/advanced).
  */
 
 const TAB_IDS = ["now", "advanced"];
 
 /** Hash → panel id on /created/ (hub deep-links). */
 export const CREATED_PANEL_FOCUS = {
-  "update-status": "manifesto-update-panel",
+  "update-status": "created-live-scanners-see",
   revoke: "revoke-details",
   "rotate-qr": "qr-rotate-panel",
   "extend-qr": "qr-extend-panel",
   "live-proof": "live-control-proof",
-  manage: "manifesto-update-panel",
+  manage: "created-live-scanners-see",
 };
 
 /** @param {string} [hash] location.hash or bare key */
@@ -28,7 +28,7 @@ export function stewardFocusKeyFromHash(hash = location.hash) {
  */
 function focusCreatedPanel(select, focusKey) {
   const panelId = CREATED_PANEL_FOCUS[focusKey] || focusKey;
-  if (panelId === "live-control-proof") {
+  if (panelId === "live-control-proof" || panelId === "created-live-scanners-see") {
     select("now");
   } else if (CREATED_PANEL_FOCUS[focusKey] || document.getElementById(panelId)) {
     select("advanced");

@@ -20,7 +20,7 @@ export function applyCreatedWorkspaceMode(mode) {
 
   if (heroTitle) {
     heroTitle.textContent =
-      mode === "setup" ? "Set up your live QR" : "Live QR ready";
+      mode === "setup" ? "Set up your live QR" : "Your object is live";
   }
 }
 
@@ -34,7 +34,7 @@ export function clearFreshUrlParam() {
   history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
 }
 
-/** Move keys strip back into the control Tasks panel after setup. */
+/** Move keys strip back into the control Live panel after setup. */
 export function restoreKeysStripToControlPanel() {
   const keysStrip = document.getElementById("created-keys-strip");
   const tabNow = document.getElementById("created-tab-now");

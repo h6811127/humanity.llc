@@ -14,7 +14,7 @@ import { initRecoveryKeyUi } from "./recovery-key-ui.mjs";
 import { initManifestoUpdate } from "./created-manifesto-update.mjs";
 import { initQrRotate } from "./created-qr-rotate.mjs";
 import { initQrExtend } from "./created-qr-extend.mjs";
-import { inferPilotTemplate } from "./manifesto-display.mjs";
+import { inferPilotTemplate, parseManifestoDisplay } from "./manifesto-display.mjs";
 import { createdLiveProofPollShouldRun } from "./created-live-proof-poll-core.mjs";
 import { initCreatedTabs } from "./created-tabs.mjs";
 import { initCreatedDashboard } from "./created-dashboard.mjs?v=2";
@@ -123,6 +123,14 @@ const humanTrustIconEl = document.getElementById("human-trust-icon");
 const networkCardStatusEl = document.getElementById("network-card-status");
 const networkQrExpiresEl = document.getElementById("network-qr-expires");
 const dashboardMetaEl = document.getElementById("created-hero-meta");
+const liveStatusMetaEl = document.getElementById("created-live-status-meta");
+const liveNetworkChipEl = document.getElementById("created-live-network-chip");
+const liveQrHitEl = document.getElementById("created-live-qr-hit");
+const liveQrImgEl = document.getElementById("created-live-qr-img");
+const liveManifestoTeaserEl = document.getElementById("created-live-manifesto-teaser");
+const liveObjectMetaEl = document.getElementById("created-live-object-meta");
+const liveOpenScanEl = document.getElementById("created-live-open-scan");
+const liveCopyScanEl = document.getElementById("created-live-copy-scan");
 const qrPreviewWrap = document.getElementById("created-qr-preview-wrap");
 const qrPreviewImg = document.getElementById("created-qr-preview-img");
 const saveRequiredBadge = document.getElementById("created-save-required-badge");
@@ -149,8 +157,20 @@ function formatHeroExpiry(iso) {
   }
 }
 
-function updateHeroMeta() {
-  if (!dashboardMetaEl) return;
+function formatManifestoTeaser(manifestoLine) {
+  if (!manifestoLine?.trim()) return "";
+  const d = parseManifestoDisplay(manifestoLine);
+  if (d.kind === "general" && d.line) return `"${d.line}"`;
+  if (d.kind === "status_plate" && d.objectLabel && d.statusLine) {
+    return `"${d.objectLabel}" · ${d.statusLine}`;
+  }
+  if (d.kind === "lost_item_relay" && d.objectLabel && d.statusLine) {
+    return `${d.objectLabel} · ${d.statusLine}`;
+  }
+  return String(manifestoLine).trim();
+}
+
+function buildHeroMetaParts() {
   const parts = [];
   const cardStatus = networkCardStatusEl?.textContent?.trim();
   if (cardStatus && cardStatus !== " - ") {
@@ -162,16 +182,78 @@ function updateHeroMeta() {
   } else if (data?.qr_expires_at) {
     parts.push(`QR expires ${formatHeroExpiry(data.qr_expires_at)}`);
   }
-  dashboardMetaEl.textContent = parts.length
+  return parts;
+}
+
+function updateHeroMeta() {
+  const parts = buildHeroMetaParts();
+  const metaText = parts.length
     ? parts.join(" · ")
     : "Save your control key to keep update and revoke access in this browser.";
+  if (dashboardMetaEl) dashboardMetaEl.textContent = metaText;
+  if (liveStatusMetaEl) liveStatusMetaEl.textContent = metaText;
+
+  const cardStatus = networkCardStatusEl?.textContent?.trim()?.toLowerCase();
+  if (liveNetworkChipEl) {
+    const live =
+      cardStatus === "active" || cardStatus === "reachable" || (!cardStatus && data?.status === "active");
+    liveNetworkChipEl.hidden = !live;
+  }
+
+  syncLiveCockpit();
+}
+
+function syncLiveCockpit() {
+  const vouchSub = humanTrustSubEl?.textContent?.trim();
+  if (liveObjectMetaEl) {
+    const vouch =
+      vouchSub && vouchSub !== "No accepted vouches yet."
+        ? vouchSub
+        : data?.verification?.vouch_count > 0
+          ? `${data.verification.vouch_count} accepted vouch${data.verification.vouch_count === 1 ? "" : "es"}`
+          : "Registered on the network";
+    liveObjectMetaEl.textContent = vouch;
+  }
+
+  const teaser = formatManifestoTeaser(data?.manifesto_line);
+  if (liveManifestoTeaserEl) {
+    if (teaser) {
+      liveManifestoTeaserEl.textContent = teaser;
+      liveManifestoTeaserEl.hidden = false;
+    } else {
+      liveManifestoTeaserEl.hidden = true;
+    }
+  }
+
+  if (liveOpenScanEl && openScanBtn) {
+    const href = openScanBtn.getAttribute("href");
+    if (href && href.startsWith("http")) {
+      liveOpenScanEl.href = href;
+      liveOpenScanEl.hidden = false;
+    } else {
+      liveOpenScanEl.hidden = true;
+    }
+  }
+
+  if (liveCopyScanEl && copyBtn) {
+    liveCopyScanEl.disabled = copyBtn.disabled;
+  }
+
+  syncQrPreview();
 }
 
 function syncQrPreview() {
-  if (!qrImg?.src || !qrPreviewImg) return;
-  qrPreviewImg.src = qrImg.src;
-  qrPreviewImg.alt = qrImg.alt || "Your scan QR preview";
-  if (qrPreviewWrap) qrPreviewWrap.hidden = false;
+  if (!qrImg?.src) return;
+  if (qrPreviewImg) {
+    qrPreviewImg.src = qrImg.src;
+    qrPreviewImg.alt = qrImg.alt || "Your scan QR preview";
+    if (qrPreviewWrap) qrPreviewWrap.hidden = false;
+  }
+  if (liveQrImgEl) {
+    liveQrImgEl.src = qrImg.src;
+    liveQrImgEl.alt = qrImg.alt || "Your scan QR";
+    if (liveQrHitEl) liveQrHitEl.hidden = false;
+  }
 }
 let deviceSaveCtl = null;
 /** @type {{ select: (tabId: string) => void } | undefined} */
@@ -535,6 +617,7 @@ if (data?.handle) {
 if (data?.manifesto_line) {
   manifestoEl.textContent = data.manifesto_line;
   manifestoEl.hidden = false;
+  syncLiveCockpit();
 }
 
 if (profileId) {
@@ -587,6 +670,7 @@ function applyHumanTrustDisplay(ht, verification) {
     // Operator workflow entry appears only for stewards in this tab.
     stewardReviewDetails.hidden = state !== "steward";
   }
+  syncLiveCockpit();
 }
 
 if (data?.verification?.label) {
@@ -739,6 +823,12 @@ if (activeScanUrl) {
   scanUrlEl.textContent = activeScanUrl;
   copyBtn.disabled = false;
   copyBtn.onclick = () => navigator.clipboard.writeText(activeScanUrl);
+  if (liveCopyScanEl) {
+    liveCopyScanEl.disabled = false;
+    liveCopyScanEl.addEventListener("click", () => {
+      void navigator.clipboard.writeText(activeScanUrl);
+    });
+  }
 
   if (openScanBtn) {
     openScanBtn.hidden = false;
@@ -834,6 +924,13 @@ async function bootstrapOwnerTools() {
     getSigningKeys: currentSigningKeys,
     onUpdated(manifestoLine) {
       if (manifestoEl) manifestoEl.textContent = manifestoLine;
+      const sessionNow = loadSession();
+      if (sessionNow) {
+        const next = { ...sessionNow, manifesto_line: manifestoLine };
+        saveSession(next);
+        data = next;
+      }
+      syncLiveCockpit();
       void refreshNetworkStatus();
     },
   });
@@ -857,10 +954,21 @@ async function bootstrapOwnerTools() {
           copyBtn.onclick = () => navigator.clipboard.writeText(newScanUrl);
         }
         if (openScanBtn) openScanBtn.href = newScanUrl;
+        if (liveOpenScanEl) {
+          liveOpenScanEl.href = newScanUrl;
+          liveOpenScanEl.hidden = false;
+        }
+        if (liveCopyScanEl) {
+          liveCopyScanEl.disabled = false;
+          liveCopyScanEl.onclick = () => {
+            void navigator.clipboard.writeText(newScanUrl);
+          };
+        }
         if (qrImg) {
           try {
             const { renderQrToImage } = await import("./qr-render.mjs");
             await renderQrToImage(qrImg, newScanUrl);
+            syncQrPreview();
           } catch (err) {
             console.error(err);
           }

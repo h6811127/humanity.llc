@@ -678,6 +678,39 @@ html[data-theme="dark"] .created-tab-lead {
   color: var(--shell-label);
 }
 
+html[data-theme="dark"] .created-live-object-card {
+  background: var(--shell-fill);
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .created-live-object-qr-hit {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .created-live-object-quote {
+  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .created-live-status-meta,
+html[data-theme="dark"] .created-live-object-meta {
+  color: var(--shell-label);
+}
+
+html[data-theme="dark"] .created-live-status-chip {
+  color: #6ee7a0;
+  background: rgba(52, 199, 89, 0.18);
+  border-color: rgba(52, 199, 89, 0.35);
+}
+
+html[data-theme="dark"] .created-live-scanners-see {
+  border-top-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .created-live-scanners-see-title {
+  color: var(--shell-label-strong);
+}
+
 html[data-theme="dark"] .created-primitive {
   background: rgba(255, 77, 109, 0.12);
   border-color: rgba(255, 77, 109, 0.28);

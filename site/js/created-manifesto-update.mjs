@@ -13,14 +13,14 @@ import { inferPilotTemplate } from "./manifesto-display.mjs";
  * }} ctx
  */
 export function initManifestoUpdate(ctx) {
-  const panel = document.getElementById("manifesto-update-panel");
+  const scannersSee = document.getElementById("created-live-scanners-see");
   const form = document.getElementById("manifesto-update-form");
   const statusEl = document.getElementById("manifesto-update-status");
   const generalFields = document.getElementById("update-fields-general");
   const generalField = document.getElementById("update-manifesto-general");
   const plateFields = document.getElementById("update-fields-status-plate");
   const relayFields = document.getElementById("update-fields-lost-item");
-  if (!panel || !form) return;
+  if (!form) return;
 
   const session = ctx.getSession();
   const pilot =
@@ -153,7 +153,7 @@ export function initManifestoUpdate(ctx) {
 
   return {
     show() {
-      panel.removeAttribute("hidden");
+      scannersSee?.removeAttribute("hidden");
     },
   };
 }
