@@ -2,7 +2,7 @@
 
 **Status:** Phase 1–4 shipped · shared hub · activity log · returning-user desktop · **landing desktop layout**  
 **Scope:** Browser-local personalization only  -  not resolver-wide discovery  
-**Companion:** [`DEVICE_OS.md`](DEVICE_OS.md)  -  two-layer model, placement rule, landing story · [`LANDING_DESKTOP_LAYOUT.md`](LANDING_DESKTOP_LAYOUT.md) · [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md)
+**Companion:** [`DEVICE_OS.md`](DEVICE_OS.md)  -  two-layer model, placement rule, landing story · [`LANDING_DESKTOP_LAYOUT.md`](LANDING_DESKTOP_LAYOUT.md) · [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md) · [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md)
 
 ---
 
@@ -69,7 +69,9 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Landing trust UI:** Intro mode shows **Design choices**, **Clear limits**, and **Documentation** as stacked `.landing-disclosure-card` rows (icon + title + subtitle + chevron). The status-plate **flow strip** (plate → scan → live state) uses `.flow-strip--model` and picks up dark surfaces from `site/css/theme-dark.css` when `hc_theme` is dark.
 
-**Shortcuts & settings (shipped):** On the **homepage** (`/`) only - section after the studio example (unified list rows: Appearance, **Browser alerts** (background OS notifications for live proof), saved cards, manage, auto-save, focus). Hub sheet on all routes has **home icon** (left), status line (center), **Create +** (right); no shortcuts block in the hub.
+**Shortcuts & settings (shipped):** On the **homepage** (`/`) only - section after the studio example (unified list rows: Appearance, **Browser alerts** (background OS notifications for live proof), saved cards, manage, auto-save, focus). Hub sheet on all routes has **home icon** (left) and status line (center); Create lives beside the saved-items heading; no shortcuts block in the hub.
+
+**Hub header simplification (Step 1):** Create moves out of the sheet's top status rail and into the saved-items section header as compact **+ New**. The top rail stays focused on Home + resolver/device status, while Close remains the sheet escape. See [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md).
 
 **Chrome inbox (shipped):** Floating **inbox badge** next to the status dot when action items exist; hub `#device-hub-alerts-top` holds full rows. Spec and roadmap: [`DEVICE_INBOX.md`](DEVICE_INBOX.md). Status dot semantics: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 

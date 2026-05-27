@@ -24,8 +24,8 @@
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=4" />
     <link rel="stylesheet" href="/styles.css?v=126" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=54" />
-    <link rel="stylesheet" href="/css/theme-dark.css?v=27" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=55" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=28" />
   </head>
   <body class="page-flow has-shell-chrome has-device-hub-search flow-shell flow-shell-create">
     <div class="page">
@@ -98,7 +98,6 @@
               id="device-hub-status-panel"
               aria-label="System status"
             ></div>
-            <a class="device-hub-create-btn" href="/create/" aria-label="Create a live card"><span class="device-hub-create-glyph" aria-hidden="true">+</span></a>
           </div>
 
           <h2 class="device-hub-title" id="device-hub-title">This browser</h2>
@@ -129,7 +128,13 @@
             id="device-hub-saved-items-section"
             aria-labelledby="device-hub-saved-items-title"
           >
-            <h3 class="device-hub-section-title" id="device-hub-saved-items-title">Saved items</h3>
+            <div class="device-hub-section-header">
+              <h3 class="device-hub-section-title" id="device-hub-saved-items-title">Saved items</h3>
+              <a class="device-hub-create-btn" href="/create/" aria-label="Create a live card">
+                <span class="device-hub-create-glyph" aria-hidden="true">+</span>
+                <span class="device-hub-create-label">New</span>
+              </a>
+            </div>
             <p class="device-hub-section-lead">
               Cards, pins, and shortcuts on this device. Does not track who scans your QR.
             </p>
