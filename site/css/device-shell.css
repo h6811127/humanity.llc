@@ -865,7 +865,6 @@ button.device-hub-notice-banner {
   align-items: flex-start;
   gap: 10px;
   margin: 0 0 10px;
-  padding-right: 44px;
 }
 
 .device-hub-home-btn {
@@ -971,6 +970,18 @@ button.device-hub-notice-banner {
   font-weight: 650;
   letter-spacing: -0.02em;
   color: var(--shell-label-strong, #1c1c1e);
+}
+
+.device-hub-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 6px;
+}
+
+.device-hub-section-header .device-hub-section-title {
+  margin-bottom: 0;
 }
 
 .device-hub-section--secondary {
@@ -1221,34 +1232,40 @@ button.device-hub-notice-banner {
   margin-bottom: 0;
 }
 
-/* Solid torus profile: flat top, rounded sides, no hole */
 .device-hub-create-btn {
   margin-left: auto;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 46px;
-  height: 42px;
+  gap: 4px;
+  min-width: 0;
+  height: 30px;
+  padding: 0 10px 0 9px;
   text-decoration: none;
   color: #ffffff;
   border: none;
-  border-radius: 50%;
+  border-radius: 999px;
   background: var(--red);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.22) inset,
-    0 -4px 8px rgba(0, 0, 0, 0.08) inset,
-    0 2px 6px rgba(219, 27, 67, 0.16);
+  box-shadow: 0 2px 6px rgba(219, 27, 67, 0.16);
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.2s var(--shell-spring);
 }
 
 .device-hub-create-glyph {
   display: block;
-  font-size: 28px;
-  font-weight: 500;
+  font-size: 17px;
+  font-weight: 700;
   line-height: 1;
   margin-top: -1px;
+}
+
+.device-hub-create-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
 }
 
 .device-hub-create-btn:active {
@@ -1258,8 +1275,6 @@ button.device-hub-notice-banner {
 .device-hub-create-btn:focus-visible {
   outline: none;
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.22) inset,
-    0 -4px 8px rgba(0, 0, 0, 0.08) inset,
     0 2px 6px rgba(219, 27, 67, 0.16),
     0 0 0 3px rgba(219, 27, 67, 0.28);
 }
