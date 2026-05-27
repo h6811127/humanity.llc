@@ -1,32 +1,40 @@
-# L3 P2 — Steward authoring assistant
+# L3 P2 — Steward draft API (UI retired)
 
-**Status:** Shipped  
+**Status:** **UI retired** (2026-05-27) — API kept for tests/integrators only  
 **Parent:** [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) · [`MANIFESTO_STATUS_UPDATE.md`](MANIFESTO_STATUS_UPDATE.md)
 
 ---
 
-## Goal
+## Decision
 
-Stewards on `/created/` can request an **AI draft** of manifesto copy and optional object stream rows. The draft fills the update form only — the steward **must still sign and submit** `POST …/cards/{id}/update` to publish.
+**Steward ghostwriting is off-brand for humanity.llc.** Stewards write manifesto copy themselves and sign with their key. The `/created/` “Suggest draft with AI” UI was removed per [AI_FEATURE_DEVELOPMENT.md § Concrete next steps](AI_FEATURE_DEVELOPMENT.md#concrete-next-steps) step 1.
+
+The **HTTP API remains** so existing tests pass and third-party integrators *could* call it—but the reference operator does **not** expose or document it in product UI.
 
 ---
 
-## Non-goals
+## Goal (historical)
+
+Stewards could request an AI draft of manifesto copy and optional object stream rows. The draft filled the update form only—the steward **had to still sign and submit** `POST …/cards/{id}/update` to publish.
+
+---
+
+## Non-goals (unchanged)
 
 - Auto-publish to resolver
 - Scan-page changes
-- Draft without owner context (public anonymous drafting)
+- Product UI on `/created/` (**retired**)
 
 ---
 
-## API
+## API (deprecated — no product UI)
 
 | | |
 |---|---|
 | **Method** | `POST` |
 | **Path** | `/.well-known/hc/v1/ai/draft-manifesto` |
-| **Auth** | None (rate-limited per IP; owner signing still required to publish) |
-| **CORS** | Same allowlist as other hc/v1 routes |
+| **Auth** | None (rate-limited per IP) |
+| **Product exposure** | **None** — not linked from Pages or device shell |
 
 ### Request body
 
@@ -50,8 +58,7 @@ Stewards on `/created/` can request an **AI draft** of manifesto copy and option
   "draft": {
     "object_label": "Studio door",
     "status_line": "Closed early today",
-    "manifesto_line": "Studio door\nClosed early today",
-    "object_streams": [{ "label": "Tasks", "value": "Turn compost", "class": "care" }]
+    "manifesto_line": "Studio door\nClosed early today"
   },
   "source": "workers_ai",
   "disclaimer": "AI draft — review and sign to publish…",
@@ -59,21 +66,13 @@ Stewards on `/created/` can request an **AI draft** of manifesto copy and option
 }
 ```
 
-Shape varies by pilot (relay uses `relay_item` / `relay_message`; general uses `manifesto_line`).
-
 ---
 
-## Owner UI (`/created/`)
+## Owner UI
 
-In **What scanners see** / manifesto update form:
+**Removed.** Stewards use the manifesto update form only (`site/js/created-manifesto-update.mjs`).
 
-1. Optional hint textarea
-2. **Suggest draft with AI** (opt-in)
-3. Preview panel (dashed orange — not signed state styling)
-4. **Use this draft** → fills form fields
-5. Steward clicks **Publish update** → existing signed update flow
-
-Module: `site/js/created-ai-draft.mjs`
+~~Module: `site/js/created-ai-draft.mjs`~~ — deleted.
 
 ---
 
@@ -90,9 +89,6 @@ Module: `site/js/created-ai-draft.mjs`
 | Core | `worker/src/resolver/ai-draft-core.ts` |
 | Handler | `worker/src/resolver/ai-draft-manifesto.ts` |
 | Trust copy | `AI_DRAFT_LIMIT` in `worker/src/resolver/trust-copy.ts` |
-| Rate limit | `checkAiDraftRateLimit` in `worker/src/db/rate-limit.ts` |
-
-Workers AI model: `@cf/meta/llama-3.1-8b-instruct` (JSON response). Deterministic fallback when AI unavailable.
 
 ---
 
@@ -101,9 +97,8 @@ Workers AI model: `@cf/meta/llama-3.1-8b-instruct` (JSON response). Deterministi
 | Step | Pass? |
 |------|-------|
 | POST draft returns validated shape | ✅ `ai-draft-manifesto.test.ts` |
-| Invalid pilot returns 422 | ✅ |
-| Rate limit returns 429 | ✅ |
-| `/created/` shows draft UI for plate/general/relay | ☐ manual |
+| `/created/` has **no** draft UI | ✅ step 1 (2026-05-27) |
+| Docs state UI retired | ✅ |
 | Submit Update still required to publish | ✅ by design |
 
 ---
@@ -112,5 +107,5 @@ Workers AI model: `@cf/meta/llama-3.1-8b-instruct` (JSON response). Deterministi
 
 | Doc | Role |
 |-----|------|
-| [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md) | L3 P1 stranger explainer |
-| [`LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md`](LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md) | L0–L3 layers |
+| [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md) | P1 scan reader (under review) |
+| [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) | Brand direction + next steps |
