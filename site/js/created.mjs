@@ -899,6 +899,10 @@ initVouchReturnBanner();
 workspaceMode = getWorkspaceMode();
 applyCreatedWorkspaceMode(workspaceMode);
 
+if (workspaceMode === "view" && profileId && activeQrId && noSessionEl) {
+  noSessionEl.hidden = false;
+}
+
 if (profileId && activeQrId) {
   deviceSaveCtl = initCreatedDeviceSave(loadSession);
 }

@@ -7,6 +7,16 @@
 
 /**
  * @param {CreatedMode} mode
+ * @returns {string}
+ */
+export function createdHeroTitleForMode(mode) {
+  if (mode === "setup") return "Set up your live QR";
+  if (mode === "view") return "View this card";
+  return "Your object is live";
+}
+
+/**
+ * @param {CreatedMode} mode
  */
 export function applyCreatedWorkspaceMode(mode) {
   document.body.dataset.createdMode = mode;
@@ -19,8 +29,7 @@ export function applyCreatedWorkspaceMode(mode) {
   if (controlRoot) controlRoot.hidden = mode !== "control";
 
   if (heroTitle) {
-    heroTitle.textContent =
-      mode === "setup" ? "Set up your live QR" : "Your object is live";
+    heroTitle.textContent = createdHeroTitleForMode(mode);
   }
 }
 

@@ -43,4 +43,15 @@ describe("resolveCreatedLivePrimaryCta", () => {
   it("defaults to open scan when healthy", () => {
     expect(resolveCreatedLivePrimaryCta(base).mode).toBe("open-scan");
   });
+
+  it("does not offer prove-live when challenge pending but keys absent (sad-path S7)", () => {
+    expect(
+      resolveCreatedLivePrimaryCta({
+        ...base,
+        liveProofPending: true,
+        hasSigningKeys: false,
+        walletSaved: false,
+      }).mode
+    ).not.toBe("prove-live");
+  });
 });
