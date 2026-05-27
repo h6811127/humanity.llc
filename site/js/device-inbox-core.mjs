@@ -15,7 +15,7 @@ import {
   crossTabAggregateTitle,
   crossTabPresenceLabel,
 } from "./device-cross-tab-copy-core.mjs";
-import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=45";
+import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=55";
 
 /** @typedef {'live_proof' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'other_tabs_unsaved_keys' | 'orphan_keys_removed' | 'card_disabled_since_visit'} InboxKind */
 

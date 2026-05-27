@@ -124,7 +124,7 @@ Uncommitted local work also bumped bootstrap to **54** without aligning peer `?v
 3. Shell imports updated: bootstrap, `device-network-health`, `device-hub-build-stamp` → `build-meta-browser.mjs` only.
 4. **`DEVICE_SHELL_ASSET_VERSION` → 55** on shell HTML bootstrap tags; `build-meta-browser.mjs` added to shell manifest.
 
-**Follow-up:** align all status-graph peer `?v=` with `DEVICE_SHELL_ASSET_VERSION` per AGENTS.md (still `?v=45` on several peers).
+**Follow-up (shipped):** status-graph peer imports aligned to `DEVICE_SHELL_ASSET_VERSION` (55); Vitest guard in `device-status-shell-modules.test.ts`.
 
 ---
 

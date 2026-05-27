@@ -34,4 +34,18 @@ describe("device status shell module manifest", () => {
       `/js/device-status-bootstrap.mjs?v=${DEVICE_SHELL_ASSET_VERSION}`
     );
   });
+
+  it("manifest modules use DEVICE_SHELL_ASSET_VERSION on graph peer imports", () => {
+    const versionPattern = /\?v=(\d+)/g;
+    for (const file of DEVICE_STATUS_SHELL_JS_FILES) {
+      const src = fs.readFileSync(path.join(siteJsDir, file), "utf8");
+      for (const match of src.matchAll(versionPattern)) {
+        const n = Number(match[1]);
+        expect(
+          n,
+          `${file} imports ?v=${n}; expected ${DEVICE_SHELL_ASSET_VERSION}`
+        ).toBe(DEVICE_SHELL_ASSET_VERSION);
+      }
+    }
+  });
 });
