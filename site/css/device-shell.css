@@ -1525,10 +1525,12 @@ button.device-hub-notice-banner {
 }
 
 .hub-card-item {
-  border: none;
+  border: 0.5px solid var(--hc-emphasis-card-border-neutral);
   border-radius: var(--shell-radius-card);
-  background: var(--shell-fill);
-  box-shadow: var(--shell-shadow-sm);
+  background: var(--hc-emphasis-card-fill-info-glass);
+  box-shadow: var(--hc-emphasis-card-shadow);
+  -webkit-backdrop-filter: var(--hc-emphasis-card-backdrop);
+  backdrop-filter: var(--hc-emphasis-card-backdrop);
   transition:
     transform 0.35s var(--shell-spring),
     box-shadow 0.35s var(--shell-ease);
@@ -1721,6 +1723,8 @@ button.hub-card-action.hub-use-keys {
   background: var(--surface-popover-bg-glass, var(--surface-popover-bg, #ffffff));
   color: var(--surface-popover-fg, #1c1c1e);
   box-shadow: var(--shell-shadow-sheet);
+  -webkit-backdrop-filter: var(--hc-emphasis-card-backdrop);
+  backdrop-filter: var(--hc-emphasis-card-backdrop);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -2061,7 +2065,12 @@ body.device-hub-sheet-open .shell-status-dot {
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .device-hub.device-hub--sheet,
+  .device-hub.device-hub--sheet {
+    background: var(--surface-popover-bg, #ffffff);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
   .device-inbox-sheet {
     background: var(--surface-popover-bg, #ffffff);
   }

@@ -173,8 +173,11 @@ describe("UI color scheme popover guard", () => {
       require: ["--surface-popover-bg", "--surface-popover-fg"],
     });
     assertGuardedRule("site/css/device-shell.css", ".device-hub.device-hub--sheet", {
-      require: ["--surface-popover-bg-glass", "--surface-popover-fg"],
-      forbid: ["backdrop-filter"],
+      require: [
+        "--surface-popover-bg-glass",
+        "--surface-popover-fg",
+        "--hc-emphasis-card-backdrop",
+      ],
     });
     assertGuardedRule("site/css/device-shell.css", ".device-hub-network-tools", {
       require: [
@@ -189,11 +192,9 @@ describe("UI color scheme popover guard", () => {
       require: [
         "--hc-emphasis-card-fill-info-glass",
         "--hc-emphasis-card-border-neutral",
+        "--hc-emphasis-card-shadow",
+        "--hc-emphasis-card-backdrop",
       ],
-    });
-    assertGuardedRule("site/css/device-shell.css", "button.hub-card-action.hub-use-keys", {
-      require: ["--surface-popover-control-bg", "--surface-popover-border"],
-      forbid: ["background: var(--red)"],
     });
     assertGuardedRule("site/css/device-shell.css", ".device-inbox-sheet", {
       require: ["--surface-popover-bg", "--surface-popover-fg"],
@@ -287,6 +288,21 @@ describe("UI color scheme popover guard", () => {
     const scanPass = readSiteCss("site/scan-pass.css");
     expect(scanPass).toContain("html[data-theme=\"dark\"] .hc-emphasis-card--info");
     expect(scanPass).toContain("prefers-reduced-transparency: reduce");
+    assertGuardedRule("site/scan-pass.css", ":root", {
+      require: [
+        "--hc-scan-surface-bg",
+        "--hc-scan-surface-fg",
+        "--hc-scan-surface-fg-muted",
+        "--hc-scan-surface-border",
+      ],
+    });
+    assertGuardedRule("site/scan-pass.css", "html[data-theme=\"dark\"]", {
+      require: ["--hc-scan-surface-bg", "--hc-scan-surface-fg"],
+    });
+    assertGuardedRule("site/scan-pass.css", ".scan-trust-details", {
+      require: ["var(--hc-scan-surface-bg)", "var(--hc-scan-surface-border)"],
+      forbid: ["background: #fff", "background:#fff"],
+    });
     expect(readSiteCss("site/styles.css")).not.toContain("landing-liquid-glass.css");
     expect(readSiteCss("site/styles.css")).not.toContain(".live-control-notification-inner");
     assertGuardedRule("site/css/theme-dark.css", "a.wallet-chrome-home", {

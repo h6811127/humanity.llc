@@ -22,8 +22,8 @@
   --surface-popover-bg: #ffffff;
   --surface-popover-bg-glass: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.94) 0%,
-    rgba(255, 255, 255, 0.88) 100%
+    rgba(255, 255, 255, 0.84) 0%,
+    rgba(255, 255, 255, 0.76) 100%
   );
   --surface-popover-fg: #1c1c1e;
   --surface-popover-fg-muted: rgba(60, 60, 67, 0.72);
@@ -783,9 +783,11 @@ body.page-flow.has-shell-chrome .page > main.screen {
   margin: 0 0 5px;
   padding: 0;
   border-radius: var(--shell-radius-card, 14px);
-  background: var(--shell-fill, var(--white));
-  border: none;
-  box-shadow: var(--shell-shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.03));
+  background: var(--hc-emphasis-card-fill-info-glass);
+  border: 0.5px solid var(--hc-emphasis-card-border-neutral);
+  box-shadow: var(--hc-emphasis-card-shadow);
+  -webkit-backdrop-filter: var(--hc-emphasis-card-backdrop);
+  backdrop-filter: var(--hc-emphasis-card-backdrop);
   overflow: visible;
   position: relative;
   z-index: 0;
@@ -821,6 +823,22 @@ body.page-flow.has-shell-chrome .page > main.screen {
 
 .hub-card-item--civic {
   border-left: 3px solid rgba(20, 184, 166, 0.55);
+}
+
+@supports not (
+  (-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))
+) {
+  .hub-card-item {
+    background: var(--hc-emphasis-card-fill-info);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .hub-card-item {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--hc-emphasis-card-fill-info);
+  }
 }
 
 .hub-card-item:has(.hub-card-menu[open]) {
