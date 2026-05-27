@@ -149,5 +149,11 @@ export function personalizeProductDisplay(product) {
       typeof product.shopify_variant_id === "string"
         ? product.shopify_variant_id.trim()
         : "",
+    printTemplateId:
+      typeof product.print_template_id === "string" ? product.print_template_id.trim() : "",
+    printVariantId:
+      typeof product.print_variant_id === "string" ? product.print_variant_id.trim() : "",
+    catalogDescription:
+      typeof product.catalog_description === "string" ? product.catalog_description.trim() : "",
   };
 }

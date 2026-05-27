@@ -13,11 +13,23 @@
     "products": [
       {
         "product_id": "hoodie_live_object_v1",
+        "print_template_id": "hc-hoodie-live-object-v1",
+        "print_variant_id": "black-m",
         "title": "Live Object hoodie",
         "preview": "hoodie",
         "price_display": "$48 + shipping",
         "shopify_variant_id": "YOUR_VARIANT_ID",
         "checkout_url": "https://YOUR-STORE.myshopify.com/cart/YOUR_VARIANT_ID:1"
+      },
+      {
+        "product_id": "sticker_personalized_v1",
+        "print_template_id": "hc-sticker-square-v1",
+        "print_variant_id": "2x2-white",
+        "title": "Personalized sticker",
+        "preview": "sticker",
+        "price_display": "$12 + shipping",
+        "shopify_variant_id": "YOUR_STICKER_VARIANT_ID",
+        "checkout_url": "https://YOUR-STORE.myshopify.com/cart/YOUR_STICKER_VARIANT_ID:1"
       }
     ]
   }

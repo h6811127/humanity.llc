@@ -17,8 +17,12 @@ import {
   isPersonalizeCheckoutReady,
   loadCardSessionForCustomize,
   personalizeProductDisplay,
-  personalizeProducts,
 } from "./shop-customize-core.mjs";
+import {
+  fetchPrintCatalog,
+  readInitialPersonalizeProductId,
+  resolvePersonalizeProducts,
+} from "./shop-print-catalog-core.mjs";
 import { goToShopifyCheckout } from "./shop-checkout-handoff.mjs";
 import {
   SHOP_CHECKOUT_AFTER_REDIRECT_STATUS,
@@ -42,6 +46,8 @@ const createLink = document.getElementById("shop-customize-create-link");
 
 /** @type {Record<string, unknown> | null} */
 let shopConfig = null;
+/** @type {Array<Record<string, unknown>>} */
+let personalizeProductList = [];
 /** @type {ReturnType<typeof loadCardSessionForCustomize> | null} */
 let cardSession = null;
 /** @type {string | null} */
@@ -71,8 +77,8 @@ function showPreviewImage(show) {
 }
 
 function selectedProduct() {
-  if (!shopConfig || !selectedProductId) return null;
-  return personalizeProducts(shopConfig).find((p) => p.product_id === selectedProductId) ?? null;
+  if (!selectedProductId) return null;
+  return personalizeProductList.find((p) => p.product_id === selectedProductId) ?? null;
 }
 
 function decorateCreateLinks() {
@@ -83,17 +89,17 @@ function decorateCreateLinks() {
 }
 
 function renderProductPicker() {
-  if (!productRow || !shopConfig) return;
-  const products = personalizeProducts(shopConfig);
+  if (!productRow) return;
+  const products = personalizeProductList;
   productRow.replaceChildren();
   if (!products.length) {
     productRow.hidden = true;
-    setStatus("No personalized products configured yet.", true);
+    setStatus("No personalized products in the approved print catalog yet.", true);
     return;
   }
   productRow.hidden = false;
   if (!selectedProductId) {
-    selectedProductId = String(products[0].product_id);
+    selectedProductId = readInitialPersonalizeProductId(products);
   }
   for (const product of products) {
     const display = personalizeProductDisplay(product);
@@ -102,6 +108,9 @@ function renderProductPicker() {
     btn.className = "create-template-btn shop-customize-product-btn";
     btn.dataset.productId = display.productId;
     btn.textContent = display.title;
+    if (display.catalogDescription) {
+      btn.title = display.catalogDescription;
+    }
     btn.setAttribute("aria-pressed", display.productId === selectedProductId ? "true" : "false");
     if (display.productId === selectedProductId) {
       btn.classList.add("is-active");
@@ -238,6 +247,9 @@ async function refreshPreview() {
   if (priceEl) {
     priceEl.textContent = display.priceDisplay || "Price at checkout";
   }
+  if (previewNote && display.catalogDescription) {
+    previewNote.dataset.catalogNote = display.catalogDescription;
+  }
   setPreviewLoading(true);
   showPreviewImage(false);
   setStatus("");
@@ -258,6 +270,10 @@ async function refreshPreview() {
     if (previewNote) {
       previewNote.textContent =
         "This is your item's planned QR — it goes live after payment and fulfillment. Holding the garment still does not prove you own the card.";
+      const catalogNote = previewNote.dataset.catalogNote;
+      if (catalogNote) {
+        previewNote.textContent = `${catalogNote} ${previewNote.textContent}`;
+      }
     }
   } catch {
     const fallbackUrl = cardFallbackScanUrl();
@@ -333,9 +349,15 @@ async function init() {
   });
 
   try {
-    shopConfig = await loadShopConfig();
+    const [config, catalogPayload] = await Promise.all([
+      loadShopConfig(),
+      fetchPrintCatalog(resolverApiOrigin()).catch(() => ({ products: [] })),
+    ]);
+    shopConfig = config;
+    personalizeProductList = resolvePersonalizeProducts(config, catalogPayload);
   } catch {
     shopConfig = {};
+    personalizeProductList = [];
   }
 
   const session = loadCardSessionForCustomize();

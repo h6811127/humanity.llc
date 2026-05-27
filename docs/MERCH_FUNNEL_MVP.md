@@ -29,7 +29,7 @@ What reads as “cheap” is not the stack — it is **UX polish and checkout ha
 | Tier 1 personalize | Customizer → artifact intent → checkout | `/shop/customize/` + `POST /v1/store/artifact-intents` | Operator must enable `personalize.checkout_open` + Shopify variants |
 | Checkout | Branded Humanity checkout; may pass through Shopify | Same-tab redirect to Shopify; return via `/shop/thanks/` | Post-pay order timeline on site (thin) |
 | Catalog API | `GET /v1/store/rows` | Static `shop-config.json` | API rows when catalog grows |
-| Print catalog | Apparel from `GET /v1/print/catalog` | 2 sticker SKUs in worker | Hoodie template after Printify QA |
+| Print catalog | Apparel from `GET /v1/print/catalog` | Customizer merges catalog + `shop-config.json` | Hoodie Printify QA + operator enable |
 | Fulfillment | Paid webhook → Printify | Queue + operator submit path shipped | Self-serve E2E for one personalized SKU |
 
 **Do not conflate:** Tier 0 founding batch page (`/shop/founding/`) and Tier 1 customizer (`/shop/customize/`). Different QR models, different stories.
@@ -58,8 +58,8 @@ See [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) for operator 
 |-------|--------|--------|
 | **1** | Same-tab Shopify checkout handoff (`shop-checkout-handoff.mjs`) | Shipped |
 | **2** | 2-row `/shop/` hub + `/shop/founding/` Tier 0 page | Shipped |
-| **3** | Wire customizer to `GET /v1/print/catalog` when hoodie QA passes | Next |
-| **4** | Enable one personalized SKU E2E (`personalize.checkout_open` + webhook → Printify) | Operator + engineering |
+| **3** | Wire customizer to `GET /v1/print/catalog` when hoodie QA passes | Shipped |
+| **4** | Enable one personalized SKU E2E (`personalize.checkout_open` + webhook → Printify) | Next |
 | **5** | Post-purchase order status on humanity.llc | Backlog |
 | **6** | Full story-row catalog (~50 SKUs) | Post-MVP |
 
@@ -96,6 +96,7 @@ Storefront spec (personalized purchase): [`features/Storefront v1.0.md`](feature
 | User-facing | Implementation |
 |-------------|----------------|
 | QR customizer | `/shop/customize/` + `site/js/shop-customize.mjs` |
+| Print catalog merge | `site/js/shop-print-catalog-core.mjs` · `GET /v1/print/catalog` |
 | Branded QR preview | `qr-branding.mjs` · `qr-render.mjs` (`LIVE OBJECT` band) |
 | Print layout (sticker) | `qr-print-sticker.mjs` |
 | Pre-checkout record | **Artifact intent** — `POST /v1/store/artifact-intents` |
@@ -150,7 +151,7 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
 
 1. Create **Shopify** product(s) for hoodie / personalized sticker — cart permalink with variant id.
 2. Map **Printify** product + variant (fulfillment — see [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md)).
-3. Edit `site/data/shop-config.json`:
+3. Edit `site/data/shop-config.json` — each product needs `print_template_id` matching an approved template from `GET /v1/print/catalog`:
 
 ```json
 {
@@ -159,6 +160,8 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
     "products": [
       {
         "product_id": "hoodie_live_object_v1",
+        "print_template_id": "hc-hoodie-live-object-v1",
+        "print_variant_id": "black-m",
         "title": "Live Object hoodie",
         "preview": "hoodie",
         "price_display": "$48 + shipping",
@@ -169,6 +172,8 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
   }
 }
 ```
+
+The customizer loads `GET /v1/print/catalog`, merges approved templates with commerce fields above, and hides products not in the catalog (including Tier 0 batch templates).
 
 4. Deploy Pages. `/shop/customize/` shows **Continue to checkout** when card session exists and `checkout_open` is true.
 5. **Deploy Worker** — `npm run worker:deploy` — `humanity.llc/v1/*` must route to the resolver (else artifact intent returns 405).

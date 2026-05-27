@@ -17,6 +17,11 @@ import {
   isPersonalizeProductCheckoutOpen,
 } from "./shop-customize-core.mjs";
 import {
+  fetchPrintCatalog,
+  resolvePersonalizeProducts,
+} from "./shop-print-catalog-core.mjs";
+import { resolverApiOrigin } from "./hc-sign.mjs";
+import {
   SHOP_CHECKOUT_PENDING_LABEL,
   shopPriceLabelWhenCheckoutClosed,
 } from "./shop-copy-core.mjs";
@@ -35,9 +40,10 @@ function decorateShopCreateLinks() {
 
 /**
  * @param {Record<string, unknown>} config
+ * @param {unknown} catalogPayload
  */
-function syncPersonalizeRow(config) {
-  const products = personalizeProducts(config);
+function syncPersonalizeRow(config, catalogPayload) {
+  const products = resolvePersonalizeProducts(config, catalogPayload);
   const anyPreview = products.length > 0;
   const checkoutReady =
     isPersonalizeCheckoutOpen(config) &&
@@ -50,7 +56,13 @@ function syncPersonalizeRow(config) {
     return;
   }
   if (anyPreview) {
-    personalizeStatusEl.textContent = "Preview live · checkout opening soon";
+    const countLabel = products.length === 1 ? "1 product" : `${products.length} products`;
+    personalizeStatusEl.textContent = `Preview live · ${countLabel} in approved catalog · checkout opening soon`;
+    personalizeStatusEl.classList.remove("shop-hub-status--live");
+    return;
+  }
+  if (personalizeProducts(config).length) {
+    personalizeStatusEl.textContent = "Print catalog syncing — check back soon";
     personalizeStatusEl.classList.remove("shop-hub-status--live");
     return;
   }
@@ -87,8 +99,11 @@ async function initHub() {
   persistMerchCreateRef("tier0_shop");
   decorateShopCreateLinks();
   try {
-    const config = await loadShopConfig();
-    syncPersonalizeRow(config);
+    const [config, catalogPayload] = await Promise.all([
+      loadShopConfig(),
+      fetchPrintCatalog(resolverApiOrigin()).catch(() => ({ products: [] })),
+    ]);
+    syncPersonalizeRow(config, catalogPayload);
     syncFoundingRow(config);
   } catch {
     if (personalizeStatusEl) {
