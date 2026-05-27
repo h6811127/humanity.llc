@@ -4820,6 +4820,32 @@ body.landing-focus-mode .screen-landing {
   border: 1px solid rgba(219, 27, 67, 0.18);
 }
 
+.shop-thanks-status-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.shop-thanks-status-result {
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: var(--radius);
+  background: var(--surface-muted, rgba(0, 0, 0, 0.04));
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.shop-thanks-status-result[hidden] {
+  display: none !important;
+}
+
+.shop-thanks-status-meta {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--grey);
+}
+
 .shop-interest-form {
   display: flex;
   flex-direction: column;
