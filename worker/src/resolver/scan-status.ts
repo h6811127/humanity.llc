@@ -1,7 +1,10 @@
 import { loadScanContext, type ScanContext } from "../db/scan";
+import { checkCardResolutionRateLimit, hashIp } from "../db/rate-limit";
 import { PROFILE_ID_REGEX } from "../crypto";
 import { jsonResponseWithWeakEtag } from "../http/conditional-json";
 import {
+  clientIp,
+  errorResponse,
   jsonResponse,
   OPERATOR_ID,
   PROTOCOL_VERSION,
@@ -182,6 +185,19 @@ export async function handleGetScanStatus(
   db: D1Database,
   profileId: string
 ): Promise<Response> {
+  const ipHash = await hashIp(clientIp(request));
+  const rate = await checkCardResolutionRateLimit(db, ipHash);
+  if (!rate.allowed) {
+    return errorResponse(
+      "RATE_LIMITED",
+      "Too many card status requests from this network. Try again later.",
+      429,
+      rate.retryAfterSec
+        ? { "Retry-After": String(rate.retryAfterSec) }
+        : undefined
+    );
+  }
+
   const origin = requestOrigin(request);
   const url = new URL(request.url);
   const qrRaw = url.searchParams.get("q");

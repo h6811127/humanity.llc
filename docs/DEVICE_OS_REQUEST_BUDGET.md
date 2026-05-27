@@ -171,7 +171,7 @@ Client budgets are necessary; they are **not** sufficient against bugs, old cach
 | Control | Purpose | Status |
 |---------|---------|--------|
 | **429 + Retry-After** on hot routes | Client backs off (60s live proof; health degraded) | Partially shipped client-side |
-| **Per-IP / per-device rate limits** | Cap burst “Check network” fan-out | Planned |
+| **Per-IP / per-device rate limits** | Cap burst “Check network” fan-out | **Partial (2026-05-27)** — `GET …/status` 300/IP/min (Technical Standards §15) |
 | **Short TTL / ETag** on `status` and challenge list | Cheap 304s for repeat polls | **Shipped** (Phase 9) |
 | **Workers Paid + dashboard alerts** | Production reference operator survives organic use | Ops (Phase 0) |
 | **Fail closed on 1027** | Site down until quota resets | Shipped behavior |
@@ -469,7 +469,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 | S2 | Presence heartbeat **10s** + coalesce events | Yes | — | Lag ✅ |
 | S3 | Chrome debounce + fingerprint skip | Yes (`device-chrome-refresh.mjs`) | — | Lag ✅ |
 | S4 | Skip presence heartbeat **when alone with keys** | Yes (`shouldSkipPresenceHeartbeat`) | Also skip when no `hc_created` | 8b ✅ |
-| S5 | Lazy-load inbox sheet / notifications | — | Smaller bootstrap graph | P2 |
+| S5 | Lazy-load inbox sheet / notifications | Yes (`device-inbox-sheet-loader`, `device-browser-notifications-loader`) | Smaller bootstrap graph | P2 ✅ |
 | S6 | Shard `hc_wallet_network_cache` | — | Bound session cache size | Open issues |
 | S7 | Cross-tab rebuild (one snapshot) | Partial (Phases 1–6) | Full state machine per [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md) | Cross-tab |
 
@@ -486,14 +486,14 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 | # | Idea | Shipped today | Planned direction | Phase |
 |---|------|---------------|-------------------|-------|
 | O1 | Workers Paid on production | Ops | Monitor daily requests | 0 |
-| O2 | Per-IP rate limits on hot routes | — | Cap burst **Check network** | Server |
+| O2 | Per-IP rate limits on hot routes | **Partial** — `GET …/status` 300/IP/min | Cap burst **Check network** | Server ✅ step 1 |
 | O3 | Fail closed on 1027 | Yes | User-visible degraded state | 3 ✅ |
 
 ### Implementer order (after Phases 1–9 + 8c)
 
 1. **Phase 10 (M8 complete, G0 signed)** — **Next:** production rollout ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout). Legal review for G7 when available.
-2. **Shell P2** - Lazy browser notifications loader ([`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md)) — inbox loader shipped; notifications loader **2026-05-27**.  
-3. **Ops O2** - Per-IP rate limits on hot routes.
+2. **Shell P2** - Lazy browser notifications loader ([`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md)) — **shipped 2026-05-27**.  
+3. **Ops O2** - Per-IP rate limits on hot routes — **step 1 shipped:** `GET …/cards/{profile_id}/status` (300/IP/min, Technical Standards §15). Next: live-control / health hot routes if needed.
 
 See also [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) and [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
 
@@ -521,7 +521,7 @@ Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). 
 
 | Date | Note |
 |------|------|
-| 2026-05-27 | **M8 E2 staging:** client entitlement probe tests + `e2e/hosted-tier-budget.spec.ts` cover H1–H3/H5 |
+| 2026-05-27 | **O2 step 1:** per-IP rate limit on `GET …/status` (300/min); Shell P2 lazy notifications shipped |
 | 2026-05-26 | **M8 epics:** [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) |
 | 2026-05-26 | **M7:** Phase 10 entitlement rows + test plan (§ Phase 10 — hosted tier rows) |
 | 2026-05-26 | **M6 standards delta:** [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) |

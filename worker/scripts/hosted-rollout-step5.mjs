@@ -1,15 +1,13 @@
 /**
- * Hosted steward production rollout — step 5 (ops dashboard + E6.2 CI).
+ * Hosted steward production rollout — step 5b–d (E6.2 CI + verify).
  *
- * Per HOSTED_TIER_IMPLEMENTATION_EPICS.md § Production rollout (after G0):
- *   5. Pin CF dashboard; add repo secret OPERATOR_AUDIT_TOKEN for E6.2 CI
+ * Step 5a (CF dashboard pin) — hosted:rollout:step5a
  *
  * Usage:
  *   npm run hosted:rollout:step5
  *   npm run hosted:rollout:step5 -- --verify
  *   OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step5 -- --verify
  *
- * @see docs/HOSTED_STEWARD_CF_DASHBOARD.md
  * @see docs/HOSTED_STEWARD_OPS_RUNBOOK.md
  * @see docs/HOSTED_TIER_G0_READINESS.md § Ops checklist
  */
@@ -22,7 +20,6 @@ import { normalizeOperatorAuditToken } from "./hosted-rollout-token.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
-const cfDashboardDoc = "docs/HOSTED_STEWARD_CF_DASHBOARD.md";
 const opsRunbookDoc = "docs/HOSTED_STEWARD_OPS_RUNBOOK.md";
 const e62Workflow = ".github/workflows/steward-ops-daily.yml";
 
@@ -36,28 +33,10 @@ try {
   process.exit(1);
 }
 
-function printCfDashboardSetup() {
-  console.log("Step 5a — Pin Cloudflare Workers metrics (E6.1, manual)\n");
-  console.log(`See ${cfDashboardDoc} for full detail.\n`);
-  console.log("1. Open Cloudflare dashboard → Workers & Pages → humanity-llc-resolver → Metrics.");
-  console.log("2. Pin 7-day and 24-hour views for on-call review.");
-  console.log("3. Note these hosted-tier paths for 429/5xx spikes:");
-  for (const row of [
-    "/.well-known/hc/v1/steward/entitlements",
-    "/.well-known/hc/v1/steward/push",
-    "/.well-known/hc/v1/cards/*/live-control/challenges",
-    "/.well-known/hc/v1/operator/steward-ops",
-    "/.well-known/hc/v1/operator/billing/webhook",
-  ]) {
-    console.log(`   • ${row}`);
-  }
-  console.log("4. Compare daily CF metrics with steward-ops snapshot + E6.2 CI.\n");
-}
-
 function printGithubSecretSetup() {
   const repo = resolveGithubRepo();
   console.log("Step 5b — GitHub secret for E6.2 daily CI\n");
-  console.log("The same OPERATOR_AUDIT_TOKEN from step 3 must exist as a repo Actions secret.");
+  console.log("The same OPERATOR_AUDIT_TOKEN from step 3a must exist as a repo Actions secret.");
   console.log(`   gh secret set OPERATOR_AUDIT_TOKEN --repo ${repo}`);
   console.log("   (GitHub → Settings → Secrets and variables → Actions)\n");
 }
@@ -65,6 +44,12 @@ function printGithubSecretSetup() {
 function printRunbookReview() {
   console.log("Step 5c — Review ops runbook\n");
   console.log(`Read ${opsRunbookDoc} § Daily check and Incident responses.\n`);
+}
+
+function printE62WorkflowNote() {
+  console.log("Step 5d — Confirm E6.2 workflow");
+  console.log(`   Workflow: ${e62Workflow} (daily 14:00 UTC + workflow_dispatch)`);
+  console.log("   After secret is set: Actions → Steward ops daily → Run workflow\n");
 }
 
 /**
@@ -140,19 +125,18 @@ function checkGithubSecretListed() {
 }
 
 async function main() {
-  console.log("Hosted steward rollout — step 5 (ops dashboard + E6.2 CI)");
+  console.log("Hosted steward rollout — step 5 (E6.2 CI + verify)");
   console.log("Docs: docs/HOSTED_TIER_IMPLEMENTATION_EPICS.md § Production rollout\n");
 
-  printCfDashboardSetup();
+  console.log("ℹ️  Step 5a (CF dashboard) is manual — run first if not done:");
+  console.log("   npm run hosted:rollout:step5a\n");
+
   printGithubSecretSetup();
   printRunbookReview();
-
-  console.log("Step 5d — Confirm E6.2 workflow");
-  console.log(`   Workflow: ${e62Workflow} (daily 14:00 UTC + workflow_dispatch)`);
-  console.log("   After secret is set: Actions → Steward ops daily → Run workflow\n");
+  printE62WorkflowNote();
 
   if (!verify) {
-    console.log("⏭  Run with --verify after CF dashboard is pinned and GitHub secret is set:");
+    console.log("⏭  After step 5a + GitHub secret are set:");
     console.log("   npm run hosted:rollout:step5 -- --verify");
     console.log(
       "   OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step5 -- --verify"

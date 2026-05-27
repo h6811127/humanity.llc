@@ -116,11 +116,18 @@ npm run hosted:rollout:step4 -- --verify
 OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step4 -- --verify
 ```
 
-**Rollout step 5 (script):**
+**Rollout step 5a — pin Cloudflare dashboard (do this first, manual):**
+
+```bash
+npm run hosted:rollout:step5a
+```
+
+See [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md).
+
+**Rollout step 5b — E6.2 CI secret + verify:**
 
 ```bash
 npm run hosted:rollout:step5
-# After CF dashboard is pinned and GitHub secret is set:
 npm run hosted:rollout:step5 -- --verify
 OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step5 -- --verify
 ```

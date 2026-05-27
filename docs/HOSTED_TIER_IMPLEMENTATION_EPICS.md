@@ -351,7 +351,8 @@ Engineering checklist once M4 governance checklist is signed ([`HOSTED_TIER_PRIC
 | 3b | `STRIPE_WEBHOOK_SECRET` (after G8) | Deferred — `npm run hosted:rollout:step3b` (notes only). Not required for steps 4–6. |
 | 4a | Enable hosted flag in wrangler | `HOSTED_STEWARD_ENABLED=1` — `npm run hosted:rollout:step4a` · apply `npm run hosted:rollout:step4a -- --apply` · commit `worker/wrangler.toml` |
 | 4b | Deploy + verify production | `npm run hosted:rollout:step4 -- --deploy` · verify `npm run hosted:rollout:step4 -- --verify` · `OPERATOR_AUDIT_TOKEN=... npm run hosted:rollout:step4 -- --verify` |
-| 5 | Ops | Pin CF dashboard + E6.2 CI secret — `npm run hosted:rollout:step5` · verify `npm run hosted:rollout:step5 -- --verify` · [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md) |
+| 5a | Pin CF dashboard (E6.1) | Manual — `npm run hosted:rollout:step5a` · [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md) |
+| 5b | E6.2 CI + verify | GitHub `OPERATOR_AUDIT_TOKEN` + runbook — `npm run hosted:rollout:step5` · verify `npm run hosted:rollout:step5 -- --verify` |
 | 6 | Regression | `npm run hosted:rollout:step6` · full verify `npm run hosted:rollout:step6 -- --verify` · Vitest only `npm run hosted:rollout:step6 -- --vitest` · E2E only `npm run hosted:rollout:step6 -- --e2e` |
 
 ---

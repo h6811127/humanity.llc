@@ -13,6 +13,7 @@ import {
   buildScanViewModel,
   malformedScanView,
 } from "../src/resolver/scan-state";
+import { d1WithRateLimitBuckets } from "./rate-limit-db-mock";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const QR = "qr_7Xk9mP2nQ4rT6vW8";
@@ -257,11 +258,12 @@ describe("scan status JSON (M3.4)", () => {
 
   it("malformed status response includes hint for invalid profile id", async () => {
     const { handleGetScanStatus } = await import("../src/resolver/scan-status");
-    const db = {
-      prepare: () => ({
-        bind: () => ({ first: async () => null }),
+    const db = d1WithRateLimitBuckets(() => ({
+      bind: () => ({
+        first: async () => null,
+        run: async () => ({ meta: { changes: 0 } }),
       }),
-    } as unknown as D1Database;
+    }));
     const res = await handleGetScanStatus(
       new Request("https://humanity.llc/.well-known/hc/v1/cards/not-valid/status?q=bad"),
       db,
@@ -305,18 +307,17 @@ describe("scan status JSON (M3.4)", () => {
       verification: summary(),
       revocationDisplay: null,
     };
-    const db = {
-      prepare: (sql: string) => ({
-        bind: () => ({
-          first: async () => {
-            if (sql.includes("FROM cards")) return ctx.card;
-            if (sql.includes("FROM qr_credentials")) return ctx.qr;
-            if (sql.includes("verification_summaries")) return ctx.verification;
-            return null;
-          },
-        }),
+    const db = d1WithRateLimitBuckets((sql: string) => ({
+      bind: () => ({
+        first: async () => {
+          if (sql.includes("FROM cards")) return ctx.card;
+          if (sql.includes("FROM qr_credentials")) return ctx.qr;
+          if (sql.includes("verification_summaries")) return ctx.verification;
+          return null;
+        },
+        run: async () => ({ meta: { changes: 0 } }),
       }),
-    } as unknown as D1Database;
+    }));
 
     const { handleGetScanStatus } = await import("../src/resolver/scan-status");
     const url = `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/status?q=${QR}`;
@@ -335,11 +336,12 @@ describe("scan status JSON (M3.4)", () => {
   });
 
   it("GET status through worker.fetch includes CORS for Pages dev origin", async () => {
-    const db = {
-      prepare: () => ({
-        bind: () => ({ first: async () => null }),
+    const db = d1WithRateLimitBuckets(() => ({
+      bind: () => ({
+        first: async () => null,
+        run: async () => ({ meta: { changes: 0 } }),
       }),
-    } as unknown as D1Database;
+    }));
     const res = await worker.fetch(
       new Request(
         `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/status?q=${QR}`,

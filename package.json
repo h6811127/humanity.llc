@@ -34,6 +34,7 @@
     "hosted:rollout:step4": "node worker/scripts/hosted-rollout-step4.mjs",
     "hosted:rollout:step4a": "node worker/scripts/hosted-rollout-step4a.mjs",
     "hosted:rollout:step5": "node worker/scripts/hosted-rollout-step5.mjs",
+    "hosted:rollout:step5a": "node worker/scripts/hosted-rollout-step5a.mjs",
     "hosted:rollout:step6": "node worker/scripts/hosted-rollout-step6.mjs",
     "worker:check-steward-ops": "tsx worker/scripts/check-steward-ops-thresholds.ts",
     "e2e:hosted-tier": "playwright test e2e/hosted-tier-budget.spec.ts",
