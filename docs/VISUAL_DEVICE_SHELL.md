@@ -49,6 +49,8 @@ Principles:
 
 **Flow pages** (`/create/`, etc.) use `body.page-flow` with no header chrome  -  rely on the browser back gesture/button for home, not a floating dot or Create pill.
 
+**Hub inset cards (May 2026):** The bottom sheet uses tier-2 glass on `.device-hub--sheet`. Inside it, inset groups share the emphasis-card family: **info** glass for inline search and saved rows, **warn** glass for the **Monitoring** network/live-proof toolbar, **urgent** emphasis for the live-proof waiting group. Full anatomy and regression: [`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md).
+
 ### Phase B  -  Object continuity (shipped v1)
 
 4. **Card open transition**  -  `navigateTo` / `openCardNowPage` use `document.startViewTransition` when available (hub, wallet, activity).

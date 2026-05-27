@@ -46,6 +46,9 @@ These notes are captured as individual product refinements so implementation can
 - **Row Phase 1 (shipped):** information consolidation per [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md).
 - **Row Phase 2 (shipped):** steward actions in ⋯ **QR & lifecycle**; **Prove live** stays inline when pending ([`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md)).
 - **Row Phase 3 (shipped):** typography ladder, status dot rings, tightened spacing ([`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md)).
+- **Visual refresh Phase 1–2 (shipped):** hub sheet + inline search glass; **Monitoring** warn card for network/live-proof toolbar ([`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md)).
+- **Header simplification (shipped):** Create as **+ New** in saved-items header; inline status row ([`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md)).
+- **Live proof waiting (shipped):** urgent emphasis card replaces gold label + plain list ([`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md) § Phase 5).
 
 ---
 
