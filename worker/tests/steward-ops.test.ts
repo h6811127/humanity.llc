@@ -56,6 +56,45 @@ class FakeStewardOpsDb {
           }
           return { results: [...map.values()] } as T;
         }
+        if (
+          sql.includes("FROM steward_usage_counters") &&
+          sql.includes("GROUP BY account_id, event")
+        ) {
+          const dayKey = args[0] as string;
+          const events = new Set([args[1] as string, args[2] as string]);
+          const map = new Map<
+            string,
+            {
+              account_id: string;
+              event: string;
+              count: number;
+              deviceIds: Set<string>;
+            }
+          >();
+          for (const row of fake.usage) {
+            if (row.window_key !== dayKey || !events.has(row.event)) continue;
+            const key = `${row.account_id}:${row.event}`;
+            const current =
+              map.get(key) ??
+              {
+                account_id: row.account_id,
+                event: row.event,
+                count: 0,
+                deviceIds: new Set<string>(),
+              };
+            current.count += row.count;
+            current.deviceIds.add(row.device_id);
+            map.set(key, current);
+          }
+          return {
+            results: [...map.values()].map((row) => ({
+              account_id: row.account_id,
+              event: row.event,
+              count: row.count,
+              devices: row.deviceIds.size,
+            })),
+          } as T;
+        }
         if (sql.includes("FROM steward_usage_counters") && sql.includes("window_key = ?")) {
           const dayKey = args[0] as string;
           const map = new Map<
@@ -216,6 +255,7 @@ describe("operator steward ops snapshot", () => {
       accounts: Array<{ plan_id: string; status: string; accounts: number }>;
       sessions: { active: number };
       usage: Array<{ event: string; count: number; accounts: number; devices: number }>;
+      alerts: Array<{ code: string }>;
       push: {
         active_connections: number;
         active_client_ips: number;
@@ -236,10 +276,85 @@ describe("operator steward ops snapshot", () => {
       accounts: 1,
       devices: 2,
     });
+    expect(body.alerts).toEqual([]);
     expect(body.push.active_connections).toBe(1);
     expect(body.push.active_client_ips).toBe(1);
     expect(body.push.max_connections_per_account).toBe(5);
     expect(body.controls.sla.live_proof_push_p95_target_seconds).toBe(5);
+  });
+
+  it("returns alert candidates for account-level daily thresholds", async () => {
+    const fake = new FakeStewardOpsDb();
+    fake.usage = [
+      {
+        account_id: "acc_soft",
+        device_id: "dev_1",
+        event: "poll.live_proof.auto",
+        window_key: "2026-05-27",
+        count: 50_000,
+      },
+      {
+        account_id: "acc_hard",
+        device_id: "dev_2",
+        event: "poll.live_proof.auto",
+        window_key: "2026-05-27",
+        count: 100_000,
+      },
+      {
+        account_id: "acc_push",
+        device_id: "dev_3",
+        event: "notify.push.delivered",
+        window_key: "2026-05-27",
+        count: 10_000,
+      },
+    ];
+
+    const res = await handleGetStewardOpsSnapshot(
+      new Request(`${URL}?day=2026-05-27`, {
+        headers: { Authorization: `Bearer ${TOKEN}` },
+      }),
+      { HOSTED_STEWARD_ENABLED: "1" } as Env,
+      fake as unknown as D1Database,
+      TOKEN
+    );
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      alerts: Array<{
+        severity: string;
+        code: string;
+        account_id: string;
+        count: number;
+        threshold: number;
+      }>;
+    };
+    expect(body.alerts).toContainEqual(
+      expect.objectContaining({
+        severity: "warning",
+        code: "hosted_auto_poll_soft_cap",
+        account_id: "acc_soft",
+        count: 50_000,
+        threshold: 50_000,
+      })
+    );
+    expect(body.alerts).toContainEqual(
+      expect.objectContaining({
+        severity: "critical",
+        code: "hosted_auto_poll_hard_cap",
+        account_id: "acc_hard",
+        count: 100_000,
+        threshold: 100_000,
+      })
+    );
+    expect(body.alerts).toContainEqual(
+      expect.objectContaining({
+        severity: "warning",
+        code: "hosted_push_delivered_daily_cap",
+        account_id: "acc_push",
+        count: 10_000,
+        threshold: 10_000,
+      })
+    );
   });
 
   it("rejects invalid day", async () => {

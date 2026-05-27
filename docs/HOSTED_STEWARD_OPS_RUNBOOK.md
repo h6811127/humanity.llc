@@ -39,6 +39,7 @@ If `schema` is `missing`, run the hosted migrations before investigating hosted 
 | `accounts` | Account counts grouped by `plan_id` and lifecycle `status`. |
 | `sessions.active` | Non-expired steward bearer sessions. |
 | `usage` | Current UTC-day usage counters grouped by event. |
+| `alerts` | Account-level alert candidates for the selected UTC day. |
 | `push` | In-memory SSE connection counts for this Worker isolate. |
 | `controls` | Fair-use and SLA thresholds copied from the governance docs. |
 
@@ -50,12 +51,16 @@ If `schema` is `missing`, run the hosted migrations before investigating hosted 
 
 1. Confirm `hosted_steward_enabled` matches the rollout plan.
 2. Check `accounts` for unexpected `past_due`, `expired`, or `suspended` spikes.
-3. Check `usage`:
+3. Check `alerts` first:
+   - `hosted_auto_poll_soft_cap` means account-level usage reached **50,000** auto live-proof polls/day.
+   - `hosted_auto_poll_hard_cap` means account-level usage reached **100,000** auto live-proof polls/day.
+   - `hosted_push_delivered_daily_cap` means push delivery reached **10,000** deliveries/day.
+4. Check `usage`:
    - `poll.live_proof.auto` near **50,000/account/day** means soft-cap review.
    - `poll.live_proof.auto` near **100,000/account/day** means hard-cap/fair-use intervention.
    - `notify.push.delivered` near **10,000/account/day** means push fan-out review.
-4. Check `push.active_connections` against `push.max_connections_per_account`.
-5. Cross-check Cloudflare Workers analytics for 429 rate, 5xx rate, and request volume.
+5. Check `push.active_connections` against `push.max_connections_per_account`.
+6. Cross-check Cloudflare Workers analytics for 429 rate, 5xx rate, request volume, and push p95 latency.
 
 ---
 

@@ -289,7 +289,7 @@ flowchart LR
 |---|------|--------|
 | E6.1 | Ops metrics snapshot | **Staging** — `GET /.well-known/hc/v1/operator/steward-ops` exposes account, session, usage, and in-memory SSE counts behind `OPERATOR_AUDIT_TOKEN` |
 | E6.1 | Cloudflare dashboard | Pending external dashboard setup |
-| E6.2 | Daily alert | Pending alerting provider; snapshot carries soft/hard thresholds |
+| E6.2 | Daily alert | **Partial staging** — snapshot emits account-level alert candidates for auto-poll soft/hard caps and push delivery caps; external alerting + push p95 latency dashboard pending |
 | E6.3 | Runbook | **Staging** — `docs/HOSTED_STEWARD_OPS_RUNBOOK.md` |
 | E6.4 | Support doc link | **Staging** — runbook directs customer-facing language to `docs/SKEPTIC_FAQ.md` |
 
@@ -359,3 +359,4 @@ flowchart LR
 | 2026-05-26 | **E1 foundation:** migration `0012_steward_hosted.sql`, steward routes behind `HOSTED_STEWARD_ENABLED` |
 | 2026-05-26 | M8 initial implementation epics (planning only) |
 | 2026-05-27 | **E6 start:** operator steward ops snapshot + hosted ops runbook |
+| 2026-05-27 | **E6.2 partial:** snapshot alert candidates for fair-use and push delivery caps |
