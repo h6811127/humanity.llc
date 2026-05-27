@@ -6,6 +6,7 @@ import { renderScanPage } from "../src/resolver/scan-html";
 import {
   LOST_ITEM_RELAY_CREATE_HINT,
   LOST_ITEM_RELAY_CREATE_PATH,
+  MERCH_SCAN_CUSTOMIZE_PATH,
 } from "../src/resolver/scan-safety";
 import {
   SCAN_OFFLINE_BANNER_TEXT,
@@ -407,6 +408,8 @@ describe("renderScanPage M3.2 trust blocks", () => {
     );
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).toContain("Printed item");
+    expect(html).toContain('data-merch-funnel="1"');
+    expect(html).toContain(MERCH_SCAN_CUSTOMIZE_PATH);
   });
 
   it("renders Vouched Human with vouch recency on scan (V-001)", async () => {
