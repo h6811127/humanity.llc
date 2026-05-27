@@ -333,7 +333,7 @@ Optional **non-trust** badge on scan: “Scanned from a founding sticker” for 
 | Fulfillment mint sets `scope: print_artifact`, `expires_at: null` | Engineering | **Shipped** | `POST …/print-artifact-qrs` · `POST …/print/orders/{id}/mint` · `fulfillment-mint.ts` |
 | Artifact intent preview + cart attach metadata (A-001 spike) | Engineering | **Shipped** | `POST /v1/store/artifact-intents` · `…/attach` · migration `0014_artifact_intents.sql` |
 | Shopify paid webhook → commerce order link (O-001) | Engineering | **Shipped** | `POST /v1/webhooks/shopify/orders` · migration `0015_commerce_order_links.sql` |
-| Print fulfillment queue + catalog + artwork (O-002) | Engineering | **Shipped** (queue + live submit) | `POST /v1/print/orders` · `printify-client.ts` · `PRINTIFY_SUBMIT_ENABLED` gate |
+| Print fulfillment queue + catalog + artwork (O-002) | Engineering | **Partial** — queue + submit; **upload per order TBD** | `printify-client.ts` · [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Shipped vs spec gap |
 | Printify webhook status sync (O-003) | Engineering | **Shipped** (webhook slice) | `POST /v1/print/webhooks/printify` · migration `0018_printify_webhook_receipts.sql` · reconciliation polling deferred |
 | Operator fulfillment lookup chain (O-003) | Engineering | **Shipped** | `GET /v1/operator/fulfillment/lookup` · Shopify/commerce/intent/print order ids |
 | Orphan purge respects null expiry | Engineering | **Shipped** (existing) | `orphan-purge.test.ts` |
@@ -360,6 +360,7 @@ Before `checkout_open: true` on production:
 | Doc | Use |
 |-----|-----|
 | [`MERCH_LED_V1.md`](MERCH_LED_V1.md) | GTM phases A–D |
+| [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) | Shopify + Printify headless wiring |
 | [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) | Pre-launch gates · QR model table |
 | [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) | Interest-only shop · `checkout_open` |
 | [`LAUNCH_LANGUAGE_KIT.md`](LAUNCH_LANGUAGE_KIT.md) | § Sticker FAQ (customer copy) |

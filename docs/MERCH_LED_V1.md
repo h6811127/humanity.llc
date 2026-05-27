@@ -5,6 +5,7 @@
 
 **Implementation tracker:** `docs/SHOP_TIER0_IMPLEMENTATION.md` (Pages UI, waitlist interest, Shopify handoff checklist).  
 **Merch funnel MVP:** `docs/MERCH_FUNNEL_MVP.md` (scan → profile → `/shop/customize/` → Printify).  
+**Headless commerce (Shopify + Printify wiring):** `docs/MERCH_HEADLESS_COMMERCE.md` — factory vs cash register vs storefront; Tier 1 customizeability.  
 **Merch QR lifecycle:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` (no calendar expiry on printed artifacts, revoke/reprint, optional experiments).
 
 **Architecture and launch gate:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  -  public card creation when Phase A ships; federated networks long-term; founding cohort is optional feedback only.

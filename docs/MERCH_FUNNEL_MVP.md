@@ -2,6 +2,7 @@
 
 **Status:** Active — customizer UI shipped; operator enables products in `shop-config.json`  
 **Parent:** [`MERCH_LED_V1.md`](MERCH_LED_V1.md) · [`V1_FLOW_AUDIT.md`](V1_FLOW_AUDIT.md) · [`features/Storefront v1.0.md`](features/Storefront%20v1.0.md)  
+**Architecture (Shopify + Printify + headless):** [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) — **read first** if wiring checkout  
 **Implementation:** [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) · `site/shop/customize/`
 
 ---
@@ -27,6 +28,8 @@ A stranger **scans live wear**, sees the wearer’s **signed profile** (optional
 ```
 
 Canonical architecture diagram: [`V1_FLOW_AUDIT.md`](V1_FLOW_AUDIT.md) § Canonical V1 Flow.
+
+**Three systems:** humanity.llc = store · Shopify = checkout · Printify = factory (customers never see Printify). Full wiring: [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md).
 
 Storefront spec (personalized purchase): [`features/Storefront v1.0.md`](features/Storefront%20v1.0.md) § **10.2**.
 
@@ -65,6 +68,8 @@ The customizer **does not** call Printify from the browser. It prepares intent +
 | **Tier 0** curiosity | Batch QR on `/shop/` | Not used — buy founding sticker as-is |
 | **Tier 1** belonging | Unique `print_artifact` per unit | **`/shop/customize/`** — hoodie, personalized sticker, etc. |
 
+**First personalized launch = Tier 1 only.** Tier 0 batch is optional parallel curiosity; not a substitute for customizeability. See [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Tier 0 vs Tier 1.
+
 Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md).
 
 ---
@@ -88,9 +93,14 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
 
 ## Operator setup (personalized products)
 
-1. Create **Shopify** product(s) for hoodie / personalized sticker — cart permalink with variant id.
-2. Map **Printify** product + variant (fulfillment — see [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md)).
-3. Edit `site/data/shop-config.json`:
+**Canonical checklist:** [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Operator setup checklist (Printify factory → Shopify checkout SKU → `shop-config.json` → Worker env).
+
+Summary:
+
+1. Create **Printify** template — note product + variant ids (manufacturing).
+2. Create **Shopify** variant — cart permalink (payment). May reuse a Printify-published listing as SKU shell; fulfillment for Tier 1 still goes Worker → Printify API after webhook (avoid double-fulfill — see headless doc).
+3. Map **both** into config (Shopify) and Worker env (Printify) — dual IDs for one logical product.
+4. Edit `site/data/shop-config.json`:
 
 ```json
 {
@@ -154,6 +164,7 @@ Aggregate metrics only — no PII. Allowed refs:
 | Artifact intent created; attach returns Shopify line attributes | ✅ API tests |
 | Checkout URL includes `properties[artifact_intent_id]` | ✅ `shop-customize-core.test.ts` |
 | Paid webhook → Printify queue (operator env) | ✅ queue on paid webhook · Tier 1 template + Printify env mapping |
+| Per-order artwork upload to Printify on submit | ☐ O-002 extension — see [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Shipped vs spec gap |
 | Printed item scans; bearer warning visible | ☐ physical QA · ✅ automated scan regression (`npm run worker:test:merch-print-qa`, [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md)) |
 | Owner updates manifesto from phone without reprint | ✅ resolver |
 
@@ -162,6 +173,7 @@ Aggregate metrics only — no PII. Allowed refs:
 ## Not in this MVP slice
 
 - Full story-row catalog (~50 SKUs) — [`Storefront v1.0.md`](features/Storefront%20v1.0.md)
+- Per-order Printify artwork upload in automated submit — [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Shipped vs spec gap
 - Drag-and-drop QR placement on arbitrary Printify mockups
 - In-browser native checkout
 - Game-master / city-scale AI
@@ -173,6 +185,7 @@ Aggregate metrics only — no PII. Allowed refs:
 
 | Doc | Role |
 |-----|------|
+| [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) | **Shopify + Printify + headless wiring**, dual product IDs, FAQ |
 | [`MERCH_LED_V1.md`](MERCH_LED_V1.md) | Curiosity + belonging strategy |
 | [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) | Optional scan reader only |
 | [`V1_IMPLEMENTATION_BACKLOG.md`](V1_IMPLEMENTATION_BACKLOG.md) | O-002 Printify adapter |

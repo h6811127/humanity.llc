@@ -1,5 +1,7 @@
 # Shop Buy button — production investigation (2026-05-27)
 
+**Architecture context:** [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) — Shopify is checkout only; humanity.llc does not read Shopify automatically.
+
 **Question:** Why do all devices/browsers show “Notify when checkout opens” instead of Buy on https://humanity.llc/shop/?
 
 **Short answer:** Production is serving **`checkout_open: false`** with an **empty `checkout_url`**. That is intentional interest-only mode. It is **not** a stale-cache or “old app version” problem across devices. The Shopify store setup on iPad does **not** connect to humanity.llc until you edit `shop-config.json` and **deploy Pages**.
@@ -96,6 +98,7 @@ Shopify Admin on iPad **only** creates the product and URL. humanity.llc **never
 | Assumption | Reality |
 |------------|---------|
 | Shopify product live ⇒ Buy on humanity.llc | False — config + Pages deploy required |
+| Shopify hoodie from Printify publish ⇒ Tier 1 personalized product | False — static publish ≠ per-buyer QR; need `/shop/customize/` + artifact intent ([`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md)) |
 | Changed config locally ⇒ prod updates | False — must commit (optional) + `npm run pages:deploy` |
 | Thanks page works ⇒ checkout enabled | False — thanks is always served |
 | Backend / Printify needed for Buy | False — Buy is static config + Shopify handoff only |

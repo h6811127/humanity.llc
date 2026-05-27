@@ -499,6 +499,10 @@ Goal: complete one real paid order path safely.
 - Manual production approval gate.
 - Cancel eligible orders.
 
+**Shipped (partial):** queue + operator submit + webhook status + Tier 1 template env mapping — see [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Shipped vs spec gap.
+
+**Remaining:** per-order **artwork upload** (`POST /v1/uploads/images.json`) attached to Printify line items on submit — required for unique QR on fabric/sticker at scale (current `printify-client.ts` submits product/variant only).
+
 **Exit criteria:**
 
 - Printify token never reaches browser.
