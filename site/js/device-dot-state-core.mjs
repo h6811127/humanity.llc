@@ -341,6 +341,27 @@ export function shellChromeStatusLineFromSegments(segments) {
     .join(" · ");
 }
 
+/**
+ * Hub header status uses one calm inline line. Network is the primary read,
+ * counts are metadata, and actionable states keep alert weight.
+ * @param {Array<{ id: string, label?: string, chipLabel?: string, detail?: string, zero?: boolean, highlight?: boolean, chipTone?: string }>} segments
+ */
+export function hubStatusLineItemsFromSegments(segments) {
+  return segments.map((seg) => {
+    const emphasis =
+      seg.id === "network" ? "primary" : seg.highlight ? "alert" : "meta";
+    return {
+      id: seg.id,
+      label: seg.chipLabel ?? seg.label ?? "",
+      detail: seg.detail ?? "",
+      zero: Boolean(seg.zero),
+      highlight: Boolean(seg.highlight),
+      tone: seg.chipTone ?? (seg.highlight ? "highlight" : "neutral"),
+      emphasis,
+    };
+  });
+}
+
 export function dotClassList(network, device, overlay) {
   return [
     `pass-dot-status-network-${network}`,
