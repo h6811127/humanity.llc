@@ -150,6 +150,12 @@ describe("device-emphasis-card-html", () => {
       /#created-vouch-return-banner\.hc-emphasis-card[\s\S]*justify-content:\s*flex-start/
     );
     expect(styles).toMatch(
+      /#create-public-card-notice\.hc-emphasis-card[\s\S]*justify-content:\s*flex-start/
+    );
+    expect(styles).toMatch(
+      /#create-public-card-notice\.hc-emphasis-card \.hc-emphasis-card__main[\s\S]*flex:\s*none/
+    );
+    expect(styles).toMatch(
       /#no-session\.hc-emphasis-card \.hc-emphasis-card__main[\s\S]*flex:\s*none/
     );
   });
@@ -194,10 +200,15 @@ describe("device-emphasis-card-html", () => {
   });
 
   it("shell pages bust styles and theme-dark for emphasis alignment", () => {
-    for (const page of ["site/wallet/index.html", "site/create/index.html", "site/created/index.html"]) {
+    const stylesBust = {
+      "site/wallet/index.html": "126",
+      "site/create/index.html": "127",
+      "site/created/index.html": "127",
+    };
+    for (const [page, v] of Object.entries(stylesBust)) {
       const html = readFileSync(join(root, page), "utf8");
       expect(html).toContain('href="/css/hc-emphasis-card.css?v=4"');
-      expect(html).toContain("styles.css?v=126");
+      expect(html).toContain(`styles.css?v=${v}`);
       expect(html).toContain("theme-dark.css?v=28");
       expect(html).toContain("device-shell.css?v=56");
       expect(html).toContain('id="shell-status-line"');

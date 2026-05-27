@@ -125,7 +125,7 @@ Prioritized follow-ups after Phases 0–5. Full tier tables: [`UI_COLOR_SCHEME_S
 |------|---------|----------|-------|
 | Hub keys custody | `#device-keys-custody-hub` (`device-keys-custody.mjs` `--hub`) | `--info` | **Shipped** — emphasis card + secondary Acknowledge; **compact** stacked spacing ([`KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md`](KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md)) |
 | Wallet keys custody | `#device-keys-custody-wallet` (`--wallet`) | `--info` | **Shipped** — same as hub + help/import foot; compact spacing |
-| Compact custody strip | `device-keys-custody--compact` | `--warn` | **Shipped** — `keysCustodyHtml("compact")` + compact CSS; **not mounted** in production (hub/wallet only) |
+| Compact custody strip | `#create-public-card-notice` on `/create/` | `--warn` | **Shipped** — compact F3 stacked CSS; `keysCustodyHtml("compact")` helper unused in production |
 | Hub cross-tab slot | `#device-hub-crosstab-notice` | `--info` / `--warn` | **Shipped** — emphasis card + pill CTAs (matches page/wallet cross-tab) |
 | Vouch return | `#created-vouch-return-banner` | `--active` | **Shipped** — post-vouch continuity; green active dot + primary CTA |
 

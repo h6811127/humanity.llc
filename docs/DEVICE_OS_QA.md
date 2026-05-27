@@ -234,6 +234,7 @@ Spec: [`KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md`](KEYS_CUSTODY_EMPHA
 | 3 | Tap **Acknowledge** on wallet or hub | Card removed; `localStorage.hc_keys_custody_notice_dismissed === "1"`; reload — notice stays hidden |
 | 4 | `localStorage.hc_theme = "dark"`; reload `/wallet/` + hub | Blue eyebrow + readable detail on dark shell; glass/hairline card still visible (not flat rim) |
 | 5 | Safari iOS | `npm run e2e:keys-custody:webkit`; optional physical device spot-check if WebKit CI fails |
+| 6 | `/created/?fresh=1` (unsaved keys; reset dismiss + `hc_auto_save_device=0` if testing) | Warn **Keys on this device** card above save strip; compact padding; **Acknowledge** dismisses |
 
 **Fail signals:** Large gap between detail and **Acknowledge**; card stretches to sheet height; dismiss does not persist; dark mode gray-on-gray eyebrow/detail.
 

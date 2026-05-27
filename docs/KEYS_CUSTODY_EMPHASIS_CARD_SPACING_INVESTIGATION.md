@@ -1,6 +1,6 @@
 # Keys custody emphasis card — excessive vertical spacing
 
-**Status:** **Closed** (May 2026) — steps 1–17; CI WebKit custody e2e; regression via `npm run worker:test:keys-custody` and `npm run e2e:keys-custody`  
+**Status:** **Closed** (May 2026) — steps 1–18; CI WebKit custody e2e; regression via `npm run worker:test:keys-custody` and `npm run e2e:keys-custody`  
 **Surface:** `#device-keys-custody-hub`, `#device-keys-custody-wallet`, `device-keys-custody--created`, `device-keys-custody--compact`  
 **Canonical spacing:** [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) § Internal spacing ladder · F3 stacked layout
 
@@ -108,11 +108,11 @@ Same root cause as keys custody: column `hc-emphasis-card` without F3 stacked la
 | `hub` | `#device-keys-custody-hub` · `landing-device-hub.mjs` | **Yes** |
 | `wallet` | `#device-keys-custody-wallet` · `wallet-page.mjs` | **Yes** |
 | `created` | `#device-keys-custody-created-setup` · `created-setup.mjs` (setup save step, unsaved keys) | **Yes** (step 17) |
-| `compact` | `keysCustodyHtml("compact")` — no mount | HTML/CSS only |
+| `compact` | `#create-public-card-notice` on `/create/` (static warn card; same compact F3) | **Yes** (step 18) — `device-keys-custody--compact` HTML not mounted |
 
-Spacing/CSS for all variants is covered by `.device-keys-custody.hc-emphasis-card` (Vitest). **`compact`** mount on `/create/` remains optional product work.
+Spacing/CSS for hub/wallet/created custody uses `.device-keys-custody.hc-emphasis-card`; create uses `#create-public-card-notice` in the same compact stacked block.
 
-**No further engineering steps** after 17. **14d** (physical iPhone) remains operator-optional.
+**No further engineering steps** after 18. **14d** (physical iPhone) remains operator-optional.
 
 ---
 
@@ -123,3 +123,14 @@ Spacing/CSS for all variants is covered by `.device-keys-custody.hc-emphasis-car
 | 17a | Mount `created` variant in setup wizard save panel | `created-setup.mjs` · `#device-keys-custody-created-setup` | **Shipped** |
 | 17b | Hide when wallet saved or global custody dismiss | `syncSetupKeysCustody()` | **Shipped** |
 | 17c | E2E: `fresh=1` setup shows warn custody card above keys strip | `e2e/device-os-wallet.spec.ts` | **Shipped** |
+
+---
+
+## Create compact parity (step 18)
+
+| Step | Action | Status |
+|------|--------|--------|
+| 18a | Compact F3 stacked layout on `#create-public-card-notice` (create warn card) | `site/styles.css` | **Shipped** |
+| 18b | Vitest guard for `flex-start` + `flex: none` on create notice | `device-emphasis-card-html.test.ts` | **Shipped** |
+| 18c | `styles.css?v=` bump on `/create/` | `site/create/index.html` | **Shipped** |
+| 18d | P1-KC runbook: `/created/?fresh=1` setup custody card | [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) | **Shipped** |
