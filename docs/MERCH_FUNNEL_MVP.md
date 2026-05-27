@@ -203,6 +203,7 @@ Aggregate metrics only — no PII. Allowed refs:
 | Shopify webhook + Worker Printify secrets | ☐ Operator |
 | Per-order Printify artwork upload on submit | ✅ Shipped (PR #63) |
 | Printify blueprint/provider env for Tier 1 submit | ☐ Operator |
+| Buyer order status on `/shop/thanks/` (O-003) | ✅ Shipped (PR #66) |
 | Physical print QA sign-off | ☐ Operator — [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) |
 | Founding drop / lifecycle gates | ☐ Operator — [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) |
 
