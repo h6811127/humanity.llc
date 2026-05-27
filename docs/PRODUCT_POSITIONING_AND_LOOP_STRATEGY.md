@@ -104,6 +104,17 @@ Calm footer on lost-item relay scan template only — link to `/create/?template
 
 **Exit:** `worker/tests/lost-item-relay-loop-scorecard.test.ts`; field notes from exported summaries.
 
+### Step 8 — Manifesto showcase exit verification ✅
+
+**Shipped (local / CI):**
+
+- `worker/tests/manifesto-showcase-exit.test.ts` — showcase JSON ↔ M5 fixture alignment; status JSON `public_snapshot` for plate + live object
+- `npm run worker:test:manifesto-showcase-exit` — bundles M5 showcase path tests + site data checks
+
+**Ops (production resolver):**
+
+- After re-seed: `API_ORIGIN=https://humanity.llc npm run site:verify-showcase` — live `GET …/status` checks for `object_streams` + `public_snapshot`
+
 ---
 
 ## Related

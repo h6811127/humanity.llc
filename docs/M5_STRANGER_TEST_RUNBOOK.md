@@ -37,7 +37,8 @@ curl -sS "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status?q=QR" | jq
     - Status plate: `site/data/showcase-status-plate.json` - `npm run site:seed-showcase`
     - Live object: `site/data/showcase-live-object.json` - `npm run site:seed-showcase-live-object`
     - Lost item relay: `site/data/showcase-lost-item.json` - `npm run site:seed-showcase-lost-item`
-    - CI fixtures: `worker/tests/scan-m5-showcase-paths.test.ts`, `worker/tests/site-showcase-data.test.ts`
+    - CI fixtures: `worker/tests/scan-m5-showcase-paths.test.ts`, `worker/tests/site-showcase-data.test.ts`, `worker/tests/manifesto-showcase-exit.test.ts`
+    - After re-seed on production: `API_ORIGIN=https://humanity.llc npm run site:verify-showcase`
 
 **Deploy check:** scan response header `X-HC-Scan-UI: pass-v31` (or later) on an active scan.
 
