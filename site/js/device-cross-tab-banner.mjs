@@ -19,6 +19,7 @@ import { inboxItemsIncludeKind } from "./device-hub-inbox-alerts.mjs";
 import { actOnOtherTabKeys, walletEntryForProfile } from "./device-notice-nav.mjs";
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
 import { getCrossTabScanSnapshot } from "./device-cross-tab-state.mjs";
+import { hasUnifiedHubKeysCustodyPanel } from "./device-hub-keys-custody.mjs";
 import {
   emphasisCardActionsHtml,
   emphasisCardBodyHtml,
@@ -240,6 +241,10 @@ function renderHubOrphanRemovedNotice() {
 
 function renderHubCrossTabNotice() {
   if (!hubSlot) return;
+  if (hasUnifiedHubKeysCustodyPanel()) {
+    clearHubCrossTabNotice();
+    return;
+  }
   if (renderHubOrphanRemovedNotice()) {
     return;
   }

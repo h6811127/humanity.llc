@@ -9,7 +9,7 @@
     <title>humanity.llc</title>
     <meta
       name="description"
-      content="Physical objects with programmable social state. Scan a tag or card for live active or revoked status. Optional, revocable, no scan tracking."
+      content="Public programmable objects. Live, revocable status on physical tags — browser-native. No scan tracking."
     />
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light dark" />
@@ -27,13 +27,13 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=4" />
-    <link rel="stylesheet" href="/styles.css?v=126" />
+    <link rel="stylesheet" href="/styles.css?v=127" />
     <link rel="stylesheet" href="/css/device-shell.css?v=56" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=28" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
-      content="Live public objects. Not identity, not social media. Scan and see current state."
+      content="Public programmable objects. Live, revocable status on physical tags — browser-native. No scan tracking."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://humanity.llc" />
@@ -157,7 +157,12 @@
 
           <h2 class="device-hub-title" id="device-hub-title">This browser</h2>
           <p class="device-hub-lead">Saved in this browser - cards, keys, and pins you choose to keep here.</p>
-          <div id="device-keys-custody-hub"></div>
+          <section
+            class="device-hub-section device-hub-keys-custody-section"
+            id="device-hub-keys-custody"
+            aria-labelledby="device-hub-keys-custody-title"
+            hidden
+          ></section>
           <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint">
             Nothing saved yet? After create, tap <strong>Save control key</strong> on your
             <a href="/created/">card page</a>. Until then, keys exist only in that tab.
@@ -304,7 +309,7 @@
       <main class="screen screen-landing">
         <section class="hero hero-tight" data-landing-tutorial>
           <h1>
-            <span class="hero-headline-kicker">A network OS for physical objects</span>
+            <span class="hero-headline-kicker">Public programmable objects</span>
             Live state<br />on real objects.
           </h1>
           <p class="hero-tagline">

@@ -15,6 +15,7 @@ import { initHubBackupImport } from "./device-hub-import.mjs";
 import { mountThemeToggles } from "./device-theme.mjs";
 import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs";
 import { renderHubInboxAlerts, inboxItemsIncludeKind } from "./device-hub-inbox-alerts.mjs";
+import { renderHubKeysCustodyPanel } from "./device-hub-keys-custody.mjs";
 import { getInboxItems, notificationCount } from "./device-inbox.mjs";
 import {
   buildHubCardControls,
@@ -788,6 +789,7 @@ async function fetchAndApplyNetworkChips(opts = {}) {
 }
 
 function syncHubInboxAlertGroups() {
+  renderHubKeysCustodyPanel();
   renderHubInboxAlerts({
     noticeGroup,
     liveControlGroup,

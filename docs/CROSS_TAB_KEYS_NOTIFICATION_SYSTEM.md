@@ -2,7 +2,7 @@
 
 **Status:** Spec (canonical) - Phases 1–6 shipped ([`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md))  
 **Audience:** Product, frontend  
-**Related:** [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`DEVICE_OS.md`](DEVICE_OS.md) § Cross-tab keys · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md) · [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md)
+**Related:** [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`DEVICE_OS.md`](DEVICE_OS.md) § Cross-tab keys · [`KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md`](KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md) · [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md) · [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md)
 
 ---
 
@@ -40,7 +40,7 @@ flowchart TB
   subgraph chrome [Chrome surfaces - read snapshot only]
     BADGE["#shell-notif-badge"]
     DOT["Status dot overlay cross_tab_keys"]
-    HUB["#device-hub-crosstab-notice"]
+    HUB["#device-hub-keys-custody"]
     GLANCE["Glance / hub alerts"]
     SHEET["Inbox sheet rows"]
     BANNER["#device-cross-tab-banner legacy"]
@@ -248,7 +248,9 @@ CTAs: **Open that tab** · **Open controls here** (when wallet has keys) · **Cl
 | `site/js/scan-tab-keys.mjs` | Scan page presence + coordinator bootstrap |
 | `site/js/device-inbox-core.mjs` | `buildInboxItems`, `buildInboxSheetRows` |
 | `site/js/device-cross-tab-visibility.mjs` | `tabNoticeCount` gate |
-| `site/js/device-cross-tab-banner.mjs` | Hub slot, legacy banner, scan |
+| `site/js/device-hub-keys-custody-core.mjs` | Pure hub custody panel rows |
+| `site/js/device-hub-keys-custody.mjs` | Unified hub custody render |
+| `site/js/device-cross-tab-banner.mjs` | Legacy hub slot, page banner, scan |
 | `site/js/device-notice-nav.mjs` | `actOnOtherTabKeys` |
 | `site/js/device-orphan-keys-nav.mjs` | Orphan clear / focus |
 | `site/js/device-wallet-removed-profiles.mjs` | Denylist |

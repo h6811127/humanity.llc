@@ -101,7 +101,7 @@ export function buildInboxItems(input) {
       count: crossTabCount,
       title: "Keys in another tab",
       subtitle: extra > 0 ? `${label} (+${extra} more)` : label,
-      hubScrollTarget: "device-hub-crosstab-notice",
+      hubScrollTarget: "device-hub-keys-custody",
       meta: { crossTabEntry: entry, crossTabExtra: extra },
     });
   }
@@ -128,7 +128,7 @@ export function buildInboxItems(input) {
         extra > 0
           ? `${ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX} · ${label} (+${extra} more)`
           : `${ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX} · ${label}`,
-      hubScrollTarget: "device-hub-crosstab-notice",
+      hubScrollTarget: "device-hub-keys-custody",
       meta: { crossTabEntry: entry, crossTabExtra: extra },
     });
   }
@@ -140,7 +140,7 @@ export function buildInboxItems(input) {
       count: tabNoticeCount,
       title: "Keys in this tab · save",
       subtitle: tabSessionLabel,
-      hubScrollTarget: "device-hub-notice-group",
+      hubScrollTarget: "device-hub-keys-custody",
     });
   }
 
