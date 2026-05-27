@@ -61,7 +61,7 @@ function assertKeysCustodyLayout(metrics: CustodyLayoutMetrics) {
   expect(metrics.appearance).toBe("none");
   expect(metrics.detailToAckGapPx ?? 999).toBeGreaterThan(0);
   expect(metrics.detailToAckGapPx ?? 999).toBeLessThan(56);
-  expect(metrics.ackHeight ?? 0).toBeGreaterThanOrEqual(32);
+  expect(metrics.ackHeight ?? 0).toBeGreaterThanOrEqual(44);
   expect(metrics.ackWidth ?? 0).toBeGreaterThanOrEqual(44);
 }
 

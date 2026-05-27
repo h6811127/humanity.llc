@@ -54,5 +54,8 @@ describe("device-keys-custody-html", () => {
     expect(styles).toMatch(
       /\.device-keys-custody\.hc-emphasis-card \.hc-emphasis-card__cta--secondary[\s\S]*min-height:\s*44px/
     );
+
+    const emphasis = readFileSync(join(root, "site/css/hc-emphasis-card.css"), "utf8");
+    expect(emphasis).toContain("prefers-reduced-transparency: reduce");
   });
 });

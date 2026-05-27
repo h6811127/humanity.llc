@@ -1,6 +1,6 @@
 # Keys custody emphasis card — excessive vertical spacing
 
-**Status:** **Complete** (May 2026) — steps 1–13; automated QA in Vitest + e2e; manual sign-off via [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-KC**  
+**Status:** **Closed** (May 2026) — steps 1–14; full regression via `npm run worker:test:keys-custody` and `npm run e2e:keys-custody`  
 **Surface:** `#device-keys-custody-hub`, `#device-keys-custody-wallet`, `device-keys-custody--created`, `device-keys-custody--compact`  
 **Canonical spacing:** [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) § Internal spacing ladder · F3 stacked layout
 
@@ -70,4 +70,15 @@ Same root cause as keys custody: column `hc-emphasis-card` without F3 stacked la
 | 13a | Runbook: **P1-KC** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) | Manual checklist | **Shipped** |
 | 13b | E2E: Acknowledge dismiss persists; dark theme readable on wallet custody | `e2e/device-os-wallet.spec.ts` | **Shipped** |
 | 13c | WebKit regression: wallet + hub custody compact layout and Acknowledge styling | `e2e/keys-custody-emphasis-webkit.spec.ts` (webkit + iphone-13-pro) | **Shipped** |
-| 13d | Optional operator spot-check on physical iPhone | [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) P1-KC step 5 | As needed |
+| 13d | iPhone 13 Pro project (same spec as 13c) | `npm run e2e:keys-custody:webkit` | **Shipped** |
+
+---
+
+## Closeout (step 14)
+
+| Step | Action | Status |
+|------|--------|--------|
+| 14a | Bundle Vitest: `npm run worker:test:keys-custody` | **Shipped** |
+| 14b | Bundle e2e: `npm run e2e:keys-custody` (chromium custody tests) | **Shipped** |
+| 14c | `prefers-reduced-transparency` opaque fallback on `.hc-emphasis-card` | `device-emphasis-card-html.test.ts` (phase B CSS guard) | **Shipped** |
+| 14d | Optional physical iPhone spot-check | Operator — only if WebKit CI fails or UX doubt | As needed |
