@@ -15,11 +15,11 @@ import { initQrExtend } from "./created-qr-extend.mjs";
 import { inferPilotTemplate, parseManifestoDisplay } from "./manifesto-display.mjs";
 import { createdLiveProofPollShouldRun, liveProofPanelMostlyVisible, shouldScrollLiveProofPanelIntoView } from "./created-live-proof-poll-core.mjs";
 import { initCreatedTabs } from "./created-tabs.mjs";
-import { initCreatedDashboard } from "./created-dashboard.mjs?v=5";
+import { initCreatedDashboard } from "./created-dashboard.mjs?v=6";
 import {
   markFirstRevokeDone,
   syncUpdateStatusTaskGate,
-} from "./created-first-revoke-gate.mjs";
+} from "./created-first-revoke-gate.mjs?v=2";
 import { initCreatedDeviceSave } from "./created-device-save.mjs";
 import { markSetupDone, modeFromPage } from "./created-mode.mjs";
 import { initCreatedSetup } from "./created-setup.mjs";
@@ -890,6 +890,7 @@ function setupCreatedDashboard() {
       return href && href.startsWith("http") ? href : null;
     },
     getProfileId: () => profileId,
+    getSession: loadSession,
     hasSigningKeys: () => !!currentSigningKeys(),
   });
 }
@@ -931,7 +932,7 @@ if (workspaceMode === "setup" && profileId && activeQrId) {
   if (session?.revoke_state?.target_kind) {
     markFirstRevokeDone(profileId);
   }
-  syncUpdateStatusTaskGate(profileId);
+  syncUpdateStatusTaskGate(profileId, session);
 }
 
 if (activeScanUrl) {
@@ -1004,6 +1005,7 @@ async function bootstrapOwnerTools() {
   } catch (err) {
     console.error(err);
   }
+  syncUpdateStatusTaskGate(profileId, loadSession());
   void refreshNetworkStatus();
 
   const revokeCtx = {
@@ -1017,7 +1019,7 @@ async function bootstrapOwnerTools() {
       revealOwnerActions();
       if (kind === "qr_credential" || kind === "card") {
         markFirstRevokeDone(profileId);
-        syncUpdateStatusTaskGate(profileId);
+        syncUpdateStatusTaskGate(profileId, loadSession());
       }
       if (openScanBtn && activeScanUrl) {
         openScanBtn.textContent = "Scan again (see revoked state)";

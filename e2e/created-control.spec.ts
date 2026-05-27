@@ -152,6 +152,36 @@ test.describe("/created/ control mode (Live · Manage)", () => {
     await expect(page.locator("#manifesto-update-panel")).toHaveCount(0);
   });
 
+  test("status plate exposes scanner copy update before revoke", async ({ page }) => {
+    await page.addInitScript((sample) => {
+      const session = {
+        profile_id: sample.profile_id,
+        qr_id: sample.qr_id,
+        handle: sample.handle,
+        manifesto_line: "Studio door\nOpen until 9 PM",
+        created_at: "2026-05-25T12:00:00.000Z",
+        pilot_template: "status_plate",
+        scan_url: sample.scan_url,
+        owner_public_key_b58: sample.owner_public_key_b58,
+        owner_private_key_b58: sample.owner_private_key_b58,
+      };
+      sessionStorage.setItem("hc_created", JSON.stringify(session));
+      localStorage.setItem(
+        "hc_wallet",
+        JSON.stringify([{ id: "e2e_status_plate", label: "Studio door", ...session }])
+      );
+    }, SAMPLE);
+
+    await page.goto(`/created/?profile_id=${SAMPLE.profile_id}&qr_id=${SAMPLE.qr_id}`);
+
+    await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
+    await expect(page.locator("#created-live-scanners-see")).toBeVisible();
+    await expect(page.locator("#created-scanners-see-gate-hint")).toBeHidden();
+    await expect(page.locator("#update-fields-status-plate")).toBeVisible();
+    await expect(page.locator("#update-object-label")).toHaveValue("Studio door");
+    await expect(page.locator("#update-status-line")).toHaveValue("Open until 9 PM");
+  });
+
   test("#revoke deep link opens Manage revoke panel", async ({ page }) => {
     await page.goto(
       `/created/?profile_id=${SAMPLE.profile_id}&qr_id=${SAMPLE.qr_id}#revoke`

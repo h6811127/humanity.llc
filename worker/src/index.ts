@@ -560,9 +560,13 @@ export default {
     );
     if (cardMatch && request.method === "GET") {
       if (!env.DB) {
-        return jsonResponse({ error: "database_unconfigured" }, 503);
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
       }
-      return handleGetCard(env.DB, cardMatch[1]!, request);
+      const res = await handleGetCard(env.DB, cardMatch[1]!, request);
+      return withCors(request, res);
     }
 
     const scanOutMatch = path.match(/^\/c\/([^/]+)\/out$/);

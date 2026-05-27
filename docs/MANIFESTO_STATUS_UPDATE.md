@@ -91,7 +91,7 @@ Deep link: `/created/?profile_id=…&qr_id=…`  -  hydrates handle/manifesto fr
 | Status plate scan shows updated line 2 | ✅ `update-card.test.ts` |
 | Recovery key may sign update | ✅ `update-card.test.ts` |
 
-**Owner UX:** **Update status** on Tasks stays hidden until first in-session QR or card revoke (`site/js/created-first-revoke-gate.mjs`; `worker/tests/created-first-revoke-gate.test.ts`).
+**Owner UX:** **Update status** stays hidden for general cards until first in-session QR or card revoke. Status plate and lost-item relay pilots show it immediately so field testers can update live object copy before revoke (`site/js/created-first-revoke-gate.mjs`; `worker/tests/created-first-revoke-gate.test.ts`).
 
 ---
 
