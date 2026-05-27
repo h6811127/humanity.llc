@@ -276,15 +276,17 @@ Same class as P0-1 for users landing without params; may redirect to `/wallet/` 
 | ID | Scenario | Tool |
 |----|----------|------|
 | S1 | Incognito: `/` → create → close tab without save → reopen `/` | Manual + P0-1 doc |
-| S2 | Incognito: bogus `/created/?profile_id=` | Manual |
-| S3 | Two tabs: create in B, hub in A | `DEVICE_OS_QA.md` P0-1 |
-| S4 | Import corrupt `.hcbackup` on `/wallet/` | Manual |
-| S5 | Pin `not-a-valid-url` on wallet | Manual |
-| S6 | Revoke without keys on `/created/#revoke` | Manual |
-| S7 | `Ask for live proof` without owner keys | Two devices |
-| S8 | After P0-2 fix: hub rows vs `GET …/status` `scan.kind` | DevTools |
+| S2 | Incognito: bogus `/created/?profile_id=` | **Automated:** `e2e/production-sad-path-created.spec.ts` |
+| S3 | Two tabs: create in B, hub in A | `DEVICE_OS_QA.md` P0-1 · `e2e/device-cross-tab-keys.spec.ts` |
+| S4 | Import corrupt `.hcbackup` on `/wallet/` | **Automated:** `worker/tests/key-backup-import.test.ts` |
+| S5 | Pin `not-a-valid-url` on wallet | **Automated:** `worker/tests/device-pins.test.ts` |
+| S6 | Revoke without keys on `/created/#revoke` | **Automated:** `e2e/production-sad-path-created.spec.ts` |
+| S7 | `Ask for live proof` without owner keys | Two devices (manual) |
+| S8 | After P0-2 fix: hub rows vs `GET …/status` `scan.kind` | DevTools · `npm run worker:test:card-disabled-since-visit` |
 
 Automated regression already documented in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) and AGENTS.md status-dot / cross-tab suites.
+
+**Status (2026-05-26):** S2, S4–S6 unit/e2e coverage added; S1, S7–S8 remain manual.
 
 ---
 
@@ -303,4 +305,5 @@ Automated regression already documented in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) 
 
 ## Changelog
 
+- **2026-05-26:** Test matrix S2/S4–S6 automated (`production-sad-path-created.spec.ts`, `device-pins.test.ts`, `key-backup-import.test.ts`).
 - **2026-05-26:** Initial production sad-path pass (browser + curl).
