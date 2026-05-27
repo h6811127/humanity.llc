@@ -1,6 +1,6 @@
 # Hub sheet visual refresh
 
-**Status:** Phases 1–5 shipped (May 2026) · Phase 6 docs + regression (this file)  
+**Status:** Phases 1–6 shipped (May 2026)  
 **Scope:** Bottom-sheet hub on `/`, `/create/`, `/created/`; wallet page reuses the same saved-items blocks  
 **Companions:** [`HUB_CARD_3D_AND_SHEET_GLASS.md`](HUB_CARD_3D_AND_SHEET_GLASS.md) · [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md) · [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) · [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md)
 
@@ -17,7 +17,7 @@ The open hub read as a **solid white slab** with a generic grey toolbar wedged u
 | Rule | Implementation |
 |------|----------------|
 | **Glass on inset groups, not sheet blur budget** | Hub sheet uses `--surface-popover-bg-glass` gradient fill + `--shell-blur` on the sheet chrome only. Row and alert cards use `--hc-emphasis-card-backdrop` on **nested** surfaces. Vitest forbids regressing sheet-level emphasis blur on `.device-hub--sheet`. |
-| **Semantic card tiers** | **Info** glass — saved rows, inline search. **Warn** glass — Monitoring toolbar. **Urgent** emphasis — live proof waiting group. |
+| **Semantic card tiers** | **Info** glass — saved rows, inline search. **Warn** glass — Monitoring toolbar + card-disabled-since-visit group. **Urgent** emphasis — live proof waiting group. |
 | **Red budget** | Brand red reserved for **Create** (section pill), **Prove live** (`.hub-card-control--primary`), and primary CTAs elsewhere. **Open controls** (`.hub-use-keys`) uses `--surface-popover-control-bg` — not brand red. |
 | **Status hierarchy** | Hub header status chips = canonical network summary. Monitoring card status line complements (**Network checked …** / **Live proof checked …**). Saved rows use unified **checked** recency line — not duplicate pills. |
 | **Reduced transparency** | Sheet, rows, Monitoring, and live-proof waiting cards fall back to opaque fills; backdrop blur disabled (`prefers-reduced-transparency`, coarse pointer). |
@@ -86,6 +86,7 @@ Replaced gold section label + plain list with **`hc-emphasis-card--urgent`** car
 │  **Saved in this browser** (sheet title, `/` + `/create/`) │
 │  #device-hub-alerts-top (cross-tab, disabled, …)        │
 │  #device-hub-live-control-group (urgent card, if pending)│
+│  #device-hub-card-disabled-group (warn card, if since-visit)│
 │  search (info glass)                                     │
 │  ── Saved items ──────────────────────── [ + New ]      │
 │  section lead (one line policy copy)                     │
@@ -97,9 +98,18 @@ Replaced gold section label + plain list with **`hc-emphasis-card--urgent`** car
 
 ---
 
+### Phase 6 — Card disabled since visit group
+
+Replaced red **Disabled since your last visit** label + plain list with **`hc-emphasis-card--warn`** card (same anatomy as live proof waiting).
+
+- **Markup:** `site/index.html`, `site/create/index.html`, `site/wallet/index.html`.
+- **Copy:** `site/js/device-hub-inbox-alerts.mjs` — dynamic eyebrow/summary from entry count.
+- **CSS:** shared alert-card row styling with `.device-hub-live-control-card` in `site/css/device-shell.css`.
+
+---
+
 ## Out of scope (follow-ups)
 
-- `#device-hub-card-disabled-group` emphasis-card alignment (still legacy notice styling).
 - Monitoring eyebrow switching to urgent when live proof pending (optional; skipped).
 
 ---

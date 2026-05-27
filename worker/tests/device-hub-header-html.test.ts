@@ -49,6 +49,23 @@ describe("device hub sheet header", () => {
     }
   });
 
+  it("wraps card-disabled alerts in warn emphasis card markup", () => {
+    const pages = [
+      "site/index.html",
+      "site/create/index.html",
+      "site/wallet/index.html",
+    ];
+    for (const path of pages) {
+      const html = readPage(path);
+      expect(html, path).toContain('id="device-hub-card-disabled-group"');
+      expect(html, path).toContain("device-hub-card-disabled-card");
+      expect(html, path).toContain("hc-emphasis-card--warn");
+      expect(html, path).not.toMatch(
+        /id="device-hub-card-disabled-group"[\s\S]*device-hub-group-label/
+      );
+    }
+  });
+
   it("renders the status header as a primary line with subordinate counts", () => {
     const src = readPage("site/js/device-status.mjs");
     const css = readPage("site/css/device-shell.css");

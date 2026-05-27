@@ -1425,10 +1425,6 @@ a.hub-card-menu-item {
 }
 
 
-#device-hub-card-disabled-group .device-hub-group-label {
-  color: var(--red, #b91c1c);
-}
-
 .device-live-control-row .device-live-control-open {
   width: 100%;
 }
@@ -7677,6 +7673,22 @@ body[data-created-mode="setup"] #created-setup-keys-mount .flow-keys-panel {
 
 .created-status-plate-loop-lead[data-met="true"] {
   color: var(--text-secondary, #475569);
+}
+
+.created-status-plate-loop[data-closed="true"] {
+  border-color: var(--hc-emphasis-card-border-success, rgba(34, 197, 94, 0.35));
+  background: var(--hc-emphasis-card-fill-success-glass, rgba(34, 197, 94, 0.08));
+}
+
+.created-status-plate-loop-lead[data-closed="true"] {
+  color: var(--text-primary, #0f172a);
+  font-weight: 600;
+}
+
+.created-status-plate-loop-export {
+  margin-top: 10px;
+  width: 100%;
+  font-size: 14px;
 }
 
 .created-status-plate-loop-meta {

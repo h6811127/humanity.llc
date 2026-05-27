@@ -32,7 +32,7 @@ describe("device-emphasis-card-html", () => {
   it("landing index busts styles.css cache when spacing changes", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain('href="/css/hc-emphasis-card.css?v=4"');
-    expect(html).toContain("styles.css?v=126");
+    expect(html).toContain("styles.css?v=128");
   });
 
   it("landing final CTA uses urgent emphasis card and standard CTA", () => {
@@ -201,16 +201,16 @@ describe("device-emphasis-card-html", () => {
 
   it("shell pages bust styles and theme-dark for emphasis alignment", () => {
     const stylesBust = {
-      "site/wallet/index.html": "126",
-      "site/create/index.html": "127",
-      "site/created/index.html": "127",
+      "site/wallet/index.html": "128",
+      "site/create/index.html": "128",
+      "site/created/index.html": "128",
     };
     for (const [page, v] of Object.entries(stylesBust)) {
       const html = readFileSync(join(root, page), "utf8");
       expect(html).toContain('href="/css/hc-emphasis-card.css?v=4"');
       expect(html).toContain(`styles.css?v=${v}`);
       expect(html).toContain("theme-dark.css?v=28");
-      expect(html).toContain("device-shell.css?v=57");
+      expect(html).toContain("device-shell.css?v=58");
       expect(html).toContain('id="shell-status-line"');
       expect(html).toContain("device-status-bootstrap.mjs?v=45");
     }

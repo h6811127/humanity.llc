@@ -19,8 +19,8 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=4" />
-    <link rel="stylesheet" href="/styles.css?v=126" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=57" />
+    <link rel="stylesheet" href="/styles.css?v=128" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=58" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=28" />
   </head>
   <body class="page-wallet has-shell-chrome">
@@ -99,13 +99,22 @@
             </div>
           </div>
           <div
-            class="device-hub-group"
+            class="device-hub-group device-hub-alert-card"
             id="device-hub-card-disabled-group"
             hidden
             data-hub-group="card-disabled"
+            role="status"
           >
-            <p class="device-hub-group-label">Disabled since your last visit</p>
-            <ul class="list list-compact" id="device-hub-card-disabled-list"></ul>
+            <div class="hc-emphasis-card hc-emphasis-card--warn device-hub-card-disabled-card">
+              <div class="hc-emphasis-card__main">
+                <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
+                <div class="hc-emphasis-card__copy">
+                  <p class="hc-emphasis-card__eyebrow" id="device-hub-card-disabled-eyebrow">Disabled since your last visit</p>
+                  <p class="hc-emphasis-card__detail" id="device-hub-card-disabled-summary" hidden></p>
+                </div>
+              </div>
+              <ul class="list list-compact device-hub-card-disabled-list" id="device-hub-card-disabled-list"></ul>
+            </div>
           </div>
         </div>
 

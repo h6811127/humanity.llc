@@ -73,6 +73,22 @@ function cardDisabledEntriesFromItems(items) {
 
 /**
  * @param {HTMLElement | null} group
+ */
+function resetCardDisabledHubSummary(group) {
+  if (!group) return;
+  const summaryEl = group.querySelector("#device-hub-card-disabled-summary");
+  const eyebrowEl = group.querySelector("#device-hub-card-disabled-eyebrow");
+  if (summaryEl instanceof HTMLElement) {
+    summaryEl.textContent = "";
+    summaryEl.hidden = true;
+  }
+  if (eyebrowEl instanceof HTMLElement) {
+    eyebrowEl.textContent = "Disabled since your last visit";
+  }
+}
+
+/**
+ * @param {HTMLElement | null} group
  * @param {HTMLElement | null} list
  * @param {boolean} show
  * @param {import("./device-inbox-core.mjs").InboxItem[]} items
@@ -86,17 +102,33 @@ function renderCardDisabledHubGroup(group, list, show, items) {
   list.innerHTML = "";
   if (!show) {
     group.hidden = true;
+    resetCardDisabledHubSummary(group);
     return;
   }
 
   const entries = cardDisabledEntriesFromItems(items);
   if (entries.length === 0) {
     group.hidden = true;
+    resetCardDisabledHubSummary(group);
     return;
   }
 
   group.hidden = false;
   const sub = CARD_DISABLED_SINCE_VISIT_ALERT_TEXT;
+  const eyebrowEl = group.querySelector("#device-hub-card-disabled-eyebrow");
+  const summaryEl = group.querySelector("#device-hub-card-disabled-summary");
+  const n = entries.length;
+  if (eyebrowEl instanceof HTMLElement) {
+    eyebrowEl.textContent =
+      n === 1 ? "Disabled since your last visit" : `${n} cards disabled since your last visit`;
+  }
+  if (summaryEl instanceof HTMLElement) {
+    summaryEl.textContent =
+      n === 1
+        ? "This card was disabled on the network since your last visit. Tap below to review."
+        : `${n} cards were disabled on the network since your last visit. Tap one below to review.`;
+    summaryEl.hidden = false;
+  }
 
   for (const card of entries) {
     const label = inboxWalletEntryLabel(card);

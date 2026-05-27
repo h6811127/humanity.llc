@@ -222,6 +222,12 @@ describe("UI color scheme popover guard", () => {
       require: ["--surface-popover-control-bg"],
       forbid: ["var(--red)"],
     });
+    assertGuardedRule("site/css/device-shell.css", ".device-hub-card-disabled-card .device-hub-card-disabled-open", {
+      require: ["--surface-popover-control-bg", "--surface-popover-border"],
+    });
+    assertGuardedRule("site/css/device-shell.css", ".device-hub-card-disabled-card.hc-emphasis-card", {
+      require: ["flex-direction: column"],
+    });
     assertGuardedRule("site/css/device-shell.css", ".device-inbox-sheet", {
       require: [
         "--surface-popover-bg-glass",
