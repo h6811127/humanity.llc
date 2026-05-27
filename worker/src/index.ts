@@ -46,6 +46,7 @@ import {
   handleGetStewardPush,
   handlePostStewardSession,
 } from "./resolver/steward-hosted";
+import { handleGetStewardOpsSnapshot } from "./resolver/steward-ops";
 import { handlePostBillingWebhook } from "./http/billing-webhook";
 import { handlePostShopifyOrdersWebhook } from "./http/shopify-orders-webhook";
 import {
@@ -180,6 +181,24 @@ export default {
         return jsonResponse({ error: "database_unconfigured" }, 503);
       }
       return handlePostBillingWebhook(request, env, env.DB);
+    }
+    if (
+      path === "/.well-known/hc/v1/operator/steward-ops" &&
+      request.method === "GET"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetStewardOpsSnapshot(
+        request,
+        env,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
     }
 
     if (

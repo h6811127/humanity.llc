@@ -1,6 +1,6 @@
 # Hosted tier — implementation epics (M8)
 
-**Status:** **E1 + E5 foundation staging** (behind `HOSTED_STEWARD_ENABLED`; E2 client probe wired; E4 push in E4 epic)  
+**Status:** **E1–E6 foundation staging** (behind `HOSTED_STEWARD_ENABLED`; E6 ops snapshot + runbook started)  
 **Milestone:** M8 of [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md)  
 **Depends on:** M2–M7 complete; **M4 governance sign-off** before E1 merge to production  
 **Audience:** Engineering, ops
@@ -283,6 +283,16 @@ flowchart LR
 | E6.3 | Runbook: suspend `status`, 1027, fair-use 429, downgrade |
 | E6.4 | Support doc: link M5 FAQ for customer-facing answers |
 
+### Deliverables status (2026-05-27)
+
+| # | Item | Status |
+|---|------|--------|
+| E6.1 | Ops metrics snapshot | **Staging** — `GET /.well-known/hc/v1/operator/steward-ops` exposes account, session, usage, and in-memory SSE counts behind `OPERATOR_AUDIT_TOKEN` |
+| E6.1 | Cloudflare dashboard | Pending external dashboard setup |
+| E6.2 | Daily alert | Pending alerting provider; snapshot carries soft/hard thresholds |
+| E6.3 | Runbook | **Staging** — `docs/HOSTED_STEWARD_OPS_RUNBOOK.md` |
+| E6.4 | Support doc link | **Staging** — runbook directs customer-facing language to `docs/SKEPTIC_FAQ.md` |
+
 ### Exit tests
 
 - Runbook reviewed by ops
@@ -348,3 +358,4 @@ flowchart LR
 |------|------|
 | 2026-05-26 | **E1 foundation:** migration `0012_steward_hosted.sql`, steward routes behind `HOSTED_STEWARD_ENABLED` |
 | 2026-05-26 | M8 initial implementation epics (planning only) |
+| 2026-05-27 | **E6 start:** operator steward ops snapshot + hosted ops runbook |
