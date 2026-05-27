@@ -35,6 +35,7 @@ Principles:
 | `site/js/device-counts.mjs` | System status segment copy |
 | `site/js/device-status.mjs` | Status dot + inbox badge |
 | `docs/DEVICE_INBOX.md` | Inbox + background alerts spec |
+| `docs/PWA_INSTALL.md` | Add to Home Screen / install (shell pages only) |
 | `site/scan-pass.css` | Scan page (run `npm run worker:bundle-scan` after edits) |
 
 ---

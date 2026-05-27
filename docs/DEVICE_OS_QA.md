@@ -290,6 +290,30 @@ Automated: `e2e/device-status-dot.spec.ts` § hub sheet header chrome (steps 4�
 
 Automated: `e2e/device-status-dot.spec.ts` § hub sheet header chrome (steps 6–7); Vitest `device-hub-header-html.test.ts`.
 
+### P1-PWA · PWA install (device shell)
+
+**Spec:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · **Implementation:** [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md)
+
+**Prerequisites:** At least one card saved on device (`hc_wallet` non-empty). Phase 1+ manifest on disk.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Open `/c/…` scan URL (showcase or test card) | **No** `#device-pwa-install-card`; **no** install prompt |
+| 2 | Open `/create/` | **No** install card (flow page) |
+| 3 | Open `/` with saved cards (Chromium desktop) | After ~1s, install emphasis card may appear if `beforeinstallprompt` fired |
+| 4 | Tap **Install** (Chromium) | Native install sheet; after install, card hidden |
+| 5 | Dismiss install card | Hidden; `localStorage.hc_pwa_install_dismissed_at` set |
+| 6 | Reload within 7 days | Card stays hidden (snooze) |
+| 7 | Tab A: keys on `/created/` · Tab B: open installed PWA or second window on `/` | Cross-tab inbox / custody applies — not blocked by install UX ([`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md)) |
+| 8 | Trigger orphan or cross-tab inbox item | Install card **hidden** while urgent inbox kind active |
+| 9 | iOS Safari `/wallet/` with saved cards | Manual **Add to Home Screen** copy only — no fake Install button |
+| 10 | Standalone (installed) mode | No install card; hub dot and inbox still work (**P0-3**) |
+| 11 | Simulate status load failure (`data-device-status-error`) | No install card; fix status graph first |
+
+**Fail signals:** Install prompt on scan; install card with zero saved cards; install card over orphan inbox; dead status dot after adding PWA module to status graph.
+
+Automated (Phase 0+): `npm run worker:test -- worker/tests/pwa-install-metadata.test.ts worker/tests/pwa-install-ux.test.ts` · Phase 3: `e2e/device-pwa-install.spec.ts`.
+
 ### P1-8 · Hosted tier budget (Phase 10 — E2 staging)
 
 **Status:** E2 client probe staging; production enablement still waits on M4 sign-off and rollout gates. Spec: [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) · build order: [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md).

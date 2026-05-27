@@ -63,6 +63,8 @@ On scan pages, `#scan-page-dot` should show the `cross_tab_keys` overlay when th
 
 Full inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md). This doc owns **cross-tab / orphan** only.
 
+**Installed PWA windows:** An Add to Home Screen instance is a **separate browsing context** with the same `localStorage` profile. It heartbeats presence like any other visible tab. Install UX must defer when urgent inbox kinds are active — [`PWA_INSTALL.md`](PWA_INSTALL.md).
+
 ---
 
 ## Presence protocol

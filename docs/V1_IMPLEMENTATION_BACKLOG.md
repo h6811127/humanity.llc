@@ -588,6 +588,24 @@ Goal: make the vertical slice credible for public launch.
 - Bootstrap governance key fingerprints and sunset criteria are public.
 - Forbidden claims list is published internally for launch copy review.
 
+### H-006: PWA Install (device shell)
+
+**Spec:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · **Implementation:** [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md)
+
+**Must verify (after Phases 1–3 ship):**
+
+- Manifest and icons deploy on Pages; shell HTML links manifest on `/`, `/wallet/`, `/created/` only.
+- Scan and create flows never show install UX.
+- Returning stewards (≥1 saved card) may see dismissible install card when inbox is not urgent.
+- Installed standalone mode: hub, dot, and inbox still pass **P0-3** and **P2-1**.
+- No service worker registered (v1).
+- Vitest + **P1-PWA** pass.
+
+**Exit criteria:**
+
+- Phase table in `PWA_INSTALL.md` marked Phases 1–3 shipped.
+- `npm run worker:test:pwa-install` green.
+
 ### H-005: Growth Loop Readiness
 
 **Must verify:**

@@ -131,6 +131,7 @@ npm run pages:dev
 - Do **not** use `DEVICE_SHELL_ASSET_VERSION` as the release version — bump it only for shell graph cache bust ([`AGENTS.md`](../AGENTS.md)).
 - Do **not** put a prominent version string on the public landing for end users.
 - Do **not** assume Worker deploy updated `/create/` or shell JS — that requires Pages deploy.
+- Do **not** register a PWA service worker that caches shell JS without `DEVICE_SHELL_ASSET_VERSION` in the cache key — see [`PWA_INSTALL.md`](PWA_INSTALL.md) § Caching (v1 ships **without** SW).
 
 ## Tests
 

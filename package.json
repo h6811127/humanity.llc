@@ -49,6 +49,7 @@
     "e2e:keys-custody": "playwright test e2e/device-os-wallet.spec.ts -g \"keys custody\" e2e/keys-custody-emphasis-webkit.spec.ts",
     "e2e:keys-custody:webkit": "playwright test e2e/keys-custody-emphasis-webkit.spec.ts --project=webkit --project=iphone-13-pro",
     "worker:test:keys-custody": "vitest run worker/tests/device-keys-custody-html.test.ts worker/tests/device-keys-custody-core.test.ts worker/tests/device-emphasis-card-html.test.ts",
+    "worker:test:pwa-install": "vitest run worker/tests/pwa-install-metadata.test.ts worker/tests/pwa-install-ux.test.ts",
     "site:generate-scan-e2e-fixture": "tsx worker/scripts/generate-scan-e2e-fixture.ts",
     "site:vendor-qr": "esbuild node_modules/qrcode/lib/browser.js --bundle --format=esm --platform=browser --outfile=site/js/vendor/qrcode.mjs",
     "site:seed-showcase": "node worker/scripts/seed-showcase-status-plate.mjs",
