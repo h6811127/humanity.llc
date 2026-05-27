@@ -321,7 +321,7 @@ function readValidatedCreateInput() {
   }
   const { manifesto, pilotTemplate } = buildManifestoLine();
   return {
-    handle: handleResult.normalized,
+    handle: validation.handle,
     manifesto,
     pilotTemplate,
     wantRecovery: document.getElementById("generate-recovery")?.checked ?? true,
