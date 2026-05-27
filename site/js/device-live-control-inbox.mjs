@@ -114,6 +114,8 @@ const pollSlots = new Map();
 
 let roundRobinCursor = 0;
 let pollSyncInFlight = false;
+/** Tracks SSE push suppressing auto poll so we restart the loop when push drops. */
+let stewardPushWasSuppressingAutoPoll = false;
 let lastLiveProofCheckAt = 0;
 
 export const LIVE_PROOF_CHECKED_EVENT = "hc-live-proof-checked";
@@ -534,6 +536,7 @@ export function syncLiveControlInboxPolling() {
 
   if (pollTimer == null) {
     if (pollSyncInFlight) return;
+    if (!readPollLoopShouldRun()) return;
     pollSyncInFlight = true;
     void refreshLiveControlInbox().finally(() => {
       pollSyncInFlight = false;
@@ -574,6 +577,11 @@ function bindLiveControlPollScopeListeners() {
   });
 
   window.addEventListener(STEWARD_PUSH_STATE_CHANGED, () => {
+    const suppressing = stewardPushSuppressesAutoPoll();
+    if (stewardPushWasSuppressingAutoPoll && !suppressing) {
+      clearPollTimer();
+    }
+    stewardPushWasSuppressingAutoPoll = suppressing;
     syncLiveControlInboxPolling();
     void syncLiveProofServiceWorkerState();
   });
@@ -599,6 +607,7 @@ function bindLiveControlPollScopeListeners() {
  */
 export function enableLiveControlInboxPolling() {
   pollFeatureEnabled = true;
+  stewardPushWasSuppressingAutoPoll = stewardPushSuppressesAutoPoll();
   initStewardPushClient();
   bindLiveControlPollScopeListeners();
   bindLiveControlPollLeaderSnapshot(applyLiveControlInboxSnapshot);

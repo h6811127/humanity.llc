@@ -1,6 +1,6 @@
 # Keys custody and notification improvement plan
 
-**Status:** Phase 1 shipped (unified hub panel) · Phases 2–7 planned  
+**Status:** Phases 1–2 shipped (unified hub panel, badge/glance semantics) · Phases 3–7 planned  
 **Audience:** Product, engineering  
 **Related:** [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md)
 
@@ -125,13 +125,33 @@ Users think in **custody**. Notifications answer: **“Do I need to do something
 
 **Code:** `device-hub-keys-custody-core.mjs`, `device-hub-keys-custody.mjs`
 
-### Phase 2 — Badge and dot semantics
+### Phase 2 — Badge and dot semantics ✅
 
-Clearer ARIA/tooltip breakdown; glance copy aligned with per-tab rows; keep dot overlay priority stack.
+Clearer ARIA/tooltip breakdown; glance copy aligned with per-tab custody rows; dot overlay priority stack unchanged.
 
-### Phase 3 — Richer inbox kinds
+| Subpoint | Detail |
+|----------|--------|
+| **ARIA / tooltip** | `inboxBadgeAriaLabel(items, ctx)` includes total count + per-tab labels; `inboxBadgeTitle()` on `#shell-notif-badge` |
+| **Glance copy** | `expandInboxItemsForChrome()` + `buildGlanceRowPlan()` one row per cross-tab/orphan tab |
+| **Dot overlay** | Unchanged — `proof_waiting` → `cross_tab_keys` → `card_disabled_since_visit` |
 
-Open decisions: post-save presence ping; remove-from-device clear-everywhere confirm; multi-tab unsaved kind.
+**Code:** `device-inbox-core.mjs` (`expandInboxItemsForChrome`, `inboxBadgeTitle`), `device-status.mjs`, `device-hub-glance.mjs`
+
+### Phase 3 — Richer inbox kinds ✅
+
+| Decision | Shipped approach |
+|----------|------------------|
+| **Post-save presence ping** | `drop-profile-presence` on `hc-tab-keys-custody` — presence-only; session keys stay until tab closes |
+| **Remove from device** | Optional second confirm → `clear-profile-keys` broadcast when other tabs still heartbeat |
+| **Multi-tab unsaved** | Inbox kind `other_tabs_unsaved_keys` when ≥2 other tabs (single tab stays `cross_tab_keys`) |
+
+| Subpoint | Detail |
+|----------|--------|
+| **Save hook** | `notifyWalletProfileSaved()` → `hc-profile-saved-on-device` → `notifyProfileSavedOnDevice()` |
+| **Remove hook** | `offerClearOtherTabKeysOnRemove()` in hub + wallet remove flows |
+| **Chrome** | Glance/sheet/badge expand multi-tab aggregate to per-tab rows; dot overlay unchanged |
+
+**Code:** `device-tab-presence.mjs`, `device-wallet.mjs`, `device-inbox-core.mjs`, `device-notice-nav.mjs`, `device-hub-ui.mjs`, `card-wallet.mjs`
 
 ### Phase 4 — Proactive custody
 

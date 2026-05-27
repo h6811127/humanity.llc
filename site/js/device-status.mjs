@@ -13,9 +13,11 @@ import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
 import {
+  gatherInboxInput,
   getInboxItems,
   getInboxDotOverlay,
   inboxBadgeAriaLabel,
+  inboxBadgeTitle,
   inboxBadgeChromaClass,
   inboxBadgeChromaClassNames,
   inboxBadgeChromaKind,
@@ -433,8 +435,12 @@ function renderNotifBadge() {
   if (!notifBtn) return;
   const items = getInboxItems();
   const n = inboxCountFromItems(items);
+  const ctx = gatherInboxInput();
   notifBtn.hidden = n === 0;
-  notifBtn.setAttribute("aria-label", inboxBadgeAriaLabel(items));
+  notifBtn.setAttribute("aria-label", inboxBadgeAriaLabel(items, ctx));
+  const title = inboxBadgeTitle(items, ctx);
+  if (title) notifBtn.setAttribute("title", title);
+  else notifBtn.removeAttribute("title");
   notifBtn.classList.remove(...inboxBadgeChromaClassNames());
   const chroma = inboxBadgeChromaKind(items);
   notifBtn.classList.add(inboxBadgeChromaClass(chroma));
@@ -446,6 +452,7 @@ function renderNotifBadge() {
 
 const INBOX_HUB_TARGETS = new Set([
   "device-hub-live-control-group",
+  "device-hub-keys-custody",
   "device-hub-notice-group",
   "device-hub-crosstab-notice",
 ]);

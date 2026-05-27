@@ -255,6 +255,19 @@ Removed May 2026. See [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md). 
 
 See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 
+### P1-9 · Hub sheet visual refresh (May 2026)
+
+**Spec:** [`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md)
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Open hub on `/` in light + dark | Frosted sheet; page content subtly visible through sheet; row copy readable |
+| 2 | Expand saved-items section | **Monitoring** warn card with segmented checks + watch toggle; status line below eyebrow |
+| 3 | Trigger live proof waiting (inbox pending) | Urgent emphasis card at top of alerts — not gold section label; rows inside card |
+| 4 | Saved row | Tier-3 info glass row; object-type left accent; unified **checked** status line |
+| 5 | `prefers-reduced-transparency: reduce` | Sheet + inset cards opaque; no blur jank |
+| 6 | Tap **+ New** in saved-items header | Navigates to `/create/`; Create not in top status rail |
+
 ### P1-8 · Hosted tier budget (Phase 10 — E2 staging)
 
 **Status:** E2 client probe staging; production enablement still waits on M4 sign-off and rollout gates. Spec: [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) · build order: [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md).

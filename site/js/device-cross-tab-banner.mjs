@@ -103,7 +103,11 @@ function labelForPresence(entry) {
 function shouldShowCrossTabNotice() {
   if (shouldShowOrphanHubNotice()) return false;
   if (document.getElementById("shell-notif-badge")) {
-    return inboxItemsIncludeKind(getInboxItems(), "cross_tab_keys");
+    const items = getInboxItems();
+    return (
+      inboxItemsIncludeKind(items, "cross_tab_keys") ||
+      inboxItemsIncludeKind(items, "other_tabs_unsaved_keys")
+    );
   }
   return gatherInboxInput().crossTabEntries.length > 0;
 }

@@ -92,6 +92,7 @@ Full inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md). This doc owns **cross
 |---------|---------|--------|
 | `hc-tab-focus` | `{ type: "focus", tabId }` | Target tab `window.focus()` |
 | `hc-tab-keys-custody` | `{ type: "clear-profile-keys", profile_id }` | Matching tab clears `hc_created` + presence |
+| `hc-tab-keys-custody` | `{ type: "drop-profile-presence", profile_id }` | All tabs drop presence rows only (post-save ping; keys stay) |
 
 ---
 
@@ -99,7 +100,8 @@ Full inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md). This doc owns **cross
 
 | `kind` | When | Badge | Dot overlay | OS alert |
 |--------|------|-------|-------------|----------|
-| `cross_tab_keys` | Other tabs hold keys for profiles **not** saved on this device and **not** on remove denylist | Sum of other-tab count | `cross_tab_keys` (below `proof_waiting`) | No |
+| `cross_tab_keys` | **One** other tab holds keys for profiles **not** saved on this device and **not** on remove denylist | Sum of other-tab count | `cross_tab_keys` (below `proof_waiting`) | No |
+| `other_tabs_unsaved_keys` | **Two or more** other tabs (same filters as `cross_tab_keys`) | Same | Same | No |
 | `orphan_keys_removed` | Other tabs heartbeat keys for profiles on **remove denylist** | Same blue chroma | Same notch family | No |
 | `tab_keys_unsaved` | This tab has unsaved `hc_created` | Yes | Device axis `unsaved` (mutually excludes cross-tab UI) | No |
 

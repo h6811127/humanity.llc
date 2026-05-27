@@ -21,6 +21,8 @@ import {
   buildHubCardControls,
   partitionHubCardControls,
 } from "./device-hub-controls-core.mjs";
+import { applyHubControlPlainLabels } from "./pilot-steward-copy.mjs";
+import { inferPilotTemplate } from "./manifesto-display.mjs";
 import {
   activateWalletEntry,
   getTabSession,
@@ -67,6 +69,7 @@ import {
 } from "./device-hub-card-row-core.mjs";
 import { humanTrustIconMeta, isEligibleVoucherState } from "./human-trust-ui.mjs";
 import { purgePresenceForProfile } from "./device-tab-presence.mjs";
+import { offerClearOtherTabKeysOnRemove } from "./device-notice-nav.mjs";
 import { markProfileRemovedFromDevice } from "./device-wallet-removed-profiles.mjs";
 import {
   clearDefaultVouchIfProfile,
@@ -898,13 +901,19 @@ function renderSavedRows(opts = {}) {
   for (const entry of entries) {
     const li = document.createElement("li");
     const objectType = classifyObjectType(entry);
-    const cardControls = buildHubCardControls({
-      hasKeys: !!entry.owner_private_key_b58,
-      pendingLiveProof: !!liveControlPendingForEntry(entry),
-      scanKind: hubConfig.fetchNetworkStatus
-        ? getCachedNetworkScanKind(entry.profile_id)
-        : null,
-    });
+    const pilotTemplate =
+      entry.pilot_template ||
+      (entry.manifesto_line ? inferPilotTemplate(String(entry.manifesto_line)) : "general");
+    const cardControls = applyHubControlPlainLabels(
+      buildHubCardControls({
+        hasKeys: !!entry.owner_private_key_b58,
+        pendingLiveProof: !!liveControlPendingForEntry(entry),
+        scanKind: hubConfig.fetchNetworkStatus
+          ? getCachedNetworkScanKind(entry.profile_id)
+          : null,
+      }),
+      pilotTemplate
+    );
     const { inline: inlineControls, menu: menuControls } =
       partitionHubCardControls(cardControls);
     li.className = `hub-card-item hub-card-item--${objectType.tone}${
@@ -1177,6 +1186,7 @@ function renderSavedRows(opts = {}) {
       if (entry?.profile_id) {
         markProfileRemovedFromDevice(entry.profile_id);
         purgePresenceForProfile(entry.profile_id);
+        offerClearOtherTabKeysOnRemove(entry.profile_id);
         clearSignLock(entry.profile_id);
         clearWalletNetworkTruthForProfile(entry.profile_id);
         logDeviceActivity("remove_card", entry.label, {

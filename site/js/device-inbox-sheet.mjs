@@ -191,7 +191,7 @@ function rowIconSvg(kind) {
   if (kind === "live_proof") {
     return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="M12 18v4"/><circle cx="12" cy="12" r="4"/></svg>`;
   }
-  if (kind === "cross_tab_keys" || kind === "orphan_keys_removed") {
+  if (kind === "cross_tab_keys" || kind === "other_tabs_unsaved_keys" || kind === "orphan_keys_removed") {
     return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>`;
   }
   if (kind === "card_disabled_since_visit") {
@@ -241,7 +241,10 @@ export function renderInboxSheet() {
         openLiveControlProof(row.proofItem);
         return;
       }
-      if (row.kind === "cross_tab_keys" && row.crossTabEntry) {
+      if (
+        (row.kind === "cross_tab_keys" || row.kind === "other_tabs_unsaved_keys") &&
+        row.crossTabEntry
+      ) {
         logInboxDiagnostic({
           type: "inbox_item_action",
           kind: row.kind,
