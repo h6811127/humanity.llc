@@ -259,13 +259,13 @@ When `"0"`: behavior matches today (per-tab session cache).
 
 - [x] Toggle in `site/index.html` + `device-resolver-sync-prefs.mjs` (homepage `/` only)
 - [x] Subtitle reflects on/off
-- [ ] Manual “Refresh all tabs” row — **deferred**; hub **Check network** already broadcasts to open tabs
+- [x] Manual **Refresh all tabs** row on homepage Shortcuts (`device-resolver-refresh-all-tabs` → `refreshResolverChecksFromHub`)
 
 ### Phase 3 — Unified poll leader (optional refactor)
 
 - [x] Live-control snapshots on **`hc-resolver-sync`** (`live-control-snapshot`; one listener in `initResolverTabSync`)
 - [x] Shared leader lock unchanged (`hc_live_control_poll_leader`)
-- [ ] Retire `hc-live-control-poll-leader` channel entirely (removed from broadcaster; no dual-post)
+- [x] Retire `hc-live-control-poll-leader` channel (broadcast/listen only on `hc-resolver-sync`)
 
 ### Phase 4 — Hosted push (future)
 

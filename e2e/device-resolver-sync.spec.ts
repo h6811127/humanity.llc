@@ -238,6 +238,56 @@ test.describe("device resolver tab sync (phase 1a)", () => {
     await pageFollower.close();
   });
 
+  test("Refresh all tabs on landing broadcasts network snapshot to follower", async ({
+    context,
+  }) => {
+    const followerCounter = createStatusCounter();
+    const leaderCounter = createStatusCounter();
+
+    const pageFollower = await openFollowerLanding(context, followerCounter, { syncEnabled: true });
+    await waitForShellReady(pageFollower);
+    const pageLeader = await openFollowerLanding(context, leaderCounter, { syncEnabled: true });
+    await waitForShellReady(pageLeader);
+
+    const refreshBtn = pageLeader.locator("#device-resolver-refresh-all-tabs");
+    await refreshBtn.scrollIntoViewIfNeeded();
+    await refreshBtn.click({ timeout: 15_000 });
+
+    await expect
+      .poll(() => leaderCounter.get(), { timeout: 20_000 })
+      .toBeGreaterThanOrEqual(1);
+
+    await expect
+      .poll(
+        async () =>
+          pageFollower.evaluate((pid) => {
+            try {
+              const raw = sessionStorage.getItem("hc_wallet_network_cache");
+              if (!raw) return false;
+              const map = JSON.parse(raw);
+              return map[pid]?.status === "active";
+            } catch {
+              return false;
+            }
+          }, WALLET_ENTRY.profile_id),
+        { timeout: 10_000 }
+      )
+      .toBe(true);
+
+    followerCounter.reset();
+    await pageFollower.bringToFront();
+    await expandHub(pageFollower);
+
+    await expect(pageFollower.locator(".hub-card-status-label").first()).toContainText(
+      "Reachable",
+      { timeout: 15_000 }
+    );
+    expect(followerCounter.get()).toBe(0);
+
+    await pageLeader.close();
+    await pageFollower.close();
+  });
+
   test("landing toggle off disables cross-tab sync pref", async ({ context }) => {
     const page = await context.newPage();
     await seedResolverSyncStorage(page, true);

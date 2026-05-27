@@ -872,6 +872,19 @@ async function fetchAndApplyNetworkChips(opts = {}) {
   );
 }
 
+/** Manual Shortcuts action: one leader check, then broadcast to open tabs. @see docs/DEVICE_TAB_RESOLVER_SYNC.md § Manual refresh */
+export async function refreshResolverChecksFromHub() {
+  if (hubConfig.fetchNetworkStatus) {
+    const wallet = loadWallet();
+    if (wallet.length > 0) {
+      await fetchAndApplyNetworkChips({ manual: true });
+    }
+  }
+  if (hubConfig.showLiveControlInbox) {
+    await checkLiveProofNow();
+  }
+}
+
 function syncHubInboxAlertGroups() {
   renderHubKeysCustodyPanel();
   renderHubInboxAlerts({
