@@ -10,7 +10,7 @@ import {
   ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX,
   ORPHAN_KEYS_INBOX_TITLE,
 } from "./device-orphan-keys-nav-core.mjs";
-import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=34";
+import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=45";
 
 /** @typedef {'live_proof' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'orphan_keys_removed' | 'card_disabled_since_visit'} InboxKind */
 
