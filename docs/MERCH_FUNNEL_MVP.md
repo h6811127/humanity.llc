@@ -12,7 +12,7 @@ Ordered work after repo review. Update row status as steps complete. Cross-links
 
 | Priority | Work | Type | Status |
 |----------|------|------|--------|
-| **1** | **Merch funnel close-out** — scan → `/shop/customize/` (`scan_customize` ref + CTA); enable Tier 1 in `shop-config.json`; prove one paid personalized order (intent → webhook → mint → Printify submit) | Engineering + operator | **In progress** — scan CTA ✅ · post-create → customize ✅ · operator config + paid E2E remain |
+| **1** | **Merch funnel close-out** — scan → `/shop/customize/` (`scan_customize` ref + CTA); enable Tier 1 in `shop-config.json`; prove one paid personalized order (intent → webhook → mint → Printify submit) | Engineering + operator | **In progress** — engineering ✅ (Vitest + E2E checkout stub) · **operator:** `merch-funnel:verify-config` → paste variant URLs · live Shopify + Printify submit |
 | **2** | **Phase A trust MVP** — run M5 stranger runbook (3 outsiders, unassisted create → scan → revoke) | Validation | ☐ |
 | **3** | **Hosted steward production rollout** — `hosted:rollout:step*` through step 6 (secrets, flag, CF dashboard, regression) | Ops | ☐ |
 | **4** | **AI P1 product decision** — keep / rename / deterministic-only / remove scan reader (no new L3 user features until Phase A) | Product | ☐ |
@@ -127,10 +127,11 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
 }
 ```
 
-4. Deploy Pages. `/shop/customize/` shows **Continue to checkout** when card session exists and `checkout_open` is true.
-5. **Deploy Worker** — `npm run worker:deploy` — `humanity.llc/v1/*` must route to the resolver (else artifact intent returns 405).
-6. Run [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) gates before live payments.
-7. **Apparel QA:** physical scan test on printed hoodie ([`V1_ASSUMPTION_REGISTER.md`](V1_ASSUMPTION_REGISTER.md) A-004).
+4. Verify config locally: `npm run merch-funnel:verify-config` (use `--require-checkout` in CI when enabling payments).
+5. Deploy Pages. `/shop/customize/` shows **Continue to checkout** when card session exists and `checkout_open` is true.
+6. **Deploy Worker** — `npm run worker:deploy` — `humanity.llc/v1/*` must route to the resolver (else artifact intent returns 405).
+7. Run [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) gates before live payments.
+8. **Apparel QA:** physical scan test on printed hoodie ([`V1_ASSUMPTION_REGISTER.md`](V1_ASSUMPTION_REGISTER.md) A-004).
 
 ### Worker route (required)
 
@@ -156,12 +157,14 @@ Aggregate metrics only — no PII. Allowed refs:
 
 | Step | Pass? |
 |------|-------|
-| Stranger scans campaign merch; profile loads with limits + customize CTA | ✅ scan hint · ☐ manual E2E |
-| Create card → `/shop/customize/` detects session | ✅ redirect + `loadCardSessionForCustomize` · ☐ manual E2E |
+| Stranger scans campaign merch; profile loads with limits + customize CTA | ✅ scan hint · ☐ manual stranger QA |
+| Create card → `/shop/customize/` detects session | ✅ redirect + E2E `e2e/merch-funnel-customize.spec.ts` |
 | Preview shows LIVE OBJECT branded QR on product mockup | ✅ UI |
 | Artifact intent created; attach returns Shopify line attributes | ✅ API tests |
 | Checkout URL includes `properties[artifact_intent_id]` | ✅ `shop-customize-core.test.ts` |
-| Paid webhook → Printify queue (operator env) | ☐ operator |
+| Paid webhook → print queue → mint planned QRs | ✅ `shopify-orders-webhook` + `merch-funnel-paid-mint-path` · ☐ live Printify submit |
+| Tier 1 `shop-config.json` ready | `npm run merch-funnel:verify-config` · ☐ operator paste variant URLs |
+| Checkout opens Shopify with `artifact_intent_id` | ✅ E2E stub · ☐ live Shopify test payment |
 | Printed item scans; bearer warning visible | ☐ physical QA |
 | Owner updates manifesto from phone without reprint | ✅ resolver |
 
@@ -174,6 +177,24 @@ Aggregate metrics only — no PII. Allowed refs:
 - In-browser native checkout
 - Game-master / city-scale AI
 - Scan analytics
+
+---
+
+## Tests
+
+```bash
+npm run worker:test:merch-funnel
+npm run merch-funnel:verify-config
+npm run e2e:merch-funnel
+```
+
+| Command | Covers |
+|---------|--------|
+| `worker:test:merch-funnel` | Ref helpers, config validation, customize core, paid webhook → print queue → mint |
+| `merch-funnel:verify-config` | Operator readiness of `site/data/shop-config.json` Tier 1 block |
+| `e2e:merch-funnel` | Create → customize (`merch-funnel-customize`); checkout handoff (`merch-funnel-checkout`) — stubs `__HC_E2E_SHOP_CONFIG__` + resolver `artifact-intents` on `:8787` |
+
+**E2E notes:** Customizer preview requires protocol-valid `profile_id` / `qr_id` (see `qr-scan-url-lock.mjs`). Playwright `page.route('**/v1/...')` does not match `http://127.0.0.1:8787/...` — use `/artifact-intents/` or start `worker:dev`. Cross-origin Shopify popups: assert `window.__HC_E2E_LAST_CHECKOUT_URL` (see `merch-funnel-checkout.spec.ts`).
 
 ---
 

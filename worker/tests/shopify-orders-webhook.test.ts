@@ -5,6 +5,7 @@ import type { CommerceOrderRow } from "../src/db/commerce-orders";
 import type { PrintOrderRow } from "../src/db/print-orders";
 import { handlePostShopifyOrdersWebhook } from "../src/http/shopify-orders-webhook";
 import type { Env } from "../src/index";
+import { DEFAULT_PRINT_TEMPLATE_ID } from "../src/print/print-catalog";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const INTENT = "ai_PaidWebhookTest01";
@@ -210,6 +211,7 @@ describe("Shopify orders webhook (O-001)", () => {
       hold_reason: string | null;
       duplicate: boolean;
       print_order_ids: string[];
+      fulfillment_mode: string;
     };
 
     expect(res.status).toBe(200);
@@ -217,10 +219,17 @@ describe("Shopify orders webhook (O-001)", () => {
     expect(json.artifact_intent_ids).toEqual([INTENT]);
     expect(json.hold_reason).toBeNull();
     expect(json.duplicate).toBe(false);
+    expect(json.fulfillment_mode).toBe("personalized");
     expect(json.print_order_ids).toHaveLength(1);
     expect(json.print_order_ids[0]).toMatch(/^po_/);
     expect(state.intents.get(INTENT)?.status).toBe("converted");
     expect(state.orders.size).toBe(1);
+
+    const printOrder = [...state.printOrders.values()][0];
+    expect(printOrder?.profile_id).toBe(PROFILE);
+    expect(printOrder?.template_id).toBe(DEFAULT_PRINT_TEMPLATE_ID);
+    expect(JSON.parse(printOrder!.planned_item_qr_ids_json)).toEqual(["qr_planned1"]);
+    expect(JSON.parse(printOrder!.print_artifact_ids_json)).toEqual(["pa_planned1"]);
   });
 
   it("holds order when artifact intent metadata is missing", async () => {

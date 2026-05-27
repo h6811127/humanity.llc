@@ -14,7 +14,7 @@ account_id = "6ad770a7c6336c0c13cfb2c88c2bf8da"
 # Then paste the returned database_id below.
 [[d1_databases]]
 binding = "DB"
-database_name = "humanity-resolver"
+database_name =  "humanity-resolver"
 database_id = "f16391f9-613a-4506-9ad7-35d19178b8b6"
 migrations_dir = "migrations"
 preview_database_id = "f16391f9-613a-4506-9ad7-35d19178b8b6"
@@ -24,7 +24,7 @@ port = 8787
 
 [vars]
 # E1 staging: set to "1" locally to exercise steward routes; production off until M4 sign-off.
-HOSTED_STEWARD_ENABLED = "1"
+HOSTED_STEWARD_ENABLED = "0"
 # Tier 0 batch fulfillment (O-002): set when Shopify founding sticker SKU is live.
 # TIER0_CAMPAIGN_PROFILE_ID = ""
 # TIER0_SHOPIFY_VARIANT_IDS = ""
@@ -42,12 +42,13 @@ HOSTED_STEWARD_ENABLED = "1"
 [triggers]
 crons = ["0 4 * * *"]
 
+# L3 P1 — opt-in scan explainer (docs/AI_L3_EXPLAIN_SNAPSHOT.md)
+[ai]
+binding = "AI"
+
 [[routes]]
  pattern = "humanity.llc/.well-known/hc/v1/*"
  zone_id = "180ee38ceea795d281fb5a3bd51af533"
  [[routes]]
  pattern = "humanity.llc/c/*"
- zone_id = "180ee38ceea795d281fb5a3bd51af533"
-[[routes]]
- pattern = "humanity.llc/v1/*"
  zone_id = "180ee38ceea795d281fb5a3bd51af533"
