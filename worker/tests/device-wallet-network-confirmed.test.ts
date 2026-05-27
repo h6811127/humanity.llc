@@ -1,7 +1,11 @@
 import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
 
 import { resolverJsonResponse } from "./helpers/resolver-fetch-response.mjs";
-import { resetWalletNetworkTruth } from "../../site/js/device-wallet-network-truth.mjs";
+import {
+  resetWalletNetworkTruth,
+  setWalletNetworkTruthFromPoll,
+} from "../../site/js/device-wallet-network-truth.mjs";
+import { CARD_REVOKED_ALERT_STATE } from "../../site/js/wallet-network-baseline.mjs";
 
 vi.mock("../../site/js/hc-sign.mjs", () => ({
   getCardStatusUrl: (profileId, qrId) =>
@@ -183,6 +187,33 @@ describe("isResolverConfirmedProfile", () => {
 
     await refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }]);
 
+    expect(gatherCardDisabledSinceVisitForInbox()).toEqual([]);
+  });
+
+  it("partial poll demotes stale poll truth on cards not in this refresh tick", async () => {
+    localStore.set(
+      "hc_wallet",
+      JSON.stringify([
+        { id: "w1", profile_id: PROFILE_A, qr_id: QR_A, label: "A" },
+        { id: "w2", profile_id: PROFILE_B, qr_id: "qr_B", label: "B" },
+      ])
+    );
+    setWalletNetworkTruthFromPoll(PROFILE_B, {
+      chipStatus: "active",
+      scanKind: "card_revoked",
+      alertState: CARD_REVOKED_ALERT_STATE,
+    });
+    expect(
+      buildResolverConfirmedWalletPollMaps()?.alertStateMap[PROFILE_B]
+    ).toBe(CARD_REVOKED_ALERT_STATE);
+
+    vi.mocked(fetch).mockResolvedValueOnce(resolverJsonResponse(ACTIVE_BODY));
+    await refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }]);
+
+    expect(isResolverConfirmedProfile(PROFILE_B)).toBe(false);
+    expect(
+      buildResolverConfirmedWalletPollMaps()?.alertStateMap[PROFILE_B]
+    ).toBeUndefined();
     expect(gatherCardDisabledSinceVisitForInbox()).toEqual([]);
   });
 });

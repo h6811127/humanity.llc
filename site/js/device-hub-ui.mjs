@@ -459,7 +459,8 @@ function applyNetworkChipsToDom(
   statusMap = {},
   alertStateMap = null,
   scanKindMap = {},
-  resolverConfirmedMap = null
+  resolverConfirmedMap = null,
+  { allowBannerShow = false } = {}
 ) {
   if (!savedList) return;
   rememberWalletNetworkStatusMap(statusMap);
@@ -502,7 +503,9 @@ function applyNetworkChipsToDom(
       iconEl.innerHTML = meta.svg;
     }
   });
-  applyRevokedSinceVisitAlerts(statusMap, alertStateMap, scanKindMap, resolverConfirmedMap);
+  applyRevokedSinceVisitAlerts(statusMap, alertStateMap, scanKindMap, resolverConfirmedMap, {
+    allowShow: allowBannerShow,
+  });
 }
 
 /**
@@ -517,7 +520,7 @@ function applyRevokedSinceVisitAlerts(
   alertStateMap = null,
   scanKindMap = {},
   resolverConfirmedMap = null,
-  { allowShow = true } = {}
+  { allowShow = false } = {}
 ) {
   if (!savedList || !hubConfig.fetchNetworkStatus) return;
 
@@ -566,7 +569,13 @@ function applyRevokedSinceVisitAlerts(
       scanKind,
       resolverConfirmed
     );
-    if (show && allowShow) {
+    const truthAlert = getLatestResolvedAlertState(pid);
+    const truthKind = getLatestResolvedScanKind(pid);
+    const mapsAgreeOnRevoked =
+      String(scanKind || "").toLowerCase() === CARD_REVOKED_ALERT_STATE &&
+      String(truthKind || "").toLowerCase() === CARD_REVOKED_ALERT_STATE &&
+      normalizeBaselineState(truthAlert) === CARD_REVOKED_ALERT_STATE;
+    if (show && allowShow && mapsAgreeOnRevoked) {
       setRevokedSinceVisitAlertVisible(li, pid, true);
     } else {
       setRevokedSinceVisitAlertVisible(li, pid, false);
@@ -631,7 +640,11 @@ function applyCachedNetworkChipsOnly() {
   applyNetworkChipsToDom(
     Object.fromEntries(
       entries.map((e) => [e.profile_id, getCachedNetworkStatus(e.profile_id) ?? "checking"])
-    )
+    ),
+    null,
+    {},
+    null,
+    { allowBannerShow: false }
   );
 }
 
@@ -682,7 +695,11 @@ async function fetchAndApplyNetworkChips(opts = {}) {
   applyNetworkChipsToDom(
     Object.fromEntries(
       entries.map((e) => [e.profile_id, getCachedNetworkStatus(e.profile_id) ?? "checking"])
-    )
+    ),
+    null,
+    {},
+    null,
+    { allowBannerShow: false }
   );
 
   const staleEntries = listWalletEntriesNeedingNetworkFetch(entries);
@@ -731,7 +748,9 @@ async function fetchAndApplyNetworkChips(opts = {}) {
       resolverConfirmedMap,
     }) => {
       if (gen !== walletNetworkApplyGen) return;
-      applyNetworkChipsToDom(statusMap, alertStateMap, scanKindMap, resolverConfirmedMap);
+      applyNetworkChipsToDom(statusMap, alertStateMap, scanKindMap, resolverConfirmedMap, {
+        allowBannerShow: true,
+      });
       syncLastSeenFromNetworkMap(alertStateMap);
       const stored = loadWallet();
       let changed = false;

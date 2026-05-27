@@ -60,23 +60,45 @@ if (
   });
 }
 
+/** Strip poll authority for cards not in this refresh tick (large-wallet round-robin). */
+function demoteWalletNetworkTruthToCacheOnly(profileId) {
+  if (!profileId) return;
+  const entry = readCachedEntry(profileId);
+  if (entry) {
+    setWalletNetworkTruthFromCacheOnly(profileId, {
+      chipStatus: entry.status ?? "checking",
+      scanKind: entry.scanKind ?? null,
+    });
+  } else {
+    clearWalletNetworkTruthForProfile(profileId);
+  }
+}
+
 /**
- * @param {Array<{ profile_id?: string }>} entries
+ * @param {Array<{ profile_id?: string }>} entriesInPoll
  * @param {Record<string, string>} statusMap
  * @param {Record<string, string | null>} scanKindMap
  * @param {Set<string>} networkFetchedProfileIds
  * @param {Record<string, string>} resolverConfirmedAlertStateMap
  */
 function syncWalletNetworkTruthFromPoll(
-  entries,
+  entriesInPoll,
   statusMap,
   scanKindMap,
   networkFetchedProfileIds,
   resolverConfirmedAlertStateMap
 ) {
-  for (const entry of entries) {
+  const polledIds = new Set(
+    entriesInPoll.map((e) => e.profile_id).filter((pid) => typeof pid === "string" && pid)
+  );
+
+  for (const entry of loadWallet()) {
     const pid = entry.profile_id;
     if (!pid) continue;
+    if (!polledIds.has(pid)) {
+      demoteWalletNetworkTruthToCacheOnly(pid);
+      continue;
+    }
     const chipStatus = statusMap[pid] ?? "checking";
     const scanKind = scanKindMap[pid] ?? null;
     if (networkFetchedProfileIds.has(pid)) {
