@@ -206,6 +206,7 @@ Client budgets are necessary; they are **not** sufficient against bugs, old cach
 | Idea | Status | Notes |
 |------|--------|-------|
 | **Leader tab** (`BroadcastChannel`) | **Shipped** (Phase 7) | `device-live-control-poll-leader.mjs`; followers apply snapshot, no Worker GET |
+| **Resolver network tab sync** | **Planned** | [`DEVICE_TAB_RESOLVER_SYNC.md`](DEVICE_TAB_RESOLVER_SYNC.md) — share `GET …/status` results across tabs; followers skip duplicate polls |
 | SW only when browser alerts opted in | **Shipped** (Phase 4) | 15 min periodic minimum |
 | Poll only **active** or **recently used** cards | **Shipped** (Phase 8) | `selectLiveControlPollEntries` when wallet ≥10 cards |
 | **Per-tab/day auto-poll cap** | **Shipped** (Phase 7) | `hc_live_control_auto_poll_budget`; manual check exempt |
@@ -512,7 +513,7 @@ Every hub/inbox pass calls `loadWallet()` and `JSON.parse`s the full `hc_wallet`
 
 ### 3. Multi-tab presence (must fix)
 
-Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). That traffic is local-only (no Worker), but `storage` events drive `refreshDeviceChrome` on **all** tabs. **Must address:** debounce/coalesce with large wallets and many tabs; align with [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md). See [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md).
+Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). That traffic is local-only (no Worker), but `storage` events drive `refreshDeviceChrome` on **all** tabs. **Must address:** debounce/coalesce with large wallets and many tabs; align with [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md). See [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md). **Planned mitigation for duplicate status GETs:** [`DEVICE_TAB_RESOLVER_SYNC.md`](DEVICE_TAB_RESOLVER_SYNC.md).
 
 ---
 
