@@ -229,3 +229,48 @@ export async function submitPrintifyOrder(
     printify_shop_id: shopId,
   };
 }
+
+export interface PrintifyOrderFetchResult {
+  ok: true;
+  body: Record<string, unknown>;
+}
+
+export interface PrintifyOrderFetchError {
+  ok: false;
+  status?: number;
+}
+
+/** GET Printify order — reconciliation poll (PM-FR-33). */
+export async function fetchPrintifyOrder(
+  env: PrintifyEnv,
+  shopId: number,
+  printifyOrderId: string,
+  fetchImpl: typeof fetch = fetch
+): Promise<PrintifyOrderFetchResult | PrintifyOrderFetchError> {
+  if (!printifyConfigured(env)) {
+    return { ok: false };
+  }
+
+  const res = await fetchImpl(
+    `${PRINTIFY_API_BASE}/shops/${shopId}/orders/${printifyOrderId}.json`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${env.PRINTIFY_API_TOKEN!.trim()}`,
+        Accept: "application/json",
+      },
+    }
+  );
+
+  const text = await res.text();
+  if (!res.ok) {
+    return { ok: false, status: res.status };
+  }
+
+  try {
+    const body = JSON.parse(text) as Record<string, unknown>;
+    return { ok: true, body };
+  } catch {
+    return { ok: false, status: res.status };
+  }
+}
