@@ -39,9 +39,17 @@ describe("device-keys-custody-html", () => {
     expect(html).not.toContain("hc-notice--warning");
   });
 
-  it("styles stack all custody emphasis card variants", () => {
+  it("styles use compact stacked emphasis layout for custody cards", () => {
     const styles = readFileSync(join(root, "site/styles.css"), "utf8");
-    expect(styles).toMatch(/\.device-keys-custody\.hc-emphasis-card[\s\S]*flex-direction:\s*column/);
-    expect(styles).toContain("gap: var(--hc-emphasis-card-gap-section)");
+    expect(styles).toContain("--hc-emphasis-card-gap-section-compact: 12px");
+    expect(styles).toMatch(
+      /\.device-keys-custody\.hc-emphasis-card[\s\S]*gap:\s*var\(--hc-emphasis-card-gap-section-compact\)/
+    );
+    expect(styles).toMatch(
+      /\.device-keys-custody\.hc-emphasis-card[\s\S]*justify-content:\s*flex-start/
+    );
+    expect(styles).toMatch(
+      /\.device-keys-custody\.hc-emphasis-card \.hc-emphasis-card__main[\s\S]*flex:\s*none/
+    );
   });
 });

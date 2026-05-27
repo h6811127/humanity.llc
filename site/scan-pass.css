@@ -117,6 +117,9 @@
   --hc-emphasis-card-gap-section: 24px;
   --hc-emphasis-card-gap-row: 16px;
   --hc-emphasis-card-gap-foot: 12px;
+  --hc-emphasis-card-padding-block-compact: 14px;
+  --hc-emphasis-card-padding-inline-compact: 16px;
+  --hc-emphasis-card-gap-section-compact: 12px;
 }
 
 *,

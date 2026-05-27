@@ -123,8 +123,8 @@ Prioritized follow-ups after Phases 0–5. Full tier tables: [`UI_COLOR_SCHEME_S
 
 | Item | Surface | Modifier | Notes |
 |------|---------|----------|-------|
-| Hub keys custody | `#device-keys-custody-hub` (`device-keys-custody.mjs` `--hub`) | `--info` | **Shipped** — emphasis card + secondary Acknowledge |
-| Wallet keys custody | `#device-keys-custody-wallet` (`--wallet`) | `--info` | **Shipped** — same as hub + help/import foot |
+| Hub keys custody | `#device-keys-custody-hub` (`device-keys-custody.mjs` `--hub`) | `--info` | **Shipped** — emphasis card + secondary Acknowledge; **compact** stacked spacing ([`KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md`](KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md)) |
+| Wallet keys custody | `#device-keys-custody-wallet` (`--wallet`) | `--info` | **Shipped** — same as hub + help/import foot; compact spacing |
 | Compact custody strip | `device-keys-custody--compact` | `--warn` | **Shipped** — inline warn card for landing/create mounts |
 | Hub cross-tab slot | `#device-hub-crosstab-notice` | `--info` / `--warn` | **Shipped** — emphasis card + pill CTAs (matches page/wallet cross-tab) |
 | Vouch return | `#created-vouch-return-banner` | `--active` | **Shipped** — post-vouch continuity; green active dot + primary CTA |
@@ -156,7 +156,7 @@ Prioritized follow-ups after Phases 0–5. Full tier tables: [`UI_COLOR_SCHEME_S
 | Single CSS source | `site/css/hc-emphasis-card.css`; scan via `npm run worker:bundle-scan` |
 | Token sync | Keep `:root` emphasis tokens in `scan-pass.css` aligned with `site/styles.css` when tokens change |
 | Regression | `npm run worker:test:ui-color-scheme` + `npm run worker:test -- worker/tests/device-emphasis-card-html.test.ts` after each phase |
-| Shell delivery | `@import` for `hc-emphasis-card.css` must be **first** in `styles.css` — see [`HC_EMPHASIS_CARD_IMPORT_REGRESSION.md`](HC_EMPHASIS_CARD_IMPORT_REGRESSION.md) |
+| Shell delivery | `@import` for `hc-emphasis-card.css` must be **first** in `styles.css` — see [`HC_EMPHASIS_CARD_IMPORT_REGRESSION.md`](HC_EMPHASIS_CARD_IMPORT_REGRESSION.md) · explicit `<link>` on shell pages **shipped** |
 | Dark cache bust | Bump `theme-dark.css?v=` on shell pages when changing `theme-dark.css` |
 | No per-card fg hacks | Title/detail always `--hc-emphasis-card-title-fg` / `--hc-emphasis-card-detail-fg` |
 

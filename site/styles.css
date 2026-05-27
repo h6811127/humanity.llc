@@ -135,6 +135,10 @@
   --hc-emphasis-card-gap-section: 24px;
   --hc-emphasis-card-gap-row: 16px;
   --hc-emphasis-card-gap-foot: 12px;
+  /* Compact density — device chrome notices (docs/KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md) */
+  --hc-emphasis-card-padding-block-compact: 14px;
+  --hc-emphasis-card-padding-inline-compact: 16px;
+  --hc-emphasis-card-gap-section-compact: 12px;
 }
 
 *,
@@ -1585,7 +1589,8 @@ a.hub-card-menu-item {
 .landing-final-cta.hc-emphasis-card,
 .device-cross-tab-banner.hc-emphasis-card,
 #wallet-tab-hint.hc-emphasis-card,
-#device-hub-crosstab-notice.hc-emphasis-card {
+#device-hub-crosstab-notice.hc-emphasis-card,
+.device-keys-custody.hc-emphasis-card {
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
@@ -1596,7 +1601,8 @@ a.hub-card-menu-item {
 .landing-final-cta.hc-emphasis-card .hc-emphasis-card__main,
 .device-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__main,
 #wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__main,
-#device-hub-crosstab-notice.hc-emphasis-card .hc-emphasis-card__main {
+#device-hub-crosstab-notice.hc-emphasis-card .hc-emphasis-card__main,
+.device-keys-custody.hc-emphasis-card .hc-emphasis-card__main {
   flex: none;
   width: 100%;
 }
@@ -1605,7 +1611,8 @@ a.hub-card-menu-item {
 .landing-final-cta.hc-emphasis-card .hc-emphasis-card__actions,
 .device-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__actions,
 #wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__actions,
-#device-hub-crosstab-notice.hc-emphasis-card .hc-emphasis-card__actions {
+#device-hub-crosstab-notice.hc-emphasis-card .hc-emphasis-card__actions,
+.device-keys-custody.hc-emphasis-card .hc-emphasis-card__actions {
   width: 100%;
   justify-content: flex-start;
 }
@@ -6928,17 +6935,11 @@ button.btn-danger {
   align-items: stretch;
 }
 
-/* Keys custody — all variants (docs/HC_EMPHASIS_CARD_ROLLOUT.md backlog) */
+/* Keys custody — compact stacked emphasis (docs/KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md) */
 .device-keys-custody.hc-emphasis-card {
-  flex-direction: column;
-  align-items: stretch;
-  gap: var(--hc-emphasis-card-gap-section);
-}
-
-.device-keys-custody.hc-emphasis-card .hc-emphasis-card__actions {
-  width: 100%;
-  max-width: none;
-  justify-content: flex-start;
+  gap: var(--hc-emphasis-card-gap-section-compact);
+  padding: var(--hc-emphasis-card-padding-block-compact)
+    var(--hc-emphasis-card-padding-inline-compact);
 }
 
 .device-keys-custody.hc-emphasis-card .hc-notice-foot {

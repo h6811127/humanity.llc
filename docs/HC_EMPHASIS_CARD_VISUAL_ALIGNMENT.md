@@ -80,6 +80,18 @@ Marketing landing blocks pick the modifier by **state**, not by section aestheti
 | `--hc-emphasis-card-gap-row` | `16px` | Horizontal (side-by-side) wrap gap between `__main` and CTA column |
 | `--hc-emphasis-card-gap-foot` | `12px` | Extra inset before disclaimer line when card `gap` is not used between actions and foot |
 
+### Compact density (device chrome notices)
+
+Hub/wallet **keys custody** and similar informational cards use **compact** tokens — not the marketing comfort ladder above. See [`KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md`](KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md).
+
+| Token | Value | Use |
+|-------|-------|-----|
+| `--hc-emphasis-card-padding-block-compact` | `14px` | Keys custody card inset |
+| `--hc-emphasis-card-padding-inline-compact` | `16px` | Keys custody card inset |
+| `--hc-emphasis-card-gap-section-compact` | `12px` | Copy block ↔ Acknowledge / actions |
+
+Custody cards must also use **F3 stacked** layout (`justify-content: flex-start`, `flex: none` on `__main`) — same as cross-tab banners.
+
 **Prior values (deprecated):** padding `14/16`, section `12px`, eyebrow `4px`, copy `6px` — too incremental; do not revert without product review.
 
 **Stacked surfaces** (column + `flex: none` on `__main` + `justify-content: flex-start`):

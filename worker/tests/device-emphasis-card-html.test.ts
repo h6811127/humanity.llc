@@ -31,7 +31,8 @@ describe("device-emphasis-card-html", () => {
 
   it("landing index busts styles.css cache when spacing changes", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain("styles.css?v=123");
+    expect(html).toContain('href="/css/hc-emphasis-card.css?v=3"');
+    expect(html).toContain("styles.css?v=124");
   });
 
   it("landing final CTA uses urgent emphasis card and standard CTA", () => {
@@ -182,7 +183,8 @@ describe("device-emphasis-card-html", () => {
   it("shell pages bust styles and theme-dark for emphasis alignment", () => {
     for (const page of ["site/wallet/index.html", "site/create/index.html", "site/created/index.html"]) {
       const html = readFileSync(join(root, page), "utf8");
-      expect(html).toContain("styles.css?v=123");
+      expect(html).toContain('href="/css/hc-emphasis-card.css?v=3"');
+      expect(html).toContain("styles.css?v=124");
       expect(html).toContain("theme-dark.css?v=26");
       expect(html).toContain("device-shell.css?v=51");
     }
@@ -222,7 +224,7 @@ describe("device-emphasis-card-html", () => {
       /\.device-hub\.device-hub--sheet[\s\S]*--surface-popover-bg-glass[\s\S]*--hc-emphasis-card-backdrop/
     );
     const plan = readFileSync(join(root, "docs/HUB_CARD_3D_AND_SHEET_GLASS.md"), "utf8");
-    expect(plan).toContain("Steps 1–3 shipped");
+    expect(plan).toContain("Steps 1–4 shipped");
   });
 
   it("phase E: rollout docs mark visual alignment v2 complete", () => {
