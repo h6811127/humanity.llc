@@ -73,7 +73,7 @@ Ordered work after repo review. Update row status as steps complete. Cross-links
 
 | Priority | Work | Type | Status |
 |----------|------|------|--------|
-| **1** | **Merch funnel close-out** — scan → `/shop/customize/` (`scan_customize` ref + CTA); enable Tier 1 in `shop-config.json`; prove one paid personalized order (intent → webhook → mint → Printify submit) | Engineering + operator | **In progress** — scan CTA ✅ · post-create → customize ✅ · operator config + paid E2E remain |
+| **1** | **Merch funnel close-out** — scan → `/shop/customize/` (`scan_customize` ref + CTA); enable Tier 1 in `shop-config.json`; prove one paid personalized order (intent → webhook → mint → Printify submit) | Engineering + operator | **In progress** — scan CTA ✅ · post-create → customize ✅ · create→customize E2E ✅ · operator config + paid order proof remain |
 | **2** | **Phase A trust MVP** — run M5 stranger runbook (3 outsiders, unassisted create → scan → revoke) | Validation | ☐ |
 | **3** | **Hosted steward production rollout** — `hosted:rollout:step*` through step 6 (secrets, flag, CF dashboard, regression) | Ops | ☐ |
 | **4** | **AI P1 product decision** — keep / rename / deterministic-only / remove scan reader (no new L3 user features until Phase A) | Product | ☐ |
@@ -89,7 +89,7 @@ Ordered work after repo review. Update row status as steps complete. Cross-links
 
 | Priority | Work | Type | Status |
 |----------|------|------|--------|
-| **1** | **Merch funnel close-out** — scan → `/shop/customize/` (`scan_customize` ref + CTA); enable Tier 1 in `shop-config.json`; prove one paid personalized order (intent → webhook → mint → Printify submit) | Engineering + operator | **In progress** — scan CTA ✅ · post-create → customize ✅ · operator config + paid E2E remain |
+| **1** | **Merch funnel close-out** — scan → `/shop/customize/` (`scan_customize` ref + CTA); enable Tier 1 in `shop-config.json`; prove one paid personalized order (intent → webhook → mint → Printify submit) | Engineering + operator | **In progress** — scan CTA ✅ · post-create → customize ✅ · create→customize E2E ✅ · operator config + paid order proof remain |
 | **2** | **Phase A trust MVP** — run M5 stranger runbook (3 outsiders, unassisted create → scan → revoke) | Validation | ☐ |
 | **3** | **Hosted steward production rollout** — `hosted:rollout:step*` through step 6 (secrets, flag, CF dashboard, regression) | Ops | ☐ |
 | **4** | **AI P1 product decision** — keep / rename / deterministic-only / remove scan reader (no new L3 user features until Phase A) | Product | ☐ |
@@ -255,7 +255,7 @@ Aggregate metrics only — no PII. Allowed refs:
 | Step | Pass? |
 |------|-------|
 | Stranger scans campaign merch; profile loads with limits + customize CTA | ✅ scan merch hint + footer CTAs (`scan_customize`) |
-| Create card → `/shop/customize/` detects session | ✅ redirect + `loadCardSessionForCustomize` · ☐ manual E2E |
+| Create card → `/shop/customize/` detects session | ✅ redirect + `loadCardSessionForCustomize` · ✅ `e2e/merch-funnel-customize.spec.ts` |
 | Preview shows LIVE OBJECT branded QR on product mockup | ✅ UI |
 | Artifact intent created; attach returns Shopify line attributes | ✅ API tests |
 | Checkout URL includes `properties[artifact_intent_id]` | ✅ `shop-customize-core.test.ts` |
