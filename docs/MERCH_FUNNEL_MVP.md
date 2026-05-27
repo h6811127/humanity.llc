@@ -1,6 +1,6 @@
 # Merch funnel MVP — scan → profile → customize → Printify
 
-**Status:** Active — customizer UI shipped; 2-row shop hub + same-tab checkout handoff in progress  
+**Status:** Active — customizer UI shipped; API-driven story-row hub + same-tab checkout handoff shipped  
 **Parent:** [`MERCH_LED_V1.md`](MERCH_LED_V1.md) · [`V1_FLOW_AUDIT.md`](V1_FLOW_AUDIT.md) · [`features/Storefront v1.0.md`](features/Storefront%20v1.0.md)  
 **Implementation:** [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) · `site/shop/` · `site/shop/customize/`
 
@@ -24,11 +24,11 @@ What reads as “cheap” is not the stack — it is **UX polish and checkout ha
 
 | Area | Spec ([`Storefront v1.0.md`](features/Storefront%20v1.0.md)) | Shipped today | Gap |
 |------|----------------------------------------------------------------|---------------|-----|
-| Browse model | Story-row hub (~50 SKUs over time) | **2-row hub** at `/shop/` + product pages | Full catalog deferred |
+| Browse model | Story-row hub (~50 SKUs over time) | **API-driven 2-row hub** at `/shop/` + product pages | Full ~50 SKU launch deferred |
 | Tier 0 batch merch | Founding objects row | `/shop/founding/` — founding sticker | Founding glitch shirt / luxury batch page TBD |
 | Tier 1 personalize | Customizer → artifact intent → checkout | Personalized **sticker** path wired; hoodie after QA | Operator: sticker Shopify URL + Printify env |
 | Checkout | Branded Humanity checkout; may pass through Shopify | Same-tab redirect + `/shop/thanks/` order timeline | — |
-| Catalog API | `GET /v1/store/rows` | Static `shop-config.json` | API rows when catalog grows |
+| Catalog API | `GET /v1/store/rows` | **`GET /v1/store/rows`** + `GET /v1/store/products/{id}` (seed ~50, launch 3) | Operator expands published set |
 | Print catalog | Apparel from `GET /v1/print/catalog` | Customizer merges catalog + `shop-config.json` | Hoodie Printify QA + operator enable |
 | Fulfillment | Paid webhook → Printify | Queue + template resolve + Printify env for sticker | Operator submit after mint |
 
@@ -61,7 +61,7 @@ See [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) for operator 
 | **3** | Wire customizer to `GET /v1/print/catalog` when hoodie QA passes | Shipped |
 | **4** | Enable one personalized SKU E2E (`personalize.checkout_open` + webhook → Printify) | Shipped |
 | **5** | Post-purchase order status on humanity.llc | Shipped |
-| **6** | Full story-row catalog (~50 SKUs) | Post-MVP |
+| **6** | Full story-row catalog (~50 SKUs) | **Skeleton shipped** — seed catalog + API rows; launch exposes 3 products |
 
 ---
 
@@ -134,7 +134,7 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
 | Piece | Path |
 |-------|------|
 | Funnel doc | This file |
-| **Shop hub** (2 story rows) | `site/shop/index.html` · `site/js/shop-hub.mjs` |
+| **Shop hub** (API story rows) | `site/shop/index.html` · `site/js/shop-hub.mjs` · `GET /v1/store/rows` |
 | Tier 0 founding sticker | `site/shop/founding/index.html` · `site/js/shop-founding.mjs` |
 | Checkout handoff | `site/js/shop-checkout-handoff.mjs` |
 | **QR customizer** | `site/shop/customize/index.html` |
@@ -143,6 +143,8 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
 | Config helpers | `site/js/shop-config.mjs` |
 | Merch attribution | `site/js/merch-funnel-core.mjs` · scan `scan-merch-funnel.mjs` |
 | Post-purchase order status | `GET /v1/store/orders/status` · `/shop/thanks/` timeline UI |
+| Store rows API | `GET /v1/store/rows` · `GET /v1/store/products/{product_id}` · `worker/src/store/store-catalog.ts` |
+| Store rows client | `site/js/shop-store-rows-core.mjs` |
 | Artifact intent API | `worker/src/resolver/artifact-intents.ts` |
 | QR renderer | `site/js/qr-branding.mjs` |
 
@@ -228,7 +230,7 @@ Aggregate metrics only — no PII. Allowed refs:
 
 ## Not in this MVP slice
 
-- Full story-row catalog (~50 SKUs) — [`Storefront v1.0.md`](features/Storefront%20v1.0.md)
+- Publishing the full ~50 SKU catalog (skeleton + seed shipped; launch exposes 3 products)
 - Separate founding luxury batch page (e.g. glitch shirt campaign) — story TBD
 - Drag-and-drop QR placement on arbitrary Printify mockups
 - In-browser native checkout (headless Shopify is the v1 decision)

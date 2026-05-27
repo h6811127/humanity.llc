@@ -1,34 +1,22 @@
 /**
- * /shop/ — 2-row story hub (Make it yours + Founding objects).
+ * /shop/ — story-row hub driven by GET /v1/store/rows (Phase 6).
  */
-import {
-  isTier0CheckoutOpen,
-  isPersonalizeCheckoutOpen,
-  loadShopConfig,
-  tier0Display,
-} from "./shop-config.mjs";
+import { loadShopConfig } from "./shop-config.mjs";
 import {
   appendMerchRefToCreateUrl,
   persistMerchCreateRef,
   peekMerchCreateRef,
 } from "./merch-funnel-core.mjs";
-import {
-  personalizeProducts,
-  isPersonalizeProductCheckoutOpen,
-} from "./shop-customize-core.mjs";
-import {
-  fetchPrintCatalog,
-  resolvePersonalizeProducts,
-} from "./shop-print-catalog-core.mjs";
+import { fetchPrintCatalog } from "./shop-print-catalog-core.mjs";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import {
-  SHOP_CHECKOUT_PENDING_LABEL,
-  shopPriceLabelWhenCheckoutClosed,
-} from "./shop-copy-core.mjs";
+  enrichStoreRows,
+  fetchStoreRows,
+  renderStoreRowsHtml,
+} from "./shop-store-rows-core.mjs";
 
-const personalizeStatusEl = document.getElementById("shop-hub-personalize-status");
-const foundingStatusEl = document.getElementById("shop-hub-founding-status");
-const foundingPriceEl = document.getElementById("shop-hub-founding-price");
+const rowsRootEl = document.getElementById("shop-rows-root");
+const rowsFallbackEl = document.getElementById("shop-rows-fallback");
 
 function decorateShopCreateLinks() {
   const ref = peekMerchCreateRef();
@@ -38,80 +26,41 @@ function decorateShopCreateLinks() {
   }
 }
 
-/**
- * @param {Record<string, unknown>} config
- * @param {unknown} catalogPayload
- */
-function syncPersonalizeRow(config, catalogPayload) {
-  const products = resolvePersonalizeProducts(config, catalogPayload);
-  const anyPreview = products.length > 0;
-  const checkoutReady =
-    isPersonalizeCheckoutOpen(config) &&
-    products.some((product) => isPersonalizeProductCheckoutOpen(product));
-
-  if (!personalizeStatusEl) return;
-  if (checkoutReady) {
-    personalizeStatusEl.textContent = "Preview and checkout live";
-    personalizeStatusEl.classList.add("shop-hub-status--live");
-    return;
-  }
-  if (anyPreview) {
-    const countLabel = products.length === 1 ? "1 product" : `${products.length} products`;
-    personalizeStatusEl.textContent = `Preview live · ${countLabel} in approved catalog · checkout opening soon`;
-    personalizeStatusEl.classList.remove("shop-hub-status--live");
-    return;
-  }
-  if (personalizeProducts(config).length) {
-    personalizeStatusEl.textContent = "Print catalog syncing — check back soon";
-    personalizeStatusEl.classList.remove("shop-hub-status--live");
-    return;
-  }
-  personalizeStatusEl.textContent = "Opening soon";
-  personalizeStatusEl.classList.remove("shop-hub-status--live");
+function showFallbackRows() {
+  if (rowsRootEl) rowsRootEl.hidden = true;
+  if (rowsFallbackEl) rowsFallbackEl.hidden = false;
 }
 
 /**
- * @param {Record<string, unknown>} config
+ * @param {Array<Record<string, unknown>>} rows
  */
-function syncFoundingRow(config) {
-  const display = tier0Display(config);
-  const open = isTier0CheckoutOpen(config);
-
-  if (foundingPriceEl) {
-    foundingPriceEl.textContent = open
-      ? display.price || "Available now"
-      : shopPriceLabelWhenCheckoutClosed(display.price);
-    foundingPriceEl.classList.toggle("shop-product-price--live", open);
-  }
-  if (!foundingStatusEl) return;
-  if (open) {
-    foundingStatusEl.textContent = "Batch founding sticker · checkout live";
-    foundingStatusEl.classList.add("shop-hub-status--live");
+function renderRows(rows) {
+  if (!rowsRootEl) return;
+  const html = renderStoreRowsHtml(rows);
+  if (!html) {
+    showFallbackRows();
     return;
   }
-  foundingStatusEl.textContent = display.price
-    ? `${display.price} · ${SHOP_CHECKOUT_PENDING_LABEL.toLowerCase()}`
-    : SHOP_CHECKOUT_PENDING_LABEL;
-  foundingStatusEl.classList.remove("shop-hub-status--live");
+  rowsRootEl.innerHTML = html;
+  rowsRootEl.hidden = false;
+  if (rowsFallbackEl) rowsFallbackEl.hidden = true;
 }
 
 async function initHub() {
   persistMerchCreateRef("tier0_shop");
   decorateShopCreateLinks();
+
+  const origin = resolverApiOrigin();
   try {
-    const [config, catalogPayload] = await Promise.all([
+    const [config, catalogPayload, rowsPayload] = await Promise.all([
       loadShopConfig(),
-      fetchPrintCatalog(resolverApiOrigin()).catch(() => ({ products: [] })),
+      fetchPrintCatalog(origin).catch(() => ({ products: [] })),
+      fetchStoreRows(origin),
     ]);
-    syncPersonalizeRow(config, catalogPayload);
-    syncFoundingRow(config);
+    const rows = enrichStoreRows(config, catalogPayload, rowsPayload?.rows ?? []);
+    renderRows(rows);
   } catch {
-    if (personalizeStatusEl) {
-      personalizeStatusEl.textContent = "Preview opening soon";
-    }
-    if (foundingStatusEl) {
-      foundingStatusEl.textContent = SHOP_CHECKOUT_PENDING_LABEL;
-    }
+    showFallbackRows();
   }
 }
 

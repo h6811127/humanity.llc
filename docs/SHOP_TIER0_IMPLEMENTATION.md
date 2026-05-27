@@ -1,6 +1,6 @@
 # Shop  -  Tier 0 curiosity drop (implementation)
 
-**Status:** 2-row shop hub shipped · Tier 0 at `/shop/founding/` · same-tab Shopify handoff  
+**Status:** API-driven story-row hub shipped · Tier 0 at `/shop/founding/` · same-tab Shopify handoff  
 **Canonical strategy:** `docs/MERCH_LED_V1.md` Phase B, `docs/FOUNDING_DROP_BRIEF.md` Tier 0  
 **Merch funnel MVP:** `docs/MERCH_FUNNEL_MVP.md` · `/shop/customize/` QR customizer  
 **Merch QR policy:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` (defer `checkout_open: true` until remaining policy gates pass; M5 passed 2026-05-27)  
@@ -12,7 +12,7 @@
 
 | Piece | Path |
 |-------|------|
-| **Shop hub** (2 story rows) | `site/shop/index.html` · `site/js/shop-hub.mjs` |
+| **Shop hub** (API story rows) | `site/shop/index.html` · `site/js/shop-hub.mjs` · `GET /v1/store/rows` |
 | Tier 0 founding sticker page | `site/shop/founding/index.html` · `site/js/shop-founding.mjs` |
 | Same-tab checkout handoff | `site/js/shop-checkout-handoff.mjs` |
 | **QR customizer (Tier 1)** | `site/shop/customize/index.html` · `docs/MERCH_FUNNEL_MVP.md` |
