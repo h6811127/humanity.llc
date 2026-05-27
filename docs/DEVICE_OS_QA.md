@@ -265,7 +265,12 @@ See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 | 3 | Cancel / expire hosted | Returns to **400** cap; wallet and keys intact |
 | 4 | Anonymous create / stranger scan page | No steward session; no hosted entitlement call; poll/create unchanged |
 
-Automated: M7 Vitest + `e2e/hosted-tier-budget.spec.ts` for H1–H3/H5.
+Automated:
+
+```bash
+npm run worker:test:steward-entitlements
+npm run e2e:hosted-tier
+```
 
 ## P1 — Card disabled since last visit
 

@@ -245,11 +245,11 @@ Do **not** rip out the device OS. **Retire the default “poll every card every 
 | **8b - Presence & chrome** (P1) | **Shipped:** skip presence heartbeat when alone with keys (`shouldSkipPresenceHeartbeat`) | Less cross-tab churn when single tab | Heartbeat resumes when second tab opens |
 | **8c - Visible rows + SW watch** (P1) | **Shipped:** network refresh prefers hub-visible `.hub-card-item` rows; SW polls only when `hc_watch_live_proof === "1"` (alerts still required) | On-screen chips refresh first | Background polls off when watch off |
 | **9 - Edge cache** (P2) | ETag / short TTL on status + challenge endpoints | Fewer D1 reads on repeat polls | **Shipped** |
-| **10 - Hosted tier + push** (planning) | Entitlements, higher caps, optional server push — **no code yet** | Best UX at scale | [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md); M7 rows + test plan: § Phase 10 — hosted tier rows (M7) |
+| **10 - Hosted tier + push** (E2 staging) | Entitlements probe, higher caps, optional server push — **E2+E3 client/server staging**; E4 push next | Best UX at scale | [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md); M7 rows + test plan: § Phase 10 — hosted tier rows (M7) |
 
 **Tests (shipped, Phases 1–9):** Vitest in `device-live-control-poll-scheduler.test.ts`, `device-live-control-round-robin.test.ts`, `device-live-control-poll-budget-core.test.ts`, `device-live-control-poll-leader-core.test.ts`, `device-live-control-sw-core.test.ts`, `device-hub-visible-rows-core.test.ts`, `device-wallet-scale-core.test.ts` (if present); Playwright in `e2e/device-inbox.spec.ts`, `e2e/created-control.spec.ts` (collapsed hub idle, one challenge per tick, degraded health, watch off + manual check).
 
-**Tests (Phase 10, planning):** § Phase 10 test plan (M7) — run **free-tier regression** on every hosted-tier PR; hosted-specific suites when E1–E4 land.
+**Tests (Phase 10, E2 staging):** § Phase 10 test plan (M7) — run **free-tier regression** on every hosted-tier PR; hosted-specific: `npm run worker:test:steward-entitlements` · `npm run e2e:hosted-tier` (H1–H3/H5).
 
 ---
 
@@ -350,7 +350,8 @@ npm run e2e -- e2e/device-inbox.spec.ts e2e/created-control.spec.ts
 **Hosted-specific E2 staging:**
 
 ```bash
-npm run e2e -- e2e/hosted-tier-budget.spec.ts
+npm run worker:test:steward-entitlements
+npm run e2e:hosted-tier
 ```
 
 **Vitest (extend existing modules when E2 reads entitlements):**
