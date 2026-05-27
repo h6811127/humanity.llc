@@ -1,5 +1,5 @@
 /* humanity.llc  -  iOS grouped UI, light. #DB1B43 · #000 · #fff · #b8b8b8 */
-@import url("./css/hc-emphasis-card.css?v=2");
+@import url("./css/hc-emphasis-card.css?v=3");
 
 :root {
   --red: #db1b43;
@@ -80,6 +80,41 @@
     #f3f2f2 48%,
     #eeeded 100%
   );
+  /* Glass surfaces + hairline (Phase B — HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) */
+  --hc-emphasis-card-backdrop: blur(16px) saturate(1.15);
+  --hc-emphasis-card-border-neutral: rgba(60, 60, 67, 0.14);
+  --hc-emphasis-card-border-active: rgba(36, 138, 61, 0.2);
+  --hc-emphasis-card-border-info: rgba(0, 122, 255, 0.18);
+  --hc-emphasis-card-border-warn: rgba(161, 98, 7, 0.2);
+  --hc-emphasis-card-border-urgent: rgba(201, 52, 42, 0.18);
+  --hc-emphasis-card-fill-active-glass: linear-gradient(
+    160deg,
+    rgba(246, 248, 247, 0.78) 0%,
+    rgba(241, 244, 242, 0.68) 48%,
+    rgba(236, 241, 238, 0.74) 100%
+  );
+  --hc-emphasis-card-fill-info-glass: linear-gradient(
+    160deg,
+    rgba(246, 247, 248, 0.78) 0%,
+    rgba(242, 243, 245, 0.68) 48%,
+    rgba(236, 238, 241, 0.74) 100%
+  );
+  --hc-emphasis-card-fill-warn-glass: linear-gradient(
+    160deg,
+    rgba(250, 248, 245, 0.8) 0%,
+    rgba(245, 242, 237, 0.7) 48%,
+    rgba(240, 235, 229, 0.76) 100%
+  );
+  --hc-emphasis-card-fill-urgent-glass: linear-gradient(
+    160deg,
+    rgba(247, 246, 246, 0.78) 0%,
+    rgba(243, 242, 242, 0.68) 48%,
+    rgba(238, 237, 237, 0.74) 100%
+  );
+  --hc-emphasis-card-eyebrow-tracking: 0.025em;
+  --hc-emphasis-card-cta-radius: 10px;
+  --hc-emphasis-card-cta-padding: 7px 11px;
+  --hc-emphasis-card-cta-secondary-padding: 6px 10px;
   --hc-emphasis-card-eyebrow-active: #248a3d;
   --hc-emphasis-card-eyebrow-info: #007aff;
   --hc-emphasis-card-eyebrow-warn: #a16207;

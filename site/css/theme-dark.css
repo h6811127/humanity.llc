@@ -82,6 +82,36 @@ html[data-theme="dark"] {
     #1c1c1e 55%,
     #211a1d 100%
   );
+  --hc-emphasis-card-backdrop: blur(18px) saturate(1.12);
+  --hc-emphasis-card-border-neutral: rgba(255, 255, 255, 0.12);
+  --hc-emphasis-card-border-active: rgba(48, 209, 88, 0.22);
+  --hc-emphasis-card-border-info: rgba(100, 181, 255, 0.22);
+  --hc-emphasis-card-border-warn: rgba(255, 179, 64, 0.24);
+  --hc-emphasis-card-border-urgent: rgba(255, 105, 97, 0.22);
+  --hc-emphasis-card-fill-active-glass: linear-gradient(
+    160deg,
+    rgba(30, 36, 33, 0.84) 0%,
+    rgba(28, 28, 30, 0.78) 55%,
+    rgba(26, 33, 29, 0.82) 100%
+  );
+  --hc-emphasis-card-fill-info-glass: linear-gradient(
+    160deg,
+    rgba(30, 34, 38, 0.84) 0%,
+    rgba(28, 28, 30, 0.78) 55%,
+    rgba(26, 31, 36, 0.82) 100%
+  );
+  --hc-emphasis-card-fill-warn-glass: linear-gradient(
+    160deg,
+    rgba(36, 33, 28, 0.86) 0%,
+    rgba(28, 28, 30, 0.78) 55%,
+    rgba(33, 30, 26, 0.84) 100%
+  );
+  --hc-emphasis-card-fill-urgent-glass: linear-gradient(
+    160deg,
+    rgba(36, 28, 31, 0.86) 0%,
+    rgba(28, 28, 30, 0.78) 55%,
+    rgba(33, 26, 29, 0.84) 100%
+  );
   --hc-emphasis-card-eyebrow-active: #30d158;
   --hc-emphasis-card-eyebrow-info: #64b5ff;
   --hc-emphasis-card-eyebrow-warn: #ffb340;
@@ -509,28 +539,50 @@ html[data-theme="dark"] .hc-notice-ack {
   color: var(--hc-notice-fg);
 }
 
-/* Emphasis cards — explicit dark surfaces (fill tokens + shell text; see UI_COLOR_SCHEME_STANDARD.md) */
+/* Emphasis cards — glass surfaces + opaque fallback (UI_COLOR_SCHEME_STANDARD.md) */
 html[data-theme="dark"] .hc-emphasis-card--active {
-  background: var(--hc-emphasis-card-fill-active);
+  background: var(--hc-emphasis-card-fill-active-glass);
+  border-color: var(--hc-emphasis-card-border-active);
 }
 
 html[data-theme="dark"] .hc-emphasis-card--info {
-  background: var(--hc-emphasis-card-fill-info);
+  background: var(--hc-emphasis-card-fill-info-glass);
+  border-color: var(--hc-emphasis-card-border-info);
 }
 
 html[data-theme="dark"] .hc-emphasis-card--warn {
-  background: var(--hc-emphasis-card-fill-warn);
+  background: var(--hc-emphasis-card-fill-warn-glass);
+  border-color: var(--hc-emphasis-card-border-warn);
 }
 
 html[data-theme="dark"] .hc-emphasis-card--urgent {
-  background: var(--hc-emphasis-card-fill-urgent);
+  background: var(--hc-emphasis-card-fill-urgent-glass);
+  border-color: var(--hc-emphasis-card-border-urgent);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  html[data-theme="dark"] .hc-emphasis-card--active {
+    background: var(--hc-emphasis-card-fill-active);
+  }
+
+  html[data-theme="dark"] .hc-emphasis-card--info {
+    background: var(--hc-emphasis-card-fill-info);
+  }
+
+  html[data-theme="dark"] .hc-emphasis-card--warn {
+    background: var(--hc-emphasis-card-fill-warn);
+  }
+
+  html[data-theme="dark"] .hc-emphasis-card--urgent {
+    background: var(--hc-emphasis-card-fill-urgent);
+  }
 }
 
 html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
   color: var(--hc-emphasis-card-title-fg);
   background: var(--shell-fill-secondary);
-  border-color: var(--shell-separator);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border: 0.5px solid var(--shell-separator);
+  box-shadow: none;
 }
 
 html[data-theme="dark"] a.wallet-chrome-home {

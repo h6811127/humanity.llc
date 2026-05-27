@@ -1,6 +1,6 @@
 # Emphasis card rollout (`hc-emphasis-card`)
 
-**Status:** Phases 0–5 shipped · **Visual alignment v2 planned** (docs only)  
+**Status:** Phases 0–5 shipped · **Visual alignment v2 in progress** (A + B + C + spacing shipped)  
 **Visual standard:** [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Emphasis notice cards · **planned reset:** [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md)  
 **Primary CSS:** `site/css/hc-emphasis-card.css` (imported by `site/styles.css`; bundled into scan via `worker:bundle-scan`), `site/css/theme-dark.css`
 
@@ -183,8 +183,8 @@ Prioritized follow-ups after Phases 0–5. Full tier tables: [`UI_COLOR_SCHEME_S
 |------|-----|
 | Canonical spec | [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) |
 | Revert landing glass | **Shipped** (Phase A — `landing-liquid-glass.css` removed) |
-| Global token/CSS | Phase B — `hc-emphasis-card.css`, `:root`, `theme-dark.css` |
-| Surface rollout | Phases C–E — shell, created, scan bundle, hub, landing |
+| Global token/CSS | **Shipped** — Phase B — `hc-emphasis-card.css`, `:root`, `theme-dark.css` |
+| Surface rollout | **Shipped** Phase C — shell, created, create, scan bundle, hub; Phases D–E landing + docs/tests |
 
 Do **not** start implementation until product signs off on translucent fills + hairline border on wallet reference cards.
 

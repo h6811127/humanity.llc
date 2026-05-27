@@ -31,7 +31,7 @@ describe("device-emphasis-card-html", () => {
 
   it("landing index busts styles.css cache when spacing changes", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain("styles.css?v=119");
+    expect(html).toContain("styles.css?v=120");
   });
 
   it("landing final CTA uses urgent emphasis card and standard CTA", () => {
@@ -49,7 +49,7 @@ describe("device-emphasis-card-html", () => {
     const styles = readFileSync(join(root, "site/styles.css"), "utf8");
     expect(styles).toContain("--hc-emphasis-card-gap-section: 24px");
     expect(styles).toContain("--hc-emphasis-card-gap-dot: 14px");
-    expect(styles).toContain('hc-emphasis-card.css?v=2');
+    expect(styles).toContain('hc-emphasis-card.css?v=3');
     const emphasis = readFileSync(join(root, "site/css/hc-emphasis-card.css"), "utf8");
     expect(emphasis).toContain("var(--hc-emphasis-card-gap-dot)");
     expect(emphasis).toContain("var(--hc-emphasis-card-gap-copy)");
@@ -77,6 +77,18 @@ describe("device-emphasis-card-html", () => {
     expect(html).toContain('class="landing-framing-more-link"');
     expect(html).not.toContain("landing-cta-glass");
     expect(html).not.toContain('class="landing-framing-tab"');
+  });
+
+  it("emphasis card phase B tokens and CTA metrics in component css", () => {
+    const styles = readFileSync(join(root, "site/styles.css"), "utf8");
+    expect(styles).toContain("--hc-emphasis-card-fill-active-glass");
+    expect(styles).toContain("--hc-emphasis-card-border-active");
+    expect(styles).toContain("--hc-emphasis-card-eyebrow-tracking: 0.025em");
+    const emphasis = readFileSync(join(root, "site/css/hc-emphasis-card.css"), "utf8");
+    expect(emphasis).toContain("backdrop-filter: var(--hc-emphasis-card-backdrop)");
+    expect(emphasis).toContain("border: 0.5px solid var(--hc-emphasis-card-border-neutral)");
+    expect(emphasis).toMatch(/border-radius:\s*var\(--hc-emphasis-card-cta-radius/);
+    expect(emphasis).toContain("prefers-reduced-transparency: reduce");
   });
 
   it("styles do not import withdrawn landing liquid glass", () => {
@@ -115,6 +127,24 @@ describe("device-emphasis-card-html", () => {
     expect(html).toContain('class="hc-emphasis-card__cta" id="live-control-proof-btn"');
     expect(html).not.toContain("live-control-notification-inner");
     expect(html).not.toContain("live-control-notification-icon");
+  });
+
+  it("scan bundle propagates phase B/C emphasis tokens and dark glass rules", () => {
+    const scanPass = readFileSync(join(root, "site/scan-pass.css"), "utf8");
+    expect(scanPass).toContain("--hc-emphasis-card-fill-active-glass");
+    expect(scanPass).toContain("--hc-emphasis-card-border-info");
+    expect(scanPass).toMatch(
+      /html\[data-theme="dark"\] \.hc-emphasis-card--info[\s\S]*--hc-emphasis-card-fill-info-glass/
+    );
+    expect(scanPass).toContain("prefers-reduced-transparency: reduce");
+  });
+
+  it("shell pages bust styles and theme-dark for emphasis alignment", () => {
+    for (const page of ["site/wallet/index.html", "site/create/index.html", "site/created/index.html"]) {
+      const html = readFileSync(join(root, page), "utf8");
+      expect(html).toContain("styles.css?v=120");
+      expect(html).toContain("theme-dark.css?v=24");
+    }
   });
 
   it("cross-tab banners use stacked layout for Safari (shell + scan)", () => {

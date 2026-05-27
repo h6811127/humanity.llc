@@ -26,6 +26,11 @@ describe("scan page device dot contract", () => {
     expect(SCAN_PASS_CSS).toContain("--surface-popover-bg");
     expect(SCAN_PASS_CSS).toContain(".hc-emphasis-card");
     expect(SCAN_PASS_CSS).toContain("--hc-emphasis-card-shadow");
+    expect(SCAN_PASS_CSS).toContain("--hc-emphasis-card-fill-active-glass");
+    expect(SCAN_PASS_CSS).toContain("backdrop-filter: var(--hc-emphasis-card-backdrop)");
+    expect(SCAN_PASS_CSS).toMatch(
+      /html\[data-theme="dark"\] \.hc-emphasis-card--info[\s\S]*--hc-emphasis-card-fill-info-glass/
+    );
     expect(SCAN_PASS_CSS).toContain("--hc-scan-hero-shadow");
     expect(SCAN_PASS_CSS).toContain("scan-hero-settle-pulse");
     expect(SCAN_PASS_CSS).toMatch(

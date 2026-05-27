@@ -51,6 +51,7 @@ function assertGuardedRule(
 
 const POPOVER_ROOT_TOKENS = [
   "--surface-popover-bg",
+  "--surface-popover-bg-glass",
   "--surface-popover-fg",
   "--surface-popover-fg-muted",
   "--surface-popover-accent",
@@ -147,8 +148,17 @@ describe("UI color scheme popover guard", () => {
       require: ["--surface-popover-bg", "--surface-popover-fg"],
     });
     assertGuardedRule("site/css/device-shell.css", ".device-hub.device-hub--sheet", {
-      require: ["--surface-popover-bg", "--surface-popover-fg"],
+      require: ["--surface-popover-bg-glass", "--surface-popover-fg"],
       forbid: ["backdrop-filter"],
+    });
+    assertGuardedRule("site/css/device-shell.css", ".device-hub-network-tools", {
+      require: [
+        "--hc-emphasis-card-fill-warn-glass",
+        "--hc-emphasis-card-border-warn",
+      ],
+    });
+    assertGuardedRule("site/css/device-shell.css", ".device-hub-network-tools-eyebrow", {
+      require: ["--hc-emphasis-card-eyebrow-warn"],
     });
     assertGuardedRule("site/css/device-shell.css", ".device-inbox-sheet", {
       require: ["--surface-popover-bg", "--surface-popover-fg"],
@@ -185,11 +195,15 @@ describe("UI color scheme popover guard", () => {
       }
     );
     assertGuardedRule("site/css/hc-emphasis-card.css", ".hc-emphasis-card", {
-      require: ["--hc-emphasis-card-shadow", "border: none"],
-      forbid: ["--hc-emphasis-card-border", "rgba(10, 132, 255, 0.44)"],
+      require: [
+        "--hc-emphasis-card-shadow",
+        "--hc-emphasis-card-backdrop",
+        "--hc-emphasis-card-border-neutral",
+      ],
+      forbid: ["border: none", "rgba(10, 132, 255, 0.44)"],
     });
     assertGuardedRule("site/css/hc-emphasis-card.css", ".hc-emphasis-card--active", {
-      require: ["--hc-emphasis-card-fill-active"],
+      require: ["--hc-emphasis-card-fill-active-glass", "--hc-emphasis-card-border-active"],
       forbid: ["rgba(10, 132, 255, 0.1)"],
     });
     assertGuardedRule(
@@ -201,7 +215,7 @@ describe("UI color scheme popover guard", () => {
       }
     );
     assertGuardedRule("site/css/theme-dark.css", "html[data-theme=\"dark\"] .hc-emphasis-card--active", {
-      require: ["--hc-emphasis-card-fill-active"],
+      require: ["--hc-emphasis-card-fill-active-glass", "--hc-emphasis-card-border-active"],
     });
     assertGuardedRule(
       "site/css/theme-dark.css",
@@ -211,7 +225,7 @@ describe("UI color scheme popover guard", () => {
       }
     );
     assertGuardedRule("site/css/theme-dark.css", "html[data-theme=\"dark\"] .hc-emphasis-card--urgent", {
-      require: ["--hc-emphasis-card-fill-urgent"],
+      require: ["--hc-emphasis-card-fill-urgent-glass", "--hc-emphasis-card-border-urgent"],
     });
     expect(readSiteCss("site/styles.css")).not.toContain(".live-control-notification-inner");
     assertGuardedRule("site/css/theme-dark.css", "a.wallet-chrome-home", {
