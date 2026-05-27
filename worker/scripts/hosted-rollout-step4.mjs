@@ -1,28 +1,30 @@
 /**
- * Hosted steward production rollout — step 4 (enable hosted flag).
+ * Hosted steward production rollout — step 4b (deploy + verify hosted flag on production).
  *
- * Per HOSTED_TIER_IMPLEMENTATION_EPICS.md § Production rollout (after G0):
- *   4. Set HOSTED_STEWARD_ENABLED=1 and deploy Worker when ready for stewards.
+ * Step 4a (wrangler.toml HOSTED_STEWARD_ENABLED=1) — hosted:rollout:step4a
  *
  * Usage:
  *   npm run hosted:rollout:step4
+ *   npm run hosted:rollout:step4 -- --deploy
  *   npm run hosted:rollout:step4 -- --verify
+ *   npm run hosted:rollout:step4 -- --deploy --verify
  *   OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step4 -- --verify
  *
  * @see docs/HOSTED_TIER_G0_READINESS.md § Secrets and flags
  */
-import { readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { normalizeOperatorAuditToken } from "./hosted-rollout-token.mjs";
+import { readWranglerHostedFlag } from "./hosted-rollout-step4a.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
-const wranglerToml = path.join(repoRoot, "worker/wrangler.toml");
 
 const apiOrigin = (process.env.API_ORIGIN || "https://humanity.llc").replace(/\/$/, "");
+const deploy = process.argv.includes("--deploy");
+const verify = process.argv.includes("--verify");
 let token;
 try {
   token = normalizeOperatorAuditToken(process.env.OPERATOR_AUDIT_TOKEN);
@@ -30,34 +32,47 @@ try {
   console.error(err instanceof Error ? err.message : err);
   process.exit(1);
 }
-const verify = process.argv.includes("--verify");
 
-function printEnableInstructions() {
-  console.log("Step 4 — Enable HOSTED_STEWARD_ENABLED on production\n");
-  console.log("Prerequisites: steps 1–3 complete (migrations, deploy with flag off, OPERATOR_AUDIT_TOKEN set).\n");
-  console.log("1. In worker/wrangler.toml [vars], set:");
-  console.log('   HOSTED_STEWARD_ENABLED = "1"');
-  console.log("2. Deploy the Worker:");
-  console.log("   npm run worker:deploy");
-  console.log("   (or push worker/ changes to main — deploy-worker.yml runs on worker/** pushes)\n");
-  console.log("3. Verify hosted routes are live:");
+/**
+ * @param {string} label
+ * @param {string[]} args
+ */
+function runNpm(label, args) {
+  console.log(`\n▶ ${label}`);
+  const result = spawnSync("npm", args, {
+    cwd: repoRoot,
+    stdio: "inherit",
+    shell: false,
+  });
+  if (result.status !== 0) {
+    process.exit(result.status ?? 1);
+  }
+}
+
+function assertHostedFlagOnInToml() {
+  const flag = readWranglerHostedFlag();
+  if (flag !== true) {
+    console.error(
+      'worker/wrangler.toml must have HOSTED_STEWARD_ENABLED = "1" before deploy (step 4a).'
+    );
+    console.error("  npm run hosted:rollout:step4a -- --apply");
+    process.exit(1);
+  }
+  console.log('✓ worker/wrangler.toml HOSTED_STEWARD_ENABLED = "1"');
+}
+
+function printDeployAndVerifyChecklist() {
+  console.log("Step 4b — Deploy Worker with hosted flag on\n");
+  console.log("Prerequisites: step 4a (wrangler.toml flag = 1) committed or applied.\n");
+  console.log("1. Deploy:");
+  console.log("   npm run hosted:rollout:step4 -- --deploy\n");
+  console.log("2. Verify production:");
   console.log("   npm run hosted:rollout:step4 -- --verify");
   console.log(
     "   OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step4 -- --verify\n"
   );
-  console.log("4. Regression before announcing to stewards (step 6):");
-  console.log("   npm run verify:hosted-g0");
-  console.log("   npm run e2e:steward-hosted\n");
-}
-
-/**
- * @returns {boolean | null}
- */
-function readWranglerHostedFlag() {
-  const toml = readFileSync(wranglerToml, "utf8");
-  const match = toml.match(/HOSTED_STEWARD_ENABLED\s*=\s*"([^"]+)"/);
-  if (!match) return null;
-  return match[1] === "1" || match[1].toLowerCase() === "true";
+  console.log("3. Before steward announcement, run step 6 regression:");
+  console.log("   npm run hosted:rollout:step6 -- --verify\n");
 }
 
 async function verifyHealth() {
@@ -86,7 +101,7 @@ async function verifyHostedPlansEnabled() {
   }
   if (res.status === 404 && body.error === "hosted_steward_disabled") {
     console.error(
-      "Hosted steward is still disabled on production. Set HOSTED_STEWARD_ENABLED=1 and redeploy."
+      "Hosted steward is still disabled on production. Complete step 4a + deploy (--deploy)."
     );
     process.exit(1);
   }
@@ -99,7 +114,7 @@ async function verifyHostedPlansEnabled() {
     console.error(`hosted_steward_v1 plan missing from operator/plans: ${planIds.join(", ")}`);
     process.exit(1);
   }
-  console.log(`operator/plans OK (includes hosted_steward_v1)`);
+  console.log("operator/plans OK (includes hosted_steward_v1)");
 }
 
 /**
@@ -125,51 +140,40 @@ async function verifyStewardOpsEnabled(bearerToken) {
   console.log("steward-ops OK (hosted_steward_enabled=true)");
 }
 
-/**
- * @param {string} label
- * @param {string[]} args
- */
-function runNpm(label, args) {
-  console.log(`\n▶ ${label}`);
-  const result = spawnSync("npm", args, {
-    cwd: repoRoot,
-    env: process.env,
-    stdio: "inherit",
-    shell: false,
-  });
-  if (result.status !== 0) {
-    process.exit(result.status ?? 1);
-  }
-}
-
 async function main() {
-  console.log("Hosted steward rollout — step 4 (enable hosted flag)");
+  console.log("Hosted steward rollout — step 4 (deploy + verify)");
   console.log("Docs: docs/HOSTED_TIER_IMPLEMENTATION_EPICS.md § Production rollout\n");
 
-  const localFlag = readWranglerHostedFlag();
-  if (localFlag === true) {
-    console.log('ℹ️  worker/wrangler.toml already has HOSTED_STEWARD_ENABLED = "1" (commit + deploy when ready).');
-  } else if (localFlag === false) {
-    console.log('ℹ️  worker/wrangler.toml still has HOSTED_STEWARD_ENABLED = "0" — update before deploy.\n');
-  }
-
-  if (!verify) {
-    printEnableInstructions();
-    console.log("⏭  Run with --verify after deploy to confirm production hosted routes.");
+  if (!deploy && !verify) {
+    const flag = readWranglerHostedFlag();
+    if (flag === true) {
+      console.log('ℹ️  worker/wrangler.toml has HOSTED_STEWARD_ENABLED = "1".\n');
+    } else {
+      console.log('ℹ️  Start with step 4a: npm run hosted:rollout:step4a -- --apply\n');
+    }
+    printDeployAndVerifyChecklist();
     return;
   }
 
-  await verifyHealth();
-  await verifyHostedPlansEnabled();
-  if (token) {
-    await verifyStewardOpsEnabled(token);
-  } else {
-    console.log("\nℹ️  Set OPERATOR_AUDIT_TOKEN to also verify steward-ops hosted_steward_enabled.");
+  if (deploy) {
+    assertHostedFlagOnInToml();
+    runNpm("Worker build meta", ["run", "worker:build-meta"]);
+    runNpm("Bundle scan assets", ["run", "worker:bundle-scan"]);
+    runNpm("Deploy Worker", ["run", "worker:deploy"]);
+    console.log("\n✅ Deploy finished. Verify production:");
+    console.log("   npm run hosted:rollout:step4 -- --verify");
   }
 
-  runNpm("Free-tier + hosted regression (verify:hosted-g0)", ["run", "verify:hosted-g0"]);
-
-  console.log("\n✅ Step 4 verified on production. Next: npm run hosted:rollout:step5");
+  if (verify) {
+    await verifyHealth();
+    await verifyHostedPlansEnabled();
+    if (token) {
+      await verifyStewardOpsEnabled(token);
+    } else {
+      console.log("\nℹ️  Set OPERATOR_AUDIT_TOKEN to also verify steward-ops hosted_steward_enabled.");
+    }
+    console.log("\n✅ Step 4 verified on production. Next: npm run hosted:rollout:step5");
+  }
 }
 
 main().catch((err) => {
