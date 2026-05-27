@@ -17,7 +17,7 @@ You do **not** need multiple accounts. You **do** need to understand three separ
 | **Keys (signing)** | Ed25519 owner (+ optional recovery) keypair for the **root** card | This browser only, until you save or clear data |
 | **Verification (trust label)** | Public state from the resolver: Registered, Vouched Human, Steward, … | Network row on `/created/`, Human trust on scan, chip on `/wallet/` |
 
-**Vouching requires both:** your card must be **Steward or Vouched Human on the network**, and **that card’s keys must be active in this browser tab**.
+**Vouching requires both:** your root card must be **Steward or Vouched Human on the network**, and **that root card’s keys must be active in this browser tab**.
 
 Steward on the network does **not** automatically appear on a phone that never loaded those keys.
 
