@@ -330,7 +330,7 @@ Optional **non-trust** badge on scan: “Scanned from a founding sticker” for 
 | Resolver: `print_artifact` ignores calendar expiry | Engineering | **Shipped** | `worker/src/resolver/merch-qr-policy.ts` · `scan-state.ts` |
 | Scan UI: no “Valid until” on artifact; limits + group copy | Engineering | **Shipped** | `scan-html.ts` · `worker/tests/merch-qr-lifecycle.test.ts` |
 | Mint validation helper for `expires_at: null` on artifact | Engineering | **Shipped** (helper) | `validatePrintArtifactMintExpiry` — wire at fulfillment mint |
-| Fulfillment mint sets `scope: print_artifact`, `expires_at: null` | Engineering | Pending | `V1_IMPLEMENTATION_CONTRACTS.md` · artifact intent / Printify path |
+| Fulfillment mint sets `scope: print_artifact`, `expires_at: null` | Engineering | **Shipped** (owner issue API) | `POST …/cards/{profile_id}/print-artifact-qrs` · `issue-print-artifact-qr.test.ts` · Printify/Shopify automation pending |
 | Orphan purge respects null expiry | Engineering | **Shipped** (existing) | `orphan-purge.test.ts` |
 | Tier 0 batch rotate runbook | Ops | Pending | This doc § Tier 0 |
 | Support macros: misprint vs revoke vs reprint | Ops | Pending | `FOUNDING_DROP_BRIEF.md` |
@@ -376,3 +376,4 @@ Before `checkout_open: true` on production:
 | 2026-05-26 | Initial policy draft (planning) |
 | 2026-05-26 | Hardening sequence, creative ideas index, cross-links across docs |
 | 2026-05-26 | Resolver + scan UI: `merch-qr-policy.ts`, tests (`merch-qr-lifecycle.test.ts`) |
+| 2026-05-26 | `POST …/print-artifact-qrs` mint API (`issue-print-artifact-qr.ts`) |

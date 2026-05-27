@@ -199,6 +199,8 @@ For personalized physical products, each printed item MUST receive a distinct `q
 
 **Merch calendar expiry:** `print_artifact` credentials for founding physical SKUs MUST use `expires_at: null` unless the SKU is an explicit timed-event product (storefront + scan copy). Digital `scope: card` QRs MAY use `expires_at` per create UI. Policy: [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md).
 
+**Issue print artifact QR (shipped):** `POST /.well-known/hc/v1/cards/{profile_id}/print-artifact-qrs` with owner- or recovery-signed `{ qr_credential }` (`scope: print_artifact`, `print_artifact_id`, `expires_at` null). Does not change `card.qr.active_qr_id`. One active QR per `print_artifact_id` per profile.
+
 ### Live Control Challenge
 
 ```json

@@ -24,6 +24,7 @@ import {
 } from "./resolver/live-control";
 import { handlePostRevoke } from "./resolver/revoke";
 import { handlePostCardUpdate } from "./resolver/update-card";
+import { handlePostIssuePrintArtifactQr } from "./resolver/issue-print-artifact-qr";
 import { handlePostRotateQr } from "./resolver/rotate-qr";
 import { handlePostExtendQr } from "./resolver/extend-qr";
 import { handleGetScan } from "./resolver/scan";
@@ -279,6 +280,24 @@ export default {
         );
       }
       const res = await handlePostExtendQr(request, env.DB, qrExtendMatch[1]!);
+      return withCors(request, res);
+    }
+
+    const printArtifactQrMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/print-artifact-qrs$/
+    );
+    if (printArtifactQrMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostIssuePrintArtifactQr(
+        request,
+        env.DB,
+        printArtifactQrMatch[1]!
+      );
       return withCors(request, res);
     }
 
