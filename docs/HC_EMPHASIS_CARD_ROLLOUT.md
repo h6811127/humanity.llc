@@ -147,6 +147,7 @@ Prioritized follow-ups after Phases 0–5. Full tier tables: [`UI_COLOR_SCHEME_S
 | Solid `.device-hub-notice-banner` full-bleed | Intentional high-contrast hub taps |
 | `.research-live-banner` | Separate visual language (landing blocks — [`LANDING_FINAL_CTA_EMPHASIS_CARD.md`](LANDING_FINAL_CTA_EMPHASIS_CARD.md), alignment — [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md)) |
 | Remove `.wallet-active-*` aliases | **Shipped** — wallet active banner uses `hc-emphasis-card__*` only (`hc-emphasis-card.css?v=4`) |
+| Scan page dark-mode surface tokens | **Shipped** — `--hc-scan-surface-*` on trust/vouch/list surfaces; see [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Scan page surfaces |
 | Landing Liquid Glass CTAs | Revert per visual alignment doc phase A |
 
 ### Engineering hygiene

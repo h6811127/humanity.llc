@@ -87,6 +87,12 @@ describe("scan hero visual contract (v2 depth)", () => {
       /html\[data-theme="dark"\][\s\S]*--hc-scan-surface-fg/
     );
     expect(SCAN_PASS_CSS).toMatch(
+      /\.scan-trust-tools-title[\s\S]*color:\s*var\(--hc-scan-surface-fg\)/
+    );
+    expect(SCAN_PASS_CSS).toMatch(
+      /\.scan-page \.group-label[\s\S]*var\(--hc-scan-surface-fg-muted\)/
+    );
+    expect(SCAN_PASS_CSS).toMatch(
       /\.scan-safety-resolver[\s\S]*rgba\(60, 60, 67, 0\.72\)/
     );
     const src = readFileSync(join(root, "site/scan-pass.css"), "utf8");

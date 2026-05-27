@@ -89,6 +89,33 @@ test.describe("scan hero visual (tier 4)", () => {
       .not.toBe("none");
   });
 
+  test("dark: trust-tool row titles contrast with card surface", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("hc_theme", "dark");
+    });
+    await gotoScan(page, SCAN_ACTIVE);
+
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    await expect(page.locator(".scan-arrive-status-label")).toHaveText("Active", {
+      timeout: 8_000,
+    });
+
+    const trustRow = page.locator(".scan-trust-details").first();
+    await expect(trustRow).toBeVisible();
+
+    const { cardBg, titleColor } = await trustRow.evaluate((el) => {
+      const title = el.querySelector(".scan-group-summary-title");
+      if (!title) return { cardBg: "", titleColor: "" };
+      return {
+        cardBg: getComputedStyle(el).backgroundColor,
+        titleColor: getComputedStyle(title).color,
+      };
+    });
+
+    expect(cardBg).not.toBe("rgb(255, 255, 255)");
+    expect(titleColor).not.toBe(cardBg);
+  });
+
   test("reduced motion: no hero settle animation class after arrive", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await gotoScan(page, SCAN_ACTIVE);

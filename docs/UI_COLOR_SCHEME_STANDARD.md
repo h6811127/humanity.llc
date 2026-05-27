@@ -326,6 +326,8 @@ Per [`DEVICE_HUB_INTRO_COACHMARK.md`](DEVICE_HUB_INTRO_COACHMARK.md): clear `hc_
 
 ### Scan page surfaces (dark mode)
 
+**Status:** Shipped (May 2026) — `--hc-scan-surface-*` tokens, selector migration, Vitest guards, `e2e/scan-hero-visual.spec.ts` dark contrast checks.
+
 **Symptom (May 2026):** Trust-tool rows (`.scan-trust-details`), vouch blocks (`.vouch-card`), and `.scan-page .list` kept **light** `#fff` fills while `html[data-theme="dark"]` remaps `--black` → `#f5f5f7` → titles/readouts invisible on white cards; section lead copy stayed `rgba(60, 60, 67, …)` on the black page chrome.
 
 **Rule:** Any scan **card-shaped** surface (trust disclosure, list stack, vouch, limits) uses `--hc-scan-surface-*` for background, border, title, and muted copy — not hardcoded white + `var(--black)`.

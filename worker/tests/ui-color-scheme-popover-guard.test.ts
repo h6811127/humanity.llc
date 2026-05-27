@@ -316,6 +316,14 @@ describe("UI color scheme popover guard", () => {
       require: ["var(--hc-scan-surface-bg)", "var(--hc-scan-surface-border)"],
       forbid: ["background: #fff", "background:#fff"],
     });
+    assertGuardedRule("site/scan-pass.css", ".scan-trust-tools-title", {
+      require: ["var(--hc-scan-surface-fg)"],
+      forbid: ["color: var(--black)"],
+    });
+    assertGuardedRule("site/scan-pass.css", ".scan-page .group-label", {
+      require: ["var(--hc-scan-surface-fg-muted)"],
+      forbid: ["rgba(60, 60, 67"],
+    });
     expect(readSiteCss("site/styles.css")).not.toContain("landing-liquid-glass.css");
     expect(readSiteCss("site/styles.css")).not.toContain(".live-control-notification-inner");
     assertGuardedRule("site/css/theme-dark.css", "a.wallet-chrome-home", {
