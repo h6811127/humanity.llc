@@ -16,10 +16,13 @@ import { operatorAuditAuthorized } from "../http/operator-auth";
 import { errorResponse, jsonResponse } from "../http/resolver";
 import type { Env } from "../index";
 import { submitPrintifyOrder } from "./printify-client";
+import { parsePrintifyShippingAddress } from "./printify-shipping";
 
 interface CreatePrintOrderRequest {
   commerce_order_id?: unknown;
   submit_to_printify?: unknown;
+  shipping_address?: unknown;
+  quantity?: unknown;
 }
 
 interface MintPrintOrderRequest {
@@ -108,29 +111,60 @@ export async function handlePostPrintOrders(
       );
     }
 
+    const shippingAddress = parsePrintifyShippingAddress(body.shipping_address);
+    if (!shippingAddress) {
+      return errorResponse(
+        "PRINTIFY_SHIPPING_REQUIRED",
+        "submit_to_printify requires a valid shipping_address object (not stored in D1).",
+        422
+      );
+    }
+
+    let quantity = 1;
+    if (body.quantity !== undefined && body.quantity !== null) {
+      if (typeof body.quantity !== "number" || !Number.isInteger(body.quantity) || body.quantity < 1) {
+        return errorResponse("INVALID_QUANTITY", "quantity must be a positive integer.", 422);
+      }
+      quantity = body.quantity;
+    }
+
     const submit = await submitPrintifyOrder(env, {
       print_order_id: printOrder.order_id,
       template_id: printOrder.template_id,
       planned_item_qr_ids: JSON.parse(printOrder.planned_item_qr_ids_json) as string[],
+      shipping_address: shippingAddress,
+      quantity,
     });
 
-    if (submit.ok) {
-      await updatePrintOrderStatus(
-        db,
-        printOrder.order_id,
-        "submitted",
-        nowIso,
-        submit.printify_order_id,
-        submit.printify_shop_id
-      );
-      printOrder = {
-        ...printOrder,
-        status: "submitted",
-        printify_order_id: submit.printify_order_id,
-        printify_shop_id: submit.printify_shop_id,
-        updated_at: nowIso,
-      };
+    if (!submit.ok) {
+      const status =
+        submit.code === "PRINTIFY_RATE_LIMITED"
+          ? 429
+          : submit.code === "PRINTIFY_INVALID_ADDRESS" ||
+              submit.code === "PRINTIFY_TEMPLATE_UNCONFIGURED"
+            ? 422
+            : submit.code === "PRINTIFY_SUBMIT_DEFERRED" ||
+                submit.code === "PRINTIFY_UNCONFIGURED"
+              ? 503
+              : 502;
+      return errorResponse(submit.code, submit.message, status);
     }
+
+    await updatePrintOrderStatus(
+      db,
+      printOrder.order_id,
+      "submitted",
+      nowIso,
+      submit.printify_order_id,
+      submit.printify_shop_id
+    );
+    printOrder = {
+      ...printOrder,
+      status: "submitted",
+      printify_order_id: submit.printify_order_id,
+      printify_shop_id: submit.printify_shop_id,
+      updated_at: nowIso,
+    };
   }
 
   return jsonResponse(

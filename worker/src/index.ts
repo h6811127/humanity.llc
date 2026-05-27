@@ -80,6 +80,14 @@ export interface Env {
   PRINTIFY_API_TOKEN?: string;
   /** O-002 Printify shop id for order submit. */
   PRINTIFY_SHOP_ID?: string;
+  /** O-002 Set to 1 to enable live Printify order HTTP submit (default off). */
+  PRINTIFY_SUBMIT_ENABLED?: string;
+  /** Tier 0 Printify product id for batch sticker template. */
+  TIER0_PRINTIFY_PRODUCT_ID?: string;
+  /** Tier 0 Printify variant id (integer). */
+  TIER0_PRINTIFY_VARIANT_ID?: string;
+  /** Tier 0 Printify shipping_method id (default 1). */
+  TIER0_PRINTIFY_SHIPPING_METHOD?: string;
   /** Tier 0 batch sticker: campaign card profile_id (must exist in D1). */
   TIER0_CAMPAIGN_PROFILE_ID?: string;
   /** Tier 0 batch sticker: comma-separated Shopify variant ids. */
