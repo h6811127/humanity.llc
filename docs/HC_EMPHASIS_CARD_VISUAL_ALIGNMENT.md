@@ -1,6 +1,6 @@
 # Emphasis card visual alignment (keys-notification standard)
 
-**Status:** In progress — stacked layout + **internal spacing ladder** (phases F1–F3); translucent fill, border, CTA radius still planned  
+**Status:** In progress — **Phase A + F5 shipped**; Phase B (border, glass fill, CTA radius) next  
 **Canonical for:** All `.hc-emphasis-card` surfaces, including landing (`/`) marketing blocks that adopted the component in May 2026  
 **Supersedes (when implemented):** Opaque-fill + shadow-only-only rules in [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Emphasis notice cards · glass landing CTAs in [`LANDING_FINAL_CTA_EMPHASIS_CARD.md`](LANDING_FINAL_CTA_EMPHASIS_CARD.md)  
 **Related:** [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md)
@@ -189,6 +189,8 @@ All rows use the **same token set** after implementation.
 **Shipped F1–F4:** Spacing tokens on `:root`, wired in `hc-emphasis-card.css`, stacked surfaces use `gap-section`; landing `8px` overrides removed.
 
 **Shipped F5 (comfort ladder, May 2026):** Tokens raised to table above (`section` **24px**, padding **20px**); landing title margins zeroed inside emphasis cards; `styles.css?v=118` + `@import` `hc-emphasis-card.css?v=2`.
+
+**Shipped A (May 2026):** Deleted `landing-liquid-glass.css`; removed `@import`; final CTA uses `hc-emphasis-card__cta`; dark theme glass overrides removed; `styles.css?v=119` on `/`.
 
 **Deploy / cache:** If production looks unchanged after deploy, see [`LANDING_EMPHASIS_CARD_SPACING_DEPLOY_INVESTIGATION.md`](LANDING_EMPHASIS_CARD_SPACING_DEPLOY_INVESTIGATION.md) (Worker vs Pages, cache bust, `@import`).
 

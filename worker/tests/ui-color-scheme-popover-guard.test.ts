@@ -97,7 +97,7 @@ describe("UI color scheme popover guard", () => {
 
   it("loads hc-emphasis-card.css via valid top-of-file @import in styles.css", () => {
     const styles = readSiteCss("site/styles.css");
-    const importIdx = styles.indexOf('@import url("./css/hc-emphasis-card.css")');
+    const importIdx = styles.indexOf('@import url("./css/hc-emphasis-card.css');
     const rootIdx = styles.indexOf(":root {");
     expect(importIdx).toBeGreaterThanOrEqual(0);
     expect(rootIdx).toBeGreaterThan(importIdx);

@@ -1,6 +1,5 @@
 /* humanity.llc  -  iOS grouped UI, light. #DB1B43 · #000 · #fff · #b8b8b8 */
 @import url("./css/hc-emphasis-card.css?v=2");
-@import url("./css/landing-liquid-glass.css");
 
 :root {
   --red: #db1b43;
@@ -6118,7 +6117,9 @@ a.wallet-pin-open {
 }
 
 .landing-final-cta-actions .landing-final-cta-btn {
+  width: 100%;
   max-width: 22em;
+  min-height: 44px;
 }
 
 .landing-final-cta-foot {

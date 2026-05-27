@@ -31,14 +31,15 @@ describe("device-emphasis-card-html", () => {
 
   it("landing index busts styles.css cache when spacing changes", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain("styles.css?v=118");
+    expect(html).toContain("styles.css?v=119");
   });
 
-  it("landing final CTA uses urgent emphasis card and glass button", () => {
+  it("landing final CTA uses urgent emphasis card and standard CTA", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain("hc-emphasis-card--urgent landing-final-cta");
-    expect(html).toContain("landing-hero-btn-primary landing-final-cta-btn");
+    expect(html).toContain("hc-emphasis-card__cta landing-final-cta-btn");
     expect(html).not.toContain("landing-cta-glass");
+    expect(html).not.toMatch(/landing-final-cta-btn[^>]*landing-hero-btn/);
     expect(html).not.toMatch(
       /landing-final-cta[^>]*>\s*<h2 class="landing-final-cta-title"/
     );
@@ -70,7 +71,7 @@ describe("device-emphasis-card-html", () => {
     );
   });
 
-  it("landing framing uses info emphasis card and glass row link", () => {
+  it("landing framing uses info emphasis card and secondary row link", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain("hc-emphasis-card--info landing-framing");
     expect(html).toContain('class="landing-framing-more-link"');
@@ -78,10 +79,9 @@ describe("device-emphasis-card-html", () => {
     expect(html).not.toContain('class="landing-framing-tab"');
   });
 
-  it("styles import landing liquid glass near top", () => {
+  it("styles do not import withdrawn landing liquid glass", () => {
     const styles = readFileSync(join(root, "site/styles.css"), "utf8");
-    const head = styles.slice(0, 400);
-    expect(head).toContain('@import url("./css/landing-liquid-glass.css")');
+    expect(styles).not.toContain("landing-liquid-glass.css");
   });
 
   it("hub card disabled-since-visit alert uses warn emphasis card", () => {

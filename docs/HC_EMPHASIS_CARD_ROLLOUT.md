@@ -182,7 +182,7 @@ Prioritized follow-ups after Phases 0–5. Full tier tables: [`UI_COLOR_SCHEME_S
 | Step | Doc |
 |------|-----|
 | Canonical spec | [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) |
-| Revert landing glass | Phase A — remove `landing-liquid-glass.css` |
+| Revert landing glass | **Shipped** (Phase A — `landing-liquid-glass.css` removed) |
 | Global token/CSS | Phase B — `hc-emphasis-card.css`, `:root`, `theme-dark.css` |
 | Surface rollout | Phases C–E — shell, created, scan bundle, hub, landing |
 
