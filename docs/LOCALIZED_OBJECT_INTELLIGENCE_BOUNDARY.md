@@ -1,8 +1,8 @@
 # Localized object intelligence boundary
 
-**Status:** Active — L0–L2 shipped; **L3 P1 shipped** (opt-in explain)  
+**Status:** Active — L0–L2 shipped; **L3 P1 + P2 shipped** (explain + steward draft)  
 **Parent:** `docs/MANIFESTO_STATUS_UPDATE.md` · `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`  
-**AI hub:** `docs/AI_FEATURE_DEVELOPMENT.md` · **L3 P1 spec:** `docs/AI_L3_EXPLAIN_SNAPSHOT.md`  
+**AI hub:** `docs/AI_FEATURE_DEVELOPMENT.md` · **L3:** `docs/AI_L3_EXPLAIN_SNAPSHOT.md` · `docs/AI_L3_DRAFT_MANIFESTO.md`  
 **Research (not shipping):** `docs/PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md`
 
 ---
@@ -27,7 +27,7 @@ This doc defines the **read-only assembly boundary** before any orchestration or
 | **L0 Manifesto** | Headline + status line (`manifesto_line`) | Shipped |
 | **L1 Object streams** | Up to 4 signed detail rows (`object_streams`) | Shipped |
 | **L2 Public snapshot** | Deterministic read-only line + JSON from L0 + L1 | Shipped |
-| **L3 Agent / orchestration** | Summarize or mediate **only** from L0–L2; no hidden telemetry | **P1 shipped** (explain) · rest research |
+| **L3 Agent / orchestration** | Summarize or mediate **only** from L0–L2; no hidden telemetry | **P1 + P2 shipped** (explain + draft) · rest research |
 
 ---
 
@@ -53,7 +53,9 @@ Rules:
 
 Future read-only agents must treat `public_snapshot` + `object_streams` + `manifesto_line` as the **only** public inputs from the resolver unless a separate signed document type ships.
 
-**L3 P1 (shipped):** strangers may opt in to `POST /.well-known/hc/v1/ai/explain-snapshot` for plain-language summary — labeled **not signed network state**. See [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md). Integrators: `GET …/status` → `scan.ai.agent_context`.
+**L3 P1 (shipped):** strangers may opt in to `POST /.well-known/hc/v1/ai/explain-snapshot` for plain-language summary — labeled **not signed network state**. See [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md).
+
+**L3 P2 (shipped):** stewards on `/created/` may opt in to `POST /.well-known/hc/v1/ai/draft-manifesto` — draft fills the form; **sign + Update** still required. See [`AI_L3_DRAFT_MANIFESTO.md`](AI_L3_DRAFT_MANIFESTO.md).
 
 ---
 
@@ -76,3 +78,4 @@ Future read-only agents must treat `public_snapshot` + `object_streams` + `manif
 | `docs/MANIFESTO_STATUS_UPDATE.md` | Update + stream exit checklist |
 | `docs/AI_FEATURE_DEVELOPMENT.md` | AI hub — sequencing, backlog, risks |
 | `worker/src/resolver/ai-explain-core.ts` | L3 P1 validation + agent context packet |
+| `worker/src/resolver/ai-draft-core.ts` | L3 P2 draft validation |

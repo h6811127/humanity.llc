@@ -66,6 +66,7 @@ import {
 } from "./print/print-orders-handler";
 import { handleGetOperatorFulfillmentLookup } from "./operator/fulfillment-lookup";
 import { handlePostAiExplainSnapshot } from "./resolver/ai-explain-snapshot";
+import { handlePostAiDraftManifesto } from "./resolver/ai-draft-manifesto";
 
 export interface Env {
   DB: D1Database;
@@ -348,6 +349,19 @@ export default {
         );
       }
       return handlePostAiExplainSnapshot(request, env);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/ai/draft-manifesto" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      return handlePostAiDraftManifesto(request, env);
     }
 
     const statusMatch = path.match(

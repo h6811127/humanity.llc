@@ -10,6 +10,7 @@ import { initVoucherRevoke } from "./vouch-revoke.mjs";
 import { initKeyBackupUi } from "./key-backup-ui.mjs";
 import { initRecoveryKeyUi } from "./recovery-key-ui.mjs";
 import { initManifestoUpdate } from "./created-manifesto-update.mjs";
+import { initCreatedAiDraft } from "./created-ai-draft.mjs";
 import { initQrRotate } from "./created-qr-rotate.mjs";
 import { initQrExtend } from "./created-qr-extend.mjs";
 import { inferPilotTemplate, parseManifestoDisplay } from "./manifesto-display.mjs";
@@ -1099,6 +1100,12 @@ async function bootstrapOwnerTools() {
     },
   });
   manifestoUpdate?.show();
+
+  const aiDraft = initCreatedAiDraft({
+    getPilotTemplate: () => resolvePilotTemplate(loadSession()),
+    getSession: loadSession,
+  });
+  aiDraft?.syncVisibility();
 
   const qrRotate = initQrRotate({
     profileId,

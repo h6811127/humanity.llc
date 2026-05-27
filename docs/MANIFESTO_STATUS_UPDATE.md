@@ -80,7 +80,7 @@ Signed optional field on the `humanity_card` document:
 - Create UI: same optional detail rows on `/create/` for **status plate** and **general** templates (signed on first POST).
 - Scan limits: when streams are present, scan HTML and `GET …/status` include `limits.object_details_warning` (steward-signed copy, not verified facts).
 - **L3 P1 (shipped):** when streams present, scan HTML shows opt-in **Explain in plain language** on the signed snapshot block; `GET …/status` includes `scan.ai.agent_context` and `scan.ai.explain`. See [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md).
-- **L3 P2 (planned):** steward authoring assistant on `/created/` — drafts manifesto + stream rows; steward signs to publish (never auto-writes resolver).
+- **L3 P2 (shipped):** steward authoring assistant on `/created/` — `POST …/ai/draft-manifesto` fills update form; steward signs to publish. See [`AI_L3_DRAFT_MANIFESTO.md`](AI_L3_DRAFT_MANIFESTO.md).
 
 ---
 
@@ -118,6 +118,7 @@ Deep link: `/created/?profile_id=…&qr_id=…`  -  hydrates handle/manifesto fr
 | Create flow signs optional object_streams (status plate + general) | ✅ `create-card-object-streams.test.ts` |
 | Recovery key may sign update | ✅ `update-card.test.ts` |
 | Scan explain button + status `scan.ai` when snapshot present | ✅ `ai-explain-snapshot.test.ts` · `object-streams.test.ts` |
+| Created AI draft UI + draft API | ✅ `ai-draft-manifesto.test.ts` · manual `/created/` |
 
 **Owner UX:** **Update status** stays hidden for general cards until first in-session QR or card revoke. Status plate and lost-item relay pilots show it immediately so field testers can update live object copy before revoke (`site/js/created-first-revoke-gate.mjs`; `worker/tests/created-first-revoke-gate.test.ts`).
 

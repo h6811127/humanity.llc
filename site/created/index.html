@@ -480,6 +480,37 @@
                     placeholder="Wheelbarrow available"
                   />
                 </fieldset>
+                <div class="created-ai-draft" id="created-ai-draft-root" hidden>
+                  <label class="form-label" for="created-ai-draft-hint"
+                    >Describe what changed (optional)</label
+                  >
+                  <textarea
+                    class="form-input form-textarea created-ai-draft-hint"
+                    id="created-ai-draft-hint"
+                    rows="2"
+                    maxlength="200"
+                    placeholder="Closed early today · compost turn needed"
+                  ></textarea>
+                  <button type="button" class="btn-secondary" id="created-ai-draft-btn">
+                    Suggest draft with AI
+                  </button>
+                  <div class="created-ai-draft-panel" id="created-ai-draft-panel" hidden>
+                    <p class="created-ai-draft-label">AI draft</p>
+                    <pre
+                      class="created-ai-draft-preview"
+                      id="created-ai-draft-preview"
+                      aria-live="polite"
+                    ></pre>
+                    <p class="form-hint created-ai-draft-limit" role="note">
+                      AI draft — review and sign to publish. Nothing reaches the network until
+                      you submit Update.
+                    </p>
+                    <button type="button" class="btn-secondary" id="created-ai-draft-apply">
+                      Use this draft
+                    </button>
+                  </div>
+                  <p class="form-status" id="created-ai-draft-status" hidden role="status"></p>
+                </div>
                 <button type="submit" class="btn-primary" id="manifesto-update-submit">
                   Publish update
                 </button>
@@ -1400,6 +1431,6 @@
     </div>
     <script src="/js/device-status-bootstrap.mjs?v=56" type="module"></script>
     <script src="/js/created-hub.mjs?v=3" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=58"></script>
+    <script type="module" src="/js/created.mjs?v=59"></script>
   </body>
 </html>

@@ -1,8 +1,8 @@
 # AI feature development
 
-**Status:** Active — L3 P1 shipped (opt-in scan explainer); broader L3 backlog in research  
+**Status:** Active — L3 P1 + **P2 shipped** (explain + steward draft); broader L3 backlog in research  
 **Parent:** [`LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md`](LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md) · [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md)  
-**First slice:** [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md)
+**Slices:** [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md) · [`AI_L3_DRAFT_MANIFESTO.md`](AI_L3_DRAFT_MANIFESTO.md)
 
 ---
 
@@ -14,7 +14,8 @@ Humanity Commons does **not** build global AI profiles or present model output a
 |-------|--------|
 | **L0–L2** (manifesto, object streams, public snapshot) | **Shipped** |
 | **L3 P1** — opt-in scan explainer | **Shipped** — `POST …/ai/explain-snapshot` + scan UI |
-| **L3 backlog** — steward authoring, integrator agents, multiplayer narration | Research / next |
+| **L3 P2** — steward authoring assistant | **Shipped** — `POST …/ai/draft-manifesto` + `/created/` UI |
+| **L3 backlog** — conflict narrator, vouch nudge, inbox triage | Research / next |
 | **LLM anti-abuse** (vouch spam, stolen-key bots) | Threat model + crypto controls — not semantic moderation v1 |
 
 There is **no scan analytics** feeding AI. Strangers must **tap** to request an explanation; the resolver does not auto-generate scan copy.
@@ -30,7 +31,7 @@ Canonical boundary: [`LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md`](LOCALIZED_OBJE
 | **L0 Manifesto** | `manifesto_line` headline + status | Shipped |
 | **L1 Object streams** | Up to 4 signed detail rows (`object_streams`) | Shipped |
 | **L2 Public snapshot** | Deterministic `{ text, fields[] }` from L0 + L1 | Shipped |
-| **L3 Agent / orchestration** | Summarize or mediate **only** from L0–L2 | **P1 shipped** (explain); rest research |
+| **L3 Agent / orchestration** | Summarize or mediate **only** from L0–L2 | **P1 + P2 shipped** (explain + draft); rest research |
 
 ### Design principles (locked)
 
@@ -55,7 +56,7 @@ The shipped **scan actor band** (`pass-v33`, `site/js/scan-actor-band.mjs`) is *
 
 ---
 
-## Shipped implementation (L0–L2 + L3 P1)
+## Shipped implementation (L0–L2 + L3 P1 + P2)
 
 ### Data model
 
@@ -80,6 +81,17 @@ See [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md).
 | Scan client | `site/js/scan-ai-explain.mjs` |
 | Rate limit | `worker/src/db/rate-limit.ts` (`checkAiExplainRateLimit`) |
 | Workers AI binding | `worker/wrangler.toml` `[ai]` |
+
+### L3 P2: steward draft manifesto
+
+See [`AI_L3_DRAFT_MANIFESTO.md`](AI_L3_DRAFT_MANIFESTO.md).
+
+| Piece | Path |
+|-------|------|
+| Core (validation, prompt, deterministic fallback) | `worker/src/resolver/ai-draft-core.ts` |
+| HTTP handler | `worker/src/resolver/ai-draft-manifesto.ts` |
+| Owner client | `site/js/created-ai-draft.mjs` |
+| Rate limit | `worker/src/db/rate-limit.ts` (`checkAiDraftRateLimit`) |
 
 ---
 
@@ -145,7 +157,7 @@ All items: **consume signed L0–L2 only**; **never write resolver truth**; **no
 | # | Idea | Surface | Phase |
 |---|------|---------|-------|
 | 1 | **Scan plain-language explainer** | Stranger opt-in on snapshot | **P1 shipped** |
-| 2 | **Steward authoring assistant** | `/created/` — draft manifesto + streams; steward signs to publish | P2 |
+| 2 | **Steward authoring assistant** | `/created/` — draft manifesto + streams; steward signs to publish | **P2 shipped** |
 | 3 | **Multi-stream conflict narrator** | Explain game vs maintenance precedence ([`PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md`](PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md)) | P3 |
 | 4 | **Integrator agent SDK** | Document + JSON schema for `agent_context` | **Partial** (status JSON) |
 | 5 | **Vouch statement nudge** | Client flag for generic/LLM-like text before sign (V-07) | P2 |
@@ -162,8 +174,8 @@ All items: **consume signed L0–L2 only**; **never write resolver truth**; **no
 | Phase | Work | Rationale |
 |-------|------|-----------|
 | **Now** | Status plate + lost-item field pilots | Proves L0–L2 in the real world |
-| **Shipped** | L3 P1 explain + agent context in status JSON | Zero resolver contamination; external agents can integrate |
-| **Next** | Steward authoring assistant (owner-side) | Reduces blank-page friction without touching scan trust |
+| **Shipped** | L3 P1 explain + P2 steward draft + agent context in status JSON | Zero resolver contamination |
+| **Next** | Vouch statement nudge (V-07) or lost-item finder guidance | Owner/stranger opt-in helpers |
 | **Later** | Multi-stream narrator for multiplayer research | Needs more signed stream types + governance |
 | **Much later** | Commons Pass / city-scale orchestration | Phase D+ |
 
@@ -182,6 +194,7 @@ All items: **consume signed L0–L2 only**; **never write resolver truth**; **no
 
 ```bash
 npm run worker:test -- worker/tests/ai-explain-core.test.ts worker/tests/ai-explain-snapshot.test.ts
+npm run worker:test -- worker/tests/ai-draft-core.test.ts worker/tests/ai-draft-manifesto.test.ts
 npm run worker:test -- worker/tests/object-snapshot.test.ts worker/tests/object-streams.test.ts
 npm run worker:bundle-scan   # after site/scan-pass.css changes
 ```
