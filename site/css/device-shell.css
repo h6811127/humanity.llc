@@ -592,7 +592,7 @@ body.device-glance-popover-open .device-hub-glance-popover:not([hidden]) {
   display: none !important;
 }
 
-/* Signing key custody (tab vs saved on device) - uses .hc-notice */
+/* Signing key custody (tab vs saved on device) — hc-emphasis-card */
 .device-keys-custody {
   margin: 0 0 16px;
 }

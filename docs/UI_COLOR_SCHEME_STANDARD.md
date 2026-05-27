@@ -176,7 +176,7 @@ Prioritized places that could adopt the same **raised card** pattern. Extraction
 |---------|----------------|-------|-----|
 | Cross-tab (landing) | `#device-cross-tab-banner` on `/` | Same as wallet | Tier 1 |
 | System / resolver degraded | `#device-system-banner` | Plain status line | Lower urgency — only if copy includes a CTA; else keep minimal |
-| Keys custody summary | `#device-keys-custody-wallet` (and hub/created mounts) | DL + note | “Keys on this device” could be a compact `--info` emphasis card when expanded |
+| Keys custody summary | `#device-keys-custody-hub`, `-wallet`, `-compact` | **Shipped** — `--info` / `--warn` emphasis cards (`device-keys-custody-html.test.ts`) |
 
 #### Tier 3 — Card workspace (`/created/`)
 

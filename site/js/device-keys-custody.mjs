@@ -8,7 +8,6 @@ import {
   emphasisCardShellHtml,
   escapeEmphasisHtml,
 } from "./device-emphasis-card-html.mjs";
-import { HC_CAUTION_ICON, HC_INFO_ICON } from "./hc-notice-icons.mjs";
 import {
   dismissKeysCustodyNotice,
   isKeysCustodyNoticeDismissed,
@@ -35,8 +34,22 @@ function custodyAckButton() {
   return emphasisCardCtaSecondary("Acknowledge", "data-keys-custody-ack");
 }
 
-function custodyAckButtonLegacy() {
-  return `<button type="button" class="hc-notice-ack" data-keys-custody-ack>Acknowledge</button>`;
+/**
+ * @param {string} className
+ * @param {{ eyebrow: string, title: string, detail: string, extraCopyHtml?: string }} copy
+ */
+function custodyInfoEmphasisCard(className, copy) {
+  return emphasisCardShellHtml({
+    modifier: "info",
+    className: `device-keys-custody ${className}`,
+    role: "note",
+    dot: "info",
+    eyebrow: copy.eyebrow,
+    title: copy.title,
+    detail: copy.detail,
+    extraCopyHtml: copy.extraCopyHtml ?? "",
+    actionsHtml: emphasisCardActionsHtml([custodyAckButton()]),
+  });
 }
 
 /**
@@ -64,20 +77,15 @@ export function keysCustodyHtml(variant, opts = {}) {
   const networkNote =
     '<p class="device-keys-custody-note">Your card is already on the network. Save only stores the signing key in this browser.</p>';
 
+  const privateKeyCopy = {
+    eyebrow: "Keys custody",
+    title: "Your browser holds the private key",
+    detail:
+      "That is what lets you update, revoke, and prove control. The network never receives it.",
+  };
+
   if (variant === "hub") {
-    return `
-      <div class="hc-notice hc-notice--info device-keys-custody device-keys-custody--hub" role="note">
-        <span class="hc-notice-icon">${HC_INFO_ICON}</span>
-        <div class="hc-notice-content">
-          <p class="hc-notice-title">Your browser holds the private key</p>
-          <p class="hc-notice-body">
-            That is what lets you update, revoke, and prove control. The network never receives it.
-          </p>
-          <div class="hc-notice-actions">
-            ${custodyAckButtonLegacy()}
-          </div>
-        </div>
-      </div>`;
+    return custodyInfoEmphasisCard("device-keys-custody--hub", privateKeyCopy);
   }
 
   if (variant === "created") {
@@ -96,30 +104,22 @@ export function keysCustodyHtml(variant, opts = {}) {
   }
 
   if (variant === "wallet") {
-    return `
-      <div class="hc-notice hc-notice--info device-keys-custody device-keys-custody--wallet" role="note">
-        <span class="hc-notice-icon">${HC_INFO_ICON}</span>
-        <div class="hc-notice-content">
-          <p class="hc-notice-title">Your browser holds the private key</p>
-          <p class="hc-notice-body">
-            That is what lets you update, revoke, and prove control. The network never receives it.
-          </p>
-          <div class="hc-notice-actions">
-            ${custodyAckButtonLegacy()}
-          </div>
-          ${foot}
-        </div>
-      </div>`;
+    return custodyInfoEmphasisCard("device-keys-custody--wallet", {
+      ...privateKeyCopy,
+      extraCopyHtml: foot,
+    });
   }
 
-  return `
-    <div class="hc-notice hc-notice--warning hc-notice--compact device-keys-custody device-keys-custody--compact" role="note">
-      <span class="hc-notice-icon">${HC_CAUTION_ICON}</span>
-      <p class="hc-notice-body">
-        <strong>Keys are critical.</strong> Tab only until you save · saved cards persist in this browser until you clear site data.
-        <a href="${escapeHtml(learnHref)}">Learn more</a>
-      </p>
-    </div>`;
+  return emphasisCardShellHtml({
+    modifier: "warn",
+    className: "device-keys-custody device-keys-custody--compact",
+    role: "note",
+    dot: "warn",
+    eyebrow: "Before you save",
+    title: "Keys are critical",
+    detail:
+      "Tab only until you save · saved cards persist in this browser until you clear site data. <a href=\"${escapeHtml(learnHref)}\">Learn more</a>",
+  });
 }
 
 function bindCustodyAck(el) {

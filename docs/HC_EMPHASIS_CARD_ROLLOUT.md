@@ -123,9 +123,9 @@ Prioritized follow-ups after Phases 0–5. Full tier tables: [`UI_COLOR_SCHEME_S
 
 | Item | Surface | Modifier | Notes |
 |------|---------|----------|-------|
-| Hub keys custody | `#device-keys-custody-hub` (`device-keys-custody.mjs` `--hub`) | `--info` | Replace flat `hc-notice--info` + icon tile; keep Acknowledge |
-| Wallet keys custody | `#device-keys-custody-wallet` (`--wallet`) | `--info` | Same as hub |
-| Compact custody strip | `device-keys-custody--compact` | `--warn` | Landing/create inline strip |
+| Hub keys custody | `#device-keys-custody-hub` (`device-keys-custody.mjs` `--hub`) | `--info` | **Shipped** — emphasis card + secondary Acknowledge |
+| Wallet keys custody | `#device-keys-custody-wallet` (`--wallet`) | `--info` | **Shipped** — same as hub + help/import foot |
+| Compact custody strip | `device-keys-custody--compact` | `--warn` | **Shipped** — inline warn card for landing/create mounts |
 | Hub cross-tab slot | `#device-hub-crosstab-notice` | `--info` / `--warn` | **Shipped** — emphasis card + pill CTAs (matches page/wallet cross-tab) |
 | Vouch return | `#created-vouch-return-banner` | `--active` | **Shipped** — post-vouch continuity; green active dot + primary CTA |
 

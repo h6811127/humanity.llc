@@ -226,4 +226,13 @@ describe("device-emphasis-card-html", () => {
     expect(src).not.toContain("device-hub-notice-banner--info");
     expect(src).not.toContain("device-hub-crosstab-card");
   });
+
+  it("keys custody hub and wallet use info emphasis cards", () => {
+    const src = readFileSync(join(root, "site/js/device-keys-custody.mjs"), "utf8");
+    expect(src).toContain("custodyInfoEmphasisCard");
+    expect(src).toContain("device-keys-custody--hub");
+    expect(src).toContain("device-keys-custody--wallet");
+    expect(src).not.toContain("hc-notice--info");
+    expect(src).not.toContain("HC_INFO_ICON");
+  });
 });
