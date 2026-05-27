@@ -1,4 +1,4 @@
-import { validateCreateHandle } from "./create-handle-validation-core.mjs";
+import { validateCreateFormFields } from "./create-form-validation-core.mjs";
 import { formatCreateResolverError } from "./create-resolver-error-core.mjs";
 import {
   qrExpiryFromIssued,
@@ -279,21 +279,45 @@ export async function runCreateCard(input) {
   location.replace(created.href);
 }
 
+function readCreateFormFields() {
+  return {
+    objectLabel: document.getElementById("object-label")?.value ?? "",
+    statusLine: document.getElementById("status-line")?.value ?? "",
+    relayItem: document.getElementById("relay-item")?.value ?? "",
+    relayMessage: document.getElementById("relay-message")?.value ?? "",
+    manifesto: manifestoEl?.value ?? "",
+  };
+}
+
+function applyCreateFieldValidity(missingFieldIds, message) {
+  const ids = new Set(missingFieldIds);
+  for (const id of ["handle", "object-label", "status-line", "relay-item", "relay-message", "manifesto"]) {
+    const el = document.getElementById(id);
+    if (!el || !(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement)) {
+      continue;
+    }
+    if (ids.has(id)) {
+      el.setCustomValidity(message);
+      if (id === missingFieldIds[0]) {
+        el.reportValidity();
+      }
+    } else {
+      el.setCustomValidity("");
+    }
+  }
+}
+
 function readValidatedCreateInput() {
   const handleEl = document.getElementById("handle");
-  const handleResult = validateCreateHandle(handleEl?.value ?? "");
-  if (!handleResult.ok) {
-    if (handleEl) {
-      handleEl.setCustomValidity(handleResult.message);
-      handleEl.reportValidity();
-    }
-    throw new Error(handleResult.message);
+  const fields = readCreateFormFields();
+  const validation = validateCreateFormFields(activeTemplate, handleEl?.value ?? "", fields);
+  if (!validation.ok) {
+    applyCreateFieldValidity(validation.missingFieldIds, validation.message);
+    throw new Error(validation.message);
   }
-  if (handleEl) {
-    handleEl.setCustomValidity("");
-    if (handleEl.value !== handleResult.normalized) {
-      handleEl.value = handleResult.normalized;
-    }
+  applyCreateFieldValidity([], "");
+  if (handleEl && handleEl.value !== validation.handle) {
+    handleEl.value = validation.handle;
   }
   const { manifesto, pilotTemplate } = buildManifestoLine();
   return {

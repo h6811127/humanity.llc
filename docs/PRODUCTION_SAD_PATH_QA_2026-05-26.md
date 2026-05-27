@@ -173,6 +173,8 @@ Examples seen in create flow:
 
 ### P2-2 · Create — empty submit messaging
 
+**Status (2026-05-26):** Fix shipped — combined required-field validation per template (`create-form-validation-core.mjs`, `create-card.mjs?v=14`).
+
 | Template | Empty submit | Message |
 |----------|--------------|---------|
 | General | No fields | `Handle is required.` |
