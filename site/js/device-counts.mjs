@@ -2,7 +2,6 @@ import { getLiveControlPendingCount, getLiveControlPollHealth } from "./device-l
 import { isPollableWalletEntry } from "./device-live-control-inbox-core.mjs";
 import {
   buildDeviceCountsLabel,
-  hubStatusPanelModelFromSegments,
   buildStatusSegmentsFromCounts,
   tabNoticeCountFromState,
 } from "./device-counts-core.mjs";
@@ -38,8 +37,6 @@ export function buildStatusSegments(network = "offline") {
     liveProofPollHealth: getLiveControlPollHealth(),
   });
 }
-
-export { hubStatusPanelModelFromSegments };
 
 /** @param {"ok"|"degraded"|"offline"} network */
 export function buildStatusLine(network = "offline") {

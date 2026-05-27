@@ -43,11 +43,11 @@ describe("device hub sheet header", () => {
     const src = readPage("site/js/device-status.mjs");
     const css = readPage("site/css/device-shell.css");
 
-    expect(src).toContain("hubStatusPanelModelFromSegments");
-    expect(src).toContain("device-hub-status-main");
-    expect(src).toContain("device-hub-status-meta");
+    expect(src).toContain("hubStatusLineItemsFromSegments");
+    expect(src).toContain("device-hub-status-line");
+    expect(src).toContain("device-hub-status-item");
     expect(src).not.toContain("style=\"display:flex;flex-wrap:wrap");
-    expect(css).toMatch(/\.device-hub-status-main\s*\{[\s\S]*flex-wrap:\s*nowrap/);
-    expect(css).toContain(".device-hub-count-chip--zero");
+    expect(css).toMatch(/\.device-hub-status-line\s*\{[\s\S]*flex-wrap:\s*nowrap/);
+    expect(css).toContain(".device-hub-status-item--zero");
   });
 });

@@ -3,7 +3,7 @@
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
 import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=38";
-import { buildStatusSegments, hubStatusPanelModelFromSegments } from "./device-counts.mjs";
+import { buildStatusSegments } from "./device-counts.mjs";
 import { shouldSkipCrossTabOverlayViewTransition } from "./device-presence-inbox-stability-core.mjs";
 import { fetchResolverHealth } from "./device-network-health.mjs";
 import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visit-gate.mjs";
@@ -58,13 +58,14 @@ import {
   dotStateKey,
   dotTransitionKey,
   hasStewardVerification,
+  hubStatusLineItemsFromSegments,
   SHELL_DOT_NEUTRAL_EMPTY_CLASS,
   shellChromeStatusLineFromSegments,
   shellDotUsesNeutralEmptyWallet,
   shellStatusLinePrimaryInChrome,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=44";
+} from "./device-dot-state-core.mjs?v=45";
 
 export const DOT_STATE_CHANGED = "hc-dot-state-changed";
 
@@ -407,39 +408,25 @@ function renderShellStatusLine(segments) {
 
 function renderHubStatusPanel(segments) {
   if (!hubStatusPanel) return;
-  const chipHtml = (seg, extraClass = "") => {
-    const label = seg.chipLabel ?? seg.label;
-    const tone = seg.chipTone ?? (seg.highlight ? "highlight" : "neutral");
+  const items = hubStatusLineItemsFromSegments(segments);
+  const statusText = items.map((item) => item.label).join(" · ");
+  const parts = items.map((item, index) => {
     const cls = [
-      "device-hub-chip",
-      `device-hub-chip--${seg.id}`,
-      `device-hub-chip--${tone}`,
-      seg.zero ? "device-hub-chip--zero" : "",
-      extraClass,
+      "device-hub-status-item",
+      `device-hub-status-item--${item.id}`,
+      `device-hub-status-item--${item.tone}`,
+      `device-hub-status-item--${item.emphasis}`,
+      item.zero ? "device-hub-status-item--zero" : "",
     ]
       .filter(Boolean)
       .join(" ");
-    return `<span class="${cls}" data-seg="${seg.id}" title="${escapeHtml(seg.detail)}">${escapeHtml(label)}</span>`;
-  };
-  const countHtml = (seg, index) => {
     const separator =
       index === 0
         ? ""
-        : `<span class="device-hub-count-separator" aria-hidden="true">·</span>`;
-    return `${separator}<span class="device-hub-count-chip${seg.zero ? " device-hub-count-chip--zero" : ""}" data-seg="${seg.id}" title="${escapeHtml(seg.detail)}">${escapeHtml(seg.chipLabel ?? seg.label)}</span>`;
-  };
-  const { primary, counts, alerts } = hubStatusPanelModelFromSegments(segments);
-  const mainLine = [
-    primary ? chipHtml(primary, "device-hub-status-primary") : "",
-    counts.length
-      ? `<span class="device-hub-status-meta">${counts.map(countHtml).join("")}</span>`
-      : "",
-  ].join("");
-  const alertLine = alerts.length
-    ? `<div class="device-hub-status-alerts">${alerts.map((seg) => chipHtml(seg)).join("")}</div>`
-    : "";
-  const ariaLabel = segments.map((seg) => seg.chipLabel ?? seg.label).join(", ");
-  hubStatusPanel.innerHTML = `<div class="device-hub-status-chips" role="status" aria-label="${escapeHtml(ariaLabel)}"><div class="device-hub-status-main">${mainLine}</div>${alertLine}</div>`;
+        : `<span class="device-hub-status-separator" aria-hidden="true"> · </span>`;
+    return `${separator}<span class="${cls}" data-seg="${item.id}" title="${escapeHtml(item.detail)}">${escapeHtml(item.label)}</span>`;
+  });
+  hubStatusPanel.innerHTML = `<div class="device-hub-status-line" role="status" aria-label="${escapeHtml(statusText)}">${parts.join("")}</div>`;
 }
 
 function renderNotifBadge() {

@@ -122,20 +122,6 @@ export function buildStatusSegmentsFromCounts(input) {
 }
 
 /**
- * Hub sheet status header: keep resolver state as the primary read while counts
- * become subordinate metadata on the same line when space allows.
- * @param {Array<{ id: string, label: string, chipLabel: string, detail: string, zero: boolean, highlight: boolean, chipTone?: string }>} segments
- */
-export function hubStatusPanelModelFromSegments(segments) {
-  const primary = segments.find((seg) => seg.id === "network") ?? segments[0] ?? null;
-  const counts = segments.filter((seg) => seg.id === "saved" || seg.id === "pinned");
-  const alerts = segments.filter(
-    (seg) => seg.id !== "network" && seg.id !== "saved" && seg.id !== "pinned"
-  );
-  return { primary, counts, alerts };
-}
-
-/**
  * @param {number} saved
  * @param {number} pins
  */

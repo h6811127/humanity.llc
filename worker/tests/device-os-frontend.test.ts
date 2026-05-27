@@ -5,9 +5,9 @@ const TEST_QR_ID = "qr_xBZTq7M27tueCzBY";
 import {
   buildDeviceCountsLabel,
   buildStatusSegmentsFromCounts,
-  hubStatusPanelModelFromSegments,
   tabNoticeCountFromState,
 } from "../../site/js/device-counts-core.mjs";
+import { hubStatusLineItemsFromSegments } from "../../site/js/device-dot-state-core.mjs";
 import {
   buildLiveControlProofHref,
   classifyChallengeHttpStatus,
@@ -497,7 +497,7 @@ describe("buildStatusSegmentsFromCounts", () => {
   });
 
   it("models the hub header as primary resolver state plus subordinate counts", () => {
-    const model = hubStatusPanelModelFromSegments(
+    const items = hubStatusLineItemsFromSegments(
       buildStatusSegmentsFromCounts({
         network: "ok",
         saved: 0,
@@ -506,10 +506,12 @@ describe("buildStatusSegmentsFromCounts", () => {
         liveProof: 0,
       })
     );
-    expect(model.primary?.id).toBe("network");
-    expect(model.counts.map((s) => s.id)).toEqual(["saved", "pinned"]);
-    expect(model.counts.every((s) => s.zero)).toBe(true);
-    expect(model.alerts.map((s) => s.id)).toEqual(["notices"]);
+    expect(items.map((s) => s.id)).toEqual(["network", "saved", "pinned", "notices"]);
+    expect(items.find((s) => s.id === "network")?.emphasis).toBe("primary");
+    expect(items.filter((s) => s.id === "saved" || s.id === "pinned").every((s) => s.zero)).toBe(
+      true
+    );
+    expect(items.find((s) => s.id === "notices")?.emphasis).toBe("alert");
   });
 });
 
