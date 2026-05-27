@@ -45,14 +45,16 @@ The interest form records **optional email** on this browser only (no server upl
 
 **Worker (Tier 0 batch fulfillment):** set `TIER0_CAMPAIGN_PROFILE_ID` to the campaign card’s `profile_id` (must exist in D1) and `TIER0_SHOPIFY_VARIANT_IDS` to the Shopify variant id from the cart URL (comma-separated if multiple). Paid webhooks for that SKU queue a batch print order (`hc-tier0-sticker-batch-v1`) without artifact intent metadata.
 
----
+**Printify submit (operator):** set `PRINTIFY_SUBMIT_ENABLED=1`, `PRINTIFY_API_TOKEN` (secret), `PRINTIFY_SHOP_ID`, `TIER0_PRINTIFY_PRODUCT_ID`, and `TIER0_PRINTIFY_VARIANT_ID`. Then `POST /v1/print/orders` with `{ commerce_order_id, submit_to_printify: true, shipping_address, quantity? }`. Shipping is **not** stored in D1 — paste from Shopify admin at submit time.
+
+**Printify webhooks (O-003):** register order events to `POST /v1/print/webhooks/printify` with shared `PRINTIFY_WEBHOOK_SECRET`. Updates print order status idempotently; no raw payload stored in D1.
 
 ## Not shipped yet
 
 | Piece | Owner / doc |
 |-------|-------------|
 | Shopify store + live product URL in config | Operator  -  paste into `shop-config.json` |
-| `shopify.order_paid` → Printify middleware | **Shipped (queue)** — Tier 0 batch via `TIER0_*` env · Printify HTTP submit still deferred |
+| `shopify.order_paid` → Printify middleware | **Shipped** — queue + submit + webhook status sync |
 | Batch QR artwork + Printify product ID | `FOUNDING_DROP_BRIEF.md` |
 | Scan→create analytics (aggregate, no PII) | **Shipped** — `POST …/metrics/merch-funnel` · `GET …/operator/merch-funnel-monitor` · `hc_ref` on scan/create |
 | Resolver waitlist API (optional) | Only if moving interest off localStorage |

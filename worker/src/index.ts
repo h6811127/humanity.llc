@@ -53,6 +53,7 @@ import {
 import { handleGetStewardOpsSnapshot } from "./resolver/steward-ops";
 import { handlePostBillingWebhook } from "./http/billing-webhook";
 import { handlePostShopifyOrdersWebhook } from "./http/shopify-orders-webhook";
+import { handlePostPrintifyWebhook } from "./http/printify-webhook";
 import {
   handleGetPrintCatalog,
   handlePostPrintArtifacts,
@@ -82,6 +83,8 @@ export interface Env {
   PRINTIFY_SHOP_ID?: string;
   /** O-002 Set to 1 to enable live Printify order HTTP submit (default off). */
   PRINTIFY_SUBMIT_ENABLED?: string;
+  /** O-003 Shared secret for Printify webhook HMAC (X-Pfy-Signature). */
+  PRINTIFY_WEBHOOK_SECRET?: string;
   /** Tier 0 Printify product id for batch sticker template. */
   TIER0_PRINTIFY_PRODUCT_ID?: string;
   /** Tier 0 Printify variant id (integer). */
@@ -580,6 +583,13 @@ export default {
         return jsonResponse({ error: "database_unconfigured" }, 503);
       }
       return handlePostShopifyOrdersWebhook(request, env, env.DB);
+    }
+
+    if (path === "/v1/print/webhooks/printify" && request.method === "POST") {
+      if (!env.DB) {
+        return jsonResponse({ error: "database_unconfigured" }, 503);
+      }
+      return handlePostPrintifyWebhook(request, env, env.DB);
     }
 
     if (path === "/v1/print/catalog" && request.method === "GET") {
