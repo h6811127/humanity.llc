@@ -76,7 +76,8 @@ Signed optional field on the `humanity_card` document:
 - `class`: `place` | `care` | `narrative` | `route` (defaults to `place`).
 - Omitted or `[]` clears streams on the next signed update.
 - Exposed on scan HTML (status plate + live object heroes) and `GET …/status` JSON as `card.object_streams`.
-- Owner UI: optional detail rows on `/created/` for status plate pilots.
+- Owner UI: optional detail rows on `/created/` for **status plate** and **live object** (general) pilots.
+- Scan limits: when streams are present, scan HTML and `GET …/status` include `limits.object_details_warning` (steward-signed copy, not verified facts).
 
 ---
 

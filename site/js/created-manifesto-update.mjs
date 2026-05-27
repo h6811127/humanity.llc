@@ -21,6 +21,7 @@ export function initManifestoUpdate(ctx) {
   const generalField = document.getElementById("update-manifesto-general");
   const plateFields = document.getElementById("update-fields-status-plate");
   const relayFields = document.getElementById("update-fields-lost-item");
+  const streamFields = document.getElementById("update-fields-object-streams");
   if (!form) return;
 
   const session = ctx.getSession();
@@ -30,6 +31,9 @@ export function initManifestoUpdate(ctx) {
   if (generalFields) generalFields.hidden = pilot !== "general";
   if (plateFields) plateFields.hidden = pilot !== "status_plate";
   if (relayFields) relayFields.hidden = pilot !== "lost_item_relay";
+  if (streamFields) {
+    streamFields.hidden = pilot !== "status_plate" && pilot !== "general";
+  }
 
   if (pilot === "status_plate" && session?.manifesto_line) {
     const lines = String(session.manifesto_line).split("\n");
@@ -37,6 +41,8 @@ export function initManifestoUpdate(ctx) {
     const statusEl2 = document.getElementById("update-status-line");
     if (objectEl && lines[0]) objectEl.value = lines[0];
     if (statusEl2 && lines[1]) statusEl2.value = lines[1];
+  }
+  if (pilot === "status_plate" || pilot === "general") {
     fillObjectStreamFields(session?.object_streams);
   }
   if (pilot === "lost_item_relay" && session?.manifesto_line) {
@@ -93,7 +99,7 @@ export function initManifestoUpdate(ctx) {
   }
 
   function buildObjectStreamsForUpdate(sessionNow) {
-    if (pilot === "status_plate") {
+    if (pilot === "status_plate" || pilot === "general") {
       return buildObjectStreamsFromFormRows([
         {
           label: document.getElementById("update-stream-1-label")?.value,

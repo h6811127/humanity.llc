@@ -1438,6 +1438,13 @@ a {
   color: var(--black);
 }
 
+.scan-object-streams-limit {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(60, 60, 67, 0.62);
+}
+
 .scan-hero-steward {
   margin: 4px 0 0;
   font-size: 14px;

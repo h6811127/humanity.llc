@@ -1121,6 +1121,10 @@ html[data-theme="dark"] .scan-hero .scan-object-stream-label {
   color: rgba(235, 235, 245, 0.56);
 }
 
+html[data-theme="dark"] .scan-hero .scan-object-streams-limit {
+  color: rgba(235, 235, 245, 0.48);
+}
+
 html[data-theme="dark"] .scan-hero .scan-hero-wordmark {
   color: rgba(235, 235, 245, 0.48);
 }

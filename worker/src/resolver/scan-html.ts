@@ -6,7 +6,7 @@ import {
 } from "./manifesto-display";
 import { publicReasonLabel } from "./revocation-display";
 import { scanListIcon, type ScanIconId } from "./scan-icons";
-import { BEARER_WARNING } from "./trust-copy";
+import { BEARER_WARNING, OBJECT_STREAMS_LIMIT } from "./trust-copy";
 import { SCAN_PASS_CSS } from "./scan-pass-styles";
 import {
   humanTrustDisplay,
@@ -312,7 +312,8 @@ function renderObjectStreamsBlock(
     .join("\n");
   return `<ul class="scan-object-streams" aria-label="Object details">
 ${items}
-</ul>`;
+</ul>
+<p class="scan-object-streams-limit" role="note">${escapeHtml(OBJECT_STREAMS_LIMIT)}</p>`;
 }
 
 function buildScanHeroMain(
@@ -1463,6 +1464,10 @@ function renderLimitsSettings(vm: ScanViewModel, origin: string): string {
     vm.qrScope === "print_artifact" && vm.kind === "active"
       ? `<li>${escapeHtml(PRINT_ARTIFACT_NO_CALENDAR_EXPIRY_NOTE)}</li>`
       : "";
+  const objectStreamsNote =
+    vm.objectStreams.length > 0
+      ? `<li>${escapeHtml(OBJECT_STREAMS_LIMIT)}</li>`
+      : "";
   return `<details class="scan-limits-settings scan-trust-layer scan-limits-layer" id="scan-limits-settings">
   <summary class="scan-limits-summary">
     ${scanListIcon("orange", "shield")}
@@ -1479,6 +1484,7 @@ function renderLimitsSettings(vm: ScanViewModel, origin: string): string {
       <li>That social vouches were honest or complete</li>
       <li>Permanent ownership of a physical item (lifecycle transitions can change state)</li>
       <li>Who scanned, when, or where  -  this page returns object state, not a people trail</li>
+      ${objectStreamsNote}
       ${artifactExpiryNote}
     </ul>
     <p class="scan-limits-meta">No scan analytics on this page. <a href="${escapeHtml(policy)}">Operator data policy</a> · <a href="${escapeHtml(architecture)}">Architecture</a></p>

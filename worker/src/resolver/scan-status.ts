@@ -25,7 +25,7 @@ import { deriveCredentialCodeSync } from "../../../site/js/qr-credential-code.mj
 import { scanContractErrorForKind } from "./scan-contract-error";
 import { scanMalformedStatusHint } from "./scan-malformed-hint";
 import { guardScanResponse, scanRedirectQueryBlocked } from "./scan-redirect-guard";
-import { BEARER_WARNING } from "./trust-copy";
+import { BEARER_WARNING, OBJECT_STREAMS_LIMIT } from "./trust-copy";
 import { humanTrustDisplay } from "./verification-display";
 import type { ObjectPublicStream } from "../validation/object-streams";
 
@@ -73,6 +73,7 @@ export interface ScanStatusBody {
     live_control: { available: boolean; proven_at: string | null };
     limits: {
       bearer_warning: string;
+      object_details_warning?: string;
       scan_analytics: false;
     };
     governance?: GovernanceProcessUrls;
@@ -143,6 +144,9 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
       },
       limits: {
         bearer_warning: BEARER_WARNING,
+        ...(vm.objectStreams.length
+          ? { object_details_warning: OBJECT_STREAMS_LIMIT }
+          : {}),
         scan_analytics: false,
       },
       ...(governance ? { governance } : {}),
