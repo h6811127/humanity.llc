@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { ArtifactIntentRow } from "../src/db/artifact-intents";
 import type { CommerceOrderRow } from "../src/db/commerce-orders";
+import type { PrintOrderRow } from "../src/db/print-orders";
 import { handlePostShopifyOrdersWebhook } from "../src/http/shopify-orders-webhook";
 import type { Env } from "../src/index";
 
@@ -42,6 +43,7 @@ type DbState = {
   intents: Map<string, ArtifactIntentRow>;
   orders: Map<string, CommerceOrderRow>;
   receipts: Map<string, { webhook_id: string; commerce_order_id: string | null }>;
+  printOrders: Map<string, PrintOrderRow>;
 };
 
 function dbFor(state: DbState): D1Database {
@@ -57,6 +59,9 @@ function dbFor(state: DbState): D1Database {
           }
           if (sql.includes("FROM shopify_webhook_receipts")) {
             return state.receipts.get(args[0] as string) ?? null;
+          }
+          if (sql.includes("FROM print_orders WHERE commerce_order_id")) {
+            return state.printOrders.get(args[0] as string) ?? null;
           }
           return null;
         },
@@ -87,7 +92,19 @@ function dbFor(state: DbState): D1Database {
               });
             }
           }
-          if (sql.includes("UPDATE commerce_order_links")) {
+          if (sql.includes("UPDATE commerce_order_links") && sql.includes("print_order_ids_json")) {
+            const printOrderIds = JSON.parse(args[0] as string) as string[];
+            const commerceOrderId = args[2] as string;
+            for (const [key, order] of state.orders) {
+              if (order.commerce_order_id === commerceOrderId) {
+                state.orders.set(key, {
+                  ...order,
+                  print_order_ids_json: JSON.stringify(printOrderIds),
+                  updated_at: args[1] as string,
+                });
+              }
+            }
+          } else if (sql.includes("UPDATE commerce_order_links")) {
             for (const [key, order] of state.orders) {
               if (order.commerce_order_id === args[3]) {
                 state.orders.set(key, {
@@ -98,6 +115,24 @@ function dbFor(state: DbState): D1Database {
                 });
               }
             }
+          }
+          if (sql.includes("INSERT INTO print_orders")) {
+            const row: PrintOrderRow = {
+              order_id: args[0] as string,
+              profile_id: args[1] as string,
+              print_artifact_ids_json: args[2] as string,
+              planned_item_qr_ids_json: args[3] as string,
+              commerce_order_id: args[4] as string,
+              shopify_order_id: args[5] as string,
+              printify_order_id: null,
+              printify_shop_id: null,
+              template_id: args[6] as string,
+              status: args[7] as PrintOrderRow["status"],
+              shipping_method: args[8] as string,
+              created_at: args[9] as string,
+              updated_at: args[10] as string,
+            };
+            state.printOrders.set(row.commerce_order_id, row);
           }
           if (sql.includes("INSERT INTO shopify_webhook_receipts")) {
             state.receipts.set(args[0] as string, {
@@ -153,6 +188,7 @@ describe("Shopify orders webhook (O-001)", () => {
       intents: new Map([[INTENT, intentRow()]]),
       orders: new Map(),
       receipts: new Map(),
+      printOrders: new Map(),
     };
 
     const res = await handlePostShopifyOrdersWebhook(
@@ -165,6 +201,7 @@ describe("Shopify orders webhook (O-001)", () => {
       artifact_intent_ids: string[];
       hold_reason: string | null;
       duplicate: boolean;
+      print_order_ids: string[];
     };
 
     expect(res.status).toBe(200);
@@ -172,6 +209,8 @@ describe("Shopify orders webhook (O-001)", () => {
     expect(json.artifact_intent_ids).toEqual([INTENT]);
     expect(json.hold_reason).toBeNull();
     expect(json.duplicate).toBe(false);
+    expect(json.print_order_ids).toHaveLength(1);
+    expect(json.print_order_ids[0]).toMatch(/^po_/);
     expect(state.intents.get(INTENT)?.status).toBe("converted");
     expect(state.orders.size).toBe(1);
   });
@@ -181,6 +220,7 @@ describe("Shopify orders webhook (O-001)", () => {
       intents: new Map(),
       orders: new Map(),
       receipts: new Map(),
+      printOrders: new Map(),
     };
 
     const res = await handlePostShopifyOrdersWebhook(
@@ -199,6 +239,7 @@ describe("Shopify orders webhook (O-001)", () => {
       intents: new Map([[INTENT, intentRow()]]),
       orders: new Map(),
       receipts: new Map(),
+      printOrders: new Map(),
     };
     const db = dbFor(state);
 
@@ -227,6 +268,7 @@ describe("Shopify orders webhook (O-001)", () => {
       intents: new Map(),
       orders: new Map(),
       receipts: new Map(),
+      printOrders: new Map(),
     }));
     expect(res.status).toBe(401);
   });

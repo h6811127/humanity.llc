@@ -47,6 +47,14 @@ import {
   handlePostStewardSession,
 } from "./resolver/steward-hosted";
 import { handlePostShopifyOrdersWebhook } from "./http/shopify-orders-webhook";
+import {
+  handleGetPrintCatalog,
+  handlePostPrintArtifacts,
+} from "./print/print-handlers";
+import {
+  handleGetPrintOrder,
+  handlePostPrintOrders,
+} from "./print/print-orders-handler";
 
 export interface Env {
   DB: D1Database;
@@ -58,6 +66,10 @@ export interface Env {
   HOSTED_STEWARD_ENABLED?: string;
   /** O-001 Shopify webhook HMAC secret. */
   SHOPIFY_WEBHOOK_SECRET?: string;
+  /** O-002 Printify personal access token (server-only). */
+  PRINTIFY_API_TOKEN?: string;
+  /** O-002 Printify shop id for order submit. */
+  PRINTIFY_SHOP_ID?: string;
 }
 
 export default {
@@ -486,6 +498,32 @@ export default {
         return jsonResponse({ error: "database_unconfigured" }, 503);
       }
       return handlePostShopifyOrdersWebhook(request, env, env.DB);
+    }
+
+    if (path === "/v1/print/catalog" && request.method === "GET") {
+      const res = await handleGetPrintCatalog();
+      return withCors(request, res);
+    }
+
+    if (path === "/v1/print/artifacts" && request.method === "POST") {
+      const res = await handlePostPrintArtifacts(request);
+      return withCors(request, res);
+    }
+
+    if (path === "/v1/print/orders" && request.method === "POST") {
+      if (!env.DB) {
+        return jsonResponse({ error: "database_unconfigured" }, 503);
+      }
+      const res = await handlePostPrintOrders(request, env, env.DB);
+      return res;
+    }
+
+    const printOrderMatch = path.match(/^\/v1\/print\/orders\/([^/]+)$/);
+    if (printOrderMatch && request.method === "GET") {
+      if (!env.DB) {
+        return jsonResponse({ error: "database_unconfigured" }, 503);
+      }
+      return handleGetPrintOrder(request, env, env.DB, printOrderMatch[1]!);
     }
 
     const cardMatch = path.match(

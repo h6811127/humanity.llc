@@ -20,6 +20,7 @@ import { errorResponse, jsonResponse } from "./resolver";
 import { verifyShopifyWebhookHmac } from "./shopify-webhook-verify";
 import type { Env } from "../index";
 import { generateCommerceOrderId } from "../id";
+import { queuePrintOrderAfterPaidWebhook } from "../print/print-orders-handler";
 
 const PAID_TOPICS = new Set(["orders/paid", "orders/create"]);
 const CANCELED_TOPICS = new Set(["orders/cancelled", "orders/canceled"]);
@@ -167,6 +168,7 @@ async function handlePaidOrder(
     await markIntentsConverted(db, validation.artifact_intent_ids, nowIso);
   }
 
+  let printOrderIds: string[] = [];
   const row: CommerceOrderRow = {
     commerce_order_id: commerceOrderId,
     shopify_order_id: metadata.shopify_order_id,
@@ -179,6 +181,11 @@ async function handlePaidOrder(
     created_at: nowIso,
     updated_at: nowIso,
   };
+
+  if (validation.status === "processing") {
+    printOrderIds = await queuePrintOrderAfterPaidWebhook(db, row, nowIso);
+    row.print_order_ids_json = JSON.stringify(printOrderIds);
+  }
 
   return { ok: true, row, duplicate: false };
 }

@@ -35,6 +35,11 @@ export function generateCommerceOrderId(): string {
   return `co_${randomBase58(16)}`;
 }
 
+/** po_ + 16 base58 chars (Printify fulfillment order). */
+export function generatePrintOrderId(): string {
+  return `po_${randomBase58(16)}`;
+}
+
 /** lc_ + opaque base58 challenge id for short-lived live control proof. */
 export function generateLiveControlChallengeId(): string {
   return `lc_${randomBase58(18)}`;
