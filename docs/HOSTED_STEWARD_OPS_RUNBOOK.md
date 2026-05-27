@@ -54,6 +54,8 @@ Automated threshold review (E6.2):
 OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run worker:check-steward-ops
 ```
 
+**GitHub Actions (production):** workflow `.github/workflows/steward-ops-daily.yml` runs daily at 14:00 UTC and on manual dispatch. Requires repo secret `OPERATOR_AUDIT_TOKEN`. Workflow targets `https://humanity.llc`; for staging, run locally with `API_ORIGIN=http://127.0.0.1:8787`.
+
 Exit **0** = no alerts · **1** = critical fair-use threshold · **2** = auth/config/request error.  
 Vitest: `npm run worker:test:steward-ops`
 

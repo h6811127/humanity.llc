@@ -191,7 +191,9 @@ Hosted fees fund:
 
 **Sign-off:** `[ ]` Governance · `[ ]` Ops · `[ ]` Legal — date: _________
 
-**After sign-off:** Engineering may start **E1** per [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md). Do **not** merge billing (E5) until **G8** payment provider is checked.
+**Engineering status (2026-05-27):** E1–E6 code complete in staging behind `HOSTED_STEWARD_ENABLED`. **G0 sign-off unlocks production** (`HOSTED_STEWARD_ENABLED`, `STRIPE_WEBHOOK_SECRET`, `OPERATOR_AUDIT_TOKEN`). E5 billing code is staged; do **not** enable production webhooks until **G8** payment provider is checked.
+
+**After sign-off:** Enable production secrets per [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) rollout. Configure repo secret `OPERATOR_AUDIT_TOKEN` for E6.2 daily CI (`.github/workflows/steward-ops-daily.yml`).
 
 **Sign-off packet (read order):** [`HOSTED_TIER_M4_GOVERNANCE_BRIEF.md`](HOSTED_TIER_M4_GOVERNANCE_BRIEF.md) (summary) → this doc → [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) → [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) → [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md) § Is There A Paid Tier?
 
@@ -217,3 +219,4 @@ Hosted fees fund:
 | Date | Note |
 |------|------|
 | 2026-05-26 | M4 initial governance one-pager (planning defaults) |
+| 2026-05-27 | Engineering E1–E6 staging complete; G0 gates production enablement |

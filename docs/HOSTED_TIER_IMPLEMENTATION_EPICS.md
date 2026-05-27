@@ -1,6 +1,6 @@
 # Hosted tier — implementation epics (M8)
 
-**Status:** **M8 code complete in staging** (E1–E6 + E4d; behind `HOSTED_STEWARD_ENABLED`). **Production** blocked on **G0** M4 sign-off + external CF dashboards / cron wiring.  
+**Status:** **M8 code complete in staging** (E1–E6 + E4d; behind `HOSTED_STEWARD_ENABLED`). **Production** blocked on **G0** M4 sign-off + E6.1 external CF dashboard.  
 **Milestone:** M8 of [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md)  
 **Depends on:** M2–M7 complete; **M4 governance sign-off** before E1 merge to production  
 **Audience:** Engineering, ops
@@ -242,7 +242,7 @@ flowchart LR
 | Vitest | `device-steward-push-core.test.ts`, `steward-push-sse.test.ts`, `steward-push-notify.test.ts` |
 | E2E | `e2e/hosted-tier-push.spec.ts` — M7 **H4** + E4 fallback (SSE down re-enables poll) |
 
-**Next:** **G0** M4 governance sign-off for production enablement; wire E6.2 to external cron/pager; **E4e** DO fan-out deferred.
+**Next:** **G0** M4 governance sign-off for production enablement; configure `OPERATOR_AUDIT_TOKEN` for E6.2 CI; **E4e** DO fan-out deferred.
 
 ---
 
@@ -322,7 +322,7 @@ flowchart LR
 |---|------|--------|
 | E6.1 | Ops metrics snapshot | **Staging** — `GET /.well-known/hc/v1/operator/steward-ops` exposes account, session, usage, and in-memory SSE counts behind `OPERATOR_AUDIT_TOKEN` |
 | E6.1 | Cloudflare dashboard | Pending external dashboard setup |
-| E6.2 | Daily alert | **Staging** — `npm run worker:check-steward-ops` (threshold script + `worker/tests/steward-ops-thresholds.test.ts`); wire to external cron/pager when provider chosen |
+| E6.2 | Daily alert | **Staging** — `npm run worker:check-steward-ops` + Vitest; **CI** — `.github/workflows/steward-ops-daily.yml` (daily 14:00 UTC + manual dispatch; needs `OPERATOR_AUDIT_TOKEN`) |
 | E6.3 | Runbook | **Staging** — `docs/HOSTED_STEWARD_OPS_RUNBOOK.md` |
 | E6.4 | Support doc link | **Staging** — runbook directs customer-facing language to `docs/SKEPTIC_FAQ.md` |
 
@@ -391,6 +391,7 @@ flowchart LR
 
 | Date | Note |
 |------|------|
+| 2026-05-27 | **E6.2 CI:** `.github/workflows/steward-ops-daily.yml` daily threshold check |
 | 2026-05-27 | **M8 code-complete pass:** E4 fallback E2E; poll resume on push drop (`device-live-control-inbox.mjs`); `worker:test:steward-hosted` + `e2e:steward-hosted`; **G0** gates production |
 | 2026-05-27 | **E4d SW bridge:** push hint → service worker OS notify; skip SW poll when SSE healthy |
 | 2026-05-27 | **E6.2 daily alert script:** `worker:check-steward-ops` + threshold Vitest |
