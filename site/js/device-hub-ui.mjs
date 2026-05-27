@@ -639,7 +639,32 @@ function reapplyRevokedSinceVisitFromLatestResolved() {
   );
 }
 
-let lastWalletNetworkFetchAt = 0;
+const HUB_NETWORK_CHECKED_AT_SESSION_KEY = "hc_hub_network_checked_at";
+
+function readPersistedNetworkCheckedAt() {
+  if (typeof sessionStorage === "undefined") return 0;
+  try {
+    const n = Number(sessionStorage.getItem(HUB_NETWORK_CHECKED_AT_SESSION_KEY));
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * @param {number} at
+ */
+function persistNetworkCheckedAt(at) {
+  lastWalletNetworkFetchAt = at;
+  if (typeof sessionStorage === "undefined") return;
+  try {
+    sessionStorage.setItem(HUB_NETWORK_CHECKED_AT_SESSION_KEY, String(at));
+  } catch {
+    /* ignore */
+  }
+}
+
+let lastWalletNetworkFetchAt = readPersistedNetworkCheckedAt();
 /** @type {ReturnType<typeof setTimeout> | null} */
 let walletNetworkFetchTimer = null;
 let walletNetworkRefreshCursor = 0;
@@ -657,7 +682,7 @@ if (typeof window !== "undefined") {
         ? /** @type {{ at?: number }} */ (e.detail).at
         : undefined;
     if (typeof at === "number" && Number.isFinite(at) && at > 0) {
-      lastWalletNetworkFetchAt = at;
+      persistNetworkCheckedAt(at);
     }
   });
 }
@@ -714,7 +739,7 @@ function scheduleWalletNetworkFetch() {
  */
 async function fetchAndApplyNetworkChips(opts = {}) {
   if (!hubConfig.fetchNetworkStatus || !savedList) return;
-  lastWalletNetworkFetchAt = Date.now();
+  persistNetworkCheckedAt(Date.now());
   const stored = loadWallet();
   if (stored.length === 0) return;
   const manual = opts.manual === true;

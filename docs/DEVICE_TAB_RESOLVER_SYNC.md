@@ -170,7 +170,7 @@ Follower updates in-memory health used by dot / poll gates without `fetchResolve
 
 ### Live proof “checked … ago” (hub monitoring line)
 
-Uses the existing **`hc-live-control-poll-leader`** channel (not `hc-resolver-sync`). Leader broadcasts pending inbox + `at` after **every** poll, including manual **Check for live proof**. Followers call `applyLiveControlInboxSnapshot()` and fire `hc-live-proof-checked` so the hub line updates.
+Uses the existing **`hc-live-control-poll-leader`** channel (not `hc-resolver-sync`). **Any tab** that runs **Check for live proof** broadcasts pending inbox + `at` (leader lock not required for manual). Auto polls still broadcast from the leader tab only. Followers call `applyLiveControlInboxSnapshot()` and fire `hc-live-proof-checked`. Timestamps persist in **`sessionStorage`** (`hc_live_proof_checked_at`, `hc_hub_network_checked_at`) so reload in the same tab keeps “this visit” copy.
 
 **Requires:** both tabs on a page with live-proof inbox enabled (e.g. `/` with hub, `/wallet/`). **Watch for live proof** off still allows manual check on the leader tab.
 

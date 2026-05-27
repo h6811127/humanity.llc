@@ -104,6 +104,11 @@ function applySnapshotMessage(message) {
   saveWalletNetworkCacheForSync(merged);
   applyResolverNetworkSnapshot(message.entries, message.at);
   if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
+    try {
+      sessionStorage.setItem("hc_hub_network_checked_at", String(message.at));
+    } catch {
+      /* ignore */
+    }
     window.dispatchEvent(
       new CustomEvent("hc-hub-network-checked", { detail: { at: message.at } })
     );

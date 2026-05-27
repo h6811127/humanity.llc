@@ -116,7 +116,34 @@ let roundRobinCursor = 0;
 let pollSyncInFlight = false;
 /** Tracks SSE push suppressing auto poll so we restart the loop when push drops. */
 let stewardPushWasSuppressingAutoPoll = false;
-let lastLiveProofCheckAt = 0;
+
+/** Survives reload within the tab session (Monitoring “this visit” line). */
+const LIVE_PROOF_CHECKED_AT_SESSION_KEY = "hc_live_proof_checked_at";
+
+function readPersistedLiveProofCheckedAt() {
+  if (typeof sessionStorage === "undefined") return 0;
+  try {
+    const n = Number(sessionStorage.getItem(LIVE_PROOF_CHECKED_AT_SESSION_KEY));
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * @param {number} at
+ */
+function persistLiveProofCheckedAt(at) {
+  lastLiveProofCheckAt = at;
+  if (typeof sessionStorage === "undefined") return;
+  try {
+    sessionStorage.setItem(LIVE_PROOF_CHECKED_AT_SESSION_KEY, String(at));
+  } catch {
+    /* ignore */
+  }
+}
+
+let lastLiveProofCheckAt = readPersistedLiveProofCheckedAt();
 
 export const LIVE_PROOF_CHECKED_EVENT = "hc-live-proof-checked";
 export const LIVE_CONTROL_BUDGET_CHANGED = "hc-live-control-poll-budget-changed";
@@ -270,6 +297,9 @@ function liveControlChallengeFetchInit(manual) {
  * @param {LiveControlLeaderSnapshot} snapshot
  */
 export function applyLiveControlInboxSnapshot(snapshot) {
+  const sourceTabId = typeof snapshot.tabId === "string" ? snapshot.tabId : "";
+  if (sourceTabId && sourceTabId === getLiveControlPollTabId()) return;
+
   const next = Array.isArray(snapshot.pending) ? [...snapshot.pending] : [];
   const prevHealth = getLiveControlPollHealth();
   setLiveControlPollHealth(
@@ -280,22 +310,40 @@ export function applyLiveControlInboxSnapshot(snapshot) {
   const changed =
     liveControlInboxChanged(pending, next) || prevHealth !== getLiveControlPollHealth();
   pending = next;
-  lastLiveProofCheckAt = snapshot.at || Date.now();
+  persistLiveProofCheckedAt(snapshot.at || Date.now());
   if (changed) {
     window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
   }
   window.dispatchEvent(new Event(LIVE_PROOF_CHECKED_EVENT));
 }
 
-function publishLeaderSnapshot() {
-  if (!isLiveControlPollLeaderTab()) return;
-  touchLiveControlPollLeader();
+/** Share inbox + checked-at with other tabs (no leader lock required). */
+function broadcastLiveControlSnapshotToPeers() {
+  const tabId = getLiveControlPollTabId();
+  if (!tabId) return;
   broadcastLiveControlPollSnapshot({
     pending: getLiveControlPending(),
     health: getLiveControlPollHealth(),
     at: lastLiveProofCheckAt,
-    tabId: getLiveControlPollTabId(),
+    tabId,
   });
+}
+
+function publishLeaderSnapshot() {
+  if (!isLiveControlPollLeaderTab()) return;
+  touchLiveControlPollLeader();
+  broadcastLiveControlSnapshotToPeers();
+}
+
+/**
+ * @param {{ manual?: boolean }} [opts]
+ */
+function publishLiveControlSnapshotAfterPoll(opts = {}) {
+  if (opts.manual === true) {
+    broadcastLiveControlSnapshotToPeers();
+    return;
+  }
+  publishLeaderSnapshot();
 }
 
 function clearPollTimer() {
@@ -426,9 +474,9 @@ export async function refreshLiveControlInbox(opts = {}) {
     if (changed) {
       window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
     }
-    lastLiveProofCheckAt = Date.now();
+    persistLiveProofCheckedAt(Date.now());
     window.dispatchEvent(new Event(LIVE_PROOF_CHECKED_EVENT));
-    publishLeaderSnapshot();
+    publishLiveControlSnapshotAfterPoll(opts);
     return pending;
   }
 
@@ -450,12 +498,12 @@ export async function refreshLiveControlInbox(opts = {}) {
   const changed =
     liveControlInboxChanged(pending, next) || prevHealth !== getLiveControlPollHealth();
   pending = next;
-  lastLiveProofCheckAt = Date.now();
+  persistLiveProofCheckedAt(Date.now());
   if (changed) {
     window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
   }
   window.dispatchEvent(new Event(LIVE_PROOF_CHECKED_EVENT));
-  publishLeaderSnapshot();
+  publishLiveControlSnapshotAfterPoll(opts);
   return pending;
 }
 
@@ -490,12 +538,13 @@ export async function applyLiveProofPendingFromPush(hint) {
   const changed =
     liveControlInboxChanged(pending, next) || prevHealth !== getLiveControlPollHealth();
   pending = next;
-  lastLiveProofCheckAt = Date.now();
+  persistLiveProofCheckedAt(Date.now());
   if (changed) {
     window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
   }
   window.dispatchEvent(new Event(LIVE_PROOF_CHECKED_EVENT));
   if (isLiveControlPollLeaderTab()) publishLeaderSnapshot();
+  else broadcastLiveControlSnapshotToPeers();
   return pending;
 }
 
