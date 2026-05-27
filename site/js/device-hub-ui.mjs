@@ -57,6 +57,7 @@ import {
   syncLastSeenFromNetworkMap,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
+import { clearWalletNetworkTruthForProfile } from "./device-wallet-network-truth.mjs";
 import { getCardStatusUrl } from "./hc-sign.mjs";
 import {
   hubCardIdentityLine,
@@ -862,7 +863,11 @@ function renderActivityRows() {
   }
 }
 
-function renderSavedRows() {
+/**
+ * @param {{ initialChipChecking?: boolean }} [opts] Use checking chips until the next poll (avoids stale cache flash after wallet edits).
+ */
+function renderSavedRows(opts = {}) {
+  const initialChipChecking = opts.initialChipChecking === true;
   const entries = loadWallet();
   if (!savedList || !savedGroup) return;
 
@@ -914,8 +919,8 @@ function renderSavedRows() {
     });
     const statusHtml = hubCardStatusHtml(
       entry.profile_id,
-      getCachedNetworkStatus(entry.profile_id) ?? "checking",
-      getCachedNetworkScanKind(entry.profile_id)
+      initialChipChecking ? "checking" : getCachedNetworkStatus(entry.profile_id) ?? "checking",
+      initialChipChecking ? null : getCachedNetworkScanKind(entry.profile_id)
     );
     const cardIcon = hubConfig.fetchNetworkStatus
       ? hubCardIconHtml(entry.profile_id)
@@ -1167,14 +1172,19 @@ function renderSavedRows() {
         markProfileRemovedFromDevice(entry.profile_id);
         purgePresenceForProfile(entry.profile_id);
         clearSignLock(entry.profile_id);
+        clearWalletNetworkTruthForProfile(entry.profile_id);
         logDeviceActivity("remove_card", entry.label, {
           profile_id: entry.profile_id,
           qr_id: entry.qr_id ?? null,
         });
       }
+      bumpWalletNetworkApplyGen();
       saveWallet(loadWallet().filter((e) => e.id !== id));
-      renderSavedRows();
-      syncHubInboxAlertGroups();
+      const remaining = loadWallet();
+      renderSavedRows({ initialChipChecking: remaining.length > 0 });
+      if (remaining.length === 0) {
+        syncHubInboxAlertGroups();
+      }
       applySearchFilter();
       notifyHubChanged();
     });
@@ -1196,6 +1206,7 @@ function renderSavedRows() {
     scheduleWalletNetworkFetch();
   } else {
     applyCachedNetworkChipsOnly();
+    syncHubInboxAlertGroups();
   }
 }
 

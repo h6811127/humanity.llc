@@ -211,6 +211,7 @@ Run: `npm run worker:test:card-disabled-since-visit` · `npm run e2e:card-disabl
 5. **G4:** **Shipped** - `setWalletStatusPollHealthForSinceVisit` in `device-wallet-since-visit-gate.mjs`; wallet poll sets `degraded` on 429 or all-fetched rows offline/error (`device-wallet-network.mjs`).
 6. **G6:** **Shipped** - tab `visibilitychange` polls when wallet non-empty and (`page-wallet` or hub expanded) (`device-hub-ui.mjs`).
 7. **A3:** **Shipped** - `device-wallet-network-truth.mjs`; see `worker/tests/device-wallet-network-truth.test.ts`.
+8. **Remove from device flash:** **Shipped** - drop removed profile SSOT, cancel in-flight poll apply, render siblings with checking chips, defer hub since-visit group sync until wallet poll `onDone` (`device-hub-ui.mjs` remove handler).
 
 ---
 
