@@ -79,7 +79,9 @@ Deploy Worker with `X-HC-Scan-UI: pass-v7` for this layout.
 | Second-device scan | 1 | Owner checkbox |
 | Non-creator scans for real decisions | **≥5** across pilot | Founder field notes (no server analytics) |
 
-**Habit loop closed (one steward):** ≥2 updates + printed + second-device scan confirmed.
+**Habit loop closed (one steward):** ≥2 updates + printed + second-device scan confirmed. Scorecard headline switches to “Pilot habit loop closed on this device.” when all three are true.
+
+**Field pilot export:** **Copy pilot summary** on `/created/` copies local JSON (`humanity_status_plate_pilot_summary_v1`) for founder aggregation across plates — no server analytics.
 
 **Privacy:** Scorecard is device-local only — aligns with no scan analytics by default.
 

@@ -3,9 +3,12 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   HABIT_UPDATE_TARGET,
   STORAGE_KEY,
+  buildPilotSummaryPayload,
   defaultLoopRecord,
   formatLastUpdated,
+  formatPilotSummaryForExport,
   getLoopRecord,
+  habitLoopClosed,
   loopProgressHeadline,
   loopUpdateProgress,
   recordStatusPlateUpdate,
@@ -90,5 +93,47 @@ describe("status-plate-loop-scorecard", () => {
       milestones: {},
     });
     expect(s).toBeTruthy();
+  });
+
+  it("habitLoopClosed requires updates and both milestones", () => {
+    expect(habitLoopClosed(defaultLoopRecord())).toBe(false);
+    expect(
+      habitLoopClosed({
+        updateCount: 2,
+        lastUpdatedAt: "2026-05-27T12:00:00.000Z",
+        milestones: {},
+      })
+    ).toBe(false);
+    expect(
+      habitLoopClosed({
+        updateCount: 2,
+        lastUpdatedAt: "2026-05-27T12:00:00.000Z",
+        milestones: { printed: true, second_device_scan: true },
+      })
+    ).toBe(true);
+  });
+
+  it("loopProgressHeadline reports closed state", () => {
+    expect(
+      loopProgressHeadline({
+        updateCount: 2,
+        lastUpdatedAt: null,
+        milestones: { printed: true, second_device_scan: true },
+      })
+    ).toMatch(/closed on this device/);
+  });
+
+  it("buildPilotSummaryPayload includes habit_loop_closed", () => {
+    const payload = buildPilotSummaryPayload("p1", "river_studio", {
+      updateCount: 2,
+      lastUpdatedAt: "2026-05-27T12:00:00.000Z",
+      milestones: { printed: true, second_device_scan: true },
+    });
+    expect(payload.kind).toBe("humanity_status_plate_pilot_summary_v1");
+    expect(payload.profile_id).toBe("p1");
+    expect(payload.handle).toBe("river_studio");
+    expect(payload.habit_loop_closed).toBe(true);
+    const text = formatPilotSummaryForExport(payload);
+    expect(text).toContain('"habit_loop_closed": true');
   });
 });

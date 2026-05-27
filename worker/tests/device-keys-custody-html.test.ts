@@ -49,6 +49,8 @@ describe("device-keys-custody-html", () => {
     const html = readFileSync(join(root, "site/created/index.html"), "utf8");
     expect(html).toContain('id="status-plate-loop-scorecard"');
     expect(html).toContain('id="status-plate-loop-progress"');
+    expect(html).toContain('id="status-plate-loop-export"');
+    expect(html).toContain("Copy pilot summary");
     expect(html).toContain("No scan analytics");
   });
 

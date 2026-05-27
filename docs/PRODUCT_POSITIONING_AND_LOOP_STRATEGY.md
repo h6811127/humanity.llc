@@ -66,9 +66,16 @@
 - Status plate field hint corrected (Live updates without reprint)
 - Vitest: `worker/tests/landing-messaging.test.ts`
 
-### Step 4 — Status plate field pilot (10 plates)
+### Step 4 — Status plate field pilot tooling ✅
 
-Founder-run; see `docs/STATUS_PLATE_PILOT.md`.
+**Founder-run (field, not engineering):** deploy 5–10 real plates; score strangers with `docs/M5_STRANGER_TEST_RUNBOOK.md` and `docs/STATUS_PLATE_PILOT.md` § Pilot checklist.
+
+**Shipped tooling (device-local):**
+
+- `habitLoopClosed()` — true when ≥2 Live publishes + printed + second-device scan milestones
+- `/created/` scorecard shows closed state + **Copy pilot summary** (JSON export for founder aggregation; no scan analytics)
+
+**Exit:** `worker/tests/status-plate-loop-scorecard.test.ts`; field notes from exported summaries.
 
 ### Step 5 — Terminology sequencing pass (scanner vs steward) ✅
 

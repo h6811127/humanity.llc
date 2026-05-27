@@ -627,12 +627,20 @@ function resolvePilotTemplate(session) {
   return "general";
 }
 
+function pilotScorecardHandle(session = loadSession()) {
+  return session?.handle ?? data?.handle ?? null;
+}
+
+function syncStatusPlateScorecard(profileId, record) {
+  syncStatusPlateLoopScorecardDom(profileId, record, pilotScorecardHandle());
+}
+
 function applyPilotTemplateUi(session) {
   const pilot = resolvePilotTemplate(session);
   syncCreatedPilotStewardCopy(pilot);
   if (pilot === "status_plate" && statusPlateTipEl) {
     statusPlateTipEl.hidden = false;
-    bindStatusPlateLoopScorecard(profileId);
+    bindStatusPlateLoopScorecard(profileId, pilotScorecardHandle(session));
   }
   if (pilot === "lost_item_relay" && lostItemTipEl) {
     lostItemTipEl.hidden = false;
@@ -988,7 +996,7 @@ if (activeScanUrl) {
           downloadQrBtn.textContent = "Downloaded";
           if (resolvePilotTemplate(loadSession()) === "status_plate") {
             const row = setLoopMilestone(profileId, "printed", true);
-            syncStatusPlateLoopScorecardDom(profileId, row);
+            syncStatusPlateScorecard(profileId, row);
           }
           setTimeout(() => {
             downloadQrBtn.textContent = prev;
@@ -1065,7 +1073,7 @@ async function bootstrapOwnerTools() {
       }
       if (resolvePilotTemplate(loadSession()) === "status_plate") {
         const row = recordStatusPlateUpdate(profileId);
-        syncStatusPlateLoopScorecardDom(profileId, row);
+        syncStatusPlateScorecard(profileId, row);
       }
       syncLiveCockpit();
       void refreshNetworkStatus();
