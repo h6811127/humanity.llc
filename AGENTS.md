@@ -29,6 +29,7 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 - **Landing desktop**: Wider two-column intro at ≥880px per `docs/LANDING_DESKTOP_LAYOUT.md`
 - **Scan Path 2 UI (`pass-v33`)**: Live check data-arriving + dot sync + L3 actor band — `docs/SCAN_PAGE_TRUST_UI.md`, motion in `docs/VISUAL_IDENTITY_PRINCIPLES.md`. After `site/scan-pass.css` changes: `npm run worker:bundle-scan`. Tests: `npm run worker:test:scan-live-check-arrive` · `npm run worker:test:scan-actor-band`. Prototype: `/prototypes/scan-trust-ui-demo.html` on Pages dev.
 - **Build check**: `npm run build` (validates static site exists)
+- **Pages build stamp (debug):** `docs/SITE_BUILD_VERSIONING.md` — `npm run site:build-meta` before Pages deploy; bootstrap logs `[humanity] site build …` on shell pages. After meta/bootstrap changes: `npm run worker:test -- worker/tests/site-build-meta.test.ts`.
 - **Worker dev**: `npm run worker:dev`
 - **Pages dev**: `npm run pages:dev`
 - **Showcase scan URLs** (M5 / landing): `npm run site:seed-showcase` (status plate), `npm run site:seed-showcase-live-object` (live object), `npm run site:seed-showcase-lost-item` (lost-item relay; each needs `API_ORIGIN`)

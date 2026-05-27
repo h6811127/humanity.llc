@@ -4,8 +4,9 @@
   "description": "Humanity Commons  -  static site (Pages) + reference resolver (Worker)",
   "scripts": {
     "build": "node -e \"const fs=require('fs'); fs.accessSync('site/index.html'); fs.accessSync('site/404.html'); console.log('Static site ready: site/')\"",
-    "deploy": "wrangler pages deploy site --project-name=humanity-llc",
-    "pages:deploy": "wrangler pages deploy site --project-name=humanity-llc",
+    "site:build-meta": "node worker/scripts/generate-build-meta.mjs",
+    "deploy": "npm run site:build-meta && wrangler pages deploy site --project-name=humanity-llc",
+    "pages:deploy": "npm run site:build-meta && wrangler pages deploy site --project-name=humanity-llc",
     "pages:dev": "wrangler pages dev site",
     "worker:dev": "wrangler dev --config worker/wrangler.toml",
     "worker:bundle-scan": "tsx worker/scripts/bundle-scan-assets.ts",

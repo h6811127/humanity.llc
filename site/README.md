@@ -38,6 +38,10 @@ npm run deploy
 # or: npx wrangler pages deploy site --project-name=humanity-llc
 ```
 
+`pages:deploy` / `deploy` run `npm run site:build-meta` first (git SHA + shell asset version → `site/js/build-meta.mjs`). See [`docs/SITE_BUILD_VERSIONING.md`](../docs/SITE_BUILD_VERSIONING.md). On shell pages, DevTools console shows `[humanity] site build …` after load.
+
+**Git-connected Pages:** set build command to `npm run site:build-meta && npm run build` (output directory `site`).
+
 **Custom domain:** `humanity.llc`
 
 ### Unknown URLs (404)
