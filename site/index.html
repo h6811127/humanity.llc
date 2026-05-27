@@ -117,13 +117,22 @@
             <div class="device-hub-group" id="device-hub-crosstab-notice" hidden role="status"></div>
             <div class="device-hub-group" id="device-hub-notice-group" hidden></div>
             <div
-              class="device-hub-group"
+              class="device-hub-group device-hub-alert-card"
               id="device-hub-live-control-group"
               hidden
               data-hub-group="liveproof"
+              role="status"
             >
-              <p class="device-hub-group-label">Live proof waiting</p>
-              <ul class="list list-compact" id="device-hub-live-control-list"></ul>
+              <div class="hc-emphasis-card hc-emphasis-card--urgent device-hub-live-control-card">
+                <div class="hc-emphasis-card__main">
+                  <span class="hc-emphasis-card__dot hc-emphasis-card__dot--urgent" aria-hidden="true"></span>
+                  <div class="hc-emphasis-card__copy">
+                    <p class="hc-emphasis-card__eyebrow" id="device-hub-live-control-eyebrow">Live proof waiting</p>
+                    <p class="hc-emphasis-card__detail" id="device-hub-live-control-summary" hidden></p>
+                  </div>
+                </div>
+                <ul class="list list-compact device-hub-live-control-list" id="device-hub-live-control-list"></ul>
+              </div>
             </div>
             <div
               class="device-hub-group"
