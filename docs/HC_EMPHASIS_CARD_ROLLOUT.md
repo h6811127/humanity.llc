@@ -125,7 +125,7 @@ Prioritized follow-ups after Phases 0–5. Full tier tables: [`UI_COLOR_SCHEME_S
 |------|---------|----------|-------|
 | Hub keys custody | `#device-keys-custody-hub` (`device-keys-custody.mjs` `--hub`) | `--info` | **Shipped** — emphasis card + secondary Acknowledge; **compact** stacked spacing ([`KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md`](KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md)) |
 | Wallet keys custody | `#device-keys-custody-wallet` (`--wallet`) | `--info` | **Shipped** — same as hub + help/import foot; compact spacing |
-| Compact custody strip | `device-keys-custody--compact` | `--warn` | **Shipped** — inline warn card for landing/create mounts |
+| Compact custody strip | `device-keys-custody--compact` | `--warn` | **Shipped** — `keysCustodyHtml("compact")` + compact CSS; **not mounted** in production (hub/wallet only) |
 | Hub cross-tab slot | `#device-hub-crosstab-notice` | `--info` / `--warn` | **Shipped** — emphasis card + pill CTAs (matches page/wallet cross-tab) |
 | Vouch return | `#created-vouch-return-banner` | `--active` | **Shipped** — post-vouch continuity; green active dot + primary CTA |
 
@@ -202,8 +202,9 @@ Canonical spec: [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL
 3. Eyebrow, title, detail, CTA readable; tap targets ≥44px where buttons.
 4. **Dark mode:** explicit `background: var(--hc-emphasis-card-fill-*)` per modifier in `theme-dark.css`.
 5. `npm run worker:test:ui-color-scheme`
-6. Wallet/cross-tab: `npm run e2e -- e2e/device-os-wallet.spec.ts` when touching wallet chrome.
-7. Created/revoke: manual Manage tab revoke banner + no-session paths on `/created/`.
+6. Keys custody (hub/wallet): `npm run worker:test:keys-custody` · `npm run e2e:keys-custody` when touching `device-keys-custody.mjs` or custody CSS ([`KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md`](KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md)).
+7. Wallet/cross-tab (other): `npm run e2e -- e2e/device-os-wallet.spec.ts` when touching wallet chrome beyond custody.
+8. Created/revoke: manual Manage tab revoke banner + no-session paths on `/created/`.
 
 ---
 

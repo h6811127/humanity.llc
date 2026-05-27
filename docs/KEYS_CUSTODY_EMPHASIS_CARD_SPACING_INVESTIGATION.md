@@ -1,6 +1,6 @@
 # Keys custody emphasis card — excessive vertical spacing
 
-**Status:** **Closed** (May 2026) — steps 1–15; CI WebKit custody e2e; regression via `npm run worker:test:keys-custody` and `npm run e2e:keys-custody`  
+**Status:** **Closed** (May 2026) — steps 1–16 archived; CI WebKit custody e2e; regression via `npm run worker:test:keys-custody` and `npm run e2e:keys-custody`  
 **Surface:** `#device-keys-custody-hub`, `#device-keys-custody-wallet`, `device-keys-custody--created`, `device-keys-custody--compact`  
 **Canonical spacing:** [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) § Internal spacing ladder · F3 stacked layout
 
@@ -90,3 +90,26 @@ Same root cause as keys custody: column `hc-emphasis-card` without F3 stacked la
 | 15a | CI: `e2e/keys-custody-emphasis-webkit.spec.ts` on push (WebKit + iPhone 13 Pro) | `.github/workflows/test-site.yml` | **Shipped** |
 | 15b | `AGENTS.md` regression commands | `worker:test:keys-custody` · `e2e:keys-custody` | **Shipped** |
 | 15c | Acceptance section uses bundled scripts (below) | This file | **Shipped** |
+
+---
+
+## Archive (step 16)
+
+| Step | Action | Status |
+|------|--------|--------|
+| 16a | Record **production mount scope** (hub + wallet only) | This file § Mount scope | **Shipped** |
+| 16b | Align rollout doc: compact/created HTML shipped; mounts optional | [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) | **Shipped** |
+| 16c | Rollout QA item 6 → `e2e:keys-custody` when custody chrome changes | [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) § QA | **Shipped** |
+
+### Mount scope
+
+| Variant | Mount point | Production |
+|---------|-------------|------------|
+| `hub` | `#device-keys-custody-hub` · `landing-device-hub.mjs` | **Yes** |
+| `wallet` | `#device-keys-custody-wallet` · `wallet-page.mjs` | **Yes** |
+| `created` | `keysCustodyHtml("created")` — no `mountKeysCustody` call yet | HTML/CSS only |
+| `compact` | `keysCustodyHtml("compact")` — no mount | HTML/CSS only |
+
+Spacing/CSS for all variants is covered by `.device-keys-custody.hc-emphasis-card` (Vitest). Mounting `created` / `compact` is a **separate product change**, not part of this spacing incident.
+
+**No further engineering steps** after 16. **14d** (physical iPhone) remains operator-optional.
