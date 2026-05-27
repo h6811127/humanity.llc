@@ -28,7 +28,7 @@
     "e2e:card-disabled-since-visit": "playwright test e2e/device-os-wallet.spec.ts e2e/device-inbox.spec.ts",
     "e2e:created-control": "playwright test e2e/created-control.spec.ts",
     "e2e:install": "playwright install chromium webkit",
-    "e2e:safari": "playwright test e2e/safari-shell-scroll.spec.ts",
+    "e2e:safari": "playwright test e2e/safari-shell-scroll.spec.ts e2e/scan-cross-tab-banner-webkit.spec.ts",
     "e2e:scan-page-dot": "playwright test e2e/scan-page-dot.spec.ts",
     "e2e:scan-hero-visual": "playwright test e2e/scan-hero-visual.spec.ts",
     "e2e:scan-hero-visual:webkit": "playwright test e2e/scan-hero-visual.spec.ts --project=webkit --project=iphone-13-pro",

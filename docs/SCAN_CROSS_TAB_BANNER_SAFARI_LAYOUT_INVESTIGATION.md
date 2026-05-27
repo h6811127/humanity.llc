@@ -104,6 +104,13 @@ Manual sign-off: **P1-CT** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) · **P1-SD** 
 
 ---
 
-## Out of scope / follow-ups
+## Automated WebKit regression (shipped)
 
-- **Automated WebKit screenshot** — optional Playwright `webkit` project once browsers installed in CI (`npx playwright install webkit`).
+**Spec:** `e2e/scan-cross-tab-banner-webkit.spec.ts`  
+**Projects:** `webkit` (Desktop Safari), `iphone-13-pro` in `playwright.config.ts`  
+**CI:** `.github/workflows/test-site.yml` (with `npx playwright install webkit`)  
+**Local:** `npm run e2e:safari` or `npm run e2e -- e2e/scan-cross-tab-banner-webkit.spec.ts --project=webkit`
+
+Asserts stacked `flex-direction: column`, `-webkit-appearance: none`, red primary + secondary class, ≥6px horizontal gap between CTAs on `#scan-cross-tab-banner` and `#wallet-tab-hint`.
+
+Regenerate scan fixture after `scan-pass.css` changes: `npm run site:generate-scan-e2e-fixture`.
