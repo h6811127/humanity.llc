@@ -607,6 +607,49 @@ test.describe("device OS wallet flow", () => {
     expect(metrics!.gapPx).toBeLessThan(56);
   });
 
+  test("keys custody acknowledge dismiss persists on wallet", async ({ page }) => {
+    await page.goto("/wallet/");
+    await page.evaluate(() => localStorage.removeItem("hc_keys_custody_notice_dismissed"));
+    await page.reload();
+    const card = page.locator(".device-keys-custody--wallet");
+    await expect(card).toBeVisible();
+    await card.getByRole("button", { name: "Acknowledge" }).click();
+    await expect(card).toHaveCount(0);
+    expect(
+      await page.evaluate(() => localStorage.getItem("hc_keys_custody_notice_dismissed"))
+    ).toBe("1");
+    await page.reload();
+    await expect(page.locator(".device-keys-custody--wallet")).toHaveCount(0);
+  });
+
+  test("keys custody wallet notice readable in dark theme", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("hc_theme", "dark");
+      localStorage.removeItem("hc_keys_custody_notice_dismissed");
+    });
+    await page.goto("/wallet/");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    const card = page.locator(".device-keys-custody--wallet");
+    await expect(card).toBeVisible();
+
+    const colors = await card.evaluate((el) => {
+      const eyebrow = el.querySelector(".hc-emphasis-card__eyebrow");
+      const detail = el.querySelector(".hc-emphasis-card__detail");
+      if (!eyebrow || !detail) return null;
+      const parseRgb = (s: string) => {
+        const m = s.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+        return m ? [Number(m[1]), Number(m[2]), Number(m[3])] : null;
+      };
+      return {
+        eyebrow: parseRgb(getComputedStyle(eyebrow).color),
+        detail: parseRgb(getComputedStyle(detail).color),
+      };
+    });
+    expect(colors).not.toBeNull();
+    expect(colors!.eyebrow![2]).toBeGreaterThan(150);
+    expect(colors!.detail![0]).toBeGreaterThan(180);
+  });
+
   test("keys custody hub notice uses compact stacked layout", async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.removeItem("hc_keys_custody_notice_dismissed");

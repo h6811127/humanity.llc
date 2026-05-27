@@ -1,6 +1,6 @@
 # Keys custody emphasis card — excessive vertical spacing
 
-**Status:** Steps 1–12 **shipped** (May 2026) — step 13 manual QA remains; `styles.css?v=125`  
+**Status:** **Complete** (May 2026) — steps 1–13; automated QA in Vitest + e2e; manual sign-off via [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-KC**  
 **Surface:** `#device-keys-custody-hub`, `#device-keys-custody-wallet`, `device-keys-custody--created`, `device-keys-custody--compact`  
 **Canonical spacing:** [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) § Internal spacing ladder · F3 stacked layout
 
@@ -67,4 +67,6 @@ Same root cause as keys custody: column `hc-emphasis-card` without F3 stacked la
 | Step | Action | Status |
 |------|--------|--------|
 | 12 | E2E: wallet + hub keys custody compact layout (detail ↔ Acknowledge gap, `flex-start`, `__main` not growing) | `e2e/device-os-wallet.spec.ts` | **Shipped** |
-| 13 | Manual QA: light + dark hub/wallet custody; Acknowledge dismiss ([`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) § QA) | Operator |
+| 13a | Runbook: **P1-KC** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) | Manual checklist | **Shipped** |
+| 13b | E2E: Acknowledge dismiss persists; dark theme readable on wallet custody | `e2e/device-os-wallet.spec.ts` | **Shipped** |
+| 13c | Safari iOS visual sign-off (optional) | Operator per P1-KC step 5 | As needed |

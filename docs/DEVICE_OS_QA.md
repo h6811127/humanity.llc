@@ -203,6 +203,24 @@ Per [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § QA (hub card
 
 **Note:** `/wallet/` uses scroll-to-saved, not a separate glance popover (see [`DEVICE_OS.md`](DEVICE_OS.md)).
 
+### P1-KC · Keys custody emphasis card (compact layout)
+
+Spec: [`KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md`](KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md) · [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) § Compact density.
+
+**Reset:** `localStorage.removeItem("hc_keys_custody_notice_dismissed")` then reload.
+
+**Automated:** `npm run worker:test -- worker/tests/device-keys-custody-html.test.ts worker/tests/device-emphasis-card-html.test.ts` · `npm run e2e -- e2e/device-os-wallet.spec.ts -g "keys custody"`
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | `/wallet/` with notice visible (reset dismiss key) | **KEYS CUSTODY** info card; copy → **Acknowledge** ~12px rhythm; no tall empty band inside card |
+| 2 | `/` → tap status dot → hub open | Same card in hub (`device-keys-custody--hub`); compact padding; **Acknowledge** left-aligned |
+| 3 | Tap **Acknowledge** on wallet or hub | Card removed; `localStorage.hc_keys_custody_notice_dismissed === "1"`; reload — notice stays hidden |
+| 4 | `localStorage.hc_theme = "dark"`; reload `/wallet/` + hub | Blue eyebrow + readable detail on dark shell; glass/hairline card still visible (not flat rim) |
+| 5 | Safari iOS (optional) | Same as steps 1–3; tap targets ≥44px on **Acknowledge** |
+
+**Fail signals:** Large gap between detail and **Acknowledge**; card stretches to sheet height; dismiss does not persist; dark mode gray-on-gray eyebrow/detail.
+
 ### P1-LP · Landing progress strip — retired
 
 Removed May 2026. See [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md). Steward resume: hub + `/created/` setup wizard; strangers: hero Create + **How it works**.
