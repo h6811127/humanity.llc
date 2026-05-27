@@ -1,6 +1,6 @@
 # Hub header simplification
 
-**Status:** Steps 1-2 shipped  
+**Status:** Steps 1-2 shipped
 **Scope:** Bottom-sheet hub header on `/`, `/create/`, and `/created/`  
 **Companions:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md), [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md)
 

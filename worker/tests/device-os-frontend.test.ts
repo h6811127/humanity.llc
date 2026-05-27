@@ -7,6 +7,7 @@ import {
   buildStatusSegmentsFromCounts,
   tabNoticeCountFromState,
 } from "../../site/js/device-counts-core.mjs";
+import { hubStatusLineItemsFromSegments } from "../../site/js/device-dot-state-core.mjs";
 import {
   buildLiveControlProofHref,
   classifyChallengeHttpStatus,
@@ -493,6 +494,24 @@ describe("buildStatusSegmentsFromCounts", () => {
     expect(segments.find((s) => s.id === "liveproof")?.label).toBe(
       "Proof Check Limited"
     );
+  });
+
+  it("models the hub header as primary resolver state plus subordinate counts", () => {
+    const items = hubStatusLineItemsFromSegments(
+      buildStatusSegmentsFromCounts({
+        network: "ok",
+        saved: 0,
+        pins: 0,
+        notices: 1,
+        liveProof: 0,
+      })
+    );
+    expect(items.map((s) => s.id)).toEqual(["network", "saved", "pinned", "notices"]);
+    expect(items.find((s) => s.id === "network")?.emphasis).toBe("primary");
+    expect(items.filter((s) => s.id === "saved" || s.id === "pinned").every((s) => s.zero)).toBe(
+      true
+    );
+    expect(items.find((s) => s.id === "notices")?.emphasis).toBe("alert");
   });
 });
 
