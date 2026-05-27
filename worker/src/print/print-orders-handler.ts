@@ -2,6 +2,7 @@ import {
   allPlannedQrsMinted,
   mintPrintOrderFromCredentials,
 } from "../commerce/fulfillment-mint";
+import { ensurePrintOrderForCommerceOrder } from "../commerce/fulfillment-queue";
 import {
   getCommerceOrderById,
   type CommerceOrderRow,
