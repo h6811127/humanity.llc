@@ -7663,6 +7663,66 @@ body[data-created-mode="setup"] #created-setup-keys-mount .flow-keys-panel {
   font-size: 14px;
 }
 
+.created-status-plate-loop {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--hc-emphasis-card-border-info, rgba(59, 130, 246, 0.25));
+  background: var(--hc-emphasis-card-fill-info-glass, rgba(59, 130, 246, 0.06));
+}
+
+.created-status-plate-loop-title {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.created-status-plate-loop-lead {
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.created-status-plate-loop-lead[data-met="true"] {
+  color: var(--text-secondary, #475569);
+}
+
+.created-status-plate-loop-meta {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: var(--text-secondary, #64748b);
+}
+
+.created-status-plate-loop-checklist {
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.created-status-plate-loop-checklist li + li {
+  margin-top: 8px;
+}
+
+.created-status-plate-loop-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.created-status-plate-loop-check input {
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.created-status-plate-loop-privacy {
+  margin: 0;
+  font-size: 12px;
+}
+
 .created-manage-tools {
   display: flex;
   flex-direction: column;

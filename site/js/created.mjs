@@ -21,6 +21,13 @@ import {
   markFirstRevokeDone,
   syncUpdateStatusTaskGate,
 } from "./created-first-revoke-gate.mjs?v=2";
+import {
+  bindStatusPlateLoopScorecard,
+  recordStatusPlateUpdate,
+  setLoopMilestone,
+  syncStatusPlateLoopScorecardDom,
+} from "./status-plate-loop-scorecard.mjs";
+import { syncCreatedPilotStewardCopy } from "./pilot-steward-copy.mjs";
 import { initCreatedDeviceSave } from "./created-device-save.mjs";
 import { markSetupDone, modeFromPage } from "./created-mode.mjs";
 import { initCreatedSetup } from "./created-setup.mjs";
@@ -622,8 +629,10 @@ function resolvePilotTemplate(session) {
 
 function applyPilotTemplateUi(session) {
   const pilot = resolvePilotTemplate(session);
+  syncCreatedPilotStewardCopy(pilot);
   if (pilot === "status_plate" && statusPlateTipEl) {
     statusPlateTipEl.hidden = false;
+    bindStatusPlateLoopScorecard(profileId);
   }
   if (pilot === "lost_item_relay" && lostItemTipEl) {
     lostItemTipEl.hidden = false;
@@ -977,6 +986,10 @@ if (activeScanUrl) {
         try {
           await downloadQrPng(activeScanUrl, `humanity-${slug}-qr.png`);
           downloadQrBtn.textContent = "Downloaded";
+          if (resolvePilotTemplate(loadSession()) === "status_plate") {
+            const row = setLoopMilestone(profileId, "printed", true);
+            syncStatusPlateLoopScorecardDom(profileId, row);
+          }
           setTimeout(() => {
             downloadQrBtn.textContent = prev;
           }, 2000);
@@ -1049,6 +1062,10 @@ async function bootstrapOwnerTools() {
         const next = { ...sessionNow, manifesto_line: manifestoLine };
         saveSession(next);
         data = next;
+      }
+      if (resolvePilotTemplate(loadSession()) === "status_plate") {
+        const row = recordStatusPlateUpdate(profileId);
+        syncStatusPlateLoopScorecardDom(profileId, row);
       }
       syncLiveCockpit();
       void refreshNetworkStatus();

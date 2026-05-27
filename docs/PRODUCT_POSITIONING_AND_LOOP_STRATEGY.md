@@ -39,11 +39,18 @@
 
 ## Implementation plan
 
-### Step 1 — Status plate habit loop scorecard
+### Step 1 — Status plate habit loop scorecard ✅
 
-**Status:** Pending  
-**Build:** Local scorecard on `/created/` for status plate pilots (`site/js/status-plate-loop-scorecard.mjs`).  
-**See:** `docs/STATUS_PLATE_PILOT.md` § Habit loop scorecard
+**Shipped:**
+
+- Local scorecard on `/created/` for `status_plate` pilots (`site/js/status-plate-loop-scorecard.mjs`)
+- Tracks manifesto publish count and last update time per `profile_id` (localStorage — no scan analytics)
+- Manual milestones: printed QR, scanned from second device (owner checkboxes; print auto-checks on QR PNG download)
+- Surfaces progress toward pilot habit target: **≥2 status updates**
+
+**Exit:** `worker/tests/status-plate-loop-scorecard.test.ts`; scorecard visible on status-plate `/created/` in control workspace.
+
+**Related:** `docs/STATUS_PLATE_PILOT.md` § Habit loop scorecard
 
 ### Step 2 — Unlock live update for live-update pilots without first-revoke gate ✅
 
@@ -63,9 +70,17 @@
 
 Founder-run; see `docs/STATUS_PLATE_PILOT.md`.
 
-### Step 5 — Terminology sequencing pass (scanner vs steward)
+### Step 5 — Terminology sequencing pass (scanner vs steward) ✅
 
-Plain-language overlay on `/created/` and hub for status-plate path.
+**Shipped:**
+
+- `site/js/pilot-steward-copy.mjs` — plain-language overlay per pilot template
+- `/created/` Live + Manage labels sync on template (`syncCreatedPilotStewardCopy`)
+- Hub card controls use pilot-aware labels (`applyHubControlPlainLabels`)
+- Revoke summary + network hints simplified for status plate and lost-item pilots
+- Vitest: `worker/tests/pilot-steward-copy.test.ts`
+
+**Rule:** Precise terms (QR credential, card revoke) remain in Advanced panels and general cards.
 
 ### Step 6 — Lost-item scan → create hint (optional)
 

@@ -19,7 +19,7 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=4" />
-    <link rel="stylesheet" href="/styles.css?v=127" />
+    <link rel="stylesheet" href="/styles.css?v=128" />
     <link rel="stylesheet" href="/css/device-shell.css?v=56" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=28" />
   </head>
@@ -754,6 +754,38 @@
             </p>
           </section>
 
+          <section
+            class="created-status-plate-loop"
+            id="status-plate-loop-scorecard"
+            aria-labelledby="status-plate-loop-scorecard-title"
+            hidden
+          >
+            <h3 class="created-status-plate-loop-title" id="status-plate-loop-scorecard-title">
+              Pilot habit loop
+            </h3>
+            <p class="created-status-plate-loop-lead" id="status-plate-loop-progress" role="status">
+              Publish status updates on Live when hours change.
+            </p>
+            <p class="created-status-plate-loop-meta" id="status-plate-loop-last" hidden></p>
+            <ul class="created-status-plate-loop-checklist" aria-label="Pilot milestones on this device">
+              <li>
+                <label class="created-status-plate-loop-check">
+                  <input type="checkbox" id="status-plate-loop-printed" />
+                  <span>Printed QR and mounted the plate</span>
+                </label>
+              </li>
+              <li>
+                <label class="created-status-plate-loop-check">
+                  <input type="checkbox" id="status-plate-loop-second-scan" />
+                  <span>Scanned from a second device (not this one)</span>
+                </label>
+              </li>
+            </ul>
+            <p class="form-hint created-status-plate-loop-privacy">
+              Stored only on this browser. No scan analytics.
+            </p>
+          </section>
+
           <section class="created-what-now created-what-now-compact" id="created-lost-item-tip" hidden>
             <h2 class="created-what-now-title">Lost item relay</h2>
             <p class="created-what-now-body">
@@ -851,7 +883,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h4"/><path d="M7 13h6"/><path d="m4 4 16 16"/></svg>
               </span>
               <span class="settings-summary-text">
-                <span class="settings-summary-title">Revoke this QR</span>
+                <span class="settings-summary-title" id="revoke-summary-title">Revoke this QR</span>
                 <span class="settings-summary-sub" id="revoke-summary-sub">Turn off this scan pointer</span>
               </span>
               <span class="list-chevron" aria-hidden="true">›</span>
@@ -1311,6 +1343,6 @@
     </div>
     <script src="/js/device-status-bootstrap.mjs?v=45" type="module"></script>
     <script src="/js/created-hub.mjs?v=3" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=54"></script>
+    <script type="module" src="/js/created.mjs?v=56"></script>
   </body>
 </html>

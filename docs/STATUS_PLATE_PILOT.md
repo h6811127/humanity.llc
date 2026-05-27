@@ -25,7 +25,7 @@ Not a bio link. Not legal ID. Object name + live network status.
    - **What is this plate on?**  -  headline on scan (e.g. `Studio door`)
    - **What should scanners see?**  -  status line (e.g. `Open · Thu–Sun until 9 PM`)
    - **Optional details**  -  up to two short rows (e.g. special hours, tasks) shown under the status on scan
-4. Save recovery key on `/created/`, print QR, scan from another phone, **update the status line** on `/created/`, then revoke to test.
+4. Save recovery key on `/created/`, print QR, scan from another phone, **update the status line** on Live (no revoke required first), then revoke to test.
 
 Public showcase scan (homepage pilot): see `site/data/showcase-status-plate.json`  -  refresh with `npm run site:seed-showcase` (includes optional `object_streams` detail row on scan).
 
@@ -64,6 +64,24 @@ Deploy Worker with `X-HC-Scan-UI: pass-v7` for this layout.
 | Stranger says scan does **not** prove who owns the door | ☐ |
 | Print + second-device scan + revoke without founder present | ☐ |
 | Notes captured for copy fixes (not new hub pages) | ☐ |
+
+---
+
+## Habit loop scorecard
+
+**Strategy:** `docs/PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md` § Step 1  
+**Product:** `/created/` shows **Pilot habit loop** for status-plate templates (`site/js/status-plate-loop-scorecard.mjs`).
+
+| Signal | Target | How measured |
+|--------|--------|--------------|
+| Status updates published | **≥2** per steward | Auto-count on successful Live publish (localStorage per `profile_id`) |
+| Printed + mounted | 1 | Owner checkbox (or auto when QR PNG downloaded) |
+| Second-device scan | 1 | Owner checkbox |
+| Non-creator scans for real decisions | **≥5** across pilot | Founder field notes (no server analytics) |
+
+**Habit loop closed (one steward):** ≥2 updates + printed + second-device scan confirmed.
+
+**Privacy:** Scorecard is device-local only — aligns with no scan analytics by default.
 
 ---
 
