@@ -177,14 +177,12 @@ Examples seen in create flow:
 
 **Status (2026-05-26):** Fix shipped — combined required-field validation per template (`create-form-validation-core.mjs`, `create-card.mjs?v=14`).
 
+**Automated:** `e2e/create-form-submit.spec.ts` (empty general + status plate) · `worker/tests/create-form-validation.test.ts`
+
 | Template | Empty submit | Message |
 |----------|--------------|---------|
-| General | No fields | `Handle is required.` |
-| Status plate | No fields | `Handle is required.` only (not object/status line) |
-
-**Fix**
-
-- On status plate / lost item, validate pilot fields first or list all missing fields in one status line.
+| General | No fields | `Handle and Public statement are required.` |
+| Status plate | No fields | `Handle, Object name, and Status line are required.` |
 
 ---
 
@@ -283,10 +281,11 @@ Same class as P0-1 for users landing without params; may redirect to `/wallet/` 
 | S6 | Revoke without keys on `/created/#revoke` | **Automated:** `e2e/production-sad-path-created.spec.ts` |
 | S7 | `Ask for live proof` without owner keys | **Automated:** `e2e/production-sad-path-created.spec.ts` · `worker/tests/created-live-primary-cta.test.ts` · two-device flow manual |
 | S8 | After P0-2 fix: hub rows vs `GET …/status` `scan.kind` | **Automated:** `e2e/device-os-wallet.spec.ts` · `npm run worker:test:card-disabled-since-visit` |
+| S9 | Valid create submit lands on `/created/` with keys in tab | **Automated:** `e2e/create-form-submit.spec.ts` |
 
 Automated regression already documented in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) and AGENTS.md status-dot / cross-tab suites.
 
-**Status (2026-05-26):** Test matrix S1–S8 covered by unit/e2e where feasible; full incognito two-tab / two-device passes remain optional manual smoke.
+**Status (2026-05-26):** Test matrix S1–S9 covered by unit/e2e where feasible; full incognito two-tab / two-device passes remain optional manual smoke.
 
 ---
 
@@ -305,6 +304,7 @@ Automated regression already documented in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) 
 
 ## Changelog
 
+- **2026-05-26:** Test matrix S9 (create happy path) + P2-2 empty-submit e2e in `create-form-submit.spec.ts`.
 - **2026-05-26:** Test matrix S1/S7/S8 wired to e2e/vitest; S3 cross-tab already in `device-cross-tab-keys.spec.ts`.
 - **2026-05-26:** Test matrix S2/S4–S6 automated (`production-sad-path-created.spec.ts`, `device-pins.test.ts`, `key-backup-import.test.ts`).
 - **2026-05-26:** Initial production sad-path pass (browser + curl).

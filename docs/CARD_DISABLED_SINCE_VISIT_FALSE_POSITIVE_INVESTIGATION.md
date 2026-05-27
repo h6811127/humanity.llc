@@ -1,7 +1,7 @@
 # Investigation: “Card disabled on the network since your last visit” on every saved card
 
 **Date:** 2026-05-25 (updated 2026-05-26; **third pass 2026-05-26 evening - reopened**)  
-**Status:** **Client fixes shipped on `main` (2026-05-26)** - items 1–8 in [§ Recommended fix directions](#recommended-fix-directions-status). Reopen only with Vitest/E2E repro on a current bundle (see [§ Post-closure](#post-closure-slices-18---superseded-by-third-pass)). Historical third pass below documents RC-A–RC-F and G1–G7 analysis.  
+**Status:** **Client fixes shipped on `main` (2026-05-26)** - items 1–10 in [§ Recommended fix directions](#recommended-fix-directions-status). Reopen only with Vitest/E2E repro on a current bundle (see [§ Post-closure](#post-closure-slices-18---superseded-by-third-pass)). Historical third pass below documents RC-A–RC-F and G1–G7 analysis.  
 **Scope:** Saved-card hub rows on `/`, `/wallet/`, `/created/` - plus inbox badge, hub `#device-hub-card-disabled-group`, glance suffix, status-dot overlay  
 **Related audits:** [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md) (DH-1–DH-15), [`UI_UX_REVERTED_FEATURES_CATALOG.md`](UI_UX_REVERTED_FEATURES_CATALOG.md) (coordinator reverted `277d08e`), [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md)  
 
@@ -196,6 +196,7 @@ If Network tab shows **`active`** for a profile but the banner is visible on a *
 | **G1** re-apply with `{}` statusMap + stale cache `active` + stale `latestResolved` | Yes | `card-disabled-since-visit-approaches.test.ts` (G1 closed + A1 snapshot) |
 | **G2** cache-only poll leaves `latestResolved` | Yes | `device-wallet-network-confirmed.test.ts`, `device-wallet-network-truth.test.ts` |
 | **G3** live-control-changed re-apply without wallet poll | Yes | `card-disabled-since-visit-approaches.test.ts` (A5 hide-only); E2E `device-os-wallet.spec.ts` (live-control tick + offline poll) |
+| Hub search empty query must not unhide suppressed row banner | Yes | `device-hub-search-core.test.ts`; E2E `device-os-wallet.spec.ts` (G3/A5) |
 | Multi-card Got it must not re-light all | E2E | `device-os-wallet.spec.ts` |
 
 Run: `npm run worker:test:card-disabled-since-visit` · `npm run e2e:card-disabled-since-visit`
@@ -213,7 +214,7 @@ Run: `npm run worker:test:card-disabled-since-visit` · `npm run e2e:card-disabl
 7. **A3:** **Shipped** - `device-wallet-network-truth.mjs`; see `worker/tests/device-wallet-network-truth.test.ts`.
 8. **Remove from device flash:** **Shipped** - drop removed profile SSOT, cancel in-flight poll apply, render siblings with checking chips, defer hub since-visit group sync until wallet poll `onDone` (`device-hub-ui.mjs` remove handler).
 9. **Debounced poll cancel:** **Shipped** - `bumpWalletNetworkApplyGen()` clears pending hub debounce timer so manual **Check network** / a newer fetch cannot race with an older scheduled poll (`device-hub-ui.mjs`).
-10. **Hub search must not unhide row banners:** **Shipped** - `applyDeviceHubSearch` skips `.hub-card-status-alert` so `hc-live-control-inbox-changed` → `applySearchFilter` cannot set `hidden=false` on a suppressed since-visit banner (`device-hub-search.mjs`).
+10. **Hub search must not unhide row banners:** **Shipped** - `shouldHubSearchApplyVisibility` in `device-hub-search-core.mjs`; `applyDeviceHubSearch` skips `.hub-card-status-alert` so `hc-live-control-inbox-changed` → `applySearchFilter` cannot set `hidden=false` on a suppressed since-visit banner (`device-hub-search.mjs`).
 
 ---
 
@@ -867,7 +868,7 @@ So a badge showing **1–3** while six create tabs existed usually means: only *
 
 ## Post-closure (Slices 1–8) - superseded by third pass
 
-Slices 1–8 in [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md) fixed **RC-A** (session-cache / baseline-changed). **`70769c1`** added the global gate and offline clearing of `latestResolved*`. **Client fixes A1–A5, G4, G6, remove-flash (items 1–8)** are **shipped on `main`**; run the regression gates below before each release. New reports on a current bundle → operator protocol + Vitest/E2E repro before reopening.
+Slices 1–8 in [`DEVICE_HUB_REPAIR_SPEC.md`](DEVICE_HUB_REPAIR_SPEC.md) fixed **RC-A** (session-cache / baseline-changed). **`70769c1`** added the global gate and offline clearing of `latestResolved*`. **Client fixes (items 1–10)** are **shipped on `main`**; run the regression gates below before each release. New reports on a current bundle → operator protocol + Vitest/E2E repro before reopening.
 
 | Step | Action |
 |------|--------|

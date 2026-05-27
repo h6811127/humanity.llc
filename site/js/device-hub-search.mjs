@@ -2,12 +2,9 @@
  * Shared Phase 1–2 local search over a device hub root element.
  */
 
-const ALWAYS_VISIBLE_GROUPS = new Set(["shortcuts", "import"]);
+import { shouldHubSearchApplyVisibility } from "./device-hub-search-core.mjs";
 
-/** Row banners manage their own `hidden` state; search must not override it. */
-function isHubCardStatusAlert(el) {
-  return el.classList?.contains("hub-card-status-alert") === true;
-}
+const ALWAYS_VISIBLE_GROUPS = new Set(["shortcuts", "import"]);
 
 /**
  * @param {HTMLElement | null} hub
@@ -26,7 +23,7 @@ export function applyDeviceHubSearch(hub, query) {
     if (!q) {
       groupEl.hidden = false;
       for (const el of items) {
-        if (isHubCardStatusAlert(el)) continue;
+        if (!shouldHubSearchApplyVisibility(el)) continue;
         el.hidden = false;
       }
       groups[groupKey] = { anyVisible: true, hasItems: items.length > 0 };
@@ -35,7 +32,7 @@ export function applyDeviceHubSearch(hub, query) {
 
     let anyVisible = false;
     for (const el of items) {
-      if (isHubCardStatusAlert(el)) continue;
+      if (!shouldHubSearchApplyVisibility(el)) continue;
       const text = (el.dataset.hubSearchable || "").toLowerCase();
       const match = text.includes(q);
       el.hidden = !match;
