@@ -59,6 +59,14 @@
     0 18px 44px rgba(0, 0, 0, 0.1);
   --hc-scan-hero-fill: linear-gradient(160deg, #ffffff 0%, #fafafa 50%, #f5f5f7 100%);
   --hc-scan-hero-border: rgba(60, 60, 67, 0.14);
+  /* Trust-tool / vouch / list surfaces — docs/UI_COLOR_SCHEME_STANDARD.md § Scan page surfaces */
+  --hc-scan-surface-bg: #ffffff;
+  --hc-scan-surface-subtle-bg: #f7f7f9;
+  --hc-scan-surface-fg: #1c1c1e;
+  --hc-scan-surface-fg-muted: rgba(60, 60, 67, 0.65);
+  --hc-scan-surface-fg-subtle: rgba(60, 60, 67, 0.58);
+  --hc-scan-surface-border: rgba(60, 60, 67, 0.14);
+  --hc-scan-surface-chevron: rgba(60, 60, 67, 0.34);
   --hc-emphasis-card-fill-active: linear-gradient(
     160deg,
     #f6f8f7 0%,
@@ -131,6 +139,9 @@
   --hc-emphasis-card-gap-section: 24px;
   --hc-emphasis-card-gap-row: 16px;
   --hc-emphasis-card-gap-foot: 12px;
+  --hc-emphasis-card-padding-block-compact: 14px;
+  --hc-emphasis-card-padding-inline-compact: 16px;
+  --hc-emphasis-card-gap-section-compact: 12px;
 }
 
 *,
@@ -614,7 +625,7 @@ a {
   margin: 6px 0 0;
   font-size: 14px;
   line-height: 1.4;
-  color: rgba(60, 60, 67, 0.65);
+  color: var(--hc-scan-surface-fg-muted);
 }
 
 .scan-trust-stack {
@@ -650,8 +661,8 @@ a {
 .scan-limits-settings {
   margin-top: 4px;
   border-radius: var(--radius);
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  background: #f7f7f7;
+  border: 1px solid var(--hc-scan-surface-border);
+  background: var(--hc-scan-surface-bg);
   overflow: hidden;
 }
 
@@ -688,7 +699,7 @@ a {
 .scan-limits-summary-title {
   font-size: 16px;
   font-weight: 600;
-  color: var(--black);
+  color: var(--hc-scan-surface-fg);
 }
 
 .scan-limits-summary-sub {
@@ -710,13 +721,13 @@ a {
 
 .scan-limits-panel {
   padding: 0 14px 14px 52px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 1px solid var(--hc-scan-surface-border);
 }
 
 .scan-limits-lead {
   font-size: 14px;
   line-height: 1.45;
-  color: var(--black);
+  color: var(--hc-scan-surface-fg);
   margin: 12px 0 10px;
 }
 
@@ -725,7 +736,7 @@ a {
   padding-left: 18px;
   font-size: 14px;
   line-height: 1.45;
-  color: var(--black);
+  color: var(--hc-scan-surface-fg);
 }
 
 .scan-limits-list li {
@@ -912,6 +923,11 @@ a {
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--black);
+}
+
+.scan-trust-details .list-title,
+.scan-page .list .list-title {
+  color: var(--hc-scan-surface-fg);
 }
 
 .list-sub {
@@ -1188,8 +1204,8 @@ a {
 .vouch-card {
   padding: 16px 16px 14px;
   border-radius: 18px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background: #f7f7f9;
+  border: 1px solid var(--hc-scan-surface-border);
+  background: var(--hc-scan-surface-subtle-bg);
 }
 
 .vouch-card-hint {
@@ -1251,9 +1267,10 @@ a {
   margin: 0 0 10px;
   padding: 10px 12px;
   font-size: 16px;
-  border: 1px solid rgba(60, 60, 67, 0.24);
+  border: 1px solid var(--hc-scan-surface-border);
   border-radius: 10px;
-  background: #fff;
+  background: var(--hc-scan-surface-bg);
+  color: var(--hc-scan-surface-fg);
 }
 
 .vouch-unlock-btn {
@@ -1280,6 +1297,44 @@ a {
 .scan-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__actions {
   width: 100%;
   justify-content: flex-start;
+}
+
+/* Vouch explainer / outcome cards — hc-emphasis-card (docs/HC_EMPHASIS_CARD_ROLLOUT.md backlog) */
+.vouch-explainer.hc-emphasis-card,
+.vouch-ineligible.hc-emphasis-card,
+.vouch-success.hc-emphasis-card,
+.vouch-switch-default.hc-emphasis-card {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: var(--hc-emphasis-card-gap-section);
+}
+
+.vouch-explainer.hc-emphasis-card .hc-emphasis-card__main,
+.vouch-ineligible.hc-emphasis-card .hc-emphasis-card__main,
+.vouch-success.hc-emphasis-card .hc-emphasis-card__main,
+.vouch-switch-default.hc-emphasis-card .hc-emphasis-card__main {
+  flex: none;
+  width: 100%;
+}
+
+.vouch-explainer-actions.hc-emphasis-card__actions,
+.vouch-switch-default.hc-emphasis-card .hc-emphasis-card__actions {
+  width: 100%;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.vouch-explainer-actions .hc-emphasis-card__cta,
+.vouch-switch-default .hc-emphasis-card__cta {
+  width: 100%;
+  text-align: center;
+}
+
+.vouch-explainer .hc-emphasis-card__detail a {
+  color: #0a84ff;
+  font-weight: 600;
 }
 
 .scan-offline-banner {
@@ -1530,8 +1585,8 @@ a {
 
 .scan-trust-details {
   border-radius: 18px;
-  background: #fff;
-  border: 1px solid rgba(60, 60, 67, 0.14);
+  background: var(--hc-scan-surface-bg);
+  border: 1px solid var(--hc-scan-surface-border);
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.04),
     0 6px 18px rgba(0, 0, 0, 0.05);
@@ -1582,7 +1637,7 @@ a {
   font-size: 16px;
   font-weight: 600;
   letter-spacing: -0.02em;
-  color: var(--black);
+  color: var(--hc-scan-surface-fg);
   text-transform: none;
 }
 
@@ -1591,7 +1646,7 @@ a {
   font-size: 13px;
   font-weight: 500;
   line-height: 1.3;
-  color: rgba(60, 60, 67, 0.58);
+  color: var(--hc-scan-surface-fg-subtle);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1603,7 +1658,7 @@ a {
   font-size: 22px;
   font-weight: 300;
   line-height: 1;
-  color: rgba(60, 60, 67, 0.34);
+  color: var(--hc-scan-surface-chevron);
   transition: transform 0.2s ease;
 }
 
@@ -1612,7 +1667,7 @@ a {
 }
 
 .scan-trust-details[open] > summary.scan-group-summary {
-  border-bottom: 1px solid rgba(60, 60, 67, 0.1);
+  border-bottom: 1px solid var(--hc-scan-surface-border);
 }
 
 .scan-trust-details .list {
@@ -1644,7 +1699,7 @@ a {
 .scan-trust-stack .scan-group-vouch {
   margin-top: 6px;
   padding-top: 4px;
-  border-top: 1px solid rgba(60, 60, 67, 0.1);
+  border-top: 1px solid var(--hc-scan-surface-border);
 }
 
 .scan-trust-stack .scan-group-vouch .group-label {
@@ -2010,14 +2065,14 @@ a {
   font-size: 17px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: var(--black);
+  color: var(--hc-scan-surface-fg);
 }
 
 .vouch-lead {
   margin: 0 0 14px;
   font-size: 15px;
   line-height: 1.45;
-  color: var(--black);
+  color: var(--hc-scan-surface-fg);
 }
 
 .vouch-field-label {
@@ -2036,10 +2091,10 @@ a {
   font: inherit;
   font-size: 15px;
   line-height: 1.45;
-  color: var(--black);
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  color: var(--hc-scan-surface-fg);
+  border: 1px solid var(--hc-scan-surface-border);
   border-radius: 14px;
-  background: var(--white);
+  background: var(--hc-scan-surface-bg);
   resize: vertical;
   min-height: 88px;
 }
@@ -2051,7 +2106,7 @@ a {
   margin: 0 0 14px;
   font-size: 14px;
   line-height: 1.45;
-  color: var(--black);
+  color: var(--hc-scan-surface-fg);
   cursor: pointer;
 }
 
@@ -2083,7 +2138,7 @@ a {
 .vouch-status-panel {
   padding: 10px 12px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--hc-scan-surface-subtle-bg);
 }
 
 .vouch-status {
@@ -2445,9 +2500,7 @@ body.scan-page-dot-glance-open {
   animation: scan-brand-dot-pulse 2s ease-in-out infinite;
 }
 
-.scan-page-dot--dynamic .pass-dot-status-network-ok.pass-dot-status-device-steward {
-  background: #22c55e;
-}
+/* Mark-first: no green steward on scan corner dot (SCAN_PAGE_TRUST_UI.md). */
 
 @keyframes scan-brand-dot-pulse {
   0%,
@@ -2696,24 +2749,24 @@ body.scan-page-dot-glance-open {
 
 .scan-page .list {
   border: none;
-  background: rgba(255, 255, 255, 0.94);
+  background: var(--hc-scan-surface-bg);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 14px rgba(0, 0, 0, 0.05);
 }
 
 .scan-page .list li {
-  border-bottom: 0.5px solid rgba(60, 60, 67, 0.11);
+  border-bottom: 0.5px solid var(--hc-scan-surface-border);
 }
 
 .scan-limits-settings {
   border: none;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--hc-scan-surface-bg);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .live-control-card,
 .vouch-card {
   border: none;
-  background: rgba(255, 255, 255, 0.94);
+  background: var(--hc-scan-surface-bg);
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
 }
 
@@ -2817,6 +2870,13 @@ html[data-theme="dark"] {
   --hc-emphasis-card-eyebrow-urgent: #ff6961;
   --hc-emphasis-card-title-fg: #f5f5f7;
   --hc-emphasis-card-detail-fg: rgba(235, 235, 245, 0.9);
+  --hc-scan-surface-bg: #1c1c1e;
+  --hc-scan-surface-subtle-bg: #2c2c2e;
+  --hc-scan-surface-fg: #f5f5f7;
+  --hc-scan-surface-fg-muted: rgba(235, 235, 245, 0.72);
+  --hc-scan-surface-fg-subtle: rgba(235, 235, 245, 0.58);
+  --hc-scan-surface-border: rgba(255, 255, 255, 0.12);
+  --hc-scan-surface-chevron: rgba(235, 235, 245, 0.34);
 }
 
 html[data-theme="dark"] body {
@@ -3179,7 +3239,7 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
   <p class="scan-hero-foot">Scan shows current card state at scan time.</p>
   <details class="scan-hero-qr-details">
   <summary class="scan-hero-qr-summary">This QR</summary>
-  <div class="scan-hero-qr pass-qr scan-status-qr" id="pass-qr-slot" data-scan-url="http://127.0.0.1:8788/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5"><div class="hc-qr-frame pass-qr-svg" role="img" aria-label="QR code for this Humanity live object scan link"><svg class="hc-qr-frame-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 91.5" role="presentation" aria-hidden="true"><rect width="60" height="91.5" rx="3" fill="#ffffff"/><rect x="1.275" y="1.275" width="57.45" height="88.95" rx="2.475" fill="none" stroke="#db1b43" stroke-width="1.5"/><g transform="translate(5.5 5.5)"><path fill="#ffffff" d="M0 0h49v49H0z"/><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/><defs><mask id="hc-qr-finder-logo-mask-27ju8qcp6yg" maskUnits="userSpaceOnUse" mask-type="alpha"><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/></mask></defs><g class="hc-qr-finder-logo" aria-hidden="true" mask="url(#hc-qr-finder-logo-mask-27ju8qcp6yg)"><circle class="hc-qr-finder-logo-outer" cx="5.5" cy="5.5" r="5.145" fill="#c9979f" opacity="0.52"/><circle class="hc-qr-finder-logo-inner" cx="5.5" cy="5.5" r="2.3667" fill="#141414" opacity="0.9"/></g></g><text class="hc-qr-frame-pill-text" x="30" y="62.98" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5.5" font-weight="600" letter-spacing="0.14em" fill="#db1b43">LIVE OBJECT</text><text class="hc-qr-frame-footer-text" x="30" y="75" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5" font-weight="500" fill="#8a8a8a">humanity.llc</text><text class="hc-qr-frame-code-text" x="30" y="85.26" text-anchor="middle" font-family="ui-monospace,monospace" font-size="5" font-weight="600" letter-spacing="0.08em" fill="#db1b43">HC-CWWX-HPK0</text></svg></div><p class="pass-credential-code mono" aria-label="Credential code for print verification">HC-CWWX-HPK0</p></div>
+  <div class="scan-hero-qr pass-qr scan-status-qr" id="pass-qr-slot" data-scan-url="http://127.0.0.1:8788/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5"><div class="hc-qr-frame pass-qr-svg" role="img" aria-label="QR code for this Humanity live object scan link"><svg class="hc-qr-frame-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 91.5" role="presentation" aria-hidden="true"><rect width="60" height="91.5" rx="3" fill="#ffffff"/><rect x="1.275" y="1.275" width="57.45" height="88.95" rx="2.475" fill="none" stroke="#db1b43" stroke-width="1.5"/><g transform="translate(5.5 5.5)"><path fill="#ffffff" d="M0 0h49v49H0z"/><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/><defs><mask id="hc-qr-finder-logo-mask-i7w6uvysi1d" maskUnits="userSpaceOnUse" mask-type="alpha"><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/></mask></defs><g class="hc-qr-finder-logo" aria-hidden="true" mask="url(#hc-qr-finder-logo-mask-i7w6uvysi1d)"><circle class="hc-qr-finder-logo-outer" cx="5.5" cy="5.5" r="5.145" fill="#c9979f" opacity="0.52"/><circle class="hc-qr-finder-logo-inner" cx="5.5" cy="5.5" r="2.3667" fill="#141414" opacity="0.9"/></g></g><text class="hc-qr-frame-pill-text" x="30" y="62.98" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5.5" font-weight="600" letter-spacing="0.14em" fill="#db1b43">LIVE OBJECT</text><text class="hc-qr-frame-footer-text" x="30" y="75" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5" font-weight="500" fill="#8a8a8a">humanity.llc</text><text class="hc-qr-frame-code-text" x="30" y="85.26" text-anchor="middle" font-family="ui-monospace,monospace" font-size="5" font-weight="600" letter-spacing="0.08em" fill="#db1b43">HC-CWWX-HPK0</text></svg></div><p class="pass-credential-code mono" aria-label="Credential code for print verification">HC-CWWX-HPK0</p></div>
 </details>
 </article>
 </div>
@@ -3381,20 +3441,20 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
 </details>
 <section class="group scan-group scan-group-vouch scan-trust-layer" aria-label="Issue vouch">
   <h2 class="group-label">Vouch</h2>
-  <div id="vouch-explainer" class="vouch-card vouch-card-hint">
-    <div class="vouch-card-head">
-      <span class="list-icon list-icon-tone-slate" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/><path d="m21 2-9.6 9.6"/><circle cx="7.5" cy="15.5" r="5.5"/></svg></span>
-      <div class="vouch-card-head-text">
-        <span class="vouch-eyebrow">Device signing</span>
-        <span class="vouch-title">Signing key in this tab</span>
+  <div id="vouch-explainer" class="hc-emphasis-card hc-emphasis-card--info vouch-explainer">
+    <div class="hc-emphasis-card__main">
+      <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
+      <div class="hc-emphasis-card__copy">
+        <p class="hc-emphasis-card__eyebrow">Device signing</p>
+        <p class="hc-emphasis-card__title">Signing key in this tab</p>
+        <p class="hc-emphasis-card__detail" id="vouch-explainer-copy">
+          Checking this tab for your card’s signing key. Steward and Vouched Human are network checks—separate from signing.
+          Use <strong>Sign as…</strong> or <a href="http://127.0.0.1:8788/wallet/">Saved cards</a>.
+          Only the signed vouch is sent; your private key stays here.
+        </p>
       </div>
     </div>
-    <p class="vouch-lead" id="vouch-explainer-copy">
-      Checking this tab for your card’s signing key. Steward and Vouched Human are network checks—separate from signing.
-      Use <strong>Sign as…</strong> or <a href="http://127.0.0.1:8788/wallet/">Saved cards</a>.
-      Only the signed vouch is sent; your private key stays here.
-    </p>
-    <div id="vouch-explainer-actions" class="vouch-explainer-actions" hidden></div>
+    <div id="vouch-explainer-actions" class="hc-emphasis-card__actions vouch-explainer-actions" hidden></div>
   </div>
   <ul class="list vouch-list">
     <li class="list-row vouch-row" id="vouch-row" hidden data-vouchee-profile-id="7Xk9mP2nQ4rT6vW8yZ1aB3cD5">
@@ -3421,25 +3481,25 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
         <p class="vouch-status" id="vouch-status" aria-live="polite"></p>
       </div>
     </div>
-    <div class="vouch-card vouch-card-ineligible" id="vouch-ineligible" hidden>
-      <div class="vouch-card-head">
-        <span class="list-icon list-icon-tone-orange" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span>
-        <div class="vouch-card-head-text">
-          <span class="vouch-eyebrow">Unavailable</span>
-          <span class="vouch-title">Cannot issue vouch</span>
+    <div class="hc-emphasis-card hc-emphasis-card--warn vouch-ineligible" id="vouch-ineligible" hidden>
+      <div class="hc-emphasis-card__main">
+        <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
+        <div class="hc-emphasis-card__copy">
+          <p class="hc-emphasis-card__eyebrow">Unavailable</p>
+          <p class="hc-emphasis-card__title">Cannot issue vouch</p>
+          <p class="hc-emphasis-card__detail" id="vouch-ineligible-copy"></p>
         </div>
       </div>
-      <p class="vouch-lead" id="vouch-ineligible-copy"></p>
     </div>
-    <div class="vouch-card vouch-card-success" id="vouch-success" hidden>
-      <div class="vouch-card-head">
-        <span class="list-icon list-icon-tone-green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
-        <div class="vouch-card-head-text">
-          <span class="vouch-eyebrow">Accepted</span>
-          <span class="vouch-title">Vouch recorded</span>
+    <div class="hc-emphasis-card hc-emphasis-card--active vouch-success" id="vouch-success" hidden>
+      <div class="hc-emphasis-card__main">
+        <span class="hc-emphasis-card__dot hc-emphasis-card__dot--active" aria-hidden="true"></span>
+        <div class="hc-emphasis-card__copy">
+          <p class="hc-emphasis-card__eyebrow">Accepted</p>
+          <p class="hc-emphasis-card__title">Vouch recorded</p>
+          <p class="hc-emphasis-card__detail" id="vouch-success-copy">The signed vouch is on the network.</p>
         </div>
       </div>
-      <p class="vouch-lead" id="vouch-success-copy">The signed vouch is on the network.</p>
     </div>
   </span>
 </li>
@@ -3746,8 +3806,8 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
   checkExistingProof();
 })();
 </script>
-  <script type="module" src="http://127.0.0.1:8788/js/vouch-issue.mjs?v=12"></script>
-  <script type="module" src="http://127.0.0.1:8788/js/scan-tab-keys.mjs?v=6"></script>
+  <script type="module" src="http://127.0.0.1:8788/js/vouch-issue.mjs?v=13"></script>
+  <script type="module" src="http://127.0.0.1:8788/js/scan-tab-keys.mjs?v=7"></script>
   <script type="module">
 import { renderQrToImage } from "http://127.0.0.1:8788/js/qr-render.mjs?v=5";
 var slot = document.getElementById("pass-qr-slot");

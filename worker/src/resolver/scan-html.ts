@@ -36,7 +36,7 @@ import {
 } from "./scan-malformed-hint";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v34";
+export const SCAN_UI_VERSION = "pass-v35";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -971,7 +971,7 @@ function renderVouchIssuanceScript(vm: ScanViewModel, origin: string): string {
 function renderScanTabKeysScript(vm: ScanViewModel, origin: string): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
   const assetOrigin = pagesJsOrigin(origin);
-  const mod = JSON.stringify(`${assetOrigin}/js/scan-tab-keys.mjs?v=6`);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-tab-keys.mjs?v=7`);
   return `<script type="module" src=${mod}></script>`;
 }
 

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   scanCrossTabOverlayCount,
+  scanDotMarkFirstDevice,
   scanDotOverlayFromCounts,
   scanPageDotEligible,
   shouldScanNoneEligibleAttentionPulse,
@@ -12,8 +13,7 @@ describe("scanPageDotEligible", () => {
     profileId: "PROFILE",
     qrId: "QR",
     hasCreatedKeys: false,
-    savedWalletCount: 0,
-    hasDefaultVouchProfile: false,
+    walletSigningKeyCount: 0,
     crossTabNotice: 0,
     liveProofPending: 0,
     operatorDeviceFamiliar: true,
@@ -25,14 +25,22 @@ describe("scanPageDotEligible", () => {
     expect(scanPageDotEligible(base)).toBe(false);
   });
 
-  it("enables dynamic dot when viewer may sign", () => {
+  it("enables dynamic dot when viewer may sign or urgent overlays fire", () => {
     expect(scanPageDotEligible({ ...base, hasCreatedKeys: true })).toBe(true);
-    expect(scanPageDotEligible({ ...base, savedWalletCount: 1 })).toBe(true);
-    expect(scanPageDotEligible({ ...base, hasDefaultVouchProfile: true })).toBe(
+    expect(scanPageDotEligible({ ...base, walletSigningKeyCount: 1 })).toBe(
       true
     );
     expect(scanPageDotEligible({ ...base, crossTabNotice: 1 })).toBe(true);
     expect(scanPageDotEligible({ ...base, liveProofPending: 1 })).toBe(true);
+  });
+
+  it("mark-first: saved wallet labels alone do not enable dynamic dot", () => {
+    expect(
+      scanPageDotEligible({
+        ...base,
+        walletSigningKeyCount: 0,
+      })
+    ).toBe(false);
   });
 
   it("privacy gate blocks dynamic dot until origin is operator-familiar", () => {
@@ -40,7 +48,7 @@ describe("scanPageDotEligible", () => {
       scanPageDotEligible({
         ...base,
         operatorDeviceFamiliar: false,
-        savedWalletCount: 1,
+        walletSigningKeyCount: 1,
       })
     ).toBe(false);
     expect(
@@ -50,6 +58,15 @@ describe("scanPageDotEligible", () => {
         hasCreatedKeys: true,
       })
     ).toBe(false);
+  });
+});
+
+describe("scanDotMarkFirstDevice", () => {
+  it("maps steward to keys so scan dot never reads green", () => {
+    expect(scanDotMarkFirstDevice("steward")).toBe("keys");
+    expect(scanDotMarkFirstDevice("keys")).toBe("keys");
+    expect(scanDotMarkFirstDevice("none")).toBe("none");
+    expect(scanDotMarkFirstDevice("unsaved")).toBe("unsaved");
   });
 });
 

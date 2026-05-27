@@ -7,12 +7,13 @@ import { dotOverlayFromCounts } from "./device-dot-state-core.mjs";
 
 /**
  * Dynamic dot activates only when the viewer may sign / vouch on this scan.
+ * Mark-first (docs/SCAN_PAGE_TRUST_UI.md): saved wallet rows alone do not
+ * enable custody colors — only tab keys, signing keys in wallet, or urgent overlays.
  * @param {{
  *   profileId: string | null,
  *   qrId: string | null,
  *   hasCreatedKeys: boolean,
- *   savedWalletCount: number,
- *   hasDefaultVouchProfile: boolean,
+ *   walletSigningKeyCount: number,
  *   crossTabNotice: number,
  *   liveProofPending: number,
  *   operatorDeviceFamiliar: boolean,
@@ -22,11 +23,18 @@ export function scanPageDotEligible(input) {
   if (!input.profileId || !input.qrId) return false;
   if (!input.operatorDeviceFamiliar) return false;
   if (input.hasCreatedKeys) return true;
-  if (input.savedWalletCount > 0) return true;
-  if (input.hasDefaultVouchProfile) return true;
+  if (input.walletSigningKeyCount > 0) return true;
   if (input.crossTabNotice > 0) return true;
   if (input.liveProofPending > 0) return true;
   return false;
+}
+
+/**
+ * Scan corner dot stays mark-first: never green (reads as object verified).
+ * @param {"none" | "keys" | "unsaved" | "steward"} device
+ */
+export function scanDotMarkFirstDevice(device) {
+  return device === "steward" ? "keys" : device;
 }
 
 /**

@@ -2478,9 +2478,7 @@ body.scan-page-dot-glance-open {
   animation: scan-brand-dot-pulse 2s ease-in-out infinite;
 }
 
-.scan-page-dot--dynamic .pass-dot-status-network-ok.pass-dot-status-device-steward {
-  background: #22c55e;
-}
+/* Mark-first: no green steward on scan corner dot (SCAN_PAGE_TRUST_UI.md). */
 
 @keyframes scan-brand-dot-pulse {
   0%,

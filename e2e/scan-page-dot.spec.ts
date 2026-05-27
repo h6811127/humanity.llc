@@ -139,8 +139,9 @@ test.describe("scan page device dot", () => {
     const dot = page.locator("#scan-page-dot");
 
     await expect(btn).toHaveClass(/scan-page-dot--dynamic/, { timeout: 15_000 });
-    await expect(dot).toHaveAttribute("data-dot-state", "ok:steward");
-    await expect(dot).toHaveClass(/pass-dot-status-device-steward/);
+    await expect(dot).toHaveAttribute("data-dot-state", "ok:keys");
+    await expect(dot).toHaveClass(/pass-dot-status-device-keys/);
+    await expect(dot).not.toHaveClass(/pass-dot-status-device-steward/);
     await expect(btn).toHaveAttribute("aria-label", /your device/i);
 
     await btn.click();

@@ -10,7 +10,6 @@ import {
   dotStateKey,
   dotTransitionKey,
   hasStewardVerification,
-  shouldCelebrateStewardTransition,
 } from "./device-dot-state-core.mjs?v=38";
 import { fetchResolverHealth } from "./device-network-health.mjs";
 import { activateWalletEntry, getTabSession } from "./device-keys.mjs";
@@ -20,6 +19,7 @@ import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
 import {
   scanCrossTabOverlayCount,
+  scanDotMarkFirstDevice,
   scanDotOverlayFromCounts,
   scanPageDotEligible,
   shouldScanNoneEligibleAttentionPulse,
@@ -136,8 +136,7 @@ function computeEligible() {
     profileId,
     qrId,
     hasCreatedKeys: hasCreatedKeys(),
-    savedWalletCount: wallet.length,
-    hasDefaultVouchProfile: Boolean(getDefaultVouchProfileId()),
+    walletSigningKeyCount: savedCardsWithSigningKeys().length,
     crossTabNotice,
     liveProofPending: overlayCounts.liveProofPending,
     operatorDeviceFamiliar: isScanOperatorFamiliar(),
@@ -380,26 +379,6 @@ function clearStewardCelebrate(dot) {
   }
 }
 
-function applyStewardCelebrate(dot, network, device) {
-  clearStewardCelebrate(dot);
-  const previousDevice = lastDotSnapshot?.device ?? null;
-  if (
-    !shouldCelebrateStewardTransition({
-      network,
-      previousDevice,
-      nextDevice: device,
-      reducedMotion: prefersReducedMotion(),
-    })
-  ) {
-    return;
-  }
-  dot.classList.add(STEWARD_CELEBRATE_CLASS);
-  stewardCelebrateTimer = window.setTimeout(() => {
-    dot?.classList.remove(STEWARD_CELEBRATE_CLASS);
-    stewardCelebrateTimer = null;
-  }, 900);
-}
-
 function resetScanDotStatic(btn, dot) {
   closeScanGlance();
   lastDotTransitionKey = null;
@@ -432,6 +411,7 @@ export function refreshScanPageDot() {
 
   const network = resolveNetworkForDot();
   const device = deviceState();
+  const dotDevice = scanDotMarkFirstDevice(device);
   const overlay = dotOverlayState();
 
   btn.classList.add("scan-page-dot--dynamic");
@@ -447,19 +427,18 @@ export function refreshScanPageDot() {
   dot.className = "pass-dot";
   dot.classList.remove(...NETWORK_CLASSES, ...DEVICE_CLASSES, ...OVERLAY_CLASSES);
   dot.classList.remove(SCAN_DOT_MODIFIER);
-  for (const cls of dotClassList(network, device, overlay)) {
+  for (const cls of dotClassList(network, dotDevice, overlay)) {
     dot.classList.add(cls);
   }
-  if (network === "ok" && device === "none") {
+  if (network === "ok" && dotDevice === "none") {
     dot.classList.add(SCAN_DOT_MODIFIER);
   }
 
-  applyNoneAttentionPulse(dot, network, device, overlay);
-  applyStewardCelebrate(dot, network, device);
-  lastDotTransitionKey = dotTransitionKey(network, device, overlay);
-  lastDotSnapshot = { device };
+  applyNoneAttentionPulse(dot, network, dotDevice, overlay);
+  lastDotTransitionKey = dotTransitionKey(network, dotDevice, overlay);
+  lastDotSnapshot = { device: dotDevice };
 
-  const stateKey = dotStateKey(network, device);
+  const stateKey = dotStateKey(network, dotDevice);
   dot.dataset.dotState = stateKey;
   dot.dataset.dotOverlay = overlay;
   btn.setAttribute(
