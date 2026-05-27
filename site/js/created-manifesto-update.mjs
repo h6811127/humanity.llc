@@ -1,6 +1,7 @@
 import { getCardJsonUrl } from "./hc-sign.mjs";
 import { postCardUpdate, signCardUpdate } from "./created-update.mjs";
 import { inferPilotTemplate } from "./manifesto-display.mjs";
+import { buildObjectStreamsFromFormRows } from "./object-streams-core.mjs";
 
 /**
  * @param {{
@@ -36,6 +37,7 @@ export function initManifestoUpdate(ctx) {
     const statusEl2 = document.getElementById("update-status-line");
     if (objectEl && lines[0]) objectEl.value = lines[0];
     if (statusEl2 && lines[1]) statusEl2.value = lines[1];
+    fillObjectStreamFields(session?.object_streams);
   }
   if (pilot === "lost_item_relay" && session?.manifesto_line) {
     const raw = String(session.manifesto_line);
@@ -90,6 +92,24 @@ export function initManifestoUpdate(ctx) {
     return line;
   }
 
+  function buildObjectStreamsForUpdate(sessionNow) {
+    if (pilot === "status_plate") {
+      return buildObjectStreamsFromFormRows([
+        {
+          label: document.getElementById("update-stream-1-label")?.value,
+          value: document.getElementById("update-stream-1-value")?.value,
+          class: "place",
+        },
+        {
+          label: document.getElementById("update-stream-2-label")?.value,
+          value: document.getElementById("update-stream-2-value")?.value,
+          class: "care",
+        },
+      ]);
+    }
+    return Array.isArray(sessionNow?.object_streams) ? sessionNow.object_streams : [];
+  }
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const keys = ctx.getSigningKeys();
@@ -114,6 +134,7 @@ export function initManifestoUpdate(ctx) {
     }
     try {
       const manifestoLine = buildManifesto();
+      const objectStreams = buildObjectStreamsForUpdate(sessionNow);
       const createdAt = await resolveCreatedAt();
       const signed = await signCardUpdate({
         profileId: ctx.profileId,
@@ -137,10 +158,18 @@ export function initManifestoUpdate(ctx) {
             standards: "https://humanity.llc/standards/v1",
             data_policy: "https://humanity.llc/data-policy.html",
           },
+          ...(objectStreams.length ? { object_streams: objectStreams } : {}),
         },
       });
       await postCardUpdate(ctx.profileId, signed);
-      const next = { ...sessionNow, manifesto_line: manifestoLine };
+      const next = {
+        ...sessionNow,
+        manifesto_line: manifestoLine,
+        ...(objectStreams.length
+          ? { object_streams: objectStreams }
+          : { object_streams: undefined }),
+      };
+      if (!objectStreams.length) delete next.object_streams;
       ctx.setSession(next);
       ctx.onUpdated(manifestoLine);
       if (statusEl) statusEl.textContent = "Updated. Next scan shows the new line.";
@@ -156,4 +185,21 @@ export function initManifestoUpdate(ctx) {
       scannersSee?.removeAttribute("hidden");
     },
   };
+}
+
+/** @param {unknown} streams */
+function fillObjectStreamFields(streams) {
+  if (!Array.isArray(streams)) return;
+  const rows = [
+    ["update-stream-1-label", "update-stream-1-value"],
+    ["update-stream-2-label", "update-stream-2-value"],
+  ];
+  streams.slice(0, 2).forEach((stream, index) => {
+    const ids = rows[index];
+    if (!ids || !stream || typeof stream !== "object") return;
+    const labelEl = document.getElementById(ids[0]);
+    const valueEl = document.getElementById(ids[1]);
+    if (labelEl) labelEl.value = String(stream.label || "");
+    if (valueEl) valueEl.value = String(stream.value || "");
+  });
 }

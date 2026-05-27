@@ -17,6 +17,7 @@ import {
 } from "../http/resolver";
 import { validateHandle } from "../validation/handle";
 import { validateManifestoLine } from "../validation/manifesto";
+import { validateObjectStreamsField } from "../validation/object-streams";
 import { resolveStoredQrExpiresAt } from "./merch-qr-policy";
 
 export interface CreateCardBody {
@@ -184,6 +185,17 @@ export async function handlePostCards(
     manifestoLine = validateManifestoLine(manifestoRaw);
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Validation failed.";
+    const code =
+      e && typeof e === "object" && "code" in e
+        ? String((e as { code: string }).code)
+        : "VALIDATION_ERROR";
+    return errorResponse(code, msg, 422);
+  }
+
+  try {
+    validateObjectStreamsField(card);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Invalid object_streams.";
     const code =
       e && typeof e === "object" && "code" in e
         ? String((e as { code: string }).code)

@@ -27,6 +27,7 @@ import { scanMalformedStatusHint } from "./scan-malformed-hint";
 import { guardScanResponse, scanRedirectQueryBlocked } from "./scan-redirect-guard";
 import { BEARER_WARNING } from "./trust-copy";
 import { humanTrustDisplay } from "./verification-display";
+import type { ObjectPublicStream } from "../validation/object-streams";
 
 export { BEARER_WARNING };
 
@@ -46,6 +47,7 @@ export interface ScanStatusBody {
       status: string | null;
       handle: string | null;
       manifesto_line: string | null;
+      object_streams?: ObjectPublicStream[];
     } | null;
     qr: {
       status: string | null;
@@ -103,6 +105,9 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
             status: vm.cardStatus,
             handle: vm.handle,
             manifesto_line: vm.manifestoLine,
+            ...(vm.objectStreams.length
+              ? { object_streams: vm.objectStreams }
+              : {}),
           }
         : null,
       qr: vm.qrId

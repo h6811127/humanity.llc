@@ -161,6 +161,9 @@ html[data-theme="dark"] .list-title {
 html[data-theme="dark"] .list-sub,
 html[data-theme="dark"] .form-hint,
 html[data-theme="dark"] .device-hub-lead,
+html[data-theme="dark"] .wallet-page-lead {
+  color: var(--surface-popover-fg-muted);
+}
 html[data-theme="dark"] .device-hub-group-hint,
 html[data-theme="dark"] .device-hub-group-label,
 html[data-theme="dark"] .device-hub-subgroup-label,
@@ -903,7 +906,7 @@ html[data-theme="dark"] .device-hub-notice-banner--info {
 }
 
 html[data-theme="dark"] .device-hub-create-btn {
-  box-shadow: 0 2px 8px rgba(255, 77, 109, 0.28);
+  box-shadow: 0 2px 10px rgba(255, 77, 109, 0.35);
 }
 
 html[data-theme="dark"] .device-hub-home-btn {
@@ -1104,8 +1107,18 @@ html[data-theme="dark"] .scan-hero.scan-status-panel {
 }
 
 html[data-theme="dark"] .scan-hero .scan-hero-title,
-html[data-theme="dark"] .scan-hero .scan-hero-line {
+html[data-theme="dark"] .scan-hero .scan-hero-line,
+html[data-theme="dark"] .scan-hero .scan-object-stream-value {
   color: var(--hc-emphasis-card-title-fg);
+}
+
+html[data-theme="dark"] .scan-hero .scan-object-stream {
+  background: rgba(120, 120, 128, 0.16);
+  border-color: rgba(120, 120, 128, 0.22);
+}
+
+html[data-theme="dark"] .scan-hero .scan-object-stream-label {
+  color: rgba(235, 235, 245, 0.56);
 }
 
 html[data-theme="dark"] .scan-hero .scan-hero-wordmark {

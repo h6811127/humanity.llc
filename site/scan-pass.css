@@ -1406,6 +1406,38 @@ a {
   color: var(--black);
 }
 
+.scan-object-streams {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.scan-object-stream {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(60, 60, 67, 0.06);
+  border: 0.5px solid rgba(60, 60, 67, 0.1);
+}
+
+.scan-object-stream-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(60, 60, 67, 0.62);
+}
+
+.scan-object-stream-value {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--black);
+}
+
 .scan-hero-steward {
   margin: 4px 0 0;
   font-size: 14px;

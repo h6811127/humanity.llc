@@ -297,6 +297,24 @@ function renderGovernanceProcessLinks(origin: string): string {
   return `<p class="scan-governance-links">Read the <a href="${escapeHtml(links.data_policy_url)}">operator data policy</a> and <a href="${escapeHtml(links.architecture_url)}">architecture overview</a> for published suspension rules and appeals.</p>`;
 }
 
+function renderObjectStreamsBlock(
+  streams: ScanViewModel["objectStreams"]
+): string {
+  if (!streams?.length) return "";
+  const items = streams
+    .map(
+      (stream) =>
+        `<li class="scan-object-stream">
+  <span class="scan-object-stream-label">${escapeHtml(stream.label)}</span>
+  <span class="scan-object-stream-value">${escapeHtml(stream.value)}</span>
+</li>`
+    )
+    .join("\n");
+  return `<ul class="scan-object-streams" aria-label="Object details">
+${items}
+</ul>`;
+}
+
 function buildScanHeroMain(
   vm: ScanViewModel,
   origin: string
@@ -370,9 +388,11 @@ function buildScanHeroMain(
 
   if (template === "status_plate" && display.kind === "status_plate") {
     const steward = renderStewardStrip(vm);
+    const streams = renderObjectStreamsBlock(vm.objectStreams);
     return {
       main: `<h1 class="scan-hero-title">${escapeHtml(display.objectLabel)}</h1>
     <p class="scan-hero-line">${escapeHtml(display.statusLine)}</p>
+    ${streams}
     ${steward}`,
       foot: "Scan shows current status for this place - not who owns the door.",
     };
@@ -397,8 +417,10 @@ function buildScanHeroMain(
         ? display.line
         : "Live on the network";
     const steward = renderStewardStrip(vm);
+    const streams = renderObjectStreamsBlock(vm.objectStreams);
     return {
       main: `<h1 class="scan-hero-title">${escapeHtml(line)}</h1>
+    ${streams}
     ${steward}`,
       foot: SCAN_HERO_LIVE_OBJECT_FOOT,
     };

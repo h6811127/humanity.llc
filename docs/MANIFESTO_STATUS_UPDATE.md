@@ -62,6 +62,22 @@ Same as create  -  one `manifesto_line` field, layout parsed at scan time (`work
 | **Lost item relay** | `[relay]` prefix | `[relay] Keys` · `Found  -  thank you` |
 | **General card** | One line (or two treated as plate if newline) | Single public statement |
 
+### Optional object streams (status plate / live object)
+
+Signed optional field on the `humanity_card` document:
+
+```json
+"object_streams": [
+  { "id": "tasks", "class": "care", "label": "Today's tasks", "value": "Water bed 3" }
+]
+```
+
+- Up to **4** streams per card; plain text only; validated on create/update/rotate.
+- `class`: `place` | `care` | `narrative` | `route` (defaults to `place`).
+- Omitted or `[]` clears streams on the next signed update.
+- Exposed on scan HTML (status plate + live object heroes) and `GET …/status` JSON as `card.object_streams`.
+- Owner UI: optional detail rows on `/created/` for status plate pilots.
+
 ---
 
 ## Owner UI (`/created/`)
@@ -109,6 +125,8 @@ Deep link: `/created/?profile_id=…&qr_id=…`  -  hydrates handle/manifesto fr
 | Path | Role |
 |------|------|
 | `worker/src/resolver/update-card.ts` | POST handler |
+| `worker/src/validation/object-streams.ts` | Stream validation |
+| `site/js/object-streams-core.mjs` | Shared validation + owner form builder |
 | `site/js/created-manifesto-update.mjs` | Owner form |
 | `site/js/created-update.mjs` | Sign + POST |
 | `worker/src/resolver/extend-qr.ts` | QR expiry extension (M4.6b) |

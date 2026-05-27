@@ -13,6 +13,7 @@ import { initManifestoUpdate } from "./created-manifesto-update.mjs";
 import { initQrRotate } from "./created-qr-rotate.mjs";
 import { initQrExtend } from "./created-qr-extend.mjs";
 import { inferPilotTemplate, parseManifestoDisplay } from "./manifesto-display.mjs";
+import { parseObjectStreamsFromDocument } from "./object-streams-core.mjs";
 import { createdLiveProofPollShouldRun, liveProofPanelMostlyVisible, shouldScrollLiveProofPanelIntoView } from "./created-live-proof-poll-core.mjs";
 import { initCreatedTabs } from "./created-tabs.mjs";
 import { initCreatedDashboard } from "./created-dashboard.mjs?v=6";
@@ -643,6 +644,7 @@ async function hydrateSessionFromNetwork() {
   const card = await res.json();
   if (!card?.handle || !card?.manifesto_line) return;
 
+  const streams = parseObjectStreamsFromDocument(card);
   const next = {
     ...existing,
     profile_id: profileId,
@@ -653,6 +655,7 @@ async function hydrateSessionFromNetwork() {
     status: card.status || existing.status || "active",
     pilot_template:
       existing.pilot_template || inferPilotTemplate(card.manifesto_line),
+    ...(streams.length ? { object_streams: streams } : {}),
   };
   saveSession(next);
   data = next;
