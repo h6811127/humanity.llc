@@ -2,6 +2,7 @@
 
 **Status:** Checkout handoff wired (config-driven) · set `shop-config.json` when Shopify product exists  
 **Canonical strategy:** `docs/MERCH_LED_V1.md` Phase B, `docs/FOUNDING_DROP_BRIEF.md` Tier 0  
+**Merch funnel MVP:** `docs/MERCH_FUNNEL_MVP.md` · `/shop/customize/` QR customizer  
 **Merch QR policy:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` (defer `checkout_open: true` until M5 + policy gates)  
 **Copy:** `docs/LAUNCH_LANGUAGE_KIT.md` § Tier 0 · Sticker FAQ
 
@@ -12,6 +13,7 @@
 | Piece | Path |
 |-------|------|
 | Story-row drop page | `site/shop/index.html` |
+| **QR customizer (Tier 1)** | `site/shop/customize/index.html` · `docs/MERCH_FUNNEL_MVP.md` |
 | Checkout config | `site/data/shop-config.json` (see `shop-config.example.json`) |
 | Shop UI | `site/js/shop.mjs` + `site/js/shop-config.mjs`  -  Buy vs interest by `checkout_open` |
 | Drop interest (device-local) | `localStorage` `hc_shop_drop_interest` when checkout closed |

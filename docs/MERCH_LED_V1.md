@@ -4,6 +4,7 @@
 **Purpose:** Lead with physical artifacts as viral distribution while pairing **proof of curiosity** (spread) with **proof of belonging** (retention). Commons Pass and organizer tooling follow once people already wear the object.
 
 **Implementation tracker:** `docs/SHOP_TIER0_IMPLEMENTATION.md` (Pages UI, waitlist interest, Shopify handoff checklist).  
+**Merch funnel MVP:** `docs/MERCH_FUNNEL_MVP.md` (scan → profile → `/shop/customize/` → Printify).  
 **Merch QR lifecycle:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` (no calendar expiry on printed artifacts, revoke/reprint, optional experiments).
 
 **Architecture and launch gate:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  -  public card creation when Phase A ships; federated networks long-term; founding cohort is optional feedback only.

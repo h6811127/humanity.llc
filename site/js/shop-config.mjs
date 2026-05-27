@@ -44,6 +44,13 @@ export function tier0Display(config) {
   };
 }
 
+/**
+ * @param {Record<string, unknown>} config
+ */
+export function isPersonalizeCheckoutOpen(config) {
+  return config?.personalize?.checkout_open === true;
+}
+
 function normalizeSitePath(raw, fallback) {
   const path = typeof raw === "string" && raw.trim() ? raw.trim() : fallback;
   return path.startsWith("/") ? path : `/${path}`;

@@ -142,7 +142,7 @@ Ordered plan from brand review (2026-05-27). Update this table as steps complete
 
 | Phase | Work | Rationale |
 |-------|------|-----------|
-| **Now** | Status plate + lost-item field pilots | Proves L0–L2 in the real world |
+| **Now** | Status plate + lost-item field pilots · **merch funnel** (scan → `/shop/customize/`) | Proves L0–L2 + commerce path — [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) |
 | **Hold** | New L3 user-facing features | Until Phase A stranger loop proven |
 | **Review** | P1 scan reader (step 2) | Accessibility vs brand |
 | **Keep** | `agent_context` JSON | Protocol for external integrators |

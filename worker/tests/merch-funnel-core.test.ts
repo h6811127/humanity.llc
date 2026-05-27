@@ -14,6 +14,7 @@ describe("merch-funnel-core (server)", () => {
   it("accepts allowed refs and rejects unknown", () => {
     expect(normalizeMerchFunnelRef("tier0_sticker")).toBe("tier0_sticker");
     expect(normalizeMerchFunnelRef(" TIER0_SHOP ")).toBe("tier0_shop");
+    expect(normalizeMerchFunnelRef("customize_hoodie")).toBe("customize_hoodie");
     expect(normalizeMerchFunnelRef("unknown_campaign")).toBeNull();
     expect(normalizeMerchFunnelRef("")).toBeNull();
   });

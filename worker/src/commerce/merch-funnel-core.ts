@@ -2,6 +2,9 @@
 export const ALLOWED_MERCH_FUNNEL_REFS = new Set([
   "tier0_sticker",
   "tier0_shop",
+  "customize_shop",
+  "customize_hoodie",
+  "scan_customize",
 ]);
 
 export const MERCH_FUNNEL_EVENTS = new Set(["scan_landing", "create_attributed"]);

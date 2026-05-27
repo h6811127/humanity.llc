@@ -4852,6 +4852,139 @@ body.landing-focus-mode .screen-landing {
   color: var(--grey);
 }
 
+/* /shop/customize/ — QR customizer (docs/MERCH_FUNNEL_MVP.md) */
+.screen-shop-customize {
+  padding-bottom: 32px;
+}
+
+.shop-customize-card-gate {
+  margin-bottom: 24px;
+}
+
+.shop-customize-ready[hidden],
+.shop-customize-card-gate[hidden] {
+  display: none !important;
+}
+
+.shop-customize-products {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.shop-customize-product-btn {
+  flex: 1 1 auto;
+  min-width: 140px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 0.5px solid rgba(0, 0, 0, 0.12);
+  background: var(--white);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--black);
+  cursor: pointer;
+}
+
+.shop-customize-product-btn.is-active {
+  border-color: var(--brand-red);
+  box-shadow: 0 0 0 1px var(--brand-red);
+}
+
+.shop-customize-preview-wrap {
+  margin-bottom: 16px;
+}
+
+.shop-customize-mock {
+  position: relative;
+  margin: 0 auto 12px;
+  max-width: 320px;
+}
+
+.shop-customize-mock__garment {
+  border-radius: 16px;
+  background: linear-gradient(180deg, #f7f7f7 0%, #ececec 100%);
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+}
+
+.shop-customize-mock[data-preview="hoodie"] .shop-customize-mock__garment {
+  aspect-ratio: 4 / 5;
+}
+
+.shop-customize-mock[data-preview="hoodie"] .shop-customize-mock__qr-card {
+  position: absolute;
+  top: 28%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 46%;
+  padding: 8px;
+  background: #fff;
+  border-radius: 8px;
+  border: 0.5px solid rgba(219, 27, 67, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.shop-customize-mock[data-preview="sticker"] .shop-customize-mock__garment {
+  aspect-ratio: 1;
+  max-width: 220px;
+  margin: 0 auto;
+}
+
+.shop-customize-mock[data-preview="sticker"] .shop-customize-mock__qr-card {
+  position: absolute;
+  inset: 12%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.shop-customize-qr-preview {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.shop-customize-credential-code {
+  margin: 6px 0 0;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 11px;
+  text-align: center;
+  color: var(--grey);
+  letter-spacing: 0.04em;
+}
+
+.shop-customize-preview-note {
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.shop-customize-approve {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 16px 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+.shop-customize-approve input {
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.shop-customize-checkout {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.shop-customize-interest[hidden] {
+  display: none !important;
+}
+
 .studio-post-back {
   display: inline-block;
   margin-bottom: 12px;

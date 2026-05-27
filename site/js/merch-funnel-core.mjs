@@ -6,7 +6,13 @@
 export const MERCH_FUNNEL_SESSION_KEY = "hc_merch_create_ref";
 export const MERCH_FUNNEL_BEACON_PREFIX = "hc_merch_beacon_";
 
-export const ALLOWED_MERCH_REFS = new Set(["tier0_sticker", "tier0_shop"]);
+export const ALLOWED_MERCH_REFS = new Set([
+  "tier0_sticker",
+  "tier0_shop",
+  "customize_shop",
+  "customize_hoodie",
+  "scan_customize",
+]);
 
 const REF_PATTERN = /^[a-z0-9_]{2,32}$/;
 
