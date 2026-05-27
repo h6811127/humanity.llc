@@ -3,7 +3,7 @@
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
 import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=38";
-import { buildStatusSegments } from "./device-counts.mjs";
+import { buildStatusSegments, hubStatusPanelModelFromSegments } from "./device-counts.mjs";
 import { shouldSkipCrossTabOverlayViewTransition } from "./device-presence-inbox-stability-core.mjs";
 import { fetchResolverHealth } from "./device-network-health.mjs";
 import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visit-gate.mjs";
@@ -407,7 +407,7 @@ function renderShellStatusLine(segments) {
 
 function renderHubStatusPanel(segments) {
   if (!hubStatusPanel) return;
-  const chips = segments.map((seg) => {
+  const chipHtml = (seg, extraClass = "") => {
     const label = seg.chipLabel ?? seg.label;
     const tone = seg.chipTone ?? (seg.highlight ? "highlight" : "neutral");
     const cls = [
@@ -415,12 +415,31 @@ function renderHubStatusPanel(segments) {
       `device-hub-chip--${seg.id}`,
       `device-hub-chip--${tone}`,
       seg.zero ? "device-hub-chip--zero" : "",
+      extraClass,
     ]
       .filter(Boolean)
       .join(" ");
     return `<span class="${cls}" data-seg="${seg.id}" title="${escapeHtml(seg.detail)}">${escapeHtml(label)}</span>`;
-  });
-  hubStatusPanel.innerHTML = `<div class="device-hub-status-chips" role="status" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">${chips.join("")}</div>`;
+  };
+  const countHtml = (seg, index) => {
+    const separator =
+      index === 0
+        ? ""
+        : `<span class="device-hub-count-separator" aria-hidden="true">·</span>`;
+    return `${separator}<span class="device-hub-count-chip${seg.zero ? " device-hub-count-chip--zero" : ""}" data-seg="${seg.id}" title="${escapeHtml(seg.detail)}">${escapeHtml(seg.chipLabel ?? seg.label)}</span>`;
+  };
+  const { primary, counts, alerts } = hubStatusPanelModelFromSegments(segments);
+  const mainLine = [
+    primary ? chipHtml(primary, "device-hub-status-primary") : "",
+    counts.length
+      ? `<span class="device-hub-status-meta">${counts.map(countHtml).join("")}</span>`
+      : "",
+  ].join("");
+  const alertLine = alerts.length
+    ? `<div class="device-hub-status-alerts">${alerts.map((seg) => chipHtml(seg)).join("")}</div>`
+    : "";
+  const ariaLabel = segments.map((seg) => seg.chipLabel ?? seg.label).join(", ");
+  hubStatusPanel.innerHTML = `<div class="device-hub-status-chips" role="status" aria-label="${escapeHtml(ariaLabel)}"><div class="device-hub-status-main">${mainLine}</div>${alertLine}</div>`;
 }
 
 function renderNotifBadge() {

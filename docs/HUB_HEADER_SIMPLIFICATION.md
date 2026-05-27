@@ -1,6 +1,6 @@
 # Hub header simplification
 
-**Status:** Step 1 shipped  
+**Status:** Step 1-2 shipped  
 **Scope:** Bottom-sheet hub header on `/`, `/create/`, and `/created/`  
 **Companions:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md), [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md)
 
@@ -54,6 +54,8 @@ The first screen of the hub should prioritize:
 - Render the hub status panel as a single-line primary status where possible.
 - Keep zero saved/pinned values visually subordinate.
 - Avoid wrapping a lone `0 pinned` chip onto its own row on mobile.
+
+**Shipped:** The hub header now renders resolver state as the primary pill and saved/pinned counts as subdued same-line metadata; urgent notices/proof states remain separate alert chips.
 
 ### Step 3 - Rebalance nav controls
 

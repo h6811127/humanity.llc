@@ -902,6 +902,60 @@ button.device-hub-notice-banner {
 
 .device-hub-status-chips {
   display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.device-hub-status-main {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-width: 0;
+  flex-wrap: nowrap;
+}
+
+.device-hub-status-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  overflow: hidden;
+  flex: 1 1 auto;
+  white-space: nowrap;
+  color: var(--shell-label);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.device-hub-status-primary {
+  flex: 0 0 auto;
+}
+
+.device-hub-count-chip {
+  display: inline-flex;
+  min-width: 0;
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.device-hub-count-chip--zero {
+  opacity: 0.58;
+  font-weight: 500;
+}
+
+.device-hub-count-separator {
+  flex: 0 0 auto;
+  opacity: 0.5;
+}
+
+.device-hub-status-alerts {
+  display: flex;
   flex-wrap: wrap;
   gap: 6px;
   align-items: center;
@@ -911,7 +965,7 @@ button.device-hub-notice-banner {
   display: inline-flex;
   align-items: center;
   max-width: 100%;
-  margin: 0 6px 6px 0;
+  margin: 0;
   padding: 4px 10px;
   border-radius: 999px;
   font-size: 11px;
@@ -925,9 +979,9 @@ button.device-hub-notice-banner {
 
 .device-hub-status-panel .device-hub-status-chips {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-start;
 }
 
 .device-hub-chip--network-ok {

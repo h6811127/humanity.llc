@@ -38,4 +38,16 @@ describe("device hub sheet header", () => {
       expect(sectionHeader).toContain(">New</span>");
     }
   });
+
+  it("renders the status header as a primary line with subordinate counts", () => {
+    const src = readPage("site/js/device-status.mjs");
+    const css = readPage("site/css/device-shell.css");
+
+    expect(src).toContain("hubStatusPanelModelFromSegments");
+    expect(src).toContain("device-hub-status-main");
+    expect(src).toContain("device-hub-status-meta");
+    expect(src).not.toContain("style=\"display:flex;flex-wrap:wrap");
+    expect(css).toMatch(/\.device-hub-status-main\s*\{[\s\S]*flex-wrap:\s*nowrap/);
+    expect(css).toContain(".device-hub-count-chip--zero");
+  });
 });
