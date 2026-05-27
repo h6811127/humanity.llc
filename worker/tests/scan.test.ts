@@ -291,7 +291,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
 
   it("uses manifesto as H1 for live object print QR", async () => {
     const manifesto =
-      "Live object demo. Scan from another phone, then revoke this QR.";
+      "Neighborhood tool library · Closed for inventory until Tuesday";
     const vm = buildScanViewModel(
       PROFILE,
       QR,

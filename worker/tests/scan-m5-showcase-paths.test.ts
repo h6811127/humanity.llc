@@ -100,33 +100,46 @@ function expectM5StrangerScanBasics(html: string) {
   expect(limitsIdx).toBeGreaterThan(provesIdx);
 }
 
+/** Match H1 with Path 2 arrive classes on the live check hero. */
+function expectHeroTitle(html: string, title: string) {
+  const escaped = title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  expect(html).toMatch(
+    new RegExp(`<h1 class="[^"]*scan-hero-title[^"]*">${escaped}</h1>`)
+  );
+}
+
 describe("M5 showcase scan paths", () => {
   it("live object: manifesto H1, steward strip, foot copy", async () => {
     const html = await renderActiveShowcaseScan(LIVE_OBJECT_MANIFESTO);
     expectM5StrangerScanBasics(html);
-    expect(html).toContain(`<h1 class="scan-hero-title">${LIVE_OBJECT_MANIFESTO}</h1>`);
+    expectHeroTitle(html, LIVE_OBJECT_MANIFESTO);
     expect(html).toContain("Controlled by @river_example");
-    expect(html).not.toMatch(/<h1 class="scan-hero-title">@river_example<\/h1>/);
+    expect(html).not.toMatch(/<h1 class="[^"]*scan-hero-title[^"]*">@river_example<\/h1>/);
     expect(html).toContain("Scan shows live object state");
+    expect(html).toContain("scan-hero-meta-details");
+    expect(html).toContain("Signed and checked just now");
+    expect(html).not.toContain("Signed object verified by resolver");
+    expect(html).toContain("This QR");
+    expect(html).not.toContain("QR on this page");
   });
 
   it("status plate: object label H1, status line, door foot copy", async () => {
     const html = await renderActiveShowcaseScan(STATUS_PLATE_MANIFESTO);
     expectM5StrangerScanBasics(html);
-    expect(html).toContain('<h1 class="scan-hero-title">Studio door</h1>');
+    expectHeroTitle(html, "Studio door");
     expect(html).toContain("Open · Thu–Sun until 9 PM");
     expect(html).toContain(
       "Scan shows current status for this place - not who owns the door."
     );
-    expect(html).not.toMatch(/<h1 class="scan-hero-title">@river_example<\/h1>/);
+    expect(html).not.toMatch(/<h1 class="[^"]*scan-hero-title[^"]*">@river_example<\/h1>/);
   });
 
   it("lost item relay: relay eyebrow, object H1, holder foot copy", async () => {
     const html = await renderActiveShowcaseScan(LOST_ITEM_MANIFESTO);
     expectM5StrangerScanBasics(html);
     expect(html).toContain("Lost item relay");
-    expect(html).toContain('<h1 class="scan-hero-title">House keys</h1>');
+    expectHeroTitle(html, "House keys");
     expect(html).toContain("This scan does not prove who holds the item.");
-    expect(html).not.toMatch(/<h1 class="scan-hero-title">@river_example<\/h1>/);
+    expect(html).not.toMatch(/<h1 class="[^"]*scan-hero-title[^"]*">@river_example<\/h1>/);
   });
 });

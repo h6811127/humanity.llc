@@ -10,8 +10,15 @@ export const SCAN_SAFETY_FIRST_SEEN_NEW =
   "First time you opened this object on this device";
 export const SCAN_SAFETY_FIRST_SEEN_RETURN =
   "You opened this before on this device";
+/** Stranger-first resolver line (docs/SCANNER_EXPERIENCE.md First-scan hero). */
 export const SCAN_SAFETY_RESOLVER_VERIFIED_COPY =
-  "Signed object verified by resolver";
+  "Signed and checked just now";
+
+/** Collapsed hero meta chips (revocable, issued, network). */
+export const SCAN_HERO_META_DETAILS_SUMMARY = "Details";
+
+/** Collapsed on-page QR + credential code (zone F). */
+export const SCAN_HERO_QR_DETAILS_SUMMARY = "This QR";
 
 export interface ScanSafetyModel {
   objectSignatureVerified: boolean;

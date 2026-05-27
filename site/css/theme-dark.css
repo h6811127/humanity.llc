@@ -147,12 +147,16 @@ html[data-theme="dark"] .device-hub-search-input {
 }
 
 html[data-theme="dark"] .list-row,
-html[data-theme="dark"] .hub-card-item,
 html[data-theme="dark"] .device-hub-glance-btn,
 html[data-theme="dark"] .studio-post-card,
 html[data-theme="dark"] .landing-framing-tab {
   background: var(--shell-fill);
   border-color: var(--shell-separator);
+}
+
+html[data-theme="dark"] .hub-card-item {
+  background: var(--hc-emphasis-card-fill-info-glass);
+  border: 0.5px solid var(--hc-emphasis-card-border-neutral);
 }
 
 html[data-theme="dark"] .list-title {
@@ -1104,6 +1108,7 @@ html[data-theme="dark"] .scan-hero .scan-hero-foot,
 html[data-theme="dark"] .scan-hero .scan-safety-first-seen,
 html[data-theme="dark"] .scan-hero .scan-hero-meta,
 html[data-theme="dark"] .scan-hero .scan-hero-sub,
+html[data-theme="dark"] .scan-hero .scan-hero-meta-summary,
 html[data-theme="dark"] .scan-hero .scan-hero-qr-summary {
   color: var(--hc-emphasis-card-detail-fg);
 }

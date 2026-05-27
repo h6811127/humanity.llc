@@ -24,6 +24,8 @@ import {
   renderHeroStatusStrip,
   renderSafetyChips,
   renderScanSafetyHeaderScript,
+  SCAN_HERO_META_DETAILS_SUMMARY,
+  SCAN_HERO_QR_DETAILS_SUMMARY,
   SCAN_SAFETY_RESOLVER_VERIFIED_COPY,
   type ScanSafetyModel,
 } from "./scan-safety";
@@ -34,7 +36,7 @@ import {
 } from "./scan-malformed-hint";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v33";
+export const SCAN_UI_VERSION = "pass-v34";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -181,21 +183,14 @@ function renderScanHeroSection(
   const resolverRow = safety.objectSignatureVerified
     ? `<p class="scan-safety-resolver scan-arrive-item scan-arrive-item--hidden">${escapeHtml(SCAN_SAFETY_RESOLVER_VERIFIED_COPY)}</p>`
     : "";
-  const chips = renderSafetyChips(vm, safety);
-  const chipsBlock = chips
-    ? chips
-        .replace(
-          'class="scan-safety-chips"',
-          'class="scan-safety-chips scan-hero-details scan-arrive-item scan-arrive-item--hidden"'
-        )
-    : "";
+  const chipsBlock = renderScanHeroMetaDetails(vm, safety);
   const footBlock = foot
     ? `<p class="scan-hero-foot">${escapeHtml(foot)}</p>`
     : "";
   const qrBlock = scanHeroQrBlock(vm, qrMarkup);
   const qrSection = qrBlock
     ? `<details class="scan-hero-qr-details">
-  <summary class="scan-hero-qr-summary">QR on this page</summary>
+  <summary class="scan-hero-qr-summary">${escapeHtml(SCAN_HERO_QR_DETAILS_SUMMARY)}</summary>
   ${qrBlock}
 </details>`
     : "";
@@ -217,6 +212,18 @@ function renderScanHeroSection(
   ${qrSection}
 </article>
 </div>`;
+}
+
+function renderScanHeroMetaDetails(
+  vm: ScanViewModel,
+  safety: ScanSafetyModel
+): string {
+  const chips = renderSafetyChips(vm, safety);
+  if (!chips) return "";
+  return `<details class="scan-hero-meta-details scan-arrive-item scan-arrive-item--hidden">
+  <summary class="scan-hero-meta-summary">${escapeHtml(SCAN_HERO_META_DETAILS_SUMMARY)}</summary>
+  ${chips}
+</details>`;
 }
 
 function scanHeroQrBlock(vm: ScanViewModel, qrMarkup: string): string {

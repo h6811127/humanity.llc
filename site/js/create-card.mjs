@@ -393,7 +393,7 @@ demoBtn?.addEventListener("click", async () => {
   if (handleEl) handleEl.value = `demo_${suffix}`;
   if (manifestoEl) {
     manifestoEl.value =
-      "Live object demo. Scan from another phone, then revoke this QR.";
+      "Neighborhood tool library · Closed for inventory until Tuesday";
   }
   await submitCreate(new Event("submit"), { sampleCard: true });
 });

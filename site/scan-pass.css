@@ -37,6 +37,14 @@
     0 18px 44px rgba(0, 0, 0, 0.1);
   --hc-scan-hero-fill: linear-gradient(160deg, #ffffff 0%, #fafafa 50%, #f5f5f7 100%);
   --hc-scan-hero-border: rgba(60, 60, 67, 0.14);
+  /* Trust-tool / vouch / list surfaces — docs/UI_COLOR_SCHEME_STANDARD.md § Scan page surfaces */
+  --hc-scan-surface-bg: #ffffff;
+  --hc-scan-surface-subtle-bg: #f7f7f9;
+  --hc-scan-surface-fg: #1c1c1e;
+  --hc-scan-surface-fg-muted: rgba(60, 60, 67, 0.65);
+  --hc-scan-surface-fg-subtle: rgba(60, 60, 67, 0.58);
+  --hc-scan-surface-border: rgba(60, 60, 67, 0.14);
+  --hc-scan-surface-chevron: rgba(60, 60, 67, 0.34);
   --hc-emphasis-card-fill-active: linear-gradient(
     160deg,
     #f6f8f7 0%,
@@ -592,7 +600,7 @@ a {
   margin: 6px 0 0;
   font-size: 14px;
   line-height: 1.4;
-  color: rgba(60, 60, 67, 0.65);
+  color: var(--hc-scan-surface-fg-muted);
 }
 
 .scan-trust-stack {
@@ -628,8 +636,8 @@ a {
 .scan-limits-settings {
   margin-top: 4px;
   border-radius: var(--radius);
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  background: #f7f7f7;
+  border: 1px solid var(--hc-scan-surface-border);
+  background: var(--hc-scan-surface-bg);
   overflow: hidden;
 }
 
@@ -666,7 +674,7 @@ a {
 .scan-limits-summary-title {
   font-size: 16px;
   font-weight: 600;
-  color: var(--black);
+  color: var(--hc-scan-surface-fg);
 }
 
 .scan-limits-summary-sub {
@@ -688,13 +696,13 @@ a {
 
 .scan-limits-panel {
   padding: 0 14px 14px 52px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 1px solid var(--hc-scan-surface-border);
 }
 
 .scan-limits-lead {
   font-size: 14px;
   line-height: 1.45;
-  color: var(--black);
+  color: var(--hc-scan-surface-fg);
   margin: 12px 0 10px;
 }
 
@@ -703,7 +711,7 @@ a {
   padding-left: 18px;
   font-size: 14px;
   line-height: 1.45;
-  color: var(--black);
+  color: var(--hc-scan-surface-fg);
 }
 
 .scan-limits-list li {
@@ -890,6 +898,11 @@ a {
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--black);
+}
+
+.scan-trust-details .list-title,
+.scan-page .list .list-title {
+  color: var(--hc-scan-surface-fg);
 }
 
 .list-sub {
@@ -1166,8 +1179,8 @@ a {
 .vouch-card {
   padding: 16px 16px 14px;
   border-radius: 18px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background: #f7f7f9;
+  border: 1px solid var(--hc-scan-surface-border);
+  background: var(--hc-scan-surface-subtle-bg);
 }
 
 .vouch-card-hint {
@@ -1229,9 +1242,10 @@ a {
   margin: 0 0 10px;
   padding: 10px 12px;
   font-size: 16px;
-  border: 1px solid rgba(60, 60, 67, 0.24);
+  border: 1px solid var(--hc-scan-surface-border);
   border-radius: 10px;
-  background: #fff;
+  background: var(--hc-scan-surface-bg);
+  color: var(--hc-scan-surface-fg);
 }
 
 .vouch-unlock-btn {
@@ -1388,8 +1402,29 @@ a {
   margin-top: 6px;
 }
 
-.scan-hero-details {
-  margin-top: 12px;
+.scan-hero-meta-details,
+.scan-hero-qr-details {
+  margin-top: 14px;
+  border-top: 0.5px solid rgba(60, 60, 67, 0.1);
+  padding-top: 10px;
+}
+
+.scan-hero-meta-summary,
+.scan-hero-qr-summary {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(60, 60, 67, 0.62);
+  cursor: pointer;
+  list-style: none;
+}
+
+.scan-hero-meta-summary::-webkit-details-marker,
+.scan-hero-qr-summary::-webkit-details-marker {
+  display: none;
+}
+
+.scan-hero-meta-details[open] .scan-safety-chips {
+  margin-top: 10px;
 }
 
 .scan-hero-qr {
@@ -1402,24 +1437,6 @@ a {
   display: block;
   width: 88px;
   height: 88px;
-}
-
-.scan-hero-qr-details {
-  margin-top: 14px;
-  border-top: 0.5px solid rgba(60, 60, 67, 0.1);
-  padding-top: 10px;
-}
-
-.scan-hero-qr-summary {
-  font-size: 13px;
-  font-weight: 600;
-  color: rgba(60, 60, 67, 0.62);
-  cursor: pointer;
-  list-style: none;
-}
-
-.scan-hero-qr-summary::-webkit-details-marker {
-  display: none;
 }
 
 .scan-hero-qr-details[open] .scan-hero-qr {
@@ -1505,8 +1522,8 @@ a {
 
 .scan-trust-details {
   border-radius: 18px;
-  background: #fff;
-  border: 1px solid rgba(60, 60, 67, 0.14);
+  background: var(--hc-scan-surface-bg);
+  border: 1px solid var(--hc-scan-surface-border);
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.04),
     0 6px 18px rgba(0, 0, 0, 0.05);
@@ -1557,7 +1574,7 @@ a {
   font-size: 16px;
   font-weight: 600;
   letter-spacing: -0.02em;
-  color: var(--black);
+  color: var(--hc-scan-surface-fg);
   text-transform: none;
 }
 
@@ -1566,7 +1583,7 @@ a {
   font-size: 13px;
   font-weight: 500;
   line-height: 1.3;
-  color: rgba(60, 60, 67, 0.58);
+  color: var(--hc-scan-surface-fg-subtle);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1578,7 +1595,7 @@ a {
   font-size: 22px;
   font-weight: 300;
   line-height: 1;
-  color: rgba(60, 60, 67, 0.34);
+  color: var(--hc-scan-surface-chevron);
   transition: transform 0.2s ease;
 }
 
@@ -1587,7 +1604,7 @@ a {
 }
 
 .scan-trust-details[open] > summary.scan-group-summary {
-  border-bottom: 1px solid rgba(60, 60, 67, 0.1);
+  border-bottom: 1px solid var(--hc-scan-surface-border);
 }
 
 .scan-trust-details .list {
@@ -1619,7 +1636,7 @@ a {
 .scan-trust-stack .scan-group-vouch {
   margin-top: 6px;
   padding-top: 4px;
-  border-top: 1px solid rgba(60, 60, 67, 0.1);
+  border-top: 1px solid var(--hc-scan-surface-border);
 }
 
 .scan-trust-stack .scan-group-vouch .group-label {
@@ -1985,14 +2002,14 @@ a {
   font-size: 17px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: var(--black);
+  color: var(--hc-scan-surface-fg);
 }
 
 .vouch-lead {
   margin: 0 0 14px;
   font-size: 15px;
   line-height: 1.45;
-  color: var(--black);
+  color: var(--hc-scan-surface-fg);
 }
 
 .vouch-field-label {
@@ -2011,10 +2028,10 @@ a {
   font: inherit;
   font-size: 15px;
   line-height: 1.45;
-  color: var(--black);
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  color: var(--hc-scan-surface-fg);
+  border: 1px solid var(--hc-scan-surface-border);
   border-radius: 14px;
-  background: var(--white);
+  background: var(--hc-scan-surface-bg);
   resize: vertical;
   min-height: 88px;
 }
@@ -2026,7 +2043,7 @@ a {
   margin: 0 0 14px;
   font-size: 14px;
   line-height: 1.45;
-  color: var(--black);
+  color: var(--hc-scan-surface-fg);
   cursor: pointer;
 }
 
@@ -2058,7 +2075,7 @@ a {
 .vouch-status-panel {
   padding: 10px 12px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--hc-scan-surface-subtle-bg);
 }
 
 .vouch-status {
@@ -2671,24 +2688,24 @@ body.scan-page-dot-glance-open {
 
 .scan-page .list {
   border: none;
-  background: rgba(255, 255, 255, 0.94);
+  background: var(--hc-scan-surface-bg);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 14px rgba(0, 0, 0, 0.05);
 }
 
 .scan-page .list li {
-  border-bottom: 0.5px solid rgba(60, 60, 67, 0.11);
+  border-bottom: 0.5px solid var(--hc-scan-surface-border);
 }
 
 .scan-limits-settings {
   border: none;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--hc-scan-surface-bg);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .live-control-card,
 .vouch-card {
   border: none;
-  background: rgba(255, 255, 255, 0.94);
+  background: var(--hc-scan-surface-bg);
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
 }
 
@@ -2792,6 +2809,13 @@ html[data-theme="dark"] {
   --hc-emphasis-card-eyebrow-urgent: #ff6961;
   --hc-emphasis-card-title-fg: #f5f5f7;
   --hc-emphasis-card-detail-fg: rgba(235, 235, 245, 0.9);
+  --hc-scan-surface-bg: #1c1c1e;
+  --hc-scan-surface-subtle-bg: #2c2c2e;
+  --hc-scan-surface-fg: #f5f5f7;
+  --hc-scan-surface-fg-muted: rgba(235, 235, 245, 0.72);
+  --hc-scan-surface-fg-subtle: rgba(235, 235, 245, 0.58);
+  --hc-scan-surface-border: rgba(255, 255, 255, 0.12);
+  --hc-scan-surface-chevron: rgba(235, 235, 245, 0.34);
 }
 
 html[data-theme="dark"] body {
