@@ -32,6 +32,7 @@ import {
   BEARER_WARNING,
   OBJECT_PUBLIC_SNAPSHOT_LIMIT,
   OBJECT_STREAMS_LIMIT,
+  AI_EXPLAIN_LIMIT,
 } from "./trust-copy";
 import { humanTrustDisplay } from "./verification-display";
 import type { ObjectPublicStream } from "../validation/object-streams";
@@ -39,6 +40,8 @@ import {
   buildPublicObjectSnapshot,
   type PublicObjectSnapshot,
 } from "./object-snapshot";
+import { buildAgentContextPacket } from "./ai-explain-core";
+import { AI_EXPLAIN_ENDPOINT } from "./ai-explain-snapshot";
 
 export { BEARER_WARNING };
 
@@ -87,7 +90,17 @@ export interface ScanStatusBody {
       bearer_warning: string;
       object_details_warning?: string;
       object_snapshot_warning?: string;
+      ai_explain_warning?: string;
       scan_analytics: false;
+    };
+    ai?: {
+      explain: {
+        available: true;
+        endpoint: string;
+        method: "POST";
+        opt_in: true;
+      };
+      agent_context: ReturnType<typeof buildAgentContextPacket>;
     };
     governance?: GovernanceProcessUrls;
   };
@@ -165,10 +178,30 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
           ? { object_details_warning: OBJECT_STREAMS_LIMIT }
           : {}),
         ...(publicSnapshot
-          ? { object_snapshot_warning: OBJECT_PUBLIC_SNAPSHOT_LIMIT }
+          ? {
+              object_snapshot_warning: OBJECT_PUBLIC_SNAPSHOT_LIMIT,
+              ai_explain_warning: AI_EXPLAIN_LIMIT,
+            }
           : {}),
         scan_analytics: false,
       },
+      ...(publicSnapshot
+        ? {
+            ai: {
+              explain: {
+                available: true,
+                endpoint: AI_EXPLAIN_ENDPOINT,
+                method: "POST" as const,
+                opt_in: true,
+              },
+              agent_context: buildAgentContextPacket(
+                vm.manifestoLine,
+                vm.objectStreams,
+                publicSnapshot
+              ),
+            },
+          }
+        : {}),
       ...(governance ? { governance } : {}),
     },
   };

@@ -9,6 +9,9 @@ const CREATE_BLOCKED_BUCKET_PREFIX = "create_blocked:";
 const CREATE_DEMO_BUCKET_PREFIX = "create_demo:";
 const CREATE_DEMO_BLOCKED_BUCKET_PREFIX = "create_demo_blocked:";
 const CARD_RESOLUTION_BUCKET_PREFIX = "status:";
+/** 30 opt-in AI explain requests per IP per hour (AI L3 P1). */
+export const AI_EXPLAIN_LIMIT_PER_HOUR = 30;
+const AI_EXPLAIN_BUCKET_PREFIX = "ai_explain:";
 
 async function incrementBucket(
   db: D1Database,
@@ -147,6 +150,43 @@ export async function checkCardResolutionRateLimit(
       retryAfterSec: Math.max(
         1,
         Math.ceil((nextMinute.getTime() - now.getTime()) / 1000)
+      ),
+    };
+  }
+
+  await incrementBucket(db, bucketKey, windowIso);
+  return { allowed: true };
+}
+
+export async function checkAiExplainRateLimit(
+  db: D1Database,
+  ipHash: string,
+  now: Date = new Date()
+): Promise<{ allowed: boolean; retryAfterSec?: number }> {
+  const windowStart = new Date(
+    Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      now.getUTCHours()
+    )
+  );
+  const windowIso = windowStart.toISOString();
+  const bucketKey = `${AI_EXPLAIN_BUCKET_PREFIX}${ipHash}:${windowIso}`;
+
+  const row = await db
+    .prepare(`SELECT count FROM rate_limit_buckets WHERE bucket_key = ?`)
+    .bind(bucketKey)
+    .first<{ count: number }>();
+
+  const count = row?.count ?? 0;
+  if (count >= AI_EXPLAIN_LIMIT_PER_HOUR) {
+    const nextHour = new Date(windowStart.getTime() + 3600_000);
+    return {
+      allowed: false,
+      retryAfterSec: Math.max(
+        1,
+        Math.ceil((nextHour.getTime() - now.getTime()) / 1000)
       ),
     };
   }

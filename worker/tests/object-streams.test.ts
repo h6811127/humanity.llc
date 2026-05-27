@@ -193,6 +193,9 @@ describe("scan surfaces object_streams", () => {
     expect(html).toContain("scan-public-snapshot");
     expect(html).toContain("Signed snapshot");
     expect(html).toContain(OBJECT_PUBLIC_SNAPSHOT_LIMIT);
+    expect(html).toContain("scan-ai-explain-btn");
+    expect(html).toContain("Explain in plain language");
+    expect(html).toContain("scan-ai-explain.mjs");
   });
 
   it("includes public_snapshot in status JSON when object_streams present", () => {
@@ -235,5 +238,12 @@ describe("scan surfaces object_streams", () => {
     expect(body.scan.card?.public_snapshot?.text).toContain("Community garden");
     expect(body.scan.card?.public_snapshot?.text).toContain("Today's tasks");
     expect(body.scan.limits.object_snapshot_warning).toBe(OBJECT_PUBLIC_SNAPSHOT_LIMIT);
+    expect(body.scan.limits.ai_explain_warning).toContain("AI summary");
+    expect(body.scan.ai?.explain.endpoint).toBe(
+      "/.well-known/hc/v1/ai/explain-snapshot"
+    );
+    expect(body.scan.ai?.agent_context.public_snapshot.text).toContain(
+      "Community garden"
+    );
   });
 });

@@ -24,7 +24,7 @@ port = 8787
 
 [vars]
 # E1 staging: set to "1" locally to exercise steward routes; production off until M4 sign-off.
-HOSTED_STEWARD_ENABLED = "0"
+HOSTED_STEWARD_ENABLED = "1"
 # Tier 0 batch fulfillment (O-002): set when Shopify founding sticker SKU is live.
 # TIER0_CAMPAIGN_PROFILE_ID = ""
 # TIER0_SHOPIFY_VARIANT_IDS = ""

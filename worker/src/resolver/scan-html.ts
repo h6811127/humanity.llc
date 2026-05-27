@@ -6,7 +6,7 @@ import {
 } from "./manifesto-display";
 import { publicReasonLabel } from "./revocation-display";
 import { scanListIcon, type ScanIconId } from "./scan-icons";
-import { BEARER_WARNING, OBJECT_PUBLIC_SNAPSHOT_LIMIT, OBJECT_STREAMS_LIMIT } from "./trust-copy";
+import { BEARER_WARNING, OBJECT_PUBLIC_SNAPSHOT_LIMIT, OBJECT_STREAMS_LIMIT, AI_EXPLAIN_LIMIT } from "./trust-copy";
 import { buildPublicObjectSnapshot } from "./object-snapshot";
 import { SCAN_PASS_CSS } from "./scan-pass-styles";
 import {
@@ -96,6 +96,7 @@ export async function renderScanPage(
   ${renderScanSafetyHeaderScript()}
   ${renderScanLiveCheckArriveScript(origin)}
   ${renderScanActorBandScript(vm, origin)}
+  ${renderScanAiExplainScript(vm, origin)}
   ${renderScanMerchFunnelScript(origin)}
 </body>
 </html>`;
@@ -335,10 +336,17 @@ function renderPublicSnapshotBlock(
 ): string {
   const snapshot = buildPublicObjectSnapshot(manifestoLine, streams ?? []);
   if (!snapshot) return "";
-  return `<section class="scan-public-snapshot" aria-labelledby="scan-public-snapshot-label">
+  const snapshotJson = JSON.stringify(snapshot).replace(/</g, "\\u003c");
+  return `<section class="scan-public-snapshot" aria-labelledby="scan-public-snapshot-label" data-public-snapshot="${escapeHtml(snapshotJson)}">
   <p class="scan-public-snapshot-label" id="scan-public-snapshot-label">Signed snapshot</p>
   <p class="scan-public-snapshot-text">${escapeHtml(snapshot.text)}</p>
   <p class="scan-public-snapshot-limit" role="note">${escapeHtml(OBJECT_PUBLIC_SNAPSHOT_LIMIT)}</p>
+  <button type="button" class="scan-ai-explain-btn" id="scan-ai-explain-btn">Explain in plain language</button>
+  <div class="scan-ai-explain-panel" id="scan-ai-explain-panel" hidden>
+    <p class="scan-ai-explain-label">AI summary</p>
+    <p class="scan-ai-explain-text" id="scan-ai-explain-text"></p>
+    <p class="scan-ai-explain-limit" role="note">${escapeHtml(AI_EXPLAIN_LIMIT)}</p>
+  </div>
 </section>`;
 }
 
@@ -1064,6 +1072,15 @@ function renderScanActorBandScript(vm: ScanViewModel, origin: string): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
   const assetOrigin = pagesJsOrigin(origin);
   const mod = JSON.stringify(`${assetOrigin}/js/scan-actor-band.mjs?v=1`);
+  return `<script type="module" src=${mod}></script>`;
+}
+
+function renderScanAiExplainScript(vm: ScanViewModel, origin: string): string {
+  if (vm.kind !== "active" || !vm.objectStreams.length) return "";
+  const snapshot = buildPublicObjectSnapshot(vm.manifestoLine, vm.objectStreams);
+  if (!snapshot) return "";
+  const assetOrigin = pagesJsOrigin(origin);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-ai-explain.mjs?v=1`);
   return `<script type="module" src=${mod}></script>`;
 }
 

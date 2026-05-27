@@ -65,6 +65,7 @@ import {
   handlePostPrintOrders,
 } from "./print/print-orders-handler";
 import { handleGetOperatorFulfillmentLookup } from "./operator/fulfillment-lookup";
+import { handlePostAiExplainSnapshot } from "./resolver/ai-explain-snapshot";
 
 export interface Env {
   DB: D1Database;
@@ -96,6 +97,8 @@ export interface Env {
   TIER0_CAMPAIGN_PROFILE_ID?: string;
   /** Tier 0 batch sticker: comma-separated Shopify variant ids. */
   TIER0_SHOPIFY_VARIANT_IDS?: string;
+  /** Cloudflare Workers AI (L3 explain snapshot). */
+  AI?: Ai;
 }
 
 export default {
@@ -332,6 +335,19 @@ export default {
       }
       const res = await handlePostCards(request, env.DB);
       return withCors(request, res);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/ai/explain-snapshot" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      return handlePostAiExplainSnapshot(request, env);
     }
 
     const statusMatch = path.match(

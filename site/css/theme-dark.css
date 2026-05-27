@@ -1147,6 +1147,21 @@ html[data-theme="dark"] .scan-hero .scan-public-snapshot-limit {
   color: rgba(235, 235, 245, 0.44);
 }
 
+html[data-theme="dark"] .scan-hero .scan-ai-explain-btn {
+  background: rgba(44, 44, 46, 0.72);
+  border-color: rgba(235, 235, 245, 0.18);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+html[data-theme="dark"] .scan-hero .scan-ai-explain-panel {
+  background: rgba(255, 149, 0, 0.12);
+  border-color: rgba(255, 149, 0, 0.35);
+}
+
+html[data-theme="dark"] .scan-hero .scan-ai-explain-limit {
+  color: rgba(235, 235, 245, 0.44);
+}
+
 html[data-theme="dark"] .scan-hero .scan-hero-wordmark {
   color: rgba(235, 235, 245, 0.48);
 }

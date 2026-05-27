@@ -21,6 +21,9 @@ Defer until a vertical pilot succeeds:
 - Gamified restore logic (e.g. “3 scans to un-revoke”) on the resolver
 - NFC / mesh / Humanity node hardware
 - Full maintenance CMMS or marketplace features
+- **Full L3 orchestration** beyond opt-in explain (city-scale agents, cross-object AI) — see [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md)
+
+**Parallel (shipped):** L3 P1 opt-in scan explainer on signed `public_snapshot` — does not block Phase A pilots; strangers must tap to request.
 
 ---
 

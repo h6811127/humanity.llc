@@ -1477,6 +1477,76 @@ a {
   color: rgba(60, 60, 67, 0.62);
 }
 
+.scan-ai-explain-btn {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 10px;
+  padding: 8px 14px;
+  border: 0.5px solid rgba(60, 60, 67, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--black);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.scan-ai-explain-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.scan-ai-explain-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.scan-ai-explain-panel {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 149, 0, 0.08);
+  border: 0.5px dashed rgba(255, 149, 0, 0.45);
+}
+
+.scan-ai-explain-panel--visible {
+  animation: scan-ai-explain-in 220ms ease-out;
+}
+
+.scan-ai-explain-label {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(180, 83, 9, 0.88);
+}
+
+.scan-ai-explain-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--black);
+}
+
+.scan-ai-explain-limit {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(60, 60, 67, 0.62);
+}
+
+@keyframes scan-ai-explain-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .scan-hero-steward {
   margin: 4px 0 0;
   font-size: 14px;

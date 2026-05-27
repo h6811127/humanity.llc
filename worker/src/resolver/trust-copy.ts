@@ -9,3 +9,7 @@ export const OBJECT_STREAMS_LIMIT =
 /** When a deterministic public_snapshot is assembled from manifesto + object_streams. */
 export const OBJECT_PUBLIC_SNAPSHOT_LIMIT =
   "Signed snapshot repeats steward-published fields only — not verified facts, AI answers, or proof someone scanned.";
+
+/** When the opt-in L3 explain panel shows a model or deterministic summary. */
+export const AI_EXPLAIN_LIMIT =
+  "AI summary — not signed network state. Only the signed snapshot above is steward-published resolver copy.";
