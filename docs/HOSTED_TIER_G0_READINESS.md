@@ -84,12 +84,20 @@ npm run hosted:rollout:step2                        # verify HOSTED_STEWARD_ENAB
 npm run hosted:rollout:step2 -- --deploy --smoke    # deploy Worker + GET health on API_ORIGIN
 ```
 
-**Rollout step 3 (script):**
+**Rollout step 3a — `OPERATOR_AUDIT_TOKEN` (required; do this first):**
 
 ```bash
-npm run hosted:rollout:step3
+npm run hosted:rollout:step3a
 # After wrangler + GitHub secrets are set:
-OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step3
+OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step3a
+```
+
+(`hosted:rollout:step3` is an alias for step3a.)
+
+**Rollout step 3b — `STRIPE_WEBHOOK_SECRET` (defer until G8):**
+
+```bash
+npm run hosted:rollout:step3b   # setup notes only; not required before step 4
 ```
 
 **Rollout step 4 (script):**
