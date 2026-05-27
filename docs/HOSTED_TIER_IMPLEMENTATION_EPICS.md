@@ -1,6 +1,6 @@
 # Hosted tier — implementation epics (M8)
 
-**Status:** **M8 code complete in staging** (E1–E6 + E4d; behind `HOSTED_STEWARD_ENABLED`). **Production** blocked on **G0** M4 sign-off + E6.1 external CF dashboard.  
+**Status:** **M8 code complete in staging** (E1–E6 + E4d; behind `HOSTED_STEWARD_ENABLED`). **Production** blocked on **G0** M4 sign-off; ops completes E6.1 CF dashboard pin per [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md).  
 **Milestone:** M8 of [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md)  
 **Depends on:** M2–M7 complete; **M4 governance sign-off** before E1 merge to production  
 **Audience:** Engineering, ops
@@ -321,7 +321,7 @@ flowchart LR
 | # | Item | Status |
 |---|------|--------|
 | E6.1 | Ops metrics snapshot | **Staging** — `GET /.well-known/hc/v1/operator/steward-ops` exposes account, session, usage, and in-memory SSE counts behind `OPERATOR_AUDIT_TOKEN` |
-| E6.1 | Cloudflare dashboard | Pending external dashboard setup |
+| E6.1 | Cloudflare dashboard | **Staging** — ops setup guide [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md); pin CF Workers metrics for `humanity-llc-resolver` |
 | E6.2 | Daily alert | **Staging** — `npm run worker:check-steward-ops` + Vitest; **CI** — `.github/workflows/steward-ops-daily.yml` (daily 14:00 UTC + manual dispatch; needs `OPERATOR_AUDIT_TOKEN`) |
 | E6.3 | Runbook | **Staging** — `docs/HOSTED_STEWARD_OPS_RUNBOOK.md` |
 | E6.4 | Support doc link | **Staging** — runbook directs customer-facing language to `docs/SKEPTIC_FAQ.md` |
@@ -331,11 +331,26 @@ flowchart LR
 ### Exit tests
 
 - Runbook reviewed by ops
-- Tabletop: expired subscription → free tier behavior
+- Tabletop: expired subscription → free tier behavior — **Vitest** `worker/tests/billing-webhook.test.ts` (`subscription.deleted` → `reference_free`) + E2E **H3** in `e2e/hosted-tier-budget.spec.ts`
 
 ### Out of scope
 
 - Per-tenant billing UI in product (v1 = Stripe dashboard)
+
+---
+
+## Production rollout (after G0)
+
+Engineering checklist once M4 governance checklist is signed ([`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) § Governance checklist):
+
+| # | Step | Notes |
+|---|------|-------|
+| 1 | Apply D1 migrations | `0012_steward_hosted.sql`, `0013_steward_billing.sql` (remote) |
+| 2 | Deploy Worker with flag off | `HOSTED_STEWARD_ENABLED=0`; smoke public create/scan |
+| 3 | Set production secrets | `OPERATOR_AUDIT_TOKEN`, `STRIPE_WEBHOOK_SECRET` (after G8) |
+| 4 | Enable hosted flag | `HOSTED_STEWARD_ENABLED=1` when ready for stewards |
+| 5 | Ops | Pin CF dashboard per [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md); add repo secret `OPERATOR_AUDIT_TOKEN` for E6.2 CI |
+| 6 | Regression | `npm run worker:test:steward-hosted` · `npm run e2e:steward-hosted` · M7 free-tier bundle |
 
 ---
 
@@ -383,6 +398,8 @@ flowchart LR
 | [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) | E4 detail |
 | [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) | Wire formats |
 | [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) | G0, lifecycle |
+| [`HOSTED_STEWARD_OPS_RUNBOOK.md`](HOSTED_STEWARD_OPS_RUNBOOK.md) | E6 ops |
+| [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md) | E6.1 CF analytics |
 | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) | M7 tests |
 
 ---
@@ -391,6 +408,7 @@ flowchart LR
 
 | Date | Note |
 |------|------|
+| 2026-05-27 | **E6.1 guide:** CF Workers dashboard setup doc + G0 production rollout checklist |
 | 2026-05-27 | **E6.2 CI:** `.github/workflows/steward-ops-daily.yml` daily threshold check |
 | 2026-05-27 | **M8 code-complete pass:** E4 fallback E2E; poll resume on push drop (`device-live-control-inbox.mjs`); `worker:test:steward-hosted` + `e2e:steward-hosted`; **G0** gates production |
 | 2026-05-27 | **E4d SW bridge:** push hint → service worker OS notify; skip SW poll when SSE healthy |

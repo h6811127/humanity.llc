@@ -68,7 +68,7 @@ Manual review:
    - `poll.live_proof.auto` near **100,000/account/day** means hard-cap/fair-use intervention.
    - `notify.push.delivered` near **10,000/account/day** means push fan-out review.
 4. Check `push.active_connections` against `push.max_connections_per_account`.
-5. Cross-check Cloudflare Workers analytics for 429 rate, 5xx rate, and request volume.
+5. Cross-check Cloudflare Workers analytics for 429 rate, 5xx rate, and request volume — see [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md) (E6.1).
 
 ---
 
