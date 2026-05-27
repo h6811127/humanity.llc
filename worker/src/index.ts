@@ -80,6 +80,10 @@ export interface Env {
   PRINTIFY_API_TOKEN?: string;
   /** O-002 Printify shop id for order submit. */
   PRINTIFY_SHOP_ID?: string;
+  /** Tier 0 batch sticker: campaign card profile_id (must exist in D1). */
+  TIER0_CAMPAIGN_PROFILE_ID?: string;
+  /** Tier 0 batch sticker: comma-separated Shopify variant ids. */
+  TIER0_SHOPIFY_VARIANT_IDS?: string;
 }
 
 export default {

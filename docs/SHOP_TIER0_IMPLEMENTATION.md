@@ -43,6 +43,8 @@ The interest form records **optional email** on this browser only (no server upl
 5. Deploy Pages. `/shop/` shows **Buy** and hides the interest form.
 6. Run `FOUNDING_DROP_BRIEF.md` and `MERCH_QR_LIFECYCLE_POLICY.md` launch gates before `checkout_open: true` on production.
 
+**Worker (Tier 0 batch fulfillment):** set `TIER0_CAMPAIGN_PROFILE_ID` to the campaign card’s `profile_id` (must exist in D1) and `TIER0_SHOPIFY_VARIANT_IDS` to the Shopify variant id from the cart URL (comma-separated if multiple). Paid webhooks for that SKU queue a batch print order (`hc-tier0-sticker-batch-v1`) without artifact intent metadata.
+
 ---
 
 ## Not shipped yet
@@ -50,7 +52,7 @@ The interest form records **optional email** on this browser only (no server upl
 | Piece | Owner / doc |
 |-------|-------------|
 | Shopify store + live product URL in config | Operator  -  paste into `shop-config.json` |
-| `shopify.order_paid` → Printify middleware | Worker / fulfillment track |
+| `shopify.order_paid` → Printify middleware | **Shipped (queue)** — Tier 0 batch via `TIER0_*` env · Printify HTTP submit still deferred |
 | Batch QR artwork + Printify product ID | `FOUNDING_DROP_BRIEF.md` |
 | Scan→create analytics (aggregate, no PII) | **Shipped** — `POST …/metrics/merch-funnel` · `GET …/operator/merch-funnel-monitor` · `hc_ref` on scan/create |
 | Resolver waitlist API (optional) | Only if moving interest off localStorage |

@@ -2,7 +2,13 @@
  * Shopify order webhooks → commerce order links (O-001).
  * Printify submission deferred to O-002; missing metadata holds for operator review.
  */
-import { extractShopifyOrderMetadata, shopifyOrderIsPaid, type ShopifyOrderLike } from "../commerce/shopify-order-metadata";
+import {
+  countTier0LineQuantity,
+  extractShopifyOrderMetadata,
+  shopifyOrderIsPaid,
+  type ShopifyOrderLike,
+} from "../commerce/shopify-order-metadata";
+import { readTier0FulfillmentConfig } from "../commerce/tier0-fulfillment-config";
 import {
   getArtifactIntent,
   updateArtifactIntentStatus,
@@ -31,18 +37,26 @@ interface IntentValidation {
   profile_id: string | null;
   hold_reason: string | null;
   status: "processing" | "held_for_review";
+  fulfillment_mode: "personalized" | "tier0_batch" | null;
 }
 
 function commerceOrderResponse(row: CommerceOrderRow, duplicate = false) {
+  const intentIds = JSON.parse(row.artifact_intent_ids_json) as string[];
   return {
     commerce_order_id: row.commerce_order_id,
     shopify_order_id: row.shopify_order_id,
     shopify_checkout_id: row.shopify_checkout_id,
     profile_id: row.profile_id,
-    artifact_intent_ids: JSON.parse(row.artifact_intent_ids_json) as string[],
+    artifact_intent_ids: intentIds,
     print_order_ids: JSON.parse(row.print_order_ids_json) as string[],
     status: row.status,
     hold_reason: row.hold_reason,
+    fulfillment_mode:
+      row.status === "processing" && intentIds.length === 0 && row.profile_id
+        ? "tier0_batch"
+        : intentIds.length > 0
+          ? "personalized"
+          : null,
     duplicate,
   };
 }
@@ -54,18 +68,9 @@ function isIntentExpired(row: ArtifactIntentRow, nowMs: number): boolean {
 
 async function validatePaidOrderIntents(
   db: D1Database,
-  metadata: ReturnType<typeof extractShopifyOrderMetadata>,
+  metadata: NonNullable<ReturnType<typeof extractShopifyOrderMetadata>>,
   nowIso: string
 ): Promise<IntentValidation> {
-  if (!metadata || metadata.artifact_intent_ids.length === 0) {
-    return {
-      artifact_intent_ids: [],
-      profile_id: metadata?.profile_id ?? null,
-      hold_reason: "CHECKOUT_METADATA_MISSING",
-      status: "held_for_review",
-    };
-  }
-
   let profileId = metadata.profile_id;
   const nowMs = Date.parse(nowIso);
 
@@ -77,6 +82,7 @@ async function validatePaidOrderIntents(
         profile_id: profileId,
         hold_reason: "CHECKOUT_METADATA_MISSING",
         status: "held_for_review",
+        fulfillment_mode: null,
       };
     }
     if (isIntentExpired(row, nowMs)) {
@@ -88,6 +94,7 @@ async function validatePaidOrderIntents(
         profile_id: profileId ?? row.profile_id,
         hold_reason: "ARTIFACT_INTENT_EXPIRED",
         status: "held_for_review",
+        fulfillment_mode: null,
       };
     }
     if (row.status === "blocked") {
@@ -96,6 +103,7 @@ async function validatePaidOrderIntents(
         profile_id: profileId ?? row.profile_id,
         hold_reason: "CHECKOUT_METADATA_MISSING",
         status: "held_for_review",
+        fulfillment_mode: null,
       };
     }
     if (!profileId) profileId = row.profile_id;
@@ -105,6 +113,7 @@ async function validatePaidOrderIntents(
         profile_id: profileId,
         hold_reason: "CHECKOUT_METADATA_MISSING",
         status: "held_for_review",
+        fulfillment_mode: null,
       };
     }
   }
@@ -114,6 +123,38 @@ async function validatePaidOrderIntents(
     profile_id: profileId,
     hold_reason: null,
     status: "processing",
+    fulfillment_mode: "personalized",
+  };
+}
+
+async function resolvePaidOrderValidation(
+  db: D1Database,
+  order: ShopifyOrderLike,
+  metadata: NonNullable<ReturnType<typeof extractShopifyOrderMetadata>>,
+  env: Env,
+  nowIso: string
+): Promise<IntentValidation> {
+  if (metadata.artifact_intent_ids.length > 0) {
+    return validatePaidOrderIntents(db, metadata, nowIso);
+  }
+
+  const tier0 = readTier0FulfillmentConfig(env);
+  if (tier0 && countTier0LineQuantity(order, tier0.shopify_variant_ids) > 0) {
+    return {
+      artifact_intent_ids: [],
+      profile_id: tier0.campaign_profile_id,
+      hold_reason: null,
+      status: "processing",
+      fulfillment_mode: "tier0_batch",
+    };
+  }
+
+  return {
+    artifact_intent_ids: [],
+    profile_id: metadata.profile_id,
+    hold_reason: "CHECKOUT_METADATA_MISSING",
+    status: "held_for_review",
+    fulfillment_mode: null,
   };
 }
 
@@ -132,6 +173,7 @@ async function markIntentsConverted(
 async function handlePaidOrder(
   db: D1Database,
   order: ShopifyOrderLike,
+  env: Env,
   nowIso: string
 ): Promise<
   | { ok: true; row: CommerceOrderRow; duplicate: boolean }
@@ -150,7 +192,7 @@ async function handlePaidOrder(
     return { ok: true, row: existing, duplicate: true };
   }
 
-  const validation = await validatePaidOrderIntents(db, metadata, nowIso);
+  const validation = await resolvePaidOrderValidation(db, order, metadata, env, nowIso);
   const commerceOrderId = generateCommerceOrderId();
 
   await insertCommerceOrder(db, {
@@ -281,7 +323,7 @@ export async function handlePostShopifyOrdersWebhook(
     if (topic === "orders/create" && !shopifyOrderIsPaid(order)) {
       return jsonResponse({ ignored: true, topic, reason: "not_paid" }, 200);
     }
-    const paid = await handlePaidOrder(db, order, nowIso);
+    const paid = await handlePaidOrder(db, order, env, nowIso);
     if (!paid.ok) return paid.response;
     commerceOrderId = paid.row.commerce_order_id;
     response = jsonResponse(commerceOrderResponse(paid.row, paid.duplicate), 200);

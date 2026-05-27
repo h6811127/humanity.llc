@@ -7,6 +7,8 @@ export interface ShopifyNameValue {
 
 export interface ShopifyLineItem {
   quantity?: number;
+  variant_id?: number | string;
+  sku?: string;
   properties?: ShopifyNameValue[];
 }
 
@@ -24,6 +26,33 @@ export interface ExtractedShopifyOrderMetadata {
   shopify_checkout_id: string | null;
   profile_id: string | null;
   artifact_intent_ids: string[];
+}
+
+function lineItemVariantId(item: ShopifyLineItem): string | null {
+  if (typeof item.variant_id === "number" && Number.isFinite(item.variant_id)) {
+    return String(item.variant_id);
+  }
+  if (typeof item.variant_id === "string" && item.variant_id.trim()) {
+    return item.variant_id.trim();
+  }
+  return null;
+}
+
+export function countTier0LineQuantity(
+  order: ShopifyOrderLike,
+  variantIds: Set<string>
+): number {
+  let quantity = 0;
+  for (const item of order.line_items ?? []) {
+    const variantId = lineItemVariantId(item);
+    if (!variantId || !variantIds.has(variantId)) continue;
+    const qty =
+      typeof item.quantity === "number" && Number.isFinite(item.quantity) && item.quantity > 0
+        ? item.quantity
+        : 1;
+    quantity += qty;
+  }
+  return quantity;
 }
 
 function readAttributes(pairs: ShopifyNameValue[] | undefined): Map<string, string> {

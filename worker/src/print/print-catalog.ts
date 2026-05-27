@@ -17,7 +17,25 @@ export interface PrintCatalogProduct {
 
 export const DEFAULT_PRINT_TEMPLATE_ID = "hc-sticker-square-v1";
 
+/** Tier 0 founding sticker — shared batch QR artwork; no per-item mint. */
+export const TIER0_BATCH_PRINT_TEMPLATE_ID = "hc-tier0-sticker-batch-v1";
+
 const CATALOG: PrintCatalogProduct[] = [
+  {
+    template_id: TIER0_BATCH_PRINT_TEMPLATE_ID,
+    type: "sticker",
+    title: "Founding signal sticker (Tier 0 batch)",
+    description:
+      "Mass founding sticker with shared campaign QR — no per-order personalization.",
+    product_id: "prod_tier0_sticker_batch",
+    variants: [
+      {
+        variant_id: "tier0-batch",
+        label: "Tier 0 batch / shared QR",
+        enabled: true,
+      },
+    ],
+  },
   {
     template_id: DEFAULT_PRINT_TEMPLATE_ID,
     type: "sticker",
