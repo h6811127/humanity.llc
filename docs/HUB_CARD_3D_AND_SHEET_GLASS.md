@@ -1,6 +1,6 @@
 # Hub saved-card 3D + sheet glass
 
-**Status:** Steps 1–3 shipped · Step 4 (regression) pending  
+**Status:** Steps 1–4 shipped (Vitest green; wallet e2e 6/12 — remaining failures are `/created/` setup vs control mode, not hub CSS)  
 **Scope:** Saved card rows (`.hub-card-item`) in the device hub bottom sheet; hub sheet surface transparency (light + dark)  
 **Companions:** [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) · [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) · [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) · [`SCAN_HERO_CARD_VISUAL_SPEC.md`](SCAN_HERO_CARD_VISUAL_SPEC.md) § Visual tier
 
@@ -47,10 +47,23 @@ No markup or JS changes in `device-hub-ui.mjs` for row shells.
 | Token | Light (before → after) | Dark (before → after) |
 |-------|------------------------|------------------------|
 | `--surface-popover-bg-glass` | `0.94 / 0.88` → **`0.84 / 0.76`** | `0.94 / 0.88` → **`0.84 / 0.76`** |
-| Sheet `backdrop-filter` | none → **`var(--hc-emphasis-card-backdrop)`** | same |
+| Sheet `backdrop-filter` | none → **`var(--hc-emphasis-card-backdrop)`** → **Step 5:** **`var(--shell-blur)`** | same progression |
+| Hub dim backdrop (`.device-hub-backdrop`) | — | **Step 5:** **`var(--shell-blur)`** (was hardcoded `blur(28px)`) |
 | Dark sheet `background` | opaque `--surface-popover-bg` → **`--surface-popover-bg-glass`** | same |
 
 **Medium transparency** = clearly more see-through than May 2026 opaque migration, but row title/detail must still pass AA on the frosted stack. Inbox sheet stays opaque in Step 1; parity optional in Step 3.
+
+### Step 5 — Stronger hub frost (May 2026)
+
+Hub sheet and dim backdrop were still on tier-3 emphasis blur (`--hc-emphasis-card-backdrop`: 16px light / 18px dark). Product wants a **stronger frosted read** on the hub chrome in **both** light and dark without changing card-row tier-3 depth.
+
+| Surface | Before | After |
+|---------|--------|-------|
+| `.device-hub.device-hub--sheet` `backdrop-filter` | `var(--hc-emphasis-card-backdrop)` | **`var(--shell-blur)`** (`saturate(200%) blur(40px)`) |
+| `.device-hub-backdrop` `backdrop-filter` | `saturate(160%) blur(28px)` | **`var(--shell-blur)`** |
+| `.hub-card-item` rows | `--hc-emphasis-card-backdrop` | unchanged (nested tier-3) |
+
+**Why `--shell-blur`:** Already defined in `device-shell.css` for hub/sheet materials per [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md); Step 2 wired emphasis-tier blur instead. Step 5 aligns sheet + backdrop with that token. Coarse-pointer and `prefers-reduced-transparency` fallbacks unchanged (backdrop blur off on touch; sheet falls back to opaque popover bg).
 
 **Reduced transparency:** Sheet and rows fall back to opaque `--surface-popover-bg` / `--hc-emphasis-card-fill-info`; backdrop disabled (existing `prefers-reduced-transparency` block in `device-shell.css`).
 
@@ -63,7 +76,8 @@ No markup or JS changes in `device-hub-ui.mjs` for row shells.
 | **1** | Token transparency + `.hub-card-item` tier-3 CSS + Vitest guard | `styles.css`, `device-shell.css`, `theme-dark.css`, `ui-color-scheme-popover-guard.test.ts` | **Shipped** |
 | **2** | Hub sheet frosted surface + dark glass; extend reduced-transparency | `device-shell.css`, `theme-dark.css`, guard test | **Shipped** |
 | **3** | Cache bust shell pages; manual light/dark QA | `site/index.html`, wallet, created, create | **Shipped** |
-| **4** | Regression suite | `worker:test:ui-color-scheme`, `worker:test:device`, `e2e/device-os-wallet.spec.ts` | Planned |
+| **4** | Regression suite | `worker:test:ui-color-scheme`, `worker:test:device`, `e2e/device-os-wallet.spec.ts` | **Shipped** (Vitest green; wallet e2e partial — see below) |
+| **5** | Hub sheet + dim backdrop → `--shell-blur`; cache bust; guard tests | `device-shell.css`, shell HTML, `ui-color-scheme-popover-guard.test.ts`, `device-emphasis-card-html.test.ts` | **Shipped** |
 
 ---
 
@@ -76,7 +90,21 @@ No markup or JS changes in `device-hub-ui.mjs` for row shells.
 
 ---
 
-## QA (after Step 4)
+## QA (Step 4 — May 2026)
+
+**Automated (shipped):**
+
+```bash
+npm run worker:test:ui-color-scheme   # pass
+npm run worker:test:device            # 358 pass
+npm run e2e -- e2e/device-os-wallet.spec.ts  # 6/12 pass
+```
+
+**Vitest additions:** `device-emphasis-card-html` hub tier-3 guard; cache bust `v=123` / `theme-dark v=26` / `device-shell v=52`; `shouldUseCachedNetworkStatus` aligned with G4 card-revoke cache policy.
+
+**E2e note:** Hub-row tests pass after `Open controls` selector uses `exact: true` (avoids wallet tab-hint **Open controls here**). Six failures remain on `/created/` setup vs control mode gating (`#created-setup-root` / `#created-control-root`) — pre-existing, not hub CSS.
+
+**Manual (recommended):**
 
 1. `/` and `/wallet/` — open hub in **light** and **dark**; confirm frosted sheet and raised card rows.
 2. Object-type left accents visible on membership, status-plate, lost-item rows.

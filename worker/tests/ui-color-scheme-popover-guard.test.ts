@@ -176,7 +176,7 @@ describe("UI color scheme popover guard", () => {
       require: [
         "--surface-popover-bg-glass",
         "--surface-popover-fg",
-        "--hc-emphasis-card-backdrop",
+        "--shell-blur",
       ],
     });
     assertGuardedRule("site/css/device-shell.css", ".device-hub-network-tools", {

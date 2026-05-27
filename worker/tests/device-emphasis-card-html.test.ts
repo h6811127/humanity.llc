@@ -186,7 +186,7 @@ describe("device-emphasis-card-html", () => {
       expect(html).toContain('href="/css/hc-emphasis-card.css?v=3"');
       expect(html).toContain("styles.css?v=124");
       expect(html).toContain("theme-dark.css?v=26");
-      expect(html).toContain("device-shell.css?v=51");
+      expect(html).toContain("device-shell.css?v=52");
     }
   });
 
@@ -221,7 +221,7 @@ describe("device-emphasis-card-html", () => {
       /\.hub-card-item[\s\S]*--hc-emphasis-card-fill-info-glass[\s\S]*--hc-emphasis-card-shadow/
     );
     expect(shell).toMatch(
-      /\.device-hub\.device-hub--sheet[\s\S]*--surface-popover-bg-glass[\s\S]*--hc-emphasis-card-backdrop/
+      /\.device-hub\.device-hub--sheet[\s\S]*--surface-popover-bg-glass[\s\S]*--shell-blur/
     );
     const plan = readFileSync(join(root, "docs/HUB_CARD_3D_AND_SHEET_GLASS.md"), "utf8");
     expect(plan).toContain("Steps 1–4 shipped");

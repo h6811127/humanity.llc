@@ -1723,8 +1723,8 @@ button.hub-card-action.hub-use-keys {
   background: var(--surface-popover-bg-glass, var(--surface-popover-bg, #ffffff));
   color: var(--surface-popover-fg, #1c1c1e);
   box-shadow: var(--shell-shadow-sheet);
-  -webkit-backdrop-filter: var(--hc-emphasis-card-backdrop);
-  backdrop-filter: var(--hc-emphasis-card-backdrop);
+  -webkit-backdrop-filter: var(--shell-blur);
+  backdrop-filter: var(--shell-blur);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -1795,8 +1795,8 @@ button.hub-card-action.hub-use-keys {
   padding: 0;
   border: none;
   background: rgba(0, 0, 0, 0.22);
-  -webkit-backdrop-filter: saturate(160%) blur(28px);
-  backdrop-filter: saturate(160%) blur(28px);
+  -webkit-backdrop-filter: var(--shell-blur);
+  backdrop-filter: var(--shell-blur);
   cursor: default;
   -webkit-tap-highlight-color: transparent;
   opacity: 0;
