@@ -77,6 +77,7 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
 | Tier 0 shop | `site/shop/index.html` |
 | **QR customizer** | `site/shop/customize/index.html` |
 | Customizer logic | `site/js/shop-customize.mjs` · `site/js/shop-customize-core.mjs` |
+| **Create → customize handoff** | `site/js/created-merch-funnel.mjs` · `merch-funnel-core.mjs` |
 | Shop config | `site/data/shop-config.json` → `personalize.products[]` |
 | Config helpers | `site/js/shop-config.mjs` |
 | Merch attribution | `site/js/merch-funnel-core.mjs` · scan `scan-merch-funnel.mjs` |
@@ -139,7 +140,7 @@ Aggregate metrics only — no PII. Allowed refs:
 | Step | Pass? |
 |------|-------|
 | Stranger scans campaign merch; profile loads with limits + create CTA | ☐ manual |
-| Create card → `/shop/customize/` detects session | ☐ manual |
+| Create card → `/shop/customize/` detects session | ✅ handoff ref + `/created/` customize CTA + `loadCardSessionForCustomize` |
 | Preview shows LIVE OBJECT branded QR on product mockup | ✅ UI |
 | Artifact intent created; attach returns Shopify line attributes | ✅ API tests |
 | Checkout URL includes `properties[artifact_intent_id]` | ✅ `shop-customize-core.test.ts` |

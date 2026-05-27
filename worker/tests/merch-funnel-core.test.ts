@@ -7,7 +7,13 @@ import {
 } from "../src/commerce/merch-funnel-core";
 import {
   appendMerchRefToCreateUrl,
+  appendMerchRefToHref,
+  handoffMerchRefAfterCreate,
+  merchCustomizeUrlFromRef,
   normalizeMerchRef,
+  peekMerchCustomizeRef,
+  shouldHandoffToCustomize,
+  shouldShowCreatedMerchCustomizeCard,
 } from "../../site/js/merch-funnel-core.mjs";
 
 describe("merch-funnel-core (server)", () => {
@@ -43,5 +49,50 @@ describe("merch-funnel-core (client)", () => {
     expect(
       appendMerchRefToCreateUrl("/wallet/", "tier0_sticker")
     ).toBe("/wallet/");
+  });
+
+  it("appends hc_ref to customize and other shop URLs", () => {
+    expect(
+      appendMerchRefToHref("/shop/customize/", "scan_customize")
+    ).toBe("/shop/customize/?hc_ref=scan_customize");
+    expect(
+      appendMerchRefToHref("/shop/customize/?product=hoodie", "scan_customize")
+    ).toBe("/shop/customize/?product=hoodie&hc_ref=scan_customize");
+  });
+
+  it("handoffs customize refs after create attribution", () => {
+    const storage = {
+      hc_merch_create_ref: "scan_customize",
+      hc_merch_customize_ref: null,
+    };
+    globalThis.sessionStorage = {
+      getItem(key) {
+        return storage[key] ?? null;
+      },
+      setItem(key, value) {
+        storage[key] = value;
+      },
+      removeItem(key) {
+        storage[key] = null;
+      },
+    };
+    handoffMerchRefAfterCreate("scan_customize");
+    expect(storage.hc_merch_create_ref).toBeNull();
+    expect(storage.hc_merch_customize_ref).toBe("scan_customize");
+    expect(peekMerchCustomizeRef()).toBe("scan_customize");
+  });
+
+  it("builds customize URL and created card visibility", () => {
+    expect(shouldHandoffToCustomize("scan_customize")).toBe(true);
+    expect(shouldHandoffToCustomize("tier0_sticker")).toBe(false);
+    expect(
+      merchCustomizeUrlFromRef("scan_customize", "https://humanity.llc")
+    ).toBe("https://humanity.llc/shop/customize/?hc_ref=scan_customize");
+    expect(
+      shouldShowCreatedMerchCustomizeCard({ fresh: true, merchRef: "scan_customize" })
+    ).toBe(true);
+    expect(
+      shouldShowCreatedMerchCustomizeCard({ fresh: false, merchRef: "scan_customize" })
+    ).toBe(false);
   });
 });

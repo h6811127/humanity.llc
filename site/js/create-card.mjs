@@ -2,10 +2,11 @@ import { validateCreateFormFields } from "./create-form-validation-core.mjs";
 import { syncCreateHeroCopy } from "./create-template-copy.mjs";
 import { formatCreateResolverError } from "./create-resolver-error-core.mjs";
 import {
-  clearMerchCreateRef,
+  handoffMerchRefAfterCreate,
   peekMerchCreateRef,
   persistMerchCreateRef,
   readMerchRefFromUrl,
+  shouldHandoffToCustomize,
 } from "./merch-funnel-core.mjs";
 import { buildObjectStreamsFromFormRows } from "./object-streams-core.mjs";
 import {
@@ -278,7 +279,7 @@ export async function runCreateCard(input) {
     throw new Error(msg);
   }
 
-  if (attributionRef) clearMerchCreateRef();
+  if (attributionRef) handoffMerchRefAfterCreate(attributionRef);
 
   sessionStorage.setItem(
     "hc_created",
@@ -317,6 +318,9 @@ export async function runCreateCard(input) {
   created.searchParams.set("profile_id", profileId);
   created.searchParams.set("qr_id", qrId);
   created.searchParams.set("fresh", "1");
+  if (attributionRef && shouldHandoffToCustomize(attributionRef)) {
+    created.searchParams.set("hc_ref", attributionRef);
+  }
   location.replace(created.href);
 }
 

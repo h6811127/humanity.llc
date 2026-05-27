@@ -8,7 +8,7 @@ import { loadShopConfig } from "./shop-config.mjs";
 import {
   appendMerchRefToCreateUrl,
   persistMerchCreateRef,
-  peekMerchCreateRef,
+  peekMerchCustomizeRef,
   readMerchRefFromUrl,
 } from "./merch-funnel-core.mjs";
 import {
@@ -71,7 +71,7 @@ function selectedProduct() {
 }
 
 function decorateCreateLinks() {
-  const ref = peekMerchCreateRef() || "customize_shop";
+  const ref = peekMerchCustomizeRef() || "customize_shop";
   if (createLink) {
     createLink.href = appendMerchRefToCreateUrl("/create/", ref);
   }
@@ -314,8 +314,12 @@ function showCardReady(session) {
 
 async function init() {
   const urlRef = readMerchRefFromUrl();
-  if (urlRef) persistMerchCreateRef(urlRef);
-  persistMerchCreateRef("customize_shop");
+  if (urlRef) {
+    persistMerchCreateRef(urlRef);
+  } else {
+    const handoffRef = peekMerchCustomizeRef();
+    persistMerchCreateRef(handoffRef || "customize_shop");
+  }
   decorateCreateLinks();
 
   approveEl?.addEventListener("change", () => {
