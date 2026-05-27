@@ -203,6 +203,22 @@ Per [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § QA (hub card
 
 **Note:** `/wallet/` uses scroll-to-saved, not a separate glance popover (see [`DEVICE_OS.md`](DEVICE_OS.md)).
 
+### P1-EC · Shell emphasis card delivery (import regression Step 4)
+
+Spec: [`HC_EMPHASIS_CARD_IMPORT_REGRESSION.md`](HC_EMPHASIS_CARD_IMPORT_REGRESSION.md). Cross-tab pill layout: **P1-CT** above.
+
+**Automated:** `npm run e2e:shell-emphasis-card` · `npm run worker:test -- worker/tests/device-emphasis-card-html.test.ts` · `npm run e2e:safari` (cross-tab CTAs)
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | `/wallet/` with signing keys in this tab | `#wallet-active-banner`: raised card (shadow), green dot, **Open workspace** pill — not flat unstyled text |
+| 2 | Same + `localStorage.hc_theme = "dark"` | Active banner still raised; title readable on dark fill |
+| 3 | `/created/` with pending live proof deep link | `#live-control-proof`: urgent emphasis card + **Prove control now** pill |
+| 4 | Live proof panel in dark theme | Urgent card contrast; not white-on-white |
+| 5 | Safari cross-tab banners (optional) | P1-CT — spaced red/secondary pills |
+
+**Fail signals:** Emphasis cards render as plain text (no shadow/dot/pill); `@import` or `<link>` for `hc-emphasis-card.css` missing on shell pages.
+
 ### P1-KC · Keys custody emphasis card (compact layout)
 
 Spec: [`KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md`](KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md) · [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) § Compact density.
