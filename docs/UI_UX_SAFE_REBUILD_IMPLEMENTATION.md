@@ -186,14 +186,17 @@ Shipped (2026-05-26):
 |-----------|------|
 | **P0-3 / P0-W** manual sign-off | After any shell sheet, backdrop, or chrome inset change ([`DEVICE_OS_QA.md`](DEVICE_OS_QA.md)) |
 | Step 4 knob 4: `visibility: hidden` on **collapsed hub only** | Only if iPhone still shows dead taps after Steps 1–4 |
-| Safari Playwright smoke (catalog §11) | Optional CI - assert dot/hub/backdrop invariants, not scroll-edge classes |
+| Safari Playwright smoke (catalog §11) | **Shipped** - CI asserts dot/hub/backdrop invariants, not scroll-edge classes (`e2e/safari-shell-scroll.spec.ts`) |
 | Hub-scoped coordinator (catalog §3) | **Do not** restore global `initDeviceOsCoordinator()` from status bootstrap |
 
 ### Post-plan checklist
 
 - [x] Tripwire Vitest (`device-safe-rebuild-tripwires.test.ts`)
+- [x] WebKit Playwright smoke in CI (`e2e/safari-shell-scroll.spec.ts`)
 - [ ] Manual P0-W on production WebKit after Steps 4–5 deploy
 - [ ] Step 4 `visibility:hidden` only if P0-W fails
+
+**Current next step:** run **P0-W** on production or staging WebKit devices. Do not add more engineering work unless P0-W shows dead taps or severe scroll strobe.
 
 ---
 
