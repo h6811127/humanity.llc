@@ -286,16 +286,16 @@ Before merging shell changes that touch network I/O:
 
 Manual **Check for live proof** always runs one round-robin pass when watch is off. Opening the inbox sheet does **not** start auto poll without watch (scope may be active, but the timer requires `hc_watch_live_proof === "1"`).
 
-**Paid / hosted operator (planning):** Product definition in [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md). Free/reference use remains **manual check**, opt-in watch, and shipped caps (400 auto live-proof GETs/day/device). Paid may raise caps and add optional server push — not implemented. Full entitlement rows and test plan: § Phase 10 — hosted tier rows (M7) below.
+**Paid / hosted operator (staging):** Product definition in [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md). Free/reference use remains **manual check**, opt-in watch, and shipped caps (400 auto live-proof GETs/day/device). Hosted E2 can raise caps from `GET …/steward/entitlements`; push remains a later E4 path. Full entitlement rows and test plan: § Phase 10 — hosted tier rows (M7) below.
 
 ---
 
 ## Phase 10 — hosted tier rows (M7)
 
-**Status:** Planning complete (May 2026) — **no client or Worker implementation** until M4 governance sign-off + M8 epics  
+**Status:** E1/E2/E5 foundation staging (May 2026) — keep production flag off until M4 governance sign-off + M8 rollout gates  
 **Sources:** [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) · [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) · [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md)
 
-When build begins (M8 **E2**–**E4**), shipped free-tier constants in poll modules MUST resolve from **`GET …/steward/entitlements`** (or fall back to `reference_free` when unauthenticated). This section is the **request-budget contract** for that migration.
+As M8 **E2** stages, shipped free-tier constants in poll modules MUST resolve from **`GET …/steward/entitlements`** (or fall back to `reference_free` when unauthenticated). This section is the **request-budget contract** for that migration.
 
 ### Entitlement rows (free vs hosted)
 
@@ -340,9 +340,17 @@ npm run worker:test -- \
   worker/tests/device-hub-visible-rows-core.test.ts \
   worker/tests/device-wallet-scale-core.test.ts \
   worker/tests/device-hub-network-tools-core.test.ts \
+  worker/tests/device-steward-entitlements-core.test.ts \
+  worker/tests/device-steward-entitlements.test.ts \
   worker/tests/conditional-json.test.ts
 
 npm run e2e -- e2e/device-inbox.spec.ts e2e/created-control.spec.ts
+```
+
+**Hosted-specific E2 staging:**
+
+```bash
+npm run e2e -- e2e/hosted-tier-budget.spec.ts
 ```
 
 **Vitest (extend existing modules when E2 reads entitlements):**
@@ -362,11 +370,11 @@ npm run e2e -- e2e/device-inbox.spec.ts e2e/created-control.spec.ts
 
 | Case | Setup | Assert |
 |------|-------|--------|
-| H1 Free default | No steward session; watch on; hub expanded | Auto poll pauses at **400** simulated ticks; hub budget message visible |
-| H2 Hosted session | Mock `GET …/steward/entitlements` → `hosted_steward_v1` | Cap **4000** before pause; idle tick uses 30s (mock timers) |
-| H3 Downgrade | Session returns `reference_free` mid-session | Client re-applies **400** cap on next entitlement fetch |
+| H1 Free default | No steward session; watch on; hub expanded | `e2e/hosted-tier-budget.spec.ts` asserts **400** cap + free policy with no entitlement GET |
+| H2 Hosted session | Mock `GET …/steward/entitlements` → `hosted_steward_v1` | `e2e/hosted-tier-budget.spec.ts` asserts **4000** cap, 30s idle, 5/3 network parallel, 5 min SW |
+| H3 Downgrade | Session returns `reference_free` mid-session | `e2e/hosted-tier-budget.spec.ts` asserts client reapplies **400** cap on next entitlement fetch |
 | H4 Push opt-in | Hosted + `notify.push.live_proof`; subscribe mock | Wallet round-robin interval may widen; SW still respects watch + alerts |
-| H5 Free unchanged | No billing code paths on reference operator | Anonymous scan + create flows unchanged; no paywall on hub |
+| H5 Free unchanged | No billing code paths on reference operator | `e2e/hosted-tier-budget.spec.ts` asserts anonymous create remains available with no hosted entitlement call or paywall |
 
 **Manual QA ([`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — add **P1-8 Hosted tier budget** when E2 ships):**
 
@@ -388,9 +396,9 @@ npm run e2e -- e2e/device-inbox.spec.ts e2e/created-control.spec.ts
 
 ### M8 implementation gates (do not start E2–E4 until)
 
-1. **M4 governance sign-off** on [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md).
+1. **M4 governance sign-off** on [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) before production enablement.
 2. This M7 section reviewed against shipped module constants (table above).
-3. Vitest rows above added in the same PR as first entitlement probe (E2) — see [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md).
+3. Vitest + Playwright rows above stay green with every E2–E4 hosted-tier PR — see [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md).
 
 ---
 
@@ -431,11 +439,11 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 
 | # | Idea | Shipped today | Test when built | Phase |
 |---|------|---------------|-----------------|-------|
-| H1 | `reference_free` when no session | Yes (implicit) | 401/ absent session → 400 cap | 10 |
-| H2 | `hosted_steward_v1` caps from API | — | Mock entitlements → 4000 cap, 5 parallel | 10 |
+| H1 | `reference_free` when no session | Yes | 401 / absent session → 400 cap | 10 |
+| H2 | `hosted_steward_v1` caps from API | Staging | Mock entitlements → 4000 cap, 5 parallel | 10 |
 | H3 | `steward_account_link_v1` verify | — | Worker rejects bad sig / replay nonce | 10 |
 | H4 | Push `live_proof.pending` → one GET | — | E2E: no wallet round-robin while SSE up | 10 |
-| H5 | Downgrade to free on `expired` | — | Session cleared; 400 cap; push unsub | 10 |
+| H5 | Downgrade to free on `expired` | Staging for policy reapply | Session cleared; 400 cap; push unsub | 10 |
 | H6 | Merch order does not grant hosted | — | Policy test / fixture | 10 |
 
 ### Network status (wallet chips)
@@ -510,6 +518,7 @@ Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). 
 
 | Date | Note |
 |------|------|
+| 2026-05-27 | **M8 E2 staging:** client entitlement probe tests + `e2e/hosted-tier-budget.spec.ts` cover H1–H3/H5 |
 | 2026-05-26 | **M8 epics:** [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) |
 | 2026-05-26 | **M7:** Phase 10 entitlement rows + test plan (§ Phase 10 — hosted tier rows) |
 | 2026-05-26 | **M6 standards delta:** [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) |
