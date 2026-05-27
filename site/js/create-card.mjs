@@ -1,6 +1,12 @@
 import { validateCreateFormFields } from "./create-form-validation-core.mjs";
 import { syncCreateHeroCopy } from "./create-template-copy.mjs";
 import { formatCreateResolverError } from "./create-resolver-error-core.mjs";
+import {
+  clearMerchCreateRef,
+  peekMerchCreateRef,
+  persistMerchCreateRef,
+  readMerchRefFromUrl,
+} from "./merch-funnel-core.mjs";
 import { buildObjectStreamsFromFormRows } from "./object-streams-core.mjs";
 import {
   qrExpiryFromIssued,
@@ -245,10 +251,15 @@ export async function runCreateCard(input) {
   const qr_credential = await signDocument(qrUnsigned, privateKey, publicKeyBase58);
 
   setStatus("Submitting to resolver…");
+  const attributionRef = sampleCard ? null : peekMerchCreateRef();
+  /** @type {{ card: typeof card, qr_credential: typeof qr_credential, attribution_ref?: string }} */
+  const payload = { card, qr_credential };
+  if (attributionRef) payload.attribution_ref = attributionRef;
+
   const res = await fetch(postCardsUrl(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ card, qr_credential }),
+    body: JSON.stringify(payload),
   });
 
   const data = await res.json().catch(() => ({}));
@@ -266,6 +277,8 @@ export async function runCreateCard(input) {
     }
     throw new Error(msg);
   }
+
+  if (attributionRef) clearMerchCreateRef();
 
   sessionStorage.setItem(
     "hc_created",
@@ -416,6 +429,9 @@ if (urlTemplate === "status_plate") {
 } else if (urlTemplate === "lost_item") {
   setTemplate("lost_item_relay");
 }
+
+const urlMerchRef = readMerchRefFromUrl();
+if (urlMerchRef) persistMerchCreateRef(urlMerchRef);
 
 demoBtn?.addEventListener("click", async () => {
   const handleEl = document.getElementById("handle");

@@ -52,7 +52,7 @@ The interest form records **optional email** on this browser only (no server upl
 | Shopify store + live product URL in config | Operator  -  paste into `shop-config.json` |
 | `shopify.order_paid` → Printify middleware | Worker / fulfillment track |
 | Batch QR artwork + Printify product ID | `FOUNDING_DROP_BRIEF.md` |
-| Scan→create analytics (aggregate, no PII) | Product / ops |
+| Scan→create analytics (aggregate, no PII) | **Shipped** — `POST …/metrics/merch-funnel` · `GET …/operator/merch-funnel-monitor` · `hc_ref` on scan/create |
 | Resolver waitlist API (optional) | Only if moving interest off localStorage |
 
 ---

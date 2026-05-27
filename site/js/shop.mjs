@@ -3,6 +3,11 @@
  */
 import { isTier0CheckoutOpen, loadShopConfig, tier0Display } from "./shop-config.mjs";
 import {
+  appendMerchRefToCreateUrl,
+  persistMerchCreateRef,
+  peekMerchCreateRef,
+} from "./merch-funnel-core.mjs";
+import {
   SHOP_CHECKOUT_READY_LEAD,
   shopPriceLabelWhenCheckoutClosed,
 } from "./shop-copy-core.mjs";
@@ -132,7 +137,17 @@ function showInterestPending(display) {
   if (interestSection) interestSection.hidden = false;
 }
 
+function decorateShopCreateLinks() {
+  const ref = peekMerchCreateRef();
+  if (!ref) return;
+  for (const anchor of document.querySelectorAll('a[href*="/create"]')) {
+    anchor.href = appendMerchRefToCreateUrl(anchor.href, ref);
+  }
+}
+
 async function initShop() {
+  persistMerchCreateRef("tier0_shop");
+  decorateShopCreateLinks();
   bindInterestForm();
   try {
     const config = await loadShopConfig();

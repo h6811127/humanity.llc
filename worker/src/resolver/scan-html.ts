@@ -93,6 +93,7 @@ export async function renderScanPage(
   ${renderScanSafetyHeaderScript()}
   ${renderScanLiveCheckArriveScript(origin)}
   ${renderScanActorBandScript(vm, origin)}
+  ${renderScanMerchFunnelScript(origin)}
 </body>
 </html>`;
 }
@@ -1002,6 +1003,12 @@ function renderScanTabKeysScript(vm: ScanViewModel, origin: string): string {
 function renderScanLiveCheckArriveScript(origin: string): string {
   const assetOrigin = pagesJsOrigin(origin);
   const mod = JSON.stringify(`${assetOrigin}/js/scan-live-check-arrive.mjs?v=1`);
+  return `<script type="module" src=${mod}></script>`;
+}
+
+function renderScanMerchFunnelScript(origin: string): string {
+  const assetOrigin = pagesJsOrigin(origin);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-merch-funnel.mjs?v=1`);
   return `<script type="module" src=${mod}></script>`;
 }
 

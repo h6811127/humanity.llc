@@ -40,6 +40,10 @@ import {
 } from "./resolver/vouch-audit-flags";
 import { handleGetCreateRateMonitor } from "./resolver/create-monitoring";
 import {
+  handleGetMerchFunnelMonitor,
+  handlePostMerchFunnelBeacon,
+} from "./http/merch-funnel";
+import {
   handleGetOperatorCapabilities,
   handleGetOperatorPlans,
   handleGetStewardEntitlements,
@@ -218,6 +222,39 @@ export default {
       );
       return withCors(request, res);
     }
+
+    if (
+      path === "/.well-known/hc/v1/metrics/merch-funnel" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostMerchFunnelBeacon(request, env.DB);
+      return withCors(request, res);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/operator/merch-funnel-monitor" &&
+      request.method === "GET"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetMerchFunnelMonitor(
+        request,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
+    }
+
     if (
       path === "/.well-known/hc/v1/operator/vouch-audit-flags" &&
       request.method === "GET"
