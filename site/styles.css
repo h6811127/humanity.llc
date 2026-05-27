@@ -1190,8 +1190,10 @@ body.page-flow.has-shell-chrome .page > main.screen {
 
 .device-system-banner[hidden],
 .device-cross-tab-banner[hidden],
+.device-pwa-install-card[hidden],
 .device-system-banner:empty,
-.device-cross-tab-banner:empty {
+.device-cross-tab-banner:empty,
+.device-pwa-install-card:empty {
   display: none !important;
   margin: 0;
   padding: 0;
@@ -1575,6 +1577,7 @@ a.hub-card-menu-item {
 .landing-framing.hc-emphasis-card,
 .landing-final-cta.hc-emphasis-card,
 .device-cross-tab-banner.hc-emphasis-card,
+.device-pwa-install-card.hc-emphasis-card,
 #wallet-tab-hint.hc-emphasis-card,
 #device-hub-crosstab-notice.hc-emphasis-card,
 .device-keys-custody.hc-emphasis-card {
@@ -1587,6 +1590,7 @@ a.hub-card-menu-item {
 .landing-framing.hc-emphasis-card .hc-emphasis-card__main,
 .landing-final-cta.hc-emphasis-card .hc-emphasis-card__main,
 .device-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__main,
+.device-pwa-install-card.hc-emphasis-card .hc-emphasis-card__main,
 #wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__main,
 #device-hub-crosstab-notice.hc-emphasis-card .hc-emphasis-card__main,
 .device-keys-custody.hc-emphasis-card .hc-emphasis-card__main {
@@ -1597,6 +1601,7 @@ a.hub-card-menu-item {
 .landing-framing.hc-emphasis-card .hc-emphasis-card__actions,
 .landing-final-cta.hc-emphasis-card .hc-emphasis-card__actions,
 .device-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__actions,
+.device-pwa-install-card.hc-emphasis-card .hc-emphasis-card__actions,
 #wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__actions,
 #device-hub-crosstab-notice.hc-emphasis-card .hc-emphasis-card__actions,
 .device-keys-custody.hc-emphasis-card .hc-emphasis-card__actions {
@@ -5784,17 +5789,20 @@ details[open] > .created-advanced-summary::after {
 }
 
 .device-cross-tab-banner.hc-emphasis-card,
+.device-pwa-install-card.hc-emphasis-card,
 #wallet-tab-hint.hc-emphasis-card {
   margin: 0 0 14px;
 }
 
-.device-cross-tab-banner.hc-emphasis-card {
+.device-cross-tab-banner.hc-emphasis-card,
+.device-pwa-install-card.hc-emphasis-card {
   margin-left: var(--pad);
   margin-right: var(--pad);
 }
 
 /* Safari flex-wrap + narrow column — match scan (docs/SCAN_CROSS_TAB_BANNER_SAFARI_LAYOUT_INVESTIGATION.md) */
 .device-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__main,
+.device-pwa-install-card.hc-emphasis-card .hc-emphasis-card__main,
 #wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__main,
 #device-hub-crosstab-notice.hc-emphasis-card .hc-emphasis-card__main {
   flex: none;
@@ -5802,6 +5810,7 @@ details[open] > .created-advanced-summary::after {
 }
 
 .device-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__actions,
+.device-pwa-install-card.hc-emphasis-card .hc-emphasis-card__actions,
 #wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__actions,
 #device-hub-crosstab-notice.hc-emphasis-card .hc-emphasis-card__actions {
   width: 100%;

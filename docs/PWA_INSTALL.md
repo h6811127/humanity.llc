@@ -319,7 +319,7 @@ Implementation checklist: [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMEN
 |-------|-------------|--------|
 | **0** | Spec + core modules + Vitest | ✅ |
 | **1** | Manifest, icons, HTML `<link>` tags | ✅ |
-| **2** | `pwa-install.mjs` + emphasis card UX | Pending |
+| **2** | `pwa-install.mjs` + emphasis card UX | ✅ |
 | **3** | E2E + QA + backlog closure | Pending |
 
 ---

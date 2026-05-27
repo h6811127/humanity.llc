@@ -10,6 +10,7 @@ import {
   shouldShowIosAddToHomeInstructions,
   shouldShowPwaInstallSurface,
 } from "../../site/js/pwa-install-ux-core.mjs";
+import { pwaInstallCardBodyHtml } from "../../site/js/pwa-install-html.mjs";
 
 const baseInput = {
   pathname: "/",
@@ -139,5 +140,19 @@ describe("platform helpers", () => {
         deferredPromptAvailable: false,
       })
     ).toBe(false);
+  });
+});
+
+describe("pwaInstallCardBodyHtml", () => {
+  it("renders Chromium install CTA and iOS manual copy", () => {
+    const chromium = pwaInstallCardBodyHtml({ iosManual: false });
+    expect(chromium).toContain("Install on this device");
+    expect(chromium).toContain("data-pwa-install-confirm");
+    expect(chromium).toContain("data-pwa-install-dismiss");
+
+    const ios = pwaInstallCardBodyHtml({ iosManual: true });
+    expect(ios).toContain("Add to Home Screen");
+    expect(ios).toContain("Share");
+    expect(ios).not.toContain("data-pwa-install-confirm");
   });
 });

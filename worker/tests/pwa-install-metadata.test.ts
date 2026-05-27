@@ -109,6 +109,26 @@ describe("PWA metadata on disk (Phase 1 gate)", () => {
     expect(fs.existsSync(path.join(root, "site/icons/pwa-apple-touch.png"))).toBe(true);
   });
 
+  it("shell HTML includes install card placeholder after Phase 2", () => {
+    for (const rel of PWA_SHELL_HTML_PATHS) {
+      const htmlPath = path.join(root, "site", rel.replace(/^\//, ""));
+      const html = fs.readFileSync(htmlPath, "utf8");
+      expect(html, rel).toContain('id="device-pwa-install-card"');
+    }
+    const createHtml = fs.readFileSync(path.join(root, "site/create/index.html"), "utf8");
+    expect(createHtml).not.toContain('id="device-pwa-install-card"');
+  });
+
+  it("status bootstrap lazy-loads pwa-install on shell pages only", () => {
+    const bootstrap = fs.readFileSync(
+      path.join(root, "site/js/device-status-bootstrap.mjs"),
+      "utf8"
+    );
+    expect(bootstrap).toContain("isPwaShellPagePath");
+    expect(bootstrap).toContain("pwa-install.mjs");
+    expect(bootstrap).not.toContain('from "./pwa-install.mjs"');
+  });
+
   it("create and scan HTML do not link manifest", async () => {
     const createHtml = fs.readFileSync(path.join(root, "site/create/index.html"), "utf8");
     expect(createHtml).not.toContain('rel="manifest"');
