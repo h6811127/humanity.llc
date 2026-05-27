@@ -78,6 +78,27 @@ export function clearMerchCreateRef() {
  * @param {string | null} ref
  * @returns {string}
  */
+export function appendMerchRefToHref(href, ref) {
+  const normalized = normalizeMerchRef(ref);
+  if (!normalized) return href;
+  try {
+    const base =
+      typeof location !== "undefined" && location.origin
+        ? location.origin
+        : "https://humanity.llc";
+    const u = new URL(href, base);
+    u.searchParams.set("hc_ref", normalized);
+    return `${u.pathname}${u.search}${u.hash}`;
+  } catch {
+    return href;
+  }
+}
+
+/**
+ * @param {string} href
+ * @param {string | null} ref
+ * @returns {string}
+ */
 export function appendMerchRefToCreateUrl(href, ref) {
   const normalized = normalizeMerchRef(ref);
   if (!normalized) return href;
@@ -88,8 +109,7 @@ export function appendMerchRefToCreateUrl(href, ref) {
         : "https://humanity.llc";
     const u = new URL(href, base);
     if (!u.pathname.startsWith("/create")) return href;
-    u.searchParams.set("hc_ref", normalized);
-    return `${u.pathname}${u.search}${u.hash}`;
+    return appendMerchRefToHref(href, normalized);
   } catch {
     return href;
   }

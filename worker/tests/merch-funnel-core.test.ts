@@ -7,6 +7,7 @@ import {
 } from "../src/commerce/merch-funnel-core";
 import {
   appendMerchRefToCreateUrl,
+  appendMerchRefToHref,
   normalizeMerchRef,
 } from "../../site/js/merch-funnel-core.mjs";
 
@@ -43,5 +44,14 @@ describe("merch-funnel-core (client)", () => {
     expect(
       appendMerchRefToCreateUrl("/wallet/", "tier0_sticker")
     ).toBe("/wallet/");
+  });
+
+  it("appends hc_ref to customize and other shop URLs", () => {
+    expect(
+      appendMerchRefToHref("/shop/customize/", "scan_customize")
+    ).toBe("/shop/customize/?hc_ref=scan_customize");
+    expect(
+      appendMerchRefToHref("/shop/customize/?product=hoodie", "scan_customize")
+    ).toBe("/shop/customize/?product=hoodie&hc_ref=scan_customize");
   });
 });

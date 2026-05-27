@@ -130,7 +130,7 @@ Aggregate metrics only — no PII. Allowed refs:
 | `tier0_sticker` | Tier 0 campaign scan |
 | `customize_shop` | `/shop/customize/` |
 | `customize_hoodie` | Customizer with hoodie selected |
-| `scan_customize` | Scan page → customize CTA (future) |
+| `scan_customize` | Scan page → customize CTA on live wear / print_artifact scans |
 
 ---
 
@@ -138,7 +138,7 @@ Aggregate metrics only — no PII. Allowed refs:
 
 | Step | Pass? |
 |------|-------|
-| Stranger scans campaign merch; profile loads with limits + create CTA | ☐ manual |
+| Stranger scans campaign merch; profile loads with limits + create CTA | ✅ scan merch hint + footer CTAs (`scan_customize`) |
 | Create card → `/shop/customize/` detects session | ☐ manual |
 | Preview shows LIVE OBJECT branded QR on product mockup | ✅ UI |
 | Artifact intent created; attach returns Shopify line attributes | ✅ API tests |
