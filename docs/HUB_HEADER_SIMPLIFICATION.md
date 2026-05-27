@@ -18,7 +18,7 @@ The controls are individually clear, but their combined weight makes the sheet r
 
 The first screen of the hub should prioritize:
 
-1. **Place** - the user is in `This browser` / `My cards on this device`.
+1. **Place** - the user is in **Saved in this browser** (`/`, `/create/`) or **My cards on this device** (`/created/`). No subtitle under the sheet title on landing/create (section leads carry policy copy).
 2. **Trust state** - the resolver is reachable and device counts are available.
 3. **Escape** - Close remains easy to hit.
 4. **Next action** - Create is still available, but closer to saved items rather than competing with the sheet title.
@@ -33,6 +33,7 @@ The first screen of the hub should prioritize:
 
 ### Copy and visual rules
 
+- Sheet title on **`/`** and **`/create/`**: **Saved in this browser** (`#device-hub-title`). Removed the former `.device-hub-lead` subtitle (“cards, keys, and pins…”) so the sheet opens on the title + search + saved items.
 - Create action label: **New** when space allows, with the `+` retained as the fast-recognition glyph.
 - Create action tone: pink accent is allowed, but the control must be smaller and less shadowed than the current floating `+`.
 - Empty state counts may stay visible for diagnostics, but should not create a second row of scattered badges.

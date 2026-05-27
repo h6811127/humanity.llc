@@ -39,6 +39,16 @@ describe("device hub sheet header", () => {
     }
   });
 
+  it("uses Saved in this browser title without a hub lead on landing and create", () => {
+    for (const path of ["site/index.html", "site/create/index.html"]) {
+      const html = readPage(path);
+      expect(html).toContain('id="device-hub-title">Saved in this browser</h2>');
+      expect(html).not.toMatch(
+        /<p class="device-hub-lead">Saved in this browser[\s\S]*?<\/p>/
+      );
+    }
+  });
+
   it("renders the status header as a primary line with subordinate counts", () => {
     const src = readPage("site/js/device-status.mjs");
     const css = readPage("site/css/device-shell.css");

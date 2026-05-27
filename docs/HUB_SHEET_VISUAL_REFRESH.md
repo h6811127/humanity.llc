@@ -83,6 +83,7 @@ Replaced gold section label + plain list with **`hc-emphasis-card--urgent`** car
 ```text
 ┌─ .device-hub--sheet (tier-2 glass) ─────────────────────┐
 │  [handle]  Home  status chips…                    Close │
+│  **Saved in this browser** (sheet title, `/` + `/create/`) │
 │  #device-hub-alerts-top (cross-tab, disabled, …)        │
 │  #device-hub-live-control-group (urgent card, if pending)│
 │  search (info glass)                                     │

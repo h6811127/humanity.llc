@@ -10,6 +10,8 @@
 
 The landing page, **`/created/`**, and **`/wallet/`** share an **“on this device”** hub: saved cards with signing keys, **pinned public scan links**, **recent activity**, and shortcuts. This mirrors a Settings-style surface (grouped inset lists) without accounts, sync, or operator storage of private keys.
 
+**Sheet title (May 2026):** Bottom sheets on **`/`** and **`/create/`** use **`#device-hub-title` → “Saved in this browser”** with no `.device-hub-lead` under the title (policy copy stays in **Saved items** / Monitoring section leads). **`/created/`** keeps **My cards on this device** + its quick-switcher lead; **`/wallet/`** uses the full-page title **My cards on this device**.
+
 **Not in scope:** searching the Humanity resolver, other people’s cards, or any server index.
 
 ---
