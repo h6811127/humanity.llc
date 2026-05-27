@@ -169,7 +169,7 @@ async function main() {
 
   runNpm("Free-tier + hosted regression (verify:hosted-g0)", ["run", "verify:hosted-g0"]);
 
-  console.log("\n✅ Step 4 verified on production. Next: step 5 — ops dashboard + E6.2 CI secret check.");
+  console.log("\n✅ Step 4 verified on production. Next: npm run hosted:rollout:step5");
 }
 
 main().catch((err) => {
