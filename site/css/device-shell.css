@@ -896,15 +896,10 @@ button.device-hub-notice-banner {
 .device-hub-status-panel {
   flex: 1;
   min-width: 0;
-  margin: 0;
-  padding-top: 2px;
-}
-
-.device-hub-status-chips {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
   align-items: center;
+  min-height: 42px;
+  margin: 0;
 }
 
 .device-hub-chip {
@@ -921,13 +916,6 @@ button.device-hub-notice-banner {
   white-space: nowrap;
   background: rgba(120, 120, 128, 0.12);
   color: var(--shell-label-strong, #1c1c1e);
-}
-
-.device-hub-status-panel .device-hub-status-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
 }
 
 .device-hub-chip--network-ok {
@@ -1430,16 +1418,43 @@ button.device-hub-notice-banner {
 }
 
 .device-hub-status-line {
+  width: 100%;
   margin: 0;
   font-size: 13px;
-  font-weight: 500;
-  line-height: 1.4;
+  font-weight: 600;
+  line-height: 1.25;
   color: var(--shell-label);
   letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.device-hub-status-seg {
+  display: inline;
+  min-width: 0;
 }
 
 .device-hub-status-seg.is-zero {
-  opacity: 0.42;
+  opacity: 0.48;
+  font-weight: 500;
+}
+
+.device-hub-status-seg.is-primary {
+  color: var(--shell-label-strong, #1c1c1e);
+  opacity: 1;
+}
+
+.device-hub-status-seg--network-ok.is-primary {
+  color: #248a3d;
+}
+
+.device-hub-status-seg--network-degraded.is-primary {
+  color: #c93400;
+}
+
+.device-hub-status-seg--network-offline.is-primary {
+  color: var(--shell-label);
 }
 
 .device-hub-status-seg.is-highlight {

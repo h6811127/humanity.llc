@@ -1,6 +1,6 @@
 # Hub header simplification
 
-**Status:** Step 1 shipped  
+**Status:** Steps 1–2 shipped  
 **Scope:** Bottom-sheet hub header on `/`, `/create/`, and `/created/`  
 **Companions:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md), [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md)
 
@@ -51,9 +51,9 @@ The first screen of the hub should prioritize:
 
 ### Step 2 - Calm the status chip row
 
-- Render the hub status panel as a single-line primary status where possible.
-- Keep zero saved/pinned values visually subordinate.
-- Avoid wrapping a lone `0 pinned` chip onto its own row on mobile.
+- [x] Render the hub status panel as a single-line primary status where possible.
+- [x] Keep zero saved/pinned values visually subordinate.
+- [x] Avoid wrapping a lone `0 pinned` chip onto its own row on mobile.
 
 ### Step 3 - Rebalance nav controls
 

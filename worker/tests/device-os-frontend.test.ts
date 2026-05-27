@@ -4,6 +4,7 @@ const TEST_QR_ID = "qr_xBZTq7M27tueCzBY";
 
 import {
   buildDeviceCountsLabel,
+  buildHubStatusLineItems,
   buildStatusSegmentsFromCounts,
   tabNoticeCountFromState,
 } from "../../site/js/device-counts-core.mjs";
@@ -493,6 +494,31 @@ describe("buildStatusSegmentsFromCounts", () => {
     expect(segments.find((s) => s.id === "liveproof")?.label).toBe(
       "Proof Check Limited"
     );
+  });
+
+  it("formats hub status as one primary line with subordinate zero counts", () => {
+    const items = buildHubStatusLineItems(
+      buildStatusSegmentsFromCounts({
+        network: "ok",
+        saved: 0,
+        pins: 0,
+        notices: 0,
+        liveProof: 0,
+      })
+    );
+    expect(items.map((item) => item.label)).toEqual([
+      "Network reachable",
+      "0 cards",
+      "0 pinned",
+    ]);
+    expect(items[0]).toMatchObject({ id: "network", primary: true, zero: false });
+    expect(items[1]).toMatchObject({ id: "saved", primary: false, zero: true });
+    expect(items[2]).toMatchObject({
+      id: "pinned",
+      primary: false,
+      zero: true,
+      separatorBefore: true,
+    });
   });
 });
 

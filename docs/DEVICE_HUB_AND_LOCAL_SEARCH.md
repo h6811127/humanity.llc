@@ -71,7 +71,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Shortcuts & settings (shipped):** On the **homepage** (`/`) only - section after the studio example (unified list rows: Appearance, **Browser alerts** (background OS notifications for live proof), saved cards, manage, auto-save, focus). Hub sheet on all routes has **home icon** (left) and status line (center); Create lives beside the saved-items heading; no shortcuts block in the hub.
 
-**Hub header simplification (Step 1):** Create moves out of the sheet's top status rail and into the saved-items section header as compact **+ New**. The top rail stays focused on Home + resolver/device status, while Close remains the sheet escape. See [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md).
+**Hub header simplification (Steps 1-2):** Create moves out of the sheet's top status rail and into the saved-items section header as compact **+ New**. The top rail shows Home plus a single-line resolver/device status where zero saved or pinned counts stay subordinate, while Close remains the sheet escape. See [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md).
 
 **Chrome inbox (shipped):** Floating **inbox badge** next to the status dot when action items exist; hub `#device-hub-alerts-top` holds full rows. Spec and roadmap: [`DEVICE_INBOX.md`](DEVICE_INBOX.md). Status dot semantics: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 
