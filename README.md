@@ -10,7 +10,7 @@ object or ID  →  scan (HTTPS QR)  →  live signed state
 
 You can aim to be **the link company** in that specific sense: not short redirects or link-in-bio, but **resolver-backed links whose meaning can change** (membership, trust, access, public claims, object status). Commons Pass (community membership, events, check-in, stamps) and federation sit on the same grammar once the scan loop is proven. See `docs/DEMOCRATIC_INFRASTRUCTURE.md` and `docs/V1_0_ARCHITECTURE_ROADMAP.md`.
 
-Physical **merch** is distribution (curiosity → create), not the product definition. See `docs/MERCH_LED_V1.md`. Commerce stack: `docs/MERCH_HEADLESS_COMMERCE.md`.
+Physical **merch** is distribution (curiosity → create), not the product definition. **Post-M5 focus:** Tier 1 personalized wear ([`docs/MERCH_FUNNEL_MVP.md`](docs/MERCH_FUNNEL_MVP.md)). Commerce stack: [`docs/MERCH_HEADLESS_COMMERCE.md`](docs/MERCH_HEADLESS_COMMERCE.md).
 
 **Architecture:** open standards and **federated resolvers** - not a platform empire, not an invite-only gate, not blockchain identity. See `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
 

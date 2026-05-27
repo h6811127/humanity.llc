@@ -6,6 +6,21 @@
 
 ---
 
+## First launch recommendation (2026-05-27)
+
+**Lead with Tier 1 personalized merch** — scan live wear → create card → `/shop/customize/` → unique LIVE OBJECT QR → Shopify checkout → Printify fulfillment.
+
+| Launch path | Real product? | Notes |
+|-------------|---------------|-------|
+| **Tier 1** `/shop/customize/` + artifact intent | **Yes** — customizeability is the wedge | Hoodie or sticker with **unique `print_artifact` per unit** |
+| **Tier 0** batch founding sticker | Optional curiosity SKU | Shared campaign QR; no customizer |
+| **Shopify hoodie alone** (Printify publish, no customizer flow) | **No** — payment SKU only | Static print file; not per-buyer QR |
+| **Status plate / door pilot** | Optional Phase A vertical | Not the primary GTM wedge post-M5 |
+
+Without Tier 1 customizeability, merch is a generic POD listing — not the humanity.llc product (live state on humans, revocable per item, same ink / new meaning).
+
+---
+
 ## Mental model (one paragraph)
 
 **Printify is the factory** (garment template, print area, production, shipping). **Shopify is the cash register** (cart, payment, tax, refunds, customer email). **humanity.llc is the store** (story, customizer, LIVE OBJECT QR preview, artifact intent, trust copy). Customers never browse Printify and do not shop your Shopify theme as the primary experience — they customize on humanity.llc and **pass through Shopify only to pay**.
@@ -245,6 +260,23 @@ You get a **generic** garment charge — **no artifact intent**, webhook **holds
 ### “Why not use Shopify’s Printify integration for everything?”
 
 Auto-fulfill uses the **published static design**. Tier 1 needs **per-order unique QR artwork** — Humanity middleware after payment. See § Printify “Publish to Shopify” vs Humanity middleware.
+
+### “Isn’t customizeability the whole point?”
+
+**Yes.** The real product is: stranger scans wear → wants their own → **previews their QR on a hoodie/sticker on humanity.llc** → pays → receives **their** unique ink. A Shopify tester store or Printify-published listing without `/shop/customize/` + artifact intent is infrastructure setup, not launch.
+
+### “What still blocks taking money on Tier 1?”
+
+| Blocker | Owner |
+|---------|--------|
+| `personalize.checkout_open: true` + Shopify cart URLs in `shop-config.json` | Operator + Pages deploy |
+| Shopify `orders/paid` webhook + Worker secrets | Operator |
+| Printify env (`PERSONALIZE_*_PRINTIFY_*`) | Operator |
+| Per-order artwork upload in Printify submit | Engineering (O-002 extension) |
+| Physical sample QA sign-off | Operator — [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) |
+| Founding drop / lifecycle policy gates | Operator — [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) |
+
+Code path for scan → customize → intent → webhook → queue is largely shipped; gaps are **operator wiring** and **Printify artwork upload**.
 
 ---
 

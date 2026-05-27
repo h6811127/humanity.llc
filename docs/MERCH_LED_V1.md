@@ -1,6 +1,7 @@
 # Merch-Led V1: Curiosity + Belonging
 
 **Status:** Canonical wedge (v1 GTM) · **Phase B in progress**  -  Tier 0 story shop at `/shop/`  
+**Current focus (2026-05-27, post-M5):** **Merch funnel MVP** — Tier 1 personalized wear (hoodie / sticker with unique QR), not status plates as primary launch wedge.  
 **Purpose:** Lead with physical artifacts as viral distribution while pairing **proof of curiosity** (spread) with **proof of belonging** (retention). Commons Pass and organizer tooling follow once people already wear the object.
 
 **Implementation tracker:** `docs/SHOP_TIER0_IMPLEMENTATION.md` (Pages UI, waitlist interest, Shopify handoff checklist).  
@@ -147,7 +148,7 @@ Prove walking ads work:
 
 ### Phase C  -  Belonging on the object (personalized line)
 
-Connect artifact to card holders (not a protocol invite gate):
+Connect artifact to card holders (not a protocol invite gate). **Commerce architecture:** [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) — customize on humanity.llc, pay on Shopify, print via Printify API (not Printify storefront).
 
 1. Personalized drop for active Humanity Card holders when print QA allows.
 2. Personalized QR per item when provider QA supports it (`artifact_intent` → Shopify → Printify vertical slice).

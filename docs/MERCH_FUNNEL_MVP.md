@@ -1,9 +1,33 @@
 # Merch funnel MVP — scan → profile → customize → Printify
 
 **Status:** Active — customizer UI shipped; operator enables products in `shop-config.json`  
+**Current focus (post-M5):** **Tier 1 personalized merch** as primary GTM wedge — not status plates as launch MVP. Commerce architecture: [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md).  
 **Parent:** [`MERCH_LED_V1.md`](MERCH_LED_V1.md) · [`V1_FLOW_AUDIT.md`](V1_FLOW_AUDIT.md) · [`features/Storefront v1.0.md`](features/Storefront%20v1.0.md)  
 **Architecture (Shopify + Printify + headless):** [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) — **read first** if wiring checkout  
 **Implementation:** [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) · `site/shop/customize/`
+
+---
+
+## Product vision — Live Object on wear
+
+The flagship creative (e.g. Instagram hoodie ad) is **not** a generic QR merch listing. It is:
+
+- **LIVE OBJECT** branded QR band on chest print area (gradient frame, credential code visible)
+- **Unique `print_artifact` per garment** — revoke one hoodie without killing the card
+- **Same ink, new meaning** — owner updates manifesto from phone after strangers scan
+
+That vision requires **Tier 1** (`/shop/customize/` + artifact intent + paid webhook fulfillment), not a static Printify→Shopify publish alone. Preview UI: `qr-branding.mjs` · `qr-render.mjs` · `/shop/customize/`.
+
+---
+
+## What counts as “real launch”
+
+| Has customizeability? | Launch-ready? |
+|---------------------|---------------|
+| Buyer flows through `/shop/customize/`, artifact intent, Shopify checkout with `artifact_intent_id` | **Yes** (once operator config + print QA pass) |
+| Buyer buys Shopify hoodie URL directly (no customizer) | **No** — generic garment, no unique QR |
+| Tier 0 batch sticker only | **Partial** — curiosity ad, not belonging wedge |
+| Status plate field pilot | **Separate** — Phase A vertical, not merch GTM |
 
 ---
 
@@ -167,6 +191,21 @@ Aggregate metrics only — no PII. Allowed refs:
 | Per-order artwork upload to Printify on submit | ☐ O-002 extension — see [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Shipped vs spec gap |
 | Printed item scans; bearer warning visible | ☐ physical QA · ✅ automated scan regression (`npm run worker:test:merch-print-qa`, [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md)) |
 | Owner updates manifesto from phone without reprint | ✅ resolver |
+
+---
+
+## Blocking live Tier 1 checkout (operator + engineering)
+
+| Blocker | Status |
+|---------|--------|
+| Funnel code (scan CTAs, customize, intent, webhook queue) | ✅ Shipped |
+| `personalize.checkout_open` + Shopify URLs in `shop-config.json` | ☐ Operator |
+| Shopify webhook + Worker Printify secrets | ☐ Operator |
+| Per-order Printify artwork upload on submit | ☐ Engineering — [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) |
+| Physical print QA sign-off | ☐ Operator — [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) |
+| Founding drop / lifecycle gates | ☐ Operator — [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) |
+
+Full architecture and FAQ: [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md).
 
 ---
 
