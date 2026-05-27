@@ -25,17 +25,20 @@ export default defineConfig({
     {
       name: "chromium",
       use: { ...devices["Pixel 5"] },
-      testIgnore: /safari-shell-scroll|scan-cross-tab-banner-webkit\.spec\.ts/,
+      testIgnore:
+        /safari-shell-scroll|scan-cross-tab-banner-webkit\.spec\.ts|keys-custody-emphasis-webkit\.spec\.ts/,
     },
     {
       name: "webkit",
       use: { ...devices["Desktop Safari"] },
-      testMatch: /safari-shell-scroll|scan-hero-visual|scan-cross-tab-banner-webkit\.spec\.ts/,
+      testMatch:
+        /safari-shell-scroll|scan-hero-visual|scan-cross-tab-banner-webkit\.spec\.ts|keys-custody-emphasis-webkit\.spec\.ts/,
     },
     {
       name: "iphone-13-pro",
       use: { ...devices["iPhone 13 Pro"] },
-      testMatch: /safari-shell-scroll|scan-hero-visual|scan-cross-tab-banner-webkit\.spec\.ts/,
+      testMatch:
+        /safari-shell-scroll|scan-hero-visual|scan-cross-tab-banner-webkit\.spec\.ts|keys-custody-emphasis-webkit\.spec\.ts/,
     },
   ],
 });

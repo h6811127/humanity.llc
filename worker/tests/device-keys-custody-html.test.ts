@@ -51,5 +51,8 @@ describe("device-keys-custody-html", () => {
     expect(styles).toMatch(
       /\.device-keys-custody\.hc-emphasis-card \.hc-emphasis-card__main[\s\S]*flex:\s*none/
     );
+    expect(styles).toMatch(
+      /\.device-keys-custody\.hc-emphasis-card \.hc-emphasis-card__cta--secondary[\s\S]*min-height:\s*44px/
+    );
   });
 });

@@ -6947,6 +6947,11 @@ button.btn-danger {
     var(--hc-emphasis-card-padding-inline-compact);
 }
 
+.device-keys-custody.hc-emphasis-card .hc-emphasis-card__cta--secondary {
+  min-height: 44px;
+  min-width: 44px;
+}
+
 .device-keys-custody.hc-emphasis-card .hc-notice-foot {
   margin-top: 10px;
   font-size: 13px;

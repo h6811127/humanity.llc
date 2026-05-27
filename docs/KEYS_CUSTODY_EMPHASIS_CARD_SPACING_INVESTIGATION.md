@@ -69,4 +69,5 @@ Same root cause as keys custody: column `hc-emphasis-card` without F3 stacked la
 | 12 | E2E: wallet + hub keys custody compact layout (detail ↔ Acknowledge gap, `flex-start`, `__main` not growing) | `e2e/device-os-wallet.spec.ts` | **Shipped** |
 | 13a | Runbook: **P1-KC** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) | Manual checklist | **Shipped** |
 | 13b | E2E: Acknowledge dismiss persists; dark theme readable on wallet custody | `e2e/device-os-wallet.spec.ts` | **Shipped** |
-| 13c | Safari iOS visual sign-off (optional) | Operator per P1-KC step 5 | As needed |
+| 13c | WebKit regression: wallet + hub custody compact layout and Acknowledge styling | `e2e/keys-custody-emphasis-webkit.spec.ts` (webkit + iphone-13-pro) | **Shipped** |
+| 13d | Optional operator spot-check on physical iPhone | [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) P1-KC step 5 | As needed |

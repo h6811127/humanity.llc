@@ -209,7 +209,7 @@ Spec: [`KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md`](KEYS_CUSTODY_EMPHA
 
 **Reset:** `localStorage.removeItem("hc_keys_custody_notice_dismissed")` then reload.
 
-**Automated:** `npm run worker:test -- worker/tests/device-keys-custody-html.test.ts worker/tests/device-emphasis-card-html.test.ts` · `npm run e2e -- e2e/device-os-wallet.spec.ts -g "keys custody"` · `npm run e2e -- e2e/keys-custody-emphasis-webkit.spec.ts` (WebKit + iPhone 13 Pro)
+**Automated:** `npm run worker:test -- worker/tests/device-keys-custody-html.test.ts worker/tests/device-emphasis-card-html.test.ts` · `npm run e2e -- e2e/device-os-wallet.spec.ts -g "keys custody"`
 
 | Step | Action | Expected |
 |------|--------|----------|
