@@ -1,6 +1,6 @@
 # Keys custody emphasis card — excessive vertical spacing
 
-**Status:** **Closed** (May 2026) — steps 1–16 archived; CI WebKit custody e2e; regression via `npm run worker:test:keys-custody` and `npm run e2e:keys-custody`  
+**Status:** **Closed** (May 2026) — steps 1–17; CI WebKit custody e2e; regression via `npm run worker:test:keys-custody` and `npm run e2e:keys-custody`  
 **Surface:** `#device-keys-custody-hub`, `#device-keys-custody-wallet`, `device-keys-custody--created`, `device-keys-custody--compact`  
 **Canonical spacing:** [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) § Internal spacing ladder · F3 stacked layout
 
@@ -107,9 +107,19 @@ Same root cause as keys custody: column `hc-emphasis-card` without F3 stacked la
 |---------|-------------|------------|
 | `hub` | `#device-keys-custody-hub` · `landing-device-hub.mjs` | **Yes** |
 | `wallet` | `#device-keys-custody-wallet` · `wallet-page.mjs` | **Yes** |
-| `created` | `keysCustodyHtml("created")` — no `mountKeysCustody` call yet | HTML/CSS only |
+| `created` | `#device-keys-custody-created-setup` · `created-setup.mjs` (setup save step, unsaved keys) | **Yes** (step 17) |
 | `compact` | `keysCustodyHtml("compact")` — no mount | HTML/CSS only |
 
-Spacing/CSS for all variants is covered by `.device-keys-custody.hc-emphasis-card` (Vitest). Mounting `created` / `compact` is a **separate product change**, not part of this spacing incident.
+Spacing/CSS for all variants is covered by `.device-keys-custody.hc-emphasis-card` (Vitest). **`compact`** mount on `/create/` remains optional product work.
 
-**No further engineering steps** after 16. **14d** (physical iPhone) remains operator-optional.
+**No further engineering steps** after 17. **14d** (physical iPhone) remains operator-optional.
+
+---
+
+## Product mount (step 17)
+
+| Step | Action | Status |
+|------|--------|--------|
+| 17a | Mount `created` variant in setup wizard save panel | `created-setup.mjs` · `#device-keys-custody-created-setup` | **Shipped** |
+| 17b | Hide when wallet saved or global custody dismiss | `syncSetupKeysCustody()` | **Shipped** |
+| 17c | E2E: `fresh=1` setup shows warn custody card above keys strip | `e2e/device-os-wallet.spec.ts` | **Shipped** |

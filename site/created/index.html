@@ -19,7 +19,7 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=4" />
-    <link rel="stylesheet" href="/styles.css?v=126" />
+    <link rel="stylesheet" href="/styles.css?v=127" />
     <link rel="stylesheet" href="/css/device-shell.css?v=56" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=28" />
   </head>
@@ -404,42 +404,6 @@
                   <input class="form-input" id="update-object-label" type="text" maxlength="120" />
                   <label class="form-label" for="update-status-line">Status line</label>
                   <input class="form-input" id="update-status-line" type="text" maxlength="160" />
-                  <fieldset class="created-object-streams-fieldset">
-                    <legend class="form-label">Optional details (shown on scan)</legend>
-                    <p class="form-hint">Same QR — add short place facts like tasks or tool status.</p>
-                    <label class="form-label" for="update-stream-1-label">Detail 1 label</label>
-                    <input
-                      class="form-input"
-                      id="update-stream-1-label"
-                      type="text"
-                      maxlength="40"
-                      placeholder="Today's tasks"
-                    />
-                    <label class="form-label" for="update-stream-1-value">Detail 1 value</label>
-                    <input
-                      class="form-input"
-                      id="update-stream-1-value"
-                      type="text"
-                      maxlength="120"
-                      placeholder="Water bed 3 · turn compost"
-                    />
-                    <label class="form-label" for="update-stream-2-label">Detail 2 label</label>
-                    <input
-                      class="form-input"
-                      id="update-stream-2-label"
-                      type="text"
-                      maxlength="40"
-                      placeholder="Tools"
-                    />
-                    <label class="form-label" for="update-stream-2-value">Detail 2 value</label>
-                    <input
-                      class="form-input"
-                      id="update-stream-2-value"
-                      type="text"
-                      maxlength="120"
-                      placeholder="Wheelbarrow available"
-                    />
-                  </fieldset>
                 </div>
                 <div id="update-fields-lost-item" hidden>
                   <label class="form-label" for="update-relay-item">What is lost?</label>
@@ -461,6 +425,46 @@
                     maxlength="280"
                   ></textarea>
                 </div>
+                <fieldset
+                  id="update-fields-object-streams"
+                  class="created-object-streams-fieldset"
+                  hidden
+                >
+                  <legend class="form-label">Optional details (shown on scan)</legend>
+                  <p class="form-hint">Same QR — add short place facts like tasks or tool status.</p>
+                  <label class="form-label" for="update-stream-1-label">Detail 1 label</label>
+                  <input
+                    class="form-input"
+                    id="update-stream-1-label"
+                    type="text"
+                    maxlength="40"
+                    placeholder="Today's tasks"
+                  />
+                  <label class="form-label" for="update-stream-1-value">Detail 1 value</label>
+                  <input
+                    class="form-input"
+                    id="update-stream-1-value"
+                    type="text"
+                    maxlength="120"
+                    placeholder="Water bed 3 · turn compost"
+                  />
+                  <label class="form-label" for="update-stream-2-label">Detail 2 label</label>
+                  <input
+                    class="form-input"
+                    id="update-stream-2-label"
+                    type="text"
+                    maxlength="40"
+                    placeholder="Tools"
+                  />
+                  <label class="form-label" for="update-stream-2-value">Detail 2 value</label>
+                  <input
+                    class="form-input"
+                    id="update-stream-2-value"
+                    type="text"
+                    maxlength="120"
+                    placeholder="Wheelbarrow available"
+                  />
+                </fieldset>
                 <button type="submit" class="btn-primary" id="manifesto-update-submit">
                   Publish update
                 </button>

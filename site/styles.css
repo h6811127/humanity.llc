@@ -7348,6 +7348,10 @@ button.btn-danger {
   color: var(--grey);
 }
 
+#device-keys-custody-created-setup:not(:empty) {
+  margin-bottom: var(--hc-emphasis-card-gap-section-compact, 12px);
+}
+
 .created-setup-panel[hidden] {
   display: none !important;
 }

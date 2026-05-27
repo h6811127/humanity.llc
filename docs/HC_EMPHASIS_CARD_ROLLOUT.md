@@ -95,7 +95,7 @@ See git history (`3eab136` Phase 3, `1f0c517` Phase 2). Acceptance: shadow-only 
 | Surface | File(s) | Shipped as |
 |---------|---------|------------|
 | Public create warning | `site/create/index.html` | `#create-public-card-notice` · `hc-emphasis-card--warn` |
-| Keys custody (created) | `site/js/device-keys-custody.mjs` | `emphasisCardShellHtml` · `--warn` · Acknowledge secondary pill |
+| Keys custody (created) | `#device-keys-custody-created-setup` · `created-setup.mjs` | `emphasisCardShellHtml` · `--warn` · setup save step |
 | No session | `site/created/index.html`, `created.mjs` | `--warn` · `#no-session-detail` · **My cards** secondary pill |
 | Created error | `site/created/index.html`, `created.mjs` | `--urgent` · `#created-error-detail` |
 | Owner revoked | `site/created/index.html`, `created-revoke-banner-core.mjs` | `--urgent` · `#owner-revoked-banner-detail` |

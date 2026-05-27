@@ -39,6 +39,12 @@ describe("device-keys-custody-html", () => {
     expect(html).not.toContain("hc-notice--warning");
   });
 
+  it("created setup page exposes custody mount slot", () => {
+    const html = readFileSync(join(root, "site/created/index.html"), "utf8");
+    expect(html).toContain('id="device-keys-custody-created-setup"');
+    expect(html).toContain('id="created-setup-keys-mount"');
+  });
+
   it("styles use compact stacked emphasis layout for custody cards", () => {
     const styles = readFileSync(join(root, "site/styles.css"), "utf8");
     expect(styles).toContain("--hc-emphasis-card-gap-section-compact: 12px");
