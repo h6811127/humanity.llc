@@ -208,8 +208,8 @@ Run: `npm run worker:test:card-disabled-since-visit` · `npm run e2e:card-disabl
 2. **G2:** **Shipped** - cache-only poll clears confirmed state when cache `scanKind` disagrees with `latestResolved*`.
 3. **G3 / A2:** **Shipped** - no `reapplyRevokedSinceVisitFromLatestResolved` on `hc-live-control-inbox-changed`.
 4. **A5:** **Shipped** - re-apply uses `allowShow: false`; show only from wallet poll / `NETWORK_REFRESHED` with maps.
-5. **G4:** Optional - extend gate when any saved row last poll was `offline`/`error` (partially covered by A4 per-profile gate).
-6. **G6:** Optional - scoped wallet poll on tab visible when wallet non-empty (without restoring global coordinator).
+5. **G4:** **Shipped** - `setWalletStatusPollHealthForSinceVisit` in `device-wallet-since-visit-gate.mjs`; wallet poll sets `degraded` on 429 or all-fetched rows offline/error (`device-wallet-network.mjs`).
+6. **G6:** **Shipped** - tab `visibilitychange` polls when wallet non-empty and (`page-wallet` or hub expanded) (`device-hub-ui.mjs`).
 7. **A3:** **Shipped** - `device-wallet-network-truth.mjs`; see `worker/tests/device-wallet-network-truth.test.ts`.
 
 ---

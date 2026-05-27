@@ -2,7 +2,9 @@ import { describe, expect, it, beforeEach } from "vitest";
 
 import {
   getResolverHealthStatus,
+  getWalletStatusPollHealth,
   setResolverHealthStatusForSinceVisit,
+  setWalletStatusPollHealthForSinceVisit,
   shouldSuppressCardDisabledSinceVisitAlerts,
 } from "../../site/js/device-wallet-since-visit-gate.mjs";
 import {
@@ -22,6 +24,7 @@ describe("getResolverHealthStatus", () => {
 describe("shouldSuppressCardDisabledSinceVisitAlerts", () => {
   beforeEach(() => {
     setResolverHealthStatusForSinceVisit("ok");
+    setWalletStatusPollHealthForSinceVisit("ok");
     setLiveControlPollHealth("ok");
   });
 
@@ -32,6 +35,12 @@ describe("shouldSuppressCardDisabledSinceVisitAlerts", () => {
 
   it("suppresses when live-proof poll health is offline", () => {
     setLiveControlPollHealth("offline");
+    expect(shouldSuppressCardDisabledSinceVisitAlerts()).toBe(true);
+  });
+
+  it("suppresses when wallet status poll health is degraded (G4)", () => {
+    setWalletStatusPollHealthForSinceVisit("degraded");
+    expect(getWalletStatusPollHealth()).toBe("degraded");
     expect(shouldSuppressCardDisabledSinceVisitAlerts()).toBe(true);
   });
 

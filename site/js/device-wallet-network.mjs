@@ -22,6 +22,10 @@ import {
   WALLET_NETWORK_CACHE_TTL_MS,
 } from "./device-wallet-network-core.mjs";
 import {
+  getWalletStatusPollHealth,
+  setWalletStatusPollHealthForSinceVisit,
+} from "./device-wallet-since-visit-gate.mjs";
+import {
   buildSinceVisitPollMapsFromTruth,
   clearWalletNetworkTruthForProfile,
   getWalletNetworkTruth,
@@ -285,6 +289,32 @@ export function listWalletEntriesNeedingNetworkFetch(entries, now = Date.now()) 
 }
 
 /**
+ * G4: when a wallet status round hits 429 or every fetched row is offline/error, degrade
+ * since-visit gating until a trustworthy poll completes.
+ * @param {Set<string>} networkFetchedProfileIds
+ * @param {Record<string, string>} statusMap
+ * @param {boolean} saw429
+ */
+function applyWalletStatusPollHealthFromRound(networkFetchedProfileIds, statusMap, saw429) {
+  if (networkFetchedProfileIds.size === 0) return;
+  let next = "ok";
+  if (saw429) {
+    next = "degraded";
+  } else {
+    const allUnreachable = [...networkFetchedProfileIds].every(
+      (pid) => statusMap[pid] === "offline" || statusMap[pid] === "error"
+    );
+    if (allUnreachable) next = "degraded";
+  }
+  const prev = getWalletStatusPollHealth();
+  if (prev === next) return;
+  setWalletStatusPollHealthForSinceVisit(next);
+  if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
+    window.dispatchEvent(new CustomEvent("hc-resolver-health-changed"));
+  }
+}
+
+/**
  * @param {Array<{ profile_id: string, qr_id?: string | null }>} entries
  * @param {(result: {
  *   statusMap: Record<string, string>,
@@ -305,6 +335,7 @@ export async function refreshWalletNetworkStatuses(entries, onDone, options = {}
   const fetches = [];
   /** Profile IDs that took a network fetch this poll (not session-cache short circuit). */
   const networkFetchedProfileIds = new Set();
+  let walletStatusPollSaw429 = false;
   const now = Date.now();
   const lastSeen = loadLastSeen();
   const maxParallel =
@@ -331,6 +362,9 @@ export async function refreshWalletNetworkStatuses(entries, onDone, options = {}
             scanKindMap[pid] = cached.scanKind ?? null;
             cache[pid] = { ...cached, at: now };
             return;
+          }
+          if (status === 429) {
+            walletStatusPollSaw429 = true;
           }
           if (status < 200 || status >= 300) {
             statusMap[pid] = "error";
@@ -392,6 +426,11 @@ export async function refreshWalletNetworkStatuses(entries, onDone, options = {}
   }
 
   saveCache(cache);
+  applyWalletStatusPollHealthFromRound(
+    networkFetchedProfileIds,
+    statusMap,
+    walletStatusPollSaw429
+  );
   syncWalletNetworkTruthFromPoll(
     entries,
     statusMap,

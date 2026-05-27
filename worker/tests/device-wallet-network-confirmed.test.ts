@@ -18,7 +18,11 @@ import {
   refreshWalletNetworkStatuses,
 } from "../../site/js/device-wallet-network.mjs";
 import { gatherCardDisabledSinceVisitForInbox } from "../../site/js/device-inbox-card-disabled.mjs";
-import { setResolverHealthStatusForSinceVisit } from "../../site/js/device-wallet-since-visit-gate.mjs";
+import {
+  getWalletStatusPollHealth,
+  setResolverHealthStatusForSinceVisit,
+  setWalletStatusPollHealthForSinceVisit,
+} from "../../site/js/device-wallet-since-visit-gate.mjs";
 import { setLiveControlPollHealth } from "../../site/js/device-live-control-inbox-core.mjs";
 
 const PROFILE_A = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
@@ -69,6 +73,7 @@ describe("isResolverConfirmedProfile", () => {
     });
     vi.stubGlobal("window", { dispatchEvent: vi.fn() });
     setResolverHealthStatusForSinceVisit("ok");
+    setWalletStatusPollHealthForSinceVisit("ok");
     setLiveControlPollHealth("ok");
     vi.stubGlobal("fetch", vi.fn(async () => resolverJsonResponse(ACTIVE_BODY)));
   });
@@ -215,5 +220,12 @@ describe("isResolverConfirmedProfile", () => {
       buildResolverConfirmedWalletPollMaps()?.alertStateMap[PROFILE_B]
     ).toBeUndefined();
     expect(gatherCardDisabledSinceVisitForInbox()).toEqual([]);
+  });
+
+  it("sets wallet status poll health degraded on HTTP 429 (G4)", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(resolverJsonResponse({}, 429));
+    await refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }]);
+    expect(getWalletStatusPollHealth()).toBe("degraded");
+    expect(window.dispatchEvent).toHaveBeenCalled();
   });
 });

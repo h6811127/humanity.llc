@@ -1440,8 +1440,11 @@ export function initDeviceHub(config = {}) {
     if (document.visibilityState === "visible") {
       const hubEl = document.getElementById("device-hub");
       const hubCollapsed = hubEl?.classList.contains("device-hub-collapsed") ?? false;
+      const onWalletPage = document.body.classList.contains("page-wallet");
+      const hasWallet = loadWallet().length > 0;
       if (
-        !hubCollapsed &&
+        hasWallet &&
+        (onWalletPage || !hubCollapsed) &&
         walletNetworkVisibilityRefreshAllowed(lastWalletNetworkFetchAt)
       ) {
         void fetchAndApplyNetworkChips();
