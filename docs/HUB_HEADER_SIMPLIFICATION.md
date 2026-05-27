@@ -1,6 +1,6 @@
 # Hub header simplification
 
-**Status:** Steps 1–3 shipped · Step 4 manual QA pending
+**Status:** Steps 1–4 shipped (automated e2e + Vitest; manual **P1-HH** / **P0-W** still recommended on WebKit)
 **Scope:** Bottom-sheet hub header on `/`, `/create/`, and `/created/`  
 **Companions:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md), [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md)
 
@@ -64,11 +64,21 @@ The first screen of the hub should prioritize:
 - **Close (stronger):** `.device-hub-sheet-close` bumped to **40×40px**, popover fg (not muted), control fill + border + light shadow; dark theme border/shadow pass.
 - **Files:** `site/css/device-shell.css`, `site/css/theme-dark.css` (`device-shell.css?v=59` on shell pages).
 
-### Step 4 - Manual QA pass
+### Step 4 - QA pass ✅
 
-- Mobile Safari-width smoke: open hub, close hub, tap Home, tap New, scroll saved items.
-- Regression: status dot still opens the hub after scroll.
-- Dark mode check: Create pill uses shell/popover contrast tokens and does not bloom.
+Runbook: **P1-HH** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md).
+
+**Automated (May 2026):**
+
+```bash
+npm run worker:test -- worker/tests/device-hub-header-html.test.ts
+npm run e2e -- e2e/device-status-dot.spec.ts -g "hub sheet header chrome"
+```
+
+- Close dismisses hub; **+ New** in saved-items header → `/create/`; Home/Close visible when expanded.
+- Dot opens hub after page scroll (no `top-chrome--edge-hidden` — scroll-edge hide removed from shell).
+
+**Manual (recommended):** P1-HH steps 6–8 (dark mode, `/create/` parity, WebKit).
 
 ---
 

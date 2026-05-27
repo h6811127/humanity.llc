@@ -1,6 +1,6 @@
 # Hub sheet visual refresh
 
-**Status:** Phases 1–6 shipped (May 2026)  
+**Status:** Complete (May 2026) — Phases 1–6 shipped · header Step 4 automated regression green  
 **Scope:** Bottom-sheet hub on `/`, `/create/`, `/created/`; wallet page reuses the same saved-items blocks  
 **Companions:** [`HUB_CARD_3D_AND_SHEET_GLASS.md`](HUB_CARD_3D_AND_SHEET_GLASS.md) · [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md) · [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) · [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md)
 
@@ -106,6 +106,20 @@ Replaced red **Disabled since your last visit** label + plain list with **`hc-em
 - **Copy:** `site/js/device-hub-inbox-alerts.mjs` — dynamic eyebrow/summary from entry count.
 - **CSS:** shared alert-card row styling with `.device-hub-live-control-card` in `site/css/device-shell.css`.
 
+### Phase 7 — Regression closure
+
+Automated regression from § Regression below (May 2026):
+
+| Suite | Result |
+|-------|--------|
+| `npm run worker:test:ui-color-scheme` | pass |
+| `device-status-shell-modules`, `device-hub-header-html`, `device-hub-network-tools-core`, `device-hub-frontend-pipeline` | pass |
+| `e2e/device-status-dot.spec.ts` (hub header step 4 + scroll-open) | pass |
+| `e2e/device-os-wallet.spec.ts` | pass |
+| `e2e/device-inbox.spec.ts` (live-proof block) | requires worker + live-control mocks — run in full CI |
+
+**Manual still recommended:** [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-9** (light/dark frosted sheet, reduced transparency).
+
 ---
 
 ## Out of scope (follow-ups)
@@ -124,7 +138,7 @@ npm run worker:test -- worker/tests/device-status-shell-modules.test.ts worker/t
 npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-os-wallet.spec.ts e2e/device-inbox.spec.ts
 ```
 
-**Vitest guards:** `ui-color-scheme-popover-guard.test.ts` — sheet glass, `.device-hub-network-tools`, `.hub-card-item`, `.device-hub-live-control-card`.
+**Vitest guards:** `ui-color-scheme-popover-guard.test.ts` — sheet glass, `.device-hub-network-tools`, `.hub-card-item`, `.device-hub-live-control-card`, `.device-hub-card-disabled-card`, `.hub-use-keys` red budget.
 
 **Manual:** [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P0-3**, **P0-W**, **P1-7**, **P1-9**.
 

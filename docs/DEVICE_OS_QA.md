@@ -255,6 +255,23 @@ Removed May 2026. See [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md). 
 
 See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 
+### P1-HH · Hub header simplification (Home / Close / Create)
+
+**Spec:** [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md) · visual refresh: [`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md)
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Open hub on `/` (light) | Title **Saved in this browser**; no subtitle under title; **+ New** in saved-items header only |
+| 2 | Top rail | Home (muted) + inline status line; **no** Create in status row; Close ≥40px, visually stronger than Home |
+| 3 | Tap Home | Navigates home; hub closes |
+| 4 | Reopen hub → tap Close | Sheet closes |
+| 5 | Tap **+ New** | `/create/` |
+| 6 | Repeat on `/create/` hub | Same layout as landing |
+| 7 | Dark mode (`hc_theme=dark`) | Create pill readable; Close border visible; Home not competing with title |
+| 8 | Scroll page → tap status dot | Hub still opens (P0-3) |
+
+Automated: `e2e/device-status-dot.spec.ts` § hub sheet header chrome (steps 4–5, Close); Vitest `device-hub-header-html.test.ts` (40px Home/Close).
+
 ### P1-9 · Hub sheet visual refresh (May 2026)
 
 **Spec:** [`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md)
@@ -267,6 +284,9 @@ See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 | 4 | Saved row | Tier-3 info glass row; object-type left accent; unified **checked** status line |
 | 5 | `prefers-reduced-transparency: reduce` | Sheet + inset cards opaque; no blur jank |
 | 6 | Tap **+ New** in saved-items header | Navigates to `/create/`; Create not in top status rail |
+| 7 | Tap **Close** on expanded hub | Hub collapses; `body` loses `device-hub-sheet-open` |
+
+Automated: `e2e/device-status-dot.spec.ts` § hub sheet header chrome (steps 6–7); Vitest `device-hub-header-html.test.ts`.
 
 ### P1-8 · Hosted tier budget (Phase 10 — E2 staging)
 
