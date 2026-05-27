@@ -31,7 +31,7 @@ describe("device-emphasis-card-html", () => {
 
   it("landing index busts styles.css cache when spacing changes", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain("styles.css?v=122");
+    expect(html).toContain("styles.css?v=123");
   });
 
   it("landing final CTA uses urgent emphasis card and standard CTA", () => {
@@ -182,8 +182,9 @@ describe("device-emphasis-card-html", () => {
   it("shell pages bust styles and theme-dark for emphasis alignment", () => {
     for (const page of ["site/wallet/index.html", "site/create/index.html", "site/created/index.html"]) {
       const html = readFileSync(join(root, page), "utf8");
-      expect(html).toContain("styles.css?v=122");
-      expect(html).toContain("theme-dark.css?v=24");
+      expect(html).toContain("styles.css?v=123");
+      expect(html).toContain("theme-dark.css?v=26");
+      expect(html).toContain("device-shell.css?v=51");
     }
   });
 
@@ -204,6 +205,24 @@ describe("device-emphasis-card-html", () => {
       );
     }
     expect(emphasis).toContain(".hc-emphasis-card__cta--secondary");
+  });
+
+  it("hub saved-card rows use tier-3 emphasis depth (HUB_CARD_3D_AND_SHEET_GLASS)", () => {
+    const styles = readFileSync(join(root, "site/styles.css"), "utf8");
+    const shell = readFileSync(join(root, "site/css/device-shell.css"), "utf8");
+    for (const css of [styles, shell]) {
+      expect(css).toContain("--hc-emphasis-card-fill-info-glass");
+      expect(css).toContain("--hc-emphasis-card-shadow");
+      expect(css).toContain("--hc-emphasis-card-backdrop");
+    }
+    expect(styles).toMatch(
+      /\.hub-card-item[\s\S]*--hc-emphasis-card-fill-info-glass[\s\S]*--hc-emphasis-card-shadow/
+    );
+    expect(shell).toMatch(
+      /\.device-hub\.device-hub--sheet[\s\S]*--surface-popover-bg-glass[\s\S]*--hc-emphasis-card-backdrop/
+    );
+    const plan = readFileSync(join(root, "docs/HUB_CARD_3D_AND_SHEET_GLASS.md"), "utf8");
+    expect(plan).toContain("Steps 1–3 shipped");
   });
 
   it("phase E: rollout docs mark visual alignment v2 complete", () => {
@@ -253,5 +272,25 @@ describe("device-emphasis-card-html", () => {
     expect(src).toContain("device-keys-custody--wallet");
     expect(src).not.toContain("hc-notice--info");
     expect(src).not.toContain("HC_INFO_ICON");
+  });
+
+  it("scan vouch explainer blocks use emphasis card markup", () => {
+    const scanHtml = readFileSync(
+      join(root, "worker/src/resolver/scan-html.ts"),
+      "utf8"
+    );
+    expect(scanHtml).toContain("hc-emphasis-card--info vouch-explainer");
+    expect(scanHtml).toContain('id="vouch-explainer-copy"');
+    expect(scanHtml).toContain("hc-emphasis-card--warn vouch-ineligible");
+    expect(scanHtml).toContain("hc-emphasis-card--active vouch-success");
+
+    const scanPass = readFileSync(join(root, "site/scan-pass.css"), "utf8");
+    expect(scanPass).toMatch(
+      /\.vouch-explainer\.hc-emphasis-card[\s\S]*flex-direction:\s*column/
+    );
+
+    const vouchIssue = readFileSync(join(root, "site/js/vouch-issue.mjs"), "utf8");
+    expect(vouchIssue).toContain("hc-emphasis-card__cta vouch-use-keys-here");
+    expect(vouchIssue).toContain("emphasisCardShellHtml");
   });
 });

@@ -136,7 +136,7 @@ Prioritized follow-ups after Phases 0–5. Full tier tables: [`UI_COLOR_SCHEME_S
 | Legacy `.form-warning` (non-notice) | Create advanced blocks | `--warn` | **Shipped** — `#create-public-card-notice`; legacy `.form-warning` CSS excludes `.hc-emphasis-card` |
 | `#created-error` dynamic paths | Already Phase 4 if shipped | `--urgent` | **Shipped** — `showError()` updates `#created-error-detail` only |
 | System / resolver banner | `#device-system-banner` | Minimal or `--urgent` | Only if copy gains a CTA; else keep plain line |
-| Scan vouch explainer blocks | `scan-pass.css` | Case-by-case | Single-action cards only; do not compete with trust-tool rows |
+| Scan vouch explainer blocks | `scan-pass.css` | Case-by-case | **Shipped** — `#vouch-explainer`, `#vouch-ineligible`, `#vouch-success`, `#vouch-switch-default` use emphasis cards; `#vouch-interactive` form stays `.vouch-card` |
 
 ### Low priority / explicit out of scope
 

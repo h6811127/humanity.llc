@@ -844,20 +844,20 @@ function renderVouchSection(vm: ScanViewModel, origin: string): string {
   const createUrl = `${origin.replace(/\/$/, "")}/create/`;
   return `<section class="group scan-group scan-group-vouch scan-trust-layer" aria-label="Issue vouch">
   <h2 class="group-label">Vouch</h2>
-  <div id="vouch-explainer" class="vouch-card vouch-card-hint">
-    <div class="vouch-card-head">
-      ${scanListIcon("slate", "key")}
-      <div class="vouch-card-head-text">
-        <span class="vouch-eyebrow">Device signing</span>
-        <span class="vouch-title">Signing key in this tab</span>
+  <div id="vouch-explainer" class="hc-emphasis-card hc-emphasis-card--info vouch-explainer">
+    <div class="hc-emphasis-card__main">
+      <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
+      <div class="hc-emphasis-card__copy">
+        <p class="hc-emphasis-card__eyebrow">Device signing</p>
+        <p class="hc-emphasis-card__title">Signing key in this tab</p>
+        <p class="hc-emphasis-card__detail" id="vouch-explainer-copy">
+          Checking this tab for your card’s signing key. Steward and Vouched Human are network checks—separate from signing.
+          Use <strong>Sign as…</strong> or <a href="${escapeHtml(walletUrl)}">Saved cards</a>.
+          Only the signed vouch is sent; your private key stays here.
+        </p>
       </div>
     </div>
-    <p class="vouch-lead" id="vouch-explainer-copy">
-      Checking this tab for your card’s signing key. Steward and Vouched Human are network checks—separate from signing.
-      Use <strong>Sign as…</strong> or <a href="${escapeHtml(walletUrl)}">Saved cards</a>.
-      Only the signed vouch is sent; your private key stays here.
-    </p>
-    <div id="vouch-explainer-actions" class="vouch-explainer-actions" hidden></div>
+    <div id="vouch-explainer-actions" class="hc-emphasis-card__actions vouch-explainer-actions" hidden></div>
   </div>
   <ul class="list vouch-list">
     ${vouchIssuanceGroupRows(vm)}
@@ -937,25 +937,25 @@ function vouchIssuanceGroupRows(vm: ScanViewModel): string {
         <p class="vouch-status" id="vouch-status" aria-live="polite"></p>
       </div>
     </div>
-    <div class="vouch-card vouch-card-ineligible" id="vouch-ineligible" hidden>
-      <div class="vouch-card-head">
-        ${scanListIcon("orange", "warning")}
-        <div class="vouch-card-head-text">
-          <span class="vouch-eyebrow">Unavailable</span>
-          <span class="vouch-title">Cannot issue vouch</span>
+    <div class="hc-emphasis-card hc-emphasis-card--warn vouch-ineligible" id="vouch-ineligible" hidden>
+      <div class="hc-emphasis-card__main">
+        <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
+        <div class="hc-emphasis-card__copy">
+          <p class="hc-emphasis-card__eyebrow">Unavailable</p>
+          <p class="hc-emphasis-card__title">Cannot issue vouch</p>
+          <p class="hc-emphasis-card__detail" id="vouch-ineligible-copy"></p>
         </div>
       </div>
-      <p class="vouch-lead" id="vouch-ineligible-copy"></p>
     </div>
-    <div class="vouch-card vouch-card-success" id="vouch-success" hidden>
-      <div class="vouch-card-head">
-        ${scanListIcon("green", "people")}
-        <div class="vouch-card-head-text">
-          <span class="vouch-eyebrow">Accepted</span>
-          <span class="vouch-title">Vouch recorded</span>
+    <div class="hc-emphasis-card hc-emphasis-card--active vouch-success" id="vouch-success" hidden>
+      <div class="hc-emphasis-card__main">
+        <span class="hc-emphasis-card__dot hc-emphasis-card__dot--active" aria-hidden="true"></span>
+        <div class="hc-emphasis-card__copy">
+          <p class="hc-emphasis-card__eyebrow">Accepted</p>
+          <p class="hc-emphasis-card__title">Vouch recorded</p>
+          <p class="hc-emphasis-card__detail" id="vouch-success-copy">The signed vouch is on the network.</p>
         </div>
       </div>
-      <p class="vouch-lead" id="vouch-success-copy">The signed vouch is on the network.</p>
     </div>
   </span>
 </li>`;
@@ -964,7 +964,7 @@ function vouchIssuanceGroupRows(vm: ScanViewModel): string {
 function renderVouchIssuanceScript(vm: ScanViewModel, origin: string): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
   const assetOrigin = pagesJsOrigin(origin);
-  const mod = JSON.stringify(`${assetOrigin}/js/vouch-issue.mjs?v=12`);
+  const mod = JSON.stringify(`${assetOrigin}/js/vouch-issue.mjs?v=13`);
   return `<script type="module" src=${mod}></script>`;
 }
 

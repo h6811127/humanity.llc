@@ -1,6 +1,11 @@
 /**
  * V-002  -  vouch issuance on scan page when viewer has hc_created keys.
  */
+import {
+  emphasisCardActionsHtml,
+  emphasisCardCtaButton,
+  emphasisCardShellHtml,
+} from "./device-emphasis-card-html.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
 import { activateWalletEntry, clearTabSessionKeys } from "./device-keys.mjs";
 import {
@@ -371,7 +376,7 @@ function mountUseKeysHereButtons(eligible) {
   for (const item of withKeys) {
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "vouch-cta vouch-use-keys-here";
+    btn.className = "hc-emphasis-card__cta vouch-use-keys-here";
     btn.textContent = `Sign as ${item.label} · ${item.verificationLabel}`;
     btn.addEventListener("click", async () => {
       btn.disabled = true;
@@ -596,22 +601,28 @@ async function mountVouchSwitchDefault(session) {
       });
   const defaultLabel = cardLabel(defaultEntry);
 
-  const box = document.createElement("div");
-  box.id = "vouch-switch-default";
-  box.className = "vouch-card vouch-card-hint vouch-switch-default";
-  box.setAttribute("role", "note");
-
-  const copy = document.createElement("p");
-  copy.className = "vouch-lead";
-  copy.innerHTML =
+  const detail =
     `Active signing key: <strong>${currentLabel}</strong>. ` +
     `Default for vouching: <strong>${defaultLabel}</strong>.`;
 
-  const btn = document.createElement("button");
-  btn.type = "button";
-  btn.className = "vouch-cta vouch-switch-default-btn";
-  btn.textContent = `Switch to ${defaultLabel}`;
-  btn.addEventListener("click", () => {
+  const tpl = document.createElement("template");
+  tpl.innerHTML = emphasisCardShellHtml({
+    modifier: "info",
+    className: "vouch-switch-default",
+    id: "vouch-switch-default",
+    role: "note",
+    dot: "info",
+    eyebrow: "Default card",
+    title: "Different key active",
+    detail,
+    actionsHtml: emphasisCardActionsHtml([
+      emphasisCardCtaButton(`Switch to ${defaultLabel}`, "data-vouch-switch-default"),
+    ]),
+  }).trim();
+  const box = tpl.content.firstElementChild;
+  if (!box) return;
+
+  box.querySelector("[data-vouch-switch-default]")?.addEventListener("click", () => {
     try {
       sessionStorage.removeItem(VOUCH_SKIP_AUTO_KEY);
     } catch {
@@ -621,7 +632,6 @@ async function mountVouchSwitchDefault(session) {
     runVouchFlow({ autoActivateAttempted: true });
   });
 
-  box.append(copy, btn);
   interactive.insertBefore(box, interactive.firstChild);
 }
 

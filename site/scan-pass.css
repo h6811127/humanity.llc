@@ -1274,6 +1274,44 @@ a {
   justify-content: flex-start;
 }
 
+/* Vouch explainer / outcome cards — hc-emphasis-card (docs/HC_EMPHASIS_CARD_ROLLOUT.md backlog) */
+.vouch-explainer.hc-emphasis-card,
+.vouch-ineligible.hc-emphasis-card,
+.vouch-success.hc-emphasis-card,
+.vouch-switch-default.hc-emphasis-card {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: var(--hc-emphasis-card-gap-section);
+}
+
+.vouch-explainer.hc-emphasis-card .hc-emphasis-card__main,
+.vouch-ineligible.hc-emphasis-card .hc-emphasis-card__main,
+.vouch-success.hc-emphasis-card .hc-emphasis-card__main,
+.vouch-switch-default.hc-emphasis-card .hc-emphasis-card__main {
+  flex: none;
+  width: 100%;
+}
+
+.vouch-explainer-actions.hc-emphasis-card__actions,
+.vouch-switch-default.hc-emphasis-card .hc-emphasis-card__actions {
+  width: 100%;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.vouch-explainer-actions .hc-emphasis-card__cta,
+.vouch-switch-default .hc-emphasis-card__cta {
+  width: 100%;
+  text-align: center;
+}
+
+.vouch-explainer .hc-emphasis-card__detail a {
+  color: #0a84ff;
+  font-weight: 600;
+}
+
 .scan-offline-banner {
   margin: 0 var(--pad) 12px;
   padding: 12px 14px;
