@@ -40,7 +40,7 @@ If `schema` is `missing`, run the hosted migrations before investigating hosted 
 | `sessions.active` | Non-expired steward bearer sessions. |
 | `usage` | Current UTC-day usage counters grouped by event. |
 | `alerts` | Account-level alert candidates for the selected UTC day. |
-| `push` | In-memory SSE connection counts for this Worker isolate. |
+| `push` | In-memory SSE connection counts and delivery latency samples for this Worker isolate. |
 | `controls` | Fair-use and SLA thresholds copied from the governance docs. |
 
 `push` is per isolate and should be treated as a live debug signal, not a durable monthly metric.
@@ -55,11 +55,13 @@ If `schema` is `missing`, run the hosted migrations before investigating hosted 
    - `hosted_auto_poll_soft_cap` means account-level usage reached **50,000** auto live-proof polls/day.
    - `hosted_auto_poll_hard_cap` means account-level usage reached **100,000** auto live-proof polls/day.
    - `hosted_push_delivered_daily_cap` means push delivery reached **10,000** deliveries/day.
+   - `hosted_push_latency_p95` means in-isolate push p95 exceeded **5s**.
+   - `hosted_push_latency_p99` means in-isolate push p99 exceeded **15s**.
 4. Check `usage`:
    - `poll.live_proof.auto` near **50,000/account/day** means soft-cap review.
    - `poll.live_proof.auto` near **100,000/account/day** means hard-cap/fair-use intervention.
    - `notify.push.delivered` near **10,000/account/day** means push fan-out review.
-5. Check `push.active_connections` against `push.max_connections_per_account`.
+5. Check `push.active_connections` against `push.max_connections_per_account` and `push.delivery_latency` against SLA targets.
 6. Cross-check Cloudflare Workers analytics for 429 rate, 5xx rate, request volume, and push p95 latency.
 
 ---

@@ -28,6 +28,9 @@ export const STEWARD_PUSH_HEARTBEAT_MS = 30_000;
 
 export const CONNECTION_ACK_TYPE = "connection.ack";
 
+/** In-memory per-isolate latency samples for E6 ops snapshots. */
+export const STEWARD_PUSH_LATENCY_SAMPLE_LIMIT = 200;
+
 export class StewardPushConnectionLimitError extends Error {
   constructor(message = "steward_push_connection_limit") {
     super(message);
@@ -70,8 +73,15 @@ export interface StewardPushSink {
   close?: () => void;
 }
 
+interface StewardPushLatencySample {
+  accountId: string;
+  latencyMs: number;
+  deliveredAt: string;
+}
+
 const connectionsByAccount = new Map<string, Set<StewardPushSink>>();
 const connectionCountByIp = new Map<string, number>();
+const deliveryLatencySamples: StewardPushLatencySample[] = [];
 
 /**
  * @param {StewardPushSink} sink
@@ -120,6 +130,60 @@ export function stewardPushConnectionSummary(): {
   };
 }
 
+function percentile(sortedValues: number[], percentileRank: number): number | null {
+  if (sortedValues.length === 0) return null;
+  const idx = Math.min(
+    sortedValues.length - 1,
+    Math.max(0, Math.ceil((percentileRank / 100) * sortedValues.length) - 1)
+  );
+  return sortedValues[idx] ?? null;
+}
+
+export function recordStewardPushDeliveryLatency(
+  accountId: string,
+  issuedAt: string,
+  deliveredAtMs = Date.now()
+): number | null {
+  const issuedMs = Date.parse(issuedAt);
+  if (!Number.isFinite(issuedMs)) return null;
+  const latencyMs = Math.max(0, Math.round(deliveredAtMs - issuedMs));
+  deliveryLatencySamples.push({
+    accountId,
+    latencyMs,
+    deliveredAt: new Date(deliveredAtMs).toISOString(),
+  });
+  if (deliveryLatencySamples.length > STEWARD_PUSH_LATENCY_SAMPLE_LIMIT) {
+    deliveryLatencySamples.splice(
+      0,
+      deliveryLatencySamples.length - STEWARD_PUSH_LATENCY_SAMPLE_LIMIT
+    );
+  }
+  return latencyMs;
+}
+
+export function stewardPushDeliveryLatencySummary(): {
+  sample_count: number;
+  p95_ms: number | null;
+  p99_ms: number | null;
+  max_ms: number | null;
+  oldest_sample_at: string | null;
+  newest_sample_at: string | null;
+} {
+  const values = deliveryLatencySamples
+    .map((sample) => sample.latencyMs)
+    .sort((a, b) => a - b);
+  return {
+    sample_count: values.length,
+    p95_ms: percentile(values, 95),
+    p99_ms: percentile(values, 99),
+    max_ms: values.length ? values[values.length - 1] ?? null : null,
+    oldest_sample_at: deliveryLatencySamples[0]?.deliveredAt ?? null,
+    newest_sample_at:
+      deliveryLatencySamples[deliveryLatencySamples.length - 1]?.deliveredAt ??
+      null,
+  };
+}
+
 /** E5.4 — drop in-memory SSE sinks when subscription expires. */
 export function closeStewardPushConnectionsForAccount(accountId: string): void {
   const set = connectionsByAccount.get(accountId);
@@ -162,6 +226,7 @@ export function registerStewardPushIp(clientIp: string): () => void {
 export function clearStewardPushConnectionsForTests(): void {
   connectionsByAccount.clear();
   connectionCountByIp.clear();
+  deliveryLatencySamples.splice(0, deliveryLatencySamples.length);
 }
 
 export function formatSsePingComment(): string {
@@ -372,6 +437,7 @@ export async function notifyLiveProofPending(
     try {
       sink.write(chunk);
       delivered += 1;
+      recordStewardPushDeliveryLatency(accountId, input.issued_at);
       try {
         await incrementUsage(
           db,

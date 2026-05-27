@@ -6,6 +6,7 @@ import {
   STEWARD_PUSH_MAX_CONNECTIONS_PER_ACCOUNT,
   STEWARD_PUSH_MAX_CONNECTIONS_PER_IP,
   stewardPushConnectionSummary,
+  stewardPushDeliveryLatencySummary,
 } from "../steward/push";
 import { utcDayKey } from "../steward/plans";
 import type { Env } from "../index";
@@ -15,6 +16,8 @@ const PUSH_DELIVERED_EVENT = "notify.push.delivered";
 const HOSTED_AUTO_POLL_SOFT_DAILY_CAP = 50_000;
 const HOSTED_AUTO_POLL_HARD_DAILY_CAP = 100_000;
 const HOSTED_PUSH_DELIVERED_DAILY_CAP = 10_000;
+const HOSTED_PUSH_P95_TARGET_MS = 5_000;
+const HOSTED_PUSH_P99_TARGET_MS = 15_000;
 
 type StewardOpsAlert = {
   severity: "warning" | "critical";
@@ -168,6 +171,35 @@ function usageAlertsForRows(
   return alerts;
 }
 
+function pushLatencyAlerts(summary: ReturnType<typeof stewardPushDeliveryLatencySummary>): StewardOpsAlert[] {
+  const alerts: StewardOpsAlert[] = [];
+  if (summary.p95_ms !== null && summary.p95_ms > HOSTED_PUSH_P95_TARGET_MS) {
+    alerts.push({
+      severity: "warning",
+      code: "hosted_push_latency_p95",
+      account_id: "*",
+      event: "live_proof.pending.delivery",
+      count: summary.p95_ms,
+      threshold: HOSTED_PUSH_P95_TARGET_MS,
+      devices: 0,
+      message: "Hosted live-proof push p95 latency exceeded the SLA target.",
+    });
+  }
+  if (summary.p99_ms !== null && summary.p99_ms > HOSTED_PUSH_P99_TARGET_MS) {
+    alerts.push({
+      severity: "critical",
+      code: "hosted_push_latency_p99",
+      account_id: "*",
+      event: "live_proof.pending.delivery",
+      count: summary.p99_ms,
+      threshold: HOSTED_PUSH_P99_TARGET_MS,
+      devices: 0,
+      message: "Hosted live-proof push p99 latency exceeded the SLA target.",
+    });
+  }
+  return alerts;
+}
+
 /**
  * GET /.well-known/hc/v1/operator/steward-ops
  * Operator-only hosted tier snapshot for E6 runbooks and dashboards.
@@ -203,6 +235,7 @@ export async function handleGetStewardOpsSnapshot(
   const hostedEnabled = hostedStewardEnabled(env);
   const schemaReady = await stewardSchemaReady(db);
   const push = stewardPushConnectionSummary();
+  const deliveryLatency = stewardPushDeliveryLatencySummary();
 
   if (!schemaReady) {
     return jsonResponse(
@@ -211,8 +244,11 @@ export async function handleGetStewardOpsSnapshot(
         hosted_steward_enabled: hostedEnabled,
         schema: "missing",
         period: { window: "utc_day", key: dayKey },
-        alerts: [],
-        push,
+        alerts: pushLatencyAlerts(deliveryLatency),
+        push: {
+          ...push,
+          delivery_latency: deliveryLatency,
+        },
         runbook: "docs/HOSTED_STEWARD_OPS_RUNBOOK.md",
       },
       200
@@ -226,7 +262,10 @@ export async function handleGetStewardOpsSnapshot(
     usageCountersForDay(db, dayKey),
     usageAlertInputsForDay(db, dayKey),
   ]);
-  const alerts = usageAlertsForRows(alertInputs);
+  const alerts = [
+    ...usageAlertsForRows(alertInputs),
+    ...pushLatencyAlerts(deliveryLatency),
+  ];
 
   return jsonResponse(
     {
@@ -242,6 +281,7 @@ export async function handleGetStewardOpsSnapshot(
       alerts,
       push: {
         ...push,
+        delivery_latency: deliveryLatency,
         max_connections_per_account: STEWARD_PUSH_MAX_CONNECTIONS_PER_ACCOUNT,
         max_connections_per_ip: STEWARD_PUSH_MAX_CONNECTIONS_PER_IP,
       },
@@ -253,7 +293,8 @@ export async function handleGetStewardOpsSnapshot(
         },
         sla: {
           resolver_uptime_monthly_target: "99.5%",
-          live_proof_push_p95_target_seconds: 5,
+          live_proof_push_p95_target_ms: HOSTED_PUSH_P95_TARGET_MS,
+          live_proof_push_p99_target_ms: HOSTED_PUSH_P99_TARGET_MS,
         },
       },
       runbook: "docs/HOSTED_STEWARD_OPS_RUNBOOK.md",

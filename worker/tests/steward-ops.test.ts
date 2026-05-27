@@ -4,6 +4,7 @@ import worker from "../src";
 import { handleGetStewardOpsSnapshot } from "../src/resolver/steward-ops";
 import {
   clearStewardPushConnectionsForTests,
+  recordStewardPushDeliveryLatency,
   registerStewardPushIp,
   registerStewardPushSink,
 } from "../src/steward/push";
@@ -260,8 +261,9 @@ describe("operator steward ops snapshot", () => {
         active_connections: number;
         active_client_ips: number;
         max_connections_per_account: number;
+        delivery_latency: { sample_count: number };
       };
-      controls: { sla: { live_proof_push_p95_target_seconds: number } };
+      controls: { sla: { live_proof_push_p95_target_ms: number } };
     };
     expect(body.hosted_steward_enabled).toBe(true);
     expect(body.accounts).toContainEqual({
@@ -280,7 +282,8 @@ describe("operator steward ops snapshot", () => {
     expect(body.push.active_connections).toBe(1);
     expect(body.push.active_client_ips).toBe(1);
     expect(body.push.max_connections_per_account).toBe(5);
-    expect(body.controls.sla.live_proof_push_p95_target_seconds).toBe(5);
+    expect(body.push.delivery_latency.sample_count).toBe(0);
+    expect(body.controls.sla.live_proof_push_p95_target_ms).toBe(5_000);
   });
 
   it("returns alert candidates for account-level daily thresholds", async () => {
@@ -353,6 +356,59 @@ describe("operator steward ops snapshot", () => {
         account_id: "acc_push",
         count: 10_000,
         threshold: 10_000,
+      })
+    );
+  });
+
+  it("returns push latency samples and alert candidates", async () => {
+    recordStewardPushDeliveryLatency(
+      "acc_latency",
+      "2026-05-27T12:00:00.000Z",
+      Date.parse("2026-05-27T12:00:06.000Z")
+    );
+    recordStewardPushDeliveryLatency(
+      "acc_latency",
+      "2026-05-27T12:00:00.000Z",
+      Date.parse("2026-05-27T12:00:16.000Z")
+    );
+
+    const res = await handleGetStewardOpsSnapshot(
+      new Request(`${URL}?day=2026-05-27`, {
+        headers: { Authorization: `Bearer ${TOKEN}` },
+      }),
+      { HOSTED_STEWARD_ENABLED: "1" } as Env,
+      new FakeStewardOpsDb() as unknown as D1Database,
+      TOKEN
+    );
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      push: {
+        delivery_latency: {
+          sample_count: number;
+          p95_ms: number;
+          p99_ms: number;
+        };
+      };
+      alerts: Array<{ severity: string; code: string; count: number; threshold: number }>;
+    };
+    expect(body.push.delivery_latency.sample_count).toBe(2);
+    expect(body.push.delivery_latency.p95_ms).toBe(16_000);
+    expect(body.push.delivery_latency.p99_ms).toBe(16_000);
+    expect(body.alerts).toContainEqual(
+      expect.objectContaining({
+        severity: "warning",
+        code: "hosted_push_latency_p95",
+        count: 16_000,
+        threshold: 5_000,
+      })
+    );
+    expect(body.alerts).toContainEqual(
+      expect.objectContaining({
+        severity: "critical",
+        code: "hosted_push_latency_p99",
+        count: 16_000,
+        threshold: 15_000,
       })
     );
   });

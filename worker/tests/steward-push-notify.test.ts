@@ -6,10 +6,12 @@ import {
   formatLiveProofPendingSse,
   LIVE_PROOF_PENDING_TYPE,
   notifyLiveProofPending,
+  recordStewardPushDeliveryLatency,
   registerStewardPushSink,
   StewardPushConnectionLimitError,
   STEWARD_PUSH_MAX_CONNECTIONS_PER_ACCOUNT,
   stewardPushConnectionCount,
+  stewardPushDeliveryLatencySummary,
 } from "../src/steward/push";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
@@ -141,6 +143,26 @@ describe("notifyLiveProofPending", () => {
     expect(writes[0]).toContain(CHALLENGE);
     expect(incrementCalls.length).toBe(1);
     expect(incrementCalls[0]?.[1]).toBe("dev_1");
+    expect(stewardPushDeliveryLatencySummary().sample_count).toBe(1);
+  });
+
+  it("summarizes in-memory delivery latency samples for ops", () => {
+    const deliveredAt = Date.parse("2026-05-26T12:00:10.000Z");
+    expect(
+      recordStewardPushDeliveryLatency(
+        ACCOUNT,
+        "2026-05-26T12:00:00.000Z",
+        deliveredAt
+      )
+    ).toBe(10_000);
+    expect(
+      recordStewardPushDeliveryLatency(ACCOUNT, "not-a-date", deliveredAt)
+    ).toBeNull();
+    const summary = stewardPushDeliveryLatencySummary();
+    expect(summary.sample_count).toBe(1);
+    expect(summary.p95_ms).toBe(10_000);
+    expect(summary.p99_ms).toBe(10_000);
+    expect(summary.max_ms).toBe(10_000);
   });
 
   it("skips when profile is not linked to an account", async () => {
