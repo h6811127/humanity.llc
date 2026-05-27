@@ -195,6 +195,14 @@ function bindOrphanClearKeys(root, entry) {
   });
 }
 
+function clearHubCrossTabNotice() {
+  if (!hubSlot) return;
+  hubSlot.hidden = true;
+  hubSlot.innerHTML = "";
+  hubSlot.className = "device-hub-group";
+  delete hubSlot.dataset.hubSearchable;
+}
+
 function renderHubOrphanRemovedNotice() {
   if (!hubSlot) return;
   if (!shouldShowOrphanHubNotice()) {
@@ -206,16 +214,21 @@ function renderHubOrphanRemovedNotice() {
     return false;
   }
 
+  const actions = [
+    emphasisCardCtaButton("Open that tab", "data-orphan-focus-tab"),
+    emphasisCardCtaSecondary("Clear keys on this device", "data-orphan-clear-keys"),
+  ];
+
   hubSlot.hidden = false;
-  hubSlot.innerHTML = `
-    <div class="device-hub-crosstab-card device-hub-crosstab-card--orphan" data-hub-searchable="keys removed card another tab">
-      <button type="button" class="device-hub-notice-banner device-hub-notice-banner--info" data-orphan-focus-tab>
-        <span class="device-hub-notice-title">${escapeHtml(ORPHAN_KEYS_INBOX_TITLE)}</span>
-        <span class="device-hub-notice-sub">${escapeHtml(ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX)} · ${msg.label}${msg.extra}</span>
-        <span class="device-hub-notice-chevron" aria-hidden="true">›</span>
-      </button>
-      <button type="button" class="device-hub-notice-secondary" data-orphan-clear-keys>Clear keys on this device</button>
-    </div>`;
+  hubSlot.className = "device-hub-group hc-emphasis-card hc-emphasis-card--warn";
+  hubSlot.dataset.hubSearchable = "keys removed card another tab";
+  hubSlot.innerHTML = emphasisCardBodyHtml({
+    eyebrow: ORPHAN_KEYS_INBOX_TITLE,
+    title: `${msg.label}${msg.extra}`,
+    detail: `${ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX} Open that tab to close it, or clear keys on this device.`,
+    dot: "warn",
+    actionsHtml: emphasisCardActionsHtml(actions),
+  });
 
   hubSlot.querySelector("[data-orphan-focus-tab]")?.addEventListener("click", (e) => {
     e.preventDefault();
@@ -231,32 +244,38 @@ function renderHubCrossTabNotice() {
     return;
   }
   if (!shouldShowCrossTabNotice()) {
-    hubSlot.hidden = true;
-    hubSlot.innerHTML = "";
+    clearHubCrossTabNotice();
     return;
   }
   const others = gatherInboxInput().crossTabEntries;
   const msg = crossTabMessage(others);
   if (!msg) {
-    hubSlot.hidden = true;
-    hubSlot.innerHTML = "";
+    clearHubCrossTabNotice();
     return;
   }
   const walletEntry = walletEntryForVouchHere(msg.primary.profile_id);
-  const useKeysBtn = walletEntry
-    ? `<button type="button" class="device-hub-notice-secondary" data-cross-tab-use-keys>Open controls here</button>`
-    : "";
+  const subtext = vouchCrossTabSubtext().replace(/^\s*-\s*/, "").trim();
+  const detail = subtext
+    ? `${subtext.charAt(0).toUpperCase()}${subtext.slice(1)}`
+    : "Open that tab to continue.";
+
+  const actions = [emphasisCardCtaButton("Open that tab", "data-cross-tab-action")];
+  if (walletEntry) {
+    actions.push(
+      emphasisCardCtaSecondary("Open controls here", "data-cross-tab-use-keys")
+    );
+  }
 
   hubSlot.hidden = false;
-  hubSlot.innerHTML = `
-    <div class="device-hub-crosstab-card" data-hub-searchable="keys another tab">
-      <button type="button" class="device-hub-notice-banner device-hub-notice-banner--info" data-cross-tab-action>
-        <span class="device-hub-notice-title">Keys in another tab</span>
-        <span class="device-hub-notice-sub">${msg.label}${msg.extra}${vouchCrossTabSubtext()}</span>
-        <span class="device-hub-notice-chevron" aria-hidden="true">›</span>
-      </button>
-      ${useKeysBtn}
-    </div>`;
+  hubSlot.className = "device-hub-group hc-emphasis-card hc-emphasis-card--info";
+  hubSlot.dataset.hubSearchable = "keys another tab";
+  hubSlot.innerHTML = emphasisCardBodyHtml({
+    eyebrow: "Keys in another tab",
+    title: `${msg.label}${msg.extra}`,
+    detail,
+    dot: "info",
+    actionsHtml: emphasisCardActionsHtml(actions),
+  });
   bindCrossTabAction(hubSlot, msg.primary);
   bindUseKeysHere(hubSlot, walletEntry?.profile_id ?? msg.primary.profile_id);
 }

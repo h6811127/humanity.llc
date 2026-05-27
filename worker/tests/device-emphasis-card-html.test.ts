@@ -31,7 +31,7 @@ describe("device-emphasis-card-html", () => {
 
   it("landing index busts styles.css cache when spacing changes", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain("styles.css?v=121");
+    expect(html).toContain("styles.css?v=122");
   });
 
   it("landing final CTA uses urgent emphasis card and standard CTA", () => {
@@ -149,7 +149,7 @@ describe("device-emphasis-card-html", () => {
   it("shell pages bust styles and theme-dark for emphasis alignment", () => {
     for (const page of ["site/wallet/index.html", "site/create/index.html", "site/created/index.html"]) {
       const html = readFileSync(join(root, page), "utf8");
-      expect(html).toContain("styles.css?v=120");
+      expect(html).toContain("styles.css?v=122");
       expect(html).toContain("theme-dark.css?v=24");
     }
   });
@@ -191,6 +191,9 @@ describe("device-emphasis-card-html", () => {
     expect(styles).toMatch(
       /#wallet-tab-hint\.hc-emphasis-card[\s\S]*flex-direction:\s*column/
     );
+    expect(styles).toMatch(
+      /#device-hub-crosstab-notice\.hc-emphasis-card[\s\S]*flex-direction:\s*column/
+    );
 
     const scanPass = readFileSync(join(root, "site/scan-pass.css"), "utf8");
     expect(scanPass).toMatch(
@@ -200,5 +203,13 @@ describe("device-emphasis-card-html", () => {
     const emphasis = readFileSync(join(root, "site/css/hc-emphasis-card.css"), "utf8");
     expect(emphasis).toContain("-webkit-appearance: none");
     expect(emphasis).toContain(".hc-emphasis-card__actions > *");
+  });
+
+  it("hub cross-tab slot uses emphasis card markup", () => {
+    const src = readFileSync(join(root, "site/js/device-cross-tab-banner.mjs"), "utf8");
+    expect(src).toContain("hubSlot.className = \"device-hub-group hc-emphasis-card hc-emphasis-card--info\"");
+    expect(src).toContain("hc-emphasis-card hc-emphasis-card--warn");
+    expect(src).not.toContain("device-hub-notice-banner--info");
+    expect(src).not.toContain("device-hub-crosstab-card");
   });
 });

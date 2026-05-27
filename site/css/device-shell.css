@@ -1314,9 +1314,13 @@ button.device-hub-notice-banner {
 }
 
 .device-hub-alerts-top #device-hub-notice-group,
-.device-hub-alerts-top #device-hub-crosstab-notice {
+.device-hub-alerts-top #device-hub-crosstab-notice:not(.hc-emphasis-card) {
   background: transparent;
   box-shadow: none;
+  margin-bottom: 8px;
+}
+
+.device-hub-alerts-top #device-hub-crosstab-notice.hc-emphasis-card {
   margin-bottom: 8px;
 }
 

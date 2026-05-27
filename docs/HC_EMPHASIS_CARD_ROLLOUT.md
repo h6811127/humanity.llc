@@ -126,7 +126,7 @@ Prioritized follow-ups after Phases 0–5. Full tier tables: [`UI_COLOR_SCHEME_S
 | Hub keys custody | `#device-keys-custody-hub` (`device-keys-custody.mjs` `--hub`) | `--info` | Replace flat `hc-notice--info` + icon tile; keep Acknowledge |
 | Wallet keys custody | `#device-keys-custody-wallet` (`--wallet`) | `--info` | Same as hub |
 | Compact custody strip | `device-keys-custody--compact` | `--warn` | Landing/create inline strip |
-| Hub cross-tab slot | `#device-hub-crosstab-notice` | `--info` | Optional: match page banner or keep solid hub-blue tap target (product choice) |
+| Hub cross-tab slot | `#device-hub-crosstab-notice` | `--info` / `--warn` | **Shipped** — emphasis card + pill CTAs (matches page/wallet cross-tab) |
 | Vouch return | `#created-vouch-return-banner` | `--active` or `--info` | Post-vouch continuity; green/neutral vs success dot |
 
 ### Medium value (workspace + flows)

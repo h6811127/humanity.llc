@@ -1566,7 +1566,8 @@ a.hub-card-menu-item {
 .landing-framing.hc-emphasis-card,
 .landing-final-cta.hc-emphasis-card,
 .device-cross-tab-banner.hc-emphasis-card,
-#wallet-tab-hint.hc-emphasis-card {
+#wallet-tab-hint.hc-emphasis-card,
+#device-hub-crosstab-notice.hc-emphasis-card {
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
@@ -1576,9 +1577,19 @@ a.hub-card-menu-item {
 .landing-framing.hc-emphasis-card .hc-emphasis-card__main,
 .landing-final-cta.hc-emphasis-card .hc-emphasis-card__main,
 .device-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__main,
-#wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__main {
+#wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__main,
+#device-hub-crosstab-notice.hc-emphasis-card .hc-emphasis-card__main {
   flex: none;
   width: 100%;
+}
+
+.landing-framing.hc-emphasis-card .hc-emphasis-card__actions,
+.landing-final-cta.hc-emphasis-card .hc-emphasis-card__actions,
+.device-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__actions,
+#wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__actions,
+#device-hub-crosstab-notice.hc-emphasis-card .hc-emphasis-card__actions {
+  width: 100%;
+  justify-content: flex-start;
 }
 
 /* Landing framing — hc-emphasis-card--info (see docs/LANDING_FINAL_CTA_EMPHASIS_CARD.md) */
@@ -5761,13 +5772,15 @@ details[open] > .created-advanced-summary::after {
 
 /* Safari flex-wrap + narrow column — match scan (docs/SCAN_CROSS_TAB_BANNER_SAFARI_LAYOUT_INVESTIGATION.md) */
 .device-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__main,
-#wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__main {
+#wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__main,
+#device-hub-crosstab-notice.hc-emphasis-card .hc-emphasis-card__main {
   flex: none;
   width: 100%;
 }
 
 .device-cross-tab-banner.hc-emphasis-card .hc-emphasis-card__actions,
-#wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__actions {
+#wallet-tab-hint.hc-emphasis-card .hc-emphasis-card__actions,
+#device-hub-crosstab-notice.hc-emphasis-card .hc-emphasis-card__actions {
   width: 100%;
   justify-content: flex-start;
 }
