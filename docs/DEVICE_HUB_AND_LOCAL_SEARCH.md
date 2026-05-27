@@ -75,6 +75,8 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Hub status line simplification (Step 2):** The sheet status panel is one inline read: network state first, muted saved/pinned counts next, and compact alert-weight items only for tab keys / live proof / proof-check warnings. This keeps zero counts visible without a separate wrapped `0 pinned` badge.
 
+**Hub nav rebalance (Step 3):** Close is the stronger 42px escape control; Home remains available as a quieter 40px navigation target. This keeps both controls tappable without letting Home compete with the sheet exit.
+
 **Chrome inbox (shipped):** Floating **inbox badge** next to the status dot when action items exist; hub `#device-hub-alerts-top` holds full rows. Spec and roadmap: [`DEVICE_INBOX.md`](DEVICE_INBOX.md). Status dot semantics: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md).
 
 **Hub intro coachmark (shipped):** First visit on `/`, `/create/`, and `/created/` points at the status dot; `hc_device_hub_intro_seen` prevents repeat on refresh, `hc_device_hub_intro_dismissed` after **Got it** or opening the hub. Not on `/wallet/`. Spec: [`DEVICE_HUB_INTRO_COACHMARK.md`](DEVICE_HUB_INTRO_COACHMARK.md).

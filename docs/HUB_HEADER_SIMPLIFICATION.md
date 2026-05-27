@@ -1,6 +1,6 @@
 # Hub header simplification
 
-**Status:** Steps 1-2 shipped
+**Status:** Steps 1-3 shipped
 **Scope:** Bottom-sheet hub header on `/`, `/create/`, and `/created/`  
 **Companions:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md), [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md)
 
@@ -63,6 +63,8 @@ The first screen of the hub should prioritize:
 - Keep Close stronger than Home because it exits the sheet; keep Home available but quieter.
 - Verify tap targets remain at least 40px.
 
+**Shipped:** Home is a quieter 40px navigation target; Close is a stronger 42px escape control with higher contrast and pressed feedback.
+
 ### Step 4 - Manual QA pass
 
 - Mobile Safari-width smoke: open hub, close hub, tap Home, tap New, scroll saved items.
@@ -76,5 +78,6 @@ The first screen of the hub should prioritize:
 - The top rail contains Home + status only; Create no longer competes with Close or the title.
 - The saved-items heading exposes a compact **+ New** action.
 - The status panel stays on one inline row in the empty-wallet case: network + muted `0 cards` / `0 pinned`.
+- Home and Close both meet the 40px minimum tap target, with Close visually stronger than Home.
 - Existing hub open/close state contracts still route through `setHubSheetOpen()` / `setHubExpanded()`.
 - No new module imports are added to the status-dot graph.

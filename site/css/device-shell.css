@@ -872,15 +872,18 @@ button.device-hub-notice-banner {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  border: none;
-  background: rgba(120, 120, 128, 0.14);
-  color: var(--shell-label-strong, #1c1c1e);
+  border: 0.5px solid transparent;
+  background: rgba(120, 120, 128, 0.08);
+  color: var(--surface-popover-fg-muted, var(--shell-label, rgba(60, 60, 67, 0.62)));
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.2s var(--shell-spring);
+  transition:
+    background-color 0.2s var(--shell-ease),
+    color 0.2s var(--shell-ease),
+    transform 0.2s var(--shell-spring);
 }
 
 .device-hub-home-btn svg {
@@ -891,6 +894,7 @@ button.device-hub-notice-banner {
 
 .device-hub-home-btn:active {
   transform: scale(0.96);
+  background: rgba(120, 120, 128, 0.12);
 }
 
 .device-hub-status-panel {
@@ -1810,23 +1814,29 @@ button.hub-card-action.hub-use-keys {
 
 .device-hub-sheet-close {
   position: absolute;
-  top: 8px;
-  right: 10px;
+  top: 6px;
+  right: 8px;
   z-index: 4;
-  width: 32px;
-  height: 32px;
+  width: 42px;
+  height: 42px;
   border: none;
   border-radius: 50%;
-  background: var(--surface-popover-control-bg, rgba(120, 120, 128, 0.12));
-  font-size: 22px;
+  background: var(--surface-popover-control-bg, rgba(120, 120, 128, 0.16));
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  font-size: 24px;
   line-height: 1;
-  color: var(--surface-popover-fg-muted, rgba(60, 60, 67, 0.72));
+  color: var(--surface-popover-control-fg, var(--surface-popover-fg, #1c1c1e));
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 0.2s var(--shell-ease),
+    transform 0.2s var(--shell-spring),
+    opacity 0.2s ease;
 }
 
 .device-hub-sheet-close:active {
   opacity: 0.82;
+  transform: scale(0.96);
 }
 
 .device-hub-backdrop {
