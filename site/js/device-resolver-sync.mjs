@@ -147,11 +147,12 @@ export function initResolverTabSync() {
 
 /**
  * Follower auto hub visibility refresh may skip GETs when a fresh leader snapshot exists.
+ * Uses snapshot TTL only — not live-control poll leader lock (vacant lock must not force refetch).
  */
 export function shouldFollowerSkipAutoNetworkFetch(now = Date.now()) {
   return shouldFollowerSkipNetworkFetch({
     syncEnabled: readResolverSyncTabsPref(),
-    isLeader: isLiveControlPollLeaderTab(now),
+    isLeader: false,
     snapshotAt: lastReceivedSnapshotAt,
     now,
     ttlMs: RESOLVER_SYNC_SNAPSHOT_TTL_MS,
@@ -164,7 +165,7 @@ export function shouldFollowerSkipAutoNetworkFetch(now = Date.now()) {
 export function shouldFollowerSkipAutoHealthFetch(now = Date.now()) {
   return shouldFollowerSkipHealthFetch({
     syncEnabled: readResolverSyncTabsPref(),
-    isLeader: isLiveControlPollLeaderTab(now),
+    isLeader: false,
     snapshotAt: lastReceivedHealthAt,
     now,
     ttlMs: HEALTH_SNAPSHOT_TTL_MS,

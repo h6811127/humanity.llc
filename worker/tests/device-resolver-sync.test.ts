@@ -46,7 +46,7 @@ describe("device-resolver-sync-core", () => {
     expect(parseNetworkSnapshotMessage({ type: "network-snapshot", entries: [] })).toBeNull();
   });
 
-  it("skips follower fetch when snapshot is fresh and tab is not leader", () => {
+  it("skips auto fetch when snapshot is fresh (sync on)", () => {
     const now = 100_000;
     expect(
       shouldFollowerSkipNetworkFetch({
@@ -60,9 +60,10 @@ describe("device-resolver-sync-core", () => {
     expect(
       shouldFollowerSkipNetworkFetch({
         syncEnabled: true,
-        isLeader: true,
-        snapshotAt: now - 1000,
+        isLeader: false,
+        snapshotAt: now - 90_000,
         now,
+        ttlMs: RESOLVER_SYNC_SNAPSHOT_TTL_MS,
       })
     ).toBe(false);
     expect(
