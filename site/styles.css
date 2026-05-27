@@ -6369,8 +6369,8 @@ p.hc-notice:not(:has(.hc-notice-content)) a {
   border: none !important;
 }
 
-/* Legacy warning block without .hc-notice — do not override tinted hc-notice banners */
-.form-warning:not(.hc-notice):not(.hc-notice--error) {
+/* Legacy warning block without emphasis card — do not override hc-emphasis-card surfaces */
+.form-warning:not(.hc-notice):not(.hc-notice--error):not(.hc-emphasis-card) {
   display: flex;
   gap: 10px;
   align-items: flex-start;

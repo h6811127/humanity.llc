@@ -150,6 +150,25 @@ describe("device-emphasis-card-html", () => {
     );
   });
 
+  it("created showError only updates created-error-detail", () => {
+    const src = readFileSync(join(root, "site/js/created.mjs"), "utf8");
+    expect(src).toContain('getElementById("created-error-detail")');
+    const showErrorFn = src.match(/function showError\(msg\) \{[\s\S]*?\n\}/);
+    expect(showErrorFn?.[0]).toContain("errorDetailEl.textContent");
+    expect(showErrorFn?.[0]).not.toContain("innerHTML");
+
+    const html = readFileSync(join(root, "site/created/index.html"), "utf8");
+    expect(html).toContain('id="created-error-detail"');
+    expect(html).not.toMatch(/id="created-error"[^>]*form-warning/);
+  });
+
+  it("create flow warnings use emphasis card without legacy form-warning class", () => {
+    const html = readFileSync(join(root, "site/create/index.html"), "utf8");
+    expect(html).toContain('id="create-public-card-notice"');
+    expect(html).toContain("hc-emphasis-card--warn flow-form-warning");
+    expect(html).not.toContain("form-warning flow-form-warning");
+  });
+
   it("scan bundle propagates phase B/C emphasis tokens and dark glass rules", () => {
     const scanPass = readFileSync(join(root, "site/scan-pass.css"), "utf8");
     expect(scanPass).toContain("--hc-emphasis-card-fill-active-glass");

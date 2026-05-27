@@ -203,7 +203,7 @@ Prioritized places that could adopt the same **raised card** pattern. Extraction
 | Public card warning | `#create-public-card-notice` on `/create/` | **Shipped** — `hc-emphasis-card--warn` (Phase 4) |
 | Keys custody (created) | `device-keys-custody--created` | **Shipped** — `hc-emphasis-card--warn` (Phase 4) |
 | Keys custody (hub/wallet) | `#device-keys-custody-hub`, `-wallet` | **Shipped** — `--info` emphasis cards (`device-keys-custody-html.test.ts`) |
-| Flow warnings | `.form-warning` legacy (non-notice) | Backlog | Migrate when touching create UX |
+| Flow warnings | `.form-warning` legacy (non-notice) | **Shipped** — create public-card notice uses `hc-emphasis-card--warn`; no legacy `form-warning` class |
 
 #### Tier 6 — Hub card context (use with care)
 

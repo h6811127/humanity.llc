@@ -2280,7 +2280,7 @@ body.device-shell-created .created-screen {
   line-height: 1.4;
 }
 
-.flow-form-warning {
+.flow-form-warning.hc-emphasis-card {
   margin-top: 12px;
   margin-bottom: 12px;
 }

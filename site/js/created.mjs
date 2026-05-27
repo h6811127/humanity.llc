@@ -50,24 +50,12 @@ const liveReturnUrlParam = params.get("return_url")?.trim() || null;
 const vouchIntentParam = params.get("intent") === "vouch";
 
 const errorEl = document.getElementById("created-error");
-function showError(msg) {
-  if (!errorEl) return;
-  errorEl.hidden = false;
-  const detail =
-    errorEl.querySelector("#created-error-detail") ??
-    errorEl.querySelector(".hc-emphasis-card__detail");
-  if (detail) {
-    detail.textContent = String(msg);
-    return;
-  }
-  errorEl.innerHTML = `<p class="hc-notice-body">${escapeHtml(String(msg))}</p>`;
-}
+const errorDetailEl = document.getElementById("created-error-detail");
 
-function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+function showError(msg) {
+  if (!errorEl || !errorDetailEl) return;
+  errorEl.hidden = false;
+  errorDetailEl.textContent = String(msg);
 }
 
 function setNoSessionNotice(html) {

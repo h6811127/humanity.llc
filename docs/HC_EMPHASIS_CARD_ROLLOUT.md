@@ -133,8 +133,8 @@ Prioritized follow-ups after Phases 0–5. Full tier tables: [`UI_COLOR_SCHEME_S
 
 | Item | Surface | Modifier | Notes |
 |------|---------|----------|-------|
-| Legacy `.form-warning` (non-notice) | Create advanced blocks | `--warn` | Migrate when touching create UX |
-| `#created-error` dynamic paths | Already Phase 4 if shipped | `--urgent` | Ensure `showError()` only updates `__detail` |
+| Legacy `.form-warning` (non-notice) | Create advanced blocks | `--warn` | **Shipped** — `#create-public-card-notice`; legacy `.form-warning` CSS excludes `.hc-emphasis-card` |
+| `#created-error` dynamic paths | Already Phase 4 if shipped | `--urgent` | **Shipped** — `showError()` updates `#created-error-detail` only |
 | System / resolver banner | `#device-system-banner` | Minimal or `--urgent` | Only if copy gains a CTA; else keep plain line |
 | Scan vouch explainer blocks | `scan-pass.css` | Case-by-case | Single-action cards only; do not compete with trust-tool rows |
 
