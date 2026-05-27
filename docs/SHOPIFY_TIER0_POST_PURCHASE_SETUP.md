@@ -57,8 +57,17 @@ Some stores expose a custom redirect after payment. If Shopify offers a **post-p
 
 1. Place a **test order** (Shopify test mode or Bogus Gateway if enabled).
 2. Complete checkout.
-3. Confirm you can open **https://humanity.llc/shop/thanks/** and see Tier 0 post-purchase copy.
+3. Confirm you can open **https://humanity.llc/shop/thanks/** and see post-purchase copy plus the **Track your order** form.
 4. Optional: follow **Create a free card** — should carry `hc_ref=tier0_shop` when arriving from shop/thanks flow.
+
+### Order status lookup
+
+Buyers can track production on the thanks page:
+
+- **Personalized orders:** paste `artifact_intent_id` from Shopify line item properties (also in confirmation email).
+- **Any order:** paste Shopify order number.
+
+API (same data): `GET /v1/store/orders/status?artifact_intent_id=ai_…` or `?shopify_order_id=…`
 
 ---
 
