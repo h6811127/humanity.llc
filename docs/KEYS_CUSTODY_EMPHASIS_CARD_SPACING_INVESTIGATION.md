@@ -1,6 +1,6 @@
 # Keys custody emphasis card — excessive vertical spacing
 
-**Status:** Steps 1–11 **shipped** (May 2026) — keys custody + created column cards; `styles.css?v=125`  
+**Status:** Steps 1–12 **shipped** (May 2026) — step 13 manual QA remains; `styles.css?v=125`  
 **Surface:** `#device-keys-custody-hub`, `#device-keys-custody-wallet`, `device-keys-custody--created`, `device-keys-custody--compact`  
 **Canonical spacing:** [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) § Internal spacing ladder · F3 stacked layout
 
@@ -59,3 +59,12 @@ Same root cause as keys custody: column `hc-emphasis-card` without F3 stacked la
 | 9 | Apply compact stacked layout | `#no-session`, `#created-error`, `#live-control-proof`, `#created-vouch-return-banner`, `#owner-revoked-banner`, `.revoke-id-warning` | **Shipped** |
 | 10 | Bump `styles.css?v=` on shell pages | `site/index.html`, `wallet/`, `create/`, `created/` | **Shipped** `v=125` |
 | 11 | Vitest guards for `flex-start` on created column cards | `device-emphasis-card-html.test.ts` | **Shipped** |
+
+---
+
+## Acceptance — automated (step 12)
+
+| Step | Action | Status |
+|------|--------|--------|
+| 12 | E2E: wallet + hub keys custody compact layout (detail ↔ Acknowledge gap, `flex-start`, `__main` not growing) | `e2e/device-os-wallet.spec.ts` | **Shipped** |
+| 13 | Manual QA: light + dark hub/wallet custody; Acknowledge dismiss ([`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) § QA) | Operator |

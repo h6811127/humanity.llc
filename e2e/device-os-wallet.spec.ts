@@ -581,4 +581,63 @@ test.describe("device OS wallet flow", () => {
     await expect(page).toHaveURL(/\/wallet\/$/);
     await expect(page.getByRole("heading", { name: "My cards on this device" })).toBeVisible();
   });
+
+  test("keys custody wallet notice uses compact stacked layout", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.removeItem("hc_keys_custody_notice_dismissed");
+    });
+    await page.goto("/wallet/");
+    const card = page.locator(".device-keys-custody--wallet");
+    await expect(card).toBeVisible();
+    await expect(card.getByRole("button", { name: "Acknowledge" })).toBeVisible();
+
+    const metrics = await card.evaluate((el) => {
+      const detail = el.querySelector(".hc-emphasis-card__detail");
+      const ack = el.querySelector("[data-keys-custody-ack]");
+      const main = el.querySelector(".hc-emphasis-card__main");
+      if (!detail || !ack || !main) return null;
+      return {
+        gapPx: ack.getBoundingClientRect().top - detail.getBoundingClientRect().bottom,
+        justifyContent: getComputedStyle(el).justifyContent,
+        mainFlexGrow: getComputedStyle(main).flexGrow,
+      };
+    });
+    expect(metrics).not.toBeNull();
+    expect(metrics!.justifyContent).toBe("flex-start");
+    expect(metrics!.mainFlexGrow).toBe("0");
+    expect(metrics!.gapPx).toBeGreaterThan(0);
+    expect(metrics!.gapPx).toBeLessThan(56);
+  });
+
+  test("keys custody hub notice uses compact stacked layout", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.removeItem("hc_keys_custody_notice_dismissed");
+    });
+    await page.goto("/");
+    await page.locator("#brand-status-dot-btn").click({ timeout: 15_000 });
+    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/, {
+      timeout: 15_000,
+    });
+
+    const card = page.locator(".device-keys-custody--hub");
+    await expect(card).toBeVisible();
+    await expect(card.getByRole("button", { name: "Acknowledge" })).toBeVisible();
+
+    const metrics = await card.evaluate((el) => {
+      const detail = el.querySelector(".hc-emphasis-card__detail");
+      const ack = el.querySelector("[data-keys-custody-ack]");
+      const main = el.querySelector(".hc-emphasis-card__main");
+      if (!detail || !ack || !main) return null;
+      return {
+        gapPx: ack.getBoundingClientRect().top - detail.getBoundingClientRect().bottom,
+        justifyContent: getComputedStyle(el).justifyContent,
+        mainFlexGrow: getComputedStyle(main).flexGrow,
+      };
+    });
+    expect(metrics).not.toBeNull();
+    expect(metrics!.justifyContent).toBe("flex-start");
+    expect(metrics!.mainFlexGrow).toBe("0");
+    expect(metrics!.gapPx).toBeGreaterThan(0);
+    expect(metrics!.gapPx).toBeLessThan(56);
+  });
 });
