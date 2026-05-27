@@ -188,7 +188,7 @@ Aggregate metrics only — no PII. Allowed refs:
 | Artifact intent created; attach returns Shopify line attributes | ✅ API tests |
 | Checkout URL includes `properties[artifact_intent_id]` | ✅ `shop-customize-core.test.ts` |
 | Paid webhook → Printify queue (operator env) | ✅ queue on paid webhook · Tier 1 template + Printify env mapping |
-| Per-order artwork upload to Printify on submit | ☐ O-002 extension — see [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Shipped vs spec gap |
+| Per-order artwork upload to Printify on submit | ✅ `printify-upload.ts` · requires blueprint/provider env — [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) |
 | Printed item scans; bearer warning visible | ☐ physical QA · ✅ automated scan regression (`npm run worker:test:merch-print-qa`, [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md)) |
 | Owner updates manifesto from phone without reprint | ✅ resolver |
 
@@ -201,7 +201,8 @@ Aggregate metrics only — no PII. Allowed refs:
 | Funnel code (scan CTAs, customize, intent, webhook queue) | ✅ Shipped |
 | `personalize.checkout_open` + Shopify URLs in `shop-config.json` | ☐ Operator |
 | Shopify webhook + Worker Printify secrets | ☐ Operator |
-| Per-order Printify artwork upload on submit | ☐ Engineering — [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) |
+| Per-order Printify artwork upload on submit | ✅ Shipped (PR #63) |
+| Printify blueprint/provider env for Tier 1 submit | ☐ Operator |
 | Physical print QA sign-off | ☐ Operator — [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) |
 | Founding drop / lifecycle gates | ☐ Operator — [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) |
 
@@ -212,7 +213,6 @@ Full architecture and FAQ: [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERC
 ## Not in this MVP slice
 
 - Full story-row catalog (~50 SKUs) — [`Storefront v1.0.md`](features/Storefront%20v1.0.md)
-- Per-order Printify artwork upload in automated submit — [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Shipped vs spec gap
 - Drag-and-drop QR placement on arbitrary Printify mockups
 - In-browser native checkout
 - Game-master / city-scale AI

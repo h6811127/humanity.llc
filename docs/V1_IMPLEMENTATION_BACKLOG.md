@@ -501,7 +501,7 @@ Goal: complete one real paid order path safely.
 
 **Shipped (partial):** queue + operator submit + webhook status + Tier 1 template env mapping — see [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Shipped vs spec gap.
 
-**Remaining:** per-order **artwork upload** (`POST /v1/uploads/images.json`) attached to Printify line items on submit — required for unique QR on fabric/sticker at scale (current `printify-client.ts` submits product/variant only).
+**Shipped (2026-05-27):** per-order artwork upload on Tier 1 submit — `printify-upload.ts` · `printify-line-items.ts`. Operator env: `PERSONALIZE_*_PRINTIFY_BLUEPRINT_ID`, `PERSONALIZE_*_PRINTIFY_PRINT_PROVIDER_ID`.
 
 **Exit criteria:**
 

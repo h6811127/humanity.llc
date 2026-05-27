@@ -103,7 +103,7 @@ Hardening finding: live control proof is the clearest upgrade beyond static QR, 
 | Submit Printify order | Printify Fulfillment Middleware | `print_order` and provider refs | Rate limited, invalid address, provider outage | Printify receives fulfillment-required fields only. |
 | Production/shipment updates | Printify + middleware | Webhook events, order timeline | Missed webhook, on hold, has issues | User sees safe status; operators see provider details. |
 
-Hardening finding: the riskiest handoff is artifact intent metadata surviving Shopify checkout and paid webhooks. This needs an integration spike before broad implementation. **Implementation note (2026-05-27):** metadata spike shipped; per-order Printify **artwork upload** on submit remains open — [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Shipped vs spec gap.
+Hardening finding: the riskiest handoff is artifact intent metadata surviving Shopify checkout and paid webhooks. This needs an integration spike before broad implementation. **Implementation note (2026-05-27):** metadata spike shipped; per-order Printify **artwork upload** on submit shipped (PR #63) — [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Shipped vs spec gap.
 
 ---
 

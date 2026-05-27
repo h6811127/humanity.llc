@@ -194,7 +194,7 @@ Deploy: `npm run worker:deploy`. Route `humanity.llc/v1/*` required for artifact
 | Operator mint planned QRs | ✅ Shipped | [`fulfillment-mint.ts`](../worker/src/commerce/fulfillment-mint.ts) |
 | Printify order submit (product/variant line) | ✅ Shipped | [`printify-client.ts`](../worker/src/print/printify-client.ts) — operator-gated |
 | Printify webhook status sync | ✅ Shipped | O-003 slice |
-| **Per-order artwork upload to Printify** | ☐ **Not in submit path yet** | Spec: PM-FR-13 [`Printify Fulfillment Middleware v1.0.md`](features/Printify%20Fulfillment%20Middleware%20v1.0.md) §7.2 — `POST /v1/uploads/images.json` then attach to line item. Current submit sends template product/variant only. **Required before true per-unit unique QR on fabric.** Track: O-002 extension / [`V1_IMPLEMENTATION_BACKLOG.md`](V1_IMPLEMENTATION_BACKLOG.md) O-002. |
+| **Per-order artwork upload to Printify** | ✅ Shipped (PR #63) | PM-FR-13 — [`printify-upload.ts`](../worker/src/print/printify-upload.ts) · [`printify-line-items.ts`](../worker/src/print/printify-line-items.ts). Upload SVG → ephemeral product with `print_areas` → order line item per planned QR. Requires `PERSONALIZE_*_PRINTIFY_BLUEPRINT_ID` + `PRINT_PROVIDER_ID`. |
 | Shipping quote before checkout | ☐ Deferred | PM-FR-20 — Shopify remains checkout total authority for v1 |
 | humanity.llc order timeline UI | ☐ Partial | Operator lookup shipped; buyer-facing timeline deferred |
 
@@ -205,7 +205,7 @@ Deploy: `npm run worker:deploy`. Route `humanity.llc/v1/*` required for artifact
 ### 1. Printify (factory)
 
 - [ ] Create / approve hoodie (or sticker) template in Printify — print area, scan QA per [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) (A-004)
-- [ ] Note **Printify product id** and **variant id** for Worker env
+- [ ] Note **Printify blueprint id**, **print provider id**, and **variant id** for Worker env (inspect catalog or an approved template product in Printify admin)
 
 ### 2. Shopify (cash register)
 
@@ -222,7 +222,7 @@ Deploy: `npm run worker:deploy`. Route `humanity.llc/v1/*` required for artifact
 
 ### 4. Worker (middleware)
 
-- [ ] Set `PERSONALIZE_*_PRINTIFY_*` + shared Printify/Shopify secrets
+- [ ] Set `PERSONALIZE_*_PRINTIFY_*` (variant + shipping) **and** `PERSONALIZE_*_PRINTIFY_BLUEPRINT_ID` + `PRINT_PROVIDER_ID` for per-order artwork submit
 - [ ] `npm run worker:deploy`
 - [ ] Test artifact intent: `POST /v1/store/artifact-intents` (not 405)
 
@@ -271,12 +271,12 @@ Auto-fulfill uses the **published static design**. Tier 1 needs **per-order uniq
 |---------|--------|
 | `personalize.checkout_open: true` + Shopify cart URLs in `shop-config.json` | Operator + Pages deploy |
 | Shopify `orders/paid` webhook + Worker secrets | Operator |
-| Printify env (`PERSONALIZE_*_PRINTIFY_*`) | Operator |
-| Per-order artwork upload in Printify submit | Engineering (O-002 extension) |
+| Printify env (`PERSONALIZE_*_PRINTIFY_*` + blueprint/provider) | Operator |
+| ~~Per-order artwork upload in Printify submit~~ | ✅ Shipped — PR #63 |
 | Physical sample QA sign-off | Operator — [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) |
 | Founding drop / lifecycle policy gates | Operator — [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) |
 
-Code path for scan → customize → intent → webhook → queue is largely shipped; gaps are **operator wiring** and **Printify artwork upload**.
+Code path for scan → customize → intent → webhook → queue → **artwork upload submit** is shipped; remaining gaps are **operator wiring** and **physical QA**.
 
 ---
 
