@@ -98,20 +98,63 @@ export function formatSiteBuildHubLabel(meta) {
 }
 
 /**
+ * @param {WorkerBuildMeta} meta
+ * @returns {string}
+ */
+export function formatWorkerBuildHubLabel(meta) {
+  return `Worker ${meta.gitSha} · ${meta.source}`;
+}
+
+/**
+ * @param {unknown} body Health JSON body
+ * @returns {WorkerBuildMeta | null}
+ */
+export function parseResolverHealthBuild(body) {
+  if (!body || typeof body !== "object") return null;
+  const build = /** @type {{ build?: unknown }} */ (body).build;
+  if (!build || typeof build !== "object") return null;
+  const record = /** @type {Record<string, unknown>} */ (build);
+  const gitSha = typeof record.gitSha === "string" ? record.gitSha : "";
+  const builtAt = typeof record.builtAt === "string" ? record.builtAt : "";
+  const source = typeof record.source === "string" ? record.source : "";
+  if (!gitSha || !builtAt || !source) return null;
+  if (source !== "deploy" && source !== "dev" && source !== "ci") return null;
+  return { gitSha, builtAt, source };
+}
+
+/**
  * @param {SiteBuildMeta} meta
  * @param {string} [pagePath]
  * @returns {string}
  */
 export function formatSiteBuildCopyText(meta, pagePath = "") {
-  return [
-    `site.gitSha=${meta.gitSha}`,
-    `site.builtAt=${meta.builtAt}`,
-    `site.shellAssetVersion=${meta.shellAssetVersion}`,
-    `site.source=${meta.source}`,
-    pagePath ? `page=${pagePath}` : "",
-  ]
-    .filter(Boolean)
-    .join("\n");
+  return formatCombinedBuildCopyText(meta, null, pagePath);
+}
+
+/**
+ * @param {SiteBuildMeta} siteMeta
+ * @param {WorkerBuildMeta | null | undefined} workerBuild
+ * @param {string} [pagePath]
+ * @returns {string}
+ */
+export function formatCombinedBuildCopyText(siteMeta, workerBuild, pagePath = "") {
+  const lines = [
+    `site.gitSha=${siteMeta.gitSha}`,
+    `site.builtAt=${siteMeta.builtAt}`,
+    `site.shellAssetVersion=${siteMeta.shellAssetVersion}`,
+    `site.source=${siteMeta.source}`,
+  ];
+  if (workerBuild) {
+    lines.push(
+      `worker.gitSha=${workerBuild.gitSha}`,
+      `worker.builtAt=${workerBuild.builtAt}`,
+      `worker.source=${workerBuild.source}`
+    );
+  } else {
+    lines.push("worker.build=(unavailable)");
+  }
+  if (pagePath) lines.push(`page=${pagePath}`);
+  return lines.join("\n");
 }
 
 /**

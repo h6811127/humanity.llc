@@ -1051,6 +1051,11 @@ button.device-hub-notice-banner {
   word-break: break-all;
 }
 
+.device-hub-build-stamp-line--worker {
+  margin-top: 4px;
+  color: var(--surface-popover-fg-muted);
+}
+
 .device-hub-build-stamp-copy {
   margin-top: 8px;
   padding: 0;

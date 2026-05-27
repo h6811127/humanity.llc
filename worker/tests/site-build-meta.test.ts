@@ -7,9 +7,12 @@ import {
   DEFAULT_SITE_BUILD_META,
   DEFAULT_WORKER_BUILD_META,
   formatSiteBuildConsoleLine,
+  formatCombinedBuildCopyText,
   formatSiteBuildCopyText,
   formatSiteBuildHubLabel,
+  formatWorkerBuildHubLabel,
   isSiteDebugEnabled,
+  parseResolverHealthBuild,
   renderBuildMetaModule,
   renderWorkerBuildMetaModule,
   SITE_DEBUG_FLAG_KEY,
@@ -89,6 +92,43 @@ describe("site build meta", () => {
     );
     expect(formatSiteBuildCopyText(meta, "/wallet/")).toContain("site.gitSha=abc1234");
     expect(formatSiteBuildCopyText(meta, "/wallet/")).toContain("page=/wallet/");
+    expect(formatSiteBuildCopyText(meta, "/wallet/")).toContain(
+      "worker.build=(unavailable)"
+    );
+  });
+
+  it("parseResolverHealthBuild reads health.build", () => {
+    expect(
+      parseResolverHealthBuild({
+        version: "1.0",
+        build: {
+          gitSha: "w1w1w1w",
+          builtAt: "2026-05-27T12:00:00.000Z",
+          source: "deploy",
+        },
+      })
+    ).toEqual({
+      gitSha: "w1w1w1w",
+      builtAt: "2026-05-27T12:00:00.000Z",
+      source: "deploy",
+    });
+    expect(parseResolverHealthBuild({ version: "1.0" })).toBeNull();
+  });
+
+  it("formatCombinedBuildCopyText and worker hub label", () => {
+    const site = {
+      gitSha: "a",
+      builtAt: "t1",
+      shellAssetVersion: 54,
+      source: "deploy" as const,
+    };
+    const worker = {
+      gitSha: "b",
+      builtAt: "t2",
+      source: "ci" as const,
+    };
+    expect(formatWorkerBuildHubLabel(worker)).toBe("Worker b · ci");
+    expect(formatCombinedBuildCopyText(site, worker)).toContain("worker.gitSha=b");
   });
 
   it("device-hub-build-stamp.mjs is in shell manifest", () => {

@@ -1,17 +1,24 @@
 /**
- * Debug-gated Pages build stamp in the device hub.
- * @see docs/SITE_BUILD_VERSIONING.md — Phase 2
+ * Debug-gated Pages + Worker build stamp in the device hub.
+ * @see docs/SITE_BUILD_VERSIONING.md — Phases 2 and 4
  */
 import { SITE_BUILD_META } from "./build-meta.mjs";
 import {
-  formatSiteBuildCopyText,
+  formatCombinedBuildCopyText,
   formatSiteBuildHubLabel,
+  formatWorkerBuildHubLabel,
   isSiteDebugEnabled,
 } from "./build-meta-core.mjs";
+import { fetchResolverHealthBuild } from "./device-network-health.mjs";
+import { resolverApiOrigin } from "./hc-sign.mjs";
 
 const STAMP_ID = "device-hub-build-stamp";
-const LABEL_ID = "device-hub-build-stamp-label";
+const SITE_LABEL_ID = "device-hub-build-stamp-site";
+const WORKER_LABEL_ID = "device-hub-build-stamp-worker";
 const COPY_ID = "device-hub-build-stamp-copy";
+
+/** @type {import("./build-meta-core.mjs").WorkerBuildMeta | null} */
+let cachedWorkerBuild = null;
 
 /**
  * @param {ParentNode} hubRoot
@@ -31,7 +38,8 @@ export function mountHubBuildStamp(hubRoot, meta = SITE_BUILD_META) {
     stamp.hidden = true;
     stamp.innerHTML = `
       <p class="device-hub-build-stamp-eyebrow">Build (debug)</p>
-      <p class="device-hub-build-stamp-line" id="${LABEL_ID}"></p>
+      <p class="device-hub-build-stamp-line" id="${SITE_LABEL_ID}"></p>
+      <p class="device-hub-build-stamp-line device-hub-build-stamp-line--worker" id="${WORKER_LABEL_ID}"></p>
       <button type="button" class="device-hub-build-stamp-copy" id="${COPY_ID}">
         Copy build info
       </button>
@@ -54,10 +62,32 @@ export function mountHubBuildStamp(hubRoot, meta = SITE_BUILD_META) {
   const enabled = isSiteDebugEnabled();
   stamp.hidden = !enabled;
 
-  const label = stamp.querySelector(`#${LABEL_ID}`);
-  if (label) {
-    label.textContent = formatSiteBuildHubLabel(meta);
+  const siteLabel = stamp.querySelector(`#${SITE_LABEL_ID}`);
+  if (siteLabel) {
+    siteLabel.textContent = formatSiteBuildHubLabel(meta);
   }
+
+  if (enabled) {
+    void refreshWorkerBuildLine(stamp);
+  } else {
+    cachedWorkerBuild = null;
+    const workerLabel = stamp.querySelector(`#${WORKER_LABEL_ID}`);
+    if (workerLabel) workerLabel.textContent = "";
+  }
+}
+
+/**
+ * @param {HTMLElement} stamp
+ */
+async function refreshWorkerBuildLine(stamp) {
+  const workerLabel = stamp.querySelector(`#${WORKER_LABEL_ID}`);
+  if (!workerLabel) return;
+
+  workerLabel.textContent = "Worker …";
+  cachedWorkerBuild = await fetchResolverHealthBuild(resolverApiOrigin());
+  workerLabel.textContent = cachedWorkerBuild
+    ? formatWorkerBuildHubLabel(cachedWorkerBuild)
+    : "Worker (health unavailable)";
 }
 
 /**
@@ -65,7 +95,15 @@ export function mountHubBuildStamp(hubRoot, meta = SITE_BUILD_META) {
  * @param {HTMLButtonElement} button
  */
 async function copyBuildStamp(meta, button) {
-  const text = formatSiteBuildCopyText(meta, location.pathname);
+  const stamp = button.closest(`#${STAMP_ID}`);
+  if (stamp instanceof HTMLElement && isSiteDebugEnabled()) {
+    await refreshWorkerBuildLine(stamp);
+  }
+  const text = formatCombinedBuildCopyText(
+    meta,
+    cachedWorkerBuild,
+    location.pathname
+  );
   const previous = button.textContent;
   try {
     if (navigator.clipboard?.writeText) {
