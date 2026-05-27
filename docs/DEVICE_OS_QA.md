@@ -209,7 +209,7 @@ Spec: [`KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md`](KEYS_CUSTODY_EMPHA
 
 **Reset:** `localStorage.removeItem("hc_keys_custody_notice_dismissed")` then reload.
 
-**Automated:** `npm run worker:test -- worker/tests/device-keys-custody-html.test.ts worker/tests/device-emphasis-card-html.test.ts` · `npm run e2e -- e2e/device-os-wallet.spec.ts -g "keys custody"`
+**Automated:** `npm run worker:test -- worker/tests/device-keys-custody-html.test.ts worker/tests/device-emphasis-card-html.test.ts` · `npm run e2e -- e2e/device-os-wallet.spec.ts -g "keys custody"` · `npm run e2e -- e2e/keys-custody-emphasis-webkit.spec.ts` (WebKit + iPhone 13 Pro)
 
 | Step | Action | Expected |
 |------|--------|----------|
@@ -217,7 +217,7 @@ Spec: [`KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md`](KEYS_CUSTODY_EMPHA
 | 2 | `/` → tap status dot → hub open | Same card in hub (`device-keys-custody--hub`); compact padding; **Acknowledge** left-aligned |
 | 3 | Tap **Acknowledge** on wallet or hub | Card removed; `localStorage.hc_keys_custody_notice_dismissed === "1"`; reload — notice stays hidden |
 | 4 | `localStorage.hc_theme = "dark"`; reload `/wallet/` + hub | Blue eyebrow + readable detail on dark shell; glass/hairline card still visible (not flat rim) |
-| 5 | Safari iOS (optional) | Same as steps 1–3; tap targets ≥44px on **Acknowledge** |
+| 5 | Safari iOS | Automated: `e2e/keys-custody-emphasis-webkit.spec.ts`; optional spot-check on physical device if WebKit project passes |
 
 **Fail signals:** Large gap between detail and **Acknowledge**; card stretches to sheet height; dismiss does not persist; dark mode gray-on-gray eyebrow/detail.
 

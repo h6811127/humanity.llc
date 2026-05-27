@@ -32,6 +32,7 @@
     "e2e:scan-page-dot": "playwright test e2e/scan-page-dot.spec.ts",
     "e2e:scan-hero-visual": "playwright test e2e/scan-hero-visual.spec.ts",
     "e2e:scan-hero-visual:webkit": "playwright test e2e/scan-hero-visual.spec.ts --project=webkit --project=iphone-13-pro",
+    "e2e:shell-emphasis-card": "playwright test e2e/shell-emphasis-card-delivery.spec.ts",
     "site:generate-scan-e2e-fixture": "tsx worker/scripts/generate-scan-e2e-fixture.ts",
     "site:vendor-qr": "esbuild node_modules/qrcode/lib/browser.js --bundle --format=esm --platform=browser --outfile=site/js/vendor/qrcode.mjs",
     "site:seed-showcase": "node worker/scripts/seed-showcase-status-plate.mjs",
