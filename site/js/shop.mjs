@@ -33,6 +33,8 @@ const emailInput = document.getElementById("shop-interest-email");
 const interestStatus = document.getElementById("shop-interest-status");
 const thanksLink = document.getElementById("shop-thanks-link");
 const postPurchaseUrlEl = document.getElementById("shop-post-purchase-url");
+const postPurchaseLink = document.getElementById("shop-post-purchase-link");
+const postPurchaseCode = document.querySelector(".shop-post-purchase-url__code");
 
 function loadInterest() {
   try {
@@ -103,8 +105,7 @@ function showCheckout(display, checkoutUrl, thanksUrl) {
     priceEl.classList.add("shop-product-price--live");
   }
   setBuyButtonsVisible(true, checkoutUrl);
-  // One primary buy in the product card; footer CTA duplicates layout when both show.
-  if (buyBtnFooter) buyBtnFooter.hidden = true;
+  if (buyBtnFooter) buyBtnFooter.hidden = false;
   if (checkoutNote) checkoutNote.hidden = false;
   if (notifyBtn) notifyBtn.hidden = true;
   if (heroPrimary) {
@@ -116,14 +117,14 @@ function showCheckout(display, checkoutUrl, thanksUrl) {
     heroPrimary.classList.remove("landing-hero-btn-secondary");
   }
   if (thanksLink) thanksLink.href = thanksUrl;
+  if (postPurchaseLink) postPurchaseLink.href = thanksUrl;
+  if (postPurchaseCode) postPurchaseCode.textContent = thanksUrl;
   if (checkoutLead) {
     checkoutLead.textContent = SHOP_CHECKOUT_READY_LEAD;
     checkoutLead.hidden = false;
     checkoutLead.classList.add("shop-checkout-lead-ready");
   }
   if (postPurchaseUrlEl) {
-    const code = postPurchaseUrlEl.querySelector(".shop-post-purchase-url__value");
-    if (code) code.textContent = thanksUrl;
     postPurchaseUrlEl.hidden = false;
   }
   if (checkoutSection) checkoutSection.hidden = false;

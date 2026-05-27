@@ -9,7 +9,7 @@
       content="Tier 0 curiosity drop  -  a physical QR sticker that resolves to live Humanity Card status. Buying merch does not verify you."
     />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=79" />
+    <link rel="stylesheet" href="/styles.css?v=80" />
     <link rel="stylesheet" href="/css/device-shell.css?v=2" />
   </head>
   <body class="screen-shop-body">
@@ -107,14 +107,18 @@
             target="_blank"
             >Continue to checkout</a
           >
-          <p class="shop-lead shop-lead-muted">
+          <p class="shop-lead shop-lead-muted shop-after-purchase">
             After purchase:
             <a href="/shop/thanks/" id="shop-thanks-link">what happens next</a>
           </p>
-          <p class="shop-lead shop-lead-muted shop-post-purchase-url" id="shop-post-purchase-url" hidden>
-            Post-purchase page:
-            <code class="shop-post-purchase-url__value"></code>
-          </p>
+          <div class="shop-post-purchase-url" id="shop-post-purchase-url" hidden>
+            <p class="shop-post-purchase-url__label">Post-purchase page (paste into Shopify Admin)</p>
+            <p class="shop-post-purchase-url__value">
+              <a href="/shop/thanks/" id="shop-post-purchase-link" class="shop-post-purchase-url__link"
+                ><code class="shop-post-purchase-url__code"></code
+              ></a>
+            </p>
+          </div>
         </section>
 
         <section
@@ -214,6 +218,6 @@
         </section>
       </main>
     </div>
-    <script src="/js/shop.mjs?v=5" type="module"></script>
+    <script src="/js/shop.mjs?v=6" type="module"></script>
   </body>
 </html>
