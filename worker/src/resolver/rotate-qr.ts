@@ -15,6 +15,7 @@ import {
 import { getCardOwner } from "../db/revoke";
 import { errorResponse, jsonResponse, requestOrigin } from "../http/resolver";
 import { validateManifestoLine } from "../validation/manifesto";
+import { resolveStoredQrExpiresAt } from "./merch-qr-policy";
 
 function parseRotateBody(body: unknown): {
   card: Record<string, unknown>;
@@ -282,9 +283,9 @@ export async function handlePostRotateQr(
   }
 
   const issuedAt = qr.issued_at as string;
-  const expiresAt =
-    (typeof qr.expires_at === "string" && qr.expires_at) ||
-    defaultQrExpiry(issuedAt);
+  const expiresAt = resolveStoredQrExpiresAt("card", qr.expires_at, () =>
+    defaultQrExpiry(issuedAt)
+  );
 
   const owner = await getCardOwner(db, profileId);
   if (owner?.status === "revoked") {

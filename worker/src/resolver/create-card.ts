@@ -17,6 +17,7 @@ import {
 } from "../http/resolver";
 import { validateHandle } from "../validation/handle";
 import { validateManifestoLine } from "../validation/manifesto";
+import { resolveStoredQrExpiresAt } from "./merch-qr-policy";
 
 export interface CreateCardBody {
   card: Record<string, unknown>;
@@ -255,6 +256,12 @@ export async function handlePostCards(
     issuerPublicKey = issuerPublicKeyRaw;
   }
 
+  const storedExpiresAt = resolveStoredQrExpiresAt(
+    "card",
+    qr.expires_at,
+    () => defaultQrExpiry(qr.issued_at as string)
+  );
+
   try {
     await insertCardWithQr(
       db,
@@ -273,9 +280,7 @@ export async function handlePostCards(
         qrId: qr.qr_id as string,
         payload: expectedPayload,
         issuedAt: qr.issued_at as string,
-        expiresAt:
-          (typeof qr.expires_at === "string" && qr.expires_at) ||
-          defaultQrExpiry(qr.issued_at as string),
+        expiresAt: storedExpiresAt,
         credentialDocumentJson: JSON.stringify(qr),
       }
     );
@@ -307,9 +312,7 @@ export async function handlePostCards(
       handle: handleNormalized,
       qr_id: qr.qr_id,
       scan_url: expectedPayload,
-      qr_expires_at:
-        (typeof qr.expires_at === "string" && qr.expires_at) ||
-        defaultQrExpiry(qr.issued_at as string),
+      qr_expires_at: storedExpiresAt,
       card_url: `${RESOLVER_ORIGIN}/.well-known/hc/v1/cards/${profileId}`,
       status: "active",
       verification: {

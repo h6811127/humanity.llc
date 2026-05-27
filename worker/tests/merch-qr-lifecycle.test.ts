@@ -4,6 +4,7 @@ import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db
 import {
   isQrCalendarExpired,
   normalizeExpiresAtForScope,
+  resolveStoredQrExpiresAt,
   validatePrintArtifactMintExpiry,
 } from "../src/resolver/merch-qr-policy";
 import { buildScanViewModel } from "../src/resolver/scan-state";
@@ -77,6 +78,21 @@ describe("merch-qr-policy", () => {
     expect(validatePrintArtifactMintExpiry("print_artifact", null).ok).toBe(true);
     expect(validatePrintArtifactMintExpiry("print_artifact", "2027-01-01").ok).toBe(false);
     expect(validatePrintArtifactMintExpiry("card", "2027-01-01").ok).toBe(true);
+  });
+
+  it("resolveStoredQrExpiresAt supports Tier 0 batch null on card scope", () => {
+    expect(
+      resolveStoredQrExpiresAt("card", null, () => "2027-01-01T00:00:00.000Z")
+    ).toBeNull();
+    expect(
+      resolveStoredQrExpiresAt("card", "2028-06-01T00:00:00.000Z", () => "2027-01-01T00:00:00.000Z")
+    ).toBe("2028-06-01T00:00:00.000Z");
+    expect(
+      resolveStoredQrExpiresAt("card", undefined, () => "2027-01-01T00:00:00.000Z")
+    ).toBe("2027-01-01T00:00:00.000Z");
+    expect(
+      resolveStoredQrExpiresAt("print_artifact", "2027-01-01", () => "2027-01-01T00:00:00.000Z")
+    ).toBeNull();
   });
 });
 

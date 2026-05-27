@@ -2,7 +2,7 @@
 
 **Status:** Working checklist  -  fill in bracketed fields before launch  
 **Canonical strategy:** `docs/MERCH_LED_V1.md`, `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  
-**Merch QR policy:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` (no calendar expiry on artifacts, revoke/reprint, creative roadmap)  
+**Merch QR policy:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` · Tier 0 batch: `docs/TIER0_CAMPAIGN_QR_RUNBOOK.md` · Support: `docs/MERCH_SUPPORT_MACROS.md`  
 **Copy source:** `docs/LAUNCH_LANGUAGE_KIT.md` (Tier 0 / Tier 1 sections · Sticker FAQ)
 
 ---
@@ -52,7 +52,8 @@ Check every box before taking money.
 - [ ] Vouch rules published (3 vouch threshold, quotas, 90-day wait)
 - [ ] Shopify metadata spike passed if personalized (`artifact_intent_id` on paid webhook)
 - [ ] Printify sample order passed if per-item unique QR
-- [ ] Support/reprint policy published (`MERCH_QR_LIFECYCLE_POLICY.md` § Revoke, reprint, and support)
+- [ ] Support/reprint policy published ([`MERCH_SUPPORT_MACROS.md`](MERCH_SUPPORT_MACROS.md) + policy § Revoke, reprint, and support)
+- [ ] Batch rotate drill completed in staging ([`TIER0_CAMPAIGN_QR_RUNBOOK.md`](TIER0_CAMPAIGN_QR_RUNBOOK.md))
 
 ### Ops
 

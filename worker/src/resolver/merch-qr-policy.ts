@@ -48,3 +48,20 @@ export function validatePrintArtifactMintExpiry(
     message: "print_artifact credentials must not set expires_at (see MERCH_QR_LIFECYCLE_POLICY).",
   };
 }
+
+/**
+ * Persisted expiry for signed QR credentials at create/rotate/mint.
+ * Tier 0 batch campaign QRs use explicit JSON `null` on card-scoped credentials.
+ */
+export function resolveStoredQrExpiresAt(
+  scope: QrScope | null | undefined,
+  signedExpiresAt: unknown,
+  defaultExpiryIso: () => string
+): string | null {
+  if (isPrintArtifactScope(scope)) return null;
+  if (signedExpiresAt === null) return null;
+  if (typeof signedExpiresAt === "string" && signedExpiresAt.length > 0) {
+    return signedExpiresAt;
+  }
+  return defaultExpiryIso();
+}

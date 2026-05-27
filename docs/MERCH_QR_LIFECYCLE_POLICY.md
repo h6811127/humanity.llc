@@ -332,8 +332,8 @@ Optional **non-trust** badge on scan: “Scanned from a founding sticker” for 
 | Mint validation helper for `expires_at: null` on artifact | Engineering | **Shipped** (helper) | `validatePrintArtifactMintExpiry` — wire at fulfillment mint |
 | Fulfillment mint sets `scope: print_artifact`, `expires_at: null` | Engineering | **Shipped** (owner issue API) | `POST …/cards/{profile_id}/print-artifact-qrs` · `issue-print-artifact-qr.test.ts` · Printify/Shopify automation pending |
 | Orphan purge respects null expiry | Engineering | **Shipped** (existing) | `orphan-purge.test.ts` |
-| Tier 0 batch rotate runbook | Ops | Pending | This doc § Tier 0 |
-| Support macros: misprint vs revoke vs reprint | Ops | Pending | `FOUNDING_DROP_BRIEF.md` |
+| Tier 0 batch rotate runbook | Ops | **Shipped** | [`TIER0_CAMPAIGN_QR_RUNBOOK.md`](TIER0_CAMPAIGN_QR_RUNBOOK.md) |
+| Support macros: misprint vs revoke vs reprint | Ops | **Shipped** (draft) | [`MERCH_SUPPORT_MACROS.md`](MERCH_SUPPORT_MACROS.md) |
 | Comprehension test includes “sticker doesn’t expire” | Product | Pending | `LAUNCH_LANGUAGE_KIT.md` § Sticker FAQ · question 12 in tier-specific test |
 
 ---
@@ -365,7 +365,8 @@ Before `checkout_open: true` on production:
 | [`CARD_RETENTION_AND_ORPHAN_CLEANUP.md`](CARD_RETENTION_AND_ORPHAN_CLEANUP.md) | Orphan purge vs live merch QR |
 | [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) | Gate before money |
 | [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) | Trust bugs before checkout |
-| [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md) | Post-M5 vertical pilot |
+| [`TIER0_CAMPAIGN_QR_RUNBOOK.md`](TIER0_CAMPAIGN_QR_RUNBOOK.md) | Batch sticker QR + rotate drill |
+| [`MERCH_SUPPORT_MACROS.md`](MERCH_SUPPORT_MACROS.md) | Support reply templates |
 
 ---
 
@@ -377,3 +378,4 @@ Before `checkout_open: true` on production:
 | 2026-05-26 | Hardening sequence, creative ideas index, cross-links across docs |
 | 2026-05-26 | Resolver + scan UI: `merch-qr-policy.ts`, tests (`merch-qr-lifecycle.test.ts`) |
 | 2026-05-26 | `POST …/print-artifact-qrs` mint API (`issue-print-artifact-qr.ts`) |
+| 2026-05-26 | Tier 0 null `expires_at` on card-scoped batch QRs; runbook + support macros |

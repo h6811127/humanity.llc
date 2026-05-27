@@ -43,7 +43,7 @@ export interface ApplyQrRotationParams {
     epoch: number;
     payload: string;
     issuedAt: string;
-    expiresAt: string;
+    expiresAt: string | null;
     credentialDocumentJson: string;
   };
 }
