@@ -1,4 +1,5 @@
 import { validateCreateFormFields } from "./create-form-validation-core.mjs";
+import { syncCreateHeroCopy } from "./create-template-copy.mjs";
 import { formatCreateResolverError } from "./create-resolver-error-core.mjs";
 import {
   qrExpiryFromIssued,
@@ -61,6 +62,7 @@ function setTemplate(template) {
   if (statusLine) statusLine.required = isPlate;
   if (relayItem) relayItem.required = isRelay;
   if (relayMessage) relayMessage.required = isRelay;
+  syncCreateHeroCopy(template);
 }
 
 templateBtns.forEach((btn) => {

@@ -79,6 +79,7 @@ Keep positioning layered; do not collapse into a single slogan:
 
 | Doc | Use |
 |-----|-----|
+| `docs/PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md` | Positioning synthesis + messaging matrix |
 | `docs/STATUS_PLATE_PILOT.md` | Vertical #1 pilot |
 | `docs/LOST_ITEM_RELAY_PILOT.md` | Vertical #2 pilot |
 | `docs/ORGANIZER_SIGNED_REVOKE_PILOT.md` | Vertical #3 pilot (current) |

@@ -6,7 +6,7 @@
     <title>Create a live card · humanity.llc</title>
     <meta
       name="description"
-      content="Create a QR-backed live object you can scan, verify, and revoke. Your private key stays in this browser session unless you save backup or recovery."
+      content="Create a live object — status plate, lost-item tag, or general card. Signed QR, browser-held keys, no scan tracking."
     />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <meta name="theme-color" content="#ffffff" />
@@ -244,11 +244,11 @@
       <main class="screen">
         <section class="hero hero-compact">
           <p class="hero-eyebrow">Create</p>
-          <h1>Create a live card</h1>
-          <p class="hero-line">
+          <h1 id="create-hero-title">Create a live card</h1>
+          <p class="hero-line" id="create-hero-lead">
             One tap registers your <strong>card</strong> on the network and issues a
-            <strong>signed QR</strong> to print or share. Scans show live status  -  active,
-            revoked, or expired  -  not a frozen link.
+            <strong>signed QR</strong> to print or share. Scans show live status — active,
+            revoked, or expired — not a frozen link.
           </p>
           <p class="hero-line hero-line-sub">
             Your owner key stays in this browser tab until you save it on the next screen.
@@ -360,7 +360,7 @@
               rows="2"
               placeholder="Open · Thu–Sun until 9 PM"
             ></textarea>
-            <p class="form-hint">Live status line  -  you can change it later by creating a new card or future updates.</p>
+            <p class="form-hint">Live status line — change it later on Live without reprinting the QR.</p>
           </div>
 
           <div id="create-fields-lost-item" hidden>
@@ -470,6 +470,6 @@
     </div>
     <script src="/js/device-status-bootstrap.mjs?v=45" type="module"></script>
     <script src="/js/create-hub.mjs?v=1" type="module"></script>
-    <script type="module" src="/js/create-card.mjs?v=15"></script>
+    <script type="module" src="/js/create-card.mjs?v=16"></script>
   </body>
 </html>
