@@ -110,6 +110,16 @@ npm run hosted:rollout:step5 -- --verify
 OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step5 -- --verify
 ```
 
+**Rollout step 6 (script):**
+
+```bash
+npm run hosted:rollout:step6
+# Full regression before steward announcement:
+npm run hosted:rollout:step6 -- --verify
+npm run hosted:rollout:step6 -- --vitest   # step 6a (Vitest) only
+npm run hosted:rollout:step6 -- --e2e      # step 6b (Playwright) only
+```
+
 Rollout steps: [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout (after G0).
 
 ---

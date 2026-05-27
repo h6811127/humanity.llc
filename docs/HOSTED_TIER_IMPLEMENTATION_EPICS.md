@@ -350,7 +350,7 @@ Engineering checklist once M4 governance checklist is signed ([`HOSTED_TIER_PRIC
 | 3 | Set production secrets | `OPERATOR_AUDIT_TOKEN` (required), `STRIPE_WEBHOOK_SECRET` (after G8) — `npm run hosted:rollout:step3` · verify with `OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step3` |
 | 4 | Enable hosted flag | `HOSTED_STEWARD_ENABLED=1` in `worker/wrangler.toml` + deploy — `npm run hosted:rollout:step4` · verify `npm run hosted:rollout:step4 -- --verify` |
 | 5 | Ops | Pin CF dashboard + E6.2 CI secret — `npm run hosted:rollout:step5` · verify `npm run hosted:rollout:step5 -- --verify` · [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md) |
-| 6 | Regression | `npm run verify:hosted-g0` · `npm run e2e:steward-hosted` |
+| 6 | Regression | `npm run hosted:rollout:step6` · full verify `npm run hosted:rollout:step6 -- --verify` · Vitest only `npm run hosted:rollout:step6 -- --vitest` · E2E only `npm run hosted:rollout:step6 -- --e2e` |
 
 ---
 

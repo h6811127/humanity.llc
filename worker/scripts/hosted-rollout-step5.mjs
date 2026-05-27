@@ -180,7 +180,7 @@ async function main() {
     API_ORIGIN: apiOrigin,
   });
 
-  console.log("\n✅ Step 5 verified (E6.2 path). Next: step 6 — npm run verify:hosted-g0 && npm run e2e:steward-hosted");
+  console.log("\n✅ Step 5 verified (E6.2 path). Next: npm run hosted:rollout:step6 -- --verify");
 }
 
 main().catch((err) => {
