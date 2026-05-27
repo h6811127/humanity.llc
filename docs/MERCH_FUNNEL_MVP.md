@@ -1,14 +1,14 @@
 # Merch funnel MVP — scan → profile → customize → Printify
 
 **Status:** Active — customizer UI shipped; operator enables products in `shop-config.json`  
-**Parent:** [`MERCH_LED_V1.md`](MERCH_LED_V1.md) · [`V1_FLOW_AUDIT.md`](V1_FLOW_AUDIT.md) · [`features/Storefront v1.0.md`](features/Storefront%20v1.0.md)  
+**Parent:** [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`MERCH_LED_V1.md`](MERCH_LED_V1.md) · [`V1_FLOW_AUDIT.md`](V1_FLOW_AUDIT.md) · [`features/Storefront v1.0.md`](features/Storefront%20v1.0.md)  
 **Implementation:** [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) · `site/shop/customize/`
 
 ---
 
 ## One-sentence MVP
 
-A stranger **scans live wear**, sees the wearer’s **signed profile** (optional plain-language reader), wants their own, **creates a card**, **customizes a branded QR** on a **Printify product**, and **checks out on humanity.llc** — without touching Printify directly.
+A stranger **scans live wear**, sees a **child object controlled by a signed root profile** (optional plain-language reader), wants their own, **creates or uses a root card**, **customizes a branded child-object QR** on a **Printify product**, and **checks out on humanity.llc** — without touching Printify directly.
 
 ---
 
@@ -18,11 +18,11 @@ A stranger **scans live wear**, sees the wearer’s **signed profile** (optional
 1. SEE     QR on hoodie / sticker / campaign merch
 2. SCAN    https://humanity.llc/c/{profile_id}?q={qr_id}
 3. READ    Live manifesto + object snapshot (+ optional L3 plain-language reader)
-4. WANT    Curiosity CTA → Create card (hc_ref preserved)
-5. CUSTOM  /shop/customize/ — preview LIVE OBJECT QR on product mockup
+4. WANT    Curiosity CTA → Create root card, or use existing root (hc_ref preserved)
+5. CUSTOM  /shop/customize/ — preview LIVE OBJECT child QR on product mockup
 6. INTENT  POST /v1/store/artifact-intents → planned per-item qr_ids
 7. CHECKOUT Shopify cart with artifact_intent metadata
-8. FULFILL Paid webhook → Printify middleware → unique print_artifact QR minted
+8. FULFILL Paid webhook → Printify middleware → unique print_artifact child QR minted
 9. WEAR    Update ephemeral state from /created/ — same ink, new meaning
 ```
 
@@ -51,9 +51,9 @@ The customizer **does not** call Printify from the browser. It prepares intent +
 
 | Surface | Role |
 |---------|------|
-| Scan profile | **Signed** `manifesto_line` + `public_snapshot` (L0–L2) |
+| Scan profile/object | **Signed** root + child object state (`manifesto_line` / `public_snapshot`) (L0–L2) |
 | Optional reader | L3 P1 opt-in “plain language” — not signed truth ([`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md)) |
-| Customizer | **No AI** — steward already created the card; preview is deterministic QR artwork |
+| Customizer | **No AI** — steward already controls the root card; preview is deterministic child QR artwork |
 | Marketing | Lead with **live state on humans**, not “AI profiles” |
 
 ---
@@ -63,7 +63,7 @@ The customizer **does not** call Printify from the browser. It prepares intent +
 | Tier | QR model | Customizer |
 |------|----------|------------|
 | **Tier 0** curiosity | Batch QR on `/shop/` | Not used — buy founding sticker as-is |
-| **Tier 1** belonging | Unique `print_artifact` per unit | **`/shop/customize/`** — hoodie, personalized sticker, etc. |
+| **Tier 1** belonging | Unique `print_artifact` child QR per unit | **`/shop/customize/`** — hoodie, personalized sticker, etc. |
 
 Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md).
 

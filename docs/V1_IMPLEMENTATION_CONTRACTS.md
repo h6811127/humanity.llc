@@ -14,7 +14,7 @@ The first rebuild slice MUST implement:
 1. Signed public Humanity Card creation.
 2. HTTPS QR resolution.
 3. Revoked/suspended/expired status pages.
-4. Product trust UI that separates card status, human trust status, artifact status, and claim limitations.
+4. Product trust UI that separates root card status, child/artifact status, human trust status, and claim limitations.
 5. One personalized sticker/card artifact intent.
 6. Shopify checkout handoff with artifact-intent metadata.
 7. Paid Shopify webhook ingestion.
@@ -40,10 +40,11 @@ Optional but high-leverage for v1.1 or a strong private alpha:
 
 | Identifier | Format | Owner | Public? | Notes |
 |---|---|---|---|---|
-| `profile_id` | 24 base58 chars | Network/Card service | Yes | Opaque; no user metadata. |
-| `qr_id` | `qr_` + opaque random/ULID | Network/Card service | Yes | Referenced by QR payload. Personalized physical items receive unique QR IDs so each item can be revoked independently. |
+| `profile_id` | 24 base58 chars | Network/Card service | Yes | Opaque root Humanity Card id; no user metadata. Human trust and vouching attach here. |
+| `object_id` | `obj_` + opaque random/ULID | Network/Card service | Yes | Future child object id under a root `profile_id`; no default private key. |
+| `qr_id` | `qr_` + opaque random/ULID | Network/Card service | Yes | Referenced by QR payload. Personalized physical items and child objects receive unique QR IDs so each item can be revoked independently. |
 | `artifact_intent_id` | `ai_` + opaque random/ULID | Storefront API | No | Pre-checkout preview/proof record. |
-| `print_artifact_id` | `pa_` + opaque random/ULID | Printify Fulfillment Middleware | No | Generated artwork/proof ID. |
+| `print_artifact_id` | `pa_` + opaque random/ULID | Printify Fulfillment Middleware | No | Generated artwork/proof ID; v1 bridge for child-object-like printed items. |
 | `commerce_order_id` | `co_` + opaque random/ULID | Commerce webhook service | No | Internal Shopify order link. |
 | `print_order_id` | `po_` + opaque random/ULID | Printify Fulfillment Middleware | No | Internal fulfillment order. |
 | `vouch_id` | `vouch_` + opaque random/ULID | Verification service | Public reference | Signed vouch credential. |
@@ -65,6 +66,9 @@ Optional but high-leverage for v1.1 or a strong private alpha:
 | `POST /.well-known/hc/v1/cards/{profile_id}/qr` | POST | Owner signature | Creates/rotates QR credential. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/revoke` | POST | Owner/recovery signature | Revokes card or QR credential. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/update` | POST | Owner/recovery signature | Updates `manifesto_line` and signed card document; handle and keys immutable. |
+| `POST /.well-known/hc/v1/cards/{profile_id}/objects` | POST | Owner/recovery signature | **Target model:** creates a child object under the root card. Not routed in the current no-migration slice. |
+| `POST /.well-known/hc/v1/cards/{profile_id}/objects/{object_id}/update` | POST | Owner/recovery signature | **Target model:** updates child object public fields without a separate child key. |
+| `POST /.well-known/hc/v1/cards/{profile_id}/objects/{object_id}/revoke` | POST | Owner/recovery signature | **Target model:** disables a child object or one child QR; root remains active. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/live-control/challenges` | POST | Scanner session | Creates short-lived live control challenge. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/live-control/responses` | POST | Owner signature | Submits signed live control challenge response. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/export` | POST | Owner auth/signature | Requests export bundle. |
@@ -130,6 +134,8 @@ Optional but high-leverage for v1.1 or a strong private alpha:
 
 ### Humanity Card
 
+This is the **root** document. Verification, vouching, Steward status, and owner/recovery keys attach here. Child objects inherit control from this root; they do not get human trust state of their own.
+
 Required fields:
 
 ```json
@@ -151,6 +157,27 @@ Required fields:
 ```
 
 Allowed `status`: `active`, `revoked`, `suspended`, `expired`.
+
+### Child Object (target)
+
+Child object endpoints are not routed in the current implementation, but new build slices should converge on this parent-signed shape instead of minting a new root card for every status plate, lost-item tag, or merch object:
+
+```json
+{
+  "object_id": "obj_123",
+  "parent_profile_id": "base58-profile-id",
+  "object_type": "status_plate",
+  "public_label": "Studio door",
+  "public_state": "Open",
+  "status": "active",
+  "qr": {},
+  "signature": {}
+}
+```
+
+Allowed child `status`: `active`, `revoked`, `replaced`, `disabled`.
+
+Auth: parent root owner key, accepted recovery key, or future root-signed delegated child capability.
 
 ### Verification Summary
 
@@ -195,11 +222,11 @@ Allowed `status`: `active`, `revoked`, `expired`, `replaced`.
 
 Allowed `scope`: `card`, `print_artifact`.
 
-For personalized physical products, each printed item MUST receive a distinct `qr_id` with `scope: "print_artifact"` even when multiple items are ordered together. All item QR credentials MAY resolve to the same `profile_id`, but each item QR MUST be individually revocable. Card-level revocation or suspension still overrides every linked QR credential.
+For personalized physical products, each printed item MUST receive a distinct `qr_id` with `scope: "print_artifact"` even when multiple items are ordered together. All item QR credentials MAY resolve to the same root `profile_id` and MAY represent child-object-like printed items, but each item QR MUST be individually revocable. Root card revocation or suspension still overrides every linked QR credential and child object.
 
 **Merch calendar expiry:** `print_artifact` credentials for founding physical SKUs MUST use `expires_at: null` unless the SKU is an explicit timed-event product (storefront + scan copy). Digital `scope: card` QRs MAY use `expires_at` per create UI. Policy: [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md).
 
-**Issue print artifact QR (shipped):** `POST /.well-known/hc/v1/cards/{profile_id}/print-artifact-qrs` with owner- or recovery-signed `{ qr_credential }` (`scope: print_artifact`, `print_artifact_id`, `expires_at` null). Does not change `card.qr.active_qr_id`. One active QR per `print_artifact_id` per profile.
+**Issue print artifact QR (shipped):** `POST /.well-known/hc/v1/cards/{profile_id}/print-artifact-qrs` with root owner- or recovery-signed `{ qr_credential }` (`scope: print_artifact`, `print_artifact_id`, `expires_at` null). Does not change `card.qr.active_qr_id`. One active QR per `print_artifact_id` per root profile.
 
 ### Live Control Challenge
 

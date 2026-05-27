@@ -4,7 +4,7 @@
 **Blocks:** Revoke anytime / any device after create session ends  
 **Does not block:** M5 stranger tests, public create announce, or commerce milestones  
 
-**Related:** `docs/V1_0_ARCHITECTURE_ROADMAP.md` §M5.5, `docs/Technical Standards v1.0.md` §10.1 (recovery key), §12.1 (encrypted export), `docs/M4_CREATED_REVOKE_UI.md` (current session-only revoke)
+**Related:** `docs/ROOT_CARD_AND_CHILD_OBJECTS.md`, `docs/V1_0_ARCHITECTURE_ROADMAP.md` §M5.5, `docs/Technical Standards v1.0.md` §10.1 (recovery key), §12.1 (encrypted export), `docs/M4_CREATED_REVOKE_UI.md` (current session-only revoke)
 
 ---
 
@@ -23,14 +23,14 @@ If the user closes the tab, switches devices, or clears site data, they **cannot
 
 ## Product goal
 
-> A card owner can **revoke (and later: rotate QR, vouch, export)** from a **new browser or device** without creating a duplicate card.
+> A root card owner can **revoke (and later: rotate QR, vouch, export, and manage child objects)** from a **new browser or device** without creating a duplicate card.
 
 Two complementary paths (ship both; user may use one or both):
 
 | Path | User story | Standards alignment |
 |------|------------|---------------------|
-| **A. Encrypted key export / import** | “I saved a backup file at create; I import it on my laptop to revoke.” | Export bundle §12.1  -  encrypted private key **if user opts in** |
-| **B. Recovery key** | “I lost my phone but I wrote down a recovery code; I can still revoke.” | Revocation §10.1  -  **accepted recovery key**; live control §challenge |
+| **A. Encrypted key export / import** | “I saved a backup file at create; I import it on my laptop to revoke the root or one child object.” | Export bundle §12.1  -  encrypted private key **if user opts in** |
+| **B. Recovery key** | “I lost my phone but I wrote down a recovery code; I can still recover root/child lifecycle control.” | Revocation §10.1  -  **accepted recovery key**; live control §challenge |
 
 Neither path uploads plaintext private keys to the resolver.
 
@@ -64,7 +64,11 @@ Neither path uploads plaintext private keys to the resolver.
 - humanity.llc staff recovering your passphrase or key.
 - Automatic iCloud/Drive upload (user must not treat backup like a normal doc without encryption awareness).
 - Recovery if **both** device key and backup/passphrase are lost.
-- Revoke without either session key **or** backup+passphrase.
+- Revoke or child-object edit without either session key **or** backup+passphrase.
+
+### Child-object implication
+
+In the target model, one root key controls many child objects. That makes backup/recovery more important, not less: importing one root backup should restore control over the whole object tree. Product copy should treat backup/recovery as a setup seatbelt before users create many public objects or paid printed artifacts.
 
 ### Crypto (v1 backup file)
 

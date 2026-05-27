@@ -1,7 +1,7 @@
 # Status plate pilot (Phase A vertical #1)
 
 **Status:** Active pilot  
-**Parent:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`  
+**Parent:** `docs/ROOT_CARD_AND_CHILD_OBJECTS.md` · `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`  
 **Prerequisite:** M5 stranger loop (`docs/M5_STRANGER_TEST_RUNBOOK.md`)
 
 ---
@@ -18,6 +18,8 @@ Not a bio link. Not legal ID. Object name + live network status.
 
 ## How to create one
 
+**Current implementation (flat-card bridge):**
+
 1. Go to **https://humanity.llc/create/**
 2. Choose **Status plate** under “Start from”
 3. Fill in:
@@ -26,6 +28,8 @@ Not a bio link. Not legal ID. Object name + live network status.
    - **What should scanners see?**  -  status line (e.g. `Open · Thu–Sun until 9 PM`)
    - **Optional details**  -  up to two short rows (e.g. special hours, tasks) shown under the status on scan
 4. Save recovery key on `/created/`, print QR, scan from another phone, **update the status line** on Live (no revoke required first), then revoke to test.
+
+**Target model:** From an existing root Humanity Card, choose **Add object -> Status plate**. The root key signs the plate's public state; the plate gets its own object/QR lifecycle but no new private key or separate human verification.
 
 Public showcase scan (homepage pilot): see `site/data/showcase-status-plate.json`  -  refresh with `npm run site:seed-showcase` (includes optional `object_streams` detail row on scan).
 
@@ -59,7 +63,8 @@ Deploy Worker with `X-HC-Scan-UI: pass-v7` for this layout.
 
 | Step | Pass? |
 |------|-------|
-| Stranger creates status plate unassisted | ☐ |
+| Stranger creates status plate unassisted (current flat-card bridge) | ☐ |
+| Existing card owner adds status plate as child object (target flow) | ☐ future |
 | Scan answers “open or not?” in &lt;30s | ☐ |
 | Stranger says scan does **not** prove who owns the door | ☐ |
 | Print + second-device scan + revoke without founder present | ☐ |

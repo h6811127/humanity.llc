@@ -33,11 +33,11 @@ If we never ship vouches, live control, org tools, or federation, stop the proje
 
 No - if we ship the full trust loop. Yes - if we stop at a pretty link.
 
-A generic QR profile points to **content**. A Humanity Card points to **current signed state**:
+A generic QR profile points to **content**. A root Humanity Card and its child objects point to **current signed state**:
 
 - The card has signed public data anyone can inspect.
 - The QR resolves to **live** status (not a cached bio).
-- The owner can revoke the card or **specific printed-item** QR credentials.
+- The owner can revoke the root card, a child object, or **specific printed-item** QR credentials.
 - Vouches show accountable social trust under rules - not a hidden score.
 - Live control proof can show recent control of the card key in person.
 - The scan page states what the QR does and does not prove.
@@ -100,17 +100,17 @@ If someone steals a sticker or printed card:
 
 The scan page must say:
 
-> This QR resolves to a Humanity Card. It does not prove the person holding this item is the card owner.
+> This QR resolves through a Humanity Card. It does not prove the person holding this item is the card owner.
 
 ---
 
 ## What Does Live Control Prove?
 
-Live control proof means the card key signed a fresh challenge moments ago.
+Live control proof means the root card key signed a fresh challenge moments ago.
 
 It proves:
 
-- Recent control of the card key or accepted recovery/rotation key.
+- Recent control of the root card key or accepted recovery/rotation key.
 
 It does not prove:
 
@@ -246,7 +246,7 @@ V1 should provide:
 - Key rotation/recovery design if implemented.
 - Honest warnings if recovery is not available yet.
 
-If a user loses the only key and has no recovery path, they may not be able to prove control or revoke normally. The product must explain this before users rely on the card.
+If a user loses the only root key and has no recovery path, they may not be able to prove control, revoke, or edit child objects normally. The product must explain this before users rely on the card, and should push backup/recovery harder before many child objects or paid printed artifacts.
 
 ---
 
