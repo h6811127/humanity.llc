@@ -32,7 +32,7 @@ describe("device-emphasis-card-html", () => {
   it("landing index busts styles.css cache when spacing changes", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain('href="/css/hc-emphasis-card.css?v=3"');
-    expect(html).toContain("styles.css?v=124");
+    expect(html).toContain("styles.css?v=125");
   });
 
   it("landing final CTA uses urgent emphasis card and standard CTA", () => {
@@ -147,7 +147,10 @@ describe("device-emphasis-card-html", () => {
 
     const styles = readFileSync(join(root, "site/styles.css"), "utf8");
     expect(styles).toMatch(
-      /#created-vouch-return-banner\.hc-emphasis-card[\s\S]*flex-direction:\s*column/
+      /#created-vouch-return-banner\.hc-emphasis-card[\s\S]*justify-content:\s*flex-start/
+    );
+    expect(styles).toMatch(
+      /#no-session\.hc-emphasis-card \.hc-emphasis-card__main[\s\S]*flex:\s*none/
     );
   });
 
@@ -170,6 +173,16 @@ describe("device-emphasis-card-html", () => {
     expect(html).not.toContain("form-warning flow-form-warning");
   });
 
+  it("scan bundle propagates compact emphasis spacing tokens", () => {
+    const scanPass = readFileSync(join(root, "site/scan-pass.css"), "utf8");
+    const bundled = readFileSync(
+      join(root, "worker/src/resolver/scan-pass-styles.ts"),
+      "utf8"
+    );
+    expect(scanPass).toContain("--hc-emphasis-card-gap-section-compact: 12px");
+    expect(bundled).toContain("--hc-emphasis-card-gap-section-compact");
+  });
+
   it("scan bundle propagates phase B/C emphasis tokens and dark glass rules", () => {
     const scanPass = readFileSync(join(root, "site/scan-pass.css"), "utf8");
     expect(scanPass).toContain("--hc-emphasis-card-fill-active-glass");
@@ -184,7 +197,7 @@ describe("device-emphasis-card-html", () => {
     for (const page of ["site/wallet/index.html", "site/create/index.html", "site/created/index.html"]) {
       const html = readFileSync(join(root, page), "utf8");
       expect(html).toContain('href="/css/hc-emphasis-card.css?v=3"');
-      expect(html).toContain("styles.css?v=124");
+      expect(html).toContain("styles.css?v=125");
       expect(html).toContain("theme-dark.css?v=26");
       expect(html).toContain("device-shell.css?v=52");
     }

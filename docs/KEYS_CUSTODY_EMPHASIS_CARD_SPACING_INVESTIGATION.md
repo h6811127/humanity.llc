@@ -1,6 +1,6 @@
 # Keys custody emphasis card — excessive vertical spacing
 
-**Status:** **Fixed** (May 2026) — compact tokens + F3 stacked layout shipped; `styles.css?v=124` on shell pages  
+**Status:** Steps 1–11 **shipped** (May 2026) — keys custody + created column cards; `styles.css?v=125`  
 **Surface:** `#device-keys-custody-hub`, `#device-keys-custody-wallet`, `device-keys-custody--created`, `device-keys-custody--compact`  
 **Canonical spacing:** [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) § Internal spacing ladder · F3 stacked layout
 
@@ -32,6 +32,8 @@ Hub keys custody card (`KEYS CUSTODY` / “Your browser holds the private key”
 | 4 | Document compact tier in visual alignment spacing table | `HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md` |
 | 5 | Vitest: stacked + compact tokens + `flex-start` on custody | `worker/tests/device-keys-custody-html.test.ts`, `device-emphasis-card-html.test.ts` |
 | 6 | Cache bust `styles.css?v=` on shell pages that mount custody | `site/index.html`, `site/wallet/index.html`, `site/create/index.html`, `site/created/index.html` |
+| 7 | **`npm run worker:bundle-scan`** — sync compact tokens into scan bundle | `worker/src/resolver/scan-pass-styles.ts` ([`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) § Engineering hygiene) |
+| 8 | Run rollout QA commands (below) | Vitest + optional wallet e2e |
 
 **Do not** lower global `--hc-emphasis-card-gap-section` (24px) — landing / cross-tab marketing cards keep comfort density.
 
@@ -42,3 +44,18 @@ Hub keys custody card (`KEYS CUSTODY` / “Your browser holds the private key”
 - Copy and **Acknowledge** sit with **~12px** section rhythm (compact token), no internal dead band.
 - Hub, wallet, created, and compact custody variants share the same density.
 - `npm run worker:test -- worker/tests/device-keys-custody-html.test.ts worker/tests/device-emphasis-card-html.test.ts`
+- `npm run worker:test:ui-color-scheme` ([`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) § QA)
+- `npm run e2e -- e2e/device-os-wallet.spec.ts` when wallet/hub custody chrome changed (rollout § QA item 6)
+- Manual: hub + wallet keys custody, light + dark ([`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) § QA checklist)
+
+---
+
+## Follow-up — phase 4 created column cards (step 9)
+
+Same root cause as keys custody: column `hc-emphasis-card` without F3 stacked layout inherits `justify-content: space-between` and `flex: 1 1 12rem` on `__main`.
+
+| Step | Action | Selectors |
+|------|--------|-----------|
+| 9 | Apply compact stacked layout | `#no-session`, `#created-error`, `#live-control-proof`, `#created-vouch-return-banner`, `#owner-revoked-banner`, `.revoke-id-warning` | **Shipped** |
+| 10 | Bump `styles.css?v=` on shell pages | `site/index.html`, `wallet/`, `create/`, `created/` | **Shipped** `v=125` |
+| 11 | Vitest guards for `flex-start` on created column cards | `device-emphasis-card-html.test.ts` | **Shipped** |

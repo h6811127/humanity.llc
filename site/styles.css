@@ -6931,8 +6931,6 @@ button.btn-danger {
 
 .revoke-id-warning.hc-emphasis-card {
   margin: 0 0 12px;
-  flex-direction: column;
-  align-items: stretch;
 }
 
 /* Keys custody — compact stacked emphasis (docs/KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md) */
@@ -6953,11 +6951,6 @@ button.btn-danger {
   color: var(--hc-notice-link);
 }
 
-.device-keys-custody--created.hc-emphasis-card {
-  flex-direction: column;
-  align-items: stretch;
-}
-
 .device-keys-custody--created .hc-emphasis-card__actions {
   width: 100%;
   max-width: none;
@@ -6976,10 +6969,29 @@ button.btn-danger {
   color: var(--hc-notice-link);
 }
 
+/* Created workspace column emphasis — compact F3 stacked (KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md § step 9) */
 #no-session.hc-emphasis-card,
-#created-error.hc-emphasis-card {
+#created-error.hc-emphasis-card,
+#live-control-proof.hc-emphasis-card,
+#created-vouch-return-banner.hc-emphasis-card,
+#owner-revoked-banner.hc-emphasis-card,
+.revoke-id-warning.hc-emphasis-card {
   flex-direction: column;
   align-items: stretch;
+  justify-content: flex-start;
+  gap: var(--hc-emphasis-card-gap-section-compact);
+  padding: var(--hc-emphasis-card-padding-block-compact)
+    var(--hc-emphasis-card-padding-inline-compact);
+}
+
+#no-session.hc-emphasis-card .hc-emphasis-card__main,
+#created-error.hc-emphasis-card .hc-emphasis-card__main,
+#live-control-proof.hc-emphasis-card .hc-emphasis-card__main,
+#created-vouch-return-banner.hc-emphasis-card .hc-emphasis-card__main,
+#owner-revoked-banner.hc-emphasis-card .hc-emphasis-card__main,
+.revoke-id-warning.hc-emphasis-card .hc-emphasis-card__main {
+  flex: none;
+  width: 100%;
 }
 
 #no-session .hc-emphasis-card__actions {
@@ -7761,8 +7773,6 @@ body.device-shell-created .flow-keys-group .list-row {
 /* Vouch return — hc-emphasis-card--active (docs/HC_EMPHASIS_CARD_ROLLOUT.md backlog) */
 #created-vouch-return-banner.hc-emphasis-card {
   margin: 0 0 12px;
-  flex-direction: column;
-  align-items: stretch;
 }
 
 #created-vouch-return-banner .hc-emphasis-card__actions {
@@ -7781,8 +7791,6 @@ body.device-shell-created .flow-keys-group .list-row {
 /* Live proof panel — hc-emphasis-card--urgent (docs/HC_EMPHASIS_CARD_ROLLOUT.md Phase 3) */
 #live-control-proof.hc-emphasis-card {
   margin-bottom: 4px;
-  flex-direction: column;
-  align-items: stretch;
 }
 
 #live-control-proof .hc-emphasis-card__actions {
