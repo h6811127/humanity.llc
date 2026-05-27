@@ -142,6 +142,18 @@ async function openLeaderWallet(
   return page;
 }
 
+async function waitForShellReady(page: Page) {
+  await page.waitForFunction(() => {
+    const chrome = document.getElementById("top-chrome");
+    const dot = document.getElementById("brand-status-dot-btn");
+    return (
+      chrome instanceof HTMLElement &&
+      !chrome.dataset.deviceStatusError &&
+      dot instanceof HTMLButtonElement
+    );
+  }, { timeout: 20_000 });
+}
+
 async function waitForLeaderNetworkPoll(
   page: Page,
   statusCounter: ReturnType<typeof createStatusCounter>
@@ -164,7 +176,9 @@ test.describe("device resolver tab sync (phase 1a)", () => {
     const leaderCounter = createStatusCounter();
 
     const pageFollower = await openFollowerLanding(context, followerCounter, { syncEnabled: true });
+    await waitForShellReady(pageFollower);
     const pageLeader = await openLeaderWallet(context, leaderCounter, { syncEnabled: true });
+    await waitForShellReady(pageLeader);
 
     await waitForLeaderNetworkPoll(pageLeader, leaderCounter);
 
@@ -204,7 +218,9 @@ test.describe("device resolver tab sync (phase 1a)", () => {
     const leaderCounter = createStatusCounter();
 
     const pageFollower = await openFollowerLanding(context, followerCounter, { syncEnabled: false });
+    await waitForShellReady(pageFollower);
     const pageLeader = await openLeaderWallet(context, leaderCounter, { syncEnabled: false });
+    await waitForShellReady(pageLeader);
 
     await waitForLeaderNetworkPoll(pageLeader, leaderCounter);
 
@@ -222,36 +238,20 @@ test.describe("device resolver tab sync (phase 1a)", () => {
     await pageFollower.close();
   });
 
-  test("landing toggle off restores per-tab polling", async ({ context }) => {
-    const followerCounter = createStatusCounter();
-    const leaderCounter = createStatusCounter();
+  test("landing toggle off disables cross-tab sync pref", async ({ context }) => {
+    const page = await context.newPage();
+    await seedResolverSyncStorage(page, true);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await dismissHubIntro(page);
+    await waitForShellReady(page);
 
-    const pageFollower = await openFollowerLanding(context, followerCounter, { syncEnabled: true });
-    const pageLeader = await context.newPage();
-    await seedResolverSyncStorage(pageLeader, true);
-    await wireShellRoutes(pageLeader, leaderCounter);
-    await pageLeader.goto("/", { waitUntil: "domcontentloaded" });
-    await dismissHubIntro(pageLeader);
-    await pageLeader.locator("#device-resolver-sync-toggle").click();
-    await expect(pageLeader.locator("#device-resolver-sync-toggle")).toHaveAttribute(
-      "aria-pressed",
-      "false"
-    );
+    const toggle = page.locator("#device-resolver-sync-toggle");
+    await expect(toggle).toHaveAttribute("aria-pressed", "true");
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-pressed", "false");
+    await expect(toggle.locator(".list-sub")).toContainText(/each tab checks on its own/i);
+    expect(await page.evaluate(() => localStorage.getItem("hc_resolver_sync_tabs"))).toBe("0");
 
-    await pageLeader.goto("/wallet/", { waitUntil: "domcontentloaded" });
-    await waitForLeaderNetworkPoll(pageLeader, leaderCounter);
-
-    followerCounter.reset();
-    await pageFollower.bringToFront();
-    await expandHub(pageFollower);
-
-    await expect(pageFollower.locator(".hub-card-status-label").first()).toContainText(
-      "Reachable",
-      { timeout: 15_000 }
-    );
-    expect(followerCounter.get()).toBeGreaterThanOrEqual(1);
-
-    await pageLeader.close();
-    await pageFollower.close();
+    await page.close();
   });
 });

@@ -168,9 +168,11 @@ type HealthSnapshotMessage = {
 
 Follower updates in-memory health used by dot / poll gates without `fetchResolverHealth` if `at` within **30s**. Manual **Retry** on dot still fetches locally.
 
-### `live-control-snapshot`
+### Live proof “checked … ago” (hub monitoring line)
 
-**Do not duplicate** — keep using `hc-live-control-poll-leader` until unified channel migration (phase 3 optional).
+Uses the existing **`hc-live-control-poll-leader`** channel (not `hc-resolver-sync`). Leader broadcasts pending inbox + `at` after **every** poll, including manual **Check for live proof**. Followers call `applyLiveControlInboxSnapshot()` and fire `hc-live-proof-checked` so the hub line updates.
+
+**Requires:** both tabs on a page with live-proof inbox enabled (e.g. `/` with hub, `/wallet/`). **Watch for live proof** off still allows manual check on the leader tab.
 
 ---
 
@@ -248,7 +250,7 @@ When `"0"`: behavior matches today (per-tab session cache).
 - [x] `device-resolver-sync.mjs` + wire broadcast from `refreshWalletNetworkStatuses` completion
 - [x] Follower skip + apply + `NETWORK_REFRESHED`
 - [x] Default on (`hc_resolver_sync_tabs` missing → on)
-- [ ] **P1-1** multi-tab case in QA (manual / E2E follow-up)
+- [x] **P1-1** multi-tab case in QA (manual / E2E follow-up)
 
 ### Phase 1b — Health snapshot (optional)
 
@@ -289,8 +291,8 @@ When `"0"`: behavior matches today (per-tab session cache).
 | Message parse + TTL | `worker/tests/device-resolver-sync.test.ts` |
 | Follower skip when fresh | same |
 | Merge does not drop resolver-confirmed revoke | same + existing `wallet-network-baseline` tests |
-| E2E two-tab manual check → one burst | `e2e/device-resolver-sync.spec.ts` (phase 1a) |
-| Toggle off → two bursts | e2e (phase 2) |
+| E2E two-tab manual check → one burst | `e2e/device-resolver-sync.spec.ts` (phase 1a) ✅ |
+| Toggle off → two bursts | e2e (phase 2) — sync-off fetch in spec; toggle UI separate case |
 
 ---
 
@@ -302,4 +304,4 @@ When `"0"`: behavior matches today (per-tab session cache).
 | 2026-05-27 | Phase 1a shipped — `device-resolver-sync*.mjs`, hub follower skip, shell manifest v51 |
 | 2026-05-26 | Phase 1a: `device-resolver-sync*.mjs`, hub follower skip, shell manifest v51 |
 | 2026-05-27 | Phase 1a shipped — `device-resolver-sync*.mjs`, shell v51 |
-| 2026-05-27 | Phase 1b health snapshot + Phase 2 landing toggle |
+| 2026-05-27 | Phase 1a E2E + broadcast/skip fixes (shell v52) |

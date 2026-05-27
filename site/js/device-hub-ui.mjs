@@ -650,6 +650,18 @@ export function getLastWalletNetworkCheckedAt() {
   return lastWalletNetworkFetchAt;
 }
 
+if (typeof window !== "undefined") {
+  window.addEventListener(HUB_NETWORK_CHECKED_EVENT, (e) => {
+    const at =
+      e instanceof CustomEvent && e.detail && typeof e.detail === "object"
+        ? /** @type {{ at?: number }} */ (e.detail).at
+        : undefined;
+    if (typeof at === "number" && Number.isFinite(at) && at > 0) {
+      lastWalletNetworkFetchAt = at;
+    }
+  });
+}
+
 function applyCachedNetworkChipsOnly() {
   if (!savedList) return;
   const entries = loadWallet();

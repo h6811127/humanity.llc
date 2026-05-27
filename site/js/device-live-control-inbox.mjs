@@ -428,7 +428,7 @@ export async function refreshLiveControlInbox(opts = {}) {
     }
     lastLiveProofCheckAt = Date.now();
     window.dispatchEvent(new Event(LIVE_PROOF_CHECKED_EVENT));
-    if (!manual) publishLeaderSnapshot();
+    publishLeaderSnapshot();
     return pending;
   }
 
@@ -455,7 +455,7 @@ export async function refreshLiveControlInbox(opts = {}) {
     window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
   }
   window.dispatchEvent(new Event(LIVE_PROOF_CHECKED_EVENT));
-  if (!manual) publishLeaderSnapshot();
+  publishLeaderSnapshot();
   return pending;
 }
 

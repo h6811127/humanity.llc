@@ -103,6 +103,11 @@ function applySnapshotMessage(message) {
   const merged = mergeNetworkSnapshotIntoCache(cache, message.entries, message.at);
   saveWalletNetworkCacheForSync(merged);
   applyResolverNetworkSnapshot(message.entries, message.at);
+  if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
+    window.dispatchEvent(
+      new CustomEvent("hc-hub-network-checked", { detail: { at: message.at } })
+    );
+  }
   void import("./device-chrome-refresh.mjs")
     .then((m) => m.refreshDeviceChrome({ immediate: true }))
     .catch(() => {});
@@ -213,7 +218,6 @@ export function broadcastNetworkSnapshotIfEligible(detail) {
   if (!readResolverSyncTabsPref()) return;
   const manual = detail.manual === true;
   const now = Date.now();
-  if (!manual && !isLiveControlPollLeaderTab(now)) return;
   if (!manual) touchLiveControlPollLeader(now);
 
   const cache = loadWalletNetworkCacheForSync();
