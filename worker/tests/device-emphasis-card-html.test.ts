@@ -9,6 +9,7 @@ import {
   emphasisCardCtaButton,
   escapeEmphasisHtml,
 } from "../../site/js/device-emphasis-card-html.mjs";
+import { DEVICE_SHELL_ASSET_VERSION } from "../../site/js/device-status-shell-modules.mjs";
 
 describe("device-emphasis-card-html", () => {
   it("escapes HTML in CTA labels", () => {
@@ -212,7 +213,7 @@ describe("device-emphasis-card-html", () => {
       expect(html).toContain("theme-dark.css?v=29");
       expect(html).toContain("device-shell.css?v=59");
       expect(html).toContain('id="shell-status-line"');
-      expect(html).toContain("device-status-bootstrap.mjs?v=53");
+      expect(html).toContain(`device-status-bootstrap.mjs?v=${DEVICE_SHELL_ASSET_VERSION}`);
     }
   });
 

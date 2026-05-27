@@ -11,6 +11,14 @@ import {
 } from "../../site/js/device-status-shell-modules.mjs";
 
 const siteJsDir = path.join(fileURLToPath(new URL("../..", import.meta.url)), "site/js");
+const siteRoot = path.join(fileURLToPath(new URL("../..", import.meta.url)), "site");
+
+const SHELL_HTML_PAGES = [
+  "index.html",
+  "create/index.html",
+  "created/index.html",
+  "wallet/index.html",
+];
 
 describe("device status shell module manifest", () => {
   it("every manifest entry exists under site/js", () => {
@@ -46,6 +54,14 @@ describe("device status shell module manifest", () => {
           `${file} imports ?v=${n}; expected ${DEVICE_SHELL_ASSET_VERSION}`
         ).toBe(DEVICE_SHELL_ASSET_VERSION);
       }
+    }
+  });
+
+  it("shell HTML pages use DEVICE_SHELL_ASSET_VERSION on status bootstrap", () => {
+    const expected = `device-status-bootstrap.mjs?v=${DEVICE_SHELL_ASSET_VERSION}`;
+    for (const page of SHELL_HTML_PAGES) {
+      const html = fs.readFileSync(path.join(siteRoot, page), "utf8");
+      expect(html, page).toContain(expected);
     }
   });
 });

@@ -50,7 +50,7 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 
 The floating **status dot** (`#brand-status-dot-btn`) is the hub opener on `/`, `/create/`, and `/created/`. On `/wallet/` it only scrolls to saved cards. Do not wire glance-first on dot tap.
 
-**Red outline ring + dead dot on all pages** = `device-status.mjs` import graph failed (`data-device-status-error`). See `docs/STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`. Never merge a new `./device-*.mjs` import on the status graph without the file in the same PR; add the filename to `DEVICE_STATUS_SHELL_JS_FILES` in `site/js/device-status-shell-modules.mjs`, bump `DEVICE_SHELL_ASSET_VERSION` on shell HTML bootstrap and on every `./peer.mjs?v=N` import between manifest peers. Run `npm run worker:test -- worker/tests/device-status-shell-modules.test.ts`.
+**Red outline ring + dead dot on all pages** = `device-status.mjs` import graph failed (`data-device-status-error`). See `docs/STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`. Never merge a new `./device-*.mjs` import on the status graph without the file in the same PR; add the filename to `DEVICE_STATUS_SHELL_JS_FILES` in `site/js/device-status-shell-modules.mjs`, bump `DEVICE_SHELL_ASSET_VERSION` on shell HTML bootstrap and on every `./peer.mjs?v=N` import between manifest peers. Run `npm run worker:test -- worker/tests/device-status-shell-modules.test.ts`. **Lazy subgraphs (Shell P2):** `device-inbox-sheet-loader.mjs` and `device-browser-notifications-loader.mjs` — do not static-import full sheet/notifications from `device-status.mjs` or `device-hub-ui.mjs`. Tests: `npm run worker:test:lazy-shell`.
 
 When you touch any of these, run the regression suite before finishing:
 

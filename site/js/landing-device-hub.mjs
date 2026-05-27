@@ -7,7 +7,6 @@ import {
   initResolverSyncTabsToggle,
 } from "./device-resolver-sync-prefs.mjs";
 import { initDeviceHub } from "./device-hub-ui.mjs";
-import { mountBrowserNotifToggles } from "./device-browser-notifications.mjs";
 import { mountThemeToggles } from "./device-theme.mjs";
 import "./device-help-fab.mjs";
 
@@ -16,4 +15,3 @@ initAutoSaveToggle();
 initResolverSyncTabsToggle();
 initResolverRefreshAllTabsAction();
 mountThemeToggles();
-mountBrowserNotifToggles();

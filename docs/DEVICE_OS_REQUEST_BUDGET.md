@@ -492,7 +492,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 ### Implementer order (after Phases 1–9 + 8c)
 
 1. **Phase 10 (M8 complete, G0 signed)** — **Next:** production rollout ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout). Legal review for G7 when available.
-2. **Shell P2** - Lazy inbox loader ([`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md)).  
+2. **Shell P2** - Lazy browser notifications loader ([`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md)) — inbox loader shipped; notifications loader **2026-05-27**.  
 3. **Ops O2** - Per-IP rate limits on hot routes.
 
 See also [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) and [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).

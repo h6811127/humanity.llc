@@ -13,7 +13,7 @@ import {
 import { applyDeviceHubSearch } from "./device-hub-search.mjs";
 import { initHubBackupImport } from "./device-hub-import.mjs";
 import { mountThemeToggles } from "./device-theme.mjs";
-import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs";
+import { syncBrowserNotifPrompts } from "./device-browser-notifications-loader.mjs";
 import { renderHubInboxAlerts, inboxItemsIncludeKind } from "./device-hub-inbox-alerts.mjs";
 import { renderHubKeysCustodyPanel } from "./device-hub-keys-custody.mjs";
 import { getInboxItems, notificationCount } from "./device-inbox.mjs";
