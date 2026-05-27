@@ -330,10 +330,11 @@ Optional **non-trust** badge on scan: “Scanned from a founding sticker” for 
 | Resolver: `print_artifact` ignores calendar expiry | Engineering | **Shipped** | `worker/src/resolver/merch-qr-policy.ts` · `scan-state.ts` |
 | Scan UI: no “Valid until” on artifact; limits + group copy | Engineering | **Shipped** | `scan-html.ts` · `worker/tests/merch-qr-lifecycle.test.ts` |
 | Mint validation helper for `expires_at: null` on artifact | Engineering | **Shipped** (helper) | `validatePrintArtifactMintExpiry` — wire at fulfillment mint |
-| Fulfillment mint sets `scope: print_artifact`, `expires_at: null` | Engineering | **Shipped** (owner issue API) | `POST …/cards/{profile_id}/print-artifact-qrs` · `issue-print-artifact-qr.test.ts` · Printify/Shopify automation pending |
+| Fulfillment mint sets `scope: print_artifact`, `expires_at: null` | Engineering | **Shipped** | `POST …/print-artifact-qrs` · `POST …/print/orders/{id}/mint` · `fulfillment-mint.ts` |
 | Artifact intent preview + cart attach metadata (A-001 spike) | Engineering | **Shipped** | `POST /v1/store/artifact-intents` · `…/attach` · migration `0014_artifact_intents.sql` |
 | Shopify paid webhook → commerce order link (O-001) | Engineering | **Shipped** | `POST /v1/webhooks/shopify/orders` · migration `0015_commerce_order_links.sql` · Printify submit pending |
 | Print fulfillment queue + catalog + artwork (O-002) | Engineering | **Shipped** (queue + preview) | `GET /v1/print/catalog` · `POST /v1/print/artifacts` · `POST /v1/print/orders` · migration `0016_print_orders.sql` · Printify HTTP deferred |
+| Operator fulfillment lookup chain (O-003) | Engineering | **Shipped** | `GET /v1/operator/fulfillment/lookup` · Shopify/commerce/intent/print order ids |
 | Orphan purge respects null expiry | Engineering | **Shipped** (existing) | `orphan-purge.test.ts` |
 | Tier 0 batch rotate runbook | Ops | **Shipped** | [`TIER0_CAMPAIGN_QR_RUNBOOK.md`](TIER0_CAMPAIGN_QR_RUNBOOK.md) |
 | Support macros: misprint vs revoke vs reprint | Ops | **Shipped** (draft) | [`MERCH_SUPPORT_MACROS.md`](MERCH_SUPPORT_MACROS.md) |

@@ -124,6 +124,24 @@ export async function updateCommerceOrderPrintOrderIds(
     .run();
 }
 
+export async function findCommerceOrdersByArtifactIntentId(
+  db: D1Database,
+  artifactIntentId: string
+): Promise<CommerceOrderRow[]> {
+  const pattern = `%"${artifactIntentId}"%`;
+  const rows = await db
+    .prepare(
+      `SELECT commerce_order_id, shopify_order_id, shopify_checkout_id, profile_id,
+              artifact_intent_ids_json, print_order_ids_json, status, hold_reason,
+              created_at, updated_at
+       FROM commerce_order_links
+       WHERE artifact_intent_ids_json LIKE ?`
+    )
+    .bind(pattern)
+    .all<CommerceOrderRow>();
+  return rows.results ?? [];
+}
+
 export async function getShopifyWebhookReceipt(
   db: D1Database,
   webhookId: string

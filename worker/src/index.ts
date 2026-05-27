@@ -53,8 +53,10 @@ import {
 } from "./print/print-handlers";
 import {
   handleGetPrintOrder,
+  handlePostPrintOrderMint,
   handlePostPrintOrders,
 } from "./print/print-orders-handler";
+import { handleGetOperatorFulfillmentLookup } from "./operator/fulfillment-lookup";
 
 export interface Env {
   DB: D1Database;
@@ -524,6 +526,21 @@ export default {
         return jsonResponse({ error: "database_unconfigured" }, 503);
       }
       return handleGetPrintOrder(request, env, env.DB, printOrderMatch[1]!);
+    }
+
+    const printOrderMintMatch = path.match(/^\/v1\/print\/orders\/([^/]+)\/mint$/);
+    if (printOrderMintMatch && request.method === "POST") {
+      if (!env.DB) {
+        return jsonResponse({ error: "database_unconfigured" }, 503);
+      }
+      return handlePostPrintOrderMint(request, env, env.DB, printOrderMintMatch[1]!);
+    }
+
+    if (path === "/v1/operator/fulfillment/lookup" && request.method === "GET") {
+      if (!env.DB) {
+        return jsonResponse({ error: "database_unconfigured" }, 503);
+      }
+      return handleGetOperatorFulfillmentLookup(request, env, env.DB);
     }
 
     const cardMatch = path.match(

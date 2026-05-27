@@ -45,6 +45,29 @@ export interface InsertPrintOrderInput {
   created_at: string;
 }
 
+export async function getPrintOrderByPrintifyOrderId(
+  db: D1Database,
+  printifyOrderId: string
+): Promise<PrintOrderRow | null> {
+  return db
+    .prepare(
+      `SELECT order_id, profile_id, print_artifact_ids_json, planned_item_qr_ids_json,
+              commerce_order_id, shopify_order_id, printify_order_id, printify_shop_id,
+              template_id, status, shipping_method, created_at, updated_at
+       FROM print_orders WHERE printify_order_id = ?`
+    )
+    .bind(printifyOrderId)
+    .first<PrintOrderRow>();
+}
+
+export async function getPrintOrdersByCommerceOrderId(
+  db: D1Database,
+  commerceOrderId: string
+): Promise<PrintOrderRow[]> {
+  const primary = await getPrintOrderByCommerceOrderId(db, commerceOrderId);
+  return primary ? [primary] : [];
+}
+
 export async function getPrintOrderByCommerceOrderId(
   db: D1Database,
   commerceOrderId: string

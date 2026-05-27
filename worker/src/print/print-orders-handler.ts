@@ -1,4 +1,7 @@
-import { ensurePrintOrderForCommerceOrder } from "../commerce/fulfillment-queue";
+import {
+  allPlannedQrsMinted,
+  mintPrintOrderFromCredentials,
+} from "../commerce/fulfillment-mint";
 import {
   getCommerceOrderById,
   type CommerceOrderRow,
@@ -16,6 +19,10 @@ import { submitPrintifyOrder } from "./printify-client";
 interface CreatePrintOrderRequest {
   commerce_order_id?: unknown;
   submit_to_printify?: unknown;
+}
+
+interface MintPrintOrderRequest {
+  qr_credentials?: unknown;
 }
 
 function printOrderResponse(row: PrintOrderRow) {
@@ -91,6 +98,15 @@ export async function handlePostPrintOrders(
       return jsonResponse(printOrderResponse(printOrder), 200);
     }
 
+    const minted = await allPlannedQrsMinted(db, printOrder);
+    if (!minted) {
+      return errorResponse(
+        "PLANNED_QRS_NOT_MINTED",
+        "All planned print_artifact QRs must be minted before Printify submit.",
+        409
+      );
+    }
+
     const submit = await submitPrintifyOrder(env, {
       print_order_id: printOrder.order_id,
       template_id: printOrder.template_id,
@@ -141,6 +157,76 @@ export async function handleGetPrintOrder(
   }
 
   return jsonResponse(printOrderResponse(row));
+}
+
+/** POST /v1/print/orders/{order_id}/mint — batch mint planned owner-signed QRs. */
+export async function handlePostPrintOrderMint(
+  request: Request,
+  env: Env,
+  db: D1Database,
+  orderId: string
+): Promise<Response> {
+  const authErr = requireOperator(request, env);
+  if (authErr) return authErr;
+
+  let body: MintPrintOrderRequest;
+  try {
+    body = (await request.json()) as MintPrintOrderRequest;
+  } catch {
+    return errorResponse("MALFORMED_REQUEST", "Invalid JSON body.", 400);
+  }
+
+  if (!Array.isArray(body.qr_credentials) || body.qr_credentials.length === 0) {
+    return errorResponse(
+      "MALFORMED_REQUEST",
+      "Body must include qr_credentials array.",
+      400
+    );
+  }
+
+  const printOrder = await getPrintOrderById(db, orderId);
+  if (!printOrder) {
+    return errorResponse("PRINT_ORDER_NOT_FOUND", "Print order not found.", 404);
+  }
+
+  if (printOrder.status === "canceled" || printOrder.status === "unfulfillable") {
+    return errorResponse(
+      "PRINT_ORDER_NOT_MINTABLE",
+      "Print order cannot accept fulfillment mint.",
+      409
+    );
+  }
+
+  const credentials = body.qr_credentials.filter(
+    (item): item is Record<string, unknown> => !!item && typeof item === "object"
+  );
+
+  const result = await mintPrintOrderFromCredentials(
+    request,
+    db,
+    printOrder,
+    credentials
+  );
+
+  if (!result.ok) {
+    return errorResponse(result.code, result.message, result.httpStatus);
+  }
+
+  const status = result.all_planned_minted ? 200 : 422;
+  return jsonResponse(
+    {
+      order_id: printOrder.order_id,
+      minted: result.minted.map((m) => ({
+        qr_id: m.qr_id,
+        print_artifact_id: m.print_artifact_id,
+        scan_url: m.scan_url,
+        already_minted: m.already_minted,
+      })),
+      failures: result.failures,
+      all_planned_minted: result.all_planned_minted,
+    },
+    status
+  );
 }
 
 export async function queuePrintOrderAfterPaidWebhook(
