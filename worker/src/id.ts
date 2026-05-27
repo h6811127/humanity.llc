@@ -20,6 +20,16 @@ export function generateQrId(): string {
   return `qr_${randomBase58(16)}`;
 }
 
+/** ai_ + 16 base58 chars (artifact intent for cart/checkout metadata). */
+export function generateArtifactIntentId(): string {
+  return `ai_${randomBase58(16)}`;
+}
+
+/** pa_ + 16 base58 chars (planned print artifact; minted at fulfillment). */
+export function generatePrintArtifactId(): string {
+  return `pa_${randomBase58(16)}`;
+}
+
 /** lc_ + opaque base58 challenge id for short-lived live control proof. */
 export function generateLiveControlChallengeId(): string {
   return `lc_${randomBase58(18)}`;

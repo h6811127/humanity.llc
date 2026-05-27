@@ -14,7 +14,7 @@ import {
   PROTOCOL_VERSION,
   withCors,
 } from "./http/resolver";
-import { handlePostArtifactIntent } from "./resolver/artifact-intents";
+import { handlePostArtifactIntent, handlePostArtifactIntentAttach } from "./resolver/artifact-intents";
 import { handleGetCard, handlePostCards } from "./resolver/create-card";
 import {
   handleGetLiveControlChallenge,
@@ -457,6 +457,24 @@ export default {
         );
       }
       const res = await handlePostArtifactIntent(request, env.DB);
+      return withCors(request, res);
+    }
+
+    const artifactIntentAttachMatch = path.match(
+      /^\/v1\/store\/artifact-intents\/([^/]+)\/attach$/
+    );
+    if (artifactIntentAttachMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostArtifactIntentAttach(
+        request,
+        env.DB,
+        artifactIntentAttachMatch[1]!
+      );
       return withCors(request, res);
     }
 
