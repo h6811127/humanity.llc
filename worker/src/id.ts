@@ -30,6 +30,11 @@ export function generatePrintArtifactId(): string {
   return `pa_${randomBase58(16)}`;
 }
 
+/** co_ + 16 base58 chars (internal Shopify order link). */
+export function generateCommerceOrderId(): string {
+  return `co_${randomBase58(16)}`;
+}
+
 /** lc_ + opaque base58 challenge id for short-lived live control proof. */
 export function generateLiveControlChallengeId(): string {
   return `lc_${randomBase58(18)}`;

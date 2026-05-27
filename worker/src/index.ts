@@ -46,6 +46,7 @@ import {
   handleGetStewardPush,
   handlePostStewardSession,
 } from "./resolver/steward-hosted";
+import { handlePostShopifyOrdersWebhook } from "./http/shopify-orders-webhook";
 
 export interface Env {
   DB: D1Database;
@@ -55,6 +56,8 @@ export interface Env {
   SCAN_OUT_HMAC_SECRET?: string;
   /** E1 hosted steward API (`1` / `true` to enable). */
   HOSTED_STEWARD_ENABLED?: string;
+  /** O-001 Shopify webhook HMAC secret. */
+  SHOPIFY_WEBHOOK_SECRET?: string;
 }
 
 export default {
@@ -476,6 +479,13 @@ export default {
         artifactIntentAttachMatch[1]!
       );
       return withCors(request, res);
+    }
+
+    if (path === "/v1/webhooks/shopify/orders" && request.method === "POST") {
+      if (!env.DB) {
+        return jsonResponse({ error: "database_unconfigured" }, 503);
+      }
+      return handlePostShopifyOrdersWebhook(request, env, env.DB);
     }
 
     const cardMatch = path.match(
