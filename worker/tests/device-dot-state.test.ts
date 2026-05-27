@@ -8,6 +8,7 @@ import {
   dotOverlayFromCounts,
   dotStateKey,
   hasStewardVerification,
+  hubStatusLineItemsFromSegments,
   inboxOverlayQuickAction,
   overlayAriaText,
   primaryDotTone,
@@ -382,6 +383,56 @@ describe("shell S4 neutral dot and chrome status line", () => {
       },
     ]);
     expect(line).toBe("Network reachable · 0 cards");
+  });
+
+  it("maps hub status segments to one calm inline status line", () => {
+    const items = hubStatusLineItemsFromSegments([
+      {
+        id: "network",
+        chipLabel: "Network reachable",
+        label: "Resolver Online",
+        detail: "Resolver Online",
+        zero: false,
+        highlight: false,
+        chipTone: "network-ok",
+      },
+      {
+        id: "saved",
+        chipLabel: "0 cards",
+        label: "No Cards on Device",
+        detail: "",
+        zero: true,
+        highlight: false,
+      },
+      {
+        id: "pinned",
+        chipLabel: "0 pinned",
+        label: "No Pinned Scans",
+        detail: "",
+        zero: true,
+        highlight: false,
+      },
+      {
+        id: "notices",
+        chipLabel: "Tab keys",
+        label: "Tab Keys Active",
+        detail: "",
+        zero: false,
+        highlight: true,
+        chipTone: "highlight",
+      },
+    ]);
+
+    expect(items.map((item) => item.label)).toEqual([
+      "Network reachable",
+      "0 cards",
+      "0 pinned",
+      "Tab keys",
+    ]);
+    expect(items.find((item) => item.id === "network")?.emphasis).toBe("primary");
+    expect(items.find((item) => item.id === "pinned")?.emphasis).toBe("meta");
+    expect(items.find((item) => item.id === "pinned")?.zero).toBe(true);
+    expect(items.find((item) => item.id === "notices")?.emphasis).toBe("alert");
   });
 
   it("maps neutral empty wallet tone for CSS", () => {

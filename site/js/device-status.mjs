@@ -58,13 +58,14 @@ import {
   dotStateKey,
   dotTransitionKey,
   hasStewardVerification,
+  hubStatusLineItemsFromSegments,
   SHELL_DOT_NEUTRAL_EMPTY_CLASS,
   shellChromeStatusLineFromSegments,
   shellDotUsesNeutralEmptyWallet,
   shellStatusLinePrimaryInChrome,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=44";
+} from "./device-dot-state-core.mjs?v=45";
 
 export const DOT_STATE_CHANGED = "hc-dot-state-changed";
 
@@ -407,20 +408,24 @@ function renderShellStatusLine(segments) {
 
 function renderHubStatusPanel(segments) {
   if (!hubStatusPanel) return;
-  const chips = segments.map((seg) => {
-    const label = seg.chipLabel ?? seg.label;
-    const tone = seg.chipTone ?? (seg.highlight ? "highlight" : "neutral");
+  const items = hubStatusLineItemsFromSegments(segments);
+  const parts = items.map((item, index) => {
     const cls = [
-      "device-hub-chip",
-      `device-hub-chip--${seg.id}`,
-      `device-hub-chip--${tone}`,
-      seg.zero ? "device-hub-chip--zero" : "",
+      "device-hub-status-item",
+      `device-hub-status-item--${item.id}`,
+      `device-hub-status-item--${item.tone}`,
+      `device-hub-status-item--${item.emphasis}`,
+      item.zero ? "device-hub-status-item--zero" : "",
     ]
       .filter(Boolean)
       .join(" ");
-    return `<span class="${cls}" data-seg="${seg.id}" title="${escapeHtml(seg.detail)}">${escapeHtml(label)}</span>`;
+    const separator =
+      index === 0
+        ? ""
+        : `<span class="device-hub-status-separator" aria-hidden="true">·</span>`;
+    return `${separator}<span class="${cls}" data-seg="${item.id}" title="${escapeHtml(item.detail)}">${escapeHtml(item.label)}</span>`;
   });
-  hubStatusPanel.innerHTML = `<div class="device-hub-status-chips" role="status" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">${chips.join("")}</div>`;
+  hubStatusPanel.innerHTML = `<div class="device-hub-status-line" role="status">${parts.join("")}</div>`;
 }
 
 function renderNotifBadge() {
