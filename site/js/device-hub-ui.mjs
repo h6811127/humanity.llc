@@ -99,6 +99,7 @@ import {
   normalizeBaselineState,
 } from "./wallet-network-baseline.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
+import { mountHubBuildStamp } from "./device-hub-build-stamp.mjs";
 import { mountHubNetworkTools } from "./device-hub-network-tools.mjs";
 import {
   getLiveControlPending,
@@ -1475,6 +1476,7 @@ export function initDeviceHub(config = {}) {
 
   initHubBackupImport(hubEl("hub-import-form"), hubEl("hub-import-status"));
   mountThemeToggles();
+  mountHubBuildStamp(hubQueryRoot ?? document);
 
   refreshDeviceHub();
   notifyHubChanged();
