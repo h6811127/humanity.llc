@@ -4696,24 +4696,29 @@ body.landing-focus-mode .screen-landing {
 }
 
 .shop-buy-btn[hidden],
-.shop-buy-btn[aria-disabled="true"] {
+.shop-buy-btn[aria-disabled="true"],
+.shop-notify-btn[hidden] {
   display: none !important;
 }
 
 .shop-buy-btn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  max-width: 22rem;
   margin: 0 0 14px;
+  text-align: center;
   text-decoration: none;
   box-sizing: border-box;
 }
 
 .shop-notify-btn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
+  max-width: 22rem;
   margin: 0 0 14px;
   text-align: center;
   text-decoration: none;
@@ -4721,10 +4726,16 @@ body.landing-focus-mode .screen-landing {
 }
 
 .shop-buy-btn-block {
-  display: flex;
-  width: 100%;
-  max-width: 22rem;
   margin-bottom: 12px;
+}
+
+.shop-checkout-group:not([hidden]) {
+  margin-top: 8px;
+  padding-top: 4px;
+}
+
+.shop-checkout-group:not([hidden]) .shop-checkout-lead-ready {
+  margin-bottom: 14px;
 }
 
 .shop-bullets {

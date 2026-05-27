@@ -95,6 +95,8 @@ function showCheckout(display, checkoutUrl) {
     priceEl.classList.add("shop-product-price--live");
   }
   setBuyButtonsVisible(true, checkoutUrl);
+  // One primary buy in the product card; footer CTA duplicates layout when both show.
+  if (buyBtnFooter) buyBtnFooter.hidden = true;
   if (checkoutNote) checkoutNote.hidden = false;
   if (notifyBtn) notifyBtn.hidden = true;
   if (heroPrimary) {
@@ -108,6 +110,7 @@ function showCheckout(display, checkoutUrl) {
   if (checkoutLead) {
     checkoutLead.textContent = SHOP_CHECKOUT_READY_LEAD;
     checkoutLead.hidden = false;
+    checkoutLead.classList.add("shop-checkout-lead-ready");
   }
   if (checkoutSection) checkoutSection.hidden = false;
   if (interestSection) interestSection.hidden = true;
@@ -132,6 +135,7 @@ function showInterestPending(display) {
   if (checkoutLead) {
     checkoutLead.textContent = "";
     checkoutLead.hidden = true;
+    checkoutLead.classList.remove("shop-checkout-lead-ready");
   }
   if (checkoutSection) checkoutSection.hidden = true;
   if (interestSection) interestSection.hidden = false;

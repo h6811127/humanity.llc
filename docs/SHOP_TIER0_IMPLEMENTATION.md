@@ -27,7 +27,7 @@ The interest form records **optional email** on this browser only (no server upl
 
 1. Create **Founding signal sticker** in Shopify (test or live store).
 2. Copy a checkout URL  -  product page, cart permalink (`/cart/VARIANT_ID:1`), or Buy Button link.
-3. Edit `site/data/shop-config.json`:
+3. Edit `site/data/shop-config.json` (**both** `checkout_open: true` and a non-empty `checkout_url` are required — open alone keeps interest-only UI):
 
 ```json
 {
