@@ -63,7 +63,7 @@ Spec: [`docs/QR_BRANDING.md`](QR_BRANDING.md) § Verification. Automated: `npm r
 
 ### P1-SD · Scan page device dot + glance (`/c/…`)
 
-Spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · Path 2 arrive [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) · Hero plate [`SCAN_HERO_CARD_VISUAL_SPEC.md`](SCAN_HERO_CARD_VISUAL_SPEC.md). Automated: `npm run worker:test:scan-page-dot` · `npm run worker:test:scan-live-check-arrive` · `npm run worker:test -- worker/tests/scan-hero-visual-contract.test.ts` · `npm run e2e:scan-page-dot` · `npm run e2e:scan-hero-visual` (P1-SD steps 8–9 plate + dark + revoked).
+Spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · Path 2 arrive [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) · Hero plate [`SCAN_HERO_CARD_VISUAL_SPEC.md`](SCAN_HERO_CARD_VISUAL_SPEC.md). Automated: `npm run worker:test:scan-page-dot` · `npm run worker:test:scan-live-check-arrive` · `npm run worker:test -- worker/tests/scan-hero-visual-contract.test.ts` · `npm run e2e:scan-page-dot` · `npm run e2e:scan-hero-visual` · `npm run e2e:scan-hero-visual:webkit` (P1-SD steps 8–9 plate + dark + revoked).
 
 | Step | Action | Expected |
 |------|--------|----------|

@@ -30,12 +30,12 @@ export default defineConfig({
     {
       name: "webkit",
       use: { ...devices["Desktop Safari"] },
-      testMatch: /safari-shell-scroll\.spec\.ts/,
+      testMatch: /safari-shell-scroll|scan-hero-visual\.spec\.ts/,
     },
     {
       name: "iphone-13-pro",
       use: { ...devices["iPhone 13 Pro"] },
-      testMatch: /safari-shell-scroll\.spec\.ts/,
+      testMatch: /safari-shell-scroll|scan-hero-visual\.spec\.ts/,
     },
   ],
 });
