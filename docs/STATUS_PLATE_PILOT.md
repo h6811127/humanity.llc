@@ -24,6 +24,7 @@ Not a bio link. Not legal ID. Object name + live network status.
    - **Handle**  -  your card id (e.g. `river_studio`)
    - **What is this plate on?**  -  headline on scan (e.g. `Studio door`)
    - **What should scanners see?**  -  status line (e.g. `Open · Thu–Sun until 9 PM`)
+   - **Optional details**  -  up to two short rows (e.g. special hours, tasks) shown under the status on scan
 4. Save recovery key on `/created/`, print QR, scan from another phone, **update the status line** on `/created/`, then revoke to test.
 
 Public showcase scan (homepage pilot): see `site/data/showcase-status-plate.json`  -  refresh with `npm run site:seed-showcase` (includes optional `object_streams` detail row on scan).

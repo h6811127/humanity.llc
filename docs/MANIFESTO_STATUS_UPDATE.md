@@ -77,6 +77,7 @@ Signed optional field on the `humanity_card` document:
 - Omitted or `[]` clears streams on the next signed update.
 - Exposed on scan HTML (status plate + live object heroes) and `GET …/status` JSON as `card.object_streams`.
 - Owner UI: optional detail rows on `/created/` for **status plate** and **live object** (general) pilots.
+- Create UI: same optional detail rows on `/create/` for **status plate** and **general** templates (signed on first POST).
 - Scan limits: when streams are present, scan HTML and `GET …/status` include `limits.object_details_warning` (steward-signed copy, not verified facts).
 
 ---
@@ -110,6 +111,7 @@ Deep link: `/created/?profile_id=…&qr_id=…`  -  hydrates handle/manifesto fr
 | M5 showcase status plate scan renders object_streams + limit copy | ✅ `scan-m5-showcase-paths.test.ts` |
 | M5 showcase live object scan renders object_streams + limit copy | ✅ `scan-m5-showcase-paths.test.ts` |
 | Production showcase cards include object_streams (re-seed) | ☐ `npm run site:seed-showcase` · `site:seed-showcase-live-object` |
+| Create flow signs optional object_streams (status plate + general) | ✅ `create-card-object-streams.test.ts` |
 | Recovery key may sign update | ✅ `update-card.test.ts` |
 
 **Owner UX:** **Update status** stays hidden for general cards until first in-session QR or card revoke. Status plate and lost-item relay pilots show it immediately so field testers can update live object copy before revoke (`site/js/created-first-revoke-gate.mjs`; `worker/tests/created-first-revoke-gate.test.ts`).
