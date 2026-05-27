@@ -1,6 +1,6 @@
 # Hosted tier — implementation epics (M8)
 
-**Status:** **E1–E5 + E4 push staging** (behind `HOSTED_STEWARD_ENABLED`; E4d SW bridge + E6 ops dashboards remain)  
+**Status:** **E1–E6 staging** (behind `HOSTED_STEWARD_ENABLED`; E4d SW bridge + external CF dashboards remain)  
 **Milestone:** M8 of [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md)  
 **Depends on:** M2–M7 complete; **M4 governance sign-off** before E1 merge to production  
 **Audience:** Engineering, ops
@@ -143,14 +143,14 @@ flowchart LR
 | Deliverable | Status |
 |-------------|--------|
 | E2.1–E2.5 | **Staging** — `device-steward-entitlements*.mjs` resolves/caches policy; budget, scheduler, scale, SW, and hub copy consume resolved policy |
-| E2.6 | **Partial staging** — push/SSE clients are gated on `steward.hosted` + `notify.push.live_proof`; no production subscribe UI yet |
+| E2.6 | **Staging** — `stewardPushSubscribeAllowed()` gates `device-steward-push.mjs` + SW |
 | Tests | `worker/tests/device-steward-entitlements-core.test.ts`, `worker/tests/device-steward-entitlements.test.ts`, `e2e/hosted-tier-budget.spec.ts` |
 
-**Next:** E3 server/client quota alignment and E4 push-path validation remain follow-up work.
+**Next:** production enablement waits on **G0** (M4 sign-off).
 
 ### Out of scope
 
-- Server 429 (E3), push subscribe (E4)
+- Server 429 detail (see E3 epic)
 
 ---
 
@@ -181,6 +181,15 @@ flowchart LR
 - Vitest server quota tests
 
 **Note:** Often shipped in **same PR as E2** once E1 is in staging.
+
+### Implementation status (2026-05-27)
+
+| Deliverable | Status |
+|-------------|--------|
+| E3.1–E3.2 | **Staging** — `worker/src/steward/quota.ts` on authenticated challenge GET |
+| E3.3 | **Staging** — account soft/hard caps in quota module |
+| E3.4 | **Staging** — client 429 handling + hub quota line |
+| Tests | `worker/tests/steward-quota.test.ts`, `device-steward-quota-core.test.ts` |
 
 ---
 
@@ -220,6 +229,19 @@ flowchart LR
 
 - Web Push VAPID (M3 Q5)
 - Cross-tab / marketing events
+
+### Implementation status (2026-05-27)
+
+| Deliverable | Status |
+|-------------|--------|
+| E4a | **Staging** — `notifyLiveProofPending()` on challenge POST |
+| E4b | **Staging** — `GET …/steward/push` SSE + connection registry |
+| E4c | **Staging** — `device-steward-push.mjs` leader-tab client + inbox GET |
+| E4d–e | Deferred (SW bridge, Durable Object fan-out) |
+| Vitest | `device-steward-push-core.test.ts`, `steward-push-sse.test.ts`, `steward-push-notify.test.ts` |
+| E2E | `e2e/hosted-tier-push.spec.ts` — M7 **H4** |
+
+**Next:** **E4d** SW bridge when tab-hidden OS notify is prioritized.
 
 ---
 
@@ -299,9 +321,11 @@ flowchart LR
 |---|------|--------|
 | E6.1 | Ops metrics snapshot | **Staging** — `GET /.well-known/hc/v1/operator/steward-ops` exposes account, session, usage, and in-memory SSE counts behind `OPERATOR_AUDIT_TOKEN` |
 | E6.1 | Cloudflare dashboard | Pending external dashboard setup |
-| E6.2 | Daily alert | Pending alerting provider; snapshot carries soft/hard thresholds |
+| E6.2 | Daily alert | **Staging** — `npm run worker:check-steward-ops` (threshold script + `worker/tests/steward-ops-thresholds.test.ts`); wire to external cron/pager when provider chosen |
 | E6.3 | Runbook | **Staging** — `docs/HOSTED_STEWARD_OPS_RUNBOOK.md` |
 | E6.4 | Support doc link | **Staging** — runbook directs customer-facing language to `docs/SKEPTIC_FAQ.md` |
+
+**Tests:** `npm run worker:test:steward-ops`
 
 ### Exit tests
 
@@ -366,6 +390,7 @@ flowchart LR
 
 | Date | Note |
 |------|------|
+| 2026-05-27 | **E6.2 daily alert script:** `worker:check-steward-ops` + threshold Vitest |
 | 2026-05-27 | **E4 push staging:** SSE client/worker + `e2e/hosted-tier-push.spec.ts` H4 |
 | 2026-05-27 | **E2 client probe staging:** browser fetch/cache Vitest + hosted budget E2E H1–H3/H5 |
 | 2026-05-26 | **E1 foundation:** migration `0012_steward_hosted.sql`, steward routes behind `HOSTED_STEWARD_ENABLED` |

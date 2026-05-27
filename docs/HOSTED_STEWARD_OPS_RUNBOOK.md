@@ -48,6 +48,17 @@ If `schema` is `missing`, run the hosted migrations before investigating hosted 
 
 ## Daily check
 
+Automated threshold review (E6.2):
+
+```bash
+OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run worker:check-steward-ops
+```
+
+Exit **0** = no alerts · **1** = critical fair-use threshold · **2** = auth/config/request error.  
+Vitest: `npm run worker:test:steward-ops`
+
+Manual review:
+
 1. Confirm `hosted_steward_enabled` matches the rollout plan.
 2. Check `accounts` for unexpected `past_due`, `expired`, or `suspended` spikes.
 3. Check `usage`:
