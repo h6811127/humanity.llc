@@ -1,6 +1,6 @@
 # Keys custody emphasis card — excessive vertical spacing
 
-**Status:** **Closed** (May 2026) — steps 1–14; full regression via `npm run worker:test:keys-custody` and `npm run e2e:keys-custody`  
+**Status:** **Closed** (May 2026) — steps 1–15; CI WebKit custody e2e; regression via `npm run worker:test:keys-custody` and `npm run e2e:keys-custody`  
 **Surface:** `#device-keys-custody-hub`, `#device-keys-custody-wallet`, `device-keys-custody--created`, `device-keys-custody--compact`  
 **Canonical spacing:** [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) § Internal spacing ladder · F3 stacked layout
 
@@ -43,10 +43,8 @@ Hub keys custody card (`KEYS CUSTODY` / “Your browser holds the private key”
 
 - Copy and **Acknowledge** sit with **~12px** section rhythm (compact token), no internal dead band.
 - Hub, wallet, created, and compact custody variants share the same density.
-- `npm run worker:test -- worker/tests/device-keys-custody-html.test.ts worker/tests/device-emphasis-card-html.test.ts`
-- `npm run worker:test:ui-color-scheme` ([`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) § QA)
-- `npm run e2e -- e2e/device-os-wallet.spec.ts` when wallet/hub custody chrome changed (rollout § QA item 6)
-- Manual: hub + wallet keys custody, light + dark ([`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) § QA checklist)
+- **Regression:** `npm run worker:test:keys-custody` · `npm run e2e:keys-custody` · `npm run worker:test:ui-color-scheme` ([`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) § QA)
+- **Manual:** [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-KC** (hub + wallet, light + dark)
 
 ---
 
@@ -82,3 +80,13 @@ Same root cause as keys custody: column `hc-emphasis-card` without F3 stacked la
 | 14b | Bundle e2e: `npm run e2e:keys-custody` (chromium custody tests) | **Shipped** |
 | 14c | `prefers-reduced-transparency` opaque fallback on `.hc-emphasis-card` | `device-emphasis-card-html.test.ts` (phase B CSS guard) | **Shipped** |
 | 14d | Optional physical iPhone spot-check | Operator — only if WebKit CI fails or UX doubt | As needed |
+
+---
+
+## Post-close (step 15)
+
+| Step | Action | Status |
+|------|--------|--------|
+| 15a | CI: `e2e/keys-custody-emphasis-webkit.spec.ts` on push (WebKit + iPhone 13 Pro) | `.github/workflows/test-site.yml` | **Shipped** |
+| 15b | `AGENTS.md` regression commands | `worker:test:keys-custody` · `e2e:keys-custody` | **Shipped** |
+| 15c | Acceptance section uses bundled scripts (below) | This file | **Shipped** |
