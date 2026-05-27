@@ -1,6 +1,6 @@
 # Hosted tier — implementation epics (M8)
 
-**Status:** **M8 code complete in staging** (E1–E6 + E4d; behind `HOSTED_STEWARD_ENABLED`). **Production** blocked on **G0** M4 sign-off; ops completes E6.1 CF dashboard pin per [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md).  
+**Status:** **M8 code complete** (E1–E6 + E4d). **G0 signed** (Governance + Ops, 2026-05-27); **Legal pending** (G7). **Next:** production rollout § below; ops pins CF dashboard per [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md).  
 **Milestone:** M8 of [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md)  
 **Depends on:** M2–M7 complete; **M4 governance sign-off** before E1 merge to production  
 **Audience:** Engineering, ops
@@ -19,7 +19,7 @@ M1–M7 defined product boundaries, entitlements, push, pricing/SLA, public copy
 
 | # | Gate | Doc |
 |---|------|-----|
-| G0 | M4 governance checklist signed | [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) § Governance checklist · [`HOSTED_TIER_M4_GOVERNANCE_BRIEF.md`](HOSTED_TIER_M4_GOVERNANCE_BRIEF.md) |
+| G0 | M4 governance checklist signed | [`HOSTED_TIER_G0_READINESS.md`](HOSTED_TIER_G0_READINESS.md) · [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) § Governance checklist · [`HOSTED_TIER_M4_GOVERNANCE_BRIEF.md`](HOSTED_TIER_M4_GOVERNANCE_BRIEF.md) |
 | G1 | Free-tier regression green before/after each epic PR | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) |
 | G2 | No change to watch default (`hc_watch_live_proof` unset = off) | Request budget doc |
 | G3 | Card create / public scan / stranger poll unchanged without session | M2, M5 |
@@ -99,7 +99,7 @@ flowchart LR
 | Tests | `worker/tests/steward-hosted.test.ts`, `worker/tests/steward-quota.test.ts` |
 | Flag | `HOSTED_STEWARD_ENABLED` default **`0`** in `worker/wrangler.toml`; set **`1`** locally after `npm run worker:migrate:local` |
 
-**Next after G0:** merge E1 to production with flag off; keep E2 client probe staged until E3/E4 validation is ready.
+**Next after G0:** production rollout per § Production rollout (after G0) — deploy with flag off, then enable secrets and `HOSTED_STEWARD_ENABLED`.
 
 ---
 
@@ -350,7 +350,7 @@ Engineering checklist once M4 governance checklist is signed ([`HOSTED_TIER_PRIC
 | 3 | Set production secrets | `OPERATOR_AUDIT_TOKEN`, `STRIPE_WEBHOOK_SECRET` (after G8) |
 | 4 | Enable hosted flag | `HOSTED_STEWARD_ENABLED=1` when ready for stewards |
 | 5 | Ops | Pin CF dashboard per [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md); add repo secret `OPERATOR_AUDIT_TOKEN` for E6.2 CI |
-| 6 | Regression | `npm run worker:test:steward-hosted` · `npm run e2e:steward-hosted` · M7 free-tier bundle |
+| 6 | Regression | `npm run verify:hosted-g0` · `npm run e2e:steward-hosted` |
 
 ---
 
@@ -373,7 +373,7 @@ Engineering checklist once M4 governance checklist is signed ([`HOSTED_TIER_PRIC
 | Optional SSE live-proof notify | E4a–c |
 | Public copy matches M5 | No “premium verified” UI |
 | M4 SLA measurable | E6 |
-| Governance signed | G0 |
+| Governance signed | G0 (Governance + Ops ✅; Legal pending G7) |
 
 ---
 
@@ -397,6 +397,7 @@ Engineering checklist once M4 governance checklist is signed ([`HOSTED_TIER_PRIC
 | [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) | APIs + keys |
 | [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) | E4 detail |
 | [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) | Wire formats |
+| [`HOSTED_TIER_G0_READINESS.md`](HOSTED_TIER_G0_READINESS.md) | G0 sign-off packet |
 | [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) | G0, lifecycle |
 | [`HOSTED_STEWARD_OPS_RUNBOOK.md`](HOSTED_STEWARD_OPS_RUNBOOK.md) | E6 ops |
 | [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md) | E6.1 CF analytics |
@@ -408,6 +409,7 @@ Engineering checklist once M4 governance checklist is signed ([`HOSTED_TIER_PRIC
 
 | Date | Note |
 |------|------|
+| 2026-05-27 | **G0 signed** (Governance + Ops, solo founder); Legal pending — production rollout unlocked |
 | 2026-05-27 | **E6.1 guide:** CF Workers dashboard setup doc + G0 production rollout checklist |
 | 2026-05-27 | **E6.2 CI:** `.github/workflows/steward-ops-daily.yml` daily threshold check |
 | 2026-05-27 | **M8 code-complete pass:** E4 fallback E2E; poll resume on push drop (`device-live-control-inbox.mjs`); `worker:test:steward-hosted` + `e2e:steward-hosted`; **G0** gates production |

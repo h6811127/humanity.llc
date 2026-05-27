@@ -249,7 +249,7 @@ Do **not** rip out the device OS. **Retire the default “poll every card every 
 
 **Tests (shipped, Phases 1–9):** Vitest in `device-live-control-poll-scheduler.test.ts`, `device-live-control-round-robin.test.ts`, `device-live-control-poll-budget-core.test.ts`, `device-live-control-poll-leader-core.test.ts`, `device-live-control-sw-core.test.ts`, `device-hub-visible-rows-core.test.ts`, `device-wallet-scale-core.test.ts` (if present); Playwright in `e2e/device-inbox.spec.ts`, `e2e/created-control.spec.ts` (collapsed hub idle, one challenge per tick, degraded health, watch off + manual check).
 
-**Tests (Phase 10, M8 staging):** § Phase 10 test plan (M7) — run **free-tier regression** on every hosted-tier PR; hosted bundle: `npm run worker:test:steward-hosted` · `npm run e2e:steward-hosted` (H1–H6).
+**Tests (Phase 10, M8 staging):** § Phase 10 test plan (M7) — G0 verification: `npm run verify:hosted-g0` · `npm run e2e:steward-hosted` (H1–H6).
 
 ---
 
@@ -347,13 +347,12 @@ npm run worker:test -- \
 npm run e2e -- e2e/device-inbox.spec.ts e2e/created-control.spec.ts
 ```
 
-**Hosted-specific E2 + E4 staging:**
+**Hosted-specific (bundled):**
 
 ```bash
-npm run worker:test:steward-entitlements
-npm run worker:test:steward-push
-npm run e2e:hosted-tier
-npm run e2e:hosted-tier-push
+npm run worker:test:steward-hosted
+npm run e2e:steward-hosted
+npm run verify:hosted-g0   # free-tier Vitest + steward-hosted Vitest
 ```
 
 **Vitest (extend existing modules when E2 reads entitlements):**
@@ -491,7 +490,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 
 ### Implementer order (after Phases 1–9 + 8c)
 
-1. **Phase 10 (planning → build)** — M2–M8 done. **Next:** M4 governance sign-off ([`HOSTED_TIER_M4_GOVERNANCE_BRIEF.md`](HOSTED_TIER_M4_GOVERNANCE_BRIEF.md)) → **E1** per [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md).  
+1. **Phase 10 (M8 complete, G0 signed)** — **Next:** production rollout ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout). Legal review for G7 when available.
 2. **Shell P2** - Lazy inbox loader ([`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md)).  
 3. **Ops O2** - Per-IP rate limits on hot routes.
 

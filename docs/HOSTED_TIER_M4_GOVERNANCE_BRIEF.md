@@ -43,9 +43,10 @@ Check boxes in [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md
 ## Read order (15–20 min)
 
 1. This brief  
-2. [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) — fair use + lifecycle + SLA  
-3. [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md) § Is There A Paid Tier? — public framing  
-4. [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) — free vs hosted caps  
+2. [`HOSTED_TIER_G0_READINESS.md`](HOSTED_TIER_G0_READINESS.md) — engineering verification + ops checklist  
+3. [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) — fair use + lifecycle + SLA  
+4. [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md) § Is There A Paid Tier? — public framing  
+5. [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) — free vs hosted caps  
 
 Optional depth: [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md), [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md).
 
@@ -59,7 +60,7 @@ Optional depth: [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLE
 | Ops | E6.1 CF dashboard ([`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md)) + E6.2 daily CI (`.github/workflows/steward-ops-daily.yml`; needs `OPERATOR_AUDIT_TOKEN`) |
 | Not yet | Public marketing of paid tier until product chooses launch date |
 
-**Staging note (2026-05-27):** E1–E6 code is complete behind the feature flag; **G0** is the remaining gate before production secrets and customer-facing launch.
+**Staging note (2026-05-27):** E1–E6 code complete behind the feature flag. **G0 signed** (Governance + Ops, solo founder, 2026-05-27); **Legal pending** for G7 refund wording. Production rollout may proceed; public paid-tier marketing still optional.
 
 ---
 
@@ -79,3 +80,4 @@ Optional depth: [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLE
 |------|------|
 | 2026-05-26 | M4 governance brief for sign-off meeting |
 | 2026-05-27 | E1–E6 staging complete; G0 gates production enablement |
+| 2026-05-27 | **G0 signed** (Governance + Ops); Legal pending |
