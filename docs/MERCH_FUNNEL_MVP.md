@@ -27,7 +27,7 @@ What reads as “cheap” is not the stack — it is **UX polish and checkout ha
 | Browse model | Story-row hub (~50 SKUs over time) | **2-row hub** at `/shop/` + product pages | Full catalog deferred |
 | Tier 0 batch merch | Founding objects row | `/shop/founding/` — founding sticker | Founding glitch shirt / luxury batch page TBD |
 | Tier 1 personalize | Customizer → artifact intent → checkout | Personalized **sticker** path wired; hoodie after QA | Operator: sticker Shopify URL + Printify env |
-| Checkout | Branded Humanity checkout; may pass through Shopify | Same-tab redirect to Shopify; return via `/shop/thanks/` | Post-pay order timeline on site (thin) |
+| Checkout | Branded Humanity checkout; may pass through Shopify | Same-tab redirect + `/shop/thanks/` order timeline | — |
 | Catalog API | `GET /v1/store/rows` | Static `shop-config.json` | API rows when catalog grows |
 | Print catalog | Apparel from `GET /v1/print/catalog` | Customizer merges catalog + `shop-config.json` | Hoodie Printify QA + operator enable |
 | Fulfillment | Paid webhook → Printify | Queue + template resolve + Printify env for sticker | Operator submit after mint |
@@ -60,7 +60,7 @@ See [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) for operator 
 | **2** | 2-row `/shop/` hub + `/shop/founding/` Tier 0 page | Shipped |
 | **3** | Wire customizer to `GET /v1/print/catalog` when hoodie QA passes | Shipped |
 | **4** | Enable one personalized SKU E2E (`personalize.checkout_open` + webhook → Printify) | Shipped |
-| **5** | Post-purchase order status on humanity.llc | Next |
+| **5** | Post-purchase order status on humanity.llc | Shipped |
 | **6** | Full story-row catalog (~50 SKUs) | Post-MVP |
 
 ---
@@ -142,6 +142,7 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
 | Shop config | `site/data/shop-config.json` → `personalize.products[]` |
 | Config helpers | `site/js/shop-config.mjs` |
 | Merch attribution | `site/js/merch-funnel-core.mjs` · scan `scan-merch-funnel.mjs` |
+| Post-purchase order status | `GET /v1/store/orders/status` · `/shop/thanks/` timeline UI |
 | Artifact intent API | `worker/src/resolver/artifact-intents.ts` |
 | QR renderer | `site/js/qr-branding.mjs` |
 
@@ -178,6 +179,12 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
 
 The customizer loads `GET /v1/print/catalog`, merges approved templates with commerce fields above, and hides products not in the catalog (including Tier 0 batch templates).
 
+### Post-purchase order status (Phase 5)
+
+- **API:** `GET /v1/store/orders/status?artifact_intent_id=ai_…` or `?shopify_order_id=…` (optional `profile_id` for personalized orders)
+- **UI:** `/shop/thanks/` — timeline + lookup form; reads URL params or `artifact_intent_id` from Shopify line item properties
+- **Privacy:** No shipping address or payment details; no internal commerce/print order ids in response
+
 4. Deploy Pages. `/shop/customize/` shows **Continue to checkout** when card session exists and `checkout_open` is true.
 5. **Deploy Worker** — `npm run worker:deploy` — `humanity.llc/v1/*` must route to the resolver (else artifact intent returns 405).
 6. Run [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) gates before live payments.
@@ -213,6 +220,7 @@ Aggregate metrics only — no PII. Allowed refs:
 | Artifact intent created; attach returns Shopify line attributes | ✅ API tests |
 | Checkout URL includes `properties[artifact_intent_id]` | ✅ `shop-customize-core.test.ts` |
 | Paid webhook → Printify queue (operator env) | ✅ code path for personalized sticker |
+| Post-purchase order timeline on `/shop/thanks/` | ✅ `GET /v1/store/orders/status` |
 | Printed item scans; bearer warning visible | ☐ physical QA |
 | Owner updates manifesto from phone without reprint | ✅ resolver |
 

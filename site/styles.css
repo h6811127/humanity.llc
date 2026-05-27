@@ -4901,6 +4901,71 @@ body.landing-focus-mode .screen-landing {
   color: var(--grey);
 }
 
+.shop-thanks-lookup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 22rem;
+}
+
+.shop-thanks-lookup-btn {
+  margin-top: 4px;
+}
+
+.shop-order-timeline {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  border-left: 2px solid rgba(0, 0, 0, 0.12);
+}
+
+.shop-order-timeline__step {
+  position: relative;
+  margin: 0 0 18px;
+  padding: 0 0 0 16px;
+}
+
+.shop-order-timeline__step::before {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+.shop-order-timeline__step--complete::before {
+  border-color: var(--black);
+  background: var(--black);
+}
+
+.shop-order-timeline__step--current::before {
+  border-color: var(--black);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+}
+
+.shop-order-timeline__step--issue::before {
+  border-color: #b45309;
+  background: #b45309;
+}
+
+.shop-order-timeline__label {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--black);
+}
+
+.shop-order-timeline__detail {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
 /* /shop/customize/ — QR customizer (docs/MERCH_FUNNEL_MVP.md) */
 .screen-shop-customize {
   padding-bottom: 40px;

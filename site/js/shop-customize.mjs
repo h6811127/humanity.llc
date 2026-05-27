@@ -28,6 +28,7 @@ import {
   SHOP_CHECKOUT_AFTER_REDIRECT_STATUS,
   SHOP_CHECKOUT_REDIRECT_STATUS,
 } from "./shop-copy-core.mjs";
+import { persistCheckoutIntentId } from "./shop-order-status-core.mjs";
 
 const cardGate = document.getElementById("shop-customize-card-gate");
 const cardReady = document.getElementById("shop-customize-card-ready");
@@ -307,6 +308,9 @@ async function onCheckoutClick() {
     const intent = await ensureIntent(product);
     const attrs = intent.shopify?.cart_line_attributes ?? [];
     const display = personalizeProductDisplay(product);
+    if (intent.artifact_intent_id) {
+      persistCheckoutIntentId(intent.artifact_intent_id);
+    }
     const url = buildShopifyCartUrl(display.checkoutUrl, 1, attrs);
     goToShopifyCheckout(url);
     setStatus(SHOP_CHECKOUT_AFTER_REDIRECT_STATUS);
