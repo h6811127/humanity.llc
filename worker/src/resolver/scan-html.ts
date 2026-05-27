@@ -24,6 +24,7 @@ import {
   renderHeroStatusStrip,
   renderSafetyChips,
   renderScanSafetyHeaderScript,
+  SCAN_HERO_LIVE_OBJECT_FOOT,
   SCAN_HERO_META_DETAILS_SUMMARY,
   SCAN_HERO_QR_DETAILS_SUMMARY,
   SCAN_SAFETY_RESOLVER_VERIFIED_COPY,
@@ -36,7 +37,7 @@ import {
 } from "./scan-malformed-hint";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v35";
+export const SCAN_UI_VERSION = "pass-v36";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -399,7 +400,7 @@ function buildScanHeroMain(
     return {
       main: `<h1 class="scan-hero-title">${escapeHtml(line)}</h1>
     ${steward}`,
-      foot: "Scan shows live object state.",
+      foot: SCAN_HERO_LIVE_OBJECT_FOOT,
     };
   }
 

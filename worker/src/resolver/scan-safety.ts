@@ -20,6 +20,10 @@ export const SCAN_HERO_META_DETAILS_SUMMARY = "Details";
 /** Collapsed on-page QR + credential code (zone F). */
 export const SCAN_HERO_QR_DETAILS_SUMMARY = "This QR";
 
+/** Active live-object scan foot (M5 stranger success criteria). */
+export const SCAN_HERO_LIVE_OBJECT_FOOT =
+  "Active on humanity.llc — status checked at scan time.";
+
 export interface ScanSafetyModel {
   objectSignatureVerified: boolean;
   stewardRegistered: boolean;

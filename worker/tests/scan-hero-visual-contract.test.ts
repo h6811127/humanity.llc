@@ -79,7 +79,19 @@ describe("scan hero visual contract (v2 depth)", () => {
     expect(SCAN_PASS_CSS).toMatch(
       /html\[data-theme="dark"\][\s\S]*--hc-scan-hero-fill/
     );
+    expect(SCAN_PASS_CSS).toContain("--hc-scan-surface-bg");
+    expect(SCAN_PASS_CSS).toMatch(
+      /\.scan-trust-details[\s\S]*background:\s*var\(--hc-scan-surface-bg\)/
+    );
+    expect(SCAN_PASS_CSS).toMatch(
+      /html\[data-theme="dark"\][\s\S]*--hc-scan-surface-fg/
+    );
+    expect(SCAN_PASS_CSS).toMatch(
+      /\.scan-safety-resolver[\s\S]*rgba\(60, 60, 67, 0\.72\)/
+    );
     const src = readFileSync(join(root, "site/scan-pass.css"), "utf8");
+    const resolverBlock = src.match(/\.scan-safety-resolver\s*\{[^}]+\}/)?.[0] ?? "";
+    expect(resolverBlock).not.toContain("#248a3d");
     expect(src).toContain("html[data-theme=\"dark\"] .scan-hero.scan-status-panel");
   });
 

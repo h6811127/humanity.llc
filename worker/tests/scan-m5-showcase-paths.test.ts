@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
 import { renderScanPage, SCAN_UI_VERSION } from "../src/resolver/scan-html";
+import { SCAN_HERO_LIVE_OBJECT_FOOT } from "../src/resolver/scan-safety";
 import { BEARER_WARNING } from "../src/resolver/trust-copy";
 import { buildScanViewModel } from "../src/resolver/scan-state";
 import {
@@ -115,7 +116,8 @@ describe("M5 showcase scan paths", () => {
     expectHeroTitle(html, LIVE_OBJECT_MANIFESTO);
     expect(html).toContain("Controlled by @river_example");
     expect(html).not.toMatch(/<h1 class="[^"]*scan-hero-title[^"]*">@river_example<\/h1>/);
-    expect(html).toContain("Scan shows live object state");
+    expect(html).toContain(SCAN_HERO_LIVE_OBJECT_FOOT);
+    expect(html).not.toContain("Scan shows live object state");
     expect(html).toContain("scan-hero-meta-details");
     expect(html).toContain("Signed and checked just now");
     expect(html).not.toContain("Signed object verified by resolver");
