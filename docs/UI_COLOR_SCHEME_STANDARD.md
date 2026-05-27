@@ -61,6 +61,8 @@ Raised, card-shaped callouts for **high-salience device state** on page chrome (
 
 **Scan hero (tier above emphasis cards):** Public resolver **live check hero** uses the same shadow *language* at larger scale — not the `.hc-emphasis-card` component. Token: `--hc-scan-hero-shadow` on `:root` (`site/styles.css`, `site/scan-pass.css`; dark override in `theme-dark.css`). See [`SCAN_HERO_CARD_VISUAL_SPEC.md`](SCAN_HERO_CARD_VISUAL_SPEC.md) § Visual tier.
 
+**Scan trust surfaces (Check at scan time, vouch, limits):** Raised cards and disclosure rows on bundled scan pages. Token family `--hc-scan-surface-*` in `site/scan-pass.css` (Worker bundle via `npm run worker:bundle-scan`). **Do not** leave `#fff` / `rgba(255,…)` card fills while copy uses flipped `var(--black)` in dark — labels disappear (white on white). See **Scan page surfaces (dark mode)** below.
+
 **Reference instances:** `#wallet-active-banner` (`--active`, green) · `#wallet-tab-hint` / `#device-cross-tab-banner` (`--info`, blue).
 
 ### Design rules (shipped — May 2026, alignment v2)
@@ -200,7 +202,7 @@ Prioritized places that could adopt the same **raised card** pattern. Extraction
 |---------|----------------|-------|-----|
 | Public card warning | `#create-public-card-notice` on `/create/` | **Shipped** — `hc-emphasis-card--warn` (Phase 4) |
 | Keys custody (created) | `device-keys-custody--created` | **Shipped** — `hc-emphasis-card--warn` (Phase 4) |
-| Keys custody (hub/wallet) | `#device-keys-custody-hub`, `-wallet` | Backlog — `--info` emphasis cards |
+| Keys custody (hub/wallet) | `#device-keys-custody-hub`, `-wallet` | **Shipped** — `--info` emphasis cards (`device-keys-custody-html.test.ts`) |
 | Flow warnings | `.form-warning` legacy (non-notice) | Backlog | Migrate when touching create UX |
 
 #### Tier 6 — Hub card context (use with care)
@@ -321,6 +323,39 @@ Per [`DEVICE_HUB_INTRO_COACHMARK.md`](DEVICE_HUB_INTRO_COACHMARK.md): clear `hc_
 
 1. Glance popover with default saved-card rows and notice/cross-tab/live-proof rows - titles readable in light and dark.
 2. Inbox sheet with live-proof waiting + browser notification prompt - prompt copy and dismiss in both themes.
+
+### Scan page surfaces (dark mode)
+
+**Symptom (May 2026):** Trust-tool rows (`.scan-trust-details`), vouch blocks (`.vouch-card`), and `.scan-page .list` kept **light** `#fff` fills while `html[data-theme="dark"]` remaps `--black` → `#f5f5f7` → titles/readouts invisible on white cards; section lead copy stayed `rgba(60, 60, 67, …)` on the black page chrome.
+
+**Rule:** Any scan **card-shaped** surface (trust disclosure, list stack, vouch, limits) uses `--hc-scan-surface-*` for background, border, title, and muted copy — not hardcoded white + `var(--black)`.
+
+| Token | Role | Light (`:root` in `scan-pass.css`) | Dark (`html[data-theme="dark"]` in bundled block) |
+|-------|------|-------------------------------------|---------------------------------------------------|
+| `--hc-scan-surface-bg` | Card / list panel fill | `#ffffff` | `#1c1c1e` |
+| `--hc-scan-surface-subtle-bg` | Vouch / secondary inset | `#f7f7f9` | `#2c2c2e` |
+| `--hc-scan-surface-fg` | Titles on surfaces | `#1c1c1e` | `#f5f5f7` |
+| `--hc-scan-surface-fg-muted` | Lead, peek, foot copy on surfaces | `rgba(60, 60, 67, 0.65)` | `rgba(235, 235, 245, 0.72)` |
+| `--hc-scan-surface-fg-subtle` | Chevrons, tertiary on surfaces | `rgba(60, 60, 67, 0.58)` | `rgba(235, 235, 245, 0.58)` |
+| `--hc-scan-surface-border` | Card hairline | `rgba(60, 60, 67, 0.14)` | `rgba(255, 255, 255, 0.12)` |
+
+**Selectors (migrate to tokens):**
+
+- `.scan-trust-details` — `background`, `border-color`
+- `.scan-group-summary-title`, `.scan-trust-details .list-title` — `--hc-scan-surface-fg`
+- `.scan-group-summary-peek`, `.scan-trust-tools-lead` — muted / subtle tokens
+- `.scan-page .list`, `.scan-limits-settings`, `.live-control-card`, `.vouch-card` — `--hc-scan-surface-bg` or `--hc-scan-surface-subtle-bg`
+
+**Implementation checklist (one PR slice per step):**
+
+1. **Tokens** — Add `--hc-scan-surface-*` on `:root` in `site/scan-pass.css`; mirror dark values in the bundled `html[data-theme="dark"]` block (keep in sync with `site/css/theme-dark.css` if shell ever shares these surfaces).
+2. **Light selectors** — Replace hardcoded `#fff` / fixed `rgba(60, 60, 67, …)` on the selectors above with surface tokens.
+3. **Dark selectors** — Confirm dark block sets token overrides only (no duplicate per-component `#fff`); optional explicit rules if a selector still wins on specificity.
+4. **Regression** — Extend `worker/tests/ui-color-scheme-popover-guard.test.ts` (or `scan-hero-visual-contract.test.ts`) to require tokens in `scan-pass.css` and forbid `background: #fff` on `.scan-trust-details`.
+5. **Bundle** — `npm run worker:bundle-scan` after CSS edits; then `npm run site:generate-scan-e2e-fixture` so Pages e2e fixtures embed the new CSS.
+6. **QA** — `npm run worker:test:ui-color-scheme` · `npm run worker:test -- worker/tests/scan-hero-visual-contract.test.ts` · `npm run e2e:scan-hero-visual` with `hc_theme=dark`: trust row title contrast ≠ card background; hero plate unchanged.
+
+**QA (manual):** Active scan URL, `localStorage.hc_theme = "dark"` — **Check at scan time** row titles readable; expand a row — list titles readable; **Vouch** signing copy readable; limits disclosure lead readable on black chrome.
 
 ### QA (wallet active-tab banner / `hc-emphasis-card` reference)
 
