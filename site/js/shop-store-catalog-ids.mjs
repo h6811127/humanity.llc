@@ -1,2 +1,28 @@
-/** Shared storefront product ids (mirrors worker store-catalog). */
+/** Shared storefront product paths (mirrors worker store-catalog). */
 export const TIER0_FOUNDING_STORE_PRODUCT_ID = "tier0_founding_sticker_v1";
+
+/**
+ * @param {string} productId
+ */
+export function storeProductDetailPath(productId) {
+  const id = typeof productId === "string" ? productId.trim() : "";
+  if (!id) return "/shop/";
+  return `/shop/products/${encodeURIComponent(id)}/`;
+}
+
+/**
+ * @param {Record<string, unknown>} product
+ */
+export function storeProductActionPath(product) {
+  const productId = String(product.product_id ?? "");
+  if (productId === TIER0_FOUNDING_STORE_PRODUCT_ID) {
+    return "/shop/founding/";
+  }
+  if (product.product_class === "personalized") {
+    return `/shop/customize/?product=${encodeURIComponent(productId)}`;
+  }
+  if (typeof product.action_path === "string" && product.action_path.trim()) {
+    return product.action_path.trim();
+  }
+  return storeProductDetailPath(productId);
+}

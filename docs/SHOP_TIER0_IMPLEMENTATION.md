@@ -13,6 +13,7 @@
 | Piece | Path |
 |-------|------|
 | **Shop hub** (API story rows) | `site/shop/index.html` · `site/js/shop-hub.mjs` · `GET /v1/store/rows` |
+| Product detail | `/shop/products/{product_id}/` · `GET /v1/store/products/{id}` |
 | Tier 0 founding sticker page | `site/shop/founding/index.html` · `site/js/shop-founding.mjs` |
 | Same-tab checkout handoff | `site/js/shop-checkout-handoff.mjs` |
 | **QR customizer (Tier 1)** | `site/shop/customize/index.html` · `docs/MERCH_FUNNEL_MVP.md` |

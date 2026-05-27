@@ -14,7 +14,8 @@ describe("store-rows-handler", () => {
     expect(body.rows[0].products[0]).toMatchObject({
       product_id: "hoodie_live_object_v1",
       personalization_indicator: "Personalized QR",
-      detail_path: "/shop/customize/?product=hoodie_live_object_v1",
+      detail_path: "/shop/products/hoodie_live_object_v1/",
+      cta_label: "View product",
     });
   });
 
@@ -24,7 +25,8 @@ describe("store-rows-handler", () => {
     const body = await res.json();
     expect(body.product_id).toBe("tier0_founding_sticker_v1");
     expect(body.requires_card).toBe(false);
-    expect(body.detail_path).toBe("/shop/founding/");
+    expect(body.detail_path).toBe("/shop/products/tier0_founding_sticker_v1/");
+    expect(body.action_path).toBe("/shop/founding/");
   });
 
   it("GET /v1/store/products/{id} 404 for draft product", async () => {

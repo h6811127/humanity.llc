@@ -48,6 +48,21 @@ export interface StoreCatalogRow {
 
 export const TIER0_FOUNDING_STORE_PRODUCT_ID = "tier0_founding_sticker_v1";
 
+export function storeProductDetailPath(productId: string): string {
+  const id = productId.trim();
+  return `/shop/products/${encodeURIComponent(id)}/`;
+}
+
+export function storeProductActionPath(product: StoreCatalogProduct): string {
+  if (product.product_id === TIER0_FOUNDING_STORE_PRODUCT_ID) {
+    return "/shop/founding/";
+  }
+  if (product.product_class === "personalized") {
+    return `/shop/customize/?product=${encodeURIComponent(product.product_id)}`;
+  }
+  return storeProductDetailPath(product.product_id);
+}
+
 const LAUNCH_PRODUCTS: StoreCatalogProduct[] = [
   {
     product_id: STICKER_PERSONALIZED_STORE_PRODUCT_ID,
@@ -62,8 +77,8 @@ const LAUNCH_PRODUCTS: StoreCatalogProduct[] = [
     fulfillment_provider: "printify",
     print_template_id: DEFAULT_PRINT_TEMPLATE_ID,
     price_display: "$12 + shipping",
-    detail_path: "/shop/customize/?product=sticker_personalized_v1",
-    cta_label: "Customize sticker",
+    detail_path: storeProductDetailPath(STICKER_PERSONALIZED_STORE_PRODUCT_ID),
+    cta_label: "View product",
     status: "published",
     row_ids: ["row_personalize"],
   },
@@ -80,8 +95,8 @@ const LAUNCH_PRODUCTS: StoreCatalogProduct[] = [
     fulfillment_provider: "printify",
     print_template_id: HOODIE_LIVE_OBJECT_TEMPLATE_ID,
     price_display: "$48 + shipping",
-    detail_path: "/shop/customize/?product=hoodie_live_object_v1",
-    cta_label: "Preview on hoodie",
+    detail_path: storeProductDetailPath(HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID),
+    cta_label: "View product",
     status: "published",
     row_ids: ["row_personalize"],
   },
@@ -98,8 +113,8 @@ const LAUNCH_PRODUCTS: StoreCatalogProduct[] = [
     fulfillment_provider: "printify",
     print_template_id: TIER0_BATCH_PRINT_TEMPLATE_ID,
     price_display: null,
-    detail_path: "/shop/founding/",
-    cta_label: "View founding sticker",
+    detail_path: storeProductDetailPath(TIER0_FOUNDING_STORE_PRODUCT_ID),
+    cta_label: "View product",
     status: "published",
     row_ids: ["row_founding"],
   },
@@ -304,6 +319,7 @@ export function toStoreProductDetail(product: StoreCatalogProduct) {
     print_template_id: product.print_template_id,
     price_display: product.price_display,
     detail_path: product.detail_path,
+    action_path: storeProductActionPath(product),
     cta_label: product.cta_label,
     row_ids: product.row_ids,
     status: product.status,

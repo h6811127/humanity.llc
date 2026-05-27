@@ -62,6 +62,7 @@ See [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) for operator 
 | **4** | Enable one personalized SKU E2E (`personalize.checkout_open` + webhook → Printify) | Shipped |
 | **5** | Post-purchase order status on humanity.llc | Shipped |
 | **6** | Full story-row catalog (~50 SKUs) | **Skeleton shipped** — seed catalog + API rows; launch exposes 3 products |
+| **7** | Product detail pages (`/shop/products/{id}/`) | Shipped |
 
 ---
 
@@ -145,6 +146,7 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
 | Post-purchase order status | `GET /v1/store/orders/status` · `/shop/thanks/` timeline UI |
 | Store rows API | `GET /v1/store/rows` · `GET /v1/store/products/{product_id}` · `worker/src/store/store-catalog.ts` |
 | Store rows client | `site/js/shop-store-rows-core.mjs` |
+| Product detail pages | `/shop/products/{product_id}/` · `site/js/shop-product-detail.mjs` |
 | Artifact intent API | `worker/src/resolver/artifact-intents.ts` |
 | QR renderer | `site/js/qr-branding.mjs` |
 

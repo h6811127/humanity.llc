@@ -28,7 +28,7 @@ describe("store-catalog", () => {
     const product = getStoreProductById("sticker_personalized_v1");
     expect(product?.status).toBe("published");
     expect(product?.supports_personalization).toBe(true);
-    expect(product?.detail_path).toContain("/shop/customize/");
+    expect(product?.detail_path).toBe("/shop/products/sticker_personalized_v1/");
   });
 
   it("hides draft catalog products from lookup", () => {

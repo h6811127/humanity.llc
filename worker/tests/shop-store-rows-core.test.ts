@@ -21,8 +21,8 @@ const ROWS = [
         meaning_line: "Unique QR sticker.",
         product_class: "personalized",
         personalization_indicator: "Personalized QR",
-        detail_path: "/shop/customize/?product=sticker_personalized_v1",
-        cta_label: "Customize sticker",
+        detail_path: "/shop/products/sticker_personalized_v1/",
+        cta_label: "View product",
         price_display: "$12 + shipping",
       },
       {
@@ -48,8 +48,8 @@ const ROWS = [
         meaning_line: "Batch QR.",
         product_class: "limited_drop",
         personalization_indicator: "Limited Drop",
-        detail_path: "/shop/founding/",
-        cta_label: "View founding sticker",
+        detail_path: "/shop/products/tier0_founding_sticker_v1/",
+        cta_label: "View product",
         price_display: null,
       },
     ],
@@ -145,6 +145,6 @@ describe("shop-store-rows-core", () => {
     const html = renderStoreRowsHtml(enrichStoreRows(CONFIG, CATALOG, ROWS));
     expect(html).toContain('id="shop-row-row_personalize"');
     expect(html).toContain("Personalized sticker");
-    expect(html).toContain('href="/shop/founding/"');
+    expect(html).toContain('href="/shop/products/tier0_founding_sticker_v1/"');
   });
 });
