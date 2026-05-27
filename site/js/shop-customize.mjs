@@ -29,6 +29,10 @@ const previewPlaceholder = document.getElementById("shop-customize-qr-placeholde
 const previewNote = document.getElementById("shop-customize-preview-note");
 const mockEl = document.getElementById("shop-customize-mock");
 const priceEl = document.getElementById("shop-customize-price");
+const shippingForm = document.getElementById("shop-customize-shipping-form");
+const shippingCountryInput = document.getElementById("shop-customize-shipping-country");
+const shippingZipInput = document.getElementById("shop-customize-shipping-zip");
+const shippingResultEl = document.getElementById("shop-customize-shipping-result");
 const statusEl = document.getElementById("shop-customize-status");
 const checkoutBtn = document.getElementById("shop-customize-checkout");
 const interestSection = document.getElementById("shop-customize-interest");
@@ -105,6 +109,7 @@ function renderProductPicker() {
       selectedProductId = display.productId;
       activeIntent = null;
       previewMode = null;
+      clearShippingEstimate();
       if (display.preview === "hoodie") {
         persistMerchCreateRef("customize_hoodie");
       }
@@ -207,6 +212,60 @@ function syncCheckoutUi(product) {
   if (interestSection) {
     interestSection.hidden = isPersonalizeCheckoutReady(shopConfig, product);
   }
+  if (shippingForm instanceof HTMLFormElement) {
+    shippingForm.hidden = !isPersonalizeCheckoutReady(shopConfig, product);
+  }
+}
+
+function renderShippingEstimate(payload) {
+  if (!shippingResultEl) return;
+  shippingResultEl.hidden = false;
+  const shipping =
+    typeof payload.shipping_display === "string"
+      ? payload.shipping_display
+      : payload.shipping_cost != null
+        ? `$${(Number(payload.shipping_cost) / 100).toFixed(2)}`
+        : null;
+  shippingResultEl.textContent = shipping
+    ? `Estimated shipping: ${shipping} (${payload.shipping_label || "standard"}). ${payload.disclaimer || ""}`
+    : payload.disclaimer || "Shipping estimate unavailable.";
+}
+
+function clearShippingEstimate() {
+  if (!shippingResultEl) return;
+  shippingResultEl.hidden = true;
+  shippingResultEl.textContent = "";
+}
+
+async function fetchShippingEstimate(product) {
+  const country =
+    shippingCountryInput instanceof HTMLInputElement
+      ? shippingCountryInput.value.trim().toUpperCase()
+      : "";
+  const zip =
+    shippingZipInput instanceof HTMLInputElement ? shippingZipInput.value.trim() : "";
+  if (!country) throw new Error("Enter a country code (e.g. US).");
+
+  const display = personalizeProductDisplay(product);
+  const origin = resolverApiOrigin();
+  const res = await fetch(`${origin}/v1/print/quotes`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({
+      product_id: display.productId,
+      quantity: 1,
+      destination: { country, zip },
+    }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const msg =
+      typeof data.message === "string"
+        ? data.message
+        : "Could not estimate shipping for this destination.";
+    throw new Error(msg);
+  }
+  return data;
 }
 
 function previewStatusMessage(product) {
@@ -329,6 +388,21 @@ async function init() {
   });
   checkoutBtn?.addEventListener("click", () => {
     void onCheckoutClick();
+  });
+  shippingForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const product = selectedProduct();
+    if (!product) return;
+    if (shippingResultEl) shippingResultEl.hidden = true;
+    void fetchShippingEstimate(product)
+      .then(renderShippingEstimate)
+      .catch((err) => {
+        if (shippingResultEl) {
+          shippingResultEl.hidden = false;
+          shippingResultEl.textContent =
+            err instanceof Error ? err.message : "Could not estimate shipping.";
+        }
+      });
   });
 
   try {

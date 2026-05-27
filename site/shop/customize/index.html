@@ -109,6 +109,43 @@
 
           <p class="shop-product-price" id="shop-customize-price">Price at checkout</p>
 
+          <div class="shop-customize-shipping-estimate" id="shop-customize-shipping-estimate">
+            <h2 class="group-label">Shipping estimate</h2>
+            <p class="shop-lead shop-lead-muted">
+              Optional — product price is set at Shopify checkout. Estimate Printify shipping before
+              you continue.
+            </p>
+            <form class="shop-customize-shipping-form" id="shop-customize-shipping-form">
+              <label class="shop-customize-shipping-field">
+                Country
+                <input
+                  type="text"
+                  id="shop-customize-shipping-country"
+                  name="country"
+                  maxlength="2"
+                  autocomplete="country"
+                  value="US"
+                  required
+                />
+              </label>
+              <label class="shop-customize-shipping-field">
+                ZIP / postal
+                <input
+                  type="text"
+                  id="shop-customize-shipping-zip"
+                  name="zip"
+                  maxlength="16"
+                  autocomplete="postal-code"
+                  placeholder="11221"
+                />
+              </label>
+              <button type="submit" class="btn-secondary shop-customize-shipping-btn">
+                Estimate shipping
+              </button>
+            </form>
+            <p class="shop-customize-shipping-result" id="shop-customize-shipping-result" hidden></p>
+          </div>
+
           <label class="shop-customize-approve">
             <input type="checkbox" id="shop-customize-approve" />
             <span
@@ -166,6 +203,6 @@
         </section>
       </main>
     </div>
-    <script src="/js/shop-customize.mjs?v=2" type="module"></script>
+    <script src="/js/shop-customize.mjs?v=3" type="module"></script>
   </body>
 </html>

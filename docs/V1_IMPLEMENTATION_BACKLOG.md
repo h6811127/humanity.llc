@@ -525,6 +525,8 @@ Goal: complete one real paid order path safely.
 
 **Shipped (2026-05-27):** tracking + reconciliation — migration `0021_print_order_tracking.sql` · Printify shipment webhooks store carrier/number/url · buyer order status returns `tracking` · cron `runPrintifyReconcile` polls active Printify orders every 30 minutes.
 
+**Shipped (2026-05-27):** pre-checkout shipping quotes — `POST /v1/print/quotes` (Printify `orders/shipping.json`) · 15-minute TTL · `/shop/customize/` optional estimate form.
+
 ---
 
 ## Phase 7: Launch Hardening
