@@ -31,7 +31,7 @@ describe("device-emphasis-card-html", () => {
 
   it("landing index busts styles.css cache when spacing changes", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain("styles.css?v=120");
+    expect(html).toContain("styles.css?v=121");
   });
 
   it("landing final CTA uses urgent emphasis card and standard CTA", () => {
@@ -74,9 +74,16 @@ describe("device-emphasis-card-html", () => {
   it("landing framing uses info emphasis card and secondary row link", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain("hc-emphasis-card--info landing-framing");
-    expect(html).toContain('class="landing-framing-more-link"');
+    expect(html).toContain("hc-emphasis-card__cta--secondary landing-framing-more-link");
+    expect(html).toContain("landing-framing-more-actions");
     expect(html).not.toContain("landing-cta-glass");
     expect(html).not.toContain('class="landing-framing-tab"');
+  });
+
+  it("landing hero primary uses shared emphasis card CTA class", () => {
+    const html = readFileSync(join(root, "site/index.html"), "utf8");
+    expect(html).toContain('class="hc-emphasis-card__cta landing-hero-btn-primary"');
+    expect(html).not.toMatch(/landing-hero-btn\s+landing-hero-btn-primary/);
   });
 
   it("emphasis card phase B tokens and CTA metrics in component css", () => {

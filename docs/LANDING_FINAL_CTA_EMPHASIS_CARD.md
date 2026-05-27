@@ -1,6 +1,6 @@
 # Landing “Ready to try it?” emphasis card
 
-**Status:** Shipped (emphasis card markup) · **Stacked layout + spacing ladder** (`--hc-emphasis-card-gap-*` tokens) · **Glass CTAs withdrawn** — see [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md)  
+**Status:** Shipped (emphasis card markup + Phase D CTA polish) · **Stacked layout + spacing ladder** · **Glass CTAs withdrawn** — see [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md)  
 **Scope:** `.landing-final-cta`, `.landing-framing` on `/` (`site/index.html`)  
 **Pattern:** [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md)
 
@@ -17,9 +17,19 @@ The closing landing CTA (`.landing-final-cta`) used a **flat** pink wash + **1px
 | Surface | Markup | Notes |
 |---------|--------|-------|
 | **Ready to try it?** | `hc-emphasis-card hc-emphasis-card--urgent landing-final-cta` | Dot, eyebrow, title, detail, actions |
-| **Physical software objects** | `hc-emphasis-card hc-emphasis-card--info landing-framing` | “What else can a QR do?” as nested row |
+| **Physical software objects** | `hc-emphasis-card hc-emphasis-card--info landing-framing` | “What else can a QR do?” in `__actions` as `hc-emphasis-card__cta--secondary` full-width row |
+| **Hero Create** | `hc-emphasis-card__cta landing-hero-btn-primary` | Same primary CTA family as wallet; landing scope adds full width + 50px height |
 
 **Withdrawn (do not extend):** `site/css/landing-liquid-glass.css` and `.landing-cta-glass*` on hero, final CTA, and framing row. Revert and realign to keys-notification CTAs per [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) phase A.
+
+### Modifier choice (Phase D)
+
+| Block | Modifier | Rationale |
+|-------|----------|-----------|
+| **Physical software objects** (`.landing-framing`) | `--info` | Informational design-space copy; blue eyebrow matches cross-tab / custody pattern |
+| **Ready to try it?** (`.landing-final-cta`) | `--urgent` | Primary conversion + live-object creation; red eyebrow matches live-proof / error family without being an error state |
+
+Product may switch the final block to `--info` for a calmer close; keep markup on `hc-emphasis-card` and change only the modifier class.
 
 ---
 
@@ -80,8 +90,9 @@ Do not document or test these classes after phase A of the alignment doc.
 | Step | Task | Status |
 |------|------|--------|
 | 1–7 | Emphasis card migration + glass experiment | Shipped then **superseded** |
-| **A** | Revert glass; restore standard CTAs | Planned — alignment doc |
-| **B–E** | Global emphasis tokens (blur, border, CTA shape) | Planned — alignment doc |
+| **A** | Revert glass; restore standard CTAs | **Shipped** |
+| **B–D** | Global emphasis tokens + landing CTA polish | **Shipped** — alignment doc |
+| **E** | Regression tests + rollout doc status | Next |
 
 ---
 

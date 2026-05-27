@@ -1612,26 +1612,28 @@ a.hub-card-menu-item {
   text-underline-offset: 2px;
 }
 
-.landing-framing-more-link {
+.landing-framing.hc-emphasis-card .landing-framing-more-actions {
+  width: 100%;
+  max-width: none;
+  justify-content: stretch;
+  margin: 0;
+}
+
+.landing-framing.hc-emphasis-card .landing-framing-more-actions > * {
+  margin: 0;
+  flex: 1 1 100%;
+}
+
+.hc-emphasis-card__cta.landing-framing-more-link {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 10px;
   width: 100%;
   min-height: 44px;
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 0.5px solid rgba(60, 60, 67, 0.12);
-  background: rgba(255, 255, 255, 0.72);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92);
-  text-decoration: none;
+  padding: 10px 12px;
   text-align: left;
-  color: var(--hc-emphasis-card-title-fg);
   flex-shrink: 0;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.landing-framing-more-link:active {
-  opacity: 0.88;
 }
 
 .landing-framing-more-link .landing-framing-more-text {
@@ -6005,6 +6007,24 @@ a.wallet-pin-open {
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
+/* Hero primary — shared hc-emphasis-card__cta shape; landing scope for width/scale */
+.landing-hero-actions .hc-emphasis-card__cta.landing-hero-btn-primary {
+  width: 100%;
+  min-height: 50px;
+  padding: 14px 18px;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 4px 14px rgba(219, 27, 67, 0.32);
+}
+
+.landing-hero-actions .hc-emphasis-card__cta.landing-hero-btn-primary:active {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.05),
+    0 2px 8px rgba(219, 27, 67, 0.22);
+}
+
 .landing-hero-btn-primary {
   background: var(--red);
   border: none;
@@ -6090,8 +6110,7 @@ a.wallet-pin-open {
   padding-top: 2px;
 }
 
-.landing-how-it-works-title,
-.landing-final-cta-title {
+.landing-how-it-works-title {
   margin: 0 0 6px;
   font-size: 22px;
   font-weight: 700;
@@ -6100,8 +6119,7 @@ a.wallet-pin-open {
   color: var(--black);
 }
 
-.landing-how-it-works-lead,
-.landing-final-cta-lead {
+.landing-how-it-works-lead {
   margin: 0 0 14px;
   font-size: 15px;
   line-height: 1.45;

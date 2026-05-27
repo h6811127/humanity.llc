@@ -1,6 +1,6 @@
 # Emphasis card visual alignment (keys-notification standard)
 
-**Status:** In progress — **Phases A, B, C, F5 shipped**; Phase D (landing markup polish) next  
+**Status:** In progress — **Phases A–D, F5 shipped**; Phase E (docs + regression tests) next  
 **Canonical for:** All `.hc-emphasis-card` surfaces, including landing (`/`) marketing blocks that adopted the component in May 2026  
 **Supersedes (when implemented):** Opaque-fill + shadow-only-only rules in [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Emphasis notice cards · glass landing CTAs in [`LANDING_FINAL_CTA_EMPHASIS_CARD.md`](LANDING_FINAL_CTA_EMPHASIS_CARD.md)  
 **Related:** [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md)
@@ -195,6 +195,8 @@ All rows use the **same token set** after implementation.
 **Shipped B (May 2026):** Glass fills + hairline borders + `backdrop-filter` on `.hc-emphasis-card`; opaque fallback via `@supports` / `prefers-reduced-transparency`; eyebrow `0.025em`; CTA radius **10px** and tighter padding; `hc-emphasis-card.css?v=3`; `styles.css?v=120` / `theme-dark.css?v=24`.
 
 **Shipped C (May 2026):** Glass parity on shell (`device-cross-tab`, wallet tab hint), created/create/organizer-revoke via shared import; scan bundle tokens + dark emphasis rules in `scan-pass.css` (`npm run worker:bundle-scan`); hub inset inherits component CSS; cache bust `styles.css?v=120` / `theme-dark.css?v=24` on wallet, create, created.
+
+**Shipped D (May 2026):** Landing hero primary uses `hc-emphasis-card__cta`; framing “What else” row in `__actions` with `hc-emphasis-card__cta--secondary`; modifier choices documented in [`LANDING_FINAL_CTA_EMPHASIS_CARD.md`](LANDING_FINAL_CTA_EMPHASIS_CARD.md); `styles.css?v=121` / `theme-dark.css?v=25` on `/`.
 
 **Deploy / cache:** If production looks unchanged after deploy, see [`LANDING_EMPHASIS_CARD_SPACING_DEPLOY_INVESTIGATION.md`](LANDING_EMPHASIS_CARD_SPACING_DEPLOY_INVESTIGATION.md) (Worker vs Pages, cache bust, `@import`).
 
