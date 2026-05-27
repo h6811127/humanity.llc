@@ -13,6 +13,7 @@ import {
 } from "./device-live-control-poll-budget-core.mjs";
 import {
   getStewardEntitlementsPolicy,
+  stewardPushSubscribeAllowed,
   stewardResolverRequestHeaders,
   STEWARD_ENTITLEMENTS_CHANGED,
   STEWARD_MANUAL_POLL_HEADER,
@@ -24,6 +25,7 @@ import {
 } from "./device-steward-quota-core.mjs";
 import {
   initStewardPushClient,
+  isStewardPushHealthy,
   stewardPushSuppressesAutoPoll,
   syncStewardPushConnection,
   STEWARD_PUSH_LIVE_PROOF_EVENT,
@@ -39,7 +41,10 @@ import {
 } from "./device-live-control-poll-leader.mjs";
 import { getResolverHealthStatus } from "./device-wallet-since-visit-gate.mjs";
 import { selectLiveControlPollEntries } from "./device-wallet-scale-core.mjs";
-import { syncLiveProofServiceWorkerState } from "./device-browser-notifications-sw.mjs";
+import {
+  forwardLiveProofPushToServiceWorker,
+  syncLiveProofServiceWorkerState,
+} from "./device-browser-notifications-sw.mjs";
 import { getPendingLiveControlChallengeUrl } from "./hc-sign.mjs";
 import { fetchResolverJson } from "./resolver-conditional-fetch-core.mjs";
 import { activateWalletEntry } from "./device-keys.mjs";
@@ -570,6 +575,7 @@ function bindLiveControlPollScopeListeners() {
 
   window.addEventListener(STEWARD_PUSH_STATE_CHANGED, () => {
     syncLiveControlInboxPolling();
+    void syncLiveProofServiceWorkerState();
   });
 
   window.addEventListener(STEWARD_PUSH_LIVE_PROOF_EVENT, (e) => {
@@ -577,7 +583,14 @@ function bindLiveControlPollScopeListeners() {
       e instanceof CustomEvent && e.detail && typeof e.detail === "object"
         ? e.detail
         : null;
-    if (detail) void applyLiveProofPendingFromPush(detail);
+    if (!detail) return;
+    void (async () => {
+      await applyLiveProofPendingFromPush(detail);
+      await forwardLiveProofPushToServiceWorker(detail, {
+        pushEntitled: stewardPushSubscribeAllowed(getStewardEntitlementsPolicy()),
+        pushHealthy: isStewardPushHealthy(),
+      });
+    })();
   });
 }
 

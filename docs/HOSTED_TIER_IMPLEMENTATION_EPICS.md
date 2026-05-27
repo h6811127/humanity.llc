@@ -1,6 +1,6 @@
 # Hosted tier — implementation epics (M8)
 
-**Status:** **E1–E6 staging** (behind `HOSTED_STEWARD_ENABLED`; E4d SW bridge + external CF dashboards remain)  
+**Status:** **E1–E6 staging** (behind `HOSTED_STEWARD_ENABLED`; external CF dashboards remain)  
 **Milestone:** M8 of [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md)  
 **Depends on:** M2–M7 complete; **M4 governance sign-off** before E1 merge to production  
 **Audience:** Engineering, ops
@@ -237,11 +237,12 @@ flowchart LR
 | E4a | **Staging** — `notifyLiveProofPending()` on challenge POST |
 | E4b | **Staging** — `GET …/steward/push` SSE + connection registry |
 | E4c | **Staging** — `device-steward-push.mjs` leader-tab client + inbox GET |
-| E4d–e | Deferred (SW bridge, Durable Object fan-out) |
+| E4d | **Staging** — page → SW `HC_SW_LIVE_PROOF_PUSH` bridge; SW skips poll when push healthy |
+| E4e | Deferred (Durable Object fan-out) |
 | Vitest | `device-steward-push-core.test.ts`, `steward-push-sse.test.ts`, `steward-push-notify.test.ts` |
 | E2E | `e2e/hosted-tier-push.spec.ts` — M7 **H4** |
 
-**Next:** **E4d** SW bridge when tab-hidden OS notify is prioritized.
+**Next:** **G0** M4 governance sign-off for production enablement; **E4e** DO fan-out deferred.
 
 ---
 
@@ -390,6 +391,7 @@ flowchart LR
 
 | Date | Note |
 |------|------|
+| 2026-05-27 | **E4d SW bridge:** push hint → service worker OS notify; skip SW poll when SSE healthy |
 | 2026-05-27 | **E6.2 daily alert script:** `worker:check-steward-ops` + threshold Vitest |
 | 2026-05-27 | **E4 push staging:** SSE client/worker + `e2e/hosted-tier-push.spec.ts` H4 |
 | 2026-05-27 | **E2 client probe staging:** browser fetch/cache Vitest + hosted budget E2E H1–H3/H5 |
