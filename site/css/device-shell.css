@@ -872,25 +872,30 @@ button.device-hub-notice-banner {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
   border-radius: 50%;
   border: none;
-  background: rgba(120, 120, 128, 0.14);
-  color: var(--shell-label-strong, #1c1c1e);
+  background: rgba(120, 120, 128, 0.08);
+  color: var(--surface-popover-fg-muted, rgba(60, 60, 67, 0.55));
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.2s var(--shell-spring);
+  transition:
+    transform 0.2s var(--shell-spring),
+    background 0.2s var(--shell-ease);
 }
 
 .device-hub-home-btn svg {
   display: block;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
 }
 
 .device-hub-home-btn:active {
   transform: scale(0.96);
+  background: rgba(120, 120, 128, 0.14);
 }
 
 .device-hub-status-panel {
@@ -1964,20 +1969,25 @@ button.hub-card-action.hub-use-keys {
   top: 8px;
   right: 10px;
   z-index: 4;
-  width: 32px;
-  height: 32px;
-  border: none;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  border: 0.5px solid var(--surface-popover-border, rgba(60, 60, 67, 0.12));
   border-radius: 50%;
-  background: var(--surface-popover-control-bg, rgba(120, 120, 128, 0.12));
-  font-size: 22px;
+  background: var(--surface-popover-control-bg, rgba(120, 120, 128, 0.16));
+  font-size: 24px;
+  font-weight: 500;
   line-height: 1;
-  color: var(--surface-popover-fg-muted, rgba(60, 60, 67, 0.72));
+  color: var(--surface-popover-fg, rgba(28, 28, 30, 0.92));
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  box-shadow: var(--shell-shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
 }
 
 .device-hub-sheet-close:active {
-  opacity: 0.82;
+  opacity: 0.88;
+  transform: scale(0.96);
 }
 
 .device-hub-backdrop {

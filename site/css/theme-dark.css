@@ -910,8 +910,17 @@ html[data-theme="dark"] .device-hub-create-btn {
 }
 
 html[data-theme="dark"] .device-hub-home-btn {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--surface-popover-fg-muted);
+}
+
+html[data-theme="dark"] .device-hub-home-btn:active {
   background: rgba(255, 255, 255, 0.12);
-  color: var(--shell-label-strong);
+}
+
+html[data-theme="dark"] .device-hub-sheet-close {
+  border-color: var(--surface-popover-border);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 
 html[data-theme="dark"] .landing-device-settings-list {

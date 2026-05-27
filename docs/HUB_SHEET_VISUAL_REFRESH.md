@@ -30,7 +30,7 @@ The open hub read as a **solid white slab** with a generic grey toolbar wedged u
 |------|---------|--------------|
 | **2** | Hub bottom sheet (`.device-hub--sheet`) | `--surface-popover-bg-glass`, `--shell-blur` |
 | **3 info** | Inline search (`.device-hub-search--inline`), saved row (`.hub-card-item`) | `--hc-emphasis-card-fill-info-glass` |
-| **3 warn** | Monitoring card (`.device-hub-network-tools`) | `--hc-emphasis-card-fill-warn-glass` |
+| **3 warn** | Monitoring card (`.device-hub-network-tools`), card-disabled since visit (`.device-hub-card-disabled-card`) | `--hc-emphasis-card-fill-warn-glass` / `hc-emphasis-card--warn` |
 | **3 urgent** | Live proof waiting (`.device-hub-live-control-card`) | `hc-emphasis-card--urgent` |
 
 Row depth and sheet glass details: [`HUB_CARD_3D_AND_SHEET_GLASS.md`](HUB_CARD_3D_AND_SHEET_GLASS.md).

@@ -66,6 +66,16 @@ describe("device hub sheet header", () => {
     }
   });
 
+  it("gives hub Home and Close at least 40px tap targets with stronger Close weight", () => {
+    const css = readPage("site/css/device-shell.css");
+    expect(css).toMatch(/\.device-hub-home-btn\s*\{[\s\S]*min-width:\s*40px/);
+    expect(css).toMatch(/\.device-hub-home-btn\s*\{[\s\S]*--surface-popover-fg-muted/);
+    expect(css).toMatch(/\.device-hub-sheet-close\s*\{[\s\S]*min-width:\s*40px/);
+    expect(css).toMatch(
+      /\.device-hub-sheet-close\s*\{[\s\S]*?color:\s*var\(--surface-popover-fg/
+    );
+  });
+
   it("renders the status header as a primary line with subordinate counts", () => {
     const src = readPage("site/js/device-status.mjs");
     const css = readPage("site/css/device-shell.css");

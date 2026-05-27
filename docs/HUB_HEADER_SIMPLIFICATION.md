@@ -1,6 +1,6 @@
 # Hub header simplification
 
-**Status:** Steps 1-2 shipped
+**Status:** Steps 1–3 shipped · Step 4 manual QA pending
 **Scope:** Bottom-sheet hub header on `/`, `/create/`, and `/created/`  
 **Companions:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md), [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md)
 
@@ -58,11 +58,11 @@ The first screen of the hub should prioritize:
 
 **Shipped:** The sheet header now renders one inline status line: network first, then muted device counts, then compact alert-weight items only for actionable states.
 
-### Step 3 - Rebalance nav controls
+### Step 3 - Rebalance nav controls ✅
 
-- Review Home and Close visual weight together.
-- Keep Close stronger than Home because it exits the sheet; keep Home available but quieter.
-- Verify tap targets remain at least 40px.
+- **Home (quieter):** `.device-hub-home-btn` uses muted popover fg, lighter fill (`rgba(120,120,128,0.08)`), 20px icon; still **40×40px** tap target.
+- **Close (stronger):** `.device-hub-sheet-close` bumped to **40×40px**, popover fg (not muted), control fill + border + light shadow; dark theme border/shadow pass.
+- **Files:** `site/css/device-shell.css`, `site/css/theme-dark.css` (`device-shell.css?v=59` on shell pages).
 
 ### Step 4 - Manual QA pass
 
