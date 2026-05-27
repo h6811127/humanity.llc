@@ -115,6 +115,17 @@ Calm footer on lost-item relay scan template only — link to `/create/?template
 
 - After re-seed: `API_ORIGIN=https://humanity.llc npm run site:verify-showcase` — live `GET …/status` checks for `object_streams` + `public_snapshot`
 
+### Step 9 — Field pilot summary aggregation ✅
+
+**Founder-run (field):** collect **Copy pilot summary** JSON from stewards after status plate / lost-item pilots.
+
+**Shipped tooling:**
+
+- `site/js/pilot-summary-aggregate.mjs` — parse + rollup exported summaries (no server analytics)
+- `npm run site:aggregate-pilot-summaries -- path/to/*.json` — text rollup for founder field notes
+
+**Exit:** `worker/tests/pilot-summary-aggregate.test.ts`
+
 ---
 
 ## Related

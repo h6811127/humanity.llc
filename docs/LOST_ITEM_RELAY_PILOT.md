@@ -83,7 +83,7 @@ Score with `docs/M5_STRANGER_TEST_RUNBOOK.md`.
 
 **Habit loop closed (one steward):** ≥1 update + printed + second-device scan confirmed. Scorecard headline switches to “Pilot habit loop closed on this device.” when all three are true.
 
-**Field pilot export:** **Copy pilot summary** on `/created/` copies local JSON (`humanity_lost_item_relay_pilot_summary_v1`) for founder aggregation — no server analytics.
+**Field pilot export:** **Copy pilot summary** on `/created/` copies local JSON (`humanity_lost_item_relay_pilot_summary_v1`) for founder aggregation — no server analytics. Roll up exports: `npm run site:aggregate-pilot-summaries -- summaries/*.json`
 
 **Privacy:** Scorecard is device-local only — aligns with no scan analytics by default.
 

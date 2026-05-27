@@ -53,6 +53,7 @@
     "site:seed-showcase-live-object": "node worker/scripts/seed-showcase-live-object.mjs",
     "site:seed-showcase-lost-item": "node worker/scripts/seed-showcase-lost-item.mjs",
     "site:verify-showcase": "node worker/scripts/verify-showcase-resolver.mjs",
+    "site:aggregate-pilot-summaries": "node worker/scripts/aggregate-pilot-summaries.mjs",
     "worker:test:manifesto-showcase-exit": "vitest run worker/tests/manifesto-showcase-exit.test.ts worker/tests/site-showcase-data.test.ts worker/tests/scan-m5-showcase-paths.test.ts"
   },
   "dependencies": {
