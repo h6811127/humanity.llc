@@ -128,7 +128,7 @@ Run on **production** (or staging with full Pages deploy) after `site/` ships. M
 
 **Fail signals:** Laggy landing scroll with hub closed; dot dead; full-page taps blocked (stuck backdrop — use unstick snippet in Safari investigation doc). If W1–W4 fail, consider Phase 3A/3B in that doc (do not ship without triage).
 
-**Automated gate:** Chromium device shell E2E in CI (`e2e/device-status-dot.spec.ts`, `device-inbox`, `device-os-wallet`). **P0-W** WebKit sign-off is manual on real devices (Safari-specific E2E removed in UI revert step 3).
+**Automated gate:** device shell E2E in CI (`e2e/device-status-dot.spec.ts`, `device-inbox`, `device-os-wallet`) plus invariant-only WebKit smoke (`e2e/safari-shell-scroll.spec.ts`). **P0-W** sign-off is still manual on real WebKit devices.
 
 ### P1-4 · Hub intro coachmark (first visit)
 
@@ -254,18 +254,18 @@ Removed May 2026. See [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md). 
 
 See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 
-### P1-8 · Hosted tier budget (Phase 10 — when E2 ships)
+### P1-8 · Hosted tier budget (Phase 10 — E2 staging)
 
-**Status:** Planning only until M4 sign-off + E2 implementation. Spec: [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) · build order: [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md).
+**Status:** E2 client probe staging; production enablement still waits on M4 sign-off and rollout gates. Spec: [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) · build order: [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md).
 
 | Step | Action | Expected |
 |------|--------|----------|
 | 1 | Free steward; watch on; hub expanded | **400**/day auto cap message; behavior unchanged from P1-7 |
 | 2 | Hosted test account (mock or staging entitlements) | Cap **4000**/day; idle poll **30s** when watch on |
 | 3 | Cancel / expire hosted | Returns to **400** cap; wallet and keys intact |
-| 4 | Stranger scan page | No steward session; poll unchanged |
+| 4 | Anonymous create / stranger scan page | No steward session; no hosted entitlement call; poll/create unchanged |
 
-Automated: M7 Vitest + E2E H1–H5 when implemented.
+Automated: M7 Vitest + `e2e/hosted-tier-budget.spec.ts` for H1–H3/H5.
 
 ## P1 — Card disabled since last visit
 

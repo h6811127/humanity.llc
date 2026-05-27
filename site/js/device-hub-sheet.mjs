@@ -2,11 +2,11 @@
  * Bottom sheet host for #device-hub on shell pages.
  */
 import { prefersReducedMotion } from "./device-shell-motion.mjs";
-import { hubSheetReconcileAction } from "./device-hub-sheet-core.mjs?v=34";
+import { hubSheetReconcileAction } from "./device-hub-sheet-core.mjs?v=45";
 import {
   bindSheetLifecycleReconcile,
   syncSheetBackdropClosed,
-} from "./device-sheet-backdrop-sync.mjs?v=34";
+} from "./device-sheet-backdrop-sync.mjs?v=45";
 import { LIVE_CONTROL_POLL_SCOPE_CHANGED } from "./device-live-control-inbox.mjs";
 
 const HUB_OPEN_KEY = "hc_hub_open";
@@ -26,6 +26,7 @@ function ensureBackdrop() {
   backdrop.id = "device-hub-backdrop";
   backdrop.className = "device-hub-backdrop";
   backdrop.setAttribute("aria-label", "Close device panel");
+  backdrop.setAttribute("aria-hidden", "true");
   backdrop.hidden = true;
   document.body.appendChild(backdrop);
   backdrop.addEventListener("click", () => {

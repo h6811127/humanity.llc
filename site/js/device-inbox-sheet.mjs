@@ -72,6 +72,7 @@ function ensureInboxSheetDom() {
   backdrop.id = BACKDROP_ID;
   backdrop.className = "device-inbox-backdrop";
   backdrop.setAttribute("aria-label", "Close inbox");
+  backdrop.setAttribute("aria-hidden", "true");
   backdrop.hidden = true;
   backdrop.addEventListener("click", () => {
     setInboxSheetOpen(false);
