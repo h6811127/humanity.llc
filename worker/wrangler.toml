@@ -55,6 +55,8 @@ HOSTED_STEWARD_ENABLED = "1"
 # PERSONALIZE_STICKER_PRINTIFY_PLACEHOLDER = "front"
 # Printify webhook (O-003): register in Printify admin → POST …/v1/print/webhooks/printify
 # PRINTIFY_WEBHOOK_SECRET = ""  # wrangler secret; must match Printify webhook secret
+# Encrypted shipping from Shopify paid webhook (PM-FR-41 / PM-SEC-05): 32 raw bytes, base64
+# FULFILLMENT_PII_ENCRYPTION_KEY = ""  # wrangler secret; generate: openssl rand -base64 32
 
 # Daily orphan card purge (04:00 UTC). See docs/CARD_RETENTION_AND_ORPHAN_CLEANUP.md
 [triggers]

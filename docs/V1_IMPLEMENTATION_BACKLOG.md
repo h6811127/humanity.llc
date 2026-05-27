@@ -516,12 +516,14 @@ Goal: complete one real paid order path safely.
 - User-safe order timeline.
 - Operator lookup by Shopify order, commerce order, artifact intent, and Printify order.
 
-**Shipped (partial):** Printify webhook receiver · operator lookup · **buyer order status** — `GET /v1/store/order-status` (email hash + order number) · `/shop/thanks/` UI. Reconciliation polling and tracking links deferred.
+**Shipped (partial):** Printify webhook receiver · operator lookup · **buyer order status** — `GET /v1/store/order-status` (email hash + order number) · `/shop/thanks/` UI · **encrypted shipping capture** — Shopify paid webhook → `commerce_fulfillment_pii` (AES-256-GCM) · Printify submit loads from store unless body override. Reconciliation polling and tracking links deferred.
 
 **Exit criteria:**
 
 - On-hold, has-issues, source-check-failed, unfulfillable, fulfilled, partially fulfilled, and canceled states are actionable.
 - Full shipping address is encrypted and not logged in normal logs.
+
+**Shipped (2026-05-27):** encrypted shipping at rest — migration `0020_commerce_fulfillment_pii.sql` · `FULFILLMENT_PII_ENCRYPTION_KEY` wrangler secret · Shopify `orders/paid` captures `shipping_address` · operator Printify submit resolves from encrypted store (`shipping_source: encrypted_store`) or request body override.
 
 ---
 

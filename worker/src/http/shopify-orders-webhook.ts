@@ -3,6 +3,9 @@
  * Printify submission deferred to O-002; missing metadata holds for operator review.
  */
 import { hashBuyerEmail } from "../commerce/buyer-email-hash";
+import { fulfillmentPiiEncryptionConfigured } from "../commerce/fulfillment-pii-crypto";
+import { parseShopifyOrderShippingAddress } from "../commerce/shopify-shipping-address";
+import { upsertEncryptedShippingAddress } from "../db/commerce-fulfillment-pii";
 import {
   countTier0LineQuantity,
   extractShopifyOrderMetadata,
@@ -214,6 +217,17 @@ async function handlePaidOrder(
 
   if (validation.status === "processing") {
     await markIntentsConverted(db, validation.artifact_intent_ids, nowIso);
+  }
+
+  if (fulfillmentPiiEncryptionConfigured(env)) {
+    const shippingAddress = parseShopifyOrderShippingAddress(order);
+    if (shippingAddress) {
+      await upsertEncryptedShippingAddress(db, env, {
+        commerce_order_id: commerceOrderId,
+        shipping_address: shippingAddress,
+        now_iso: nowIso,
+      });
+    }
   }
 
   let printOrderIds: string[] = [];

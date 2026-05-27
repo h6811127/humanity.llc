@@ -1,4 +1,4 @@
-/** Printify address_to — operator-supplied at submit; never persisted in D1. */
+/** Printify address_to — operator body override or encrypted store from Shopify webhook. */
 
 export interface PrintifyShippingAddress {
   first_name: string;

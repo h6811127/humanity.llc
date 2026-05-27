@@ -2,7 +2,9 @@ import {
   allPlannedQrsMinted,
   mintPrintOrderFromCredentials,
 } from "../commerce/fulfillment-mint";
+import { resolvePrintifyShippingForSubmit } from "../commerce/resolve-printify-shipping";
 import { ensurePrintOrderForCommerceOrder } from "../commerce/fulfillment-queue";
+import type { PrintifyShippingSource } from "../commerce/resolve-printify-shipping";
 import {
   getCommerceOrderById,
   type CommerceOrderRow,
@@ -16,7 +18,6 @@ import { operatorAuditAuthorized } from "../http/operator-auth";
 import { errorResponse, jsonResponse } from "../http/resolver";
 import type { Env } from "../index";
 import { submitPrintifyOrder } from "./printify-client";
-import { parsePrintifyShippingAddress } from "./printify-shipping";
 
 interface CreatePrintOrderRequest {
   commerce_order_id?: unknown;
@@ -96,6 +97,7 @@ export async function handlePostPrintOrders(
   }
 
   let printOrder = queued.print_order;
+  let shippingSource: PrintifyShippingSource | undefined;
 
   if (body.submit_to_printify === true) {
     if (printOrder.status !== "awaiting_production_approval") {
@@ -111,14 +113,21 @@ export async function handlePostPrintOrders(
       );
     }
 
-    const shippingAddress = parsePrintifyShippingAddress(body.shipping_address);
-    if (!shippingAddress) {
+    const resolvedShipping = await resolvePrintifyShippingForSubmit(
+      env,
+      db,
+      commerceOrderId,
+      body.shipping_address
+    );
+    if (!resolvedShipping) {
       return errorResponse(
         "PRINTIFY_SHIPPING_REQUIRED",
-        "submit_to_printify requires a valid shipping_address object (not stored in D1).",
+        "submit_to_printify requires shipping_address in the request body, or encrypted shipping captured from the Shopify paid webhook (set FULFILLMENT_PII_ENCRYPTION_KEY).",
         422
       );
     }
+    const shippingAddress = resolvedShipping.address;
+    shippingSource = resolvedShipping.source;
 
     let quantity = JSON.parse(printOrder.planned_item_qr_ids_json).length;
     if (quantity < 1) quantity = 1;
@@ -179,6 +188,7 @@ export async function handlePostPrintOrders(
     {
       ...printOrderResponse(printOrder),
       created: queued.created,
+      ...(shippingSource ? { shipping_source: shippingSource } : {}),
     },
     queued.created ? 201 : 200
   );
