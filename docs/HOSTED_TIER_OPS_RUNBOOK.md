@@ -26,6 +26,16 @@ This runbook covers the operator loop for quota health, push health, subscriptio
 
 Operator APIs are still feature-flagged behind `HOSTED_STEWARD_ENABLED`; production secrets stay unset until governance/payment sign-off.
 
+Operator summary endpoint (E6 staging):
+
+```bash
+curl -sS \
+  -H "Authorization: Bearer $OPERATOR_AUDIT_TOKEN" \
+  "https://humanity.llc/.well-known/hc/v1/operator/hosted-steward/ops?window_key=$(date -u +%F)"
+```
+
+The response includes account status counts, usage totals, top usage accounts, current in-memory SSE connection counts, and alert candidates for the daily check below.
+
 ---
 
 ## Daily hosted steward check

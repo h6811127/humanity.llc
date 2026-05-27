@@ -100,6 +100,21 @@ export function stewardPushConnectionCount(accountId: string): number {
   return connectionsByAccount.get(accountId)?.size ?? 0;
 }
 
+export function stewardPushConnectionSnapshot(): Array<{
+  account_id: string;
+  connections: number;
+}> {
+  return [...connectionsByAccount.entries()]
+    .map(([account_id, sinks]) => ({ account_id, connections: sinks.size }))
+    .sort((a, b) => b.connections - a.connections || a.account_id.localeCompare(b.account_id));
+}
+
+export function stewardPushTotalConnectionCount(): number {
+  let total = 0;
+  for (const sinks of connectionsByAccount.values()) total += sinks.size;
+  return total;
+}
+
 /** E5.4 — drop in-memory SSE sinks when subscription expires. */
 export function closeStewardPushConnectionsForAccount(accountId: string): void {
   const set = connectionsByAccount.get(accountId);

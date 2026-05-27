@@ -292,8 +292,8 @@ flowchart LR
 
 | Deliverable | Status |
 |-------------|--------|
-| E6.1 | Started — [`HOSTED_TIER_OPS_RUNBOOK.md`](HOSTED_TIER_OPS_RUNBOOK.md) defines the Cloudflare/D1/Stripe dashboard inputs to wire in ops tooling |
-| E6.2 | Started — daily alert signals documented in [`HOSTED_TIER_OPS_RUNBOOK.md`](HOSTED_TIER_OPS_RUNBOOK.md) |
+| E6.1 | **Staging** — operator summary endpoint `GET /.well-known/hc/v1/operator/hosted-steward/ops` plus [`HOSTED_TIER_OPS_RUNBOOK.md`](HOSTED_TIER_OPS_RUNBOOK.md) dashboard inputs |
+| E6.2 | **Staging** — endpoint returns soft-cap, hard-cap, billing, and push-limit alert candidates for the daily check |
 | E6.3 | **Staging** — suspend/status, 1027, fair-use, push degraded, and downgrade runbook |
 | E6.4 | **Staging** — customer-facing macros in [`HOSTED_TIER_SUPPORT_MACROS.md`](HOSTED_TIER_SUPPORT_MACROS.md) |
 
