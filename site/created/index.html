@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Your live object · humanity.llc</title>
+    <title>Created card · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <meta name="theme-color" content="#ffffff" />
     <script>
@@ -18,11 +18,30 @@
         }
       })();
     </script>
-    <link rel="stylesheet" href="/styles.css?v=118" />
+    <link rel="stylesheet" href="/styles.css?v=120" />
     <link rel="stylesheet" href="/css/device-shell.css?v=48" />
-    <link rel="stylesheet" href="/css/theme-dark.css?v=18" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=24" />
   </head>
-  <body class="has-device-hub-search device-shell-created">
+  <body class="has-device-hub-search device-shell-created" data-created-route="pending">
+    <script>
+      (function () {
+        var params = new URLSearchParams(location.search);
+        var hasParam = !!(params.get("profile_id") || params.get("qr_id"));
+        var hasSession = false;
+        try {
+          var raw = sessionStorage.getItem("hc_created");
+          if (raw) {
+            var s = JSON.parse(raw);
+            hasSession = !!(s && (s.profile_id || s.qr_id));
+          }
+        } catch (e) {
+          /* ignore */
+        }
+        if (!hasParam && !hasSession) {
+          location.replace("/wallet/");
+        }
+      })();
+    </script>
     <div class="page">
       <div class="top-chrome top-chrome--float" id="top-chrome">
         <div class="top-chrome-bar top-chrome-bar--minimal" id="top-status">
@@ -130,7 +149,7 @@
       <main class="screen created-screen">
         <section class="hero hero-compact created-hero">
           <p class="hero-eyebrow created-hero-handle" id="created-handle"> - </p>
-          <h1 class="created-hero-title">Live QR ready</h1>
+          <h1 class="created-hero-title">Checking link…</h1>
           <p class="created-hero-meta" id="created-hero-meta"></p>
           <p class="hero-line hero-line-sub created-hero-manifesto" id="created-manifesto" hidden></p>
         </section>
@@ -1230,6 +1249,6 @@
     </div>
     <script src="/js/device-status-bootstrap.mjs?v=43" type="module"></script>
     <script src="/js/created-hub.mjs?v=3" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=51"></script>
+    <script type="module" src="/js/created.mjs?v=52"></script>
   </body>
 </html>

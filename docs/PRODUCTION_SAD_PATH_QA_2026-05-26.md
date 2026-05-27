@@ -250,6 +250,8 @@ POST /.well-known/hc/v1/cards {"garbage":true}
 
 ### P2-9 · `/created/` bare (no query)
 
+**Status (2026-05-26):** Fix shipped — neutral static shell (`data-created-route="pending"`, “Checking link…”), sync redirect to `/wallet/` when no params and no `hc_created` session; module gate unchanged (`created/index.html`, `created-route-gate-core.mjs`, `created.mjs?v=52`).
+
 **curl:** `GET /created/` → 200, title “Your live object”, hero “Live QR ready”.
 
 Same class as P0-1 for users landing without params; may redirect to `/wallet/` when no session (code path exists) — verify in incognito.

@@ -1,6 +1,6 @@
 /**
  * /created/ route gate — pure checks before showing live success chrome.
- * @see docs/PRODUCTION_SAD_PATH_QA_2026-05-26.md P0-1
+ * @see docs/PRODUCTION_SAD_PATH_QA_2026-05-26.md P0-1, P2-9
  */
 
 /** @typedef {"redirect_wallet" | "ok" | "invalid_link" | "incomplete_link" | "session_mismatch"} CreatedRouteAction */
@@ -28,6 +28,47 @@ export function shouldRedirectCreatedToWallet(input) {
   const hasParam = !!(profileIdParam || qrIdParam);
   const hasSession = !!(session?.profile_id || session?.qr_id);
   return !hasParam && !hasSession;
+}
+
+/**
+ * @param {string} [search] location.search (with or without leading ?)
+ */
+export function parseCreatedUrlSearch(search = "") {
+  const normalized = search.startsWith("?") ? search : search ? `?${search}` : "";
+  const params = new URLSearchParams(normalized);
+  return {
+    profileIdParam: params.get("profile_id"),
+    qrIdParam: params.get("qr_id"),
+  };
+}
+
+/**
+ * @param {string | null | undefined} raw sessionStorage hc_created JSON
+ * @returns {Record<string, unknown> | null}
+ */
+export function parseHcCreatedSession(raw) {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Inline bootstrap on /created/ (must stay aligned with early body script).
+ * @param {{ locationSearch?: string, session?: Record<string, unknown> | null }} input
+ * @returns {{ action: "redirect_wallet" } | { action: "pending_shell" }}
+ */
+export function evaluateCreatedEarlyBootstrap(input) {
+  const { profileIdParam, qrIdParam } = parseCreatedUrlSearch(input.locationSearch ?? "");
+  const session = input.session ?? null;
+  if (shouldRedirectCreatedToWallet({ profileIdParam, qrIdParam, session })) {
+    return { action: "redirect_wallet" };
+  }
+  return { action: "pending_shell" };
 }
 
 /**

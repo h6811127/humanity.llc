@@ -4,7 +4,10 @@ import {
   classifyCardLookupStatus,
   createdInvalidLinkMessage,
   createdRouteNeedsProfileLookup,
+  evaluateCreatedEarlyBootstrap,
   isCreatedSessionProfileMismatch,
+  parseCreatedUrlSearch,
+  parseHcCreatedSession,
   resolveCreatedQrId,
   shouldRedirectCreatedToWallet,
 } from "../../site/js/created-route-gate-core.mjs";
@@ -21,6 +24,41 @@ describe("created-route-gate-core", () => {
     expect(classifyCardLookupStatus(400)).toBe("bad_request");
     expect(classifyCardLookupStatus(422)).toBe("bad_request");
     expect(classifyCardLookupStatus(503)).toBe("unreachable");
+  });
+
+  it("parses created URL params", () => {
+    expect(parseCreatedUrlSearch("?profile_id=p1&qr_id=qr_1")).toEqual({
+      profileIdParam: "p1",
+      qrIdParam: "qr_1",
+    });
+    expect(parseCreatedUrlSearch("")).toEqual({
+      profileIdParam: null,
+      qrIdParam: null,
+    });
+  });
+
+  it("parses hc_created session JSON", () => {
+    expect(parseHcCreatedSession(null)).toBeNull();
+    expect(parseHcCreatedSession("{")).toBeNull();
+    expect(parseHcCreatedSession('{"profile_id":"p1"}')).toEqual({ profile_id: "p1" });
+  });
+
+  it("evaluates early bootstrap for bare /created/", () => {
+    expect(
+      evaluateCreatedEarlyBootstrap({ locationSearch: "", session: null })
+    ).toEqual({ action: "redirect_wallet" });
+    expect(
+      evaluateCreatedEarlyBootstrap({
+        locationSearch: "?profile_id=p1",
+        session: null,
+      })
+    ).toEqual({ action: "pending_shell" });
+    expect(
+      evaluateCreatedEarlyBootstrap({
+        locationSearch: "",
+        session: { qr_id: "qr_tab" },
+      })
+    ).toEqual({ action: "pending_shell" });
   });
 
   it("redirects wallet when no params and no session", () => {
@@ -94,6 +132,15 @@ describe("created-route-gate-core", () => {
 });
 
 describe("gateCreatedRoute", () => {
+  it("returns redirect_wallet for bare /created/ with no session", async () => {
+    const gate = await gateCreatedRoute({
+      profileIdParam: null,
+      qrIdParam: null,
+      loadSession: () => null,
+    });
+    expect(gate.action).toBe("redirect_wallet");
+  });
+
   it("returns invalid_link when card lookup fails", async () => {
     const gate = await gateCreatedRoute({
       profileIdParam: "fakeprofileid123456789012345",
