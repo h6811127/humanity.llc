@@ -76,7 +76,7 @@ Hub sheet and dim backdrop were still on tier-3 emphasis blur (`--hc-emphasis-ca
 | **1** | Token transparency + `.hub-card-item` tier-3 CSS + Vitest guard | `styles.css`, `device-shell.css`, `theme-dark.css`, `ui-color-scheme-popover-guard.test.ts` | **Shipped** |
 | **2** | Hub sheet frosted surface + dark glass; extend reduced-transparency | `device-shell.css`, `theme-dark.css`, guard test | **Shipped** |
 | **3** | Cache bust shell pages; manual light/dark QA | `site/index.html`, wallet, created, create | **Shipped** |
-| **4** | Regression suite | `worker:test:ui-color-scheme`, `worker:test:device`, `e2e/device-os-wallet.spec.ts` | **Shipped** (Vitest green; wallet e2e partial — see below) |
+| **4** | Regression suite | `worker:test:ui-color-scheme`, `worker:test:device`, `e2e/device-os-wallet.spec.ts` | **Shipped** (Vitest + wallet e2e green) |
 | **5** | Hub sheet + dim backdrop → `--shell-blur`; cache bust; guard tests | `device-shell.css`, shell HTML, `ui-color-scheme-popover-guard.test.ts`, `device-emphasis-card-html.test.ts` | **Shipped** |
 | **6** | Inbox sheet + dim backdrop glass parity with hub (`--surface-popover-bg-glass`, `--shell-blur`); cache bust; guard tests | `device-shell.css`, `theme-dark.css`, shell HTML, guard tests | **Shipped** |
 
@@ -96,13 +96,13 @@ Hub sheet and dim backdrop were still on tier-3 emphasis blur (`--hc-emphasis-ca
 
 ```bash
 npm run worker:test:ui-color-scheme   # pass
-npm run worker:test:device            # 358 pass
-npm run e2e -- e2e/device-os-wallet.spec.ts  # 6/12 pass
+npm run worker:test:device            # pass
+npm run e2e -- e2e/device-os-wallet.spec.ts  # 16/16 pass
 ```
 
 **Vitest additions:** `device-emphasis-card-html` hub tier-3 guard; cache bust `v=123` / `theme-dark v=26` / `device-shell v=52`; `shouldUseCachedNetworkStatus` aligned with G4 card-revoke cache policy.
 
-**E2e note:** Hub-row tests pass after `Open controls` selector uses `exact: true` (avoids wallet tab-hint **Open controls here**). Six failures remain on `/created/` setup vs control mode gating (`#created-setup-root` / `#created-control-root`) — pre-existing, not hub CSS.
+**E2e fixes (May 2026):** Hub-row **Open controls** uses `.hub-card-item` + `{ exact: true }` (avoids wallet tab-hint **Open controls here**). `/created/` tests stub resolver card lookup (`health` + `status` + card JSON) so route gate boots setup/control roots. **Update status** test sets `hc_created_first_qr_revoke` before asserting `#created-live-scanners-see` (Phase A first-revoke gate).
 
 **Manual (recommended):**
 

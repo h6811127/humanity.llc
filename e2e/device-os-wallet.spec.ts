@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 
 const SAMPLE_WALLET_ENTRY = {
   id: "e2e_test_1",
@@ -15,6 +15,62 @@ const SAMPLE_WALLET_ENTRY = {
   status: "active",
 };
 
+function cardStatusBody(entry = SAMPLE_WALLET_ENTRY) {
+  return {
+    version: "1.0",
+    resolver: { operator: "humanity.llc", version: "1.0" },
+    scan: {
+      kind: "active",
+      profile_id: entry.profile_id,
+      qr_id: entry.qr_id,
+      card: {
+        status: "active",
+        handle: entry.handle,
+        manifesto_line: entry.manifesto_line,
+      },
+      verification: { state: "registered", label: "Registered" },
+      human_trust: { label: "Registered", subtitle: "", pill_active: false },
+    },
+  };
+}
+
+async function stubCreatedResolver(page: Page, entry = SAMPLE_WALLET_ENTRY) {
+  await page.route("**/.well-known/hc/v1/health**", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ status: "ok", database: "ok" }),
+    })
+  );
+  await page.route("**/.well-known/hc/v1/cards/**/status**", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(cardStatusBody(entry)),
+    })
+  );
+  await page.route(`**/.well-known/hc/v1/cards/${entry.profile_id}`, (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        handle: entry.handle,
+        manifesto_line: entry.manifesto_line,
+        created_at: "2026-05-25T12:00:00.000Z",
+        status: "active",
+      }),
+    })
+  );
+}
+
+async function clickOpenControlsOnSavedCard(page: Page) {
+  await page
+    .locator(".hub-card-item")
+    .first()
+    .getByRole("button", { name: "Open controls", exact: true })
+    .click();
+}
+
 test.describe("device OS wallet flow", () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript((entry) => {
@@ -28,7 +84,7 @@ test.describe("device OS wallet flow", () => {
     await page.goto("/wallet/");
     await expect(page.getByRole("heading", { name: "My cards on this device" })).toBeVisible();
     await expect(page.getByText("E2E Test Card")).toBeVisible();
-    await page.getByRole("button", { name: "Open controls" }).click();
+    await clickOpenControlsOnSavedCard(page);
     await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
     const sessionRaw = await page.evaluate(() => sessionStorage.getItem("hc_created"));
     expect(sessionRaw).toContain("privkeyfortestonlyxxxxxxxxx");
@@ -116,9 +172,10 @@ test.describe("device OS wallet flow", () => {
     await page.addInitScript((profileId) => {
       localStorage.removeItem("hc_setup_done");
     }, SAMPLE_WALLET_ENTRY.profile_id);
+    await stubCreatedResolver(page);
 
     await page.goto("/wallet/");
-    await page.getByRole("button", { name: "Open controls" }).click();
+    await clickOpenControlsOnSavedCard(page);
 
     await expect(page).toHaveURL(/\/created\/\?.*profile_id=7Xk9mP2nQ4rT6vW8yZ1aB3cD5/);
     await expect(page.locator("#created-setup-root")).toBeHidden();
@@ -137,9 +194,10 @@ test.describe("device OS wallet flow", () => {
       });
       sessionStorage.setItem("hc_created_task_done", done);
     }, SAMPLE_WALLET_ENTRY.profile_id);
+    await stubCreatedResolver(page);
 
     await page.goto("/wallet/");
-    await page.getByRole("button", { name: "Open controls" }).click();
+    await clickOpenControlsOnSavedCard(page);
 
     await expect(page.locator("#created-control-root")).toBeVisible();
     await expect(page.getByRole("tab", { name: "Live", selected: true })).toBeVisible();
@@ -166,6 +224,7 @@ test.describe("device OS wallet flow", () => {
         })
       );
     }, SAMPLE_WALLET_ENTRY);
+    await stubCreatedResolver(page);
 
     const url = `/created/?profile_id=${SAMPLE_WALLET_ENTRY.profile_id}&qr_id=${SAMPLE_WALLET_ENTRY.qr_id}&fresh=1`;
     await page.goto(url);
@@ -178,36 +237,12 @@ test.describe("device OS wallet flow", () => {
   test("Update status opens /created/ with keys and update panel focus", async ({ page }) => {
     await page.addInitScript((profileId) => {
       localStorage.setItem("hc_setup_done", JSON.stringify({ [profileId]: true }));
+      sessionStorage.setItem(
+        "hc_created_first_qr_revoke",
+        JSON.stringify({ [profileId]: true })
+      );
     }, SAMPLE_WALLET_ENTRY.profile_id);
-    await page.route("**/.well-known/hc/v1/health**", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ status: "ok", database: "ok" }),
-      })
-    );
-    await page.route("**/.well-known/hc/v1/cards/**/status**", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          version: "1.0",
-          resolver: { operator: "humanity.llc", version: "1.0" },
-          scan: {
-            kind: "active",
-            profile_id: SAMPLE_WALLET_ENTRY.profile_id,
-            qr_id: SAMPLE_WALLET_ENTRY.qr_id,
-            card: {
-              status: "active",
-              handle: SAMPLE_WALLET_ENTRY.handle,
-              manifesto_line: SAMPLE_WALLET_ENTRY.manifesto_line,
-            },
-            verification: { state: "registered", label: "Registered" },
-            human_trust: { label: "Registered", subtitle: "", pill_active: false },
-          },
-        }),
-      })
-    );
+    await stubCreatedResolver(page);
     await page.goto("/wallet/");
     await expect(page.getByText("Reachable")).toBeVisible({ timeout: 15_000 });
     const cardRow = page.locator(".hub-card-item").first();
