@@ -81,6 +81,8 @@ export interface Env {
   STRIPE_WEBHOOK_SECRET?: string;
   /** O-001 Shopify webhook HMAC secret. */
   SHOPIFY_WEBHOOK_SECRET?: string;
+  /** AES-256 key (32 bytes, base64) for encrypted fulfillment shipping at rest. */
+  FULFILLMENT_PII_ENCRYPTION_KEY?: string;
   /** O-002 Printify personal access token (server-only). */
   PRINTIFY_API_TOKEN?: string;
   /** O-002 Printify shop id for order submit. */
