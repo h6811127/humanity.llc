@@ -96,6 +96,15 @@ export function isPersonalizeProductCheckoutOpen(product) {
 export function isPersonalizeCheckoutReady(config, product) {
   if (product?.checkout_open === false) return false;
   if (config?.personalize?.checkout_open !== true) return false;
+
+  const launchSku =
+    typeof config?.personalize?.checkout_product_id === "string"
+      ? config.personalize.checkout_product_id.trim()
+      : "";
+  if (launchSku && String(product?.product_id ?? "") !== launchSku) {
+    return false;
+  }
+
   return isPersonalizeProductCheckoutOpen(product);
 }
 

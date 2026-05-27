@@ -157,6 +157,7 @@ async function createArtifactIntent(product) {
       profile_id: cardSession.profile_id,
       source_qr_id: cardSession.qr_id,
       product_id: display.productId,
+      print_template_id: display.printTemplateId || undefined,
       quantity: 1,
       shopify_variant_id: display.shopifyVariantId || undefined,
     }),

@@ -1,4 +1,7 @@
-import { TIER0_BATCH_PRINT_TEMPLATE_ID } from "./print-catalog";
+import {
+  DEFAULT_PRINT_TEMPLATE_ID,
+  TIER0_BATCH_PRINT_TEMPLATE_ID,
+} from "./print-catalog";
 
 export interface PrintifyLineItemConfig {
   product_id: string;
@@ -18,6 +21,9 @@ export function resolvePrintifyLineItem(
     TIER0_PRINTIFY_PRODUCT_ID?: string;
     TIER0_PRINTIFY_VARIANT_ID?: string;
     TIER0_PRINTIFY_SHIPPING_METHOD?: string;
+    PERSONALIZED_STICKER_PRINTIFY_PRODUCT_ID?: string;
+    PERSONALIZED_STICKER_PRINTIFY_VARIANT_ID?: string;
+    PERSONALIZED_STICKER_PRINTIFY_SHIPPING_METHOD?: string;
   },
   templateId: string
 ): PrintifyLineItemConfig | null {
@@ -31,5 +37,17 @@ export function resolvePrintifyLineItem(
       shipping_method: parsePositiveInt(env.TIER0_PRINTIFY_SHIPPING_METHOD, 1),
     };
   }
+
+  if (templateId === DEFAULT_PRINT_TEMPLATE_ID) {
+    const product_id = env.PERSONALIZED_STICKER_PRINTIFY_PRODUCT_ID?.trim() ?? "";
+    const variant_id = parsePositiveInt(env.PERSONALIZED_STICKER_PRINTIFY_VARIANT_ID, 0);
+    if (!product_id || variant_id <= 0) return null;
+    return {
+      product_id,
+      variant_id,
+      shipping_method: parsePositiveInt(env.PERSONALIZED_STICKER_PRINTIFY_SHIPPING_METHOD, 1),
+    };
+  }
+
   return null;
 }

@@ -26,11 +26,11 @@ What reads as “cheap” is not the stack — it is **UX polish and checkout ha
 |------|----------------------------------------------------------------|---------------|-----|
 | Browse model | Story-row hub (~50 SKUs over time) | **2-row hub** at `/shop/` + product pages | Full catalog deferred |
 | Tier 0 batch merch | Founding objects row | `/shop/founding/` — founding sticker | Founding glitch shirt / luxury batch page TBD |
-| Tier 1 personalize | Customizer → artifact intent → checkout | `/shop/customize/` + `POST /v1/store/artifact-intents` | Operator must enable `personalize.checkout_open` + Shopify variants |
+| Tier 1 personalize | Customizer → artifact intent → checkout | Personalized **sticker** path wired; hoodie after QA | Operator: sticker Shopify URL + Printify env |
 | Checkout | Branded Humanity checkout; may pass through Shopify | Same-tab redirect to Shopify; return via `/shop/thanks/` | Post-pay order timeline on site (thin) |
 | Catalog API | `GET /v1/store/rows` | Static `shop-config.json` | API rows when catalog grows |
 | Print catalog | Apparel from `GET /v1/print/catalog` | Customizer merges catalog + `shop-config.json` | Hoodie Printify QA + operator enable |
-| Fulfillment | Paid webhook → Printify | Queue + operator submit path shipped | Self-serve E2E for one personalized SKU |
+| Fulfillment | Paid webhook → Printify | Queue + template resolve + Printify env for sticker | Operator submit after mint |
 
 **Do not conflate:** Tier 0 founding batch page (`/shop/founding/`) and Tier 1 customizer (`/shop/customize/`). Different QR models, different stories.
 
@@ -59,8 +59,8 @@ See [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) for operator 
 | **1** | Same-tab Shopify checkout handoff (`shop-checkout-handoff.mjs`) | Shipped |
 | **2** | 2-row `/shop/` hub + `/shop/founding/` Tier 0 page | Shipped |
 | **3** | Wire customizer to `GET /v1/print/catalog` when hoodie QA passes | Shipped |
-| **4** | Enable one personalized SKU E2E (`personalize.checkout_open` + webhook → Printify) | Next |
-| **5** | Post-purchase order status on humanity.llc | Backlog |
+| **4** | Enable one personalized SKU E2E (`personalize.checkout_open` + webhook → Printify) | Shipped |
+| **5** | Post-purchase order status on humanity.llc | Next |
 | **6** | Full story-row catalog (~50 SKUs) | Post-MVP |
 
 ---
@@ -149,22 +149,25 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
 
 ## Operator setup (personalized products)
 
-1. Create **Shopify** product(s) for hoodie / personalized sticker — cart permalink with variant id.
-2. Map **Printify** product + variant (fulfillment — see [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md)).
+**Phase 4 launch SKU:** `sticker_personalized_v1` only (`personalize.checkout_product_id`). Hoodie remains preview-only until apparel QA.
+
+1. Create **Shopify** personalized sticker product — cart permalink with variant id.
+2. Map **Printify** sticker product in Worker env (`PERSONALIZED_STICKER_PRINTIFY_*` — see [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md)).
 3. Edit `site/data/shop-config.json` — each product needs `print_template_id` matching an approved template from `GET /v1/print/catalog`:
 
 ```json
 {
   "personalize": {
     "checkout_open": true,
+    "checkout_product_id": "sticker_personalized_v1",
     "products": [
       {
-        "product_id": "hoodie_live_object_v1",
-        "print_template_id": "hc-hoodie-live-object-v1",
-        "print_variant_id": "black-m",
-        "title": "Live Object hoodie",
-        "preview": "hoodie",
-        "price_display": "$48 + shipping",
+        "product_id": "sticker_personalized_v1",
+        "print_template_id": "hc-sticker-square-v1",
+        "print_variant_id": "2x2-white",
+        "title": "Personalized sticker",
+        "preview": "sticker",
+        "price_display": "$12 + shipping",
         "shopify_variant_id": "12345678901234",
         "checkout_url": "https://YOUR-STORE.myshopify.com/cart/12345678901234:1"
       }
@@ -209,7 +212,7 @@ Aggregate metrics only — no PII. Allowed refs:
 | Preview shows LIVE OBJECT branded QR on product mockup | ✅ UI |
 | Artifact intent created; attach returns Shopify line attributes | ✅ API tests |
 | Checkout URL includes `properties[artifact_intent_id]` | ✅ `shop-customize-core.test.ts` |
-| Paid webhook → Printify queue (operator env) | ☐ operator |
+| Paid webhook → Printify queue (operator env) | ✅ code path for personalized sticker |
 | Printed item scans; bearer warning visible | ☐ physical QA |
 | Owner updates manifesto from phone without reprint | ✅ resolver |
 

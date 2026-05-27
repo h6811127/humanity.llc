@@ -52,6 +52,8 @@ The interest form records **optional email** on this browser only (no server upl
 
 **Printify submit (operator):** set `PRINTIFY_SUBMIT_ENABLED=1`, `PRINTIFY_API_TOKEN` (secret), `PRINTIFY_SHOP_ID`, `TIER0_PRINTIFY_PRODUCT_ID`, and `TIER0_PRINTIFY_VARIANT_ID`. Then `POST /v1/print/orders` with `{ commerce_order_id, submit_to_printify: true, shipping_address, quantity? }`. Shipping is **not** stored in D1 — paste from Shopify admin at submit time.
 
+**Personalized sticker (Phase 4):** set `PERSONALIZED_STICKER_PRINTIFY_PRODUCT_ID` and `PERSONALIZED_STICKER_PRINTIFY_VARIANT_ID` for template `hc-sticker-square-v1`. Paid webhook queues print order with that template; operator mints planned QRs then submits to Printify same as Tier 0.
+
 **Printify webhooks (O-003):** register order events to `POST /v1/print/webhooks/printify` with shared `PRINTIFY_WEBHOOK_SECRET`. Updates print order status idempotently; no raw payload stored in D1.
 
 ## Not shipped yet

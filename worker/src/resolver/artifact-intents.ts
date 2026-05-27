@@ -13,11 +13,17 @@ import {
   generateQrId,
 } from "../id";
 import { buildScanViewModel, QR_ID_REGEX, type ScanPageKind } from "./scan-state";
+import {
+  getPrintCatalogProduct,
+  isKnownStoreProductId,
+  resolvePrintTemplateForStoreProductId,
+} from "../print/print-catalog";
 
 interface ArtifactIntentRequest {
   profile_id?: unknown;
   source_qr_id?: unknown;
   product_id?: unknown;
+  print_template_id?: unknown;
   quantity?: unknown;
   shopify_variant_id?: unknown;
 }
@@ -91,11 +97,14 @@ function artifactIntentResponse(
   };
 }
 
-function shopifyCartMetadata(row: ArtifactIntentRow) {
+function shopifyCartMetadata(row: ArtifactIntentRow, printTemplateId: string | null = null) {
   const plannedItemQrIds = JSON.parse(row.planned_item_qr_ids_json) as string[];
   const plannedPrintArtifactIds = JSON.parse(
     row.planned_print_artifact_ids_json
   ) as string[];
+
+  const templateId =
+    printTemplateId ?? resolvePrintTemplateForStoreProductId(row.product_id);
 
   return {
     cart_line_attributes: [
@@ -108,12 +117,30 @@ function shopifyCartMetadata(row: ArtifactIntentRow) {
         value: plannedPrintArtifactIds.join(","),
       },
       ...(row.product_id ? [{ key: "product_id", value: row.product_id }] : []),
+      ...(templateId ? [{ key: "print_template_id", value: templateId }] : []),
     ],
     order_note_attributes: [
       { name: "artifact_intent_id", value: row.artifact_intent_id },
       { name: "profile_id", value: row.profile_id },
+      ...(templateId ? [{ name: "print_template_id", value: templateId }] : []),
     ],
   };
+}
+
+function resolveIntentPrintTemplateId(
+  body: ArtifactIntentRequest,
+  productId: string | null
+): string | null {
+  const explicit =
+    typeof body.print_template_id === "string" && body.print_template_id.trim()
+      ? body.print_template_id.trim()
+      : null;
+  const fromProduct = productId ? resolvePrintTemplateForStoreProductId(productId) : null;
+  const templateId = explicit ?? fromProduct;
+  if (!templateId) return null;
+  if (!getPrintCatalogProduct(templateId)) return null;
+  if (fromProduct && explicit && explicit !== fromProduct) return null;
+  return templateId;
 }
 
 function isIntentExpired(row: ArtifactIntentRow, nowMs: number): boolean {
@@ -220,6 +247,22 @@ export async function handlePostArtifactIntent(
     );
   }
 
+  const printTemplateId = resolveIntentPrintTemplateId(body, productId);
+  if (productId && !isKnownStoreProductId(productId)) {
+    return errorResponse(
+      "UNKNOWN_PRINT_PRODUCT",
+      "product_id is not mapped to an approved print template.",
+      422
+    );
+  }
+  if (productId && !printTemplateId) {
+    return errorResponse(
+      "UNKNOWN_PRINT_PRODUCT",
+      "product_id is not mapped to an approved print template.",
+      422
+    );
+  }
+
   const scanCheck = await validateActiveSourceScan(request, db, profileId, sourceQrId);
   if (!scanCheck.ok) return scanCheck.response;
 
@@ -263,7 +306,10 @@ export async function handlePostArtifactIntent(
   };
 
   return jsonResponse(
-    artifactIntentResponse(row, requestOrigin(request), shopifyVariantId),
+    {
+      ...artifactIntentResponse(row, requestOrigin(request), shopifyVariantId),
+      print_template_id: printTemplateId,
+    },
     201
   );
 }
@@ -319,7 +365,10 @@ export async function handlePostArtifactIntentAttach(
 
   return jsonResponse({
     ...artifactIntentResponse(row, requestOrigin(request), shopifyVariantId),
-    shopify: shopifyCartMetadata(row),
+    shopify: shopifyCartMetadata(
+      row,
+      resolvePrintTemplateForStoreProductId(row.product_id)
+    ),
   });
 }
 

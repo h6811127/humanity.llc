@@ -260,6 +260,7 @@ describe("artifact intent pre-commerce guard (M4.4)", () => {
       expect.arrayContaining([
         { key: "artifact_intent_id", value: intentId },
         { key: "planned_item_qr_ids", value: "qr_planned1" },
+        { key: "print_template_id", value: "hc-sticker-square-v1" },
       ])
     );
     expect(intents.get(intentId)?.status).toBe("attached_to_cart");
@@ -310,6 +311,26 @@ describe("artifact intent pre-commerce guard (M4.4)", () => {
     const serialized = JSON.stringify(meta);
     expect(serialized).not.toMatch(/private_key|secret|signature/i);
     expect(meta.cart_line_attributes.map((a) => a.key)).toContain("artifact_intent_id");
+    expect(meta.cart_line_attributes).toEqual(
+      expect.arrayContaining([
+        { key: "print_template_id", value: "hc-sticker-square-v1" },
+      ])
+    );
+  });
+
+  it("rejects unknown storefront product_id", async () => {
+    const res = await handlePostArtifactIntent(
+      request({
+        profile_id: PROFILE,
+        source_qr_id: QR,
+        product_id: "unknown_merch_product",
+      }),
+      dbFor({ card: card(), qr: qr(), verification: summary() })
+    );
+    expect(res.status).toBe(422);
+    expect((await res.json()) as { error: string }).toMatchObject({
+      error: "UNKNOWN_PRINT_PRODUCT",
+    });
   });
 
   it("routes POST /v1/store/artifact-intents through the Worker dispatcher", async () => {

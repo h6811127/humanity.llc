@@ -9,7 +9,8 @@
   },
   "thanks_path": "/shop/thanks/",
   "personalize": {
-    "checkout_open": false,
+    "checkout_open": true,
+    "checkout_product_id": "sticker_personalized_v1",
     "products": [
       {
         "product_id": "hoodie_live_object_v1",
