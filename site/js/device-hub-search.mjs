@@ -4,6 +4,11 @@
 
 const ALWAYS_VISIBLE_GROUPS = new Set(["shortcuts", "import"]);
 
+/** Row banners manage their own `hidden` state; search must not override it. */
+function isHubCardStatusAlert(el) {
+  return el.classList?.contains("hub-card-status-alert") === true;
+}
+
 /**
  * @param {HTMLElement | null} hub
  * @param {string} query
@@ -21,6 +26,7 @@ export function applyDeviceHubSearch(hub, query) {
     if (!q) {
       groupEl.hidden = false;
       for (const el of items) {
+        if (isHubCardStatusAlert(el)) continue;
         el.hidden = false;
       }
       groups[groupKey] = { anyVisible: true, hasItems: items.length > 0 };
@@ -29,6 +35,7 @@ export function applyDeviceHubSearch(hub, query) {
 
     let anyVisible = false;
     for (const el of items) {
+      if (isHubCardStatusAlert(el)) continue;
       const text = (el.dataset.hubSearchable || "").toLowerCase();
       const match = text.includes(q);
       el.hidden = !match;

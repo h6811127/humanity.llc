@@ -213,6 +213,7 @@ Run: `npm run worker:test:card-disabled-since-visit` · `npm run e2e:card-disabl
 7. **A3:** **Shipped** - `device-wallet-network-truth.mjs`; see `worker/tests/device-wallet-network-truth.test.ts`.
 8. **Remove from device flash:** **Shipped** - drop removed profile SSOT, cancel in-flight poll apply, render siblings with checking chips, defer hub since-visit group sync until wallet poll `onDone` (`device-hub-ui.mjs` remove handler).
 9. **Debounced poll cancel:** **Shipped** - `bumpWalletNetworkApplyGen()` clears pending hub debounce timer so manual **Check network** / a newer fetch cannot race with an older scheduled poll (`device-hub-ui.mjs`).
+10. **Hub search must not unhide row banners:** **Shipped** - `applyDeviceHubSearch` skips `.hub-card-status-alert` so `hc-live-control-inbox-changed` → `applySearchFilter` cannot set `hidden=false` on a suppressed since-visit banner (`device-hub-search.mjs`).
 
 ---
 
@@ -403,7 +404,7 @@ npm run e2e:card-disabled-since-visit
 After implementing **A1** in `device-hub-ui.mjs`:
 
 1. **Shipped** - Vitest in `card-disabled-since-visit-approaches.test.ts` (G1 repro + approach invariants).
-2. **Shipped** - Vitest (`device-wallet-network-confirmed.test.ts` stale-generation + active-after-revoked) and E2E G3/A5 in `device-os-wallet.spec.ts` (debounced poll canceled on new fetch).
+2. **Shipped** - Vitest (`device-wallet-network-confirmed.test.ts` stale-generation + active-after-revoked) and E2E G3/A5 in `device-os-wallet.spec.ts` (debounced poll cancel + hub search does not unhide suppressed row banners).
 
 ### Different way to think about the problem (architecture)
 

@@ -259,8 +259,7 @@ test.describe("device OS wallet flow", () => {
     ).toBeHidden();
   });
 
-  // G3/A5 mechanism covered in Vitest; E2E is flaky when debounced wallet polls complete out of order.
-  test.skip("does not re-show since-visit banner after live-control tick once resolver reports active (G3/A5)", async ({
+  test("does not re-show since-visit banner after live-control tick once resolver reports active (G3/A5)", async ({
     page,
   }) => {
     const profileId = SAMPLE_WALLET_ENTRY.profile_id;
@@ -349,7 +348,6 @@ test.describe("device OS wallet flow", () => {
     await expect(page.locator(".hub-card-status-alert:not([hidden])")).toHaveCount(0, {
       timeout: 15_000,
     });
-    await page.waitForTimeout(800);
 
     await page.evaluate(() => {
       window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
