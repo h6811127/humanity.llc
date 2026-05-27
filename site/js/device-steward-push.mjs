@@ -23,6 +23,7 @@ import {
   parseSseMessageBlock,
   parseStewardPushEventPayload,
   shouldMaintainStewardPushConnection,
+  STEWARD_PUSH_DOWN_FALLBACK_MS,
   stewardPushInFallbackCooldown,
 } from "./device-steward-push-core.mjs";
 
@@ -41,6 +42,8 @@ let lastPushDownAt = 0;
 let pushAbort = null;
 let pushSyncInFlight = false;
 let pushListenersBound = false;
+/** @type {ReturnType<typeof setTimeout> | null} */
+let pushReconnectTimer = null;
 
 export function isStewardPushHealthy() {
   return pushStreamHealthy === true;
@@ -52,6 +55,21 @@ export function stewardPushSuppressesAutoPoll() {
 
 function notifyPushStateChanged() {
   window.dispatchEvent(new Event(STEWARD_PUSH_STATE_CHANGED));
+}
+
+function clearPushReconnectTimer() {
+  if (pushReconnectTimer == null) return;
+  window.clearTimeout(pushReconnectTimer);
+  pushReconnectTimer = null;
+}
+
+function schedulePushReconnectAfterCooldown() {
+  if (typeof window === "undefined") return;
+  clearPushReconnectTimer();
+  pushReconnectTimer = window.setTimeout(() => {
+    pushReconnectTimer = null;
+    syncStewardPushConnection();
+  }, STEWARD_PUSH_DOWN_FALLBACK_MS);
 }
 
 function readPushConnectionContext() {
@@ -81,6 +99,7 @@ function shouldConnectNow() {
 function markPushDown() {
   pushStreamHealthy = false;
   lastPushDownAt = Date.now();
+  schedulePushReconnectAfterCooldown();
   notifyPushStateChanged();
 }
 
@@ -88,6 +107,7 @@ function markPushUp() {
   const was = pushStreamHealthy;
   pushStreamHealthy = true;
   lastPushDownAt = 0;
+  clearPushReconnectTimer();
   if (!was) notifyPushStateChanged();
 }
 

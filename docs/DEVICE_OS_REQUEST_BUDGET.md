@@ -359,6 +359,12 @@ npm run e2e -- e2e/hosted-tier-budget.spec.ts
 npm run worker:test -- worker/tests/steward-quota.test.ts worker/tests/live-control.test.ts worker/tests/device-live-control-inbox-quota.test.ts worker/tests/device-steward-quota-core.test.ts worker/tests/device-hub-network-tools-core.test.ts
 ```
 
+**Hosted-specific E4 staging:**
+
+```bash
+npm run worker:test -- worker/tests/steward-push-notify.test.ts worker/tests/steward-push-sse.test.ts worker/tests/device-steward-push-core.test.ts worker/tests/device-steward-push.test.ts worker/tests/device-live-control-inbox-push.test.ts worker/tests/live-control.test.ts
+```
+
 **Vitest (extend existing modules when E2 reads entitlements):**
 
 | Case | Module | Assert |
@@ -526,6 +532,7 @@ Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). 
 |------|------|
 | 2026-05-27 | **M8 E2 staging:** client entitlement probe tests + `e2e/hosted-tier-budget.spec.ts` cover H1–H3/H5 |
 | 2026-05-27 | **M8 E3 staging:** server quota route tests + client 429 pause/manual-bypass tests |
+| 2026-05-27 | **M8 E4 staging:** SSE fan-out/client reconnect tests cover POST push and one targeted inbox GET |
 | 2026-05-26 | **M8 epics:** [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) |
 | 2026-05-26 | **M7:** Phase 10 entitlement rows + test plan (§ Phase 10 — hosted tier rows) |
 | 2026-05-26 | **M6 standards delta:** [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) |

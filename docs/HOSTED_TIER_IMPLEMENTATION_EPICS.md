@@ -227,6 +227,18 @@ flowchart LR
 - Fallback: SSE down 60s → resumes Phase 7–9 poll behavior
 - Free tier: no SSE connection attempted
 
+### Implementation status (2026-05-27)
+
+| Sub-epic | Status |
+|----------|--------|
+| E4a | **Staging** — live-control challenge POST schedules `notifyLiveProofPending()` with `waitUntil` |
+| E4b | **Staging** — steward SSE route, connection registry, account/IP limits, and connection ack are implemented behind hosted gate |
+| E4c | **Staging** — leader-tab client consumes SSE, suppresses round-robin while healthy, reconnects after fallback cooldown, and triggers one targeted inbox GET per push hint |
+| E4d–E4e | Deferred |
+| Tests | `worker/tests/steward-push-notify.test.ts`, `worker/tests/steward-push-sse.test.ts`, `worker/tests/device-steward-push-core.test.ts`, `worker/tests/device-steward-push.test.ts`, `worker/tests/device-live-control-inbox-push.test.ts`, `worker/tests/live-control.test.ts` |
+
+**Next:** H4 browser E2E and optional P1b service-worker bridge remain follow-up work.
+
 ### Out of scope
 
 - Web Push VAPID (M3 Q5)
@@ -367,6 +379,7 @@ flowchart LR
 
 | Date | Note |
 |------|------|
+| 2026-05-27 | **E4 push staging:** POST waitUntil fan-out + inbox push target GET tests; client reconnect after cooldown |
 | 2026-05-27 | **E3 quota alignment staging:** live-control route quota tests + client manual-bypass-after-429 test |
 | 2026-05-27 | **E2 client probe staging:** browser fetch/cache Vitest + hosted budget E2E H1–H3/H5 |
 | 2026-05-26 | **E1 foundation:** migration `0012_steward_hosted.sql`, steward routes behind `HOSTED_STEWARD_ENABLED` |

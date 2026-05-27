@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 import * as ed from "@noble/ed25519";
 
@@ -18,6 +18,10 @@ import {
 } from "../src/resolver/live-control";
 import type { Env } from "../src/index";
 import { STEWARD_MANUAL_POLL_HEADER } from "../src/steward/quota";
+import {
+  clearStewardPushConnectionsForTests,
+  registerStewardPushSink,
+} from "../src/steward/push";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const QR = "qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
@@ -140,6 +144,8 @@ function dbFor(rows: {
             return rows.stewardQuota
               ? {
                   entitlements_json: JSON.stringify({
+                    "steward.hosted": true,
+                    "notify.push.live_proof": true,
                     "poll.live_proof.auto_daily_cap": rows.stewardQuota.cap,
                   }),
                 }
@@ -239,6 +245,10 @@ function dbFor(rows: {
   } as unknown as D1Database;
 }
 
+afterEach(() => {
+  clearStewardPushConnectionsForTests();
+});
+
 describe("live control proof alpha", () => {
   it("creates a short-lived challenge for an active scan", async () => {
     const owner = await getTestKeypair();
@@ -262,6 +272,53 @@ describe("live control proof alpha", () => {
     expect(json.owner_url).toContain("profile_id=");
     expect(json.owner_url).toContain("qr_id=");
     expect(json.owner_url).toContain("return_url=");
+  });
+
+  it("notifies hosted steward push sinks after creating a challenge", async () => {
+    const owner = await getTestKeypair();
+    const stewardQuota = {
+      accountId: "acc_liveControlPush01",
+      deviceId: "dev_live_control_push",
+      cap: 4000,
+      used: 0,
+      increments: { count: 0 },
+    };
+    const db = dbFor({
+      card: card(owner.publicKeyBase58),
+      qr: qr(),
+      stewardQuota,
+    });
+    const env: Env = { DB: db, HOSTED_STEWARD_ENABLED: "1" };
+    const writes: string[] = [];
+    registerStewardPushSink({
+      accountId: stewardQuota.accountId,
+      connectionId: "conn_live_control_push",
+      deviceId: stewardQuota.deviceId,
+      write: (chunk) => writes.push(chunk),
+    });
+    const waitUntilPromises: Promise<unknown>[] = [];
+    const executionCtx = {
+      waitUntil(promise: Promise<unknown>) {
+        waitUntilPromises.push(promise);
+      },
+    } as unknown as ExecutionContext;
+
+    const res = await handlePostLiveControlChallenge(
+      request({ qr_id: QR }),
+      db,
+      PROFILE,
+      { env, executionCtx }
+    );
+    const json = (await res.json()) as { challenge_id: string };
+    await Promise.all(waitUntilPromises);
+
+    expect(res.status).toBe(201);
+    expect(waitUntilPromises).toHaveLength(1);
+    expect(writes).toHaveLength(1);
+    expect(writes[0]).toContain("live_proof.pending");
+    expect(writes[0]).toContain(json.challenge_id);
+    expect(writes[0]).toContain(PROFILE);
+    expect(stewardQuota.increments.count).toBe(1);
   });
 
   it("returns the latest pending challenge for a QR", async () => {
