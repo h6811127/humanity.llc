@@ -1,7 +1,7 @@
 # Emphasis card rollout (`hc-emphasis-card`)
 
-**Status:** Phases 0–5 shipped · **Visual alignment v2 in progress** (A + B + C + spacing shipped)  
-**Visual standard:** [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Emphasis notice cards · **planned reset:** [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md)  
+**Status:** Phases 0–5 shipped · **Visual alignment v2 shipped** (Phases A–E + spacing ladder, May 2026)  
+**Visual standard:** [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Emphasis notice cards · [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md)  
 **Primary CSS:** `site/css/hc-emphasis-card.css` (imported by `site/styles.css`; bundled into scan via `worker:bundle-scan`), `site/css/theme-dark.css`
 
 ---
@@ -10,8 +10,7 @@
 
 Shared **raised notice cards** for high-salience device warnings and actions: layered shadow depth, semantic color in eyebrow/dot/CTA, status-dot glow.
 
-**Shipped (May 2026):** Opaque neutral fills, `border: none`, pill CTAs (`border-radius: 999px`).  
-**Planned:** Align all surfaces to **keys-notification** reference styling with translucent blurred fills, subtle hairline border, tighter eyebrow tracking, and precise in-card CTAs — see [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md). Landing **Liquid Glass** buttons revert in phase A of that doc.
+**Shipped (May 2026):** Glass fills + hairline borders + `backdrop-filter`; opaque fallback when blur unsupported or `prefers-reduced-transparency: reduce`; eyebrow `0.025em`; CTA radius **10px**; landing glass withdrawn. See [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) changelog.
 
 Replaces over time: flat `.hc-notice` strips, plain `<p>` cross-tab lines, and amber bordered `.wallet-strip-hint` boxes where a card + CTA is appropriate.
 
@@ -59,12 +58,16 @@ Replaces over time: flat `.hc-notice` strips, plain `<p>` cross-tab lines, and a
 | Token | Role |
 |-------|------|
 | `--hc-emphasis-card-shadow` | Shared inset + outer lift (light/dark override) |
-| `--hc-emphasis-card-fill-{active,info,warn,urgent}` | Opaque gradients per modifier |
+| `--hc-emphasis-card-fill-{active,info,warn,urgent}` | Opaque gradients per modifier (reduced-transparency fallback) |
+| `--hc-emphasis-card-fill-*-glass` | Default translucent gradients per modifier |
+| `--hc-emphasis-card-border-*` | Hairline stroke (neutral + per-modifier semantic tint) |
+| `--hc-emphasis-card-backdrop` | `blur()` + `saturate()` for glass surfaces |
+| `--hc-emphasis-card-cta-radius` / `cta-padding` | Precise in-card controls (**10px**, not pill) |
 | `--hc-emphasis-card-eyebrow-{active,info,warn,urgent}` | Eyebrow text color per modifier |
 | `--hc-emphasis-card-title-fg` | `.hc-emphasis-card__title` — all instances |
 | `--hc-emphasis-card-detail-fg` | `.hc-emphasis-card__detail` — all instances (explicit literals; not `shell-label`) |
 
-Default CTA: `.hc-emphasis-card__cta` uses `var(--red)` pill (brand primary action).
+Default CTA: `.hc-emphasis-card__cta` uses `var(--red)` at `--hc-emphasis-card-cta-radius` (brand primary action).
 
 ### Typography contrast (global)
 
@@ -152,7 +155,7 @@ Prioritized follow-ups after Phases 0–5. Full tier tables: [`UI_COLOR_SCHEME_S
 |------|-------|
 | Single CSS source | `site/css/hc-emphasis-card.css`; scan via `npm run worker:bundle-scan` |
 | Token sync | Keep `:root` emphasis tokens in `scan-pass.css` aligned with `site/styles.css` when tokens change |
-| Regression | `npm run worker:test:ui-color-scheme` + `device-emphasis-card-html.test.ts` after each phase |
+| Regression | `npm run worker:test:ui-color-scheme` + `npm run worker:test -- worker/tests/device-emphasis-card-html.test.ts` after each phase |
 | Shell delivery | `@import` for `hc-emphasis-card.css` must be **first** in `styles.css` — see [`HC_EMPHASIS_CARD_IMPORT_REGRESSION.md`](HC_EMPHASIS_CARD_IMPORT_REGRESSION.md) |
 | Dark cache bust | Bump `theme-dark.css?v=` on shell pages when changing `theme-dark.css` |
 | No per-card fg hacks | Title/detail always `--hc-emphasis-card-title-fg` / `--hc-emphasis-card-detail-fg` |
@@ -177,23 +180,24 @@ Prioritized follow-ups after Phases 0–5. Full tier tables: [`UI_COLOR_SCHEME_S
 
 ---
 
-## Visual alignment v2 (planned — docs only)
+## Visual alignment v2 (shipped — May 2026)
 
-| Step | Doc |
-|------|-----|
-| Canonical spec | [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) |
-| Revert landing glass | **Shipped** (Phase A — `landing-liquid-glass.css` removed) |
-| Global token/CSS | **Shipped** — Phase B — `hc-emphasis-card.css`, `:root`, `theme-dark.css` |
-| Surface rollout | **Shipped** Phase C — shell, created, create, scan bundle, hub; Phases D–E landing + docs/tests |
+| Phase | Work | Status |
+|-------|------|--------|
+| A | Revert landing glass | **Shipped** |
+| B | Global glass tokens + `hc-emphasis-card.css` | **Shipped** |
+| C | Shell, created, create, scan bundle, hub | **Shipped** |
+| D | Landing markup + standard CTAs | **Shipped** |
+| E | Docs + Vitest regression guards | **Shipped** |
 
-Do **not** start implementation until product signs off on translucent fills + hairline border on wallet reference cards.
+Canonical spec: [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md).
 
 ---
 
 ## QA (every phase)
 
 1. Light + dark theme on target page.
-2. No blue (or semantic) **rim** from translucent fill alone—hairline border uses neutral/semantic tint per alignment doc (shipped rollout: shadow-only, no stroke).
+2. No blue (or semantic) **rim** from translucent fill alone — hairline uses neutral/semantic tint per alignment doc.
 3. Eyebrow, title, detail, CTA readable; tap targets ≥44px where buttons.
 4. **Dark mode:** explicit `background: var(--hc-emphasis-card-fill-*)` per modifier in `theme-dark.css`.
 5. `npm run worker:test:ui-color-scheme`

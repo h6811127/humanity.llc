@@ -94,6 +94,31 @@ describe("UI color scheme popover guard", () => {
     }
     expect(darkRoot).not.toContain("--hc-emphasis-card-detail-fg: var(--shell-label)");
     expect(darkRoot).toContain("rgba(235, 235, 245, 0.9)");
+    for (const token of [
+      "--hc-emphasis-card-backdrop",
+      "--hc-emphasis-card-fill-info-glass",
+      "--hc-emphasis-card-border-warn",
+      "--hc-emphasis-card-border-urgent",
+    ]) {
+      expect(darkRoot).toContain(`${token}:`);
+    }
+  });
+
+  it("defines emphasis card glass tokens on light :root (phase E)", () => {
+    const lightRoot = extractRuleBlocks(readSiteCss("site/styles.css"), ":root")[0];
+    expect(lightRoot).toBeTruthy();
+    for (const token of [
+      "--hc-emphasis-card-backdrop",
+      "--hc-emphasis-card-border-neutral",
+      "--hc-emphasis-card-fill-active-glass",
+      "--hc-emphasis-card-fill-info-glass",
+      "--hc-emphasis-card-fill-warn-glass",
+      "--hc-emphasis-card-fill-urgent-glass",
+      "--hc-emphasis-card-eyebrow-tracking",
+      "--hc-emphasis-card-cta-radius",
+    ]) {
+      expect(lightRoot).toContain(`${token}:`);
+    }
   });
 
   it("loads hc-emphasis-card.css via valid top-of-file @import in styles.css", () => {
@@ -160,6 +185,16 @@ describe("UI color scheme popover guard", () => {
     assertGuardedRule("site/css/device-shell.css", ".device-hub-network-tools-eyebrow", {
       require: ["--hc-emphasis-card-eyebrow-warn"],
     });
+    assertGuardedRule("site/css/device-shell.css", ".hub-card-item", {
+      require: [
+        "--hc-emphasis-card-fill-info-glass",
+        "--hc-emphasis-card-border-neutral",
+      ],
+    });
+    assertGuardedRule("site/css/device-shell.css", "button.hub-card-action.hub-use-keys", {
+      require: ["--surface-popover-control-bg", "--surface-popover-border"],
+      forbid: ["background: var(--red)"],
+    });
     assertGuardedRule("site/css/device-shell.css", ".device-inbox-sheet", {
       require: ["--surface-popover-bg", "--surface-popover-fg"],
       forbid: ["backdrop-filter"],
@@ -206,6 +241,22 @@ describe("UI color scheme popover guard", () => {
       require: ["--hc-emphasis-card-fill-active-glass", "--hc-emphasis-card-border-active"],
       forbid: ["rgba(10, 132, 255, 0.1)"],
     });
+    assertGuardedRule("site/css/hc-emphasis-card.css", ".hc-emphasis-card--info", {
+      require: ["--hc-emphasis-card-fill-info-glass", "--hc-emphasis-card-border-info"],
+    });
+    assertGuardedRule("site/css/hc-emphasis-card.css", ".hc-emphasis-card--warn", {
+      require: ["--hc-emphasis-card-fill-warn-glass", "--hc-emphasis-card-border-warn"],
+    });
+    assertGuardedRule("site/css/hc-emphasis-card.css", ".hc-emphasis-card--urgent", {
+      require: ["--hc-emphasis-card-fill-urgent-glass", "--hc-emphasis-card-border-urgent"],
+    });
+    assertGuardedRule("site/css/hc-emphasis-card.css", ".hc-emphasis-card__cta--secondary", {
+      require: ["--hc-emphasis-card-cta-secondary-padding"],
+      forbid: ["border-radius: 999px"],
+    });
+    const emphasisCss = readSiteCss("site/css/hc-emphasis-card.css");
+    expect(emphasisCss).toContain("prefers-reduced-transparency: reduce");
+    expect(emphasisCss).toContain("@supports not");
     assertGuardedRule(
       "site/css/hc-emphasis-card.css",
       ".hc-emphasis-card__title,\n.wallet-active-label",
@@ -227,6 +278,16 @@ describe("UI color scheme popover guard", () => {
     assertGuardedRule("site/css/theme-dark.css", "html[data-theme=\"dark\"] .hc-emphasis-card--urgent", {
       require: ["--hc-emphasis-card-fill-urgent-glass", "--hc-emphasis-card-border-urgent"],
     });
+    assertGuardedRule("site/css/theme-dark.css", "html[data-theme=\"dark\"] .hc-emphasis-card--info", {
+      require: ["--hc-emphasis-card-fill-info-glass", "--hc-emphasis-card-border-info"],
+    });
+    assertGuardedRule("site/css/theme-dark.css", "html[data-theme=\"dark\"] .hc-emphasis-card--warn", {
+      require: ["--hc-emphasis-card-fill-warn-glass", "--hc-emphasis-card-border-warn"],
+    });
+    const scanPass = readSiteCss("site/scan-pass.css");
+    expect(scanPass).toContain("html[data-theme=\"dark\"] .hc-emphasis-card--info");
+    expect(scanPass).toContain("prefers-reduced-transparency: reduce");
+    expect(readSiteCss("site/styles.css")).not.toContain("landing-liquid-glass.css");
     expect(readSiteCss("site/styles.css")).not.toContain(".live-control-notification-inner");
     assertGuardedRule("site/css/theme-dark.css", "a.wallet-chrome-home", {
       require: ["color: var(--red)", "--shell-fill"],

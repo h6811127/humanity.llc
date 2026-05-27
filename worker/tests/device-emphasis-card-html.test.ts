@@ -154,6 +154,35 @@ describe("device-emphasis-card-html", () => {
     }
   });
 
+  it("phase E: no withdrawn landing glass in site sources", () => {
+    const index = readFileSync(join(root, "site/index.html"), "utf8");
+    const styles = readFileSync(join(root, "site/styles.css"), "utf8");
+    expect(index + styles).not.toContain("landing-cta-glass");
+    expect(styles).not.toContain("landing-liquid-glass.css");
+  });
+
+  it("phase E: all semantic modifiers use glass fills in component css", () => {
+    const emphasis = readFileSync(join(root, "site/css/hc-emphasis-card.css"), "utf8");
+    for (const mod of ["active", "info", "warn", "urgent"] as const) {
+      expect(emphasis).toMatch(
+        new RegExp(
+          `\\.hc-emphasis-card--${mod}[\\s\\S]*--hc-emphasis-card-fill-${mod}-glass`
+        )
+      );
+    }
+    expect(emphasis).toContain(".hc-emphasis-card__cta--secondary");
+  });
+
+  it("phase E: rollout docs mark visual alignment v2 complete", () => {
+    const rollout = readFileSync(join(root, "docs/HC_EMPHASIS_CARD_ROLLOUT.md"), "utf8");
+    const alignment = readFileSync(
+      join(root, "docs/HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md"),
+      "utf8"
+    );
+    expect(rollout).toContain("Visual alignment v2 shipped");
+    expect(alignment).toContain("Shipped E (May 2026)");
+  });
+
   it("cross-tab banners use stacked layout for Safari (shell + scan)", () => {
     const styles = readFileSync(join(root, "site/styles.css"), "utf8");
     expect(styles).toMatch(

@@ -53,10 +53,9 @@ Use these for:
 
 ## Emphasis notice cards (`hc-emphasis-card` pattern)
 
-**Status:** Shared component shipped (Phase 0) — see [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md)  
-**Planned visual reset (docs only):** [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) — keys-notification baseline + translucent blur, hairline border, tighter eyebrows, precise CTAs; **revert** landing Liquid Glass.  
+**Status:** Shared component shipped · **Visual alignment v2 shipped** (Phases A–E, May 2026) — see [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) · [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md)  
 **Files:** `site/css/hc-emphasis-card.css` (imported by `site/styles.css` and bundled into scan via `worker:bundle-scan`), `site/css/theme-dark.css`  
-**Regression:** `worker/tests/ui-color-scheme-popover-guard.test.ts` (`.hc-emphasis-card`, `.hc-emphasis-card--active`)
+**Regression:** `npm run worker:test:ui-color-scheme` · `npm run worker:test -- worker/tests/device-emphasis-card-html.test.ts`
 
 Raised, card-shaped callouts for **high-salience device state** on page chrome (keys active, cross-tab, live proof, setup gates). They sit between flat `.hc-notice` strips and full-bleed hub tap banners (`.device-hub-notice-banner`).
 
@@ -64,25 +63,17 @@ Raised, card-shaped callouts for **high-salience device state** on page chrome (
 
 **Reference instances:** `#wallet-active-banner` (`--active`, green) · `#wallet-tab-hint` / `#device-cross-tab-banner` (`--info`, blue).
 
-### Design rules (shipped — May 2026)
+### Design rules (shipped — May 2026, alignment v2)
 
 | Rule | Why |
 |------|-----|
-| **Depth = shadow only** | `border: none`; `box-shadow: var(--hc-emphasis-card-shadow)`. A painted or translucent-colored rim reads as a “stroke,” not 3D. |
-| **Opaque fills** | Use solid or near-solid gradients (`#f6f8f7` → `#ecf1ee` light; `#1e2421` → `#1a211d` dark). **Do not** use `rgba(10, 132, 255, 0.1)` (or similar) on white — it blends at rounded edges and looks like a blue outline. |
-| **Semantic color in copy, not the frame** | Eyebrow + optional status dot carry blue/amber/red/green meaning; the card surface stays neutral. |
-| **Typography ladder** | Eyebrow (12px uppercase) → title (17px bold, optional) → detail (13px muted) → optional pill CTA (brand red or contextual). |
-| **14px corner radius** | Matches wallet / grouped UI; shadow stack is tuned for this radius. |
-
-### Design rules (planned — see alignment doc)
-
-| Rule | Target |
-|------|--------|
-| **Border + shadow** | Subtle hairline (`0.5px`–`1px`) **plus** existing `--hc-emphasis-card-shadow` |
-| **Translucent fill** | Modifier-tinted wash + `backdrop-filter` blur; opaque fallback when reduced transparency |
-| **Eyebrow** | `letter-spacing: 0.025em` (down from `0.04em`) |
-| **CTA** | `border-radius: 10px`, tighter padding — not full pill (`999px`) |
-| **Landing CTAs** | Same as wallet — **no** `landing-liquid-glass.css` |
+| **Border + shadow** | `0.5px` hairline (`--hc-emphasis-card-border-neutral` / per-modifier semantic tint) **plus** `box-shadow: var(--hc-emphasis-card-shadow)`. Shadow alone is not enough for the physical-object read. |
+| **Glass fill** | Default: `--hc-emphasis-card-fill-*-glass` + `backdrop-filter: var(--hc-emphasis-card-backdrop)`. Opaque `--hc-emphasis-card-fill-*` via `@supports not (backdrop-filter)` and `prefers-reduced-transparency: reduce`. **Do not** use translucent semantic rims only (`rgba(0, 122, 255, 0.1)` on white). |
+| **Semantic color in copy, not the frame** | Eyebrow + status dot carry green/blue/amber/red; card fill stays neutral-tinted gray. |
+| **Typography ladder** | Eyebrow (12px uppercase, `letter-spacing: 0.025em`) → title → detail → CTA. |
+| **CTA shape** | `border-radius: 10px` (`--hc-emphasis-card-cta-radius`); primary `var(--red)`; secondary flat control with hairline border — not full pill (`999px`). |
+| **14px corner radius** | Card shell; shadow stack tuned for this radius. |
+| **Landing CTAs** | Hero + framing + final block use `hc-emphasis-card__cta` family — **no** `landing-liquid-glass.css`. |
 
 ### Token: `--hc-emphasis-card-shadow`
 
@@ -97,14 +88,14 @@ Future variants may add `--hc-emphasis-card-fill-*` and `--hc-emphasis-card-eyeb
 
 | Class | Role |
 |-------|------|
-| `.hc-emphasis-card` | Base layout, shadow, no border |
-| `.hc-emphasis-card--{active,info,warn,urgent}` | Fill + eyebrow token per semantic |
+| `.hc-emphasis-card` | Base layout, hairline border, shadow, glass backdrop |
+| `.hc-emphasis-card--{active,info,warn,urgent}` | Glass fill + semantic border color per modifier |
 | `.hc-emphasis-card__main` / `__copy` | Left column |
 | `.hc-emphasis-card__dot--{success,info,warn,urgent}` | Optional status dot |
 | `.hc-emphasis-card__eyebrow` / `__title` / `__detail` | Typography ladder |
-| `.hc-emphasis-card__cta` | Pill CTA (`var(--red)` default) |
+| `.hc-emphasis-card__cta` | Primary control (`var(--red)`); `__cta--secondary` for in-card rows |
 
-Fill and eyebrow tokens: `--hc-emphasis-card-fill-*`, `--hc-emphasis-card-eyebrow-*` on `:root` (dark overrides in `theme-dark.css`).
+Fill tokens: `--hc-emphasis-card-fill-*` (opaque fallback) and `--hc-emphasis-card-fill-*-glass` (default); borders `--hc-emphasis-card-border-*`; eyebrows `--hc-emphasis-card-eyebrow-*` on `:root` (dark overrides in `theme-dark.css`).
 
 Typography tokens — **single source of truth** for every `.hc-emphasis-card` instance (wallet active, cross-tab, scan when migrated). Set on `:root` in `site/styles.css` and overridden on `html[data-theme="dark"]` in `theme-dark.css`. **Do not** point card copy at `var(--black)`, `var(--shell-label)`, or per-page selectors.
 
@@ -129,7 +120,7 @@ Eyebrow colors stay on `--hc-emphasis-card-eyebrow-{active,info,warn,urgent}` pe
 **Fix (shipped):**
 
 1. Title/detail use `--hc-emphasis-card-title-fg` and `--hc-emphasis-card-detail-fg` (not `var(--black)` alone).
-2. `theme-dark.css` sets **explicit** `background: var(--hc-emphasis-card-fill-*)` per modifier (`--active`, `--info`, `--warn`, `--urgent`) — do not rely on token swap alone.
+2. `theme-dark.css` sets **explicit** `background: var(--hc-emphasis-card-fill-*-glass)` per modifier (`--active`, `--info`, `--warn`, `--urgent`), with opaque fallback under `prefers-reduced-transparency: reduce`.
 3. `a.wallet-chrome-home` keeps `color: var(--red)` and `background: var(--shell-fill)` in dark mode.
 
 **QA:** `/wallet/` with `localStorage.hc_theme = "dark"` — active card surface is dark gray-green; title, detail, and eyebrow readable; **Home** pill shows red label on elevated shell fill.

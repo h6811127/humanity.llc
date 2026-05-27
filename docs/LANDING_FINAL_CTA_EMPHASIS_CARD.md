@@ -92,7 +92,7 @@ Do not document or test these classes after phase A of the alignment doc.
 | 1–7 | Emphasis card migration + glass experiment | Shipped then **superseded** |
 | **A** | Revert glass; restore standard CTAs | **Shipped** |
 | **B–D** | Global emphasis tokens + landing CTA polish | **Shipped** — alignment doc |
-| **E** | Regression tests + rollout doc status | Next |
+| **E** | Regression tests + rollout doc status | **Shipped** |
 
 ---
 
