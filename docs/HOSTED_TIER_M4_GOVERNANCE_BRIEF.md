@@ -55,9 +55,11 @@ Optional depth: [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLE
 
 | After signatures | Action |
 |------------------|--------|
-| Engineering | **E1** — Worker steward account + entitlements API (feature-flagged staging) |
-| Not yet | **E5** billing until **G8** payment provider confirmed |
+| Engineering | Production enablement: `HOSTED_STEWARD_ENABLED`, `STRIPE_WEBHOOK_SECRET`, `OPERATOR_AUDIT_TOKEN` on reference operator |
+| Ops | E6.1 Cloudflare dashboard + E6.2 daily threshold cron (`npm run worker:check-steward-ops`) |
 | Not yet | Public marketing of paid tier until product chooses launch date |
+
+**Staging note (2026-05-27):** E1–E6 code is complete behind the feature flag; **G0** is the remaining gate before production secrets and customer-facing launch.
 
 ---
 
@@ -76,3 +78,4 @@ Optional depth: [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLE
 | Date | Note |
 |------|------|
 | 2026-05-26 | M4 governance brief for sign-off meeting |
+| 2026-05-27 | E1–E6 staging complete; G0 gates production enablement |
