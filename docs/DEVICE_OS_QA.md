@@ -186,6 +186,8 @@ Per [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § QA (hub card
 
 **Fail signals:** Many duplicate `/.well-known/hc/v1/health` or per-card status requests on a single focus.
 
+**Multi-tab (Phase 1a resolver sync):** Two tabs on `/` with the same saved card. Tab A expands hub or **Check network**; within 60s, focus Tab B and expand hub — Tab B should show updated chips **without** a second burst of `GET …/status?q=…` (health fetch may still run once). Disable with `localStorage.hc_resolver_sync_tabs = "0"` to confirm per-tab polling returns.
+
 ### P1-2 · Resolver health → status dot
 
 | Step | Action | Expected |

@@ -61,6 +61,14 @@ import {
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import { clearWalletNetworkTruthForProfile } from "./device-wallet-network-truth.mjs";
+import {
+  broadcastNetworkSnapshotIfEligible,
+  shouldFollowerSkipAutoNetworkFetch,
+} from "./device-resolver-sync.mjs";
+import {
+  claimLiveControlPollLeader,
+  touchLiveControlPollLeader,
+} from "./device-live-control-poll-leader.mjs";
 import { getCardStatusUrl } from "./hc-sign.mjs";
 import {
   hubCardIdentityLine,
@@ -698,6 +706,33 @@ async function fetchAndApplyNetworkChips(opts = {}) {
   const stored = loadWallet();
   if (stored.length === 0) return;
   const manual = opts.manual === true;
+  if (manual) {
+    claimLiveControlPollLeader();
+  } else if (shouldFollowerSkipAutoNetworkFetch()) {
+    const { entries } = normalizeWalletQrIds(stored);
+    applyNetworkChipsToDom(
+      Object.fromEntries(
+        entries.map((e) => [
+          e.profile_id,
+          getCachedNetworkStatus(e.profile_id) ?? "checking",
+        ])
+      ),
+      null,
+      {},
+      null,
+      { allowBannerShow: true }
+    );
+    syncHubInboxAlertGroups();
+    notifyHubChanged();
+    window.dispatchEvent(
+      new CustomEvent(HUB_NETWORK_CHECKED_EVENT, {
+        detail: { at: lastWalletNetworkFetchAt },
+      })
+    );
+    return;
+  } else {
+    touchLiveControlPollLeader();
+  }
   const { entries, changed: qrBackfill } = normalizeWalletQrIds(stored);
   if (qrBackfill) saveWallet(entries);
   const gen = bumpWalletNetworkApplyGen();
@@ -782,6 +817,14 @@ async function fetchAndApplyNetworkChips(opts = {}) {
           detail: { at: lastWalletNetworkFetchAt },
         })
       );
+      broadcastNetworkSnapshotIfEligible({
+        manual,
+        entries: entriesToFetch,
+        statusMap,
+        scanKindMap,
+        resolverConfirmedMap,
+        alertStateMap,
+      });
     },
     {
       generation: gen,

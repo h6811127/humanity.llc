@@ -1,6 +1,6 @@
 # Device tab resolver sync
 
-**Status:** Planned (spec)  
+**Status:** Phase 1a shipped (auto network snapshot); Phase 2+ planned  
 **Audience:** Product, frontend  
 **Opened:** 2026-05-27  
 **Related:** [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) · [`UI_UX_REVERTED_FEATURES_CATALOG.md`](UI_UX_REVERTED_FEATURES_CATALOG.md) · [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md)
@@ -227,15 +227,15 @@ When `"0"`: behavior matches today (per-tab session cache).
 
 | Module | Responsibility |
 |--------|----------------|
-| `device-resolver-sync-core.mjs` | Pure: parse/validate messages, TTL, merge cache maps, `shouldFollowerSkipNetworkFetch` |
-| `device-resolver-sync.mjs` | Browser: BC bind, broadcast, apply snapshot, read `hc_resolver_sync_tabs` |
+| `device-resolver-sync-core.mjs` | Pure: `parseNetworkSnapshotMessage`, `shouldFollowerSkipNetworkFetch`, `mergeNetworkSnapshotIntoCache` |
+| `device-resolver-sync.mjs` | Browser: `initResolverTabSync`, `broadcastNetworkSnapshotIfEligible`, `shouldFollowerSkipAutoNetworkFetch` |
 | `device-resolver-sync-prefs.mjs` | Toggle UI for landing settings (phase 2) |
 
-**Integration points:**
+**Integration points (shipped):**
 
-- [`device-wallet-network.mjs`](../site/js/device-wallet-network.mjs) — after successful poll, `broadcastNetworkSnapshot` if leader.
-- [`device-hub-ui.mjs`](../site/js/device-hub-ui.mjs) — manual check path; optional follower skip at start of `refreshWalletNetworkStatuses` callers.
-- [`device-status.mjs`](../site/js/device-status.mjs) — optional health snapshot after `fetchResolverHealth`.
+- [`device-wallet-network.mjs`](../site/js/device-wallet-network.mjs) — `applyResolverNetworkSnapshot`, cache load/save helpers.
+- [`device-hub-ui.mjs`](../site/js/device-hub-ui.mjs) — `broadcastNetworkSnapshotIfEligible` after poll `onDone`; `shouldFollowerSkipAutoNetworkFetch` before auto refresh.
+- [`device-status.mjs`](../site/js/device-status.mjs) — `initResolverTabSync()` at shell bootstrap (health snapshot: phase 1b).
 - Shell manifest — add modules to [`device-status-shell-modules.mjs`](../site/js/device-status-shell-modules.mjs) when shipped; bump `DEVICE_SHELL_ASSET_VERSION`.
 
 ---
@@ -244,11 +244,11 @@ When `"0"`: behavior matches today (per-tab session cache).
 
 ### Phase 1a — Auto network snapshot (no UI)
 
-- [ ] `device-resolver-sync-core.mjs` + Vitest `worker/tests/device-resolver-sync.test.ts`
-- [ ] `device-resolver-sync.mjs` + wire broadcast from `refreshWalletNetworkStatuses` completion on leader
-- [ ] Follower skip + apply + `NETWORK_REFRESHED`
-- [ ] Default on (`hc_resolver_sync_tabs` missing → on)
-- [ ] Docs changelog; **P1-1** multi-tab case in QA
+- [x] `device-resolver-sync-core.mjs` + Vitest `worker/tests/device-resolver-sync.test.ts`
+- [x] `device-resolver-sync.mjs` + wire broadcast from `refreshWalletNetworkStatuses` completion
+- [x] Follower skip + apply + `NETWORK_REFRESHED`
+- [x] Default on (`hc_resolver_sync_tabs` missing → on)
+- [ ] **P1-1** multi-tab case in QA (manual / E2E follow-up)
 
 ### Phase 1b — Health snapshot (optional)
 
@@ -299,3 +299,6 @@ When `"0"`: behavior matches today (per-tab session cache).
 | Date | Note |
 |------|------|
 | 2026-05-27 | Initial spec |
+| 2026-05-27 | Phase 1a shipped — `device-resolver-sync*.mjs`, hub follower skip, shell manifest v51 |
+| 2026-05-26 | Phase 1a: `device-resolver-sync*.mjs`, hub follower skip, shell manifest v51 |
+| 2026-05-27 | Phase 1a shipped — `device-resolver-sync*.mjs`, shell v51 |

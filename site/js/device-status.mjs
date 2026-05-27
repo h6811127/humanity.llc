@@ -52,6 +52,7 @@ import {
   startDeviceChromeRefresh,
 } from "./device-chrome-refresh.mjs?v=45";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
+import { initResolverTabSync } from "./device-resolver-sync.mjs";
 import {
   describeDotState,
   deviceStateFromContext,
@@ -586,6 +587,7 @@ window.addEventListener("hc-focus-hub-search", () => {
 });
 
 startTabKeysPresence();
+initResolverTabSync();
 startCrossTabNotificationState();
 setRefreshStatusSurfaces(() => {
   refreshSummary();

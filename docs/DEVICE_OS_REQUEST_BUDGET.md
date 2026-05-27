@@ -206,7 +206,7 @@ Client budgets are necessary; they are **not** sufficient against bugs, old cach
 | Idea | Status | Notes |
 |------|--------|-------|
 | **Leader tab** (`BroadcastChannel`) | **Shipped** (Phase 7) | `device-live-control-poll-leader.mjs`; followers apply snapshot, no Worker GET |
-| **Resolver network tab sync** | **Planned** | [`DEVICE_TAB_RESOLVER_SYNC.md`](DEVICE_TAB_RESOLVER_SYNC.md) — share `GET …/status` results across tabs; followers skip duplicate polls |
+| **Resolver network tab sync** | **Shipped** (Phase 1a) | [`DEVICE_TAB_RESOLVER_SYNC.md`](DEVICE_TAB_RESOLVER_SYNC.md) — `hc-resolver-sync` BC; followers skip duplicate polls within 60s |
 | SW only when browser alerts opted in | **Shipped** (Phase 4) | 15 min periodic minimum |
 | Poll only **active** or **recently used** cards | **Shipped** (Phase 8) | `selectLiveControlPollEntries` when wallet ≥10 cards |
 | **Per-tab/day auto-poll cap** | **Shipped** (Phase 7) | `hc_live_control_auto_poll_budget`; manual check exempt |
