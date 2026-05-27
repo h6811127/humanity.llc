@@ -13,7 +13,9 @@ export type ObjectPublicStream = {
 
 export {
   OBJECT_STREAM_CLASSES,
+  OBJECT_STREAM_LABEL_MAX,
   OBJECT_STREAM_MAX_COUNT,
+  OBJECT_STREAM_VALUE_MAX,
   parseObjectStreamsFromDocument,
 } from "../../../site/js/object-streams-core.mjs";
 

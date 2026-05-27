@@ -31,6 +31,21 @@ describe("ai-draft-core", () => {
     expect(draft.manifesto_line).toContain("\n");
   });
 
+  it("accepts up to four current object_streams in request body", () => {
+    const result = validateDraftRequest({
+      pilot_template: "general",
+      current: {
+        object_streams: [
+          { label: "A", value: "1", class: "place" },
+          { label: "B", value: "2", class: "care" },
+          { label: "C", value: "3", class: "narrative" },
+          { label: "D", value: "4", class: "route" },
+        ],
+      },
+    });
+    expect("error" in result).toBe(false);
+  });
+
   it("parses AI JSON payload for lost_item_relay", () => {
     const parsed = parseAiDraftPayload(
       {

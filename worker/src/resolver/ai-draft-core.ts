@@ -3,6 +3,7 @@ import { AI_DRAFT_LIMIT } from "./trust-copy";
 import {
   OBJECT_STREAM_CLASSES,
   OBJECT_STREAM_LABEL_MAX,
+  OBJECT_STREAM_MAX_COUNT,
   OBJECT_STREAM_VALUE_MAX,
 } from "../validation/object-streams";
 
@@ -80,7 +81,7 @@ export function validateDraftRequest(body: unknown): DraftManifestoRequest | { e
       current.manifesto_line = cur.manifesto_line.trim() || undefined;
     }
     if (cur.object_streams !== undefined) {
-      const streams = normalizeDraftStreams(cur.object_streams);
+      const streams = normalizeDraftStreams(cur.object_streams, OBJECT_STREAM_MAX_COUNT);
       if ("error" in streams) return streams;
       current.object_streams = streams;
     }
@@ -89,9 +90,14 @@ export function validateDraftRequest(body: unknown): DraftManifestoRequest | { e
   return { pilot_template: pilot as PilotTemplate, hint, current };
 }
 
-function normalizeDraftStreams(raw: unknown): DraftObjectStream[] | { error: string } {
+function normalizeDraftStreams(
+  raw: unknown,
+  maxCount = 2
+): DraftObjectStream[] | { error: string } {
   if (!Array.isArray(raw)) return { error: "object_streams must be an array." };
-  if (raw.length > 2) return { error: "object_streams may include at most 2 entries." };
+  if (raw.length > maxCount) {
+    return { error: `object_streams may include at most ${maxCount} entries.` };
+  }
   const out: DraftObjectStream[] = [];
   for (const item of raw) {
     if (!item || typeof item !== "object") {
@@ -219,7 +225,7 @@ export function parseAiDraftPayload(
   }
 
   if (record.object_streams !== undefined) {
-    const streams = normalizeDraftStreams(record.object_streams);
+    const streams = normalizeDraftStreams(record.object_streams, 2);
     if ("error" in streams) return streams;
     if (streams.length) draft.object_streams = streams;
   }

@@ -3,8 +3,23 @@
  * @see docs/AI_L3_DRAFT_MANIFESTO.md
  */
 import { resolverApiOrigin } from "./hc-sign.mjs";
+import { inferPilotTemplate } from "./manifesto-display.mjs";
 
 const DRAFT_PATH = "/.well-known/hc/v1/ai/draft-manifesto";
+const VALID_PILOTS = new Set(["status_plate", "general", "lost_item_relay"]);
+
+/**
+ * @param {string | undefined | null} pilot
+ * @param {Record<string, unknown> | null | undefined} session
+ */
+export function resolveDraftPilotTemplate(pilot, session) {
+  if (pilot && VALID_PILOTS.has(pilot)) return pilot;
+  if (session?.manifesto_line) {
+    const inferred = inferPilotTemplate(String(session.manifesto_line));
+    if (VALID_PILOTS.has(inferred)) return inferred;
+  }
+  return "general";
+}
 
 /**
  * @param {{
@@ -26,10 +41,9 @@ export function initCreatedAiDraft(ctx) {
   let lastDraft = null;
 
   function syncVisibility() {
-    const pilot = ctx.getPilotTemplate();
-    const show =
-      pilot === "status_plate" || pilot === "general" || pilot === "lost_item_relay";
-    root.hidden = !show;
+    const session = ctx.getSession();
+    const pilot = resolveDraftPilotTemplate(ctx.getPilotTemplate(), session);
+    root.hidden = !VALID_PILOTS.has(pilot);
   }
 
   function formatDraftPreview(draft) {
@@ -50,7 +64,8 @@ export function initCreatedAiDraft(ctx) {
   }
 
   function applyDraftToForm(draft) {
-    const pilot = ctx.getPilotTemplate();
+    const session = ctx.getSession();
+    const pilot = resolveDraftPilotTemplate(ctx.getPilotTemplate(), session);
     if (pilot === "status_plate") {
       const objectEl = document.getElementById("update-object-label");
       const statusEl2 = document.getElementById("update-status-line");
@@ -85,9 +100,38 @@ export function initCreatedAiDraft(ctx) {
     });
   }
 
+  function formatDraftStreamsForRequest(streams) {
+    if (!Array.isArray(streams)) return undefined;
+    return streams.slice(0, 4).map((stream) => {
+      if (!stream || typeof stream !== "object") return null;
+      const row = /** @type {Record<string, unknown>} */ (stream);
+      const label = typeof row.label === "string" ? row.label.trim() : "";
+      const value = typeof row.value === "string" ? row.value.trim() : "";
+      const streamClass = typeof row.class === "string" ? row.class : "place";
+      if (!label || !value) return null;
+      return { label, value, class: streamClass };
+    }).filter(Boolean);
+  }
+
+  function describeDraftFailure(res, json) {
+    if (typeof json.message === "string" && json.message.trim()) return json.message;
+    if (typeof json.error === "string" && json.error.trim()) {
+      if (json.error === "not_found") {
+        return "Draft API is not available on this resolver yet. Deploy the worker or run worker:dev locally.";
+      }
+      return json.error;
+    }
+    if (res.status === 404) {
+      return "Draft API not found — deploy the latest worker or use local worker:dev.";
+    }
+    if (res.status === 429) return "Too many draft requests. Try again in a few minutes.";
+    return `Could not generate a draft (HTTP ${res.status}).`;
+  }
+
   async function requestDraft() {
-    const pilot = ctx.getPilotTemplate();
     const session = ctx.getSession();
+    const pilot = resolveDraftPilotTemplate(ctx.getPilotTemplate(), session);
+    const streams = formatDraftStreamsForRequest(session?.object_streams);
     const body = {
       pilot_template: pilot,
       hint: hintEl?.value?.trim() || undefined,
@@ -95,9 +139,7 @@ export function initCreatedAiDraft(ctx) {
         manifesto_line: session?.manifesto_line
           ? String(session.manifesto_line)
           : undefined,
-        object_streams: Array.isArray(session?.object_streams)
-          ? session.object_streams
-          : undefined,
+        ...(streams?.length ? { object_streams: streams } : {}),
       },
     };
 
@@ -108,11 +150,7 @@ export function initCreatedAiDraft(ctx) {
     });
     const json = await res.json().catch(() => ({}));
     if (!res.ok) {
-      const msg =
-        typeof json.message === "string"
-          ? json.message
-          : "Could not generate a draft right now.";
-      throw new Error(msg);
+      throw new Error(describeDraftFailure(res, json));
     }
     return json;
   }
