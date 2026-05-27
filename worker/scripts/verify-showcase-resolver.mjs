@@ -109,8 +109,11 @@ async function main() {
   }
   if (failed) {
     console.error(
-      "\nRe-seed when cards are missing streams: npm run site:seed-showcase && npm run site:seed-showcase-live-object"
+      "\nRe-seed when cards are missing streams:"
     );
+    console.error("  API_ORIGIN=https://humanity.llc npm run site:seed-showcase");
+    console.error("  API_ORIGIN=https://humanity.llc npm run site:seed-showcase-live-object");
+    console.error("Then commit site/data/*.json, deploy Pages, and re-run verify.");
     process.exit(1);
   }
   console.log("All showcase resolver checks passed.");
