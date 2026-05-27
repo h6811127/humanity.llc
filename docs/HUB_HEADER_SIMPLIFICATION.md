@@ -1,6 +1,6 @@
 # Hub header simplification
 
-**Status:** Steps 1–2 shipped  
+**Status:** Steps 1-2 shipped
 **Scope:** Bottom-sheet hub header on `/`, `/create/`, and `/created/`  
 **Companions:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md), [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md)
 
@@ -55,6 +55,8 @@ The first screen of the hub should prioritize:
 - [x] Keep zero saved/pinned values visually subordinate.
 - [x] Avoid wrapping a lone `0 pinned` chip onto its own row on mobile.
 
+**Shipped:** The sheet header now renders one inline status line: network first, then muted device counts, then compact alert-weight items only for actionable states.
+
 ### Step 3 - Rebalance nav controls
 
 - Review Home and Close visual weight together.
@@ -73,5 +75,6 @@ The first screen of the hub should prioritize:
 
 - The top rail contains Home + status only; Create no longer competes with Close or the title.
 - The saved-items heading exposes a compact **+ New** action.
+- The status panel stays on one inline row in the empty-wallet case: network + muted `0 cards` / `0 pinned`.
 - Existing hub open/close state contracts still route through `setHubSheetOpen()` / `setHubExpanded()`.
 - No new module imports are added to the status-dot graph.

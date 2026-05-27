@@ -896,50 +896,70 @@ button.device-hub-notice-banner {
 .device-hub-status-panel {
   flex: 1;
   min-width: 0;
-  display: flex;
-  align-items: center;
-  min-height: 42px;
   margin: 0;
+  padding-top: 2px;
 }
 
-.device-hub-chip {
-  display: inline-flex;
+.device-hub-status-line {
+  display: flex;
+  flex-wrap: nowrap;
   align-items: center;
+  gap: 5px;
   max-width: 100%;
-  margin: 0 6px 6px 0;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  line-height: 1.2;
+  min-height: 30px;
+  overflow: hidden;
   white-space: nowrap;
-  background: rgba(120, 120, 128, 0.12);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.device-hub-status-item {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.device-hub-status-item--primary {
+  flex: 1 1 auto;
   color: var(--shell-label-strong, #1c1c1e);
 }
 
-.device-hub-chip--network-ok {
-  background: rgba(52, 199, 89, 0.14);
-  color: #248a3d;
+.device-hub-status-item--meta {
+  flex: 0 0 auto;
+  color: var(--shell-label, rgba(60, 60, 67, 0.62));
+  font-weight: 600;
 }
 
-.device-hub-chip--network-degraded {
-  background: rgba(255, 149, 0, 0.16);
-  color: #c93400;
-}
-
-.device-hub-chip--network-offline {
-  background: rgba(120, 120, 128, 0.14);
-  color: var(--shell-label);
-}
-
-.device-hub-chip--highlight {
+.device-hub-status-item--alert {
+  flex: 0 0 auto;
+  padding: 3px 8px;
+  border-radius: 999px;
   background: rgba(219, 27, 67, 0.12);
   color: var(--red);
 }
 
-.device-hub-chip--zero {
-  opacity: 0.55;
+.device-hub-status-item--zero {
+  opacity: 0.62;
+}
+
+.device-hub-status-separator {
+  flex: 0 0 auto;
+  color: var(--shell-label, rgba(60, 60, 67, 0.55));
+  opacity: 0.5;
+}
+
+.device-hub-status-item--network-ok {
+  color: #248a3d;
+}
+
+.device-hub-status-item--network-degraded {
+  color: #c93400;
+}
+
+.device-hub-status-item--network-offline {
+  color: var(--shell-label);
 }
 
 .device-hub-section {
@@ -1418,43 +1438,16 @@ button.device-hub-notice-banner {
 }
 
 .device-hub-status-line {
-  width: 100%;
   margin: 0;
   font-size: 13px;
-  font-weight: 600;
-  line-height: 1.25;
+  font-weight: 500;
+  line-height: 1.4;
   color: var(--shell-label);
   letter-spacing: -0.01em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.device-hub-status-seg {
-  display: inline;
-  min-width: 0;
 }
 
 .device-hub-status-seg.is-zero {
-  opacity: 0.48;
-  font-weight: 500;
-}
-
-.device-hub-status-seg.is-primary {
-  color: var(--shell-label-strong, #1c1c1e);
-  opacity: 1;
-}
-
-.device-hub-status-seg--network-ok.is-primary {
-  color: #248a3d;
-}
-
-.device-hub-status-seg--network-degraded.is-primary {
-  color: #c93400;
-}
-
-.device-hub-status-seg--network-offline.is-primary {
-  color: var(--shell-label);
+  opacity: 0.42;
 }
 
 .device-hub-status-seg.is-highlight {

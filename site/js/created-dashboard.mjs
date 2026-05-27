@@ -4,7 +4,7 @@
  */
 
 import { isWalletSaved } from "./device-wallet.mjs";
-import { syncUpdateStatusTaskGate } from "./created-first-revoke-gate.mjs";
+import { syncUpdateStatusTaskGate } from "./created-first-revoke-gate.mjs?v=2";
 import { initCreatedLivePrimaryCta } from "./created-live-primary-cta.mjs";
 import { initCreatedLiveSetupMemory } from "./created-live-setup-memory.mjs";
 import { isSetupDone } from "./created-mode.mjs";
@@ -44,6 +44,7 @@ function persistDoneAction(profileId, actionId) {
  *   refreshSave?: () => void,
  *   getScanUrl?: () => string | null,
  *   getProfileId?: () => string | null,
+ *   getSession?: () => Record<string, unknown> | null,
  *   hasSigningKeys?: () => boolean,
  * }} opts
  */
@@ -53,6 +54,7 @@ export function initCreatedDashboard({
   refreshSave,
   getScanUrl,
   getProfileId,
+  getSession,
   hasSigningKeys,
 }) {
   const keysStrip = document.getElementById("created-keys-strip");
@@ -139,7 +141,7 @@ export function initCreatedDashboard({
     });
 
     syncCustodySummary(saved);
-    syncUpdateStatusTaskGate(pid);
+    syncUpdateStatusTaskGate(pid, getSession?.());
   }
 
   /** @type {Record<string, () => void>} */

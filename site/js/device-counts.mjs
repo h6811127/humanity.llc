@@ -2,7 +2,6 @@ import { getLiveControlPendingCount, getLiveControlPollHealth } from "./device-l
 import { isPollableWalletEntry } from "./device-live-control-inbox-core.mjs";
 import {
   buildDeviceCountsLabel,
-  buildHubStatusLineItems,
   buildStatusSegmentsFromCounts,
   tabNoticeCountFromState,
 } from "./device-counts-core.mjs";
@@ -57,5 +56,3 @@ export function buildStatusLine(network = "offline") {
 export function getDeviceCounts() {
   return buildDeviceCountsLabel(loadWallet().length, loadPins().length);
 }
-
-export { buildHubStatusLineItems };

@@ -136,19 +136,3 @@ export function buildDeviceCountsLabel(saved, pins) {
     label: parts.join(" · ") || "",
   };
 }
-
-/**
- * @param {Array<{ id: string, label: string, chipLabel?: string, detail: string, zero: boolean, highlight: boolean, chipTone?: string }>} segments
- */
-export function buildHubStatusLineItems(segments) {
-  return segments.map((seg, index) => ({
-    id: seg.id,
-    label: seg.chipLabel ?? seg.label,
-    detail: seg.detail,
-    zero: seg.zero,
-    highlight: seg.highlight,
-    tone: seg.chipTone ?? (seg.highlight ? "highlight" : "neutral"),
-    primary: seg.id === "network",
-    separatorBefore: index > 0,
-  }));
-}

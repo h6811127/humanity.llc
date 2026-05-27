@@ -1,9 +1,16 @@
+import { inferPilotTemplate } from "./manifesto-display.mjs";
+
 /**
- * Phase A: tuck manifesto update until owner has revoked once in-session.
+ * Phase A: tuck generic manifesto update until owner has revoked once in-session.
+ * Status plate and lost-item pilots need live line edits before revoke field tests.
  * @see docs/PHASE_A_STRANGER_PATH_PRIORITIES.md
  */
 
 const STORAGE_KEY = "hc_created_first_qr_revoke";
+const PILOT_TEMPLATES_UNLOCKED_BEFORE_REVOKE = new Set([
+  "status_plate",
+  "lost_item_relay",
+]);
 
 /**
  * @param {string | null | undefined} profileId
@@ -33,12 +40,25 @@ export function hasFirstRevokeDone(profileId) {
 }
 
 /**
- * @param {string | null | undefined} profileId
+ * @param {Record<string, unknown> | null | undefined} session
  */
-export function syncUpdateStatusTaskGate(profileId) {
+export function isPilotUpdateUnlocked(session) {
+  const explicit = typeof session?.pilot_template === "string" ? session.pilot_template : "";
+  if (PILOT_TEMPLATES_UNLOCKED_BEFORE_REVOKE.has(explicit)) return true;
+  if (typeof session?.manifesto_line !== "string") return false;
+  return PILOT_TEMPLATES_UNLOCKED_BEFORE_REVOKE.has(
+    inferPilotTemplate(session.manifesto_line)
+  );
+}
+
+/**
+ * @param {string | null | undefined} profileId
+ * @param {Record<string, unknown> | null | undefined} session
+ */
+export function syncUpdateStatusTaskGate(profileId, session = null) {
   const scannersSee = document.getElementById("created-live-scanners-see");
   const hint = document.getElementById("created-scanners-see-gate-hint");
-  const unlocked = hasFirstRevokeDone(profileId);
+  const unlocked = hasFirstRevokeDone(profileId) || isPilotUpdateUnlocked(session);
   if (scannersSee) scannersSee.hidden = !unlocked;
   if (hint) hint.hidden = unlocked;
 }

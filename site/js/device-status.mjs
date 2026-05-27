@@ -3,7 +3,7 @@
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
 import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=45";
-import { buildHubStatusLineItems, buildStatusSegments } from "./device-counts.mjs";
+import { buildStatusSegments } from "./device-counts.mjs";
 import { shouldSkipCrossTabOverlayViewTransition } from "./device-presence-inbox-stability-core.mjs";
 import { fetchResolverHealth } from "./device-network-health.mjs";
 import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visit-gate.mjs";
@@ -58,6 +58,7 @@ import {
   dotStateKey,
   dotTransitionKey,
   hasStewardVerification,
+  hubStatusLineItemsFromSegments,
   SHELL_DOT_NEUTRAL_EMPTY_CLASS,
   shellChromeStatusLineFromSegments,
   shellDotUsesNeutralEmptyWallet,
@@ -407,25 +408,25 @@ function renderShellStatusLine(segments) {
 
 function renderHubStatusPanel(segments) {
   if (!hubStatusPanel) return;
-  const items = buildHubStatusLineItems(segments);
-  const line = items.map((item) => {
+  const items = hubStatusLineItemsFromSegments(segments);
+  const statusText = items.map((item) => item.label).join(" · ");
+  const parts = items.map((item, index) => {
     const cls = [
-      "device-hub-status-seg",
-      `device-hub-status-seg--${item.id}`,
-      `device-hub-status-seg--${item.tone}`,
-      item.primary ? "is-primary" : "",
-      item.zero ? "is-zero" : "",
-      item.highlight ? "is-highlight" : "",
+      "device-hub-status-item",
+      `device-hub-status-item--${item.id}`,
+      `device-hub-status-item--${item.tone}`,
+      `device-hub-status-item--${item.emphasis}`,
+      item.zero ? "device-hub-status-item--zero" : "",
     ]
       .filter(Boolean)
       .join(" ");
-    const separator = item.separatorBefore
-      ? `<span class="device-hub-status-sep" aria-hidden="true">·</span>`
-      : "";
+    const separator =
+      index === 0
+        ? ""
+        : `<span class="device-hub-status-separator" aria-hidden="true"> · </span>`;
     return `${separator}<span class="${cls}" data-seg="${item.id}" title="${escapeHtml(item.detail)}">${escapeHtml(item.label)}</span>`;
   });
-  const ariaLabel = items.map((item) => item.label).join(", ");
-  hubStatusPanel.innerHTML = `<div class="device-hub-status-line" role="status" aria-label="${escapeHtml(ariaLabel)}">${line.join("")}</div>`;
+  hubStatusPanel.innerHTML = `<div class="device-hub-status-line" role="status" aria-label="${escapeHtml(statusText)}">${parts.join("")}</div>`;
 }
 
 function renderNotifBadge() {
