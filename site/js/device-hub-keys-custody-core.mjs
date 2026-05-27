@@ -1,6 +1,6 @@
 /**
  * Pure hub Keys custody panel model.
- * @see docs/KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md Phase 1
+ * @see docs/KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md Phases 1 + 4
  */
 import {
   shouldShowCrossTabKeysNotice,
@@ -11,7 +11,7 @@ import {
   ORPHAN_KEYS_INBOX_TITLE,
 } from "./device-orphan-keys-nav-core.mjs";
 
-/** @typedef {'this_tab_active' | 'this_tab_unsaved' | 'cross_tab' | 'orphan' | 'education'} HubKeysCustodyRowKind */
+/** @typedef {'this_tab_active' | 'this_tab_unsaved' | 'cross_tab' | 'orphan' | 'vouch_default' | 'sign_lock' | 'vouch_nudge'} HubKeysCustodyRowKind */
 
 /**
  * @typedef {object} HubKeysCustodyPresenceEntry
@@ -53,6 +53,12 @@ export function labelForHubKeysCustodyEntry(entry) {
  *   tabSessionLabel?: string,
  *   hasActiveKeys?: boolean,
  *   educationDismissed?: boolean,
+ *   defaultVouchProfileId?: string | null,
+ *   defaultVouchLabel?: string | null,
+ *   vouchAutoActivate?: boolean,
+ *   signLockMode?: "pin" | "webauthn" | null,
+ *   signLockLabel?: string | null,
+ *   walletEntriesWithKeys?: number,
  * }} input
  * @returns {HubKeysCustodyPanelState}
  */
@@ -64,6 +70,12 @@ export function buildHubKeysCustodyPanel(input) {
     tabSessionLabel = "This tab",
     hasActiveKeys = false,
     educationDismissed = true,
+    defaultVouchProfileId = null,
+    defaultVouchLabel = null,
+    vouchAutoActivate = false,
+    signLockMode = null,
+    signLockLabel = null,
+    walletEntriesWithKeys = 0,
   } = input;
 
   /** @type {HubKeysCustodyRow[]} */
@@ -105,6 +117,41 @@ export function buildHubKeysCustodyPanel(input) {
         entry,
       });
     }
+  }
+
+  if (hasActiveKeys && signLockMode) {
+    rows.push({
+      kind: "sign_lock",
+      title:
+        signLockMode === "webauthn"
+          ? "Device unlock required before sign"
+          : "PIN required before sign",
+      subtitle: signLockLabel || tabSessionLabel,
+    });
+  }
+
+  if (defaultVouchProfileId && vouchAutoActivate) {
+    rows.push({
+      kind: "vouch_default",
+      title: "Default for vouching on scan",
+      subtitle:
+        defaultVouchLabel ||
+        `${String(defaultVouchProfileId).slice(0, 12)}… · auto-loads on scan open`,
+    });
+  }
+
+  if (
+    walletEntriesWithKeys >= 2 &&
+    !defaultVouchProfileId &&
+    tabNoticeCount === 0 &&
+    !hasActiveKeys &&
+    crossTabEntries.length === 0
+  ) {
+    rows.push({
+      kind: "vouch_nudge",
+      title: "Set a default for vouching",
+      subtitle: `${walletEntriesWithKeys} saved cards · pick one for scan auto-load`,
+    });
   }
 
   const showEducation = !educationDismissed && rows.length === 0;

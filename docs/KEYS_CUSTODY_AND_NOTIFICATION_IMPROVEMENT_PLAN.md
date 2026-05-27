@@ -1,6 +1,6 @@
 # Keys custody and notification improvement plan
 
-**Status:** Phases 1–2 shipped (unified hub panel, badge/glance semantics) · Phases 3–7 planned  
+**Status:** Phases 1–4 shipped · Phases 5–7 planned  
 **Audience:** Product, engineering  
 **Related:** [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md)
 
@@ -153,9 +153,19 @@ Clearer ARIA/tooltip breakdown; glance copy aligned with per-tab custody rows; d
 
 **Code:** `device-tab-presence.mjs`, `device-wallet.mjs`, `device-inbox-core.mjs`, `device-notice-nav.mjs`, `device-hub-ui.mjs`, `card-wallet.mjs`
 
-### Phase 4 — Proactive custody
+### Phase 4 — Proactive custody ✅
 
-Vouch-ready (shipped), default vouch card, scan strip, PIN/lock for shared devices.
+**Goal:** Reduce reactive cross-tab chrome by surfacing vouch-ready settings in the custody panel.
+
+| Subpoint | Detail |
+|----------|--------|
+| **Vouch-ready keys** | Shipped on scan — opt-in auto-activate ([`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md)) |
+| **Default vouch card** | Hub custody row when default + auto-activate set; clear default or jump to saved cards |
+| **Scan strip** | Shipped on scan — `Signing as @handle` status + Stop ([`vouch-issue.mjs`](../site/js/vouch-issue.mjs)) |
+| **Sign lock / PIN** | Hub custody row when keys active in tab and per-card lock enabled |
+| **Multi-card nudge** | Hub row when ≥2 saved cards with keys and no default (idle, no cross-tab) |
+
+**Code:** `device-hub-keys-custody-core.mjs`, `device-hub-keys-custody.mjs`
 
 ### Phase 5 — Faster, quieter presence
 

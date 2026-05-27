@@ -76,6 +76,46 @@ describe("buildHubKeysCustodyPanel", () => {
       }).visible
     ).toBe(false);
   });
+
+  it("shows default vouch row when auto-activate is enabled", () => {
+    const state = buildHubKeysCustodyPanel({
+      defaultVouchProfileId: "abc123",
+      defaultVouchLabel: "@steward",
+      vouchAutoActivate: true,
+    });
+    expect(state.rows.map((r) => r.kind)).toEqual(["vouch_default"]);
+    expect(state.rows[0].subtitle).toBe("@steward");
+    expect(state.visible).toBe(true);
+  });
+
+  it("shows sign lock row when keys are active with PIN lock", () => {
+    const state = buildHubKeysCustodyPanel({
+      hasActiveKeys: true,
+      tabSessionLabel: "@alice",
+      signLockMode: "pin",
+      signLockLabel: "@alice",
+    });
+    expect(state.rows.map((r) => r.kind)).toEqual(["this_tab_active", "sign_lock"]);
+    expect(state.rows[1].title).toContain("PIN");
+  });
+
+  it("nudges default vouch when multiple saved cards and idle", () => {
+    const state = buildHubKeysCustodyPanel({
+      walletEntriesWithKeys: 3,
+      educationDismissed: true,
+    });
+    expect(state.rows.map((r) => r.kind)).toEqual(["vouch_nudge"]);
+    expect(state.rows[0].subtitle).toContain("3 saved cards");
+  });
+
+  it("suppresses vouch nudge when cross-tab notice is active", () => {
+    const state = buildHubKeysCustodyPanel({
+      walletEntriesWithKeys: 2,
+      crossTabEntries: [{ profile_id: "x", tabId: "t1" }],
+    });
+    expect(state.rows.some((r) => r.kind === "vouch_nudge")).toBe(false);
+    expect(state.rows.some((r) => r.kind === "cross_tab")).toBe(true);
+  });
 });
 
 describe("labelForHubKeysCustodyEntry", () => {

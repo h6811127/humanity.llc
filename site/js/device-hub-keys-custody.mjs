@@ -1,6 +1,6 @@
 /**
  * Unified Keys custody panel in the device hub.
- * @see docs/KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md Phase 1
+ * @see docs/KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md Phases 1 + 4
  */
 import {
   buildHubKeysCustodyPanel,
@@ -8,6 +8,7 @@ import {
 } from "./device-hub-keys-custody-core.mjs";
 import { gatherInboxInput } from "./device-inbox.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
+import { loadWallet } from "./device-wallet.mjs";
 import { isKeysCustodyNoticeDismissed, dismissKeysCustodyNotice } from "./device-keys-custody-core.mjs";
 import { keysCustodyHtml } from "./device-keys-custody.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab, walletEntryForProfile } from "./device-notice-nav.mjs";
@@ -15,7 +16,12 @@ import {
   actOnOrphanRemovedTabKeys,
   clearOrphanKeysOnDevice,
 } from "./device-orphan-keys-nav.mjs";
-import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
+import {
+  getDefaultVouchProfileId,
+  isVouchAutoActivateEnabled,
+  setDefaultVouchProfile,
+} from "./vouch-ready-keys.mjs";
+import { getSignLock } from "./vouch-sign-lock.mjs";
 
 export { hubKeysCustodyPanelEnabledInDom as hasUnifiedHubKeysCustodyPanel };
 
@@ -25,6 +31,45 @@ function escapeHtml(s) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+function walletEntryLabel(entry) {
+  if (entry?.label) return entry.label;
+  if (entry?.handle) return `@${entry.handle}`;
+  if (entry?.profile_id) return `${String(entry.profile_id).slice(0, 12)}…`;
+  return "Saved card";
+}
+
+function gatherProactiveCustodyInput(session) {
+  const defaultId = getDefaultVouchProfileId();
+  const wallet = loadWallet();
+  const defaultEntry = defaultId
+    ? wallet.find((entry) => entry.profile_id === defaultId)
+    : null;
+  const activeProfileId = session?.profile_id ?? null;
+  const signLock = activeProfileId ? getSignLock(activeProfileId) : null;
+  const walletEntriesWithKeys = wallet.filter((entry) => entry.owner_private_key_b58).length;
+
+  return {
+    defaultVouchProfileId: defaultId,
+    defaultVouchLabel: defaultEntry ? walletEntryLabel(defaultEntry) : null,
+    vouchAutoActivate: isVouchAutoActivateEnabled(),
+    signLockMode: signLock?.mode ?? null,
+    signLockLabel:
+      activeProfileId && signLock
+        ? session?.handle
+          ? `@${session.handle}`
+          : session?.wallet_label || `${String(activeProfileId).slice(0, 12)}…`
+        : null,
+    walletEntriesWithKeys,
+  };
+}
+
+function scrollHubToSavedCards() {
+  document.getElementById("device-hub-saved-group")?.scrollIntoView({
+    behavior: "smooth",
+    block: "nearest",
+  });
 }
 
 function walletEntryForVouchHere(primaryProfileId) {
@@ -37,14 +82,27 @@ function walletEntryForVouchHere(primaryProfileId) {
 }
 
 function rowIconTone(row) {
-  if (row.kind === "this_tab_unsaved" || row.kind === "orphan") return "amber";
-  if (row.kind === "this_tab_active") return "green";
+  if (row.kind === "this_tab_unsaved" || row.kind === "orphan" || row.kind === "sign_lock") {
+    return "amber";
+  }
+  if (row.kind === "this_tab_active" || row.kind === "vouch_default") return "green";
   return "blue";
 }
 
 function rowActionsHtml(row) {
   if (row.kind === "this_tab_unsaved") {
     return `<button type="button" class="device-hub-keys-custody-action" data-hub-custody-save>Save on this device</button>`;
+  }
+  if (row.kind === "sign_lock") {
+    return `<button type="button" class="device-hub-keys-custody-action" data-hub-custody-open-card>Open card</button>`;
+  }
+  if (row.kind === "vouch_default") {
+    return `
+      <button type="button" class="device-hub-keys-custody-action device-hub-keys-custody-action--secondary" data-hub-custody-clear-default>Clear default</button>
+      <button type="button" class="device-hub-keys-custody-action" data-hub-custody-saved-cards>Saved cards</button>`;
+  }
+  if (row.kind === "vouch_nudge") {
+    return `<button type="button" class="device-hub-keys-custody-action" data-hub-custody-saved-cards>Choose on saved cards</button>`;
   }
   if (row.kind === "cross_tab" && row.entry) {
     const parts = [`<button type="button" class="device-hub-keys-custody-action" data-hub-custody-focus>Open tab</button>`];
@@ -136,6 +194,28 @@ function bindPanelActions(panel, state) {
         renderHubKeysCustodyPanel();
       }
     });
+
+    li.querySelector("[data-hub-custody-open-card]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      const session = getTabSession();
+      const walletEntry = session?.profile_id
+        ? walletEntryForProfile(session.profile_id)
+        : null;
+      if (!walletEntry?.owner_private_key_b58) return;
+      window.dispatchEvent(new CustomEvent("hc-hub-sheet-close"));
+      openCardNowPage(walletEntry);
+    });
+
+    li.querySelector("[data-hub-custody-clear-default]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      setDefaultVouchProfile(null);
+      renderHubKeysCustodyPanel();
+    });
+
+    li.querySelector("[data-hub-custody-saved-cards]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      scrollHubToSavedCards();
+    });
   }
 
   panel.querySelector("[data-keys-custody-ack]")?.addEventListener("click", (e) => {
@@ -158,6 +238,7 @@ export function renderHubKeysCustodyPanel() {
     tabSessionLabel: inbox.tabSessionLabel,
     hasActiveKeys: Boolean(session?.owner_private_key_b58),
     educationDismissed: isKeysCustodyNoticeDismissed(),
+    ...gatherProactiveCustodyInput(session),
   });
 
   if (!state.visible) {
@@ -177,4 +258,7 @@ export function renderHubKeysCustodyPanel() {
 
 if (typeof document !== "undefined" && document.getElementById("device-hub-keys-custody")) {
   renderHubKeysCustodyPanel();
+  window.addEventListener("hc-vouch-ready-changed", () => renderHubKeysCustodyPanel());
+  window.addEventListener("hc-vouch-sign-lock-changed", () => renderHubKeysCustodyPanel());
+  window.addEventListener("hc-device-hub-changed", () => renderHubKeysCustodyPanel());
 }
