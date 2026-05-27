@@ -6,3 +6,13 @@
 
 /styles.css
   Cache-Control: public, max-age=3600
+
+/app.webmanifest
+  Content-Type: application/manifest+json
+  Cache-Control: public, max-age=3600
+
+/assets/*.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/sw-live-proof.mjs
+  Cache-Control: no-cache
