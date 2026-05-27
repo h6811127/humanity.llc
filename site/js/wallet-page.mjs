@@ -8,6 +8,7 @@ import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import { refreshWalletContextFromChrome, walletEntryForSession } from "./wallet-page-chrome.mjs";
 import { createPinEntry, loadPins, savePins } from "./device-pins.mjs";
 import { mountKeysCustody } from "./device-keys-custody.mjs";
+import { initPwaInstallPrompt } from "./pwa-install.mjs";
 import "./device-help-fab.mjs";
 import {
   defaultWalletLabel,
@@ -140,6 +141,7 @@ initDeviceHub({
   showEmptyHint: true,
   showLiveControlInbox: true,
 });
+initPwaInstallPrompt();
 
 mountKeysCustody("#device-keys-custody-wallet", "wallet", {
   importHref: "#hub-import-form",

@@ -2035,10 +2035,60 @@ body.device-inbox-sheet-open .top-chrome--inbox-locked .shell-notif-badge {
   margin-bottom: 8px;
 }
 
+.pwa-install-prompt-host {
+  margin-bottom: 8px;
+}
+
 .device-browser-notif-prompt {
   margin: 0;
   padding: 12px 14px;
   border-radius: 12px;
+}
+
+.pwa-install-prompt {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+}
+
+.pwa-install-prompt-title {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--shell-label-strong, #1c1c1e);
+}
+
+.pwa-install-prompt-copy {
+  margin: 0 0 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--shell-label, rgba(60, 60, 67, 0.85));
+}
+
+.pwa-install-prompt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.pwa-install-prompt-actions .btn-secondary {
+  flex: 1 1 auto;
+  min-height: 36px;
+  font-size: 14px;
+}
+
+.pwa-install-prompt-dismiss {
+  border: none;
+  background: transparent;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--shell-label, rgba(60, 60, 67, 0.72));
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .device-inbox-sheet .device-browser-notif-prompt {

@@ -2,6 +2,7 @@
  * /created/ device hub init.
  */
 import { initDeviceHub } from "./device-hub-ui.mjs";
+import { initPwaInstallPrompt } from "./pwa-install.mjs";
 import "./device-help-fab.mjs";
 
 initDeviceHub({
@@ -9,6 +10,7 @@ initDeviceHub({
   showLiveControlInbox: false,
   savedLabel: "My cards",
 });
+initPwaInstallPrompt();
 
 document.getElementById("created-hub-manage-tab")?.addEventListener("click", () => {
   document.getElementById("created-tab-btn-advanced")?.click();

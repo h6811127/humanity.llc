@@ -19,12 +19,17 @@ import {
   getStewardEntitlementsPolicy,
   stewardPushSubscribeAllowed,
 } from "./device-steward-entitlements.mjs";
+import {
+  PWA_SW_SCRIPT_URL,
+  pwaServiceWorkerSupported,
+  registerPwaServiceWorker,
+} from "./pwa-service-worker.mjs";
 
-export const SW_SCRIPT_URL = "/sw-live-proof.mjs";
+export const SW_SCRIPT_URL = PWA_SW_SCRIPT_URL;
 
 /** @returns {boolean} */
 export function liveProofServiceWorkerSupported() {
-  return typeof navigator !== "undefined" && "serviceWorker" in navigator;
+  return pwaServiceWorkerSupported();
 }
 
 function notificationGranted() {
@@ -33,40 +38,12 @@ function notificationGranted() {
 
 /** @returns {Promise<ServiceWorkerRegistration | null>} */
 export async function registerLiveProofServiceWorker() {
-  if (!liveProofServiceWorkerSupported()) return null;
-  try {
-    const existing = await navigator.serviceWorker.getRegistration("/");
-    if (existing?.active?.scriptURL?.includes("sw-live-proof")) {
-      return existing;
-    }
-    return await navigator.serviceWorker.register(SW_SCRIPT_URL, {
-      type: "module",
-      scope: "/",
-    });
-  } catch (err) {
-    console.warn("[humanity] live-proof service worker registration failed:", err);
-    return null;
-  }
+  return registerPwaServiceWorker();
 }
 
 /** @returns {Promise<void>} */
 export async function unregisterLiveProofServiceWorker() {
-  if (!liveProofServiceWorkerSupported()) return;
-  try {
-    const reg = await navigator.serviceWorker.getRegistration("/");
-    if (reg) {
-      if ("periodicSync" in reg) {
-        try {
-          await reg.periodicSync.unregister(SW_PERIODIC_TAG);
-        } catch {
-          /* ignore */
-        }
-      }
-      await reg.unregister();
-    }
-  } catch {
-    /* ignore */
-  }
+  await teardownLiveProofServiceWorker();
 }
 
 /**

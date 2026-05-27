@@ -134,6 +134,10 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 
+self.addEventListener("fetch", (event) => {
+  event.respondWith(fetch(event.request));
+});
+
 self.addEventListener("message", (event) => {
   const msg = event.data;
   if (!msg || msg.type !== "HC_SW_SYNC_STATE") return;

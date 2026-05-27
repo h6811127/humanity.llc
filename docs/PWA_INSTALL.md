@@ -1,6 +1,6 @@
 # Mobile home-screen app / PWA install plan
 
-**Status:** Phase 1 foundation in progress  
+**Status:** Phase 2 install UX in progress  
 **Audience:** Product, design, and engineers working on the device shell  
 **Related:** [`DEVICE_OS.md`](DEVICE_OS.md), [`DEVICE_INBOX.md`](DEVICE_INBOX.md), [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md), [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md)
 
@@ -72,12 +72,28 @@ These boundaries matter because card status, QR revocation, verification labels,
 3. Show iOS-specific instructions because iOS does not support `beforeinstallprompt`.
 4. Suppress the prompt in standalone mode using `matchMedia("(display-mode: standalone)")` and `navigator.standalone`.
 
+Implementation notes:
+
+- Mount the prompt from shell page entry modules, not the status-dot bootstrap graph.
+- Insert the prompt into `#device-hub-alerts-top` and `#wallet-alerts-top` so it uses the existing device-shell alert rhythm.
+- Store only local dismissal/install flags (`hc_pwa_install_dismissed`, `hc_pwa_install_installed`).
+- Do not register a new service worker or change live-proof alert registration in this phase.
+
 ### Phase 3 - service-worker alignment
 
 1. Decide whether Chrome install prompting is worth registering a service worker before notification opt-in.
 2. If yes, extend the existing root service worker instead of adding another one.
 3. Add only a pass-through `fetch` handler at first.
 4. Avoid asset/API caching until cache invalidation is documented against `DEVICE_SHELL_ASSET_VERSION`.
+
+Decision: register the existing `/sw-live-proof.mjs` from the install UX path. This supports installability without introducing a second root-scoped worker. The worker stays network-only for fetches and live-proof polling remains disabled until browser alerts are explicitly enabled.
+
+Implementation notes:
+
+- `site/js/pwa-service-worker.mjs` owns the lightweight app-shell registration helper.
+- `device-browser-notifications-sw.mjs` reuses that helper so install UX and browser alerts cannot compete over root scope.
+- Turning off browser alerts disables live-proof state and periodic sync, but it does not unregister the app service worker.
+- The fetch handler is `fetch(event.request)` only; no shell, resolver, scan, or API caching is introduced.
 
 ### Phase 4 - QA and broader rollout
 
