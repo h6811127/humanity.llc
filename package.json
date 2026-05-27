@@ -30,6 +30,7 @@
     "e2e:install": "playwright install chromium webkit",
     "e2e:safari": "playwright test e2e/safari-shell-scroll.spec.ts",
     "e2e:scan-page-dot": "playwright test e2e/scan-page-dot.spec.ts",
+    "e2e:scan-hero-visual": "playwright test e2e/scan-hero-visual.spec.ts",
     "site:generate-scan-e2e-fixture": "tsx worker/scripts/generate-scan-e2e-fixture.ts",
     "site:vendor-qr": "esbuild node_modules/qrcode/lib/browser.js --bundle --format=esm --platform=browser --outfile=site/js/vendor/qrcode.mjs",
     "site:seed-showcase": "node worker/scripts/seed-showcase-status-plate.mjs",

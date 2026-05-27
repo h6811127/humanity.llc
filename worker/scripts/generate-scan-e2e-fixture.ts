@@ -1,7 +1,7 @@
 /**
- * Writes a static scan page for Playwright (Pages :8788, no Worker DB).
+ * Writes static scan pages for Playwright (Pages :8788, no Worker DB).
  * Run: npm run site:generate-scan-e2e-fixture
- * @see docs/SCAN_PAGE_DEVICE_DOT.md § Test plan (E2E)
+ * @see docs/SCAN_PAGE_DEVICE_DOT.md · docs/SCAN_HERO_CARD_VISUAL_SPEC.md
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -19,12 +19,11 @@ import {
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const outDir = join(root, "site/e2e-fixtures");
-const outPath = join(outDir, "scan-active.html");
 
 /** Pages dev origin so module scripts load from the same host as Playwright baseURL. */
 const PAGES_ORIGIN = "http://127.0.0.1:8788";
 
-function card(): CardRow {
+function card(overrides: Partial<CardRow> = {}): CardRow {
   return {
     profile_id: SHOWCASE_PROFILE,
     public_key: "pk",
@@ -35,10 +34,11 @@ function card(): CardRow {
     card_document_json: "{}",
     created_at: "2026-05-16T17:00:00Z",
     updated_at: "2026-05-16T17:00:00Z",
+    ...overrides,
   };
 }
 
-function qr(): QrCredentialRow {
+function qr(overrides: Partial<QrCredentialRow> = {}): QrCredentialRow {
   return {
     qr_id: SHOWCASE_QR,
     profile_id: SHOWCASE_PROFILE,
@@ -53,6 +53,7 @@ function qr(): QrCredentialRow {
     credential_document_json: "{}",
     created_at: "2026-05-16T17:00:00Z",
     updated_at: "2026-05-16T17:00:00Z",
+    ...overrides,
   };
 }
 
@@ -71,23 +72,45 @@ function summary(): VerificationSummaryRow {
   };
 }
 
-async function main() {
-  const vm = buildScanViewModel(
-    SHOWCASE_PROFILE,
-    SHOWCASE_QR,
-    {
-      card: card(),
-      qr: qr(),
-      verification: summary(),
-      revocationDisplay: null,
-    },
-    PAGES_ORIGIN
-  );
-
+async function writeFixture(fileName: string, vm: ReturnType<typeof buildScanViewModel>) {
   const html = await renderScanPage(vm, PAGES_ORIGIN);
-  mkdirSync(outDir, { recursive: true });
+  const outPath = join(outDir, fileName);
   writeFileSync(outPath, html, "utf8");
   console.log(`Wrote ${outPath}`);
+}
+
+async function main() {
+  mkdirSync(outDir, { recursive: true });
+
+  await writeFixture(
+    "scan-active.html",
+    buildScanViewModel(
+      SHOWCASE_PROFILE,
+      SHOWCASE_QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: summary(),
+        revocationDisplay: null,
+      },
+      PAGES_ORIGIN
+    )
+  );
+
+  await writeFixture(
+    "scan-revoked.html",
+    buildScanViewModel(
+      SHOWCASE_PROFILE,
+      "qr_e2e_revoked_fixture",
+      {
+        card: card(),
+        qr: qr({ qr_id: "qr_e2e_revoked_fixture", status: "revoked" }),
+        verification: summary(),
+        revocationDisplay: null,
+      },
+      PAGES_ORIGIN
+    )
+  );
 }
 
 main().catch((err) => {

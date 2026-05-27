@@ -1,6 +1,6 @@
 # Scan hero card — visual spec (live check)
 
-**Status:** Active — **v2 depth shipped** (`pass-v33`); tier-4 hero plate + dark mode + automated contract tests. Manual QA: § Implementation checklist step 5 · [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) P1-SD steps 8–9.  
+**Status:** Active — **v2 depth complete** (`pass-v33`): tier-4 hero plate, dark mode, Vitest + Playwright regression. Residual manual: production WebKit device pass — [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) P1-SD steps 8–9 (Safari/iPhone if E2E green).  
 **Audience:** Product, design, frontend  
 **Component name:** **Live check hero** (resolver plate)  
 **Related:** [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) (motion) · [`M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) (layout) · [`SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) (copy IA) · [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § Emphasis notice cards · [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md)
@@ -231,6 +231,8 @@ Canonical timeline: [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md). Implementa
 | `site/js/scan-page-dot.mjs` | L1 settle sync |
 | `site/js/scan-actor-band*.mjs` | L3 band after settle |
 | `worker/tests/scan-hero-visual-contract.test.ts` | v2 CSS + markup contract |
+| `e2e/scan-hero-visual.spec.ts` | Playwright: plate, settle, dark, reduced motion, revoked |
+| `site/e2e-fixtures/scan-revoked.html` | Revoked QR fixture (generate with active) |
 
 After `scan-pass.css` changes: `npm run worker:bundle-scan`.
 
@@ -238,7 +240,8 @@ After `scan-pass.css` changes: `npm run worker:bundle-scan`.
 npm run worker:test -- worker/tests/scan-hero-visual-contract.test.ts worker/tests/scan-hero-snapshot.test.ts worker/tests/scan-page-dot-contract.test.ts worker/tests/scan-live-check-arrive-core.test.ts worker/tests/scan-safety.test.ts worker/tests/scan.test.ts
 npm run worker:test:scan-live-check-arrive
 npm run site:generate-scan-e2e-fixture
-npm run e2e -- e2e/scan-page-dot.spec.ts
+npm run e2e:scan-page-dot
+npm run e2e:scan-hero-visual
 ```
 
 Prototype (timing tune): `npm run pages:dev` → `/prototypes/scan-trust-ui-demo.html`
@@ -253,7 +256,7 @@ When raising the hero to tier 4:
 2. ~~Apply to `.scan-hero.scan-status-panel` at rest; ensure `scan-safety--pulse` still has headroom above resting shadow.~~ **Done** (`scan-hero-settle-pulse`)
 3. ~~Add dark hero fill overrides in `theme-dark.css` (scan pages that honor `data-theme`).~~ **Done** (+ bundled `scan-pass.css` dark block, `SCAN_PAGE_THEME_BOOTSTRAP`)
 4. ~~Update this doc **Status** line and snapshot tests if class list or tokens change.~~ **Done** — `scan-hero-visual-contract.test.ts`, revoked/expired hero snapshots, regenerate `site/e2e-fixtures/scan-active.html`
-5. Manual: light + dark, active + revoked, reduced motion, first paint → settle on mobile Safari — [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-SD** steps 8–9
+5. ~~Manual: light + dark, active + revoked, reduced motion, first paint → settle on mobile Safari~~ **Automated:** `npm run e2e:scan-hero-visual` (Chromium). **Residual manual:** real-device Safari/WebKit if needed — [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-SD** steps 8–9
 
 ---
 
@@ -266,3 +269,4 @@ When raising the hero to tier 4:
 | 2026-05-26 | v2 step 2: `.scan-hero.scan-status-panel` uses token at rest; `scan-hero-settle-pulse` for Path 2 settle |
 | 2026-05-26 | v2 step 3: `--hc-scan-hero-fill` / dark overrides; Worker `hc_theme` bootstrap; bundled scan dark CSS |
 | 2026-05-26 | v2 step 4: `scan-hero-visual-contract.test.ts`; revoked/expired snapshots; QA steps in DEVICE_OS_QA |
+| 2026-05-26 | v2 step 5: `e2e/scan-hero-visual.spec.ts`; `scan-revoked.html` fixture; `e2e:scan-hero-visual` |
