@@ -18,7 +18,7 @@ The open hub read as a **solid white slab** with a generic grey toolbar wedged u
 |------|----------------|
 | **Glass on inset groups, not sheet blur budget** | Hub sheet uses `--surface-popover-bg-glass` gradient fill + `--shell-blur` on the sheet chrome only. Row and alert cards use `--hc-emphasis-card-backdrop` on **nested** surfaces. Vitest forbids regressing sheet-level emphasis blur on `.device-hub--sheet`. |
 | **Semantic card tiers** | **Info** glass — saved rows, inline search. **Warn** glass — Monitoring toolbar. **Urgent** emphasis — live proof waiting group. |
-| **Red budget** | Brand red reserved for **Create** (section pill), **Prove live** (`.hub-card-control--primary`), and primary CTAs elsewhere. **Open controls** demotion to popover control surface is **optional follow-up** (still red on main as of May 2026). |
+| **Red budget** | Brand red reserved for **Create** (section pill), **Prove live** (`.hub-card-control--primary`), and primary CTAs elsewhere. **Open controls** (`.hub-use-keys`) uses `--surface-popover-control-bg` — not brand red. |
 | **Status hierarchy** | Hub header status chips = canonical network summary. Monitoring card status line complements (**Network checked …** / **Live proof checked …**). Saved rows use unified **checked** recency line — not duplicate pills. |
 | **Reduced transparency** | Sheet, rows, Monitoring, and live-proof waiting cards fall back to opaque fills; backdrop blur disabled (`prefers-reduced-transparency`, coarse pointer). |
 
@@ -55,7 +55,7 @@ Network / live-proof toolbar is a **warn-tinted inset card** with eyebrow **Moni
 
 ### Phase 3 — Saved row polish
 
-Tier-3 saved rows shipped via [`HUB_CARD_3D_AND_SHEET_GLASS.md`](HUB_CARD_3D_AND_SHEET_GLASS.md). Action button hierarchy (demote **Open controls** from red) documented as follow-up in [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md).
+Tier-3 saved rows shipped via [`HUB_CARD_3D_AND_SHEET_GLASS.md`](HUB_CARD_3D_AND_SHEET_GLASS.md). **Open controls** demoted to popover control surface per [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) Phase 5.
 
 ### Phase 4 — Header simplification
 
@@ -101,7 +101,6 @@ Replaced gold section label + plain list with **`hc-emphasis-card--urgent`** car
 
 - `#device-hub-card-disabled-group` emphasis-card alignment (still legacy notice styling).
 - Monitoring eyebrow switching to urgent when live proof pending (optional; skipped).
-- **Open controls** red → popover control surface demotion.
 
 ---
 

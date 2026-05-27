@@ -218,6 +218,10 @@ describe("UI color scheme popover guard", () => {
     assertGuardedRule("site/css/device-shell.css", ".device-hub-live-control-card .device-live-control-open", {
       require: ["--surface-popover-control-bg", "--surface-popover-border"],
     });
+    assertGuardedRule("site/css/device-shell.css", "button.hub-card-action.hub-use-keys", {
+      require: ["--surface-popover-control-bg"],
+      forbid: ["var(--red)"],
+    });
     assertGuardedRule("site/css/device-shell.css", ".device-inbox-sheet", {
       require: [
         "--surface-popover-bg-glass",

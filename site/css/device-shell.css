@@ -1676,9 +1676,9 @@ button.device-hub-notice-banner {
 }
 
 button.hub-card-action.hub-use-keys {
-  background: var(--red);
-  color: var(--white);
-  box-shadow: 0 2px 8px rgba(219, 27, 67, 0.25);
+  background: var(--surface-popover-control-bg);
+  color: var(--surface-popover-control-fg, var(--surface-popover-fg));
+  box-shadow: none;
 }
 
 .hub-card-menu-btn {

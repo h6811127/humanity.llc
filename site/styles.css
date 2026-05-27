@@ -1251,12 +1251,6 @@ body.page-flow.has-shell-chrome .page > main.screen {
   color: var(--black);
 }
 
-.hub-card-item--has-controls .hub-card-actions button.hub-card-action.hub-use-keys {
-  background: var(--shell-fill-secondary, rgba(0, 0, 0, 0.05));
-  color: var(--black);
-  box-shadow: none;
-}
-
 .hub-card-actions {
   display: flex;
   align-items: center;
@@ -1310,11 +1304,8 @@ body.page-flow.has-shell-chrome .page > main.screen {
   background: rgba(0, 0, 0, 0.06);
 }
 
-button.hub-card-action.hub-use-keys {
-  background: var(--red);
-  border: none;
-  color: var(--white);
-  box-shadow: 0 2px 8px rgba(219, 27, 67, 0.22);
+button.hub-card-action.hub-use-keys:active {
+  opacity: 0.9;
 }
 
 .hub-card-menu {
