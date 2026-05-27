@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
+  PWA_APPLE_TOUCH_ICON_PATH,
   PWA_INSTALL_DOC,
   PWA_MANIFEST_PATH,
   PWA_REQUIRED_ICON_SIZES,
@@ -13,6 +14,8 @@ import {
   manifestHasRequiredIconSizes,
   validatePwaManifestShape,
 } from "../../site/js/pwa-install-metadata-core.mjs";
+import { buildScanViewModel } from "../src/resolver/scan-state";
+import { renderScanPage } from "../src/resolver/scan-html";
 
 const root = path.join(fileURLToPath(new URL("../..", import.meta.url)));
 
@@ -92,6 +95,71 @@ describe("PWA metadata on disk (Phase 1 gate)", () => {
       }
       expect(html, rel).toContain('rel="manifest"');
       expect(html, rel).toContain(PWA_MANIFEST_PATH);
+      expect(html, rel).toContain('rel="apple-touch-icon"');
+      expect(html, rel).toContain(PWA_APPLE_TOUCH_ICON_PATH);
     }
+  });
+
+  it("icon PNGs exist on disk after Phase 1", () => {
+    const manifestPath = path.join(root, "site/manifest.webmanifest");
+    if (!fs.existsSync(manifestPath)) return;
+    for (const size of PWA_REQUIRED_ICON_SIZES) {
+      expect(fs.existsSync(path.join(root, `site/icons/pwa-${size}.png`))).toBe(true);
+    }
+    expect(fs.existsSync(path.join(root, "site/icons/pwa-apple-touch.png"))).toBe(true);
+  });
+
+  it("create and scan HTML do not link manifest", async () => {
+    const createHtml = fs.readFileSync(path.join(root, "site/create/index.html"), "utf8");
+    expect(createHtml).not.toContain('rel="manifest"');
+
+    const vm = buildScanViewModel(
+      "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+      "qr_test",
+      {
+        card: {
+          profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+          public_key: "pk",
+          handle: "test",
+          handle_normalized: "test",
+          manifesto_line: "line",
+          status: "active",
+          card_document_json: "{}",
+          created_at: "2026-05-16T17:00:00Z",
+          updated_at: "2026-05-16T17:00:00Z",
+        },
+        qr: {
+          qr_id: "qr_test",
+          profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+          epoch: 1,
+          scope: "card",
+          print_artifact_id: null,
+          resolver_hint: "https://humanity.llc",
+          status: "active",
+          payload: "https://humanity.llc/c/x?q=qr_test",
+          issued_at: "2026-05-16T17:00:00Z",
+          expires_at: "2027-05-16T17:00:00Z",
+          credential_document_json: "{}",
+          created_at: "2026-05-16T17:00:00Z",
+          updated_at: "2026-05-16T17:00:00Z",
+        },
+        verification: {
+          profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+          state: "registered",
+          level: 1,
+          label: "Registered",
+          method: "registered",
+          vouch_count: 0,
+          latest_accepted_vouch_at: null,
+          credential_ids_json: "[]",
+          summary_document_json: null,
+          updated_at: "2026-05-16T17:00:00Z",
+        },
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+    const scanHtml = await renderScanPage(vm, "https://humanity.llc");
+    expect(scanHtml).not.toContain('rel="manifest"');
   });
 });

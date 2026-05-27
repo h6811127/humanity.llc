@@ -8,6 +8,9 @@ export const PWA_INSTALL_DOC = "docs/PWA_INSTALL.md";
 /** Canonical manifest URL (Pages static root). */
 export const PWA_MANIFEST_PATH = "/manifest.webmanifest";
 
+/** Apple touch icon for iOS Add to Home Screen (shell pages only). */
+export const PWA_APPLE_TOUCH_ICON_PATH = "/icons/pwa-apple-touch.png";
+
 /** Shell pages that ship manifest link tags and may show install UX. */
 export const PWA_SHELL_HTML_PATHS = [
   "/index.html",
