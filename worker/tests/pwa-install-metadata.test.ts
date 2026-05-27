@@ -13,6 +13,14 @@ const SHELL_PAGES = [
   "site/organizer-revoke/index.html",
 ];
 
+const NON_SHELL_INSTALL_DEFERRED = [
+  "site/help/index.html",
+  "site/features-available-now.html",
+  "site/features/device-hub.html",
+  "site/what-can-a-qr-do.html",
+  "site/shop/index.html",
+];
+
 function readSiteFile(relativePath: string): string {
   return readFileSync(join(root, relativePath), "utf8");
 }
@@ -108,6 +116,24 @@ describe("PWA install metadata", () => {
         '<meta name="apple-mobile-web-app-status-bar-style" content="default" />'
       );
       expect(html, page).toContain('<meta name="theme-color" content="#ffffff" />');
+    }
+  });
+
+  it("keeps broader rollout gated to shell pages until real-device QA", () => {
+    for (const page of NON_SHELL_INSTALL_DEFERRED) {
+      const html = readSiteFile(page);
+      expect(html, page).not.toContain('rel="manifest"');
+      expect(html, page).not.toContain("apple-mobile-web-app-capable");
+      expect(html, page).not.toContain("apple-touch-icon");
+    }
+
+    for (const workerHtmlSource of [
+      "worker/src/resolver/scan-html.ts",
+      "worker/src/resolver/scan-out-html.ts",
+    ]) {
+      const src = readSiteFile(workerHtmlSource);
+      expect(src, workerHtmlSource).not.toContain("app.webmanifest");
+      expect(src, workerHtmlSource).not.toContain("apple-mobile-web-app-capable");
     }
   });
 

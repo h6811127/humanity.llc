@@ -145,5 +145,6 @@ describe("PWA install UX", () => {
     const plan = readSiteFile("docs/PWA_INSTALL.md");
     expect(plan).toContain("P1-PWA · Home-screen install and standalone shell");
     expect(plan).toContain("Marketing/docs pages and Worker-generated scan pages remain out of scope");
+    expect(plan).toContain("Rollout gate before adding install metadata beyond shell pages");
   });
 });

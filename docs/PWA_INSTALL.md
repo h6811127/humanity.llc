@@ -1,6 +1,6 @@
 # Mobile home-screen app / PWA install plan
 
-**Status:** Phase 2 install UX in progress  
+**Status:** Phase 4 rollout gate in progress  
 **Audience:** Product, design, and engineers working on the device shell  
 **Related:** [`DEVICE_OS.md`](DEVICE_OS.md), [`DEVICE_INBOX.md`](DEVICE_INBOX.md), [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md), [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md)
 
@@ -107,6 +107,14 @@ Implementation notes:
 - Manual QA lives in `DEVICE_OS_QA.md` as **P1-PWA · Home-screen install and standalone shell**.
 - Phase 4 keeps rollout scoped to shell pages. Marketing/docs pages and Worker-generated scan pages remain out of scope until shell install behavior has real-device sign-off.
 - Real install behavior must be checked on HTTPS; localhost only proves metadata and shell contracts.
+
+Rollout gate before adding install metadata beyond shell pages:
+
+1. Pass **P1-PWA** on iPhone Safari and Android Chrome.
+2. Pass **P0-3** and **P0-W** from a standalone launch.
+3. Confirm browser-alert opt-out does not unregister the root app service worker.
+4. Decide whether marketing/docs pages should launch the app at `/` or remain normal browser pages.
+5. Decide separately whether scan URLs should ever be installable entry points; default is **no**.
 
 ---
 
