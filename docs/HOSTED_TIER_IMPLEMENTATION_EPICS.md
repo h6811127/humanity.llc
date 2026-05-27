@@ -146,7 +146,7 @@ flowchart LR
 | E2.6 | **Partial staging** — push/SSE clients are gated on `steward.hosted` + `notify.push.live_proof`; no production subscribe UI yet |
 | Tests | `worker/tests/device-steward-entitlements-core.test.ts`, `worker/tests/device-steward-entitlements.test.ts`, `e2e/hosted-tier-budget.spec.ts` |
 
-**Next:** E3 server/client quota alignment and E4 push-path validation remain follow-up work.
+**Next:** E4 push-path validation remains follow-up work.
 
 ### Out of scope
 
@@ -181,6 +181,17 @@ flowchart LR
 - Vitest server quota tests
 
 **Note:** Often shipped in **same PR as E2** once E1 is in staging.
+
+### Implementation status (2026-05-27)
+
+| Deliverable | Status |
+|-------------|--------|
+| E3.1–E3.2 | **Staging** — `enforceStewardAutoPollQuota()` meters authenticated live-control auto polls and returns `steward_quota_exceeded` at cap |
+| E3.3 | **Staging** — account hard cap enforced; soft cap remains E6 ops alerting |
+| E3.4 | **Staging** — client pauses automatic polling on server quota 429, shows operator-limit copy, and still allows manual checks |
+| Tests | `worker/tests/steward-quota.test.ts`, `worker/tests/live-control.test.ts`, `worker/tests/device-live-control-inbox-quota.test.ts`, `worker/tests/device-steward-quota-core.test.ts`, `worker/tests/device-hub-network-tools-core.test.ts` |
+
+**Next:** E4 SSE push-path validation remains follow-up work.
 
 ---
 
@@ -356,6 +367,7 @@ flowchart LR
 
 | Date | Note |
 |------|------|
+| 2026-05-27 | **E3 quota alignment staging:** live-control route quota tests + client manual-bypass-after-429 test |
 | 2026-05-27 | **E2 client probe staging:** browser fetch/cache Vitest + hosted budget E2E H1–H3/H5 |
 | 2026-05-26 | **E1 foundation:** migration `0012_steward_hosted.sql`, steward routes behind `HOSTED_STEWARD_ENABLED` |
 | 2026-05-26 | M8 initial implementation epics (planning only) |

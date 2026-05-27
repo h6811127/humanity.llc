@@ -16,6 +16,7 @@ import {
   handlePostStewardSession,
 } from "../src/resolver/steward-hosted";
 import { stewardSchemaReady } from "../src/steward/db";
+import { STEWARD_NULL_DEVICE_CAP_FALLBACK } from "../src/steward/quota";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const ACCOUNT = "acc_TestHostedSteward1";
@@ -56,7 +57,13 @@ function card(publicKey: string): CardRow {
   };
 }
 
-function stewardDb(ownerPublicKey: string) {
+function stewardDb(
+  ownerPublicKey: string,
+  opts: {
+    accountPlanIdOnInsert?: string;
+    hostedEntitlementsJson?: string;
+  } = {}
+) {
   const accounts = new Map<string, Record<string, unknown>>();
   const profiles = new Map<string, string>();
   const sessions = new Map<string, Record<string, unknown>>();
@@ -74,6 +81,7 @@ function stewardDb(ownerPublicKey: string) {
       plan_id: "hosted_steward_v1",
       plan_version: 1,
       entitlements_json:
+        opts.hostedEntitlementsJson ??
         '{"steward.hosted":true,"poll.live_proof.auto_daily_cap":4000}',
       description: "hosted",
     },
@@ -137,7 +145,7 @@ function stewardDb(ownerPublicKey: string) {
           if (sql.includes("INSERT INTO steward_accounts")) {
             accounts.set(String(params[0]), {
               account_id: params[0],
-              plan_id: params[1],
+              plan_id: opts.accountPlanIdOnInsert ?? params[1],
               plan_version: params[2],
               status: params[3],
               effective_from: params[4],
@@ -262,6 +270,57 @@ describe("steward hosted E1", () => {
     };
     expect(ent.plan_id).toBe("reference_free");
     expect(ent.entitlements["poll.live_proof.auto_daily_cap"]).toBe(400);
+  });
+
+  it("reports null auto-poll entitlement limit with the server fair-use fallback", async () => {
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const db = stewardDb(publicKeyBase58, {
+      accountPlanIdOnInsert: "hosted_steward_v1",
+      hostedEntitlementsJson:
+        '{"steward.hosted":true,"poll.live_proof.auto_daily_cap":null}',
+    });
+    const env: Env = { DB: db, HOSTED_STEWARD_ENABLED: "1" };
+    const linkProof = await buildLinkProof(
+      privateKey,
+      publicKeyBase58,
+      "nonce_null_cap_001"
+    );
+
+    const sessionRes = await handlePostStewardSession(
+      new Request("https://humanity.llc/.well-known/hc/v1/steward/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          profile_id: PROFILE,
+          device_id: DEVICE,
+          link_proof: linkProof,
+        }),
+      }),
+      env,
+      db
+    );
+    const sessionBody = (await sessionRes.json()) as { token: string };
+
+    const entRes = await handleGetStewardEntitlements(
+      new Request("https://humanity.llc/.well-known/hc/v1/steward/entitlements", {
+        headers: {
+          Authorization: `Bearer ${sessionBody.token}`,
+          "X-HC-Device-Id": DEVICE,
+        },
+      }),
+      env,
+      db
+    );
+
+    expect(entRes.status).toBe(200);
+    const ent = (await entRes.json()) as {
+      entitlements: Record<string, unknown>;
+      usage: { limits: Record<string, number> };
+    };
+    expect(ent.entitlements["poll.live_proof.auto_daily_cap"]).toBeNull();
+    expect(ent.usage.limits["poll.live_proof.auto"]).toBe(
+      STEWARD_NULL_DEVICE_CAP_FALLBACK
+    );
   });
 
   it("lists public plans when enabled", async () => {

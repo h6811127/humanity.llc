@@ -29,6 +29,7 @@ import {
   stewardPushConnectionCount,
   stewardPushIpAtLimit,
 } from "../steward/push";
+import { STEWARD_NULL_DEVICE_CAP_FALLBACK } from "../steward/quota";
 import { verifyStewardAccountLink } from "../steward/link-proof";
 import { parseEntitlementsJson, utcDayKey } from "../steward/plans";
 import {
@@ -320,7 +321,9 @@ export async function handleGetStewardEntitlements(
   const autoCap =
     typeof entitlements["poll.live_proof.auto_daily_cap"] === "number"
       ? entitlements["poll.live_proof.auto_daily_cap"]
-      : 400;
+      : entitlements["poll.live_proof.auto_daily_cap"] === null
+        ? STEWARD_NULL_DEVICE_CAP_FALLBACK
+        : 400;
 
   const body = {
     version: "1.0",

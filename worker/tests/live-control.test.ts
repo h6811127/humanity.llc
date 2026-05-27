@@ -16,6 +16,8 @@ import {
   handlePostLiveControlChallenge,
   handlePostLiveControlResponse,
 } from "../src/resolver/live-control";
+import type { Env } from "../src/index";
+import { STEWARD_MANUAL_POLL_HEADER } from "../src/steward/quota";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const QR = "qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
@@ -90,12 +92,67 @@ function dbFor(rows: {
   card: CardRow;
   qr: QrCredentialRow;
   verification?: VerificationSummaryRow | null;
+  stewardQuota?: {
+    accountId: string;
+    deviceId: string;
+    cap: number;
+    used: number;
+    increments?: { count: number };
+  };
 }): D1Database {
   const challenges: Record<string, Record<string, unknown>> = {};
+  const event = "poll.live_proof.auto";
+  const dayKey = new Date().toISOString().slice(0, 10);
   return {
     prepare: (sql: string) => ({
       bind: (...params: unknown[]) => ({
         first: async () => {
+          if (sql.includes("sqlite_master")) return { 1: 1 };
+          if (sql.includes("FROM steward_account_profiles")) {
+            return rows.stewardQuota
+              ? { account_id: rows.stewardQuota.accountId }
+              : null;
+          }
+          if (sql.includes("FROM steward_sessions")) {
+            return rows.stewardQuota
+              ? {
+                  token_hash: params[0],
+                  account_id: rows.stewardQuota.accountId,
+                  device_id: rows.stewardQuota.deviceId,
+                  expires_at: new Date(Date.now() + 60_000).toISOString(),
+                }
+              : null;
+          }
+          if (sql.includes("FROM steward_accounts")) {
+            return rows.stewardQuota
+              ? {
+                  account_id: rows.stewardQuota.accountId,
+                  plan_id: "hosted_steward_v1",
+                  plan_version: 1,
+                  status: "active",
+                  effective_from: "2026-05-01T00:00:00.000Z",
+                  effective_until: null,
+                  overrides_json: null,
+                }
+              : null;
+          }
+          if (sql.includes("FROM steward_plan_definitions")) {
+            return rows.stewardQuota
+              ? {
+                  entitlements_json: JSON.stringify({
+                    "poll.live_proof.auto_daily_cap": rows.stewardQuota.cap,
+                  }),
+                }
+              : null;
+          }
+          if (sql.includes("steward_usage_counters") && sql.includes("SELECT count")) {
+            if (!rows.stewardQuota) return { count: 0 };
+            const [, deviceId, metric, windowKey] = params as string[];
+            if (metric === event && windowKey === dayKey && deviceId === rows.stewardQuota.deviceId) {
+              return { count: rows.stewardQuota.used };
+            }
+            return { count: 0 };
+          }
           if (sql.includes("FROM cards")) {
             return {
               ...rows.card,
@@ -126,6 +183,9 @@ function dbFor(rows: {
           return null;
         },
         run: async () => {
+          if (sql.includes("INSERT INTO steward_usage_counters")) {
+            if (rows.stewardQuota?.increments) rows.stewardQuota.increments.count += 1;
+          }
           if (sql.includes("INSERT INTO live_control_challenges")) {
             const [
               challenge_id,
@@ -269,6 +329,84 @@ describe("live control proof alpha", () => {
     );
 
     expect(pendingRes.status).toBe(404);
+  });
+
+  it("returns steward quota 429 before resolving pending challenge when device cap is reached", async () => {
+    const owner = await getTestKeypair();
+    const stewardQuota = {
+      accountId: "acc_liveControlQuota01",
+      deviceId: "dev_live_control_quota",
+      cap: 2,
+      used: 2,
+      increments: { count: 0 },
+    };
+    const db = dbFor({
+      card: card(owner.publicKeyBase58),
+      qr: qr(),
+      stewardQuota,
+    });
+    const env: Env = { DB: db, HOSTED_STEWARD_ENABLED: "1" };
+
+    const pendingRes = await handleGetPendingLiveControlChallenge(
+      new Request(
+        `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/live-control/challenges?qr_id=${QR}`,
+        {
+          headers: {
+            Authorization: "Bearer quota-route-token",
+            "X-HC-Device-Id": stewardQuota.deviceId,
+          },
+        }
+      ),
+      db,
+      PROFILE,
+      env
+    );
+
+    expect(pendingRes.status).toBe(429);
+    const body = (await pendingRes.json()) as {
+      error: string;
+      usage: Record<string, number>;
+    };
+    expect(body.error).toBe("steward_quota_exceeded");
+    expect(body.usage.limit).toBe(2);
+    expect(body.usage["poll.live_proof.auto"]).toBe(2);
+    expect(stewardQuota.increments.count).toBe(0);
+  });
+
+  it("lets manual live-proof checks bypass steward auto-poll quota", async () => {
+    const owner = await getTestKeypair();
+    const stewardQuota = {
+      accountId: "acc_liveControlManual01",
+      deviceId: "dev_live_control_manual",
+      cap: 2,
+      used: 2,
+      increments: { count: 0 },
+    };
+    const db = dbFor({
+      card: card(owner.publicKeyBase58),
+      qr: qr(),
+      stewardQuota,
+    });
+    const env: Env = { DB: db, HOSTED_STEWARD_ENABLED: "1" };
+
+    const pendingRes = await handleGetPendingLiveControlChallenge(
+      new Request(
+        `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/live-control/challenges?qr_id=${QR}`,
+        {
+          headers: {
+            Authorization: "Bearer quota-route-token",
+            "X-HC-Device-Id": stewardQuota.deviceId,
+            [STEWARD_MANUAL_POLL_HEADER]: "1",
+          },
+        }
+      ),
+      db,
+      PROFILE,
+      env
+    );
+
+    expect(pendingRes.status).toBe(404);
+    expect(stewardQuota.increments.count).toBe(0);
   });
 
   it("does not create a challenge for a revoked QR", async () => {

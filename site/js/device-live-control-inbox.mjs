@@ -393,7 +393,7 @@ export async function refreshLiveControlInbox(opts = {}) {
   if (!liveControlPollAllowedByResolverHealth(getResolverHealthStatus())) {
     return pending;
   }
-  if (Date.now() < pollBackoffUntil) return pending;
+  if (!manual && Date.now() < pollBackoffUntil) return pending;
 
   if (!manual) {
     if (!ensurePollLeaderClaim() || !isLiveControlPollLeaderTab()) {
