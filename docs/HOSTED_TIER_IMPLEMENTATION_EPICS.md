@@ -1,6 +1,6 @@
 # Hosted tier — implementation epics (M8)
 
-**Status:** **E1 foundation shipped** (behind `HOSTED_STEWARD_ENABLED`; push/billing in E4/E5)  
+**Status:** **E1 + E5 foundation staging** (behind `HOSTED_STEWARD_ENABLED`; E2 client probe wired; E4 push in E4 epic)  
 **Milestone:** M8 of [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md)  
 **Depends on:** M2–M7 complete; **M4 governance sign-off** before E1 merge to production  
 **Audience:** Engineering, ops
@@ -248,6 +248,23 @@ flowchart LR
 
 - Org seat packs `hosted_org_v1` (Commons Pass)
 - Member-governed billing alternative (unless governance picks before build)
+
+### Deliverables status (2026-05-27)
+
+| # | Item | Status |
+|---|------|--------|
+| E5.1 | Stripe webhook + signature verify | **Staging** — `billing-webhook.ts`, `stripe-webhook-verify.ts` |
+| E5.2 | Map subscription events → plan status | **Staging** — `billing-lifecycle.ts` |
+| E5.3 | 7-day `past_due` grace | **Staging** — lazy expiry on entitlements fetch + webhook |
+| E5.4 | Expired → revoke sessions + close SSE | **Staging** — `db.ts`, `push.ts` |
+| E5.5 | Manual `account_overrides` | Out of band v1 |
+| E5.6 | Checkout / customer portal | Out of scope v1 |
+
+**Migration:** `0013_steward_billing.sql` (billing customer/subscription ids)  
+**Route:** `POST /.well-known/hc/v1/operator/billing/webhook` (requires `STRIPE_WEBHOOK_SECRET`)  
+**Tests:** `worker/tests/billing-lifecycle.test.ts`, `billing-webhook.test.ts`, `stripe-webhook-verify.test.ts`
+
+**Production:** Requires **G0** (M4 sign-off) before enabling webhook secret on production Worker.
 
 ---
 

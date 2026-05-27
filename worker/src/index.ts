@@ -46,6 +46,7 @@ import {
   handleGetStewardPush,
   handlePostStewardSession,
 } from "./resolver/steward-hosted";
+import { handlePostBillingWebhook } from "./http/billing-webhook";
 import { handlePostShopifyOrdersWebhook } from "./http/shopify-orders-webhook";
 import {
   handleGetPrintCatalog,
@@ -66,6 +67,8 @@ export interface Env {
   SCAN_OUT_HMAC_SECRET?: string;
   /** E1 hosted steward API (`1` / `true` to enable). */
   HOSTED_STEWARD_ENABLED?: string;
+  /** E5 Stripe webhook signing secret (`whsec_…`). */
+  STRIPE_WEBHOOK_SECRET?: string;
   /** O-001 Shopify webhook HMAC secret. */
   SHOPIFY_WEBHOOK_SECRET?: string;
   /** O-002 Printify personal access token (server-only). */
@@ -168,6 +171,15 @@ export default {
       }
       const res = await handleGetStewardPush(request, env, env.DB);
       return withCors(request, res);
+    }
+    if (
+      path === "/.well-known/hc/v1/operator/billing/webhook" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return jsonResponse({ error: "database_unconfigured" }, 503);
+      }
+      return handlePostBillingWebhook(request, env, env.DB);
     }
 
     if (

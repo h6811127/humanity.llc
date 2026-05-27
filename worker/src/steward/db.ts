@@ -4,6 +4,13 @@ import {
   type StewardAccountRow,
   type EntitlementMap,
 } from "./plans";
+import type { StewardBillingAccountUpdate } from "./billing-lifecycle";
+import {
+  shouldExpireCanceledAccount,
+  shouldExpirePastDueAccount,
+  stewardUpdateForExpiredAccount,
+} from "./billing-lifecycle";
+import { closeStewardPushConnectionsForAccount } from "./push";
 
 const STEWARD_TABLE = "steward_accounts";
 
@@ -39,11 +46,140 @@ export async function getAccount(
 ): Promise<StewardAccountRow | null> {
   return db
     .prepare(
-      `SELECT account_id, plan_id, plan_version, status, effective_from, effective_until, overrides_json
+      `SELECT account_id, plan_id, plan_version, status, effective_from, effective_until,
+              overrides_json, billing_customer_id, billing_subscription_id
        FROM steward_accounts WHERE account_id = ?`
     )
     .bind(accountId)
     .first<StewardAccountRow>();
+}
+
+export async function getAccountByBillingCustomer(
+  db: D1Database,
+  customerId: string
+): Promise<StewardAccountRow | null> {
+  return db
+    .prepare(
+      `SELECT account_id, plan_id, plan_version, status, effective_from, effective_until,
+              overrides_json, billing_customer_id, billing_subscription_id
+       FROM steward_accounts WHERE billing_customer_id = ?`
+    )
+    .bind(customerId)
+    .first<StewardAccountRow>();
+}
+
+export async function getAccountByBillingSubscription(
+  db: D1Database,
+  subscriptionId: string
+): Promise<StewardAccountRow | null> {
+  return db
+    .prepare(
+      `SELECT account_id, plan_id, plan_version, status, effective_from, effective_until,
+              overrides_json, billing_customer_id, billing_subscription_id
+       FROM steward_accounts WHERE billing_subscription_id = ?`
+    )
+    .bind(subscriptionId)
+    .first<StewardAccountRow>();
+}
+
+/**
+ * Apply billing webhook lifecycle to an existing steward account (E5).
+ * Account must already exist (session link); commerce cannot create hosted rows.
+ */
+export async function applyStewardBillingUpdate(
+  db: D1Database,
+  update: StewardBillingAccountUpdate & {
+    billing_subscription_id?: string | null;
+  }
+): Promise<boolean> {
+  const existing = await getAccount(db, update.account_id);
+  if (!existing) return false;
+
+  const now = new Date().toISOString();
+  const subId =
+    update.billing_subscription_id === undefined
+      ? existing.billing_subscription_id ?? null
+      : update.billing_subscription_id || null;
+
+  await db
+    .prepare(
+      `UPDATE steward_accounts SET
+        plan_id = ?,
+        plan_version = ?,
+        status = ?,
+        effective_from = ?,
+        effective_until = ?,
+        billing_customer_id = ?,
+        billing_subscription_id = ?,
+        updated_at = ?
+       WHERE account_id = ?`
+    )
+    .bind(
+      update.plan_id,
+      update.plan_version,
+      update.status,
+      update.effective_from,
+      update.effective_until,
+      update.billing_customer_id || existing.billing_customer_id || null,
+      subId,
+      now,
+      update.account_id
+    )
+    .run();
+  return true;
+}
+
+/** E5.4 — revoke steward sessions on expired. */
+export async function revokeAllSessionsForAccount(
+  db: D1Database,
+  accountId: string
+): Promise<void> {
+  await db
+    .prepare(`DELETE FROM steward_sessions WHERE account_id = ?`)
+    .bind(accountId)
+    .run();
+}
+
+/**
+ * Lazy lifecycle transitions on entitlement fetch (past_due grace, canceled period end).
+ */
+export async function applyStewardLifecycleTransitions(
+  db: D1Database,
+  accountId: string
+): Promise<StewardAccountRow | null> {
+  const account = await getAccount(db, accountId);
+  if (!account) return null;
+
+  const now = Date.now();
+  if (
+    shouldExpirePastDueAccount(account, now) ||
+    shouldExpireCanceledAccount(account, now)
+  ) {
+    const expired = stewardUpdateForExpiredAccount(account, now);
+    await db
+      .prepare(
+        `UPDATE steward_accounts SET
+          plan_id = ?,
+          status = ?,
+          effective_from = ?,
+          effective_until = NULL,
+          updated_at = ?
+         WHERE account_id = ?`
+      )
+      .bind(
+        expired.plan_id,
+        expired.status,
+        expired.effective_from,
+        new Date(now).toISOString(),
+        accountId
+      )
+      .run();
+    await revokeAllSessionsForAccount(db, accountId);
+    closeStewardPushConnectionsForAccount(accountId);
+    return getAccount(db, accountId);
+  }
+
+  return account;
 }
 
 export async function upsertAccount(

@@ -100,6 +100,20 @@ export function stewardPushConnectionCount(accountId: string): number {
   return connectionsByAccount.get(accountId)?.size ?? 0;
 }
 
+/** E5.4 — drop in-memory SSE sinks when subscription expires. */
+export function closeStewardPushConnectionsForAccount(accountId: string): void {
+  const set = connectionsByAccount.get(accountId);
+  if (!set) return;
+  for (const sink of [...set]) {
+    try {
+      sink.close?.();
+    } catch {
+      /* ignore */
+    }
+  }
+  connectionsByAccount.delete(accountId);
+}
+
 /** @param {string} clientIp */
 export function stewardPushIpAtLimit(clientIp: string): boolean {
   const ip = clientIp.trim() || "unknown";

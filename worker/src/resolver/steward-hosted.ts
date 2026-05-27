@@ -16,6 +16,7 @@ import {
   insertSession,
   linkProfileToAccount,
   listPublicPlans,
+  applyStewardLifecycleTransitions,
   resolveEffectiveEntitlements,
   stewardSchemaReady,
   touchSession,
@@ -291,6 +292,14 @@ export async function handleGetStewardEntitlements(
 
   const auth = await authenticateSession(db, request);
   if (!auth.ok) return auth.response;
+
+  const transitioned = await applyStewardLifecycleTransitions(
+    db,
+    auth.account_id
+  );
+  if (!transitioned) {
+    return errorResponse("NOT_FOUND", "Account not found.", 404);
+  }
 
   const resolved = await resolveEffectiveEntitlements(db, auth.account_id);
   if (!resolved) {

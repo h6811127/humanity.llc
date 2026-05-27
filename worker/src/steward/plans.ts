@@ -14,6 +14,8 @@ export interface StewardAccountRow {
   effective_from: string;
   effective_until: string | null;
   overrides_json: string | null;
+  billing_customer_id?: string | null;
+  billing_subscription_id?: string | null;
 }
 
 export type EntitlementMap = Record<string, boolean | number | null>;
