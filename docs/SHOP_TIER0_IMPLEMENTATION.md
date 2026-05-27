@@ -17,7 +17,7 @@
 | Checkout config | `site/data/shop-config.json` (see `shop-config.example.json`) |
 | Shop UI | `site/js/shop.mjs` + `site/js/shop-config.mjs`  -  Buy vs interest by `checkout_open` |
 | Drop interest (device-local) | `localStorage` `hc_shop_drop_interest` when checkout closed |
-| Post-checkout page | `site/shop/thanks/index.html`  -  link from Shopify thank-you / order status URL |
+| Post-checkout page | `site/shop/thanks/index.html`  -  link from Shopify thank-you / order status URL · **buyer order status lookup** |
 | Hub shortcut | Landing **Shortcuts** → Founding sticker drop |
 | Hero secondary CTA | Landing hero → `/shop/` |
 
