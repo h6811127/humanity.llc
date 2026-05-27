@@ -345,7 +345,7 @@ Engineering checklist once M4 governance checklist is signed ([`HOSTED_TIER_PRIC
 
 | # | Step | Notes |
 |---|------|-------|
-| 1 | Apply D1 migrations | `0012_steward_hosted.sql`, `0013_steward_billing.sql` (remote) |
+| 1 | Apply D1 migrations | `0012_steward_hosted.sql`, `0013_steward_billing.sql` — `npm run hosted:rollout:step1` (local preflight) then `npm run hosted:rollout:step1 -- --remote` |
 | 2 | Deploy Worker with flag off | `HOSTED_STEWARD_ENABLED=0`; smoke public create/scan |
 | 3 | Set production secrets | `OPERATOR_AUDIT_TOKEN`, `STRIPE_WEBHOOK_SECRET` (after G8) |
 | 4 | Enable hosted flag | `HOSTED_STEWARD_ENABLED=1` when ready for stewards |

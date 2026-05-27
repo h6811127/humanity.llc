@@ -78,8 +78,9 @@ Keep existing `version` as **protocol** version only.
 ### Phase 1 — Pages stamp + bootstrap console (shipped)
 
 - [`worker/scripts/generate-build-meta.mjs`](../worker/scripts/generate-build-meta.mjs) writes [`site/js/build-meta.mjs`](../site/js/build-meta.mjs).
-- [`site/js/build-meta-core.mjs`](../site/js/build-meta-core.mjs) — pure helpers (Vitest).
-- [`site/js/device-status-bootstrap.mjs`](../site/js/device-status-bootstrap.mjs) imports meta and logs once on shell pages.
+- [`site/js/build-meta-browser.mjs`](../site/js/build-meta-browser.mjs) — browser-safe helpers (shell imports **only** this file).
+- [`site/js/build-meta-core.mjs`](../site/js/build-meta-core.mjs) — Node generators (`git`, `render*Module`); **never** import from shell pages ([`HUB_DOT_DEAD_INVESTIGATION_2026-05-27.md`](HUB_DOT_DEAD_INVESTIGATION_2026-05-27.md)).
+- [`site/js/device-status-bootstrap.mjs`](../site/js/device-status-bootstrap.mjs) imports `build-meta-browser` and logs once on shell pages.
 - **Commands:** `npm run site:build-meta` · runs automatically before `npm run pages:deploy` and `npm run deploy`.
 
 **Git-connected Pages:** set **Build command** to:
@@ -95,7 +96,7 @@ npm run site:build-meta && npm run build
 ### Phase 2 — Debug-gated hub UI (shipped)
 
 - [`site/js/device-hub-build-stamp.mjs`](../site/js/device-hub-build-stamp.mjs) mounts at the bottom of `#device-hub-body` (before the status-key reference).
-- Shown when `localStorage.hc_debug === "1"` or URL `?hc_debug=1` / `?hc_debug=true` ([`isSiteDebugEnabled()`](../site/js/build-meta-core.mjs)).
+- Shown when `localStorage.hc_debug === "1"` or URL `?hc_debug=1` / `?hc_debug=true` ([`isSiteDebugEnabled()`](../site/js/build-meta-browser.mjs)).
 - Displays `SITE_BUILD_META` as `Site {sha} · shell {n} · {source}`; **Copy build info** writes multi-line text for bug reports.
 - Wired from [`initDeviceHub()`](../site/js/device-hub-ui.mjs) on all shell hub pages.
 - Listed in [`DEVICE_STATUS_SHELL_JS_FILES`](../site/js/device-status-shell-modules.mjs) (bump shell asset version when changing).

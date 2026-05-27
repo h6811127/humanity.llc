@@ -3,7 +3,7 @@
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md - Fix directions §1
  * @see docs/SITE_BUILD_VERSIONING.md - Phase 1 console build stamp
  */
-import { formatSiteBuildConsoleLine } from "./build-meta-core.mjs";
+import { formatSiteBuildConsoleLine } from "./build-meta-browser.mjs";
 import { SITE_BUILD_META } from "./build-meta.mjs";
 import { DEVICE_SHELL_ASSET_VERSION } from "./device-status-shell-modules.mjs";
 

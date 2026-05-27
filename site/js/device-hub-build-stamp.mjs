@@ -8,7 +8,7 @@ import {
   formatSiteBuildHubLabel,
   formatWorkerBuildHubLabel,
   isSiteDebugEnabled,
-} from "./build-meta-core.mjs";
+} from "./build-meta-browser.mjs";
 import { fetchResolverHealthBuild } from "./device-network-health.mjs";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 
@@ -17,12 +17,12 @@ const SITE_LABEL_ID = "device-hub-build-stamp-site";
 const WORKER_LABEL_ID = "device-hub-build-stamp-worker";
 const COPY_ID = "device-hub-build-stamp-copy";
 
-/** @type {import("./build-meta-core.mjs").WorkerBuildMeta | null} */
+/** @type {import("./build-meta-browser.mjs").WorkerBuildMeta | null} */
 let cachedWorkerBuild = null;
 
 /**
  * @param {ParentNode} hubRoot
- * @param {import("./build-meta-core.mjs").SiteBuildMeta} [meta]
+ * @param {import("./build-meta-browser.mjs").SiteBuildMeta} [meta]
  */
 export function mountHubBuildStamp(hubRoot, meta = SITE_BUILD_META) {
   const body =
@@ -91,7 +91,7 @@ async function refreshWorkerBuildLine(stamp) {
 }
 
 /**
- * @param {import("./build-meta-core.mjs").SiteBuildMeta} meta
+ * @param {import("./build-meta-browser.mjs").SiteBuildMeta} meta
  * @param {HTMLButtonElement} button
  */
 async function copyBuildStamp(meta, button) {

@@ -13,9 +13,11 @@ import {
   formatWorkerBuildHubLabel,
   isSiteDebugEnabled,
   parseResolverHealthBuild,
+  SITE_DEBUG_FLAG_KEY,
+} from "../../site/js/build-meta-browser.mjs";
+import {
   renderBuildMetaModule,
   renderWorkerBuildMetaModule,
-  SITE_DEBUG_FLAG_KEY,
 } from "../../site/js/build-meta-core.mjs";
 import { DEVICE_SHELL_ASSET_VERSION } from "../../site/js/device-status-shell-modules.mjs";
 import { SITE_BUILD_META } from "../../site/js/build-meta.mjs";
@@ -65,8 +67,20 @@ describe("site build meta", () => {
     expect(DEFAULT_SITE_BUILD_META.gitSha).toBe("dev");
   });
 
-  it("build-meta-core.mjs is present under site/js", () => {
+  it("build-meta modules are present under site/js", () => {
     expect(fs.existsSync(path.join(siteJsDir, "build-meta-core.mjs"))).toBe(true);
+    expect(fs.existsSync(path.join(siteJsDir, "build-meta-browser.mjs"))).toBe(true);
+  });
+
+  it("build-meta-browser.mjs has no Node built-in imports", () => {
+    const src = fs.readFileSync(path.join(siteJsDir, "build-meta-browser.mjs"), "utf8");
+    expect(src).not.toMatch(/from\s+["']node:/);
+  });
+
+  it("device-status-bootstrap imports browser build-meta only", () => {
+    const src = fs.readFileSync(path.join(siteJsDir, "device-status-bootstrap.mjs"), "utf8");
+    expect(src).toContain("build-meta-browser.mjs");
+    expect(src).not.toMatch(/build-meta-core\.mjs/);
   });
 
   it("isSiteDebugEnabled respects localStorage and URL", () => {

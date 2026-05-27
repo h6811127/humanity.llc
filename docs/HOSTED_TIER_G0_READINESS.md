@@ -68,6 +68,13 @@ OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run worker:check-st
 
 Migrations: `0012_steward_hosted.sql`, `0013_steward_billing.sql`.
 
+**Rollout step 1 (script):**
+
+```bash
+npm run hosted:rollout:step1              # verify:hosted-g0 + local D1 apply
+npm run hosted:rollout:step1 -- --remote  # + production D1 (Cloudflare auth)
+```
+
 Rollout steps: [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout (after G0).
 
 ---

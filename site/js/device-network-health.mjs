@@ -2,7 +2,7 @@
  * Resolver health check for device shell (shared by coordinator + status chrome).
  * @see docs/SITE_BUILD_VERSIONING.md — Phase 4 hub Worker line
  */
-import { parseResolverHealthBuild } from "./build-meta-core.mjs";
+import { parseResolverHealthBuild } from "./build-meta-browser.mjs";
 
 /**
  * @param {string} apiOrigin
@@ -40,7 +40,7 @@ export async function fetchResolverHealth(apiOrigin) {
 
 /**
  * @param {string} apiOrigin
- * @returns {Promise<import("./build-meta-core.mjs").WorkerBuildMeta | null>}
+ * @returns {Promise<import("./build-meta-browser.mjs").WorkerBuildMeta | null>}
  */
 export async function fetchResolverHealthBuild(apiOrigin) {
   const result = await fetchHealthJson(apiOrigin);
