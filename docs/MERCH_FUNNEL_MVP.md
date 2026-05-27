@@ -1,6 +1,6 @@
 # Merch funnel MVP — scan → profile → customize → Printify
 
-**Status:** Active — customizer UI shipped; API-driven story-row hub + same-tab checkout handoff shipped  
+**Status:** Active — Phases 1–8 shipped (shop hub, catalog API, product detail, proof/consent); operator enables checkout in `shop-config.json`
 **Parent:** [`MERCH_LED_V1.md`](MERCH_LED_V1.md) · [`V1_FLOW_AUDIT.md`](V1_FLOW_AUDIT.md) · [`features/Storefront v1.0.md`](features/Storefront%20v1.0.md)  
 **Implementation:** [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) · `site/shop/` · `site/shop/customize/`
 
@@ -64,6 +64,22 @@ See [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) for operator 
 | **6** | Full story-row catalog (~50 SKUs) | **Skeleton shipped** — seed catalog + API rows; launch exposes 3 products |
 | **7** | Product detail pages (`/shop/products/{id}/`) | Shipped |
 | **8** | Proof and consent UX before checkout (SF-003) | Shipped |
+
+---
+
+## Implementation priority stack (2026-05-27)
+
+Ordered work after repo review. Update row status as steps complete. Cross-links: [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) · [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md) · [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Open issues.
+
+| Priority | Work | Type | Status |
+|----------|------|------|--------|
+| **1** | **Merch funnel close-out** — scan → `/shop/customize/` (`scan_customize` ref + CTA); enable Tier 1 in `shop-config.json`; prove one paid personalized order (intent → webhook → mint → Printify submit) | Engineering + operator | **In progress** — scan CTA ✅ · post-create → customize ✅ · operator config + paid E2E remain |
+| **2** | **Phase A trust MVP** — run M5 stranger runbook (3 outsiders, unassisted create → scan → revoke) | Validation | ☐ |
+| **3** | **Hosted steward production rollout** — `hosted:rollout:step*` through step 6 (secrets, flag, CF dashboard, regression) | Ops | ☐ |
+| **4** | **AI P1 product decision** — keep / rename / deterministic-only / remove scan reader (no new L3 user features until Phase A) | Product | ☐ |
+| **5** | **Large-wallet shell performance** — bound `hc_wallet_network_cache`, avoid full-wallet parse on hub/inbox hot paths | Engineering debt | ☐ |
+
+**Rule:** Do not start new L3 user-facing AI surfaces until priority **2** passes. Commerce never grants vouch.
 
 ---
 
@@ -144,6 +160,8 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
 | Shop config | `site/data/shop-config.json` → `personalize.products[]` |
 | Config helpers | `site/js/shop-config.mjs` |
 | Merch attribution | `site/js/merch-funnel-core.mjs` · scan `scan-merch-funnel.mjs` |
+| **Scan → customize CTA** | Active **live object / personal card** scans — `scan-merch-hint` · `hc_ref=scan_customize` |
+| **Post-create → customize** | `scan_customize` / `customize_shop` / `customize_hoodie` → `/shop/customize/` after `POST /cards` |
 | Post-purchase order status | `GET /v1/store/orders/status` · `/shop/thanks/` timeline UI |
 | Store rows API | `GET /v1/store/rows` · `GET /v1/store/products/{product_id}` · `worker/src/store/store-catalog.ts` |
 | Store rows client | `site/js/shop-store-rows-core.mjs` |
@@ -220,8 +238,8 @@ Aggregate metrics only — no PII. Allowed refs:
 
 | Step | Pass? |
 |------|-------|
-| Stranger scans campaign merch; profile loads with limits + create CTA | ✅ scan merch hint + footer CTAs (`scan_customize`) |
-| Create card → `/shop/customize/` detects session | ☐ manual |
+| Stranger scans campaign merch; profile loads with limits + customize CTA | ✅ scan merch hint + footer CTAs (`scan_customize`) |
+| Create card → `/shop/customize/` detects session | ✅ redirect + `loadCardSessionForCustomize` · ☐ manual E2E |
 | Preview shows LIVE OBJECT branded QR on product mockup | ✅ UI |
 | Artifact intent created; attach returns Shopify line attributes | ✅ API tests |
 | Checkout URL includes `properties[artifact_intent_id]` | ✅ `shop-customize-core.test.ts` |

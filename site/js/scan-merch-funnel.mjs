@@ -4,7 +4,7 @@
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import {
   appendMerchRefToCreateUrl,
-  appendMerchRefToHref,
+  appendMerchRefToCustomizeUrl,
   markMerchBeaconSent,
   merchBeaconAlreadySent,
   peekMerchCreateRef,
@@ -25,10 +25,6 @@ function qrIdFromQuery() {
   }
 }
 
-function isMerchFunnelScanPage() {
-  return document.querySelector("[data-merch-funnel='1']") != null;
-}
-
 function isCardOwnerHere(profileId, qrId) {
   if (!profileId || !qrId) return false;
   try {
@@ -46,13 +42,21 @@ function isCardOwnerHere(profileId, qrId) {
   }
 }
 
-function decorateMerchLinks(ref) {
+function isMerchFunnelScanPage() {
+  return document.querySelector("[data-merch-funnel='1']") != null;
+}
+
+function decorateCreateLinks(ref) {
   if (!ref) return;
   for (const anchor of document.querySelectorAll('a[href*="/create"]')) {
     anchor.href = appendMerchRefToCreateUrl(anchor.href, ref);
   }
+}
+
+function decorateCustomizeLinks(ref) {
+  if (!ref) return;
   for (const anchor of document.querySelectorAll('a[href*="/shop/customize"]')) {
-    anchor.href = appendMerchRefToHref(anchor.href, ref);
+    anchor.href = appendMerchRefToCustomizeUrl(anchor.href, ref);
   }
 }
 
@@ -78,7 +82,8 @@ function init() {
   else if (isMerchFunnelScanPage()) persistMerchCreateRef("scan_customize");
 
   const ref = peekMerchCreateRef();
-  decorateMerchLinks(ref);
+  decorateCreateLinks(ref);
+  decorateCustomizeLinks(ref);
 
   if (!ref) return;
 

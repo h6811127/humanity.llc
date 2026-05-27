@@ -7,8 +7,10 @@ import {
 } from "../src/commerce/merch-funnel-core";
 import {
   appendMerchRefToCreateUrl,
-  appendMerchRefToHref,
+  appendMerchRefToCustomizeUrl,
+  buildPostCreateDestinationUrl,
   normalizeMerchRef,
+  shouldPostCreateRedirectToCustomize,
 } from "../../site/js/merch-funnel-core.mjs";
 
 describe("merch-funnel-core (server)", () => {
@@ -46,12 +48,40 @@ describe("merch-funnel-core (client)", () => {
     ).toBe("/wallet/");
   });
 
-  it("appends hc_ref to customize and other shop URLs", () => {
+  it("routes post-create to customize for customize funnel refs", () => {
+    expect(shouldPostCreateRedirectToCustomize("scan_customize")).toBe(true);
+    expect(shouldPostCreateRedirectToCustomize("customize_hoodie")).toBe(true);
+    expect(shouldPostCreateRedirectToCustomize("tier0_shop")).toBe(false);
     expect(
-      appendMerchRefToHref("/shop/customize/", "scan_customize")
+      buildPostCreateDestinationUrl("scan_customize", {
+        origin: "https://humanity.llc",
+        profileId: "prof1",
+        qrId: "qr1",
+        fresh: true,
+      })
+    ).toBe("https://humanity.llc/shop/customize/?hc_ref=scan_customize");
+    expect(
+      buildPostCreateDestinationUrl("tier0_sticker", {
+        origin: "https://humanity.llc",
+        profileId: "prof1",
+        qrId: "qr1",
+        fresh: true,
+      })
+    ).toBe("https://humanity.llc/created/?profile_id=prof1&qr_id=qr1&fresh=1");
+  });
+
+  it("appends hc_ref to customize URLs without overwriting existing ref", () => {
+    expect(
+      appendMerchRefToCustomizeUrl("/shop/customize/", "scan_customize")
     ).toBe("/shop/customize/?hc_ref=scan_customize");
     expect(
-      appendMerchRefToHref("/shop/customize/?product=hoodie", "scan_customize")
-    ).toBe("/shop/customize/?product=hoodie&hc_ref=scan_customize");
+      appendMerchRefToCustomizeUrl(
+        "/shop/customize/?hc_ref=scan_customize",
+        "tier0_shop"
+      )
+    ).toBe("/shop/customize/?hc_ref=scan_customize");
+    expect(
+      appendMerchRefToCustomizeUrl("/shop/", "scan_customize")
+    ).toBe("/shop/");
   });
 });
