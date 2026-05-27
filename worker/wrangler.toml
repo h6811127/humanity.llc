@@ -35,6 +35,13 @@ HOSTED_STEWARD_ENABLED = "1"
 # TIER0_PRINTIFY_PRODUCT_ID = ""
 # TIER0_PRINTIFY_VARIANT_ID = ""
 # TIER0_PRINTIFY_SHIPPING_METHOD = "1"
+# Tier 1 personalized fulfillment (artifact intent → print order queue):
+# PERSONALIZE_HOODIE_PRINTIFY_PRODUCT_ID = ""
+# PERSONALIZE_HOODIE_PRINTIFY_VARIANT_ID = ""
+# PERSONALIZE_HOODIE_PRINTIFY_SHIPPING_METHOD = "1"
+# PERSONALIZE_STICKER_PRINTIFY_PRODUCT_ID = ""
+# PERSONALIZE_STICKER_PRINTIFY_VARIANT_ID = ""
+# PERSONALIZE_STICKER_PRINTIFY_SHIPPING_METHOD = "1"
 # Printify webhook (O-003): register in Printify admin → POST …/v1/print/webhooks/printify
 # PRINTIFY_WEBHOOK_SECRET = ""  # wrangler secret; must match Printify webhook secret
 

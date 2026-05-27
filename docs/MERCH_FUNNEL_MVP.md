@@ -112,8 +112,17 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
 
 4. Deploy Pages. `/shop/customize/` shows **Continue to checkout** when card session exists and `checkout_open` is true.
 5. **Deploy Worker** — `npm run worker:deploy` — `humanity.llc/v1/*` must route to the resolver (else artifact intent returns 405).
-6. Run [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) gates before live payments.
-7. **Apparel QA:** physical scan test on printed hoodie ([`V1_ASSUMPTION_REGISTER.md`](V1_ASSUMPTION_REGISTER.md) A-004).
+6. **Worker env (Tier 1 Printify queue):** after Shopify `orders/paid` webhook validates artifact intent metadata, a print order is queued automatically. Set Printify mappings per product template (secrets via `wrangler secret` where noted):
+
+| Template | Env vars |
+|----------|----------|
+| `hc-hoodie-live-object-v1` | `PERSONALIZE_HOODIE_PRINTIFY_PRODUCT_ID`, `PERSONALIZE_HOODIE_PRINTIFY_VARIANT_ID`, optional `PERSONALIZE_HOODIE_PRINTIFY_SHIPPING_METHOD` |
+| `hc-sticker-square-v1` | `PERSONALIZE_STICKER_PRINTIFY_PRODUCT_ID`, `PERSONALIZE_STICKER_PRINTIFY_VARIANT_ID`, optional `PERSONALIZE_STICKER_PRINTIFY_SHIPPING_METHOD` |
+
+Shared: `PRINTIFY_SUBMIT_ENABLED=1`, `PRINTIFY_API_TOKEN` (secret), `PRINTIFY_SHOP_ID`, `SHOPIFY_WEBHOOK_SECRET` (secret). Operator submits via `POST /v1/print/orders` with `{ commerce_order_id, submit_to_printify: true, shipping_address }` after minting planned QRs — same path as Tier 0 ([`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md)).
+
+7. Run [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) gates before live payments.
+8. **Apparel QA:** physical scan test on printed hoodie ([`V1_ASSUMPTION_REGISTER.md`](V1_ASSUMPTION_REGISTER.md) A-004).
 
 ### Worker route (required)
 
@@ -144,7 +153,7 @@ Aggregate metrics only — no PII. Allowed refs:
 | Preview shows LIVE OBJECT branded QR on product mockup | ✅ UI |
 | Artifact intent created; attach returns Shopify line attributes | ✅ API tests |
 | Checkout URL includes `properties[artifact_intent_id]` | ✅ `shop-customize-core.test.ts` |
-| Paid webhook → Printify queue (operator env) | ☐ operator |
+| Paid webhook → Printify queue (operator env) | ✅ queue on paid webhook · Tier 1 template + Printify env mapping |
 | Printed item scans; bearer warning visible | ☐ physical QA |
 | Owner updates manifesto from phone without reprint | ✅ resolver |
 

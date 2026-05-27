@@ -6,7 +6,11 @@ import {
   printifySubmitEnabled,
   submitPrintifyOrder,
 } from "../src/print/printify-client";
-import { TIER0_BATCH_PRINT_TEMPLATE_ID } from "../src/print/print-catalog";
+import {
+  DEFAULT_PRINT_TEMPLATE_ID,
+  HOODIE_PRINT_TEMPLATE_ID,
+  TIER0_BATCH_PRINT_TEMPLATE_ID,
+} from "../src/print/print-catalog";
 
 const ADDRESS = {
   first_name: "Ada",
@@ -45,6 +49,37 @@ describe("printify-template-config", () => {
       product_id: "prod_abc",
       variant_id: 17887,
       shipping_method: 2,
+    });
+  });
+
+  it("resolves Tier 1 hoodie and sticker mappings from env", () => {
+    expect(
+      resolvePrintifyLineItem(
+        {
+          PERSONALIZE_HOODIE_PRINTIFY_PRODUCT_ID: "hoodie_prod",
+          PERSONALIZE_HOODIE_PRINTIFY_VARIANT_ID: "42",
+        },
+        HOODIE_PRINT_TEMPLATE_ID
+      )
+    ).toEqual({
+      product_id: "hoodie_prod",
+      variant_id: 42,
+      shipping_method: 1,
+    });
+
+    expect(
+      resolvePrintifyLineItem(
+        {
+          PERSONALIZE_STICKER_PRINTIFY_PRODUCT_ID: "sticker_prod",
+          PERSONALIZE_STICKER_PRINTIFY_VARIANT_ID: "99",
+          PERSONALIZE_STICKER_PRINTIFY_SHIPPING_METHOD: "3",
+        },
+        DEFAULT_PRINT_TEMPLATE_ID
+      )
+    ).toEqual({
+      product_id: "sticker_prod",
+      variant_id: 99,
+      shipping_method: 3,
     });
   });
 });

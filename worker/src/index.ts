@@ -94,6 +94,18 @@ export interface Env {
   TIER0_PRINTIFY_VARIANT_ID?: string;
   /** Tier 0 Printify shipping_method id (default 1). */
   TIER0_PRINTIFY_SHIPPING_METHOD?: string;
+  /** Tier 1 personalized hoodie Printify product id. */
+  PERSONALIZE_HOODIE_PRINTIFY_PRODUCT_ID?: string;
+  /** Tier 1 personalized hoodie Printify variant id (integer). */
+  PERSONALIZE_HOODIE_PRINTIFY_VARIANT_ID?: string;
+  /** Tier 1 personalized hoodie Printify shipping_method id (default 1). */
+  PERSONALIZE_HOODIE_PRINTIFY_SHIPPING_METHOD?: string;
+  /** Tier 1 personalized sticker Printify product id. */
+  PERSONALIZE_STICKER_PRINTIFY_PRODUCT_ID?: string;
+  /** Tier 1 personalized sticker Printify variant id (integer). */
+  PERSONALIZE_STICKER_PRINTIFY_VARIANT_ID?: string;
+  /** Tier 1 personalized sticker Printify shipping_method id (default 1). */
+  PERSONALIZE_STICKER_PRINTIFY_SHIPPING_METHOD?: string;
   /** Tier 0 batch sticker: campaign card profile_id (must exist in D1). */
   TIER0_CAMPAIGN_PROFILE_ID?: string;
   /** Tier 0 batch sticker: comma-separated Shopify variant ids. */
