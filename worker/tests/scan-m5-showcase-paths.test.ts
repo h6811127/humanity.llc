@@ -39,7 +39,7 @@ function qr(overrides: Partial<QrCredentialRow> = {}): QrCredentialRow {
     status: "active",
     payload: `https://humanity.llc/c/${SHOWCASE_PROFILE}?q=${SHOWCASE_QR}`,
     issued_at: "2026-05-16T17:00:00Z",
-    expires_at: "2027-05-16T17:00:00Z",
+    expires_at: null,
     credential_document_json: "{}",
     created_at: "2026-05-16T17:00:00Z",
     updated_at: "2026-05-16T17:00:00Z",

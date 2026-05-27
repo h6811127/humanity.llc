@@ -12,6 +12,7 @@ import {
   resolveScanMalformedReason,
   type ScanMalformedReason,
 } from "./scan-malformed-hint";
+import { isQrCalendarExpired } from "./merch-qr-policy";
 
 export const QR_ID_REGEX =
   /^qr_[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{8,40}$/;
@@ -224,7 +225,7 @@ export function buildScanViewModel(
       tone: "warn",
     });
   }
-  if (qr.status === "expired" || isQrPastExpiry(qr.expires_at, now)) {
+  if (qr.status === "expired" || isQrCalendarExpired(qr.scope, qr.expires_at, now)) {
     return statusView(
       "qr_expired",
       card,
@@ -398,12 +399,6 @@ function statusView(
     },
     origin
   );
-}
-
-function isQrPastExpiry(expiresAt: string | null, now: Date): boolean {
-  if (!expiresAt) return false;
-  const t = Date.parse(expiresAt);
-  return Number.isFinite(t) && t < now.getTime();
 }
 
 function malformedView(

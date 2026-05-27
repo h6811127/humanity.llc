@@ -1,3 +1,4 @@
+import { PRINT_ARTIFACT_NO_CALENDAR_EXPIRY_NOTE } from "./merch-qr-policy";
 import type { ScanViewModel } from "./scan-state";
 import {
   parseManifestoDisplay,
@@ -75,7 +76,7 @@ export async function renderScanPage(
       ${renderScanHeroSection(vm, safety, origin, qrMarkup)}
       ${renderScanActorBand(vm, origin)}
       ${renderScanTrustModules(vm, safety)}
-      ${renderLimitsSettings(origin)}
+      ${renderLimitsSettings(vm, origin)}
       ${renderTrustGroups(vm, origin)}
       ${renderScanUrlControl(vm)}
       ${renderFooter(vm, origin)}
@@ -272,7 +273,10 @@ function renderStewardStrip(
   if (vm.handle && !opts.omitHandle) {
     parts.push(`Controlled by @${vm.handle}`);
   }
-  const expiry = formatQrExpiryLabel(vm.qrExpiresAt);
+  const expiry =
+    vm.qrScope === "print_artifact"
+      ? null
+      : formatQrExpiryLabel(vm.qrExpiresAt);
   if (expiry && vm.kind === "active") {
     parts.push(`Valid until ${expiry}`);
   }
@@ -861,6 +865,16 @@ function qrGroupRows(vm: ScanViewModel): string {
       ? "Printed item  -  revoke one artifact without killing the card"
       : "Card-scoped credential";
   const rows = [listRow("qr", qrStatusIconTone(vm), status, scope)];
+  if (vm.qrScope === "print_artifact" && vm.kind === "active") {
+    rows.push(
+      listRow(
+        "qr",
+        "green",
+        "No calendar expiry",
+        "This object QR stays valid until the owner revokes or replaces it"
+      )
+    );
+  }
   if (vm.qrId) {
     rows.push(listRow("profile", "blue", "Credential", vm.qrId));
   }
@@ -1412,9 +1426,13 @@ function liveControlApiOrigin(vm: ScanViewModel, fallback: string): string {
 }
 
 /** iOS-style settings row  -  all “does not prove” copy in one place. */
-function renderLimitsSettings(origin: string): string {
+function renderLimitsSettings(vm: ScanViewModel, origin: string): string {
   const policy = `${origin}/data-policy.html`;
   const architecture = `${origin}/architecture.html`;
+  const artifactExpiryNote =
+    vm.qrScope === "print_artifact" && vm.kind === "active"
+      ? `<li>${escapeHtml(PRINT_ARTIFACT_NO_CALENDAR_EXPIRY_NOTE)}</li>`
+      : "";
   return `<details class="scan-limits-settings scan-trust-layer scan-limits-layer" id="scan-limits-settings">
   <summary class="scan-limits-summary">
     ${scanListIcon("orange", "shield")}
@@ -1431,6 +1449,7 @@ function renderLimitsSettings(origin: string): string {
       <li>That social vouches were honest or complete</li>
       <li>Permanent ownership of a physical item (lifecycle transitions can change state)</li>
       <li>Who scanned, when, or where  -  this page returns object state, not a people trail</li>
+      ${artifactExpiryNote}
     </ul>
     <p class="scan-limits-meta">No scan analytics on this page. <a href="${escapeHtml(policy)}">Operator data policy</a> · <a href="${escapeHtml(architecture)}">Architecture</a></p>
   </div>
