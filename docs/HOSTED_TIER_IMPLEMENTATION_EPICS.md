@@ -99,7 +99,7 @@ flowchart LR
 | Tests | `worker/tests/steward-hosted.test.ts`, `worker/tests/steward-quota.test.ts` |
 | Flag | `HOSTED_STEWARD_ENABLED` default **`0`** in `worker/wrangler.toml`; set **`1`** locally after `npm run worker:migrate:local` |
 
-**Next after G0:** merge E1 to production with flag off; start **E2** client probe (`device-steward-entitlements-core.mjs`).
+**Next after G0:** merge E1 to production with flag off; keep E2 client probe staged until E3/E4 validation is ready.
 
 ---
 
@@ -114,7 +114,7 @@ flowchart LR
 | # | Item |
 |---|------|
 | E2.1 | `device-steward-entitlements-core.mjs` — fetch, cache ≤300s, merge policy |
-| E2.2 | `sessionStorage` `hc_steward_session` + `hc_device_id` (first visit UUID) |
+| E2.2 | `sessionStorage` `hc_steward_session` + `localStorage` `hc_device_id` (first visit UUID) |
 | E2.3 | Hub expand / visibility: fetch entitlements when keys present |
 | E2.4 | Wire `device-live-control-poll-budget-core`, scheduler, scale, SW modules to **resolved policy** not hard-coded 400 |
 | E2.5 | Hub UI: hosted indicator line (no “premium verified” copy — M5) |
@@ -137,6 +137,16 @@ flowchart LR
 - Vitest: 400 vs 4000 cap; 401 → free fallback
 - E2E H1–H3, H5 (M7)
 - Manual P1-8 when enabled
+
+### Implementation status (2026-05-27)
+
+| Deliverable | Status |
+|-------------|--------|
+| E2.1–E2.5 | **Staging** — `device-steward-entitlements*.mjs` resolves/caches policy; budget, scheduler, scale, SW, and hub copy consume resolved policy |
+| E2.6 | **Partial staging** — push/SSE clients are gated on `steward.hosted` + `notify.push.live_proof`; no production subscribe UI yet |
+| Tests | `worker/tests/device-steward-entitlements-core.test.ts`, `worker/tests/device-steward-entitlements.test.ts`, `e2e/hosted-tier-budget.spec.ts` |
+
+**Next:** E3 server/client quota alignment and E4 push-path validation remain follow-up work.
 
 ### Out of scope
 
@@ -356,6 +366,7 @@ flowchart LR
 
 | Date | Note |
 |------|------|
+| 2026-05-27 | **E2 client probe staging:** browser fetch/cache Vitest + hosted budget E2E H1–H3/H5 |
 | 2026-05-26 | **E1 foundation:** migration `0012_steward_hosted.sql`, steward routes behind `HOSTED_STEWARD_ENABLED` |
 | 2026-05-26 | M8 initial implementation epics (planning only) |
 | 2026-05-27 | **E6 start:** operator steward ops snapshot + hosted ops runbook |
