@@ -53,9 +53,9 @@ Canonical boundary: [`LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md`](LOCALIZED_OBJE
 
 ### Design principles (locked)
 
-- **Object-scoped** — one card / one QR handle
-- **Signed** — stewards publish mutable copy with keys; models never write resolver state
-- **Revocable** — same lifecycle as the card
+- **Object-scoped** — one root card controls one child object / QR handle at a time
+- **Signed** — stewards publish mutable copy with root keys; models never write resolver state
+- **Revocable** — root and child lifecycle stay explicit
 - **Read-only at scan** — strangers consume resolver state by default
 - **No generative resolver truth** — model text is never stored in D1 or shown without an explicit non-signed label
 
