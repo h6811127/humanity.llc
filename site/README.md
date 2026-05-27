@@ -40,6 +40,10 @@ npm run deploy
 
 **Custom domain:** `humanity.llc`
 
+### Unknown URLs (404)
+
+Pages serves `404.html` with HTTP **404** for paths that do not match a file when **SPA / single-page fallback is disabled** in the project. If fallback is enabled, unknown URLs return **200** with the landing shell — disable it so broken links get a real not-found page.
+
 ## Files
 
 | File | Purpose |
@@ -66,6 +70,7 @@ npm run deploy
 | `js/pass-flip.js` | Pass card tilt (touch + desktop), tap-to-flip (landing + scan) |
 | `_headers` | Security and cache headers |
 | `_redirects` | `/create` → `/create/` (301; avoid `create.html`  -  Pages strips `.html` and loops) |
+| `404.html` | Custom **404** for unknown Pages paths (disable SPA fallback or unknown URLs serve landing with 200) |
 | `assets/red_qr_transparent_bg.png` | Favicon, brand mark, card preview |
 
 ### Homepage showcase card

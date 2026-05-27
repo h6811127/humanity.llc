@@ -125,6 +125,8 @@ Resolver health at test time: `GET /.well-known/hc/v1/health` → `{"status":"ok
 
 ### P1-3 · Unknown Pages paths return 200 (landing), not 404
 
+**Status (2026-05-26):** Fix shipped — `site/404.html` for Cloudflare Pages; disable SPA fallback in project settings. Re-verify: `curl -sI https://humanity.llc/nonsense-page-xyz` → **404**.
+
 **Steps**
 
 - `curl -I https://humanity.llc/nonsense-page-xyz` → **200** (serves site shell / index).

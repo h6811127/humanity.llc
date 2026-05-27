@@ -1,4 +1,5 @@
 # Cloudflare Pages  -  use directory index files (same pattern as /created/).
 # Do not rewrite /create → create.html (Pages 308-strips .html and causes a redirect loop).
+# Unknown paths: site/404.html (HTTP 404). Disable SPA fallback in Pages project settings.
 
 /create  /create/  301
