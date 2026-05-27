@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
 import { renderScanPage, SCAN_UI_VERSION } from "../src/resolver/scan-html";
-import { SCAN_HERO_LIVE_OBJECT_FOOT, LOST_ITEM_RELAY_CREATE_HINT, LOST_ITEM_RELAY_CREATE_PATH } from "../src/resolver/scan-safety";
+import { SCAN_HERO_LIVE_OBJECT_FOOT, LOST_ITEM_RELAY_CREATE_HINT, LOST_ITEM_RELAY_CREATE_PATH, MERCH_SCAN_CREATE_PATH, MERCH_SCAN_CUSTOMIZE_PATH, MERCH_SCAN_FUNNEL_HINT } from "../src/resolver/scan-safety";
 import { BEARER_WARNING } from "../src/resolver/trust-copy";
 import { buildScanViewModel } from "../src/resolver/scan-state";
 import {
@@ -129,6 +129,12 @@ describe("M5 showcase scan paths", () => {
     expect(html).not.toContain("Signed object verified by resolver");
     expect(html).toContain("This QR");
     expect(html).not.toContain("QR on this page");
+    expect(html).toContain('data-merch-funnel="1"');
+    expect(html).toContain("scan-merch-hint");
+    expect(html).toContain(MERCH_SCAN_CREATE_PATH);
+    expect(html).toContain(MERCH_SCAN_CUSTOMIZE_PATH);
+    expect(html).toContain(MERCH_SCAN_FUNNEL_HINT);
+    expect(html).toContain("Get yours on wear");
   });
 
   it("status plate: object label H1, status line, door foot copy", async () => {
@@ -140,6 +146,8 @@ describe("M5 showcase scan paths", () => {
       "Scan shows current status for this place - not who owns the door."
     );
     expect(html).not.toMatch(/<h1 class="[^"]*scan-hero-title[^"]*">@river_example<\/h1>/);
+    expect(html).not.toContain('data-merch-funnel="1"');
+    expect(html).not.toContain("scan-merch-hint");
   });
 
   it("status plate: object_streams show detail cards and limit copy", async () => {
