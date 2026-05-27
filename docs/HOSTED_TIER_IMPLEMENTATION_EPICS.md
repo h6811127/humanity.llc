@@ -1,6 +1,6 @@
 # Hosted tier — implementation epics (M8)
 
-**Status:** **E1 + E5 foundation staging** (behind `HOSTED_STEWARD_ENABLED`; E2 client probe wired; E4 push in E4 epic)  
+**Status:** **E1-E5 foundation staging** (behind `HOSTED_STEWARD_ENABLED`; E6 ops runbook started)  
 **Milestone:** M8 of [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md)  
 **Depends on:** M2–M7 complete; **M4 governance sign-off** before E1 merge to production  
 **Audience:** Engineering, ops
@@ -288,6 +288,15 @@ flowchart LR
 - Runbook reviewed by ops
 - Tabletop: expired subscription → free tier behavior
 
+### Implementation status (2026-05-27)
+
+| Deliverable | Status |
+|-------------|--------|
+| E6.1 | Started — [`HOSTED_TIER_OPS_RUNBOOK.md`](HOSTED_TIER_OPS_RUNBOOK.md) defines the Cloudflare/D1/Stripe dashboard inputs to wire in ops tooling |
+| E6.2 | Started — daily alert signals documented in [`HOSTED_TIER_OPS_RUNBOOK.md`](HOSTED_TIER_OPS_RUNBOOK.md) |
+| E6.3 | **Staging** — suspend/status, 1027, fair-use, push degraded, and downgrade runbook |
+| E6.4 | **Staging** — customer-facing macros in [`HOSTED_TIER_SUPPORT_MACROS.md`](HOSTED_TIER_SUPPORT_MACROS.md) |
+
 ### Out of scope
 
 - Per-tenant billing UI in product (v1 = Stripe dashboard)
@@ -339,6 +348,8 @@ flowchart LR
 | [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) | Wire formats |
 | [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) | G0, lifecycle |
 | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) | M7 tests |
+| [`HOSTED_TIER_OPS_RUNBOOK.md`](HOSTED_TIER_OPS_RUNBOOK.md) | E6 operator procedures |
+| [`HOSTED_TIER_SUPPORT_MACROS.md`](HOSTED_TIER_SUPPORT_MACROS.md) | E6 customer replies |
 
 ---
 
@@ -346,5 +357,6 @@ flowchart LR
 
 | Date | Note |
 |------|------|
+| 2026-05-27 | **E6 started:** ops runbook + support macros for hosted steward staging |
 | 2026-05-26 | **E1 foundation:** migration `0012_steward_hosted.sql`, steward routes behind `HOSTED_STEWARD_ENABLED` |
 | 2026-05-26 | M8 initial implementation epics (planning only) |
