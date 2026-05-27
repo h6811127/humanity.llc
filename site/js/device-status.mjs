@@ -409,6 +409,7 @@ function renderShellStatusLine(segments) {
 function renderHubStatusPanel(segments) {
   if (!hubStatusPanel) return;
   const items = hubStatusLineItemsFromSegments(segments);
+  const statusText = items.map((item) => item.label).join(" · ");
   const parts = items.map((item, index) => {
     const cls = [
       "device-hub-status-item",
@@ -422,10 +423,10 @@ function renderHubStatusPanel(segments) {
     const separator =
       index === 0
         ? ""
-        : `<span class="device-hub-status-separator" aria-hidden="true">·</span>`;
+        : `<span class="device-hub-status-separator" aria-hidden="true"> · </span>`;
     return `${separator}<span class="${cls}" data-seg="${item.id}" title="${escapeHtml(item.detail)}">${escapeHtml(item.label)}</span>`;
   });
-  hubStatusPanel.innerHTML = `<div class="device-hub-status-line" role="status">${parts.join("")}</div>`;
+  hubStatusPanel.innerHTML = `<div class="device-hub-status-line" role="status" aria-label="${escapeHtml(statusText)}">${parts.join("")}</div>`;
 }
 
 function renderNotifBadge() {
