@@ -3,7 +3,7 @@
 **Status:** Checkout handoff wired (config-driven) · set `shop-config.json` when Shopify product exists  
 **Canonical strategy:** `docs/MERCH_LED_V1.md` Phase B, `docs/FOUNDING_DROP_BRIEF.md` Tier 0  
 **Merch funnel MVP:** `docs/MERCH_FUNNEL_MVP.md` · `/shop/customize/` QR customizer  
-**Merch QR policy:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` (defer `checkout_open: true` until M5 + policy gates)  
+**Merch QR policy:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` (defer `checkout_open: true` until remaining policy gates pass; M5 passed 2026-05-27)  
 **Copy:** `docs/LAUNCH_LANGUAGE_KIT.md` § Tier 0 · Sticker FAQ
 
 ---
@@ -43,7 +43,8 @@ The interest form records **optional email** on this browser only (no server upl
 
 4. In Shopify checkout settings, set **Order status page** or post-purchase link to `https://humanity.llc/shop/thanks/` — see [`SHOPIFY_TIER0_POST_PURCHASE_SETUP.md`](SHOPIFY_TIER0_POST_PURCHASE_SETUP.md) (iPad/Safari steps). When checkout is open, `/shop/` displays the post-purchase URL in the Checkout section for copy-paste.
 5. Deploy Pages. `/shop/` shows **Buy** and hides the interest form.
-6. Run `FOUNDING_DROP_BRIEF.md` and `MERCH_QR_LIFECYCLE_POLICY.md` launch gates before `checkout_open: true` on production.
+6. Deploy Worker — `npm run worker:deploy` — required for `/v1/store/*` (customizer artifact intent).
+7. Run `FOUNDING_DROP_BRIEF.md` and `MERCH_QR_LIFECYCLE_POLICY.md` launch gates before `checkout_open: true` on production.
 
 **Worker (Tier 0 batch fulfillment):** set `TIER0_CAMPAIGN_PROFILE_ID` to the campaign card’s `profile_id` (must exist in D1) and `TIER0_SHOPIFY_VARIANT_IDS` to the Shopify variant id from the cart URL (comma-separated if multiple). Paid webhooks for that SKU queue a batch print order (`hc-tier0-sticker-batch-v1`) without artifact intent metadata.
 

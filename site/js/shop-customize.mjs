@@ -4,7 +4,6 @@
  */
 import { qrScanUrl, resolverApiOrigin } from "./hc-sign.mjs";
 import { renderQrToImage } from "./qr-render.mjs";
-import { credentialCodeFromScanUrl } from "./qr-credential-code.mjs";
 import { loadShopConfig } from "./shop-config.mjs";
 import {
   appendMerchRefToCreateUrl,
@@ -26,8 +25,9 @@ const cardReady = document.getElementById("shop-customize-card-ready");
 const handleEl = document.getElementById("shop-customize-handle");
 const productRow = document.getElementById("shop-customize-products");
 const previewImg = document.getElementById("shop-customize-qr-preview");
+const previewPlaceholder = document.getElementById("shop-customize-qr-placeholder");
+const previewNote = document.getElementById("shop-customize-preview-note");
 const mockEl = document.getElementById("shop-customize-mock");
-const credentialEl = document.getElementById("shop-customize-credential-code");
 const priceEl = document.getElementById("shop-customize-price");
 const statusEl = document.getElementById("shop-customize-status");
 const checkoutBtn = document.getElementById("shop-customize-checkout");
@@ -43,12 +43,26 @@ let cardSession = null;
 let selectedProductId = null;
 /** @type {{ artifact_intent_id: string, planned_item_qr_ids: string[], shopify?: { cart_line_attributes: { key: string, value: string }[] } } | null} */
 let activeIntent = null;
+/** @type {"planned" | "card_fallback" | null} */
+let previewMode = null;
 
 function setStatus(message, isError = false) {
   if (!statusEl) return;
   statusEl.hidden = !message;
   statusEl.textContent = message || "";
   statusEl.className = isError ? "form-status error" : "form-status";
+}
+
+function setPreviewLoading(loading) {
+  mockEl?.classList.toggle("is-loading", loading);
+  if (previewPlaceholder) {
+    previewPlaceholder.hidden = !loading;
+    previewPlaceholder.textContent = loading ? "Generating preview…" : "";
+  }
+}
+
+function showPreviewImage(show) {
+  if (previewImg) previewImg.hidden = !show;
 }
 
 function selectedProduct() {
@@ -80,7 +94,7 @@ function renderProductPicker() {
     const display = personalizeProductDisplay(product);
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "shop-customize-product-btn";
+    btn.className = "create-template-btn shop-customize-product-btn";
     btn.dataset.productId = display.productId;
     btn.textContent = display.title;
     btn.setAttribute("aria-pressed", display.productId === selectedProductId ? "true" : "false");
@@ -90,6 +104,7 @@ function renderProductPicker() {
     btn.addEventListener("click", () => {
       selectedProductId = display.productId;
       activeIntent = null;
+      previewMode = null;
       if (display.preview === "hoodie") {
         persistMerchCreateRef("customize_hoodie");
       }
@@ -110,6 +125,11 @@ function syncMockPreviewKind() {
   const kind =
     product && personalizeProductDisplay(product).preview === "sticker" ? "sticker" : "hoodie";
   mockEl.dataset.preview = kind;
+}
+
+function cardFallbackScanUrl() {
+  if (!cardSession) return null;
+  return cardSession.scan_url || qrScanUrl(cardSession.profile_id, cardSession.qr_id);
 }
 
 async function createArtifactIntent(product) {
@@ -143,19 +163,20 @@ async function createArtifactIntent(product) {
 async function attachArtifactIntent(intentId, product) {
   const display = personalizeProductDisplay(product);
   const origin = resolverApiOrigin();
-  const res = await fetch(`${origin}/v1/store/artifact-intents/${encodeURIComponent(intentId)}/attach`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify({
-      shopify_variant_id: display.shopifyVariantId || undefined,
-    }),
-  });
+  const res = await fetch(
+    `${origin}/v1/store/artifact-intents/${encodeURIComponent(intentId)}/attach`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        shopify_variant_id: display.shopifyVariantId || undefined,
+      }),
+    }
+  );
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     const msg =
-      typeof data.message === "string"
-        ? data.message
-        : "Could not attach order metadata.";
+      typeof data.message === "string" ? data.message : "Could not attach order metadata.";
     throw new Error(msg);
   }
   return data;
@@ -169,6 +190,41 @@ async function ensureIntent(product) {
   return attached;
 }
 
+async function renderPreviewScanUrl(scanUrl) {
+  if (!previewImg || !scanUrl) throw new Error("Preview unavailable.");
+  await renderQrToImage(previewImg, scanUrl);
+  previewImg.alt = "Branded QR preview for your print item";
+  showPreviewImage(true);
+}
+
+function syncCheckoutUi(product) {
+  const checkoutReady =
+    isPersonalizeCheckoutReady(shopConfig, product) && approveEl?.checked;
+  if (checkoutBtn) {
+    checkoutBtn.disabled = !checkoutReady;
+    checkoutBtn.hidden = !isPersonalizeCheckoutReady(shopConfig, product);
+  }
+  if (interestSection) {
+    interestSection.hidden = isPersonalizeCheckoutReady(shopConfig, product);
+  }
+}
+
+function previewStatusMessage(product) {
+  const checkoutOpen = isPersonalizeCheckoutReady(shopConfig, product);
+  if (previewMode === "card_fallback") {
+    return checkoutOpen
+      ? "Showing your card QR while print setup finishes. Confirm limits below to continue."
+      : "Showing your card QR. A unique print code is reserved when personalized checkout opens.";
+  }
+  if (checkoutOpen && approveEl?.checked) {
+    return "Preview ready. Continue to checkout when you are ready.";
+  }
+  if (checkoutOpen) {
+    return "Preview ready. Confirm the limits below to continue.";
+  }
+  return "Preview ready. Personalized checkout opens soon.";
+}
+
 async function refreshPreview() {
   const product = selectedProduct();
   if (!product || !previewImg || !cardSession) return;
@@ -177,46 +233,52 @@ async function refreshPreview() {
   if (priceEl) {
     priceEl.textContent = display.priceDisplay || "Price at checkout";
   }
-  setStatus("Preparing your unique print QR…");
+  setPreviewLoading(true);
+  showPreviewImage(false);
+  setStatus("");
   if (checkoutBtn) checkoutBtn.disabled = true;
+
+  const origin =
+    typeof shopConfig?.site_origin === "string" && shopConfig.site_origin.trim()
+      ? shopConfig.site_origin.trim()
+      : "https://humanity.llc";
+
   try {
     const intent = await ensureIntent(product);
     const plannedQrId = intent.planned_item_qr_ids?.[0];
     if (!plannedQrId) throw new Error("Missing planned QR for preview.");
-    const scanUrl = buildPlannedItemScanUrl(
-      cardSession.profile_id,
-      plannedQrId,
-      shopConfig?.site_origin || location.origin
-    );
-    await renderQrToImage(previewImg, scanUrl);
-    if (credentialEl) {
-      credentialEl.textContent = credentialCodeFromScanUrl(scanUrl) || "";
+    const scanUrl = buildPlannedItemScanUrl(cardSession.profile_id, plannedQrId, origin);
+    await renderPreviewScanUrl(scanUrl);
+    previewMode = "planned";
+    if (previewNote) {
+      previewNote.textContent =
+        "This is your item's planned QR — it goes live after payment and fulfillment. Holding the garment still does not prove you own the card.";
     }
-    const checkoutReady =
-      isPersonalizeCheckoutReady(shopConfig, product) && approveEl?.checked;
-    if (checkoutBtn) {
-      checkoutBtn.disabled = !checkoutReady;
-      checkoutBtn.hidden = !isPersonalizeCheckoutReady(shopConfig, product);
+  } catch {
+    const fallbackUrl = cardFallbackScanUrl();
+    if (!fallbackUrl) throw new Error("Create a card first.");
+    await renderPreviewScanUrl(fallbackUrl);
+    previewMode = "card_fallback";
+    if (previewNote) {
+      previewNote.textContent =
+        "Print preview uses your card QR for now. Each physical item still receives its own unique code at fulfillment.";
     }
-    if (interestSection) {
-      interestSection.hidden = isPersonalizeCheckoutReady(shopConfig, product);
-    }
-    setStatus(
-      checkoutReady
-        ? "Preview ready. Continue to checkout when you approve the limits below."
-        : isPersonalizeCheckoutReady(shopConfig, product)
-          ? "Preview ready. Confirm the limits below to continue."
-          : "Preview ready. Checkout opens when the operator enables this product."
-    );
-  } catch (err) {
-    setStatus(err instanceof Error ? err.message : "Preview failed.", true);
-    if (checkoutBtn) checkoutBtn.disabled = true;
   }
+
+  syncCheckoutUi(product);
+  setStatus(previewStatusMessage(product));
+  setPreviewLoading(false);
 }
 
 async function onCheckoutClick() {
   const product = selectedProduct();
   if (!product || !approveEl?.checked) return;
+  if (previewMode === "card_fallback") {
+    setStatus("Print setup is still finishing. Try again in a moment.", true);
+    activeIntent = null;
+    void refreshPreview();
+    return;
+  }
   setStatus("Opening checkout…");
   if (checkoutBtn) checkoutBtn.disabled = true;
   try {
@@ -257,7 +319,9 @@ async function init() {
   decorateCreateLinks();
 
   approveEl?.addEventListener("change", () => {
-    void refreshPreview();
+    const product = selectedProduct();
+    if (product) syncCheckoutUi(product);
+    setStatus(product ? previewStatusMessage(product) : "");
   });
   checkoutBtn?.addEventListener("click", () => {
     void onCheckoutClick();
@@ -275,7 +339,6 @@ async function init() {
     return;
   }
 
-  // Show current card QR in gate hint if scan_url missing
   if (!session.scan_url) {
     session.scan_url = qrScanUrl(session.profile_id, session.qr_id);
   }

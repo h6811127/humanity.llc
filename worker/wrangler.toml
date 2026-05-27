@@ -48,3 +48,6 @@ crons = ["0 4 * * *"]
  [[routes]]
  pattern = "humanity.llc/c/*"
  zone_id = "180ee38ceea795d281fb5a3bd51af533"
+[[routes]]
+ pattern = "humanity.llc/v1/*"
+ zone_id = "180ee38ceea795d281fb5a3bd51af533"

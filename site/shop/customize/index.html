@@ -12,7 +12,7 @@
       content="Preview your LIVE OBJECT QR on a hoodie or sticker, then checkout through humanity.llc. Buying merch does not verify you."
     />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=81" />
+    <link rel="stylesheet" href="/styles.css?v=121" />
   </head>
   <body class="screen-shop-body">
     <div class="page">
@@ -35,7 +35,7 @@
         </section>
 
         <section
-          class="shop-customize-card-gate"
+          class="shop-customize-card-gate shop-customize-panel"
           id="shop-customize-card-gate"
           aria-labelledby="shop-customize-gate-title"
         >
@@ -58,20 +58,22 @@
         </section>
 
         <section
-          class="shop-customize-ready"
+          class="shop-customize-ready shop-customize-panel"
           id="shop-customize-card-ready"
           hidden
           aria-labelledby="shop-customize-ready-title"
         >
-          <h2 class="group-label" id="shop-customize-ready-title">Your card</h2>
-          <p class="shop-lead">
-            Customizing for <strong id="shop-customize-handle">@handle</strong>. Each unit printed
-            receives its own QR — revoke one item without killing your card.
+          <p class="shop-product-kicker" id="shop-customize-ready-kicker">Your card</p>
+          <h2 class="shop-customize-ready-title" id="shop-customize-ready-title">
+            Customizing for <span id="shop-customize-handle">@handle</span>
+          </h2>
+          <p class="shop-lead shop-lead-muted shop-customize-ready-lead">
+            Each unit printed receives its own QR — revoke one item without killing your card.
           </p>
 
           <h2 class="group-label">Choose product</h2>
           <div
-            class="shop-customize-products flow-segmented"
+            class="create-template-row shop-customize-products"
             id="shop-customize-products"
             role="group"
             aria-label="Product"
@@ -80,20 +82,25 @@
 
           <h2 class="group-label">Preview</h2>
           <div class="shop-customize-preview-wrap">
-            <div class="shop-customize-mock" id="shop-customize-mock" data-preview="hoodie">
-              <div class="shop-customize-mock__garment" aria-hidden="true"></div>
-              <div class="shop-customize-mock__qr-card">
+            <div class="shop-customize-mock is-loading" id="shop-customize-mock" data-preview="hoodie">
+              <div class="shop-customize-mock__garment" aria-hidden="true">
+                <span class="shop-customize-mock__hoodie-neck" aria-hidden="true"></span>
+              </div>
+              <div class="shop-customize-mock__qr-slot">
                 <img
                   class="shop-customize-qr-preview"
                   id="shop-customize-qr-preview"
-                  alt="Branded QR preview for your print item"
+                  alt=""
                   width="220"
                   height="280"
+                  hidden
                 />
-                <p class="shop-customize-credential-code" id="shop-customize-credential-code"></p>
+                <p class="shop-customize-qr-placeholder" id="shop-customize-qr-placeholder">
+                  Generating preview…
+                </p>
               </div>
             </div>
-            <p class="shop-lead shop-lead-muted shop-customize-preview-note">
+            <p class="shop-lead shop-customize-preview-note" id="shop-customize-preview-note">
               Preview uses your item&apos;s planned QR. It activates after payment and fulfillment.
               Strangers still see honest limits — holding the garment does not prove you own the
               card.
@@ -112,20 +119,24 @@
 
           <p class="form-status" id="shop-customize-status" hidden role="status"></p>
 
-          <button type="button" class="btn-primary shop-customize-checkout" id="shop-customize-checkout" hidden>
+          <button
+            type="button"
+            class="btn-primary shop-customize-checkout"
+            id="shop-customize-checkout"
+            hidden
+          >
             Continue to checkout
           </button>
 
           <section
-            class="group shop-interest-group shop-customize-interest"
+            class="shop-customize-interest"
             id="shop-customize-interest"
             aria-labelledby="shop-customize-interest-title"
           >
-            <h2 class="group-label" id="shop-customize-interest-title">Checkout not open yet</h2>
+            <h2 class="group-label" id="shop-customize-interest-title">Checkout opening soon</h2>
             <p class="shop-lead shop-lead-muted">
-              Preview works now. When the operator enables personalized checkout in
-              <code>shop-config.json</code>, this page will link to Shopify. See
-              <a href="/shop/">founding sticker</a> or create your card first.
+              Your preview works now. Personalized checkout for hoodies and stickers is not live
+              yet — try the <a href="/shop/">founding sticker</a> or check back soon.
             </p>
           </section>
         </section>
@@ -155,6 +166,6 @@
         </section>
       </main>
     </div>
-    <script src="/js/shop-customize.mjs?v=1" type="module"></script>
+    <script src="/js/shop-customize.mjs?v=2" type="module"></script>
   </body>
 </html>
