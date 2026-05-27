@@ -136,6 +136,20 @@ describe("device-emphasis-card-html", () => {
     expect(html).not.toContain("live-control-notification-icon");
   });
 
+  it("created vouch return banner uses active emphasis card markup", () => {
+    const html = readFileSync(join(root, "site/created/index.html"), "utf8");
+    expect(html).toContain('id="created-vouch-return-banner"');
+    expect(html).toContain("hc-emphasis-card--active");
+    expect(html).toContain('class="hc-emphasis-card__cta" id="created-vouch-return-link"');
+    expect(html).not.toContain("created-vouch-return-text");
+    expect(html).not.toContain("btn-primary created-vouch-return-btn");
+
+    const styles = readFileSync(join(root, "site/styles.css"), "utf8");
+    expect(styles).toMatch(
+      /#created-vouch-return-banner\.hc-emphasis-card[\s\S]*flex-direction:\s*column/
+    );
+  });
+
   it("scan bundle propagates phase B/C emphasis tokens and dark glass rules", () => {
     const scanPass = readFileSync(join(root, "site/scan-pass.css"), "utf8");
     expect(scanPass).toContain("--hc-emphasis-card-fill-active-glass");

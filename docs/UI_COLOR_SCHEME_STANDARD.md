@@ -184,7 +184,7 @@ Prioritized places that could adopt the same **raised card** pattern. Extraction
 | No session / view mode | `#no-session` | **Shipped** — `hc-emphasis-card--warn` + **My cards** pill (Phase 4) |
 | Owner revoked | `#owner-revoked-banner` | **Shipped** — `hc-emphasis-card--urgent` (Phase 4) |
 | Created error | `#created-error` | **Shipped** — `hc-emphasis-card--urgent` (Phase 4) |
-| Vouch return | `#created-vouch-return-banner` | Backlog — post-vouch continuity (`HC_EMPHASIS_CARD_ROLLOUT.md`) |
+| Vouch return | `#created-vouch-return-banner` | **Shipped** — `hc-emphasis-card--active` (rollout backlog) |
 | Revoke warnings | `.revoke-id-warning` | **Shipped** — `hc-emphasis-card--warn` (Phase 4) |
 
 #### Tier 4 — Scan resolver pages

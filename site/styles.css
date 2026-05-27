@@ -6360,6 +6360,7 @@ p.hc-notice:not(:has(.hc-notice-content)) a {
 #created-error[hidden],
 #created-error:empty,
 #no-session[hidden],
+#created-vouch-return-banner[hidden],
 .live-control-notification[hidden] {
   display: none !important;
   margin: 0 !important;
@@ -7714,31 +7715,22 @@ body.device-shell-created .flow-keys-group .list-row {
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
 }
 
-.created-vouch-return {
+/* Vouch return — hc-emphasis-card--active (docs/HC_EMPHASIS_CARD_ROLLOUT.md backlog) */
+#created-vouch-return-banner.hc-emphasis-card {
   margin: 0 0 12px;
-  padding: 14px 16px;
-  border-radius: 16px;
-  border: 1px solid rgba(26, 107, 50, 0.28);
-  background: rgba(26, 107, 50, 0.08);
-  display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
+  align-items: stretch;
 }
 
-.created-vouch-return[hidden] {
-  display: none !important;
-}
-
-.created-vouch-return-text {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--black);
-}
-
-.created-vouch-return-btn {
+#created-vouch-return-banner .hc-emphasis-card__actions {
   width: 100%;
+  max-width: none;
+  justify-content: stretch;
+}
+
+#created-vouch-return-banner .hc-emphasis-card__cta {
+  flex: 1;
+  min-width: 100%;
   text-align: center;
   text-decoration: none;
 }
