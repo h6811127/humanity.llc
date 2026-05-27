@@ -16,11 +16,19 @@ import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { normalizeOperatorAuditToken } from "./hosted-rollout-token.mjs";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
 
 const apiOrigin = (process.env.API_ORIGIN || "https://humanity.llc").replace(/\/$/, "");
-const token = process.env.OPERATOR_AUDIT_TOKEN?.trim();
+let token;
+try {
+  token = normalizeOperatorAuditToken(process.env.OPERATOR_AUDIT_TOKEN);
+} catch (err) {
+  console.error(err instanceof Error ? err.message : err);
+  process.exit(1);
+}
 const stripeCheck = process.argv.includes("--stripe-check");
 
 function printOperatorSecretSetup() {

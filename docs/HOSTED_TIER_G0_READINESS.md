@@ -66,6 +66,8 @@ OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run worker:check-st
 | `OPERATOR_AUDIT_TOKEN` | Before E6.2 CI | `steward-ops` + daily workflow |
 | `STRIPE_WEBHOOK_SECRET` | After **G8** checked | Billing lifecycle webhooks |
 
+`OPERATOR_AUDIT_TOKEN` must be **ASCII-only** when passed on the shell (HTTP `Authorization` is a ByteString). Do not paste doc placeholders like `...` or `…` — use the exact value from `wrangler secret list` / GitHub Actions secret.
+
 Migrations: `0012_steward_hosted.sql`, `0013_steward_billing.sql`.
 
 **Rollout step 1 (script):**
@@ -75,12 +77,28 @@ npm run hosted:rollout:step1              # verify:hosted-g0 + local D1 apply
 npm run hosted:rollout:step1 -- --remote  # + production D1 (Cloudflare auth)
 ```
 
+**Rollout step 2 (script):**
+
+```bash
+npm run hosted:rollout:step2                        # verify HOSTED_STEWARD_ENABLED=0 in wrangler.toml
+npm run hosted:rollout:step2 -- --deploy --smoke    # deploy Worker + GET health on API_ORIGIN
+```
+
 **Rollout step 3 (script):**
 
 ```bash
 npm run hosted:rollout:step3
 # After wrangler + GitHub secrets are set:
 OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step3
+```
+
+**Rollout step 4 (script):**
+
+```bash
+npm run hosted:rollout:step4
+# After HOSTED_STEWARD_ENABLED=1 is deployed:
+npm run hosted:rollout:step4 -- --verify
+OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step4 -- --verify
 ```
 
 Rollout steps: [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout (after G0).
