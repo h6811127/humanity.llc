@@ -1,6 +1,6 @@
 # Device tab resolver sync
 
-**Status:** Phase 1a shipped (auto network snapshot); Phase 2+ planned  
+**Status:** Phases 1a–1b and 2 (toggle) shipped; E2E follow-up open  
 **Audience:** Product, frontend  
 **Opened:** 2026-05-27  
 **Related:** [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) · [`UI_UX_REVERTED_FEATURES_CATALOG.md`](UI_UX_REVERTED_FEATURES_CATALOG.md) · [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md)
@@ -252,13 +252,13 @@ When `"0"`: behavior matches today (per-tab session cache).
 
 ### Phase 1b — Health snapshot (optional)
 
-- [ ] `health-snapshot` message + follower gate for `fetchResolverHealth`
+- [x] `health-snapshot` message + follower gate for `fetchResolverHealth` (30s TTL; dot **Retry** bypasses)
 
 ### Phase 2 — Shortcuts & settings
 
-- [ ] Toggle in `site/index.html` + `device-resolver-sync-prefs.mjs`
-- [ ] Subtitle reflects on/off
-- [ ] Manual “Refresh all tabs” action (if product approves copy)
+- [x] Toggle in `site/index.html` + `device-resolver-sync-prefs.mjs` (homepage `/` only)
+- [x] Subtitle reflects on/off
+- [ ] Manual “Refresh all tabs” row — **deferred**; hub **Check network** already broadcasts to open tabs
 
 ### Phase 3 — Unified poll leader (optional refactor)
 
@@ -302,3 +302,4 @@ When `"0"`: behavior matches today (per-tab session cache).
 | 2026-05-27 | Phase 1a shipped — `device-resolver-sync*.mjs`, hub follower skip, shell manifest v51 |
 | 2026-05-26 | Phase 1a: `device-resolver-sync*.mjs`, hub follower skip, shell manifest v51 |
 | 2026-05-27 | Phase 1a shipped — `device-resolver-sync*.mjs`, shell v51 |
+| 2026-05-27 | Phase 1b health snapshot + Phase 2 landing toggle |

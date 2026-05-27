@@ -8,6 +8,9 @@ export const RESOLVER_SYNC_PREF_KEY = "hc_resolver_sync_tabs";
 /** Follower may skip auto status GETs while leader snapshot is this fresh. */
 export const RESOLVER_SYNC_SNAPSHOT_TTL_MS = 60_000;
 
+/** Follower may skip auto health GETs while leader health snapshot is this fresh. */
+export const HEALTH_SNAPSHOT_TTL_MS = 30_000;
+
 /**
  * @param {string | null | undefined} raw localStorage `hc_resolver_sync_tabs`
  */
@@ -135,4 +138,60 @@ export function mergeNetworkSnapshotIntoCache(cache, snapshotEntries, fallbackAt
  */
 export function networkSnapshotOriginMatches(messageOrigin, localOrigin) {
   return Boolean(messageOrigin && localOrigin && messageOrigin === localOrigin);
+}
+
+/**
+ * @typedef {{
+ *   type: "health-snapshot";
+ *   tabId: string;
+ *   at: number;
+ *   status: "ok" | "degraded" | "offline";
+ * }} HealthSnapshotMessage
+ */
+
+/**
+ * @param {unknown} data
+ * @returns {HealthSnapshotMessage | null}
+ */
+export function parseHealthSnapshotMessage(data) {
+  if (!data || typeof data !== "object") return null;
+  const msg = /** @type {Record<string, unknown>} */ (data);
+  if (msg.type !== "health-snapshot") return null;
+  const tabId = typeof msg.tabId === "string" ? msg.tabId : "";
+  const at = typeof msg.at === "number" && Number.isFinite(msg.at) ? msg.at : 0;
+  const status = msg.status;
+  if (!tabId || !at) return null;
+  if (status !== "ok" && status !== "degraded" && status !== "offline") return null;
+  return { type: "health-snapshot", tabId, at, status };
+}
+
+/**
+ * @param {number} messageAt
+ * @param {number} lastAppliedAt
+ */
+export function shouldIgnoreHealthSnapshotMessage(messageAt, lastAppliedAt) {
+  if (!messageAt || !lastAppliedAt) return false;
+  return messageAt <= lastAppliedAt;
+}
+
+/**
+ * @param {{
+ *   syncEnabled: boolean,
+ *   isLeader: boolean,
+ *   snapshotAt: number | null | undefined,
+ *   now?: number,
+ *   ttlMs?: number,
+ * }} opts
+ */
+export function shouldFollowerSkipHealthFetch(opts) {
+  const {
+    syncEnabled,
+    isLeader,
+    snapshotAt,
+    now = Date.now(),
+    ttlMs = HEALTH_SNAPSHOT_TTL_MS,
+  } = opts;
+  if (!syncEnabled || isLeader) return false;
+  if (typeof snapshotAt !== "number" || !Number.isFinite(snapshotAt)) return false;
+  return now - snapshotAt <= ttlMs;
 }

@@ -52,7 +52,12 @@ import {
   startDeviceChromeRefresh,
 } from "./device-chrome-refresh.mjs?v=45";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
-import { initResolverTabSync } from "./device-resolver-sync.mjs";
+import {
+  broadcastHealthSnapshotIfEligible,
+  initResolverTabSync,
+  RESOLVER_HEALTH_PEER_SYNC,
+  shouldFollowerSkipAutoHealthFetch,
+} from "./device-resolver-sync.mjs";
 import {
   describeDotState,
   deviceStateFromContext,
@@ -490,14 +495,35 @@ function refreshSummary() {
   renderSystemBanner();
 }
 
-async function refreshNetwork() {
+/**
+ * @param {{ manual?: boolean }} [opts] Manual dot retry bypasses follower health skip.
+ */
+async function refreshNetwork(opts = {}) {
+  const manual = opts.manual === true;
+  if (!manual && shouldFollowerSkipAutoHealthFetch()) {
+    refreshSummary();
+    return;
+  }
   networkStatus = await fetchResolverHealth(resolverApiOrigin());
   setResolverHealthStatusForSinceVisit(networkStatus);
   window.dispatchEvent(
     new CustomEvent(RESOLVER_HEALTH_CHANGED, { detail: { networkStatus } })
   );
+  broadcastHealthSnapshotIfEligible(networkStatus, { manual });
   refreshSummary();
 }
+
+window.addEventListener(RESOLVER_HEALTH_PEER_SYNC, (e) => {
+  const status = /** @type {{ networkStatus?: string } | undefined} */ (e.detail)
+    ?.networkStatus;
+  if (status !== "ok" && status !== "degraded" && status !== "offline") return;
+  networkStatus = status;
+  setResolverHealthStatusForSinceVisit(networkStatus);
+  window.dispatchEvent(
+    new CustomEvent(RESOLVER_HEALTH_CHANGED, { detail: { networkStatus } })
+  );
+  refreshSummary();
+});
 
 function scrollWalletToSaved() {
   const target =
@@ -647,7 +673,7 @@ document.addEventListener("click", (e) => {
   if (!action) return;
   logDotDiagnostic({ type: "quick_action", action });
   if (action === "retry") {
-    refreshNetwork();
+    void refreshNetwork({ manual: true });
     return;
   }
   if (action === "open_controls") {

@@ -9,14 +9,20 @@ import {
   touchLiveControlPollLeader,
 } from "./device-live-control-poll-leader.mjs";
 import {
+  HEALTH_SNAPSHOT_TTL_MS,
   isResolverSyncTabsEnabled,
   mergeNetworkSnapshotIntoCache,
   networkSnapshotOriginMatches,
+  parseHealthSnapshotMessage,
   parseNetworkSnapshotMessage,
   RESOLVER_SYNC_PREF_KEY,
   RESOLVER_SYNC_SNAPSHOT_TTL_MS,
+  shouldFollowerSkipHealthFetch,
   shouldFollowerSkipNetworkFetch,
+  shouldIgnoreHealthSnapshotMessage,
 } from "./device-resolver-sync-core.mjs";
+
+export const RESOLVER_HEALTH_PEER_SYNC = "hc-resolver-health-peer-sync";
 import { alertStateForNetworkPoll } from "./wallet-network-baseline.mjs";
 import {
   applyResolverNetworkSnapshot,
@@ -52,6 +58,10 @@ let listenerBound = false;
 let lastAppliedSnapshotAt = null;
 /** @type {number | null} */
 let lastReceivedSnapshotAt = null;
+/** @type {number | null} */
+let lastReceivedHealthAt = null;
+/** @type {number | null} */
+let lastAppliedHealthAt = null;
 
 function ensureChannel() {
   if (channel || typeof BroadcastChannel === "undefined") return channel;
@@ -72,6 +82,16 @@ export function readResolverSyncTabsPref() {
   }
 }
 
+/** @param {boolean} on */
+export function setResolverSyncTabsEnabled(on) {
+  if (typeof localStorage === "undefined") return;
+  try {
+    localStorage.setItem(RESOLVER_SYNC_PREF_KEY, on ? "1" : "0");
+  } catch {
+    /* ignore */
+  }
+}
+
 function applySnapshotMessage(message) {
   if (!readResolverSyncTabsPref()) return;
   if (!networkSnapshotOriginMatches(message.origin, resolverApiOrigin())) return;
@@ -89,6 +109,23 @@ function applySnapshotMessage(message) {
 }
 
 /**
+ * @param {import("./device-resolver-sync-core.mjs").HealthSnapshotMessage} message
+ */
+function applyHealthSnapshotMessage(message) {
+  if (!readResolverSyncTabsPref()) return;
+  if (message.tabId === getLiveControlPollTabId()) return;
+  if (shouldIgnoreHealthSnapshotMessage(message.at, lastAppliedHealthAt ?? 0)) return;
+  lastAppliedHealthAt = message.at;
+  lastReceivedHealthAt = message.at;
+  if (typeof window === "undefined" || typeof window.dispatchEvent !== "function") return;
+  window.dispatchEvent(
+    new CustomEvent(RESOLVER_HEALTH_PEER_SYNC, {
+      detail: { networkStatus: message.status },
+    })
+  );
+}
+
+/**
  * Bind BroadcastChannel listener once per page.
  */
 export function initResolverTabSync() {
@@ -96,10 +133,15 @@ export function initResolverTabSync() {
   if (!ch || listenerBound) return;
   listenerBound = true;
   ch.addEventListener("message", (event) => {
-    const message = parseNetworkSnapshotMessage(event?.data);
-    if (!message) return;
-    if (message.tabId === getLiveControlPollTabId()) return;
-    applySnapshotMessage(message);
+    const data = event?.data;
+    const network = parseNetworkSnapshotMessage(data);
+    if (network) {
+      if (network.tabId === getLiveControlPollTabId()) return;
+      applySnapshotMessage(network);
+      return;
+    }
+    const health = parseHealthSnapshotMessage(data);
+    if (health) applyHealthSnapshotMessage(health);
   });
 }
 
@@ -114,6 +156,45 @@ export function shouldFollowerSkipAutoNetworkFetch(now = Date.now()) {
     now,
     ttlMs: RESOLVER_SYNC_SNAPSHOT_TTL_MS,
   });
+}
+
+/**
+ * Follower visibility health refresh may skip GET when a fresh leader snapshot exists.
+ */
+export function shouldFollowerSkipAutoHealthFetch(now = Date.now()) {
+  return shouldFollowerSkipHealthFetch({
+    syncEnabled: readResolverSyncTabsPref(),
+    isLeader: isLiveControlPollLeaderTab(now),
+    snapshotAt: lastReceivedHealthAt,
+    now,
+    ttlMs: HEALTH_SNAPSHOT_TTL_MS,
+  });
+}
+
+/**
+ * @param {"ok" | "degraded" | "offline"} status
+ * @param {{ manual?: boolean }} [opts]
+ */
+export function broadcastHealthSnapshotIfEligible(status, opts = {}) {
+  if (!readResolverSyncTabsPref()) return;
+  if (status !== "ok" && status !== "degraded" && status !== "offline") return;
+  const manual = opts.manual === true;
+  const now = Date.now();
+  if (!manual && !isLiveControlPollLeaderTab(now)) return;
+  if (!manual) touchLiveControlPollLeader(now);
+
+  const tabId = getLiveControlPollTabId();
+  if (!tabId) return;
+  lastReceivedHealthAt = now;
+  lastAppliedHealthAt = now;
+
+  const ch = ensureChannel();
+  if (!ch) return;
+  try {
+    ch.postMessage({ type: "health-snapshot", tabId, at: now, status });
+  } catch {
+    /* ignore */
+  }
 }
 
 /**

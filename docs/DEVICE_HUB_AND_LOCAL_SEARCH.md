@@ -76,7 +76,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Shortcuts & settings (shipped):** On the **homepage** (`/`) only - section after the studio example (unified list rows: Appearance, **Browser alerts** (background OS notifications for live proof), saved cards, manage, auto-save, focus). Hub sheet on all routes has **home icon** (left) and status line (center); Create lives beside the saved-items heading; no shortcuts block in the hub.
 
-**Planned:** **Share network checks across tabs** (resolver snapshot sync) — [`DEVICE_TAB_RESOLVER_SYNC.md`](DEVICE_TAB_RESOLVER_SYNC.md).
+**Share network checks across tabs** (resolver snapshot sync; default on) — [`DEVICE_TAB_RESOLVER_SYNC.md`](DEVICE_TAB_RESOLVER_SYNC.md); toggle on homepage **Shortcuts & settings**.
 
 **Hub header simplification (Step 1):** Create moves out of the sheet's top status rail and into the saved-items section header as compact **+ New**. The top rail stays focused on Home + resolver/device status, while Close remains the sheet escape. See [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md).
 

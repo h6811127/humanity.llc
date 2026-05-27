@@ -1,12 +1,16 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  HEALTH_SNAPSHOT_TTL_MS,
   isResolverSyncTabsEnabled,
   mergeNetworkSnapshotIntoCache,
   networkSnapshotOriginMatches,
+  parseHealthSnapshotMessage,
   parseNetworkSnapshotMessage,
   RESOLVER_SYNC_SNAPSHOT_TTL_MS,
+  shouldFollowerSkipHealthFetch,
   shouldFollowerSkipNetworkFetch,
+  shouldIgnoreHealthSnapshotMessage,
 } from "../../site/js/device-resolver-sync-core.mjs";
 
 describe("device-resolver-sync-core", () => {
@@ -74,6 +78,35 @@ describe("device-resolver-sync-core", () => {
   it("matches snapshot origin to local resolver origin", () => {
     expect(networkSnapshotOriginMatches("https://a", "https://a")).toBe(true);
     expect(networkSnapshotOriginMatches("https://a", "https://b")).toBe(false);
+  });
+
+  it("parses health-snapshot messages", () => {
+    const parsed = parseHealthSnapshotMessage({
+      type: "health-snapshot",
+      tabId: "tab-b",
+      at: 2000,
+      status: "degraded",
+    });
+    expect(parsed?.status).toBe("degraded");
+    expect(parseHealthSnapshotMessage({ type: "health-snapshot", status: "ok" })).toBeNull();
+  });
+
+  it("skips follower health fetch when snapshot is fresh", () => {
+    const now = 50_000;
+    expect(
+      shouldFollowerSkipHealthFetch({
+        syncEnabled: true,
+        isLeader: false,
+        snapshotAt: now - 10_000,
+        now,
+        ttlMs: HEALTH_SNAPSHOT_TTL_MS,
+      })
+    ).toBe(true);
+  });
+
+  it("ignores duplicate health snapshots", () => {
+    expect(shouldIgnoreHealthSnapshotMessage(1000, 1000)).toBe(true);
+    expect(shouldIgnoreHealthSnapshotMessage(1001, 1000)).toBe(false);
   });
 
   it("merges snapshot rows into cache map", () => {
