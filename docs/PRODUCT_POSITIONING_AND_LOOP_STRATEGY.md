@@ -113,7 +113,9 @@ Calm footer on lost-item relay scan template only — link to `/create/?template
 
 **Ops (production resolver):**
 
-- After re-seed: `API_ORIGIN=https://humanity.llc npm run site:verify-showcase` — live `GET …/status` checks for `object_streams` + `public_snapshot`
+- Re-seed both stream pilots: `API_ORIGIN=https://humanity.llc npm run site:refresh-showcase`
+- After commit + Pages deploy: `API_ORIGIN=https://humanity.llc npm run site:verify-showcase` — live `GET …/status` checks for `object_streams` + `public_snapshot`
+- Local exit bundle: `npm run site:verify-positioning-exit`
 
 ### Step 9 — Field pilot summary aggregation ✅
 

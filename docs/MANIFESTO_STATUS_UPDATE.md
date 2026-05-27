@@ -112,7 +112,7 @@ Deep link: `/created/?profile_id=…&qr_id=…`  -  hydrates handle/manifesto fr
 | M5 showcase live object scan renders object_streams + limit copy | ✅ `scan-m5-showcase-paths.test.ts` |
 | M5 showcase status plate + live object status JSON include public_snapshot | ✅ `manifesto-showcase-exit.test.ts` |
 | Committed showcase JSON streams match M5 scan fixtures | ✅ `manifesto-showcase-exit.test.ts` |
-| Production showcase cards include object_streams (re-seed) | ☐ `npm run site:seed-showcase` · `site:seed-showcase-live-object` · commit `site/data/*.json` · deploy Pages · `npm run site:verify-showcase` |
+| Production showcase cards include object_streams (re-seed) | ✅ `npm run site:refresh-showcase` · commit `site/data/*.json` · deploy Pages · `npm run site:verify-showcase` |
 | Create flow signs optional object_streams (status plate + general) | ✅ `create-card-object-streams.test.ts` |
 | Recovery key may sign update | ✅ `update-card.test.ts` |
 

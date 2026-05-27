@@ -32,7 +32,7 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 - **Build stamps (debug):** `docs/SITE_BUILD_VERSIONING.md` — Pages: `npm run site:build-meta` before `pages:deploy`; console + hub (`hc_debug`). Worker: `npm run worker:build-meta` before `worker:deploy`; `GET /.well-known/hc/v1/health` → `build`. Tests: `npm run worker:test -- worker/tests/site-build-meta.test.ts worker/tests/resolver-health-build.test.ts`.
 - **Worker dev**: `npm run worker:dev`
 - **Pages dev**: `npm run pages:dev`
-- **Showcase scan URLs** (M5 / landing): `npm run site:seed-showcase` (status plate), `npm run site:seed-showcase-live-object` (live object), `npm run site:seed-showcase-lost-item` (lost-item relay; each needs `API_ORIGIN`)
+- **Showcase scan URLs** (M5 / landing): `npm run site:refresh-showcase` (status plate + live object streams), or `site:seed-showcase` / `site:seed-showcase-live-object` / `site:seed-showcase-lost-item` individually (each needs `API_ORIGIN`)
 
 ### Non-obvious notes
 

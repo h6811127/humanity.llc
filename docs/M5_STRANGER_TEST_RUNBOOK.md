@@ -34,10 +34,10 @@ curl -sS "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status?q=QR" | jq
 
 10. **Live object scan** (recommended) - open a pilot or demo live-object scan URL on phone; confirm within ~30s they can state host trust, live status, what the **message** says, and that holding the sticker does not prove ownership. They should **not** need to reconcile multiple “Active” labels.
 
-    - Status plate: `site/data/showcase-status-plate.json` - `npm run site:seed-showcase`
-    - Live object: `site/data/showcase-live-object.json` - `npm run site:seed-showcase-live-object`
+    - Status plate + live object (streams): `npm run site:refresh-showcase` (or individual `site:seed-showcase` scripts)
     - Lost item relay: `site/data/showcase-lost-item.json` - `npm run site:seed-showcase-lost-item`
     - CI fixtures: `worker/tests/scan-m5-showcase-paths.test.ts`, `worker/tests/site-showcase-data.test.ts`, `worker/tests/manifesto-showcase-exit.test.ts`
+    - Local exit bundle: `npm run site:verify-positioning-exit`
     - After re-seed on production: `API_ORIGIN=https://humanity.llc npm run site:verify-showcase`
 
 **Deploy check:** scan response header `X-HC-Scan-UI: pass-v31` (or later) on an active scan.
