@@ -201,7 +201,7 @@ describe("device-emphasis-card-html", () => {
       expect(html).toContain("theme-dark.css?v=28");
       expect(html).toContain("device-shell.css?v=55");
       expect(html).toContain('id="shell-status-line"');
-      expect(html).toContain("device-status-bootstrap.mjs?v=44");
+      expect(html).toContain("device-status-bootstrap.mjs?v=45");
     }
   });
 

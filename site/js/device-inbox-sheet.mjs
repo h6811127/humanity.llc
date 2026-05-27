@@ -2,8 +2,8 @@
  * Compact inbox bottom sheet — badge tap and open_notifications.
  * @see docs/DEVICE_INBOX.md phase 3
  */
-import { buildInboxItems, buildInboxSheetRows } from "./device-inbox-core.mjs?v=38";
-import { gatherInboxInput, getInboxItems, notificationCount } from "./device-inbox.mjs?v=38";
+import { buildInboxItems, buildInboxSheetRows } from "./device-inbox-core.mjs?v=45";
+import { gatherInboxInput, getInboxItems, notificationCount } from "./device-inbox.mjs?v=45";
 import {
   formatLiveControlExpiry,
   getLiveControlPending,
@@ -16,23 +16,23 @@ import {
   actOnOrphanRemovedTabKeys,
 } from "./device-orphan-keys-nav.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
-import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=38";
+import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=45";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import { prefersReducedMotion } from "./device-shell-motion.mjs";
 import { closeGlancePopover } from "./device-hub-glance-popover.mjs";
-import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs?v=38";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=38";
+import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs?v=45";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=45";
 import {
   inboxSheetMountAllowed,
   inboxSheetReconcileAction,
-} from "./device-inbox-sheet-core.mjs?v=38";
+} from "./device-inbox-sheet-core.mjs?v=45";
 import {
   bindSheetLifecycleReconcile,
   syncSheetBackdropClosed,
-} from "./device-sheet-backdrop-sync.mjs?v=38";
+} from "./device-sheet-backdrop-sync.mjs?v=45";
 
 const SHEET_ID = "device-inbox-sheet";
 const LIST_ID = "device-inbox-sheet-list";
@@ -72,6 +72,7 @@ function ensureInboxSheetDom() {
   backdrop.id = BACKDROP_ID;
   backdrop.className = "device-inbox-backdrop";
   backdrop.setAttribute("aria-label", "Close inbox");
+  backdrop.setAttribute("aria-hidden", "true");
   backdrop.hidden = true;
   backdrop.addEventListener("click", () => {
     setInboxSheetOpen(false);

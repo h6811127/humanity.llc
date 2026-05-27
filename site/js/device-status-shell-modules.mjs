@@ -10,7 +10,7 @@
  * Bump on all shell HTML (`device-status-bootstrap.mjs?v=N`) and on every
  * `./peer.mjs?v=N` import between files in DEVICE_STATUS_SHELL_JS_FILES.
  */
-export const DEVICE_SHELL_ASSET_VERSION = 44;
+export const DEVICE_SHELL_ASSET_VERSION = 45;
 
 /** @deprecated Use DEVICE_SHELL_ASSET_VERSION */
 export const DEVICE_STATUS_BOOTSTRAP_CACHE_BUST = DEVICE_SHELL_ASSET_VERSION;
