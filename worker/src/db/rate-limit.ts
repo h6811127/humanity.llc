@@ -1,7 +1,11 @@
+import { DEMO_CREATE_LIMIT_PER_HOUR } from "../demo-card-policy";
+
 /** 10 card creations per IP per hour (Technical Standards §15). */
 export const CREATE_LIMIT_PER_HOUR = 10;
 const CREATE_BUCKET_PREFIX = "create:";
 const CREATE_BLOCKED_BUCKET_PREFIX = "create_blocked:";
+const CREATE_DEMO_BUCKET_PREFIX = "create_demo:";
+const CREATE_DEMO_BLOCKED_BUCKET_PREFIX = "create_demo_blocked:";
 
 async function incrementBucket(
   db: D1Database,
@@ -65,6 +69,48 @@ export async function checkCreateRateLimit(
 
   await incrementBucket(db, bucketKey, windowIso);
 
+  return { allowed: true };
+}
+
+export async function checkDemoCreateRateLimit(
+  db: D1Database,
+  ipHash: string,
+  now: Date = new Date()
+): Promise<{ allowed: boolean; retryAfterSec?: number }> {
+  const windowStart = new Date(
+    Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      now.getUTCHours()
+    )
+  );
+  const windowIso = windowStart.toISOString();
+  const bucketKey = `${CREATE_DEMO_BUCKET_PREFIX}${ipHash}:${windowIso}`;
+
+  const row = await db
+    .prepare(`SELECT count FROM rate_limit_buckets WHERE bucket_key = ?`)
+    .bind(bucketKey)
+    .first<{ count: number }>();
+
+  const count = row?.count ?? 0;
+  if (count >= DEMO_CREATE_LIMIT_PER_HOUR) {
+    await incrementBucket(
+      db,
+      `${CREATE_DEMO_BLOCKED_BUCKET_PREFIX}${ipHash}:${windowIso}`,
+      windowIso
+    );
+    const nextHour = new Date(windowStart.getTime() + 3600_000);
+    return {
+      allowed: false,
+      retryAfterSec: Math.max(
+        1,
+        Math.ceil((nextHour.getTime() - now.getTime()) / 1000)
+      ),
+    };
+  }
+
+  await incrementBucket(db, bucketKey, windowIso);
   return { allowed: true };
 }
 

@@ -188,6 +188,8 @@ Examples seen in create flow:
 
 ### P2-3 · Create — duplicate handle
 
+**Status (2026-05-26):** Verified correct — no code change (`Handle is already taken.` on 409).
+
 **Steps:** Handle `studio_door_showcase` + manifesto → submit.
 
 **Actual:** `Handle is already taken.` — **correct** (409-style behavior).
@@ -195,6 +197,8 @@ Examples seen in create flow:
 ---
 
 ### P2-4 · Create — “Create a sample card” (happy for demo, sad for production hygiene)
+
+**Status (2026-05-26):** Fix shipped — `demo_*` handles, 5/hour IP cap for demo handles, 7-day demo orphan purge (`demo-card-policy.ts`, `rate-limit.ts`, `orphan-purge.ts`, `create-card.mjs`).
 
 **Steps:** Click demo on `/create/`.
 

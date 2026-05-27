@@ -6,7 +6,8 @@ import {
   verifySignedDocument,
 } from "../crypto";
 import { insertCardWithQr, handleExists, profileIdExists } from "../db/cards";
-import { checkCreateRateLimit, hashIp } from "../db/rate-limit";
+import { isDemoHandle } from "../demo-card-policy";
+import { checkCreateRateLimit, checkDemoCreateRateLimit, hashIp } from "../db/rate-limit";
 import {
   clientIp,
   errorResponse,
@@ -187,6 +188,20 @@ export async function handlePostCards(
         ? String((e as { code: string }).code)
         : "VALIDATION_ERROR";
     return errorResponse(code, msg, 422);
+  }
+
+  if (isDemoHandle(handleNormalized)) {
+    const demoRate = await checkDemoCreateRateLimit(db, ipHash);
+    if (!demoRate.allowed) {
+      return errorResponse(
+        "RATE_LIMITED",
+        "Too many sample card creations from this network. Try again later.",
+        429,
+        demoRate.retryAfterSec
+          ? { "Retry-After": String(demoRate.retryAfterSec) }
+          : undefined
+      );
+    }
   }
 
   if (await profileIdExists(db, profileId)) {

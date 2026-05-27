@@ -32,6 +32,10 @@ Over time this **orphan** data accumulates. Rate limits slow abuse but do not re
 | Active card with owner updates, vouches, or non-expired QR | Indefinite |
 | **Orphan** (see eligibility below) | Removed after grace period |
 
+### Sample-card handles (`demo_*`, `live_demo_*`)
+
+Create **“Create a sample card”** registers real network rows with handles prefixed `demo_` (or legacy `live_demo_`). These follow the same orphan rules below, but with a **7-day** grace (`DEMO_ORPHAN_MIN_AGE_DAYS`) and a separate cron batch (up to 25 per run). Creation is also capped at **5 per IP per hour** in addition to the general create limit. Policy module: `worker/src/demo-card-policy.ts`.
+
 ### Orphan eligibility (all must be true)
 
 A profile is eligible for **automatic purge** when:

@@ -390,7 +390,7 @@ demoBtn?.addEventListener("click", async () => {
   const handleEl = document.getElementById("handle");
   const suffix = randomDemoSuffix();
   setTemplate("general");
-  if (handleEl) handleEl.value = `live_demo_${suffix}`;
+  if (handleEl) handleEl.value = `demo_${suffix}`;
   if (manifestoEl) {
     manifestoEl.value =
       "Live object demo. Scan from another phone, then revoke this QR.";

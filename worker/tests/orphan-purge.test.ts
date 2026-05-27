@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { findOrphanProfileIds, runOrphanPurge } from "../src/db/orphan-purge";
+import {
+  findDemoOrphanProfileIds,
+  findOrphanProfileIds,
+  runOrphanPurge,
+} from "../src/db/orphan-purge";
+import { DEMO_HANDLE_PREFIXES } from "../src/demo-card-policy";
 
 const NOW = new Date("2026-05-25T12:00:00.000Z");
 const OLD = "2025-01-01T00:00:00.000Z";
@@ -9,6 +14,7 @@ const EXPIRED_QR = "2025-06-01T00:00:00.000Z";
 
 type CardRow = {
   profile_id: string;
+  handle?: string;
   status: string;
   created_at: string;
   updated_at: string;
@@ -50,14 +56,25 @@ function makeDb(state: {
           return this;
         },
         async all<T>() {
-          const cutoff = binds[0] as string;
-          const nowIso = binds[1] as string;
-          const limit = binds[2] as number;
+          const isDemoQuery = sql.includes("c.handle LIKE");
+          const prefixCount = DEMO_HANDLE_PREFIXES.length;
+          const cutoff = (isDemoQuery ? binds[prefixCount] : binds[0]) as string;
+          const nowIso = (isDemoQuery ? binds[prefixCount + 1] : binds[1]) as string;
+          const limit = (isDemoQuery ? binds[prefixCount + 2] : binds[2]) as number;
+          const demoPrefixes = isDemoQuery
+            ? (binds.slice(0, prefixCount) as string[])
+            : [];
 
           if (sql.includes("SELECT c.profile_id")) {
             const ids = cards
               .filter((c) => {
                 if (c.status !== "active") return false;
+                if (
+                  isDemoQuery &&
+                  !demoPrefixes.some((p) => (c.handle ?? "").startsWith(p))
+                ) {
+                  return false;
+                }
                 if (c.created_at >= cutoff) return false;
                 if (c.updated_at !== c.created_at) return false;
                 const sum = summaries.find((s) => s.profile_id === c.profile_id);
@@ -197,6 +214,49 @@ describe("orphan purge", () => {
 
     const ids = await findOrphanProfileIds(db, { now: NOW });
     expect(ids).toEqual([]);
+  });
+
+  it("finds demo handles after shorter grace period", async () => {
+    const { db } = makeDb({
+      cards: [
+        {
+          profile_id: "demo_orphan",
+          handle: "demo_week_old",
+          status: "active",
+          created_at: "2026-05-10T00:00:00.000Z",
+          updated_at: "2026-05-10T00:00:00.000Z",
+        },
+        {
+          profile_id: "real_orphan",
+          handle: "studio_kit",
+          status: "active",
+          created_at: OLD,
+          updated_at: OLD,
+        },
+      ],
+      summaries: [
+        { profile_id: "demo_orphan", vouch_count: 0 },
+        { profile_id: "real_orphan", vouch_count: 0 },
+      ],
+      qrs: [
+        {
+          profile_id: "demo_orphan",
+          status: "expired",
+          expires_at: EXPIRED_QR,
+        },
+        {
+          profile_id: "real_orphan",
+          status: "expired",
+          expires_at: EXPIRED_QR,
+        },
+      ],
+    });
+
+    const demoIds = await findDemoOrphanProfileIds(db, { now: NOW, minAgeDays: 7 });
+    expect(demoIds).toEqual(["demo_orphan"]);
+
+    const regularIds = await findOrphanProfileIds(db, { now: NOW, minAgeDays: 90 });
+    expect(regularIds).toEqual(["real_orphan"]);
   });
 
   it("runOrphanPurge deletes eligible profiles", async () => {
