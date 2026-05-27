@@ -7,12 +7,16 @@ import { BEARER_WARNING } from "../src/resolver/trust-copy";
 import { buildScanViewModel } from "../src/resolver/scan-state";
 import {
   LIVE_OBJECT_MANIFESTO,
+  LIVE_OBJECT_STREAMS,
   LOST_ITEM_MANIFESTO,
   SHOWCASE_HANDLE,
   SHOWCASE_PROFILE,
   SHOWCASE_QR,
   STATUS_PLATE_MANIFESTO,
+  STATUS_PLATE_OBJECT_STREAMS,
+  showcaseCardDocumentJson,
 } from "./fixtures/scan-showcase-fixtures";
+import { OBJECT_STREAMS_LIMIT } from "../src/resolver/trust-copy";
 
 function card(manifestoLine: string | null, overrides: Partial<CardRow> = {}): CardRow {
   return {
@@ -65,13 +69,15 @@ function summary(): VerificationSummaryRow {
 
 async function renderActiveShowcaseScan(
   manifestoLine: string | null,
-  opts: { objectSignatureVerified?: boolean } = {}
+  opts: { objectSignatureVerified?: boolean; cardDocumentJson?: string } = {}
 ) {
   const vm = buildScanViewModel(
     SHOWCASE_PROFILE,
     SHOWCASE_QR,
     {
-      card: card(manifestoLine),
+      card: card(manifestoLine, {
+        card_document_json: opts.cardDocumentJson ?? "{}",
+      }),
       qr: qr(),
       verification: summary(),
       revocationDisplay: null,
@@ -134,6 +140,27 @@ describe("M5 showcase scan paths", () => {
       "Scan shows current status for this place - not who owns the door."
     );
     expect(html).not.toMatch(/<h1 class="[^"]*scan-hero-title[^"]*">@river_example<\/h1>/);
+  });
+
+  it("status plate: object_streams show detail cards and limit copy", async () => {
+    const html = await renderActiveShowcaseScan(STATUS_PLATE_MANIFESTO, {
+      cardDocumentJson: showcaseCardDocumentJson(STATUS_PLATE_OBJECT_STREAMS),
+    });
+    expect(html).toContain("scan-object-streams");
+    expect(html).toContain("Special hours");
+    expect(html).toContain("Thursday closes at 6 PM this week");
+    expect(html).toContain("scan-object-streams-limit");
+    expect(html).toContain(OBJECT_STREAMS_LIMIT);
+  });
+
+  it("live object: object_streams show detail cards and limit copy", async () => {
+    const html = await renderActiveShowcaseScan(LIVE_OBJECT_MANIFESTO, {
+      cardDocumentJson: showcaseCardDocumentJson(LIVE_OBJECT_STREAMS),
+    });
+    expect(html).toContain("scan-object-streams");
+    expect(html).toContain("Returns due");
+    expect(html).toContain("Cordless drill");
+    expect(html).toContain(OBJECT_STREAMS_LIMIT);
   });
 
   it("lost item relay: relay eyebrow, object H1, holder foot copy", async () => {

@@ -15,6 +15,14 @@ import canonicalize from "canonicalize";
 
 const PROTOCOL_VERSION = "1.0";
 const apiOrigin = process.env.API_ORIGIN || "https://humanity.llc";
+const STATUS_PLATE_OBJECT_STREAMS = [
+  {
+    id: "special_hours",
+    class: "place",
+    label: "Special hours",
+    value: "Thursday closes at 6 PM this week",
+  },
+];
 const outPath = join(
   dirname(fileURLToPath(import.meta.url)),
   "../../site/data/showcase-status-plate.json"
@@ -83,6 +91,7 @@ async function main() {
           latest_accepted_vouch_at: null,
         },
         badges: [],
+        object_streams: STATUS_PLATE_OBJECT_STREAMS,
         qr: { active_qr_id: qrId, epoch: 1 },
         links: { standards: "https://humanity.llc/standards/v1" },
       },
@@ -130,6 +139,7 @@ async function main() {
     label: "Studio door · Open Thu–Sun (showcase)",
     scan_url: scanUrl,
     created_at: now,
+    object_streams: STATUS_PLATE_OBJECT_STREAMS,
     note: "Showcase card  -  owner key not stored. Revoke only via operator DB if needed.",
   };
 

@@ -5,5 +5,13 @@
   "label": "Studio door · Open Thu–Sun (showcase)",
   "scan_url": "https://humanity.llc/c/nSVXWPqgRFEhGPjxyRzidF6s?q=qr_xBZTq7M27tueCzBY",
   "created_at": "2026-05-24T20:07:06.766Z",
+  "object_streams": [
+    {
+      "id": "special_hours",
+      "class": "place",
+      "label": "Special hours",
+      "value": "Thursday closes at 6 PM this week"
+    }
+  ],
   "note": "Showcase card  -  owner key not stored. Revoke only via operator DB if needed."
 }

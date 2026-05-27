@@ -18,6 +18,14 @@ import canonicalize from "canonicalize";
 
 const PROTOCOL_VERSION = "1.0";
 const apiOrigin = process.env.API_ORIGIN || "https://humanity.llc";
+const LIVE_OBJECT_STREAMS = [
+  {
+    id: "returns",
+    class: "care",
+    label: "Returns due",
+    value: "Cordless drill · ladder",
+  },
+];
 const outPath = join(
   dirname(fileURLToPath(import.meta.url)),
   "../../site/data/showcase-live-object.json"
@@ -87,6 +95,7 @@ async function main() {
           latest_accepted_vouch_at: null,
         },
         badges: [],
+        object_streams: LIVE_OBJECT_STREAMS,
         qr: { active_qr_id: qrId, epoch: 1 },
         links: { standards: "https://humanity.llc/standards/v1" },
       },
@@ -135,6 +144,7 @@ async function main() {
     manifesto_line: manifesto,
     scan_url: scanUrl,
     created_at: now,
+    object_streams: LIVE_OBJECT_STREAMS,
     note: "M5 stranger-test live object showcase - owner key not stored.",
   };
 

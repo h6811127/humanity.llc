@@ -106,6 +106,10 @@ Deep link: `/created/?profile_id=…&qr_id=…`  -  hydrates handle/manifesto fr
 | Scan cache: new line visible within active TTL (~5 min) or hard refresh | ☐ manual |
 | Lost-item relay scan shows updated line 2 | ✅ `update-card.test.ts` |
 | Status plate scan shows updated line 2 | ✅ `update-card.test.ts` |
+| Status plate scan shows updated object_streams | ✅ `update-card.test.ts` |
+| M5 showcase status plate scan renders object_streams + limit copy | ✅ `scan-m5-showcase-paths.test.ts` |
+| M5 showcase live object scan renders object_streams + limit copy | ✅ `scan-m5-showcase-paths.test.ts` |
+| Production showcase cards include object_streams (re-seed) | ☐ `npm run site:seed-showcase` · `site:seed-showcase-live-object` |
 | Recovery key may sign update | ✅ `update-card.test.ts` |
 
 **Owner UX:** **Update status** stays hidden for general cards until first in-session QR or card revoke. Status plate and lost-item relay pilots show it immediately so field testers can update live object copy before revoke (`site/js/created-first-revoke-gate.mjs`; `worker/tests/created-first-revoke-gate.test.ts`).

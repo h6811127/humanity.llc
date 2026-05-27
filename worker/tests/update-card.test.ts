@@ -520,4 +520,48 @@ describe("handlePostCardUpdate", () => {
     expect(html).toContain("Closed until Monday");
     expect(html).toContain("Studio door");
   });
+
+  it("scan HTML reflects updated object_streams on status plate", async () => {
+    const streams = [
+      { id: "note", class: "place", label: "Special hours", value: "Closed Friday" },
+    ];
+    const vm = buildScanViewModel(
+      PROFILE,
+      "qr_test",
+      {
+        card: {
+          profile_id: PROFILE,
+          public_key: "pk",
+          handle: "river_example",
+          handle_normalized: "river_example",
+          manifesto_line: "Studio door\nOpen · Thu–Sun until 9 PM",
+          status: "active",
+          card_document_json: JSON.stringify({ object_streams: streams }),
+          created_at: CREATED,
+          updated_at: "2026-05-17T12:00:00.000Z",
+        },
+        qr: {
+          qr_id: "qr_test",
+          profile_id: PROFILE,
+          epoch: 1,
+          scope: "card",
+          print_artifact_id: null,
+          resolver_hint: "https://humanity.llc",
+          status: "active",
+          payload: `https://humanity.llc/c/${PROFILE}?q=qr_test`,
+          issued_at: CREATED,
+          expires_at: "2027-05-16T12:00:00.000Z",
+          credential_document_json: "{}",
+          created_at: CREATED,
+          updated_at: CREATED,
+        },
+        verification: null,
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain("scan-object-streams");
+    expect(html).toContain("Special hours");
+    expect(html).toContain("Closed Friday");
+  });
 });
