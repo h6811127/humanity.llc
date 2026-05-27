@@ -1434,19 +1434,12 @@ a.hub-card-menu-item {
 }
 
 
-#device-hub-live-control-group .device-hub-group-label {
-  color: var(--gold-dark, #8a6d1f);
-}
-
 #device-hub-card-disabled-group .device-hub-group-label {
   color: var(--red, #b91c1c);
 }
 
 .device-live-control-row .device-live-control-open {
   width: 100%;
-  border: 1px solid rgba(180, 140, 20, 0.25);
-  border-radius: var(--radius);
-  background: rgba(180, 140, 20, 0.06);
 }
 
 .device-hub-search-block {

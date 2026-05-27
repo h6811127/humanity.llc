@@ -212,6 +212,12 @@ describe("UI color scheme popover guard", () => {
         "--hc-emphasis-card-backdrop",
       ],
     });
+    assertGuardedRule("site/css/device-shell.css", ".device-hub-live-control-card.hc-emphasis-card", {
+      require: ["flex-direction: column"],
+    });
+    assertGuardedRule("site/css/device-shell.css", ".device-hub-live-control-card .device-live-control-open", {
+      require: ["--surface-popover-control-bg", "--surface-popover-border"],
+    });
     assertGuardedRule("site/css/device-shell.css", ".device-inbox-sheet", {
       require: [
         "--surface-popover-bg-glass",

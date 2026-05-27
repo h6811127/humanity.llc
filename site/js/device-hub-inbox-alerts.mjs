@@ -142,10 +142,30 @@ function renderLiveProofHubGroup(liveControlGroup, liveControlList, show) {
   const pending = getLiveControlPending();
   if (pending.length === 0) {
     liveControlGroup.hidden = true;
+    const summaryEl = liveControlGroup.querySelector("#device-hub-live-control-summary");
+    if (summaryEl instanceof HTMLElement) {
+      summaryEl.textContent = "";
+      summaryEl.hidden = true;
+    }
     return;
   }
 
   liveControlGroup.hidden = false;
+
+  const summaryEl = liveControlGroup.querySelector("#device-hub-live-control-summary");
+  const eyebrowEl = liveControlGroup.querySelector("#device-hub-live-control-eyebrow");
+  const n = pending.length;
+  if (eyebrowEl instanceof HTMLElement) {
+    eyebrowEl.textContent = n === 1 ? "Live proof waiting" : `${n} live proofs waiting`;
+  }
+  if (summaryEl instanceof HTMLElement) {
+    summaryEl.textContent =
+      n === 1
+        ? "Someone nearby asked for live proof. Tap the card below to sign."
+        : `${n} cards need your signature. Tap one below.`;
+    summaryEl.hidden = false;
+  }
+
   for (const item of pending) {
     const label = inboxWalletEntryLabel(item.entry);
     const expiry = item.expires_at ? formatLiveControlExpiry(item.expires_at) : "";
