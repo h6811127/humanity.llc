@@ -5,11 +5,13 @@ import { fileURLToPath } from "node:url";
 
 import {
   DEFAULT_SITE_BUILD_META,
+  DEFAULT_WORKER_BUILD_META,
   formatSiteBuildConsoleLine,
   formatSiteBuildCopyText,
   formatSiteBuildHubLabel,
   isSiteDebugEnabled,
   renderBuildMetaModule,
+  renderWorkerBuildMetaModule,
   SITE_DEBUG_FLAG_KEY,
 } from "../../site/js/build-meta-core.mjs";
 import { DEVICE_SHELL_ASSET_VERSION } from "../../site/js/device-status-shell-modules.mjs";
@@ -95,5 +97,29 @@ describe("site build meta", () => {
       "utf8"
     );
     expect(manifest).toContain('"device-hub-build-stamp.mjs"');
+  });
+
+  it("renderWorkerBuildMetaModule emits WORKER_BUILD_META TypeScript", () => {
+    const meta = {
+      gitSha: "abc1234",
+      builtAt: "2026-05-27T00:00:00.000Z",
+      source: "deploy" as const,
+    };
+    const src = renderWorkerBuildMetaModule(meta);
+    expect(src).toContain("npm run worker:build-meta");
+    expect(src).toContain('"gitSha": "abc1234"');
+    expect(src).toContain("export type WorkerBuildMeta");
+  });
+
+  it("generate-worker-build-meta script exists", () => {
+    const script = path.join(
+      fileURLToPath(new URL("../..", import.meta.url)),
+      "worker/scripts/generate-worker-build-meta.mjs"
+    );
+    expect(fs.existsSync(script)).toBe(true);
+  });
+
+  it("DEFAULT_WORKER_BUILD_META documents dev fallback", () => {
+    expect(DEFAULT_WORKER_BUILD_META.gitSha).toBe("dev");
   });
 });

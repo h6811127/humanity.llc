@@ -1,11 +1,14 @@
 /**
- * Pure helpers for Pages build metadata.
+ * Pure helpers for Pages and Worker build metadata.
  * @see docs/SITE_BUILD_VERSIONING.md
  */
+import { execSync } from "node:child_process";
 
 /**
- * @typedef {"deploy" | "dev" | "ci"} SiteBuildMetaSource
+ * @typedef {"deploy" | "dev" | "ci"} BuildMetaSource
  */
+
+/** @typedef {BuildMetaSource} SiteBuildMetaSource */
 
 /**
  * @typedef {object} SiteBuildMeta
@@ -13,6 +16,13 @@
  * @property {string} builtAt ISO-8601 UTC
  * @property {number} shellAssetVersion
  * @property {SiteBuildMetaSource} source
+ */
+
+/**
+ * @typedef {object} WorkerBuildMeta
+ * @property {string} gitSha
+ * @property {string} builtAt ISO-8601 UTC
+ * @property {BuildMetaSource} source
  */
 
 /** @see docs/SITE_BUILD_VERSIONING.md — Phase 2 hub stamp */
@@ -25,6 +35,38 @@ export const DEFAULT_SITE_BUILD_META = {
   shellAssetVersion: 0,
   source: "dev",
 };
+
+/** Default Worker stamp before `npm run worker:build-meta`. */
+export const DEFAULT_WORKER_BUILD_META = {
+  gitSha: "dev",
+  builtAt: "1970-01-01T00:00:00.000Z",
+  source: "dev",
+};
+
+/**
+ * @param {string} root Repo root (directory containing .git)
+ * @returns {string}
+ */
+export function resolveGitShaFromRoot(root) {
+  try {
+    return execSync("git rev-parse --short HEAD", {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+  } catch {
+    return "unknown";
+  }
+}
+
+/**
+ * @param {string} root
+ * @returns {BuildMetaSource}
+ */
+export function buildMetaSourceFromEnv(root) {
+  void root;
+  return process.env.CI === "true" ? "ci" : "deploy";
+}
 
 /**
  * @param {Pick<Location, "search"> | null | undefined} locationLike
@@ -92,4 +134,20 @@ export const SITE_BUILD_META = ${body};
  */
 export function formatSiteBuildConsoleLine(meta) {
   return `[humanity] site build ${meta.gitSha} shell=${meta.shellAssetVersion} ${meta.builtAt}`;
+}
+
+/**
+ * @param {WorkerBuildMeta} meta
+ * @returns {string}
+ */
+export function renderWorkerBuildMetaModule(meta) {
+  const body = JSON.stringify(meta, null, 2);
+  return `/**
+ * Auto-generated — do not edit. Regenerate: npm run worker:build-meta
+ * @see docs/SITE_BUILD_VERSIONING.md
+ */
+export const WORKER_BUILD_META = ${body} as const;
+
+export type WorkerBuildMeta = typeof WORKER_BUILD_META;
+`;
 }

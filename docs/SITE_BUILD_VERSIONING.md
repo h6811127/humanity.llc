@@ -1,6 +1,6 @@
 # Site and Worker build versioning
 
-**Status:** Phases 1–2 shipped. Phase 3 (Worker health `build`) planned.
+**Status:** Phases 1–3 shipped.
 
 When deploying straight to production, you need to answer **which deploy** is running in the browser and whether **Pages** and **Worker** are on the same commit. This doc defines build stamps, where they surface, and how they differ from cache-bust numbers.
 
@@ -40,9 +40,17 @@ Generated module (do not edit by hand):
 | `shellAssetVersion` | Current `DEVICE_SHELL_ASSET_VERSION` from [`device-status-shell-modules.mjs`](../site/js/device-status-shell-modules.mjs) |
 | `source` | `deploy` \| `dev` \| `ci` — how the file was produced |
 
-### Worker (Phase 3 — planned)
+### Worker (`worker/src/generated/worker-build-meta.ts`)
 
-Extend `GET /.well-known/hc/v1/health` with a sibling field, e.g.:
+Generated at deploy; exposed on health as `build`:
+
+| Field | Meaning |
+|-------|---------|
+| `gitSha` | Short git commit at generation time |
+| `builtAt` | ISO-8601 UTC when the file was written |
+| `source` | `deploy` \| `dev` \| `ci` |
+
+Example `GET /.well-known/hc/v1/health` body:
 
 ```json
 {
@@ -62,7 +70,7 @@ Keep existing `version` as **protocol** version only.
 |-------|----------------|
 | Site | DevTools console on shell pages: `[humanity] site build …` |
 | Site (debug) | Device hub footer when `localStorage.hc_debug === "1"` or `?hc_debug=1` |
-| Worker | Phase 3: `curl https://humanity.llc/.well-known/hc/v1/health` |
+| Worker | `curl -s https://humanity.llc/.well-known/hc/v1/health \| jq .build` |
 | Shell graph cache | `shell=` in console line or `SITE_BUILD_META.shellAssetVersion` |
 
 ## Phased implementation
@@ -94,18 +102,22 @@ npm run site:build-meta && npm run build
 
 **Enable on a phone:** Safari → bookmark or type `?hc_debug=1` once, or in console: `localStorage.hc_debug = "1"` then reload and open the hub.
 
-### Phase 3 — Worker health `build` (planned)
+### Phase 3 — Worker health `build` (shipped)
 
-- Inject `build.gitSha` / `build.builtAt` at `npm run worker:deploy` (env or bundled constant).
-- Document in this file and [`worker/README.md`](../worker/README.md).
+- [`worker/scripts/generate-worker-build-meta.mjs`](../worker/scripts/generate-worker-build-meta.mjs) writes [`worker/src/generated/worker-build-meta.ts`](../worker/src/generated/worker-build-meta.ts).
+- [`worker/src/resolver-health-build.ts`](../worker/src/resolver-health-build.ts) maps meta into the health JSON `build` object.
+- [`worker/src/index.ts`](../worker/src/index.ts) `healthResponse()` always includes `build` (ok and degraded responses).
+- **Commands:** `npm run worker:build-meta` · runs automatically before `npm run worker:deploy` (and CI deploy via `.github/workflows/deploy-worker.yml`).
 
 ## Commands
 
 | Command | When |
 |---------|------|
 | `npm run site:build-meta` | Before Pages deploy; optional locally to match prod stamping |
+| `npm run worker:build-meta` | Before Worker deploy; optional locally |
 | `npm run pages:deploy` | Runs `site:build-meta` then `wrangler pages deploy` |
 | `npm run deploy` | Same as `pages:deploy` |
+| `npm run worker:deploy` | Runs `worker:build-meta`, bundle-scan, then `wrangler deploy` |
 
 Local dev without regenerating keeps the committed default stamp (`gitSha: "dev"`). Regenerate when you need a real SHA in console:
 
@@ -122,10 +134,10 @@ npm run pages:dev
 
 ## Tests
 
-After changes to build meta, bootstrap logging, or hub debug stamp:
+After changes to build meta, bootstrap logging, hub debug stamp, or Worker health `build`:
 
 ```bash
-npm run worker:test -- worker/tests/site-build-meta.test.ts worker/tests/device-status-shell-modules.test.ts
+npm run worker:test -- worker/tests/site-build-meta.test.ts worker/tests/resolver-health-build.test.ts worker/tests/device-status-shell-modules.test.ts
 ```
 
 ## Related docs

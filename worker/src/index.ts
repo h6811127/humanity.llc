@@ -4,6 +4,7 @@
  */
 
 import { schemaReady } from "./db";
+import { resolverHealthBuildField } from "./resolver-health-build";
 import { runOrphanPurge } from "./db/orphan-purge";
 import {
   clientIp,
@@ -681,11 +682,13 @@ async function healthResponse(env: Env): Promise<Response> {
     operator: string;
     status: string;
     database: string;
+    build: ReturnType<typeof resolverHealthBuildField>;
   } = {
     version: PROTOCOL_VERSION,
     operator: OPERATOR_ID,
     status: "ok",
     database: "unknown",
+    build: resolverHealthBuildField(),
   };
 
   if (!env.DB) {
