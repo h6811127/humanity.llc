@@ -129,10 +129,13 @@ See dev panel + [`site/prototypes/scan-trust-ui-demo.mjs`](../site/prototypes/sc
 
 ```bash
 npm run worker:bundle-scan   # after scan-pass.css changes
-npm run worker:test -- worker/tests/scan-live-check-arrive-core.test.ts worker/tests/scan-safety.test.ts worker/tests/scan.test.ts worker/tests/scan-hero-snapshot.test.ts
+npm run worker:test -- worker/tests/scan-live-check-arrive-core.test.ts worker/tests/scan-safety.test.ts worker/tests/scan.test.ts worker/tests/scan-hero-snapshot.test.ts worker/tests/device-dot-state.test.ts
+npm run e2e:scan-page-dot
+npm run e2e:scan-hero-visual
+npm run e2e -- e2e/device-status-dot.spec.ts -g "shell S4"
 ```
 
-Manual: `docs/DEVICE_OS_QA.md` **P1-SD** (update for arrive sequence).
+Manual: `docs/DEVICE_OS_QA.md` **P1-SD** (scan arrive + hero) · **P0-3b** (shell S4 empty wallet).
 
 ---
 

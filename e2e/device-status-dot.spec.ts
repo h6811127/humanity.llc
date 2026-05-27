@@ -288,3 +288,47 @@ test.describe("hub intro coachmark", () => {
     await expect(page.locator("#device-hub-intro-coachmark")).toHaveCount(0);
   });
 });
+
+test.describe("shell S4 empty-wallet chrome", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+      localStorage.setItem("hc_device_hub_intro_dismissed", "1");
+    });
+    await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
+  });
+
+  test("shows primary status line and neutral dot when wallet is empty", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const line = page.locator("#shell-status-line");
+    await expect(line).toBeVisible({ timeout: 15_000 });
+    await expect(line).toContainText(/network reachable/i);
+    await expect(line).toContainText(/0 cards/i);
+
+    const dot = page.locator("#brand-status-dot");
+    await expect(dot).toHaveAttribute("data-dot-state", "ok:none");
+    await expect(dot).toHaveClass(/shell-status-dot--neutral-empty/);
+    await expect(dot).not.toHaveClass(/pass-dot-status-device-steward/);
+
+    const animation = await dot.evaluate((el) => getComputedStyle(el).animationName);
+    expect(animation === "none" || animation === "").toBe(true);
+  });
+
+  test("hides status line and uses steward dot when cards are saved", async ({ page }) => {
+    await page.addInitScript((entry) => {
+      localStorage.setItem("hc_wallet", JSON.stringify([entry]));
+      localStorage.setItem("hc_device_hub_intro_dismissed", "1");
+    }, STEWARD_WALLET_ENTRY);
+
+    await page.goto("/");
+    await expect(page.locator("#shell-status-line")).toBeHidden({ timeout: 15_000 });
+
+    const dot = page.locator("#brand-status-dot");
+    await expect(dot).toHaveAttribute("data-dot-state", "ok:steward");
+    await expect(dot).toHaveClass(/pass-dot-status-device-steward/);
+    await expect(dot).not.toHaveClass(/shell-status-dot--neutral-empty/);
+  });
+});
