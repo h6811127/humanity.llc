@@ -147,6 +147,25 @@ describe("buildHubKeysCustodyPanel", () => {
     expect(state.rows.map((r) => r.kind)).toEqual(["wallet_scale"]);
     expect(state.visible).toBe(true);
   });
+
+  it("omits wallet scale row without hint text", () => {
+    const state = buildHubKeysCustodyPanel({
+      savedCardCount: 3,
+      walletScaleTitle: "",
+      walletScaleHint: null,
+    });
+    expect(state.rows.some((r) => r.kind === "wallet_scale")).toBe(false);
+  });
+
+  it("can show wallet scale alongside cross-tab custody rows", () => {
+    const state = buildHubKeysCustodyPanel({
+      savedCardCount: 8,
+      walletScaleTitle: "Many saved cards",
+      walletScaleHint: "8 saved — comfortable use is about 1–5 cards.",
+      crossTabEntries: [{ profile_id: "abc", tabId: "t1", handle: "alice" }],
+    });
+    expect(state.rows.map((r) => r.kind)).toEqual(["cross_tab", "wallet_scale"]);
+  });
 });
 
 describe("labelForHubKeysCustodyEntry", () => {
