@@ -314,8 +314,11 @@ function showCardReady(session) {
 
 async function init() {
   const urlRef = readMerchRefFromUrl();
-  if (urlRef) persistMerchCreateRef(urlRef);
-  persistMerchCreateRef("customize_shop");
+  if (urlRef) {
+    persistMerchCreateRef(urlRef);
+  } else if (!peekMerchCreateRef()) {
+    persistMerchCreateRef("customize_shop");
+  }
   decorateCreateLinks();
 
   approveEl?.addEventListener("change", () => {

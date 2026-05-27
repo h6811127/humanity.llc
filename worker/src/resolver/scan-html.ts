@@ -29,6 +29,8 @@ import {
   SCAN_HERO_META_DETAILS_SUMMARY,
   SCAN_HERO_QR_DETAILS_SUMMARY,
   LOST_ITEM_RELAY_CREATE_HINT,
+  SCAN_MERCH_CUSTOMIZE_HINT,
+  SCAN_MERCH_CUSTOMIZE_PATH,
   LOST_ITEM_RELAY_CREATE_PATH,
   SCAN_SAFETY_RESOLVER_VERIFIED_COPY,
   type ScanSafetyModel,
@@ -201,6 +203,12 @@ function renderScanHeroSection(
     display.kind === "lost_item_relay"
       ? renderLostItemCreateHint(origin)
       : "";
+  const merchCustomizeHint =
+    vm.kind === "active" &&
+    heroTemplate !== "lost_item_relay" &&
+    heroTemplate !== "status_plate"
+      ? renderScanMerchCustomizeHint(origin)
+      : "";
   const qrBlock = scanHeroQrBlock(vm, qrMarkup);
   const qrSection = qrBlock
     ? `<details class="scan-hero-qr-details">
@@ -224,6 +232,7 @@ function renderScanHeroSection(
   <p class="scan-safety-first-seen" id="scan-safety-first-seen" hidden></p>
   ${footBlock}
   ${lostItemCreateHint}
+  ${merchCustomizeHint}
   ${qrSection}
 </article>
 </div>`;
@@ -353,6 +362,11 @@ function renderPublicSnapshotBlock(
 function renderLostItemCreateHint(origin: string): string {
   const href = `${origin.replace(/\/$/, "")}${LOST_ITEM_RELAY_CREATE_PATH}`;
   return `<p class="scan-create-hint" role="note"><a href="${escapeHtml(href)}">Create a lost-item tag</a> — ${escapeHtml(LOST_ITEM_RELAY_CREATE_HINT)}</p>`;
+}
+
+function renderScanMerchCustomizeHint(origin: string): string {
+  const href = `${origin.replace(/\/$/, "")}${SCAN_MERCH_CUSTOMIZE_PATH}`;
+  return `<p class="scan-merch-hint" id="scan-merch-customize-hint" role="note"><a href="${escapeHtml(href)}">Customize live object merch</a> — ${escapeHtml(SCAN_MERCH_CUSTOMIZE_HINT)}</p>`;
 }
 
 function buildScanHeroMain(
@@ -1050,7 +1064,7 @@ function renderScanLiveCheckArriveScript(origin: string): string {
 
 function renderScanMerchFunnelScript(origin: string): string {
   const assetOrigin = pagesJsOrigin(origin);
-  const mod = JSON.stringify(`${assetOrigin}/js/scan-merch-funnel.mjs?v=1`);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-merch-funnel.mjs?v=2`);
   return `<script type="module" src=${mod}></script>`;
 }
 

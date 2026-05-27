@@ -1,9 +1,10 @@
 /**
- * Scan page — carry hc_ref to /create/ and fire aggregate scan_landing beacon (M8.4).
+ * Scan page — carry hc_ref to /create/ and /shop/customize/; fire aggregate scan_landing beacon (M8.4).
  */
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import {
   appendMerchRefToCreateUrl,
+  appendMerchRefToCustomizeUrl,
   markMerchBeaconSent,
   merchBeaconAlreadySent,
   peekMerchCreateRef,
@@ -48,6 +49,13 @@ function decorateCreateLinks(ref) {
   }
 }
 
+function decorateCustomizeLinks(ref) {
+  if (!ref) return;
+  for (const anchor of document.querySelectorAll('a[href*="/shop/customize"]')) {
+    anchor.href = appendMerchRefToCustomizeUrl(anchor.href, ref);
+  }
+}
+
 async function postScanLandingBeacon(ref) {
   if (merchBeaconAlreadySent(ref)) return;
   markMerchBeaconSent(ref);
@@ -70,6 +78,7 @@ function init() {
 
   const ref = peekMerchCreateRef();
   decorateCreateLinks(ref);
+  decorateCustomizeLinks(ref);
 
   if (!ref) return;
 
