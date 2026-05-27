@@ -1857,9 +1857,11 @@ body.device-hub-sheet-open {
   transform: translateX(-50%) translateY(100%);
   transition: transform 0.45s var(--shell-spring);
   border-radius: var(--shell-radius-sheet) var(--shell-radius-sheet) 0 0;
-  background: var(--surface-popover-bg, #ffffff);
+  background: var(--surface-popover-bg-glass, var(--surface-popover-bg, #ffffff));
   color: var(--surface-popover-fg, #1c1c1e);
   box-shadow: var(--shell-shadow-sheet);
+  -webkit-backdrop-filter: var(--shell-blur);
+  backdrop-filter: var(--shell-blur);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -1965,8 +1967,8 @@ body.device-hub-sheet-open {
   padding: 0;
   border: none;
   background: rgba(0, 0, 0, 0.22);
-  -webkit-backdrop-filter: saturate(160%) blur(28px);
-  backdrop-filter: saturate(160%) blur(28px);
+  -webkit-backdrop-filter: var(--shell-blur);
+  backdrop-filter: var(--shell-blur);
   cursor: default;
   -webkit-tap-highlight-color: transparent;
   opacity: 0;
@@ -2092,6 +2094,8 @@ body.device-hub-sheet-open .shell-status-dot {
 
   .device-inbox-sheet {
     background: var(--surface-popover-bg, #ffffff);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 
   .device-hub-network-tools,

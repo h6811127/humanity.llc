@@ -1,6 +1,6 @@
 # Hub saved card row UX
 
-**Status:** Phases 1–3 shipped (May 2026) · Phase 4 in progress — [`HUB_CARD_3D_AND_SHEET_GLASS.md`](HUB_CARD_3D_AND_SHEET_GLASS.md)  
+**Status:** Phases 1–4 shipped (May 2026) — [`HUB_CARD_3D_AND_SHEET_GLASS.md`](HUB_CARD_3D_AND_SHEET_GLASS.md)  
 **Scope:** Saved card rows in the device hub (`/`, `/wallet/`, `/created/`) - `renderSavedRows()` in `site/js/device-hub-ui.mjs`  
 **Companions:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md), [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)
 
@@ -117,11 +117,12 @@ Implementation: `getCachedNetworkSeenAt()` → `entry.at` set in `refreshWalletN
 - [x] Tighter row rhythm - 5px card gap, compact head/controls/actions padding; 34px trust icon.
 - [x] Shell + dark theme - label tokens in `device-shell.css`; identity/status/menu in `theme-dark.css`.
 
-### Phase 4 - Tier-3 depth + sheet glass (in progress)
+### Phase 4 - Tier-3 depth + sheet glass (shipped)
 
 - [x] **Step 1:** `.hub-card-item` uses emphasis-card tier-3 tokens (hairline, `--hc-emphasis-card-shadow`, info glass fill, backdrop); opaque fallback per alignment doc.
 - [x] **Step 2:** Hub bottom sheet medium frosted transparency (light + dark).
-- [x] **Step 3:** Cache bust + regression (see [`HUB_CARD_3D_AND_SHEET_GLASS.md`](HUB_CARD_3D_AND_SHEET_GLASS.md)).
+- [x] **Step 3:** Cache bust shell pages.
+- [x] **Step 4:** Vitest regression + wallet e2e (see [`HUB_CARD_3D_AND_SHEET_GLASS.md`](HUB_CARD_3D_AND_SHEET_GLASS.md) § QA).
 
 ---
 

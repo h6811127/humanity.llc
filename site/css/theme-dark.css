@@ -186,7 +186,7 @@ html[data-theme="dark"] .device-hub.device-hub--sheet {
 }
 
 html[data-theme="dark"] .device-inbox-sheet {
-  background: var(--surface-popover-bg);
+  background: var(--surface-popover-bg-glass);
   color: var(--surface-popover-fg);
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.55);
 }

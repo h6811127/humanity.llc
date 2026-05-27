@@ -213,8 +213,15 @@ describe("UI color scheme popover guard", () => {
       ],
     });
     assertGuardedRule("site/css/device-shell.css", ".device-inbox-sheet", {
-      require: ["--surface-popover-bg", "--surface-popover-fg"],
-      forbid: ["backdrop-filter"],
+      require: [
+        "--surface-popover-bg-glass",
+        "--surface-popover-fg",
+        "--shell-blur",
+      ],
+    });
+    assertGuardedRule("site/css/device-shell.css", ".device-inbox-backdrop", {
+      require: ["--shell-blur"],
+      forbid: ["blur(28px)"],
     });
     assertGuardedRule(
       "site/css/device-shell.css",

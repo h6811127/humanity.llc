@@ -199,7 +199,7 @@ describe("device-emphasis-card-html", () => {
       expect(html).toContain('href="/css/hc-emphasis-card.css?v=4"');
       expect(html).toContain("styles.css?v=126");
       expect(html).toContain("theme-dark.css?v=27");
-      expect(html).toContain("device-shell.css?v=53");
+      expect(html).toContain("device-shell.css?v=54");
       expect(html).toContain('id="shell-status-line"');
       expect(html).toContain("device-status-bootstrap.mjs?v=44");
     }
@@ -247,8 +247,12 @@ describe("device-emphasis-card-html", () => {
     expect(shell).toMatch(
       /\.device-hub\.device-hub--sheet[\s\S]*--surface-popover-bg-glass[\s\S]*--shell-blur/
     );
+    expect(shell).toMatch(
+      /\.device-inbox-sheet[\s\S]*--surface-popover-bg-glass[\s\S]*--shell-blur/
+    );
+    expect(shell).toMatch(/\.device-inbox-backdrop[\s\S]*--shell-blur/);
     const plan = readFileSync(join(root, "docs/HUB_CARD_3D_AND_SHEET_GLASS.md"), "utf8");
-    expect(plan).toContain("Steps 1–4 shipped");
+    expect(plan).toContain("Step 6 inbox sheet glass parity shipped");
   });
 
   it("phase E: rollout docs mark visual alignment v2 complete", () => {

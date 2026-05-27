@@ -567,7 +567,11 @@ test.describe("device OS wallet flow", () => {
     await expect(page.getByText("Reachable").first()).toBeVisible();
     await expect(page.locator(".hub-card-status-alert:not([hidden])")).toHaveCount(0);
 
-    await page.getByRole("button", { name: "Open controls" }).first().click();
+    await page
+      .locator(".hub-card-item")
+      .first()
+      .getByRole("button", { name: "Open controls" })
+      .click();
     await expect(page).toHaveURL(/\/created\/\?.*profile_id=/);
     await page.goto("/wallet/");
     await expect(page.getByText("Reachable").first()).toBeVisible();

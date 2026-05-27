@@ -1,6 +1,6 @@
 # Hub saved-card 3D + sheet glass
 
-**Status:** Steps 1–4 shipped (Vitest green; wallet e2e 6/12 — remaining failures are `/created/` setup vs control mode, not hub CSS)  
+**Status:** Steps 1–5 shipped · Step 6 inbox sheet glass parity shipped (May 2026)  
 **Scope:** Saved card rows (`.hub-card-item`) in the device hub bottom sheet; hub sheet surface transparency (light + dark)  
 **Companions:** [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) · [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) · [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) · [`SCAN_HERO_CARD_VISUAL_SPEC.md`](SCAN_HERO_CARD_VISUAL_SPEC.md) § Visual tier
 
@@ -51,7 +51,7 @@ No markup or JS changes in `device-hub-ui.mjs` for row shells.
 | Hub dim backdrop (`.device-hub-backdrop`) | — | **Step 5:** **`var(--shell-blur)`** (was hardcoded `blur(28px)`) |
 | Dark sheet `background` | opaque `--surface-popover-bg` → **`--surface-popover-bg-glass`** | same |
 
-**Medium transparency** = clearly more see-through than May 2026 opaque migration, but row title/detail must still pass AA on the frosted stack. Inbox sheet stays opaque in Step 1; parity optional in Step 3.
+**Medium transparency** = clearly more see-through than May 2026 opaque migration, but row title/detail must still pass AA on the frosted stack. Inbox sheet matched hub frosted glass in Step 6.
 
 ### Step 5 — Stronger hub frost (May 2026)
 
@@ -78,12 +78,12 @@ Hub sheet and dim backdrop were still on tier-3 emphasis blur (`--hc-emphasis-ca
 | **3** | Cache bust shell pages; manual light/dark QA | `site/index.html`, wallet, created, create | **Shipped** |
 | **4** | Regression suite | `worker:test:ui-color-scheme`, `worker:test:device`, `e2e/device-os-wallet.spec.ts` | **Shipped** (Vitest green; wallet e2e partial — see below) |
 | **5** | Hub sheet + dim backdrop → `--shell-blur`; cache bust; guard tests | `device-shell.css`, shell HTML, `ui-color-scheme-popover-guard.test.ts`, `device-emphasis-card-html.test.ts` | **Shipped** |
+| **6** | Inbox sheet + dim backdrop glass parity with hub (`--surface-popover-bg-glass`, `--shell-blur`); cache bust; guard tests | `device-shell.css`, `theme-dark.css`, shell HTML, guard tests | **Shipped** |
 
 ---
 
 ## Out of scope
 
-- Inbox sheet glass (unless Step 2 extends for parity)
 - Glance popover rows, pin rows, hub notice full-bleed banners
 - Changing row copy, controls partition, or poll behavior
 - Scan hero (tier 4) shadow on hub rows
