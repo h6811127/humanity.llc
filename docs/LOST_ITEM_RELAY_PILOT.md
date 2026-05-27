@@ -50,6 +50,7 @@ Line 1 = `[relay] ` + item label · Line 2 = return message. Parsed in `worker/s
 - **Handle:** smaller `@handle` under the message  
 - **Badge:** Active / Revoked / etc. from network  
 - **Foot:** “This scan does not prove who holds the item. It only shows whether the return relay is active.”
+- **Create hint (Step 6):** Calm link to `/create/?template=lost_item` — “Create a lost-item tag” + copy from `scan-safety.ts` (`LOST_ITEM_RELAY_CREATE_*`). Lost-item relay template only.
 
 Deploy Worker with `X-HC-Scan-UI: pass-v8` for this layout.
 

@@ -176,7 +176,7 @@ describe("M5 showcase scan paths", () => {
 
   it("lost item relay: create hint links to lost_item template", async () => {
     const html = await renderActiveShowcaseScan(LOST_ITEM_MANIFESTO);
-    expect(html).toContain("scan-create-hint");
+    expect(html).toMatch(/<p class="scan-create-hint"/);
     expect(html).toContain(LOST_ITEM_RELAY_CREATE_HINT);
     expect(html).toContain(LOST_ITEM_RELAY_CREATE_PATH);
     expect(html).toContain("Create a lost-item tag");
