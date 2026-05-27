@@ -34,6 +34,13 @@ export const SCAN_MERCH_CUSTOMIZE_HINT =
   "Print your own live object on a sticker or hoodie — buying never grants vouch.";
 export const SCAN_MERCH_CUSTOMIZE_PATH = "/shop/customize/?hc_ref=scan_customize";
 
+/** Merch funnel — live wear / print_artifact scans (docs/MERCH_FUNNEL_MVP.md). */
+export const MERCH_SCAN_FUNNEL_REF = "scan_customize";
+export const MERCH_SCAN_FUNNEL_HINT =
+  "Create a free card, customize your QR on a hoodie or sticker, then update what strangers see from your phone.";
+export const MERCH_SCAN_CREATE_PATH = `/create/?hc_ref=${MERCH_SCAN_FUNNEL_REF}`;
+export const MERCH_SCAN_CUSTOMIZE_PATH = `/shop/customize/?hc_ref=${MERCH_SCAN_FUNNEL_REF}`;
+
 export interface ScanSafetyModel {
   objectSignatureVerified: boolean;
   stewardRegistered: boolean;

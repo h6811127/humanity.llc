@@ -408,11 +408,11 @@ Complete before milestone A.1. Map to backlog D-001–D-006.
 
 ### Phase A exit criteria (MVP shipped)
 
-- [ ] 3 people outside your network create cards without assistance.
-- [ ] Each can explain what scan proves and does not prove in one sentence.
-- [ ] Revoke one QR; scan shows revoked within cache TTL.
-- [ ] No scan analytics code paths in production.
-- [ ] Data policy linked from scan page.
+- [x] 3 people outside your network create cards without assistance. **Passed 2026-05-27**
+- [x] Each can explain what scan proves and does not prove in one sentence.
+- [x] Revoke one QR; scan shows revoked within cache TTL.
+- [x] No scan analytics code paths in production.
+- [x] Data policy linked from scan page.
 
 ---
 
@@ -531,7 +531,7 @@ Follow these steps in order. Each step lists **exit criteria** and **spec refs**
 | Step | Action | Exit | Refs |
 |---|---|---|---|
 | 5.1 | Landing CTA → `/create` | No mailto gate | PROTOCOL §4 |
-| 5.2 | Run 3 stranger tests | Pass Phase A exit | §12 |
+| 5.2 | Run 3 stranger tests | Pass Phase A exit | §12 — **done** (2026-05-27) |
 | 5.3 | Announce public create (site + README) |  -  |  -  |
 
 ### Milestone M5.5  -  Owner key portability (follow-up; not Phase A gate)
@@ -611,7 +611,7 @@ From `V1_IMPLEMENTATION_BACKLOG.md` Phase 7:
 - H-001 security checklist (no keys server-side, no scan analytics).
 - H-002 copy comprehension (5+ testers).
 - H-002A two-minute trust loop demo.
-- H-003 stranger create (Phase A exit).
+- H-003 stranger create (Phase A exit). **Passed 2026-05-27**
 
 ### 18.3 Anti-metrics (stop and fix)
 
@@ -667,11 +667,11 @@ Keep **specs in `docs/`**; keep **implementations** in `worker/` and `site/`. Li
 
 **Suggested command to an implementer:**
 
-> Start at **Step 1.1** (Worker project). Complete each step’s exit criteria before the next. Stop after **Step 5.3** for **MVP**. Continue M6+ only when Phase A exit criteria pass.
+> Start at **Step 1.1** (Worker project). Complete each step’s exit criteria before the next. Stop after **Step 5.3** for **MVP**. **Phase A exit criteria passed 2026-05-27** (M5 stranger tests). Continue M6+ when product priority calls for it.
 
 **Suggested command for commerce:**
 
-> Do not start M8 until M5.3 passes. Do not start M9 until Shopify spike 9.1 passes.  
+> **M5 passed 2026-05-27.** M8 may proceed subject to remaining gates in `docs/MERCH_QR_LIFECYCLE_POLICY.md`. Do not start M9 until Shopify spike 9.1 passes.  
 > **M5.5** (key export/recovery) is recommended **after M5.3** and before scaling stranger onboarding; it does not change Phase A exit criteria.
 
 This document should be updated when milestones ship: mark steps done in commit messages or a living `docs/V1_0_PROGRESS.md` if you add one later.

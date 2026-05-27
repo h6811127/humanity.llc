@@ -14,7 +14,7 @@ function intentRow(): ArtifactIntentRow {
     artifact_intent_id: INTENT,
     profile_id: PROFILE,
     source_qr_id: "qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
-    product_id: "prod_sticker_square",
+    product_id: "sticker_personalized_v1",
     quantity: 1,
     planned_item_qr_ids_json: JSON.stringify(["qr_plannedFulfill1"]),
     planned_print_artifact_ids_json: JSON.stringify(["pa_plannedFulfill1"]),
@@ -105,6 +105,7 @@ describe("ensurePrintOrderForCommerceOrder", () => {
 
     expect(result?.created).toBe(true);
     expect(result?.print_order.status).toBe("awaiting_production_approval");
+    expect(result?.print_order.template_id).toBe("hc-sticker-square-v1");
     expect(JSON.parse(result!.print_order.planned_item_qr_ids_json)).toEqual([
       "qr_plannedFulfill1",
     ]);

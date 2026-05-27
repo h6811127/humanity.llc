@@ -42,6 +42,10 @@ function isCardOwnerHere(profileId, qrId) {
   }
 }
 
+function isMerchFunnelScanPage() {
+  return document.querySelector("[data-merch-funnel='1']") != null;
+}
+
 function decorateCreateLinks(ref) {
   if (!ref) return;
   for (const anchor of document.querySelectorAll('a[href*="/create"]')) {
@@ -75,6 +79,7 @@ async function postScanLandingBeacon(ref) {
 function init() {
   const urlRef = readMerchRefFromUrl();
   if (urlRef) persistMerchCreateRef(urlRef);
+  else if (isMerchFunnelScanPage()) persistMerchCreateRef("scan_customize");
 
   const ref = peekMerchCreateRef();
   decorateCreateLinks(ref);
