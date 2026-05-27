@@ -102,6 +102,12 @@ Implementation notes:
 3. Consider adding the manifest link to marketing/docs pages after shell behavior is stable.
 4. Leave Worker-generated scan pages out unless product wants scan URLs themselves to be installable entry points.
 
+Implementation notes:
+
+- Manual QA lives in `DEVICE_OS_QA.md` as **P1-PWA · Home-screen install and standalone shell**.
+- Phase 4 keeps rollout scoped to shell pages. Marketing/docs pages and Worker-generated scan pages remain out of scope until shell install behavior has real-device sign-off.
+- Real install behavior must be checked on HTTPS; localhost only proves metadata and shell contracts.
+
 ---
 
 ## Tradeoffs

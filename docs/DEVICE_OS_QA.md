@@ -130,6 +130,24 @@ Run on **production** (or staging with full Pages deploy) after `site/` ships. M
 
 **Automated gate:** device shell E2E in CI (`e2e/device-status-dot.spec.ts`, `device-inbox`, `device-os-wallet`) plus invariant-only WebKit smoke (`e2e/safari-shell-scroll.spec.ts`). **P0-W** sign-off is still manual on real WebKit devices.
 
+### P1-PWA · Home-screen install and standalone shell
+
+Spec: [`PWA_INSTALL.md`](PWA_INSTALL.md). Automated metadata/contract checks: `npm run worker:test -- worker/tests/pwa-install-metadata.test.ts worker/tests/pwa-install-ux.test.ts`.
+
+Run on a deployed HTTPS origin; localhost can validate metadata but not the real mobile install surfaces.
+
+| Step | Device | Action | Expected |
+|------|--------|--------|----------|
+| PWA-1 | iPhone Safari | Open `/`; Share → **Add to Home Screen**; accept default name/icon | Home-screen icon uses Humanity artwork and title; launch opens without Safari URL bar |
+| PWA-2 | iPhone standalone | From the home-screen icon, open `/`, tap status dot, open hub, dismiss **Add Humanity to your home screen** if visible | Prompt hides in standalone mode; dot opens hub; no dead tap or stuck backdrop |
+| PWA-3 | iPhone standalone | Open `/wallet/` from in-app navigation or direct URL; tap status dot | Wallet loads; dot scrolls to saved cards, not hub sheet |
+| PWA-4 | Android Chrome | Open `/`; use browser **Install app** / **Add to Home screen**; launch from icon | App opens in standalone/minimal browser chrome; manifest name/icon are correct |
+| PWA-5 | Android Chrome normal tab | Clear `localStorage.hc_pwa_install_dismissed`; open `/`; trigger install prompt when Chrome exposes it | In-page prompt offers **Add**; accepted install stores `hc_pwa_install_installed=1`; dismissed prompt stores `hc_pwa_install_dismissed=1` |
+| PWA-6 | Any standalone launch | DevTools/Application → Service Workers | Single root worker is `/sw-live-proof.mjs`; fetch handler is network-only; no resolver/scan/API responses served from cache |
+| PWA-7 | Browser alerts opt-in | Enable then disable browser alerts from the hub/inbox control | Live-proof polling state disables, but the app service worker remains registered for installability |
+
+**Fail signals:** URL bar still visible from home-screen launch; prompt appears inside standalone mode; status dot is dead after standalone launch; two root-scoped service workers compete; card status or scan HTML is served stale from cache; disabling browser alerts unregisters the PWA service worker.
+
 ### P1-4 · Hub intro coachmark (first visit)
 
 Spec: [`DEVICE_HUB_INTRO_COACHMARK.md`](DEVICE_HUB_INTRO_COACHMARK.md). Automated: `e2e/device-status-dot.spec.ts` (hub intro coachmark block).

@@ -132,4 +132,18 @@ describe("PWA install UX", () => {
     expect(swScript).toContain("event.respondWith(fetch(event.request));");
     expect(swScript).not.toContain("caches.match(event.request)");
   });
+
+  it("documents manual PWA install and standalone QA", () => {
+    const qa = readSiteFile("docs/DEVICE_OS_QA.md");
+    expect(qa).toContain("### P1-PWA · Home-screen install and standalone shell");
+    expect(qa).toContain("iPhone Safari");
+    expect(qa).toContain("Android Chrome");
+    expect(qa).toContain("Prompt hides in standalone mode");
+    expect(qa).toContain("Single root worker is `/sw-live-proof.mjs`");
+    expect(qa).toContain("disabling browser alerts unregisters the PWA service worker");
+
+    const plan = readSiteFile("docs/PWA_INSTALL.md");
+    expect(plan).toContain("P1-PWA · Home-screen install and standalone shell");
+    expect(plan).toContain("Marketing/docs pages and Worker-generated scan pages remain out of scope");
+  });
 });
