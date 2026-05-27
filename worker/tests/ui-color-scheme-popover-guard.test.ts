@@ -130,6 +130,22 @@ describe("UI color scheme popover guard", () => {
     expect(styles.slice(0, rootIdx)).not.toMatch(/^\s*[^{@/][^{]*\{/m);
   });
 
+  it("shell pages link hc-emphasis-card.css before styles.css", () => {
+    for (const page of [
+      "site/index.html",
+      "site/wallet/index.html",
+      "site/create/index.html",
+      "site/created/index.html",
+      "site/organizer-revoke/index.html",
+    ]) {
+      const html = readSiteCss(page);
+      const linkIdx = html.indexOf('href="/css/hc-emphasis-card.css?v=4"');
+      const stylesIdx = html.indexOf('href="/styles.css?v=');
+      expect(linkIdx, page).toBeGreaterThanOrEqual(0);
+      expect(stylesIdx, page).toBeGreaterThan(linkIdx);
+    }
+  });
+
   it("keeps migrated shell popover surfaces on semantic tokens", () => {
     assertGuardedRule("site/styles.css", ".hub-card-menu-panel", {
       require: ["--surface-popover-bg", "--surface-popover-fg"],
@@ -258,14 +274,11 @@ describe("UI color scheme popover guard", () => {
     const emphasisCss = readSiteCss("site/css/hc-emphasis-card.css");
     expect(emphasisCss).toContain("prefers-reduced-transparency: reduce");
     expect(emphasisCss).toContain("@supports not");
-    assertGuardedRule(
-      "site/css/hc-emphasis-card.css",
-      ".hc-emphasis-card__title,\n.wallet-active-label",
-      {
-        require: ["--hc-emphasis-card-title-fg"],
-        forbid: ["color: var(--black)"],
-      }
-    );
+    assertGuardedRule("site/css/hc-emphasis-card.css", ".hc-emphasis-card__title", {
+      require: ["--hc-emphasis-card-title-fg"],
+      forbid: ["color: var(--black)", ".wallet-active-label"],
+    });
+    expect(readSiteCss("site/css/hc-emphasis-card.css")).not.toContain(".wallet-active-");
     assertGuardedRule("site/css/theme-dark.css", "html[data-theme=\"dark\"] .hc-emphasis-card--active", {
       require: ["--hc-emphasis-card-fill-active-glass", "--hc-emphasis-card-border-active"],
     });

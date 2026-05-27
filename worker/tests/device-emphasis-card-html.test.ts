@@ -31,7 +31,7 @@ describe("device-emphasis-card-html", () => {
 
   it("landing index busts styles.css cache when spacing changes", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
-    expect(html).toContain('href="/css/hc-emphasis-card.css?v=3"');
+    expect(html).toContain('href="/css/hc-emphasis-card.css?v=4"');
     expect(html).toContain("styles.css?v=125");
   });
 
@@ -50,7 +50,7 @@ describe("device-emphasis-card-html", () => {
     const styles = readFileSync(join(root, "site/styles.css"), "utf8");
     expect(styles).toContain("--hc-emphasis-card-gap-section: 24px");
     expect(styles).toContain("--hc-emphasis-card-gap-dot: 14px");
-    expect(styles).toContain('hc-emphasis-card.css?v=3');
+    expect(styles).toContain('hc-emphasis-card.css?v=4');
     const emphasis = readFileSync(join(root, "site/css/hc-emphasis-card.css"), "utf8");
     expect(emphasis).toContain("var(--hc-emphasis-card-gap-dot)");
     expect(emphasis).toContain("var(--hc-emphasis-card-gap-copy)");
@@ -196,11 +196,20 @@ describe("device-emphasis-card-html", () => {
   it("shell pages bust styles and theme-dark for emphasis alignment", () => {
     for (const page of ["site/wallet/index.html", "site/create/index.html", "site/created/index.html"]) {
       const html = readFileSync(join(root, page), "utf8");
-      expect(html).toContain('href="/css/hc-emphasis-card.css?v=3"');
+      expect(html).toContain('href="/css/hc-emphasis-card.css?v=4"');
       expect(html).toContain("styles.css?v=125");
       expect(html).toContain("theme-dark.css?v=26");
       expect(html).toContain("device-shell.css?v=52");
     }
+  });
+
+  it("wallet active banner uses emphasis card classes without legacy aliases", () => {
+    const html = readFileSync(join(root, "site/wallet/index.html"), "utf8");
+    expect(html).toContain('id="wallet-active-banner"');
+    expect(html).toContain("hc-emphasis-card--active");
+    expect(html).toContain("hc-emphasis-card__title");
+    expect(html).not.toMatch(/class="[^"]*\bwallet-active-/);
+    expect(html).not.toMatch(/class='[^']*\bwallet-active-/);
   });
 
   it("phase E: no withdrawn landing glass in site sources", () => {

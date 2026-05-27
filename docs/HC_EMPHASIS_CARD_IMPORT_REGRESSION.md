@@ -1,6 +1,6 @@
 # Emphasis card CSS import regression (shell pages)
 
-**Status:** Step 1–2 shipped  
+**Status:** Step 1–5 shipped  
 **Introduced:** Phase 2 (`1f0c517`) — extract `site/css/hc-emphasis-card.css`  
 **Symptom:** `#wallet-active-banner` and other `hc-emphasis-card` surfaces on shell pages render as **unstyled text** (no shadow, dot, or pill CTA).
 
@@ -51,7 +51,7 @@ All pages that rely on `styles.css` only (not scan bundle):
 | **2** | Add Vitest guard: `@import` must appear before first `{` rule block in `styles.css` | **Shipped** |
 | **3** | Bump `styles.css?v=` on shell pages that ship emphasis cards (`/wallet/`, `/`, `/created/`, `/create/`, hub) | **Shipped** (`v=110`) |
 | **4** | Manual QA: wallet active banner 3D card, cross-tab pill CTAs, created live proof (light + dark) | After deploy |
-| **5** | Optional: `<link href="/css/hc-emphasis-card.css">` on shell pages as belt-and-suspenders (not required if Step 1 holds) | Backlog |
+| **5** | Optional: `<link href="/css/hc-emphasis-card.css">` on shell pages as belt-and-suspenders (not required if Step 1 holds) | **Shipped** — `/`, `/wallet/`, `/create/`, `/created/`, `/organizer-revoke/` |
 
 **Do not** rely on mid-file `@import` again. Alternative long-term: explicit `<link>` on shell HTML only (no `@import` in `styles.css`).
 

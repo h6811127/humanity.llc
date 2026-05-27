@@ -47,7 +47,7 @@ Use these for:
 - Hub card overflow menu (`.hub-card-menu-panel`, `.hub-card-menu-item*`)
 - Device hub and inbox bottom sheets (`.device-hub--sheet`, `.device-inbox-sheet`)
 - Any new floating panel or popup-style shell component
-- Wallet **Active in this tab** banner (`.wallet-active-banner` on `/wallet/`)
+- Wallet **Active in this tab** banner (`#wallet-active-banner` on `/wallet/`)
 
 ---
 
@@ -111,7 +111,7 @@ Eyebrow colors stay on `--hc-emphasis-card-eyebrow-{active,info,warn,urgent}` pe
 ### Typography contrast — implementation checklist
 
 1. **Tokens** — Assign explicit `--hc-emphasis-card-title-fg` and `--hc-emphasis-card-detail-fg` on `:root` and `html[data-theme="dark"]` (no `var(--shell-label)` alias for detail in dark).
-2. **Selectors** — `.hc-emphasis-card__title` and `.hc-emphasis-card__detail` (and legacy `.wallet-active-label` / `.wallet-active-detail` aliases) use **only** these tokens for `color`.
+2. **Selectors** — `.hc-emphasis-card__title` and `.hc-emphasis-card__detail` use **only** these tokens for `color`.
 3. **Regression** — Extend `worker/tests/ui-color-scheme-popover-guard.test.ts` so dark `:root` block forbids `--hc-emphasis-card-detail-fg: var(--shell-label)`.
 4. **QA** — `/wallet/` dark: title and detail both readable on every modifier fill; bump `theme-dark.css?v=` on shell pages when CSS changes.
 
@@ -130,7 +130,7 @@ Eyebrow colors stay on `--hc-emphasis-card-eyebrow-{active,info,warn,urgent}` pe
 ### Reference instance: wallet active tab (`--active`)
 
 **When shown:** `/wallet/` when this tab holds signing keys (`wallet-page-chrome.mjs`).  
-**Markup:** `#wallet-active-banner` with `hc-emphasis-card hc-emphasis-card--active` (+ legacy `wallet-active-*` classes).
+**Markup:** `#wallet-active-banner` with `hc-emphasis-card hc-emphasis-card--active` (legacy `.wallet-active-*` class aliases removed May 2026).
 
 | Part | Class | Light | Dark |
 |------|--------|-------|------|
@@ -160,7 +160,7 @@ Eyebrow colors stay on `--hc-emphasis-card-eyebrow-{active,info,warn,urgent}` pe
 
 ### Rollout candidates (brainstorm)
 
-Prioritized places that could adopt the same **raised card** pattern. Extraction work: generalize `.wallet-active-banner` → `.hc-emphasis-card` + modifiers; keep one shadow token.
+Prioritized places that could adopt the same **raised card** pattern. Extraction work: use `.hc-emphasis-card` + modifiers; keep one shadow token.
 
 #### Tier 1 — Wallet / My cards (same screen, highest fit)
 
@@ -278,7 +278,7 @@ When touching legacy components, migrate them incrementally to this token family
 | Inbox browser-alert prompt | `.device-inbox-sheet .device-browser-notif-prompt*` | Live-proof OS notification opt-in inside inbox sheet footer on popover tokens. |
 | Glance status row tints | `.device-hub-glance-row--notice/crosstab/liveproof/revoked` | Notice/cross-tab/warn bg, border, and title fg tokens (light + dark on `:root`). |
 | Dot explainer (base) | `.device-dot-explainer*` | Default explainer block uses popover tokens; hub/glance scopes retain explicit rules. |
-| Wallet active-tab banner | `.hc-emphasis-card--active` (`#wallet-active-banner`) | Phase 0 reference; legacy `.wallet-active-*` aliases retained (see **Emphasis notice cards**, [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md)). |
+| Wallet active-tab banner | `.hc-emphasis-card--active` (`#wallet-active-banner`) | Phase 0 reference; `hc-emphasis-card__*` only |
 
 ### Migration complete (shell popovers)
 

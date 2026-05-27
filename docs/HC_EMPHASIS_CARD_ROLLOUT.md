@@ -47,7 +47,7 @@ Replaces over time: flat `.hc-notice` strips, plain `<p>` cross-tab lines, and a
 
 **IDs:** Keep stable `id`s for JS (`#wallet-active-banner`, `#live-control-proof-lead`, `#no-session-detail`, etc.) even when classes migrate.
 
-**Legacy aliases:** `.wallet-active-banner` and `.wallet-active-*` remain valid aliases to `.hc-emphasis-card` / `__*` until all call sites migrate (do not remove until Phase 5+ cleanup).
+**Legacy aliases:** `.wallet-active-*` class aliases **removed** (May 2026) — `#wallet-active-banner` uses `hc-emphasis-card__*` only; stable `id`s unchanged.
 
 **Helpers:** `site/js/device-emphasis-card-html.mjs` · **Tests:** `worker/tests/device-emphasis-card-html.test.ts`
 
@@ -146,7 +146,7 @@ Prioritized follow-ups after Phases 0–5. Full tier tables: [`UI_COLOR_SCHEME_S
 | Inbox sheet rows | Dense list UX |
 | Solid `.device-hub-notice-banner` full-bleed | Intentional high-contrast hub taps |
 | `.research-live-banner` | Separate visual language (landing blocks — [`LANDING_FINAL_CTA_EMPHASIS_CARD.md`](LANDING_FINAL_CTA_EMPHASIS_CARD.md), alignment — [`HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md`](HC_EMPHASIS_CARD_VISUAL_ALIGNMENT.md)) |
-| Remove `.wallet-active-*` aliases | After all consumers use `hc-emphasis-card__*` only |
+| Remove `.wallet-active-*` aliases | **Shipped** — wallet active banner uses `hc-emphasis-card__*` only (`hc-emphasis-card.css?v=4`) |
 | Landing Liquid Glass CTAs | Revert per visual alignment doc phase A |
 
 ### Engineering hygiene

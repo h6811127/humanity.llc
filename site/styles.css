@@ -1,5 +1,5 @@
 /* humanity.llc  -  iOS grouped UI, light. #DB1B43 · #000 · #fff · #b8b8b8 */
-@import url("./css/hc-emphasis-card.css?v=3");
+@import url("./css/hc-emphasis-card.css?v=4");
 
 :root {
   --red: #db1b43;
@@ -5057,7 +5057,7 @@ body.landing-focus-mode .screen-landing {
   margin-bottom: 6px;
 }
 
-.screen-wallet-sleek .hc-emphasis-card.wallet-active-banner {
+.screen-wallet-sleek #wallet-active-banner.hc-emphasis-card {
   margin-bottom: 4px;
 }
 
