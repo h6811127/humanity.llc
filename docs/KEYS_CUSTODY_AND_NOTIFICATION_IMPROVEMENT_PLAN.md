@@ -1,6 +1,6 @@
 # Keys custody and notification improvement plan
 
-**Status:** Phases 1–5 + 7 (partial) shipped · Phase 6 planned  
+**Status:** Phases 1–5 + 7 (partial) shipped · Phase 6 (partial) shipped  
 **Audience:** Product, engineering  
 **Related:** [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md)
 
@@ -179,9 +179,15 @@ Clearer ARIA/tooltip breakdown; glance copy aligned with per-tab custody rows; d
 
 **Code:** `device-cross-tab-copy-core.mjs`, `device-inbox-core.mjs`, `device-hub-keys-custody-core.mjs`, `device-cross-tab-banner.mjs`, `device-tab-presence.mjs`
 
-### Phase 6 — Scale limits + portability
+### Phase 6 — Scale limits + portability (partial) ✅
 
-1–5 card guardrails; poll budget; backup/import ([`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md)).
+| Subpoint | Detail |
+|----------|--------|
+| **1–5 card guardrails** | Hub custody `wallet_scale` row when saved count > 5 (below large-wallet threshold); links to import + saved cards |
+| **Large wallet copy** | Reuses `walletScaleHint()` / `walletScaleRowTitle()` from `device-wallet-scale-core.mjs` |
+| **Poll budget / backup** | Large-wallet poll caps unchanged; full backup/import path — [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) |
+
+**Code:** `device-wallet-scale-core.mjs`, `device-hub-keys-custody-core.mjs`, `device-hub-keys-custody.mjs`, `device-hub-ui.mjs`
 
 ### Phase 7 — Demote legacy banners ✅ (partial)
 

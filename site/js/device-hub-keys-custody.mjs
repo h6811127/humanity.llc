@@ -22,6 +22,11 @@ import {
   setDefaultVouchProfile,
 } from "./vouch-ready-keys.mjs";
 import { getSignLock } from "./vouch-sign-lock.mjs";
+import { getStewardEntitlementsPolicy } from "./device-steward-entitlements.mjs";
+import {
+  walletScaleHint,
+  walletScaleRowTitle,
+} from "./device-wallet-scale-core.mjs";
 
 export { hubKeysCustodyPanelEnabledInDom as hasUnifiedHubKeysCustodyPanel };
 
@@ -65,6 +70,29 @@ function gatherProactiveCustodyInput(session) {
   };
 }
 
+function gatherWalletScaleInput() {
+  const wallet = loadWallet();
+  const count = wallet.length;
+  const policy = getStewardEntitlementsPolicy();
+  const hint = walletScaleHint(count, policy);
+  return {
+    savedCardCount: count,
+    walletScaleHint: hint,
+    walletScaleTitle: hint ? walletScaleRowTitle(count, policy) : null,
+  };
+}
+
+function scrollHubToImport() {
+  const target =
+    document.getElementById("hub-import-form") ??
+    document.querySelector(".device-hub-import");
+  target?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  const details = target instanceof HTMLDetailsElement ? target : target?.closest("details");
+  if (details instanceof HTMLDetailsElement) {
+    details.open = true;
+  }
+}
+
 function scrollHubToSavedCards() {
   document.getElementById("device-hub-saved-group")?.scrollIntoView({
     behavior: "smooth",
@@ -86,7 +114,7 @@ function rowIconTone(row) {
     return "amber";
   }
   if (row.kind === "this_tab_active" || row.kind === "vouch_default") return "green";
-  if (row.kind === "cross_tab_summary") return "blue";
+  if (row.kind === "cross_tab_summary" || row.kind === "wallet_scale") return "blue";
   return "blue";
 }
 
@@ -104,6 +132,11 @@ function rowActionsHtml(row) {
   }
   if (row.kind === "vouch_nudge") {
     return `<button type="button" class="device-hub-keys-custody-action" data-hub-custody-saved-cards>Choose on saved cards</button>`;
+  }
+  if (row.kind === "wallet_scale") {
+    return `
+      <button type="button" class="device-hub-keys-custody-action device-hub-keys-custody-action--secondary" data-hub-custody-import-backup>Import backup</button>
+      <button type="button" class="device-hub-keys-custody-action" data-hub-custody-saved-cards>Saved cards</button>`;
   }
   if (row.kind === "cross_tab" && row.entry) {
     const parts = [`<button type="button" class="device-hub-keys-custody-action" data-hub-custody-focus>Open tab</button>`];
@@ -217,6 +250,11 @@ function bindPanelActions(panel, state) {
       e.preventDefault();
       scrollHubToSavedCards();
     });
+
+    li.querySelector("[data-hub-custody-import-backup]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      scrollHubToImport();
+    });
   }
 
   panel.querySelector("[data-keys-custody-ack]")?.addEventListener("click", (e) => {
@@ -240,6 +278,7 @@ export function renderHubKeysCustodyPanel() {
     hasActiveKeys: Boolean(session?.owner_private_key_b58),
     educationDismissed: isKeysCustodyNoticeDismissed(),
     ...gatherProactiveCustodyInput(session),
+    ...gatherWalletScaleInput(),
   });
 
   if (!state.visible) {

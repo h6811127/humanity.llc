@@ -300,6 +300,7 @@ function bindCustodyChannel() {
       if (data?.type === DROP_PRESENCE_MSG && data.profile_id) {
         purgePresenceForProfile(data.profile_id);
         syncTabKeysPresence();
+        window.dispatchEvent(new Event("hc-cross-tab-custody-invalidated"));
         return;
       }
       if (data?.type !== "clear-profile-keys" || !data.profile_id) return;

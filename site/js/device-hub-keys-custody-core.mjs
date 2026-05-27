@@ -16,7 +16,7 @@ import {
   ORPHAN_KEYS_INBOX_TITLE,
 } from "./device-orphan-keys-nav-core.mjs";
 
-/** @typedef {'this_tab_active' | 'this_tab_unsaved' | 'cross_tab' | 'cross_tab_summary' | 'orphan' | 'vouch_default' | 'sign_lock' | 'vouch_nudge'} HubKeysCustodyRowKind */
+/** @typedef {'this_tab_active' | 'this_tab_unsaved' | 'cross_tab' | 'cross_tab_summary' | 'orphan' | 'vouch_default' | 'sign_lock' | 'vouch_nudge' | 'wallet_scale'} HubKeysCustodyRowKind */
 
 /**
  * @typedef {object} HubKeysCustodyPresenceEntry
@@ -62,6 +62,9 @@ export function labelForHubKeysCustodyEntry(entry) {
  *   signLockMode?: "pin" | "webauthn" | null,
  *   signLockLabel?: string | null,
  *   walletEntriesWithKeys?: number,
+ *   savedCardCount?: number,
+ *   walletScaleHint?: string | null,
+ *   walletScaleTitle?: string | null,
  * }} input
  * @returns {HubKeysCustodyPanelState}
  */
@@ -79,6 +82,9 @@ export function buildHubKeysCustodyPanel(input) {
     signLockMode = null,
     signLockLabel = null,
     walletEntriesWithKeys = 0,
+    savedCardCount = 0,
+    walletScaleHint: walletScaleHintText = null,
+    walletScaleTitle = null,
   } = input;
 
   /** @type {HubKeysCustodyRow[]} */
@@ -163,6 +169,14 @@ export function buildHubKeysCustodyPanel(input) {
       kind: "vouch_nudge",
       title: "Set a default for vouching",
       subtitle: `${walletEntriesWithKeys} saved cards · pick one for scan auto-load`,
+    });
+  }
+
+  if (walletScaleHintText && walletScaleTitle && savedCardCount > 0) {
+    rows.push({
+      kind: "wallet_scale",
+      title: walletScaleTitle,
+      subtitle: walletScaleHintText,
     });
   }
 

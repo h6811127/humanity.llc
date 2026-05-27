@@ -137,6 +137,16 @@ describe("buildHubKeysCustodyPanel", () => {
     expect(state.rows[1].title).toBe("@alice");
     expect(state.rows[1].subtitle).toBe("Other tab with signing keys");
   });
+
+  it("shows wallet scale row when above comfortable card count", () => {
+    const state = buildHubKeysCustodyPanel({
+      savedCardCount: 7,
+      walletScaleTitle: "Many saved cards",
+      walletScaleHint: "7 saved — comfortable use is about 1–5 cards.",
+    });
+    expect(state.rows.map((r) => r.kind)).toEqual(["wallet_scale"]);
+    expect(state.visible).toBe(true);
+  });
 });
 
 describe("labelForHubKeysCustodyEntry", () => {

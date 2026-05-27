@@ -107,7 +107,7 @@ import {
 } from "./device-live-control-inbox.mjs";
 import {
   isLargeWallet,
-  largeWalletHint,
+  walletScaleHint,
   selectNetworkRefreshEntries,
   walletNetworkMaxParallel,
 } from "./device-wallet-scale-core.mjs";
@@ -1410,7 +1410,7 @@ export function initDeviceHub(config = {}) {
       getAutoPollBudgetPaused: () => isLiveControlAutoPollBudgetPaused(),
       getStewardQuotaPaused: () => isStewardServerQuotaPaused(),
       getLargeWalletHint: () =>
-        largeWalletHint(loadWallet().length, getStewardEntitlementsPolicy()),
+        walletScaleHint(loadWallet().length, getStewardEntitlementsPolicy()),
       getHostedTierLine: () =>
         hostedTierHubIndicatorLine(getStewardEntitlementsPolicy()),
       onCheckNetwork: () => fetchAndApplyNetworkChips({ manual: true }),
