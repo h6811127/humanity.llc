@@ -1,5 +1,7 @@
 /**
- * Browser leader tab + BroadcastChannel snapshots for live-control inbox (Phase 7).
+ * Browser leader tab election for live-control auto polling (Phase 7).
+ * Cross-tab snapshots use unified `hc-resolver-sync` (Phase 3).
+ * @see docs/DEVICE_TAB_RESOLVER_SYNC.md
  */
 import {
   LIVE_CONTROL_POLL_LEADER_STORAGE_KEY,
@@ -8,25 +10,9 @@ import {
   shouldTabActAsLiveControlPollLeader,
 } from "./device-live-control-poll-leader-core.mjs";
 
-const CHANNEL_NAME = "hc-live-control-poll-leader";
 const TAB_ID_SESSION_KEY = "hc_live_control_poll_tab_id";
 
-/** @type {BroadcastChannel | null} */
-let channel = null;
-let listenerBound = false;
-
-/** @type {((payload: import("./device-live-control-inbox.mjs").LiveControlLeaderSnapshot) => void) | null} */
-let onSnapshot = null;
-
-function ensureChannel() {
-  if (channel || typeof BroadcastChannel === "undefined") return channel;
-  try {
-    channel = new BroadcastChannel(CHANNEL_NAME);
-  } catch {
-    channel = null;
-  }
-  return channel;
-}
+let pagehideBound = false;
 
 function randomTabId() {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -98,36 +84,29 @@ export function releaseLiveControlPollLeader() {
  * @param {import("./device-live-control-inbox.mjs").LiveControlLeaderSnapshot} snapshot
  */
 export function broadcastLiveControlPollSnapshot(snapshot) {
-  const ch = ensureChannel();
-  if (!ch) return;
-  try {
-    ch.postMessage({ type: "snapshot", ...snapshot });
-  } catch {
-    /* ignore */
-  }
+  void import("./device-resolver-sync.mjs").then((m) => {
+    m.broadcastLiveControlSyncSnapshot(snapshot);
+  });
 }
 
 /**
  * @param {(payload: import("./device-live-control-inbox.mjs").LiveControlLeaderSnapshot) => void} handler
  */
 export function bindLiveControlPollLeaderSnapshot(handler) {
-  onSnapshot = handler;
-  const ch = ensureChannel();
-  if (!ch || listenerBound) return;
-  listenerBound = true;
-  ch.addEventListener("message", (event) => {
-    const data = event?.data;
-    if (!data || data.type !== "snapshot") return;
-    onSnapshot?.({
-      pending: Array.isArray(data.pending) ? data.pending : [],
-      health: data.health === "degraded" || data.health === "offline" ? data.health : "ok",
-      at: typeof data.at === "number" ? data.at : Date.now(),
-      tabId: typeof data.tabId === "string" ? data.tabId : "",
+  void import("./device-resolver-sync.mjs").then((m) => {
+    m.registerLiveControlSnapshotHandler((message) => {
+      handler({
+        pending: message.pending,
+        health: message.health,
+        at: message.at,
+        tabId: message.tabId,
+      });
     });
+    m.initResolverTabSync();
   });
 
-  if (typeof window !== "undefined" && !window.__hcLiveControlLeaderPagehide) {
-    window.__hcLiveControlLeaderPagehide = true;
+  if (typeof window !== "undefined" && !pagehideBound) {
+    pagehideBound = true;
     window.addEventListener("pagehide", () => {
       releaseLiveControlPollLeader();
     });

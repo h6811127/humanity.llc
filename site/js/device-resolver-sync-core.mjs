@@ -5,6 +5,9 @@
 
 export const RESOLVER_SYNC_PREF_KEY = "hc_resolver_sync_tabs";
 
+/** Unified cross-tab channel (network, health, live-control). */
+export const RESOLVER_SYNC_CHANNEL = "hc-resolver-sync";
+
 /** Follower may skip auto status GETs while leader snapshot is this fresh. */
 export const RESOLVER_SYNC_SNAPSHOT_TTL_MS = 60_000;
 
@@ -194,4 +197,39 @@ export function shouldFollowerSkipHealthFetch(opts) {
   if (!syncEnabled || isLeader) return false;
   if (typeof snapshotAt !== "number" || !Number.isFinite(snapshotAt)) return false;
   return now - snapshotAt <= ttlMs;
+}
+
+/**
+ * @typedef {{
+ *   type: "live-control-snapshot";
+ *   tabId: string;
+ *   at: number;
+ *   pending: unknown[];
+ *   health: "ok" | "degraded" | "offline";
+ * }} LiveControlSnapshotMessage
+ */
+
+/**
+ * @param {unknown} data
+ * @returns {LiveControlSnapshotMessage | null}
+ */
+export function parseLiveControlSnapshotMessage(data) {
+  if (!data || typeof data !== "object") return null;
+  const msg = /** @type {Record<string, unknown>} */ (data);
+  const type = msg.type;
+  if (type !== "live-control-snapshot" && type !== "snapshot") return null;
+  const tabId = typeof msg.tabId === "string" ? msg.tabId : "";
+  const at = typeof msg.at === "number" && Number.isFinite(msg.at) ? msg.at : 0;
+  if (!tabId || !at) return null;
+  const health = msg.health;
+  const normalizedHealth =
+    health === "degraded" || health === "offline" ? health : "ok";
+  const pending = Array.isArray(msg.pending) ? msg.pending : [];
+  return {
+    type: "live-control-snapshot",
+    tabId,
+    at,
+    pending,
+    health: normalizedHealth,
+  };
 }

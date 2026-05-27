@@ -1021,6 +1021,49 @@ button.device-hub-notice-banner {
   opacity: 0.92;
 }
 
+.device-hub-build-stamp {
+  margin: 12px 4px 0;
+  padding: 10px 12px;
+  border-radius: var(--shell-radius-card);
+  background: var(--surface-popover-control-bg);
+  border: 0.5px solid var(--surface-popover-border);
+}
+
+.device-hub-build-stamp[hidden] {
+  display: none !important;
+}
+
+.device-hub-build-stamp-eyebrow {
+  margin: 0 0 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--surface-popover-fg-muted);
+}
+
+.device-hub-build-stamp-line {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--surface-popover-fg);
+  word-break: break-all;
+}
+
+.device-hub-build-stamp-copy {
+  margin-top: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--brand-accent, #db1b43);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .device-hub-network-tools {
   margin: 0 0 14px 4px;
   padding: 14px 14px 12px;

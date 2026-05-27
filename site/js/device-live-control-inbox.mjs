@@ -3,7 +3,10 @@
  * Signing stays on /created/  -  inbox only surfaces waiting requests.
  * @see docs/DEVICE_OS_REQUEST_BUDGET.md (Phases 1–5 shipped; 7–8 budget, leader, large wallet)
  */
-import { isWatchLiveProofEnabled } from "./device-hub-network-tools-core.mjs";
+import {
+  isWatchLiveProofEnabled,
+  LIVE_PROOF_CHECKED_AT_SESSION_KEY,
+} from "./device-hub-network-tools-core.mjs";
 import { getTabSession } from "./device-keys.mjs";
 import {
   isLiveControlAutoPollBudgetExhausted,
@@ -31,6 +34,7 @@ import {
   STEWARD_PUSH_LIVE_PROOF_EVENT,
   STEWARD_PUSH_STATE_CHANGED,
 } from "./device-steward-push.mjs";
+import { shouldIgnoreLiveControlSnapshotFromSameTab } from "./device-live-control-poll-leader-core.mjs";
 import {
   bindLiveControlPollLeaderSnapshot,
   broadcastLiveControlPollSnapshot,
@@ -116,9 +120,6 @@ let roundRobinCursor = 0;
 let pollSyncInFlight = false;
 /** Tracks SSE push suppressing auto poll so we restart the loop when push drops. */
 let stewardPushWasSuppressingAutoPoll = false;
-
-/** Survives reload within the tab session (Monitoring “this visit” line). */
-const LIVE_PROOF_CHECKED_AT_SESSION_KEY = "hc_live_proof_checked_at";
 
 function readPersistedLiveProofCheckedAt() {
   if (typeof sessionStorage === "undefined") return 0;
@@ -298,7 +299,9 @@ function liveControlChallengeFetchInit(manual) {
  */
 export function applyLiveControlInboxSnapshot(snapshot) {
   const sourceTabId = typeof snapshot.tabId === "string" ? snapshot.tabId : "";
-  if (sourceTabId && sourceTabId === getLiveControlPollTabId()) return;
+  if (shouldIgnoreLiveControlSnapshotFromSameTab(sourceTabId, getLiveControlPollTabId())) {
+    return;
+  }
 
   const next = Array.isArray(snapshot.pending) ? [...snapshot.pending] : [];
   const prevHealth = getLiveControlPollHealth();

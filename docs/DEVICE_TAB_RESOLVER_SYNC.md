@@ -71,14 +71,13 @@ flowchart TB
 
 [`device-live-control-poll-leader.mjs`](../site/js/device-live-control-poll-leader.mjs) already elects a leader for **live-control auto poll** and broadcasts `LiveControlLeaderSnapshot` on `hc-live-control-poll-leader`.
 
-| Concern | Live-control leader (shipped) | Resolver network sync (this spec) |
-|---------|------------------------------|-----------------------------------|
-| Channel | `hc-live-control-poll-leader` | `hc-resolver-sync` (new) |
-| Payload | Pending challenges, health coarse | Per-`profile_id` status, `scan.kind`, `at`, resolver-confirmed flags |
-| Follower behavior | Apply inbox pending state | Merge `hc_wallet_network_cache` + truth + `NETWORK_REFRESHED` |
-| Leader lock key | `hc_live_control_poll_leader` | Reuse **same** lock record **or** separate `hc_resolver_sync_leader` (implementation choice; prefer **one unified leader** tab for all auto Worker work — see § Leader election) |
+| Message type | Channel | Payload |
+|--------------|---------|---------|
+| `network-snapshot` | `hc-resolver-sync` | Per-`profile_id` status, `scan.kind`, resolver-confirmed |
+| `health-snapshot` | `hc-resolver-sync` | Resolver health coarse (`ok` / `degraded` / `offline`) |
+| `live-control-snapshot` | `hc-resolver-sync` | Pending challenges + poll health + `at` |
 
-**Recommendation:** One **device poll leader** tab per origin (extend existing lock + heartbeat) with **typed** BC messages (`live-control-snapshot`, `network-snapshot`, `health-snapshot`). Avoid two competing locks that fight on Safari with many tabs.
+**Leader lock:** `hc_live_control_poll_leader` — one tab per origin for auto live-proof polls; network auto-fetch uses snapshot TTL, not a second lock.
 
 ---
 
@@ -170,7 +169,7 @@ Follower updates in-memory health used by dot / poll gates without `fetchResolve
 
 ### Live proof “checked … ago” (hub monitoring line)
 
-Uses the existing **`hc-live-control-poll-leader`** channel (not `hc-resolver-sync`). **Any tab** that runs **Check for live proof** broadcasts pending inbox + `at` (leader lock not required for manual). Auto polls still broadcast from the leader tab only. Followers call `applyLiveControlInboxSnapshot()` and fire `hc-live-proof-checked`. Timestamps persist in **`sessionStorage`** (`hc_live_proof_checked_at`, `hc_hub_network_checked_at`) so reload in the same tab keeps “this visit” copy.
+Uses unified **`hc-resolver-sync`** with message type **`live-control-snapshot`** (Phase 3; legacy `snapshot` type still parsed). **Any tab** that runs **Check for live proof** broadcasts pending inbox + `at` (leader lock not required for manual). Auto polls still broadcast from the leader tab only. Followers call `applyLiveControlInboxSnapshot()` and fire `hc-live-proof-checked`. Timestamps persist in **`sessionStorage`** (`hc_live_proof_checked_at`, `hc_hub_network_checked_at`) so reload in the same tab keeps “this visit” copy.
 
 **Requires:** both tabs on a page with live-proof inbox enabled (e.g. `/` with hub, `/wallet/`). **Watch for live proof** off still allows manual check on the leader tab.
 
@@ -264,7 +263,9 @@ When `"0"`: behavior matches today (per-tab session cache).
 
 ### Phase 3 — Unified poll leader (optional refactor)
 
-- [ ] Single lock + channel for live-control + network (reduce lock contention)
+- [x] Live-control snapshots on **`hc-resolver-sync`** (`live-control-snapshot`; one listener in `initResolverTabSync`)
+- [x] Shared leader lock unchanged (`hc_live_control_poll_leader`)
+- [ ] Retire `hc-live-control-poll-leader` channel entirely (removed from broadcaster; no dual-post)
 
 ### Phase 4 — Hosted push (future)
 
@@ -293,6 +294,7 @@ When `"0"`: behavior matches today (per-tab session cache).
 | Merge does not drop resolver-confirmed revoke | same + existing `wallet-network-baseline` tests |
 | E2E two-tab manual check → one burst | `e2e/device-resolver-sync.spec.ts` (phase 1a) ✅ |
 | Toggle off → two bursts | e2e (phase 2) — sync-off fetch in spec; toggle UI separate case |
+| Live proof checked-at cross-tab + reload | `e2e/device-live-proof-tab-sync.spec.ts` ✅ |
 
 ---
 
@@ -304,4 +306,6 @@ When `"0"`: behavior matches today (per-tab session cache).
 | 2026-05-27 | Phase 1a shipped — `device-resolver-sync*.mjs`, hub follower skip, shell manifest v51 |
 | 2026-05-26 | Phase 1a: `device-resolver-sync*.mjs`, hub follower skip, shell manifest v51 |
 | 2026-05-27 | Phase 1a shipped — `device-resolver-sync*.mjs`, shell v51 |
+| 2026-05-27 | Live proof monitoring cross-tab E2E + session key Vitest |
 | 2026-05-27 | Phase 1a E2E + broadcast/skip fixes (shell v52) |
+| 2026-05-27 | Phase 3 step 1 — live-control on unified `hc-resolver-sync` channel |

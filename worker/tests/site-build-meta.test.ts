@@ -6,7 +6,11 @@ import { fileURLToPath } from "node:url";
 import {
   DEFAULT_SITE_BUILD_META,
   formatSiteBuildConsoleLine,
+  formatSiteBuildCopyText,
+  formatSiteBuildHubLabel,
+  isSiteDebugEnabled,
   renderBuildMetaModule,
+  SITE_DEBUG_FLAG_KEY,
 } from "../../site/js/build-meta-core.mjs";
 import { DEVICE_SHELL_ASSET_VERSION } from "../../site/js/device-status-shell-modules.mjs";
 import { SITE_BUILD_META } from "../../site/js/build-meta.mjs";
@@ -58,5 +62,38 @@ describe("site build meta", () => {
 
   it("build-meta-core.mjs is present under site/js", () => {
     expect(fs.existsSync(path.join(siteJsDir, "build-meta-core.mjs"))).toBe(true);
+  });
+
+  it("isSiteDebugEnabled respects localStorage and URL", () => {
+    const storage = { getItem: (k: string) => (k === SITE_DEBUG_FLAG_KEY ? "1" : null) };
+    expect(isSiteDebugEnabled({ search: "" }, storage)).toBe(true);
+    expect(
+      isSiteDebugEnabled({ search: "?hc_debug=1" }, { getItem: () => null })
+    ).toBe(true);
+    expect(
+      isSiteDebugEnabled({ search: "?foo=1" }, { getItem: () => null })
+    ).toBe(false);
+  });
+
+  it("formatSiteBuildHubLabel and copy text include stamp fields", () => {
+    const meta = {
+      gitSha: "abc1234",
+      builtAt: "2026-05-27T00:00:00.000Z",
+      shellAssetVersion: DEVICE_SHELL_ASSET_VERSION,
+      source: "deploy" as const,
+    };
+    expect(formatSiteBuildHubLabel(meta)).toBe(
+      `Site abc1234 · shell ${DEVICE_SHELL_ASSET_VERSION} · deploy`
+    );
+    expect(formatSiteBuildCopyText(meta, "/wallet/")).toContain("site.gitSha=abc1234");
+    expect(formatSiteBuildCopyText(meta, "/wallet/")).toContain("page=/wallet/");
+  });
+
+  it("device-hub-build-stamp.mjs is in shell manifest", () => {
+    const manifest = fs.readFileSync(
+      path.join(siteJsDir, "device-status-shell-modules.mjs"),
+      "utf8"
+    );
+    expect(manifest).toContain('"device-hub-build-stamp.mjs"');
   });
 });

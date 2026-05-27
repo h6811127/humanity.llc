@@ -14,13 +14,16 @@ import {
   mergeNetworkSnapshotIntoCache,
   networkSnapshotOriginMatches,
   parseHealthSnapshotMessage,
+  parseLiveControlSnapshotMessage,
   parseNetworkSnapshotMessage,
+  RESOLVER_SYNC_CHANNEL,
   RESOLVER_SYNC_PREF_KEY,
   RESOLVER_SYNC_SNAPSHOT_TTL_MS,
   shouldFollowerSkipHealthFetch,
   shouldFollowerSkipNetworkFetch,
   shouldIgnoreHealthSnapshotMessage,
 } from "./device-resolver-sync-core.mjs";
+import { HUB_NETWORK_CHECKED_AT_SESSION_KEY } from "./device-hub-network-tools-core.mjs";
 
 export const RESOLVER_HEALTH_PEER_SYNC = "hc-resolver-health-peer-sync";
 import { alertStateForNetworkPoll } from "./wallet-network-baseline.mjs";
@@ -31,7 +34,7 @@ import {
 } from "./device-wallet-network.mjs";
 import { verificationRecordFromLabelState } from "./device-wallet-network-core.mjs";
 
-const CHANNEL_NAME = "hc-resolver-sync";
+const CHANNEL_NAME = RESOLVER_SYNC_CHANNEL;
 
 /** @typedef {{
  *   profile_id: string;
@@ -62,6 +65,9 @@ let lastReceivedSnapshotAt = null;
 let lastReceivedHealthAt = null;
 /** @type {number | null} */
 let lastAppliedHealthAt = null;
+
+/** @type {((snapshot: import("./device-resolver-sync-core.mjs").LiveControlSnapshotMessage) => void) | null} */
+let liveControlSnapshotHandler = null;
 
 function ensureChannel() {
   if (channel || typeof BroadcastChannel === "undefined") return channel;
@@ -105,7 +111,7 @@ function applySnapshotMessage(message) {
   applyResolverNetworkSnapshot(message.entries, message.at);
   if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
     try {
-      sessionStorage.setItem("hc_hub_network_checked_at", String(message.at));
+      sessionStorage.setItem(HUB_NETWORK_CHECKED_AT_SESSION_KEY, String(message.at));
     } catch {
       /* ignore */
     }
@@ -136,6 +142,39 @@ function applyHealthSnapshotMessage(message) {
 }
 
 /**
+ * @param {(snapshot: import("./device-resolver-sync-core.mjs").LiveControlSnapshotMessage) => void} handler
+ */
+export function registerLiveControlSnapshotHandler(handler) {
+  liveControlSnapshotHandler = handler;
+}
+
+/**
+ * @param {Record<string, unknown>} message
+ */
+export function postResolverSyncMessage(message) {
+  const ch = ensureChannel();
+  if (!ch) return;
+  try {
+    ch.postMessage(message);
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * @param {import("./device-live-control-inbox.mjs").LiveControlLeaderSnapshot} snapshot
+ */
+export function broadcastLiveControlSyncSnapshot(snapshot) {
+  postResolverSyncMessage({
+    type: "live-control-snapshot",
+    tabId: snapshot.tabId,
+    at: snapshot.at,
+    pending: snapshot.pending,
+    health: snapshot.health,
+  });
+}
+
+/**
  * Bind BroadcastChannel listener once per page.
  */
 export function initResolverTabSync() {
@@ -144,6 +183,12 @@ export function initResolverTabSync() {
   listenerBound = true;
   ch.addEventListener("message", (event) => {
     const data = event?.data;
+    const liveControl = parseLiveControlSnapshotMessage(data);
+    if (liveControl) {
+      if (liveControl.tabId === getLiveControlPollTabId()) return;
+      liveControlSnapshotHandler?.(liveControl);
+      return;
+    }
     const network = parseNetworkSnapshotMessage(data);
     if (network) {
       if (network.tabId === getLiveControlPollTabId()) return;

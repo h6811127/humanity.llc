@@ -6,7 +6,9 @@ import {
   mergeNetworkSnapshotIntoCache,
   networkSnapshotOriginMatches,
   parseHealthSnapshotMessage,
+  parseLiveControlSnapshotMessage,
   parseNetworkSnapshotMessage,
+  RESOLVER_SYNC_CHANNEL,
   RESOLVER_SYNC_SNAPSHOT_TTL_MS,
   shouldFollowerSkipHealthFetch,
   shouldFollowerSkipNetworkFetch,
@@ -108,6 +110,25 @@ describe("device-resolver-sync-core", () => {
   it("ignores duplicate health snapshots", () => {
     expect(shouldIgnoreHealthSnapshotMessage(1000, 1000)).toBe(true);
     expect(shouldIgnoreHealthSnapshotMessage(1001, 1000)).toBe(false);
+  });
+
+  it("uses unified resolver sync channel name", () => {
+    expect(RESOLVER_SYNC_CHANNEL).toBe("hc-resolver-sync");
+  });
+
+  it("parses live-control-snapshot on unified channel", () => {
+    const parsed = parseLiveControlSnapshotMessage({
+      type: "live-control-snapshot",
+      tabId: "tab-c",
+      at: 3000,
+      pending: [{ challenge_id: "c1" }],
+      health: "ok",
+    });
+    expect(parsed?.type).toBe("live-control-snapshot");
+    expect(parsed?.pending).toHaveLength(1);
+    expect(parseLiveControlSnapshotMessage({ type: "snapshot", tabId: "t", at: 1 })).toEqual(
+      expect.objectContaining({ type: "live-control-snapshot", tabId: "t", at: 1 })
+    );
   });
 
   it("merges snapshot rows into cache map", () => {

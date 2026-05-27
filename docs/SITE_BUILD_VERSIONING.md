@@ -1,6 +1,6 @@
 # Site and Worker build versioning
 
-**Status:** Phase 1 shipped (Pages `build-meta.mjs` + bootstrap console). Phases 2–3 planned.
+**Status:** Phases 1–2 shipped. Phase 3 (Worker health `build`) planned.
 
 When deploying straight to production, you need to answer **which deploy** is running in the browser and whether **Pages** and **Worker** are on the same commit. This doc defines build stamps, where they surface, and how they differ from cache-bust numbers.
 
@@ -61,7 +61,7 @@ Keep existing `version` as **protocol** version only.
 | Layer | Where to look |
 |-------|----------------|
 | Site | DevTools console on shell pages: `[humanity] site build …` |
-| Site (debug) | Phase 2: hub line when `localStorage.hc_debug === "1"` or `?hc_debug=1` |
+| Site (debug) | Device hub footer when `localStorage.hc_debug === "1"` or `?hc_debug=1` |
 | Worker | Phase 3: `curl https://humanity.llc/.well-known/hc/v1/health` |
 | Shell graph cache | `shell=` in console line or `SITE_BUILD_META.shellAssetVersion` |
 
@@ -84,10 +84,15 @@ npm run site:build-meta && npm run build
 
 **Worker-only CI** (`.github/workflows/deploy-worker.yml`) does **not** update the site; Pages deploy is separate ([`site/README.md`](../site/README.md)).
 
-### Phase 2 — Debug-gated UI (planned)
+### Phase 2 — Debug-gated hub UI (shipped)
 
-- Small line in device hub (or settings) when `localStorage.hc_debug === "1"` or URL `?hc_debug=1`.
-- Same fields as `SITE_BUILD_META`; optional link to copy stamp for bug reports.
+- [`site/js/device-hub-build-stamp.mjs`](../site/js/device-hub-build-stamp.mjs) mounts at the bottom of `#device-hub-body` (before the status-key reference).
+- Shown when `localStorage.hc_debug === "1"` or URL `?hc_debug=1` / `?hc_debug=true` ([`isSiteDebugEnabled()`](../site/js/build-meta-core.mjs)).
+- Displays `SITE_BUILD_META` as `Site {sha} · shell {n} · {source}`; **Copy build info** writes multi-line text for bug reports.
+- Wired from [`initDeviceHub()`](../site/js/device-hub-ui.mjs) on all shell hub pages.
+- Listed in [`DEVICE_STATUS_SHELL_JS_FILES`](../site/js/device-status-shell-modules.mjs) (bump shell asset version when changing).
+
+**Enable on a phone:** Safari → bookmark or type `?hc_debug=1` once, or in console: `localStorage.hc_debug = "1"` then reload and open the hub.
 
 ### Phase 3 — Worker health `build` (planned)
 
@@ -117,10 +122,10 @@ npm run pages:dev
 
 ## Tests
 
-After changes to build meta or bootstrap logging:
+After changes to build meta, bootstrap logging, or hub debug stamp:
 
 ```bash
-npm run worker:test -- worker/tests/site-build-meta.test.ts
+npm run worker:test -- worker/tests/site-build-meta.test.ts worker/tests/device-status-shell-modules.test.ts
 ```
 
 ## Related docs
