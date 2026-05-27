@@ -1,6 +1,6 @@
 # Keys custody and notification improvement plan
 
-**Status:** Phases 1–5 shipped · Phases 6–7 planned  
+**Status:** Phases 1–5 + 7 (partial) shipped · Phase 6 planned  
 **Audience:** Product, engineering  
 **Related:** [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md)
 
@@ -183,9 +183,16 @@ Clearer ARIA/tooltip breakdown; glance copy aligned with per-tab custody rows; d
 
 1–5 card guardrails; poll budget; backup/import ([`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md)).
 
-### Phase 7 — Demote legacy banners
+### Phase 7 — Demote legacy banners ✅ (partial)
 
-Hub + sheet authority; page banner only without shell badge; scan banner retained.
+| Surface | Shipped behavior |
+|---------|------------------|
+| **Landing `#device-cross-tab-banner`** | Hidden when `#shell-notif-badge` exists (inbox authority) |
+| **Hub `#device-hub-crosstab-notice` / `#device-hub-notice-group`** | Skipped when `#device-hub-keys-custody` unified panel mounts |
+| **`/wallet/` `#wallet-tab-hint`** | Hidden for cross-tab/orphan when shell badge present — `shouldShowWalletTabHintCrossTabChrome()` |
+| **Scan `#scan-cross-tab-banner`** | Unchanged (retained) |
+
+**Code:** `device-cross-tab-banner.mjs`, `device-hub-inbox-alerts.mjs`, `wallet-tab-hint-chrome-core.mjs`, `wallet-page-chrome.mjs`
 
 ---
 
@@ -203,7 +210,7 @@ Hub + sheet authority; page banner only without shell badge; scan banner retaine
 ## Regression tests
 
 ```bash
-npm run worker:test -- worker/tests/device-hub-keys-custody-core.test.ts worker/tests/device-inbox.test.ts
+npm run worker:test -- worker/tests/device-hub-keys-custody-core.test.ts worker/tests/device-inbox.test.ts worker/tests/wallet-tab-hint-chrome.test.ts
 npm run e2e -- e2e/device-cross-tab-keys.spec.ts e2e/device-inbox.spec.ts
 ```
 

@@ -159,7 +159,7 @@ getInboxItems() → buildInboxItems(gatherInboxInput())
 | Inbox sheet | `device-inbox-sheet.mjs` | `gatherInboxInput()` + `buildInboxSheetRows` | Coordinator tick when open |
 | Landing/wallet banner | `device-cross-tab-banner.mjs` | `gatherInboxInput()` when no shell badge | Legacy |
 | Scan banner | `device-cross-tab-banner.mjs` | **`getCrossTabScanSnapshot()`** | Fingerprint streak; `scan-tab-keys.mjs` uses coordinator |
-| Wallet tab hint | `wallet-page-chrome.mjs` | `gatherInboxInput()` | Coordinator tick on `/wallet/` |
+| Wallet tab hint | `wallet-page-chrome.mjs` | `gatherInboxInput()` | **Legacy only** — hidden on `/wallet/` when `#shell-notif-badge` exists; use inbox + hub custody panel |
 
 **Navigation CTAs:** `device-notice-nav.mjs` (`actOnOtherTabKeys`), `device-orphan-keys-nav.mjs` (orphan focus / clear).
 
