@@ -105,6 +105,49 @@ describe("isResolverConfirmedProfile", () => {
     expect(maps?.resolverConfirmedMap[PROFILE_B]).toBeUndefined();
   });
 
+  it("stale poll generation does not overwrite truth after a newer poll completes first", async () => {
+    localStore.set(
+      "hc_wallet_last_seen_network",
+      JSON.stringify({ [PROFILE_A]: "active" })
+    );
+    const fetchMock = vi.mocked(fetch);
+    fetchMock
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            setTimeout(
+              () =>
+                resolve(
+                  resolverJsonResponse({
+                    scan: {
+                      kind: "card_revoked",
+                      card: { status: "revoked", handle: "e2e", manifesto_line: "Test" },
+                    },
+                  })
+                ),
+              40
+            );
+          })
+      )
+      .mockResolvedValueOnce(resolverJsonResponse(ACTIVE_BODY));
+
+    let gen = 1;
+    const slow = refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }], undefined, {
+      generation: 1,
+      isCurrentGeneration: () => gen === 1,
+    });
+    gen = 2;
+    const fast = refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }], undefined, {
+      generation: 2,
+      isCurrentGeneration: () => gen === 2,
+    });
+    await fast;
+    await slow;
+
+    expect(buildResolverConfirmedWalletPollMaps()?.scanKindMap[PROFILE_A]).toBe("active");
+    expect(gatherCardDisabledSinceVisitForInbox()).toEqual([]);
+  });
+
   it("active poll after card_revoked drops since-visit SSOT (out-of-order safe)", async () => {
     localStore.set(
       "hc_wallet_last_seen_network",

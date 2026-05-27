@@ -363,7 +363,7 @@ describe("mergeLastSeenFromNetworkMap", () => {
 });
 
 describe("shouldUseCachedNetworkStatus", () => {
-  it("bypasses cache when cached card_revoked disagrees with baseline", () => {
+  it("never trusts session cache for card-level revoke without resolver poll", () => {
     const now = 1_000_000;
     const cached = { status: "revoked", scanKind: "card_revoked", at: now - 1000 };
     expect(
@@ -371,7 +371,7 @@ describe("shouldUseCachedNetworkStatus", () => {
     ).toBe(false);
     expect(
       shouldUseCachedNetworkStatus({ p1: "card_revoked" }, "p1", cached, now)
-    ).toBe(true);
+    ).toBe(false);
   });
 });
 

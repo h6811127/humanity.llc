@@ -191,6 +191,10 @@ function rememberWalletNetworkStatusMap(statusMap = {}) {
 }
 
 function bumpWalletNetworkApplyGen() {
+  if (walletNetworkFetchTimer != null) {
+    clearTimeout(walletNetworkFetchTimer);
+    walletNetworkFetchTimer = null;
+  }
   walletNetworkApplyGen += 1;
   return walletNetworkApplyGen;
 }
