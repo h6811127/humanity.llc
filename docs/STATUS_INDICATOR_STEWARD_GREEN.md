@@ -44,7 +44,8 @@ Priority order (highest first):
 3. `ok + unsaved` -> pulsing red
 4. `ok + steward` -> bright green
 5. `ok + keys` -> solid red
-6. `ok + none` -> pulsing red
+6. `ok + none` + empty wallet + no overlays -> **neutral** static dot; **chrome status line** primary (`#shell-status-line`)
+7. `ok + none` (otherwise) -> pulsing red
 
 Notes:
 - Steward green appears only when resolver health is `ok`.

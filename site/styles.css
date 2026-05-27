@@ -323,6 +323,13 @@ body.page-flow.has-shell-chrome .page > main.screen {
   animation: brand-dot-pulse 2s ease-in-out infinite;
 }
 
+/* S4: calm mark when empty wallet — status line in chrome is primary */
+.pass-dot-status-network-ok.pass-dot-status-device-none.shell-status-dot--neutral-empty {
+  background: rgba(120, 120, 128, 0.52);
+  box-shadow: inset 0 0 0 2px rgba(120, 120, 128, 0.34);
+  animation: none;
+}
+
 .pass-dot-status-network-ok.pass-dot-status-device-keys {
   background: var(--red);
 }

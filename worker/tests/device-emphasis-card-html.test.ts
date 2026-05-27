@@ -32,7 +32,7 @@ describe("device-emphasis-card-html", () => {
   it("landing index busts styles.css cache when spacing changes", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain('href="/css/hc-emphasis-card.css?v=4"');
-    expect(html).toContain("styles.css?v=125");
+    expect(html).toContain("styles.css?v=126");
   });
 
   it("landing final CTA uses urgent emphasis card and standard CTA", () => {
@@ -197,9 +197,11 @@ describe("device-emphasis-card-html", () => {
     for (const page of ["site/wallet/index.html", "site/create/index.html", "site/created/index.html"]) {
       const html = readFileSync(join(root, page), "utf8");
       expect(html).toContain('href="/css/hc-emphasis-card.css?v=4"');
-      expect(html).toContain("styles.css?v=125");
-      expect(html).toContain("theme-dark.css?v=26");
-      expect(html).toContain("device-shell.css?v=52");
+      expect(html).toContain("styles.css?v=126");
+      expect(html).toContain("theme-dark.css?v=27");
+      expect(html).toContain("device-shell.css?v=53");
+      expect(html).toContain('id="shell-status-line"');
+      expect(html).toContain("device-status-bootstrap.mjs?v=44");
     }
   });
 

@@ -11,6 +11,10 @@ import {
   inboxOverlayQuickAction,
   overlayAriaText,
   primaryDotTone,
+  shellChromeStatusLineFromSegments,
+  shellDotUsesNeutralEmptyWallet,
+  shellStatusLinePrimaryInChrome,
+  SHELL_DOT_NEUTRAL_EMPTY_CLASS,
   shouldCelebrateStewardTransition,
   dotTransitionKey,
   statusAriaLabel,
@@ -286,6 +290,104 @@ describe("dotTransitionKey", () => {
     expect(dotTransitionKey("ok", "steward", "proof_waiting")).toBe(
       "ok:steward:proof_waiting"
     );
+  });
+});
+
+describe("shell S4 neutral dot and chrome status line", () => {
+  it("uses neutral empty-wallet dot only when calm", () => {
+    expect(
+      shellDotUsesNeutralEmptyWallet({
+        network: "ok",
+        device: "none",
+        overlay: "none",
+        savedWalletCount: 0,
+      })
+    ).toBe(true);
+    expect(
+      shellDotUsesNeutralEmptyWallet({
+        network: "ok",
+        device: "none",
+        overlay: "none",
+        savedWalletCount: 1,
+      })
+    ).toBe(false);
+    expect(
+      shellDotUsesNeutralEmptyWallet({
+        network: "ok",
+        device: "unsaved",
+        overlay: "none",
+        savedWalletCount: 0,
+      })
+    ).toBe(false);
+    expect(
+      shellDotUsesNeutralEmptyWallet({
+        network: "ok",
+        device: "none",
+        overlay: "cross_tab_keys",
+        savedWalletCount: 0,
+      })
+    ).toBe(false);
+    expect(
+      shellDotUsesNeutralEmptyWallet({
+        network: "degraded",
+        device: "none",
+        overlay: "none",
+        savedWalletCount: 0,
+      })
+    ).toBe(false);
+  });
+
+  it("shows chrome status line when wallet empty and no urgent device state", () => {
+    expect(
+      shellStatusLinePrimaryInChrome({
+        device: "none",
+        overlay: "none",
+        savedWalletCount: 0,
+      })
+    ).toBe(true);
+    expect(
+      shellStatusLinePrimaryInChrome({
+        device: "keys",
+        overlay: "none",
+        savedWalletCount: 2,
+      })
+    ).toBe(false);
+  });
+
+  it("formats network and saved chips for chrome", () => {
+    const line = shellChromeStatusLineFromSegments([
+      {
+        id: "network",
+        chipLabel: "Network reachable",
+        label: "Resolver Online",
+        detail: "",
+        zero: false,
+        highlight: false,
+      },
+      {
+        id: "saved",
+        chipLabel: "0 cards",
+        label: "No Cards on Device",
+        detail: "",
+        zero: true,
+        highlight: false,
+      },
+      {
+        id: "pinned",
+        chipLabel: "0 pinned",
+        label: "No Pinned Scans",
+        detail: "",
+        zero: true,
+        highlight: false,
+      },
+    ]);
+    expect(line).toBe("Network reachable · 0 cards");
+  });
+
+  it("maps neutral empty wallet tone for CSS", () => {
+    expect(primaryDotTone("ok", "none", { shellNeutralEmpty: true })).toBe("neutral");
+    expect(primaryDotTone("ok", "none", { shellNeutralEmpty: false })).toBe("unsaved");
+    expect(SHELL_DOT_NEUTRAL_EMPTY_CLASS).toBe("shell-status-dot--neutral-empty");
   });
 });
 

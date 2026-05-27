@@ -292,6 +292,55 @@ export function dotStateKey(network, device) {
  * @param {"none" | "keys" | "unsaved" | "steward"} device
  * @param {DotInboxOverlay} overlay
  */
+/** Calm shell dot when stranger has no keys and no urgent overlays (S4). */
+export const SHELL_DOT_NEUTRAL_EMPTY_CLASS = "shell-status-dot--neutral-empty";
+
+/**
+ * @param {{
+ *   network: "ok" | "degraded" | "offline",
+ *   device: "none" | "keys" | "unsaved" | "steward",
+ *   overlay: DotInboxOverlay,
+ *   savedWalletCount: number,
+ * }}
+ */
+export function shellDotUsesNeutralEmptyWallet({
+  network,
+  device,
+  overlay,
+  savedWalletCount,
+}) {
+  if (network !== "ok") return false;
+  if (device !== "none") return false;
+  if (overlay !== "none") return false;
+  if (savedWalletCount > 0) return false;
+  return true;
+}
+
+/**
+ * Top-chrome status line is primary read when wallet is empty and dot is calm.
+ * @param {{
+ *   device: "none" | "keys" | "unsaved" | "steward",
+ *   overlay: DotInboxOverlay,
+ *   savedWalletCount: number,
+ * }}
+ */
+export function shellStatusLinePrimaryInChrome({ device, overlay, savedWalletCount }) {
+  if (savedWalletCount > 0) return false;
+  if (device !== "none") return false;
+  if (overlay !== "none") return false;
+  return true;
+}
+
+/**
+ * @param {Array<{ id: string, chipLabel: string }>} segments
+ */
+export function shellChromeStatusLineFromSegments(segments) {
+  return segments
+    .filter((seg) => seg.id === "network" || seg.id === "saved")
+    .map((seg) => seg.chipLabel)
+    .join(" · ");
+}
+
 export function dotClassList(network, device, overlay) {
   return [
     `pass-dot-status-network-${network}`,
@@ -305,7 +354,13 @@ export function dotClassList(network, device, overlay) {
  * @param {"ok" | "degraded" | "offline"} network
  * @param {"none" | "keys" | "unsaved" | "steward"} device
  */
-export function primaryDotTone(network, device) {
+/**
+ * @param {"ok" | "degraded" | "offline"} network
+ * @param {"none" | "keys" | "unsaved" | "steward"} device
+ * @param {{ shellNeutralEmpty?: boolean }} [opts]
+ */
+export function primaryDotTone(network, device, opts = {}) {
+  if (opts.shellNeutralEmpty) return "neutral";
   if (network === "offline") return "offline";
   if (network === "degraded") return "degraded";
   if (device === "steward") return "steward";

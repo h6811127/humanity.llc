@@ -1,7 +1,7 @@
 # Scan & global status UI — Path 2 (shipped direction)
 
 **Status:** **Approved** — Path 2 with **Option 2** (hero data-arriving + corner dot one-shot sync)  
-**Shipped slices:** **S1 + S2** (`pass-v32`) · **S3** (`pass-v33`) L3 actor band  
+**Shipped slices:** **S1 + S2** (`pass-v32`) · **S3** (`pass-v33`) L3 actor band · **S4** shell status line + neutral empty-wallet dot  
 **Date:** 2026-05-26  
 **Audience:** Product, design, frontend  
 **Related:** [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · [`SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) · [`M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) · [`SCAN_HERO_CARD_VISUAL_SPEC.md`](SCAN_HERO_CARD_VISUAL_SPEC.md) (surface + depth)
@@ -143,7 +143,7 @@ Manual: `docs/DEVICE_OS_QA.md` **P1-SD** (update for arrive sequence).
 | **S1** | **Shipped** (`pass-v32`) | L2 data-arriving |
 | **S2** | **Shipped** (`pass-v32`) | L1 dot one-shot sync |
 | **S3** | **Shipped** (`pass-v33`) | L3 operator band after settle |
-| **S4** | Planned | Shell status line primary; neutral dot when empty wallet |
+| **S4** | **Shipped** | Shell status line primary; neutral dot when empty wallet |
 
 ---
 
@@ -173,7 +173,7 @@ Use prototype or production scan URL. Record in table below.
 | 2026-05-26 | S1+S2 implemented `pass-v32`; pulse removed from first-seen inline script |
 | 2026-05-26 | Functional prototype for design review (no Figma) |
 | 2026-05-26 | S3 operator band after settle (`pass-v33`) |
-| TBD | Demote Phase 8 custody colors on scan dot for strangers (mark-first) |
+| 2026-05-26 | Mark-first scan dot shipped (`pass-v35`); S4 shell chrome shipped (neutral empty-wallet dot + `#shell-status-line`) |
 
 ---
 
@@ -181,6 +181,7 @@ Use prototype or production scan URL. Record in table below.
 
 | Date | Note |
 |------|------|
+| 2026-05-26 | **S4 shipped** — shell `#shell-status-line` + neutral empty-wallet dot |
 | 2026-05-26 | Brainstorm + prototype |
 | 2026-05-26 | **Approved Path 2 Option 2; S1+S2 shipped `pass-v32`** |
 | 2026-05-26 | **S3 shipped `pass-v33`** — L3 actor band |

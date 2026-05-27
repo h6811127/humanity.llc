@@ -58,9 +58,13 @@ import {
   dotStateKey,
   dotTransitionKey,
   hasStewardVerification,
+  SHELL_DOT_NEUTRAL_EMPTY_CLASS,
+  shellChromeStatusLineFromSegments,
+  shellDotUsesNeutralEmptyWallet,
+  shellStatusLinePrimaryInChrome,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=38";
+} from "./device-dot-state-core.mjs?v=44";
 
 export const DOT_STATE_CHANGED = "hc-dot-state-changed";
 
@@ -89,6 +93,7 @@ const dot = document.getElementById("brand-status-dot");
 const notifBtn = document.getElementById("shell-notif-badge");
 const notifCountEl = document.getElementById("shell-notif-badge-count");
 const hubStatusPanel = document.getElementById("device-hub-status-panel");
+const shellStatusLine = document.getElementById("shell-status-line");
 const hub = document.getElementById("device-hub");
 const walletPage = document.getElementById("wallet-page");
 const systemBanner = document.getElementById("device-system-banner");
@@ -238,12 +243,27 @@ function applyDot() {
   if (!dot) return;
   const device = deviceState();
   const overlay = dotOverlayState();
+  const savedWalletCount = loadWallet().length;
+  const shellNeutralEmpty = shellDotUsesNeutralEmptyWallet({
+    network: networkStatus,
+    device,
+    overlay,
+    savedWalletCount,
+  });
   const nextSnapshot = { network: networkStatus, device, overlay };
   const run = () => {
     const previousDevice = lastDotSnapshot?.device ?? null;
-    dot.classList.remove(...NETWORK_CLASSES, ...DEVICE_CLASSES, ...OVERLAY_CLASSES);
+    dot.classList.remove(
+      ...NETWORK_CLASSES,
+      ...DEVICE_CLASSES,
+      ...OVERLAY_CLASSES,
+      SHELL_DOT_NEUTRAL_EMPTY_CLASS
+    );
     for (const cls of dotClassList(networkStatus, device, overlay)) {
       dot.classList.add(cls);
+    }
+    if (shellNeutralEmpty) {
+      dot.classList.add(SHELL_DOT_NEUTRAL_EMPTY_CLASS);
     }
     const dotState = dotStateKey(networkStatus, device);
     dot.dataset.dotState = dotState;
@@ -366,6 +386,25 @@ function renderStatusKey() {
     </ul>`;
 }
 
+function renderShellStatusLine(segments) {
+  if (!shellStatusLine) return;
+  const savedWalletCount = loadWallet().length;
+  const device = deviceState();
+  const overlay = dotOverlayState();
+  const show = shellStatusLinePrimaryInChrome({
+    device,
+    overlay,
+    savedWalletCount,
+  });
+  if (!show) {
+    shellStatusLine.hidden = true;
+    shellStatusLine.textContent = "";
+    return;
+  }
+  shellStatusLine.hidden = false;
+  shellStatusLine.textContent = shellChromeStatusLineFromSegments(segments);
+}
+
 function renderHubStatusPanel(segments) {
   if (!hubStatusPanel) return;
   const chips = segments.map((seg) => {
@@ -429,6 +468,7 @@ function renderSystemBanner() {
 
 function refreshSummary() {
   const segments = buildStatusSegments(networkStatus);
+  renderShellStatusLine(segments);
   renderHubStatusPanel(segments);
   renderStatusKey();
   applyDot();

@@ -107,6 +107,25 @@ body.has-shell-chrome .page {
 
 .top-chrome-bar--minimal {
   justify-content: flex-start;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  row-gap: 6px;
+}
+
+.shell-status-line {
+  flex: 1 1 10rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0 2px 2px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--shell-label-strong, rgba(0, 0, 0, 0.88));
+}
+
+.shell-status-line[hidden] {
+  display: none !important;
 }
 
 .top-chrome-bar--wallet {

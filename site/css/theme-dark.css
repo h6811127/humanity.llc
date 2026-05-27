@@ -279,6 +279,16 @@ html[data-theme="dark"] .shell-status-dot-btn:active {
   background: rgba(255, 255, 255, 0.08);
 }
 
+html[data-theme="dark"]
+  .pass-dot-status-network-ok.pass-dot-status-device-none.shell-status-dot--neutral-empty {
+  background: rgba(174, 174, 178, 0.48);
+  box-shadow: inset 0 0 0 2px rgba(174, 174, 178, 0.3);
+}
+
+html[data-theme="dark"] .shell-status-line {
+  color: var(--shell-label-strong, rgba(255, 255, 255, 0.92));
+}
+
 html[data-theme="dark"] .shell-notif-badge-ring {
   background: transparent;
   border-color: var(--red);
