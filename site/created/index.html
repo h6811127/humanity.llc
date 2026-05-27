@@ -802,6 +802,46 @@
             </p>
           </section>
 
+          <section
+            class="created-status-plate-loop"
+            id="lost-item-loop-scorecard"
+            aria-labelledby="lost-item-loop-scorecard-title"
+            hidden
+          >
+            <h3 class="created-status-plate-loop-title" id="lost-item-loop-scorecard-title">
+              Pilot habit loop
+            </h3>
+            <p class="created-status-plate-loop-lead" id="lost-item-loop-progress" role="status">
+              Publish a return message update on Live when copy changes.
+            </p>
+            <p class="created-status-plate-loop-meta" id="lost-item-loop-last" hidden></p>
+            <ul class="created-status-plate-loop-checklist" aria-label="Pilot milestones on this device">
+              <li>
+                <label class="created-status-plate-loop-check">
+                  <input type="checkbox" id="lost-item-loop-printed" />
+                  <span>Printed QR and tagged the item</span>
+                </label>
+              </li>
+              <li>
+                <label class="created-status-plate-loop-check">
+                  <input type="checkbox" id="lost-item-loop-second-scan" />
+                  <span>Scanned from a second device (not this one)</span>
+                </label>
+              </li>
+            </ul>
+            <p class="form-hint created-status-plate-loop-privacy">
+              Stored only on this browser. No scan analytics.
+            </p>
+            <button
+              type="button"
+              class="btn-secondary created-status-plate-loop-export"
+              id="lost-item-loop-export"
+              hidden
+            >
+              Copy pilot summary
+            </button>
+          </section>
+
         </div>
 
         <!--  -  -  -  Advanced: update, revoke, keys  -  -  -  -->
@@ -1351,6 +1391,6 @@
     </div>
     <script src="/js/device-status-bootstrap.mjs?v=45" type="module"></script>
     <script src="/js/created-hub.mjs?v=3" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=57"></script>
+    <script type="module" src="/js/created.mjs?v=58"></script>
   </body>
 </html>

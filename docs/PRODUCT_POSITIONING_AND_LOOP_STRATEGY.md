@@ -93,6 +93,17 @@
 
 Calm footer on lost-item relay scan template only — link to `/create/?template=lost_item`. Copy in `worker/src/resolver/scan-safety.ts`; render in `scan-html.ts` (`scan-create-hint`). Tests: `scan.test.ts`, `scan-m5-showcase-paths.test.ts`.
 
+### Step 7 — Lost-item relay field pilot tooling ✅
+
+**Founder-run (field):** deploy 5–10 real tags; score finders with `docs/M5_STRANGER_TEST_RUNBOOK.md` and `docs/LOST_ITEM_RELAY_PILOT.md` § Pilot checklist.
+
+**Shipped tooling (device-local):**
+
+- `site/js/lost-item-relay-loop-scorecard.mjs` — habit loop on `/created/` for `lost_item_relay` pilots
+- Target: **≥1** return message update + printed + second-device scan; **Copy pilot summary** export (`humanity_lost_item_relay_pilot_summary_v1`)
+
+**Exit:** `worker/tests/lost-item-relay-loop-scorecard.test.ts`; field notes from exported summaries.
+
 ---
 
 ## Related

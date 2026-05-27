@@ -24,9 +24,15 @@ import {
 import {
   bindStatusPlateLoopScorecard,
   recordStatusPlateUpdate,
-  setLoopMilestone,
+  setLoopMilestone as setStatusPlateLoopMilestone,
   syncStatusPlateLoopScorecardDom,
 } from "./status-plate-loop-scorecard.mjs";
+import {
+  bindLostItemRelayLoopScorecard,
+  recordLostItemRelayUpdate,
+  setLoopMilestone as setLostItemLoopMilestone,
+  syncLostItemRelayLoopScorecardDom,
+} from "./lost-item-relay-loop-scorecard.mjs";
 import { syncCreatedPilotStewardCopy } from "./pilot-steward-copy.mjs";
 import { initCreatedDeviceSave } from "./created-device-save.mjs";
 import { markSetupDone, modeFromPage } from "./created-mode.mjs";
@@ -635,6 +641,10 @@ function syncStatusPlateScorecard(profileId, record) {
   syncStatusPlateLoopScorecardDom(profileId, record, pilotScorecardHandle());
 }
 
+function syncLostItemScorecard(profileId, record) {
+  syncLostItemRelayLoopScorecardDom(profileId, record, pilotScorecardHandle());
+}
+
 function applyPilotTemplateUi(session) {
   const pilot = resolvePilotTemplate(session);
   syncCreatedPilotStewardCopy(pilot);
@@ -644,6 +654,7 @@ function applyPilotTemplateUi(session) {
   }
   if (pilot === "lost_item_relay" && lostItemTipEl) {
     lostItemTipEl.hidden = false;
+    bindLostItemRelayLoopScorecard(profileId, pilotScorecardHandle(session));
   }
 }
 
@@ -995,8 +1006,12 @@ if (activeScanUrl) {
           await downloadQrPng(activeScanUrl, `humanity-${slug}-qr.png`);
           downloadQrBtn.textContent = "Downloaded";
           if (resolvePilotTemplate(loadSession()) === "status_plate") {
-            const row = setLoopMilestone(profileId, "printed", true);
+            const row = setStatusPlateLoopMilestone(profileId, "printed", true);
             syncStatusPlateScorecard(profileId, row);
+          }
+          if (resolvePilotTemplate(loadSession()) === "lost_item_relay") {
+            const row = setLostItemLoopMilestone(profileId, "printed", true);
+            syncLostItemScorecard(profileId, row);
           }
           setTimeout(() => {
             downloadQrBtn.textContent = prev;
@@ -1074,6 +1089,10 @@ async function bootstrapOwnerTools() {
       if (resolvePilotTemplate(loadSession()) === "status_plate") {
         const row = recordStatusPlateUpdate(profileId);
         syncStatusPlateScorecard(profileId, row);
+      }
+      if (resolvePilotTemplate(loadSession()) === "lost_item_relay") {
+        const row = recordLostItemRelayUpdate(profileId);
+        syncLostItemScorecard(profileId, row);
       }
       syncLiveCockpit();
       void refreshNetworkStatus();

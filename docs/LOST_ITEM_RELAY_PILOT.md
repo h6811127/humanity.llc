@@ -70,6 +70,25 @@ Score with `docs/M5_STRANGER_TEST_RUNBOOK.md`.
 
 ---
 
+## Habit loop scorecard
+
+**Strategy:** `docs/PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md` § Step 7  
+**Product:** `/created/` shows **Pilot habit loop** for lost-item relay templates (`site/js/lost-item-relay-loop-scorecard.mjs`).
+
+| Signal | Target | How measured |
+|--------|--------|--------------|
+| Return message updates published | **≥1** per steward | Auto-count on successful Live publish (localStorage per `profile_id`) |
+| Printed + tagged | 1 | Owner checkbox (or auto when QR PNG downloaded) |
+| Second-device scan | 1 | Owner checkbox |
+
+**Habit loop closed (one steward):** ≥1 update + printed + second-device scan confirmed. Scorecard headline switches to “Pilot habit loop closed on this device.” when all three are true.
+
+**Field pilot export:** **Copy pilot summary** on `/created/` copies local JSON (`humanity_lost_item_relay_pilot_summary_v1`) for founder aggregation — no server analytics.
+
+**Privacy:** Scorecard is device-local only — aligns with no scan analytics by default.
+
+---
+
 ## Return message updates
 
 Owner can change line 2 (return message) without reprinting  -  `docs/MANIFESTO_STATUS_UPDATE.md`, **Update public line** on `/created/`.
