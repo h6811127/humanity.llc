@@ -15,8 +15,11 @@ describe("buildHubKeysCustodyPanel", () => {
       ],
     });
     expect(state.rows.filter((r) => r.kind === "cross_tab")).toHaveLength(2);
-    expect(state.rows[0].subtitle).toBe("@alice");
-    expect(state.rows[1].subtitle).toBe("Demo card");
+    expect(state.rows.some((r) => r.kind === "cross_tab_summary")).toBe(true);
+    expect(state.rows.find((r) => r.kind === "cross_tab_summary")?.title).toBe(
+      "Keys open in 2 other tabs"
+    );
+    expect(state.rows.filter((r) => r.kind === "cross_tab")[0].title).toBe("@alice");
     expect(state.visible).toBe(true);
     expect(state.showEducation).toBe(false);
   });
@@ -115,6 +118,24 @@ describe("buildHubKeysCustodyPanel", () => {
     });
     expect(state.rows.some((r) => r.kind === "vouch_nudge")).toBe(false);
     expect(state.rows.some((r) => r.kind === "cross_tab")).toBe(true);
+  });
+
+  it("adds summary row when multiple cross-tab entries", () => {
+    const state = buildHubKeysCustodyPanel({
+      crossTabEntries: [
+        { profile_id: "abc", tabId: "t1", handle: "alice" },
+        { profile_id: "def", tabId: "t2", handle: "bob" },
+      ],
+    });
+    expect(state.rows.map((r) => r.kind)).toEqual([
+      "cross_tab_summary",
+      "cross_tab",
+      "cross_tab",
+    ]);
+    expect(state.rows[0].title).toBe("Keys open in 2 other tabs");
+    expect(state.rows[0].subtitle).toContain("@alice");
+    expect(state.rows[1].title).toBe("@alice");
+    expect(state.rows[1].subtitle).toBe("Other tab with signing keys");
   });
 });
 

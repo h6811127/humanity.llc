@@ -17,6 +17,10 @@ import {
 import { gatherInboxInput, getInboxItems } from "./device-inbox.mjs";
 import { inboxItemsIncludeKind } from "./device-hub-inbox-alerts.mjs";
 import { actOnOtherTabKeys, walletEntryForProfile } from "./device-notice-nav.mjs";
+import {
+  crossTabAggregateSubtitle,
+  crossTabAggregateTitle,
+} from "./device-cross-tab-copy-core.mjs";
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
 import { getCrossTabScanSnapshot } from "./device-cross-tab-state.mjs";
 import { hasUnifiedHubKeysCustodyPanel } from "./device-hub-keys-custody.mjs";
@@ -122,15 +126,10 @@ function shouldShowOrphanHubNotice() {
 function crossTabMessage(others) {
   if (others.length === 0) return null;
   const primary = others[0];
-  const label = escapeHtml(labelForPresence(primary));
-  const extra =
-    others.length > 1
-      ? ` (+${others.length - 1} other tab${others.length === 2 ? "" : "s"})`
-      : "";
   return {
     primary,
-    label,
-    extra,
+    title: crossTabAggregateTitle(others.length),
+    detail: crossTabAggregateSubtitle(others),
   };
 }
 
@@ -277,10 +276,10 @@ function renderHubCrossTabNotice() {
 
   hubSlot.hidden = false;
   hubSlot.className = "device-hub-group hc-emphasis-card hc-emphasis-card--info";
-  hubSlot.dataset.hubSearchable = "keys another tab";
+  hubSlot.dataset.hubSearchable = "keys open another tab";
   hubSlot.innerHTML = emphasisCardBodyHtml({
-    eyebrow: "Keys in another tab",
-    title: `${msg.label}${msg.extra}`,
+    eyebrow: escapeHtml(msg.title),
+    title: escapeHtml(msg.detail),
     detail,
     dot: "info",
     actionsHtml: emphasisCardActionsHtml(actions),
@@ -326,8 +325,8 @@ function renderScanCrossTabNotice() {
   scanBanner.hidden = false;
   scanBanner.className = "hc-emphasis-card hc-emphasis-card--info scan-cross-tab-banner";
   scanBanner.innerHTML = emphasisCardBodyHtml({
-    eyebrow: "Keys in another tab",
-    title: `${msg.label}${msg.extra}`,
+    eyebrow: escapeHtml(msg.title),
+    title: escapeHtml(msg.detail),
     detail,
     dot: "info",
     actionsHtml: emphasisCardActionsHtml(actions),

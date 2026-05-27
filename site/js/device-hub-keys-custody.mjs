@@ -86,6 +86,7 @@ function rowIconTone(row) {
     return "amber";
   }
   if (row.kind === "this_tab_active" || row.kind === "vouch_default") return "green";
+  if (row.kind === "cross_tab_summary") return "blue";
   return "blue";
 }
 

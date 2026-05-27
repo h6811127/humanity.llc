@@ -25,7 +25,7 @@ describe("buildInboxItems", () => {
       crossTabEntries: [{ profile_id: "abc", tabId: "t1", handle: "alice" }],
     });
     expect(items.map((i) => i.kind)).toEqual(["cross_tab_keys"]);
-    expect(items[0].title).toBe("Keys in another tab");
+    expect(items[0].title).toBe("Keys open in 1 other tab");
   });
 
   it("uses other_tabs_unsaved_keys when two or more other tabs hold keys", () => {
@@ -38,7 +38,8 @@ describe("buildInboxItems", () => {
       ],
     });
     expect(items.map((i) => i.kind)).toEqual(["other_tabs_unsaved_keys"]);
-    expect(items[0].title).toBe("2 tabs with unsaved keys");
+    expect(items[0].title).toBe("Keys open in 2 other tabs");
+    expect(items[0].subtitle).toBe("@alice · def…");
     expect(topInboxKind(items)).toBe("cross_tab_keys");
     expect(inboxDotOverlayFromItems(items)).toBe("cross_tab_keys");
   });
@@ -54,10 +55,8 @@ describe("buildInboxItems", () => {
     });
     expect(items.map((i) => i.kind)).toEqual(["live_proof", "other_tabs_unsaved_keys"]);
     expect(items[0].count).toBe(2);
-    expect(items[0].title).toBe("2 live proof waiting");
-    expect(items[1].count).toBe(2);
-    expect(items[1].subtitle).toContain("@alice");
-    expect(items[1].subtitle).toContain("1 other tab");
+    expect(items[1].title).toBe("Keys open in 2 other tabs");
+    expect(items[1].subtitle).toBe("@alice · def…");
   });
 
   it("includes tab notice item when keys are unsaved in this tab", () => {
@@ -335,7 +334,7 @@ describe("inboxBadgeAriaLabel", () => {
       crossTabEntries: [{ profile_id: "x", tabId: "t" }],
     });
     expect(inboxBadgeAriaLabel(items)).toBe(
-      "Needs attention (3 items): 2 live proofs, keys in another tab (x…)"
+      "Needs attention (3 items): 2 live proofs, keys open in another tab (x…)"
     );
   });
 
@@ -356,7 +355,7 @@ describe("inboxBadgeAriaLabel", () => {
         ],
       })
     ).toBe(
-      "Needs attention (2 items): keys in another tab (@alice), keys in another tab (Demo)"
+      "Needs attention (2 items): keys open in another tab (@alice), keys open in another tab (Demo)"
     );
   });
 

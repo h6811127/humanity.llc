@@ -7,11 +7,16 @@ import {
   shouldShowOrphanRemovedKeysNotice,
 } from "./device-cross-tab-visibility.mjs";
 import {
+  crossTabAggregateSubtitle,
+  crossTabAggregateTitle,
+  crossTabPresenceLabel,
+} from "./device-cross-tab-copy-core.mjs";
+import {
   ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX,
   ORPHAN_KEYS_INBOX_TITLE,
 } from "./device-orphan-keys-nav-core.mjs";
 
-/** @typedef {'this_tab_active' | 'this_tab_unsaved' | 'cross_tab' | 'orphan' | 'vouch_default' | 'sign_lock' | 'vouch_nudge'} HubKeysCustodyRowKind */
+/** @typedef {'this_tab_active' | 'this_tab_unsaved' | 'cross_tab' | 'cross_tab_summary' | 'orphan' | 'vouch_default' | 'sign_lock' | 'vouch_nudge'} HubKeysCustodyRowKind */
 
 /**
  * @typedef {object} HubKeysCustodyPresenceEntry
@@ -40,9 +45,7 @@ import {
  * @param {HubKeysCustodyPresenceEntry} entry
  */
 export function labelForHubKeysCustodyEntry(entry) {
-  if (entry.label) return entry.label;
-  if (entry.handle) return `@${entry.handle}`;
-  return `${String(entry.profile_id).slice(0, 12)}…`;
+  return crossTabPresenceLabel(entry);
 }
 
 /**
@@ -108,12 +111,20 @@ export function buildHubKeysCustodyPanel(input) {
   }
 
   if (shouldShowCrossTabKeysNotice(crossTabEntries.length, tabNoticeCount)) {
+    if (crossTabEntries.length >= 2) {
+      rows.push({
+        kind: "cross_tab_summary",
+        title: crossTabAggregateTitle(crossTabEntries.length),
+        subtitle: crossTabAggregateSubtitle(crossTabEntries),
+      });
+    }
     for (const entry of crossTabEntries) {
       const label = labelForHubKeysCustodyEntry(entry);
       rows.push({
         kind: "cross_tab",
-        title: "Keys in another tab",
-        subtitle: label,
+        title: crossTabEntries.length >= 2 ? label : crossTabAggregateTitle(1),
+        subtitle:
+          crossTabEntries.length >= 2 ? "Other tab with signing keys" : label,
         entry,
       });
     }
@@ -145,7 +156,8 @@ export function buildHubKeysCustodyPanel(input) {
     !defaultVouchProfileId &&
     tabNoticeCount === 0 &&
     !hasActiveKeys &&
-    crossTabEntries.length === 0
+    crossTabEntries.length === 0 &&
+    orphanRemovedEntries.length === 0
   ) {
     rows.push({
       kind: "vouch_nudge",

@@ -1,6 +1,6 @@
 # Keys custody and notification improvement plan
 
-**Status:** Phases 1–4 shipped · Phases 5–7 planned  
+**Status:** Phases 1–5 shipped · Phases 6–7 planned  
 **Audience:** Product, engineering  
 **Related:** [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md)
 
@@ -167,9 +167,17 @@ Clearer ARIA/tooltip breakdown; glance copy aligned with per-tab custody rows; d
 
 **Code:** `device-hub-keys-custody-core.mjs`, `device-hub-keys-custody.mjs`
 
-### Phase 5 — Faster, quieter presence
+### Phase 5 — Faster, quieter presence ✅
 
-Write on fingerprint change (partial); post-save BroadcastChannel; per-tab list copy.
+**Goal:** Less `storage` churn, faster hide after custody changes; clearer per-tab copy.
+
+| Subpoint | Detail |
+|----------|--------|
+| **Write on fingerprint change** | Shipped — `shouldTouchPresenceRow()` + `shouldSkipPresenceHeartbeat()` ([`device-tab-presence-core.mjs`](../site/js/device-tab-presence-core.mjs)) |
+| **Post-save presence ping** | Shipped in Phase 3 — `drop-profile-presence` BroadcastChannel; receiving tab dispatches `hc-cross-tab-custody-invalidated` |
+| **Per-tab list copy** | `device-cross-tab-copy-core.mjs` — “Keys open in N other tabs” + joined labels in inbox, hub custody summary, banners, sheet |
+
+**Code:** `device-cross-tab-copy-core.mjs`, `device-inbox-core.mjs`, `device-hub-keys-custody-core.mjs`, `device-cross-tab-banner.mjs`, `device-tab-presence.mjs`
 
 ### Phase 6 — Scale limits + portability
 

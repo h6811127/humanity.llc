@@ -10,6 +10,11 @@ import {
   ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX,
   ORPHAN_KEYS_INBOX_TITLE,
 } from "./device-orphan-keys-nav-core.mjs";
+import {
+  crossTabAggregateSubtitle,
+  crossTabAggregateTitle,
+  crossTabPresenceLabel,
+} from "./device-cross-tab-copy-core.mjs";
 import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=45";
 
 /** @typedef {'live_proof' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'other_tabs_unsaved_keys' | 'orphan_keys_removed' | 'card_disabled_since_visit'} InboxKind */
@@ -91,28 +96,24 @@ export function buildInboxItems(input) {
 
   if (crossTabCount > 0) {
     const entry = crossTabEntries[0];
-    const label =
-      entry?.label ||
-      (entry?.handle ? `@${entry.handle}` : `${entry?.profile_id?.slice(0, 12) ?? ""}…`);
-    const extra = crossTabCount > 1 ? crossTabCount - 1 : 0;
 
     if (crossTabCount >= 2) {
       items.push({
         kind: "other_tabs_unsaved_keys",
         urgency: "medium",
         count: crossTabCount,
-        title: `${crossTabCount} tabs with unsaved keys`,
-        subtitle: `${label} and ${extra} other tab${extra === 1 ? "" : "s"}`,
+        title: crossTabAggregateTitle(crossTabCount),
+        subtitle: crossTabAggregateSubtitle(crossTabEntries),
         hubScrollTarget: "device-hub-keys-custody",
-        meta: { crossTabEntry: entry, crossTabExtra: extra },
+        meta: { crossTabEntry: entry, crossTabExtra: crossTabCount - 1 },
       });
     } else {
       items.push({
         kind: "cross_tab_keys",
         urgency: "medium",
         count: crossTabCount,
-        title: "Keys in another tab",
-        subtitle: label,
+        title: crossTabAggregateTitle(1),
+        subtitle: crossTabPresenceLabel(entry),
         hubScrollTarget: "device-hub-keys-custody",
         meta: { crossTabEntry: entry, crossTabExtra: 0 },
       });
@@ -259,7 +260,7 @@ export function expandInboxItemsForChrome(items, ctx = {}) {
           kind: "cross_tab_keys",
           count: 1,
           urgency: item.urgency,
-          title: "Keys in another tab",
+          title: crossTabAggregateTitle(1),
           subtitle: inboxCrossTabLabel(entry),
           hubScrollTarget: item.hubScrollTarget,
           meta: { crossTabEntry: entry },
@@ -435,12 +436,13 @@ function describeItemForAria(item) {
   }
   if (item.kind === "cross_tab_keys") {
     const who = item.subtitle ? ` (${item.subtitle})` : "";
-    return `keys in another tab${who}`;
+    return `keys open in another tab${who}`;
   }
   if (item.kind === "other_tabs_unsaved_keys") {
+    const who = item.subtitle ? ` (${item.subtitle})` : "";
     return item.count > 1
-      ? `${item.count} tabs with unsaved keys`
-      : "keys in another tab";
+      ? `keys open in ${item.count} other tabs${who}`
+      : `keys open in another tab${who}`;
   }
   if (item.kind === "orphan_keys_removed") {
     const who = item.subtitle
@@ -550,9 +552,7 @@ export function inboxWalletEntryLabel(entry) {
  * @param {InboxCrossTabEntry} entry
  */
 export function inboxCrossTabLabel(entry) {
-  if (entry.label) return entry.label;
-  if (entry.handle) return `@${entry.handle}`;
-  return `${entry.profile_id.slice(0, 12)}…`;
+  return crossTabPresenceLabel(entry);
 }
 
 /**
@@ -602,7 +602,7 @@ export function buildInboxSheetRows(items, ctx = {}) {
       for (const entry of crossTabEntries) {
         rows.push({
           kind: item.kind === "other_tabs_unsaved_keys" ? "other_tabs_unsaved_keys" : "cross_tab_keys",
-          title: "Keys in another tab",
+          title: crossTabAggregateTitle(1),
           subtitle: inboxCrossTabLabel(entry),
           tone: "blue",
           crossTabEntry: entry,
