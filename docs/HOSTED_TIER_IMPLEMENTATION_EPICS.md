@@ -347,7 +347,7 @@ Engineering checklist once M4 governance checklist is signed ([`HOSTED_TIER_PRIC
 |---|------|-------|
 | 1 | Apply D1 migrations | `0012_steward_hosted.sql`, `0013_steward_billing.sql` — `npm run hosted:rollout:step1` (local preflight) then `npm run hosted:rollout:step1 -- --remote` |
 | 2 | Deploy Worker with flag off | `HOSTED_STEWARD_ENABLED=0`; smoke public create/scan |
-| 3 | Set production secrets | `OPERATOR_AUDIT_TOKEN`, `STRIPE_WEBHOOK_SECRET` (after G8) |
+| 3 | Set production secrets | `OPERATOR_AUDIT_TOKEN` (required), `STRIPE_WEBHOOK_SECRET` (after G8) — `npm run hosted:rollout:step3` · verify with `OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step3` |
 | 4 | Enable hosted flag | `HOSTED_STEWARD_ENABLED=1` when ready for stewards |
 | 5 | Ops | Pin CF dashboard per [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md); add repo secret `OPERATOR_AUDIT_TOKEN` for E6.2 CI |
 | 6 | Regression | `npm run verify:hosted-g0` · `npm run e2e:steward-hosted` |

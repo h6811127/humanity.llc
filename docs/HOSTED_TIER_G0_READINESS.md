@@ -75,6 +75,14 @@ npm run hosted:rollout:step1              # verify:hosted-g0 + local D1 apply
 npm run hosted:rollout:step1 -- --remote  # + production D1 (Cloudflare auth)
 ```
 
+**Rollout step 3 (script):**
+
+```bash
+npm run hosted:rollout:step3
+# After wrangler + GitHub secrets are set:
+OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step3
+```
+
 Rollout steps: [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout (after G0).
 
 ---

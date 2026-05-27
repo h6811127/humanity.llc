@@ -71,7 +71,7 @@ function main() {
       );
     }
     runNpm("D1 migrations (remote — production)", ["run", "worker:migrate:remote"]);
-    console.log("\n✅ Step 1 complete (remote). Next: deploy Worker with HOSTED_STEWARD_ENABLED=0.");
+    console.log("\n✅ Step 1 complete (remote). Next: step 2 — deploy Worker (HOSTED_STEWARD_ENABLED=0) and smoke create/scan.");
   } else {
     console.log(
       "\n✅ Step 1 preflight complete (local). Apply production D1 with:\n" +
