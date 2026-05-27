@@ -105,6 +105,31 @@ describe("isResolverConfirmedProfile", () => {
     expect(maps?.resolverConfirmedMap[PROFILE_B]).toBeUndefined();
   });
 
+  it("active poll after card_revoked drops since-visit SSOT (out-of-order safe)", async () => {
+    localStore.set(
+      "hc_wallet_last_seen_network",
+      JSON.stringify({ [PROFILE_A]: "active" })
+    );
+    const fetchMock = vi.mocked(fetch);
+    fetchMock
+      .mockResolvedValueOnce(
+        resolverJsonResponse({
+          scan: {
+            kind: "card_revoked",
+            card: { status: "revoked", handle: "e2e", manifesto_line: "Test" },
+          },
+        })
+      )
+      .mockResolvedValueOnce(resolverJsonResponse(ACTIVE_BODY));
+
+    await refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }]);
+    expect(gatherCardDisabledSinceVisitForInbox()).toHaveLength(1);
+
+    await refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }]);
+    expect(gatherCardDisabledSinceVisitForInbox()).toEqual([]);
+    expect(buildResolverConfirmedWalletPollMaps()?.alertStateMap[PROFILE_A]).toBe("active");
+  });
+
   it("clears since-visit after offline poll following resolver-confirmed card_revoked", async () => {
     localStore.set(
       "hc_wallet_last_seen_network",

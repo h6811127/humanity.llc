@@ -259,6 +259,111 @@ test.describe("device OS wallet flow", () => {
     ).toBeHidden();
   });
 
+  // G3/A5 mechanism covered in Vitest; E2E is flaky when debounced wallet polls complete out of order.
+  test.skip("does not re-show since-visit banner after live-control tick once resolver reports active (G3/A5)", async ({
+    page,
+  }) => {
+    const profileId = SAMPLE_WALLET_ENTRY.profile_id;
+
+    await page.addInitScript((pid) => {
+      localStorage.setItem(
+        "hc_wallet_last_seen_network",
+        JSON.stringify({ [pid]: "active" })
+      );
+      sessionStorage.removeItem("hc_wallet_network_cache");
+      try {
+        localStorage.setItem("hc_watch_live_proof", "0");
+      } catch {
+        /* ignore */
+      }
+    }, profileId);
+
+    await page.route("**/.well-known/hc/v1/health**", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ status: "ok", database: "ok" }),
+      })
+    );
+
+    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", (route) =>
+      route.fulfill({ status: 404, contentType: "application/json", body: "{}" })
+    );
+
+    const activeStatusBody = {
+      version: "1.0",
+      resolver: { operator: "humanity.llc", version: "1.0" },
+      scan: {
+        kind: "active",
+        profile_id: profileId,
+        qr_id: SAMPLE_WALLET_ENTRY.qr_id,
+        card: { status: "active", handle: "e2etest", manifesto_line: "Test line" },
+        verification: { state: "registered", label: "Registered" },
+        human_trust: { label: "Registered", subtitle: "", pill_active: false },
+      },
+    };
+
+    let seededRevoked = false;
+    await page.route("**/.well-known/hc/v1/cards/**/status**", async (route) => {
+      if (!seededRevoked) {
+        seededRevoked = true;
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            version: "1.0",
+            resolver: { operator: "humanity.llc", version: "1.0" },
+            scan: {
+              kind: "card_revoked",
+              profile_id: profileId,
+              qr_id: SAMPLE_WALLET_ENTRY.qr_id,
+              card: { status: "revoked", handle: "e2etest", manifesto_line: "Test line" },
+            },
+          }),
+        });
+        return;
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(activeStatusBody),
+      });
+    });
+
+    const statusResponse = (resp) =>
+      resp.url().includes("/status") && resp.request().method() === "GET" && resp.ok();
+
+    await page.goto("/wallet/");
+    await page.waitForResponse(statusResponse, { timeout: 15_000 });
+    await page.evaluate(() => {
+      sessionStorage.removeItem("hc_wallet_network_cache");
+      for (const key of Object.keys(sessionStorage)) {
+        if (key.startsWith("hc_resolver_etag:")) sessionStorage.removeItem(key);
+      }
+    });
+
+    const refreshStatus = page.waitForResponse(statusResponse, { timeout: 15_000 });
+    await page.getByRole("button", { name: "Check network" }).click({ timeout: 15_000 });
+    await refreshStatus;
+    await expect(page.getByText("Reachable")).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator(".hub-card-status-alert:not([hidden])")).toHaveCount(0, {
+      timeout: 15_000,
+    });
+    await page.waitForTimeout(800);
+
+    await page.evaluate(() => {
+      window.dispatchEvent(new Event("hc-live-control-inbox-changed"));
+    });
+
+    await expect(page.locator(".hub-card-status-alert:not([hidden])")).toHaveCount(0, {
+      timeout: 15_000,
+    });
+    await expect(
+      page.getByText("Card disabled on the network since your last visit.")
+    ).toBeHidden();
+    await expect(page.getByText("Reachable")).toBeVisible();
+  });
+
   test("does not show banner when stale session cache says card_revoked but resolver is active", async ({
     page,
   }) => {

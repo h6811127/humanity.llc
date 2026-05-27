@@ -110,7 +110,8 @@ function syncWalletNetworkTruthFromPoll(
       if (alertState != null) {
         setWalletNetworkTruthFromPoll(pid, { chipStatus, scanKind, alertState });
       } else {
-        clearWalletNetworkTruthForProfile(pid);
+        // Active / unreachable poll: drop revoke authority (avoid stale card_revoked SSOT).
+        setWalletNetworkTruthFromCacheOnly(pid, { chipStatus, scanKind });
       }
     } else {
       const prior = getWalletNetworkTruth(pid);
