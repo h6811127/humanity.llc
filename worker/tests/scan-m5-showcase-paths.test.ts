@@ -163,6 +163,8 @@ describe("M5 showcase scan paths", () => {
     expect(html).toContain("Returns due");
     expect(html).toContain("Cordless drill");
     expect(html).toContain(OBJECT_STREAMS_LIMIT);
+    expect(html).toContain("scan-public-snapshot");
+    expect(html).toContain(OBJECT_PUBLIC_SNAPSHOT_LIMIT);
   });
 
   it("lost item relay: relay eyebrow, object H1, holder foot copy", async () => {
