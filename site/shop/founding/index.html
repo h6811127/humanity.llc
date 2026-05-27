@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Founding signal sticker · humanity.llc</title>
+    <meta
+      name="description"
+      content="Tier 0 curiosity drop  -  a physical QR sticker that resolves to live Humanity Card status. Buying merch does not verify you."
+    />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=122" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=2" />
+  </head>
+  <body class="screen-shop-body">
+    <div class="page">
+      <header class="top">
+        <a class="top-brand top-brand--mark" href="/" aria-label="Home">
+          <span class="pass-dot" aria-hidden="true"></span>
+        </a>
+        <a class="top-create" href="/create/">Create card</a>
+      </header>
+
+      <main class="screen screen-shop">
+        <p class="shop-breadcrumb">
+          <a href="/shop/">Shop</a>
+          <span aria-hidden="true"> · </span>
+          <span>Founding objects</span>
+        </p>
+
+        <section class="hero hero-compact shop-hero">
+          <p class="hero-eyebrow">Tier 0 · curiosity drop</p>
+          <h1>Scan the sticker. See the experiment.</h1>
+          <p class="hero-line">
+            A physical QR that resolves to a live, signed Humanity Card  -  honest about what it
+            proves and what it doesn't. No phone. No ID. No scan analytics.
+          </p>
+          <div class="landing-hero-actions shop-hero-actions">
+            <a
+              class="landing-hero-btn landing-hero-btn-primary"
+              id="shop-hero-primary"
+              href="#shop-product"
+              >About this sticker</a
+            >
+            <a class="landing-hero-btn landing-hero-btn-secondary" href="/create/"
+              >Create a free card</a
+            >
+          </div>
+        </section>
+
+        <section class="shop-story-row" id="shop-product" aria-labelledby="shop-product-title">
+          <h2 class="group-label" id="shop-product-title">Founding signal sticker</h2>
+          <p class="shop-lead">
+            This is a <strong>pointer</strong>, not a passport. The QR resolves to
+            <strong>current</strong> card status when scanned. What you hold is ink and vinyl;
+            what you trust is what the scan shows right now.
+          </p>
+
+          <div class="shop-product-card">
+            <p class="shop-product-kicker">One design · batch QR</p>
+            <p class="shop-product-price" id="shop-product-price">Checkout opening soon</p>
+            <p class="shop-checkout-note" id="shop-checkout-note" hidden>
+              Secure checkout runs on Shopify in this tab — taxes and shipping shown there.
+              humanity.llc does not store your payment details.
+            </p>
+            <a
+              class="btn-primary shop-buy-btn"
+              id="shop-buy-btn"
+              href=""
+              hidden
+              >Buy the founding sticker</a
+            >
+            <a
+              class="btn-secondary shop-notify-btn"
+              id="shop-notify-btn"
+              href="#shop-interest-group"
+              >Notify when checkout opens</a
+            >
+            <ul class="shop-bullets shop-bullets-get">
+              <li>One durable sticker with a scannable QR</li>
+              <li>A story about trust without surveillance</li>
+              <li>Supports a founder-built experiment heading toward member governance</li>
+            </ul>
+            <ul class="shop-bullets shop-bullets-not">
+              <li>Legal identity or KYC</li>
+              <li>Automatic &ldquo;verified human&rdquo; status</li>
+              <li>Proof that whoever wears the sticker owns the card</li>
+              <li>A social network or follower graph</li>
+            </ul>
+            <p class="shop-required-line" role="note">
+              <strong>Buying this sticker does not verify you.</strong> Create a card separately.
+              Vouches come from real people under public rules  -  not from checkout.
+            </p>
+          </div>
+        </section>
+
+        <section
+          class="group shop-checkout-group"
+          id="shop-checkout-group"
+          hidden
+          aria-labelledby="shop-checkout-title"
+        >
+          <h2 class="group-label" id="shop-checkout-title">Checkout</h2>
+          <p class="shop-lead" id="shop-checkout-lead" hidden></p>
+          <a
+            class="btn-primary shop-buy-btn shop-buy-btn-block"
+            id="shop-buy-btn-footer"
+            href=""
+            hidden
+            >Continue to secure checkout</a
+          >
+          <p class="shop-lead shop-lead-muted shop-after-purchase">
+            After purchase:
+            <a href="/shop/thanks/" id="shop-thanks-link">what happens next</a>
+          </p>
+          <div class="shop-post-purchase-url" id="shop-post-purchase-url" hidden>
+            <p class="shop-post-purchase-url__label">Post-purchase page (paste into Shopify Admin)</p>
+            <p class="shop-post-purchase-url__value">
+              <a href="/shop/thanks/" id="shop-post-purchase-link" class="shop-post-purchase-url__link"
+                ><code class="shop-post-purchase-url__code"></code
+              ></a>
+            </p>
+          </div>
+        </section>
+
+        <section
+          class="group shop-interest-group"
+          id="shop-interest-group"
+          aria-labelledby="shop-interest-title"
+        >
+          <h2 class="group-label" id="shop-interest-title">Notify when checkout opens</h2>
+          <p class="shop-lead shop-lead-muted" id="shop-interest-lead">
+            Checkout is not open yet. Leave an optional email on this device, or bookmark this
+            page  -  interest is stored locally only (see
+            <a href="/data-policy.html">data policy</a>).
+          </p>
+          <form id="shop-interest-form" class="shop-interest-form" autocomplete="on" novalidate>
+            <label class="form-label" for="shop-interest-email">Email (optional)</label>
+            <input
+              class="form-input"
+              id="shop-interest-email"
+              type="email"
+              name="email"
+              inputmode="email"
+              autocomplete="email"
+              placeholder="you@example.com"
+            />
+            <button type="submit" class="btn-primary shop-interest-btn">
+              Save interest on this device
+            </button>
+          </form>
+          <p id="shop-interest-status" class="form-status" hidden role="status"></p>
+        </section>
+
+        <section class="group shop-faq-group" aria-labelledby="shop-faq-title">
+          <h2 class="group-label" id="shop-faq-title">FAQ</h2>
+          <details class="shop-faq">
+            <summary>Does buying this verify me?</summary>
+            <p>
+              No. Verification and vouches come from the Humanity Card and human vouch rules  - 
+              never from merch checkout.
+            </p>
+          </details>
+          <details class="shop-faq">
+            <summary>What does a stranger see when they scan?</summary>
+            <p>
+              Live card status (active, revoked, suspended, or unknown), trust labels where
+              applicable, plain limits, and CTAs to create a card or read the trust model  -  not
+              proof that the wearer owns the card.
+            </p>
+          </details>
+          <details class="shop-faq">
+            <summary>Can I revoke if I lose my phone?</summary>
+            <p>
+              Yes, if you saved an encrypted backup or recovery key at create. Import on
+              <a href="/created/">/created/</a> from another device. See
+              <a href="/data-policy.html">data policy</a> for what we store.
+            </p>
+          </details>
+          <details class="shop-faq">
+            <summary>What is Tier 1?</summary>
+            <p>
+              Personalized artifacts for card holders — preview your QR on a hoodie or sticker at
+              <a href="/shop/customize/">/shop/customize/</a>. Same rule: buying never grants vouch
+              status.
+            </p>
+          </details>
+        </section>
+
+        <section class="group shop-links-group">
+          <h2 class="group-label">Related</h2>
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/shop/">
+                <span class="list-content">
+                  <span class="list-title">Shop hub</span>
+                  <span class="list-sub">Make it yours · founding objects</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/shop/customize/">
+                <span class="list-content">
+                  <span class="list-title">Customize your QR</span>
+                  <span class="list-sub">Hoodie or sticker · unique item QR</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/create/">
+                <span class="list-content">
+                  <span class="list-title">Create a Humanity Card</span>
+                  <span class="list-sub">Free · keys stay in your browser</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+    <script src="/js/shop-founding.mjs?v=1" type="module"></script>
+  </body>
+</html>

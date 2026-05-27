@@ -1,6 +1,6 @@
 # Shop  -  Tier 0 curiosity drop (implementation)
 
-**Status:** Checkout handoff wired (config-driven) · set `shop-config.json` when Shopify product exists  
+**Status:** 2-row shop hub shipped · Tier 0 at `/shop/founding/` · same-tab Shopify handoff  
 **Canonical strategy:** `docs/MERCH_LED_V1.md` Phase B, `docs/FOUNDING_DROP_BRIEF.md` Tier 0  
 **Merch funnel MVP:** `docs/MERCH_FUNNEL_MVP.md` · `/shop/customize/` QR customizer  
 **Merch QR policy:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` (defer `checkout_open: true` until remaining policy gates pass; M5 passed 2026-05-27)  
@@ -12,13 +12,15 @@
 
 | Piece | Path |
 |-------|------|
-| Story-row drop page | `site/shop/index.html` |
+| **Shop hub** (2 story rows) | `site/shop/index.html` · `site/js/shop-hub.mjs` |
+| Tier 0 founding sticker page | `site/shop/founding/index.html` · `site/js/shop-founding.mjs` |
+| Same-tab checkout handoff | `site/js/shop-checkout-handoff.mjs` |
 | **QR customizer (Tier 1)** | `site/shop/customize/index.html` · `docs/MERCH_FUNNEL_MVP.md` |
 | Checkout config | `site/data/shop-config.json` (see `shop-config.example.json`) |
-| Shop UI | `site/js/shop.mjs` + `site/js/shop-config.mjs`  -  Buy vs interest by `checkout_open` |
+| Shop UI (Tier 0) | `shop-founding.mjs` + `shop-config.mjs`  -  Buy vs interest by `checkout_open` |
 | Drop interest (device-local) | `localStorage` `hc_shop_drop_interest` when checkout closed |
 | Post-checkout page | `site/shop/thanks/index.html`  -  link from Shopify thank-you / order status URL |
-| Hub shortcut | Landing **Shortcuts** → Founding sticker drop |
+| Hub shortcut | Landing **Shortcuts** → Shop |
 | Hero secondary CTA | Landing hero → `/shop/` |
 
 The interest form records **optional email** on this browser only (no server upload). Operator exports from DevTools: `JSON.parse(localStorage.getItem('hc_shop_drop_interest'))`.
@@ -41,8 +43,8 @@ The interest form records **optional email** on this browser only (no server upl
 }
 ```
 
-4. In Shopify checkout settings, set **Order status page** or post-purchase link to `https://humanity.llc/shop/thanks/` — see [`SHOPIFY_TIER0_POST_PURCHASE_SETUP.md`](SHOPIFY_TIER0_POST_PURCHASE_SETUP.md) (iPad/Safari steps). When checkout is open, `/shop/` displays the post-purchase URL in the Checkout section for copy-paste.
-5. Deploy Pages. `/shop/` shows **Buy** and hides the interest form.
+4. In Shopify checkout settings, set **Order status page** or post-purchase link to `https://humanity.llc/shop/thanks/` — see [`SHOPIFY_TIER0_POST_PURCHASE_SETUP.md`](SHOPIFY_TIER0_POST_PURCHASE_SETUP.md) (iPad/Safari steps). When checkout is open, `/shop/founding/` displays the post-purchase URL in the Checkout section for copy-paste.
+5. Deploy Pages. `/shop/founding/` shows **Buy** and hides the interest form.
 6. Deploy Worker — `npm run worker:deploy` — required for `/v1/store/*` (customizer artifact intent).
 7. Run `FOUNDING_DROP_BRIEF.md` and `MERCH_QR_LIFECYCLE_POLICY.md` launch gates before `checkout_open: true` on production.
 
@@ -70,7 +72,8 @@ The interest form records **optional email** on this browser only (no server upl
 |------|--------|
 | 1. Create Shopify product **Founding signal sticker** | Operator |
 | 2. `site/data/shop-config.json` + example file | ✅ |
-| 3. Buy CTA when `checkout_open` + valid `checkout_url` | ✅ (`shop.mjs`) |
+| 3. Buy CTA when `checkout_open` + valid `checkout_url` | ✅ (`shop-founding.mjs`) |
+| 3b. Same-tab Shopify redirect (no new tab) | ✅ (`shop-checkout-handoff.mjs`) |
 | 4. Post-purchase page + Shopify email copy | ✅ thanks page · [`SHOPIFY_TIER0_POST_PURCHASE_SETUP.md`](SHOPIFY_TIER0_POST_PURCHASE_SETUP.md) · email in `LAUNCH_LANGUAGE_KIT.md` |
 | 5. Pre-launch gates before live payments | Operator (`FOUNDING_DROP_BRIEF.md`) |
 

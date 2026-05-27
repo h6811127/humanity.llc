@@ -21,7 +21,7 @@ This is derived in repo from `site/data/shop-config.json`:
 - `site_origin`: `https://humanity.llc`
 - `thanks_path`: `/shop/thanks/`
 
-When checkout is open, `/shop/` shows this URL in the **Checkout** section under “Post-purchase page” for copy-paste into Shopify Admin.
+When checkout is open, `/shop/founding/` shows this URL in the **Checkout** section under “Post-purchase page” for copy-paste into Shopify Admin.
 
 ---
 

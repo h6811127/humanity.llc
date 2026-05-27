@@ -19,6 +19,11 @@ import {
   personalizeProductDisplay,
   personalizeProducts,
 } from "./shop-customize-core.mjs";
+import { goToShopifyCheckout } from "./shop-checkout-handoff.mjs";
+import {
+  SHOP_CHECKOUT_AFTER_REDIRECT_STATUS,
+  SHOP_CHECKOUT_REDIRECT_STATUS,
+} from "./shop-copy-core.mjs";
 
 const cardGate = document.getElementById("shop-customize-card-gate");
 const cardReady = document.getElementById("shop-customize-card-ready");
@@ -279,15 +284,15 @@ async function onCheckoutClick() {
     void refreshPreview();
     return;
   }
-  setStatus("Opening checkout…");
+  setStatus(SHOP_CHECKOUT_REDIRECT_STATUS);
   if (checkoutBtn) checkoutBtn.disabled = true;
   try {
     const intent = await ensureIntent(product);
     const attrs = intent.shopify?.cart_line_attributes ?? [];
     const display = personalizeProductDisplay(product);
     const url = buildShopifyCartUrl(display.checkoutUrl, 1, attrs);
-    window.open(url, "_blank", "noopener,noreferrer");
-    setStatus("Checkout opened in a new tab. Complete payment on Shopify.");
+    goToShopifyCheckout(url);
+    setStatus(SHOP_CHECKOUT_AFTER_REDIRECT_STATUS);
   } catch (err) {
     setStatus(err instanceof Error ? err.message : "Checkout failed.", true);
   } finally {

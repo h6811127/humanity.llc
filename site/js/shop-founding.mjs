@@ -1,5 +1,5 @@
 /**
- * Tier 0 shop  -  checkout handoff or local interest until Shopify URL is set.
+ * Tier 0 founding sticker — /shop/founding/
  */
 import {
   isTier0CheckoutOpen,
@@ -16,6 +16,7 @@ import {
   SHOP_CHECKOUT_READY_LEAD,
   shopPriceLabelWhenCheckoutClosed,
 } from "./shop-copy-core.mjs";
+import { bindSameTabCheckoutAnchor } from "./shop-checkout-handoff.mjs";
 
 const INTEREST_KEY = "hc_shop_drop_interest";
 
@@ -35,6 +36,9 @@ const thanksLink = document.getElementById("shop-thanks-link");
 const postPurchaseUrlEl = document.getElementById("shop-post-purchase-url");
 const postPurchaseLink = document.getElementById("shop-post-purchase-link");
 const postPurchaseCode = document.querySelector(".shop-post-purchase-url__code");
+
+/** @type {string} */
+let activeCheckoutUrl = "";
 
 function loadInterest() {
   try {
@@ -57,12 +61,14 @@ function setInterestStatus(msg, isError = false) {
 }
 
 function setBuyButtonsVisible(visible, checkoutUrl = "") {
+  activeCheckoutUrl = visible && checkoutUrl ? checkoutUrl : "";
   for (const btn of [buyBtn, buyBtnFooter]) {
     if (!btn) continue;
     if (visible && checkoutUrl) {
       btn.href = checkoutUrl;
       btn.hidden = false;
       btn.removeAttribute("aria-disabled");
+      bindSameTabCheckoutAnchor(btn, () => activeCheckoutUrl);
     } else {
       btn.removeAttribute("href");
       btn.hidden = true;
@@ -111,10 +117,11 @@ function showCheckout(display, checkoutUrl, thanksUrl) {
   if (heroPrimary) {
     heroPrimary.href = checkoutUrl;
     heroPrimary.textContent = "Buy the founding sticker";
-    heroPrimary.target = "_blank";
-    heroPrimary.rel = "noopener noreferrer";
+    heroPrimary.removeAttribute("target");
+    heroPrimary.removeAttribute("rel");
     heroPrimary.classList.add("landing-hero-btn-primary");
     heroPrimary.classList.remove("landing-hero-btn-secondary");
+    bindSameTabCheckoutAnchor(heroPrimary, () => activeCheckoutUrl);
   }
   if (thanksLink) thanksLink.href = thanksUrl;
   if (postPurchaseLink) postPurchaseLink.href = thanksUrl;
@@ -166,7 +173,7 @@ function decorateShopCreateLinks() {
 }
 
 async function initShop() {
-  persistMerchCreateRef("tier0_shop");
+  persistMerchCreateRef("tier0_sticker");
   decorateShopCreateLinks();
   bindInterestForm();
   try {

@@ -1,8 +1,67 @@
 # Merch funnel MVP — scan → profile → customize → Printify
 
-**Status:** Active — customizer UI shipped; operator enables products in `shop-config.json`  
+**Status:** Active — customizer UI shipped; 2-row shop hub + same-tab checkout handoff in progress  
 **Parent:** [`MERCH_LED_V1.md`](MERCH_LED_V1.md) · [`V1_FLOW_AUDIT.md`](V1_FLOW_AUDIT.md) · [`features/Storefront v1.0.md`](features/Storefront%20v1.0.md)  
-**Implementation:** [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) · `site/shop/customize/`
+**Implementation:** [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) · `site/shop/` · `site/shop/customize/`
+
+---
+
+## MVP feasibility (2026-05-27)
+
+**Yes — the MVP is technically feasible** with the architecture already locked in [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md):
+
+- **humanity.llc** — browse, story rows, QR preview/proof, post-purchase
+- **Headless Shopify** — cart, checkout, payments, tax, refunds (no native checkout required for v1)
+- **Printify middleware** — fulfillment only on the server; users never touch Printify in the browser
+
+What reads as “cheap” is not the stack — it is **UX polish and checkout handoff** (new-tab dump, single-SKU landing, placeholder mocks, operator/debug copy). Premium feel is achievable on the same architecture.
+
+**Would block MVP only if:** payment UI had to be 100% embedded on humanity.llc with zero Shopify surface. That constraint is **not** required.
+
+---
+
+## Spec vs shipped (honest gap table)
+
+| Area | Spec ([`Storefront v1.0.md`](features/Storefront%20v1.0.md)) | Shipped today | Gap |
+|------|----------------------------------------------------------------|---------------|-----|
+| Browse model | Story-row hub (~50 SKUs over time) | **2-row hub** at `/shop/` + product pages | Full catalog deferred |
+| Tier 0 batch merch | Founding objects row | `/shop/founding/` — founding sticker | Founding glitch shirt / luxury batch page TBD |
+| Tier 1 personalize | Customizer → artifact intent → checkout | `/shop/customize/` + `POST /v1/store/artifact-intents` | Operator must enable `personalize.checkout_open` + Shopify variants |
+| Checkout | Branded Humanity checkout; may pass through Shopify | Same-tab redirect to Shopify; return via `/shop/thanks/` | Post-pay order timeline on site (thin) |
+| Catalog API | `GET /v1/store/rows` | Static `shop-config.json` | API rows when catalog grows |
+| Print catalog | Apparel from `GET /v1/print/catalog` | 2 sticker SKUs in worker | Hoodie template after Printify QA |
+| Fulfillment | Paid webhook → Printify | Queue + operator submit path shipped | Self-serve E2E for one personalized SKU |
+
+**Do not conflate:** Tier 0 founding batch page (`/shop/founding/`) and Tier 1 customizer (`/shop/customize/`). Different QR models, different stories.
+
+---
+
+## Premium UX principles (headless Shopify)
+
+Checkout on Shopify is acceptable for v1 when framed as a **secure payment step**, not a tab dump:
+
+| Avoid (feels cheap) | Target (feels intentional) |
+|---------------------|----------------------------|
+| `window.open` to Shopify in a new tab | Same-tab redirect; copy names Shopify as secure checkout |
+| Single product page as the whole “shop” | `/shop/` hub: **Make it yours** + **Founding objects** |
+| Grey CSS-only hoodie mock | Real product imagery + approved print template when live |
+| “Checkout opening soon” on production paths | Production copy; config gates only where checkout is truly closed |
+| Story stops at payment | Branded `/shop/thanks/` + future order status on humanity.llc |
+
+See [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) for operator checkout setup.
+
+---
+
+## Implementation phases (engineering order)
+
+| Phase | Scope | Status |
+|-------|--------|--------|
+| **1** | Same-tab Shopify checkout handoff (`shop-checkout-handoff.mjs`) | Shipped |
+| **2** | 2-row `/shop/` hub + `/shop/founding/` Tier 0 page | Shipped |
+| **3** | Wire customizer to `GET /v1/print/catalog` when hoodie QA passes | Next |
+| **4** | Enable one personalized SKU E2E (`personalize.checkout_open` + webhook → Printify) | Operator + engineering |
+| **5** | Post-purchase order status on humanity.llc | Backlog |
+| **6** | Full story-row catalog (~50 SKUs) | Post-MVP |
 
 ---
 
@@ -62,7 +121,7 @@ The customizer **does not** call Printify from the browser. It prepares intent +
 
 | Tier | QR model | Customizer |
 |------|----------|------------|
-| **Tier 0** curiosity | Batch QR on `/shop/` | Not used — buy founding sticker as-is |
+| **Tier 0** curiosity | Batch QR on founding product page | Not used — buy founding sticker at **`/shop/founding/`** |
 | **Tier 1** belonging | Unique `print_artifact` per unit | **`/shop/customize/`** — hoodie, personalized sticker, etc. |
 
 Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md).
@@ -74,7 +133,9 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
 | Piece | Path |
 |-------|------|
 | Funnel doc | This file |
-| Tier 0 shop | `site/shop/index.html` |
+| **Shop hub** (2 story rows) | `site/shop/index.html` · `site/js/shop-hub.mjs` |
+| Tier 0 founding sticker | `site/shop/founding/index.html` · `site/js/shop-founding.mjs` |
+| Checkout handoff | `site/js/shop-checkout-handoff.mjs` |
 | **QR customizer** | `site/shop/customize/index.html` |
 | Customizer logic | `site/js/shop-customize.mjs` · `site/js/shop-customize-core.mjs` |
 | Shop config | `site/data/shop-config.json` → `personalize.products[]` |
@@ -126,8 +187,8 @@ Aggregate metrics only — no PII. Allowed refs:
 
 | Ref | When set |
 |-----|----------|
-| `tier0_shop` | `/shop/` |
-| `tier0_sticker` | Tier 0 campaign scan |
+| `tier0_shop` | `/shop/` hub |
+| `tier0_sticker` | `/shop/founding/` · Tier 0 campaign scan |
 | `customize_shop` | `/shop/customize/` |
 | `customize_hoodie` | Customizer with hoodie selected |
 | `scan_customize` | Scan page → customize CTA on live wear / print_artifact scans |
@@ -152,8 +213,9 @@ Aggregate metrics only — no PII. Allowed refs:
 ## Not in this MVP slice
 
 - Full story-row catalog (~50 SKUs) — [`Storefront v1.0.md`](features/Storefront%20v1.0.md)
+- Separate founding luxury batch page (e.g. glitch shirt campaign) — story TBD
 - Drag-and-drop QR placement on arbitrary Printify mockups
-- In-browser native checkout
+- In-browser native checkout (headless Shopify is the v1 decision)
 - Game-master / city-scale AI
 - Scan analytics
 
