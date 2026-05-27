@@ -24,6 +24,7 @@ import {
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
 import { getCrossTabScanSnapshot } from "./device-cross-tab-state.mjs";
 import { hasUnifiedHubKeysCustodyPanel } from "./device-hub-keys-custody.mjs";
+import { shouldShowLegacyHubCrossTabChrome } from "./device-legacy-cross-tab-chrome-core.mjs";
 import {
   emphasisCardActionsHtml,
   emphasisCardBodyHtml,
@@ -59,6 +60,11 @@ function clearScanCrossTabBanner() {
 function renderPageCrossTabBanner() {
   if (!banner) return;
 
+  if (!shouldRenderLegacyHubCrossTabChrome()) {
+    clearPageCrossTabBanner();
+    return;
+  }
+
   if (!shouldShowCrossTabNotice()) {
     clearPageCrossTabBanner();
     return;
@@ -88,8 +94,8 @@ function renderPageCrossTabBanner() {
   banner.hidden = false;
   banner.className = "hc-emphasis-card hc-emphasis-card--info device-cross-tab-banner";
   banner.innerHTML = emphasisCardBodyHtml({
-    eyebrow: "Keys in another tab",
-    title: `${msg.label}${msg.extra}`,
+    eyebrow: escapeHtml(msg.title),
+    title: escapeHtml(msg.detail),
     detail,
     dot: "info",
     actionsHtml: emphasisCardActionsHtml(actions),
@@ -207,8 +213,18 @@ function clearHubCrossTabNotice() {
   delete hubSlot.dataset.hubSearchable;
 }
 
+function shouldRenderLegacyHubCrossTabChrome() {
+  return shouldShowLegacyHubCrossTabChrome(
+    Boolean(document.getElementById("shell-notif-badge")),
+    hasUnifiedHubKeysCustodyPanel()
+  );
+}
+
 function renderHubOrphanRemovedNotice() {
   if (!hubSlot) return;
+  if (!shouldRenderLegacyHubCrossTabChrome()) {
+    return false;
+  }
   if (!shouldShowOrphanHubNotice()) {
     return false;
   }
@@ -228,7 +244,7 @@ function renderHubOrphanRemovedNotice() {
   hubSlot.dataset.hubSearchable = "keys removed card another tab";
   hubSlot.innerHTML = emphasisCardBodyHtml({
     eyebrow: ORPHAN_KEYS_INBOX_TITLE,
-    title: `${msg.label}${msg.extra}`,
+    title: escapeHtml(msg.detail),
     detail: `${ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX} Open that tab to close it, or clear keys on this device.`,
     dot: "warn",
     actionsHtml: emphasisCardActionsHtml(actions),
@@ -244,7 +260,7 @@ function renderHubOrphanRemovedNotice() {
 
 function renderHubCrossTabNotice() {
   if (!hubSlot) return;
-  if (hasUnifiedHubKeysCustodyPanel()) {
+  if (!shouldRenderLegacyHubCrossTabChrome()) {
     clearHubCrossTabNotice();
     return;
   }
@@ -341,11 +357,12 @@ export function renderCrossTabKeysBanner() {
   renderScanCrossTabNotice();
 
   if (document.getElementById("shell-notif-badge")) {
-    renderHubCrossTabNotice();
+    clearHubCrossTabNotice();
     clearPageCrossTabBanner();
     return;
   }
 
+  renderHubCrossTabNotice();
   renderPageCrossTabBanner();
 }
 

@@ -1,6 +1,6 @@
 # Keys custody and notification improvement plan
 
-**Status:** Phases 1–5 + 7 (partial) shipped · Phase 6 (partial) shipped  
+**Status:** Phases 1–7 shipped  
 **Audience:** Product, engineering  
 **Related:** [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md)
 
@@ -10,7 +10,7 @@
 
 A meaningfully better keys and key-notification system is **possible** without server-side key sync or OS push for cross-tab custody. Improvements concentrate on **custody clarity** (one user mental model) and **notification surface reduction** (badge/dot as urgency, hub as authority), not on new infrastructure.
 
-Engineering already shipped the cross-tab **notification rebuild** (Phases 1–6 in [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md)). This plan covers **product and UX layers** that rebuild alone does not address.
+Engineering already shipped the cross-tab **notification rebuild** (Phases 1–6 in [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md)). **This plan (Phases 1–7) is complete** as of May 2026 — custody panel, inbox semantics, scale guardrails, and legacy banner demotion. Scan cross-tab banner intentionally retained.
 
 ---
 
@@ -179,7 +179,7 @@ Clearer ARIA/tooltip breakdown; glance copy aligned with per-tab custody rows; d
 
 **Code:** `device-cross-tab-copy-core.mjs`, `device-inbox-core.mjs`, `device-hub-keys-custody-core.mjs`, `device-cross-tab-banner.mjs`, `device-tab-presence.mjs`
 
-### Phase 6 — Scale limits + portability (partial) ✅
+### Phase 6 — Scale limits + portability ✅
 
 | Subpoint | Detail |
 |----------|--------|
@@ -189,16 +189,17 @@ Clearer ARIA/tooltip breakdown; glance copy aligned with per-tab custody rows; d
 
 **Code:** `device-wallet-scale-core.mjs`, `device-hub-keys-custody-core.mjs`, `device-hub-keys-custody.mjs`, `device-hub-ui.mjs`
 
-### Phase 7 — Demote legacy banners ✅ (partial)
+### Phase 7 — Demote legacy banners ✅
 
 | Surface | Shipped behavior |
 |---------|------------------|
 | **Landing `#device-cross-tab-banner`** | Hidden when `#shell-notif-badge` exists (inbox authority) |
-| **Hub `#device-hub-crosstab-notice` / `#device-hub-notice-group`** | Skipped when `#device-hub-keys-custody` unified panel mounts |
+| **Hub `#device-hub-crosstab-notice`** | Hidden when shell badge or unified custody panel — `shouldShowLegacyHubCrossTabChrome()` |
+| **Hub `#device-hub-notice-group` tab-keys strip** | Same demotion via `shouldShowLegacyTabKeysHubNotice()` |
 | **`/wallet/` `#wallet-tab-hint`** | Hidden for cross-tab/orphan when shell badge present — `shouldShowWalletTabHintCrossTabChrome()` |
 | **Scan `#scan-cross-tab-banner`** | Unchanged (retained) |
 
-**Code:** `device-cross-tab-banner.mjs`, `device-hub-inbox-alerts.mjs`, `wallet-tab-hint-chrome-core.mjs`, `wallet-page-chrome.mjs`
+**Code:** `device-legacy-cross-tab-chrome-core.mjs`, `device-cross-tab-banner.mjs`, `device-hub-inbox-alerts.mjs`, `wallet-tab-hint-chrome-core.mjs`, `wallet-page-chrome.mjs`
 
 ---
 
@@ -216,7 +217,7 @@ Clearer ARIA/tooltip breakdown; glance copy aligned with per-tab custody rows; d
 ## Regression tests
 
 ```bash
-npm run worker:test -- worker/tests/device-hub-keys-custody-core.test.ts worker/tests/device-inbox.test.ts worker/tests/wallet-tab-hint-chrome.test.ts
+npm run worker:test -- worker/tests/device-hub-keys-custody-core.test.ts worker/tests/device-wallet-scale-core.test.ts worker/tests/device-inbox.test.ts worker/tests/wallet-tab-hint-chrome.test.ts worker/tests/device-legacy-cross-tab-chrome.test.ts
 npm run e2e -- e2e/device-cross-tab-keys.spec.ts e2e/device-inbox.spec.ts
 ```
 
