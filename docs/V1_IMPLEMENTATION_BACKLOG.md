@@ -592,6 +592,8 @@ Goal: make the vertical slice credible for public launch.
 
 **Spec:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · **Implementation:** [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md)
 
+**Status (2026-05-27):** Phases 0–3 shipped — Vitest (`npm run worker:test:pwa-install`) + E2E (`e2e/device-pwa-install.spec.ts`). Manual **P1-PWA** remains for iOS Safari and standalone smoke.
+
 **Must verify (after Phases 1–3 ship):**
 
 - Manifest and icons deploy on Pages; shell HTML links manifest on `/`, `/wallet/`, `/created/` only.
@@ -603,8 +605,9 @@ Goal: make the vertical slice credible for public launch.
 
 **Exit criteria:**
 
-- Phase table in `PWA_INSTALL.md` marked Phases 1–3 shipped.
-- `npm run worker:test:pwa-install` green.
+- Phase table in `PWA_INSTALL.md` marked Phases 1–3 shipped. ✅
+- `npm run worker:test:pwa-install` green. ✅
+- `npm run e2e -- e2e/device-pwa-install.spec.ts` green. ✅
 
 ### H-005: Growth Loop Readiness
 

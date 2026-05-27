@@ -1,6 +1,6 @@
 # PWA install — implementation plan
 
-**Status:** Phases 0–2 shipped · Phase 3 pending  
+**Status:** Phases 0–3 shipped  
 **Audience:** Engineers implementing [`PWA_INSTALL.md`](PWA_INSTALL.md)  
 **Related:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) · [`AGENTS.md`](../AGENTS.md) · [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md)
 
@@ -196,6 +196,7 @@ No database or Worker migration rollback required.
 
 | Date | Change |
 |------|--------|
+| 2026-05-27 | Phase 3 shipped — E2E + backlog H-006 closure |
 | 2026-05-27 | Phase 2 shipped — install card UX + lazy bootstrap load |
 | 2026-05-27 | Phase 1 shipped — manifest, icons, shell `<link>` tags |
 | 2026-05-27 | Phase 0 shipped; Phases 1–3 defined |
