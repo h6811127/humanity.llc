@@ -4743,6 +4743,13 @@ body.landing-focus-mode .screen-landing {
   margin-bottom: 14px;
 }
 
+.shop-post-purchase-url__value {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 13px;
+  word-break: break-all;
+}
+
 .shop-bullets {
   margin: 0 0 12px;
   padding-left: 1.15rem;

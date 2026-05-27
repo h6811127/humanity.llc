@@ -43,3 +43,22 @@ export function tier0Display(config) {
     checkoutUrl: typeof tier0.checkout_url === "string" ? tier0.checkout_url.trim() : "",
   };
 }
+
+function normalizeSitePath(raw, fallback) {
+  const path = typeof raw === "string" && raw.trim() ? raw.trim() : fallback;
+  return path.startsWith("/") ? path : `/${path}`;
+}
+
+/**
+ * Absolute thanks URL for Shopify order-status redirect (SHOP_TIER0 step 4).
+ * @param {Record<string, unknown>} config
+ * @param {string} [locationOrigin] — fallback when site_origin unset (local Pages dev)
+ */
+export function tier0ThanksPageUrl(config, locationOrigin = "") {
+  const thanksPath = normalizeSitePath(config?.thanks_path, "/shop/thanks/");
+  const configuredOrigin =
+    typeof config?.site_origin === "string" ? config.site_origin.trim().replace(/\/$/, "") : "";
+  const origin = configuredOrigin || (typeof locationOrigin === "string" ? locationOrigin.trim().replace(/\/$/, "") : "");
+  if (!origin) return thanksPath;
+  return `${origin}${thanksPath}`;
+}

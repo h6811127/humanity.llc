@@ -9,7 +9,7 @@
       content="Tier 0 curiosity drop  -  a physical QR sticker that resolves to live Humanity Card status. Buying merch does not verify you."
     />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=78" />
+    <link rel="stylesheet" href="/styles.css?v=79" />
     <link rel="stylesheet" href="/css/device-shell.css?v=2" />
   </head>
   <body class="screen-shop-body">
@@ -109,7 +109,11 @@
           >
           <p class="shop-lead shop-lead-muted">
             After purchase:
-            <a href="/shop/thanks/">what happens next</a>
+            <a href="/shop/thanks/" id="shop-thanks-link">what happens next</a>
+          </p>
+          <p class="shop-lead shop-lead-muted shop-post-purchase-url" id="shop-post-purchase-url" hidden>
+            Post-purchase page:
+            <code class="shop-post-purchase-url__value"></code>
           </p>
         </section>
 
@@ -210,6 +214,6 @@
         </section>
       </main>
     </div>
-    <script src="/js/shop.mjs?v=4" type="module"></script>
+    <script src="/js/shop.mjs?v=5" type="module"></script>
   </body>
 </html>

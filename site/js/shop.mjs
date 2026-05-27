@@ -1,7 +1,12 @@
 /**
  * Tier 0 shop  -  checkout handoff or local interest until Shopify URL is set.
  */
-import { isTier0CheckoutOpen, loadShopConfig, tier0Display } from "./shop-config.mjs";
+import {
+  isTier0CheckoutOpen,
+  loadShopConfig,
+  tier0Display,
+  tier0ThanksPageUrl,
+} from "./shop-config.mjs";
 import {
   appendMerchRefToCreateUrl,
   persistMerchCreateRef,
@@ -26,6 +31,8 @@ const heroPrimary = document.getElementById("shop-hero-primary");
 const interestForm = document.getElementById("shop-interest-form");
 const emailInput = document.getElementById("shop-interest-email");
 const interestStatus = document.getElementById("shop-interest-status");
+const thanksLink = document.getElementById("shop-thanks-link");
+const postPurchaseUrlEl = document.getElementById("shop-post-purchase-url");
 
 function loadInterest() {
   try {
@@ -88,8 +95,9 @@ function bindInterestForm() {
 /**
  * @param {ReturnType<typeof tier0Display>} display
  * @param {string} checkoutUrl
+ * @param {string} thanksUrl
  */
-function showCheckout(display, checkoutUrl) {
+function showCheckout(display, checkoutUrl, thanksUrl) {
   if (priceEl) {
     priceEl.textContent = display.price || "Available now";
     priceEl.classList.add("shop-product-price--live");
@@ -107,10 +115,16 @@ function showCheckout(display, checkoutUrl) {
     heroPrimary.classList.add("landing-hero-btn-primary");
     heroPrimary.classList.remove("landing-hero-btn-secondary");
   }
+  if (thanksLink) thanksLink.href = thanksUrl;
   if (checkoutLead) {
     checkoutLead.textContent = SHOP_CHECKOUT_READY_LEAD;
     checkoutLead.hidden = false;
     checkoutLead.classList.add("shop-checkout-lead-ready");
+  }
+  if (postPurchaseUrlEl) {
+    const code = postPurchaseUrlEl.querySelector(".shop-post-purchase-url__value");
+    if (code) code.textContent = thanksUrl;
+    postPurchaseUrlEl.hidden = false;
   }
   if (checkoutSection) checkoutSection.hidden = false;
   if (interestSection) interestSection.hidden = true;
@@ -137,6 +151,7 @@ function showInterestPending(display) {
     checkoutLead.hidden = true;
     checkoutLead.classList.remove("shop-checkout-lead-ready");
   }
+  if (postPurchaseUrlEl) postPurchaseUrlEl.hidden = true;
   if (checkoutSection) checkoutSection.hidden = true;
   if (interestSection) interestSection.hidden = false;
 }
@@ -157,7 +172,7 @@ async function initShop() {
     const config = await loadShopConfig();
     const display = tier0Display(config);
     if (isTier0CheckoutOpen(config)) {
-      showCheckout(display, display.checkoutUrl);
+      showCheckout(display, display.checkoutUrl, tier0ThanksPageUrl(config, location.origin));
       return;
     }
     showInterestPending(display);

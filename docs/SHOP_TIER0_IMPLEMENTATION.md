@@ -39,7 +39,7 @@ The interest form records **optional email** on this browser only (no server upl
 }
 ```
 
-4. In Shopify checkout settings, set **Order status page** or post-purchase link to `https://humanity.llc/shop/thanks/` (optional).
+4. In Shopify checkout settings, set **Order status page** or post-purchase link to `https://humanity.llc/shop/thanks/` — see [`SHOPIFY_TIER0_POST_PURCHASE_SETUP.md`](SHOPIFY_TIER0_POST_PURCHASE_SETUP.md) (iPad/Safari steps). When checkout is open, `/shop/` displays the post-purchase URL in the Checkout section for copy-paste.
 5. Deploy Pages. `/shop/` shows **Buy** and hides the interest form.
 6. Run `FOUNDING_DROP_BRIEF.md` and `MERCH_QR_LIFECYCLE_POLICY.md` launch gates before `checkout_open: true` on production.
 
@@ -68,7 +68,7 @@ The interest form records **optional email** on this browser only (no server upl
 | 1. Create Shopify product **Founding signal sticker** | Operator |
 | 2. `site/data/shop-config.json` + example file | ✅ |
 | 3. Buy CTA when `checkout_open` + valid `checkout_url` | ✅ (`shop.mjs`) |
-| 4. Post-purchase page + Shopify email copy | ✅ thanks page · email in `LAUNCH_LANGUAGE_KIT.md` |
+| 4. Post-purchase page + Shopify email copy | ✅ thanks page · [`SHOPIFY_TIER0_POST_PURCHASE_SETUP.md`](SHOPIFY_TIER0_POST_PURCHASE_SETUP.md) · email in `LAUNCH_LANGUAGE_KIT.md` |
 | 5. Pre-launch gates before live payments | Operator (`FOUNDING_DROP_BRIEF.md`) |
 
 ---
