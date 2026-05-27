@@ -5158,6 +5158,30 @@ body.landing-focus-mode .screen-landing {
   height: 18px;
 }
 
+.shop-proof-consent {
+  margin: 16px 0;
+  padding: 0;
+  border: 0;
+}
+
+.shop-proof-consent-lead {
+  margin: 0 0 10px;
+}
+
+.shop-proof-consent-item {
+  margin: 0 0 10px;
+}
+
+.shop-proof-consent-item:last-child {
+  margin-bottom: 0;
+}
+
+a.shop-buy-btn[aria-disabled="true"],
+a.shop-hub-cta[aria-disabled="true"] {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
 .shop-customize-checkout {
   display: flex;
   align-items: center;

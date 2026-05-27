@@ -63,11 +63,43 @@
               Secure checkout runs on Shopify in this tab — taxes and shipping shown there.
               humanity.llc does not store your payment details.
             </p>
+
+            <fieldset
+              class="shop-proof-consent"
+              id="shop-proof-consent"
+              aria-labelledby="shop-proof-consent-title"
+              hidden
+            >
+              <legend class="group-label" id="shop-proof-consent-title">Before you buy</legend>
+              <p class="shop-lead shop-lead-muted shop-proof-consent-lead">
+                Confirm each line before secure checkout:
+              </p>
+              <label class="shop-customize-approve shop-proof-consent-item">
+                <input type="checkbox" data-proof-consent="commerce_not_verification" />
+                <span>Buying this sticker does not verify me or grant a vouch.</span>
+              </label>
+              <label class="shop-customize-approve shop-proof-consent-item">
+                <input type="checkbox" data-proof-consent="bearer_not_ownership" />
+                <span
+                  >A printed QR is a pointer — holding the sticker does not prove I own the Humanity
+                  Card.</span
+                >
+              </label>
+              <label class="shop-customize-approve shop-proof-consent-item">
+                <input type="checkbox" data-proof-consent="batch_qr_pointer" />
+                <span
+                  >This sticker uses a batch campaign QR — it points at live status, not proof that I
+                  hold a card.</span
+                >
+              </label>
+            </fieldset>
+
             <a
               class="btn-primary shop-buy-btn"
               id="shop-buy-btn"
               href=""
               hidden
+              aria-disabled="true"
               >Buy the founding sticker</a
             >
             <a
@@ -107,6 +139,7 @@
             id="shop-buy-btn-footer"
             href=""
             hidden
+            aria-disabled="true"
             >Continue to secure checkout</a
           >
           <p class="shop-lead shop-lead-muted shop-after-purchase">
@@ -221,6 +254,6 @@
         </section>
       </main>
     </div>
-    <script src="/js/shop-founding.mjs?v=1" type="module"></script>
+    <script src="/js/shop-founding.mjs?v=2" type="module"></script>
   </body>
 </html>

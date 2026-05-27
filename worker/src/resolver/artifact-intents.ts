@@ -26,6 +26,7 @@ interface ArtifactIntentRequest {
   print_template_id?: unknown;
   quantity?: unknown;
   shopify_variant_id?: unknown;
+  proof_acknowledged?: unknown;
 }
 
 interface BlockReason {
@@ -348,6 +349,14 @@ export async function handlePostArtifactIntentAttach(
       "ARTIFACT_INTENT_UNAVAILABLE",
       "Artifact intent cannot be attached to cart.",
       409
+    );
+  }
+
+  if (body.proof_acknowledged !== true) {
+    return errorResponse(
+      "PROOF_CONSENT_REQUIRED",
+      "Explicit proof and persistence acknowledgment is required before cart attach.",
+      422
     );
   }
 

@@ -63,6 +63,7 @@ See [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) for operator 
 | **5** | Post-purchase order status on humanity.llc | Shipped |
 | **6** | Full story-row catalog (~50 SKUs) | **Skeleton shipped** — seed catalog + API rows; launch exposes 3 products |
 | **7** | Product detail pages (`/shop/products/{id}/`) | Shipped |
+| **8** | Proof and consent UX before checkout (SF-003) | Shipped |
 
 ---
 
@@ -147,6 +148,7 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
 | Store rows API | `GET /v1/store/rows` · `GET /v1/store/products/{product_id}` · `worker/src/store/store-catalog.ts` |
 | Store rows client | `site/js/shop-store-rows-core.mjs` |
 | Product detail pages | `/shop/products/{product_id}/` · `site/js/shop-product-detail.mjs` |
+| Proof / consent before checkout | `site/js/shop-proof-consent-core.mjs` · customize + founding |
 | Artifact intent API | `worker/src/resolver/artifact-intents.ts` |
 | QR renderer | `site/js/qr-branding.mjs` |
 

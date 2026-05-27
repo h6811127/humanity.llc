@@ -37,12 +37,17 @@ export function goToShopifyCheckout(url, navigation = globalThis.location) {
  * Intercept anchor clicks for validated same-tab checkout.
  * @param {HTMLAnchorElement | null | undefined} anchor
  * @param {() => string} getUrl
+ * @param {() => boolean} [canProceed]
  */
-export function bindSameTabCheckoutAnchor(anchor, getUrl) {
+export function bindSameTabCheckoutAnchor(anchor, getUrl, canProceed = () => true) {
   if (!anchor) return;
   anchor.removeAttribute("target");
   anchor.removeAttribute("rel");
   anchor.addEventListener("click", (event) => {
+    if (!canProceed()) {
+      event.preventDefault();
+      return;
+    }
     const href = getUrl();
     if (!isAllowedCheckoutUrl(href)) {
       event.preventDefault();

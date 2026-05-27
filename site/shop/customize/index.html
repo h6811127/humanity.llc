@@ -109,13 +109,30 @@
 
           <p class="shop-product-price" id="shop-customize-price">Price at checkout</p>
 
-          <label class="shop-customize-approve">
-            <input type="checkbox" id="shop-customize-approve" />
-            <span
-              >I understand: buying does not verify me; this QR is a pointer, not proof the wearer
-              owns the card; I can revoke this item if it is lost or stolen.</span
-            >
-          </label>
+          <fieldset class="shop-proof-consent" id="shop-proof-consent" aria-labelledby="shop-proof-consent-title">
+            <legend class="group-label" id="shop-proof-consent-title">Approve proof before checkout</legend>
+            <p class="shop-lead shop-lead-muted shop-proof-consent-lead">
+              Separate commerce from verification — confirm each line before payment:
+            </p>
+            <label class="shop-customize-approve shop-proof-consent-item">
+              <input type="checkbox" data-proof-consent="commerce_not_verification" />
+              <span>Buying this merch does not verify me or grant a vouch.</span>
+            </label>
+            <label class="shop-customize-approve shop-proof-consent-item">
+              <input type="checkbox" data-proof-consent="bearer_not_ownership" />
+              <span
+                >A printed QR is a pointer — holding the object does not prove I own the Humanity
+                Card.</span
+              >
+            </label>
+            <label class="shop-customize-approve shop-proof-consent-item">
+              <input type="checkbox" data-proof-consent="persistence_revocable" />
+              <span
+                >Printed ink persists. I can revoke this item&apos;s QR from my phone, but strangers
+                may still scan old ink until I do.</span
+              >
+            </label>
+          </fieldset>
 
           <p class="form-status" id="shop-customize-status" hidden role="status"></p>
 
@@ -175,6 +192,6 @@
         </section>
       </main>
     </div>
-    <script src="/js/shop-customize.mjs?v=3" type="module"></script>
+    <script src="/js/shop-customize.mjs?v=4" type="module"></script>
   </body>
 </html>

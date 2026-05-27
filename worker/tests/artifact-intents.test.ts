@@ -245,7 +245,10 @@ describe("artifact intent pre-commerce guard (M4.4)", () => {
     const intents = new Map([[intentId, { ...row }]]);
 
     const res = await handlePostArtifactIntentAttach(
-      request({ shopify_variant_id: "gid://shopify/ProductVariant/123" }, `/v1/store/artifact-intents/${intentId}/attach`),
+      request(
+        { shopify_variant_id: "gid://shopify/ProductVariant/123", proof_acknowledged: true },
+        `/v1/store/artifact-intents/${intentId}/attach`
+      ),
       dbFor({ card: card(), qr: qr(), verification: summary() }, intents),
       intentId
     );
@@ -264,6 +267,36 @@ describe("artifact intent pre-commerce guard (M4.4)", () => {
       ])
     );
     expect(intents.get(intentId)?.status).toBe("attached_to_cart");
+  });
+
+  it("attach rejects missing proof acknowledgment", async () => {
+    const future = new Date(Date.now() + ARTIFACT_INTENT_TTL_MS).toISOString();
+    const intentId = "ai_ProofConsentRequired1";
+    const row: ArtifactIntentRow = {
+      artifact_intent_id: intentId,
+      profile_id: PROFILE,
+      source_qr_id: QR,
+      product_id: "prod_sticker_square",
+      quantity: 1,
+      planned_item_qr_ids_json: JSON.stringify(["qr_planned1"]),
+      planned_print_artifact_ids_json: JSON.stringify(["pa_planned1"]),
+      status: "proofed",
+      expires_at: future,
+      created_at: "2026-05-16T17:00:00Z",
+      updated_at: "2026-05-16T17:00:00Z",
+    };
+    const intents = new Map([[intentId, { ...row }]]);
+
+    const res = await handlePostArtifactIntentAttach(
+      request({}, `/v1/store/artifact-intents/${intentId}/attach`),
+      dbFor({}, intents),
+      intentId
+    );
+    expect(res.status).toBe(422);
+    expect((await res.json()) as { error: string }).toMatchObject({
+      error: "PROOF_CONSENT_REQUIRED",
+    });
+    expect(intents.get(intentId)?.status).toBe("proofed");
   });
 
   it("attach rejects expired intents", async () => {
