@@ -269,7 +269,9 @@ Automated:
 
 ```bash
 npm run worker:test:steward-entitlements
+npm run worker:test:steward-push
 npm run e2e:hosted-tier
+npm run e2e:hosted-tier-push
 ```
 
 ## P1 — Card disabled since last visit

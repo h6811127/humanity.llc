@@ -347,11 +347,13 @@ npm run worker:test -- \
 npm run e2e -- e2e/device-inbox.spec.ts e2e/created-control.spec.ts
 ```
 
-**Hosted-specific E2 staging:**
+**Hosted-specific E2 + E4 staging:**
 
 ```bash
 npm run worker:test:steward-entitlements
+npm run worker:test:steward-push
 npm run e2e:hosted-tier
+npm run e2e:hosted-tier-push
 ```
 
 **Vitest (extend existing modules when E2 reads entitlements):**
@@ -374,7 +376,7 @@ npm run e2e:hosted-tier
 | H1 Free default | No steward session; watch on; hub expanded | `e2e/hosted-tier-budget.spec.ts` asserts **400** cap + free policy with no entitlement GET |
 | H2 Hosted session | Mock `GET …/steward/entitlements` → `hosted_steward_v1` | `e2e/hosted-tier-budget.spec.ts` asserts **4000** cap, 30s idle, 5/3 network parallel, 5 min SW |
 | H3 Downgrade | Session returns `reference_free` mid-session | `e2e/hosted-tier-budget.spec.ts` asserts client reapplies **400** cap on next entitlement fetch |
-| H4 Push opt-in | Hosted + `notify.push.live_proof`; subscribe mock | Wallet round-robin interval may widen; SW still respects watch + alerts |
+| H4 Push opt-in | Hosted + `notify.push.live_proof`; SSE mock | `e2e/hosted-tier-push.spec.ts` — push healthy suppresses auto poll; `live_proof.pending` triggers one GET |
 | H5 Free unchanged | No billing code paths on reference operator | `e2e/hosted-tier-budget.spec.ts` asserts anonymous create remains available with no hosted entitlement call or paywall |
 
 **Manual QA ([`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — add **P1-8 Hosted tier budget** when E2 ships):**
