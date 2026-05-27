@@ -82,9 +82,9 @@ Founder-run; see `docs/STATUS_PLATE_PILOT.md`.
 
 **Rule:** Precise terms (QR credential, card revoke) remain in Advanced panels and general cards.
 
-### Step 6 — Lost-item scan → create hint (optional)
+### Step 6 — Lost-item scan → create hint (optional) ✅
 
-Calm footer on lost-item relay scan template only.
+Calm footer on lost-item relay scan template only — link to `/create/?template=lost_item`. Copy in `worker/src/resolver/scan-safety.ts`; render in `scan-html.ts` (`scan-create-hint`). Tests: `scan.test.ts`, `scan-m5-showcase-paths.test.ts`.
 
 ---
 

@@ -1125,6 +1125,19 @@ html[data-theme="dark"] .scan-hero .scan-object-streams-limit {
   color: rgba(235, 235, 245, 0.48);
 }
 
+html[data-theme="dark"] .scan-hero .scan-public-snapshot {
+  background: rgba(235, 235, 245, 0.08);
+  color: rgba(235, 235, 245, 0.78);
+}
+
+html[data-theme="dark"] .scan-hero .scan-public-snapshot-label {
+  color: rgba(235, 235, 245, 0.48);
+}
+
+html[data-theme="dark"] .scan-hero .scan-public-snapshot-limit {
+  color: rgba(235, 235, 245, 0.44);
+}
+
 html[data-theme="dark"] .scan-hero .scan-hero-wordmark {
   color: rgba(235, 235, 245, 0.48);
 }

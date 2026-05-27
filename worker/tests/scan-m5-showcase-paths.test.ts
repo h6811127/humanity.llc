@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
 import { renderScanPage, SCAN_UI_VERSION } from "../src/resolver/scan-html";
-import { SCAN_HERO_LIVE_OBJECT_FOOT } from "../src/resolver/scan-safety";
+import { SCAN_HERO_LIVE_OBJECT_FOOT, LOST_ITEM_RELAY_CREATE_HINT, LOST_ITEM_RELAY_CREATE_PATH } from "../src/resolver/scan-safety";
 import { BEARER_WARNING } from "../src/resolver/trust-copy";
 import { buildScanViewModel } from "../src/resolver/scan-state";
 import {
@@ -16,7 +16,7 @@ import {
   STATUS_PLATE_OBJECT_STREAMS,
   showcaseCardDocumentJson,
 } from "./fixtures/scan-showcase-fixtures";
-import { OBJECT_STREAMS_LIMIT } from "../src/resolver/trust-copy";
+import { OBJECT_STREAMS_LIMIT, OBJECT_PUBLIC_SNAPSHOT_LIMIT } from "../src/resolver/trust-copy";
 
 function card(manifestoLine: string | null, overrides: Partial<CardRow> = {}): CardRow {
   return {
@@ -151,6 +151,8 @@ describe("M5 showcase scan paths", () => {
     expect(html).toContain("Thursday closes at 6 PM this week");
     expect(html).toContain("scan-object-streams-limit");
     expect(html).toContain(OBJECT_STREAMS_LIMIT);
+    expect(html).toContain("scan-public-snapshot");
+    expect(html).toContain(OBJECT_PUBLIC_SNAPSHOT_LIMIT);
   });
 
   it("live object: object_streams show detail cards and limit copy", async () => {
@@ -170,5 +172,13 @@ describe("M5 showcase scan paths", () => {
     expectHeroTitle(html, "House keys");
     expect(html).toContain("This scan does not prove who holds the item.");
     expect(html).not.toMatch(/<h1 class="[^"]*scan-hero-title[^"]*">@river_example<\/h1>/);
+  });
+
+  it("lost item relay: create hint links to lost_item template", async () => {
+    const html = await renderActiveShowcaseScan(LOST_ITEM_MANIFESTO);
+    expect(html).toContain("scan-create-hint");
+    expect(html).toContain(LOST_ITEM_RELAY_CREATE_HINT);
+    expect(html).toContain(LOST_ITEM_RELAY_CREATE_PATH);
+    expect(html).toContain("Create a lost-item tag");
   });
 });

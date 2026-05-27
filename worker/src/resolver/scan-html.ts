@@ -6,7 +6,8 @@ import {
 } from "./manifesto-display";
 import { publicReasonLabel } from "./revocation-display";
 import { scanListIcon, type ScanIconId } from "./scan-icons";
-import { BEARER_WARNING, OBJECT_STREAMS_LIMIT } from "./trust-copy";
+import { BEARER_WARNING, OBJECT_PUBLIC_SNAPSHOT_LIMIT, OBJECT_STREAMS_LIMIT } from "./trust-copy";
+import { buildPublicObjectSnapshot } from "./object-snapshot";
 import { SCAN_PASS_CSS } from "./scan-pass-styles";
 import {
   humanTrustDisplay,
@@ -27,6 +28,8 @@ import {
   SCAN_HERO_LIVE_OBJECT_FOOT,
   SCAN_HERO_META_DETAILS_SUMMARY,
   SCAN_HERO_QR_DETAILS_SUMMARY,
+  LOST_ITEM_RELAY_CREATE_HINT,
+  LOST_ITEM_RELAY_CREATE_PATH,
   SCAN_SAFETY_RESOLVER_VERIFIED_COPY,
   type ScanSafetyModel,
 } from "./scan-safety";
@@ -189,6 +192,14 @@ function renderScanHeroSection(
   const footBlock = foot
     ? `<p class="scan-hero-foot">${escapeHtml(foot)}</p>`
     : "";
+  const display = parseManifestoDisplay(vm.manifestoLine);
+  const heroTemplate = scanHeroTemplate(display, vm.qrScope);
+  const lostItemCreateHint =
+    vm.kind === "active" &&
+    heroTemplate === "lost_item_relay" &&
+    display.kind === "lost_item_relay"
+      ? renderLostItemCreateHint(origin)
+      : "";
   const qrBlock = scanHeroQrBlock(vm, qrMarkup);
   const qrSection = qrBlock
     ? `<details class="scan-hero-qr-details">
@@ -211,6 +222,7 @@ function renderScanHeroSection(
   ${chipsBlock}
   <p class="scan-safety-first-seen" id="scan-safety-first-seen" hidden></p>
   ${footBlock}
+  ${lostItemCreateHint}
   ${qrSection}
 </article>
 </div>`;
@@ -317,6 +329,24 @@ ${items}
 <p class="scan-object-streams-limit" role="note">${escapeHtml(OBJECT_STREAMS_LIMIT)}</p>`;
 }
 
+function renderPublicSnapshotBlock(
+  manifestoLine: string | null,
+  streams: ScanViewModel["objectStreams"]
+): string {
+  const snapshot = buildPublicObjectSnapshot(manifestoLine, streams ?? []);
+  if (!snapshot) return "";
+  return `<section class="scan-public-snapshot" aria-labelledby="scan-public-snapshot-label">
+  <p class="scan-public-snapshot-label" id="scan-public-snapshot-label">Signed snapshot</p>
+  <p class="scan-public-snapshot-text">${escapeHtml(snapshot.text)}</p>
+  <p class="scan-public-snapshot-limit" role="note">${escapeHtml(OBJECT_PUBLIC_SNAPSHOT_LIMIT)}</p>
+</section>`;
+}
+
+function renderLostItemCreateHint(origin: string): string {
+  const href = `${origin.replace(/\/$/, "")}${LOST_ITEM_RELAY_CREATE_PATH}`;
+  return `<p class="scan-create-hint" role="note"><a href="${escapeHtml(href)}">Create a lost-item tag</a> — ${escapeHtml(LOST_ITEM_RELAY_CREATE_HINT)}</p>`;
+}
+
 function buildScanHeroMain(
   vm: ScanViewModel,
   origin: string
@@ -391,10 +421,12 @@ function buildScanHeroMain(
   if (template === "status_plate" && display.kind === "status_plate") {
     const steward = renderStewardStrip(vm);
     const streams = renderObjectStreamsBlock(vm.objectStreams);
+    const snapshot = renderPublicSnapshotBlock(vm.manifestoLine, vm.objectStreams);
     return {
       main: `<h1 class="scan-hero-title">${escapeHtml(display.objectLabel)}</h1>
     <p class="scan-hero-line">${escapeHtml(display.statusLine)}</p>
     ${streams}
+    ${snapshot}
     ${steward}`,
       foot: "Scan shows current status for this place - not who owns the door.",
     };
@@ -420,9 +452,11 @@ function buildScanHeroMain(
         : "Live on the network";
     const steward = renderStewardStrip(vm);
     const streams = renderObjectStreamsBlock(vm.objectStreams);
+    const snapshot = renderPublicSnapshotBlock(vm.manifestoLine, vm.objectStreams);
     return {
       main: `<h1 class="scan-hero-title">${escapeHtml(line)}</h1>
     ${streams}
+    ${snapshot}
     ${steward}`,
       foot: SCAN_HERO_LIVE_OBJECT_FOOT,
     };

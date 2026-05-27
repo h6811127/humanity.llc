@@ -24,6 +24,11 @@ export const SCAN_HERO_QR_DETAILS_SUMMARY = "This QR";
 export const SCAN_HERO_LIVE_OBJECT_FOOT =
   "Active on humanity.llc — status checked at scan time.";
 
+/** Lost-item relay scan — calm create hint (PRODUCT_POSITIONING Step 6). */
+export const LOST_ITEM_RELAY_CREATE_HINT =
+  "Tag your own item with a revocable return path — no phone number on the sticker.";
+export const LOST_ITEM_RELAY_CREATE_PATH = "/create/?template=lost_item";
+
 export interface ScanSafetyModel {
   objectSignatureVerified: boolean;
   stewardRegistered: boolean;

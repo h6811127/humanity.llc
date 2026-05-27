@@ -25,9 +25,17 @@ import { deriveCredentialCodeSync } from "../../../site/js/qr-credential-code.mj
 import { scanContractErrorForKind } from "./scan-contract-error";
 import { scanMalformedStatusHint } from "./scan-malformed-hint";
 import { guardScanResponse, scanRedirectQueryBlocked } from "./scan-redirect-guard";
-import { BEARER_WARNING, OBJECT_STREAMS_LIMIT } from "./trust-copy";
+import {
+  BEARER_WARNING,
+  OBJECT_PUBLIC_SNAPSHOT_LIMIT,
+  OBJECT_STREAMS_LIMIT,
+} from "./trust-copy";
 import { humanTrustDisplay } from "./verification-display";
 import type { ObjectPublicStream } from "../validation/object-streams";
+import {
+  buildPublicObjectSnapshot,
+  type PublicObjectSnapshot,
+} from "./object-snapshot";
 
 export { BEARER_WARNING };
 
@@ -48,6 +56,7 @@ export interface ScanStatusBody {
       handle: string | null;
       manifesto_line: string | null;
       object_streams?: ObjectPublicStream[];
+      public_snapshot?: PublicObjectSnapshot;
     } | null;
     qr: {
       status: string | null;
@@ -74,6 +83,7 @@ export interface ScanStatusBody {
     limits: {
       bearer_warning: string;
       object_details_warning?: string;
+      object_snapshot_warning?: string;
       scan_analytics: false;
     };
     governance?: GovernanceProcessUrls;
@@ -88,6 +98,9 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
   const governance =
     vm.kind === "card_suspended" ? governanceProcessUrls(origin) : undefined;
   const error = scanContractErrorForKind(vm.kind, vm.qrScope);
+  const publicSnapshot = vm.objectStreams.length
+    ? buildPublicObjectSnapshot(vm.manifestoLine, vm.objectStreams)
+    : null;
   return {
     version: PROTOCOL_VERSION,
     resolver: {
@@ -109,6 +122,7 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
             ...(vm.objectStreams.length
               ? { object_streams: vm.objectStreams }
               : {}),
+            ...(publicSnapshot ? { public_snapshot: publicSnapshot } : {}),
           }
         : null,
       qr: vm.qrId
@@ -146,6 +160,9 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
         bearer_warning: BEARER_WARNING,
         ...(vm.objectStreams.length
           ? { object_details_warning: OBJECT_STREAMS_LIMIT }
+          : {}),
+        ...(publicSnapshot
+          ? { object_snapshot_warning: OBJECT_PUBLIC_SNAPSHOT_LIMIT }
           : {}),
         scan_analytics: false,
       },

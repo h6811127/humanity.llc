@@ -249,7 +249,7 @@ Do **not** rip out the device OS. **Retire the default “poll every card every 
 
 **Tests (shipped, Phases 1–9):** Vitest in `device-live-control-poll-scheduler.test.ts`, `device-live-control-round-robin.test.ts`, `device-live-control-poll-budget-core.test.ts`, `device-live-control-poll-leader-core.test.ts`, `device-live-control-sw-core.test.ts`, `device-hub-visible-rows-core.test.ts`, `device-wallet-scale-core.test.ts` (if present); Playwright in `e2e/device-inbox.spec.ts`, `e2e/created-control.spec.ts` (collapsed hub idle, one challenge per tick, degraded health, watch off + manual check).
 
-**Tests (Phase 10, E2 staging):** § Phase 10 test plan (M7) — run **free-tier regression** on every hosted-tier PR; hosted-specific: `npm run worker:test:steward-entitlements` · `npm run e2e:hosted-tier` (H1–H3/H5).
+**Tests (Phase 10, M8 staging):** § Phase 10 test plan (M7) — run **free-tier regression** on every hosted-tier PR; hosted bundle: `npm run worker:test:steward-hosted` · `npm run e2e:steward-hosted` (H1–H6).
 
 ---
 
@@ -445,9 +445,9 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 | H1 | `reference_free` when no session | Yes | 401 / absent session → 400 cap | 10 |
 | H2 | `hosted_steward_v1` caps from API | Staging | Mock entitlements → 4000 cap, 5 parallel | 10 |
 | H3 | `steward_account_link_v1` verify | — | Worker rejects bad sig / replay nonce | 10 |
-| H4 | Push `live_proof.pending` → one GET | — | E2E: no wallet round-robin while SSE up | 10 |
+| H4 | Push `live_proof.pending` → one GET | Staging | E2E: no wallet round-robin while SSE up; SSE down re-enables poll | 10 |
 | H5 | Downgrade to free on `expired` | Staging for policy reapply | Session cleared; 400 cap; push unsub | 10 |
-| H6 | Merch order does not grant hosted | — | Policy test / fixture | 10 |
+| H6 | Merch order does not grant hosted | Staging | `worker/tests/billing-webhook.test.ts` commerce ignore | 10 |
 
 ### Network status (wallet chips)
 

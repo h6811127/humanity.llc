@@ -4,6 +4,10 @@ import type { ScanContext } from "../src/db/scan";
 import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
 import { renderScanPage } from "../src/resolver/scan-html";
 import {
+  LOST_ITEM_RELAY_CREATE_HINT,
+  LOST_ITEM_RELAY_CREATE_PATH,
+} from "../src/resolver/scan-safety";
+import {
   SCAN_OFFLINE_BANNER_TEXT,
   shouldShowScanOfflineBanner,
 } from "../src/resolver/scan-offline";
@@ -165,9 +169,13 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("contact owner through relay");
     expect(html).not.toContain("[relay]");
     expect(html).toContain("does not prove who holds the item");
+    expect(html).toContain("scan-create-hint");
+    expect(html).toContain(LOST_ITEM_RELAY_CREATE_HINT);
+    expect(html).toContain(LOST_ITEM_RELAY_CREATE_PATH);
+    expect(html).toMatch(/<p class="scan-create-hint"/);
   });
 
-  it("renders status-plate manifesto as object label + status line", async () => {
+  it("does not show lost-item create hint on status plate scans", async () => {
     const vm = buildScanViewModel(
       PROFILE,
       QR,
@@ -188,6 +196,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("Controlled by");
     expect(html).toContain("scan-hero-title");
     expect(html).not.toContain('class="scan-state-row"');
+    expect(html).not.toMatch(/<p class="scan-create-hint"/);
   });
 
   it("renders flat status panel with shared styles (no ID-style flip card)", async () => {

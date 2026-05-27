@@ -1,6 +1,6 @@
 # Hosted tier — implementation epics (M8)
 
-**Status:** **E1–E6 staging** (behind `HOSTED_STEWARD_ENABLED`; external CF dashboards remain)  
+**Status:** **M8 code complete in staging** (E1–E6 + E4d; behind `HOSTED_STEWARD_ENABLED`). **Production** blocked on **G0** M4 sign-off + external CF dashboards / cron wiring.  
 **Milestone:** M8 of [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md)  
 **Depends on:** M2–M7 complete; **M4 governance sign-off** before E1 merge to production  
 **Audience:** Engineering, ops
@@ -11,7 +11,7 @@
 
 M1–M7 defined product boundaries, entitlements, push, pricing/SLA, public copy, standards, and test plan. **M8** turns that into **shippable epics** with build order, file touch lists, exit tests, and rollout rules.
 
-**Recommended v1 scope:** E1 → E2+E3 → E4a–c (SSE push MVP) → E5 (billing) → E6 (ops). Defer E4d (SW bridge) and E4e (Durable Object) until push metrics justify cost.
+**Recommended v1 scope:** E1 → E2+E3 → E4a–d (SSE push MVP + SW bridge) → E5 (billing) → E6 (ops). Defer **E4e** (Durable Object) until push metrics justify cost.
 
 ---
 
@@ -240,9 +240,9 @@ flowchart LR
 | E4d | **Staging** — page → SW `HC_SW_LIVE_PROOF_PUSH` bridge; SW skips poll when push healthy |
 | E4e | Deferred (Durable Object fan-out) |
 | Vitest | `device-steward-push-core.test.ts`, `steward-push-sse.test.ts`, `steward-push-notify.test.ts` |
-| E2E | `e2e/hosted-tier-push.spec.ts` — M7 **H4** |
+| E2E | `e2e/hosted-tier-push.spec.ts` — M7 **H4** + E4 fallback (SSE down re-enables poll) |
 
-**Next:** **G0** M4 governance sign-off for production enablement; **E4e** DO fan-out deferred.
+**Next:** **G0** M4 governance sign-off for production enablement; wire E6.2 to external cron/pager; **E4e** DO fan-out deferred.
 
 ---
 
@@ -391,6 +391,7 @@ flowchart LR
 
 | Date | Note |
 |------|------|
+| 2026-05-27 | **M8 code-complete pass:** E4 fallback E2E; poll resume on push drop (`device-live-control-inbox.mjs`); `worker:test:steward-hosted` + `e2e:steward-hosted`; **G0** gates production |
 | 2026-05-27 | **E4d SW bridge:** push hint → service worker OS notify; skip SW poll when SSE healthy |
 | 2026-05-27 | **E6.2 daily alert script:** `worker:check-steward-ops` + threshold Vitest |
 | 2026-05-27 | **E4 push staging:** SSE client/worker + `e2e/hosted-tier-push.spec.ts` H4 |

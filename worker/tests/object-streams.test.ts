@@ -9,7 +9,7 @@ import { objectStreamsFromCardDocumentJson } from "../src/validation/object-stre
 import { buildScanViewModel } from "../src/resolver/scan-state";
 import { scanStatusBodyFromViewModel } from "../src/resolver/scan-status";
 import { renderScanPage } from "../src/resolver/scan-html";
-import { OBJECT_STREAMS_LIMIT } from "../src/resolver/trust-copy";
+import { OBJECT_STREAMS_LIMIT, OBJECT_PUBLIC_SNAPSHOT_LIMIT } from "../src/resolver/trust-copy";
 
 describe("object_streams validation", () => {
   it("accepts up to four plain-text streams", () => {
@@ -190,5 +190,50 @@ describe("scan surfaces object_streams", () => {
     expect(html).toContain("Compost turn");
     expect(html).toContain("scan-object-streams-limit");
     expect(html).toContain("steward-signed public copy");
+    expect(html).toContain("scan-public-snapshot");
+    expect(html).toContain("Signed snapshot");
+    expect(html).toContain(OBJECT_PUBLIC_SNAPSHOT_LIMIT);
+  });
+
+  it("includes public_snapshot in status JSON when object_streams present", () => {
+    const vm = buildScanViewModel(
+      profileId,
+      qrId,
+      {
+        card: {
+          profile_id: profileId,
+          public_key: "pk",
+          handle: "garden_gate",
+          handle_normalized: "garden_gate",
+          manifesto_line: "Community garden\nOpen · volunteers welcome",
+          status: "active",
+          card_document_json: cardDocumentJson,
+          created_at: "2026-05-16T17:00:00.000Z",
+          updated_at: "2026-05-17T12:00:00.000Z",
+        },
+        qr: {
+          qr_id: qrId,
+          profile_id: profileId,
+          epoch: 1,
+          scope: "card",
+          print_artifact_id: null,
+          resolver_hint: "https://humanity.llc",
+          status: "active",
+          payload: `https://humanity.llc/c/${profileId}?q=${qrId}`,
+          issued_at: "2026-05-16T17:00:00.000Z",
+          expires_at: null,
+          credential_document_json: null,
+          created_at: "2026-05-16T17:00:00.000Z",
+          updated_at: "2026-05-16T17:00:00.000Z",
+        },
+        verification: null,
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+    const body = scanStatusBodyFromViewModel(vm);
+    expect(body.scan.card?.public_snapshot?.text).toContain("Community garden");
+    expect(body.scan.card?.public_snapshot?.text).toContain("Today's tasks");
+    expect(body.scan.limits.object_snapshot_warning).toBe(OBJECT_PUBLIC_SNAPSHOT_LIMIT);
   });
 });

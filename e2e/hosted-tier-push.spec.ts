@@ -32,8 +32,8 @@ const HOSTED_ENTITLEMENTS_BODY = {
     "steward.hosted": true,
     "notify.push.live_proof": true,
     "poll.live_proof.auto_daily_cap": 4000,
-    "poll.live_proof.idle_ms": 30_000,
-    "poll.live_proof.active_ms": 5000,
+    "poll.live_proof.idle_ms": 3_000,
+    "poll.live_proof.active_ms": 3_000,
     "poll.network.max_parallel": 5,
     "poll.network.manual_max_parallel": 3,
     "wallet.large_threshold": 25,
@@ -190,15 +190,49 @@ async function readAutoPollShouldRun(page: Page) {
     const push = await import("/js/device-steward-push.mjs");
     const scheduler = await import("/js/device-live-control-poll-scheduler.mjs");
     const network = await import("/js/device-hub-network-tools-core.mjs");
+    const leader = await import("/js/device-live-control-poll-leader.mjs");
+    const wallet = await import("/js/device-wallet-since-visit-gate.mjs");
+    const budgetCore = await import("/js/device-live-control-poll-budget-core.mjs");
+    const entitlements = await import("/js/device-steward-entitlements.mjs");
+    const hubEl = document.getElementById("device-hub");
+    const scopeActive = scheduler.resolveLiveControlPollScope({
+      hubEl,
+      inboxSheetOpen: document.body.classList.contains("device-inbox-sheet-open"),
+      walletPage: document.body.classList.contains("page-wallet"),
+      watchEnabled: network.isWatchLiveProofEnabled(),
+    });
+    let budgetExhausted = false;
+    try {
+      const raw = localStorage.getItem("hc_live_control_auto_poll");
+      const cap = entitlements.getStewardEntitlementsPolicy().pollLiveProofAutoDailyCap;
+      budgetExhausted = budgetCore.isLiveControlAutoPollBudgetExhausted(
+        raw ? JSON.parse(raw) : {},
+        Date.now(),
+        cap
+      );
+    } catch {
+      budgetExhausted = false;
+    }
     return scheduler.liveControlAutoPollShouldRun({
       watchEnabled: network.isWatchLiveProofEnabled(),
-      scopeActive: true,
-      resolverHealth: "ok",
-      budgetExhausted: false,
-      isPollLeader: true,
+      scopeActive,
+      resolverHealth: wallet.getResolverHealthStatus(),
+      budgetExhausted,
+      isPollLeader: leader.isLiveControlPollLeaderTab(),
       stewardPushHealthy: push.isStewardPushHealthy(),
     });
   });
+}
+
+async function waitForPollLeader(page: Page) {
+  await expect
+    .poll(async () =>
+      page.evaluate(async () => {
+        const leader = await import("/js/device-live-control-poll-leader.mjs");
+        return leader.isLiveControlPollLeaderTab();
+      })
+    )
+    .toBe(true);
 }
 
 test.describe("hosted tier E4 push (SSE)", () => {
@@ -285,5 +319,44 @@ test.describe("hosted tier E4 push (SSE)", () => {
 
     await expect.poll(() => challengeGets).toBeGreaterThan(baseline);
     expect(challengeGets - baseline).toBe(1);
+  });
+
+  test("E4 fallback: SSE disconnect re-enables live-control poll", async ({ page }) => {
+    await installHostedPushFetchMock(page, true);
+    await installCommonRoutes(page);
+
+    let challengeGets = 0;
+    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", (route) => {
+      challengeGets += 1;
+      return route.fulfill({ status: 404, contentType: "application/json", body: "{}" });
+    });
+
+    await page.goto("/");
+    await openExpandedHub(page);
+    await waitForPollLeader(page);
+    await waitForPushHealthy(page);
+    expect(await readAutoPollShouldRun(page)).toBe(false);
+
+    await page.evaluate(() => {
+      window.__hcE2ePushController?.close();
+    });
+
+    await expect
+      .poll(async () =>
+        page.evaluate(async () => {
+          const mod = await import("/js/device-steward-push.mjs");
+          return mod.isStewardPushHealthy();
+        })
+      )
+      .toBe(false);
+
+    expect(await readAutoPollShouldRun(page)).toBe(true);
+
+    const baseline = challengeGets;
+    await page.evaluate(async () => {
+      const inbox = await import("/js/device-live-control-inbox.mjs");
+      await inbox.refreshLiveControlInbox({ manual: true });
+    });
+    expect(challengeGets).toBeGreaterThan(baseline);
   });
 });

@@ -545,6 +545,21 @@ export function syncLiveControlInboxPolling() {
     return;
   }
 
+  if (!readPollLoopShouldRun()) {
+    return;
+  }
+
+  if (!stewardPushSuppressesAutoPoll()) {
+    clearPollTimer();
+    if (pollSyncInFlight) return;
+    pollSyncInFlight = true;
+    void refreshLiveControlInbox().finally(() => {
+      pollSyncInFlight = false;
+      if (pollFeatureEnabled && readPollLoopShouldRun()) armPollTimer();
+    });
+    return;
+  }
+
   const ms = liveControlPollIntervalMs(pending.length, getStewardEntitlementsPolicy());
   if (ms !== scheduledIntervalMs) {
     armPollTimer();

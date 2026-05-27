@@ -1445,6 +1445,38 @@ a {
   color: rgba(60, 60, 67, 0.62);
 }
 
+.scan-public-snapshot {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(60, 60, 67, 0.06);
+  border: 0.5px solid rgba(60, 60, 67, 0.1);
+}
+
+.scan-public-snapshot-label {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(60, 60, 67, 0.62);
+}
+
+.scan-public-snapshot-text {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--black);
+}
+
+.scan-public-snapshot-limit {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(60, 60, 67, 0.62);
+}
+
 .scan-hero-steward {
   margin: 4px 0 0;
   font-size: 14px;
@@ -1467,6 +1499,22 @@ a {
   font-size: 12px;
   line-height: 1.4;
   color: rgba(60, 60, 67, 0.55);
+}
+
+.scan-create-hint {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(60, 60, 67, 0.55);
+}
+
+.scan-create-hint a {
+  color: rgba(0, 122, 255, 0.92);
+  text-decoration: none;
+}
+
+.scan-create-hint a:hover {
+  text-decoration: underline;
 }
 
 .scan-hero-meta,
@@ -2925,6 +2973,7 @@ html[data-theme="dark"] .scan-hero .scan-hero-steward,
 html[data-theme="dark"] .scan-hero .scan-safety-resolver,
 html[data-theme="dark"] .scan-hero .scan-hero-limit,
 html[data-theme="dark"] .scan-hero .scan-hero-foot,
+html[data-theme="dark"] .scan-hero .scan-create-hint,
 html[data-theme="dark"] .scan-hero .scan-safety-first-seen,
 html[data-theme="dark"] .scan-hero .scan-hero-meta,
 html[data-theme="dark"] .scan-hero .scan-hero-sub,
