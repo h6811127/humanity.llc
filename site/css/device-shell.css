@@ -45,6 +45,7 @@
     --shell-bg-elevated: rgba(255, 255, 255, 0.96);
     --shell-fill: #ffffff;
     --shell-fill-secondary: rgba(120, 120, 128, 0.12);
+    --surface-popover-bg-glass: var(--surface-popover-bg);
   }
 }
 
@@ -56,6 +57,7 @@
     --shell-bg-elevated: rgba(255, 255, 255, 0.98);
     --shell-fill: #ffffff;
     --shell-fill-secondary: rgba(120, 120, 128, 0.12);
+    --surface-popover-bg-glass: var(--surface-popover-bg);
   }
 }
 
@@ -977,61 +979,132 @@ button.device-hub-notice-banner {
 }
 
 .device-hub-network-tools {
-  margin: 0 0 12px 4px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: var(--shell-surface-elevated, rgba(255, 255, 255, 0.04));
-  border: 1px solid var(--shell-border-subtle, rgba(255, 255, 255, 0.08));
+  margin: 0 0 14px 4px;
+  padding: 14px 14px 12px;
+  border-radius: var(--shell-radius-card);
+  background: var(--hc-emphasis-card-fill-warn-glass);
+  border: 0.5px solid var(--hc-emphasis-card-border-warn);
+  box-shadow: var(--shell-shadow-sm);
+  -webkit-backdrop-filter: var(--hc-emphasis-card-backdrop);
+  backdrop-filter: var(--hc-emphasis-card-backdrop);
+}
+
+.device-hub-network-tools-eyebrow {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: var(--hc-emphasis-card-eyebrow-tracking, 0.025em);
+  text-transform: uppercase;
+  color: var(--hc-emphasis-card-eyebrow-warn);
 }
 
 .device-hub-network-tools-hint,
 .device-hub-steward-tier-line {
-  margin: 0.35rem 0 0;
-  font-size: 0.8125rem;
-  line-height: 1.35;
-  color: var(--text-muted, rgba(255, 255, 255, 0.65));
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--surface-popover-fg-muted);
 }
 
 .device-hub-steward-tier-line {
-  color: var(--text-secondary, rgba(255, 255, 255, 0.78));
+  color: var(--surface-popover-fg);
 }
 
 .device-hub-network-tools-status {
-  margin: 0 0 8px;
+  margin: 0;
   font-size: 12px;
-  line-height: 1.4;
-  color: var(--shell-label);
-  opacity: 0.9;
+  line-height: 1.45;
+  color: var(--surface-popover-fg-muted);
 }
 
-.device-hub-network-tools-actions {
+.device-hub-network-tools-segment {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 12px;
+  gap: 3px;
+  margin-top: 10px;
+  padding: 3px;
+  border-radius: var(--shell-radius-control);
+  background: var(--surface-popover-control-bg);
 }
 
-.device-hub-network-tools-btn {
-  font-size: 12px;
-  padding: 6px 12px;
+.device-hub-network-tools-segment-btn {
+  flex: 1 1 0;
+  min-width: 0;
   min-height: 32px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: calc(var(--shell-radius-control) - 3px);
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--surface-popover-fg);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background 0.25s var(--shell-ease),
+    transform 0.2s var(--shell-spring);
+}
+
+.device-hub-network-tools-segment-btn:active {
+  transform: scale(0.98);
+  background: var(--surface-popover-bg, #ffffff);
+}
+
+.device-hub-network-tools-segment-btn[hidden] {
+  display: none;
 }
 
 .device-hub-watch-live-proof {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--shell-label);
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 0.5px solid var(--surface-popover-border);
+  font-size: 13px;
+  color: var(--surface-popover-fg);
   cursor: pointer;
   user-select: none;
 }
 
-.device-hub-watch-live-proof input {
-  width: 16px;
-  height: 16px;
+.device-hub-watch-live-proof-text {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.device-hub-watch-live-proof-input {
+  appearance: none;
+  flex-shrink: 0;
+  width: 51px;
+  height: 31px;
   margin: 0;
-  accent-color: var(--shell-accent, #6ee7b7);
+  border: none;
+  border-radius: 31px;
+  background: var(--surface-popover-control-bg);
+  cursor: pointer;
+  transition: background 0.25s var(--shell-ease);
+}
+
+.device-hub-watch-live-proof-input::before {
+  content: "";
+  display: block;
+  width: 27px;
+  height: 27px;
+  margin: 2px;
+  border-radius: 50%;
+  background: var(--surface-popover-bg, #ffffff);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  transition: transform 0.28s var(--shell-spring);
+}
+
+.device-hub-watch-live-proof-input:checked {
+  background: var(--hc-emphasis-card-eyebrow-active, #248a3d);
+}
+
+.device-hub-watch-live-proof-input:checked::before {
+  transform: translateX(20px);
 }
 
 .device-hub-section--secondary .device-hub-section-lead {
@@ -1429,10 +1502,12 @@ button.device-hub-notice-banner {
 }
 
 .device-hub-search--inline {
-  border: none;
-  background: var(--shell-fill);
+  border: 0.5px solid var(--surface-popover-border);
+  background: var(--hc-emphasis-card-fill-info-glass);
   box-shadow: var(--shell-shadow-sm);
-  transition: box-shadow 0.3s var(--shell-ease);
+  transition:
+    box-shadow 0.3s var(--shell-ease),
+    border-color 0.3s var(--shell-ease);
 }
 
 .device-hub-search--inline:focus {
@@ -1639,7 +1714,7 @@ button.hub-card-action.hub-use-keys {
   transform: translateX(-50%) translateY(100%);
   transition: transform 0.45s var(--shell-spring);
   border-radius: var(--shell-radius-sheet) var(--shell-radius-sheet) 0 0;
-  background: var(--surface-popover-bg, #ffffff);
+  background: var(--surface-popover-bg-glass, var(--surface-popover-bg, #ffffff));
   color: var(--surface-popover-fg, #1c1c1e);
   box-shadow: var(--shell-shadow-sheet);
   overflow: hidden;
@@ -1985,6 +2060,21 @@ body.device-hub-sheet-open .shell-status-dot {
   .device-hub.device-hub--sheet,
   .device-inbox-sheet {
     background: var(--surface-popover-bg, #ffffff);
+  }
+
+  .device-hub-network-tools,
+  .device-hub-search--inline {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .device-hub-network-tools {
+    background: var(--surface-popover-warn-bg);
+    border-color: var(--surface-popover-warn-border);
+  }
+
+  .device-hub-search--inline {
+    background: var(--surface-popover-control-bg);
   }
 
   .device-hub-backdrop,

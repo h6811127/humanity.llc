@@ -41,21 +41,22 @@ export function mountHubNetworkTools(config) {
     toolbar.id = TOOLBAR_ID;
     toolbar.className = "device-hub-network-tools";
     toolbar.innerHTML = `
+      <p class="device-hub-network-tools-eyebrow">Monitoring</p>
       <p class="device-hub-network-tools-status" id="${STATUS_ID}" role="status"></p>
       <p class="device-hub-steward-tier-line" id="device-hub-steward-tier-line" role="status" hidden></p>
       <p class="device-hub-network-tools-hint" id="device-hub-large-wallet-hint" role="note" hidden></p>
-      <div class="device-hub-network-tools-actions">
-        <button type="button" class="btn-secondary device-hub-network-tools-btn" id="${CHECK_NETWORK_ID}" hidden>
+      <div class="device-hub-network-tools-segment" role="group" aria-label="Network checks">
+        <button type="button" class="device-hub-network-tools-segment-btn" id="${CHECK_NETWORK_ID}" hidden>
           Check network
         </button>
-        <button type="button" class="btn-secondary device-hub-network-tools-btn" id="${CHECK_LIVE_PROOF_ID}" hidden>
+        <button type="button" class="device-hub-network-tools-segment-btn" id="${CHECK_LIVE_PROOF_ID}" hidden>
           Check for live proof
         </button>
-        <label class="device-hub-watch-live-proof" id="device-hub-watch-live-proof-label" hidden>
-          <input type="checkbox" id="${WATCH_INPUT_ID}" />
-          <span>Watch for live proof</span>
-        </label>
       </div>
+      <label class="device-hub-watch-live-proof" id="device-hub-watch-live-proof-label" hidden>
+        <span class="device-hub-watch-live-proof-text">Watch for live proof</span>
+        <input type="checkbox" class="device-hub-watch-live-proof-input" id="${WATCH_INPUT_ID}" />
+      </label>
     `;
     const lead = section.querySelector(".device-hub-section-lead");
     if (lead) {

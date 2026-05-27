@@ -20,6 +20,11 @@
   --hc-notice-foot-border: rgba(60, 60, 67, 0.12);
   /* Floating popovers / coachmarks — opaque surfaces for readable contrast */
   --surface-popover-bg: #ffffff;
+  --surface-popover-bg-glass: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.94) 0%,
+    rgba(255, 255, 255, 0.88) 100%
+  );
   --surface-popover-fg: #1c1c1e;
   --surface-popover-fg-muted: rgba(60, 60, 67, 0.72);
   --surface-popover-accent: var(--red);
@@ -1426,8 +1431,8 @@ a.hub-card-menu-item {
   width: 100%;
   box-sizing: border-box;
   border-radius: var(--radius-pill);
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  background: var(--white);
+  border: 0.5px solid var(--surface-popover-border);
+  background: var(--surface-popover-control-bg);
   min-height: 44px;
   padding: 0 14px;
 }
