@@ -20,6 +20,7 @@ export interface ShopifyOrderLike {
   email?: string | null;
   order_number?: number | null;
   name?: string | null;
+  shipping_address?: Record<string, unknown> | null;
   line_items?: ShopifyLineItem[];
   note_attributes?: ShopifyNameValue[];
 }
