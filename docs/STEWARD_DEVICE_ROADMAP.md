@@ -8,6 +8,21 @@ Use this page when you need **one map** of steward-facing device work. Detailed 
 
 ---
 
+## Current engineering steps (ordered)
+
+| # | Step | Owner | Doc / command |
+|---|------|-------|----------------|
+| **1** | **Steward session link (client)** — sign `steward_account_link_v1`, `POST …/steward/session`, store `hc_steward_session`; checkout return `?hc_account_id=acc_…` | **Shipped** in repo | `site/js/device-steward-session*.mjs` · [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) |
+| **2** | **Production rollout** — D1 migrations → deploy flag off → secrets → flag on → regression | Ops / eng with Cloudflare auth | [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout · [`HOSTED_TIER_G0_READINESS.md`](HOSTED_TIER_G0_READINESS.md) |
+| **3** | **Verify hosted path** — entitlements probe, SSE push (watch + Browser alerts on), poll cap 4000 | QA | `npm run verify:hosted-g0` · `npm run e2e:steward-hosted` |
+| **4** | **Billing checkout → `hc_account_id` URL** (Stripe return) | Product + E5 | [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § E5.6 (minimal v1) |
+| **5** | **Child object UI** under one root (beyond `print_artifact` bridge) | Product | [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) |
+| **6** | **M5.5 key import** on new device | Product | [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) |
+
+**Free tier unchanged:** no session, no SSE, 400 auto-poll/day — steps 2–3 must not regress H1–H6 ([`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10).
+
+---
+
 ## Product sentence
 
 > **Strangers stay in the browser with no install.** **Stewards** use a **browser device shell** (hub + inbox + optional home-screen icon) with **keys on device**, **intent-based polling**, and **opt-in OS alerts for live proof only** — upgraded on the hosted tier by **server push**, not by replacing the web shell with an app store app.
@@ -114,7 +129,7 @@ flowchart LR
 | **Browser alerts** | v2 A–D + `sw-live-proof.mjs` | Same UX; less polling when SSE healthy | [`DEVICE_INBOX.md`](DEVICE_INBOX.md) § Background alerts roadmap |
 | **Poll budget** | Phases 1–9 + 8c; 400 auto GET/day; leader tab | Entitlement-driven cap; push miss → poll | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Optimization catalog **L12–L15**, **B1–B3** |
 | **PWA install** | Contract + Phases 1–3 per backlog | No shell-caching SW without RFC | [`PWA_INSTALL.md`](PWA_INSTALL.md) · backlog **H-006** |
-| **Hosted steward tier** | M8 **code complete** (staging); production rollout gated | E4 SSE + billing + ops | [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) |
+| **Hosted steward tier** | M8 code + **client session link** (checkout `?hc_account_id=`) | Production rollout + Stripe return URL | [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) |
 | **Server push** | — | SSE P1; DO P2; SW fallback | [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) |
 | **Native mobile app** | — | Planning only (webhook path C) | [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) § Server push options |
 
@@ -164,6 +179,7 @@ Product boundaries and build order — **do not re-spec here**.
 | Explain root vs child objects | [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) |
 | Ship or review PWA install | [`PWA_INSTALL.md`](PWA_INSTALL.md) |
 | Implement hosted push | [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) · [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § E4 |
+| Link billing account to device session | `device-steward-session.mjs` · `?hc_account_id=acc_…` after checkout |
 | QA steward flows | [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — P2 live proof, P3 background alerts, PWA |
 
 ---

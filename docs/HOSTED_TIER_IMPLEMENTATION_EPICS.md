@@ -144,9 +144,10 @@ flowchart LR
 |-------------|--------|
 | E2.1–E2.5 | **Staging** — `device-steward-entitlements*.mjs` resolves/caches policy; budget, scheduler, scale, SW, and hub copy consume resolved policy |
 | E2.6 | **Staging** — `stewardPushSubscribeAllowed()` gates `device-steward-push.mjs` + SW |
-| Tests | `worker/tests/device-steward-entitlements-core.test.ts`, `worker/tests/device-steward-entitlements.test.ts`, `e2e/hosted-tier-budget.spec.ts` |
+| E2.7 | **Shipped** — `device-steward-session*.mjs` signs `steward_account_link_v1`, `POST …/steward/session`; billing return `?hc_account_id=acc_…` (see [`STEWARD_DEVICE_ROADMAP.md`](STEWARD_DEVICE_ROADMAP.md)) |
+| Tests | `worker/tests/device-steward-entitlements-core.test.ts`, `device-steward-session-core.test.ts`, `device-steward-entitlements.test.ts`, `e2e/hosted-tier-budget.spec.ts` |
 
-**Next:** production enablement waits on **G0** (M4 sign-off).
+**Next:** production rollout ([§ Production rollout](#production-rollout-after-g0)); Stripe return URL for `hc_account_id` (E5.6).
 
 ### Out of scope
 
@@ -347,7 +348,7 @@ Engineering checklist once M4 governance checklist is signed ([`HOSTED_TIER_PRIC
 |---|------|-------|
 | 1 | Apply D1 migrations | `0012_steward_hosted.sql`, `0013_steward_billing.sql` — `npm run hosted:rollout:step1` (local preflight) then `npm run hosted:rollout:step1 -- --remote` |
 | 2 | Deploy Worker with flag off | `HOSTED_STEWARD_ENABLED=0` — `npm run hosted:rollout:step2` then `npm run hosted:rollout:step2 -- --deploy` · `npm run hosted:rollout:step2 -- --smoke` (health + `hosted_steward_disabled` on entitlements) |
-| 3a | `OPERATOR_AUDIT_TOKEN` (required) | Worker wrangler secret + GitHub for E6.2 — `npm run hosted:rollout:step3a` · verify `OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step3a` · `hosted:rollout:step3` aliases step3a |
+| 3a | `OPERATOR_AUDIT_TOKEN` (required) | Worker wrangler secret + GitHub for E6.2 — `npm run hosted:rollout:step3a` · `npm run hosted:rollout:step3a -- --smoke` (auth gate before secret) · verify `OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step3a` · `hosted:rollout:step3` aliases step3a |
 | 3b | `STRIPE_WEBHOOK_SECRET` (after G8) | Deferred — `npm run hosted:rollout:step3b` (notes only). Not required for steps 4–6. |
 | 4a | Enable hosted flag in wrangler | `HOSTED_STEWARD_ENABLED=1` — `npm run hosted:rollout:step4a` · apply `npm run hosted:rollout:step4a -- --apply` · commit `worker/wrangler.toml` |
 | 4b | Deploy + verify production | `npm run hosted:rollout:step4 -- --deploy` · verify `npm run hosted:rollout:step4 -- --verify` · `OPERATOR_AUDIT_TOKEN=... npm run hosted:rollout:step4 -- --verify` |
