@@ -82,7 +82,7 @@ Implementation note:
 
 ## The coolest version: "Trust Dot Intelligence"
 
-The strongest evolution is to make the dot a **mini trust radar** while preserving simplicity:
+The strongest evolution is to make the dot a **mini trust radar** while preserving simplicity. This is **deterministic shell state** (network, custody, inbox overlays) — **not** LLM inference. For object-scoped AI, see [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md).
 
 1. **Single glance state:** base color reflects the highest-priority truth.
 2. **Micro-overlay badge:** tiny ring/notch for urgent pending events (for example live proof waiting).

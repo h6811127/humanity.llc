@@ -2,7 +2,11 @@
  * Shared navigation for hub / glance device notices.
  */
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
-import { requestFocusTab } from "./device-tab-presence.mjs";
+import {
+  broadcastClearProfileKeys,
+  getOtherTabsHoldingProfile,
+  requestFocusTab,
+} from "./device-tab-presence.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import {
   otherTabSwitchConfirmMessage,
@@ -81,4 +85,23 @@ export function actOnOtherTabKeys(entry) {
 
   requestFocusTab(entry.tabId);
   return true;
+}
+
+/**
+ * Optional second confirm after remove-from-device when other tabs still heartbeat keys.
+ * @param {string} profileId
+ */
+export function offerClearOtherTabKeysOnRemove(profileId) {
+  const pid = typeof profileId === "string" ? profileId.trim() : "";
+  if (!pid) return;
+  const others = getOtherTabsHoldingProfile(pid);
+  if (others.length === 0) return;
+  if (
+    !window.confirm(
+      "Other open tabs still have signing keys for this card. Clear keys in those tabs too?"
+    )
+  ) {
+    return;
+  }
+  broadcastClearProfileKeys(pid);
 }

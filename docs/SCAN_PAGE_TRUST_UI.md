@@ -30,6 +30,8 @@
 | **L2** | **Object** | Resolver truth for **this** QR at scan time + limits. |
 | **L3** | **Actor** | What this tab can do (vouch, keys) — **after** L2 settles; band/chip, not dot custody colors (v1). |
 
+**Not object-intelligence L3:** The **L3 actor band** is scan UI only. Optional **AI explain** (plain-language summary of signed snapshot) is object-intelligence **L3 P1** — separate panel, opt-in, not signed state. See [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) § Naming collision · [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md).
+
 **Non-negotiable (stranger):** Corner dot must not read as “the sticker is legit.” Object state animates only in the **hero**.
 
 ### Motion dictionary

@@ -182,6 +182,14 @@ async function webhookRequest(body: unknown, headers: Record<string, string> = {
 
 const env = { SHOPIFY_WEBHOOK_SECRET: SECRET } as Env;
 
+const TIER0_CAMPAIGN = "nSVXWPqgRFEhGPjxyRzidF6";
+const TIER0_VARIANT = "12345678";
+const tier0Env = {
+  ...env,
+  TIER0_CAMPAIGN_PROFILE_ID: TIER0_CAMPAIGN,
+  TIER0_SHOPIFY_VARIANT_IDS: TIER0_VARIANT,
+} as Env;
+
 describe("Shopify orders webhook (O-001)", () => {
   it("creates processing commerce order and converts intent", async () => {
     const state: DbState = {
@@ -213,6 +221,38 @@ describe("Shopify orders webhook (O-001)", () => {
     expect(json.print_order_ids[0]).toMatch(/^po_/);
     expect(state.intents.get(INTENT)?.status).toBe("converted");
     expect(state.orders.size).toBe(1);
+
+    const printOrder = [...state.printOrders.values()][0];
+    expect(printOrder?.template_id).toBe("hc-sticker-square-v1");
+    expect(JSON.parse(printOrder!.planned_item_qr_ids_json)).toEqual(["qr_planned1"]);
+  });
+
+  it("queues personalized sticker print order for storefront product id", async () => {
+    const state: DbState = {
+      intents: new Map([
+        [
+          INTENT,
+          intentRow({ product_id: "sticker_personalized_v1" }),
+        ],
+      ]),
+      orders: new Map(),
+      receipts: new Map(),
+      printOrders: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(paidOrderBody()),
+      env,
+      dbFor(state)
+    );
+    const json = (await res.json()) as { fulfillment_mode: string; print_order_ids: string[] };
+
+    expect(res.status).toBe(200);
+    expect(json.fulfillment_mode).toBe("personalized");
+    expect(json.print_order_ids).toHaveLength(1);
+
+    const printOrder = [...state.printOrders.values()][0];
+    expect(printOrder?.template_id).toBe("hc-sticker-square-v1");
   });
 
   it("holds order when artifact intent metadata is missing", async () => {
@@ -232,6 +272,43 @@ describe("Shopify orders webhook (O-001)", () => {
     expect(res.status).toBe(200);
     expect(json.status).toBe("held_for_review");
     expect(json.hold_reason).toBe("CHECKOUT_METADATA_MISSING");
+  });
+
+  it("queues tier0 batch print order when variant matches operator config", async () => {
+    const state: DbState = {
+      intents: new Map(),
+      orders: new Map(),
+      receipts: new Map(),
+      printOrders: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(
+        paidOrderBody({
+          line_items: [{ variant_id: Number(TIER0_VARIANT), quantity: 1 }],
+        })
+      ),
+      tier0Env,
+      dbFor(state)
+    );
+    const json = (await res.json()) as {
+      status: string;
+      hold_reason: string | null;
+      fulfillment_mode: string;
+      profile_id: string;
+      print_order_ids: string[];
+    };
+
+    expect(res.status).toBe(200);
+    expect(json.status).toBe("processing");
+    expect(json.hold_reason).toBeNull();
+    expect(json.fulfillment_mode).toBe("tier0_batch");
+    expect(json.profile_id).toBe(TIER0_CAMPAIGN);
+    expect(json.print_order_ids).toHaveLength(1);
+
+    const printOrder = [...state.printOrders.values()][0];
+    expect(printOrder?.template_id).toBe("hc-tier0-sticker-batch-v1");
+    expect(JSON.parse(printOrder!.planned_item_qr_ids_json)).toEqual([]);
   });
 
   it("is idempotent for duplicate paid webhooks", async () => {

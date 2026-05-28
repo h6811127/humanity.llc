@@ -69,7 +69,7 @@ Do not lead with “bot-proof,” “sybil solved,” or graph-theory on the fir
 
 Full analysis: [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) - adversaries, 40+ threats with controls/gaps, attack trees, audit flags, steward playbook, integrator misuse.
 
-**Core insight (AI era):** Cheap synthetic personas raise the cost of **accountable, signed, revocable** attestations-they do not replace the need for biometrics at every interaction. The protocol’s job is to make **gaming Vouched Human** expensive and visible, not to prove global uniqueness.
+**Core insight (AI era):** Cheap synthetic personas raise the cost of **accountable, signed, revocable** attestations-they do not replace the need for biometrics at every interaction. The protocol’s job is to make **gaming Vouched Human** expensive and visible, not to prove global uniqueness. Product AI stance: [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) (L3 explain on signed snapshot only; no AI profiles).
 
 | Class | Examples | Primary v1 response |
 |-------|----------|---------------------|

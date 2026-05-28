@@ -225,4 +225,41 @@ describe("handlePostBillingWebhook", () => {
     expect(row.status).toBe("expired");
     expect(row.plan_id).toBe("reference_free");
   });
+
+  it("marks invoice payment failures past_due without revoking sessions", async () => {
+    const { db, accounts, sessions } = billingDb();
+    accounts.set(ACCOUNT, {
+      ...accounts.get(ACCOUNT)!,
+      plan_id: "hosted_steward_v1",
+      status: "active",
+      billing_customer_id: CUSTOMER,
+      billing_subscription_id: SUB,
+    });
+    sessions.add("session_should_survive_grace");
+
+    const body = JSON.stringify({
+      type: "invoice.payment_failed",
+      data: {
+        object: {
+          customer: CUSTOMER,
+          subscription: SUB,
+        },
+      },
+    });
+    const now = Math.floor(Date.now() / 1000);
+    const res = await handlePostBillingWebhook(
+      await signedRequest(secret, body, now),
+      env,
+      db
+    );
+
+    const json = (await res.json()) as { result?: string };
+    const row = accounts.get(ACCOUNT)!;
+    expect(res.status).toBe(200);
+    expect(json.result).toBe("ok");
+    expect(row.status).toBe("past_due");
+    expect(row.plan_id).toBe("hosted_steward_v1");
+    expect(Date.parse(String(row.effective_until))).toBeGreaterThan(Date.now());
+    expect(sessions.size).toBe(1);
+  });
 });

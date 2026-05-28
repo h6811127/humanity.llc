@@ -2,10 +2,19 @@ import { DEMO_CREATE_LIMIT_PER_HOUR } from "../demo-card-policy";
 
 /** 10 card creations per IP per hour (Technical Standards §15). */
 export const CREATE_LIMIT_PER_HOUR = 10;
+/** 300 card resolution (status) requests per IP per minute (Technical Standards §15). */
+export const CARD_RESOLUTION_LIMIT_PER_MINUTE = 300;
 const CREATE_BUCKET_PREFIX = "create:";
 const CREATE_BLOCKED_BUCKET_PREFIX = "create_blocked:";
 const CREATE_DEMO_BUCKET_PREFIX = "create_demo:";
 const CREATE_DEMO_BLOCKED_BUCKET_PREFIX = "create_demo_blocked:";
+const CARD_RESOLUTION_BUCKET_PREFIX = "status:";
+/** 30 opt-in AI explain requests per IP per hour (AI L3 P1). */
+export const AI_EXPLAIN_LIMIT_PER_HOUR = 30;
+const AI_EXPLAIN_BUCKET_PREFIX = "ai_explain:";
+/** 20 steward AI draft requests per IP per hour (AI L3 P2). */
+export const AI_DRAFT_LIMIT_PER_HOUR = 20;
+const AI_DRAFT_BUCKET_PREFIX = "ai_draft:";
 
 async function incrementBucket(
   db: D1Database,
@@ -100,6 +109,118 @@ export async function checkDemoCreateRateLimit(
       `${CREATE_DEMO_BLOCKED_BUCKET_PREFIX}${ipHash}:${windowIso}`,
       windowIso
     );
+    const nextHour = new Date(windowStart.getTime() + 3600_000);
+    return {
+      allowed: false,
+      retryAfterSec: Math.max(
+        1,
+        Math.ceil((nextHour.getTime() - now.getTime()) / 1000)
+      ),
+    };
+  }
+
+  await incrementBucket(db, bucketKey, windowIso);
+  return { allowed: true };
+}
+
+export async function checkCardResolutionRateLimit(
+  db: D1Database,
+  ipHash: string,
+  now: Date = new Date()
+): Promise<{ allowed: boolean; retryAfterSec?: number }> {
+  const windowStart = new Date(
+    Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      now.getUTCHours(),
+      now.getUTCMinutes()
+    )
+  );
+  const windowIso = windowStart.toISOString();
+  const bucketKey = `${CARD_RESOLUTION_BUCKET_PREFIX}${ipHash}:${windowIso}`;
+
+  const row = await db
+    .prepare(`SELECT count FROM rate_limit_buckets WHERE bucket_key = ?`)
+    .bind(bucketKey)
+    .first<{ count: number }>();
+
+  const count = row?.count ?? 0;
+  if (count >= CARD_RESOLUTION_LIMIT_PER_MINUTE) {
+    const nextMinute = new Date(windowStart.getTime() + 60_000);
+    return {
+      allowed: false,
+      retryAfterSec: Math.max(
+        1,
+        Math.ceil((nextMinute.getTime() - now.getTime()) / 1000)
+      ),
+    };
+  }
+
+  await incrementBucket(db, bucketKey, windowIso);
+  return { allowed: true };
+}
+
+export async function checkAiExplainRateLimit(
+  db: D1Database,
+  ipHash: string,
+  now: Date = new Date()
+): Promise<{ allowed: boolean; retryAfterSec?: number }> {
+  const windowStart = new Date(
+    Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      now.getUTCHours()
+    )
+  );
+  const windowIso = windowStart.toISOString();
+  const bucketKey = `${AI_EXPLAIN_BUCKET_PREFIX}${ipHash}:${windowIso}`;
+
+  const row = await db
+    .prepare(`SELECT count FROM rate_limit_buckets WHERE bucket_key = ?`)
+    .bind(bucketKey)
+    .first<{ count: number }>();
+
+  const count = row?.count ?? 0;
+  if (count >= AI_EXPLAIN_LIMIT_PER_HOUR) {
+    const nextHour = new Date(windowStart.getTime() + 3600_000);
+    return {
+      allowed: false,
+      retryAfterSec: Math.max(
+        1,
+        Math.ceil((nextHour.getTime() - now.getTime()) / 1000)
+      ),
+    };
+  }
+
+  await incrementBucket(db, bucketKey, windowIso);
+  return { allowed: true };
+}
+
+export async function checkAiDraftRateLimit(
+  db: D1Database,
+  ipHash: string,
+  now: Date = new Date()
+): Promise<{ allowed: boolean; retryAfterSec?: number }> {
+  const windowStart = new Date(
+    Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      now.getUTCHours()
+    )
+  );
+  const windowIso = windowStart.toISOString();
+  const bucketKey = `${AI_DRAFT_BUCKET_PREFIX}${ipHash}:${windowIso}`;
+
+  const row = await db
+    .prepare(`SELECT count FROM rate_limit_buckets WHERE bucket_key = ?`)
+    .bind(bucketKey)
+    .first<{ count: number }>();
+
+  const count = row?.count ?? 0;
+  if (count >= AI_DRAFT_LIMIT_PER_HOUR) {
     const nextHour = new Date(windowStart.getTime() + 3600_000);
     return {
       allowed: false,

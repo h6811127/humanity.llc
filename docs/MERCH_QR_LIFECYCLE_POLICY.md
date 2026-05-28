@@ -64,7 +64,7 @@ Do **not** turn on live Shopify checkout (`checkout_open: true`) until the digit
 
 | Order | Gate | Doc |
 |-------|------|-----|
-| 1 | **M5 stranger test** — 3 people outside your network complete scan → create → revoke without coaching | [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) |
+| 1 | ~~**M5 stranger test**~~ — 3 people outside your network complete scan → create → revoke without coaching | [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) — **passed 2026-05-27** |
 | 2 | **Production P0 fixes** deployed and re-verified (e.g. `/created/` fake ID, disabled-since-visit false positive) | [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) |
 | 3 | **Safari / device shell** smoke (P0-W) | [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) |
 | 4 | **One vertical pilot** on a real object (status plate, lost-item relay) | [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md) |
@@ -332,8 +332,9 @@ Optional **non-trust** badge on scan: “Scanned from a founding sticker” for 
 | Mint validation helper for `expires_at: null` on artifact | Engineering | **Shipped** (helper) | `validatePrintArtifactMintExpiry` — wire at fulfillment mint |
 | Fulfillment mint sets `scope: print_artifact`, `expires_at: null` | Engineering | **Shipped** | `POST …/print-artifact-qrs` · `POST …/print/orders/{id}/mint` · `fulfillment-mint.ts` |
 | Artifact intent preview + cart attach metadata (A-001 spike) | Engineering | **Shipped** | `POST /v1/store/artifact-intents` · `…/attach` · migration `0014_artifact_intents.sql` |
-| Shopify paid webhook → commerce order link (O-001) | Engineering | **Shipped** | `POST /v1/webhooks/shopify/orders` · migration `0015_commerce_order_links.sql` · Printify submit pending |
-| Print fulfillment queue + catalog + artwork (O-002) | Engineering | **Shipped** (queue + preview) | `GET /v1/print/catalog` · `POST /v1/print/artifacts` · `POST /v1/print/orders` · migration `0016_print_orders.sql` · Printify HTTP deferred |
+| Shopify paid webhook → commerce order link (O-001) | Engineering | **Shipped** | `POST /v1/webhooks/shopify/orders` · migration `0015_commerce_order_links.sql` |
+| Print fulfillment queue + catalog + artwork (O-002) | Engineering | **Shipped** (queue + live submit) | `POST /v1/print/orders` · `printify-client.ts` · `PRINTIFY_SUBMIT_ENABLED` gate |
+| Printify webhook status sync (O-003) | Engineering | **Shipped** (webhook slice) | `POST /v1/print/webhooks/printify` · migration `0018_printify_webhook_receipts.sql` · reconciliation polling deferred |
 | Operator fulfillment lookup chain (O-003) | Engineering | **Shipped** | `GET /v1/operator/fulfillment/lookup` · Shopify/commerce/intent/print order ids |
 | Orphan purge respects null expiry | Engineering | **Shipped** (existing) | `orphan-purge.test.ts` |
 | Tier 0 batch rotate runbook | Ops | **Shipped** | [`TIER0_CAMPAIGN_QR_RUNBOOK.md`](TIER0_CAMPAIGN_QR_RUNBOOK.md) |
@@ -367,7 +368,7 @@ Before `checkout_open: true` on production:
 | [`V1_IMPLEMENTATION_CONTRACTS.md`](V1_IMPLEMENTATION_CONTRACTS.md) | `print_artifact` mint rules |
 | [`V1_ASSUMPTION_REGISTER.md`](V1_ASSUMPTION_REGISTER.md) | A-004 print QA · A-006 per-item QR · A-012G comprehension |
 | [`CARD_RETENTION_AND_ORPHAN_CLEANUP.md`](CARD_RETENTION_AND_ORPHAN_CLEANUP.md) | Orphan purge vs live merch QR |
-| [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) | Gate before money |
+| [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) | Gate before money (**passed** 2026-05-27) |
 | [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) | Trust bugs before checkout |
 | [`TIER0_CAMPAIGN_QR_RUNBOOK.md`](TIER0_CAMPAIGN_QR_RUNBOOK.md) | Batch sticker QR + rotate drill |
 | [`MERCH_SUPPORT_MACROS.md`](MERCH_SUPPORT_MACROS.md) | Support reply templates |

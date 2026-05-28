@@ -1,9 +1,11 @@
 # M5  -  Stranger test runbook (Phase A exit gate)
 
-**Status:** Active checklist  
+**Status:** **Passed** — 2026-05-27  
 **Canonical gate:** `docs/V1_0_ARCHITECTURE_ROADMAP.md` §12 Phase A exit; `docs/M3_M4_EXECUTION_PLAN.md` § M5  
 **Scanner spec:** `docs/SCANNER_EXPERIENCE.md`  
 **Prerequisite:** Worker + Pages deployed; you can create → scan → revoke in one browser session.
+
+**Outcome:** Three people outside the founder network completed create → scan → revoke without coaching. Each could state in one sentence what scan proves and what it does not. Phase A exit criteria met — see `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` for what ships next.
 
 **Goal:** Three people **outside your network** complete the loop **without you explaining the UI**. Each can say in one sentence what scan **proves** and what it **does not**.
 
@@ -34,10 +36,11 @@ curl -sS "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status?q=QR" | jq
 
 10. **Live object scan** (recommended) - open a pilot or demo live-object scan URL on phone; confirm within ~30s they can state host trust, live status, what the **message** says, and that holding the sticker does not prove ownership. They should **not** need to reconcile multiple “Active” labels.
 
-    - Status plate: `site/data/showcase-status-plate.json` - `npm run site:seed-showcase`
-    - Live object: `site/data/showcase-live-object.json` - `npm run site:seed-showcase-live-object`
+    - Status plate + live object (streams): `npm run site:refresh-showcase` (or individual `site:seed-showcase` scripts)
     - Lost item relay: `site/data/showcase-lost-item.json` - `npm run site:seed-showcase-lost-item`
-    - CI fixtures: `worker/tests/scan-m5-showcase-paths.test.ts`, `worker/tests/site-showcase-data.test.ts`
+    - CI fixtures: `worker/tests/scan-m5-showcase-paths.test.ts`, `worker/tests/site-showcase-data.test.ts`, `worker/tests/manifesto-showcase-exit.test.ts`
+    - Local exit bundle: `npm run site:verify-positioning-exit`
+    - After re-seed on production: `API_ORIGIN=https://humanity.llc npm run site:verify-showcase`
 
 **Deploy check:** scan response header `X-HC-Scan-UI: pass-v31` (or later) on an active scan.
 
@@ -95,11 +98,11 @@ Do **not** send the data policy or research page unless they ask.
 
 ## After three pass
 
-1. Check boxes in `docs/M3_M4_EXECUTION_PLAN.md` § M5.
-2. Update landing **Building now**  -  move stranger tests to done; optional one-line public note (email list, post, or hero eyebrow).
-3. **Do not** start merch (M8) or Commons Pass until M5 is checked.
+1. ~~Check boxes in `docs/M3_M4_EXECUTION_PLAN.md` § M5.~~ **Done** (2026-05-27).
+2. Optional: update landing **Building now** + one-line public note (email list, post, or hero eyebrow).
+3. ~~**Do not** start merch (M8) or Commons Pass until M5 is checked.~~ **M5 passed** — M8 may proceed subject to remaining gates in `docs/MERCH_QR_LIFECYCLE_POLICY.md`.
 4. **Recommended next:** finish M5.5 backup confidence (import on second device) if strangers struggled with “revoke later.”
-5. **Then:** harden the stranger path with **one vertical pilot**  -  see `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` (status plate, lost-item relay, organizer-signed revoke; not more hub pages).
+5. **Active:** harden the stranger path with **one vertical pilot**  -  see `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` (status plate, lost-item relay, organizer-signed revoke; not more hub pages).
 6. **Before live merch checkout:** read `docs/MERCH_QR_LIFECYCLE_POLICY.md` (no calendar expiry on artifacts, hardening sequence, reprint/revoke macros).
 
 ---

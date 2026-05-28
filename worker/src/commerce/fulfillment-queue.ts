@@ -13,11 +13,24 @@ import {
   type PrintOrderRow,
 } from "../db/print-orders";
 import { generatePrintOrderId } from "../id";
-import { DEFAULT_PRINT_TEMPLATE_ID } from "../print/print-catalog";
+import {
+  DEFAULT_PRINT_TEMPLATE_ID,
+  resolvePrintTemplateForStoreProductId,
+  TIER0_BATCH_PRINT_TEMPLATE_ID,
+} from "../print/print-catalog";
 
 export interface QueuedPrintOrder {
   print_order: PrintOrderRow;
   created: boolean;
+}
+
+function isTier0BatchCommerceOrder(commerceOrder: CommerceOrderRow): boolean {
+  const intentIds = JSON.parse(commerceOrder.artifact_intent_ids_json) as string[];
+  return (
+    commerceOrder.status === "processing" &&
+    intentIds.length === 0 &&
+    Boolean(commerceOrder.profile_id)
+  );
 }
 
 export async function ensurePrintOrderForCommerceOrder(
@@ -38,6 +51,48 @@ export async function ensurePrintOrderForCommerceOrder(
   const printArtifactIds: string[] = [];
   const plannedItemQrIds: string[] = [];
 
+  if (isTier0BatchCommerceOrder(commerceOrder)) {
+    const orderId = generatePrintOrderId();
+    const templateId = TIER0_BATCH_PRINT_TEMPLATE_ID;
+    await insertPrintOrder(db, {
+      order_id: orderId,
+      profile_id: commerceOrder.profile_id!,
+      print_artifact_ids: [],
+      planned_item_qr_ids: [],
+      commerce_order_id: commerceOrder.commerce_order_id,
+      shopify_order_id: commerceOrder.shopify_order_id,
+      template_id: templateId,
+      status: "awaiting_production_approval",
+      shipping_method: "standard",
+      created_at: nowIso,
+    });
+
+    await updateCommerceOrderPrintOrderIds(
+      db,
+      commerceOrder.commerce_order_id,
+      [orderId],
+      nowIso
+    );
+
+    const row: PrintOrderRow = {
+      order_id: orderId,
+      profile_id: commerceOrder.profile_id!,
+      print_artifact_ids_json: "[]",
+      planned_item_qr_ids_json: "[]",
+      commerce_order_id: commerceOrder.commerce_order_id,
+      shopify_order_id: commerceOrder.shopify_order_id,
+      printify_order_id: null,
+      printify_shop_id: null,
+      template_id: templateId,
+      status: "awaiting_production_approval",
+      shipping_method: "standard",
+      created_at: nowIso,
+      updated_at: nowIso,
+    };
+
+    return { print_order: row, created: true };
+  }
+
   for (const intentId of intentIds) {
     const intent = await getArtifactIntent(db, intentId);
     if (!intent) continue;
@@ -51,6 +106,14 @@ export async function ensurePrintOrderForCommerceOrder(
     return null;
   }
 
+  let templateId = DEFAULT_PRINT_TEMPLATE_ID;
+  for (const intentId of intentIds) {
+    const intent = await getArtifactIntent(db, intentId);
+    if (!intent?.product_id) continue;
+    templateId = resolvePrintTemplateForStoreProductId(intent.product_id);
+    break;
+  }
+
   const orderId = generatePrintOrderId();
   await insertPrintOrder(db, {
     order_id: orderId,
@@ -59,7 +122,7 @@ export async function ensurePrintOrderForCommerceOrder(
     planned_item_qr_ids: plannedItemQrIds,
     commerce_order_id: commerceOrder.commerce_order_id,
     shopify_order_id: commerceOrder.shopify_order_id,
-    template_id: DEFAULT_PRINT_TEMPLATE_ID,
+    template_id: templateId,
     status: "awaiting_production_approval",
     shipping_method: "standard",
     created_at: nowIso,
@@ -81,7 +144,7 @@ export async function ensurePrintOrderForCommerceOrder(
     shopify_order_id: commerceOrder.shopify_order_id,
     printify_order_id: null,
     printify_shop_id: null,
-    template_id: DEFAULT_PRINT_TEMPLATE_ID,
+    template_id: templateId,
     status: "awaiting_production_approval",
     shipping_method: "standard",
     created_at: nowIso,

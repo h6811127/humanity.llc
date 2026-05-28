@@ -3,7 +3,9 @@
 **Status:** Active product direction  
 **Purpose:** Record what to build **after** the generic create → scan → revoke loop is proven, without expanding the design-space catalog faster than real deployments.
 
-**Prerequisite:** `docs/M5_STRANGER_TEST_RUNBOOK.md`  -  three strangers complete the loop unassisted.
+**Prerequisite:** ~~M5 stranger loop~~ **Satisfied** — M5 passed 2026-05-27 (`docs/M5_STRANGER_TEST_RUNBOOK.md`)
+
+**Primary post-M5 wedge (canonical GTM):** **Merch with custom QRs + ephemeral state** — scan → profile → `/shop/customize/` → unique `print_artifact` → owner updates manifesto from phone without reprint. See `docs/MERCH_FUNNEL_MVP.md` · `docs/MERCH_LED_V1.md`. The LIVE OBJECT frame (gradient QR, credential code, `humanity.llc`) is the walking-ad MVP — not status plates.
 
 **Canonical loop (unchanged):** Create card → print QR → scan live status → revoke → re-scan revoked state. See `docs/M3_M4_EXECUTION_PLAN.md`.
 
@@ -11,16 +13,19 @@
 
 ## Operating rule
 
-**One vertical, end-to-end, on real objects**  -  not more hub pages.
+**Merch-first for MVP** — custom branded QR on a physical object strangers want to scan and wear. One end-to-end path: create card → customize → checkout → print → wear → update state from phone.
 
-The site’s **What can a QR do?** walkthroughs (`site/what-can-a-qr-do/`) are **research and narrative**. They do not replace a single template strangers can print and use tomorrow on a door, sticker, or card.
+The site’s **What can a QR do?** walkthroughs (`site/what-can-a-qr-do/`) are **research and narrative**. **Status plate** and **lost-item relay** templates are optional field pilots — useful for trust UX testing, not required as the public wedge.
 
-Defer until a vertical pilot succeeds:
+Defer until the merch loop ships or a field pilot succeeds:
 
 - Additional idea walkthrough pages without product support
 - Gamified restore logic (e.g. “3 scans to un-revoke”) on the resolver
 - NFC / mesh / Humanity node hardware
 - Full maintenance CMMS or marketplace features
+- **Full L3 orchestration** beyond opt-in explain (city-scale agents, cross-object AI) — see [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md)
+
+**Parallel (shipped):** L3 P1 opt-in scan explainer on signed `public_snapshot` — does not block Phase A pilots; strangers must tap to request.
 
 ---
 
@@ -79,10 +84,11 @@ Keep positioning layered; do not collapse into a single slogan:
 
 | Doc | Use |
 |-----|-----|
+| `docs/PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md` | Positioning synthesis + messaging matrix |
 | `docs/STATUS_PLATE_PILOT.md` | Vertical #1 pilot |
 | `docs/LOST_ITEM_RELAY_PILOT.md` | Vertical #2 pilot |
 | `docs/ORGANIZER_SIGNED_REVOKE_PILOT.md` | Vertical #3 pilot (current) |
-| `docs/M5_STRANGER_TEST_RUNBOOK.md` | Phase A exit gate |
+| `docs/M5_STRANGER_TEST_RUNBOOK.md` | Phase A exit gate (**passed** 2026-05-27) |
 | `docs/M5_5_OWNER_KEY_PORTABILITY.md` | If strangers fail “revoke later” |
 | `docs/V1_USE_CASES.md` | Full use-case catalog (phased) |
 | `docs/V1_0_ARCHITECTURE_ROADMAP.md` | Build order M0–M10 |

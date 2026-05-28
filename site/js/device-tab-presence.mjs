@@ -17,6 +17,7 @@ import {
   normalizePresenceMap,
   PRESENCE_CHANGE_COALESCE_MS,
   PRESENCE_HEARTBEAT_MS,
+  PRESENCE_SHOW_MS,
   removePresenceRowsForProfile,
   shouldSkipPresenceHeartbeat,
   shouldTouchPresenceRow,
@@ -25,6 +26,7 @@ import {
 const PRESENCE_KEY = "hc_tab_keys_presence";
 const FOCUS_CHANNEL = "hc-tab-focus";
 const CUSTODY_CHANNEL = "hc-tab-keys-custody";
+const DROP_PRESENCE_MSG = "drop-profile-presence";
 
 let heartbeatTimer = null;
 let focusChannel = null;
@@ -188,6 +190,54 @@ export function purgePresenceForProfile(profileId) {
   }
 }
 
+/**
+ * Other open tabs currently heartbeating keys for a profile (presence map only).
+ * @param {string} profileId
+ */
+export function getOtherTabsHoldingProfile(profileId) {
+  const pid = typeof profileId === "string" ? profileId.trim() : "";
+  if (!pid) return [];
+  const tabId = getTabId();
+  const map = readPrunedPresence();
+  const now = Date.now();
+  /** @type {ReturnType<typeof getOtherTabsWithKeys>} */
+  const rows = [];
+  for (const [id, entry] of Object.entries(map)) {
+    if (id === tabId) continue;
+    const normalized = normalizePresenceEntry(entry, now);
+    if (!normalized || normalized.profile_id !== pid) continue;
+    if (now - normalized.updatedAt > PRESENCE_SHOW_MS) continue;
+    rows.push({ tabId: id, ...normalized });
+  }
+  return rows;
+}
+
+/** Presence-only: drop shared rows after save; keys in session stay. */
+export function broadcastDropPresenceForProfile(profileId) {
+  const pid = typeof profileId === "string" ? profileId.trim() : "";
+  if (!pid) return false;
+  try {
+    const ch = new BroadcastChannel(CUSTODY_CHANNEL);
+    ch.postMessage({ type: DROP_PRESENCE_MSG, profile_id: pid });
+    ch.close();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * After save to wallet: purge stale presence rows and ping other tabs (Phase 3).
+ * @param {string} profileId
+ */
+export function notifyProfileSavedOnDevice(profileId) {
+  const pid = typeof profileId === "string" ? profileId.trim() : "";
+  if (!pid) return;
+  purgePresenceForProfile(pid);
+  broadcastDropPresenceForProfile(pid);
+  syncTabKeysPresence();
+}
+
 export function crossTabNoticeCount() {
   const others = getOtherTabsWithKeys();
   return shouldShowCrossTabKeysNotice(others.length, tabNoticeCount()) ? others.length : 0;
@@ -247,6 +297,12 @@ function bindCustodyChannel() {
     custodyChannel = new BroadcastChannel(CUSTODY_CHANNEL);
     custodyChannel.onmessage = (ev) => {
       const data = ev.data;
+      if (data?.type === DROP_PRESENCE_MSG && data.profile_id) {
+        purgePresenceForProfile(data.profile_id);
+        syncTabKeysPresence();
+        window.dispatchEvent(new Event("hc-cross-tab-custody-invalidated"));
+        return;
+      }
       if (data?.type !== "clear-profile-keys" || !data.profile_id) return;
       const session = getTabSession();
       if (session?.profile_id !== data.profile_id) return;
@@ -290,5 +346,14 @@ export function startTabKeysPresence() {
   });
   window.addEventListener("hc-wallet-removed-profiles-changed", () => {
     emitTabPresenceChanged();
+  });
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("hc-profile-saved-on-device", (ev) => {
+    const pid = ev.detail?.profile_id;
+    if (typeof pid === "string" && pid) {
+      notifyProfileSavedOnDevice(pid);
+    }
   });
 }

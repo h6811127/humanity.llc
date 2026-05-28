@@ -166,6 +166,61 @@ function saveCache(cache) {
   }
 }
 
+/** @see docs/DEVICE_TAB_RESOLVER_SYNC.md */
+export function loadWalletNetworkCacheForSync() {
+  return loadCache();
+}
+
+/** @see docs/DEVICE_TAB_RESOLVER_SYNC.md */
+export function saveWalletNetworkCacheForSync(cache) {
+  saveCache(cache);
+}
+
+/**
+ * Apply a leader network snapshot on follower tabs (cache + truth + NETWORK_REFRESHED).
+ * @param {Array<{
+ *   profile_id: string,
+ *   status: string,
+ *   scanKind: string | null,
+ *   resolverConfirmed: boolean,
+ *   alertState?: string | null,
+ * }>} snapshotEntries
+ * @param {number} [snapshotAt]
+ */
+export function applyResolverNetworkSnapshot(snapshotEntries, snapshotAt = Date.now()) {
+  const statusMap = {};
+  const alertStateMap = {};
+  const scanKindMap = {};
+  const resolverConfirmedMap = {};
+
+  for (const row of snapshotEntries) {
+    const pid = row.profile_id;
+    if (!pid) continue;
+    statusMap[pid] = row.status;
+    scanKindMap[pid] = row.scanKind ?? null;
+    if (row.resolverConfirmed) {
+      resolverConfirmedMap[pid] = true;
+      const alert =
+        row.alertState ?? alertStateForNetworkPoll(row.scanKind, row.status);
+      if (alert != null) alertStateMap[pid] = alert;
+    }
+    const chipStatus = row.status;
+    const scanKind = row.scanKind ?? null;
+    if (row.resolverConfirmed && alertStateMap[pid] != null) {
+      setWalletNetworkTruthFromPoll(pid, {
+        chipStatus,
+        scanKind,
+        alertState: alertStateMap[pid],
+      });
+    } else {
+      setWalletNetworkTruthFromCacheOnly(pid, { chipStatus, scanKind });
+    }
+  }
+
+  persistWalletFromNetworkPoll({ statusMap, alertStateMap, scanKindMap });
+  notifyNetworkRefreshed(statusMap, alertStateMap, scanKindMap, resolverConfirmedMap);
+}
+
 function readCachedEntry(profileId) {
   const cache = loadCache();
   const entry = cache[profileId];
@@ -456,6 +511,7 @@ export async function refreshWalletNetworkStatuses(entries, onDone, options = {}
     alertStateMap: bannerAlertStateMap,
     scanKindMap: bannerScanKindMap,
     resolverConfirmedMap,
+    networkFetchedProfileIds: [...networkFetchedProfileIds],
   });
 }
 

@@ -7,6 +7,7 @@ import {
 import { applyCardUpdate, getCardForUpdate } from "../db/card-update";
 import { errorResponse, jsonResponse } from "../http/resolver";
 import { validateManifestoLine } from "../validation/manifesto";
+import { validateObjectStreamsField } from "../validation/object-streams";
 
 function parseUpdateBody(body: unknown): Record<string, unknown> | null {
   if (!body || typeof body !== "object") return null;
@@ -147,6 +148,14 @@ export async function handlePostCardUpdate(
     return errorResponse("MALFORMED_REQUEST", msg, 422);
   }
 
+  let objectStreams;
+  try {
+    objectStreams = validateObjectStreamsField(doc);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Invalid object_streams.";
+    return errorResponse("MALFORMED_REQUEST", msg, 422);
+  }
+
   const cardDocumentJson = JSON.stringify(doc);
 
   try {
@@ -160,6 +169,7 @@ export async function handlePostCardUpdate(
     {
       profile_id: profileId,
       manifesto_line: manifestoLine,
+      ...(objectStreams.length ? { object_streams: objectStreams } : {}),
       updated_at: updatedAt,
       status: "active",
     },

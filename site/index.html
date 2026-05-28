@@ -9,11 +9,13 @@
     <title>humanity.llc</title>
     <meta
       name="description"
-      content="Physical objects with programmable social state. Scan a tag or card for live active or revoked status. Optional, revocable, no scan tracking."
+      content="Public programmable objects. Live, revocable status on physical tags — browser-native. No scan tracking."
     />
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/pwa-apple-touch.png" />
     <script>
       (function () {
         try {
@@ -27,13 +29,13 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=4" />
-    <link rel="stylesheet" href="/styles.css?v=126" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=56" />
-    <link rel="stylesheet" href="/css/theme-dark.css?v=28" />
+    <link rel="stylesheet" href="/styles.css?v=128" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=59" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=29" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
-      content="Live public objects. Not identity, not social media. Scan and see current state."
+      content="Public programmable objects. Live, revocable status on physical tags — browser-native. No scan tracking."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://humanity.llc" />
@@ -103,6 +105,13 @@
         hidden
       ></div>
 
+      <div
+        class="device-pwa-install-card"
+        id="device-pwa-install-card"
+        role="status"
+        hidden
+      ></div>
+
       <section
         class="device-hub device-hub-top device-hub--sheet device-hub-collapsed"
         id="device-hub"
@@ -117,22 +126,40 @@
             <div class="device-hub-group" id="device-hub-crosstab-notice" hidden role="status"></div>
             <div class="device-hub-group" id="device-hub-notice-group" hidden></div>
             <div
-              class="device-hub-group"
+              class="device-hub-group device-hub-alert-card"
               id="device-hub-live-control-group"
               hidden
               data-hub-group="liveproof"
+              role="status"
             >
-              <p class="device-hub-group-label">Live proof waiting</p>
-              <ul class="list list-compact" id="device-hub-live-control-list"></ul>
+              <div class="hc-emphasis-card hc-emphasis-card--urgent device-hub-live-control-card">
+                <div class="hc-emphasis-card__main">
+                  <span class="hc-emphasis-card__dot hc-emphasis-card__dot--urgent" aria-hidden="true"></span>
+                  <div class="hc-emphasis-card__copy">
+                    <p class="hc-emphasis-card__eyebrow" id="device-hub-live-control-eyebrow">Live proof waiting</p>
+                    <p class="hc-emphasis-card__detail" id="device-hub-live-control-summary" hidden></p>
+                  </div>
+                </div>
+                <ul class="list list-compact device-hub-live-control-list" id="device-hub-live-control-list"></ul>
+              </div>
             </div>
             <div
-              class="device-hub-group"
+              class="device-hub-group device-hub-alert-card"
               id="device-hub-card-disabled-group"
               hidden
               data-hub-group="card-disabled"
+              role="status"
             >
-              <p class="device-hub-group-label">Disabled since your last visit</p>
-              <ul class="list list-compact" id="device-hub-card-disabled-list"></ul>
+              <div class="hc-emphasis-card hc-emphasis-card--warn device-hub-card-disabled-card">
+                <div class="hc-emphasis-card__main">
+                  <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
+                  <div class="hc-emphasis-card__copy">
+                    <p class="hc-emphasis-card__eyebrow" id="device-hub-card-disabled-eyebrow">Disabled since your last visit</p>
+                    <p class="hc-emphasis-card__detail" id="device-hub-card-disabled-summary" hidden></p>
+                  </div>
+                </div>
+                <ul class="list list-compact device-hub-card-disabled-list" id="device-hub-card-disabled-list"></ul>
+              </div>
             </div>
           </div>
           <div class="device-hub-status-head">
@@ -146,9 +173,13 @@
             ></div>
           </div>
 
-          <h2 class="device-hub-title" id="device-hub-title">This browser</h2>
-          <p class="device-hub-lead">Saved in this browser - cards, keys, and pins you choose to keep here.</p>
-          <div id="device-keys-custody-hub"></div>
+          <h2 class="device-hub-title" id="device-hub-title">Saved in this browser</h2>
+          <section
+            class="device-hub-section device-hub-keys-custody-section"
+            id="device-hub-keys-custody"
+            aria-labelledby="device-hub-keys-custody-title"
+            hidden
+          ></section>
           <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint">
             Nothing saved yet? After create, tap <strong>Save control key</strong> on your
             <a href="/created/">card page</a>. Until then, keys exist only in that tab.
@@ -295,7 +326,7 @@
       <main class="screen screen-landing">
         <section class="hero hero-tight" data-landing-tutorial>
           <h1>
-            <span class="hero-headline-kicker">A network OS for physical objects</span>
+            <span class="hero-headline-kicker">Public programmable objects</span>
             Live state<br />on real objects.
           </h1>
           <p class="hero-tagline">
@@ -307,7 +338,7 @@
               >Create a live object</a
             >
             <div class="landing-hero-sub-links" aria-label="More options">
-              <a class="landing-hero-sub-link" href="/shop/">Founding sticker drop</a>
+              <a class="landing-hero-sub-link" href="/shop/">Shop</a>
               <a class="landing-hero-sub-link landing-hero-sub-link--muted" href="/case-study/"
                 >See the full loop</a
               >
@@ -586,6 +617,36 @@
                 <span class="list-content">
                   <span class="list-title">Browser alerts</span>
                   <span class="list-sub">Live proof waiting · off</span>
+                </span>
+                <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
+              </button>
+            </li>
+            <li
+              class="list-row list-action"
+              data-hub-searchable="share network checks tabs resolver sync"
+            >
+              <button type="button" id="device-resolver-sync-toggle" aria-pressed="true">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Share network checks</span>
+                  <span class="list-sub">On · other tabs use the same last check</span>
+                </span>
+                <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
+              </button>
+            </li>
+            <li
+              class="list-row list-action"
+              data-hub-searchable="refresh all tabs network live proof check"
+            >
+              <button type="button" id="device-resolver-refresh-all-tabs">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Refresh all tabs</span>
+                  <span class="list-sub">One check, then share with open tabs</span>
                 </span>
                 <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
               </button>
@@ -996,7 +1057,7 @@
       </main>
     </div>
     <script src="/js/landing-focus.mjs?v=3" type="module"></script>
-    <script src="/js/device-status-bootstrap.mjs?v=45" type="module"></script>
+    <script src="/js/device-status-bootstrap.mjs?v=56" type="module"></script>
     <script src="/js/landing-device-hub.mjs?v=13" type="module"></script>
     <script src="/js/landing-showcase.mjs?v=2" type="module"></script>
     <script src="/js/landing-showcase-live-object.mjs?v=1" type="module"></script>

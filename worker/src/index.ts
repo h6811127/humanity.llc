@@ -4,6 +4,7 @@
  */
 
 import { schemaReady } from "./db";
+import { resolverHealthBuildField } from "./resolver-health-build";
 import { runOrphanPurge } from "./db/orphan-purge";
 import {
   clientIp,
@@ -15,6 +16,8 @@ import {
   withCors,
 } from "./http/resolver";
 import { handlePostArtifactIntent, handlePostArtifactIntentAttach } from "./resolver/artifact-intents";
+import { handleGetStoreOrderStatus } from "./store/store-order-status-handler";
+import { handleGetStoreProduct, handleGetStoreRows } from "./store/store-rows-handler";
 import { handleGetCard, handlePostCards } from "./resolver/create-card";
 import {
   handleGetLiveControlChallenge,
@@ -40,6 +43,10 @@ import {
 } from "./resolver/vouch-audit-flags";
 import { handleGetCreateRateMonitor } from "./resolver/create-monitoring";
 import {
+  handleGetMerchFunnelMonitor,
+  handlePostMerchFunnelBeacon,
+} from "./http/merch-funnel";
+import {
   handleGetOperatorCapabilities,
   handleGetOperatorPlans,
   handleGetStewardEntitlements,
@@ -49,6 +56,7 @@ import {
 import { handleGetStewardOpsSnapshot } from "./resolver/steward-ops";
 import { handlePostBillingWebhook } from "./http/billing-webhook";
 import { handlePostShopifyOrdersWebhook } from "./http/shopify-orders-webhook";
+import { handlePostPrintifyWebhook } from "./http/printify-webhook";
 import {
   handleGetPrintCatalog,
   handlePostPrintArtifacts,
@@ -59,6 +67,8 @@ import {
   handlePostPrintOrders,
 } from "./print/print-orders-handler";
 import { handleGetOperatorFulfillmentLookup } from "./operator/fulfillment-lookup";
+import { handlePostAiExplainSnapshot } from "./resolver/ai-explain-snapshot";
+import { handlePostAiDraftManifesto } from "./resolver/ai-draft-manifesto";
 
 export interface Env {
   DB: D1Database;
@@ -76,6 +86,22 @@ export interface Env {
   PRINTIFY_API_TOKEN?: string;
   /** O-002 Printify shop id for order submit. */
   PRINTIFY_SHOP_ID?: string;
+  /** O-002 Set to 1 to enable live Printify order HTTP submit (default off). */
+  PRINTIFY_SUBMIT_ENABLED?: string;
+  /** O-003 Shared secret for Printify webhook HMAC (X-Pfy-Signature). */
+  PRINTIFY_WEBHOOK_SECRET?: string;
+  /** Tier 0 Printify product id for batch sticker template. */
+  TIER0_PRINTIFY_PRODUCT_ID?: string;
+  /** Tier 0 Printify variant id (integer). */
+  TIER0_PRINTIFY_VARIANT_ID?: string;
+  /** Tier 0 Printify shipping_method id (default 1). */
+  TIER0_PRINTIFY_SHIPPING_METHOD?: string;
+  /** Tier 0 batch sticker: campaign card profile_id (must exist in D1). */
+  TIER0_CAMPAIGN_PROFILE_ID?: string;
+  /** Tier 0 batch sticker: comma-separated Shopify variant ids. */
+  TIER0_SHOPIFY_VARIANT_IDS?: string;
+  /** Cloudflare Workers AI (L3 explain snapshot). */
+  AI?: Ai;
 }
 
 export default {
@@ -218,6 +244,39 @@ export default {
       );
       return withCors(request, res);
     }
+
+    if (
+      path === "/.well-known/hc/v1/metrics/merch-funnel" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostMerchFunnelBeacon(request, env.DB);
+      return withCors(request, res);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/operator/merch-funnel-monitor" &&
+      request.method === "GET"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetMerchFunnelMonitor(
+        request,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
+    }
+
     if (
       path === "/.well-known/hc/v1/operator/vouch-audit-flags" &&
       request.method === "GET"
@@ -279,6 +338,32 @@ export default {
       }
       const res = await handlePostCards(request, env.DB);
       return withCors(request, res);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/ai/explain-snapshot" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      return handlePostAiExplainSnapshot(request, env);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/ai/draft-manifesto" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      return handlePostAiDraftManifesto(request, env);
     }
 
     const statusMatch = path.match(
@@ -526,11 +611,40 @@ export default {
       return withCors(request, res);
     }
 
+    if (path === "/v1/store/orders/status" && request.method === "GET") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetStoreOrderStatus(request, env.DB);
+      return withCors(request, res);
+    }
+
+    if (path === "/v1/store/rows" && request.method === "GET") {
+      const res = await handleGetStoreRows();
+      return withCors(request, res);
+    }
+
+    const storeProductMatch = path.match(/^\/v1\/store\/products\/([^/]+)$/);
+    if (storeProductMatch && request.method === "GET") {
+      const res = await handleGetStoreProduct(decodeURIComponent(storeProductMatch[1]!));
+      return withCors(request, res);
+    }
+
     if (path === "/v1/webhooks/shopify/orders" && request.method === "POST") {
       if (!env.DB) {
         return jsonResponse({ error: "database_unconfigured" }, 503);
       }
       return handlePostShopifyOrdersWebhook(request, env, env.DB);
+    }
+
+    if (path === "/v1/print/webhooks/printify" && request.method === "POST") {
+      if (!env.DB) {
+        return jsonResponse({ error: "database_unconfigured" }, 503);
+      }
+      return handlePostPrintifyWebhook(request, env, env.DB);
     }
 
     if (path === "/v1/print/catalog" && request.method === "GET") {
@@ -622,11 +736,13 @@ async function healthResponse(env: Env): Promise<Response> {
     operator: string;
     status: string;
     database: string;
+    build: ReturnType<typeof resolverHealthBuildField>;
   } = {
     version: PROTOCOL_VERSION,
     operator: OPERATOR_ID,
     status: "ok",
     database: "unknown",
+    build: resolverHealthBuildField(),
   };
 
   if (!env.DB) {

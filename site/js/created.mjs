@@ -13,6 +13,7 @@ import { initManifestoUpdate } from "./created-manifesto-update.mjs";
 import { initQrRotate } from "./created-qr-rotate.mjs";
 import { initQrExtend } from "./created-qr-extend.mjs";
 import { inferPilotTemplate, parseManifestoDisplay } from "./manifesto-display.mjs";
+import { parseObjectStreamsFromDocument } from "./object-streams-core.mjs";
 import { createdLiveProofPollShouldRun, liveProofPanelMostlyVisible, shouldScrollLiveProofPanelIntoView } from "./created-live-proof-poll-core.mjs";
 import { initCreatedTabs } from "./created-tabs.mjs";
 import { initCreatedDashboard } from "./created-dashboard.mjs?v=6";
@@ -20,6 +21,19 @@ import {
   markFirstRevokeDone,
   syncUpdateStatusTaskGate,
 } from "./created-first-revoke-gate.mjs?v=2";
+import {
+  bindStatusPlateLoopScorecard,
+  recordStatusPlateUpdate,
+  setLoopMilestone as setStatusPlateLoopMilestone,
+  syncStatusPlateLoopScorecardDom,
+} from "./status-plate-loop-scorecard.mjs";
+import {
+  bindLostItemRelayLoopScorecard,
+  recordLostItemRelayUpdate,
+  setLoopMilestone as setLostItemLoopMilestone,
+  syncLostItemRelayLoopScorecardDom,
+} from "./lost-item-relay-loop-scorecard.mjs";
+import { syncCreatedPilotStewardCopy } from "./pilot-steward-copy.mjs";
 import { initCreatedDeviceSave } from "./created-device-save.mjs";
 import { markSetupDone, modeFromPage } from "./created-mode.mjs";
 import { initCreatedSetup } from "./created-setup.mjs";
@@ -619,13 +633,28 @@ function resolvePilotTemplate(session) {
   return "general";
 }
 
+function pilotScorecardHandle(session = loadSession()) {
+  return session?.handle ?? data?.handle ?? null;
+}
+
+function syncStatusPlateScorecard(profileId, record) {
+  syncStatusPlateLoopScorecardDom(profileId, record, pilotScorecardHandle());
+}
+
+function syncLostItemScorecard(profileId, record) {
+  syncLostItemRelayLoopScorecardDom(profileId, record, pilotScorecardHandle());
+}
+
 function applyPilotTemplateUi(session) {
   const pilot = resolvePilotTemplate(session);
+  syncCreatedPilotStewardCopy(pilot);
   if (pilot === "status_plate" && statusPlateTipEl) {
     statusPlateTipEl.hidden = false;
+    bindStatusPlateLoopScorecard(profileId, pilotScorecardHandle(session));
   }
   if (pilot === "lost_item_relay" && lostItemTipEl) {
     lostItemTipEl.hidden = false;
+    bindLostItemRelayLoopScorecard(profileId, pilotScorecardHandle(session));
   }
 }
 
@@ -643,6 +672,7 @@ async function hydrateSessionFromNetwork() {
   const card = await res.json();
   if (!card?.handle || !card?.manifesto_line) return;
 
+  const streams = parseObjectStreamsFromDocument(card);
   const next = {
     ...existing,
     profile_id: profileId,
@@ -653,6 +683,7 @@ async function hydrateSessionFromNetwork() {
     status: card.status || existing.status || "active",
     pilot_template:
       existing.pilot_template || inferPilotTemplate(card.manifesto_line),
+    ...(streams.length ? { object_streams: streams } : {}),
   };
   saveSession(next);
   data = next;
@@ -974,6 +1005,14 @@ if (activeScanUrl) {
         try {
           await downloadQrPng(activeScanUrl, `humanity-${slug}-qr.png`);
           downloadQrBtn.textContent = "Downloaded";
+          if (resolvePilotTemplate(loadSession()) === "status_plate") {
+            const row = setStatusPlateLoopMilestone(profileId, "printed", true);
+            syncStatusPlateScorecard(profileId, row);
+          }
+          if (resolvePilotTemplate(loadSession()) === "lost_item_relay") {
+            const row = setLostItemLoopMilestone(profileId, "printed", true);
+            syncLostItemScorecard(profileId, row);
+          }
           setTimeout(() => {
             downloadQrBtn.textContent = prev;
           }, 2000);
@@ -1046,6 +1085,14 @@ async function bootstrapOwnerTools() {
         const next = { ...sessionNow, manifesto_line: manifestoLine };
         saveSession(next);
         data = next;
+      }
+      if (resolvePilotTemplate(loadSession()) === "status_plate") {
+        const row = recordStatusPlateUpdate(profileId);
+        syncStatusPlateScorecard(profileId, row);
+      }
+      if (resolvePilotTemplate(loadSession()) === "lost_item_relay") {
+        const row = recordLostItemRelayUpdate(profileId);
+        syncLostItemScorecard(profileId, row);
       }
       syncLiveCockpit();
       void refreshNetworkStatus();

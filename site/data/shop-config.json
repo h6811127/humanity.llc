@@ -1,10 +1,37 @@
 {
   "version": 1,
+  "site_origin": "https://humanity.llc",
   "tier0": {
     "product_title": "Founding signal sticker",
     "price_display": null,
-    "checkout_url": "",
-    "checkout_open": false
+    "checkout_url": "https://bfgy9ofdza74ybde-100263625013.shopifypreview.com/products_preview?preview_key=2872939b67efc93989e6a1a6bdf7fdf3",
+    "checkout_open": true
   },
-  "thanks_path": "/shop/thanks/"
+  "thanks_path": "/shop/thanks/",
+  "personalize": {
+    "checkout_open": true,
+    "checkout_product_id": "sticker_personalized_v1",
+    "products": [
+      {
+        "product_id": "hoodie_live_object_v1",
+        "print_template_id": "hc-hoodie-live-object-v1",
+        "print_variant_id": "black-m",
+        "title": "Live Object hoodie",
+        "preview": "hoodie",
+        "price_display": "$48 + shipping",
+        "shopify_variant_id": "",
+        "checkout_url": ""
+      },
+      {
+        "product_id": "sticker_personalized_v1",
+        "print_template_id": "hc-sticker-square-v1",
+        "print_variant_id": "2x2-white",
+        "title": "Personalized sticker",
+        "preview": "sticker",
+        "price_display": "$12 + shipping",
+        "shopify_variant_id": "",
+        "checkout_url": ""
+      }
+    ]
+  }
 }

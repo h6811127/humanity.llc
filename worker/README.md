@@ -50,9 +50,16 @@ Expected when migrations are applied:
   "version": "1.0",
   "operator": "humanity.llc",
   "status": "ok",
-  "database": "ok"
+  "database": "ok",
+  "build": {
+    "gitSha": "dev",
+    "builtAt": "1970-01-01T00:00:00.000Z",
+    "source": "dev"
+  }
 }
 ```
+
+`build` is the Worker deploy stamp (git SHA + time). Regenerate before deploy: `npm run worker:build-meta`. See [`docs/SITE_BUILD_VERSIONING.md`](../docs/SITE_BUILD_VERSIONING.md).
 
 If `database` is `schema_missing`, run `npm run worker:migrate:local`.
 

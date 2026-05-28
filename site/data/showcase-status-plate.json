@@ -1,9 +1,17 @@
 {
-  "profile_id": "nSVXWPqgRFEhGPjxyRzidF6s",
-  "qr_id": "qr_xBZTq7M27tueCzBY",
-  "handle": "studio_door_showcase",
+  "profile_id": "r4YyNEWJvVwWNMETzXfGjFyL",
+  "qr_id": "qr_8w7zHCPHisXvTnar",
+  "handle": "studio_door_showcase_srSjAJ",
   "label": "Studio door · Open Thu–Sun (showcase)",
-  "scan_url": "https://humanity.llc/c/nSVXWPqgRFEhGPjxyRzidF6s?q=qr_xBZTq7M27tueCzBY",
-  "created_at": "2026-05-24T20:07:06.766Z",
+  "scan_url": "https://humanity.llc/c/r4YyNEWJvVwWNMETzXfGjFyL?q=qr_8w7zHCPHisXvTnar",
+  "created_at": "2026-05-27T17:44:08.368Z",
+  "object_streams": [
+    {
+      "id": "special_hours",
+      "class": "place",
+      "label": "Special hours",
+      "value": "Thursday closes at 6 PM this week"
+    }
+  ],
   "note": "Showcase card  -  owner key not stored. Revoke only via operator DB if needed."
 }

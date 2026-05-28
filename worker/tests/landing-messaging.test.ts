@@ -1,0 +1,51 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { describe, expect, it } from "vitest";
+
+import {
+  CREATE_TEMPLATE_HERO,
+  createHeroCopyForTemplate,
+} from "../../site/js/create-template-copy.mjs";
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+
+const LANDING_META_SNIPPET =
+  "Public programmable objects. Live, revocable status on physical tags";
+
+describe("landing messaging (Step 3)", () => {
+  it("landing meta and OG align with messaging matrix", () => {
+    const html = readFileSync(join(root, "site/index.html"), "utf8");
+    expect(html).toContain(LANDING_META_SNIPPET);
+    expect(html).toContain("No scan tracking.");
+    expect(html).not.toContain("Physical objects with programmable social state");
+    expect(html).not.toContain("Live public objects. Not identity, not social media");
+  });
+
+  it("landing hero uses hook H1 and public programmable kicker", () => {
+    const html = readFileSync(join(root, "site/index.html"), "utf8");
+    expect(html).toContain("Public programmable objects");
+    expect(html).toContain("Live state<br />on real objects.");
+    expect(html).not.toContain("A network OS for physical objects");
+  });
+
+  it("create page exposes hero ids for template copy sync", () => {
+    const html = readFileSync(join(root, "site/create/index.html"), "utf8");
+    expect(html).toContain('id="create-hero-title"');
+    expect(html).toContain('id="create-hero-lead"');
+    expect(html).toContain("change it later on Live without reprinting");
+  });
+});
+
+describe("create-template-copy", () => {
+  it("status plate lead matches messaging matrix", () => {
+    const copy = createHeroCopyForTemplate("status_plate");
+    expect(copy.lead).toMatch(/One plate · one question · open or closed right now/);
+    expect(CREATE_TEMPLATE_HERO.status_plate.title).toBe("Create a status plate");
+  });
+
+  it("general template keeps default card framing", () => {
+    expect(createHeroCopyForTemplate("general").title).toBe("Create a live card");
+    expect(createHeroCopyForTemplate(undefined).title).toBe("Create a live card");
+  });
+});

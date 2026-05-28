@@ -3,6 +3,7 @@
  * @see docs/CARD_WORKSPACE_UX.md
  */
 
+import { mountKeysCustody } from "./device-keys-custody.mjs";
 import { isWalletSaved } from "./device-wallet.mjs";
 import { clearFreshUrlParam } from "./created-workspace.mjs";
 import { markSetupDone } from "./created-mode.mjs";
@@ -49,9 +50,25 @@ export function initCreatedSetup(opts) {
   const feedbackEl = document.getElementById("created-setup-feedback");
   const keysStrip = document.getElementById("created-keys-strip");
   const keysMount = document.getElementById("created-setup-keys-mount");
+  const custodyMount = document.getElementById("device-keys-custody-created-setup");
   const qrPreviewWrap = document.getElementById("created-setup-qr-preview");
   const setupQrImg = document.getElementById("created-setup-qr-img");
   const doneBtn = document.getElementById("created-setup-finish");
+
+  function syncSetupKeysCustody() {
+    if (!custodyMount) return;
+    const saved = isWalletSaved(profileId);
+    const card = custodyMount.querySelector(".device-keys-custody--created");
+    if (saved) {
+      card?.remove();
+      return;
+    }
+    if (!card) {
+      mountKeysCustody(custodyMount, "created", { importHref: "/wallet/#import" });
+    }
+  }
+
+  syncSetupKeysCustody();
 
   if (keysStrip && keysMount) {
     keysMount.appendChild(keysStrip);
@@ -263,6 +280,7 @@ export function initCreatedSetup(opts) {
   });
 
   window.addEventListener("hc-device-hub-changed", () => {
+    syncSetupKeysCustody();
     if (currentStep() === "save") syncIndicators();
   });
   window.addEventListener("hc-created-qr-ready", syncSetupQrPreview);

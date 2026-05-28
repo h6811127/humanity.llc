@@ -1,5 +1,14 @@
 import { validateCreateFormFields } from "./create-form-validation-core.mjs";
+import { syncCreateHeroCopy } from "./create-template-copy.mjs";
 import { formatCreateResolverError } from "./create-resolver-error-core.mjs";
+import {
+  buildPostCreateDestinationUrl,
+  clearMerchCreateRef,
+  peekMerchCreateRef,
+  persistMerchCreateRef,
+  readMerchRefFromUrl,
+} from "./merch-funnel-core.mjs";
+import { buildObjectStreamsFromFormRows } from "./object-streams-core.mjs";
 import {
   qrExpiryFromIssued,
   encodePrivateKeyBase58,
@@ -20,6 +29,7 @@ const demoBtn = document.getElementById("create-demo-btn");
 const fieldsGeneral = document.getElementById("create-fields-general");
 const fieldsStatusPlate = document.getElementById("create-fields-status-plate");
 const fieldsLostItem = document.getElementById("create-fields-lost-item");
+const fieldsObjectStreams = document.getElementById("create-fields-object-streams");
 const manifestoEl = document.getElementById("manifesto");
 const templateBtns = document.querySelectorAll(".create-template-btn");
 
@@ -52,6 +62,9 @@ function setTemplate(template) {
   if (fieldsGeneral) fieldsGeneral.hidden = isPilot;
   if (fieldsStatusPlate) fieldsStatusPlate.hidden = !isPlate;
   if (fieldsLostItem) fieldsLostItem.hidden = !isRelay;
+  if (fieldsObjectStreams) {
+    fieldsObjectStreams.hidden = !isPlate && template !== "general";
+  }
   if (manifestoEl) manifestoEl.required = !isPilot;
   const objectLabel = document.getElementById("object-label");
   const statusLine = document.getElementById("status-line");
@@ -61,6 +74,7 @@ function setTemplate(template) {
   if (statusLine) statusLine.required = isPlate;
   if (relayItem) relayItem.required = isRelay;
   if (relayMessage) relayMessage.required = isRelay;
+  syncCreateHeroCopy(template);
 }
 
 templateBtns.forEach((btn) => {
@@ -99,6 +113,22 @@ function buildManifestoLine() {
   return { manifesto, pilotTemplate: "general" };
 }
 
+function buildObjectStreamsForCreate() {
+  if (activeTemplate !== "status_plate" && activeTemplate !== "general") return [];
+  return buildObjectStreamsFromFormRows([
+    {
+      label: document.getElementById("create-stream-1-label")?.value,
+      value: document.getElementById("create-stream-1-value")?.value,
+      class: "place",
+    },
+    {
+      label: document.getElementById("create-stream-2-label")?.value,
+      value: document.getElementById("create-stream-2-value")?.value,
+      class: "care",
+    },
+  ]);
+}
+
 function readOrganizerKeyConfig() {
   const enabled = document.getElementById("enable-organizer-revoke")?.checked ?? false;
   if (!enabled) return { enabled: false };
@@ -115,7 +145,7 @@ function readOrganizerKeyConfig() {
 }
 
 /**
- * @param {{ handle: string, manifesto: string, wantRecovery: boolean, pilotTemplate?: string, qrValidityDays?: number, organizer?: ReturnType<typeof readOrganizerKeyConfig> }} input
+ * @param {{ handle: string, manifesto: string, wantRecovery: boolean, pilotTemplate?: string, qrValidityDays?: number, organizer?: ReturnType<typeof readOrganizerKeyConfig>, objectStreams?: Array<{ id: string, class: string, label: string, value: string }> }} input
  */
 function readQrValidityDays() {
   const raw = document.getElementById("qr-validity-days")?.value;
@@ -134,6 +164,7 @@ export async function runCreateCard(input) {
     pilotTemplate = "general",
     qrValidityDays = 365,
     organizer = { enabled: false },
+    objectStreams = [],
     sampleCard = false,
   } = input;
   const { privateKey, publicKeyBase58 } = await generateKeypair();
@@ -195,6 +226,9 @@ export async function runCreateCard(input) {
   if (organizerPublicKeyBase58) {
     cardFields.issuer_public_key = organizerPublicKeyBase58;
   }
+  if (objectStreams.length) {
+    cardFields.object_streams = objectStreams;
+  }
 
   const cardUnsigned = withProtocolFields(cardFields, "humanity_card");
 
@@ -218,10 +252,15 @@ export async function runCreateCard(input) {
   const qr_credential = await signDocument(qrUnsigned, privateKey, publicKeyBase58);
 
   setStatus("Submitting to resolver…");
+  const attributionRef = sampleCard ? null : peekMerchCreateRef();
+  /** @type {{ card: typeof card, qr_credential: typeof qr_credential, attribution_ref?: string }} */
+  const payload = { card, qr_credential };
+  if (attributionRef) payload.attribution_ref = attributionRef;
+
   const res = await fetch(postCardsUrl(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ card, qr_credential }),
+    body: JSON.stringify(payload),
   });
 
   const data = await res.json().catch(() => ({}));
@@ -239,6 +278,8 @@ export async function runCreateCard(input) {
     }
     throw new Error(msg);
   }
+
+  if (attributionRef) clearMerchCreateRef();
 
   sessionStorage.setItem(
     "hc_created",
@@ -268,15 +309,18 @@ export async function runCreateCard(input) {
       private_key_warning: true,
       created_at: now,
       handle,
+      ...(objectStreams.length ? { object_streams: objectStreams } : {}),
       ...(sampleCard ? { sample_card: true } : {}),
     })
   );
 
-  const created = new URL("/created/", location.origin);
-  created.searchParams.set("profile_id", profileId);
-  created.searchParams.set("qr_id", qrId);
-  created.searchParams.set("fresh", "1");
-  location.replace(created.href);
+  const destination = buildPostCreateDestinationUrl(attributionRef, {
+    origin: location.origin,
+    profileId,
+    qrId,
+    fresh: true,
+  });
+  location.replace(destination);
 }
 
 function readCreateFormFields() {
@@ -320,10 +364,12 @@ function readValidatedCreateInput() {
     handleEl.value = validation.handle;
   }
   const { manifesto, pilotTemplate } = buildManifestoLine();
+  const objectStreams = buildObjectStreamsForCreate();
   return {
     handle: validation.handle,
     manifesto,
     pilotTemplate,
+    objectStreams,
     wantRecovery: document.getElementById("generate-recovery")?.checked ?? true,
     qrValidityDays: readQrValidityDays(),
     organizer: readOrganizerKeyConfig(),
@@ -343,6 +389,7 @@ async function submitCreate(e, opts = {}) {
       manifesto: input.manifesto,
       wantRecovery: input.wantRecovery,
       pilotTemplate: input.pilotTemplate,
+      objectStreams: input.objectStreams,
       qrValidityDays: input.qrValidityDays,
       organizer: input.organizer,
       sampleCard: !!opts.sampleCard,
@@ -385,6 +432,9 @@ if (urlTemplate === "status_plate") {
 } else if (urlTemplate === "lost_item") {
   setTemplate("lost_item_relay");
 }
+
+const urlMerchRef = readMerchRefFromUrl();
+if (urlMerchRef) persistMerchCreateRef(urlMerchRef);
 
 demoBtn?.addEventListener("click", async () => {
   const handleEl = document.getElementById("handle");

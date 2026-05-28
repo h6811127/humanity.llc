@@ -1,6 +1,6 @@
 # Device OS  -  browser shell + physical network
 
-**Status:** Phase 8 shipped (device hub) · Phase 1 refresh coordinator shipped · **Active vertical:** merch Tier 0 shop (`/shop/`)  
+**Status:** Phase 8 shipped (device hub) · Phase 1 refresh coordinator shipped · **Active vertical:** merch Tier 0 shop (`/shop/`) · **PWA install:** spec shipped ([`PWA_INSTALL.md`](PWA_INSTALL.md))  
 **Audience:** Product, frontend, and anyone extending Pages without accounts
 
 ---
@@ -32,6 +32,7 @@ Before shipping UI, answer:
 | Live proof **signing** | **`/created/`** only (existing proof panel + poll) |
 | What a stranger sees | **Scan page only**  -  never a second homepage demo |
 | Protocol essays, threat models, case study walkthrough | **Reference** (full docs in intro mode; Help & protocol footer in focus mode) |
+| Install app / Add to Home Screen (returning stewards) | **Device chrome** — shell pages only; never scan — [`PWA_INSTALL.md`](PWA_INSTALL.md) |
 
 **Do not put on the landing hub:** per-pin revoke, disable QR, or any signed network mutation without **Open controls → /created/**. Pins are public bookmarks only.
 
@@ -113,6 +114,7 @@ Same chrome on **landing**, **`/created/`**, and **`/wallet/`**:
 | Background alerts (live proof) | `device-browser-notifications.mjs` | Contextual opt-in strip + OS notify when tab hidden; click → `/created/` sign URL |
 | Hub body | `device-hub-ui.mjs` | Saved, pins, notice, activity, search, import |
 | Hub glance | `device-hub-glance.mjs` | Landing only; visible when hub collapsed |
+| PWA install (Add to Home Screen) | `pwa-install.mjs` (lazy) | Returning stewards on shell pages only — [`PWA_INSTALL.md`](PWA_INSTALL.md) |
 | Wallet / activity / keys | `device-wallet.mjs`, `device-activity.mjs`, `device-keys.mjs` | |
 
 ### `/wallet/` (saved page)
@@ -176,7 +178,8 @@ Manual regression: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) (especially **P1-1** - n
 | 9 | **Revoked since last visit** (`hc_wallet_last_seen_network`) | ✅ |
 | 10 | Live-control inbox (`device-live-control-inbox.mjs`) | ✅ |
 | 11 | Cross-tab keys banner (`device-tab-presence.mjs`) | ✅ |
-| 12 | Deferred: resolver-wide search / directory |  -  |
+| 12 | PWA install spec + contracts (`pwa-install-*-core.mjs`) | ✅ spec · Phases 1–3 pending — [`PWA_INSTALL.md`](PWA_INSTALL.md) |
+| 13 | Deferred: resolver-wide search / directory |  -  |
 |  -  | Deferred: per-card revoke on landing hub |  -  (use Manage) |
 
 ### Device inbox & chrome notifications

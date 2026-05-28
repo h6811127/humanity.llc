@@ -72,7 +72,7 @@ Track with [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Resolver UI 
 | **1** | Hero consolidation, dedupe status/limits, QR demotion, spacing | **Shipped** - `scan-html.ts`, `scan-safety.ts`, `scan-pass.css` |
 | **2** | Scan-type hero templates | **Shipped** - `buildScanHeroMain()` |
 | **3** | Collapsible groups + proves/does-not-prove modules | **Shipped** - `renderScanTrustModules()`, `scan-trust-details` |
-| **4** | M5 showcase paths + tests + `X-HC-Scan-UI` bump | **Shipped** (`pass-v23`) - `scan-m5-showcase-paths.test.ts`, hero snapshots; M5 strangers still manual |
+| **4** | M5 showcase paths + tests + `X-HC-Scan-UI` bump | **Shipped** (`pass-v23`) - `scan-m5-showcase-paths.test.ts`, hero snapshots; **M5 strangers passed 2026-05-27** |
 | **5** | Omit empty trust groups; M5 showcase seed + landing row | **Shipped** (`pass-v24`) - `pushTrustGroup`, `site:seed-showcase-live-object` |
 | **6** | Trust-tool emphasis (icons, peek, section kicker, layout) | **Shipped** (`pass-v25`) - `scan-trust-tools`, `scan-group-summary` |
 | **7** | Dot-only page chrome (remove white top bar + duplicate wordmark) | **Shipped** (`pass-v26`) - `renderScanPageChrome`, `.scan-page-chrome` |
