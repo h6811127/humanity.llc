@@ -110,12 +110,12 @@ OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:
 npm run hosted:rollout:step3b   # setup notes only; not required before step 4
 ```
 
-**Rollout step 4a — enable `HOSTED_STEWARD_ENABLED` in wrangler (do this first):**
+**Rollout step 4a — enable `HOSTED_STEWARD_ENABLED` in wrangler (shipped in repo):**
 
 ```bash
 npm run hosted:rollout:step4a
-npm run hosted:rollout:step4a -- --apply   # writes "1" to worker/wrangler.toml locally
-# commit worker/wrangler.toml, then step 4b
+npm run hosted:rollout:step4a -- --apply   # idempotent if already "1"
+# worker/wrangler.toml committed with HOSTED_STEWARD_ENABLED = "1" — proceed to step 4b
 ```
 
 **Rollout step 4b — deploy + smoke + verify production:**
