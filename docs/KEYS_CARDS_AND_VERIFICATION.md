@@ -170,5 +170,6 @@ Steward is **not** earned by vouch count. It is set on the resolver (bootstrap o
 - [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) - root key, child objects, recovery posture, delegation direction
 - [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) - saved row layout, **checked** recency vs scan policy
 - [`DEVICE_OS.md`](DEVICE_OS.md) - two-layer product model
+- [`STEWARD_DEVICE_ROADMAP.md`](STEWARD_DEVICE_ROADMAP.md) - index: keys, inbox, Browser alerts, hosted push, PWA
 - [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) - resolver polling vs saved-card count (must fix at ~10+)
 - [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md) - `hc_wallet` parse/cache growth on hub paths
