@@ -11,7 +11,7 @@ export function escapeEmphasisHtml(s) {
 }
 
 /**
- * @param {{ eyebrow: string, title?: string, detail: string, dot?: 'success'|'info'|'warn'|'urgent', actionsHtml?: string, extraCopyHtml?: string, detailId?: string }} opts
+ * @param {{ eyebrow: string, title?: string, detail: string, dot?: 'success'|'info'|'warn'|'urgent', actionsHtml?: string, extraCopyHtml?: string, afterActionsHtml?: string, detailId?: string }} opts
  */
 export function emphasisCardBodyHtml(opts) {
   const dot = opts.dot ?? "info";
@@ -19,6 +19,7 @@ export function emphasisCardBodyHtml(opts) {
     ? `<p class="hc-emphasis-card__title">${opts.title}</p>`
     : "";
   const actions = opts.actionsHtml ?? "";
+  const afterActions = opts.afterActionsHtml ?? "";
   const detailId = opts.detailId
     ? ` id="${escapeEmphasisHtml(opts.detailId)}"`
     : "";
@@ -33,7 +34,7 @@ export function emphasisCardBodyHtml(opts) {
         ${extraCopy}
       </div>
     </div>
-    ${actions}`;
+    ${actions}${afterActions}`;
 }
 
 /**

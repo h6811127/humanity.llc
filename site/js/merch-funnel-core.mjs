@@ -162,6 +162,33 @@ export function shouldShowCreatedMerchCustomizeCard(input) {
 }
 
 /**
+ * Fresh create with customize handoff ref and readable hc_created session.
+ * @param {{ fresh?: boolean, merchRef?: string | null, hasCreatedSession?: boolean }} input
+ * @returns {boolean}
+ */
+export function shouldRedirectFreshCreateToCustomize(input) {
+  return (
+    input.fresh === true &&
+    shouldHandoffToCustomize(input.merchRef) &&
+    input.hasCreatedSession === true
+  );
+}
+
+/**
+ * @returns {boolean}
+ */
+export function hasCreatedCardSession() {
+  try {
+    const raw = sessionStorage.getItem("hc_created");
+    if (!raw) return false;
+    const parsed = JSON.parse(raw);
+    return typeof parsed?.owner_private_key_b58 === "string" && parsed.owner_private_key_b58.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * @param {string} href
  * @param {string | null} ref
  * @returns {string}

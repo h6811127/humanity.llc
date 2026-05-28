@@ -11,8 +11,8 @@
 | Step | Spec / surface | Symptom | Root cause |
 |------|----------------|---------|------------|
 | **1** | Pages dev (`site/_redirects`) | `Infinite loop detected` for `/shop/products/*` | Rewrite target `index.html` is normalized by Pages and re-matches the splat rule ([same class of bug as `/create`](site/_redirects) comment) |
-| **2** | `e2e/device-os-wallet.spec.ts` · `e2e/keys-custody-emphasis-webkit.spec.ts` | `detail` ↔ **Acknowledge** gap **66–68px** (limit **&lt; 56**) | Wallet custody puts `.hc-notice-foot` **inside** `__main` between detail and the actions row; E2E measures detail bottom → ack top |
-| **3** | `e2e/merch-funnel-customize.spec.ts` | Stays on `/created/?…&hc_ref=scan_customize` | `created-merch-funnel.mjs` shows customize CTA card only; E2E + exit checklist expect **auto-redirect** to `/shop/customize/` on fresh `scan_customize` create |
+| **2** | `e2e/device-os-wallet.spec.ts` · `e2e/keys-custody-emphasis-webkit.spec.ts` | Wallet `--wallet` foot below Acknowledge; detail ↔ button gap **&lt; 56px** | **Shipped** — `afterActionsHtml` on emphasis card; foot moved out of `__main` |
+| **3** | `e2e/merch-funnel-customize.spec.ts` | Fresh `scan_customize` create → `/shop/customize/` | **Shipped** — `location.replace()` when `hc_created` session readable |
 | — | Wrangler / workerd stderr | `Broken pipe` on Playwright teardown | Benign shutdown noise when Pages dev stops worker; not a product failure |
 
 **Passing:** 84 specs in the Device shell E2E bundle; worker Vitest gate runs before Playwright in the same workflow.
@@ -98,4 +98,5 @@ Update this doc **Status** to **Closed** when all steps pass in CI.
 | Date | Note |
 |------|------|
 | 2026-05-28 | Opened from CI Device shell E2E failures (3 Playwright specs + `_redirects` warning) |
-| 2026-05-28 | **Step 1 shipped:** product detail shell → `detail.html`; `_redirects` splat target updated |
+| 2026-05-28 | **Step 2 shipped:** wallet custody foot below Acknowledge (`afterActionsHtml`) |
+| 2026-05-28 | **Step 3 shipped:** fresh customize handoff auto-redirect on `/created/` |

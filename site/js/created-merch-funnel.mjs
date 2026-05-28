@@ -3,10 +3,12 @@
  * See docs/MERCH_FUNNEL_MVP.md exit checklist step 2.
  */
 import {
+  hasCreatedCardSession,
   merchCustomizeUrlFromRef,
   peekMerchCustomizeRef,
   persistMerchCreateRef,
   readMerchRefFromUrl,
+  shouldRedirectFreshCreateToCustomize,
   shouldShowCreatedMerchCustomizeCard,
 } from "./merch-funnel-core.mjs";
 
@@ -32,6 +34,17 @@ export function initCreatedMerchFunnel(opts = {}) {
   const customizeUrl = merchCustomizeUrlFromRef(merchRef, location.origin);
   if (!customizeUrl) {
     card.hidden = true;
+    return;
+  }
+
+  if (
+    shouldRedirectFreshCreateToCustomize({
+      fresh,
+      merchRef,
+      hasCreatedSession: hasCreatedCardSession(),
+    })
+  ) {
+    location.replace(customizeUrl);
     return;
   }
 

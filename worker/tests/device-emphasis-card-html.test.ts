@@ -33,7 +33,7 @@ describe("device-emphasis-card-html", () => {
   it("landing index busts styles.css cache when spacing changes", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain('href="/css/hc-emphasis-card.css?v=4"');
-    expect(html).toContain("styles.css?v=128");
+    expect(html).toContain("styles.css?v=129");
   });
 
   it("landing final CTA uses urgent emphasis card and standard CTA", () => {
