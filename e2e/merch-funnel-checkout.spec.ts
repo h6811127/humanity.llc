@@ -14,6 +14,7 @@ const E2E_PLANNED_QR = "qr_8Yk9nQ3oR5sU7wX9zA2bC3dE6fG";
 const OPEN_SHOP_CONFIG = {
   version: 1,
   site_origin: "http://127.0.0.1:8788",
+  e2e_skip_pre_mint_sign: true,
   personalize: {
     checkout_open: true,
     products: [
@@ -33,31 +34,36 @@ const E2E_SESSION = {
   profile_id: E2E_PROFILE,
   qr_id: E2E_CARD_QR,
   handle: "e2e_merch_checkout",
-  owner_private_key_b58: "e2e_stub_key",
+  owner_public_key_b58: "pubkeyfortestonlyxxxxxxxxxxxx",
+  owner_private_key_b58: "privkeyfortestonlyxxxxxxxxx",
   scan_url: `http://127.0.0.1:8787/c/${E2E_PROFILE}?q=${E2E_CARD_QR}`,
 };
 
 test.describe("merch funnel checkout handoff", () => {
-  test.beforeEach(async ({ page }) => {
+  test("navigates to Shopify cart with artifact_intent_id in same tab", async ({ page }) => {
     await page.addInitScript((payload) => {
       sessionStorage.clear();
       localStorage.clear();
       window.__HC_E2E_SHOP_CONFIG__ = payload.config;
       sessionStorage.setItem("hc_created", JSON.stringify(payload.session));
-      const open = window.open.bind(window);
-      window.open = (url, target, features) => {
-        if (typeof url === "string" && url) {
-          window.__HC_E2E_LAST_CHECKOUT_URL = url;
-        }
-        return open(url, target, features);
-      };
     }, { config: OPEN_SHOP_CONFIG, session: E2E_SESSION });
 
-    // Resolver API (8787) — glob **/v1/... does not match host:port URLs in Playwright.
     await page.route(/artifact-intents/, async (route) => {
       const url = route.request().url();
       if (route.request().method() !== "POST") {
         await route.fulfill({ status: 405 });
+        return;
+      }
+      if (/\/pre-mint$/.test(url)) {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            artifact_intent_id: E2E_INTENT,
+            pre_mint_ready: true,
+            planned_item_count: 1,
+          }),
+        });
         return;
       }
       if (/\/attach$/.test(url)) {
@@ -67,6 +73,7 @@ test.describe("merch funnel checkout handoff", () => {
           body: JSON.stringify({
             artifact_intent_id: E2E_INTENT,
             planned_item_qr_ids: [E2E_PLANNED_QR],
+            planned_print_artifact_ids: ["pa_e2e1"],
             shopify: {
               cart_line_attributes: [
                 { key: "artifact_intent_id", value: E2E_INTENT },
@@ -88,9 +95,7 @@ test.describe("merch funnel checkout handoff", () => {
         }),
       });
     });
-  });
 
-  test("opens Shopify cart with artifact_intent_id line property", async ({ page }) => {
     await page.goto("/shop/customize/?hc_ref=customize_shop");
 
     await expect(page.locator("#shop-customize-card-ready")).toBeVisible({
@@ -105,16 +110,9 @@ test.describe("merch funnel checkout handoff", () => {
     await page.locator("#shop-customize-approve").check();
     await expect(page.locator("#shop-customize-checkout")).toBeEnabled();
 
-    const [popup] = await Promise.all([
-      page.waitForEvent("popup"),
-      page.locator("#shop-customize-checkout").click(),
-    ]);
-
-    const checkoutHref = await page.evaluate(
-      () => window.__HC_E2E_LAST_CHECKOUT_URL ?? ""
-    );
-    const checkoutUrl = new URL(checkoutHref);
+    await page.locator("#shop-customize-checkout").click();
+    await page.waitForURL(/store\.example\/cart\//, { timeout: 15_000 });
+    const checkoutUrl = new URL(page.url());
     expect(checkoutUrl.searchParams.get("properties[artifact_intent_id]")).toBe(E2E_INTENT);
-    await popup.close();
   });
 });

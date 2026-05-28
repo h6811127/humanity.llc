@@ -13,7 +13,7 @@ import {
   jsonResponse,
   withCors,
 } from "./http/resolver";
-import { handlePostArtifactIntent, handlePostArtifactIntentAttach } from "./resolver/artifact-intents";
+import { handlePostArtifactIntent, handlePostArtifactIntentAttach, handlePostArtifactIntentPreMint } from "./resolver/artifact-intents";
 import { handleGetStoreOrderStatus } from "./resolver/store-order-status";
 import { handleGetCard, handlePostCards } from "./resolver/create-card";
 import {
@@ -720,6 +720,24 @@ export default {
         request,
         env.DB,
         artifactIntentAttachMatch[1]!
+      );
+      return withCors(request, res);
+    }
+
+    const artifactIntentPreMintMatch = path.match(
+      /^\/v1\/store\/artifact-intents\/([^/]+)\/pre-mint$/
+    );
+    if (artifactIntentPreMintMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostArtifactIntentPreMint(
+        request,
+        env.DB,
+        artifactIntentPreMintMatch[1]!
       );
       return withCors(request, res);
     }

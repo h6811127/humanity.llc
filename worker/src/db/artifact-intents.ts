@@ -17,6 +17,7 @@ export interface ArtifactIntentRow {
   quantity: number;
   planned_item_qr_ids_json: string;
   planned_print_artifact_ids_json: string;
+  pending_mint_credentials_json: string | null;
   status: ArtifactIntentStatus;
   expires_at: string;
   created_at: string;
@@ -72,11 +73,28 @@ export async function getArtifactIntent(
     .prepare(
       `SELECT artifact_intent_id, profile_id, source_qr_id, product_id, quantity,
               planned_item_qr_ids_json, planned_print_artifact_ids_json,
+              pending_mint_credentials_json,
               status, expires_at, created_at, updated_at
        FROM artifact_intents WHERE artifact_intent_id = ?`
     )
     .bind(artifactIntentId)
     .first<ArtifactIntentRow>();
+}
+
+export async function updateArtifactIntentPendingMint(
+  db: D1Database,
+  artifactIntentId: string,
+  pendingMintCredentialsJson: string,
+  updatedAt: string
+): Promise<void> {
+  await db
+    .prepare(
+      `UPDATE artifact_intents
+       SET pending_mint_credentials_json = ?, updated_at = ?
+       WHERE artifact_intent_id = ?`
+    )
+    .bind(pendingMintCredentialsJson, updatedAt, artifactIntentId)
+    .run();
 }
 
 export async function updateArtifactIntentStatus(

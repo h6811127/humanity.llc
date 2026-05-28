@@ -30,6 +30,7 @@ import { errorResponse, jsonResponse } from "./resolver";
 import { verifyShopifyWebhookHmac } from "./shopify-webhook-verify";
 import type { Env } from "../env";
 import { generateCommerceOrderId } from "../id";
+import { tryAutoMintQueuedPrintOrders, type AutoMintFromIntentsResult } from "../commerce/fulfillment-auto-mint";
 import { queuePrintOrderAfterPaidWebhook } from "../print/print-orders-handler";
 
 const PAID_TOPICS = new Set(["orders/paid", "orders/create"]);
@@ -44,7 +45,11 @@ interface IntentValidation {
   fulfillment_mode: "personalized" | "tier0_batch" | null;
 }
 
-function commerceOrderResponse(row: CommerceOrderRow, duplicate = false) {
+function commerceOrderResponse(
+  row: CommerceOrderRow,
+  duplicate = false,
+  autoMint: AutoMintFromIntentsResult[] = []
+) {
   const intentIds = JSON.parse(row.artifact_intent_ids_json) as string[];
   return {
     commerce_order_id: row.commerce_order_id,
@@ -62,6 +67,15 @@ function commerceOrderResponse(row: CommerceOrderRow, duplicate = false) {
           ? "personalized"
           : null,
     duplicate,
+    ...(autoMint.length > 0
+      ? {
+          auto_mint: autoMint.map((result) => ({
+            attempted: result.attempted,
+            all_planned_minted: result.all_planned_minted,
+            print_order_id: result.print_order_id,
+          })),
+        }
+      : {}),
   };
 }
 
@@ -184,27 +198,43 @@ async function markIntentsConverted(
 }
 
 async function recoverDuplicateProcessingOrder(
+  request: Request,
+  env: Env,
   db: D1Database,
   row: CommerceOrderRow,
   nowIso: string
-): Promise<CommerceOrderRow> {
-  if (row.status !== "processing") return row;
+): Promise<{ row: CommerceOrderRow; autoMint: AutoMintFromIntentsResult[] }> {
+  if (row.status !== "processing") {
+    return { row, autoMint: [] };
+  }
 
   const printOrderIds = await queuePrintOrderAfterPaidWebhook(db, row, nowIso);
+  const intentIds = JSON.parse(row.artifact_intent_ids_json) as string[];
+  const autoMint = await tryAutoMintQueuedPrintOrders(
+    request,
+    env,
+    db,
+    printOrderIds,
+    intentIds
+  );
   return {
-    ...row,
-    print_order_ids_json: JSON.stringify(printOrderIds),
-    updated_at: printOrderIds.length > 0 ? nowIso : row.updated_at,
+    row: {
+      ...row,
+      print_order_ids_json: JSON.stringify(printOrderIds),
+      updated_at: printOrderIds.length > 0 ? nowIso : row.updated_at,
+    },
+    autoMint,
   };
 }
 
 async function handlePaidOrder(
+  request: Request,
   db: D1Database,
   order: ShopifyOrderLike,
   env: Env,
   nowIso: string
 ): Promise<
-  | { ok: true; row: CommerceOrderRow; duplicate: boolean }
+  | { ok: true; row: CommerceOrderRow; duplicate: boolean; autoMint: AutoMintFromIntentsResult[] }
   | { ok: false; response: Response }
 > {
   const metadata = extractShopifyOrderMetadata(order);
@@ -217,8 +247,13 @@ async function handlePaidOrder(
 
   const existing = await getCommerceOrderByShopifyId(db, metadata.shopify_order_id);
   if (existing) {
-    const recovered = await recoverDuplicateProcessingOrder(db, existing, nowIso);
-    return { ok: true, row: recovered, duplicate: true };
+    const recovered = await recoverDuplicateProcessingOrder(request, env, db, existing, nowIso);
+    return {
+      ok: true,
+      row: recovered.row,
+      duplicate: true,
+      autoMint: recovered.autoMint,
+    };
   }
 
   const validation = await resolvePaidOrderValidation(db, order, metadata, env, nowIso);
@@ -256,6 +291,7 @@ async function handlePaidOrder(
   }
 
   let printOrderIds: string[] = [];
+  let autoMint: AutoMintFromIntentsResult[] = [];
   const row: CommerceOrderRow = {
     commerce_order_id: commerceOrderId,
     shopify_order_id: metadata.shopify_order_id,
@@ -274,9 +310,16 @@ async function handlePaidOrder(
   if (validation.status === "processing") {
     printOrderIds = await queuePrintOrderAfterPaidWebhook(db, row, nowIso);
     row.print_order_ids_json = JSON.stringify(printOrderIds);
+    autoMint = await tryAutoMintQueuedPrintOrders(
+      request,
+      env,
+      db,
+      printOrderIds,
+      validation.artifact_intent_ids
+    );
   }
 
-  return { ok: true, row, duplicate: false };
+  return { ok: true, row, duplicate: false, autoMint };
 }
 
 async function handleStatusOrder(
@@ -370,10 +413,13 @@ export async function handlePostShopifyOrdersWebhook(
     if (topic === "orders/create" && !shopifyOrderIsPaid(order)) {
       return jsonResponse({ ignored: true, topic, reason: "not_paid" }, 200);
     }
-    const paid = await handlePaidOrder(db, order, env, nowIso);
+    const paid = await handlePaidOrder(request, db, order, env, nowIso);
     if (!paid.ok) return paid.response;
     commerceOrderId = paid.row.commerce_order_id;
-    response = jsonResponse(commerceOrderResponse(paid.row, paid.duplicate), 200);
+    response = jsonResponse(
+      commerceOrderResponse(paid.row, paid.duplicate, paid.autoMint),
+      200
+    );
   } else if (CANCELED_TOPICS.has(topic)) {
     response = (await handleStatusOrder(db, order, "canceled", nowIso))!;
     const existing = metadata

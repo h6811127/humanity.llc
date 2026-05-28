@@ -27,10 +27,56 @@ function normalizeCardSession(entry) {
 }
 
 /**
+ * @param {Record<string, unknown>} entry
+ */
+function normalizeSigningSession(entry) {
+  const base = normalizeCardSession(entry);
+  if (!base) return null;
+  const ownerPrivate =
+    typeof entry.owner_private_key_b58 === "string" ? entry.owner_private_key_b58 : null;
+  const recoveryPrivate =
+    typeof entry.recovery_private_key_b58 === "string" ? entry.recovery_private_key_b58 : null;
+  const ownerPublic =
+    typeof entry.owner_public_key_b58 === "string" ? entry.owner_public_key_b58 : null;
+  const recoveryPublic =
+    typeof entry.recovery_public_key_b58 === "string" ? entry.recovery_public_key_b58 : null;
+  const privateKeyBase58 = ownerPrivate || recoveryPrivate;
+  const publicKeyBase58 = ownerPrivate ? ownerPublic : recoveryPublic;
+  if (!privateKeyBase58 || !publicKeyBase58) return null;
+  return {
+    ...base,
+    private_key_b58: privateKeyBase58,
+    public_key_b58: publicKeyBase58,
+  };
+}
+
+/**
  * Card session from hc_created, else first wallet entry with keys.
  * @returns {{ profile_id: string, qr_id: string, handle: string | null, scan_url: string | null } | null}
  */
 export function loadCardSessionForCustomize(storage = globalThis) {
+  const signing = loadCardSigningSessionForCustomize(storage);
+  if (!signing) return null;
+  return {
+    profile_id: signing.profile_id,
+    qr_id: signing.qr_id,
+    handle: signing.handle,
+    scan_url: signing.scan_url,
+  };
+}
+
+/**
+ * Card session with signing keys for pre-checkout print_artifact mint credentials.
+ * @returns {{
+ *   profile_id: string;
+ *   qr_id: string;
+ *   handle: string | null;
+ *   scan_url: string | null;
+ *   private_key_b58: string;
+ *   public_key_b58: string;
+ * } | null}
+ */
+export function loadCardSigningSessionForCustomize(storage = globalThis) {
   const sessionStorage = storage.sessionStorage;
   const localStorage = storage.localStorage;
   if (sessionStorage) {
@@ -39,7 +85,7 @@ export function loadCardSessionForCustomize(storage = globalThis) {
       if (raw) {
         const parsed = JSON.parse(raw);
         if (hasSigningKeys(parsed)) {
-          const normalized = normalizeCardSession(parsed);
+          const normalized = normalizeSigningSession(parsed);
           if (normalized) return normalized;
         }
       }
@@ -53,7 +99,7 @@ export function loadCardSessionForCustomize(storage = globalThis) {
       if (Array.isArray(wallet)) {
         for (const entry of wallet) {
           if (!hasSigningKeys(entry)) continue;
-          const normalized = normalizeCardSession(entry);
+          const normalized = normalizeSigningSession(entry);
           if (normalized) return normalized;
         }
       }

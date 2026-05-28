@@ -96,6 +96,7 @@ describe("loadCardSessionForCustomize", () => {
               qr_id: "qr_1",
               handle: "river",
               owner_private_key_b58: "k",
+              owner_public_key_b58: "pubk",
             });
           }
           return null;
@@ -118,7 +119,12 @@ describe("loadCardSessionForCustomize", () => {
         getItem(key) {
           if (key === "hc_wallet") {
             return JSON.stringify([
-              { profile_id: "p2", qr_id: "qr_2", recovery_private_key_b58: "r" },
+              {
+                profile_id: "p2",
+                qr_id: "qr_2",
+                recovery_private_key_b58: "r",
+                recovery_public_key_b58: "pubr",
+              },
             ]);
           }
           return null;

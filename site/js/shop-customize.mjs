@@ -12,10 +12,16 @@ import {
   readMerchRefFromUrl,
 } from "./merch-funnel-core.mjs";
 import {
+  postArtifactIntentPreMint,
+  signPlannedPrintArtifactCredentials,
+} from "./shop-artifact-pre-mint.mjs";
+import { goToShopifyCheckout } from "./shop-checkout-handoff.mjs";
+import {
   buildPlannedItemScanUrl,
   buildShopifyCartUrl,
   isPersonalizeCheckoutReady,
   loadCardSessionForCustomize,
+  loadCardSigningSessionForCustomize,
   personalizeProductDisplay,
   personalizeProducts,
 } from "./shop-customize-core.mjs";
@@ -49,8 +55,8 @@ const createLink = document.getElementById("shop-customize-create-link");
 
 /** @type {Record<string, unknown> | null} */
 let shopConfig = null;
-/** @type {ReturnType<typeof loadCardSessionForCustomize> | null} */
-let cardSession = null;
+/** @type {ReturnType<typeof loadCardSigningSessionForCustomize> | null} */
+let signingSession = null;
 /** @type {string | null} */
 let selectedProductId = null;
 /** @type {{ artifact_intent_id: string, planned_item_qr_ids: string[], shopify?: { cart_line_attributes: { key: string, value: string }[] } } | null} */
@@ -141,20 +147,20 @@ function syncMockPreviewKind() {
 }
 
 function cardFallbackScanUrl() {
-  if (!cardSession) return null;
-  return cardSession.scan_url || qrScanUrl(cardSession.profile_id, cardSession.qr_id);
+  if (!signingSession) return null;
+  return signingSession.scan_url || qrScanUrl(signingSession.profile_id, signingSession.qr_id);
 }
 
 async function createArtifactIntent(product) {
-  if (!cardSession) throw new Error("Create a card first.");
+  if (!signingSession) throw new Error("Create a card first.");
   const display = personalizeProductDisplay(product);
   const origin = resolverApiOrigin();
   const res = await fetch(`${origin}/v1/store/artifact-intents`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify({
-      profile_id: cardSession.profile_id,
-      source_qr_id: cardSession.qr_id,
+      profile_id: signingSession.profile_id,
+      source_qr_id: signingSession.qr_id,
       product_id: display.productId,
       quantity: 1,
       shopify_variant_id: display.shopifyVariantId || undefined,
@@ -173,7 +179,7 @@ async function createArtifactIntent(product) {
   return data;
 }
 
-async function attachArtifactIntent(intentId, product) {
+async function attachArtifactIntent(intentId, product, proofAcknowledged) {
   const display = personalizeProductDisplay(product);
   const origin = resolverApiOrigin();
   const res = await fetch(
@@ -183,6 +189,7 @@ async function attachArtifactIntent(intentId, product) {
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({
         shopify_variant_id: display.shopifyVariantId || undefined,
+        proof_acknowledged: proofAcknowledged === true,
       }),
     }
   );
@@ -195,10 +202,16 @@ async function attachArtifactIntent(intentId, product) {
   return data;
 }
 
-async function ensureIntent(product) {
+async function ensureArtifactIntent(product) {
   if (activeIntent?.artifact_intent_id) return activeIntent;
-  const created = await createArtifactIntent(product);
-  const attached = await attachArtifactIntent(created.artifact_intent_id, product);
+  activeIntent = await createArtifactIntent(product);
+  return activeIntent;
+}
+
+async function prepareCheckoutIntent(product) {
+  const intent = await ensureArtifactIntent(product);
+  if (intent.shopify?.cart_line_attributes?.length) return intent;
+  const attached = await attachArtifactIntent(intent.artifact_intent_id, product, true);
   activeIntent = attached;
   return attached;
 }
@@ -300,7 +313,7 @@ function previewStatusMessage(product) {
 
 async function refreshPreview() {
   const product = selectedProduct();
-  if (!product || !previewImg || !cardSession) return;
+  if (!product || !previewImg || !signingSession) return;
   syncMockPreviewKind();
   const display = personalizeProductDisplay(product);
   if (priceEl) {
@@ -317,10 +330,10 @@ async function refreshPreview() {
       : "https://humanity.llc";
 
   try {
-    const intent = await ensureIntent(product);
+    const intent = await ensureArtifactIntent(product);
     const plannedQrId = intent.planned_item_qr_ids?.[0];
     if (!plannedQrId) throw new Error("Missing planned QR for preview.");
-    const scanUrl = buildPlannedItemScanUrl(cardSession.profile_id, plannedQrId, origin);
+    const scanUrl = buildPlannedItemScanUrl(signingSession.profile_id, plannedQrId, origin);
     await renderPreviewScanUrl(scanUrl);
     previewMode = "planned";
     if (previewNote) {
@@ -345,25 +358,43 @@ async function refreshPreview() {
 
 async function onCheckoutClick() {
   const product = selectedProduct();
-  if (!product || !personalizeProofConsentComplete(product)) return;
+  if (!product || !personalizeProofConsentComplete(product) || !signingSession) return;
   if (previewMode === "card_fallback") {
     setStatus("Print setup is still finishing. Try again in a moment.", true);
     activeIntent = null;
     void refreshPreview();
     return;
   }
-  setStatus("Opening checkout…");
+  setStatus("Preparing checkout…");
   if (checkoutBtn) checkoutBtn.disabled = true;
   try {
-    const intent = await ensureIntent(product);
+    const intent = await prepareCheckoutIntent(product);
+    const plannedQrIds = intent.planned_item_qr_ids ?? [];
+    const plannedPrintArtifactIds = intent.planned_print_artifact_ids ?? [];
+    if (!plannedQrIds.length || plannedQrIds.length !== plannedPrintArtifactIds.length) {
+      throw new Error("Print setup is incomplete. Refresh and try again.");
+    }
+    const siteOrigin =
+      typeof shopConfig?.site_origin === "string" && shopConfig.site_origin.trim()
+        ? shopConfig.site_origin.trim()
+        : undefined;
+    if (shopConfig?.e2e_skip_pre_mint_sign !== true) {
+      const credentials = await signPlannedPrintArtifactCredentials({
+        profileId: signingSession.profile_id,
+        plannedItemQrIds: plannedQrIds,
+        plannedPrintArtifactIds,
+        privateKeyBase58: signingSession.private_key_b58,
+        publicKeyBase58: signingSession.public_key_b58,
+        siteOrigin,
+      });
+      await postArtifactIntentPreMint(intent.artifact_intent_id, credentials);
+    }
     const attrs = intent.shopify?.cart_line_attributes ?? [];
     const display = personalizeProductDisplay(product);
     const url = buildShopifyCartUrl(display.checkoutUrl, 1, attrs);
-    window.open(url, "_blank", "noopener,noreferrer");
-    setStatus("Checkout opened in a new tab. Complete payment on Shopify.");
+    goToShopifyCheckout(url);
   } catch (err) {
     setStatus(err instanceof Error ? err.message : "Checkout failed.", true);
-  } finally {
     if (checkoutBtn) checkoutBtn.disabled = false;
   }
 }
@@ -375,7 +406,7 @@ function showCardGate() {
 }
 
 function showCardReady(session) {
-  cardSession = session;
+  signingSession = session;
   cardGate?.setAttribute("hidden", "");
   cardReady?.removeAttribute("hidden");
   if (handleEl) {
@@ -425,7 +456,7 @@ async function init() {
     shopConfig = {};
   }
 
-  const session = loadCardSessionForCustomize();
+  const session = loadCardSigningSessionForCustomize();
   if (!session) {
     showCardGate();
     return;

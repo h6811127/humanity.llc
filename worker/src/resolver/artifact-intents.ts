@@ -1,7 +1,9 @@
+import { validatePreMintCredentialsForIntent } from "../commerce/pre-mint-credentials";
 import { PROFILE_ID_REGEX } from "../crypto";
 import {
   getArtifactIntent,
   insertArtifactIntent,
+  updateArtifactIntentPendingMint,
   updateArtifactIntentStatus,
   type ArtifactIntentRow,
 } from "../db/artifact-intents";
@@ -27,6 +29,10 @@ interface ArtifactIntentRequest {
   quantity?: unknown;
   shopify_variant_id?: unknown;
   proof_acknowledged?: unknown;
+}
+
+interface ArtifactIntentPreMintRequest {
+  qr_credentials?: unknown;
 }
 
 interface BlockReason {
@@ -300,6 +306,7 @@ export async function handlePostArtifactIntent(
     quantity,
     planned_item_qr_ids_json: JSON.stringify(plannedItemQrIds),
     planned_print_artifact_ids_json: JSON.stringify(plannedPrintArtifactIds),
+    pending_mint_credentials_json: null,
     status: "proofed",
     expires_at: expiresAt,
     created_at: createdAt,
@@ -379,6 +386,82 @@ export async function handlePostArtifactIntentAttach(
       resolvePrintTemplateForStoreProductId(row.product_id)
     ),
   });
+}
+
+/**
+ * POST /v1/store/artifact-intents/{id}/pre-mint
+ * Store owner-signed print_artifact credentials before Shopify checkout.
+ * Credentials are minted automatically after the paid webhook.
+ */
+export async function handlePostArtifactIntentPreMint(
+  request: Request,
+  db: D1Database,
+  artifactIntentId: string
+): Promise<Response> {
+  let body: ArtifactIntentPreMintRequest;
+  try {
+    body = (await request.json()) as ArtifactIntentPreMintRequest;
+  } catch {
+    return errorResponse("MALFORMED_REQUEST", "Invalid JSON body.", 400);
+  }
+
+  if (!Array.isArray(body.qr_credentials) || body.qr_credentials.length === 0) {
+    return errorResponse(
+      "MALFORMED_REQUEST",
+      "Body must include qr_credentials array.",
+      400
+    );
+  }
+
+  const row = await getArtifactIntent(db, artifactIntentId);
+  if (!row) {
+    return errorResponse("ARTIFACT_INTENT_NOT_FOUND", "Artifact intent not found.", 404);
+  }
+
+  const nowMs = Date.now();
+  if (isIntentExpired(row, nowMs)) {
+    if (row.status !== "expired" && row.status !== "converted") {
+      await updateArtifactIntentStatus(db, artifactIntentId, "expired", new Date().toISOString());
+    }
+    return errorResponse("ARTIFACT_INTENT_EXPIRED", "Artifact intent has expired.", 410);
+  }
+
+  if (row.status === "blocked" || row.status === "converted") {
+    return errorResponse(
+      "ARTIFACT_INTENT_UNAVAILABLE",
+      "Artifact intent cannot accept pre-mint credentials.",
+      409
+    );
+  }
+
+  const validation = await validatePreMintCredentialsForIntent(
+    request,
+    db,
+    row,
+    body.qr_credentials
+  );
+  if (!validation.ok) {
+    return errorResponse(validation.code, validation.message, validation.httpStatus);
+  }
+
+  const updatedAt = new Date().toISOString();
+  await updateArtifactIntentPendingMint(
+    db,
+    artifactIntentId,
+    JSON.stringify(validation.credentials),
+    updatedAt
+  );
+
+  return jsonResponse(
+    {
+      artifact_intent_id: artifactIntentId,
+      profile_id: row.profile_id,
+      pre_mint_ready: true,
+      planned_item_count: validation.credentials.length,
+      status: row.status,
+    },
+    200
+  );
 }
 
 export { shopifyCartMetadata };

@@ -118,10 +118,9 @@ CUSTOM /shop/customize/
         ├─ preview planned QR (artifact intent)
         ├─ user approves limits checkbox
         └─ buildShopifyCartUrl(checkout_url, properties[artifact_intent_id], …)
-CHECKOUT  Shopify (new tab) — buyer pays
-WEBHOOK   Shopify orders/paid → Worker validates intent → commerce order (processing) · encrypted shipping capture (PM-FR-41)
-QUEUE     print order (awaiting_production_approval)
-MINT      operator POST …/print/orders/{id}/mint (owner-signed qr_credentials)
+           + POST …/pre-mint (owner-signed qr_credentials)
+CHECKOUT  Shopify (same tab) — buyer pays
+WEBHOOK   Shopify orders/paid → commerce order → print queue → auto-mint when pre-mint stored
 SUBMIT    operator POST …/print/orders { submit_to_printify: true } — shipping from encrypted store or body override
 PRINTIFY  production → ship → webhook status sync
 WEAR      Owner updates manifesto from phone; same ink, new meaning
@@ -192,7 +191,7 @@ Deploy: `npm run worker:deploy`. Route `humanity.llc/v1/*` required for artifact
 | Shopify cart URL + line `properties[artifact_intent_id]` | ✅ Shipped | [`shop-customize-core.mjs`](../site/js/shop-customize-core.mjs) |
 | Paid webhook → commerce order → print queue | ✅ Shipped | [`shopify-orders-webhook.ts`](../worker/src/http/shopify-orders-webhook.ts) |
 | Tier 1 template → Printify env mapping | ✅ Shipped | [`printify-template-config.ts`](../worker/src/print/printify-template-config.ts) |
-| Operator mint planned QRs | ✅ Shipped | [`fulfillment-mint.ts`](../worker/src/commerce/fulfillment-mint.ts) |
+| Operator mint planned QRs | ✅ Shipped | Auto-mint after paid webhook when pre-mint credentials stored · manual `POST …/mint` fallback |
 | Printify order submit (product/variant line) | ✅ Shipped | [`printify-client.ts`](../worker/src/print/printify-client.ts) — operator-gated |
 | Printify webhook status sync | ✅ Shipped | O-003 slice |
 | **Per-order artwork upload to Printify** | ✅ Shipped (PR #63) | PM-FR-13 — [`printify-upload.ts`](../worker/src/print/printify-upload.ts) · [`printify-line-items.ts`](../worker/src/print/printify-line-items.ts). Upload SVG → ephemeral product with `print_areas` → order line item per planned QR. Requires `PERSONALIZE_*_PRINTIFY_BLUEPRINT_ID` + `PRINT_PROVIDER_ID`. |
@@ -239,9 +238,10 @@ Deploy: `npm run worker:deploy`. Route `humanity.llc/v1/*` required for artifact
 - [ ] Physical sample sign-off ([`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md))
 - [ ] Automated regression: `npm run worker:test:merch-print-qa`
 
-### 6. Post-payment ops (until fully automated)
+### 6. Post-payment ops (Printify submit remains operator-gated)
 
-- [ ] Mint: `POST /v1/print/orders/{id}/mint` with owner-signed credentials
+- [ ] **Auto-mint:** Buyer pre-signs at `/shop/customize/` checkout → paid webhook mints planned QRs (no buyer action after pay)
+- [ ] **Manual fallback:** Mint: `POST /v1/print/orders/{id}/mint` when pre-mint was skipped or failed
 - [ ] Submit: `POST /v1/print/orders` `{ commerce_order_id, submit_to_printify: true }` (shipping from encrypted store when key configured; optional `shipping_address` body override)
 
 ---
