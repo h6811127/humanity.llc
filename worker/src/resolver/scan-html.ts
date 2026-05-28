@@ -19,6 +19,12 @@ import {
   credentialCodeFromScanUrl,
   deriveCredentialCodeSync,
 } from "../../../site/js/qr-credential-code.mjs";
+import {
+  isChildObjectScope,
+  qrNoCalendarExpirySubtitle,
+  qrScopeRelationshipCopy,
+  qrTrustGroupScopeSubtitle,
+} from "../../../site/js/object-taxonomy-core.mjs";
 import { renderScanQrMarkup } from "./scan-qr";
 import {
   EMPTY_SCAN_SAFETY,
@@ -300,10 +306,14 @@ function renderStewardStrip(
 ): string {
   const parts: string[] = [];
   if (vm.handle && !opts.omitHandle) {
-    parts.push(`Controlled by @${vm.handle}`);
+    const relationship = qrScopeRelationshipCopy({
+      scope: vm.qrScope,
+      handle: vm.handle,
+    });
+    if (relationship) parts.push(relationship);
   }
   const expiry =
-    vm.qrScope === "print_artifact"
+    isChildObjectScope(vm.qrScope)
       ? null
       : formatQrExpiryLabel(vm.qrExpiresAt);
   if (expiry && vm.kind === "active") {
@@ -958,18 +968,16 @@ function renderVouchSection(vm: ScanViewModel, origin: string): string {
 
 function qrGroupRows(vm: ScanViewModel): string {
   const status = vm.qrStatus ? `QR ${formatQrStatus(vm.qrStatus)}` : "QR unknown";
-  const scope =
-    vm.qrScope === "print_artifact"
-      ? "Printed item  -  revoke one artifact without killing the card"
-      : "Card-scoped credential";
+  const scope = qrTrustGroupScopeSubtitle(vm.qrScope);
   const rows = [listRow("qr", qrStatusIconTone(vm), status, scope)];
-  if (vm.qrScope === "print_artifact" && vm.kind === "active") {
+  const noCalendarExpirySubtitle = qrNoCalendarExpirySubtitle(vm.qrScope);
+  if (noCalendarExpirySubtitle && vm.kind === "active") {
     rows.push(
       listRow(
         "qr",
         "green",
         "No calendar expiry",
-        "This object QR stays valid until the owner revokes or replaces it"
+        noCalendarExpirySubtitle
       )
     );
   }
