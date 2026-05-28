@@ -40,6 +40,7 @@ const CHANNEL_NAME = RESOLVER_SYNC_CHANNEL;
  *   profile_id: string;
  *   status: string;
  *   scanKind: string | null;
+ *   qrScope?: string | null;
  *   verification?: { label?: string; state?: string } | null;
  *   cachedAt: number;
  *   resolverConfirmed: boolean;
@@ -286,6 +287,7 @@ export function broadcastNetworkSnapshotIfEligible(detail) {
       profile_id: pid,
       status,
       scanKind,
+      qrScope: cached?.qrScope ?? null,
       verification: cached
         ? verificationRecordFromLabelState(
             cached.verificationLabel,

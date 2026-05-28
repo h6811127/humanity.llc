@@ -11,10 +11,10 @@ Two layers that must stay separate but feel like one product:
 
 | Layer | Where it lives | Job |
 |-------|----------------|-----|
-| **Device (browser shell)** | `localStorage` / `sessionStorage`, hub UI | Custody and control: where are my keys, what can I do next, what happened here |
-| **Network (physical software)** | Cloudflare Worker + D1, scan pages | Public truth: signed cards, live manifesto, revoke, vouch, live control |
+| **Device (browser shell)** | `localStorage` / `sessionStorage`, hub UI | Custody and control: where is my root key, what child objects can it manage, what happened here |
+| **Network (physical software)** | Cloudflare Worker + D1, scan pages | Public truth: root cards, child objects, live manifesto/state, revoke, vouch, live control |
 
-This is **not** a crypto wallet app and **not** a social network. It is **Settings + launcher** for keys you already created, on top of a **minimal public resolver**.
+This is **not** a crypto wallet app and **not** a social network. It is **Settings + launcher** for root keys you already created, on top of a **minimal public resolver**. Target model: one root key can control many child objects without adding a private key for each one ([`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)).
 
 ---
 
@@ -25,16 +25,16 @@ Before shipping UI, answer:
 | Question | Put it here |
 |----------|-------------|
 | Save, search, relabel, import backup, activity log, collapsed glance | **Device hub** (`#device-hub`) + glance strip |
-| Live proof **inbox** (pending challenges for saved cards) | **Device hub**  -  tap opens `/created/` to sign |
+| Live proof **inbox** (pending challenges for saved root cards / supported child QR scopes) | **Device hub**  -  tap opens `/created/` to sign |
 | Actionable **device inbox** (badge, alerts, glance) | **Chrome** + hub `#device-hub-alerts-top` - see [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
 | **Background alerts** (OS notifications, opt-in) | Device-only; live proof when tab hidden - see [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
-| Manifesto, revoke, QR, backup export | **Network object** + `/created/` **Advanced** tab |
+| Manifesto, child object state, revoke, QR, backup export | **Network object** + `/created/` **Advanced** tab |
 | Live proof **signing** | **`/created/`** only (existing proof panel + poll) |
 | What a stranger sees | **Scan page only**  -  never a second homepage demo |
 | Protocol essays, threat models, case study walkthrough | **Reference** (full docs in intro mode; Help & protocol footer in focus mode) |
 | Install app / Add to Home Screen (returning stewards) | **Device chrome** — shell pages only; never scan — [`PWA_INSTALL.md`](PWA_INSTALL.md) |
 
-**Do not put on the landing hub:** per-pin revoke, disable QR, or any signed network mutation without **Open controls → /created/**. Pins are public bookmarks only.
+**Do not put on the landing hub:** per-pin revoke, child disable, QR disable, or any signed network mutation without **Open controls → /created/**. Pins are public bookmarks only.
 
 ---
 
@@ -46,7 +46,7 @@ Before shipping UI, answer:
 |------|------|--------|
 | **Glance** | Network live / limited / offline, saved · pinned · notice counts | Status line + brand dot sheet |
 | **Inbox** | Action items: live proof, unsaved tab keys, cross-tab keys, card disabled since visit | `#shell-notif-badge`, hub alerts, glance rows - [`DEVICE_INBOX.md`](DEVICE_INBOX.md) |
-| **Act** | Hub: cards, pins, search, activity, shortcuts, import | `#device-hub` (expand to work) |
+| **Act** | Hub: root cards, child object shortcuts, pins, search, activity, shortcuts, import | `#device-hub` (expand to work) |
 | **Glance (collapsed hub)** | Notice + up to 3 saved labels (+ “N more”) | `#device-hub-glance` (landing only) |
 | **System** | Resolver degraded or offline (actionable) | `#device-system-banner` (landing only, hidden when ok) |
 | **Reference** | Features map, studio, case study, architecture, data policy | Full **Documentation** disclosure card (intro mode) or **Help & protocol** list (focus mode) |
@@ -86,7 +86,7 @@ Hides `[data-landing-tutorial]` (hero, **How it works**, One use, design choices
 
 ### Auto-save (`hc_auto_save_device`)
 
-Hub toggle (**on by default** until set to `"0"`): after create, write tab keys to `hc_wallet` without tapping **Save control key**. For returning users on a trusted browser  -  not a substitute for recovery key or encrypted backup. See `docs/CARD_WORKSPACE_PHASE0.md`.
+Hub toggle (**on by default** until set to `"0"`): after root-card create, write tab keys to `hc_wallet` without tapping **Save control key**. For returning users on a trusted browser  -  not a substitute for recovery key or encrypted backup. This matters more as one root key controls more child objects. See `docs/CARD_WORKSPACE_PHASE0.md`.
 
 ### Global information on the desktop (now vs later)
 
@@ -138,9 +138,9 @@ Same chrome on **landing**, **`/created/`**, and **`/wallet/`**:
 
 ---
 
-## Network layer (unchanged contract)
+## Network layer (root + child contract)
 
-- Signed card + QR + resolver status  
+- Signed root card + child object / QR + resolver status  
 - **Status plate**  -  first dogfooded template  
 - Scan = public truth  
 
@@ -209,7 +209,7 @@ Small TLC items that need **no new resolver APIs**:
 
 ### Owner key portability (shipped  -  see M5.5)
 
-Revoke and manage from a **new device** without a duplicate card is **in repo** (`docs/M5_5_OWNER_KEY_PORTABILITY.md`):
+Revoke and manage from a **new device** without a duplicate root card is **in repo** (`docs/M5_5_OWNER_KEY_PORTABILITY.md`). In the child-object model, importing the root backup restores control over the child tree too:
 
 - Encrypted backup export/import (`.hcbackup`, PBKDF2 + AES-GCM) on `/created/` and hub **Import backup**
 - Recovery key at create + recovery-signed revoke on the Worker
@@ -276,11 +276,11 @@ Merch and stranger tests do **not** block on further M5.5 work unless QA finds a
 | `site/js/device-network-health.mjs` | Shared resolver `/.well-known/hc/v1/health` fetch |
 | `site/js/device-tab-presence.mjs` | Cross-tab signing-key heartbeat |
 | `site/js/device-cross-tab-banner.mjs` | Cross-tab keys banner copy |
-| `site/js/device-live-control-inbox.mjs` | Poll pending challenges for saved cards |
+| `site/js/device-live-control-inbox.mjs` | Poll pending challenges for saved root cards / supported child QR scopes |
 | `site/js/device-wallet-network.mjs` | Resolver status cache for saved rows |
 | `site/js/wallet-page.mjs` | Wallet page init |
 | `site/js/device-hub-glance.mjs` | Collapsed-hub summary (landing) |
-| `site/wallet/index.html` | **My cards** device shell (`/wallet/`) |
+| `site/wallet/index.html` | **My cards** device shell (`/wallet/`) - target copy should evolve toward root keys + objects |
 | `site/js/device-status.mjs` | Status, banner, popover Help row |
 | `site/css/device-shell.css` | Shell materials, motion, system status chrome |
 | `docs/VISUAL_DEVICE_SHELL.md` | Visual / interaction philosophy + OSification roadmap |
