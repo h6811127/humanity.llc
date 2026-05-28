@@ -179,6 +179,7 @@ Aggregate metrics only — no PII. Allowed refs:
 
 | Step | Pass? |
 |------|-------|
+| Glitch drop PDP (`/shop/products/tier0_glitch_hoodie_v1/`) + store catalog API | ✅ Pages splat + Worker `GET /v1/store/products` · E2E `shop-product-detail` · `rollout:step5/6 -- --verify` |
 | Stranger scans campaign merch; profile loads with limits + customize CTA | ✅ scan hint · ☐ manual stranger QA |
 | Create card → `/shop/customize/` detects session | ✅ redirect + E2E `e2e/merch-funnel-customize.spec.ts` |
 | Preview shows LIVE OBJECT branded QR on product mockup | ✅ UI |
@@ -222,7 +223,7 @@ npm run merch-funnel:verify-config -- --require-checkout   # CI when Tier 1 goes
 | `merch-funnel:verify-exit:fast` | Same without E2E (quick CI subset) |
 | `worker:test:merch-funnel` | Ref helpers, config validation, customize core, paid webhook → mint, production route guard |
 | `merch-funnel:verify-config` | Operator readiness of `site/data/shop-config.json` Tier 1 block |
-| `e2e:merch-funnel` | Create → customize (`merch-funnel-customize`); checkout handoff (`merch-funnel-checkout`) — stubs `__HC_E2E_SHOP_CONFIG__` + resolver `artifact-intents` on `:8787` |
+| `e2e:merch-funnel` | Create → customize; checkout handoff; **Glitch PDP** (`shop-product-detail`) — stubs `__HC_E2E_SHOP_CONFIG__` + store API on `:8787` |
 
 **E2E notes:** Customizer preview requires protocol-valid `profile_id` / `qr_id` (see `qr-scan-url-lock.mjs`). Playwright `page.route('**/v1/...')` does not match `http://127.0.0.1:8787/...` — use `/artifact-intents/` or start `worker:dev`. Cross-origin Shopify popups: assert `window.__HC_E2E_LAST_CHECKOUT_URL` (see `merch-funnel-checkout.spec.ts`).
 

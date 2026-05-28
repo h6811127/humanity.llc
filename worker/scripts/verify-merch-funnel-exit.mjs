@@ -44,5 +44,7 @@ if (!skipE2e) {
 run("npm", ["run", "merch-funnel:verify-config"]);
 
 console.log("\n✅ Merch funnel engineering gate passed.");
+console.log("   Rollout close-out: npm run merch-funnel:rollout:step6 -- --verify");
 console.log("   Operator: paste Shopify variant URLs, then merch-funnel:verify-config -- --require-checkout");
+console.log("   Glitch checkout: merch-funnel:verify-config -- --require-tier0=tier0_glitch_hoodie_v1");
 console.log("   Next: operator Tier 1 close-out (shop-config + live checkout) — docs/MERCH_FUNNEL_MVP.md Priority 1 operator");

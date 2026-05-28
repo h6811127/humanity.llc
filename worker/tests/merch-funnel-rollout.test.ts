@@ -60,7 +60,10 @@ describe("merch-funnel rollout scripts", () => {
       "utf8"
     );
     expect(script).toContain("--preflight");
+    expect(script).toContain("--verify");
     expect(script).toContain("verify:merch-funnel");
+    expect(script).toContain("smokeShopGlitchProductPage");
+    expect(script).toContain("e2e:merch-funnel");
     expect(script).toContain("runMerchRolloutPreflightVitest");
   });
 });

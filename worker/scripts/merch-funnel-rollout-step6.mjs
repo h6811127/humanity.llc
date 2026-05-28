@@ -1,41 +1,49 @@
 /**
  * Merch funnel close-out — step 6 (full regression before live payments).
  *
- * Runs merch funnel Vitest bundles + customize E2E.
+ * Runs merch funnel Vitest bundles + merch E2E + optional production Glitch PDP smoke.
  *
  * Usage:
  *   npm run merch-funnel:rollout:step6
- *   npm run merch-funnel:rollout:step6 -- --preflight   # rollout unit tests + verify:merch-funnel (no Playwright)
- *   npm run merch-funnel:rollout:step6 -- --verify
+ *   npm run merch-funnel:rollout:step6 -- --preflight   # rollout Vitest + verify:merch-funnel (no Playwright)
+ *   npm run merch-funnel:rollout:step6 -- --verify      # preflight + E2E + production smoke + verify-config
  *   npm run merch-funnel:rollout:step6 -- --vitest
  *   npm run merch-funnel:rollout:step6 -- --e2e
+ *   SITE_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step6 -- --verify --skip-production-smoke
  *
  * @see docs/MERCH_FUNNEL_MVP.md § Exit checklist
+ * @see docs/MERCH_HEADLESS_COMMERCE.md § Production rollout commands
  */
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { runMerchRolloutPreflightVitest, runNpm } from "./merch-funnel-rollout-preflight.mjs";
+import { smokeShopGlitchProductPage } from "./merch-rollout-shop-pdp-smoke.mjs";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const siteOrigin = (process.env.SITE_ORIGIN || "https://humanity.llc").replace(/\/$/, "");
+const apiOrigin = (process.env.API_ORIGIN || siteOrigin).replace(/\/$/, "");
 
 const verify = process.argv.includes("--verify");
 const vitestOnly = process.argv.includes("--vitest");
 const e2eOnly = process.argv.includes("--e2e");
 const preflight = process.argv.includes("--preflight");
+const skipProductionSmoke = process.argv.includes("--skip-production-smoke");
 
 function printRegressionChecklist() {
   console.log("Prerequisites: steps 1–5 complete (operator deploy + physical QA as needed).\n");
   console.log("Engineering preflight (local, no Playwright):");
   console.log("   npm run merch-funnel:rollout:step6 -- --preflight\n");
-  console.log("Step 6 — full merch funnel regression\n");
-  console.log("  npm run verify:merch-funnel");
-  console.log("    (= worker:test:merch-funnel + worker:test:merch-print-qa + shop-config rollout tests)");
-  console.log("  npm run e2e:merch-funnel");
-  console.log("    (includes e2e/shop-product-detail.spec.ts — Glitch PDP + hub CTA)");
-  console.log("\nOperator smoke (after deploy):");
-  console.log("  SITE_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step2 -- --verify");
-  console.log("  API_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step3 -- --verify");
+  console.log("Step 6 — full merch funnel regression (engineering close-out)\n");
+  console.log("  npm run merch-funnel:rollout:step6 -- --verify");
+  console.log("    (= preflight Vitest + e2e:merch-funnel + production Glitch PDP/API + verify-config)");
+  console.log("  npm run merch-funnel:verify-exit   # same Vitest/E2E gate + wrangler route guard");
+  console.log("\nE2E includes:");
+  console.log("  • e2e/merch-funnel-customize.spec.ts");
+  console.log("  • e2e/merch-funnel-checkout.spec.ts");
+  console.log("  • e2e/shop-product-detail.spec.ts (Glitch drop + hub CTA)");
+  console.log("\nOperator-only (not replaced by step 6):");
+  console.log("  npm run merch-funnel:rollout:step5 -- --verify   # digital production gate");
+  console.log("  docs/MERCH_PHYSICAL_QA_RUNBOOK.md                # printed ink QA");
 }
 
 function runPreflight() {
@@ -49,7 +57,25 @@ function runPreflight() {
   console.log("  npm run merch-funnel:rollout:step6 -- --verify");
 }
 
-function main() {
+async function runFullVerify() {
+  console.log("Step 6 verify — engineering close-out (Vitest + E2E + production smoke)\n");
+  runPreflight();
+  runNpm("e2e:merch-funnel (Playwright)", ["run", "e2e:merch-funnel"]);
+  if (!skipProductionSmoke) {
+    await smokeShopGlitchProductPage(siteOrigin, { apiOrigin });
+  } else {
+    console.log("\n(skipped production Glitch PDP smoke — --skip-production-smoke)\n");
+  }
+  runNpm("merch-funnel:verify-config", ["run", "merch-funnel:verify-config"]);
+  console.log("\n✅ Step 6 complete — engineering regression passed.");
+  console.log("   Glitch drop: view path gated by step 5/6 smoke; checkout still operator-gated.");
+  console.log("   Before live Tier 1 or Glitch checkout:");
+  console.log("     • docs/MERCH_PHYSICAL_QA_RUNBOOK.md");
+  console.log("     • npm run merch-funnel:verify-config -- --require-checkout");
+  console.log("     • npm run merch-funnel:verify-config -- --require-tier0=tier0_glitch_hoodie_v1");
+}
+
+async function main() {
   console.log("Merch funnel rollout — step 6 (regression)");
   console.log("Docs: docs/MERCH_FUNNEL_MVP.md § Exit checklist\n");
 
@@ -66,28 +92,24 @@ function main() {
     return;
   }
 
-  if (verify || vitestOnly) {
-    runNpm("verify:merch-funnel (Vitest)", ["run", "verify:merch-funnel"]);
-  }
-
-  if (verify || e2eOnly) {
-    runNpm("e2e:merch-funnel (Playwright)", ["run", "e2e:merch-funnel"]);
-  }
-
   if (verify) {
-    console.log("\n✅ Step 6 complete (Vitest + E2E). Merch funnel engineering regression passed.");
-    console.log("   Operator still required: step 2/3 smoke on production + step 5 physical QA.");
-  } else if (vitestOnly) {
+    await runFullVerify();
+    return;
+  }
+
+  if (vitestOnly) {
+    runPreflight();
     console.log("\n✅ Step 6a complete. Next: npm run merch-funnel:rollout:step6 -- --e2e");
-  } else if (e2eOnly) {
+    return;
+  }
+
+  if (e2eOnly) {
+    runNpm("e2e:merch-funnel (Playwright)", ["run", "e2e:merch-funnel"]);
     console.log("\n✅ Step 6b complete.");
   }
 }
 
-const isCli =
-  process.argv[1] &&
-  path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
-
-if (isCli) {
-  main();
-}
+main().catch((err) => {
+  console.error(err instanceof Error ? err.message : err);
+  process.exit(1);
+});
