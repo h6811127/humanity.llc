@@ -513,7 +513,7 @@ Phases 1–5 improved polling, but **N saved cards** on one browser is still an 
 
 ### 2. Shell performance (must fix)
 
-Hub/inbox chrome and poll selection avoid copying the full `hc_wallet` array for count/profile-only reads via persisted `hc_wallet_summary` (S8). Hub saved-card DOM uses display-safe rows without private key fields; signing actions hydrate the full row via `findWalletEntryById` (S9, 2026-05-28). Large wallets cap hub sheet saved-card rows at **15** with a link to **My cards** (S10) and cap `/wallet/` initial render at **40** with **Show all saved cards** (S11, 2026-05-28). **`hc_wallet_network_cache`** is capped at **20** fresh rows (S6). Optional later: virtual scroll on `/wallet/` for N ≫ 40. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
+Status/count, compact hub/inbox, cross-tab checks, card-disabled inbox, and **collapsed hub previews** use persisted `hc_wallet_summary` (2026-05-28). Expanded hub/wallet rendering uses display-safe rows (S9); signing hydrates via `findWalletEntryById`. Large wallets cap hub DOM at **15** (S10) and `/wallet/` at **40** with **Show all** (S11). **`hc_wallet_network_cache`** capped at **20** fresh rows (S6). Optional later: virtual scroll on `/wallet/` for N ≫ 40. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
 
 ### 3. Multi-tab presence (monitor)
 
@@ -530,7 +530,7 @@ Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). 
 | 2026-05-28 | **S10 shipped:** large-wallet hub DOM cap via `selectHubSavedRowEntries` + “N more saved” row |
 | 2026-05-28 | **S9 shipped:** hub `renderSavedRows` uses `listWalletDisplayEntries`; signing actions hydrate via `findWalletEntryById` |
 | 2026-05-28 | **S8b shipped:** poll/coordinator/presence/SW paths use `listPollableWalletEntries` + `forEachWalletEntry`; snapshot baseline uses truth profile ids only |
-| 2026-05-28 | **S8 shipped:** `hc_wallet_summary` + wallet metadata hot paths for count/pollable/signing/profile-summary reads |
+| 2026-05-28 | **S8 shipped:** `hc_wallet_summary` + wallet metadata hot paths; collapsed hub uses summary previews |
 | 2026-05-27 | **S6 shipped:** bound `hc_wallet_network_cache` (max 20 fresh rows, LRU prune) |
 | 2026-05-27 | **O2 step 1:** per-IP rate limit on `GET …/status` (300/min); Shell P2 lazy notifications shipped |
 | 2026-05-26 | **M8 epics:** [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) |
