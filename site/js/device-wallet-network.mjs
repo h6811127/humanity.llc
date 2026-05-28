@@ -288,10 +288,10 @@ export function getLatestResolvedScanKind(profileId) {
 
 /**
  * Maps for since-visit UI from resolver-confirmed reads this visit only (SSOT).
- * @param {Array<{ profile_id?: string }>} [entries] defaults to {@link loadWallet}
+ * @param {Array<{ profile_id?: string }>} [entries] When omitted, scans poll truth only (no {@link loadWallet}).
  */
 export function buildResolverConfirmedWalletPollMaps(entries) {
-  return buildSinceVisitPollMapsFromTruth(entries ?? loadWallet());
+  return buildSinceVisitPollMapsFromTruth(entries);
 }
 
 /** @param {string} profileId */

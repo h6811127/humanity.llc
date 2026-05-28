@@ -470,7 +470,8 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 | S3 | Chrome debounce + fingerprint skip | Yes (`device-chrome-refresh.mjs`) | — | Lag ✅ |
 | S4 | Skip presence heartbeat **when alone with keys** | Yes (`shouldSkipPresenceHeartbeat`) | Also skip when no `hc_created` | 8b ✅ |
 | S5 | Lazy-load inbox sheet / notifications | Yes (`device-inbox-sheet-loader`, `device-browser-notifications-loader`) | Smaller bootstrap graph | P2 ✅ |
-| S6 | Shard / bound `hc_wallet_network_cache` | **Yes** (2026-05-27) | Max **20** fresh rows; LRU + wallet protect on save | Open issues → shipped |
+| S6 | Shard / bound `hc_wallet_network_cache` | **Yes** (2026-05-27) | Max **20** fresh rows; LRU + wallet protect on save | Shipped |
+| S6b | Hot-path wallet access (no full-array copy) | **Yes** (2026-05-27) | `getWalletLength`, truth-backed inbox maps | Shipped |
 | S7 | Cross-tab rebuild (one snapshot) | Partial (Phases 1–6) | Full state machine per [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md) | Cross-tab |
 
 ### Background / SW
@@ -509,7 +510,7 @@ Phases 1–5 improved polling, but **N saved cards** on one browser is still an 
 
 ### 2. Shell performance (must fix)
 
-Every hub/inbox pass calls `loadWallet()` and `JSON.parse`s the full `hc_wallet` array. **`hc_wallet_network_cache`** is now capped at **20** fresh rows per session (S6, 2026-05-27); remaining: avoid full-wallet parse on hot paths, lazy row hydration. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
+Hub/inbox chrome refresh uses memoized `hc_wallet` with **`getWalletLength()`** / **`forEachWalletEntry()`** / **`findWalletEntryByProfileId()`** instead of copying the full array on every dot/badge pass (2026-05-27). **`buildResolverConfirmedWalletPollMaps()`** and **`gatherCardDisabledSinceVisitForInbox()`** read poll truth only (no default `loadWallet()`). **`hc_wallet_network_cache`** is capped at **20** fresh rows (S6). Remaining at large N: hub row render still calls `loadWallet()` for full saved list; lazy row hydration optional. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
 
 ### 3. Multi-tab presence (must fix)
 
@@ -521,6 +522,7 @@ Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). 
 
 | Date | Note |
 |------|------|
+| 2026-05-27 | **S6b shipped:** hub/inbox/dot hot paths avoid full `loadWallet()` copy; truth-backed since-visit maps |
 | 2026-05-27 | **S6 shipped:** bound `hc_wallet_network_cache` (max 20 fresh rows, LRU prune) |
 | 2026-05-27 | **O2 step 1:** per-IP rate limit on `GET …/status` (300/min); Shell P2 lazy notifications shipped |
 | 2026-05-26 | **M8 epics:** [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) |

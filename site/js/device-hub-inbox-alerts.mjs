@@ -7,7 +7,7 @@ import { inboxItemsIncludeKind, inboxWalletEntryLabel } from "./device-inbox-cor
 import { hasUnifiedHubKeysCustodyPanel } from "./device-hub-keys-custody.mjs";
 import { shouldShowLegacyTabKeysHubNotice } from "./device-legacy-cross-tab-chrome-core.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
-import { loadWallet } from "./device-wallet.mjs";
+import { findWalletEntryByProfileId } from "./device-wallet.mjs";
 import { CARD_DISABLED_SINCE_VISIT_ALERT_TEXT } from "./wallet-network-baseline.mjs";
 import { openSaveKeysForThisTab } from "./device-notice-nav.mjs";
 import {
@@ -149,7 +149,7 @@ function renderCardDisabledHubGroup(group, list, show, items) {
         <span class="list-chevron" aria-hidden="true">›</span>
       </button>`;
     li.querySelector(".device-hub-card-disabled-open")?.addEventListener("click", () => {
-      const entry = loadWallet().find((e) => e.profile_id === card.profile_id);
+      const entry = findWalletEntryByProfileId(card.profile_id);
       if (entry) openCardNowPage(entry);
     });
     list.appendChild(li);

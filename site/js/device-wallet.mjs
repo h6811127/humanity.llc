@@ -62,22 +62,64 @@ export function normalizeWalletQrIds(entries) {
   return { entries: next, changed };
 }
 
-export function loadWallet() {
+function ensureWalletCache() {
   try {
     const raw = localStorage.getItem(WALLET_STORAGE_KEY);
     if (raw === walletCacheRaw && walletCache) {
-      return walletCache.slice();
+      return walletCache;
     }
     const parsed = raw ? JSON.parse(raw) : [];
     const entries = Array.isArray(parsed) ? parsed : [];
     walletCacheRaw = raw;
     walletCache = entries;
-    return entries.slice();
+    return entries;
   } catch {
     walletCacheRaw = null;
     walletCache = [];
     return [];
   }
+}
+
+/** Drop memo when `hc_wallet` changes in another tab (tests may call directly). */
+export function invalidateWalletCache() {
+  walletCacheRaw = null;
+  walletCache = null;
+}
+
+export function loadWallet() {
+  return ensureWalletCache().slice();
+}
+
+/** Saved card count without copying the full wallet array (hub/inbox hot paths). */
+export function getWalletLength() {
+  return ensureWalletCache().length;
+}
+
+/**
+ * @param {string} profileId
+ * @returns {Record<string, unknown> | null}
+ */
+export function findWalletEntryByProfileId(profileId) {
+  if (!profileId) return null;
+  const row = ensureWalletCache().find((e) => e.profile_id === profileId);
+  return row ? { ...row } : null;
+}
+
+/**
+ * @param {(entry: Record<string, unknown>) => void} fn
+ */
+export function forEachWalletEntry(fn) {
+  for (const entry of ensureWalletCache()) {
+    fn(entry);
+  }
+}
+
+/**
+ * @param {string} profileId
+ */
+export function walletHasProfileId(profileId) {
+  if (!profileId) return false;
+  return ensureWalletCache().some((e) => e.profile_id === profileId);
 }
 
 export function saveWallet(entries) {
@@ -117,7 +159,13 @@ export function walletEntryFromSession(session, label) {
 }
 
 export function isWalletSaved(profileId) {
-  return loadWallet().some((e) => e.profile_id === profileId);
+  return walletHasProfileId(profileId);
+}
+
+if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+  window.addEventListener("storage", (event) => {
+    if (event.key === WALLET_STORAGE_KEY) invalidateWalletCache();
+  });
 }
 
 /** Row subtitle  -  always show network handle + id so labels cannot lie. */

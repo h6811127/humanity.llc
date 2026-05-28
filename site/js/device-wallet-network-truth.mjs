@@ -28,6 +28,16 @@ export function hasWalletNetworkTruthPoll() {
   return false;
 }
 
+/** Profile IDs with resolver-confirmed poll rows this visit (no full-wallet scan). */
+export function listWalletNetworkTruthPollProfileIds() {
+  /** @type {string[]} */
+  const ids = [];
+  for (const [profileId, row] of truthByProfileId) {
+    if (row.source === "poll" && row.resolverConfirmed) ids.push(profileId);
+  }
+  return ids;
+}
+
 export function resetWalletNetworkTruth() {
   truthByProfileId.clear();
 }
@@ -137,16 +147,19 @@ export function shouldSuppressCardDisabledSinceVisitFromTruth(profileId) {
  *   resolverConfirmedMap: Record<string, boolean>,
  * } | null}
  */
-export function buildSinceVisitPollMapsFromTruth(entries = []) {
+export function buildSinceVisitPollMapsFromTruth(entries) {
   if (!hasWalletNetworkTruthPoll()) return null;
+  const profileIds =
+    entries === undefined
+      ? listWalletNetworkTruthPollProfileIds()
+      : entries.map((entry) => entry.profile_id).filter((pid) => typeof pid === "string" && pid);
   /** @type {Record<string, string>} */
   const alertStateMap = {};
   /** @type {Record<string, string | null>} */
   const scanKindMap = {};
   /** @type {Record<string, boolean>} */
   const resolverConfirmedMap = {};
-  for (const entry of entries) {
-    const pid = entry.profile_id;
+  for (const pid of profileIds) {
     if (!pid || !isWalletNetworkTruthPollConfirmed(pid)) continue;
     const alertState = getWalletNetworkTruthPollAlertState(pid);
     if (alertState == null) continue;

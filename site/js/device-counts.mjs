@@ -5,7 +5,11 @@ import {
   buildStatusSegmentsFromCounts,
   tabNoticeCountFromState,
 } from "./device-counts-core.mjs";
-import { loadWallet, isWalletSaved } from "./device-wallet.mjs";
+import {
+  forEachWalletEntry,
+  getWalletLength,
+  isWalletSaved,
+} from "./device-wallet.mjs";
 import { loadPins } from "./device-pins.mjs";
 
 export function tabNoticeCount() {
@@ -20,7 +24,11 @@ export function tabNoticeCount() {
 }
 
 function pollableSavedCount() {
-  return loadWallet().filter((e) => isPollableWalletEntry(e)).length;
+  let count = 0;
+  forEachWalletEntry((e) => {
+    if (isPollableWalletEntry(e)) count += 1;
+  });
+  return count;
 }
 
 /**
@@ -29,7 +37,7 @@ function pollableSavedCount() {
 export function buildStatusSegments(network = "offline") {
   return buildStatusSegmentsFromCounts({
     network,
-    saved: loadWallet().length,
+    saved: getWalletLength(),
     pins: loadPins().length,
     notices: tabNoticeCount(),
     liveProof: getLiveControlPendingCount(),
@@ -42,7 +50,7 @@ export function buildStatusSegments(network = "offline") {
 export function buildStatusLine(network = "offline") {
   const segments = buildStatusSegments(network);
   return {
-    saved: loadWallet().length,
+    saved: getWalletLength(),
     pins: loadPins().length,
     notices: tabNoticeCount(),
     segments,
@@ -54,5 +62,5 @@ export function buildStatusLine(network = "offline") {
  * @returns {{ saved: number, pins: number, total: number, label: string }}
  */
 export function getDeviceCounts() {
-  return buildDeviceCountsLabel(loadWallet().length, loadPins().length);
+  return buildDeviceCountsLabel(getWalletLength(), loadPins().length);
 }

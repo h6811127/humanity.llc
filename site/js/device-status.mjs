@@ -11,7 +11,12 @@ import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visi
 export const RESOLVER_HEALTH_CHANGED = "hc-resolver-health-changed";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
-import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
+import {
+  forEachWalletEntry,
+  getWalletLength,
+  isWalletSaved,
+  loadWallet,
+} from "./device-wallet.mjs";
 import {
   gatherInboxInput,
   getInboxItems,
@@ -135,20 +140,30 @@ function hasUnsavedTabKeys() {
 function hasStewardReadyKeys() {
   const session = getTabSession();
   if (session?.owner_private_key_b58 && hasStewardVerification(session)) return true;
-  return loadWallet().some(
-    (entry) => Boolean(entry?.owner_private_key_b58) && hasStewardVerification(entry)
-  );
+  let found = false;
+  forEachWalletEntry((entry) => {
+    if (found) return;
+    if (Boolean(entry?.owner_private_key_b58) && hasStewardVerification(entry)) {
+      found = true;
+    }
+  });
+  return found;
 }
 
 function savedCardsWithSigningKeys() {
-  return loadWallet().filter((entry) => Boolean(entry?.owner_private_key_b58));
+  /** @type {Array<Record<string, unknown>>} */
+  const out = [];
+  forEachWalletEntry((entry) => {
+    if (Boolean(entry?.owner_private_key_b58)) out.push(entry);
+  });
+  return out;
 }
 
 function deviceState() {
   return deviceStateFromContext({
     unsavedTabKeys: hasUnsavedTabKeys(),
     stewardReady: hasStewardReadyKeys(),
-    savedWalletCount: loadWallet().length,
+    savedWalletCount: getWalletLength(),
   });
 }
 
@@ -252,7 +267,7 @@ function applyDot() {
   if (!dot) return;
   const device = deviceState();
   const overlay = dotOverlayState();
-  const savedWalletCount = loadWallet().length;
+  const savedWalletCount = getWalletLength();
   const shellNeutralEmpty = shellDotUsesNeutralEmptyWallet({
     network: networkStatus,
     device,
@@ -397,7 +412,7 @@ function renderStatusKey() {
 
 function renderShellStatusLine(segments) {
   if (!shellStatusLine) return;
-  const savedWalletCount = loadWallet().length;
+  const savedWalletCount = getWalletLength();
   const device = deviceState();
   const overlay = dotOverlayState();
   const show = shellStatusLinePrimaryInChrome({
