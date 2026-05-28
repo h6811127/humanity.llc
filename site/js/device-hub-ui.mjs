@@ -33,6 +33,7 @@ import {
 import { loadPins, pinHaystack } from "./device-pins.mjs";
 import {
   loadWallet,
+  loadWalletSummary,
   normalizeWalletQrIds,
   saveWallet,
   formatSavedAt,
@@ -141,6 +142,8 @@ import {
   profileIdsWithVisibleRows,
 } from "./device-hub-visible-rows-core.mjs";
 
+const COLLAPSED_SAVED_ROW_PREVIEW_LIMIT = 3;
+
 function escapeHtml(s) {
   return String(s)
     .replace(/&/g, "&amp;")
@@ -153,6 +156,21 @@ function walletHaystack(entry) {
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
+}
+
+function onWalletPage() {
+  return document.body.classList.contains("page-wallet");
+}
+
+function hubExpanded() {
+  return onWalletPage() || isDeviceHubExpanded(document.getElementById("device-hub"));
+}
+
+function shouldRenderFullSavedRows() {
+  if (onWalletPage()) return true;
+  if (hubExpanded()) return true;
+  if (searchInput?.value?.trim()) return true;
+  return false;
 }
 
 function classifyObjectType(entry, qrScopeOverride = undefined) {
@@ -220,6 +238,13 @@ function bumpWalletNetworkApplyGen() {
 }
 
 function restoreHubCardSearchable(li, profileId) {
+  if (li.dataset.summaryRow === "1") {
+    const row = loadWalletSummary().rows.find((entry) => entry.profile_id === profileId);
+    if (row) {
+      li.dataset.hubSearchable = walletHaystack(row);
+      return;
+    }
+  }
   const entry = loadWallet().find((e) => e.profile_id === profileId);
   if (entry) {
     li.dataset.hubSearchable = walletHaystack(entry);
@@ -242,9 +267,13 @@ function setRevokedSinceVisitAlertVisible(li, profileId, show) {
     else alertEl.setAttribute("hidden", "");
   }
   if (show) {
-    const base = li.dataset.hubSearchable || walletHaystack(
-      loadWallet().find((e) => e.profile_id === profileId) || {}
-    );
+    const base =
+      li.dataset.hubSearchable ||
+      (li.dataset.summaryRow === "1"
+        ? walletHaystack(
+            loadWalletSummary().rows.find((e) => e.profile_id === profileId) || {}
+          )
+        : walletHaystack(loadWallet().find((e) => e.profile_id === profileId) || {}));
     if (!base.includes(CARD_DISABLED_SINCE_VISIT_SEARCH_SNIPPET)) {
       li.dataset.hubSearchable = `${base} ${CARD_DISABLED_SINCE_VISIT_SEARCH_SNIPPET}`.trim();
     }
@@ -505,10 +534,11 @@ function applyNetworkChipsToDom(
     }
     const identityEl = li.querySelector(".hub-card-identity");
     if (identityEl) {
-      const entry = loadWallet().find((e) => e.profile_id === pid);
-      const objectType = entry
-        ? classifyObjectType(entry, getCachedNetworkQrScope(pid))
-        : { label: "Object", tone: "general" };
+      const entry =
+        li.dataset.summaryRow === "1"
+          ? loadWalletSummary().rows.find((e) => e.profile_id === pid)
+          : loadWallet().find((e) => e.profile_id === pid);
+      const objectType = classifyObjectType(entry ?? {}, getCachedNetworkQrScope(pid));
       const cached = getCachedVerification(pid);
       const identity = hubCardIdentityLine({
         objectTypeLabel: objectType.label,
@@ -635,7 +665,9 @@ function acknowledgeNetworkSeenForEntry(entry) {
 
 function reapplyRevokedSinceVisitFromLatestResolved() {
   if (!savedList || !hubConfig.fetchNetworkStatus) return;
-  const maps = buildResolverConfirmedWalletPollMaps();
+  const maps = buildResolverConfirmedWalletPollMaps(
+    savedList.dataset.walletRowsMode === "summary" ? loadWalletSummary().rows : undefined
+  );
   if (!maps) {
     applyRevokedSinceVisitAlerts({}, null, {}, null, { allowShow: false });
     return;
@@ -699,7 +731,8 @@ if (typeof window !== "undefined") {
 
 function applyCachedNetworkChipsOnly() {
   if (!savedList) return;
-  const entries = loadWallet();
+  const entries =
+    savedList.dataset.walletRowsMode === "summary" ? loadWalletSummary().rows : loadWallet();
   if (entries.length === 0) return;
   applyNetworkChipsToDom(
     Object.fromEntries(
@@ -980,8 +1013,13 @@ function renderActivityRows() {
  */
 function renderSavedRows(opts = {}) {
   const initialChipChecking = opts.initialChipChecking === true;
-  const entries = loadWallet();
+  const fullRows = shouldRenderFullSavedRows();
+  const allEntries = fullRows ? loadWallet() : loadWalletSummary().rows;
+  const entries = fullRows
+    ? allEntries
+    : allEntries.slice(0, COLLAPSED_SAVED_ROW_PREVIEW_LIMIT);
   if (!savedList || !savedGroup) return;
+  savedList.dataset.walletRowsMode = fullRows ? "full" : "summary";
 
   const labelEl =
     savedGroup.querySelector(".device-hub-subgroup-label") ||
@@ -1010,23 +1048,26 @@ function renderSavedRows(opts = {}) {
     const pilotTemplate =
       entry.pilot_template ||
       (entry.manifesto_line ? inferPilotTemplate(String(entry.manifesto_line)) : "general");
-    const cardControls = applyHubControlPlainLabels(
-      buildHubCardControls({
-        hasKeys: !!entry.owner_private_key_b58,
-        pendingLiveProof: !!liveControlPendingForEntry(entry),
-        scanKind: hubConfig.fetchNetworkStatus
-          ? getCachedNetworkScanKind(entry.profile_id)
-          : null,
-      }),
-      pilotTemplate
-    );
+    const cardControls = fullRows
+      ? applyHubControlPlainLabels(
+          buildHubCardControls({
+            hasKeys: !!entry.owner_private_key_b58,
+            pendingLiveProof: !!liveControlPendingForEntry(entry),
+            scanKind: hubConfig.fetchNetworkStatus
+              ? getCachedNetworkScanKind(entry.profile_id)
+              : null,
+          }),
+          pilotTemplate
+        )
+      : [];
     const { inline: inlineControls, menu: menuControls } =
       partitionHubCardControls(cardControls);
     li.className = `hub-card-item hub-card-item--${objectType.tone}${
       inlineControls.length > 0 ? " hub-card-item--has-controls" : ""
-    }`;
+    }${fullRows ? "" : " hub-card-item--summary"}`;
     li.dataset.hubSearchable = walletHaystack(entry);
     li.dataset.profileId = entry.profile_id;
+    if (!fullRows) li.dataset.summaryRow = "1";
     const lastUsed = lastActivityForEntry(entry);
     const scan = scanUrlForEntry(entry);
     const cachedVerification = hubConfig.fetchNetworkStatus
@@ -1062,7 +1103,16 @@ function renderSavedRows(opts = {}) {
         </div>`
       : "";
 
-    const menuBlock = hubCardMenuHtml(entry, menuControls);
+    const menuBlock = fullRows ? hubCardMenuHtml(entry, menuControls) : "";
+    const controlsHtml = fullRows ? hubCardControlsHtml(entry, inlineControls) : "";
+    const actionsHtml = fullRows
+      ? `<div class="hub-card-actions">
+        <div class="hub-card-actions-primary">
+          <button type="button" class="hub-card-action hub-use-keys" data-id="${escapeHtml(entry.id)}" title="Load signing keys into this tab, then open your card page">Open controls</button>
+          <a class="hub-card-action hub-open-scan" href="${escapeHtml(scan)}" target="_blank" rel="noopener noreferrer">Open scan</a>
+        </div>
+      </div>`
+      : "";
 
     li.innerHTML = `
       <div class="hub-card-head">
@@ -1078,17 +1128,32 @@ function renderSavedRows(opts = {}) {
         </div>
       </div>
       ${revokedAlert}
-      ${hubCardControlsHtml(entry, inlineControls)}
-      <div class="hub-card-actions">
-        <div class="hub-card-actions-primary">
-          <button type="button" class="hub-card-action hub-use-keys" data-id="${escapeHtml(entry.id)}" title="Load signing keys into this tab, then open your card page">Open controls</button>
-          <a class="hub-card-action hub-open-scan" href="${escapeHtml(scan)}" target="_blank" rel="noopener noreferrer">Open scan</a>
-        </div>
+      ${controlsHtml}
+      ${actionsHtml}`;
+    savedList.appendChild(li);
+  }
+
+  if (!fullRows && allEntries.length > entries.length) {
+    const li = document.createElement("li");
+    li.className = "hub-card-item hub-card-item--general hub-card-item--summary hub-card-item--more";
+    li.dataset.hubSearchable = "more saved cards";
+    li.innerHTML = `
+      <div class="hub-card-head">
+        <span class="list-icon list-icon-tone-trust" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+        <span class="list-content">
+          <span class="list-title">${allEntries.length - entries.length} more saved on this device</span>
+          <span class="hub-card-identity hub-card-identity--muted">Open the hub to load full rows</span>
+        </span>
       </div>`;
     savedList.appendChild(li);
   }
 
   bindRevokedAlertHandlers();
+
+  if (!fullRows) {
+    syncHubInboxAlertGroups();
+    return;
+  }
 
   savedList.querySelectorAll(".hub-card-control, .hub-card-menu-steward").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -1368,7 +1433,7 @@ function renderPinRows() {
 function refreshEmptyHint() {
   if (!emptyHint) return;
   const hasData =
-    loadWallet().length > 0 ||
+    loadWalletSummary().count > 0 ||
     loadPins().length > 0 ||
     notificationCount() > 0 ||
     loadActivity().slice(0, HUB_RECENT_DISPLAY_LIMIT).length > 0;
@@ -1517,7 +1582,7 @@ export function initDeviceHub(config = {}) {
       getAutoPollBudgetPaused: () => isLiveControlAutoPollBudgetPaused(),
       getStewardQuotaPaused: () => isStewardServerQuotaPaused(),
       getLargeWalletHint: () =>
-        walletScaleHint(loadWallet().length, getStewardEntitlementsPolicy()),
+        walletScaleHint(loadWalletSummary().count, getStewardEntitlementsPolicy()),
       getHostedTierLine: () =>
         hostedTierHubIndicatorLine(getStewardEntitlementsPolicy()),
       onCheckNetwork: () => fetchAndApplyNetworkChips({ manual: true }),
@@ -1574,11 +1639,11 @@ export function initDeviceHub(config = {}) {
     if (document.visibilityState === "visible") {
       const hubEl = document.getElementById("device-hub");
       const hubCollapsed = hubEl?.classList.contains("device-hub-collapsed") ?? false;
-      const onWalletPage = document.body.classList.contains("page-wallet");
-      const hasWallet = loadWallet().length > 0;
+      const walletPage = onWalletPage();
+      const hasWallet = loadWalletSummary().count > 0;
       if (
         hasWallet &&
-        (onWalletPage || !hubCollapsed) &&
+        (walletPage || !hubCollapsed) &&
         walletNetworkVisibilityRefreshAllowed(lastWalletNetworkFetchAt)
       ) {
         void fetchAndApplyNetworkChips();
@@ -1587,10 +1652,16 @@ export function initDeviceHub(config = {}) {
   });
 
   window.addEventListener(LIVE_CONTROL_POLL_SCOPE_CHANGED, () => {
-    if (!hubConfig.fetchNetworkStatus) return;
     const hubEl = document.getElementById("device-hub");
-    const onWalletPage = document.body.classList.contains("page-wallet");
-    if (onWalletPage || isDeviceHubExpanded(hubEl)) {
+    const walletPage = onWalletPage();
+    const expanded = walletPage || isDeviceHubExpanded(hubEl);
+    if (expanded && savedList?.dataset.walletRowsMode === "summary") {
+      renderSavedRows();
+      applySearchFilter();
+      refreshEmptyHint();
+    }
+    if (!hubConfig.fetchNetworkStatus) return;
+    if (expanded) {
       void fetchAndApplyNetworkChips();
     }
   });
