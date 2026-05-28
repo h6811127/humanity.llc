@@ -118,6 +118,8 @@ npm run hosted:rollout:step4a -- --apply   # writes "1" to worker/wrangler.toml 
 # commit worker/wrangler.toml, then step 4b
 ```
 
+**Status:** step 4a is applied in repo (`worker/wrangler.toml` has `HOSTED_STEWARD_ENABLED = "1"`). Continue with step 4b deploy/smoke/verify.
+
 **Rollout step 4b — deploy + smoke + verify production:**
 
 ```bash
