@@ -192,6 +192,19 @@ npm run worker:test:device  # broader shell module coverage
 
 ---
 
+## Resolution (2026-05-28)
+
+| Step | Action | Result |
+|------|--------|--------|
+| 1 | Reset `cursor/next-doc-implementation-e79e` to `main` (`6a549b33`) | Branch identical to base — zero diff |
+| 2 | Force-push aligned branch | GitHub reported 0 commits on PR |
+| 3 | Merge | **Not applicable** — nothing to merge; PR **closed as superseded** (same outcome as PR #93) |
+| 4 | Vitest | `device-wallet-save` · `device-hub-wallet-summary` · `device-hub-visible-rows-core` — **22 passed** |
+
+PR comment: https://github.com/h6811127/humanity.llc/pull/80#issuecomment-4566462486
+
+---
+
 ## Related docs
 
 - [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Shell performance (S1–S12)
