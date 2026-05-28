@@ -32,7 +32,7 @@ console.log("Merch funnel engineering exit gate\n");
 
 run("npm", ["run", "worker:test:merch-funnel"]);
 run("npm", ["run", "worker:test:merch-print-qa"]);
-run("npm", ["run", "worker:test", "--", "worker/tests/scan.test.ts", "-t", "merch"]);
+run("npm", ["run", "worker:test", "--", "worker/tests/scan.test.ts", "-t", "print_artifact"]);
 
 const skipE2e = process.argv.includes("--skip-e2e");
 if (!skipE2e) {

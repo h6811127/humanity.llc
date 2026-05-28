@@ -8,7 +8,14 @@ on:
     paths:
       - "site/**"
       - "e2e/**"
+      - "worker/tests/merch-*.test.ts"
       - "worker/tests/merch-funnel*.test.ts"
+      - "worker/tests/fulfillment-pii*.test.ts"
+      - "worker/tests/resolve-printify-shipping.test.ts"
+      - "worker/tests/shopify-shipping-address.test.ts"
+      - "worker/tests/buyer-order-status.test.ts"
+      - "worker/tests/printify-tracking.test.ts"
+      - "worker/tests/printify-reconcile.test.ts"
       - "worker/tests/shop-*.test.ts"
       - "worker/tests/wrangler-merch-routes.test.ts"
       - "worker/scripts/verify-merch-funnel*.mjs"
@@ -21,7 +28,14 @@ on:
     paths:
       - "site/**"
       - "e2e/**"
+      - "worker/tests/merch-*.test.ts"
       - "worker/tests/merch-funnel*.test.ts"
+      - "worker/tests/fulfillment-pii*.test.ts"
+      - "worker/tests/resolve-printify-shipping.test.ts"
+      - "worker/tests/shopify-shipping-address.test.ts"
+      - "worker/tests/buyer-order-status.test.ts"
+      - "worker/tests/printify-tracking.test.ts"
+      - "worker/tests/printify-reconcile.test.ts"
       - "worker/tests/shop-*.test.ts"
       - "worker/tests/wrangler-merch-routes.test.ts"
       - "worker/scripts/verify-merch-funnel*.mjs"
@@ -41,6 +55,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run worker:test
+      - name: Merch funnel engineering gate (fast)
+        run: npm run merch-funnel:verify-exit:fast
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium webkit
       - name: Device shell E2E
