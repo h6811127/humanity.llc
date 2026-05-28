@@ -36,6 +36,7 @@
     "hosted:rollout:step4": "node worker/scripts/hosted-rollout-step4.mjs",
     "hosted:rollout:step4a": "node worker/scripts/hosted-rollout-step4a.mjs",
     "hosted:rollout:step4b": "node worker/scripts/hosted-rollout-step4b.mjs",
+    "hosted:rollout:post-deploy-smoke": "node worker/scripts/hosted-rollout-post-deploy-smoke.mjs",
     "hosted:rollout:step5": "node worker/scripts/hosted-rollout-step5.mjs",
     "hosted:rollout:step5a": "node worker/scripts/hosted-rollout-step5a.mjs",
     "hosted:rollout:step6": "node worker/scripts/hosted-rollout-step6.mjs",
