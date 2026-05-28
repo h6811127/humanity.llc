@@ -5,9 +5,11 @@
 import {
   anyClientVisible,
   buildLiveProofSwNotification,
+  buildLiveProofSwNotificationFromPushHint,
   pollWalletEntriesForLiveProof,
   shouldShowSwLiveProofNotification,
   swLiveProofPollingShouldRun,
+  SW_MESSAGE_LIVE_PROOF_PUSH,
   SW_NOTIFICATION_TAG,
   SW_PERIODIC_TAG,
   SW_RATE_LIMIT_BACKOFF_MS,
@@ -28,6 +30,9 @@ import {
  *   resolverHealth?: 'ok' | 'degraded' | 'offline',
  *   watchLiveProofEnabled?: boolean,
  *   pollBackoffUntil?: number,
+ *   stewardPushEntitled?: boolean,
+ *   stewardPushHealthy?: boolean,
+ *   lastPushChallengeId?: string,
  * }} SwState */
 
 /** @returns {Promise<SwState | null>} */
@@ -63,6 +68,8 @@ async function pollAndMaybeNotify() {
       enabled: state.enabled,
       watchLiveProofEnabled: state.watchLiveProofEnabled !== false,
       resolverHealth: state.resolverHealth,
+      stewardPushEntitled: state.stewardPushEntitled === true,
+      stewardPushHealthy: state.stewardPushHealthy === true,
     })
   ) {
     return;
@@ -126,6 +133,42 @@ async function pollAndMaybeNotify() {
   });
 }
 
+async function notifyFromPushHint(hint) {
+  const state = await readState();
+  if (!state?.enabled || !state.pageOrigin) return;
+
+  const clients = await self.clients.matchAll({
+    type: "window",
+    includeUncontrolled: true,
+  });
+  if (anyClientVisible(clients)) return;
+
+  const payload = buildLiveProofSwNotificationFromPushHint(
+    hint,
+    state.entries,
+    state.pageOrigin
+  );
+  if (!payload) return;
+
+  const challengeId =
+    typeof hint.challenge_id === "string" ? hint.challenge_id.trim() : "";
+  if (challengeId && state.lastPushChallengeId === challengeId) return;
+
+  const requireInteraction = !state.interactShown;
+  await self.registration.showNotification(payload.title, {
+    body: payload.body,
+    tag: SW_NOTIFICATION_TAG,
+    data: { href: payload.href },
+    requireInteraction,
+  });
+
+  await writeState({
+    ...state,
+    lastPushChallengeId: challengeId || state.lastPushChallengeId,
+    interactShown: state.interactShown || requireInteraction,
+  });
+}
+
 self.addEventListener("install", (event) => {
   event.waitUntil(self.skipWaiting());
 });
@@ -136,7 +179,14 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("message", (event) => {
   const msg = event.data;
-  if (!msg || msg.type !== "HC_SW_SYNC_STATE") return;
+  if (!msg) return;
+
+  if (msg.type === SW_MESSAGE_LIVE_PROOF_PUSH) {
+    event.waitUntil(notifyFromPushHint(msg.hint ?? msg));
+    return;
+  }
+
+  if (msg.type !== "HC_SW_SYNC_STATE") return;
 
   event.waitUntil(
     (async () => {
@@ -160,6 +210,9 @@ self.addEventListener("message", (event) => {
         roundRobinCursor: enabled ? (prev?.roundRobinCursor ?? 0) : 0,
         pollSlots: enabled ? (prev?.pollSlots ?? {}) : {},
         pollBackoffUntil: enabled ? (prev?.pollBackoffUntil ?? 0) : 0,
+        stewardPushEntitled: msg.stewardPushEntitled === true,
+        stewardPushHealthy: msg.stewardPushHealthy === true,
+        lastPushChallengeId: enabled ? (prev?.lastPushChallengeId ?? "") : "",
       };
 
       await writeState(state);
@@ -169,6 +222,8 @@ self.addEventListener("message", (event) => {
           enabled: state.enabled,
           watchLiveProofEnabled: state.watchLiveProofEnabled,
           resolverHealth: state.resolverHealth,
+          stewardPushEntitled: state.stewardPushEntitled,
+          stewardPushHealthy: state.stewardPushHealthy,
         })
       ) {
         await pollAndMaybeNotify();

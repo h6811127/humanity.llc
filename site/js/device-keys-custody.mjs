@@ -143,7 +143,10 @@ export function mountKeysCustody(target, variant = "hub", opts = {}) {
   const el =
     typeof target === "string" ? document.querySelector(target) : target;
   if (!el) return;
-  if ((variant === "hub" || variant === "wallet") && isKeysCustodyNoticeDismissed()) {
+  if (
+    (variant === "hub" || variant === "wallet" || variant === "created") &&
+    isKeysCustodyNoticeDismissed()
+  ) {
     el.innerHTML = "";
     return;
   }

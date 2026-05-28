@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Customize your QR · humanity.llc</title>
+    <meta
+      name="description"
+      content="Preview your LIVE OBJECT QR on a hoodie or sticker, then checkout through humanity.llc. Buying merch does not verify you."
+    />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=121" />
+  </head>
+  <body class="screen-shop-body">
+    <div class="page">
+      <header class="top">
+        <a class="top-brand top-brand--mark" href="/" aria-label="Home">
+          <span class="pass-dot" aria-hidden="true"></span>
+        </a>
+        <a class="top-create" href="/create/">Create card</a>
+      </header>
+
+      <main class="screen screen-shop screen-shop-customize">
+        <section class="hero hero-compact shop-hero">
+          <p class="hero-eyebrow">Tier 1 · personalize</p>
+          <h1>Customize your live object</h1>
+          <p class="hero-line">
+            Preview your branded QR on wearables and print — each physical item gets a
+            <strong>unique</strong> revocable code. You update what strangers see from your phone;
+            the ink stays the same.
+          </p>
+        </section>
+
+        <section
+          class="shop-customize-card-gate shop-customize-panel"
+          id="shop-customize-card-gate"
+          aria-labelledby="shop-customize-gate-title"
+        >
+          <h2 class="group-label" id="shop-customize-gate-title">Start with a card</h2>
+          <p class="shop-lead">
+            Personalization ties print to <strong>your</strong> signed Humanity Card. Create one
+            free — keys stay in this browser tab.
+          </p>
+          <div class="landing-hero-actions shop-hero-actions">
+            <a
+              class="landing-hero-btn landing-hero-btn-primary"
+              id="shop-customize-create-link"
+              href="/create/"
+              >Create a card</a
+            >
+            <a class="landing-hero-btn landing-hero-btn-secondary" href="/wallet/"
+              >Open wallet</a
+            >
+          </div>
+        </section>
+
+        <section
+          class="shop-customize-ready shop-customize-panel"
+          id="shop-customize-card-ready"
+          hidden
+          aria-labelledby="shop-customize-ready-title"
+        >
+          <p class="shop-product-kicker" id="shop-customize-ready-kicker">Your card</p>
+          <h2 class="shop-customize-ready-title" id="shop-customize-ready-title">
+            Customizing for <span id="shop-customize-handle">@handle</span>
+          </h2>
+          <p class="shop-lead shop-lead-muted shop-customize-ready-lead">
+            Each unit printed receives its own QR — revoke one item without killing your card.
+          </p>
+
+          <h2 class="group-label">Choose product</h2>
+          <div
+            class="create-template-row shop-customize-products"
+            id="shop-customize-products"
+            role="group"
+            aria-label="Product"
+            hidden
+          ></div>
+
+          <h2 class="group-label">Preview</h2>
+          <div class="shop-customize-preview-wrap">
+            <div class="shop-customize-mock is-loading" id="shop-customize-mock" data-preview="hoodie">
+              <div class="shop-customize-mock__garment" aria-hidden="true">
+                <span class="shop-customize-mock__hoodie-neck" aria-hidden="true"></span>
+              </div>
+              <div class="shop-customize-mock__qr-slot">
+                <img
+                  class="shop-customize-qr-preview"
+                  id="shop-customize-qr-preview"
+                  alt=""
+                  width="220"
+                  height="280"
+                  hidden
+                />
+                <p class="shop-customize-qr-placeholder" id="shop-customize-qr-placeholder">
+                  Generating preview…
+                </p>
+              </div>
+            </div>
+            <p class="shop-lead shop-customize-preview-note" id="shop-customize-preview-note">
+              Preview uses your item&apos;s planned QR. It activates after payment and fulfillment.
+              Strangers still see honest limits — holding the garment does not prove you own the
+              card.
+            </p>
+          </div>
+
+          <p class="shop-product-price" id="shop-customize-price">Price at checkout</p>
+
+          <fieldset class="shop-proof-consent" id="shop-proof-consent" aria-labelledby="shop-proof-consent-title">
+            <legend class="group-label" id="shop-proof-consent-title">Approve proof before checkout</legend>
+            <p class="shop-lead shop-lead-muted shop-proof-consent-lead">
+              Separate commerce from verification — confirm each line before payment:
+            </p>
+            <label class="shop-customize-approve shop-proof-consent-item">
+              <input type="checkbox" data-proof-consent="commerce_not_verification" />
+              <span>Buying this merch does not verify me or grant a vouch.</span>
+            </label>
+            <label class="shop-customize-approve shop-proof-consent-item">
+              <input type="checkbox" data-proof-consent="bearer_not_ownership" />
+              <span
+                >A printed QR is a pointer — holding the object does not prove I own the Humanity
+                Card.</span
+              >
+            </label>
+            <label class="shop-customize-approve shop-proof-consent-item">
+              <input type="checkbox" data-proof-consent="persistence_revocable" />
+              <span
+                >Printed ink persists. I can revoke this item&apos;s QR from my phone, but strangers
+                may still scan old ink until I do.</span
+              >
+            </label>
+          </fieldset>
+
+          <p class="form-status" id="shop-customize-status" hidden role="status"></p>
+
+          <button
+            type="button"
+            class="btn-primary shop-customize-checkout"
+            id="shop-customize-checkout"
+            hidden
+          >
+            Continue to checkout
+          </button>
+
+          <section
+            class="shop-customize-interest"
+            id="shop-customize-interest"
+            aria-labelledby="shop-customize-interest-title"
+          >
+            <h2 class="group-label" id="shop-customize-interest-title">Checkout opening soon</h2>
+            <p class="shop-lead shop-lead-muted">
+              Your preview works now. Personalized checkout for hoodies and stickers is not live
+              yet — try the <a href="/shop/founding/">founding sticker</a> or check back soon.
+            </p>
+          </section>
+        </section>
+
+        <section class="group shop-links-group">
+          <h2 class="group-label">Related</h2>
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/shop/founding/">
+                <span class="list-content">
+                  <span class="list-title">Founding sticker (Tier 0)</span>
+                  <span class="list-sub">Curiosity drop · batch QR</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/shop/">
+                <span class="list-content">
+                  <span class="list-title">Shop hub</span>
+                  <span class="list-sub">Make it yours · founding objects</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/created/">
+                <span class="list-content">
+                  <span class="list-title">Update your live line</span>
+                  <span class="list-sub">Same QR · new meaning from your phone</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+    <script src="/js/shop-customize.mjs?v=4" type="module"></script>
+  </body>
+</html>

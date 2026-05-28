@@ -2,11 +2,13 @@ import { describe, expect, it } from "vitest";
 
 import {
   LARGE_WALLET_THRESHOLD,
+  comfortableWalletHint,
   isLargeWallet,
   largeWalletHint,
   selectLiveControlPollEntries,
   selectNetworkRefreshEntries,
   walletNetworkMaxParallel,
+  walletScaleHint,
 } from "../../site/js/device-wallet-scale-core.mjs";
 import { REFERENCE_FREE_POLICY } from "../../site/js/device-steward-entitlements-core.mjs";
 
@@ -144,5 +146,22 @@ describe("largeWalletHint", () => {
   it("returns copy at threshold", () => {
     expect(largeWalletHint(LARGE_WALLET_THRESHOLD)).toContain("Large wallet");
     expect(largeWalletHint(2)).toBeNull();
+  });
+});
+
+describe("comfortableWalletHint", () => {
+  it("warns above comfortable max and below large threshold", () => {
+    expect(comfortableWalletHint(5)).toBeNull();
+    expect(comfortableWalletHint(6)).toContain("1–5");
+    expect(comfortableWalletHint(9)).toContain("9 saved");
+    expect(comfortableWalletHint(LARGE_WALLET_THRESHOLD)).toBeNull();
+  });
+});
+
+describe("walletScaleHint", () => {
+  it("prefers large-wallet copy when at threshold", () => {
+    expect(walletScaleHint(7)).toContain("1–5");
+    expect(walletScaleHint(LARGE_WALLET_THRESHOLD)).toContain("Large wallet");
+    expect(walletScaleHint(3)).toBeNull();
   });
 });

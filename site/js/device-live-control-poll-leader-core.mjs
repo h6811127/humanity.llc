@@ -55,3 +55,13 @@ export function shouldTabActAsLiveControlPollLeader(record, tabId, now = Date.no
   if (!record || isLiveControlPollLeaderStale(record, now)) return true;
   return record.tabId === tabId;
 }
+
+/**
+ * Ignore BroadcastChannel snapshots echoed from this tab (follower applies peer only).
+ *
+ * @param {string} sourceTabId
+ * @param {string} localTabId
+ */
+export function shouldIgnoreLiveControlSnapshotFromSameTab(sourceTabId, localTabId) {
+  return Boolean(sourceTabId && localTabId && sourceTabId === localTabId);
+}

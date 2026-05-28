@@ -4,7 +4,9 @@
  */
 
 import { schemaReady } from "./db";
+import { resolverHealthBuildField } from "./resolver-health-build";
 import { runOrphanPurge } from "./db/orphan-purge";
+import { runPrintifyReconcile } from "./print/printify-reconcile";
 import {
   clientIp,
   corsHeaders,
@@ -15,6 +17,7 @@ import {
   withCors,
 } from "./http/resolver";
 import { handlePostArtifactIntent, handlePostArtifactIntentAttach } from "./resolver/artifact-intents";
+import { handleGetStoreOrderStatus } from "./resolver/store-order-status";
 import { handleGetCard, handlePostCards } from "./resolver/create-card";
 import {
   handleGetLiveControlChallenge,
@@ -40,6 +43,10 @@ import {
 } from "./resolver/vouch-audit-flags";
 import { handleGetCreateRateMonitor } from "./resolver/create-monitoring";
 import {
+  handleGetMerchFunnelMonitor,
+  handlePostMerchFunnelBeacon,
+} from "./http/merch-funnel";
+import {
   handleGetOperatorCapabilities,
   handleGetOperatorPlans,
   handleGetStewardEntitlements,
@@ -49,6 +56,7 @@ import {
 import { handleGetStewardOpsSnapshot } from "./resolver/steward-ops";
 import { handlePostBillingWebhook } from "./http/billing-webhook";
 import { handlePostShopifyOrdersWebhook } from "./http/shopify-orders-webhook";
+import { handlePostPrintifyWebhook } from "./http/printify-webhook";
 import {
   handleGetPrintCatalog,
   handlePostPrintArtifacts,
@@ -59,6 +67,8 @@ import {
   handlePostPrintOrders,
 } from "./print/print-orders-handler";
 import { handleGetOperatorFulfillmentLookup } from "./operator/fulfillment-lookup";
+import { handlePostAiExplainSnapshot } from "./resolver/ai-explain-snapshot";
+import { handlePostAiDraftManifesto } from "./resolver/ai-draft-manifesto";
 
 export interface Env {
   DB: D1Database;
@@ -72,15 +82,57 @@ export interface Env {
   STRIPE_WEBHOOK_SECRET?: string;
   /** O-001 Shopify webhook HMAC secret. */
   SHOPIFY_WEBHOOK_SECRET?: string;
+  /** AES-256 key (32 bytes, base64) for encrypted fulfillment shipping at rest. */
+  FULFILLMENT_PII_ENCRYPTION_KEY?: string;
   /** O-002 Printify personal access token (server-only). */
   PRINTIFY_API_TOKEN?: string;
   /** O-002 Printify shop id for order submit. */
   PRINTIFY_SHOP_ID?: string;
+  /** O-002 Set to 1 to enable live Printify order HTTP submit (default off). */
+  PRINTIFY_SUBMIT_ENABLED?: string;
+  /** O-003 Shared secret for Printify webhook HMAC (X-Pfy-Signature). */
+  PRINTIFY_WEBHOOK_SECRET?: string;
+  /** Tier 0 Printify product id for batch sticker template. */
+  TIER0_PRINTIFY_PRODUCT_ID?: string;
+  /** Tier 0 Printify variant id (integer). */
+  TIER0_PRINTIFY_VARIANT_ID?: string;
+  /** Tier 0 Printify shipping_method id (default 1). */
+  TIER0_PRINTIFY_SHIPPING_METHOD?: string;
+  /** Tier 1 personalized hoodie Printify product id. */
+  PERSONALIZE_HOODIE_PRINTIFY_PRODUCT_ID?: string;
+  /** Tier 1 personalized hoodie Printify variant id (integer). */
+  PERSONALIZE_HOODIE_PRINTIFY_VARIANT_ID?: string;
+  /** Tier 1 personalized hoodie Printify shipping_method id (default 1). */
+  PERSONALIZE_HOODIE_PRINTIFY_SHIPPING_METHOD?: string;
+  /** Tier 1 personalized sticker Printify product id. */
+  PERSONALIZE_STICKER_PRINTIFY_PRODUCT_ID?: string;
+  /** Tier 1 personalized sticker Printify variant id (integer). */
+  PERSONALIZE_STICKER_PRINTIFY_VARIANT_ID?: string;
+  /** Tier 1 personalized sticker Printify shipping_method id (default 1). */
+  PERSONALIZE_STICKER_PRINTIFY_SHIPPING_METHOD?: string;
+  /** Tier 1 hoodie Printify blueprint id for per-order artwork products. */
+  PERSONALIZE_HOODIE_PRINTIFY_BLUEPRINT_ID?: string;
+  /** Tier 1 hoodie Printify print provider id. */
+  PERSONALIZE_HOODIE_PRINTIFY_PRINT_PROVIDER_ID?: string;
+  /** Tier 1 hoodie print placeholder (default front). */
+  PERSONALIZE_HOODIE_PRINTIFY_PLACEHOLDER?: string;
+  /** Tier 1 sticker Printify blueprint id for per-order artwork products. */
+  PERSONALIZE_STICKER_PRINTIFY_BLUEPRINT_ID?: string;
+  /** Tier 1 sticker Printify print provider id. */
+  PERSONALIZE_STICKER_PRINTIFY_PRINT_PROVIDER_ID?: string;
+  /** Tier 1 sticker print placeholder (default front). */
+  PERSONALIZE_STICKER_PRINTIFY_PLACEHOLDER?: string;
+  /** Tier 0 batch sticker: campaign card profile_id (must exist in D1). */
+  TIER0_CAMPAIGN_PROFILE_ID?: string;
+  /** Tier 0 batch sticker: comma-separated Shopify variant ids. */
+  TIER0_SHOPIFY_VARIANT_IDS?: string;
+  /** Cloudflare Workers AI (L3 explain snapshot). */
+  AI?: Ai;
 }
 
 export default {
   async scheduled(
-    _event: ScheduledEvent,
+    event: ScheduledEvent,
     env: Env,
     _ctx: ExecutionContext
   ): Promise<void> {
@@ -88,9 +140,15 @@ export default {
     try {
       const ready = await schemaReady(env.DB);
       if (!ready) return;
+
+      if (event.cron === "0,30 * * * *") {
+        await runPrintifyReconcile(env.DB, env);
+        return;
+      }
+
       await runOrphanPurge(env.DB);
     } catch (err) {
-      console.error("orphan_purge_failed", err);
+      console.error("scheduled_job_failed", event.cron, err);
     }
   },
 
@@ -218,6 +276,39 @@ export default {
       );
       return withCors(request, res);
     }
+
+    if (
+      path === "/.well-known/hc/v1/metrics/merch-funnel" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostMerchFunnelBeacon(request, env.DB);
+      return withCors(request, res);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/operator/merch-funnel-monitor" &&
+      request.method === "GET"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetMerchFunnelMonitor(
+        request,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
+    }
+
     if (
       path === "/.well-known/hc/v1/operator/vouch-audit-flags" &&
       request.method === "GET"
@@ -279,6 +370,32 @@ export default {
       }
       const res = await handlePostCards(request, env.DB);
       return withCors(request, res);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/ai/explain-snapshot" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      return handlePostAiExplainSnapshot(request, env);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/ai/draft-manifesto" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      return handlePostAiDraftManifesto(request, env);
     }
 
     const statusMatch = path.match(
@@ -508,6 +625,17 @@ export default {
       return withCors(request, res);
     }
 
+    if (path === "/v1/store/order-status" && request.method === "GET") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetStoreOrderStatus(request, env.DB);
+      return withCors(request, res);
+    }
+
     const artifactIntentAttachMatch = path.match(
       /^\/v1\/store\/artifact-intents\/([^/]+)\/attach$/
     );
@@ -531,6 +659,13 @@ export default {
         return jsonResponse({ error: "database_unconfigured" }, 503);
       }
       return handlePostShopifyOrdersWebhook(request, env, env.DB);
+    }
+
+    if (path === "/v1/print/webhooks/printify" && request.method === "POST") {
+      if (!env.DB) {
+        return jsonResponse({ error: "database_unconfigured" }, 503);
+      }
+      return handlePostPrintifyWebhook(request, env, env.DB);
     }
 
     if (path === "/v1/print/catalog" && request.method === "GET") {
@@ -622,11 +757,13 @@ async function healthResponse(env: Env): Promise<Response> {
     operator: string;
     status: string;
     database: string;
+    build: ReturnType<typeof resolverHealthBuildField>;
   } = {
     version: PROTOCOL_VERSION,
     operator: OPERATOR_ID,
     status: "ok",
     database: "unknown",
+    build: resolverHealthBuildField(),
   };
 
   if (!env.DB) {

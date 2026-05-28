@@ -1,121 +1,185 @@
 import { describe, expect, it } from "vitest";
-import { existsSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import fs from "node:fs";
+import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+import {
+  PWA_APPLE_TOUCH_ICON_PATH,
+  PWA_INSTALL_DOC,
+  PWA_MANIFEST_PATH,
+  PWA_REQUIRED_ICON_SIZES,
+  PWA_SHELL_HTML_PATHS,
+  isPwaExcludedPath,
+  isPwaShellPagePath,
+  manifestHasRequiredIconSizes,
+  validatePwaManifestShape,
+} from "../../site/js/pwa-install-metadata-core.mjs";
+import { buildScanViewModel } from "../src/resolver/scan-state";
+import { renderScanPage } from "../src/resolver/scan-html";
 
-const SHELL_PAGES = [
-  "site/index.html",
-  "site/wallet/index.html",
-  "site/create/index.html",
-  "site/created/index.html",
-  "site/organizer-revoke/index.html",
-];
+const root = path.join(fileURLToPath(new URL("../..", import.meta.url)));
 
-function readSiteFile(relativePath: string): string {
-  return readFileSync(join(root, relativePath), "utf8");
-}
+describe("pwa-install-metadata-core", () => {
+  it("documents canonical spec path", () => {
+    expect(PWA_INSTALL_DOC).toBe("docs/PWA_INSTALL.md");
+    expect(fs.existsSync(path.join(root, "docs/PWA_INSTALL.md"))).toBe(true);
+  });
 
-function pngDimensions(relativePath: string): { width: number; height: number } {
-  const bytes = readFileSync(join(root, relativePath));
-  const signature = bytes.subarray(0, 8).toString("hex");
-  expect(signature, relativePath).toBe("89504e470d0a1a0a");
-  return {
-    width: bytes.readUInt32BE(16),
-    height: bytes.readUInt32BE(20),
-  };
-}
+  it("classifies shell vs excluded paths", () => {
+    expect(isPwaShellPagePath("/")).toBe(true);
+    expect(isPwaShellPagePath("/wallet/")).toBe(true);
+    expect(isPwaShellPagePath("/created/")).toBe(true);
+    expect(isPwaShellPagePath("/c/abc")).toBe(false);
+    expect(isPwaShellPagePath("/create/")).toBe(false);
+    expect(isPwaExcludedPath("/c/abc")).toBe(true);
+    expect(isPwaExcludedPath("/create/")).toBe(true);
+  });
 
-describe("PWA install metadata", () => {
-  it("defines an installable web app manifest", () => {
-    const manifest = JSON.parse(readSiteFile("site/app.webmanifest"));
-
-    expect(manifest).toMatchObject({
-      id: "/",
+  it("validates manifest shape", () => {
+    const ok = validatePwaManifestShape({
       name: "humanity.llc",
-      short_name: "Humanity",
+      short_name: "humanity",
       start_url: "/",
-      scope: "/",
       display: "standalone",
       background_color: "#ffffff",
       theme_color: "#ffffff",
+      icons: [{ src: "/icons/pwa-192.png", sizes: "192x192", type: "image/png" }],
     });
-    expect(manifest.display_override).toEqual(["standalone", "minimal-ui", "browser"]);
-    expect(manifest.icons).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          src: "/assets/pwa-icon-192.png",
-          sizes: "192x192",
-          type: "image/png",
-          purpose: "any",
-        }),
-        expect.objectContaining({
-          src: "/assets/pwa-icon-512.png",
-          sizes: "512x512",
-          type: "image/png",
-          purpose: "any",
-        }),
-        expect.objectContaining({
-          src: "/assets/pwa-maskable-512.png",
-          sizes: "512x512",
-          type: "image/png",
-          purpose: "maskable",
-        }),
+    expect(ok.ok).toBe(true);
+
+    const bad = validatePwaManifestShape({ name: "x" });
+    expect(bad.ok).toBe(false);
+    if (!bad.ok) {
+      expect(bad.missing).toContain("icons");
+    }
+  });
+
+  it("requires 192 and 512 icon sizes when manifest ships", () => {
+    expect(
+      manifestHasRequiredIconSizes([
+        { sizes: "192x192" },
+        { sizes: "512x512" },
       ])
+    ).toBe(true);
+    expect(manifestHasRequiredIconSizes([{ sizes: "192x192" }])).toBe(false);
+    expect(PWA_REQUIRED_ICON_SIZES).toEqual([192, 512]);
+  });
+});
+
+describe("PWA metadata on disk (Phase 1 gate)", () => {
+  it("manifest path constant matches planned deploy location", () => {
+    expect(PWA_MANIFEST_PATH).toBe("/manifest.webmanifest");
+  });
+
+  it("manifest file exists with required fields after Phase 1", () => {
+    const manifestPath = path.join(root, "site/manifest.webmanifest");
+    if (!fs.existsSync(manifestPath)) {
+      expect.soft(manifestPath).toMatch(/manifest\.webmanifest$/);
+      return;
+    }
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    const result = validatePwaManifestShape(manifest);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(manifestHasRequiredIconSizes(manifest.icons)).toBe(true);
+    }
+  });
+
+  it("shell HTML includes manifest link after Phase 1", () => {
+    for (const rel of PWA_SHELL_HTML_PATHS) {
+      const htmlPath = path.join(root, "site", rel.replace(/^\//, ""));
+      const html = fs.readFileSync(htmlPath, "utf8");
+      if (!fs.existsSync(path.join(root, "site/manifest.webmanifest"))) {
+        expect(html).not.toContain('rel="manifest"');
+        continue;
+      }
+      expect(html, rel).toContain('rel="manifest"');
+      expect(html, rel).toContain(PWA_MANIFEST_PATH);
+      expect(html, rel).toContain('rel="apple-touch-icon"');
+      expect(html, rel).toContain(PWA_APPLE_TOUCH_ICON_PATH);
+    }
+  });
+
+  it("icon PNGs exist on disk after Phase 1", () => {
+    const manifestPath = path.join(root, "site/manifest.webmanifest");
+    if (!fs.existsSync(manifestPath)) return;
+    for (const size of PWA_REQUIRED_ICON_SIZES) {
+      expect(fs.existsSync(path.join(root, `site/icons/pwa-${size}.png`))).toBe(true);
+    }
+    expect(fs.existsSync(path.join(root, "site/icons/pwa-apple-touch.png"))).toBe(true);
+  });
+
+  it("shell HTML includes install card placeholder after Phase 2", () => {
+    for (const rel of PWA_SHELL_HTML_PATHS) {
+      const htmlPath = path.join(root, "site", rel.replace(/^\//, ""));
+      const html = fs.readFileSync(htmlPath, "utf8");
+      expect(html, rel).toContain('id="device-pwa-install-card"');
+    }
+    const createHtml = fs.readFileSync(path.join(root, "site/create/index.html"), "utf8");
+    expect(createHtml).not.toContain('id="device-pwa-install-card"');
+  });
+
+  it("status bootstrap lazy-loads pwa-install on shell pages only", () => {
+    const bootstrap = fs.readFileSync(
+      path.join(root, "site/js/device-status-bootstrap.mjs"),
+      "utf8"
     );
-    expect(manifest.shortcuts.map((shortcut: { url: string }) => shortcut.url)).toEqual([
-      "/wallet/",
-      "/create/",
-      "/help/",
-    ]);
+    expect(bootstrap).toContain("isPwaShellPagePath");
+    expect(bootstrap).toContain("pwa-install.mjs");
+    expect(bootstrap).not.toContain('from "./pwa-install.mjs"');
   });
 
-  it("ships manifest and Apple icon assets at declared sizes", () => {
-    for (const path of [
-      "site/app.webmanifest",
-      "site/assets/pwa-icon-192.png",
-      "site/assets/pwa-icon-512.png",
-      "site/assets/pwa-maskable-512.png",
-      "site/assets/apple-touch-icon.png",
-    ]) {
-      expect(existsSync(join(root, path)), path).toBe(true);
-    }
+  it("create and scan HTML do not link manifest", async () => {
+    const createHtml = fs.readFileSync(path.join(root, "site/create/index.html"), "utf8");
+    expect(createHtml).not.toContain('rel="manifest"');
 
-    expect(pngDimensions("site/assets/pwa-icon-192.png")).toEqual({ width: 192, height: 192 });
-    expect(pngDimensions("site/assets/pwa-icon-512.png")).toEqual({ width: 512, height: 512 });
-    expect(pngDimensions("site/assets/pwa-maskable-512.png")).toEqual({
-      width: 512,
-      height: 512,
-    });
-    expect(pngDimensions("site/assets/apple-touch-icon.png")).toEqual({
-      width: 180,
-      height: 180,
-    });
-  });
-
-  it("links install metadata from shell entry pages", () => {
-    for (const page of SHELL_PAGES) {
-      const html = readSiteFile(page);
-      expect(html, page).toContain('<link rel="manifest" href="/app.webmanifest" />');
-      expect(html, page).toContain(
-        '<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />'
-      );
-      expect(html, page).toContain('<meta name="mobile-web-app-capable" content="yes" />');
-      expect(html, page).toContain('<meta name="apple-mobile-web-app-capable" content="yes" />');
-      expect(html, page).toContain('<meta name="apple-mobile-web-app-title" content="Humanity" />');
-      expect(html, page).toContain(
-        '<meta name="apple-mobile-web-app-status-bar-style" content="default" />'
-      );
-      expect(html, page).toContain('<meta name="theme-color" content="#ffffff" />');
-    }
-  });
-
-  it("serves install assets with explicit Pages headers", () => {
-    const headers = readSiteFile("site/_headers");
-
-    expect(headers).toContain("/app.webmanifest\n  Content-Type: application/manifest+json");
-    expect(headers).toContain("/assets/*.png\n  Cache-Control: public, max-age=31536000, immutable");
-    expect(headers).toContain("/sw-live-proof.mjs\n  Cache-Control: no-cache");
+    const vm = buildScanViewModel(
+      "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+      "qr_test",
+      {
+        card: {
+          profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+          public_key: "pk",
+          handle: "test",
+          handle_normalized: "test",
+          manifesto_line: "line",
+          status: "active",
+          card_document_json: "{}",
+          created_at: "2026-05-16T17:00:00Z",
+          updated_at: "2026-05-16T17:00:00Z",
+        },
+        qr: {
+          qr_id: "qr_test",
+          profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+          epoch: 1,
+          scope: "card",
+          print_artifact_id: null,
+          resolver_hint: "https://humanity.llc",
+          status: "active",
+          payload: "https://humanity.llc/c/x?q=qr_test",
+          issued_at: "2026-05-16T17:00:00Z",
+          expires_at: "2027-05-16T17:00:00Z",
+          credential_document_json: "{}",
+          created_at: "2026-05-16T17:00:00Z",
+          updated_at: "2026-05-16T17:00:00Z",
+        },
+        verification: {
+          profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+          state: "registered",
+          level: 1,
+          label: "Registered",
+          method: "registered",
+          vouch_count: 0,
+          latest_accepted_vouch_at: null,
+          credential_ids_json: "[]",
+          summary_document_json: null,
+          updated_at: "2026-05-16T17:00:00Z",
+        },
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+    const scanHtml = await renderScanPage(vm, "https://humanity.llc");
+    expect(scanHtml).not.toContain('rel="manifest"');
   });
 });

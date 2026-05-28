@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   anyClientVisible,
   buildLiveProofSwNotification,
+  buildLiveProofSwNotificationFromPushHint,
   liveProofPollTargetsFromWallet,
   pendingLiveControlChallengeUrl,
   pollWalletEntriesForLiveProof,
@@ -51,6 +52,18 @@ describe("swLiveProofPollingShouldRun", () => {
     ).toBe(false);
     expect(
       swLiveProofPollingShouldRun({ enabled: true, resolverHealth: "degraded" })
+    ).toBe(false);
+  });
+
+  it("skips SW polling when hosted push is healthy (E4d)", () => {
+    expect(
+      swLiveProofPollingShouldRun({
+        enabled: true,
+        watchLiveProofEnabled: true,
+        resolverHealth: "ok",
+        stewardPushEntitled: true,
+        stewardPushHealthy: true,
+      })
     ).toBe(false);
   });
 });
@@ -188,5 +201,31 @@ describe("buildLiveProofSwNotification", () => {
     expect(payload.body).toContain("Live proof");
     expect(payload.href).toContain("/created/");
     expect(payload.href).toContain("live_challenge=ch1");
+  });
+});
+
+describe("buildLiveProofSwNotificationFromPushHint", () => {
+  it("builds notification payload from SSE push hint", () => {
+    const payload = buildLiveProofSwNotificationFromPushHint(
+      {
+        profile_id: PROFILE,
+        qr_id: QR_ID,
+        challenge_id: "lc_push_1",
+      },
+      [{ profile_id: PROFILE, qr_id: QR_ID, label: "Push card" }],
+      "http://localhost:8788"
+    );
+    expect(payload?.title).toBe("Push card");
+    expect(payload?.href).toContain("live_challenge=lc_push_1");
+  });
+
+  it("returns null when wallet row is missing", () => {
+    expect(
+      buildLiveProofSwNotificationFromPushHint(
+        { profile_id: PROFILE, challenge_id: "lc_push_1" },
+        [],
+        "http://localhost:8788"
+      )
+    ).toBeNull();
   });
 });

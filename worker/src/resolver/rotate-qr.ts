@@ -15,6 +15,7 @@ import {
 import { getCardOwner } from "../db/revoke";
 import { errorResponse, jsonResponse, requestOrigin } from "../http/resolver";
 import { validateManifestoLine } from "../validation/manifesto";
+import { validateObjectStreamsField } from "../validation/object-streams";
 import { resolveStoredQrExpiresAt } from "./merch-qr-policy";
 
 function parseRotateBody(body: unknown): {
@@ -279,6 +280,13 @@ export async function handlePostRotateQr(
     manifestoLine = validateManifestoLine(card.manifesto_line as string);
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Invalid manifesto_line.";
+    return errorResponse("MALFORMED_REQUEST", msg, 422);
+  }
+
+  try {
+    validateObjectStreamsField(card);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Invalid object_streams.";
     return errorResponse("MALFORMED_REQUEST", msg, 422);
   }
 

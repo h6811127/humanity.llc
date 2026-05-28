@@ -1,9 +1,12 @@
 # Merch-Led V1: Curiosity + Belonging
 
 **Status:** Canonical wedge (v1 GTM) · **Phase B in progress**  -  Tier 0 story shop at `/shop/`  
+**Current focus (2026-05-27, post-M5):** **Merch funnel MVP** — Tier 1 personalized wear (hoodie / sticker with unique QR), not status plates as primary launch wedge.  
 **Purpose:** Lead with physical artifacts as viral distribution while pairing **proof of curiosity** (spread) with **proof of belonging** (retention). Commons Pass and organizer tooling follow once people already wear the object.
 
 **Implementation tracker:** `docs/SHOP_TIER0_IMPLEMENTATION.md` (Pages UI, waitlist interest, Shopify handoff checklist).  
+**Merch funnel MVP:** `docs/MERCH_FUNNEL_MVP.md` (scan → profile → `/shop/customize/` → Printify).  
+**Headless commerce (Shopify + Printify wiring):** `docs/MERCH_HEADLESS_COMMERCE.md` — factory vs cash register vs storefront; Tier 1 customizeability.  
 **Merch QR lifecycle:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` (no calendar expiry on printed artifacts, revoke/reprint, optional experiments).
 
 **Architecture and launch gate:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  -  public card creation when Phase A ships; federated networks long-term; founding cohort is optional feedback only.
@@ -145,7 +148,7 @@ Prove walking ads work:
 
 ### Phase C  -  Belonging on the object (personalized line)
 
-Connect artifact to card holders (not a protocol invite gate):
+Connect artifact to card holders (not a protocol invite gate). **Commerce architecture:** [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) — customize on humanity.llc, pay on Shopify, print via Printify API (not Printify storefront).
 
 1. Personalized drop for active Humanity Card holders when print QA allows.
 2. Personalized QR per item when provider QA supports it (`artifact_intent` → Shopify → Printify vertical slice).

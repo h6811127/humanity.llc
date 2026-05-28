@@ -13,6 +13,7 @@ import { tabNoticeCount } from "./device-counts.mjs";
 import { gatherInboxInput } from "./device-inbox.mjs";
 import { openCardNowPage, getTabSession } from "./device-keys.mjs";
 import { purgePresenceForProfile } from "./device-tab-presence.mjs";
+import { offerClearOtherTabKeysOnRemove } from "./device-notice-nav.mjs";
 import { markProfileRemovedFromDevice } from "./device-wallet-removed-profiles.mjs";
 import {
   defaultWalletLabel,
@@ -188,6 +189,7 @@ function renderList() {
       if (entry?.profile_id) {
         markProfileRemovedFromDevice(entry.profile_id);
         purgePresenceForProfile(entry.profile_id);
+        offerClearOtherTabKeysOnRemove(entry.profile_id);
       }
       saveWallet(loadWallet().filter((e) => e.id !== id));
       renderList();

@@ -4,15 +4,15 @@
 **Purpose:** Define **Revoke QR**, **Disable card**, **Suspend**, and **Delete** as distinct owner/governance actions; what scanners see; what stays in the URL; and what is shipped vs planned.  
 **Supersedes:** Informal “revoke” wording in UI copy only  -  crypto/API field names may still use `revoked` until a labeled migration.
 
-**Related:** `docs/Technical Standards v1.0.md` §10–11, `docs/V1_PRODUCT_TRUST_MODEL.md`, `docs/M4_CREATED_REVOKE_UI.md`, `docs/M5_5_OWNER_KEY_PORTABILITY.md`, `docs/V1_IMPLEMENTATION_CONTRACTS.md`, `docs/MERCH_QR_LIFECYCLE_POLICY.md` (printed artifacts)
+**Related:** `docs/ROOT_CARD_AND_CHILD_OBJECTS.md`, `docs/Technical Standards v1.0.md` §10–11, `docs/V1_PRODUCT_TRUST_MODEL.md`, `docs/M4_CREATED_REVOKE_UI.md`, `docs/M5_5_OWNER_KEY_PORTABILITY.md`, `docs/V1_IMPLEMENTATION_CONTRACTS.md`, `docs/MERCH_QR_LIFECYCLE_POLICY.md` (printed artifacts)
 
 ---
 
 ## Core primitive
 
-A Humanity **QR credential** (`qr_id`) is a **signed capability pointer**: it resolves to **current** resolver state until an authorized key changes that state.
+A Humanity **QR credential** (`qr_id`) is a **signed capability pointer**: it resolves to **current** resolver state until an authorized root, recovery, or future delegated child key changes that state.
 
-**Owning the object** means owning its **lifecycle**  -  not only “delete this QR.” The interesting product is **programmable state transitions** for physical software objects. **Revoke is one transition** (pointer off). **Expiry** is another (time). Future transitions (claimed, recovered, after-next-scan, replaced) use the same primitive: **object state on the resolver**, not scan surveillance.
+**Owning the object** means owning its **lifecycle**  -  not only “delete this QR.” In the target model, the root Humanity Card key owns the lifecycle of its child objects by default. The interesting product is **programmable state transitions** for physical software objects. **Revoke is one transition** (pointer off). **Expiry** is another (time). Future transitions (claimed, recovered, after-next-scan, replaced) use the same primitive: **object state on the resolver**, not scan surveillance.
 
 **Design rule (privacy):** Store **minimal object state** (`status`, `expires_at`, optional counters/reasons)  -  not **who scanned, when, or where**. No default scan logs. See §State transitions.
 
@@ -25,7 +25,8 @@ A Humanity **QR credential** (`qr_id`) is a **signed capability pointer**: it re
 | **Active** | Default; scan shows live manifesto / pilot layout | ✓ | No |
 | **Expired** | Validity ended (`expires_at`) | ✓ (M4.6) | No |
 | **Revoke QR** | One pointer off; siblings may stay active | ✓ | No |
-| **Disable card** | Whole profile offline | ✓ | No |
+| **Disable child object** | One nested object offline; root stays active | Target | No |
+| **Disable card** | Whole root profile offline; child trust cascades off | ✓ | No |
 | **Organizer revoke** | Coalition key, `organizer_revoked` | ✓ (pilot) | No |
 | **After next scan** | One-time reveal then off | Research | Counter only, not identity |
 | **After N scans** | Limited tickets / clues | Research | Count only, not who |
@@ -44,11 +45,12 @@ A Humanity **QR credential** (`qr_id`) is a **signed capability pointer**: it re
 | User-facing term | Protocol / D1 (today) | Who | Scope |
 |------------------|----------------------|-----|--------|
 | **Revoke this QR** | `target_kind: qr_credential`, `qr_credentials.status → revoked` | Owner or recovery key | One `qr_id` |
-| **Disable card** | `target_kind: card`, `cards.status → revoked` | Owner or recovery key | Profile + all active QRs |
-| **Suspend card** | `cards.status → suspended` | Governance keys (not owner) | Profile + policy-defined QRs |
+| **Disable child object** | Future object status row → `disabled` / linked QR statuses | Root owner, recovery key, or future delegated child capability | One child object + policy-defined child QRs |
+| **Disable card** | `target_kind: card`, `cards.status → revoked` | Owner or recovery key | Root profile + all active child objects / QRs |
+| **Suspend card** | `cards.status → suspended` | Governance keys (not owner) | Root profile + policy-defined child objects / QRs |
 | **Delete card** | *Not implemented*  -  see §Delete below | Owner (future spec) | Strongest privacy / export erasure story |
 
-**UI direction:** Replace “Revoke entire card” with **Disable card**. Keep **Revoke this QR**  -  it matches stickers, wristbands, and printed items.
+**UI direction:** Replace “Revoke entire card” with **Disable card**. Keep **Revoke this QR**  -  it matches stickers, wristbands, and printed items. When child-object endpoints ship, use **Disable object** for one nested object and reserve **Disable card** for the root cascade.
 
 **Internal labels:** Resolver rows may stay `revoked`; public scan copy uses **Revoked** (QR) vs **Disabled** (card) where helpful. Trust model labels: `Revoked By Owner` vs `Suspended Under Public Rules` (`docs/V1_DECISION_LOCK.md`).
 
@@ -58,7 +60,7 @@ A Humanity **QR credential** (`qr_id`) is a **signed capability pointer**: it re
 
 | Capability | Status |
 |------------|--------|
-| Owner-signed `POST …/revoke` for one QR or whole card | **Live** |
+| Owner-signed `POST …/revoke` for one QR or whole root card | **Live** |
 | Recovery-key-signed revoke | **Live** (after D1 migration `0003_recovery_public_key.sql`) |
 | Encrypted backup import → revoke on `/created/` | **Live** |
 | Scan shows `qr_revoked` (card may stay active) or `card_revoked` | **Live** |
@@ -74,7 +76,7 @@ Current scan copy (whole card): handle/manifesto may still appear on revoked sca
 
 ## Revoke QR
 
-**Intent:** Kill **one** printed or shared pointer (event wristband, one sticker, one scan link) without destroying the owner’s card.
+**Intent:** Kill **one** printed or shared pointer (event wristband, one sticker, one scan link) without destroying the owner’s root card or sibling child objects.
 
 ### Scanner experience (target)
 
@@ -90,7 +92,7 @@ Current scan copy (whole card): handle/manifesto may still appear on revoked sca
 
 - Show `@handle` + “QR revoked” for contexts where the link was semi-public (studio door plate)
 
-**Sibling QRs:** Other `qr_id`s on the same card stay **active** unless separately revoked (`M4.3`).
+**Sibling QRs:** Other `qr_id`s on the same root card / child object stay **active** unless separately revoked (`M4.3`).
 
 ### Permanent warning (physical reality)
 
@@ -134,7 +136,7 @@ The resolver cannot erase what is **printed**. Disable/revoke changes **what the
 |---------|-----------|
 | **Scheduled end** | `expires_at` on `qr_credential` (schema exists)  -  UI for “valid until Sunday 11pm” |
 | **Replace / rotate** | New epoch; old QR → `replaced` (`A.6`) |
-| **Item-scoped QR** | `scope: print_artifact`  -  revoke one merch sticker; **no calendar `expires_at` on founding merch** ([`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md)) |
+| **Item-scoped QR** | `scope: print_artifact`  -  child-object-like printed item; revoke one merch sticker; **no calendar `expires_at` on founding merch** ([`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md)) |
 
 ### Way future (explicit non-goals for v1)
 
@@ -149,7 +151,7 @@ These need accounts, location, or private graphs  -  out of scope for public sca
 
 ## Disable card
 
-**Intent:** Owner retires the **whole public card**  -  all active QRs stop resolving as active; the person is not using this profile on this operator anymore.
+**Intent:** Owner retires the **whole public root card**  -  all active child objects and QRs stop resolving as active; the person is not using this profile on this operator anymore.
 
 **Maps to today’s API:** `target_kind: card` (UI label → **Disable card**).
 

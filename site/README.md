@@ -38,6 +38,10 @@ npm run deploy
 # or: npx wrangler pages deploy site --project-name=humanity-llc
 ```
 
+`pages:deploy` / `deploy` run `npm run site:build-meta` first (git SHA + shell asset version → `site/js/build-meta.mjs`). See [`docs/SITE_BUILD_VERSIONING.md`](../docs/SITE_BUILD_VERSIONING.md). On shell pages, DevTools console shows `[humanity] site build …` after load.
+
+**Git-connected Pages:** set build command to `npm run site:build-meta && npm run build` (output directory `site`).
+
 **Custom domain:** `humanity.llc`
 
 ### Unknown URLs (404)
@@ -76,16 +80,12 @@ Pages serves `404.html` with HTTP **404** for paths that do not match a file whe
 ### Homepage showcase card
 
 ```bash
-API_ORIGIN=https://humanity.llc npm run site:seed-showcase
+API_ORIGIN=https://humanity.llc npm run site:refresh-showcase
 ```
 
-Writes `data/showcase-status-plate.json` with a live scan URL for the status-plate pilot block on the landing page.
+Writes `data/showcase-status-plate.json` and `data/showcase-live-object.json` with live scan URLs for the landing pilot rows. If a base handle is already taken on the API, each seed retries with a unique suffix automatically. Re-run after rotating showcase cards; commit updated JSON and deploy Pages before `npm run site:verify-showcase`.
 
-```bash
-API_ORIGIN=https://humanity.llc npm run site:seed-showcase-live-object
-```
-
-Writes `data/showcase-live-object.json` with a **print_artifact** scan URL for M5 stranger tests and the landing “Try a live object scan” row (`landing-showcase-live-object.mjs`). Re-run after rotating showcase cards.
+Individual seeds: `site:seed-showcase` (status plate only) · `site:seed-showcase-live-object` (live object only).
 
 ### Device OS (browser shell)
 

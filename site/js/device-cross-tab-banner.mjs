@@ -17,8 +17,14 @@ import {
 import { gatherInboxInput, getInboxItems } from "./device-inbox.mjs";
 import { inboxItemsIncludeKind } from "./device-hub-inbox-alerts.mjs";
 import { actOnOtherTabKeys, walletEntryForProfile } from "./device-notice-nav.mjs";
+import {
+  crossTabAggregateSubtitle,
+  crossTabAggregateTitle,
+} from "./device-cross-tab-copy-core.mjs";
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
 import { getCrossTabScanSnapshot } from "./device-cross-tab-state.mjs";
+import { hasUnifiedHubKeysCustodyPanel } from "./device-hub-keys-custody.mjs";
+import { shouldShowLegacyHubCrossTabChrome } from "./device-legacy-cross-tab-chrome-core.mjs";
 import {
   emphasisCardActionsHtml,
   emphasisCardBodyHtml,
@@ -54,6 +60,11 @@ function clearScanCrossTabBanner() {
 function renderPageCrossTabBanner() {
   if (!banner) return;
 
+  if (!shouldRenderLegacyHubCrossTabChrome()) {
+    clearPageCrossTabBanner();
+    return;
+  }
+
   if (!shouldShowCrossTabNotice()) {
     clearPageCrossTabBanner();
     return;
@@ -83,8 +94,8 @@ function renderPageCrossTabBanner() {
   banner.hidden = false;
   banner.className = "hc-emphasis-card hc-emphasis-card--info device-cross-tab-banner";
   banner.innerHTML = emphasisCardBodyHtml({
-    eyebrow: "Keys in another tab",
-    title: `${msg.label}${msg.extra}`,
+    eyebrow: escapeHtml(msg.title),
+    title: escapeHtml(msg.detail),
     detail,
     dot: "info",
     actionsHtml: emphasisCardActionsHtml(actions),
@@ -102,7 +113,11 @@ function labelForPresence(entry) {
 function shouldShowCrossTabNotice() {
   if (shouldShowOrphanHubNotice()) return false;
   if (document.getElementById("shell-notif-badge")) {
-    return inboxItemsIncludeKind(getInboxItems(), "cross_tab_keys");
+    const items = getInboxItems();
+    return (
+      inboxItemsIncludeKind(items, "cross_tab_keys") ||
+      inboxItemsIncludeKind(items, "other_tabs_unsaved_keys")
+    );
   }
   return gatherInboxInput().crossTabEntries.length > 0;
 }
@@ -117,15 +132,10 @@ function shouldShowOrphanHubNotice() {
 function crossTabMessage(others) {
   if (others.length === 0) return null;
   const primary = others[0];
-  const label = escapeHtml(labelForPresence(primary));
-  const extra =
-    others.length > 1
-      ? ` (+${others.length - 1} other tab${others.length === 2 ? "" : "s"})`
-      : "";
   return {
     primary,
-    label,
-    extra,
+    title: crossTabAggregateTitle(others.length),
+    detail: crossTabAggregateSubtitle(others),
   };
 }
 
@@ -203,8 +213,18 @@ function clearHubCrossTabNotice() {
   delete hubSlot.dataset.hubSearchable;
 }
 
+function shouldRenderLegacyHubCrossTabChrome() {
+  return shouldShowLegacyHubCrossTabChrome(
+    Boolean(document.getElementById("shell-notif-badge")),
+    hasUnifiedHubKeysCustodyPanel()
+  );
+}
+
 function renderHubOrphanRemovedNotice() {
   if (!hubSlot) return;
+  if (!shouldRenderLegacyHubCrossTabChrome()) {
+    return false;
+  }
   if (!shouldShowOrphanHubNotice()) {
     return false;
   }
@@ -224,7 +244,7 @@ function renderHubOrphanRemovedNotice() {
   hubSlot.dataset.hubSearchable = "keys removed card another tab";
   hubSlot.innerHTML = emphasisCardBodyHtml({
     eyebrow: ORPHAN_KEYS_INBOX_TITLE,
-    title: `${msg.label}${msg.extra}`,
+    title: escapeHtml(msg.detail),
     detail: `${ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX} Open that tab to close it, or clear keys on this device.`,
     dot: "warn",
     actionsHtml: emphasisCardActionsHtml(actions),
@@ -240,6 +260,10 @@ function renderHubOrphanRemovedNotice() {
 
 function renderHubCrossTabNotice() {
   if (!hubSlot) return;
+  if (!shouldRenderLegacyHubCrossTabChrome()) {
+    clearHubCrossTabNotice();
+    return;
+  }
   if (renderHubOrphanRemovedNotice()) {
     return;
   }
@@ -268,10 +292,10 @@ function renderHubCrossTabNotice() {
 
   hubSlot.hidden = false;
   hubSlot.className = "device-hub-group hc-emphasis-card hc-emphasis-card--info";
-  hubSlot.dataset.hubSearchable = "keys another tab";
+  hubSlot.dataset.hubSearchable = "keys open another tab";
   hubSlot.innerHTML = emphasisCardBodyHtml({
-    eyebrow: "Keys in another tab",
-    title: `${msg.label}${msg.extra}`,
+    eyebrow: escapeHtml(msg.title),
+    title: escapeHtml(msg.detail),
     detail,
     dot: "info",
     actionsHtml: emphasisCardActionsHtml(actions),
@@ -317,8 +341,8 @@ function renderScanCrossTabNotice() {
   scanBanner.hidden = false;
   scanBanner.className = "hc-emphasis-card hc-emphasis-card--info scan-cross-tab-banner";
   scanBanner.innerHTML = emphasisCardBodyHtml({
-    eyebrow: "Keys in another tab",
-    title: `${msg.label}${msg.extra}`,
+    eyebrow: escapeHtml(msg.title),
+    title: escapeHtml(msg.detail),
     detail,
     dot: "info",
     actionsHtml: emphasisCardActionsHtml(actions),
@@ -333,11 +357,12 @@ export function renderCrossTabKeysBanner() {
   renderScanCrossTabNotice();
 
   if (document.getElementById("shell-notif-badge")) {
-    renderHubCrossTabNotice();
+    clearHubCrossTabNotice();
     clearPageCrossTabBanner();
     return;
   }
 
+  renderHubCrossTabNotice();
   renderPageCrossTabBanner();
 }
 

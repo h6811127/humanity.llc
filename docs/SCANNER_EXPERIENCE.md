@@ -181,7 +181,7 @@ The hero answers four questions in one calm block (ASCII layout is illustrative)
 |----------|-----------------|
 | Host + status | `humanity.llc` + **one** status treatment (Active / Revoked / Expired / …) |
 | H1 | Scan-type-specific (see § Scan type templates) |
-| Resolver | “Signed object verified by resolver” when signatures validate—**object** verified, not person |
+| Resolver | “Signed object verified by resolver” when signatures validate—**object** verified, not person; child objects are controlled by a root card |
 | Limit | Single canonical bearer line in hero; no duplicate “Limits” row in a fact grid |
 | Motion | One brand border pulse on hero load, then settle—`prefers-reduced-motion` respected |
 | First open | “First time you opened this object on this device” as **footnote**, not competing with status |
@@ -195,7 +195,7 @@ Branch on `parseManifestoDisplay()` (`worker/src/resolver/manifesto-display.ts`)
 
 | Scan type | H1 (primary) | Subhero / secondary |
 |-----------|--------------|---------------------|
-| **Live object** (general manifesto, single line or prose) | Manifesto text | `Controlled by @handle` |
+| **Live object** (general manifesto, single line or prose) | Manifesto text | `Controlled by @handle` root relationship |
 | **Status plate** (`{label}\n{status line}`) | Object label (e.g. “Studio door”) | Status line (e.g. “Open until 9 PM”) |
 | **Lost item relay** (`[relay] {label}\n{line}`) | Item label | Relay status line |
 | **Personal card** | `@handle` | Manifesto + trust pills (vouched, live control, QR active) |
@@ -206,6 +206,8 @@ Foot copy per type (examples):
 - Live object: “Scan shows live object state.”
 - Status plate: “Scan shows current status for this place—not who owns the door.”
 - Lost item relay: “This scan does not prove who holds the item.”
+
+Child-object rule: object status and root human trust must be visually separate. A scan may say **Controlled by @handle**, but it must not imply the object itself is a separate vouched human.
 
 ### Known UX gaps (resolved pass-v21–v24)
 
@@ -367,7 +369,7 @@ Implementation detail: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) § UI ref
 | **1** | **Hero consolidation** for active scans: single Live check card; dedupe status/limits/brand; demote QR; CSS spacing pass | **Shipped** |
 | **2** | Scan-type templates: status plate, lost item relay, personal card heroes | **Shipped** — `buildScanHeroMain()` |
 | **3** | Below-fold: collapsible trust groups; “proves / does not prove” modules | **Shipped** — `renderScanTrustModules()`, `scan-trust-details` |
-| **4** | M5 stranger test + live object fixture; HTML snapshot tests; `X-HC-Scan-UI` bump | **Shipped** (`pass-v23`) — automated hero template tests; M5 strangers still manual |
+| **4** | M5 stranger test + live object fixture; HTML snapshot tests; `X-HC-Scan-UI` bump | **Shipped** (`pass-v23`) — automated hero template tests; **M5 strangers passed 2026-05-27** |
 | **5** | Omit empty trust groups; M5 showcase seed + landing | **Shipped** (`pass-v24`) — [`docs/M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) step 10 |
 | **6** | Trust-tool rows: icon + peek summaries, “Check at scan time” section, above show-link | **Shipped** (`pass-v25`) — `scan-group-summary` in `scan-html.ts` |
 
@@ -377,7 +379,7 @@ Implementation detail: [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) § UI ref
 
 ### Stranger test (exit gate)
 
-[`docs/M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md): three outsiders explain proves / does-not-prove in one sentence; at least one revokes QR and re-scans. Include at least one **live object** or pilot sticker scan—not only self-created cards.
+**Passed 2026-05-27.** [`docs/M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md): three outsiders explained proves / does-not-prove in one sentence; at least one revoked QR and re-scanned. Included at least one **live object** or pilot sticker scan—not only self-created cards.
 
 ### Success criteria (first scan)
 

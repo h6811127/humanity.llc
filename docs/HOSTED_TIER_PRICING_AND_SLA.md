@@ -189,11 +189,15 @@ Hosted fees fund:
 | G9 | Sell on reference only at launch | Yes | Governance |
 | G10 | Org plan `hosted_org_v1` | Defer post–Commons Pass | Product |
 
-**Sign-off:** `[ ]` Governance · `[ ]` Ops · `[ ]` Legal — date: _________
+**Sign-off:** `[x]` Governance · `[x]` Ops · `[ ]` Legal — date: **2026-05-27** (solo founder; no formal meeting — product/governance and ops defaults accepted as listed)
 
-**After sign-off:** Engineering may start **E1** per [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md). Do **not** merge billing (E5) until **G8** payment provider is checked.
+**Legal pending:** G7 refund wording and any customer-facing billing terms remain **planning defaults** until counsel review. Does **not** block engineering production rollout or ops monitoring.
 
-**Sign-off packet (read order):** [`HOSTED_TIER_M4_GOVERNANCE_BRIEF.md`](HOSTED_TIER_M4_GOVERNANCE_BRIEF.md) (summary) → this doc → [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) → [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) → [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md) § Is There A Paid Tier?
+**Engineering status (2026-05-27):** E1–E6 code complete in staging. **G0 (Governance + Ops) unlocks production rollout** per [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout (after G0). Enable `HOSTED_STEWARD_ENABLED`, `OPERATOR_AUDIT_TOKEN`; enable `STRIPE_WEBHOOK_SECRET` only after **G8** (Stripe) is explicitly confirmed for production billing.
+
+**After sign-off:** Enable production secrets per [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) rollout. Configure repo secret `OPERATOR_AUDIT_TOKEN` for E6.2 daily CI (`.github/workflows/steward-ops-daily.yml`).
+
+**Sign-off packet (read order):** [`HOSTED_TIER_G0_READINESS.md`](HOSTED_TIER_G0_READINESS.md) (verification) → [`HOSTED_TIER_M4_GOVERNANCE_BRIEF.md`](HOSTED_TIER_M4_GOVERNANCE_BRIEF.md) (summary) → this doc → [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) → [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) → [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md) § Is There A Paid Tier?
 
 ---
 
@@ -217,3 +221,5 @@ Hosted fees fund:
 | Date | Note |
 |------|------|
 | 2026-05-26 | M4 initial governance one-pager (planning defaults) |
+| 2026-05-27 | Engineering E1–E6 staging complete; G0 gates production enablement |
+| 2026-05-27 | **G0 signed** (Governance + Ops, solo founder); Legal pending for G7 |

@@ -7,6 +7,10 @@ export function normalizeScanHeroSnippet(html: string): string {
     .replace(/data-qr-id="[^"]+"/g, 'data-qr-id="QR"')
     .replace(/data-scan-url="[^"]+"/g, 'data-scan-url="SCAN_URL"')
     .replace(/HC-[0-9A-HJKMNP-TV-Z]{4}-[0-9A-HJKMNP-TV-Z]{4}/g, "HC-XXXX-XXXX")
+    .replace(
+      /Valid until ([^·]+), \d+:\d+ [AP]M/g,
+      "Valid until $1, EXPIRY_TIME"
+    )
     .replace(/<svg[\s\S]*?<\/svg>/g, "<svg><!-- qr --></svg>")
     .replace(/\s+/g, " ")
     .trim();

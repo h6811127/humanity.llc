@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  countTier0LineQuantity,
   extractShopifyOrderMetadata,
   shopifyOrderIsPaid,
 } from "../src/commerce/shopify-order-metadata";
@@ -34,6 +35,21 @@ describe("extractShopifyOrderMetadata", () => {
       line_items: [{ properties: [{ name: "artifact_intent_id", value: "ai_two" }] }],
     });
     expect(meta?.artifact_intent_ids).toEqual(["ai_one", "ai_two"]);
+  });
+});
+
+describe("countTier0LineQuantity", () => {
+  it("sums quantity for configured variant ids", () => {
+    const qty = countTier0LineQuantity(
+      {
+        line_items: [
+          { variant_id: 12345678, quantity: 2 },
+          { variant_id: 999, quantity: 1 },
+        ],
+      },
+      new Set(["12345678"])
+    );
+    expect(qty).toBe(2);
   });
 });
 

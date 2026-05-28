@@ -11,6 +11,8 @@ describe("print handlers (O-002)", () => {
     const json = (await res.json()) as { products: { template_id: string }[] };
     expect(res.status).toBe(200);
     expect(json.products.some((p) => p.template_id === "hc-sticker-square-v1")).toBe(true);
+    expect(json.products.some((p) => p.template_id === "hc-hoodie-live-object-v1")).toBe(true);
+    expect(json.products.some((p) => p.template_id === "hc-tier0-sticker-batch-v1")).toBe(true);
   });
 
   it("POST /v1/print/artifacts generates sticker SVG artwork", async () => {

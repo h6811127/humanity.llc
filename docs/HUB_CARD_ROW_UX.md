@@ -124,6 +124,12 @@ Implementation: `getCachedNetworkSeenAt()` → `entry.at` set in `refreshWalletN
 - [x] **Step 3:** Cache bust shell pages.
 - [x] **Step 4:** Vitest regression + wallet e2e (see [`HUB_CARD_3D_AND_SHEET_GLASS.md`](HUB_CARD_3D_AND_SHEET_GLASS.md) § QA).
 
+### Phase 5 - Action hierarchy (shipped)
+
+- [x] **Prove live** stays brand red (`.hub-card-control--primary`) when inbox pending.
+- [x] **Open controls** (`.hub-use-keys`) uses popover control surface — not brand red. See [`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md) § Red budget.
+- [x] **Open scan** remains tertiary / neutral beside Open controls.
+
 ---
 
 ## Regression
