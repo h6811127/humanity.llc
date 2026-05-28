@@ -4,6 +4,7 @@ import { CHILD_OBJECT_ID_REGEX } from "../src/resolver/child-objects";
 import {
   childObjectApiUrl,
   childObjectCreatePath,
+  childObjectIssueQrPath,
   childObjectRevokePath,
   childObjectUpdatePath,
 } from "../../site/js/child-object-api-core.mjs";
@@ -22,6 +23,9 @@ describe("child-object-api-core", () => {
     );
     expect(childObjectRevokePath(PROFILE, OBJECT_ID)).toBe(
       "/.well-known/hc/v1/cards/cuAPt5nFYr8VCCWgPbAAupBS/objects/obj_testChildObject01/revoke"
+    );
+    expect(childObjectIssueQrPath(PROFILE, OBJECT_ID)).toBe(
+      "/.well-known/hc/v1/cards/cuAPt5nFYr8VCCWgPbAAupBS/objects/obj_testChildObject01/issue-qr"
     );
     expect(childObjectApiUrl(ORIGIN, childObjectCreatePath(PROFILE))).toBe(
       `${ORIGIN}/.well-known/hc/v1/cards/cuAPt5nFYr8VCCWgPbAAupBS/objects`

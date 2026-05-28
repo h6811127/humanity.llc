@@ -15,6 +15,7 @@ import {
   signChildObjectCreate,
   signChildObjectUpdate,
 } from "./child-object-update.mjs";
+import { postChildObjectIssueQr, signChildObjectIssueQr } from "./child-object-qr.mjs";
 
 /**
  * @param {string} profileId
@@ -47,6 +48,35 @@ function renderStatusPlateList(profileId, rows) {
       content.append(title, sub);
       li.append(content);
 
+      const scanWrap = document.createElement("div");
+      scanWrap.className = "child-object-plate-scan";
+      const scanStatus = document.createElement("p");
+      scanStatus.className = "form-hint child-object-plate-scan-status";
+      scanStatus.hidden = true;
+      scanStatus.setAttribute("role", "status");
+      if (typeof row.scan_url === "string" && row.scan_url) {
+        const link = document.createElement("a");
+        link.className = "btn-text";
+        link.href = row.scan_url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = "Open scan page";
+        const copyBtn = document.createElement("button");
+        copyBtn.type = "button";
+        copyBtn.className = "btn-secondary child-object-plate-copy-scan";
+        copyBtn.dataset.scanUrl = row.scan_url;
+        copyBtn.textContent = "Copy scan link";
+        scanWrap.append(link, copyBtn);
+      } else {
+        const issueBtn = document.createElement("button");
+        issueBtn.type = "button";
+        issueBtn.className = "btn-secondary child-object-plate-issue-qr";
+        issueBtn.dataset.objectId = row.object_id;
+        issueBtn.textContent = "Issue scan link";
+        scanWrap.append(issueBtn);
+      }
+      scanWrap.append(scanStatus);
+
       const form = document.createElement("form");
       form.className = "compact-form child-object-plate-update-form";
       form.noValidate = true;
@@ -77,7 +107,7 @@ function renderStatusPlateList(profileId, rows) {
       rowStatus.hidden = true;
       rowStatus.setAttribute("role", "status");
 
-      li.append(form, rowStatus);
+      li.append(scanWrap, form, rowStatus);
       return li;
     })
   );
@@ -109,6 +139,83 @@ export function initCreatedChildObject(ctx) {
   }
 
   refreshVisibility();
+
+  listEl?.addEventListener("click", async (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+
+    if (target.classList.contains("child-object-plate-copy-scan")) {
+      const url = target.dataset.scanUrl;
+      if (!url) return;
+      try {
+        await navigator.clipboard.writeText(url);
+        const status = target
+          .closest(".child-object-plate-scan")
+          ?.querySelector(".child-object-plate-scan-status");
+        if (status instanceof HTMLElement) {
+          status.hidden = false;
+          status.textContent = "Scan link copied.";
+        }
+      } catch {
+        ctx.showError("Could not copy scan link.");
+      }
+      return;
+    }
+
+    if (!target.classList.contains("child-object-plate-issue-qr")) return;
+    const objectId = target.dataset.objectId;
+    if (!objectId) return;
+
+    const keys = ctx.getSigningKeys();
+    const scanStatus = target
+      .closest(".child-object-plate-scan")
+      ?.querySelector(".child-object-plate-scan-status");
+    if (!keys) {
+      if (scanStatus instanceof HTMLElement) {
+        scanStatus.hidden = false;
+        scanStatus.textContent = "Unlock owner or recovery key before issuing a scan link.";
+      }
+      return;
+    }
+
+    if (target instanceof HTMLButtonElement) target.disabled = true;
+    if (scanStatus instanceof HTMLElement) {
+      scanStatus.hidden = false;
+      scanStatus.textContent = "Signing and issuing scan link…";
+    }
+
+    try {
+      const signed = await signChildObjectIssueQr({
+        profileId: ctx.profileId,
+        objectId,
+        privateKeyBase58: keys.privateKeyBase58,
+        publicKeyBase58: keys.publicKeyBase58,
+      });
+      const result = await postChildObjectIssueQr(
+        ctx.profileId,
+        objectId,
+        signed.qr_credential
+      );
+      const scanUrl =
+        typeof result.scan_url === "string" ? result.scan_url : signed.scanUrl;
+      const qrId = typeof result.qr_id === "string" ? result.qr_id : signed.qrId;
+      updateChildObjectRow(localStorage, ctx.profileId, objectId, {
+        qr_id: qrId,
+        scan_url: scanUrl,
+      });
+      refreshList();
+      if (statusEl) {
+        statusEl.hidden = false;
+        statusEl.textContent = "Scan link ready — print or share the URL on the status plate.";
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (scanStatus instanceof HTMLElement) scanStatus.textContent = message;
+      ctx.showError(message);
+    } finally {
+      if (target instanceof HTMLButtonElement) target.disabled = false;
+    }
+  });
 
   listEl?.addEventListener("submit", async (event) => {
     const target = event.target;
@@ -164,7 +271,7 @@ export function initCreatedChildObject(ctx) {
       updateChildObjectRow(localStorage, ctx.profileId, objectId, { public_state: publicState });
       refreshList();
       if (rowStatus instanceof HTMLElement) {
-        rowStatus.textContent = "Updated on the network. Child-object scan QR is a later slice.";
+        rowStatus.textContent = "Updated on the network.";
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
@@ -222,7 +329,7 @@ export function initCreatedChildObject(ctx) {
       if (statusEl) {
         statusEl.hidden = false;
         statusEl.textContent =
-          "Status plate registered. Publish status updates below; scan QR for child objects is a later slice.";
+          "Status plate registered. Issue a scan link below, then publish status updates as needed.";
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);

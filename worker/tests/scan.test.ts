@@ -44,6 +44,7 @@ function qr(overrides: Partial<QrCredentialRow> = {}): QrCredentialRow {
     epoch: 1,
     scope: "card",
     print_artifact_id: null,
+    object_id: null,
     resolver_hint: "https://humanity.llc",
     status: "active",
     payload: `https://humanity.llc/c/${PROFILE}?q=${QR}`,

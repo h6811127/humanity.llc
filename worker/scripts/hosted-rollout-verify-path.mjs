@@ -53,12 +53,13 @@ function main() {
     "--",
     "worker/tests/device-steward-billing-return-core.test.ts",
   ]);
-  runNpm("Child object status plate (created-child-object)", [
+  runNpm("Child object status plate + scan QR", [
     "run",
     "worker:test",
     "--",
     "worker/tests/created-child-object.test.ts",
     "worker/tests/child-objects.test.ts",
+    "worker/tests/issue-child-object-qr.test.ts",
   ]);
   runNpm("Rollout step3a smoke (unit)", [
     "run",

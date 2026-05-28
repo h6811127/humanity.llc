@@ -15,12 +15,18 @@ export function childObjectsBucketKey(profileId) {
 export function isChildObjectRow(row) {
   if (!row || typeof row !== "object") return false;
   const r = /** @type {Record<string, unknown>} */ (row);
-  return (
-    typeof r.object_id === "string" &&
-    typeof r.object_type === "string" &&
-    typeof r.public_label === "string" &&
-    typeof r.public_state === "string"
-  );
+  if (
+    typeof r.object_id !== "string" ||
+    typeof r.object_type !== "string" ||
+    typeof r.public_label !== "string" ||
+    typeof r.public_state !== "string"
+  ) {
+    return false;
+  }
+  if (r.qr_id !== undefined && typeof r.qr_id !== "string") return false;
+  if (r.scan_url !== undefined && typeof r.scan_url !== "string") return false;
+  if (r.created_at !== undefined && typeof r.created_at !== "string") return false;
+  return true;
 }
 
 /**

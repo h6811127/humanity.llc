@@ -1,9 +1,16 @@
+import { getChildObject } from "./child-objects";
 import { getRevocationDisplay } from "./revoke";
-import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "./types";
+import type {
+  CardRow,
+  ChildObjectRow,
+  QrCredentialRow,
+  VerificationSummaryRow,
+} from "./types";
 
 export interface ScanContext {
   card: CardRow | null;
   qr: QrCredentialRow | null;
+  childObject: ChildObjectRow | null;
   verification: VerificationSummaryRow | null;
   revocationDisplay: {
     display_mode: string | null;
@@ -27,13 +34,21 @@ export async function loadScanContext(
 
   const qr = await db
     .prepare(
-      `SELECT qr_id, profile_id, epoch, scope, print_artifact_id, resolver_hint,
+      `SELECT qr_id, profile_id, epoch, scope, print_artifact_id, object_id, resolver_hint,
               status, payload, issued_at, expires_at, credential_document_json,
               created_at, updated_at
        FROM qr_credentials WHERE qr_id = ?`
     )
     .bind(qrId)
     .first<QrCredentialRow>();
+
+  let childObject: ChildObjectRow | null = null;
+  if (qr?.scope === "child_object" && qr.object_id) {
+    const row = await getChildObject(db, qr.object_id);
+    if (row && row.parent_profile_id === profileId) {
+      childObject = row;
+    }
+  }
 
   let verification: VerificationSummaryRow | null = null;
   if (card) {
@@ -63,6 +78,7 @@ export async function loadScanContext(
   return {
     card: card ?? null,
     qr: qr ?? null,
+    childObject,
     verification,
     revocationDisplay,
   };
