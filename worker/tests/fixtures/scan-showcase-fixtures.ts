@@ -19,3 +19,32 @@ export const PERSONAL_CARD_MANIFESTO = "Open studio";
 export const SHOWCASE_HANDLE = "river_example";
 
 export const SHOWCASE_SCAN_URL = `https://humanity.llc/c/${SHOWCASE_PROFILE}?q=${SHOWCASE_QR}`;
+
+export const STATUS_PLATE_OBJECT_STREAMS = [
+  {
+    id: "special_hours",
+    class: "place",
+    label: "Special hours",
+    value: "Thursday closes at 6 PM this week",
+  },
+] as const;
+
+export const LIVE_OBJECT_STREAMS = [
+  {
+    id: "returns",
+    class: "care",
+    label: "Returns due",
+    value: "Cordless drill · ladder",
+  },
+] as const;
+
+export function showcaseCardDocumentJson(
+  streams: ReadonlyArray<{
+    id: string;
+    class: string;
+    label: string;
+    value: string;
+  }>
+): string {
+  return JSON.stringify({ object_streams: streams });
+}

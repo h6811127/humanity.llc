@@ -13,6 +13,8 @@ import {
   type ScanMalformedReason,
 } from "./scan-malformed-hint";
 import { isQrCalendarExpired } from "./merch-qr-policy";
+import { objectStreamsFromCardDocumentJson } from "../validation/object-streams";
+import type { ObjectPublicStream } from "../validation/object-streams";
 
 export const QR_ID_REGEX =
   /^qr_[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{8,40}$/;
@@ -61,6 +63,7 @@ export interface ScanViewModel {
   qrId: string | null;
   handle: string | null;
   manifestoLine: string | null;
+  objectStreams: ObjectPublicStream[];
   cardStatus: CardStatus | null;
   qrStatus: QrStatus | null;
   qrScope: QrScope | null;
@@ -454,6 +457,7 @@ function baseView(input: BaseViewInput, origin: string): ScanViewModel {
     qrId: input.qrId,
     handle: card?.handle ?? null,
     manifestoLine: card?.manifesto_line ?? null,
+    objectStreams: objectStreamsFromCardDocumentJson(card?.card_document_json),
     cardStatus: card?.status ?? null,
     qrStatus: qr?.status ?? null,
     qrScope: qr?.scope ?? null,

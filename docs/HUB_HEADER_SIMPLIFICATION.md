@@ -1,6 +1,6 @@
 # Hub header simplification
 
-**Status:** Step 1 shipped  
+**Status:** Steps 1–4 shipped (automated e2e + Vitest; manual **P1-HH** / **P0-W** still recommended on WebKit)
 **Scope:** Bottom-sheet hub header on `/`, `/create/`, and `/created/`  
 **Companions:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md), [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md)
 
@@ -18,7 +18,7 @@ The controls are individually clear, but their combined weight makes the sheet r
 
 The first screen of the hub should prioritize:
 
-1. **Place** - the user is in `This browser` / `My cards on this device`.
+1. **Place** - the user is in **Saved in this browser** (`/`, `/create/`) or **My cards on this device** (`/created/`). No subtitle under the sheet title on landing/create (section leads carry policy copy).
 2. **Trust state** - the resolver is reachable and device counts are available.
 3. **Escape** - Close remains easy to hit.
 4. **Next action** - Create is still available, but closer to saved items rather than competing with the sheet title.
@@ -33,6 +33,7 @@ The first screen of the hub should prioritize:
 
 ### Copy and visual rules
 
+- Sheet title on **`/`** and **`/create/`**: **Saved in this browser** (`#device-hub-title`). Removed the former `.device-hub-lead` subtitle (“cards, keys, and pins…”) so the sheet opens on the title + search + saved items.
 - Create action label: **New** when space allows, with the `+` retained as the fast-recognition glyph.
 - Create action tone: pink accent is allowed, but the control must be smaller and less shadowed than the current floating `+`.
 - Empty state counts may stay visible for diagnostics, but should not create a second row of scattered badges.
@@ -51,21 +52,33 @@ The first screen of the hub should prioritize:
 
 ### Step 2 - Calm the status chip row
 
-- Render the hub status panel as a single-line primary status where possible.
-- Keep zero saved/pinned values visually subordinate.
-- Avoid wrapping a lone `0 pinned` chip onto its own row on mobile.
+- [x] Render the hub status panel as a single-line primary status where possible.
+- [x] Keep zero saved/pinned values visually subordinate.
+- [x] Avoid wrapping a lone `0 pinned` chip onto its own row on mobile.
 
-### Step 3 - Rebalance nav controls
+**Shipped:** The sheet header now renders one inline status line: network first, then muted device counts, then compact alert-weight items only for actionable states.
 
-- Review Home and Close visual weight together.
-- Keep Close stronger than Home because it exits the sheet; keep Home available but quieter.
-- Verify tap targets remain at least 40px.
+### Step 3 - Rebalance nav controls ✅
 
-### Step 4 - Manual QA pass
+- **Home (quieter):** `.device-hub-home-btn` uses muted popover fg, lighter fill (`rgba(120,120,128,0.08)`), 20px icon; still **40×40px** tap target.
+- **Close (stronger):** `.device-hub-sheet-close` bumped to **40×40px**, popover fg (not muted), control fill + border + light shadow; dark theme border/shadow pass.
+- **Files:** `site/css/device-shell.css`, `site/css/theme-dark.css` (`device-shell.css?v=59` on shell pages).
 
-- Mobile Safari-width smoke: open hub, close hub, tap Home, tap New, scroll saved items.
-- Regression: status dot still opens the hub after scroll.
-- Dark mode check: Create pill uses shell/popover contrast tokens and does not bloom.
+### Step 4 - QA pass ✅
+
+Runbook: **P1-HH** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md).
+
+**Automated (May 2026):**
+
+```bash
+npm run worker:test -- worker/tests/device-hub-header-html.test.ts
+npm run e2e -- e2e/device-status-dot.spec.ts -g "hub sheet header chrome"
+```
+
+- Close dismisses hub; **+ New** in saved-items header → `/create/`; Home/Close visible when expanded.
+- Dot opens hub after page scroll (no `top-chrome--edge-hidden` — scroll-edge hide removed from shell).
+
+**Manual (recommended):** P1-HH steps 6–8 (dark mode, `/create/` parity, WebKit).
 
 ---
 
@@ -73,5 +86,6 @@ The first screen of the hub should prioritize:
 
 - The top rail contains Home + status only; Create no longer competes with Close or the title.
 - The saved-items heading exposes a compact **+ New** action.
+- The status panel stays on one inline row in the empty-wallet case: network + muted `0 cards` / `0 pinned`.
 - Existing hub open/close state contracts still route through `setHubSheetOpen()` / `setHubExpanded()`.
 - No new module imports are added to the status-dot graph.

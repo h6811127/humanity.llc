@@ -9,10 +9,10 @@ import {
   shouldShowBrowserNotifPrompt,
   STORAGE_BROWSER_NOTIF,
   STORAGE_PROMPT_DISMISS,
-} from "./device-browser-notifications-core.mjs?v=34";
+} from "./device-browser-notifications-core.mjs?v=56";
 import { buildLiveControlProofHref } from "./device-live-control-inbox-core.mjs";
 import { getLiveControlPending, getLiveControlPendingCount } from "./device-live-control-inbox.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=34";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=56";
 import {
   registerLiveProofServiceWorker,
   syncLiveProofServiceWorkerState,
@@ -308,7 +308,15 @@ export function mountBrowserNotifToggles() {
   syncBrowserNotifToggleButtons();
 }
 
+let browserNotifListenersBound = false;
+
 export function initBrowserNotifications() {
+  if (browserNotifListenersBound) {
+    mountBrowserNotifToggles();
+    syncBrowserNotifPrompts();
+    return;
+  }
+  browserNotifListenersBound = true;
   mountBrowserNotifToggles();
   syncBrowserNotifPrompts();
   window.addEventListener("hc-live-control-inbox-changed", () => {
@@ -341,5 +349,3 @@ export function initBrowserNotifications() {
     });
   }
 }
-
-initBrowserNotifications();

@@ -2,8 +2,8 @@
  * Compact inbox bottom sheet — badge tap and open_notifications.
  * @see docs/DEVICE_INBOX.md phase 3
  */
-import { buildInboxItems, buildInboxSheetRows } from "./device-inbox-core.mjs?v=38";
-import { gatherInboxInput, getInboxItems, notificationCount } from "./device-inbox.mjs?v=38";
+import { buildInboxItems, buildInboxSheetRows } from "./device-inbox-core.mjs?v=56";
+import { gatherInboxInput, getInboxItems, notificationCount } from "./device-inbox.mjs?v=56";
 import {
   formatLiveControlExpiry,
   getLiveControlPending,
@@ -16,23 +16,23 @@ import {
   actOnOrphanRemovedTabKeys,
 } from "./device-orphan-keys-nav.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
-import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=38";
+import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=56";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import { prefersReducedMotion } from "./device-shell-motion.mjs";
 import { closeGlancePopover } from "./device-hub-glance-popover.mjs";
-import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs?v=38";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=38";
+import { syncBrowserNotifPrompts } from "./device-browser-notifications-loader.mjs?v=56";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=56";
 import {
   inboxSheetMountAllowed,
   inboxSheetReconcileAction,
-} from "./device-inbox-sheet-core.mjs?v=38";
+} from "./device-inbox-sheet-core.mjs?v=56";
 import {
   bindSheetLifecycleReconcile,
   syncSheetBackdropClosed,
-} from "./device-sheet-backdrop-sync.mjs?v=38";
+} from "./device-sheet-backdrop-sync.mjs?v=56";
 
 const SHEET_ID = "device-inbox-sheet";
 const LIST_ID = "device-inbox-sheet-list";
@@ -72,6 +72,7 @@ function ensureInboxSheetDom() {
   backdrop.id = BACKDROP_ID;
   backdrop.className = "device-inbox-backdrop";
   backdrop.setAttribute("aria-label", "Close inbox");
+  backdrop.setAttribute("aria-hidden", "true");
   backdrop.hidden = true;
   backdrop.addEventListener("click", () => {
     setInboxSheetOpen(false);
@@ -190,7 +191,7 @@ function rowIconSvg(kind) {
   if (kind === "live_proof") {
     return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="M12 18v4"/><circle cx="12" cy="12" r="4"/></svg>`;
   }
-  if (kind === "cross_tab_keys" || kind === "orphan_keys_removed") {
+  if (kind === "cross_tab_keys" || kind === "other_tabs_unsaved_keys" || kind === "orphan_keys_removed") {
     return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>`;
   }
   if (kind === "card_disabled_since_visit") {
@@ -240,7 +241,10 @@ export function renderInboxSheet() {
         openLiveControlProof(row.proofItem);
         return;
       }
-      if (row.kind === "cross_tab_keys" && row.crossTabEntry) {
+      if (
+        (row.kind === "cross_tab_keys" || row.kind === "other_tabs_unsaved_keys") &&
+        row.crossTabEntry
+      ) {
         logInboxDiagnostic({
           type: "inbox_item_action",
           kind: row.kind,

@@ -1,255 +1,267 @@
 import { afterEach, describe, expect, it } from "vitest";
 
 import worker from "../src";
-import type { Env } from "../src";
-import { handleGetHostedStewardOps } from "../src/resolver/steward-ops";
+import { handleGetStewardOpsSnapshot } from "../src/resolver/steward-ops";
 import {
   clearStewardPushConnectionsForTests,
+  registerStewardPushIp,
   registerStewardPushSink,
 } from "../src/steward/push";
+import type { Env } from "../src";
 
-const TOKEN = "test-operator-token";
-const URL = "https://humanity.llc/.well-known/hc/v1/operator/hosted-steward/ops";
+const TOKEN = "test-operator-audit-token";
+const URL = "https://humanity.llc/.well-known/hc/v1/operator/steward-ops";
 
-const accounts = [
-  {
-    account_id: "acc_opsA",
-    plan_id: "hosted_steward_v1",
-    plan_version: 1,
-    status: "active",
-    effective_from: "2026-05-01T00:00:00.000Z",
-    effective_until: null,
-    billing_customer_id: "cus_opsA",
-    billing_subscription_id: "sub_opsA",
-  },
-  {
-    account_id: "acc_opsB",
-    plan_id: "hosted_steward_v1",
-    plan_version: 1,
-    status: "past_due",
-    effective_from: "2026-05-01T00:00:00.000Z",
-    effective_until: "2026-05-28T00:00:00.000Z",
-    billing_customer_id: "cus_opsB",
-    billing_subscription_id: null,
-  },
-  {
-    account_id: "acc_opsC",
-    plan_id: "reference_free",
-    plan_version: 1,
-    status: "active",
-    effective_from: "2026-05-01T00:00:00.000Z",
-    effective_until: null,
-    billing_customer_id: null,
-    billing_subscription_id: null,
-  },
-];
+class FakeStewardOpsDb {
+  schemaReady = true;
+  accounts: Array<{ plan_id: string; status: string }> = [];
+  sessions: Array<{ expires_at: string }> = [];
+  usage: Array<{
+    account_id: string;
+    device_id: string;
+    event: string;
+    window_key: string;
+    count: number;
+  }> = [];
 
-const usage = [
-  {
-    account_id: "acc_opsA",
-    device_id: "dev_a",
-    event: "poll.live_proof.auto",
-    window_key: "2026-05-27",
-    count: 50_000,
-  },
-  {
-    account_id: "acc_opsA",
-    device_id: "dev_a",
-    event: "notify.push.delivered",
-    window_key: "2026-05-27",
-    count: 2,
-  },
-  {
-    account_id: "acc_opsB",
-    device_id: "dev_b",
-    event: "poll.live_proof.auto",
-    window_key: "2026-05-27",
-    count: 100_001,
-  },
-];
-
-const sessions = [
-  {
-    account_id: "acc_opsA",
-    expires_at: "2999-01-01T00:00:00.000Z",
-  },
-  {
-    account_id: "acc_opsB",
-    expires_at: "2999-01-01T00:00:00.000Z",
-  },
-  {
-    account_id: "acc_opsB",
-    expires_at: "2000-01-01T00:00:00.000Z",
-  },
-];
-
-class FakeHostedOpsDb {
   prepare(sql: string) {
-    return {
-      bind: (...params: unknown[]) => this.query(sql, params),
-      ...this.query(sql, []),
-    };
-  }
-
-  private query(sql: string, params: unknown[]) {
-    return {
+    const fake = this;
+    const bound = (...args: unknown[]) => ({
       async first<T>() {
-        if (sql.includes("sqlite_master")) return { 1: 1 } as T;
+        if (sql.includes("sqlite_master")) {
+          return (fake.schemaReady ? { 1: 1 } : null) as T | null;
+        }
+        if (sql.includes("FROM steward_sessions") && sql.includes("expires_at >")) {
+          const nowIso = args[0] as string;
+          const sessions = fake.sessions.filter(
+            (session) => session.expires_at > nowIso
+          ).length;
+          return { sessions } as T;
+        }
         return null as T | null;
       },
       async all<T>() {
-        if (sql.includes("FROM steward_accounts") && sql.includes("GROUP BY status")) {
-          return { results: groupCount(accounts, "status") as T[] };
+        if (sql.includes("FROM steward_accounts") && sql.includes("GROUP BY")) {
+          const map = new Map<string, { plan_id: string; status: string; accounts: number }>();
+          for (const account of fake.accounts) {
+            const key = `${account.plan_id}:${account.status}`;
+            const row =
+              map.get(key) ?? {
+                plan_id: account.plan_id,
+                status: account.status,
+                accounts: 0,
+              };
+            row.accounts += 1;
+            map.set(key, row);
+          }
+          return { results: [...map.values()] } as T;
         }
-        if (sql.includes("FROM steward_accounts") && sql.includes("GROUP BY plan_id")) {
-          return { results: groupCount(accounts, "plan_id") as T[] };
-        }
-        if (sql.includes("FROM steward_sessions")) {
-          const nowIso = String(params[0]);
-          const grouped = new Map<string, number>();
-          for (const row of sessions) {
-            if (row.expires_at <= nowIso) continue;
-            grouped.set(row.account_id, (grouped.get(row.account_id) ?? 0) + 1);
+        if (sql.includes("FROM steward_usage_counters") && sql.includes("window_key = ?")) {
+          const dayKey = args[0] as string;
+          const map = new Map<
+            string,
+            {
+              event: string;
+              count: number;
+              accountIds: Set<string>;
+              deviceIds: Set<string>;
+            }
+          >();
+          for (const row of fake.usage) {
+            if (row.window_key !== dayKey) continue;
+            const current =
+              map.get(row.event) ??
+              {
+                event: row.event,
+                count: 0,
+                accountIds: new Set<string>(),
+                deviceIds: new Set<string>(),
+              };
+            current.count += row.count;
+            current.accountIds.add(row.account_id);
+            current.deviceIds.add(row.device_id);
+            map.set(row.event, current);
           }
           return {
-            results: [...grouped.entries()].map(([account_id, n]) => ({
-              account_id,
-              n,
-            })) as T[],
-          };
-        }
-        if (sql.includes("FROM steward_usage_counters")) {
-          const windowKey = String(params[0]);
-          const grouped = new Map<string, { account_id: string; event: string; count: number }>();
-          for (const row of usage) {
-            if (row.window_key !== windowKey) continue;
-            const key = `${row.account_id}:${row.event}`;
-            const current = grouped.get(key) ?? {
-              account_id: row.account_id,
+            results: [...map.values()].map((row) => ({
               event: row.event,
-              count: 0,
-            };
-            current.count += row.count;
-            grouped.set(key, current);
-          }
-          return { results: [...grouped.values()] as T[] };
+              count: row.count,
+              accounts: row.accountIds.size,
+              devices: row.deviceIds.size,
+            })),
+          } as T;
         }
-        if (sql.includes("SELECT account_id, plan_id, status")) {
-          return { results: accounts as T[] };
-        }
-        return { results: [] as T[] };
+        return { results: [] } as T;
       },
-      async run() {
-        return { success: true };
+    });
+    return {
+      bind(...args: unknown[]) {
+        return bound(...args);
+      },
+      all<T>() {
+        return bound().all<T>();
       },
     };
   }
 }
 
-function groupCount(rows: typeof accounts, key: "status" | "plan_id") {
-  const grouped = new Map<string, number>();
-  for (const row of rows) grouped.set(row[key], (grouped.get(row[key]) ?? 0) + 1);
-  return [...grouped.entries()].map(([value, n]) => ({ key: value, n }));
-}
-
 function db(): D1Database {
-  return new FakeHostedOpsDb() as unknown as D1Database;
+  return new FakeStewardOpsDb() as unknown as D1Database;
 }
 
 afterEach(() => {
   clearStewardPushConnectionsForTests();
 });
 
-describe("hosted steward ops API (E6)", () => {
-  it("requires operator audit token configuration", async () => {
-    const res = await handleGetHostedStewardOps(
+describe("operator steward ops snapshot", () => {
+  it("returns 503 when token is not configured", async () => {
+    const res = await handleGetStewardOpsSnapshot(
       new Request(URL),
-      { DB: db(), HOSTED_STEWARD_ENABLED: "1" } as Env,
-      db()
+      { HOSTED_STEWARD_ENABLED: "1" } as Env,
+      db(),
+      undefined
     );
     expect(res.status).toBe(503);
   });
 
-  it("requires bearer authorization", async () => {
-    const res = await handleGetHostedStewardOps(
+  it("returns 401 without operator audit token", async () => {
+    const res = await handleGetStewardOpsSnapshot(
       new Request(URL),
-      { DB: db(), HOSTED_STEWARD_ENABLED: "1", OPERATOR_AUDIT_TOKEN: TOKEN } as Env,
-      db()
+      { HOSTED_STEWARD_ENABLED: "1" } as Env,
+      db(),
+      TOKEN
     );
     expect(res.status).toBe(401);
   });
 
-  it("is hidden when hosted steward is disabled", async () => {
-    const res = await handleGetHostedStewardOps(
-      new Request(URL, { headers: { Authorization: `Bearer ${TOKEN}` } }),
-      { DB: db(), HOSTED_STEWARD_ENABLED: "0", OPERATOR_AUDIT_TOKEN: TOKEN } as Env,
-      db()
-    );
-    expect(res.status).toBe(404);
-  });
+  it("returns schema status without querying hosted tables before migration", async () => {
+    const fake = new FakeStewardOpsDb();
+    fake.schemaReady = false;
 
-  it("returns quota, push, and billing summary when authorized", async () => {
-    registerStewardPushSink({
-      accountId: "acc_opsA",
-      connectionId: "conn_opsA",
-      deviceId: "dev_a",
-      write: () => {},
-    });
-    const res = await handleGetHostedStewardOps(
-      new Request(`${URL}?window_key=2026-05-27`, {
-        headers: { Authorization: `Bearer ${TOKEN}` },
-      }),
-      { DB: db(), HOSTED_STEWARD_ENABLED: "1", OPERATOR_AUDIT_TOKEN: TOKEN } as Env,
-      db()
+    const res = await handleGetStewardOpsSnapshot(
+      new Request(URL, { headers: { Authorization: `Bearer ${TOKEN}` } }),
+      { HOSTED_STEWARD_ENABLED: "0" } as Env,
+      fake as unknown as D1Database,
+      TOKEN
     );
 
     expect(res.status).toBe(200);
     const body = (await res.json()) as {
-      accounts: {
-        total: number;
-        by_status: Record<string, number>;
-        over_soft_cap: number;
-        over_hard_cap: number;
-        billing_attention: number;
-      };
-      usage: {
-        event_totals: Record<string, number>;
-        top_accounts: Array<{
-          account_id: string;
-          usage_total: number;
-          active_sessions: number;
-          current_push_connections: number;
-        }>;
-      };
-      push: { current_connections_total: number };
-      alerts: Array<{ code: string; account_id: string }>;
+      hosted_steward_enabled: boolean;
+      schema: string;
       runbook: string;
     };
+    expect(body.hosted_steward_enabled).toBe(false);
+    expect(body.schema).toBe("missing");
+    expect(body.runbook).toContain("HOSTED_STEWARD_OPS_RUNBOOK");
+  });
 
-    expect(body.accounts.total).toBe(3);
-    expect(body.accounts.by_status.active).toBe(2);
-    expect(body.accounts.over_soft_cap).toBe(2);
-    expect(body.accounts.over_hard_cap).toBe(1);
-    expect(body.accounts.billing_attention).toBe(1);
-    expect(body.usage.event_totals["poll.live_proof.auto"]).toBe(150_001);
-    expect(body.push.current_connections_total).toBe(1);
-    expect(body.usage.top_accounts[0].account_id).toBe("acc_opsB");
-    expect(body.usage.top_accounts[1].current_push_connections).toBe(1);
-    expect(body.alerts.map((a) => a.code)).toContain("account_over_hard_cap");
-    expect(body.alerts.map((a) => a.code)).toContain("billing_attention");
-    expect(body.runbook).toContain("HOSTED_TIER_OPS_RUNBOOK");
+  it("returns hosted account, session, usage, and push metrics", async () => {
+    const fake = new FakeStewardOpsDb();
+    fake.accounts = [
+      { plan_id: "hosted_steward_v1", status: "active" },
+      { plan_id: "hosted_steward_v1", status: "past_due" },
+      { plan_id: "reference_free", status: "active" },
+    ];
+    fake.sessions = [
+      { expires_at: "2099-01-01T00:00:00.000Z" },
+      { expires_at: "2026-05-26T00:00:00.000Z" },
+    ];
+    fake.usage = [
+      {
+        account_id: "acc_1",
+        device_id: "dev_1",
+        event: "poll.live_proof.auto",
+        window_key: "2026-05-27",
+        count: 25,
+      },
+      {
+        account_id: "acc_1",
+        device_id: "dev_2",
+        event: "poll.live_proof.auto",
+        window_key: "2026-05-27",
+        count: 5,
+      },
+      {
+        account_id: "acc_2",
+        device_id: "dev_3",
+        event: "notify.push.delivered",
+        window_key: "2026-05-27",
+        count: 2,
+      },
+    ];
+    const unregisterSink = registerStewardPushSink({
+      accountId: "acc_1",
+      connectionId: "conn_1",
+      deviceId: "dev_1",
+      write() {},
+    });
+    const unregisterIp = registerStewardPushIp("203.0.113.10");
+
+    const res = await handleGetStewardOpsSnapshot(
+      new Request(`${URL}?day=2026-05-27`, {
+        headers: { Authorization: `Bearer ${TOKEN}` },
+      }),
+      { HOSTED_STEWARD_ENABLED: "1" } as Env,
+      fake as unknown as D1Database,
+      TOKEN
+    );
+
+    unregisterSink();
+    unregisterIp();
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      hosted_steward_enabled: boolean;
+      accounts: Array<{ plan_id: string; status: string; accounts: number }>;
+      sessions: { active: number };
+      usage: Array<{ event: string; count: number; accounts: number; devices: number }>;
+      push: {
+        active_connections: number;
+        active_client_ips: number;
+        max_connections_per_account: number;
+      };
+      controls: { sla: { live_proof_push_p95_target_seconds: number } };
+    };
+    expect(body.hosted_steward_enabled).toBe(true);
+    expect(body.accounts).toContainEqual({
+      plan_id: "hosted_steward_v1",
+      status: "active",
+      accounts: 1,
+    });
+    expect(body.sessions.active).toBe(1);
+    expect(body.usage).toContainEqual({
+      event: "poll.live_proof.auto",
+      count: 30,
+      accounts: 1,
+      devices: 2,
+    });
+    expect(body.push.active_connections).toBe(1);
+    expect(body.push.active_client_ips).toBe(1);
+    expect(body.push.max_connections_per_account).toBe(5);
+    expect(body.controls.sla.live_proof_push_p95_target_seconds).toBe(5);
+  });
+
+  it("rejects invalid day", async () => {
+    const res = await handleGetStewardOpsSnapshot(
+      new Request(`${URL}?day=today`, {
+        headers: { Authorization: `Bearer ${TOKEN}` },
+      }),
+      { HOSTED_STEWARD_ENABLED: "1" } as Env,
+      db(),
+      TOKEN
+    );
+    expect(res.status).toBe(400);
   });
 
   it("routes through worker.fetch", async () => {
     const res = await worker.fetch(
-      new Request(URL, { headers: { Authorization: `Bearer ${TOKEN}` } }),
-      {
-        DB: db(),
-        HOSTED_STEWARD_ENABLED: "1",
-        OPERATOR_AUDIT_TOKEN: TOKEN,
-      } as Env,
+      new Request(URL, {
+        headers: { Authorization: `Bearer ${TOKEN}` },
+      }),
+      { DB: undefined, OPERATOR_AUDIT_TOKEN: TOKEN } as unknown as Env,
       {} as ExecutionContext
     );
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(503);
   });
 });

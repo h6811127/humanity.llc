@@ -1,6 +1,6 @@
 # Hosted tier — implementation epics (M8)
 
-**Status:** **E1-E5 foundation staging** (behind `HOSTED_STEWARD_ENABLED`; E6 ops runbook started)  
+**Status:** **M8 code complete** (E1–E6 + E4d). **G0 signed** (Governance + Ops, 2026-05-27); **Legal pending** (G7). **Next:** production rollout § below; ops pins CF dashboard per [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md).  
 **Milestone:** M8 of [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md)  
 **Depends on:** M2–M7 complete; **M4 governance sign-off** before E1 merge to production  
 **Audience:** Engineering, ops
@@ -11,7 +11,7 @@
 
 M1–M7 defined product boundaries, entitlements, push, pricing/SLA, public copy, standards, and test plan. **M8** turns that into **shippable epics** with build order, file touch lists, exit tests, and rollout rules.
 
-**Recommended v1 scope:** E1 → E2+E3 → E4a–c (SSE push MVP) → E5 (billing) → E6 (ops). Defer E4d (SW bridge) and E4e (Durable Object) until push metrics justify cost.
+**Recommended v1 scope:** E1 → E2+E3 → E4a–d (SSE push MVP + SW bridge) → E5 (billing) → E6 (ops). Defer **E4e** (Durable Object) until push metrics justify cost.
 
 ---
 
@@ -19,7 +19,7 @@ M1–M7 defined product boundaries, entitlements, push, pricing/SLA, public copy
 
 | # | Gate | Doc |
 |---|------|-----|
-| G0 | M4 governance checklist signed | [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) § Governance checklist · [`HOSTED_TIER_M4_GOVERNANCE_BRIEF.md`](HOSTED_TIER_M4_GOVERNANCE_BRIEF.md) |
+| G0 | M4 governance checklist signed | [`HOSTED_TIER_G0_READINESS.md`](HOSTED_TIER_G0_READINESS.md) · [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) § Governance checklist · [`HOSTED_TIER_M4_GOVERNANCE_BRIEF.md`](HOSTED_TIER_M4_GOVERNANCE_BRIEF.md) |
 | G1 | Free-tier regression green before/after each epic PR | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) |
 | G2 | No change to watch default (`hc_watch_live_proof` unset = off) | Request budget doc |
 | G3 | Card create / public scan / stranger poll unchanged without session | M2, M5 |
@@ -99,7 +99,7 @@ flowchart LR
 | Tests | `worker/tests/steward-hosted.test.ts`, `worker/tests/steward-quota.test.ts` |
 | Flag | `HOSTED_STEWARD_ENABLED` default **`0`** in `worker/wrangler.toml`; set **`1`** locally after `npm run worker:migrate:local` |
 
-**Next after G0:** merge E1 to production with flag off; start **E2** client probe (`device-steward-entitlements-core.mjs`).
+**Next after G0:** production rollout per § Production rollout (after G0) — deploy with flag off, then enable secrets and `HOSTED_STEWARD_ENABLED`.
 
 ---
 
@@ -114,7 +114,7 @@ flowchart LR
 | # | Item |
 |---|------|
 | E2.1 | `device-steward-entitlements-core.mjs` — fetch, cache ≤300s, merge policy |
-| E2.2 | `sessionStorage` `hc_steward_session` + `hc_device_id` (first visit UUID) |
+| E2.2 | `sessionStorage` `hc_steward_session` + `localStorage` `hc_device_id` (first visit UUID) |
 | E2.3 | Hub expand / visibility: fetch entitlements when keys present |
 | E2.4 | Wire `device-live-control-poll-budget-core`, scheduler, scale, SW modules to **resolved policy** not hard-coded 400 |
 | E2.5 | Hub UI: hosted indicator line (no “premium verified” copy — M5) |
@@ -138,9 +138,19 @@ flowchart LR
 - E2E H1–H3, H5 (M7)
 - Manual P1-8 when enabled
 
+### Implementation status (2026-05-27)
+
+| Deliverable | Status |
+|-------------|--------|
+| E2.1–E2.5 | **Staging** — `device-steward-entitlements*.mjs` resolves/caches policy; budget, scheduler, scale, SW, and hub copy consume resolved policy |
+| E2.6 | **Staging** — `stewardPushSubscribeAllowed()` gates `device-steward-push.mjs` + SW |
+| Tests | `worker/tests/device-steward-entitlements-core.test.ts`, `worker/tests/device-steward-entitlements.test.ts`, `e2e/hosted-tier-budget.spec.ts` |
+
+**Next:** production enablement waits on **G0** (M4 sign-off).
+
 ### Out of scope
 
-- Server 429 (E3), push subscribe (E4)
+- Server 429 detail (see E3 epic)
 
 ---
 
@@ -171,6 +181,15 @@ flowchart LR
 - Vitest server quota tests
 
 **Note:** Often shipped in **same PR as E2** once E1 is in staging.
+
+### Implementation status (2026-05-27)
+
+| Deliverable | Status |
+|-------------|--------|
+| E3.1–E3.2 | **Staging** — `worker/src/steward/quota.ts` on authenticated challenge GET |
+| E3.3 | **Staging** — account soft/hard caps in quota module |
+| E3.4 | **Staging** — client 429 handling + hub quota line |
+| Tests | `worker/tests/steward-quota.test.ts`, `device-steward-quota-core.test.ts` |
 
 ---
 
@@ -210,6 +229,20 @@ flowchart LR
 
 - Web Push VAPID (M3 Q5)
 - Cross-tab / marketing events
+
+### Implementation status (2026-05-27)
+
+| Deliverable | Status |
+|-------------|--------|
+| E4a | **Staging** — `notifyLiveProofPending()` on challenge POST |
+| E4b | **Staging** — `GET …/steward/push` SSE + connection registry |
+| E4c | **Staging** — `device-steward-push.mjs` leader-tab client + inbox GET |
+| E4d | **Staging** — page → SW `HC_SW_LIVE_PROOF_PUSH` bridge; SW skips poll when push healthy |
+| E4e | Deferred (Durable Object fan-out) |
+| Vitest | `device-steward-push-core.test.ts`, `steward-push-sse.test.ts`, `steward-push-notify.test.ts` |
+| E2E | `e2e/hosted-tier-push.spec.ts` — M7 **H4** + E4 fallback (SSE down re-enables poll) |
+
+**Next:** **G0** M4 governance sign-off for production enablement; configure `OPERATOR_AUDIT_TOKEN` for E6.2 CI; **E4e** DO fan-out deferred.
 
 ---
 
@@ -283,23 +316,44 @@ flowchart LR
 | E6.3 | Runbook: suspend `status`, 1027, fair-use 429, downgrade |
 | E6.4 | Support doc: link M5 FAQ for customer-facing answers |
 
+### Deliverables status (2026-05-27)
+
+| # | Item | Status |
+|---|------|--------|
+| E6.1 | Ops metrics snapshot | **Staging** — `GET /.well-known/hc/v1/operator/steward-ops` exposes account, session, usage, and in-memory SSE counts behind `OPERATOR_AUDIT_TOKEN` |
+| E6.1 | Cloudflare dashboard | **Staging** — ops setup guide [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md); pin CF Workers metrics for `humanity-llc-resolver` |
+| E6.2 | Daily alert | **Staging** — `npm run worker:check-steward-ops` + Vitest; **CI** — `.github/workflows/steward-ops-daily.yml` (daily 14:00 UTC + manual dispatch; needs `OPERATOR_AUDIT_TOKEN`) |
+| E6.3 | Runbook | **Staging** — `docs/HOSTED_STEWARD_OPS_RUNBOOK.md` |
+| E6.4 | Support doc link | **Staging** — runbook directs customer-facing language to `docs/SKEPTIC_FAQ.md` |
+
+**Tests:** `npm run worker:test:steward-ops`
+
 ### Exit tests
 
 - Runbook reviewed by ops
-- Tabletop: expired subscription → free tier behavior
-
-### Implementation status (2026-05-27)
-
-| Deliverable | Status |
-|-------------|--------|
-| E6.1 | **Staging** — operator summary endpoint `GET /.well-known/hc/v1/operator/hosted-steward/ops` plus [`HOSTED_TIER_OPS_RUNBOOK.md`](HOSTED_TIER_OPS_RUNBOOK.md) dashboard inputs |
-| E6.2 | **Staging** — endpoint returns soft-cap, hard-cap, billing, and push-limit alert candidates for the daily check |
-| E6.3 | **Staging** — suspend/status, 1027, fair-use, push degraded, and downgrade runbook |
-| E6.4 | **Staging** — customer-facing macros in [`HOSTED_TIER_SUPPORT_MACROS.md`](HOSTED_TIER_SUPPORT_MACROS.md) |
+- Tabletop: expired subscription → free tier behavior — **Vitest** `worker/tests/billing-webhook.test.ts` (`subscription.deleted` → `reference_free`) + E2E **H3** in `e2e/hosted-tier-budget.spec.ts`
 
 ### Out of scope
 
 - Per-tenant billing UI in product (v1 = Stripe dashboard)
+
+---
+
+## Production rollout (after G0)
+
+Engineering checklist once M4 governance checklist is signed ([`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) § Governance checklist):
+
+| # | Step | Notes |
+|---|------|-------|
+| 1 | Apply D1 migrations | `0012_steward_hosted.sql`, `0013_steward_billing.sql` — `npm run hosted:rollout:step1` (local preflight) then `npm run hosted:rollout:step1 -- --remote` |
+| 2 | Deploy Worker with flag off | `HOSTED_STEWARD_ENABLED=0` — `npm run hosted:rollout:step2` then `npm run hosted:rollout:step2 -- --deploy` · `npm run hosted:rollout:step2 -- --smoke` |
+| 3a | `OPERATOR_AUDIT_TOKEN` (required) | Worker wrangler secret + GitHub for E6.2 — `npm run hosted:rollout:step3a` · verify `OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step3a` · `hosted:rollout:step3` aliases step3a |
+| 3b | `STRIPE_WEBHOOK_SECRET` (after G8) | Deferred — `npm run hosted:rollout:step3b` (notes only). Not required for steps 4–6. |
+| 4a | Enable hosted flag in wrangler | `HOSTED_STEWARD_ENABLED=1` — `npm run hosted:rollout:step4a` · apply `npm run hosted:rollout:step4a -- --apply` · commit `worker/wrangler.toml` |
+| 4b | Deploy + verify production | `npm run hosted:rollout:step4 -- --deploy` · verify `npm run hosted:rollout:step4 -- --verify` · `OPERATOR_AUDIT_TOKEN=... npm run hosted:rollout:step4 -- --verify` |
+| 5a | Pin CF dashboard (E6.1) | Manual — `npm run hosted:rollout:step5a` · [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md) |
+| 5b | E6.2 CI + verify | GitHub `OPERATOR_AUDIT_TOKEN` + runbook — `npm run hosted:rollout:step5` · verify `npm run hosted:rollout:step5 -- --verify` |
+| 6 | Regression | `npm run hosted:rollout:step6` · full verify `npm run hosted:rollout:step6 -- --verify` · Vitest only `npm run hosted:rollout:step6 -- --vitest` · E2E only `npm run hosted:rollout:step6 -- --e2e` |
 
 ---
 
@@ -322,7 +376,7 @@ flowchart LR
 | Optional SSE live-proof notify | E4a–c |
 | Public copy matches M5 | No “premium verified” UI |
 | M4 SLA measurable | E6 |
-| Governance signed | G0 |
+| Governance signed | G0 (Governance + Ops ✅; Legal pending G7) |
 
 ---
 
@@ -346,10 +400,11 @@ flowchart LR
 | [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) | APIs + keys |
 | [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) | E4 detail |
 | [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) | Wire formats |
+| [`HOSTED_TIER_G0_READINESS.md`](HOSTED_TIER_G0_READINESS.md) | G0 sign-off packet |
 | [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) | G0, lifecycle |
+| [`HOSTED_STEWARD_OPS_RUNBOOK.md`](HOSTED_STEWARD_OPS_RUNBOOK.md) | E6 ops |
+| [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md) | E6.1 CF analytics |
 | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) | M7 tests |
-| [`HOSTED_TIER_OPS_RUNBOOK.md`](HOSTED_TIER_OPS_RUNBOOK.md) | E6 operator procedures |
-| [`HOSTED_TIER_SUPPORT_MACROS.md`](HOSTED_TIER_SUPPORT_MACROS.md) | E6 customer replies |
 
 ---
 
@@ -357,6 +412,14 @@ flowchart LR
 
 | Date | Note |
 |------|------|
-| 2026-05-27 | **E6 started:** ops runbook + support macros for hosted steward staging |
+| 2026-05-27 | **G0 signed** (Governance + Ops, solo founder); Legal pending — production rollout unlocked |
+| 2026-05-27 | **E6.1 guide:** CF Workers dashboard setup doc + G0 production rollout checklist |
+| 2026-05-27 | **E6.2 CI:** `.github/workflows/steward-ops-daily.yml` daily threshold check |
+| 2026-05-27 | **M8 code-complete pass:** E4 fallback E2E; poll resume on push drop (`device-live-control-inbox.mjs`); `worker:test:steward-hosted` + `e2e:steward-hosted`; **G0** gates production |
+| 2026-05-27 | **E4d SW bridge:** push hint → service worker OS notify; skip SW poll when SSE healthy |
+| 2026-05-27 | **E6.2 daily alert script:** `worker:check-steward-ops` + threshold Vitest |
+| 2026-05-27 | **E4 push staging:** SSE client/worker + `e2e/hosted-tier-push.spec.ts` H4 |
+| 2026-05-27 | **E2 client probe staging:** browser fetch/cache Vitest + hosted budget E2E H1–H3/H5 |
 | 2026-05-26 | **E1 foundation:** migration `0012_steward_hosted.sql`, steward routes behind `HOSTED_STEWARD_ENABLED` |
 | 2026-05-26 | M8 initial implementation epics (planning only) |
+| 2026-05-27 | **E6 start:** operator steward ops snapshot + hosted ops runbook |

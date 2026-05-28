@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>My cards on this device · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/pwa-apple-touch.png" />
     <meta name="theme-color" content="#ffffff" />
     <script>
       (function () {
@@ -19,9 +21,9 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=4" />
-    <link rel="stylesheet" href="/styles.css?v=126" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=55" />
-    <link rel="stylesheet" href="/css/theme-dark.css?v=28" />
+    <link rel="stylesheet" href="/styles.css?v=128" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=59" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=29" />
   </head>
   <body class="page-wallet has-shell-chrome">
     <div class="page">
@@ -67,6 +69,13 @@
         hidden
       ></div>
 
+      <div
+        class="device-pwa-install-card"
+        id="device-pwa-install-card"
+        role="status"
+        hidden
+      ></div>
+
       <main
         class="screen screen-wallet screen-wallet-sleek wallet-hub"
         id="wallet-page"
@@ -81,22 +90,40 @@
           <div class="device-hub-group" id="device-hub-crosstab-notice" hidden role="status"></div>
           <div class="device-hub-group" id="device-hub-notice-group" hidden></div>
           <div
-            class="device-hub-group"
+            class="device-hub-group device-hub-alert-card"
             id="device-hub-live-control-group"
             hidden
             data-hub-group="liveproof"
+            role="status"
           >
-            <p class="device-hub-group-label">Live proof waiting</p>
-            <ul class="list list-compact" id="device-hub-live-control-list"></ul>
+            <div class="hc-emphasis-card hc-emphasis-card--urgent device-hub-live-control-card">
+              <div class="hc-emphasis-card__main">
+                <span class="hc-emphasis-card__dot hc-emphasis-card__dot--urgent" aria-hidden="true"></span>
+                <div class="hc-emphasis-card__copy">
+                  <p class="hc-emphasis-card__eyebrow" id="device-hub-live-control-eyebrow">Live proof waiting</p>
+                  <p class="hc-emphasis-card__detail" id="device-hub-live-control-summary" hidden></p>
+                </div>
+              </div>
+              <ul class="list list-compact device-hub-live-control-list" id="device-hub-live-control-list"></ul>
+            </div>
           </div>
           <div
-            class="device-hub-group"
+            class="device-hub-group device-hub-alert-card"
             id="device-hub-card-disabled-group"
             hidden
             data-hub-group="card-disabled"
+            role="status"
           >
-            <p class="device-hub-group-label">Disabled since your last visit</p>
-            <ul class="list list-compact" id="device-hub-card-disabled-list"></ul>
+            <div class="hc-emphasis-card hc-emphasis-card--warn device-hub-card-disabled-card">
+              <div class="hc-emphasis-card__main">
+                <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
+                <div class="hc-emphasis-card__copy">
+                  <p class="hc-emphasis-card__eyebrow" id="device-hub-card-disabled-eyebrow">Disabled since your last visit</p>
+                  <p class="hc-emphasis-card__detail" id="device-hub-card-disabled-summary" hidden></p>
+                </div>
+              </div>
+              <ul class="list list-compact device-hub-card-disabled-list" id="device-hub-card-disabled-list"></ul>
+            </div>
           </div>
         </div>
 
@@ -365,7 +392,7 @@
       </main>
     </div>
 
-    <script src="/js/device-status-bootstrap.mjs?v=44" type="module"></script>
+    <script src="/js/device-status-bootstrap.mjs?v=56" type="module"></script>
     <script src="/js/wallet-page.mjs?v=5" type="module"></script>
   </body>
 </html>

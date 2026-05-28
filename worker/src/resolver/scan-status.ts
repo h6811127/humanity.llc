@@ -1,7 +1,10 @@
 import { loadScanContext, type ScanContext } from "../db/scan";
+import { checkCardResolutionRateLimit, hashIp } from "../db/rate-limit";
 import { PROFILE_ID_REGEX } from "../crypto";
 import { jsonResponseWithWeakEtag } from "../http/conditional-json";
 import {
+  clientIp,
+  errorResponse,
   jsonResponse,
   OPERATOR_ID,
   PROTOCOL_VERSION,
@@ -25,8 +28,20 @@ import { deriveCredentialCodeSync } from "../../../site/js/qr-credential-code.mj
 import { scanContractErrorForKind } from "./scan-contract-error";
 import { scanMalformedStatusHint } from "./scan-malformed-hint";
 import { guardScanResponse, scanRedirectQueryBlocked } from "./scan-redirect-guard";
-import { BEARER_WARNING } from "./trust-copy";
+import {
+  BEARER_WARNING,
+  OBJECT_PUBLIC_SNAPSHOT_LIMIT,
+  OBJECT_STREAMS_LIMIT,
+  AI_EXPLAIN_LIMIT,
+} from "./trust-copy";
 import { humanTrustDisplay } from "./verification-display";
+import type { ObjectPublicStream } from "../validation/object-streams";
+import {
+  buildPublicObjectSnapshot,
+  type PublicObjectSnapshot,
+} from "./object-snapshot";
+import { buildAgentContextPacket } from "./ai-explain-core";
+import { AI_EXPLAIN_ENDPOINT } from "./ai-explain-snapshot";
 
 export { BEARER_WARNING };
 
@@ -46,6 +61,8 @@ export interface ScanStatusBody {
       status: string | null;
       handle: string | null;
       manifesto_line: string | null;
+      object_streams?: ObjectPublicStream[];
+      public_snapshot?: PublicObjectSnapshot;
     } | null;
     qr: {
       status: string | null;
@@ -71,7 +88,19 @@ export interface ScanStatusBody {
     live_control: { available: boolean; proven_at: string | null };
     limits: {
       bearer_warning: string;
+      object_details_warning?: string;
+      object_snapshot_warning?: string;
+      ai_explain_warning?: string;
       scan_analytics: false;
+    };
+    ai?: {
+      explain: {
+        available: true;
+        endpoint: string;
+        method: "POST";
+        opt_in: true;
+      };
+      agent_context: ReturnType<typeof buildAgentContextPacket>;
     };
     governance?: GovernanceProcessUrls;
   };
@@ -85,6 +114,9 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
   const governance =
     vm.kind === "card_suspended" ? governanceProcessUrls(origin) : undefined;
   const error = scanContractErrorForKind(vm.kind, vm.qrScope);
+  const publicSnapshot = vm.objectStreams.length
+    ? buildPublicObjectSnapshot(vm.manifestoLine, vm.objectStreams)
+    : null;
   return {
     version: PROTOCOL_VERSION,
     resolver: {
@@ -103,6 +135,10 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
             status: vm.cardStatus,
             handle: vm.handle,
             manifesto_line: vm.manifestoLine,
+            ...(vm.objectStreams.length
+              ? { object_streams: vm.objectStreams }
+              : {}),
+            ...(publicSnapshot ? { public_snapshot: publicSnapshot } : {}),
           }
         : null,
       qr: vm.qrId
@@ -138,8 +174,34 @@ export function scanStatusBodyFromViewModel(vm: ScanViewModel): ScanStatusBody {
       },
       limits: {
         bearer_warning: BEARER_WARNING,
+        ...(vm.objectStreams.length
+          ? { object_details_warning: OBJECT_STREAMS_LIMIT }
+          : {}),
+        ...(publicSnapshot
+          ? {
+              object_snapshot_warning: OBJECT_PUBLIC_SNAPSHOT_LIMIT,
+              ai_explain_warning: AI_EXPLAIN_LIMIT,
+            }
+          : {}),
         scan_analytics: false,
       },
+      ...(publicSnapshot
+        ? {
+            ai: {
+              explain: {
+                available: true,
+                endpoint: AI_EXPLAIN_ENDPOINT,
+                method: "POST" as const,
+                opt_in: true,
+              },
+              agent_context: buildAgentContextPacket(
+                vm.manifestoLine,
+                vm.objectStreams,
+                publicSnapshot
+              ),
+            },
+          }
+        : {}),
       ...(governance ? { governance } : {}),
     },
   };
@@ -156,6 +218,19 @@ export async function handleGetScanStatus(
   db: D1Database,
   profileId: string
 ): Promise<Response> {
+  const ipHash = await hashIp(clientIp(request));
+  const rate = await checkCardResolutionRateLimit(db, ipHash);
+  if (!rate.allowed) {
+    return errorResponse(
+      "RATE_LIMITED",
+      "Too many card status requests from this network. Try again later.",
+      429,
+      rate.retryAfterSec
+        ? { "Retry-After": String(rate.retryAfterSec) }
+        : undefined
+    );
+  }
+
   const origin = requestOrigin(request);
   const url = new URL(request.url);
   const qrRaw = url.searchParams.get("q");

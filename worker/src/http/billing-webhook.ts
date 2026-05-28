@@ -4,7 +4,7 @@
  */
 import { errorResponse, jsonResponse } from "./resolver";
 import { verifyStripeWebhookSignature } from "./stripe-webhook-verify";
-import type { Env } from "../index";
+import type { Env } from "../env";
 import { hostedStewardEnabled } from "../steward/config";
 import {
   applyStewardBillingUpdate,

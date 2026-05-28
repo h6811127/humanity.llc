@@ -14,7 +14,7 @@
 | [`277d08e`](https://github.com/h6811127/humanity.llc/commit/277d08e) | Global `initDeviceOsCoordinator()` from status bootstrap |
 | [`733ae5e`](https://github.com/h6811127/humanity.llc/commit/733ae5e) | May 26 WebKit sheet CSS cascade (hit-test, blur-off, visibility) |
 
-**Step 3 cleanup (Safari cascade JS/tests):** Marked done in the revert plan; may exist as **uncommitted** local deletes (`device-inbox-sheet-loader.mjs`, `device-sheet-backdrop-sync.mjs`, `e2e/safari-shell-scroll.spec.ts`). See [§7–§9](#7-lazy-inbox-sheet-loader-phase-22--22b) below.
+**Step 3 cleanup (Safari cascade JS/tests):** Marked done in the revert plan. The old broad Safari cascade was removed; the current repo intentionally restores an invariant-only WebKit smoke (`e2e/safari-shell-scroll.spec.ts`) for dot/hub/backdrop checks. See §11 below.
 
 **Not reverted by this incident:** Device inbox v2 (badge, sheet, dot overlays, live-proof SW), resolver-confirmed card-disabled correctness, module manifest, steward E2E - still shipped. Optional steps 4–6 in the revert plan are **future** rollbacks, not done here.
 
@@ -414,7 +414,7 @@ WebKit project tests: scroll landing, dot/hub, optional scroll-chrome flag, back
 
 ### Reverted by
 
-**Step 3 (local / pending):** spec deleted; CI WebKit device tests trimmed per `DEVICE_OS_QA.md`.
+**Step 3 cleanup:** the old broad spec was removed with the cascade. The current state is rebuilt as an invariant-only smoke in `e2e/safari-shell-scroll.spec.ts` and wired through `playwright.config.ts` + `.github/workflows/test-site.yml`.
 
 ### Cross-feature impact
 
@@ -424,8 +424,8 @@ WebKit project tests: scroll landing, dot/hub, optional scroll-chrome flag, back
 
 After any shell scroll or backdrop change:
 
-- Restore tests that assert **invariants** (dot opens hub, no stuck backdrop), not scroll-edge class toggling.
-- Run WebKit in CI only if stable; otherwise keep manual P0-W.
+- Keep tests limited to **invariants** (dot opens hub, no stuck backdrop), not scroll-edge class toggling.
+- Keep WebKit CI as a regression gate while stable; **P0-W** remains the real-device sign-off.
 
 ---
 

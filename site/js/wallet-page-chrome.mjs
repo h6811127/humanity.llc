@@ -3,7 +3,7 @@
  * Click handler for Open controls: `bindWalletActiveOpenControls()` from wallet-page.mjs.
  */
 
-import { gatherInboxInput } from "./device-inbox.mjs?v=38";
+import { gatherInboxInput } from "./device-inbox.mjs?v=56";
 import { activateWalletEntry, createdUrlForEntry, getTabSession } from "./device-keys.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import {
@@ -16,6 +16,9 @@ import {
 } from "./device-orphan-keys-nav.mjs";
 import { actOnOtherTabKeys, walletEntryForProfile } from "./device-notice-nav.mjs";
 import { escapeEmphasisHtml } from "./device-emphasis-card-html.mjs";
+import { shouldShowWalletTabHintCrossTabChrome } from "./wallet-tab-hint-chrome-core.mjs";
+
+export { shouldShowWalletTabHintCrossTabChrome } from "./wallet-tab-hint-chrome-core.mjs";
 
 /** @param {Record<string, unknown> | null} session */
 export function walletEntryForSession(session) {
@@ -67,6 +70,10 @@ function hideTabHintActions() {
 function setTabHint(tabHint, input) {
   if (!tabHint) return;
 
+  const hasShellBadge = Boolean(document.getElementById("shell-notif-badge"));
+  const orphanCount = input.orphanRemovedEntries.length;
+  const crossTabCount = input.crossTabEntries.length;
+
   const eyebrow = document.getElementById("wallet-tab-hint-eyebrow");
   const title = document.getElementById("wallet-tab-hint-title");
   const detail = document.getElementById("wallet-tab-hint-detail");
@@ -76,12 +83,20 @@ function setTabHint(tabHint, input) {
 
   hideTabHintActions();
 
-  if (input.orphanRemovedEntries.length > 0) {
+  if (
+    !shouldShowWalletTabHintCrossTabChrome(hasShellBadge, orphanCount, crossTabCount)
+  ) {
+    if (title) title.hidden = true;
+    tabHint.hidden = true;
+    return;
+  }
+
+  if (orphanCount > 0) {
     const entry = input.orphanRemovedEntries[0];
     const label = escapeEmphasisHtml(labelForPresence(entry));
     const extra =
-      input.orphanRemovedEntries.length > 1
-        ? ` (+${input.orphanRemovedEntries.length - 1} other tab${input.orphanRemovedEntries.length === 2 ? "" : "s"})`
+      orphanCount > 1
+        ? ` (+${orphanCount - 1} other tab${orphanCount === 2 ? "" : "s"})`
         : "";
 
     setTabHintModifier(tabHint, "warn");
@@ -100,12 +115,12 @@ function setTabHint(tabHint, input) {
     return;
   }
 
-  if (input.crossTabEntries.length > 0) {
+  if (crossTabCount > 0) {
     const entry = input.crossTabEntries[0];
     const label = escapeEmphasisHtml(labelForPresence(entry));
     const extra =
-      input.crossTabEntries.length > 1
-        ? ` (+${input.crossTabEntries.length - 1} other tab${input.crossTabEntries.length === 2 ? "" : "s"})`
+      crossTabCount > 1
+        ? ` (+${crossTabCount - 1} other tab${crossTabCount === 2 ? "" : "s"})`
         : "";
     const walletEntry = walletEntryForProfile(entry.profile_id);
 

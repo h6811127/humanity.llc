@@ -149,9 +149,10 @@ export function resolverApiOrigin() {
     }
   }
 
-  const { hostname } = location;
+  const { hostname, protocol } = location;
   if (isLocalDevHost(hostname)) {
-    return "http://127.0.0.1:8787";
+    // Match page hostname (localhost vs 127.0.0.1) so browser private-network checks pass.
+    return `${protocol}//${hostname}:8787`;
   }
   if (hostname === "humanity.llc") {
     return location.origin;

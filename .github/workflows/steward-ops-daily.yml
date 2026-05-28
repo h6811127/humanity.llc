@@ -1,0 +1,26 @@
+# E6.2 — daily hosted steward ops threshold check against production snapshot.
+# @see docs/HOSTED_STEWARD_OPS_RUNBOOK.md
+# @see docs/HOSTED_TIER_IMPLEMENTATION_EPICS.md § E6
+name: Steward ops daily
+
+on:
+  schedule:
+    # 14:00 UTC daily
+    - cron: "0 14 * * *"
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - name: Check steward ops thresholds (E6.2)
+        run: npm run worker:check-steward-ops
+        env:
+          OPERATOR_AUDIT_TOKEN: ${{ secrets.OPERATOR_AUDIT_TOKEN }}
+          API_ORIGIN: https://humanity.llc

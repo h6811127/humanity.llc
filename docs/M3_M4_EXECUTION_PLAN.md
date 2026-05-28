@@ -154,7 +154,7 @@ Do these **in order**. Each step has an exit test before moving on.
 - [x] `/created/` **Update public line** UI (`site/js/created-manifesto-update.mjs`)
 - [x] Status plate + lost-item relay field layouts; infer pilot from stored manifesto on return visit
 - [x] Scan HTML shows updated two-line copy (`update-card.test.ts`)
-- [x] Exit checklist API cases (wrong key, revoked card, relay layout) + update-status gate after first revoke
+- [x] Exit checklist API cases (wrong key, revoked card, relay layout) + general update-status gate after first revoke; pilot templates unlock before revoke
 
 ---
 
@@ -162,12 +162,15 @@ Do these **in order**. Each step has an exit test before moving on.
 
 **Refs:** roadmap §12 Phase A exit; **`docs/M5_STRANGER_TEST_RUNBOOK.md`** (step-by-step)
 
-- [ ] 3 people outside your network create cards unassisted
-- [ ] Each explains what scan proves / does not prove in one sentence
-- [ ] Revoke one QR; scan shows revoked within cache TTL
-- [ ] No scan analytics in production paths
+**Status:** **Passed 2026-05-27**
+
+- [x] 3 people outside your network create cards unassisted
+- [x] Each explains what scan proves / does not prove in one sentence
+- [x] Revoke one QR; scan shows revoked within cache TTL
+- [x] No scan analytics in production paths
 - [ ] Update landing “Building now” + short public announce
-- [ ] **Then:** one vertical pilot per `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`
+- [ ] **Primary next:** Tier 1 merch funnel — [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) · [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md)
+- [ ] **Optional:** one vertical field pilot per `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`
 
 ---
 

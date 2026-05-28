@@ -39,6 +39,28 @@ describe("device-keys-custody-html", () => {
     expect(html).not.toContain("hc-notice--warning");
   });
 
+  it("created setup page exposes custody mount slot", () => {
+    const html = readFileSync(join(root, "site/created/index.html"), "utf8");
+    expect(html).toContain('id="device-keys-custody-created-setup"');
+    expect(html).toContain('id="created-setup-keys-mount"');
+  });
+
+  it("status plate pilot exposes habit loop scorecard on created", () => {
+    const html = readFileSync(join(root, "site/created/index.html"), "utf8");
+    expect(html).toContain('id="status-plate-loop-scorecard"');
+    expect(html).toContain('id="status-plate-loop-progress"');
+    expect(html).toContain('id="status-plate-loop-export"');
+    expect(html).toContain("Copy pilot summary");
+    expect(html).toContain("No scan analytics");
+  });
+
+  it("lost item relay pilot exposes habit loop scorecard on created", () => {
+    const html = readFileSync(join(root, "site/created/index.html"), "utf8");
+    expect(html).toContain('id="lost-item-loop-scorecard"');
+    expect(html).toContain('id="lost-item-loop-export"');
+    expect(html).toContain("Printed QR and tagged the item");
+  });
+
   it("styles use compact stacked emphasis layout for custody cards", () => {
     const styles = readFileSync(join(root, "site/styles.css"), "utf8");
     expect(styles).toContain("--hc-emphasis-card-gap-section-compact: 12px");

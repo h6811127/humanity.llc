@@ -3,15 +3,15 @@
 **Opened:** 2026-05-26  
 **Status:** **Active** - product/ops constraint; client polling must change before production scale  
 **Audience:** Product, frontend, operators  
-**Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) (saved-card scale) · [`UI_UX_REVERT_PLAN.md`](UI_UX_REVERT_PLAN.md) · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md)
+**Related:** [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) (saved root-card scale) · [`UI_UX_REVERT_PLAN.md`](UI_UX_REVERT_PLAN.md) · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md)
 
 ---
 
 ## Why this doc exists
 
-Humanity Commons is meant to be a **simple** reference site: static Pages + a small Worker resolver. In practice, the **device shell** can generate more Worker traffic than organic scans and creates combined - enough to exhaust the **Workers Free daily cap (100,000 requests/day)** in minutes when a steward leaves `/wallet/` open with many saved cards.
+Humanity Commons is meant to be a **simple** reference site: static Pages + a small Worker resolver. In practice, the **device shell** can generate more Worker traffic than organic scans and creates combined - enough to exhaust the **Workers Free daily cap (100,000 requests/day)** in minutes when a steward leaves `/wallet/` open with many saved root cards or later many watched child objects.
 
-That is not “the site went viral.” It is **N cards × poll interval × open tabs**, mostly from **live-proof inbox** and **wallet status** fetches documented below.
+That is not “the site went viral.” It is **N roots/objects × poll interval × open tabs**, mostly from **live-proof inbox** and **wallet status** fetches documented below.
 
 **Cloudflare Error 1027** (`workers_daily_limit`) is an account quota event. Client mitigations (backoff, suppress since-visit UI when degraded) do not replace fixing the **poll budget**.
 
@@ -26,7 +26,7 @@ Humanity Commons is **not** a wallet monitoring service. It is a **reference res
 | “Last checked on **this device** …” | “Always live” / “real-time dashboard” for every saved card |
 | “Tap **Check network**” or “**Check for live proof**” when you care | That the server is watching your wallet 24/7 |
 | **Watch for live proof** is **opt-in** | That saving a card turns on background polling |
-| **1–5 saved cards** is comfortable; **10+** is power-user / out of spec until budget fixes land | Unlimited multi-card stewardship with no cost |
+| **1–5 saved root cards** is comfortable; **10+** is power-user / out of spec until budget fixes land. Many child objects should be managed under one root, but automatic checks still need explicit budgets. | Unlimited multi-card or multi-object stewardship with no cost |
 
 Stewards get **power when they intend it** (buttons, watch toggle, `/created/` signing surface). They do **not** get unlimited free infrastructure just by leaving `/wallet/` open.
 
@@ -171,7 +171,7 @@ Client budgets are necessary; they are **not** sufficient against bugs, old cach
 | Control | Purpose | Status |
 |---------|---------|--------|
 | **429 + Retry-After** on hot routes | Client backs off (60s live proof; health degraded) | Partially shipped client-side |
-| **Per-IP / per-device rate limits** | Cap burst “Check network” fan-out | Planned |
+| **Per-IP / per-device rate limits** | Cap burst “Check network” fan-out | **Partial (2026-05-27)** — `GET …/status` 300/IP/min (Technical Standards §15) |
 | **Short TTL / ETag** on `status` and challenge list | Cheap 304s for repeat polls | **Shipped** (Phase 9) |
 | **Workers Paid + dashboard alerts** | Production reference operator survives organic use | Ops (Phase 0) |
 | **Fail closed on 1027** | Site down until quota resets | Shipped behavior |
@@ -206,6 +206,7 @@ Client budgets are necessary; they are **not** sufficient against bugs, old cach
 | Idea | Status | Notes |
 |------|--------|-------|
 | **Leader tab** (`BroadcastChannel`) | **Shipped** (Phase 7) | `device-live-control-poll-leader.mjs`; followers apply snapshot, no Worker GET |
+| **Resolver network tab sync** | **Shipped** (Phase 1a) | [`DEVICE_TAB_RESOLVER_SYNC.md`](DEVICE_TAB_RESOLVER_SYNC.md) — `hc-resolver-sync` BC; followers skip duplicate polls within 60s |
 | SW only when browser alerts opted in | **Shipped** (Phase 4) | 15 min periodic minimum |
 | Poll only **active** or **recently used** cards | **Shipped** (Phase 8) | `selectLiveControlPollEntries` when wallet ≥10 cards |
 | **Per-tab/day auto-poll cap** | **Shipped** (Phase 7) | `hc_live_control_auto_poll_budget`; manual check exempt |
@@ -245,11 +246,11 @@ Do **not** rip out the device OS. **Retire the default “poll every card every 
 | **8b - Presence & chrome** (P1) | **Shipped:** skip presence heartbeat when alone with keys (`shouldSkipPresenceHeartbeat`) | Less cross-tab churn when single tab | Heartbeat resumes when second tab opens |
 | **8c - Visible rows + SW watch** (P1) | **Shipped:** network refresh prefers hub-visible `.hub-card-item` rows; SW polls only when `hc_watch_live_proof === "1"` (alerts still required) | On-screen chips refresh first | Background polls off when watch off |
 | **9 - Edge cache** (P2) | ETag / short TTL on status + challenge endpoints | Fewer D1 reads on repeat polls | **Shipped** |
-| **10 - Hosted tier + push** (planning) | Entitlements, higher caps, optional server push — **no code yet** | Best UX at scale | [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md); M7 rows + test plan: § Phase 10 — hosted tier rows (M7) |
+| **10 - Hosted tier + push** (E2 staging) | Entitlements probe, higher caps, optional server push — **E2+E3 client/server staging**; E4 push next | Best UX at scale | [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md); M7 rows + test plan: § Phase 10 — hosted tier rows (M7) |
 
 **Tests (shipped, Phases 1–9):** Vitest in `device-live-control-poll-scheduler.test.ts`, `device-live-control-round-robin.test.ts`, `device-live-control-poll-budget-core.test.ts`, `device-live-control-poll-leader-core.test.ts`, `device-live-control-sw-core.test.ts`, `device-hub-visible-rows-core.test.ts`, `device-wallet-scale-core.test.ts` (if present); Playwright in `e2e/device-inbox.spec.ts`, `e2e/created-control.spec.ts` (collapsed hub idle, one challenge per tick, degraded health, watch off + manual check).
 
-**Tests (Phase 10, planning):** § Phase 10 test plan (M7) — run **free-tier regression** on every hosted-tier PR; hosted-specific suites when E1–E4 land.
+**Tests (Phase 10, M8 staging):** § Phase 10 test plan (M7) — G0 verification: `npm run verify:hosted-g0` · `npm run e2e:steward-hosted` (H1–H6).
 
 ---
 
@@ -286,16 +287,16 @@ Before merging shell changes that touch network I/O:
 
 Manual **Check for live proof** always runs one round-robin pass when watch is off. Opening the inbox sheet does **not** start auto poll without watch (scope may be active, but the timer requires `hc_watch_live_proof === "1"`).
 
-**Paid / hosted operator (planning):** Product definition in [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md). Free/reference use remains **manual check**, opt-in watch, and shipped caps (400 auto live-proof GETs/day/device). Paid may raise caps and add optional server push — not implemented. Full entitlement rows and test plan: § Phase 10 — hosted tier rows (M7) below.
+**Paid / hosted operator (staging):** Product definition in [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md). Free/reference use remains **manual check**, opt-in watch, and shipped caps (400 auto live-proof GETs/day/device). Hosted E2 can raise caps from `GET …/steward/entitlements`; push remains a later E4 path. Full entitlement rows and test plan: § Phase 10 — hosted tier rows (M7) below.
 
 ---
 
 ## Phase 10 — hosted tier rows (M7)
 
-**Status:** Planning complete (May 2026) — **no client or Worker implementation** until M4 governance sign-off + M8 epics  
+**Status:** E1/E2/E5 foundation staging (May 2026) — keep production flag off until M4 governance sign-off + M8 rollout gates  
 **Sources:** [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md) · [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) · [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md)
 
-When build begins (M8 **E2**–**E4**), shipped free-tier constants in poll modules MUST resolve from **`GET …/steward/entitlements`** (or fall back to `reference_free` when unauthenticated). This section is the **request-budget contract** for that migration.
+As M8 **E2** stages, shipped free-tier constants in poll modules MUST resolve from **`GET …/steward/entitlements`** (or fall back to `reference_free` when unauthenticated). This section is the **request-budget contract** for that migration.
 
 ### Entitlement rows (free vs hosted)
 
@@ -340,9 +341,19 @@ npm run worker:test -- \
   worker/tests/device-hub-visible-rows-core.test.ts \
   worker/tests/device-wallet-scale-core.test.ts \
   worker/tests/device-hub-network-tools-core.test.ts \
+  worker/tests/device-steward-entitlements-core.test.ts \
+  worker/tests/device-steward-entitlements.test.ts \
   worker/tests/conditional-json.test.ts
 
 npm run e2e -- e2e/device-inbox.spec.ts e2e/created-control.spec.ts
+```
+
+**Hosted-specific (bundled):**
+
+```bash
+npm run worker:test:steward-hosted
+npm run e2e:steward-hosted
+npm run verify:hosted-g0   # free-tier Vitest + steward-hosted Vitest
 ```
 
 **Vitest (extend existing modules when E2 reads entitlements):**
@@ -362,11 +373,11 @@ npm run e2e -- e2e/device-inbox.spec.ts e2e/created-control.spec.ts
 
 | Case | Setup | Assert |
 |------|-------|--------|
-| H1 Free default | No steward session; watch on; hub expanded | Auto poll pauses at **400** simulated ticks; hub budget message visible |
-| H2 Hosted session | Mock `GET …/steward/entitlements` → `hosted_steward_v1` | Cap **4000** before pause; idle tick uses 30s (mock timers) |
-| H3 Downgrade | Session returns `reference_free` mid-session | Client re-applies **400** cap on next entitlement fetch |
-| H4 Push opt-in | Hosted + `notify.push.live_proof`; subscribe mock | Wallet round-robin interval may widen; SW still respects watch + alerts |
-| H5 Free unchanged | No billing code paths on reference operator | Anonymous scan + create flows unchanged; no paywall on hub |
+| H1 Free default | No steward session; watch on; hub expanded | `e2e/hosted-tier-budget.spec.ts` asserts **400** cap + free policy with no entitlement GET |
+| H2 Hosted session | Mock `GET …/steward/entitlements` → `hosted_steward_v1` | `e2e/hosted-tier-budget.spec.ts` asserts **4000** cap, 30s idle, 5/3 network parallel, 5 min SW |
+| H3 Downgrade | Session returns `reference_free` mid-session | `e2e/hosted-tier-budget.spec.ts` asserts client reapplies **400** cap on next entitlement fetch |
+| H4 Push opt-in | Hosted + `notify.push.live_proof`; SSE mock | `e2e/hosted-tier-push.spec.ts` — push healthy suppresses auto poll; `live_proof.pending` triggers one GET |
+| H5 Free unchanged | No billing code paths on reference operator | `e2e/hosted-tier-budget.spec.ts` asserts anonymous create remains available with no hosted entitlement call or paywall |
 
 **Manual QA ([`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — add **P1-8 Hosted tier budget** when E2 ships):**
 
@@ -388,9 +399,9 @@ npm run e2e -- e2e/device-inbox.spec.ts e2e/created-control.spec.ts
 
 ### M8 implementation gates (do not start E2–E4 until)
 
-1. **M4 governance sign-off** on [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md).
+1. **M4 governance sign-off** on [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) before production enablement.
 2. This M7 section reviewed against shipped module constants (table above).
-3. Vitest rows above added in the same PR as first entitlement probe (E2) — see [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md).
+3. Vitest + Playwright rows above stay green with every E2–E4 hosted-tier PR — see [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md).
 
 ---
 
@@ -431,12 +442,12 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 
 | # | Idea | Shipped today | Test when built | Phase |
 |---|------|---------------|-----------------|-------|
-| H1 | `reference_free` when no session | Yes (implicit) | 401/ absent session → 400 cap | 10 |
-| H2 | `hosted_steward_v1` caps from API | — | Mock entitlements → 4000 cap, 5 parallel | 10 |
+| H1 | `reference_free` when no session | Yes | 401 / absent session → 400 cap | 10 |
+| H2 | `hosted_steward_v1` caps from API | Staging | Mock entitlements → 4000 cap, 5 parallel | 10 |
 | H3 | `steward_account_link_v1` verify | — | Worker rejects bad sig / replay nonce | 10 |
-| H4 | Push `live_proof.pending` → one GET | — | E2E: no wallet round-robin while SSE up | 10 |
-| H5 | Downgrade to free on `expired` | — | Session cleared; 400 cap; push unsub | 10 |
-| H6 | Merch order does not grant hosted | — | Policy test / fixture | 10 |
+| H4 | Push `live_proof.pending` → one GET | Staging | E2E: no wallet round-robin while SSE up; SSE down re-enables poll | 10 |
+| H5 | Downgrade to free on `expired` | Staging for policy reapply | Session cleared; 400 cap; push unsub | 10 |
+| H6 | Merch order does not grant hosted | Staging | `worker/tests/billing-webhook.test.ts` commerce ignore | 10 |
 
 ### Network status (wallet chips)
 
@@ -458,8 +469,8 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 | S2 | Presence heartbeat **10s** + coalesce events | Yes | — | Lag ✅ |
 | S3 | Chrome debounce + fingerprint skip | Yes (`device-chrome-refresh.mjs`) | — | Lag ✅ |
 | S4 | Skip presence heartbeat **when alone with keys** | Yes (`shouldSkipPresenceHeartbeat`) | Also skip when no `hc_created` | 8b ✅ |
-| S5 | Lazy-load inbox sheet / notifications | — | Smaller bootstrap graph | P2 |
-| S6 | Shard `hc_wallet_network_cache` | — | Bound session cache size | Open issues |
+| S5 | Lazy-load inbox sheet / notifications | Yes (`device-inbox-sheet-loader`, `device-browser-notifications-loader`) | Smaller bootstrap graph | P2 ✅ |
+| S6 | Shard / bound `hc_wallet_network_cache` | **Yes** (2026-05-27) | Max **20** fresh rows; LRU + wallet protect on save | Open issues → shipped |
 | S7 | Cross-tab rebuild (one snapshot) | Partial (Phases 1–6) | Full state machine per [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md) | Cross-tab |
 
 ### Background / SW
@@ -475,14 +486,14 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 | # | Idea | Shipped today | Planned direction | Phase |
 |---|------|---------------|-------------------|-------|
 | O1 | Workers Paid on production | Ops | Monitor daily requests | 0 |
-| O2 | Per-IP rate limits on hot routes | — | Cap burst **Check network** | Server |
+| O2 | Per-IP rate limits on hot routes | **Partial** — `GET …/status` 300/IP/min | Cap burst **Check network** | Server ✅ step 1 |
 | O3 | Fail closed on 1027 | Yes | User-visible degraded state | 3 ✅ |
 
 ### Implementer order (after Phases 1–9 + 8c)
 
-1. **Phase 10 (planning → build)** — M2–M8 done. **Next:** M4 governance sign-off ([`HOSTED_TIER_M4_GOVERNANCE_BRIEF.md`](HOSTED_TIER_M4_GOVERNANCE_BRIEF.md)) → **E1** per [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md).  
-2. **Shell P2** - Lazy inbox loader ([`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md)).  
-3. **Ops O2** - Per-IP rate limits on hot routes.
+1. **Phase 10 (M8 complete, G0 signed)** — **Next:** production rollout ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout). Legal review for G7 when available.
+2. **Shell P2** - Lazy browser notifications loader ([`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md)) — **shipped 2026-05-27**.  
+3. **Ops O2** - Per-IP rate limits on hot routes — **step 1 shipped:** `GET …/cards/{profile_id}/status` (300/IP/min, Technical Standards §15). Next: live-control / health hot routes if needed.
 
 See also [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) and [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
 
@@ -498,11 +509,11 @@ Phases 1–5 improved polling, but **N saved cards** on one browser is still an 
 
 ### 2. Shell performance (must fix)
 
-Every hub/inbox pass calls `loadWallet()` and `JSON.parse`s the full `hc_wallet` array. `hc_wallet_network_cache` grows per saved card per session. **Must address:** avoid full-wallet parse on hot paths, bound or shard cache entries, lazy row hydration. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
+Every hub/inbox pass calls `loadWallet()` and `JSON.parse`s the full `hc_wallet` array. **`hc_wallet_network_cache`** is now capped at **20** fresh rows per session (S6, 2026-05-27); remaining: avoid full-wallet parse on hot paths, lazy row hydration. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
 
 ### 3. Multi-tab presence (must fix)
 
-Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). That traffic is local-only (no Worker), but `storage` events drive `refreshDeviceChrome` on **all** tabs. **Must address:** debounce/coalesce with large wallets and many tabs; align with [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md). See [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md).
+Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). That traffic is local-only (no Worker), but `storage` events drive `refreshDeviceChrome` on **all** tabs. **Must address:** debounce/coalesce with large wallets and many tabs; align with [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md). See [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md). **Planned mitigation for duplicate status GETs:** [`DEVICE_TAB_RESOLVER_SYNC.md`](DEVICE_TAB_RESOLVER_SYNC.md).
 
 ---
 
@@ -510,6 +521,8 @@ Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). 
 
 | Date | Note |
 |------|------|
+| 2026-05-27 | **S6 shipped:** bound `hc_wallet_network_cache` (max 20 fresh rows, LRU prune) |
+| 2026-05-27 | **O2 step 1:** per-IP rate limit on `GET …/status` (300/min); Shell P2 lazy notifications shipped |
 | 2026-05-26 | **M8 epics:** [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) |
 | 2026-05-26 | **M7:** Phase 10 entitlement rows + test plan (§ Phase 10 — hosted tier rows) |
 | 2026-05-26 | **M6 standards delta:** [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) |

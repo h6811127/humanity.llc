@@ -1,10 +1,18 @@
 {
-  "profile_id": "hB3bfa3efjxwSDhfjGgWrgYq",
-  "qr_id": "qr_7cAhVBDprgcnyKs9",
-  "handle": "tool_library_showcase",
+  "profile_id": "mht4JbKX7Q9L5owpNw9wnAC8",
+  "qr_id": "qr_3JNFm4wMGyrcm1e9",
+  "handle": "tool_library_showcase_NSmpu7",
   "label": "Live object · tool library hours",
   "manifesto_line": "Neighborhood tool library · Closed for inventory until Tuesday",
-  "scan_url": "https://humanity.llc/c/hB3bfa3efjxwSDhfjGgWrgYq?q=qr_7cAhVBDprgcnyKs9",
-  "created_at": "2026-05-26T04:08:51.841Z",
+  "scan_url": "https://humanity.llc/c/mht4JbKX7Q9L5owpNw9wnAC8?q=qr_3JNFm4wMGyrcm1e9",
+  "created_at": "2026-05-27T17:44:11.379Z",
+  "object_streams": [
+    {
+      "id": "returns",
+      "class": "care",
+      "label": "Returns due",
+      "value": "Cordless drill · ladder"
+    }
+  ],
   "note": "M5 stranger-test live object showcase - owner key not stored."
 }

@@ -21,6 +21,8 @@ The project is not yet venture-ready because the first wedge, buyer, recurring u
 
 Until that is proven, Humanity Commons should be treated as a high-conviction prototype and public-interest protocol experiment, not a scaled venture business.
 
+**AI product stance:** Macro problem includes AI/bot spam; product response is **signed, revocable trust loop** — not an AI profile platform. Optional L3 explain consumes signed snapshot only ([`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md)).
+
 ---
 
 ## Sharpest Market Wedge

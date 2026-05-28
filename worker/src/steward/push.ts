@@ -4,7 +4,7 @@
  */
 import { OPERATOR_ID } from "../http/resolver";
 import { generateStewardPushConnectionId } from "../id";
-import type { Env } from "../index";
+import type { Env } from "../env";
 import { hostedStewardEnabled } from "./config";
 import {
   incrementUsage,
@@ -100,19 +100,24 @@ export function stewardPushConnectionCount(accountId: string): number {
   return connectionsByAccount.get(accountId)?.size ?? 0;
 }
 
-export function stewardPushConnectionSnapshot(): Array<{
-  account_id: string;
-  connections: number;
-}> {
-  return [...connectionsByAccount.entries()]
-    .map(([account_id, sinks]) => ({ account_id, connections: sinks.size }))
-    .sort((a, b) => b.connections - a.connections || a.account_id.localeCompare(b.account_id));
-}
-
-export function stewardPushTotalConnectionCount(): number {
-  let total = 0;
-  for (const sinks of connectionsByAccount.values()) total += sinks.size;
-  return total;
+export function stewardPushConnectionSummary(): {
+  accounts_with_connections: number;
+  active_connections: number;
+  active_client_ips: number;
+} {
+  let activeConnections = 0;
+  for (const set of connectionsByAccount.values()) {
+    activeConnections += set.size;
+  }
+  let activeClientIps = 0;
+  for (const count of connectionCountByIp.values()) {
+    if (count > 0) activeClientIps += 1;
+  }
+  return {
+    accounts_with_connections: connectionsByAccount.size,
+    active_connections: activeConnections,
+    active_client_ips: activeClientIps,
+  };
 }
 
 /** E5.4 — drop in-memory SSE sinks when subscription expires. */

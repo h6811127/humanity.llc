@@ -8,6 +8,12 @@ import { stewardServerQuotaPausedMessage } from "./device-steward-quota-core.mjs
 
 export const STORAGE_WATCH_LIVE_PROOF = "hc_watch_live_proof";
 
+/** Hub monitoring line — survives reload within tab session. @see docs/DEVICE_TAB_RESOLVER_SYNC.md */
+export const HUB_NETWORK_CHECKED_AT_SESSION_KEY = "hc_hub_network_checked_at";
+
+/** Hub monitoring line — survives reload within tab session. @see docs/DEVICE_TAB_RESOLVER_SYNC.md */
+export const LIVE_PROOF_CHECKED_AT_SESSION_KEY = "hc_live_proof_checked_at";
+
 /** Debounce hub wallet status fetches (Safari P1 / request budget). */
 export const WALLET_NETWORK_HUB_FETCH_DEBOUNCE_MS = 300;
 

@@ -9,6 +9,7 @@ import {
   emphasisCardCtaButton,
   escapeEmphasisHtml,
 } from "../../site/js/device-emphasis-card-html.mjs";
+import { DEVICE_SHELL_ASSET_VERSION } from "../../site/js/device-status-shell-modules.mjs";
 
 describe("device-emphasis-card-html", () => {
   it("escapes HTML in CTA labels", () => {
@@ -32,7 +33,7 @@ describe("device-emphasis-card-html", () => {
   it("landing index busts styles.css cache when spacing changes", () => {
     const html = readFileSync(join(root, "site/index.html"), "utf8");
     expect(html).toContain('href="/css/hc-emphasis-card.css?v=4"');
-    expect(html).toContain("styles.css?v=126");
+    expect(html).toContain("styles.css?v=128");
   });
 
   it("landing final CTA uses urgent emphasis card and standard CTA", () => {
@@ -150,6 +151,12 @@ describe("device-emphasis-card-html", () => {
       /#created-vouch-return-banner\.hc-emphasis-card[\s\S]*justify-content:\s*flex-start/
     );
     expect(styles).toMatch(
+      /#create-public-card-notice\.hc-emphasis-card[\s\S]*justify-content:\s*flex-start/
+    );
+    expect(styles).toMatch(
+      /#create-public-card-notice\.hc-emphasis-card \.hc-emphasis-card__main[\s\S]*flex:\s*none/
+    );
+    expect(styles).toMatch(
       /#no-session\.hc-emphasis-card \.hc-emphasis-card__main[\s\S]*flex:\s*none/
     );
   });
@@ -194,14 +201,19 @@ describe("device-emphasis-card-html", () => {
   });
 
   it("shell pages bust styles and theme-dark for emphasis alignment", () => {
-    for (const page of ["site/wallet/index.html", "site/create/index.html", "site/created/index.html"]) {
+    const stylesBust = {
+      "site/wallet/index.html": "128",
+      "site/create/index.html": "128",
+      "site/created/index.html": "128",
+    };
+    for (const [page, v] of Object.entries(stylesBust)) {
       const html = readFileSync(join(root, page), "utf8");
       expect(html).toContain('href="/css/hc-emphasis-card.css?v=4"');
-      expect(html).toContain("styles.css?v=126");
-      expect(html).toContain("theme-dark.css?v=28");
-      expect(html).toContain("device-shell.css?v=55");
+      expect(html).toContain(`styles.css?v=${v}`);
+      expect(html).toContain("theme-dark.css?v=29");
+      expect(html).toContain("device-shell.css?v=59");
       expect(html).toContain('id="shell-status-line"');
-      expect(html).toContain("device-status-bootstrap.mjs?v=44");
+      expect(html).toContain(`device-status-bootstrap.mjs?v=${DEVICE_SHELL_ASSET_VERSION}`);
     }
   });
 
