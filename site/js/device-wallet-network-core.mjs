@@ -98,6 +98,15 @@ export function readCachedNetworkStatus(cache, profileId, now, ttlMs = WALLET_NE
 
 /**
  * @param {unknown} body Resolver GET .../status JSON
+ * @returns {string | null}
+ */
+export function parseNetworkQrScope(body) {
+  const scope = body?.scan?.qr?.scope;
+  return typeof scope === "string" && scope.trim() ? scope.trim() : null;
+}
+
+/**
+ * @param {unknown} body Resolver GET .../status JSON
  * @returns {{ verificationLabel: string | null, verificationState: string | null }}
  */
 export function parseNetworkVerification(body) {

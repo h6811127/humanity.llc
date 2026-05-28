@@ -14,6 +14,7 @@ vi.mock("../../site/js/hc-sign.mjs", () => ({
 
 import {
   buildResolverConfirmedWalletPollMaps,
+  getCachedNetworkQrScope,
   isResolverConfirmedProfile,
   refreshWalletNetworkStatuses,
 } from "../../site/js/device-wallet-network.mjs";
@@ -33,6 +34,7 @@ const ACTIVE_BODY = {
   scan: {
     kind: "active",
     card: { status: "active", handle: "e2e", manifesto_line: "Test" },
+    qr: { status: "active", scope: "card" },
   },
 };
 
@@ -92,6 +94,24 @@ describe("isResolverConfirmedProfile", () => {
 
     expect(isResolverConfirmedProfile(PROFILE_A)).toBe(true);
     expect(isResolverConfirmedProfile(PROFILE_B)).toBe(false);
+  });
+
+  it("persists resolver QR scope into cache and wallet row", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      resolverJsonResponse({
+        scan: {
+          kind: "active",
+          card: { status: "active", handle: "e2e", manifesto_line: "Test" },
+          qr: { status: "active", scope: "print_artifact" },
+        },
+      })
+    );
+
+    await refreshWalletNetworkStatuses([{ profile_id: PROFILE_A, qr_id: QR_A }]);
+
+    expect(getCachedNetworkQrScope(PROFILE_A)).toBe("print_artifact");
+    const wallet = JSON.parse(localStore.get("hc_wallet") || "[]");
+    expect(wallet[0].qr_scope).toBe("print_artifact");
   });
 
   it("buildResolverConfirmedWalletPollMaps includes only resolver-confirmed profiles after poll", async () => {

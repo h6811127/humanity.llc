@@ -4,7 +4,7 @@
 **Audience:** Product, ops, engineering, support  
 **Purpose:** Define how QR credentials on **physical Humanity artifacts** are born, age, fail, and die — separately from digital-only QRs and separately from human verification. Supersedes informal “QR expiry” discussion for merch; engineering and copy should cite this doc before fulfillment ships.
 
-**Canonical companions:** [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md) · [`REVOKE_AND_LIFECYCLE_V1.md`](REVOKE_AND_LIFECYCLE_V1.md) · [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) · [`CARD_RETENTION_AND_ORPHAN_CLEANUP.md`](CARD_RETENTION_AND_ORPHAN_CLEANUP.md) · [`MERCH_LED_V1.md`](MERCH_LED_V1.md) · [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) · [`V1_IMPLEMENTATION_CONTRACTS.md`](V1_IMPLEMENTATION_CONTRACTS.md) (`scope: print_artifact`)
+**Canonical companions:** [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md) · [`REVOKE_AND_LIFECYCLE_V1.md`](REVOKE_AND_LIFECYCLE_V1.md) · [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) · [`CARD_RETENTION_AND_ORPHAN_CLEANUP.md`](CARD_RETENTION_AND_ORPHAN_CLEANUP.md) · [`MERCH_LED_V1.md`](MERCH_LED_V1.md) · [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) · [`V1_IMPLEMENTATION_CONTRACTS.md`](V1_IMPLEMENTATION_CONTRACTS.md) (`scope: print_artifact`)
 
 ---
 
@@ -27,7 +27,8 @@ This policy separates:
 | **URL** | Does the camera open a Humanity page? → **Always yes** |
 | **Credential time** | Does `expires_at` pass? → **No for merch** (by default) |
 | **Credential state** | Is this pointer still trusted for its purpose? → **active / revoked / replaced** |
-| **Card** | Is the steward profile still on the network? → **active / disabled / suspended** |
+| **Child object / printed item** | Which object or artifact does this QR represent? → status, label, and item lifecycle |
+| **Root card** | Is the steward profile still on the network? → **active / disabled / suspended** |
 | **Human trust** | Is the holder vouched? → **Independent; never bought** |
 
 ---
@@ -39,7 +40,7 @@ This policy separates:
 3. **Bearer warning** — scan + packaging: holding the item ≠ owning the card.
 4. **Commerce firewall** — payment does not grant vouch, hosted tier, or verification.
 5. **Revoked still resolves** — minimal tombstone scan, not 404.
-6. **Sibling independence** — revoking one `print_artifact` QR must not revoke others unless card-level disable applies.
+6. **Sibling independence** — revoking one `print_artifact` QR must not revoke others unless child disable or root card disable applies.
 7. **No scan analytics** — no per-scan trails on the operator; aggregate order/ops metrics only.
 
 ---
@@ -54,7 +55,7 @@ Use **`scope`** to drive lifecycle rules (see implementation contracts).
 | `print_artifact` | Stickers, cards, plates, event kits | **`null` (none)** for v1 merch | **Revoke this item** · Replace item QR |
 | `card` (batch / curiosity) | Tier 0 mass sticker | **`null`** OR long-lived campaign credential | Operator rotate batch · Owner adopts later (Phase C) |
 
-**Rule:** Fulfillment MUST NOT mint `print_artifact` credentials with a calendar `expires_at` unless a future **explicit event SKU** is labeled “timed admission” in storefront copy (see [§ Creative ideas](#creative-ideas-optional-phases) · idea **#7**).
+**Rule:** Fulfillment MUST NOT mint `print_artifact` credentials with a calendar `expires_at` unless a future **explicit event SKU** is labeled “timed admission” in storefront copy (see [§ Creative ideas](#creative-ideas-optional-phases) · idea **#7**). Treat `print_artifact` as the shipped child-object bridge: controlled by the parent root key, independently revocable, and not a separate verified human.
 
 ---
 
@@ -99,8 +100,8 @@ Do **not** turn on live Shopify checkout (`checkout_open: true`) until the digit
 | **Goal** | Holder wears **their** handle / object story; scan shows real card + vouch state |
 | **QR model** | **One `qr_id` per physical item** (`scope: print_artifact`) |
 | **Expiry** | **`expires_at` null** |
-| **Prerequisite** | Active Humanity Card + artifact intent + metadata spike (Shopify → paid webhook) |
-| **Revoke** | Owner revokes **this item only**; other stickers on same profile stay active |
+| **Prerequisite** | Active root Humanity Card + artifact intent + metadata spike (Shopify → paid webhook); backup/recovery strongly recommended before printing many child objects |
+| **Revoke** | Owner revokes **this item only**; other stickers under the same root stay active |
 | **Buyer expectation** | Copy: “This sticker points at **your** public card. You can revoke **this sticker** if it’s lost or gifted.” |
 
 **Hard rule unchanged:** buying Tier 1 does not make you **Vouched Human**.

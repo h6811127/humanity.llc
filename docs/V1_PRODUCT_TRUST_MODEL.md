@@ -17,19 +17,21 @@
 
 Humanity Commons v1.0 should make one clear promise:
 
-> Create a signed public Humanity Card, get vouched for by real people, prove live control when needed, and carry a QR that always resolves to current status.
+> Create a signed public root Humanity Card, get vouched for by real people, prove live control when needed, and control many public child objects whose QRs always resolve to current status.
 
 V1 must not promise government identity, bot-proof uniqueness, legal identity, KYC, background checks, age verification, iris/biometric personhood registries, or absolute proof that a person is unique across the world.
 
 The product is trustworthy when a normal scanner can understand, in under five seconds:
 
-1. Whether the card or QR is active, revoked, suspended, expired, or unknown.
-2. Whether the person has social trust evidence such as accepted vouches or steward/founding credentials.
-3. Whether the person nearby has recently proven control of the card key.
-4. Whether the physical object being scanned is merely a pointer to a card.
+1. Whether the root card, child object, or QR is active, revoked, suspended, expired, or unknown.
+2. Whether the root person has social trust evidence such as accepted vouches or steward/founding credentials.
+3. Whether the person nearby has recently proven control of the root card key.
+4. Whether the physical object being scanned is merely a pointer to a root card / child object.
 5. What the scan explicitly does not prove.
 
-**Steward device vs resolver (ops):** Trust labels come from the **resolver at scan or refresh time**. A steward’s phone does **not** continuously guarantee fresh network state for every saved card — that would imply a monitoring product the reference operator does not offer. Live proof while someone waits is driven by the **scanner’s session** and the steward’s **signing tab** or **opt-in** hub checks. See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
+**Root/child authority:** Human trust lives on the root Humanity Card. Child objects can show that they are **controlled by** a root, but they are not separate verified humans and do not vouch. See [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md).
+
+**Steward device vs resolver (ops):** Trust labels come from the **resolver at scan or refresh time**. A steward’s phone does **not** continuously guarantee fresh network state for every saved root card or child object — that would imply a monitoring product the reference operator does not offer. Live proof while someone waits is driven by the **scanner’s session** and the steward’s **signing tab** or **opt-in** hub checks. See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 
 ---
 
@@ -56,36 +58,36 @@ Protocol fields may continue to use `verified_human` where needed for compatibil
 
 **What it proves:**
 
-- The scanned QR resolves to a Humanity Card or artifact status page.
+- The scanned QR resolves to a root Humanity Card, child object, or artifact status page.
 - The QR credential is active, revoked, expired, suspended, or unknown at scan time.
-- The card has whatever current public status the resolver returns.
+- The parent root card and/or child object has whatever current public status the resolver returns.
 
 **What it does not prove:**
 
-- The holder is the card owner.
-- The holder controls the card key.
+- The holder is the root card owner.
+- The holder controls the root card key.
 - The holder is a vouched human.
 - The physical item is still owned by the person named on the card.
 
 **Required copy:**
 
-> This QR resolves to a Humanity Card. It does not prove the person holding this item is the card owner.
+> This QR resolves through a Humanity Card. It does not prove the person holding this item is the card owner.
 
 **Product constraint:**
 
-Do not print mutable verification claims such as "Verified Human" on v1 artifacts. Current trust state belongs in the scan result, not on the object.
+Do not print mutable verification claims such as "Verified Human" on v1 artifacts. Current trust state belongs in the scan result, not on the object. If the scan is for a child object, show object state separately from root human trust.
 
 ### Level 1: Current Card Resolution
 
 **Examples:**
 
-- Scanner opens `https://humanity.llc/c/{profile_id}?q={qr_id}`.
+- Scanner opens `https://humanity.llc/c/{profile_id}?q={qr_id}` for a root card or child-object QR.
 - Scanner opens the public card page directly.
 
 **What it proves:**
 
-- The resolver currently recognizes the card or QR.
-- The card status is visible.
+- The resolver currently recognizes the root card, child object, or QR.
+- The root/card status and any child-object status are visible.
 - The card document and QR credential can be checked against signed payloads.
 - Public verification summary, vouch recency, and badges are visible when available.
 
@@ -98,9 +100,9 @@ Do not print mutable verification claims such as "Verified Human" on v1 artifact
 
 **Required UI blocks:**
 
-1. Card status.
-2. Human trust status.
-3. Artifact/QR status when the scan came from a printed item.
+1. Root card status.
+2. Human trust status on the root only.
+3. Child object / artifact / QR status when the scan came from a printed item or nested object.
 4. Data/logging disclosure.
 
 ### Level 2: Social Vouch Trust
