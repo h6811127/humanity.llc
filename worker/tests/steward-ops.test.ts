@@ -164,7 +164,7 @@ describe("operator steward ops snapshot", () => {
       { plan_id: "reference_free", status: "active" },
     ];
     fake.sessions = [
-      { expires_at: "2026-05-28T00:00:00.000Z" },
+      { expires_at: "2999-05-28T00:00:00.000Z" },
       { expires_at: "2026-05-26T00:00:00.000Z" },
     ];
     fake.usage = [
