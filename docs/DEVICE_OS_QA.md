@@ -5,7 +5,7 @@
 **Storage & hub detail:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)  
 **Refresh pipeline:** Status dot — resolver health only (`device-status.mjs` + `device-network-health.mjs`). Hub/wallet — scoped polls in `device-hub-ui.mjs` (`fetchAndApplyNetworkChips`, live-control inbox). `device-os-coordinator.mjs` is retained but not auto-started (see `docs/UI_UX_REVERT_PLAN.md` step 2).
 
-**Purpose:** Repeatable checks before M5 stranger tests and after device-shell changes. Log failures in the triage table at the bottom.
+**Purpose:** Repeatable checks after device-shell changes and before vertical pilots or merch checkout. Log failures in the triage table at the bottom.
 
 **Environment:** Run against local Pages (`npm run pages:dev`) + Worker (`npm run worker:dev`) unless noted “production only.”
 
@@ -186,6 +186,8 @@ Per [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) § QA (hub card
 
 **Fail signals:** Many duplicate `/.well-known/hc/v1/health` or per-card status requests on a single focus.
 
+**Multi-tab (Phase 1a resolver sync):** Two tabs on `/` with the same saved card. Tab A expands hub or **Check network**; within 60s, focus Tab B and expand hub — Tab B should show updated chips **without** a second burst of `GET …/status?q=…` (health fetch may still run once). Disable with `localStorage.hc_resolver_sync_tabs = "0"` to confirm per-tab polling returns.
+
 ### P1-2 · Resolver health → status dot
 
 | Step | Action | Expected |
@@ -234,6 +236,7 @@ Spec: [`KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md`](KEYS_CUSTODY_EMPHA
 | 3 | Tap **Acknowledge** on wallet or hub | Card removed; `localStorage.hc_keys_custody_notice_dismissed === "1"`; reload — notice stays hidden |
 | 4 | `localStorage.hc_theme = "dark"`; reload `/wallet/` + hub | Blue eyebrow + readable detail on dark shell; glass/hairline card still visible (not flat rim) |
 | 5 | Safari iOS | `npm run e2e:keys-custody:webkit`; optional physical device spot-check if WebKit CI fails |
+| 6 | `/created/?fresh=1` (unsaved keys; reset dismiss + `hc_auto_save_device=0` if testing) | Warn **Keys on this device** card above save strip; compact padding; **Acknowledge** dismisses |
 
 **Fail signals:** Large gap between detail and **Acknowledge**; card stretches to sheet height; dismiss does not persist; dark mode gray-on-gray eyebrow/detail.
 
@@ -254,6 +257,63 @@ Removed May 2026. See [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md). 
 
 See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 
+### P1-HH · Hub header simplification (Home / Close / Create)
+
+**Spec:** [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md) · visual refresh: [`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md)
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Open hub on `/` (light) | Title **Saved in this browser**; no subtitle under title; **+ New** in saved-items header only |
+| 2 | Top rail | Home (muted) + inline status line; **no** Create in status row; Close ≥40px, visually stronger than Home |
+| 3 | Tap Home | Navigates home; hub closes |
+| 4 | Reopen hub → tap Close | Sheet closes |
+| 5 | Tap **+ New** | `/create/` |
+| 6 | Repeat on `/create/` hub | Same layout as landing |
+| 7 | Dark mode (`hc_theme=dark`) | Create pill readable; Close border visible; Home not competing with title |
+| 8 | Scroll page → tap status dot | Hub still opens (P0-3) |
+
+Automated: `e2e/device-status-dot.spec.ts` § hub sheet header chrome (steps 4–5, Close); Vitest `device-hub-header-html.test.ts` (40px Home/Close).
+
+### P1-9 · Hub sheet visual refresh (May 2026)
+
+**Spec:** [`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md)
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Open hub on `/` in light + dark | Frosted sheet; page content subtly visible through sheet; row copy readable |
+| 2 | Expand saved-items section | **Monitoring** warn card with segmented checks + watch toggle; status line below eyebrow |
+| 3 | Trigger live proof waiting (inbox pending) | Urgent emphasis card at top of alerts — not gold section label; rows inside card |
+| 4 | Saved row | Tier-3 info glass row; object-type left accent; unified **checked** status line |
+| 5 | `prefers-reduced-transparency: reduce` | Sheet + inset cards opaque; no blur jank |
+| 6 | Tap **+ New** in saved-items header | Navigates to `/create/`; Create not in top status rail |
+| 7 | Tap **Close** on expanded hub | Hub collapses; `body` loses `device-hub-sheet-open` |
+
+Automated: `e2e/device-status-dot.spec.ts` § hub sheet header chrome (steps 6–7); Vitest `device-hub-header-html.test.ts`.
+
+### P1-PWA · PWA install (device shell)
+
+**Spec:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · **Implementation:** [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md)
+
+**Prerequisites:** At least one card saved on device (`hc_wallet` non-empty). Phase 1+ manifest on disk.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Open `/c/…` scan URL (showcase or test card) | **No** `#device-pwa-install-card`; **no** install prompt |
+| 2 | Open `/create/` | **No** install card (flow page) |
+| 3 | Open `/` with saved cards (Chromium desktop) | After ~1s, install emphasis card may appear if `beforeinstallprompt` fired |
+| 4 | Tap **Install** (Chromium) | Native install sheet; after install, card hidden |
+| 5 | Dismiss install card | Hidden; `localStorage.hc_pwa_install_dismissed_at` set |
+| 6 | Reload within 7 days | Card stays hidden (snooze) |
+| 7 | Tab A: keys on `/created/` · Tab B: open installed PWA or second window on `/` | Cross-tab inbox / custody applies — not blocked by install UX ([`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md)) |
+| 8 | Trigger orphan or cross-tab inbox item | Install card **hidden** while urgent inbox kind active |
+| 9 | iOS Safari `/wallet/` with saved cards | Manual **Add to Home Screen** copy only — no fake Install button |
+| 10 | Standalone (installed) mode | No install card; hub dot and inbox still work (**P0-3**) |
+| 11 | Simulate status load failure (`data-device-status-error`) | No install card; fix status graph first |
+
+**Fail signals:** Install prompt on scan; install card with zero saved cards; install card over orphan inbox; dead status dot after adding PWA module to status graph.
+
+Automated (Phase 0+): `npm run worker:test -- worker/tests/pwa-install-metadata.test.ts worker/tests/pwa-install-ux.test.ts` · Phase 3: `e2e/device-pwa-install.spec.ts`.
+
 ### P1-8 · Hosted tier budget (Phase 10 — E2 staging)
 
 **Status:** E2 client probe staging; production enablement still waits on M4 sign-off and rollout gates. Spec: [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) · build order: [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md).
@@ -265,7 +325,14 @@ See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 | 3 | Cancel / expire hosted | Returns to **400** cap; wallet and keys intact |
 | 4 | Anonymous create / stranger scan page | No steward session; no hosted entitlement call; poll/create unchanged |
 
-Automated: M7 Vitest + `e2e/hosted-tier-budget.spec.ts` for H1–H3/H5.
+Automated:
+
+```bash
+npm run worker:test:steward-entitlements
+npm run worker:test:steward-push
+npm run e2e:hosted-tier
+npm run e2e:hosted-tier-push
+```
 
 ## P1 — Card disabled since last visit
 
@@ -424,7 +491,7 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device
 
 ## Bug triage log
 
-Copy a row per finding. **P0** blocks M5 strangers; fix before public announce.
+Copy a row per finding. **P0** blocks vertical pilots or public announce; fix before scaling strangers.
 
 | ID | Date | Priority | Scenario | Expected | Actual | Owner |
 |----|------|----------|----------|----------|--------|-------|
@@ -436,7 +503,7 @@ Copy a row per finding. **P0** blocks M5 strangers; fix before public announce.
 
 | Doc | Use |
 |-----|-----|
-| [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) | End-to-end stranger gate after OS QA |
+| [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) | Phase A exit gate (**passed** 2026-05-27) |
 | [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) | Backup import / second device |
 | [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md) | Chrome / sheet / motion |
 | [`SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md`](SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md) | WebKit scroll/dot fix plan + P0-W acceptance |

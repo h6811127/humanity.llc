@@ -234,6 +234,40 @@ test.describe("device OS wallet flow", () => {
     await expect(page.getByText("Four steps · keys stay in this browser")).toBeVisible();
   });
 
+  test("fresh=1 setup save step shows created keys custody emphasis card", async ({
+    page,
+  }) => {
+    await page.addInitScript((entry) => {
+      localStorage.removeItem("hc_setup_done");
+      localStorage.removeItem("hc_keys_custody_notice_dismissed");
+      localStorage.setItem("hc_auto_save_device", "0");
+      localStorage.setItem("hc_wallet", JSON.stringify([]));
+      sessionStorage.setItem(
+        "hc_created",
+        JSON.stringify({
+          profile_id: entry.profile_id,
+          qr_id: entry.qr_id,
+          owner_private_key_b58: entry.owner_private_key_b58,
+          owner_public_key_b58: entry.owner_public_key_b58,
+          handle: entry.handle,
+          manifesto_line: entry.manifesto_line,
+          scan_url: entry.scan_url,
+        })
+      );
+    }, SAMPLE_WALLET_ENTRY);
+    await stubCreatedResolver(page);
+
+    await page.goto(
+      `/created/?profile_id=${SAMPLE_WALLET_ENTRY.profile_id}&qr_id=${SAMPLE_WALLET_ENTRY.qr_id}&fresh=1`
+    );
+
+    const card = page.locator("#device-keys-custody-created-setup .device-keys-custody--created");
+    await expect(card).toBeVisible();
+    await expect(card.locator(".hc-emphasis-card__eyebrow")).toHaveText(/keys on this device/i);
+    await expect(card.getByRole("button", { name: "Acknowledge" })).toBeVisible();
+    await expect(page.locator("#created-setup-keys-mount #created-keys-strip")).toBeVisible();
+  });
+
   test("Update status opens /created/ with keys and update panel focus", async ({ page }) => {
     await page.addInitScript((profileId) => {
       localStorage.setItem("hc_setup_done", JSON.stringify({ [profileId]: true }));

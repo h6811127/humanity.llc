@@ -251,11 +251,11 @@ document.getElementById("top-chrome")?.dataset?.deviceStatusError
 | **P0** | Heartbeat writes every ~4.5s when metadata unchanged | `shouldTouchPresenceRow` keep-alive only near `PRESENCE_SHOW_MS` | **Shipped 2026-05-26** - `device-tab-presence-core.mjs`; Vitest `device-tab-presence-heartbeat.test.ts` |
 | **P1** | `renderSavedRows` → full network refresh | Debounced `scheduleWalletNetworkFetch`; cache-only DOM on re-render; fetch only when hub expanded or `/wallet/` | **Shipped 2026-05-26** - `device-hub-ui.mjs`, `device-hub-network-tools-core.mjs` |
 | **P1** | Wallet page always in live-control poll scope | Auto poll on `/wallet/` only when **Watch for live proof** is on; manual **Check for live proof** when off | **Shipped 2026-05-26** - `device-live-control-poll-scheduler.mjs`, `device-live-control-inbox.mjs` |
-| **P2** | Heavy module graph on every shell page | Lazy-load inbox sheet / notifications; smaller bootstrap graph | Open |
-| **P2** | Safari cache / version drift | Enforce `DEVICE_SHELL_ASSET_VERSION` on all peer imports in CI | Open |
+| **P2** | Heavy module graph on every shell page | Lazy-load inbox sheet / notifications; smaller bootstrap graph | **Partial 2026-05-27** — inbox loader shipped; browser notifications lazy loader + shell HTML bootstrap CI |
+| **P2** | Safari cache / version drift | Enforce `DEVICE_SHELL_ASSET_VERSION` on all peer imports in CI | **Partial 2026-05-27** — Vitest shell HTML bootstrap + manifest peer imports |
 | **P3** | Week-long `/created/` session | Stop 3s live-proof poll when tab hidden or on `pagehide`; resume on visible + keys | **Shipped 2026-05-26** - `created.mjs`, `created-live-proof-poll-core.mjs` |
 
-**Shell cache bust:** `DEVICE_SHELL_ASSET_VERSION` **38** (P0 ship).
+**Shell cache bust:** `DEVICE_SHELL_ASSET_VERSION` **56** (P2 lazy notifications ship).
 
 **Product guidance (ops, until P2 ships):**
 
@@ -304,3 +304,4 @@ Yes. The device shell is doing **continuous cross-tab synchronization** and, on 
 | 2026-05-26 | Initial investigation - Safari refresh slowness, accumulation, long-session expectations |
 | 2026-05-26 | **P0 shipped:** presence storage debounce + heartbeat keep-alive spacing; shell `?v=38` |
 | 2026-05-26 | **P1 shipped:** hub wallet network fetch debounced + hub-expand/wallet scope only |
+| 2026-05-27 | **P2 partial:** lazy `device-browser-notifications-loader.mjs`; shell HTML bootstrap version in Vitest; shell v56 |

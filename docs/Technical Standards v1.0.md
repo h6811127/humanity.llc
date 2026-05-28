@@ -17,6 +17,7 @@ It covers:
 - Profile IDs.
 - Ed25519 keypairs and signatures.
 - QR credentials.
+- Root cards and child-object authority.
 - Live control proof challenges.
 - Network API behavior.
 - Verification status and badge records.
@@ -39,12 +40,15 @@ Any network, client, scanner, Printify Fulfillment Middleware, or verification s
 
 | Term | Definition |
 |---|---|
-| **Humanity Card** | Signed public profile object owned by a human. |
-| **Card Owner** | Human controlling the private key for a card. |
-| **Profile ID** | Opaque identifier for a Humanity Card. |
+| **Root Humanity Card** | Signed public profile object owned by a human or steward-controlled root. It is the default signing authority for its child objects. |
+| **Humanity Card** | Compatibility term for a root Humanity Card unless a section explicitly describes a child object. |
+| **Card Owner** | Human or steward controlling the root card owner key. |
+| **Profile ID** | Opaque identifier for a root Humanity Card. |
+| **Child Object** | Public object nested under a root card. It has its own lifecycle and QR credentials but no default private key. |
+| **Object ID** | Future opaque identifier for a child object. Until object endpoints ship, `print_artifact_id` and pilot template metadata are the v1 bridge. |
 | **Network** | Service that resolves profile IDs and QR credentials. |
 | **QR Credential** | Signed credential encoded in or referenced by a QR code. |
-| **Printed-Item QR** | Item-scoped QR credential printed on one physical artifact and individually revocable. |
+| **Printed-Item QR** | Item-scoped QR credential printed on one physical artifact and individually revocable; the first shipped child-object-like scope. |
 | **Verification Record** | Public or semi-public evidence contributing to verification status. |
 | **Badge** | Signed public claim shown on a card. |
 | **Vouch** | Signed statement by one verified human for another. |
@@ -106,6 +110,8 @@ Profile IDs MUST NOT encode:
 - Verification level.
 - Network hostname.
 - Print order data.
+
+Profile IDs identify root cards, not every public object the root controls. New child-object identifiers MUST be opaque, non-semantic, and free of user-identifying metadata by the same rules.
 
 ### 4.2 Format
 
@@ -186,6 +192,7 @@ Signatures are REQUIRED for:
 
 - Card creation.
 - Card updates.
+- Child object creation and updates.
 - QR credential issuance.
 - QR rotation.
 - Live control proof challenge responses.
@@ -195,9 +202,13 @@ Signatures are REQUIRED for:
 - Export manifest.
 - Suspension by governance keys.
 
+Child-object mutations MUST be signed by the parent root owner key, accepted recovery key, or a future root-signed delegated child capability.
+
 ---
 
 ## 6. Humanity Card Document
+
+Humanity Card documents are root documents. Human verification, vouches, Steward status, and live-control authority attach to this root unless a future standard explicitly defines a narrower delegated capability.
 
 ### 6.1 JSON Schema
 
@@ -353,6 +364,51 @@ Vouches MUST NOT contain private notes in the public record.
 
 ---
 
+## 7A. Child Object Documents
+
+### 7A.1 Authority
+
+Child objects are controlled by a root Humanity Card. By default, child object create, update, rotate, revoke, replace, and disable operations MUST be signed by the root owner key or accepted recovery key.
+
+Networks MUST NOT require a new private key for each child object. A future delegated capability MAY authorize limited child operations when it is:
+
+- Signed by the root key.
+- Scoped to one child object or operation class.
+- Expiring.
+- Revocable by the root key.
+- Not valid for vouching, root disable, or human verification changes.
+
+### 7A.2 Minimum document shape (target)
+
+The future child object document SHOULD use this parent-signed shape:
+
+```json
+{
+  "version": "1.0",
+  "object_id": "obj_opaque-id",
+  "parent_profile_id": "base58-profile-id",
+  "object_type": "status_plate",
+  "public_label": "Studio door",
+  "public_state": "Open",
+  "status": "active",
+  "created_at": "2026-05-16T17:00:00Z",
+  "updated_at": "2026-05-16T17:00:00Z",
+  "signature": {
+    "alg": "Ed25519",
+    "public_key": "root-owner-public-key",
+    "signature": "base58-signature",
+    "signed_at": "2026-05-16T17:00:00Z",
+    "canonicalization": "JCS"
+  }
+}
+```
+
+### 7A.3 V1 bridge
+
+Until child object endpoints ship, `scope: "print_artifact"`, `print_artifact_id`, `pilot_template`, and object-forward manifesto layouts are compatibility bridges. They MUST be explained as child-object-like surfaces controlled by the parent root card, not as separate humans or separately keyed identities.
+
+---
+
 ## 8. QR Credential Standard
 
 ### 8.1 QR Payload Goals
@@ -365,7 +421,7 @@ QR payloads MUST be:
 - Verifiable by clients.
 - Free of personal data beyond opaque IDs and network hints.
 
-Personalized printed artifacts MUST use item-scoped QR credentials. A card owner ordering multiple personalized physical items receives distinct `qr_id` values per item unless a product explicitly uses a disclosed batch QR policy. All item-scoped QR credentials resolve to the same public card, but each item QR can be revoked independently.
+Personalized printed artifacts MUST use item-scoped QR credentials. A root card owner ordering multiple personalized physical items receives distinct `qr_id` values per item unless a product explicitly uses a disclosed batch QR policy. All item-scoped QR credentials resolve through the same parent root card and may identify a child object / printed item, but each item QR can be revoked independently.
 
 ### 8.2 URI Scheme
 
@@ -421,7 +477,7 @@ Printed QR codes MUST resolve even after expiration or revocation. They MUST dis
 
 Printed QR codes MUST NOT encode shipping address, order ID, email, phone, or private profile data.
 
-Printed-item QR scan pages MUST state that the QR resolves to a Humanity Card but does not prove the person holding the physical item is the card owner or verified human.
+Printed-item QR scan pages MUST state that the QR resolves through a root Humanity Card or child object controlled by that root, but does not prove the person holding the physical item is the card owner or verified human.
 
 ### 8.5 QR Output Requirements
 
@@ -616,7 +672,7 @@ Suspension records MAY include public notice fields required for appeals.
 
 ### 10.1 Revocation Statement
 
-Revocation MUST be signed by the card owner's private key or accepted recovery key.
+Revocation MUST be signed by the root card owner's private key, accepted recovery key, or a future delegated child capability when the target is limited to that child.
 
 ```json
 {
@@ -644,6 +700,7 @@ After revocation:
 - Existing physical artifacts are not recalled.
 - Printed QR codes resolve to revoked status.
 - Item-scoped printed QR revocation invalidates only that printed item QR unless the card or source credential is also revoked.
+- Root card revocation or suspension cascades to child objects so no child continues presenting active human trust after the parent root is disabled.
 
 ---
 
@@ -671,6 +728,7 @@ No shadow suspension is allowed. A card must resolve as active, revoked, suspend
 Export bundle MUST include:
 
 - Public card document.
+- Child object metadata and parent/child relationship records when present.
 - QR credential history.
 - Badge records.
 - Vouch records involving the profile.

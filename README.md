@@ -10,7 +10,7 @@ object or ID  →  scan (HTTPS QR)  →  live signed state
 
 You can aim to be **the link company** in that specific sense: not short redirects or link-in-bio, but **resolver-backed links whose meaning can change** (membership, trust, access, public claims, object status). Commons Pass (community membership, events, check-in, stamps) and federation sit on the same grammar once the scan loop is proven. See `docs/DEMOCRATIC_INFRASTRUCTURE.md` and `docs/V1_0_ARCHITECTURE_ROADMAP.md`.
 
-Physical **merch** is distribution (curiosity → create), not the product definition. See `docs/MERCH_LED_V1.md`.
+Physical **merch** is distribution (curiosity → create), not the product definition. **Post-M5 focus:** Tier 1 personalized wear ([`docs/MERCH_FUNNEL_MVP.md`](docs/MERCH_FUNNEL_MVP.md)). Commerce stack: [`docs/MERCH_HEADLESS_COMMERCE.md`](docs/MERCH_HEADLESS_COMMERCE.md).
 
 **Architecture:** open standards and **federated resolvers** - not a platform empire, not an invite-only gate, not blockchain identity. See `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
 
@@ -21,7 +21,7 @@ Physical **merch** is distribution (curiosity → create), not the product defin
 | Layer | What it is | Status |
 |-------|------------|--------|
 | **Live QR primitive** | QR/NFC URL → resolver → honest current status + limits copy | **Live** (create, scan, revoke, manifesto update); **M5.5** key export/recovery |
-| **Humanity Card** | Signed public identity document (`profile_id`, handle, manifesto, keys on device) | Phase A MVP |
+| **Humanity Card** | Signed public identity document (`profile_id`, handle, manifesto, keys on device) | **Shipped** (Phase A complete) |
 | **Vouches & live control** | Social trust and optional in-person key proof | After MVP core |
 | **Per-object / item QRs** | Revoke one sticker without killing the card | Phase B–C |
 | **Commons Pass** | Org membership, events, check-in on same API | Phase D |
@@ -82,7 +82,7 @@ See `docs/V1_PRODUCT_TRUST_MODEL.md`.
 
 ## V1 scope (summary)
 
-**Phase A MVP** (build first):
+**Phase A MVP** (shipped — M5 passed 2026-05-27):
 
 1. Signed Humanity Card creation (browser-held keys).
 2. HTTPS QR resolution with **live** status.
@@ -153,6 +153,8 @@ Signed card → HTTPS QR → trust-state UI → artifact intent → per-item QR 
 **V1 wedge and copy:**
 
 - `docs/MERCH_LED_V1.md`  -  curiosity + belonging, phases
+- `docs/MERCH_HEADLESS_COMMERCE.md`  -  **Shopify + Printify + headless storefront** (operator wiring)
+- `docs/MERCH_FUNNEL_MVP.md`  -  scan → customize → checkout funnel
 - `docs/FOUNDING_DROP_BRIEF.md`, `docs/LAUNCH_LANGUAGE_KIT.md`
 
 **Trust and use cases:**
@@ -241,13 +243,13 @@ Health: `GET /.well-known/hc/v1/health` · Create: `POST /.well-known/hc/v1/card
 |-----------|--------|
 | M1 Foundation | Health, D1 schema, signature harness |
 | M2 Create card | API + `/create/` + `/created/` |
-| **M3 Scan** | Pass-card UI at `/c/…` (deploy Worker to ship) |
-| M4 Revoke | After scan |
-| M5 Stranger-tested launch | After revoke |
+| M3 Scan | Pass-card UI at `/c/…` |
+| M4 Revoke | Owner revoke + item-scoped QR |
+| **M5 Stranger-tested launch** | **Passed** (2026-05-27) — three strangers completed create → scan → revoke unassisted |
 
-**MVP** = Phase A through roadmap step **5.3** (honest create → scan → revoke). Commons Pass and federation are **not** required for that gate.
+**Phase A MVP is complete.** Commons Pass and federation are **not** required for that gate.
 
-**Current focus:** `docs/M5_STRANGER_TEST_RUNBOOK.md`  -  Phase A exit gate (manual stranger tests). Product loops (manifesto update, QR rotate, expiry extend) are shipped in repo.
+**Current focus:** `docs/MERCH_FUNNEL_MVP.md` — **merch-led MVP**: custom LIVE OBJECT QR on wearables (`/shop/customize/`), ephemeral state updates from `/created/`, Shopify → Printify fulfillment. Status plate / lost-item pilots are optional field tests, not the GTM wedge (`docs/MERCH_LED_V1.md`).
 
 ---
 

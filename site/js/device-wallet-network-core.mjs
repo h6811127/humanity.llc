@@ -6,6 +6,79 @@ import {
 
 export const WALLET_NETWORK_CACHE_TTL_MS = 5 * 60 * 1000;
 
+/** Max fresh rows kept in session `hc_wallet_network_cache` (S6 / large-wallet shell perf). */
+export const WALLET_NETWORK_CACHE_MAX_ENTRIES = 20;
+
+/**
+ * @typedef {{
+ *   status?: string,
+ *   scanKind?: string | null,
+ *   qrScope?: string | null,
+ *   verificationLabel?: string | null,
+ *   verificationState?: string | null,
+ *   at?: number,
+ * }} WalletNetworkCacheEntry
+ */
+
+/**
+ * Drop expired rows and LRU-evict when over {@link WALLET_NETWORK_CACHE_MAX_ENTRIES}.
+ * Protected profile IDs (current wallet / active poll set) are evicted last.
+ *
+ * @param {Record<string, WalletNetworkCacheEntry>} cache
+ * @param {{
+ *   now?: number,
+ *   ttlMs?: number,
+ *   maxEntries?: number,
+ *   protectProfileIds?: Iterable<string>,
+ * }} [opts]
+ */
+export function pruneWalletNetworkCache(cache, opts = {}) {
+  const {
+    now = Date.now(),
+    ttlMs = WALLET_NETWORK_CACHE_TTL_MS,
+    maxEntries = WALLET_NETWORK_CACHE_MAX_ENTRIES,
+    protectProfileIds = [],
+  } = opts;
+
+  const protect = new Set(
+    [...protectProfileIds].filter((pid) => typeof pid === "string" && pid)
+  );
+  /** @type {Record<string, WalletNetworkCacheEntry>} */
+  const fresh = {};
+
+  for (const [profileId, entry] of Object.entries(cache || {})) {
+    if (!profileId || !entry || typeof entry !== "object") continue;
+    if (!isNetworkCacheFresh(entry.at, now, ttlMs)) continue;
+    fresh[profileId] = entry;
+  }
+
+  const ids = Object.keys(fresh);
+  if (ids.length <= maxEntries) return fresh;
+
+  const byOldest = ids.sort(
+    (a, b) => (fresh[a]?.at ?? 0) - (fresh[b]?.at ?? 0)
+  );
+  let over = ids.length - maxEntries;
+
+  for (const profileId of byOldest) {
+    if (over <= 0) break;
+    if (protect.has(profileId)) continue;
+    delete fresh[profileId];
+    over -= 1;
+  }
+
+  if (over > 0) {
+    for (const profileId of byOldest) {
+      if (over <= 0) break;
+      if (!(profileId in fresh)) continue;
+      delete fresh[profileId];
+      over -= 1;
+    }
+  }
+
+  return fresh;
+}
+
 /**
  * @param {number | null | undefined} cachedAt
  * @param {number} now
@@ -94,6 +167,15 @@ export function readCachedNetworkStatus(cache, profileId, now, ttlMs = WALLET_NE
   const entry = cache[profileId];
   if (!entry || !isNetworkCacheFresh(entry.at, now, ttlMs)) return null;
   return entry.status ?? null;
+}
+
+/**
+ * @param {unknown} body Resolver GET .../status JSON
+ * @returns {string | null}
+ */
+export function parseNetworkQrScope(body) {
+  const scope = body?.scan?.qr?.scope;
+  return typeof scope === "string" && scope.trim() ? scope.trim() : null;
 }
 
 /**

@@ -1,4 +1,4 @@
-import type { Env } from "../index";
+import type { Env } from "../env";
 
 /** E1 feature gate (M8): off in production until governance + billing ready. */
 export function hostedStewardEnabled(env: Env): boolean {

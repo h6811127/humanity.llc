@@ -21,6 +21,12 @@ describe("site showcase data (M5 landing)", () => {
         qr_id?: string;
         scan_url?: string;
         label?: string;
+        object_streams?: Array<{
+          id: string;
+          class: string;
+          label: string;
+          value: string;
+        }>;
       };
       expect(data.profile_id).toMatch(/^[A-Za-z0-9]+$/);
       expect(data.qr_id).toMatch(/^qr_/);
@@ -28,6 +34,14 @@ describe("site showcase data (M5 landing)", () => {
       expect(data.scan_url).toContain(`/c/${data.profile_id}`);
       expect(data.scan_url).toContain(`q=${data.qr_id}`);
       expect(data.scan_url).toMatch(/^https:\/\/humanity\.llc\//);
+      if (data.object_streams?.length) {
+        for (const stream of data.object_streams) {
+          expect(stream.id).toMatch(/^[a-z0-9_-]{1,32}$/);
+          expect(["place", "care", "narrative", "route"]).toContain(stream.class);
+          expect(stream.label.length).toBeGreaterThan(0);
+          expect(stream.value.length).toBeGreaterThan(0);
+        }
+      }
     });
   }
 });

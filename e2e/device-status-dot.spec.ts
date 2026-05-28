@@ -126,7 +126,7 @@ test.describe("status dot steward green", () => {
     await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
   });
 
-  test("dot click opens hub after scroll hides chrome bar", async ({ page }) => {
+  test("dot click opens hub after page scroll", async ({ page }) => {
     await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
     await page.addInitScript(() => {
       document.documentElement.style.minHeight = "300vh";
@@ -135,14 +135,11 @@ test.describe("status dot steward green", () => {
     await page.goto("/");
     await expect(page.locator("#brand-status-dot")).toHaveAttribute("data-dot-state", /.+/);
     await page.evaluate(() => {
-      document.documentElement.style.minHeight = "300vh";
       window.scrollTo(0, 400);
     });
-    await page.waitForFunction(() =>
-      document.getElementById("top-chrome")?.classList.contains("top-chrome--edge-hidden")
-    );
     await page.locator("#brand-status-dot-btn").click();
     await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/);
+    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
   });
 
   test("status bootstrap loads and records dot_click in diagnostics", async ({ page }) => {
@@ -230,6 +227,41 @@ test.describe("status dot accessibility", () => {
     await expect(popoverExplainer).toContainText(
       "Steward ready: you can review and sign steward actions now."
     );
+  });
+});
+
+test.describe("hub sheet header chrome (simplification step 4)", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
+    await page.addInitScript(() => {
+      localStorage.setItem("hc_device_hub_intro_seen", "1");
+    });
+  });
+
+  test("Close dismisses expanded hub on landing", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("#brand-status-dot-btn").click();
+    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
+    await page.locator(".device-hub-sheet-close").click();
+    await expect(page.locator("body")).not.toHaveClass(/device-hub-sheet-open/);
+    await expect(page.locator("#device-hub")).toHaveClass(/device-hub-collapsed/);
+  });
+
+  test("Create + New lives in saved-items header and navigates to /create/", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator(".device-hub-status-head .device-hub-create-btn")).toHaveCount(0);
+    await page.locator("#brand-status-dot-btn").click();
+    const createBtn = page.locator("#device-hub-saved-items-section .device-hub-create-btn");
+    await expect(createBtn).toBeVisible();
+    await createBtn.click();
+    await expect(page).toHaveURL(/\/create\//);
+  });
+
+  test("Home and Close controls are visible when hub is expanded", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("#brand-status-dot-btn").click();
+    await expect(page.locator(".device-hub-home-btn")).toBeVisible();
+    await expect(page.locator(".device-hub-sheet-close")).toBeVisible();
   });
 });
 

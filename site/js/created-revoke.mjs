@@ -4,6 +4,12 @@
 import { applyOwnerRevokedBanner } from "./created-revoke-banner-core.mjs";
 import { getCardStatusUrl, postRevokeUrl, signRevocation } from "./hc-sign.mjs";
 import { resolverErrorMessage } from "./resolver-user-error-core.mjs";
+import {
+  formatRevokeSummarySub,
+  normalizePilotTemplate,
+  revokeNetworkHintForPilot,
+} from "./pilot-steward-copy.mjs";
+import { inferPilotTemplate } from "./manifesto-display.mjs";
 
 const ICON_TONE = {
   active: "green",
@@ -101,9 +107,25 @@ export function initOwnerRevoke(ctx) {
     return `Scans resolve as: ${kind}`;
   }
 
+  function resolvePilot() {
+    const session = ctx.getSession();
+    if (session?.pilot_template) {
+      return normalizePilotTemplate(String(session.pilot_template));
+    }
+    if (typeof session?.manifesto_line === "string") {
+      return normalizePilotTemplate(inferPilotTemplate(session.manifesto_line));
+    }
+    return "general";
+  }
+
   function updateSummarySub(cardLine, qrLine, scanKind) {
     if (!revokeSummarySub) return;
-    revokeSummarySub.textContent = `${scanKindSummary(scanKind)} · Card ${cardLine} · QR ${qrLine}`;
+    revokeSummarySub.textContent = formatRevokeSummarySub(
+      scanKind,
+      cardLine,
+      qrLine,
+      resolvePilot()
+    );
   }
 
   function applyNetworkStatus(body, scanKindOverride) {
@@ -135,9 +157,12 @@ export function initOwnerRevoke(ctx) {
     updateSummarySub(cardStatus, qrStatus, scanKind);
 
     if (statusHintEl) {
-      if (scanKind === "active") {
+      const pilotHint = revokeNetworkHintForPilot(resolvePilot(), scanKind);
+      if (pilotHint) {
+        statusHintEl.textContent = pilotHint;
+      } else if (scanKind === "active") {
         statusHintEl.textContent =
-          "Revoking changes this live answer on the network. The printed URL stays the same  -  only the resolver status changes.";
+          "Revoking changes this live answer on the network. The printed URL stays the same — only the resolver status changes.";
       } else if (scanKind === "qr_revoked") {
         statusHintEl.textContent =
           "This QR is already revoked on the network. Scanners see revoked state; you can still disable the whole card below.";

@@ -15,9 +15,11 @@ describe("shop-copy-core", () => {
   });
 
   it("does not embed ready-to-order copy in shop HTML shell", () => {
-    const html = readFileSync(join(process.cwd(), "site/shop/index.html"), "utf8");
-    expect(html).not.toMatch(/Ready to order/i);
-    expect(html).toContain('id="shop-checkout-lead"');
+    const hubHtml = readFileSync(join(process.cwd(), "site/shop/index.html"), "utf8");
+    const foundingHtml = readFileSync(join(process.cwd(), "site/shop/founding/index.html"), "utf8");
+    expect(hubHtml).not.toMatch(/Ready to order/i);
+    expect(foundingHtml).not.toMatch(/Ready to order/i);
+    expect(foundingHtml).toContain('id="shop-checkout-lead"');
   });
 
   it("exposes ready-to-order copy only for JS when checkout opens", () => {

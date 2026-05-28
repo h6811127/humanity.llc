@@ -88,6 +88,8 @@ Hardening finding: live control proof is the clearest upgrade beyond static QR, 
 
 ## Flow 4: Personalized Artifact Purchase
 
+**Operator architecture:** [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) — humanity.llc storefront, Shopify checkout, Printify fulfillment; dual product IDs.
+
 | Step | Owner | Persisted Record | Failure State | Privacy Boundary |
 |---|---|---|---|---|
 | Open product page | Storefront | None required | Product disabled, unsupported template | No Printify browsing. |
@@ -101,7 +103,7 @@ Hardening finding: live control proof is the clearest upgrade beyond static QR, 
 | Submit Printify order | Printify Fulfillment Middleware | `print_order` and provider refs | Rate limited, invalid address, provider outage | Printify receives fulfillment-required fields only. |
 | Production/shipment updates | Printify + middleware | Webhook events, order timeline | Missed webhook, on hold, has issues | User sees safe status; operators see provider details. |
 
-Hardening finding: the riskiest handoff is artifact intent metadata surviving Shopify checkout and paid webhooks. This needs an integration spike before broad implementation.
+Hardening finding: the riskiest handoff is artifact intent metadata surviving Shopify checkout and paid webhooks. This needs an integration spike before broad implementation. **Implementation note (2026-05-27):** metadata spike shipped; per-order Printify **artwork upload** on submit shipped (PR #63) — [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Shipped vs spec gap.
 
 ---
 

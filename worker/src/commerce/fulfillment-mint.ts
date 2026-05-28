@@ -136,6 +136,10 @@ export async function allPlannedQrsMinted(
   db: D1Database,
   printOrder: PrintOrderRow
 ): Promise<boolean> {
+  const qrIds = JSON.parse(printOrder.planned_item_qr_ids_json) as string[];
+  if (qrIds.length === 0) {
+    return true;
+  }
   const status = await getPlannedMintStatus(db, printOrder);
   return status.all_planned_minted;
 }

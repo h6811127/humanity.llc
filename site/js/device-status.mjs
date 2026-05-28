@@ -2,7 +2,7 @@
  * Floating status dot, notification badge, hub sheet host.
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
-import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=45";
+import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=56";
 import { buildStatusSegments } from "./device-counts.mjs";
 import { shouldSkipCrossTabOverlayViewTransition } from "./device-presence-inbox-stability-core.mjs";
 import { fetchResolverHealth } from "./device-network-health.mjs";
@@ -13,43 +13,51 @@ import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
 import {
+  gatherInboxInput,
   getInboxItems,
   getInboxDotOverlay,
   inboxBadgeAriaLabel,
+  inboxBadgeTitle,
   inboxBadgeChromaClass,
   inboxBadgeChromaClassNames,
   inboxBadgeChromaKind,
   inboxBadgeCountText,
   inboxCountFromItems,
   notificationCount,
-} from "./device-inbox.mjs?v=45";
+} from "./device-inbox.mjs?v=56";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import {
   initHubIntroCoachmark,
   onHubOpenedFromIntro,
 } from "./device-hub-intro-coachmark.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=45";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=56";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import "./device-shell-motion.mjs";
-import "./device-shell-chrome.mjs?v=45";
+import "./device-shell-chrome.mjs?v=56";
 import "./device-theme.mjs";
-import "./device-browser-notifications.mjs?v=45";
+import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=56";
 import {
   isHubSheet,
   reconcileHubSheetState,
   setHubSheetOpen,
-} from "./device-hub-sheet.mjs?v=45";
+} from "./device-hub-sheet.mjs?v=56";
 import { startCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import {
   refreshDeviceChrome,
   setRefreshStatusSurfaces,
   startDeviceChromeRefresh,
-} from "./device-chrome-refresh.mjs?v=45";
+} from "./device-chrome-refresh.mjs?v=56";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
+import {
+  broadcastHealthSnapshotIfEligible,
+  initResolverTabSync,
+  RESOLVER_HEALTH_PEER_SYNC,
+  shouldFollowerSkipAutoHealthFetch,
+} from "./device-resolver-sync.mjs";
 import {
   describeDotState,
   deviceStateFromContext,
@@ -65,7 +73,7 @@ import {
   shellStatusLinePrimaryInChrome,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=45";
+} from "./device-dot-state-core.mjs?v=56";
 
 export const DOT_STATE_CHANGED = "hc-dot-state-changed";
 
@@ -433,8 +441,12 @@ function renderNotifBadge() {
   if (!notifBtn) return;
   const items = getInboxItems();
   const n = inboxCountFromItems(items);
+  const ctx = gatherInboxInput();
   notifBtn.hidden = n === 0;
-  notifBtn.setAttribute("aria-label", inboxBadgeAriaLabel(items));
+  notifBtn.setAttribute("aria-label", inboxBadgeAriaLabel(items, ctx));
+  const title = inboxBadgeTitle(items, ctx);
+  if (title) notifBtn.setAttribute("title", title);
+  else notifBtn.removeAttribute("title");
   notifBtn.classList.remove(...inboxBadgeChromaClassNames());
   const chroma = inboxBadgeChromaKind(items);
   notifBtn.classList.add(inboxBadgeChromaClass(chroma));
@@ -446,6 +458,7 @@ function renderNotifBadge() {
 
 const INBOX_HUB_TARGETS = new Set([
   "device-hub-live-control-group",
+  "device-hub-keys-custody",
   "device-hub-notice-group",
   "device-hub-crosstab-notice",
 ]);
@@ -482,14 +495,35 @@ function refreshSummary() {
   renderSystemBanner();
 }
 
-async function refreshNetwork() {
+/**
+ * @param {{ manual?: boolean }} [opts] Manual dot retry bypasses follower health skip.
+ */
+async function refreshNetwork(opts = {}) {
+  const manual = opts.manual === true;
+  if (!manual && shouldFollowerSkipAutoHealthFetch()) {
+    refreshSummary();
+    return;
+  }
   networkStatus = await fetchResolverHealth(resolverApiOrigin());
   setResolverHealthStatusForSinceVisit(networkStatus);
   window.dispatchEvent(
     new CustomEvent(RESOLVER_HEALTH_CHANGED, { detail: { networkStatus } })
   );
+  broadcastHealthSnapshotIfEligible(networkStatus, { manual });
   refreshSummary();
 }
+
+window.addEventListener(RESOLVER_HEALTH_PEER_SYNC, (e) => {
+  const status = /** @type {{ networkStatus?: string } | undefined} */ (e.detail)
+    ?.networkStatus;
+  if (status !== "ok" && status !== "degraded" && status !== "offline") return;
+  networkStatus = status;
+  setResolverHealthStatusForSinceVisit(networkStatus);
+  window.dispatchEvent(
+    new CustomEvent(RESOLVER_HEALTH_CHANGED, { detail: { networkStatus } })
+  );
+  refreshSummary();
+});
 
 function scrollWalletToSaved() {
   const target =
@@ -579,6 +613,8 @@ window.addEventListener("hc-focus-hub-search", () => {
 });
 
 startTabKeysPresence();
+initBrowserNotifications();
+initResolverTabSync();
 startCrossTabNotificationState();
 setRefreshStatusSurfaces(() => {
   refreshSummary();
@@ -638,7 +674,7 @@ document.addEventListener("click", (e) => {
   if (!action) return;
   logDotDiagnostic({ type: "quick_action", action });
   if (action === "retry") {
-    refreshNetwork();
+    void refreshNetwork({ manual: true });
     return;
   }
   if (action === "open_controls") {

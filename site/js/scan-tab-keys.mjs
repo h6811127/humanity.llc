@@ -8,7 +8,7 @@ import "./scan-page-dot.mjs?v=7";
 import {
   refreshDeviceChrome,
   startDeviceChromeRefresh,
-} from "./device-chrome-refresh.mjs?v=45";
+} from "./device-chrome-refresh.mjs?v=56";
 import { startCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 

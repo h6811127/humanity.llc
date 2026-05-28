@@ -2,7 +2,7 @@
 
 **Status:** Spec (canonical) - Phases 1–6 shipped ([`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md))  
 **Audience:** Product, frontend  
-**Related:** [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`DEVICE_OS.md`](DEVICE_OS.md) § Cross-tab keys · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md) · [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md)
+**Related:** [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`DEVICE_OS.md`](DEVICE_OS.md) § Cross-tab keys · [`DEVICE_TAB_RESOLVER_SYNC.md`](DEVICE_TAB_RESOLVER_SYNC.md) (resolver poll snapshots across tabs — separate from keys) · [`KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md`](KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md) · [`CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md`](CROSS_TAB_KEYS_FLASH_AFTER_CARD_DELETE_INVESTIGATION.md) · [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md)
 
 ---
 
@@ -40,7 +40,7 @@ flowchart TB
   subgraph chrome [Chrome surfaces - read snapshot only]
     BADGE["#shell-notif-badge"]
     DOT["Status dot overlay cross_tab_keys"]
-    HUB["#device-hub-crosstab-notice"]
+    HUB["#device-hub-keys-custody"]
     GLANCE["Glance / hub alerts"]
     SHEET["Inbox sheet rows"]
     BANNER["#device-cross-tab-banner legacy"]
@@ -62,6 +62,8 @@ On scan pages, `#scan-page-dot` should show the `cross_tab_keys` overlay when th
 | **Chrome** | How do we render badge, dot, hub, sheet? | Re-derive presence independently per surface |
 
 Full inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md). This doc owns **cross-tab / orphan** only.
+
+**Installed PWA windows:** An Add to Home Screen instance is a **separate browsing context** with the same `localStorage` profile. It heartbeats presence like any other visible tab. Install UX must defer when urgent inbox kinds are active — [`PWA_INSTALL.md`](PWA_INSTALL.md).
 
 ---
 
@@ -92,6 +94,7 @@ Full inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md). This doc owns **cross
 |---------|---------|--------|
 | `hc-tab-focus` | `{ type: "focus", tabId }` | Target tab `window.focus()` |
 | `hc-tab-keys-custody` | `{ type: "clear-profile-keys", profile_id }` | Matching tab clears `hc_created` + presence |
+| `hc-tab-keys-custody` | `{ type: "drop-profile-presence", profile_id }` | All tabs drop presence rows only (post-save ping; keys stay) |
 
 ---
 
@@ -99,7 +102,8 @@ Full inbox taxonomy: [`DEVICE_INBOX.md`](DEVICE_INBOX.md). This doc owns **cross
 
 | `kind` | When | Badge | Dot overlay | OS alert |
 |--------|------|-------|-------------|----------|
-| `cross_tab_keys` | Other tabs hold keys for profiles **not** saved on this device and **not** on remove denylist | Sum of other-tab count | `cross_tab_keys` (below `proof_waiting`) | No |
+| `cross_tab_keys` | **One** other tab holds keys for profiles **not** saved on this device and **not** on remove denylist | Sum of other-tab count | `cross_tab_keys` (below `proof_waiting`) | No |
+| `other_tabs_unsaved_keys` | **Two or more** other tabs (same filters as `cross_tab_keys`) | Same | Same | No |
 | `orphan_keys_removed` | Other tabs heartbeat keys for profiles on **remove denylist** | Same blue chroma | Same notch family | No |
 | `tab_keys_unsaved` | This tab has unsaved `hc_created` | Yes | Device axis `unsaved` (mutually excludes cross-tab UI) | No |
 
@@ -157,7 +161,7 @@ getInboxItems() → buildInboxItems(gatherInboxInput())
 | Inbox sheet | `device-inbox-sheet.mjs` | `gatherInboxInput()` + `buildInboxSheetRows` | Coordinator tick when open |
 | Landing/wallet banner | `device-cross-tab-banner.mjs` | `gatherInboxInput()` when no shell badge | Legacy |
 | Scan banner | `device-cross-tab-banner.mjs` | **`getCrossTabScanSnapshot()`** | Fingerprint streak; `scan-tab-keys.mjs` uses coordinator |
-| Wallet tab hint | `wallet-page-chrome.mjs` | `gatherInboxInput()` | Coordinator tick on `/wallet/` |
+| Wallet tab hint | `wallet-page-chrome.mjs` | `gatherInboxInput()` | **Legacy only** — hidden on `/wallet/` when `#shell-notif-badge` exists; use inbox + hub custody panel |
 
 **Navigation CTAs:** `device-notice-nav.mjs` (`actOnOtherTabKeys`), `device-orphan-keys-nav.mjs` (orphan focus / clear).
 
@@ -248,7 +252,9 @@ CTAs: **Open that tab** · **Open controls here** (when wallet has keys) · **Cl
 | `site/js/scan-tab-keys.mjs` | Scan page presence + coordinator bootstrap |
 | `site/js/device-inbox-core.mjs` | `buildInboxItems`, `buildInboxSheetRows` |
 | `site/js/device-cross-tab-visibility.mjs` | `tabNoticeCount` gate |
-| `site/js/device-cross-tab-banner.mjs` | Hub slot, legacy banner, scan |
+| `site/js/device-hub-keys-custody-core.mjs` | Pure hub custody panel rows |
+| `site/js/device-hub-keys-custody.mjs` | Unified hub custody render |
+| `site/js/device-cross-tab-banner.mjs` | Legacy hub slot, page banner, scan |
 | `site/js/device-notice-nav.mjs` | `actOnOtherTabKeys` |
 | `site/js/device-orphan-keys-nav.mjs` | Orphan clear / focus |
 | `site/js/device-wallet-removed-profiles.mjs` | Denylist |

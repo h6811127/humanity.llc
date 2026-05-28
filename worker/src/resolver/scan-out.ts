@@ -16,7 +16,7 @@ import {
   renderScanOutErrorPage,
   renderScanOutInterstitialPage,
 } from "./scan-out-html";
-import type { Env } from "../index";
+import type { Env } from "../env";
 
 export { buildScanOutInterstitialUrl, validateExternalDestinationUrl } from "./scan-out-token";
 

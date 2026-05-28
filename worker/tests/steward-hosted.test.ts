@@ -21,6 +21,11 @@ const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const ACCOUNT = "acc_TestHostedSteward1";
 const DEVICE = "devTestdevice1111";
 
+type StewardTestDb = D1Database & {
+  accounts: Map<string, Record<string, unknown>>;
+  sessions: Map<string, Record<string, unknown>>;
+};
+
 async function buildLinkProof(
   privateKey: Uint8Array,
   publicKeyBase58: string,
@@ -56,7 +61,7 @@ function card(publicKey: string): CardRow {
   };
 }
 
-function stewardDb(ownerPublicKey: string) {
+function stewardDb(ownerPublicKey: string): StewardTestDb {
   const accounts = new Map<string, Record<string, unknown>>();
   const profiles = new Map<string, string>();
   const sessions = new Map<string, Record<string, unknown>>();
@@ -163,6 +168,32 @@ function stewardDb(ownerPublicKey: string) {
               sessions.set(String(params[2]), row);
             }
           }
+          if (sql.includes("UPDATE steward_accounts")) {
+            const accountId = String(params[params.length - 1]);
+            const row = accounts.get(accountId);
+            if (row) {
+              row.plan_id = params[0];
+              if (sql.includes("plan_version = ?")) {
+                row.plan_version = params[1];
+                row.status = params[2];
+                row.effective_from = params[3];
+                row.effective_until = params[4];
+              } else {
+                row.status = params[1];
+                row.effective_from = params[2];
+                row.effective_until = null;
+              }
+              accounts.set(accountId, row);
+            }
+          }
+          if (sql.includes("DELETE FROM steward_sessions WHERE account_id")) {
+            const accountId = String(params[0]);
+            for (const [tokenHash, session] of sessions) {
+              if (session.account_id === accountId) {
+                sessions.delete(tokenHash);
+              }
+            }
+          }
           return { success: true };
         },
         all: async () => {
@@ -174,6 +205,8 @@ function stewardDb(ownerPublicKey: string) {
   });
 
   return {
+    accounts,
+    sessions,
     prepare: (sql: string) => {
       const base = handlers(sql, []);
       return {
@@ -183,7 +216,7 @@ function stewardDb(ownerPublicKey: string) {
         all: base.all,
       };
     },
-  } as unknown as D1Database;
+  } as unknown as StewardTestDb;
 }
 
 describe("steward hosted E1", () => {
@@ -262,6 +295,84 @@ describe("steward hosted E1", () => {
     };
     expect(ent.plan_id).toBe("reference_free");
     expect(ent.entitlements["poll.live_proof.auto_daily_cap"]).toBe(400);
+  });
+
+  it("expires past-due accounts during entitlements fetch and revokes sessions", async () => {
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const db = stewardDb(publicKeyBase58);
+    const env: Env = { DB: db, HOSTED_STEWARD_ENABLED: "1" };
+
+    const linkProof = await buildLinkProof(
+      privateKey,
+      publicKeyBase58,
+      "nonce_lazy_expire_001"
+    );
+
+    const sessionRes = await handlePostStewardSession(
+      new Request("https://humanity.llc/.well-known/hc/v1/steward/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          profile_id: PROFILE,
+          device_id: DEVICE,
+          link_proof: linkProof,
+        }),
+      }),
+      env,
+      db
+    );
+    const sessionBody = (await sessionRes.json()) as {
+      token: string;
+      account_id: string;
+    };
+
+    db.accounts.set(ACCOUNT, {
+      ...db.accounts.get(ACCOUNT)!,
+      plan_id: "hosted_steward_v1",
+      status: "past_due",
+      effective_until: "2026-05-01T00:00:00.000Z",
+      billing_customer_id: "cus_lazy_expire",
+      billing_subscription_id: "sub_lazy_expire",
+    });
+    expect(db.sessions.size).toBe(1);
+
+    const entRes = await handleGetStewardEntitlements(
+      new Request("https://humanity.llc/.well-known/hc/v1/steward/entitlements", {
+        headers: {
+          Authorization: `Bearer ${sessionBody.token}`,
+          "X-HC-Device-Id": DEVICE,
+        },
+      }),
+      env,
+      db
+    );
+    const ent = (await entRes.json()) as {
+      plan_id: string;
+      status: string;
+      effective_until: string | null;
+      entitlements: Record<string, unknown>;
+      usage: { limits: Record<string, unknown> };
+    };
+
+    expect(entRes.status).toBe(200);
+    expect(ent.plan_id).toBe("reference_free");
+    expect(ent.status).toBe("expired");
+    expect(ent.effective_until).toBeNull();
+    expect(ent.entitlements["steward.hosted"]).toBe(false);
+    expect(ent.usage.limits["poll.live_proof.auto"]).toBe(400);
+    expect(db.sessions.size).toBe(0);
+
+    const revokedSessionRes = await handleGetStewardEntitlements(
+      new Request("https://humanity.llc/.well-known/hc/v1/steward/entitlements", {
+        headers: {
+          Authorization: `Bearer ${sessionBody.token}`,
+          "X-HC-Device-Id": DEVICE,
+        },
+      }),
+      env,
+      db
+    );
+    expect(revokedSessionRes.status).toBe(401);
   });
 
   it("lists public plans when enabled", async () => {

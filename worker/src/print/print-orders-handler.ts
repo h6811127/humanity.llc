@@ -2,6 +2,9 @@ import {
   allPlannedQrsMinted,
   mintPrintOrderFromCredentials,
 } from "../commerce/fulfillment-mint";
+import { resolvePrintifyShippingForSubmit } from "../commerce/resolve-printify-shipping";
+import { ensurePrintOrderForCommerceOrder } from "../commerce/fulfillment-queue";
+import type { PrintifyShippingSource } from "../commerce/resolve-printify-shipping";
 import {
   getCommerceOrderById,
   type CommerceOrderRow,
@@ -13,16 +16,27 @@ import {
 } from "../db/print-orders";
 import { operatorAuditAuthorized } from "../http/operator-auth";
 import { errorResponse, jsonResponse } from "../http/resolver";
-import type { Env } from "../index";
+import type { Env } from "../env";
 import { submitPrintifyOrder } from "./printify-client";
 
 interface CreatePrintOrderRequest {
   commerce_order_id?: unknown;
   submit_to_printify?: unknown;
+  shipping_address?: unknown;
+  quantity?: unknown;
 }
 
 interface MintPrintOrderRequest {
   qr_credentials?: unknown;
+}
+
+function printOrderTracking(row: PrintOrderRow) {
+  if (!row.tracking_carrier && !row.tracking_number && !row.tracking_url) return null;
+  return {
+    carrier: row.tracking_carrier,
+    tracking_number: row.tracking_number,
+    tracking_url: row.tracking_url,
+  };
 }
 
 function printOrderResponse(row: PrintOrderRow) {
@@ -38,6 +52,7 @@ function printOrderResponse(row: PrintOrderRow) {
     template_id: row.template_id,
     status: row.status,
     shipping_method: row.shipping_method,
+    tracking: printOrderTracking(row),
     created_at: row.created_at,
     updated_at: row.updated_at,
   };
@@ -92,6 +107,7 @@ export async function handlePostPrintOrders(
   }
 
   let printOrder = queued.print_order;
+  let shippingSource: PrintifyShippingSource | undefined;
 
   if (body.submit_to_printify === true) {
     if (printOrder.status !== "awaiting_production_approval") {
@@ -107,35 +123,82 @@ export async function handlePostPrintOrders(
       );
     }
 
+    const resolvedShipping = await resolvePrintifyShippingForSubmit(
+      env,
+      db,
+      commerceOrderId,
+      body.shipping_address
+    );
+    if (!resolvedShipping) {
+      return errorResponse(
+        "PRINTIFY_SHIPPING_REQUIRED",
+        "submit_to_printify requires shipping_address in the request body, or encrypted shipping captured from the Shopify paid webhook (set FULFILLMENT_PII_ENCRYPTION_KEY).",
+        422
+      );
+    }
+    const shippingAddress = resolvedShipping.address;
+    shippingSource = resolvedShipping.source;
+
+    let quantity = JSON.parse(printOrder.planned_item_qr_ids_json).length;
+    if (quantity < 1) quantity = 1;
+    if (body.quantity !== undefined && body.quantity !== null) {
+      if (typeof body.quantity !== "number" || !Number.isInteger(body.quantity) || body.quantity < 1) {
+        return errorResponse("INVALID_QUANTITY", "quantity must be a positive integer.", 422);
+      }
+      quantity = body.quantity;
+    }
+
     const submit = await submitPrintifyOrder(env, {
       print_order_id: printOrder.order_id,
       template_id: printOrder.template_id,
+      profile_id: printOrder.profile_id,
       planned_item_qr_ids: JSON.parse(printOrder.planned_item_qr_ids_json) as string[],
+      shipping_address: shippingAddress,
+      quantity,
+      scan_origin: new URL(request.url).origin,
     });
 
-    if (submit.ok) {
-      await updatePrintOrderStatus(
-        db,
-        printOrder.order_id,
-        "submitted",
-        nowIso,
-        submit.printify_order_id,
-        submit.printify_shop_id
-      );
-      printOrder = {
-        ...printOrder,
-        status: "submitted",
-        printify_order_id: submit.printify_order_id,
-        printify_shop_id: submit.printify_shop_id,
-        updated_at: nowIso,
-      };
+    if (!submit.ok) {
+      const status =
+        submit.code === "PRINTIFY_RATE_LIMITED"
+          ? 429
+          : submit.code === "PRINTIFY_INVALID_ADDRESS" ||
+              submit.code === "PRINTIFY_TEMPLATE_UNCONFIGURED" ||
+              submit.code === "PRINTIFY_ARTWORK_UNCONFIGURED" ||
+              submit.code === "PRINTIFY_ARTWORK_GENERATION_FAILED" ||
+              submit.code === "PRINTIFY_PLANNED_QRS_REQUIRED" ||
+              submit.code === "PRINTIFY_UPLOAD_FAILED" ||
+              submit.code === "PRINTIFY_PRODUCT_CREATE_FAILED"
+            ? 422
+            : submit.code === "PRINTIFY_SUBMIT_DEFERRED" ||
+                submit.code === "PRINTIFY_UNCONFIGURED"
+              ? 503
+              : 502;
+      return errorResponse(submit.code, submit.message, status);
     }
+
+    await updatePrintOrderStatus(
+      db,
+      printOrder.order_id,
+      "submitted",
+      nowIso,
+      submit.printify_order_id,
+      submit.printify_shop_id
+    );
+    printOrder = {
+      ...printOrder,
+      status: "submitted",
+      printify_order_id: submit.printify_order_id,
+      printify_shop_id: submit.printify_shop_id,
+      updated_at: nowIso,
+    };
   }
 
   return jsonResponse(
     {
       ...printOrderResponse(printOrder),
       created: queued.created,
+      ...(shippingSource ? { shipping_source: shippingSource } : {}),
     },
     queued.created ? 201 : 200
   );

@@ -13,9 +13,37 @@ import {
   topInboxKind,
   inboxBadgeChromaKind,
   inboxBadgeChromaClass,
+  expandInboxItemsForChrome,
+  inboxBadgeTitle,
 } from "../../site/js/device-inbox-core.mjs";
 
 describe("buildInboxItems", () => {
+  it("uses cross_tab_keys for a single other tab", () => {
+    const items = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 0,
+      crossTabEntries: [{ profile_id: "abc", tabId: "t1", handle: "alice" }],
+    });
+    expect(items.map((i) => i.kind)).toEqual(["cross_tab_keys"]);
+    expect(items[0].title).toBe("Keys open in 1 other tab");
+  });
+
+  it("uses other_tabs_unsaved_keys when two or more other tabs hold keys", () => {
+    const items = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 0,
+      crossTabEntries: [
+        { profile_id: "abc", tabId: "t1", handle: "alice" },
+        { profile_id: "def", tabId: "t2" },
+      ],
+    });
+    expect(items.map((i) => i.kind)).toEqual(["other_tabs_unsaved_keys"]);
+    expect(items[0].title).toBe("Keys open in 2 other tabs");
+    expect(items[0].subtitle).toBe("@alice · def…");
+    expect(topInboxKind(items)).toBe("cross_tab_keys");
+    expect(inboxDotOverlayFromItems(items)).toBe("cross_tab_keys");
+  });
+
   it("returns live proof and cross-tab in priority order", () => {
     const items = buildInboxItems({
       tabNoticeCount: 0,
@@ -25,12 +53,10 @@ describe("buildInboxItems", () => {
         { profile_id: "def", tabId: "t2" },
       ],
     });
-    expect(items.map((i) => i.kind)).toEqual(["live_proof", "cross_tab_keys"]);
+    expect(items.map((i) => i.kind)).toEqual(["live_proof", "other_tabs_unsaved_keys"]);
     expect(items[0].count).toBe(2);
-    expect(items[0].title).toBe("2 live proof waiting");
-    expect(items[1].count).toBe(2);
-    expect(items[1].subtitle).toContain("@alice");
-    expect(items[1].subtitle).toContain("+1 more");
+    expect(items[1].title).toBe("Keys open in 2 other tabs");
+    expect(items[1].subtitle).toBe("@alice · def…");
   });
 
   it("includes tab notice item when keys are unsaved in this tab", () => {
@@ -142,6 +168,28 @@ describe("buildGlanceRowPlan", () => {
       { revokedHintProfileIds: new Set(["w9"]) }
     );
     expect(plan[0].type === "wallet" && plan[0].revokedHint).toBe(true);
+  });
+
+  it("expands cross-tab inbox into one glance row per tab", () => {
+    const inboxItems = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 0,
+      crossTabEntries: [
+        { profile_id: "a", tabId: "t1", handle: "one" },
+        { profile_id: "b", tabId: "t2", label: "Two" },
+      ],
+    });
+    const plan = buildGlanceRowPlan(inboxItems, [], {
+      crossTabEntries: [
+        { profile_id: "a", tabId: "t1", handle: "one" },
+        { profile_id: "b", tabId: "t2", label: "Two" },
+      ],
+    });
+    expect(plan.filter((r) => r.type === "inbox")).toHaveLength(2);
+    const subs = plan
+      .filter((r) => r.type === "inbox")
+      .map((r) => (r.type === "inbox" ? r.item.subtitle : ""));
+    expect(subs).toEqual(["@one", "Two"]);
   });
 });
 
@@ -279,19 +327,85 @@ describe("inboxOverlayCountsFromItems", () => {
 });
 
 describe("inboxBadgeAriaLabel", () => {
-  it("describes kinds in plain language", () => {
+  it("describes kinds in plain language with total count", () => {
     const items = buildInboxItems({
       tabNoticeCount: 0,
       liveProofCount: 2,
       crossTabEntries: [{ profile_id: "x", tabId: "t" }],
     });
     expect(inboxBadgeAriaLabel(items)).toBe(
-      "Needs attention: 2 live proofs, keys in another tab"
+      "Needs attention (3 items): 2 live proofs, keys open in another tab (x…)"
+    );
+  });
+
+  it("lists each cross-tab tab when context is provided", () => {
+    const items = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 0,
+      crossTabEntries: [
+        { profile_id: "a", tabId: "t1", handle: "alice" },
+        { profile_id: "b", tabId: "t2", label: "Demo" },
+      ],
+    });
+    expect(
+      inboxBadgeAriaLabel(items, {
+        crossTabEntries: [
+          { profile_id: "a", tabId: "t1", handle: "alice" },
+          { profile_id: "b", tabId: "t2", label: "Demo" },
+        ],
+      })
+    ).toBe(
+      "Needs attention (2 items): keys open in another tab (@alice), keys open in another tab (Demo)"
     );
   });
 
   it("returns Inbox when empty", () => {
     expect(inboxBadgeAriaLabel([])).toBe("Inbox");
+  });
+});
+
+describe("inboxBadgeTitle", () => {
+  it("joins expanded row titles for tooltip", () => {
+    const items = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 0,
+      crossTabEntries: [
+        { profile_id: "a", tabId: "t1", handle: "alice" },
+        { profile_id: "b", tabId: "t2", label: "Demo" },
+      ],
+    });
+    const title = inboxBadgeTitle(items, {
+      crossTabEntries: [
+        { profile_id: "a", tabId: "t1", handle: "alice" },
+        { profile_id: "b", tabId: "t2", label: "Demo" },
+      ],
+    });
+    expect(title).toContain("2 items need attention");
+    expect(title).toContain("@alice");
+    expect(title).toContain("Demo");
+  });
+});
+
+describe("expandInboxItemsForChrome", () => {
+  it("expands cross-tab aggregate into one item per tab", () => {
+    const items = buildInboxItems({
+      tabNoticeCount: 0,
+      liveProofCount: 0,
+      crossTabEntries: [
+        { profile_id: "a", tabId: "t1", handle: "one" },
+        { profile_id: "b", tabId: "t2", label: "Two" },
+      ],
+    });
+    expect(items[0].kind).toBe("other_tabs_unsaved_keys");
+    const expanded = expandInboxItemsForChrome(items, {
+      crossTabEntries: [
+        { profile_id: "a", tabId: "t1", handle: "one" },
+        { profile_id: "b", tabId: "t2", label: "Two" },
+      ],
+    });
+    expect(expanded.filter((i) => i.kind === "cross_tab_keys")).toHaveLength(2);
+    expect(expanded[0].subtitle).toBe("@one");
+    expect(expanded[1].subtitle).toBe("Two");
   });
 });
 
@@ -387,7 +501,9 @@ describe("buildInboxSheetRows", () => {
       ],
     });
     expect(rows).toHaveLength(2);
+    expect(rows[0].kind).toBe("other_tabs_unsaved_keys");
     expect(rows[0].subtitle).toBe("@one");
+    expect(rows[1].kind).toBe("other_tabs_unsaved_keys");
     expect(rows[1].subtitle).toBe("Two");
   });
 });

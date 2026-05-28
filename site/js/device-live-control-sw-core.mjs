@@ -28,6 +28,9 @@ export const SW_SYNC_TAG = "hc-live-proof-poll";
 export const SW_PERIODIC_TAG = "hc-live-proof-poll";
 export const SW_NOTIFICATION_TAG = "hc-live-proof";
 
+/** Page → SW: steward SSE `live_proof.pending` hint (hosted tier E4d). */
+export const SW_MESSAGE_LIVE_PROOF_PUSH = "HC_SW_LIVE_PROOF_PUSH";
+
 /** Minimum periodicSync interval (request budget Phase 4: 5–15 min; use 15). */
 export const SW_PERIODIC_MIN_INTERVAL_MS = 15 * 60 * 1000;
 
@@ -78,11 +81,16 @@ export function liveProofPollTargetsFromWallet(wallet) {
  *   enabled: boolean,
  *   watchLiveProofEnabled?: boolean,
  *   resolverHealth?: 'ok' | 'degraded' | 'offline',
+ *   stewardPushEntitled?: boolean,
+ *   stewardPushHealthy?: boolean,
  * }} input
  */
 export function swLiveProofPollingShouldRun(input) {
   if (!input.enabled) return false;
   if (input.watchLiveProofEnabled === false) return false;
+  if (input.stewardPushEntitled === true && input.stewardPushHealthy === true) {
+    return false;
+  }
   return liveControlPollAllowedByResolverHealth(input.resolverHealth ?? "offline");
 }
 
@@ -172,6 +180,39 @@ export function buildLiveProofSwNotification(item, pageOrigin) {
     tag: SW_NOTIFICATION_TAG,
     href: buildLiveControlProofHref(item, pageOrigin),
   };
+}
+
+/**
+ * Build SW notification payload from a server push hint + mirrored wallet rows.
+ *
+ * @param {{
+ *   profile_id?: string,
+ *   qr_id?: string,
+ *   challenge_id?: string,
+ *   expires_at?: string,
+ * }} hint
+ * @param {Array<Record<string, unknown>>} entries
+ * @param {string} pageOrigin
+ */
+export function buildLiveProofSwNotificationFromPushHint(hint, entries, pageOrigin) {
+  const profileId =
+    typeof hint.profile_id === "string" ? hint.profile_id.trim() : "";
+  if (!profileId) return null;
+  const entry = entries.find((row) => row.profile_id === profileId);
+  if (!entry) return null;
+  const challengeId =
+    typeof hint.challenge_id === "string" ? hint.challenge_id.trim() : "";
+  if (!challengeId) return null;
+  return buildLiveProofSwNotification(
+    {
+      entry,
+      challenge_id: challengeId,
+      return_url: null,
+      owner_url: null,
+      expires_at: typeof hint.expires_at === "string" ? hint.expires_at : "",
+    },
+    pageOrigin
+  );
 }
 
 /**

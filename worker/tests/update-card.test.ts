@@ -131,6 +131,61 @@ describe("handlePostCardUpdate", () => {
     expect(json.manifesto_line).toBe(manifesto);
   });
 
+  it("accepts owner-signed update with object_streams", async () => {
+    const { handlePostCardUpdate } = await import("../src/resolver/update-card");
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const updatedAt = "2026-05-17T12:00:00.000Z";
+    const manifesto = "Community garden\nOpen · volunteers welcome";
+    const objectStreams = [
+      { id: "tasks", class: "care", label: "Today's tasks", value: "Water bed 3" },
+    ];
+
+    const signed = await signDocument(
+      withProtocolFields(
+        {
+          profile_id: PROFILE,
+          public_key: publicKeyBase58,
+          handle: "river_example",
+          manifesto_line: manifesto,
+          object_streams: objectStreams,
+          created_at: CREATED,
+          updated_at: updatedAt,
+          status: "active",
+          verification: {
+            level: 1,
+            label: "Registered",
+            method: "registered",
+            verified_at: CREATED,
+            vouch_count: 0,
+            latest_accepted_vouch_at: null,
+          },
+          badges: [],
+          qr: { active_qr_id: "qr_test", epoch: 1 },
+          links: {},
+        },
+        PAYLOAD_TYPES.HUMANITY_CARD
+      ),
+      { privateKey, publicKeyBase58 }
+    );
+
+    const db = mockDb({ public_key: publicKeyBase58 });
+    const res = await handlePostCardUpdate(
+      new Request(
+        `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/update`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ card: signed }),
+        }
+      ),
+      db,
+      PROFILE
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { object_streams?: typeof objectStreams };
+    expect(body.object_streams).toEqual(objectStreams);
+  });
+
   it("rejects stale updated_at", async () => {
     const { handlePostCardUpdate } = await import("../src/resolver/update-card");
     const { privateKey, publicKeyBase58 } = await getTestKeypair();
@@ -464,5 +519,49 @@ describe("handlePostCardUpdate", () => {
     const html = await renderScanPage(vm, "https://humanity.llc");
     expect(html).toContain("Closed until Monday");
     expect(html).toContain("Studio door");
+  });
+
+  it("scan HTML reflects updated object_streams on status plate", async () => {
+    const streams = [
+      { id: "note", class: "place", label: "Special hours", value: "Closed Friday" },
+    ];
+    const vm = buildScanViewModel(
+      PROFILE,
+      "qr_test",
+      {
+        card: {
+          profile_id: PROFILE,
+          public_key: "pk",
+          handle: "river_example",
+          handle_normalized: "river_example",
+          manifesto_line: "Studio door\nOpen · Thu–Sun until 9 PM",
+          status: "active",
+          card_document_json: JSON.stringify({ object_streams: streams }),
+          created_at: CREATED,
+          updated_at: "2026-05-17T12:00:00.000Z",
+        },
+        qr: {
+          qr_id: "qr_test",
+          profile_id: PROFILE,
+          epoch: 1,
+          scope: "card",
+          print_artifact_id: null,
+          resolver_hint: "https://humanity.llc",
+          status: "active",
+          payload: `https://humanity.llc/c/${PROFILE}?q=qr_test`,
+          issued_at: CREATED,
+          expires_at: "2027-05-16T12:00:00.000Z",
+          credential_document_json: "{}",
+          created_at: CREATED,
+          updated_at: CREATED,
+        },
+        verification: null,
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(html).toContain("scan-object-streams");
+    expect(html).toContain("Special hours");
+    expect(html).toContain("Closed Friday");
   });
 });

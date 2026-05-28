@@ -1,8 +1,8 @@
 # Lost item relay pilot (Phase A vertical #2)
 
 **Status:** Active pilot  
-**Parent:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`  
-**Prerequisite:** M5 stranger loop (`docs/M5_STRANGER_TEST_RUNBOOK.md`)  
+**Parent:** `docs/ROOT_CARD_AND_CHILD_OBJECTS.md` · `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`  
+**Prerequisite:** ~~M5 stranger loop~~ **Satisfied** — M5 passed 2026-05-27 (`docs/M5_STRANGER_TEST_RUNBOOK.md`)
 **Research:** `site/what-can-a-qr-do/lost-item-relay/`
 
 ---
@@ -19,6 +19,8 @@ Not proof of ownership. Not a phone number printed in plain sight. Item name + r
 
 ## How to create one
 
+**Current implementation (flat-card bridge):**
+
 1. Go to **https://humanity.llc/create/**
 2. Choose **Lost item** under “Start from”
 3. Fill in:
@@ -26,6 +28,8 @@ Not proof of ownership. Not a phone number printed in plain sight. Item name + r
    - **What is lost?**  -  headline on scan (e.g. `House keys`)
    - **What should finders see?**  -  return message (e.g. `Lost  -  contact owner through relay`)
 4. Save recovery key on `/created/`, print QR, scan from another phone, revoke when recovered.
+
+**Target model:** From an existing root Humanity Card, choose **Add object -> Lost item**. The root key signs the relay state; the tag can be revoked or updated without creating another keyed card.
 
 Public showcase scan (homepage pilot): see `site/data/showcase-lost-item.json` - refresh with `npm run site:seed-showcase-lost-item`.
 
@@ -50,6 +54,7 @@ Line 1 = `[relay] ` + item label · Line 2 = return message. Parsed in `worker/s
 - **Handle:** smaller `@handle` under the message  
 - **Badge:** Active / Revoked / etc. from network  
 - **Foot:** “This scan does not prove who holds the item. It only shows whether the return relay is active.”
+- **Create hint (Step 6):** Calm link to `/create/?template=lost_item` — “Create a lost-item tag” + copy from `scan-safety.ts` (`LOST_ITEM_RELAY_CREATE_*`). Lost-item relay template only.
 
 Deploy Worker with `X-HC-Scan-UI: pass-v8` for this layout.
 
@@ -59,13 +64,33 @@ Deploy Worker with `X-HC-Scan-UI: pass-v8` for this layout.
 
 | Step | Pass? |
 |------|-------|
-| Stranger creates lost item relay unassisted | ☐ |
+| Stranger creates lost item relay unassisted (current flat-card bridge) | ☐ |
+| Existing card owner adds lost-item child object (target flow) | ☐ future |
 | Finder understands return path in &lt;30s | ☐ |
 | Owner revokes after “found” and re-scan shows revoked | ☐ |
 | Stranger answers “does scan prove holder?” correctly | ☐ |
 | No phone number required on the printed tag | ☐ |
 
 Score with `docs/M5_STRANGER_TEST_RUNBOOK.md`.
+
+---
+
+## Habit loop scorecard
+
+**Strategy:** `docs/PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md` § Step 7  
+**Product:** `/created/` shows **Pilot habit loop** for lost-item relay templates (`site/js/lost-item-relay-loop-scorecard.mjs`).
+
+| Signal | Target | How measured |
+|--------|--------|--------------|
+| Return message updates published | **≥1** per steward | Auto-count on successful Live publish (localStorage per `profile_id`) |
+| Printed + tagged | 1 | Owner checkbox (or auto when QR PNG downloaded) |
+| Second-device scan | 1 | Owner checkbox |
+
+**Habit loop closed (one steward):** ≥1 update + printed + second-device scan confirmed. Scorecard headline switches to “Pilot habit loop closed on this device.” when all three are true.
+
+**Field pilot export:** **Copy pilot summary** on `/created/` copies local JSON (`humanity_lost_item_relay_pilot_summary_v1`) for founder aggregation — no server analytics. Roll up exports: `npm run site:aggregate-pilot-summaries -- summaries/*.json`
+
+**Privacy:** Scorecard is device-local only — aligns with no scan analytics by default.
 
 ---
 

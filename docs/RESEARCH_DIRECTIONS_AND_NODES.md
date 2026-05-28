@@ -59,3 +59,4 @@ NFC/mesh diagrams were removed from `site/index.html` (May 2026) and live on the
 
 - `docs/M3_M4_EXECUTION_PLAN.md`  -  NFC/mesh called out as post–vertical-slice
 - `docs/V1_USE_CASES.md`  -  full use-case catalog (not on homepage scroll)
+- `docs/AI_FEATURE_DEVELOPMENT.md`  -  localized object intelligence + L3 explain (shipped P1)

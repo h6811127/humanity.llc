@@ -4,7 +4,7 @@
 **Audience:** Product, ops, engineering, support  
 **Purpose:** Define how QR credentials on **physical Humanity artifacts** are born, age, fail, and die — separately from digital-only QRs and separately from human verification. Supersedes informal “QR expiry” discussion for merch; engineering and copy should cite this doc before fulfillment ships.
 
-**Canonical companions:** [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md) · [`REVOKE_AND_LIFECYCLE_V1.md`](REVOKE_AND_LIFECYCLE_V1.md) · [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) · [`CARD_RETENTION_AND_ORPHAN_CLEANUP.md`](CARD_RETENTION_AND_ORPHAN_CLEANUP.md) · [`MERCH_LED_V1.md`](MERCH_LED_V1.md) · [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) · [`V1_IMPLEMENTATION_CONTRACTS.md`](V1_IMPLEMENTATION_CONTRACTS.md) (`scope: print_artifact`)
+**Canonical companions:** [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`V1_DECISION_LOCK.md`](V1_DECISION_LOCK.md) · [`REVOKE_AND_LIFECYCLE_V1.md`](REVOKE_AND_LIFECYCLE_V1.md) · [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md) · [`CARD_RETENTION_AND_ORPHAN_CLEANUP.md`](CARD_RETENTION_AND_ORPHAN_CLEANUP.md) · [`MERCH_LED_V1.md`](MERCH_LED_V1.md) · [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) · [`V1_IMPLEMENTATION_CONTRACTS.md`](V1_IMPLEMENTATION_CONTRACTS.md) (`scope: print_artifact`)
 
 ---
 
@@ -27,7 +27,8 @@ This policy separates:
 | **URL** | Does the camera open a Humanity page? → **Always yes** |
 | **Credential time** | Does `expires_at` pass? → **No for merch** (by default) |
 | **Credential state** | Is this pointer still trusted for its purpose? → **active / revoked / replaced** |
-| **Card** | Is the steward profile still on the network? → **active / disabled / suspended** |
+| **Child object / printed item** | Which object or artifact does this QR represent? → status, label, and item lifecycle |
+| **Root card** | Is the steward profile still on the network? → **active / disabled / suspended** |
 | **Human trust** | Is the holder vouched? → **Independent; never bought** |
 
 ---
@@ -39,7 +40,7 @@ This policy separates:
 3. **Bearer warning** — scan + packaging: holding the item ≠ owning the card.
 4. **Commerce firewall** — payment does not grant vouch, hosted tier, or verification.
 5. **Revoked still resolves** — minimal tombstone scan, not 404.
-6. **Sibling independence** — revoking one `print_artifact` QR must not revoke others unless card-level disable applies.
+6. **Sibling independence** — revoking one `print_artifact` QR must not revoke others unless child disable or root card disable applies.
 7. **No scan analytics** — no per-scan trails on the operator; aggregate order/ops metrics only.
 
 ---
@@ -54,7 +55,7 @@ Use **`scope`** to drive lifecycle rules (see implementation contracts).
 | `print_artifact` | Stickers, cards, plates, event kits | **`null` (none)** for v1 merch | **Revoke this item** · Replace item QR |
 | `card` (batch / curiosity) | Tier 0 mass sticker | **`null`** OR long-lived campaign credential | Operator rotate batch · Owner adopts later (Phase C) |
 
-**Rule:** Fulfillment MUST NOT mint `print_artifact` credentials with a calendar `expires_at` unless a future **explicit event SKU** is labeled “timed admission” in storefront copy (see [§ Creative ideas](#creative-ideas-optional-phases) · idea **#7**).
+**Rule:** Fulfillment MUST NOT mint `print_artifact` credentials with a calendar `expires_at` unless a future **explicit event SKU** is labeled “timed admission” in storefront copy (see [§ Creative ideas](#creative-ideas-optional-phases) · idea **#7**). Treat `print_artifact` as the shipped child-object bridge: controlled by the parent root key, independently revocable, and not a separate verified human.
 
 ---
 
@@ -64,7 +65,7 @@ Do **not** turn on live Shopify checkout (`checkout_open: true`) until the digit
 
 | Order | Gate | Doc |
 |-------|------|-----|
-| 1 | **M5 stranger test** — 3 people outside your network complete scan → create → revoke without coaching | [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) |
+| 1 | ~~**M5 stranger test**~~ — 3 people outside your network complete scan → create → revoke without coaching | [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) — **passed 2026-05-27** |
 | 2 | **Production P0 fixes** deployed and re-verified (e.g. `/created/` fake ID, disabled-since-visit false positive) | [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) |
 | 3 | **Safari / device shell** smoke (P0-W) | [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) |
 | 4 | **One vertical pilot** on a real object (status plate, lost-item relay) | [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md) |
@@ -99,8 +100,8 @@ Do **not** turn on live Shopify checkout (`checkout_open: true`) until the digit
 | **Goal** | Holder wears **their** handle / object story; scan shows real card + vouch state |
 | **QR model** | **One `qr_id` per physical item** (`scope: print_artifact`) |
 | **Expiry** | **`expires_at` null** |
-| **Prerequisite** | Active Humanity Card + artifact intent + metadata spike (Shopify → paid webhook) |
-| **Revoke** | Owner revokes **this item only**; other stickers on same profile stay active |
+| **Prerequisite** | Active root Humanity Card + artifact intent + metadata spike (Shopify → paid webhook); backup/recovery strongly recommended before printing many child objects |
+| **Revoke** | Owner revokes **this item only**; other stickers under the same root stay active |
 | **Buyer expectation** | Copy: “This sticker points at **your** public card. You can revoke **this sticker** if it’s lost or gifted.” |
 
 **Hard rule unchanged:** buying Tier 1 does not make you **Vouched Human**.
@@ -332,8 +333,9 @@ Optional **non-trust** badge on scan: “Scanned from a founding sticker” for 
 | Mint validation helper for `expires_at: null` on artifact | Engineering | **Shipped** (helper) | `validatePrintArtifactMintExpiry` — wire at fulfillment mint |
 | Fulfillment mint sets `scope: print_artifact`, `expires_at: null` | Engineering | **Shipped** | `POST …/print-artifact-qrs` · `POST …/print/orders/{id}/mint` · `fulfillment-mint.ts` |
 | Artifact intent preview + cart attach metadata (A-001 spike) | Engineering | **Shipped** | `POST /v1/store/artifact-intents` · `…/attach` · migration `0014_artifact_intents.sql` |
-| Shopify paid webhook → commerce order link (O-001) | Engineering | **Shipped** | `POST /v1/webhooks/shopify/orders` · migration `0015_commerce_order_links.sql` · Printify submit pending |
-| Print fulfillment queue + catalog + artwork (O-002) | Engineering | **Shipped** (queue + preview) | `GET /v1/print/catalog` · `POST /v1/print/artifacts` · `POST /v1/print/orders` · migration `0016_print_orders.sql` · Printify HTTP deferred |
+| Shopify paid webhook → commerce order link (O-001) | Engineering | **Shipped** | `POST /v1/webhooks/shopify/orders` · migration `0015_commerce_order_links.sql` |
+| Print fulfillment queue + catalog + artwork (O-002) | Engineering | **Shipped** (queue + live submit + per-order upload) | `POST /v1/print/orders` · `printify-client.ts` · `printify-upload.ts` · `PRINTIFY_SUBMIT_ENABLED` gate |
+| Printify webhook status sync (O-003) | Engineering | **Shipped** | `POST /v1/print/webhooks/printify` · migration `0018_printify_webhook_receipts.sql` · tracking on `0021_print_order_tracking.sql` · reconciliation cron every 30m |
 | Operator fulfillment lookup chain (O-003) | Engineering | **Shipped** | `GET /v1/operator/fulfillment/lookup` · Shopify/commerce/intent/print order ids |
 | Orphan purge respects null expiry | Engineering | **Shipped** (existing) | `orphan-purge.test.ts` |
 | Tier 0 batch rotate runbook | Ops | **Shipped** | [`TIER0_CAMPAIGN_QR_RUNBOOK.md`](TIER0_CAMPAIGN_QR_RUNBOOK.md) |
@@ -359,6 +361,7 @@ Before `checkout_open: true` on production:
 | Doc | Use |
 |-----|-----|
 | [`MERCH_LED_V1.md`](MERCH_LED_V1.md) | GTM phases A–D |
+| [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) | Shopify + Printify headless wiring |
 | [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) | Pre-launch gates · QR model table |
 | [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) | Interest-only shop · `checkout_open` |
 | [`LAUNCH_LANGUAGE_KIT.md`](LAUNCH_LANGUAGE_KIT.md) | § Sticker FAQ (customer copy) |
@@ -367,7 +370,7 @@ Before `checkout_open: true` on production:
 | [`V1_IMPLEMENTATION_CONTRACTS.md`](V1_IMPLEMENTATION_CONTRACTS.md) | `print_artifact` mint rules |
 | [`V1_ASSUMPTION_REGISTER.md`](V1_ASSUMPTION_REGISTER.md) | A-004 print QA · A-006 per-item QR · A-012G comprehension |
 | [`CARD_RETENTION_AND_ORPHAN_CLEANUP.md`](CARD_RETENTION_AND_ORPHAN_CLEANUP.md) | Orphan purge vs live merch QR |
-| [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) | Gate before money |
+| [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) | Gate before money (**passed** 2026-05-27) |
 | [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) | Trust bugs before checkout |
 | [`TIER0_CAMPAIGN_QR_RUNBOOK.md`](TIER0_CAMPAIGN_QR_RUNBOOK.md) | Batch sticker QR + rotate drill |
 | [`MERCH_SUPPORT_MACROS.md`](MERCH_SUPPORT_MACROS.md) | Support reply templates |

@@ -28,6 +28,10 @@ export interface PrintOrderRow {
   template_id: string;
   status: PrintOrderStatus;
   shipping_method: string;
+  tracking_carrier: string | null;
+  tracking_number: string | null;
+  tracking_url: string | null;
+  last_reconciled_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -45,17 +49,27 @@ export interface InsertPrintOrderInput {
   created_at: string;
 }
 
+const PRINT_ORDER_COLUMNS = `order_id, profile_id, print_artifact_ids_json, planned_item_qr_ids_json,
+              commerce_order_id, shopify_order_id, printify_order_id, printify_shop_id,
+              template_id, status, shipping_method,
+              tracking_carrier, tracking_number, tracking_url, last_reconciled_at,
+              created_at, updated_at`;
+
+/** Active print orders linked to Printify — reconciliation poll batch (PM-FR-33). */
+export const RECONCILE_PRINT_ORDER_STATUSES: PrintOrderStatus[] = [
+  "submitted",
+  "in_production",
+  "on_hold",
+  "has_issues",
+  "partially_fulfilled",
+];
+
 export async function getPrintOrderByPrintifyOrderId(
   db: D1Database,
   printifyOrderId: string
 ): Promise<PrintOrderRow | null> {
   return db
-    .prepare(
-      `SELECT order_id, profile_id, print_artifact_ids_json, planned_item_qr_ids_json,
-              commerce_order_id, shopify_order_id, printify_order_id, printify_shop_id,
-              template_id, status, shipping_method, created_at, updated_at
-       FROM print_orders WHERE printify_order_id = ?`
-    )
+    .prepare(`SELECT ${PRINT_ORDER_COLUMNS} FROM print_orders WHERE printify_order_id = ?`)
     .bind(printifyOrderId)
     .first<PrintOrderRow>();
 }
@@ -73,12 +87,7 @@ export async function getPrintOrderByCommerceOrderId(
   commerceOrderId: string
 ): Promise<PrintOrderRow | null> {
   return db
-    .prepare(
-      `SELECT order_id, profile_id, print_artifact_ids_json, planned_item_qr_ids_json,
-              commerce_order_id, shopify_order_id, printify_order_id, printify_shop_id,
-              template_id, status, shipping_method, created_at, updated_at
-       FROM print_orders WHERE commerce_order_id = ?`
-    )
+    .prepare(`SELECT ${PRINT_ORDER_COLUMNS} FROM print_orders WHERE commerce_order_id = ?`)
     .bind(commerceOrderId)
     .first<PrintOrderRow>();
 }
@@ -88,14 +97,30 @@ export async function getPrintOrderById(
   orderId: string
 ): Promise<PrintOrderRow | null> {
   return db
-    .prepare(
-      `SELECT order_id, profile_id, print_artifact_ids_json, planned_item_qr_ids_json,
-              commerce_order_id, shopify_order_id, printify_order_id, printify_shop_id,
-              template_id, status, shipping_method, created_at, updated_at
-       FROM print_orders WHERE order_id = ?`
-    )
+    .prepare(`SELECT ${PRINT_ORDER_COLUMNS} FROM print_orders WHERE order_id = ?`)
     .bind(orderId)
     .first<PrintOrderRow>();
+}
+
+export async function listPrintOrdersForReconciliation(
+  db: D1Database,
+  limit: number
+): Promise<PrintOrderRow[]> {
+  const placeholders = RECONCILE_PRINT_ORDER_STATUSES.map(() => "?").join(", ");
+  const result = await db
+    .prepare(
+      `SELECT ${PRINT_ORDER_COLUMNS}
+       FROM print_orders
+       WHERE printify_order_id IS NOT NULL
+         AND printify_shop_id IS NOT NULL
+         AND status IN (${placeholders})
+       ORDER BY COALESCE(last_reconciled_at, created_at) ASC
+       LIMIT ?`
+    )
+    .bind(...RECONCILE_PRINT_ORDER_STATUSES, limit)
+    .all<PrintOrderRow>();
+
+  return result.results ?? [];
 }
 
 export async function insertPrintOrder(
@@ -143,5 +168,68 @@ export async function updatePrintOrderStatus(
        WHERE order_id = ?`
     )
     .bind(status, updatedAt, printifyOrderId, printifyShopId, orderId)
+    .run();
+}
+
+export async function updatePrintOrderTracking(
+  db: D1Database,
+  orderId: string,
+  input: {
+    tracking_carrier: string | null;
+    tracking_number: string | null;
+    tracking_url: string | null;
+    updated_at: string;
+  }
+): Promise<void> {
+  await db
+    .prepare(
+      `UPDATE print_orders
+       SET tracking_carrier = ?, tracking_number = ?, tracking_url = ?, updated_at = ?
+       WHERE order_id = ?`
+    )
+    .bind(
+      input.tracking_carrier,
+      input.tracking_number,
+      input.tracking_url,
+      input.updated_at,
+      orderId
+    )
+    .run();
+}
+
+export async function syncPrintOrderFromPrintify(
+  db: D1Database,
+  input: {
+    order_id: string;
+    status: PrintOrderStatus;
+    tracking: {
+      carrier: string | null;
+      tracking_number: string | null;
+      tracking_url: string | null;
+    } | null;
+    last_reconciled_at: string;
+    updated_at: string;
+  }
+): Promise<void> {
+  await db
+    .prepare(
+      `UPDATE print_orders
+       SET status = ?,
+           tracking_carrier = ?,
+           tracking_number = ?,
+           tracking_url = ?,
+           last_reconciled_at = ?,
+           updated_at = ?
+       WHERE order_id = ?`
+    )
+    .bind(
+      input.status,
+      input.tracking?.carrier ?? null,
+      input.tracking?.tracking_number ?? null,
+      input.tracking?.tracking_url ?? null,
+      input.last_reconciled_at,
+      input.updated_at,
+      input.order_id
+    )
     .run();
 }
