@@ -1264,6 +1264,7 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
   var qrId = ${JSON.stringify(vm.qrId)};
   var pollTimer = null;
   var countdownTimer = null;
+  var proofExpiryTimer = null;
   var relativeTimer = null;
   function isOwnerBrowser() {
     try {
@@ -1330,6 +1331,7 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
   function showProvenSuccess(provenAt) {
     stopPolling();
     stopCountdown();
+    stopProofExpiryTimer();
     if (interactive) interactive.hidden = true;
     if (success) success.hidden = false;
     if (row) row.classList.add("is-proven");
@@ -1340,6 +1342,7 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
   }
   function resetForNewRequest() {
     stopRelativeTimer();
+    stopProofExpiryTimer();
     stopPolling();
     stopCountdown();
     if (interactive) interactive.hidden = false;
@@ -1412,6 +1415,55 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
     if (countdownTimer) window.clearInterval(countdownTimer);
     countdownTimer = null;
   }
+  function stopProofExpiryTimer() {
+    if (proofExpiryTimer) window.clearTimeout(proofExpiryTimer);
+    proofExpiryTimer = null;
+  }
+  function showRequestExpired() {
+    stopPolling();
+    stopCountdown();
+    stopProofExpiryTimer();
+    stopRelativeTimer();
+    if (interactive) interactive.hidden = false;
+    if (success) success.hidden = true;
+    if (row) row.classList.remove("is-proven");
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Ask for live proof";
+    }
+    setStatus("Control was not proven. The request expired.", false);
+  }
+  function showProofExpired() {
+    stopPolling();
+    stopCountdown();
+    stopProofExpiryTimer();
+    stopRelativeTimer();
+    if (interactive) interactive.hidden = false;
+    if (success) success.hidden = true;
+    if (row) row.classList.remove("is-proven");
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Ask for live proof";
+    }
+    setStatus("Live proof expired. Ask again to prove control now.", false);
+  }
+  function freshProofMs(body) {
+    if (body.status !== "proven" || !body.proof_expires_at) return null;
+    var proofExpiresAt = Date.parse(body.proof_expires_at);
+    if (!Number.isFinite(proofExpiresAt)) return null;
+    var remaining = proofExpiresAt - Date.now();
+    return remaining > 0 ? remaining : null;
+  }
+  function showProven(body) {
+    var remaining = freshProofMs(body);
+    if (remaining === null) {
+      showProofExpired();
+      return;
+    }
+    stopProofExpiryTimer();
+    showProvenSuccess(body.proven_at);
+    proofExpiryTimer = window.setTimeout(showProofExpired, remaining);
+  }
   function formatRemaining(ms) {
     var total = Math.max(0, Math.ceil(ms / 1000));
     var minutes = Math.floor(total / 60);
@@ -1443,15 +1495,9 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
         .then(function (res) { return res.json(); })
         .then(function (body) {
           if (body.status === "proven") {
-            showProvenSuccess(body.proven_at);
+            showProven(body);
           } else if (body.status === "expired") {
-            stopPolling();
-            stopCountdown();
-            if (btn) {
-              btn.disabled = false;
-              btn.textContent = "Ask for live proof";
-            }
-            setStatus("Control was not proven. The request expired.", false);
+            showRequestExpired();
           }
         })
         .catch(function () {});
@@ -1471,10 +1517,9 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
       .then(function (res) { return res.json(); })
       .then(function (body) {
         if (body.status === "proven") {
-          showProvenSuccess(body.proven_at);
+          showProven(body);
         } else if (body.status === "expired") {
-          if (btn) btn.textContent = "Ask for live proof";
-          setStatus("Control was not proven. The request expired.", false);
+          showRequestExpired();
         } else {
           if (body.expires_at) {
             startCountdown(body.expires_at, "Waiting for the owner to sign…");
@@ -1499,6 +1544,7 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
   btn.addEventListener("click", function () {
     btn.disabled = true;
     btn.textContent = "Waiting…";
+    stopProofExpiryTimer();
     setStatus("Creating a live proof request…", true);
     fetch(${JSON.stringify(challengeUrl)}, {
       method: "POST",

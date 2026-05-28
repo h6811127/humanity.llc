@@ -1,4 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { runInNewContext } from "node:vm";
+
+import { describe, expect, it, vi } from "vitest";
 
 import type { ScanContext } from "../src/db/scan";
 import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
@@ -98,6 +100,105 @@ function scanDbFor(challenge: Record<string, unknown> | null = null): D1Database
       }),
     }),
   } as unknown as D1Database;
+}
+
+function extractLiveControlScript(html: string): string {
+  const match = html.match(
+    /<script>\n\(function \(\) \{\n  var PROOF_TTL_MS = 5 \* 60 \* 1000;[\s\S]*?\n\}\)\(\);\n<\/script>/
+  );
+  expect(match).not.toBeNull();
+  return match![0].replace(/^<script>\n/, "").replace(/\n<\/script>$/, "");
+}
+
+async function runLiveControlScriptWithStatus(body: Record<string, unknown>) {
+  const vm = buildScanViewModel(
+    PROFILE,
+    QR,
+    {
+      card: card(),
+      qr: qr(),
+      verification: summary(),
+    },
+    "https://humanity.llc"
+  );
+  const html = await renderScanPage(vm, "https://humanity.llc");
+  const script = extractLiveControlScript(html);
+  type FakeElement = {
+    disabled?: boolean;
+    textContent?: string;
+    addEventListener?: ReturnType<typeof vi.fn>;
+    hidden?: boolean;
+    href?: string;
+    classList?: {
+      add?: ReturnType<typeof vi.fn>;
+      remove?: ReturnType<typeof vi.fn>;
+      toggle?: ReturnType<typeof vi.fn>;
+    };
+    setAttribute?: ReturnType<typeof vi.fn>;
+    getAttribute?: ReturnType<typeof vi.fn>;
+  };
+  const elements: Record<string, FakeElement> = {
+    "live-control-request": {
+      disabled: false,
+      textContent: "Ask for live proof",
+      addEventListener: vi.fn(),
+    },
+    "live-control-status": { textContent: "Ready when you are." },
+    "live-control-status-panel": { classList: { toggle: vi.fn() } },
+    "live-control-interactive": { hidden: false },
+    "live-control-success": {
+      hidden: true,
+      setAttribute: vi.fn(),
+      getAttribute: vi.fn(() => null),
+    },
+    "live-control-proven-at": { textContent: "" },
+    "live-control-proven-ago": {
+      textContent: "",
+      setAttribute: vi.fn(),
+      getAttribute: vi.fn(() => null),
+    },
+    "live-control-row": { classList: { add: vi.fn(), remove: vi.fn() } },
+    "live-control-owner-link": { hidden: true, href: "#" },
+    "live-control-owner-view": { hidden: true },
+    "live-control-owner-copy": { textContent: "" },
+    "live-control-owner-created-link": { href: "" },
+  };
+  const fetchMock = vi.fn(async () => ({ json: async () => body }));
+  const setTimeoutMock = vi.fn(() => 1);
+
+  runInNewContext(script, {
+    Date,
+    Error,
+    Number,
+    URLSearchParams,
+    encodeURIComponent,
+    document: {
+      getElementById: (id: string) => elements[id] ?? null,
+    },
+    fetch: fetchMock,
+    location: {
+      origin: "https://humanity.llc",
+      search: `?q=${QR}&live_challenge=${LIVE_CHALLENGE}`,
+    },
+    window: {
+      clearInterval: vi.fn(),
+      clearTimeout: vi.fn(),
+      setInterval: vi.fn(() => 1),
+      setTimeout: setTimeoutMock,
+    },
+  });
+
+  await Promise.resolve();
+  await Promise.resolve();
+  await Promise.resolve();
+
+  return {
+    button: elements["live-control-request"],
+    fetchMock,
+    setTimeoutMock,
+    status: elements["live-control-status"],
+    elements,
+  };
 }
 
 describe("scan offline banner (F2-2)", () => {
@@ -392,6 +493,65 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain('id="live-control-owner-view"');
     expect(html).toContain('id="live-control-interactive" hidden');
     expect(html).toContain('id="live-control-request"');
+  });
+
+  it("does not render stale live proof as recently proven", async () => {
+    const res = await handleGetScan(
+      new Request(
+        `https://humanity.llc/c/${PROFILE}?q=${QR}&live_challenge=${LIVE_CHALLENGE}`
+      ),
+      scanDbFor({
+        challenge_id: LIVE_CHALLENGE,
+        profile_id: PROFILE,
+        qr_id: QR,
+        nonce: "nonce",
+        verifier_session_id: "verifier",
+        status: "proven",
+        issued_at: new Date(Date.now() - 600_000).toISOString(),
+        expires_at: new Date(Date.now() - 540_000).toISOString(),
+        proven_at: new Date(Date.now() - 301_000).toISOString(),
+        signer_public_key: "pk",
+        response_document_json: "{}",
+        created_at: new Date(Date.now() - 600_000).toISOString(),
+        updated_at: new Date(Date.now() - 301_000).toISOString(),
+      }),
+      PROFILE
+    );
+    const html = await res.text();
+
+    expect(res.status).toBe(200);
+    expect(html).toContain('id="live-control-success" hidden');
+    expect(html).not.toContain('id="live-control-interactive" hidden');
+    expect(html).not.toContain('live-control-row is-proven');
+    expect(html).toContain('id="live-control-request"');
+    expect(html).toContain("Ready when you are.");
+  });
+
+  it("does not let browser status checks revive stale live proof", async () => {
+    const result = await runLiveControlScriptWithStatus({
+      status: "proven",
+      proof_expires_at: new Date(Date.now() - 1_000).toISOString(),
+    });
+
+    expect(result.status.textContent).toBe(
+      "Live proof expired. Ask again to prove control now."
+    );
+    expect(result.button.textContent).toBe("Ask for live proof");
+    expect(result.setTimeoutMock).not.toHaveBeenCalled();
+    expect(result.elements["live-control-success"].hidden).toBe(true);
+  });
+
+  it("clears browser live proof status when the proof display window ends", async () => {
+    const result = await runLiveControlScriptWithStatus({
+      status: "proven",
+      proven_at: new Date().toISOString(),
+      proof_expires_at: new Date(Date.now() + 60_000).toISOString(),
+    });
+
+    expect(result.elements["live-control-success"].hidden).toBe(false);
+    expect(result.elements["live-control-interactive"].hidden).toBe(true);
+    expect(result.setTimeoutMock).toHaveBeenCalledTimes(1);
+    expect(result.setTimeoutMock.mock.calls[0][1]).toBeGreaterThan(0);
   });
 
   it("uses print_artifact scope copy when applicable", async () => {
