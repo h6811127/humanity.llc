@@ -7,6 +7,10 @@ import {
   CREATE_TEMPLATE_HERO,
   createHeroCopyForTemplate,
 } from "../../site/js/create-template-copy.mjs";
+import {
+  OBJECT_PUBLIC_SNAPSHOT_LIMIT,
+  OBJECT_STREAMS_LIMIT,
+} from "../src/resolver/trust-copy";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -34,6 +38,28 @@ describe("landing messaging (Step 3)", () => {
     expect(html).toContain('id="create-hero-title"');
     expect(html).toContain('id="create-hero-lead"');
     expect(html).toContain("change it later on Live without reprinting");
+  });
+});
+
+describe("public marketing clarity (AI step 5)", () => {
+  it("landing and create copy lead with signed state instead of AI language", () => {
+    const landing = readFileSync(join(root, "site/index.html"), "utf8");
+    const create = readFileSync(join(root, "site/create/index.html"), "utf8");
+    const publicCopy = `${landing}\n${create}`;
+
+    expect(publicCopy).toContain("Public programmable objects");
+    expect(publicCopy).toContain("Live state<br />on real objects.");
+    expect(publicCopy).toContain("signed QR");
+    expect(publicCopy).toContain("No scan tracking.");
+    expect(publicCopy).not.toMatch(/\bAI\b|artificial intelligence|AI profiles|we have AI/i);
+  });
+
+  it("scan limit strings describe signed state without AI-as-product language", () => {
+    const limits = `${OBJECT_STREAMS_LIMIT}\n${OBJECT_PUBLIC_SNAPSHOT_LIMIT}`;
+
+    expect(limits).toContain("steward-signed public copy");
+    expect(limits).toContain("Signed snapshot repeats steward-published fields only");
+    expect(limits).not.toMatch(/\bAI\b|model answers|generated answers/i);
   });
 });
 

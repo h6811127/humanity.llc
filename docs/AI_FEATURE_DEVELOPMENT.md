@@ -134,7 +134,7 @@ Ordered plan from brand review (2026-05-27). Update this table as steps complete
 | **2** | **Decide P1 scan reader** — keep opt-in with rename (“Plain language”, de-emphasize AI). Existing endpoint/protocol fields remain stable for integrators. | ✅ Done | [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md) |
 | **3** | **Rewrite doc hub** — this file splits object state vs external readers vs anti-synthetic abuse (this revision). Optionally rename file to `OBJECT_STATE_AND_READERS.md` in a follow-up. | ✅ Done | This doc |
 | **4** | **Re-align sequencing** with Phase A pilots — no new L3 user features until strangers complete create → scan → update → revoke without hand-holding. | ✅ Noted | [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md) |
-| **5** | **Marketing clarity** — public copy leads with accountable humans and signed state, not “we have AI.” Audit landing, create, scan limit strings. | ☐ Pending | [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) · [`LAUNCH_LANGUAGE_KIT.md`](LAUNCH_LANGUAGE_KIT.md) |
+| **5** | **Marketing clarity** — public copy leads with accountable humans and signed state, not “we have AI.” Audit landing, create, scan limit strings. | ✅ Done — landing/create guard + scan limit copy avoids AI-as-product language | [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) · [`LAUNCH_LANGUAGE_KIT.md`](LAUNCH_LANGUAGE_KIT.md) |
 
 ---
 
