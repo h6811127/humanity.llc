@@ -62,6 +62,26 @@ function readMethodId(raw: unknown): number | null {
   return null;
 }
 
+const NAMED_METHOD_IDS: Record<string, number> = {
+  standard: 1,
+  economy: 1,
+  priority: 2,
+  express: 2,
+};
+
+function pushNamedMethodCost(
+  options: ParsedShippingQuoteOption[],
+  name: string,
+  cost: unknown
+) {
+  const shipping_cost = readCostCents(cost);
+  if (shipping_cost === null) return;
+  const key = name.trim().toLowerCase();
+  const shipping_method_id = NAMED_METHOD_IDS[key] ?? readMethodId(name) ?? options.length + 1;
+  const label = key ? key.charAt(0).toUpperCase() + key.slice(1) : `Method ${shipping_method_id}`;
+  options.push({ shipping_method_id, label, shipping_cost, currency: "USD" });
+}
+
 /** Parse Printify shipping quote response (array or keyed object). */
 export function parsePrintifyShippingQuoteOptions(body: unknown): ParsedShippingQuoteOption[] {
   const options: ParsedShippingQuoteOption[] = [];
@@ -96,6 +116,20 @@ export function parsePrintifyShippingQuoteOptions(body: unknown): ParsedShipping
       for (const item of root.shipping) pushOption(item);
       return options;
     }
+
+    // Printify orders/shipping.json compact map: { standard: 849, priority: 1299 }
+    const namedCosts = Object.entries(root).filter(
+      ([key, value]) =>
+        typeof key === "string" &&
+        key.trim() &&
+        !["data", "shipping"].includes(key) &&
+        (typeof value === "number" || typeof value === "string")
+    );
+    if (namedCosts.length > 0) {
+      for (const [name, cost] of namedCosts) pushNamedMethodCost(options, name, cost);
+      return options;
+    }
+
     for (const value of Object.values(root)) {
       if (value && typeof value === "object" && !Array.isArray(value)) {
         pushOption(value);

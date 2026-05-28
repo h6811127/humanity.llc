@@ -33,6 +33,8 @@ import {
   proofConsentStatusMessage,
   readProofConsentState,
 } from "./shop-proof-consent-core.mjs";
+import { syncMerchBackupNudgeNotice } from "./merch-backup-nudge.mjs";
+import { loadRootSessionRecordForMerch } from "./merch-backup-nudge-core.mjs";
 
 const PERSONALIZE_PROOF_CONSENT_IDS = proofConsentRequiredIds("personalized");
 
@@ -246,6 +248,12 @@ function syncCheckoutUi(product) {
   if (shippingForm instanceof HTMLFormElement) {
     shippingForm.hidden = !checkoutOpen;
   }
+  syncMerchBackupNudgeNotice({
+    noticeId: "shop-customize-backup-nudge",
+    phase: "pre_checkout",
+    enabled: checkoutOpen,
+    getSession: () => loadRootSessionRecordForMerch(),
+  });
 }
 
 function renderShippingEstimate(payload) {
@@ -437,6 +445,14 @@ async function init() {
   });
   checkoutBtn?.addEventListener("click", () => {
     void onCheckoutClick();
+  });
+  window.addEventListener("hc-key-backup-exported", () => {
+    const product = selectedProduct();
+    if (product) syncCheckoutUi(product);
+  });
+  window.addEventListener("hc-recovery-acknowledged", () => {
+    const product = selectedProduct();
+    if (product) syncCheckoutUi(product);
   });
   shippingForm?.addEventListener("submit", (event) => {
     event.preventDefault();

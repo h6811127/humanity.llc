@@ -12,6 +12,7 @@ import {
   readMerchRefFromUrl,
 } from "./merch-funnel-core.mjs";
 import { reconcileThanksMintPanel } from "./shop-thanks-mint.mjs";
+import { syncMerchBackupNudgeNotice } from "./merch-backup-nudge.mjs";
 
 const form = document.getElementById("shop-thanks-status-form");
 const resultEl = document.getElementById("shop-thanks-status-result");
@@ -68,6 +69,14 @@ function resolveActiveMerchRef() {
   return readMerchRefFromUrl() || peekMerchCustomizeRef() || peekMerchCreateRef();
 }
 
+function syncThanksBackupNudge() {
+  syncMerchBackupNudgeNotice({
+    noticeId: "shop-thanks-backup-nudge",
+    phase: "post_checkout",
+    enabled: resolveTier1Thanks(),
+  });
+}
+
 function applyThanksTierCopy() {
   const tier1 = resolveTier1Thanks();
   const ref = resolveActiveMerchRef();
@@ -98,6 +107,7 @@ function applyThanksTierCopy() {
       ? "Thanks for your personalized Live Object order. Update what scanners read from your phone — same ink, new meaning."
       : tier0Copy.meta;
   }
+  syncThanksBackupNudge();
 }
 
 function decorateThanksCreateLinks() {
@@ -202,3 +212,5 @@ if (urlRef) {
 applyThanksTierCopy();
 decorateThanksCreateLinks();
 prefillFromQuery();
+window.addEventListener("hc-key-backup-exported", syncThanksBackupNudge);
+window.addEventListener("hc-recovery-acknowledged", syncThanksBackupNudge);

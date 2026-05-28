@@ -77,14 +77,14 @@ Tier 1 hoodie buyers typically use the **general** template. The revoke-first ga
 | `/shop/thanks/` | Tier 0 vs Tier 1 copy from `hc_ref`; Tier 1 links to `/created/#update-status`; **Activate print QR** when mint still pending |
 | Operator | Set Shopify post-purchase URL to `https://humanity.llc/shop/thanks/?hc_ref=customize_hoodie` (or `customize_shop`) |
 
-Code: [`site/js/merch-funnel-core.mjs`](../site/js/merch-funnel-core.mjs) · [`site/js/created-first-revoke-gate.mjs`](../site/js/created-first-revoke-gate.mjs) · [`site/js/shop-thanks.mjs`](../site/js/shop-thanks.mjs) · [`site/js/shop-thanks-mint.mjs`](../site/js/shop-thanks-mint.mjs) · [`worker/src/resolver/store-order-mint.ts`](../worker/src/resolver/store-order-mint.ts)
+Code: [`site/js/merch-funnel-core.mjs`](../site/js/merch-funnel-core.mjs) · [`site/js/created-first-revoke-gate.mjs`](../site/js/created-first-revoke-gate.mjs) · [`site/js/shop-thanks.mjs`](../site/js/shop-thanks.mjs) · [`site/js/shop-thanks-mint.mjs`](../site/js/shop-thanks-mint.mjs) · [`site/js/merch-backup-nudge.mjs`](../site/js/merch-backup-nudge.mjs) · [`worker/src/resolver/store-order-mint.ts`](../worker/src/resolver/store-order-mint.ts)
 
 ### Next (ordered)
 
 | Step | Work | Type |
 |------|------|------|
 | 1 | Merch operator close-out — live payment, Printify submit, physical QA | Operator |
-| 2 | Backup/recovery nudge before or after first Tier 1 checkout | Product + UI |
+| 2 | Backup/recovery nudge before or after first Tier 1 checkout | Product + UI | **✅ Shipped** — `/shop/customize/` pre-checkout + `/shop/thanks/` post-checkout (`merch-backup-nudge-core.mjs`) |
 | 3 | AI P1 decision — keep / deterministic-only / remove | Product |
 | 4 | Guided live-object template at create (optional `object_streams` without AI) | Engineering |
 | 5 | Gift mode · adopt batch QR · Commons Pass ephemeral scopes | Phase C / D |
@@ -107,7 +107,7 @@ Hub: [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md).
 ## Tests
 
 ```bash
-npm run worker:test -- worker/tests/created-first-revoke-gate.test.ts worker/tests/merch-funnel-core.test.ts worker/tests/buyer-order-mint.test.ts worker/tests/store-order-mint.test.ts worker/tests/shop-thanks-mint-core.test.ts
+npm run worker:test -- worker/tests/created-first-revoke-gate.test.ts worker/tests/merch-funnel-core.test.ts worker/tests/merch-backup-nudge-core.test.ts worker/tests/buyer-order-mint.test.ts worker/tests/store-order-mint.test.ts worker/tests/shop-thanks-mint-core.test.ts
 npm run worker:test -- worker/tests/object-snapshot.test.ts worker/tests/update-card.test.ts
 ```
 

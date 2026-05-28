@@ -29,6 +29,25 @@ describe("parsePrintifyShippingQuoteOptions", () => {
     expect(pickShippingQuoteOption(options, 2)?.label).toBe("Express");
   });
 
+  it("parses Printify compact shipping map", () => {
+    const options = parsePrintifyShippingQuoteOptions({ standard: 849, priority: 1299 });
+    expect(options).toEqual([
+      {
+        shipping_method_id: 1,
+        label: "Standard",
+        shipping_cost: 849,
+        currency: "USD",
+      },
+      {
+        shipping_method_id: 2,
+        label: "Priority",
+        shipping_cost: 1299,
+        currency: "USD",
+      },
+    ]);
+    expect(pickShippingQuoteOption(options, 1)?.shipping_cost).toBe(849);
+  });
+
   it("formats USD cents for display", () => {
     expect(formatUsdCents(399)).toBe("$3.99");
   });

@@ -4993,6 +4993,11 @@ body.landing-focus-mode .screen-landing {
   display: none;
 }
 
+.shop-merch-backup-nudge {
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
 .shop-order-timeline {
   list-style: none;
   margin: 16px 0 0;
