@@ -13,8 +13,9 @@ describe("hosted-rollout-verify-path", () => {
     expect(script).toContain("verify:hosted-g0");
     expect(script).toContain("device-steward-session-core.test.ts");
     expect(script).toContain("device-steward-billing-return-core.test.ts");
-    expect(script).toContain("created-child-object-core.test.ts");
+    expect(script).toContain("created-child-object.test.ts");
     expect(script).toContain("hosted-rollout-step3a-smoke.test.ts");
+    expect(script).toContain("hosted-rollout-step4-smoke.test.ts");
     expect(script).toContain("--e2e");
     expect(script).toContain("e2e:steward-hosted");
     expect(existsSync(join(repoRoot, "docs/STEWARD_DEVICE_ROADMAP.md"))).toBe(true);
