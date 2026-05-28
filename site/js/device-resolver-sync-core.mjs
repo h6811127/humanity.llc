@@ -3,6 +3,8 @@
  * @see docs/DEVICE_TAB_RESOLVER_SYNC.md
  */
 
+import { pruneWalletNetworkCache } from "./device-wallet-network-core.mjs";
+
 export const RESOLVER_SYNC_PREF_KEY = "hc_resolver_sync_tabs";
 
 /** Unified cross-tab channel (network, health, live-control). */
@@ -126,8 +128,11 @@ export function shouldFollowerSkipNetworkFetch(opts) {
  */
 export function mergeNetworkSnapshotIntoCache(cache, snapshotEntries, fallbackAt = Date.now()) {
   const next = { ...cache };
+  /** @type {string[]} */
+  const protectProfileIds = [];
   for (const row of snapshotEntries) {
     if (!row?.profile_id) continue;
+    protectProfileIds.push(row.profile_id);
     next[row.profile_id] = {
       status: row.status,
       scanKind: row.scanKind ?? null,
@@ -137,7 +142,7 @@ export function mergeNetworkSnapshotIntoCache(cache, snapshotEntries, fallbackAt
       at: row.cachedAt ?? fallbackAt,
     };
   }
-  return next;
+  return pruneWalletNetworkCache(next, { protectProfileIds, now: fallbackAt });
 }
 
 /**

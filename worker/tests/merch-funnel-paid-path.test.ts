@@ -159,7 +159,7 @@ function createDb(state: DbState): D1Database {
             const pattern = String(args[0]);
             const needle = pattern.replace(/%/g, "").replace(/"/g, "");
             const rows = [...state.commerce.values()].filter((row) =>
-              row.artifact_intent_ids_json?.includes(needle)
+              (row.artifact_intent_ids_json ?? "").includes(needle)
             );
             return { results: rows };
           }

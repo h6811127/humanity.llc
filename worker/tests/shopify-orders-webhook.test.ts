@@ -5,6 +5,7 @@ import type { CommerceOrderRow } from "../src/db/commerce-orders";
 import type { PrintOrderRow } from "../src/db/print-orders";
 import { handlePostShopifyOrdersWebhook } from "../src/http/shopify-orders-webhook";
 import type { Env } from "../src/env";
+import { DEFAULT_PRINT_TEMPLATE_ID } from "../src/print/print-catalog";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const INTENT = "ai_PaidWebhookTest01";
@@ -39,11 +40,18 @@ function intentRow(overrides: Partial<ArtifactIntentRow> = {}): ArtifactIntentRo
   };
 }
 
+type FulfillmentPiiRow = {
+  commerce_order_id: string;
+  shipping_iv_b64: string;
+  shipping_ciphertext_b64: string;
+};
+
 type DbState = {
   intents: Map<string, ArtifactIntentRow>;
   orders: Map<string, CommerceOrderRow>;
   receipts: Map<string, { webhook_id: string; commerce_order_id: string | null }>;
   printOrders: Map<string, PrintOrderRow>;
+  fulfillmentPii: Map<string, FulfillmentPiiRow>;
 };
 
 function dbFor(state: DbState): D1Database {
@@ -62,6 +70,9 @@ function dbFor(state: DbState): D1Database {
           }
           if (sql.includes("FROM print_orders WHERE commerce_order_id")) {
             return state.printOrders.get(args[0] as string) ?? null;
+          }
+          if (sql.includes("FROM commerce_fulfillment_pii")) {
+            return state.fulfillmentPii.get(args[0] as string) ?? null;
           }
           return null;
         },
@@ -142,12 +153,21 @@ function dbFor(state: DbState): D1Database {
               commerce_order_id: args[3] as string | null,
             });
           }
+          if (sql.includes("INSERT INTO commerce_fulfillment_pii")) {
+            state.fulfillmentPii.set(args[0] as string, {
+              commerce_order_id: args[0] as string,
+              shipping_iv_b64: args[1] as string,
+              shipping_ciphertext_b64: args[2] as string,
+            });
+          }
           return { success: true };
         },
       }),
     }),
   } as unknown as D1Database;
 }
+
+const FULFILLMENT_PII_KEY = btoa(String.fromCharCode(...new Uint8Array(32).fill(0xef)));
 
 function paidOrderBody(overrides: Record<string, unknown> = {}) {
   return {
@@ -157,6 +177,15 @@ function paidOrderBody(overrides: Record<string, unknown> = {}) {
     email: "buyer@example.com",
     order_number: 1001,
     name: "#1001",
+    shipping_address: {
+      first_name: "Ada",
+      last_name: "Lovelace",
+      address1: "123 Example St",
+      city: "Brooklyn",
+      province_code: "NY",
+      country_code: "US",
+      zip: "11221",
+    },
     line_items: [
       {
         properties: [
@@ -186,6 +215,7 @@ async function webhookRequest(body: unknown, headers: Record<string, string> = {
 }
 
 const env = { SHOPIFY_WEBHOOK_SECRET: SECRET } as Env;
+const piiEnv = { ...env, FULFILLMENT_PII_ENCRYPTION_KEY: FULFILLMENT_PII_KEY } as Env;
 
 const TIER0_CAMPAIGN = "nSVXWPqgRFEhGPjxyRzidF6";
 const TIER0_VARIANT = "12345678";
@@ -202,6 +232,7 @@ describe("Shopify orders webhook (O-001)", () => {
       orders: new Map(),
       receipts: new Map(),
       printOrders: new Map(),
+      fulfillmentPii: new Map(),
     };
 
     const res = await handlePostShopifyOrdersWebhook(
@@ -215,6 +246,7 @@ describe("Shopify orders webhook (O-001)", () => {
       hold_reason: string | null;
       duplicate: boolean;
       print_order_ids: string[];
+      fulfillment_mode: string;
     };
 
     expect(res.status).toBe(200);
@@ -222,14 +254,17 @@ describe("Shopify orders webhook (O-001)", () => {
     expect(json.artifact_intent_ids).toEqual([INTENT]);
     expect(json.hold_reason).toBeNull();
     expect(json.duplicate).toBe(false);
+    expect(json.fulfillment_mode).toBe("personalized");
     expect(json.print_order_ids).toHaveLength(1);
     expect(json.print_order_ids[0]).toMatch(/^po_/);
     expect(state.intents.get(INTENT)?.status).toBe("converted");
     expect(state.orders.size).toBe(1);
 
     const printOrder = [...state.printOrders.values()][0];
-    expect(printOrder?.template_id).toBe("hc-sticker-square-v1");
+    expect(printOrder?.profile_id).toBe(PROFILE);
+    expect(printOrder?.template_id).toBe(DEFAULT_PRINT_TEMPLATE_ID);
     expect(JSON.parse(printOrder!.planned_item_qr_ids_json)).toEqual(["qr_planned1"]);
+    expect(JSON.parse(printOrder!.print_artifact_ids_json)).toEqual(["pa_planned1"]);
   });
 
   it("queues personalized sticker print order for storefront product id", async () => {
@@ -257,7 +292,8 @@ describe("Shopify orders webhook (O-001)", () => {
     expect(json.print_order_ids).toHaveLength(1);
 
     const printOrder = [...state.printOrders.values()][0];
-    expect(printOrder?.template_id).toBe("hc-sticker-square-v1");
+    expect(printOrder?.template_id).toBe(DEFAULT_PRINT_TEMPLATE_ID);
+    expect(JSON.parse(printOrder!.planned_item_qr_ids_json)).toEqual(["qr_planned1"]);
   });
 
   it("holds order when artifact intent metadata is missing", async () => {
@@ -266,6 +302,7 @@ describe("Shopify orders webhook (O-001)", () => {
       orders: new Map(),
       receipts: new Map(),
       printOrders: new Map(),
+      fulfillmentPii: new Map(),
     };
 
     const res = await handlePostShopifyOrdersWebhook(
@@ -285,6 +322,7 @@ describe("Shopify orders webhook (O-001)", () => {
       orders: new Map(),
       receipts: new Map(),
       printOrders: new Map(),
+      fulfillmentPii: new Map(),
     };
 
     const res = await handlePostShopifyOrdersWebhook(
@@ -322,6 +360,7 @@ describe("Shopify orders webhook (O-001)", () => {
       orders: new Map(),
       receipts: new Map(),
       printOrders: new Map(),
+      fulfillmentPii: new Map(),
     };
     const db = dbFor(state);
 
@@ -351,7 +390,29 @@ describe("Shopify orders webhook (O-001)", () => {
       orders: new Map(),
       receipts: new Map(),
       printOrders: new Map(),
+      fulfillmentPii: new Map(),
     }));
     expect(res.status).toBe(401);
+  });
+
+  it("stores encrypted shipping when FULFILLMENT_PII_ENCRYPTION_KEY is set", async () => {
+    const state: DbState = {
+      intents: new Map([[INTENT, intentRow()]]),
+      orders: new Map(),
+      receipts: new Map(),
+      printOrders: new Map(),
+      fulfillmentPii: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(paidOrderBody()),
+      piiEnv,
+      dbFor(state)
+    );
+    expect(res.status).toBe(200);
+    expect(state.fulfillmentPii.size).toBe(1);
+    const row = [...state.fulfillmentPii.values()][0];
+    expect(row?.shipping_iv_b64.length).toBeGreaterThan(0);
+    expect(row?.shipping_ciphertext_b64.length).toBeGreaterThan(0);
   });
 });

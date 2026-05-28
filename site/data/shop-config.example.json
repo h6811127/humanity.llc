@@ -20,8 +20,8 @@
         "title": "Live Object hoodie",
         "preview": "hoodie",
         "price_display": "$48 + shipping",
-        "shopify_variant_id": "YOUR_VARIANT_ID",
-        "checkout_url": "https://YOUR-STORE.myshopify.com/cart/YOUR_VARIANT_ID:1"
+        "shopify_variant_id": "YOUR_HOODIE_VARIANT_ID",
+        "checkout_url": "https://YOUR-STORE.myshopify.com/cart/YOUR_HOODIE_VARIANT_ID:1"
       },
       {
         "product_id": "sticker_personalized_v1",

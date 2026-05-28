@@ -516,12 +516,14 @@ Goal: complete one real paid order path safely.
 - User-safe order timeline.
 - Operator lookup by Shopify order, commerce order, artifact intent, and Printify order.
 
-**Shipped (partial):** Printify webhook receiver · operator lookup · **buyer order status** — `GET /v1/store/order-status` (email hash + order number) · `/shop/thanks/` UI. Reconciliation polling and tracking links deferred.
+**Shipped (partial):** Printify webhook receiver · operator lookup · **buyer order status** — `GET /v1/store/order-status` (email hash + order number) · `/shop/thanks/` UI · **encrypted shipping capture** — Shopify paid webhook → `commerce_fulfillment_pii` (AES-256-GCM) · Printify submit loads from store unless body override · **tracking links** — carrier/number/url on print orders · **reconciliation polling** — Worker cron every 30 minutes (`0,30 * * * *`) repairs missed Printify webhooks.
 
 **Exit criteria:**
 
 - On-hold, has-issues, source-check-failed, unfulfillable, fulfilled, partially fulfilled, and canceled states are actionable.
 - Full shipping address is encrypted and not logged in normal logs.
+
+**Shipped (2026-05-27):** tracking + reconciliation — migration `0021_print_order_tracking.sql` · Printify shipment webhooks store carrier/number/url · buyer order status returns `tracking` · cron `runPrintifyReconcile` polls active Printify orders every 30 minutes.
 
 ---
 

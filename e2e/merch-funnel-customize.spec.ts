@@ -1,8 +1,8 @@
 import { test, expect } from "@playwright/test";
 
 /**
- * Merch funnel close-out — create with scan_customize ref lands on customizer with card session.
- * @see docs/MERCH_FUNNEL_MVP.md exit checklist · priority stack item 1
+ * Merch funnel — create with scan_customize lands on /shop/customize/.
+ * @see docs/MERCH_FUNNEL_MVP.md · exit checklist · priority stack item 1
  */
 
 const PRINT_CATALOG = {
@@ -43,12 +43,14 @@ async function stubCreateResolver(page: import("@playwright/test").Page) {
 
       if (method === "POST" && /\/cards\/?(\?|$)/.test(url)) {
         const body = route.request().postDataJSON() as {
-          card?: { profile_id?: string; handle?: string; attribution_ref?: string };
+          card?: { profile_id?: string; handle?: string };
           qr_credential?: { qr_id?: string };
+          attribution_ref?: string;
         };
         const profileId = body?.card?.profile_id ?? "";
         const qrId = body?.qr_credential?.qr_id ?? "";
         const handle = body?.card?.handle ?? "";
+        expect(body.attribution_ref).toBe("scan_customize");
         await route.fulfill({
           status: 200,
           contentType: "application/json",
@@ -56,13 +58,13 @@ async function stubCreateResolver(page: import("@playwright/test").Page) {
             profile_id: profileId,
             qr_id: qrId,
             scan_url: `http://127.0.0.1:8787/c/${profileId}?q=${qrId}`,
-            attribution_ref: body?.card?.attribution_ref ?? null,
+            handle,
           }),
         });
         return;
       }
 
-      await route.fulfill({ status: 404, body: "NOT_FOUND" });
+      await route.fulfill({ status: 405, body: "METHOD_NOT_ALLOWED" });
     }
   );
 }
@@ -76,7 +78,7 @@ async function stubCustomizeApis(page: import("@playwright/test").Page) {
     })
   );
 
-  await page.route("**/v1/store/artifact-intents**", async (route) => {
+  await page.route(/artifact-intents/, async (route) => {
     if (route.request().method() !== "POST") {
       await route.fulfill({ status: 405, body: "METHOD_NOT_ALLOWED" });
       return;
@@ -90,7 +92,7 @@ async function stubCustomizeApis(page: import("@playwright/test").Page) {
     const plannedQrId = "qr_planned_e2e_item";
     const intentId = "ai_e2eMerchFunnel01";
     await route.fulfill({
-      status: 200,
+      status: 201,
       contentType: "application/json",
       body: JSON.stringify({
         artifact_intent_id: intentId,
@@ -117,37 +119,35 @@ test.describe("merch funnel customize", () => {
     await stubCustomizeApis(page);
   });
 
-  test("scan_customize ref: create card redirects to customizer with session", async ({
-    page,
-  }) => {
-    const handle = `merch_${Date.now().toString(36).slice(-8)}`;
+  test("scan_customize: create redirects to customize with session ready", async ({ page }) => {
+    const handle = `e2e_merch_${Date.now().toString(36).slice(-8)}`;
 
     await page.goto("/create/?hc_ref=scan_customize");
     await page.locator("#handle").fill(handle);
-    await page.locator("#manifesto").fill("Merch funnel E2E — live object preview");
+    await page.locator("#manifesto").fill("E2E merch funnel — live object on a hoodie");
     await page.locator("#submit").click();
 
-    await page.waitForURL(/\/shop\/customize\/\?.*hc_ref=scan_customize/, {
+    await page.waitForURL(/\/shop\/customize\/\?hc_ref=scan_customize/, {
       timeout: 20_000,
     });
 
-    const cardReady = page.locator("#shop-customize-card-ready");
-    await expect(cardReady).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator("#shop-customize-card-ready")).toBeVisible({
+      timeout: 15_000,
+    });
     await expect(page.locator("#shop-customize-card-gate")).toBeHidden();
-    await expect(page.locator("#shop-customize-handle")).toHaveText(`@${handle}`);
 
     const session = await page.evaluate(() => sessionStorage.getItem("hc_created"));
     expect(session).toBeTruthy();
     const parsed = JSON.parse(session!) as {
       handle?: string;
+      profile_id?: string;
       owner_private_key_b58?: string;
     };
     expect(parsed.handle).toBe(handle);
     expect(parsed.owner_private_key_b58).toMatch(/^[1-9A-HJ-NP-Za-km-z]+$/);
 
-    await expect(page.getByRole("button", { name: "Personalized sticker" })).toBeVisible({
-      timeout: 10_000,
-    });
+    await expect(page.locator("#shop-customize-handle")).toContainText(`@${handle}`);
+    await expect(page.getByRole("heading", { name: "Customize your live object" })).toBeVisible();
   });
 
   test("customizer shows card gate when no session exists", async ({ page }) => {

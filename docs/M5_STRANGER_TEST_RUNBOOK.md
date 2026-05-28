@@ -40,6 +40,7 @@ curl -sS "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status?q=QR" | jq
     - Lost item relay: `site/data/showcase-lost-item.json` - `npm run site:seed-showcase-lost-item`
     - CI fixtures: `worker/tests/scan-m5-showcase-paths.test.ts`, `worker/tests/site-showcase-data.test.ts`, `worker/tests/manifesto-showcase-exit.test.ts`
     - Local exit bundle: `npm run site:verify-positioning-exit`
+    - Merch funnel engineering (code, not strangers): `npm run merch-funnel:verify-exit`
     - After re-seed on production: `API_ORIGIN=https://humanity.llc npm run site:verify-showcase`
 
 **Deploy check:** scan response header `X-HC-Scan-UI: pass-v31` (or later) on an active scan.
@@ -80,6 +81,8 @@ Do **not** send the data policy or research page unless they ask.
 | 2 | | | ☐ | ☐ | | | ☐ | |
 | 3 | | | ☐ | ☐ | | | ☐ | |
 
+**Optional (merch, no purchase):** On a **live object** scan with the customize CTA, stranger states that tapping “Customize live object merch” does **not** prove the wearer owns the card and is not required for the trust loop.
+
 **Pass line for M5:** all three rows checked for create + scan understanding; **at least one** live-object (or pilot sticker) scan checked; **at least one** completes revoke + re-scan; none think it proves legal ID or “holder owns the sticker” without reading limits.
 
 ---
@@ -100,10 +103,11 @@ Do **not** send the data policy or research page unless they ask.
 
 1. Check boxes in `docs/M3_M4_EXECUTION_PLAN.md` § M5.
 2. Update landing **Building now**  -  move stranger tests to done; optional one-line public note (email list, post, or hero eyebrow).
-3. **Primary next (2026-05-27):** **Merch funnel Tier 1** — scan → create → `/shop/customize/` → Shopify → Printify. See [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) and [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md). Enable operator config before live checkout.
-4. **Optional:** finish M5.5 backup confidence (import on second device) if strangers struggled with “revoke later.”
-5. **Optional field pilots:** status plate, lost-item relay, organizer revoke — [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md). Not required before Tier 1 merch launch.
-6. **Before live merch checkout:** read `docs/MERCH_QR_LIFECYCLE_POLICY.md` (no calendar expiry on artifacts, hardening sequence, reprint/revoke macros).
+3. **Do not** turn on **live Tier 1 checkout** (`personalize.checkout_open` on production) or announce paid merch until M5 is checked. Engineering for `/shop/customize/` may ship earlier — [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) § Implementation priority stack.
+4. **After M5 passes:** **Merch funnel Tier 1 operator close-out** — scan → create → `/shop/customize/` → Shopify → Printify. See [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) and [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md); run `npm run merch-funnel:verify-config -- --require-checkout` before enabling payments.
+5. **Recommended:** finish M5.5 backup confidence (import on second device) if strangers struggled with “revoke later.”
+6. **Optional field pilots:** status plate, lost-item relay, organizer revoke — [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md).
+7. **Before live merch checkout:** read `docs/MERCH_QR_LIFECYCLE_POLICY.md` (no calendar expiry on artifacts, hardening sequence, reprint/revoke macros).
 
 ---
 
