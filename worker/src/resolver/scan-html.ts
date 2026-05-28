@@ -1222,7 +1222,7 @@ function renderLiveControlSuccessPanel(provenAt: string, visible: boolean): stri
     </div>
   </div>
   <p class="live-control-success-copy">
-    The owner signed with their key. This does not prove legal identity or physical ownership.
+    Control proven moments ago. This does not prove legal identity, vouching, or ownership of the physical object.
   </p>
   <p class="live-control-proven-at" id="live-control-proven-at">${escapeHtml(provenLabel)}</p>
   <button type="button" class="live-control-cta-secondary" id="live-control-request-again">

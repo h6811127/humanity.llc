@@ -495,6 +495,29 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain('id="live-control-request"');
   });
 
+  it("states live control comprehension limits on the success panel (H-002)", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: summary(),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+    vm.liveControlProvenAt = new Date().toISOString();
+    vm.liveControlAvailable = true;
+    const html = await renderScanPage(vm, "https://humanity.llc");
+
+    expect(html).toContain("Control proven moments ago");
+    expect(html).toContain("does not prove legal identity");
+    expect(html).toContain("vouching");
+    expect(html).toContain("ownership of the physical object");
+    expect(html).not.toContain("Verified Human");
+  });
+
   it("does not render stale live proof as recently proven", async () => {
     const res = await handleGetScan(
       new Request(
