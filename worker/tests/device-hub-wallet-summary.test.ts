@@ -19,6 +19,11 @@ describe("device hub wallet summary hydration", () => {
     expect(src).toContain("fetchAndApplyNetworkChips();");
   });
 
+  it("does not shadow existing hubExpanded render variable", () => {
+    expect(src).toContain("function hubIsExpanded()");
+    expect(src).not.toContain("function hubExpanded()");
+  });
+
   it("keeps large expanded hubs on summary rows until an action hydrates one entry", () => {
     expect(src).toContain("return !isLargeWallet(summary.count, getStewardEntitlementsPolicy())");
     expect(src).toContain("walletEntryForActionButton");

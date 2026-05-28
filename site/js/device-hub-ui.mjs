@@ -162,14 +162,14 @@ function onWalletPage() {
   return document.body.classList.contains("page-wallet");
 }
 
-function hubExpanded() {
+function hubIsExpanded() {
   return onWalletPage() || isDeviceHubExpanded(document.getElementById("device-hub"));
 }
 
 function shouldRenderFullSavedRows(summary = loadWalletSummary()) {
   if (onWalletPage()) return true;
   if (searchInput?.value?.trim()) return true;
-  if (!hubExpanded()) return false;
+  if (!hubIsExpanded()) return false;
   return !isLargeWallet(summary.count, getStewardEntitlementsPolicy());
 }
 
@@ -1026,7 +1026,7 @@ function renderActivityRows() {
 function renderSavedRows(opts = {}) {
   const initialChipChecking = opts.initialChipChecking === true;
   const summary = loadWalletSummary();
-  const expandedRows = hubExpanded();
+  const expandedRows = hubIsExpanded();
   const fullRows = shouldRenderFullSavedRows(summary);
   const allEntries = fullRows ? loadWallet() : summary.rows;
   const previewRows = !fullRows && !expandedRows;
