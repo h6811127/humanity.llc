@@ -3,6 +3,7 @@ import {
   publicKeyFromPrivateKeyBase58,
   signRevocation,
 } from "./hc-sign.mjs";
+import { resolverErrorMessage } from "./resolver-user-error-core.mjs";
 
 const params = new URLSearchParams(location.search);
 const profileInput = document.getElementById("org-profile-id");
@@ -82,7 +83,14 @@ async function submitOrganizerRevoke(targetKind) {
     });
     const payload = await res.json().catch(() => ({}));
     if (!res.ok) {
-      throw new Error(payload.message || payload.error || `HTTP ${res.status}`);
+      const url = postRevokeUrl(profileId);
+      throw new Error(
+        resolverErrorMessage(payload, {
+          status: res.status,
+          requestUrl: url,
+          fallback: "Could not revoke on the network.",
+        })
+      );
     }
 
     const label =

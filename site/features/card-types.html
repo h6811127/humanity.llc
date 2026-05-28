@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Expanding card types · Features · humanity.llc</title>
+    <meta name="description" content="One primitive  -  many physical roles." />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=69" />
+  </head>
+  <body>
+    <div class="page feature-page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+      <main class="screen">
+        <section class="hero">
+          <p class="hero-eyebrow">Feature <span class="phase">3</span></p>
+          <h1>Expanding card types</h1>
+        </section>
+        <div class="feature">
+          <p class="feature-lead">One primitive  -  many physical roles.</p>
+          <p class="feature-sub"><span class="ship-badge ship-badge-partial">Partial</span> <a href="/create/?template=status_plate">status plate</a>, <a href="/create/?template=lost_item">lost-item relay</a>, and basic card live on create</p>
+        </div>
+        <section class="group feature-aspects">
+          <h2 class="group-label">About this feature</h2>
+          <div class="feature-aspect-stack"><details class="settings-disclosure settings-disclosure-info feature-aspect" open>
+  <summary class="settings-summary">
+    <span class="list-icon list-icon-tone-red" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></span>
+    <span class="settings-summary-text">
+      <span class="settings-summary-title">Why it matters</span>
+    </span>
+    <span class="list-chevron" aria-hidden="true">›</span>
+  </summary>
+  <div class="settings-panel settings-panel-info-body">
+    <p class="settings-panel-lead">The product is not “a membership card.” The same signed object model powers a studio door plate, a festival wristband, a keys sticker, and a mutual-aid flyer  -  each with different scan copy and credential scope.</p>
+  </div>
+</details>
+<details class="settings-disclosure settings-disclosure-info feature-aspect">
+  <summary class="settings-summary">
+    <span class="list-icon list-icon-tone-blue" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg></span>
+    <span class="settings-summary-text">
+      <span class="settings-summary-title">Design decisions</span>
+    </span>
+    <span class="list-chevron" aria-hidden="true">›</span>
+  </summary>
+  <div class="settings-panel settings-panel-info-body">
+    <p class="settings-panel-lead"><strong>Status plate (shipped pilot)</strong>  -  object name + live status line for doors and booths; homepage <strong>One use</strong> section + <a href="/studio/">Studio blog</a>. <strong>Lost item relay (shipped pilot)</strong>  -  item headline + return message on scan; create at <a href="/create/?template=lost_item">/create/</a>; showcase via <code>npm run site:seed-showcase-lost-item</code>. <strong>Basic card</strong>  -  handle + manifesto + verification summary. <strong>Print artifact</strong>  -  unique <code>qr_id</code> per unit via artifact intent.</p>
+  </div>
+</details>
+<details class="settings-disclosure settings-disclosure-info feature-aspect">
+  <summary class="settings-summary">
+    <span class="list-icon list-icon-tone-green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+    <span class="settings-summary-text">
+      <span class="settings-summary-title">Safety · privacy · security</span>
+    </span>
+    <span class="list-chevron" aria-hidden="true">›</span>
+  </summary>
+  <div class="settings-panel settings-panel-info-body">
+    <p class="settings-panel-lead">Relay patterns must not doxx owners. Per-item QR scope limits blast radius when one sticker is stolen. Template copy stays honest about what scan proves.</p>
+  </div>
+</details>
+<details class="settings-disclosure settings-disclosure-info feature-aspect">
+  <summary class="settings-summary">
+    <span class="list-icon list-icon-tone-orange" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span>
+    <span class="settings-summary-text">
+      <span class="settings-summary-title">Limits</span>
+    </span>
+    <span class="list-chevron" aria-hidden="true">›</span>
+  </summary>
+  <div class="settings-panel settings-panel-info-body">
+    <p class="settings-panel-lead">Storefront → Printify personalization path still in build. Relay has no separate contact-routing API beyond signed manifesto updates.</p>
+  </div>
+</details>
+<details class="settings-disclosure settings-disclosure-info feature-aspect">
+  <summary class="settings-summary">
+    <span class="list-icon list-icon-tone-purple" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M18 12h4"/><path d="m19.07 4.93-2.83 2.83"/></svg></span>
+    <span class="settings-summary-text">
+      <span class="settings-summary-title">Future directions</span>
+    </span>
+    <span class="list-chevron" aria-hidden="true">›</span>
+  </summary>
+  <div class="settings-panel settings-panel-info-body">
+    <p class="settings-panel-lead">Template library for organizers, commerce-backed unique QRs, city-game objects (<a href="/what-can-a-qr-do/physical-world-multiplayer/">research</a>).</p>
+  </div>
+</details></div>
+        </section>
+        <section class="group">
+  <div class="feature-nav">
+    <a href="/features/live-control.html"><span class="feature-nav-label">Previous</span><span class="feature-nav-title"><span class="phase">2</span> Live control</span></a>
+    <a href="/features/scan-ui.html"><span class="feature-nav-label">Next</span><span class="feature-nav-title"><span class="phase">4</span> Scan trust-state UI</span></a>
+  </div>
+</section>
+      </main>
+    </div>
+  </body>
+</html>

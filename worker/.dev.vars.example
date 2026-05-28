@@ -1,0 +1,4 @@
+# Copy to worker/.dev.vars for local worker:dev (gitignored).
+# Production: wrangler secret put OPERATOR_AUDIT_TOKEN --config worker/wrangler.toml
+
+OPERATOR_AUDIT_TOKEN=dev-only-change-me

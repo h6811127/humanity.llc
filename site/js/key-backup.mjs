@@ -1,13 +1,17 @@
 /**
- * Encrypted owner key backup (M5.5.1) — browser only, never uploaded by default.
+ * Encrypted owner key backup (M5.5.1)  -  browser only, never uploaded by default.
  * Crypto parity: worker/src/crypto/key-backup.ts (tests).
  * @see docs/M5_5_OWNER_KEY_PORTABILITY.md
  */
 import * as ed from "https://esm.sh/@noble/ed25519@2.3.0";
 import { decodeBase58, encodeBase58 } from "./hc-sign.mjs";
+import {
+  BACKUP_TYPE,
+  BACKUP_VERSION,
+  parseBackupFileText,
+} from "./key-backup-file-core.mjs";
 
-export const BACKUP_TYPE = "humanity_card_key_backup";
-export const BACKUP_VERSION = "1.0";
+export { BACKUP_TYPE, BACKUP_VERSION };
 export const MIN_PASSPHRASE_LENGTH = 12;
 export const PBKDF2_ITERATIONS = 310_000;
 
@@ -118,26 +122,11 @@ export async function createEncryptedBackup({
   };
 }
 
-function validateBackupShape(backup) {
-  if (!backup || typeof backup !== "object") {
-    throw new Error("Invalid backup file.");
-  }
-  if (backup.type !== BACKUP_TYPE) {
-    throw new Error("Not a Humanity Card key backup file.");
-  }
-  if (backup.version !== BACKUP_VERSION) {
-    throw new Error(`Unsupported backup version: ${backup.version}`);
-  }
-  if (!backup.profile_id || !backup.public_key || !backup.kdf || !backup.cipher) {
-    throw new Error("Backup file is missing required fields.");
-  }
-}
-
 /**
  * @returns {{ profileId: string, publicKeyBase58: string, privateKeyBase58: string }}
  */
 export async function decryptBackup(backup, passphrase) {
-  validateBackupShape(backup);
+  parseBackupFileText(JSON.stringify(backup));
   const pass = assertPassphrase(passphrase);
 
   const salt = b58ToBytes(backup.kdf.salt_b58);
@@ -198,13 +187,6 @@ export function downloadBackupFile(backup) {
 }
 
 export async function readBackupFile(file) {
-  const text = (await file.text()).replace(/^\uFEFF/, "").trim();
-  let parsed;
-  try {
-    parsed = JSON.parse(text);
-  } catch {
-    throw new Error("Backup file is not valid JSON.");
-  }
-  validateBackupShape(parsed);
-  return parsed;
+  const text = await file.text();
+  return parseBackupFileText(text);
 }

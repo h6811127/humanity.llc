@@ -1,9 +1,22 @@
+import type { QrScope } from "../db/types";
+
 /**
  * Pilot manifesto layouts (two lines, line 1 may carry a prefix):
  * - Status plate: "Studio door" + "Open until 9 PM"
- * - Lost item relay: "[relay] Keys" + "Lost — contact owner via relay"
+ * - Lost item relay: "[relay] Keys" + "Lost  -  contact owner via relay"
  */
 export const LOST_ITEM_RELAY_PREFIX = "[relay] ";
+
+/** Hero template for active scans (docs/M3_SCAN_PAGE_UI.md § Scan type heroes). */
+export type ScanHeroTemplate =
+  | "status_plate"
+  | "lost_item_relay"
+  | "live_object"
+  | "personal_card";
+
+/** Manifesto reads as an object message (sticker / labeled artifact), not a card tagline. */
+export const OBJECT_FORWARD_MANIFESTO_MIN_LEN = 56;
+export const OBJECT_FORWARD_SENTENCE_MIN_LEN = 28;
 
 export type ManifestoDisplay =
   | { kind: "general"; line: string | null }
@@ -30,6 +43,31 @@ export function parseManifestoDisplay(manifestoLine: string | null): ManifestoDi
     }
   }
   return { kind: "status_plate", objectLabel: first, statusLine: rest };
+}
+
+export function isObjectForwardManifesto(
+  qrScope: QrScope | null,
+  line: string | null
+): boolean {
+  if (qrScope === "print_artifact") return true;
+  const t = line?.trim();
+  if (!t) return false;
+  if (t.length >= OBJECT_FORWARD_MANIFESTO_MIN_LEN) return true;
+  return t.includes(".") && t.length >= OBJECT_FORWARD_SENTENCE_MIN_LEN;
+}
+
+export function scanHeroTemplate(
+  display: ManifestoDisplay,
+  qrScope: QrScope | null
+): ScanHeroTemplate {
+  if (display.kind === "status_plate") return "status_plate";
+  if (display.kind === "lost_item_relay") return "lost_item_relay";
+  if (display.kind === "general") {
+    return isObjectForwardManifesto(qrScope, display.line)
+      ? "live_object"
+      : "personal_card";
+  }
+  return "personal_card";
 }
 
 /** @deprecated use parseManifestoDisplay */

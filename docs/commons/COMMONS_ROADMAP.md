@@ -3,7 +3,7 @@
 **Status:** Strategic draft  
 **Purpose:** Define how Humanity Commons can grow from a v1 trust product into a democratic, worker-and-member-governed digital enterprise.
 
-**Trust layer architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — federated networks and open standards are the path to institutional gravity; a single permanent operator or public blockchain core is not the plan.
+**Trust layer architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  -  federated networks and open standards are the path to institutional gravity; a single permanent operator or public blockchain core is not the plan.
 
 ---
 
@@ -101,7 +101,7 @@ Humanity Commons can become a sustainable enterprise because it combines four du
 
 The market wedge is not "identity SaaS for everyone." The wedge is a trusted, member-owned membership and coordination layer for communities that already distrust extractive platforms.
 
-The first market proof should be narrow: one event, cooperative, club, or online community should use the card because it solves a concrete trust or membership problem—with **public card creation** and a path to a **second network operator**. The project should not present itself as venture-ready until a repeatable beachhead use case, buyer/funder, retention signal, and non-extractive growth loop exist.
+The first market proof should be narrow: one event, cooperative, club, or online community should use the card because it solves a concrete trust or membership problem - with **public card creation** and a path to a **second network operator**. The project should not present itself as venture-ready until a repeatable beachhead use case, buyer/funder, retention signal, and non-extractive growth loop exist.
 
 ---
 
@@ -765,7 +765,7 @@ People may understand the idea but not know where they would actually use it.
 
 The project may attract admiration but not repeated use or invitations.
 
-**Response:** Design around vouching, live control proof, public launch, and real-world scans. Measure stranger create rate, invitations, and repeated use—not just positive feedback.
+**Response:** Design around vouching, live control proof, public launch, and real-world scans. Measure stranger create rate, invitations, and repeated use - not just positive feedback.
 
 ---
 

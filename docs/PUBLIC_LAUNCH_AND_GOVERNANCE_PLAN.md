@@ -75,11 +75,11 @@ Most online identity systems ask people to trade privacy, platform dependence, o
 
 The first public launch should be built around a specific use context, not a generic "everyone needs identity" claim.
 
-**Launch posture:** **public card creation** when Phase A ships—no invite-only founding cohort as the product gate. See `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
+**Launch posture:** **public card creation** when Phase A ships - no invite-only founding cohort as the product gate. See `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
 
 Recommended beachhead:
 
-> Events and meetup-style communities first; cooperative/member organization pilots second—with a path for the org to run a **compatible network** for its members.
+> Events and meetup-style communities first; cooperative/member organization pilots second - with a path for the org to run a **compatible network** for its members.
 
 Why:
 
@@ -190,7 +190,7 @@ Members should eventually control or ratify:
 
 Governance should move from founder control to member/steward control when these triggers are met:
 
-1. The v1 trust loop works publicly: card, QR, vouching, revocation, export, and one physical artifact—with **open card creation** (not cohort-gated).
+1. The v1 trust loop works publicly: card, QR, vouching, revocation, export, and one physical artifact - with **open card creation** (not cohort-gated).
 2. At least 25 active cards from users outside the founder’s direct network (public launch metric).
 3. At least 10 completed vouch flows between distinct users (social trust is real, not founder-issued only).
 4. A published **second network operator** commitment or live second host running `hc/v1` (federation credibility).
@@ -632,7 +632,7 @@ Networks are **operators**, not neutral physics. The public plan MUST include:
 - What the reference operator stores (see `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` §5).
 - How legal requests are handled.
 - How a second operator joins without forking the trust grammar.
-- That **blockchain is not** the v1 legitimacy story—open standards and plural hosts are.
+- That **blockchain is not** the v1 legitimacy story - open standards and plural hosts are.
 
 ---
 

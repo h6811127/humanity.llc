@@ -38,7 +38,8 @@
 | A-012C | A narrow beachhead such as events, meetups, or cooperative/member organizations will make the trust loop easier to understand than a generic identity launch. | Product/Growth | Unverified, High product risk | Run interviews and at least one pilot with an event, cooperative, club, or online community; pursue second-network-operator conversation. | Do not expand storefront or governance machinery until a real use case is found. |
 | A-012D | Users will invite others because vouching/live proof creates value, not just because they like the mission. | Growth | Unverified, High product risk | Track public launch vouch requests, repeated scans, stranger create rate, and whether users can name a real use case. | Reposition around a sharper job-to-be-done or pause growth work. |
 | A-012E | A minimal reference network plus published spec can grow institutional power without a public blockchain core. | Strategy/Engineering | Medium | Ship Phase A; document second-network-operator path; avoid positioning as crypto identity. | Reframe around federation or accept chain-based tradeoffs explicitly. |
-| A-012F | Public launch without cohort gate will not cause unmanageable abuse before rate limits and suspension policy exist. | Security/Ops | Unverified, Medium risk | Monitor create rate, impersonation reports, and support load first 30 days. | Temporary stricter rate limits—not permanent invite-only product gate. |
+| A-012F | Public launch without cohort gate will not cause unmanageable abuse before rate limits and suspension policy exist. | Security/Ops | Unverified, Medium risk | Monitor create rate (`/.well-known/hc/v1/operator/create-rate-monitor`), impersonation reports, and support load first 30 days. | Temporary stricter rate limits - not permanent invite-only product gate. |
+| A-012G | Buyers expect founding **physical** sticker QRs **not** to calendar-expire; they accept **revoked / replaced** scan pages when status changes. | Product | Unverified, Medium risk | Comprehension test (≥5): “Will this sticker stop working in a year?” + policy gates in [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md). Fulfillment must mint `print_artifact` with `expires_at: null`. | Do not ship Printify SKUs until policy implemented; fix scan copy if users confuse expiry with revoke. |
 
 ---
 
@@ -47,6 +48,16 @@
 | ID | Assumption | Owner | Confidence | Validation Method | If False |
 |---|---|---|---|---|---|
 | A-013 | Story-row storefront will be easier to understand than a conventional grid for approximately 50 products. | Product/Design | Unverified | Needs prototype test. Recommendation: story rows remain primary, but include a simple "all artifacts" fallback if users cannot find products. | Need secondary navigation or reduced catalog. |
+
+### Vouch trust (see `docs/VOUCH_THREAT_MODEL.md`)
+
+| ID | Assumption | Owner | Confidence | Validation Method | If False |
+|---|---|---|---|---|---|
+| VT-01 | Operators triage `listVouchAuditFlags` within days of launch traffic. | Ops/Steward | Unverified | Runbook + weekly review during founding cohort. | Cliques persist; lower trust in VH label. |
+| VT-02 | Users and integrators understand **Vouched Human ≠ legal ID / KYC**. | Product | Unverified | Comprehension test + support macros. | Revise labels; tighten integrator docs. |
+| VT-03 | 4-person mutual-vouch cliques are rare at early scale. | Security | Unverified | Monitor flags + creation velocity. | Add clique detection or raise threshold experiment. |
+| VT-04 | Steward keys are few, guarded, and not shared across people. | Ops | Medium | Steward onboarding checklist. | Per-steward caps; faster suspend on burst. |
+| VT-05 | Integrators adopt recency + possession policies when gating on VH. | Ecosystem | Unverified | Publish policy snippet; pilot one partner. | Misuse causes harm; public FAQ on integrator misuse. |
 | A-014 | Approximately 50 products is operationally manageable while launching identity and fulfillment systems. | Ops/Product | Low | Recommendation: 50 may exist as planned product records, but launch should expose 10-20 products and only 1-2 personalized product types. | Cut catalog drastically for launch. |
 | A-015 | Founding badges add legitimacy rather than creating status anxiety or governance politics. | Product/Governance | Low | Recommendation: allow `founding_human` and `early_builder` only as non-verification badges with public issuance rules. | Defer founding badges or make them non-verification badges. |
 | A-016 | Manual production approval is operationally sustainable for early orders. | Ops | Medium | Recommendation: keep manual approval until order volume exceeds operator capacity; build automated QA gates first. | Need stronger automated proof gates before launch. |
@@ -78,6 +89,7 @@
 5. **Bearer confusion:** if scanners treat possession of a sticker as proof of identity, the trust model fails socially.
 6. **Live control confusion:** if users treat live control proof as legal identity or human uniqueness, a trust upgrade becomes another overclaim.
 7. **No urgent use case:** if users admire the idea but cannot name where they would use it, the product becomes a manifesto instead of a tool.
+8. **Vouch graph gaming:** if 4-cliques or steward farms outpace operator triage, **Vouched Human** degrades quickly (`docs/VOUCH_THREAT_MODEL.md` **R-02**, **R-03**).
 8. **Weak growth loop:** if users do not invite others to vouch, scan, or pilot the card in a community, the network will not bootstrap.
 9. **Operational support:** if on-hold, failed, duplicate, and refunded orders lack clear internal states, launch will become support-driven chaos.
 
@@ -150,7 +162,7 @@ Conclusion: Shopify is still the correct default. Native checkout should remain 
 | Question | Recommended Answer For V1 | Rationale |
 |---|---|---|
 | What exact product is first: sticker, flat card, or both? | Start with both one sticker and one flat card **if** Printify sample QA passes; otherwise launch only the strongest-scanning sticker. | Stickers prove real-world QR spread; flat cards prove the "membership/passport" metaphor. Do not start with apparel. |
-| Who can create a card at launch, and who is allowed to vouch? | **Public launch:** anyone when Phase A is stable. Vouching per `V1_DECISION_LOCK` (3 vouch threshold, quotas, 90-day wait). Optional 10–25 early testers for ops/copy—not a protocol gate. | Federation strategy requires open create; abuse handled by rate limits, not permanent invite-only product. |
+| Who can create a card at launch, and who is allowed to vouch? | **Public launch:** anyone when Phase A is stable. Vouching per `V1_DECISION_LOCK` (3 vouch threshold, quotas, 90-day wait). Optional 10–25 early testers for ops/copy - not a protocol gate. | Federation strategy requires open create; abuse handled by rate limits, not permanent invite-only product. |
 | What exact words can the product use without overclaiming "verified human"? | Use `Registered`, `Vouched Human`, `Steward`, `Revoked`, and `Suspended` in early UI. Reserve `Verified Human` for docs/protocol or after copy testing. | "Vouched Human" is more honest for an early social-trust system. |
 | Who holds bootstrap governance keys before there is real governance? | Use 3-of-5 bootstrap signer keys held by named founder/operator/security roles, with public key fingerprints and a sunset rule after governance launch. | Suspension, badge issuance, and template approval need authority before formal governance exists. |
 | What is the public revenue/margin policy for store purchases? | Publish a simple policy: price covers production, shipping/tax where applicable, platform/payment fees, support/reprint reserve, and a transparent Humanity Commons operating margin. | Trust product plus merch revenue needs plain-language transparency. |

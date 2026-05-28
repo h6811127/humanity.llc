@@ -1,9 +1,11 @@
-# Phase A — Harden the stranger path (post-M5 priorities)
+# Phase A  -  Harden the stranger path (post-M5 priorities)
 
 **Status:** Active product direction  
 **Purpose:** Record what to build **after** the generic create → scan → revoke loop is proven, without expanding the design-space catalog faster than real deployments.
 
-**Prerequisite:** `docs/M5_STRANGER_TEST_RUNBOOK.md` — three strangers complete the loop unassisted.
+**Prerequisite:** `docs/M5_STRANGER_TEST_RUNBOOK.md`  -  three strangers complete the loop unassisted (**passed 2026-05-27**).
+
+**Primary GTM after M5:** **Merch funnel Tier 1** (scan wear → create → `/shop/customize/` → unique QR on Printify product) — [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) · [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md). Status plate / lost-item / organizer pilots below are **optional vertical hardening**, not the main launch wedge.
 
 **Canonical loop (unchanged):** Create card → print QR → scan live status → revoke → re-scan revoked state. See `docs/M3_M4_EXECUTION_PLAN.md`.
 
@@ -11,7 +13,7 @@
 
 ## Operating rule
 
-**One vertical, end-to-end, on real objects** — not more hub pages.
+**One vertical, end-to-end, on real objects**  -  not more hub pages.
 
 The site’s **What can a QR do?** walkthroughs (`site/what-can-a-qr-do/`) are **research and narrative**. They do not replace a single template strangers can print and use tomorrow on a door, sticker, or card.
 
@@ -21,6 +23,9 @@ Defer until a vertical pilot succeeds:
 - Gamified restore logic (e.g. “3 scans to un-revoke”) on the resolver
 - NFC / mesh / Humanity node hardware
 - Full maintenance CMMS or marketplace features
+- **Full L3 orchestration** beyond opt-in explain (city-scale agents, cross-object AI) — see [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md)
+
+**Parallel (shipped):** L3 P1 opt-in scan explainer on signed `public_snapshot` — does not block Phase A pilots; strangers must tap to request.
 
 ---
 
@@ -28,13 +33,16 @@ Defer until a vertical pilot succeeds:
 
 | Priority | Vertical | Why |
 |----------|----------|-----|
-| **1** | **Status plate** (“open / closed / until …”) | Matches the landing demo (studio door, hours, run ends). Easiest story for strangers: one object, one question, one scan. |
+| **0 (GTM)** | **Tier 1 merch funnel** (live wear → customize → order) | Post-M5 primary wedge; walking ad with **unique** QR per garment. [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) |
+| **1** | **Status plate** (“open / closed / until …”) | Optional field pilot. Matches landing demo; not required before merch launch. |
 | **2** | **Lost-item relay** | Emotional and clear: return contact **without** printing a phone number; revoke when recovered or abused. Site research: `site/what-can-a-qr-do/lost-item-relay/`. |
-| **3** | **Organizer-signed revoke** | Unlocks civic flyers, vendor placards, market passes — anything where a **trusted issuer** must update or kill a printed QR. Requires signed updates/revokes, not open crowd vouch. Site research: `site/what-can-a-qr-do/civic-protest-infrastructure/`, `site/what-can-a-qr-do/local-economies/`. |
+| **3** | **Organizer-signed revoke** | Unlocks civic flyers, vendor placards, market passes  -  anything where a **trusted issuer** must update or kill a printed QR. Requires signed updates/revokes, not open crowd vouch. Site research: `site/what-can-a-qr-do/civic-protest-infrastructure/`, `site/what-can-a-qr-do/local-economies/`. |
 
-Pick **one** for the first real-world pilot (5–10 printed QRs, watch where people stall: print, recovery key, finding revoke).
+Pick **one** optional vertical for field hardening (5–10 printed QRs). **Do not** block Tier 1 merch launch on status plate pilot success.
 
-**Current build focus:** Organizer-signed revoke — see `docs/ORGANIZER_SIGNED_REVOKE_PILOT.md`. Verticals #1–2: `docs/STATUS_PLATE_PILOT.md`, `docs/LOST_ITEM_RELAY_PILOT.md`.
+**Current build focus:** **Manifesto / status line updates**  -  `docs/MANIFESTO_STATUS_UPDATE.md` (same QR, live public copy). Enables status plate (#1) and lost-item relay (#2) without reprinting.
+
+Organizer revoke shipped: `docs/ORGANIZER_SIGNED_REVOKE_PILOT.md`.
 
 ---
 
@@ -44,11 +52,11 @@ These tighten Phase A for the chosen vertical without a new “product tab”:
 
 | Area | Direction |
 |------|-----------|
-| **Create / scan copy** | Name the **object** (“Studio door”, “Keys tag”) on scan UI where helpful; keep “what this does not prove” visible. |
-| **Scan page** | Active vs revoked must read in &lt;30s for non-technical scanners (`docs/M3_SCAN_PAGE_UI.md`). |
-| **`/created/`** | Recovery gate stays; consider tucking **More options** until after first successful revoke in-session (`docs/M4_CREATED_REVOKE_UI.md`). |
+| **Create / scan copy** | Name the **object** (“Studio door”, “Keys tag”) on scan UI where helpful; keep “what this does not prove” visible. **Shipped:** scanner safety chips (`Object · …` / `Item · …`) on `/c/…` per `docs/SCANNER_EXPERIENCE.md` Phase B. |
+| **Scan page** | Active vs revoked in &lt;30s; **Live check** hero (manifesto/plate as H1, one status, one limit) per [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) and [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) UI refresh phases. |
+| **`/created/`** | Recovery gate stays; **Update status** unlocks after first in-session revoke (`created-first-revoke-gate.mjs`). |
 | **Print path** | Download QR PNG + phone print steps on `/created/` (shipped); validate strangers actually print before testing revoke in the wild. |
-| **Landing** | Physical software objects framing + demo revoke animation are **marketing only** — not resolver behavior. |
+| **Landing** | Physical software objects framing + demo revoke animation are **marketing only**  -  not resolver behavior. |
 
 ---
 
@@ -77,6 +85,7 @@ Keep positioning layered; do not collapse into a single slogan:
 
 | Doc | Use |
 |-----|-----|
+| `docs/PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md` | Positioning synthesis + messaging matrix |
 | `docs/STATUS_PLATE_PILOT.md` | Vertical #1 pilot |
 | `docs/LOST_ITEM_RELAY_PILOT.md` | Vertical #2 pilot |
 | `docs/ORGANIZER_SIGNED_REVOKE_PILOT.md` | Vertical #3 pilot (current) |

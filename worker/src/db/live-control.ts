@@ -67,6 +67,48 @@ export async function getLiveControlChallenge(
   return row ?? null;
 }
 
+export async function getRecentLiveControlProof(
+  db: D1Database,
+  profileId: string,
+  qrId: string,
+  provenAfterIso: string
+): Promise<LiveControlChallengeRow | null> {
+  const row = await db
+    .prepare(
+      `SELECT challenge_id, profile_id, qr_id, nonce, verifier_session_id, status,
+              issued_at, expires_at, proven_at, signer_public_key,
+              response_document_json, created_at, updated_at
+       FROM live_control_challenges
+       WHERE profile_id = ? AND qr_id = ? AND status = 'proven' AND proven_at > ?
+       ORDER BY proven_at DESC
+       LIMIT 1`
+    )
+    .bind(profileId, qrId, provenAfterIso)
+    .first<LiveControlChallengeRow>();
+  return row ?? null;
+}
+
+export async function getLatestPendingLiveControlChallenge(
+  db: D1Database,
+  profileId: string,
+  qrId: string,
+  nowIso: string
+): Promise<LiveControlChallengeRow | null> {
+  const row = await db
+    .prepare(
+      `SELECT challenge_id, profile_id, qr_id, nonce, verifier_session_id, status,
+              issued_at, expires_at, proven_at, signer_public_key,
+              response_document_json, created_at, updated_at
+       FROM live_control_challenges
+       WHERE profile_id = ? AND qr_id = ? AND status = 'pending' AND expires_at > ?
+       ORDER BY issued_at DESC
+       LIMIT 1`
+    )
+    .bind(profileId, qrId, nowIso)
+    .first<LiveControlChallengeRow>();
+  return row ?? null;
+}
+
 export async function markLiveControlExpired(
   db: D1Database,
   challengeId: string,

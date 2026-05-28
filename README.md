@@ -6,13 +6,13 @@
 object or ID  →  scan (HTTPS QR)  →  live signed state
 ```
 
-**humanity.llc** is the reference operator and product surface for that primitive. **Humanity Commons** is the open protocol and democratic-infrastructure project around it: portable trust you can inspect, revoke, and export—without surveillance platforms, legal-ID pipelines, or one company owning “who counts.”
+**humanity.llc** is the reference operator and product surface for that primitive. **Humanity Commons** is the open protocol and democratic-infrastructure project around it: portable trust you can inspect, revoke, and export - without surveillance platforms, legal-ID pipelines, or one company owning “who counts.”
 
 You can aim to be **the link company** in that specific sense: not short redirects or link-in-bio, but **resolver-backed links whose meaning can change** (membership, trust, access, public claims, object status). Commons Pass (community membership, events, check-in, stamps) and federation sit on the same grammar once the scan loop is proven. See `docs/DEMOCRATIC_INFRASTRUCTURE.md` and `docs/V1_0_ARCHITECTURE_ROADMAP.md`.
 
-Physical **merch** is distribution (curiosity → create), not the product definition. See `docs/MERCH_LED_V1.md`.
+Physical **merch** is distribution (curiosity → create), not the product definition. **Post-M5 focus:** Tier 1 personalized wear ([`docs/MERCH_FUNNEL_MVP.md`](docs/MERCH_FUNNEL_MVP.md)). Commerce stack: [`docs/MERCH_HEADLESS_COMMERCE.md`](docs/MERCH_HEADLESS_COMMERCE.md).
 
-**Architecture:** open standards and **federated resolvers**—not a platform empire, not an invite-only gate, not blockchain identity. See `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
+**Architecture:** open standards and **federated resolvers** - not a platform empire, not an invite-only gate, not blockchain identity. See `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
 
 ---
 
@@ -20,8 +20,8 @@ Physical **merch** is distribution (curiosity → create), not the product defin
 
 | Layer | What it is | Status |
 |-------|------------|--------|
-| **Live QR primitive** | QR/NFC URL → resolver → honest current status + limits copy | **Live** (create, scan, revoke in-session); **M5.5** key export/recovery next |
-| **Humanity Card** | Signed public identity document (`profile_id`, handle, manifesto, keys on device) | Phase A MVP |
+| **Live QR primitive** | QR/NFC URL → resolver → honest current status + limits copy | **Live** (create, scan, revoke, manifesto update); **M5.5** key export/recovery |
+| **Humanity Card** | Signed public identity document (`profile_id`, handle, manifesto, keys on device) | **Shipped** (Phase A complete) |
 | **Vouches & live control** | Social trust and optional in-person key proof | After MVP core |
 | **Per-object / item QRs** | Revoke one sticker without killing the card | Phase B–C |
 | **Commons Pass** | Org membership, events, check-in on same API | Phase D |
@@ -37,7 +37,7 @@ A profile link is static. This stack is built for **current truth at scan time**
 
 - Signed public card data (inspectable, not “trust me bro”).
 - **Per-QR and per-card revocation** (stolen sticker, lost item, compromised key).
-- **Vouches** as accountable social trust—not follower counts or hidden scores.
+- **Vouches** as accountable social trust - not follower counts or hidden scores.
 - **Live control proof** when a static QR is not enough (recent key control, in person).
 - Clear **what the scan does not prove** (no legal ID, no “holder owns this object” from QR alone).
 
@@ -66,7 +66,7 @@ Cryptography here means **signatures and published rules**, not coins.
 
 **Commons Pass (Phase D, on top of the card):**
 
-> Run a community with mobile web passes, event check-in, and signed stamps—without ads, scan analytics, or platform lock-in.
+> Run a community with mobile web passes, event check-in, and signed stamps - without ads, scan analytics, or platform lock-in.
 
 V1 earns trust by being **honest about limits**:
 
@@ -82,7 +82,7 @@ See `docs/V1_PRODUCT_TRUST_MODEL.md`.
 
 ## V1 scope (summary)
 
-**Phase A MVP** (build first):
+**Phase A MVP** (shipped — M5 passed 2026-05-27):
 
 1. Signed Humanity Card creation (browser-held keys).
 2. HTTPS QR resolution with **live** status.
@@ -125,7 +125,7 @@ Avoid legal identity, KYC, age verification, bot-proof, or guaranteed-unique hum
 ## Architecture direction
 
 - Browser/device generates and holds Humanity Card **private keys**.
-- **Reference resolver** (`humanity.llc`) stores public card, QR, status, vouch, and revocation data under a published **data-minimization policy**—no scan analytics by default.
+- **Reference resolver** (`humanity.llc`) stores public card, QR, status, vouch, and revocation data under a published **data-minimization policy** - no scan analytics by default.
 - **Protocol is portable:** `docs/Technical Standards v1.0.md`; other operators implement the same API (federation).
 - Commerce (when live) stays in Shopify/Printify; **never** upgrades trust status from a purchase.
 - Trust core is **signed documents + resolver state**, not a public blockchain.
@@ -142,25 +142,27 @@ Signed card → HTTPS QR → trust-state UI → artifact intent → per-item QR 
 
 **Direction and skeptics:**
 
-- `docs/DEMOCRATIC_INFRASTRUCTURE.md` — **canonical direction** (infrastructure vs empire; why scan matters)
-- `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — federation, public launch, privacy boundaries
-- `docs/SKEPTIC_FAQ.md` — objections (QR profile, blockchain, honeypot, etc.)
+- `docs/DEMOCRATIC_INFRASTRUCTURE.md`  -  **canonical direction** (infrastructure vs empire; why scan matters)
+- `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  -  federation, public launch, privacy boundaries
+- `docs/SKEPTIC_FAQ.md`  -  objections (QR profile, blockchain, honeypot, etc.)
 
 **Implementation (build step by step):**
 
-- `docs/V1_0_ARCHITECTURE_ROADMAP.md` — **canonical build sequence** (M0–M10)
+- `docs/V1_0_ARCHITECTURE_ROADMAP.md`  -  **canonical build sequence** (M0–M10)
 
 **V1 wedge and copy:**
 
-- `docs/MERCH_LED_V1.md` — curiosity + belonging, phases
+- `docs/MERCH_LED_V1.md`  -  curiosity + belonging, phases
+- `docs/MERCH_HEADLESS_COMMERCE.md`  -  **Shopify + Printify + headless storefront** (operator wiring)
+- `docs/MERCH_FUNNEL_MVP.md`  -  scan → customize → checkout funnel
 - `docs/FOUNDING_DROP_BRIEF.md`, `docs/LAUNCH_LANGUAGE_KIT.md`
 
 **Trust and use cases:**
 
 - `docs/V1_PRODUCT_TRUST_MODEL.md`
-- `docs/REVOKE_AND_LIFECYCLE_V1.md` — **Revoke QR vs Disable card**, scan privacy, lifecycle roadmap
-- `docs/PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md` — city-scale play with privacy and authority boundaries
-- `docs/V1_USE_CASES.md` — primitive + phased examples (not all in v1 code)
+- `docs/REVOKE_AND_LIFECYCLE_V1.md`  -  **Revoke QR vs Disable card**, scan privacy, lifecycle roadmap
+- `docs/PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md`  -  city-scale play with privacy and authority boundaries
+- `docs/V1_USE_CASES.md`  -  primitive + phased examples (not all in v1 code)
 - `docs/V1_MARKET_AND_GROWTH_STRATEGY.md`
 - `docs/features/Humanity Card v1.0.md`
 - `docs/features/Human Verification v1.0.md`
@@ -193,7 +195,7 @@ Signed card → HTTPS QR → trust-state UI → artifact intent → per-item QR 
 
 - `docs/PUBLIC_LAUNCH_AND_GOVERNANCE_PLAN.md`
 - `docs/MOVEMENT_NARRATIVE.md`
-- `docs/FOUNDING_COHORT_PLAYBOOK.md` — optional early testers (non-gating)
+- `docs/FOUNDING_COHORT_PLAYBOOK.md`  -  optional early testers (non-gating)
 - `docs/VISUAL_IDENTITY_PRINCIPLES.md`
 - `docs/🧠 Organizing Documents/📜 Constitution.md`
 - `docs/Technical Standards v1.0.md`
@@ -218,7 +220,7 @@ Signed card → HTTPS QR → trust-state UI → artifact intent → per-item QR 
 npm run deploy
 ```
 
-**Resolver (Worker)** — required for `/c/…` scan pages (not Pages):
+**Resolver (Worker)**  -  required for `/c/…` scan pages (not Pages):
 
 ```bash
 npm run worker:dev          # local :8787
@@ -228,7 +230,7 @@ npm run worker:test
 ```
 
 After deploy, scan responses include `X-HC-Scan-UI: pass-v4` and HTML with `pass-scene` (flippable card).  
-Scan UI contract: `docs/M3_SCAN_PAGE_UI.md` (card QR = same payload as `/created/`).  
+Scanner experience: `docs/SCANNER_EXPERIENCE.md` · Scan UI implementation: `docs/M3_SCAN_PAGE_UI.md` (card QR = same payload as `/created/`).  
 Pages-only deploy updates landing/create headers; **scan UI will not change until the Worker deploys.**
 
 Health: `GET /.well-known/hc/v1/health` · Create: `POST /.well-known/hc/v1/cards` · Public scan: `GET /c/{profile_id}?q={qr_id}`.
@@ -241,13 +243,13 @@ Health: `GET /.well-known/hc/v1/health` · Create: `POST /.well-known/hc/v1/card
 |-----------|--------|
 | M1 Foundation | Health, D1 schema, signature harness |
 | M2 Create card | API + `/create/` + `/created/` |
-| **M3 Scan** | Pass-card UI at `/c/…` (deploy Worker to ship) |
-| M4 Revoke | After scan |
-| M5 Stranger-tested launch | After revoke |
+| M3 Scan | Pass-card UI at `/c/…` |
+| M4 Revoke | Owner revoke + item-scoped QR |
+| **M5 Stranger-tested launch** | **Passed** (2026-05-27) — three strangers completed create → scan → revoke unassisted |
 
-**MVP** = Phase A through roadmap step **5.3** (honest create → scan → revoke). Commons Pass and federation are **not** required for that gate.
+**Phase A MVP is complete.** Commons Pass and federation are **not** required for that gate.
 
-**After M5:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` — one vertical on real objects (status plate, lost-item relay, organizer-signed revoke), not more design-space pages.
+**Current focus:** `docs/MERCH_FUNNEL_MVP.md` — **merch-led MVP**: custom LIVE OBJECT QR on wearables (`/shop/customize/`), ephemeral state updates from `/created/`, Shopify → Printify fulfillment. Status plate / lost-item pilots are optional field tests, not the GTM wedge (`docs/MERCH_LED_V1.md`).
 
 ---
 
@@ -255,6 +257,6 @@ Health: `GET /.well-known/hc/v1/health` · Create: `POST /.well-known/hc/v1/card
 
 Make the strongest **honest** claim:
 
-> Scan this link and see **current** signed status—revocable, inspectable, with clear limits on what it does not prove.
+> Scan this link and see **current** signed status - revocable, inspectable, with clear limits on what it does not prove.
 
-Market proof is strangers using the loop without hand-holding, then a **second operator** on the same spec—not a laundry list of every QR idea on the homepage.
+Market proof is strangers using the loop without hand-holding, then a **second operator** on the same spec - not a laundry list of every QR idea on the homepage.

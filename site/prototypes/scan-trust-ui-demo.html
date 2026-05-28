@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex" />
+    <title>Scan trust UI prototype (Path 2)</title>
+    <link rel="stylesheet" href="/scan-pass.css" />
+    <link rel="stylesheet" href="/prototypes/scan-trust-ui-demo.css" />
+  </head>
+  <body>
+    <div class="page trust-demo-page">
+      <header class="trust-demo-chrome">
+        <a
+          id="trust-demo-dot-btn"
+          class="scan-page-dot"
+          href="/"
+          aria-label="humanity.llc home"
+        >
+          <span id="trust-demo-dot" class="pass-dot" aria-hidden="true"></span>
+        </a>
+        <p class="trust-demo-phase-label" id="trust-demo-phase-label">T+checking</p>
+      </header>
+
+      <article
+        class="scan-hero scan-status-panel scan-safety-header"
+        id="trust-demo-hero"
+        aria-label="Live check"
+      >
+        <header class="scan-hero-head">
+          <p class="scan-hero-host scan-hero-wordmark" translate="no">humanity.llc</p>
+        </header>
+        <div class="scan-hero-body">
+          <p class="scan-hero-eyebrow">Scan result</p>
+          <h1 class="scan-hero-title">Demo live object</h1>
+          <p class="trust-demo-status-line is-checking" id="trust-demo-status-line">
+            Checking live status…
+          </p>
+          <ul class="scan-hero-trust" aria-label="What this scan shows">
+            <li class="trust-demo-trust-row trust-on" hidden>Card status: active</li>
+            <li class="trust-demo-trust-row trust-on" hidden>This QR: valid</li>
+            <li class="trust-demo-trust-row" hidden>Checked just now</li>
+          </ul>
+        </div>
+        <p class="scan-hero-limit trust-demo-limits" id="trust-demo-limits" role="note">
+          <strong>What this scan does not prove</strong><br />
+          Holding this QR does not prove you own the object.
+        </p>
+      </article>
+
+      <section
+        class="trust-demo-actor-band"
+        id="trust-demo-actor-band"
+        aria-label="Your device on this scan"
+      >
+        <h2>Keys on this device</h2>
+        <p>You can vouch or open your cards from here.</p>
+        <div class="trust-demo-actor-actions">
+          <button type="button" class="primary">Go to vouch</button>
+          <a class="secondary" href="/wallet/">My cards</a>
+        </div>
+      </section>
+    </div>
+
+    <aside class="trust-demo-dev" aria-label="Prototype controls">
+      <h2>Path 2 prototype</h2>
+      <p>
+        Functional demo for <code>docs/SCAN_PAGE_TRUST_UI.md</code> (not production scan HTML).
+      </p>
+      <div class="trust-demo-dev-row" role="group" aria-label="Timeline">
+        <button type="button" class="trust-demo-dev-btn" data-trust-phase="idle">T+0</button>
+        <button type="button" class="trust-demo-dev-btn" data-trust-phase="checking" aria-pressed="true">
+          Checking
+        </button>
+        <button type="button" class="trust-demo-dev-btn" data-trust-phase="resolved">Resolved</button>
+        <button type="button" class="trust-demo-dev-btn" data-trust-phase="after">After</button>
+        <button type="button" class="trust-demo-dev-btn" id="trust-demo-auto">▶ Auto</button>
+      </div>
+      <div class="trust-demo-dev-row" role="group" aria-label="Corner dot mode">
+        <button type="button" class="trust-demo-dev-btn" data-trust-dot="static" aria-pressed="true">
+          Dot static
+        </button>
+        <button type="button" class="trust-demo-dev-btn" data-trust-dot="sync">Dot sync</button>
+        <button type="button" class="trust-demo-dev-btn" data-trust-dot="breathe">Dot breathe</button>
+        <button type="button" class="trust-demo-dev-btn trust-demo-dev-btn--bad" data-trust-dot="loop">
+          Dot loop (bad)
+        </button>
+      </div>
+      <div class="trust-demo-dev-row">
+        <label class="trust-demo-dev-check">
+          <input type="checkbox" id="trust-demo-operator-toggle" />
+          Operator band (L3)
+        </label>
+        <label class="trust-demo-dev-check">
+          <input type="checkbox" id="trust-demo-reduced-toggle" />
+          Force reduced motion
+        </label>
+      </div>
+      <div class="trust-demo-dev-test">
+        <strong>Hallway presets</strong>
+        <div class="trust-demo-dev-row">
+          <button type="button" class="trust-demo-dev-btn" id="trust-demo-test-a">Test A (still)</button>
+          <button type="button" class="trust-demo-dev-btn" id="trust-demo-test-b-static">Test B · hero</button>
+          <button type="button" class="trust-demo-dev-btn" id="trust-demo-test-b-loop">Test B · loop</button>
+        </div>
+        <ol>
+          <li><strong>Test A:</strong> “What is the red dot about?” (expect site/logo)</li>
+          <li><strong>Test B:</strong> compare hero-only vs looping dot — which shows scan result?</li>
+          <li><strong>Test C:</strong> after 30s — what does this prove / not prove?</li>
+        </ol>
+      </div>
+    </aside>
+
+    <script type="module" src="/prototypes/scan-trust-ui-demo.mjs"></script>
+  </body>
+</html>

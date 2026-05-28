@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { encodeBase58 } from "../src/crypto/base58";
 import { getTestKeypair } from "../src/crypto/ed25519";
 
-// Browser module — tested in Node via Web Crypto (Node 20+).
+// Browser module  -  tested in Node via Web Crypto (Node 20+).
 import {
   BACKUP_VERSION,
   createEncryptedBackup,

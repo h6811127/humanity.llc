@@ -14,6 +14,7 @@ import { errorResponse, jsonResponse } from "../http/resolver";
 import { QR_ID_REGEX } from "./scan-state";
 import type { RevocationTargetKind } from "../db/types";
 import { REVOCATION_TARGET_KINDS } from "../db/types";
+import { parseRevocationDisplayFields } from "./revocation-display";
 
 const OWNER_REASONS = new Set(["owner_revoked"]);
 const ORGANIZER_REASONS = new Set(["organizer_revoked"]);
@@ -186,6 +187,11 @@ export async function handlePostRevoke(
   const nonce = unsigned.nonce as string;
   const revokedAt = unsigned.revoked_at as string;
 
+  const displayParsed = parseRevocationDisplayFields(unsigned);
+  if (!displayParsed.ok) {
+    return errorResponse("MALFORMED_REQUEST", displayParsed.message, 422);
+  }
+
   try {
     await applyRevocation(db, {
       profileId,
@@ -196,6 +202,8 @@ export async function handlePostRevoke(
       revocationId: nonce,
       signedDocumentJson: JSON.stringify(doc),
       issuerPublicKey: verify.signature.public_key,
+      displayMode: displayParsed.meta.display_mode,
+      publicReason: displayParsed.meta.public_reason,
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
@@ -212,6 +220,8 @@ export async function handlePostRevoke(
       target_qr_id: targetQrId,
       status: "revoked",
       revoked_at: revokedAt,
+      display_mode: displayParsed.meta.display_mode,
+      public_reason: displayParsed.meta.public_reason,
     },
     200,
     { "Cache-Control": "no-store" }

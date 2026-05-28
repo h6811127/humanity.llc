@@ -4,14 +4,21 @@
 import * as ed from "https://esm.sh/@noble/ed25519@2.3.0";
 import { base58 } from "https://esm.sh/@scure/base@1.2.6";
 import canonicalize from "https://esm.sh/canonicalize@2.1.0";
+import { buildOfficialScanUrl } from "./qr-scan-url-lock.mjs";
 
 const PROTOCOL_VERSION = "1.0";
 const SIGNATURE_ALG = "Ed25519";
 const CANONICALIZATION = "JCS";
 const PAYLOAD_TYPE_REVOCATION = "revocation";
 const PAYLOAD_TYPE_LIVE_CONTROL_RESPONSE = "live_control_response";
+const PAYLOAD_TYPE_VOUCH = "vouch";
+const PAYLOAD_TYPE_VOUCH_REVOCATION = "vouch_revocation";
 
-/** Level 0 bearer copy (V1_PRODUCT_TRUST_MODEL.md) — keep in sync with worker trust-copy.ts */
+/** Default public vouch statement (M6 copy kit  -  max 280 chars). */
+export const DEFAULT_VOUCH_STATEMENT =
+  "I know this person as a distinct human. This vouch is public, revocable, and not legal identity proof.";
+
+/** Level 0 bearer copy (V1_PRODUCT_TRUST_MODEL.md)  -  keep in sync with worker trust-copy.ts */
 export const BEARER_WARNING =
   "This QR resolves to a Humanity Card. It does not prove the person holding this item is the card owner.";
 const BASE58 =
@@ -57,6 +64,16 @@ export function generateRevocationNonce() {
   return `nonce_${randomBase58(16)}`;
 }
 
+/** Vouch nonce  -  replay protection on POST. */
+export function generateVouchNonce() {
+  return `nonce_${randomBase58(16)}`;
+}
+
+/** Vouch document id (`vouch_` + base58). */
+export function generateVouchId() {
+  return `vouch_${randomBase58(16)}`;
+}
+
 export function encodePrivateKeyBase58(privateKey) {
   return encodeBase58(privateKey);
 }
@@ -100,6 +117,17 @@ export function withProtocolFields(payload, type) {
   return { ...payload, type, version: PROTOCOL_VERSION };
 }
 
+const PRODUCTION_RESOLVER_ORIGIN = "https://humanity.llc";
+
+function isLocalDevHost(hostname) {
+  return hostname === "localhost" || hostname === "127.0.0.1";
+}
+
+/** Cloudflare Pages preview URLs serve static files only  -  API lives on humanity.llc. */
+function isPagesPreviewHost(hostname) {
+  return hostname.endsWith(".pages.dev");
+}
+
 /**
  * Resolver origin only (no path). Avoids ?api=https://humanity.llc/create
  * which would POST to /create/.well-known/... and Pages returns 405.
@@ -110,26 +138,32 @@ export function resolverApiOrigin() {
   if (apiParam) {
     try {
       const parsed = new URL(apiParam, location.href);
-      if (
-        parsed.hostname === "127.0.0.1" ||
-        parsed.hostname === "localhost"
-      ) {
+      if (isLocalDevHost(parsed.hostname)) {
+        return parsed.origin;
+      }
+      if (parsed.hostname === "humanity.llc") {
         return parsed.origin;
       }
     } catch {
-      /* ignore bad api= on production */
+      /* ignore bad api= */
     }
   }
-  if (
-    location.hostname === "localhost" ||
-    location.hostname === "127.0.0.1"
-  ) {
-    return "http://127.0.0.1:8787";
+
+  const { hostname, protocol } = location;
+  if (isLocalDevHost(hostname)) {
+    // Match page hostname (localhost vs 127.0.0.1) so browser private-network checks pass.
+    return `${protocol}//${hostname}:8787`;
+  }
+  if (hostname === "humanity.llc") {
+    return location.origin;
+  }
+  if (isPagesPreviewHost(hostname)) {
+    return PRODUCTION_RESOLVER_ORIGIN;
   }
   return location.origin;
 }
 
-/** @deprecated use resolverApiOrigin — kept for existing imports */
+/** @deprecated use resolverApiOrigin  -  kept for existing imports */
 export function resolverApiBase() {
   return resolverApiOrigin();
 }
@@ -145,11 +179,41 @@ export function postRevokeUrl(profileId) {
   ).href;
 }
 
+export function postCardUpdateUrl(profileId) {
+  return new URL(
+    `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/update`,
+    resolverApiOrigin()
+  ).href;
+}
+
+export function postQrRotateUrl(profileId) {
+  return new URL(
+    `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/qr`,
+    resolverApiOrigin()
+  ).href;
+}
+
+export function postQrExtendUrl(profileId) {
+  return new URL(
+    `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/qr/extend`,
+    resolverApiOrigin()
+  ).href;
+}
+
 export function postLiveControlResponseUrl(profileId) {
   return new URL(
     `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/live-control/responses`,
     resolverApiOrigin()
   ).href;
+}
+
+export function getPendingLiveControlChallengeUrl(profileId, qrId) {
+  const url = new URL(
+    `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/live-control/challenges`,
+    resolverApiOrigin()
+  );
+  url.searchParams.set("qr_id", qrId);
+  return url.href;
 }
 
 export function getCardStatusUrl(profileId, qrId = null) {
@@ -168,8 +232,26 @@ export function getCardJsonUrl(profileId) {
   ).href;
 }
 
+export function postVouchUrl() {
+  return new URL("/.well-known/hc/v1/verification/vouches", resolverApiOrigin()).href;
+}
+
+export function getVouchUrl(vouchId) {
+  return new URL(
+    `/.well-known/hc/v1/verification/vouches/${encodeURIComponent(vouchId)}`,
+    resolverApiOrigin()
+  ).href;
+}
+
+export function postVouchRevokeUrl(vouchId) {
+  return new URL(
+    `/.well-known/hc/v1/verification/vouches/${encodeURIComponent(vouchId)}/revoke`,
+    resolverApiOrigin()
+  ).href;
+}
+
 export function qrScanUrl(profileId, qrId, origin = "https://humanity.llc") {
-  return `${origin}/c/${profileId}?q=${qrId}`;
+  return buildOfficialScanUrl(profileId, qrId, origin);
 }
 
 /** @param {string} issuedAt ISO timestamp @param {number} days valid from issue */
@@ -194,6 +276,8 @@ export async function signRevocation({
   privateKeyBase58,
   publicKeyBase58,
   reason = "owner_revoked",
+  displayMode = "minimal",
+  publicReason = null,
 }) {
   const privateKey = decodePrivateKeyBase58(privateKeyBase58);
   const revokedAt = new Date().toISOString();
@@ -204,6 +288,12 @@ export async function signRevocation({
     revoked_at: revokedAt,
     nonce: generateRevocationNonce(),
   };
+  if (displayMode && displayMode !== "minimal") {
+    payload.display_mode = displayMode;
+  }
+  if (publicReason) {
+    payload.public_reason = publicReason;
+  }
   if (targetKind === "qr_credential") {
     if (!targetQrId) throw new Error("target_qr_id required for QR revocation.");
     payload.target_qr_id = targetQrId;
@@ -231,5 +321,57 @@ export async function signLiveControlResponse({
     signed_at: new Date().toISOString(),
   };
   const unsigned = withProtocolFields(payload, PAYLOAD_TYPE_LIVE_CONTROL_RESPONSE);
+  return signDocument(unsigned, privateKey, publicKeyBase58);
+}
+
+/**
+ * Voucher-signed public vouch (POST /v1/verification/vouches).
+ * @param {{ voucherProfileId: string, voucheeProfileId: string, privateKeyBase58: string, publicKeyBase58: string, statement?: string, method?: string }} opts
+ */
+export async function signVouch({
+  voucherProfileId,
+  voucheeProfileId,
+  privateKeyBase58,
+  publicKeyBase58,
+  statement = DEFAULT_VOUCH_STATEMENT,
+  method = "in_person",
+}) {
+  const privateKey = decodePrivateKeyBase58(privateKeyBase58);
+  const createdAt = new Date().toISOString();
+  const payload = {
+    vouch_id: generateVouchId(),
+    voucher_profile_id: voucherProfileId,
+    vouchee_profile_id: voucheeProfileId,
+    nonce: generateVouchNonce(),
+    statement: statement.trim(),
+    method,
+    created_at: createdAt,
+    revoked: false,
+  };
+  const unsigned = withProtocolFields(payload, PAYLOAD_TYPE_VOUCH);
+  return signDocument(unsigned, privateKey, publicKeyBase58);
+}
+
+/**
+ * Voucher-signed vouch revocation (POST /v1/verification/vouches/{vouch_id}/revoke).
+ * @param {{ vouchId: string, voucherProfileId: string, voucheeProfileId: string, privateKeyBase58: string, publicKeyBase58: string }} opts
+ */
+export async function signVouchRevocation({
+  vouchId,
+  voucherProfileId,
+  voucheeProfileId,
+  privateKeyBase58,
+  publicKeyBase58,
+}) {
+  const privateKey = decodePrivateKeyBase58(privateKeyBase58);
+  const payload = {
+    vouch_id: vouchId,
+    voucher_profile_id: voucherProfileId,
+    vouchee_profile_id: voucheeProfileId,
+    nonce: generateRevocationNonce(),
+    revoked_at: new Date().toISOString(),
+    reason: "voucher_revoked",
+  };
+  const unsigned = withProtocolFields(payload, PAYLOAD_TYPE_VOUCH_REVOCATION);
   return signDocument(unsigned, privateKey, publicKeyBase58);
 }

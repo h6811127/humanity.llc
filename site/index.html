@@ -9,234 +9,368 @@
     <title>humanity.llc</title>
     <meta
       name="description"
-      content="Physical objects with programmable social state. Scan a tag or card for live active or revoked status. Optional, revocable, no scan tracking."
+      content="Public programmable objects. Live, revocable status on physical tags — browser-native. No scan tracking."
     />
     <meta name="theme-color" content="#ffffff" />
-    <meta name="color-scheme" content="light" />
+    <meta name="color-scheme" content="light dark" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=45" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/pwa-apple-touch.png" />
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem("hc_theme") === "dark") {
+            document.documentElement.dataset.theme = "dark";
+            document.documentElement.style.colorScheme = "dark";
+          }
+        } catch (e) {
+          /* ignore */
+        }
+      })();
+    </script>
+    <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=4" />
+    <link rel="stylesheet" href="/styles.css?v=128" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=59" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=29" />
     <meta property="og:title" content="humanity.llc" />
     <meta
       property="og:description"
-      content="Live public objects. Not identity, not social media. Scan and see current state."
+      content="Public programmable objects. Live, revocable status on physical tags — browser-native. No scan tracking."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://humanity.llc" />
     <meta property="og:image" content="https://humanity.llc/assets/red_qr_transparent_bg.png" />
   </head>
-  <body>
+  <body class="has-shell-chrome has-device-hub-search">
     <div class="page">
-      <header class="top">
-        <a class="top-brand" href="/">
-          <span class="pass-dot" aria-hidden="true"></span>
-          <span>humanity.llc</span>
-        </a>
-        <a class="top-create" href="/create/">Create</a>
-      </header>
+      <div class="top-chrome top-chrome--float" id="top-chrome">
+        <div class="top-chrome-bar top-chrome-bar--minimal" id="top-status">
+          <div class="shell-status-cluster">
+            <button
+              type="button"
+              class="shell-status-dot-btn"
+              id="brand-status-dot-btn"
+              aria-label="Device and system status"
+              aria-expanded="false"
+              aria-haspopup="dialog"
+              aria-controls="device-hub-glance-popover device-hub"
+            >
+              <span class="pass-dot shell-status-dot" id="brand-status-dot"></span>
+            </button>
+            <div
+              class="brand-status-popover device-hub-glance-popover"
+              id="device-hub-glance-popover"
+              role="dialog"
+              aria-label="My cards and notices on this device"
+              hidden
+            >
+              <ul class="device-hub-glance-list" id="device-hub-glance-list"></ul>
+              <a
+                class="device-hub-glance-help brand-status-sheet-link"
+                href="mailto:info@humanity.llc"
+              >
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                </span>
+                <span class="device-hub-glance-help-text">info@humanity.llc</span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </div>
+            <button
+              type="button"
+              class="shell-notif-badge"
+              id="shell-notif-badge"
+              hidden
+              aria-label="Notifications"
+            >
+              <span class="shell-notif-badge-ring" aria-hidden="true"></span>
+              <span class="shell-notif-badge-count" id="shell-notif-badge-count">0</span>
+            </button>
+          </div>
+          <p class="shell-status-line" id="shell-status-line" role="status" hidden></p>
+        </div>
+      </div>
 
-      <main class="screen screen-landing">
-        <section class="hero hero-tight">
-          <p class="hero-eyebrow">Try it</p>
-          <h1>Live state<br />on real objects.</h1>
-          <p class="hero-tagline">Print a QR once. Change its live state later.</p>
-          <p class="hero-line">
-            Not a bio link. A sticker, wristband, or card that resolves to
-            <strong>current</strong> state: active, expired, revoked, or disabled.
-          </p>
-          <p class="hero-line hero-line-sub">
-            Normal QR codes are permanent. Humanity live objects can be updated, revoked, or
-            limited after they&rsquo;re printed — no invite, no app, keys stay in your browser.
-          </p>
-        </section>
+      <p
+        class="device-system-banner"
+        id="device-system-banner"
+        role="status"
+        hidden
+      ></p>
 
-        <section class="pass" id="card" aria-label="Network status preview">
-          <p class="section-kicker">What someone sees when they scan</p>
-          <div class="pass-scene" id="pass-scene">
-            <div class="pass-tilt-wrap" id="pass-tilt-wrap">
-              <div class="pass-flip" id="pass-flip">
-                <div class="pass-inner">
-                  <div class="pass-face pass-front">
-                    <div class="pass-tilt-surface" id="pass-tilt-surface">
-                      <div class="pass-state pass-state-live" id="pass-demo-live">
-                        <div class="pass-head">
-                          <div class="pass-brand">
-                            <span class="pass-dot" aria-hidden="true"></span>
-                            <span>humanity.llc</span>
-                          </div>
-                          <span class="pass-badge badge-live" id="pass-demo-badge">Active</span>
-                        </div>
-                        <div class="pass-body">
-                          <div class="pass-main">
-                            <p class="pass-type">Live object</p>
-                            <p class="pass-name">river.example</p>
-                            <p class="pass-manifesto">Open studio · Thu–Sun</p>
-                            <ul class="pass-trust" aria-label="Status at a glance">
-                              <li class="trust-on">Card active</li>
-                              <li class="trust-on">Registered</li>
-                              <li class="trust-on">QR active</li>
-                            </ul>
-                          </div>
-                          <div class="pass-qr" id="pass-demo-qr">
-                            <img
-                              src="/assets/red_qr_transparent_bg.png"
-                              width="96"
-                              height="96"
-                              alt=""
-                            />
-                          </div>
-                        </div>
-                        <p class="pass-foot">
-                          Scan shows live state. Holding the object does not prove ownership.
-                        </p>
-                      </div>
-                      <div
-                        class="pass-state pass-state-revoked"
-                        id="pass-demo-revoked"
-                        hidden
-                        aria-hidden="true"
-                      >
-                        <div class="pass-head">
-                          <div class="pass-brand">
-                            <span class="pass-dot pass-dot-muted" aria-hidden="true"></span>
-                            <span>humanity.llc</span>
-                          </div>
-                          <span class="pass-badge badge-warn">Revoked</span>
-                        </div>
-                        <div class="pass-body">
-                          <div class="pass-main">
-                            <p class="pass-type">Network status</p>
-                            <p class="pass-revoke-headline">Revoked</p>
-                            <p class="pass-revoke-message">
-                              Until <strong>3 more scans</strong> are achieved.
-                            </p>
-                            <div class="pass-scan-meter" aria-hidden="true">
-                              <span class="pass-scan-meter-label">Scans toward restore</span>
-                              <div class="pass-scan-meter-track">
-                                <span class="pass-scan-meter-fill" id="pass-demo-meter"></span>
-                              </div>
-                              <span class="pass-scan-meter-count" id="pass-demo-meter-count"
-                                >0 / 3</span
-                              >
-                            </div>
-                          </div>
-                          <div class="pass-qr pass-qr-revoked">
-                            <img
-                              src="/assets/red_qr_transparent_bg.png"
-                              width="96"
-                              height="96"
-                              alt=""
-                            />
-                          </div>
-                        </div>
-                        <p class="pass-foot pass-foot-demo">
-                          Demo only — playful copy, not live product behavior.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="pass-face pass-back" aria-hidden="true">
-                    <div class="pass-back-accent" aria-hidden="true"></div>
-                    <div class="pass-back-inner">
-                      <div class="pass-head">
-                        <div class="pass-brand">
-                          <span class="pass-dot" aria-hidden="true"></span>
-                          <span>Limits</span>
-                        </div>
-                        <span class="pass-badge">Optional</span>
-                      </div>
-                      <ul class="pass-back-grid" aria-label="Privacy posture">
-                        <li>
-                          <span class="pass-back-label">You choose</span>
-                          <span class="pass-back-value">what to put on objects</span>
-                        </li>
-                        <li>
-                          <span class="pass-back-label">Revocable</span>
-                          <span class="pass-back-value">per object, per item QR</span>
-                        </li>
-                        <li>
-                          <span class="pass-back-label">No default</span>
-                          <span class="pass-back-value">scan analytics or legal ID</span>
-                        </li>
-                      </ul>
-                      <p class="pass-foot">
-                        <a href="/data-policy.html">Operator data policy</a>
-                      </p>
-                    </div>
+      <div
+        class="device-cross-tab-banner"
+        id="device-cross-tab-banner"
+        role="status"
+        hidden
+      ></div>
+
+      <div
+        class="device-pwa-install-card"
+        id="device-pwa-install-card"
+        role="status"
+        hidden
+      ></div>
+
+      <section
+        class="device-hub device-hub-top device-hub--sheet device-hub-collapsed"
+        id="device-hub"
+        aria-labelledby="device-hub-title"
+        aria-hidden="true"
+        inert
+      >
+        <div class="device-hub-body" id="device-hub-body">
+          <button type="button" class="device-hub-sheet-close" aria-label="Close">×</button>
+          <div class="device-hub-sheet-handle" aria-hidden="true"></div>
+          <div class="device-hub-alerts-top" id="device-hub-alerts-top">
+            <div class="device-hub-group" id="device-hub-crosstab-notice" hidden role="status"></div>
+            <div class="device-hub-group" id="device-hub-notice-group" hidden></div>
+            <div
+              class="device-hub-group device-hub-alert-card"
+              id="device-hub-live-control-group"
+              hidden
+              data-hub-group="liveproof"
+              role="status"
+            >
+              <div class="hc-emphasis-card hc-emphasis-card--urgent device-hub-live-control-card">
+                <div class="hc-emphasis-card__main">
+                  <span class="hc-emphasis-card__dot hc-emphasis-card__dot--urgent" aria-hidden="true"></span>
+                  <div class="hc-emphasis-card__copy">
+                    <p class="hc-emphasis-card__eyebrow" id="device-hub-live-control-eyebrow">Live proof waiting</p>
+                    <p class="hc-emphasis-card__detail" id="device-hub-live-control-summary" hidden></p>
                   </div>
                 </div>
+                <ul class="list list-compact device-hub-live-control-list" id="device-hub-live-control-list"></ul>
               </div>
             </div>
-            <div class="pass-scene-actions">
-              <button
-                type="button"
-                class="pass-flip-btn"
-                id="pass-flip-btn"
-                aria-label="Flip card"
-              >
-                Tap to flip
-              </button>
-              <button
-                type="button"
-                class="pass-demo-revoke-btn"
-                id="pass-demo-revoke-btn"
-                aria-pressed="false"
-              >
-                Revoke (demo)
-              </button>
+            <div
+              class="device-hub-group device-hub-alert-card"
+              id="device-hub-card-disabled-group"
+              hidden
+              data-hub-group="card-disabled"
+              role="status"
+            >
+              <div class="hc-emphasis-card hc-emphasis-card--warn device-hub-card-disabled-card">
+                <div class="hc-emphasis-card__main">
+                  <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
+                  <div class="hc-emphasis-card__copy">
+                    <p class="hc-emphasis-card__eyebrow" id="device-hub-card-disabled-eyebrow">Disabled since your last visit</p>
+                    <p class="hc-emphasis-card__detail" id="device-hub-card-disabled-summary" hidden></p>
+                  </div>
+                </div>
+                <ul class="list list-compact device-hub-card-disabled-list" id="device-hub-card-disabled-list"></ul>
+              </div>
             </div>
           </div>
-        </section>
-
-        <section class="landing-framing" aria-labelledby="framing-title">
-          <p class="section-kicker">The idea</p>
-          <h2 class="landing-framing-title" id="framing-title">Physical software objects</h2>
-          <p class="landing-framing-lead">
-            Stickers, clothing, signs, and cards are not just printed media. Each QR is a
-            <strong>deployed software endpoint</strong> in the world — status, permissions, and
-            revocation can change after the ink dries.
-          </p>
-          <ul class="landing-framing-list">
-            <li>Printing is deployment, not a dead link</li>
-            <li>Scan interacts with live state, not a frozen file</li>
-            <li>One primitive powers benches, wearables, markets, and flyers</li>
-          </ul>
-          <div class="landing-framing-actions">
-            <a
-              class="btn-secondary landing-framing-cta"
-              href="/what-can-a-qr-do/physical-software-objects/"
-              >Read the full framing</a
-            >
-            <a class="landing-framing-tab" href="/what-can-a-qr-do.html">
-              <span class="list-icon list-icon-tone-gold" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
-              </span>
-              <span class="landing-framing-tab-text">
-                <span class="landing-framing-tab-title">What else can a QR do?</span>
-                <span class="landing-framing-tab-sub">More ideas on live physical objects</span>
-              </span>
-              <span class="list-chevron" aria-hidden="true">›</span>
+          <div class="device-hub-status-head">
+            <a href="/" class="device-hub-home-btn" aria-label="Home">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             </a>
+            <div
+              class="device-hub-status-panel"
+              id="device-hub-status-panel"
+              aria-label="System status"
+            ></div>
           </div>
-        </section>
 
-        <section class="example-flow" aria-label="Concrete example">
-          <h2 class="group-label">One use</h2>
-          <p class="group-intro short">
-            A status plate on a studio door. Someone scans for tonight’s hours, whether
-            the door is open, or when the run ends. The network answers. Not a dead link.
+          <h2 class="device-hub-title" id="device-hub-title">Saved in this browser</h2>
+          <section
+            class="device-hub-section device-hub-keys-custody-section"
+            id="device-hub-keys-custody"
+            aria-labelledby="device-hub-keys-custody-title"
+            hidden
+          ></section>
+          <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint">
+            Nothing saved yet? After create, tap <strong>Save control key</strong> on your
+            <a href="/created/">card page</a>. Until then, keys exist only in that tab.
           </p>
 
-          <div class="flow-strip">
+          <div class="device-hub-search-block" id="device-hub-search-block" role="search">
+            <label class="device-hub-search device-hub-search--inline" for="device-hub-search">
+              <span class="device-hub-search-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              </span>
+              <input
+                type="search"
+                id="device-hub-search"
+                class="device-hub-search-input"
+                placeholder="Search saved cards, pins, shortcuts"
+                autocomplete="off"
+                enterkeyhint="search"
+              />
+            </label>
+            <p class="device-hub-search-status" id="device-hub-search-status" hidden role="status"></p>
+          </div>
+
+          <section
+            class="device-hub-section"
+            id="device-hub-saved-items-section"
+            aria-labelledby="device-hub-saved-items-title"
+          >
+            <div class="device-hub-section-header">
+              <h3 class="device-hub-section-title" id="device-hub-saved-items-title">Saved items</h3>
+              <a class="device-hub-create-btn" href="/create/" aria-label="Create a live card">
+                <span class="device-hub-create-glyph" aria-hidden="true">+</span>
+                <span class="device-hub-create-label">New</span>
+              </a>
+            </div>
+            <p class="device-hub-section-lead">
+              Cards, pins, and shortcuts on this device. Does not track who scans your QR.
+            </p>
+
+          <div
+            class="device-hub-group device-hub-group--empty"
+            id="device-hub-saved-group"
+            data-hub-group="saved"
+          >
+            <ul class="hub-card-list" id="device-hub-wallet-list" hidden></ul>
+            <p class="device-hub-section-empty" id="device-hub-saved-empty">
+              Cards you save on this device will show here.
+            </p>
+          </div>
+
+          <div
+            class="device-hub-group device-hub-group--empty"
+            id="device-hub-pins-group"
+            data-hub-group="pins"
+          >
+            <p class="device-hub-subgroup-label">Pinned scans</p>
+            <ul class="list list-compact" id="device-hub-pins-list" hidden></ul>
+            <p class="device-hub-section-empty" id="device-hub-pins-empty">
+              Your pinned scans will show here.
+            </p>
+          </div>
+
+          <div class="device-hub-group" id="device-hub-shortcuts-group" data-hub-group="shortcuts">
+            <p class="device-hub-subgroup-label">Shortcuts</p>
+            <ul class="list list-compact">
+              <li class="list-row list-action" data-hub-searchable="shortcuts settings dark mode notifications">
+                <a href="#landing-device-settings">
+                  <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                  </span>
+                  <span class="list-content">
+                    <span class="list-title">Settings &amp; shortcuts</span>
+                    <span class="list-sub">Theme, auto-save, notifications</span>
+                  </span>
+                  <span class="list-chevron" aria-hidden="true">›</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="device-hub-group" data-hub-group="import">
+            <p class="device-hub-subgroup-label">Backup</p>
+            <details
+              class="device-hub-import device-hub-import-block"
+              data-hub-searchable="import backup file keys"
+            >
+              <summary class="device-hub-import-summary">
+                <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Import backup file</span>
+                  <span class="list-sub">Move keys to this device</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <form class="device-hub-import-form" id="hub-import-form">
+                <p class="form-hint">
+                  Encrypted .hcbackup.json from your card page  -  never uploaded.
+                </p>
+                <input type="file" accept=".json,application/json" required />
+                <label class="form-label" for="hub-import-passphrase">Passphrase</label>
+                <input
+                  type="password"
+                  id="hub-import-passphrase"
+                  name="passphrase"
+                  class="form-input"
+                  autocomplete="off"
+                  required
+                />
+                <button type="submit" class="btn-secondary device-hub-import-btn">
+                  Import to this device
+                </button>
+                <p class="form-status" id="hub-import-status" hidden role="status"></p>
+              </form>
+            </details>
+          </div>
+          </section>
+
+          <section
+            class="device-hub-section device-hub-section--secondary"
+            id="device-hub-actions-section"
+            aria-labelledby="device-hub-actions-title"
+          >
+            <h3 class="device-hub-section-title" id="device-hub-actions-title">Recent device actions</h3>
+            <p class="device-hub-section-lead">
+              Things this browser did - saved keys, signed live proof, loaded keys.
+            </p>
+            <div
+              class="device-hub-group device-hub-group--empty device-hub-activity-group"
+              id="device-hub-activity-group"
+              data-hub-group="activity"
+            >
+              <ul class="device-hub-action-list" id="device-hub-activity-list" hidden></ul>
+              <p class="device-hub-section-empty device-hub-section-empty--muted" id="device-hub-activity-empty">
+                Nothing logged yet on this browser.
+              </p>
+            </div>
+          </section>
+
+          <div class="device-hub-status-key" id="device-hub-status-key" aria-label="Status dot reference"></div>
+        </div>
+      </section>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-tight" data-landing-tutorial>
+          <h1>
+            <span class="hero-headline-kicker">Public programmable objects</span>
+            Live state<br />on real objects.
+          </h1>
+          <p class="hero-tagline">
+            Print once. Scanners see whether it’s <strong>Active</strong>, <strong>Revoked</strong>, or <strong>Limited</strong>.
+            Keys stay in your browser.
+          </p>
+          <div class="landing-hero-actions" aria-label="Get started">
+            <a class="hc-emphasis-card__cta landing-hero-btn-primary" href="/create/"
+              >Create a live object</a
+            >
+            <div class="landing-hero-sub-links" aria-label="More options">
+              <a class="landing-hero-sub-link" href="/shop/">Shop</a>
+              <a class="landing-hero-sub-link landing-hero-sub-link--muted" href="/case-study/"
+                >See the full loop</a
+              >
+            </div>
+          </div>
+          <ul class="landing-trust-chips" aria-label="Trust at a glance">
+            <li class="landing-trust-chip">No account</li>
+            <li class="landing-trust-chip">Keys in your browser</li>
+            <li class="landing-trust-chip">No scan tracking</li>
+          </ul>
+        </section>
+
+        <section
+          class="landing-how-it-works"
+          aria-labelledby="landing-how-it-works-title"
+          data-landing-tutorial
+        >
+          <h2 class="landing-how-it-works-title" id="landing-how-it-works-title">How it works</h2>
+          <p class="landing-how-it-works-lead">
+            Print once. Any camera can read <strong>current</strong> signed status - no app required.
+          </p>
+          <div class="flow-strip flow-strip--model">
             <div class="flow-step">
-              <div class="flow-object" aria-hidden="true">
+              <div class="flow-object">
                 <div class="flow-door">
                   <span class="flow-plaque">
                     <img src="/assets/red_qr_transparent_bg.png" width="28" height="28" alt="" />
                   </span>
                 </div>
               </div>
-              <p class="flow-label">Object</p>
-              <p class="flow-caption">Plate, tag, wristband</p>
+              <p class="flow-label">Print</p>
+              <p class="flow-caption">Plate, tag, sticker</p>
             </div>
 
             <div class="flow-arrow" aria-hidden="true">→</div>
@@ -255,61 +389,416 @@
             <div class="flow-step">
               <div class="flow-object flow-state" aria-hidden="true">
                 <span class="flow-state-dot live"></span>
-                <span class="flow-state-text">Open</span>
+                <span class="flow-state-text">Active</span>
               </div>
-              <p class="flow-label">Live state</p>
-              <p class="flow-caption">Or closed, revoked</p>
+              <p class="flow-label">Verify</p>
+              <p class="flow-caption">Active, revoked, or limited</p>
             </div>
           </div>
+          <p class="landing-how-it-works-note">
+            The printed URL stays the same. You change what scanners see when status changes.
+          </p>
+        </section>
+
+        <section
+          class="hc-emphasis-card hc-emphasis-card--info landing-framing landing-framing--compact"
+          aria-labelledby="framing-title"
+          data-landing-tutorial
+        >
+          <div class="hc-emphasis-card__main">
+            <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
+            <div class="hc-emphasis-card__copy">
+              <p class="hc-emphasis-card__eyebrow">Physical objects</p>
+              <h2 class="hc-emphasis-card__title landing-framing-title" id="framing-title">
+                Physical software objects
+              </h2>
+              <p class="hc-emphasis-card__detail landing-framing-lead">
+                Each QR is a live endpoint — status and revocation can change after print.
+                <a href="/what-can-a-qr-do/physical-software-objects/">Read more</a>
+              </p>
+            </div>
+          </div>
+          <div class="hc-emphasis-card__actions landing-framing-more-actions">
+            <a
+              class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary landing-framing-more-link"
+              href="/what-can-a-qr-do.html"
+            >
+              <span class="list-icon list-icon-tone-gold" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+              </span>
+              <span class="landing-framing-more-text">
+                <span class="landing-framing-more-title">What else can a QR do?</span>
+                <span class="landing-framing-more-sub">More ideas on live physical objects</span>
+              </span>
+              <span class="landing-framing-more-chevron" aria-hidden="true">›</span>
+            </a>
+          </div>
+        </section>
+
+        <section
+          class="example-flow studio-one-use"
+          aria-labelledby="one-use-title"
+          data-landing-tutorial
+        >
+          <p class="section-kicker">Studio</p>
+          <h2 class="group-label" id="one-use-title">One use · status plate</h2>
+          <p class="group-intro short">
+            Our first deployed object is a <strong>studio door plate</strong>: a QR that answers
+            with live hours, open/closed, and “done for the night,” updatable without reprinting.
+            The same primitive works on shops, booths, and rehearsal rooms.
+          </p>
+
+          <details class="landing-disclosure-card studio-use-cases-disclosure">
+            <summary class="landing-disclosure-card-summary">
+              <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+              </span>
+              <span class="landing-disclosure-card-text">
+                <span class="landing-disclosure-card-title">Example uses on a door plate</span>
+                <span class="landing-disclosure-card-sub">Door scan, run state, hours, revoke visibility</span>
+              </span>
+              <span class="list-chevron" aria-hidden="true">›</span>
+            </summary>
+            <div class="landing-disclosure-card-body">
+            <ul class="list list-compact studio-use-cases-list">
+            <li class="list-row studio-use-case-row">
+              <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Door scan</span>
+                <span class="list-sub">“Open Thu–Sun · back at 7” before someone pulls the handle</span>
+              </span>
+            </li>
+            <li class="list-row studio-use-case-row">
+              <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="M12 18v4"/><circle cx="12" cy="12" r="4"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Run state</span>
+                <span class="list-sub">Flip to closed or done for the night from your card page</span>
+              </span>
+            </li>
+            <li class="list-row studio-use-case-row">
+              <span class="list-icon list-icon-tone-gold" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Special hours</span>
+                <span class="list-sub">One signed line for open studio, critique night, or a holiday</span>
+              </span>
+            </li>
+            <li class="list-row studio-use-case-row">
+              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Guest wayfinding</span>
+                <span class="list-sub">Object name and status when the studio shares a building entrance</span>
+              </span>
+            </li>
+            <li class="list-row studio-use-case-row">
+              <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">After revoke</span>
+                <span class="list-sub">Plate still resolves; scanners see revoked, not a dead 404</span>
+              </span>
+            </li>
+            </ul>
+            </div>
+          </details>
 
           <p class="example-note">
-            Tomorrow the same plate can read <em>closed</em>. No reprint required.
+            Tomorrow the same plate can read <em>revoked</em> or <em>limited</em>. No reprint required.
           </p>
+
+          <ul class="list list-compact studio-one-use-actions">
+            <li class="list-row list-action" id="one-use-live-scan-row" hidden>
+              <a id="one-use-live-scan-link" href="#">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Try a status plate scan</span>
+                  <span class="list-sub" id="one-use-live-scan-sub">Public status plate on the network</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action" id="one-use-live-object-scan-row" hidden>
+              <a id="one-use-live-object-scan-link" href="#">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Try a live object scan</span>
+                  <span class="list-sub" id="one-use-live-object-scan-sub">Public live object on the network</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action" id="one-use-lost-item-scan-row" hidden>
+              <a id="one-use-lost-item-scan-link" href="#">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Try a lost item relay scan</span>
+                  <span class="list-sub" id="one-use-lost-item-scan-sub">Public return relay on the network</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/create/?template=status_plate">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Create your status plate</span>
+                  <span class="list-sub">Object name + live status line · print QR</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/studio/">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Studio blog</span>
+                  <span class="list-sub">Cards on building this site &amp; the door plate</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
         </section>
 
-        <section class="object-model" aria-label="How it works">
-          <h2 class="group-label">The model</h2>
+        <section
+          class="landing-device-settings"
+          id="landing-device-settings"
+          aria-labelledby="landing-device-settings-title"
+        >
+          <h2 class="landing-device-settings-title" id="landing-device-settings-title">
+            Shortcuts &amp; settings
+          </h2>
+          <ul class="landing-device-settings-list">
+            <li class="list-row list-action" data-hub-searchable="dark mode appearance theme">
+              <button
+                type="button"
+                class="device-theme-toggle"
+                data-device-theme-toggle
+                id="device-theme-toggle"
+                aria-pressed="false"
+              >
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Appearance</span>
+                  <span class="list-sub">Light · OLED black available</span>
+                </span>
+                <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
+              </button>
+            </li>
+            <li class="list-row list-action" data-hub-searchable="browser notifications alerts">
+              <button
+                type="button"
+                data-device-browser-notif-toggle
+                aria-pressed="false"
+              >
+                <span class="list-icon list-icon-tone-gold" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Browser alerts</span>
+                  <span class="list-sub">Live proof waiting · off</span>
+                </span>
+                <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
+              </button>
+            </li>
+            <li
+              class="list-row list-action"
+              data-hub-searchable="share network checks tabs resolver sync"
+            >
+              <button type="button" id="device-resolver-sync-toggle" aria-pressed="true">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Share network checks</span>
+                  <span class="list-sub">On · other tabs use the same last check</span>
+                </span>
+                <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
+              </button>
+            </li>
+            <li
+              class="list-row list-action"
+              data-hub-searchable="refresh all tabs network live proof check"
+            >
+              <button type="button" id="device-resolver-refresh-all-tabs">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Refresh all tabs</span>
+                  <span class="list-sub">One check, then share with open tabs</span>
+                </span>
+                <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
+              </button>
+            </li>
+            <li class="list-row list-action" data-hub-searchable="saved cards keys store vouch">
+              <a href="/wallet/">
+                <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">My cards</span>
+                  <span class="list-sub">Saved on this device</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action" data-hub-searchable="revoke manage created update backup">
+              <a href="/created/">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Revoke &amp; manage</span>
+                  <span class="list-sub">Update, revoke, backup</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action" data-hub-searchable="auto save device keys">
+              <button type="button" id="device-auto-save-toggle">
+                <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Auto-save</span>
+                  <span class="list-sub">Off · save after each create</span>
+                </span>
+                <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
+              </button>
+            </li>
+            <li class="list-row list-action" data-hub-searchable="focus intro tutorial">
+              <button type="button" id="landing-focus-toggle">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Focus mode</span>
+                  <span class="list-sub">Hide intro · hub-first</span>
+                </span>
+                <span class="list-chevron list-chevron--spacer" aria-hidden="true">›</span>
+              </button>
+            </li>
+          </ul>
+        </section>
+
+        <details
+          class="landing-disclosure-card trust-posture"
+          aria-label="Trust posture"
+          data-landing-tutorial
+        >
+          <summary class="landing-disclosure-card-summary">
+            <span class="list-icon list-icon-tone-green" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            <span class="landing-disclosure-card-text">
+              <span class="landing-disclosure-card-title">Design choices</span>
+              <span class="landing-disclosure-card-sub">Optional, revocable, no scan tracking, not legal ID</span>
+            </span>
+            <span class="list-chevron" aria-hidden="true">›</span>
+          </summary>
+          <div class="landing-disclosure-card-body">
           <p class="group-intro short">
-            Not identity. Not crypto. Not social media. A <strong>live public object</strong>.
+            Engineering decisions  -  each tag names a concrete mechanism, not marketing copy.
           </p>
-          <ol class="model-ladder">
-            <li>
-              <span class="model-icon" aria-hidden="true">◇</span>
-              <span class="model-text"><strong>Physical thing</strong> in the world</span>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Optional</span>
+                <span class="list-sub"
+                  >Scanning needs no account. Create a live object only when you want one  -  keys stay
+                  in your browser, not on our servers.</span
+                >
+              </span>
             </li>
-            <li class="model-connector" aria-hidden="true"></li>
-            <li>
-              <span class="model-icon" aria-hidden="true">↯</span>
-              <span class="model-text"><strong>Network</strong> returns signed status</span>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Revocable</span>
+                <span class="list-sub"
+                  >Owner signs revoke with an Ed25519 key held locally; the resolver verifies the
+                  signature and updates server-side status for that <code>qr_id</code>. The printed URL
+                  stays  -  the live answer changes.</span
+                >
+              </span>
             </li>
-            <li class="model-connector" aria-hidden="true"></li>
-            <li>
-              <span class="model-icon model-icon-live" aria-hidden="true">●</span>
-              <span class="model-text"><strong>Live state</strong> you can read in seconds</span>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m4 4 16 16"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">No scan tracking</span>
+                <span class="list-sub"
+                  >The resolver returns object state, not a trail of who scanned, when, or where. No
+                  scan analytics by default.</span
+                >
+              </span>
             </li>
-          </ol>
-        </section>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h4"/><path d="M7 13h6"/><path d="m4 4 16 16"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Not legal ID</span>
+                <span class="list-sub"
+                  >Signed public status for communities  -  not government ID, KYC, employment proof, or
+                  a hidden trust score.</span
+                >
+              </span>
+            </li>
+            <li class="list-row list-action">
+              <a href="/architecture.html">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Architecture &amp; security</span>
+                  <span class="list-sub">Threat models, failure modes, tests, and tradeoffs</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+          </div>
+        </details>
 
-        <ul class="trust-pills" aria-label="Trust posture">
-          <li>Optional</li>
-          <li>Revocable</li>
-          <li>Scoped</li>
-          <li>No scan tracking</li>
-          <li>Not legal ID</li>
-        </ul>
-
-        <nav class="dock" aria-label="Actions">
-          <a class="dock-btn dock-btn-primary" href="/create/">Create a live object</a>
-          <a
-            class="dock-btn"
-            href="https://github.com/h6811127/humanity.llc"
-            rel="noopener noreferrer"
-            >Specs on GitHub</a
-          >
-        </nav>
-
-        <section class="group" id="limits">
-          <h2 class="group-label">Clear limits</h2>
+        <details class="landing-disclosure-card" id="limits" data-landing-tutorial>
+          <summary class="landing-disclosure-card-summary">
+            <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            </span>
+            <span class="landing-disclosure-card-text">
+              <span class="landing-disclosure-card-title">Clear limits</span>
+              <span class="landing-disclosure-card-sub">What a scan does not prove or guarantee</span>
+            </span>
+            <span class="list-chevron" aria-hidden="true">›</span>
+          </summary>
+          <div class="landing-disclosure-card-body">
           <ul class="list list-compact">
             <li class="list-row">
               <span class="list-icon list-icon-tone-orange" aria-hidden="true">
@@ -355,50 +844,194 @@
               </a>
             </li>
           </ul>
+          </div>
+        </details>
+
+        <section class="group pilot-more-ideas" aria-label="More ideas" data-landing-tutorial>
+          <p class="group-intro short">
+            One primitive  -  current signed status on any camera. Benches, wearables, markets, and
+            flyers are in the
+            <a href="/what-can-a-qr-do.html">design space</a> (research, not all shipping yet).
+          </p>
         </section>
 
-        <section class="same-idea" aria-label="Same idea elsewhere">
-          <h2 class="group-label">Same idea elsewhere</h2>
-          <p class="group-intro short">
-            One primitive: a physical thing points at <strong>current</strong> signed status, not a
-            permanent file. QR works on any camera today.
+        <section
+          class="hc-emphasis-card hc-emphasis-card--urgent landing-final-cta"
+          aria-label="Get started"
+          data-landing-tutorial
+        >
+          <div class="hc-emphasis-card__main">
+            <span class="hc-emphasis-card__dot hc-emphasis-card__dot--urgent" aria-hidden="true"></span>
+            <div class="hc-emphasis-card__copy">
+              <p class="hc-emphasis-card__eyebrow">Get started</p>
+              <h2 class="hc-emphasis-card__title landing-final-cta-title">Ready to try it?</h2>
+              <p class="hc-emphasis-card__detail landing-final-cta-lead">
+                Create a live object, save keys on this device, and print a QR that always resolves to
+                current status.
+              </p>
+            </div>
+          </div>
+          <div class="hc-emphasis-card__actions landing-final-cta-actions">
+            <a
+              class="hc-emphasis-card__cta landing-final-cta-btn"
+              href="/create/"
+              >Create your first live object</a
+            >
+          </div>
+          <p class="landing-final-cta-foot">
+            Not legal ID · not scan analytics ·
+            <a href="/architecture.html">open protocol details</a>
           </p>
+        </section>
+
+        <details class="landing-disclosure-card landing-essentials landing-docs-full" id="landing-docs-full">
+          <summary class="landing-disclosure-card-summary">
+            <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+            </span>
+            <span class="landing-disclosure-card-text">
+              <span class="landing-disclosure-card-title">Documentation</span>
+              <span class="landing-disclosure-card-sub">Features map, case study, architecture, data policy</span>
+            </span>
+            <span class="list-chevron" aria-hidden="true">›</span>
+          </summary>
+          <div class="landing-disclosure-card-body">
           <ul class="list list-compact">
-            <li class="list-row">
-              <span class="list-icon list-icon-tone-red" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">Poster or flyer</span>
-                <span class="list-sub">Mutual-aid or event contact. Revoke when the run ends, not when stickers fade.</span>
-              </span>
-            </li>
-            <li class="list-row">
-              <span class="list-icon list-icon-tone-pink" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3h12l4 6-10 12L2 9z"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">Sticker on merch</span>
-                <span class="list-sub">Scan shows active or revoked; a stolen batch can be killed without reprinting the line</span>
-              </span>
-            </li>
-            <li class="list-row">
-              <span class="list-icon list-icon-tone-purple" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">Member badge or card</span>
-                <span class="list-sub">Club or co-op asks for live membership state, not a static plastic claim</span>
-              </span>
-            </li>
             <li class="list-row list-action">
-              <a href="/research-directions.html">
-                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M18 12h4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
+              <a href="/features-available-now.html">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
                 </span>
                 <span class="list-content">
-                  <span class="list-title">Research directions</span>
-                  <span class="list-sub">NFC, mesh, and the Humanity node</span>
+                  <span class="list-title">All features available now</span>
+                  <span class="list-sub">Device hub, studio pilot, protocol map, limits, and security posture</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/studio/">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Studio blog</span>
+                  <span class="list-sub">Notes on the door plate pilot and this codebase</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/case-study/">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Case study</span>
+                  <span class="list-sub">Create → scan → update → revoke → live control</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/architecture.html">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Architecture &amp; security</span>
+                  <span class="list-sub">Threat models, tests, tradeoffs</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/data-policy.html">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Data policy</span>
+                  <span class="list-sub">What the network stores</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+          </div>
+        </details>
+
+        <section class="group landing-essentials landing-docs-footer" id="landing-docs-footer" hidden>
+          <h2 class="group-label">Help &amp; protocol</h2>
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/help/">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Help guide</span>
+                  <span class="list-sub">Keys, hub, wallet, and create - one place</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/features-available-now.html">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">All features available now</span>
+                  <span class="list-sub">Protocol map, limits, security</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/features/card-creation.html#keys-custody">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">How signing keys work</span>
+                  <span class="list-sub">Tab only vs saved on this device</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/case-study/">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Case study</span>
+                  <span class="list-sub">Create → scan → revoke loop</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/architecture.html">
+                <span class="list-icon list-icon-tone-orange" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Architecture &amp; security</span>
+                  <span class="list-sub">Threat model and tests</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/data-policy.html">
+                <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Data policy</span>
+                  <span class="list-sub">What the network stores</span>
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </a>
@@ -406,31 +1039,7 @@
           </ul>
         </section>
 
-        <section class="group group-muted">
-          <h2 class="group-label">Building now</h2>
-          <ul class="list list-compact">
-            <li>
-              <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">Create → scan → revoke</span>
-                <span class="list-sub">Phase A loop live on Worker + Pages</span>
-              </span>
-            </li>
-            <li>
-              <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              </span>
-              <span class="list-content">
-                <span class="list-title">Stranger test</span>
-                <span class="list-sub">First outside run complete — create is open</span>
-              </span>
-            </li>
-          </ul>
-        </section>
-
-        <section class="group" id="now">
+        <section class="group landing-essentials" id="now">
           <ul class="list">
             <li class="list-row list-action">
               <a href="mailto:info@humanity.llc">
@@ -447,7 +1056,11 @@
         </section>
       </main>
     </div>
-    <script src="/js/pass-flip.js?v=1" defer></script>
-    <script src="/js/pass-demo-revoke.js?v=1" defer></script>
+    <script src="/js/landing-focus.mjs?v=3" type="module"></script>
+    <script src="/js/device-status-bootstrap.mjs?v=56" type="module"></script>
+    <script src="/js/landing-device-hub.mjs?v=13" type="module"></script>
+    <script src="/js/landing-showcase.mjs?v=2" type="module"></script>
+    <script src="/js/landing-showcase-live-object.mjs?v=1" type="module"></script>
+    <script src="/js/landing-showcase-lost-item.mjs?v=1" type="module"></script>
   </body>
 </html>

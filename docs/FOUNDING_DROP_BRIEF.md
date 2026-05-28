@@ -1,14 +1,15 @@
 # Founding Drop Brief (Operational)
 
-**Status:** Working checklist — fill in bracketed fields before launch  
+**Status:** Working checklist  -  fill in bracketed fields before launch  
 **Canonical strategy:** `docs/MERCH_LED_V1.md`, `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  
-**Copy source:** `docs/LAUNCH_LANGUAGE_KIT.md` (Tier 0 / Tier 1 sections)
+**Merch QR policy:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` · Tier 0 batch: `docs/TIER0_CAMPAIGN_QR_RUNBOOK.md` · Support: `docs/MERCH_SUPPORT_MACROS.md`  
+**Copy source:** `docs/LAUNCH_LANGUAGE_KIT.md` (Tier 0 / Tier 1 sections · Sticker FAQ)
 
 ---
 
 ## Drop Overview
 
-| Field | Tier 0 — Curiosity | Tier 1 — Belonging |
+| Field | Tier 0  -  Curiosity | Tier 1  -  Belonging |
 |---|---|---|
 | **Codename** | `[e.g. Signal Sticker]` | `[e.g. Founding Human Line]` |
 | **Purpose** | Walking ads + scan→create | Cohort trust + personalized artifact |
@@ -16,7 +17,7 @@
 | **Window** | `[start]` → `[end]` | `[start]` → `[end]` (after Tier 0 or overlap final week) |
 | **Quantity cap** | `[e.g. 500]` or unlimited | `[e.g. 100]` |
 | **SKU count** | 1 design | 1 design (+ personalization when QA ready) |
-| **QR model** | Batch QR → landing OK | Unique item QR required when enabled |
+| **QR model** | Batch QR → landing OK; **no `expires_at`** | Unique item QR (`print_artifact`); **no `expires_at`** |
 | **Price** | `[e.g. $8–12 + ship]` | `[e.g. $15–25 + ship]` |
 | **Status on scan** | Card may be `Registered` only | May show `Founding Human` / `Vouched Human` per policy |
 
@@ -30,27 +31,31 @@ Check every box before taking money.
 
 ### Product / trust
 
+- [ ] [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) reviewed; launch gates at bottom of that doc checked
 - [ ] `V1_PRODUCT_TRUST_MODEL.md` published and linked from scan page
 - [ ] Scan page: status + limits + bearer warning + dual CTAs (curiosity + belonging where applicable)
 - [ ] Forbidden claims list on internal launch checklist (`LAUNCH_LANGUAGE_KIT.md`)
 - [ ] Public labels locked: `Registered`, `Vouched Human`, `Founding Human`, etc.
-- [ ] Copy comprehension test passed (≥5 testers): merch ≠ vouched; sticker ≠ owner proof
+- [ ] Copy comprehension test passed (≥5 testers): merch ≠ vouched; sticker ≠ owner proof; **sticker QR does not calendar-expire** (URL always resolves)
 
 ### Tier 0 (curiosity)
 
 - [ ] One sticker (or card) passes physical scan QA on ≥3 phones
-- [ ] Story-row product page live with Tier 0 copy
+- [x] Story-row shop hub live (`/shop/`) + Tier 0 founding sticker (`/shop/founding/`, `docs/SHOP_TIER0_IMPLEMENTATION.md`)
 - [ ] Batch QR resolves to correct landing (no stale verification on print)
 - [ ] Analytics: scan count + scan→card-create (no per-scan PII logging)
 
 ### Tier 1 (belonging)
+
+**Commerce wiring:** [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) — Printify template + Shopify variant + `shop-config.json` + Worker env; customization on `/shop/customize/`, not Shopify alone.
 
 - [ ] Card-creation flow live (public launch)
 - [ ] Checkout verifies active card / owner session for personalized SKUs
 - [ ] Vouch rules published (3 vouch threshold, quotas, 90-day wait)
 - [ ] Shopify metadata spike passed if personalized (`artifact_intent_id` on paid webhook)
 - [ ] Printify sample order passed if per-item unique QR
-- [ ] Support/reprint policy published (`V1_DECISION_LOCK` D-005)
+- [ ] Support/reprint policy published ([`MERCH_SUPPORT_MACROS.md`](MERCH_SUPPORT_MACROS.md) + policy § Revoke, reprint, and support)
+- [ ] Batch rotate drill completed in staging ([`TIER0_CAMPAIGN_QR_RUNBOOK.md`](TIER0_CAMPAIGN_QR_RUNBOOK.md))
 
 ### Ops
 
@@ -61,7 +66,7 @@ Check every box before taking money.
 
 ---
 
-## Tier 0 Checklist — Curiosity Drop
+## Tier 0 Checklist  -  Curiosity Drop
 
 ### Offer
 
@@ -76,11 +81,12 @@ Check every box before taking money.
 - [ ] Subhead: scan hook, not verification promise
 - [ ] Product bullets: what you get / what you do **not** get
 - [ ] FAQ: “Does buying this verify me?” → No
+- [ ] Sticker FAQ live (`LAUNCH_LANGUAGE_KIT.md` § Sticker FAQ): no calendar expiry; revoke ≠ erase ink
 - [ ] Secondary CTA: Create a card (free path)
 
 ### Fulfillment
 
-- [ ] Batch QR artwork approved
+- [ ] Batch QR artwork approved; credential has **no `expires_at`** (see `MERCH_QR_LIFECYCLE_POLICY.md`)
 - [ ] Shipping regions: `[ ]`
 - [ ] Estimated delivery copy: `[ ]`
 - [ ] Held-for-review path tested (payment without fulfillment)
@@ -101,7 +107,7 @@ Check every box before taking money.
 
 ---
 
-## Tier 1 Checklist — Belonging Drop
+## Tier 1 Checklist  -  Belonging Drop
 
 ### Cohort
 
@@ -113,7 +119,7 @@ Check every box before taking money.
 ### Offer
 
 - [ ] Founding-only product variant or gated collection
-- [ ] Personalization: `[handle on print | QR only]` — per Printify QA
+- [ ] Personalization: `[handle on print | QR only]`  -  per Printify QA
 - [ ] Packaging insert: belonging + vouch responsibility copy
 - [ ] Optional: ceremony / first-vouch circle event date `[ ]`
 
@@ -146,15 +152,15 @@ Check every box before taking money.
 
 ## Metrics Dashboard (Minimal)
 
-Track weekly in a spreadsheet — no scan analytics product.
+Track weekly in a spreadsheet  -  no scan analytics product.
 
 | Metric | Tier 0 target | Tier 1 target |
 |---|---|---|
 | Orders | `[ ]` | `[ ]` |
 | Scans (aggregate) | `[ ]` | `[ ]` |
 | Scan → card create | `[ ]%` | `[ ]%` |
-| Cards from non-friend domains | `[ ]` | — |
-| Vouches in cohort | — | `[ ]` |
+| Cards from non-friend domains | `[ ]` |  -  |
+| Vouches in cohort |  -  | `[ ]` |
 | Invites attributed | `[ ]` | `[ ]` |
 | Support tickets: verification confusion | 0 open | 0 open |
 | Support tickets: misprint / ship | `<[ ]%` orders | same |
@@ -202,8 +208,8 @@ Pause sales and fix before continuing if:
 
 ## Related Docs
 
-- `docs/MERCH_LED_V1.md` — strategy and phase order
-- `docs/LAUNCH_LANGUAGE_KIT.md` — all public strings
-- `docs/FOUNDING_COHORT_PLAYBOOK.md` — cohort weeks and rituals
-- `docs/V1_ASSUMPTION_REGISTER.md` — Shopify / Printify spikes
-- `docs/V1_DECISION_LOCK.md` — locked technical decisions
+- `docs/MERCH_LED_V1.md`  -  strategy and phase order
+- `docs/LAUNCH_LANGUAGE_KIT.md`  -  all public strings
+- `docs/FOUNDING_COHORT_PLAYBOOK.md`  -  cohort weeks and rituals
+- `docs/V1_ASSUMPTION_REGISTER.md`  -  Shopify / Printify spikes
+- `docs/V1_DECISION_LOCK.md`  -  locked technical decisions

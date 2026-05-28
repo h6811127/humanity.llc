@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Shop · humanity.llc</title>
+    <meta
+      name="description"
+      content="Personalize your LIVE OBJECT QR on wearables, or collect founding curiosity objects. Buying merch does not verify you."
+    />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=122" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=2" />
+  </head>
+  <body class="screen-shop-body">
+    <div class="page">
+      <header class="top">
+        <a class="top-brand top-brand--mark" href="/" aria-label="Home">
+          <span class="pass-dot" aria-hidden="true"></span>
+        </a>
+        <a class="top-create" href="/create/">Create card</a>
+      </header>
+
+      <main class="screen screen-shop">
+        <section class="hero hero-compact shop-hero">
+          <p class="hero-eyebrow">Humanity store</p>
+          <h1>Wear the signal. Keep the story honest.</h1>
+          <p class="hero-line">
+            Physical artifacts that resolve to live, signed Humanity Card status — curated in
+            story rows, not a generic merch grid. Preview and proof stay on humanity.llc; secure
+            checkout runs on Shopify when you are ready to pay.
+          </p>
+          <div class="landing-hero-actions shop-hero-actions">
+            <a
+              class="landing-hero-btn landing-hero-btn-primary"
+              href="/shop/customize/"
+              >Make it yours</a
+            >
+            <a class="landing-hero-btn landing-hero-btn-secondary" href="/create/"
+              >Create a free card</a
+            >
+          </div>
+        </section>
+
+        <div id="shop-rows-root" class="shop-rows-root" hidden></div>
+
+        <div id="shop-rows-fallback">
+        <section class="shop-story-row" id="shop-row-personalize" aria-labelledby="shop-row-personalize-title">
+          <h2 class="group-label" id="shop-row-personalize-title">Make it yours</h2>
+          <p class="shop-lead">
+            Tier 1 belonging — preview your branded <strong>LIVE OBJECT</strong> QR on a hoodie or
+            sticker. Each physical unit gets a <strong>unique</strong> revocable code; you update
+            what strangers see from your phone without reprinting.
+          </p>
+
+          <article class="shop-hub-card">
+            <p class="shop-product-kicker">Tier 1 · unique item QR</p>
+            <p class="shop-hub-status" id="shop-hub-personalize-status">Preview live · checkout opening soon</p>
+            <p class="shop-lead shop-lead-muted shop-hub-card-note">
+              Requires a Humanity Card in this browser. Checkout uses Shopify's secure payment
+              page in this tab — then return to humanity.llc for what to expect.
+            </p>
+            <a class="btn-primary shop-hub-cta" href="/shop/customize/">Customize your QR</a>
+          </article>
+        </section>
+
+        <section class="shop-story-row" id="shop-row-founding" aria-labelledby="shop-row-founding-title">
+          <h2 class="group-label" id="shop-row-founding-title">Founding objects</h2>
+          <p class="shop-lead">
+            Tier 0 curiosity — batch artifacts with a shared campaign QR. A pointer to the
+            experiment, not a passport. Separate from personalized wear; same honesty about limits.
+          </p>
+
+          <article class="shop-hub-card">
+            <p class="shop-product-kicker">Founding signal sticker · batch QR</p>
+            <p class="shop-product-price shop-hub-price" id="shop-hub-founding-price">Checkout opening soon</p>
+            <p class="shop-hub-status" id="shop-hub-founding-status">Checkout opening soon</p>
+            <p class="shop-lead shop-lead-muted shop-hub-card-note">
+              One design for the founding drop. No card required to order.
+            </p>
+            <a class="btn-primary shop-hub-cta" href="/shop/founding/">View founding sticker</a>
+          </article>
+        </section>
+        </div>
+
+        <section class="group shop-faq-group" aria-labelledby="shop-faq-title">
+          <h2 class="group-label" id="shop-faq-title">Before you buy</h2>
+          <p class="shop-required-line" role="note">
+            <strong>Buying merch does not verify you.</strong> Vouches come from real people under
+            public rules — never from checkout.
+          </p>
+          <details class="shop-faq">
+            <summary>Why does checkout leave humanity.llc?</summary>
+            <p>
+              Shopify handles payments, tax, and order records. You complete checkout on their secure
+              page, then return here for post-purchase guidance. We never store your card details.
+            </p>
+          </details>
+          <details class="shop-faq">
+            <summary>What's the difference between Tier 0 and Tier 1?</summary>
+            <p>
+              <strong>Founding objects</strong> use a batch QR shared across a drop.
+              <strong>Make it yours</strong> prints a unique QR per item tied to your card — revoke
+              one sticker or hoodie without killing your profile.
+            </p>
+          </details>
+        </section>
+
+        <section class="group shop-links-group">
+          <h2 class="group-label">Related</h2>
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/create/">
+                <span class="list-content">
+                  <span class="list-title">Create a Humanity Card</span>
+                  <span class="list-sub">Free · keys stay in your browser</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/case-study/">
+                <span class="list-content">
+                  <span class="list-title">Case study</span>
+                  <span class="list-sub">Create → scan → revoke loop</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/">
+                <span class="list-content">
+                  <span class="list-title">Home</span>
+                  <span class="list-sub">Device hub · status plate pilot</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
+    <script src="/js/shop-hub.mjs?v=3" type="module"></script>
+  </body>
+</html>

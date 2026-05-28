@@ -30,7 +30,7 @@ async function main(): Promise<void> {
     join(fixturesDir, "keys.json"),
     `${JSON.stringify(
       {
-        note: "TEST ONLY — never use this seed in production",
+        note: "TEST ONLY  -  never use this seed in production",
         profile_id: PROFILE_ID,
         public_key_base58: publicKeyBase58,
         seed_phrase: "humanity-commons-test-seed-v1",
