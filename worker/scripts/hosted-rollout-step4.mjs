@@ -20,7 +20,10 @@ import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { normalizeOperatorAuditToken } from "./hosted-rollout-token.mjs";
+import {
+  normalizeOperatorAuditToken,
+  operatorAuditTokenShellHint,
+} from "./hosted-rollout-token.mjs";
 import { readWranglerHostedFlag } from "./hosted-rollout-step4a.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -51,6 +54,7 @@ try {
   token = normalizeOperatorAuditToken(process.env.OPERATOR_AUDIT_TOKEN);
 } catch (err) {
   console.error(err instanceof Error ? err.message : err);
+  console.error(`\n${operatorAuditTokenShellHint()}`);
   process.exit(1);
 }
 
@@ -93,9 +97,8 @@ function printDeployAndVerifyChecklist() {
   console.log("   (after worker:migrate:local + worker:dev) API_ORIGIN=http://127.0.0.1:8787\n");
   console.log("3. Verify production:");
   console.log("   npm run hosted:rollout:step4 -- --verify");
-  console.log(
-    "   OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step4 -- --verify\n"
-  );
+  console.log("   export OPERATOR_AUDIT_TOKEN='your-token-from-wrangler'");
+  console.log("   npm run hosted:rollout:step4 -- --verify\n");
   console.log("4. Before steward announcement, run step 6 regression:");
   console.log("   npm run hosted:rollout:step6 -- --verify\n");
 }

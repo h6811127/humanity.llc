@@ -8,11 +8,36 @@
  * @param {string} [label]
  * @returns {string | null}
  */
+const DOC_PLACEHOLDER_TOKENS = new Set(["...", "…", "<token>", "<your-token>"]);
+
 export function normalizeOperatorAuditToken(token, label = "OPERATOR_AUDIT_TOKEN") {
   const trimmed = token?.trim();
   if (!trimmed) return null;
+  if (DOC_PLACEHOLDER_TOKENS.has(trimmed)) {
+    throw new Error(
+      `${label} is still a doc placeholder (${JSON.stringify(trimmed)}). ` +
+        "Paste the real ASCII secret from wrangler / GitHub — do not copy the literal ... from docs."
+    );
+  }
   assertAsciiBearerToken(trimmed, label);
   return trimmed;
+}
+
+/**
+ * Shell-safe usage hint when env assignment fails (PowerShell, fish, pasted token only).
+ */
+export function operatorAuditTokenShellHint() {
+  return [
+    "Set the token in two lines (zsh/bash):",
+    "  export OPERATOR_AUDIT_TOKEN='paste-token-here'",
+    "  npm run hosted:rollout:step4b -- --verify",
+    "",
+    "PowerShell:",
+    "  $env:OPERATOR_AUDIT_TOKEN='paste-token-here'",
+    "  npm run hosted:rollout:step4b -- --verify",
+    "",
+    "--smoke and --preflight do not require OPERATOR_AUDIT_TOKEN.",
+  ].join("\n");
 }
 
 /**

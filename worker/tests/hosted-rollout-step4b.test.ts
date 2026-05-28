@@ -3,6 +3,8 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { normalizeOperatorAuditToken } from "../scripts/hosted-rollout-token.mjs";
+
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
 describe("hosted-rollout-step4b", () => {
@@ -11,6 +13,10 @@ describe("hosted-rollout-step4b", () => {
       readFileSync(path.join(repoRoot, "package.json"), "utf8")
     );
     expect(pkg.scripts["hosted:rollout:step4b"]).toContain("hosted-rollout-step4b.mjs");
+  });
+
+  it("rejects doc placeholder OPERATOR_AUDIT_TOKEN", () => {
+    expect(() => normalizeOperatorAuditToken("...")).toThrow(/doc placeholder/);
   });
 
   it("step4b script documents preflight and local-smoke", () => {
