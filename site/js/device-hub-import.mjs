@@ -1,5 +1,6 @@
 /**
  * Import encrypted backup file into hc_wallet (Phase 3 hub shortcut).
+ * M5.5: loads keys into this tab and offers /created/ controls.
  */
 import {
   decryptBackup,
@@ -9,7 +10,36 @@ import {
   readBackupFile,
 } from "./key-backup.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
+import { activateWalletEntry, openCardNowPage } from "./device-keys.mjs";
+import { mergeBackupIntoWallet } from "./device-hub-import-core.mjs";
 import { loadWallet, saveWallet, walletEntryFromSession } from "./device-wallet.mjs";
+
+/**
+ * @param {HTMLElement | null} statusEl
+ */
+function clearImportOpenControlsCta(statusEl) {
+  const existing = statusEl?.parentElement?.querySelector("#hub-import-open-controls");
+  existing?.remove();
+}
+
+/**
+ * @param {HTMLElement | null} statusEl
+ * @param {Record<string, unknown>} entry
+ */
+function showImportOpenControlsCta(statusEl, entry) {
+  clearImportOpenControlsCta(statusEl);
+  if (!statusEl?.parentElement) return;
+  const cta = document.createElement("button");
+  cta.type = "button";
+  cta.id = "hub-import-open-controls";
+  cta.className = "btn-secondary hub-import-open-controls";
+  cta.textContent = "Open card controls";
+  cta.addEventListener("click", () => {
+    window.dispatchEvent(new CustomEvent("hc-hub-sheet-close"));
+    openCardNowPage(entry);
+  });
+  statusEl.insertAdjacentElement("afterend", cta);
+}
 
 /**
  * @param {HTMLFormElement | null} form
@@ -23,6 +53,7 @@ export function initHubBackupImport(form, statusEl) {
     statusEl.hidden = !msg;
     statusEl.textContent = msg;
     statusEl.className = isError ? "form-status error" : "form-status";
+    if (isError) clearImportOpenControlsCta(statusEl);
   }
 
   form.addEventListener("submit", async (e) => {
@@ -46,32 +77,39 @@ export function initHubBackupImport(form, statusEl) {
       const backup = await readBackupFile(file);
       const unlocked = await decryptBackup(backup, passphrase);
       const entries = loadWallet();
-      const idx = entries.findIndex((e) => e.profile_id === unlocked.profileId);
-      const session = {
-        profile_id: unlocked.profileId,
-        owner_public_key_b58: unlocked.publicKeyBase58,
-        owner_private_key_b58: unlocked.privateKeyBase58,
-        handle: idx >= 0 ? entries[idx].handle : undefined,
-        scan_url:
-          idx >= 0 && entries[idx].scan_url
-            ? entries[idx].scan_url
-            : `${location.origin}/c/${unlocked.profileId}`,
-      };
-      if (idx >= 0) {
-        entries[idx] = {
-          ...entries[idx],
+      const idx = entries.findIndex((ent) => ent.profile_id === unlocked.profileId);
+      const defaultScanUrl =
+        idx >= 0 && entries[idx].scan_url
+          ? String(entries[idx].scan_url)
+          : `${location.origin}/c/${unlocked.profileId}`;
+      const merged = mergeBackupIntoWallet(
+        entries,
+        {
+          profileId: unlocked.profileId,
+          publicKeyBase58: unlocked.publicKeyBase58,
+          privateKeyBase58: unlocked.privateKeyBase58,
+        },
+        defaultScanUrl
+      );
+      let walletEntries = merged.entries;
+      let savedEntry = merged.entry;
+      if (merged.isNew) {
+        const session = {
+          profile_id: unlocked.profileId,
           owner_public_key_b58: unlocked.publicKeyBase58,
           owner_private_key_b58: unlocked.privateKeyBase58,
-          saved_at: new Date().toISOString(),
+          scan_url: defaultScanUrl,
+          handle: undefined,
         };
-        saveWallet(entries);
-      } else {
-        entries.unshift(walletEntryFromSession(session, unlocked.profileId.slice(0, 12)));
-        saveWallet(entries);
+        savedEntry = walletEntryFromSession(session, unlocked.profileId.slice(0, 12));
+        walletEntries = [savedEntry, ...entries];
       }
-      setStatus("Imported to this device. Tap Open controls or Open card to manage.");
-      const savedEntry =
-        idx >= 0 ? entries[idx] : walletEntryFromSession(session, unlocked.profileId.slice(0, 12));
+      saveWallet(walletEntries);
+      activateWalletEntry(savedEntry);
+      setStatus(
+        "Imported and loaded signing keys in this tab. Open card controls to revoke, update status plates, or manage object QRs."
+      );
+      showImportOpenControlsCta(statusEl, savedEntry);
       logDeviceActivity("backup_import", savedEntry.label || "Imported backup", {
         profile_id: unlocked.profileId,
         qr_id: savedEntry.qr_id ?? null,
