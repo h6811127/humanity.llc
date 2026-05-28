@@ -352,7 +352,7 @@ Engineering checklist once M4 governance checklist is signed ([`HOSTED_TIER_PRIC
 | 3b | `STRIPE_WEBHOOK_SECRET` (after G8) | Deferred — `npm run hosted:rollout:step3b` (notes only). Not required for steps 4–6. |
 | 4a | Enable hosted flag in wrangler | **Shipped** — `HOSTED_STEWARD_ENABLED=1` in `worker/wrangler.toml` · `npm run hosted:rollout:step4a -- --apply` |
 | 4b | Deploy + verify production | **Shipped** — `hosted:rollout:step4b` · step 2/4 smoke includes **public `/c/` scan probe** · **CI:** `deploy-worker.yml` → `hosted:rollout:post-deploy-smoke -- --verify` |
-| 5a | Pin CF dashboard (E6.1) | Manual — `npm run hosted:rollout:step5a` · [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md) |
+| 5a | Pin CF dashboard (E6.1) | **Shipped** — `hosted:rollout:step5a` (`--preflight` · manual CF pin) · [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md) |
 | 5b | E6.2 CI + verify | **Shipped** — `hosted:rollout:step5b` (`--preflight` · `--verify`) · GitHub `OPERATOR_AUDIT_TOKEN` + `steward-ops-daily.yml` |
 | 6 | Regression | **Shipped** — `hosted:rollout:step6` (`--preflight` · `--verify`) · preflight = rollout unit tests + `verify:hosted-g0` · full verify adds `e2e:steward-hosted` |
 
@@ -413,6 +413,7 @@ Engineering checklist once M4 governance checklist is signed ([`HOSTED_TIER_PRIC
 
 | Date | Note |
 |------|------|
+| 2026-05-28 | **Rollout step 5a:** `hosted:rollout:step5a -- --preflight` (wrangler worker name + CF dashboard doc) |
 | 2026-05-28 | **Rollout step 6:** `hosted:rollout:step6 -- --preflight` (rollout unit tests + `verify:hosted-g0`) |
 | 2026-05-28 | **Rollout step 5b:** `hosted:rollout:step5b` preflight + E6.2 verify alias |
 | 2026-05-28 | **Rollout step 4b:** `hosted:rollout:step4b` preflight + local-smoke + deploy/smoke/verify · CI post-deploy verify in `deploy-worker.yml` |

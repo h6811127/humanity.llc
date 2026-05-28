@@ -138,7 +138,8 @@ OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:
 **Rollout step 5a — pin Cloudflare dashboard (do this first, manual):**
 
 ```bash
-npm run hosted:rollout:step5a
+npm run hosted:rollout:step5a -- --preflight   # wrangler name + doc + Vitest
+npm run hosted:rollout:step5a                  # CF UI checklist
 ```
 
 See [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md).

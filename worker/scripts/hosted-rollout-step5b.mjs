@@ -31,7 +31,8 @@ const forwardArgs = process.argv.slice(2).filter((arg) => arg !== "--preflight")
 function printStep5bChecklist() {
   console.log("Step 5b — E6.2 daily CI secret + production verify\n");
   console.log("Prerequisites: step 4b production verify passed.\n");
-  console.log("Manual first:");
+  console.log("Manual first (after step 5a preflight):");
+  console.log("   npm run hosted:rollout:step5a -- --preflight");
   console.log("   npm run hosted:rollout:step5a\n");
   console.log("Engineering preflight (local):");
   console.log("   npm run hosted:rollout:step5b -- --preflight\n");
@@ -49,7 +50,7 @@ function runPreflight() {
   assertDeployWorkerUsesOperatorToken();
   runStep5PreflightVitest();
   console.log("\n✅ Step 5b preflight OK.");
-  console.log("Complete step 5a (CF dashboard) manually, then:");
+  console.log("Complete step 5a (CF dashboard pin) manually if not done, then:");
   console.log("  npm run hosted:rollout:step5b -- --verify");
   console.log(
     "  OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step5b -- --verify"
