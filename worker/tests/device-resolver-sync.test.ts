@@ -14,6 +14,7 @@ import {
   shouldFollowerSkipNetworkFetch,
   shouldIgnoreHealthSnapshotMessage,
 } from "../../site/js/device-resolver-sync-core.mjs";
+import { WALLET_NETWORK_CACHE_MAX_ENTRIES } from "../../site/js/device-wallet-network-core.mjs";
 
 describe("device-resolver-sync-core", () => {
   it("defaults sync on unless pref is 0", () => {
@@ -157,5 +158,26 @@ describe("device-resolver-sync-core", () => {
       verificationLabel: "Steward",
       at: 50,
     });
+  });
+
+  it("bounds merged cache to WALLET_NETWORK_CACHE_MAX_ENTRIES", () => {
+    const now = 5_000_000;
+    /** @type {Record<string, { status: string; scanKind: string; at: number }>} */
+    const existing = {};
+    for (let i = 0; i < 25; i += 1) {
+      existing[`old${i}`] = { status: "active", scanKind: "active", at: now - 60_000 - i };
+    }
+    const rows = [
+      {
+        profile_id: "leader-new",
+        status: "active",
+        scanKind: "active",
+        cachedAt: now,
+        resolverConfirmed: true,
+      },
+    ];
+    const merged = mergeNetworkSnapshotIntoCache(existing, rows, now);
+    expect(Object.keys(merged).length).toBeLessThanOrEqual(WALLET_NETWORK_CACHE_MAX_ENTRIES);
+    expect(merged["leader-new"]).toBeDefined();
   });
 });

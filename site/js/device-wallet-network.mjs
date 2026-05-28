@@ -21,6 +21,7 @@ import {
   shouldUseCachedNetworkStatus,
   verificationRecordFromLabelState,
   WALLET_NETWORK_CACHE_TTL_MS,
+  pruneWalletNetworkCache,
 } from "./device-wallet-network-core.mjs";
 import {
   getWalletStatusPollHealth,
@@ -153,15 +154,23 @@ function loadCache() {
   try {
     const raw = sessionStorage.getItem(CACHE_KEY);
     const parsed = raw ? JSON.parse(raw) : {};
-    return parsed && typeof parsed === "object" ? parsed : {};
+    const cache = parsed && typeof parsed === "object" ? parsed : {};
+    return pruneWalletNetworkCache(cache);
   } catch {
     return {};
   }
 }
 
-function saveCache(cache) {
+/**
+ * @param {Record<string, unknown>} cache
+ * @param {{ protectProfileIds?: Iterable<string> }} [opts]
+ */
+function saveCache(cache, opts = {}) {
   try {
-    sessionStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+    const next = pruneWalletNetworkCache(cache, {
+      protectProfileIds: opts.protectProfileIds,
+    });
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify(next));
   } catch {
     /* ignore */
   }
@@ -173,8 +182,10 @@ export function loadWalletNetworkCacheForSync() {
 }
 
 /** @see docs/DEVICE_TAB_RESOLVER_SYNC.md */
-export function saveWalletNetworkCacheForSync(cache) {
-  saveCache(cache);
+export function saveWalletNetworkCacheForSync(cache, protectProfileIds) {
+  saveCache(cache, {
+    protectProfileIds: protectProfileIds ?? Object.keys(cache),
+  });
 }
 
 /**
@@ -502,7 +513,9 @@ export async function refreshWalletNetworkStatuses(entries, onDone, options = {}
     return;
   }
 
-  saveCache(cache);
+  saveCache(cache, {
+    protectProfileIds: entries.map((e) => e.profile_id).filter(Boolean),
+  });
   applyWalletStatusPollHealthFromRound(
     networkFetchedProfileIds,
     statusMap,

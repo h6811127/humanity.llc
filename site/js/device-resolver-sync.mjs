@@ -108,7 +108,7 @@ function applySnapshotMessage(message) {
 
   const cache = loadWalletNetworkCacheForSync();
   const merged = mergeNetworkSnapshotIntoCache(cache, message.entries, message.at);
-  saveWalletNetworkCacheForSync(merged);
+  saveWalletNetworkCacheForSync(merged, message.entries.map((row) => row.profile_id));
   applyResolverNetworkSnapshot(message.entries, message.at);
   if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
     try {
