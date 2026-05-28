@@ -525,6 +525,8 @@ Goal: complete one real paid order path safely.
 
 **Shipped (2026-05-27):** tracking + reconciliation — migration `0021_print_order_tracking.sql` · Printify shipment webhooks store carrier/number/url · buyer order status returns `tracking` · cron `runPrintifyReconcile` polls active Printify orders every 30 minutes.
 
+**Shipped (2026-05-27):** pre-checkout shipping quotes — `POST /v1/print/quotes` (Printify `orders/shipping.json`) · 15-minute TTL · `/shop/customize/` optional estimate form.
+
 ---
 
 ## Phase 7: Launch Hardening
@@ -598,20 +600,21 @@ Goal: make the vertical slice credible for public launch.
 
 **Spec:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · **Implementation:** [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md)
 
-**Status (2026-05-27):** Phases 0–3 shipped — Vitest (`npm run worker:test:pwa-install`) + E2E (`e2e/device-pwa-install.spec.ts`). Manual **P1-PWA** remains for iOS Safari and standalone smoke.
+**Status (2026-05-28):** **Closed** — Phases 0–5 shipped. Vitest (`npm run worker:test:pwa-install`) + E2E (`npm run e2e:pwa-install`). Manual **P1-PWA** signed off iOS Safari. Phase 4.1 brand-dot icon. Phase 5 rollout decisions locked in CI.
 
 **Must verify (after Phases 1–3 ship):**
 
-- Manifest and icons deploy on Pages; shell HTML links manifest on `/`, `/wallet/`, `/created/` only.
-- Scan and create flows never show install UX.
-- Returning stewards (≥1 saved card) may see dismissible install card when inbox is not urgent.
-- Installed standalone mode: hub, dot, and inbox still pass **P0-3** and **P2-1**.
-- No service worker registered (v1).
-- Vitest + **P1-PWA** pass.
+- Manifest and icons deploy on Pages; shell HTML links manifest on `/`, `/wallet/`, `/created/` only. ✅
+- Scan and create flows never show install UX. ✅
+- Returning stewards (≥1 saved card) may see dismissible install card when inbox is not urgent. ✅
+- Installed standalone mode: hub, dot, and inbox still pass **P0-3** and **P2-1**. ✅
+- No service worker registered (v1). ✅
+- Vitest + **P1-PWA** pass. ✅
+- Reference/marketing HTML does not link manifest (Phase 5). ✅
 
 **Exit criteria:**
 
-- Phase table in `PWA_INSTALL.md` marked Phases 1–3 shipped. ✅
+- Phase table in `PWA_INSTALL.md` marked Phases 1–5 shipped. ✅
 - `npm run worker:test:pwa-install` green. ✅
 - `npm run e2e -- e2e/device-pwa-install.spec.ts` green. ✅
 

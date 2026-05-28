@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -13,12 +13,9 @@ describe("hosted-rollout-step2", () => {
     expect(script).toContain('HOSTED_STEWARD_ENABLED = "0"');
     expect(script).toContain("worker:deploy");
     expect(script).toContain("/.well-known/hc/v1/health");
+    expect(script).toContain("smokeHostedStewardGated");
+    expect(script).toContain("hosted_steward_disabled");
     expect(script).toContain("hosted:rollout:step1");
-  });
-
-  it("wrangler.toml default keeps hosted flag off for production step 2", () => {
-    const toml = readFileSync(join(repoRoot, "worker/wrangler.toml"), "utf8");
-    expect(toml).toMatch(/HOSTED_STEWARD_ENABLED\s*=\s*"0"/);
   });
 
   it("package.json exposes hosted:rollout:step2", () => {

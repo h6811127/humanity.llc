@@ -40,6 +40,11 @@ export function generatePrintOrderId(): string {
   return `po_${randomBase58(16)}`;
 }
 
+/** pq_ + 16 base58 chars (pre-checkout fulfillment estimate). */
+export function generatePrintQuoteId(): string {
+  return `pq_${randomBase58(16)}`;
+}
+
 /** lc_ + opaque base58 challenge id for short-lived live control proof. */
 export function generateLiveControlChallengeId(): string {
   return `lc_${randomBase58(18)}`;

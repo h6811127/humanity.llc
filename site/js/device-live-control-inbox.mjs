@@ -76,7 +76,11 @@ import {
   pickRoundRobinPollIndex,
   resolveLiveControlPollScope,
 } from "./device-live-control-poll-scheduler.mjs";
-import { loadWallet, walletEntryQrId } from "./device-wallet.mjs";
+import {
+  findWalletEntryByProfileId,
+  listPollableWalletEntries,
+  walletEntryQrId,
+} from "./device-wallet.mjs";
 
 export { getLiveControlPollHealth } from "./device-live-control-inbox-core.mjs";
 export {
@@ -462,7 +466,7 @@ export async function refreshLiveControlInbox(opts = {}) {
     }
   }
 
-  const allPollable = loadWallet().filter((e) => isPollableWalletEntry(e));
+  const allPollable = listPollableWalletEntries();
   const entries = resolvePollEntries(allPollable);
   pruneLiveControlPollSlots(pollSlots, allPollable);
 
@@ -529,11 +533,11 @@ export async function applyLiveProofPendingFromPush(hint) {
     if (Number.isFinite(exp) && exp <= Date.now()) return pending;
   }
 
-  const entry = loadWallet().find((e) => e.profile_id === profileId);
+  const entry = findWalletEntryByProfileId(profileId);
   if (!entry || !isPollableWalletEntry(entry)) return pending;
 
   const result = await fetchPendingForEntry(entry, { pushTriggered: true });
-  const allPollable = loadWallet().filter((e) => isPollableWalletEntry(e));
+  const allPollable = listPollableWalletEntries();
   updateLiveControlPollSlot(pollSlots, entry, result);
   const next = pendingItemsFromPollSlots(allPollable, pollSlots);
   const prevHealth = getLiveControlPollHealth();
@@ -571,18 +575,21 @@ export function syncLiveControlInboxPolling() {
   if (!pollFeatureEnabled) return;
 
   syncStewardPushConnection();
+  const scopeActive = readPollScope();
+  const resolverHealth = getResolverHealthStatus();
+  const watchEnabled = isWatchLiveProofEnabled();
 
-  if (!readPollScope()) {
+  if (!scopeActive) {
     clearPollTimer();
     return;
   }
 
-  if (!liveControlPollAllowedByResolverHealth(getResolverHealthStatus())) {
+  if (!liveControlPollAllowedByResolverHealth(resolverHealth)) {
     clearPollTimer();
     return;
   }
 
-  if (isWatchLiveProofEnabled()) {
+  if (watchEnabled) {
     ensurePollLeaderClaim();
   }
 
@@ -598,17 +605,6 @@ export function syncLiveControlInboxPolling() {
   }
 
   if (!readPollLoopShouldRun()) {
-    return;
-  }
-
-  if (!stewardPushSuppressesAutoPoll()) {
-    clearPollTimer();
-    if (pollSyncInFlight) return;
-    pollSyncInFlight = true;
-    void refreshLiveControlInbox().finally(() => {
-      pollSyncInFlight = false;
-      if (pollFeatureEnabled && readPollLoopShouldRun()) armPollTimer();
-    });
     return;
   }
 

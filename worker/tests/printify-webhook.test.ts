@@ -202,6 +202,109 @@ describe("handlePostPrintifyWebhook", () => {
     expect(row?.tracking_number).toBe("9400111899223344556677");
   });
 
+  it("processes tracking-only updates when provider status is unchanged", async () => {
+    const state: DbState = {
+      printOrders: new Map([
+        [PRINTIFY_ORDER_ID, printOrderRow({ status: "fulfilled" })],
+      ]),
+      receipts: new Map(),
+      lastStatusUpdate: null,
+    };
+    const payload = JSON.stringify({
+      id: "evt_tracking_only_1",
+      type: "order:updated",
+      resource: {
+        id: PRINTIFY_ORDER_ID,
+        type: "order",
+        data: {
+          status: "fulfilled",
+          shipments: [
+            {
+              carrier: "USPS",
+              tracking_number: "9400111899223344556677",
+              tracking_url: "https://tools.usps.com/go/TrackConfirmAction",
+            },
+          ],
+        },
+      },
+    });
+    const request = new Request("https://humanity.llc/v1/print/webhooks/printify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Pfy-Signature": await signPayload(payload),
+      },
+      body: payload,
+    });
+
+    const res = await handlePostPrintifyWebhook(request, { PRINTIFY_WEBHOOK_SECRET: SECRET } as Env, dbFor(state));
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      processing_status: string;
+      status: string;
+      tracking_updated: boolean;
+    };
+    expect(body.processing_status).toBe("processed");
+    expect(body.status).toBe("fulfilled");
+    expect(body.tracking_updated).toBe(true);
+    const row = state.printOrders.get(PRINTIFY_ORDER_ID);
+    expect(row?.status).toBe("fulfilled");
+    expect(row?.tracking_number).toBe("9400111899223344556677");
+  });
+
+  it("ignores duplicate tracking when neither status nor tracking changes", async () => {
+    const state: DbState = {
+      printOrders: new Map([
+        [
+          PRINTIFY_ORDER_ID,
+          printOrderRow({
+            status: "fulfilled",
+            tracking_carrier: "USPS",
+            tracking_number: "9400111899223344556677",
+            tracking_url: "https://tools.usps.com/go/TrackConfirmAction",
+          }),
+        ],
+      ]),
+      receipts: new Map(),
+      lastStatusUpdate: null,
+    };
+    const payload = JSON.stringify({
+      id: "evt_tracking_duplicate_1",
+      type: "order:updated",
+      resource: {
+        id: PRINTIFY_ORDER_ID,
+        type: "order",
+        data: {
+          status: "fulfilled",
+          shipments: [
+            {
+              carrier: "USPS",
+              tracking_number: "9400111899223344556677",
+              tracking_url: "https://tools.usps.com/go/TrackConfirmAction",
+            },
+          ],
+        },
+      },
+    });
+    const request = new Request("https://humanity.llc/v1/print/webhooks/printify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Pfy-Signature": await signPayload(payload),
+      },
+      body: payload,
+    });
+
+    const res = await handlePostPrintifyWebhook(request, { PRINTIFY_WEBHOOK_SECRET: SECRET } as Env, dbFor(state));
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { processing_status: string; reason: string };
+    expect(body.processing_status).toBe("ignored");
+    expect(body.reason).toBe("NO_STATUS_TRANSITION");
+    expect(state.lastStatusUpdate).toBeNull();
+  });
+
   it("is idempotent for duplicate event ids", async () => {
     const state: DbState = {
       printOrders: new Map([[PRINTIFY_ORDER_ID, printOrderRow()]]),

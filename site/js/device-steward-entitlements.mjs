@@ -262,4 +262,8 @@ export function initStewardEntitlementsHubHook() {
       refreshStewardEntitlementsOnHubContext();
     }
   });
+
+  void import("./device-steward-session.mjs").then((mod) => {
+    mod.initStewardSessionClient();
+  });
 }

@@ -128,7 +128,7 @@ Run on **production** (or staging with full Pages deploy) after `site/` ships. M
 
 **Fail signals:** Laggy landing scroll with hub closed; dot dead; full-page taps blocked (stuck backdrop — use unstick snippet in Safari investigation doc). If W1–W4 fail, consider Phase 3A/3B in that doc (do not ship without triage).
 
-**Automated gate:** device shell E2E in CI (`e2e/device-status-dot.spec.ts`, `device-inbox`, `device-os-wallet`) plus invariant-only WebKit smoke (`e2e/safari-shell-scroll.spec.ts`). **P0-W** sign-off is still manual on real WebKit devices.
+**Automated gate:** device shell E2E in CI — `npm run device-shell:e2e` (see [`DEVICE_SHELL_E2E_CI_REMEDIATION.md`](DEVICE_SHELL_E2E_CI_REMEDIATION.md)). **P0-W** sign-off is still manual on real WebKit devices.
 
 ### P1-4 · Hub intro coachmark (first visit)
 
@@ -257,6 +257,41 @@ Removed May 2026. See [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md). 
 
 See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 
+### P1-LC · Live control copy comprehension (M7 Step 2)
+
+**Runbook:** [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md) · automated copy guards: `npm run worker:test -- worker/tests/scan.test.ts` (H-002 assertion).
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Complete live proof loop (two phones) | Success panel includes **Control proven moments ago** + **does not prove legal identity** |
+| 2 | Ask tester: “What did live control prove?” | Recent key control; not legal ID or vouch |
+| 3 | Proof window ends | Scanner returns to **Ask for live proof** with expired copy; success panel showed **Proof display expires in M:SS** while active |
+| 4 | Let challenge expire unsigned | **Control was not proven. The request expired.** |
+
+### P1-LCP · Live control printed QR camera QA (M7 Step 2)
+
+**Runbook:** [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) · desk check: `npm run worker:test -- worker/tests/scan.test.ts worker/tests/live-control.test.ts`.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Print QR from `/created/`; scan with **iPhone Camera** | Opens Safari scan page; live control block visible |
+| 2 | Repeat with **Android** camera/scanner | Same scan page; no app install required |
+| 3 | Complete live proof from camera-opened session | Countdown, proven success, expiry, and retry all work |
+| 4 | Wide viewport (tablet or desktop) while waiting | Scanner and Owner panes side by side |
+
+### P1-LW · Large-wallet expanded hub summary rows
+
+**Refs:** [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) S12 · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) § Realistic scale.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Save **≥10** cards; expand hub on `/` | First **8** summary rows; **Show N more** at bottom |
+| 2 | Scroll hub list near bottom | More summary rows load without full wallet hydration |
+| 3 | Tap **Open controls** on a summary row | Full row hydrates; navigates to `/created/` |
+| 4 | Search hub while expanded | Filter still works on summary rows |
+
+Automated: `e2e/device-hub-large-wallet-summary.spec.ts` (steps 1–4); Vitest `device-hub-visible-rows-core.test.ts` · `device-hub-wallet-summary.test.ts`.
+
 ### P1-HH · Hub header simplification (Home / Close / Create)
 
 **Spec:** [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md) · visual refresh: [`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md)
@@ -312,7 +347,7 @@ Automated: `e2e/device-status-dot.spec.ts` § hub sheet header chrome (steps 6�
 
 **Fail signals:** Install prompt on scan; install card with zero saved cards; install card over orphan inbox; dead status dot after adding PWA module to status graph.
 
-Automated (Phase 0+): `npm run worker:test -- worker/tests/pwa-install-metadata.test.ts worker/tests/pwa-install-ux.test.ts` · Phase 3: `e2e/device-pwa-install.spec.ts`.
+Automated (Phase 0+): `npm run worker:test:pwa-install` · Phase 3–4: `npm run e2e:pwa-install` (steps 2, 8–11 + no-SW policy in CI). **Manual HTTPS sign-off:** iOS Safari 2026-05-28 ✅ (steps 1–2, 5–6, 9–10, P0-W, standalone wallet). Re-verify icon after Phase 4.1 deploy (`site:generate-pwa-icons` + Pages).
 
 ### P1-8 · Hosted tier budget (Phase 10 — E2 staging)
 

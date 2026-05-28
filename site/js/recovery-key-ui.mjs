@@ -83,7 +83,7 @@ export function initRecoveryKeyUi(opts) {
     const s = opts.getSession() || {};
     opts.setSession({ ...s, recovery_key_acknowledged: true });
     if (detailsEl) detailsEl.open = false;
-    setRecoveryStatus("Recovery key marked saved.");
+    setRecoveryStatus("Recovery key marked saved. It can restore root-card control for this card and its object QRs.");
     window.dispatchEvent(new CustomEvent("hc-recovery-acknowledged"));
   });
 
@@ -117,7 +117,7 @@ export function initRecoveryKeyUi(opts) {
         recovery_private_key_b58: raw,
         recovery_imported_at: new Date().toISOString(),
       });
-      setImportStatus("Recovery key unlocked locally. Revoke controls are available below.");
+      setImportStatus("Recovery key unlocked locally. Root-card controls are available below for this card and its object QRs.");
       importForm.reset();
       syncFromSession();
       opts.onKeysUnlocked();

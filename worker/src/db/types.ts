@@ -11,7 +11,7 @@ export const CARD_STATUSES = [
 ] as const;
 export type CardStatus = (typeof CARD_STATUSES)[number];
 
-export const QR_SCOPES = ["card", "print_artifact"] as const;
+export const QR_SCOPES = ["card", "print_artifact", "child_object"] as const;
 export type QrScope = (typeof QR_SCOPES)[number];
 
 export const QR_STATUSES = [
@@ -44,6 +44,14 @@ export type VerificationMethod = (typeof VERIFICATION_METHODS)[number];
 
 export const REVOCATION_TARGET_KINDS = ["card", "qr_credential"] as const;
 export type RevocationTargetKind = (typeof REVOCATION_TARGET_KINDS)[number];
+
+export const CHILD_OBJECT_STATUSES = [
+  "active",
+  "disabled",
+  "revoked",
+  "replaced",
+] as const;
+export type ChildObjectStatus = (typeof CHILD_OBJECT_STATUSES)[number];
 
 export const VOUCH_METHODS = ["in_person"] as const;
 export type VouchMethod = (typeof VOUCH_METHODS)[number];
@@ -80,6 +88,7 @@ export interface QrCredentialRow {
   epoch: number;
   scope: QrScope;
   print_artifact_id: string | null;
+  object_id: string | null;
   resolver_hint: string;
   status: QrStatus;
   payload: string;
@@ -116,6 +125,18 @@ export interface RevocationRow {
   appeal_deadline: string | null;
   issuer_public_key: string | null;
   created_at: string;
+}
+
+export interface ChildObjectRow {
+  object_id: string;
+  parent_profile_id: string;
+  object_type: string;
+  public_label: string;
+  public_state: string;
+  status: ChildObjectStatus;
+  child_object_document_json: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface VouchRow {

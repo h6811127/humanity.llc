@@ -69,6 +69,7 @@ Do not use:
 - Premium verification / Pro human / Verified+.
 - Always-on monitoring included.
 - Pay to get vouched faster or look more verified.
+- AI profiles / We have AI too / AI-generated trust.
 
 These either overclaim, confuse the legal boundary, attract the wrong expectations, or misstate the hosted tier (capacity only, not surveillance).
 

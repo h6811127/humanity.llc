@@ -6,12 +6,16 @@ import { fileURLToPath } from "node:url";
 import {
   PWA_APPLE_TOUCH_ICON_PATH,
   PWA_INSTALL_DOC,
+  PWA_MANIFEST_LINK_ALLOWED_HTML_PATHS,
   PWA_MANIFEST_PATH,
   PWA_REQUIRED_ICON_SIZES,
+  PWA_ROLLOUT_MANIFEST_ON_REFERENCE_PAGES,
+  PWA_ROLLOUT_SCAN_INSTALLABLE,
   PWA_SHELL_HTML_PATHS,
   isPwaExcludedPath,
   isPwaShellPagePath,
   manifestHasRequiredIconSizes,
+  mayHtmlFileLinkPwaManifest,
   validatePwaManifestShape,
 } from "../../site/js/pwa-install-metadata-core.mjs";
 import { buildScanViewModel } from "../src/resolver/scan-state";
@@ -107,6 +111,7 @@ describe("PWA metadata on disk (Phase 1 gate)", () => {
       expect(fs.existsSync(path.join(root, `site/icons/pwa-${size}.png`))).toBe(true);
     }
     expect(fs.existsSync(path.join(root, "site/icons/pwa-apple-touch.png"))).toBe(true);
+    expect(fs.existsSync(path.join(root, "site/icons/pwa-512-maskable.png"))).toBe(true);
   });
 
   it("shell HTML includes install card placeholder after Phase 2", () => {
@@ -181,5 +186,50 @@ describe("PWA metadata on disk (Phase 1 gate)", () => {
     );
     const scanHtml = await renderScanPage(vm, "https://humanity.llc");
     expect(scanHtml).not.toContain('rel="manifest"');
+  });
+});
+
+describe("PWA Phase 5 closure (rollout decisions)", () => {
+  it("locks rollout gate: no manifest on reference pages; scan not installable", () => {
+    expect(PWA_ROLLOUT_MANIFEST_ON_REFERENCE_PAGES).toBe(false);
+    expect(PWA_ROLLOUT_SCAN_INSTALLABLE).toBe(false);
+  });
+
+  it("manifest start_url stays landing hub, not scan", () => {
+    const manifestPath = path.join(root, "site/manifest.webmanifest");
+    if (!fs.existsSync(manifestPath)) return;
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    expect(manifest.start_url).toBe("/");
+    expect(String(manifest.scope)).toBe("/");
+  });
+
+  it("only shell HTML files may link manifest (Phase 5 CI gate)", () => {
+    const siteDir = path.join(root, "site");
+    /** @param {string} dir @param {string[]} acc */
+    function walkHtml(dir, acc = []) {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) walkHtml(full, acc);
+        else if (entry.name.endsWith(".html")) acc.push(full);
+      }
+      return acc;
+    }
+
+    for (const htmlPath of walkHtml(siteDir)) {
+      const rel = path.relative(siteDir, htmlPath).split(path.sep).join("/");
+      const html = fs.readFileSync(htmlPath, "utf8");
+      const linksManifest = html.includes('rel="manifest"');
+      const allowed = mayHtmlFileLinkPwaManifest(rel);
+      expect(
+        { rel, linksManifest, allowed },
+        `${rel}: manifest link only on shell pages`
+      ).toEqual({
+        rel,
+        linksManifest: allowed,
+        allowed,
+      });
+    }
+
+    expect(PWA_MANIFEST_LINK_ALLOWED_HTML_PATHS).toEqual(PWA_SHELL_HTML_PATHS);
   });
 });

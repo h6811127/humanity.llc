@@ -147,9 +147,15 @@ Delegated capabilities must be root-signed, scoped, expiring, revocable, and cle
 
 ## Implementation sequence
 
-1. **Shared taxonomy (first slice):** centralize QR scope / child-object copy so scan pages describe `print_artifact` as a printed object controlled by a root card.
-2. **Device cache:** carry `scan.qr.scope` into wallet/network cache so hub rows can distinguish root cards from child objects.
-3. **Backup gating copy:** make root backup/recovery harder to skip before many child objects, merch checkout, or steward operations.
-4. **Child object endpoints:** add parent-signed create/update/revoke routes once the data model is frozen.
-5. **Delegated capabilities:** add scoped, expiring, root-signed child keys only after real team/event use cases demand them.
+1. **Shared taxonomy (first slice shipped):** `object-taxonomy-core.mjs` centralizes QR scope / child-object copy; scan pages describe printed objects and child objects; lost-item relays use `[relay]` prefix via `childObjectManifestoLine()`.
+2. **Device cache (shipped):** carry `scan.qr.scope` into wallet/network cache and `hc_wallet_summary` rows so hub rows can distinguish root cards from child objects.
+3. **Backup gating copy (shipped):** make root backup/recovery harder to skip before many child objects, merch checkout, or steward operations.
+4. **Child object endpoints (first slice shipped):** parent-signed create/update/revoke routes and `child_objects` storage.
+5. **Client signing (shipped):** browser helpers in `site/js/child-object-update.mjs` sign and POST parent-signed child objects; path helpers in `site/js/child-object-api-core.mjs`; `generateChildObjectId()` in `hc-sign.mjs`.
+6. **Status plate UI (first slice shipped):** `/created/` Live → **Add status plate** for general root cards; registers child objects via API and indexes them in device `localStorage` (`child-object-store-core.mjs`).
+7. **Child object update UI (shipped):** publish status-line updates for registered status plates via `signChildObjectUpdate` / `postChildObjectUpdate` on `/created/`.
+8. **Child object scan QR (shipped):** migration `0023_child_object_qr.sql`; `scope: child_object` + `object_id` on `qr_credentials`; `POST …/objects/{object_id}/issue-qr`; `/created/` **Issue scan link**; scan page shows object label/state from `child_objects` row (status plates use manifesto display). Tests: `issue-child-object-qr.test.ts` · `scan-context.test.ts`. **Production:** apply `0023` before deploy that selects `object_id` — [`SCAN_WORKER_1101_POSTMORTEM.md`](SCAN_WORKER_1101_POSTMORTEM.md); rollout scan smoke in `hosted-rollout-scan-smoke.mjs`.
+9. **Child object disable UI (shipped):** `/created/` Live → **Disable this plate** on registered status plates; signs `POST …/objects/{object_id}/revoke`; local index marks `status: disabled`; scan shows **Object unavailable** when child is disabled.
+10. **Lost-item relay child UI (shipped):** `/created/` Live → **Add lost-item relay** for general root cards; register, update return message, issue scan link, disable relay — mirrors status plate flow with `object_type: lost_item_relay` and `[relay]` scan layout via `childObjectManifestoLine()`.
+11. **Delegated capabilities:** add scoped, expiring, root-signed child keys only after real team/event use cases demand them.
 

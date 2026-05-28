@@ -66,9 +66,10 @@ Optional but high-leverage for v1.1 or a strong private alpha:
 | `POST /.well-known/hc/v1/cards/{profile_id}/qr` | POST | Owner signature | Creates/rotates QR credential. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/revoke` | POST | Owner/recovery signature | Revokes card or QR credential. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/update` | POST | Owner/recovery signature | Updates `manifesto_line` and signed card document; handle and keys immutable. |
-| `POST /.well-known/hc/v1/cards/{profile_id}/objects` | POST | Owner/recovery signature | **Target model:** creates a child object under the root card. Not routed in the current no-migration slice. |
-| `POST /.well-known/hc/v1/cards/{profile_id}/objects/{object_id}/update` | POST | Owner/recovery signature | **Target model:** updates child object public fields without a separate child key. |
-| `POST /.well-known/hc/v1/cards/{profile_id}/objects/{object_id}/revoke` | POST | Owner/recovery signature | **Target model:** disables a child object or one child QR; root remains active. |
+| `POST /.well-known/hc/v1/cards/{profile_id}/objects` | POST | Owner/recovery signature | Creates a child object under the root card. |
+| `POST /.well-known/hc/v1/cards/{profile_id}/objects/{object_id}/update` | POST | Owner/recovery signature | Updates child object public fields without a separate child key. |
+| `POST /.well-known/hc/v1/cards/{profile_id}/objects/{object_id}/revoke` | POST | Owner/recovery signature | Disables a child object; root remains active. |
+| `POST /.well-known/hc/v1/cards/{profile_id}/objects/{object_id}/issue-qr` | POST | Owner/recovery signature | Issues one active child-object QR credential for the object. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/live-control/challenges` | POST | Scanner session | Creates short-lived live control challenge. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/live-control/responses` | POST | Owner signature | Submits signed live control challenge response. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/export` | POST | Owner auth/signature | Requests export bundle. |
@@ -158,9 +159,9 @@ Required fields:
 
 Allowed `status`: `active`, `revoked`, `suspended`, `expired`.
 
-### Child Object (target)
+### Child Object (shipped)
 
-Child object endpoints are not routed in the current implementation, but new build slices should converge on this parent-signed shape instead of minting a new root card for every status plate, lost-item tag, or merch object:
+Parent-signed create/update/revoke routes are live under `/.well-known/hc/v1/cards/{profile_id}/objects`. Browser signing: `site/js/child-object-update.mjs`. New build slices should converge on this parent-signed shape instead of minting a new root card for every status plate, lost-item tag, or merch object:
 
 ```json
 {
@@ -209,6 +210,7 @@ Allowed `method`: `none`, `registered`, `vouch`, `ceremony`, `device_proof`, `st
   "epoch": 1,
   "scope": "card",
   "print_artifact_id": null,
+  "object_id": null,
   "resolver_hint": "https://humanity.llc",
   "issued_at": "2026-05-16T17:00:00Z",
   "expires_at": "2026-06-15T17:00:00Z",
@@ -220,13 +222,15 @@ Allowed `method`: `none`, `registered`, `vouch`, `ceremony`, `device_proof`, `st
 
 Allowed `status`: `active`, `revoked`, `expired`, `replaced`.
 
-Allowed `scope`: `card`, `print_artifact`.
+Allowed `scope`: `card`, `print_artifact`, `child_object`.
 
 For personalized physical products, each printed item MUST receive a distinct `qr_id` with `scope: "print_artifact"` even when multiple items are ordered together. All item QR credentials MAY resolve to the same root `profile_id` and MAY represent child-object-like printed items, but each item QR MUST be individually revocable. Root card revocation or suspension still overrides every linked QR credential and child object.
 
 **Merch calendar expiry:** `print_artifact` credentials for founding physical SKUs MUST use `expires_at: null` unless the SKU is an explicit timed-event product (storefront + scan copy). Digital `scope: card` QRs MAY use `expires_at` per create UI. Policy: [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md).
 
 **Issue print artifact QR (shipped):** `POST /.well-known/hc/v1/cards/{profile_id}/print-artifact-qrs` with root owner- or recovery-signed `{ qr_credential }` (`scope: print_artifact`, `print_artifact_id`, `expires_at` null). Does not change `card.qr.active_qr_id`. One active QR per `print_artifact_id` per root profile.
+
+**Issue child object QR (shipped):** `POST /.well-known/hc/v1/cards/{profile_id}/objects/{object_id}/issue-qr` with root owner- or recovery-signed `{ qr_credential }` (`scope: child_object`, matching `object_id`). Does not change `card.qr.active_qr_id`. One active QR per `object_id` per root profile. Scan page reads child object `public_label` / `public_state` when scope is `child_object`.
 
 ### Live Control Challenge
 

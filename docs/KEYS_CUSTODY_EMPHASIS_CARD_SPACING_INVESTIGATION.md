@@ -112,7 +112,15 @@ Same root cause as keys custody: column `hc-emphasis-card` without F3 stacked la
 
 Spacing/CSS for hub/wallet/created custody uses `.device-keys-custody.hc-emphasis-card`; create uses `#create-public-card-notice` in the same compact stacked block.
 
-**No further engineering steps** after 18. **14d** (physical iPhone) remains operator-optional.
+**No further engineering steps** after 18 unless CI regresses — see [`DEVICE_SHELL_E2E_CI_REMEDIATION.md`](DEVICE_SHELL_E2E_CI_REMEDIATION.md) **step 2** (wallet foot placement vs detail→Acknowledge E2E gap).
+
+---
+
+## CI regression (step 19)
+
+| Step | Action | Status |
+|------|--------|--------|
+| 19 | Wallet `--wallet` foot links below Acknowledge (not between detail and button) | [`DEVICE_SHELL_E2E_CI_REMEDIATION.md`](DEVICE_SHELL_E2E_CI_REMEDIATION.md) step 2 | **Shipped** |
 
 ---
 

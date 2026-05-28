@@ -206,8 +206,12 @@ Deploy: `npm run worker:deploy`. Route `humanity.llc/v1/*` required for artifact
 
 ### 1. Printify (factory)
 
-- [ ] Create / approve hoodie (or sticker) template in Printify — print area, scan QA per [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) (A-004)
-- [ ] Note **Printify blueprint id**, **print provider id**, and **variant id** for Worker env (inspect catalog or an approved template product in Printify admin)
+**Tier 1 hoodie blank (approved):** [Champion S700 hoodie](https://printify.com/app/products/528/champion/champion-hoodie) — Printify **blueprint `528`**. Launch size/color: **Solid Black / M** (`print_variant_id: black-m` in `shop-config.json`).
+
+- [ ] Run `PRINTIFY_API_TOKEN=… npm run printify:lookup-blueprint -- 528` — lists print providers, variant ids, and suggested `wrangler.toml` lines. Prefer a provider with **DTF or DTG on front** (QR scans poorly through embroidery).
+- [ ] Save a **reference product** in your Printify shop (same blueprint / provider / variant) — copy its **shop product id** into `PERSONALIZE_HOODIE_PRINTIFY_PRODUCT_ID` (shipping quotes use this; Tier 1 submit creates ephemeral products with per-order artwork).
+- [ ] Set `PERSONALIZE_HOODIE_PRINTIFY_BLUEPRINT_ID`, `PRINT_PROVIDER_ID`, `VARIANT_ID`, placeholder + image offsets after physical QA per [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) (A-004)
+- [ ] Sticker path unchanged — separate `PERSONALIZE_STICKER_PRINTIFY_*` env keys
 
 ### 2. Shopify (cash register)
 
@@ -239,6 +243,29 @@ Deploy: `npm run worker:deploy`. Route `humanity.llc/v1/*` required for artifact
 
 - [ ] Mint: `POST /v1/print/orders/{id}/mint` with owner-signed credentials
 - [ ] Submit: `POST /v1/print/orders` `{ commerce_order_id, submit_to_printify: true }` (shipping from encrypted store when key configured; optional `shipping_address` body override)
+
+---
+
+## Production rollout commands (engineering)
+
+Mirrors [`hosted:rollout:step*`](HOSTED_TIER_G0_READINESS.md) for merch funnel close-out. Run in order before enabling live Tier 1 payments.
+
+| Step | Command | Purpose |
+|------|---------|---------|
+| 1 | `npm run merch-funnel:rollout:step1` | Validate repo `shop-config.json` + merch funnel Vitest |
+| 1 strict | `npm run merch-funnel:rollout:step1 -- --strict` | Fail if launch SKU lacks `checkout_url` |
+| 2 preflight | `npm run merch-funnel:rollout:step2 -- --preflight` | Local shop-config + rollout unit tests (no fetch) |
+| 2 | `SITE_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step2 -- --verify` | Smoke deployed Pages config + repo drift |
+| 2 CI | `deploy-pages.yml` → `merch-funnel:rollout:post-deploy -- --pages` | Post-deploy step 2 verify (non-`--strict`; warnings OK until operator pastes URLs) |
+| 3 preflight | `npm run merch-funnel:rollout:step3 -- --preflight` | `humanity.llc/v1/*` route + rollout Vitest (no API) |
+| 3 | `API_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step3 -- --verify` | Health, print catalog, artifact-intent route |
+| 3 CI | `deploy-worker.yml` → `merch-funnel:rollout:post-deploy -- --worker` | Post-deploy step 3 verify after Worker deploy |
+| 4 | `npm run merch-funnel:rollout:step4` | Worker env + route checklist (`wrangler.toml`) |
+| 5 | `npm run merch-funnel:rollout:step5` | Launch gates + physical QA sign-off checklist |
+| 6 preflight | `npm run merch-funnel:rollout:step6 -- --preflight` | Rollout unit tests + `verify:merch-funnel` (no Playwright) |
+| 6 | `npm run merch-funnel:rollout:step6 -- --verify` | Full regression: `verify:merch-funnel` + `e2e:merch-funnel` |
+
+**Vitest bundle:** `npm run verify:merch-funnel` (= merch funnel + print QA + shop-config rollout tests).
 
 ---
 

@@ -129,7 +129,9 @@ function createDb(state: DbState): D1Database {
             const pattern = String(args[0]);
             return (
               [...state.commerce.values()].find((row) =>
-                pattern.includes(row.artifact_intent_ids_json.slice(1, -1).split('"')[1] ?? "")
+                row.artifact_intent_ids_json?.includes(
+                  pattern.replace(/%/g, "").replace(/"/g, "")
+                )
               ) ?? null
             );
           }
@@ -155,10 +157,9 @@ function createDb(state: DbState): D1Database {
         all: async () => {
           if (sql.includes("FROM commerce_order_links") && sql.includes("LIKE")) {
             const pattern = String(args[0]);
+            const needle = pattern.replace(/%/g, "").replace(/"/g, "");
             const rows = [...state.commerce.values()].filter((row) =>
-              (row.artifact_intent_ids_json ?? "").includes(
-                pattern.replace(/%/g, "").replace(/"/g, "")
-              )
+              (row.artifact_intent_ids_json ?? "").includes(needle)
             );
             return { results: rows };
           }
@@ -196,13 +197,13 @@ function createDb(state: DbState): D1Database {
               commerce_order_id: args[0] as string,
               shopify_order_id: args[1] as string,
               shopify_checkout_id: args[2] as string | null,
-              shopify_order_number: (args[3] as string | null) ?? null,
-              buyer_email_hash: (args[4] as string | null) ?? null,
-              profile_id: (args[5] as string | null) ?? null,
+              shopify_order_number: args[3] as number | null,
+              buyer_email_hash: args[4] as string | null,
+              profile_id: args[5] as string | null,
               artifact_intent_ids_json: args[6] as string,
               print_order_ids_json: "[]",
               status: args[7] as CommerceOrderRow["status"],
-              hold_reason: (args[8] as string | null) ?? null,
+              hold_reason: args[8] as string | null,
               created_at: args[9] as string,
               updated_at: args[10] as string,
             };

@@ -46,6 +46,8 @@ function dbFor(state: DbState): D1Database {
               tracking_carrier: args[1],
               tracking_number: args[2],
               tracking_url: args[3],
+              last_reconciled_at: args[4],
+              updated_at: args[5],
             };
             const row = state.rows.find((r) => r.order_id === args[6]);
             if (row) {
@@ -98,5 +100,102 @@ describe("runPrintifyReconcile", () => {
     expect(state.rows[0]?.status).toBe("fulfilled");
     expect(state.rows[0]?.tracking_number).toBe("9400111899223344556677");
     expect(fetchImpl).toHaveBeenCalledOnce();
+  });
+
+  it("persists tracking from Printify poll even when status is unchanged", async () => {
+    const state: DbState = {
+      rows: [printOrderRow({ status: "in_production" })],
+      lastSync: null,
+    };
+
+    const fetchImpl = vi.fn(async () =>
+      new Response(
+        JSON.stringify({
+          id: PRINTIFY_ORDER_ID,
+          status: "in-production",
+          shipments: [
+            {
+              carrier: "USPS",
+              tracking_number: "9400111899223344556677",
+              tracking_url: "https://tools.usps.com/go/TrackConfirmAction",
+            },
+          ],
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      )
+    );
+
+    const result = await runPrintifyReconcile(
+      dbFor(state),
+      { PRINTIFY_API_TOKEN: "token", PRINTIFY_SHOP_ID: "99" },
+      { now: "2026-05-27T01:05:00.000Z", fetchImpl }
+    );
+
+    expect(result).toEqual({ polled: 1, updated: 1, errors: 0 });
+    expect(state.rows[0]?.status).toBe("in_production");
+    expect(state.rows[0]?.tracking_number).toBe("9400111899223344556677");
+    expect(state.lastSync?.updated_at).toBe("2026-05-27T01:05:00.000Z");
+  });
+
+  it("records poll errors without mutating the print order", async () => {
+    const state: DbState = {
+      rows: [printOrderRow()],
+      lastSync: null,
+    };
+
+    const fetchImpl = vi.fn(async () => new Response("unauthorized", { status: 401 }));
+
+    const result = await runPrintifyReconcile(
+      dbFor(state),
+      { PRINTIFY_API_TOKEN: "token", PRINTIFY_SHOP_ID: "99" },
+      { now: "2026-05-27T01:10:00.000Z", fetchImpl }
+    );
+
+    expect(result).toEqual({ polled: 1, updated: 0, errors: 1 });
+    expect(state.lastSync).toBeNull();
+    expect(state.rows[0]?.status).toBe("in_production");
+    expect(state.rows[0]?.last_reconciled_at).toBeNull();
+  });
+
+  it("stamps last_reconciled_at on no-op polls without bumping updated_at", async () => {
+    const state: DbState = {
+      rows: [
+        printOrderRow({
+          tracking_carrier: "USPS",
+          tracking_number: "9400111899223344556677",
+          tracking_url: "https://tools.usps.com/go/TrackConfirmAction",
+          updated_at: "2026-05-27T00:30:00.000Z",
+        }),
+      ],
+      lastSync: null,
+    };
+
+    const fetchImpl = vi.fn(async () =>
+      new Response(
+        JSON.stringify({
+          id: PRINTIFY_ORDER_ID,
+          status: "in-production",
+          shipments: [
+            {
+              carrier: "USPS",
+              tracking_number: "9400111899223344556677",
+              tracking_url: "https://tools.usps.com/go/TrackConfirmAction",
+            },
+          ],
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      )
+    );
+
+    const result = await runPrintifyReconcile(
+      dbFor(state),
+      { PRINTIFY_API_TOKEN: "token", PRINTIFY_SHOP_ID: "99" },
+      { now: "2026-05-27T01:15:00.000Z", fetchImpl }
+    );
+
+    expect(result).toEqual({ polled: 1, updated: 0, errors: 0 });
+    expect(state.rows[0]?.last_reconciled_at).toBe("2026-05-27T01:15:00.000Z");
+    expect(state.rows[0]?.updated_at).toBe("2026-05-27T00:30:00.000Z");
+    expect(state.lastSync?.updated_at).toBe("2026-05-27T00:30:00.000Z");
   });
 });

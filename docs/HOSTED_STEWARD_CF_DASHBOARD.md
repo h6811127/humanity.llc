@@ -32,6 +32,8 @@ Cloudflare Workers analytics show **edge-level** health: request volume, error r
 
 ## Setup (Cloudflare dashboard)
 
+**Local preflight (repo only):** `npm run hosted:rollout:step5a -- --preflight` — confirms `worker/wrangler.toml` `name` matches this doc and rollout Vitest pass.
+
 1. Open **Workers & Pages** → **humanity-llc-resolver** → **Metrics** (or account **Analytics & Logs** → Workers).
 2. Pin a **7-day** and **24-hour** view for on-call review.
 3. Add saved filters or note these paths for hosted-tier load:
@@ -80,4 +82,5 @@ Cloudflare Workers analytics show **edge-level** health: request volume, error r
 
 | Date | Note |
 |------|------|
+| 2026-05-28 | `hosted:rollout:step5a -- --preflight` (wrangler name + doc gate before manual pin) |
 | 2026-05-27 | E6.1 ops setup guide for external CF Workers dashboard |

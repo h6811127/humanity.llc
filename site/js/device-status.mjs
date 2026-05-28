@@ -2,7 +2,7 @@
  * Floating status dot, notification badge, hub sheet host.
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
-import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=56";
+import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=57";
 import { buildStatusSegments } from "./device-counts.mjs";
 import { shouldSkipCrossTabOverlayViewTransition } from "./device-presence-inbox-stability-core.mjs";
 import { fetchResolverHealth } from "./device-network-health.mjs";
@@ -11,7 +11,11 @@ import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visi
 export const RESOLVER_HEALTH_CHANGED = "hc-resolver-health-changed";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
-import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
+import {
+  isWalletSaved,
+  loadWallet,
+  loadWalletSummary,
+} from "./device-wallet.mjs";
 import {
   gatherInboxInput,
   getInboxItems,
@@ -24,33 +28,33 @@ import {
   inboxBadgeCountText,
   inboxCountFromItems,
   notificationCount,
-} from "./device-inbox.mjs?v=56";
+} from "./device-inbox.mjs?v=57";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import {
   initHubIntroCoachmark,
   onHubOpenedFromIntro,
 } from "./device-hub-intro-coachmark.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=56";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=57";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import "./device-shell-motion.mjs";
-import "./device-shell-chrome.mjs?v=56";
+import "./device-shell-chrome.mjs?v=57";
 import "./device-theme.mjs";
-import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=56";
+import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=57";
 import {
   isHubSheet,
   reconcileHubSheetState,
   setHubSheetOpen,
-} from "./device-hub-sheet.mjs?v=56";
+} from "./device-hub-sheet.mjs?v=57";
 import { startCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import {
   refreshDeviceChrome,
   setRefreshStatusSurfaces,
   startDeviceChromeRefresh,
-} from "./device-chrome-refresh.mjs?v=56";
+} from "./device-chrome-refresh.mjs?v=57";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 import {
   broadcastHealthSnapshotIfEligible,
@@ -73,7 +77,7 @@ import {
   shellStatusLinePrimaryInChrome,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=56";
+} from "./device-dot-state-core.mjs?v=57";
 
 export const DOT_STATE_CHANGED = "hc-dot-state-changed";
 
@@ -135,9 +139,7 @@ function hasUnsavedTabKeys() {
 function hasStewardReadyKeys() {
   const session = getTabSession();
   if (session?.owner_private_key_b58 && hasStewardVerification(session)) return true;
-  return loadWallet().some(
-    (entry) => Boolean(entry?.owner_private_key_b58) && hasStewardVerification(entry)
-  );
+  return loadWalletSummary().stewardReady;
 }
 
 function savedCardsWithSigningKeys() {
@@ -145,10 +147,16 @@ function savedCardsWithSigningKeys() {
 }
 
 function deviceState() {
+  const summary = loadWalletSummary();
   return deviceStateFromContext({
     unsavedTabKeys: hasUnsavedTabKeys(),
-    stewardReady: hasStewardReadyKeys(),
-    savedWalletCount: loadWallet().length,
+    stewardReady:
+      summary.stewardReady ||
+      (() => {
+        const session = getTabSession();
+        return Boolean(session?.owner_private_key_b58 && hasStewardVerification(session));
+      })(),
+    savedWalletCount: summary.count,
   });
 }
 
@@ -252,7 +260,7 @@ function applyDot() {
   if (!dot) return;
   const device = deviceState();
   const overlay = dotOverlayState();
-  const savedWalletCount = loadWallet().length;
+  const savedWalletCount = loadWalletSummary().count;
   const shellNeutralEmpty = shellDotUsesNeutralEmptyWallet({
     network: networkStatus,
     device,
@@ -347,11 +355,12 @@ function renderDotExplainer(container, descriptor, compact = false) {
 }
 
 function renderDotExplainability(network, device, overlay) {
+  const summary = loadWalletSummary();
   const descriptor = describeDotState(network, device, overlay, {
     stewardReady: hasStewardReadyKeys(),
     queueUrl: getStewardQueueUrl(),
     pageKind: dotPageKind(),
-    singleSavedCardWithKeys: savedCardsWithSigningKeys().length === 1,
+    singleSavedCardWithKeys: summary.signingKeyCount === 1,
   });
   const keyRoot = document.getElementById("device-hub-status-key");
   if (keyRoot) {
@@ -397,7 +406,7 @@ function renderStatusKey() {
 
 function renderShellStatusLine(segments) {
   if (!shellStatusLine) return;
-  const savedWalletCount = loadWallet().length;
+  const savedWalletCount = loadWalletSummary().count;
   const device = deviceState();
   const overlay = dotOverlayState();
   const show = shellStatusLinePrimaryInChrome({

@@ -25,3 +25,7 @@ jobs:
         run: npm run pages:deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      - name: Post-deploy merch funnel verify (step 2)
+        run: npm run merch-funnel:rollout:post-deploy -- --pages
+        env:
+          SITE_ORIGIN: https://humanity.llc

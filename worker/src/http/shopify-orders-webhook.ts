@@ -89,6 +89,15 @@ async function validatePaidOrderIntents(
         fulfillment_mode: null,
       };
     }
+    if (row.status === "converted") {
+      return {
+        artifact_intent_ids: metadata.artifact_intent_ids,
+        profile_id: profileId ?? row.profile_id,
+        hold_reason: "ARTIFACT_INTENT_ALREADY_CONVERTED",
+        status: "held_for_review",
+        fulfillment_mode: null,
+      };
+    }
     if (isIntentExpired(row, nowMs)) {
       if (row.status !== "expired" && row.status !== "converted") {
         await updateArtifactIntentStatus(db, intentId, "expired", nowIso);
@@ -174,6 +183,21 @@ async function markIntentsConverted(
   }
 }
 
+async function recoverDuplicateProcessingOrder(
+  db: D1Database,
+  row: CommerceOrderRow,
+  nowIso: string
+): Promise<CommerceOrderRow> {
+  if (row.status !== "processing") return row;
+
+  const printOrderIds = await queuePrintOrderAfterPaidWebhook(db, row, nowIso);
+  return {
+    ...row,
+    print_order_ids_json: JSON.stringify(printOrderIds),
+    updated_at: printOrderIds.length > 0 ? nowIso : row.updated_at,
+  };
+}
+
 async function handlePaidOrder(
   db: D1Database,
   order: ShopifyOrderLike,
@@ -193,7 +217,8 @@ async function handlePaidOrder(
 
   const existing = await getCommerceOrderByShopifyId(db, metadata.shopify_order_id);
   if (existing) {
-    return { ok: true, row: existing, duplicate: true };
+    const recovered = await recoverDuplicateProcessingOrder(db, existing, nowIso);
+    return { ok: true, row: recovered, duplicate: true };
   }
 
   const validation = await resolvePaidOrderValidation(db, order, metadata, env, nowIso);

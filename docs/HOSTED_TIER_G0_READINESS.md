@@ -32,6 +32,15 @@ npm run verify:hosted-g0
 
 Equivalent to `worker:test:hosted-free-tier` + `worker:test:steward-hosted`.
 
+**Roadmap step 3 (session link + rollout smoke unit tests):**
+
+```bash
+npm run hosted:rollout:verify-path
+npm run hosted:rollout:verify-path -- --e2e
+```
+
+See [`STEWARD_DEVICE_ROADMAP.md`](STEWARD_DEVICE_ROADMAP.md) § Current engineering steps.
+
 **Playwright (hosted E2E — run before production flag on):**
 
 ```bash
@@ -81,13 +90,14 @@ npm run hosted:rollout:step1 -- --remote  # + production D1 (Cloudflare auth)
 
 ```bash
 npm run hosted:rollout:step2                        # verify HOSTED_STEWARD_ENABLED=0 in wrangler.toml
-npm run hosted:rollout:step2 -- --deploy --smoke    # deploy Worker + GET health on API_ORIGIN
+npm run hosted:rollout:step2 -- --deploy --smoke    # deploy Worker + smoke health + hosted routes gated
 ```
 
 **Rollout step 3a — `OPERATOR_AUDIT_TOKEN` (required; do this first):**
 
 ```bash
 npm run hosted:rollout:step3a
+npm run hosted:rollout:step3a -- --smoke   # steward-ops route + auth gate (no token in env)
 # After wrangler + GitHub secrets are set:
 OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step3a
 ```
@@ -100,47 +110,65 @@ OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:
 npm run hosted:rollout:step3b   # setup notes only; not required before step 4
 ```
 
-**Rollout step 4a — enable `HOSTED_STEWARD_ENABLED` in wrangler (do this first):**
+**Rollout step 4a — enable `HOSTED_STEWARD_ENABLED` in wrangler (shipped in repo):**
 
 ```bash
 npm run hosted:rollout:step4a
-npm run hosted:rollout:step4a -- --apply   # writes "1" to worker/wrangler.toml locally
-# commit worker/wrangler.toml, then step 4b
+npm run hosted:rollout:step4a -- --apply   # idempotent if already "1"
+# worker/wrangler.toml committed with HOSTED_STEWARD_ENABLED = "1" — proceed to step 4b
 ```
 
-**Rollout step 4b — deploy + verify production:**
+**Status:** step 4a is applied in repo (`worker/wrangler.toml` has `HOSTED_STEWARD_ENABLED = "1"`). Continue with step 4b deploy/smoke/verify.
+
+**Rollout step 4b — deploy + smoke + verify production:**
 
 ```bash
+# Local worker (after worker:migrate:local + worker:dev):
+npm run hosted:rollout:step4b -- --preflight
+npm run hosted:rollout:step4b -- --local-smoke
+# Production (push worker/ to main triggers deploy-worker.yml post-deploy verify):
 npm run hosted:rollout:step4 -- --deploy
-npm run hosted:rollout:step4 -- --verify
+npm run hosted:rollout:post-deploy-smoke -- --verify
+npm run hosted:rollout:step4 -- --smoke
 OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step4 -- --verify
 ```
+
+**Status:** production smoke/verify passed for public hosted routes (`health`, plans, capabilities, entitlements 401). Local `--deploy` still requires `CLOUDFLARE_API_TOKEN`; full steward-ops verification additionally requires `OPERATOR_AUDIT_TOKEN`.
 
 **Rollout step 5a — pin Cloudflare dashboard (do this first, manual):**
 
 ```bash
-npm run hosted:rollout:step5a
+npm run hosted:rollout:step5a -- --preflight   # wrangler name + doc + Vitest
+npm run hosted:rollout:step5a                  # CF UI checklist
 ```
 
-See [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md).
+See [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md). **Status:** ✅ preflight + manual CF pin complete (2026-05-28).
 
 **Rollout step 5b — E6.2 CI secret + verify:**
 
 ```bash
-npm run hosted:rollout:step5
-npm run hosted:rollout:step5 -- --verify
-OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step5 -- --verify
+npm run hosted:rollout:step5b -- --preflight
+npm run hosted:rollout:step5b
+npm run hosted:rollout:step5b -- --verify
+OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step5b -- --verify
+# hosted:rollout:step5 aliases step5b verify path
 ```
+
+**Status:** preflight ✅ · GitHub `OPERATOR_AUDIT_TOKEN` secret listed ✅ · **production threshold check** requires token in shell (same value as Worker secret).
 
 **Rollout step 6 (script):**
 
 ```bash
 npm run hosted:rollout:step6
+# Local preflight (rollout unit tests + verify:hosted-g0, no Playwright):
+npm run hosted:rollout:step6 -- --preflight
 # Full regression before steward announcement:
 npm run hosted:rollout:step6 -- --verify
 npm run hosted:rollout:step6 -- --vitest   # step 6a (Vitest) only
 npm run hosted:rollout:step6 -- --e2e      # step 6b (Playwright) only
 ```
+
+**Status:** preflight ✅ · E2E (`--e2e`) ✅ 8/8 Playwright · production post-deploy smoke ✅ (health, scan 200, hosted routes).
 
 Rollout steps: [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout (after G0).
 
@@ -175,5 +203,6 @@ Checklist: [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) §
 
 | Date | Note |
 |------|------|
+| 2026-05-28 | **Rollout step 3a:** `hosted:rollout:step3a -- --smoke` checks steward-ops auth gate before bearer verify |
 | 2026-05-27 | G0 readiness packet — engineering verification + ops parallel checklist |
 | 2026-05-27 | **G0 signed** (Governance + Ops); Legal pending |

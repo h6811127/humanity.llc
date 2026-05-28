@@ -2,3 +2,7 @@
 # Production: wrangler secret put OPERATOR_AUDIT_TOKEN --config worker/wrangler.toml
 
 OPERATOR_AUDIT_TOKEN=dev-only-change-me
+
+# Merch / Printify catalog lookup (npm run printify:lookup-blueprint)
+# PRINTIFY_API_TOKEN=
+# PRINTIFY_SHOP_ID=

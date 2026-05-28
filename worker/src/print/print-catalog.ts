@@ -58,7 +58,7 @@ const CATALOG: PrintCatalogProduct[] = [
     type: "hoodie",
     title: "Live Object hoodie",
     description:
-      "Front-chest LIVE OBJECT QR — unique revocable code per physical unit.",
+      "Champion S700 (Printify blueprint 528) — front-chest LIVE OBJECT QR, unique revocable code per unit.",
     product_id: "prod_hoodie_live_object",
     variants: [
       {
