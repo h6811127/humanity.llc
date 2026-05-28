@@ -202,9 +202,9 @@ describe("child-object issue-qr client", () => {
     );
     expect(src).toContain("child-object-plate-issue-qr");
     expect(src).toContain("child-object-plate-disable");
-    expect(src).toContain("signChildObjectIssueQr");
+    expect(src).toContain("registerChildObjectAndIssueScanLink");
+    expect(src).toContain("issueChildObjectScanLink");
     expect(src).toContain("signChildObjectRevoke");
-    expect(src).toContain("postChildObjectIssueQr");
     expect(src).toContain("postChildObjectRevoke");
   });
 
@@ -216,7 +216,8 @@ describe("child-object issue-qr client", () => {
     expect(src).toContain("child-object-relay-issue-qr");
     expect(src).toContain("child-object-relay-disable");
     expect(src).toContain("CHILD_OBJECT_TYPE_LOST_ITEM_RELAY");
-    expect(src).toContain("signChildObjectIssueQr");
+    expect(src).toContain("registerChildObjectAndIssueScanLink");
+    expect(src).toContain("issueChildObjectScanLink");
     expect(src).toContain("signChildObjectRevoke");
     expect(src).toContain("refreshChildObjectsFromNetwork");
   });

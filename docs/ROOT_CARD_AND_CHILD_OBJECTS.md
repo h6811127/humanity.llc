@@ -128,7 +128,7 @@ Status plates and lost-item relays currently use full card templates in the crea
 |----------|--------------------------------------|--------------------------------------------------|
 | What gets a `profile_id`? | The plate/relay **is** the root card | Only the **general root**; children get `object_id` |
 | Private keys | New owner + recovery keypair | Reuses root keys |
-| First QR | Immediate at create | Register object, then **Issue scan link** |
+| First QR | Immediate at create | Register object + first scan link in one Live action (step 15) |
 | Where it appears on device | **My cards** (`hc_wallet` row) | **Nested under root** in hub / **My cards** + `hc_child_objects_v1:{profile_id}` index |
 | Human trust on scan | Root card’s verification | Root relationship (“Controlled by @handle”); trust stays on root |
 
@@ -139,7 +139,7 @@ Status plates and lost-item relays currently use full card templates in the crea
 1. **One visible tree** — root row in **My cards**, children nested underneath (not separate saved cards with keys).
 2. **One create story** — `/create/` emphasizes general Humanity Card; status plate / lost item are **Add object** actions, not parallel card types (flat templates remain as compatibility).
 3. **Network-backed list** — opening `/created/` or hub refreshes child rows from resolver truth, not only from a device-only index.
-4. **Shorter QR path** — register + issue first scan credential in one flow where possible.
+4. **Shorter QR path** — register + issue first scan credential in one steward action on `/created/` (shipped step 15); per-row re-issue remains for retries.
 5. **Backup seatbelt** — harder to skip encrypted backup / recovery before N child objects or print checkout (copy exists; hard gate still tightening).
 
 ---
@@ -268,9 +268,9 @@ Delegated capabilities must be root-signed, scoped, expiring, revocable, and cle
 10. **Lost-item relay child UI (shipped):** `/created/` Live → **Add lost-item relay** for general root cards; register, update return message, issue scan link, disable relay — mirrors status plate flow with `object_type: lost_item_relay` and `[relay]` scan layout via `childObjectManifestoLine()`.
 11. **Browser signing fix (shipped):** `hc-sign.mjs` `requireFields()` accepts `parent_profile_id` for `child_object` payloads (create/update/revoke were failing client-side before POST).
 12. **Resolver child list (first slice shipped):** read-only `GET /.well-known/hc/v1/cards/{profile_id}/objects`; `/created/` reconciles `hc_child_objects_v1` from network on Live panel refresh.
-13. **Hub tree rows (first slice shipped):** nested child rows under general root in **My cards** / expanded hub; reconcile on hub render via `reconcileChildObjectsForProfileIds`; no child entries in `hc_wallet`. **Next:** register + first QR (step 15).
-14. **Create flow convergence (first slice shipped):** `/create/` emphasizes general Humanity Card; status plate / lost item show Add-on-Live nudge when a general root with keys exists; legacy standalone pilot forms stay in a disclosure; landing copy updated. **Next:** register + first QR (step 15).
-15. **Register + first QR (planned):** combine object create and first `issue-qr` in one steward action where product copy allows.
+13. **Hub tree rows (first slice shipped):** nested child rows under general root in **My cards** / expanded hub; reconcile on hub render via `reconcileChildObjectsForProfileIds`; no child entries in `hc_wallet`.
+14. **Create flow convergence (first slice shipped):** `/create/` emphasizes general Humanity Card; status plate / lost item show Add-on-Live nudge when a general root with keys exists; legacy standalone pilot forms stay in a disclosure; landing copy updated.
+15. **Register + first QR (first slice shipped):** `/created/` Add status plate / lost-item relay runs register + first `issue-qr` in one action (`child-object-register-issue.mjs`); per-row **Issue scan link** remains for retries and legacy rows. **Next:** backup gate (step 16).
 16. **Backup gate (planned):** block or strongly warn before N active child objects without encrypted backup / recovery acknowledged.
 17. **Delegated capabilities:** add scoped, expiring, root-signed child keys only after real team/event use cases demand them.
 

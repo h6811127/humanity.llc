@@ -13,14 +13,16 @@ import {
   shouldOfferAddStatusPlate,
 } from "./created-child-object-core.mjs";
 import {
-  postChildObjectCreate,
   postChildObjectUpdate,
-  signChildObjectCreate,
   signChildObjectRevoke,
   signChildObjectUpdate,
   postChildObjectRevoke,
 } from "./child-object-update.mjs";
-import { postChildObjectIssueQr, signChildObjectIssueQr } from "./child-object-qr.mjs";
+import { issueChildObjectScanLink, registerChildObjectAndIssueScanLink } from "./child-object-register-issue.mjs";
+import {
+  childObjectRegisterProgressLabel,
+  childObjectRegisterSuccessMessage,
+} from "./child-object-register-issue-core.mjs";
 
 /**
  * @param {string} profileId
@@ -265,20 +267,12 @@ export function initCreatedChildObject(ctx) {
     }
 
     try {
-      const signed = await signChildObjectIssueQr({
+      const { scanUrl, qrId } = await issueChildObjectScanLink({
         profileId: ctx.profileId,
         objectId,
         privateKeyBase58: keys.privateKeyBase58,
         publicKeyBase58: keys.publicKeyBase58,
       });
-      const result = await postChildObjectIssueQr(
-        ctx.profileId,
-        objectId,
-        signed.qr_credential
-      );
-      const scanUrl =
-        typeof result.scan_url === "string" ? result.scan_url : signed.scanUrl;
-      const qrId = typeof result.qr_id === "string" ? result.qr_id : signed.qrId;
       updateChildObjectRow(localStorage, ctx.profileId, objectId, {
         qr_id: qrId,
         scan_url: scanUrl,
@@ -378,38 +372,44 @@ export function initCreatedChildObject(ctx) {
     if (submitBtn instanceof HTMLButtonElement) submitBtn.disabled = true;
     if (statusEl) {
       statusEl.hidden = false;
-      statusEl.textContent = "Signing and registering status plate…";
+      statusEl.textContent = childObjectRegisterProgressLabel(CHILD_OBJECT_TYPE_STATUS_PLATE);
     }
     try {
       const { publicLabel, publicState } = parseStatusPlateChildFields(
         labelInput instanceof HTMLInputElement ? labelInput.value : "",
         stateInput instanceof HTMLInputElement ? stateInput.value : ""
       );
-      const signed = await signChildObjectCreate({
-        parentProfileId: ctx.profileId,
+      const result = await registerChildObjectAndIssueScanLink({
+        profileId: ctx.profileId,
         objectType: CHILD_OBJECT_TYPE_STATUS_PLATE,
         publicLabel,
         publicState,
         privateKeyBase58: keys.privateKeyBase58,
         publicKeyBase58: keys.publicKeyBase58,
       });
-      const result = await postChildObjectCreate(ctx.profileId, signed);
-      const createdAt =
-        typeof signed.created_at === "string" ? signed.created_at : new Date().toISOString();
       appendChildObjectRow(localStorage, ctx.profileId, {
-        object_id: String(result.object_id || signed.object_id),
+        object_id: result.objectId,
         object_type: CHILD_OBJECT_TYPE_STATUS_PLATE,
         public_label: publicLabel,
         public_state: publicState,
-        created_at: createdAt,
+        created_at: result.createdAt,
+        ...(result.scanUrl && result.qrId
+          ? { qr_id: result.qrId, scan_url: result.scanUrl }
+          : {}),
       });
       if (labelInput instanceof HTMLInputElement) labelInput.value = "";
       if (stateInput instanceof HTMLInputElement) stateInput.value = "";
       refreshList();
       if (statusEl) {
         statusEl.hidden = false;
-        statusEl.textContent =
-          "Status plate registered. Issue a scan link below, then publish status updates as needed.";
+        statusEl.textContent = childObjectRegisterSuccessMessage({
+          objectType: CHILD_OBJECT_TYPE_STATUS_PLATE,
+          scanUrl: result.scanUrl,
+          issueFailed: result.issueFailed,
+        });
+      }
+      if (result.issueFailed && result.issueError) {
+        ctx.showError(result.issueError);
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
