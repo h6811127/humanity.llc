@@ -395,7 +395,7 @@ npm run verify:hosted-g0   # free-tier Vitest + steward-hosted Vitest
 | **E3** Raised caps | Vitest rows above; server 429 `steward_quota_exceeded` |
 | **E4** Push channel | M3 interoperability; E2E H4; poll fallback when SSE down |
 | **E5** Billing webhooks | Lifecycle `active` / `expired` → entitlement status |
-| **E6** Ops dashboards | Runbook only |
+| **E6** Ops dashboards | [`HOSTED_TIER_OPS_RUNBOOK.md`](HOSTED_TIER_OPS_RUNBOOK.md) + [`HOSTED_TIER_SUPPORT_MACROS.md`](HOSTED_TIER_SUPPORT_MACROS.md) |
 
 ### M8 implementation gates (do not start E2–E4 until)
 
