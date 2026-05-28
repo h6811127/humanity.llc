@@ -5,6 +5,7 @@ import {
 } from "./wallet-network-baseline.mjs";
 
 export const WALLET_NETWORK_CACHE_TTL_MS = 5 * 60 * 1000;
+export const WALLET_NETWORK_CACHE_MAX_ENTRIES = 50;
 
 /**
  * @param {number | null | undefined} cachedAt
@@ -94,6 +95,49 @@ export function readCachedNetworkStatus(cache, profileId, now, ttlMs = WALLET_NE
   const entry = cache[profileId];
   if (!entry || !isNetworkCacheFresh(entry.at, now, ttlMs)) return null;
   return entry.status ?? null;
+}
+
+/**
+ * Keep hc_wallet_network_cache scoped to saved wallet rows and recent resolver reads.
+ *
+ * @param {Record<string, unknown>} cache
+ * @param {Array<{ profile_id?: unknown }>} walletEntries
+ * @param {number} [now]
+ * @param {{ maxEntries?: number, ttlMs?: number }} [options]
+ */
+export function pruneWalletNetworkCache(
+  cache,
+  walletEntries,
+  now = Date.now(),
+  options = {}
+) {
+  const maxEntries =
+    typeof options.maxEntries === "number"
+      ? Math.max(0, Math.floor(options.maxEntries))
+      : WALLET_NETWORK_CACHE_MAX_ENTRIES;
+  const ttlMs = options.ttlMs ?? WALLET_NETWORK_CACHE_TTL_MS;
+  if (!cache || typeof cache !== "object" || maxEntries <= 0) return {};
+
+  const walletIds = new Set(
+    walletEntries
+      .map((entry) => entry?.profile_id)
+      .filter((profileId) => typeof profileId === "string" && profileId)
+  );
+  if (walletIds.size === 0) return {};
+
+  return Object.fromEntries(
+    Object.entries(cache)
+      .filter(([profileId, entry]) => {
+        if (!walletIds.has(profileId) || !entry || typeof entry !== "object") return false;
+        return isNetworkCacheFresh(entry.at, now, ttlMs);
+      })
+      .sort((a, b) => {
+        const aAt = typeof a[1]?.at === "number" ? a[1].at : 0;
+        const bAt = typeof b[1]?.at === "number" ? b[1].at : 0;
+        return bAt - aAt;
+      })
+      .slice(0, maxEntries)
+  );
 }
 
 /**

@@ -16,6 +16,7 @@ import {
   networkStatusChip,
   parseNetworkQrScope,
   parseNetworkVerification,
+  pruneWalletNetworkCache,
   readCachedNetworkStatus,
   readCachedVerification,
   shouldUseCachedNetworkStatus,
@@ -394,7 +395,7 @@ function applyWalletStatusPollHealthFromRound(networkFetchedProfileIds, statusMa
  */
 export async function refreshWalletNetworkStatuses(entries, onDone, options = {}) {
   const { generation, isCurrentGeneration } = options;
-  const cache = loadCache();
+  const cache = pruneWalletNetworkCache(loadCache(), entries);
   const statusMap = {};
   const alertStateMap = {};
   const scanKindMap = {};
@@ -502,7 +503,7 @@ export async function refreshWalletNetworkStatuses(entries, onDone, options = {}
     return;
   }
 
-  saveCache(cache);
+  saveCache(pruneWalletNetworkCache(cache, entries, now));
   applyWalletStatusPollHealthFromRound(
     networkFetchedProfileIds,
     statusMap,

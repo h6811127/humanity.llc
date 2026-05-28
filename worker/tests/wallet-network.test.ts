@@ -12,8 +12,10 @@ import {
   shouldShowCardDisabledSinceVisitAlert,
 } from "../../site/js/wallet-network-baseline.mjs";
 import {
+  pruneWalletNetworkCache,
   mergeLastSeenFromNetworkMap,
   shouldUseCachedNetworkStatus,
+  WALLET_NETWORK_CACHE_MAX_ENTRIES,
   WALLET_NETWORK_CACHE_TTL_MS,
 } from "../../site/js/device-wallet-network-core.mjs";
 
@@ -203,6 +205,42 @@ describe("stale cache + active fetch (Slice 4 integration)", () => {
     expect(
       cardDisabledSinceVisitVisible(staleAlert, "active", "card_revoked", false)
     ).toBe(false);
+  });
+});
+
+describe("wallet network cache pruning", () => {
+  it("drops orphaned and expired entries from hc_wallet_network_cache", () => {
+    const now = 1_000_000;
+    const pruned = pruneWalletNetworkCache(
+      {
+        saved_fresh: { status: "active", at: now },
+        saved_expired: { status: "active", at: now - WALLET_NETWORK_CACHE_TTL_MS - 1 },
+        removed_fresh: { status: "active", at: now },
+      },
+      [{ profile_id: "saved_fresh" }, { profile_id: "saved_expired" }],
+      now
+    );
+
+    expect(Object.keys(pruned)).toEqual(["saved_fresh"]);
+  });
+
+  it("caps retained entries by most recent resolver reads", () => {
+    const now = 1_000_000;
+    const wallet = Array.from({ length: WALLET_NETWORK_CACHE_MAX_ENTRIES + 5 }, (_, i) => ({
+      profile_id: `profile_${i}`,
+    }));
+    const cache = Object.fromEntries(
+      wallet.map((entry, i) => [
+        entry.profile_id,
+        { status: "active", at: now - i },
+      ])
+    );
+
+    const pruned = pruneWalletNetworkCache(cache, wallet, now);
+    expect(Object.keys(pruned)).toHaveLength(WALLET_NETWORK_CACHE_MAX_ENTRIES);
+    expect(pruned.profile_0?.status).toBe("active");
+    expect(pruned.profile_49?.status).toBe("active");
+    expect(pruned.profile_50).toBeUndefined();
   });
 });
 
