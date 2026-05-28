@@ -239,6 +239,24 @@ Deploy: `npm run worker:deploy`. Route `humanity.llc/v1/*` required for artifact
 
 ---
 
+## Production rollout commands (engineering)
+
+Mirrors [`hosted:rollout:step*`](HOSTED_TIER_G0_READINESS.md) for merch funnel close-out. Run in order before enabling live Tier 1 payments.
+
+| Step | Command | Purpose |
+|------|---------|---------|
+| 1 | `npm run merch-funnel:rollout:step1` | Validate repo `shop-config.json` + merch funnel Vitest |
+| 1 strict | `npm run merch-funnel:rollout:step1 -- --strict` | Fail if launch SKU lacks `checkout_url` |
+| 2 | `SITE_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step2 -- --verify` | Smoke deployed Pages config + repo drift |
+| 3 | `API_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step3 -- --verify` | Health, print catalog, artifact-intent route |
+| 4 | `npm run merch-funnel:rollout:step4` | Worker env + route checklist (`wrangler.toml`) |
+| 5 | `npm run merch-funnel:rollout:step5` | Launch gates + physical QA sign-off checklist |
+| 6 | `npm run merch-funnel:rollout:step6 -- --verify` | Full regression: `verify:merch-funnel` + `e2e:merch-funnel` |
+
+**Vitest bundle:** `npm run verify:merch-funnel` (= merch funnel + print QA + shop-config rollout tests).
+
+---
+
 ## FAQ
 
 ### “I already have a hoodie on Shopify to launch my store — is that the product?”

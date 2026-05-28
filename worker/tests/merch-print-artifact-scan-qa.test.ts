@@ -102,8 +102,8 @@ describe("merch print_artifact scan QA (exit checklist step 7)", () => {
     const html = await renderPrintArtifactScan();
 
     expectBearerWarningContract(html);
-    expect(html).toContain("Printed item");
-    expect(html).toContain("revoke one artifact without killing the card");
+    expect(html).toContain("Printed object");
+    expect(html).toContain("revoke this item without disabling the root card");
     expect(html).toContain("No calendar expiry");
     expect(html).toContain(PRINT_ARTIFACT_NO_CALENDAR_EXPIRY_NOTE);
     expect(html).not.toContain("Valid until");
@@ -120,7 +120,7 @@ describe("merch print_artifact scan QA (exit checklist step 7)", () => {
 
     expectBearerWarningContract(html);
     expect(html).toContain("Revoked");
-    expect(html).toContain("Printed item");
+    expect(html).toContain("Printed object");
     expect(html).not.toContain("No calendar expiry");
   });
 
