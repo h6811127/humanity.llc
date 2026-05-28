@@ -157,6 +157,8 @@ OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:
 
 ```bash
 npm run hosted:rollout:step6
+# Local preflight (rollout unit tests + verify:hosted-g0, no Playwright):
+npm run hosted:rollout:step6 -- --preflight
 # Full regression before steward announcement:
 npm run hosted:rollout:step6 -- --verify
 npm run hosted:rollout:step6 -- --vitest   # step 6a (Vitest) only
