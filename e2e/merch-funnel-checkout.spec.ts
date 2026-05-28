@@ -48,6 +48,14 @@ test.describe("merch funnel checkout handoff", () => {
       sessionStorage.setItem("hc_created", JSON.stringify(payload.session));
     }, { config: OPEN_SHOP_CONFIG, session: E2E_SESSION });
 
+    await page.route(/https:\/\/store\.example\//, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "text/html",
+        body: "<!DOCTYPE html><title>checkout stub</title>",
+      });
+    });
+
     await page.route(/artifact-intents/, async (route) => {
       const url = route.request().url();
       if (route.request().method() !== "POST") {
@@ -102,16 +110,26 @@ test.describe("merch funnel checkout handoff", () => {
       timeout: 15_000,
     });
     await expect(page.locator("#shop-customize-status")).toContainText(
-      /Confirm the limits below/i,
+      /Confirm each acknowledgment below to continue/i,
       { timeout: 20_000 }
     );
     await expect(page.locator("#shop-customize-interest")).toBeHidden();
 
-    await page.locator("#shop-customize-approve").check();
+    const consentBoxes = page.locator("#shop-proof-consent [data-proof-consent]");
+    await expect(consentBoxes).toHaveCount(3);
+    for (let i = 0; i < 3; i += 1) {
+      await consentBoxes.nth(i).check();
+    }
+    await expect(page.locator("#shop-customize-status")).toContainText(
+      /Proof approved/i,
+      { timeout: 5_000 }
+    );
     await expect(page.locator("#shop-customize-checkout")).toBeEnabled();
 
-    await page.locator("#shop-customize-checkout").click();
-    await page.waitForURL(/store\.example\/cart\//, { timeout: 15_000 });
+    await Promise.all([
+      page.waitForURL(/store\.example\/cart\//, { timeout: 15_000 }),
+      page.locator("#shop-customize-checkout").click(),
+    ]);
     const checkoutUrl = new URL(page.url());
     expect(checkoutUrl.searchParams.get("properties[artifact_intent_id]")).toBe(E2E_INTENT);
   });
