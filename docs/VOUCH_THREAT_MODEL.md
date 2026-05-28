@@ -150,6 +150,8 @@ Impact: **L** low · **M** medium · **H** high (trust in network / harm to vouc
 
 ### 5.7 AI-era and automation
 
+**Product response:** [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) — localized object intelligence (L0–L2 signed state; L3 opt-in explain only). **Not** global AI profiles or model text as resolver truth.
+
 | ID | Threat | Path | L | I | V1 controls | Gaps / residual |
 |----|--------|------|---|---|-------------|-----------------|
 | A-01 | **Synthetic identity content** | LLM handles, statements, outreach | H | M | Crypto bar unchanged | AI lowers **cost of personas**, not forgery of signatures |

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Created card · humanity.llc</title>
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/pwa-apple-touch.png" />
     <meta name="theme-color" content="#ffffff" />
     <script>
       (function () {
@@ -19,9 +21,9 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=4" />
-    <link rel="stylesheet" href="/styles.css?v=126" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=56" />
-    <link rel="stylesheet" href="/css/theme-dark.css?v=28" />
+    <link rel="stylesheet" href="/styles.css?v=128" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=59" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=29" />
   </head>
   <body class="has-device-hub-search device-shell-created" data-created-route="pending">
     <script>
@@ -72,6 +74,13 @@
         </div>
       </div>
 
+      <div
+        class="device-pwa-install-card"
+        id="device-pwa-install-card"
+        role="status"
+        hidden
+      ></div>
+
       <section
         class="device-hub device-hub-top device-hub--sheet device-hub-collapsed"
         id="device-hub"
@@ -99,6 +108,12 @@
 
           <h2 class="device-hub-title" id="device-hub-title">My cards on this device</h2>
           <p class="device-hub-lead">Quick switcher for saved cards in this browser. Use My cards for pins, backup, and full history.</p>
+          <section
+            class="device-hub-section device-hub-keys-custody-section"
+            id="device-hub-keys-custody"
+            aria-labelledby="device-hub-keys-custody-title"
+            hidden
+          ></section>
           <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint" hidden>
             Tap <strong>Save control key</strong> during setup to keep keys after you close this tab.
           </p>
@@ -211,6 +226,35 @@
         </section>
 
         <section
+          class="hc-emphasis-card hc-emphasis-card--info created-merch-customize-card"
+          id="created-merch-customize-card"
+          hidden
+          aria-labelledby="created-merch-customize-title"
+        >
+          <div class="hc-emphasis-card__main">
+            <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
+            <div class="hc-emphasis-card__copy">
+              <p class="hc-emphasis-card__eyebrow">Merch funnel</p>
+              <p class="hc-emphasis-card__title" id="created-merch-customize-title">
+                Customize your live object
+              </p>
+              <p class="hc-emphasis-card__detail">
+                Your card is ready in this tab. Preview your branded QR on a hoodie or sticker —
+                buying never grants vouch status.
+              </p>
+            </div>
+          </div>
+          <div class="hc-emphasis-card__actions">
+            <a
+              class="hc-emphasis-card__cta"
+              id="created-merch-customize-link"
+              href="/shop/customize/"
+              >Get yours on wear</a
+            >
+          </div>
+        </section>
+
+        <section
           class="created-setup"
           id="created-setup-root"
           hidden
@@ -242,6 +286,7 @@
               Your signing key stays in this browser until you save it here. Without save, closing
               this tab means you cannot update or revoke later.
             </p>
+            <div id="device-keys-custody-created-setup"></div>
             <div id="created-setup-keys-mount"></div>
             <button type="button" class="btn-secondary created-setup-inline-action" data-setup-action="save">
               Save control key
@@ -424,6 +469,46 @@
                     maxlength="280"
                   ></textarea>
                 </div>
+                <fieldset
+                  id="update-fields-object-streams"
+                  class="created-object-streams-fieldset"
+                  hidden
+                >
+                  <legend class="form-label">Optional details (shown on scan)</legend>
+                  <p class="form-hint">Same QR — add short place facts like tasks or tool status.</p>
+                  <label class="form-label" for="update-stream-1-label">Detail 1 label</label>
+                  <input
+                    class="form-input"
+                    id="update-stream-1-label"
+                    type="text"
+                    maxlength="40"
+                    placeholder="Today's tasks"
+                  />
+                  <label class="form-label" for="update-stream-1-value">Detail 1 value</label>
+                  <input
+                    class="form-input"
+                    id="update-stream-1-value"
+                    type="text"
+                    maxlength="120"
+                    placeholder="Water bed 3 · turn compost"
+                  />
+                  <label class="form-label" for="update-stream-2-label">Detail 2 label</label>
+                  <input
+                    class="form-input"
+                    id="update-stream-2-label"
+                    type="text"
+                    maxlength="40"
+                    placeholder="Tools"
+                  />
+                  <label class="form-label" for="update-stream-2-value">Detail 2 value</label>
+                  <input
+                    class="form-input"
+                    id="update-stream-2-value"
+                    type="text"
+                    maxlength="120"
+                    placeholder="Wheelbarrow available"
+                  />
+                </fieldset>
                 <button type="submit" class="btn-primary" id="manifesto-update-submit">
                   Publish update
                 </button>
@@ -707,12 +792,92 @@
             </p>
           </section>
 
+          <section
+            class="created-status-plate-loop"
+            id="status-plate-loop-scorecard"
+            aria-labelledby="status-plate-loop-scorecard-title"
+            hidden
+          >
+            <h3 class="created-status-plate-loop-title" id="status-plate-loop-scorecard-title">
+              Pilot habit loop
+            </h3>
+            <p class="created-status-plate-loop-lead" id="status-plate-loop-progress" role="status">
+              Publish status updates on Live when hours change.
+            </p>
+            <p class="created-status-plate-loop-meta" id="status-plate-loop-last" hidden></p>
+            <ul class="created-status-plate-loop-checklist" aria-label="Pilot milestones on this device">
+              <li>
+                <label class="created-status-plate-loop-check">
+                  <input type="checkbox" id="status-plate-loop-printed" />
+                  <span>Printed QR and mounted the plate</span>
+                </label>
+              </li>
+              <li>
+                <label class="created-status-plate-loop-check">
+                  <input type="checkbox" id="status-plate-loop-second-scan" />
+                  <span>Scanned from a second device (not this one)</span>
+                </label>
+              </li>
+            </ul>
+            <p class="form-hint created-status-plate-loop-privacy">
+              Stored only on this browser. No scan analytics.
+            </p>
+            <button
+              type="button"
+              class="btn-secondary created-status-plate-loop-export"
+              id="status-plate-loop-export"
+              hidden
+            >
+              Copy pilot summary
+            </button>
+          </section>
+
           <section class="created-what-now created-what-now-compact" id="created-lost-item-tip" hidden>
             <h2 class="created-what-now-title">Lost item relay</h2>
             <p class="created-what-now-body">
               Tag the item. Finders see what is lost and your return message  -  not your phone number.
               Update copy on <strong>Live</strong>; revoke when recovered under <strong>Manage</strong>.
             </p>
+          </section>
+
+          <section
+            class="created-status-plate-loop"
+            id="lost-item-loop-scorecard"
+            aria-labelledby="lost-item-loop-scorecard-title"
+            hidden
+          >
+            <h3 class="created-status-plate-loop-title" id="lost-item-loop-scorecard-title">
+              Pilot habit loop
+            </h3>
+            <p class="created-status-plate-loop-lead" id="lost-item-loop-progress" role="status">
+              Publish a return message update on Live when copy changes.
+            </p>
+            <p class="created-status-plate-loop-meta" id="lost-item-loop-last" hidden></p>
+            <ul class="created-status-plate-loop-checklist" aria-label="Pilot milestones on this device">
+              <li>
+                <label class="created-status-plate-loop-check">
+                  <input type="checkbox" id="lost-item-loop-printed" />
+                  <span>Printed QR and tagged the item</span>
+                </label>
+              </li>
+              <li>
+                <label class="created-status-plate-loop-check">
+                  <input type="checkbox" id="lost-item-loop-second-scan" />
+                  <span>Scanned from a second device (not this one)</span>
+                </label>
+              </li>
+            </ul>
+            <p class="form-hint created-status-plate-loop-privacy">
+              Stored only on this browser. No scan analytics.
+            </p>
+            <button
+              type="button"
+              class="btn-secondary created-status-plate-loop-export"
+              id="lost-item-loop-export"
+              hidden
+            >
+              Copy pilot summary
+            </button>
           </section>
 
         </div>
@@ -804,7 +969,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h4"/><path d="M7 13h6"/><path d="m4 4 16 16"/></svg>
               </span>
               <span class="settings-summary-text">
-                <span class="settings-summary-title">Revoke this QR</span>
+                <span class="settings-summary-title" id="revoke-summary-title">Revoke this QR</span>
                 <span class="settings-summary-sub" id="revoke-summary-sub">Turn off this scan pointer</span>
               </span>
               <span class="list-chevron" aria-hidden="true">›</span>
@@ -1262,8 +1427,8 @@
         </div>
       </main>
     </div>
-    <script src="/js/device-status-bootstrap.mjs?v=45" type="module"></script>
+    <script src="/js/device-status-bootstrap.mjs?v=56" type="module"></script>
     <script src="/js/created-hub.mjs?v=3" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=54"></script>
+    <script type="module" src="/js/created.mjs?v=61"></script>
   </body>
 </html>

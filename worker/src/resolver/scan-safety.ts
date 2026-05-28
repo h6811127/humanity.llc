@@ -1,5 +1,6 @@
 import type { ScanContext } from "../db/scan";
 import { PAYLOAD_TYPES, verifySignedDocument } from "../crypto";
+import { objectTypeLabelFromContext } from "../../../site/js/object-taxonomy-core.mjs";
 import { parseManifestoDisplay } from "./manifesto-display";
 import type { ScanViewModel, StatusTone } from "./scan-state";
 
@@ -23,6 +24,18 @@ export const SCAN_HERO_QR_DETAILS_SUMMARY = "This QR";
 /** Active live-object scan foot (M5 stranger success criteria). */
 export const SCAN_HERO_LIVE_OBJECT_FOOT =
   "Active on humanity.llc — status checked at scan time.";
+
+/** Lost-item relay scan — calm create hint (PRODUCT_POSITIONING Step 6). */
+export const LOST_ITEM_RELAY_CREATE_HINT =
+  "Tag your own item with a revocable return path — no phone number on the sticker.";
+export const LOST_ITEM_RELAY_CREATE_PATH = "/create/?template=lost_item";
+
+/** Merch funnel — live wear / print_artifact scans (docs/MERCH_FUNNEL_MVP.md). */
+export const MERCH_SCAN_FUNNEL_REF = "scan_customize";
+export const MERCH_SCAN_FUNNEL_HINT =
+  "Create a free card, customize your QR on a hoodie or sticker, then update what strangers see from your phone.";
+export const MERCH_SCAN_CREATE_PATH = `/create/?hc_ref=${MERCH_SCAN_FUNNEL_REF}`;
+export const MERCH_SCAN_CUSTOMIZE_PATH = `/shop/customize/?hc_ref=${MERCH_SCAN_FUNNEL_REF}`;
 
 export interface ScanSafetyModel {
   objectSignatureVerified: boolean;
@@ -158,6 +171,9 @@ export function renderSafetyChips(vm: ScanViewModel, safety: ScanSafetyModel): s
     chips.push(`Object · ${display.objectLabel}`);
   } else if (display.kind === "lost_item_relay" && display.objectLabel) {
     chips.push(`Item · ${display.objectLabel}`);
+  } else if (vm.qrScope === "print_artifact") {
+    const objectLabel = objectTypeLabelFromContext({ qrScope: vm.qrScope }).label;
+    chips.push(objectLabel);
   }
   if (vm.profileId && vm.qrId) {
     chips.push("Revocable");

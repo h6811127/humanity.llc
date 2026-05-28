@@ -71,7 +71,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Shortcuts & settings (shipped):** On the **homepage** (`/`) only - section after the studio example (unified list rows: Appearance, **Browser alerts** (background OS notifications for live proof), saved cards, manage, auto-save, focus). Hub sheet on all routes has **home icon** (left) and status line (center); Create lives beside the saved-items heading; no shortcuts block in the hub.
 
-**Hub header simplification (Step 1):** Create moves out of the sheet's top status rail and into the saved-items section header as compact **+ New**. The top rail stays focused on Home + resolver/device status, while Close remains the sheet escape. See [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md).
+**Hub header simplification (Steps 1-2):** Create moves out of the sheet's top status rail and into the saved-items section header as compact **+ New**. The top rail shows Home plus a single-line resolver/device status where zero saved or pinned counts stay subordinate, while Close remains the sheet escape. See [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md).
 
 **Hub status line simplification (Step 2):** The sheet status panel is one inline read: network state first, muted saved/pinned counts next, and compact alert-weight items only for tab keys / live proof / proof-check warnings. This keeps zero counts visible without a separate wrapped `0 pinned` badge.
 

@@ -35,6 +35,7 @@ Principles:
 | `site/js/device-counts.mjs` | System status segment copy |
 | `site/js/device-status.mjs` | Status dot + inbox badge |
 | `docs/DEVICE_INBOX.md` | Inbox + background alerts spec |
+| `docs/PWA_INSTALL.md` | Add to Home Screen / install (shell pages only) |
 | `site/scan-pass.css` | Scan page (run `npm run worker:bundle-scan` after edits) |
 
 ---
@@ -48,6 +49,8 @@ Principles:
 3. **Landing de-explain**  -  shorter hero + compact framing on `/` (**v2 shipped:** studio example uses, **Design choices**, **Clear limits**, and **Documentation** default closed in icon **disclosure cards** (`.landing-disclosure-card` on `site/index.html`; chevron rotates when open). The status-plate **object model** strip (`.flow-strip--model`) uses the same elevated surface as lists in dark mode (`theme-dark.css`). Status-dot pulse and chrome blur pause while scrolling via `shell-is-scrolling` in `device-shell-chrome.mjs`. **`content-visibility: auto` on tutorial blocks was removed** (2026-05-26) - it caused jumpy mobile scroll; see [`IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md`](IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md).
 
 **Flow pages** (`/create/`, etc.) use `body.page-flow` with no header chrome  -  rely on the browser back gesture/button for home, not a floating dot or Create pill.
+
+**Hub inset cards (May 2026):** The bottom sheet uses tier-2 glass on `.device-hub--sheet`. Inside it, inset groups share the emphasis-card family: **info** glass for inline search and saved rows, **warn** glass for the **Monitoring** network/live-proof toolbar, **urgent** emphasis for the live-proof waiting group. Full anatomy and regression: [`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md).
 
 ### Phase B  -  Object continuity (shipped v1)
 

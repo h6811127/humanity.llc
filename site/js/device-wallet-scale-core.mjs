@@ -10,6 +10,9 @@ export { orderEntriesVisibleFirst } from "./device-hub-visible-rows-core.mjs";
 /** Cards at or above this count use narrowed auto-poll and capped network parallelism. */
 export const LARGE_WALLET_THRESHOLD = 10;
 
+/** Product guidance: day-to-day comfort zone before large-wallet behavior. */
+export const COMFORTABLE_WALLET_MAX = 5;
+
 /**
  * @param {number} savedCardCount
  * @param {import("./device-steward-entitlements-core.mjs").StewardEntitlementsPolicy} [policy]
@@ -26,6 +29,43 @@ export function isLargeWallet(savedCardCount, policy) {
 export function largeWalletHint(savedCardCount, policy) {
   if (!isLargeWallet(savedCardCount, policy)) return null;
   return `Large wallet (${savedCardCount} saved) - automatic checks focus on your active card and any waiting live proof. Use Check network or Check for live proof for a full refresh.`;
+}
+
+/**
+ * @param {number} savedCardCount
+ */
+export function isComfortableWalletSize(savedCardCount) {
+  return savedCardCount <= COMFORTABLE_WALLET_MAX;
+}
+
+/**
+ * Hint when above comfortable size but below large-wallet threshold.
+ * @param {number} savedCardCount
+ */
+export function comfortableWalletHint(savedCardCount) {
+  if (savedCardCount <= COMFORTABLE_WALLET_MAX) return null;
+  if (savedCardCount >= LARGE_WALLET_THRESHOLD) return null;
+  return `${savedCardCount} saved — comfortable use is about 1–5 cards. Import a backup before adding more, or remove cards you no longer need.`;
+}
+
+/**
+ * Hub / custody scale guidance (comfort zone, then large-wallet copy).
+ * @param {number} savedCardCount
+ * @param {import("./device-steward-entitlements-core.mjs").StewardEntitlementsPolicy} [policy]
+ */
+export function walletScaleHint(savedCardCount, policy) {
+  return largeWalletHint(savedCardCount, policy) ?? comfortableWalletHint(savedCardCount);
+}
+
+/**
+ * Short title for custody / hub scale rows.
+ * @param {number} savedCardCount
+ * @param {import("./device-steward-entitlements-core.mjs").StewardEntitlementsPolicy} [policy]
+ */
+export function walletScaleRowTitle(savedCardCount, policy) {
+  if (!walletScaleHint(savedCardCount, policy)) return "";
+  if (isLargeWallet(savedCardCount, policy)) return "Large wallet on this device";
+  return "Many saved cards";
 }
 
 /**

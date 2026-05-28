@@ -10,7 +10,7 @@
  * Bump on all shell HTML (`device-status-bootstrap.mjs?v=N`) and on every
  * `./peer.mjs?v=N` import between files in DEVICE_STATUS_SHELL_JS_FILES.
  */
-export const DEVICE_SHELL_ASSET_VERSION = 45;
+export const DEVICE_SHELL_ASSET_VERSION = 56;
 
 /** @deprecated Use DEVICE_SHELL_ASSET_VERSION */
 export const DEVICE_STATUS_BOOTSTRAP_CACHE_BUST = DEVICE_SHELL_ASSET_VERSION;
@@ -21,12 +21,14 @@ export const DEVICE_STATUS_BOOTSTRAP_CACHE_BUST = DEVICE_SHELL_ASSET_VERSION;
  */
 export const DEVICE_STATUS_SHELL_JS_FILES = [
   "device-status-bootstrap.mjs",
+  "build-meta-browser.mjs",
   "device-status.mjs",
   "device-hub-intro-coachmark.mjs",
   "device-dot-state-core.mjs",
   "device-chrome-refresh-core.mjs",
   "device-chrome-refresh.mjs",
   "device-inbox-sheet-loader.mjs",
+  "device-browser-notifications-loader.mjs",
   "device-inbox-sheet.mjs",
   "device-inbox-sheet-core.mjs",
   "device-inbox-card-disabled.mjs",
@@ -35,6 +37,9 @@ export const DEVICE_STATUS_SHELL_JS_FILES = [
   "device-inbox-core.mjs",
   "device-cross-tab-state-core.mjs",
   "device-cross-tab-state.mjs",
+  "device-legacy-cross-tab-chrome-core.mjs",
+  "device-hub-keys-custody-core.mjs",
+  "device-hub-keys-custody.mjs",
   "device-presence-inbox-stability-core.mjs",
   "device-inbox.mjs",
   "device-tab-presence-core.mjs",
@@ -42,7 +47,12 @@ export const DEVICE_STATUS_SHELL_JS_FILES = [
   "device-wallet-removed-profiles-core.mjs",
   "device-wallet-removed-profiles.mjs",
   "wallet-page-chrome.mjs",
+  "device-resolver-sync-core.mjs",
+  "device-resolver-sync.mjs",
+  "device-live-control-poll-leader-core.mjs",
+  "device-live-control-poll-leader.mjs",
   "device-hub-ui.mjs",
+  "device-hub-build-stamp.mjs",
   "device-steward-entitlements.mjs",
   "device-steward-entitlements-core.mjs",
   "device-steward-quota-core.mjs",

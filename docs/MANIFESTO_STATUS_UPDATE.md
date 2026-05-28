@@ -1,8 +1,8 @@
 # Manifesto / status line updates (post-create)
 
-**Status:** Active  -  current Phase A product focus  
-**Parent:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` (status plate, lost-item relay)  
-**Skipped for now:** M5 stranger gate batch, M7 Step 2 polish (see `docs/M3_M4_EXECUTION_PLAN.md`)
+**Status:** Active — current post-M5 product focus
+**Parent:** `docs/ROOT_CARD_AND_CHILD_OBJECTS.md` · `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` (status plate, lost-item relay)  
+**Deferred:** M7 Step 2 polish (see `docs/M3_M4_EXECUTION_PLAN.md`)
 
 ---
 
@@ -10,16 +10,19 @@
 
 Create locks the first public line at issuance. **Status plates** and **lost-item relays** need the printed QR to stay the same while **network copy changes** (open/closed, return message, corrections).
 
+Today those pilots are implemented as flat card templates. Target model: they become child objects under a root Humanity Card, so the root key edits the object without giving the status plate or lost-item tag its own private key.
+
 That is the gap between **revocable** (pull trust back) and **live** (current truth at scan time).
 
 ---
 
 ## Product rule
 
-> Same physical QR · new signed public line on the resolver.
+> Same physical QR · root-signed public object update on the resolver.
 
-- **Immutable:** `profile_id`, owner `public_key`, `handle`, `created_at`
-- **Mutable:** `manifesto_line`, `updated_at`, full signed `humanity_card` document stored in D1
+- **Immutable root fields:** `profile_id`, owner `public_key`, `handle`, `created_at`
+- **Mutable today:** `manifesto_line`, `updated_at`, full signed `humanity_card` document stored in D1
+- **Target child mutable fields:** object label, object public state, object streams, child QR lifecycle state
 - **Not mutable via this API:** QR credentials, verification, badges, organizer key
 
 ---
@@ -29,6 +32,8 @@ That is the gap between **revocable** (pull trust back) and **live** (current tr
 | Endpoint | Method | Auth | Body |
 |----------|--------|------|------|
 | `/.well-known/hc/v1/cards/{profile_id}/update` | POST | Owner or recovery key | `{ "card": <signed humanity_card> }` |
+
+Target child-object endpoint (not routed yet): `POST /.well-known/hc/v1/cards/{profile_id}/objects/{object_id}/update`, signed by the parent root owner or recovery key.
 
 **Validation:**
 
@@ -54,13 +59,33 @@ Scans and `GET …/cards/{id}` read the updated document on next fetch (active c
 
 ## Storage formats (pilots)
 
-Same as create  -  one `manifesto_line` field, layout parsed at scan time (`worker/src/resolver/manifesto-display.ts`):
+Current bridge is same as create  -  one `manifesto_line` field, layout parsed at scan time (`worker/src/resolver/manifesto-display.ts`):
 
 | Pilot | Format | Example line 1 · line 2 |
 |-------|--------|-------------------------|
 | **Status plate** | Two lines | `Studio door` · `Closed until Monday` |
 | **Lost item relay** | `[relay]` prefix | `[relay] Keys` · `Found  -  thank you` |
 | **General card** | One line (or two treated as plate if newline) | Single public statement |
+
+### Optional object streams (status plate / live object)
+
+Signed optional field on the `humanity_card` document:
+
+```json
+"object_streams": [
+  { "id": "tasks", "class": "care", "label": "Today's tasks", "value": "Water bed 3" }
+]
+```
+
+- Up to **4** streams per card; plain text only; validated on create/update/rotate.
+- `class`: `place` | `care` | `narrative` | `route` (defaults to `place`).
+- Omitted or `[]` clears streams on the next signed update.
+- Exposed on scan HTML (status plate + live object heroes) and `GET …/status` JSON as `card.object_streams`.
+- Owner UI: optional detail rows on `/created/` for **status plate** and **live object** (general) pilots.
+- Create UI: same optional detail rows on `/create/` for **status plate** and **general** templates (signed on first POST).
+- Scan limits: when streams are present, scan HTML and `GET …/status` include `limits.object_details_warning` (steward-signed copy, not verified facts).
+- **L3 P1 (shipped):** when streams present, scan HTML shows opt-in **Explain in plain language** on the signed snapshot block; `GET …/status` includes `scan.ai.agent_context` and `scan.ai.explain`. See [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md).
+- **L3 P2 (UI retired):** steward ghostwriting removed from `/created/` (2026-05-27). Deprecated API only—see [`AI_L3_DRAFT_MANIFESTO.md`](AI_L3_DRAFT_MANIFESTO.md).
 
 ---
 
@@ -89,7 +114,16 @@ Deep link: `/created/?profile_id=…&qr_id=…`  -  hydrates handle/manifesto fr
 | Scan cache: new line visible within active TTL (~5 min) or hard refresh | ☐ manual |
 | Lost-item relay scan shows updated line 2 | ✅ `update-card.test.ts` |
 | Status plate scan shows updated line 2 | ✅ `update-card.test.ts` |
+| Status plate scan shows updated object_streams | ✅ `update-card.test.ts` |
+| M5 showcase status plate scan renders object_streams + limit copy | ✅ `scan-m5-showcase-paths.test.ts` |
+| M5 showcase live object scan renders object_streams + limit copy | ✅ `scan-m5-showcase-paths.test.ts` |
+| M5 showcase status plate + live object status JSON include public_snapshot | ✅ `manifesto-showcase-exit.test.ts` |
+| Committed showcase JSON streams match M5 scan fixtures | ✅ `manifesto-showcase-exit.test.ts` |
+| Production showcase cards include object_streams (re-seed) | ✅ `npm run site:refresh-showcase` · commit `site/data/*.json` · deploy Pages · `npm run site:verify-showcase` |
+| Create flow signs optional object_streams (status plate + general) | ✅ `create-card-object-streams.test.ts` |
 | Recovery key may sign update | ✅ `update-card.test.ts` |
+| Scan explain button + status `scan.ai` when snapshot present | ✅ `ai-explain-snapshot.test.ts` · `object-streams.test.ts` |
+| Draft manifesto API (no product UI) | ✅ `ai-draft-manifesto.test.ts` |
 
 **Owner UX:** **Update status** stays hidden for general cards until first in-session QR or card revoke. Status plate and lost-item relay pilots show it immediately so field testers can update live object copy before revoke (`site/js/created-first-revoke-gate.mjs`; `worker/tests/created-first-revoke-gate.test.ts`).
 
@@ -109,9 +143,12 @@ Deep link: `/created/?profile_id=…&qr_id=…`  -  hydrates handle/manifesto fr
 | Path | Role |
 |------|------|
 | `worker/src/resolver/update-card.ts` | POST handler |
+| `worker/src/validation/object-streams.ts` | Stream validation |
+| `site/js/object-streams-core.mjs` | Shared validation + owner form builder |
 | `site/js/created-manifesto-update.mjs` | Owner form |
 | `site/js/created-update.mjs` | Sign + POST |
 | `worker/src/resolver/extend-qr.ts` | QR expiry extension (M4.6b) |
 | `worker/src/resolver/rotate-qr.ts` | QR rotation (A.6) |
 | `docs/STATUS_PLATE_PILOT.md` | Vertical #1 |
 | `docs/LOST_ITEM_RELAY_PILOT.md` | Vertical #2 |
+| `docs/AI_FEATURE_DEVELOPMENT.md` | L3 AI hub |

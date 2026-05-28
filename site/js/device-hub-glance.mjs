@@ -2,8 +2,8 @@
  * Compact hub summary: landing when sheet is collapsed; /wallet/ always when non-empty.
  */
 import { buildGlanceRowPlan } from "./device-inbox-core.mjs";
-import { getInboxItems } from "./device-inbox.mjs";
-import { openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=34";
+import { gatherInboxInput, getInboxItems } from "./device-inbox.mjs";
+import { openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=56";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import { actOnOrphanRemovedTabKeys } from "./device-orphan-keys-nav.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
@@ -91,10 +91,13 @@ function appendInboxGlanceRow(item, list, copy) {
     return;
   }
 
-  if (item.kind === "cross_tab_keys") {
+  if (item.kind === "cross_tab_keys" || item.kind === "other_tabs_unsaved_keys") {
     const entry = item.meta?.crossTabEntry;
     if (!entry) return;
-    li.className = "device-hub-glance-row device-hub-glance-row--crosstab";
+    li.className =
+      item.kind === "other_tabs_unsaved_keys"
+        ? "device-hub-glance-row device-hub-glance-row--crosstab device-hub-glance-row--multi-unsaved"
+        : "device-hub-glance-row device-hub-glance-row--crosstab";
     li.innerHTML = `
       <button type="button" class="device-hub-glance-btn">
         <span class="device-hub-glance-title">${escapeHtml(item.title)}</span>
@@ -232,10 +235,13 @@ function refreshGlanceTarget(target) {
   const { root, list, wallet } = target;
   const copy = glanceCopy(wallet);
   const inboxItems = getInboxItems();
+  const inboxCtx = gatherInboxInput();
   const entries = loadWallet();
   const plan = buildGlanceRowPlan(inboxItems, entries, {
     maxSavedCards: GLANCE_MAX_CARDS,
     revokedHintProfileIds: revokedHintProfileIdsFromEntries(entries),
+    crossTabEntries: inboxCtx.crossTabEntries,
+    orphanRemovedEntries: inboxCtx.orphanRemovedEntries,
   });
 
   if (plan.length === 0) {

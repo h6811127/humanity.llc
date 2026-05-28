@@ -13,13 +13,16 @@ import {
 import { applyDeviceHubSearch } from "./device-hub-search.mjs";
 import { initHubBackupImport } from "./device-hub-import.mjs";
 import { mountThemeToggles } from "./device-theme.mjs";
-import { syncBrowserNotifPrompts } from "./device-browser-notifications.mjs";
+import { syncBrowserNotifPrompts } from "./device-browser-notifications-loader.mjs";
 import { renderHubInboxAlerts, inboxItemsIncludeKind } from "./device-hub-inbox-alerts.mjs";
+import { renderHubKeysCustodyPanel } from "./device-hub-keys-custody.mjs";
 import { getInboxItems, notificationCount } from "./device-inbox.mjs";
 import {
   buildHubCardControls,
   partitionHubCardControls,
 } from "./device-hub-controls-core.mjs";
+import { applyHubControlPlainLabels } from "./pilot-steward-copy.mjs";
+import { inferPilotTemplate } from "./manifesto-display.mjs";
 import {
   activateWalletEntry,
   getTabSession,
@@ -40,6 +43,7 @@ import { shouldSuppressCardDisabledSinceVisitAlerts } from "./device-wallet-sinc
 import {
   getCachedNetworkSeenAt,
   getCachedNetworkScanKind,
+  getCachedNetworkQrScope,
   getCachedNetworkStatus,
   getCachedVerification,
   buildResolverConfirmedWalletPollMaps,
@@ -58,6 +62,14 @@ import {
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import { clearWalletNetworkTruthForProfile } from "./device-wallet-network-truth.mjs";
+import {
+  broadcastNetworkSnapshotIfEligible,
+  shouldFollowerSkipAutoNetworkFetch,
+} from "./device-resolver-sync.mjs";
+import {
+  claimLiveControlPollLeader,
+  touchLiveControlPollLeader,
+} from "./device-live-control-poll-leader.mjs";
 import { getCardStatusUrl } from "./hc-sign.mjs";
 import {
   hubCardIdentityLine,
@@ -65,7 +77,9 @@ import {
   hubCardTitle,
 } from "./device-hub-card-row-core.mjs";
 import { humanTrustIconMeta, isEligibleVoucherState } from "./human-trust-ui.mjs";
+import { objectTypeLabelFromContext } from "./object-taxonomy-core.mjs";
 import { purgePresenceForProfile } from "./device-tab-presence.mjs";
+import { offerClearOtherTabKeysOnRemove } from "./device-notice-nav.mjs";
 import { markProfileRemovedFromDevice } from "./device-wallet-removed-profiles.mjs";
 import {
   clearDefaultVouchIfProfile,
@@ -87,6 +101,7 @@ import {
   normalizeBaselineState,
 } from "./wallet-network-baseline.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
+import { mountHubBuildStamp } from "./device-hub-build-stamp.mjs";
 import { mountHubNetworkTools } from "./device-hub-network-tools.mjs";
 import {
   getLiveControlPending,
@@ -103,7 +118,7 @@ import {
 } from "./device-live-control-inbox.mjs";
 import {
   isLargeWallet,
-  largeWalletHint,
+  walletScaleHint,
   selectNetworkRefreshEntries,
   walletNetworkMaxParallel,
 } from "./device-wallet-scale-core.mjs";
@@ -140,10 +155,14 @@ function walletHaystack(entry) {
     .toLowerCase();
 }
 
-function classifyObjectType(entry) {
+function classifyObjectType(entry, qrScopeOverride = undefined) {
   const pilot = String(entry?.pilot_template || "").toLowerCase();
-  if (pilot === "status_plate") return { label: "Status plate", tone: "status-plate" };
-  if (pilot === "lost_item_relay") return { label: "Lost item", tone: "lost-item" };
+  const qrScope = qrScopeOverride ?? entry?.qr_scope ?? null;
+  const taxonomy = objectTypeLabelFromContext({
+    pilotTemplate: pilot,
+    qrScope,
+  });
+  if (pilot === "status_plate" || pilot === "lost_item_relay") return taxonomy;
 
   const text = [
     entry?.label,
@@ -160,6 +179,7 @@ function classifyObjectType(entry) {
   if (/(demo|showcase|prototype|live demo)/.test(text)) return { label: "Live demo", tone: "live-demo" };
   if (/(tool|device|equipment|kit)/.test(text)) return { label: "Tool", tone: "tool" };
   if (/(civic|city|commons|public)/.test(text)) return { label: "Civic object", tone: "civic" };
+  if (qrScope) return taxonomy;
   return { label: "Object", tone: "general" };
 }
 
@@ -486,7 +506,9 @@ function applyNetworkChipsToDom(
     const identityEl = li.querySelector(".hub-card-identity");
     if (identityEl) {
       const entry = loadWallet().find((e) => e.profile_id === pid);
-      const objectType = entry ? classifyObjectType(entry) : { label: "Object", tone: "general" };
+      const objectType = entry
+        ? classifyObjectType(entry, getCachedNetworkQrScope(pid))
+        : { label: "Object", tone: "general" };
       const cached = getCachedVerification(pid);
       const identity = hubCardIdentityLine({
         objectTypeLabel: objectType.label,
@@ -627,7 +649,32 @@ function reapplyRevokedSinceVisitFromLatestResolved() {
   );
 }
 
-let lastWalletNetworkFetchAt = 0;
+const HUB_NETWORK_CHECKED_AT_SESSION_KEY = "hc_hub_network_checked_at";
+
+function readPersistedNetworkCheckedAt() {
+  if (typeof sessionStorage === "undefined") return 0;
+  try {
+    const n = Number(sessionStorage.getItem(HUB_NETWORK_CHECKED_AT_SESSION_KEY));
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * @param {number} at
+ */
+function persistNetworkCheckedAt(at) {
+  lastWalletNetworkFetchAt = at;
+  if (typeof sessionStorage === "undefined") return;
+  try {
+    sessionStorage.setItem(HUB_NETWORK_CHECKED_AT_SESSION_KEY, String(at));
+  } catch {
+    /* ignore */
+  }
+}
+
+let lastWalletNetworkFetchAt = readPersistedNetworkCheckedAt();
 /** @type {ReturnType<typeof setTimeout> | null} */
 let walletNetworkFetchTimer = null;
 let walletNetworkRefreshCursor = 0;
@@ -636,6 +683,18 @@ export const HUB_NETWORK_CHECKED_EVENT = "hc-hub-network-checked";
 
 export function getLastWalletNetworkCheckedAt() {
   return lastWalletNetworkFetchAt;
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener(HUB_NETWORK_CHECKED_EVENT, (e) => {
+    const at =
+      e instanceof CustomEvent && e.detail && typeof e.detail === "object"
+        ? /** @type {{ at?: number }} */ (e.detail).at
+        : undefined;
+    if (typeof at === "number" && Number.isFinite(at) && at > 0) {
+      persistNetworkCheckedAt(at);
+    }
+  });
 }
 
 function applyCachedNetworkChipsOnly() {
@@ -690,10 +749,37 @@ function scheduleWalletNetworkFetch() {
  */
 async function fetchAndApplyNetworkChips(opts = {}) {
   if (!hubConfig.fetchNetworkStatus || !savedList) return;
-  lastWalletNetworkFetchAt = Date.now();
+  persistNetworkCheckedAt(Date.now());
   const stored = loadWallet();
   if (stored.length === 0) return;
   const manual = opts.manual === true;
+  if (manual) {
+    claimLiveControlPollLeader();
+  } else if (shouldFollowerSkipAutoNetworkFetch()) {
+    const { entries } = normalizeWalletQrIds(stored);
+    applyNetworkChipsToDom(
+      Object.fromEntries(
+        entries.map((e) => [
+          e.profile_id,
+          getCachedNetworkStatus(e.profile_id) ?? "checking",
+        ])
+      ),
+      null,
+      {},
+      null,
+      { allowBannerShow: true }
+    );
+    syncHubInboxAlertGroups();
+    notifyHubChanged();
+    window.dispatchEvent(
+      new CustomEvent(HUB_NETWORK_CHECKED_EVENT, {
+        detail: { at: lastWalletNetworkFetchAt },
+      })
+    );
+    return;
+  } else {
+    touchLiveControlPollLeader();
+  }
   const { entries, changed: qrBackfill } = normalizeWalletQrIds(stored);
   if (qrBackfill) saveWallet(entries);
   const gen = bumpWalletNetworkApplyGen();
@@ -778,6 +864,14 @@ async function fetchAndApplyNetworkChips(opts = {}) {
           detail: { at: lastWalletNetworkFetchAt },
         })
       );
+      broadcastNetworkSnapshotIfEligible({
+        manual,
+        entries: entriesToFetch,
+        statusMap,
+        scanKindMap,
+        resolverConfirmedMap,
+        alertStateMap,
+      });
     },
     {
       generation: gen,
@@ -787,7 +881,21 @@ async function fetchAndApplyNetworkChips(opts = {}) {
   );
 }
 
+/** Manual Shortcuts action: one leader check, then broadcast to open tabs. @see docs/DEVICE_TAB_RESOLVER_SYNC.md § Manual refresh */
+export async function refreshResolverChecksFromHub() {
+  if (hubConfig.fetchNetworkStatus) {
+    const wallet = loadWallet();
+    if (wallet.length > 0) {
+      await fetchAndApplyNetworkChips({ manual: true });
+    }
+  }
+  if (hubConfig.showLiveControlInbox) {
+    await checkLiveProofNow();
+  }
+}
+
 function syncHubInboxAlertGroups() {
+  renderHubKeysCustodyPanel();
   renderHubInboxAlerts({
     noticeGroup,
     liveControlGroup,
@@ -895,14 +1003,23 @@ function renderSavedRows(opts = {}) {
   setHubSectionEmpty(savedGroup, savedList, savedEmptyEl, false, "");
   for (const entry of entries) {
     const li = document.createElement("li");
-    const objectType = classifyObjectType(entry);
-    const cardControls = buildHubCardControls({
-      hasKeys: !!entry.owner_private_key_b58,
-      pendingLiveProof: !!liveControlPendingForEntry(entry),
-      scanKind: hubConfig.fetchNetworkStatus
-        ? getCachedNetworkScanKind(entry.profile_id)
-        : null,
-    });
+    const objectType = classifyObjectType(
+      entry,
+      hubConfig.fetchNetworkStatus ? getCachedNetworkQrScope(entry.profile_id) : undefined
+    );
+    const pilotTemplate =
+      entry.pilot_template ||
+      (entry.manifesto_line ? inferPilotTemplate(String(entry.manifesto_line)) : "general");
+    const cardControls = applyHubControlPlainLabels(
+      buildHubCardControls({
+        hasKeys: !!entry.owner_private_key_b58,
+        pendingLiveProof: !!liveControlPendingForEntry(entry),
+        scanKind: hubConfig.fetchNetworkStatus
+          ? getCachedNetworkScanKind(entry.profile_id)
+          : null,
+      }),
+      pilotTemplate
+    );
     const { inline: inlineControls, menu: menuControls } =
       partitionHubCardControls(cardControls);
     li.className = `hub-card-item hub-card-item--${objectType.tone}${
@@ -1175,6 +1292,7 @@ function renderSavedRows(opts = {}) {
       if (entry?.profile_id) {
         markProfileRemovedFromDevice(entry.profile_id);
         purgePresenceForProfile(entry.profile_id);
+        offerClearOtherTabKeysOnRemove(entry.profile_id);
         clearSignLock(entry.profile_id);
         clearWalletNetworkTruthForProfile(entry.profile_id);
         logDeviceActivity("remove_card", entry.label, {
@@ -1383,6 +1501,7 @@ export function initDeviceHub(config = {}) {
 
   initHubBackupImport(hubEl("hub-import-form"), hubEl("hub-import-status"));
   mountThemeToggles();
+  mountHubBuildStamp(hubQueryRoot ?? document);
 
   refreshDeviceHub();
   notifyHubChanged();
@@ -1398,7 +1517,7 @@ export function initDeviceHub(config = {}) {
       getAutoPollBudgetPaused: () => isLiveControlAutoPollBudgetPaused(),
       getStewardQuotaPaused: () => isStewardServerQuotaPaused(),
       getLargeWalletHint: () =>
-        largeWalletHint(loadWallet().length, getStewardEntitlementsPolicy()),
+        walletScaleHint(loadWallet().length, getStewardEntitlementsPolicy()),
       getHostedTierLine: () =>
         hostedTierHubIndicatorLine(getStewardEntitlementsPolicy()),
       onCheckNetwork: () => fetchAndApplyNetworkChips({ manual: true }),

@@ -10,9 +10,14 @@ import {
   ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX,
   ORPHAN_KEYS_INBOX_TITLE,
 } from "./device-orphan-keys-nav-core.mjs";
-import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=34";
+import {
+  crossTabAggregateSubtitle,
+  crossTabAggregateTitle,
+  crossTabPresenceLabel,
+} from "./device-cross-tab-copy-core.mjs";
+import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=56";
 
-/** @typedef {'live_proof' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'orphan_keys_removed' | 'card_disabled_since_visit'} InboxKind */
+/** @typedef {'live_proof' | 'tab_keys_unsaved' | 'cross_tab_keys' | 'other_tabs_unsaved_keys' | 'orphan_keys_removed' | 'card_disabled_since_visit'} InboxKind */
 
 /**
  * @param {InboxItem[]} items
@@ -91,19 +96,28 @@ export function buildInboxItems(input) {
 
   if (crossTabCount > 0) {
     const entry = crossTabEntries[0];
-    const label =
-      entry?.label ||
-      (entry?.handle ? `@${entry.handle}` : `${entry?.profile_id?.slice(0, 12) ?? ""}…`);
-    const extra = crossTabCount > 1 ? crossTabCount - 1 : 0;
-    items.push({
-      kind: "cross_tab_keys",
-      urgency: "medium",
-      count: crossTabCount,
-      title: "Keys in another tab",
-      subtitle: extra > 0 ? `${label} (+${extra} more)` : label,
-      hubScrollTarget: "device-hub-crosstab-notice",
-      meta: { crossTabEntry: entry, crossTabExtra: extra },
-    });
+
+    if (crossTabCount >= 2) {
+      items.push({
+        kind: "other_tabs_unsaved_keys",
+        urgency: "medium",
+        count: crossTabCount,
+        title: crossTabAggregateTitle(crossTabCount),
+        subtitle: crossTabAggregateSubtitle(crossTabEntries),
+        hubScrollTarget: "device-hub-keys-custody",
+        meta: { crossTabEntry: entry, crossTabExtra: crossTabCount - 1 },
+      });
+    } else {
+      items.push({
+        kind: "cross_tab_keys",
+        urgency: "medium",
+        count: crossTabCount,
+        title: crossTabAggregateTitle(1),
+        subtitle: crossTabPresenceLabel(entry),
+        hubScrollTarget: "device-hub-keys-custody",
+        meta: { crossTabEntry: entry, crossTabExtra: 0 },
+      });
+    }
   }
 
   const orphanCount = shouldShowOrphanRemovedKeysNotice(
@@ -128,7 +142,7 @@ export function buildInboxItems(input) {
         extra > 0
           ? `${ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX} · ${label} (+${extra} more)`
           : `${ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX} · ${label}`,
-      hubScrollTarget: "device-hub-crosstab-notice",
+      hubScrollTarget: "device-hub-keys-custody",
       meta: { crossTabEntry: entry, crossTabExtra: extra },
     });
   }
@@ -140,7 +154,7 @@ export function buildInboxItems(input) {
       count: tabNoticeCount,
       title: "Keys in this tab · save",
       subtitle: tabSessionLabel,
-      hubScrollTarget: "device-hub-notice-group",
+      hubScrollTarget: "device-hub-keys-custody",
     });
   }
 
@@ -209,6 +223,71 @@ export function cardDisabledProfileIdsFromInbox(items) {
 /** @typedef {GlanceRowInbox | GlanceRowWallet | GlanceRowMore} GlanceRowPlanEntry */
 
 /**
+ * Expand aggregate inbox items into one row per cross-tab / orphan target (Phase 2).
+ * Badge count stays on aggregate `buildInboxItems()`; chrome copy uses stable per-tab labels.
+ * @param {InboxItem[]} items
+ * @param {{
+ *   crossTabEntries?: InboxCrossTabEntry[],
+ *   orphanRemovedEntries?: InboxCrossTabEntry[],
+ * }} [ctx]
+ * @returns {InboxItem[]}
+ */
+export function expandInboxItemsForChrome(items, ctx = {}) {
+  const {
+    crossTabEntries = [],
+    orphanRemovedEntries = [],
+  } = ctx;
+
+  /** @type {InboxItem[]} */
+  const expanded = [];
+
+  for (const item of items) {
+    if (item.kind === "cross_tab_keys" && crossTabEntries.length > 0) {
+      for (const entry of crossTabEntries) {
+        expanded.push({
+          ...item,
+          count: 1,
+          subtitle: inboxCrossTabLabel(entry),
+          meta: { crossTabEntry: entry },
+        });
+      }
+      continue;
+    }
+
+    if (item.kind === "other_tabs_unsaved_keys" && crossTabEntries.length > 0) {
+      for (const entry of crossTabEntries) {
+        expanded.push({
+          kind: "cross_tab_keys",
+          count: 1,
+          urgency: item.urgency,
+          title: crossTabAggregateTitle(1),
+          subtitle: inboxCrossTabLabel(entry),
+          hubScrollTarget: item.hubScrollTarget,
+          meta: { crossTabEntry: entry },
+        });
+      }
+      continue;
+    }
+
+    if (item.kind === "orphan_keys_removed" && orphanRemovedEntries.length > 0) {
+      for (const entry of orphanRemovedEntries) {
+        expanded.push({
+          ...item,
+          count: 1,
+          subtitle: `${ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX} · ${inboxCrossTabLabel(entry)}`,
+          meta: { crossTabEntry: entry },
+        });
+      }
+      continue;
+    }
+
+    expanded.push(item);
+  }
+
+  return expanded;
+}
+
+/**
  * Ordered glance popover rows: inbox actionable items, then saved-card peek, then “N more”.
  * @param {InboxItem[]} inboxItems
  * @param {GlanceWalletEntry[]} walletEntries
@@ -216,6 +295,8 @@ export function cardDisabledProfileIdsFromInbox(items) {
  *   maxSavedCards?: number,
  *   cardDisabledProfileIds?: Set<string>,
  *   revokedHintProfileIds?: Set<string>,
+ *   crossTabEntries?: InboxCrossTabEntry[],
+ *   orphanRemovedEntries?: InboxCrossTabEntry[],
  * }} [options]
  * @returns {GlanceRowPlanEntry[]}
  */
@@ -225,10 +306,15 @@ export function buildGlanceRowPlan(inboxItems, walletEntries, options = {}) {
     options.cardDisabledProfileIds ?? cardDisabledProfileIdsFromInbox(inboxItems);
   const revokedHintPids = options.revokedHintProfileIds ?? new Set();
 
+  const displayItems = expandInboxItemsForChrome(inboxItems, {
+    crossTabEntries: options.crossTabEntries,
+    orphanRemovedEntries: options.orphanRemovedEntries,
+  });
+
   /** @type {GlanceRowPlanEntry[]} */
   const rows = [];
 
-  for (const item of inboxItems) {
+  for (const item of displayItems) {
     rows.push({ type: "inbox", item });
   }
 
@@ -267,7 +353,9 @@ export function inboxCountFromItems(items) {
  */
 export function topInboxKind(items) {
   if (items.some((i) => i.kind === "live_proof")) return "live_proof";
-  if (items.some((i) => i.kind === "cross_tab_keys")) return "cross_tab_keys";
+  if (items.some((i) => i.kind === "cross_tab_keys" || i.kind === "other_tabs_unsaved_keys")) {
+    return "cross_tab_keys";
+  }
   if (items.some((i) => i.kind === "orphan_keys_removed")) return "orphan_keys_removed";
   if (items.some((i) => i.kind === "card_disabled_since_visit")) {
     return "card_disabled_since_visit";
@@ -322,7 +410,12 @@ export function inboxOverlayCountsFromItems(items) {
     .filter((i) => i.kind === "live_proof")
     .reduce((s, i) => s + i.count, 0);
   const crossTabNotice = items
-    .filter((i) => i.kind === "cross_tab_keys" || i.kind === "orphan_keys_removed")
+    .filter(
+      (i) =>
+        i.kind === "cross_tab_keys" ||
+        i.kind === "other_tabs_unsaved_keys" ||
+        i.kind === "orphan_keys_removed"
+    )
     .reduce((s, i) => s + i.count, 0);
   const cardDisabledSinceVisit = items
     .filter((i) => i.kind === "card_disabled_since_visit")
@@ -331,22 +424,31 @@ export function inboxOverlayCountsFromItems(items) {
 }
 
 /**
- * @param {InboxItem[]} items
+ * @param {InboxItem} item
  */
 function describeItemForAria(item) {
   if (item.kind === "live_proof") {
     return `${item.count} live proof${item.count === 1 ? "" : "s"}`;
   }
   if (item.kind === "tab_keys_unsaved") {
-    return "unsaved tab keys";
+    const who = item.subtitle ? ` (${item.subtitle})` : "";
+    return `unsaved tab keys${who}`;
   }
   if (item.kind === "cross_tab_keys") {
-    return item.count > 1 ? `keys in ${item.count} other tabs` : "keys in another tab";
+    const who = item.subtitle ? ` (${item.subtitle})` : "";
+    return `keys open in another tab${who}`;
+  }
+  if (item.kind === "other_tabs_unsaved_keys") {
+    const who = item.subtitle ? ` (${item.subtitle})` : "";
+    return item.count > 1
+      ? `keys open in ${item.count} other tabs${who}`
+      : `keys open in another tab${who}`;
   }
   if (item.kind === "orphan_keys_removed") {
-    return item.count > 1
-      ? `keys for ${item.count} removed cards in other tabs`
-      : "keys for a removed card in another tab";
+    const who = item.subtitle
+      ? ` (${item.subtitle.replace(`${ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX} · `, "")})`
+      : "";
+    return `keys for a removed card in another tab${who}`;
   }
   if (item.kind === "card_disabled_since_visit") {
     return item.count === 1
@@ -358,15 +460,59 @@ function describeItemForAria(item) {
 
 /**
  * @param {InboxItem[]} items
+ * @param {{
+ *   crossTabEntries?: InboxCrossTabEntry[],
+ *   orphanRemovedEntries?: InboxCrossTabEntry[],
+ * }} [ctx]
  */
-export function inboxBadgeAriaLabel(items) {
+export function inboxBadgeAriaLabel(items, ctx) {
   const n = inboxCountFromItems(items);
   if (n === 0) return "Inbox";
-  const parts = items.map(describeItemForAria).filter(Boolean);
+
+  const displayItems = ctx
+    ? expandInboxItemsForChrome(items, ctx)
+    : items;
+
+  const parts = displayItems.map(describeItemForAria).filter(Boolean);
   if (parts.length === 0) {
     return n === 1 ? "1 item needs attention" : `${n} items need attention`;
   }
-  return `Needs attention: ${parts.join(", ")}`;
+  const total =
+    n === 1 ? "1 item" : `${n} items`;
+  return `Needs attention (${total}): ${parts.join(", ")}`;
+}
+
+/**
+ * Longer breakdown for badge `title` tooltip (Phase 2).
+ * @param {InboxItem[]} items
+ * @param {{
+ *   crossTabEntries?: InboxCrossTabEntry[],
+ *   orphanRemovedEntries?: InboxCrossTabEntry[],
+ * }} [ctx]
+ */
+export function inboxBadgeTitle(items, ctx) {
+  const n = inboxCountFromItems(items);
+  if (n === 0) return "";
+
+  const displayItems = ctx
+    ? expandInboxItemsForChrome(items, ctx)
+    : items;
+
+  const parts = displayItems.map((item) => {
+    if (item.kind === "live_proof") return item.title;
+    if (item.kind === "cross_tab_keys" || item.kind === "orphan_keys_removed") {
+      return item.subtitle
+        ? `${item.title} · ${item.subtitle}`
+        : item.title;
+    }
+    if (item.kind === "tab_keys_unsaved") {
+      return item.subtitle ? `${item.title} · ${item.subtitle}` : item.title;
+    }
+    return item.title;
+  });
+
+  const headline = n === 1 ? "1 item needs attention" : `${n} items need attention`;
+  return `${headline} — ${parts.join(" · ")}`;
 }
 
 /**
@@ -406,9 +552,7 @@ export function inboxWalletEntryLabel(entry) {
  * @param {InboxCrossTabEntry} entry
  */
 export function inboxCrossTabLabel(entry) {
-  if (entry.label) return entry.label;
-  if (entry.handle) return `@${entry.handle}`;
-  return `${entry.profile_id.slice(0, 12)}…`;
+  return crossTabPresenceLabel(entry);
 }
 
 /**
@@ -454,11 +598,11 @@ export function buildInboxSheetRows(items, ctx = {}) {
       continue;
     }
 
-    if (item.kind === "cross_tab_keys") {
+    if (item.kind === "cross_tab_keys" || item.kind === "other_tabs_unsaved_keys") {
       for (const entry of crossTabEntries) {
         rows.push({
-          kind: "cross_tab_keys",
-          title: "Keys in another tab",
+          kind: item.kind === "other_tabs_unsaved_keys" ? "other_tabs_unsaved_keys" : "cross_tab_keys",
+          title: crossTabAggregateTitle(1),
           subtitle: inboxCrossTabLabel(entry),
           tone: "blue",
           crossTabEntry: entry,

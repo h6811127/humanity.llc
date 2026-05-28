@@ -17,11 +17,15 @@ import {
 } from "../http/resolver";
 import { validateHandle } from "../validation/handle";
 import { validateManifestoLine } from "../validation/manifesto";
+import { validateObjectStreamsField } from "../validation/object-streams";
+import { normalizeMerchFunnelRef } from "../commerce/merch-funnel-core";
+import { incrementMerchFunnelCounter } from "../db/merch-funnel";
 import { resolveStoredQrExpiresAt } from "./merch-qr-policy";
 
 export interface CreateCardBody {
   card: Record<string, unknown>;
   qr_credential: Record<string, unknown>;
+  attribution_ref?: string | null;
 }
 
 function parseCreateBody(body: unknown): CreateCardBody | null {
@@ -29,9 +33,14 @@ function parseCreateBody(body: unknown): CreateCardBody | null {
   const o = body as Record<string, unknown>;
   if (!o.card || typeof o.card !== "object") return null;
   if (!o.qr_credential || typeof o.qr_credential !== "object") return null;
+  const attributionRef =
+    o.attribution_ref == null || o.attribution_ref === ""
+      ? null
+      : normalizeMerchFunnelRef(o.attribution_ref);
   return {
     card: o.card as Record<string, unknown>,
     qr_credential: o.qr_credential as Record<string, unknown>,
+    attribution_ref: attributionRef,
   };
 }
 
@@ -191,6 +200,17 @@ export async function handlePostCards(
     return errorResponse(code, msg, 422);
   }
 
+  try {
+    validateObjectStreamsField(card);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Invalid object_streams.";
+    const code =
+      e && typeof e === "object" && "code" in e
+        ? String((e as { code: string }).code)
+        : "VALIDATION_ERROR";
+    return errorResponse(code, msg, 422);
+  }
+
   if (isDemoHandle(handleNormalized)) {
     const demoRate = await checkDemoCreateRateLimit(db, ipHash);
     if (!demoRate.allowed) {
@@ -304,6 +324,10 @@ export async function handlePostCards(
       );
     }
     return errorResponse("RESOLVER_ERROR", msg, 500);
+  }
+
+  if (parsed.attribution_ref && !isDemoHandle(handleNormalized)) {
+    await incrementMerchFunnelCounter(db, parsed.attribution_ref, "create_attributed");
   }
 
   return jsonResponse(

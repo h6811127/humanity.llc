@@ -48,6 +48,19 @@ If `schema` is `missing`, run the hosted migrations before investigating hosted 
 
 ## Daily check
 
+Automated threshold review (E6.2):
+
+```bash
+OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run worker:check-steward-ops
+```
+
+**GitHub Actions (production):** workflow `.github/workflows/steward-ops-daily.yml` runs daily at 14:00 UTC and on manual dispatch. Requires repo secret `OPERATOR_AUDIT_TOKEN`. Workflow targets `https://humanity.llc`; for staging, run locally with `API_ORIGIN=http://127.0.0.1:8787`.
+
+Exit **0** = no alerts · **1** = critical fair-use threshold · **2** = auth/config/request error.  
+Vitest: `npm run worker:test:steward-ops`
+
+Manual review:
+
 1. Confirm `hosted_steward_enabled` matches the rollout plan.
 2. Check `accounts` for unexpected `past_due`, `expired`, or `suspended` spikes.
 3. Check `usage`:
@@ -55,7 +68,7 @@ If `schema` is `missing`, run the hosted migrations before investigating hosted 
    - `poll.live_proof.auto` near **100,000/account/day** means hard-cap/fair-use intervention.
    - `notify.push.delivered` near **10,000/account/day** means push fan-out review.
 4. Check `push.active_connections` against `push.max_connections_per_account`.
-5. Cross-check Cloudflare Workers analytics for 429 rate, 5xx rate, and request volume.
+5. Cross-check Cloudflare Workers analytics for 429 rate, 5xx rate, and request volume — see [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md) (E6.1).
 
 ---
 

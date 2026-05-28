@@ -231,9 +231,19 @@ export function saveSessionToWallet(session, label = "") {
     }
     entries[idx] = merged;
     saveWallet(entries);
+    notifyWalletProfileSaved(session.profile_id);
     return { ok: true, updated: true };
   }
   entries.unshift(walletEntryFromSession(session, label));
   saveWallet(entries);
+  notifyWalletProfileSaved(session.profile_id);
   return { ok: true };
+}
+
+function notifyWalletProfileSaved(profileId) {
+  const pid = typeof profileId === "string" ? profileId.trim() : "";
+  if (!pid || typeof window === "undefined") return;
+  window.dispatchEvent(
+    new CustomEvent("hc-profile-saved-on-device", { detail: { profile_id: pid } })
+  );
 }

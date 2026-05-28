@@ -2,7 +2,7 @@
  * Progressive viewer device dot on public scan pages (Phase 8).
  * @see docs/SCAN_PAGE_DEVICE_DOT.md
  */
-import { setRefreshStatusSurfaces } from "./device-chrome-refresh.mjs?v=38";
+import { setRefreshStatusSurfaces } from "./device-chrome-refresh.mjs?v=56";
 import {
   describeDotState,
   deviceStateFromContext,
@@ -10,11 +10,11 @@ import {
   dotStateKey,
   dotTransitionKey,
   hasStewardVerification,
-} from "./device-dot-state-core.mjs?v=38";
+} from "./device-dot-state-core.mjs?v=56";
 import { fetchResolverHealth } from "./device-network-health.mjs";
 import { activateWalletEntry, getTabSession } from "./device-keys.mjs";
 import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
-import { getInboxOverlayCounts } from "./device-inbox.mjs?v=38";
+import { getInboxOverlayCounts } from "./device-inbox.mjs?v=56";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
 import {
