@@ -1,6 +1,6 @@
 # M7  -  Live control alpha
 
-**Status:** Step 1 shipped (verify on production); Step 2 polish deferred  
+**Status:** Step 1 shipped (verify on production); Step 2 polish in progress  
 **Canonical refs:** `docs/Technical Standards v1.0.md` §8.6, `docs/V1_PRODUCT_TRUST_MODEL.md` § Live Control Proof Flow  
 **Product thesis:** Revocation proves the object is mutable. Live control proves the object is actively possessed.
 
@@ -78,7 +78,7 @@ Those become meaningful only after the base interaction is legible.
 ## Step 2 candidates
 
 - Better side-by-side scanner/owner layout for in-person use.
-- Visible countdown for challenge expiry.
-- Clear expired/failed state on the scanner page.
+- Visible countdown for challenge expiry — **partial:** challenge wait uses `startCountdown()` on scan page; proof display window uses server `proof_expires_at` + client timer.
+- Clear expired/failed state on the scanner page — **shipped (2026-05-28):** SSR stale-proof gate (`scan.ts`), client `showProofExpired` / `showRequestExpired` (`scan-html.ts`), regression tests in `worker/tests/scan.test.ts` and `worker/tests/live-control.test.ts`.
 - Copy comprehension test with the question: “What did live control prove?”
 - Manual iPhone/Android camera scan of a printed QR.

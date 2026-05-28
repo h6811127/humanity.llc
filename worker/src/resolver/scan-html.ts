@@ -1354,6 +1354,7 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
     }
     if (status) setStatus("Ready when you are.", false);
     if (ownerPanel) ownerPanel.hidden = true;
+    if (ownerLink) ownerLink.href = "#";
   }
   function wireAskAgain() {
     if (!askAgainBtn) return;
@@ -1544,7 +1545,10 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
   btn.addEventListener("click", function () {
     btn.disabled = true;
     btn.textContent = "Waiting…";
+    stopPolling();
     stopProofExpiryTimer();
+    if (ownerPanel) ownerPanel.hidden = true;
+    if (ownerLink) ownerLink.href = "#";
     setStatus("Creating a live proof request…", true);
     fetch(${JSON.stringify(challengeUrl)}, {
       method: "POST",

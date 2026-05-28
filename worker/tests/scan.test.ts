@@ -554,6 +554,24 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(result.setTimeoutMock.mock.calls[0][1]).toBeGreaterThan(0);
   });
 
+  it("clears stale owner proof link before a new live proof request resolves", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: summary(),
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+
+    expect(html).toContain("stopPolling();");
+    expect(html).toContain("if (ownerPanel) ownerPanel.hidden = true;");
+    expect(html).toContain('if (ownerLink) ownerLink.href = "#";');
+  });
+
   it("uses print_artifact scope copy when applicable", async () => {
     const vm = buildScanViewModel(
       PROFILE,
