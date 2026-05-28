@@ -4,7 +4,7 @@ import type { ArtifactIntentRow } from "../src/db/artifact-intents";
 import type { CommerceOrderRow } from "../src/db/commerce-orders";
 import type { PrintOrderRow } from "../src/db/print-orders";
 import { handlePostShopifyOrdersWebhook } from "../src/http/shopify-orders-webhook";
-import type { Env } from "../src/index";
+import type { Env } from "../src/env";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const INTENT = "ai_PaidWebhookTest01";
@@ -256,6 +256,38 @@ describe("Shopify orders webhook (O-001)", () => {
     expect(json.print_order_ids[0]).toMatch(/^po_/);
     expect(state.intents.get(INTENT)?.status).toBe("converted");
     expect(state.orders.size).toBe(1);
+
+    const printOrder = [...state.printOrders.values()][0];
+    expect(printOrder?.template_id).toBe("hc-sticker-square-v1");
+    expect(JSON.parse(printOrder!.planned_item_qr_ids_json)).toEqual(["qr_planned1"]);
+  });
+
+  it("queues personalized sticker print order for storefront product id", async () => {
+    const state: DbState = {
+      intents: new Map([
+        [
+          INTENT,
+          intentRow({ product_id: "sticker_personalized_v1" }),
+        ],
+      ]),
+      orders: new Map(),
+      receipts: new Map(),
+      printOrders: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(paidOrderBody()),
+      env,
+      dbFor(state)
+    );
+    const json = (await res.json()) as { fulfillment_mode: string; print_order_ids: string[] };
+
+    expect(res.status).toBe(200);
+    expect(json.fulfillment_mode).toBe("personalized");
+    expect(json.print_order_ids).toHaveLength(1);
+
+    const printOrder = [...state.printOrders.values()][0];
+    expect(printOrder?.template_id).toBe("hc-sticker-square-v1");
   });
 
   it("holds order when artifact intent metadata is missing", async () => {

@@ -28,7 +28,7 @@ import {
 } from "../db/commerce-orders";
 import { errorResponse, jsonResponse } from "./resolver";
 import { verifyShopifyWebhookHmac } from "./shopify-webhook-verify";
-import type { Env } from "../index";
+import type { Env } from "../env";
 import { generateCommerceOrderId } from "../id";
 import { queuePrintOrderAfterPaidWebhook } from "../print/print-orders-handler";
 

@@ -1,5 +1,5 @@
 /**
- * Tier 0 shop  -  checkout handoff or local interest until Shopify URL is set.
+ * Tier 0 founding sticker — /shop/founding/
  */
 import {
   isTier0CheckoutOpen,
@@ -16,8 +16,15 @@ import {
   SHOP_CHECKOUT_READY_LEAD,
   shopPriceLabelWhenCheckoutClosed,
 } from "./shop-copy-core.mjs";
+import { bindSameTabCheckoutAnchor } from "./shop-checkout-handoff.mjs";
+import {
+  canProceedToCheckout,
+  proofConsentRequiredIds,
+  readProofConsentState,
+} from "./shop-proof-consent-core.mjs";
 
 const INTEREST_KEY = "hc_shop_drop_interest";
+const TIER0_PROOF_CONSENT_IDS = proofConsentRequiredIds("tier0");
 
 const checkoutSection = document.getElementById("shop-checkout-group");
 const interestSection = document.getElementById("shop-interest-group");
@@ -35,6 +42,12 @@ const thanksLink = document.getElementById("shop-thanks-link");
 const postPurchaseUrlEl = document.getElementById("shop-post-purchase-url");
 const postPurchaseLink = document.getElementById("shop-post-purchase-link");
 const postPurchaseCode = document.querySelector(".shop-post-purchase-url__code");
+const proofConsentEl = document.getElementById("shop-proof-consent");
+
+/** @type {string} */
+let activeCheckoutUrl = "";
+/** @type {boolean} */
+let checkoutUiOpen = false;
 
 function loadInterest() {
   try {
@@ -56,19 +69,42 @@ function setInterestStatus(msg, isError = false) {
   interestStatus.className = isError ? "form-status error" : "form-status";
 }
 
+function tier0ProofConsentComplete() {
+  return canProceedToCheckout(
+    checkoutUiOpen,
+    TIER0_PROOF_CONSENT_IDS,
+    readProofConsentState(proofConsentEl, TIER0_PROOF_CONSENT_IDS)
+  );
+}
+
+function syncTier0BuyButtons() {
+  const ready = tier0ProofConsentComplete();
+  for (const btn of [buyBtn, buyBtnFooter, heroPrimary]) {
+    if (!btn || btn.hidden) continue;
+    if (ready) {
+      btn.removeAttribute("aria-disabled");
+    } else {
+      btn.setAttribute("aria-disabled", "true");
+    }
+  }
+}
+
 function setBuyButtonsVisible(visible, checkoutUrl = "") {
+  activeCheckoutUrl = visible && checkoutUrl ? checkoutUrl : "";
+  const canProceed = () => tier0ProofConsentComplete();
   for (const btn of [buyBtn, buyBtnFooter]) {
     if (!btn) continue;
     if (visible && checkoutUrl) {
       btn.href = checkoutUrl;
       btn.hidden = false;
-      btn.removeAttribute("aria-disabled");
+      bindSameTabCheckoutAnchor(btn, () => activeCheckoutUrl, canProceed);
     } else {
       btn.removeAttribute("href");
       btn.hidden = true;
       btn.setAttribute("aria-disabled", "true");
     }
   }
+  syncTier0BuyButtons();
 }
 
 function bindInterestForm() {
@@ -100,6 +136,7 @@ function bindInterestForm() {
  * @param {string} thanksUrl
  */
 function showCheckout(display, checkoutUrl, thanksUrl) {
+  checkoutUiOpen = true;
   if (priceEl) {
     priceEl.textContent = display.price || "Available now";
     priceEl.classList.add("shop-product-price--live");
@@ -111,10 +148,11 @@ function showCheckout(display, checkoutUrl, thanksUrl) {
   if (heroPrimary) {
     heroPrimary.href = checkoutUrl;
     heroPrimary.textContent = "Buy the founding sticker";
-    heroPrimary.target = "_blank";
-    heroPrimary.rel = "noopener noreferrer";
+    heroPrimary.removeAttribute("target");
+    heroPrimary.removeAttribute("rel");
     heroPrimary.classList.add("landing-hero-btn-primary");
     heroPrimary.classList.remove("landing-hero-btn-secondary");
+    bindSameTabCheckoutAnchor(heroPrimary, () => activeCheckoutUrl, () => tier0ProofConsentComplete());
   }
   if (thanksLink) thanksLink.href = thanksUrl;
   if (postPurchaseLink) postPurchaseLink.href = thanksUrl;
@@ -129,9 +167,12 @@ function showCheckout(display, checkoutUrl, thanksUrl) {
   }
   if (checkoutSection) checkoutSection.hidden = false;
   if (interestSection) interestSection.hidden = true;
+  if (proofConsentEl) proofConsentEl.hidden = false;
+  syncTier0BuyButtons();
 }
 
 function showInterestPending(display) {
+  checkoutUiOpen = false;
   if (priceEl) {
     priceEl.textContent = shopPriceLabelWhenCheckoutClosed(display.price);
     priceEl.classList.remove("shop-product-price--live");
@@ -155,6 +196,7 @@ function showInterestPending(display) {
   if (postPurchaseUrlEl) postPurchaseUrlEl.hidden = true;
   if (checkoutSection) checkoutSection.hidden = true;
   if (interestSection) interestSection.hidden = false;
+  if (proofConsentEl) proofConsentEl.hidden = true;
 }
 
 function decorateShopCreateLinks() {
@@ -166,9 +208,12 @@ function decorateShopCreateLinks() {
 }
 
 async function initShop() {
-  persistMerchCreateRef("tier0_shop");
+  persistMerchCreateRef("tier0_sticker");
   decorateShopCreateLinks();
   bindInterestForm();
+  proofConsentEl?.addEventListener("change", () => {
+    syncTier0BuyButtons();
+  });
   try {
     const config = await loadShopConfig();
     const display = tier0Display(config);

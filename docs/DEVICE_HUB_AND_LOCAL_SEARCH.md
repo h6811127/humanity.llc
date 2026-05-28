@@ -10,8 +10,6 @@
 
 The landing page, **`/created/`**, and **`/wallet/`** share an **“on this device”** hub: saved cards with signing keys, **pinned public scan links**, **recent activity**, and shortcuts. This mirrors a Settings-style surface (grouped inset lists) without accounts, sync, or operator storage of private keys.
 
-**Sheet title (May 2026):** Bottom sheets on **`/`** and **`/create/`** use **`#device-hub-title` → “Saved in this browser”** with no `.device-hub-lead` under the title (policy copy stays in **Saved items** / Monitoring section leads). **`/created/`** keeps **My cards on this device** + its quick-switcher lead; **`/wallet/`** uses the full-page title **My cards on this device**.
-
 **Not in scope:** searching the Humanity resolver, other people’s cards, or any server index.
 
 ---
@@ -48,9 +46,6 @@ These notes are captured as individual product refinements so implementation can
 - **Row Phase 1 (shipped):** information consolidation per [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md).
 - **Row Phase 2 (shipped):** steward actions in ⋯ **QR & lifecycle**; **Prove live** stays inline when pending ([`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md)).
 - **Row Phase 3 (shipped):** typography ladder, status dot rings, tightened spacing ([`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md)).
-- **Visual refresh Phase 1–2 (shipped):** hub sheet + inline search glass; **Monitoring** warn card for network/live-proof toolbar ([`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md)).
-- **Header simplification (shipped):** Create as **+ New** in saved-items header; inline status row ([`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md)).
-- **Live proof waiting (shipped):** urgent emphasis card replaces gold label + plain list ([`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md) § Phase 5).
 
 ---
 
@@ -76,9 +71,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Shortcuts & settings (shipped):** On the **homepage** (`/`) only - section after the studio example (unified list rows: Appearance, **Browser alerts** (background OS notifications for live proof), saved cards, manage, auto-save, focus). Hub sheet on all routes has **home icon** (left) and status line (center); Create lives beside the saved-items heading; no shortcuts block in the hub.
 
-**Share network checks across tabs** (resolver snapshot sync; default on) — [`DEVICE_TAB_RESOLVER_SYNC.md`](DEVICE_TAB_RESOLVER_SYNC.md); toggle + **Refresh all tabs** on homepage **Shortcuts & settings**.
-
-**Hub header simplification (Step 1):** Create moves out of the sheet's top status rail and into the saved-items section header as compact **+ New**. The top rail stays focused on Home + resolver/device status, while Close remains the sheet escape. See [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md).
+**Hub header simplification (Steps 1-2):** Create moves out of the sheet's top status rail and into the saved-items section header as compact **+ New**. The top rail shows Home plus a single-line resolver/device status where zero saved or pinned counts stay subordinate, while Close remains the sheet escape. See [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md).
 
 **Hub status line simplification (Step 2):** The sheet status panel is one inline read: network state first, muted saved/pinned counts next, and compact alert-weight items only for tab keys / live proof / proof-check warnings. This keeps zero counts visible without a separate wrapped `0 pinned` badge.
 

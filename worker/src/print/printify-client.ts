@@ -4,7 +4,6 @@
  */
 
 import { resolvePrintifyLineItem } from "./printify-template-config";
-import { preparePrintifyLineItems } from "./printify-line-items";
 import type { PrintifyShippingAddress } from "./printify-shipping";
 
 const PRINTIFY_API_BASE = "https://api.printify.com/v1";
@@ -12,11 +11,9 @@ const PRINTIFY_API_BASE = "https://api.printify.com/v1";
 export interface PrintifySubmitInput {
   print_order_id: string;
   template_id: string;
-  profile_id: string;
   planned_item_qr_ids: string[];
   shipping_address: PrintifyShippingAddress;
   quantity: number;
-  scan_origin?: string;
 }
 
 export interface PrintifySubmitResult {
@@ -29,11 +26,6 @@ export type PrintifySubmitErrorCode =
   | "PRINTIFY_UNCONFIGURED"
   | "PRINTIFY_SUBMIT_DEFERRED"
   | "PRINTIFY_TEMPLATE_UNCONFIGURED"
-  | "PRINTIFY_ARTWORK_UNCONFIGURED"
-  | "PRINTIFY_ARTWORK_GENERATION_FAILED"
-  | "PRINTIFY_UPLOAD_FAILED"
-  | "PRINTIFY_PRODUCT_CREATE_FAILED"
-  | "PRINTIFY_PLANNED_QRS_REQUIRED"
   | "PRINTIFY_API_ERROR"
   | "PRINTIFY_RATE_LIMITED"
   | "PRINTIFY_INVALID_ADDRESS";
@@ -58,20 +50,6 @@ export interface PrintifyEnv {
   PERSONALIZE_STICKER_PRINTIFY_PRODUCT_ID?: string;
   PERSONALIZE_STICKER_PRINTIFY_VARIANT_ID?: string;
   PERSONALIZE_STICKER_PRINTIFY_SHIPPING_METHOD?: string;
-  PERSONALIZE_HOODIE_PRINTIFY_BLUEPRINT_ID?: string;
-  PERSONALIZE_HOODIE_PRINTIFY_PRINT_PROVIDER_ID?: string;
-  PERSONALIZE_HOODIE_PRINTIFY_PLACEHOLDER?: string;
-  PERSONALIZE_HOODIE_PRINTIFY_IMAGE_X?: string;
-  PERSONALIZE_HOODIE_PRINTIFY_IMAGE_Y?: string;
-  PERSONALIZE_HOODIE_PRINTIFY_IMAGE_SCALE?: string;
-  PERSONALIZE_HOODIE_PRINTIFY_IMAGE_ANGLE?: string;
-  PERSONALIZE_STICKER_PRINTIFY_BLUEPRINT_ID?: string;
-  PERSONALIZE_STICKER_PRINTIFY_PRINT_PROVIDER_ID?: string;
-  PERSONALIZE_STICKER_PRINTIFY_PLACEHOLDER?: string;
-  PERSONALIZE_STICKER_PRINTIFY_IMAGE_X?: string;
-  PERSONALIZE_STICKER_PRINTIFY_IMAGE_Y?: string;
-  PERSONALIZE_STICKER_PRINTIFY_IMAGE_SCALE?: string;
-  PERSONALIZE_STICKER_PRINTIFY_IMAGE_ANGLE?: string;
 }
 
 export function printifyConfigured(env: PrintifyEnv): boolean {
@@ -152,36 +130,15 @@ export async function submitPrintifyOrder(
     };
   }
 
-  const prepared = await preparePrintifyLineItems(
-    env,
-    {
-      print_order_id: input.print_order_id,
-      template_id: input.template_id,
-      profile_id: input.profile_id,
-      planned_item_qr_ids: input.planned_item_qr_ids,
-      quantity: input.quantity,
-      scan_origin: input.scan_origin,
-    },
-    shopId,
-    fetchImpl
-  );
-
-  if (!prepared.ok) {
-    return {
-      ok: false,
-      code: prepared.code,
-      message: prepared.message,
-      status: prepared.status,
-    };
-  }
-
   const payload = {
     external_id: input.print_order_id,
-    line_items: prepared.line_items.map((item) => ({
-      product_id: item.product_id,
-      variant_id: item.variant_id,
-      quantity: item.quantity,
-    })),
+    line_items: [
+      {
+        product_id: lineItem.product_id,
+        variant_id: lineItem.variant_id,
+        quantity: input.quantity,
+      },
+    ],
     shipping_method: lineItem.shipping_method,
     send_shipping_notification: false,
     address_to: input.shipping_address,

@@ -11,7 +11,7 @@ import {
   syncPrintOrderFromPrintify,
   type PrintOrderRow,
 } from "../db/print-orders";
-import type { Env } from "../index";
+import type { Env } from "../env";
 import { statusFromPrintifyWebhookEvent } from "../print/printify-status-map";
 import {
   mergeTracking,

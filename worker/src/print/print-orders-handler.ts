@@ -16,7 +16,7 @@ import {
 } from "../db/print-orders";
 import { operatorAuditAuthorized } from "../http/operator-auth";
 import { errorResponse, jsonResponse } from "../http/resolver";
-import type { Env } from "../index";
+import type { Env } from "../env";
 import { submitPrintifyOrder } from "./printify-client";
 
 interface CreatePrintOrderRequest {
