@@ -31,7 +31,7 @@ async function requestExplain(snapshot) {
     const msg =
       typeof body.message === "string"
         ? body.message
-        : "Could not generate an explanation right now.";
+        : "Could not prepare plain-language help right now.";
     throw new Error(msg);
   }
   return body;
@@ -61,7 +61,7 @@ function bindExplain() {
       panel.classList.add("scan-ai-explain-panel--visible");
     } catch (err) {
       textEl.textContent =
-        err instanceof Error ? err.message : "Could not generate an explanation.";
+        err instanceof Error ? err.message : "Could not prepare plain-language help.";
       panel.hidden = false;
       panel.classList.add("scan-ai-explain-panel--visible");
     } finally {

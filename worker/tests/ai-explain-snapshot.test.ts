@@ -47,7 +47,7 @@ describe("ai explain snapshot", () => {
     };
     expect(body.source).toBe("deterministic");
     expect(body.summary).toContain("Studio door");
-    expect(body.limits.ai_explain_warning).toContain("AI summary");
+    expect(body.limits.ai_explain_warning).toContain("Plain-language summary");
     expect(body.disclaimer).toContain("not signed network state");
   });
 

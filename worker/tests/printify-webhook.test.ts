@@ -42,6 +42,10 @@ function printOrderRow(overrides: Partial<PrintOrderRow> = {}): PrintOrderRow {
     template_id: "hc-tier0-sticker-batch-v1",
     status: "submitted",
     shipping_method: "standard",
+    tracking_carrier: null,
+    tracking_number: null,
+    tracking_url: null,
+    last_reconciled_at: null,
     created_at: "2026-05-27T00:00:00.000Z",
     updated_at: "2026-05-27T00:00:00.000Z",
     ...overrides,
@@ -81,15 +85,18 @@ function dbFor(state: DbState): D1Database {
           }
           if (sql.includes("UPDATE print_orders")) {
             state.lastStatusUpdate = {
-              orderId: args[4] as string,
+              orderId: args[6] as string,
               status: args[0] as string,
             };
             const row = [...state.printOrders.values()].find(
-              (r) => r.order_id === (args[4] as string)
+              (r) => r.order_id === (args[6] as string)
             );
             if (row) {
               row.status = args[0] as PrintOrderRow["status"];
-              row.updated_at = args[1] as string;
+              row.tracking_carrier = args[1] as string | null;
+              row.tracking_number = args[2] as string | null;
+              row.tracking_url = args[3] as string | null;
+              row.updated_at = args[5] as string;
             }
           }
           return { success: true };
@@ -153,6 +160,46 @@ describe("handlePostPrintifyWebhook", () => {
     expect(body.status).toBe("in_production");
     expect(body.processing_status).toBe("processed");
     expect(state.lastStatusUpdate?.status).toBe("in_production");
+  });
+
+  it("stores tracking on order:shipment:created", async () => {
+    const state: DbState = {
+      printOrders: new Map([[PRINTIFY_ORDER_ID, printOrderRow()]]),
+      receipts: new Map(),
+      lastStatusUpdate: null,
+    };
+    const payload = JSON.stringify({
+      id: "evt_shipment_1",
+      type: "order:shipment:created",
+      resource: {
+        id: PRINTIFY_ORDER_ID,
+        type: "order",
+        data: {
+          status: "fulfilled",
+          shipments: [
+            {
+              carrier: "USPS",
+              tracking_number: "9400111899223344556677",
+              tracking_url: "https://tools.usps.com/go/TrackConfirmAction",
+            },
+          ],
+        },
+      },
+    });
+    const request = new Request("https://humanity.llc/v1/print/webhooks/printify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Pfy-Signature": await signPayload(payload),
+      },
+      body: payload,
+    });
+
+    const res = await handlePostPrintifyWebhook(request, { PRINTIFY_WEBHOOK_SECRET: SECRET } as Env, dbFor(state));
+    expect(res.status).toBe(200);
+    const row = state.printOrders.get(PRINTIFY_ORDER_ID);
+    expect(row?.status).toBe("fulfilled");
+    expect(row?.tracking_number).toBe("9400111899223344556677");
   });
 
   it("is idempotent for duplicate event ids", async () => {
