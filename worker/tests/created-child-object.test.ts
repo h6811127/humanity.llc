@@ -121,6 +121,15 @@ describe("child-object-store-core", () => {
 });
 
 describe("child-object issue-qr client", () => {
+  it("browser signDocument accepts parent_profile_id for child_object payloads", () => {
+    const src = readFileSync(join(process.cwd(), "site/js/hc-sign.mjs"), "utf8");
+    const requireFields = src.slice(
+      src.indexOf("function requireFields"),
+      src.indexOf("export async function signDocument")
+    );
+    expect(requireFields).toContain("parent_profile_id");
+  });
+
   it("exports issue-qr path and signing module for /created/", () => {
     expect(childObjectIssueQrPath("prof_1", "obj_1")).toContain("/issue-qr");
     const src = readFileSync(

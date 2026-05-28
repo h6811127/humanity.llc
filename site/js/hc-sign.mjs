@@ -102,7 +102,12 @@ function requireFields(unsigned) {
   if (!unsigned.type || !unsigned.version) {
     throw new Error("Missing type or version on signed payload.");
   }
-  if (!unsigned.profile_id && !unsigned.vouchee_profile_id) {
+  if (
+    !unsigned.profile_id &&
+    !unsigned.vouchee_profile_id &&
+    !unsigned.parent_profile_id &&
+    !unsigned.issued_to
+  ) {
     throw new Error("Missing subject profile id.");
   }
 }
