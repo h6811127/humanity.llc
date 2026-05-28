@@ -1771,6 +1771,7 @@ button.device-hub-notice-banner {
 }
 
 .hub-card-item {
+  margin: 0 0 5px;
   border: 0.5px solid var(--hc-emphasis-card-border-neutral);
   border-radius: var(--shell-radius-card);
   background: var(--hc-emphasis-card-fill-info-glass);
