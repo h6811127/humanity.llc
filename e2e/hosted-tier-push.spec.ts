@@ -168,6 +168,9 @@ async function installHostedPushFetchMock(page: Page, withSession: boolean) {
 }
 
 async function openExpandedHub(page: Page) {
+  await expect(page.locator("#brand-status-dot")).toHaveAttribute("data-dot-state", /.+/, {
+    timeout: 15_000,
+  });
   await page.locator("#brand-status-dot-btn").click({ timeout: 15_000 });
   await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/, {
     timeout: 15_000,

@@ -354,7 +354,7 @@ Engineering checklist once M4 governance checklist is signed ([`HOSTED_TIER_PRIC
 | 4b | Deploy + verify production | **Shipped** — `hosted:rollout:step4b` (preflight · local-smoke · deploy/smoke/verify) · **CI:** `deploy-worker.yml` runs `hosted:rollout:post-deploy-smoke -- --verify` after deploy |
 | 5a | Pin CF dashboard (E6.1) | Manual — `npm run hosted:rollout:step5a` · [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md) |
 | 5b | E6.2 CI + verify | **Shipped** — `hosted:rollout:step5b` (`--preflight` · `--verify`) · GitHub `OPERATOR_AUDIT_TOKEN` + `steward-ops-daily.yml` |
-| 6 | Regression | `npm run hosted:rollout:step6` · full verify `npm run hosted:rollout:step6 -- --verify` · Vitest only `npm run hosted:rollout:step6 -- --vitest` · E2E only `npm run hosted:rollout:step6 -- --e2e` |
+| 6 | Regression | **✅ Passed** — `npm run hosted:rollout:step6 -- --verify` (Vitest + hosted E2E); remaining rollout work is ops-only step 5a dashboard pin / token-backed step 5b verify |
 
 ---
 

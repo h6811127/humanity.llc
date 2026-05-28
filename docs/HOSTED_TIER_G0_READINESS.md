@@ -163,6 +163,8 @@ npm run hosted:rollout:step6 -- --vitest   # step 6a (Vitest) only
 npm run hosted:rollout:step6 -- --e2e      # step 6b (Playwright) only
 ```
 
+**Status:** full step 6 regression passed with `npm run hosted:rollout:step6 -- --verify` (Vitest + hosted E2E).
+
 Rollout steps: [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout (after G0).
 
 ---
