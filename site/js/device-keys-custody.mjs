@@ -104,9 +104,16 @@ export function keysCustodyHtml(variant, opts = {}) {
   }
 
   if (variant === "wallet") {
-    return custodyInfoEmphasisCard("device-keys-custody--wallet", {
-      ...privateKeyCopy,
-      extraCopyHtml: foot,
+    return emphasisCardShellHtml({
+      modifier: "info",
+      className: "device-keys-custody device-keys-custody--wallet",
+      role: "note",
+      dot: "info",
+      eyebrow: privateKeyCopy.eyebrow,
+      title: privateKeyCopy.title,
+      detail: privateKeyCopy.detail,
+      actionsHtml: emphasisCardActionsHtml([custodyAckButton()]),
+      afterActionsHtml: foot,
     });
   }
 
