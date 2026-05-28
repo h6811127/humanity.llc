@@ -27,6 +27,11 @@ import {
 } from "./resolver/live-control";
 import { handlePostRevoke } from "./resolver/revoke";
 import { handlePostCardUpdate } from "./resolver/update-card";
+import {
+  handlePostChildObjectCreate,
+  handlePostChildObjectRevoke,
+  handlePostChildObjectUpdate,
+} from "./resolver/child-objects";
 import { handlePostIssuePrintArtifactQr } from "./resolver/issue-print-artifact-qr";
 import { handlePostRotateQr } from "./resolver/rotate-qr";
 import { handlePostExtendQr } from "./resolver/extend-qr";
@@ -491,6 +496,42 @@ export default {
         );
       }
       const res = await handlePostCardUpdate(request, env.DB, updateMatch[1]!);
+      return withCors(request, res);
+    }
+
+    const childObjectCreateMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/objects$/
+    );
+    if (childObjectCreateMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostChildObjectCreate(
+        request,
+        env.DB,
+        childObjectCreateMatch[1]!
+      );
+      return withCors(request, res);
+    }
+
+    const childObjectActionMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/objects\/([^/]+)\/(update|revoke)$/
+    );
+    if (childObjectActionMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const [, profileId, objectId, action] = childObjectActionMatch;
+      const res =
+        action === "update"
+          ? await handlePostChildObjectUpdate(request, env.DB, profileId!, objectId!)
+          : await handlePostChildObjectRevoke(request, env.DB, profileId!, objectId!);
       return withCors(request, res);
     }
 

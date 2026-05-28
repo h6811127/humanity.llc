@@ -67,6 +67,11 @@ export const PAYLOAD_FIELD_RULES: Record<PayloadType, PayloadFieldRules> = {
     timestampFields: ["issued_at", "expires_at"],
     uniqueIdFields: ["nonce"],
   },
+  [PAYLOAD_TYPES.CHILD_OBJECT]: {
+    subjectProfileField: "parent_profile_id",
+    timestampFields: ["created_at", "updated_at"],
+    uniqueIdFields: ["object_id"],
+  },
 };
 
 export function isPayloadType(value: string): value is PayloadType {
