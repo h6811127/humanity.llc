@@ -21,7 +21,7 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=4" />
-    <link rel="stylesheet" href="/styles.css?v=128" />
+    <link rel="stylesheet" href="/styles.css?v=129" />
     <link rel="stylesheet" href="/css/device-shell.css?v=59" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=29" />
   </head>
@@ -281,10 +281,10 @@
           </ol>
 
           <div class="created-setup-panel" data-setup-panel="save" id="created-setup-panel-save">
-            <h2 class="created-setup-panel-title" id="created-setup-title">Save control on this device</h2>
+            <h2 class="created-setup-panel-title" id="created-setup-title">Save root control on this device</h2>
             <p class="created-setup-panel-lead">
-              Your signing key stays in this browser until you save it here. Without save, closing
-              this tab means you cannot update or revoke later.
+              Your root signing key stays in this browser until you save it here. Without save,
+              closing this tab means you cannot update, revoke, or manage object QRs later.
             </p>
             <div id="device-keys-custody-created-setup"></div>
             <div id="created-setup-keys-mount"></div>
@@ -672,7 +672,8 @@
             </div>
 
             <p class="created-keys-foot form-hint">
-              Recovery key and encrypted backup live under <strong>Manage</strong>.
+              Recovery key and encrypted backup live under <strong>Manage</strong> and restore
+              control of this root card plus its object QRs.
             </p>
                 </section>
               </div>
@@ -793,6 +794,104 @@
           </section>
 
           <section
+            class="created-what-now created-what-now-compact"
+            id="child-object-add-status-plate"
+            hidden
+            aria-labelledby="child-object-add-status-plate-title"
+          >
+            <h2 class="created-what-now-title" id="child-object-add-status-plate-title">
+              Add status plate under this root
+            </h2>
+            <p class="created-what-now-body">
+              One root signing key controls additional public objects. This registers a
+              <strong>status plate</strong> child on the network (no new private key).
+            </p>
+            <form id="child-object-status-plate-form" class="compact-form" novalidate>
+              <label class="form-label" for="child-object-plate-label">Object name</label>
+              <input
+                class="form-input"
+                id="child-object-plate-label"
+                type="text"
+                maxlength="120"
+                autocomplete="off"
+                required
+              />
+              <label class="form-label" for="child-object-plate-state">Status line</label>
+              <input
+                class="form-input"
+                id="child-object-plate-state"
+                type="text"
+                maxlength="280"
+                autocomplete="off"
+                required
+              />
+              <button
+                type="submit"
+                class="btn-secondary"
+                id="child-object-status-plate-submit"
+              >
+                Register status plate
+              </button>
+            </form>
+            <p class="form-hint" id="child-object-status-plate-status" hidden role="status"></p>
+            <ul
+              class="list-rows"
+              id="child-object-status-plate-list"
+              hidden
+              aria-label="Status plates under this root on this device"
+            ></ul>
+          </section>
+
+          <section
+            class="created-what-now created-what-now-compact"
+            id="child-object-add-lost-item"
+            hidden
+            aria-labelledby="child-object-add-lost-item-title"
+          >
+            <h2 class="created-what-now-title" id="child-object-add-lost-item-title">
+              Add lost-item relay under this root
+            </h2>
+            <p class="created-what-now-body">
+              One root signing key controls additional public objects. This registers a
+              <strong>lost-item relay</strong> child on the network (no new private key).
+            </p>
+            <form id="child-object-lost-item-form" class="compact-form" novalidate>
+              <label class="form-label" for="child-object-relay-item">Item name</label>
+              <input
+                class="form-input"
+                id="child-object-relay-item"
+                type="text"
+                maxlength="120"
+                autocomplete="off"
+                required
+              />
+              <label class="form-label" for="child-object-relay-message">Return message</label>
+              <input
+                class="form-input"
+                id="child-object-relay-message"
+                type="text"
+                maxlength="280"
+                autocomplete="off"
+                required
+              />
+              <button
+                type="submit"
+                class="btn-secondary"
+                id="child-object-lost-item-submit"
+              >
+                Register lost-item relay
+              </button>
+            </form>
+            <p class="form-hint" id="child-object-lost-item-status" hidden role="status"></p>
+            <ul
+              class="list-rows"
+              id="child-object-lost-item-list"
+              hidden
+              aria-label="Lost-item relays under this root on this device"
+            ></ul>
+          </section>
+
+          <section
             class="created-status-plate-loop"
             id="status-plate-loop-scorecard"
             aria-labelledby="status-plate-loop-scorecard-title"
@@ -885,8 +984,8 @@
         <!--  -  -  -  Advanced: update, revoke, keys  -  -  -  -->
         <div class="created-tab-panel" data-created-panel="advanced" id="created-tab-advanced" role="tabpanel" aria-labelledby="created-tab-btn-advanced" hidden>
           <p class="created-tab-lead">
-            Rotate, revoke, backup, and unlock keys. Same printed QR  -  you change resolver state,
-            not the sticker. Public copy publishes on <strong>Live</strong>. Open
+            Rotate, revoke, backup, and unlock keys. This root key controls the card and its
+            object QRs; you change resolver state, not the sticker. Public copy publishes on <strong>Live</strong>. Open
             <strong>Keys on this device</strong> on Live (or
             <a href="/wallet/">My cards</a>) before switching tabs.
           </p>
@@ -1031,7 +1130,8 @@
               </div>
               <p class="form-hint" id="owner-no-key">
                 Unlock a saved backup or recovery key below, or create again on
-                <a href="/create/">/create/</a>. humanity.llc cannot revoke for you.
+                <a href="/create/">/create/</a>. humanity.llc cannot revoke or recover
+                root-object control for you.
               </p>
 
               <div id="revoke-actions" hidden>
@@ -1175,13 +1275,14 @@
                 </span>
                 <span class="settings-summary-text">
                   <span class="settings-summary-title">Recovery key from create</span>
-                  <span class="settings-summary-sub">Copy once · for a new browser if you lose this tab</span>
+                  <span class="settings-summary-sub">Copy once · restores root and object QR control</span>
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </summary>
               <div class="settings-panel settings-panel-action created-recovery-panel">
                 <p class="form-hint">
-                  Does not add keys to Saved on this device. Store offline before you close this panel.
+                  Does not add keys to Saved on this device. Store offline before you close this panel;
+                  this key can restore control of this root card and its object QRs.
                 </p>
                 <p class="mono recovery-key-display" id="recovery-key-display"></p>
                 <button type="button" class="btn-secondary" id="copy-recovery-key">
@@ -1205,14 +1306,15 @@
                 </span>
                 <span class="settings-summary-text">
                   <span class="settings-summary-title">Encrypted backup</span>
-                  <span class="settings-summary-sub">Download · import on another device</span>
+                  <span class="settings-summary-sub">Download · restore root and object control</span>
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </summary>
               <div class="settings-panel settings-panel-action">
                 <div id="backup-export-block" hidden>
                   <p class="form-hint">
-                    Available while this tab still has your owner key. Never uploaded to humanity.llc.
+                    Available while this tab still has your root owner key. This backup restores
+                    control of this card and its object QRs. Never uploaded to humanity.llc.
                   </p>
                   <form id="export-backup-form" class="compact-form" autocomplete="off" novalidate>
                     <label class="form-label" for="export-passphrase">New backup passphrase</label>
@@ -1278,7 +1380,7 @@
                     required
                     placeholder="Same passphrase used when downloading"
                   />
-                  <button type="submit" class="btn-secondary">Unlock for revoke</button>
+                  <button type="submit" class="btn-secondary">Unlock root controls</button>
                 </form>
                 <p class="form-status" id="import-backup-status" hidden></p>
               </div>
@@ -1427,8 +1529,8 @@
         </div>
       </main>
     </div>
-    <script src="/js/device-status-bootstrap.mjs?v=56" type="module"></script>
+    <script src="/js/device-status-bootstrap.mjs?v=57" type="module"></script>
     <script src="/js/created-hub.mjs?v=3" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=61"></script>
+    <script type="module" src="/js/created.mjs?v=63"></script>
   </body>
 </html>

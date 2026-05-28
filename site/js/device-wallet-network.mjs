@@ -16,12 +16,12 @@ import {
   networkStatusChip,
   parseNetworkQrScope,
   parseNetworkVerification,
+  pruneWalletNetworkCache,
   readCachedNetworkStatus,
   readCachedVerification,
   shouldUseCachedNetworkStatus,
   verificationRecordFromLabelState,
   WALLET_NETWORK_CACHE_TTL_MS,
-  pruneWalletNetworkCache,
 } from "./device-wallet-network-core.mjs";
 import {
   getWalletStatusPollHealth,
@@ -35,6 +35,7 @@ import {
   getWalletNetworkTruthPollScanKind,
   hasWalletNetworkTruthPoll,
   isWalletNetworkTruthPollConfirmed,
+  listWalletNetworkTruthPollProfileIds,
   resetWalletNetworkTruth,
   setWalletNetworkTruthFromCacheOnly,
   setWalletNetworkTruthFromPoll,
@@ -45,6 +46,7 @@ export { readCachedVerification };
 export {
   getWalletNetworkTruthChipStatus,
   isSinceVisitBlockedChipStatus,
+  listWalletNetworkTruthPollProfileIds,
   shouldSuppressCardDisabledSinceVisitFromTruth,
 } from "./device-wallet-network-truth.mjs";
 
@@ -98,9 +100,8 @@ function syncWalletNetworkTruthFromPoll(
     entriesInPoll.map((e) => e.profile_id).filter((pid) => typeof pid === "string" && pid)
   );
 
-  for (const entry of loadWallet()) {
-    const pid = entry.profile_id;
-    if (!pid) continue;
+  const idsToSync = new Set([...listWalletNetworkTruthPollProfileIds(), ...polledIds]);
+  for (const pid of idsToSync) {
     if (!polledIds.has(pid)) {
       demoteWalletNetworkTruthToCacheOnly(pid);
       continue;
@@ -163,12 +164,13 @@ function loadCache() {
 
 /**
  * @param {Record<string, unknown>} cache
- * @param {{ protectProfileIds?: Iterable<string> }} [opts]
+ * @param {{ protectProfileIds?: Iterable<string>, scopeProfileIds?: Iterable<string> }} [opts]
  */
 function saveCache(cache, opts = {}) {
   try {
     const next = pruneWalletNetworkCache(cache, {
       protectProfileIds: opts.protectProfileIds,
+      scopeProfileIds: opts.scopeProfileIds,
     });
     sessionStorage.setItem(CACHE_KEY, JSON.stringify(next));
   } catch {
@@ -288,10 +290,10 @@ export function getLatestResolvedScanKind(profileId) {
 
 /**
  * Maps for since-visit UI from resolver-confirmed reads this visit only (SSOT).
- * @param {Array<{ profile_id?: string }>} [entries] defaults to {@link loadWallet}
+ * @param {Array<{ profile_id?: string }>} [entries] omit to use truth poll profile ids only
  */
 export function buildResolverConfirmedWalletPollMaps(entries) {
-  return buildSinceVisitPollMapsFromTruth(entries ?? loadWallet());
+  return buildSinceVisitPollMapsFromTruth(entries);
 }
 
 /** @param {string} profileId */
@@ -405,7 +407,11 @@ function applyWalletStatusPollHealthFromRound(networkFetchedProfileIds, statusMa
  */
 export async function refreshWalletNetworkStatuses(entries, onDone, options = {}) {
   const { generation, isCurrentGeneration } = options;
-  const cache = loadCache();
+  const entryProfileIds = entries.map((e) => e.profile_id).filter(Boolean);
+  const cache = pruneWalletNetworkCache(loadCache(), {
+    protectProfileIds: entryProfileIds,
+    scopeProfileIds: entryProfileIds,
+  });
   const statusMap = {};
   const alertStateMap = {};
   const scanKindMap = {};
@@ -514,7 +520,8 @@ export async function refreshWalletNetworkStatuses(entries, onDone, options = {}
   }
 
   saveCache(cache, {
-    protectProfileIds: entries.map((e) => e.profile_id).filter(Boolean),
+    protectProfileIds: entryProfileIds,
+    scopeProfileIds: entryProfileIds,
   });
   applyWalletStatusPollHealthFromRound(
     networkFetchedProfileIds,
@@ -591,8 +598,7 @@ export function snapshotNetworkSeenOnExit() {
   // DH-4: Only persist baselines from resolver-confirmed reads in this visit.
   if (!hasWalletNetworkTruthPoll()) return;
   const seen = loadLastSeen();
-  for (const entry of loadWallet()) {
-    const pid = entry.profile_id;
+  for (const pid of listWalletNetworkTruthPollProfileIds()) {
     const alertState = getWalletNetworkTruthPollAlertState(pid);
     if (!alertState) continue;
     seen[pid] = String(alertState).toLowerCase();

@@ -179,6 +179,47 @@
           </p>
         </section>
 
+        <section class="group">
+          <h2 class="group-label">Key custody</h2>
+          <ul class="list list-compact">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Session-only key</span>
+                <span class="list-sub"
+                  >The owner key is generated in your browser and kept only while the create tab or
+                  owner session still has it.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Encrypted backup</span>
+                <span class="list-sub"
+                  >A backup file stays client-side. The passphrase is never sent to humanity.llc;
+                  lose it and the backup cannot be reset.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Recovery key</span>
+                <span class="list-sub"
+                  >If you saved the recovery private key shown at create, it can sign revokes later.
+                  The resolver stores only the public recovery key.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">No operator backdoor</span>
+                <span class="list-sub"
+                  >humanity.llc cannot recover lost keys, decrypt backups, or revoke on your behalf.</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
+
         <section class="group" id="now">
           <h2 class="group-label">Full spec</h2>
           <ul class="list">

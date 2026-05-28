@@ -91,3 +91,13 @@ export function getCrossTabScanSnapshot() {
   scanPreviousFingerprint = lane.fingerprint;
   return { show: lane.show, entries: lane.entries };
 }
+
+/**
+ * Prime stable cross-tab lanes without rendering. The chrome refresh scheduler
+ * calls this when raw presence first appears, then the debounced render performs
+ * the second read required by the stability gate.
+ */
+export function primeCrossTabNotificationState() {
+  getCrossTabNotificationState();
+  getCrossTabScanSnapshot();
+}

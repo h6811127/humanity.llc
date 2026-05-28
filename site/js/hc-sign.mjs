@@ -5,6 +5,12 @@ import * as ed from "https://esm.sh/@noble/ed25519@2.3.0";
 import { base58 } from "https://esm.sh/@scure/base@1.2.6";
 import canonicalize from "https://esm.sh/canonicalize@2.1.0";
 import { buildOfficialScanUrl } from "./qr-scan-url-lock.mjs";
+import {
+  childObjectApiUrl,
+  childObjectCreatePath,
+  childObjectRevokePath,
+  childObjectUpdatePath,
+} from "./child-object-api-core.mjs";
 
 const PROTOCOL_VERSION = "1.0";
 const SIGNATURE_ALG = "Ed25519";
@@ -57,6 +63,11 @@ export function generateProfileId() {
 
 export function generateQrId() {
   return `qr_${randomBase58(16)}`;
+}
+
+/** Child object id (`obj_` + base58). */
+export function generateChildObjectId() {
+  return `obj_${randomBase58(16)}`;
 }
 
 /** Revocation nonce (Technical Standards §10.1). */
@@ -184,6 +195,18 @@ export function postCardUpdateUrl(profileId) {
     `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/update`,
     resolverApiOrigin()
   ).href;
+}
+
+export function postChildObjectCreateUrl(profileId) {
+  return childObjectApiUrl(resolverApiOrigin(), childObjectCreatePath(profileId));
+}
+
+export function postChildObjectUpdateUrl(profileId, objectId) {
+  return childObjectApiUrl(resolverApiOrigin(), childObjectUpdatePath(profileId, objectId));
+}
+
+export function postChildObjectRevokeUrl(profileId, objectId) {
+  return childObjectApiUrl(resolverApiOrigin(), childObjectRevokePath(profileId, objectId));
 }
 
 export function postQrRotateUrl(profileId) {

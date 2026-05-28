@@ -36,7 +36,7 @@ function custodyAckButton() {
 
 /**
  * @param {string} className
- * @param {{ eyebrow: string, title: string, detail: string, extraCopyHtml?: string }} copy
+ * @param {{ eyebrow: string, title: string, detail: string, extraCopyHtml?: string, afterActionsHtml?: string }} copy
  */
 function custodyInfoEmphasisCard(className, copy) {
   return emphasisCardShellHtml({
@@ -48,6 +48,7 @@ function custodyInfoEmphasisCard(className, copy) {
     title: copy.title,
     detail: copy.detail,
     extraCopyHtml: copy.extraCopyHtml ?? "",
+    afterActionsHtml: copy.afterActionsHtml ?? "",
     actionsHtml: emphasisCardActionsHtml([custodyAckButton()]),
   });
 }
@@ -68,20 +69,20 @@ export function keysCustodyHtml(variant, opts = {}) {
       </div>
       <div class="device-keys-custody-dl-row device-keys-custody-dl-row--saved">
         <dt>Saved on this device</dt>
-        <dd>Stays in this browser until you remove the card or clear site data.</dd>
+        <dd>Stays in this browser until you remove the root card or clear site data.</dd>
       </div>
     </dl>`;
 
   const foot = noticeFoot(importHref, learnHref);
 
   const networkNote =
-    '<p class="device-keys-custody-note">Your card is already on the network. Save only stores the signing key in this browser.</p>';
+    '<p class="device-keys-custody-note">Your root card is already on the network. Save only stores the signing key in this browser.</p>';
 
   const privateKeyCopy = {
     eyebrow: "Keys custody",
     title: "Your browser holds the private key",
     detail:
-      "That is what lets you update, revoke, and prove control. The network never receives it.",
+      "That is what lets you update, revoke, prove control, and manage child object QRs. The network never receives it.",
   };
 
   if (variant === "hub") {
@@ -95,18 +96,25 @@ export function keysCustodyHtml(variant, opts = {}) {
       role: "note",
       dot: "warn",
       eyebrow: "Keys on this device",
-      title: "Save your key on this device",
+      title: "Save your root key on this device",
       detail:
-        "You can sign from this tab now. Tap <strong>Save on this device</strong> below to keep that ability after you close the tab.",
+        "You can sign from this tab now. Tap <strong>Save on this device</strong> below to keep control of this root card and its object QRs after you close the tab.",
       extraCopyHtml: `${tiersDl}${networkNote}${foot}`,
       actionsHtml: emphasisCardActionsHtml([custodyAckButton()]),
     });
   }
 
   if (variant === "wallet") {
-    return custodyInfoEmphasisCard("device-keys-custody--wallet", {
-      ...privateKeyCopy,
-      extraCopyHtml: foot,
+    return emphasisCardShellHtml({
+      modifier: "info",
+      className: "device-keys-custody device-keys-custody--wallet",
+      role: "note",
+      dot: "info",
+      eyebrow: privateKeyCopy.eyebrow,
+      title: privateKeyCopy.title,
+      detail: privateKeyCopy.detail,
+      actionsHtml: emphasisCardActionsHtml([custodyAckButton()]),
+      afterActionsHtml: foot,
     });
   }
 
@@ -118,7 +126,7 @@ export function keysCustodyHtml(variant, opts = {}) {
     eyebrow: "Before you save",
     title: "Keys are critical",
     detail:
-      "Tab only until you save · saved cards persist in this browser until you clear site data. <a href=\"${escapeHtml(learnHref)}\">Learn more</a>",
+      "Tab only until you save · saved root cards persist in this browser until you clear site data. <a href=\"${escapeHtml(learnHref)}\">Learn more</a>",
   });
 }
 

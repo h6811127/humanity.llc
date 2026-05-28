@@ -10,6 +10,12 @@ export { orderEntriesVisibleFirst } from "./device-hub-visible-rows-core.mjs";
 /** Cards at or above this count use narrowed auto-poll and capped network parallelism. */
 export const LARGE_WALLET_THRESHOLD = 10;
 
+/** Max hub saved-card DOM rows when wallet is large (S10 shell perf). */
+export const LARGE_WALLET_HUB_DOM_CAP = 15;
+
+/** Initial `/wallet/` saved-card DOM rows when wallet is large (S11; expand via Show all). */
+export const LARGE_WALLET_PAGE_DOM_CAP = 40;
+
 /** Product guidance: day-to-day comfort zone before large-wallet behavior. */
 export const COMFORTABLE_WALLET_MAX = 5;
 
@@ -160,6 +166,49 @@ export function selectNetworkRefreshEntries(entries, ctx, policy) {
     entries: [stale[idx]],
     nextCursor: stale.length > 0 ? (idx + 1) % stale.length : 0,
   };
+}
+
+/**
+ * @template {{ profile_id?: unknown }} T
+ * @param {T[]} entries
+ * @param {Iterable<string>} visibleProfileIds
+ * @param {number} cap
+ * @returns {{ entries: T[], hiddenCount: number }}
+ */
+function selectCappedSavedRowEntries(entries, visibleProfileIds, cap) {
+  const ordered = orderEntriesVisibleFirst(entries, visibleProfileIds);
+  if (ordered.length <= cap) {
+    return { entries: ordered, hiddenCount: 0 };
+  }
+  return {
+    entries: ordered.slice(0, cap),
+    hiddenCount: ordered.length - cap,
+  };
+}
+
+export function selectHubSavedRowEntries(entries, visibleProfileIds = [], policy) {
+  if (!isLargeWallet(entries.length, policy)) {
+    return { entries, hiddenCount: 0 };
+  }
+  const cap = policy?.hubDomCap ?? LARGE_WALLET_HUB_DOM_CAP;
+  return selectCappedSavedRowEntries(entries, visibleProfileIds, cap);
+}
+
+/**
+ * Cap `/wallet/` saved-card DOM for large wallets (S11). User can expand to full list.
+ *
+ * @template {{ profile_id?: unknown }} T
+ * @param {T[]} entries
+ * @param {Iterable<string>} [visibleProfileIds]
+ * @param {import("./device-steward-entitlements-core.mjs").StewardEntitlementsPolicy} [policy]
+ * @returns {{ entries: T[], hiddenCount: number }}
+ */
+export function selectWalletPageSavedRowEntries(entries, visibleProfileIds = [], policy) {
+  if (!isLargeWallet(entries.length, policy)) {
+    return { entries, hiddenCount: 0 };
+  }
+  const cap = policy?.walletPageDomCap ?? LARGE_WALLET_PAGE_DOM_CAP;
+  return selectCappedSavedRowEntries(entries, visibleProfileIds, cap);
 }
 
 /**

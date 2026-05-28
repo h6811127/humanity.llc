@@ -13,7 +13,12 @@ describe("hosted-rollout-step3a", () => {
     expect(script).toContain("OPERATOR_AUDIT_TOKEN");
     expect(script).toContain("worker:check-steward-ops");
     expect(script).toContain("steward-ops");
-    expect(script).toContain("hosted:rollout:step4");
+    expect(script).toContain("--smoke");
+    expect(script).toContain("smokeStewardOpsAuthGate");
+    expect(existsSync(join(repoRoot, "worker/tests/hosted-rollout-step3a-smoke.test.ts"))).toBe(
+      true
+    );
+    expect(script).toContain("hosted:rollout:step4a");
     expect(script).not.toContain("Re-run with --stripe-check");
   });
 
@@ -32,6 +37,9 @@ describe("hosted-rollout-step3a", () => {
     expect(pkg.scripts["hosted:rollout:step3a"]).toContain("hosted-rollout-step3a.mjs");
     expect(pkg.scripts["hosted:rollout:step3"]).toContain("hosted-rollout-step3a.mjs");
     expect(pkg.scripts["hosted:rollout:step3b"]).toContain("hosted-rollout-step3b.mjs");
+    expect(pkg.scripts["hosted:rollout:verify-path"]).toContain(
+      "hosted-rollout-verify-path.mjs"
+    );
   });
 
   it("dev vars example documents wrangler secret put", () => {

@@ -30,6 +30,7 @@ export const WALLET_NETWORK_CACHE_MAX_ENTRIES = 20;
  *   ttlMs?: number,
  *   maxEntries?: number,
  *   protectProfileIds?: Iterable<string>,
+ *   scopeProfileIds?: Iterable<string>,
  * }} [opts]
  */
 export function pruneWalletNetworkCache(cache, opts = {}) {
@@ -38,16 +39,21 @@ export function pruneWalletNetworkCache(cache, opts = {}) {
     ttlMs = WALLET_NETWORK_CACHE_TTL_MS,
     maxEntries = WALLET_NETWORK_CACHE_MAX_ENTRIES,
     protectProfileIds = [],
+    scopeProfileIds = null,
   } = opts;
 
   const protect = new Set(
     [...protectProfileIds].filter((pid) => typeof pid === "string" && pid)
   );
+  const scope = scopeProfileIds
+    ? new Set([...scopeProfileIds].filter((pid) => typeof pid === "string" && pid))
+    : null;
   /** @type {Record<string, WalletNetworkCacheEntry>} */
   const fresh = {};
 
   for (const [profileId, entry] of Object.entries(cache || {})) {
     if (!profileId || !entry || typeof entry !== "object") continue;
+    if (scope && !scope.has(profileId)) continue;
     if (!isNetworkCacheFresh(entry.at, now, ttlMs)) continue;
     fresh[profileId] = entry;
   }

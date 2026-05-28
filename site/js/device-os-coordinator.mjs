@@ -11,13 +11,14 @@ import {
   shouldRefreshLiveControlInbox,
   shouldRefreshWalletNetwork,
 } from "./device-os-coordinator-core.mjs";
-import { loadWallet, walletPollableCount, walletSavedCount } from "./device-wallet.mjs";
+import { listPollableWalletEntries } from "./device-wallet.mjs";
 import {
   refreshWalletNetworkStatuses,
   snapshotNetworkSeenOnExit,
 } from "./device-wallet-network.mjs";
 import { syncTabKeysPresence } from "./device-tab-presence.mjs";
 import { refreshLiveControlInbox } from "./device-live-control-inbox.mjs";
+import { isPollableWalletEntry } from "./device-live-control-inbox-core.mjs";
 
 export const DEVICE_OS_REFRESHED = "hc-device-os-refreshed";
 
@@ -75,13 +76,11 @@ async function runDeviceOsRefresh(reason) {
   }
 
   inFlight = (async () => {
-    const refreshNetwork =
-      shouldRefreshWalletNetwork(reason) && walletSavedCount() > 0;
-    const entries = refreshNetwork ? loadWallet() : [];
+    const entries = listPollableWalletEntries();
 
     const [networkStatus, walletResult] = await Promise.all([
       fetchResolverHealth(resolverApiOrigin()),
-      refreshNetwork
+      shouldRefreshWalletNetwork(reason) && entries.length > 0
         ? new Promise((resolve) => {
             refreshWalletNetworkStatuses(entries, (result) => resolve(result));
           })
@@ -93,7 +92,7 @@ async function runDeviceOsRefresh(reason) {
 
     if (
       shouldRefreshLiveControlInbox(reason) &&
-      walletPollableCount() > 0
+      entries.some((e) => isPollableWalletEntry(e))
     ) {
       await refreshLiveControlInbox();
     }

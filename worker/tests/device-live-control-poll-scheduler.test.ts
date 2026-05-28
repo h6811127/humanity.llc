@@ -80,7 +80,7 @@ describe("liveControlPollingShouldRun", () => {
     ).toBe(false);
   });
 
-  it("does not run on wallet page when hub collapsed (manual check / expand hub)", () => {
+  it("runs on wallet page when watch is on", () => {
     expect(
       liveControlPollingShouldRun({
         hubExpanded: false,
@@ -88,7 +88,7 @@ describe("liveControlPollingShouldRun", () => {
         walletPage: true,
         watchEnabled: true,
       })
-    ).toBe(false);
+    ).toBe(true);
   });
 });
 
@@ -261,7 +261,7 @@ describe("walletNetworkVisibilityRefreshAllowed", () => {
 });
 
 describe("resolveLiveControlPollScope", () => {
-  it("does not scope poll on wallet page when hub collapsed", () => {
+  it("scopes wallet page polling only when watch is on", () => {
     /** @type {HTMLElement} */
     const collapsed = {
       classList: { contains: (c) => c === "device-hub-collapsed" },
@@ -281,7 +281,7 @@ describe("resolveLiveControlPollScope", () => {
         walletPage: true,
         watchEnabled: true,
       })
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it("combines hub, inbox, and wallet flags", () => {

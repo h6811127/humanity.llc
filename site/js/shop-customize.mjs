@@ -19,6 +19,14 @@ import {
   personalizeProductDisplay,
   personalizeProducts,
 } from "./shop-customize-core.mjs";
+import {
+  canProceedToCheckout,
+  proofConsentRequiredIds,
+  proofConsentStatusMessage,
+  readProofConsentState,
+} from "./shop-proof-consent-core.mjs";
+
+const PERSONALIZE_PROOF_CONSENT_IDS = proofConsentRequiredIds("personalized");
 
 const cardGate = document.getElementById("shop-customize-card-gate");
 const cardReady = document.getElementById("shop-customize-card-ready");
@@ -29,10 +37,14 @@ const previewPlaceholder = document.getElementById("shop-customize-qr-placeholde
 const previewNote = document.getElementById("shop-customize-preview-note");
 const mockEl = document.getElementById("shop-customize-mock");
 const priceEl = document.getElementById("shop-customize-price");
+const shippingForm = document.getElementById("shop-customize-shipping-form");
+const shippingCountryInput = document.getElementById("shop-customize-shipping-country");
+const shippingZipInput = document.getElementById("shop-customize-shipping-zip");
+const shippingResultEl = document.getElementById("shop-customize-shipping-result");
 const statusEl = document.getElementById("shop-customize-status");
 const checkoutBtn = document.getElementById("shop-customize-checkout");
 const interestSection = document.getElementById("shop-customize-interest");
-const approveEl = document.getElementById("shop-customize-approve");
+const proofConsentEl = document.getElementById("shop-proof-consent");
 const createLink = document.getElementById("shop-customize-create-link");
 
 /** @type {Record<string, unknown> | null} */
@@ -105,6 +117,7 @@ function renderProductPicker() {
       selectedProductId = display.productId;
       activeIntent = null;
       previewMode = null;
+      clearShippingEstimate();
       if (display.preview === "hoodie") {
         persistMerchCreateRef("customize_hoodie");
       }
@@ -197,16 +210,78 @@ async function renderPreviewScanUrl(scanUrl) {
   showPreviewImage(true);
 }
 
+function personalizeProofConsentComplete(product) {
+  return canProceedToCheckout(
+    isPersonalizeCheckoutReady(shopConfig, product),
+    PERSONALIZE_PROOF_CONSENT_IDS,
+    readProofConsentState(proofConsentEl, PERSONALIZE_PROOF_CONSENT_IDS)
+  );
+}
+
 function syncCheckoutUi(product) {
-  const checkoutReady =
-    isPersonalizeCheckoutReady(shopConfig, product) && approveEl?.checked;
+  const checkoutOpen = isPersonalizeCheckoutReady(shopConfig, product);
+  const checkoutReady = personalizeProofConsentComplete(product);
   if (checkoutBtn) {
     checkoutBtn.disabled = !checkoutReady;
-    checkoutBtn.hidden = !isPersonalizeCheckoutReady(shopConfig, product);
+    checkoutBtn.hidden = !checkoutOpen;
   }
   if (interestSection) {
-    interestSection.hidden = isPersonalizeCheckoutReady(shopConfig, product);
+    interestSection.hidden = checkoutOpen;
   }
+  if (shippingForm instanceof HTMLFormElement) {
+    shippingForm.hidden = !checkoutOpen;
+  }
+}
+
+function renderShippingEstimate(payload) {
+  if (!shippingResultEl) return;
+  shippingResultEl.hidden = false;
+  const shipping =
+    typeof payload.shipping_display === "string"
+      ? payload.shipping_display
+      : payload.shipping_cost != null
+        ? `$${(Number(payload.shipping_cost) / 100).toFixed(2)}`
+        : null;
+  shippingResultEl.textContent = shipping
+    ? `Estimated shipping: ${shipping} (${payload.shipping_label || "standard"}). ${payload.disclaimer || ""}`
+    : payload.disclaimer || "Shipping estimate unavailable.";
+}
+
+function clearShippingEstimate() {
+  if (!shippingResultEl) return;
+  shippingResultEl.hidden = true;
+  shippingResultEl.textContent = "";
+}
+
+async function fetchShippingEstimate(product) {
+  const country =
+    shippingCountryInput instanceof HTMLInputElement
+      ? shippingCountryInput.value.trim().toUpperCase()
+      : "";
+  const zip =
+    shippingZipInput instanceof HTMLInputElement ? shippingZipInput.value.trim() : "";
+  if (!country) throw new Error("Enter a country code (e.g. US).");
+
+  const display = personalizeProductDisplay(product);
+  const origin = resolverApiOrigin();
+  const res = await fetch(`${origin}/v1/print/quotes`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({
+      product_id: display.productId,
+      quantity: 1,
+      destination: { country, zip },
+    }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const msg =
+      typeof data.message === "string"
+        ? data.message
+        : "Could not estimate shipping for this destination.";
+    throw new Error(msg);
+  }
+  return data;
 }
 
 function previewStatusMessage(product) {
@@ -216,13 +291,11 @@ function previewStatusMessage(product) {
       ? "Showing your card QR while print setup finishes. Confirm limits below to continue."
       : "Showing your card QR. A unique print code is reserved when personalized checkout opens.";
   }
-  if (checkoutOpen && approveEl?.checked) {
-    return "Preview ready. Continue to checkout when you are ready.";
-  }
-  if (checkoutOpen) {
-    return "Preview ready. Confirm the limits below to continue.";
-  }
-  return "Preview ready. Personalized checkout opens soon.";
+  return proofConsentStatusMessage(
+    "personalized",
+    checkoutOpen,
+    readProofConsentState(proofConsentEl, PERSONALIZE_PROOF_CONSENT_IDS)
+  );
 }
 
 async function refreshPreview() {
@@ -272,7 +345,7 @@ async function refreshPreview() {
 
 async function onCheckoutClick() {
   const product = selectedProduct();
-  if (!product || !approveEl?.checked) return;
+  if (!product || !personalizeProofConsentComplete(product)) return;
   if (previewMode === "card_fallback") {
     setStatus("Print setup is still finishing. Try again in a moment.", true);
     activeIntent = null;
@@ -322,13 +395,28 @@ async function init() {
   }
   decorateCreateLinks();
 
-  approveEl?.addEventListener("change", () => {
+  proofConsentEl?.addEventListener("change", () => {
     const product = selectedProduct();
     if (product) syncCheckoutUi(product);
     setStatus(product ? previewStatusMessage(product) : "");
   });
   checkoutBtn?.addEventListener("click", () => {
     void onCheckoutClick();
+  });
+  shippingForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const product = selectedProduct();
+    if (!product) return;
+    if (shippingResultEl) shippingResultEl.hidden = true;
+    void fetchShippingEstimate(product)
+      .then(renderShippingEstimate)
+      .catch((err) => {
+        if (shippingResultEl) {
+          shippingResultEl.hidden = false;
+          shippingResultEl.textContent =
+            err instanceof Error ? err.message : "Could not estimate shipping.";
+        }
+      });
   });
 
   try {

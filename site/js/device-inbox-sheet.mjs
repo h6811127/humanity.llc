@@ -2,8 +2,8 @@
  * Compact inbox bottom sheet — badge tap and open_notifications.
  * @see docs/DEVICE_INBOX.md phase 3
  */
-import { buildInboxItems, buildInboxSheetRows } from "./device-inbox-core.mjs?v=56";
-import { gatherInboxInput, getInboxItems, notificationCount } from "./device-inbox.mjs?v=56";
+import { buildInboxItems, buildInboxSheetRows } from "./device-inbox-core.mjs?v=57";
+import { gatherInboxInput, getInboxItems, notificationCount } from "./device-inbox.mjs?v=57";
 import {
   formatLiveControlExpiry,
   getLiveControlPending,
@@ -11,28 +11,28 @@ import {
   openLiveControlProof,
 } from "./device-live-control-inbox.mjs";
 import { openCardNowPage } from "./device-keys.mjs";
-import { loadWallet } from "./device-wallet.mjs";
+import { findWalletEntryByProfileId } from "./device-wallet.mjs";
 import {
   actOnOrphanRemovedTabKeys,
 } from "./device-orphan-keys-nav.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab } from "./device-notice-nav.mjs";
-import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=56";
+import { gatherCardDisabledSinceVisitForInbox } from "./device-inbox-card-disabled.mjs?v=57";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import { prefersReducedMotion } from "./device-shell-motion.mjs";
 import { closeGlancePopover } from "./device-hub-glance-popover.mjs";
-import { syncBrowserNotifPrompts } from "./device-browser-notifications-loader.mjs?v=56";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=56";
+import { syncBrowserNotifPrompts } from "./device-browser-notifications-loader.mjs?v=57";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=57";
 import {
   inboxSheetMountAllowed,
   inboxSheetReconcileAction,
-} from "./device-inbox-sheet-core.mjs?v=56";
+} from "./device-inbox-sheet-core.mjs?v=57";
 import {
   bindSheetLifecycleReconcile,
   syncSheetBackdropClosed,
-} from "./device-sheet-backdrop-sync.mjs?v=56";
+} from "./device-sheet-backdrop-sync.mjs?v=57";
 
 const SHEET_ID = "device-inbox-sheet";
 const LIST_ID = "device-inbox-sheet-list";
@@ -269,9 +269,7 @@ export function renderInboxSheet() {
       }
       if (row.kind === "card_disabled_since_visit" && row.cardDisabledEntry) {
         logInboxDiagnostic({ type: "inbox_item_action", kind: row.kind, outcome: "open_card" });
-        const entry = loadWallet().find(
-          (e) => e.profile_id === row.cardDisabledEntry?.profile_id
-        );
+        const entry = findWalletEntryByProfileId(row.cardDisabledEntry?.profile_id);
         if (entry) openCardNowPage(entry);
       }
     });

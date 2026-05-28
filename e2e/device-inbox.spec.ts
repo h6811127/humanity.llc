@@ -129,6 +129,9 @@ async function openHubViaStatusDot(page: import("@playwright/test").Page) {
   if (await dismiss.isVisible({ timeout: 2000 }).catch(() => false)) {
     await dismiss.click();
   }
+  await expect(page.locator("#brand-status-dot")).toHaveAttribute("data-dot-state", /.+/, {
+    timeout: 15_000,
+  });
   await page.locator("#brand-status-dot-btn").click();
 }
 
@@ -138,6 +141,7 @@ test.describe("device inbox - live proof", () => {
     await page.addInitScript((entry) => {
       localStorage.removeItem("hc_browser_notif_prompt_dismissed");
       localStorage.setItem("hc_browser_notif", "off");
+      localStorage.setItem("hc_watch_live_proof", "1");
       localStorage.setItem("hc_wallet", JSON.stringify([entry]));
     }, WALLET_ENTRY);
     await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
@@ -257,6 +261,7 @@ test.describe("device inbox - background OS notification", () => {
     await page.addInitScript((entry) => {
       localStorage.setItem("hc_browser_notif", "on");
       localStorage.setItem("hc_browser_notif_prompt_dismissed", "1");
+      localStorage.setItem("hc_watch_live_proof", "1");
       localStorage.setItem("hc_wallet", JSON.stringify([entry]));
     }, WALLET_ENTRY);
     await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));

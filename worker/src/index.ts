@@ -4,16 +4,13 @@
  */
 
 import { schemaReady } from "./db";
-import { resolverHealthBuildField } from "./resolver-health-build";
+import { handleGetResolverHealth } from "./resolver/resolver-health";
 import { runOrphanPurge } from "./db/orphan-purge";
 import { runPrintifyReconcile } from "./print/printify-reconcile";
 import {
-  clientIp,
   corsHeaders,
   htmlResponse,
   jsonResponse,
-  OPERATOR_ID,
-  PROTOCOL_VERSION,
   withCors,
 } from "./http/resolver";
 import { handlePostArtifactIntent, handlePostArtifactIntentAttach } from "./resolver/artifact-intents";
@@ -27,7 +24,13 @@ import {
 } from "./resolver/live-control";
 import { handlePostRevoke } from "./resolver/revoke";
 import { handlePostCardUpdate } from "./resolver/update-card";
+import {
+  handlePostChildObjectCreate,
+  handlePostChildObjectRevoke,
+  handlePostChildObjectUpdate,
+} from "./resolver/child-objects";
 import { handlePostIssuePrintArtifactQr } from "./resolver/issue-print-artifact-qr";
+import { handlePostIssueChildObjectQr } from "./resolver/issue-child-object-qr";
 import { handlePostRotateQr } from "./resolver/rotate-qr";
 import { handlePostExtendQr } from "./resolver/extend-qr";
 import { handleGetScan } from "./resolver/scan";
@@ -66,6 +69,7 @@ import {
   handlePostPrintOrderMint,
   handlePostPrintOrders,
 } from "./print/print-orders-handler";
+import { handlePostPrintQuotes } from "./print/print-quotes-handler";
 import { handleGetOperatorFulfillmentLookup } from "./operator/fulfillment-lookup";
 import { handlePostAiExplainSnapshot } from "./resolver/ai-explain-snapshot";
 import { handlePostAiDraftManifesto } from "./resolver/ai-draft-manifesto";
@@ -168,7 +172,7 @@ export default {
     const path = url.pathname;
 
     if (path === "/.well-known/hc/v1/health" && request.method === "GET") {
-      return healthResponse(env);
+      return handleGetResolverHealth(request, env);
     }
 
     if (
@@ -494,6 +498,61 @@ export default {
       return withCors(request, res);
     }
 
+    const childObjectCreateMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/objects$/
+    );
+    if (childObjectCreateMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostChildObjectCreate(
+        request,
+        env.DB,
+        childObjectCreateMatch[1]!
+      );
+      return withCors(request, res);
+    }
+
+    const childObjectIssueQrMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/objects\/([^/]+)\/issue-qr$/
+    );
+    if (childObjectIssueQrMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostIssueChildObjectQr(
+        request,
+        env.DB,
+        childObjectIssueQrMatch[1]!,
+        childObjectIssueQrMatch[2]!
+      );
+      return withCors(request, res);
+    }
+
+    const childObjectActionMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/objects\/([^/]+)\/(update|revoke)$/
+    );
+    if (childObjectActionMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const [, profileId, objectId, action] = childObjectActionMatch;
+      const res =
+        action === "update"
+          ? await handlePostChildObjectUpdate(request, env.DB, profileId!, objectId!)
+          : await handlePostChildObjectRevoke(request, env.DB, profileId!, objectId!);
+      return withCors(request, res);
+    }
+
     const liveChallengeStatusMatch = path.match(
       /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/live-control\/challenges\/([^/]+)$/
     );
@@ -678,6 +737,11 @@ export default {
       return withCors(request, res);
     }
 
+    if (path === "/v1/print/quotes" && request.method === "POST") {
+      const res = await handlePostPrintQuotes(request, env);
+      return withCors(request, res);
+    }
+
     if (path === "/v1/print/orders" && request.method === "POST") {
       if (!env.DB) {
         return jsonResponse({ error: "database_unconfigured" }, 503);
@@ -750,40 +814,3 @@ export default {
     return jsonResponse({ error: "not_found", path }, 404);
   },
 };
-
-async function healthResponse(env: Env): Promise<Response> {
-  const body: {
-    version: string;
-    operator: string;
-    status: string;
-    database: string;
-    build: ReturnType<typeof resolverHealthBuildField>;
-  } = {
-    version: PROTOCOL_VERSION,
-    operator: OPERATOR_ID,
-    status: "ok",
-    database: "unknown",
-    build: resolverHealthBuildField(),
-  };
-
-  if (!env.DB) {
-    body.database = "unconfigured";
-    body.status = "degraded";
-    return jsonResponse(body, 503);
-  }
-
-  try {
-    const ready = await schemaReady(env.DB);
-    body.database = ready ? "ok" : "schema_missing";
-    if (!ready) {
-      body.status = "degraded";
-      return jsonResponse(body, 503);
-    }
-  } catch {
-    body.database = "error";
-    body.status = "degraded";
-    return jsonResponse(body, 503);
-  }
-
-  return jsonResponse(body, 200);
-}

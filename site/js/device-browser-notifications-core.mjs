@@ -2,7 +2,7 @@
  * Pure browser-alert helpers (testable).
  * @see docs/DEVICE_INBOX.md - background alerts v2
  */
-import { inboxWalletEntryLabel } from "./device-inbox-core.mjs?v=56";
+import { inboxWalletEntryLabel } from "./device-inbox-core.mjs?v=57";
 
 export const STORAGE_BROWSER_NOTIF = "hc_browser_notif";
 export const STORAGE_PROMPT_DISMISS = "hc_browser_notif_prompt_dismissed";

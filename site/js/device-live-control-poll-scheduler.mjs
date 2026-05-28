@@ -32,6 +32,7 @@ export function liveControlPollIntervalMs(pendingCount, policy) {
 export function liveControlPollingShouldRun(scope) {
   if (scope.inboxSheetOpen) return true;
   if (scope.hubExpanded) return true;
+  if (scope.walletPage && scope.watchEnabled) return true;
   return false;
 }
 

@@ -197,7 +197,7 @@ Deploy: `npm run worker:deploy`. Route `humanity.llc/v1/*` required for artifact
 | Printify webhook status sync | ✅ Shipped | O-003 slice |
 | **Per-order artwork upload to Printify** | ✅ Shipped (PR #63) | PM-FR-13 — [`printify-upload.ts`](../worker/src/print/printify-upload.ts) · [`printify-line-items.ts`](../worker/src/print/printify-line-items.ts). Upload SVG → ephemeral product with `print_areas` → order line item per planned QR. Requires `PERSONALIZE_*_PRINTIFY_BLUEPRINT_ID` + `PRINT_PROVIDER_ID`. |
 | **Encrypted shipping at rest (PM-FR-41)** | ✅ Shipped | Shopify paid webhook → `commerce_fulfillment_pii` · [`fulfillment-pii-crypto.ts`](../worker/src/commerce/fulfillment-pii-crypto.ts) · Printify submit via [`resolve-printify-shipping.ts`](../worker/src/commerce/resolve-printify-shipping.ts) |
-| Shipping quote before checkout | ☐ Deferred | PM-FR-20 — Shopify remains checkout total authority for v1 |
+| Shipping quote before checkout | ✅ Shipped (PR #83) | PM-FR-20 — `POST /v1/print/quotes` · optional estimate on `/shop/customize/`; Shopify remains checkout total authority |
 | humanity.llc order timeline UI | ✅ Buyer status shipped (PR #66) | `GET /v1/store/order-status` · `/shop/thanks/` form · **tracking links** on shipped orders · reconciliation cron every 30m |
 
 ---
@@ -239,6 +239,7 @@ Deploy: `npm run worker:deploy`. Route `humanity.llc/v1/*` required for artifact
 
 - [ ] Mint: `POST /v1/print/orders/{id}/mint` with owner-signed credentials
 - [ ] Submit: `POST /v1/print/orders` `{ commerce_order_id, submit_to_printify: true }` (shipping from encrypted store when key configured; optional `shipping_address` body override)
+- **One-call option:** pass `submit_to_printify: true` on the mint request (same shipping rules) to mint planned QRs and submit in one operator step when `PRINTIFY_SUBMIT_ENABLED=1`. Printify manual production approval (PM-FR-27) still applies on their side.
 
 ---
 

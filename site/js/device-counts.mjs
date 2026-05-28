@@ -4,11 +4,7 @@ import {
   buildStatusSegmentsFromCounts,
   tabNoticeCountFromState,
 } from "./device-counts-core.mjs";
-import {
-  isWalletSaved,
-  walletPollableCount,
-  walletSavedCount,
-} from "./device-wallet.mjs";
+import { getWalletCount, getWalletPollableCount, isWalletSaved } from "./device-wallet.mjs";
 import { loadPins } from "./device-pins.mjs";
 
 export function tabNoticeCount() {
@@ -22,21 +18,17 @@ export function tabNoticeCount() {
   }
 }
 
-function pollableSavedCount() {
-  return walletPollableCount();
-}
-
 /**
  * @param {"ok"|"degraded"|"offline"} network
  */
 export function buildStatusSegments(network = "offline") {
   return buildStatusSegmentsFromCounts({
     network,
-    saved: walletSavedCount(),
+    saved: getWalletCount(),
     pins: loadPins().length,
     notices: tabNoticeCount(),
     liveProof: getLiveControlPendingCount(),
-    pollableSaved: pollableSavedCount(),
+    pollableSaved: getWalletPollableCount(),
     liveProofPollHealth: getLiveControlPollHealth(),
   });
 }
@@ -45,7 +37,7 @@ export function buildStatusSegments(network = "offline") {
 export function buildStatusLine(network = "offline") {
   const segments = buildStatusSegments(network);
   return {
-    saved: walletSavedCount(),
+    saved: getWalletCount(),
     pins: loadPins().length,
     notices: tabNoticeCount(),
     segments,
@@ -57,5 +49,5 @@ export function buildStatusLine(network = "offline") {
  * @returns {{ saved: number, pins: number, total: number, label: string }}
  */
 export function getDeviceCounts() {
-  return buildDeviceCountsLabel(walletSavedCount(), loadPins().length);
+  return buildDeviceCountsLabel(getWalletCount(), loadPins().length);
 }

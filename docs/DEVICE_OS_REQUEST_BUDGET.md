@@ -3,7 +3,7 @@
 **Opened:** 2026-05-26  
 **Status:** **Active** - product/ops constraint; client polling must change before production scale  
 **Audience:** Product, frontend, operators  
-**Related:** [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) (saved root-card scale) · [`UI_UX_REVERT_PLAN.md`](UI_UX_REVERT_PLAN.md) · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md)
+**Related:** [`STEWARD_DEVICE_ROADMAP.md`](STEWARD_DEVICE_ROADMAP.md) (steward delivery index) · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) (saved root-card scale) · [`UI_UX_REVERT_PLAN.md`](UI_UX_REVERT_PLAN.md) · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md)
 
 ---
 
@@ -69,12 +69,12 @@ Target behavior stewards should understand (shipped pieces noted).
 | Mode | When | Live proof | Network status | Shipped? |
 |------|------|------------|----------------|----------|
 | **Idle** | Hub collapsed on landing; not in signing flow | No auto poll; show cache + “not checked this visit” until user acts | No fetch unless user navigates to `/wallet/` scope | Partial — poll scope shipped; copy still evolving |
-| **Attending** | Hub expanded or inbox sheet open | Round-robin if **Watch** on (`hc_watch_live_proof === "1"`); else manual **Check for live proof** only | Fetch on expand / manual **Check network**; `/wallet/` in network scope | Yes (Phases 1–5) |
+| **Attending** | Hub expanded, inbox sheet open, or `/wallet/` with Watch on | Round-robin if **Watch** on (`hc_watch_live_proof === "1"`); else manual **Check for live proof** only | Fetch on expand / manual **Check network**; `/wallet/` in network scope | Yes (Phases 1–5) |
 | **Urgent** | Pending live proof known | **5s** tick interval (still one card per tick) | Unchanged | Yes (`liveControlPollIntervalMs`) |
 | **Signing** | `/created/` with keys | **~3s** for **this card only** | Row chips from wallet cache | Yes (`created.mjs`) |
 | **Background** | Tab hidden + browser alerts on | SW round-robin, **15 min** minimum periodic sync | N/A | Yes (Phase 4) |
 
-**Watch for live proof** is **off by default**. Enabling it is consent to automatic Worker use while hub/inbox scope is active — not a requirement to use Humanity Cards.
+**Watch for live proof** is **off by default**. Enabling it is consent to automatic Worker use while hub, inbox, or `/wallet/` scope is active — not a requirement to use Humanity Cards.
 
 ---
 
@@ -171,7 +171,7 @@ Client budgets are necessary; they are **not** sufficient against bugs, old cach
 | Control | Purpose | Status |
 |---------|---------|--------|
 | **429 + Retry-After** on hot routes | Client backs off (60s live proof; health degraded) | Partially shipped client-side |
-| **Per-IP / per-device rate limits** | Cap burst “Check network” fan-out | **Partial (2026-05-27)** — `GET …/status` 300/IP/min (Technical Standards §15) |
+| **Per-IP / per-device rate limits** | Cap burst “Check network” + live-proof poll + health fan-out | **Shipped (2026-05-28)** — `GET …/status` 300/IP/min; `GET …/live-control/*` 300/IP/min; `GET …/health` 120/IP/min (Technical Standards §15 + O2 step 2) |
 | **Short TTL / ETag** on `status` and challenge list | Cheap 304s for repeat polls | **Shipped** (Phase 9) |
 | **Workers Paid + dashboard alerts** | Production reference operator survives organic use | Ops (Phase 0) |
 | **Fail closed on 1027** | Site down until quota resets | Shipped behavior |
@@ -184,7 +184,7 @@ Client budgets are necessary; they are **not** sufficient against bugs, old cach
 
 | Idea | Status | Notes |
 |------|--------|-------|
-| Poll live proof only when hub **expanded** or **inbox sheet** open | **Shipped** (Phase 1) | Not on collapsed landing; not “bare” wallet without hub expand |
+| Poll live proof only when hub **expanded**, **inbox sheet** open, or `/wallet/` with Watch on | **Shipped** (Phase 1) | Not on collapsed landing; not bare wallet when Watch is off |
 | Poll only on `/created/` for the open card | **Shipped** for signing | Inbox still needs hub/inbox + watch or manual check |
 | Stop polling when resolver health ≠ `ok` | **Shipped** (Phase 3) | |
 | Manual **Check for live proof** when watch off | **Shipped** (Phase 5) | |
@@ -199,6 +199,7 @@ Client budgets are necessary; they are **not** sufficient against bugs, old cach
 | Network refresh: capped parallelism on large wallet | **Shipped** (Phase 8) | `walletNetworkMaxParallel` (2 auto, 1 manual) |
 | Network refresh: round-robin one stale row per debounced hub refresh (large wallet) | **Shipped** (Phase 8b) | `selectNetworkRefreshEntries` + `listWalletEntriesNeedingNetworkFetch` |
 | Network refresh: visible-row priority | **Shipped** (Phase 8c) | `device-hub-visible-rows-core.mjs` + `orderEntriesVisibleFirst` |
+| `hc_wallet_network_cache` bounded to current wallet rows | **First slice shipped** (Phase 8d) | `pruneWalletNetworkCache` drops orphaned/expired entries and caps retained rows by recency |
 | `If-None-Match` / short TTL on Worker | **Shipped** (Phase 9) | `conditional-json.ts`; client `resolver-conditional-fetch-core.mjs` |
 
 ### C. Scope *who* polls
@@ -313,7 +314,7 @@ As M8 **E2** stages, shipped free-tier constants in poll modules MUST resolve fr
 | `wallet.large_threshold` | **10** | **25** | `device-wallet-scale-core.mjs` |
 | `sw.periodic_min_ms` | **900000** (15 min) | **300000** (5 min) | `device-live-control-sw-core.mjs` |
 
-**Unchanged on every tier:** round-robin **one** live-proof GET per tick; poll only when hub expanded or inbox open (unless push replaces poll — M3); manual **Check for live proof** and **Check network** uncapped by daily auto cap; resolver health gate; leader tab; stranger scan page polls **their** session only.
+**Unchanged on every tier:** round-robin **one** live-proof GET per tick; poll only when hub expanded, inbox open, or `/wallet/` with Watch on (unless push replaces poll — M3); manual **Check for live proof** and **Check network** uncapped by daily auto cap; resolver health gate; leader tab; stranger scan page polls **their** session only.
 
 **Server push (hosted only):** When `notify.push.live_proof === true` and steward subscribes, push **reduces** wallet round-robin need; SW remains fallback ([`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md)). Free tier keeps device-only polling + OS alerts path ([`DEVICE_INBOX.md`](DEVICE_INBOX.md)).
 
@@ -395,7 +396,7 @@ npm run verify:hosted-g0   # free-tier Vitest + steward-hosted Vitest
 | **E3** Raised caps | Vitest rows above; server 429 `steward_quota_exceeded` |
 | **E4** Push channel | M3 interoperability; E2E H4; poll fallback when SSE down |
 | **E5** Billing webhooks | Lifecycle `active` / `expired` → entitlement status |
-| **E6** Ops dashboards | Runbook only |
+| **E6** Ops dashboards | [`HOSTED_TIER_OPS_RUNBOOK.md`](HOSTED_TIER_OPS_RUNBOOK.md) + [`HOSTED_TIER_SUPPORT_MACROS.md`](HOSTED_TIER_SUPPORT_MACROS.md) |
 
 ### M8 implementation gates (do not start E2–E4 until)
 
@@ -467,12 +468,16 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 |---|------|---------------|-------------------|-------|
 | S1 | `loadWallet()` memo | Yes (`device-wallet.mjs`) | Invalidate on external storage only | Lag ✅ |
 | S2 | Presence heartbeat **10s** + coalesce events | Yes | — | Lag ✅ |
-| S3 | Chrome debounce + fingerprint skip | Yes (`device-chrome-refresh.mjs`) | — | Lag ✅ |
+| S3 | Chrome debounce + fingerprint skip | Yes (`device-chrome-refresh.mjs`) | Large wallets: `presenceChromeDebounceMs` steps 1200→1600→2000 ms (open issues §3) | Lag ✅ |
 | S4 | Skip presence heartbeat **when alone with keys** | Yes (`shouldSkipPresenceHeartbeat`) | Also skip when no `hc_created` | 8b ✅ |
 | S5 | Lazy-load inbox sheet / notifications | Yes (`device-inbox-sheet-loader`, `device-browser-notifications-loader`) | Smaller bootstrap graph | P2 ✅ |
 | S6 | Shard / bound `hc_wallet_network_cache` | **Yes** (2026-05-27) | Max **20** fresh rows; LRU + wallet protect on save | Open issues → shipped |
-| S8 | Compact wallet index for shell counts | **Yes** (2026-05-28) | `hc_wallet_index` lets dot/count/profile checks skip full `hc_wallet` hydration; falls back and rebuilds for older wallets | Open issues → partial |
-| S7 | Cross-tab rebuild (one snapshot) | Partial (Phases 1–6) | Full state machine per [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md) | Cross-tab |
+| S8 | Wallet metadata hot paths | **Yes** (2026-05-28) | Count/pollable/signing/profile-summary reads avoid full wallet copies in status, glance, inbox, scan dot | Shipped |
+| S9 | Hub saved-row display hydration | **Yes** (2026-05-28) | `listWalletDisplayEntries` + `findWalletEntryById` on action (no `loadWallet().slice()` per render) | Shipped |
+| S10 | Hub saved-row DOM cap (large wallet) | **Yes** (2026-05-28) | `selectHubSavedRowEntries` (cap **15**, visible-first) + “N more” row → `/wallet/` | Shipped |
+| S11 | `/wallet/` saved-row DOM cap (large wallet) | **Yes** (2026-05-28) | `selectWalletPageSavedRowEntries` (cap **40**, visible-first) + **Show all saved cards** expands full list | Shipped |
+| S12 | Large expanded hub summary-row viewport window | **Yes** (2026-05-28) | `visibleSummaryRowWindow` + Show more; scroll/sentinel grows window via `summaryRowLimitAfterViewportLoad`; resets on hub collapse | Shipped |
+| S7 | Cross-tab rebuild (one snapshot) | **Yes** (Phases 1–6) | Coordinator + fingerprint skip; large-wallet scales `presenceChromeDebounceMs` | Cross-tab ✅ |
 
 ### Background / SW
 
@@ -487,14 +492,14 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 | # | Idea | Shipped today | Planned direction | Phase |
 |---|------|---------------|-------------------|-------|
 | O1 | Workers Paid on production | Ops | Monitor daily requests | 0 |
-| O2 | Per-IP rate limits on hot routes | **Partial** — `GET …/status` 300/IP/min | Cap burst **Check network** | Server ✅ step 1 |
+| O2 | Per-IP rate limits on hot routes | **Yes** (2026-05-28) | `GET …/status` 300/IP/min; `GET …/live-control/*` 300/IP/min; `GET …/health` 120/IP/min | Server ✅ |
 | O3 | Fail closed on 1027 | Yes | User-visible degraded state | 3 ✅ |
 
 ### Implementer order (after Phases 1–9 + 8c)
 
 1. **Phase 10 (M8 complete, G0 signed)** — **Next:** production rollout ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout). Legal review for G7 when available.
 2. **Shell P2** - Lazy browser notifications loader ([`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md)) — **shipped 2026-05-27**.  
-3. **Ops O2** - Per-IP rate limits on hot routes — **step 1 shipped:** `GET …/cards/{profile_id}/status` (300/IP/min, Technical Standards §15). Next: live-control / health hot routes if needed.
+3. **Ops O2** — **shipped:** per-IP limits on `GET …/status` (300/min), `GET …/live-control/*` (300/min), and `GET …/health` (120/min). Vitest: `worker/tests/hot-route-rate-limit.test.ts`.
 
 See also [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) and [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
 
@@ -510,11 +515,11 @@ Phases 1–5 improved polling, but **N saved cards** on one browser is still an 
 
 ### 2. Shell performance (must fix)
 
-Every hub/inbox pass used to call `loadWallet()` and `JSON.parse` the full `hc_wallet` array for counts and profile existence. **`hc_wallet_network_cache`** is capped at **20** fresh rows per session (S6, 2026-05-27), and shell count/profile checks now read compact `hc_wallet_index` first (S8, 2026-05-28). Remaining: lazy row hydration for full hub rows and actions that truly need key material. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
+Status/count, compact hub/inbox, cross-tab checks, card-disabled inbox, **collapsed hub previews**, large expanded hub **summary rows**, incremental summary-row windows, and **viewport scroll-sync** (visible-row expansion + sentinel/scroll load) use persisted `hc_wallet_summary` (2026-05-28). Expanded hub/wallet rendering uses display-safe rows (S9); signing hydrates via `findWalletEntryById` on full rows and on action for large expanded summary rows. Large wallets cap full-row hub DOM at **15** (S10) and `/wallet/` at **40** with **Show all** (S11). **`hc_wallet_network_cache`** capped at **20** fresh rows (S6). Optional later: true virtual scroll recycle on `/wallet/` for N ≫ 40. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
 
-### 3. Multi-tab presence (must fix)
+### 3. Multi-tab presence (monitor)
 
-Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). That traffic is local-only (no Worker), but `storage` events drive `refreshDeviceChrome` on **all** tabs. **Must address:** debounce/coalesce with large wallets and many tabs; align with [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md). See [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md). **Planned mitigation for duplicate status GETs:** [`DEVICE_TAB_RESOLVER_SYNC.md`](DEVICE_TAB_RESOLVER_SYNC.md).
+Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). Phases 1–6 ([`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md)) ship one coordinator, coalesced events, and fingerprint skip. **2026-05-28:** large wallets (≥10 saved) use longer `presenceChromeDebounceMs` (1.6s / 2.0s at ≥20). Re-test multi-tab landing scroll per [`LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md`](LAGGY_SCROLL_CROSS_TAB_PRESENCE_INVESTIGATION.md). Duplicate status GET mitigation: [`DEVICE_TAB_RESOLVER_SYNC.md`](DEVICE_TAB_RESOLVER_SYNC.md) (shipped).
 
 ---
 
@@ -522,7 +527,14 @@ Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). 
 
 | Date | Note |
 |------|------|
-| 2026-05-28 | **S7 partial shipped:** compact `hc_wallet_index` for shell count/profile hot paths; fixed `maxParallel` network status queue to start only the active batch |
+| 2026-05-28 | **S12 shipped:** large expanded hub summary-row viewport window (scroll/sentinel + Show more; resets on hub collapse) |
+| 2026-05-28 | **Large-wallet shell perf:** viewport scroll-sync for expanded hub summary rows (visible-row window + sentinel/scroll load); incremental summary-window paths avoid full `hc_wallet` row hydration until action |
+| 2026-05-28 | **O2 step 2 shipped:** per-IP rate limits on `GET …/live-control/*` (300/min) and `GET …/health` (120/min) |
+| 2026-05-28 | **S11 shipped:** large-wallet `/wallet/` DOM cap (40) + Show all; **presence debounce scales** with wallet size |
+| 2026-05-28 | **S10 shipped:** large-wallet hub DOM cap via `selectHubSavedRowEntries` + “N more saved” row |
+| 2026-05-28 | **S9 shipped:** hub `renderSavedRows` uses `listWalletDisplayEntries`; signing actions hydrate via `findWalletEntryById` |
+| 2026-05-28 | **S8b shipped:** poll/coordinator/presence/SW paths use `listPollableWalletEntries` + `forEachWalletEntry`; snapshot baseline uses truth profile ids only |
+| 2026-05-28 | **S8 shipped:** `hc_wallet_summary` + wallet metadata hot paths; collapsed hub uses summary previews |
 | 2026-05-27 | **S6 shipped:** bound `hc_wallet_network_cache` (max 20 fresh rows, LRU prune) |
 | 2026-05-27 | **O2 step 1:** per-IP rate limit on `GET …/status` (300/min); Shell P2 lazy notifications shipped |
 | 2026-05-26 | **M8 epics:** [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) |

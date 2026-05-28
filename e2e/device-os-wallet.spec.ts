@@ -63,6 +63,12 @@ async function stubCreatedResolver(page: Page, entry = SAMPLE_WALLET_ENTRY) {
   );
 }
 
+async function waitForStatusDotReady(page: Page) {
+  await expect(page.locator("#brand-status-dot")).toHaveAttribute("data-dot-state", /.+/, {
+    timeout: 15_000,
+  });
+}
+
 async function clickOpenControlsOnSavedCard(page: Page) {
   await page
     .locator(".hub-card-item")
@@ -728,6 +734,7 @@ test.describe("device OS wallet flow", () => {
       localStorage.removeItem("hc_keys_custody_notice_dismissed");
     });
     await page.goto("/");
+    await waitForStatusDotReady(page);
     await page.locator("#brand-status-dot-btn").click({ timeout: 15_000 });
     await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/, {
       timeout: 15_000,

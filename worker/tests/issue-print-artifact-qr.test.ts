@@ -151,7 +151,7 @@ describe("handlePostIssuePrintArtifactQr", () => {
 
     expect(res.status).toBe(422);
     const json = (await res.json()) as { error?: string };
-    expect(json.error).toBe("PRINT_ARTIFACT_NO_CALENDAR_EXPIRY");
+    expect(json.error).toBe("ITEM_SCOPED_NO_CALENDAR_EXPIRY");
   });
 
   it("mints print_artifact with null expires_at and leaves card QR siblings", async () => {

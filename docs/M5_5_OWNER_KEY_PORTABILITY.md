@@ -114,6 +114,7 @@ Separate threat model when **5.5.3–5.5.4** ship: one-time recovery code, recov
 **Exit:**
 
 - [x] Import UI on `/created/` (`key-backup-ui.mjs`) unlocks owner controls
+- [x] Hub import (`device-hub-import.mjs`) loads keys into this tab + **Open card controls** → `/created/`
 - [ ] Import + revoke QR works on second device (manual test after deploy)
 - [x] Wrong passphrase fails clearly (`decryptBackup` error message)
 
