@@ -12,6 +12,10 @@ on:
       - "worker/tests/shop-*.test.ts"
       - "worker/tests/wrangler-merch-routes.test.ts"
       - "worker/scripts/verify-merch-funnel*.mjs"
+      - "worker/scripts/merch-funnel-rollout*.mjs"
+      - "site/js/shop-config-rollout-core.mjs"
+      - "worker/tests/shop-config-rollout.test.ts"
+      - "worker/tests/merch-funnel-rollout.test.ts"
       - "package.json"
       - "package-lock.json"
       - "playwright.config.ts"
@@ -25,6 +29,10 @@ on:
       - "worker/tests/shop-*.test.ts"
       - "worker/tests/wrangler-merch-routes.test.ts"
       - "worker/scripts/verify-merch-funnel*.mjs"
+      - "worker/scripts/merch-funnel-rollout*.mjs"
+      - "site/js/shop-config-rollout-core.mjs"
+      - "worker/tests/shop-config-rollout.test.ts"
+      - "worker/tests/merch-funnel-rollout.test.ts"
       - "package.json"
       - "package-lock.json"
       - "playwright.config.ts"
@@ -41,6 +49,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run worker:test
+      - name: Merch funnel rollout preflight (step 1 + step 6 Vitest)
+        run: |
+          npm run merch-funnel:rollout:step1
+          npm run merch-funnel:rollout:step6 -- --preflight
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium webkit
       - name: Device shell E2E

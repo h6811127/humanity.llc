@@ -12,9 +12,9 @@ Ordered work after repo review. Update row status as steps complete. Cross-links
 
 | Priority | Work | Type | Status |
 |----------|------|------|--------|
-| **1** | **Merch funnel close-out** — scan → `/shop/customize/` (`scan_customize` ref + CTA); enable Tier 1 in `shop-config.json`; prove one paid personalized order (intent → webhook → mint → Printify submit) | Engineering + operator | **Engineering ✅** (`merch-funnel:verify-exit` · `merch-funnel:rollout:step1` → `step6`) · **operator next:** `rollout:step2 -- --verify` · paste variant URLs · `verify-config --require-checkout` · live payment + Printify · physical QA [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) |
+| **1** | **Merch funnel close-out** — scan → `/shop/customize/` (`scan_customize` ref + CTA); enable Tier 1 in `shop-config.json`; prove one paid personalized order (intent → webhook → mint → Printify submit) | Engineering + operator | **Engineering ✅** (`merch-funnel:rollout:step1`–`step6` incl. `--preflight` on 2/3/6) · **operator next:** paste variant URLs · `step2 -- --verify` · `step3 -- --verify` · live payment + Printify · physical QA [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) |
 | **2** | **Phase A trust MVP** — run M5 stranger runbook (3 outsiders, unassisted create → scan → revoke) | Validation | **✅ Passed 2026-05-27** — [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) |
-| **3** | **Hosted steward production rollout** — `hosted:rollout:step*` through step 6 (secrets, flag, CF dashboard, regression) | Ops | **In progress** — step 4b–6 + 5a preflight ✅ · **next (ops):** step 5a CF pin · `step5b -- --verify` · `step6 -- --verify` |
+| **3** | **Hosted steward production rollout** — `hosted:rollout:step*` through step 6 (secrets, flag, CF dashboard, regression) | Ops | **Nearly complete** — 5a ✅ · 5b preflight ✅ · 6 Vitest + E2E ✅ · 4b prod smoke ✅ · **remaining:** `OPERATOR_AUDIT_TOKEN=… npm run hosted:rollout:step5b -- --verify` |
 | **4** | **AI P1 product decision** — keep / rename / deterministic-only / remove scan reader (no new L3 user features until Phase A) | Product | ☐ |
 | **5** | **Large-wallet shell performance** — bound `hc_wallet_network_cache`, avoid full-wallet parse on hub/inbox hot paths | Engineering debt | **✅ Shipped** — S6–S12 + `hc_wallet_summary` (see `DEVICE_OS_REQUEST_BUDGET.md`) |
 
@@ -208,6 +208,7 @@ Aggregate metrics only — no PII. Allowed refs:
 ## Tests
 
 ```bash
+npm run merch-funnel:rollout:step6 -- --preflight   # local Vitest gate before Playwright
 npm run merch-funnel:verify-exit          # engineering gate (Vitest + scan merch + E2E + config report)
 npm run merch-funnel:verify-exit:fast     # Vitest + config only (no Playwright)
 npm run merch-funnel:verify-config -- --require-checkout   # CI when Tier 1 goes live

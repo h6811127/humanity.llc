@@ -5,40 +5,29 @@
  *
  * Usage:
  *   npm run merch-funnel:rollout:step6
+ *   npm run merch-funnel:rollout:step6 -- --preflight   # rollout unit tests + verify:merch-funnel (no Playwright)
  *   npm run merch-funnel:rollout:step6 -- --verify
  *   npm run merch-funnel:rollout:step6 -- --vitest
  *   npm run merch-funnel:rollout:step6 -- --e2e
  *
  * @see docs/MERCH_FUNNEL_MVP.md § Exit checklist
  */
-import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { runMerchRolloutPreflightVitest, runNpm } from "./merch-funnel-rollout-preflight.mjs";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(__dirname, "../..");
 
 const verify = process.argv.includes("--verify");
 const vitestOnly = process.argv.includes("--vitest");
 const e2eOnly = process.argv.includes("--e2e");
-
-/**
- * @param {string} label
- * @param {string[]} args
- */
-function runNpm(label, args) {
-  console.log(`\n▶ ${label}`);
-  const result = spawnSync("npm", args, {
-    cwd: repoRoot,
-    stdio: "inherit",
-    shell: false,
-  });
-  if (result.status !== 0) {
-    process.exit(result.status ?? 1);
-  }
-}
+const preflight = process.argv.includes("--preflight");
 
 function printRegressionChecklist() {
+  console.log("Prerequisites: steps 1–5 complete (operator deploy + physical QA as needed).\n");
+  console.log("Engineering preflight (local, no Playwright):");
+  console.log("   npm run merch-funnel:rollout:step6 -- --preflight\n");
   console.log("Step 6 — full merch funnel regression\n");
   console.log("  npm run verify:merch-funnel");
   console.log("    (= worker:test:merch-funnel + worker:test:merch-print-qa + shop-config rollout tests)");
@@ -48,13 +37,30 @@ function printRegressionChecklist() {
   console.log("  API_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step3 -- --verify");
 }
 
+function runPreflight() {
+  console.log("Step 6 preflight — local gate before Playwright regression\n");
+  runMerchRolloutPreflightVitest();
+  runNpm("verify:merch-funnel (Vitest)", ["run", "verify:merch-funnel"]);
+  console.log("\n✅ Step 6 preflight OK.");
+  console.log("Next (Playwright, before live Tier 1 checkout):");
+  console.log("  npm run e2e:install   # once per machine");
+  console.log("  npm run merch-funnel:rollout:step6 -- --e2e");
+  console.log("  npm run merch-funnel:rollout:step6 -- --verify");
+}
+
 function main() {
   console.log("Merch funnel rollout — step 6 (regression)");
   console.log("Docs: docs/MERCH_FUNNEL_MVP.md § Exit checklist\n");
 
+  if (preflight) {
+    runPreflight();
+    return;
+  }
+
   if (!verify && !vitestOnly && !e2eOnly) {
     printRegressionChecklist();
     console.log("\n⏭  Run full regression:");
+    console.log("   npm run merch-funnel:rollout:step6 -- --preflight");
     console.log("   npm run merch-funnel:rollout:step6 -- --verify");
     return;
   }
@@ -77,4 +83,10 @@ function main() {
   }
 }
 
-main();
+const isCli =
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
+
+if (isCli) {
+  main();
+}

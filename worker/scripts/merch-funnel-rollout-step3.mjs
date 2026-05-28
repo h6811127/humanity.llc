@@ -5,16 +5,35 @@
  *
  * Usage:
  *   npm run merch-funnel:rollout:step3
+ *   npm run merch-funnel:rollout:step3 -- --preflight   # wrangler v1 route + Vitest (no API fetch)
  *   API_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step3 -- --verify
  *   API_ORIGIN=http://127.0.0.1:8787 npm run merch-funnel:rollout:step3 -- --verify
  *
  * @see docs/MERCH_HEADLESS_COMMERCE.md § 4. Worker (middleware)
  */
+import {
+  assertMerchV1RouteInWrangler,
+  runMerchRolloutPreflightVitest,
+} from "./merch-funnel-rollout-preflight.mjs";
+
 const apiOrigin = (process.env.API_ORIGIN || "https://humanity.llc").replace(/\/$/, "");
+const preflight = process.argv.includes("--preflight");
 const verify = process.argv.includes("--verify");
+
+function runPreflight() {
+  console.log("Step 3 preflight — local Worker route gate (no API_ORIGIN fetch)\n");
+  assertMerchV1RouteInWrangler();
+  runMerchRolloutPreflightVitest();
+  console.log("\n✅ Step 3 preflight OK.");
+  console.log("Next:");
+  console.log("  npm run worker:migrate:local && npm run worker:dev");
+  console.log("  API_ORIGIN=http://127.0.0.1:8787 npm run merch-funnel:rollout:step3 -- --verify");
+  console.log("  API_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step3 -- --verify");
+}
 
 function printChecklist() {
   console.log("Step 3 — Worker API smoke\n");
+  console.log("  0. Local preflight: npm run merch-funnel:rollout:step3 -- --preflight");
   console.log("  • GET /.well-known/hc/v1/health — database ok");
   console.log("  • GET /v1/print/catalog — approved templates");
   console.log("  • POST /v1/store/artifact-intents — must not return 405 (route wired)");
@@ -125,6 +144,11 @@ async function smokeArtifactIntentRoute() {
 async function main() {
   console.log("Merch funnel rollout — step 3 (Worker API smoke)");
   console.log("Docs: docs/MERCH_HEADLESS_COMMERCE.md § 4\n");
+
+  if (preflight) {
+    runPreflight();
+    return;
+  }
 
   if (!verify) {
     printChecklist();
