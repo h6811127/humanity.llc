@@ -509,7 +509,7 @@ Phases 1–5 improved polling, but **N saved cards** on one browser is still an 
 
 ### 2. Shell performance (must fix)
 
-Every hub/inbox pass used to call `loadWallet()` and hydrate the full `hc_wallet` array. **`hc_wallet_network_cache`** is now capped at **20** fresh rows per session (S6, 2026-05-27), and shell/scan status counts, compact hub/inbox rows, cross-tab saved-profile checks, card-disabled inbox reads, and collapsed hub previews use a lightweight `hc_wallet_summary` index instead of full key-bearing wallet rows on hot status paths. Remaining: virtualize/hydrate visible rows inside expanded large hubs. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
+Every hub/inbox pass used to call `loadWallet()` and hydrate the full `hc_wallet` array. **`hc_wallet_network_cache`** is now capped at **20** fresh rows per session (S6, 2026-05-27), and shell/scan status counts, compact hub/inbox rows, cross-tab saved-profile checks, card-disabled inbox reads, collapsed hub previews, and large expanded hub summary rows use a lightweight `hc_wallet_summary` index instead of full key-bearing wallet rows on hot status paths. Full row hydration now happens on action for large expanded hubs. Remaining: true DOM virtualization for very large expanded hubs. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
 
 ### 3. Multi-tab presence (must fix)
 
@@ -521,7 +521,7 @@ Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). 
 
 | Date | Note |
 |------|------|
-| 2026-05-28 | **Large-wallet shell perf:** added `hc_wallet_summary` so status/count, compact hub/inbox, cross-tab saved-profile, card-disabled inbox, and collapsed hub preview paths avoid full `hc_wallet` row hydration |
+| 2026-05-28 | **Large-wallet shell perf:** added `hc_wallet_summary` so status/count, compact hub/inbox, cross-tab saved-profile, card-disabled inbox, collapsed hub preview, and large expanded hub summary paths avoid full `hc_wallet` row hydration |
 | 2026-05-27 | **S6 shipped:** bound `hc_wallet_network_cache` (max 20 fresh rows, LRU prune) |
 | 2026-05-27 | **O2 step 1:** per-IP rate limit on `GET …/status` (300/min); Shell P2 lazy notifications shipped |
 | 2026-05-26 | **M8 epics:** [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) |

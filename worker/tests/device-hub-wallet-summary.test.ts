@@ -18,4 +18,10 @@ describe("device hub wallet summary hydration", () => {
     expect(src).toContain("renderSavedRows();");
     expect(src).toContain("fetchAndApplyNetworkChips();");
   });
+
+  it("keeps large expanded hubs on summary rows until an action hydrates one entry", () => {
+    expect(src).toContain("return !isLargeWallet(summary.count, getStewardEntitlementsPolicy())");
+    expect(src).toContain("walletEntryForActionButton");
+    expect(src).toContain('data-profile-id="${escapeHtml(entry.profile_id ?? "")}"');
+  });
 });

@@ -166,11 +166,23 @@ function hubExpanded() {
   return onWalletPage() || isDeviceHubExpanded(document.getElementById("device-hub"));
 }
 
-function shouldRenderFullSavedRows() {
+function shouldRenderFullSavedRows(summary = loadWalletSummary()) {
   if (onWalletPage()) return true;
-  if (hubExpanded()) return true;
   if (searchInput?.value?.trim()) return true;
-  return false;
+  if (!hubExpanded()) return false;
+  return !isLargeWallet(summary.count, getStewardEntitlementsPolicy());
+}
+
+function walletEntryForActionButton(btn) {
+  const id = btn.getAttribute("data-id");
+  const profileId = btn.getAttribute("data-profile-id");
+  return (
+    loadWallet().find(
+      (entry) =>
+        (id && entry.id === id) ||
+        (profileId && entry.profile_id === profileId)
+    ) ?? null
+  );
 }
 
 function classifyObjectType(entry, qrScopeOverride = undefined) {
@@ -1013,11 +1025,14 @@ function renderActivityRows() {
  */
 function renderSavedRows(opts = {}) {
   const initialChipChecking = opts.initialChipChecking === true;
-  const fullRows = shouldRenderFullSavedRows();
-  const allEntries = fullRows ? loadWallet() : loadWalletSummary().rows;
+  const summary = loadWalletSummary();
+  const expandedRows = hubExpanded();
+  const fullRows = shouldRenderFullSavedRows(summary);
+  const allEntries = fullRows ? loadWallet() : summary.rows;
+  const previewRows = !fullRows && !expandedRows;
   const entries = fullRows
     ? allEntries
-    : allEntries.slice(0, COLLAPSED_SAVED_ROW_PREVIEW_LIMIT);
+    : allEntries.slice(0, previewRows ? COLLAPSED_SAVED_ROW_PREVIEW_LIMIT : allEntries.length);
   if (!savedList || !savedGroup) return;
   savedList.dataset.walletRowsMode = fullRows ? "full" : "summary";
 
@@ -1105,10 +1120,11 @@ function renderSavedRows(opts = {}) {
 
     const menuBlock = fullRows ? hubCardMenuHtml(entry, menuControls) : "";
     const controlsHtml = fullRows ? hubCardControlsHtml(entry, inlineControls) : "";
-    const actionsHtml = fullRows
+    const actionData = `data-id="${escapeHtml(entry.id ?? "")}" data-profile-id="${escapeHtml(entry.profile_id ?? "")}"`;
+    const actionsHtml = fullRows || expandedRows
       ? `<div class="hub-card-actions">
         <div class="hub-card-actions-primary">
-          <button type="button" class="hub-card-action hub-use-keys" data-id="${escapeHtml(entry.id)}" title="Load signing keys into this tab, then open your card page">Open controls</button>
+          <button type="button" class="hub-card-action hub-use-keys" ${actionData} title="Load signing keys into this tab, then open your card page">Open controls</button>
           <a class="hub-card-action hub-open-scan" href="${escapeHtml(scan)}" target="_blank" rel="noopener noreferrer">Open scan</a>
         </div>
       </div>`
@@ -1121,7 +1137,7 @@ function renderSavedRows(opts = {}) {
           <span class="list-title">${escapeHtml(hubCardTitle(entry))}</span>
           <span class="hub-card-identity hub-card-identity--${identity.verifyTone}">${escapeHtml(identity.text)}</span>
           ${statusHtml}
-          ${hubCardSubHtml(entry, lastUsed)}
+          ${fullRows ? hubCardSubHtml(entry, lastUsed) : ""}
         </span>
         <div class="hub-card-head-meta">
           ${menuBlock}
@@ -1133,7 +1149,7 @@ function renderSavedRows(opts = {}) {
     savedList.appendChild(li);
   }
 
-  if (!fullRows && allEntries.length > entries.length) {
+  if (previewRows && allEntries.length > entries.length) {
     const li = document.createElement("li");
     li.className = "hub-card-item hub-card-item--general hub-card-item--summary hub-card-item--more";
     li.dataset.hubSearchable = "more saved cards";
@@ -1150,7 +1166,7 @@ function renderSavedRows(opts = {}) {
 
   bindRevokedAlertHandlers();
 
-  if (!fullRows) {
+  if (previewRows) {
     syncHubInboxAlertGroups();
     return;
   }
@@ -1185,8 +1201,7 @@ function renderSavedRows(opts = {}) {
 
   savedList.querySelectorAll(".hub-use-keys").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-id");
-      const entry = loadWallet().find((e) => e.id === id);
+      const entry = walletEntryForActionButton(btn);
       if (!entry) return;
       acknowledgeNetworkSeenForEntry(entry);
       let returnUrl = null;
