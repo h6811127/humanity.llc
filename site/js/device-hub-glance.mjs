@@ -20,7 +20,7 @@ import {
   CARD_DISABLED_SINCE_VISIT_GLANCE_SUFFIX,
   cardDisabledSinceVisitVisible,
 } from "./wallet-network-baseline.mjs";
-import { loadWallet, walletEntrySubtitle } from "./device-wallet.mjs";
+import { loadWallet, loadWalletSummary, walletEntrySubtitle } from "./device-wallet.mjs";
 
 const GLANCE_MAX_CARDS = 3;
 
@@ -194,16 +194,27 @@ function appendWalletGlanceRow(entry, revokedHint, list) {
   li.className = revokedHint
     ? "device-hub-glance-row device-hub-glance-row--revoked"
     : "device-hub-glance-row";
+  const title = entry.label || (entry.handle ? `@${entry.handle}` : "Saved card");
   const sub = walletEntrySubtitle(entry);
   const subLine = revokedHint ? `${sub} · ${CARD_DISABLED_SINCE_VISIT_GLANCE_SUFFIX}` : sub;
   li.innerHTML = `
     <button type="button" class="device-hub-glance-btn">
-      <span class="device-hub-glance-title">${escapeHtml(entry.label)}</span>
+      <span class="device-hub-glance-title">${escapeHtml(title)}</span>
       <span class="device-hub-glance-sub">${escapeHtml(subLine)} · Saved on device</span>
     </button>`;
   li.querySelector("button")?.addEventListener("click", () => {
     closeGlancePopoverEvent();
-    openCardNowPage(entry);
+    const hydrated =
+      loadWallet().find(
+        (walletEntry) =>
+          (entry.id && walletEntry.id === entry.id) ||
+          (entry.profile_id && walletEntry.profile_id === entry.profile_id)
+      ) ?? null;
+    if (hydrated) {
+      openCardNowPage(hydrated);
+    } else {
+      expandHub("device-hub-saved-group");
+    }
   });
   list.appendChild(li);
 }
@@ -236,7 +247,7 @@ function refreshGlanceTarget(target) {
   const copy = glanceCopy(wallet);
   const inboxItems = getInboxItems();
   const inboxCtx = gatherInboxInput();
-  const entries = loadWallet();
+  const entries = loadWalletSummary().rows;
   const plan = buildGlanceRowPlan(inboxItems, entries, {
     maxSavedCards: GLANCE_MAX_CARDS,
     revokedHintProfileIds: revokedHintProfileIdsFromEntries(entries),

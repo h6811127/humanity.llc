@@ -102,8 +102,22 @@ describe("loadWalletSummary", () => {
       signingKeyCount: 1,
       pollableCount: 2,
       stewardReady: true,
+      rows: [
+        {
+          profile_id: "p1",
+          label: undefined,
+          handle: undefined,
+          qr_id: "qr_xBZTq7M27tueCzBY",
+        },
+        {
+          profile_id: "p2",
+          scan_url: "https://humanity.llc/c/p2?q=qr_Abcdefghijkmnop",
+          qr_id: "qr_Abcdefghijkmnop",
+        },
+      ],
     });
     expect(localStore.get("hc_wallet_summary")).toContain('"count":3');
+    expect(localStore.get("hc_wallet_summary")).not.toContain("priv");
   });
 
   it("uses a valid persisted summary without parsing key-bearing wallet JSON", () => {
@@ -129,6 +143,7 @@ describe("loadWalletSummary", () => {
       profileIds: ["p1"],
       signingKeyCount: 1,
       pollableCount: 1,
+      rows: [{ profile_id: "p1", qr_id: "qr_xBZTq7M27tueCzBY" }],
     });
     expect(parseSpy).toHaveBeenCalledTimes(1);
   });

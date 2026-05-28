@@ -2,7 +2,7 @@
  * Resolver-backed card-disabled-since-visit rows for the unified inbox.
  * @see docs/DEVICE_INBOX.md
  */
-import { loadWallet } from "./device-wallet.mjs";
+import { loadWalletSummary } from "./device-wallet.mjs";
 import { listCardDisabledSinceVisit } from "./wallet-network-baseline.mjs";
 import {
   buildResolverConfirmedWalletPollMaps,
@@ -11,10 +11,10 @@ import {
 } from "./device-wallet-network.mjs";
 import { shouldSuppressCardDisabledSinceVisitAlerts } from "./device-wallet-since-visit-gate.mjs";
 
-/** @returns {ReturnType<typeof loadWallet>} */
+/** @returns {ReturnType<typeof loadWalletSummary>["rows"]} */
 export function gatherCardDisabledSinceVisitForInbox() {
   if (shouldSuppressCardDisabledSinceVisitAlerts()) return [];
-  const wallet = loadWallet();
+  const wallet = loadWalletSummary().rows;
   const maps = buildResolverConfirmedWalletPollMaps(wallet);
   if (!maps) return [];
 

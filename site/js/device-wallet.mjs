@@ -9,7 +9,7 @@ import { reconcileRemovedProfilesAfterWalletSave } from "./device-wallet-removed
 
 export const WALLET_STORAGE_KEY = "hc_wallet";
 export const WALLET_SUMMARY_STORAGE_KEY = "hc_wallet_summary";
-const WALLET_SUMMARY_VERSION = 1;
+const WALLET_SUMMARY_VERSION = 2;
 
 /** @type {string | null} */
 let walletCacheRaw = null;
@@ -77,7 +77,17 @@ export function normalizeWalletQrIds(entries) {
  *   signingKeyCount: number,
  *   pollableCount: number,
  *   stewardReady: boolean,
+ *   rows: WalletSummaryRow[],
  * }} WalletSummary
+ *
+ * @typedef {{
+ *   id?: string,
+ *   profile_id: string,
+ *   label?: string,
+ *   handle?: string,
+ *   qr_id?: string,
+ *   scan_url?: string,
+ * }} WalletSummaryRow
  */
 
 /**
@@ -115,8 +125,17 @@ function isWalletSummary(value) {
     Array.isArray(value.profileIds) &&
     Number.isInteger(value.signingKeyCount) &&
     Number.isInteger(value.pollableCount) &&
-    typeof value.stewardReady === "boolean"
+    typeof value.stewardReady === "boolean" &&
+    Array.isArray(value.rows)
   );
+}
+
+/**
+ * @param {unknown} value
+ * @returns {string | undefined}
+ */
+function optionalString(value) {
+  return typeof value === "string" && value ? value : undefined;
 }
 
 /**
@@ -126,6 +145,8 @@ function isWalletSummary(value) {
  */
 function buildWalletSummary(entries, walletFingerprint) {
   const profileIds = [];
+  /** @type {WalletSummaryRow[]} */
+  const rows = [];
   let count = 0;
   let signingKeyCount = 0;
   let pollableCount = 0;
@@ -136,6 +157,14 @@ function buildWalletSummary(entries, walletFingerprint) {
     count += 1;
     if (typeof entry.profile_id === "string" && entry.profile_id) {
       profileIds.push(entry.profile_id);
+      rows.push({
+        id: optionalString(entry.id),
+        profile_id: entry.profile_id,
+        label: optionalString(entry.label),
+        handle: optionalString(entry.handle),
+        qr_id: optionalString(walletEntryQrId(entry)),
+        scan_url: optionalString(entry.scan_url),
+      });
     }
     if (entry.owner_private_key_b58) {
       signingKeyCount += 1;
@@ -154,6 +183,7 @@ function buildWalletSummary(entries, walletFingerprint) {
     signingKeyCount,
     pollableCount,
     stewardReady,
+    rows,
   };
 }
 
@@ -172,6 +202,7 @@ function cloneWalletSummary(summary) {
   return {
     ...summary,
     profileIds: summary.profileIds.slice(),
+    rows: summary.rows.map((row) => ({ ...row })),
   };
 }
 
