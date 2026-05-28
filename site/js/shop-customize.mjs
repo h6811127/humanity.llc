@@ -10,12 +10,14 @@ import {
   persistMerchCreateRef,
   peekMerchCustomizeRef,
   readMerchRefFromUrl,
+  markTier1EphemeralOwner,
 } from "./merch-funnel-core.mjs";
 import {
   postArtifactIntentPreMint,
   signPlannedPrintArtifactCredentials,
 } from "./shop-artifact-pre-mint.mjs";
 import { goToShopifyCheckout } from "./shop-checkout-handoff.mjs";
+import { persistCheckoutIntentId } from "./shop-order-status-core.mjs";
 import {
   buildPlannedItemScanUrl,
   buildShopifyCartUrl,
@@ -369,6 +371,7 @@ async function onCheckoutClick() {
   if (checkoutBtn) checkoutBtn.disabled = true;
   try {
     const intent = await prepareCheckoutIntent(product);
+    persistCheckoutIntentId(intent.artifact_intent_id);
     const plannedQrIds = intent.planned_item_qr_ids ?? [];
     const plannedPrintArtifactIds = intent.planned_print_artifact_ids ?? [];
     if (!plannedQrIds.length || plannedQrIds.length !== plannedPrintArtifactIds.length) {
@@ -392,6 +395,7 @@ async function onCheckoutClick() {
     const attrs = intent.shopify?.cart_line_attributes ?? [];
     const display = personalizeProductDisplay(product);
     const url = buildShopifyCartUrl(display.checkoutUrl, 1, attrs);
+    markTier1EphemeralOwner(signingSession.profile_id);
     goToShopifyCheckout(url);
   } catch (err) {
     setStatus(err instanceof Error ? err.message : "Checkout failed.", true);

@@ -4982,6 +4982,17 @@ body.landing-focus-mode .screen-landing {
   margin-top: 4px;
 }
 
+.shop-thanks-mint-result {
+  margin-top: 0.75rem;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--text-secondary, #5c5c5c);
+}
+
+.shop-thanks-mint-result[hidden] {
+  display: none;
+}
+
 .shop-order-timeline {
   list-style: none;
   margin: 16px 0 0;

@@ -15,6 +15,7 @@ import {
 } from "./http/resolver";
 import { handlePostArtifactIntent, handlePostArtifactIntentAttach, handlePostArtifactIntentPreMint } from "./resolver/artifact-intents";
 import { handleGetStoreOrderStatus } from "./resolver/store-order-status";
+import { handlePostStoreOrderMint } from "./resolver/store-order-mint";
 import { handleGetCard, handlePostCards } from "./resolver/create-card";
 import {
   handleGetLiveControlChallenge,
@@ -705,6 +706,17 @@ export default {
         );
       }
       const res = await handleGetStoreOrderStatus(request, env.DB);
+      return withCors(request, res);
+    }
+
+    if (path === "/v1/store/order-mint" && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostStoreOrderMint(request, env.DB);
       return withCors(request, res);
     }
 

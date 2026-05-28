@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Thanks · Founding sticker · humanity.llc</title>
+    <title>Thanks · humanity.llc</title>
     <meta
       name="description"
-      content="Thanks for backing the Tier 0 founding signal sticker. Scan before you stick; buying merch does not verify you."
+      content="Thanks for your humanity.llc order. Scan when it arrives; buying merch does not verify you."
     />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="/styles.css?v=79" />
@@ -22,15 +22,29 @@
       </header>
 
       <main class="screen screen-shop">
-        <section class="hero hero-compact shop-hero">
-          <p class="hero-eyebrow">Tier 0 · thanks</p>
-          <h1>Your sticker ships  -  your status doesn&rsquo;t</h1>
-          <p class="hero-line">
-            Thanks for backing a physical experiment in human trust. When your sticker arrives,
-            <strong>scan it before you stick it anywhere</strong>. You&rsquo;ll see live status and
-            plain limits  -  not a verified badge in the mail.
-          </p>
-        </section>
+        <div id="shop-thanks-tier0">
+          <section class="hero hero-compact shop-hero">
+            <p class="hero-eyebrow">Tier 0 · thanks</p>
+            <h1>Your sticker ships  -  your status doesn&rsquo;t</h1>
+            <p class="hero-line">
+              Thanks for backing a physical experiment in human trust. When your sticker arrives,
+              <strong>scan it before you stick it anywhere</strong>. You&rsquo;ll see live status and
+              plain limits  -  not a verified badge in the mail.
+            </p>
+          </section>
+        </div>
+
+        <div id="shop-thanks-tier1" hidden>
+          <section class="hero hero-compact shop-hero">
+            <p class="hero-eyebrow">Tier 1 · thanks</p>
+            <h1>Same ink  -  you choose what it means</h1>
+            <p class="hero-line">
+              Your personalized Live Object is in production. When it arrives,
+              <strong>scan it before you wear it</strong>. The QR on the garment stays fixed; what
+              strangers read updates when you change your signed public line from your phone.
+            </p>
+          </section>
+        </div>
 
         <section class="group" id="shop-thanks-status-section">
           <h2 class="group-label">Order status</h2>
@@ -63,29 +77,67 @@
           <div class="shop-thanks-status-result" id="shop-thanks-status-result" hidden></div>
         </section>
 
-        <section class="group">
-          <h2 class="group-label">What to do next</h2>
-          <ul class="shop-bullets shop-bullets-get">
-            <li>Scan the QR when it arrives  -  check active / revoked / limits on the page</li>
-            <li>
-              Create a free Humanity Card if you want belonging in the graph  -
-              <a href="/create/">/create/</a>
-            </li>
-            <li>Vouch only when it&rsquo;s true  -  vouches are not sold at checkout</li>
-          </ul>
-          <p class="shop-required-line" role="note">
-            <strong>Buying this sticker did not verify you.</strong> Save an encrypted backup or
-            recovery key on <a href="/created/">/created/</a> if you created a root card; it
-            controls any personalized object QRs you print.
+        <section class="group" id="shop-thanks-mint-section" hidden>
+          <h2 class="group-label">Activate your print QR</h2>
+          <p class="shop-required-line" id="shop-thanks-mint-lead"></p>
+          <p class="shop-required-line" id="shop-thanks-mint-no-keys" hidden>
+            Open <a href="/created/">/created/</a> on the device that holds your card keys, or import
+            an encrypted backup, then return here.
           </p>
+          <button class="btn btn-primary" type="button" id="shop-thanks-mint-btn">
+            Sign &amp; activate print QR
+          </button>
+          <p class="shop-thanks-mint-result" id="shop-thanks-mint-result" hidden></p>
         </section>
+
+        <div id="shop-thanks-next-tier0">
+          <section class="group">
+            <h2 class="group-label">What to do next</h2>
+            <ul class="shop-bullets shop-bullets-get">
+              <li>Scan the QR when it arrives  -  check active / revoked / limits on the page</li>
+              <li>
+                Create a free Humanity Card if you want belonging in the graph  -
+                <a href="/create/">/create/</a>
+              </li>
+              <li>Vouch only when it&rsquo;s true  -  vouches are not sold at checkout</li>
+            </ul>
+            <p class="shop-required-line" role="note">
+              <strong>Buying this sticker did not verify you.</strong> Save an encrypted backup or
+              recovery key on <a href="/created/">/created/</a> if you created a root card; it
+              controls any personalized object QRs you print.
+            </p>
+          </section>
+        </div>
+
+        <div id="shop-thanks-next-tier1" hidden>
+          <section class="group">
+            <h2 class="group-label">What to do next</h2>
+            <ul class="shop-bullets shop-bullets-get">
+              <li>Scan your item when it arrives  -  confirm active status and limits on the page</li>
+              <li>
+                Update what scanners read  -
+                <a href="/created/#update-status">Update status on /created/</a> (same QR, new line
+                on the next scan)
+              </li>
+              <li>
+                Save an encrypted backup or recovery key on
+                <a href="/created/">/created/</a>  -  your key controls the whole object tree
+              </li>
+              <li>If someone steals the physical item, revoke that item&rsquo;s QR  -  not your whole card</li>
+            </ul>
+            <p class="shop-required-line" role="note">
+              <strong>Buying this merch did not verify you.</strong> Vouches and founding labels appear
+              on scan when earned  -  not because the printer said so.
+            </p>
+          </section>
+        </div>
 
         <section class="group shop-links-group">
           <ul class="list list-compact">
             <li class="list-row list-action">
               <a href="/shop/">
                 <span class="list-content">
-                  <span class="list-title">Back to the drop page</span>
+                  <span class="list-title">Back to the shop</span>
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </a>
@@ -102,6 +154,6 @@
         </section>
       </main>
     </div>
-    <script src="/js/shop-thanks.mjs?v=2" type="module"></script>
+    <script src="/js/shop-thanks.mjs?v=4" type="module"></script>
   </body>
 </html>

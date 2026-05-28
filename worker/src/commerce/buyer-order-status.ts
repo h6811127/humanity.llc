@@ -1,3 +1,4 @@
+import type { BuyerMintStatus } from "./buyer-order-mint";
 import type { CommerceOrderRow } from "../db/commerce-orders";
 import type { PrintOrderRow, PrintOrderStatus } from "../db/print-orders";
 
@@ -22,6 +23,7 @@ export interface BuyerOrderStatusResponse {
   message: string;
   fulfillment_mode: "personalized" | "tier0_batch" | "tier0_inventory" | null;
   tracking: BuyerOrderTracking | null;
+  mint?: BuyerMintStatus;
   updated_at: string;
 }
 
@@ -139,7 +141,7 @@ function trackingFromPrintOrder(row: PrintOrderRow): BuyerOrderTracking | null {
   };
 }
 
-function pickDominantPrintOrder(printOrders: PrintOrderRow[]): PrintOrderRow | null {
+export function pickDominantPrintOrder(printOrders: PrintOrderRow[]): PrintOrderRow | null {
   const status = dominantPrintStatus(printOrders);
   if (!status) return null;
   return printOrders.find((row) => row.status === status) ?? printOrders[0] ?? null;
