@@ -28,7 +28,10 @@ import { setLiveControlPollHealth } from "../../site/js/device-live-control-inbo
 
 const PROFILE_A = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const PROFILE_B = "8Ym2nP3oR5sU7wX9zA1bC4dE6";
+const PROFILE_C = "9Zn3oQ4pS6tV8xY1aB2cD5eF7";
+const PROFILE_D = "6Wj8kL1mN3pQ5rS7tU9vX2yZ4";
 const QR_A = "qr_E2eWakketTest9";
+const QR_B = "qr_E2eWakketTest8";
 
 const ACTIVE_BODY = {
   scan: {
@@ -112,6 +115,34 @@ describe("isResolverConfirmedProfile", () => {
     expect(getCachedNetworkQrScope(PROFILE_A)).toBe("print_artifact");
     const wallet = JSON.parse(localStore.get("hc_wallet") || "[]");
     expect(wallet[0].qr_scope).toBe("print_artifact");
+  });
+
+  it("honors maxParallel while fetching wallet network statuses", async () => {
+    let active = 0;
+    let maxActive = 0;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => {
+        active += 1;
+        maxActive = Math.max(maxActive, active);
+        await Promise.resolve();
+        active -= 1;
+        return resolverJsonResponse(ACTIVE_BODY);
+      })
+    );
+
+    await refreshWalletNetworkStatuses(
+      [
+        { profile_id: PROFILE_A, qr_id: QR_A },
+        { profile_id: PROFILE_B, qr_id: QR_B },
+        { profile_id: PROFILE_C, qr_id: QR_A },
+        { profile_id: PROFILE_D, qr_id: QR_B },
+      ],
+      undefined,
+      { maxParallel: 2 }
+    );
+
+    expect(maxActive).toBeLessThanOrEqual(2);
   });
 
   it("buildResolverConfirmedWalletPollMaps includes only resolver-confirmed profiles after poll", async () => {

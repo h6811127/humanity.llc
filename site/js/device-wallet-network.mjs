@@ -434,7 +434,7 @@ export async function refreshWalletNetworkStatuses(entries, onDone, options = {}
     }
     networkFetchedProfileIds.add(pid);
     fetches.push(
-      (async () => {
+      async () => {
         try {
           const statusUrl = getCardStatusUrl(pid, walletEntryQrId(entry));
           const { status, body, notModified } = await fetchResolverJson(statusUrl);
@@ -492,20 +492,20 @@ export async function refreshWalletNetworkStatuses(entries, onDone, options = {}
             at: now,
           };
         }
-      })()
+      }
     );
   }
 
   if (fetches.length > 0 && Number.isFinite(maxParallel)) {
     for (let i = 0; i < fetches.length; i += maxParallel) {
-      await Promise.all(fetches.slice(i, i + maxParallel));
+      await Promise.all(fetches.slice(i, i + maxParallel).map((run) => run()));
       if (generation != null && isCurrentGeneration && !isCurrentGeneration()) {
         onDone?.();
         return;
       }
     }
   } else if (fetches.length > 0) {
-    await Promise.all(fetches);
+    await Promise.all(fetches.map((run) => run()));
   }
 
   if (generation != null && isCurrentGeneration && !isCurrentGeneration()) {

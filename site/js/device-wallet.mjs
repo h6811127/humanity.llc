@@ -8,11 +8,37 @@ import { verificationRecordFromLabelState } from "./device-wallet-network-core.m
 import { reconcileRemovedProfilesAfterWalletSave } from "./device-wallet-removed-profiles.mjs";
 
 export const WALLET_STORAGE_KEY = "hc_wallet";
+export const WALLET_INDEX_STORAGE_KEY = "hc_wallet_index";
+const WALLET_INDEX_VERSION = 1;
 
 /** @type {string | null} */
 let walletCacheRaw = null;
 /** @type {Array<Record<string, unknown>> | null} */
 let walletCache = null;
+/** @type {string | null} */
+let walletIndexCacheSignature = null;
+/** @type {WalletIndex | null} */
+let walletIndexCache = null;
+
+/**
+ * @typedef {{
+ *   version: number,
+ *   raw_signature: string,
+ *   count: number,
+ *   profile_ids: string[],
+ *   pollable_count: number,
+ *   signing_count: number,
+ *   steward_signing_count: number,
+ * }} WalletIndexRecord
+ *
+ * @typedef {{
+ *   count: number,
+ *   profileIds: Set<string>,
+ *   pollableCount: number,
+ *   signingCount: number,
+ *   stewardSigningCount: number,
+ * }} WalletIndex
+ */
 
 /** Matches resolver / pin parsing (`device-pins.mjs`). */
 const QR_ID_RE = /^qr_[1-9A-HJ-NP-Za-km-z_]{8,64}$/;
@@ -45,6 +71,168 @@ export function walletEntryQrId(entry) {
 }
 
 /**
+ * @param {string | null} raw
+ */
+function walletRawSignature(raw) {
+  if (!raw) return "0:0";
+  let hash = 2166136261;
+  for (let i = 0; i < raw.length; i += 1) {
+    hash ^= raw.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return `${raw.length}:${(hash >>> 0).toString(36)}`;
+}
+
+/**
+ * @param {unknown} value
+ * @returns {string | null}
+ */
+function normalizedProfileId(value) {
+  return typeof value === "string" && value ? value : null;
+}
+
+/**
+ * @param {{ verification?: { state?: string, label?: string } } | null | undefined} entry
+ */
+function hasStewardVerification(entry) {
+  const state = String(entry?.verification?.state || "").toLowerCase();
+  const label = String(entry?.verification?.label || "").toLowerCase();
+  return state === "steward" || label === "steward";
+}
+
+/**
+ * @param {WalletIndexRecord} record
+ * @returns {WalletIndex}
+ */
+function normalizeWalletIndexRecord(record) {
+  return {
+    count: Number.isFinite(record.count) ? record.count : 0,
+    profileIds: new Set(Array.isArray(record.profile_ids) ? record.profile_ids : []),
+    pollableCount: Number.isFinite(record.pollable_count) ? record.pollable_count : 0,
+    signingCount: Number.isFinite(record.signing_count) ? record.signing_count : 0,
+    stewardSigningCount: Number.isFinite(record.steward_signing_count)
+      ? record.steward_signing_count
+      : 0,
+  };
+}
+
+/**
+ * @param {Array<Record<string, unknown>>} entries
+ * @param {string | null} raw
+ * @returns {WalletIndexRecord}
+ */
+function buildWalletIndexRecord(entries, raw) {
+  const profileIds = [];
+  let pollableCount = 0;
+  let signingCount = 0;
+  let stewardSigningCount = 0;
+  for (const entry of entries) {
+    const profileId = normalizedProfileId(entry?.profile_id);
+    if (profileId) profileIds.push(profileId);
+    if (profileId && walletEntryQrId(entry)) pollableCount += 1;
+    if (profileId && entry?.owner_private_key_b58) {
+      signingCount += 1;
+      if (hasStewardVerification(entry)) stewardSigningCount += 1;
+    }
+  }
+  return {
+    version: WALLET_INDEX_VERSION,
+    raw_signature: walletRawSignature(raw),
+    count: entries.length,
+    profile_ids: profileIds,
+    pollable_count: pollableCount,
+    signing_count: signingCount,
+    steward_signing_count: stewardSigningCount,
+  };
+}
+
+/** @param {WalletIndexRecord} record */
+function cacheWalletIndex(record) {
+  walletIndexCacheSignature = record.raw_signature;
+  walletIndexCache = normalizeWalletIndexRecord(record);
+  return walletIndexCache;
+}
+
+/** @param {WalletIndexRecord} record */
+function persistWalletIndexRecord(record) {
+  cacheWalletIndex(record);
+  try {
+    localStorage.setItem(WALLET_INDEX_STORAGE_KEY, JSON.stringify(record));
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * @param {string | null} raw
+ * @returns {WalletIndex | null}
+ */
+function readWalletIndex(raw) {
+  const signature = walletRawSignature(raw);
+  if (walletIndexCacheSignature === signature && walletIndexCache) {
+    return walletIndexCache;
+  }
+  try {
+    const indexRaw = localStorage.getItem(WALLET_INDEX_STORAGE_KEY);
+    const parsed = indexRaw ? JSON.parse(indexRaw) : null;
+    if (
+      !parsed ||
+      parsed.version !== WALLET_INDEX_VERSION ||
+      parsed.raw_signature !== signature
+    ) {
+      return null;
+    }
+    return cacheWalletIndex(/** @type {WalletIndexRecord} */ (parsed));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * @returns {{ entries: Array<Record<string, unknown>>, index: WalletIndex }}
+ */
+function readWalletView() {
+  try {
+    const raw = localStorage.getItem(WALLET_STORAGE_KEY);
+    if (raw === walletCacheRaw && walletCache) {
+      let index = readWalletIndex(raw);
+      if (!index) {
+        const record = buildWalletIndexRecord(walletCache, raw);
+        persistWalletIndexRecord(record);
+        index = normalizeWalletIndexRecord(record);
+      }
+      return { entries: walletCache, index };
+    }
+    const parsed = raw ? JSON.parse(raw) : [];
+    const entries = Array.isArray(parsed) ? parsed : [];
+    walletCacheRaw = raw;
+    walletCache = entries;
+    const record = buildWalletIndexRecord(entries, raw);
+    persistWalletIndexRecord(record);
+    return { entries, index: normalizeWalletIndexRecord(record) };
+  } catch {
+    walletCacheRaw = null;
+    walletCache = [];
+    const record = buildWalletIndexRecord([], null);
+    cacheWalletIndex(record);
+    return { entries: [], index: normalizeWalletIndexRecord(record) };
+  }
+}
+
+/**
+ * Compact wallet metadata for hot shell paths. Uses `hc_wallet_index` when present,
+ * falling back to full wallet hydration once for old browsers / stale indexes.
+ */
+function walletIndex() {
+  try {
+    const raw = localStorage.getItem(WALLET_STORAGE_KEY);
+    return readWalletIndex(raw) ?? readWalletView().index;
+  } catch {
+    return readWalletView().index;
+  }
+}
+
+/**
  * Backfill `qr_id` from `scan_url` when missing (DH-10).
  * @param {Array<Record<string, unknown>>} entries
  * @returns {{ entries: Array<Record<string, unknown>>, changed: boolean }}
@@ -63,21 +251,7 @@ export function normalizeWalletQrIds(entries) {
 }
 
 export function loadWallet() {
-  try {
-    const raw = localStorage.getItem(WALLET_STORAGE_KEY);
-    if (raw === walletCacheRaw && walletCache) {
-      return walletCache.slice();
-    }
-    const parsed = raw ? JSON.parse(raw) : [];
-    const entries = Array.isArray(parsed) ? parsed : [];
-    walletCacheRaw = raw;
-    walletCache = entries;
-    return entries.slice();
-  } catch {
-    walletCacheRaw = null;
-    walletCache = [];
-    return [];
-  }
+  return readWalletView().entries.slice();
 }
 
 export function saveWallet(entries) {
@@ -85,6 +259,7 @@ export function saveWallet(entries) {
   walletCacheRaw = serialized;
   walletCache = entries;
   localStorage.setItem(WALLET_STORAGE_KEY, serialized);
+  persistWalletIndexRecord(buildWalletIndexRecord(entries, serialized));
   if (entries.length > 0) markScanOperatorFamiliar();
   reconcileRemovedProfilesAfterWalletSave(entries);
   window.dispatchEvent(new Event("hc-device-hub-changed"));
@@ -117,7 +292,35 @@ export function walletEntryFromSession(session, label) {
 }
 
 export function isWalletSaved(profileId) {
-  return loadWallet().some((e) => e.profile_id === profileId);
+  const pid = normalizedProfileId(profileId);
+  return Boolean(pid && walletIndex().profileIds.has(pid));
+}
+
+export function walletSavedCount() {
+  return walletIndex().count;
+}
+
+export function walletPollableCount() {
+  return walletIndex().pollableCount;
+}
+
+export function walletSigningCount() {
+  return walletIndex().signingCount;
+}
+
+export function walletHasStewardSigningKey() {
+  return walletIndex().stewardSigningCount > 0;
+}
+
+export function findWalletEntryByProfileId(profileId) {
+  const pid = normalizedProfileId(profileId);
+  if (!pid || !isWalletSaved(pid)) return null;
+  return readWalletView().entries.find((e) => e.profile_id === pid) ?? null;
+}
+
+export function findWalletEntryById(id) {
+  if (typeof id !== "string" || !id) return null;
+  return readWalletView().entries.find((e) => e.id === id) ?? null;
 }
 
 /** Row subtitle  -  always show network handle + id so labels cannot lie. */

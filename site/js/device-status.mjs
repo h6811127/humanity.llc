@@ -11,7 +11,13 @@ import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visi
 export const RESOLVER_HEALTH_CHANGED = "hc-resolver-health-changed";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
-import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
+import {
+  isWalletSaved,
+  loadWallet,
+  walletHasStewardSigningKey,
+  walletSavedCount,
+  walletSigningCount,
+} from "./device-wallet.mjs";
 import {
   gatherInboxInput,
   getInboxItems,
@@ -135,9 +141,7 @@ function hasUnsavedTabKeys() {
 function hasStewardReadyKeys() {
   const session = getTabSession();
   if (session?.owner_private_key_b58 && hasStewardVerification(session)) return true;
-  return loadWallet().some(
-    (entry) => Boolean(entry?.owner_private_key_b58) && hasStewardVerification(entry)
-  );
+  return walletHasStewardSigningKey();
 }
 
 function savedCardsWithSigningKeys() {
@@ -148,7 +152,7 @@ function deviceState() {
   return deviceStateFromContext({
     unsavedTabKeys: hasUnsavedTabKeys(),
     stewardReady: hasStewardReadyKeys(),
-    savedWalletCount: loadWallet().length,
+    savedWalletCount: walletSavedCount(),
   });
 }
 
@@ -252,7 +256,7 @@ function applyDot() {
   if (!dot) return;
   const device = deviceState();
   const overlay = dotOverlayState();
-  const savedWalletCount = loadWallet().length;
+  const savedWalletCount = walletSavedCount();
   const shellNeutralEmpty = shellDotUsesNeutralEmptyWallet({
     network: networkStatus,
     device,
@@ -351,7 +355,7 @@ function renderDotExplainability(network, device, overlay) {
     stewardReady: hasStewardReadyKeys(),
     queueUrl: getStewardQueueUrl(),
     pageKind: dotPageKind(),
-    singleSavedCardWithKeys: savedCardsWithSigningKeys().length === 1,
+    singleSavedCardWithKeys: walletSigningCount() === 1,
   });
   const keyRoot = document.getElementById("device-hub-status-key");
   if (keyRoot) {
@@ -397,7 +401,7 @@ function renderStatusKey() {
 
 function renderShellStatusLine(segments) {
   if (!shellStatusLine) return;
-  const savedWalletCount = loadWallet().length;
+  const savedWalletCount = walletSavedCount();
   const device = deviceState();
   const overlay = dotOverlayState();
   const show = shellStatusLinePrimaryInChrome({
