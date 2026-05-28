@@ -87,4 +87,21 @@ describe("device hub sheet header", () => {
     expect(css).toMatch(/\.device-hub-status-line\s*\{[\s\S]*flex-wrap:\s*nowrap/);
     expect(css).toContain(".device-hub-status-item--zero");
   });
+
+  it("keeps Close stronger than Home with 40px-plus tap targets", () => {
+    const css = readPage("site/css/device-shell.css");
+    const darkCss = readPage("site/css/theme-dark.css");
+
+    expect(css).toMatch(/\.device-hub-home-btn\s*\{[\s\S]*width:\s*40px;[\s\S]*height:\s*40px;/);
+    expect(css).toMatch(
+      /\.device-hub-sheet-close\s*\{[\s\S]*width:\s*42px;[\s\S]*height:\s*42px;/
+    );
+    expect(css).toMatch(
+      /\.device-hub-home-btn\s*\{[\s\S]*background:\s*rgba\(120,\s*120,\s*128,\s*0\.08\)/
+    );
+    expect(css).toMatch(/\.device-hub-sheet-close\s*\{[\s\S]*box-shadow:/);
+    expect(darkCss).toMatch(
+      /html\[data-theme="dark"\] \.device-hub-home-btn\s*\{[\s\S]*surface-popover-fg-muted/
+    );
+  });
 });
