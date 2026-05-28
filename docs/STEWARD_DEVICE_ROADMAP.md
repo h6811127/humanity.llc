@@ -13,10 +13,10 @@ Use this page when you need **one map** of steward-facing device work. Detailed 
 | # | Step | Owner | Doc / command |
 |---|------|-------|----------------|
 | **1** | **Steward session link (client)** — sign `steward_account_link_v1`, `POST …/steward/session`, store `hc_steward_session`; checkout return `?hc_account_id=acc_…` | **Shipped** in repo | `site/js/device-steward-session*.mjs` · [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) |
-| **2** | **Production rollout** — D1 migrations → deploy flag off → secrets → flag on → regression | Ops / eng with Cloudflare auth | [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout · [`HOSTED_TIER_G0_READINESS.md`](HOSTED_TIER_G0_READINESS.md) |
-| **3** | **Verify hosted path** — entitlements probe, steward session link core, SSE push (watch + Browser alerts on), poll cap 4000 | QA | `npm run verify:hosted-g0` (incl. `device-steward-session-core.test.ts`) · `npm run e2e:steward-hosted` |
-| **4** | **Billing checkout → `hc_account_id` URL** (Stripe return) | Product + E5 | [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § E5.6 (minimal v1) |
-| **5** | **Child object UI** under one root (beyond `print_artifact` bridge) | Product | [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) |
+| **2** | **Production rollout** — D1 migrations → deploy flag off → secrets → flag on → regression | Ops / eng with Cloudflare auth | `hosted:rollout:step1` → `step6` · [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout |
+| **3** | **Verify hosted path** — entitlements probe, session link, SSE policy, free-tier regression | **Tooling shipped** — run before/after rollout | `npm run hosted:rollout:verify-path` (wraps `verify:hosted-g0` + session/billing core tests) · optional `--e2e` · [`HOSTED_TIER_G0_READINESS.md`](HOSTED_TIER_G0_READINESS.md) |
+| **4** | **Billing checkout → `hc_account_id` URL** (Stripe return) | **URL builder shipped** — wire in Stripe Dashboard | `npm run hosted:stripe-return-url -- acc_…` · `device-steward-billing-return-core.mjs` |
+| **5** | **Child object UI** under one root (beyond `print_artifact` bridge) | **First slice shipped** — general `/created/` status plate register + local list; child QR scan later | [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · `created-child-object.mjs` |
 | **6** | **M5.5 key import** on new device | Product | [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) |
 
 **Free tier unchanged:** no session, no SSE, 400 auto-poll/day — steps 2–3 must not regress H1–H6 ([`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10).
@@ -180,6 +180,7 @@ Product boundaries and build order — **do not re-spec here**.
 | Ship or review PWA install | [`PWA_INSTALL.md`](PWA_INSTALL.md) |
 | Implement hosted push | [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) · [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § E4 |
 | Link billing account to device session | `device-steward-session.mjs` · `?hc_account_id=acc_…` after checkout |
+| Build Stripe success_url + metadata | `npm run hosted:stripe-return-url -- acc_…` · `device-steward-billing-return-core.mjs` |
 | QA steward flows | [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — P2 live proof, P3 background alerts, PWA |
 
 ---

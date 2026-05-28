@@ -26,6 +26,8 @@
     "worker:test:steward-hosted": "npm run worker:test:steward-entitlements && npm run worker:test:steward-push && npm run worker:test:steward-billing && npm run worker:test:steward-ops",
     "worker:test:hosted-free-tier": "vitest run worker/tests/device-live-control-poll-scheduler.test.ts worker/tests/device-live-control-round-robin.test.ts worker/tests/device-live-control-poll-budget-core.test.ts worker/tests/device-live-control-poll-leader-core.test.ts worker/tests/device-live-control-sw-core.test.ts worker/tests/device-hub-visible-rows-core.test.ts worker/tests/device-wallet-scale-core.test.ts worker/tests/device-hub-network-tools-core.test.ts worker/tests/device-steward-entitlements-core.test.ts worker/tests/device-steward-entitlements.test.ts worker/tests/conditional-json.test.ts",
     "verify:hosted-g0": "npm run worker:test:hosted-free-tier && npm run worker:test:steward-hosted",
+    "hosted:rollout:verify-path": "node worker/scripts/hosted-rollout-verify-path.mjs",
+    "hosted:stripe-return-url": "node worker/scripts/hosted-stripe-checkout-return.mjs",
     "hosted:rollout:step1": "node worker/scripts/hosted-rollout-step1.mjs",
     "hosted:rollout:step2": "node worker/scripts/hosted-rollout-step2.mjs",
     "hosted:rollout:step3": "node worker/scripts/hosted-rollout-step3a.mjs",

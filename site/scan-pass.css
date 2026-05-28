@@ -998,6 +998,35 @@ a {
   padding: 0 !important;
 }
 
+.live-control-in-person-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.live-control-scanner-pane {
+  min-width: 0;
+}
+
+.live-control-in-person-layout.is-owner-waiting .live-control-owner-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 640px) {
+  .live-control-in-person-layout.is-owner-waiting {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 14px;
+    align-items: stretch;
+  }
+
+  .live-control-in-person-layout.is-owner-waiting .live-control-owner-panel {
+    margin-top: 0;
+    justify-content: space-between;
+  }
+}
+
 .list-row.live-control-row {
   align-items: stretch;
   padding: 0;

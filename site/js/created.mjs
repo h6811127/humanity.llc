@@ -37,6 +37,7 @@ import { syncCreatedPilotStewardCopy } from "./pilot-steward-copy.mjs";
 import { initCreatedDeviceSave } from "./created-device-save.mjs";
 import { markSetupDone, modeFromPage } from "./created-mode.mjs";
 import { initCreatedMerchFunnel } from "./created-merch-funnel.mjs";
+import { initCreatedChildObject } from "./created-child-object.mjs";
 import { initCreatedSetup } from "./created-setup.mjs";
 import {
   applyCreatedWorkspaceMode,
@@ -325,6 +326,8 @@ function syncQrPreview() {
   }
 }
 let deviceSaveCtl = null;
+/** @type {{ refresh?: () => void } | null} */
+let childObjectCtl = null;
 /** @type {{ select: (tabId: string) => void } | undefined} */
 let createdTabs;
 let workspaceMode = "view";
@@ -659,6 +662,7 @@ function applyPilotTemplateUi(session) {
     lostItemTipEl.hidden = false;
     bindLostItemRelayLoopScorecard(profileId, pilotScorecardHandle(session));
   }
+  childObjectCtl?.refresh?.();
 }
 
 /** Load handle/manifesto/created_at from resolver when session is partial (return visit). */
@@ -1170,6 +1174,13 @@ async function bootstrapOwnerTools() {
   });
   qrExtend?.show();
 
+  childObjectCtl = initCreatedChildObject({
+    profileId,
+    getSession: loadSession,
+    showError,
+    getSigningKeys: currentSigningKeys,
+  });
+
   const backup = initKeyBackupUi({
     profileId,
     getSession: loadSession,
@@ -1179,6 +1190,7 @@ async function bootstrapOwnerTools() {
       revoke?.refresh();
       voucherRevoke?.refresh();
       liveControl?.refresh();
+      childObjectCtl?.refresh?.();
     },
   });
   deviceSaveCtl?.refresh();
@@ -1192,6 +1204,7 @@ async function bootstrapOwnerTools() {
       liveControl?.refresh();
       deviceSaveCtl?.refresh();
       recoveryUi?.refresh();
+      childObjectCtl?.refresh?.();
     },
   });
   deviceSaveCtl?.refresh();

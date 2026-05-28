@@ -10,7 +10,7 @@
 
 | Step | Spec / surface | Symptom | Root cause |
 |------|----------------|---------|------------|
-| **1** | Pages dev (`site/_redirects`) | `Infinite loop detected` for `/shop/products/*` | Rewrite target `index.html` is normalized by Pages and re-matches the splat rule ([same class of bug as `/create`](site/_redirects) comment) |
+| **1** | Pages dev (`site/_redirects`) | `Infinite loop detected` for `/shop/products/*` | **Fixed 2026-05-28:** splat rewrite targets `detail.html` (not `index.html`) — see changelog |
 | **2** | `e2e/device-os-wallet.spec.ts` · `e2e/keys-custody-emphasis-webkit.spec.ts` | `detail` ↔ **Acknowledge** gap **66–68px** (limit **&lt; 56**) | **Fixed 2026-05-28:** wallet `.hc-notice-foot` moved below Acknowledge (`afterActionsHtml`) |
 | **3** | `e2e/merch-funnel-customize.spec.ts` | Stays on `/created/?…&hc_ref=scan_customize` | **Fixed 2026-05-28:** `created-merch-funnel.mjs` auto-redirects fresh customize handoffs when `hc_created` is readable |
 | — | Wrangler / workerd stderr | `Broken pipe` on Playwright teardown | Benign shutdown noise when Pages dev stops worker; not a product failure |

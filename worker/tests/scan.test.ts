@@ -495,6 +495,29 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain('id="live-control-request"');
   });
 
+  it("states live control comprehension limits on the success panel (H-002)", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: summary(),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+    vm.liveControlProvenAt = new Date().toISOString();
+    vm.liveControlAvailable = true;
+    const html = await renderScanPage(vm, "https://humanity.llc");
+
+    expect(html).toContain("Control proven moments ago");
+    expect(html).toContain("does not prove legal identity");
+    expect(html).toContain("vouching");
+    expect(html).toContain("ownership of the physical object");
+    expect(html).not.toContain("Verified Human");
+  });
+
   it("does not render stale live proof as recently proven", async () => {
     const res = await handleGetScan(
       new Request(
@@ -669,6 +692,26 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("stopPolling();");
     expect(html).toContain("if (ownerPanel) ownerPanel.hidden = true;");
     expect(html).toContain('if (ownerLink) ownerLink.href = "#";');
+  });
+
+  it("renders side-by-side in-person layout markup for live control", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: summary(),
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+
+    expect(html).toContain('id="live-control-in-person-layout"');
+    expect(html).toContain("live-control-scanner-pane");
+    expect(html).toContain('live-control-eyebrow">Scanner</span>');
+    expect(html).toContain('live-control-eyebrow">Owner</span>');
+    expect(html).toContain('inPersonLayout.classList.add("is-owner-waiting")');
   });
 
   it("uses print_artifact scope copy when applicable", async () => {
