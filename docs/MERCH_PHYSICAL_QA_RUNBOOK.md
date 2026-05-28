@@ -100,6 +100,7 @@ When signed off, mark **Printed item scans; bearer warning visible** in [`MERCH_
 | Doc | Role |
 |-----|------|
 | [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) | Funnel exit checklist |
+| [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) | Shopify + Printify + headless architecture |
 | [`QR_BRANDING.md`](QR_BRANDING.md) | Artwork size / contrast |
 | [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) | Digital stranger path (pre-print) |
 | [`TIER0_CAMPAIGN_QR_RUNBOOK.md`](TIER0_CAMPAIGN_QR_RUNBOOK.md) | Tier 0 batch rotate drill |

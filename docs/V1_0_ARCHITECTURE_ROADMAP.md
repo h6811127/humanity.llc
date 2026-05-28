@@ -420,6 +420,8 @@ Complete before milestone A.1. Map to backlog D-001–D-006.
 
 **Goal:** Walking QR drives strangers to create cards; merch does not grant vouch.
 
+**Post-M5 note:** Tier 0 batch sticker is **optional** parallel curiosity. **Primary GTM wedge** is Tier 1 personalized merch (Phase C funnel shipped in code) — [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md).
+
 - Story-row store (small catalog; 1 launch SKU).
 - Batch or card-level QR on sticker (unique per-item optional later).
 - Product copy: merch ≠ vouched; bearer warning.
@@ -433,6 +435,8 @@ Complete before milestone A.1. Map to backlog D-001–D-006.
 ## 14. Phase C: belonging and personalized artifacts
 
 **Goal:** Card holders personalize physical items; commerce vertical slice complete.
+
+**Current focus (2026-05-27):** This phase is the **first real merch launch** — Live Object hoodie / personalized sticker with unique QR per unit. Headless stack: [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md).
 
 **Note:** Open to all card holders with active card - not a private cohort gate (`PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`).
 
