@@ -87,11 +87,11 @@ describe("operator create-rate monitor API", () => {
 
   it("returns create monitoring metrics when authorized", async () => {
     const fake = new FakeRateMonitorDb();
-    fake.addCard("a", "2026-05-25T00:00:00.000Z");
-    fake.addCard("b", "2026-05-25T01:00:00.000Z");
+    const now = new Date();
+    fake.addCard("a", new Date(now.getTime() - 3 * 3600_000).toISOString());
+    fake.addCard("b", new Date(now.getTime() - 2 * 3600_000).toISOString());
 
     const ipHash = await hashIp("203.0.113.1");
-    const now = new Date("2026-05-25T02:30:00.000Z");
     for (let i = 0; i < 10; i++) {
       await checkCreateRateLimit(fake as unknown as D1Database, ipHash, now);
     }

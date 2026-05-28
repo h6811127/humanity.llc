@@ -52,6 +52,25 @@ describe("isPersonalizeCheckoutReady", () => {
       })
     ).toBe(false);
   });
+
+  it("gates checkout to launch SKU when checkout_product_id is set", () => {
+    const sticker = {
+      product_id: "sticker_personalized_v1",
+      checkout_url: "https://store.example/cart/99:1",
+    };
+    const hoodie = {
+      product_id: "hoodie_live_object_v1",
+      checkout_url: "https://store.example/cart/88:1",
+    };
+    const config = {
+      personalize: {
+        checkout_open: true,
+        checkout_product_id: "sticker_personalized_v1",
+      },
+    };
+    expect(isPersonalizeCheckoutReady(config, sticker)).toBe(true);
+    expect(isPersonalizeCheckoutReady(config, hoodie)).toBe(false);
+  });
 });
 
 describe("personalizeProducts", () => {

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Product · humanity.llc</title>
+    <meta
+      name="description"
+      content="Humanity store product — story, personalization policy, and secure checkout handoff."
+    />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=122" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=2" />
+  </head>
+  <body class="screen-shop-body">
+    <div class="page">
+      <header class="top">
+        <a class="top-brand top-brand--mark" href="/" aria-label="Home">
+          <span class="pass-dot" aria-hidden="true"></span>
+        </a>
+        <a class="top-create" href="/create/">Create card</a>
+      </header>
+
+      <main class="screen screen-shop" id="product-main">
+        <p class="shop-breadcrumb">
+          <a href="/shop/">Shop</a>
+          <span aria-hidden="true"> · </span>
+          <span id="product-row-label">Product</span>
+        </p>
+
+        <section class="hero hero-compact shop-hero">
+          <p class="hero-eyebrow" id="product-kicker">Product</p>
+          <h1 id="product-title">Loading product…</h1>
+          <p class="hero-line" id="product-meaning"></p>
+        </section>
+
+        <section class="shop-story-row" aria-labelledby="product-detail-title">
+          <h2 class="group-label" id="product-detail-title">About this artifact</h2>
+          <div class="shop-product-card">
+            <p class="shop-product-price" id="product-price">Loading…</p>
+            <p class="shop-hub-status" id="product-status"></p>
+            <p class="shop-lead" id="product-story"></p>
+
+            <p class="shop-required-line" role="note">
+              <strong>Buying merch does not verify you.</strong> Vouches come from real people under
+              public rules — never from checkout.
+            </p>
+
+            <p class="shop-lead shop-lead-muted" id="product-card-requirement" hidden>
+              Requires a Humanity Card in this browser before personalization or checkout.
+            </p>
+
+            <p class="shop-lead shop-lead-muted" id="product-persistence-warning" hidden>
+              Printed QR codes persist on the object. You can revoke a single item from your phone
+              without reprinting, but strangers may still scan old ink until you do.
+            </p>
+
+            <p class="shop-checkout-note">
+              Secure checkout runs on Shopify in this tab when available — taxes and shipping shown
+              there. humanity.llc does not store your payment details.
+            </p>
+
+            <a class="btn-primary shop-buy-btn" id="product-action-btn" href="/shop/" hidden
+              >Continue</a
+            >
+          </div>
+        </section>
+
+        <section class="group shop-links-group">
+          <h2 class="group-label">Related</h2>
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/shop/">
+                <span class="list-content">
+                  <span class="list-title">Back to shop</span>
+                  <span class="list-sub">Story rows · curated artifacts</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/create/">
+                <span class="list-content">
+                  <span class="list-title">Create a Humanity Card</span>
+                  <span class="list-sub">Free · keys stay in your browser</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+
+      <main class="screen screen-shop" id="product-error" hidden>
+        <section class="shop-story-row">
+          <h1 class="group-label">Product unavailable</h1>
+          <p class="shop-lead" data-product-error-message>We could not load this product.</p>
+          <a class="btn-primary shop-hub-cta" href="/shop/">Back to shop</a>
+        </section>
+      </main>
+    </div>
+    <script src="/js/shop-product-detail.mjs?v=1" type="module"></script>
+  </body>
+</html>
