@@ -31,6 +31,10 @@ const PRINT_BASE: PrintOrderRow = {
   template_id: "hc-sticker-square-v1",
   status: "awaiting_production_approval",
   shipping_method: "standard",
+  tracking_carrier: null,
+  tracking_number: null,
+  tracking_url: null,
+  last_reconciled_at: null,
   created_at: "2026-05-16T17:00:00Z",
   updated_at: "2026-05-16T17:05:00Z",
 };
@@ -58,5 +62,19 @@ describe("buildBuyerOrderStatus", () => {
   it("maps fulfilled print status to shipped", () => {
     const status = buildBuyerOrderStatus(COMMERCE, [{ ...PRINT_BASE, status: "fulfilled" }]);
     expect(status.status).toBe("shipped");
+  });
+
+  it("includes tracking link when print order has carrier data", () => {
+    const status = buildBuyerOrderStatus(COMMERCE, [
+      {
+        ...PRINT_BASE,
+        status: "fulfilled",
+        tracking_carrier: "USPS",
+        tracking_number: "9400111899223344556677",
+        tracking_url: "https://tools.usps.com/go/TrackConfirmAction",
+      },
+    ]);
+    expect(status.tracking?.tracking_url).toContain("usps.com");
+    expect(status.message).toContain("tracking link");
   });
 });

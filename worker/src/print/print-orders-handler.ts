@@ -30,6 +30,15 @@ interface MintPrintOrderRequest {
   qr_credentials?: unknown;
 }
 
+function printOrderTracking(row: PrintOrderRow) {
+  if (!row.tracking_carrier && !row.tracking_number && !row.tracking_url) return null;
+  return {
+    carrier: row.tracking_carrier,
+    tracking_number: row.tracking_number,
+    tracking_url: row.tracking_url,
+  };
+}
+
 function printOrderResponse(row: PrintOrderRow) {
   return {
     order_id: row.order_id,
@@ -43,6 +52,7 @@ function printOrderResponse(row: PrintOrderRow) {
     template_id: row.template_id,
     status: row.status,
     shipping_method: row.shipping_method,
+    tracking: printOrderTracking(row),
     created_at: row.created_at,
     updated_at: row.updated_at,
   };

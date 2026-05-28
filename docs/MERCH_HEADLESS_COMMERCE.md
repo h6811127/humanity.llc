@@ -198,7 +198,7 @@ Deploy: `npm run worker:deploy`. Route `humanity.llc/v1/*` required for artifact
 | **Per-order artwork upload to Printify** | ✅ Shipped (PR #63) | PM-FR-13 — [`printify-upload.ts`](../worker/src/print/printify-upload.ts) · [`printify-line-items.ts`](../worker/src/print/printify-line-items.ts). Upload SVG → ephemeral product with `print_areas` → order line item per planned QR. Requires `PERSONALIZE_*_PRINTIFY_BLUEPRINT_ID` + `PRINT_PROVIDER_ID`. |
 | **Encrypted shipping at rest (PM-FR-41)** | ✅ Shipped | Shopify paid webhook → `commerce_fulfillment_pii` · [`fulfillment-pii-crypto.ts`](../worker/src/commerce/fulfillment-pii-crypto.ts) · Printify submit via [`resolve-printify-shipping.ts`](../worker/src/commerce/resolve-printify-shipping.ts) |
 | Shipping quote before checkout | ☐ Deferred | PM-FR-20 — Shopify remains checkout total authority for v1 |
-| humanity.llc order timeline UI | ✅ Buyer status shipped (PR #66) | `GET /v1/store/order-status` · `/shop/thanks/` form. Tracking links + full timeline deferred. |
+| humanity.llc order timeline UI | ✅ Buyer status shipped (PR #66) | `GET /v1/store/order-status` · `/shop/thanks/` form · **tracking links** on shipped orders · reconciliation cron every 30m |
 
 ---
 

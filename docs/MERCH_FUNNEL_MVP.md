@@ -186,6 +186,7 @@ Aggregate metrics only — no PII. Allowed refs:
 | Per-order artwork upload to Printify on submit (PM-FR-13) | ✅ `printify-upload.ts` · `printify-line-items.ts` — requires `PERSONALIZE_*_PRINTIFY_BLUEPRINT_ID` + `PRINT_PROVIDER_ID` |
 | Buyer order status on `/shop/thanks/` (O-003) | ✅ `GET /v1/store/order-status` · email hash lookup · no shipping PII in response |
 | Encrypted shipping from Shopify webhook (PM-FR-41) | ✅ `commerce_fulfillment_pii` · decrypt on Printify submit · body override still supported |
+| Tracking links + reconciliation polling (O-003) | ✅ Printify webhook + 30m cron poll · buyer `/shop/thanks/` tracking link |
 | Tier 1 `shop-config.json` ready | `npm run merch-funnel:verify-config` · ☐ operator paste variant URLs |
 | Checkout opens Shopify with `artifact_intent_id` | ✅ E2E stub · ☐ live Shopify test payment |
 | Printed item scans; bearer warning visible | ☐ physical QA · ✅ automated scan regression (`npm run worker:test:merch-print-qa`, [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md)) |
