@@ -26,7 +26,7 @@ describe("device-shell E2E bundle", () => {
     for (const spec of DEVICE_SHELL_E2E_SPECS) {
       expect(specsModule).toContain(spec);
     }
-    expect(DEVICE_SHELL_E2E_SPECS).toHaveLength(8);
+    expect(DEVICE_SHELL_E2E_SPECS).toHaveLength(9);
   });
 
   it("package.json device-shell:e2e runs verify script", () => {

@@ -26,6 +26,7 @@ export function isChildObjectRow(row) {
   if (r.qr_id !== undefined && typeof r.qr_id !== "string") return false;
   if (r.scan_url !== undefined && typeof r.scan_url !== "string") return false;
   if (r.created_at !== undefined && typeof r.created_at !== "string") return false;
+  if (r.status !== undefined && typeof r.status !== "string") return false;
   return true;
 }
 

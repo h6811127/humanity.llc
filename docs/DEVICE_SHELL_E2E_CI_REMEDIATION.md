@@ -110,3 +110,4 @@ Spec list: `worker/scripts/device-shell-e2e-specs.mjs` · Vitest guard: `npm run
 | 2026-05-28 | **Step 2 shipped:** wallet keys custody foot below Acknowledge (`afterActionsHtml`) |
 | 2026-05-28 | **Step 3 shipped:** fresh customize handoff auto-redirect from `/created/` |
 | 2026-05-28 | **Step 4 shipped:** full Device shell E2E bundle — 87 passed, 1 skipped (WebKit touch profile); doc **Closed** |
+| 2026-05-28 | **P1-LW / S12:** `e2e/device-hub-large-wallet-summary.spec.ts` added to bundle (90 specs with new file) |

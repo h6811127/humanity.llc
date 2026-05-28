@@ -11,7 +11,9 @@ import {
   updateChildObjectRow,
 } from "../../site/js/child-object-store-core.mjs";
 import {
+  CHILD_OBJECT_STATUS_DISABLED,
   CHILD_OBJECT_TYPE_STATUS_PLATE,
+  isActiveStatusPlateRow,
   parseStatusPlateChildFields,
   parseStatusPlateChildState,
   shouldOfferAddStatusPlate,
@@ -90,6 +92,27 @@ describe("child-object-store-core", () => {
       scan_url: `https://humanity.llc/c/${PROFILE}?q=qr_testPlateScan01`,
     });
   });
+
+  it("stores disabled status on child object rows", () => {
+    const storage = new Map();
+    const ls = {
+      getItem(key: string) {
+        return storage.get(key) ?? null;
+      },
+      setItem(key: string, value: string) {
+        storage.set(key, value);
+      },
+    };
+    appendChildObjectRow(ls, PROFILE, {
+      object_id: "obj_testPlate001",
+      object_type: CHILD_OBJECT_TYPE_STATUS_PLATE,
+      public_label: "Studio door",
+      public_state: "Open",
+      created_at: "2026-05-16T17:00:00.000Z",
+    });
+    updateChildObjectRow(ls, PROFILE, "obj_testPlate001", { status: "disabled" });
+    expect(readChildObjectRows(ls, PROFILE)[0].status).toBe("disabled");
+  });
 });
 
 describe("child-object issue-qr client", () => {
@@ -100,12 +123,33 @@ describe("child-object issue-qr client", () => {
       "utf8"
     );
     expect(src).toContain("child-object-plate-issue-qr");
+    expect(src).toContain("child-object-plate-disable");
     expect(src).toContain("signChildObjectIssueQr");
+    expect(src).toContain("signChildObjectRevoke");
     expect(src).toContain("postChildObjectIssueQr");
+    expect(src).toContain("postChildObjectRevoke");
   });
 });
 
 describe("created-child-object-core", () => {
+  it("hides disabled status plates from active list", () => {
+    expect(
+      isActiveStatusPlateRow({
+        object_type: CHILD_OBJECT_TYPE_STATUS_PLATE,
+        public_label: "Door",
+        public_state: "Open",
+      })
+    ).toBe(true);
+    expect(
+      isActiveStatusPlateRow({
+        object_type: CHILD_OBJECT_TYPE_STATUS_PLATE,
+        public_label: "Door",
+        public_state: "Closed",
+        status: CHILD_OBJECT_STATUS_DISABLED,
+      })
+    ).toBe(false);
+  });
+
   it("offers add status plate only for general root cards", () => {
     expect(shouldOfferAddStatusPlate({ pilot_template: "general" })).toBe(true);
     expect(shouldOfferAddStatusPlate({ pilot_template: "status_plate" })).toBe(false);

@@ -4,7 +4,9 @@ import {
   updateChildObjectRow,
 } from "./child-object-store-core.mjs";
 import {
+  CHILD_OBJECT_STATUS_DISABLED,
   CHILD_OBJECT_TYPE_STATUS_PLATE,
+  isActiveStatusPlateRow,
   parseStatusPlateChildFields,
   parseStatusPlateChildState,
   shouldOfferAddStatusPlate,
@@ -13,7 +15,9 @@ import {
   postChildObjectCreate,
   postChildObjectUpdate,
   signChildObjectCreate,
+  signChildObjectRevoke,
   signChildObjectUpdate,
+  postChildObjectRevoke,
 } from "./child-object-update.mjs";
 import { postChildObjectIssueQr, signChildObjectIssueQr } from "./child-object-qr.mjs";
 
@@ -24,7 +28,7 @@ import { postChildObjectIssueQr, signChildObjectIssueQr } from "./child-object-q
 function renderStatusPlateList(profileId, rows) {
   const listEl = document.getElementById("child-object-status-plate-list");
   if (!listEl) return;
-  const plates = rows.filter((row) => row.object_type === CHILD_OBJECT_TYPE_STATUS_PLATE);
+  const plates = rows.filter(isActiveStatusPlateRow);
   if (!plates.length) {
     listEl.hidden = true;
     listEl.replaceChildren();
@@ -107,7 +111,13 @@ function renderStatusPlateList(profileId, rows) {
       rowStatus.hidden = true;
       rowStatus.setAttribute("role", "status");
 
-      li.append(scanWrap, form, rowStatus);
+      const disableBtn = document.createElement("button");
+      disableBtn.type = "button";
+      disableBtn.className = "btn-text child-object-plate-disable";
+      disableBtn.dataset.objectId = row.object_id;
+      disableBtn.textContent = "Disable this plate";
+
+      li.append(scanWrap, form, rowStatus, disableBtn);
       return li;
     })
   );
@@ -162,7 +172,75 @@ export function initCreatedChildObject(ctx) {
       return;
     }
 
-    if (!target.classList.contains("child-object-plate-issue-qr")) return;
+    if (!target.classList.contains("child-object-plate-issue-qr")) {
+      if (!target.classList.contains("child-object-plate-disable")) return;
+      const objectId = target.dataset.objectId;
+      if (!objectId) return;
+
+      const keys = ctx.getSigningKeys();
+      const rowEl = target.closest(".child-object-plate-row");
+      const rowStatus = rowEl?.querySelector(".child-object-plate-update-status");
+      if (!keys) {
+        if (rowStatus instanceof HTMLElement) {
+          rowStatus.hidden = false;
+          rowStatus.textContent = "Unlock owner or recovery key before disabling.";
+        }
+        return;
+      }
+
+      const stored = readChildObjectRows(localStorage, ctx.profileId).find(
+        (row) => row.object_id === objectId
+      );
+      if (!stored || typeof stored.created_at !== "string") {
+        ctx.showError("Missing child object record on this device.");
+        return;
+      }
+
+      if (
+        !window.confirm(
+          "Disable this status plate on the network? Scanners will see the object as unavailable."
+        )
+      ) {
+        return;
+      }
+
+      if (target instanceof HTMLButtonElement) target.disabled = true;
+      if (rowStatus instanceof HTMLElement) {
+        rowStatus.hidden = false;
+        rowStatus.textContent = "Signing and disabling…";
+      }
+
+      try {
+        const signed = await signChildObjectRevoke({
+          objectId,
+          parentProfileId: ctx.profileId,
+          objectType: CHILD_OBJECT_TYPE_STATUS_PLATE,
+          publicLabel: stored.public_label,
+          publicState: stored.public_state,
+          createdAt: stored.created_at,
+          privateKeyBase58: keys.privateKeyBase58,
+          publicKeyBase58: keys.publicKeyBase58,
+          status: CHILD_OBJECT_STATUS_DISABLED,
+        });
+        await postChildObjectRevoke(ctx.profileId, objectId, signed);
+        updateChildObjectRow(localStorage, ctx.profileId, objectId, {
+          status: CHILD_OBJECT_STATUS_DISABLED,
+        });
+        refreshList();
+        if (statusEl) {
+          statusEl.hidden = false;
+          statusEl.textContent = "Status plate disabled on the network.";
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        if (rowStatus instanceof HTMLElement) rowStatus.textContent = message;
+        ctx.showError(message);
+      } finally {
+        if (target instanceof HTMLButtonElement) target.disabled = false;
+      }
+      return;
+    }
+
     const objectId = target.dataset.objectId;
     if (!objectId) return;
 
