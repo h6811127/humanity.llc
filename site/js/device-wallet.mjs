@@ -9,7 +9,7 @@ import { reconcileRemovedProfilesAfterWalletSave } from "./device-wallet-removed
 
 export const WALLET_STORAGE_KEY = "hc_wallet";
 export const WALLET_SUMMARY_STORAGE_KEY = "hc_wallet_summary";
-const WALLET_SUMMARY_VERSION = 2;
+const WALLET_SUMMARY_VERSION = 3;
 
 /** @type {string | null} */
 let walletCacheRaw = null;
@@ -87,6 +87,10 @@ export function normalizeWalletQrIds(entries) {
  *   handle?: string,
  *   qr_id?: string,
  *   scan_url?: string,
+ *   hasSigningKeys?: boolean,
+ *   manifesto_line?: string,
+ *   pilot_template?: string,
+ *   saved_at?: string,
  * }} WalletSummaryRow
  */
 
@@ -138,6 +142,13 @@ function optionalString(value) {
   return typeof value === "string" && value ? value : undefined;
 }
 
+/** @param {unknown} value @param {number} maxLen */
+function optionalTruncatedString(value, maxLen = 120) {
+  if (typeof value !== "string" || !value.trim()) return undefined;
+  const trimmed = value.trim();
+  return trimmed.length > maxLen ? `${trimmed.slice(0, maxLen)}…` : trimmed;
+}
+
 /**
  * @param {Array<Record<string, unknown>>} entries
  * @param {string} walletFingerprint
@@ -164,6 +175,10 @@ function buildWalletSummary(entries, walletFingerprint) {
         handle: optionalString(entry.handle),
         qr_id: optionalString(walletEntryQrId(entry)),
         scan_url: optionalString(entry.scan_url),
+        hasSigningKeys: Boolean(entry.owner_private_key_b58),
+        manifesto_line: optionalTruncatedString(entry.manifesto_line),
+        pilot_template: optionalString(entry.pilot_template),
+        saved_at: optionalString(entry.saved_at),
       });
     }
     if (entry.owner_private_key_b58) {
@@ -309,6 +324,23 @@ export function walletEntryFromSession(session, label) {
 export function isWalletSaved(profileId) {
   if (!profileId) return false;
   return loadWalletSummary().profileIds.includes(profileId);
+}
+
+/**
+ * Hydrate a full wallet row by id (actions / signing only — not hub list render).
+ * @param {string | null | undefined} id
+ */
+export function findWalletEntryById(id) {
+  if (!id) return null;
+  return loadWallet().find((entry) => entry.id === id) ?? null;
+}
+
+/**
+ * @param {string | null | undefined} profileId
+ */
+export function findWalletEntryByProfileId(profileId) {
+  if (!profileId) return null;
+  return loadWallet().find((entry) => entry.profile_id === profileId) ?? null;
 }
 
 export function resetWalletCachesForTests() {

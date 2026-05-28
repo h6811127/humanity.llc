@@ -509,7 +509,7 @@ Phases 1–5 improved polling, but **N saved cards** on one browser is still an 
 
 ### 2. Shell performance (must fix)
 
-Every hub/inbox pass used to call `loadWallet()` and hydrate the full `hc_wallet` array. **`hc_wallet_network_cache`** is now capped at **20** fresh rows per session (S6, 2026-05-27), and shell/scan status counts, hub glance, cross-tab saved-profile checks, and card-disabled inbox reads use a lightweight `hc_wallet_summary` index instead of full key-bearing wallet rows on hot status paths. Remaining: lazy hydration for expanded hub row rendering/actions. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
+Every hub/inbox pass used to call `loadWallet()` and hydrate the full `hc_wallet` array. **`hc_wallet_network_cache`** is now capped at **20** fresh rows per session (S6, 2026-05-27), and shell/scan status counts, hub glance, cross-tab saved-profile checks, card-disabled inbox reads, **and expanded hub saved-row rendering** use a lightweight `hc_wallet_summary` index instead of full key-bearing wallet rows on hot status paths. Full wallet rows hydrate only when a steward taps row actions (Open controls, relabel, remove, etc.). Remaining: multi-tab presence coalesce at large N. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
 
 ### 3. Multi-tab presence (must fix)
 
@@ -521,6 +521,7 @@ Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). 
 
 | Date | Note |
 |------|------|
+| 2026-05-28 | **Hub saved-row lazy hydration:** expanded hub list render + network poll scheduling read `hc_wallet_summary`; full wallet hydrates on row actions only |
 | 2026-05-28 | **Large-wallet shell perf:** added `hc_wallet_summary` so status/count, hub glance, cross-tab saved-profile, and card-disabled inbox hot paths avoid full `hc_wallet` row hydration |
 | 2026-05-27 | **S6 shipped:** bound `hc_wallet_network_cache` (max 20 fresh rows, LRU prune) |
 | 2026-05-27 | **O2 step 1:** per-IP rate limit on `GET …/status` (300/min); Shell P2 lazy notifications shipped |

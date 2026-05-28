@@ -108,15 +108,17 @@ describe("loadWalletSummary", () => {
           label: undefined,
           handle: undefined,
           qr_id: "qr_xBZTq7M27tueCzBY",
+          hasSigningKeys: true,
         },
         {
           profile_id: "p2",
           scan_url: "https://humanity.llc/c/p2?q=qr_Abcdefghijkmnop",
           qr_id: "qr_Abcdefghijkmnop",
+          hasSigningKeys: false,
         },
       ],
     });
-    expect(localStore.get("hc_wallet_summary")).toContain('"count":3');
+    expect(localStore.get("hc_wallet_summary")).toContain('"hasSigningKeys":true');
     expect(localStore.get("hc_wallet_summary")).not.toContain("priv");
   });
 
