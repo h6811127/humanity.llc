@@ -6,6 +6,7 @@
  *
  * Usage:
  *   npm run hosted:rollout:step6
+ *   npm run hosted:rollout:step6 -- --preflight   # local Vitest gate before full regression
  *   npm run hosted:rollout:step6 -- --verify       # vitest + e2e (full step 6)
  *   npm run hosted:rollout:step6 -- --vitest       # step 6a only (first)
  *   npm run hosted:rollout:step6 -- --e2e          # step 6b only
@@ -19,6 +20,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
 
+const preflight = process.argv.includes("--preflight");
 const verify = process.argv.includes("--verify");
 const vitestOnly = process.argv.includes("--vitest");
 const e2eOnly = process.argv.includes("--e2e");
@@ -39,32 +41,70 @@ function runNpm(label, args) {
   }
 }
 
+export function runStep6PreflightVitest() {
+  runNpm("Rollout step 6 Vitest", [
+    "run",
+    "worker:test",
+    "--",
+    "worker/tests/hosted-rollout-step6.test.ts",
+  ]);
+  runNpm("Rollout chain Vitest (steps 4b–5b)", [
+    "run",
+    "worker:test",
+    "--",
+    "worker/tests/hosted-rollout-post-deploy-smoke.test.ts",
+    "worker/tests/hosted-rollout-step4b.test.ts",
+    "worker/tests/hosted-rollout-step5b.test.ts",
+  ]);
+}
+
+export function runStep6VitestRegression() {
+  runNpm("Step 6a — verify:hosted-g0", ["run", "verify:hosted-g0"]);
+}
+
 function printRegressionChecklist() {
-  console.log("Step 6a — Vitest regression (free-tier + hosted bundles)\n");
-  console.log("   npm run verify:hosted-g0");
-  console.log("   (= worker:test:hosted-free-tier + worker:test:steward-hosted)\n");
-  console.log("Step 6b — Playwright hosted E2E\n");
+  console.log("Step 6 — Final regression before steward announcement\n");
+  console.log("Prerequisites: steps 4b + 5b production verify passed.\n");
+  console.log("Engineering preflight (local):");
+  console.log("   npm run hosted:rollout:step6 -- --preflight\n");
+  console.log("Step 6a — Vitest regression (free-tier + hosted bundles):");
+  console.log("   npm run hosted:rollout:step6 -- --vitest");
+  console.log("   (= verify:hosted-g0)\n");
+  console.log("Step 6b — Playwright hosted E2E:");
   console.log("   npm run e2e:install   # once per machine");
-  console.log("   npm run e2e:steward-hosted");
+  console.log("   npm run hosted:rollout:step6 -- --e2e");
   console.log("   (= e2e:hosted-tier + e2e:hosted-tier-push)\n");
+  console.log("Full step 6:");
+  console.log("   npm run hosted:rollout:step6 -- --verify\n");
   console.log("Exit tests: docs/HOSTED_TIER_G0_READINESS.md § Exit tests mapped\n");
+}
+
+function runPreflight() {
+  console.log("Step 6 preflight — local gate before full regression\n");
+  runStep6PreflightVitest();
+  runStep6VitestRegression();
+  console.log("\n✅ Step 6 preflight OK.");
+  console.log("Run full regression before steward announcement:");
+  console.log("  npm run hosted:rollout:step6 -- --verify");
+  console.log("  npm run hosted:rollout:step6 -- --e2e   # Playwright only");
 }
 
 function main() {
   console.log("Hosted steward rollout — step 6 (regression)");
   console.log("Docs: docs/HOSTED_TIER_IMPLEMENTATION_EPICS.md § Production rollout\n");
 
+  if (preflight) {
+    runPreflight();
+    return;
+  }
+
   if (!verify && !vitestOnly && !e2eOnly) {
     printRegressionChecklist();
-    console.log("⏭  Run full regression before announcing hosted steward to customers:");
-    console.log("   npm run hosted:rollout:step6 -- --verify");
-    console.log("   npm run hosted:rollout:step6 -- --vitest   # step 6a only");
-    console.log("   npm run hosted:rollout:step6 -- --e2e      # step 6b only");
     return;
   }
 
   if (verify || vitestOnly) {
-    runNpm("Step 6a — verify:hosted-g0", ["run", "verify:hosted-g0"]);
+    runStep6VitestRegression();
   }
 
   if (verify || e2eOnly) {
@@ -80,4 +120,10 @@ function main() {
   }
 }
 
-main();
+const isCli =
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
+
+if (isCli) {
+  main();
+}

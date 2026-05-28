@@ -13,6 +13,8 @@ describe("hosted-rollout-step6", () => {
     expect(script).toContain("verify:hosted-g0");
     expect(script).toContain("e2e:steward-hosted");
     expect(script).toContain("HOSTED_TIER_G0_READINESS.md");
+    expect(script).toContain("--preflight");
+    expect(script).toContain("runStep6PreflightVitest");
   });
 
   it("package.json exposes hosted:rollout:step6", () => {

@@ -40,7 +40,7 @@ function printStep5bChecklist() {
   console.log(
     "   OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step5b -- --verify\n"
   );
-  console.log("Next after 5b: npm run hosted:rollout:step6 -- --verify");
+  console.log("Next after 5b: npm run hosted:rollout:step6 -- --preflight");
 }
 
 function runPreflight() {
