@@ -73,6 +73,13 @@ function runPreflight() {
   assertHostedFlagOnInToml();
   runNpm("D1 migrations (local)", ["run", "worker:migrate:local"]);
   runStep4PreflightVitest();
+  runNpm("Rollout step 4b + post-deploy CI (Vitest)", [
+    "run",
+    "worker:test",
+    "--",
+    "worker/tests/hosted-rollout-post-deploy-smoke.test.ts",
+    "worker/tests/hosted-rollout-step4b.test.ts",
+  ]);
   runNpm("Hosted verify path (Vitest)", ["run", "hosted:rollout:verify-path"]);
   console.log("\n✅ Step 4b preflight OK.");
   console.log("Start worker:dev, then:");

@@ -234,7 +234,7 @@ export async function smokeStewardOpsHostedEnabled(bearerToken, origin = getApiO
   console.log("steward-ops OK (hosted_steward_enabled=true)");
 }
 
-export async function smokeProduction(origin = apiOrigin) {
+export async function smokeProduction(origin = getApiOrigin()) {
   await smokeProductionHealth(origin);
   await smokeHostedPlansEnabled(origin);
   await smokeHostedStewardRoutesEnabled(origin);

@@ -121,13 +121,13 @@ npm run hosted:rollout:step4a -- --apply   # idempotent if already "1"
 **Rollout step 4b — deploy + smoke + verify production:**
 
 ```bash
-npm run hosted:rollout:step4 -- --deploy
-npm run hosted:rollout:step4 -- --smoke
 # Local worker (after worker:migrate:local + worker:dev):
 npm run hosted:rollout:step4b -- --preflight
 npm run hosted:rollout:step4b -- --local-smoke
-# Aliases on step4: npm run hosted:rollout:step4 -- --smoke --local --preflight
-npm run hosted:rollout:step4 -- --verify
+# Production (push worker/ to main triggers deploy-worker.yml post-deploy verify):
+npm run hosted:rollout:step4 -- --deploy
+npm run hosted:rollout:post-deploy-smoke -- --verify
+npm run hosted:rollout:step4 -- --smoke
 OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step4 -- --verify
 ```
 

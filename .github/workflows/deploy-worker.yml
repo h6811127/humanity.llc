@@ -30,3 +30,8 @@ jobs:
         run: npm run worker:deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      - name: Post-deploy hosted rollout verify (step 4b)
+        run: npm run hosted:rollout:post-deploy-smoke -- --verify
+        env:
+          API_ORIGIN: https://humanity.llc
+          OPERATOR_AUDIT_TOKEN: ${{ secrets.OPERATOR_AUDIT_TOKEN }}
