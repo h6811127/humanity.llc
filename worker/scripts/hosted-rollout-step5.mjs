@@ -2,6 +2,7 @@
  * Hosted steward production rollout — step 5b–d (E6.2 CI + verify).
  *
  * Step 5a (CF dashboard pin) — hosted:rollout:step5a
+ * Step 5b alias — hosted:rollout:step5b (--preflight · --verify)
  *
  * Usage:
  *   npm run hosted:rollout:step5
@@ -99,6 +100,35 @@ function assertE62WorkflowPresent() {
   console.log(`✓ ${e62Workflow} references OPERATOR_AUDIT_TOKEN`);
 }
 
+export function assertDeployWorkerUsesOperatorToken() {
+  const deployWorkflow = ".github/workflows/deploy-worker.yml";
+  const workflowPath = path.join(repoRoot, deployWorkflow);
+  if (!existsSync(workflowPath)) {
+    console.error(`Missing deploy workflow: ${deployWorkflow}`);
+    process.exit(1);
+  }
+  const workflow = readFileSync(workflowPath, "utf8");
+  if (!workflow.includes("OPERATOR_AUDIT_TOKEN")) {
+    console.error(`${deployWorkflow} must pass secrets.OPERATOR_AUDIT_TOKEN for post-deploy verify.`);
+    process.exit(1);
+  }
+  console.log(`✓ ${deployWorkflow} references OPERATOR_AUDIT_TOKEN`);
+}
+
+export { assertE62WorkflowPresent };
+
+export function runStep5PreflightVitest() {
+  runNpm("E6.2 steward-ops Vitest", ["run", "worker:test:steward-ops"]);
+  runNpm("Rollout step 5 Vitest", [
+    "run",
+    "worker:test",
+    "--",
+    "worker/tests/hosted-rollout-step5.test.ts",
+    "worker/tests/hosted-rollout-step5a.test.ts",
+    "worker/tests/hosted-rollout-step5b.test.ts",
+  ]);
+}
+
 /**
  * @returns {boolean | null} true = secret listed, false = missing, null = could not check
  */
@@ -167,7 +197,13 @@ async function main() {
   console.log("\n✅ Step 5 verified (E6.2 path). Next: npm run hosted:rollout:step6 -- --verify");
 }
 
-main().catch((err) => {
-  console.error(err instanceof Error ? err.message : err);
-  process.exit(1);
-});
+const isCli =
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
+
+if (isCli) {
+  main().catch((err) => {
+    console.error(err instanceof Error ? err.message : err);
+    process.exit(1);
+  });
+}

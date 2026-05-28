@@ -146,9 +146,11 @@ See [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md).
 **Rollout step 5b — E6.2 CI secret + verify:**
 
 ```bash
-npm run hosted:rollout:step5
-npm run hosted:rollout:step5 -- --verify
-OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step5 -- --verify
+npm run hosted:rollout:step5b -- --preflight
+npm run hosted:rollout:step5b
+npm run hosted:rollout:step5b -- --verify
+OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step5b -- --verify
+# hosted:rollout:step5 aliases step5b verify path
 ```
 
 **Rollout step 6 (script):**

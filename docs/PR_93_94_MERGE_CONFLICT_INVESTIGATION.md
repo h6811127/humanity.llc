@@ -154,3 +154,21 @@ npm run worker:test -- worker/tests/issue-child-object-qr.test.ts worker/tests/s
 - [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md)
 - [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md)
 - [`SCAN_WORKER_1101_POSTMORTEM.md`](SCAN_WORKER_1101_POSTMORTEM.md) — migration `0023` before scan deploy
+
+---
+
+## Resolution (2026-05-28)
+
+| PR | Branch | Action | Result |
+|----|--------|--------|--------|
+| **#94** | `cursor/hosted-rollout-step4a-9f90` | Merged `main`; kept main step 4b tooling + remote production verify notes | **Mergeable** — no conflicts vs `main` |
+| **#93** | `cursor/child-object-scan-qr-30c9` | Reset to `main` tip (PR superseded by shipped `/issue-qr` path) | **Mergeable** — identical to `main` |
+
+**Also on `main`:** `V1_IMPLEMENTATION_CONTRACTS.md` updated with `child_object` scope and `/issue-qr` route (commit `261a4039`).
+
+**Verify locally:**
+
+```bash
+git fetch origin pull/93/head pull/94/head
+git merge-tree $(git merge-base main FETCH_HEAD) main FETCH_HEAD  # repeat per PR
+```
