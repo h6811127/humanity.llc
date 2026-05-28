@@ -16,8 +16,7 @@ import {
   withCors,
 } from "./http/resolver";
 import { handlePostArtifactIntent, handlePostArtifactIntentAttach } from "./resolver/artifact-intents";
-import { handleGetStoreOrderStatus } from "./store/store-order-status-handler";
-import { handleGetStoreProduct, handleGetStoreRows } from "./store/store-rows-handler";
+import { handleGetStoreOrderStatus } from "./resolver/store-order-status";
 import { handleGetCard, handlePostCards } from "./resolver/create-card";
 import {
   handleGetLiveControlChallenge,
@@ -82,6 +81,8 @@ export interface Env {
   STRIPE_WEBHOOK_SECRET?: string;
   /** O-001 Shopify webhook HMAC secret. */
   SHOPIFY_WEBHOOK_SECRET?: string;
+  /** AES-256 key (32 bytes, base64) for encrypted fulfillment shipping at rest. */
+  FULFILLMENT_PII_ENCRYPTION_KEY?: string;
   /** O-002 Printify personal access token (server-only). */
   PRINTIFY_API_TOKEN?: string;
   /** O-002 Printify shop id for order submit. */
@@ -96,6 +97,30 @@ export interface Env {
   TIER0_PRINTIFY_VARIANT_ID?: string;
   /** Tier 0 Printify shipping_method id (default 1). */
   TIER0_PRINTIFY_SHIPPING_METHOD?: string;
+  /** Tier 1 personalized hoodie Printify product id. */
+  PERSONALIZE_HOODIE_PRINTIFY_PRODUCT_ID?: string;
+  /** Tier 1 personalized hoodie Printify variant id (integer). */
+  PERSONALIZE_HOODIE_PRINTIFY_VARIANT_ID?: string;
+  /** Tier 1 personalized hoodie Printify shipping_method id (default 1). */
+  PERSONALIZE_HOODIE_PRINTIFY_SHIPPING_METHOD?: string;
+  /** Tier 1 personalized sticker Printify product id. */
+  PERSONALIZE_STICKER_PRINTIFY_PRODUCT_ID?: string;
+  /** Tier 1 personalized sticker Printify variant id (integer). */
+  PERSONALIZE_STICKER_PRINTIFY_VARIANT_ID?: string;
+  /** Tier 1 personalized sticker Printify shipping_method id (default 1). */
+  PERSONALIZE_STICKER_PRINTIFY_SHIPPING_METHOD?: string;
+  /** Tier 1 hoodie Printify blueprint id for per-order artwork products. */
+  PERSONALIZE_HOODIE_PRINTIFY_BLUEPRINT_ID?: string;
+  /** Tier 1 hoodie Printify print provider id. */
+  PERSONALIZE_HOODIE_PRINTIFY_PRINT_PROVIDER_ID?: string;
+  /** Tier 1 hoodie print placeholder (default front). */
+  PERSONALIZE_HOODIE_PRINTIFY_PLACEHOLDER?: string;
+  /** Tier 1 sticker Printify blueprint id for per-order artwork products. */
+  PERSONALIZE_STICKER_PRINTIFY_BLUEPRINT_ID?: string;
+  /** Tier 1 sticker Printify print provider id. */
+  PERSONALIZE_STICKER_PRINTIFY_PRINT_PROVIDER_ID?: string;
+  /** Tier 1 sticker print placeholder (default front). */
+  PERSONALIZE_STICKER_PRINTIFY_PLACEHOLDER?: string;
   /** Tier 0 batch sticker: campaign card profile_id (must exist in D1). */
   TIER0_CAMPAIGN_PROFILE_ID?: string;
   /** Tier 0 batch sticker: comma-separated Shopify variant ids. */
@@ -593,6 +618,17 @@ export default {
       return withCors(request, res);
     }
 
+    if (path === "/v1/store/order-status" && request.method === "GET") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetStoreOrderStatus(request, env.DB);
+      return withCors(request, res);
+    }
+
     const artifactIntentAttachMatch = path.match(
       /^\/v1\/store\/artifact-intents\/([^/]+)\/attach$/
     );
@@ -608,28 +644,6 @@ export default {
         env.DB,
         artifactIntentAttachMatch[1]!
       );
-      return withCors(request, res);
-    }
-
-    if (path === "/v1/store/orders/status" && request.method === "GET") {
-      if (!env.DB) {
-        return withCors(
-          request,
-          jsonResponse({ error: "database_unconfigured" }, 503)
-        );
-      }
-      const res = await handleGetStoreOrderStatus(request, env.DB);
-      return withCors(request, res);
-    }
-
-    if (path === "/v1/store/rows" && request.method === "GET") {
-      const res = await handleGetStoreRows();
-      return withCors(request, res);
-    }
-
-    const storeProductMatch = path.match(/^\/v1\/store\/products\/([^/]+)$/);
-    if (storeProductMatch && request.method === "GET") {
-      const res = await handleGetStoreProduct(decodeURIComponent(storeProductMatch[1]!));
       return withCors(request, res);
     }
 

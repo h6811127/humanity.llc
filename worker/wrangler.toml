@@ -14,7 +14,7 @@ account_id = "6ad770a7c6336c0c13cfb2c88c2bf8da"
 # Then paste the returned database_id below.
 [[d1_databases]]
 binding = "DB"
-database_name = "humanity-resolver"
+database_name =  "humanity-resolver"
 database_id = "f16391f9-613a-4506-9ad7-35d19178b8b6"
 migrations_dir = "migrations"
 preview_database_id = "f16391f9-613a-4506-9ad7-35d19178b8b6"
@@ -35,23 +35,46 @@ HOSTED_STEWARD_ENABLED = "0"
 # TIER0_PRINTIFY_PRODUCT_ID = ""
 # TIER0_PRINTIFY_VARIANT_ID = ""
 # TIER0_PRINTIFY_SHIPPING_METHOD = "1"
-# Tier 1 personalized sticker (Phase 4 E2E — hc-sticker-square-v1):
-# PERSONALIZED_STICKER_PRINTIFY_PRODUCT_ID = ""
-# PERSONALIZED_STICKER_PRINTIFY_VARIANT_ID = ""
-# PERSONALIZED_STICKER_PRINTIFY_SHIPPING_METHOD = "1"
+# Tier 1 personalized fulfillment (artifact intent → print order queue):
+# PERSONALIZE_HOODIE_PRINTIFY_PRODUCT_ID = ""
+# PERSONALIZE_HOODIE_PRINTIFY_VARIANT_ID = ""
+# PERSONALIZE_HOODIE_PRINTIFY_SHIPPING_METHOD = "1"
+# Per-order artwork (PM-FR-13): blueprint + provider + placeholder for ephemeral product create
+# PERSONALIZE_HOODIE_PRINTIFY_BLUEPRINT_ID = ""
+# PERSONALIZE_HOODIE_PRINTIFY_PRINT_PROVIDER_ID = ""
+# PERSONALIZE_HOODIE_PRINTIFY_PLACEHOLDER = "front"
+# PERSONALIZE_HOODIE_PRINTIFY_IMAGE_X = "0.5"
+# PERSONALIZE_HOODIE_PRINTIFY_IMAGE_Y = "0.5"
+# PERSONALIZE_HOODIE_PRINTIFY_IMAGE_SCALE = "1"
+# PERSONALIZE_HOODIE_PRINTIFY_IMAGE_ANGLE = "0"
+# PERSONALIZE_STICKER_PRINTIFY_PRODUCT_ID = ""
+# PERSONALIZE_STICKER_PRINTIFY_VARIANT_ID = ""
+# PERSONALIZE_STICKER_PRINTIFY_SHIPPING_METHOD = "1"
+# PERSONALIZE_STICKER_PRINTIFY_BLUEPRINT_ID = ""
+# PERSONALIZE_STICKER_PRINTIFY_PRINT_PROVIDER_ID = ""
+# PERSONALIZE_STICKER_PRINTIFY_PLACEHOLDER = "front"
 # Printify webhook (O-003): register in Printify admin → POST …/v1/print/webhooks/printify
 # PRINTIFY_WEBHOOK_SECRET = ""  # wrangler secret; must match Printify webhook secret
+# Encrypted shipping from Shopify paid webhook (PM-FR-41 / PM-SEC-05): 32 raw bytes, base64
+# FULFILLMENT_PII_ENCRYPTION_KEY = ""  # wrangler secret; generate: openssl rand -base64 32
 
 # Daily orphan card purge (04:00 UTC). See docs/CARD_RETENTION_AND_ORPHAN_CLEANUP.md
 [triggers]
 crons = ["0 4 * * *"]
 
+# L3 P1 — opt-in scan explainer (docs/AI_L3_EXPLAIN_SNAPSHOT.md)
+[ai]
+binding = "AI"
+
 [[routes]]
- pattern = "humanity.llc/.well-known/hc/v1/*"
- zone_id = "180ee38ceea795d281fb5a3bd51af533"
- [[routes]]
- pattern = "humanity.llc/c/*"
- zone_id = "180ee38ceea795d281fb5a3bd51af533"
+pattern = "humanity.llc/.well-known/hc/v1/*"
+zone_id = "180ee38ceea795d281fb5a3bd51af533"
+
 [[routes]]
- pattern = "humanity.llc/v1/*"
- zone_id = "180ee38ceea795d281fb5a3bd51af533"
+pattern = "humanity.llc/c/*"
+zone_id = "180ee38ceea795d281fb5a3bd51af533"
+
+# Commerce + print middleware (artifact intents, Shopify webhooks, Printify)
+[[routes]]
+pattern = "humanity.llc/v1/*"
+zone_id = "180ee38ceea795d281fb5a3bd51af533"

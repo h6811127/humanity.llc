@@ -10,7 +10,7 @@ import {
   getPrintOrderByPrintifyOrderId,
   updatePrintOrderStatus,
 } from "../db/print-orders";
-import type { Env } from "../index";
+import type { Env } from "../env";
 import { statusFromPrintifyWebhookEvent } from "../print/printify-status-map";
 import { verifyPrintifyWebhookSignature } from "../print/printify-webhook-verify";
 import { errorResponse, jsonResponse } from "./resolver";

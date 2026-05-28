@@ -17,6 +17,10 @@ export interface ShopifyOrderLike {
   checkout_id?: number | string | null;
   checkout_token?: string | null;
   financial_status?: string | null;
+  email?: string | null;
+  order_number?: number | null;
+  name?: string | null;
+  shipping_address?: Record<string, unknown> | null;
   line_items?: ShopifyLineItem[];
   note_attributes?: ShopifyNameValue[];
 }
@@ -24,6 +28,8 @@ export interface ShopifyOrderLike {
 export interface ExtractedShopifyOrderMetadata {
   shopify_order_id: string;
   shopify_checkout_id: string | null;
+  shopify_order_number: number | null;
+  buyer_email: string | null;
   profile_id: string | null;
   artifact_intent_ids: string[];
 }
@@ -133,7 +139,24 @@ export function extractShopifyOrderMetadata(
   return {
     shopify_order_id: shopifyOrderId,
     shopify_checkout_id: checkoutId,
+    shopify_order_number: parseShopifyOrderNumber(order),
+    buyer_email:
+      typeof order.email === "string" && order.email.trim()
+        ? order.email.trim().toLowerCase()
+        : null,
     profile_id: profileId,
     artifact_intent_ids: collectIntentIds(intentIdSources),
   };
+}
+
+function parseShopifyOrderNumber(order: ShopifyOrderLike): number | null {
+  if (typeof order.order_number === "number" && Number.isFinite(order.order_number)) {
+    return order.order_number;
+  }
+  if (typeof order.name === "string") {
+    const digits = order.name.trim().replace(/^#+/, "");
+    const n = Number.parseInt(digits, 10);
+    if (Number.isFinite(n) && n > 0) return n;
+  }
+  return null;
 }

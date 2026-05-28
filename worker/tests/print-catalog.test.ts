@@ -2,31 +2,34 @@ import { describe, expect, it } from "vitest";
 
 import {
   DEFAULT_PRINT_TEMPLATE_ID,
-  getPersonalizablePrintCatalog,
-  HOODIE_LIVE_OBJECT_TEMPLATE_ID,
-  resolvePrintTemplateForStoreProductId,
-  STICKER_PERSONALIZED_STORE_PRODUCT_ID,
-  TIER0_BATCH_PRINT_TEMPLATE_ID,
+  HOODIE_LIVE_OBJECT_PRODUCT_ID,
+  HOODIE_PRINT_TEMPLATE_ID,
+  STICKER_PERSONALIZED_PRODUCT_ID,
+  getPrintCatalogProduct,
+  resolvePrintTemplateIdForProduct,
 } from "../src/print/print-catalog";
 
-describe("print-catalog", () => {
-  it("excludes Tier 0 batch from personalizable catalog", () => {
-    const personalizable = getPersonalizablePrintCatalog();
-    expect(personalizable.some((p) => p.template_id === TIER0_BATCH_PRINT_TEMPLATE_ID)).toBe(
-      false
-    );
-    expect(personalizable.some((p) => p.template_id === HOODIE_LIVE_OBJECT_TEMPLATE_ID)).toBe(
-      true
+describe("resolvePrintTemplateIdForProduct", () => {
+  it("maps hoodie product to hoodie template", () => {
+    expect(resolvePrintTemplateIdForProduct(HOODIE_LIVE_OBJECT_PRODUCT_ID)).toBe(
+      HOODIE_PRINT_TEMPLATE_ID
     );
   });
 
-  it("maps storefront product ids to print templates", () => {
-    expect(resolvePrintTemplateForStoreProductId(STICKER_PERSONALIZED_STORE_PRODUCT_ID)).toBe(
+  it("maps sticker product and unknown to default sticker template", () => {
+    expect(resolvePrintTemplateIdForProduct(STICKER_PERSONALIZED_PRODUCT_ID)).toBe(
       DEFAULT_PRINT_TEMPLATE_ID
     );
-    expect(resolvePrintTemplateForStoreProductId("hoodie_live_object_v1")).toBe(
-      HOODIE_LIVE_OBJECT_TEMPLATE_ID
+    expect(resolvePrintTemplateIdForProduct(null)).toBe(DEFAULT_PRINT_TEMPLATE_ID);
+    expect(resolvePrintTemplateIdForProduct("unknown_product")).toBe(DEFAULT_PRINT_TEMPLATE_ID);
+  });
+});
+
+describe("getPrintCatalogProduct", () => {
+  it("includes Tier 1 hoodie and sticker templates", () => {
+    expect(getPrintCatalogProduct(HOODIE_PRINT_TEMPLATE_ID)?.type).toBe("hoodie");
+    expect(getPrintCatalogProduct(DEFAULT_PRINT_TEMPLATE_ID)?.product_id).toBe(
+      "prod_sticker_square"
     );
-    expect(resolvePrintTemplateForStoreProductId(null)).toBe(DEFAULT_PRINT_TEMPLATE_ID);
   });
 });

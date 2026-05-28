@@ -1,91 +1,115 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  buildOrderTimeline,
-  buildStoreOrderStatusResponse,
-  isValidArtifactIntentLookupId,
-  printStatusLabel,
-} from "../src/store/store-order-status";
+import { hashBuyerEmail } from "../src/commerce/buyer-email-hash";
 import type { CommerceOrderRow } from "../src/db/commerce-orders";
 import type { PrintOrderRow } from "../src/db/print-orders";
+import { handleGetStoreOrderStatus } from "../src/resolver/store-order-status";
 
-function commerce(overrides: Partial<CommerceOrderRow> = {}): CommerceOrderRow {
-  return {
-    commerce_order_id: "co_test123456789012345",
-    shopify_order_id: "450789469",
-    shopify_checkout_id: "901414060",
-    profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
-    artifact_intent_ids_json: JSON.stringify(["ai_PaidWebhookTest01"]),
-    print_order_ids_json: JSON.stringify(["po_test123456789012345"]),
-    status: "processing",
-    hold_reason: null,
-    created_at: "2026-05-16T17:00:00Z",
-    updated_at: "2026-05-16T18:00:00Z",
-    ...overrides,
-  };
+const EMAIL = "buyer@example.com";
+const ORDER_NUMBER = 1001;
+const SHOPIFY_ID = "450789469";
+
+async function emailHash(): Promise<string> {
+  return hashBuyerEmail(EMAIL);
 }
 
-function printOrder(overrides: Partial<PrintOrderRow> = {}): PrintOrderRow {
+function dbFor(commerce: CommerceOrderRow | null, printOrders: PrintOrderRow[] = []): D1Database {
   return {
-    order_id: "po_test123456789012345",
-    profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
-    print_artifact_ids_json: "[]",
-    planned_item_qr_ids_json: '["qr_planned1"]',
-    commerce_order_id: "co_test123456789012345",
-    shopify_order_id: "450789469",
-    printify_order_id: null,
-    printify_shop_id: null,
-    template_id: "hc-sticker-square-v1",
-    status: "awaiting_production_approval",
-    shipping_method: "standard",
-    created_at: "2026-05-16T17:00:00Z",
-    updated_at: "2026-05-16T18:00:00Z",
-    ...overrides,
-  };
+    prepare: (sql: string) => ({
+      bind: (...args: unknown[]) => ({
+        first: async () => {
+          if (sql.includes("WHERE shopify_order_id = ?")) {
+            if (commerce && args[0] === commerce.shopify_order_id) return commerce;
+            return null;
+          }
+          if (sql.includes("WHERE shopify_order_number = ?")) {
+            if (commerce && args[0] === commerce.shopify_order_number) return commerce;
+            return null;
+          }
+          if (sql.includes("FROM print_orders WHERE commerce_order_id")) {
+            return printOrders[0] ?? null;
+          }
+          return null;
+        },
+        all: async () => ({ results: printOrders }),
+      }),
+    }),
+  } as unknown as D1Database;
 }
 
-describe("store-order-status", () => {
-  it("validates artifact intent lookup ids", () => {
-    expect(isValidArtifactIntentLookupId("ai_Hc9mP2nQ4rT6vW8yZ1")).toBe(true);
-    expect(isValidArtifactIntentLookupId("bad")).toBe(false);
+describe("GET /v1/store/order-status", () => {
+  it("returns buyer-safe status when email and order number match", async () => {
+    const hash = await emailHash();
+    const commerce: CommerceOrderRow = {
+      commerce_order_id: "co_storeStatusTest01",
+      shopify_order_id: SHOPIFY_ID,
+      shopify_checkout_id: null,
+      shopify_order_number: ORDER_NUMBER,
+      buyer_email_hash: hash,
+      profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+      artifact_intent_ids_json: JSON.stringify(["ai_testIntent001"]),
+      print_order_ids_json: "[]",
+      status: "processing",
+      hold_reason: null,
+      created_at: "2026-05-16T17:00:00Z",
+      updated_at: "2026-05-16T17:00:00Z",
+    };
+    const printOrder: PrintOrderRow = {
+      order_id: "po_storeStatusTest1",
+      profile_id: commerce.profile_id!,
+      print_artifact_ids_json: "[]",
+      planned_item_qr_ids_json: "[]",
+      commerce_order_id: commerce.commerce_order_id,
+      shopify_order_id: SHOPIFY_ID,
+      printify_order_id: null,
+      printify_shop_id: null,
+      template_id: "hc-sticker-square-v1",
+      status: "in_production",
+      shipping_method: "standard",
+      created_at: "2026-05-16T17:00:00Z",
+      updated_at: "2026-05-16T17:10:00Z",
+    };
+
+    const res = await handleGetStoreOrderStatus(
+      new Request(
+        `https://humanity.llc/v1/store/order-status?order=${ORDER_NUMBER}&email=${encodeURIComponent(EMAIL)}`
+      ),
+      dbFor(commerce, [printOrder])
+    );
+
+    expect(res.status).toBe(200);
+    const json = (await res.json()) as {
+      status: string;
+      order_number: string;
+      fulfillment_mode: string;
+    };
+    expect(json.status).toBe("in_production");
+    expect(json.order_number).toBe("#1001");
+    expect(json.fulfillment_mode).toBe("personalized");
   });
 
-  it("builds timeline for processing personalized order", () => {
-    const timeline = buildOrderTimeline(
-      commerce(),
-      printOrder(),
-      "sticker_personalized_v1"
-    );
-    expect(timeline[0]?.state).toBe("complete");
-    expect(timeline.some((step) => step.id === "print_queued" && step.state === "current")).toBe(
-      true
-    );
-    expect(timeline.some((step) => step.id === "shipped")).toBe(true);
-  });
+  it("returns 404 for wrong email without leaking existence", async () => {
+    const commerce: CommerceOrderRow = {
+      commerce_order_id: "co_storeStatusTest02",
+      shopify_order_id: SHOPIFY_ID,
+      shopify_checkout_id: null,
+      shopify_order_number: ORDER_NUMBER,
+      buyer_email_hash: await emailHash(),
+      profile_id: null,
+      artifact_intent_ids_json: "[]",
+      print_order_ids_json: "[]",
+      status: "processing",
+      hold_reason: null,
+      created_at: "2026-05-16T17:00:00Z",
+      updated_at: "2026-05-16T17:00:00Z",
+    };
 
-  it("marks held orders with issue state", () => {
-    const timeline = buildOrderTimeline(
-      commerce({ status: "held_for_review", hold_reason: "CHECKOUT_METADATA_MISSING" }),
-      null,
-      null
+    const res = await handleGetStoreOrderStatus(
+      new Request(
+        `https://humanity.llc/v1/store/order-status?order=${ORDER_NUMBER}&email=wrong@example.com`
+      ),
+      dbFor(commerce)
     );
-    expect(timeline[0]?.state).toBe("issue");
-    expect(timeline[0]?.detail).toMatch(/verify order details/i);
-  });
-
-  it("builds safe response without internal ids", () => {
-    const response = buildStoreOrderStatusResponse(
-      commerce(),
-      printOrder({ status: "in_production" }),
-      "sticker_personalized_v1"
-    );
-    expect(response.fulfillment_mode).toBe("personalized");
-    expect(response.print_status_label).toBe("In production");
-    expect(JSON.stringify(response)).not.toMatch(/commerce_order_id|shopify_order_id/);
-  });
-
-  it("labels print statuses for shoppers", () => {
-    expect(printStatusLabel("fulfilled")).toBe("Shipped");
-    expect(printStatusLabel("awaiting_production_approval")).toBe("Awaiting print approval");
+    expect(res.status).toBe(404);
   });
 });

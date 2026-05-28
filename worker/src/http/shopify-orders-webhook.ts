@@ -2,6 +2,10 @@
  * Shopify order webhooks → commerce order links (O-001).
  * Printify submission deferred to O-002; missing metadata holds for operator review.
  */
+import { hashBuyerEmail } from "../commerce/buyer-email-hash";
+import { fulfillmentPiiEncryptionConfigured } from "../commerce/fulfillment-pii-crypto";
+import { parseShopifyOrderShippingAddress } from "../commerce/shopify-shipping-address";
+import { upsertEncryptedShippingAddress } from "../db/commerce-fulfillment-pii";
 import {
   countTier0LineQuantity,
   extractShopifyOrderMetadata,
@@ -24,7 +28,7 @@ import {
 } from "../db/commerce-orders";
 import { errorResponse, jsonResponse } from "./resolver";
 import { verifyShopifyWebhookHmac } from "./shopify-webhook-verify";
-import type { Env } from "../index";
+import type { Env } from "../env";
 import { generateCommerceOrderId } from "../id";
 import { queuePrintOrderAfterPaidWebhook } from "../print/print-orders-handler";
 
@@ -194,11 +198,16 @@ async function handlePaidOrder(
 
   const validation = await resolvePaidOrderValidation(db, order, metadata, env, nowIso);
   const commerceOrderId = generateCommerceOrderId();
+  const buyerEmailHash = metadata.buyer_email
+    ? await hashBuyerEmail(metadata.buyer_email)
+    : null;
 
   await insertCommerceOrder(db, {
     commerce_order_id: commerceOrderId,
     shopify_order_id: metadata.shopify_order_id,
     shopify_checkout_id: metadata.shopify_checkout_id,
+    shopify_order_number: metadata.shopify_order_number,
+    buyer_email_hash: buyerEmailHash,
     profile_id: validation.profile_id,
     artifact_intent_ids: validation.artifact_intent_ids,
     status: validation.status,
@@ -210,11 +219,24 @@ async function handlePaidOrder(
     await markIntentsConverted(db, validation.artifact_intent_ids, nowIso);
   }
 
+  if (fulfillmentPiiEncryptionConfigured(env)) {
+    const shippingAddress = parseShopifyOrderShippingAddress(order);
+    if (shippingAddress) {
+      await upsertEncryptedShippingAddress(db, env, {
+        commerce_order_id: commerceOrderId,
+        shipping_address: shippingAddress,
+        now_iso: nowIso,
+      });
+    }
+  }
+
   let printOrderIds: string[] = [];
   const row: CommerceOrderRow = {
     commerce_order_id: commerceOrderId,
     shopify_order_id: metadata.shopify_order_id,
     shopify_checkout_id: metadata.shopify_checkout_id,
+    shopify_order_number: metadata.shopify_order_number,
+    buyer_email_hash: buyerEmailHash,
     profile_id: validation.profile_id,
     artifact_intent_ids_json: JSON.stringify(validation.artifact_intent_ids),
     print_order_ids_json: "[]",

@@ -26,6 +26,8 @@ function commerceOrder(): CommerceOrderRow {
     commerce_order_id: COMMERCE,
     shopify_order_id: SHOPIFY,
     shopify_checkout_id: "901414060",
+    shopify_order_number: 1001,
+    buyer_email_hash: null,
     profile_id: PROFILE,
     artifact_intent_ids_json: JSON.stringify([INTENT]),
     print_order_ids_json: JSON.stringify([PRINT_ORDER]),

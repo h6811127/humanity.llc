@@ -5,12 +5,34 @@
 
 let cached = null;
 
+function shouldCacheShopConfig() {
+  if (typeof location === "undefined") return true;
+  const host = location.hostname;
+  return host !== "127.0.0.1" && host !== "localhost";
+}
+
+export function resetShopConfigCache() {
+  cached = null;
+}
+
 export async function loadShopConfig() {
-  if (cached) return cached;
+  if (typeof globalThis !== "undefined") {
+    const host = globalThis.location?.hostname;
+    const e2eConfig = globalThis.__HC_E2E_SHOP_CONFIG__;
+    if (
+      e2eConfig &&
+      typeof e2eConfig === "object" &&
+      (host === "127.0.0.1" || host === "localhost")
+    ) {
+      return e2eConfig;
+    }
+  }
+  if (shouldCacheShopConfig() && cached) return cached;
   const res = await fetch("/data/shop-config.json", { cache: "no-store" });
   if (!res.ok) throw new Error("Shop config unavailable");
-  cached = await res.json();
-  return cached;
+  const config = await res.json();
+  if (shouldCacheShopConfig()) cached = config;
+  return config;
 }
 
 /**

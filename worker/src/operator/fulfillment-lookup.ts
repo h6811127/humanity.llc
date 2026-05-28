@@ -18,7 +18,7 @@ import {
 } from "../db/print-orders";
 import { operatorAuditAuthorized } from "../http/operator-auth";
 import { errorResponse, jsonResponse } from "../http/resolver";
-import type { Env } from "../index";
+import type { Env } from "../env";
 
 export interface FulfillmentLookupQuery {
   shopify_order_id?: string;

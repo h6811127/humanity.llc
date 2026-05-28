@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Thanks · humanity.llc shop</title>
+    <title>Thanks · Founding sticker · humanity.llc</title>
     <meta
       name="description"
-      content="Thanks for your humanity.llc order. Track print status and read what to expect when your item ships."
+      content="Thanks for backing the Tier 0 founding signal sticker. Scan before you stick; buying merch does not verify you."
     />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=123" />
+    <link rel="stylesheet" href="/styles.css?v=79" />
     <link rel="stylesheet" href="/css/device-shell.css?v=2" />
   </head>
   <body class="screen-shop-body">
@@ -23,67 +23,60 @@
 
       <main class="screen screen-shop">
         <section class="hero hero-compact shop-hero">
-          <p class="hero-eyebrow">Shop · thanks</p>
-          <h1>Payment received — here&rsquo;s what happens next</h1>
+          <p class="hero-eyebrow">Tier 0 · thanks</p>
+          <h1>Your sticker ships  -  your status doesn&rsquo;t</h1>
           <p class="hero-line">
-            Thanks for backing a physical experiment in human trust. Track production below, then
-            read what to expect when your item arrives. <strong>Buying merch does not verify you.</strong>
+            Thanks for backing a physical experiment in human trust. When your sticker arrives,
+            <strong>scan it before you stick it anywhere</strong>. You&rsquo;ll see live status and
+            plain limits  -  not a verified badge in the mail.
           </p>
         </section>
 
-        <section
-          class="group shop-thanks-status-group"
-          id="shop-thanks-status"
-          hidden
-          aria-labelledby="shop-thanks-status-headline"
-        >
-          <h2 class="group-label" id="shop-thanks-status-headline">Order status</h2>
-          <p class="shop-lead" id="shop-thanks-status-lead"></p>
-          <div id="shop-thanks-timeline" hidden></div>
-        </section>
-
-        <section class="group shop-thanks-lookup-group" aria-labelledby="shop-thanks-lookup-title">
-          <h2 class="group-label" id="shop-thanks-lookup-title">Track your order</h2>
-          <p class="shop-lead shop-lead-muted">
-            Use the personalization reference from your Shopify confirmation
-            (<code>artifact_intent_id</code> line item property) or your Shopify order number.
+        <section class="group" id="shop-thanks-status-section">
+          <h2 class="group-label">Order status</h2>
+          <p class="shop-required-line">
+            Check fulfillment progress with your Shopify order number and checkout email.
           </p>
-          <form id="shop-thanks-lookup-form" class="shop-thanks-lookup-form" autocomplete="off">
-            <label class="form-label" for="shop-thanks-lookup-intent">Personalization reference</label>
+          <form class="shop-thanks-status-form" id="shop-thanks-status-form">
+            <label class="form-label" for="shop-thanks-order">Order number</label>
             <input
               class="form-input"
-              id="shop-thanks-lookup-intent"
-              name="artifact_intent_id"
-              inputmode="text"
-              placeholder="ai_…"
-            />
-            <label class="form-label" for="shop-thanks-lookup-order">Shopify order number</label>
-            <input
-              class="form-input"
-              id="shop-thanks-lookup-order"
-              name="shopify_order_id"
+              id="shop-thanks-order"
+              name="order"
               inputmode="numeric"
-              placeholder="e.g. 450789469"
+              autocomplete="off"
+              placeholder="#1001"
+              required
             />
-            <button type="submit" class="btn-primary shop-thanks-lookup-btn">Check status</button>
+            <label class="form-label" for="shop-thanks-email">Email used at checkout</label>
+            <input
+              class="form-input"
+              id="shop-thanks-email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              placeholder="you@example.com"
+              required
+            />
+            <button class="btn btn-primary" type="submit">Check status</button>
           </form>
-          <p class="form-status error" id="shop-thanks-status-error" hidden role="alert"></p>
+          <div class="shop-thanks-status-result" id="shop-thanks-status-result" hidden></div>
         </section>
 
         <section class="group">
-          <h2 class="group-label">When your item arrives</h2>
+          <h2 class="group-label">What to do next</h2>
           <ul class="shop-bullets shop-bullets-get">
-            <li>Scan the QR when it arrives — check active / revoked / limits on the page</li>
+            <li>Scan the QR when it arrives  -  check active / revoked / limits on the page</li>
             <li>
-              Create a free Humanity Card if you want belonging in the graph —
+              Create a free Humanity Card if you want belonging in the graph  -
               <a href="/create/">/create/</a>
             </li>
-            <li>Vouch only when it&rsquo;s true — vouches are not sold at checkout</li>
+            <li>Vouch only when it&rsquo;s true  -  vouches are not sold at checkout</li>
           </ul>
           <p class="shop-required-line" role="note">
-            <strong>Buying merch did not verify you.</strong> Save an encrypted backup or recovery
-            key on <a href="/created/">/created/</a> if you created a root card; it controls
-            any personalized object QRs you print.
+            <strong>Buying this sticker did not verify you.</strong> Save an encrypted backup or
+            recovery key on <a href="/created/">/created/</a> if you created a root card; it
+            controls any personalized object QRs you print.
           </p>
         </section>
 
@@ -92,7 +85,7 @@
             <li class="list-row list-action">
               <a href="/shop/">
                 <span class="list-content">
-                  <span class="list-title">Shop hub</span>
+                  <span class="list-title">Back to the drop page</span>
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </a>
