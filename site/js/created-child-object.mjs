@@ -1,0 +1,240 @@
+import {
+  appendChildObjectRow,
+  readChildObjectRows,
+  updateChildObjectRow,
+} from "./child-object-store-core.mjs";
+import {
+  CHILD_OBJECT_TYPE_STATUS_PLATE,
+  parseStatusPlateChildFields,
+  parseStatusPlateChildState,
+  shouldOfferAddStatusPlate,
+} from "./created-child-object-core.mjs";
+import {
+  postChildObjectCreate,
+  postChildObjectUpdate,
+  signChildObjectCreate,
+  signChildObjectUpdate,
+} from "./child-object-update.mjs";
+
+/**
+ * @param {string} profileId
+ * @param {ReturnType<typeof readChildObjectRows>} rows
+ */
+function renderStatusPlateList(profileId, rows) {
+  const listEl = document.getElementById("child-object-status-plate-list");
+  if (!listEl) return;
+  const plates = rows.filter((row) => row.object_type === CHILD_OBJECT_TYPE_STATUS_PLATE);
+  if (!plates.length) {
+    listEl.hidden = true;
+    listEl.replaceChildren();
+    return;
+  }
+  listEl.hidden = false;
+  listEl.replaceChildren(
+    ...plates.map((row) => {
+      const li = document.createElement("li");
+      li.className = "list-row child-object-plate-row";
+      li.dataset.objectId = row.object_id;
+
+      const content = document.createElement("span");
+      content.className = "list-content";
+      const title = document.createElement("span");
+      title.className = "list-title";
+      title.textContent = row.public_label;
+      const sub = document.createElement("span");
+      sub.className = "list-sub child-object-plate-current-state";
+      sub.textContent = row.public_state;
+      content.append(title, sub);
+      li.append(content);
+
+      const form = document.createElement("form");
+      form.className = "compact-form child-object-plate-update-form";
+      form.noValidate = true;
+
+      const label = document.createElement("label");
+      label.className = "form-label";
+      label.textContent = "Update status line";
+      form.append(label);
+
+      const input = document.createElement("input");
+      input.className = "form-input";
+      input.type = "text";
+      input.name = "public_state";
+      input.maxLength = 280;
+      input.autocomplete = "off";
+      input.required = true;
+      input.value = row.public_state;
+      form.append(input);
+
+      const button = document.createElement("button");
+      button.type = "submit";
+      button.className = "btn-secondary";
+      button.textContent = "Publish update";
+      form.append(button);
+
+      const rowStatus = document.createElement("p");
+      rowStatus.className = "form-hint child-object-plate-update-status";
+      rowStatus.hidden = true;
+      rowStatus.setAttribute("role", "status");
+
+      li.append(form, rowStatus);
+      return li;
+    })
+  );
+}
+
+/**
+ * @param {{
+ *   profileId: string;
+ *   getSession: () => Record<string, unknown> | null;
+ *   showError: (msg: string) => void;
+ *   getSigningKeys: () => { privateKeyBase58: string; publicKeyBase58: string } | null;
+ * }} ctx
+ */
+export function initCreatedChildObject(ctx) {
+  const panel = document.getElementById("child-object-add-status-plate");
+  const form = document.getElementById("child-object-status-plate-form");
+  const statusEl = document.getElementById("child-object-status-plate-status");
+  const listEl = document.getElementById("child-object-status-plate-list");
+  if (!panel || !form) return null;
+
+  function refreshList() {
+    renderStatusPlateList(ctx.profileId, readChildObjectRows(localStorage, ctx.profileId));
+  }
+
+  function refreshVisibility() {
+    const show = shouldOfferAddStatusPlate(ctx.getSession());
+    panel.hidden = !show;
+    if (show) refreshList();
+  }
+
+  refreshVisibility();
+
+  listEl?.addEventListener("submit", async (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLFormElement) || !target.classList.contains("child-object-plate-update-form")) {
+      return;
+    }
+    event.preventDefault();
+    const rowEl = target.closest(".child-object-plate-row");
+    const objectId = rowEl instanceof HTMLElement ? rowEl.dataset.objectId : "";
+    if (!objectId) return;
+
+    const keys = ctx.getSigningKeys();
+    const rowStatus = rowEl?.querySelector(".child-object-plate-update-status");
+    if (!keys) {
+      if (rowStatus instanceof HTMLElement) {
+        rowStatus.hidden = false;
+        rowStatus.textContent = "Unlock owner or recovery key before updating.";
+      }
+      return;
+    }
+
+    const stored = readChildObjectRows(localStorage, ctx.profileId).find(
+      (row) => row.object_id === objectId
+    );
+    if (!stored || typeof stored.created_at !== "string") {
+      ctx.showError("Missing child object record on this device.");
+      return;
+    }
+
+    const submitBtn = target.querySelector('button[type="submit"]');
+    if (submitBtn instanceof HTMLButtonElement) submitBtn.disabled = true;
+    if (rowStatus instanceof HTMLElement) {
+      rowStatus.hidden = false;
+      rowStatus.textContent = "Signing and updating…";
+    }
+
+    try {
+      const stateInput = target.querySelector('input[name="public_state"]');
+      const { publicState } = parseStatusPlateChildState(
+        stateInput instanceof HTMLInputElement ? stateInput.value : ""
+      );
+      const signed = await signChildObjectUpdate({
+        objectId,
+        parentProfileId: ctx.profileId,
+        objectType: CHILD_OBJECT_TYPE_STATUS_PLATE,
+        publicLabel: stored.public_label,
+        publicState,
+        createdAt: stored.created_at,
+        privateKeyBase58: keys.privateKeyBase58,
+        publicKeyBase58: keys.publicKeyBase58,
+      });
+      await postChildObjectUpdate(ctx.profileId, objectId, signed);
+      updateChildObjectRow(localStorage, ctx.profileId, objectId, { public_state: publicState });
+      refreshList();
+      if (rowStatus instanceof HTMLElement) {
+        rowStatus.textContent = "Updated on the network. Child-object scan QR is a later slice.";
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (rowStatus instanceof HTMLElement) rowStatus.textContent = message;
+      ctx.showError(message);
+    } finally {
+      if (submitBtn instanceof HTMLButtonElement) submitBtn.disabled = false;
+    }
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const keys = ctx.getSigningKeys();
+    if (!keys) {
+      if (statusEl) {
+        statusEl.hidden = false;
+        statusEl.textContent = "Unlock owner or recovery key before adding a status plate.";
+      }
+      return;
+    }
+    const labelInput = document.getElementById("child-object-plate-label");
+    const stateInput = document.getElementById("child-object-plate-state");
+    const submitBtn = document.getElementById("child-object-status-plate-submit");
+    if (submitBtn instanceof HTMLButtonElement) submitBtn.disabled = true;
+    if (statusEl) {
+      statusEl.hidden = false;
+      statusEl.textContent = "Signing and registering status plate…";
+    }
+    try {
+      const { publicLabel, publicState } = parseStatusPlateChildFields(
+        labelInput instanceof HTMLInputElement ? labelInput.value : "",
+        stateInput instanceof HTMLInputElement ? stateInput.value : ""
+      );
+      const signed = await signChildObjectCreate({
+        parentProfileId: ctx.profileId,
+        objectType: CHILD_OBJECT_TYPE_STATUS_PLATE,
+        publicLabel,
+        publicState,
+        privateKeyBase58: keys.privateKeyBase58,
+        publicKeyBase58: keys.publicKeyBase58,
+      });
+      const result = await postChildObjectCreate(ctx.profileId, signed);
+      const createdAt =
+        typeof signed.created_at === "string" ? signed.created_at : new Date().toISOString();
+      appendChildObjectRow(localStorage, ctx.profileId, {
+        object_id: String(result.object_id || signed.object_id),
+        object_type: CHILD_OBJECT_TYPE_STATUS_PLATE,
+        public_label: publicLabel,
+        public_state: publicState,
+        created_at: createdAt,
+      });
+      if (labelInput instanceof HTMLInputElement) labelInput.value = "";
+      if (stateInput instanceof HTMLInputElement) stateInput.value = "";
+      refreshList();
+      if (statusEl) {
+        statusEl.hidden = false;
+        statusEl.textContent =
+          "Status plate registered. Publish status updates below; scan QR for child objects is a later slice.";
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (statusEl) {
+        statusEl.hidden = false;
+        statusEl.textContent = message;
+      }
+      ctx.showError(message);
+    } finally {
+      if (submitBtn instanceof HTMLButtonElement) submitBtn.disabled = false;
+    }
+  });
+
+  return { refresh: refreshVisibility };
+}

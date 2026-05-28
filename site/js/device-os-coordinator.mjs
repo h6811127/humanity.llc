@@ -11,7 +11,7 @@ import {
   shouldRefreshLiveControlInbox,
   shouldRefreshWalletNetwork,
 } from "./device-os-coordinator-core.mjs";
-import { loadWallet } from "./device-wallet.mjs";
+import { listPollableWalletEntries } from "./device-wallet.mjs";
 import {
   refreshWalletNetworkStatuses,
   snapshotNetworkSeenOnExit,
@@ -76,7 +76,7 @@ async function runDeviceOsRefresh(reason) {
   }
 
   inFlight = (async () => {
-    const entries = loadWallet();
+    const entries = listPollableWalletEntries();
 
     const [networkStatus, walletResult] = await Promise.all([
       fetchResolverHealth(resolverApiOrigin()),

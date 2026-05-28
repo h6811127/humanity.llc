@@ -162,6 +162,17 @@ export function shouldShowCreatedMerchCustomizeCard(input) {
 }
 
 /**
+ * Fresh create with customize handoff ref and signing session ready → auto-redirect.
+ *
+ * @param {{ fresh?: boolean, merchRef?: string | null, sessionHasSigningKeys?: boolean }} input
+ * @returns {boolean}
+ */
+export function shouldAutoRedirectCreatedToCustomize(input) {
+  if (!shouldShowCreatedMerchCustomizeCard(input)) return false;
+  return input.sessionHasSigningKeys === true;
+}
+
+/**
  * @param {string} href
  * @param {string | null} ref
  * @returns {string}

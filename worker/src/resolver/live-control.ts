@@ -5,6 +5,7 @@ import {
   PROFILE_ID_REGEX,
   verifySignedDocument,
 } from "../crypto";
+import { checkLiveControlGetRateLimit, hashIp } from "../db/rate-limit";
 import { getCardOwner } from "../db/revoke";
 import { loadScanContext } from "../db/scan";
 import {
@@ -16,7 +17,12 @@ import {
   type LiveControlChallengeRow,
 } from "../db/live-control";
 import { jsonResponseWithWeakEtag } from "../http/conditional-json";
-import { errorResponse, jsonResponse, requestOrigin } from "../http/resolver";
+import {
+  clientIp,
+  errorResponse,
+  jsonResponse,
+  requestOrigin,
+} from "../http/resolver";
 import {
   buildScanViewModel,
   QR_ID_REGEX,
@@ -35,6 +41,25 @@ const CHALLENGE_TTL_MS = 120_000;
 const PROOF_DISPLAY_TTL_MS = 5 * 60_000;
 const CHALLENGE_ID_REGEX =
   /^lc_[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{12,40}$/;
+
+async function enforceLiveControlGetRateLimit(
+  request: Request,
+  db: D1Database
+): Promise<Response | null> {
+  const ipHash = await hashIp(clientIp(request));
+  const rate = await checkLiveControlGetRateLimit(db, ipHash);
+  if (!rate.allowed) {
+    return errorResponse(
+      "RATE_LIMITED",
+      "Too many live control requests from this network. Try again later.",
+      429,
+      rate.retryAfterSec
+        ? { "Retry-After": String(rate.retryAfterSec) }
+        : undefined
+    );
+  }
+  return null;
+}
 
 interface CreateChallengeBody {
   qr_id?: unknown;
@@ -159,6 +184,9 @@ export async function handleGetLiveControlChallenge(
   challengeId: string,
   env?: Env
 ): Promise<Response> {
+  const rateLimited = await enforceLiveControlGetRateLimit(request, db);
+  if (rateLimited) return rateLimited;
+
   if (env) {
     const quota = await enforceStewardAutoPollQuota(request, env, db, profileId);
     if (quota) return quota;
@@ -188,6 +216,9 @@ export async function handleGetPendingLiveControlChallenge(
   profileId: string,
   env?: Env
 ): Promise<Response> {
+  const rateLimited = await enforceLiveControlGetRateLimit(request, db);
+  if (rateLimited) return rateLimited;
+
   if (env) {
     const quota = await enforceStewardAutoPollQuota(request, env, db, profileId);
     if (quota) return quota;

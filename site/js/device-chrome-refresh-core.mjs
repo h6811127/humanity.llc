@@ -7,6 +7,29 @@
 /** Debounce for cross-tab presence-driven chrome (longer than DEVICE_OS_DEBOUNCE_MS). */
 export const PRESENCE_CHROME_DEBOUNCE_MS = 1200;
 
+/** Extra debounce when wallet is very large (many tabs + presence fan-out). */
+export const PRESENCE_CHROME_DEBOUNCE_LARGE_MS = 1600;
+export const PRESENCE_CHROME_DEBOUNCE_VERY_LARGE_MS = 2000;
+
+/** Saved-card count at which presence chrome debounce steps up. */
+export const PRESENCE_CHROME_LARGE_WALLET_COUNT = 10;
+export const PRESENCE_CHROME_VERY_LARGE_WALLET_COUNT = 20;
+
+/**
+ * Scale presence chrome coalesce delay with wallet size (open issues §3).
+ *
+ * @param {number} savedCardCount
+ */
+export function presenceChromeDebounceMs(savedCardCount) {
+  if (savedCardCount >= PRESENCE_CHROME_VERY_LARGE_WALLET_COUNT) {
+    return PRESENCE_CHROME_DEBOUNCE_VERY_LARGE_MS;
+  }
+  if (savedCardCount >= PRESENCE_CHROME_LARGE_WALLET_COUNT) {
+    return PRESENCE_CHROME_DEBOUNCE_LARGE_MS;
+  }
+  return PRESENCE_CHROME_DEBOUNCE_MS;
+}
+
 /** localStorage keys that must refresh chrome immediately (custody / wallet). */
 export const CHROME_REFRESH_IMMEDIATE_STORAGE_KEYS = new Set([
   "hc_wallet",

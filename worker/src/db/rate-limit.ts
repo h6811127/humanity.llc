@@ -4,11 +4,17 @@ import { DEMO_CREATE_LIMIT_PER_HOUR } from "../demo-card-policy";
 export const CREATE_LIMIT_PER_HOUR = 10;
 /** 300 card resolution (status) requests per IP per minute (Technical Standards §15). */
 export const CARD_RESOLUTION_LIMIT_PER_MINUTE = 300;
+/** 300 live-control GET polls per IP per minute (O2 step 2; device inbox / scan polling). */
+export const LIVE_CONTROL_GET_LIMIT_PER_MINUTE = 300;
+/** 120 resolver health checks per IP per minute (O2 step 2; shell bootstrap + tab sync). */
+export const RESOLVER_HEALTH_LIMIT_PER_MINUTE = 120;
 const CREATE_BUCKET_PREFIX = "create:";
 const CREATE_BLOCKED_BUCKET_PREFIX = "create_blocked:";
 const CREATE_DEMO_BUCKET_PREFIX = "create_demo:";
 const CREATE_DEMO_BLOCKED_BUCKET_PREFIX = "create_demo_blocked:";
 const CARD_RESOLUTION_BUCKET_PREFIX = "status:";
+const LIVE_CONTROL_GET_BUCKET_PREFIX = "live_control_get:";
+const RESOLVER_HEALTH_BUCKET_PREFIX = "health:";
 /** 30 opt-in AI explain requests per IP per hour (AI L3 P1). */
 export const AI_EXPLAIN_LIMIT_PER_HOUR = 30;
 const AI_EXPLAIN_BUCKET_PREFIX = "ai_explain:";
@@ -123,9 +129,11 @@ export async function checkDemoCreateRateLimit(
   return { allowed: true };
 }
 
-export async function checkCardResolutionRateLimit(
+async function checkPerMinuteIpRateLimit(
   db: D1Database,
   ipHash: string,
+  bucketPrefix: string,
+  limit: number,
   now: Date = new Date()
 ): Promise<{ allowed: boolean; retryAfterSec?: number }> {
   const windowStart = new Date(
@@ -138,7 +146,7 @@ export async function checkCardResolutionRateLimit(
     )
   );
   const windowIso = windowStart.toISOString();
-  const bucketKey = `${CARD_RESOLUTION_BUCKET_PREFIX}${ipHash}:${windowIso}`;
+  const bucketKey = `${bucketPrefix}${ipHash}:${windowIso}`;
 
   const row = await db
     .prepare(`SELECT count FROM rate_limit_buckets WHERE bucket_key = ?`)
@@ -146,7 +154,7 @@ export async function checkCardResolutionRateLimit(
     .first<{ count: number }>();
 
   const count = row?.count ?? 0;
-  if (count >= CARD_RESOLUTION_LIMIT_PER_MINUTE) {
+  if (count >= limit) {
     const nextMinute = new Date(windowStart.getTime() + 60_000);
     return {
       allowed: false,
@@ -159,6 +167,48 @@ export async function checkCardResolutionRateLimit(
 
   await incrementBucket(db, bucketKey, windowIso);
   return { allowed: true };
+}
+
+export async function checkCardResolutionRateLimit(
+  db: D1Database,
+  ipHash: string,
+  now: Date = new Date()
+): Promise<{ allowed: boolean; retryAfterSec?: number }> {
+  return checkPerMinuteIpRateLimit(
+    db,
+    ipHash,
+    CARD_RESOLUTION_BUCKET_PREFIX,
+    CARD_RESOLUTION_LIMIT_PER_MINUTE,
+    now
+  );
+}
+
+export async function checkLiveControlGetRateLimit(
+  db: D1Database,
+  ipHash: string,
+  now: Date = new Date()
+): Promise<{ allowed: boolean; retryAfterSec?: number }> {
+  return checkPerMinuteIpRateLimit(
+    db,
+    ipHash,
+    LIVE_CONTROL_GET_BUCKET_PREFIX,
+    LIVE_CONTROL_GET_LIMIT_PER_MINUTE,
+    now
+  );
+}
+
+export async function checkResolverHealthRateLimit(
+  db: D1Database,
+  ipHash: string,
+  now: Date = new Date()
+): Promise<{ allowed: boolean; retryAfterSec?: number }> {
+  return checkPerMinuteIpRateLimit(
+    db,
+    ipHash,
+    RESOLVER_HEALTH_BUCKET_PREFIX,
+    RESOLVER_HEALTH_LIMIT_PER_MINUTE,
+    now
+  );
 }
 
 export async function checkAiExplainRateLimit(

@@ -111,13 +111,13 @@ function hasStewardReadyKeys() {
   return loadWalletSummary().stewardReady;
 }
 
+function savedCardsWithSigningKeys() {
+  return loadWallet().filter((entry) => Boolean(entry?.owner_private_key_b58));
+}
+
 function hasCreatedKeys() {
   const session = getTabSession();
   return Boolean(session?.owner_private_key_b58);
-}
-
-function savedCardsWithSigningKeys() {
-  return loadWallet().filter((entry) => Boolean(entry?.owner_private_key_b58));
 }
 
 function scanCrossTabNoticeCount() {

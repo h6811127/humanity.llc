@@ -1770,6 +1770,16 @@ button.device-hub-notice-banner {
   color: var(--shell-label);
 }
 
+.hub-summary-viewport-sentinel {
+  list-style: none;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .hub-card-item {
   margin: 0 0 5px;
   border: 0.5px solid var(--hc-emphasis-card-border-neutral);

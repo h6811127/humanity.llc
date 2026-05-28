@@ -11,7 +11,11 @@ import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visi
 export const RESOLVER_HEALTH_CHANGED = "hc-resolver-health-changed";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
-import { isWalletSaved, loadWallet, loadWalletSummary } from "./device-wallet.mjs";
+import {
+  isWalletSaved,
+  loadWallet,
+  loadWalletSummary,
+} from "./device-wallet.mjs";
 import {
   gatherInboxInput,
   getInboxItems,
