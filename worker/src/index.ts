@@ -131,6 +131,8 @@ export interface Env {
   TIER0_CAMPAIGN_PROFILE_ID?: string;
   /** Tier 0 batch sticker: comma-separated Shopify variant ids. */
   TIER0_SHOPIFY_VARIANT_IDS?: string;
+  /** Tier 0 pre-printed inventory: comma-separated Shopify variant ids (no Printify queue). */
+  TIER0_SHOPIFY_INVENTORY_VARIANT_IDS?: string;
   /** Cloudflare Workers AI (L3 explain snapshot). */
   AI?: Ai;
 }

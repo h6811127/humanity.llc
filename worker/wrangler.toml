@@ -28,6 +28,7 @@ HOSTED_STEWARD_ENABLED = "1"
 # Tier 0 batch fulfillment (O-002): set when Shopify founding sticker SKU is live.
 # TIER0_CAMPAIGN_PROFILE_ID = ""
 # TIER0_SHOPIFY_VARIANT_IDS = ""
+# TIER0_SHOPIFY_INVENTORY_VARIANT_IDS = ""  # pre-printed SKUs (Glitch hoodie) — no Printify queue
 # Printify live submit (operator-only POST …/print/orders with shipping_address):
 PRINTIFY_SUBMIT_ENABLED = "0"
 # PRINTIFY_API_TOKEN — wrangler secret (not in toml)
