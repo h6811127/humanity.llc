@@ -28,6 +28,16 @@ export function hasWalletNetworkTruthPoll() {
   return false;
 }
 
+export function listWalletNetworkTruthPollProfileIds() {
+  const ids = [];
+  for (const [profileId, row] of truthByProfileId.entries()) {
+    if (row.source === "poll" && row.resolverConfirmed && row.alertState != null) {
+      ids.push(profileId);
+    }
+  }
+  return ids;
+}
+
 export function resetWalletNetworkTruth() {
   truthByProfileId.clear();
 }

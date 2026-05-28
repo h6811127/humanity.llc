@@ -13,7 +13,12 @@ import {
 } from "./device-dot-state-core.mjs?v=56";
 import { fetchResolverHealth } from "./device-network-health.mjs";
 import { activateWalletEntry, getTabSession } from "./device-keys.mjs";
-import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
+import {
+  getWalletCount,
+  getWalletSigningKeyCount,
+  isWalletSaved,
+  walletSome,
+} from "./device-wallet.mjs";
 import { getInboxOverlayCounts } from "./device-inbox.mjs?v=56";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
@@ -108,7 +113,7 @@ function hasStewardReadyKeys() {
   if (session?.owner_private_key_b58 && hasStewardVerification(session)) {
     return true;
   }
-  return loadWallet().some(
+  return walletSome(
     (entry) => Boolean(entry?.owner_private_key_b58) && hasStewardVerification(entry)
   );
 }
@@ -118,25 +123,20 @@ function hasCreatedKeys() {
   return Boolean(session?.owner_private_key_b58);
 }
 
-function savedCardsWithSigningKeys() {
-  return loadWallet().filter((entry) => Boolean(entry?.owner_private_key_b58));
-}
-
 function scanCrossTabNoticeCount() {
   return scanCrossTabOverlayCount(getCrossTabScanSnapshot(), hasCreatedKeys());
 }
 
 function computeEligible() {
   const { profileId, qrId } = readScanContext();
-  const wallet = loadWallet();
-  syncScanOperatorFamiliarFromWallet(wallet.length);
+  syncScanOperatorFamiliarFromWallet(getWalletCount());
   const overlayCounts = getInboxOverlayCounts();
   const crossTabNotice = scanCrossTabNoticeCount();
   return scanPageDotEligible({
     profileId,
     qrId,
     hasCreatedKeys: hasCreatedKeys(),
-    walletSigningKeyCount: savedCardsWithSigningKeys().length,
+    walletSigningKeyCount: getWalletSigningKeyCount(),
     crossTabNotice,
     liveProofPending: overlayCounts.liveProofPending,
     operatorDeviceFamiliar: isScanOperatorFamiliar(),
@@ -158,7 +158,7 @@ function deviceState() {
   return deviceStateFromContext({
     unsavedTabKeys: hasUnsavedTabKeys(),
     stewardReady: hasStewardReadyKeys(),
-    savedWalletCount: loadWallet().length,
+    savedWalletCount: getWalletCount(),
   });
 }
 

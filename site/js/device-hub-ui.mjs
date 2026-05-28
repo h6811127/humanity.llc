@@ -32,6 +32,7 @@ import {
 } from "./device-keys.mjs";
 import { loadPins, pinHaystack } from "./device-pins.mjs";
 import {
+  getWalletCount,
   loadWallet,
   normalizeWalletQrIds,
   saveWallet,
@@ -1368,7 +1369,7 @@ function renderPinRows() {
 function refreshEmptyHint() {
   if (!emptyHint) return;
   const hasData =
-    loadWallet().length > 0 ||
+    getWalletCount() > 0 ||
     loadPins().length > 0 ||
     notificationCount() > 0 ||
     loadActivity().slice(0, HUB_RECENT_DISPLAY_LIMIT).length > 0;
@@ -1517,7 +1518,7 @@ export function initDeviceHub(config = {}) {
       getAutoPollBudgetPaused: () => isLiveControlAutoPollBudgetPaused(),
       getStewardQuotaPaused: () => isStewardServerQuotaPaused(),
       getLargeWalletHint: () =>
-        walletScaleHint(loadWallet().length, getStewardEntitlementsPolicy()),
+        walletScaleHint(getWalletCount(), getStewardEntitlementsPolicy()),
       getHostedTierLine: () =>
         hostedTierHubIndicatorLine(getStewardEntitlementsPolicy()),
       onCheckNetwork: () => fetchAndApplyNetworkChips({ manual: true }),
@@ -1575,7 +1576,7 @@ export function initDeviceHub(config = {}) {
       const hubEl = document.getElementById("device-hub");
       const hubCollapsed = hubEl?.classList.contains("device-hub-collapsed") ?? false;
       const onWalletPage = document.body.classList.contains("page-wallet");
-      const hasWallet = loadWallet().length > 0;
+      const hasWallet = getWalletCount() > 0;
       if (
         hasWallet &&
         (onWalletPage || !hubCollapsed) &&

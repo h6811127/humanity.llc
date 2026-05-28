@@ -13,6 +13,8 @@ export const WALLET_STORAGE_KEY = "hc_wallet";
 let walletCacheRaw = null;
 /** @type {Array<Record<string, unknown>> | null} */
 let walletCache = null;
+/** @type {{ count: number, pollableCount: number, signingKeyCount: number, summaries: Array<Record<string, unknown>> } | null} */
+let walletMetaCache = null;
 
 /** Matches resolver / pin parsing (`device-pins.mjs`). */
 const QR_ID_RE = /^qr_[1-9A-HJ-NP-Za-km-z_]{8,64}$/;
@@ -62,32 +64,131 @@ export function normalizeWalletQrIds(entries) {
   return { entries: next, changed };
 }
 
-export function loadWallet() {
+/** @param {Array<Record<string, unknown>>} entries */
+function buildWalletMeta(entries) {
+  let pollableCount = 0;
+  let signingKeyCount = 0;
+  const summaries = [];
+  for (const entry of entries) {
+    if (typeof entry?.profile_id === "string" && walletEntryQrId(entry)) {
+      pollableCount += 1;
+    }
+    if (entry?.owner_private_key_b58) {
+      signingKeyCount += 1;
+    }
+    summaries.push({
+      id: entry?.id,
+      profile_id: entry?.profile_id,
+      label: entry?.label,
+      handle: entry?.handle,
+    });
+  }
+  return {
+    count: entries.length,
+    pollableCount,
+    signingKeyCount,
+    summaries,
+  };
+}
+
+function clearWalletCache() {
+  walletCacheRaw = null;
+  walletCache = [];
+  walletMetaCache = buildWalletMeta([]);
+}
+
+/** @returns {Array<Record<string, unknown>>} */
+function readWalletEntries() {
   try {
     const raw = localStorage.getItem(WALLET_STORAGE_KEY);
     if (raw === walletCacheRaw && walletCache) {
-      return walletCache.slice();
+      return walletCache;
     }
     const parsed = raw ? JSON.parse(raw) : [];
     const entries = Array.isArray(parsed) ? parsed : [];
     walletCacheRaw = raw;
     walletCache = entries;
-    return entries.slice();
+    walletMetaCache = buildWalletMeta(entries);
+    return entries;
   } catch {
-    walletCacheRaw = null;
-    walletCache = [];
+    clearWalletCache();
     return [];
   }
+}
+
+function readWalletMeta() {
+  readWalletEntries();
+  return walletMetaCache ?? buildWalletMeta([]);
+}
+
+export function loadWallet() {
+  return readWalletEntries().slice();
 }
 
 export function saveWallet(entries) {
   const serialized = JSON.stringify(entries);
   walletCacheRaw = serialized;
   walletCache = entries;
+  walletMetaCache = buildWalletMeta(entries);
   localStorage.setItem(WALLET_STORAGE_KEY, serialized);
   if (entries.length > 0) markScanOperatorFamiliar();
   reconcileRemovedProfilesAfterWalletSave(entries);
   window.dispatchEvent(new Event("hc-device-hub-changed"));
+}
+
+export function getWalletCount() {
+  return readWalletMeta().count;
+}
+
+export function getWalletPollableCount() {
+  return readWalletMeta().pollableCount;
+}
+
+export function getWalletSigningKeyCount() {
+  return readWalletMeta().signingKeyCount;
+}
+
+/**
+ * Metadata-only view for chrome hot paths. Does not expose private keys.
+ * @param {number} [limit]
+ */
+export function getWalletEntrySummaries(limit = Infinity) {
+  const summaries = readWalletMeta().summaries;
+  const capped =
+    Number.isFinite(limit) && limit >= 0 ? summaries.slice(0, limit) : summaries.slice();
+  return capped.map((entry) => ({ ...entry }));
+}
+
+/** @param {Iterable<string>} profileIds */
+export function getWalletEntrySummariesByProfileIds(profileIds) {
+  const wanted = new Set([...profileIds].filter(Boolean).map(String));
+  if (wanted.size === 0) return [];
+  return readWalletMeta()
+    .summaries.filter((entry) => wanted.has(String(entry.profile_id || "")))
+    .map((entry) => ({ ...entry }));
+}
+
+/** @param {string | null | undefined} id */
+export function findWalletEntryById(id) {
+  if (!id) return null;
+  return readWalletEntries().find((entry) => entry.id === id) ?? null;
+}
+
+/** @param {string | null | undefined} profileId */
+export function findWalletEntryByProfileId(profileId) {
+  if (!profileId) return null;
+  return readWalletEntries().find((entry) => entry.profile_id === profileId) ?? null;
+}
+
+export function getPollableWalletEntries() {
+  return readWalletEntries().filter(
+    (entry) => typeof entry?.profile_id === "string" && !!walletEntryQrId(entry)
+  );
+}
+
+/** @param {(entry: Record<string, unknown>) => boolean} predicate */
+export function walletSome(predicate) {
+  return readWalletEntries().some(predicate);
 }
 
 export function walletEntryFromSession(session, label) {
@@ -117,7 +218,7 @@ export function walletEntryFromSession(session, label) {
 }
 
 export function isWalletSaved(profileId) {
-  return loadWallet().some((e) => e.profile_id === profileId);
+  return walletSome((e) => e.profile_id === profileId);
 }
 
 /** Row subtitle  -  always show network handle + id so labels cannot lie. */

@@ -1,7 +1,7 @@
 /**
  * Landing focus mode  -  hide tutorial sections, show device hub + docs + contact.
  */
-import { loadWallet } from "./device-wallet.mjs";
+import { getWalletCount } from "./device-wallet.mjs";
 import { loadPins } from "./device-pins.mjs";
 
 const FOCUS_KEY = "hc_landing_focus";
@@ -11,7 +11,7 @@ const docsFull = document.getElementById("landing-docs-full");
 const docsFooter = document.getElementById("landing-docs-footer");
 
 function hasDeviceData() {
-  return loadWallet().length > 0 || loadPins().length > 0;
+  return getWalletCount() > 0 || loadPins().length > 0;
 }
 
 function isFocusMode() {

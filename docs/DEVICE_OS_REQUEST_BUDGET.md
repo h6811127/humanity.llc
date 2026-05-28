@@ -471,6 +471,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 | S4 | Skip presence heartbeat **when alone with keys** | Yes (`shouldSkipPresenceHeartbeat`) | Also skip when no `hc_created` | 8b ✅ |
 | S5 | Lazy-load inbox sheet / notifications | Yes (`device-inbox-sheet-loader`, `device-browser-notifications-loader`) | Smaller bootstrap graph | P2 ✅ |
 | S6 | Shard / bound `hc_wallet_network_cache` | **Yes** (2026-05-27) | Max **20** fresh rows; LRU + wallet protect on save | Open issues → shipped |
+| S8 | Wallet metadata hot paths | **Yes** (2026-05-28) | Count/pollable/signing/profile-summary reads avoid full wallet copies in status, glance, inbox, scan dot | Large wallet ✅ |
 | S7 | Cross-tab rebuild (one snapshot) | Partial (Phases 1–6) | Full state machine per [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md) | Cross-tab |
 
 ### Background / SW
@@ -509,7 +510,7 @@ Phases 1–5 improved polling, but **N saved cards** on one browser is still an 
 
 ### 2. Shell performance (must fix)
 
-Every hub/inbox pass calls `loadWallet()` and `JSON.parse`s the full `hc_wallet` array. **`hc_wallet_network_cache`** is now capped at **20** fresh rows per session (S6, 2026-05-27); remaining: avoid full-wallet parse on hot paths, lazy row hydration. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
+Every hub/inbox pass used to call `loadWallet()` and copy the full `hc_wallet` array for count/profile-only reads. **`hc_wallet_network_cache`** is capped at **20** fresh rows per session (S6, 2026-05-27), and wallet metadata hot paths now avoid key-bearing full-row copies for status, glance, inbox, scan-dot, and live-proof poll selection reads (S8, 2026-05-28). Remaining: lazy hub row hydration / virtualization for very large wallets. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
 
 ### 3. Multi-tab presence (must fix)
 
@@ -521,6 +522,7 @@ Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). 
 
 | Date | Note |
 |------|------|
+| 2026-05-28 | **S8 shipped:** wallet metadata hot paths for count/pollable/signing/profile-summary reads |
 | 2026-05-27 | **S6 shipped:** bound `hc_wallet_network_cache` (max 20 fresh rows, LRU prune) |
 | 2026-05-27 | **O2 step 1:** per-IP rate limit on `GET …/status` (300/min); Shell P2 lazy notifications shipped |
 | 2026-05-26 | **M8 epics:** [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) |

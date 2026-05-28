@@ -20,7 +20,11 @@ import {
   CARD_DISABLED_SINCE_VISIT_GLANCE_SUFFIX,
   cardDisabledSinceVisitVisible,
 } from "./wallet-network-baseline.mjs";
-import { loadWallet, walletEntrySubtitle } from "./device-wallet.mjs";
+import {
+  findWalletEntryById,
+  getWalletEntrySummaries,
+  walletEntrySubtitle,
+} from "./device-wallet.mjs";
 
 const GLANCE_MAX_CARDS = 3;
 
@@ -202,8 +206,13 @@ function appendWalletGlanceRow(entry, revokedHint, list) {
       <span class="device-hub-glance-sub">${escapeHtml(subLine)} · Saved on device</span>
     </button>`;
   li.querySelector("button")?.addEventListener("click", () => {
+    const fullEntry = findWalletEntryById(entry.id);
+    if (!fullEntry) {
+      expandHub("device-hub-saved-group");
+      return;
+    }
     closeGlancePopoverEvent();
-    openCardNowPage(entry);
+    openCardNowPage(fullEntry);
   });
   list.appendChild(li);
 }
@@ -236,7 +245,7 @@ function refreshGlanceTarget(target) {
   const copy = glanceCopy(wallet);
   const inboxItems = getInboxItems();
   const inboxCtx = gatherInboxInput();
-  const entries = loadWallet();
+  const entries = getWalletEntrySummaries();
   const plan = buildGlanceRowPlan(inboxItems, entries, {
     maxSavedCards: GLANCE_MAX_CARDS,
     revokedHintProfileIds: revokedHintProfileIdsFromEntries(entries),

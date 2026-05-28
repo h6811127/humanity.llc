@@ -35,6 +35,7 @@ import {
   getWalletNetworkTruthPollScanKind,
   hasWalletNetworkTruthPoll,
   isWalletNetworkTruthPollConfirmed,
+  listWalletNetworkTruthPollProfileIds,
   resetWalletNetworkTruth,
   setWalletNetworkTruthFromCacheOnly,
   setWalletNetworkTruthFromPoll,
@@ -45,6 +46,7 @@ export { readCachedVerification };
 export {
   getWalletNetworkTruthChipStatus,
   isSinceVisitBlockedChipStatus,
+  listWalletNetworkTruthPollProfileIds,
   shouldSuppressCardDisabledSinceVisitFromTruth,
 } from "./device-wallet-network-truth.mjs";
 
@@ -98,9 +100,8 @@ function syncWalletNetworkTruthFromPoll(
     entriesInPoll.map((e) => e.profile_id).filter((pid) => typeof pid === "string" && pid)
   );
 
-  for (const entry of loadWallet()) {
-    const pid = entry.profile_id;
-    if (!pid) continue;
+  const idsToSync = new Set([...listWalletNetworkTruthPollProfileIds(), ...polledIds]);
+  for (const pid of idsToSync) {
     if (!polledIds.has(pid)) {
       demoteWalletNetworkTruthToCacheOnly(pid);
       continue;

@@ -76,7 +76,11 @@ import {
   pickRoundRobinPollIndex,
   resolveLiveControlPollScope,
 } from "./device-live-control-poll-scheduler.mjs";
-import { loadWallet, walletEntryQrId } from "./device-wallet.mjs";
+import {
+  findWalletEntryByProfileId,
+  getPollableWalletEntries,
+  walletEntryQrId,
+} from "./device-wallet.mjs";
 
 export { getLiveControlPollHealth } from "./device-live-control-inbox-core.mjs";
 export {
@@ -462,7 +466,7 @@ export async function refreshLiveControlInbox(opts = {}) {
     }
   }
 
-  const allPollable = loadWallet().filter((e) => isPollableWalletEntry(e));
+  const allPollable = getPollableWalletEntries();
   const entries = resolvePollEntries(allPollable);
   pruneLiveControlPollSlots(pollSlots, allPollable);
 
@@ -529,11 +533,11 @@ export async function applyLiveProofPendingFromPush(hint) {
     if (Number.isFinite(exp) && exp <= Date.now()) return pending;
   }
 
-  const entry = loadWallet().find((e) => e.profile_id === profileId);
+  const entry = findWalletEntryByProfileId(profileId);
   if (!entry || !isPollableWalletEntry(entry)) return pending;
 
   const result = await fetchPendingForEntry(entry, { pushTriggered: true });
-  const allPollable = loadWallet().filter((e) => isPollableWalletEntry(e));
+  const allPollable = getPollableWalletEntries();
   updateLiveControlPollSlot(pollSlots, entry, result);
   const next = pendingItemsFromPollSlots(allPollable, pollSlots);
   const prevHealth = getLiveControlPollHealth();

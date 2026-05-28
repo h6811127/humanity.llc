@@ -11,6 +11,7 @@ import { mountKeysCustody } from "./device-keys-custody.mjs";
 import "./device-help-fab.mjs";
 import {
   defaultWalletLabel,
+  getWalletCount,
   loadWallet,
   saveSessionToWallet,
 } from "./device-wallet.mjs";
@@ -47,7 +48,7 @@ function refreshAutoSaveLine() {
 
 function refreshHelpVisibility() {
   if (!helpDetails) return;
-  helpDetails.hidden = loadWallet().length > 0;
+  helpDetails.hidden = getWalletCount() > 0;
 }
 
 function bindWalletActiveLink() {
