@@ -343,6 +343,21 @@ function bindHubSummaryViewportSentinel(sentinel) {
   summaryViewportObserver.observe(sentinel);
 }
 
+/** After layout, grow the summary window for rows already in the hub viewport. */
+function scheduleInitialSummaryViewportSync() {
+  const apply = () => {
+    if (!syncSummaryRowLimitFromViewport({ nearEnd: false })) return;
+    renderSavedRows({ viewportSync: true });
+    applySearchFilter();
+    refreshEmptyHint();
+  };
+  if (typeof requestAnimationFrame === "function") {
+    requestAnimationFrame(apply);
+    return;
+  }
+  apply();
+}
+
 /** Last chip status per profile from wallet poll (A1: re-apply must not rely on session cache alone). */
 let lastWalletNetworkStatusMap = {};
 
@@ -1458,12 +1473,7 @@ function renderSavedRows(opts = {}) {
   ensureHubSummaryViewportScrollLoader();
 
   if (virtualizedSummaryRows && !opts.viewportSync) {
-    if (syncSummaryRowLimitFromViewport({ nearEnd: false })) {
-      renderSavedRows({ viewportSync: true });
-      applySearchFilter();
-      refreshEmptyHint();
-      return;
-    }
+    scheduleInitialSummaryViewportSync();
   }
 
   if (fullRows) {
