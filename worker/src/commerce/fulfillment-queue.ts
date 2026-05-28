@@ -43,6 +43,15 @@ export async function ensurePrintOrderForCommerceOrder(
 
   const existing = await getPrintOrderByCommerceOrderId(db, commerceOrder.commerce_order_id);
   if (existing) {
+    const linkedPrintOrderIds = JSON.parse(commerceOrder.print_order_ids_json) as string[];
+    if (!linkedPrintOrderIds.includes(existing.order_id)) {
+      await updateCommerceOrderPrintOrderIds(
+        db,
+        commerceOrder.commerce_order_id,
+        [existing.order_id],
+        nowIso
+      );
+    }
     return { print_order: existing, created: false };
   }
 

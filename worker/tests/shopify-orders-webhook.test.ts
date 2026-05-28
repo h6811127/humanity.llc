@@ -40,6 +40,24 @@ function intentRow(overrides: Partial<ArtifactIntentRow> = {}): ArtifactIntentRo
   };
 }
 
+function commerceOrderRow(overrides: Partial<CommerceOrderRow> = {}): CommerceOrderRow {
+  return {
+    commerce_order_id: "co_existing_paid_webhook",
+    shopify_order_id: "450789469",
+    shopify_checkout_id: "901414060",
+    shopify_order_number: 1001,
+    buyer_email_hash: null,
+    profile_id: PROFILE,
+    artifact_intent_ids_json: JSON.stringify([INTENT]),
+    print_order_ids_json: "[]",
+    status: "processing",
+    hold_reason: null,
+    created_at: "2026-05-16T17:10:00Z",
+    updated_at: "2026-05-16T17:10:00Z",
+    ...overrides,
+  };
+}
+
 type FulfillmentPiiRow = {
   commerce_order_id: string;
   shipping_iv_b64: string;
@@ -373,6 +391,68 @@ describe("Shopify orders webhook (O-001)", () => {
 
     expect(json2.duplicate).toBe(true);
     expect(state.orders.size).toBe(1);
+  });
+
+  it("recovers print fulfillment when a paid webhook retry finds an existing processing order", async () => {
+    const existingOrder = commerceOrderRow();
+    const state: DbState = {
+      intents: new Map([[INTENT, intentRow({ status: "converted" })]]),
+      orders: new Map([[existingOrder.shopify_order_id, existingOrder]]),
+      receipts: new Map(),
+      printOrders: new Map(),
+      fulfillmentPii: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(paidOrderBody(), { "X-Shopify-Webhook-Id": "wh_retry" }),
+      env,
+      dbFor(state)
+    );
+    const json = (await res.json()) as { duplicate: boolean; print_order_ids: string[] };
+
+    expect(res.status).toBe(200);
+    expect(json.duplicate).toBe(true);
+    expect(json.print_order_ids).toHaveLength(1);
+    expect(state.orders.size).toBe(1);
+    expect(state.printOrders.size).toBe(1);
+    expect(JSON.parse(state.orders.get("450789469")!.print_order_ids_json)).toEqual(
+      json.print_order_ids
+    );
+  });
+
+  it("holds a new paid order that reuses an already converted artifact intent", async () => {
+    const firstOrder = commerceOrderRow({
+      commerce_order_id: "co_first_checkout",
+      shopify_order_id: "111111111",
+      shopify_checkout_id: "222222222",
+      shopify_order_number: 1000,
+      print_order_ids_json: JSON.stringify(["po_first"]),
+    });
+    const state: DbState = {
+      intents: new Map([[INTENT, intentRow({ status: "converted" })]]),
+      orders: new Map([[firstOrder.shopify_order_id, firstOrder]]),
+      receipts: new Map(),
+      printOrders: new Map(),
+      fulfillmentPii: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(paidOrderBody(), { "X-Shopify-Webhook-Id": "wh_reused_intent" }),
+      env,
+      dbFor(state)
+    );
+    const json = (await res.json()) as {
+      status: string;
+      hold_reason: string | null;
+      print_order_ids: string[];
+    };
+
+    expect(res.status).toBe(200);
+    expect(json.status).toBe("held_for_review");
+    expect(json.hold_reason).toBe("ARTIFACT_INTENT_ALREADY_CONVERTED");
+    expect(json.print_order_ids).toEqual([]);
+    expect(state.orders.get("450789469")?.status).toBe("held_for_review");
+    expect(state.printOrders.size).toBe(0);
   });
 
   it("rejects invalid HMAC", async () => {
