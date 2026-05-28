@@ -20,6 +20,14 @@ describe("shop-copy-core", () => {
     expect(hubHtml).not.toMatch(/Ready to order/i);
     expect(foundingHtml).not.toMatch(/Ready to order/i);
     expect(foundingHtml).toContain('id="shop-checkout-lead"');
+    expect(foundingHtml).toContain("restore root card and");
+    expect(foundingHtml).toContain("object QR control");
+  });
+
+  it("post-purchase copy reminds card owners that root backup controls printed object QRs", () => {
+    const thanksHtml = readFileSync(join(process.cwd(), "site/shop/thanks/index.html"), "utf8");
+    expect(thanksHtml).toContain("created a root card");
+    expect(thanksHtml).toContain("personalized object QRs");
   });
 
   it("exposes ready-to-order copy only for JS when checkout opens", () => {

@@ -252,10 +252,10 @@
           </ol>
 
           <div class="created-setup-panel" data-setup-panel="save" id="created-setup-panel-save">
-            <h2 class="created-setup-panel-title" id="created-setup-title">Save control on this device</h2>
+            <h2 class="created-setup-panel-title" id="created-setup-title">Save root control on this device</h2>
             <p class="created-setup-panel-lead">
-              Your signing key stays in this browser until you save it here. Without save, closing
-              this tab means you cannot update or revoke later.
+              Your root signing key stays in this browser until you save it here. Without save,
+              closing this tab means you cannot update, revoke, or manage object QRs later.
             </p>
             <div id="device-keys-custody-created-setup"></div>
             <div id="created-setup-keys-mount"></div>
@@ -643,7 +643,8 @@
             </div>
 
             <p class="created-keys-foot form-hint">
-              Recovery key and encrypted backup live under <strong>Manage</strong>.
+              Recovery key and encrypted backup live under <strong>Manage</strong> and restore
+              control of this root card plus its object QRs.
             </p>
                 </section>
               </div>
@@ -856,8 +857,8 @@
         <!--  -  -  -  Advanced: update, revoke, keys  -  -  -  -->
         <div class="created-tab-panel" data-created-panel="advanced" id="created-tab-advanced" role="tabpanel" aria-labelledby="created-tab-btn-advanced" hidden>
           <p class="created-tab-lead">
-            Rotate, revoke, backup, and unlock keys. Same printed QR  -  you change resolver state,
-            not the sticker. Public copy publishes on <strong>Live</strong>. Open
+            Rotate, revoke, backup, and unlock keys. This root key controls the card and its
+            object QRs; you change resolver state, not the sticker. Public copy publishes on <strong>Live</strong>. Open
             <strong>Keys on this device</strong> on Live (or
             <a href="/wallet/">My cards</a>) before switching tabs.
           </p>
@@ -1002,7 +1003,8 @@
               </div>
               <p class="form-hint" id="owner-no-key">
                 Unlock a saved backup or recovery key below, or create again on
-                <a href="/create/">/create/</a>. humanity.llc cannot revoke for you.
+                <a href="/create/">/create/</a>. humanity.llc cannot revoke or recover
+                root-object control for you.
               </p>
 
               <div id="revoke-actions" hidden>
@@ -1146,13 +1148,14 @@
                 </span>
                 <span class="settings-summary-text">
                   <span class="settings-summary-title">Recovery key from create</span>
-                  <span class="settings-summary-sub">Copy once · for a new browser if you lose this tab</span>
+                  <span class="settings-summary-sub">Copy once · restores root and object QR control</span>
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </summary>
               <div class="settings-panel settings-panel-action created-recovery-panel">
                 <p class="form-hint">
-                  Does not add keys to Saved on this device. Store offline before you close this panel.
+                  Does not add keys to Saved on this device. Store offline before you close this panel;
+                  this key can restore control of this root card and its object QRs.
                 </p>
                 <p class="mono recovery-key-display" id="recovery-key-display"></p>
                 <button type="button" class="btn-secondary" id="copy-recovery-key">
@@ -1176,14 +1179,15 @@
                 </span>
                 <span class="settings-summary-text">
                   <span class="settings-summary-title">Encrypted backup</span>
-                  <span class="settings-summary-sub">Download · import on another device</span>
+                  <span class="settings-summary-sub">Download · restore root and object control</span>
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </summary>
               <div class="settings-panel settings-panel-action">
                 <div id="backup-export-block" hidden>
                   <p class="form-hint">
-                    Available while this tab still has your owner key. Never uploaded to humanity.llc.
+                    Available while this tab still has your root owner key. This backup restores
+                    control of this card and its object QRs. Never uploaded to humanity.llc.
                   </p>
                   <form id="export-backup-form" class="compact-form" autocomplete="off" novalidate>
                     <label class="form-label" for="export-passphrase">New backup passphrase</label>
@@ -1249,7 +1253,7 @@
                     required
                     placeholder="Same passphrase used when downloading"
                   />
-                  <button type="submit" class="btn-secondary">Unlock for revoke</button>
+                  <button type="submit" class="btn-secondary">Unlock root controls</button>
                 </form>
                 <p class="form-status" id="import-backup-status" hidden></p>
               </div>
