@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { mintPrintOrderFromCredentials } from "../src/commerce/fulfillment-mint";
+import { getPlannedMintStatus } from "../src/commerce/fulfillment-mint";
 import {
   getTestKeypair,
   PAYLOAD_TYPES,
@@ -12,19 +13,20 @@ import type { CommerceOrderRow } from "../src/db/commerce-orders";
 import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
 import type { PrintOrderRow } from "../src/db/print-orders";
 import { handlePostShopifyOrdersWebhook } from "../src/http/shopify-orders-webhook";
-import type { Env } from "../src/index";
+import { resolvePrintTemplateForStoreProductId } from "../src/print/print-catalog";
 import {
   handlePostArtifactIntent,
   handlePostArtifactIntentAttach,
 } from "../src/resolver/artifact-intents";
 import { handleGetStoreOrderStatus } from "../src/store/store-order-status-handler";
-import { getPlannedMintStatus } from "../src/commerce/fulfillment-mint";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const SOURCE_QR = "qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const SHOPIFY_ORDER_ID = "450789469";
 const WEBHOOK_SECRET = "shpss_merch_paid_path_test";
 const CREATED = "2026-05-16T17:00:00.000Z";
+
+type TestEnv = { SHOPIFY_WEBHOOK_SECRET?: string };
 
 function card(): CardRow {
   return {
@@ -325,6 +327,11 @@ async function signedPlannedCredential(
 
 describe("merch funnel paid personalized path (close-out)", () => {
   it("chains intent → attach → paid webhook → mint → order status", async () => {
+    expect(typeof resolvePrintTemplateForStoreProductId).toBe("function");
+    expect(resolvePrintTemplateForStoreProductId("sticker_personalized_v1")).toBe(
+      "hc-sticker-square-v1"
+    );
+
     const { privateKey, publicKeyBase58 } = await getTestKeypair();
     const state: DbState = {
       card: card(),
@@ -341,7 +348,7 @@ describe("merch funnel paid personalized path (close-out)", () => {
       mintedQrRows: new Map(),
     };
     const db = createDb(state);
-    const env = { SHOPIFY_WEBHOOK_SECRET: WEBHOOK_SECRET } as Env;
+    const env = { SHOPIFY_WEBHOOK_SECRET: WEBHOOK_SECRET } as TestEnv;
 
     const intentRes = await handlePostArtifactIntent(
       new Request("https://humanity.llc/v1/store/artifact-intents", {
