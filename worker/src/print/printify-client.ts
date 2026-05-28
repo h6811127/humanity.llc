@@ -4,6 +4,7 @@
  */
 
 import { resolvePrintifyLineItem } from "./printify-template-config";
+import { preparePrintifyLineItems } from "./printify-line-items";
 import type { PrintifyShippingAddress } from "./printify-shipping";
 
 const PRINTIFY_API_BASE = "https://api.printify.com/v1";
@@ -26,6 +27,10 @@ export type PrintifySubmitErrorCode =
   | "PRINTIFY_UNCONFIGURED"
   | "PRINTIFY_SUBMIT_DEFERRED"
   | "PRINTIFY_TEMPLATE_UNCONFIGURED"
+  | "PRINTIFY_ARTWORK_GENERATION_FAILED"
+  | "PRINTIFY_UPLOAD_FAILED"
+  | "PRINTIFY_PRODUCT_CREATE_FAILED"
+  | "PRINTIFY_PLANNED_QRS_REQUIRED"
   | "PRINTIFY_API_ERROR"
   | "PRINTIFY_RATE_LIMITED"
   | "PRINTIFY_INVALID_ADDRESS";
@@ -121,25 +126,43 @@ export async function submitPrintifyOrder(
     };
   }
 
-  const lineItem = resolvePrintifyLineItem(env, input.template_id);
-  if (!lineItem) {
+  const staticLineItem = resolvePrintifyLineItem(env, input.template_id);
+  const prepared = await preparePrintifyLineItems(
+    env,
+    {
+      print_order_id: input.print_order_id,
+      template_id: input.template_id,
+      profile_id: input.profile_id,
+      planned_item_qr_ids: input.planned_item_qr_ids,
+      quantity: input.quantity,
+    },
+    shopId,
+    fetchImpl
+  );
+  if (!prepared.ok && prepared.code === "PRINTIFY_ARTWORK_UNCONFIGURED" && !staticLineItem) {
     return {
       ok: false,
       code: "PRINTIFY_TEMPLATE_UNCONFIGURED",
       message: `No Printify product mapping configured for template ${input.template_id}.`,
     };
   }
+  if (!prepared.ok) {
+    return {
+      ok: false,
+      code: prepared.code,
+      message: prepared.message,
+      status: prepared.status,
+    };
+  }
 
   const payload = {
     external_id: input.print_order_id,
-    line_items: [
-      {
-        product_id: lineItem.product_id,
-        variant_id: lineItem.variant_id,
-        quantity: input.quantity,
-      },
-    ],
-    shipping_method: lineItem.shipping_method,
+    line_items: prepared.line_items.map(({ product_id, variant_id, quantity }) => ({
+      product_id,
+      variant_id,
+      quantity,
+    })),
+    shipping_method: staticLineItem?.shipping_method ?? 1,
     send_shipping_notification: false,
     address_to: input.shipping_address,
   };

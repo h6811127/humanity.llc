@@ -66,9 +66,9 @@ Optional but high-leverage for v1.1 or a strong private alpha:
 | `POST /.well-known/hc/v1/cards/{profile_id}/qr` | POST | Owner signature | Creates/rotates QR credential. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/revoke` | POST | Owner/recovery signature | Revokes card or QR credential. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/update` | POST | Owner/recovery signature | Updates `manifesto_line` and signed card document; handle and keys immutable. |
-| `POST /.well-known/hc/v1/cards/{profile_id}/objects` | POST | Owner/recovery signature | **Target model:** creates a child object under the root card. Not routed in the current no-migration slice. |
-| `POST /.well-known/hc/v1/cards/{profile_id}/objects/{object_id}/update` | POST | Owner/recovery signature | **Target model:** updates child object public fields without a separate child key. |
-| `POST /.well-known/hc/v1/cards/{profile_id}/objects/{object_id}/revoke` | POST | Owner/recovery signature | **Target model:** disables a child object or one child QR; root remains active. |
+| `POST /.well-known/hc/v1/cards/{profile_id}/objects` | POST | Owner/recovery signature | Creates a child object under the root card. |
+| `POST /.well-known/hc/v1/cards/{profile_id}/objects/{object_id}/update` | POST | Owner/recovery signature | Updates child object public fields without a separate child key. |
+| `POST /.well-known/hc/v1/cards/{profile_id}/objects/{object_id}/revoke` | POST | Owner/recovery signature | Disables a child object; root remains active. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/live-control/challenges` | POST | Scanner session | Creates short-lived live control challenge. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/live-control/responses` | POST | Owner signature | Submits signed live control challenge response. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/export` | POST | Owner auth/signature | Requests export bundle. |

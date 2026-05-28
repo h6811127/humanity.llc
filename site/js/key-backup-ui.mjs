@@ -86,7 +86,7 @@ export function initKeyBackupUi(opts) {
       opts.setSession({ ...session, key_backup_exported_at: new Date().toISOString() });
       setStatus(
         exportStatus,
-        "Downloaded. Store the file safely on your device; we cannot reset your passphrase or recover this backup."
+        "Downloaded. Store it safely; this root-card backup restores control of this card and its object QRs. We cannot reset your passphrase or recover it."
       );
       exportForm.reset();
     } catch (err) {
@@ -141,7 +141,7 @@ export function initKeyBackupUi(opts) {
       });
       setStatus(
         importStatus,
-        "Unlocked locally. Revoke controls are available below."
+        "Unlocked locally. Root-card controls are available below for this card and its object QRs."
       );
       importForm.reset();
       refreshExportVisibility();
