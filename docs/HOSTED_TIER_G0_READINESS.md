@@ -133,6 +133,8 @@ npm run hosted:rollout:step4 -- --smoke
 OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step4 -- --verify
 ```
 
+**Status:** production smoke/verify passed for public hosted routes (`health`, plans, capabilities, entitlements 401). Local `--deploy` still requires `CLOUDFLARE_API_TOKEN`; full steward-ops verification additionally requires `OPERATOR_AUDIT_TOKEN`.
+
 **Rollout step 5a — pin Cloudflare dashboard (do this first, manual):**
 
 ```bash
