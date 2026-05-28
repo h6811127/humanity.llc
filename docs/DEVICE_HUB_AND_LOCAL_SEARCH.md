@@ -2,17 +2,17 @@
 
 **Status:** Phase 1–4 shipped · shared hub · activity log · returning-user desktop · **landing desktop layout**  
 **Scope:** Browser-local personalization only  -  not resolver-wide discovery  
-**Companion:** [`DEVICE_OS.md`](DEVICE_OS.md)  -  two-layer model, placement rule, landing story · [`LANDING_DESKTOP_LAYOUT.md`](LANDING_DESKTOP_LAYOUT.md) · [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md) · [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md)
+**Companion:** [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`DEVICE_OS.md`](DEVICE_OS.md)  -  two-layer model, placement rule, landing story · [`LANDING_DESKTOP_LAYOUT.md`](LANDING_DESKTOP_LAYOUT.md) · [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md) · [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md)
 
 ---
 
 ## Product intent
 
-The landing page, **`/created/`**, and **`/wallet/`** share an **“on this device”** hub: saved cards with signing keys, **pinned public scan links**, **recent activity**, and shortcuts. This mirrors a Settings-style surface (grouped inset lists) without accounts, sync, or operator storage of private keys.
+The landing page, **`/created/`**, and **`/wallet/`** share an **“on this device”** hub: saved root cards with signing keys, child-object shortcuts as they ship, **pinned public scan links**, **recent activity**, and shortcuts. This mirrors a Settings-style surface (grouped inset lists) without accounts, sync, or operator storage of private keys.
 
 **Sheet title (May 2026):** Bottom sheets on **`/`** and **`/create/`** use **`#device-hub-title` → “Saved in this browser”** with no `.device-hub-lead` under the title (policy copy stays in **Saved items** / Monitoring section leads). **`/created/`** keeps **My cards on this device** + its quick-switcher lead; **`/wallet/`** uses the full-page title **My cards on this device**.
 
-**Not in scope:** searching the Humanity resolver, other people’s cards, or any server index.
+**Not in scope:** searching the Humanity resolver, other people’s root cards/objects, or any server index.
 
 ---
 
@@ -122,13 +122,13 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 ### Phase 1 (shipped)
 
-- **Data:** `hc_wallet` entries.
+- **Data:** `hc_wallet` root-card entries.
 - **UI:** Filter at top of hub; status-line magnifier focuses search.
 - **Wallet:** Inline search on saved-cards section.
 
 ### Phase 2 (shipped)
 
-- **Storage:** `hc_device_pins`  -  public scan bookmarks only.
+- **Storage:** `hc_device_pins`  -  public scan bookmarks only; pins do not carry root keys or child edit authority.
 - **Add pin:** `/wallet/` form  -  `device-pins.mjs`.
 - **Landing + created:** Injected pin group when pins exist.
 
@@ -140,7 +140,7 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 ### Phase 4  -  live-control inbox (shipped)
 
-- **`device-live-control-inbox.mjs`** polls pending challenges for saved cards with `qr_id`.
+- **`device-live-control-inbox.mjs`** polls pending challenges for saved root cards with `qr_id` (and later supported child QR scopes).
 - Hub group **Live proof waiting** on landing and `/wallet/`; tap loads keys and opens `/created/` to sign.
 - `/created/` keeps the existing proof panel (no duplicate inbox).
 

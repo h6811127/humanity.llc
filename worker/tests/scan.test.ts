@@ -407,7 +407,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
       "https://humanity.llc"
     );
     const html = await renderScanPage(vm, "https://humanity.llc");
-    expect(html).toContain("Printed item");
+    expect(html).toContain("Printed object - revoke this item without disabling the root card");
     expect(html).toContain('data-merch-funnel="1"');
     expect(html).toContain(MERCH_SCAN_CUSTOMIZE_PATH);
   });

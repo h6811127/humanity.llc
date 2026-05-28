@@ -43,6 +43,7 @@ import { shouldSuppressCardDisabledSinceVisitAlerts } from "./device-wallet-sinc
 import {
   getCachedNetworkSeenAt,
   getCachedNetworkScanKind,
+  getCachedNetworkQrScope,
   getCachedNetworkStatus,
   getCachedVerification,
   buildResolverConfirmedWalletPollMaps,
@@ -76,6 +77,7 @@ import {
   hubCardTitle,
 } from "./device-hub-card-row-core.mjs";
 import { humanTrustIconMeta, isEligibleVoucherState } from "./human-trust-ui.mjs";
+import { objectTypeLabelFromContext } from "./object-taxonomy-core.mjs";
 import { purgePresenceForProfile } from "./device-tab-presence.mjs";
 import { offerClearOtherTabKeysOnRemove } from "./device-notice-nav.mjs";
 import { markProfileRemovedFromDevice } from "./device-wallet-removed-profiles.mjs";
@@ -153,10 +155,14 @@ function walletHaystack(entry) {
     .toLowerCase();
 }
 
-function classifyObjectType(entry) {
+function classifyObjectType(entry, qrScopeOverride = undefined) {
   const pilot = String(entry?.pilot_template || "").toLowerCase();
-  if (pilot === "status_plate") return { label: "Status plate", tone: "status-plate" };
-  if (pilot === "lost_item_relay") return { label: "Lost item", tone: "lost-item" };
+  const qrScope = qrScopeOverride ?? entry?.qr_scope ?? null;
+  const taxonomy = objectTypeLabelFromContext({
+    pilotTemplate: pilot,
+    qrScope,
+  });
+  if (pilot === "status_plate" || pilot === "lost_item_relay") return taxonomy;
 
   const text = [
     entry?.label,
@@ -173,6 +179,7 @@ function classifyObjectType(entry) {
   if (/(demo|showcase|prototype|live demo)/.test(text)) return { label: "Live demo", tone: "live-demo" };
   if (/(tool|device|equipment|kit)/.test(text)) return { label: "Tool", tone: "tool" };
   if (/(civic|city|commons|public)/.test(text)) return { label: "Civic object", tone: "civic" };
+  if (qrScope) return taxonomy;
   return { label: "Object", tone: "general" };
 }
 
@@ -499,7 +506,9 @@ function applyNetworkChipsToDom(
     const identityEl = li.querySelector(".hub-card-identity");
     if (identityEl) {
       const entry = loadWallet().find((e) => e.profile_id === pid);
-      const objectType = entry ? classifyObjectType(entry) : { label: "Object", tone: "general" };
+      const objectType = entry
+        ? classifyObjectType(entry, getCachedNetworkQrScope(pid))
+        : { label: "Object", tone: "general" };
       const cached = getCachedVerification(pid);
       const identity = hubCardIdentityLine({
         objectTypeLabel: objectType.label,
@@ -994,7 +1003,10 @@ function renderSavedRows(opts = {}) {
   setHubSectionEmpty(savedGroup, savedList, savedEmptyEl, false, "");
   for (const entry of entries) {
     const li = document.createElement("li");
-    const objectType = classifyObjectType(entry);
+    const objectType = classifyObjectType(
+      entry,
+      hubConfig.fetchNetworkStatus ? getCachedNetworkQrScope(entry.profile_id) : undefined
+    );
     const pilotTemplate =
       entry.pilot_template ||
       (entry.manifesto_line ? inferPilotTemplate(String(entry.manifesto_line)) : "general");

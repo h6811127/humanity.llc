@@ -36,6 +36,7 @@ import {
 import { syncCreatedPilotStewardCopy } from "./pilot-steward-copy.mjs";
 import { initCreatedDeviceSave } from "./created-device-save.mjs";
 import { markSetupDone, modeFromPage } from "./created-mode.mjs";
+import { initCreatedMerchFunnel } from "./created-merch-funnel.mjs";
 import { initCreatedSetup } from "./created-setup.mjs";
 import {
   applyCreatedWorkspaceMode,
@@ -62,6 +63,8 @@ const freshParam = params.get("fresh") === "1";
 const liveChallengeParam = params.get("live_challenge")?.trim() || null;
 const liveReturnUrlParam = params.get("return_url")?.trim() || null;
 const vouchIntentParam = params.get("intent") === "vouch";
+
+initCreatedMerchFunnel({ fresh: freshParam });
 
 const errorEl = document.getElementById("created-error");
 const errorDetailEl = document.getElementById("created-error-detail");

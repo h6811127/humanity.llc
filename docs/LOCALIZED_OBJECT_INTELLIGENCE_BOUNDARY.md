@@ -1,7 +1,7 @@
 # Localized object intelligence boundary
 
 **Status:** Active — L0–L2 shipped; **L3 P1 shipped** (explain, under review); **L3 P2 UI retired** (draft API tests only)  
-**Parent:** `docs/MANIFESTO_STATUS_UPDATE.md` · `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`  
+**Parent:** `docs/ROOT_CARD_AND_CHILD_OBJECTS.md` · `docs/MANIFESTO_STATUS_UPDATE.md` · `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`  
 **AI hub:** `docs/AI_FEATURE_DEVELOPMENT.md` · **L3:** `docs/AI_L3_EXPLAIN_SNAPSHOT.md` · `docs/AI_L3_DRAFT_MANIFESTO.md`  
 **Research (not shipping):** `docs/PHYSICAL_WORLD_MULTIPLAYER_RESEARCH_SPEC.md`
 
@@ -11,9 +11,9 @@
 
 Humanity objects expose **bounded public state**, not global AI profiles. Intelligence attached to a place or object must stay:
 
-- **Object-scoped** — one card / one QR handle
-- **Signed** — steward keys publish `manifesto_line` and optional `object_streams`
-- **Revocable** — same lifecycle as the card
+- **Object-scoped** — one root card controls one child object / QR handle at a time
+- **Signed** — root steward keys publish `manifesto_line` and optional `object_streams`
+- **Revocable** — root and child lifecycle stay explicit
 - **Read-only at scan** — strangers consume resolver state; no scan analytics by default
 
 This doc defines the **read-only assembly boundary** before any orchestration or model layer.

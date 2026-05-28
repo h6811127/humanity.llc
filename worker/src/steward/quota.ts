@@ -1,5 +1,5 @@
 import { jsonResponse } from "../http/resolver";
-import type { Env } from "../index";
+import type { Env } from "../env";
 import { hostedStewardEnabled, STEWARD_SESSION_TTL_MS } from "./config";
 import {
   getSessionByTokenHash,

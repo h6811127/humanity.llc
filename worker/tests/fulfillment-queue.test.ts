@@ -4,12 +4,17 @@ import { ensurePrintOrderForCommerceOrder } from "../src/commerce/fulfillment-qu
 import type { ArtifactIntentRow } from "../src/db/artifact-intents";
 import type { CommerceOrderRow } from "../src/db/commerce-orders";
 import type { PrintOrderRow } from "../src/db/print-orders";
+import {
+  DEFAULT_PRINT_TEMPLATE_ID,
+  HOODIE_LIVE_OBJECT_PRODUCT_ID,
+  HOODIE_PRINT_TEMPLATE_ID,
+} from "../src/print/print-catalog";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const INTENT = "ai_FulfillQueueTest01";
 const COMMERCE = "co_testCommerce1234";
 
-function intentRow(): ArtifactIntentRow {
+function intentRow(overrides: Partial<ArtifactIntentRow> = {}): ArtifactIntentRow {
   return {
     artifact_intent_id: INTENT,
     profile_id: PROFILE,
@@ -22,6 +27,7 @@ function intentRow(): ArtifactIntentRow {
     expires_at: "2099-01-01T00:00:00Z",
     created_at: "2026-05-16T17:00:00Z",
     updated_at: "2026-05-16T17:00:00Z",
+    ...overrides,
   };
 }
 
@@ -105,11 +111,29 @@ describe("ensurePrintOrderForCommerceOrder", () => {
 
     expect(result?.created).toBe(true);
     expect(result?.print_order.status).toBe("awaiting_production_approval");
-    expect(result?.print_order.template_id).toBe("hc-sticker-square-v1");
+    expect(result?.print_order.template_id).toBe(DEFAULT_PRINT_TEMPLATE_ID);
     expect(JSON.parse(result!.print_order.planned_item_qr_ids_json)).toEqual([
       "qr_plannedFulfill1",
     ]);
     expect(state.commercePrintOrderIds.get(COMMERCE)).toEqual([result!.print_order.order_id]);
+  });
+
+  it("uses hoodie print template when artifact intent product is hoodie", async () => {
+    const state: State = {
+      intents: new Map([
+        [INTENT, intentRow({ product_id: HOODIE_LIVE_OBJECT_PRODUCT_ID })],
+      ]),
+      printOrders: new Map(),
+      commercePrintOrderIds: new Map(),
+    };
+
+    const result = await ensurePrintOrderForCommerceOrder(
+      dbFor(state),
+      commerceOrder(),
+      "2026-05-16T18:00:00Z"
+    );
+
+    expect(result?.print_order.template_id).toBe(HOODIE_PRINT_TEMPLATE_ID);
   });
 
   it("returns existing print order idempotently", async () => {

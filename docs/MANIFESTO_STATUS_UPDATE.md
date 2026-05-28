@@ -1,7 +1,7 @@
 # Manifesto / status line updates (post-create)
 
-**Status:** Active — current post-M5 product focus  
-**Parent:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` (status plate, lost-item relay)  
+**Status:** Active — current post-M5 product focus
+**Parent:** `docs/ROOT_CARD_AND_CHILD_OBJECTS.md` · `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` (status plate, lost-item relay)  
 **Deferred:** M7 Step 2 polish (see `docs/M3_M4_EXECUTION_PLAN.md`)
 
 ---
@@ -10,16 +10,19 @@
 
 Create locks the first public line at issuance. **Status plates** and **lost-item relays** need the printed QR to stay the same while **network copy changes** (open/closed, return message, corrections).
 
+Today those pilots are implemented as flat card templates. Target model: they become child objects under a root Humanity Card, so the root key edits the object without giving the status plate or lost-item tag its own private key.
+
 That is the gap between **revocable** (pull trust back) and **live** (current truth at scan time).
 
 ---
 
 ## Product rule
 
-> Same physical QR · new signed public line on the resolver.
+> Same physical QR · root-signed public object update on the resolver.
 
-- **Immutable:** `profile_id`, owner `public_key`, `handle`, `created_at`
-- **Mutable:** `manifesto_line`, `updated_at`, full signed `humanity_card` document stored in D1
+- **Immutable root fields:** `profile_id`, owner `public_key`, `handle`, `created_at`
+- **Mutable today:** `manifesto_line`, `updated_at`, full signed `humanity_card` document stored in D1
+- **Target child mutable fields:** object label, object public state, object streams, child QR lifecycle state
 - **Not mutable via this API:** QR credentials, verification, badges, organizer key
 
 ---
@@ -29,6 +32,8 @@ That is the gap between **revocable** (pull trust back) and **live** (current tr
 | Endpoint | Method | Auth | Body |
 |----------|--------|------|------|
 | `/.well-known/hc/v1/cards/{profile_id}/update` | POST | Owner or recovery key | `{ "card": <signed humanity_card> }` |
+
+Target child-object endpoint (not routed yet): `POST /.well-known/hc/v1/cards/{profile_id}/objects/{object_id}/update`, signed by the parent root owner or recovery key.
 
 **Validation:**
 
@@ -54,7 +59,7 @@ Scans and `GET …/cards/{id}` read the updated document on next fetch (active c
 
 ## Storage formats (pilots)
 
-Same as create  -  one `manifesto_line` field, layout parsed at scan time (`worker/src/resolver/manifesto-display.ts`):
+Current bridge is same as create  -  one `manifesto_line` field, layout parsed at scan time (`worker/src/resolver/manifesto-display.ts`):
 
 | Pilot | Format | Example line 1 · line 2 |
 |-------|--------|-------------------------|

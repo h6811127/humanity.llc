@@ -7,10 +7,13 @@ import {
 } from "../src/commerce/merch-funnel-core";
 import {
   appendMerchRefToCreateUrl,
-  appendMerchRefToCustomizeUrl,
-  buildPostCreateDestinationUrl,
+  appendMerchRefToHref,
+  handoffMerchRefAfterCreate,
+  merchCustomizeUrlFromRef,
   normalizeMerchRef,
-  shouldPostCreateRedirectToCustomize,
+  peekMerchCustomizeRef,
+  shouldHandoffToCustomize,
+  shouldShowCreatedMerchCustomizeCard,
 } from "../../site/js/merch-funnel-core.mjs";
 
 describe("merch-funnel-core (server)", () => {
@@ -48,40 +51,48 @@ describe("merch-funnel-core (client)", () => {
     ).toBe("/wallet/");
   });
 
-  it("routes post-create to customize for customize funnel refs", () => {
-    expect(shouldPostCreateRedirectToCustomize("scan_customize")).toBe(true);
-    expect(shouldPostCreateRedirectToCustomize("customize_hoodie")).toBe(true);
-    expect(shouldPostCreateRedirectToCustomize("tier0_shop")).toBe(false);
+  it("appends hc_ref to customize and other shop URLs", () => {
     expect(
-      buildPostCreateDestinationUrl("scan_customize", {
-        origin: "https://humanity.llc",
-        profileId: "prof1",
-        qrId: "qr1",
-        fresh: true,
-      })
-    ).toBe("https://humanity.llc/shop/customize/?hc_ref=scan_customize");
+      appendMerchRefToHref("/shop/customize/", "scan_customize")
+    ).toBe("/shop/customize/?hc_ref=scan_customize");
     expect(
-      buildPostCreateDestinationUrl("tier0_sticker", {
-        origin: "https://humanity.llc",
-        profileId: "prof1",
-        qrId: "qr1",
-        fresh: true,
-      })
-    ).toBe("https://humanity.llc/created/?profile_id=prof1&qr_id=qr1&fresh=1");
+      appendMerchRefToHref("/shop/customize/?product=hoodie", "scan_customize")
+    ).toBe("/shop/customize/?product=hoodie&hc_ref=scan_customize");
   });
 
-  it("appends hc_ref to customize URLs without overwriting existing ref", () => {
+  it("handoffs customize refs after create attribution", () => {
+    const storage = {
+      hc_merch_create_ref: "scan_customize",
+      hc_merch_customize_ref: null,
+    };
+    globalThis.sessionStorage = {
+      getItem(key) {
+        return storage[key] ?? null;
+      },
+      setItem(key, value) {
+        storage[key] = value;
+      },
+      removeItem(key) {
+        storage[key] = null;
+      },
+    };
+    handoffMerchRefAfterCreate("scan_customize");
+    expect(storage.hc_merch_create_ref).toBeNull();
+    expect(storage.hc_merch_customize_ref).toBe("scan_customize");
+    expect(peekMerchCustomizeRef()).toBe("scan_customize");
+  });
+
+  it("builds customize URL and created card visibility", () => {
+    expect(shouldHandoffToCustomize("scan_customize")).toBe(true);
+    expect(shouldHandoffToCustomize("tier0_sticker")).toBe(false);
     expect(
-      appendMerchRefToCustomizeUrl("/shop/customize/", "scan_customize")
-    ).toBe("/shop/customize/?hc_ref=scan_customize");
+      merchCustomizeUrlFromRef("scan_customize", "https://humanity.llc")
+    ).toBe("https://humanity.llc/shop/customize/?hc_ref=scan_customize");
     expect(
-      appendMerchRefToCustomizeUrl(
-        "/shop/customize/?hc_ref=scan_customize",
-        "tier0_shop"
-      )
-    ).toBe("/shop/customize/?hc_ref=scan_customize");
+      shouldShowCreatedMerchCustomizeCard({ fresh: true, merchRef: "scan_customize" })
+    ).toBe(true);
     expect(
-      appendMerchRefToCustomizeUrl("/shop/", "scan_customize")
-    ).toBe("/shop/");
+      shouldShowCreatedMerchCustomizeCard({ fresh: false, merchRef: "scan_customize" })
+    ).toBe(false);
   });
 });

@@ -6,7 +6,11 @@ import {
   printifySubmitEnabled,
   submitPrintifyOrder,
 } from "../src/print/printify-client";
-import { TIER0_BATCH_PRINT_TEMPLATE_ID } from "../src/print/print-catalog";
+import {
+  DEFAULT_PRINT_TEMPLATE_ID,
+  HOODIE_PRINT_TEMPLATE_ID,
+  TIER0_BATCH_PRINT_TEMPLATE_ID,
+} from "../src/print/print-catalog";
 
 const ADDRESS = {
   first_name: "Ada",
@@ -48,18 +52,34 @@ describe("printify-template-config", () => {
     });
   });
 
-  it("resolves personalized sticker mapping from env", () => {
-    const cfg = resolvePrintifyLineItem(
-      {
-        PERSONALIZED_STICKER_PRINTIFY_PRODUCT_ID: "prod_sticker",
-        PERSONALIZED_STICKER_PRINTIFY_VARIANT_ID: "55123",
-      },
-      "hc-sticker-square-v1"
-    );
-    expect(cfg).toEqual({
-      product_id: "prod_sticker",
-      variant_id: 55123,
+  it("resolves Tier 1 hoodie and sticker mappings from env", () => {
+    expect(
+      resolvePrintifyLineItem(
+        {
+          PERSONALIZE_HOODIE_PRINTIFY_PRODUCT_ID: "hoodie_prod",
+          PERSONALIZE_HOODIE_PRINTIFY_VARIANT_ID: "42",
+        },
+        HOODIE_PRINT_TEMPLATE_ID
+      )
+    ).toEqual({
+      product_id: "hoodie_prod",
+      variant_id: 42,
       shipping_method: 1,
+    });
+
+    expect(
+      resolvePrintifyLineItem(
+        {
+          PERSONALIZE_STICKER_PRINTIFY_PRODUCT_ID: "sticker_prod",
+          PERSONALIZE_STICKER_PRINTIFY_VARIANT_ID: "99",
+          PERSONALIZE_STICKER_PRINTIFY_SHIPPING_METHOD: "3",
+        },
+        DEFAULT_PRINT_TEMPLATE_ID
+      )
+    ).toEqual({
+      product_id: "sticker_prod",
+      variant_id: 99,
+      shipping_method: 3,
     });
   });
 });
@@ -77,6 +97,7 @@ describe("submitPrintifyOrder", () => {
       {
         print_order_id: "po_test123456789012345",
         template_id: TIER0_BATCH_PRINT_TEMPLATE_ID,
+        profile_id: "nSVXWPqgRFEhGPjxyRzidF6s",
         planned_item_qr_ids: [],
         shipping_address: ADDRESS,
         quantity: 1,
@@ -86,7 +107,7 @@ describe("submitPrintifyOrder", () => {
     if (!result.ok) expect(result.code).toBe("PRINTIFY_SUBMIT_DEFERRED");
   });
 
-  it("posts order when enabled", async () => {
+  it("posts Tier 0 order when enabled (no artwork upload)", async () => {
     const fetchMock = vi.fn(async () =>
       new Response(JSON.stringify({ id: "5a96f649b2439217d070f507" }), {
         status: 200,
@@ -105,6 +126,7 @@ describe("submitPrintifyOrder", () => {
       {
         print_order_id: "po_test123456789012345",
         template_id: TIER0_BATCH_PRINT_TEMPLATE_ID,
+        profile_id: "nSVXWPqgRFEhGPjxyRzidF6s",
         planned_item_qr_ids: [],
         shipping_address: ADDRESS,
         quantity: 2,
@@ -126,6 +148,65 @@ describe("submitPrintifyOrder", () => {
     expect(body.external_id).toBe("po_test123456789012345");
     expect(body.line_items[0].quantity).toBe(2);
     expect(body.address_to.email).toBe("ada@example.com");
+  });
+
+  it("uploads artwork and posts Tier 1 order with ephemeral product line item", async () => {
+    const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      if (url.endsWith("/uploads/images.json")) {
+        return new Response(JSON.stringify({ id: "upload_xyz" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      if (url.includes("/products.json")) {
+        return new Response(JSON.stringify({ id: "prod_personalized" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      if (url.endsWith("/orders.json")) {
+        return new Response(JSON.stringify({ id: "order_personalized" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      return new Response("unexpected", { status: 500 });
+    });
+
+    const result = await submitPrintifyOrder(
+      {
+        PRINTIFY_API_TOKEN: "token",
+        PRINTIFY_SHOP_ID: "99",
+        PRINTIFY_SUBMIT_ENABLED: "1",
+        PERSONALIZE_STICKER_PRINTIFY_PRODUCT_ID: "prod_static",
+        PERSONALIZE_STICKER_PRINTIFY_VARIANT_ID: "17887",
+        PERSONALIZE_STICKER_PRINTIFY_BLUEPRINT_ID: "384",
+        PERSONALIZE_STICKER_PRINTIFY_PRINT_PROVIDER_ID: "1",
+      },
+      {
+        print_order_id: "po_test123456789012345",
+        template_id: DEFAULT_PRINT_TEMPLATE_ID,
+        profile_id: "nSVXWPqgRFEhGPjxyRzidF6s",
+        planned_item_qr_ids: ["qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5"],
+        shipping_address: ADDRESS,
+        quantity: 1,
+      },
+      fetchMock
+    );
+
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.printify_order_id).toBe("order_personalized");
+
+    const orderCall = fetchMock.mock.calls.find(([u]) =>
+      String(u).endsWith("/orders.json")
+    );
+    expect(orderCall).toBeTruthy();
+    const orderBody = JSON.parse(String(orderCall![1]?.body));
+    expect(orderBody.line_items[0]).toMatchObject({
+      product_id: "prod_personalized",
+      variant_id: 17887,
+      quantity: 1,
+    });
   });
 
   it("detects submit enabled flag", () => {
