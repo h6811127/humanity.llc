@@ -15,7 +15,7 @@ import {
   getWalletCount,
   getWalletSigningKeyCount,
   isWalletSaved,
-  walletSome,
+  walletSomeSigningKey,
 } from "./device-wallet.mjs";
 import {
   gatherInboxInput,
@@ -140,9 +140,7 @@ function hasUnsavedTabKeys() {
 function hasStewardReadyKeys() {
   const session = getTabSession();
   if (session?.owner_private_key_b58 && hasStewardVerification(session)) return true;
-  return walletSome(
-    (entry) => Boolean(entry?.owner_private_key_b58) && hasStewardVerification(entry)
-  );
+  return walletSomeSigningKey((entry) => hasStewardVerification(entry));
 }
 
 function deviceState() {
