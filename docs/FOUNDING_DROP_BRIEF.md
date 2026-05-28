@@ -47,6 +47,8 @@ Check every box before taking money.
 
 ### Tier 1 (belonging)
 
+**Commerce wiring:** [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) — Printify template + Shopify variant + `shop-config.json` + Worker env; customization on `/shop/customize/`, not Shopify alone.
+
 - [ ] Card-creation flow live (public launch)
 - [ ] Checkout verifies active card / owner session for personalized SKUs
 - [ ] Vouch rules published (3 vouch threshold, quotas, 90-day wait)

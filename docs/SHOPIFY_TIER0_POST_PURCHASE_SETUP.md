@@ -21,7 +21,7 @@ This is derived in repo from `site/data/shop-config.json`:
 - `site_origin`: `https://humanity.llc`
 - `thanks_path`: `/shop/thanks/`
 
-When checkout is open, `/shop/founding/` shows this URL in the **Checkout** section under “Post-purchase page” for copy-paste into Shopify Admin.
+When checkout is open, `/shop/` shows this URL in the **Checkout** section under “Post-purchase page” for copy-paste into Shopify Admin.
 
 ---
 
@@ -57,17 +57,10 @@ Some stores expose a custom redirect after payment. If Shopify offers a **post-p
 
 1. Place a **test order** (Shopify test mode or Bogus Gateway if enabled).
 2. Complete checkout.
-3. Confirm you can open **https://humanity.llc/shop/thanks/** and see post-purchase copy plus the **Track your order** form.
-4. Optional: follow **Create a free card** — should carry `hc_ref=tier0_shop` when arriving from shop/thanks flow.
-
-### Order status lookup
-
-Buyers can track production on the thanks page:
-
-- **Personalized orders:** paste `artifact_intent_id` from Shopify line item properties (also in confirmation email).
-- **Any order:** paste Shopify order number.
-
-API (same data): `GET /v1/store/orders/status?artifact_intent_id=ai_…` or `?shopify_order_id=…`
+3. Confirm you can open **https://humanity.llc/shop/thanks/** and see Tier 0 post-purchase copy.
+4. Use **Order status** on that page (order number + checkout email) — calls `GET /v1/store/order-status` (buyer-safe; no shipping address returned).
+5. Optional deep link for emails: `https://humanity.llc/shop/thanks/?order=1001&email=buyer@example.com` (order number without `#`).
+6. Optional: follow **Create a free card** — should carry `hc_ref=tier0_shop` when arriving from shop/thanks flow.
 
 ---
 

@@ -1,10 +1,23 @@
 # Shop  -  Tier 0 curiosity drop (implementation)
 
-**Status:** API-driven story-row hub shipped · Tier 0 at `/shop/founding/` · same-tab Shopify handoff  
+**Status:** Checkout handoff wired (config-driven) · set `shop-config.json` when Shopify product exists  
 **Canonical strategy:** `docs/MERCH_LED_V1.md` Phase B, `docs/FOUNDING_DROP_BRIEF.md` Tier 0  
 **Merch funnel MVP:** `docs/MERCH_FUNNEL_MVP.md` · `/shop/customize/` QR customizer  
+**Headless commerce:** `docs/MERCH_HEADLESS_COMMERCE.md` — Printify = factory, Shopify = checkout, humanity.llc = storefront; dual product IDs  
 **Merch QR policy:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` (defer `checkout_open: true` until remaining policy gates pass; M5 passed 2026-05-27)  
 **Copy:** `docs/LAUNCH_LANGUAGE_KIT.md` § Tier 0 · Sticker FAQ
+
+---
+
+## Three systems (not interchangeable)
+
+| System | Role in v1 | This doc |
+|--------|------------|----------|
+| **humanity.llc** | Storefront UI, Tier 0 `/shop/`, Tier 1 `/shop/customize/` | Pages deploy + `shop-config.json` |
+| **Shopify** | Payment, tax, refunds — cart permalinks only | § Enable checkout below |
+| **Printify** | Manufacture + ship — **never** customer-facing | Worker env + `POST /v1/print/orders` |
+
+Tier 0 uses Shopify variant + optional batch Printify mapping. **Tier 1 personalized** requires artifact intent from the customizer — see [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md). A hoodie “live on Shopify” from Printify publish is a **checkout SKU shell**, not the full personalized product until `/shop/customize/` + webhook path is wired.
 
 ---
 
@@ -12,17 +25,13 @@
 
 | Piece | Path |
 |-------|------|
-| **Shop hub** (API story rows) | `site/shop/index.html` · `site/js/shop-hub.mjs` · `GET /v1/store/rows` |
-| Product detail | `/shop/products/{product_id}/` · `GET /v1/store/products/{id}` |
-| Proof consent before checkout | `shop-proof-consent-core.mjs` · attach requires `proof_acknowledged` |
-| Tier 0 founding sticker page | `site/shop/founding/index.html` · `site/js/shop-founding.mjs` |
-| Same-tab checkout handoff | `site/js/shop-checkout-handoff.mjs` |
+| Story-row drop page | `site/shop/index.html` |
 | **QR customizer (Tier 1)** | `site/shop/customize/index.html` · `docs/MERCH_FUNNEL_MVP.md` |
 | Checkout config | `site/data/shop-config.json` (see `shop-config.example.json`) |
-| Shop UI (Tier 0) | `shop-founding.mjs` + `shop-config.mjs`  -  Buy vs interest by `checkout_open` |
+| Shop UI | `site/js/shop.mjs` + `site/js/shop-config.mjs`  -  Buy vs interest by `checkout_open` |
 | Drop interest (device-local) | `localStorage` `hc_shop_drop_interest` when checkout closed |
-| Post-checkout page + order status | `site/shop/thanks/index.html` · `GET /v1/store/orders/status` · link from Shopify order status URL |
-| Hub shortcut | Landing **Shortcuts** → Shop |
+| Post-checkout page | `site/shop/thanks/index.html`  -  link from Shopify thank-you / order status URL · **buyer order status lookup** |
+| Hub shortcut | Landing **Shortcuts** → Founding sticker drop |
 | Hero secondary CTA | Landing hero → `/shop/` |
 
 The interest form records **optional email** on this browser only (no server upload). Operator exports from DevTools: `JSON.parse(localStorage.getItem('hc_shop_drop_interest'))`.
@@ -45,16 +54,14 @@ The interest form records **optional email** on this browser only (no server upl
 }
 ```
 
-4. In Shopify checkout settings, set **Order status page** or post-purchase link to `https://humanity.llc/shop/thanks/` — see [`SHOPIFY_TIER0_POST_PURCHASE_SETUP.md`](SHOPIFY_TIER0_POST_PURCHASE_SETUP.md) (iPad/Safari steps). When checkout is open, `/shop/founding/` displays the post-purchase URL in the Checkout section for copy-paste.
-5. Deploy Pages. `/shop/founding/` shows **Buy** and hides the interest form.
+4. In Shopify checkout settings, set **Order status page** or post-purchase link to `https://humanity.llc/shop/thanks/` — see [`SHOPIFY_TIER0_POST_PURCHASE_SETUP.md`](SHOPIFY_TIER0_POST_PURCHASE_SETUP.md) (iPad/Safari steps). When checkout is open, `/shop/` displays the post-purchase URL in the Checkout section for copy-paste.
+5. Deploy Pages. `/shop/` shows **Buy** and hides the interest form.
 6. Deploy Worker — `npm run worker:deploy` — required for `/v1/store/*` (customizer artifact intent).
 7. Run `FOUNDING_DROP_BRIEF.md` and `MERCH_QR_LIFECYCLE_POLICY.md` launch gates before `checkout_open: true` on production.
 
 **Worker (Tier 0 batch fulfillment):** set `TIER0_CAMPAIGN_PROFILE_ID` to the campaign card’s `profile_id` (must exist in D1) and `TIER0_SHOPIFY_VARIANT_IDS` to the Shopify variant id from the cart URL (comma-separated if multiple). Paid webhooks for that SKU queue a batch print order (`hc-tier0-sticker-batch-v1`) without artifact intent metadata.
 
 **Printify submit (operator):** set `PRINTIFY_SUBMIT_ENABLED=1`, `PRINTIFY_API_TOKEN` (secret), `PRINTIFY_SHOP_ID`, `TIER0_PRINTIFY_PRODUCT_ID`, and `TIER0_PRINTIFY_VARIANT_ID`. Then `POST /v1/print/orders` with `{ commerce_order_id, submit_to_printify: true, shipping_address, quantity? }`. Shipping is **not** stored in D1 — paste from Shopify admin at submit time.
-
-**Personalized sticker (Phase 4):** set `PERSONALIZED_STICKER_PRINTIFY_PRODUCT_ID` and `PERSONALIZED_STICKER_PRINTIFY_VARIANT_ID` for template `hc-sticker-square-v1`. Paid webhook queues print order with that template; operator mints planned QRs then submits to Printify same as Tier 0.
 
 **Printify webhooks (O-003):** register order events to `POST /v1/print/webhooks/printify` with shared `PRINTIFY_WEBHOOK_SECRET`. Updates print order status idempotently; no raw payload stored in D1.
 
@@ -76,8 +83,7 @@ The interest form records **optional email** on this browser only (no server upl
 |------|--------|
 | 1. Create Shopify product **Founding signal sticker** | Operator |
 | 2. `site/data/shop-config.json` + example file | ✅ |
-| 3. Buy CTA when `checkout_open` + valid `checkout_url` | ✅ (`shop-founding.mjs`) |
-| 3b. Same-tab Shopify redirect (no new tab) | ✅ (`shop-checkout-handoff.mjs`) |
+| 3. Buy CTA when `checkout_open` + valid `checkout_url` | ✅ (`shop.mjs`) |
 | 4. Post-purchase page + Shopify email copy | ✅ thanks page · [`SHOPIFY_TIER0_POST_PURCHASE_SETUP.md`](SHOPIFY_TIER0_POST_PURCHASE_SETUP.md) · email in `LAUNCH_LANGUAGE_KIT.md` |
 | 5. Pre-launch gates before live payments | Operator (`FOUNDING_DROP_BRIEF.md`) |
 
@@ -95,6 +101,7 @@ The interest form records **optional email** on this browser only (no server upl
 
 | Topic | Doc |
 |-------|-----|
+| **Headless Shopify + Printify wiring** | `docs/MERCH_HEADLESS_COMMERCE.md` |
 | Owner revoke from second device | `docs/M5_5_OWNER_KEY_PORTABILITY.md` (shipped in repo) |
 | Device hub (save keys, inbox) | `docs/DEVICE_OS.md` |
 | Drop ops checklist | `docs/FOUNDING_DROP_BRIEF.md` |

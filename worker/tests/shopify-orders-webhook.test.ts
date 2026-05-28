@@ -71,13 +71,15 @@ function dbFor(state: DbState): D1Database {
               commerce_order_id: args[0] as string,
               shopify_order_id: args[1] as string,
               shopify_checkout_id: args[2] as string | null,
-              profile_id: args[3] as string | null,
-              artifact_intent_ids_json: args[4] as string,
+              shopify_order_number: args[3] as number | null,
+              buyer_email_hash: args[4] as string | null,
+              profile_id: args[5] as string | null,
+              artifact_intent_ids_json: args[6] as string,
               print_order_ids_json: "[]",
-              status: args[6] as CommerceOrderRow["status"],
-              hold_reason: args[7] as string | null,
-              created_at: args[8] as string,
-              updated_at: args[9] as string,
+              status: args[7] as CommerceOrderRow["status"],
+              hold_reason: args[8] as string | null,
+              created_at: args[9] as string,
+              updated_at: args[10] as string,
             };
             state.orders.set(row.shopify_order_id, row);
           }
@@ -152,6 +154,9 @@ function paidOrderBody(overrides: Record<string, unknown> = {}) {
     id: 450789469,
     checkout_id: 901414060,
     financial_status: "paid",
+    email: "buyer@example.com",
+    order_number: 1001,
+    name: "#1001",
     line_items: [
       {
         properties: [

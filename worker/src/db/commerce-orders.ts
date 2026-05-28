@@ -15,6 +15,8 @@ export interface CommerceOrderRow {
   commerce_order_id: string;
   shopify_order_id: string;
   shopify_checkout_id: string | null;
+  shopify_order_number: number | null;
+  buyer_email_hash: string | null;
   profile_id: string | null;
   artifact_intent_ids_json: string;
   print_order_ids_json: string;
@@ -28,6 +30,8 @@ export interface InsertCommerceOrderInput {
   commerce_order_id: string;
   shopify_order_id: string;
   shopify_checkout_id: string | null;
+  shopify_order_number: number | null;
+  buyer_email_hash: string | null;
   profile_id: string | null;
   artifact_intent_ids: string[];
   status: CommerceOrderStatus;
@@ -35,17 +39,17 @@ export interface InsertCommerceOrderInput {
   created_at: string;
 }
 
+const COMMERCE_ORDER_SELECT = `SELECT commerce_order_id, shopify_order_id, shopify_checkout_id,
+              shopify_order_number, buyer_email_hash, profile_id,
+              artifact_intent_ids_json, print_order_ids_json, status, hold_reason,
+              created_at, updated_at`;
+
 export async function getCommerceOrderByShopifyId(
   db: D1Database,
   shopifyOrderId: string
 ): Promise<CommerceOrderRow | null> {
   return db
-    .prepare(
-      `SELECT commerce_order_id, shopify_order_id, shopify_checkout_id, profile_id,
-              artifact_intent_ids_json, print_order_ids_json, status, hold_reason,
-              created_at, updated_at
-       FROM commerce_order_links WHERE shopify_order_id = ?`
-    )
+    .prepare(`${COMMERCE_ORDER_SELECT} FROM commerce_order_links WHERE shopify_order_id = ?`)
     .bind(shopifyOrderId)
     .first<CommerceOrderRow>();
 }
@@ -55,13 +59,25 @@ export async function getCommerceOrderById(
   commerceOrderId: string
 ): Promise<CommerceOrderRow | null> {
   return db
-    .prepare(
-      `SELECT commerce_order_id, shopify_order_id, shopify_checkout_id, profile_id,
-              artifact_intent_ids_json, print_order_ids_json, status, hold_reason,
-              created_at, updated_at
-       FROM commerce_order_links WHERE commerce_order_id = ?`
-    )
+    .prepare(`${COMMERCE_ORDER_SELECT} FROM commerce_order_links WHERE commerce_order_id = ?`)
     .bind(commerceOrderId)
+    .first<CommerceOrderRow>();
+}
+
+/** Lookup by Shopify numeric id or display order number (#1001 → 1001). */
+export async function getCommerceOrderForBuyerLookup(
+  db: D1Database,
+  orderRef: string
+): Promise<CommerceOrderRow | null> {
+  const byId = await getCommerceOrderByShopifyId(db, orderRef);
+  if (byId) return byId;
+
+  const asNumber = Number.parseInt(orderRef, 10);
+  if (!Number.isFinite(asNumber) || asNumber <= 0) return null;
+
+  return db
+    .prepare(`${COMMERCE_ORDER_SELECT} FROM commerce_order_links WHERE shopify_order_number = ?`)
+    .bind(asNumber)
     .first<CommerceOrderRow>();
 }
 
@@ -72,15 +88,18 @@ export async function insertCommerceOrder(
   await db
     .prepare(
       `INSERT INTO commerce_order_links (
-        commerce_order_id, shopify_order_id, shopify_checkout_id, profile_id,
+        commerce_order_id, shopify_order_id, shopify_checkout_id, shopify_order_number,
+        buyer_email_hash, profile_id,
         artifact_intent_ids_json, print_order_ids_json, status, hold_reason,
         created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, '[]', ?, ?, ?, ?)`
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, '[]', ?, ?, ?, ?)`
     )
     .bind(
       input.commerce_order_id,
       input.shopify_order_id,
       input.shopify_checkout_id,
+      input.shopify_order_number,
+      input.buyer_email_hash,
       input.profile_id,
       JSON.stringify(input.artifact_intent_ids),
       input.status,
@@ -131,9 +150,7 @@ export async function findCommerceOrdersByArtifactIntentId(
   const pattern = `%"${artifactIntentId}"%`;
   const rows = await db
     .prepare(
-      `SELECT commerce_order_id, shopify_order_id, shopify_checkout_id, profile_id,
-              artifact_intent_ids_json, print_order_ids_json, status, hold_reason,
-              created_at, updated_at
+      `${COMMERCE_ORDER_SELECT}
        FROM commerce_order_links
        WHERE artifact_intent_ids_json LIKE ?`
     )

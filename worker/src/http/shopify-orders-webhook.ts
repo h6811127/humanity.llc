@@ -2,6 +2,7 @@
  * Shopify order webhooks → commerce order links (O-001).
  * Printify submission deferred to O-002; missing metadata holds for operator review.
  */
+import { hashBuyerEmail } from "../commerce/buyer-email-hash";
 import {
   countTier0LineQuantity,
   extractShopifyOrderMetadata,
@@ -194,11 +195,16 @@ async function handlePaidOrder(
 
   const validation = await resolvePaidOrderValidation(db, order, metadata, env, nowIso);
   const commerceOrderId = generateCommerceOrderId();
+  const buyerEmailHash = metadata.buyer_email
+    ? await hashBuyerEmail(metadata.buyer_email)
+    : null;
 
   await insertCommerceOrder(db, {
     commerce_order_id: commerceOrderId,
     shopify_order_id: metadata.shopify_order_id,
     shopify_checkout_id: metadata.shopify_checkout_id,
+    shopify_order_number: metadata.shopify_order_number,
+    buyer_email_hash: buyerEmailHash,
     profile_id: validation.profile_id,
     artifact_intent_ids: validation.artifact_intent_ids,
     status: validation.status,
@@ -215,6 +221,8 @@ async function handlePaidOrder(
     commerce_order_id: commerceOrderId,
     shopify_order_id: metadata.shopify_order_id,
     shopify_checkout_id: metadata.shopify_checkout_id,
+    shopify_order_number: metadata.shopify_order_number,
+    buyer_email_hash: buyerEmailHash,
     profile_id: validation.profile_id,
     artifact_intent_ids_json: JSON.stringify(validation.artifact_intent_ids),
     print_order_ids_json: "[]",
