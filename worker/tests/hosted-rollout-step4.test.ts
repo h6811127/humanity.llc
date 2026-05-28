@@ -50,4 +50,9 @@ describe("hosted-rollout-step4", () => {
     const pkg = JSON.parse(readFileSync(join(repoRoot, "package.json"), "utf8"));
     expect(pkg.scripts["hosted:rollout:step4"]).toContain("hosted-rollout-step4.mjs");
   });
+
+  it("wrangler.toml has hosted flag enabled after rollout step 4a", () => {
+    const toml = readFileSync(join(repoRoot, "worker/wrangler.toml"), "utf8");
+    expect(toml).toMatch(/HOSTED_STEWARD_ENABLED\s*=\s*"1"/);
+  });
 });

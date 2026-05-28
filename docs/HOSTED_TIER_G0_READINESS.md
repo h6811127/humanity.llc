@@ -118,6 +118,8 @@ npm run hosted:rollout:step4a -- --apply   # idempotent if already "1"
 # worker/wrangler.toml committed with HOSTED_STEWARD_ENABLED = "1" — proceed to step 4b
 ```
 
+**Status:** step 4a is applied in repo (`worker/wrangler.toml` has `HOSTED_STEWARD_ENABLED = "1"`). Continue with step 4b deploy/smoke/verify.
+
 **Rollout step 4b — deploy + smoke + verify production:**
 
 ```bash
@@ -130,6 +132,8 @@ npm run hosted:rollout:post-deploy-smoke -- --verify
 npm run hosted:rollout:step4 -- --smoke
 OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step4 -- --verify
 ```
+
+**Status:** production smoke/verify passed for public hosted routes (`health`, plans, capabilities, entitlements 401). Local `--deploy` still requires `CLOUDFLARE_API_TOKEN`; full steward-ops verification additionally requires `OPERATOR_AUDIT_TOKEN`.
 
 **Rollout step 5a — pin Cloudflare dashboard (do this first, manual):**
 
