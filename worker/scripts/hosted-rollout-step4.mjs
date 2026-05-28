@@ -25,6 +25,7 @@ import {
   operatorAuditTokenShellHint,
 } from "./hosted-rollout-token.mjs";
 import { readWranglerHostedFlag } from "./hosted-rollout-step4a.mjs";
+import { smokeProductionScanPage } from "./hosted-rollout-scan-smoke.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -236,6 +237,7 @@ export async function smokeStewardOpsHostedEnabled(bearerToken, origin = getApiO
 
 export async function smokeProduction(origin = getApiOrigin()) {
   await smokeProductionHealth(origin);
+  await smokeProductionScanPage(origin);
   await smokeHostedPlansEnabled(origin);
   await smokeHostedStewardRoutesEnabled(origin);
   if (token) {
@@ -249,6 +251,7 @@ export async function smokeProduction(origin = getApiOrigin()) {
 
 async function verifyProduction() {
   await smokeProductionHealth();
+  await smokeProductionScanPage();
   await smokeHostedPlansEnabled();
   await smokeHostedStewardRoutesEnabled();
   if (token) {
@@ -266,6 +269,8 @@ export function runStep4PreflightVitest() {
     "worker/tests/hosted-rollout-step4-smoke.test.ts",
     "worker/tests/hosted-rollout-step4.test.ts",
     "worker/tests/hosted-rollout-step4a.test.ts",
+    "worker/tests/hosted-rollout-scan-smoke.test.ts",
+    "worker/tests/schema-ready.test.ts",
   ]);
 }
 
