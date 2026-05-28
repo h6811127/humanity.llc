@@ -13,11 +13,11 @@ Use this page when you need **one map** of steward-facing device work. Detailed 
 | # | Step | Owner | Doc / command |
 |---|------|-------|----------------|
 | **1** | **Steward session link (client)** — sign `steward_account_link_v1`, `POST …/steward/session`, store `hc_steward_session`; checkout return `?hc_account_id=acc_…` | **Shipped** in repo | `site/js/device-steward-session*.mjs` · [`HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md`](HOSTED_TIER_TECHNICAL_STANDARDS_DELTA.md) |
-| **2** | **Production rollout** — D1 migrations → deploy flag off → secrets → flag on → regression | Ops / eng with Cloudflare auth | `hosted:rollout:step1` → `step6` · [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout — **step 4a ✅** · **next:** step 4b `hosted:rollout:step4 -- --deploy` + `--smoke` / `--verify` · local: `hosted:rollout:step4 -- --smoke --local --preflight` |
+| **2** | **Production rollout** — D1 migrations → deploy flag off → secrets → flag on → regression | Ops / eng with Cloudflare auth | `hosted:rollout:step1` → `step6` · [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout — **step 4a ✅** · **next:** `hosted:rollout:step4b -- --preflight` then `--deploy` / `--smoke` / `--verify` · local: `hosted:rollout:step4b -- --local-smoke` |
 | **3** | **Verify hosted path** — entitlements probe, session link, SSE policy, free-tier regression | **Tooling shipped** — run before/after rollout | `npm run hosted:rollout:verify-path` (wraps `verify:hosted-g0` + session/billing core tests) · optional `--e2e` · [`HOSTED_TIER_G0_READINESS.md`](HOSTED_TIER_G0_READINESS.md) |
 | **4** | **Billing checkout → `hc_account_id` URL** (Stripe return) | **URL builder shipped** — wire in Stripe Dashboard | `npm run hosted:stripe-return-url -- acc_…` · `device-steward-billing-return-core.mjs` |
-| **5** | **Child object UI** under one root (beyond `print_artifact` bridge) | **Shipped** — register, update, issue `child_object` scan QR on `/created/` Live | [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · `created-child-object.mjs` · `POST …/objects/{id}/issue-qr` |
-| **6** | **M5.5 key import** on new device | Product | [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) |
+| **5** | **Child object UI** under one root (beyond `print_artifact` bridge) | **Shipped** — register, update, issue scan QR, disable plate on `/created/` Live | [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · `created-child-object.mjs` |
+| **6** | **M5.5 key import** on new device | **Hub import shipped** — backup → wallet + tab session + **Open card controls** → `/created/` | [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · `device-hub-import.mjs` |
 
 **Free tier unchanged:** no session, no SSE, 400 auto-poll/day — steps 2–3 must not regress H1–H6 ([`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10).
 
@@ -124,7 +124,7 @@ flowchart LR
 | Area | Shipped (reference / free) | Next / hosted | Canonical detail |
 |------|----------------------------|---------------|------------------|
 | **Key model** | Root + `print_artifact` child bridge; wallet scale guardrails | One root → many child objects (product direction) | [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) |
-| **Portability** | Owner revoke path; backup/recovery docs | M5.5 import on new device | [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) |
+| **Portability** | Owner revoke path; backup/recovery; hub import → `/created/` | Shipped in repo; manual second-device QA | [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) |
 | **Inbox + custody panel** | Phases 1–14 inbox; custody plan 1–7 | Per-card watch flags (catalog L9+) | [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md`](KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md) |
 | **Browser alerts** | v2 A–D + `sw-live-proof.mjs` | Same UX; less polling when SSE healthy | [`DEVICE_INBOX.md`](DEVICE_INBOX.md) § Background alerts roadmap |
 | **Poll budget** | Phases 1–9 + 8c; 400 auto GET/day; leader tab | Entitlement-driven cap; push miss → poll | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Optimization catalog **L12–L15**, **B1–B3** |
