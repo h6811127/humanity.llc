@@ -34,3 +34,17 @@ export function parseStatusPlateChildFields(publicLabelRaw, publicStateRaw) {
   }
   return { publicLabel, publicState };
 }
+
+/**
+ * @param {unknown} publicStateRaw
+ */
+export function parseStatusPlateChildState(publicStateRaw) {
+  const publicState = typeof publicStateRaw === "string" ? publicStateRaw.trim() : "";
+  if (!publicState) {
+    throw new Error("Status line is required.");
+  }
+  if (publicState.length > 280) {
+    throw new Error("Status line must be 280 characters or fewer.");
+  }
+  return { publicState };
+}

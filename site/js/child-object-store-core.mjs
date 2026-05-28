@@ -56,3 +56,25 @@ export function appendChildObjectRow(storage, profileId, row) {
   storage.setItem(childObjectsBucketKey(profileId), JSON.stringify(next));
   return next;
 }
+
+/**
+ * @param {Pick<Storage, "getItem" | "setItem">} storage
+ * @param {string} profileId
+ * @param {string} objectId
+ * @param {Partial<Record<string, unknown>>} patch
+ */
+export function updateChildObjectRow(storage, profileId, objectId, patch) {
+  const rows = readChildObjectRows(storage, profileId);
+  const index = rows.findIndex((row) => row.object_id === objectId);
+  if (index < 0) {
+    throw new Error("Child object not found on this device.");
+  }
+  const updated = { ...rows[index], ...patch };
+  if (!isChildObjectRow(updated)) {
+    throw new Error("Invalid child object row.");
+  }
+  const next = [...rows];
+  next[index] = updated;
+  storage.setItem(childObjectsBucketKey(profileId), JSON.stringify(next));
+  return next;
+}
