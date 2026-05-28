@@ -61,7 +61,7 @@ The first screen of the hub should prioritize:
 ### Step 3 - Rebalance nav controls ✅
 
 - **Home (quieter):** `.device-hub-home-btn` uses muted popover fg, lighter fill (`rgba(120,120,128,0.08)`), 20px icon; still **40×40px** tap target.
-- **Close (stronger):** `.device-hub-sheet-close` bumped to **40×40px**, popover fg (not muted), control fill + border + light shadow; dark theme border/shadow pass.
+- **Close (stronger):** `.device-hub-sheet-close` bumped to **42×42px**, popover fg (not muted), control fill + border + light shadow; dark theme border/shadow pass.
 - **Files:** `site/css/device-shell.css`, `site/css/theme-dark.css` (`device-shell.css?v=59` on shell pages).
 
 ### Step 4 - QA pass ✅
@@ -87,5 +87,6 @@ npm run e2e -- e2e/device-status-dot.spec.ts -g "hub sheet header chrome"
 - The top rail contains Home + status only; Create no longer competes with Close or the title.
 - The saved-items heading exposes a compact **+ New** action.
 - The status panel stays on one inline row in the empty-wallet case: network + muted `0 cards` / `0 pinned`.
+- Home and Close both meet the 40px minimum tap target, with Close visually stronger than Home.
 - Existing hub open/close state contracts still route through `setHubSheetOpen()` / `setHubExpanded()`.
 - No new module imports are added to the status-dot graph.

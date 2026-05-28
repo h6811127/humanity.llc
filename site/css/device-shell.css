@@ -877,14 +877,15 @@ button.device-hub-notice-banner {
   min-width: 40px;
   min-height: 40px;
   border-radius: 50%;
-  border: none;
+  border: 0.5px solid transparent;
   background: rgba(120, 120, 128, 0.08);
-  color: var(--surface-popover-fg-muted, rgba(60, 60, 67, 0.55));
+  color: var(--surface-popover-fg-muted, var(--shell-label, rgba(60, 60, 67, 0.62)));
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
   transition:
-    transform 0.2s var(--shell-spring),
-    background 0.2s var(--shell-ease);
+    background-color 0.2s var(--shell-ease),
+    color 0.2s var(--shell-ease),
+    transform 0.2s var(--shell-spring);
 }
 
 .device-hub-home-btn svg {
@@ -2025,11 +2026,11 @@ button.hub-card-action.hub-use-keys {
 
 .device-hub-sheet-close {
   position: absolute;
-  top: 8px;
-  right: 10px;
+  top: 6px;
+  right: 8px;
   z-index: 4;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   min-width: 40px;
   min-height: 40px;
   border: 0.5px solid var(--surface-popover-border, rgba(60, 60, 67, 0.12));
@@ -2042,6 +2043,10 @@ button.hub-card-action.hub-use-keys {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   box-shadow: var(--shell-shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+  transition:
+    background-color 0.2s var(--shell-ease),
+    transform 0.2s var(--shell-spring),
+    opacity 0.2s ease;
 }
 
 .device-hub-sheet-close:active {
