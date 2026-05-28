@@ -36,7 +36,8 @@
 npm run pages:dev
 # In another shell — should 200 without redirect-loop warning on first request:
 curl -sI http://127.0.0.1:8788/shop/products/sticker_personalized_v1/ | head -5
-npm run worker:test -- worker/tests/shop-product-detail-core.test.ts
+npm run worker:test -- worker/tests/shop-product-detail-core.test.ts worker/tests/pages-404.test.ts
+npm run e2e -- e2e/shop-product-detail.spec.ts
 ```
 
 ---
@@ -111,3 +112,4 @@ Spec list: `worker/scripts/device-shell-e2e-specs.mjs` · Vitest guard: `npm run
 | 2026-05-28 | **Step 3 shipped:** fresh customize handoff auto-redirect from `/created/` |
 | 2026-05-28 | **Step 4 shipped:** full Device shell E2E bundle — 87 passed, 1 skipped (WebKit touch profile); doc **Closed** |
 | 2026-05-28 | **P1-LW / S12:** `e2e/device-hub-large-wallet-summary.spec.ts` added to bundle (90 specs with new file) |
+| 2026-05-28 | **Step 1 regression:** `e2e/shop-product-detail.spec.ts` (Glitch drop + hub CTA; no `/shop/products/detail` loop) |

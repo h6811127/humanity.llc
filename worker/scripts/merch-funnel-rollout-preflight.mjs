@@ -50,5 +50,7 @@ export function runMerchRolloutPreflightVitest() {
     "worker/tests/merch-funnel-rollout-post-deploy.test.ts",
     "worker/tests/shop-config-rollout.test.ts",
     "worker/tests/wrangler-merch-routes.test.ts",
+    "worker/tests/store-routes-dispatch.test.ts",
+    "worker/tests/store-rows-handler.test.ts",
   ]);
 }

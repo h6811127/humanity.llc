@@ -14,6 +14,7 @@ import {
   withCors,
 } from "./http/resolver";
 import { handlePostArtifactIntent, handlePostArtifactIntentAttach, handlePostArtifactIntentPreMint } from "./resolver/artifact-intents";
+import { handleGetStoreProduct, handleGetStoreRows } from "./store/store-rows-handler";
 import { handleGetStoreOrderStatus } from "./resolver/store-order-status";
 import { handlePostStoreOrderMint } from "./resolver/store-order-mint";
 import { handleGetCard, handlePostCards } from "./resolver/create-card";
@@ -684,6 +685,17 @@ export default {
         env.DB,
         vouchRevokeMatch[1]!
       );
+      return withCors(request, res);
+    }
+
+    if (path === "/v1/store/rows" && request.method === "GET") {
+      const res = await handleGetStoreRows();
+      return withCors(request, res);
+    }
+
+    const storeProductMatch = path.match(/^\/v1\/store\/products\/([^/]+)$/);
+    if (storeProductMatch && request.method === "GET") {
+      const res = await handleGetStoreProduct(storeProductMatch[1]!);
       return withCors(request, res);
     }
 

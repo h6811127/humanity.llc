@@ -73,7 +73,7 @@ Pages serves `404.html` with HTTP **404** for paths that do not match a file whe
 | `styles.css` | Layout and visual system |
 | `js/pass-flip.js` | Pass card tilt (touch + desktop), tap-to-flip (landing + scan) |
 | `_headers` | Security and cache headers |
-| `_redirects` | `/create` → `/create/` (301; avoid `create.html`  -  Pages strips `.html` and loops) |
+| `_redirects` | `/create` → `/create/` (301; avoid `create.html`  -  Pages strips `.html` and loops); `/shop/products/*` → `/shop/product-detail/` (200 shell outside splat) |
 | `404.html` | Custom **404** for unknown Pages paths (disable SPA fallback or unknown URLs serve landing with 200) |
 | `assets/red_qr_transparent_bg.png` | Favicon, brand mark, card preview |
 

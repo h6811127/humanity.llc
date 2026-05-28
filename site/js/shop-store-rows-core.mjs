@@ -46,12 +46,15 @@ export async function fetchStoreProduct(origin, productId) {
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
+    const errCode = typeof data.error === "string" ? data.error : "";
     const msg =
       typeof data.message === "string"
         ? data.message
-        : typeof data.error === "string"
-          ? data.error
-          : "Product unavailable.";
+        : errCode === "not_found"
+          ? "Store catalog API is unavailable — deploy the Worker with GET /v1/store/products routes."
+          : errCode === "PRODUCT_NOT_FOUND"
+            ? "Unknown or unpublished product."
+            : errCode || "Product unavailable.";
     throw new Error(msg);
   }
   return data;

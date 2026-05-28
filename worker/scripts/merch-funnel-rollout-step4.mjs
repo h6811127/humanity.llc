@@ -16,6 +16,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
 const wranglerToml = path.join(repoRoot, "worker/wrangler.toml");
+const workerIndex = path.join(repoRoot, "worker/src/index.ts");
 
 const strict = process.argv.includes("--strict");
 
@@ -65,6 +66,20 @@ function main() {
     if (strict) process.exit(1);
   } else {
     console.log("✓ Route pattern humanity.llc/v1/* present");
+  }
+
+  const indexTs = readFileSync(workerIndex, "utf8");
+  if (
+    !indexTs.includes("handleGetStoreRows") ||
+    !indexTs.includes("handleGetStoreProduct") ||
+    !indexTs.includes("storeProductMatch")
+  ) {
+    console.error(
+      "✗ worker/src/index.ts missing store catalog routes (GET /v1/store/rows, GET /v1/store/products/{id})"
+    );
+    if (strict) process.exit(1);
+  } else {
+    console.log("✓ Store catalog routes wired in worker/src/index.ts (SF-001)");
   }
 
   /** @type {string[]} */

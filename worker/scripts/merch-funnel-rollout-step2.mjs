@@ -20,12 +20,14 @@ import {
   validateShopConfig,
 } from "../../site/js/shop-config-rollout-core.mjs";
 import { runMerchRolloutPreflightVitest } from "./merch-funnel-rollout-preflight.mjs";
+import { smokeShopGlitchProductPage } from "./merch-rollout-shop-pdp-smoke.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
 const shopConfigPath = path.join(repoRoot, "site/data/shop-config.json");
 
 const siteOrigin = (process.env.SITE_ORIGIN || "https://humanity.llc").replace(/\/$/, "");
+const apiOrigin = (process.env.API_ORIGIN || siteOrigin).replace(/\/$/, "");
 const preflight = process.argv.includes("--preflight");
 const verify = process.argv.includes("--verify");
 const strict = process.argv.includes("--strict");
@@ -46,6 +48,7 @@ function printChecklist() {
   console.log("  2. npm run pages:deploy");
   console.log("  3. Verify deployed config:");
   console.log(`     SITE_ORIGIN=${siteOrigin} npm run merch-funnel:rollout:step2 -- --verify`);
+  console.log("  4. Smoke Glitch PDP + store API (Pages shell + Worker catalog)");
   console.log("\nDrift check compares repo file vs deployed /data/shop-config.json.");
 }
 
@@ -149,6 +152,8 @@ async function main() {
   if (!result.ok) {
     process.exit(1);
   }
+
+  await smokeShopGlitchProductPage(siteOrigin, { apiOrigin });
 
   console.log("\n✅ Step 2 complete. Next: npm run merch-funnel:rollout:step3 -- --verify");
 }

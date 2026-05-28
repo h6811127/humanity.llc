@@ -20,6 +20,7 @@ describe("merch-funnel rollout scripts", () => {
     expect(script).toContain("--preflight");
     expect(script).toContain("--verify");
     expect(script).toContain("shop-config-rollout-core.mjs");
+    expect(script).toContain("smokeShopGlitchProductPage");
   });
 
   it("step3 documents preflight and production verify", () => {
@@ -29,6 +30,17 @@ describe("merch-funnel rollout scripts", () => {
     );
     expect(script).toContain("--preflight");
     expect(script).toContain("merch-funnel-rollout-preflight.mjs");
+    expect(script).toContain("smokeStoreCatalog");
+    expect(script).toContain("/v1/store/products/");
+  });
+
+  it("step4 asserts store catalog routes in worker index", () => {
+    const script = readFileSync(
+      join(repoRoot, "worker/scripts/merch-funnel-rollout-step4.mjs"),
+      "utf8"
+    );
+    expect(script).toContain("handleGetStoreProduct");
+    expect(script).toContain("worker/src/index.ts");
   });
 
   it("step6 documents preflight before full verify", () => {

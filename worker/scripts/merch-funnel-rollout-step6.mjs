@@ -32,8 +32,9 @@ function printRegressionChecklist() {
   console.log("  npm run verify:merch-funnel");
   console.log("    (= worker:test:merch-funnel + worker:test:merch-print-qa + shop-config rollout tests)");
   console.log("  npm run e2e:merch-funnel");
+  console.log("    (includes e2e/shop-product-detail.spec.ts — Glitch PDP + hub CTA)");
   console.log("\nOperator smoke (after deploy):");
-  console.log("  npm run merch-funnel:rollout:step2 -- --verify --strict");
+  console.log("  SITE_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step2 -- --verify");
   console.log("  API_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step3 -- --verify");
 }
 

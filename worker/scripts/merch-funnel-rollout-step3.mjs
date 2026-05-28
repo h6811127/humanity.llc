@@ -36,6 +36,8 @@ function printChecklist() {
   console.log("  0. Local preflight: npm run merch-funnel:rollout:step3 -- --preflight");
   console.log("  • GET /.well-known/hc/v1/health — database ok");
   console.log("  • GET /v1/print/catalog — approved templates");
+  console.log("  • GET /v1/store/rows — story rows (SF-001)");
+  console.log("  • GET /v1/store/products/tier0_glitch_hoodie_v1 — Glitch PDP catalog");
   console.log("  • POST /v1/store/artifact-intents — must not return 405 (route wired)");
   console.log("\nLocal dev:");
   console.log("  npm run worker:migrate:local && npm run worker:dev");
@@ -141,6 +143,63 @@ async function smokeArtifactIntentRoute() {
   console.log(`✓ artifact-intents route wired (POST returned ${res.status}, expected 4xx not 405)`);
 }
 
+async function smokeStoreCatalog() {
+  const rowsUrl = `${apiOrigin}/v1/store/rows`;
+  const { res: rowsRes, body: rowsBody, text: rowsText } = await fetchJson(
+    "Store rows",
+    rowsUrl,
+    { headers: { Accept: "application/json" } }
+  );
+  if (rowsRes.status === 403 && isCloudflareChallenge(rowsText)) {
+    console.warn(
+      "⚠ store rows blocked by Cloudflare bot challenge — smoke locally:\n" +
+        "  API_ORIGIN=http://127.0.0.1:8787 npm run merch-funnel:rollout:step3 -- --verify"
+    );
+    return;
+  }
+  if (!rowsRes.ok) {
+    const err =
+      rowsBody && typeof rowsBody === "object" && rowsBody.error
+        ? String(rowsBody.error)
+        : String(rowsRes.status);
+    console.error(
+      `store rows failed (${rowsRes.status}, error=${err}) — wire GET /v1/store/rows in worker/src/index.ts`
+    );
+    process.exit(1);
+  }
+  if (!Array.isArray(rowsBody?.rows) || rowsBody.rows.length === 0) {
+    console.error("store rows returned no published rows");
+    process.exit(1);
+  }
+  console.log(`✓ store rows OK (${rowsBody.rows.length} rows)`);
+
+  const glitchId = "tier0_glitch_hoodie_v1";
+  const productUrl = `${apiOrigin}/v1/store/products/${glitchId}`;
+  const { res: productRes, body: productBody, text: productText } = await fetchJson(
+    "Store product (Glitch hoodie)",
+    productUrl,
+    { headers: { Accept: "application/json" } }
+  );
+  if (productRes.status === 403 && isCloudflareChallenge(productText)) {
+    return;
+  }
+  if (!productRes.ok) {
+    const err =
+      productBody && typeof productBody === "object" && productBody.error
+        ? String(productBody.error)
+        : String(productRes.status);
+    console.error(
+      `store product failed (${productRes.status}, error=${err}) — wire GET /v1/store/products/{id} in worker/src/index.ts`
+    );
+    process.exit(1);
+  }
+  if (productBody?.product_id !== glitchId) {
+    console.error(`store product mismatch (expected ${glitchId})`);
+    process.exit(1);
+  }
+  console.log(`✓ store product OK (${productBody.title ?? glitchId})`);
+}
+
 async function main() {
   console.log("Merch funnel rollout — step 3 (Worker API smoke)");
   console.log("Docs: docs/MERCH_HEADLESS_COMMERCE.md § 4\n");
@@ -158,6 +217,7 @@ async function main() {
 
   await smokeHealth();
   await smokePrintCatalog();
+  await smokeStoreCatalog();
   await smokeArtifactIntentRoute();
 
   console.log("\n✅ Step 3 complete. Next: npm run merch-funnel:rollout:step4");
