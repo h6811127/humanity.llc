@@ -11,7 +11,7 @@ export const CARD_STATUSES = [
 ] as const;
 export type CardStatus = (typeof CARD_STATUSES)[number];
 
-export const QR_SCOPES = ["card", "print_artifact"] as const;
+export const QR_SCOPES = ["card", "print_artifact", "child_object"] as const;
 export type QrScope = (typeof QR_SCOPES)[number];
 
 export const QR_STATUSES = [
@@ -88,6 +88,7 @@ export interface QrCredentialRow {
   epoch: number;
   scope: QrScope;
   print_artifact_id: string | null;
+  object_id: string | null;
   resolver_hint: string;
   status: QrStatus;
   payload: string;

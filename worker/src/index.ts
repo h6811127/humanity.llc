@@ -30,6 +30,7 @@ import {
   handlePostChildObjectUpdate,
 } from "./resolver/child-objects";
 import { handlePostIssuePrintArtifactQr } from "./resolver/issue-print-artifact-qr";
+import { handlePostIssueChildObjectQr } from "./resolver/issue-child-object-qr";
 import { handlePostRotateQr } from "./resolver/rotate-qr";
 import { handlePostExtendQr } from "./resolver/extend-qr";
 import { handleGetScan } from "./resolver/scan";
@@ -511,6 +512,25 @@ export default {
         request,
         env.DB,
         childObjectCreateMatch[1]!
+      );
+      return withCors(request, res);
+    }
+
+    const childObjectIssueQrMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/objects\/([^/]+)\/issue-qr$/
+    );
+    if (childObjectIssueQrMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostIssueChildObjectQr(
+        request,
+        env.DB,
+        childObjectIssueQrMatch[1]!,
+        childObjectIssueQrMatch[2]!
       );
       return withCors(request, res);
     }

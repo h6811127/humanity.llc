@@ -279,6 +279,17 @@ See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 | 3 | Complete live proof from camera-opened session | Countdown, proven success, expiry, and retry all work |
 | 4 | Wide viewport (tablet or desktop) while waiting | Scanner and Owner panes side by side |
 
+### P1-LW · Large-wallet expanded hub summary rows
+
+**Refs:** [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) S12 · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) § Realistic scale.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Save **≥10** cards; expand hub on `/` | First **8** summary rows; **Show N more** at bottom |
+| 2 | Scroll hub list near bottom | More summary rows load without full wallet hydration |
+| 3 | Tap **Open controls** on a summary row | Full row hydrates; navigates to `/created/` |
+| 4 | Search hub while expanded | Filter still works on summary rows |
+
 ### P1-HH · Hub header simplification (Home / Close / Create)
 
 **Spec:** [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md) · visual refresh: [`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md)

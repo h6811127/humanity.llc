@@ -2,15 +2,17 @@
 
 export const QR_SCOPE_CARD = "card";
 export const QR_SCOPE_PRINT_ARTIFACT = "print_artifact";
+export const QR_SCOPE_CHILD_OBJECT = "child_object";
 
 /**
  * @param {unknown} scope
- * @returns {"card" | "print_artifact" | null}
+ * @returns {"card" | "print_artifact" | "child_object" | null}
  */
 export function normalizeQrScope(scope) {
   const value = typeof scope === "string" ? scope.trim().toLowerCase() : "";
   if (value === QR_SCOPE_CARD) return QR_SCOPE_CARD;
   if (value === QR_SCOPE_PRINT_ARTIFACT) return QR_SCOPE_PRINT_ARTIFACT;
+  if (value === QR_SCOPE_CHILD_OBJECT) return QR_SCOPE_CHILD_OBJECT;
   return null;
 }
 
@@ -18,7 +20,8 @@ export function normalizeQrScope(scope) {
  * @param {unknown} scope
  */
 export function isChildObjectScope(scope) {
-  return normalizeQrScope(scope) === QR_SCOPE_PRINT_ARTIFACT;
+  const normalized = normalizeQrScope(scope);
+  return normalized === QR_SCOPE_PRINT_ARTIFACT || normalized === QR_SCOPE_CHILD_OBJECT;
 }
 
 /**
@@ -35,6 +38,9 @@ export function qrScopeRelationshipCopy({ scope, handle } = {}) {
  * @param {unknown} scope
  */
 export function qrTrustGroupScopeSubtitle(scope) {
+  if (normalizeQrScope(scope) === QR_SCOPE_CHILD_OBJECT) {
+    return "Child object — revoke this scan link without disabling the root card";
+  }
   if (isChildObjectScope(scope)) {
     return "Printed item — revoke one artifact without killing the card";
   }
@@ -58,6 +64,9 @@ export function objectTypeLabelFromContext({ pilotTemplate, qrScope } = {}) {
   const pilot = typeof pilotTemplate === "string" ? pilotTemplate.trim().toLowerCase() : "";
   if (pilot === "status_plate") return { label: "Status plate", tone: "status-plate" };
   if (pilot === "lost_item_relay") return { label: "Lost item", tone: "lost-item" };
+  if (normalizeQrScope(qrScope) === QR_SCOPE_CHILD_OBJECT) {
+    return { label: "Status plate", tone: "status-plate" };
+  }
   if (isChildObjectScope(qrScope)) return { label: "Printed item", tone: "wearable" };
   return { label: "Root card", tone: "general" };
 }

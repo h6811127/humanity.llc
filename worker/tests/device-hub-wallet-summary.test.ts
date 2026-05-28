@@ -34,5 +34,11 @@ describe("device hub wallet summary hydration", () => {
     expect(src).toContain("LARGE_HUB_SUMMARY_ROW_INITIAL_LIMIT");
     expect(src).toContain("visibleSummaryRowWindow");
     expect(src).toContain("hub-show-more-summary");
+    expect(src).toContain("expandSummaryRowLimitForVisible");
+    expect(src).toContain("bindHubSummaryViewportSentinel");
+    expect(src).toContain("ensureHubSummaryViewportScrollLoader");
+    expect(src).toContain("resetExpandedSummaryRowWindow");
+    expect(src).toContain("scheduleInitialSummaryViewportSync");
+    expect(src).toContain("viewportSync: true");
   });
 });

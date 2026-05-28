@@ -13,13 +13,22 @@ export function isPrintArtifactScope(scope: QrScope | null | undefined): boolean
   return scope === "print_artifact";
 }
 
+export function isChildObjectQrScope(scope: QrScope | null | undefined): boolean {
+  return scope === "child_object";
+}
+
+/** Item- and object-scoped QRs do not use calendar expiry in v1. */
+export function isItemScopedQrScope(scope: QrScope | null | undefined): boolean {
+  return isPrintArtifactScope(scope) || isChildObjectQrScope(scope);
+}
+
 /** Founding merch ignores calendar expiry even if a row was mis-minted with expires_at. */
 export function isQrCalendarExpired(
   scope: QrScope | null | undefined,
   expiresAt: string | null,
   now: Date = new Date()
 ): boolean {
-  if (isPrintArtifactScope(scope)) return false;
+  if (isItemScopedQrScope(scope)) return false;
   if (!expiresAt) return false;
   const t = Date.parse(expiresAt);
   if (Number.isNaN(t)) return false;
@@ -31,7 +40,7 @@ export function normalizeExpiresAtForScope(
   scope: QrScope | null | undefined,
   expiresAt: string | null | undefined
 ): string | null {
-  if (isPrintArtifactScope(scope)) return null;
+  if (isItemScopedQrScope(scope)) return null;
   if (expiresAt == null || expiresAt === "") return null;
   return expiresAt;
 }
@@ -40,12 +49,20 @@ export function validatePrintArtifactMintExpiry(
   scope: QrScope | null | undefined,
   expiresAt: unknown
 ): { ok: true } | { ok: false; code: string; message: string } {
-  if (!isPrintArtifactScope(scope)) return { ok: true };
+  return validateItemScopedMintExpiry(scope, expiresAt);
+}
+
+export function validateItemScopedMintExpiry(
+  scope: QrScope | null | undefined,
+  expiresAt: unknown
+): { ok: true } | { ok: false; code: string; message: string } {
+  if (!isItemScopedQrScope(scope)) return { ok: true };
   if (expiresAt == null || expiresAt === "") return { ok: true };
+  const label = isChildObjectQrScope(scope) ? "child_object" : "print_artifact";
   return {
     ok: false,
-    code: "PRINT_ARTIFACT_NO_CALENDAR_EXPIRY",
-    message: "print_artifact credentials must not set expires_at (see MERCH_QR_LIFECYCLE_POLICY).",
+    code: "ITEM_SCOPED_NO_CALENDAR_EXPIRY",
+    message: `${label} credentials must not set expires_at.`,
   };
 }
 
@@ -58,7 +75,7 @@ export function resolveStoredQrExpiresAt(
   signedExpiresAt: unknown,
   defaultExpiryIso: () => string
 ): string | null {
-  if (isPrintArtifactScope(scope)) return null;
+  if (isItemScopedQrScope(scope)) return null;
   if (signedExpiresAt === null) return null;
   if (typeof signedExpiresAt === "string" && signedExpiresAt.length > 0) {
     return signedExpiresAt;

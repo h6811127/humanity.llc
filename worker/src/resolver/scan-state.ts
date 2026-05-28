@@ -240,6 +240,52 @@ export function buildScanViewModel(
     );
   }
 
+  if (qr.scope === "child_object") {
+    const child = ctx.childObject;
+    if (!child) {
+      return statusView(
+        "unknown_qr",
+        card,
+        qr,
+        ctx.verification,
+        origin,
+        { label: "Unknown object", tone: "neutral" },
+        scanLayoutForMinimalFailureTrust()
+      );
+    }
+    if (child.status !== "active") {
+      return statusView(
+        "qr_revoked",
+        card,
+        qr,
+        ctx.verification,
+        origin,
+        { label: "Object unavailable", tone: "bad" },
+        scanLayoutForMinimalFailureTrust()
+      );
+    }
+    const objectCard = {
+      ...card,
+      manifesto_line: `${child.public_label}\n${child.public_state}`,
+    };
+    return baseView(
+      {
+        kind: "active",
+        profileId,
+        qrId,
+        card: objectCard,
+        qr,
+        verification: ctx.verification,
+        primaryBadge: { label: "Active", tone: "live" },
+        showCardBlock: true,
+        showHumanTrustBlock: true,
+        showArtifactBlock: true,
+        showLiveControlBlock: false,
+      },
+      origin
+    );
+  }
+
   return baseView(
     {
       kind: "active",

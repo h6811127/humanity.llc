@@ -154,5 +154,6 @@ Delegated capabilities must be root-signed, scoped, expiring, revocable, and cle
 5. **Client signing (shipped):** browser helpers in `site/js/child-object-update.mjs` sign and POST parent-signed child objects; path helpers in `site/js/child-object-api-core.mjs`; `generateChildObjectId()` in `hc-sign.mjs`.
 6. **Status plate UI (first slice shipped):** `/created/` Live → **Add status plate** for general root cards; registers child objects via API and indexes them in device `localStorage` (`child-object-store-core.mjs`).
 7. **Child object update UI (shipped):** publish status-line updates for registered status plates via `signChildObjectUpdate` / `postChildObjectUpdate` on `/created/`.
-8. **Delegated capabilities:** add scoped, expiring, root-signed child keys only after real team/event use cases demand them.
+8. **Child object scan QR (shipped):** migration `0023_child_object_qr.sql`; `scope: child_object` + `object_id` on `qr_credentials`; `POST …/objects/{object_id}/issue-qr`; `/created/` **Issue scan link**; scan page shows object label/state from `child_objects` row (status plates use manifesto display). Tests: `issue-child-object-qr.test.ts` · `scan-context.test.ts`.
+9. **Delegated capabilities:** add scoped, expiring, root-signed child keys only after real team/event use cases demand them.
 

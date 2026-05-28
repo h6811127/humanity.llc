@@ -12,6 +12,10 @@ export function childObjectRevokePath(profileId, objectId) {
   return `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/objects/${encodeURIComponent(objectId)}/revoke`;
 }
 
+export function childObjectIssueQrPath(profileId, objectId) {
+  return `/.well-known/hc/v1/cards/${encodeURIComponent(profileId)}/objects/${encodeURIComponent(objectId)}/issue-qr`;
+}
+
 /**
  * @param {string} origin
  * @param {string} path

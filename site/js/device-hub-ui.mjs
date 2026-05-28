@@ -144,14 +144,21 @@ import {
   walletNetworkVisibilityRefreshAllowed,
 } from "./device-live-control-poll-scheduler.mjs";
 import {
+  expandSummaryRowLimitForVisible,
+  isScrollNearBottom,
   orderEntriesVisibleFirst,
   profileIdsWithVisibleRows,
+  summaryRowLimitAfterViewportLoad,
+  nextSummaryRowWindowLimit,
+  summaryRowLoadIncrement,
   visibleSummaryRowWindow,
 } from "./device-hub-visible-rows-core.mjs";
 
 const COLLAPSED_SAVED_ROW_PREVIEW_LIMIT = 3;
 const LARGE_HUB_SUMMARY_ROW_INITIAL_LIMIT = 8;
 const LARGE_HUB_SUMMARY_ROW_INCREMENT = 8;
+const HUB_SUMMARY_VIEWPORT_SCROLL_DEBOUNCE_MS = 80;
+const HUB_SUMMARY_VIEWPORT_NEAR_END_PX = 120;
 
 function escapeHtml(s) {
   return String(s)
@@ -239,6 +246,117 @@ let hubConfig = {
 let walletNetworkApplyGen = 0;
 let expandedSummaryRowLimit = LARGE_HUB_SUMMARY_ROW_INITIAL_LIMIT;
 let expandedSummaryWalletFingerprint = null;
+/** @type {HTMLElement | null} */
+let summaryViewportScrollRoot = null;
+/** @type {(() => void) | null} */
+let summaryViewportScrollHandler = null;
+/** @type {IntersectionObserver | null} */
+let summaryViewportObserver = null;
+/** @type {number | null} */
+let summaryViewportScrollTimer = null;
+
+function resetExpandedSummaryRowWindow() {
+  expandedSummaryRowLimit = LARGE_HUB_SUMMARY_ROW_INITIAL_LIMIT;
+}
+
+function hubSavedListScrollRoot() {
+  if (!savedList) return null;
+  return (
+    savedList.closest(".device-hub-body") ||
+    savedList.closest(".device-hub-scroll") ||
+    savedList.closest("#device-hub") ||
+    savedList
+  );
+}
+
+function hubSummaryScrollNearEnd() {
+  const root = hubSavedListScrollRoot();
+  if (!root) return false;
+  return isScrollNearBottom(
+    {
+      scrollTop: root.scrollTop,
+      scrollHeight: root.scrollHeight,
+      clientHeight: root.clientHeight,
+    },
+    HUB_SUMMARY_VIEWPORT_NEAR_END_PX
+  );
+}
+
+function syncSummaryRowLimitFromViewport(opts = {}) {
+  if (onWalletPage() || !hubIsExpanded()) return false;
+  const summary = loadWalletSummary();
+  if (shouldRenderFullSavedRows(summary)) return false;
+  if (!isLargeWallet(summary.count, getStewardEntitlementsPolicy())) return false;
+  const allEntries = summary.rows;
+  const next = summaryRowLimitAfterViewportLoad(allEntries, expandedSummaryRowLimit, {
+    visibleProfileIds: visibleHubCardProfileIds(),
+    nearEnd: opts.nearEnd === true,
+    increment: LARGE_HUB_SUMMARY_ROW_INCREMENT,
+  });
+  if (next === expandedSummaryRowLimit) return false;
+  expandedSummaryRowLimit = next;
+  return true;
+}
+
+function scheduleSummaryViewportRowSync() {
+  if (summaryViewportScrollTimer != null) {
+    clearTimeout(summaryViewportScrollTimer);
+  }
+  summaryViewportScrollTimer = window.setTimeout(() => {
+    summaryViewportScrollTimer = null;
+    if (!syncSummaryRowLimitFromViewport({ nearEnd: hubSummaryScrollNearEnd() })) return;
+    renderSavedRows({ viewportSync: true });
+    applySearchFilter();
+    refreshEmptyHint();
+  }, HUB_SUMMARY_VIEWPORT_SCROLL_DEBOUNCE_MS);
+}
+
+function ensureHubSummaryViewportScrollLoader() {
+  const root = hubSavedListScrollRoot();
+  if (!root || root === summaryViewportScrollRoot) return;
+  if (summaryViewportScrollRoot && summaryViewportScrollHandler) {
+    summaryViewportScrollRoot.removeEventListener("scroll", summaryViewportScrollHandler);
+  }
+  summaryViewportScrollRoot = root;
+  summaryViewportScrollHandler = () => scheduleSummaryViewportRowSync();
+  root.addEventListener("scroll", summaryViewportScrollHandler, { passive: true });
+}
+
+function bindHubSummaryViewportSentinel(sentinel) {
+  summaryViewportObserver?.disconnect();
+  summaryViewportObserver = null;
+  if (!sentinel) return;
+  const root = hubSavedListScrollRoot();
+  summaryViewportObserver = new IntersectionObserver(
+    (entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      if (!syncSummaryRowLimitFromViewport({ nearEnd: true })) return;
+      renderSavedRows({ viewportSync: true });
+      applySearchFilter();
+      refreshEmptyHint();
+    },
+    {
+      root: root instanceof HTMLElement ? root : null,
+      rootMargin: `${HUB_SUMMARY_VIEWPORT_NEAR_END_PX}px 0px`,
+    }
+  );
+  summaryViewportObserver.observe(sentinel);
+}
+
+/** After layout, grow the summary window for rows already in the hub viewport. */
+function scheduleInitialSummaryViewportSync() {
+  const apply = () => {
+    if (!syncSummaryRowLimitFromViewport({ nearEnd: false })) return;
+    renderSavedRows({ viewportSync: true });
+    applySearchFilter();
+    refreshEmptyHint();
+  };
+  if (typeof requestAnimationFrame === "function") {
+    requestAnimationFrame(apply);
+    return;
+  }
+  apply();
+}
 
 /** Last chip status per profile from wallet poll (A1: re-apply must not rely on session cache alone). */
 let lastWalletNetworkStatusMap = {};
@@ -258,6 +376,17 @@ function bumpWalletNetworkApplyGen() {
   }
   walletNetworkApplyGen += 1;
   return walletNetworkApplyGen;
+}
+
+function expandSummaryRowWindow(totalCount = loadWalletSummary().rows.length) {
+  expandedSummaryRowLimit = nextSummaryRowWindowLimit(
+    expandedSummaryRowLimit,
+    LARGE_HUB_SUMMARY_ROW_INCREMENT,
+    totalCount
+  );
+  renderSavedRows({ viewportSync: true });
+  applySearchFilter();
+  refreshEmptyHint();
 }
 
 function restoreHubCardSearchable(li, profileId) {
@@ -878,10 +1007,8 @@ function applyCachedNetworkChipsOnly() {
  */
 function visibleHubCardProfileIds() {
   if (!savedList) return [];
-  const scrollRoot =
-    savedList.closest(".device-hub-scroll") ||
-    savedList.closest("#device-hub") ||
-    savedList;
+  const scrollRoot = hubSavedListScrollRoot();
+  if (!scrollRoot) return [];
   const viewportRect = scrollRoot.getBoundingClientRect();
   const viewport = { top: viewportRect.top, bottom: viewportRect.bottom };
   const rowRects = [];
@@ -1142,7 +1269,7 @@ function renderSavedRows(opts = {}) {
   const summary = loadWalletSummary();
   if (summary.walletFingerprint !== expandedSummaryWalletFingerprint) {
     expandedSummaryWalletFingerprint = summary.walletFingerprint;
-    expandedSummaryRowLimit = LARGE_HUB_SUMMARY_ROW_INITIAL_LIMIT;
+    resetExpandedSummaryRowWindow();
   }
   const expandedRows = hubIsExpanded();
   const fullRows = shouldRenderFullSavedRows(summary);
@@ -1165,6 +1292,16 @@ function renderSavedRows(opts = {}) {
     previewRows = !expandedRows;
     virtualizedSummaryRows =
       expandedRows && isLargeWallet(summary.count, getStewardEntitlementsPolicy());
+    if (
+      virtualizedSummaryRows &&
+      savedList?.querySelector(".hub-card-item[data-profile-id]")
+    ) {
+      expandedSummaryRowLimit = expandSummaryRowLimitForVisible(
+        allEntries,
+        expandedSummaryRowLimit,
+        visibleHubCardProfileIds()
+      );
+    }
     windowed = virtualizedSummaryRows
       ? visibleSummaryRowWindow(allEntries, { limit: expandedSummaryRowLimit })
       : null;
@@ -1304,10 +1441,18 @@ function renderSavedRows(opts = {}) {
   }
 
   if (virtualizedSummaryRows && windowed && windowed.remaining > 0) {
+    const sentinel = document.createElement("li");
+    sentinel.className = "hub-summary-viewport-sentinel";
+    sentinel.setAttribute("aria-hidden", "true");
+    savedList.appendChild(sentinel);
+
     const li = document.createElement("li");
     li.className = "hub-card-item hub-card-item--general hub-card-item--summary hub-card-item--more";
     li.dataset.hubSearchable = "more saved cards";
-    const nextCount = Math.min(LARGE_HUB_SUMMARY_ROW_INCREMENT, windowed.remaining);
+    const nextCount = summaryRowLoadIncrement(
+      windowed.remaining,
+      LARGE_HUB_SUMMARY_ROW_INCREMENT
+    );
     li.innerHTML = `
       <div class="hub-card-head">
         <span class="list-icon list-icon-tone-trust" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
@@ -1320,6 +1465,15 @@ function renderSavedRows(opts = {}) {
         </div>
       </div>`;
     savedList.appendChild(li);
+    bindHubSummaryViewportSentinel(sentinel);
+  } else {
+    bindHubSummaryViewportSentinel(null);
+  }
+
+  ensureHubSummaryViewportScrollLoader();
+
+  if (virtualizedSummaryRows && !opts.viewportSync) {
+    scheduleInitialSummaryViewportSync();
   }
 
   if (fullRows) {
@@ -1334,10 +1488,7 @@ function renderSavedRows(opts = {}) {
   }
 
   savedList.querySelector(".hub-show-more-summary")?.addEventListener("click", () => {
-    expandedSummaryRowLimit += LARGE_HUB_SUMMARY_ROW_INCREMENT;
-    renderSavedRows();
-    applySearchFilter();
-    refreshEmptyHint();
+    expandSummaryRowWindow(allEntriesCount);
   });
 
   savedList.querySelectorAll(".hub-card-control, .hub-card-menu-steward").forEach((btn) => {
@@ -1569,6 +1720,11 @@ function renderSavedRows(opts = {}) {
     refreshStewardEntitlementsOnHubContext();
   }
   const onWalletPage = document.body.classList.contains("page-wallet");
+  if (opts.viewportSync) {
+    applyCachedNetworkChipsOnly();
+    syncHubInboxAlertGroups();
+    return;
+  }
   if (
     shouldScheduleWalletNetworkFetchAfterHubRender({
       fetchNetworkStatus: hubConfig.fetchNetworkStatus,
@@ -1757,6 +1913,7 @@ export function initDeviceHub(config = {}) {
   refreshDeviceHub();
   notifyHubChanged();
   initStewardEntitlementsHubHook();
+  ensureHubSummaryViewportScrollLoader();
 
   if (hubConfig.fetchNetworkStatus || hubConfig.showLiveControlInbox) {
     mountHubNetworkTools({
@@ -1841,6 +1998,9 @@ export function initDeviceHub(config = {}) {
     const hubEl = document.getElementById("device-hub");
     const walletPage = onWalletPage();
     const expanded = walletPage || isDeviceHubExpanded(hubEl);
+    if (!expanded) {
+      resetExpandedSummaryRowWindow();
+    }
     if (expanded && savedList?.dataset.walletRowsMode === "summary") {
       renderSavedRows();
       applySearchFilter();
