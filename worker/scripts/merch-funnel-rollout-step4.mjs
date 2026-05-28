@@ -77,7 +77,9 @@ function main() {
     }
   }
 
-  console.log("\nSecrets (wrangler secret — not visible in toml):");
+  console.log("\nHoodie blank: Champion S700 — blueprint 528");
+  console.log("  npm run printify:lookup-blueprint -- 528");
+  console.log("  https://printify.com/app/products/528/champion/champion-hoodie\n");
   console.log("  • PRINTIFY_API_TOKEN");
   console.log("  • SHOPIFY_WEBHOOK_SECRET");
   console.log("  • PRINTIFY_WEBHOOK_SECRET (O-003 status sync)");

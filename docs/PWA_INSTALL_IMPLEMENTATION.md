@@ -1,6 +1,6 @@
 # PWA install — implementation plan
 
-**Status:** Phases 0–3 shipped · **Phase 4 automated gate shipped** (CI `e2e:pwa-install` in `test-site.yml`) · manual HTTPS P1-PWA sign-off pending  
+**Status:** Phases 0–5 shipped · Phase 4.1 brand-dot icons · iOS Safari P1-PWA signed off 2026-05-28 · **H-006 closed**  
 **Audience:** Engineers implementing [`PWA_INSTALL.md`](PWA_INSTALL.md)  
 **Related:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) · [`AGENTS.md`](../AGENTS.md) · [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md)
 
@@ -214,6 +214,31 @@ npm run e2e:pwa-install
 
 ---
 
+## Phase 5 — Closure
+
+### Intent
+
+Lock Phase 4 rollout decisions (no manifest on reference pages; scan not installable); enforce manifest scope in CI; close **H-006**.
+
+### Files
+
+| File | Action |
+|------|--------|
+| `site/js/pwa-install-metadata-core.mjs` | `PWA_ROLLOUT_*` constants, `PWA_MANIFEST_LINK_ALLOWED_HTML_PATHS`, `mayHtmlFileLinkPwaManifest()` |
+| `worker/tests/pwa-install-metadata.test.ts` | Site-wide HTML walk + rollout decision assertions |
+| `docs/PWA_INSTALL.md` | Phase 5 row + locked decisions |
+| `docs/V1_IMPLEMENTATION_BACKLOG.md` | H-006 closed |
+| `docs/STEWARD_DEVICE_ROADMAP.md` | PWA row → Phases 1–5 shipped |
+
+### Verification
+
+```bash
+npm run worker:test:pwa-install
+npm run e2e:pwa-install
+```
+
+---
+
 ## Rollback
 
 | Phase | Rollback |
@@ -240,6 +265,8 @@ No database or Worker migration rollback required.
 
 | Date | Change |
 |------|--------|
+| 2026-05-28 | Phase 5 closure — rollout decisions + site-wide manifest CI gate; H-006 closed |
+| 2026-05-28 | Phase 4.1 — brand-dot home screen icons; `site:generate-pwa-icons`; iOS Safari P1-PWA sign-off |
 | 2026-05-28 | Phase 4 automated CI gate — `e2e:pwa-install` in `test-site.yml`; standalone hub E2E waits for status dot |
 | 2026-05-28 | Phase 4 rollout gate — extended E2E + manual HTTPS sign-off checklist |
 | 2026-05-27 | Phase 3 shipped — E2E + backlog H-006 closure |

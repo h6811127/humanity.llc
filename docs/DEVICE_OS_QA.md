@@ -347,7 +347,7 @@ Automated: `e2e/device-status-dot.spec.ts` § hub sheet header chrome (steps 6�
 
 **Fail signals:** Install prompt on scan; install card with zero saved cards; install card over orphan inbox; dead status dot after adding PWA module to status graph.
 
-Automated (Phase 0+): `npm run worker:test:pwa-install` · Phase 3–4: `npm run e2e:pwa-install` (steps 2, 8–11 + no-SW policy in CI). Manual HTTPS sign-off still required for steps 1, 4, 6–7, 9 on real devices.
+Automated (Phase 0+): `npm run worker:test:pwa-install` · Phase 3–4: `npm run e2e:pwa-install` (steps 2, 8–11 + no-SW policy in CI). **Manual HTTPS sign-off:** iOS Safari 2026-05-28 ✅ (steps 1–2, 5–6, 9–10, P0-W, standalone wallet). Re-verify icon after Phase 4.1 deploy (`site:generate-pwa-icons` + Pages).
 
 ### P1-8 · Hosted tier budget (Phase 10 — E2 staging)
 

@@ -1,6 +1,6 @@
 # PWA install (device shell)
 
-**Status:** Spec + contract modules shipped · Phases 1–3 shipped · **Phase 4 automated gate shipped** (CI `e2e:pwa-install`) · manual HTTPS P1-PWA sign-off pending  
+**Status:** Spec + contract modules shipped · Phases 1–4.1 shipped · **Phase 5 closure** (rollout decisions locked + CI gate)  
 **Audience:** Product, frontend, ops  
 **Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md) · [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md) · [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md`](IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md) · [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) · [`features/QR Public Profile v1.0.md`](features/QR%20Public%20Profile%20v1.0.md)
 
@@ -80,6 +80,7 @@ flowchart TB
 | `site/manifest.webmanifest` | Web app manifest (JSON) | 1 |
 | `site/icons/pwa-192.png` | Install icon 192×192 | 1 |
 | `site/icons/pwa-512.png` | Install icon 512×512 | 1 |
+| `site/icons/pwa-512-maskable.png` | Android maskable 512×512 | 4.1 |
 | `site/icons/pwa-apple-touch.png` | iOS home screen 180×180 | 1 |
 | `site/js/pwa-install-metadata-core.mjs` | Path rules, manifest validation | **Contract shipped** |
 | `site/js/pwa-install-ux-core.mjs` | Show/hide gating, dismiss snooze | **Contract shipped** |
@@ -120,6 +121,8 @@ Validated by `validatePwaManifestShape()` in [`pwa-install-metadata-core.mjs`](.
 | `background_color` | `#ffffff` | Splash / task switcher |
 | `theme_color` | `#ffffff` | Must match shell `meta name="theme-color"` on light; dark uses inline boot script today |
 | `icons` | 192 + 512 PNG | `manifestHasRequiredIconSizes()` |
+
+**Icon art (Phase 4.1):** Static **device shell brand dot** (`#db1b43` on `#ffffff`) — same mark as status-dot chrome, not the QR code. Home screen icons cannot animate; avoid steward-green or urgent pulse styling. Regenerate: `npm run site:generate-pwa-icons`.
 
 ### HTML head tags (shell pages only)
 
@@ -321,21 +324,40 @@ Implementation checklist: [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMEN
 | **1** | Manifest, icons, HTML `<link>` tags | ✅ |
 | **2** | `pwa-install.mjs` + emphasis card UX | ✅ |
 | **3** | E2E + QA + backlog closure | ✅ |
-| **4** | Real-device rollout gate + extended CI smoke | ✅ automated (CI) · manual HTTPS sign-off pending |
+| **4** | Real-device rollout gate + extended CI smoke | ✅ iOS Safari 2026-05-28 · Android Chrome optional |
+| **4.1** | Brand-dot home screen icons | ✅ |
+| **5** | Rollout decisions locked + manifest scope CI gate | ✅ |
 
 ### Phase 4 rollout gate (after Phases 1–3)
 
 Before expanding install metadata beyond shell pages or revisiting service-worker policy:
 
-1. Pass **P1-PWA** on iPhone Safari and Android Chrome (HTTPS origin).
-2. Pass **P0-3** and **P0-W** from a standalone home-screen launch.
-3. Confirm v1 ships **without** a shell-caching service worker ([`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md)).
-4. Decide whether marketing/docs pages should link the manifest (default: **no**).
-5. Decide whether scan URLs should be installable entry points (default: **no**).
+1. Pass **P1-PWA** on iPhone Safari and Android Chrome (HTTPS origin). **iOS Safari ✅** 2026-05-28. Android Chrome: optional follow-up (Chromium install sheet differs; CI covers automated gates).
+2. Pass **P0-3** and **P0-W** from a standalone home-screen launch. **✅** iOS Safari 2026-05-28.
+3. Confirm v1 ships **without** a shell-caching service worker ([`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md)). **✅** CI `e2e:pwa-install` no-SW test.
+4. Decide whether marketing/docs pages should link the manifest. **Locked: no** — `PWA_ROLLOUT_MANIFEST_ON_REFERENCE_PAGES = false`; Vitest walks all `site/**/*.html`.
+5. Decide whether scan URLs should be installable entry points. **Locked: no** — scan HTML has no manifest; `start_url` remains `/` (`PWA_ROLLOUT_SCAN_INSTALLABLE = false`).
 
 Automated Phase 4 smoke (CI): `npm run e2e:pwa-install` — covers P1-PWA steps 2, 8–11 plus no-SW policy.
 
-Manual Phase 4 (required for sign-off): [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-PWA** steps 1, 4, 6–7, 9 on real devices over HTTPS.
+Manual Phase 4 (required for sign-off): [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-PWA** steps 1, 4, 6–7, 9 on real devices over HTTPS. **Signed off:** iOS Safari 2026-05-28 (Blocks A–D, P0-W, standalone wallet scroll).
+
+### Phase 4.1 — Home screen icon polish
+
+Replace QR artwork with static brand dot (see manifest § Icon art). Regenerate PNGs via `npm run site:generate-pwa-icons`; deploy with Pages. Existing home-screen shortcuts keep the old icon until re-added.
+
+### Phase 5 — Closure
+
+Lock Phase 4 rollout decisions in code (`pwa-install-metadata-core.mjs`) and CI:
+
+- `PWA_MANIFEST_LINK_ALLOWED_HTML_PATHS` — only shell HTML may link manifest
+- `mayHtmlFileLinkPwaManifest()` + Vitest site-wide HTML walk
+- Backlog **H-006** closed; no shell-caching service worker without separate RFC
+
+```bash
+npm run worker:test:pwa-install
+npm run e2e:pwa-install
+```
 
 ---
 
@@ -343,6 +365,8 @@ Manual Phase 4 (required for sign-off): [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P
 
 | Date | Change |
 |------|--------|
+| 2026-05-28 | Phase 5 closure — rollout decisions locked; site-wide manifest link CI gate; H-006 closed |
+| 2026-05-28 | Phase 4.1 — brand-dot icons replace QR; manual iOS Safari P1-PWA sign-off |
 | 2026-05-28 | Phase 4 automated CI gate — `test-site.yml` runs `e2e:pwa-install` |
 | 2026-05-28 | Phase 4 rollout gate — extended E2E smoke for P1-PWA steps 2, 8–11; manual HTTPS QA remains |
 | 2026-05-27 | Initial spec, metadata/UX core modules, Vitest contracts, DEVICE_OS + QA cross-links |

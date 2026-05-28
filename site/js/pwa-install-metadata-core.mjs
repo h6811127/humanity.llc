@@ -18,6 +18,18 @@ export const PWA_SHELL_HTML_PATHS = [
   "/created/index.html",
 ];
 
+/**
+ * Phase 5 rollout decisions — only these site HTML files may link the manifest.
+ * @see docs/PWA_INSTALL.md § Phase 5 closure
+ */
+export const PWA_MANIFEST_LINK_ALLOWED_HTML_PATHS = [...PWA_SHELL_HTML_PATHS];
+
+/** Phase 4 gate: marketing/reference pages do not link manifest (default locked). */
+export const PWA_ROLLOUT_MANIFEST_ON_REFERENCE_PAGES = false;
+
+/** Phase 4 gate: scan URLs are not install entry points (no manifest on scan HTML). */
+export const PWA_ROLLOUT_SCAN_INSTALLABLE = false;
+
 /** URL path prefixes where install UX and manifest links must not appear. */
 export const PWA_EXCLUDED_PATH_PREFIXES = [
   "/c/",
@@ -62,6 +74,16 @@ export function isPwaShellPagePath(pathname) {
     return pathname === "/created" || pathname === "/created/" || pathname === "/created/index.html";
   }
   return false;
+}
+
+/**
+ * @param {string} siteRelativePath e.g. `index.html`, `wallet/index.html`, `features/scan-ui.html`
+ */
+export function mayHtmlFileLinkPwaManifest(siteRelativePath) {
+  const normalized = siteRelativePath.replace(/^\//, "");
+  return PWA_MANIFEST_LINK_ALLOWED_HTML_PATHS.some(
+    (allowed) => allowed.replace(/^\//, "") === normalized
+  );
 }
 
 /**

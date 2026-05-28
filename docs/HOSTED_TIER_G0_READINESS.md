@@ -142,7 +142,7 @@ npm run hosted:rollout:step5a -- --preflight   # wrangler name + doc + Vitest
 npm run hosted:rollout:step5a                  # CF UI checklist
 ```
 
-See [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md).
+See [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md). **Status:** ✅ preflight + manual CF pin complete (2026-05-28).
 
 **Rollout step 5b — E6.2 CI secret + verify:**
 
@@ -153,6 +153,8 @@ npm run hosted:rollout:step5b -- --verify
 OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step5b -- --verify
 # hosted:rollout:step5 aliases step5b verify path
 ```
+
+**Status:** preflight ✅ · GitHub `OPERATOR_AUDIT_TOKEN` secret listed ✅ · **production threshold check** requires token in shell (same value as Worker secret).
 
 **Rollout step 6 (script):**
 
@@ -165,6 +167,8 @@ npm run hosted:rollout:step6 -- --verify
 npm run hosted:rollout:step6 -- --vitest   # step 6a (Vitest) only
 npm run hosted:rollout:step6 -- --e2e      # step 6b (Playwright) only
 ```
+
+**Status:** preflight ✅ · E2E (`--e2e`) ✅ 8/8 Playwright · production post-deploy smoke ✅ (health, scan 200, hosted routes).
 
 Rollout steps: [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout (after G0).
 

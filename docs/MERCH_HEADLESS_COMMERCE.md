@@ -206,8 +206,12 @@ Deploy: `npm run worker:deploy`. Route `humanity.llc/v1/*` required for artifact
 
 ### 1. Printify (factory)
 
-- [ ] Create / approve hoodie (or sticker) template in Printify — print area, scan QA per [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) (A-004)
-- [ ] Note **Printify blueprint id**, **print provider id**, and **variant id** for Worker env (inspect catalog or an approved template product in Printify admin)
+**Tier 1 hoodie blank (approved):** [Champion S700 hoodie](https://printify.com/app/products/528/champion/champion-hoodie) — Printify **blueprint `528`**. Launch size/color: **Solid Black / M** (`print_variant_id: black-m` in `shop-config.json`).
+
+- [ ] Run `PRINTIFY_API_TOKEN=… npm run printify:lookup-blueprint -- 528` — lists print providers, variant ids, and suggested `wrangler.toml` lines. Prefer a provider with **DTF or DTG on front** (QR scans poorly through embroidery).
+- [ ] Save a **reference product** in your Printify shop (same blueprint / provider / variant) — copy its **shop product id** into `PERSONALIZE_HOODIE_PRINTIFY_PRODUCT_ID` (shipping quotes use this; Tier 1 submit creates ephemeral products with per-order artwork).
+- [ ] Set `PERSONALIZE_HOODIE_PRINTIFY_BLUEPRINT_ID`, `PRINT_PROVIDER_ID`, `VARIANT_ID`, placeholder + image offsets after physical QA per [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) (A-004)
+- [ ] Sticker path unchanged — separate `PERSONALIZE_STICKER_PRINTIFY_*` env keys
 
 ### 2. Shopify (cash register)
 
