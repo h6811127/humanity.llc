@@ -26,7 +26,12 @@ Minimize stored data so the network is not a surveillance honeypot. Publish what
 ## Access logs
 
 - **Default:** no logging of scan requests.
-- If minimal access logs are ever required for abuse response, that MUST be a **governance-approved** policy with published retention—not a silent product default.
+- **Reference network v1:** `GET /c/…`, `GET …/status?q=…`, and `GET …/qr/{qr_id}` are **not** access-logged. Status JSON exposes `scan.limits.scan_analytics: false`.
+- If minimal access logs are ever required for abuse response, that MUST be a **governance-approved** policy with published retention - not a silent product default.
+
+## Client UI (not operator storage)
+
+Saved card rows on `/wallet/` and the device hub may show **checked … ago**. That timestamp is **only** when **this browser** last successfully polled `GET …/cards/{profile_id}/status?q=…` for a saved card (`hc_wallet_network_cache` in session storage). It is **not** a log of who scanned the QR, and the operator does not receive or retain that client timestamp. Product copy MUST NOT use **seen** or **last scan** on saved rows in ways that imply stranger scan trails. Spec: [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) § Recency wording and data policy.
 
 ## Commerce firewall
 
@@ -38,7 +43,8 @@ Minimize stored data so the network is not a surveillance honeypot. Publish what
 
 | Data class | Retention |
 |------------|-----------|
-| Public card + credential state | Until user export + delete, or operator policy after account closure |
+| Public card + credential state (active, maintained) | Until owner revoke/disable, user-initiated delete (future), or operator suspension |
+| **Orphan registrations** (active, never updated, no vouches, no live QR, older than 90 days) | **Automatic purge** daily via Worker cron - see [`CARD_RETENTION_AND_ORPHAN_CLEANUP.md`](CARD_RETENTION_AND_ORPHAN_CLEANUP.md) |
 | Revocation / suspension records | Retained while status matters for trust; public notice fields follow governance |
 | Live-control challenges | Minutes (TTL); not kept as long-term history |
 | Access logs (if ever enabled) | Short, published maximum; governance-approved only |
@@ -51,10 +57,12 @@ Minimize stored data so the network is not a surveillance honeypot. Publish what
 
 ## Changes
 
-Rights-affecting retention changes require published notice and member governance per launch plan—not silent expansion.
+Rights-affecting retention changes require published notice and member governance per launch plan - not silent expansion.
 
 ## Related documents
 
+- `docs/MERCH_QR_LIFECYCLE_POLICY.md` (printed artifact QRs: no calendar expiry, fulfillment mint rules)
+- `docs/CARD_RETENTION_AND_ORPHAN_CLEANUP.md` (orphan eligibility + cron purge)
 - `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` §5 (normative minimization rules)
 - `docs/Technical Standards v1.0.md`
 - `docs/V1_PRODUCT_TRUST_MODEL.md`

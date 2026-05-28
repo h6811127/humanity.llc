@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Stack notes · Studio · humanity.llc</title>
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=69" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand" href="/studio/">Studio</a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+      <main class="screen screen-landing">
+        <article class="studio-post-article">
+          <a class="studio-post-back" href="/studio/">← All posts</a>
+          <p class="hero-eyebrow">Engineering</p>
+          <h1>Workers, D1, and keys that never upload</h1>
+          <p>
+            The public loop runs on Cloudflare Workers + D1: create (signed POST), scan resolver,
+            manifesto update, revoke, vouch, live-control challenge. Pages hosts the static UI;
+            private keys are generated and stored in the browser only.
+          </p>
+          <p>
+            We test the Worker with Vitest (crypto, revoke, scan, CORS). The site is plain HTML +
+            small ES modules  -  no SPA  -  so workshop pages stay fast on phone Safari.
+          </p>
+          <p>
+            <a href="/architecture.html">Architecture &amp; security</a>
+            ·
+            <a href="/case-study/">Case study loop</a>
+          </p>
+        </article>
+      </main>
+    </div>
+  </body>
+</html>

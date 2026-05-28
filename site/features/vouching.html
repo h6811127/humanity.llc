@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Human verification & vouching · Features · humanity.llc</title>
+    <meta name="description" content="Signed, public, revocable human attestations-not legal ID or biometric personhood." />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=69" />
+  </head>
+  <body>
+    <div class="page feature-page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+      <main class="screen">
+        <section class="hero">
+          <p class="hero-eyebrow">Feature <span class="phase">5</span></p>
+          <h1>Human verification & vouching</h1>
+        </section>
+        <div class="feature">
+          <p class="feature-lead">Accountable humans sign public, revocable attestations-without legal ID or a biometric personhood database.</p>
+          <p class="feature-sub"><span class="ship-badge ship-badge-partial">Partial</span> scan truth + Issue vouch + revoke live; steward audit queue next</p>
+        </div>
+        <section class="group feature-aspects">
+          <h2 class="group-label">About this feature</h2>
+          <div class="feature-aspect-stack"><details class="settings-disclosure settings-disclosure-info feature-aspect" open>
+  <summary class="settings-summary">
+    <span class="list-icon list-icon-tone-red" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></span>
+    <span class="settings-summary-text">
+      <span class="settings-summary-title">Why it matters</span>
+    </span>
+    <span class="list-chevron" aria-hidden="true">›</span>
+  </summary>
+  <div class="settings-panel settings-panel-info-body">
+    <p class="settings-panel-lead">In an age of synthetic agents, communities need <strong>accountability</strong>-who put their name on this profile under published rules-not a central iris registry. Three eligible vouchers sign public Ed25519 vouches; the card becomes <strong>Vouched Human</strong>. Not legal ID. Not proof the person holding a sticker owns the card (use live control when that matters).</p>
+  </div>
+</details>
+<details class="settings-disclosure settings-disclosure-info feature-aspect">
+  <summary class="settings-summary">
+    <span class="list-icon list-icon-tone-blue" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg></span>
+    <span class="settings-summary-text">
+      <span class="settings-summary-title">Design decisions</span>
+    </span>
+    <span class="list-chevron" aria-hidden="true">›</span>
+  </summary>
+  <div class="settings-panel settings-panel-info-body">
+    <p class="settings-panel-lead">Own the verb <strong>vouch</strong>: sign and publish a revocable attestation. Verifiable documents on the network; default statement template; private notes never POSTed. Threshold (3), quota (5/year), 90-day wait for new vouchers, one active vouch per pair. Scan: <strong>Issue vouch</strong>, <strong>Sign as…</strong> when keys are not loaded, count + recency-no full social graph on first screen.</p>
+  </div>
+</details>
+<details class="settings-disclosure settings-disclosure-info feature-aspect">
+  <summary class="settings-summary">
+    <span class="list-icon list-icon-tone-green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+    <span class="settings-summary-text">
+      <span class="settings-summary-title">Safety · privacy · security</span>
+    </span>
+    <span class="list-chevron" aria-hidden="true">›</span>
+  </summary>
+  <div class="settings-panel settings-panel-info-body">
+    <p class="settings-panel-lead">Signed payloads, nonce replay protection, voucher eligibility checks. Documented threats include Sybil cliques (minimum 4 mutual vouchers), rotating rings, stolen keys, and integrator over-trust-mitigated by quotas, wait periods, operator audit flags, and revocation. See <code>docs/VOUCH_THREAT_MODEL.md</code>.</p>
+  </div>
+</details>
+<details class="settings-disclosure settings-disclosure-info feature-aspect">
+  <summary class="settings-summary">
+    <span class="list-icon list-icon-tone-orange" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span>
+    <span class="settings-summary-text">
+      <span class="settings-summary-title">Limits</span>
+    </span>
+    <span class="list-chevron" aria-hidden="true">›</span>
+  </summary>
+  <div class="settings-panel settings-panel-info-body">
+    <p class="settings-panel-lead">Does not prove legal identity, global uniqueness, voucher honesty, or liveness at sign time. Registration ≠ Vouched Human. <strong>Steward on the network ≠ signing key in this tab</strong> - see <code>docs/KEYS_CARDS_AND_VERIFICATION.md</code> and <code>docs/VOUCH_TRUST_POSITIONING.md</code>.</p>
+  </div>
+</details>
+<details class="settings-disclosure settings-disclosure-info feature-aspect">
+  <summary class="settings-summary">
+    <span class="list-icon list-icon-tone-purple" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M18 12h4"/><path d="m19.07 4.93-2.83 2.83"/></svg></span>
+    <span class="settings-summary-text">
+      <span class="settings-summary-title">Future directions</span>
+    </span>
+    <span class="list-chevron" aria-hidden="true">›</span>
+  </summary>
+  <div class="settings-panel settings-panel-info-body">
+    <p class="settings-panel-lead">Integrator trust-policy helpers (min vouches, recency), steward review queue UI, ceremony credentials (separate path), cross-operator federation. Positioning doc: <code>docs/VOUCH_TRUST_POSITIONING.md</code>.</p>
+  </div>
+</details></div>
+        </section>
+        <section class="group">
+  <div class="feature-nav">
+    <a href="/features/scan-ui.html"><span class="feature-nav-label">Previous</span><span class="feature-nav-title"><span class="phase">4</span> Scan trust-state UI</span></a>
+    <a href="/features/organizer-revoke.html"><span class="feature-nav-label">Next</span><span class="feature-nav-title"><span class="phase">6</span> Organizer revoke</span></a>
+  </div>
+</section>
+      </main>
+    </div>
+  </body>
+</html>

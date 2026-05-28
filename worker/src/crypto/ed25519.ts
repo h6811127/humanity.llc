@@ -2,7 +2,7 @@ import * as ed from "@noble/ed25519";
 
 import { decodePublicKeyBase58, decodeSignatureBase58, encodeBase58 } from "./base58";
 
-/** Deterministic test seed — NEVER use in production. */
+/** Deterministic test seed  -  NEVER use in production. */
 export const TEST_SEED_PHRASE = "humanity-commons-test-seed-v1";
 
 let testSeedPromise: Promise<Uint8Array> | null = null;

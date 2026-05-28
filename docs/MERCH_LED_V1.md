@@ -1,9 +1,15 @@
 # Merch-Led V1: Curiosity + Belonging
 
-**Status:** Canonical wedge (v1 GTM)  
+**Status:** Canonical wedge (v1 GTM) · **Phase B in progress**  -  Tier 0 story shop at `/shop/`  
+**Current focus (2026-05-27, post-M5):** **Merch funnel MVP** — Tier 1 personalized wear (hoodie / sticker with unique QR), not status plates as primary launch wedge.  
 **Purpose:** Lead with physical artifacts as viral distribution while pairing **proof of curiosity** (spread) with **proof of belonging** (retention). Commons Pass and organizer tooling follow once people already wear the object.
 
-**Architecture and launch gate:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — public card creation when Phase A ships; federated networks long-term; founding cohort is optional feedback only.
+**Implementation tracker:** `docs/SHOP_TIER0_IMPLEMENTATION.md` (Pages UI, waitlist interest, Shopify handoff checklist).  
+**Merch funnel MVP:** `docs/MERCH_FUNNEL_MVP.md` (scan → profile → `/shop/customize/` → Printify).  
+**Headless commerce (Shopify + Printify wiring):** `docs/MERCH_HEADLESS_COMMERCE.md` — factory vs cash register vs storefront; Tier 1 customizeability.  
+**Merch QR lifecycle:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` (no calendar expiry on printed artifacts, revoke/reprint, optional experiments).
+
+**Architecture and launch gate:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  -  public card creation when Phase A ships; federated networks long-term; founding cohort is optional feedback only.
 
 ---
 
@@ -76,7 +82,7 @@ Neither proof claims legal identity, KYC, or “holder = owner” from a static 
 **Product surfaces:**
 
 - Humanity Card + vouch flow (`docs/features/Human Verification v1.0.md`).
-- Optional early testers (`docs/FOUNDING_COHORT_PLAYBOOK.md`) for copy/ops—not a product gate.
+- Optional early testers (`docs/FOUNDING_COHORT_PLAYBOOK.md`) for copy/ops - not a product gate.
 - Artifact copy and packaging that never print mutable “verified” text on the object.
 
 **Success signals:**
@@ -114,33 +120,35 @@ Belonging is earned through cohort rules and vouches, not checkout.
 
 Build in this order. Do not start with Commons Pass console or event check-in.
 
-### Phase A — Digital trust slice (before money)
+### Phase A  -  Digital trust slice (before money)
 
 Prove the scan moment is worth a stranger’s attention:
 
 1. Signed Humanity Card create (browser-held keys).
 2. HTTPS QR network + trust-state UI (card, human trust, limitations).
 3. Revoked / suspended / unknown status pages.
-4. Optional waitlist for merch drops only—not for card creation gate.
+4. Optional waitlist for merch drops only - not for card creation gate.
 5. Vouch issuance + display (`Vouched Human` public label).
 6. Live control proof: private alpha minimum; public UI when copy-tested.
 
 **Exit:** 10–25 founding humans can scan each other and explain what the page does and does not prove.
 
-### Phase B — Curiosity drop (one SKU, one story)
+### Phase B  -  Curiosity drop (one SKU, one story)
 
 Prove walking ads work:
 
 1. One flagship artifact (sticker recommended first for scan QA; flat card second).
-2. Story-row storefront — one narrative, not a 50-SKU grid.
-3. Non-personalized or lightly personalized QR pointing at network (personalized per-item QR only after Printify spike passes — see `docs/V1_ASSUMPTION_REGISTER.md`).
+2. Story-row storefront  -  one narrative, not a 50-SKU grid. **Shipped (UI):** [`/shop/`](../site/shop/index.html)  -  Shopify URL via `site/data/shop-config.json` when operator enables.
+3. Non-personalized or lightly personalized QR pointing at network (personalized per-item QR only after Printify spike passes  -  see `docs/V1_ASSUMPTION_REGISTER.md`). **Lifecycle:** [`docs/MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) (batch QR, no time expiry, rotate via `replaced`).
 4. Packaging / product page with bearer warning and “merch ≠ vouched” line.
 
 **Exit:** Orders from outside founder network; scan→create conversion tracked; at least one organic reshare.
 
-### Phase C — Belonging on the object (personalized line)
+**Prerequisite (digital):** Owner key portability for revoke-any-device is shipped in repo (`docs/M5_5_OWNER_KEY_PORTABILITY.md`)  -  encrypted backup + recovery key; deploy QA remains.
 
-Connect artifact to card holders (not a protocol invite gate):
+### Phase C  -  Belonging on the object (personalized line)
+
+Connect artifact to card holders (not a protocol invite gate). **Commerce architecture:** [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) — customize on humanity.llc, pay on Shopify, print via Printify API (not Printify storefront).
 
 1. Personalized drop for active Humanity Card holders when print QA allows.
 2. Personalized QR per item when provider QA supports it (`artifact_intent` → Shopify → Printify vertical slice).
@@ -148,12 +156,12 @@ Connect artifact to card holders (not a protocol invite gate):
 
 **Exit:** Holders vouch and invite; stolen-QR revocation tested on a real item.
 
-### Phase D — Commons Pass (organizer upsell)
+### Phase D  -  Commons Pass (organizer upsell)
 
 When the same room has many cards/stickers:
 
 - Community pass, check-in, stamps (`docs/COMMONS_PASS_V1_SPEC.md`).
-- Pitch: “Your members already wear the QR — now issue the community pass.”
+- Pitch: “Your members already wear the QR  -  now issue the community pass.”
 
 **Defer until Phase A–C show repeat scans and vouches.**
 
@@ -161,19 +169,19 @@ When the same room has many cards/stickers:
 
 ## Founding Drop Design (Both Proofs at Once)
 
-### Tier 0 — Curiosity (open or wide waitlist)
+### Tier 0  -  Curiosity (open or wide waitlist)
 
 - **Offer:** Standard founding sticker/card design, same landing QR or batch QR.
 - **Story:** Movement line + honest trust limits (`docs/LAUNCH_LANGUAGE_KIT.md`).
 - **Goal:** Volume, scans, narrative spread.
 - **Risk control:** No “verified human” on print; scan page carries all mutable trust state.
 
-### Tier 1 — Belonging (personalized, not gated)
+### Tier 1  -  Belonging (personalized, not gated)
 
 - **Offer:** Personalized artifact for card holders when print QA allows; may be time-limited drop, not invite-only access to the protocol.
-- **Story:** Vouched humans and credentials under public rules—export and revoke rights.
+- **Story:** Vouched humans and credentials under public rules - export and revoke rights.
 - **Goal:** Trust graph, repeat wear, peer invites.
-- **Risk control:** 3-vouch threshold, quotas, 90-day vouch wait — per `docs/V1_DECISION_LOCK.md`.
+- **Risk control:** 3-vouch threshold, quotas, 90-day vouch wait  -  per `docs/V1_DECISION_LOCK.md`.
 
 ### Same brand, two doors
 
@@ -190,11 +198,11 @@ When the same room has many cards/stickers:
 
 Required blocks, visually separated:
 
-1. **Status** — card/QR active, revoked, suspended, unknown.
-2. **Human trust** — `Registered` / `Vouched Human` / founding badges, or “not vouched” (no shame language; factual).
-3. **Curiosity CTA** — always visible for non-holders: create card, get the drop, read what this is.
-4. **Belonging CTA** — for holders: prove live control, export, revoke; vouch request where policy allows.
-5. **Limits** — bearer warning + what scan does not prove.
+1. **Status**  -  card/QR active, revoked, suspended, unknown.
+2. **Human trust**  -  `Registered` / `Vouched Human` / founding badges, or “not vouched” (no shame language; factual).
+3. **Curiosity CTA**  -  always visible for non-holders: create card, get the drop, read what this is.
+4. **Belonging CTA**  -  for holders: prove live control, export, revoke; vouch request where policy allows.
+5. **Limits**  -  bearer warning + what scan does not prove.
 
 Curiosity and belonging share one URL pattern; content adapts by network status, not by separate products.
 
@@ -223,7 +231,7 @@ Curiosity and belonging share one URL pattern; content adapts by network status,
 | M-01 | First artifact | One sticker; add flat card after scan QA |
 | M-02 | Drop order | Phase A digital → Tier 0 curiosity drop → Tier 1 belonging personalize |
 | M-03 | Open vs closed Tier 0 | Open curiosity drop; Tier 1 personalized for card holders (no protocol invite gate) |
-| M-04 | Batch vs unique QR on Tier 0 | Batch QR acceptable for Tier 0; unique item QR for Tier 1 |
+| M-04 | Batch vs unique QR on Tier 0 | Batch QR acceptable for Tier 0; unique item QR for Tier 1 — **policy:** [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) |
 | M-05 | Public labels | `Vouched Human` not `Verified Human` on UI and print |
 | M-06 | Live control | Private alpha in Phase A; public when comprehension test passes |
 
@@ -239,6 +247,7 @@ Curiosity and belonging share one URL pattern; content adapts by network status,
 | Implementation shapes | `docs/V1_IMPLEMENTATION_CONTRACTS.md`, `docs/V1_IMPLEMENTATION_BACKLOG.md` (reorder phases to match this doc) |
 | Copy and slogans | `docs/LAUNCH_LANGUAGE_KIT.md`, `docs/SKEPTIC_FAQ.md` |
 | Founding drop ops | `docs/FOUNDING_DROP_BRIEF.md` |
+| **Merch QR lifecycle (expiry, revoke, reprint, experiments)** | `docs/MERCH_QR_LIFECYCLE_POLICY.md` |
 | Optional early testers | `docs/FOUNDING_COHORT_PLAYBOOK.md` (non-gating) |
 | Protocol / federation | `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` |
 | Community pass (later) | `docs/COMMONS_PASS_V1_SPEC.md` |
@@ -252,7 +261,7 @@ This doc **supersedes** “Commons Pass first” ordering in README and backlog 
 
 Make the strongest **honest** claims on the object and the scan page:
 
-- **Curiosity:** “Scan it — you’ll see what we actually prove.”
-- **Belonging:** “Signed, vouched where shown, revocable, live control when needed — not surveillance, not legal ID.”
+- **Curiosity:** “Scan it  -  you’ll see what we actually prove.”
+- **Belonging:** “Signed, vouched where shown, revocable, live control when needed  -  not surveillance, not legal ID.”
 
-Institutional gravity grows when walking ads point at **federated** trust infrastructure people keep using after the sticker arrives—and when a second operator runs the same spec.
+Institutional gravity grows when walking ads point at **federated** trust infrastructure people keep using after the sticker arrives - and when a second operator runs the same spec.

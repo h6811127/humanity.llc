@@ -5,18 +5,20 @@ export const SIGNATURE_ALG = "Ed25519" as const;
 export const CANONICALIZATION = "JCS" as const;
 
 /**
- * Signed payload `type` values (Technical Standards §17 — prevents signature confusion).
+ * Signed payload `type` values (Technical Standards §17  -  prevents signature confusion).
  * @see docs/Technical Standards v1.0.md
  */
 export const PAYLOAD_TYPES = {
   HUMANITY_CARD: "humanity_card",
   QR_CREDENTIAL: "qr_credential",
   VOUCH: "vouch",
+  VOUCH_REVOCATION: "vouch_revocation",
   REVOCATION: "revocation",
   BADGE: "badge",
   SUSPENSION: "suspension",
   EXPORT_MANIFEST: "export_manifest",
   LIVE_CONTROL_RESPONSE: "live_control_response",
+  STEWARD_ACCOUNT_LINK: "steward_account_link_v1",
 } as const;
 
 export type PayloadType = (typeof PAYLOAD_TYPES)[keyof typeof PAYLOAD_TYPES];

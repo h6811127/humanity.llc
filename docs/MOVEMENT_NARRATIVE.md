@@ -3,9 +3,9 @@
 **Status:** Strategic draft  
 **Purpose:** Define the emotional and cultural layer of Humanity Commons without overloading the product UI or turning the card into "Linktree plus politics."
 
-**Architecture (factual):** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` — open spec, federated networks, public card creation.
+**Architecture (factual):** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  -  open spec, federated networks, public card creation.
 
-**Direction (factual):** `docs/DEMOCRATIC_INFRASTRUCTURE.md` — infrastructure for member-run communities, not a platform empire or blockchain identity play.
+**Direction (factual):** `docs/DEMOCRATIC_INFRASTRUCTURE.md`  -  infrastructure for member-run communities, not a platform empire or blockchain identity play.
 
 ---
 
@@ -43,7 +43,7 @@ Human trust should not require surveillance, platform lock-in, follower counts, 
 
 Humanity Commons starts with a small object that must **grow into infrastructure**:
 
-> A signed public card, vouched by real people, revocable by its owner, with scans that show **current** trust state—not a static profile—and readable without becoming another tracking surface.
+> A signed public card, vouched by real people, revocable by its owner, with scans that show **current** trust state - not a static profile - and readable without becoming another tracking surface.
 
 The movement fails if the scan stays a vanity link. It wins if communities **check the same grammar** at the door (status, vouch, revoke, live control, then Commons Pass for orgs).
 

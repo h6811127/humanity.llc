@@ -1,6 +1,6 @@
 /**
  * D1 row types aligned with docs/V1_IMPLEMENTATION_CONTRACTS.md
- * (M1.2 — schema only; write paths arrive in M2/M4).
+ * (M1.2  -  schema only; write paths arrive in M2/M4).
  */
 
 export const CARD_STATUSES = [
@@ -130,4 +130,6 @@ export interface VouchRow {
   issuer_public_key: string;
   created_at: string;
   revoked_at: string | null;
+  revoke_nonce: string | null;
+  revoke_signed_document_json: string | null;
 }

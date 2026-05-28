@@ -1,9 +1,14 @@
+import { getRevocationDisplay } from "./revoke";
 import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "./types";
 
 export interface ScanContext {
   card: CardRow | null;
   qr: QrCredentialRow | null;
   verification: VerificationSummaryRow | null;
+  revocationDisplay: {
+    display_mode: string | null;
+    public_reason: string | null;
+  } | null;
 }
 
 export async function loadScanContext(
@@ -43,5 +48,22 @@ export async function loadScanContext(
       .first<VerificationSummaryRow>();
   }
 
-  return { card: card ?? null, qr: qr ?? null, verification };
+  let revocationDisplay: ScanContext["revocationDisplay"] = null;
+  if (card?.status === "revoked") {
+    revocationDisplay = await getRevocationDisplay(db, profileId, "card", null);
+  } else if (qr?.status === "revoked") {
+    revocationDisplay = await getRevocationDisplay(
+      db,
+      profileId,
+      "qr_credential",
+      qrId
+    );
+  }
+
+  return {
+    card: card ?? null,
+    qr: qr ?? null,
+    verification,
+    revocationDisplay,
+  };
 }

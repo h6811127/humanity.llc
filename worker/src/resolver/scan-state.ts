@@ -1,8 +1,26 @@
+import { deriveCredentialCodeSync } from "../../../site/js/qr-credential-code.mjs";
+import { validateOfficialScanUrl } from "../../../site/js/qr-scan-url-lock.mjs";
 import type { ScanContext } from "../db/scan";
 import type { CardStatus, QrScope, QrStatus } from "../db/types";
+import {
+  publicReasonLabel,
+  scanLayoutForMinimalFailureTrust,
+  scanLayoutForRevocationDisplay,
+  type RevocationDisplayMeta,
+} from "./revocation-display";
+import {
+  resolveScanMalformedReason,
+  type ScanMalformedReason,
+} from "./scan-malformed-hint";
+import { isQrCalendarExpired } from "./merch-qr-policy";
+import { objectStreamsFromCardDocumentJson } from "../validation/object-streams";
+import type { ObjectPublicStream } from "../validation/object-streams";
 
 export const QR_ID_REGEX =
   /^qr_[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{8,40}$/;
+
+export type { ScanMalformedReason } from "./scan-malformed-hint";
+export { resolveScanMalformedReason } from "./scan-malformed-hint";
 
 export type ScanPageKind =
   | "active"
@@ -45,6 +63,7 @@ export interface ScanViewModel {
   qrId: string | null;
   handle: string | null;
   manifestoLine: string | null;
+  objectStreams: ObjectPublicStream[];
   cardStatus: CardStatus | null;
   qrStatus: QrStatus | null;
   qrScope: QrScope | null;
@@ -59,10 +78,20 @@ export interface ScanViewModel {
   showArtifactBlock: boolean;
   showLiveControlBlock: boolean;
   liveControlAvailable: boolean;
+  liveControlProvenAt: string | null;
+  qrExpiresAt: string | null;
+  qrIssuedAt: string | null;
+  qrPayload: string | null;
   minimalScan: boolean;
+  revocationDisplayMode: string | null;
+  publicReason: string | null;
   primaryBadge: { label: string; tone: StatusTone };
   scanUrl: string | null;
+  /** Human fingerprint for print / verifier (Phase F). */
+  credentialCode: string | null;
   cacheControl: string;
+  /** Set when kind === "malformed" (P2-1 differentiated copy). */
+  malformedReason: ScanMalformedReason | null;
 }
 
 /** Canonical HTTPS scan target for this request. */
@@ -72,10 +101,25 @@ export function resolveScanUrl(
   qrId: string | null,
   payload: string | null | undefined
 ): string | null {
-  if (payload?.trim()) return payload.trim();
-  if (!profileId || !qrId) return null;
-  const base = origin.replace(/\/$/, "");
-  return `${base}/c/${encodeURIComponent(profileId)}?q=${encodeURIComponent(qrId)}`;
+  const built =
+    profileId && qrId
+      ? `${origin.replace(/\/$/, "")}/c/${encodeURIComponent(profileId)}?q=${encodeURIComponent(qrId)}`
+      : null;
+
+  const stored = payload?.trim() || null;
+  if (stored) {
+    const check = validateOfficialScanUrl(stored, { profileId, qrId });
+    if (check.ok) return stored;
+    if (built) {
+      const builtCheck = validateOfficialScanUrl(built, { profileId, qrId });
+      if (builtCheck.ok) return built;
+    }
+    return null;
+  }
+
+  if (!built) return null;
+  const builtCheck = validateOfficialScanUrl(built, { profileId, qrId });
+  return builtCheck.ok ? built : null;
 }
 
 export function buildScanViewModel(
@@ -86,7 +130,7 @@ export function buildScanViewModel(
   now: Date = new Date()
 ): ScanViewModel {
   if (!qrId) {
-    return malformedView(profileId, null, origin);
+    return malformedView(profileId, null, origin, "missing_qr");
   }
 
   if (!ctx.card) {
@@ -143,16 +187,16 @@ export function buildScanViewModel(
   const qr = ctx.qr;
 
   if (card.status === "revoked") {
-    return statusView("card_revoked", card, qr, ctx.verification, origin, {
-      label: "Disabled",
-      tone: "bad",
-    }, {
-      minimalScan: true,
-      showCardBlock: false,
-      showHumanTrustBlock: false,
-      showArtifactBlock: false,
-      showLiveControlBlock: false,
-    });
+    return statusView(
+      "card_revoked",
+      card,
+      qr,
+      ctx.verification,
+      origin,
+      { label: "Disabled", tone: "bad" },
+      revocationDisplayLayout(ctx.revocationDisplay),
+      ctx.revocationDisplay
+    );
   }
   if (card.status === "suspended") {
     return statusView("card_suspended", card, qr, ctx.verification, origin, {
@@ -167,16 +211,16 @@ export function buildScanViewModel(
     });
   }
   if (qr.status === "revoked") {
-    return statusView("qr_revoked", card, qr, ctx.verification, origin, {
-      label: "QR invalid",
-      tone: "bad",
-    }, {
-      minimalScan: true,
-      showCardBlock: false,
-      showHumanTrustBlock: false,
-      showArtifactBlock: false,
-      showLiveControlBlock: false,
-    });
+    return statusView(
+      "qr_revoked",
+      card,
+      qr,
+      ctx.verification,
+      origin,
+      { label: "QR invalid", tone: "bad" },
+      revocationDisplayLayout(ctx.revocationDisplay),
+      ctx.revocationDisplay
+    );
   }
   if (qr.status === "replaced") {
     return statusView("qr_replaced", card, qr, ctx.verification, origin, {
@@ -184,17 +228,16 @@ export function buildScanViewModel(
       tone: "warn",
     });
   }
-  if (qr.status === "expired" || isQrPastExpiry(qr.expires_at, now)) {
-    return statusView("qr_expired", card, qr, ctx.verification, origin, {
-      label: "QR expired",
-      tone: "warn",
-    }, {
-      minimalScan: true,
-      showCardBlock: false,
-      showHumanTrustBlock: false,
-      showArtifactBlock: false,
-      showLiveControlBlock: false,
-    });
+  if (qr.status === "expired" || isQrCalendarExpired(qr.scope, qr.expires_at, now)) {
+    return statusView(
+      "qr_expired",
+      card,
+      qr,
+      ctx.verification,
+      origin,
+      { label: "QR expired", tone: "warn" },
+      scanLayoutForMinimalFailureTrust()
+    );
   }
 
   return baseView(
@@ -218,9 +261,15 @@ export function buildScanViewModel(
 export function malformedScanView(
   profileId: string | null,
   qrId: string | null,
-  origin: string = "https://humanity.llc"
+  origin: string = "https://humanity.llc",
+  reason?: ScanMalformedReason
 ): ScanViewModel {
-  return malformedView(profileId, qrId, origin);
+  return malformedView(
+    profileId,
+    qrId,
+    origin,
+    reason ?? resolveScanMalformedReason(profileId, qrId)
+  );
 }
 
 /**
@@ -294,6 +343,27 @@ export function buildCardOnlyScanViewModel(
   );
 }
 
+function revocationDisplayLayout(
+  row: ScanContext["revocationDisplay"]
+): Partial<
+  Pick<
+    ScanViewModel,
+    | "minimalScan"
+    | "showCardBlock"
+    | "showHumanTrustBlock"
+    | "showArtifactBlock"
+    | "showLiveControlBlock"
+  >
+> {
+  if (!row?.display_mode) {
+    return scanLayoutForRevocationDisplay(null);
+  }
+  return scanLayoutForRevocationDisplay({
+    display_mode: row.display_mode as RevocationDisplayMeta["display_mode"],
+    public_reason: row.public_reason,
+  });
+}
+
 function statusView(
   kind: ScanPageKind,
   card: ScanContext["card"] & object,
@@ -310,7 +380,8 @@ function statusView(
       | "showArtifactBlock"
       | "showLiveControlBlock"
     >
-  >
+  >,
+  revocationDisplay?: ScanContext["revocationDisplay"]
 ): ScanViewModel {
   return baseView(
     {
@@ -326,23 +397,20 @@ function statusView(
       showArtifactBlock: display?.showArtifactBlock ?? true,
       showLiveControlBlock: display?.showLiveControlBlock ?? true,
       minimalScan: display?.minimalScan ?? false,
+      revocationDisplayMode: revocationDisplay?.display_mode ?? null,
+      publicReason: revocationDisplay?.public_reason ?? null,
     },
     origin
   );
 }
 
-function isQrPastExpiry(expiresAt: string | null, now: Date): boolean {
-  if (!expiresAt) return false;
-  const t = Date.parse(expiresAt);
-  return Number.isFinite(t) && t < now.getTime();
-}
-
 function malformedView(
   profileId: string | null,
   qrId: string | null,
-  origin: string
+  origin: string,
+  reason: ScanMalformedReason
 ): ScanViewModel {
-  return baseView(
+  const vm = baseView(
     {
       kind: "malformed",
       profileId,
@@ -355,6 +423,7 @@ function malformedView(
     },
     origin
   );
+  return { ...vm, malformedReason: reason };
 }
 
 interface BaseViewInput {
@@ -372,6 +441,8 @@ interface BaseViewInput {
   showArtifactBlock: boolean;
   showLiveControlBlock?: boolean;
   minimalScan?: boolean;
+  revocationDisplayMode?: string | null;
+  publicReason?: string | null;
 }
 
 function baseView(input: BaseViewInput, origin: string): ScanViewModel {
@@ -386,6 +457,7 @@ function baseView(input: BaseViewInput, origin: string): ScanViewModel {
     qrId: input.qrId,
     handle: card?.handle ?? null,
     manifestoLine: card?.manifesto_line ?? null,
+    objectStreams: objectStreamsFromCardDocumentJson(card?.card_document_json),
     cardStatus: card?.status ?? null,
     qrStatus: qr?.status ?? null,
     qrScope: qr?.scope ?? null,
@@ -404,9 +476,20 @@ function baseView(input: BaseViewInput, origin: string): ScanViewModel {
       input.showLiveControlBlock ??
       (isHealthy || input.kind.startsWith("qr_") || input.kind.startsWith("card_")),
     liveControlAvailable: false,
+    liveControlProvenAt: null,
+    qrExpiresAt: qr?.expires_at ?? null,
+    qrIssuedAt: qr?.issued_at ?? null,
+    qrPayload: qr?.payload ?? null,
     minimalScan: input.minimalScan ?? false,
+    revocationDisplayMode: input.revocationDisplayMode ?? null,
+    publicReason: input.publicReason ?? null,
     primaryBadge: input.primaryBadge,
     scanUrl: resolveScanUrl(origin, input.profileId, input.qrId, qr?.payload),
+    credentialCode:
+      input.profileId && input.qrId
+        ? deriveCredentialCodeSync(input.profileId, input.qrId)
+        : null,
     cacheControl: isHealthy ? CACHE_ACTIVE : CACHE_INACTIVE,
+    malformedReason: null,
   };
 }

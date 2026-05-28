@@ -12,6 +12,7 @@ import {
 import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
 import {
   handleGetLiveControlChallenge,
+  handleGetPendingLiveControlChallenge,
   handlePostLiveControlChallenge,
   handlePostLiveControlResponse,
 } from "../src/resolver/live-control";
@@ -109,6 +110,17 @@ function dbFor(rows: {
             return rows.verification ?? summary();
           }
           if (sql.includes("FROM live_control_challenges")) {
+            if (sql.includes("ORDER BY issued_at DESC")) {
+              const [profile_id, qr_id, nowIso] = params;
+              const pending = Object.values(challenges).find(
+                (row) =>
+                  row.profile_id === profile_id &&
+                  row.qr_id === qr_id &&
+                  row.status === "pending" &&
+                  String(row.expires_at) > String(nowIso)
+              );
+              return pending ?? null;
+            }
             return challenges[String(params[0])] ?? null;
           }
           return null;
@@ -190,6 +202,73 @@ describe("live control proof alpha", () => {
     expect(json.owner_url).toContain("profile_id=");
     expect(json.owner_url).toContain("qr_id=");
     expect(json.owner_url).toContain("return_url=");
+  });
+
+  it("returns the latest pending challenge for a QR", async () => {
+    const owner = await getTestKeypair();
+    const db = dbFor({ card: card(owner.publicKeyBase58), qr: qr() });
+    const createRes = await handlePostLiveControlChallenge(
+      request({ qr_id: QR }),
+      db,
+      PROFILE
+    );
+    const created = (await createRes.json()) as { challenge_id: string };
+
+    const pendingRes = await handleGetPendingLiveControlChallenge(
+      new Request(
+        `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/live-control/challenges?qr_id=${QR}`
+      ),
+      db,
+      PROFILE
+    );
+    const pending = (await pendingRes.json()) as {
+      challenge_id: string;
+      status: string;
+      return_url: string | null;
+    };
+
+    expect(pendingRes.status).toBe(200);
+    expect(pending.status).toBe("pending");
+    expect(pending.challenge_id).toBe(created.challenge_id);
+    expect(pending.return_url).toContain(`/c/${PROFILE}`);
+  });
+
+  it("returns 304 for pending challenge when If-None-Match matches", async () => {
+    const owner = await getTestKeypair();
+    const db = dbFor({ card: card(owner.publicKeyBase58), qr: qr() });
+    await handlePostLiveControlChallenge(request({ qr_id: QR }), db, PROFILE);
+
+    const url = `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/live-control/challenges?qr_id=${QR}`;
+    const first = await handleGetPendingLiveControlChallenge(
+      new Request(url),
+      db,
+      PROFILE
+    );
+    const etag = first.headers.get("ETag");
+    expect(etag).toBeTruthy();
+
+    const second = await handleGetPendingLiveControlChallenge(
+      new Request(url, { headers: { "If-None-Match": etag! } }),
+      db,
+      PROFILE
+    );
+    expect(second.status).toBe(304);
+    expect(second.headers.get("Cache-Control")).toContain("max-age=15");
+  });
+
+  it("returns 404 when no pending challenge exists for a QR", async () => {
+    const owner = await getTestKeypair();
+    const db = dbFor({ card: card(owner.publicKeyBase58), qr: qr() });
+
+    const pendingRes = await handleGetPendingLiveControlChallenge(
+      new Request(
+        `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/live-control/challenges?qr_id=${QR}`
+      ),
+      db,
+      PROFILE
+    );
+
+    expect(pendingRes.status).toBe(404);
   });
 
   it("does not create a challenge for a revoked QR", async () => {

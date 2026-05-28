@@ -3,6 +3,7 @@
 **Constitution Reference:** Humanity Commons Constitution (Articles I-VII)
 **Technical Standards Reference:** Technical Standards v1.0
 **Product Trust Reference:** V1 Product Trust Model  
+**Scanner experience:** `docs/SCANNER_EXPERIENCE.md`  
 **Lifecycle (Revoke QR / Disable card):** `docs/REVOKE_AND_LIFECYCLE_V1.md`
 **Dependencies:** Humanity Card v1.0, Human Verification v1.0
 
@@ -10,18 +11,18 @@
 
 ## 1. Executive Summary
 
-QR Public Profile v1.0 defines how public Humanity Card data is encoded, resolved, displayed, cached, revoked, and printed.
+QR Public Profile v1.0 defines how public root Humanity Card data, child-object scans, QR credentials, caching, revocation, and print-safe resolution work.
 
 In earlier prototypes, the QR system was treated as a small public profile resolver. In v1.0, the QR system is a core verification surface for Humanity Cards and physical artifacts. A scanned QR should answer:
 
-- Which Humanity Card or artifact is this?
+- Which root Humanity Card, child object, or artifact is this?
 - Is it active, revoked, suspended, expired, or unknown?
 - Is the resolver response signed?
-- What public information did the card owner choose to show?
+- What public information did the root card owner choose to show?
 - What verification state or badge trail is visible?
-- Has the nearby card owner recently proven live control of the card key, if requested?
+- Has the nearby card owner recently proven live control of the root key, if requested?
 
-QR Public Profile v1.0 is not a link-in-bio system. It is the public resolution layer for signed, revocable proof objects.
+QR Public Profile v1.0 is not a link-in-bio system. It is the public resolution layer for signed, revocable proof objects. The target model is one root card controlling many child objects; see [`../ROOT_CARD_AND_CHILD_OBJECTS.md`](../ROOT_CARD_AND_CHILD_OBJECTS.md).
 
 ---
 
@@ -50,6 +51,7 @@ QR Public Profile v1.0 is not a link-in-bio system. It is the public resolution 
 | QR-US-03 | As a card owner, I want each personalized printed item to receive its own QR credential. |
 | QR-US-04 | As a card owner, I want to revoke a stolen printed item without revoking every sticker or card I own. |
 | QR-US-05 | As a card owner, I want QR-bearing artifacts to resolve to current card status while keeping each physical item individually revocable. |
+| QR-US-05A | As a root card owner, I want to create and edit child objects without managing a new private key for each one. |
 
 ### 3.2 Scanner
 
@@ -60,6 +62,7 @@ QR Public Profile v1.0 is not a link-in-bio system. It is the public resolution 
 | QR-US-08 | As a scanner, I want to know whether I am viewing cached or current data. |
 | QR-US-09 | As a scanner, I want clear status for revoked, suspended, expired, or unknown QR credentials. |
 | QR-US-10 | As a scanner, I want to know that a printed QR resolves to a card but does not prove the person holding it is the card owner. |
+| QR-US-10B | As a scanner, I want to see when an object is controlled by a root card without mistaking the object for a separate verified human. |
 | QR-US-10A | As a scanner, I want to ask the card owner to prove live control when static QR evidence is not enough. |
 
 ### 3.3 Operator
@@ -79,9 +82,9 @@ QR Public Profile v1.0 is not a link-in-bio system. It is the public resolution 
 
 | ID | Requirement | Priority |
 |---|---|---|
-| QR-FR-01 | System MUST generate a signed QR credential for each active Humanity Card. | P0 |
+| QR-FR-01 | System MUST generate a signed QR credential for each active root Humanity Card and supported child-object scope. | P0 |
 | QR-FR-02 | QR credential MUST include profile ID, QR ID, epoch, issued_at, expires_at, resolver hint, status, and signature. | P0 |
-| QR-FR-03 | QR credential MUST be signed with the card owner's key or authorized recovery/rotation key. | P0 |
+| QR-FR-03 | QR credential MUST be signed with the root card owner's key, authorized recovery/rotation key, or a future delegated child capability scoped to the object. | P0 |
 | QR-FR-04 | QR ID MUST be opaque and not encode personal data. | P0 |
 | QR-FR-05 | QR payload MUST be short enough for reliable print scanning. | P0 |
 | QR-FR-06 | Personalized printed items MUST receive unique item-scoped QR credentials so individual stolen/lost items can be revoked. | P0 |
@@ -99,12 +102,12 @@ QR Public Profile v1.0 is not a link-in-bio system. It is the public resolution 
 
 | ID | Requirement | Priority |
 |---|---|---|
-| QR-FR-11 | QR resolution MUST return a public Humanity Card view for active cards. | P0 |
+| QR-FR-11 | QR resolution MUST return a public root card or child-object view for active scans. | P0 |
 | QR-FR-12 | Resolution MUST support HTML for browsers and JSON for clients. | P0 |
 | QR-FR-13 | Public card view MUST include verification status, latest accepted vouch recency when available, and badge trail. | P0 |
 | QR-FR-14 | Public card view MUST not expose private or semi-public profile layers. | P0 |
 | QR-FR-15 | Public card view MUST link to constitution, governance, and technical standards. | P0 |
-| QR-FR-16 | Public scan UI for printed-item QR credentials MUST state that the QR resolves to a Humanity Card but does not prove the person holding the item is the card owner. | P0 |
+| QR-FR-16 | Public scan UI for printed-item QR credentials MUST state that the QR resolves through a root Humanity Card / child object but does not prove the person holding the item is the card owner. | P0 |
 
 ### 4.3A Live Control Proof Display
 
@@ -134,8 +137,16 @@ QR Public Profile v1.0 is not a link-in-bio system. It is the public resolution 
 | QR-FR-24 | Revoked QR credentials MUST resolve to revoked status, not 404. | P0 |
 | QR-FR-25 | Expired QR credentials MUST resolve to expired/replaced status. | P0 |
 | QR-FR-26 | Revocation MUST not attempt to physically recall shipped artifacts. | P0 |
-| QR-FR-27 | Revoking one printed-item QR MUST NOT revoke sibling printed-item QR credentials for the same profile unless the user revokes the entire card or source QR. | P0 |
+| QR-FR-27 | Revoking one printed-item QR MUST NOT revoke sibling printed-item QR credentials for the same root profile / child object unless the user revokes the source QR, disables the child, or disables the root card. | P0 |
 | QR-FR-28 | Public copy MUST explain that printed QR artifacts may still exist after revocation. | P0 |
+
+### 4.5A Child object authority
+
+| ID | Requirement | Priority |
+|---|---|---|
+| QR-FR-28A | Child-object create/update/revoke operations MUST be signed by the parent root key or accepted recovery key until delegated child capabilities ship. | P0 |
+| QR-FR-28B | Child objects MUST NOT receive human verification, vouching authority, or Steward status independent from their root card. | P0 |
+| QR-FR-28C | Public child-object scans SHOULD show the object label/status first and the root relationship second, e.g. **Controlled by @handle**. | P0 |
 
 ### 4.6 Offline and Cache Behavior
 

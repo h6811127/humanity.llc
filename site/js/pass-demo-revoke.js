@@ -1,6 +1,6 @@
 (function () {
   /**
-   * Landing pass card — demo revoke animation (not connected to the network).
+   * Landing pass card  -  demo revoke animation (not connected to the network).
    */
   var surface = document.getElementById("pass-tilt-surface");
   var live = document.getElementById("pass-demo-live");

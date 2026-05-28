@@ -6,8 +6,8 @@ Implements **RFC 8785 (JCS)** canonicalization and **Ed25519** sign/verify for a
 
 1. Build the **unsigned** JSON object (no `signature` key).
 2. Include Technical Standards §17 fields:
-   - `type` — payload type (`humanity_card`, `qr_credential`, `vouch`, …)
-   - `version` — `"1.0"`
+   - `type`  -  payload type (`humanity_card`, `qr_credential`, `vouch`, …)
+   - `version`  -  `"1.0"`
    - Subject profile id (`profile_id`, `vouchee_profile_id`, or `issued_to`)
    - Timestamp (`created_at`, `revoked_at`, `issued_at`, …)
    - `nonce` or stable unique id (`vouch_id`, `qr_id`, `manifest_id`, …)
@@ -32,8 +32,8 @@ const result = await verifySignedDocument(signed, {
 
 Public badge records in prose specs use `type: "founding_human"` for badge kind. Signed badge **payloads** use:
 
-- `type: "badge"` — protocol payload type (§17)
-- `badge_type: "founding_human"` — display/issuance kind
+- `type: "badge"`  -  protocol payload type (§17)
+- `badge_type: "founding_human"`  -  display/issuance kind
 
 ## Replay protection
 

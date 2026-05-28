@@ -9,6 +9,7 @@ export const TABLES = {
   revocations: "revocations",
   vouches: "vouches",
   live_control_challenges: "live_control_challenges",
+  vouch_audit_dismissals: "vouch_audit_dismissals",
 } as const;
 
 export const REQUIRED_TABLES = Object.values(TABLES);
