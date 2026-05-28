@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, afterEach } from "vitest";
 
 import {
   getTestKeypair,
@@ -11,6 +11,7 @@ import type { ArtifactIntentRow } from "../src/db/artifact-intents";
 import { handlePostShopifyOrdersWebhook } from "../src/http/shopify-orders-webhook";
 import type { Env } from "../src/env";
 import { HOODIE_LIVE_OBJECT_TEMPLATE_ID } from "../src/print/print-catalog";
+import * as printifySubmit from "../src/print/print-order-printify-submit";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const INTENT = "ai_PreMintAutoMint01";
@@ -219,6 +220,10 @@ function dbFor(state: DbState, cardPublicKey: string): D1Database {
 const env = { SHOPIFY_WEBHOOK_SECRET: SECRET } as Env;
 
 describe("artifact intent pre-mint + paid webhook auto-mint", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("stores pre-mint credentials then auto-mints after paid webhook", async () => {
     const { privateKey, publicKeyBase58 } = await getTestKeypair();
     const credential = await buildPrintArtifactCredential(privateKey, publicKeyBase58);
@@ -285,5 +290,88 @@ describe("artifact intent pre-mint + paid webhook auto-mint", () => {
     };
     expect(printOrder.template_id).toBe(HOODIE_LIVE_OBJECT_TEMPLATE_ID);
     expect(JSON.parse(printOrder.planned_item_qr_ids_json)).toEqual([PLANNED_QR]);
+  });
+
+  it("auto-submits to Printify after mint when PRINTIFY_SUBMIT_ENABLED=1", async () => {
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const credential = await buildPrintArtifactCredential(privateKey, publicKeyBase58);
+    const state: DbState = {
+      intents: new Map([[INTENT, intentRow()]]),
+      orders: new Map(),
+      receipts: new Map(),
+      printOrders: new Map(),
+    };
+    const db = dbFor(state, publicKeyBase58);
+    const submitSpy = vi.spyOn(printifySubmit, "submitPrintOrderToPrintify").mockResolvedValue({
+      ok: true,
+      printOrder: {
+        order_id: "po_autoSubmitFromWebhook",
+        profile_id: PROFILE,
+        print_artifact_ids_json: JSON.stringify([PLANNED_PA]),
+        planned_item_qr_ids_json: JSON.stringify([PLANNED_QR]),
+        commerce_order_id: "co_autoSubmitFromWebhook",
+        shopify_order_id: "450789473",
+        printify_order_id: "pf_autoSubmitFromWebhook",
+        printify_shop_id: 99,
+        template_id: HOODIE_LIVE_OBJECT_TEMPLATE_ID,
+        status: "submitted",
+        shipping_method: "standard",
+        created_at: "2026-05-16T17:00:00Z",
+        updated_at: "2026-05-16T17:00:00Z",
+      },
+    });
+
+    await handlePostArtifactIntentPreMint(
+      new Request(`https://humanity.llc/v1/store/artifact-intents/${INTENT}/pre-mint`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ qr_credentials: [credential] }),
+      }),
+      db,
+      INTENT
+    );
+
+    const payload = JSON.stringify({
+      id: 450789473,
+      checkout_id: 901414063,
+      financial_status: "paid",
+      line_items: [
+        {
+          properties: [
+            { name: "artifact_intent_id", value: INTENT },
+            { name: "profile_id", value: PROFILE },
+          ],
+        },
+      ],
+    });
+    const hmac = await signPayload(payload);
+    const webhookRes = await handlePostShopifyOrdersWebhook(
+      new Request("https://humanity.llc/v1/webhooks/shopify/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Shopify-Hmac-Sha256": hmac,
+          "X-Shopify-Topic": "orders/paid",
+          "X-Shopify-Webhook-Id": "wh_pre_mint_auto_submit_1",
+        },
+        body: payload,
+      }),
+      { ...env, PRINTIFY_SUBMIT_ENABLED: "1" },
+      db
+    );
+
+    const webhookJson = (await webhookRes.json()) as {
+      auto_mint: {
+        all_planned_minted: boolean;
+        printify_submit: { attempted: boolean; submitted: boolean };
+      }[];
+    };
+    expect(webhookJson.auto_mint[0]?.all_planned_minted).toBe(true);
+    expect(webhookJson.auto_mint[0]?.printify_submit).toEqual({
+      attempted: true,
+      submitted: true,
+      skipped: false,
+    });
+    expect(submitSpy).toHaveBeenCalledOnce();
   });
 });

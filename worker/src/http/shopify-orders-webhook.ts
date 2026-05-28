@@ -73,6 +73,7 @@ function commerceOrderResponse(
             attempted: result.attempted,
             all_planned_minted: result.all_planned_minted,
             print_order_id: result.print_order_id,
+            printify_submit: result.printify_submit,
           })),
         }
       : {}),
