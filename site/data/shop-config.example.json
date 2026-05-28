@@ -1,4 +1,5 @@
 {
+  "_operator_documentation": "docs/MERCH_HEADLESS_COMMERCE.md — Shopify checkout URLs here; Printify IDs in Worker env; humanity.llc does not auto-sync either catalog.",
   "version": 1,
   "site_origin": "https://humanity.llc",
   "tier0": {

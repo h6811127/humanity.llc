@@ -3,8 +3,21 @@
 **Status:** Checkout handoff wired (config-driven) · set `shop-config.json` when Shopify product exists  
 **Canonical strategy:** `docs/MERCH_LED_V1.md` Phase B, `docs/FOUNDING_DROP_BRIEF.md` Tier 0  
 **Merch funnel MVP:** `docs/MERCH_FUNNEL_MVP.md` · `/shop/customize/` QR customizer  
+**Headless commerce:** `docs/MERCH_HEADLESS_COMMERCE.md` — Printify = factory, Shopify = checkout, humanity.llc = storefront; dual product IDs  
 **Merch QR policy:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` (defer `checkout_open: true` until remaining policy gates pass; M5 passed 2026-05-27)  
 **Copy:** `docs/LAUNCH_LANGUAGE_KIT.md` § Tier 0 · Sticker FAQ
+
+---
+
+## Three systems (not interchangeable)
+
+| System | Role in v1 | This doc |
+|--------|------------|----------|
+| **humanity.llc** | Storefront UI, Tier 0 `/shop/`, Tier 1 `/shop/customize/` | Pages deploy + `shop-config.json` |
+| **Shopify** | Payment, tax, refunds — cart permalinks only | § Enable checkout below |
+| **Printify** | Manufacture + ship — **never** customer-facing | Worker env + `POST /v1/print/orders` |
+
+Tier 0 uses Shopify variant + optional batch Printify mapping. **Tier 1 personalized** requires artifact intent from the customizer — see [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md). A hoodie “live on Shopify” from Printify publish is a **checkout SKU shell**, not the full personalized product until `/shop/customize/` + webhook path is wired.
 
 ---
 
@@ -88,6 +101,7 @@ The interest form records **optional email** on this browser only (no server upl
 
 | Topic | Doc |
 |-------|-----|
+| **Headless Shopify + Printify wiring** | `docs/MERCH_HEADLESS_COMMERCE.md` |
 | Owner revoke from second device | `docs/M5_5_OWNER_KEY_PORTABILITY.md` (shipped in repo) |
 | Device hub (save keys, inbox) | `docs/DEVICE_OS.md` |
 | Drop ops checklist | `docs/FOUNDING_DROP_BRIEF.md` |

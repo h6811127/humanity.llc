@@ -499,7 +499,7 @@ Goal: complete one real paid order path safely.
 - Manual production approval gate.
 - Cancel eligible orders.
 
-**Shipped (2026-05-27):** per-order artwork upload on Tier 1 submit — `POST /v1/uploads/images.json` → ephemeral product with `print_areas` → order line item. Operator env: `PERSONALIZE_*_PRINTIFY_BLUEPRINT_ID`, `PERSONALIZE_*_PRINTIFY_PRINT_PROVIDER_ID`, optional placeholder/transform vars. Tier 0 batch still uses static `product_id` mapping.
+**Shipped:** queue + operator submit + webhook status + Tier 1 template env mapping + **per-order artwork upload** (PM-FR-13) — [`printify-upload.ts`](../worker/src/print/printify-upload.ts) · [`printify-line-items.ts`](../worker/src/print/printify-line-items.ts). Operator env: `PERSONALIZE_*_PRINTIFY_BLUEPRINT_ID`, `PERSONALIZE_*_PRINTIFY_PRINT_PROVIDER_ID`. See [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md).
 
 **Exit criteria:**
 
