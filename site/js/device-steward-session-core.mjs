@@ -9,6 +9,9 @@ export const STEWARD_OPERATOR_ID = "humanity.llc";
 /** Checkout / billing return query param (strip after consume). */
 export const STEWARD_ACCOUNT_URL_PARAM = "hc_account_id";
 
+/** sessionStorage — survives reload until link succeeds or session exists. */
+export const STEWARD_PENDING_ACCOUNT_STORAGE_KEY = "hc_steward_pending_account_id";
+
 /** Max link_proof TTL (operator rejects longer). */
 export const STEWARD_LINK_TTL_MS = 5 * 60 * 1000;
 
@@ -74,4 +77,30 @@ export function buildStewardAccountLinkUnsigned(fields) {
     expires_at: fields.expires_at,
     nonce: fields.nonce,
   };
+}
+
+/**
+ * Prefer checkout return param; fall back to pending storage.
+ *
+ * @param {string | null | undefined} urlAccountId
+ * @param {string | null | undefined} pendingAccountId
+ * @returns {string | null}
+ */
+export function resolveStewardAccountLinkTarget(urlAccountId, pendingAccountId) {
+  if (isValidStewardAccountId(urlAccountId)) return String(urlAccountId).trim();
+  if (isValidStewardAccountId(pendingAccountId)) return String(pendingAccountId).trim();
+  return null;
+}
+
+/**
+ * Hub monitoring line while billing checkout return is pending link.
+ *
+ * @param {boolean} hasSigningKeys
+ * @returns {string | null}
+ */
+export function stewardBillingReturnPendingLine(hasSigningKeys) {
+  if (hasSigningKeys) {
+    return "Finishing hosted plan link on this device…";
+  }
+  return "Hosted plan ready — open or import a saved card to link this device after checkout.";
 }

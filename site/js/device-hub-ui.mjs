@@ -146,6 +146,7 @@ import {
 } from "./device-wallet-scale-core.mjs";
 import {
   getStewardEntitlementsPolicy,
+  getStewardBillingReturnPendingLine,
   hostedTierHubIndicatorLine,
   initStewardEntitlementsHubHook,
   refreshStewardEntitlementsOnHubContext,
@@ -2076,6 +2077,7 @@ export function initDeviceHub(config = {}) {
         walletScaleHint(getWalletCount(), getStewardEntitlementsPolicy()),
       getHostedTierLine: () =>
         hostedTierHubIndicatorLine(getStewardEntitlementsPolicy()),
+      getStewardBillingPendingLine: () => getStewardBillingReturnPendingLine(),
       onCheckNetwork: () => fetchAndApplyNetworkChips({ manual: true }),
       onCheckLiveProof: () => checkLiveProofNow(),
       onWatchChange: () => applyLiveControlWatchPreference(),

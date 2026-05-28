@@ -46,6 +46,7 @@ function main() {
     "worker:test",
     "--",
     "worker/tests/device-steward-session-core.test.ts",
+    "worker/tests/device-steward-session.test.ts",
   ]);
   runNpm("Stripe checkout return URL (device-steward-billing-return-core)", [
     "run",

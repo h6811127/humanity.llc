@@ -17,6 +17,13 @@ import {
   stewardEntitlementsRequestHeaders,
   stewardPushSubscribeAllowed,
 } from "./device-steward-entitlements-core.mjs";
+import {
+  STEWARD_PENDING_ACCOUNT_STORAGE_KEY,
+  isValidStewardAccountId,
+  parseStewardAccountIdFromUrl,
+  resolveStewardAccountLinkTarget,
+  stewardBillingReturnPendingLine,
+} from "./device-steward-session-core.mjs";
 
 export {
   REFERENCE_FREE_POLICY,
@@ -81,19 +88,6 @@ export function clearStewardSession() {
  * Stable per-browser install id for metering headers.
  * @returns {string}
  */
-/**
- * Optional bearer + device headers for authenticated resolver GETs.
- * @returns {Record<string, string>}
- */
-export function stewardResolverRequestHeaders() {
-  const token = readStewardSessionToken();
-  if (!token) return {};
-  return {
-    Authorization: `Bearer ${token}`,
-    "X-HC-Device-Id": getOrCreateStewardDeviceId(),
-  };
-}
-
 export function getOrCreateStewardDeviceId() {
   try {
     const existing = localStorage.getItem(STEWARD_DEVICE_ID_STORAGE_KEY);
@@ -107,6 +101,40 @@ export function getOrCreateStewardDeviceId() {
   } catch {
     return "unknown-device";
   }
+}
+
+/**
+ * Optional bearer + device headers for authenticated resolver GETs.
+ * @returns {Record<string, string>}
+ */
+export function stewardResolverRequestHeaders() {
+  const token = readStewardSessionToken();
+  if (!token) return {};
+  return {
+    Authorization: `Bearer ${token}`,
+    "X-HC-Device-Id": getOrCreateStewardDeviceId(),
+  };
+}
+
+/**
+ * Hub monitoring line after Stripe checkout return, before session link completes.
+ *
+ * @returns {string | null}
+ */
+export function getStewardBillingReturnPendingLine() {
+  if (readStewardSessionToken()) return null;
+  let pending = null;
+  try {
+    const raw = sessionStorage.getItem(STEWARD_PENDING_ACCOUNT_STORAGE_KEY);
+    pending = isValidStewardAccountId(raw) ? String(raw).trim() : null;
+  } catch {
+    /* ignore */
+  }
+  const urlAccountId =
+    typeof location !== "undefined" ? parseStewardAccountIdFromUrl(location.search) : null;
+  const accountId = resolveStewardAccountLinkTarget(urlAccountId, pending);
+  if (!accountId) return null;
+  return stewardBillingReturnPendingLine(!!getTabSession()?.owner_private_key_b58);
 }
 
 /**

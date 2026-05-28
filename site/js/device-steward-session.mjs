@@ -3,7 +3,8 @@
  * @see docs/HOSTED_TIER_IMPLEMENTATION_EPICS.md § E2
  * @see docs/STEWARD_DEVICE_ROADMAP.md § Current engineering steps
  */
-import { getTabSession } from "./device-keys.mjs";
+import { activateWalletEntry, getTabSession } from "./device-keys.mjs";
+import { loadWallet } from "./device-wallet.mjs";
 import {
   decodePrivateKeyBase58,
   randomBase58,
@@ -20,9 +21,11 @@ import {
 import {
   STEWARD_ACCOUNT_LINK_TYPE,
   STEWARD_ACCOUNT_URL_PARAM,
+  STEWARD_PENDING_ACCOUNT_STORAGE_KEY,
   buildStewardAccountLinkUnsigned,
   isValidStewardAccountId,
   parseStewardAccountIdFromUrl,
+  resolveStewardAccountLinkTarget,
   stewardAccountLinkTimestamps,
 } from "./device-steward-session-core.mjs";
 
@@ -33,6 +36,77 @@ export {
 } from "./device-steward-session-core.mjs";
 
 let sessionClientInit = false;
+
+/**
+ * @returns {string | null}
+ */
+export function readPendingStewardAccountId() {
+  try {
+    const raw = sessionStorage.getItem(STEWARD_PENDING_ACCOUNT_STORAGE_KEY);
+    if (!raw) return null;
+    return isValidStewardAccountId(raw) ? raw.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * @param {string} accountId
+ */
+export function writePendingStewardAccountId(accountId) {
+  if (!isValidStewardAccountId(accountId)) return;
+  try {
+    sessionStorage.setItem(STEWARD_PENDING_ACCOUNT_STORAGE_KEY, accountId.trim());
+  } catch {
+    /* ignore */
+  }
+}
+
+export function clearPendingStewardAccountId() {
+  try {
+    sessionStorage.removeItem(STEWARD_PENDING_ACCOUNT_STORAGE_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * Persist checkout return account id (survives reload until link succeeds).
+ *
+ * @returns {string | null}
+ */
+export function captureStewardAccountIdFromUrl() {
+  if (typeof window === "undefined") return null;
+  const accountId = parseStewardAccountIdFromUrl(location.search);
+  if (accountId) writePendingStewardAccountId(accountId);
+  return accountId;
+}
+
+/**
+ * Stripe success_url may include profile_id — load matching wallet keys when saved.
+ *
+ * @returns {boolean}
+ */
+export function tryActivateWalletForBillingReturn() {
+  if (typeof window === "undefined") return false;
+  const params = new URLSearchParams(location.search);
+  if (!params.has(STEWARD_ACCOUNT_URL_PARAM) && !readPendingStewardAccountId()) {
+    return false;
+  }
+  const profileId = params.get("profile_id")?.trim();
+  if (!profileId) return false;
+
+  const session = getTabSession();
+  if (session?.profile_id === profileId && session?.owner_private_key_b58) {
+    return true;
+  }
+
+  const entry = loadWallet().find((row) => row.profile_id === profileId);
+  if (!entry?.owner_private_key_b58) return false;
+
+  activateWalletEntry(entry);
+  return true;
+}
 
 /**
  * @param {string} accountId
@@ -142,15 +216,24 @@ export async function tryCompleteStewardAccountLinkFromUrl() {
   if (typeof window === "undefined") return false;
   if (readStewardSessionToken()) {
     stripStewardAccountUrlParam();
+    clearPendingStewardAccountId();
     return false;
   }
 
-  const accountId = parseStewardAccountIdFromUrl(location.search);
+  captureStewardAccountIdFromUrl();
+  const accountId = resolveStewardAccountLinkTarget(
+    parseStewardAccountIdFromUrl(location.search),
+    readPendingStewardAccountId()
+  );
   if (!accountId) return false;
   if (!getTabSession()?.owner_private_key_b58) return false;
 
   const result = await linkStewardAccountWithActiveKeys(accountId);
-  stripStewardAccountUrlParam();
+  if (result.ok) {
+    stripStewardAccountUrlParam();
+    clearPendingStewardAccountId();
+    window.dispatchEvent(new Event("hc-steward-session-linked"));
+  }
   return result.ok;
 }
 
@@ -162,6 +245,8 @@ export function initStewardSessionClient() {
   sessionClientInit = true;
 
   const attempt = () => {
+    captureStewardAccountIdFromUrl();
+    tryActivateWalletForBillingReturn();
     void tryCompleteStewardAccountLinkFromUrl();
   };
 

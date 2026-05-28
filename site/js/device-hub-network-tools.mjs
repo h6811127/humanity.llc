@@ -23,6 +23,7 @@ const WATCH_INPUT_ID = "device-hub-watch-live-proof";
  *   getStewardQuotaPaused?: () => boolean,
  *   getLargeWalletHint?: () => string | null,
  *   getHostedTierLine?: () => string | null,
+ *   getStewardBillingPendingLine?: () => string | null,
  *   onCheckNetwork: () => void | Promise<void>,
  *   onCheckLiveProof: () => void | Promise<void>,
  *   onWatchChange: (enabled: boolean) => void,
@@ -44,6 +45,7 @@ export function mountHubNetworkTools(config) {
       <p class="device-hub-network-tools-eyebrow">Monitoring</p>
       <p class="device-hub-network-tools-status" id="${STATUS_ID}" role="status"></p>
       <p class="device-hub-steward-tier-line" id="device-hub-steward-tier-line" role="status" hidden></p>
+      <p class="device-hub-steward-tier-line" id="device-hub-steward-billing-pending-line" role="status" hidden></p>
       <p class="device-hub-network-tools-hint" id="device-hub-large-wallet-hint" role="note" hidden></p>
       <div class="device-hub-network-tools-segment" role="group" aria-label="Network checks">
         <button type="button" class="device-hub-network-tools-segment-btn" id="${CHECK_NETWORK_ID}" hidden>
@@ -113,6 +115,7 @@ export function mountHubNetworkTools(config) {
 
   const hintEl = toolbar.querySelector("#device-hub-large-wallet-hint");
   const hostedLineEl = toolbar.querySelector("#device-hub-steward-tier-line");
+  const billingPendingEl = toolbar.querySelector("#device-hub-steward-billing-pending-line");
 
   const renderStatus = () => {
     if (!statusEl) return;
@@ -131,6 +134,16 @@ export function mountHubNetworkTools(config) {
       } else {
         hostedLineEl.textContent = "";
         hostedLineEl.hidden = true;
+      }
+    }
+    if (billingPendingEl instanceof HTMLElement) {
+      const billingLine = config.getStewardBillingPendingLine?.() ?? null;
+      if (billingLine) {
+        billingPendingEl.textContent = billingLine;
+        billingPendingEl.hidden = false;
+      } else {
+        billingPendingEl.textContent = "";
+        billingPendingEl.hidden = true;
       }
     }
     if (hintEl instanceof HTMLElement) {
@@ -155,6 +168,8 @@ export function mountHubNetworkTools(config) {
     window.addEventListener("hc-live-control-poll-budget-changed", refresh);
     window.addEventListener("hc-steward-entitlements-changed", refresh);
     window.addEventListener("hc-steward-quota-changed", refresh);
+    window.addEventListener("hc-steward-session-linked", refresh);
+    window.addEventListener("hc-device-hub-changed", refresh);
     window.addEventListener("storage", (e) => {
       if (e.key === STORAGE_WATCH_LIVE_PROOF && watchInput instanceof HTMLInputElement) {
         watchInput.checked = isWatchLiveProofEnabled();

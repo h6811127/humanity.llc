@@ -3,10 +3,13 @@ import { describe, expect, it } from "vitest";
 import {
   ACCOUNT_ID_REGEX,
   STEWARD_ACCOUNT_URL_PARAM,
+  STEWARD_PENDING_ACCOUNT_STORAGE_KEY,
   buildStewardAccountLinkUnsigned,
   isValidStewardAccountId,
   parseStewardAccountIdFromUrl,
+  resolveStewardAccountLinkTarget,
   stewardAccountLinkTimestamps,
+  stewardBillingReturnPendingLine,
 } from "../../site/js/device-steward-session-core.mjs";
 
 describe("isValidStewardAccountId", () => {
@@ -52,5 +55,35 @@ describe("buildStewardAccountLinkUnsigned", () => {
     });
     expect(doc.operator_id).toBe("humanity.llc");
     expect(ACCOUNT_ID_REGEX.test(doc.account_id)).toBe(true);
+  });
+});
+
+describe("resolveStewardAccountLinkTarget", () => {
+  it("prefers URL account id over pending storage", () => {
+    expect(
+      resolveStewardAccountLinkTarget("acc_TestHostedSteward1", "acc_TestHostedSteward2")
+    ).toBe("acc_TestHostedSteward1");
+  });
+
+  it("falls back to pending when URL param absent", () => {
+    expect(resolveStewardAccountLinkTarget(null, "acc_TestHostedSteward1")).toBe(
+      "acc_TestHostedSteward1"
+    );
+  });
+});
+
+describe("stewardBillingReturnPendingLine", () => {
+  it("prompts to load keys when checkout returns without signing keys", () => {
+    expect(stewardBillingReturnPendingLine(false)).toContain("open or import");
+  });
+
+  it("shows finishing copy when keys are loaded", () => {
+    expect(stewardBillingReturnPendingLine(true)).toContain("Finishing hosted plan link");
+  });
+});
+
+describe("STEWARD_PENDING_ACCOUNT_STORAGE_KEY", () => {
+  it("is a stable sessionStorage key", () => {
+    expect(STEWARD_PENDING_ACCOUNT_STORAGE_KEY).toBe("hc_steward_pending_account_id");
   });
 });

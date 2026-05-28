@@ -34,7 +34,7 @@ try {
   console.log(`  Landing: ${landing}`);
   console.log(`  Wallet:  ${wallet}`);
   console.log(
-    "\nAfter payment, steward opens success_url with keys in tab; device-steward-session.mjs links account."
+    "\nAfter payment, steward opens success_url; device-steward-session.mjs persists hc_account_id until link succeeds (import keys if needed)."
   );
   console.log("Commerce checkout must NOT set metadata.account_id (H6).");
 } catch (err) {

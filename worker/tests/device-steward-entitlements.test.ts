@@ -181,6 +181,45 @@ describe("refreshStewardEntitlements", () => {
   });
 });
 
+describe("getStewardBillingReturnPendingLine", () => {
+  let sessionStore: ReturnType<typeof storageFor>;
+
+  beforeEach(() => {
+    vi.resetModules();
+    sessionStore = storageFor();
+    vi.stubGlobal("sessionStorage", sessionStore);
+    vi.stubGlobal("localStorage", storageFor());
+    vi.stubGlobal("location", {
+      search: "?hc_account_id=acc_TestHostedSteward1",
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("returns null when steward session already exists", async () => {
+    sessionStore.setItem("hc_steward_session", JSON.stringify({ token: "tok" }));
+    const mod = await importEntitlements();
+    expect(mod.getStewardBillingReturnPendingLine()).toBeNull();
+  });
+
+  it("returns import copy when checkout return is pending without keys", async () => {
+    const mod = await importEntitlements();
+    const line = mod.getStewardBillingReturnPendingLine();
+    expect(line).toContain("open or import");
+  });
+
+  it("returns finishing copy when keys are loaded in tab", async () => {
+    sessionStore.setItem(
+      "hc_created",
+      JSON.stringify({ profile_id: "p1", owner_private_key_b58: "priv" })
+    );
+    const mod = await importEntitlements();
+    expect(mod.getStewardBillingReturnPendingLine()).toContain("Finishing hosted plan link");
+  });
+});
+
 function modWriteSessionPlaceholder() {
   sessionStorage.setItem("hc_steward_session", JSON.stringify({ token: "token-1" }));
 }
