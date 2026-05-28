@@ -14,7 +14,7 @@ import {
 } from "../db/print-orders";
 import { operatorAuditAuthorized } from "../http/operator-auth";
 import { errorResponse, jsonResponse } from "../http/resolver";
-import type { Env } from "../index";
+import type { Env } from "../env";
 import { submitPrintifyOrder } from "./printify-client";
 import { parsePrintifyShippingAddress } from "./printify-shipping";
 
@@ -120,7 +120,8 @@ export async function handlePostPrintOrders(
       );
     }
 
-    let quantity = 1;
+    let quantity = JSON.parse(printOrder.planned_item_qr_ids_json).length;
+    if (quantity < 1) quantity = 1;
     if (body.quantity !== undefined && body.quantity !== null) {
       if (typeof body.quantity !== "number" || !Number.isInteger(body.quantity) || body.quantity < 1) {
         return errorResponse("INVALID_QUANTITY", "quantity must be a positive integer.", 422);
@@ -131,9 +132,11 @@ export async function handlePostPrintOrders(
     const submit = await submitPrintifyOrder(env, {
       print_order_id: printOrder.order_id,
       template_id: printOrder.template_id,
+      profile_id: printOrder.profile_id,
       planned_item_qr_ids: JSON.parse(printOrder.planned_item_qr_ids_json) as string[],
       shipping_address: shippingAddress,
       quantity,
+      scan_origin: new URL(request.url).origin,
     });
 
     if (!submit.ok) {
@@ -141,7 +144,12 @@ export async function handlePostPrintOrders(
         submit.code === "PRINTIFY_RATE_LIMITED"
           ? 429
           : submit.code === "PRINTIFY_INVALID_ADDRESS" ||
-              submit.code === "PRINTIFY_TEMPLATE_UNCONFIGURED"
+              submit.code === "PRINTIFY_TEMPLATE_UNCONFIGURED" ||
+              submit.code === "PRINTIFY_ARTWORK_UNCONFIGURED" ||
+              submit.code === "PRINTIFY_ARTWORK_GENERATION_FAILED" ||
+              submit.code === "PRINTIFY_PLANNED_QRS_REQUIRED" ||
+              submit.code === "PRINTIFY_UPLOAD_FAILED" ||
+              submit.code === "PRINTIFY_PRODUCT_CREATE_FAILED"
             ? 422
             : submit.code === "PRINTIFY_SUBMIT_DEFERRED" ||
                 submit.code === "PRINTIFY_UNCONFIGURED"

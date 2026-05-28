@@ -19,6 +19,12 @@ import {
   credentialCodeFromScanUrl,
   deriveCredentialCodeSync,
 } from "../../../site/js/qr-credential-code.mjs";
+import {
+  isChildObjectScope,
+  qrNoCalendarExpirySubtitle,
+  qrScopeRelationshipCopy,
+  qrTrustGroupScopeSubtitle,
+} from "../../../site/js/object-taxonomy-core.mjs";
 import { renderScanQrMarkup } from "./scan-qr";
 import {
   EMPTY_SCAN_SAFETY,
@@ -29,9 +35,11 @@ import {
   SCAN_HERO_META_DETAILS_SUMMARY,
   SCAN_HERO_QR_DETAILS_SUMMARY,
   LOST_ITEM_RELAY_CREATE_HINT,
-  SCAN_MERCH_CUSTOMIZE_HINT,
-  SCAN_MERCH_CUSTOMIZE_PATH,
   LOST_ITEM_RELAY_CREATE_PATH,
+  MERCH_SCAN_CREATE_PATH,
+  MERCH_SCAN_CUSTOMIZE_PATH,
+  MERCH_SCAN_FUNNEL_HINT,
+  MERCH_SCAN_FUNNEL_REF,
   SCAN_SAFETY_RESOLVER_VERIFIED_COPY,
   type ScanSafetyModel,
 } from "./scan-safety";
@@ -42,7 +50,7 @@ import {
 } from "./scan-malformed-hint";
 
 /** Response header  -  confirms pass-card scan UI (not legacy .block layout). */
-export const SCAN_UI_VERSION = "pass-v36";
+export const SCAN_UI_VERSION = "pass-v37";
 
 /**
  * Public scan UI  -  flippable pass card (landing) + iOS grouped trust blocks below (spec §7).
@@ -188,6 +196,7 @@ function renderScanHeroSection(
     : "";
   const qrAttr = vm.qrId ? ` data-qr-id="${escapeHtml(vm.qrId)}"` : "";
   const scanActiveAttr = vm.kind === "active" ? ` data-scan-active="1"` : "";
+  const merchFunnelAttr = isMerchFunnelScan(vm) ? ` data-merch-funnel="1"` : "";
   const resolverRow = safety.objectSignatureVerified
     ? `<p class="scan-safety-resolver scan-arrive-item scan-arrive-item--hidden">${escapeHtml(SCAN_SAFETY_RESOLVER_VERIFIED_COPY)}</p>`
     : "";
@@ -203,12 +212,7 @@ function renderScanHeroSection(
     display.kind === "lost_item_relay"
       ? renderLostItemCreateHint(origin)
       : "";
-  const merchCustomizeHint =
-    vm.kind === "active" &&
-    heroTemplate !== "lost_item_relay" &&
-    heroTemplate !== "status_plate"
-      ? renderScanMerchCustomizeHint(origin)
-      : "";
+  const merchFunnelHint = isMerchFunnelScan(vm) ? renderMerchFunnelHint(origin) : "";
   const qrBlock = scanHeroQrBlock(vm, qrMarkup);
   const qrSection = qrBlock
     ? `<details class="scan-hero-qr-details">
@@ -218,7 +222,7 @@ function renderScanHeroSection(
     : "";
 
   return `<div class="scan-pass-layer">
-<article class="scan-hero scan-status-panel scan-safety-header scan-live-check--pending" id="scan-safety-header" aria-label="Live check"${profileAttr}${qrAttr}${scanActiveAttr}>
+<article class="scan-hero scan-status-panel scan-safety-header scan-live-check--pending" id="scan-safety-header" aria-label="Live check"${profileAttr}${qrAttr}${scanActiveAttr}${merchFunnelAttr}>
   <header class="scan-hero-head">
     ${renderScanHeroHost()}
     ${renderHeroStatusStrip(vm)}
@@ -232,7 +236,7 @@ function renderScanHeroSection(
   <p class="scan-safety-first-seen" id="scan-safety-first-seen" hidden></p>
   ${footBlock}
   ${lostItemCreateHint}
-  ${merchCustomizeHint}
+  ${merchFunnelHint}
   ${qrSection}
 </article>
 </div>`;
@@ -302,10 +306,14 @@ function renderStewardStrip(
 ): string {
   const parts: string[] = [];
   if (vm.handle && !opts.omitHandle) {
-    parts.push(`Controlled by @${vm.handle}`);
+    const relationship = qrScopeRelationshipCopy({
+      scope: vm.qrScope,
+      handle: vm.handle,
+    });
+    if (relationship) parts.push(relationship);
   }
   const expiry =
-    vm.qrScope === "print_artifact"
+    isChildObjectScope(vm.qrScope)
       ? null
       : formatQrExpiryLabel(vm.qrExpiresAt);
   if (expiry && vm.kind === "active") {
@@ -364,9 +372,21 @@ function renderLostItemCreateHint(origin: string): string {
   return `<p class="scan-create-hint" role="note"><a href="${escapeHtml(href)}">Create a lost-item tag</a> — ${escapeHtml(LOST_ITEM_RELAY_CREATE_HINT)}</p>`;
 }
 
-function renderScanMerchCustomizeHint(origin: string): string {
-  const href = `${origin.replace(/\/$/, "")}${SCAN_MERCH_CUSTOMIZE_PATH}`;
-  return `<p class="scan-merch-hint" id="scan-merch-customize-hint" role="note"><a href="${escapeHtml(href)}">Customize live object merch</a> — ${escapeHtml(SCAN_MERCH_CUSTOMIZE_HINT)}</p>`;
+/** Active live-object / print_artifact scans — curiosity path to create + customize (M8 merch funnel). */
+function isMerchFunnelScan(vm: ScanViewModel): boolean {
+  if (vm.kind !== "active") return false;
+  const display = parseManifestoDisplay(vm.manifestoLine);
+  const template = scanHeroTemplate(display, vm.qrScope);
+  if (template === "status_plate" || template === "lost_item_relay") return false;
+  if (vm.qrScope === "print_artifact") return true;
+  return template === "live_object";
+}
+
+function renderMerchFunnelHint(origin: string): string {
+  const base = origin.replace(/\/$/, "");
+  const createHref = `${base}${MERCH_SCAN_CREATE_PATH}`;
+  const customizeHref = `${base}${MERCH_SCAN_CUSTOMIZE_PATH}`;
+  return `<p class="scan-create-hint scan-merch-hint" role="note"><a href="${escapeHtml(createHref)}">Create your live object</a> · <a href="${escapeHtml(customizeHref)}">Get yours on wear</a> — ${escapeHtml(MERCH_SCAN_FUNNEL_HINT)}</p>`;
 }
 
 function buildScanHeroMain(
@@ -948,18 +968,16 @@ function renderVouchSection(vm: ScanViewModel, origin: string): string {
 
 function qrGroupRows(vm: ScanViewModel): string {
   const status = vm.qrStatus ? `QR ${formatQrStatus(vm.qrStatus)}` : "QR unknown";
-  const scope =
-    vm.qrScope === "print_artifact"
-      ? "Printed item  -  revoke one artifact without killing the card"
-      : "Card-scoped credential";
+  const scope = qrTrustGroupScopeSubtitle(vm.qrScope);
   const rows = [listRow("qr", qrStatusIconTone(vm), status, scope)];
-  if (vm.qrScope === "print_artifact" && vm.kind === "active") {
+  const noCalendarExpirySubtitle = qrNoCalendarExpirySubtitle(vm.qrScope);
+  if (noCalendarExpirySubtitle && vm.kind === "active") {
     rows.push(
       listRow(
         "qr",
         "green",
         "No calendar expiry",
-        "This object QR stays valid until the owner revokes or replaces it"
+        noCalendarExpirySubtitle
       )
     );
   }
@@ -1607,14 +1625,23 @@ function qrStatusIconTone(vm: ScanViewModel): string {
 }
 
 function renderFooter(vm: ScanViewModel, origin: string): string {
+  const base = origin.replace(/\/$/, "");
   const jsonLink =
     vm.profileId && vm.kind === "active"
-      ? `<a class="scan-footer-link" href="${escapeHtml(origin)}/.well-known/hc/v1/cards/${encodeURIComponent(vm.profileId)}">Public card JSON</a>`
+      ? `<a class="scan-footer-link" href="${escapeHtml(base)}/.well-known/hc/v1/cards/${encodeURIComponent(vm.profileId)}">Public card JSON</a>`
       : "";
-  const createCta =
-    vm.kind === "unknown_profile" || vm.kind === "malformed"
-      ? `<a class="dock-btn dock-btn-primary" href="${escapeHtml(origin)}/create/">Create a live object</a>`
-      : `<a class="dock-btn dock-btn-secondary" href="${escapeHtml(origin)}/">About humanity.llc</a>`;
+  let createCta: string;
+  if (vm.kind === "unknown_profile" || vm.kind === "malformed") {
+    createCta = `<a class="dock-btn dock-btn-primary" href="${escapeHtml(base)}/create/">Create a live object</a>`;
+  } else if (isMerchFunnelScan(vm)) {
+    createCta = `<a class="dock-btn dock-btn-primary" href="${escapeHtml(`${base}${MERCH_SCAN_CREATE_PATH}`)}">Create a live object</a>
+  <a class="dock-btn dock-btn-secondary" href="${escapeHtml(`${base}${MERCH_SCAN_CUSTOMIZE_PATH}`)}">Get yours on wear</a>`;
+  } else if (vm.kind === "active") {
+    createCta = `<a class="dock-btn dock-btn-primary" href="${escapeHtml(base)}/create/">Create a live object</a>
+  <a class="dock-btn dock-btn-secondary" href="${escapeHtml(base)}/">About humanity.llc</a>`;
+  } else {
+    createCta = `<a class="dock-btn dock-btn-secondary" href="${escapeHtml(base)}/">About humanity.llc</a>`;
+  }
 
   return `<footer class="scan-footer">
   ${createCta}

@@ -11,8 +11,8 @@ import type { ArtifactIntentRow } from "../src/db/artifact-intents";
 import type { CommerceOrderRow } from "../src/db/commerce-orders";
 import type { PrintOrderRow } from "../src/db/print-orders";
 import { handlePostShopifyOrdersWebhook } from "../src/http/shopify-orders-webhook";
-import type { Env } from "../src/index";
-import { DEFAULT_PRINT_TEMPLATE_ID } from "../src/print/print-catalog";
+import type { Env } from "../src/env";
+import { HOODIE_LIVE_OBJECT_TEMPLATE_ID } from "../src/print/print-catalog";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const INTENT = "ai_MerchFunnelMint01";
@@ -230,7 +230,7 @@ describe("merch funnel paid → mint path", () => {
     expect(webhookJson.print_order_ids).toHaveLength(1);
 
     const printOrder = [...state.printOrders.values()][0]!;
-    expect(printOrder.template_id).toBe(DEFAULT_PRINT_TEMPLATE_ID);
+    expect(printOrder.template_id).toBe(HOODIE_LIVE_OBJECT_TEMPLATE_ID);
     expect(JSON.parse(printOrder.planned_item_qr_ids_json)).toEqual([PLANNED_QR]);
 
     const credential = await signDocument(

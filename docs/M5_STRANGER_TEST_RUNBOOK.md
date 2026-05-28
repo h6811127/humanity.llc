@@ -1,9 +1,11 @@
 # M5  -  Stranger test runbook (Phase A exit gate)
 
-**Status:** Active checklist  
+**Status:** **Passed 2026-05-27** — Phase A digital trust loop validated with strangers  
 **Canonical gate:** `docs/V1_0_ARCHITECTURE_ROADMAP.md` §12 Phase A exit; `docs/M3_M4_EXECUTION_PLAN.md` § M5  
 **Scanner spec:** `docs/SCANNER_EXPERIENCE.md`  
 **Prerequisite:** Worker + Pages deployed; you can create → scan → revoke in one browser session.
+
+**Recommended next (post-M5):** [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) Tier 1 personalized merch — not status plates as launch MVP. Commerce wiring: [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md).
 
 **Goal:** Three people **outside your network** complete the loop **without you explaining the UI**. Each can say in one sentence what scan **proves** and what it **does not**.
 
@@ -101,10 +103,11 @@ Do **not** send the data policy or research page unless they ask.
 
 1. Check boxes in `docs/M3_M4_EXECUTION_PLAN.md` § M5.
 2. Update landing **Building now**  -  move stranger tests to done; optional one-line public note (email list, post, or hero eyebrow).
-3. **Do not** turn on **live Tier 1 checkout** (`personalize.checkout_open` on production) or announce paid merch until M5 is checked. Engineering for `/shop/customize/` may ship earlier (`docs/MERCH_FUNNEL_MVP.md`).
-4. **Recommended next:** finish M5.5 backup confidence (import on second device) if strangers struggled with “revoke later.”
-5. **Then:** harden the stranger path with **one vertical pilot**  -  see `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` (status plate, lost-item relay, organizer-signed revoke; not more hub pages).
-6. **Before live merch checkout:** read `docs/MERCH_QR_LIFECYCLE_POLICY.md` (no calendar expiry on artifacts, hardening sequence, reprint/revoke macros).
+3. **Do not** turn on **live Tier 1 checkout** (`personalize.checkout_open` on production) or announce paid merch until M5 is checked. Engineering for `/shop/customize/` may ship earlier — [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) § Implementation priority stack.
+4. **After M5 passes:** **Merch funnel Tier 1 operator close-out** — scan → create → `/shop/customize/` → Shopify → Printify. See [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) and [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md); run `npm run merch-funnel:verify-config -- --require-checkout` before enabling payments.
+5. **Recommended:** finish M5.5 backup confidence (import on second device) if strangers struggled with “revoke later.”
+6. **Optional field pilots:** status plate, lost-item relay, organizer revoke — [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md).
+7. **Before live merch checkout:** read `docs/MERCH_QR_LIFECYCLE_POLICY.md` (no calendar expiry on artifacts, hardening sequence, reprint/revoke macros).
 
 ---
 

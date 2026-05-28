@@ -1,6 +1,6 @@
 # Merch funnel MVP — scan → profile → customize → Printify
 
-**Status:** Active — customizer UI shipped; scan → customize CTA shipped; operator enables products in `shop-config.json`  
+**Status:** Active — customizer UI shipped; operator enables products in `shop-config.json`  
 **Parent:** [`MERCH_LED_V1.md`](MERCH_LED_V1.md) · [`V1_FLOW_AUDIT.md`](V1_FLOW_AUDIT.md) · [`features/Storefront v1.0.md`](features/Storefront%20v1.0.md)  
 **Implementation:** [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) · `site/shop/customize/`
 
@@ -8,7 +8,7 @@
 
 ## Implementation priority stack (2026-05-27)
 
-Ordered work after repo review. Update row status as steps complete. Cross-links: [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) · [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md) · [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Open issues.
+Ordered work after repo review. Update row status as steps complete. Cross-links: [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) · [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md) · [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Open issues · headless commerce [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md).
 
 | Priority | Work | Type | Status |
 |----------|------|------|--------|
@@ -25,7 +25,8 @@ Ordered work after repo review. Update row status as steps complete. Cross-links
 1. Run **`npm run merch-funnel:verify-exit`** locally (or CI `merch-funnel:verify-exit:fast` + separate E2E job).
 2. Execute **[`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md)** — three strangers, create → scan → revoke without coaching. Digital preflight: `npm run site:verify-positioning-exit`.
 3. **Do not enable live Tier 1 checkout** (`personalize.checkout_open: true` on production) until M5 passes — see M5 runbook § After three pass.
-4. Optional stranger row: scan live wear → sees customize CTA → understands it does not prove ownership (no purchase required).
+4. **After M5:** operator Tier 1 config + live Shopify/Printify per [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md).
+5. Optional stranger row: scan live wear → sees customize CTA → understands it does not prove ownership (no purchase required).
 
 ---
 
@@ -100,11 +101,10 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
 | Tier 0 shop | `site/shop/index.html` |
 | **QR customizer** | `site/shop/customize/index.html` |
 | Customizer logic | `site/js/shop-customize.mjs` · `site/js/shop-customize-core.mjs` |
+| **Create → customize handoff** | `site/js/created-merch-funnel.mjs` · `merch-funnel-core.mjs` |
 | Shop config | `site/data/shop-config.json` → `personalize.products[]` |
 | Config helpers | `site/js/shop-config.mjs` |
 | Merch attribution | `site/js/merch-funnel-core.mjs` · scan `scan-merch-funnel.mjs` |
-| **Scan → customize CTA** | Active **live object / personal card** scans (not status plate or lost-item relay) — `scan-merch-hint` · `hc_ref=scan_customize` |
-| **Post-create → customize** | `scan_customize` / `customize_shop` / `customize_hoodie` → `/shop/customize/` after `POST /cards` (`buildPostCreateDestinationUrl` in `merch-funnel-core.mjs`) |
 | Artifact intent API | `worker/src/resolver/artifact-intents.ts` |
 | QR renderer | `site/js/qr-branding.mjs` |
 
@@ -137,8 +137,17 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
 4. Verify config locally: `npm run merch-funnel:verify-config` (use `--require-checkout` in CI when enabling payments).
 5. Deploy Pages. `/shop/customize/` shows **Continue to checkout** when card session exists and `checkout_open` is true.
 6. **Deploy Worker** — `npm run worker:deploy` — `humanity.llc/v1/*` must route to the resolver (else artifact intent returns 405).
-7. Run [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) gates before live payments.
-8. **Apparel QA:** physical scan test on printed hoodie ([`V1_ASSUMPTION_REGISTER.md`](V1_ASSUMPTION_REGISTER.md) A-004).
+7. **Worker env (Tier 1 Printify queue):** after Shopify `orders/paid` webhook validates artifact intent metadata, a print order is queued automatically. Set Printify mappings per product template (secrets via `wrangler secret` where noted):
+
+| Template | Env vars |
+|----------|----------|
+| `hc-hoodie-live-object-v1` | `PERSONALIZE_HOODIE_PRINTIFY_PRODUCT_ID`, `PERSONALIZE_HOODIE_PRINTIFY_VARIANT_ID`, optional `PERSONALIZE_HOODIE_PRINTIFY_SHIPPING_METHOD` |
+| `hc-sticker-square-v1` | `PERSONALIZE_STICKER_PRINTIFY_PRODUCT_ID`, `PERSONALIZE_STICKER_PRINTIFY_VARIANT_ID`, optional `PERSONALIZE_STICKER_PRINTIFY_SHIPPING_METHOD` |
+
+Shared: `PRINTIFY_SUBMIT_ENABLED=1`, `PRINTIFY_API_TOKEN` (secret), `PRINTIFY_SHOP_ID`, `SHOPIFY_WEBHOOK_SECRET` (secret). Operator submits via `POST /v1/print/orders` with `{ commerce_order_id, submit_to_printify: true, shipping_address }` after minting planned QRs — same path as Tier 0 ([`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md)).
+
+8. Run [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) gates before live payments.
+9. **Apparel QA:** physical scan test on printed hoodie ([`V1_ASSUMPTION_REGISTER.md`](V1_ASSUMPTION_REGISTER.md) A-004) — runbook [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md); automated regression: `npm run worker:test:merch-print-qa`.
 
 ### Worker route (required)
 
@@ -156,7 +165,7 @@ Aggregate metrics only — no PII. Allowed refs:
 | `tier0_sticker` | Tier 0 campaign scan |
 | `customize_shop` | `/shop/customize/` |
 | `customize_hoodie` | Customizer with hoodie selected |
-| `scan_customize` | Scan page → customize CTA (`/shop/customize/?hc_ref=scan_customize`) |
+| `scan_customize` | Scan page → customize CTA on live wear / print_artifact scans |
 
 ---
 
@@ -170,9 +179,12 @@ Aggregate metrics only — no PII. Allowed refs:
 | Artifact intent created; attach returns Shopify line attributes | ✅ API tests |
 | Checkout URL includes `properties[artifact_intent_id]` | ✅ `shop-customize-core.test.ts` |
 | Paid webhook → print queue → mint planned QRs | ✅ `shopify-orders-webhook` + `merch-funnel-paid-mint-path` · ☐ live Printify submit |
+| Paid webhook → Printify queue (operator env) | ✅ queue on paid webhook · Tier 1 template + Printify env mapping |
+| Per-order artwork upload to Printify on submit (PM-FR-13) | ✅ `printify-upload.ts` · `printify-line-items.ts` — requires `PERSONALIZE_*_PRINTIFY_BLUEPRINT_ID` + `PRINT_PROVIDER_ID` |
+| Buyer order status on `/shop/thanks/` (O-003) | ✅ `GET /v1/store/order-status` · email hash lookup · no shipping PII in response |
 | Tier 1 `shop-config.json` ready | `npm run merch-funnel:verify-config` · ☐ operator paste variant URLs |
 | Checkout opens Shopify with `artifact_intent_id` | ✅ E2E stub · ☐ live Shopify test payment |
-| Printed item scans; bearer warning visible | ☐ physical QA |
+| Printed item scans; bearer warning visible | ☐ physical QA · ✅ automated scan regression (`npm run worker:test:merch-print-qa`, [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md)) |
 | Owner updates manifesto from phone without reprint | ✅ resolver |
 
 ---
@@ -212,6 +224,8 @@ npm run merch-funnel:verify-config -- --require-checkout   # CI when Tier 1 goes
 | Doc | Role |
 |-----|------|
 | [`MERCH_LED_V1.md`](MERCH_LED_V1.md) | Curiosity + belonging strategy |
+| [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) | Shopify + Printify operator wiring |
+| [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) | Printed artifact scan QA |
 | [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) | Optional scan reader only |
 | [`V1_IMPLEMENTATION_BACKLOG.md`](V1_IMPLEMENTATION_BACKLOG.md) | O-002 Printify adapter |
 | [`features/Printify Fulfillment Middleware v1.0.md`](features/Printify%20Fulfillment%20Middleware%20v1.0.md) | Server-side fulfillment |

@@ -8,7 +8,7 @@ import {
   stewardPushConnectionSummary,
 } from "../steward/push";
 import { utcDayKey } from "../steward/plans";
-import type { Env } from "../index";
+import type { Env } from "../env";
 
 function parseDayKey(raw: string | null, now = new Date()): string | null {
   if (raw === null || raw === "") return utcDayKey(now);

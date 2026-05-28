@@ -4,6 +4,7 @@
  */
 
 export const MERCH_FUNNEL_SESSION_KEY = "hc_merch_create_ref";
+export const MERCH_FUNNEL_POST_CREATE_KEY = "hc_merch_customize_ref";
 export const MERCH_FUNNEL_BEACON_PREFIX = "hc_merch_beacon_";
 
 export const ALLOWED_MERCH_REFS = new Set([
@@ -14,8 +15,8 @@ export const ALLOWED_MERCH_REFS = new Set([
   "scan_customize",
 ]);
 
-/** Refs that continue to /shop/customize/ after card create (docs/MERCH_FUNNEL_MVP.md). */
-export const CUSTOMIZE_FUNNEL_REFS = new Set([
+/** Refs that should continue to `/shop/customize/` after card create. */
+export const CUSTOMIZE_HANDOFF_REFS = new Set([
   "scan_customize",
   "customize_shop",
   "customize_hoodie",
@@ -81,42 +82,50 @@ export function clearMerchCreateRef() {
 }
 
 /**
- * @param {string | null | undefined} ref
+ * @param {unknown} ref
  * @returns {boolean}
  */
-export function shouldPostCreateRedirectToCustomize(ref) {
+export function shouldHandoffToCustomize(ref) {
   const normalized = normalizeMerchRef(ref);
-  return normalized !== null && CUSTOMIZE_FUNNEL_REFS.has(normalized);
+  return normalized != null && CUSTOMIZE_HANDOFF_REFS.has(normalized);
 }
 
 /**
- * After successful POST /cards — customize funnel or /created/ workspace.
+ * After create attribution is sent, keep customize funnel refs for /created/ → /shop/customize/.
  * @param {string | null | undefined} ref
- * @param {{ origin?: string, profileId: string, qrId: string, fresh?: boolean }} opts
- * @returns {string}
  */
-export function buildPostCreateDestinationUrl(ref, opts) {
-  const origin = (opts.origin ?? "https://humanity.llc").replace(/\/$/, "");
+export function handoffMerchRefAfterCreate(ref) {
   const normalized = normalizeMerchRef(ref);
-  if (normalized && CUSTOMIZE_FUNNEL_REFS.has(normalized)) {
-    const customize = new URL(`${origin}/shop/customize/`);
-    customize.searchParams.set("hc_ref", normalized);
-    return customize.href;
+  if (!normalized) return;
+  clearMerchCreateRef();
+  if (!shouldHandoffToCustomize(normalized)) return;
+  try {
+    sessionStorage.setItem(MERCH_FUNNEL_POST_CREATE_KEY, normalized);
+  } catch {
+    /* sessionStorage unavailable */
   }
-  const created = new URL(`${origin}/created/`);
-  created.searchParams.set("profile_id", opts.profileId);
-  created.searchParams.set("qr_id", opts.qrId);
-  if (opts.fresh) created.searchParams.set("fresh", "1");
-  return created.href;
+}
+
+/**
+ * Ref for customize handoff (post-create) or active create attribution.
+ * @returns {string | null}
+ */
+export function peekMerchCustomizeRef() {
+  try {
+    const post = normalizeMerchRef(sessionStorage.getItem(MERCH_FUNNEL_POST_CREATE_KEY));
+    if (post) return post;
+  } catch {
+    /* ignore */
+  }
+  return peekMerchCreateRef();
 }
 
 /**
  * @param {string} href
  * @param {string | null} ref
- * @param {string} pathPrefix — e.g. `/create` or `/shop/customize`
  * @returns {string}
  */
-export function appendMerchRefToPath(href, ref, pathPrefix) {
+export function appendMerchRefToHref(href, ref) {
   const normalized = normalizeMerchRef(ref);
   if (!normalized) return href;
   try {
@@ -125,8 +134,6 @@ export function appendMerchRefToPath(href, ref, pathPrefix) {
         ? location.origin
         : "https://humanity.llc";
     const u = new URL(href, base);
-    if (!u.pathname.startsWith(pathPrefix)) return href;
-    if (u.searchParams.has("hc_ref")) return href;
     u.searchParams.set("hc_ref", normalized);
     return `${u.pathname}${u.search}${u.hash}`;
   } catch {
@@ -135,12 +142,23 @@ export function appendMerchRefToPath(href, ref, pathPrefix) {
 }
 
 /**
- * @param {string} href
- * @param {string | null} ref
- * @returns {string}
+ * @param {string | null | undefined} ref
+ * @param {string} [origin]
+ * @returns {string | null}
  */
-export function appendMerchRefToCreateUrl(href, ref) {
-  return appendMerchRefToPath(href, ref, "/create");
+export function merchCustomizeUrlFromRef(ref, origin = "https://humanity.llc") {
+  const normalized = normalizeMerchRef(ref);
+  if (!normalized || !shouldHandoffToCustomize(normalized)) return null;
+  const base = origin.replace(/\/$/, "");
+  return `${base}/shop/customize/?hc_ref=${encodeURIComponent(normalized)}`;
+}
+
+/**
+ * @param {{ fresh?: boolean, merchRef?: string | null }} input
+ * @returns {boolean}
+ */
+export function shouldShowCreatedMerchCustomizeCard(input) {
+  return input.fresh === true && shouldHandoffToCustomize(input.merchRef);
 }
 
 /**
@@ -148,8 +166,20 @@ export function appendMerchRefToCreateUrl(href, ref) {
  * @param {string | null} ref
  * @returns {string}
  */
-export function appendMerchRefToCustomizeUrl(href, ref) {
-  return appendMerchRefToPath(href, ref, "/shop/customize");
+export function appendMerchRefToCreateUrl(href, ref) {
+  const normalized = normalizeMerchRef(ref);
+  if (!normalized) return href;
+  try {
+    const base =
+      typeof location !== "undefined" && location.origin
+        ? location.origin
+        : "https://humanity.llc";
+    const u = new URL(href, base);
+    if (!u.pathname.startsWith("/create")) return href;
+    return appendMerchRefToHref(href, normalized);
+  } catch {
+    return href;
+  }
 }
 
 /**

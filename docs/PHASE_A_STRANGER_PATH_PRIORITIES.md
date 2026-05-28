@@ -3,7 +3,9 @@
 **Status:** Active product direction  
 **Purpose:** Record what to build **after** the generic create → scan → revoke loop is proven, without expanding the design-space catalog faster than real deployments.
 
-**Prerequisite:** `docs/M5_STRANGER_TEST_RUNBOOK.md`  -  three strangers complete the loop unassisted.
+**Prerequisite:** `docs/M5_STRANGER_TEST_RUNBOOK.md`  -  three strangers complete the loop unassisted (**passed 2026-05-27**).
+
+**Primary GTM after M5:** **Merch funnel Tier 1** (scan wear → create → `/shop/customize/` → unique QR on Printify product) — [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) · [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md). Status plate / lost-item / organizer pilots below are **optional vertical hardening**, not the main launch wedge.
 
 **Canonical loop (unchanged):** Create card → print QR → scan live status → revoke → re-scan revoked state. See `docs/M3_M4_EXECUTION_PLAN.md`.
 
@@ -31,11 +33,12 @@ Defer until a vertical pilot succeeds:
 
 | Priority | Vertical | Why |
 |----------|----------|-----|
-| **1** | **Status plate** (“open / closed / until …”) | Matches the landing demo (studio door, hours, run ends). Easiest story for strangers: one object, one question, one scan. |
+| **0 (GTM)** | **Tier 1 merch funnel** (live wear → customize → order) | Post-M5 primary wedge; walking ad with **unique** QR per garment. [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) |
+| **1** | **Status plate** (“open / closed / until …”) | Optional field pilot. Matches landing demo; not required before merch launch. |
 | **2** | **Lost-item relay** | Emotional and clear: return contact **without** printing a phone number; revoke when recovered or abused. Site research: `site/what-can-a-qr-do/lost-item-relay/`. |
 | **3** | **Organizer-signed revoke** | Unlocks civic flyers, vendor placards, market passes  -  anything where a **trusted issuer** must update or kill a printed QR. Requires signed updates/revokes, not open crowd vouch. Site research: `site/what-can-a-qr-do/civic-protest-infrastructure/`, `site/what-can-a-qr-do/local-economies/`. |
 
-Pick **one** for the first real-world pilot (5–10 printed QRs, watch where people stall: print, recovery key, finding revoke).
+Pick **one** optional vertical for field hardening (5–10 printed QRs). **Do not** block Tier 1 merch launch on status plate pilot success.
 
 **Current build focus:** **Manifesto / status line updates**  -  `docs/MANIFESTO_STATUS_UPDATE.md` (same QR, live public copy). Enables status plate (#1) and lost-item relay (#2) without reprinting.
 

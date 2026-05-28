@@ -6,8 +6,7 @@ import { renderScanPage } from "../src/resolver/scan-html";
 import {
   LOST_ITEM_RELAY_CREATE_HINT,
   LOST_ITEM_RELAY_CREATE_PATH,
-  SCAN_MERCH_CUSTOMIZE_HINT,
-  SCAN_MERCH_CUSTOMIZE_PATH,
+  MERCH_SCAN_CUSTOMIZE_PATH,
 } from "../src/resolver/scan-safety";
 import {
   SCAN_OFFLINE_BANNER_TEXT,
@@ -199,29 +198,6 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("scan-hero-title");
     expect(html).not.toContain('class="scan-state-row"');
     expect(html).not.toMatch(/<p class="scan-create-hint"/);
-    expect(html).not.toMatch(/<p class="scan-merch-hint"/);
-    expect(html).not.toContain('id="scan-merch-customize-hint"');
-  });
-
-  it("shows merch customize hint on active scans (not lost-item relay)", async () => {
-    const vm = buildScanViewModel(
-      PROFILE,
-      QR,
-      {
-        card: card(),
-        qr: qr(),
-        verification: summary(),
-        revocationDisplay: null,
-      },
-      "https://humanity.llc"
-    );
-    const html = await renderScanPage(vm, "https://humanity.llc");
-    expect(html).toMatch(/<p class="scan-merch-hint"/);
-    expect(html).toContain('id="scan-merch-customize-hint"');
-    expect(html).toContain(SCAN_MERCH_CUSTOMIZE_HINT);
-    expect(html).toContain(SCAN_MERCH_CUSTOMIZE_PATH);
-    expect(html).toContain("Customize live object merch");
-    expect(html).toContain("scan-merch-funnel.mjs?v=2");
   });
 
   it("renders flat status panel with shared styles (no ID-style flip card)", async () => {
@@ -270,8 +246,6 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).not.toContain('class="section-kicker">Network status');
     expect(html).toContain("Valid until");
     expect(html).not.toContain('class="scan-state-row"');
-    expect(html).toMatch(/<p class="scan-merch-hint"/);
-    expect(html).toContain(SCAN_MERCH_CUSTOMIZE_PATH);
     expect(html).not.toContain("pass-badge badge-live");
     expect(html).toContain("@river_example");
     expect(html).toContain("Card active");
@@ -433,7 +407,9 @@ describe("renderScanPage M3.2 trust blocks", () => {
       "https://humanity.llc"
     );
     const html = await renderScanPage(vm, "https://humanity.llc");
-    expect(html).toContain("Printed item");
+    expect(html).toContain("Printed object - revoke this item without disabling the root card");
+    expect(html).toContain('data-merch-funnel="1"');
+    expect(html).toContain(MERCH_SCAN_CUSTOMIZE_PATH);
   });
 
   it("renders Vouched Human with vouch recency on scan (V-001)", async () => {

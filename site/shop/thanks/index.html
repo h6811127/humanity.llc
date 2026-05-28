@@ -32,6 +32,37 @@
           </p>
         </section>
 
+        <section class="group" id="shop-thanks-status-section">
+          <h2 class="group-label">Order status</h2>
+          <p class="shop-required-line">
+            Check fulfillment progress with your Shopify order number and checkout email.
+          </p>
+          <form class="shop-thanks-status-form" id="shop-thanks-status-form">
+            <label class="form-label" for="shop-thanks-order">Order number</label>
+            <input
+              class="form-input"
+              id="shop-thanks-order"
+              name="order"
+              inputmode="numeric"
+              autocomplete="off"
+              placeholder="#1001"
+              required
+            />
+            <label class="form-label" for="shop-thanks-email">Email used at checkout</label>
+            <input
+              class="form-input"
+              id="shop-thanks-email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              placeholder="you@example.com"
+              required
+            />
+            <button class="btn btn-primary" type="submit">Check status</button>
+          </form>
+          <div class="shop-thanks-status-result" id="shop-thanks-status-result" hidden></div>
+        </section>
+
         <section class="group">
           <h2 class="group-label">What to do next</h2>
           <ul class="shop-bullets shop-bullets-get">
@@ -70,6 +101,6 @@
         </section>
       </main>
     </div>
-    <script src="/js/shop-thanks.mjs?v=1" type="module"></script>
+    <script src="/js/shop-thanks.mjs?v=2" type="module"></script>
   </body>
 </html>

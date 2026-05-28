@@ -3,7 +3,12 @@
 export const SHOP_CHECKOUT_PENDING_LABEL = "Checkout opening soon";
 
 export const SHOP_CHECKOUT_READY_LEAD =
-  "Ready to order. You will complete payment on Shopify's secure checkout — then return here for what to expect when the sticker ships.";
+  "Ready to order. Continue to Shopify's secure checkout in this tab — then return here for what to expect when your order ships.";
+
+export const SHOP_CHECKOUT_REDIRECT_STATUS = "Redirecting to secure checkout…";
+
+export const SHOP_CHECKOUT_AFTER_REDIRECT_STATUS =
+  "Complete payment on Shopify, then return here for what to expect.";
 
 /**
  * @param {string | null | undefined} priceDisplay
