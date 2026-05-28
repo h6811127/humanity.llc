@@ -12,11 +12,11 @@ Ordered work after repo review. Update row status as steps complete. Cross-links
 
 | Priority | Work | Type | Status |
 |----------|------|------|--------|
-| **1** | **Merch funnel close-out** — scan → `/shop/customize/` (`scan_customize` ref + CTA); enable Tier 1 in `shop-config.json`; prove one paid personalized order (intent → webhook → mint → Printify submit) | Engineering + operator | **Engineering ✅** (`merch-funnel:verify-exit` incl. `merch-print-qa`) · **operator next:** paste variant URLs · `verify-config --require-checkout` · live payment + Printify · physical QA [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) |
+| **1** | **Merch funnel close-out** — scan → `/shop/customize/` (`scan_customize` ref + CTA); enable Tier 1 in `shop-config.json`; prove one paid personalized order (intent → webhook → mint → Printify submit) | Engineering + operator | **Engineering ✅** (`merch-funnel:verify-exit` · `merch-funnel:rollout:step1` → `step6`) · **operator next:** `rollout:step2 -- --verify` · paste variant URLs · `verify-config --require-checkout` · live payment + Printify · physical QA [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) |
 | **2** | **Phase A trust MVP** — run M5 stranger runbook (3 outsiders, unassisted create → scan → revoke) | Validation | **✅ Passed 2026-05-27** — [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) |
-| **3** | **Hosted steward production rollout** — `hosted:rollout:step*` through step 6 (secrets, flag, CF dashboard, regression) | Ops | ☐ |
+| **3** | **Hosted steward production rollout** — `hosted:rollout:step*` through step 6 (secrets, flag, CF dashboard, regression) | Ops | **In progress** — step 4b–6 preflight tooling ✅ · **next (ops):** step 5a CF dashboard · `step5b -- --verify` · `step6 -- --verify` |
 | **4** | **AI P1 product decision** — keep / rename / deterministic-only / remove scan reader (no new L3 user features until Phase A) | Product | ☐ |
-| **5** | **Large-wallet shell performance** — bound `hc_wallet_network_cache`, avoid full-wallet parse on hub/inbox hot paths | Engineering debt | **Partial ✅** — S6 cache bound (`WALLET_NETWORK_CACHE_MAX_ENTRIES`); hot-path wallet parse still open |
+| **5** | **Large-wallet shell performance** — bound `hc_wallet_network_cache`, avoid full-wallet parse on hub/inbox hot paths | Engineering debt | **✅ Shipped** — S6–S12 + `hc_wallet_summary` (see `DEVICE_OS_REQUEST_BUDGET.md`) |
 
 **Rule:** Do not start new L3 user-facing AI surfaces until priority **2** passes. Commerce never grants vouch.
 
