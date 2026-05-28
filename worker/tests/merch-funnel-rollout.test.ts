@@ -43,6 +43,17 @@ describe("merch-funnel rollout scripts", () => {
     expect(script).toContain("worker/src/index.ts");
   });
 
+  it("step5 supports preflight and digital production verify", () => {
+    const script = readFileSync(
+      join(repoRoot, "worker/scripts/merch-funnel-rollout-step5.mjs"),
+      "utf8"
+    );
+    expect(script).toContain("--preflight");
+    expect(script).toContain("--verify");
+    expect(script).toContain("smokeShopGlitchProductPage");
+    expect(script).toContain("worker:test:merch-print-qa");
+  });
+
   it("step6 documents preflight before full verify", () => {
     const script = readFileSync(
       join(repoRoot, "worker/scripts/merch-funnel-rollout-step6.mjs"),

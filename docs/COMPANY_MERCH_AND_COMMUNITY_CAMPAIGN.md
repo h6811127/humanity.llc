@@ -148,7 +148,7 @@ A **line** is a sequence of **limited drops**, each with:
 |------------|--------|-------|
 | Tier 0 policy + runbook | Shipped (docs) | |
 | `/shop/` founding row + `/shop/founding/` | Shipped (sticker) | Glitch hoodie on **Founding objects** row → `/shop/products/tier0_glitch_hoodie_v1/` |
-| `GET /v1/store/rows` · `GET /v1/store/products/{id}` | Shipped (Worker) | SF-001 catalog API — `worker/src/index.ts` · verify: `merch-funnel:rollout:step3 -- --verify` |
+| `GET /v1/store/rows` · `GET /v1/store/products/{id}` | Shipped (Worker) | SF-001 catalog API — `merch-funnel:rollout:step3 -- --verify` · digital gate: `rollout:step5 -- --verify` |
 | `TIER0_SHOPIFY_VARIANT_IDS` + `TIER0_CAMPAIGN_PROFILE_ID` | Operator env | Batch Printify SKUs (e.g. founding sticker) |
 | `TIER0_SHOPIFY_INVENTORY_VARIANT_IDS` | Operator env | Pre-printed inventory SKUs (e.g. Glitch hoodie) — webhook `tier0_inventory`, no Printify queue |
 | Paid webhook `tier0_batch` | Shipped | Queues batch Printify template |
