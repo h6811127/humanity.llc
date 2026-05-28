@@ -8,6 +8,10 @@ on:
     paths:
       - "site/**"
       - "e2e/**"
+      - "worker/tests/merch-funnel*.test.ts"
+      - "worker/tests/shop-*.test.ts"
+      - "worker/tests/wrangler-merch-routes.test.ts"
+      - "worker/scripts/verify-merch-funnel*.mjs"
       - "package.json"
       - "package-lock.json"
       - "playwright.config.ts"
@@ -17,6 +21,10 @@ on:
     paths:
       - "site/**"
       - "e2e/**"
+      - "worker/tests/merch-funnel*.test.ts"
+      - "worker/tests/shop-*.test.ts"
+      - "worker/tests/wrangler-merch-routes.test.ts"
+      - "worker/scripts/verify-merch-funnel*.mjs"
       - "package.json"
       - "package-lock.json"
       - "playwright.config.ts"
@@ -41,5 +49,9 @@ jobs:
           CI: "true"
       - name: Hosted steward E2E (M8)
         run: npm run e2e:steward-hosted
+        env:
+          CI: "true"
+      - name: Merch funnel E2E
+        run: npm run e2e:merch-funnel
         env:
           CI: "true"

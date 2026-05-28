@@ -47,8 +47,14 @@ crons = ["0 4 * * *"]
 binding = "AI"
 
 [[routes]]
- pattern = "humanity.llc/.well-known/hc/v1/*"
- zone_id = "180ee38ceea795d281fb5a3bd51af533"
- [[routes]]
- pattern = "humanity.llc/c/*"
- zone_id = "180ee38ceea795d281fb5a3bd51af533"
+pattern = "humanity.llc/.well-known/hc/v1/*"
+zone_id = "180ee38ceea795d281fb5a3bd51af533"
+
+[[routes]]
+pattern = "humanity.llc/c/*"
+zone_id = "180ee38ceea795d281fb5a3bd51af533"
+
+# Commerce + print middleware (artifact intents, Shopify webhooks, Printify)
+[[routes]]
+pattern = "humanity.llc/v1/*"
+zone_id = "180ee38ceea795d281fb5a3bd51af533"

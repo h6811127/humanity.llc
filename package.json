@@ -73,8 +73,10 @@
     "site:aggregate-pilot-summaries": "node worker/scripts/aggregate-pilot-summaries.mjs",
     "site:verify-positioning-exit": "vitest run worker/tests/manifesto-showcase-exit.test.ts worker/tests/site-showcase-data.test.ts worker/tests/scan-m5-showcase-paths.test.ts worker/tests/seed-showcase-core.test.ts worker/tests/pilot-summary-aggregate.test.ts worker/tests/status-plate-loop-scorecard.test.ts worker/tests/lost-item-relay-loop-scorecard.test.ts",
     "worker:test:manifesto-showcase-exit": "vitest run worker/tests/manifesto-showcase-exit.test.ts worker/tests/site-showcase-data.test.ts worker/tests/scan-m5-showcase-paths.test.ts",
-    "worker:test:merch-funnel": "vitest run worker/tests/merch-funnel-core.test.ts worker/tests/shop-customize-core.test.ts worker/tests/shop-config-personalize.test.ts worker/tests/shopify-orders-webhook.test.ts worker/tests/merch-funnel-paid-mint-path.test.ts",
+    "worker:test:merch-funnel": "vitest run worker/tests/merch-funnel-core.test.ts worker/tests/shop-customize-core.test.ts worker/tests/shop-config-personalize.test.ts worker/tests/shopify-orders-webhook.test.ts worker/tests/merch-funnel-paid-mint-path.test.ts worker/tests/wrangler-merch-routes.test.ts",
     "merch-funnel:verify-config": "node worker/scripts/verify-merch-funnel-config.mjs",
+    "merch-funnel:verify-exit": "node worker/scripts/verify-merch-funnel-exit.mjs",
+    "merch-funnel:verify-exit:fast": "node worker/scripts/verify-merch-funnel-exit.mjs -- --skip-e2e",
     "e2e:merch-funnel": "playwright test e2e/merch-funnel-customize.spec.ts e2e/merch-funnel-checkout.spec.ts"
   },
   "dependencies": {

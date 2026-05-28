@@ -12,13 +12,20 @@ Ordered work after repo review. Update row status as steps complete. Cross-links
 
 | Priority | Work | Type | Status |
 |----------|------|------|--------|
-| **1** | **Merch funnel close-out** — scan → `/shop/customize/` (`scan_customize` ref + CTA); enable Tier 1 in `shop-config.json`; prove one paid personalized order (intent → webhook → mint → Printify submit) | Engineering + operator | **In progress** — engineering ✅ (Vitest + E2E checkout stub) · **operator:** `merch-funnel:verify-config` → paste variant URLs · live Shopify + Printify submit |
-| **2** | **Phase A trust MVP** — run M5 stranger runbook (3 outsiders, unassisted create → scan → revoke) | Validation | ☐ |
+| **1** | **Merch funnel close-out** — scan → `/shop/customize/` (`scan_customize` ref + CTA); enable Tier 1 in `shop-config.json`; prove one paid personalized order (intent → webhook → mint → Printify submit) | Engineering + operator | **Engineering ✅** (`merch-funnel:verify-exit`) · **operator:** paste variant URLs · `verify-config --require-checkout` · live payment + Printify |
+| **2** | **Phase A trust MVP** — run M5 stranger runbook (3 outsiders, unassisted create → scan → revoke) | Validation | **Next** — see § Priority 2 handoff |
 | **3** | **Hosted steward production rollout** — `hosted:rollout:step*` through step 6 (secrets, flag, CF dashboard, regression) | Ops | ☐ |
 | **4** | **AI P1 product decision** — keep / rename / deterministic-only / remove scan reader (no new L3 user features until Phase A) | Product | ☐ |
 | **5** | **Large-wallet shell performance** — bound `hc_wallet_network_cache`, avoid full-wallet parse on hub/inbox hot paths | Engineering debt | ☐ |
 
 **Rule:** Do not start new L3 user-facing AI surfaces until priority **2** passes. Commerce never grants vouch.
+
+### Priority 2 handoff (after engineering gate)
+
+1. Run **`npm run merch-funnel:verify-exit`** locally (or CI `merch-funnel:verify-exit:fast` + separate E2E job).
+2. Execute **[`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md)** — three strangers, create → scan → revoke without coaching. Digital preflight: `npm run site:verify-positioning-exit`.
+3. **Do not enable live Tier 1 checkout** (`personalize.checkout_open: true` on production) until M5 passes — see M5 runbook § After three pass.
+4. Optional stranger row: scan live wear → sees customize CTA → understands it does not prove ownership (no purchase required).
 
 ---
 
@@ -183,14 +190,16 @@ Aggregate metrics only — no PII. Allowed refs:
 ## Tests
 
 ```bash
-npm run worker:test:merch-funnel
-npm run merch-funnel:verify-config
-npm run e2e:merch-funnel
+npm run merch-funnel:verify-exit          # engineering gate (Vitest + scan merch + E2E + config report)
+npm run merch-funnel:verify-exit:fast     # Vitest + config only (no Playwright)
+npm run merch-funnel:verify-config -- --require-checkout   # CI when Tier 1 goes live
 ```
 
 | Command | Covers |
 |---------|--------|
-| `worker:test:merch-funnel` | Ref helpers, config validation, customize core, paid webhook → print queue → mint |
+| `merch-funnel:verify-exit` | Full engineering gate — Vitest bundle, scan merch HTML, E2E, config report, `wrangler.toml` `v1/*` route |
+| `merch-funnel:verify-exit:fast` | Same without E2E (quick CI subset) |
+| `worker:test:merch-funnel` | Ref helpers, config validation, customize core, paid webhook → mint, production route guard |
 | `merch-funnel:verify-config` | Operator readiness of `site/data/shop-config.json` Tier 1 block |
 | `e2e:merch-funnel` | Create → customize (`merch-funnel-customize`); checkout handoff (`merch-funnel-checkout`) — stubs `__HC_E2E_SHOP_CONFIG__` + resolver `artifact-intents` on `:8787` |
 
