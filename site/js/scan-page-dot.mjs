@@ -17,7 +17,7 @@ import {
   getWalletCount,
   getWalletSigningKeyCount,
   isWalletSaved,
-  walletSome,
+  walletSomeSigningKey,
 } from "./device-wallet.mjs";
 import { getInboxOverlayCounts } from "./device-inbox.mjs?v=56";
 import { resolverApiOrigin } from "./hc-sign.mjs";
@@ -113,9 +113,7 @@ function hasStewardReadyKeys() {
   if (session?.owner_private_key_b58 && hasStewardVerification(session)) {
     return true;
   }
-  return walletSome(
-    (entry) => Boolean(entry?.owner_private_key_b58) && hasStewardVerification(entry)
-  );
+  return walletSomeSigningKey((entry) => hasStewardVerification(entry));
 }
 
 function hasCreatedKeys() {

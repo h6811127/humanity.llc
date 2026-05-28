@@ -124,6 +124,7 @@ import {
 import {
   isLargeWallet,
   walletScaleHint,
+  selectHubSavedRowEntries,
   selectNetworkRefreshEntries,
   walletNetworkMaxParallel,
 } from "./device-wallet-scale-core.mjs";
@@ -367,6 +368,45 @@ function scanUrlForEntry(entry) {
   const base = `${location.origin}/c/${encodeURIComponent(entry.profile_id)}`;
   const qrId = entry.qr_id ?? walletEntryQrId(entry);
   return qrId ? `${base}?q=${encodeURIComponent(qrId)}` : base;
+}
+
+/**
+ * Saved-card rows for hub sheet render (S9 display-safe + S10 large-wallet DOM cap).
+ * @returns {{ entries: ReturnType<typeof listWalletDisplayEntries>, hiddenCount: number }}
+ */
+function savedRowsForRender() {
+  const all = listWalletDisplayEntries();
+  if (document.body.classList.contains("page-wallet")) {
+    return { entries: all, hiddenCount: 0 };
+  }
+  return selectHubSavedRowEntries(
+    all,
+    visibleHubCardProfileIds(),
+    getStewardEntitlementsPolicy()
+  );
+}
+
+/**
+ * @param {number} hiddenCount
+ */
+function appendHubSavedMoreRow(hiddenCount) {
+  if (!savedList || hiddenCount <= 0) return;
+  const li = document.createElement("li");
+  li.className = "hub-card-item hub-card-item--more";
+  li.dataset.hubSearchable = "more saved cards wallet";
+  li.innerHTML = `
+    <div class="hub-card-head">
+      <span class="list-content">
+        <span class="list-title">${hiddenCount} more saved on this device</span>
+        <span class="list-sub">Open My cards for the full list and controls</span>
+      </span>
+    </div>
+    <div class="hub-card-actions">
+      <div class="hub-card-actions-primary">
+        <a class="hub-card-action" href="/wallet/">Open My cards</a>
+      </div>
+    </div>`;
+  savedList.appendChild(li);
 }
 
 /** @param {Record<string, unknown>} entry Full row or {@link walletEntryPublicView}. */
@@ -986,7 +1026,7 @@ function renderActivityRows() {
  */
 function renderSavedRows(opts = {}) {
   const initialChipChecking = opts.initialChipChecking === true;
-  const entries = listWalletDisplayEntries();
+  const { entries, hiddenCount } = savedRowsForRender();
   if (!savedList || !savedGroup) return;
 
   const labelEl =
@@ -1093,6 +1133,8 @@ function renderSavedRows(opts = {}) {
       </div>`;
     savedList.appendChild(li);
   }
+
+  appendHubSavedMoreRow(hiddenCount);
 
   bindRevokedAlertHandlers();
 

@@ -473,6 +473,7 @@ Use this table when prioritizing work. **Shipped** items have modules named; **P
 | S6 | Shard / bound `hc_wallet_network_cache` | **Yes** (2026-05-27) | Max **20** fresh rows; LRU + wallet protect on save | Open issues → shipped |
 | S8 | Wallet metadata hot paths | **Yes** (2026-05-28) | Count/pollable/signing/profile-summary reads avoid full wallet copies in status, glance, inbox, scan dot | Shipped |
 | S9 | Hub saved-row display hydration | **Yes** (2026-05-28) | `listWalletDisplayEntries` + `findWalletEntryById` on action (no `loadWallet().slice()` per render) | Shipped |
+| S10 | Hub saved-row DOM cap (large wallet) | **Yes** (2026-05-28) | `selectHubSavedRowEntries` (cap **15**, visible-first) + “N more” row → `/wallet/`; full list on wallet page | Shipped |
 | S7 | Cross-tab rebuild (one snapshot) | Partial (Phases 1–6) | Full state machine per [`CROSS_TAB_KEYS_REBUILD_PLAN.md`](CROSS_TAB_KEYS_REBUILD_PLAN.md) | Cross-tab |
 
 ### Background / SW
@@ -511,7 +512,7 @@ Phases 1–5 improved polling, but **N saved cards** on one browser is still an 
 
 ### 2. Shell performance (must fix)
 
-Hub/inbox chrome and poll selection avoid copying the full `hc_wallet` array for count/profile-only reads (S8). Hub saved-card DOM uses display-safe rows without private key fields; signing actions hydrate the full row via `findWalletEntryById` (S9, 2026-05-28). **`hc_wallet_network_cache`** is capped at **20** fresh rows (S6). Optional later: virtualize very large hub lists. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
+Hub/inbox chrome and poll selection avoid copying the full `hc_wallet` array for count/profile-only reads (S8). Hub saved-card DOM uses display-safe rows without private key fields; signing actions hydrate the full row via `findWalletEntryById` (S9, 2026-05-28). Large wallets cap hub sheet saved-card rows at **15** with a link to **My cards** for the full list (S10, 2026-05-28). **`hc_wallet_network_cache`** is capped at **20** fresh rows (S6). Optional later: virtualize very large hub lists on `/wallet/`. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
 
 ### 3. Multi-tab presence (must fix)
 
@@ -523,6 +524,7 @@ Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). 
 
 | Date | Note |
 |------|------|
+| 2026-05-28 | **S10 shipped:** large-wallet hub DOM cap via `selectHubSavedRowEntries` + “N more saved” row; `/wallet/` renders full list |
 | 2026-05-28 | **S9 shipped:** hub `renderSavedRows` uses `listWalletDisplayEntries`; signing actions hydrate via `findWalletEntryById` |
 | 2026-05-28 | **S8b shipped:** poll/coordinator/presence/SW paths use `listPollableWalletEntries` + `forEachWalletEntry`; snapshot baseline uses truth profile ids only |
 | 2026-05-28 | **S8 shipped:** wallet metadata hot paths for count/pollable/signing/profile-summary reads |

@@ -10,6 +10,9 @@ export { orderEntriesVisibleFirst } from "./device-hub-visible-rows-core.mjs";
 /** Cards at or above this count use narrowed auto-poll and capped network parallelism. */
 export const LARGE_WALLET_THRESHOLD = 10;
 
+/** Max hub saved-card DOM rows when wallet is large (S10 shell perf). */
+export const LARGE_WALLET_HUB_DOM_CAP = 15;
+
 /** Product guidance: day-to-day comfort zone before large-wallet behavior. */
 export const COMFORTABLE_WALLET_MAX = 5;
 
@@ -159,6 +162,30 @@ export function selectNetworkRefreshEntries(entries, ctx, policy) {
   return {
     entries: [stale[idx]],
     nextCursor: stale.length > 0 ? (idx + 1) % stale.length : 0,
+  };
+}
+
+/**
+ * Cap hub saved-card DOM for large wallets; prefer visible rows first.
+ *
+ * @template {{ profile_id?: unknown }} T
+ * @param {T[]} entries
+ * @param {Iterable<string>} [visibleProfileIds]
+ * @param {import("./device-steward-entitlements-core.mjs").StewardEntitlementsPolicy} [policy]
+ * @returns {{ entries: T[], hiddenCount: number }}
+ */
+export function selectHubSavedRowEntries(entries, visibleProfileIds = [], policy) {
+  if (!isLargeWallet(entries.length, policy)) {
+    return { entries, hiddenCount: 0 };
+  }
+  const cap = policy?.hubDomCap ?? LARGE_WALLET_HUB_DOM_CAP;
+  const ordered = orderEntriesVisibleFirst(entries, visibleProfileIds);
+  if (ordered.length <= cap) {
+    return { entries: ordered, hiddenCount: 0 };
+  }
+  return {
+    entries: ordered.slice(0, cap),
+    hiddenCount: ordered.length - cap,
   };
 }
 
