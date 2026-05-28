@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   LOST_ITEM_RELAY_PREFIX,
+  isObjectForwardManifesto,
   parseManifestoDisplay,
+  scanHeroTemplate,
   splitManifestoDisplay,
 } from "../src/resolver/manifesto-display";
 
@@ -16,17 +18,37 @@ describe("parseManifestoDisplay", () => {
   });
 
   it("parses lost item relay prefix", () => {
-    const r = parseManifestoDisplay(`${LOST_ITEM_RELAY_PREFIX}Keys\nLost — relay active`);
+    const r = parseManifestoDisplay(`${LOST_ITEM_RELAY_PREFIX}Keys\nLost  -  relay active`);
     expect(r.kind).toBe("lost_item_relay");
     if (r.kind === "lost_item_relay") {
       expect(r.objectLabel).toBe("Keys");
-      expect(r.statusLine).toBe("Lost — relay active");
+      expect(r.statusLine).toBe("Lost  -  relay active");
     }
   });
 
   it("treats single line as general card", () => {
     const r = parseManifestoDisplay("Open studio all week");
     expect(r.kind).toBe("general");
+  });
+});
+
+describe("scanHeroTemplate", () => {
+  it("chooses live_object for print_artifact scope", () => {
+    const d = parseManifestoDisplay("Open studio");
+    expect(scanHeroTemplate(d, "print_artifact")).toBe("live_object");
+  });
+
+  it("chooses personal_card for short card-scope manifesto", () => {
+    const d = parseManifestoDisplay("Open studio");
+    expect(scanHeroTemplate(d, "card")).toBe("personal_card");
+  });
+
+  it("chooses live_object for long demo-style manifesto on card scope", () => {
+    const line =
+      "Live object demo. Scan from another phone, then revoke this QR.";
+    const d = parseManifestoDisplay(line);
+    expect(isObjectForwardManifesto("card", line)).toBe(true);
+    expect(scanHeroTemplate(d, "card")).toBe("live_object");
   });
 });
 

@@ -87,6 +87,14 @@
               </span>
             </li>
             <li class="list-row">
+              <span class="list-icon list-icon-tone-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1v6"/><path d="M12 17v6"/><path d="M4.22 4.22l4.24 4.24"/><path d="m15.54 15.54 4.24 4.24"/><path d="M1 12h6"/><path d="M17 12h6"/><path d="m4.22 19.78 4.24-4.24"/><path d="m15.54 8.46 4.24-4.24"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Backup passphrases or encrypted backup files by default</span>
+              </span>
+            </li>
+            <li class="list-row">
               <span class="list-icon list-icon-tone-red" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h4"/><path d="M7 13h6"/><path d="m4 4 16 16"/></svg>
               </span>
@@ -116,6 +124,48 @@
               </span>
               <span class="list-content">
                 <span class="list-title">Payment or shipping PII in the resolver DB</span>
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="group">
+          <h2 class="group-label">Key custody</h2>
+          <ul class="list">
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l7 4v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-4z"/><path d="m9 12 2 2 4-4"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Owner key stays on your device</span>
+                <span class="list-sub"
+                  >The browser can sign revoke or live proof only while this tab still has the key,
+                  or after you unlock a saved backup or recovery key locally.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-purple" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">Backups download locally</span>
+                <span class="list-sub"
+                  >Encrypted backup files and passphrases stay with you unless you choose to store
+                  them elsewhere.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-icon list-icon-tone-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m4 4 16 16"/><path d="M9.17 9.17A3 3 0 0 0 15 10"/><path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c5 0 9.27 3.11 11 7.5a11.8 11.8 0 0 1-2.16 3.19"/><path d="M6.71 6.72C3.73 8.23 1.45 10.62 1 12c.62 1.53 1.67 2.94 3.05 4.1"/><path d="M14.12 14.12A3 3 0 0 1 9.88 9.88"/></svg>
+              </span>
+              <span class="list-content">
+                <span class="list-title">No operator backdoor</span>
+                <span class="list-sub"
+                  >humanity.llc can verify signed actions. It cannot recover your passphrase, load
+                  your private key, or revoke on your behalf.</span
+                >
               </span>
             </li>
           </ul>
@@ -184,6 +234,18 @@
                 <span class="list-content">
                   <span class="list-title">REFERENCE_OPERATOR_DATA_POLICY.md</span>
                   <span class="list-sub">Canonical policy in the repo</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/architecture.html">
+                <span class="list-icon list-icon-tone-green" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="6" rx="1"/><rect x="2" y="15" width="20" height="6" rx="1"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Architecture</span>
+                  <span class="list-sub">Keys, revoke path, resolver state</span>
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </a>

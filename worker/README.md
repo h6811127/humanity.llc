@@ -6,7 +6,7 @@ Implements `/.well-known/hc/v1/*` and public scan shortcuts per `docs/V1_0_ARCHI
 
 This repo pins **`wrangler@4.47.0`**, which runs on **Node 20 LTS** (not Node 22).
 
-**Recommended Node:** `>=20.18.1` (see `.nvmrc`). On `20.11.0` you may see a harmless-looking `EBADENGINE` for `undici` — it still installs; bumping to the latest **20.x** clears it:
+**Recommended Node:** `>=20.18.1` (see `.nvmrc`). On `20.11.0` you may see a harmless-looking `EBADENGINE` for `undici`  -  it still installs; bumping to the latest **20.x** clears it:
 
 ```bash
 nvm install    # reads .nvmrc → 20.18.1
@@ -50,9 +50,16 @@ Expected when migrations are applied:
   "version": "1.0",
   "operator": "humanity.llc",
   "status": "ok",
-  "database": "ok"
+  "database": "ok",
+  "build": {
+    "gitSha": "dev",
+    "builtAt": "1970-01-01T00:00:00.000Z",
+    "source": "dev"
+  }
 }
 ```
+
+`build` is the Worker deploy stamp (git SHA + time). Regenerate before deploy: `npm run worker:build-meta`. See [`docs/SITE_BUILD_VERSIONING.md`](../docs/SITE_BUILD_VERSIONING.md).
 
 If `database` is `schema_missing`, run `npm run worker:migrate:local`.
 
@@ -89,9 +96,9 @@ export CLOUDFLARE_API_TOKEN="your_token_here"
 npm run worker:deploy
 ```
 
-Optional: copy `worker/.env.example` to **repo root** `.env` and load it (`set -a; source .env; set +a`) — keep `.env` in `.gitignore`.
+Optional: copy `worker/.env.example` to **repo root** `.env` and load it (`set -a; source .env; set +a`)  -  keep `.env` in `.gitignore`.
 
-**Alternative:** `npx wrangler login` (browser OAuth) — no API token file needed for interactive deploys.
+**Alternative:** `npx wrangler login` (browser OAuth)  -  no API token file needed for interactive deploys.
 
 **CI:** GitHub Actions uses repository secret `CLOUDFLARE_API_TOKEN` (see `.github/workflows/deploy-worker.yml`).
 
@@ -144,9 +151,9 @@ npm run worker:dev
 
 - **Create UI:** https://humanity.llc/create/ (or Pages dev; API defaults to `http://127.0.0.1:8787` on localhost)
 - **POST** `/.well-known/hc/v1/cards` with `{ card, qr_credential }` signed documents
-- **GET** `/.well-known/hc/v1/cards/{profile_id}` — public card JSON
-- **GET** `/.well-known/hc/v1/cards/{profile_id}/status?q={qr_id}` — machine-readable scan state (M3.4)
-- **POST** `/.well-known/hc/v1/cards/{profile_id}/revoke` — owner-signed revocation (M4.1)
+- **GET** `/.well-known/hc/v1/cards/{profile_id}`  -  public card JSON
+- **GET** `/.well-known/hc/v1/cards/{profile_id}/status?q={qr_id}`  -  machine-readable scan state (M3.4)
+- **POST** `/.well-known/hc/v1/cards/{profile_id}/revoke`  -  owner-signed revocation (M4.1)
 
 After create, open `/created/` for scan link + QR image.
 
@@ -160,7 +167,41 @@ curl -s -X POST "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/revoke" \
   -d '{"revocation":{...}}' | jq .
 ```
 
+### Manifesto / status line update
+
+Owner-signed post-create copy change (same QR, no reprint). Spec: `docs/MANIFESTO_STATUS_UPDATE.md`.
+
+```bash
+# Body: { "card": <signed humanity_card with new manifesto_line and newer updated_at> }
+curl -s -X POST "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/update" \
+  -H "Content-Type: application/json" \
+  -d '{"card":{...}}' | jq .
+```
+
+Owner UI: `/created/` → **Update public line**.
+
+### Artifact intent gate (M4.4 stub)
+
+Pre-commerce stub: blocks revoked/suspended/expired card or QR before personalized merch (Phase C).
+
+```bash
+curl -s -X POST "https://humanity.llc/v1/store/artifact-intents" \
+  -H "Content-Type: application/json" \
+  -d '{"profile_id":"PROFILE","source_qr_id":"qr_..."}' | jq .
+```
+
+- Revoked QR → `403` `QR_REVOKED`
+- Active QR → `501` `ARTIFACT_INTENTS_NOT_IMPLEMENTED` (full intent creation not built yet)
+
 **Production:** run `npm run worker:migrate:remote` then `npm run worker:deploy`.
+
+## Orphan card purge (cron)
+
+Daily cron (`0 4 * * *` UTC) removes **abandoned** registrations: active, older than 90 days, never updated, no vouches, no non-expired active QR. See `docs/CARD_RETENTION_AND_ORPHAN_CLEANUP.md`.
+
+- Implementation: `worker/src/db/orphan-purge.ts` · `scheduled()` in `worker/src/index.ts`
+- Tests: `worker/tests/orphan-purge.test.ts`
+- Batch cap: 50 profiles per run
 
 ## Cryptography (1.5)
 

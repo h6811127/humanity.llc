@@ -1,6 +1,6 @@
 # Organizer-signed revoke pilot (Phase A vertical #3)
 
-**Status:** Active pilot  
+**Status:** Shipped in repo (field-test checklist below)  
 **Parent:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`  
 **Prerequisite:** M5 stranger loop; `docs/REVOKE_AND_LIFECYCLE_V1.md`  
 **Research:** `site/what-can-a-qr-do/civic-protest-infrastructure/`, `site/what-can-a-qr-do/local-economies/`
@@ -60,7 +60,7 @@ Revocation row stores `issuer_public_key` = signer's public key (audit).
 
 ## Not in this pilot
 
-- Signed **manifesto updates** (status changes without revoke) — future `card_update` document
+- Signed **manifesto updates**  -  owner-only via `POST …/update` (`docs/MANIFESTO_STATUS_UPDATE.md`); organizers cannot edit copy
 - Multi-organizer federation or rotation UI
 - Organizer revoke from `/created/` (use `/organizer-revoke/` only)
 

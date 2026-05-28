@@ -6,19 +6,26 @@ import {
   verifySignedDocument,
 } from "../crypto";
 import { insertCardWithQr, handleExists, profileIdExists } from "../db/cards";
-import { checkCreateRateLimit, hashIp } from "../db/rate-limit";
+import { isDemoHandle } from "../demo-card-policy";
+import { checkCreateRateLimit, checkDemoCreateRateLimit, hashIp } from "../db/rate-limit";
 import {
   clientIp,
   errorResponse,
   jsonResponse,
+  requestOrigin,
   RESOLVER_ORIGIN,
 } from "../http/resolver";
 import { validateHandle } from "../validation/handle";
 import { validateManifestoLine } from "../validation/manifesto";
+import { validateObjectStreamsField } from "../validation/object-streams";
+import { normalizeMerchFunnelRef } from "../commerce/merch-funnel-core";
+import { incrementMerchFunnelCounter } from "../db/merch-funnel";
+import { resolveStoredQrExpiresAt } from "./merch-qr-policy";
 
 export interface CreateCardBody {
   card: Record<string, unknown>;
   qr_credential: Record<string, unknown>;
+  attribution_ref?: string | null;
 }
 
 function parseCreateBody(body: unknown): CreateCardBody | null {
@@ -26,14 +33,42 @@ function parseCreateBody(body: unknown): CreateCardBody | null {
   const o = body as Record<string, unknown>;
   if (!o.card || typeof o.card !== "object") return null;
   if (!o.qr_credential || typeof o.qr_credential !== "object") return null;
+  const attributionRef =
+    o.attribution_ref == null || o.attribution_ref === ""
+      ? null
+      : normalizeMerchFunnelRef(o.attribution_ref);
   return {
     card: o.card as Record<string, unknown>,
     qr_credential: o.qr_credential as Record<string, unknown>,
+    attribution_ref: attributionRef,
   };
 }
 
-function qrPayload(profileId: string, qrId: string): string {
-  return `${RESOLVER_ORIGIN}/c/${profileId}?q=${qrId}`;
+function qrPayload(origin: string, profileId: string, qrId: string): string {
+  return `${origin}/c/${profileId}?q=${qrId}`;
+}
+
+function isLocalOrigin(origin: string): boolean {
+  try {
+    const url = new URL(origin);
+    return url.hostname === "localhost" || url.hostname === "127.0.0.1";
+  } catch {
+    return false;
+  }
+}
+
+function expectedQrOrigin(request: Request, payload: unknown): string {
+  const origin = requestOrigin(request);
+  const requestOriginHeader = request.headers.get("Origin") ?? "";
+  if (isLocalOrigin(requestOriginHeader) && typeof payload === "string") {
+    try {
+      const payloadUrl = new URL(payload);
+      if (isLocalOrigin(payloadUrl.origin)) return payloadUrl.origin;
+    } catch {
+      /* Keep canonical validation error below. */
+    }
+  }
+  return origin;
 }
 
 export async function handlePostCards(
@@ -138,7 +173,11 @@ export async function handlePostCards(
     );
   }
 
-  const expectedPayload = qrPayload(profileId, qr.qr_id as string);
+  const expectedPayload = qrPayload(
+    expectedQrOrigin(request, qr.payload),
+    profileId,
+    qr.qr_id as string
+  );
   if (qr.payload !== expectedPayload) {
     return errorResponse(
       "INVALID_QR_PAYLOAD",
@@ -159,6 +198,31 @@ export async function handlePostCards(
         ? String((e as { code: string }).code)
         : "VALIDATION_ERROR";
     return errorResponse(code, msg, 422);
+  }
+
+  try {
+    validateObjectStreamsField(card);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Invalid object_streams.";
+    const code =
+      e && typeof e === "object" && "code" in e
+        ? String((e as { code: string }).code)
+        : "VALIDATION_ERROR";
+    return errorResponse(code, msg, 422);
+  }
+
+  if (isDemoHandle(handleNormalized)) {
+    const demoRate = await checkDemoCreateRateLimit(db, ipHash);
+    if (!demoRate.allowed) {
+      return errorResponse(
+        "RATE_LIMITED",
+        "Too many sample card creations from this network. Try again later.",
+        429,
+        demoRate.retryAfterSec
+          ? { "Retry-After": String(demoRate.retryAfterSec) }
+          : undefined
+      );
+    }
   }
 
   if (await profileIdExists(db, profileId)) {
@@ -212,6 +276,12 @@ export async function handlePostCards(
     issuerPublicKey = issuerPublicKeyRaw;
   }
 
+  const storedExpiresAt = resolveStoredQrExpiresAt(
+    "card",
+    qr.expires_at,
+    () => defaultQrExpiry(qr.issued_at as string)
+  );
+
   try {
     await insertCardWithQr(
       db,
@@ -230,9 +300,7 @@ export async function handlePostCards(
         qrId: qr.qr_id as string,
         payload: expectedPayload,
         issuedAt: qr.issued_at as string,
-        expiresAt:
-          (typeof qr.expires_at === "string" && qr.expires_at) ||
-          defaultQrExpiry(qr.issued_at as string),
+        expiresAt: storedExpiresAt,
         credentialDocumentJson: JSON.stringify(qr),
       }
     );
@@ -258,12 +326,17 @@ export async function handlePostCards(
     return errorResponse("RESOLVER_ERROR", msg, 500);
   }
 
+  if (parsed.attribution_ref && !isDemoHandle(handleNormalized)) {
+    await incrementMerchFunnelCounter(db, parsed.attribution_ref, "create_attributed");
+  }
+
   return jsonResponse(
     {
       profile_id: profileId,
       handle: handleNormalized,
       qr_id: qr.qr_id,
       scan_url: expectedPayload,
+      qr_expires_at: storedExpiresAt,
       card_url: `${RESOLVER_ORIGIN}/.well-known/hc/v1/cards/${profileId}`,
       status: "active",
       verification: {

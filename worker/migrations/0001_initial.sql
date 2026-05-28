@@ -1,4 +1,4 @@
--- Humanity Commons reference resolver — initial schema (roadmap M1.2)
+-- Humanity Commons reference resolver  -  initial schema (roadmap M1.2)
 -- Contracts: docs/V1_IMPLEMENTATION_CONTRACTS.md
 -- Data policy: docs/REFERENCE_OPERATOR_DATA_POLICY.md
 --

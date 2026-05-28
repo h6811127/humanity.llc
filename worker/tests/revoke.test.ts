@@ -67,7 +67,7 @@ function qr(): QrCredentialRow {
 
 describe("M3.6 cache + HTTP status", () => {
   it("active scan uses standards Cache-Control", () => {
-    const vm = buildScanViewModel(PROFILE, QR, { card: card(), qr: qr(), verification: null }, "https://humanity.llc");
+    const vm = buildScanViewModel(PROFILE, QR, { card: card(), qr: qr(), verification: null, revocationDisplay: null }, "https://humanity.llc");
     expect(vm.cacheControl).toBe(CACHE_ACTIVE);
     expect(httpStatusForScanKind("card_revoked")).toBe(410);
     expect(httpStatusForScanKind("malformed")).toBe(400);
@@ -190,6 +190,126 @@ describe("handlePostRevoke", () => {
     expect(json.target_kind).toBe("qr_credential");
     expect(json.target_qr_id).toBe(qrId);
     expect(batchCalls.length).toBe(1);
+  });
+
+  it("rejects invalid display_mode on revocation", async () => {
+    const { handlePostRevoke } = await import("../src/resolver/revoke");
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const qrId = "qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
+    const signed = await signDocument(
+      withProtocolFields(
+        {
+          profile_id: PROFILE,
+          target_kind: "qr_credential",
+          target_qr_id: qrId,
+          reason: "owner_revoked",
+          revoked_at: "2026-05-16T17:00:00.000Z",
+          nonce: `nonce_display_bad_${Date.now()}`,
+          display_mode: "glossy",
+        },
+        PAYLOAD_TYPES.REVOCATION
+      ),
+      { privateKey, publicKeyBase58 }
+    );
+
+    const db = {
+      prepare: (sql: string) => ({
+        bind: () => ({
+          first: async () => {
+            if (sql.includes("FROM cards")) {
+              return {
+                public_key: publicKeyBase58,
+                recovery_public_key: null,
+                issuer_public_key: null,
+                status: "active",
+              };
+            }
+            if (sql.includes("FROM revocations")) return null;
+            if (sql.includes("FROM qr_credentials")) {
+              return { qr_id: qrId, profile_id: PROFILE, status: "active" };
+            }
+            return null;
+          },
+        }),
+      }),
+      batch: async () => [{ success: true }],
+    } as unknown as D1Database;
+
+    const res = await handlePostRevoke(
+      new Request(`https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/revoke`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ revocation: signed }),
+      }),
+      db,
+      PROFILE
+    );
+    expect(res.status).toBe(422);
+  });
+
+  it("accepts tombstone display_mode on QR revocation", async () => {
+    const { handlePostRevoke } = await import("../src/resolver/revoke");
+    const { privateKey, publicKeyBase58 } = await getTestKeypair();
+    const qrId = "qr_7Xk9mP2nQ4rT6vW8yZ1aB3c";
+    const signed = await signDocument(
+      withProtocolFields(
+        {
+          profile_id: PROFILE,
+          target_kind: "qr_credential",
+          target_qr_id: qrId,
+          reason: "owner_revoked",
+          revoked_at: "2026-05-16T17:00:00.000Z",
+          nonce: `nonce_tombstone_${Date.now()}`,
+          display_mode: "tombstone",
+          public_reason: "event_ended",
+        },
+        PAYLOAD_TYPES.REVOCATION
+      ),
+      { privateKey, publicKeyBase58 }
+    );
+
+    const db = {
+      prepare: (sql: string) => ({
+        bind: () => ({
+          first: async () => {
+            if (sql.includes("FROM cards")) {
+              return {
+                public_key: publicKeyBase58,
+                recovery_public_key: null,
+                issuer_public_key: null,
+                status: "active",
+              };
+            }
+            if (sql.includes("FROM revocations")) return null;
+            if (sql.includes("FROM qr_credentials")) {
+              return { qr_id: qrId, profile_id: PROFILE, status: "active" };
+            }
+            return null;
+          },
+        }),
+      }),
+      batch: async (stmts: unknown) =>
+        Array.isArray(stmts)
+          ? stmts.map(() => ({ success: true }))
+          : [{ success: true }],
+    } as unknown as D1Database;
+
+    const res = await handlePostRevoke(
+      new Request(`https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/revoke`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ revocation: signed }),
+      }),
+      db,
+      PROFILE
+    );
+    expect(res.status).toBe(200);
+    const json = (await res.json()) as {
+      display_mode: string;
+      public_reason: string;
+    };
+    expect(json.display_mode).toBe("tombstone");
+    expect(json.public_reason).toBe("event_ended");
   });
 
   it("accepts valid QR revocation signed by recovery key", async () => {

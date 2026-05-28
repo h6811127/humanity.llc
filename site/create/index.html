@@ -3,56 +3,311 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Create a live public card · humanity.llc</title>
+    <title>Create a live card · humanity.llc</title>
     <meta
       name="description"
-      content="Create a QR-backed live object you can scan, verify, and revoke. Your private key stays in this browser session only."
+      content="Create a live object — status plate, lost-item tag, or general card. Signed QR, browser-held keys, no scan tracking."
     />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=47" />
+    <meta name="theme-color" content="#ffffff" />
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem("hc_theme") === "dark") {
+            document.documentElement.dataset.theme = "dark";
+            document.documentElement.style.colorScheme = "dark";
+          }
+        } catch (e) {
+          /* ignore */
+        }
+      })();
+    </script>
+    <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=4" />
+    <link rel="stylesheet" href="/styles.css?v=128" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=59" />
+    <link rel="stylesheet" href="/css/theme-dark.css?v=29" />
   </head>
-  <body>
+  <body class="page-flow has-shell-chrome has-device-hub-search flow-shell flow-shell-create">
     <div class="page">
-      <header class="top">
-        <a class="top-brand" href="/">
-          <span class="pass-dot" aria-hidden="true"></span>
-          <span>humanity.llc</span>
-        </a>
-        <a class="top-create" href="/create/" aria-current="page">Create</a>
-      </header>
+      <div class="top-chrome top-chrome--float top-chrome--flow" id="top-chrome">
+        <div class="top-chrome-bar top-chrome-bar--minimal" id="top-status">
+          <div class="shell-status-cluster">
+            <button
+              type="button"
+              class="shell-status-dot-btn"
+              id="brand-status-dot-btn"
+              aria-label="Device and system status"
+              aria-expanded="false"
+              aria-controls="device-hub"
+            >
+              <span class="pass-dot shell-status-dot" id="brand-status-dot"></span>
+            </button>
+            <button
+              type="button"
+              class="shell-notif-badge"
+              id="shell-notif-badge"
+              hidden
+              aria-label="Notifications"
+            >
+              <span class="shell-notif-badge-ring" aria-hidden="true"></span>
+              <span class="shell-notif-badge-count" id="shell-notif-badge-count">0</span>
+            </button>
+          </div>
+          <p class="shell-status-line" id="shell-status-line" role="status" hidden></p>
+        </div>
+      </div>
+
+      <section
+        class="device-hub device-hub-top device-hub--sheet device-hub-collapsed"
+        id="device-hub"
+        aria-labelledby="device-hub-title"
+        aria-hidden="true"
+        inert
+      >
+        <div class="device-hub-body" id="device-hub-body">
+          <button type="button" class="device-hub-sheet-close" aria-label="Close">×</button>
+          <div class="device-hub-sheet-handle" aria-hidden="true"></div>
+          <div class="device-hub-alerts-top" id="device-hub-alerts-top">
+            <div class="device-hub-group" id="device-hub-crosstab-notice" hidden role="status"></div>
+            <div class="device-hub-group" id="device-hub-notice-group" hidden></div>
+            <div
+              class="device-hub-group device-hub-alert-card"
+              id="device-hub-live-control-group"
+              hidden
+              data-hub-group="liveproof"
+              role="status"
+            >
+              <div class="hc-emphasis-card hc-emphasis-card--urgent device-hub-live-control-card">
+                <div class="hc-emphasis-card__main">
+                  <span class="hc-emphasis-card__dot hc-emphasis-card__dot--urgent" aria-hidden="true"></span>
+                  <div class="hc-emphasis-card__copy">
+                    <p class="hc-emphasis-card__eyebrow" id="device-hub-live-control-eyebrow">Live proof waiting</p>
+                    <p class="hc-emphasis-card__detail" id="device-hub-live-control-summary" hidden></p>
+                  </div>
+                </div>
+                <ul class="list list-compact device-hub-live-control-list" id="device-hub-live-control-list"></ul>
+              </div>
+            </div>
+            <div
+              class="device-hub-group device-hub-alert-card"
+              id="device-hub-card-disabled-group"
+              hidden
+              data-hub-group="card-disabled"
+              role="status"
+            >
+              <div class="hc-emphasis-card hc-emphasis-card--warn device-hub-card-disabled-card">
+                <div class="hc-emphasis-card__main">
+                  <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
+                  <div class="hc-emphasis-card__copy">
+                    <p class="hc-emphasis-card__eyebrow" id="device-hub-card-disabled-eyebrow">Disabled since your last visit</p>
+                    <p class="hc-emphasis-card__detail" id="device-hub-card-disabled-summary" hidden></p>
+                  </div>
+                </div>
+                <ul class="list list-compact device-hub-card-disabled-list" id="device-hub-card-disabled-list"></ul>
+              </div>
+            </div>
+          </div>
+          <div class="device-hub-status-head">
+            <a href="/" class="device-hub-home-btn" aria-label="Home">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </a>
+            <div
+              class="device-hub-status-panel"
+              id="device-hub-status-panel"
+              aria-label="System status"
+            ></div>
+          </div>
+
+          <h2 class="device-hub-title" id="device-hub-title">Saved in this browser</h2>
+          <section
+            class="device-hub-section device-hub-keys-custody-section"
+            id="device-hub-keys-custody"
+            aria-labelledby="device-hub-keys-custody-title"
+            hidden
+          ></section>
+          <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint" hidden>
+            Finish the form below, then save your control key on the <a href="/created/">card page</a>.
+          </p>
+
+          <div class="device-hub-search-block" id="device-hub-search-block" role="search">
+            <label class="device-hub-search device-hub-search--inline" for="device-hub-search">
+              <span class="device-hub-search-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              </span>
+              <input
+                type="search"
+                id="device-hub-search"
+                class="device-hub-search-input"
+                placeholder="Search saved cards, pins, shortcuts"
+                autocomplete="off"
+                enterkeyhint="search"
+              />
+            </label>
+            <p class="device-hub-search-status" id="device-hub-search-status" hidden role="status"></p>
+          </div>
+
+          <section
+            class="device-hub-section"
+            id="device-hub-saved-items-section"
+            aria-labelledby="device-hub-saved-items-title"
+          >
+            <div class="device-hub-section-header">
+              <h3 class="device-hub-section-title" id="device-hub-saved-items-title">Saved items</h3>
+              <a class="device-hub-create-btn" href="/create/" aria-label="Create a live card">
+                <span class="device-hub-create-glyph" aria-hidden="true">+</span>
+                <span class="device-hub-create-label">New</span>
+              </a>
+            </div>
+            <p class="device-hub-section-lead">
+              Cards, pins, and shortcuts on this device. Does not track who scans your QR.
+            </p>
+
+          <div
+            class="device-hub-group device-hub-group--empty"
+            id="device-hub-saved-group"
+            data-hub-group="saved"
+          >
+            <ul class="hub-card-list" id="device-hub-wallet-list" hidden></ul>
+            <p class="device-hub-section-empty" id="device-hub-saved-empty">
+              Cards you save on this device will show here.
+            </p>
+          </div>
+
+          <div
+            class="device-hub-group device-hub-group--empty"
+            id="device-hub-pins-group"
+            data-hub-group="pins"
+          >
+            <p class="device-hub-subgroup-label">Pinned scans</p>
+            <ul class="list list-compact" id="device-hub-pins-list" hidden></ul>
+            <p class="device-hub-section-empty" id="device-hub-pins-empty">
+              Bookmarks only  -  no scan history.
+            </p>
+          </div>
+
+          <div class="device-hub-group" data-hub-group="import">
+            <p class="device-hub-subgroup-label">Backup</p>
+            <details
+              class="device-hub-import device-hub-import-block"
+              data-hub-searchable="import backup file keys"
+            >
+              <summary class="device-hub-import-summary">
+                <span class="list-icon list-icon-tone-trust" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </span>
+                <span class="list-content">
+                  <span class="list-title">Import backup file</span>
+                  <span class="list-sub">Move keys to this device</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <form class="device-hub-import-form" id="hub-import-form">
+                <p class="form-hint">
+                  Encrypted .hcbackup.json from your card page  -  never uploaded.
+                </p>
+                <input type="file" accept=".json,application/json" required />
+                <label class="form-label" for="hub-import-passphrase">Passphrase</label>
+                <input
+                  type="password"
+                  id="hub-import-passphrase"
+                  name="passphrase"
+                  class="form-input"
+                  autocomplete="off"
+                  required
+                />
+                <button type="submit" class="btn-secondary device-hub-import-btn">
+                  Import to this device
+                </button>
+                <p class="form-status" id="hub-import-status" hidden role="status"></p>
+              </form>
+            </details>
+          </div>
+          </section>
+
+          <section
+            class="device-hub-section device-hub-section--secondary"
+            id="device-hub-actions-section"
+            aria-labelledby="device-hub-actions-title"
+          >
+            <h3 class="device-hub-section-title" id="device-hub-actions-title">Recent device actions</h3>
+            <p class="device-hub-section-lead">
+              Things this browser did — saved keys, signed live proof, loaded keys.
+            </p>
+            <div
+              class="device-hub-group device-hub-group--empty device-hub-activity-group"
+              id="device-hub-activity-group"
+              data-hub-group="activity"
+            >
+              <ul class="device-hub-action-list" id="device-hub-activity-list" hidden></ul>
+              <p class="device-hub-section-empty device-hub-section-empty--muted" id="device-hub-activity-empty">
+                Nothing logged yet on this browser.
+              </p>
+            </div>
+          </section>
+
+          <div class="device-hub-status-key" id="device-hub-status-key" aria-label="Status dot reference"></div>
+        </div>
+      </section>
 
       <main class="screen">
         <section class="hero hero-compact">
           <p class="hero-eyebrow">Create</p>
-          <h1>Create a live public card</h1>
-          <p class="hero-line">
-            You&rsquo;ll get a <strong>QR-backed object</strong> that can be scanned, verified,
-            and revoked — not a frozen link that points forever.
+          <h1 id="create-hero-title">Create a live card</h1>
+          <p class="hero-line" id="create-hero-lead">
+            One tap registers your <strong>card</strong> on the network and issues a
+            <strong>signed QR</strong> to print or share. Scans show live status — active,
+            revoked, or expired — not a frozen link.
           </p>
           <p class="hero-line hero-line-sub">
-            A handle, one public line, and a red QR ready to print. Your signing key starts
-            session-only in this tab; save a recovery key or encrypted backup next if you want
-            to revoke later.
+            Your signing key starts session-only in this tab. Save on this device, keep a recovery
+            key, or export an encrypted backup next if you want to revoke later.
           </p>
         </section>
 
-        <ul class="create-you-get" aria-label="What you get">
-          <li>Scan page with live active or revoked status</li>
-          <li>QR and link you can put on stickers, cards, or doors</li>
-          <li>Revoke from this tab, a recovery key, or an encrypted backup you control</li>
-        </ul>
+        <section class="flow-section" aria-labelledby="create-glossary-label">
+          <h2 class="group-label" id="create-glossary-label">Card vs QR</h2>
+          <ul class="list list-compact flow-glossary">
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Card</span>
+                <span class="list-sub"
+                  >Your live profile: handle, public line, status on the network. Not the same as
+                  profile ID alone.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">QR</span>
+                <span class="list-sub"
+                  >Signed credential encoded in the code. It points at your card and can expire or
+                  be revoked separately from reprinting.</span
+                >
+              </span>
+            </li>
+            <li class="list-row">
+              <span class="list-content">
+                <span class="list-title">Profile ID</span>
+                <span class="list-sub"
+                  >Opaque network ID for your card (assigned at create). Printers and scanners use
+                  it; you rarely need to memorize it.</span
+                >
+              </span>
+            </li>
+          </ul>
+        </section>
 
-        <section class="create-demo-strip" aria-label="Demo">
-          <a class="btn-secondary create-demo-link" href="/#card">See an example scan first</a>
+        <section class="create-demo-strip flow-demo-strip" aria-label="Demo">
+          <a class="btn-secondary create-demo-link" href="/case-study/">See the full loop first</a>
           <button type="button" class="btn-secondary" id="create-demo-btn">
             Create a sample card
           </button>
         </section>
 
-        <form id="create-form" class="form-card" method="dialog" action="#" autocomplete="off" novalidate>
-          <fieldset class="create-templates" aria-label="Start from a template">
-            <legend class="form-label">Start from</legend>
-            <div class="create-template-row">
+        <form id="create-form" class="form-card flow-form-card" method="dialog" action="#" autocomplete="off" novalidate>
+          <section class="flow-form-section">
+            <h2 class="group-label">Start from</h2>
+            <div class="create-template-row flow-segmented" role="group" aria-label="Template">
               <button type="button" class="create-template-btn is-active" data-template="general">
                 General
               </button>
@@ -63,11 +318,12 @@
                 Lost item
               </button>
             </div>
-          </fieldset>
+          </section>
 
+          <section class="flow-form-section flow-inset-fields">
           <label class="form-label" for="handle">Handle</label>
           <input
-            class="form-input"
+            class="form-input flow-field-input"
             id="handle"
             name="handle"
             required
@@ -113,7 +369,7 @@
               rows="2"
               placeholder="Open · Thu–Sun until 9 PM"
             ></textarea>
-            <p class="form-hint">Live status line — you can change it later by creating a new card or future updates.</p>
+            <p class="form-hint">Live status line — change it later on Live without reprinting the QR.</p>
           </div>
 
           <div id="create-fields-lost-item" hidden>
@@ -125,7 +381,7 @@
               maxlength="72"
               placeholder="House keys"
             />
-            <p class="form-hint">Shown as the headline when someone scans — not your phone number.</p>
+            <p class="form-hint">Shown as the headline when someone scans  -  not your phone number.</p>
             <label class="form-label" for="relay-message">What should finders see?</label>
             <textarea
               class="form-input form-textarea"
@@ -133,17 +389,61 @@
               name="relay_message"
               maxlength="199"
               rows="2"
-              placeholder="Lost — contact owner through relay (see scan page)"
+              placeholder="Lost  -  contact owner through relay (see scan page)"
             ></textarea>
             <p class="form-hint">
               Return instructions only. Revoke when recovered or if the relay is abused.
             </p>
           </div>
 
-          <details class="create-organizer-opt" id="create-organizer-details">
+          <fieldset
+            id="create-fields-object-streams"
+            class="created-object-streams-fieldset"
+            hidden
+          >
+            <legend class="form-label">Optional details (shown on scan)</legend>
+            <p class="form-hint">Same QR — add short place facts like tasks or tool status.</p>
+            <label class="form-label" for="create-stream-1-label">Detail 1 label</label>
+            <input
+              class="form-input"
+              id="create-stream-1-label"
+              type="text"
+              maxlength="40"
+              placeholder="Today's tasks"
+            />
+            <label class="form-label" for="create-stream-1-value">Detail 1 value</label>
+            <input
+              class="form-input"
+              id="create-stream-1-value"
+              type="text"
+              maxlength="120"
+              placeholder="Water bed 3 · turn compost"
+            />
+            <label class="form-label" for="create-stream-2-label">Detail 2 label</label>
+            <input
+              class="form-input"
+              id="create-stream-2-label"
+              type="text"
+              maxlength="40"
+              placeholder="Tools"
+            />
+            <label class="form-label" for="create-stream-2-value">Detail 2 value</label>
+            <input
+              class="form-input"
+              id="create-stream-2-value"
+              type="text"
+              maxlength="120"
+              placeholder="Wheelbarrow available"
+            />
+          </fieldset>
+
+          </section>
+
+          <section class="flow-form-section flow-inset-fields">
+          <details class="create-organizer-opt flow-disclosure" id="create-organizer-details">
             <summary class="form-label create-organizer-summary">Organizer can revoke (optional)</summary>
             <p class="form-hint">
-              Register a coalition or event key that may revoke this card&rsquo;s QR — without
+              Register a coalition or event key that may revoke this card&rsquo;s QR  -  without
               owning the card. You keep the owner key; the organizer gets their own.
             </p>
             <label class="revoke-confirm">
@@ -182,28 +482,45 @@
             <option value="365" selected>1 year (default)</option>
           </select>
           <p class="form-hint">
-            After this date the scan shows <strong>expired</strong> — different from
+            After this date the scan shows <strong>expired</strong>  -  different from
             <strong>revoke</strong>, which you control anytime. See
             <a href="/created/#revoke-rules">revoke rules</a> after create.
           </p>
 
-          <label class="revoke-confirm create-recovery-opt">
+          <label class="revoke-confirm create-recovery-opt flow-inset-check">
             <input type="checkbox" id="generate-recovery" name="generate_recovery" checked />
             <span>Generate recovery key (recommended; save once on the next screen)</span>
           </label>
+          </section>
 
-          <p class="form-warning">
-            After create, save your <strong>recovery key</strong> and/or download an encrypted
-            backup. Without this tab, a recovery key, or backup + passphrase, you cannot sign a
-            revoke from the web UI. humanity.llc cannot recover lost keys or revoke on your behalf.
-            Card creation does not verify legal identity.
-          </p>
+          <div
+            class="hc-emphasis-card hc-emphasis-card--warn flow-form-warning"
+            id="create-public-card-notice"
+            role="note"
+          >
+            <div class="hc-emphasis-card__main">
+              <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
+              <div class="hc-emphasis-card__copy">
+                <p class="hc-emphasis-card__eyebrow">Before you create</p>
+                <p class="hc-emphasis-card__title">Create registers a public card on the network</p>
+                <p class="hc-emphasis-card__detail">
+                  Handle, QR, and status are stored on the network. Private keys stay in this tab until
+                  you save on this device, export a backup, or keep a recovery key. Without save or
+                  backup, closing this tab means you cannot revoke or update from the web UI.
+                  humanity.llc cannot recover lost keys or revoke on your behalf. Card creation does
+                  not verify legal identity.
+                </p>
+              </div>
+            </div>
+          </div>
 
-          <button type="submit" class="btn-primary" id="submit">Create my live card</button>
+          <button type="submit" class="btn-primary flow-submit" id="submit">Create card &amp; QR</button>
           <p id="status" class="form-status" role="status"></p>
         </form>
       </main>
     </div>
-    <script type="module" src="/js/create-card.mjs?v=11"></script>
+    <script src="/js/device-status-bootstrap.mjs?v=56" type="module"></script>
+    <script src="/js/create-hub.mjs?v=1" type="module"></script>
+    <script type="module" src="/js/create-card.mjs?v=16"></script>
   </body>
 </html>

@@ -53,7 +53,7 @@ export async function insertCardWithQr(
     qrId: string;
     payload: string;
     issuedAt: string;
-    expiresAt: string;
+    expiresAt: string | null;
     credentialDocumentJson: string;
   }
 ): Promise<void> {

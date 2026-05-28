@@ -1,7 +1,7 @@
 # V1.0 Architecture Roadmap
 
 **Status:** Canonical implementation roadmap  
-**Purpose:** Single end-to-end picture of Humanity Commons v1.0—architecture, phases, boundaries, and a **numbered build sequence** to follow step by step.  
+**Purpose:** Single end-to-end picture of Humanity Commons v1.0 - architecture, phases, boundaries, and a **numbered build sequence** to follow step by step.  
 **Audience:** Founder, implementers, and agents building the reference operator on `humanity.llc`.
 
 **How to use this doc:** Work milestones in order. Do not skip exit criteria. When a step says “spec,” use the linked document for field-level detail; this roadmap defines **order and system shape**, not every JSON field.
@@ -48,6 +48,7 @@
 | `docs/V1_DECISION_LOCK.md` | Locked vs deferred product decisions |
 | `docs/V1_IMPLEMENTATION_BACKLOG.md` | Task IDs (R-001, SF-002, …) mapped to milestones below |
 | `docs/MERCH_LED_V1.md` | GTM framing: curiosity + belonging |
+| `docs/MERCH_QR_LIFECYCLE_POLICY.md` | Printed artifact QR: no calendar expiry, revoke/reprint, experiments |
 | `docs/REFERENCE_OPERATOR_DATA_POLICY.md` | What the reference operator stores |
 | `docs/features/*.md` | Feature-level requirements |
 
@@ -80,13 +81,13 @@
 
 ## 3. Architecture principles
 
-1. **Dependency is live status** — Merch is distribution; the product is “scan → current signed truth.”
-2. **Minimize operator data** — Pseudonymous `profile_id` + public key + public fields; no legal ID in core loop.
-3. **Keys stay on device** — Private keys never sent to resolver, Shopify, or Printify.
-4. **Commerce firewalled** — Payment/shipping PII never upgrades trust status; QR payloads contain no order data.
-5. **Mechanism-revealing UI** — `Vouched Human`, not “verified forever.”
-6. **Revocation is visible** — Revoked QR resolves to revoked state, not 404 silence.
-7. **Build MVP before empire** — Phase A strangers test; Phase D org tooling later.
+1. **Dependency is live status**  -  Merch is distribution; the product is “scan → current signed truth.”
+2. **Minimize operator data**  -  Pseudonymous `profile_id` + public key + public fields; no legal ID in core loop.
+3. **Keys stay on device**  -  Private keys never sent to resolver, Shopify, or Printify.
+4. **Commerce firewalled**  -  Payment/shipping PII never upgrades trust status; QR payloads contain no order data.
+5. **Mechanism-revealing UI**  -  `Vouched Human`, not “verified forever.”
+6. **Revocation is visible**  -  Revoked QR resolves to revoked state, not 404 silence.
+7. **Build MVP before empire**  -  Phase A strangers test; Phase D org tooling later.
 
 ---
 
@@ -202,12 +203,12 @@ Alternative: single Node service on Fly/Railway. Workers keep latency and cost l
 | **Card client** | Keygen, sign card, sign revoke/vouch, export | Private key local | A |
 | **Resolver** | Validate signatures; store public card; resolve QR; render scan | Cards, QR, status | A |
 | **Verification service** | Aggregate vouches; compute summary; badges | Vouches, summaries | A (display) / A+ (issue) |
-| **Scan renderer** | HTML/JSON trust-state UI + limitations | — | A |
+| **Scan renderer** | HTML/JSON trust-state UI + limitations |  -  | A |
 | **Live control module** | Challenge/response | Short-lived challenges | A.1 optional |
 | **Storefront** | Story rows, product pages, artifact intents | Intents, catalog seed | B–C |
 | **Commerce consumer** | Shopify webhooks idempotent | Commerce order links | C |
 | **Printify middleware** | Artwork upload, order create, webhooks | Print orders | C |
-| **Static site** | Narrative, policy, preview card | — | Done |
+| **Static site** | Narrative, policy, preview card |  -  | Done |
 
 ---
 
@@ -304,7 +305,7 @@ Print payloads use HTTPS URL, not only `hc://` (standards §QR).
 
 | Phase | Name | Ship to public? | Exit signal |
 |---|---|---|---|
-| **0** | Decisions | — | Copy, stack, bootstrap keys locked |
+| **0** | Decisions |  -  | Copy, stack, bootstrap keys locked |
 | **A** | **MVP digital trust** | **Yes (open create)** | Stranger scan → create without you |
 | **A.1** | Vouches | Yes | Distinct users vouch; labels understood |
 | **A.2** | Live control (optional) | Alpha / v1.1 | Not confused with legal ID |
@@ -338,7 +339,7 @@ Complete before milestone A.1. Map to backlog D-001–D-006.
 
 ## 12. Phase A: MVP (digital trust)
 
-**Goal:** A stranger can create a card, scan a QR, read honest status, and revoke—without email, without you in the room.
+**Goal:** A stranger can create a card, scan a QR, read honest status, and revoke - without email, without you in the room.
 
 ### A.1 Infrastructure
 
@@ -361,7 +362,7 @@ Complete before milestone A.1. Map to backlog D-001–D-006.
 
 ### A.4 Owner view
 
-- Minimal “my card” view: show QR, copy link, revoke (session key) — **done** (`site/created/`).
+- Minimal “my card” view: show QR, copy link, revoke (session key)  -  **done** (`site/created/`).
 - Warn on key loss (session-only revoke today).
 - **Follow-up M5.5:** encrypted key export/import + optional recovery key so revoke works from any device (`docs/M5_5_OWNER_KEY_PORTABILITY.md`).
 
@@ -380,9 +381,9 @@ Complete before milestone A.1. Map to backlog D-001–D-006.
 
 - Owner-signed revoke for card and for `print_artifact` scoped `qr_id` (schema ready even before print).
 - Scan shows revoked; sibling item QRs unaffected when only one item revoked.
-- **Product spec:** `docs/REVOKE_AND_LIFECYCLE_V1.md` — Revoke QR vs Disable card, minimal scan pages, URL/profile-id honesty, planned `display_mode`.
+- **Product spec:** `docs/REVOKE_AND_LIFECYCLE_V1.md`  -  Revoke QR vs Disable card, minimal scan pages, URL/profile-id honesty, planned `display_mode`.
 
-### A.7.1 Lifecycle UX follow-up (M4.5 — proposed)
+### A.7.1 Lifecycle UX follow-up (M4.5  -  proposed)
 
 - Rename owner whole-card action UI to **Disable card**.
 - QR-revoked scan default: **This QR is no longer valid** (minimal; hide handle/manifesto).
@@ -407,17 +408,19 @@ Complete before milestone A.1. Map to backlog D-001–D-006.
 
 ### Phase A exit criteria (MVP shipped)
 
-- [ ] 3 people outside your network create cards without assistance.
-- [ ] Each can explain what scan proves and does not prove in one sentence.
-- [ ] Revoke one QR; scan shows revoked within cache TTL.
-- [ ] No scan analytics code paths in production.
-- [ ] Data policy linked from scan page.
+- [x] 3 people outside your network create cards without assistance. **Passed 2026-05-27**
+- [x] Each can explain what scan proves and does not prove in one sentence.
+- [x] Revoke one QR; scan shows revoked within cache TTL.
+- [x] No scan analytics code paths in production.
+- [x] Data policy linked from scan page.
 
 ---
 
 ## 13. Phase B: curiosity drop (commerce-lite)
 
 **Goal:** Walking QR drives strangers to create cards; merch does not grant vouch.
+
+**Post-M5 note:** Tier 0 batch sticker is **optional** parallel curiosity. **Primary GTM wedge** is Tier 1 personalized merch (Phase C funnel shipped in code) — [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md).
 
 - Story-row store (small catalog; 1 launch SKU).
 - Batch or card-level QR on sticker (unique per-item optional later).
@@ -433,7 +436,9 @@ Complete before milestone A.1. Map to backlog D-001–D-006.
 
 **Goal:** Card holders personalize physical items; commerce vertical slice complete.
 
-**Note:** Open to all card holders with active card—not a private cohort gate (`PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`).
+**Current focus (2026-05-27):** This phase is the **first real merch launch** — Live Object hoodie / personalized sticker with unique QR per unit. Headless stack: [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md).
+
+**Note:** Open to all card holders with active card - not a private cohort gate (`PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`).
 
 - Artifact intent with planned per-item `qr_id`s.
 - Shopify cart metadata spike proven (`V1_ASSUMPTION_REGISTER.md` A-001).
@@ -473,7 +478,7 @@ Not required for MVP.
 
 Follow these steps in order. Each step lists **exit criteria** and **spec refs**. Backlog task IDs in parentheses where they exist.
 
-### Milestone M0 — Decisions (Phase 0)
+### Milestone M0  -  Decisions (Phase 0)
 
 | Step | Action | Exit | Refs |
 |---|---|---|---|
@@ -482,41 +487,41 @@ Follow these steps in order. Each step lists **exit criteria** and **spec refs**
 | 0.3 | Lock bootstrap signer model (or defer suspension to manual) | Key fingerprints documented | `V1_DECISION_LOCK` |
 | 0.4 | Confirm data policy published | Live URL works | `REFERENCE_OPERATOR_DATA_POLICY` |
 
-### Milestone M1 — Foundation
+### Milestone M1  -  Foundation
 
 | Step | Action | Exit | Refs |
 |---|---|---|---|
-| 1.1 | Create `worker/` (or `api/`) Wrangler project; bind routes | `wrangler dev` serves health | §19 — **done** (`worker/`, `npm run worker:dev`) |
-| 1.2 | D1 migrations: cards, qr_credentials, revocations, verification_summaries | Tables exist | `V1_IMPLEMENTATION_CONTRACTS` — **done** (`worker/migrations/`) |
+| 1.1 | Create `worker/` (or `api/`) Wrangler project; bind routes | `wrangler dev` serves health | §19  -  **done** (`worker/`, `npm run worker:dev`) |
+| 1.2 | D1 migrations: cards, qr_credentials, revocations, verification_summaries | Tables exist | `V1_IMPLEMENTATION_CONTRACTS`  -  **done** (`worker/migrations/`) |
 | 1.3 | Implement `GET /.well-known/hc/v1/health` | JSON version + operator id | Standards §9 |
-| 1.4 | Deploy Worker to staging + production | Route reachable on domain | — |
-| 1.5 | Implement signature verify utility + tests (C-003) | Fixture vectors pass | Backlog C-003 — **done** (`worker/src/crypto/`, `npm run worker:test`) |
+| 1.4 | Deploy Worker to staging + production | Route reachable on domain |  -  |
+| 1.5 | Implement signature verify utility + tests (C-003) | Fixture vectors pass | Backlog C-003  -  **done** (`worker/src/crypto/`, `npm run worker:test`) |
 
-### Milestone M2 — Create card (MVP core)
-
-| Step | Action | Exit | Refs |
-|---|---|---|---|
-| 2.1 | Client keygen + card document builder | Key in memory only | `features/Humanity Card v1.0.md` — **done** (`site/js/`) |
-| 2.2 | `POST /.well-known/hc/v1/cards` with signature verify | 201 + profile_id | R-001 — **done** |
-| 2.3 | Handle uniqueness + validation | 409 on duplicate | Standards §4 — **done** |
-| 2.4 | Rate limit create by IP (no PII log if possible) | 429 when abused | PROTOCOL §5 — **done** (`0002_rate_limits`) |
-| 2.5 | `/create` page on domain | User creates card E2E | A.3 — **done** (`site/create/`) |
-| 2.6 | Issue initial QR credential on create | QR payload scans | R-002 — **done** (POST bundles QR) |
-| 2.7 | Minimal owner dashboard: QR PNG/link | Owner can share | A.4 — **done** (`site/created/`) |
-
-### Milestone M3 — Scan (the product moment)
+### Milestone M2  -  Create card (MVP core)
 
 | Step | Action | Exit | Refs |
 |---|---|---|---|
-| 3.1 | `GET /c/{profile_id}?q={qr_id}` HTML template | Mobile-readable in 5s | R-002, trust model — **done** |
-| 3.2 | Trust blocks: card, human, artifact, limitations | Clear separation | §7 — **done** (`docs/M3_SCAN_PAGE_UI.md`, `worker/src/resolver/scan-html.ts`) |
+| 2.1 | Client keygen + card document builder | Key in memory only | `features/Humanity Card v1.0.md`  -  **done** (`site/js/`) |
+| 2.2 | `POST /.well-known/hc/v1/cards` with signature verify | 201 + profile_id | R-001  -  **done** |
+| 2.3 | Handle uniqueness + validation | 409 on duplicate | Standards §4  -  **done** |
+| 2.4 | Rate limit create by IP (no PII log if possible) | 429 when abused | PROTOCOL §5  -  **done** (`0002_rate_limits`) |
+| 2.5 | `/create` page on domain | User creates card E2E | A.3  -  **done** (`site/create/`) |
+| 2.6 | Issue initial QR credential on create | QR payload scans | R-002  -  **done** (POST bundles QR) |
+| 2.7 | Minimal owner dashboard: QR PNG/link | Owner can share | A.4  -  **done** (`site/created/`) |
+
+### Milestone M3  -  Scan (the product moment)
+
+| Step | Action | Exit | Refs |
+|---|---|---|---|
+| 3.1 | `GET /c/{profile_id}?q={qr_id}` HTML template | Mobile-readable in 5s | R-002, trust model  -  **done** |
+| 3.2 | Trust blocks: card, human, artifact, limitations | Clear separation | §7  -  **done** (`docs/M3_SCAN_PAGE_UI.md`, `worker/src/resolver/scan-html.ts`) |
 | 3.3 | Bearer warning on item-scoped QR | Visible above fold on mobile | Flow audit §2 |
 | 3.4 | `GET .../status` JSON | Matches HTML state | Standards §9 |
 | 3.5 | Unknown profile/QR pages | No blank 404 | R-002 |
 | 3.6 | Cache-Control per status | Revoke visible <1 min CDN | Standards §9.3 |
 | 3.7 | Link create CTA + data policy on scan | Stranger path clear | A.8 |
 
-### Milestone M4 — Revoke
+### Milestone M4  -  Revoke
 
 | Step | Action | Exit | Refs |
 |---|---|---|---|
@@ -525,17 +530,17 @@ Follow these steps in order. Each step lists **exit criteria** and **spec refs**
 | 4.3 | Item-scoped revoke (schema + API) | Sibling QRs active | Standards §QR |
 | 4.4 | Block new intents on revoked QR (stub OK pre-commerce) | 403 on intent | Flow 5 |
 
-### Milestone M5 — Landing + public launch
+### Milestone M5  -  Landing + public launch
 
 | Step | Action | Exit | Refs |
 |---|---|---|---|
 | 5.1 | Landing CTA → `/create` | No mailto gate | PROTOCOL §4 |
-| 5.2 | Run 3 stranger tests | Pass Phase A exit | §12 |
-| 5.3 | Announce public create (site + README) | — | — |
+| 5.2 | Run 3 stranger tests | Pass Phase A exit | §12 — **done** (2026-05-27) |
+| 5.3 | Announce public create (site + README) |  -  |  -  |
 
-### Milestone M5.5 — Owner key portability (follow-up; not Phase A gate)
+### Milestone M5.5  -  Owner key portability (follow-up; not Phase A gate)
 
-**Goal:** Revoke (and later rotate/vouch) from any device after create — not only the original browser tab.
+**Goal:** Revoke (and later rotate/vouch) from any device after create  -  not only the original browser tab.
 
 | Step | Action | Exit | Refs |
 |---|---|---|---|
@@ -547,7 +552,7 @@ Follow these steps in order. Each step lists **exit criteria** and **spec refs**
 
 **Does not block M5.2 stranger tests.** Phase A MVP remains: create → scan → revoke **in create session**.
 
-### Milestone M6 — Vouches (A.1)
+### Milestone M6  -  Vouches (A.1)
 
 | Step | Action | Exit | Refs |
 |---|---|---|---|
@@ -556,14 +561,16 @@ Follow these steps in order. Each step lists **exit criteria** and **spec refs**
 | 6.3 | Verification summary aggregate | Scan shows Vouched Human | V-001 |
 | 6.4 | Vouch revoke | Count updates | V-002 |
 
-### Milestone M7 — Live control (optional)
+### Milestone M7  -  Live control (optional)
+
+**Alpha plan:** `docs/M7_LIVE_CONTROL_ALPHA.md`
 
 | Step | Action | Exit | Refs |
 |---|---|---|---|
 | 7.1 | Challenge create + sign response | Scanner sees success window | R-004 |
 | 7.2 | Separate UI block; no badge issuance | Copy test pass | H-002 |
 
-### Milestone M8 — Curiosity drop (Phase B)
+### Milestone M8  -  Curiosity drop (Phase B)
 
 | Step | Action | Exit | Refs |
 |---|---|---|---|
@@ -572,7 +579,7 @@ Follow these steps in order. Each step lists **exit criteria** and **spec refs**
 | 8.3 | Shopify handoff + webhook skeleton | Test order | O-001 |
 | 8.4 | Track scan→create | Metric exists | MERCH_LED metrics |
 
-### Milestone M9 — Personalized commerce (Phase C)
+### Milestone M9  -  Personalized commerce (Phase C)
 
 | Step | Action | Exit | Refs |
 |---|---|---|---|
@@ -583,7 +590,7 @@ Follow these steps in order. Each step lists **exit criteria** and **spec refs**
 | 9.5 | Order timeline (user-safe) | Support can trace | O-003 |
 | 9.6 | End-to-end revoke printed item | Scan shows revoked | Flow 5 |
 
-### Milestone M10 — Federation prep (Phase E)
+### Milestone M10  -  Federation prep (Phase E)
 
 | Step | Action | Exit | Refs |
 |---|---|---|---|
@@ -608,7 +615,7 @@ From `V1_IMPLEMENTATION_BACKLOG.md` Phase 7:
 - H-001 security checklist (no keys server-side, no scan analytics).
 - H-002 copy comprehension (5+ testers).
 - H-002A two-minute trust loop demo.
-- H-003 stranger create (Phase A exit).
+- H-003 stranger create (Phase A exit). **Passed 2026-05-27**
 
 ### 18.3 Anti-metrics (stop and fix)
 
@@ -625,8 +632,8 @@ Current repo is docs + `site/`. Target layout as implementation proceeds:
 
 ```text
 humanity.llc/
-├── site/                    # Cloudflare Pages (static) — DONE
-├── worker/                  # Cloudflare Worker — resolver + APIs (CREATE)
+├── site/                    # Cloudflare Pages (static)  -  DONE
+├── worker/                  # Cloudflare Worker  -  resolver + APIs (CREATE)
 │   ├── src/
 │   │   ├── index.ts         # route dispatcher
 │   │   ├── resolver/        # hc/v1 handlers
@@ -664,11 +671,11 @@ Keep **specs in `docs/`**; keep **implementations** in `worker/` and `site/`. Li
 
 **Suggested command to an implementer:**
 
-> Start at **Step 1.1** (Worker project). Complete each step’s exit criteria before the next. Stop after **Step 5.3** for **MVP**. Continue M6+ only when Phase A exit criteria pass.
+> Start at **Step 1.1** (Worker project). Complete each step’s exit criteria before the next. Stop after **Step 5.3** for **MVP**. **Phase A exit criteria passed 2026-05-27** (M5 stranger tests). Continue M6+ when product priority calls for it.
 
 **Suggested command for commerce:**
 
-> Do not start M8 until M5.3 passes. Do not start M9 until Shopify spike 9.1 passes.  
+> **M5 passed 2026-05-27.** M8 may proceed subject to remaining gates in `docs/MERCH_QR_LIFECYCLE_POLICY.md`. Do not start M9 until Shopify spike 9.1 passes.  
 > **M5.5** (key export/recovery) is recommended **after M5.3** and before scaling stranger onboarding; it does not change Phase A exit criteria.
 
 This document should be updated when milestones ship: mark steps done in commit messages or a living `docs/V1_0_PROGRESS.md` if you add one later.

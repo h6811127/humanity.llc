@@ -1,7 +1,7 @@
 
 **Version:** 1.0  
 **Ratified:** [Date TBD]  
-**Duration:** Living document — amendable by collective process
+**Duration:** Living document  -  amendable by collective process
 
 ---
 

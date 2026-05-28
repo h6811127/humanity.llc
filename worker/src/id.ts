@@ -19,3 +19,37 @@ export function generateProfileId(): string {
 export function generateQrId(): string {
   return `qr_${randomBase58(16)}`;
 }
+
+/** ai_ + 16 base58 chars (artifact intent for cart/checkout metadata). */
+export function generateArtifactIntentId(): string {
+  return `ai_${randomBase58(16)}`;
+}
+
+/** pa_ + 16 base58 chars (planned print artifact; minted at fulfillment). */
+export function generatePrintArtifactId(): string {
+  return `pa_${randomBase58(16)}`;
+}
+
+/** co_ + 16 base58 chars (internal Shopify order link). */
+export function generateCommerceOrderId(): string {
+  return `co_${randomBase58(16)}`;
+}
+
+/** po_ + 16 base58 chars (Printify fulfillment order). */
+export function generatePrintOrderId(): string {
+  return `po_${randomBase58(16)}`;
+}
+
+/** lc_ + opaque base58 challenge id for short-lived live control proof. */
+export function generateLiveControlChallengeId(): string {
+  return `lc_${randomBase58(18)}`;
+}
+
+/** Opaque scanner session reference; not a user identifier. */
+export function generateVerifierSessionId(): string {
+  return `vs_${randomBase58(18)}`;
+}
+
+export function generateStewardPushConnectionId(): string {
+  return `conn_${randomBase58(16)}`;
+}

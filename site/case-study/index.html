@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Case study · humanity.llc</title>
+    <meta
+      name="description"
+      content="End-to-end walkthrough: create a live QR object, scan, update public line, revoke, and prove live control on Cloudflare Workers + D1."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=77" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=2" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <a class="top-brand top-brand--mark" href="/" aria-label="Home">
+          <span class="pass-dot" aria-hidden="true"></span>
+        </a>
+        <a class="top-create" href="/create/">Create</a>
+      </header>
+
+      <main class="screen screen-landing">
+        <section class="hero hero-compact">
+          <p class="hero-eyebrow">Case study</p>
+          <h1>One loop, fully shipped</h1>
+          <p class="hero-line">
+            A production-shaped slice on <strong>Cloudflare Workers + D1 + Pages</strong>  -  Ed25519
+            signed writes, replay-protected mutations, mechanism-visible scan UI, and automated
+            Worker tests.
+          </p>
+        </section>
+
+        <section class="group" aria-labelledby="loop-title">
+          <h2 class="group-label" id="loop-title">Try it in order</h2>
+          <ol class="case-study-steps">
+            <li class="case-study-step">
+              <span class="case-study-step-num" aria-hidden="true">1</span>
+              <div class="case-study-step-body">
+                <p class="case-study-step-title">Create</p>
+                <p class="case-study-step-desc">
+                  Generate keys in the browser, sign card + QR, POST to the resolver. Keys stay on
+                  your device unless you save recovery or encrypted backup.
+                </p>
+                <a class="case-study-step-link" href="/create/?template=status_plate"
+                  >Create a status plate</a
+                >
+              </div>
+            </li>
+            <li class="case-study-step">
+              <span class="case-study-step-num" aria-hidden="true">2</span>
+              <div class="case-study-step-body">
+                <p class="case-study-step-title">Scan</p>
+                <p class="case-study-step-desc">
+                  Open the scan link from another phone. The pass UI separates card status, QR
+                  credential, human trust, and limits.
+                </p>
+              </div>
+            </li>
+            <li class="case-study-step">
+              <span class="case-study-step-num" aria-hidden="true">3</span>
+              <div class="case-study-step-body">
+                <p class="case-study-step-title">Update</p>
+                <p class="case-study-step-desc">
+                  On <code>/created/</code>, change the public line (status plate: object name +
+                  status). Same printed QR; the network returns the new manifesto.
+                </p>
+              </div>
+            </li>
+            <li class="case-study-step">
+              <span class="case-study-step-num" aria-hidden="true">4</span>
+              <div class="case-study-step-body">
+                <p class="case-study-step-title">Revoke</p>
+                <p class="case-study-step-desc">
+                  Owner-signed revoke updates resolver state. The URL on the sticker stays; the
+                  answer changes to revoked.
+                </p>
+              </div>
+            </li>
+            <li class="case-study-step">
+              <span class="case-study-step-num" aria-hidden="true">5</span>
+              <div class="case-study-step-body">
+                <p class="case-study-step-title">Live control</p>
+                <p class="case-study-step-desc">
+                  Scanner requests a short-lived challenge; owner signs on a key-holding device.
+                  Proves recent key possession, not legal ID.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <section class="group" aria-labelledby="stack-title">
+          <h2 class="group-label" id="stack-title">What reviewers should look at</h2>
+          <ul class="list list-compact">
+            <li class="list-row list-action">
+              <a href="/architecture.html">
+                <span class="list-content">
+                  <span class="list-title">Architecture &amp; threat model</span>
+                  <span class="list-sub">Keys, revoke path, what the resolver stores</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/features-available-now.html">
+                <span class="list-content">
+                  <span class="list-title">All features</span>
+                  <span class="list-sub">Design decisions, limits, live vs partial</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a
+                href="https://github.com/h6811127/humanity.llc"
+                rel="noopener noreferrer"
+              >
+                <span class="list-content">
+                  <span class="list-title">Specs on GitHub</span>
+                  <span class="list-sub">Worker tests: npm run worker:test</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        <section class="group" aria-labelledby="limits-title">
+          <h2 class="group-label" id="limits-title">Honest limits</h2>
+          <p class="group-intro short">
+            Scan does not prove the holder owns the object. Live control alpha does not prevent
+            screenshot replay. Not KYC, not employment proof, not a social score. Merch does not
+            grant vouched status.
+          </p>
+        </section>
+
+        <nav class="dock" aria-label="Actions">
+          <a class="dock-btn" href="/">Back to landing</a>
+        </nav>
+      </main>
+    </div>
+  </body>
+</html>

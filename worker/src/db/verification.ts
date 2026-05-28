@@ -7,6 +7,7 @@ import type {
 
 export const VOUCH_THRESHOLD = 3;
 export const VOUCHER_ACTIVE_QUOTA_PER_YEAR = 5;
+export const STEWARD_VOUCHER_ISSUANCE_CAP_PER_YEAR = 3;
 export const VOUCHER_WAIT_DAYS = 90;
 
 export interface VouchCardOwner {
@@ -98,6 +99,86 @@ export async function activeVouchCountSince(
     .bind(voucherProfileId, since)
     .first<{ n: number }>();
   return row?.n ?? 0;
+}
+
+/**
+ * Yearly vouch quota (M6): counts all issuances in the window, including revoked,
+ * so revoke cannot reset quota. Re-vouch after revoke still consumes quota headroom.
+ */
+export async function voucherIssuanceCountSince(
+  db: D1Database,
+  voucherProfileId: string,
+  since: string
+): Promise<number> {
+  const row = await db
+    .prepare(
+      `SELECT COUNT(*) AS n FROM vouches
+       WHERE voucher_profile_id = ?
+         AND created_at >= ?`
+    )
+    .bind(voucherProfileId, since)
+    .first<{ n: number }>();
+  return row?.n ?? 0;
+}
+
+export async function getVouchById(
+  db: D1Database,
+  vouchId: string
+): Promise<VouchRow | null> {
+  return db
+    .prepare(
+      `SELECT vouch_id, voucher_profile_id, vouchee_profile_id, nonce, statement,
+              method, status, signed_document_json, issuer_public_key, created_at,
+              revoked_at, revoke_nonce, revoke_signed_document_json
+       FROM vouches WHERE vouch_id = ?`
+    )
+    .bind(vouchId)
+    .first<VouchRow>();
+}
+
+export async function vouchRevocationNonceUsed(
+  db: D1Database,
+  nonce: string
+): Promise<boolean> {
+  const row = await db
+    .prepare(`SELECT 1 FROM vouches WHERE revoke_nonce = ?`)
+    .bind(nonce)
+    .first();
+  return !!row;
+}
+
+export interface RevokeVouchParams {
+  vouchId: string;
+  revokedAt: string;
+  revokeNonce: string;
+  revokeSignedDocumentJson: string;
+}
+
+export async function revokeVouch(
+  db: D1Database,
+  params: RevokeVouchParams
+): Promise<VouchRow | null> {
+  const result = await db
+    .prepare(
+      `UPDATE vouches
+       SET status = 'revoked',
+           revoked_at = ?,
+           revoke_nonce = ?,
+           revoke_signed_document_json = ?
+       WHERE vouch_id = ?
+         AND status = 'active'`
+    )
+    .bind(
+      params.revokedAt,
+      params.revokeNonce,
+      params.revokeSignedDocumentJson,
+      params.vouchId
+    )
+    .run();
+  if (!result.success || (result.meta?.changes ?? 0) === 0) {
+    return null;
+  }
+  return getVouchById(db, params.vouchId);
 }
 
 export async function insertVouch(

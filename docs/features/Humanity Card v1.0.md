@@ -9,9 +9,9 @@
 
 ## 1. Executive Summary
 
-Humanity Card v1.0 is the first public release of Humanity Commons. It is not a link aggregator and it is not a decorative QR profile. It is a portable, revocable, cryptographically signed public proof-of-humanity object that a person can show online, print, wear, scan, and use as the entry point into the commons.
+Humanity Card v1.0 is the first public release of Humanity Commons. It is not a link aggregator and it is not a decorative QR profile. It is a portable, revocable, cryptographically signed root proof object that a person can show online, print, wear, scan, and use as the entry point into the commons.
 
-The core social object is the **Humanity Card**:
+The core social object is the **root Humanity Card**:
 
 - A public profile card owned by a human.
 - A signed QR credential that resolves to that card.
@@ -20,7 +20,8 @@ The core social object is the **Humanity Card**:
 - A public badge trail showing how the person entered the commons.
 - A revocation mechanism controlled by the owner.
 - A live control proof path for situations where a scanner needs recent evidence that the person nearby controls the card key.
-- A print-ready physical artifact that can be purchased through the Humanity Storefront and fulfilled through Printify Fulfillment Middleware.
+- A parent authority for child objects such as status plates, lost-item tags, printed items, stickers, hoodies, and demos.
+- A print-ready physical artifact / child object that can be purchased through the Humanity Storefront and fulfilled through Printify Fulfillment Middleware.
 
 The product promise is:
 
@@ -41,6 +42,7 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 | No fake decentralization | If only one network exists at launch, the product must say so; protocol design still supports multiple networks. |
 | No surveillance default | Scan analytics and tracking are disabled unless explicit consent rules are satisfied. |
 | Physical-digital bridge | Printing is a first-class system component, not an afterthought. |
+| One root, many objects | Users should not manage a new private key for every public object they create. |
 | Governance visible | Every card links to the constitution, technical standards, and governance process. |
 
 ---
@@ -60,6 +62,8 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 | HC-US-07 | As a card owner, I want clear warnings before any printed artifact is produced because a printed QR can outlive my current web session. |
 | HC-US-08 | As a card owner, I want to regenerate print artifacts after rotating keys or revoking a previous QR epoch. |
 | HC-US-09 | As a card owner, I want to prove live control of my card key without exposing private identity data. |
+| HC-US-09A | As a card owner, I want to create and edit child objects under my root card without managing a new key per object. |
+| HC-US-09B | As a card owner with many child objects, I want backup and recovery to restore control of the whole tree. |
 
 ### 3.2 Scanner
 
@@ -71,6 +75,7 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 | HC-US-13 | As a scanner, I want to know what data, if any, is being logged when I scan. |
 | HC-US-14 | As a scanner, I want cached cards to clearly show that they may be stale. |
 | HC-US-15 | As a scanner, I want to know that a printed QR resolves to a card but does not prove the holder is the card owner. |
+| HC-US-15A | As a scanner, I want child-object scans to show which root card controls the object without implying the object is a separate verified human. |
 | HC-US-16 | As a scanner, I want to ask the nearby card owner to prove live control of the card key. |
 | HC-US-17 | As a scanner, I want to request deeper access only through explicit consent flows. |
 
@@ -98,14 +103,14 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 
 | ID | Requirement | Priority |
 |---|---|---|
-| HC-FR-01 | System MUST generate an Ed25519 keypair on the user's device. | P0 |
+| HC-FR-01 | System MUST generate an Ed25519 root keypair on the user's device. | P0 |
 | HC-FR-02 | Private keys MUST NOT be transmitted to any Humanity network or Printify Fulfillment Middleware. | P0 |
 | HC-FR-03 | User MUST choose a unique handle matching protocol handle rules. | P0 |
 | HC-FR-04 | User MUST provide a manifesto line of 1-280 characters. | P0 |
 | HC-FR-05 | System MUST create a signed public profile document. | P0 |
 | HC-FR-06 | System MUST create a stable `profile_id` that does not encode user metadata. | P0 |
 | HC-FR-07 | System MUST issue a card version and QR epoch. | P0 |
-| HC-FR-08 | System MUST display clear backup instructions for private key and export bundle. | P0 |
+| HC-FR-08 | System MUST display clear backup instructions for private key and export bundle; backup/recovery copy must become stronger before users create many child objects or paid printed artifacts. | P0 |
 
 ### 4.2 Humanity Card Display
 
@@ -154,6 +159,15 @@ Version 1.0 must feel like a passport stamp, membership card, and public proof o
 | HC-FR-33 | Each personalized printed item MUST receive a unique item-scoped QR credential so stolen/lost items can be revoked individually. | P0 |
 | HC-FR-34 | Printed QR codes MUST resolve to a status page after expiration or revocation, not silently fail. | P0 |
 | HC-FR-35 | QR PNG/SVG/PDF outputs MUST be generated at print-safe resolution. | P0 |
+
+### 4.5B Child Objects
+
+| ID | Requirement | Priority |
+|---|---|---|
+| HC-FR-35E | Root card owner MUST be able to control supported child objects without creating a separate private key for each child. | P0 |
+| HC-FR-35F | Child objects MUST have separate lifecycle state from the root card where supported, including per-QR revoke/replace. | P0 |
+| HC-FR-35G | Child objects MUST NOT receive independent human verification, vouching authority, or Steward status. | P0 |
+| HC-FR-35H | Child-object public UI SHOULD show object state first and the root relationship second, e.g. **Controlled by @handle**. | P0 |
 
 ### 4.5A Live Control Proof
 

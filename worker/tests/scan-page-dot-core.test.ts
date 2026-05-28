@@ -1,0 +1,142 @@
+import { describe, expect, it } from "vitest";
+
+import {
+  scanCrossTabOverlayCount,
+  scanDotMarkFirstDevice,
+  scanDotOverlayFromCounts,
+  scanPageDotEligible,
+  shouldScanNoneEligibleAttentionPulse,
+} from "../../site/js/scan-page-dot-core.mjs";
+
+describe("scanPageDotEligible", () => {
+  const base = {
+    profileId: "PROFILE",
+    qrId: "QR",
+    hasCreatedKeys: false,
+    walletSigningKeyCount: 0,
+    crossTabNotice: 0,
+    liveProofPending: 0,
+    operatorDeviceFamiliar: true,
+  };
+
+  it("requires active scan profile and qr", () => {
+    expect(scanPageDotEligible({ ...base, profileId: null })).toBe(false);
+    expect(scanPageDotEligible({ ...base, qrId: null })).toBe(false);
+    expect(scanPageDotEligible(base)).toBe(false);
+  });
+
+  it("enables dynamic dot when viewer may sign or urgent overlays fire", () => {
+    expect(scanPageDotEligible({ ...base, hasCreatedKeys: true })).toBe(true);
+    expect(scanPageDotEligible({ ...base, walletSigningKeyCount: 1 })).toBe(
+      true
+    );
+    expect(scanPageDotEligible({ ...base, crossTabNotice: 1 })).toBe(true);
+    expect(scanPageDotEligible({ ...base, liveProofPending: 1 })).toBe(true);
+  });
+
+  it("mark-first: saved wallet labels alone do not enable dynamic dot", () => {
+    expect(
+      scanPageDotEligible({
+        ...base,
+        walletSigningKeyCount: 0,
+      })
+    ).toBe(false);
+  });
+
+  it("privacy gate blocks dynamic dot until origin is operator-familiar", () => {
+    expect(
+      scanPageDotEligible({
+        ...base,
+        operatorDeviceFamiliar: false,
+        walletSigningKeyCount: 1,
+      })
+    ).toBe(false);
+    expect(
+      scanPageDotEligible({
+        ...base,
+        operatorDeviceFamiliar: false,
+        hasCreatedKeys: true,
+      })
+    ).toBe(false);
+  });
+});
+
+describe("scanDotMarkFirstDevice", () => {
+  it("maps steward to keys so scan dot never reads green", () => {
+    expect(scanDotMarkFirstDevice("steward")).toBe("keys");
+    expect(scanDotMarkFirstDevice("keys")).toBe("keys");
+    expect(scanDotMarkFirstDevice("none")).toBe("none");
+    expect(scanDotMarkFirstDevice("unsaved")).toBe("unsaved");
+  });
+});
+
+describe("scanDotOverlayFromCounts", () => {
+  it("omits card_disabled_since_visit on scan (inbox-only on shell)", () => {
+    expect(
+      scanDotOverlayFromCounts(
+        { liveProofPending: 0, cardDisabledSinceVisit: 2 },
+        0
+      )
+    ).toBe("none");
+    expect(
+      scanDotOverlayFromCounts(
+        { liveProofPending: 1, cardDisabledSinceVisit: 2 },
+        0
+      )
+    ).toBe("proof_waiting");
+    expect(
+      scanDotOverlayFromCounts(
+        { liveProofPending: 0, cardDisabledSinceVisit: 2 },
+        1
+      )
+    ).toBe("cross_tab_keys");
+  });
+});
+
+describe("shouldScanNoneEligibleAttentionPulse", () => {
+  it("pulses only when transitioning into ok+none", () => {
+    expect(
+      shouldScanNoneEligibleAttentionPulse({
+        previousKey: null,
+        nextKey: "ok:none:none",
+      })
+    ).toBe(true);
+    expect(
+      shouldScanNoneEligibleAttentionPulse({
+        previousKey: "ok:steward:none",
+        nextKey: "ok:none:cross_tab_keys",
+      })
+    ).toBe(true);
+    expect(
+      shouldScanNoneEligibleAttentionPulse({
+        previousKey: "ok:none:none",
+        nextKey: "ok:none:none",
+      })
+    ).toBe(false);
+    expect(
+      shouldScanNoneEligibleAttentionPulse({
+        previousKey: "ok:none:cross_tab_keys",
+        nextKey: "ok:none:none",
+      })
+    ).toBe(false);
+    expect(
+      shouldScanNoneEligibleAttentionPulse({
+        previousKey: "ok:keys:none",
+        nextKey: "ok:steward:none",
+        reducedMotion: true,
+      })
+    ).toBe(false);
+  });
+});
+
+describe("scanCrossTabOverlayCount", () => {
+  it("matches scan banner: no overlay when keys are in this tab", () => {
+    expect(
+      scanCrossTabOverlayCount({ show: true, entries: [{ tabId: "a" }] }, true)
+    ).toBe(0);
+    expect(
+      scanCrossTabOverlayCount({ show: true, entries: [{ tabId: "a" }] }, false)
+    ).toBe(1);
+    expect(scanCrossTabOverlayCount({ show: false, entries: [] }, false)).toBe(0);
+  });
+});

@@ -30,7 +30,7 @@ describe("JCS canonicalization", () => {
   });
 
   it("preserves UTF-8 manifesto text deterministically", () => {
-    const line = "Trust — naïve café 日本";
+    const line = "Trust  -  naïve café 日本";
     const a = toCanonicalJson({ manifesto_line: line, type: "x", version: "1.0" });
     const b = toCanonicalJson({ version: "1.0", type: "x", manifesto_line: line });
     expect(a).toBe(b);

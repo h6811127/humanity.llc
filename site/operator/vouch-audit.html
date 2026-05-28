@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Vouch audit review · Operator · humanity.llc</title>
+    <meta
+      name="description"
+      content="Operator-only steward review queue for vouch audit flags."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=69" />
+  </head>
+  <body>
+    <div class="page feature-page">
+      <header class="top">
+        <a class="top-brand" href="/">
+          <span class="pass-dot" aria-hidden="true"></span>
+          <span>humanity.llc</span>
+        </a>
+        <a class="top-create" href="/created/">Created</a>
+      </header>
+
+      <main class="screen">
+        <section class="hero">
+          <p class="hero-eyebrow">Operator tool</p>
+          <h1>Vouch audit review queue</h1>
+          <p class="hero-sub">
+            Internal steward workflow for reviewing collusion-risk flags. Never expose this in
+            public scan UI.
+          </p>
+        </section>
+
+        <section class="group">
+          <h2 class="group-label">Auth</h2>
+          <label class="field-label" for="audit-token">OPERATOR_AUDIT_TOKEN</label>
+          <input id="audit-token" class="input" type="password" autocomplete="off" />
+          <p class="list-sub">Stored in this browser tab only. Required for operator endpoints.</p>
+        </section>
+
+        <section class="group">
+          <h2 class="group-label">Queue controls</h2>
+          <div class="created-keys-actions">
+            <button type="button" class="btn-secondary" id="audit-refresh">Refresh</button>
+            <button type="button" class="btn-secondary" id="audit-toggle-reviewed">
+              Hide reviewed
+            </button>
+          </div>
+          <p id="audit-status" class="list-sub" role="status" aria-live="polite"></p>
+        </section>
+
+        <section class="group">
+          <h2 class="group-label">Flags</h2>
+          <ol id="audit-flags" class="list" aria-live="polite"></ol>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="/js/operator-vouch-audit.mjs?v=2"></script>
+  </body>
+</html>
