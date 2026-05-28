@@ -19,9 +19,11 @@ import {
   productDetailRowLabel,
   productDetailShowsCardRequirement,
   productDetailShowsPersistenceWarning,
+  productDetailUsesTier0InlineCheckout,
   readProductIdFromPath,
 } from "./shop-product-detail-core.mjs";
-import { TIER0_FOUNDING_STORE_PRODUCT_ID } from "./shop-store-catalog-ids.mjs";
+import { TIER0_FOUNDING_STORE_PRODUCT_ID, TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID } from "./shop-store-catalog-ids.mjs";
+import { bindTier0ProductCheckout } from "./shop-tier0-product-checkout.mjs";
 
 const rowLabelEl = document.getElementById("product-row-label");
 const kickerEl = document.getElementById("product-kicker");
@@ -35,6 +37,8 @@ const cardReqEl = document.getElementById("product-card-requirement");
 const persistenceEl = document.getElementById("product-persistence-warning");
 const errorEl = document.getElementById("product-error");
 const mainEl = document.getElementById("product-main");
+const proofConsentEl = document.getElementById("product-proof-consent");
+const checkoutNoteEl = document.getElementById("product-checkout-note");
 
 function decorateShopCreateLinks() {
   const ref = peekMerchCreateRef();
@@ -104,7 +108,11 @@ async function initProductDetail() {
   }
 
   const merchRef =
-    productId === TIER0_FOUNDING_STORE_PRODUCT_ID ? "tier0_sticker" : "customize_shop";
+    productId === TIER0_FOUNDING_STORE_PRODUCT_ID
+      ? "tier0_sticker"
+      : productId === TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID
+        ? "tier0_shop"
+        : "customize_shop";
   persistMerchCreateRef(merchRef);
   decorateShopCreateLinks();
 
@@ -117,6 +125,17 @@ async function initProductDetail() {
     ]);
     const product = enrichProductDetail(config, catalogPayload, productPayload);
     renderProduct(product);
+    if (productDetailUsesTier0InlineCheckout(product)) {
+      bindTier0ProductCheckout({
+        config,
+        productId,
+        priceEl,
+        statusEl,
+        actionBtn,
+        proofConsentEl,
+        checkoutNoteEl,
+      });
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : "Product unavailable.";
     showError(message);

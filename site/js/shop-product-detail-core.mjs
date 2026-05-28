@@ -9,6 +9,7 @@ import {
   resolveProductPriceDisplay,
 } from "./shop-store-rows-core.mjs";
 import {
+  isTier0StoreProductId,
   storeProductActionPath,
   storeProductDetailPath,
   TIER0_FOUNDING_STORE_PRODUCT_ID,
@@ -81,6 +82,7 @@ export function productDetailActionLabel(product) {
   const productId = String(product.product_id ?? "");
   if (product.availability === "checkout") {
     if (productId === TIER0_FOUNDING_STORE_PRODUCT_ID) return "Continue to order";
+    if (isTier0StoreProductId(productId)) return "Continue to secure checkout";
     if (product.product_class === "personalized") return "Customize and checkout";
     return "Continue to checkout";
   }
@@ -91,9 +93,21 @@ export function productDetailActionLabel(product) {
 }
 
 /**
+ * Tier 0 company drops use inline checkout on the product detail page (not /shop/founding/).
+ * @param {Record<string, unknown>} product
+ */
+export function productDetailUsesTier0InlineCheckout(product) {
+  const productId = String(product.product_id ?? "");
+  return isTier0StoreProductId(productId) && productId !== TIER0_FOUNDING_STORE_PRODUCT_ID;
+}
+
+/**
  * @param {Record<string, unknown>} product
  */
 export function productDetailActionEnabled(product) {
+  if (productDetailUsesTier0InlineCheckout(product)) {
+    return true;
+  }
   return product.availability === "checkout" || product.availability === "preview";
 }
 

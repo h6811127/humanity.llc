@@ -3,11 +3,12 @@
  * See docs/MERCH_FUNNEL_MVP.md · GET /v1/store/rows.
  */
 
+import { isPersonalizeCheckoutOpen } from "./shop-config.mjs";
 import {
-  isPersonalizeCheckoutOpen,
-  isTier0CheckoutOpen,
-  tier0Display,
-} from "./shop-config.mjs";
+  isTier0StoreProductCheckoutOpen,
+  tier0ProductById,
+} from "./shop-tier0-core.mjs";
+import { isTier0StoreProductId } from "./shop-store-catalog-ids.mjs";
 import {
   isPersonalizeProductCheckoutOpen,
   personalizeProducts,
@@ -16,7 +17,6 @@ import {
   personalizableCatalogProducts,
   resolvePersonalizeProducts,
 } from "./shop-print-catalog-core.mjs";
-import { TIER0_FOUNDING_STORE_PRODUCT_ID } from "./shop-store-catalog-ids.mjs";
 
 /**
  * @param {string} origin
@@ -73,8 +73,8 @@ function personalizeProductFromConfig(config, product) {
  */
 export function resolveProductAvailability(config, catalogPayload, product) {
   const productId = String(product.product_id ?? "");
-  if (productId === TIER0_FOUNDING_STORE_PRODUCT_ID) {
-    return isTier0CheckoutOpen(config) ? "checkout" : "coming_soon";
+  if (isTier0StoreProductId(productId)) {
+    return isTier0StoreProductCheckoutOpen(config, productId) ? "checkout" : "coming_soon";
   }
 
   const configProduct = personalizeProductFromConfig(config, product);
@@ -106,9 +106,9 @@ export function resolveProductAvailability(config, catalogPayload, product) {
  */
 export function resolveProductPriceDisplay(config, product) {
   const productId = String(product.product_id ?? "");
-  if (productId === TIER0_FOUNDING_STORE_PRODUCT_ID) {
-    const display = tier0Display(config);
-    return display.price || product.price_display || null;
+  if (isTier0StoreProductId(productId)) {
+    const tier0 = tier0ProductById(config, productId);
+    return tier0?.price_display || product.price_display || null;
   }
 
   const configProduct = personalizeProductFromConfig(config, product);

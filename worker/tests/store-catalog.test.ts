@@ -5,6 +5,7 @@ import {
   getStoreCatalogProductCount,
   getStoreProductById,
   TIER0_FOUNDING_STORE_PRODUCT_ID,
+  TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID,
 } from "../src/store/store-catalog";
 
 describe("store-catalog", () => {
@@ -21,6 +22,7 @@ describe("store-catalog", () => {
     ]);
     expect(rows[1]?.products.map((product) => product.product_id)).toEqual([
       TIER0_FOUNDING_STORE_PRODUCT_ID,
+      TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID,
     ]);
   });
 

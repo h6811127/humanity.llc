@@ -147,11 +147,11 @@ A **line** is a sequence of **limited drops**, each with:
 | Capability | Status | Notes |
 |------------|--------|-------|
 | Tier 0 policy + runbook | Shipped (docs) | |
-| `/shop/` founding row + `/shop/founding/` | Shipped (sticker) | Second SKU needs catalog + config |
+| `/shop/` founding row + `/shop/founding/` | Shipped (sticker) | Glitch hoodie on **Founding objects** row → `/shop/products/tier0_glitch_hoodie_v1/` |
 | `TIER0_SHOPIFY_VARIANT_IDS` + `TIER0_CAMPAIGN_PROFILE_ID` | Operator env | All batch SKUs share **one** campaign profile unless code extended |
 | Paid webhook `tier0_batch` | Shipped | Queues batch Printify template — **wrong** for pre-printed-only Glitch unless variant excluded or manual fulfillment |
 | Democratic voting on scan text | **Not shipped** | |
-| `tier0.products[]` in `shop-config.json` | **Not shipped** | Single `tier0` block today |
+| `tier0.products[]` in `shop-config.json` | **Shipped** | `site/js/shop-tier0-core.mjs` · legacy `tier0` block still maps to founding sticker |
 
 **Engineering follow-ups** (when Glitch or Series B ships): see [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Operator setup; extend config for multiple Tier 0 SKUs; add `store-catalog` product; manual-fulfillment webhook branch if Shopify-only inventory.
 

@@ -7,6 +7,11 @@
 
 import { isTier0CheckoutOpen } from "./shop-config.mjs";
 import {
+  isTier0ProductCheckoutOpen,
+  isAnyTier0CheckoutOpen,
+  tier0Products,
+} from "./shop-tier0-core.mjs";
+import {
   isPersonalizeCheckoutReady,
   isPersonalizeProductCheckoutOpen,
   personalizeProducts,
@@ -84,17 +89,44 @@ export function validateShopConfig(config, options = {}) {
     warnings.push(`${label}: site_origin is not a valid URL`);
   }
 
-  const tier0CheckoutOpen = isTier0CheckoutOpen(config);
-  const tier0Url = trimString(config.tier0?.checkout_url);
-  if (config.tier0?.checkout_open === true && !tier0CheckoutOpen) {
-    errors.push(`${label}: tier0.checkout_open is true but checkout_url is missing or invalid`);
+  const tier0CheckoutOpen = isAnyTier0CheckoutOpen(config);
+  const tier0Catalog = tier0Products(config);
+  if (!tier0Catalog.length) {
+    warnings.push(`${label}: tier0 has no products (use tier0.products[] or legacy tier0 block)`);
   }
-  if (tier0Url && PLACEHOLDER_URL.test(tier0Url)) {
-    warnings.push(`${label}: tier0.checkout_url looks like a placeholder`);
+  for (let i = 0; i < tier0Catalog.length; i++) {
+    const product = tier0Catalog[i];
+    const productId = String(product.product_id);
+    if (product.checkout_open && !isTier0ProductCheckoutOpen(product)) {
+      errors.push(
+        `${label}: ${productId} checkout_open is true but checkout_url is missing or invalid`
+      );
+    }
+    const checkoutUrl = trimString(product.checkout_url);
+    if (checkoutUrl && PLACEHOLDER_URL.test(checkoutUrl)) {
+      warnings.push(`${label}: ${productId} checkout_url looks like a placeholder`);
+    }
+    if (checkoutUrl && !looksLikeShopifyCartPermalink(checkoutUrl)) {
+      warnings.push(
+        `${label}: ${productId} checkout_url is not a Shopify cart permalink (/cart/VARIANT:QTY) — preview/product URLs may still work but cart permalinks are preferred`
+      );
+    }
+    const variantId = trimString(product.shopify_variant_id);
+    if (variantId && PLACEHOLDER_VARIANT.test(variantId)) {
+      warnings.push(`${label}: ${productId} shopify_variant_id looks like a placeholder`);
+    }
+    if (variantId && checkoutUrl) {
+      const cartMatch = checkoutUrl.match(/\/cart\/(\d+):/);
+      if (cartMatch && cartMatch[1] !== variantId) {
+        warnings.push(
+          `${label}: ${productId} shopify_variant_id (${variantId}) does not match checkout_url variant (${cartMatch[1]})`
+        );
+      }
+    }
   }
-  if (tier0Url && !looksLikeShopifyCartPermalink(tier0Url)) {
+  if (config.tier0?.checkout_open === true && !isTier0CheckoutOpen(config)) {
     warnings.push(
-      `${label}: tier0.checkout_url is not a Shopify cart permalink (/cart/VARIANT:QTY) — preview/product URLs may still work but cart permalinks are preferred`
+      `${label}: legacy tier0.checkout_open is set but founding sticker is not checkout-ready (prefer tier0.products[])`
     );
   }
 

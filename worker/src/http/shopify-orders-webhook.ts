@@ -12,7 +12,7 @@ import {
   shopifyOrderIsPaid,
   type ShopifyOrderLike,
 } from "../commerce/shopify-order-metadata";
-import { readTier0FulfillmentConfig } from "../commerce/tier0-fulfillment-config";
+import { readTier0FulfillmentConfig, readTier0InventoryFulfillmentConfig } from "../commerce/tier0-fulfillment-config";
 import {
   getArtifactIntent,
   updateArtifactIntentStatus,
@@ -42,30 +42,36 @@ interface IntentValidation {
   profile_id: string | null;
   hold_reason: string | null;
   status: "processing" | "held_for_review";
-  fulfillment_mode: "personalized" | "tier0_batch" | null;
+  fulfillment_mode: "personalized" | "tier0_batch" | "tier0_inventory" | null;
 }
 
 function commerceOrderResponse(
   row: CommerceOrderRow,
   duplicate = false,
-  autoMint: AutoMintFromIntentsResult[] = []
+  autoMint: AutoMintFromIntentsResult[] = [],
+  fulfillmentMode: IntentValidation["fulfillment_mode"] | null = null
 ) {
   const intentIds = JSON.parse(row.artifact_intent_ids_json) as string[];
+  const printOrderIds = JSON.parse(row.print_order_ids_json) as string[];
+  const resolvedFulfillmentMode =
+    fulfillmentMode ??
+    (row.status === "processing" && intentIds.length > 0
+      ? "personalized"
+      : row.status === "processing" && intentIds.length === 0 && row.profile_id
+        ? printOrderIds.length > 0
+          ? "tier0_batch"
+          : "tier0_inventory"
+        : null);
   return {
     commerce_order_id: row.commerce_order_id,
     shopify_order_id: row.shopify_order_id,
     shopify_checkout_id: row.shopify_checkout_id,
     profile_id: row.profile_id,
     artifact_intent_ids: intentIds,
-    print_order_ids: JSON.parse(row.print_order_ids_json) as string[],
+    print_order_ids: printOrderIds,
     status: row.status,
     hold_reason: row.hold_reason,
-    fulfillment_mode:
-      row.status === "processing" && intentIds.length === 0 && row.profile_id
-        ? "tier0_batch"
-        : intentIds.length > 0
-          ? "personalized"
-          : null,
+    fulfillment_mode: resolvedFulfillmentMode,
     duplicate,
     ...(autoMint.length > 0
       ? {
@@ -166,6 +172,17 @@ async function resolvePaidOrderValidation(
     return validatePaidOrderIntents(db, metadata, nowIso);
   }
 
+  const inventory = readTier0InventoryFulfillmentConfig(env);
+  if (inventory && countTier0LineQuantity(order, inventory.shopify_variant_ids) > 0) {
+    return {
+      artifact_intent_ids: [],
+      profile_id: inventory.campaign_profile_id,
+      hold_reason: null,
+      status: "processing",
+      fulfillment_mode: "tier0_inventory",
+    };
+  }
+
   const tier0 = readTier0FulfillmentConfig(env);
   if (tier0 && countTier0LineQuantity(order, tier0.shopify_variant_ids) > 0) {
     return {
@@ -203,10 +220,24 @@ async function recoverDuplicateProcessingOrder(
   env: Env,
   db: D1Database,
   row: CommerceOrderRow,
+  order: ShopifyOrderLike,
   nowIso: string
-): Promise<{ row: CommerceOrderRow; autoMint: AutoMintFromIntentsResult[] }> {
+): Promise<{ row: CommerceOrderRow; autoMint: AutoMintFromIntentsResult[]; fulfillmentMode: IntentValidation["fulfillment_mode"] | null }> {
   if (row.status !== "processing") {
-    return { row, autoMint: [] };
+    return { row, autoMint: [], fulfillmentMode: null };
+  }
+
+  const metadata = extractShopifyOrderMetadata(order);
+  if (!metadata) {
+    return { row, autoMint: [], fulfillmentMode: null };
+  }
+
+  const validation = await resolvePaidOrderValidation(db, order, metadata, env, nowIso);
+  if (
+    validation.fulfillment_mode !== "personalized" &&
+    validation.fulfillment_mode !== "tier0_batch"
+  ) {
+    return { row, autoMint: [], fulfillmentMode: validation.fulfillment_mode };
   }
 
   const printOrderIds = await queuePrintOrderAfterPaidWebhook(db, row, nowIso);
@@ -225,6 +256,7 @@ async function recoverDuplicateProcessingOrder(
       updated_at: printOrderIds.length > 0 ? nowIso : row.updated_at,
     },
     autoMint,
+    fulfillmentMode: validation.fulfillment_mode,
   };
 }
 
@@ -235,7 +267,7 @@ async function handlePaidOrder(
   env: Env,
   nowIso: string
 ): Promise<
-  | { ok: true; row: CommerceOrderRow; duplicate: boolean; autoMint: AutoMintFromIntentsResult[] }
+  | { ok: true; row: CommerceOrderRow; duplicate: boolean; autoMint: AutoMintFromIntentsResult[]; fulfillmentMode: IntentValidation["fulfillment_mode"] | null }
   | { ok: false; response: Response }
 > {
   const metadata = extractShopifyOrderMetadata(order);
@@ -248,12 +280,13 @@ async function handlePaidOrder(
 
   const existing = await getCommerceOrderByShopifyId(db, metadata.shopify_order_id);
   if (existing) {
-    const recovered = await recoverDuplicateProcessingOrder(request, env, db, existing, nowIso);
+    const recovered = await recoverDuplicateProcessingOrder(request, env, db, existing, order, nowIso);
     return {
       ok: true,
       row: recovered.row,
       duplicate: true,
       autoMint: recovered.autoMint,
+      fulfillmentMode: recovered.fulfillmentMode,
     };
   }
 
@@ -309,18 +342,23 @@ async function handlePaidOrder(
   };
 
   if (validation.status === "processing") {
-    printOrderIds = await queuePrintOrderAfterPaidWebhook(db, row, nowIso);
-    row.print_order_ids_json = JSON.stringify(printOrderIds);
-    autoMint = await tryAutoMintQueuedPrintOrders(
-      request,
-      env,
-      db,
-      printOrderIds,
-      validation.artifact_intent_ids
-    );
+    if (
+      validation.fulfillment_mode === "personalized" ||
+      validation.fulfillment_mode === "tier0_batch"
+    ) {
+      printOrderIds = await queuePrintOrderAfterPaidWebhook(db, row, nowIso);
+      row.print_order_ids_json = JSON.stringify(printOrderIds);
+      autoMint = await tryAutoMintQueuedPrintOrders(
+        request,
+        env,
+        db,
+        printOrderIds,
+        validation.artifact_intent_ids
+      );
+    }
   }
 
-  return { ok: true, row, duplicate: false, autoMint };
+  return { ok: true, row, duplicate: false, autoMint, fulfillmentMode: validation.fulfillment_mode };
 }
 
 async function handleStatusOrder(
@@ -418,7 +456,7 @@ export async function handlePostShopifyOrdersWebhook(
     if (!paid.ok) return paid.response;
     commerceOrderId = paid.row.commerce_order_id;
     response = jsonResponse(
-      commerceOrderResponse(paid.row, paid.duplicate, paid.autoMint),
+      commerceOrderResponse(paid.row, paid.duplicate, paid.autoMint, paid.fulfillmentMode),
       200
     );
   } else if (CANCELED_TOPICS.has(topic)) {

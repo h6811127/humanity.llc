@@ -55,10 +55,40 @@
               without reprinting, but strangers may still scan old ink until you do.
             </p>
 
-            <p class="shop-checkout-note">
+            <p class="shop-checkout-note" id="product-checkout-note" hidden>
               Secure checkout runs on Shopify in this tab when available — taxes and shipping shown
               there. humanity.llc does not store your payment details.
             </p>
+
+            <fieldset
+              class="shop-proof-consent"
+              id="product-proof-consent"
+              aria-labelledby="product-proof-consent-title"
+              hidden
+            >
+              <legend class="group-label" id="product-proof-consent-title">Before you buy</legend>
+              <p class="shop-lead shop-lead-muted shop-proof-consent-lead">
+                Confirm each line before secure checkout:
+              </p>
+              <label class="shop-customize-approve shop-proof-consent-item">
+                <input type="checkbox" data-proof-consent="commerce_not_verification" />
+                <span>Buying this merch does not verify me or grant a vouch.</span>
+              </label>
+              <label class="shop-customize-approve shop-proof-consent-item">
+                <input type="checkbox" data-proof-consent="bearer_not_ownership" />
+                <span
+                  >A printed QR is a pointer — holding the item does not prove I own the Humanity
+                  Card.</span
+                >
+              </label>
+              <label class="shop-customize-approve shop-proof-consent-item">
+                <input type="checkbox" data-proof-consent="batch_qr_pointer" />
+                <span
+                  >This item uses a shared batch campaign QR — it points at live status, not proof
+                  that I hold a card.</span
+                >
+              </label>
+            </fieldset>
 
             <a class="btn-primary shop-buy-btn" id="product-action-btn" href="/shop/" hidden
               >Continue</a
@@ -99,6 +129,6 @@
         </section>
       </main>
     </div>
-    <script src="/js/shop-product-detail.mjs?v=1" type="module"></script>
+    <script src="/js/shop-product-detail.mjs?v=2" type="module"></script>
   </body>
 </html>

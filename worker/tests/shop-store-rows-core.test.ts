@@ -52,15 +52,36 @@ const ROWS = [
         cta_label: "View product",
         price_display: null,
       },
+      {
+        product_id: "tier0_glitch_hoodie_v1",
+        title: "Glitch LIVE QR hoodie",
+        meaning_line: "Company drop.",
+        product_class: "limited_drop",
+        personalization_indicator: "Company drop",
+        detail_path: "/shop/products/tier0_glitch_hoodie_v1/",
+        cta_label: "View drop",
+        price_display: "$88 + shipping",
+      },
     ],
   },
 ];
 
 const CONFIG = {
   tier0: {
-    checkout_open: true,
-    checkout_url: "https://store.example/cart/1:1",
-    price_display: "$8 + shipping",
+    products: [
+      {
+        product_id: "tier0_founding_sticker_v1",
+        checkout_open: true,
+        checkout_url: "https://store.example/cart/1:1",
+        price_display: "$8 + shipping",
+      },
+      {
+        product_id: "tier0_glitch_hoodie_v1",
+        checkout_open: false,
+        checkout_url: "",
+        price_display: "$88 + shipping",
+      },
+    ],
   },
   personalize: {
     checkout_open: true,
@@ -98,6 +119,21 @@ const CATALOG = {
 };
 
 describe("shop-store-rows-core", () => {
+  it("marks glitch hoodie coming soon when checkout gated off", () => {
+    expect(
+      resolveProductAvailability(CONFIG, CATALOG, {
+        product_id: "tier0_glitch_hoodie_v1",
+        product_class: "limited_drop",
+      })
+    ).toBe("coming_soon");
+    expect(
+      resolveProductPriceDisplay(CONFIG, {
+        product_id: "tier0_glitch_hoodie_v1",
+        price_display: "$88 + shipping",
+      })
+    ).toBe("$88 + shipping");
+  });
+
   it("marks founding product checkout from tier0 config", () => {
     expect(
       resolveProductAvailability(CONFIG, CATALOG, {

@@ -1,12 +1,28 @@
 {
-  "_operator_documentation": "Paste Shopify cart permalinks from shop-config.example.json, then personalize.checkout_open: true after physical QA — docs/MERCH_PHYSICAL_QA_RUNBOOK.md",
+  "_operator_documentation": "Tier 0 company drops: tier0.products[] — docs/COMPANY_MERCH_AND_COMMUNITY_CAMPAIGN.md. Tier 1: shop-config.example.json after physical QA.",
   "version": 1,
   "site_origin": "https://humanity.llc",
   "tier0": {
-    "product_title": "Founding signal sticker",
-    "price_display": null,
-    "checkout_url": "https://bfgy9ofdza74ybde-100263625013.shopifypreview.com/products_preview?preview_key=2872939b67efc93989e6a1a6bdf7fdf3",
-    "checkout_open": true
+    "products": [
+      {
+        "product_id": "tier0_founding_sticker_v1",
+        "title": "Founding signal sticker",
+        "price_display": null,
+        "checkout_url": "https://bfgy9ofdza74ybde-100263625013.shopifypreview.com/products_preview?preview_key=2872939b67efc93989e6a1a6bdf7fdf3",
+        "checkout_open": true,
+        "shopify_variant_id": "",
+        "fulfillment": "printify_batch"
+      },
+      {
+        "product_id": "tier0_glitch_hoodie_v1",
+        "title": "Glitch LIVE QR hoodie",
+        "price_display": "$88 + shipping",
+        "checkout_url": "",
+        "checkout_open": false,
+        "shopify_variant_id": "",
+        "fulfillment": "shopify_inventory"
+      }
+    ]
   },
   "thanks_path": "/shop/thanks/",
   "personalize": {

@@ -3,10 +3,26 @@
   "version": 1,
   "site_origin": "https://humanity.llc",
   "tier0": {
-    "product_title": "Founding signal sticker",
-    "price_display": "$12 + shipping",
-    "checkout_url": "https://YOUR-STORE.myshopify.com/cart/VARIANT_ID:1",
-    "checkout_open": true
+    "products": [
+      {
+        "product_id": "tier0_founding_sticker_v1",
+        "title": "Founding signal sticker",
+        "price_display": "$12 + shipping",
+        "checkout_url": "https://YOUR-STORE.myshopify.com/cart/VARIANT_ID:1",
+        "checkout_open": true,
+        "shopify_variant_id": "YOUR_TIER0_STICKER_VARIANT_ID",
+        "fulfillment": "printify_batch"
+      },
+      {
+        "product_id": "tier0_glitch_hoodie_v1",
+        "title": "Glitch LIVE QR hoodie",
+        "price_display": "$88 + shipping",
+        "checkout_url": "https://humanity-llc.myshopify.com/cart/YOUR_GLITCH_HOODIE_VARIANT_ID:1",
+        "checkout_open": false,
+        "shopify_variant_id": "YOUR_GLITCH_HOODIE_VARIANT_ID",
+        "fulfillment": "shopify_inventory"
+      }
+    ]
   },
   "thanks_path": "/shop/thanks/",
   "personalize": {

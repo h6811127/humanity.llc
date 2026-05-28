@@ -19,7 +19,7 @@ export const PROOF_CONSENT_COPY = {
   },
   batch_qr_pointer: {
     label:
-      "This sticker uses a batch campaign QR — it points at live status, not proof that I hold a card.",
+      "This item uses a shared batch campaign QR — it points at live status, not proof that I hold a card.",
   },
 };
 

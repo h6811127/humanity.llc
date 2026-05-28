@@ -47,6 +47,7 @@ export interface StoreCatalogRow {
 }
 
 export const TIER0_FOUNDING_STORE_PRODUCT_ID = "tier0_founding_sticker_v1";
+export const TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID = "tier0_glitch_hoodie_v1";
 
 export function storeProductDetailPath(productId: string): string {
   const id = productId.trim();
@@ -118,6 +119,24 @@ const LAUNCH_PRODUCTS: StoreCatalogProduct[] = [
     status: "published",
     row_ids: ["row_founding"],
   },
+  {
+    product_id: TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID,
+    title: "Glitch LIVE QR hoodie",
+    meaning_line: "Shared campaign QR on a fixed founding garment.",
+    story:
+      "Company merch — one live scan destination for every unit. Stewards update what strangers see on the campaign card; buying does not grant control or a vouch.",
+    product_class: "limited_drop",
+    personalization_indicator: "Company drop",
+    requires_card: false,
+    supports_personalization: false,
+    fulfillment_provider: "manual",
+    print_template_id: null,
+    price_display: "$88 + shipping",
+    detail_path: storeProductDetailPath(TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID),
+    cta_label: "View drop",
+    status: "published",
+    row_ids: ["row_founding"],
+  },
 ];
 
 const ROWS: StoreCatalogRow[] = [
@@ -137,7 +156,7 @@ const ROWS: StoreCatalogRow[] = [
     subtitle: "Tier 0 curiosity",
     story:
       "Batch artifacts with a shared campaign QR. A pointer to the experiment, not a passport. Separate from personalized wear; same honesty about limits.",
-    product_ids: [TIER0_FOUNDING_STORE_PRODUCT_ID],
+    product_ids: [TIER0_FOUNDING_STORE_PRODUCT_ID, TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID],
     sort_order: 2,
     status: "published",
   },
