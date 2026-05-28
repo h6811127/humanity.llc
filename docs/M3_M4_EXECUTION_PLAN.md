@@ -1,6 +1,6 @@
 # M3 finish + M4 revoke  -  careful execution plan
 
-**Status:** Working checklist (Phase A MVP)  
+**Status:** Phase A MVP **complete** (M5 passed 2026-05-27) — post-M5 product focus  
 **Canonical milestones:** `docs/V1_0_ARCHITECTURE_ROADMAP.md` §12–13, steps M3.3–M4.4  
 **Contracts:** `docs/V1_IMPLEMENTATION_CONTRACTS.md`, `docs/Technical Standards v1.0.md` §9–10  
 **Scan UI:** `docs/M3_SCAN_PAGE_UI.md`  
@@ -18,7 +18,7 @@
 | M3.1–M3.2 | Scan HTML: pass card + trust lists (`pass-v4`, `M3_SCAN_PAGE_UI.md`) |
 | M3.3–M3.7 | **This plan** |
 | M4 | Revoke API + owner flow (after M3 tail) |
-| M5 | Three stranger tests + public announce |
+| M5 | **Passed** (2026-05-27) — three stranger tests |
 
 **Deploy reminder:** Scan HTML is Worker-only (`npm run worker:deploy`). Pages deploy does not change `/c/…`.
 
@@ -160,14 +160,15 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ## M5  -  Launch gate (after M4)
 
-**Refs:** roadmap §12 Phase A exit; **`docs/M5_STRANGER_TEST_RUNBOOK.md`** (step-by-step)
+**Refs:** roadmap §12 Phase A exit; **`docs/M5_STRANGER_TEST_RUNBOOK.md`** (step-by-step)  
+**Passed:** 2026-05-27
 
-- [ ] 3 people outside your network create cards unassisted
-- [ ] Each explains what scan proves / does not prove in one sentence
-- [ ] Revoke one QR; scan shows revoked within cache TTL
-- [ ] No scan analytics in production paths
-- [ ] Update landing “Building now” + short public announce
-- [ ] **Then:** one vertical pilot per `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`
+- [x] 3 people outside your network create cards unassisted
+- [x] Each explains what scan proves / does not prove in one sentence
+- [x] Revoke one QR; scan shows revoked within cache TTL
+- [x] No scan analytics in production paths
+- [ ] Update landing “Building now” + short public announce (optional follow-up)
+- [ ] **Next:** one vertical pilot per `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`
 
 ---
 
@@ -225,8 +226,10 @@ Do these **in order**. Each step has an exit test before moving on.
 
 ## Current step
 
-**→ M5 stranger test batch**  -  `docs/M5_STRANGER_TEST_RUNBOOK.md` (Phase A exit gate; manual, not a code milestone).
+**→ Merch funnel MVP**  -  `docs/MERCH_FUNNEL_MVP.md` (custom LIVE OBJECT QR → Shopify → Printify → wear → ephemeral state update from `/created/`).
+
+**Phase A exit (M5):** passed 2026-05-27 — `docs/M5_STRANGER_TEST_RUNBOOK.md`.
 
 **Shipped in repo (verify on production):** Manifesto/status updates (`docs/MANIFESTO_STATUS_UPDATE.md`), A.6 QR rotation, M4.6b QR expiry extension, M7 live control Step 1, M4.4 artifact-intent gate.
 
-**Deferred (not blocking this track):** M7 Step 2 polish; resolver cron for `expired` status column.
+**Deferred (not blocking this track):** M7 Step 2 polish; resolver cron for `expired` status column; optional M5.3 public announce copy.

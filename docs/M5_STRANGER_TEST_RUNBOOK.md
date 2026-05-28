@@ -1,9 +1,11 @@
 # M5  -  Stranger test runbook (Phase A exit gate)
 
-**Status:** Active checklist  
+**Status:** **Passed** — 2026-05-27  
 **Canonical gate:** `docs/V1_0_ARCHITECTURE_ROADMAP.md` §12 Phase A exit; `docs/M3_M4_EXECUTION_PLAN.md` § M5  
 **Scanner spec:** `docs/SCANNER_EXPERIENCE.md`  
 **Prerequisite:** Worker + Pages deployed; you can create → scan → revoke in one browser session.
+
+**Outcome:** Three people outside the founder network completed create → scan → revoke without coaching. Each could state in one sentence what scan proves and what it does not. Phase A exit criteria met — see `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` for what ships next.
 
 **Goal:** Three people **outside your network** complete the loop **without you explaining the UI**. Each can say in one sentence what scan **proves** and what it **does not**.
 
@@ -96,11 +98,11 @@ Do **not** send the data policy or research page unless they ask.
 
 ## After three pass
 
-1. Check boxes in `docs/M3_M4_EXECUTION_PLAN.md` § M5.
-2. Update landing **Building now**  -  move stranger tests to done; optional one-line public note (email list, post, or hero eyebrow).
-3. **Do not** start merch (M8) or Commons Pass until M5 is checked.
+1. ~~Check boxes in `docs/M3_M4_EXECUTION_PLAN.md` § M5.~~ **Done** (2026-05-27).
+2. Optional: update landing **Building now** + one-line public note (email list, post, or hero eyebrow).
+3. ~~**Do not** start merch (M8) or Commons Pass until M5 is checked.~~ **M5 passed** — M8 may proceed subject to remaining gates in `docs/MERCH_QR_LIFECYCLE_POLICY.md`.
 4. **Recommended next:** finish M5.5 backup confidence (import on second device) if strangers struggled with “revoke later.”
-5. **Then:** harden the stranger path with **one vertical pilot**  -  see `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` (status plate, lost-item relay, organizer-signed revoke; not more hub pages).
+5. **Active:** harden the stranger path with **one vertical pilot**  -  see `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` (status plate, lost-item relay, organizer-signed revoke; not more hub pages).
 6. **Before live merch checkout:** read `docs/MERCH_QR_LIFECYCLE_POLICY.md` (no calendar expiry on artifacts, hardening sequence, reprint/revoke macros).
 
 ---
