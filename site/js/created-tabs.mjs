@@ -19,6 +19,9 @@ export const CREATED_PANEL_FOCUS = {
   manage: "created-live-scanners-see",
   /** Landing Continue (Phase 2) when setup is done but card not pinned. */
   "deploy-print": "created-deploy-print",
+  /** Create flow convergence — scroll to Add object panels on Live. */
+  "add-status-plate": "child-object-add-status-plate",
+  "add-lost-item": "child-object-add-lost-item",
 };
 
 /** @param {string} [hash] location.hash or bare key */
@@ -35,7 +38,12 @@ export function stewardFocusKeyFromHash(hash = location.hash) {
  */
 function focusCreatedPanel(select, focusKey) {
   const panelId = CREATED_PANEL_FOCUS[focusKey] || focusKey;
-  if (panelId === "live-control-proof" || panelId === "created-live-scanners-see") {
+  const livePanel =
+    panelId === "live-control-proof" ||
+    panelId === "created-live-scanners-see" ||
+    panelId === "child-object-add-status-plate" ||
+    panelId === "child-object-add-lost-item";
+  if (livePanel) {
     select("now");
   } else if (CREATED_PANEL_FOCUS[focusKey] || document.getElementById(panelId)) {
     select("advanced");

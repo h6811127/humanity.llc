@@ -1,5 +1,6 @@
 import { validateCreateFormFields } from "./create-form-validation-core.mjs";
 import { syncCreateHeroCopy } from "./create-template-copy.mjs";
+import { syncCreateFlowConvergence } from "./create-flow-convergence.mjs";
 import { formatCreateResolverError } from "./create-resolver-error-core.mjs";
 import {
   handoffMerchRefAfterCreate,
@@ -75,12 +76,24 @@ function setTemplate(template) {
   if (relayItem) relayItem.required = isRelay;
   if (relayMessage) relayMessage.required = isRelay;
   syncCreateHeroCopy(template);
+  syncCreateFlowConvergence(template);
 }
 
 templateBtns.forEach((btn) => {
   btn.addEventListener("click", () => {
     if (btn.dataset.template) setTemplate(btn.dataset.template);
   });
+});
+
+document.getElementById("create-add-object-nudge-general")?.addEventListener("click", () => {
+  setTemplate("general");
+});
+
+document.getElementById("create-add-object-nudge-primary")?.addEventListener("click", (ev) => {
+  const el = ev.currentTarget;
+  if (!(el instanceof HTMLAnchorElement) || el.href) return;
+  ev.preventDefault();
+  setTemplate("general");
 });
 
 function buildManifestoLine() {
@@ -436,6 +449,8 @@ if (urlTemplate === "status_plate") {
 
 const urlMerchRef = readMerchRefFromUrl();
 if (urlMerchRef) persistMerchCreateRef(urlMerchRef);
+
+syncCreateFlowConvergence(activeTemplate);
 
 demoBtn?.addEventListener("click", async () => {
   const handleEl = document.getElementById("handle");

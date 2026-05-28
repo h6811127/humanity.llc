@@ -2218,6 +2218,23 @@ a.hub-card-menu-item {
   padding: 0;
 }
 
+.create-add-object-nudge {
+  margin-top: 14px;
+}
+
+.create-flat-pilot-compat {
+  margin-top: 12px;
+}
+
+.create-flat-pilot-compat-summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.create-flat-pilot-compat-summary::-webkit-details-marker {
+  display: none;
+}
+
 .created-revoke-rules {
   margin: 0 0 16px;
   padding: 16px;

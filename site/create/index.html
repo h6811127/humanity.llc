@@ -306,7 +306,11 @@
 
         <form id="create-form" class="form-card flow-form-card" method="dialog" action="#" autocomplete="off" novalidate>
           <section class="flow-form-section">
-            <h2 class="group-label">Start from</h2>
+            <h2 class="group-label">Card type</h2>
+            <p class="form-hint" id="create-template-hint">
+              Start with a general Humanity Card. Add status plates and lost-item relays from Live after
+              create.
+            </p>
             <div class="create-template-row flow-segmented" role="group" aria-label="Template">
               <button type="button" class="create-template-btn is-active" data-template="general">
                 General
@@ -317,6 +321,31 @@
               <button type="button" class="create-template-btn" data-template="lost_item_relay">
                 Lost item
               </button>
+            </div>
+            <div
+              id="create-add-object-nudge"
+              class="hc-notice hc-notice--info create-add-object-nudge"
+              hidden
+              role="note"
+            >
+              <span class="hc-notice-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 16v-4M12 8h.01" />
+                </svg>
+              </span>
+              <div class="hc-notice-content">
+                <p class="hc-notice-title" id="create-add-object-nudge-title"></p>
+                <p class="hc-notice-body" id="create-add-object-nudge-body"></p>
+                <div class="hc-notice-actions">
+                  <a class="btn-secondary" id="create-add-object-nudge-primary" href="/wallet/"
+                    >Add on Live</a
+                  >
+                  <button type="button" class="hc-notice-ack" id="create-add-object-nudge-general">
+                    Use general card
+                  </button>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -349,6 +378,15 @@
             ></textarea>
             <p class="form-hint">Plain text only, 280 characters max.</p>
           </div>
+
+          <details class="create-flat-pilot-compat flow-disclosure" id="create-flat-pilot-compat" hidden>
+            <summary class="form-label create-flat-pilot-compat-summary">
+              Or create a standalone card (legacy)
+            </summary>
+            <p class="form-hint">
+              Mints a new root card and keypair — use only when you need a separate pilot card without a
+              general root.
+            </p>
 
           <div id="create-fields-status-plate" hidden>
             <label class="form-label" for="object-label">What is this plate on?</label>
@@ -395,6 +433,7 @@
               Return instructions only. Revoke when recovered or if the relay is abused.
             </p>
           </div>
+          </details>
 
           <fieldset
             id="create-fields-object-streams"
@@ -521,6 +560,6 @@
     </div>
     <script src="/js/device-status-bootstrap.mjs?v=57" type="module"></script>
     <script src="/js/create-hub.mjs?v=1" type="module"></script>
-    <script type="module" src="/js/create-card.mjs?v=16"></script>
+    <script type="module" src="/js/create-card.mjs?v=17"></script>
   </body>
 </html>

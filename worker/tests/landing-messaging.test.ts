@@ -64,14 +64,14 @@ describe("public marketing clarity (AI step 5)", () => {
 });
 
 describe("create-template-copy", () => {
-  it("status plate lead matches messaging matrix", () => {
+  it("status plate lead recommends Live add under root", () => {
     const copy = createHeroCopyForTemplate("status_plate");
-    expect(copy.lead).toMatch(/One plate · one question · open or closed right now/);
-    expect(CREATE_TEMPLATE_HERO.status_plate.title).toBe("Create a status plate");
+    expect(copy.lead).toMatch(/Live/);
+    expect(CREATE_TEMPLATE_HERO.status_plate.title).toBe("Add a status plate");
   });
 
-  it("general template keeps default card framing", () => {
-    expect(createHeroCopyForTemplate("general").title).toBe("Create a live card");
-    expect(createHeroCopyForTemplate(undefined).title).toBe("Create a live card");
+  it("general template emphasizes Humanity Card first", () => {
+    expect(createHeroCopyForTemplate("general").title).toBe("Create a Humanity Card");
+    expect(createHeroCopyForTemplate(undefined).title).toBe("Create a Humanity Card");
   });
 });

@@ -268,8 +268,8 @@ Delegated capabilities must be root-signed, scoped, expiring, revocable, and cle
 10. **Lost-item relay child UI (shipped):** `/created/` Live → **Add lost-item relay** for general root cards; register, update return message, issue scan link, disable relay — mirrors status plate flow with `object_type: lost_item_relay` and `[relay]` scan layout via `childObjectManifestoLine()`.
 11. **Browser signing fix (shipped):** `hc-sign.mjs` `requireFields()` accepts `parent_profile_id` for `child_object` payloads (create/update/revoke were failing client-side before POST).
 12. **Resolver child list (first slice shipped):** read-only `GET /.well-known/hc/v1/cards/{profile_id}/objects`; `/created/` reconciles `hc_child_objects_v1` from network on Live panel refresh.
-13. **Hub tree rows (first slice shipped):** nested child rows under general root in **My cards** / expanded hub; reconcile on hub render via `reconcileChildObjectsForProfileIds`; no child entries in `hc_wallet`. **Next:** create flow convergence (step 14).
-14. **Create flow convergence (planned):** `/create/` nudges general root; status plate / lost item primary path becomes **Add object** on `/created/`; flat templates remain compatibility.
+13. **Hub tree rows (first slice shipped):** nested child rows under general root in **My cards** / expanded hub; reconcile on hub render via `reconcileChildObjectsForProfileIds`; no child entries in `hc_wallet`. **Next:** register + first QR (step 15).
+14. **Create flow convergence (first slice shipped):** `/create/` emphasizes general Humanity Card; status plate / lost item show Add-on-Live nudge when a general root with keys exists; legacy standalone pilot forms stay in a disclosure; landing copy updated. **Next:** register + first QR (step 15).
 15. **Register + first QR (planned):** combine object create and first `issue-qr` in one steward action where product copy allows.
 16. **Backup gate (planned):** block or strongly warn before N active child objects without encrypted backup / recovery acknowledged.
 17. **Delegated capabilities:** add scoped, expiring, root-signed child keys only after real team/event use cases demand them.

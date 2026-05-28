@@ -8,19 +8,19 @@
 /** @type {Record<CreatePilotTemplate, { title: string; lead: string }>} */
 export const CREATE_TEMPLATE_HERO = {
   general: {
-    title: "Create a live card",
+    title: "Create a Humanity Card",
     lead:
-      "One tap registers your card on the network and issues a signed QR to print or share. Scans show live status — active, revoked, or expired — not a frozen link.",
+      "One general root card on the network — add status plates, lost-item relays, and more from Live after create. Same signed QR model: live status, not a frozen link.",
   },
   status_plate: {
-    title: "Create a status plate",
+    title: "Add a status plate",
     lead:
-      "One plate · one question · open or closed right now. Same QR — update the status line on Live without reprinting.",
+      "Recommended: add under an existing general card on Live — one root key, nested in My cards. Standalone plate cards below stay available for legacy pilots.",
   },
   lost_item_relay: {
-    title: "Create a lost item relay",
+    title: "Add a lost-item relay",
     lead:
-      "Tag the item — finders see a live return path, not your phone number. Revoke on Manage when recovered.",
+      "Recommended: add under an existing general card on Live — one root key, no phone number on the tag. Standalone relay cards below stay available for legacy pilots.",
   },
 };
 
