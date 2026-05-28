@@ -46,7 +46,7 @@ Delegated payloads must be **root-signed**, **scoped**, **expiring**, and **revo
 
 First slice should be minimal:
 
-1. **Schema** — `delegated_capabilities` or signed capability document shape (no default child private keys in wallet).
+1. **Schema** — [`DELEGATED_CHILD_CAPABILITY_SCHEMA.md`](DELEGATED_CHILD_CAPABILITY_SCHEMA.md) (draft RFC; no migration until G1–G5 pass).
 2. **Resolver** — verify root-signed delegation + enforce scope on existing child-object routes before accepting delegated signer.
 3. **Steward UI** — issue/revoke delegation on `/created/` Manage; never on scan or `/create/`.
 4. **Tests** — scope boundary, expiry, root override, no vouch/trust fields on delegation.

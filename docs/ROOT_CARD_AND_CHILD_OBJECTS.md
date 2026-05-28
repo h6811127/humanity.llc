@@ -272,7 +272,7 @@ Delegated capabilities must be root-signed, scoped, expiring, revocable, and cle
 14. **Create flow convergence (first slice shipped):** `/create/` emphasizes general Humanity Card; status plate / lost item show Add-on-Live nudge when a general root with keys exists; legacy standalone pilot forms stay in a disclosure; landing copy updated.
 15. **Register + first QR (first slice shipped):** `/created/` Add status plate / lost-item relay runs register + first `issue-qr` in one action (`child-object-register-issue.mjs`); per-row **Issue scan link** remains for retries and legacy rows.
 16. **Backup gate (first slice shipped):** warn before a 2nd active child object without backup seatbelt; block a 3rd+ until `recovery_key_acknowledged`, encrypted backup export, or backup import (`child-object-backup-gate-core.mjs`, threshold `2`).
-17. **Delegated capabilities (deferred):** scoped, expiring, root-signed child keys — **do not implement** until product gates in [`DELEGATED_CHILD_CAPABILITIES_GATE.md`](DELEGATED_CHILD_CAPABILITIES_GATE.md) pass (named team/event pilot, capability matrix, anti-surveillance review).
+17. **Delegated capabilities (deferred):** scoped, expiring, root-signed child keys — **do not implement** until product gates in [`DELEGATED_CHILD_CAPABILITIES_GATE.md`](DELEGATED_CHILD_CAPABILITIES_GATE.md) pass (named team/event pilot, capability matrix, anti-surveillance review). Schema RFC: [`DELEGATED_CHILD_CAPABILITY_SCHEMA.md`](DELEGATED_CHILD_CAPABILITY_SCHEMA.md).
 
 **Sequence status:** Steps **1–16 shipped** (May 2026). Step **17** is the next **product-gated** slice, not the next default engineering slice.
 

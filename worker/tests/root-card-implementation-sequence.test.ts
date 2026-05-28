@@ -18,8 +18,24 @@ describe("root-card implementation sequence", () => {
   it("links delegated capabilities gate doc from step 17", () => {
     const src = readFileSync(ROOT_CARD_DOC, "utf8");
     expect(src).toContain("DELEGATED_CHILD_CAPABILITIES_GATE.md");
+    expect(src).toContain("DELEGATED_CHILD_CAPABILITY_SCHEMA.md");
     const gate = readFileSync(GATE_DOC, "utf8");
     expect(gate).toContain("Deferred");
     expect(gate).toContain("G1");
+    expect(gate).toContain("DELEGATED_CHILD_CAPABILITY_SCHEMA.md");
+  });
+
+  it("companion hub docs reflect shipped nested child rows (step 13)", () => {
+    const hubDoc = readFileSync(
+      join(process.cwd(), "docs/DEVICE_HUB_AND_LOCAL_SEARCH.md"),
+      "utf8"
+    );
+    const keysDoc = readFileSync(
+      join(process.cwd(), "docs/KEYS_CARDS_AND_VERIFICATION.md"),
+      "utf8"
+    );
+    expect(hubDoc).toContain("first slice shipped");
+    expect(hubDoc).not.toContain("not hub rows yet");
+    expect(keysDoc).not.toContain("hub rows are root-only");
   });
 });
