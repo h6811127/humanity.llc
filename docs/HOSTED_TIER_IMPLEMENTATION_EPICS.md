@@ -351,7 +351,7 @@ Engineering checklist once M4 governance checklist is signed ([`HOSTED_TIER_PRIC
 | 3a | `OPERATOR_AUDIT_TOKEN` (required) | Worker wrangler secret + GitHub for E6.2 — `npm run hosted:rollout:step3a` · `npm run hosted:rollout:step3a -- --smoke` (auth gate before secret) · verify `OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step3a` · `hosted:rollout:step3` aliases step3a |
 | 3b | `STRIPE_WEBHOOK_SECRET` (after G8) | Deferred — `npm run hosted:rollout:step3b` (notes only). Not required for steps 4–6. |
 | 4a | Enable hosted flag in wrangler | **Shipped** — `HOSTED_STEWARD_ENABLED=1` in `worker/wrangler.toml` · `npm run hosted:rollout:step4a -- --apply` |
-| 4b | Deploy + verify production | `npm run hosted:rollout:step4 -- --deploy` · `npm run hosted:rollout:step4 -- --smoke` (health + hosted routes on; local `API_ORIGIN=http://127.0.0.1:8787` after 4a) · verify `npm run hosted:rollout:step4 -- --verify` · `OPERATOR_AUDIT_TOKEN=... npm run hosted:rollout:step4 -- --verify` |
+| 4b | Deploy + verify production | **Preflight:** `npm run hosted:rollout:step4b -- --preflight` · local smoke: `API_ORIGIN=http://127.0.0.1:8787 npm run hosted:rollout:step4b -- --local-smoke` · **Production:** `npm run hosted:rollout:step4b -- --deploy` · `--smoke` · `OPERATOR_AUDIT_TOKEN=... npm run hosted:rollout:step4b -- --verify` (aliases `hosted:rollout:step4`) |
 | 5a | Pin CF dashboard (E6.1) | Manual — `npm run hosted:rollout:step5a` · [`HOSTED_STEWARD_CF_DASHBOARD.md`](HOSTED_STEWARD_CF_DASHBOARD.md) |
 | 5b | E6.2 CI + verify | GitHub `OPERATOR_AUDIT_TOKEN` + runbook — `npm run hosted:rollout:step5` · verify `npm run hosted:rollout:step5 -- --verify` |
 | 6 | Regression | `npm run hosted:rollout:step6` · full verify `npm run hosted:rollout:step6 -- --verify` · Vitest only `npm run hosted:rollout:step6 -- --vitest` · E2E only `npm run hosted:rollout:step6 -- --e2e` |
@@ -413,6 +413,7 @@ Engineering checklist once M4 governance checklist is signed ([`HOSTED_TIER_PRIC
 
 | Date | Note |
 |------|------|
+| 2026-05-28 | **Rollout step 4b:** `hosted:rollout:step4b` preflight + local-smoke + production deploy/smoke/verify aliases |
 | 2026-05-28 | **Rollout step 4a:** `HOSTED_STEWARD_ENABLED=1` committed in `worker/wrangler.toml` |
 | 2026-05-28 | **Rollout step 4b:** `hosted:rollout:step4 -- --smoke` (health + hosted routes on; mirrors step 2 `--smoke`) |
 | 2026-05-27 | **G0 signed** (Governance + Ops, solo founder); Legal pending — production rollout unlocked |

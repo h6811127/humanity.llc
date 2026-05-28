@@ -212,12 +212,12 @@ export async function smokeStewardOpsHostedEnabled(bearerToken, origin = apiOrig
   console.log("steward-ops OK (hosted_steward_enabled=true)");
 }
 
-async function smokeProduction() {
-  await smokeProductionHealth();
-  await smokeHostedPlansEnabled();
-  await smokeHostedStewardRoutesEnabled();
+export async function smokeProduction(origin = apiOrigin) {
+  await smokeProductionHealth(origin);
+  await smokeHostedPlansEnabled(origin);
+  await smokeHostedStewardRoutesEnabled(origin);
   if (token) {
-    await smokeStewardOpsHostedEnabled(token);
+    await smokeStewardOpsHostedEnabled(token, origin);
   } else {
     console.log(
       "\nℹ️  Set OPERATOR_AUDIT_TOKEN to also smoke steward-ops hosted_steward_enabled=true."
