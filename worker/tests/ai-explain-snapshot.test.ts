@@ -90,6 +90,9 @@ describe("ai explain snapshot", () => {
         { DB: db }
       );
       expect(res.status).toBe(429);
+      const body = (await res.json()) as { message: string };
+      expect(body.message).toContain("plain-language");
+      expect(body.message).not.toContain("AI explain");
     } finally {
       vi.useRealTimers();
     }
