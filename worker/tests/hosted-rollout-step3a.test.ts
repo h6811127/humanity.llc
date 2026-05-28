@@ -13,7 +13,12 @@ describe("hosted-rollout-step3a", () => {
     expect(script).toContain("OPERATOR_AUDIT_TOKEN");
     expect(script).toContain("worker:check-steward-ops");
     expect(script).toContain("steward-ops");
-    expect(script).toContain("hosted:rollout:step4");
+    expect(script).toContain("--smoke");
+    expect(script).toContain("smokeStewardOpsAuthGate");
+    expect(existsSync(join(repoRoot, "worker/tests/hosted-rollout-step3a-smoke.test.ts"))).toBe(
+      true
+    );
+    expect(script).toContain("hosted:rollout:step4a");
     expect(script).not.toContain("Re-run with --stripe-check");
   });
 

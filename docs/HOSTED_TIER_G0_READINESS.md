@@ -32,6 +32,15 @@ npm run verify:hosted-g0
 
 Equivalent to `worker:test:hosted-free-tier` + `worker:test:steward-hosted`.
 
+**Roadmap step 3 (session link + rollout smoke unit tests):**
+
+```bash
+npm run hosted:rollout:verify-path
+npm run hosted:rollout:verify-path -- --e2e
+```
+
+See [`STEWARD_DEVICE_ROADMAP.md`](STEWARD_DEVICE_ROADMAP.md) § Current engineering steps.
+
 **Playwright (hosted E2E — run before production flag on):**
 
 ```bash
@@ -88,6 +97,7 @@ npm run hosted:rollout:step2 -- --deploy --smoke    # deploy Worker + smoke heal
 
 ```bash
 npm run hosted:rollout:step3a
+npm run hosted:rollout:step3a -- --smoke   # steward-ops route + auth gate (no token in env)
 # After wrangler + GitHub secrets are set:
 OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step3a
 ```
@@ -175,5 +185,6 @@ Checklist: [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) §
 
 | Date | Note |
 |------|------|
+| 2026-05-28 | **Rollout step 3a:** `hosted:rollout:step3a -- --smoke` checks steward-ops auth gate before bearer verify |
 | 2026-05-27 | G0 readiness packet — engineering verification + ops parallel checklist |
 | 2026-05-27 | **G0 signed** (Governance + Ops); Legal pending |

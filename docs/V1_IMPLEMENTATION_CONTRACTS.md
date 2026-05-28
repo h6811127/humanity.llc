@@ -158,9 +158,9 @@ Required fields:
 
 Allowed `status`: `active`, `revoked`, `suspended`, `expired`.
 
-### Child Object (target)
+### Child Object (shipped)
 
-Child object endpoints are not routed in the current implementation, but new build slices should converge on this parent-signed shape instead of minting a new root card for every status plate, lost-item tag, or merch object:
+Parent-signed create/update/revoke routes are live under `/.well-known/hc/v1/cards/{profile_id}/objects`. Browser signing: `site/js/child-object-update.mjs`. New build slices should converge on this parent-signed shape instead of minting a new root card for every status plate, lost-item tag, or merch object:
 
 ```json
 {
