@@ -65,7 +65,7 @@ Do **not** turn on live Shopify checkout (`checkout_open: true`) until the digit
 
 | Order | Gate | Doc |
 |-------|------|-----|
-| 1 | **M5 stranger test** — 3 people outside your network complete scan → create → revoke without coaching | [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) |
+| 1 | ~~**M5 stranger test**~~ — 3 people outside your network complete scan → create → revoke without coaching | [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) — **passed 2026-05-27** |
 | 2 | **Production P0 fixes** deployed and re-verified (e.g. `/created/` fake ID, disabled-since-visit false positive) | [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) |
 | 3 | **Safari / device shell** smoke (P0-W) | [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) |
 | 4 | **One vertical pilot** on a real object (status plate, lost-item relay) | [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md) |
@@ -369,7 +369,7 @@ Before `checkout_open: true` on production:
 | [`V1_IMPLEMENTATION_CONTRACTS.md`](V1_IMPLEMENTATION_CONTRACTS.md) | `print_artifact` mint rules |
 | [`V1_ASSUMPTION_REGISTER.md`](V1_ASSUMPTION_REGISTER.md) | A-004 print QA · A-006 per-item QR · A-012G comprehension |
 | [`CARD_RETENTION_AND_ORPHAN_CLEANUP.md`](CARD_RETENTION_AND_ORPHAN_CLEANUP.md) | Orphan purge vs live merch QR |
-| [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) | Gate before money |
+| [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) | Gate before money (**passed** 2026-05-27) |
 | [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) | Trust bugs before checkout |
 | [`TIER0_CAMPAIGN_QR_RUNBOOK.md`](TIER0_CAMPAIGN_QR_RUNBOOK.md) | Batch sticker QR + rotate drill |
 | [`MERCH_SUPPORT_MACROS.md`](MERCH_SUPPORT_MACROS.md) | Support reply templates |

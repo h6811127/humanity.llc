@@ -1,8 +1,8 @@
 # Manifesto / status line updates (post-create)
 
-**Status:** Active  -  current Phase A product focus  
+**Status:** Active — current post-M5 product focus
 **Parent:** `docs/ROOT_CARD_AND_CHILD_OBJECTS.md` · `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` (status plate, lost-item relay)  
-**Skipped for now:** M5 stranger gate batch, M7 Step 2 polish (see `docs/M3_M4_EXECUTION_PLAN.md`)
+**Deferred:** M7 Step 2 polish (see `docs/M3_M4_EXECUTION_PLAN.md`)
 
 ---
 
