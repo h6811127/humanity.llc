@@ -22,7 +22,7 @@ import {
   QR_ID_REGEX,
   type ScanPageKind,
 } from "./scan-state";
-import type { Env } from "../index";
+import type { Env } from "../env";
 import { notifyLiveProofPending } from "../steward/push";
 import { enforceStewardAutoPollQuota } from "../steward/quota";
 import {

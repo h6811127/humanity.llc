@@ -3,15 +3,15 @@
 **Opened:** 2026-05-26  
 **Status:** **Active** - product/ops constraint; client polling must change before production scale  
 **Audience:** Product, frontend, operators  
-**Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) (saved-card scale) · [`UI_UX_REVERT_PLAN.md`](UI_UX_REVERT_PLAN.md) · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md)
+**Related:** [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) (saved root-card scale) · [`UI_UX_REVERT_PLAN.md`](UI_UX_REVERT_PLAN.md) · [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md)
 
 ---
 
 ## Why this doc exists
 
-Humanity Commons is meant to be a **simple** reference site: static Pages + a small Worker resolver. In practice, the **device shell** can generate more Worker traffic than organic scans and creates combined - enough to exhaust the **Workers Free daily cap (100,000 requests/day)** in minutes when a steward leaves `/wallet/` open with many saved cards.
+Humanity Commons is meant to be a **simple** reference site: static Pages + a small Worker resolver. In practice, the **device shell** can generate more Worker traffic than organic scans and creates combined - enough to exhaust the **Workers Free daily cap (100,000 requests/day)** in minutes when a steward leaves `/wallet/` open with many saved root cards or later many watched child objects.
 
-That is not “the site went viral.” It is **N cards × poll interval × open tabs**, mostly from **live-proof inbox** and **wallet status** fetches documented below.
+That is not “the site went viral.” It is **N roots/objects × poll interval × open tabs**, mostly from **live-proof inbox** and **wallet status** fetches documented below.
 
 **Cloudflare Error 1027** (`workers_daily_limit`) is an account quota event. Client mitigations (backoff, suppress since-visit UI when degraded) do not replace fixing the **poll budget**.
 
@@ -26,7 +26,7 @@ Humanity Commons is **not** a wallet monitoring service. It is a **reference res
 | “Last checked on **this device** …” | “Always live” / “real-time dashboard” for every saved card |
 | “Tap **Check network**” or “**Check for live proof**” when you care | That the server is watching your wallet 24/7 |
 | **Watch for live proof** is **opt-in** | That saving a card turns on background polling |
-| **1–5 saved cards** is comfortable; **10+** is power-user / out of spec until budget fixes land | Unlimited multi-card stewardship with no cost |
+| **1–5 saved root cards** is comfortable; **10+** is power-user / out of spec until budget fixes land. Many child objects should be managed under one root, but automatic checks still need explicit budgets. | Unlimited multi-card or multi-object stewardship with no cost |
 
 Stewards get **power when they intend it** (buttons, watch toggle, `/created/` signing surface). They do **not** get unlimited free infrastructure just by leaving `/wallet/` open.
 

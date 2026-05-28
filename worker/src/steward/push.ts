@@ -4,7 +4,7 @@
  */
 import { OPERATOR_ID } from "../http/resolver";
 import { generateStewardPushConnectionId } from "../id";
-import type { Env } from "../index";
+import type { Env } from "../env";
 import { hostedStewardEnabled } from "./config";
 import {
   incrementUsage,

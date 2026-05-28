@@ -33,6 +33,7 @@ describe("device-resolver-sync-core", () => {
           profile_id: "p1",
           status: "active",
           scanKind: "active",
+          qrScope: "print_artifact",
           cachedAt: 999,
           resolverConfirmed: true,
           alertState: "active",
@@ -41,6 +42,7 @@ describe("device-resolver-sync-core", () => {
     });
     expect(parsed?.entries).toHaveLength(1);
     expect(parsed?.entries[0].profile_id).toBe("p1");
+    expect(parsed?.entries[0].qrScope).toBe("print_artifact");
   });
 
   it("rejects invalid snapshot payloads", () => {
@@ -139,6 +141,7 @@ describe("device-resolver-sync-core", () => {
           profile_id: "p1",
           status: "active",
           scanKind: "active",
+          qrScope: "print_artifact",
           verification: { label: "Steward", state: "steward" },
           cachedAt: 50,
           resolverConfirmed: true,
@@ -150,6 +153,7 @@ describe("device-resolver-sync-core", () => {
     expect(merged.p1).toMatchObject({
       status: "active",
       scanKind: "active",
+      qrScope: "print_artifact",
       verificationLabel: "Steward",
       at: 50,
     });

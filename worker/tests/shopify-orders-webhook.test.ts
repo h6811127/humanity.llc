@@ -4,7 +4,7 @@ import type { ArtifactIntentRow } from "../src/db/artifact-intents";
 import type { CommerceOrderRow } from "../src/db/commerce-orders";
 import type { PrintOrderRow } from "../src/db/print-orders";
 import { handlePostShopifyOrdersWebhook } from "../src/http/shopify-orders-webhook";
-import type { Env } from "../src/index";
+import type { Env } from "../src/env";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const INTENT = "ai_PaidWebhookTest01";
