@@ -554,6 +554,105 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(result.setTimeoutMock.mock.calls[0][1]).toBeGreaterThan(0);
   });
 
+  it("expires the live proof request when the challenge countdown reaches zero", async () => {
+    const intervalCallbacks: Array<() => void> = [];
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: summary(),
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    const script = extractLiveControlScript(html);
+    type FakeElement = {
+      disabled?: boolean;
+      textContent?: string;
+      hidden?: boolean;
+      href?: string;
+      classList?: { add?: ReturnType<typeof vi.fn>; remove?: ReturnType<typeof vi.fn> };
+      setAttribute?: ReturnType<typeof vi.fn>;
+      getAttribute?: ReturnType<typeof vi.fn>;
+    };
+    const elements: Record<string, FakeElement> = {
+      "live-control-request": {
+        disabled: true,
+        textContent: "Waiting…",
+        addEventListener: vi.fn(),
+      },
+      "live-control-status": { textContent: "" },
+      "live-control-status-panel": { classList: { toggle: vi.fn() } },
+      "live-control-interactive": { hidden: false },
+      "live-control-success": {
+        hidden: true,
+        setAttribute: vi.fn(),
+        getAttribute: vi.fn(() => null),
+      },
+      "live-control-proven-at": { textContent: "" },
+      "live-control-proven-ago": {
+        textContent: "",
+        setAttribute: vi.fn(),
+        getAttribute: vi.fn(() => null),
+      },
+      "live-control-row": { classList: { add: vi.fn(), remove: vi.fn() } },
+      "live-control-owner-panel": { hidden: false },
+      "live-control-owner-link": { href: "https://humanity.llc/created/" },
+      "live-control-owner-view": { hidden: true },
+      "live-control-owner-copy": { textContent: "" },
+      "live-control-owner-created-link": { href: "" },
+    };
+    const fetchMock = vi.fn(async () => ({
+      json: async () => ({
+        status: "pending",
+        expires_at: new Date(Date.now() - 1_000).toISOString(),
+        owner_url: "https://humanity.llc/created/?live_challenge=lc_test",
+      }),
+    }));
+    const setIntervalMock = vi.fn((cb: () => void) => {
+      intervalCallbacks.push(cb);
+      return intervalCallbacks.length;
+    });
+
+    runInNewContext(script, {
+      Date,
+      Error,
+      Number,
+      URLSearchParams,
+      encodeURIComponent,
+      document: {
+        getElementById: (id: string) => elements[id] ?? null,
+      },
+      fetch: fetchMock,
+      location: {
+        origin: "https://humanity.llc",
+        search: `?q=${QR}&live_challenge=${LIVE_CHALLENGE}`,
+      },
+      window: {
+        clearInterval: vi.fn(),
+        clearTimeout: vi.fn(),
+        setInterval: setIntervalMock,
+        setTimeout: vi.fn(() => 1),
+      },
+    });
+
+    for (let i = 0; i < 8; i++) {
+      await Promise.resolve();
+    }
+
+    expect(fetchMock).toHaveBeenCalled();
+    expect(intervalCallbacks.length).toBeGreaterThan(0);
+    intervalCallbacks[0]();
+
+    expect(elements["live-control-status"]?.textContent).toBe(
+      "Control was not proven. The request expired."
+    );
+    expect(elements["live-control-request"]?.disabled).toBe(false);
+    expect(elements["live-control-request"]?.textContent).toBe("Ask for live proof");
+  });
+
   it("clears stale owner proof link before a new live proof request resolves", async () => {
     const vm = buildScanViewModel(
       PROFILE,
