@@ -3,7 +3,7 @@
  * @see docs/SCAN_PAGE_TRUST_UI.md
  */
 import { getTabSession } from "./device-keys.mjs";
-import { loadWallet } from "./device-wallet.mjs";
+import { getWalletCount } from "./device-wallet.mjs";
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
 import {
   SCAN_ACTOR_BAND_REVEAL_MS,
@@ -31,7 +31,7 @@ function gatherEligibility() {
     qrId,
     scanActive,
     hasCreatedKeys: Boolean(session?.owner_private_key_b58),
-    savedWalletCount: loadWallet().length,
+    savedWalletCount: getWalletCount(),
     hasDefaultVouchProfile: Boolean(getDefaultVouchProfileId()),
   });
 }

@@ -11,7 +11,7 @@ import {
   openLiveControlProof,
 } from "./device-live-control-inbox.mjs";
 import { openCardNowPage } from "./device-keys.mjs";
-import { loadWallet } from "./device-wallet.mjs";
+import { findWalletEntryByProfileId } from "./device-wallet.mjs";
 import {
   actOnOrphanRemovedTabKeys,
 } from "./device-orphan-keys-nav.mjs";
@@ -269,9 +269,7 @@ export function renderInboxSheet() {
       }
       if (row.kind === "card_disabled_since_visit" && row.cardDisabledEntry) {
         logInboxDiagnostic({ type: "inbox_item_action", kind: row.kind, outcome: "open_card" });
-        const entry = loadWallet().find(
-          (e) => e.profile_id === row.cardDisabledEntry?.profile_id
-        );
+        const entry = findWalletEntryByProfileId(row.cardDisabledEntry?.profile_id);
         if (entry) openCardNowPage(entry);
       }
     });

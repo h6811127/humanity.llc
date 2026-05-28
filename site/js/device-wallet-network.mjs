@@ -35,6 +35,7 @@ import {
   getWalletNetworkTruthPollScanKind,
   hasWalletNetworkTruthPoll,
   isWalletNetworkTruthPollConfirmed,
+  listWalletNetworkTruthPollProfileIds,
   resetWalletNetworkTruth,
   setWalletNetworkTruthFromCacheOnly,
   setWalletNetworkTruthFromPoll,
@@ -45,6 +46,7 @@ export { readCachedVerification };
 export {
   getWalletNetworkTruthChipStatus,
   isSinceVisitBlockedChipStatus,
+  listWalletNetworkTruthPollProfileIds,
   shouldSuppressCardDisabledSinceVisitFromTruth,
 } from "./device-wallet-network-truth.mjs";
 
@@ -98,9 +100,8 @@ function syncWalletNetworkTruthFromPoll(
     entriesInPoll.map((e) => e.profile_id).filter((pid) => typeof pid === "string" && pid)
   );
 
-  for (const entry of loadWallet()) {
-    const pid = entry.profile_id;
-    if (!pid) continue;
+  const idsToSync = new Set([...listWalletNetworkTruthPollProfileIds(), ...polledIds]);
+  for (const pid of idsToSync) {
     if (!polledIds.has(pid)) {
       demoteWalletNetworkTruthToCacheOnly(pid);
       continue;
@@ -288,10 +289,10 @@ export function getLatestResolvedScanKind(profileId) {
 
 /**
  * Maps for since-visit UI from resolver-confirmed reads this visit only (SSOT).
- * @param {Array<{ profile_id?: string }>} [entries] defaults to {@link loadWallet}
+ * @param {Array<{ profile_id?: string }>} [entries] omit to use truth poll profile ids only
  */
 export function buildResolverConfirmedWalletPollMaps(entries) {
-  return buildSinceVisitPollMapsFromTruth(entries ?? loadWallet());
+  return buildSinceVisitPollMapsFromTruth(entries);
 }
 
 /** @param {string} profileId */
@@ -591,8 +592,7 @@ export function snapshotNetworkSeenOnExit() {
   // DH-4: Only persist baselines from resolver-confirmed reads in this visit.
   if (!hasWalletNetworkTruthPoll()) return;
   const seen = loadLastSeen();
-  for (const entry of loadWallet()) {
-    const pid = entry.profile_id;
+  for (const pid of listWalletNetworkTruthPollProfileIds()) {
     const alertState = getWalletNetworkTruthPollAlertState(pid);
     if (!alertState) continue;
     seen[pid] = String(alertState).toLowerCase();

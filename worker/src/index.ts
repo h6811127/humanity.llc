@@ -4,16 +4,13 @@
  */
 
 import { schemaReady } from "./db";
-import { resolverHealthBuildField } from "./resolver-health-build";
+import { handleGetResolverHealth } from "./resolver/resolver-health";
 import { runOrphanPurge } from "./db/orphan-purge";
 import { runPrintifyReconcile } from "./print/printify-reconcile";
 import {
-  clientIp,
   corsHeaders,
   htmlResponse,
   jsonResponse,
-  OPERATOR_ID,
-  PROTOCOL_VERSION,
   withCors,
 } from "./http/resolver";
 import { handlePostArtifactIntent, handlePostArtifactIntentAttach } from "./resolver/artifact-intents";
@@ -174,7 +171,7 @@ export default {
     const path = url.pathname;
 
     if (path === "/.well-known/hc/v1/health" && request.method === "GET") {
-      return healthResponse(env);
+      return handleGetResolverHealth(request, env);
     }
 
     if (
@@ -797,40 +794,3 @@ export default {
     return jsonResponse({ error: "not_found", path }, 404);
   },
 };
-
-async function healthResponse(env: Env): Promise<Response> {
-  const body: {
-    version: string;
-    operator: string;
-    status: string;
-    database: string;
-    build: ReturnType<typeof resolverHealthBuildField>;
-  } = {
-    version: PROTOCOL_VERSION,
-    operator: OPERATOR_ID,
-    status: "ok",
-    database: "unknown",
-    build: resolverHealthBuildField(),
-  };
-
-  if (!env.DB) {
-    body.database = "unconfigured";
-    body.status = "degraded";
-    return jsonResponse(body, 503);
-  }
-
-  try {
-    const ready = await schemaReady(env.DB);
-    body.database = ready ? "ok" : "schema_missing";
-    if (!ready) {
-      body.status = "degraded";
-      return jsonResponse(body, 503);
-    }
-  } catch {
-    body.database = "error";
-    body.status = "degraded";
-    return jsonResponse(body, 503);
-  }
-
-  return jsonResponse(body, 200);
-}

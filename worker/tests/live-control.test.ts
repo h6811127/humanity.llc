@@ -10,6 +10,7 @@ import {
   withProtocolFields,
 } from "../src/crypto";
 import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
+import type { LiveControlChallengeRow } from "../src/db/live-control";
 import {
   handleGetLiveControlChallenge,
   handleGetPendingLiveControlChallenge,
@@ -19,6 +20,18 @@ import {
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const QR = "qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
+const LIVE_CHALLENGE = "lc_7Xk9mP2nQ4rT6vW8";
+const SIGNED_AT = "2026-05-16T17:00:00.000Z";
+
+interface SigningKeypair {
+  privateKey: Uint8Array;
+  publicKeyBase58: string;
+}
+
+type CardWithControlKeys = CardRow & {
+  recovery_public_key?: string | null;
+  issuer_public_key?: string | null;
+};
 
 async function randomKeypair() {
   const privateKey = ed.utils.randomPrivateKey();
@@ -26,7 +39,10 @@ async function randomKeypair() {
   return { privateKey, publicKeyBase58: encodeBase58(publicKey) };
 }
 
-function card(publicKey: string, overrides: Partial<CardRow> = {}): CardRow {
+function card(
+  publicKey: string,
+  overrides: Partial<CardWithControlKeys> = {}
+): CardWithControlKeys {
   return {
     profile_id: PROFILE,
     public_key: publicKey,
@@ -75,6 +91,27 @@ function summary(): VerificationSummaryRow {
   };
 }
 
+function challenge(
+  overrides: Partial<LiveControlChallengeRow> = {}
+): LiveControlChallengeRow {
+  return {
+    challenge_id: LIVE_CHALLENGE,
+    profile_id: PROFILE,
+    qr_id: QR,
+    nonce: "nonce",
+    verifier_session_id: "verifier",
+    status: "pending",
+    issued_at: SIGNED_AT,
+    expires_at: new Date(Date.now() + 60_000).toISOString(),
+    proven_at: null,
+    signer_public_key: null,
+    response_document_json: null,
+    created_at: SIGNED_AT,
+    updated_at: SIGNED_AT,
+    ...overrides,
+  };
+}
+
 function request(body: unknown): Request {
   return new Request(
     `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/live-control/challenges`,
@@ -86,12 +123,44 @@ function request(body: unknown): Request {
   );
 }
 
+function responseRequest(response: unknown): Request {
+  return new Request(
+    `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/live-control/responses`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ response }),
+    }
+  );
+}
+
+async function signedLiveControlResponse(
+  keypair: SigningKeypair,
+  challengeId: string
+) {
+  return signDocument(
+    withProtocolFields(
+      {
+        profile_id: PROFILE,
+        qr_id: QR,
+        challenge_id: challengeId,
+        signed_at: SIGNED_AT,
+      },
+      PAYLOAD_TYPES.LIVE_CONTROL_RESPONSE
+    ),
+    keypair
+  );
+}
+
 function dbFor(rows: {
-  card: CardRow;
+  card: CardWithControlKeys;
   qr: QrCredentialRow;
   verification?: VerificationSummaryRow | null;
+  challenges?: LiveControlChallengeRow[];
 }): D1Database {
-  const challenges: Record<string, Record<string, unknown>> = {};
+  const challenges: Record<string, Record<string, unknown>> = Object.fromEntries(
+    (rows.challenges ?? []).map((row) => [row.challenge_id, { ...row }])
+  );
   return {
     prepare: (sql: string) => ({
       bind: (...params: unknown[]) => ({
@@ -338,6 +407,93 @@ describe("live control proof alpha", () => {
       challenge.challenge_id
     );
     expect(((await statusRes.json()) as { status: string }).status).toBe("proven");
+  });
+
+  it("accepts a recovery-key-signed response for live control", async () => {
+    const owner = await getTestKeypair();
+    const recovery = await randomKeypair();
+    const db = dbFor({
+      card: card(owner.publicKeyBase58, {
+        recovery_public_key: recovery.publicKeyBase58,
+      }),
+      qr: qr(),
+    });
+    const challengeRes = await handlePostLiveControlChallenge(
+      request({ qr_id: QR }),
+      db,
+      PROFILE
+    );
+    const created = (await challengeRes.json()) as { challenge_id: string };
+    const signed = await signedLiveControlResponse(recovery, created.challenge_id);
+
+    const responseRes = await handlePostLiveControlResponse(
+      responseRequest(signed),
+      db,
+      PROFILE
+    );
+    const responseJson = (await responseRes.json()) as { status: string };
+
+    expect(responseRes.status).toBe(200);
+    expect(responseJson.status).toBe("proven");
+  });
+
+  it("rejects a response after the challenge expires", async () => {
+    const owner = await getTestKeypair();
+    const expiredChallenge = challenge({
+      expires_at: "2020-01-01T00:00:00.000Z",
+    });
+    const db = dbFor({
+      card: card(owner.publicKeyBase58),
+      qr: qr(),
+      challenges: [expiredChallenge],
+    });
+    const signed = await signedLiveControlResponse(owner, expiredChallenge.challenge_id);
+
+    const responseRes = await handlePostLiveControlResponse(
+      responseRequest(signed),
+      db,
+      PROFILE
+    );
+    const responseJson = (await responseRes.json()) as { error: string };
+
+    expect(responseRes.status).toBe(410);
+    expect(responseJson.error).toBe("LIVE_CONTROL_EXPIRED");
+
+    const statusRes = await handleGetLiveControlChallenge(
+      new Request(
+        `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/live-control/challenges/${expiredChallenge.challenge_id}`
+      ),
+      db,
+      PROFILE,
+      expiredChallenge.challenge_id
+    );
+    expect(((await statusRes.json()) as { status: string }).status).toBe("expired");
+  });
+
+  it("rejects a second response after a challenge is proven", async () => {
+    const owner = await getTestKeypair();
+    const provenChallenge = challenge({
+      status: "proven",
+      proven_at: SIGNED_AT,
+      signer_public_key: owner.publicKeyBase58,
+      response_document_json: "{}",
+    });
+    const db = dbFor({
+      card: card(owner.publicKeyBase58),
+      qr: qr(),
+      challenges: [provenChallenge],
+    });
+    const signed = await signedLiveControlResponse(owner, provenChallenge.challenge_id);
+
+    const responseRes = await handlePostLiveControlResponse(
+      responseRequest(signed),
+      db,
+      PROFILE
+    );
+    const responseJson = (await responseRes.json()) as { error: string };
+
+    expect(responseRes.status).toBe(409);
+    expect(responseJson.error).toBe("LIVE_CONTROL_ALREADY_PROVEN");
   });
 
   it("rejects a response signed by an unrelated key", async () => {

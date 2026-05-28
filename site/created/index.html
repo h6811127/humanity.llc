@@ -21,7 +21,7 @@
       })();
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=4" />
-    <link rel="stylesheet" href="/styles.css?v=128" />
+    <link rel="stylesheet" href="/styles.css?v=129" />
     <link rel="stylesheet" href="/css/device-shell.css?v=59" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=29" />
   </head>
@@ -794,6 +794,55 @@
           </section>
 
           <section
+            class="created-what-now created-what-now-compact"
+            id="child-object-add-status-plate"
+            hidden
+            aria-labelledby="child-object-add-status-plate-title"
+          >
+            <h2 class="created-what-now-title" id="child-object-add-status-plate-title">
+              Add status plate under this root
+            </h2>
+            <p class="created-what-now-body">
+              One root signing key controls additional public objects. This registers a
+              <strong>status plate</strong> child on the network (no new private key).
+            </p>
+            <form id="child-object-status-plate-form" class="compact-form" novalidate>
+              <label class="form-label" for="child-object-plate-label">Object name</label>
+              <input
+                class="form-input"
+                id="child-object-plate-label"
+                type="text"
+                maxlength="120"
+                autocomplete="off"
+                required
+              />
+              <label class="form-label" for="child-object-plate-state">Status line</label>
+              <input
+                class="form-input"
+                id="child-object-plate-state"
+                type="text"
+                maxlength="280"
+                autocomplete="off"
+                required
+              />
+              <button
+                type="submit"
+                class="btn-secondary"
+                id="child-object-status-plate-submit"
+              >
+                Register status plate
+              </button>
+            </form>
+            <p class="form-hint" id="child-object-status-plate-status" hidden role="status"></p>
+            <ul
+              class="list-rows"
+              id="child-object-status-plate-list"
+              hidden
+              aria-label="Status plates under this root on this device"
+            ></ul>
+          </section>
+
+          <section
             class="created-status-plate-loop"
             id="status-plate-loop-scorecard"
             aria-labelledby="status-plate-loop-scorecard-title"
@@ -1433,6 +1482,6 @@
     </div>
     <script src="/js/device-status-bootstrap.mjs?v=56" type="module"></script>
     <script src="/js/created-hub.mjs?v=3" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=61"></script>
+    <script type="module" src="/js/created.mjs?v=62"></script>
   </body>
 </html>

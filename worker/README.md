@@ -180,18 +180,36 @@ curl -s -X POST "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/update" \
 
 Owner UI: `/created/` → **Update public line**.
 
-### Artifact intent gate (M4.4 stub)
+### Artifact intent preview and Shopify metadata (Phase C staging)
 
-Pre-commerce stub: blocks revoked/suspended/expired card or QR before personalized merch (Phase C).
+Creates a short-lived personalized merch intent from an active card QR, allocates
+planned item QR IDs / print artifact IDs, and returns preview + Shopify cart
+metadata. Revoked, suspended, expired, replaced, unknown, or mismatched source
+states are blocked before checkout.
 
 ```bash
 curl -s -X POST "https://humanity.llc/v1/store/artifact-intents" \
   -H "Content-Type: application/json" \
-  -d '{"profile_id":"PROFILE","source_qr_id":"qr_..."}' | jq .
+  -d '{"profile_id":"PROFILE","source_qr_id":"qr_...","product_id":"prod_sticker_square","quantity":1}' | jq .
 ```
 
-- Revoked QR → `403` `QR_REVOKED`
-- Active QR → `501` `ARTIFACT_INTENTS_NOT_IMPLEMENTED` (full intent creation not built yet)
+- Active QR -> `201` with `artifact_intent_id`, `planned_item_qr_ids`,
+  `planned_print_artifact_ids`, `preview_url`, and one-hour `expires_at`
+- Revoked QR -> `403` `QR_REVOKED`
+- Expired QR -> `403` `QR_EXPIRED`
+- Card suspended -> `403` `CARD_SUSPENDED`
+
+Attach the intent to Shopify line/note metadata:
+
+```bash
+curl -s -X POST "https://humanity.llc/v1/store/artifact-intents/ai_.../attach" \
+  -H "Content-Type: application/json" \
+  -d '{"shopify_variant_id":"gid://shopify/ProductVariant/123"}' | jq .
+```
+
+Paid Shopify webhooks then create commerce order links and queue print orders
+for operator approval. Live Printify HTTP submission remains deferred behind the
+server-side Printify adapter.
 
 **Production:** run `npm run worker:migrate:remote` then `npm run worker:deploy`.
 

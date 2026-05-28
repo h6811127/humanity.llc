@@ -37,7 +37,7 @@ export function emphasisCardBodyHtml(opts) {
 }
 
 /**
- * @param {{ modifier?: 'active'|'info'|'warn'|'urgent', className?: string, id?: string, role?: string, hidden?: boolean, ariaLive?: string } & Parameters<typeof emphasisCardBodyHtml>[0]} opts
+ * @param {{ modifier?: 'active'|'info'|'warn'|'urgent', className?: string, id?: string, role?: string, hidden?: boolean, ariaLive?: string, afterActionsHtml?: string } & Parameters<typeof emphasisCardBodyHtml>[0]} opts
  */
 export function emphasisCardShellHtml(opts) {
   const mod = opts.modifier ?? "info";
@@ -52,7 +52,8 @@ export function emphasisCardShellHtml(opts) {
   ]
     .filter(Boolean)
     .join(" ");
-  return `<div class="${classes}" ${attrs}>${emphasisCardBodyHtml(opts)}</div>`;
+  const afterActions = opts.afterActionsHtml ?? "";
+  return `<div class="${classes}" ${attrs}>${emphasisCardBodyHtml(opts)}${afterActions}</div>`;
 }
 
 /**

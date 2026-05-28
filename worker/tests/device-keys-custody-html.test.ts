@@ -22,7 +22,14 @@ describe("device-keys-custody-html", () => {
     expect(wallet).toContain("hc-emphasis-card--info");
     expect(wallet).toContain("device-keys-custody--wallet");
     expect(wallet).toContain("hc-notice-foot");
+    expect(wallet).toMatch(
+      /hc-emphasis-card__actions[\s\S]*hc-notice-foot/
+    );
     expect(wallet).not.toContain("hc-notice-ack");
+    const ackIdx = wallet.indexOf("data-keys-custody-ack");
+    const footIdx = wallet.indexOf("hc-notice-foot");
+    expect(ackIdx).toBeGreaterThan(-1);
+    expect(footIdx).toBeGreaterThan(ackIdx);
   });
 
   it("created variant stays warn emphasis card", () => {

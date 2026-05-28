@@ -3,7 +3,7 @@
  * @see docs/PWA_INSTALL.md
  */
 
-import { loadWallet } from "./device-wallet.mjs";
+import { getWalletCount } from "./device-wallet.mjs";
 import { getInboxItems } from "./device-inbox.mjs";
 import {
   canTriggerNativeInstallPrompt,
@@ -69,7 +69,7 @@ function gatherSurfaceInput() {
     deferredPromptAvailable: Boolean(deferredPrompt),
     isIosSafari: isIosSafari(),
     dismissedAtIso: readDismissedAtIso(),
-    savedCardCount: loadWallet().length,
+    savedCardCount: getWalletCount(),
     inboxKinds: activeInboxKinds(),
     deviceStatusLoadError: deviceStatusLoadError(),
   };

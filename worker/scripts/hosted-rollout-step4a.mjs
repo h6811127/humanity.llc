@@ -90,4 +90,10 @@ function main() {
   }
 }
 
-main();
+const isCli =
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
+
+if (isCli) {
+  main();
+}
