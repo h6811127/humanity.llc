@@ -13,6 +13,7 @@ import {
   type ScanMalformedReason,
 } from "./scan-malformed-hint";
 import { isQrCalendarExpired } from "./merch-qr-policy";
+import { childObjectManifestoLine } from "./manifesto-display";
 import { objectStreamsFromCardDocumentJson } from "../validation/object-streams";
 import type { ObjectPublicStream } from "../validation/object-streams";
 
@@ -266,7 +267,7 @@ export function buildScanViewModel(
     }
     const objectCard = {
       ...card,
-      manifesto_line: `${child.public_label}\n${child.public_state}`,
+      manifesto_line: childObjectManifestoLine(child),
     };
     return baseView(
       {

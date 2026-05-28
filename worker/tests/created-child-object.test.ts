@@ -12,10 +12,15 @@ import {
 } from "../../site/js/child-object-store-core.mjs";
 import {
   CHILD_OBJECT_STATUS_DISABLED,
+  CHILD_OBJECT_TYPE_LOST_ITEM_RELAY,
   CHILD_OBJECT_TYPE_STATUS_PLATE,
+  isActiveLostItemRelayRow,
   isActiveStatusPlateRow,
+  parseLostItemRelayChildFields,
+  parseLostItemRelayChildState,
   parseStatusPlateChildFields,
   parseStatusPlateChildState,
+  shouldOfferAddLostItemRelay,
   shouldOfferAddStatusPlate,
 } from "../../site/js/created-child-object-core.mjs";
 
@@ -129,6 +134,18 @@ describe("child-object issue-qr client", () => {
     expect(src).toContain("postChildObjectIssueQr");
     expect(src).toContain("postChildObjectRevoke");
   });
+
+  it("exports lost-item relay client wiring for /created/", () => {
+    const src = readFileSync(
+      join(process.cwd(), "site/js/created-child-object-lost-item.mjs"),
+      "utf8"
+    );
+    expect(src).toContain("child-object-relay-issue-qr");
+    expect(src).toContain("child-object-relay-disable");
+    expect(src).toContain("CHILD_OBJECT_TYPE_LOST_ITEM_RELAY");
+    expect(src).toContain("signChildObjectIssueQr");
+    expect(src).toContain("signChildObjectRevoke");
+  });
 });
 
 describe("created-child-object-core", () => {
@@ -176,5 +193,39 @@ describe("created-child-object-core", () => {
     });
     expect(() => parseStatusPlateChildState("")).toThrow(/required/i);
     expect(() => parseStatusPlateChildState("x".repeat(281))).toThrow(/280/);
+  });
+
+  it("hides disabled lost-item relays from active list", () => {
+    expect(
+      isActiveLostItemRelayRow({
+        object_type: CHILD_OBJECT_TYPE_LOST_ITEM_RELAY,
+        public_label: "Keys",
+        public_state: "Lost",
+      })
+    ).toBe(true);
+    expect(
+      isActiveLostItemRelayRow({
+        object_type: CHILD_OBJECT_TYPE_LOST_ITEM_RELAY,
+        public_label: "Keys",
+        public_state: "Found",
+        status: CHILD_OBJECT_STATUS_DISABLED,
+      })
+    ).toBe(false);
+  });
+
+  it("offers add lost-item relay only for general root cards", () => {
+    expect(shouldOfferAddLostItemRelay({ pilot_template: "general" })).toBe(true);
+    expect(shouldOfferAddLostItemRelay({ pilot_template: "lost_item_relay" })).toBe(false);
+  });
+
+  it("validates lost-item relay child fields", () => {
+    expect(
+      parseLostItemRelayChildFields("House keys", "Lost — contact owner through relay")
+    ).toEqual({
+      publicLabel: "House keys",
+      publicState: "Lost — contact owner through relay",
+    });
+    expect(() => parseLostItemRelayChildFields("", "Lost")).toThrow(/required/i);
+    expect(() => parseLostItemRelayChildState("")).toThrow(/required/i);
   });
 });

@@ -38,6 +38,7 @@ import { initCreatedDeviceSave } from "./created-device-save.mjs";
 import { markSetupDone, modeFromPage } from "./created-mode.mjs";
 import { initCreatedMerchFunnel } from "./created-merch-funnel.mjs";
 import { initCreatedChildObject } from "./created-child-object.mjs";
+import { initCreatedLostItemRelay } from "./created-child-object-lost-item.mjs";
 import { initCreatedSetup } from "./created-setup.mjs";
 import {
   applyCreatedWorkspaceMode,
@@ -328,6 +329,7 @@ function syncQrPreview() {
 let deviceSaveCtl = null;
 /** @type {{ refresh?: () => void } | null} */
 let childObjectCtl = null;
+let lostItemRelayCtl = null;
 /** @type {{ select: (tabId: string) => void } | undefined} */
 let createdTabs;
 let workspaceMode = "view";
@@ -663,6 +665,7 @@ function applyPilotTemplateUi(session) {
     bindLostItemRelayLoopScorecard(profileId, pilotScorecardHandle(session));
   }
   childObjectCtl?.refresh?.();
+  lostItemRelayCtl?.refresh?.();
 }
 
 /** Load handle/manifesto/created_at from resolver when session is partial (return visit). */
@@ -1181,6 +1184,13 @@ async function bootstrapOwnerTools() {
     getSigningKeys: currentSigningKeys,
   });
 
+  lostItemRelayCtl = initCreatedLostItemRelay({
+    profileId,
+    getSession: loadSession,
+    showError,
+    getSigningKeys: currentSigningKeys,
+  });
+
   const backup = initKeyBackupUi({
     profileId,
     getSession: loadSession,
@@ -1191,6 +1201,7 @@ async function bootstrapOwnerTools() {
       voucherRevoke?.refresh();
       liveControl?.refresh();
       childObjectCtl?.refresh?.();
+  lostItemRelayCtl?.refresh?.();
     },
   });
   deviceSaveCtl?.refresh();
@@ -1205,6 +1216,7 @@ async function bootstrapOwnerTools() {
       deviceSaveCtl?.refresh();
       recoveryUi?.refresh();
       childObjectCtl?.refresh?.();
+  lostItemRelayCtl?.refresh?.();
     },
   });
   deviceSaveCtl?.refresh();
