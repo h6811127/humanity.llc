@@ -2,7 +2,7 @@
 
 **Status:** Working checklist  -  fill in bracketed fields before launch  
 **Canonical strategy:** `docs/MERCH_LED_V1.md`, `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  
-**Merch QR policy:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` · Tier 0 batch: `docs/TIER0_CAMPAIGN_QR_RUNBOOK.md` · Support: `docs/MERCH_SUPPORT_MACROS.md`  
+**Merch QR policy:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` · Tier 0 batch: `docs/TIER0_CAMPAIGN_QR_RUNBOOK.md` · **Company/community merch (e.g. Glitch drop):** `docs/COMPANY_MERCH_AND_COMMUNITY_CAMPAIGN.md` · Support: `docs/MERCH_SUPPORT_MACROS.md`  
 **Copy source:** `docs/LAUNCH_LANGUAGE_KIT.md` (Tier 0 / Tier 1 sections · Sticker FAQ)
 
 ---

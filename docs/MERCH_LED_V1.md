@@ -139,7 +139,7 @@ Prove walking ads work:
 
 1. One flagship artifact (sticker recommended first for scan QA; flat card second).
 2. Story-row storefront  -  one narrative, not a 50-SKU grid. **Shipped (UI):** [`/shop/`](../site/shop/index.html)  -  Shopify URL via `site/data/shop-config.json` when operator enables.
-3. Non-personalized or lightly personalized QR pointing at network (personalized per-item QR only after Printify spike passes  -  see `docs/V1_ASSUMPTION_REGISTER.md`). **Lifecycle:** [`docs/MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) (batch QR, no time expiry, rotate via `replaced`).
+3. Non-personalized or lightly personalized QR pointing at network (personalized per-item QR only after Printify spike passes  -  see `docs/V1_ASSUMPTION_REGISTER.md`). **Lifecycle:** [`docs/MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) (batch QR, no time expiry, rotate via `replaced`). **Company/community line (fixed batch, shared scan):** [`docs/COMPANY_MERCH_AND_COMMUNITY_CAMPAIGN.md`](COMPANY_MERCH_AND_COMMUNITY_CAMPAIGN.md).
 4. Packaging / product page with bearer warning and “merch ≠ vouched” line.
 
 **Exit:** Orders from outside founder network; scan→create conversion tracked; at least one organic reshare.

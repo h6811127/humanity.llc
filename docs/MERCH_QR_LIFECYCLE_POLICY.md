@@ -317,7 +317,7 @@ Optional **non-trust** badge on scan: “Scanned from a founding sticker” for 
 | # | Decision | Options | Recommendation |
 |---|----------|---------|----------------|
 | D-M1 | Tier 0 first run: batch vs per-item | Batch only · Per-item only · Batch then Gen 2 per-item | **Batch** for first 500; per-item before personalized Tier 1 |
-| D-M2 | Campaign profile ownership | Operator-owned demo profile · Rotating `@founding_signal` | Operator-owned; clear “not a person” copy |
+| D-M2 | Campaign profile ownership | Operator-owned demo profile · Rotating `@founding_signal` | Operator-owned; clear “not a person” copy — see [`COMPANY_MERCH_AND_COMMUNITY_CAMPAIGN.md`](COMPANY_MERCH_AND_COMMUNITY_CAMPAIGN.md) |
 | D-M3 | `replaced` scan CTA | Shop · Create · None | Shop + Create for curiosity; minimal for Tier 1 |
 | D-M4 | Reprint fee | Free once · Paid · Subscription perk | Free once for misprint; paid reprint after owner revoke |
 | D-M5 | Null `expires_at` in protocol docs | Require explicit `lifetime: artifact` field vs null only | Null + `scope: print_artifact` for v1 |
