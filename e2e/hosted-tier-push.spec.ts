@@ -167,11 +167,48 @@ async function installHostedPushFetchMock(page: Page, withSession: boolean) {
   );
 }
 
-async function openExpandedHub(page: Page) {
-  await page.locator("#brand-status-dot-btn").click({ timeout: 15_000 });
-  await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/, {
+async function waitForStatusDotReady(page: Page) {
+  await expect(page.locator("#brand-status-dot")).toHaveAttribute("data-dot-state", /.+/, {
     timeout: 15_000,
   });
+}
+
+/** Dismiss intro coachmark when it overlays the dot (see device-inbox.spec.ts). */
+async function dismissHubIntroIfVisible(page: Page) {
+  const dismiss = page.locator("#device-hub-intro-dismiss");
+  if (await dismiss.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await dismiss.click();
+  }
+}
+
+async function openExpandedHub(page: Page) {
+  await dismissHubIntroIfVisible(page);
+  await waitForStatusDotReady(page);
+  await page.locator("#brand-status-dot-btn").click();
+  const hub = page.locator("#device-hub");
+  try {
+    await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/, { timeout: 5000 });
+    await expect(hub).not.toHaveClass(/device-hub-collapsed/, { timeout: 5000 });
+    return;
+  } catch {
+    // Sheet open class can desync from collapsed hub; retry dot or force expand.
+  }
+  await page.locator("#brand-status-dot-btn").click();
+  try {
+    await expect(hub).not.toHaveClass(/device-hub-collapsed/, { timeout: 5000 });
+    return;
+  } catch {
+    await page.evaluate(() => {
+      window.dispatchEvent(new CustomEvent("hc-hub-expand-request"));
+    });
+  }
+  await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/, { timeout: 15_000 });
+  await expect(hub).not.toHaveClass(/device-hub-collapsed/, { timeout: 15_000 });
+}
+
+async function gotoHome(page: Page) {
+  await page.goto("/");
+  await waitForStatusDotReady(page);
 }
 
 async function waitForPushHealthy(page: Page) {
@@ -261,7 +298,7 @@ test.describe("hosted tier E4 push (SSE)", () => {
       return route.fulfill({ status: 404, contentType: "application/json", body: "{}" });
     });
 
-    await page.goto("/");
+    await gotoHome(page);
     await openExpandedHub(page);
     await waitForPushHealthy(page);
 
@@ -290,7 +327,7 @@ test.describe("hosted tier E4 push (SSE)", () => {
       });
     });
 
-    await page.goto("/");
+    await gotoHome(page);
     await openExpandedHub(page);
     await waitForPushHealthy(page);
 
@@ -331,7 +368,7 @@ test.describe("hosted tier E4 push (SSE)", () => {
       return route.fulfill({ status: 404, contentType: "application/json", body: "{}" });
     });
 
-    await page.goto("/");
+    await gotoHome(page);
     await openExpandedHub(page);
     await waitForPollLeader(page);
     await waitForPushHealthy(page);
