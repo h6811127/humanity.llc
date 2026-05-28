@@ -7,8 +7,9 @@
  * Usage:
  *   npm run hosted:rollout:step2              # verify wrangler flag + print deploy/smoke checklist
  *   npm run hosted:rollout:step2 -- --deploy  # run worker:build-meta, bundle-scan, wrangler deploy
- *   npm run hosted:rollout:step2 -- --smoke   # GET production health (after deploy)
+ *   npm run hosted:rollout:step2 -- --smoke   # health + hosted routes gated (after deploy)
  *   npm run hosted:rollout:step2 -- --deploy --smoke
+ *   API_ORIGIN=http://127.0.0.1:8787 npm run hosted:rollout:step2 -- --smoke  # local worker:dev
  *
  * @see docs/HOSTED_TIER_G0_READINESS.md
  * @see docs/HOSTED_TIER_IMPLEMENTATION_EPICS.md § Production rollout (after G0)
@@ -70,20 +71,31 @@ function printManualSmokeChecklist() {
 /**
  * @returns {Promise<void>}
  */
+/**
+ * @param {string} url
+ * @param {RequestInit} [init]
+ */
+async function fetchJson(url, init) {
+  const res = await fetch(url, init);
+  const text = await res.text();
+  let body;
+  try {
+    body = text ? JSON.parse(text) : {};
+  } catch {
+    console.error(`Non-JSON response from ${url}: ${text.slice(0, 300)}`);
+    process.exit(1);
+  }
+  return { res, body };
+}
+
 async function smokeProductionHealth() {
   const url = `${apiOrigin}/.well-known/hc/v1/health`;
   console.log(`\n▶ Smoke health (${url})`);
-  const res = await fetch(url, { headers: { Accept: "application/json" } });
-  const text = await res.text();
+  const { res, body } = await fetchJson(url, {
+    headers: { Accept: "application/json" },
+  });
   if (!res.ok) {
-    console.error(`health failed (${res.status}): ${text.slice(0, 300)}`);
-    process.exit(1);
-  }
-  let body;
-  try {
-    body = JSON.parse(text);
-  } catch {
-    console.error("health response was not JSON.");
+    console.error(`health failed (${res.status}): ${JSON.stringify(body).slice(0, 300)}`);
     process.exit(1);
   }
   if (body.database === "schema_missing") {
@@ -96,6 +108,53 @@ async function smokeProductionHealth() {
   if (body.build?.gitSha) {
     console.log(`  build.gitSha=${body.build.gitSha}`);
   }
+}
+
+/** Step 2: public routes work; hosted steward extension stays off until step 4. */
+async function smokeHostedStewardGated() {
+  const capsUrl = `${apiOrigin}/.well-known/hc/v1/operator/capabilities`;
+  console.log(`\n▶ Smoke operator capabilities (${capsUrl})`);
+  const { res: capsRes, body: capsBody } = await fetchJson(capsUrl, {
+    headers: { Accept: "application/json" },
+  });
+  if (!capsRes.ok) {
+    console.error(`capabilities failed (${capsRes.status})`);
+    process.exit(1);
+  }
+  const extensions = capsBody.extensions;
+  if (
+    extensions &&
+    typeof extensions === "object" &&
+    extensions.hosted_steward &&
+    extensions.hosted_steward.status === "enabled"
+  ) {
+    console.error(
+      "capabilities.extensions.hosted_steward is enabled — HOSTED_STEWARD_ENABLED must stay 0 for step 2."
+    );
+    process.exit(1);
+  }
+  console.log("capabilities OK (hosted_steward extension not enabled)");
+
+  const entUrl = `${apiOrigin}/.well-known/hc/v1/steward/entitlements`;
+  console.log(`\n▶ Smoke steward entitlements gated (${entUrl})`);
+  const { res: entRes, body: entBody } = await fetchJson(entUrl, {
+    headers: {
+      Accept: "application/json",
+      "X-HC-Device-Id": "rollout_step2_smoke_device",
+    },
+  });
+  if (entRes.status !== 404 || entBody.error !== "hosted_steward_disabled") {
+    console.error(
+      `expected 404 hosted_steward_disabled, got ${entRes.status} ${JSON.stringify(entBody).slice(0, 200)}`
+    );
+    process.exit(1);
+  }
+  console.log("steward entitlements gated OK (404 hosted_steward_disabled)");
+}
+
+async function smokeProduction() {
+  await smokeProductionHealth();
+  await smokeHostedStewardGated();
 }
 
 async function main() {
@@ -115,15 +174,17 @@ async function main() {
   }
 
   if (smoke) {
-    await smokeProductionHealth();
+    await smokeProduction();
   } else {
     printManualSmokeChecklist();
-    console.log("\nAutomated health smoke:");
+    console.log("\nAutomated smoke (health + hosted routes gated):");
     console.log("  npm run hosted:rollout:step2 -- --smoke");
   }
 
   if (deploy && smoke) {
-    console.log("\n✅ Step 2 complete (deploy + health smoke). Next: step 3 — npm run hosted:rollout:step3");
+    console.log(
+      "\n✅ Step 2 complete (deploy + smoke). Next: step 3 — npm run hosted:rollout:step3"
+    );
   } else if (deploy) {
     console.log("\n✅ Deploy finished. Run --smoke to verify health, then step 3.");
   } else {

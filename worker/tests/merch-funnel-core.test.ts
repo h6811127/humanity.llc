@@ -13,7 +13,7 @@ import {
   normalizeMerchRef,
   peekMerchCustomizeRef,
   shouldHandoffToCustomize,
-  shouldRedirectFreshCreateToCustomize,
+  shouldAutoRedirectCreatedToCustomize,
   shouldShowCreatedMerchCustomizeCard,
 } from "../../site/js/merch-funnel-core.mjs";
 
@@ -97,33 +97,33 @@ describe("merch-funnel-core (client)", () => {
     ).toBe(false);
   });
 
-  it("redirects fresh customize handoff only when hc_created session exists", () => {
+  it("auto-redirect only on fresh customize handoff with session keys", () => {
     expect(
-      shouldRedirectFreshCreateToCustomize({
+      shouldAutoRedirectCreatedToCustomize({
         fresh: true,
         merchRef: "scan_customize",
-        hasCreatedSession: true,
+        sessionHasSigningKeys: true,
       })
     ).toBe(true);
     expect(
-      shouldRedirectFreshCreateToCustomize({
+      shouldAutoRedirectCreatedToCustomize({
         fresh: true,
         merchRef: "scan_customize",
-        hasCreatedSession: false,
+        sessionHasSigningKeys: false,
       })
     ).toBe(false);
     expect(
-      shouldRedirectFreshCreateToCustomize({
+      shouldAutoRedirectCreatedToCustomize({
         fresh: false,
         merchRef: "scan_customize",
-        hasCreatedSession: true,
+        sessionHasSigningKeys: true,
       })
     ).toBe(false);
     expect(
-      shouldRedirectFreshCreateToCustomize({
+      shouldAutoRedirectCreatedToCustomize({
         fresh: true,
         merchRef: "tier0_sticker",
-        hasCreatedSession: true,
+        sessionHasSigningKeys: true,
       })
     ).toBe(false);
   });

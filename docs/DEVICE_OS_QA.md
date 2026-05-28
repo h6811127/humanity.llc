@@ -257,6 +257,17 @@ Removed May 2026. See [`LANDING_PROGRESS_STRIP.md`](LANDING_PROGRESS_STRIP.md). 
 
 See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 
+### P1-LC · Live control copy comprehension (M7 Step 2)
+
+**Runbook:** [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md) · automated copy guards: `npm run worker:test -- worker/tests/scan.test.ts` (H-002 assertion).
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Complete live proof loop (two phones) | Success panel includes **Control proven moments ago** + **does not prove legal identity** |
+| 2 | Ask tester: “What did live control prove?” | Recent key control; not legal ID or vouch |
+| 3 | Proof window ends | Scanner returns to **Ask for live proof** with expired copy |
+| 4 | Let challenge expire unsigned | **Control was not proven. The request expired.** |
+
 ### P1-HH · Hub header simplification (Home / Close / Create)
 
 **Spec:** [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md) · visual refresh: [`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md)

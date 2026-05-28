@@ -10,12 +10,12 @@
 
 | Step | Spec / surface | Symptom | Root cause |
 |------|----------------|---------|------------|
-| **1** | Pages dev (`site/_redirects`) | `/shop/products/*` redirect loop | **Shipped** — splat target `detail.html` (does not re-match splat) |
-| **2** | `e2e/device-os-wallet.spec.ts` · `e2e/keys-custody-emphasis-webkit.spec.ts` | Wallet `--wallet` foot below Acknowledge; detail ↔ button gap **&lt; 56px** | **Shipped** — `afterActionsHtml` on emphasis card; foot moved out of `__main` |
-| **3** | `e2e/merch-funnel-customize.spec.ts` | Fresh `scan_customize` create → `/shop/customize/` | **Shipped** — `location.replace()` when `hc_created` session readable |
+| **1** | Pages dev (`site/_redirects`) | `Infinite loop detected` for `/shop/products/*` | **Fixed 2026-05-28:** splat rewrite targets `detail.html` (not `index.html`) |
+| **2** | `e2e/device-os-wallet.spec.ts` · `e2e/keys-custody-emphasis-webkit.spec.ts` | `detail` ↔ **Acknowledge** gap **66–68px** (limit **&lt; 56**) | **Fixed 2026-05-28:** wallet `.hc-notice-foot` moved below Acknowledge (`afterActionsHtml`) |
+| **3** | `e2e/merch-funnel-customize.spec.ts` | Stays on `/created/?…&hc_ref=scan_customize` | **Fixed 2026-05-28:** `created-merch-funnel.mjs` auto-redirects fresh customize handoffs when `hc_created` is readable |
 | — | Wrangler / workerd stderr | `Broken pipe` on Playwright teardown | Benign shutdown noise when Pages dev stops worker; not a product failure |
 
-**Passing:** 84 specs in the Device shell E2E bundle; worker Vitest gate runs before Playwright in the same workflow.
+**Passing:** 87 specs in the Device shell E2E bundle (1 skipped WebKit touch profile on desktop); worker Vitest gate runs before Playwright in the same workflow.
 
 ---
 
@@ -41,7 +41,7 @@ npm run worker:test -- worker/tests/shop-product-detail-core.test.ts
 
 ---
 
-### Step 2 — Keys custody wallet layout (detail → Acknowledge gap)
+### Step 2 — Keys custody wallet layout (detail → Acknowledge gap) ✅
 
 **Intent:** Restore compact stacked rhythm per [`KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md`](KEYS_CUSTODY_EMPHASIS_CARD_SPACING_INVESTIGATION.md); help/import foot **below** Acknowledge, not between detail and button.
 
@@ -50,6 +50,8 @@ npm run worker:test -- worker/tests/shop-product-detail-core.test.ts
 | Move `.hc-notice-foot` out of `__main` extra copy for `--wallet` (and hub if needed) | `site/js/device-keys-custody.mjs` |
 | Optional CSS: foot margin when it follows `__actions` | `site/styles.css` |
 | Bump `styles.css?v=` on shell pages if CSS changes | `site/index.html`, `site/wallet/index.html`, … |
+
+**Shipped:** wallet `.hc-notice-foot` via `afterActionsHtml` on `emphasisCardShellHtml` (below Acknowledge, not inside `__main`).
 
 **Verify:**
 
@@ -62,7 +64,7 @@ npm run e2e -- e2e/device-os-wallet.spec.ts -g "keys custody"
 
 ---
 
-### Step 3 — Merch funnel `scan_customize` auto-redirect
+### Step 3 — Merch funnel `scan_customize` auto-redirect ✅
 
 **Intent:** Match [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) exit checklist (“Create card → `/shop/customize/` detects session”) and `e2e/merch-funnel-customize.spec.ts`.
 
@@ -70,6 +72,8 @@ npm run e2e -- e2e/device-os-wallet.spec.ts -g "keys custody"
 |--------|------|
 | On fresh create with `scan_customize` (or other `CUSTOMIZE_HANDOFF_REFS`), `location.replace()` to customize URL after session is readable | `site/js/created-merch-funnel.mjs` |
 | Keep customize CTA card as fallback when redirect blocked / no session | same |
+
+**Shipped:** `shouldAutoRedirectCreatedToCustomize` in `merch-funnel-core.mjs`; redirect when `hc_created` has signing keys, else show CTA card.
 
 **Verify:**
 
@@ -80,7 +84,7 @@ npm run e2e -- e2e/merch-funnel-customize.spec.ts
 
 ---
 
-### Step 4 — CI sign-off
+### Step 4 — CI sign-off ✅
 
 **Status:** **Shipped** — full bundle run locally (2026-05-28): 87 passed, 1 skipped (`safari-shell-scroll` touch profile on desktop WebKit only).
 
@@ -91,8 +95,6 @@ npm run e2e:install
 npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device-os-wallet.spec.ts e2e/scan-page-dot.spec.ts e2e/safari-shell-scroll.spec.ts e2e/scan-cross-tab-banner-webkit.spec.ts e2e/keys-custody-emphasis-webkit.spec.ts e2e/merch-funnel-customize.spec.ts
 ```
 
-Update this doc **Status** to **Closed** when all steps pass in CI.
-
 ---
 
 ## Changelog
@@ -101,6 +103,6 @@ Update this doc **Status** to **Closed** when all steps pass in CI.
 |------|------|
 | 2026-05-28 | Opened from CI Device shell E2E failures (3 Playwright specs + `_redirects` warning) |
 | 2026-05-28 | **Step 1 shipped:** product detail shell → `detail.html`; `_redirects` splat target updated |
-| 2026-05-28 | **Step 2 shipped:** wallet custody foot below Acknowledge (`afterActionsHtml`) |
-| 2026-05-28 | **Step 3 shipped:** fresh customize handoff auto-redirect on `/created/` |
+| 2026-05-28 | **Step 2 shipped:** wallet keys custody foot below Acknowledge (`afterActionsHtml`) |
+| 2026-05-28 | **Step 3 shipped:** fresh customize handoff auto-redirect from `/created/` |
 | 2026-05-28 | **Step 4 shipped:** full Device shell E2E bundle — 87 passed, 1 skipped (WebKit touch profile); doc **Closed** |

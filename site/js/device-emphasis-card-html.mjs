@@ -11,7 +11,7 @@ export function escapeEmphasisHtml(s) {
 }
 
 /**
- * @param {{ eyebrow: string, title?: string, detail: string, dot?: 'success'|'info'|'warn'|'urgent', actionsHtml?: string, extraCopyHtml?: string, afterActionsHtml?: string, detailId?: string }} opts
+ * @param {{ eyebrow: string, title?: string, detail: string, dot?: 'success'|'info'|'warn'|'urgent', actionsHtml?: string, extraCopyHtml?: string, detailId?: string }} opts
  */
 export function emphasisCardBodyHtml(opts) {
   const dot = opts.dot ?? "info";
@@ -19,7 +19,6 @@ export function emphasisCardBodyHtml(opts) {
     ? `<p class="hc-emphasis-card__title">${opts.title}</p>`
     : "";
   const actions = opts.actionsHtml ?? "";
-  const afterActions = opts.afterActionsHtml ?? "";
   const detailId = opts.detailId
     ? ` id="${escapeEmphasisHtml(opts.detailId)}"`
     : "";
@@ -34,11 +33,11 @@ export function emphasisCardBodyHtml(opts) {
         ${extraCopy}
       </div>
     </div>
-    ${actions}${afterActions}`;
+    ${actions}`;
 }
 
 /**
- * @param {{ modifier?: 'active'|'info'|'warn'|'urgent', className?: string, id?: string, role?: string, hidden?: boolean, ariaLive?: string } & Parameters<typeof emphasisCardBodyHtml>[0]} opts
+ * @param {{ modifier?: 'active'|'info'|'warn'|'urgent', className?: string, id?: string, role?: string, hidden?: boolean, ariaLive?: string, afterActionsHtml?: string } & Parameters<typeof emphasisCardBodyHtml>[0]} opts
  */
 export function emphasisCardShellHtml(opts) {
   const mod = opts.modifier ?? "info";
@@ -53,7 +52,8 @@ export function emphasisCardShellHtml(opts) {
   ]
     .filter(Boolean)
     .join(" ");
-  return `<div class="${classes}" ${attrs}>${emphasisCardBodyHtml(opts)}</div>`;
+  const afterActions = opts.afterActionsHtml ?? "";
+  return `<div class="${classes}" ${attrs}>${emphasisCardBodyHtml(opts)}${afterActions}</div>`;
 }
 
 /**

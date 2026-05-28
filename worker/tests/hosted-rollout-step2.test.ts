@@ -13,6 +13,8 @@ describe("hosted-rollout-step2", () => {
     expect(script).toContain('HOSTED_STEWARD_ENABLED = "0"');
     expect(script).toContain("worker:deploy");
     expect(script).toContain("/.well-known/hc/v1/health");
+    expect(script).toContain("smokeHostedStewardGated");
+    expect(script).toContain("hosted_steward_disabled");
     expect(script).toContain("hosted:rollout:step1");
   });
 

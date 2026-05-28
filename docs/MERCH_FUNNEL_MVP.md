@@ -14,7 +14,7 @@ Ordered work after repo review. Update row status as steps complete. Cross-links
 |----------|------|------|--------|
 | **1** | **Merch funnel close-out** — scan → `/shop/customize/` (`scan_customize` ref + CTA); enable Tier 1 in `shop-config.json`; prove one paid personalized order (intent → webhook → mint → Printify submit) | Engineering + operator | **Engineering ✅** (`merch-funnel:verify-exit` incl. `merch-print-qa`) · **operator next:** paste variant URLs · `verify-config --require-checkout` · live payment + Printify · physical QA [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) |
 | **2** | **Phase A trust MVP** — run M5 stranger runbook (3 outsiders, unassisted create → scan → revoke) | Validation | **✅ Passed 2026-05-27** — [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) |
-| **3** | **Hosted steward production rollout** — `hosted:rollout:step*` through step 6 (secrets, flag, CF dashboard, regression) | Ops | ☐ |
+| **3** | **Hosted steward production rollout** — `hosted:rollout:step*` through step 6 (secrets, flag, CF dashboard, regression) | Ops | **In progress** — steps 1–2 ✅ · step 3a: `hosted:rollout:step3a -- --smoke` then set `OPERATOR_AUDIT_TOKEN` and verify |
 | **4** | **AI P1 product decision** — keep / rename / deterministic-only / remove scan reader (no new L3 user features until Phase A) | Product | ☐ |
 | **5** | **Large-wallet shell performance** — bound `hc_wallet_network_cache`, avoid full-wallet parse on hub/inbox hot paths | Engineering debt | **✅** — S6–S11 + `hc_wallet_summary` (cache, hot paths, collapsed hub previews, hub/wallet DOM caps, presence debounce; see `DEVICE_OS_REQUEST_BUDGET.md`) |
 
@@ -177,7 +177,7 @@ Aggregate metrics only — no PII. Allowed refs:
 | Step | Pass? |
 |------|-------|
 | Stranger scans campaign merch; profile loads with limits + customize CTA | ✅ scan hint · ☐ manual stranger QA |
-| Create card → `/shop/customize/` detects session | ✅ auto-redirect on fresh `scan_customize` — [`DEVICE_SHELL_E2E_CI_REMEDIATION.md`](DEVICE_SHELL_E2E_CI_REMEDIATION.md) step 3 · E2E `e2e/merch-funnel-customize.spec.ts` |
+| Create card → `/shop/customize/` detects session | ✅ auto-redirect on fresh `scan_customize` — `created-merch-funnel.mjs` · E2E `e2e/merch-funnel-customize.spec.ts` |
 | Preview shows LIVE OBJECT branded QR on product mockup | ✅ UI |
 | Artifact intent created; attach returns Shopify line attributes | ✅ API tests |
 | Checkout URL includes `properties[artifact_intent_id]` | ✅ `shop-customize-core.test.ts` |
