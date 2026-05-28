@@ -1,27 +1,23 @@
 /**
- * /shop/thanks/ — post-purchase guidance + order status timeline.
+ * Post-purchase thanks page — merch funnel attribution + buyer order status (O-003).
  */
-import { resolverApiOrigin } from "./hc-sign.mjs";
 import {
   appendMerchRefToCreateUrl,
   persistMerchCreateRef,
   peekMerchCreateRef,
 } from "./merch-funnel-core.mjs";
-import {
-  fetchStoreOrderStatus,
-  orderStatusHeadline,
-  peekCheckoutIntentId,
-  readOrderStatusQuery,
-} from "./shop-order-status-core.mjs";
 
-const statusSection = document.getElementById("shop-thanks-status");
-const statusHeadline = document.getElementById("shop-thanks-status-headline");
-const statusLead = document.getElementById("shop-thanks-status-lead");
-const timelineEl = document.getElementById("shop-thanks-timeline");
-const statusError = document.getElementById("shop-thanks-status-error");
-const lookupForm = document.getElementById("shop-thanks-lookup-form");
-const lookupIntentInput = document.getElementById("shop-thanks-lookup-intent");
-const lookupOrderInput = document.getElementById("shop-thanks-lookup-order");
+const form = document.getElementById("shop-thanks-status-form");
+const resultEl = document.getElementById("shop-thanks-status-result");
+const orderInput = document.getElementById("shop-thanks-order");
+const emailInput = document.getElementById("shop-thanks-email");
+
+function apiOrigin() {
+  if (typeof window !== "undefined" && window.location.hostname === "localhost") {
+    return "http://127.0.0.1:8787";
+  }
+  return "https://humanity.llc";
+}
 
 function decorateThanksCreateLinks() {
   const ref = peekMerchCreateRef();
@@ -31,110 +27,72 @@ function decorateThanksCreateLinks() {
   }
 }
 
-function setStatusError(message) {
-  if (!statusError) return;
-  statusError.hidden = !message;
-  statusError.textContent = message || "";
-}
-
-function renderTimeline(timeline) {
-  if (!timelineEl) return;
-  timelineEl.replaceChildren();
-  if (!Array.isArray(timeline) || !timeline.length) {
-    timelineEl.hidden = true;
-    return;
-  }
-  timelineEl.hidden = false;
-  const list = document.createElement("ol");
-  list.className = "shop-order-timeline";
-  for (const step of timeline) {
-    const item = document.createElement("li");
-    item.className = `shop-order-timeline__step shop-order-timeline__step--${step.state || "pending"}`;
-    const title = document.createElement("p");
-    title.className = "shop-order-timeline__label";
-    title.textContent = step.label || "Update";
-    item.appendChild(title);
-    if (step.detail) {
-      const detail = document.createElement("p");
-      detail.className = "shop-order-timeline__detail";
-      detail.textContent = step.detail;
-      item.appendChild(detail);
+function renderStatusResult(payload) {
+  if (!resultEl) return;
+  resultEl.hidden = false;
+  resultEl.innerHTML = `
+    <p class="shop-thanks-status-label"><strong>${payload.status_label}</strong></p>
+    <p class="shop-thanks-status-message">${payload.message}</p>
+    ${
+      payload.order_number
+        ? `<p class="shop-thanks-status-meta">Order ${payload.order_number}</p>`
+        : ""
     }
-    list.appendChild(item);
-  }
-  timelineEl.appendChild(list);
+  `;
 }
 
-/**
- * @param {Record<string, unknown>} status
- */
-function renderStatus(status) {
-  if (!statusSection) return;
-  statusSection.hidden = false;
-  if (statusHeadline) {
-    statusHeadline.textContent = orderStatusHeadline(String(status.commerce_status || ""));
-  }
-  if (statusLead) {
-    const mode =
-      status.fulfillment_mode === "personalized"
-        ? "Personalized print"
-        : status.fulfillment_mode === "tier0_batch"
-          ? "Founding sticker"
-          : "Merch order";
-    const printLabel =
-      typeof status.print_status_label === "string" && status.print_status_label.trim()
-        ? status.print_status_label.trim()
-        : null;
-    statusLead.textContent = printLabel ? `${mode} · ${printLabel}` : mode;
-  }
-  renderTimeline(status.timeline);
+function renderStatusError(message) {
+  if (!resultEl) return;
+  resultEl.hidden = false;
+  resultEl.innerHTML = `<p class="shop-thanks-status-message" role="alert">${message}</p>`;
 }
 
-async function loadStatusFromQuery(query) {
-  setStatusError("");
-  if (!query) return;
-  try {
-    const status = await fetchStoreOrderStatus(resolverApiOrigin(), query);
-    renderStatus(status);
-  } catch (err) {
-    if (statusSection) statusSection.hidden = true;
-    setStatusError(err instanceof Error ? err.message : "Could not load order status.");
+async function fetchOrderStatus(order, email) {
+  const params = new URLSearchParams({ order, email });
+  const res = await fetch(`${apiOrigin()}/v1/store/order-status?${params.toString()}`, {
+    headers: { Accept: "application/json" },
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const msg =
+      typeof json.message === "string"
+        ? json.message
+        : "Order not found. Check your order number and email.";
+    throw new Error(msg);
+  }
+  return json;
+}
+
+function prefillFromQuery() {
+  const params = new URLSearchParams(window.location.search);
+  const order = params.get("order");
+  const email = params.get("email");
+  if (order && orderInput instanceof HTMLInputElement) orderInput.value = order;
+  if (email && emailInput instanceof HTMLInputElement) emailInput.value = email;
+  if (order && email) {
+    void fetchOrderStatus(order.replace(/^#+/, ""), email)
+      .then(renderStatusResult)
+      .catch((err) => renderStatusError(err.message));
   }
 }
 
-function bindLookupForm() {
-  if (!lookupForm) return;
-  lookupForm.addEventListener("submit", (event) => {
+if (form instanceof HTMLFormElement) {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const intentId = lookupIntentInput?.value?.trim() || "";
-    const orderId = lookupOrderInput?.value?.trim() || "";
-    if (intentId) {
-      void loadStatusFromQuery({ artifact_intent_id: intentId });
-      return;
+    const order =
+      orderInput instanceof HTMLInputElement ? orderInput.value.trim().replace(/^#+/, "") : "";
+    const email = emailInput instanceof HTMLInputElement ? emailInput.value.trim() : "";
+    if (!order || !email) return;
+    if (resultEl) resultEl.hidden = true;
+    try {
+      const status = await fetchOrderStatus(order, email);
+      renderStatusResult(status);
+    } catch (err) {
+      renderStatusError(err instanceof Error ? err.message : "Could not load order status.");
     }
-    if (orderId) {
-      void loadStatusFromQuery({ shopify_order_id: orderId });
-      return;
-    }
-    setStatusError("Enter your personalization reference or Shopify order number.");
   });
 }
 
-async function initThanks() {
-  persistMerchCreateRef("tier0_shop");
-  decorateThanksCreateLinks();
-  bindLookupForm();
-
-  const urlQuery = readOrderStatusQuery();
-  if (urlQuery) {
-    await loadStatusFromQuery(urlQuery);
-    return;
-  }
-
-  const sessionIntent = peekCheckoutIntentId();
-  if (sessionIntent) {
-    await loadStatusFromQuery({ artifact_intent_id: sessionIntent });
-  }
-}
-
-void initThanks();
+persistMerchCreateRef("tier0_shop");
+decorateThanksCreateLinks();
+prefillFromQuery();

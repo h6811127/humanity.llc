@@ -516,6 +516,8 @@ Goal: complete one real paid order path safely.
 - User-safe order timeline.
 - Operator lookup by Shopify order, commerce order, artifact intent, and Printify order.
 
+**Shipped (partial):** Printify webhook receiver · operator lookup · **buyer order status** — `GET /v1/store/order-status` (email hash + order number) · `/shop/thanks/` UI. Reconciliation polling and tracking links deferred.
+
 **Exit criteria:**
 
 - On-hold, has-issues, source-check-failed, unfulfillable, fulfilled, partially fulfilled, and canceled states are actionable.
