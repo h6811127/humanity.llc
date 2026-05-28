@@ -1,0 +1,25 @@
+> vitest run worker/tests/pwa-install-metadata.test.ts
+
+The CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#
+The CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.
+
+ RUN  v3.2.4 /Users/spencerdavis/Documents/projects/humanity.llc
+
+ ✓ worker/tests/pwa-install-metadata.test.ts (9 tests) 17ms
+   ✓ pwa-install-metadata-core > documents canonical spec path 1ms
+   ✓ pwa-install-metadata-core > classifies shell vs excluded paths 0ms
+   ✓ pwa-install-metadata-core > validates manifest shape 1ms
+   ✓ pwa-install-metadata-core > requires 192 and 512 icon sizes when manifest ships 1ms
+   ✓ PWA metadata on disk (Phase 1 gate) > manifest path constant matches planned deploy locatio
+   ✓ PWA metadata on disk (Phase 1 gate) > manifest path constant matches planned deploy location 0ms
+   ✓ PWA metadata on disk (Phase 1 gate) > manifest file exists with required se
+   ✓ PWA medata on disk (Phase 1 gate) > manifest file exists with required fields after Phase 1 0ms
+   ✓ PWA metadata on disk (Phase 1 gate) > shell HTML includes manifest link after Phase 1 1ms
+   ✓ PWA metadata on disk (Phase 1 gate) > icon PNGs exist on disk after Phase 1 0ms
+   ✓ PWA metadata on disk (Phase 1 gate) > create and scan HTML do not link manifest 13ms
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  14:10:58
+   Duration  530ms (transform 165ms, setup 0ms, collect 234ms, tests 17ms, environment 0ms, prep
+   Duration  530ms (transform 165ms, setup 0ms, collect 234ms, tests 17ms, environment 0ms, prepare 67ms)

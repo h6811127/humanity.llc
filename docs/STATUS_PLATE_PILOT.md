@@ -2,7 +2,7 @@
 
 **Status:** Active pilot  
 **Parent:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`  
-**Prerequisite:** M5 stranger loop (`docs/M5_STRANGER_TEST_RUNBOOK.md`)
+**Prerequisite:** ~~M5 stranger loop~~ **Satisfied** — M5 passed 2026-05-27 (`docs/M5_STRANGER_TEST_RUNBOOK.md`)
 
 ---
 

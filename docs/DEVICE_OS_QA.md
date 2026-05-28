@@ -5,7 +5,7 @@
 **Storage & hub detail:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)  
 **Refresh pipeline:** Status dot — resolver health only (`device-status.mjs` + `device-network-health.mjs`). Hub/wallet — scoped polls in `device-hub-ui.mjs` (`fetchAndApplyNetworkChips`, live-control inbox). `device-os-coordinator.mjs` is retained but not auto-started (see `docs/UI_UX_REVERT_PLAN.md` step 2).
 
-**Purpose:** Repeatable checks before M5 stranger tests and after device-shell changes. Log failures in the triage table at the bottom.
+**Purpose:** Repeatable checks after device-shell changes and before vertical pilots or merch checkout. Log failures in the triage table at the bottom.
 
 **Environment:** Run against local Pages (`npm run pages:dev`) + Worker (`npm run worker:dev`) unless noted “production only.”
 
@@ -491,7 +491,7 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device
 
 ## Bug triage log
 
-Copy a row per finding. **P0** blocks M5 strangers; fix before public announce.
+Copy a row per finding. **P0** blocks vertical pilots or public announce; fix before scaling strangers.
 
 | ID | Date | Priority | Scenario | Expected | Actual | Owner |
 |----|------|----------|----------|----------|--------|-------|
@@ -503,7 +503,7 @@ Copy a row per finding. **P0** blocks M5 strangers; fix before public announce.
 
 | Doc | Use |
 |-----|-----|
-| [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) | End-to-end stranger gate after OS QA |
+| [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) | Phase A exit gate (**passed** 2026-05-27) |
 | [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) | Backup import / second device |
 | [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md) | Chrome / sheet / motion |
 | [`SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md`](SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md) | WebKit scroll/dot fix plan + P0-W acceptance |
