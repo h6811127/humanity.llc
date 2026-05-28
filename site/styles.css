@@ -7444,6 +7444,10 @@ button.btn-danger {
   color: var(--hc-emphasis-card-detail-fg);
 }
 
+.device-keys-custody.hc-emphasis-card .hc-emphasis-card__actions + .hc-notice-foot {
+  width: 100%;
+}
+
 .device-keys-custody.hc-emphasis-card .hc-notice-foot a {
   color: var(--hc-notice-link);
 }

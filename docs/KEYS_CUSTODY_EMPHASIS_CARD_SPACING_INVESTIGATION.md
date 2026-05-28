@@ -120,7 +120,7 @@ Spacing/CSS for hub/wallet/created custody uses `.device-keys-custody.hc-emphasi
 
 | Step | Action | Status |
 |------|--------|--------|
-| 19 | Wallet `--wallet` foot links between detail and Acknowledge inflate E2E gap (&gt; 56px); move foot below actions | [`DEVICE_SHELL_E2E_CI_REMEDIATION.md`](DEVICE_SHELL_E2E_CI_REMEDIATION.md) step 2 | **Open** |
+| 19 | Wallet `--wallet` foot links below Acknowledge (not between detail and button) | [`DEVICE_SHELL_E2E_CI_REMEDIATION.md`](DEVICE_SHELL_E2E_CI_REMEDIATION.md) step 2 | **Shipped** |
 
 ---
 

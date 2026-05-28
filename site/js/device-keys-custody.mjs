@@ -36,7 +36,7 @@ function custodyAckButton() {
 
 /**
  * @param {string} className
- * @param {{ eyebrow: string, title: string, detail: string, extraCopyHtml?: string }} copy
+ * @param {{ eyebrow: string, title: string, detail: string, extraCopyHtml?: string, afterActionsHtml?: string }} copy
  */
 function custodyInfoEmphasisCard(className, copy) {
   return emphasisCardShellHtml({
@@ -48,6 +48,7 @@ function custodyInfoEmphasisCard(className, copy) {
     title: copy.title,
     detail: copy.detail,
     extraCopyHtml: copy.extraCopyHtml ?? "",
+    afterActionsHtml: copy.afterActionsHtml ?? "",
     actionsHtml: emphasisCardActionsHtml([custodyAckButton()]),
   });
 }
