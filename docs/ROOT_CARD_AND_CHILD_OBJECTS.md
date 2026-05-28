@@ -152,5 +152,6 @@ Delegated capabilities must be root-signed, scoped, expiring, revocable, and cle
 3. **Backup gating copy (shipped):** make root backup/recovery harder to skip before many child objects, merch checkout, or steward operations.
 4. **Child object endpoints (first slice shipped):** parent-signed create/update/revoke routes and `child_objects` storage.
 5. **Client signing (shipped):** browser helpers in `site/js/child-object-update.mjs` sign and POST parent-signed child objects; path helpers in `site/js/child-object-api-core.mjs`; `generateChildObjectId()` in `hc-sign.mjs`.
-6. **Delegated capabilities:** add scoped, expiring, root-signed child keys only after real team/event use cases demand them.
+6. **Status plate UI (first slice shipped):** `/created/` Advanced → **Add status plate** for general root cards; registers child objects via API and indexes them in device `localStorage` (`child-object-store-core.mjs`).
+7. **Delegated capabilities:** add scoped, expiring, root-signed child keys only after real team/event use cases demand them.
 
