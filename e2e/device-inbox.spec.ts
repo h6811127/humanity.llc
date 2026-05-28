@@ -138,6 +138,7 @@ test.describe("device inbox - live proof", () => {
     await page.addInitScript((entry) => {
       localStorage.removeItem("hc_browser_notif_prompt_dismissed");
       localStorage.setItem("hc_browser_notif", "off");
+      localStorage.setItem("hc_watch_live_proof", "1");
       localStorage.setItem("hc_wallet", JSON.stringify([entry]));
     }, WALLET_ENTRY);
     await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
@@ -257,6 +258,7 @@ test.describe("device inbox - background OS notification", () => {
     await page.addInitScript((entry) => {
       localStorage.setItem("hc_browser_notif", "on");
       localStorage.setItem("hc_browser_notif_prompt_dismissed", "1");
+      localStorage.setItem("hc_watch_live_proof", "1");
       localStorage.setItem("hc_wallet", JSON.stringify([entry]));
     }, WALLET_ENTRY);
     await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
