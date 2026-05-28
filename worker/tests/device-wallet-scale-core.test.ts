@@ -1,12 +1,16 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  LARGE_WALLET_HUB_DOM_CAP,
+  LARGE_WALLET_PAGE_DOM_CAP,
   LARGE_WALLET_THRESHOLD,
   comfortableWalletHint,
   isLargeWallet,
   largeWalletHint,
+  selectHubSavedRowEntries,
   selectLiveControlPollEntries,
   selectNetworkRefreshEntries,
+  selectWalletPageSavedRowEntries,
   walletNetworkMaxParallel,
   walletScaleHint,
 } from "../../site/js/device-wallet-scale-core.mjs";
@@ -163,5 +167,103 @@ describe("walletScaleHint", () => {
     expect(walletScaleHint(7)).toContain("1–5");
     expect(walletScaleHint(LARGE_WALLET_THRESHOLD)).toContain("Large wallet");
     expect(walletScaleHint(3)).toBeNull();
+  });
+});
+
+describe("selectHubSavedRowEntries", () => {
+  const makeEntries = (n) =>
+    Array.from({ length: n }, (_, i) => ({
+      profile_id: `7Xk9mP2nQ4rT6vW8yZ1aB3cD${String(i).padStart(2, "0")}`,
+    }));
+
+  it("returns all rows for small wallets", () => {
+    const entries = makeEntries(5);
+    expect(selectHubSavedRowEntries(entries)).toEqual({
+      entries,
+      hiddenCount: 0,
+    });
+  });
+
+  it("caps DOM rows at LARGE_WALLET_HUB_DOM_CAP when large", () => {
+    const entries = makeEntries(LARGE_WALLET_THRESHOLD + 5);
+    const picked = selectHubSavedRowEntries(entries);
+    expect(picked.entries).toHaveLength(LARGE_WALLET_HUB_DOM_CAP);
+    expect(picked.hiddenCount).toBe(entries.length - LARGE_WALLET_HUB_DOM_CAP);
+  });
+
+  it("prefers visible profile ids before cap", () => {
+    const entries = makeEntries(LARGE_WALLET_HUB_DOM_CAP + 5);
+    const visibleId = entries[entries.length - 1].profile_id;
+    const picked = selectHubSavedRowEntries(entries, [visibleId]);
+    expect(picked.entries.some((e) => e.profile_id === visibleId)).toBe(true);
+    expect(picked.hiddenCount).toBe(entries.length - LARGE_WALLET_HUB_DOM_CAP);
+  });
+
+  it("honors hosted hubDomCap from policy", () => {
+    const entries = makeEntries(30);
+    const policy = { ...HOSTED_POLICY, hubDomCap: 20 };
+    const picked = selectHubSavedRowEntries(entries, [], policy);
+    expect(picked.entries).toHaveLength(20);
+    expect(picked.hiddenCount).toBe(10);
+  });
+});
+
+describe("selectWalletPageSavedRowEntries", () => {
+  const makeEntries = (n) =>
+    Array.from({ length: n }, (_, i) => ({
+      profile_id: `7Xk9mP2nQ4rT6vW8yZ1aB3cD${String(i).padStart(2, "0")}`,
+    }));
+
+  it("returns all rows for small wallets", () => {
+    const entries = makeEntries(5);
+    expect(selectWalletPageSavedRowEntries(entries)).toEqual({
+      entries,
+      hiddenCount: 0,
+    });
+  });
+
+  it("caps DOM rows at LARGE_WALLET_PAGE_DOM_CAP when large", () => {
+    const entries = makeEntries(LARGE_WALLET_THRESHOLD + 35);
+    const picked = selectWalletPageSavedRowEntries(entries);
+    expect(picked.entries).toHaveLength(LARGE_WALLET_PAGE_DOM_CAP);
+    expect(picked.hiddenCount).toBe(entries.length - LARGE_WALLET_PAGE_DOM_CAP);
+  });
+
+  it("honors hosted walletPageDomCap from policy", () => {
+    const entries = makeEntries(60);
+    const policy = { ...HOSTED_POLICY, walletPageDomCap: 50 };
+    const picked = selectWalletPageSavedRowEntries(entries, [], policy);
+    expect(picked.entries).toHaveLength(50);
+    expect(picked.hiddenCount).toBe(10);
+  });
+});
+
+describe("selectWalletPageSavedRowEntries", () => {
+  const makeEntries = (n) =>
+    Array.from({ length: n }, (_, i) => ({
+      profile_id: `7Xk9mP2nQ4rT6vW8yZ1aB3cD${String(i).padStart(2, "0")}`,
+    }));
+
+  it("returns all rows for small wallets", () => {
+    const entries = makeEntries(5);
+    expect(selectWalletPageSavedRowEntries(entries)).toEqual({
+      entries,
+      hiddenCount: 0,
+    });
+  });
+
+  it("caps DOM at LARGE_WALLET_PAGE_DOM_CAP when large", () => {
+    const entries = makeEntries(LARGE_WALLET_THRESHOLD + 35);
+    const picked = selectWalletPageSavedRowEntries(entries);
+    expect(picked.entries).toHaveLength(LARGE_WALLET_PAGE_DOM_CAP);
+    expect(picked.hiddenCount).toBe(entries.length - LARGE_WALLET_PAGE_DOM_CAP);
+  });
+
+  it("honors hosted walletPageDomCap from policy", () => {
+    const entries = makeEntries(50);
+    const policy = { ...HOSTED_POLICY, walletPageDomCap: 30 };
+    const picked = selectWalletPageSavedRowEntries(entries, [], policy);
+    expect(picked.entries).toHaveLength(30);
+    expect(picked.hiddenCount).toBe(20);
   });
 });

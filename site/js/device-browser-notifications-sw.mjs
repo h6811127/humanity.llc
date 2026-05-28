@@ -3,7 +3,7 @@
  * @see docs/DEVICE_INBOX.md
  */
 import { resolverApiOrigin } from "./hc-sign.mjs";
-import { loadWallet } from "./device-wallet.mjs";
+import { listPollableWalletEntries } from "./device-wallet.mjs";
 import { getLiveControlPending } from "./device-live-control-inbox.mjs";
 import { liveControlPendingSignature } from "./device-live-control-inbox-core.mjs";
 import { isBrowserNotifEnabled } from "./device-browser-notifications-core.mjs";
@@ -105,7 +105,7 @@ export async function syncLiveProofServiceWorkerState(opts = {}) {
     watchLiveProofEnabled: watchOn,
     apiOrigin: resolverApiOrigin(),
     pageOrigin: location.origin,
-    entries: liveProofPollTargetsFromWallet(loadWallet()),
+    entries: liveProofPollTargetsFromWallet(listPollableWalletEntries()),
     lastSig: liveControlPendingSignature(pending),
     interactShown,
     resolverHealth: getResolverHealthStatus(),

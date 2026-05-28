@@ -4,13 +4,14 @@
  */
 import { DEVICE_OS_DEBOUNCE_MS } from "./device-os-coordinator-core.mjs";
 import {
-  PRESENCE_CHROME_DEBOUNCE_MS,
+  presenceChromeDebounceMs,
   presenceChromeFingerprint,
   presenceChromeRefreshScheduleAction,
   shouldChromeRefreshStorageImmediately,
   shouldRunChromeRefreshImmediate,
   shouldSkipPresenceChromeRefresh,
 } from "./device-chrome-refresh-core.mjs";
+import { getWalletCount } from "./device-wallet.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
 import {
   shouldShowCrossTabKeysNotice,
@@ -149,7 +150,7 @@ function schedulePresenceChromeRefresh() {
       presenceDebounceTimer = null;
     }
     runChromeRefresh();
-  }, PRESENCE_CHROME_DEBOUNCE_MS);
+  }, presenceChromeDebounceMs(getWalletCount()));
 }
 
 function onPresenceChanged() {

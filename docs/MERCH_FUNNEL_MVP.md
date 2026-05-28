@@ -16,7 +16,7 @@ Ordered work after repo review. Update row status as steps complete. Cross-links
 | **2** | **Phase A trust MVP** — run M5 stranger runbook (3 outsiders, unassisted create → scan → revoke) | Validation | **✅ Passed 2026-05-27** — [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) |
 | **3** | **Hosted steward production rollout** — `hosted:rollout:step*` through step 6 (secrets, flag, CF dashboard, regression) | Ops | ☐ |
 | **4** | **AI P1 product decision** — keep / rename / deterministic-only / remove scan reader (no new L3 user features until Phase A) | Product | ☐ |
-| **5** | **Large-wallet shell performance** — bound `hc_wallet_network_cache`, avoid full-wallet parse on hub/inbox hot paths | Engineering debt | **Partial ✅** — S6 cache bound; status/count + hub saved-row render + network poll scheduling use `hc_wallet_summary`; full wallet hydrates on row actions only; multi-tab presence coalesce still open |
+| **5** | **Large-wallet shell performance** — bound `hc_wallet_network_cache`, avoid full-wallet parse on hub/inbox hot paths | Engineering debt | **✅** — S6–S11 + `hc_wallet_summary` (cache, hot paths, collapsed hub previews, hub/wallet DOM caps, presence debounce; see `DEVICE_OS_REQUEST_BUDGET.md`) |
 
 **Rule:** Do not start new L3 user-facing AI surfaces until priority **2** passes. Commerce never grants vouch.
 
@@ -177,7 +177,7 @@ Aggregate metrics only — no PII. Allowed refs:
 | Step | Pass? |
 |------|-------|
 | Stranger scans campaign merch; profile loads with limits + customize CTA | ✅ scan hint · ☐ manual stranger QA |
-| Create card → `/shop/customize/` detects session | ✅ redirect + E2E `e2e/merch-funnel-customize.spec.ts` |
+| Create card → `/shop/customize/` detects session | ☐ auto-redirect on fresh `scan_customize` — [`DEVICE_SHELL_E2E_CI_REMEDIATION.md`](DEVICE_SHELL_E2E_CI_REMEDIATION.md) step 3 · E2E `e2e/merch-funnel-customize.spec.ts` |
 | Preview shows LIVE OBJECT branded QR on product mockup | ✅ UI |
 | Artifact intent created; attach returns Shopify line attributes | ✅ API tests |
 | Checkout URL includes `properties[artifact_intent_id]` | ✅ `shop-customize-core.test.ts` |

@@ -7,7 +7,7 @@ import {
   getOtherTabsHoldingProfile,
   requestFocusTab,
 } from "./device-tab-presence.mjs";
-import { loadWallet } from "./device-wallet.mjs";
+import { findWalletEntryByProfileId } from "./device-wallet.mjs";
 import {
   otherTabSwitchConfirmMessage,
   resolveOtherTabKeysAction,
@@ -44,7 +44,7 @@ export function openCreatedForProfile(profileId, qrId) {
  * @param {string} profileId
  */
 export function walletEntryForProfile(profileId) {
-  return loadWallet().find((e) => e.profile_id === profileId) ?? null;
+  return findWalletEntryByProfileId(profileId);
 }
 
 function closeHubOverlays() {

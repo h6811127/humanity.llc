@@ -3,4 +3,5 @@
 # Unknown paths: site/404.html (HTTP 404). Disable SPA fallback in Pages project settings.
 
 /create  /create/  301
-/shop/products/*  /shop/products/index.html  200
+# Product detail SPA — use detail.html (not index.html) so Pages does not re-match the splat and loop.
+/shop/products/*  /shop/products/detail.html  200

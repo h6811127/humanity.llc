@@ -8,7 +8,11 @@ import {
 } from "./device-hub-keys-custody-core.mjs";
 import { gatherInboxInput } from "./device-inbox.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
-import { loadWallet } from "./device-wallet.mjs";
+import {
+  findWalletEntryByProfileId,
+  getWalletCount,
+  getWalletSigningKeyCount,
+} from "./device-wallet.mjs";
 import { isKeysCustodyNoticeDismissed, dismissKeysCustodyNotice } from "./device-keys-custody-core.mjs";
 import { keysCustodyHtml } from "./device-keys-custody.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab, walletEntryForProfile } from "./device-notice-nav.mjs";
@@ -47,13 +51,10 @@ function walletEntryLabel(entry) {
 
 function gatherProactiveCustodyInput(session) {
   const defaultId = getDefaultVouchProfileId();
-  const wallet = loadWallet();
-  const defaultEntry = defaultId
-    ? wallet.find((entry) => entry.profile_id === defaultId)
-    : null;
+  const defaultEntry = defaultId ? findWalletEntryByProfileId(defaultId) : null;
   const activeProfileId = session?.profile_id ?? null;
   const signLock = activeProfileId ? getSignLock(activeProfileId) : null;
-  const walletEntriesWithKeys = wallet.filter((entry) => entry.owner_private_key_b58).length;
+  const walletEntriesWithKeys = getWalletSigningKeyCount();
 
   return {
     defaultVouchProfileId: defaultId,
@@ -71,8 +72,7 @@ function gatherProactiveCustodyInput(session) {
 }
 
 function gatherWalletScaleInput() {
-  const wallet = loadWallet();
-  const count = wallet.length;
+  const count = getWalletCount();
   const policy = getStewardEntitlementsPolicy();
   const hint = walletScaleHint(count, policy);
   return {
