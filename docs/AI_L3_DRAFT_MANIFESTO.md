@@ -107,5 +107,5 @@ Stewards could request an AI draft of manifesto copy and optional object stream 
 
 | Doc | Role |
 |-----|------|
-| [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md) | P1 scan reader (under review) |
+| [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md) | P1 scan reader (kept as opt-in Plain language reader) |
 | [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) | Brand direction + next steps |

@@ -1,13 +1,13 @@
 # L3 P1 — Opt-in scan explainer
 
-**Status:** Shipped  
+**Status:** Shipped — kept as opt-in “Plain language” reader in UI  
 **Parent:** [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) · [`LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md`](LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md)
 
 ---
 
 ## Goal
 
-Strangers scanning a **status plate** or **live object** with `object_streams` may optionally request a **plain-language summary** of the signed public snapshot. The summary is **not** resolver truth — it is labeled AI output and never replaces the signed snapshot block.
+Strangers scanning a **status plate** or **live object** with `object_streams` may optionally request a **plain-language summary** of the signed public snapshot. The summary is **not** resolver truth and never replaces the signed snapshot block. UI copy says **Plain language**, while the stable endpoint and JSON fields keep their `ai` names for integrators.
 
 ---
 
@@ -52,7 +52,7 @@ Validation matches L2 assembly limits (plain text, bounded field count and lengt
 {
   "summary": "The studio door is open until 9 PM. Special hours: Thursday closes at 6 PM.",
   "source": "workers_ai",
-  "disclaimer": "AI summary — not signed network state. Only the signed snapshot above is steward-published resolver copy.",
+  "disclaimer": "Plain-language summary — not signed network state. Only the signed snapshot above is steward-published resolver copy.",
   "limits": {
     "ai_explain_warning": "..."
   }
@@ -91,7 +91,7 @@ Rendered inside `.scan-public-snapshot` when L2 snapshot exists:
 1. **Signed snapshot** (unchanged — resolver truth)
 2. Limit note (unchanged)
 3. **Explain in plain language** button (opt-in)
-4. Hidden panel `#scan-ai-explain-panel` — shows summary + `AI_EXPLAIN_LIMIT` on success
+4. Hidden panel `#scan-ai-explain-panel` — labels the result “Plain-language help” and shows summary + `AI_EXPLAIN_LIMIT` on success
 
 Module: `site/js/scan-ai-explain.mjs` (loaded from scan HTML when snapshot present).
 

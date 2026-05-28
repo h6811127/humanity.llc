@@ -138,7 +138,7 @@ export function buildAgentContextPacket(
 }
 
 export const AI_EXPLAIN_DISCLAIMER =
-  "AI summary — not signed network state. Only the signed snapshot above is steward-published resolver copy.";
+  "Plain-language summary — not signed network state. Only the signed snapshot above is steward-published resolver copy.";
 
 export function aiExplainResponseBody(
   summary: string,

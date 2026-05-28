@@ -360,7 +360,7 @@ function renderPublicSnapshotBlock(
   <p class="scan-public-snapshot-limit" role="note">${escapeHtml(OBJECT_PUBLIC_SNAPSHOT_LIMIT)}</p>
   <button type="button" class="scan-ai-explain-btn" id="scan-ai-explain-btn">Explain in plain language</button>
   <div class="scan-ai-explain-panel" id="scan-ai-explain-panel" hidden>
-    <p class="scan-ai-explain-label">AI summary</p>
+    <p class="scan-ai-explain-label">Plain-language help</p>
     <p class="scan-ai-explain-text" id="scan-ai-explain-text"></p>
     <p class="scan-ai-explain-limit" role="note">${escapeHtml(AI_EXPLAIN_LIMIT)}</p>
   </div>

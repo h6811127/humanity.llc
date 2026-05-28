@@ -8,10 +8,17 @@ import {
 } from "../db/printify-webhooks";
 import {
   getPrintOrderByPrintifyOrderId,
-  updatePrintOrderStatus,
+  syncPrintOrderFromPrintify,
+  type PrintOrderRow,
 } from "../db/print-orders";
 import type { Env } from "../env";
 import { statusFromPrintifyWebhookEvent } from "../print/printify-status-map";
+import {
+  mergeTracking,
+  parsePrintifyTrackingFromWebhookData,
+  trackingIsEmpty,
+  type PrintifyTracking,
+} from "../print/printify-tracking";
 import { verifyPrintifyWebhookSignature } from "../print/printify-webhook-verify";
 import { errorResponse, jsonResponse } from "./resolver";
 
@@ -21,10 +28,7 @@ interface PrintifyWebhookEnvelope {
   resource?: {
     id?: unknown;
     type?: unknown;
-    data?: {
-      status?: unknown;
-      shop_id?: unknown;
-    } | null;
+    data?: Record<string, unknown> | null;
   };
 }
 
@@ -45,6 +49,24 @@ function readPrintifyOrderId(envelope: PrintifyWebhookEnvelope): string | null {
   if (typeof id === "string" && id.trim()) return id.trim();
   if (typeof id === "number" && Number.isFinite(id)) return String(id);
   return null;
+}
+
+function trackingFromRow(row: PrintOrderRow): PrintifyTracking | null {
+  if (!row.tracking_carrier && !row.tracking_number && !row.tracking_url) return null;
+  return {
+    carrier: row.tracking_carrier,
+    tracking_number: row.tracking_number,
+    tracking_url: row.tracking_url,
+  };
+}
+
+function trackingChanged(row: PrintOrderRow, merged: PrintifyTracking | null): boolean {
+  if (!merged || trackingIsEmpty(merged)) return false;
+  return (
+    merged.carrier !== row.tracking_carrier ||
+    merged.tracking_number !== row.tracking_number ||
+    merged.tracking_url !== row.tracking_url
+  );
 }
 
 /** POST /v1/print/webhooks/printify */
@@ -109,6 +131,7 @@ export async function handlePostPrintifyWebhook(
       ? envelope.resource.data.status.trim()
       : null;
   const nextStatus = statusFromPrintifyWebhookEvent(eventType, providerStatus);
+  const incomingTracking = parsePrintifyTrackingFromWebhookData(envelope.resource?.data);
 
   const printOrder = await getPrintOrderByPrintifyOrderId(db, printifyOrderId);
   if (!printOrder) {
@@ -129,7 +152,11 @@ export async function handlePostPrintifyWebhook(
     });
   }
 
-  if (!nextStatus) {
+  const mergedTracking = mergeTracking(trackingFromRow(printOrder), incomingTracking);
+  const statusChanged = nextStatus !== null && nextStatus !== printOrder.status;
+  const hasTrackingUpdate = trackingChanged(printOrder, mergedTracking);
+
+  if (!statusChanged && !hasTrackingUpdate) {
     await insertPrintifyWebhookReceipt(db, {
       event_id: eventId,
       event_type: eventType,
@@ -148,7 +175,14 @@ export async function handlePostPrintifyWebhook(
     });
   }
 
-  await updatePrintOrderStatus(db, printOrder.order_id, nextStatus, nowIso);
+  const appliedStatus = nextStatus ?? printOrder.status;
+  await syncPrintOrderFromPrintify(db, {
+    order_id: printOrder.order_id,
+    status: appliedStatus,
+    tracking: mergedTracking,
+    last_reconciled_at: nowIso,
+    updated_at: nowIso,
+  });
   await insertPrintifyWebhookReceipt(db, {
     event_id: eventId,
     event_type: eventType,
@@ -163,7 +197,8 @@ export async function handlePostPrintifyWebhook(
     event_id: eventId,
     printify_order_id: printifyOrderId,
     print_order_id: printOrder.order_id,
-    status: nextStatus,
+    status: appliedStatus,
+    tracking_updated: hasTrackingUpdate,
     processing_status: "processed",
   });
 }

@@ -46,7 +46,7 @@ export async function handlePostAiExplainSnapshot(
       request,
       errorResponse(
         "RATE_LIMITED",
-        "Too many AI explain requests from this network. Try again later.",
+        "Too many plain-language explain requests from this network. Try again later.",
         429,
         rate.retryAfterSec ? { "Retry-After": String(rate.retryAfterSec) } : undefined
       )

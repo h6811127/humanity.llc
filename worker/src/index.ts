@@ -6,6 +6,7 @@
 import { schemaReady } from "./db";
 import { resolverHealthBuildField } from "./resolver-health-build";
 import { runOrphanPurge } from "./db/orphan-purge";
+import { runPrintifyReconcile } from "./print/printify-reconcile";
 import {
   clientIp,
   corsHeaders,
@@ -131,7 +132,7 @@ export interface Env {
 
 export default {
   async scheduled(
-    _event: ScheduledEvent,
+    event: ScheduledEvent,
     env: Env,
     _ctx: ExecutionContext
   ): Promise<void> {
@@ -139,9 +140,15 @@ export default {
     try {
       const ready = await schemaReady(env.DB);
       if (!ready) return;
+
+      if (event.cron === "0,30 * * * *") {
+        await runPrintifyReconcile(env.DB, env);
+        return;
+      }
+
       await runOrphanPurge(env.DB);
     } catch (err) {
-      console.error("orphan_purge_failed", err);
+      console.error("scheduled_job_failed", event.cron, err);
     }
   },
 
