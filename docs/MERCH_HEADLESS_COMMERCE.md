@@ -119,10 +119,10 @@ CUSTOM /shop/customize/
         ├─ user approves limits checkbox
         └─ buildShopifyCartUrl(checkout_url, properties[artifact_intent_id], …)
 CHECKOUT  Shopify (new tab) — buyer pays
-WEBHOOK   Shopify orders/paid → Worker validates intent → commerce order (processing)
+WEBHOOK   Shopify orders/paid → Worker validates intent → commerce order (processing) · encrypted shipping capture (PM-FR-41)
 QUEUE     print order (awaiting_production_approval)
 MINT      operator POST …/print/orders/{id}/mint (owner-signed qr_credentials)
-SUBMIT    operator POST …/print/orders { submit_to_printify: true, shipping_address }
+SUBMIT    operator POST …/print/orders { submit_to_printify: true } — shipping from encrypted store or body override
 PRINTIFY  production → ship → webhook status sync
 WEAR      Owner updates manifesto from phone; same ink, new meaning
 ```
@@ -178,8 +178,9 @@ Deploy: `npm run pages:deploy` after edits.
 | `TIER0_*` / `PERSONALIZE_*_PRINTIFY_*` | Printify product mapping per template |
 | `PRINTIFY_API_TOKEN`, `PRINTIFY_SHOP_ID` | API auth |
 | `PRINTIFY_SUBMIT_ENABLED=1` | Allow live Printify HTTP submit (operator-gated) |
+| `FULFILLMENT_PII_ENCRYPTION_KEY` (secret) | AES-256-GCM key (32 raw bytes, base64) — encrypt Shopify `shipping_address` at paid webhook |
 
-Deploy: `npm run worker:deploy`. Route `humanity.llc/v1/*` required for artifact intents.
+Deploy: `npm run worker:deploy`. Route `humanity.llc/v1/*` required for artifact intents. Run `npm run worker:migrate:local` (or remote apply) for `0020_commerce_fulfillment_pii.sql`.
 
 ---
 
@@ -195,6 +196,7 @@ Deploy: `npm run worker:deploy`. Route `humanity.llc/v1/*` required for artifact
 | Printify order submit (product/variant line) | ✅ Shipped | [`printify-client.ts`](../worker/src/print/printify-client.ts) — operator-gated |
 | Printify webhook status sync | ✅ Shipped | O-003 slice |
 | **Per-order artwork upload to Printify** | ✅ Shipped (PR #63) | PM-FR-13 — [`printify-upload.ts`](../worker/src/print/printify-upload.ts) · [`printify-line-items.ts`](../worker/src/print/printify-line-items.ts). Upload SVG → ephemeral product with `print_areas` → order line item per planned QR. Requires `PERSONALIZE_*_PRINTIFY_BLUEPRINT_ID` + `PRINT_PROVIDER_ID`. |
+| **Encrypted shipping at rest (PM-FR-41)** | ✅ Shipped | Shopify paid webhook → `commerce_fulfillment_pii` · [`fulfillment-pii-crypto.ts`](../worker/src/commerce/fulfillment-pii-crypto.ts) · Printify submit via [`resolve-printify-shipping.ts`](../worker/src/commerce/resolve-printify-shipping.ts) |
 | Shipping quote before checkout | ☐ Deferred | PM-FR-20 — Shopify remains checkout total authority for v1 |
 | humanity.llc order timeline UI | ✅ Buyer status shipped (PR #66) | `GET /v1/store/order-status` · `/shop/thanks/` form. Tracking links + full timeline deferred. |
 
@@ -223,6 +225,7 @@ Deploy: `npm run worker:deploy`. Route `humanity.llc/v1/*` required for artifact
 ### 4. Worker (middleware)
 
 - [ ] Set `PERSONALIZE_*_PRINTIFY_*` (variant + shipping) **and** `PERSONALIZE_*_PRINTIFY_BLUEPRINT_ID` + `PRINT_PROVIDER_ID` for per-order artwork submit
+- [ ] Set `FULFILLMENT_PII_ENCRYPTION_KEY` secret (`openssl rand -base64 32`) — enables encrypted Shopify shipping capture
 - [ ] `npm run worker:deploy`
 - [ ] Test artifact intent: `POST /v1/store/artifact-intents` (not 405)
 
@@ -235,7 +238,7 @@ Deploy: `npm run worker:deploy`. Route `humanity.llc/v1/*` required for artifact
 ### 6. Post-payment ops (until fully automated)
 
 - [ ] Mint: `POST /v1/print/orders/{id}/mint` with owner-signed credentials
-- [ ] Submit: `POST /v1/print/orders` `{ commerce_order_id, submit_to_printify: true, shipping_address }` (paste address from Shopify admin — not stored in D1)
+- [ ] Submit: `POST /v1/print/orders` `{ commerce_order_id, submit_to_printify: true }` (shipping from encrypted store when key configured; optional `shipping_address` body override)
 
 ---
 
