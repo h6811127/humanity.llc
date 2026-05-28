@@ -5,11 +5,11 @@ import {
 } from "./child-object-store-core.mjs";
 import {
   CHILD_OBJECT_STATUS_DISABLED,
-  CHILD_OBJECT_TYPE_STATUS_PLATE,
-  isActiveStatusPlateRow,
-  parseStatusPlateChildFields,
-  parseStatusPlateChildState,
-  shouldOfferAddStatusPlate,
+  CHILD_OBJECT_TYPE_LOST_ITEM_RELAY,
+  isActiveLostItemRelayRow,
+  parseLostItemRelayChildFields,
+  parseLostItemRelayChildState,
+  shouldOfferAddLostItemRelay,
 } from "./created-child-object-core.mjs";
 import {
   postChildObjectCreate,
@@ -25,20 +25,20 @@ import { postChildObjectIssueQr, signChildObjectIssueQr } from "./child-object-q
  * @param {string} profileId
  * @param {ReturnType<typeof readChildObjectRows>} rows
  */
-function renderStatusPlateList(profileId, rows) {
-  const listEl = document.getElementById("child-object-status-plate-list");
+function renderLostItemRelayList(profileId, rows) {
+  const listEl = document.getElementById("child-object-lost-item-list");
   if (!listEl) return;
-  const plates = rows.filter(isActiveStatusPlateRow);
-  if (!plates.length) {
+  const relays = rows.filter(isActiveLostItemRelayRow);
+  if (!relays.length) {
     listEl.hidden = true;
     listEl.replaceChildren();
     return;
   }
   listEl.hidden = false;
   listEl.replaceChildren(
-    ...plates.map((row) => {
+    ...relays.map((row) => {
       const li = document.createElement("li");
-      li.className = "list-row child-object-plate-row";
+      li.className = "list-row child-object-relay-row";
       li.dataset.objectId = row.object_id;
 
       const content = document.createElement("span");
@@ -47,15 +47,15 @@ function renderStatusPlateList(profileId, rows) {
       title.className = "list-title";
       title.textContent = row.public_label;
       const sub = document.createElement("span");
-      sub.className = "list-sub child-object-plate-current-state";
+      sub.className = "list-sub child-object-relay-current-state";
       sub.textContent = row.public_state;
       content.append(title, sub);
       li.append(content);
 
       const scanWrap = document.createElement("div");
-      scanWrap.className = "child-object-plate-scan";
+      scanWrap.className = "child-object-relay-scan";
       const scanStatus = document.createElement("p");
-      scanStatus.className = "form-hint child-object-plate-scan-status";
+      scanStatus.className = "form-hint child-object-relay-scan-status";
       scanStatus.hidden = true;
       scanStatus.setAttribute("role", "status");
       if (typeof row.scan_url === "string" && row.scan_url) {
@@ -67,14 +67,14 @@ function renderStatusPlateList(profileId, rows) {
         link.textContent = "Open scan page";
         const copyBtn = document.createElement("button");
         copyBtn.type = "button";
-        copyBtn.className = "btn-secondary child-object-plate-copy-scan";
+        copyBtn.className = "btn-secondary child-object-relay-copy-scan";
         copyBtn.dataset.scanUrl = row.scan_url;
         copyBtn.textContent = "Copy scan link";
         scanWrap.append(link, copyBtn);
       } else {
         const issueBtn = document.createElement("button");
         issueBtn.type = "button";
-        issueBtn.className = "btn-secondary child-object-plate-issue-qr";
+        issueBtn.className = "btn-secondary child-object-relay-issue-qr";
         issueBtn.dataset.objectId = row.object_id;
         issueBtn.textContent = "Issue scan link";
         scanWrap.append(issueBtn);
@@ -82,12 +82,12 @@ function renderStatusPlateList(profileId, rows) {
       scanWrap.append(scanStatus);
 
       const form = document.createElement("form");
-      form.className = "compact-form child-object-plate-update-form";
+      form.className = "compact-form child-object-relay-update-form";
       form.noValidate = true;
 
       const label = document.createElement("label");
       label.className = "form-label";
-      label.textContent = "Update status line";
+      label.textContent = "Update return message";
       form.append(label);
 
       const input = document.createElement("input");
@@ -107,15 +107,15 @@ function renderStatusPlateList(profileId, rows) {
       form.append(button);
 
       const rowStatus = document.createElement("p");
-      rowStatus.className = "form-hint child-object-plate-update-status";
+      rowStatus.className = "form-hint child-object-relay-update-status";
       rowStatus.hidden = true;
       rowStatus.setAttribute("role", "status");
 
       const disableBtn = document.createElement("button");
       disableBtn.type = "button";
-      disableBtn.className = "btn-text child-object-plate-disable";
+      disableBtn.className = "btn-text child-object-relay-disable";
       disableBtn.dataset.objectId = row.object_id;
-      disableBtn.textContent = "Disable this plate";
+      disableBtn.textContent = "Disable this relay";
 
       li.append(scanWrap, form, rowStatus, disableBtn);
       return li;
@@ -131,19 +131,19 @@ function renderStatusPlateList(profileId, rows) {
  *   getSigningKeys: () => { privateKeyBase58: string; publicKeyBase58: string } | null;
  * }} ctx
  */
-export function initCreatedChildObject(ctx) {
-  const panel = document.getElementById("child-object-add-status-plate");
-  const form = document.getElementById("child-object-status-plate-form");
-  const statusEl = document.getElementById("child-object-status-plate-status");
-  const listEl = document.getElementById("child-object-status-plate-list");
+export function initCreatedLostItemRelay(ctx) {
+  const panel = document.getElementById("child-object-add-lost-item");
+  const form = document.getElementById("child-object-lost-item-form");
+  const statusEl = document.getElementById("child-object-lost-item-status");
+  const listEl = document.getElementById("child-object-lost-item-list");
   if (!panel || !form) return null;
 
   function refreshList() {
-    renderStatusPlateList(ctx.profileId, readChildObjectRows(localStorage, ctx.profileId));
+    renderLostItemRelayList(ctx.profileId, readChildObjectRows(localStorage, ctx.profileId));
   }
 
   function refreshVisibility() {
-    const show = shouldOfferAddStatusPlate(ctx.getSession());
+    const show = shouldOfferAddLostItemRelay(ctx.getSession());
     panel.hidden = !show;
     if (show) refreshList();
   }
@@ -154,14 +154,14 @@ export function initCreatedChildObject(ctx) {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
 
-    if (target.classList.contains("child-object-plate-copy-scan")) {
+    if (target.classList.contains("child-object-relay-copy-scan")) {
       const url = target.dataset.scanUrl;
       if (!url) return;
       try {
         await navigator.clipboard.writeText(url);
         const status = target
-          .closest(".child-object-plate-scan")
-          ?.querySelector(".child-object-plate-scan-status");
+          .closest(".child-object-relay-scan")
+          ?.querySelector(".child-object-relay-scan-status");
         if (status instanceof HTMLElement) {
           status.hidden = false;
           status.textContent = "Scan link copied.";
@@ -172,14 +172,14 @@ export function initCreatedChildObject(ctx) {
       return;
     }
 
-    if (!target.classList.contains("child-object-plate-issue-qr")) {
-      if (!target.classList.contains("child-object-plate-disable")) return;
+    if (!target.classList.contains("child-object-relay-issue-qr")) {
+      if (!target.classList.contains("child-object-relay-disable")) return;
       const objectId = target.dataset.objectId;
       if (!objectId) return;
 
       const keys = ctx.getSigningKeys();
-      const rowEl = target.closest(".child-object-plate-row");
-      const rowStatus = rowEl?.querySelector(".child-object-plate-update-status");
+      const rowEl = target.closest(".child-object-relay-row");
+      const rowStatus = rowEl?.querySelector(".child-object-relay-update-status");
       if (!keys) {
         if (rowStatus instanceof HTMLElement) {
           rowStatus.hidden = false;
@@ -198,7 +198,7 @@ export function initCreatedChildObject(ctx) {
 
       if (
         !window.confirm(
-          "Disable this status plate on the network? Scanners will see the object as unavailable."
+          "Disable this lost-item relay on the network? Scanners will see the object as unavailable."
         )
       ) {
         return;
@@ -214,7 +214,7 @@ export function initCreatedChildObject(ctx) {
         const signed = await signChildObjectRevoke({
           objectId,
           parentProfileId: ctx.profileId,
-          objectType: CHILD_OBJECT_TYPE_STATUS_PLATE,
+          objectType: CHILD_OBJECT_TYPE_LOST_ITEM_RELAY,
           publicLabel: stored.public_label,
           publicState: stored.public_state,
           createdAt: stored.created_at,
@@ -229,7 +229,7 @@ export function initCreatedChildObject(ctx) {
         refreshList();
         if (statusEl) {
           statusEl.hidden = false;
-          statusEl.textContent = "Status plate disabled on the network.";
+          statusEl.textContent = "Lost-item relay disabled on the network.";
         }
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
@@ -246,8 +246,8 @@ export function initCreatedChildObject(ctx) {
 
     const keys = ctx.getSigningKeys();
     const scanStatus = target
-      .closest(".child-object-plate-scan")
-      ?.querySelector(".child-object-plate-scan-status");
+      .closest(".child-object-relay-scan")
+      ?.querySelector(".child-object-relay-scan-status");
     if (!keys) {
       if (scanStatus instanceof HTMLElement) {
         scanStatus.hidden = false;
@@ -284,7 +284,8 @@ export function initCreatedChildObject(ctx) {
       refreshList();
       if (statusEl) {
         statusEl.hidden = false;
-        statusEl.textContent = "Scan link ready — print or share the URL on the status plate.";
+        statusEl.textContent =
+          "Scan link ready — print or share the URL on the lost-item tag.";
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
@@ -297,16 +298,19 @@ export function initCreatedChildObject(ctx) {
 
   listEl?.addEventListener("submit", async (event) => {
     const target = event.target;
-    if (!(target instanceof HTMLFormElement) || !target.classList.contains("child-object-plate-update-form")) {
+    if (
+      !(target instanceof HTMLFormElement) ||
+      !target.classList.contains("child-object-relay-update-form")
+    ) {
       return;
     }
     event.preventDefault();
-    const rowEl = target.closest(".child-object-plate-row");
+    const rowEl = target.closest(".child-object-relay-row");
     const objectId = rowEl instanceof HTMLElement ? rowEl.dataset.objectId : "";
     if (!objectId) return;
 
     const keys = ctx.getSigningKeys();
-    const rowStatus = rowEl?.querySelector(".child-object-plate-update-status");
+    const rowStatus = rowEl?.querySelector(".child-object-relay-update-status");
     if (!keys) {
       if (rowStatus instanceof HTMLElement) {
         rowStatus.hidden = false;
@@ -332,13 +336,13 @@ export function initCreatedChildObject(ctx) {
 
     try {
       const stateInput = target.querySelector('input[name="public_state"]');
-      const { publicState } = parseStatusPlateChildState(
+      const { publicState } = parseLostItemRelayChildState(
         stateInput instanceof HTMLInputElement ? stateInput.value : ""
       );
       const signed = await signChildObjectUpdate({
         objectId,
         parentProfileId: ctx.profileId,
-        objectType: CHILD_OBJECT_TYPE_STATUS_PLATE,
+        objectType: CHILD_OBJECT_TYPE_LOST_ITEM_RELAY,
         publicLabel: stored.public_label,
         publicState,
         createdAt: stored.created_at,
@@ -366,26 +370,26 @@ export function initCreatedChildObject(ctx) {
     if (!keys) {
       if (statusEl) {
         statusEl.hidden = false;
-        statusEl.textContent = "Unlock owner or recovery key before adding a status plate.";
+        statusEl.textContent = "Unlock owner or recovery key before adding a lost-item relay.";
       }
       return;
     }
-    const labelInput = document.getElementById("child-object-plate-label");
-    const stateInput = document.getElementById("child-object-plate-state");
-    const submitBtn = document.getElementById("child-object-status-plate-submit");
+    const labelInput = document.getElementById("child-object-relay-item");
+    const stateInput = document.getElementById("child-object-relay-message");
+    const submitBtn = document.getElementById("child-object-lost-item-submit");
     if (submitBtn instanceof HTMLButtonElement) submitBtn.disabled = true;
     if (statusEl) {
       statusEl.hidden = false;
-      statusEl.textContent = "Signing and registering status plate…";
+      statusEl.textContent = "Signing and registering lost-item relay…";
     }
     try {
-      const { publicLabel, publicState } = parseStatusPlateChildFields(
+      const { publicLabel, publicState } = parseLostItemRelayChildFields(
         labelInput instanceof HTMLInputElement ? labelInput.value : "",
         stateInput instanceof HTMLInputElement ? stateInput.value : ""
       );
       const signed = await signChildObjectCreate({
         parentProfileId: ctx.profileId,
-        objectType: CHILD_OBJECT_TYPE_STATUS_PLATE,
+        objectType: CHILD_OBJECT_TYPE_LOST_ITEM_RELAY,
         publicLabel,
         publicState,
         privateKeyBase58: keys.privateKeyBase58,
@@ -396,7 +400,7 @@ export function initCreatedChildObject(ctx) {
         typeof signed.created_at === "string" ? signed.created_at : new Date().toISOString();
       appendChildObjectRow(localStorage, ctx.profileId, {
         object_id: String(result.object_id || signed.object_id),
-        object_type: CHILD_OBJECT_TYPE_STATUS_PLATE,
+        object_type: CHILD_OBJECT_TYPE_LOST_ITEM_RELAY,
         public_label: publicLabel,
         public_state: publicState,
         created_at: createdAt,
@@ -407,7 +411,7 @@ export function initCreatedChildObject(ctx) {
       if (statusEl) {
         statusEl.hidden = false;
         statusEl.textContent =
-          "Status plate registered. Issue a scan link below, then publish status updates as needed.";
+          "Lost-item relay registered. Issue a scan link below, then publish return-message updates as needed.";
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);

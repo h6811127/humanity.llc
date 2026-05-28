@@ -110,12 +110,12 @@ OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:
 npm run hosted:rollout:step3b   # setup notes only; not required before step 4
 ```
 
-**Rollout step 4a — enable `HOSTED_STEWARD_ENABLED` in wrangler (do this first):**
+**Rollout step 4a — enable `HOSTED_STEWARD_ENABLED` in wrangler (shipped in repo):**
 
 ```bash
 npm run hosted:rollout:step4a
-npm run hosted:rollout:step4a -- --apply   # writes "1" to worker/wrangler.toml locally
-# commit worker/wrangler.toml, then step 4b
+npm run hosted:rollout:step4a -- --apply   # idempotent if already "1"
+# worker/wrangler.toml committed with HOSTED_STEWARD_ENABLED = "1" — proceed to step 4b
 ```
 
 **Status:** step 4a is applied in repo (`worker/wrangler.toml` has `HOSTED_STEWARD_ENABLED = "1"`). Continue with step 4b deploy/smoke/verify.
@@ -123,10 +123,13 @@ npm run hosted:rollout:step4a -- --apply   # writes "1" to worker/wrangler.toml 
 **Rollout step 4b — deploy + smoke + verify production:**
 
 ```bash
+# Local worker (after worker:migrate:local + worker:dev):
+npm run hosted:rollout:step4b -- --preflight
+npm run hosted:rollout:step4b -- --local-smoke
+# Production (push worker/ to main triggers deploy-worker.yml post-deploy verify):
 npm run hosted:rollout:step4 -- --deploy
+npm run hosted:rollout:post-deploy-smoke -- --verify
 npm run hosted:rollout:step4 -- --smoke
-API_ORIGIN=http://127.0.0.1:8787 npm run hosted:rollout:step4 -- --smoke   # after 4a --apply + worker:dev
-npm run hosted:rollout:step4 -- --verify
 OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step4 -- --verify
 ```
 

@@ -23,7 +23,7 @@ preview_database_id = "f16391f9-613a-4506-9ad7-35d19178b8b6"
 port = 8787
 
 [vars]
-# Hosted rollout step 4a: enabled after G0 + steps 1-3a; deploy/verify in step 4b.
+# G0 signed (2026-05-27): production rollout step 4a — hosted routes on after deploy.
 HOSTED_STEWARD_ENABLED = "1"
 # Tier 0 batch fulfillment (O-002): set when Shopify founding sticker SKU is live.
 # TIER0_CAMPAIGN_PROFILE_ID = ""

@@ -56,6 +56,19 @@ export function isObjectForwardManifesto(
   return t.includes(".") && t.length >= OBJECT_FORWARD_SENTENCE_MIN_LEN;
 }
 
+/** Build scan manifesto_line from a child_objects row (lost-item relays need [relay] prefix). */
+export function childObjectManifestoLine(child: {
+  object_type: string;
+  public_label: string;
+  public_state: string;
+}): string {
+  const label =
+    child.object_type === "lost_item_relay"
+      ? `${LOST_ITEM_RELAY_PREFIX}${child.public_label}`
+      : child.public_label;
+  return `${label}\n${child.public_state}`;
+}
+
 export function scanHeroTemplate(
   display: ManifestoDisplay,
   qrScope: QrScope | null

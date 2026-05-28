@@ -290,6 +290,8 @@ See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 | 3 | Tap **Open controls** on a summary row | Full row hydrates; navigates to `/created/` |
 | 4 | Search hub while expanded | Filter still works on summary rows |
 
+Automated: `e2e/device-hub-large-wallet-summary.spec.ts` (steps 1–4); Vitest `device-hub-visible-rows-core.test.ts` · `device-hub-wallet-summary.test.ts`.
+
 ### P1-HH · Hub header simplification (Home / Close / Create)
 
 **Spec:** [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md) · visual refresh: [`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md)
@@ -345,7 +347,7 @@ Automated: `e2e/device-status-dot.spec.ts` § hub sheet header chrome (steps 6�
 
 **Fail signals:** Install prompt on scan; install card with zero saved cards; install card over orphan inbox; dead status dot after adding PWA module to status graph.
 
-Automated (Phase 0+): `npm run worker:test -- worker/tests/pwa-install-metadata.test.ts worker/tests/pwa-install-ux.test.ts` · Phase 3: `e2e/device-pwa-install.spec.ts`.
+Automated (Phase 0+): `npm run worker:test:pwa-install` · Phase 3–4: `npm run e2e:pwa-install` (steps 2, 8–11 + no-SW policy in CI). Manual HTTPS sign-off still required for steps 1, 4, 6–7, 9 on real devices.
 
 ### P1-8 · Hosted tier budget (Phase 10 — E2 staging)
 

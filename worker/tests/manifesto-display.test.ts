@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   LOST_ITEM_RELAY_PREFIX,
+  childObjectManifestoLine,
   isObjectForwardManifesto,
   parseManifestoDisplay,
   scanHeroTemplate,
@@ -56,5 +57,34 @@ describe("splitManifestoDisplay", () => {
   it("remains compatible for status plates", () => {
     const r = splitManifestoDisplay("Studio door\nOpen until 9 PM");
     expect(r.isStatusPlate).toBe(true);
+  });
+});
+
+describe("childObjectManifestoLine", () => {
+  it("adds relay prefix for lost_item_relay child objects", () => {
+    expect(
+      childObjectManifestoLine({
+        object_type: "lost_item_relay",
+        public_label: "House keys",
+        public_state: "Lost — contact owner through relay",
+      })
+    ).toBe(`${LOST_ITEM_RELAY_PREFIX}House keys\nLost — contact owner through relay`);
+    expect(parseManifestoDisplay(
+      childObjectManifestoLine({
+        object_type: "lost_item_relay",
+        public_label: "House keys",
+        public_state: "Lost — contact owner through relay",
+      })
+    ).kind).toBe("lost_item_relay");
+  });
+
+  it("keeps status plate labels unprefixed", () => {
+    expect(
+      childObjectManifestoLine({
+        object_type: "status_plate",
+        public_label: "Studio door",
+        public_state: "Open until 9 PM",
+      })
+    ).toBe("Studio door\nOpen until 9 PM");
   });
 });

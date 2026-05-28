@@ -1,6 +1,6 @@
 # PWA install — implementation plan
 
-**Status:** Phases 0–3 shipped  
+**Status:** Phases 0–3 shipped · **Phase 4 rollout gate in progress**  
 **Audience:** Engineers implementing [`PWA_INSTALL.md`](PWA_INSTALL.md)  
 **Related:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) · [`AGENTS.md`](../AGENTS.md) · [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md)
 
@@ -170,6 +170,49 @@ npm run worker:test -- worker/tests/pwa-install-metadata.test.ts worker/tests/pw
 
 ---
 
+## Phase 4 — Rollout gate
+
+### Intent
+
+Validate install behavior on real devices before expanding manifest coverage; lock remaining P1-PWA gates in CI where possible.
+
+### Files
+
+| File | Action |
+|------|--------|
+| `e2e/device-pwa-install.spec.ts` | Extend with Phase 4 describe (create exclusion, inbox block, iOS copy, standalone hub, status error, no SW) |
+| `docs/PWA_INSTALL.md` | Phase 4 row + rollout checklist |
+| `docs/DEVICE_OS_QA.md` | Cross-link automated Phase 4 coverage |
+| `package.json` | `e2e:pwa-install` script |
+
+### Automated scenarios (Phase 4)
+
+1. `/create/` — no install card placeholder (P1-PWA step 2)
+2. Zero saved cards — card hidden
+3. `cross_tab_keys` inbox active — card hidden (P1-PWA step 8)
+4. iOS Safari user agent on `/wallet/` — manual copy only (P1-PWA step 9)
+5. Standalone display mode — no card; dot opens hub (P1-PWA step 10 / P0-3)
+6. `data-device-status-error` — card hidden (P1-PWA step 11)
+7. No service worker registered after PWA module load (v1 policy)
+
+### Manual sign-off (required)
+
+Run [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-PWA** on a **deployed HTTPS origin**:
+
+- Steps 1, 4, 6–7 (install/dismiss/snooze/cross-tab with real installed PWA)
+- **P0-3** + **P0-W** from standalone launch
+
+Localhost validates metadata and CI smoke only — not real mobile install sheets.
+
+### Verification
+
+```bash
+npm run worker:test:pwa-install
+npm run e2e:pwa-install
+```
+
+---
+
 ## Rollback
 
 | Phase | Rollback |
@@ -196,6 +239,7 @@ No database or Worker migration rollback required.
 
 | Date | Change |
 |------|--------|
+| 2026-05-28 | Phase 4 rollout gate — extended E2E + manual HTTPS sign-off checklist |
 | 2026-05-27 | Phase 3 shipped — E2E + backlog H-006 closure |
 | 2026-05-27 | Phase 2 shipped — install card UX + lazy bootstrap load |
 | 2026-05-27 | Phase 1 shipped — manifest, icons, shell `<link>` tags |

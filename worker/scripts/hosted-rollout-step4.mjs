@@ -8,6 +8,8 @@
  *   npm run hosted:rollout:step4 -- --deploy
  *   npm run hosted:rollout:step4 -- --verify
  *   npm run hosted:rollout:step4 -- --smoke
+ *   npm run hosted:rollout:step4 -- --smoke --local
+ *   npm run hosted:rollout:step4 -- --smoke --local --preflight
  *   npm run hosted:rollout:step4 -- --deploy --smoke
  *   OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step4 -- --verify
  *   API_ORIGIN=http://127.0.0.1:8787 npm run hosted:rollout:step4 -- --smoke
@@ -18,21 +20,41 @@ import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { normalizeOperatorAuditToken } from "./hosted-rollout-token.mjs";
+import {
+  normalizeOperatorAuditToken,
+  operatorAuditTokenShellHint,
+} from "./hosted-rollout-token.mjs";
 import { readWranglerHostedFlag } from "./hosted-rollout-step4a.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
 
-const apiOrigin = (process.env.API_ORIGIN || "https://humanity.llc").replace(/\/$/, "");
+const LOCAL_DEV_ORIGIN = "http://127.0.0.1:8787";
 const deploy = process.argv.includes("--deploy");
 const verify = process.argv.includes("--verify");
 const smoke = process.argv.includes("--smoke");
+const useLocal = process.argv.includes("--local");
+const preflight = process.argv.includes("--preflight");
+
+/** @returns {string} */
+export function getApiOrigin() {
+  return (process.env.API_ORIGIN || "https://humanity.llc").replace(/\/$/, "");
+}
+
+/**
+ * @param {boolean} [forceLocal] When true, default API_ORIGIN to local worker:dev.
+ */
+export function applyLocalApiOriginDefault(forceLocal = useLocal) {
+  if (!forceLocal || process.env.API_ORIGIN) return getApiOrigin();
+  process.env.API_ORIGIN = LOCAL_DEV_ORIGIN;
+  return getApiOrigin();
+}
 let token;
 try {
   token = normalizeOperatorAuditToken(process.env.OPERATOR_AUDIT_TOKEN);
 } catch (err) {
   console.error(err instanceof Error ? err.message : err);
+  console.error(`\n${operatorAuditTokenShellHint()}`);
   process.exit(1);
 }
 
@@ -71,12 +93,12 @@ function printDeployAndVerifyChecklist() {
   console.log("   npm run hosted:rollout:step4 -- --deploy\n");
   console.log("2. Smoke (health + hosted routes on):");
   console.log("   npm run hosted:rollout:step4 -- --smoke");
-  console.log("   API_ORIGIN=http://127.0.0.1:8787 npm run hosted:rollout:step4 -- --smoke\n");
+  console.log("   npm run hosted:rollout:step4 -- --smoke --local --preflight");
+  console.log("   (after worker:migrate:local + worker:dev) API_ORIGIN=http://127.0.0.1:8787\n");
   console.log("3. Verify production:");
   console.log("   npm run hosted:rollout:step4 -- --verify");
-  console.log(
-    "   OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step4 -- --verify\n"
-  );
+  console.log("   export OPERATOR_AUDIT_TOKEN='your-token-from-wrangler'");
+  console.log("   npm run hosted:rollout:step4 -- --verify\n");
   console.log("4. Before steward announcement, run step 6 regression:");
   console.log("   npm run hosted:rollout:step6 -- --verify\n");
 }
@@ -100,7 +122,7 @@ export async function fetchJson(url, init) {
 /**
  * @param {string} [origin]
  */
-export async function smokeProductionHealth(origin = apiOrigin) {
+export async function smokeProductionHealth(origin = getApiOrigin()) {
   const url = `${origin}/.well-known/hc/v1/health`;
   console.log(`\n▶ Smoke health (${url})`);
   const { res, body } = await fetchJson(url, {
@@ -125,7 +147,7 @@ export async function smokeProductionHealth(origin = apiOrigin) {
 /**
  * @param {string} [origin]
  */
-export async function smokeHostedPlansEnabled(origin = apiOrigin) {
+export async function smokeHostedPlansEnabled(origin = getApiOrigin()) {
   const url = `${origin}/.well-known/hc/v1/operator/plans`;
   console.log(`\n▶ Smoke hosted plans (${url})`);
   const { res, body } = await fetchJson(url, {
@@ -150,7 +172,7 @@ export async function smokeHostedPlansEnabled(origin = apiOrigin) {
 }
 
 /** Step 4: hosted extension on; entitlements route live (auth required, not disabled). */
-export async function smokeHostedStewardRoutesEnabled(origin = apiOrigin) {
+export async function smokeHostedStewardRoutesEnabled(origin = getApiOrigin()) {
   const capsUrl = `${origin}/.well-known/hc/v1/operator/capabilities`;
   console.log(`\n▶ Smoke operator capabilities (${capsUrl})`);
   const { res: capsRes, body: capsBody } = await fetchJson(capsUrl, {
@@ -193,7 +215,7 @@ export async function smokeHostedStewardRoutesEnabled(origin = apiOrigin) {
  * @param {string} bearerToken
  * @param {string} [origin]
  */
-export async function smokeStewardOpsHostedEnabled(bearerToken, origin = apiOrigin) {
+export async function smokeStewardOpsHostedEnabled(bearerToken, origin = getApiOrigin()) {
   const url = `${origin}/.well-known/hc/v1/operator/steward-ops`;
   console.log(`\n▶ Smoke steward-ops hosted flag (${url})`);
   const { res, body } = await fetchJson(url, {
@@ -212,12 +234,12 @@ export async function smokeStewardOpsHostedEnabled(bearerToken, origin = apiOrig
   console.log("steward-ops OK (hosted_steward_enabled=true)");
 }
 
-async function smokeProduction() {
-  await smokeProductionHealth();
-  await smokeHostedPlansEnabled();
-  await smokeHostedStewardRoutesEnabled();
+export async function smokeProduction(origin = getApiOrigin()) {
+  await smokeProductionHealth(origin);
+  await smokeHostedPlansEnabled(origin);
+  await smokeHostedStewardRoutesEnabled(origin);
   if (token) {
-    await smokeStewardOpsHostedEnabled(token);
+    await smokeStewardOpsHostedEnabled(token, origin);
   } else {
     console.log(
       "\nℹ️  Set OPERATOR_AUDIT_TOKEN to also smoke steward-ops hosted_steward_enabled=true."
@@ -236,9 +258,25 @@ async function verifyProduction() {
   }
 }
 
+export function runStep4PreflightVitest() {
+  runNpm("Step 4 rollout unit tests (preflight)", [
+    "run",
+    "worker:test",
+    "--",
+    "worker/tests/hosted-rollout-step4-smoke.test.ts",
+    "worker/tests/hosted-rollout-step4.test.ts",
+    "worker/tests/hosted-rollout-step4a.test.ts",
+  ]);
+}
+
 async function main() {
   console.log("Hosted steward rollout — step 4 (deploy + verify)");
   console.log("Docs: docs/HOSTED_TIER_IMPLEMENTATION_EPICS.md § Production rollout\n");
+
+  const origin = applyLocalApiOriginDefault();
+  if (useLocal) {
+    console.log(`ℹ️  Using API_ORIGIN=${origin} (--local)\n`);
+  }
 
   if (!deploy && !verify && !smoke) {
     const flag = readWranglerHostedFlag();
@@ -265,8 +303,11 @@ async function main() {
   }
 
   if (smoke) {
+    if (preflight) {
+      runStep4PreflightVitest();
+    }
     await smokeProduction();
-    console.log("\n✅ Step 4 smoke OK (hosted routes enabled on origin).");
+    console.log(`\n✅ Step 4 smoke OK (hosted routes enabled on ${origin}).`);
     if (!deploy && !verify) {
       console.log("Next: npm run hosted:rollout:step4 -- --deploy  (production)");
     }

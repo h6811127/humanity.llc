@@ -226,4 +226,72 @@ describe("issue-child-object-qr", () => {
     expect(html).toContain("Open until 9 PM");
     expect(html).not.toContain("Root manifesto");
   });
+
+  it("renders lost-item relay scan HTML from child object state", async () => {
+    const keys = await getTestKeypair();
+    const vm = buildScanViewModel(
+      PROFILE,
+      CHILD_QR,
+      {
+        card: {
+          profile_id: PROFILE,
+          public_key: keys.publicKeyBase58,
+          handle: "keys_relay",
+          handle_normalized: "keys_relay",
+          manifesto_line: "Root manifesto",
+          status: "active",
+          card_document_json: "{}",
+          created_at: CREATED,
+          updated_at: CREATED,
+        },
+        qr: {
+          qr_id: CHILD_QR,
+          profile_id: PROFILE,
+          epoch: 1,
+          scope: "child_object",
+          print_artifact_id: null,
+          object_id: OBJECT_ID,
+          resolver_hint: "https://humanity.llc",
+          status: "active",
+          payload: `https://humanity.llc/c/${PROFILE}?q=${CHILD_QR}`,
+          issued_at: CREATED,
+          expires_at: null,
+          credential_document_json: "{}",
+          created_at: CREATED,
+          updated_at: CREATED,
+        },
+        childObject: {
+          object_id: OBJECT_ID,
+          parent_profile_id: PROFILE,
+          object_type: "lost_item_relay",
+          public_label: "House keys",
+          public_state: "Lost — contact owner through relay",
+          status: "active",
+          child_object_document_json: "{}",
+          created_at: CREATED,
+          updated_at: CREATED,
+        },
+        verification: {
+          profile_id: PROFILE,
+          state: "registered",
+          level: 1,
+          label: "Registered",
+          method: "registered",
+          vouch_count: 0,
+          latest_accepted_vouch_at: null,
+          credential_ids_json: "[]",
+          summary_document_json: null,
+          updated_at: CREATED,
+        },
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    expect(vm.kind).toBe("active");
+    expect(html).toContain("House keys");
+    expect(html).toContain("Lost — contact owner through relay");
+    expect(html).not.toContain("Root manifesto");
+  });
 });

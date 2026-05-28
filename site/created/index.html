@@ -843,6 +843,55 @@
           </section>
 
           <section
+            class="created-what-now created-what-now-compact"
+            id="child-object-add-lost-item"
+            hidden
+            aria-labelledby="child-object-add-lost-item-title"
+          >
+            <h2 class="created-what-now-title" id="child-object-add-lost-item-title">
+              Add lost-item relay under this root
+            </h2>
+            <p class="created-what-now-body">
+              One root signing key controls additional public objects. This registers a
+              <strong>lost-item relay</strong> child on the network (no new private key).
+            </p>
+            <form id="child-object-lost-item-form" class="compact-form" novalidate>
+              <label class="form-label" for="child-object-relay-item">Item name</label>
+              <input
+                class="form-input"
+                id="child-object-relay-item"
+                type="text"
+                maxlength="120"
+                autocomplete="off"
+                required
+              />
+              <label class="form-label" for="child-object-relay-message">Return message</label>
+              <input
+                class="form-input"
+                id="child-object-relay-message"
+                type="text"
+                maxlength="280"
+                autocomplete="off"
+                required
+              />
+              <button
+                type="submit"
+                class="btn-secondary"
+                id="child-object-lost-item-submit"
+              >
+                Register lost-item relay
+              </button>
+            </form>
+            <p class="form-hint" id="child-object-lost-item-status" hidden role="status"></p>
+            <ul
+              class="list-rows"
+              id="child-object-lost-item-list"
+              hidden
+              aria-label="Lost-item relays under this root on this device"
+            ></ul>
+          </section>
+
+          <section
             class="created-status-plate-loop"
             id="status-plate-loop-scorecard"
             aria-labelledby="status-plate-loop-scorecard-title"
@@ -1482,6 +1531,6 @@
     </div>
     <script src="/js/device-status-bootstrap.mjs?v=57" type="module"></script>
     <script src="/js/created-hub.mjs?v=3" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=62"></script>
+    <script type="module" src="/js/created.mjs?v=63"></script>
   </body>
 </html>

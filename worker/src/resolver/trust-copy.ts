@@ -4,11 +4,11 @@ export const BEARER_WARNING =
 
 /** When signed object_streams are present on the card document. */
 export const OBJECT_STREAMS_LIMIT =
-  "Extra object details are steward-signed public copy on this object — not verified facts, AI answers, or proof someone scanned.";
+  "Extra object details are steward-signed public copy on this object — not verified facts, outside summaries, or proof someone scanned.";
 
 /** When a deterministic public_snapshot is assembled from manifesto + object_streams. */
 export const OBJECT_PUBLIC_SNAPSHOT_LIMIT =
-  "Signed snapshot repeats steward-published fields only — not verified facts, AI answers, or proof someone scanned.";
+  "Signed snapshot repeats steward-published fields only — not verified facts, outside summaries, or proof someone scanned.";
 
 /** When the opt-in L3 explain panel shows a model or deterministic summary. */
 export const AI_EXPLAIN_LIMIT =

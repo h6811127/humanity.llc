@@ -13,4 +13,5 @@ export const DEVICE_SHELL_E2E_SPECS = [
   "e2e/scan-cross-tab-banner-webkit.spec.ts",
   "e2e/keys-custody-emphasis-webkit.spec.ts",
   "e2e/merch-funnel-customize.spec.ts",
+  "e2e/device-hub-large-wallet-summary.spec.ts",
 ];

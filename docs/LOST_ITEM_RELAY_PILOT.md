@@ -29,7 +29,7 @@ Not proof of ownership. Not a phone number printed in plain sight. Item name + r
    - **What should finders see?**  -  return message (e.g. `Lost  -  contact owner through relay`)
 4. Save recovery key on `/created/`, print QR, scan from another phone, revoke when recovered.
 
-**Target model:** From an existing root Humanity Card, choose **Add object -> Lost item**. The root key signs the relay state; the tag can be revoked or updated without creating another keyed card.
+**Target model:** From an existing root Humanity Card, choose **Add lost-item relay** on `/created/` Live. The root key signs the relay state; the tag gets its own object/QR lifecycle but no new private key or separate human verification.
 
 Public showcase scan (homepage pilot): see `site/data/showcase-lost-item.json` - refresh with `npm run site:seed-showcase-lost-item`.
 
@@ -65,7 +65,7 @@ Deploy Worker with `X-HC-Scan-UI: pass-v8` for this layout.
 | Step | Pass? |
 |------|-------|
 | Stranger creates lost item relay unassisted (current flat-card bridge) | ☐ |
-| Existing card owner adds lost-item child object (target flow) | ☐ future |
+| Existing card owner adds lost-item child object (target flow) | ☐ manual · **create + update + scan link + disable** on `/created/` Live |
 | Finder understands return path in &lt;30s | ☐ |
 | Owner revokes after “found” and re-scan shows revoked | ☐ |
 | Stranger answers “does scan prove holder?” correctly | ☐ |
@@ -116,5 +116,6 @@ Owner can change line 2 (return message) without reprinting  -  `docs/MANIFESTO_
 | `site/create/` | Lost item template |
 | `site/js/create-card.mjs` | `[relay] ` prefix + `pilot_template` |
 | `site/created/` | Lost item pilot tip |
-| `worker/src/resolver/manifesto-display.ts` | Parse relay layout |
+| `site/js/created-child-object-lost-item.mjs` | Lost-item relay child UI on `/created/` Live |
+| `worker/src/resolver/manifesto-display.ts` | `childObjectManifestoLine()` — `[relay]` prefix for lost-item child scans |
 | `worker/src/resolver/scan-html.ts` | Scan UI (`pass-v8`) |
