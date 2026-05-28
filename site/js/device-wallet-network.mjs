@@ -16,12 +16,12 @@ import {
   networkStatusChip,
   parseNetworkQrScope,
   parseNetworkVerification,
+  pruneWalletNetworkCache,
   readCachedNetworkStatus,
   readCachedVerification,
   shouldUseCachedNetworkStatus,
   verificationRecordFromLabelState,
   WALLET_NETWORK_CACHE_TTL_MS,
-  pruneWalletNetworkCache,
 } from "./device-wallet-network-core.mjs";
 import {
   getWalletStatusPollHealth,
@@ -164,12 +164,13 @@ function loadCache() {
 
 /**
  * @param {Record<string, unknown>} cache
- * @param {{ protectProfileIds?: Iterable<string> }} [opts]
+ * @param {{ protectProfileIds?: Iterable<string>, scopeProfileIds?: Iterable<string> }} [opts]
  */
 function saveCache(cache, opts = {}) {
   try {
     const next = pruneWalletNetworkCache(cache, {
       protectProfileIds: opts.protectProfileIds,
+      scopeProfileIds: opts.scopeProfileIds,
     });
     sessionStorage.setItem(CACHE_KEY, JSON.stringify(next));
   } catch {
@@ -406,7 +407,11 @@ function applyWalletStatusPollHealthFromRound(networkFetchedProfileIds, statusMa
  */
 export async function refreshWalletNetworkStatuses(entries, onDone, options = {}) {
   const { generation, isCurrentGeneration } = options;
-  const cache = loadCache();
+  const entryProfileIds = entries.map((e) => e.profile_id).filter(Boolean);
+  const cache = pruneWalletNetworkCache(loadCache(), {
+    protectProfileIds: entryProfileIds,
+    scopeProfileIds: entryProfileIds,
+  });
   const statusMap = {};
   const alertStateMap = {};
   const scanKindMap = {};
@@ -515,7 +520,8 @@ export async function refreshWalletNetworkStatuses(entries, onDone, options = {}
   }
 
   saveCache(cache, {
-    protectProfileIds: entries.map((e) => e.profile_id).filter(Boolean),
+    protectProfileIds: entryProfileIds,
+    scopeProfileIds: entryProfileIds,
   });
   applyWalletStatusPollHealthFromRound(
     networkFetchedProfileIds,

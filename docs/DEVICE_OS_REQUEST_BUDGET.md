@@ -199,6 +199,7 @@ Client budgets are necessary; they are **not** sufficient against bugs, old cach
 | Network refresh: capped parallelism on large wallet | **Shipped** (Phase 8) | `walletNetworkMaxParallel` (2 auto, 1 manual) |
 | Network refresh: round-robin one stale row per debounced hub refresh (large wallet) | **Shipped** (Phase 8b) | `selectNetworkRefreshEntries` + `listWalletEntriesNeedingNetworkFetch` |
 | Network refresh: visible-row priority | **Shipped** (Phase 8c) | `device-hub-visible-rows-core.mjs` + `orderEntriesVisibleFirst` |
+| `hc_wallet_network_cache` bounded to current wallet rows | **First slice shipped** (Phase 8d) | `pruneWalletNetworkCache` drops orphaned/expired entries and caps retained rows by recency |
 | `If-None-Match` / short TTL on Worker | **Shipped** (Phase 9) | `conditional-json.ts`; client `resolver-conditional-fetch-core.mjs` |
 
 ### C. Scope *who* polls
