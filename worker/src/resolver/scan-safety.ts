@@ -1,5 +1,6 @@
 import type { ScanContext } from "../db/scan";
 import { PAYLOAD_TYPES, verifySignedDocument } from "../crypto";
+import { objectTypeLabelFromContext } from "../../../site/js/object-taxonomy-core.mjs";
 import { parseManifestoDisplay } from "./manifesto-display";
 import type { ScanViewModel, StatusTone } from "./scan-state";
 
@@ -170,6 +171,9 @@ export function renderSafetyChips(vm: ScanViewModel, safety: ScanSafetyModel): s
     chips.push(`Object · ${display.objectLabel}`);
   } else if (display.kind === "lost_item_relay" && display.objectLabel) {
     chips.push(`Item · ${display.objectLabel}`);
+  } else if (vm.qrScope === "print_artifact") {
+    const objectLabel = objectTypeLabelFromContext({ qrScope: vm.qrScope }).label;
+    chips.push(objectLabel);
   }
   if (vm.profileId && vm.qrId) {
     chips.push("Revocable");

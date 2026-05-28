@@ -31,6 +31,7 @@ if (!/pattern\s*=\s*"humanity\.llc\/v1\/\*"/.test(toml)) {
 console.log("Merch funnel engineering exit gate\n");
 
 run("npm", ["run", "worker:test:merch-funnel"]);
+run("npm", ["run", "worker:test:merch-print-qa"]);
 run("npm", ["run", "worker:test", "--", "worker/tests/scan.test.ts", "-t", "merch"]);
 
 const skipE2e = process.argv.includes("--skip-e2e");
@@ -44,4 +45,4 @@ run("npm", ["run", "merch-funnel:verify-config"]);
 
 console.log("\n✅ Merch funnel engineering gate passed.");
 console.log("   Operator: paste Shopify variant URLs, then merch-funnel:verify-config -- --require-checkout");
-console.log("   Next product gate: docs/M5_STRANGER_TEST_RUNBOOK.md (Priority 2)");
+console.log("   Next: operator Tier 1 close-out (shop-config + live checkout) — docs/MERCH_FUNNEL_MVP.md Priority 1 operator");

@@ -20,7 +20,7 @@ describe("object taxonomy core", () => {
 
   it("describes child-object QR scope without assigning human trust to it", () => {
     expect(qrTrustGroupScopeSubtitle("print_artifact")).toBe(
-      "Printed object - revoke this item without disabling the root card"
+      "Printed item — revoke one artifact without killing the card"
     );
     expect(qrNoCalendarExpirySubtitle("print_artifact")).toBe(
       "This object QR stays valid until the owner revokes or replaces it"
@@ -34,7 +34,7 @@ describe("object taxonomy core", () => {
     expect(qrTrustGroupScopeSubtitle("card")).toBe("Root card-scoped credential");
     expect(qrNoCalendarExpirySubtitle("card")).toBeNull();
     expect(objectTypeLabelFromContext({ qrScope: "print_artifact" })).toEqual({
-      label: "Printed object",
+      label: "Printed item",
       tone: "wearable",
     });
     expect(objectTypeLabelFromContext({ qrScope: "card" })).toEqual({
