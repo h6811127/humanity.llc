@@ -1,9 +1,13 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
   compareShopConfigDrift,
   validateShopConfig,
 } from "../../site/js/shop-config-rollout-core.mjs";
+
+const repoRoot = join(import.meta.dirname, "../..");
 
 const launchReadyConfig = {
   version: 1,
@@ -90,5 +94,15 @@ describe("compareShopConfigDrift", () => {
       { personalize: { checkout_open: false } }
     );
     expect(warnings.some((w) => w.includes("personalize.checkout_open drift"))).toBe(true);
+  });
+});
+
+describe("merch-funnel rollout npm scripts", () => {
+  it("exposes rollout steps and verify:merch-funnel bundle", () => {
+    const pkg = JSON.parse(readFileSync(join(repoRoot, "package.json"), "utf8"));
+    expect(pkg.scripts["merch-funnel:rollout:step1"]).toContain("merch-funnel-rollout-step1.mjs");
+    expect(pkg.scripts["merch-funnel:rollout:step6"]).toContain("merch-funnel-rollout-step6.mjs");
+    expect(pkg.scripts["verify:merch-funnel"]).toContain("worker:test:merch-funnel");
+    expect(pkg.scripts["verify:merch-funnel"]).toContain("shop-config-rollout.test.ts");
   });
 });

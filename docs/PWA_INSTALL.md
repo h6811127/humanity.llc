@@ -1,6 +1,6 @@
 # PWA install (device shell)
 
-**Status:** Spec + contract modules shipped · Phases 1–3 shipped · **Phase 4 rollout gate in progress**  
+**Status:** Spec + contract modules shipped · Phases 1–3 shipped · **Phase 4 automated gate shipped** (CI `e2e:pwa-install`) · manual HTTPS P1-PWA sign-off pending  
 **Audience:** Product, frontend, ops  
 **Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md) · [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md) · [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md`](IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md) · [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) · [`features/QR Public Profile v1.0.md`](features/QR%20Public%20Profile%20v1.0.md)
 
@@ -321,7 +321,7 @@ Implementation checklist: [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMEN
 | **1** | Manifest, icons, HTML `<link>` tags | ✅ |
 | **2** | `pwa-install.mjs` + emphasis card UX | ✅ |
 | **3** | E2E + QA + backlog closure | ✅ |
-| **4** | Real-device rollout gate + extended CI smoke | 🔄 in progress |
+| **4** | Real-device rollout gate + extended CI smoke | ✅ automated (CI) · manual HTTPS sign-off pending |
 
 ### Phase 4 rollout gate (after Phases 1–3)
 
@@ -343,5 +343,6 @@ Manual Phase 4 (required for sign-off): [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P
 
 | Date | Change |
 |------|--------|
+| 2026-05-28 | Phase 4 automated CI gate — `test-site.yml` runs `e2e:pwa-install` |
 | 2026-05-28 | Phase 4 rollout gate — extended E2E smoke for P1-PWA steps 2, 8–11; manual HTTPS QA remains |
 | 2026-05-27 | Initial spec, metadata/UX core modules, Vitest contracts, DEVICE_OS + QA cross-links |

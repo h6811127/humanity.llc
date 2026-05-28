@@ -109,6 +109,12 @@ async function waitForInstallCardVisible(page: Page) {
   );
 }
 
+async function waitForStatusDotReady(page: Page) {
+  await expect(page.locator("#brand-status-dot")).toHaveAttribute("data-dot-state", /.+/, {
+    timeout: 15_000,
+  });
+}
+
 function withStandaloneDisplayMode() {
   return {
     content: `
@@ -279,6 +285,7 @@ test.describe("device PWA install (phase 4 rollout gate)", () => {
     await expect(page.locator("#device-pwa-install-card")).toBeHidden();
 
     await expect(page.locator("body")).not.toHaveClass(/device-hub-sheet-open/);
+    await waitForStatusDotReady(page);
     await page.locator("#brand-status-dot-btn").click();
     await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/);
     await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);

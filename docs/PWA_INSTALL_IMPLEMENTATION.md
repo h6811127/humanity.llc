@@ -1,6 +1,6 @@
 # PWA install — implementation plan
 
-**Status:** Phases 0–3 shipped · **Phase 4 rollout gate in progress**  
+**Status:** Phases 0–3 shipped · **Phase 4 automated gate shipped** (CI `e2e:pwa-install` in `test-site.yml`) · manual HTTPS P1-PWA sign-off pending  
 **Audience:** Engineers implementing [`PWA_INSTALL.md`](PWA_INSTALL.md)  
 **Related:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) · [`AGENTS.md`](../AGENTS.md) · [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md)
 
@@ -184,6 +184,7 @@ Validate install behavior on real devices before expanding manifest coverage; lo
 | `docs/PWA_INSTALL.md` | Phase 4 row + rollout checklist |
 | `docs/DEVICE_OS_QA.md` | Cross-link automated Phase 4 coverage |
 | `package.json` | `e2e:pwa-install` script |
+| `.github/workflows/test-site.yml` | CI job `PWA install E2E (Phase 4 smoke)` |
 
 ### Automated scenarios (Phase 4)
 
@@ -239,6 +240,7 @@ No database or Worker migration rollback required.
 
 | Date | Change |
 |------|--------|
+| 2026-05-28 | Phase 4 automated CI gate — `e2e:pwa-install` in `test-site.yml`; standalone hub E2E waits for status dot |
 | 2026-05-28 | Phase 4 rollout gate — extended E2E + manual HTTPS sign-off checklist |
 | 2026-05-27 | Phase 3 shipped — E2E + backlog H-006 closure |
 | 2026-05-27 | Phase 2 shipped — install card UX + lazy bootstrap load |
