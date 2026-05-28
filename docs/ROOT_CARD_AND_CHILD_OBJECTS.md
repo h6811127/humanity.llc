@@ -113,14 +113,14 @@ Status plates and lost-item relays currently use full card templates in the crea
 
 **Protocol and resolver:** Shipped and aligned with this doc — parent-signed `child_objects` rows, `scope: child_object` QRs, object-first scan HTML, per-object disable/revoke, no operator key custody, no scan analytics.
 
-**Steward shell:** Still a **bridge**. The network knows the tree; the device UI often does not yet *feel* like one tree. That mismatch is the main source of “this feels weird” feedback — not a surveillance or trust-model regression.
+**Steward shell:** **Bridge complete for v1 child-object tree** (steps 13–16). Hub and **My cards** show nested children; `/create/` converges on general root; register + first scan link is one action; backup seatbelt gates growth. Legacy flat-card create remains for strangers and pilots. Remaining gap: **delegated child keys** (step 17, deferred until team/event pilots demand them).
 
 | Layer | Maturity | Notes |
 |-------|----------|--------|
 | Trust / anti-surveillance | **Strong** | Same data-minimization posture; children inherit root control, not human verification |
 | Protocol simplicity | **Strong** | One root key; no child private keys by default |
-| Steward UX simplicity | **Partial** | Dual create paths, register-then-issue-QR ceremony, objects hidden in `/created/` Live panels |
-| Cross-context robustness | **Partial** | Device index is local-only; no server list API for children yet |
+| Steward UX simplicity | **Strong (v1 tree shipped)** | General root + Add object on Live; nested hub rows; combined register+QR; legacy flat `/create/` templates remain |
+| Cross-context robustness | **Strong** | Resolver child list + reconcile on `/created/` and hub; same-origin storage rules documented |
 
 ### Bridge vs target (steward-facing)
 
@@ -134,13 +134,13 @@ Status plates and lost-item relays currently use full card templates in the crea
 
 **Product direction:** Converge new stewards on **general root first → add objects**. Keep flat pilots valid for strangers and legacy plates; do not mint a new keyed root for every door or tag when a general root already exists.
 
-### What “feels simple” when done
+### What “feels simple” when done (steps 13–16 shipped)
 
-1. **One visible tree** — root row in **My cards**, children nested underneath (not separate saved cards with keys).
-2. **One create story** — `/create/` emphasizes general Humanity Card; status plate / lost item are **Add object** actions, not parallel card types (flat templates remain as compatibility).
-3. **Network-backed list** — opening `/created/` or hub refreshes child rows from resolver truth, not only from a device-only index.
-4. **Shorter QR path** — register + issue first scan credential in one steward action on `/created/` (shipped step 15); per-row re-issue remains for retries.
-5. **Backup seatbelt** — warn before a 2nd child object and block a 3rd+ without encrypted backup or recovery acknowledged on `/created/` (shipped step 16).
+1. **One visible tree** — root row in **My cards**, children nested underneath (shipped)
+2. **One create story** — `/create/` emphasizes general Humanity Card; status plate / lost item are **Add object** actions (shipped)
+3. **Network-backed list** — `/created/` and hub reconcile child rows from resolver truth (shipped)
+4. **Shorter QR path** — register + first scan link in one Live action (shipped)
+5. **Backup seatbelt** — warn/block before more objects without backup or recovery acknowledged (shipped)
 
 ---
 
@@ -271,6 +271,8 @@ Delegated capabilities must be root-signed, scoped, expiring, revocable, and cle
 13. **Hub tree rows (first slice shipped):** nested child rows under general root in **My cards** / expanded hub; reconcile on hub render via `reconcileChildObjectsForProfileIds`; no child entries in `hc_wallet`.
 14. **Create flow convergence (first slice shipped):** `/create/` emphasizes general Humanity Card; status plate / lost item show Add-on-Live nudge when a general root with keys exists; legacy standalone pilot forms stay in a disclosure; landing copy updated.
 15. **Register + first QR (first slice shipped):** `/created/` Add status plate / lost-item relay runs register + first `issue-qr` in one action (`child-object-register-issue.mjs`); per-row **Issue scan link** remains for retries and legacy rows.
-16. **Backup gate (first slice shipped):** warn before a 2nd active child object without backup seatbelt; block a 3rd+ until `recovery_key_acknowledged`, encrypted backup export, or backup import (`child-object-backup-gate-core.mjs`, threshold `2`). **Next:** delegated capabilities (step 17).
-17. **Delegated capabilities:** add scoped, expiring, root-signed child keys only after real team/event use cases demand them.
+16. **Backup gate (first slice shipped):** warn before a 2nd active child object without backup seatbelt; block a 3rd+ until `recovery_key_acknowledged`, encrypted backup export, or backup import (`child-object-backup-gate-core.mjs`, threshold `2`).
+17. **Delegated capabilities (deferred):** scoped, expiring, root-signed child keys — **do not implement** until product gates in [`DELEGATED_CHILD_CAPABILITIES_GATE.md`](DELEGATED_CHILD_CAPABILITIES_GATE.md) pass (named team/event pilot, capability matrix, anti-surveillance review).
+
+**Sequence status:** Steps **1–16 shipped** (May 2026). Step **17** is the next **product-gated** slice, not the next default engineering slice.
 

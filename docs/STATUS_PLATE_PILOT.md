@@ -29,9 +29,9 @@ Not a bio link. Not legal ID. Object name + live network status.
    - **Optional details**  -  up to two short rows (e.g. special hours, tasks) shown under the status on scan
 4. Save recovery key on `/created/`, print QR, scan from another phone, **update the status line** on Live (no revoke required first), then revoke to test.
 
-**Target model:** From an existing **general** root Humanity Card, choose **Add status plate under this root** on `/created/` Live. The root key signs the plate's public state; the plate gets its own object/QR lifecycle but no new private key or separate human verification. Full UX target (hub tree, list reconcile, create convergence): [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) § Product UX maturity.
+**Target model (shipped):** From an existing **general** root Humanity Card, choose **Add status plate under this root** on `/created/` Live or manage nested rows under the root in **My cards** / hub. The root key signs the plate's public state; the plate gets its own object/QR lifecycle but no new private key or separate human verification. See [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) § Product UX maturity (steps 13–16).
 
-**Same iPhone note:** Child plates registered on this phone are indexed in `localStorage` (`hc_child_objects_v1:{profile_id}`). They do **not** yet appear as rows in **My cards** — only under the Live panel on `/created/` for that root. Clearing website data removes the local index (network objects remain). Safari tabs and the home-screen PWA share the same origin storage — not a separate “PWA storage bucket.”
+**Same iPhone note:** Child plates are indexed in `localStorage` (`hc_child_objects_v1:{profile_id}`) and reconciled from `GET …/objects`. They appear **nested under the root** in **My cards** / expanded hub, and in the Live panel on `/created/`. Clearing website data removes the local index (network objects remain). Safari tabs and the home-screen PWA share the same origin storage — not a separate “PWA storage bucket.”
 
 Public showcase scan (homepage pilot): see `site/data/showcase-status-plate.json`  -  refresh with `npm run site:seed-showcase` (includes optional `object_streams` detail row on scan).
 
