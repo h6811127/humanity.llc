@@ -415,6 +415,7 @@ Engineering checklist once M4 governance checklist is signed ([`HOSTED_TIER_PRIC
 |------|------|
 | 2026-05-28 | **Rollout step 4a:** `HOSTED_STEWARD_ENABLED=1` committed in `worker/wrangler.toml` |
 | 2026-05-28 | **Rollout step 4b:** `hosted:rollout:step4 -- --smoke` (health + hosted routes on; mirrors step 2 `--smoke`) |
+| 2026-05-28 | **Rollout step 4b local:** `--local` + `--preflight` on `hosted:rollout:step4` for worker:dev smoke before production deploy |
 | 2026-05-27 | **G0 signed** (Governance + Ops, solo founder); Legal pending — production rollout unlocked |
 | 2026-05-27 | **E6.1 guide:** CF Workers dashboard setup doc + G0 production rollout checklist |
 | 2026-05-27 | **E6.2 CI:** `.github/workflows/steward-ops-daily.yml` daily threshold check |
