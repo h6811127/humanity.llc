@@ -436,13 +436,13 @@ function describeItemForAria(item) {
   }
   if (item.kind === "cross_tab_keys") {
     const who = item.subtitle ? ` (${item.subtitle})` : "";
-    return `keys open in another tab${who}`;
+    return `keys in another tab${who}`;
   }
   if (item.kind === "other_tabs_unsaved_keys") {
     const who = item.subtitle ? ` (${item.subtitle})` : "";
     return item.count > 1
-      ? `keys open in ${item.count} other tabs${who}`
-      : `keys open in another tab${who}`;
+      ? `keys in ${item.count} other tabs${who}`
+      : `keys in another tab${who}`;
   }
   if (item.kind === "orphan_keys_removed") {
     const who = item.subtitle

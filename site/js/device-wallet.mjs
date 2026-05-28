@@ -8,11 +8,17 @@ import { verificationRecordFromLabelState } from "./device-wallet-network-core.m
 import { reconcileRemovedProfilesAfterWalletSave } from "./device-wallet-removed-profiles.mjs";
 
 export const WALLET_STORAGE_KEY = "hc_wallet";
+export const WALLET_SUMMARY_STORAGE_KEY = "hc_wallet_summary";
+const WALLET_SUMMARY_VERSION = 2;
 
 /** @type {string | null} */
 let walletCacheRaw = null;
 /** @type {Array<Record<string, unknown>> | null} */
 let walletCache = null;
+/** @type {string | null} */
+let walletSummaryCacheRaw = null;
+/** @type {WalletSummary | null} */
+let walletSummaryCache = null;
 
 /** Matches resolver / pin parsing (`device-pins.mjs`). */
 const QR_ID_RE = /^qr_[1-9A-HJ-NP-Za-km-z_]{8,64}$/;
@@ -62,6 +68,144 @@ export function normalizeWalletQrIds(entries) {
   return { entries: next, changed };
 }
 
+/**
+ * @typedef {{
+ *   version: number,
+ *   walletFingerprint: string,
+ *   count: number,
+ *   profileIds: string[],
+ *   signingKeyCount: number,
+ *   pollableCount: number,
+ *   stewardReady: boolean,
+ *   rows: WalletSummaryRow[],
+ * }} WalletSummary
+ *
+ * @typedef {{
+ *   id?: string,
+ *   profile_id: string,
+ *   label?: string,
+ *   handle?: string,
+ *   qr_id?: string,
+ *   scan_url?: string,
+ * }} WalletSummaryRow
+ */
+
+/**
+ * Fast integrity check for the lightweight wallet summary. This scans the raw
+ * string but avoids allocating/parsing key-bearing wallet rows on shell refresh.
+ * @param {string | null} raw
+ */
+function walletRawFingerprint(raw) {
+  if (!raw) return "0:0";
+  let hash = 2166136261;
+  for (let i = 0; i < raw.length; i += 1) {
+    hash = Math.imul(hash ^ raw.charCodeAt(i), 16777619) >>> 0;
+  }
+  return `${raw.length}:${hash.toString(36)}`;
+}
+
+/** @param {Record<string, unknown> | null | undefined} entry */
+function entryHasStewardVerification(entry) {
+  const state = String(entry?.verification?.state || "").toLowerCase();
+  const label = String(entry?.verification?.label || "").toLowerCase();
+  return state === "steward" || label === "steward";
+}
+
+/**
+ * @param {unknown} value
+ * @returns {value is WalletSummary}
+ */
+function isWalletSummary(value) {
+  return (
+    value != null &&
+    typeof value === "object" &&
+    value.version === WALLET_SUMMARY_VERSION &&
+    typeof value.walletFingerprint === "string" &&
+    Number.isInteger(value.count) &&
+    Array.isArray(value.profileIds) &&
+    Number.isInteger(value.signingKeyCount) &&
+    Number.isInteger(value.pollableCount) &&
+    typeof value.stewardReady === "boolean" &&
+    Array.isArray(value.rows)
+  );
+}
+
+/**
+ * @param {unknown} value
+ * @returns {string | undefined}
+ */
+function optionalString(value) {
+  return typeof value === "string" && value ? value : undefined;
+}
+
+/**
+ * @param {Array<Record<string, unknown>>} entries
+ * @param {string} walletFingerprint
+ * @returns {WalletSummary}
+ */
+function buildWalletSummary(entries, walletFingerprint) {
+  const profileIds = [];
+  /** @type {WalletSummaryRow[]} */
+  const rows = [];
+  let count = 0;
+  let signingKeyCount = 0;
+  let pollableCount = 0;
+  let stewardReady = false;
+
+  for (const entry of entries) {
+    if (!entry || typeof entry !== "object") continue;
+    count += 1;
+    if (typeof entry.profile_id === "string" && entry.profile_id) {
+      profileIds.push(entry.profile_id);
+      rows.push({
+        id: optionalString(entry.id),
+        profile_id: entry.profile_id,
+        label: optionalString(entry.label),
+        handle: optionalString(entry.handle),
+        qr_id: optionalString(walletEntryQrId(entry)),
+        scan_url: optionalString(entry.scan_url),
+      });
+    }
+    if (entry.owner_private_key_b58) {
+      signingKeyCount += 1;
+      if (entryHasStewardVerification(entry)) stewardReady = true;
+    }
+    if (typeof entry.profile_id === "string" && entry.profile_id && walletEntryQrId(entry)) {
+      pollableCount += 1;
+    }
+  }
+
+  return {
+    version: WALLET_SUMMARY_VERSION,
+    walletFingerprint,
+    count,
+    profileIds,
+    signingKeyCount,
+    pollableCount,
+    stewardReady,
+    rows,
+  };
+}
+
+/**
+ * @param {Array<Record<string, unknown>>} entries
+ * @param {string | null} raw
+ */
+function cacheWalletSummary(entries, raw) {
+  walletSummaryCacheRaw = raw;
+  walletSummaryCache = buildWalletSummary(entries, walletRawFingerprint(raw));
+  return walletSummaryCache;
+}
+
+/** @param {WalletSummary} summary */
+function cloneWalletSummary(summary) {
+  return {
+    ...summary,
+    profileIds: summary.profileIds.slice(),
+    rows: summary.rows.map((row) => ({ ...row })),
+  };
+}
+
 export function loadWallet() {
   try {
     const raw = localStorage.getItem(WALLET_STORAGE_KEY);
@@ -72,11 +216,51 @@ export function loadWallet() {
     const entries = Array.isArray(parsed) ? parsed : [];
     walletCacheRaw = raw;
     walletCache = entries;
+    cacheWalletSummary(entries, raw);
     return entries.slice();
   } catch {
     walletCacheRaw = null;
     walletCache = [];
+    walletSummaryCacheRaw = null;
+    walletSummaryCache = buildWalletSummary([], "0:0");
     return [];
+  }
+}
+
+export function loadWalletSummary() {
+  try {
+    const raw = localStorage.getItem(WALLET_STORAGE_KEY);
+    if (raw === walletSummaryCacheRaw && walletSummaryCache) {
+      return cloneWalletSummary(walletSummaryCache);
+    }
+
+    const fingerprint = walletRawFingerprint(raw);
+    const stored = localStorage.getItem(WALLET_SUMMARY_STORAGE_KEY);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (isWalletSummary(parsed) && parsed.walletFingerprint === fingerprint) {
+          walletSummaryCacheRaw = raw;
+          walletSummaryCache = parsed;
+          return cloneWalletSummary(parsed);
+        }
+      } catch {
+        /* stale/corrupt summary; rebuild from wallet below */
+      }
+    }
+
+    const entries = loadWallet();
+    const summary = cacheWalletSummary(entries, raw);
+    try {
+      localStorage.setItem(WALLET_SUMMARY_STORAGE_KEY, JSON.stringify(summary));
+    } catch {
+      /* private mode */
+    }
+    return cloneWalletSummary(summary);
+  } catch {
+    walletSummaryCacheRaw = null;
+    walletSummaryCache = buildWalletSummary([], "0:0");
+    return cloneWalletSummary(walletSummaryCache);
   }
 }
 
@@ -84,7 +268,13 @@ export function saveWallet(entries) {
   const serialized = JSON.stringify(entries);
   walletCacheRaw = serialized;
   walletCache = entries;
+  const summary = cacheWalletSummary(entries, serialized);
   localStorage.setItem(WALLET_STORAGE_KEY, serialized);
+  try {
+    localStorage.setItem(WALLET_SUMMARY_STORAGE_KEY, JSON.stringify(summary));
+  } catch {
+    /* private mode */
+  }
   if (entries.length > 0) markScanOperatorFamiliar();
   reconcileRemovedProfilesAfterWalletSave(entries);
   window.dispatchEvent(new Event("hc-device-hub-changed"));
@@ -117,7 +307,15 @@ export function walletEntryFromSession(session, label) {
 }
 
 export function isWalletSaved(profileId) {
-  return loadWallet().some((e) => e.profile_id === profileId);
+  if (!profileId) return false;
+  return loadWalletSummary().profileIds.includes(profileId);
+}
+
+export function resetWalletCachesForTests() {
+  walletCacheRaw = null;
+  walletCache = null;
+  walletSummaryCacheRaw = null;
+  walletSummaryCache = null;
 }
 
 /** Row subtitle  -  always show network handle + id so labels cannot lie. */

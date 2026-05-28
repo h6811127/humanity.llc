@@ -69,12 +69,12 @@ Target behavior stewards should understand (shipped pieces noted).
 | Mode | When | Live proof | Network status | Shipped? |
 |------|------|------------|----------------|----------|
 | **Idle** | Hub collapsed on landing; not in signing flow | No auto poll; show cache + “not checked this visit” until user acts | No fetch unless user navigates to `/wallet/` scope | Partial — poll scope shipped; copy still evolving |
-| **Attending** | Hub expanded or inbox sheet open | Round-robin if **Watch** on (`hc_watch_live_proof === "1"`); else manual **Check for live proof** only | Fetch on expand / manual **Check network**; `/wallet/` in network scope | Yes (Phases 1–5) |
+| **Attending** | Hub expanded, inbox sheet open, or `/wallet/` with Watch on | Round-robin if **Watch** on (`hc_watch_live_proof === "1"`); else manual **Check for live proof** only | Fetch on expand / manual **Check network**; `/wallet/` in network scope | Yes (Phases 1–5) |
 | **Urgent** | Pending live proof known | **5s** tick interval (still one card per tick) | Unchanged | Yes (`liveControlPollIntervalMs`) |
 | **Signing** | `/created/` with keys | **~3s** for **this card only** | Row chips from wallet cache | Yes (`created.mjs`) |
 | **Background** | Tab hidden + browser alerts on | SW round-robin, **15 min** minimum periodic sync | N/A | Yes (Phase 4) |
 
-**Watch for live proof** is **off by default**. Enabling it is consent to automatic Worker use while hub/inbox scope is active — not a requirement to use Humanity Cards.
+**Watch for live proof** is **off by default**. Enabling it is consent to automatic Worker use while hub, inbox, or `/wallet/` scope is active — not a requirement to use Humanity Cards.
 
 ---
 
@@ -184,7 +184,7 @@ Client budgets are necessary; they are **not** sufficient against bugs, old cach
 
 | Idea | Status | Notes |
 |------|--------|-------|
-| Poll live proof only when hub **expanded** or **inbox sheet** open | **Shipped** (Phase 1) | Not on collapsed landing; not “bare” wallet without hub expand |
+| Poll live proof only when hub **expanded**, **inbox sheet** open, or `/wallet/` with Watch on | **Shipped** (Phase 1) | Not on collapsed landing; not bare wallet when Watch is off |
 | Poll only on `/created/` for the open card | **Shipped** for signing | Inbox still needs hub/inbox + watch or manual check |
 | Stop polling when resolver health ≠ `ok` | **Shipped** (Phase 3) | |
 | Manual **Check for live proof** when watch off | **Shipped** (Phase 5) | |
@@ -313,7 +313,7 @@ As M8 **E2** stages, shipped free-tier constants in poll modules MUST resolve fr
 | `wallet.large_threshold` | **10** | **25** | `device-wallet-scale-core.mjs` |
 | `sw.periodic_min_ms` | **900000** (15 min) | **300000** (5 min) | `device-live-control-sw-core.mjs` |
 
-**Unchanged on every tier:** round-robin **one** live-proof GET per tick; poll only when hub expanded or inbox open (unless push replaces poll — M3); manual **Check for live proof** and **Check network** uncapped by daily auto cap; resolver health gate; leader tab; stranger scan page polls **their** session only.
+**Unchanged on every tier:** round-robin **one** live-proof GET per tick; poll only when hub expanded, inbox open, or `/wallet/` with Watch on (unless push replaces poll — M3); manual **Check for live proof** and **Check network** uncapped by daily auto cap; resolver health gate; leader tab; stranger scan page polls **their** session only.
 
 **Server push (hosted only):** When `notify.push.live_proof === true` and steward subscribes, push **reduces** wallet round-robin need; SW remains fallback ([`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md)). Free tier keeps device-only polling + OS alerts path ([`DEVICE_INBOX.md`](DEVICE_INBOX.md)).
 
@@ -509,7 +509,7 @@ Phases 1–5 improved polling, but **N saved cards** on one browser is still an 
 
 ### 2. Shell performance (must fix)
 
-Every hub/inbox pass calls `loadWallet()` and `JSON.parse`s the full `hc_wallet` array. **`hc_wallet_network_cache`** is now capped at **20** fresh rows per session (S6, 2026-05-27); remaining: avoid full-wallet parse on hot paths, lazy row hydration. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
+Every hub/inbox pass used to call `loadWallet()` and hydrate the full `hc_wallet` array. **`hc_wallet_network_cache`** is now capped at **20** fresh rows per session (S6, 2026-05-27), and shell/scan status counts, hub glance, cross-tab saved-profile checks, and card-disabled inbox reads use a lightweight `hc_wallet_summary` index instead of full key-bearing wallet rows on hot status paths. Remaining: lazy hydration for expanded hub row rendering/actions. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
 
 ### 3. Multi-tab presence (must fix)
 
@@ -521,6 +521,7 @@ Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). 
 
 | Date | Note |
 |------|------|
+| 2026-05-28 | **Large-wallet shell perf:** added `hc_wallet_summary` so status/count, hub glance, cross-tab saved-profile, and card-disabled inbox hot paths avoid full `hc_wallet` row hydration |
 | 2026-05-27 | **S6 shipped:** bound `hc_wallet_network_cache` (max 20 fresh rows, LRU prune) |
 | 2026-05-27 | **O2 step 1:** per-IP rate limit on `GET …/status` (300/min); Shell P2 lazy notifications shipped |
 | 2026-05-26 | **M8 epics:** [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) |

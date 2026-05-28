@@ -13,7 +13,7 @@ import {
 } from "./device-dot-state-core.mjs?v=56";
 import { fetchResolverHealth } from "./device-network-health.mjs";
 import { activateWalletEntry, getTabSession } from "./device-keys.mjs";
-import { isWalletSaved, loadWallet } from "./device-wallet.mjs";
+import { isWalletSaved, loadWallet, loadWalletSummary } from "./device-wallet.mjs";
 import { getInboxOverlayCounts } from "./device-inbox.mjs?v=56";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
@@ -108,9 +108,7 @@ function hasStewardReadyKeys() {
   if (session?.owner_private_key_b58 && hasStewardVerification(session)) {
     return true;
   }
-  return loadWallet().some(
-    (entry) => Boolean(entry?.owner_private_key_b58) && hasStewardVerification(entry)
-  );
+  return loadWalletSummary().stewardReady;
 }
 
 function hasCreatedKeys() {
@@ -128,15 +126,15 @@ function scanCrossTabNoticeCount() {
 
 function computeEligible() {
   const { profileId, qrId } = readScanContext();
-  const wallet = loadWallet();
-  syncScanOperatorFamiliarFromWallet(wallet.length);
+  const summary = loadWalletSummary();
+  syncScanOperatorFamiliarFromWallet(summary.count);
   const overlayCounts = getInboxOverlayCounts();
   const crossTabNotice = scanCrossTabNoticeCount();
   return scanPageDotEligible({
     profileId,
     qrId,
     hasCreatedKeys: hasCreatedKeys(),
-    walletSigningKeyCount: savedCardsWithSigningKeys().length,
+    walletSigningKeyCount: summary.signingKeyCount,
     crossTabNotice,
     liveProofPending: overlayCounts.liveProofPending,
     operatorDeviceFamiliar: isScanOperatorFamiliar(),
@@ -155,10 +153,16 @@ function dotOverlayState() {
 }
 
 function deviceState() {
+  const summary = loadWalletSummary();
   return deviceStateFromContext({
     unsavedTabKeys: hasUnsavedTabKeys(),
-    stewardReady: hasStewardReadyKeys(),
-    savedWalletCount: loadWallet().length,
+    stewardReady:
+      summary.stewardReady ||
+      (() => {
+        const session = getTabSession();
+        return Boolean(session?.owner_private_key_b58 && hasStewardVerification(session));
+      })(),
+    savedWalletCount: summary.count,
   });
 }
 
@@ -257,11 +261,12 @@ function focusOtherTabFromScan() {
 function renderScanGlanceContent(network, device, overlay) {
   const explainer = scanGlanceExplainer();
   if (!explainer) return;
+  const summary = loadWalletSummary();
   const descriptor = describeDotState(network, device, overlay, {
     stewardReady: hasStewardReadyKeys(),
     queueUrl: null,
     pageKind: "scan",
-    singleSavedCardWithKeys: savedCardsWithSigningKeys().length === 1,
+    singleSavedCardWithKeys: summary.signingKeyCount === 1,
   });
   const primary = scanGlancePrimaryAction(descriptor.action, overlay);
   explainer.innerHTML = renderScanDotExplainerHtml(descriptor, primary);

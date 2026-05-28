@@ -26,6 +26,7 @@ import {
   resetPresenceInboxGatherCache,
 } from "./device-inbox.mjs?v=56";
 import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys } from "./device-tab-presence.mjs";
+import { primeCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import { refreshWalletContextFromChrome } from "./wallet-page-chrome.mjs";
 
 /** @type {(() => void) | null} */
@@ -130,6 +131,8 @@ function schedulePresenceChromeRefresh() {
   if (shouldSkipPresenceChromeRefresh(lastPresenceChromeFingerprint, nextFp)) {
     return;
   }
+
+  primeCrossTabNotificationState();
 
   if (presenceChromeCoalesceTimer != null) {
     clearTimeout(presenceChromeCoalesceTimer);

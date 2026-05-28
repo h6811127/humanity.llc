@@ -27,6 +27,12 @@ function mockHealth(route: Route, status: "ok" | "degraded") {
 /** Critical static imports for device-status bootstrap (partial deploy guard). */
 const SHELL_STATUS_MODULE_PATHS = deviceStatusShellModulePaths();
 
+async function waitForStatusDotReady(page: import("@playwright/test").Page) {
+  await expect(page.locator("#brand-status-dot")).toHaveAttribute("data-dot-state", /.+/, {
+    timeout: 15_000,
+  });
+}
+
 test.describe("status dot module graph", () => {
   test("shell status modules are reachable", async ({ page, baseURL }) => {
     for (const path of SHELL_STATUS_MODULE_PATHS) {
@@ -103,6 +109,7 @@ test.describe("status dot steward green", () => {
 
     await page.goto("/");
     await expect(page.locator("body")).not.toHaveClass(/device-hub-sheet-open/);
+    await waitForStatusDotReady(page);
     await page.locator("#brand-status-dot-btn").click();
     await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/);
     await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
@@ -114,6 +121,7 @@ test.describe("status dot steward green", () => {
     await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
 
     await page.goto("/");
+    await waitForStatusDotReady(page);
     await page.evaluate(() => {
       document.body.classList.add("device-hub-sheet-open");
       document.getElementById("device-hub")?.classList.add("device-hub-collapsed");
@@ -133,7 +141,7 @@ test.describe("status dot steward green", () => {
     });
 
     await page.goto("/");
-    await expect(page.locator("#brand-status-dot")).toHaveAttribute("data-dot-state", /.+/);
+    await waitForStatusDotReady(page);
     await page.evaluate(() => {
       window.scrollTo(0, 400);
     });
@@ -150,6 +158,7 @@ test.describe("status dot steward green", () => {
 
     await page.goto("/");
     await expect(page.locator("#top-chrome")).not.toHaveAttribute("data-device-status-error");
+    await waitForStatusDotReady(page);
     await page.locator("#brand-status-dot-btn").click();
     const log = await page.evaluate(() => {
       try {
@@ -204,6 +213,7 @@ test.describe("status dot accessibility", () => {
   test("exposes steward readiness in aria-label and hub explainer", async ({ page }) => {
     await page.goto("/");
     const dotBtn = page.locator("#brand-status-dot-btn");
+    await waitForStatusDotReady(page);
     await expect(dotBtn).toHaveAttribute("aria-label", /steward keys ready/i);
     await expect(dotBtn).toHaveAttribute("aria-label", /resolver online/i);
 
@@ -220,6 +230,7 @@ test.describe("status dot accessibility", () => {
 
   test("uses glance steward subtitle in landing popover explainer", async ({ page }) => {
     await page.goto("/");
+    await waitForStatusDotReady(page);
     await page.locator("#brand-status-dot-btn").click();
     const popoverExplainer = page.locator(
       "#device-hub-glance-popover .device-dot-explainer--popover"
@@ -240,6 +251,7 @@ test.describe("hub sheet header chrome (simplification step 4)", () => {
 
   test("Close dismisses expanded hub on landing", async ({ page }) => {
     await page.goto("/");
+    await waitForStatusDotReady(page);
     await page.locator("#brand-status-dot-btn").click();
     await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
     await page.locator(".device-hub-sheet-close").click();
@@ -250,6 +262,7 @@ test.describe("hub sheet header chrome (simplification step 4)", () => {
   test("Create + New lives in saved-items header and navigates to /create/", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator(".device-hub-status-head .device-hub-create-btn")).toHaveCount(0);
+    await waitForStatusDotReady(page);
     await page.locator("#brand-status-dot-btn").click();
     const createBtn = page.locator("#device-hub-saved-items-section .device-hub-create-btn");
     await expect(createBtn).toBeVisible();
@@ -259,6 +272,7 @@ test.describe("hub sheet header chrome (simplification step 4)", () => {
 
   test("Home and Close controls are visible when hub is expanded", async ({ page }) => {
     await page.goto("/");
+    await waitForStatusDotReady(page);
     await page.locator("#brand-status-dot-btn").click();
     await expect(page.locator(".device-hub-home-btn")).toBeVisible();
     await expect(page.locator(".device-hub-sheet-close")).toBeVisible();
@@ -307,6 +321,7 @@ test.describe("hub intro coachmark", () => {
     await page.goto("/");
     const intro = page.locator("#device-hub-intro-coachmark");
     await expect(intro).toBeVisible({ timeout: 5000 });
+    await waitForStatusDotReady(page);
     await page.locator("#brand-status-dot-btn").click();
     await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/);
     await expect(intro).toBeHidden();
