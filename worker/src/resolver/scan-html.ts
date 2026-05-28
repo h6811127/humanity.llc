@@ -1493,12 +1493,7 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
     function tick() {
       var remaining = Date.parse(expiresAt) - Date.now();
       if (!Number.isFinite(remaining) || remaining <= 0) {
-        stopCountdown();
-        setStatus("Control was not proven. The request expired.", false);
-        if (btn) {
-          btn.disabled = false;
-          btn.textContent = "Ask for live proof";
-        }
+        showRequestExpired();
         return;
       }
       setStatus(prefix + " Expires in " + formatRemaining(remaining) + ".", true);
