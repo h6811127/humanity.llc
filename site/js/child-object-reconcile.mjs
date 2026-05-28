@@ -31,3 +31,13 @@ export async function refreshChildObjectsFromNetwork(storage, profileId) {
     return readChildObjectRows(storage, profileId);
   }
 }
+
+/**
+ * @param {Pick<Storage, "getItem" | "setItem">} storage
+ * @param {string[]} profileIds
+ */
+export async function reconcileChildObjectsForProfileIds(storage, profileIds) {
+  const ids = [...new Set(profileIds.filter((id) => typeof id === "string" && id))];
+  if (!ids.length) return;
+  await Promise.allSettled(ids.map((pid) => reconcileChildObjectsFromNetwork(storage, pid)));
+}

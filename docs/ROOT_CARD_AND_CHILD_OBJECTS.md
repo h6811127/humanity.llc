@@ -129,7 +129,7 @@ Status plates and lost-item relays currently use full card templates in the crea
 | What gets a `profile_id`? | The plate/relay **is** the root card | Only the **general root**; children get `object_id` |
 | Private keys | New owner + recovery keypair | Reuses root keys |
 | First QR | Immediate at create | Register object, then **Issue scan link** |
-| Where it appears on device | **My cards** (`hc_wallet` row) | **`localStorage` child index only** — not hub rows yet |
+| Where it appears on device | **My cards** (`hc_wallet` row) | **Nested under root** in hub / **My cards** + `hc_child_objects_v1:{profile_id}` index |
 | Human trust on scan | Root card’s verification | Root relationship (“Controlled by @handle”); trust stays on root |
 
 **Product direction:** Converge new stewards on **general root first → add objects**. Keep flat pilots valid for strangers and legacy plates; do not mint a new keyed root for every door or tag when a general root already exists.
@@ -154,7 +154,7 @@ Child object **truth** lives on the resolver (D1). Child object **lists in the U
 | `hc_wallet` | `localStorage` | Per origin | **Root cards only** — saved keys, labels, `profile_id` |
 | `hc_created` | `sessionStorage` | Per tab | Active root keys for signing |
 
-**Shipped (first slice):** read-only `GET /.well-known/hc/v1/cards/{profile_id}/objects` returns public child rows + `active_qr_id`. `/created/` Live panels fetch this on refresh and rewrite `hc_child_objects_v1:{profile_id}` from network truth (offline: keep last local index). Hub nested rows (step 13) still pending.
+**Shipped (first slice):** read-only `GET /.well-known/hc/v1/cards/{profile_id}/objects` returns public child rows + `active_qr_id`. `/created/` Live panels fetch this on refresh and rewrite `hc_child_objects_v1:{profile_id}` from network truth (offline: keep last local index). **Hub nested rows (step 13, first slice shipped):** general root rows in **My cards** / expanded hub show nested child rows from `hc_child_objects_v1` and reconcile from network on hub render.
 
 ### Same iPhone — what to expect
 
@@ -267,8 +267,8 @@ Delegated capabilities must be root-signed, scoped, expiring, revocable, and cle
 9. **Child object disable UI (shipped):** `/created/` Live → **Disable this plate** on registered status plates; signs `POST …/objects/{object_id}/revoke`; local index marks `status: disabled`; scan shows **Object unavailable** when child is disabled.
 10. **Lost-item relay child UI (shipped):** `/created/` Live → **Add lost-item relay** for general root cards; register, update return message, issue scan link, disable relay — mirrors status plate flow with `object_type: lost_item_relay` and `[relay]` scan layout via `childObjectManifestoLine()`.
 11. **Browser signing fix (shipped):** `hc-sign.mjs` `requireFields()` accepts `parent_profile_id` for `child_object` payloads (create/update/revoke were failing client-side before POST).
-12. **Resolver child list (first slice shipped):** read-only `GET /.well-known/hc/v1/cards/{profile_id}/objects`; `/created/` reconciles `hc_child_objects_v1` from network on Live panel refresh. **Next:** hub nested rows (step 13).
-13. **Hub tree rows (planned):** nested child rows under root in **My cards** / hub per § My cards and hub presentation; no child entries in `hc_wallet`.
+12. **Resolver child list (first slice shipped):** read-only `GET /.well-known/hc/v1/cards/{profile_id}/objects`; `/created/` reconciles `hc_child_objects_v1` from network on Live panel refresh.
+13. **Hub tree rows (first slice shipped):** nested child rows under general root in **My cards** / expanded hub; reconcile on hub render via `reconcileChildObjectsForProfileIds`; no child entries in `hc_wallet`. **Next:** create flow convergence (step 14).
 14. **Create flow convergence (planned):** `/create/` nudges general root; status plate / lost item primary path becomes **Add object** on `/created/`; flat templates remain compatibility.
 15. **Register + first QR (planned):** combine object create and first `issue-qr` in one steward action where product copy allows.
 16. **Backup gate (planned):** block or strongly warn before N active child objects without encrypted backup / recovery acknowledged.

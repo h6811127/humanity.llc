@@ -2,6 +2,11 @@
  * Segmented tabs for /created/ (Live · Manage; ids remain now/advanced).
  */
 
+import {
+  childObjectHubFocusHash,
+  childObjectIdFromHubFocusHash,
+} from "./hub-child-object-row-core.mjs";
+
 const TAB_IDS = ["now", "advanced"];
 
 /** Hash → panel id on /created/ (hub deep-links). */
@@ -49,6 +54,29 @@ function focusCreatedPanel(select, focusKey) {
 }
 
 /**
+ * @param {(tabId: string) => void} select
+ * @param {string} objectId
+ */
+function focusChildObjectRow(select, objectId) {
+  if (!objectId) return;
+  select("now");
+  history.replaceState(
+    null,
+    "",
+    `${location.pathname}${location.search}#${childObjectHubFocusHash(objectId)}`
+  );
+  requestAnimationFrame(() => {
+    const row = document.querySelector(`[data-object-id="${CSS.escape(objectId)}"]`);
+    if (!row) return;
+    if (row.tagName === "DETAILS") {
+      row.removeAttribute("hidden");
+      row.setAttribute("open", "");
+    }
+    row.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+}
+
+/**
  * @returns {{ select: (tabId: string) => void, focusPanel: (focusKey: string) => void }}
  */
 export function initCreatedTabs() {
@@ -91,6 +119,8 @@ export function initCreatedTabs() {
     });
   } else if (hash && CREATED_PANEL_FOCUS[hash]) {
     focusCreatedPanel(select, hash);
+  } else if (childObjectIdFromHubFocusHash(hash)) {
+    focusChildObjectRow(select, childObjectIdFromHubFocusHash(hash));
   } else {
     // Keep old #manage links working.
     const normalized = hash === "manage" ? "advanced" : hash;

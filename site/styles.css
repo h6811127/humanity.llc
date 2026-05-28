@@ -836,6 +836,20 @@ body.page-flow.has-shell-chrome .page > main.screen {
   border-left: 3px solid rgba(20, 184, 166, 0.55);
 }
 
+.hub-card-item--nested {
+  margin-left: 14px;
+  width: calc(100% - 14px);
+}
+
+.hub-card-item--nested.hub-card-item--summary {
+  opacity: 0.96;
+}
+
+.hub-card-item--nested .list-icon {
+  width: 28px;
+  height: 28px;
+}
+
 @supports not (
   (-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))
 ) {

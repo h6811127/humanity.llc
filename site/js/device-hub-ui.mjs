@@ -81,6 +81,21 @@ import {
   hubCardStatusLine,
   hubCardTitle,
 } from "./device-hub-card-row-core.mjs";
+import {
+  childObjectHubFocusHash,
+  hubChildObjectIconHtml,
+  hubChildObjectIdentityLine,
+  hubChildObjectRootHandle,
+  hubChildObjectSearchHaystack,
+  hubChildObjectStatusLine,
+  hubChildObjectTitle,
+  hubChildObjectTypeMeta,
+  isGeneralRootWalletEntry,
+  listHubChildObjectsForDisplay,
+  shouldRenderHubChildObjectRows,
+} from "./hub-child-object-row-core.mjs";
+import { reconcileChildObjectsForProfileIds } from "./child-object-reconcile.mjs";
+import { CHILD_OBJECTS_STORAGE_KEY } from "./child-object-store-core.mjs";
 import { humanTrustIconMeta, isEligibleVoucherState } from "./human-trust-ui.mjs";
 import { objectTypeLabelFromContext } from "./object-taxonomy-core.mjs";
 import { purgePresenceForProfile } from "./device-tab-presence.mjs";
@@ -168,10 +183,17 @@ function escapeHtml(s) {
 }
 
 function walletHaystack(entry) {
-  return [entry.label, entry.handle, entry.manifesto_line, entry.profile_id]
+  const base = [entry.label, entry.handle, entry.manifesto_line, entry.profile_id]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
+  if (!isGeneralRootWalletEntry(entry) || typeof entry.profile_id !== "string") {
+    return base;
+  }
+  const childHaystack = listHubChildObjectsForDisplay(localStorage, entry.profile_id)
+    .map((row) => hubChildObjectSearchHaystack(entry, row))
+    .join(" ");
+  return childHaystack ? `${base} ${childHaystack}` : base;
 }
 
 function onWalletPage() {
@@ -244,6 +266,7 @@ let hubConfig = {
 
 /** Bumped when saved-card DOM is replaced or a new network fetch starts; stale fetches must not apply. */
 let walletNetworkApplyGen = 0;
+let hubChildObjectReconcileGen = 0;
 let expandedSummaryRowLimit = LARGE_HUB_SUMMARY_ROW_INITIAL_LIMIT;
 let expandedSummaryWalletFingerprint = null;
 /** @type {HTMLElement | null} */
@@ -1262,7 +1285,124 @@ function renderActivityRows() {
 }
 
 /**
- * @param {{ initialChipChecking?: boolean }} [opts] Use checking chips until the next poll (avoids stale cache flash after wallet edits).
+ * @param {Record<string, unknown>} parentEntry
+ * @param {Record<string, unknown>} childRow
+ * @param {{ fullRows: boolean, expandedRows: boolean }} ctx
+ */
+function buildHubChildObjectRowElement(parentEntry, childRow, ctx) {
+  const meta = hubChildObjectTypeMeta(childRow.object_type);
+  const rootHandle = hubChildObjectRootHandle(parentEntry);
+  const identity = hubChildObjectIdentityLine({
+    objectTypeLabel: meta.label,
+    rootHandle,
+  });
+  const scanUrl = typeof childRow.scan_url === "string" ? childRow.scan_url : "";
+  const status = hubChildObjectStatusLine({
+    publicState: childRow.public_state,
+    scanUrl,
+    status: childRow.status,
+  });
+  const li = document.createElement("li");
+  li.className = `hub-card-item hub-card-item--nested hub-card-item--${meta.tone}${
+    ctx.fullRows ? "" : " hub-card-item--summary"
+  }`;
+  li.dataset.hubSearchable = hubChildObjectSearchHaystack(parentEntry, childRow);
+  li.dataset.parentProfileId = String(parentEntry.profile_id ?? "");
+  li.dataset.objectId = String(childRow.object_id ?? "");
+  li.dataset.childObjectId = String(childRow.object_id ?? "");
+  if (!ctx.fullRows) li.dataset.summaryRow = "1";
+
+  const actionData = `data-profile-id="${escapeHtml(String(parentEntry.profile_id ?? ""))}" data-child-object-id="${escapeHtml(String(childRow.object_id ?? ""))}"`;
+  const scanAction = scanUrl
+    ? `<a class="hub-card-action hub-open-scan" href="${escapeHtml(scanUrl)}" target="_blank" rel="noopener noreferrer">Open scan</a>`
+    : "";
+  const actionsHtml =
+    ctx.fullRows || ctx.expandedRows
+      ? `<div class="hub-card-actions">
+        <div class="hub-card-actions-primary">
+          <button type="button" class="hub-card-action hub-child-manage" ${actionData}>${escapeHtml(meta.manageLabel)}</button>
+          ${scanAction}
+        </div>
+      </div>`
+      : "";
+
+  li.innerHTML = `
+    <div class="hub-card-head">
+      ${hubChildObjectIconHtml()}
+      <span class="list-content">
+        <span class="list-title">${escapeHtml(hubChildObjectTitle(childRow))}</span>
+        <span class="hub-card-identity hub-card-identity--muted">${escapeHtml(identity)}</span>
+        <span class="hub-card-status hub-card-status--${status.tone}" role="status"><span class="hub-card-status-dot" aria-hidden="true"></span><span class="hub-card-status-label">${escapeHtml(status.label)}</span></span>
+      </span>
+    </div>
+    ${actionsHtml}`;
+  return li;
+}
+
+/**
+ * @param {Record<string, unknown>} parentEntry
+ * @param {{ fullRows: boolean, expandedRows: boolean, previewRows: boolean }} ctx
+ */
+function appendHubChildObjectRowsForRoot(parentEntry, ctx) {
+  if (!savedList || !shouldRenderHubChildObjectRows(ctx.fullRows, ctx.previewRows)) return;
+  if (!isGeneralRootWalletEntry(parentEntry)) return;
+  const profileId = typeof parentEntry.profile_id === "string" ? parentEntry.profile_id : "";
+  if (!profileId) return;
+  for (const childRow of listHubChildObjectsForDisplay(localStorage, profileId)) {
+    savedList.appendChild(
+      buildHubChildObjectRowElement(parentEntry, childRow, {
+        fullRows: ctx.fullRows,
+        expandedRows: ctx.expandedRows,
+      })
+    );
+  }
+}
+
+/**
+ * @param {Array<Record<string, unknown>>} entries
+ * @param {{ childReconciled?: boolean, fullRows: boolean, previewRows: boolean }} opts
+ */
+function scheduleHubChildObjectReconcile(entries, opts) {
+  if (opts.childReconciled || opts.previewRows) return;
+  if (!shouldRenderHubChildObjectRows(opts.fullRows, opts.previewRows)) return;
+  const profileIds = entries
+    .filter(isGeneralRootWalletEntry)
+    .map((entry) => entry.profile_id)
+    .filter((pid) => typeof pid === "string" && pid);
+  if (!profileIds.length) return;
+  const gen = ++hubChildObjectReconcileGen;
+  void reconcileChildObjectsForProfileIds(localStorage, profileIds).then(() => {
+    if (gen !== hubChildObjectReconcileGen) return;
+    renderSavedRows({ childReconciled: true, fullRows: opts.fullRows, previewRows: opts.previewRows });
+  });
+}
+
+function bindHubChildObjectRowHandlers() {
+  if (!savedList) return;
+  savedList.querySelectorAll(".hub-child-manage").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const profileId = btn.getAttribute("data-profile-id");
+      const objectId = btn.getAttribute("data-child-object-id");
+      const entry = profileId ? findWalletEntryByProfileId(profileId) : null;
+      if (!entry || !objectId) return;
+      if (!entryHasSigningKeys(entry)) {
+        window.alert("This saved card has no signing keys on this device.");
+        return;
+      }
+      acknowledgeNetworkSeenForEntry(entry);
+      let returnUrl = null;
+      try {
+        returnUrl = sessionStorage.getItem("hc_vouch_return_url");
+      } catch {
+        /* ignore */
+      }
+      openCardControlPage(entry, childObjectHubFocusHash(objectId), { returnUrl });
+    });
+  });
+}
+
+/**
+ * @param {{ initialChipChecking?: boolean, childReconciled?: boolean, viewportSync?: boolean }} [opts] Use checking chips until the next poll (avoids stale cache flash after wallet edits).
  */
 function renderSavedRows(opts = {}) {
   const initialChipChecking = opts.initialChipChecking === true;
@@ -1423,6 +1563,7 @@ function renderSavedRows(opts = {}) {
       ${controlsHtml}
       ${actionsHtml}`;
     savedList.appendChild(li);
+    appendHubChildObjectRowsForRoot(entry, { fullRows, expandedRows, previewRows });
   }
 
   if (previewRows && allEntries.length > entries.length) {
@@ -1481,6 +1622,13 @@ function renderSavedRows(opts = {}) {
   }
 
   bindRevokedAlertHandlers();
+  bindHubChildObjectRowHandlers();
+
+  scheduleHubChildObjectReconcile(allEntries, {
+    childReconciled: opts.childReconciled === true,
+    fullRows,
+    previewRows,
+  });
 
   if (previewRows) {
     syncHubInboxAlertGroups();
@@ -1957,7 +2105,8 @@ export function initDeviceHub(config = {}) {
       e.key === "hc_wallet" ||
       e.key === "hc_device_pins" ||
       e.key === "hc_created" ||
-      e.key === "hc_device_activity"
+      e.key === "hc_device_activity" ||
+      (typeof e.key === "string" && e.key.startsWith(`${CHILD_OBJECTS_STORAGE_KEY}:`))
     ) {
       refreshDeviceHub();
       notifyHubChanged();
