@@ -81,7 +81,7 @@ npm run hosted:rollout:step1 -- --remote  # + production D1 (Cloudflare auth)
 
 ```bash
 npm run hosted:rollout:step2                        # verify HOSTED_STEWARD_ENABLED=0 in wrangler.toml
-npm run hosted:rollout:step2 -- --deploy --smoke    # deploy Worker + GET health on API_ORIGIN
+npm run hosted:rollout:step2 -- --deploy --smoke    # deploy Worker + smoke health + hosted routes gated
 ```
 
 **Rollout step 3a — `OPERATOR_AUDIT_TOKEN` (required; do this first):**

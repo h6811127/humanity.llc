@@ -346,7 +346,7 @@ Engineering checklist once M4 governance checklist is signed ([`HOSTED_TIER_PRIC
 | # | Step | Notes |
 |---|------|-------|
 | 1 | Apply D1 migrations | `0012_steward_hosted.sql`, `0013_steward_billing.sql` — `npm run hosted:rollout:step1` (local preflight) then `npm run hosted:rollout:step1 -- --remote` |
-| 2 | Deploy Worker with flag off | `HOSTED_STEWARD_ENABLED=0` — `npm run hosted:rollout:step2` then `npm run hosted:rollout:step2 -- --deploy` · `npm run hosted:rollout:step2 -- --smoke` |
+| 2 | Deploy Worker with flag off | `HOSTED_STEWARD_ENABLED=0` — `npm run hosted:rollout:step2` then `npm run hosted:rollout:step2 -- --deploy` · `npm run hosted:rollout:step2 -- --smoke` (health + `hosted_steward_disabled` on entitlements) |
 | 3a | `OPERATOR_AUDIT_TOKEN` (required) | Worker wrangler secret + GitHub for E6.2 — `npm run hosted:rollout:step3a` · verify `OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step3a` · `hosted:rollout:step3` aliases step3a |
 | 3b | `STRIPE_WEBHOOK_SECRET` (after G8) | Deferred — `npm run hosted:rollout:step3b` (notes only). Not required for steps 4–6. |
 | 4a | Enable hosted flag in wrangler | `HOSTED_STEWARD_ENABLED=1` — `npm run hosted:rollout:step4a` · apply `npm run hosted:rollout:step4a -- --apply` · commit `worker/wrangler.toml` |
