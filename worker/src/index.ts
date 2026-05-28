@@ -66,6 +66,7 @@ import {
   handlePostPrintOrderMint,
   handlePostPrintOrders,
 } from "./print/print-orders-handler";
+import { handlePostPrintQuotes } from "./print/print-quotes-handler";
 import { handleGetOperatorFulfillmentLookup } from "./operator/fulfillment-lookup";
 import { handlePostAiExplainSnapshot } from "./resolver/ai-explain-snapshot";
 import { handlePostAiDraftManifesto } from "./resolver/ai-draft-manifesto";
@@ -675,6 +676,11 @@ export default {
 
     if (path === "/v1/print/artifacts" && request.method === "POST") {
       const res = await handlePostPrintArtifacts(request);
+      return withCors(request, res);
+    }
+
+    if (path === "/v1/print/quotes" && request.method === "POST") {
+      const res = await handlePostPrintQuotes(request, env);
       return withCors(request, res);
     }
 
