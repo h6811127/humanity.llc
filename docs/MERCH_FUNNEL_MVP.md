@@ -14,9 +14,9 @@ Ordered work after repo review. Update row status as steps complete. Cross-links
 |----------|------|------|--------|
 | **1** | **Merch funnel close-out** — scan → `/shop/customize/` (`scan_customize` ref + CTA); enable Tier 1 in `shop-config.json`; prove one paid personalized order (intent → webhook → mint → Printify submit) | Engineering + operator | **Engineering ✅** (`merch-funnel:verify-exit` incl. `merch-print-qa`) · **operator next:** paste variant URLs · `verify-config --require-checkout` · live payment + Printify · physical QA [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) |
 | **2** | **Phase A trust MVP** — run M5 stranger runbook (3 outsiders, unassisted create → scan → revoke) | Validation | **✅ Passed 2026-05-27** — [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) |
-| **3** | **Hosted steward production rollout** — `hosted:rollout:step*` through step 6 (secrets, flag, CF dashboard, regression) | Ops | **In progress** — step 4b–6 preflight tooling ✅ · **next (ops):** step 5a CF dashboard · `step5b -- --verify` · `step6 -- --verify` · **next (eng):** none until ops sign-off |
+| **3** | **Hosted steward production rollout** — `hosted:rollout:step*` through step 6 (secrets, flag, CF dashboard, regression) | Ops | ☐ |
 | **4** | **AI P1 product decision** — keep / rename / deterministic-only / remove scan reader (no new L3 user features until Phase A) | Product | ☐ |
-| **5** | **Large-wallet shell performance** — bound `hc_wallet_network_cache`, avoid full-wallet parse on hub/inbox hot paths | Engineering debt | **✅ Shipped** — S6–S11 + `hc_wallet_summary`; collapsed hub previews; hub/wallet DOM caps; presence debounce; large expanded hub summary rows + action hydration; incremental summary-row windowing + viewport scroll-sync (see `DEVICE_OS_REQUEST_BUDGET.md`) |
+| **5** | **Large-wallet shell performance** — bound `hc_wallet_network_cache`, avoid full-wallet parse on hub/inbox hot paths | Engineering debt | **Partial ✅** — S6 cache bound (`WALLET_NETWORK_CACHE_MAX_ENTRIES`); hot-path wallet parse still open |
 
 **Rule:** Do not start new L3 user-facing AI surfaces until priority **2** passes. Commerce never grants vouch.
 
@@ -147,10 +147,11 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
 | `hc-hoodie-live-object-v1` | `PERSONALIZE_HOODIE_PRINTIFY_PRODUCT_ID`, `PERSONALIZE_HOODIE_PRINTIFY_VARIANT_ID`, optional `PERSONALIZE_HOODIE_PRINTIFY_SHIPPING_METHOD` |
 | `hc-sticker-square-v1` | `PERSONALIZE_STICKER_PRINTIFY_PRODUCT_ID`, `PERSONALIZE_STICKER_PRINTIFY_VARIANT_ID`, optional `PERSONALIZE_STICKER_PRINTIFY_SHIPPING_METHOD` |
 
-Shared: `PRINTIFY_SUBMIT_ENABLED=1`, `PRINTIFY_API_TOKEN` (secret), `PRINTIFY_SHOP_ID`, `SHOPIFY_WEBHOOK_SECRET` (secret), `FULFILLMENT_PII_ENCRYPTION_KEY` (secret — 32-byte base64; captures Shopify shipping on paid webhook). Optional pre-checkout shipping estimate: `POST /v1/print/quotes` with `{ product_id, destination: { country, zip? } }` — wired on `/shop/customize/`. Operator submits via `POST /v1/print/orders` with `{ commerce_order_id, submit_to_printify: true }` after minting planned QRs — or pass `submit_to_printify: true` on `POST /v1/print/orders/{id}/mint` to chain both steps. Omit `shipping_address` to use encrypted store, or pass it to override. Same path as Tier 0 ([`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md)).
+Shared: `PRINTIFY_SUBMIT_ENABLED=1`, `PRINTIFY_API_TOKEN` (secret), `PRINTIFY_SHOP_ID`, `SHOPIFY_WEBHOOK_SECRET` (secret), `FULFILLMENT_PII_ENCRYPTION_KEY` (secret — 32-byte base64; captures Shopify shipping on paid webhook). Operator submits via `POST /v1/print/orders` with `{ commerce_order_id, submit_to_printify: true }` after minting planned QRs — omit `shipping_address` to use encrypted store, or pass it to override. Same path as Tier 0 ([`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md)).
 
 8. Run [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) gates before live payments.
 9. **Apparel QA:** physical scan test on printed hoodie ([`V1_ASSUMPTION_REGISTER.md`](V1_ASSUMPTION_REGISTER.md) A-004) — runbook [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md); automated regression: `npm run worker:test:merch-print-qa`.
+10. **Engineering rollout:** `npm run merch-funnel:rollout:step1` → `step6` — see [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Production rollout commands.
 
 ### Worker route (required)
 
@@ -177,17 +178,16 @@ Aggregate metrics only — no PII. Allowed refs:
 | Step | Pass? |
 |------|-------|
 | Stranger scans campaign merch; profile loads with limits + customize CTA | ✅ scan hint · ☐ manual stranger QA |
-| Create card → `/shop/customize/` detects session | ✅ auto-redirect on fresh `scan_customize` — `created-merch-funnel.mjs` · E2E `e2e/merch-funnel-customize.spec.ts` |
+| Create card → `/shop/customize/` detects session | ✅ redirect + E2E `e2e/merch-funnel-customize.spec.ts` |
 | Preview shows LIVE OBJECT branded QR on product mockup | ✅ UI |
 | Artifact intent created; attach returns Shopify line attributes | ✅ API tests |
 | Checkout URL includes `properties[artifact_intent_id]` | ✅ `shop-customize-core.test.ts` |
-| Paid webhook → print queue → mint planned QRs | ✅ `shopify-orders-webhook` + `merch-funnel-paid-mint-path` · ✅ mint+submit chain (`submit_to_printify` on mint) · ☐ live Printify submit (operator env) |
+| Paid webhook → print queue → mint planned QRs | ✅ `shopify-orders-webhook` + `merch-funnel-paid-mint-path` · ☐ live Printify submit |
 | Paid webhook → Printify queue (operator env) | ✅ queue on paid webhook · Tier 1 template + Printify env mapping |
 | Per-order artwork upload to Printify on submit (PM-FR-13) | ✅ `printify-upload.ts` · `printify-line-items.ts` — requires `PERSONALIZE_*_PRINTIFY_BLUEPRINT_ID` + `PRINT_PROVIDER_ID` |
 | Buyer order status on `/shop/thanks/` (O-003) | ✅ `GET /v1/store/order-status` · email hash lookup · no shipping PII in response |
 | Encrypted shipping from Shopify webhook (PM-FR-41) | ✅ `commerce_fulfillment_pii` · decrypt on Printify submit · body override still supported |
 | Tracking links + reconciliation polling (O-003) | ✅ Printify webhook + 30m cron poll · buyer `/shop/thanks/` tracking link |
-| Pre-checkout shipping estimate (PM-FR-20) | ✅ `POST /v1/print/quotes` · optional estimate on `/shop/customize/` |
 | Tier 1 `shop-config.json` ready | `npm run merch-funnel:verify-config` · ☐ operator paste variant URLs |
 | Checkout opens Shopify with `artifact_intent_id` | ✅ E2E stub · ☐ live Shopify test payment |
 | Printed item scans; bearer warning visible | ☐ physical QA · ✅ automated scan regression (`npm run worker:test:merch-print-qa`, [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md)) |
