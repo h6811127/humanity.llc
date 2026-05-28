@@ -77,7 +77,7 @@ Those become meaningful only after the base interaction is legible.
 
 ## Step 2 candidates
 
-- Better side-by-side scanner/owner layout for in-person use.
+- Better side-by-side scanner/owner layout for in-person use — **shipped (2026-05-28):** `live-control-in-person-layout` splits scanner and owner panes; at ≥640px when waiting, grid shows **Scanner** | **Owner** roles side by side (`scan-html.ts`, `scan-pass.css`).
 - Visible countdown for challenge expiry — **partial:** challenge wait uses `startCountdown()` on scan page; proof display window uses server `proof_expires_at` + client timer.
 - Clear expired/failed state on the scanner page — **shipped (2026-05-28):** SSR stale-proof gate (`scan.ts`), client `showProofExpired` / `showRequestExpired` (`scan-html.ts`), regression tests in `worker/tests/scan.test.ts` and `worker/tests/live-control.test.ts`.
 - Copy comprehension test with the question: “What did live control prove?”

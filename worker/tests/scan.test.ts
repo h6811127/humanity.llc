@@ -572,6 +572,26 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain('if (ownerLink) ownerLink.href = "#";');
   });
 
+  it("renders side-by-side in-person layout markup for live control", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: summary(),
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+
+    expect(html).toContain('id="live-control-in-person-layout"');
+    expect(html).toContain("live-control-scanner-pane");
+    expect(html).toContain('live-control-eyebrow">Scanner</span>');
+    expect(html).toContain('live-control-eyebrow">Owner</span>');
+    expect(html).toContain('inPersonLayout.classList.add("is-owner-waiting")');
+  });
+
   it("uses print_artifact scope copy when applicable", async () => {
     const vm = buildScanViewModel(
       PROFILE,
