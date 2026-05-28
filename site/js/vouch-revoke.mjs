@@ -1,6 +1,7 @@
 /**
- * M6 Step 3 — revoke vouches the viewer issued from this browser session.
+ * M6 Step 3  -  revoke vouches the viewer issued from this browser session.
  */
+import { stripResolverUrlsFromMessage } from "./resolver-user-error-core.mjs";
 import { postVouchRevokeUrl, signVouchRevocation } from "./hc-sign.mjs";
 
 /**
@@ -60,7 +61,7 @@ export function initVoucherRevoke(ctx) {
   }
 
   function truncateProfileId(id) {
-    if (typeof id !== "string" || id.length < 10) return id ?? "—";
+    if (typeof id !== "string" || id.length < 10) return id ?? " - ";
     return `${id.slice(0, 6)}…${id.slice(-4)}`;
   }
 
@@ -74,7 +75,8 @@ export function initVoucherRevoke(ctx) {
       VOUCH_SUBJECT_MISMATCH: "Signed revocation does not match the stored vouch.",
       VOUCH_ID_MISMATCH: "Revocation document does not match this vouch.",
     };
-    return map[code] || fallback || "Could not revoke vouch. Try again.";
+    const plain = map[code] || stripResolverUrlsFromMessage(fallback);
+    return plain || "Could not revoke vouch. Try again.";
   }
 
   async function revokeEntry(entry, button) {

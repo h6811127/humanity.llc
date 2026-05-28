@@ -49,10 +49,10 @@ const FEATURES = [
     subHtml: `<span class="ship-badge ship-badge-live">Live</span> <a href="/create/">/create/</a> → Worker POST → D1 → scan at <code>/c/{profile_id}?q=…</code>`,
     badge: "live",
     aspects: {
-      why: "Proves the core thesis: a printed QR is a <strong>live software endpoint</strong>, not a frozen link. No app install, no account gate for scanning — any camera can read current public state.",
-      design: "Ed25519 keys generated in-browser; signed card + QR credential POSTed to <code>/.well-known/hc/v1/cards</code>. JCS canonicalization for cross-client parity. Profile and QR ids are base58 — stable in the printed URL forever; meaning changes via resolver status, not reprinting.",
-      safety: "Private signing keys never leave the owner device unless the user exports an encrypted backup. Resolver verifies signatures on ingest and stores only public documents and status flags — not a people trail.",
-      limits: "Keys start in <code>sessionStorage</code> (this tab only). <strong>Save on this device</strong> on <a href=\"/created/\">/created/</a> copies them to <code>localStorage</code> (<code>hc_wallet</code>) for other tabs — not automatic on create. Operator cannot reset your key. Printed URL exposes <code>profile_id</code> and <code>qr_id</code> (v1 privacy lock).",
+      why: "Proves the core thesis: a printed QR is a <strong>live software endpoint</strong>, not a frozen link. No app install, no account gate for scanning  -  any camera can read current public state.",
+      design: "Ed25519 keys generated in-browser; signed card + QR credential POSTed to <code>/.well-known/hc/v1/cards</code>. JCS canonicalization for cross-client parity. Profile and QR ids are base58  -  stable in the printed URL forever; meaning changes via resolver status, not reprinting.",
+      safety: "Private signing keys never leave the owner device unless the user exports an encrypted backup. Resolver verifies signatures on ingest and stores only public documents and status flags  -  not a people trail.",
+      limits: "Keys start in <code>sessionStorage</code> (this tab only). <strong>Save on this device</strong> on <a href=\"/created/\">/created/</a> copies them to <code>localStorage</code> (<code>hc_wallet</code>) for other tabs  -  not automatic on create. Operator cannot reset your key. Printed URL exposes <code>profile_id</code> and <code>qr_id</code> (v1 privacy lock).",
       future: "Federated resolvers implementing the same <code>hc/v1</code> API; NFC/mesh carriers pointing at the same truth; optional multi-device sync without central key custody.",
     },
   },
@@ -66,11 +66,11 @@ const FEATURES = [
     subHtml: `<span class="ship-badge ship-badge-live">Live</span> on <a href="/created/">/created/</a>; hub import of <code>.hcbackup.json</code> on homepage`,
     badge: "live",
     aspects: {
-      why: "Browser-held keys are powerful and fragile. Without backup, losing the create tab means losing revoke and live-control ability — the sticker still scans, but the owner cannot mutate it.",
-      design: "Encrypted backup export uses a user-chosen passphrase (client-side crypto; logic mirrored in Worker tests). Optional recovery key pair can sign revoke and live-control responses separately from the owner key — useful for “break glass” without daily use.",
-      safety: "Operator never receives plaintext private keys. Backup blobs are useless without the passphrase. Recovery key display is explicit — user must save it; we do not email or cloud-store secrets.",
+      why: "Browser-held keys are powerful and fragile. Without backup, losing the create tab means losing revoke and live-control ability  -  the sticker still scans, but the owner cannot mutate it.",
+      design: "Encrypted backup export uses a user-chosen passphrase (client-side crypto; logic mirrored in Worker tests). Optional recovery key pair can sign revoke and live-control responses separately from the owner key  -  useful for “break glass” without daily use.",
+      safety: "Operator never receives plaintext private keys. Backup blobs are useless without the passphrase. Recovery key display is explicit  -  user must save it; we do not email or cloud-store secrets.",
       limits: "No “forgot password” recovery from humanity.llc. Weak passphrases or lost backups are owner responsibility. Recovery key compromise equals signing power for that card.",
-      future: "Passkey-wrapped backups, hardware wallet integration, optional steward-assisted recovery ceremonies — always opt-in, never default key escrow.",
+      future: "Passkey-wrapped backups, hardware wallet integration, optional steward-assisted recovery ceremonies  -  always opt-in, never default key escrow.",
     },
   },
   {
@@ -83,10 +83,10 @@ const FEATURES = [
     subHtml: `<span class="ship-badge ship-badge-live">Live</span> owner revoke on <a href="/created/">/created/</a>; per-QR and whole-card scope`,
     badge: "live",
     aspects: {
-      why: "Stolen merch batches, lost stickers, ended events, compromised contacts — physical objects need a kill switch. Revoke is the proof that deployment was not permanent.",
+      why: "Stolen merch batches, lost stickers, ended events, compromised contacts  -  physical objects need a kill switch. Revoke is the proof that deployment was not permanent.",
       design: "Owner signs a typed revocation payload with a one-time nonce; resolver verifies Ed25519 signature and updates D1 status. Same HTTPS URL returns “revoked” on next scan. <strong>Per-QR scope:</strong> revoke one wristband while sibling credentials on the card stay active (<code>print_artifact</code> scope).",
-      safety: "No operator password override. Replay protection on nonces. Revocation records are auditable public mutations — not hidden admin flags.",
-      limits: "Revoke is not key rotation on the sticker — the URL remains public. Does not prove who physically held the object. “Un-revoke” requires issuing new credentials, not toggling back silently.",
+      safety: "No operator password override. Replay protection on nonces. Revocation records are auditable public mutations  -  not hidden admin flags.",
+      limits: "Revoke is not key rotation on the sticker  -  the URL remains public. Does not prove who physically held the object. “Un-revoke” requires issuing new credentials, not toggling back silently.",
       future: "Time-bound credentials, scheduled auto-expire, policy templates for events and retail runs.",
     },
   },
@@ -97,11 +97,11 @@ const FEATURES = [
     icon: "lock",
     iconTone: "red",
     lead: "Prove someone with the key can respond right now.",
-    subHtml: `<span class="ship-badge ship-badge-live">Live</span> alpha — scan page challenge + owner sign on <a href="/created/">/created/</a>`,
+    subHtml: `<span class="ship-badge ship-badge-live">Live</span> alpha  -  scan page challenge + owner sign on <a href="/created/">/created/</a>`,
     badge: "live",
     aspects: {
-      why: "Revoke proves mutability; live control proves <strong>recent key possession</strong> in an in-person moment — separate from vouches, registration, or static “active” status.",
-      design: "Short-lived challenge (~120s). Scanner polls; owner signs on a key-holding device. Visually separate block on scan — never mixed with human trust or card status. Success copy is explicit: does not prove legal identity or physical ownership. Proof does <strong>not</strong> mutate card, QR, or vouch state.",
+      why: "Revoke proves mutability; live control proves <strong>recent key possession</strong> in an in-person moment  -  separate from vouches, registration, or static “active” status.",
+      design: "Short-lived challenge (~120s). Scanner polls; owner signs on a key-holding device. Visually separate block on scan  -  never mixed with human trust or card status. Success copy is explicit: does not prove legal identity or physical ownership. Proof does <strong>not</strong> mutate card, QR, or vouch state.",
       safety: "Inactive or revoked QRs cannot create challenges. Signed responses use replay-safe payloads. No phone number, email, or account login required.",
       limits: "Alpha: no persistent proof history, permissions, or access control. A stolen key can pass live control. Screenshot of success state is not prevented.",
       future: "Ephemeral permissions, event handoff, wearable rules, clearer expired/failed UX (M7 step 2+). Still bounded: never a legal-ID substitute.",
@@ -113,14 +113,14 @@ const FEATURES = [
     title: "Expanding card types",
     icon: "layers",
     iconTone: "gold",
-    lead: "One primitive — many physical roles.",
-    subHtml: `<span class="ship-badge ship-badge-partial">Partial</span> <a href="/create/?template=status_plate">status plate</a> template live; basic card live; lost-item relay is research`,
+    lead: "One primitive  -  many physical roles.",
+    subHtml: `<span class="ship-badge ship-badge-partial">Partial</span> <a href="/create/?template=status_plate">status plate</a>, <a href="/create/?template=lost_item">lost-item relay</a>, and basic card live on create`,
     badge: "partial",
     aspects: {
-      why: "The product is not “a membership card.” The same signed object model powers a studio door plate, a festival wristband, a keys sticker, and a mutual-aid flyer — each with different scan copy and credential scope.",
-      design: "<strong>Status plate (shipped pilot)</strong> — object name + live status line for doors and booths; homepage <strong>One use</strong> section + <a href=\"/studio/\">Studio blog</a>. <strong>Basic card</strong> — handle + manifesto + verification summary. <strong>Lost item relay</strong> — design only (<a href=\"/what-can-a-qr-do/lost-item-relay/\">research</a>). <strong>Print artifact</strong> — unique <code>qr_id</code> per unit via artifact intent.",
+      why: "The product is not “a membership card.” The same signed object model powers a studio door plate, a festival wristband, a keys sticker, and a mutual-aid flyer  -  each with different scan copy and credential scope.",
+      design: "<strong>Status plate (shipped pilot)</strong>  -  object name + live status line for doors and booths; homepage <strong>One use</strong> section + <a href=\"/studio/\">Studio blog</a>. <strong>Lost item relay (shipped pilot)</strong>  -  item headline + return message on scan; create at <a href=\"/create/?template=lost_item\">/create/</a>; showcase via <code>npm run site:seed-showcase-lost-item</code>. <strong>Basic card</strong>  -  handle + manifesto + verification summary. <strong>Print artifact</strong>  -  unique <code>qr_id</code> per unit via artifact intent.",
       safety: "Relay patterns must not doxx owners. Per-item QR scope limits blast radius when one sticker is stolen. Template copy stays honest about what scan proves.",
-      limits: "Lost-item relay UI and contact routing not shipped. Storefront → Printify personalization path still in build.",
+      limits: "Storefront → Printify personalization path still in build. Relay has no separate contact-routing API beyond signed manifesto updates.",
       future: "Template library for organizers, commerce-backed unique QRs, city-game objects (<a href=\"/what-can-a-qr-do/physical-world-multiplayer/\">research</a>).",
     },
   },
@@ -134,9 +134,9 @@ const FEATURES = [
     subHtml: `<span class="ship-badge ship-badge-live">Live</span> flippable pass card + grouped trust blocks`,
     badge: "live",
     aspects: {
-      why: "Trust products fail when limits are buried. Scan separates card status, human trust, QR credential scope, live control, and vouch issuance — plus one “what this does not prove” panel.",
+      why: "Trust products fail when limits are buried. Scan separates card status, human trust, QR credential scope, live control, and vouch issuance  -  plus one “what this does not prove” panel.",
       design: "iOS-style grouped lists; bearer warning on pass card; revoked/suspended overrides hide positive verification badges. Machine-readable twin at <code>GET …/cards/{id}/status</code> matches HTML truth.",
-      safety: "<strong>No scan analytics</strong> on the public page — resolver returns object state, not who scanned. Cache-Control: no-store on live scans.",
+      safety: "<strong>No scan analytics</strong> on the public page  -  resolver returns object state, not who scanned. Cache-Control: no-store on live scans.",
       limits: "Scan UI is server-rendered; artifact-specific layouts are minimal in v1. Holding a printed QR still does not prove ownership.",
       future: "Activity stream merge rules on scan, offline/stale banners, role-specific templates for maintainers vs game operators.",
     },
@@ -151,7 +151,7 @@ const FEATURES = [
     subHtml: `<span class="ship-badge ship-badge-partial">Partial</span> scan truth + vouch issuance + revoke live; abuse hooks next`,
     badge: "partial",
     aspects: {
-      why: "Communities need accountable human trust without KYC or buying merch. Three eligible vouchers can upgrade a card to <strong>Vouched Human</strong> — a public label backed by signed statements, not a government check.",
+      why: "Communities need accountable human trust without KYC or buying merch. Three eligible vouchers can upgrade a card to <strong>Vouched Human</strong>  -  a public label backed by signed statements, not a government check.",
       design: "Public signed vouch documents; default 280-char statement template; private notes never POSTed. Abuse controls: 3-vouch threshold, 5 active vouches/voucher/year, 90-day wait, one active vouch per pair. Scan shows count + recency, not a social graph.",
       safety: "Nonce replay protection on vouch POST. Voucher must be verified human or steward. Collusion rings mitigated by quotas and operator-only cluster hooks (planned).",
       limits: "Registration alone never displays as human verification. Bootstrap requires founding stewards or verified humans to vouch first. Revoke UI lists vouches from this browser session only.",
@@ -169,9 +169,9 @@ const FEATURES = [
     badge: "live",
     aspects: {
       why: "Merch runs, festivals, and mutual-aid batches need an organizer who can disable bad prints without every volunteer holding owner keys.",
-      design: "Separate organizer key pair registered at card create; signs revocations with <code>organizer_revoked</code> reason. Distinct from owner revoke — explicit handoff UI on <a href=\"/created/\">/created/</a>.",
-      safety: "Organizer key is powerful — treat like a production secret. Same signature + nonce rules as owner revoke. Not DRM: URL remains scannable; status changes to revoked.",
-      limits: "No fine-grained ACL yet — organizer can revoke card or QR credentials they were registered for.",
+      design: "Separate organizer key pair registered at card create; signs revocations with <code>organizer_revoked</code> reason. Distinct from owner revoke  -  explicit handoff UI on <a href=\"/created/\">/created/</a>.",
+      safety: "Organizer key is powerful  -  treat like a production secret. Same signature + nonce rules as owner revoke. Not DRM: URL remains scannable; status changes to revoked.",
+      limits: "No fine-grained ACL yet  -  organizer can revoke card or QR credentials they were registered for.",
       future: "Scoped organizer permissions, time-bound organizer keys, audit log for batch operations.",
     },
   },
@@ -204,7 +204,7 @@ const FEATURES = [
     aspects: {
       why: "Personalized stickers need a planned <code>qr_id</code> per item so one stolen unit can be revoked without killing the whole card. Bridges digital create → physical print.",
       design: "Artifact intent records planned credentials before payment; must survive Shopify checkout metadata. No private keys in intent payloads.",
-      safety: "Intent is pre-commit state — operator can hold orders if metadata is missing rather than auto-printing wrong QRs.",
+      safety: "Intent is pre-commit state  -  operator can hold orders if metadata is missing rather than auto-printing wrong QRs.",
       limits: "End-to-end merch fulfillment not live for all users. Highest-risk handoff is checkout metadata survival (documented in flow audit).",
       future: "User-safe order timeline, Printify webhook reconciler, sample QA loop for launch templates.",
     },
@@ -219,7 +219,7 @@ const FEATURES = [
     subHtml: `<span class="ship-badge ship-badge-live">Live</span> 94 Vitest cases across crypto, revoke, vouch, live control, scan`,
     badge: "live",
     aspects: {
-      why: "Recruiters and security reviewers should see boundaries enforced in CI — not only in markdown threat models.",
+      why: "Recruiters and security reviewers should see boundaries enforced in CI  -  not only in markdown threat models.",
       design: "Shared crypto module for Worker + browser parity tests. Fake D1 layers for resolver handlers. Scan HTML regression tests for trust copy and live-control states.",
       safety: "Covers replay nonces, signature mismatch, vouch quotas, live-control expiry, verification display overrides. Adversarial review doc in repo for open questions.",
       limits: "No production penetration test report yet. Browser E2E for create flow is manual / stranger-test driven.",
@@ -237,10 +237,10 @@ const FEATURES = [
     badge: "live",
     aspects: {
       why: "Create puts keys in one tab; strangers need the story, returners need a control center. The hub names the two storage layers and surfaces the next action (save, notice, revoke, vouch).",
-      design: "<strong>Status line</strong> — segmented counts (network, saved, pinned, notice); tap expands <strong>On this device</strong>. <strong>Saved cards</strong> — Use keys, Open scan, relabel/remove. <strong>Pinned scans</strong> — public bookmarks only (<code>hc_device_pins</code>). <strong>Search</strong> — inline in hub; filters local rows only (not resolver-wide). <strong>Backup import</strong> — decrypt <code>.hcbackup.json</code> into <code>hc_wallet</code>. <strong>Focus mode</strong> — hide intro sections; keep hub + documentation.",
-      safety: "Private keys stay in browser storage; pins never hold signing material. Search is client-side over data you already saved. Labels are yours — rows show <code>@handle</code> + profile id so synced browser data cannot lie silently.",
-      limits: "Not cloud sync or multi-device accounts. Browser profile sync (Safari/Chrome) may copy <code>localStorage</code> incompletely — prefer explicit save per machine. No directory search for other people’s cards.",
-      future: "Optional activity log on device, clearer multi-tab key handoff, federated read — still no operator custody of owner keys.",
+      design: "<strong>Status line</strong>  -  segmented counts (network, saved, pinned, notice); tap expands <strong>On this device</strong>. <strong>Saved cards</strong>  -  Use keys, Open scan, relabel/remove. <strong>Pinned scans</strong>  -  public bookmarks only (<code>hc_device_pins</code>). <strong>Search</strong>  -  inline in hub; filters local rows only (not resolver-wide). <strong>Backup import</strong>  -  decrypt <code>.hcbackup.json</code> into <code>hc_wallet</code>. <strong>Focus mode</strong>  -  hide intro sections; keep hub + documentation.",
+      safety: "Private keys stay in browser storage; pins never hold signing material. Search is client-side over data you already saved. Labels are yours  -  rows show <code>@handle</code> + profile id so synced browser data cannot lie silently.",
+      limits: "Not cloud sync or multi-device accounts. Browser profile sync (Safari/Chrome) may copy <code>localStorage</code> incompletely  -  prefer explicit save per machine. No directory search for other people’s cards.",
+      future: "Optional activity log on device, clearer multi-tab key handoff, federated read  -  still no operator custody of owner keys.",
     },
   },
   {
@@ -249,13 +249,13 @@ const FEATURES = [
     title: "Studio blog & door-plate pilot",
     icon: "book",
     iconTone: "blue",
-    lead: "Building the project in public — starting with a real studio door plate.",
+    lead: "Building the project in public  -  starting with a real studio door plate.",
     subHtml: `<span class="ship-badge ship-badge-live">Live</span> <a href="/studio/">/studio/</a> + homepage One use · live showcase scan when configured`,
     badge: "live",
     aspects: {
-      why: "The site should explain itself the same way the product explains physical objects: short, honest cards. The studio door plate is the first object we dogfood — hours, open/closed, and line updates without reprinting.",
-      design: "<a href=\"/studio/\">Studio blog</a> — card index + posts on the plate, device hub, stack, and framing. Homepage <strong>One use · status plate</strong> lists concrete scenarios (door scan, run state, special hours, revoke visibility). <strong>Try a live scan</strong> loads from <code>site/data/showcase-status-plate.json</code> when present.",
-      safety: "Blog posts are static Pages content — no extra tracking. Showcase scan is a normal public resolver object; same limits as any card (no scan analytics by default).",
+      why: "The site should explain itself the same way the product explains physical objects: short, honest cards. The studio door plate is the first object we dogfood  -  hours, open/closed, and line updates without reprinting.",
+      design: "<a href=\"/studio/\">Studio blog</a>  -  card index + posts on the plate, device hub, stack, and framing. Homepage <strong>One use · status plate</strong> lists concrete scenarios (door scan, run state, special hours, revoke visibility). <strong>Try a live scan</strong> loads from <code>site/data/showcase-status-plate.json</code> when present.",
+      safety: "Blog posts are static Pages content  -  no extra tracking. Showcase scan is a normal public resolver object; same limits as any card (no scan analytics by default).",
       limits: "Blog is manual HTML, not a CMS feed. Only status-plate create template is fully productized; other card types remain research pages.",
       future: "More pilot objects documented as cards, RSS/Atom for posts, organizer-facing build notes tied to artifact-intent launches.",
     },
@@ -371,7 +371,7 @@ function renderHub() {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Features available now · humanity.llc</title>
-    <meta name="description" content="What ships today on humanity.llc — resolver protocol, device hub, studio pilot, and one page per feature." />
+    <meta name="description" content="What ships today on humanity.llc  -  resolver protocol, device hub, studio pilot, and one page per feature." />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="/styles.css?v=69" />
@@ -389,9 +389,9 @@ function renderHub() {
         <section class="hero">
           <p class="hero-eyebrow">Building now</p>
           <h1>All features available now</h1>
-          <p class="hero-line">Protocol features (signed objects on the Worker) plus the Pages shell returners use every day — hub, wallet, studio blog.</p>
+          <p class="hero-line">Protocol features (signed objects on the Worker) plus the Pages shell returners use every day  -  hub, wallet, studio blog.</p>
         </section>
-        <p class="insight"><strong>For recruiters:</strong> <strong>Cloudflare Workers + D1 + Pages</strong> — Ed25519-signed writes, replay-protected mutations, mechanism-visible scan UI, <strong>On this device</strong> hub (no accounts), status-plate pilot, and <strong>94 automated Worker tests</strong>.</p>
+        <p class="insight"><strong>For recruiters:</strong> <strong>Cloudflare Workers + D1 + Pages</strong>  -  Ed25519-signed writes, replay-protected mutations, mechanism-visible scan UI, <strong>On this device</strong> hub (no accounts), status-plate pilot, and <strong>94 automated Worker tests</strong>.</p>
         <section class="group">
           <h2 class="group-label">Site &amp; returning users</h2>
           <ul class="list">

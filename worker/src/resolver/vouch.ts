@@ -10,6 +10,7 @@ import {
   getVouchCardOwner,
   insertVouch,
   recalculateVouchSummary,
+  STEWARD_VOUCHER_ISSUANCE_CAP_PER_YEAR,
   VOUCHER_ACTIVE_QUOTA_PER_YEAR,
   VOUCHER_WAIT_DAYS,
   voucherIssuanceCountSince,
@@ -166,13 +167,15 @@ export async function handlePostVouch(
     );
   }
 
-  const eligibleSince = minusDaysIso(createdAt, VOUCHER_WAIT_DAYS);
-  if (summary.updated_at > eligibleSince) {
-    return errorResponse(
-      "VOUCHER_TOO_NEW",
-      `Voucher must wait ${VOUCHER_WAIT_DAYS} days after verification before vouching.`,
-      403
-    );
+  if (summary.state !== "steward") {
+    const eligibleSince = minusDaysIso(createdAt, VOUCHER_WAIT_DAYS);
+    if (summary.updated_at > eligibleSince) {
+      return errorResponse(
+        "VOUCHER_TOO_NEW",
+        `Voucher must wait ${VOUCHER_WAIT_DAYS} days after verification before vouching.`,
+        403
+      );
+    }
   }
 
   if (await activeVouchPairExists(db, voucherProfileId, voucheeProfileId)) {
@@ -185,10 +188,16 @@ export async function handlePostVouch(
 
   const quotaSince = minusDaysIso(createdAt, 365);
   const activeIssued = await voucherIssuanceCountSince(db, voucherProfileId, quotaSince);
-  if (activeIssued >= VOUCHER_ACTIVE_QUOTA_PER_YEAR) {
+  const yearlyCap =
+    summary.state === "steward"
+      ? STEWARD_VOUCHER_ISSUANCE_CAP_PER_YEAR
+      : VOUCHER_ACTIVE_QUOTA_PER_YEAR;
+  if (activeIssued >= yearlyCap) {
     return errorResponse(
-      "VOUCH_QUOTA_EXCEEDED",
-      `Voucher has reached ${VOUCHER_ACTIVE_QUOTA_PER_YEAR} vouches this year.`,
+      summary.state === "steward"
+        ? "STEWARD_VOUCH_QUOTA_EXCEEDED"
+        : "VOUCH_QUOTA_EXCEEDED",
+      `Voucher has reached ${yearlyCap} vouches this year.`,
       403
     );
   }

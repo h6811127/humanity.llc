@@ -7,6 +7,7 @@ import type {
 
 export const VOUCH_THRESHOLD = 3;
 export const VOUCHER_ACTIVE_QUOTA_PER_YEAR = 5;
+export const STEWARD_VOUCHER_ISSUANCE_CAP_PER_YEAR = 3;
 export const VOUCHER_WAIT_DAYS = 90;
 
 export interface VouchCardOwner {

@@ -1,6 +1,6 @@
 # Physical-world multiplayer research spec
 
-**Status:** Research only — not on the Phase A shipping path (`create → scan → revoke`)
+**Status:** Research only  -  not on the Phase A shipping path (`create → scan → revoke`)
 **Public summary:** `site/what-can-a-qr-do/physical-world-multiplayer/`
 **Privacy boundary:** `docs/REFERENCE_OPERATOR_DATA_POLICY.md`
 **Roadmap context:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md`
@@ -328,3 +328,4 @@ Current build focus remains the simpler pilots in `docs/PHASE_A_STRANGER_PATH_PR
 | `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` | Why this is research, not current shipping scope |
 | `docs/ORGANIZER_SIGNED_REVOKE_PILOT.md` | Closest active shipping primitive for trusted updates |
 | `site/what-can-a-qr-do/combining-ideas/games-maintenance/` | Authority split between play and maintenance |
+| `docs/AI_FEATURE_DEVELOPMENT.md` | L3 backlog — multi-stream conflict narrator (#3) |

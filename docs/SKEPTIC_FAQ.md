@@ -4,7 +4,8 @@
 **Purpose:** Prepare clear answers to the objections people are likely to raise when Humanity Commons is shared publicly.
 
 **Architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  
-**Direction:** `docs/DEMOCRATIC_INFRASTRUCTURE.md`
+**Direction:** `docs/DEMOCRATIC_INFRASTRUCTURE.md`  
+**Hosted tier (planning):** [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) · § Is There A Paid Tier? (this doc)
 
 ---
 
@@ -17,27 +18,27 @@ People care when the scan answers **operational trust questions** under **publis
 | Question at the door | What helps |
 |----------------------|------------|
 | Is this printed QR still valid? | Live network status (active / revoked / suspended) |
-| Is this person known in our network? | Vouches and credentials—not follower counts |
+| Is this person known in our network? | Vouches and credentials - not follower counts |
 | Is the person here holding the key *now*? | Live control proof (short-lived) |
 | Can we stop trusting this object tomorrow? | Owner revoke; per-sticker revoke |
 | Can our org run this without one CEO? | Federated operators + export |
 
 **Phase A** will look thin: create, scan status, revoke. That is the honest floor. **Phase D** adds Commons Pass (membership, events, check-in). **Phase E** proves you are not locked to one company.
 
-If we never ship vouches, live control, org tools, or federation, stop the project—the skeptics are right. See `docs/DEMOCRATIC_INFRASTRUCTURE.md` §2 (value stack).
+If we never ship vouches, live control, org tools, or federation, stop the project - the skeptics are right. See `docs/DEMOCRATIC_INFRASTRUCTURE.md` §2 (value stack).
 
 ---
 
 ## Isn't This Just A QR Profile?
 
-No—if we ship the full trust loop. Yes—if we stop at a pretty link.
+No - if we ship the full trust loop. Yes - if we stop at a pretty link.
 
-A generic QR profile points to **content**. A Humanity Card points to **current signed state**:
+A generic QR profile points to **content**. A root Humanity Card and its child objects point to **current signed state**:
 
 - The card has signed public data anyone can inspect.
 - The QR resolves to **live** status (not a cached bio).
-- The owner can revoke the card or **specific printed-item** QR credentials.
-- Vouches show accountable social trust under rules—not a hidden score.
+- The owner can revoke the root card, a child object, or **specific printed-item** QR credentials.
+- Vouches show accountable social trust under rules - not a hidden score.
 - Live control proof can show recent control of the card key in person.
 - The scan page states what the QR does and does not prove.
 
@@ -76,8 +77,13 @@ That is why vouching should be:
 - Visible enough to audit.
 - Separated from private notes.
 - Governed by public rules.
+- Backed by operator audit hooks for collusive rings (not public graph drama on scan).
 
-Vouching is not perfect proof. It is accountable social trust. The UI should say `Vouched Human`, not overclaim legal or universal verification.
+Vouching is not perfect proof. It is **accountable social trust**: humans put their cryptographic name on a public statement they can take back. The UI should say `Vouched Human`, not overclaim legal identity, global uniqueness, or “bot-proof.”
+
+**Deeper threats we document honestly:** minimum **4-account cliques** can mutual-vouch to VH; rotating rings may evade simple loop detection; stewards skip the 90-day wait; remote vouching is policy-only (no liveness scan). Mitigations: quotas, audit flags, revocation, steward review-not iris. See `docs/VOUCH_THREAT_MODEL.md`.
+
+Full framing (AI era, vs biometric ID, integrator policy): `docs/VOUCH_TRUST_POSITIONING.md`. Optional L3 explain (signed snapshot only): `docs/AI_FEATURE_DEVELOPMENT.md`.
 
 ---
 
@@ -94,17 +100,17 @@ If someone steals a sticker or printed card:
 
 The scan page must say:
 
-> This QR resolves to a Humanity Card. It does not prove the person holding this item is the card owner.
+> This QR resolves through a Humanity Card. It does not prove the person holding this item is the card owner.
 
 ---
 
 ## What Does Live Control Prove?
 
-Live control proof means the card key signed a fresh challenge moments ago.
+Live control proof means the root card key signed a fresh challenge moments ago.
 
 It proves:
 
-- Recent control of the card key or accepted recovery/rotation key.
+- Recent control of the root card key or accepted recovery/rotation key.
 
 It does not prove:
 
@@ -201,15 +207,15 @@ Revenue should fund operations, development, support, security, accessibility, g
 
 These solve different problems.
 
-Worldcoin and biometric systems raise major privacy, coercion, and governance concerns.
+**Worldcoin / iris and biometric global ID** optimize for *one person, one slot* at enrollment. That is a different question from *who signed a revocable attestation on this profile under published rules?* Biometric warehouses raise privacy, coercion, and governance concerns Humanity avoids by design. We do not claim to replace iris for every platform Sybil gate; we claim **vouch** is the right primitive for communities that need accountable humans on the record. See `docs/VOUCH_TRUST_POSITIONING.md`.
 
-LinkedIn is platform-owned reputation.
+**LinkedIn** is platform-owned reputation.
 
-Passkeys are useful authentication primitives, but they do not by themselves create a public, vouched, revocable trust card.
+**Passkeys** are useful authentication primitives, but they do not by themselves create a public, vouched, revocable trust card.
 
-Microsoft Authenticator proves access for a platform login. Humanity live control proof should prove recent control of a Humanity Card key to another person or community, without requiring a Microsoft/Google account.
+**Microsoft Authenticator** proves access for a platform login. Humanity live control proof should prove recent control of a Humanity Card key to another person or community, without requiring a Microsoft/Google account.
 
-Humanity Commons should use good cryptographic primitives without becoming dependent on platform identity.
+Humanity Commons should use good cryptographic primitives without becoming dependent on platform identity or a central proof-of-personhood database.
 
 ---
 
@@ -240,7 +246,7 @@ V1 should provide:
 - Key rotation/recovery design if implemented.
 - Honest warnings if recovery is not available yet.
 
-If a user loses the only key and has no recovery path, they may not be able to prove control or revoke normally. The product must explain this before users rely on the card.
+If a user loses the only root key and has no recovery path, they may not be able to prove control, revoke, or edit child objects normally. The product must explain this before users rely on the card, and should push backup/recovery harder before many child objects or paid printed artifacts.
 
 ---
 
@@ -287,7 +293,7 @@ It can be if built like a surveillance identity company.
 
 The reference design is intentionally **minimal**:
 
-- Pseudonymous `profile_id` and public key—not legal identity in the core loop.
+- Pseudonymous `profile_id` and public key - not legal identity in the core loop.
 - No scan analytics by default.
 - Private keys stay on the user device.
 - Commerce PII stays in Shopify/Printify, not the network.
@@ -306,9 +312,9 @@ See `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` §5.
 
 Not part of this project’s trust model.
 
-Public blockchains make many trust problems **more permanent and more traceable** (wallets, indexers, immutable graphs)—not less. Humanity Commons needs **live status at scan time** (revoked, suspended, active). That is a **network** job with **Ed25519-signed documents**, not chain gas or NFT identity.
+Public blockchains make many trust problems **more permanent and more traceable** (wallets, indexers, immutable graphs) - not less. Humanity Commons needs **live status at scan time** (revoked, suspended, active). That is a **network** job with **Ed25519-signed documents**, not chain gas or NFT identity.
 
-Ledger anchoring is **out of v1 scope** and not a default roadmap bet. If it is ever reconsidered, it needs a concrete governance-approved use case that a minimal operator cannot meet honestly—see `docs/V1_DECISION_LOCK.md`.
+Ledger anchoring is **out of v1 scope** and not a default roadmap bet. If it is ever reconsidered, it needs a concrete governance-approved use case that a minimal operator cannot meet honestly - see `docs/V1_DECISION_LOCK.md`.
 
 ---
 
@@ -316,7 +322,57 @@ Ledger anchoring is **out of v1 scope** and not a default roadmap bet. If it is 
 
 No.
 
-**Public launch** means anyone can create a card when Phase A ships. An optional early tester pool may help stress-test copy and support—it is not a gate, paid tier, or fake democracy.
+**Public launch** means anyone can create a card when Phase A ships. An optional early tester pool may help stress-test copy and support - it is not a gate, paid tier, or fake democracy.
+
+For optional **hosted steward** plans (infrastructure for power stewards, not identity), see the next section.
+
+---
+
+## Is There A Paid Tier? What Does It Change?
+
+**Planning only** - not required to create a card, scan, vouch, or revoke. See [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md).
+
+### Short answer
+
+**No.** Paying does **not** buy a stronger human label, legal verification, or scan analytics. It is optional **steward infrastructure** on the reference operator: higher automatic check budgets, optional live-proof alerts, and published availability targets for people who run many cards or events.
+
+### What stays free forever (reference operator)
+
+- Create a signed card and QR credentials.
+- Public scan, vouch, revoke, live control when a stranger asks.
+- Manual **Check network** and **Check for live proof** in the device hub.
+- Same trust grammar and scan page for everyone.
+
+### What hosted steward adds (optional, when offered)
+
+- Higher caps on **opt-in** automatic checks (watch must still be on).
+- Optional **server notify** when a stranger requests live proof (not "who scanned you").
+- Published fair-use and SLA for paying stewards - not a 24/7 surveillance product.
+
+Pricing and governance defaults: [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md). Technical limits: [`HOSTED_TIER_ENTITLEMENTS_AND_METERING.md`](HOSTED_TIER_ENTITLEMENTS_AND_METERING.md).
+
+### What we refuse to sell
+
+| Fear | Reality |
+|------|---------|
+| Paywall on identity | Card create stays public |
+| "Premium verified human" | Same labels; money buys capacity, not trust theater |
+| Scan analytics / "who viewed my QR" | Forbidden on every tier |
+| Always-on wallet monitoring | Even paid is bounded automation + fair use |
+| Merch unlocks hosted features | Shopify/Printify purchases do **not** grant hosted entitlements |
+
+### If I cancel hosted, do I lose my card?
+
+**No.** Cards, keys, vouches, and public scan keep working. You return to **free-tier** automatic check caps; manual checks remain. See M4 downgrade rules in [`HOSTED_TIER_PRICING_AND_SLA.md`](HOSTED_TIER_PRICING_AND_SLA.md) § Downgrade.
+
+### How is this different from founding cohort or merch tiers?
+
+| | Founding cohort / merch | Hosted steward |
+|---|-------------------------|----------------|
+| Purpose | Early testing, belonging, physical wedge | Steward ops at scale |
+| Required? | No | No |
+| Changes verification label? | No | No |
+| Tied to sticker purchase? | Merch is a pointer, not verification | No - separate subscription |
 
 ---
 

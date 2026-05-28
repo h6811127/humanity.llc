@@ -1,6 +1,6 @@
 # Founding Cohort Playbook (Optional Early Testers)
 
-**Status:** Supplemental — **non-gating**  
+**Status:** Supplemental  -  **non-gating**  
 **Purpose:** Define how a small volunteer group can stress-test copy, scans, vouches, and support **before or during public launch**.
 
 **Superseded for architecture and launch gates by:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`

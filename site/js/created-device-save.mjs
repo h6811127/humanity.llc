@@ -1,3 +1,6 @@
+import { markSetupDone } from "./created-mode.mjs";
+import { isAutoSaveEnabled } from "./device-auto-save.mjs";
+import { logDeviceActivity } from "./device-activity.mjs";
 import {
   defaultWalletLabel,
   isWalletSaved,
@@ -38,12 +41,21 @@ export function initCreatedDeviceSave(getSession) {
       }
     }
     const saved = isWalletSaved(session.profile_id);
+    if (saved) {
+      const sync = saveSessionToWallet(session, labelInput?.value ?? "");
+      if (sync.ok && sync.updated) {
+        window.dispatchEvent(new Event("hc-device-hub-changed"));
+      }
+    }
     if (saved && form && doneEl) {
       form.hidden = true;
       doneEl.hidden = false;
     } else if (form && doneEl) {
       form.hidden = false;
       doneEl.hidden = true;
+      if (isAutoSaveEnabled()) {
+        queueMicrotask(() => runSave());
+      }
     }
   }
 
@@ -51,20 +63,34 @@ export function initCreatedDeviceSave(getSession) {
     const session = getSession();
     if (!session?.profile_id || !session?.owner_private_key_b58) {
       setStatus("No signing keys in this tab.", true);
-      return;
+      return false;
     }
     const result = saveSessionToWallet(session, labelInput?.value ?? "");
     if ("error" in result) {
       setStatus(result.error, true);
       refresh();
-      return;
+      return false;
     }
     setStatus(
-      result.already ? "Already saved on this device." : "Saved on this device.",
+      result.already
+        ? "Already saved on this device."
+        : result.updated
+          ? "Updated saved keys on this device."
+          : "Saved on this device.",
       false
     );
+    if (!result.already) {
+      const label =
+        labelInput?.value?.trim() || defaultWalletLabel(session);
+      logDeviceActivity("saved", label, {
+        profile_id: session.profile_id,
+        qr_id: session.qr_id ?? null,
+      });
+    }
+    if (result.ok) markSetupDone(session.profile_id);
     refresh();
     window.dispatchEvent(new Event("hc-device-hub-changed"));
+    return true;
   }
 
   form?.addEventListener("submit", (e) => {
@@ -78,5 +104,5 @@ export function initCreatedDeviceSave(getSession) {
   });
 
   refresh();
-  return { refresh };
+  return { refresh, runSave };
 }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import worker from "../src";
 import type { ScanContext } from "../src/db/scan";
 import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
 import {
@@ -12,9 +13,10 @@ import {
   buildScanViewModel,
   malformedScanView,
 } from "../src/resolver/scan-state";
+import { d1WithRateLimitBuckets } from "./rate-limit-db-mock";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
-const QR = "qr_test_card_001";
+const QR = "qr_7Xk9mP2nQ4rT6vW8";
 
 function card(overrides: Partial<CardRow> = {}): CardRow {
   return {
@@ -70,11 +72,12 @@ describe("scan status JSON (M3.4)", () => {
     const vm = buildScanViewModel(
       PROFILE,
       QR,
-      { card: card(), qr: qr(), verification: summary() },
+      { card: card(), qr: qr(), verification: summary(), revocationDisplay: null },
       "https://humanity.llc"
     );
     const body = scanStatusBodyFromViewModel(vm);
     expect(body.scan.kind).toBe("active");
+    expect(body.scan.error).toBeUndefined();
     expect(body.scan.scan_url).toBe(`https://humanity.llc/c/${PROFILE}?q=${QR}`);
     expect(body.scan.qr?.status).toBe("active");
     expect(body.scan.limits.bearer_warning).toBe(BEARER_WARNING);
@@ -119,18 +122,115 @@ describe("scan status JSON (M3.4)", () => {
     const vm = buildScanViewModel(
       PROFILE,
       QR,
-      { card: null, qr: null, verification: null },
+      { card: null, qr: null, verification: null, revocationDisplay: null },
       "https://humanity.llc"
     );
     expect(vm.kind).toBe("unknown_profile");
     expect(httpStatusForScanKind(vm.kind)).toBe(404);
   });
 
+  it("maps scan.kind to contract error codes (F2-8)", () => {
+    const suspended = scanStatusBodyFromViewModel(
+      buildScanViewModel(
+        PROFILE,
+        QR,
+        {
+          card: card({ status: "suspended" }),
+          qr: qr(),
+          verification: summary(),
+          revocationDisplay: null,
+        },
+        "https://humanity.llc"
+      )
+    );
+    expect(suspended.scan.kind).toBe("card_suspended");
+    expect(suspended.scan.error).toBe("CARD_SUSPENDED");
+
+    const cardRevoked = scanStatusBodyFromViewModel(
+      buildScanViewModel(
+        PROFILE,
+        QR,
+        {
+          card: card({ status: "revoked" }),
+          qr: qr(),
+          verification: summary(),
+          revocationDisplay: null,
+        },
+        "https://humanity.llc"
+      )
+    );
+    expect(cardRevoked.scan.error).toBe("CARD_REVOKED");
+
+    const qrRevoked = scanStatusBodyFromViewModel(
+      buildScanViewModel(
+        PROFILE,
+        QR,
+        { card: card(), qr: qr({ status: "revoked" }), verification: summary(), revocationDisplay: null },
+        "https://humanity.llc"
+      )
+    );
+    expect(qrRevoked.scan.kind).toBe("qr_revoked");
+    expect(qrRevoked.scan.error).toBe("QR_REVOKED");
+
+    const printRevoked = scanStatusBodyFromViewModel(
+      buildScanViewModel(
+        PROFILE,
+        QR,
+        {
+          card: card(),
+          qr: qr({ status: "revoked", scope: "print_artifact" }),
+          verification: summary(),
+          revocationDisplay: null,
+        },
+        "https://humanity.llc"
+      )
+    );
+    expect(printRevoked.scan.error).toBe("PRINT_QR_REVOKED");
+
+    const qrExpired = scanStatusBodyFromViewModel(
+      buildScanViewModel(
+        PROFILE,
+        QR,
+        {
+          card: card(),
+          qr: qr({ status: "expired", expires_at: "2020-01-01T00:00:00Z" }),
+          verification: summary(),
+          revocationDisplay: null,
+        },
+        "https://humanity.llc"
+      )
+    );
+    expect(qrExpired.scan.kind).toBe("qr_expired");
+    expect(qrExpired.scan.error).toBe("QR_EXPIRED");
+  });
+
+  it("card suspended includes governance process URLs (F2-3)", () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card({ status: "suspended" }),
+        qr: qr(),
+        verification: summary(),
+        revocationDisplay: null,
+      },
+      "https://humanity.llc"
+    );
+    expect(vm.kind).toBe("card_suspended");
+    const body = scanStatusBodyFromViewModel(vm);
+    expect(body.scan.governance?.data_policy_url).toBe(
+      "https://humanity.llc/data-policy.html"
+    );
+    expect(body.scan.governance?.architecture_url).toBe(
+      "https://humanity.llc/architecture.html"
+    );
+  });
+
   it("card revoked returns 410", () => {
     const vm = buildScanViewModel(
       PROFILE,
       QR,
-      { card: card({ status: "revoked" }), qr: qr(), verification: summary() },
+      { card: card({ status: "revoked" }), qr: qr(), verification: summary(), revocationDisplay: null },
       "https://humanity.llc"
     );
     expect(vm.kind).toBe("card_revoked");
@@ -141,7 +241,7 @@ describe("scan status JSON (M3.4)", () => {
     const vm = buildScanViewModel(
       PROFILE,
       QR,
-      { card: card(), qr: qr({ status: "revoked" }), verification: summary() },
+      { card: card(), qr: qr({ status: "revoked" }), verification: summary(), revocationDisplay: null },
       "https://humanity.llc"
     );
     expect(vm.kind).toBe("qr_revoked");
@@ -156,13 +256,14 @@ describe("scan status JSON (M3.4)", () => {
     expect(httpStatusForScanKind(vm.kind)).toBe(400);
   });
 
-  it("malformed status response includes hint", async () => {
+  it("malformed status response includes hint for invalid profile id", async () => {
     const { handleGetScanStatus } = await import("../src/resolver/scan-status");
-    const db = {
-      prepare: () => ({
-        bind: () => ({ first: async () => null }),
+    const db = d1WithRateLimitBuckets(() => ({
+      bind: () => ({
+        first: async () => null,
+        run: async () => ({ meta: { changes: 0 } }),
       }),
-    } as unknown as D1Database;
+    }));
     const res = await handleGetScanStatus(
       new Request("https://humanity.llc/.well-known/hc/v1/cards/not-valid/status?q=bad"),
       db,
@@ -197,5 +298,59 @@ describe("scan status JSON (M3.4)", () => {
     );
     expect(vm.kind).toBe("unknown_profile");
     expect(httpStatusForScanKind(vm.kind)).toBe(404);
+  });
+
+  it("active status returns ETag and 304 when If-None-Match matches", async () => {
+    const ctx: ScanContext = {
+      card: card(),
+      qr: qr(),
+      verification: summary(),
+      revocationDisplay: null,
+    };
+    const db = d1WithRateLimitBuckets((sql: string) => ({
+      bind: () => ({
+        first: async () => {
+          if (sql.includes("FROM cards")) return ctx.card;
+          if (sql.includes("FROM qr_credentials")) return ctx.qr;
+          if (sql.includes("verification_summaries")) return ctx.verification;
+          return null;
+        },
+        run: async () => ({ meta: { changes: 0 } }),
+      }),
+    }));
+
+    const { handleGetScanStatus } = await import("../src/resolver/scan-status");
+    const url = `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/status?q=${QR}`;
+    const first = await handleGetScanStatus(new Request(url), db, PROFILE);
+    const etag = first.headers.get("ETag");
+    expect(first.status).toBe(200);
+    expect(etag).toBeTruthy();
+
+    const second = await handleGetScanStatus(
+      new Request(url, { headers: { "If-None-Match": etag! } }),
+      db,
+      PROFILE
+    );
+    expect(second.status).toBe(304);
+    expect(second.headers.get("Cache-Control")).toContain("max-age=300");
+  });
+
+  it("GET status through worker.fetch includes CORS for Pages dev origin", async () => {
+    const db = d1WithRateLimitBuckets(() => ({
+      bind: () => ({
+        first: async () => null,
+        run: async () => ({ meta: { changes: 0 } }),
+      }),
+    }));
+    const res = await worker.fetch(
+      new Request(
+        `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/status?q=${QR}`,
+        { headers: { Origin: "http://localhost:8788" } }
+      ),
+      { DB: db } as import("../src").Env
+    );
+    expect(res.headers.get("Access-Control-Allow-Origin")).toBe(
+      "http://localhost:8788"
+    );
   });
 });

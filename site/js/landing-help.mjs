@@ -1,5 +1,5 @@
 /**
- * Landing floating help — tips for new visitors; optional dismiss for session.
+ * Landing floating help  -  tips for new visitors; optional dismiss for session.
  */
 const DISMISS_KEY = "hc_help_dismissed";
 

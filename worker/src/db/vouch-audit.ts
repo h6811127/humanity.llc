@@ -23,6 +23,15 @@ type QuotaBurstFlag = {
   last_created_at: string;
 };
 
+type StewardIssuanceBurstFlag = {
+  kind: "steward_issuance_burst";
+  voucher_profile_id: string;
+  issuance_count: number;
+  window_hours: number;
+  first_created_at: string;
+  last_created_at: string;
+};
+
 type SharedVoucherSetFlag = {
   kind: "shared_voucher_set";
   vouchee_profile_ids: [string, string];
@@ -30,10 +39,19 @@ type SharedVoucherSetFlag = {
   similarity: number;
 };
 
+type DirectedCycleClusterFlag = {
+  kind: "directed_cycle_cluster";
+  profile_ids: string[];
+  active_edge_count: number;
+  density: number;
+};
+
 export type VouchAuditFlag =
   | ClosedLoopFlag
   | QuotaBurstFlag
-  | SharedVoucherSetFlag;
+  | StewardIssuanceBurstFlag
+  | SharedVoucherSetFlag
+  | DirectedCycleClusterFlag;
 
 export interface ListVouchAuditFlagsOptions {
   maxRows?: number;
@@ -41,6 +59,9 @@ export interface ListVouchAuditFlagsOptions {
   burstWindowHours?: number;
   sharedSetMinOverlap?: number;
   sharedSetSimilarityThreshold?: number;
+  directedCycleMinNodes?: number;
+  directedCycleMinDensity?: number;
+  stewardBurstMinIssuances?: number;
   now?: string;
 }
 
@@ -49,6 +70,9 @@ const DEFAULT_QUOTA_WINDOW_DAYS = 365;
 const DEFAULT_BURST_WINDOW_HOURS = 24;
 const DEFAULT_SHARED_SET_MIN_OVERLAP = 3;
 const DEFAULT_SHARED_SET_SIMILARITY_THRESHOLD = 0.75;
+const DEFAULT_DIRECTED_CYCLE_MIN_NODES = 3;
+const DEFAULT_DIRECTED_CYCLE_MIN_DENSITY = 0.5;
+const DEFAULT_STEWARD_BURST_MIN_ISSUANCES = 3;
 
 /**
  * Operator-only M6 abuse hooks. These aggregate public vouch rows for manual
@@ -66,16 +90,30 @@ export async function listVouchAuditFlags(
     const t = Date.parse(row.created_at);
     return Number.isFinite(t) && Number.isFinite(now) && now - t <= quotaWindowMs;
   });
+  const stewardProfileIds = await listStewardProfiles(
+    db,
+    [...new Set(quotaRows.map((row) => row.voucher_profile_id))]
+  );
 
   return [
     ...flagClosedLoops(rows),
     ...flagQuotaBursts(quotaRows, {
       burstWindowHours: options.burstWindowHours ?? DEFAULT_BURST_WINDOW_HOURS,
     }),
+    ...flagStewardBursts(quotaRows, {
+      burstWindowHours: options.burstWindowHours ?? DEFAULT_BURST_WINDOW_HOURS,
+      minIssuances:
+        options.stewardBurstMinIssuances ?? DEFAULT_STEWARD_BURST_MIN_ISSUANCES,
+      stewardProfileIds,
+    }),
     ...flagSharedVoucherSets(rows, {
       minOverlap: options.sharedSetMinOverlap ?? DEFAULT_SHARED_SET_MIN_OVERLAP,
       similarityThreshold:
         options.sharedSetSimilarityThreshold ?? DEFAULT_SHARED_SET_SIMILARITY_THRESHOLD,
+    }),
+    ...flagDirectedCycleClusters(rows, {
+      minNodes: options.directedCycleMinNodes ?? DEFAULT_DIRECTED_CYCLE_MIN_NODES,
+      minDensity: options.directedCycleMinDensity ?? DEFAULT_DIRECTED_CYCLE_MIN_DENSITY,
     }),
   ];
 }
@@ -94,6 +132,23 @@ async function listRecentVouches(
     .bind(maxRows)
     .all<VouchAuditRow>();
   return result.results ?? [];
+}
+
+async function listStewardProfiles(
+  db: D1Database,
+  profileIds: string[]
+): Promise<Set<string>> {
+  if (profileIds.length === 0) return new Set<string>();
+  const placeholders = profileIds.map(() => "?").join(", ");
+  const result = await db
+    .prepare(
+      `SELECT profile_id FROM verification_summaries
+       WHERE state = 'steward'
+         AND profile_id IN (${placeholders})`
+    )
+    .bind(...profileIds)
+    .all<{ profile_id: string }>();
+  return new Set((result.results ?? []).map((row) => row.profile_id));
 }
 
 function flagClosedLoops(rows: VouchAuditRow[]): ClosedLoopFlag[] {
@@ -161,6 +216,49 @@ function flagQuotaBursts(
   return flags.sort((a, b) => a.voucher_profile_id.localeCompare(b.voucher_profile_id));
 }
 
+function flagStewardBursts(
+  rows: VouchAuditRow[],
+  options: {
+    burstWindowHours: number;
+    minIssuances: number;
+    stewardProfileIds: Set<string>;
+  }
+): StewardIssuanceBurstFlag[] {
+  const byVoucher = new Map<string, VouchAuditRow[]>();
+  for (const row of rows) {
+    if (!options.stewardProfileIds.has(row.voucher_profile_id)) continue;
+    const group = byVoucher.get(row.voucher_profile_id) ?? [];
+    group.push(row);
+    byVoucher.set(row.voucher_profile_id, group);
+  }
+
+  const burstWindowMs = options.burstWindowHours * 60 * 60 * 1000;
+  const flags: StewardIssuanceBurstFlag[] = [];
+  for (const [voucher, group] of byVoucher.entries()) {
+    if (group.length < options.minIssuances) continue;
+    const sorted = [...group].sort((a, b) => a.created_at.localeCompare(b.created_at));
+    const first = sorted[0]!;
+    const last = sorted[sorted.length - 1]!;
+    const firstMs = Date.parse(first.created_at);
+    const lastMs = Date.parse(last.created_at);
+    if (
+      Number.isFinite(firstMs) &&
+      Number.isFinite(lastMs) &&
+      lastMs - firstMs <= burstWindowMs
+    ) {
+      flags.push({
+        kind: "steward_issuance_burst",
+        voucher_profile_id: voucher,
+        issuance_count: group.length,
+        window_hours: options.burstWindowHours,
+        first_created_at: first.created_at,
+        last_created_at: last.created_at,
+      });
+    }
+  }
+  return flags.sort((a, b) => a.voucher_profile_id.localeCompare(b.voucher_profile_id));
+}
+
 function flagSharedVoucherSets(
   rows: VouchAuditRow[],
   options: { minOverlap: number; similarityThreshold: number }
@@ -198,4 +296,92 @@ function flagSharedVoucherSets(
   return flags.sort((a, b) =>
     a.vouchee_profile_ids.join(":").localeCompare(b.vouchee_profile_ids.join(":"))
   );
+}
+
+function flagDirectedCycleClusters(
+  rows: VouchAuditRow[],
+  options: { minNodes: number; minDensity: number }
+): DirectedCycleClusterFlag[] {
+  const outgoing = new Map<string, Set<string>>();
+  const nodes = new Set<string>();
+  for (const row of rows) {
+    if (row.status !== "active") continue;
+    if (row.voucher_profile_id === row.vouchee_profile_id) continue;
+    const targets = outgoing.get(row.voucher_profile_id) ?? new Set<string>();
+    targets.add(row.vouchee_profile_id);
+    outgoing.set(row.voucher_profile_id, targets);
+    nodes.add(row.voucher_profile_id);
+    nodes.add(row.vouchee_profile_id);
+  }
+
+  // Tarjan strongly connected components over active-vouch graph.
+  const indexByNode = new Map<string, number>();
+  const lowByNode = new Map<string, number>();
+  const stack: string[] = [];
+  const onStack = new Set<string>();
+  let index = 0;
+  const components: string[][] = [];
+
+  const strongConnect = (node: string): void => {
+    indexByNode.set(node, index);
+    lowByNode.set(node, index);
+    index += 1;
+    stack.push(node);
+    onStack.add(node);
+
+    for (const neighbor of outgoing.get(node) ?? []) {
+      if (!indexByNode.has(neighbor)) {
+        strongConnect(neighbor);
+        lowByNode.set(
+          node,
+          Math.min(lowByNode.get(node) ?? Number.MAX_SAFE_INTEGER, lowByNode.get(neighbor) ?? 0)
+        );
+      } else if (onStack.has(neighbor)) {
+        lowByNode.set(
+          node,
+          Math.min(lowByNode.get(node) ?? Number.MAX_SAFE_INTEGER, indexByNode.get(neighbor) ?? 0)
+        );
+      }
+    }
+
+    if (lowByNode.get(node) === indexByNode.get(node)) {
+      const component: string[] = [];
+      while (stack.length > 0) {
+        const top = stack.pop()!;
+        onStack.delete(top);
+        component.push(top);
+        if (top === node) break;
+      }
+      components.push(component);
+    }
+  };
+
+  for (const node of nodes) {
+    if (!indexByNode.has(node)) strongConnect(node);
+  }
+
+  const flags: DirectedCycleClusterFlag[] = [];
+  for (const component of components) {
+    const members = [...component].sort();
+    if (members.length < options.minNodes) continue;
+    const memberSet = new Set(members);
+    let edgeCount = 0;
+    for (const from of members) {
+      for (const to of outgoing.get(from) ?? []) {
+        if (memberSet.has(to)) edgeCount += 1;
+      }
+    }
+    const maxEdges = members.length * (members.length - 1);
+    if (maxEdges <= 0) continue;
+    const density = edgeCount / maxEdges;
+    if (density < options.minDensity) continue;
+    flags.push({
+      kind: "directed_cycle_cluster",
+      profile_ids: members,
+      active_edge_count: edgeCount,
+      density,
+    });
+  }
+
+  return flags.sort((a, b) => a.profile_ids.join(":").localeCompare(b.profile_ids.join(":")));
 }

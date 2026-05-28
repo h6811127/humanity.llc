@@ -25,7 +25,7 @@
         </section>
         <div class="feature">
           <p class="feature-lead">Mechanism-visible answers on every scan.</p>
-          <p class="feature-sub"><span class="ship-badge ship-badge-live">Live</span> flippable pass card + grouped trust blocks</p>
+          <p class="feature-sub"><span class="ship-badge ship-badge-live">Live</span> flat status panel + grouped trust blocks</p>
         </div>
         <section class="group feature-aspects">
           <h2 class="group-label">About this feature</h2>
@@ -38,7 +38,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Trust products fail when limits are buried. Scan separates card status, human trust, QR credential scope, live control, and vouch issuance — plus one “what this does not prove” panel.</p>
+    <p class="settings-panel-lead">Trust products fail when limits are buried. Scan separates card status, human trust, QR credential scope, live control, and vouch issuance  -  plus one “what this does not prove” panel.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -50,7 +50,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">iOS-style grouped lists; bearer warning on pass card; revoked/suspended overrides hide positive verification badges. Machine-readable twin at <code>GET …/cards/{id}/status</code> matches HTML truth.</p>
+    <p class="settings-panel-lead">Flat status panel + iOS-style grouped lists (not a separate “flippable pass” product mode). Bearer warning on the pass card; revoked/suspended overrides hide positive verification badges. Humans: <code>GET /c/{profile_id}?q=…</code>. Machines: <code>GET …/cards/{id}/status?q=…</code> (same truth as HTML). Integrators needing only <code>qr_id</code>: <code>GET …/qr/{qr_id}</code>. Signed card document: <code>GET …/cards/{id}</code> (JSON, not the scan page).</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -62,7 +62,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead"><strong>No scan analytics</strong> on the public page — resolver returns object state, not who scanned. Cache-Control: no-store on live scans.</p>
+    <p class="settings-panel-lead"><strong>No scan analytics</strong> on the public page  -  resolver returns object state, not who scanned. Cache-Control: no-store on live scans.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -86,7 +86,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Activity stream merge rules on scan, offline/stale banners, role-specific templates for maintainers vs game operators.</p>
+    <p class="settings-panel-lead">Activity stream merge rules on scan, role-specific templates for maintainers vs game operators. Offline disclosure on scan pages is shipped (banner when the browser is offline).</p>
   </div>
 </details></div>
         </section>

@@ -1,6 +1,7 @@
 /**
  * Device-local saved cards (keys) + Phase 2 pinned public scan links.
  */
+import { logDeviceActivity } from "./device-activity.mjs";
 import { applyDeviceHubSearch } from "./device-hub-search.mjs";
 import {
   createPinEntry,
@@ -8,7 +9,12 @@ import {
   pinHaystack,
   savePins,
 } from "./device-pins.mjs";
-import { activateWalletEntry, createdUrlForEntry, getTabSession } from "./device-keys.mjs";
+import { tabNoticeCount } from "./device-counts.mjs";
+import { gatherInboxInput } from "./device-inbox.mjs";
+import { openCardNowPage, getTabSession } from "./device-keys.mjs";
+import { purgePresenceForProfile } from "./device-tab-presence.mjs";
+import { offerClearOtherTabKeysOnRemove } from "./device-notice-nav.mjs";
+import { markProfileRemovedFromDevice } from "./device-wallet-removed-profiles.mjs";
 import {
   defaultWalletLabel,
   loadWallet,
@@ -165,14 +171,26 @@ function renderList() {
       const id = btn.getAttribute("data-id");
       const entry = loadWallet().find((e) => e.id === id);
       if (!entry) return;
-      activateWalletEntry(entry);
-      location.href = createdUrlForEntry(entry);
+      openCardNowPage(entry);
     });
   });
 
   listEl.querySelectorAll(".wallet-remove").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-id");
+      const entry = loadWallet().find((e) => e.id === id);
+      if (
+        !window.confirm(
+          "Remove this card from this device? Keys stay in any other tab until you close it."
+        )
+      ) {
+        return;
+      }
+      if (entry?.profile_id) {
+        markProfileRemovedFromDevice(entry.profile_id);
+        purgePresenceForProfile(entry.profile_id);
+        offerClearOtherTabKeysOnRemove(entry.profile_id);
+      }
       saveWallet(loadWallet().filter((e) => e.id !== id));
       renderList();
       updateActiveBanner();
@@ -219,7 +237,20 @@ function updateActiveBanner() {
   const hasKeys = !!(session?.profile_id && session?.owner_private_key_b58);
 
   if (tabHint) {
-    tabHint.hidden = hasKeys;
+    const input = gatherInboxInput();
+    if (input.orphanRemovedEntries.length > 0) {
+      tabHint.hidden = false;
+      tabHint.innerHTML =
+        "Keys for a card you removed are still open in another tab. " +
+        "Open that tab to close it, or clear keys from the device hub.";
+    } else if (input.crossTabEntries.length > 0) {
+      tabHint.hidden = false;
+      tabHint.innerHTML =
+        "Keys are in another tab. " +
+        "Save or manage in that tab’s card workspace, or tap <strong>Open controls</strong> below.";
+    } else {
+      tabHint.hidden = true;
+    }
   }
 
   if (!activeBanner || !activeText) return;
@@ -231,7 +262,7 @@ function updateActiveBanner() {
     session.wallet_label ||
     (session.handle ? `@${session.handle}` : session.profile_id.slice(0, 12));
   activeBanner.hidden = false;
-  activeText.textContent = `Keys active in this tab: ${label}`;
+  activeText.textContent = `Tab Keys Active · ${label}`;
 }
 
 if (searchInput) {
@@ -253,6 +284,7 @@ if (pinForm) {
     const pins = loadPins();
     pins.unshift(created);
     savePins(pins);
+    logDeviceActivity("pin_added", created.label);
     if (pinUrl) pinUrl.value = "";
     if (pinLabel) pinLabel.value = "";
     setStatus(pinStatus, "Pinned on this device only.");
@@ -286,6 +318,9 @@ if (saveForm && saveGroup && session?.owner_private_key_b58 && session?.profile_
           ? "Already saved on this device."
           : "Saved on this device only."
     );
+    if (!result.already && !result.updated) {
+      logDeviceActivity("saved", label || defaultWalletLabel(session));
+    }
     prefillSaveLabel(session);
     renderList();
     applyHubSearch();

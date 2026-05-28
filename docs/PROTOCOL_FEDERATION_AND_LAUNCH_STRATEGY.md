@@ -1,11 +1,11 @@
 # Protocol, Federation, And Public Launch Strategy
 
 **Status:** Canonical strategic architecture (supersedes implicit “founding cohort gate” and “solo single-operator empire” readings across the repo)  
-**Purpose:** Define how Humanity Commons grows into member-governed trust infrastructure with institutional gravity—through **open standards and federated networks**, not a single identity honeypot, a private invite list, or a public blockchain core.
+**Purpose:** Define how Humanity Commons grows into member-governed trust infrastructure with institutional gravity - through **open standards and federated networks**, not a single identity honeypot, a private invite list, or a public blockchain core.
 
 **Read this first** when deciding product scope, launch posture, privacy boundaries, or long-term power strategy.
 
-**Product direction lock:** **Democratic infrastructure** (federated trust grammar + member governance)—not a platform empire or blockchain identity layer. Plain-language framing: `docs/DEMOCRATIC_INFRASTRUCTURE.md`.
+**Product direction lock:** **Democratic infrastructure** (federated trust grammar + member governance) - not a platform empire or blockchain identity layer. Plain-language framing: `docs/DEMOCRATIC_INFRASTRUCTURE.md`.
 
 ---
 
@@ -17,14 +17,14 @@ That grammar is:
 
 - A **signed Humanity Card** (public document + key on the user’s device).
 - **QR credentials** that resolve to **live status** (active, revoked, suspended, unknown).
-- **Vouches** and optional **live control proof** under published rules—with explicit limits on what a scan proves.
+- **Vouches** and optional **live control proof** under published rules - with explicit limits on what a scan proves.
 
 **Power** (institutional adoption, standards gravity, political legitimacy) comes from:
 
-1. **Protocol lock-in** — public spec, portable formats, multiple implementations.
-2. **Federated operators** — many networks, one API; no single company owns “identity.”
-3. **Member governance** — rights-affecting rules ratified by people who depend on the system.
-4. **Repeat dependency** — orgs, events, and tools check network status instead of platform login or legal ID.
+1. **Protocol lock-in**  -  public spec, portable formats, multiple implementations.
+2. **Federated operators**  -  many networks, one API; no single company owns “identity.”
+3. **Member governance**  -  rights-affecting rules ratified by people who depend on the system.
+4. **Repeat dependency**  -  orgs, events, and tools check network status instead of platform login or legal ID.
 
 **Privacy** (anti-surveillance, anti-honeypot) comes from:
 
@@ -33,7 +33,7 @@ That grammar is:
 3. **No scan analytics by default** (governance required to change).
 4. **Commerce firewalled** from trust status (buying merch never grants vouches).
 
-Empire and total untraceability **pull in opposite directions**. The project accepts **pseudonymous technical accounts** (`profile_id`, public key, handle, signed public state)—not “we know nothing about anyone,” and not “we verified your legal identity.”
+Empire and total untraceability **pull in opposite directions**. The project accepts **pseudonymous technical accounts** (`profile_id`, public key, handle, signed public state) - not “we know nothing about anyone,” and not “we verified your legal identity.”
 
 ---
 
@@ -58,7 +58,7 @@ The network does **not** need legal name, government ID, phone number, or email 
 - A **government identity** or KYC authority.
 - A **biometric** or “unique human on Earth” oracle.
 - A **scan surveillance** product (no default analytics).
-- A **blockchain identity layer** (see §7—out of scope for v1).
+- A **blockchain identity layer** (see §7 - out of scope for v1).
 
 ### 2.3 Identity model (honest language)
 
@@ -94,7 +94,7 @@ Subpoenas, breaches, and graph analysis still hurt. The design goal is **minimiz
                     (same trust UI, same limits copy)
 ```
 
-- **humanity.llc** runs the **reference network** and best reference client—not the only network forever.
+- **humanity.llc** runs the **reference network** and best reference client - not the only network forever.
 - **Second operator** (co-op, union, club, aligned host) is a **strategic milestone**, not a nice-to-have: it proves the system is a **protocol**, not a startup database.
 - **Commons Pass** communities may run **scoped network policy** for their members while using the same card grammar.
 
@@ -112,7 +112,7 @@ Responses SHOULD include `X-Resolver-Operator` (or equivalent in JSON body) so s
 
 ### 3.3 Portability
 
-- `profile_id` is opaque and **portable across operators** when a user exports and re-registers—or when federation sync is defined in a later spec version.
+- `profile_id` is opaque and **portable across operators** when a user exports and re-registers - or when federation sync is defined in a later spec version.
 - v1 priority: **export bundle** + documented card format so users are not locked to one host.
 - Cross-operator vouch recognition is a **governance and policy** problem, not only a technical one.
 
@@ -132,11 +132,11 @@ A single permanent operator becomes a **capture and subpoena honeypot** and bloc
 
 **Public launch** means:
 
-- **Anyone** can create a Humanity Card when Phase A ships—no invite-only waitlist as the product gate.
+- **Anyone** can create a Humanity Card when Phase A ships - no invite-only waitlist as the product gate.
 - Specs and trust limits are public on GitHub and the website.
 - The founder may build solo; the **product** does not require permission to exist.
 
-**Founding cohort** (see `docs/FOUNDING_COHORT_PLAYBOOK.md`) is **optional**: a small group for early feedback, copy tests, and ops rehearsal—not a prerequisite for opening card creation to the world.
+**Founding cohort** (see `docs/FOUNDING_COHORT_PLAYBOOK.md`) is **optional**: a small group for early feedback, copy tests, and ops rehearsal - not a prerequisite for opening card creation to the world.
 
 ### 4.2 Phased build order (unchanged wedge, changed gate)
 
@@ -186,7 +186,7 @@ These are **normative** for the reference operator and **recommended** for all o
 ### 5.3 Access logs
 
 - Default: **no scan logging**.
-- If operational abuse response requires minimal access logs, that MUST be a **governance-approved** policy with published retention—not a silent product decision.
+- If operational abuse response requires minimal access logs, that MUST be a **governance-approved** policy with published retention - not a silent product decision.
 
 ### 5.4 Commerce firewall
 
@@ -203,9 +203,9 @@ These are **normative** for the reference operator and **recommended** for all o
 | **Avoid surveillance identity** | No phone/ID for card; no scan ads; export/exit |
 | **Build institutional power** | Open spec, federated operators, Commons Pass in real orgs |
 | **Avoid honeypot** | Minimize retention; publish what you store; no pay-to-verify |
-| **Enable accountability** | Public suspension rules, appeals, steward review—not shadow scores |
+| **Enable accountability** | Public suspension rules, appeals, steward review - not shadow scores |
 
-Stronger identity (KYC, phone verification) may exist **at an org’s edge** under **their** network policy—not as humanity.llc’s global default.
+Stronger identity (KYC, phone verification) may exist **at an org’s edge** under **their** network policy - not as humanity.llc’s global default.
 
 ---
 
@@ -214,9 +214,9 @@ Stronger identity (KYC, phone verification) may exist **at an org’s edge** und
 ### 7.1 v1 position
 
 - **No public blockchain** as trust core, identity layer, or product story.
-- Card creation, vouches, and revocation use **Ed25519 signatures** and **operator network status**—not chain gas, wallets, or NFT “humanity.”
+- Card creation, vouches, and revocation use **Ed25519 signatures** and **operator network status** - not chain gas, wallets, or NFT “humanity.”
 
-**Rationale:** This project targets **live status at scan**, data minimization, and **federated operators**—not permanent wallet graphs or immutable public ledgers.
+**Rationale:** This project targets **live status at scan**, data minimization, and **federated operators** - not permanent wallet graphs or immutable public ledgers.
 
 ### 7.2 Revisit policy
 
@@ -278,4 +278,4 @@ When older copy says “join founding cohort to use the product” or implies a 
 
 ## 11. One-Sentence Summary
 
-> Build the **HTTP of trust status**—open spec, federated hosts, member-governed rules, minimal data—launch **publicly** when the network works, and grow power through **dependency and standards**, not through a private cohort or a chain.
+> Build the **HTTP of trust status** - open spec, federated hosts, member-governed rules, minimal data - launch **publicly** when the network works, and grow power through **dependency and standards**, not through a private cohort or a chain.

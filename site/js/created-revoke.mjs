@@ -1,7 +1,15 @@
 /**
  * Owner revoke controls on /created/ (M4.2 + M5.5 import).
  */
+import { applyOwnerRevokedBanner } from "./created-revoke-banner-core.mjs";
 import { getCardStatusUrl, postRevokeUrl, signRevocation } from "./hc-sign.mjs";
+import { resolverErrorMessage } from "./resolver-user-error-core.mjs";
+import {
+  formatRevokeSummarySub,
+  normalizePilotTemplate,
+  revokeNetworkHintForPilot,
+} from "./pilot-steward-copy.mjs";
+import { inferPilotTemplate } from "./manifesto-display.mjs";
 
 const ICON_TONE = {
   active: "green",
@@ -99,9 +107,25 @@ export function initOwnerRevoke(ctx) {
     return `Scans resolve as: ${kind}`;
   }
 
+  function resolvePilot() {
+    const session = ctx.getSession();
+    if (session?.pilot_template) {
+      return normalizePilotTemplate(String(session.pilot_template));
+    }
+    if (typeof session?.manifesto_line === "string") {
+      return normalizePilotTemplate(inferPilotTemplate(session.manifesto_line));
+    }
+    return "general";
+  }
+
   function updateSummarySub(cardLine, qrLine, scanKind) {
     if (!revokeSummarySub) return;
-    revokeSummarySub.textContent = `${scanKindSummary(scanKind)} · Card ${cardLine} · QR ${qrLine}`;
+    revokeSummarySub.textContent = formatRevokeSummarySub(
+      scanKind,
+      cardLine,
+      qrLine,
+      resolvePilot()
+    );
   }
 
   function applyNetworkStatus(body, scanKindOverride) {
@@ -123,7 +147,7 @@ export function initOwnerRevoke(ctx) {
     }
     if (statusVerificationEl) {
       statusVerificationEl.textContent = humanTrust
-        ? `${humanTrust.label} — ${humanTrust.subtitle}`
+        ? `${humanTrust.label}  -  ${humanTrust.subtitle}`
         : verificationLabel;
     }
 
@@ -133,7 +157,10 @@ export function initOwnerRevoke(ctx) {
     updateSummarySub(cardStatus, qrStatus, scanKind);
 
     if (statusHintEl) {
-      if (scanKind === "active") {
+      const pilotHint = revokeNetworkHintForPilot(resolvePilot(), scanKind);
+      if (pilotHint) {
+        statusHintEl.textContent = pilotHint;
+      } else if (scanKind === "active") {
         statusHintEl.textContent =
           "Revoking changes this live answer on the network. The printed URL stays the same — only the resolver status changes.";
       } else if (scanKind === "qr_revoked") {
@@ -174,13 +201,7 @@ export function initOwnerRevoke(ctx) {
   }
 
   function showRevokedUi(kind) {
-    if (revokedBannerEl) {
-      revokedBannerEl.hidden = false;
-      revokedBannerEl.textContent =
-        kind === "card"
-          ? "Card disabled. Scans may take up to a minute to update."
-          : "This QR is revoked. You can still disable the whole card below.";
-    }
+    applyOwnerRevokedBanner(revokedBannerEl, kind);
     if (kind === "card") {
       if (revokeActions) revokeActions.hidden = true;
       applyNetworkStatus(
@@ -243,16 +264,26 @@ export function initOwnerRevoke(ctx) {
 
       if (kind === "qr_revoked") showRevokedUi("qr_credential");
       else if (kind === "card_revoked") showRevokedUi("card");
+      else applyOwnerRevokedBanner(revokedBannerEl, undefined);
     } catch {
       if (statusCardEl) statusCardEl.textContent = "Unreachable";
       if (statusQrEl) statusQrEl.textContent = "Unreachable";
-      if (statusVerificationEl) statusVerificationEl.textContent = "—";
+      if (statusVerificationEl) statusVerificationEl.textContent = " - ";
       if (revokeSummarySub) revokeSummarySub.textContent = "Could not reach the network";
       if (statusHintEl) {
         statusHintEl.textContent =
           "Could not fetch live status. Check your connection, then reopen this panel.";
       }
     }
+  }
+
+  function revokeDisplayPrefs() {
+    const mode =
+      document.querySelector('input[name="revoke-display-mode"]:checked')?.value ??
+      "minimal";
+    const reasonRaw = document.getElementById("revoke-public-reason")?.value?.trim();
+    const publicReason = reasonRaw || null;
+    return { displayMode: mode, publicReason };
   }
 
   async function postRevocation(targetKind) {
@@ -263,6 +294,7 @@ export function initOwnerRevoke(ctx) {
     }
 
     const targetQrId = targetKind === "qr_credential" ? ctx.qrId : null;
+    const { displayMode, publicReason } = revokeDisplayPrefs();
     setRevokeStatus("Signing…");
     if (revokeQrBtn) revokeQrBtn.disabled = true;
     if (revokeCardBtn) revokeCardBtn.disabled = true;
@@ -274,6 +306,8 @@ export function initOwnerRevoke(ctx) {
         targetQrId,
         privateKeyBase58: k.privateKeyBase58,
         publicKeyBase58: k.publicKeyBase58,
+        displayMode,
+        publicReason,
       });
 
       setRevokeStatus("Submitting…");
@@ -284,7 +318,14 @@ export function initOwnerRevoke(ctx) {
       });
       const payload = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(payload.message || payload.error || `HTTP ${res.status}`);
+        const url = postRevokeUrl(ctx.profileId);
+        throw new Error(
+          resolverErrorMessage(payload, {
+            status: res.status,
+            requestUrl: url,
+            fallback: "Could not revoke on the network.",
+          })
+        );
       }
 
       const session = ctx.getSession() || {};

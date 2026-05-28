@@ -9,7 +9,8 @@
       content="Revoke a Humanity QR or disable a card using an organizer key registered at create time."
     />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=47" />
+    <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=4" />
+    <link rel="stylesheet" href="/styles.css?v=120" />
   </head>
   <body>
     <div class="page">
@@ -47,7 +48,7 @@
           <input
             class="form-input"
             id="org-qr-id"
-            placeholder="qr_… — leave empty only when disabling whole card"
+            placeholder="qr_…  -  leave empty only when disabling whole card"
             autocapitalize="off"
             autocorrect="off"
             spellcheck="false"
@@ -63,7 +64,7 @@
             id="org-private-key"
             required
             rows="3"
-            placeholder="Base58 private key — session only, never uploaded"
+            placeholder="Base58 private key  -  session only, never uploaded"
             autocapitalize="off"
             autocorrect="off"
             spellcheck="false"
@@ -73,14 +74,22 @@
             <code>organizer_revoked</code>.
           </p>
 
-          <p class="form-hint revoke-id-warning">
-            Printed QRs still contain profile and QR IDs in the URL. Revoking changes live network
-            status, not the physical object.
-          </p>
+          <div class="hc-emphasis-card hc-emphasis-card--warn revoke-id-warning" role="note">
+            <div class="hc-emphasis-card__main">
+              <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
+              <div class="hc-emphasis-card__copy">
+                <p class="hc-emphasis-card__eyebrow">Before you continue</p>
+                <p class="hc-emphasis-card__detail">
+                  Printed QRs still contain profile and QR IDs in the URL. Revoking changes live network
+                  status, not the physical object.
+                </p>
+              </div>
+            </div>
+          </div>
 
           <label class="revoke-confirm">
             <input type="checkbox" id="org-confirm-qr" />
-            <span>I understand — revoke this scan QR only</span>
+            <span>I understand  -  revoke this scan QR only</span>
           </label>
           <button type="button" class="btn-danger" id="org-revoke-qr-btn" disabled>
             Revoke this QR (organizer)
@@ -88,7 +97,7 @@
 
           <label class="revoke-confirm revoke-confirm-spaced">
             <input type="checkbox" id="org-confirm-card" />
-            <span>I understand — disable the whole card</span>
+            <span>I understand  -  disable the whole card</span>
           </label>
           <button type="button" class="btn-danger btn-danger-solid" id="org-revoke-card-btn" disabled>
             Disable card (organizer)
@@ -103,6 +112,6 @@
         </p>
       </main>
     </div>
-    <script type="module" src="/js/organizer-revoke.mjs?v=1"></script>
+    <script type="module" src="/js/organizer-revoke.mjs?v=2"></script>
   </body>
 </html>

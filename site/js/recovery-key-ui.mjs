@@ -38,11 +38,9 @@ export function initRecoveryKeyUi(opts) {
   function syncFromSession() {
     const session = opts.getSession();
     const hasRecovery = !!session?.recovery_private_key_b58;
-    const needsAck = hasRecovery && !session?.recovery_key_acknowledged;
 
     if (detailsEl) {
       detailsEl.hidden = !hasRecovery;
-      if (needsAck) detailsEl.open = true;
     }
     if (revealKeyEl && hasRecovery) {
       revealKeyEl.textContent = String(session.recovery_private_key_b58);

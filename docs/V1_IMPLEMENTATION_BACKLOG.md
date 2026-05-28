@@ -3,7 +3,7 @@
 **Status:** Build planning artifact  
 **Purpose:** Convert the v1.0 contracts, flow audit, decision lock, and assumption register into an execution backlog.
 
-**Build order:** Follow `docs/V1_0_ARCHITECTURE_ROADMAP.md` (canonical milestones M0–M10 and master steps). **Direction:** `docs/DEMOCRATIC_INFRASTRUCTURE.md`. **GTM framing:** `docs/MERCH_LED_V1.md`. Task IDs below map to roadmap steps.
+**Build order:** Follow `docs/V1_0_ARCHITECTURE_ROADMAP.md` (canonical milestones M0–M10 and master steps). **Direction:** `docs/DEMOCRATIC_INFRASTRUCTURE.md`. **GTM framing:** `docs/MERCH_LED_V1.md`. **Merch QR policy:** `docs/MERCH_QR_LIFECYCLE_POLICY.md` (fulfillment mint, no calendar expiry on `print_artifact`, creative roadmap). Task IDs below map to roadmap steps.
 
 ---
 
@@ -136,7 +136,7 @@ These are not engineering tasks. They are short owner decisions needed to preven
 
 ### D-007: Separate Product, Trust, And Movement Layers
 
-**Recommendation:** Keep the scan/card UI practical and fast. Put movement narrative, launch language, skeptic answers, and governance depth in supporting pages—not on the scan surface. See `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
+**Recommendation:** Keep the scan/card UI practical and fast. Put movement narrative, launch language, skeptic answers, and governance depth in supporting pages - not on the scan surface. See `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`.
 
 **Decision needed:**
 
@@ -330,7 +330,7 @@ Goal: launch the identity core without commerce.
 
 ### R-003: Revocation And Suspension Status Pages
 
-**Product spec:** `docs/REVOKE_AND_LIFECYCLE_V1.md` — Revoke QR vs Disable card, minimal scan pages, owner warnings, planned privacy modes.
+**Product spec:** `docs/REVOKE_AND_LIFECYCLE_V1.md`  -  Revoke QR vs Disable card, minimal scan pages, owner warnings, planned privacy modes.
 
 **Build:**
 
@@ -388,7 +388,7 @@ Goal: make the card meaningful without overclaiming.
 
 ### V-002: Vouching
 
-**Design:** `docs/M6_VOUCHING_DESIGN.md`
+**Design:** `docs/M6_VOUCHING_DESIGN.md` · **Positioning:** `docs/VOUCH_TRUST_POSITIONING.md` · **Threat model:** `docs/VOUCH_THREAT_MODEL.md`
 
 **Build:**
 
@@ -499,6 +499,8 @@ Goal: complete one real paid order path safely.
 - Manual production approval gate.
 - Cancel eligible orders.
 
+**Shipped:** queue + operator submit + webhook status + Tier 1 template env mapping + **per-order artwork upload** (PM-FR-13) — [`printify-upload.ts`](../worker/src/print/printify-upload.ts) · [`printify-line-items.ts`](../worker/src/print/printify-line-items.ts). Operator env: `PERSONALIZE_*_PRINTIFY_BLUEPRINT_ID`, `PERSONALIZE_*_PRINTIFY_PRINT_PROVIDER_ID`. See [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md).
+
 **Exit criteria:**
 
 - Printify token never reaches browser.
@@ -514,10 +516,14 @@ Goal: complete one real paid order path safely.
 - User-safe order timeline.
 - Operator lookup by Shopify order, commerce order, artifact intent, and Printify order.
 
+**Shipped (partial):** Printify webhook receiver · operator lookup · **buyer order status** — `GET /v1/store/order-status` (email hash + order number) · `/shop/thanks/` UI · **encrypted shipping capture** — Shopify paid webhook → `commerce_fulfillment_pii` (AES-256-GCM) · Printify submit loads from store unless body override · **tracking links** — carrier/number/url on print orders · **reconciliation polling** — Worker cron every 30 minutes (`0,30 * * * *`) repairs missed Printify webhooks.
+
 **Exit criteria:**
 
 - On-hold, has-issues, source-check-failed, unfulfillable, fulfilled, partially fulfilled, and canceled states are actionable.
 - Full shipping address is encrypted and not logged in normal logs.
+
+**Shipped (2026-05-27):** tracking + reconciliation — migration `0021_print_order_tracking.sql` · Printify shipment webhooks store carrier/number/url · buyer order status returns `tracking` · cron `runPrintifyReconcile` polls active Printify orders every 30 minutes.
 
 ---
 
@@ -587,6 +593,27 @@ Goal: make the vertical slice credible for public launch.
 - Data retention policy for print order PII is published.
 - Bootstrap governance key fingerprints and sunset criteria are public.
 - Forbidden claims list is published internally for launch copy review.
+
+### H-006: PWA Install (device shell)
+
+**Spec:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · **Implementation:** [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md)
+
+**Status (2026-05-27):** Phases 0–3 shipped — Vitest (`npm run worker:test:pwa-install`) + E2E (`e2e/device-pwa-install.spec.ts`). Manual **P1-PWA** remains for iOS Safari and standalone smoke.
+
+**Must verify (after Phases 1–3 ship):**
+
+- Manifest and icons deploy on Pages; shell HTML links manifest on `/`, `/wallet/`, `/created/` only.
+- Scan and create flows never show install UX.
+- Returning stewards (≥1 saved card) may see dismissible install card when inbox is not urgent.
+- Installed standalone mode: hub, dot, and inbox still pass **P0-3** and **P2-1**.
+- No service worker registered (v1).
+- Vitest + **P1-PWA** pass.
+
+**Exit criteria:**
+
+- Phase table in `PWA_INSTALL.md` marked Phases 1–3 shipped. ✅
+- `npm run worker:test:pwa-install` green. ✅
+- `npm run e2e -- e2e/device-pwa-install.spec.ts` green. ✅
 
 ### H-005: Growth Loop Readiness
 

@@ -3,9 +3,9 @@
 **Status:** Strategic draft  
 **Purpose:** Evaluate Humanity Commons through a venture/product lens and define the market wedge, failure modes, viral loops, and validation gates before overbuilding.
 
-**Launch and architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` (public launch, federated networks—not cohort gate).
+**Launch and architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md` (public launch, federated networks - not cohort gate).
 
-**Direction:** `docs/DEMOCRATIC_INFRASTRUCTURE.md` — sell the **trust loop and org layer**, not a static QR profile. Phase A MVP will look minimal; beachheads must still name a workflow that needs **live revoke + vouch + check-in**, not Linktree.
+**Direction:** `docs/DEMOCRATIC_INFRASTRUCTURE.md`  -  sell the **trust loop and org layer**, not a static QR profile. Phase A MVP will look minimal; beachheads must still name a workflow that needs **live revoke + vouch + check-in**, not Linktree.
 
 ---
 
@@ -17,9 +17,11 @@ The idea is worth prototyping because the macro problem is real: AI-generated ac
 
 The project is not yet venture-ready because the first wedge, buyer, recurring use case, and growth loop still need proof. The v1 question is not "Can this be built?" It is:
 
-> Do strangers and communities use the trust loop (create, scan, vouch, revoke) without hand-holding—and can a second operator adopt the same spec?
+> Do strangers and communities use the trust loop (create, scan, vouch, revoke) without hand-holding - and can a second operator adopt the same spec?
 
 Until that is proven, Humanity Commons should be treated as a high-conviction prototype and public-interest protocol experiment, not a scaled venture business.
+
+**AI product stance:** Macro problem includes AI/bot spam; product response is **signed, revocable trust loop** — not an AI profile platform. Optional L3 explain consumes signed snapshot only ([`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md)).
 
 ---
 
@@ -100,7 +102,7 @@ They are also more likely to forgive an early product if the trust model is hone
 
 ### Recommended V1 Beachhead
 
-Start with **events/meetups and public launch**, then approach cooperative/member organizations—including as a **second network operator**.
+Start with **events/meetups and public launch**, then approach cooperative/member organizations - including as a **second network operator**.
 
 Reason: events make the trust loop physically understandable. A person can scan a card, see `Vouched Human`, ask for live control, and understand why a static sticker is not enough. A co-op running the same API proves federation, not startup capture.
 

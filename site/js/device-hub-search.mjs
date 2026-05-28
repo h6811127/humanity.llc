@@ -2,6 +2,8 @@
  * Shared Phase 1–2 local search over a device hub root element.
  */
 
+import { shouldHubSearchApplyVisibility } from "./device-hub-search-core.mjs";
+
 const ALWAYS_VISIBLE_GROUPS = new Set(["shortcuts", "import"]);
 
 /**
@@ -21,6 +23,7 @@ export function applyDeviceHubSearch(hub, query) {
     if (!q) {
       groupEl.hidden = false;
       for (const el of items) {
+        if (!shouldHubSearchApplyVisibility(el)) continue;
         el.hidden = false;
       }
       groups[groupKey] = { anyVisible: true, hasItems: items.length > 0 };
@@ -29,6 +32,7 @@ export function applyDeviceHubSearch(hub, query) {
 
     let anyVisible = false;
     for (const el of items) {
+      if (!shouldHubSearchApplyVisibility(el)) continue;
       const text = (el.dataset.hubSearchable || "").toLowerCase();
       const match = text.includes(q);
       el.hidden = !match;

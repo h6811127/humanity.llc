@@ -1,3 +1,14 @@
+import { validateCreateFormFields } from "./create-form-validation-core.mjs";
+import { syncCreateHeroCopy } from "./create-template-copy.mjs";
+import { formatCreateResolverError } from "./create-resolver-error-core.mjs";
+import {
+  handoffMerchRefAfterCreate,
+  peekMerchCreateRef,
+  persistMerchCreateRef,
+  readMerchRefFromUrl,
+  shouldHandoffToCustomize,
+} from "./merch-funnel-core.mjs";
+import { buildObjectStreamsFromFormRows } from "./object-streams-core.mjs";
 import {
   qrExpiryFromIssued,
   encodePrivateKeyBase58,
@@ -18,6 +29,7 @@ const demoBtn = document.getElementById("create-demo-btn");
 const fieldsGeneral = document.getElementById("create-fields-general");
 const fieldsStatusPlate = document.getElementById("create-fields-status-plate");
 const fieldsLostItem = document.getElementById("create-fields-lost-item");
+const fieldsObjectStreams = document.getElementById("create-fields-object-streams");
 const manifestoEl = document.getElementById("manifesto");
 const templateBtns = document.querySelectorAll(".create-template-btn");
 
@@ -50,6 +62,9 @@ function setTemplate(template) {
   if (fieldsGeneral) fieldsGeneral.hidden = isPilot;
   if (fieldsStatusPlate) fieldsStatusPlate.hidden = !isPlate;
   if (fieldsLostItem) fieldsLostItem.hidden = !isRelay;
+  if (fieldsObjectStreams) {
+    fieldsObjectStreams.hidden = !isPlate && template !== "general";
+  }
   if (manifestoEl) manifestoEl.required = !isPilot;
   const objectLabel = document.getElementById("object-label");
   const statusLine = document.getElementById("status-line");
@@ -59,6 +74,7 @@ function setTemplate(template) {
   if (statusLine) statusLine.required = isPlate;
   if (relayItem) relayItem.required = isRelay;
   if (relayMessage) relayMessage.required = isRelay;
+  syncCreateHeroCopy(template);
 }
 
 templateBtns.forEach((btn) => {
@@ -97,6 +113,22 @@ function buildManifestoLine() {
   return { manifesto, pilotTemplate: "general" };
 }
 
+function buildObjectStreamsForCreate() {
+  if (activeTemplate !== "status_plate" && activeTemplate !== "general") return [];
+  return buildObjectStreamsFromFormRows([
+    {
+      label: document.getElementById("create-stream-1-label")?.value,
+      value: document.getElementById("create-stream-1-value")?.value,
+      class: "place",
+    },
+    {
+      label: document.getElementById("create-stream-2-label")?.value,
+      value: document.getElementById("create-stream-2-value")?.value,
+      class: "care",
+    },
+  ]);
+}
+
 function readOrganizerKeyConfig() {
   const enabled = document.getElementById("enable-organizer-revoke")?.checked ?? false;
   if (!enabled) return { enabled: false };
@@ -113,7 +145,7 @@ function readOrganizerKeyConfig() {
 }
 
 /**
- * @param {{ handle: string, manifesto: string, wantRecovery: boolean, pilotTemplate?: string, qrValidityDays?: number, organizer?: ReturnType<typeof readOrganizerKeyConfig> }} input
+ * @param {{ handle: string, manifesto: string, wantRecovery: boolean, pilotTemplate?: string, qrValidityDays?: number, organizer?: ReturnType<typeof readOrganizerKeyConfig>, objectStreams?: Array<{ id: string, class: string, label: string, value: string }> }} input
  */
 function readQrValidityDays() {
   const raw = document.getElementById("qr-validity-days")?.value;
@@ -132,6 +164,7 @@ export async function runCreateCard(input) {
     pilotTemplate = "general",
     qrValidityDays = 365,
     organizer = { enabled: false },
+    objectStreams = [],
     sampleCard = false,
   } = input;
   const { privateKey, publicKeyBase58 } = await generateKeypair();
@@ -193,6 +226,9 @@ export async function runCreateCard(input) {
   if (organizerPublicKeyBase58) {
     cardFields.issuer_public_key = organizerPublicKeyBase58;
   }
+  if (objectStreams.length) {
+    cardFields.object_streams = objectStreams;
+  }
 
   const cardUnsigned = withProtocolFields(cardFields, "humanity_card");
 
@@ -215,27 +251,35 @@ export async function runCreateCard(input) {
   const card = await signDocument(cardUnsigned, privateKey, publicKeyBase58);
   const qr_credential = await signDocument(qrUnsigned, privateKey, publicKeyBase58);
 
+  setStatus("Submitting to resolver…");
+  const attributionRef = sampleCard ? null : peekMerchCreateRef();
+  /** @type {{ card: typeof card, qr_credential: typeof qr_credential, attribution_ref?: string }} */
+  const payload = { card, qr_credential };
+  if (attributionRef) payload.attribution_ref = attributionRef;
+
   const res = await fetch(postCardsUrl(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ card, qr_credential }),
+    body: JSON.stringify(payload),
   });
 
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const msg = data.message || data.error || `HTTP ${res.status}`;
-    if (String(msg).includes("recovery_public_key")) {
+    const msg = formatCreateResolverError(data, res.status, postCardsUrl());
+    if (String(data.message || data.error || "").includes("recovery_public_key")) {
       throw new Error(
         "Resolver database needs an update (recovery key column). Try again in a minute or contact support."
       );
     }
-    if (String(msg).includes("issuer_public_key")) {
+    if (String(data.message || data.error || "").includes("issuer_public_key")) {
       throw new Error(
         "Resolver database needs an update (organizer key column). Apply migration 0005 and redeploy."
       );
     }
-    throw new Error(`${msg} (${postCardsUrl()})`);
+    throw new Error(msg);
   }
+
+  if (attributionRef) handoffMerchRefAfterCreate(attributionRef);
 
   sessionStorage.setItem(
     "hc_created",
@@ -265,6 +309,7 @@ export async function runCreateCard(input) {
       private_key_warning: true,
       created_at: now,
       handle,
+      ...(objectStreams.length ? { object_streams: objectStreams } : {}),
       ...(sampleCard ? { sample_card: true } : {}),
     })
   );
@@ -272,30 +317,82 @@ export async function runCreateCard(input) {
   const created = new URL("/created/", location.origin);
   created.searchParams.set("profile_id", profileId);
   created.searchParams.set("qr_id", qrId);
+  created.searchParams.set("fresh", "1");
+  if (attributionRef && shouldHandoffToCustomize(attributionRef)) {
+    created.searchParams.set("hc_ref", attributionRef);
+  }
   location.replace(created.href);
+}
+
+function readCreateFormFields() {
+  return {
+    objectLabel: document.getElementById("object-label")?.value ?? "",
+    statusLine: document.getElementById("status-line")?.value ?? "",
+    relayItem: document.getElementById("relay-item")?.value ?? "",
+    relayMessage: document.getElementById("relay-message")?.value ?? "",
+    manifesto: manifestoEl?.value ?? "",
+  };
+}
+
+function applyCreateFieldValidity(missingFieldIds, message) {
+  const ids = new Set(missingFieldIds);
+  for (const id of ["handle", "object-label", "status-line", "relay-item", "relay-message", "manifesto"]) {
+    const el = document.getElementById(id);
+    if (!el || !(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement)) {
+      continue;
+    }
+    if (ids.has(id)) {
+      el.setCustomValidity(message);
+      if (id === missingFieldIds[0]) {
+        el.reportValidity();
+      }
+    } else {
+      el.setCustomValidity("");
+    }
+  }
+}
+
+function readValidatedCreateInput() {
+  const handleEl = document.getElementById("handle");
+  const fields = readCreateFormFields();
+  const validation = validateCreateFormFields(activeTemplate, handleEl?.value ?? "", fields);
+  if (!validation.ok) {
+    applyCreateFieldValidity(validation.missingFieldIds, validation.message);
+    throw new Error(validation.message);
+  }
+  applyCreateFieldValidity([], "");
+  if (handleEl && handleEl.value !== validation.handle) {
+    handleEl.value = validation.handle;
+  }
+  const { manifesto, pilotTemplate } = buildManifestoLine();
+  const objectStreams = buildObjectStreamsForCreate();
+  return {
+    handle: validation.handle,
+    manifesto,
+    pilotTemplate,
+    objectStreams,
+    wantRecovery: document.getElementById("generate-recovery")?.checked ?? true,
+    qrValidityDays: readQrValidityDays(),
+    organizer: readOrganizerKeyConfig(),
+  };
 }
 
 async function submitCreate(e, opts = {}) {
   e?.preventDefault();
   if (submitBtn) submitBtn.disabled = true;
   if (demoBtn) demoBtn.disabled = true;
-  setStatus("Generating keys and signing…");
 
   try {
-    const handle = document.getElementById("handle")?.value?.trim();
-    const wantRecovery = document.getElementById("generate-recovery")?.checked ?? true;
-    if (!handle) throw new Error("Handle is required.");
-    const { manifesto, pilotTemplate } = buildManifestoLine();
-    const qrValidityDays = readQrValidityDays();
-    const organizer = readOrganizerKeyConfig();
-    setStatus("Submitting to resolver…");
+    const input = readValidatedCreateInput();
+    setStatus("Generating keys and signing…");
     await runCreateCard({
-      handle,
-      manifesto,
-      wantRecovery,
-      pilotTemplate,
-      qrValidityDays,
-      organizer,
+      handle: input.handle,
+      manifesto: input.manifesto,
+      wantRecovery: input.wantRecovery,
+      pilotTemplate: input.pilotTemplate,
+      objectStreams: input.objectStreams,
+      qrValidityDays: input.qrValidityDays,
+      organizer: input.organizer,
       sampleCard: !!opts.sampleCard,
     });
   } catch (err) {
@@ -306,6 +403,11 @@ async function submitCreate(e, opts = {}) {
 }
 
 form?.addEventListener("submit", submitCreate);
+
+document.getElementById("handle")?.addEventListener("input", (ev) => {
+  const el = ev.currentTarget;
+  if (el instanceof HTMLInputElement) el.setCustomValidity("");
+});
 
 const enableOrganizerEl = document.getElementById("enable-organizer-revoke");
 const organizerFieldsEl = document.getElementById("organizer-key-fields");
@@ -332,14 +434,17 @@ if (urlTemplate === "status_plate") {
   setTemplate("lost_item_relay");
 }
 
+const urlMerchRef = readMerchRefFromUrl();
+if (urlMerchRef) persistMerchCreateRef(urlMerchRef);
+
 demoBtn?.addEventListener("click", async () => {
   const handleEl = document.getElementById("handle");
   const suffix = randomDemoSuffix();
   setTemplate("general");
-  if (handleEl) handleEl.value = `live_demo_${suffix}`;
+  if (handleEl) handleEl.value = `demo_${suffix}`;
   if (manifestoEl) {
     manifestoEl.value =
-      "Live object demo. Scan from another phone, then revoke this QR.";
+      "Neighborhood tool library · Closed for inventory until Tuesday";
   }
   await submitCreate(new Event("submit"), { sampleCard: true });
 });

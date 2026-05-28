@@ -1,9 +1,9 @@
-# Cloudflare Pages — static site in /site
+# Cloudflare Pages  -  static site in /site
 #
 # Dashboard (Git):
 #   Build command:        empty or `npm run build`
 #   Build output dir:     site  (also set below for wrangler)
-#   Deploy command:       LEAVE EMPTY — do not use `npx wrangler deploy`
+#   Deploy command:       LEAVE EMPTY  -  do not use `npx wrangler deploy`
 #
 # CLI: npm run deploy  →  wrangler pages deploy site
 

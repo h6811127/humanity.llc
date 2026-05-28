@@ -1,3 +1,10 @@
+import { getLiveControlPendingCount, getLiveControlPollHealth } from "./device-live-control-inbox.mjs";
+import { isPollableWalletEntry } from "./device-live-control-inbox-core.mjs";
+import {
+  buildDeviceCountsLabel,
+  buildStatusSegmentsFromCounts,
+  tabNoticeCountFromState,
+} from "./device-counts-core.mjs";
 import { loadWallet, isWalletSaved } from "./device-wallet.mjs";
 import { loadPins } from "./device-pins.mjs";
 
@@ -5,61 +12,30 @@ export function tabNoticeCount() {
   try {
     const raw = sessionStorage.getItem("hc_created");
     const session = raw ? JSON.parse(raw) : null;
-    if (!session?.profile_id || !session?.owner_private_key_b58) return 0;
-    return isWalletSaved(session.profile_id) ? 0 : 1;
+    if (!session?.profile_id) return 0;
+    return tabNoticeCountFromState(session, isWalletSaved(session.profile_id));
   } catch {
     return 0;
   }
+}
+
+function pollableSavedCount() {
+  return loadWallet().filter((e) => isPollableWalletEntry(e)).length;
 }
 
 /**
  * @param {"ok"|"degraded"|"offline"} network
  */
 export function buildStatusSegments(network = "offline") {
-  const saved = loadWallet().length;
-  const pins = loadPins().length;
-  const notices = tabNoticeCount();
-
-  const networkLabel =
-    network === "ok"
-      ? "Network live"
-      : network === "degraded"
-        ? "Network limited"
-        : "Network offline";
-
-  return [
-    {
-      id: "network",
-      label: networkLabel,
-      detail: networkLabel,
-      zero: false,
-      highlight: false,
-    },
-    {
-      id: "saved",
-      label: `${saved} saved`,
-      detail: `${saved} saved card${saved === 1 ? "" : "s"} on this device`,
-      zero: saved === 0,
-      highlight: false,
-    },
-    {
-      id: "pinned",
-      label: `${pins} pinned`,
-      detail: `${pins} pinned scan${pins === 1 ? "" : "s"}`,
-      zero: pins === 0,
-      highlight: false,
-    },
-    {
-      id: "notices",
-      label: `${notices} notice${notices === 1 ? "" : "s"}`,
-      detail:
-        notices > 0
-          ? "Keys in this tab — not saved on device"
-          : "No pending notices",
-      zero: notices === 0,
-      highlight: notices > 0,
-    },
-  ];
+  return buildStatusSegmentsFromCounts({
+    network,
+    saved: loadWallet().length,
+    pins: loadPins().length,
+    notices: tabNoticeCount(),
+    liveProof: getLiveControlPendingCount(),
+    pollableSaved: pollableSavedCount(),
+    liveProofPollHealth: getLiveControlPollHealth(),
+  });
 }
 
 /** @param {"ok"|"degraded"|"offline"} network */
@@ -78,15 +54,5 @@ export function buildStatusLine(network = "offline") {
  * @returns {{ saved: number, pins: number, total: number, label: string }}
  */
 export function getDeviceCounts() {
-  const saved = loadWallet().length;
-  const pins = loadPins().length;
-  const parts = [];
-  if (saved > 0) parts.push(`${saved} saved`);
-  if (pins > 0) parts.push(`${pins} pinned`);
-  return {
-    saved,
-    pins,
-    total: saved + pins,
-    label: parts.join(" · ") || "",
-  };
+  return buildDeviceCountsLabel(loadWallet().length, loadPins().length);
 }

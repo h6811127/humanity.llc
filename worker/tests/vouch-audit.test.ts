@@ -10,14 +10,25 @@ type AuditRow = {
 };
 
 class FakeAuditDb {
-  constructor(private readonly rows: AuditRow[]) {}
+  constructor(
+    private readonly rows: AuditRow[],
+    private readonly stewards: string[] = []
+  ) {}
 
-  prepare(_sql: string) {
+  prepare(sql: string) {
     const rows = this.rows;
+    const stewards = this.stewards;
     return {
-      bind(_maxRows: number) {
+      bind(...args: unknown[]) {
         return {
           async all<T>() {
+            if (sql.includes("FROM verification_summaries")) {
+              const requested = new Set(args as string[]);
+              const results = stewards
+                .filter((id) => requested.has(id))
+                .map((profile_id) => ({ profile_id }));
+              return { results: results as T[] };
+            }
             return { results: rows as T[] };
           },
         };
@@ -26,8 +37,8 @@ class FakeAuditDb {
   }
 }
 
-function db(rows: AuditRow[]): D1Database {
-  return new FakeAuditDb(rows) as unknown as D1Database;
+function db(rows: AuditRow[], stewards: string[] = []): D1Database {
+  return new FakeAuditDb(rows, stewards) as unknown as D1Database;
 }
 
 describe("listVouchAuditFlags", () => {
@@ -132,5 +143,59 @@ describe("listVouchAuditFlags", () => {
           flag.vouchee_profile_ids.includes("vouchee_c")
       )
     ).toBe(false);
+  });
+
+  it("flags directed cycle clusters (G-02) for review", async () => {
+    const flags = await listVouchAuditFlags(
+      db(
+        [
+          ["a", "b"],
+          ["b", "c"],
+          ["c", "a"], // rotating 3-cycle
+          ["a", "d"],
+          ["d", "a"], // extra reciprocal edge (clique suspicion)
+        ].map(([voucher, vouchee], index) => ({
+          voucher_profile_id: voucher,
+          vouchee_profile_id: vouchee,
+          status: "active" as const,
+          created_at: `2026-05-02T0${index}:00:00.000Z`,
+        }))
+      ),
+      { directedCycleMinNodes: 3, directedCycleMinDensity: 0.4 }
+    );
+
+    expect(flags).toContainEqual({
+      kind: "directed_cycle_cluster",
+      profile_ids: ["a", "b", "c", "d"],
+      active_edge_count: 5,
+      density: 5 / 12,
+    });
+  });
+
+  it("flags steward issuance bursts for enhanced steward review", async () => {
+    const rows: AuditRow[] = [
+      "2026-05-03T00:00:00.000Z",
+      "2026-05-03T01:00:00.000Z",
+      "2026-05-03T02:00:00.000Z",
+    ].map((createdAt, index) => ({
+      voucher_profile_id: "steward_alpha",
+      vouchee_profile_id: `profile_${index}`,
+      status: "active",
+      created_at: createdAt,
+    }));
+
+    const flags = await listVouchAuditFlags(db(rows, ["steward_alpha"]), {
+      now: "2026-05-03T04:00:00.000Z",
+      stewardBurstMinIssuances: 3,
+    });
+
+    expect(flags).toContainEqual({
+      kind: "steward_issuance_burst",
+      voucher_profile_id: "steward_alpha",
+      issuance_count: 3,
+      window_hours: 24,
+      first_created_at: "2026-05-03T00:00:00.000Z",
+      last_created_at: "2026-05-03T02:00:00.000Z",
+    });
   });
 });

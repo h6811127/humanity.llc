@@ -233,6 +233,29 @@ describe("live control proof alpha", () => {
     expect(pending.return_url).toContain(`/c/${PROFILE}`);
   });
 
+  it("returns 304 for pending challenge when If-None-Match matches", async () => {
+    const owner = await getTestKeypair();
+    const db = dbFor({ card: card(owner.publicKeyBase58), qr: qr() });
+    await handlePostLiveControlChallenge(request({ qr_id: QR }), db, PROFILE);
+
+    const url = `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/live-control/challenges?qr_id=${QR}`;
+    const first = await handleGetPendingLiveControlChallenge(
+      new Request(url),
+      db,
+      PROFILE
+    );
+    const etag = first.headers.get("ETag");
+    expect(etag).toBeTruthy();
+
+    const second = await handleGetPendingLiveControlChallenge(
+      new Request(url, { headers: { "If-None-Match": etag! } }),
+      db,
+      PROFILE
+    );
+    expect(second.status).toBe(304);
+    expect(second.headers.get("Cache-Control")).toContain("max-age=15");
+  });
+
   it("returns 404 when no pending challenge exists for a QR", async () => {
     const owner = await getTestKeypair();
     const db = dbFor({ card: card(owner.publicKeyBase58), qr: qr() });

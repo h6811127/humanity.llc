@@ -1,11 +1,55 @@
 /**
- * Segmented tabs for /created/ (Now · Manage · Help).
+ * Segmented tabs for /created/ (Live · Manage; ids remain now/advanced).
  */
 
-const TAB_IDS = ["now", "manage", "help"];
+const TAB_IDS = ["now", "advanced"];
+
+/** Hash → panel id on /created/ (hub deep-links). */
+export const CREATED_PANEL_FOCUS = {
+  "update-status": "created-live-scanners-see",
+  revoke: "revoke-details",
+  "rotate-qr": "qr-rotate-panel",
+  "extend-qr": "qr-extend-panel",
+  "live-proof": "live-control-proof",
+  manage: "created-live-scanners-see",
+  /** Landing Continue (Phase 2) when setup is done but card not pinned. */
+  "deploy-print": "created-deploy-print",
+};
+
+/** @param {string} [hash] location.hash or bare key */
+export function stewardFocusKeyFromHash(hash = location.hash) {
+  const key = hash.replace(/^#/, "");
+  return Object.prototype.hasOwnProperty.call(CREATED_PANEL_FOCUS, key)
+    ? key
+    : null;
+}
 
 /**
- * @returns {{ select: (tabId: string) => void }}
+ * @param {(tabId: string) => void} select
+ * @param {string} focusKey
+ */
+function focusCreatedPanel(select, focusKey) {
+  const panelId = CREATED_PANEL_FOCUS[focusKey] || focusKey;
+  if (panelId === "live-control-proof" || panelId === "created-live-scanners-see") {
+    select("now");
+  } else if (CREATED_PANEL_FOCUS[focusKey] || document.getElementById(panelId)) {
+    select("advanced");
+  } else {
+    return;
+  }
+  requestAnimationFrame(() => {
+    const el = document.getElementById(panelId);
+    if (!el) return;
+    if (el.tagName === "DETAILS") {
+      el.removeAttribute("hidden");
+      el.setAttribute("open", "");
+    }
+    el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+}
+
+/**
+ * @returns {{ select: (tabId: string) => void, focusPanel: (focusKey: string) => void }}
  */
 export function initCreatedTabs() {
   const tablist = document.querySelector(".created-tabs");
@@ -41,13 +85,20 @@ export function initCreatedTabs() {
 
   const hash = location.hash.replace(/^#/, "");
   if (hash === "revoke-rules") {
-    select("help");
+    select("advanced");
     requestAnimationFrame(() => {
       document.getElementById("revoke-rules")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
+  } else if (hash && CREATED_PANEL_FOCUS[hash]) {
+    focusCreatedPanel(select, hash);
   } else {
-    select(TAB_IDS.includes(hash) ? hash : "now");
+    // Keep old #manage links working.
+    const normalized = hash === "manage" ? "advanced" : hash;
+    select(TAB_IDS.includes(normalized) ? normalized : "now");
   }
 
-  return { select };
+  return {
+    select,
+    focusPanel: (focusKey) => focusCreatedPanel(select, focusKey),
+  };
 }

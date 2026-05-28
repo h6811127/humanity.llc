@@ -2,7 +2,9 @@
 **Status:** Draft for Collective Ratification
 **Constitution Reference:** Humanity Commons Constitution (Articles I, III, VI)
 **Technical Standards Reference:** Technical Standards v1.0
-**Product Trust Reference:** V1 Product Trust Model
+**Product Trust Reference:** V1 Product Trust Model  
+**Vouch positioning:** [`VOUCH_TRUST_POSITIONING.md`](../VOUCH_TRUST_POSITIONING.md)  
+**Vouch threat model:** [`VOUCH_THREAT_MODEL.md`](../VOUCH_THREAT_MODEL.md)
 **Dependencies:** Humanity Card v1.0, QR Public Profile v1.0
 **Related Features:** Storefront v1.0, Printify Fulfillment Middleware v1.0
 
@@ -10,11 +12,13 @@
 
 ## 1. Executive Summary
 
-Human Verification v1.0 defines how Humanity Commons represents trust that a card belongs to a real, distinct human without requiring government ID, phone numbers, email addresses, or centralized identity brokers.
+Human Verification v1.0 defines how Humanity Commons represents trust that a card belongs to a real, distinct human without requiring government ID, phone numbers, email addresses, biometric personhood warehouses, or centralized identity brokers.
 
 Verification is expressed through the Humanity Card. The card may show a public verification state, badge trail, vouch count, ceremony credential, or steward status. Verification is never purchased, never inferred from buying merchandise, and never delegated to Shopify, Printify, or fulfillment providers.
 
-The goal is sybil resistance and portable human trust, not surveillance. V1 should be honest about what it can prove:
+**Vouch (primary path):** Eligible humans sign **public, revocable** attestations under published rules (threshold, quotas, wait). The product optimizes **accountable participation**-who staked their name on this profile-not global iris-style uniqueness. See [`VOUCH_TRUST_POSITIONING.md`](../VOUCH_TRUST_POSITIONING.md).
+
+The goal is portable, mechanism-visible human trust with sybil *mitigation*, not surveillance. V1 should be honest about what it can prove:
 
 - A card may be registered but unverified.
 - A card may be verified through vouches, ceremony, or accepted device proof.
@@ -22,6 +26,7 @@ The goal is sybil resistance and portable human trust, not surveillance. V1 shou
 - A card may be suspended or revoked.
 - A product may resolve to a real Humanity Card without proving the holder is the card owner or verified.
 - Buying or owning an artifact does not make someone verified.
+- Vouches do not prove legal identity, global uniqueness, voucher honesty, or liveness at sign time.
 
 ---
 
@@ -34,7 +39,8 @@ The goal is sybil resistance and portable human trust, not surveillance. V1 shou
 | Human legible | Badge labels must be understandable without cryptography knowledge. |
 | Cryptographically inspectable | Credentials, vouches, and status changes must be signed. |
 | Anti-exclusion | Non-phone and non-ID fallback paths must exist. |
-| Revocable with due process | Verification can be revoked or suspended only under documented rules. |
+| Revocable with due process | Verification can be revoked or suspended only under documented rules. Vouches MUST be revocable by the voucher when mistaken or harmful. |
+| Accountable, not omniscient | Public copy MUST NOT claim bot-proof or global personhood; MUST show mechanism (count, recency, rules). |
 | Card-centered | Public verification state is displayed through Humanity Card and QR resolution. |
 
 ---
@@ -395,14 +401,21 @@ END
 
 ## 13. Risks and Mitigations
 
+Canonical analysis: [`VOUCH_THREAT_MODEL.md`](../VOUCH_THREAT_MODEL.md).
+
 | Risk | Probability | Impact | Mitigation |
 |---|---|---|---|
 | Users think merch equals verification | Medium | High | Product copy and scan pages explicitly separate purchases from verification. |
 | Users think holding a sticker proves identity | Medium | High | Scan page says the QR resolves to a card but does not prove the holder is the card owner. |
-| Social vouch collusion | Medium | High | Quotas, waiting periods, auditability, revocation. |
+| Social vouch collusion (4-clique, rings) | Medium | High | Quotas, waiting periods, operator audit flags, revocation; steward review queue step 1+2 shipped (runbook + APIs + UI prototype). |
+| Rotating vouch cycles undetected | Medium | High | Manual graph review; P1 clique/cycle detection (see **G-02**). |
+| Remote / dishonest vouch | High | Medium | In-person UX; revocable statements; no liveness at sign time (documented limit). |
+| Stolen voucher or steward keys | Medium | High | User custody; quota; burst flags; suspend + batch revoke playbook. |
+| Integrator equates VH with KYC | Medium | High | Trust model + integrator policy section in threat model. |
 | Device proof excludes users | Medium | High | Keep vouching and ceremonies as first-class paths. |
 | Steward capture | Medium | High | Governance controls, transparency, term limits if adopted. |
-| Public badge leaks private context | Low | High | Public evidence schema and encrypted private notes. |
+| Public badge leaks private context | Low | High | Public evidence schema; private notes not POSTed. |
+| AI persona scale | High | Medium | Crypto accountability bar unchanged; do not claim bot-proof. |
 
 ---
 

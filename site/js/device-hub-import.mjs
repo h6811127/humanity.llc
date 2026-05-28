@@ -8,6 +8,7 @@ import {
   normalizePassphrase,
   readBackupFile,
 } from "./key-backup.mjs";
+import { logDeviceActivity } from "./device-activity.mjs";
 import { loadWallet, saveWallet, walletEntryFromSession } from "./device-wallet.mjs";
 
 /**
@@ -68,7 +69,14 @@ export function initHubBackupImport(form, statusEl) {
         entries.unshift(walletEntryFromSession(session, unlocked.profileId.slice(0, 12)));
         saveWallet(entries);
       }
-      setStatus("Imported to this device. Use keys to open /created/.");
+      setStatus("Imported to this device. Tap Open controls or Open card to manage.");
+      const savedEntry =
+        idx >= 0 ? entries[idx] : walletEntryFromSession(session, unlocked.profileId.slice(0, 12));
+      logDeviceActivity("backup_import", savedEntry.label || "Imported backup", {
+        profile_id: unlocked.profileId,
+        qr_id: savedEntry.qr_id ?? null,
+      });
+      window.dispatchEvent(new Event("hc-device-hub-changed"));
       form.reset();
     } catch (err) {
       setStatus(importErrorMessage(err), true);

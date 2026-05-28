@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Human verification & vouching · Features · humanity.llc</title>
-    <meta name="description" content="Social attestation without legal ID." />
+    <meta name="description" content="Signed, public, revocable human attestations-not legal ID or biometric personhood." />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="/styles.css?v=69" />
@@ -24,8 +24,8 @@
           <h1>Human verification & vouching</h1>
         </section>
         <div class="feature">
-          <p class="feature-lead">Social attestation without legal ID.</p>
-          <p class="feature-sub"><span class="ship-badge ship-badge-partial">Partial</span> scan truth + vouch issuance + revoke live; abuse hooks next</p>
+          <p class="feature-lead">Accountable humans sign public, revocable attestations-without legal ID or a biometric personhood database.</p>
+          <p class="feature-sub"><span class="ship-badge ship-badge-partial">Partial</span> scan truth + Issue vouch + revoke live; steward audit queue next</p>
         </div>
         <section class="group feature-aspects">
           <h2 class="group-label">About this feature</h2>
@@ -38,7 +38,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Communities need accountable human trust without KYC or buying merch. Three eligible vouchers can upgrade a card to <strong>Vouched Human</strong> — a public label backed by signed statements, not a government check.</p>
+    <p class="settings-panel-lead">In an age of synthetic agents, communities need <strong>accountability</strong>-who put their name on this profile under published rules-not a central iris registry. Three eligible vouchers sign public Ed25519 vouches; the card becomes <strong>Vouched Human</strong>. Not legal ID. Not proof the person holding a sticker owns the card (use live control when that matters).</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -50,7 +50,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Public signed vouch documents; default 280-char statement template; private notes never POSTed. Abuse controls: 3-vouch threshold, 5 active vouches/voucher/year, 90-day wait, one active vouch per pair. Scan shows count + recency, not a social graph.</p>
+    <p class="settings-panel-lead">Own the verb <strong>vouch</strong>: sign and publish a revocable attestation. Verifiable documents on the network; default statement template; private notes never POSTed. Threshold (3), quota (5/year), 90-day wait for new vouchers, one active vouch per pair. Scan: <strong>Issue vouch</strong>, <strong>Sign as…</strong> when keys are not loaded, count + recency-no full social graph on first screen.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -62,7 +62,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Nonce replay protection on vouch POST. Voucher must be verified human or steward. Collusion rings mitigated by quotas and operator-only cluster hooks (planned).</p>
+    <p class="settings-panel-lead">Signed payloads, nonce replay protection, voucher eligibility checks. Documented threats include Sybil cliques (minimum 4 mutual vouchers), rotating rings, stolen keys, and integrator over-trust-mitigated by quotas, wait periods, operator audit flags, and revocation. See <code>docs/VOUCH_THREAT_MODEL.md</code>.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -74,7 +74,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Registration alone never displays as human verification. Bootstrap requires founding stewards or verified humans to vouch first. Revoke UI lists vouches from this browser session only.</p>
+    <p class="settings-panel-lead">Does not prove legal identity, global uniqueness, voucher honesty, or liveness at sign time. Registration ≠ Vouched Human. <strong>Steward on the network ≠ signing key in this tab</strong> - see <code>docs/KEYS_CARDS_AND_VERIFICATION.md</code> and <code>docs/VOUCH_TRUST_POSITIONING.md</code>.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -86,7 +86,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Vouch revocation flow, steward review queue, ceremony credentials (separate path), cross-operator federation.</p>
+    <p class="settings-panel-lead">Integrator trust-policy helpers (min vouches, recency), steward review queue UI, ceremony credentials (separate path), cross-operator federation. Positioning doc: <code>docs/VOUCH_TRUST_POSITIONING.md</code>.</p>
   </div>
 </details></div>
         </section>

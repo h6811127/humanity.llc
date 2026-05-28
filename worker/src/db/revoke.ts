@@ -1,4 +1,10 @@
+import type { RevocationDisplayMode } from "../resolver/revocation-display";
 import type { RevocationTargetKind } from "./types";
+
+export interface RevocationDisplayRow {
+  display_mode: string | null;
+  public_reason: string | null;
+}
 
 export interface CardOwnerRow {
   public_key: string;
@@ -51,6 +57,34 @@ export interface ApplyRevocationParams {
   revocationId: string;
   signedDocumentJson: string;
   issuerPublicKey: string;
+  displayMode: RevocationDisplayMode;
+  publicReason: string | null;
+}
+
+export async function getRevocationDisplay(
+  db: D1Database,
+  profileId: string,
+  targetKind: RevocationTargetKind,
+  targetQrId: string | null
+): Promise<RevocationDisplayRow | null> {
+  if (targetKind === "qr_credential" && targetQrId) {
+    return db
+      .prepare(
+        `SELECT display_mode, public_reason FROM revocations
+         WHERE profile_id = ? AND target_kind = 'qr_credential' AND target_qr_id = ?
+         ORDER BY revoked_at DESC LIMIT 1`
+      )
+      .bind(profileId, targetQrId)
+      .first<RevocationDisplayRow>();
+  }
+  return db
+    .prepare(
+      `SELECT display_mode, public_reason FROM revocations
+       WHERE profile_id = ? AND target_kind = 'card' AND target_qr_id IS NULL
+       ORDER BY revoked_at DESC LIMIT 1`
+    )
+    .bind(profileId)
+    .first<RevocationDisplayRow>();
 }
 
 export async function applyRevocation(
@@ -63,8 +97,9 @@ export async function applyRevocation(
       .prepare(
         `INSERT INTO revocations (
           revocation_id, profile_id, target_kind, target_qr_id, reason,
-          signed_document_json, revoked_at, issuer_public_key, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          signed_document_json, revoked_at, issuer_public_key, created_at,
+          display_mode, public_reason
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .bind(
         params.revocationId,
@@ -75,7 +110,9 @@ export async function applyRevocation(
         params.signedDocumentJson,
         params.revokedAt,
         params.issuerPublicKey,
-        createdAt
+        createdAt,
+        params.displayMode,
+        params.publicReason
       ),
   ];
 

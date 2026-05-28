@@ -1,4 +1,4 @@
--- M7 alpha — short-lived live control proof challenges.
+-- M7 alpha  -  short-lived live control proof challenges.
 CREATE TABLE live_control_challenges (
   challenge_id TEXT PRIMARY KEY NOT NULL,
   profile_id TEXT NOT NULL REFERENCES cards (profile_id),

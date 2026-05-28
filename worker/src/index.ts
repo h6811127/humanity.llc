@@ -1,9 +1,12 @@
 /**
- * humanity.llc reference resolver — route dispatcher.
+ * humanity.llc reference resolver  -  route dispatcher.
  * M1: health + D1. M2: create card. M3: scan trust UI.
  */
 
 import { schemaReady } from "./db";
+import { resolverHealthBuildField } from "./resolver-health-build";
+import { runOrphanPurge } from "./db/orphan-purge";
+import { runPrintifyReconcile } from "./print/printify-reconcile";
 import {
   clientIp,
   corsHeaders,
@@ -13,7 +16,8 @@ import {
   PROTOCOL_VERSION,
   withCors,
 } from "./http/resolver";
-import { handlePostArtifactIntent } from "./resolver/artifact-intents";
+import { handlePostArtifactIntent, handlePostArtifactIntentAttach } from "./resolver/artifact-intents";
+import { handleGetStoreOrderStatus } from "./resolver/store-order-status";
 import { handleGetCard, handlePostCards } from "./resolver/create-card";
 import {
   handleGetLiveControlChallenge,
@@ -23,20 +27,135 @@ import {
 } from "./resolver/live-control";
 import { handlePostRevoke } from "./resolver/revoke";
 import { handlePostCardUpdate } from "./resolver/update-card";
+import { handlePostIssuePrintArtifactQr } from "./resolver/issue-print-artifact-qr";
+import { handlePostRotateQr } from "./resolver/rotate-qr";
+import { handlePostExtendQr } from "./resolver/extend-qr";
 import { handleGetScan } from "./resolver/scan";
+import { handleGetScanOut } from "./resolver/scan-out";
+import { handleGetQrMetadata } from "./resolver/qr-metadata";
 import { handleGetScanStatus } from "./resolver/scan-status";
 import { handlePostVouch } from "./resolver/vouch";
 import { handleGetVouch, handlePostVouchRevoke } from "./resolver/vouch-revoke";
+import {
+  handleDeleteVouchAuditFlagDismiss,
+  handleGetVouchAuditFlags,
+  handlePostVouchAuditFlagDismiss,
+} from "./resolver/vouch-audit-flags";
+import { handleGetCreateRateMonitor } from "./resolver/create-monitoring";
+import {
+  handleGetMerchFunnelMonitor,
+  handlePostMerchFunnelBeacon,
+} from "./http/merch-funnel";
+import {
+  handleGetOperatorCapabilities,
+  handleGetOperatorPlans,
+  handleGetStewardEntitlements,
+  handleGetStewardPush,
+  handlePostStewardSession,
+} from "./resolver/steward-hosted";
+import { handleGetStewardOpsSnapshot } from "./resolver/steward-ops";
+import { handlePostBillingWebhook } from "./http/billing-webhook";
+import { handlePostShopifyOrdersWebhook } from "./http/shopify-orders-webhook";
+import { handlePostPrintifyWebhook } from "./http/printify-webhook";
+import {
+  handleGetPrintCatalog,
+  handlePostPrintArtifacts,
+} from "./print/print-handlers";
+import {
+  handleGetPrintOrder,
+  handlePostPrintOrderMint,
+  handlePostPrintOrders,
+} from "./print/print-orders-handler";
+import { handleGetOperatorFulfillmentLookup } from "./operator/fulfillment-lookup";
+import { handlePostAiExplainSnapshot } from "./resolver/ai-explain-snapshot";
+import { handlePostAiDraftManifesto } from "./resolver/ai-draft-manifesto";
 
 export interface Env {
   DB: D1Database;
+  /** Bearer token for operator-only audit routes; set via wrangler secret. */
+  OPERATOR_AUDIT_TOKEN?: string;
+  /** HMAC secret for /c/…/out interstitial tokens; defaults to local dev key only. */
+  SCAN_OUT_HMAC_SECRET?: string;
+  /** E1 hosted steward API (`1` / `true` to enable). */
+  HOSTED_STEWARD_ENABLED?: string;
+  /** E5 Stripe webhook signing secret (`whsec_…`). */
+  STRIPE_WEBHOOK_SECRET?: string;
+  /** O-001 Shopify webhook HMAC secret. */
+  SHOPIFY_WEBHOOK_SECRET?: string;
+  /** AES-256 key (32 bytes, base64) for encrypted fulfillment shipping at rest. */
+  FULFILLMENT_PII_ENCRYPTION_KEY?: string;
+  /** O-002 Printify personal access token (server-only). */
+  PRINTIFY_API_TOKEN?: string;
+  /** O-002 Printify shop id for order submit. */
+  PRINTIFY_SHOP_ID?: string;
+  /** O-002 Set to 1 to enable live Printify order HTTP submit (default off). */
+  PRINTIFY_SUBMIT_ENABLED?: string;
+  /** O-003 Shared secret for Printify webhook HMAC (X-Pfy-Signature). */
+  PRINTIFY_WEBHOOK_SECRET?: string;
+  /** Tier 0 Printify product id for batch sticker template. */
+  TIER0_PRINTIFY_PRODUCT_ID?: string;
+  /** Tier 0 Printify variant id (integer). */
+  TIER0_PRINTIFY_VARIANT_ID?: string;
+  /** Tier 0 Printify shipping_method id (default 1). */
+  TIER0_PRINTIFY_SHIPPING_METHOD?: string;
+  /** Tier 1 personalized hoodie Printify product id. */
+  PERSONALIZE_HOODIE_PRINTIFY_PRODUCT_ID?: string;
+  /** Tier 1 personalized hoodie Printify variant id (integer). */
+  PERSONALIZE_HOODIE_PRINTIFY_VARIANT_ID?: string;
+  /** Tier 1 personalized hoodie Printify shipping_method id (default 1). */
+  PERSONALIZE_HOODIE_PRINTIFY_SHIPPING_METHOD?: string;
+  /** Tier 1 personalized sticker Printify product id. */
+  PERSONALIZE_STICKER_PRINTIFY_PRODUCT_ID?: string;
+  /** Tier 1 personalized sticker Printify variant id (integer). */
+  PERSONALIZE_STICKER_PRINTIFY_VARIANT_ID?: string;
+  /** Tier 1 personalized sticker Printify shipping_method id (default 1). */
+  PERSONALIZE_STICKER_PRINTIFY_SHIPPING_METHOD?: string;
+  /** Tier 1 hoodie Printify blueprint id for per-order artwork products. */
+  PERSONALIZE_HOODIE_PRINTIFY_BLUEPRINT_ID?: string;
+  /** Tier 1 hoodie Printify print provider id. */
+  PERSONALIZE_HOODIE_PRINTIFY_PRINT_PROVIDER_ID?: string;
+  /** Tier 1 hoodie print placeholder (default front). */
+  PERSONALIZE_HOODIE_PRINTIFY_PLACEHOLDER?: string;
+  /** Tier 1 sticker Printify blueprint id for per-order artwork products. */
+  PERSONALIZE_STICKER_PRINTIFY_BLUEPRINT_ID?: string;
+  /** Tier 1 sticker Printify print provider id. */
+  PERSONALIZE_STICKER_PRINTIFY_PRINT_PROVIDER_ID?: string;
+  /** Tier 1 sticker print placeholder (default front). */
+  PERSONALIZE_STICKER_PRINTIFY_PLACEHOLDER?: string;
+  /** Tier 0 batch sticker: campaign card profile_id (must exist in D1). */
+  TIER0_CAMPAIGN_PROFILE_ID?: string;
+  /** Tier 0 batch sticker: comma-separated Shopify variant ids. */
+  TIER0_SHOPIFY_VARIANT_IDS?: string;
+  /** Cloudflare Workers AI (L3 explain snapshot). */
+  AI?: Ai;
 }
 
 export default {
+  async scheduled(
+    event: ScheduledEvent,
+    env: Env,
+    _ctx: ExecutionContext
+  ): Promise<void> {
+    if (!env.DB) return;
+    try {
+      const ready = await schemaReady(env.DB);
+      if (!ready) return;
+
+      if (event.cron === "0,30 * * * *") {
+        await runPrintifyReconcile(env.DB, env);
+        return;
+      }
+
+      await runOrphanPurge(env.DB);
+    } catch (err) {
+      console.error("scheduled_job_failed", event.cron, err);
+    }
+  },
+
   async fetch(
     request: Request,
     env: Env,
-    _ctx: ExecutionContext
+    ctx: ExecutionContext
   ): Promise<Response> {
     if (request.method === "OPTIONS") {
       return new Response(null, {
@@ -52,6 +171,196 @@ export default {
       return healthResponse(env);
     }
 
+    if (
+      path === "/.well-known/hc/v1/operator/capabilities" &&
+      request.method === "GET"
+    ) {
+      const res = await handleGetOperatorCapabilities(request, env);
+      return withCors(request, res);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/operator/plans" &&
+      request.method === "GET"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetOperatorPlans(request, env, env.DB);
+      return withCors(request, res);
+    }
+    if (
+      path === "/.well-known/hc/v1/steward/session" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostStewardSession(request, env, env.DB);
+      return withCors(request, res);
+    }
+    if (
+      path === "/.well-known/hc/v1/steward/entitlements" &&
+      request.method === "GET"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetStewardEntitlements(request, env, env.DB);
+      return withCors(request, res);
+    }
+    if (
+      path === "/.well-known/hc/v1/steward/push" &&
+      request.method === "GET"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetStewardPush(request, env, env.DB);
+      return withCors(request, res);
+    }
+    if (
+      path === "/.well-known/hc/v1/operator/billing/webhook" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return jsonResponse({ error: "database_unconfigured" }, 503);
+      }
+      return handlePostBillingWebhook(request, env, env.DB);
+    }
+    if (
+      path === "/.well-known/hc/v1/operator/steward-ops" &&
+      request.method === "GET"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetStewardOpsSnapshot(
+        request,
+        env,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/operator/create-rate-monitor" &&
+      request.method === "GET"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetCreateRateMonitor(
+        request,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/metrics/merch-funnel" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostMerchFunnelBeacon(request, env.DB);
+      return withCors(request, res);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/operator/merch-funnel-monitor" &&
+      request.method === "GET"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetMerchFunnelMonitor(
+        request,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/operator/vouch-audit-flags" &&
+      request.method === "GET"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetVouchAuditFlags(
+        request,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
+    }
+    if (
+      path === "/.well-known/hc/v1/operator/vouch-audit-flags/dismiss" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostVouchAuditFlagDismiss(
+        request,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
+    }
+    if (
+      path === "/.well-known/hc/v1/operator/vouch-audit-flags/dismiss" &&
+      request.method === "DELETE"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleDeleteVouchAuditFlagDismiss(
+        request,
+        env.DB,
+        env.OPERATOR_AUDIT_TOKEN
+      );
+      return withCors(request, res);
+    }
+
     if (path === "/.well-known/hc/v1/cards" && request.method === "POST") {
       if (!env.DB) {
         return withCors(
@@ -63,14 +372,52 @@ export default {
       return withCors(request, res);
     }
 
+    if (
+      path === "/.well-known/hc/v1/ai/explain-snapshot" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      return handlePostAiExplainSnapshot(request, env);
+    }
+
+    if (
+      path === "/.well-known/hc/v1/ai/draft-manifesto" &&
+      request.method === "POST"
+    ) {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      return handlePostAiDraftManifesto(request, env);
+    }
+
     const statusMatch = path.match(
       /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/status$/
     );
     if (statusMatch && request.method === "GET") {
       if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetScanStatus(request, env.DB, statusMatch[1]!);
+      return withCors(request, res);
+    }
+
+    const qrMetadataMatch = path.match(/^\/\.well-known\/hc\/v1\/qr\/([^/]+)$/);
+    if (qrMetadataMatch && request.method === "GET") {
+      if (!env.DB) {
         return jsonResponse({ error: "database_unconfigured" }, 503);
       }
-      return handleGetScanStatus(request, env.DB, statusMatch[1]!);
+      return handleGetQrMetadata(request, env.DB, qrMetadataMatch[1]!);
     }
 
     const revokeMatch = path.match(
@@ -84,6 +431,52 @@ export default {
         );
       }
       const res = await handlePostRevoke(request, env.DB, revokeMatch[1]!);
+      return withCors(request, res);
+    }
+
+    const qrExtendMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/qr\/extend$/
+    );
+    if (qrExtendMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostExtendQr(request, env.DB, qrExtendMatch[1]!);
+      return withCors(request, res);
+    }
+
+    const printArtifactQrMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/print-artifact-qrs$/
+    );
+    if (printArtifactQrMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostIssuePrintArtifactQr(
+        request,
+        env.DB,
+        printArtifactQrMatch[1]!
+      );
+      return withCors(request, res);
+    }
+
+    const qrRotateMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/qr$/
+    );
+    if (qrRotateMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostRotateQr(request, env.DB, qrRotateMatch[1]!);
       return withCors(request, res);
     }
 
@@ -115,7 +508,8 @@ export default {
         request,
         env.DB,
         liveChallengeStatusMatch[1]!,
-        liveChallengeStatusMatch[2]!
+        liveChallengeStatusMatch[2]!,
+        env
       );
       return withCors(request, res);
     }
@@ -133,7 +527,8 @@ export default {
       const res = await handlePostLiveControlChallenge(
         request,
         env.DB,
-        liveChallengeMatch[1]!
+        liveChallengeMatch[1]!,
+        { env, executionCtx: ctx }
       );
       return withCors(request, res);
     }
@@ -148,7 +543,8 @@ export default {
       const res = await handleGetPendingLiveControlChallenge(
         request,
         env.DB,
-        liveChallengeMatch[1]!
+        liveChallengeMatch[1]!,
+        env
       );
       return withCors(request, res);
     }
@@ -171,7 +567,11 @@ export default {
       return withCors(request, res);
     }
 
-    if (path === "/v1/verification/vouches" && request.method === "POST") {
+    const vouchPostPaths = new Set([
+      "/v1/verification/vouches",
+      "/.well-known/hc/v1/verification/vouches",
+    ]);
+    if (vouchPostPaths.has(path) && request.method === "POST") {
       if (!env.DB) {
         return withCors(
           request,
@@ -182,7 +582,9 @@ export default {
       return withCors(request, res);
     }
 
-    const vouchMatch = path.match(/^\/v1\/verification\/vouches\/([^/]+)$/);
+    const vouchMatch = path.match(
+      /^(?:\/v1\/verification\/vouches|\/\.well-known\/hc\/v1\/verification\/vouches)\/([^/]+)$/
+    );
     if (vouchMatch && request.method === "GET") {
       if (!env.DB) {
         return withCors(
@@ -195,7 +597,7 @@ export default {
     }
 
     const vouchRevokeMatch = path.match(
-      /^\/v1\/verification\/vouches\/([^/]+)\/revoke$/
+      /^(?:\/v1\/verification\/vouches|\/\.well-known\/hc\/v1\/verification\/vouches)\/([^/]+)\/revoke$/
     );
     if (vouchRevokeMatch && request.method === "POST") {
       if (!env.DB) {
@@ -223,14 +625,114 @@ export default {
       return withCors(request, res);
     }
 
+    if (path === "/v1/store/order-status" && request.method === "GET") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetStoreOrderStatus(request, env.DB);
+      return withCors(request, res);
+    }
+
+    const artifactIntentAttachMatch = path.match(
+      /^\/v1\/store\/artifact-intents\/([^/]+)\/attach$/
+    );
+    if (artifactIntentAttachMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostArtifactIntentAttach(
+        request,
+        env.DB,
+        artifactIntentAttachMatch[1]!
+      );
+      return withCors(request, res);
+    }
+
+    if (path === "/v1/webhooks/shopify/orders" && request.method === "POST") {
+      if (!env.DB) {
+        return jsonResponse({ error: "database_unconfigured" }, 503);
+      }
+      return handlePostShopifyOrdersWebhook(request, env, env.DB);
+    }
+
+    if (path === "/v1/print/webhooks/printify" && request.method === "POST") {
+      if (!env.DB) {
+        return jsonResponse({ error: "database_unconfigured" }, 503);
+      }
+      return handlePostPrintifyWebhook(request, env, env.DB);
+    }
+
+    if (path === "/v1/print/catalog" && request.method === "GET") {
+      const res = await handleGetPrintCatalog();
+      return withCors(request, res);
+    }
+
+    if (path === "/v1/print/artifacts" && request.method === "POST") {
+      const res = await handlePostPrintArtifacts(request);
+      return withCors(request, res);
+    }
+
+    if (path === "/v1/print/orders" && request.method === "POST") {
+      if (!env.DB) {
+        return jsonResponse({ error: "database_unconfigured" }, 503);
+      }
+      const res = await handlePostPrintOrders(request, env, env.DB);
+      return res;
+    }
+
+    const printOrderMatch = path.match(/^\/v1\/print\/orders\/([^/]+)$/);
+    if (printOrderMatch && request.method === "GET") {
+      if (!env.DB) {
+        return jsonResponse({ error: "database_unconfigured" }, 503);
+      }
+      return handleGetPrintOrder(request, env, env.DB, printOrderMatch[1]!);
+    }
+
+    const printOrderMintMatch = path.match(/^\/v1\/print\/orders\/([^/]+)\/mint$/);
+    if (printOrderMintMatch && request.method === "POST") {
+      if (!env.DB) {
+        return jsonResponse({ error: "database_unconfigured" }, 503);
+      }
+      return handlePostPrintOrderMint(request, env, env.DB, printOrderMintMatch[1]!);
+    }
+
+    if (path === "/v1/operator/fulfillment/lookup" && request.method === "GET") {
+      if (!env.DB) {
+        return jsonResponse({ error: "database_unconfigured" }, 503);
+      }
+      return handleGetOperatorFulfillmentLookup(request, env, env.DB);
+    }
+
     const cardMatch = path.match(
       /^\/\.well-known\/hc\/v1\/cards\/([^/]+)$/
     );
     if (cardMatch && request.method === "GET") {
       if (!env.DB) {
-        return jsonResponse({ error: "database_unconfigured" }, 503);
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
       }
-      return handleGetCard(env.DB, cardMatch[1]!, request);
+      const res = await handleGetCard(env.DB, cardMatch[1]!, request);
+      return withCors(request, res);
+    }
+
+    const scanOutMatch = path.match(/^\/c\/([^/]+)\/out$/);
+    if (scanOutMatch && request.method === "GET") {
+      if (!env.DB) {
+        return htmlResponse(
+          "<!DOCTYPE html><html><body><p>Resolver database unavailable.</p></body></html>",
+          503,
+          { "Cache-Control": "no-store" }
+        );
+      }
+      return handleGetScanOut(request, env.DB, scanOutMatch[1]!, env);
     }
 
     const scanMatch = path.match(/^\/c\/([^/]+)$/);
@@ -255,11 +757,13 @@ async function healthResponse(env: Env): Promise<Response> {
     operator: string;
     status: string;
     database: string;
+    build: ReturnType<typeof resolverHealthBuildField>;
   } = {
     version: PROTOCOL_VERSION,
     operator: OPERATOR_ID,
     status: "ok",
     database: "unknown",
+    build: resolverHealthBuildField(),
   };
 
   if (!env.DB) {
