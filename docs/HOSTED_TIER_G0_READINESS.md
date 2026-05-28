@@ -123,7 +123,10 @@ npm run hosted:rollout:step4a -- --apply   # idempotent if already "1"
 ```bash
 npm run hosted:rollout:step4 -- --deploy
 npm run hosted:rollout:step4 -- --smoke
-API_ORIGIN=http://127.0.0.1:8787 npm run hosted:rollout:step4 -- --smoke   # after 4a --apply + worker:dev
+# Local worker (after worker:migrate:local + worker:dev):
+npm run hosted:rollout:step4b -- --preflight
+npm run hosted:rollout:step4b -- --local-smoke
+# Aliases on step4: npm run hosted:rollout:step4 -- --smoke --local --preflight
 npm run hosted:rollout:step4 -- --verify
 OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step4 -- --verify
 ```

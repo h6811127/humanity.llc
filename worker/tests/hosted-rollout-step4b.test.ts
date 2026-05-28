@@ -21,5 +21,6 @@ describe("hosted-rollout-step4b", () => {
     expect(src).toContain("--preflight");
     expect(src).toContain("--local-smoke");
     expect(src).toContain("hosted-rollout-step4.mjs");
+    expect(src).toContain("runStep4PreflightVitest");
   });
 });

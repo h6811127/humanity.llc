@@ -20,7 +20,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
+  applyLocalApiOriginDefault,
   assertHostedFlagOnInToml,
+  runStep4PreflightVitest,
   smokeProduction,
 } from "./hosted-rollout-step4.mjs";
 
@@ -71,13 +73,7 @@ function runPreflight() {
   console.log("Step 4b preflight — local gate before production deploy\n");
   assertHostedFlagOnInToml();
   runNpm("D1 migrations (local)", ["run", "worker:migrate:local"]);
-  runNpm("Rollout step 4 smoke (Vitest)", [
-    "run",
-    "worker:test",
-    "--",
-    "worker/tests/hosted-rollout-step4-smoke.test.ts",
-    "worker/tests/hosted-rollout-step4.test.ts",
-  ]);
+  runStep4PreflightVitest();
   runNpm("Hosted verify path (Vitest)", ["run", "hosted:rollout:verify-path"]);
   console.log("\n✅ Step 4b preflight OK.");
   console.log("Start worker:dev, then:");
@@ -88,10 +84,9 @@ function runPreflight() {
 }
 
 async function runLocalSmoke() {
-  const origin = (process.env.API_ORIGIN || "http://127.0.0.1:8787").replace(/\/$/, "");
-  console.log(`Step 4b local smoke (${origin})\n`);
   assertHostedFlagOnInToml();
-  process.env.API_ORIGIN = origin;
+  const origin = applyLocalApiOriginDefault(true);
+  console.log(`Step 4b local smoke (${origin})\n`);
   await smokeProduction();
   console.log("\n✅ Step 4b local smoke OK.");
 }
