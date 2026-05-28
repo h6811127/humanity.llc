@@ -146,9 +146,12 @@ import {
 import {
   orderEntriesVisibleFirst,
   profileIdsWithVisibleRows,
+  visibleSummaryRowWindow,
 } from "./device-hub-visible-rows-core.mjs";
 
 const COLLAPSED_SAVED_ROW_PREVIEW_LIMIT = 3;
+const LARGE_HUB_SUMMARY_ROW_INITIAL_LIMIT = 8;
+const LARGE_HUB_SUMMARY_ROW_INCREMENT = 8;
 
 function escapeHtml(s) {
   return String(s)
@@ -168,15 +171,27 @@ function onWalletPage() {
   return document.body.classList.contains("page-wallet");
 }
 
-function hubExpanded() {
+function hubIsExpanded() {
   return onWalletPage() || isDeviceHubExpanded(document.getElementById("device-hub"));
 }
 
-function shouldRenderFullSavedRows() {
+function shouldRenderFullSavedRows(summary = loadWalletSummary()) {
   if (onWalletPage()) return true;
-  if (hubExpanded()) return true;
   if (searchInput?.value?.trim()) return true;
-  return false;
+  if (!hubIsExpanded()) return false;
+  return !isLargeWallet(summary.count, getStewardEntitlementsPolicy());
+}
+
+function walletEntryForActionButton(btn) {
+  const id = btn.getAttribute("data-id");
+  const profileId = btn.getAttribute("data-profile-id");
+  return (
+    loadWallet().find(
+      (entry) =>
+        (id && entry.id === id) ||
+        (profileId && entry.profile_id === profileId)
+    ) ?? null
+  );
 }
 
 function classifyObjectType(entry, qrScopeOverride = undefined) {
@@ -222,6 +237,8 @@ let hubConfig = {
 
 /** Bumped when saved-card DOM is replaced or a new network fetch starts; stale fetches must not apply. */
 let walletNetworkApplyGen = 0;
+let expandedSummaryRowLimit = LARGE_HUB_SUMMARY_ROW_INITIAL_LIMIT;
+let expandedSummaryWalletFingerprint = null;
 
 /** Last chip status per profile from wallet poll (A1: re-apply must not rely on session cache alone). */
 let lastWalletNetworkStatusMap = {};
@@ -1122,19 +1139,38 @@ function renderActivityRows() {
  */
 function renderSavedRows(opts = {}) {
   const initialChipChecking = opts.initialChipChecking === true;
-  const fullRows = shouldRenderFullSavedRows();
+  const summary = loadWalletSummary();
+  if (summary.walletFingerprint !== expandedSummaryWalletFingerprint) {
+    expandedSummaryWalletFingerprint = summary.walletFingerprint;
+    expandedSummaryRowLimit = LARGE_HUB_SUMMARY_ROW_INITIAL_LIMIT;
+  }
+  const expandedRows = hubIsExpanded();
+  const fullRows = shouldRenderFullSavedRows(summary);
   let entries;
   let hiddenCount = 0;
   let allEntriesCount = 0;
+  let previewRows = false;
+  let virtualizedSummaryRows = false;
+  let windowed = null;
+  let allEntries = summary.rows;
+
   if (fullRows) {
     const rendered = savedRowsForRender();
     entries = rendered.entries;
     hiddenCount = rendered.hiddenCount;
-    allEntriesCount = listWalletDisplayEntries().length;
-  } else {
-    const allEntries = loadWalletSummary().rows;
+    allEntries = rendered.allEntries;
     allEntriesCount = allEntries.length;
-    entries = allEntries.slice(0, COLLAPSED_SAVED_ROW_PREVIEW_LIMIT);
+  } else {
+    allEntriesCount = allEntries.length;
+    previewRows = !expandedRows;
+    virtualizedSummaryRows =
+      expandedRows && isLargeWallet(summary.count, getStewardEntitlementsPolicy());
+    windowed = virtualizedSummaryRows
+      ? visibleSummaryRowWindow(allEntries, { limit: expandedSummaryRowLimit })
+      : null;
+    entries = previewRows
+      ? allEntries.slice(0, COLLAPSED_SAVED_ROW_PREVIEW_LIMIT)
+      : windowed?.rows ?? allEntries;
   }
   if (!savedList || !savedGroup) return;
   savedList.dataset.walletRowsMode = fullRows ? "full" : "summary";
@@ -1223,10 +1259,11 @@ function renderSavedRows(opts = {}) {
 
     const menuBlock = fullRows ? hubCardMenuHtml(entry, menuControls) : "";
     const controlsHtml = fullRows ? hubCardControlsHtml(entry, inlineControls) : "";
-    const actionsHtml = fullRows
+    const actionData = `data-id="${escapeHtml(entry.id ?? "")}" data-profile-id="${escapeHtml(entry.profile_id ?? "")}"`;
+    const actionsHtml = fullRows || expandedRows
       ? `<div class="hub-card-actions">
         <div class="hub-card-actions-primary">
-          <button type="button" class="hub-card-action hub-use-keys" data-id="${escapeHtml(entry.id)}" title="Load signing keys into this tab, then open your card page">Open controls</button>
+          <button type="button" class="hub-card-action hub-use-keys" ${actionData} title="Load signing keys into this tab, then open your card page">Open controls</button>
           <a class="hub-card-action hub-open-scan" href="${escapeHtml(scan)}" target="_blank" rel="noopener noreferrer">Open scan</a>
         </div>
       </div>`
@@ -1239,7 +1276,7 @@ function renderSavedRows(opts = {}) {
           <span class="list-title">${escapeHtml(hubCardTitle(entry))}</span>
           <span class="hub-card-identity hub-card-identity--${identity.verifyTone}">${escapeHtml(identity.text)}</span>
           ${statusHtml}
-          ${hubCardSubHtml(entry, lastUsed)}
+          ${fullRows ? hubCardSubHtml(entry, lastUsed) : ""}
         </span>
         <div class="hub-card-head-meta">
           ${menuBlock}
@@ -1251,7 +1288,7 @@ function renderSavedRows(opts = {}) {
     savedList.appendChild(li);
   }
 
-  if (!fullRows && allEntriesCount > entries.length) {
+  if (previewRows && allEntries.length > entries.length) {
     const li = document.createElement("li");
     li.className = "hub-card-item hub-card-item--general hub-card-item--summary hub-card-item--more";
     li.dataset.hubSearchable = "more saved cards";
@@ -1266,16 +1303,42 @@ function renderSavedRows(opts = {}) {
     savedList.appendChild(li);
   }
 
+  if (virtualizedSummaryRows && windowed && windowed.remaining > 0) {
+    const li = document.createElement("li");
+    li.className = "hub-card-item hub-card-item--general hub-card-item--summary hub-card-item--more";
+    li.dataset.hubSearchable = "more saved cards";
+    const nextCount = Math.min(LARGE_HUB_SUMMARY_ROW_INCREMENT, windowed.remaining);
+    li.innerHTML = `
+      <div class="hub-card-head">
+        <span class="list-icon list-icon-tone-trust" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+        <span class="list-content">
+          <span class="list-title">${windowed.remaining} more saved on this device</span>
+          <span class="hub-card-identity hub-card-identity--muted">Summary rows stay lightweight until you open controls</span>
+        </span>
+        <div class="hub-card-head-meta">
+          <button type="button" class="hub-card-action hub-show-more-summary">Show ${nextCount} more</button>
+        </div>
+      </div>`;
+    savedList.appendChild(li);
+  }
+
   if (fullRows) {
     appendHubSavedMoreRow(hiddenCount);
   }
 
   bindRevokedAlertHandlers();
 
-  if (!fullRows) {
+  if (previewRows) {
     syncHubInboxAlertGroups();
     return;
   }
+
+  savedList.querySelector(".hub-show-more-summary")?.addEventListener("click", () => {
+    expandedSummaryRowLimit += LARGE_HUB_SUMMARY_ROW_INCREMENT;
+    renderSavedRows();
+    applySearchFilter();
+    refreshEmptyHint();
+  });
 
   savedList.querySelectorAll(".hub-card-control, .hub-card-menu-steward").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -1307,8 +1370,9 @@ function renderSavedRows(opts = {}) {
 
   savedList.querySelectorAll(".hub-use-keys").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-id");
-      const entry = findWalletEntryById(id);
+      const entry = fullRows
+        ? findWalletEntryById(btn.getAttribute("data-id"))
+        : walletEntryForActionButton(btn);
       if (!entry) return;
       acknowledgeNetworkSeenForEntry(entry);
       let returnUrl = null;

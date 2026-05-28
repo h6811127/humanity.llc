@@ -513,7 +513,7 @@ Phases 1–5 improved polling, but **N saved cards** on one browser is still an 
 
 ### 2. Shell performance (must fix)
 
-Status/count, compact hub/inbox, cross-tab checks, card-disabled inbox, and **collapsed hub previews** use persisted `hc_wallet_summary` (2026-05-28). Expanded hub/wallet rendering uses display-safe rows (S9); signing hydrates via `findWalletEntryById`. Large wallets cap hub DOM at **15** (S10) and `/wallet/` at **40** with **Show all** (S11). **`hc_wallet_network_cache`** capped at **20** fresh rows (S6). Optional later: virtual scroll on `/wallet/` for N ≫ 40. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
+Status/count, compact hub/inbox, cross-tab checks, card-disabled inbox, **collapsed hub previews**, large expanded hub **summary rows**, and incremental summary-row windows use persisted `hc_wallet_summary` (2026-05-28). Expanded hub/wallet rendering uses display-safe rows (S9); signing hydrates via `findWalletEntryById` on full rows and on action for large expanded summary rows. Large wallets cap full-row hub DOM at **15** (S10) and `/wallet/` at **40** with **Show all** (S11). **`hc_wallet_network_cache`** capped at **20** fresh rows (S6). Remaining: viewport-based DOM virtualization for very large expanded hubs; optional later virtual scroll on `/wallet/` for N ≫ 40. See [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md).
 
 ### 3. Multi-tab presence (monitor)
 
@@ -525,6 +525,7 @@ Tabs with `hc_created` heartbeat into `hc_tab_keys_presence` (max **20** rows). 
 
 | Date | Note |
 |------|------|
+| 2026-05-28 | **Large-wallet shell perf:** large expanded hub summary rows + incremental summary-window paths avoid full `hc_wallet` row hydration until action |
 | 2026-05-28 | **O2 step 2 shipped:** per-IP rate limits on `GET …/live-control/*` (300/min) and `GET …/health` (120/min) |
 | 2026-05-28 | **S11 shipped:** large-wallet `/wallet/` DOM cap (40) + Show all; **presence debounce scales** with wallet size |
 | 2026-05-28 | **S10 shipped:** large-wallet hub DOM cap via `selectHubSavedRowEntries` + “N more saved” row |
