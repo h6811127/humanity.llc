@@ -195,6 +195,8 @@ describe("scan surfaces object_streams", () => {
     expect(html).toContain(OBJECT_PUBLIC_SNAPSHOT_LIMIT);
     expect(html).toContain("scan-ai-explain-btn");
     expect(html).toContain("Explain in plain language");
+    expect(html).toContain("Plain-language help");
+    expect(html).not.toContain("AI summary");
     expect(html).toContain("scan-ai-explain.mjs");
   });
 
@@ -238,7 +240,7 @@ describe("scan surfaces object_streams", () => {
     expect(body.scan.card?.public_snapshot?.text).toContain("Community garden");
     expect(body.scan.card?.public_snapshot?.text).toContain("Today's tasks");
     expect(body.scan.limits.object_snapshot_warning).toBe(OBJECT_PUBLIC_SNAPSHOT_LIMIT);
-    expect(body.scan.limits.ai_explain_warning).toContain("AI summary");
+    expect(body.scan.limits.ai_explain_warning).toContain("Plain-language summary");
     expect(body.scan.ai?.explain.endpoint).toBe(
       "/.well-known/hc/v1/ai/explain-snapshot"
     );

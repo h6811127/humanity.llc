@@ -12,7 +12,7 @@ export const OBJECT_PUBLIC_SNAPSHOT_LIMIT =
 
 /** When the opt-in L3 explain panel shows a model or deterministic summary. */
 export const AI_EXPLAIN_LIMIT =
-  "AI summary — not signed network state. Only the signed snapshot above is steward-published resolver copy.";
+  "Plain-language summary — not signed network state. Only the signed snapshot above is steward-published resolver copy.";
 
 /** When the steward authoring assistant shows a draft on /created/. */
 export const AI_DRAFT_LIMIT =
