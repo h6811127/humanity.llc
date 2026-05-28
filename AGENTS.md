@@ -64,6 +64,7 @@ When you touch any of these, run the regression suite before finishing:
 ```bash
 npm run worker:test
 npm run e2e:install   # once per machine
+npm run device-shell:e2e
 npm run e2e -- e2e/device-cross-tab-keys.spec.ts e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device-os-wallet.spec.ts e2e/scan-page-dot.spec.ts
 ```
 

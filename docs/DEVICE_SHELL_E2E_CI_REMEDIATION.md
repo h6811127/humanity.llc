@@ -88,12 +88,15 @@ npm run e2e -- e2e/merch-funnel-customize.spec.ts
 
 **Status:** **Shipped** — full bundle run locally (2026-05-28): 87 passed, 1 skipped (`safari-shell-scroll` touch profile on desktop WebKit only).
 
-Re-run the full Device shell E2E job locally before merge:
+Re-run the full Device shell E2E job locally before merge (same bundle as [`.github/workflows/test-site.yml`](../.github/workflows/test-site.yml)):
 
 ```bash
-npm run e2e:install
-npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device-os-wallet.spec.ts e2e/scan-page-dot.spec.ts e2e/safari-shell-scroll.spec.ts e2e/scan-cross-tab-banner-webkit.spec.ts e2e/keys-custody-emphasis-webkit.spec.ts e2e/merch-funnel-customize.spec.ts
+npm run e2e:install   # once per machine
+npm run device-shell:e2e:signoff
+# or: npm run device-shell:e2e
 ```
+
+Spec list: `worker/scripts/device-shell-e2e-specs.mjs` · Vitest guard: `npm run worker:test -- worker/tests/device-shell-e2e.test.ts`.
 
 ---
 
@@ -102,6 +105,7 @@ npm run e2e -- e2e/device-status-dot.spec.ts e2e/device-inbox.spec.ts e2e/device
 | Date | Note |
 |------|------|
 | 2026-05-28 | Opened from CI Device shell E2E failures (3 Playwright specs + `_redirects` warning) |
+| 2026-05-28 | **Step 4 tooling:** `device-shell:e2e` / `device-shell:e2e:signoff` + shared spec list; CI uses `npm run device-shell:e2e` |
 | 2026-05-28 | **Step 1 shipped:** product detail shell → `detail.html`; `_redirects` splat target updated |
 | 2026-05-28 | **Step 2 shipped:** wallet keys custody foot below Acknowledge (`afterActionsHtml`) |
 | 2026-05-28 | **Step 3 shipped:** fresh customize handoff auto-redirect from `/created/` |

@@ -52,6 +52,8 @@
     "worker:test:scan-page-dot": "vitest run worker/tests/scan-page-dot-core.test.ts worker/tests/scan-page-dot-glance-core.test.ts worker/tests/scan-page-dot-contract.test.ts worker/tests/device-dot-state.test.ts",
     "worker:test:watch": "vitest",
     "e2e": "playwright test",
+    "device-shell:e2e": "node worker/scripts/device-shell-e2e-verify.mjs",
+    "device-shell:e2e:signoff": "node worker/scripts/device-shell-e2e-verify.mjs --signoff",
     "e2e:card-disabled-since-visit": "playwright test e2e/device-os-wallet.spec.ts e2e/device-inbox.spec.ts",
     "e2e:created-control": "playwright test e2e/created-control.spec.ts",
     "e2e:install": "playwright install chromium webkit",

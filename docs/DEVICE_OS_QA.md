@@ -128,7 +128,7 @@ Run on **production** (or staging with full Pages deploy) after `site/` ships. M
 
 **Fail signals:** Laggy landing scroll with hub closed; dot dead; full-page taps blocked (stuck backdrop — use unstick snippet in Safari investigation doc). If W1–W4 fail, consider Phase 3A/3B in that doc (do not ship without triage).
 
-**Automated gate:** device shell E2E in CI (`e2e/device-status-dot.spec.ts`, `device-inbox`, `device-os-wallet`) plus invariant-only WebKit smoke (`e2e/safari-shell-scroll.spec.ts`). **P0-W** sign-off is still manual on real WebKit devices. CI failure triage: [`DEVICE_SHELL_E2E_CI_REMEDIATION.md`](DEVICE_SHELL_E2E_CI_REMEDIATION.md).
+**Automated gate:** device shell E2E in CI — `npm run device-shell:e2e` (see [`DEVICE_SHELL_E2E_CI_REMEDIATION.md`](DEVICE_SHELL_E2E_CI_REMEDIATION.md)). **P0-W** sign-off is still manual on real WebKit devices.
 
 ### P1-4 · Hub intro coachmark (first visit)
 
@@ -265,8 +265,19 @@ See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 |------|--------|----------|
 | 1 | Complete live proof loop (two phones) | Success panel includes **Control proven moments ago** + **does not prove legal identity** |
 | 2 | Ask tester: “What did live control prove?” | Recent key control; not legal ID or vouch |
-| 3 | Proof window ends | Scanner returns to **Ask for live proof** with expired copy |
+| 3 | Proof window ends | Scanner returns to **Ask for live proof** with expired copy; success panel showed **Proof display expires in M:SS** while active |
 | 4 | Let challenge expire unsigned | **Control was not proven. The request expired.** |
+
+### P1-LCP · Live control printed QR camera QA (M7 Step 2)
+
+**Runbook:** [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) · desk check: `npm run worker:test -- worker/tests/scan.test.ts worker/tests/live-control.test.ts`.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Print QR from `/created/`; scan with **iPhone Camera** | Opens Safari scan page; live control block visible |
+| 2 | Repeat with **Android** camera/scanner | Same scan page; no app install required |
+| 3 | Complete live proof from camera-opened session | Countdown, proven success, expiry, and retry all work |
+| 4 | Wide viewport (tablet or desktop) while waiting | Scanner and Owner panes side by side |
 
 ### P1-HH · Hub header simplification (Home / Close / Create)
 
