@@ -35,3 +35,7 @@ jobs:
         env:
           API_ORIGIN: https://humanity.llc
           OPERATOR_AUDIT_TOKEN: ${{ secrets.OPERATOR_AUDIT_TOKEN }}
+      - name: Post-deploy merch funnel verify (step 3)
+        run: npm run merch-funnel:rollout:post-deploy -- --worker
+        env:
+          API_ORIGIN: https://humanity.llc

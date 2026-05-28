@@ -252,8 +252,10 @@ Mirrors [`hosted:rollout:step*`](HOSTED_TIER_G0_READINESS.md) for merch funnel c
 | 1 strict | `npm run merch-funnel:rollout:step1 -- --strict` | Fail if launch SKU lacks `checkout_url` |
 | 2 preflight | `npm run merch-funnel:rollout:step2 -- --preflight` | Local shop-config + rollout unit tests (no fetch) |
 | 2 | `SITE_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step2 -- --verify` | Smoke deployed Pages config + repo drift |
+| 2 CI | `deploy-pages.yml` → `merch-funnel:rollout:post-deploy -- --pages` | Post-deploy step 2 verify (non-`--strict`; warnings OK until operator pastes URLs) |
 | 3 preflight | `npm run merch-funnel:rollout:step3 -- --preflight` | `humanity.llc/v1/*` route + rollout Vitest (no API) |
 | 3 | `API_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step3 -- --verify` | Health, print catalog, artifact-intent route |
+| 3 CI | `deploy-worker.yml` → `merch-funnel:rollout:post-deploy -- --worker` | Post-deploy step 3 verify after Worker deploy |
 | 4 | `npm run merch-funnel:rollout:step4` | Worker env + route checklist (`wrangler.toml`) |
 | 5 | `npm run merch-funnel:rollout:step5` | Launch gates + physical QA sign-off checklist |
 | 6 preflight | `npm run merch-funnel:rollout:step6 -- --preflight` | Rollout unit tests + `verify:merch-funnel` (no Playwright) |
