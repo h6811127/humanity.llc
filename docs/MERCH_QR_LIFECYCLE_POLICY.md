@@ -334,7 +334,7 @@ Optional **non-trust** badge on scan: “Scanned from a founding sticker” for 
 | Artifact intent preview + cart attach metadata (A-001 spike) | Engineering | **Shipped** | `POST /v1/store/artifact-intents` · `…/attach` · migration `0014_artifact_intents.sql` |
 | Shopify paid webhook → commerce order link (O-001) | Engineering | **Shipped** | `POST /v1/webhooks/shopify/orders` · migration `0015_commerce_order_links.sql` |
 | Print fulfillment queue + catalog + artwork (O-002) | Engineering | **Shipped** (queue + live submit + per-order upload) | `POST /v1/print/orders` · `printify-client.ts` · `printify-upload.ts` · `PRINTIFY_SUBMIT_ENABLED` gate |
-| Printify webhook status sync (O-003) | Engineering | **Shipped** (webhook slice) | `POST /v1/print/webhooks/printify` · migration `0018_printify_webhook_receipts.sql` · reconciliation polling deferred |
+| Printify webhook status sync (O-003) | Engineering | **Shipped** | `POST /v1/print/webhooks/printify` · migration `0018_printify_webhook_receipts.sql` · tracking on `0021_print_order_tracking.sql` · reconciliation cron every 30m |
 | Operator fulfillment lookup chain (O-003) | Engineering | **Shipped** | `GET /v1/operator/fulfillment/lookup` · Shopify/commerce/intent/print order ids |
 | Orphan purge respects null expiry | Engineering | **Shipped** (existing) | `orphan-purge.test.ts` |
 | Tier 0 batch rotate runbook | Ops | **Shipped** | [`TIER0_CAMPAIGN_QR_RUNBOOK.md`](TIER0_CAMPAIGN_QR_RUNBOOK.md) |

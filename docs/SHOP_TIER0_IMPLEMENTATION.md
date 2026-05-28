@@ -50,7 +50,7 @@ The interest form records **optional email** on this browser only (no server upl
 
 **Printify submit (operator):** set `PRINTIFY_SUBMIT_ENABLED=1`, `PRINTIFY_API_TOKEN` (secret), `PRINTIFY_SHOP_ID`, `TIER0_PRINTIFY_PRODUCT_ID`, and `TIER0_PRINTIFY_VARIANT_ID`. Set `FULFILLMENT_PII_ENCRYPTION_KEY` (secret, 32-byte base64) so paid Shopify webhooks encrypt shipping into `commerce_fulfillment_pii`. Then `POST /v1/print/orders` with `{ commerce_order_id, submit_to_printify: true, quantity? }` — shipping loads from the encrypted store; optional `shipping_address` in the body overrides for one-off fixes.
 
-**Printify webhooks (O-003):** register order events to `POST /v1/print/webhooks/printify` with shared `PRINTIFY_WEBHOOK_SECRET`. Updates print order status idempotently; no raw payload stored in D1.
+**Printify webhooks (O-003):** register order events to `POST /v1/print/webhooks/printify` with shared `PRINTIFY_WEBHOOK_SECRET`. Updates print order status and tracking idempotently; reconciliation cron polls Printify every 30 minutes for active orders. No raw payload stored in D1.
 
 ## Not shipped yet
 

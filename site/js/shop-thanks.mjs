@@ -30,9 +30,21 @@ function decorateThanksCreateLinks() {
 function renderStatusResult(payload) {
   if (!resultEl) return;
   resultEl.hidden = false;
+  const tracking = payload.tracking;
+  const trackingHtml =
+    tracking && (tracking.tracking_url || tracking.tracking_number)
+      ? `<p class="shop-thanks-status-tracking">${
+          tracking.tracking_url
+            ? `<a href="${tracking.tracking_url}" rel="noopener noreferrer" target="_blank">Track shipment${
+                tracking.carrier ? ` (${tracking.carrier})` : ""
+              }</a>`
+            : `Tracking: ${tracking.tracking_number ?? ""}`
+        }</p>`
+      : "";
   resultEl.innerHTML = `
     <p class="shop-thanks-status-label"><strong>${payload.status_label}</strong></p>
     <p class="shop-thanks-status-message">${payload.message}</p>
+    ${trackingHtml}
     ${
       payload.order_number
         ? `<p class="shop-thanks-status-meta">Order ${payload.order_number}</p>`

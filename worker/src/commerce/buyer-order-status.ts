@@ -9,12 +9,19 @@ export type BuyerFacingStatus =
   | "issue"
   | "canceled";
 
+export interface BuyerOrderTracking {
+  carrier: string | null;
+  tracking_number: string | null;
+  tracking_url: string | null;
+}
+
 export interface BuyerOrderStatusResponse {
   order_number: string | null;
   status: BuyerFacingStatus;
   status_label: string;
   message: string;
   fulfillment_mode: "personalized" | "tier0_batch" | null;
+  tracking: BuyerOrderTracking | null;
   updated_at: string;
 }
 
@@ -118,6 +125,41 @@ const STATUS_COPY: Record<
   },
 };
 
+function trackingFromPrintOrder(row: PrintOrderRow): BuyerOrderTracking | null {
+  if (!row.tracking_carrier && !row.tracking_number && !row.tracking_url) return null;
+  return {
+    carrier: row.tracking_carrier,
+    tracking_number: row.tracking_number,
+    tracking_url: row.tracking_url,
+  };
+}
+
+function pickDominantPrintOrder(printOrders: PrintOrderRow[]): PrintOrderRow | null {
+  const status = dominantPrintStatus(printOrders);
+  if (!status) return null;
+  return printOrders.find((row) => row.status === status) ?? printOrders[0] ?? null;
+}
+
+function messageForBuyerStatus(
+  buyerStatus: BuyerFacingStatus,
+  tracking: BuyerOrderTracking | null
+): { label: string; message: string } {
+  const copy = STATUS_COPY[buyerStatus];
+  if (buyerStatus === "shipped" && tracking?.tracking_url) {
+    return {
+      label: copy.label,
+      message: "Your order is on its way. Use the tracking link below for carrier updates.",
+    };
+  }
+  if (buyerStatus === "shipped" && tracking?.tracking_number) {
+    return {
+      label: copy.label,
+      message: `Your order has shipped. Tracking number: ${tracking.tracking_number}.`,
+    };
+  }
+  return copy;
+}
+
 /** Build buyer-safe order status (no shipping PII, provider ids, or profile ids). */
 export function buildBuyerOrderStatus(
   commerce: CommerceOrderRow,
@@ -134,6 +176,7 @@ export function buildBuyerOrderStatus(
       status_label: copy.label,
       message: copy.message,
       fulfillment_mode: mode,
+      tracking: null,
       updated_at: commerce.updated_at,
     };
   }
@@ -146,22 +189,23 @@ export function buildBuyerOrderStatus(
       status_label: copy.label,
       message: copy.message,
       fulfillment_mode: mode,
+      tracking: null,
       updated_at: commerce.updated_at,
     };
   }
 
-  const printStatus = dominantPrintStatus(printOrders);
-  if (printStatus) {
-    const buyerStatus = mapPrintToBuyer(printStatus);
-    const copy = STATUS_COPY[buyerStatus];
-    const printRow =
-      printOrders.find((row) => row.status === printStatus) ?? printOrders[0]!;
+  const printRow = pickDominantPrintOrder(printOrders);
+  if (printRow) {
+    const buyerStatus = mapPrintToBuyer(printRow.status);
+    const tracking = trackingFromPrintOrder(printRow);
+    const copy = messageForBuyerStatus(buyerStatus, tracking);
     return {
       order_number: orderNumber,
       status: buyerStatus,
       status_label: copy.label,
       message: copy.message,
       fulfillment_mode: mode,
+      tracking,
       updated_at: printRow.updated_at,
     };
   }
@@ -173,6 +217,7 @@ export function buildBuyerOrderStatus(
     status_label: copy.label,
     message: copy.message,
     fulfillment_mode: mode,
+    tracking: null,
     updated_at: commerce.updated_at,
   };
 }
