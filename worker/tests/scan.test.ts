@@ -104,7 +104,7 @@ function scanDbFor(challenge: Record<string, unknown> | null = null): D1Database
 
 function extractLiveControlScript(html: string): string {
   const match = html.match(
-    /<script>\n\(function \(\) \{\n  var btn = document\.getElementById\("live-control-request"\);[\s\S]*?\n\}\)\(\);\n<\/script>/
+    /<script>\n\(function \(\) \{\n  var PROOF_TTL_MS = 5 \* 60 \* 1000;[\s\S]*?\n\}\)\(\);\n<\/script>/
   );
   expect(match).not.toBeNull();
   return match![0].replace(/^<script>\n/, "").replace(/\n<\/script>$/, "");
@@ -129,6 +129,13 @@ async function runLiveControlScriptWithStatus(body: Record<string, unknown>) {
     addEventListener?: ReturnType<typeof vi.fn>;
     hidden?: boolean;
     href?: string;
+    classList?: {
+      add?: ReturnType<typeof vi.fn>;
+      remove?: ReturnType<typeof vi.fn>;
+      toggle?: ReturnType<typeof vi.fn>;
+    };
+    setAttribute?: ReturnType<typeof vi.fn>;
+    getAttribute?: ReturnType<typeof vi.fn>;
   };
   const elements: Record<string, FakeElement> = {
     "live-control-request": {
@@ -136,8 +143,25 @@ async function runLiveControlScriptWithStatus(body: Record<string, unknown>) {
       textContent: "Ask for live proof",
       addEventListener: vi.fn(),
     },
-    "live-control-status": { textContent: "Not proven yet." },
+    "live-control-status": { textContent: "Ready when you are." },
+    "live-control-status-panel": { classList: { toggle: vi.fn() } },
+    "live-control-interactive": { hidden: false },
+    "live-control-success": {
+      hidden: true,
+      setAttribute: vi.fn(),
+      getAttribute: vi.fn(() => null),
+    },
+    "live-control-proven-at": { textContent: "" },
+    "live-control-proven-ago": {
+      textContent: "",
+      setAttribute: vi.fn(),
+      getAttribute: vi.fn(() => null),
+    },
+    "live-control-row": { classList: { add: vi.fn(), remove: vi.fn() } },
     "live-control-owner-link": { hidden: true, href: "#" },
+    "live-control-owner-view": { hidden: true },
+    "live-control-owner-copy": { textContent: "" },
+    "live-control-owner-created-link": { href: "" },
   };
   const fetchMock = vi.fn(async () => ({ json: async () => body }));
   const setTimeoutMock = vi.fn(() => 1);
@@ -173,6 +197,7 @@ async function runLiveControlScriptWithStatus(body: Record<string, unknown>) {
     fetchMock,
     setTimeoutMock,
     status: elements["live-control-status"],
+    elements,
   };
 }
 
@@ -497,7 +522,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(res.status).toBe(200);
     expect(html).not.toContain("Control proven recently");
     expect(html).toContain('id="live-control-request"');
-    expect(html).toContain("Not proven yet.");
+    expect(html).toContain("Ready when you are.");
   });
 
   it("does not let browser status checks revive stale live proof", async () => {
@@ -509,20 +534,20 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(result.status.textContent).toBe(
       "Live proof expired. Ask again to prove control now."
     );
-    expect(result.button.textContent).toBe("Ask again");
+    expect(result.button.textContent).toBe("Ask for live proof");
     expect(result.setTimeoutMock).not.toHaveBeenCalled();
+    expect(result.elements["live-control-success"].hidden).toBe(true);
   });
 
   it("clears browser live proof status when the proof display window ends", async () => {
     const result = await runLiveControlScriptWithStatus({
       status: "proven",
+      proven_at: new Date().toISOString(),
       proof_expires_at: new Date(Date.now() + 60_000).toISOString(),
     });
 
-    expect(result.status.textContent).toBe(
-      "Control proven moments ago. This does not prove legal identity."
-    );
-    expect(result.button.textContent).toBe("Ask again");
+    expect(result.elements["live-control-success"].hidden).toBe(false);
+    expect(result.elements["live-control-interactive"].hidden).toBe(true);
     expect(result.setTimeoutMock).toHaveBeenCalledTimes(1);
     expect(result.setTimeoutMock.mock.calls[0][1]).toBeGreaterThan(0);
   });
