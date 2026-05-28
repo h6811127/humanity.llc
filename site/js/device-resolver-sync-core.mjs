@@ -26,6 +26,7 @@ export function isResolverSyncTabsEnabled(raw) {
  *   profile_id: string;
  *   status: string;
  *   scanKind: string | null;
+ *   qrScope?: string | null;
  *   verification?: { label?: string; state?: string } | null;
  *   cachedAt: number;
  *   resolverConfirmed: boolean;
@@ -66,6 +67,8 @@ export function parseNetworkSnapshotMessage(data) {
     const status = typeof row.status === "string" ? row.status : "checking";
     const scanKind =
       row.scanKind === null || typeof row.scanKind === "string" ? row.scanKind : null;
+    const qrScope =
+      row.qrScope === null || typeof row.qrScope === "string" ? row.qrScope : null;
     const cachedAt =
       typeof row.cachedAt === "number" && Number.isFinite(row.cachedAt) ? row.cachedAt : at;
     const resolverConfirmed = row.resolverConfirmed === true;
@@ -83,6 +86,7 @@ export function parseNetworkSnapshotMessage(data) {
       profile_id,
       status,
       scanKind,
+      qrScope,
       verification,
       cachedAt,
       resolverConfirmed,
@@ -116,7 +120,7 @@ export function shouldFollowerSkipNetworkFetch(opts) {
 }
 
 /**
- * @param {Record<string, { status?: string, scanKind?: string | null, verificationLabel?: string | null, verificationState?: string | null, at?: number }>} cache
+ * @param {Record<string, { status?: string, scanKind?: string | null, qrScope?: string | null, verificationLabel?: string | null, verificationState?: string | null, at?: number }>} cache
  * @param {NetworkSnapshotRow[]} snapshotEntries
  * @param {number} [fallbackAt]
  */
@@ -127,6 +131,7 @@ export function mergeNetworkSnapshotIntoCache(cache, snapshotEntries, fallbackAt
     next[row.profile_id] = {
       status: row.status,
       scanKind: row.scanKind ?? null,
+      qrScope: row.qrScope ?? null,
       verificationLabel: row.verification?.label ?? null,
       verificationState: row.verification?.state ?? null,
       at: row.cachedAt ?? fallbackAt,
