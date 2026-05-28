@@ -118,10 +118,12 @@ npm run hosted:rollout:step4a -- --apply   # writes "1" to worker/wrangler.toml 
 # commit worker/wrangler.toml, then step 4b
 ```
 
-**Rollout step 4b — deploy + verify production:**
+**Rollout step 4b — deploy + smoke + verify production:**
 
 ```bash
 npm run hosted:rollout:step4 -- --deploy
+npm run hosted:rollout:step4 -- --smoke
+API_ORIGIN=http://127.0.0.1:8787 npm run hosted:rollout:step4 -- --smoke   # after 4a --apply + worker:dev
 npm run hosted:rollout:step4 -- --verify
 OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step4 -- --verify
 ```

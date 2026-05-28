@@ -47,12 +47,32 @@ function main() {
     "--",
     "worker/tests/device-steward-session-core.test.ts",
   ]);
+  runNpm("Stripe checkout return URL (device-steward-billing-return-core)", [
+    "run",
+    "worker:test",
+    "--",
+    "worker/tests/device-steward-billing-return-core.test.ts",
+  ]);
+  runNpm("Child object status plate (created-child-object-core)", [
+    "run",
+    "worker:test",
+    "--",
+    "worker/tests/created-child-object-core.test.ts",
+    "worker/tests/child-objects.test.ts",
+  ]);
   runNpm("Rollout step3a smoke (unit)", [
     "run",
     "worker:test",
     "--",
     "worker/tests/hosted-rollout-step3a-smoke.test.ts",
     "worker/tests/hosted-rollout-step3a.test.ts",
+  ]);
+  runNpm("Rollout step4 smoke (unit)", [
+    "run",
+    "worker:test",
+    "--",
+    "worker/tests/hosted-rollout-step4-smoke.test.ts",
+    "worker/tests/hosted-rollout-step4.test.ts",
   ]);
 
   if (runE2e) {
