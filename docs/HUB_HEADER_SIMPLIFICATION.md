@@ -52,9 +52,9 @@ The first screen of the hub should prioritize:
 
 ### Step 2 - Calm the status chip row
 
-- Render the hub status panel as a single-line primary status where possible.
-- Keep zero saved/pinned values visually subordinate.
-- Avoid wrapping a lone `0 pinned` chip onto its own row on mobile.
+- [x] Render the hub status panel as a single-line primary status where possible.
+- [x] Keep zero saved/pinned values visually subordinate.
+- [x] Avoid wrapping a lone `0 pinned` chip onto its own row on mobile.
 
 **Shipped:** The sheet header now renders one inline status line: network first, then muted device counts, then compact alert-weight items only for actionable states.
 

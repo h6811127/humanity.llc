@@ -125,3 +125,13 @@ export function resolvePrintTemplateForStoreProductId(productId: string | null):
   const byCatalog = getApprovedPrintCatalog().find((p) => p.product_id === productId.trim());
   return byCatalog?.template_id ?? DEFAULT_PRINT_TEMPLATE_ID;
 }
+
+/** Branch-compat aliases (merch funnel handoff). */
+export const HOODIE_PRINT_TEMPLATE_ID = HOODIE_LIVE_OBJECT_TEMPLATE_ID;
+export const HOODIE_LIVE_OBJECT_PRODUCT_ID = HOODIE_LIVE_OBJECT_STORE_PRODUCT_ID;
+export const STICKER_PERSONALIZED_PRODUCT_ID = STICKER_PERSONALIZED_STORE_PRODUCT_ID;
+
+/** Map artifact-intent product_id to approved print template (Tier 1). */
+export function resolvePrintTemplateIdForProduct(productId: string | null): string {
+  return resolvePrintTemplateForStoreProductId(productId);
+}
