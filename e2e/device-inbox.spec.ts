@@ -129,6 +129,9 @@ async function openHubViaStatusDot(page: import("@playwright/test").Page) {
   if (await dismiss.isVisible({ timeout: 2000 }).catch(() => false)) {
     await dismiss.click();
   }
+  await expect(page.locator("#brand-status-dot")).toHaveAttribute("data-dot-state", /.+/, {
+    timeout: 15_000,
+  });
   await page.locator("#brand-status-dot-btn").click();
 }
 
