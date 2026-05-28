@@ -47,6 +47,21 @@ describe("printify-template-config", () => {
       shipping_method: 2,
     });
   });
+
+  it("resolves personalized sticker mapping from env", () => {
+    const cfg = resolvePrintifyLineItem(
+      {
+        PERSONALIZED_STICKER_PRINTIFY_PRODUCT_ID: "prod_sticker",
+        PERSONALIZED_STICKER_PRINTIFY_VARIANT_ID: "55123",
+      },
+      "hc-sticker-square-v1"
+    );
+    expect(cfg).toEqual({
+      product_id: "prod_sticker",
+      variant_id: 55123,
+      shipping_method: 1,
+    });
+  });
 });
 
 describe("submitPrintifyOrder", () => {

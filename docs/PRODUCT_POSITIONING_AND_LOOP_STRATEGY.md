@@ -136,4 +136,4 @@ Calm footer on lost-item relay scan template only — link to `/create/?template
 |-----|------|
 | `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` | Vertical priorities + narrative stack |
 | `docs/STATUS_PLATE_PILOT.md` | Vertical #1 |
-| `docs/M5_STRANGER_TEST_RUNBOOK.md` | Proof loop exit gate |
+| `docs/M5_STRANGER_TEST_RUNBOOK.md` | Proof loop exit gate (**passed** 2026-05-27) |

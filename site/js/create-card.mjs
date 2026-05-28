@@ -2,6 +2,7 @@ import { validateCreateFormFields } from "./create-form-validation-core.mjs";
 import { syncCreateHeroCopy } from "./create-template-copy.mjs";
 import { formatCreateResolverError } from "./create-resolver-error-core.mjs";
 import {
+  buildPostCreateDestinationUrl,
   clearMerchCreateRef,
   peekMerchCreateRef,
   persistMerchCreateRef,
@@ -313,11 +314,13 @@ export async function runCreateCard(input) {
     })
   );
 
-  const created = new URL("/created/", location.origin);
-  created.searchParams.set("profile_id", profileId);
-  created.searchParams.set("qr_id", qrId);
-  created.searchParams.set("fresh", "1");
-  location.replace(created.href);
+  const destination = buildPostCreateDestinationUrl(attributionRef, {
+    origin: location.origin,
+    profileId,
+    qrId,
+    fresh: true,
+  });
+  location.replace(destination);
 }
 
 function readCreateFormFields() {

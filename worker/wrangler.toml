@@ -24,7 +24,7 @@ port = 8787
 
 [vars]
 # E1 staging: set to "1" locally to exercise steward routes; production off until M4 sign-off.
-HOSTED_STEWARD_ENABLED = "1"
+HOSTED_STEWARD_ENABLED = "0"
 # Tier 0 batch fulfillment (O-002): set when Shopify founding sticker SKU is live.
 # TIER0_CAMPAIGN_PROFILE_ID = ""
 # TIER0_SHOPIFY_VARIANT_IDS = ""
@@ -35,6 +35,10 @@ HOSTED_STEWARD_ENABLED = "1"
 # TIER0_PRINTIFY_PRODUCT_ID = ""
 # TIER0_PRINTIFY_VARIANT_ID = ""
 # TIER0_PRINTIFY_SHIPPING_METHOD = "1"
+# Tier 1 personalized sticker (Phase 4 E2E — hc-sticker-square-v1):
+# PERSONALIZED_STICKER_PRINTIFY_PRODUCT_ID = ""
+# PERSONALIZED_STICKER_PRINTIFY_VARIANT_ID = ""
+# PERSONALIZED_STICKER_PRINTIFY_SHIPPING_METHOD = "1"
 # Printify webhook (O-003): register in Printify admin → POST …/v1/print/webhooks/printify
 # PRINTIFY_WEBHOOK_SECRET = ""  # wrangler secret; must match Printify webhook secret
 

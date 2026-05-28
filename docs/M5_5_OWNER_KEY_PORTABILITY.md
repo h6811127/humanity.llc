@@ -167,4 +167,4 @@ Separate threat model when **5.5.3–5.5.4** ship: one-time recovery code, recov
 
 ## Phase A exit criteria (unchanged)
 
-Stranger tests still pass with **session-only** revoke. M5.5 is the **first trust UX upgrade** after M5.3 announce, before or in parallel with M6 vouches (product priority TBD).
+Stranger tests passed 2026-05-27 (session-only revoke acceptable at gate). M5.5 is the **first trust UX upgrade** after optional M5.3 public announce, before or in parallel with M6 vouches (product priority TBD).

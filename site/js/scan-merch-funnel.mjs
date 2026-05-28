@@ -1,9 +1,10 @@
 /**
- * Scan page — carry hc_ref to /create/ and fire aggregate scan_landing beacon (M8.4).
+ * Scan page — carry hc_ref to /create/ and /shop/customize/; fire aggregate scan_landing beacon (M8.4).
  */
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import {
   appendMerchRefToCreateUrl,
+  appendMerchRefToCustomizeUrl,
   markMerchBeaconSent,
   merchBeaconAlreadySent,
   peekMerchCreateRef,
@@ -41,10 +42,21 @@ function isCardOwnerHere(profileId, qrId) {
   }
 }
 
+function isMerchFunnelScanPage() {
+  return document.querySelector("[data-merch-funnel='1']") != null;
+}
+
 function decorateCreateLinks(ref) {
   if (!ref) return;
   for (const anchor of document.querySelectorAll('a[href*="/create"]')) {
     anchor.href = appendMerchRefToCreateUrl(anchor.href, ref);
+  }
+}
+
+function decorateCustomizeLinks(ref) {
+  if (!ref) return;
+  for (const anchor of document.querySelectorAll('a[href*="/shop/customize"]')) {
+    anchor.href = appendMerchRefToCustomizeUrl(anchor.href, ref);
   }
 }
 
@@ -67,9 +79,11 @@ async function postScanLandingBeacon(ref) {
 function init() {
   const urlRef = readMerchRefFromUrl();
   if (urlRef) persistMerchCreateRef(urlRef);
+  else if (isMerchFunnelScanPage()) persistMerchCreateRef("scan_customize");
 
   const ref = peekMerchCreateRef();
   decorateCreateLinks(ref);
+  decorateCustomizeLinks(ref);
 
   if (!ref) return;
 

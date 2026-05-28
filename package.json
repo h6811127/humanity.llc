@@ -60,6 +60,8 @@
     "e2e:shell-emphasis-card": "playwright test e2e/shell-emphasis-card-delivery.spec.ts",
     "e2e:keys-custody": "playwright test e2e/device-os-wallet.spec.ts -g \"keys custody\" e2e/keys-custody-emphasis-webkit.spec.ts",
     "e2e:keys-custody:webkit": "playwright test e2e/keys-custody-emphasis-webkit.spec.ts --project=webkit --project=iphone-13-pro",
+    "e2e:merch-funnel": "playwright test e2e/merch-funnel-customize.spec.ts",
+    "worker:test:merch-funnel": "vitest run worker/tests/merch-funnel.test.ts worker/tests/merch-funnel-core.test.ts worker/tests/merch-funnel-paid-path.test.ts",
     "worker:test:keys-custody": "vitest run worker/tests/device-keys-custody-html.test.ts worker/tests/device-keys-custody-core.test.ts worker/tests/device-emphasis-card-html.test.ts",
     "worker:test:pwa-install": "vitest run worker/tests/pwa-install-metadata.test.ts worker/tests/pwa-install-ux.test.ts",
     "worker:test:lazy-shell": "vitest run worker/tests/device-status-lazy-inbox.test.ts worker/tests/device-status-lazy-notifications.test.ts worker/tests/device-status-shell-modules.test.ts",

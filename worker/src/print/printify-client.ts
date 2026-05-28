@@ -44,6 +44,9 @@ export interface PrintifyEnv {
   TIER0_PRINTIFY_PRODUCT_ID?: string;
   TIER0_PRINTIFY_VARIANT_ID?: string;
   TIER0_PRINTIFY_SHIPPING_METHOD?: string;
+  PERSONALIZED_STICKER_PRINTIFY_PRODUCT_ID?: string;
+  PERSONALIZED_STICKER_PRINTIFY_VARIANT_ID?: string;
+  PERSONALIZED_STICKER_PRINTIFY_SHIPPING_METHOD?: string;
 }
 
 export function printifyConfigured(env: PrintifyEnv): boolean {
