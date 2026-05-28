@@ -64,10 +64,10 @@ Deploy Worker with `X-HC-Scan-UI: pass-v7` for this layout.
 | Step | Pass? |
 |------|-------|
 | Stranger creates status plate unassisted (current flat-card bridge) | ☐ |
-| Existing card owner adds status plate as child object (target flow) | ☐ manual · **create + update + scan link** on `/created/` Live (`Issue scan link` → `child_object` QR) |
+| Existing card owner adds status plate as child object (target flow) | ☐ manual · **create + update + scan link + disable** on `/created/` Live |
 | Scan answers “open or not?” in &lt;30s | ☐ |
 | Stranger says scan does **not** prove who owns the door | ☐ |
-| Print + second-device scan + revoke without founder present | ☐ |
+| Print + second-device scan + revoke without founder present | ☐ · **Disable this plate** on `/created/`; scan shows object unavailable |
 | Notes captured for copy fixes (not new hub pages) | ☐ |
 
 ---

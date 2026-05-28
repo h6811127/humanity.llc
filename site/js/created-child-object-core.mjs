@@ -1,6 +1,17 @@
 import { inferPilotTemplate } from "./manifesto-display.mjs";
 
 export const CHILD_OBJECT_TYPE_STATUS_PLATE = "status_plate";
+export const CHILD_OBJECT_STATUS_DISABLED = "disabled";
+
+/**
+ * @param {Record<string, unknown>} row
+ */
+export function isActiveStatusPlateRow(row) {
+  return (
+    row.object_type === CHILD_OBJECT_TYPE_STATUS_PLATE &&
+    row.status !== CHILD_OBJECT_STATUS_DISABLED
+  );
+}
 
 /**
  * Root general cards may add status plates as child objects (not flat-card pilots).
