@@ -4,13 +4,14 @@
  */
 import { DEVICE_OS_DEBOUNCE_MS } from "./device-os-coordinator-core.mjs";
 import {
-  PRESENCE_CHROME_DEBOUNCE_MS,
+  presenceChromeDebounceMs,
   presenceChromeFingerprint,
   presenceChromeRefreshScheduleAction,
   shouldChromeRefreshStorageImmediately,
   shouldRunChromeRefreshImmediate,
   shouldSkipPresenceChromeRefresh,
 } from "./device-chrome-refresh-core.mjs";
+import { getWalletCount } from "./device-wallet.mjs";
 import { tabNoticeCount } from "./device-counts.mjs";
 import {
   shouldShowCrossTabKeysNotice,
@@ -24,7 +25,7 @@ import {
   beginDeviceChromeRefreshTick,
   endDeviceChromeRefreshTick,
   resetPresenceInboxGatherCache,
-} from "./device-inbox.mjs?v=56";
+} from "./device-inbox.mjs?v=57";
 import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { refreshWalletContextFromChrome } from "./wallet-page-chrome.mjs";
 
@@ -146,7 +147,7 @@ function schedulePresenceChromeRefresh() {
       presenceDebounceTimer = null;
     }
     runChromeRefresh();
-  }, PRESENCE_CHROME_DEBOUNCE_MS);
+  }, presenceChromeDebounceMs(getWalletCount()));
 }
 
 function onPresenceChanged() {

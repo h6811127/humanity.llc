@@ -125,6 +125,7 @@ import {
   isLargeWallet,
   walletScaleHint,
   selectHubSavedRowEntries,
+  selectWalletPageSavedRowEntries,
   selectNetworkRefreshEntries,
   walletNetworkMaxParallel,
 } from "./device-wallet-scale-core.mjs";
@@ -370,20 +371,39 @@ function scanUrlForEntry(entry) {
   return qrId ? `${base}?q=${encodeURIComponent(qrId)}` : base;
 }
 
+const WALLET_PAGE_SHOW_ALL_KEY = "hc_wallet_page_show_all";
+
+function walletPageShowsAllSavedRows() {
+  try {
+    return sessionStorage.getItem(WALLET_PAGE_SHOW_ALL_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function setWalletPageShowAllSavedRows() {
+  try {
+    sessionStorage.setItem(WALLET_PAGE_SHOW_ALL_KEY, "1");
+  } catch {
+    /* private mode */
+  }
+}
+
 /**
- * Saved-card rows for hub sheet render (S9 display-safe + S10 large-wallet DOM cap).
+ * Saved-card rows for hub sheet render (S9 display-safe + S10/S11 large-wallet DOM caps).
  * @returns {{ entries: ReturnType<typeof listWalletDisplayEntries>, hiddenCount: number }}
  */
 function savedRowsForRender() {
   const all = listWalletDisplayEntries();
+  const policy = getStewardEntitlementsPolicy();
+  const visible = visibleHubCardProfileIds();
   if (document.body.classList.contains("page-wallet")) {
-    return { entries: all, hiddenCount: 0 };
+    if (walletPageShowsAllSavedRows()) {
+      return { entries: all, hiddenCount: 0 };
+    }
+    return selectWalletPageSavedRowEntries(all, visible, policy);
   }
-  return selectHubSavedRowEntries(
-    all,
-    visibleHubCardProfileIds(),
-    getStewardEntitlementsPolicy()
-  );
+  return selectHubSavedRowEntries(all, visible, policy);
 }
 
 /**
@@ -391,10 +411,29 @@ function savedRowsForRender() {
  */
 function appendHubSavedMoreRow(hiddenCount) {
   if (!savedList || hiddenCount <= 0) return;
+  const onWalletPage = document.body.classList.contains("page-wallet");
   const li = document.createElement("li");
   li.className = "hub-card-item hub-card-item--more";
   li.dataset.hubSearchable = "more saved cards wallet";
-  li.innerHTML = `
+  if (onWalletPage) {
+    li.innerHTML = `
+    <div class="hub-card-head">
+      <span class="list-content">
+        <span class="list-title">${hiddenCount} more saved on this device</span>
+        <span class="list-sub">Show every card on this page</span>
+      </span>
+    </div>
+    <div class="hub-card-actions">
+      <div class="hub-card-actions-primary">
+        <button type="button" class="hub-card-action hub-wallet-show-all-saved">Show all saved cards</button>
+      </div>
+    </div>`;
+    li.querySelector(".hub-wallet-show-all-saved")?.addEventListener("click", () => {
+      setWalletPageShowAllSavedRows();
+      renderSavedRows();
+    });
+  } else {
+    li.innerHTML = `
     <div class="hub-card-head">
       <span class="list-content">
         <span class="list-title">${hiddenCount} more saved on this device</span>
@@ -406,6 +445,7 @@ function appendHubSavedMoreRow(hiddenCount) {
         <a class="hub-card-action" href="/wallet/">Open My cards</a>
       </div>
     </div>`;
+  }
   savedList.appendChild(li);
 }
 
