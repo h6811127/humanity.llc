@@ -1,4 +1,5 @@
 {
+  "_operator_documentation": "Paste Shopify cart permalinks from shop-config.example.json, then personalize.checkout_open: true after physical QA — docs/MERCH_PHYSICAL_QA_RUNBOOK.md",
   "version": 1,
   "site_origin": "https://humanity.llc",
   "tier0": {
@@ -9,7 +10,7 @@
   },
   "thanks_path": "/shop/thanks/",
   "personalize": {
-    "checkout_open": true,
+    "checkout_open": false,
     "checkout_product_id": "sticker_personalized_v1",
     "products": [
       {
