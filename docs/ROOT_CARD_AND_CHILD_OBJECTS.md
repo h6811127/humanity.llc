@@ -140,7 +140,7 @@ Status plates and lost-item relays currently use full card templates in the crea
 2. **One create story** — `/create/` emphasizes general Humanity Card; status plate / lost item are **Add object** actions, not parallel card types (flat templates remain as compatibility).
 3. **Network-backed list** — opening `/created/` or hub refreshes child rows from resolver truth, not only from a device-only index.
 4. **Shorter QR path** — register + issue first scan credential in one steward action on `/created/` (shipped step 15); per-row re-issue remains for retries.
-5. **Backup seatbelt** — harder to skip encrypted backup / recovery before N child objects or print checkout (copy exists; hard gate still tightening).
+5. **Backup seatbelt** — warn before a 2nd child object and block a 3rd+ without encrypted backup or recovery acknowledged on `/created/` (shipped step 16).
 
 ---
 
@@ -270,7 +270,7 @@ Delegated capabilities must be root-signed, scoped, expiring, revocable, and cle
 12. **Resolver child list (first slice shipped):** read-only `GET /.well-known/hc/v1/cards/{profile_id}/objects`; `/created/` reconciles `hc_child_objects_v1` from network on Live panel refresh.
 13. **Hub tree rows (first slice shipped):** nested child rows under general root in **My cards** / expanded hub; reconcile on hub render via `reconcileChildObjectsForProfileIds`; no child entries in `hc_wallet`.
 14. **Create flow convergence (first slice shipped):** `/create/` emphasizes general Humanity Card; status plate / lost item show Add-on-Live nudge when a general root with keys exists; legacy standalone pilot forms stay in a disclosure; landing copy updated.
-15. **Register + first QR (first slice shipped):** `/created/` Add status plate / lost-item relay runs register + first `issue-qr` in one action (`child-object-register-issue.mjs`); per-row **Issue scan link** remains for retries and legacy rows. **Next:** backup gate (step 16).
-16. **Backup gate (planned):** block or strongly warn before N active child objects without encrypted backup / recovery acknowledged.
+15. **Register + first QR (first slice shipped):** `/created/` Add status plate / lost-item relay runs register + first `issue-qr` in one action (`child-object-register-issue.mjs`); per-row **Issue scan link** remains for retries and legacy rows.
+16. **Backup gate (first slice shipped):** warn before a 2nd active child object without backup seatbelt; block a 3rd+ until `recovery_key_acknowledged`, encrypted backup export, or backup import (`child-object-backup-gate-core.mjs`, threshold `2`). **Next:** delegated capabilities (step 17).
 17. **Delegated capabilities:** add scoped, expiring, root-signed child keys only after real team/event use cases demand them.
 

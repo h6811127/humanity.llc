@@ -84,6 +84,7 @@ export function initKeyBackupUi(opts) {
       downloadBackupFile(backup);
       const session = opts.getSession() || {};
       opts.setSession({ ...session, key_backup_exported_at: new Date().toISOString() });
+      window.dispatchEvent(new CustomEvent("hc-key-backup-exported"));
       setStatus(
         exportStatus,
         "Downloaded. Store it safely; this root-card backup restores control of this card and its object QRs. We cannot reset your passphrase or recover it."

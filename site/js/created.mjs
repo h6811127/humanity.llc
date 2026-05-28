@@ -1224,6 +1224,12 @@ async function bootstrapOwnerTools() {
   window.addEventListener("hc-recovery-acknowledged", () => {
     deviceSaveCtl?.refresh();
     recoveryUi?.refresh();
+    childObjectCtl?.refresh?.();
+    lostItemRelayCtl?.refresh?.();
+  });
+  window.addEventListener("hc-key-backup-exported", () => {
+    childObjectCtl?.refresh?.();
+    lostItemRelayCtl?.refresh?.();
   });
   void manifestoUpdate;
 

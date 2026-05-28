@@ -20,6 +20,10 @@ import {
 } from "./child-object-update.mjs";
 import { issueChildObjectScanLink, registerChildObjectAndIssueScanLink } from "./child-object-register-issue.mjs";
 import {
+  assertChildObjectBackupGateAllowsCreate,
+  syncChildObjectBackupGateUi,
+} from "./child-object-backup-gate.mjs";
+import {
   childObjectRegisterProgressLabel,
   childObjectRegisterSuccessMessage,
 } from "./child-object-register-issue-core.mjs";
@@ -144,12 +148,26 @@ export function initCreatedChildObject(ctx) {
   async function refreshList() {
     await refreshChildObjectsFromNetwork(localStorage, ctx.profileId);
     renderStatusPlateList(ctx.profileId, readChildObjectRows(localStorage, ctx.profileId));
+    syncChildObjectBackupGateUi({
+      profileId: ctx.profileId,
+      getSession: ctx.getSession,
+      noticeId: "child-object-status-plate-backup-gate",
+      submitId: "child-object-status-plate-submit",
+    });
   }
 
   function refreshVisibility() {
     const show = shouldOfferAddStatusPlate(ctx.getSession());
     panel.hidden = !show;
     if (show) void refreshList();
+    else {
+      syncChildObjectBackupGateUi({
+        profileId: ctx.profileId,
+        getSession: ctx.getSession,
+        noticeId: "child-object-status-plate-backup-gate",
+        submitId: "child-object-status-plate-submit",
+      });
+    }
   }
 
   refreshVisibility();
@@ -375,6 +393,10 @@ export function initCreatedChildObject(ctx) {
       statusEl.textContent = childObjectRegisterProgressLabel(CHILD_OBJECT_TYPE_STATUS_PLATE);
     }
     try {
+      assertChildObjectBackupGateAllowsCreate({
+        profileId: ctx.profileId,
+        getSession: ctx.getSession,
+      });
       const { publicLabel, publicState } = parseStatusPlateChildFields(
         labelInput instanceof HTMLInputElement ? labelInput.value : "",
         stateInput instanceof HTMLInputElement ? stateInput.value : ""
