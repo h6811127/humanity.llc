@@ -3,8 +3,8 @@
  * @see docs/SITE_BUILD_VERSIONING.md
  */
 export const WORKER_BUILD_META = {
-  "gitSha": "e735b62",
-  "builtAt": "2026-05-28T00:01:42.364Z",
+  "gitSha": "2ec48d70",
+  "builtAt": "2026-05-28T00:42:46.177Z",
   "source": "deploy"
 } as const;
 

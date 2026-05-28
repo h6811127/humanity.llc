@@ -36,7 +36,7 @@ export function qrScopeRelationshipCopy({ scope, handle } = {}) {
  */
 export function qrTrustGroupScopeSubtitle(scope) {
   if (isChildObjectScope(scope)) {
-    return "Printed object - revoke this item without disabling the root card";
+    return "Printed item — revoke one artifact without killing the card";
   }
   return "Root card-scoped credential";
 }
@@ -58,7 +58,7 @@ export function objectTypeLabelFromContext({ pilotTemplate, qrScope } = {}) {
   const pilot = typeof pilotTemplate === "string" ? pilotTemplate.trim().toLowerCase() : "";
   if (pilot === "status_plate") return { label: "Status plate", tone: "status-plate" };
   if (pilot === "lost_item_relay") return { label: "Lost item", tone: "lost-item" };
-  if (isChildObjectScope(qrScope)) return { label: "Printed object", tone: "wearable" };
+  if (isChildObjectScope(qrScope)) return { label: "Printed item", tone: "wearable" };
   return { label: "Root card", tone: "general" };
 }
 

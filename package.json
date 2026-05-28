@@ -60,8 +60,6 @@
     "e2e:shell-emphasis-card": "playwright test e2e/shell-emphasis-card-delivery.spec.ts",
     "e2e:keys-custody": "playwright test e2e/device-os-wallet.spec.ts -g \"keys custody\" e2e/keys-custody-emphasis-webkit.spec.ts",
     "e2e:keys-custody:webkit": "playwright test e2e/keys-custody-emphasis-webkit.spec.ts --project=webkit --project=iphone-13-pro",
-    "e2e:merch-funnel": "playwright test e2e/merch-funnel-customize.spec.ts",
-    "worker:test:merch-funnel": "vitest run worker/tests/merch-funnel.test.ts worker/tests/merch-funnel-core.test.ts worker/tests/merch-funnel-paid-path.test.ts",
     "worker:test:keys-custody": "vitest run worker/tests/device-keys-custody-html.test.ts worker/tests/device-keys-custody-core.test.ts worker/tests/device-emphasis-card-html.test.ts",
     "worker:test:pwa-install": "vitest run worker/tests/pwa-install-metadata.test.ts worker/tests/pwa-install-ux.test.ts",
     "worker:test:lazy-shell": "vitest run worker/tests/device-status-lazy-inbox.test.ts worker/tests/device-status-lazy-notifications.test.ts worker/tests/device-status-shell-modules.test.ts",
@@ -75,7 +73,12 @@
     "site:aggregate-pilot-summaries": "node worker/scripts/aggregate-pilot-summaries.mjs",
     "site:verify-positioning-exit": "vitest run worker/tests/manifesto-showcase-exit.test.ts worker/tests/site-showcase-data.test.ts worker/tests/scan-m5-showcase-paths.test.ts worker/tests/seed-showcase-core.test.ts worker/tests/pilot-summary-aggregate.test.ts worker/tests/status-plate-loop-scorecard.test.ts worker/tests/lost-item-relay-loop-scorecard.test.ts",
     "worker:test:manifesto-showcase-exit": "vitest run worker/tests/manifesto-showcase-exit.test.ts worker/tests/site-showcase-data.test.ts worker/tests/scan-m5-showcase-paths.test.ts",
-    "worker:test:merch-print-qa": "vitest run worker/tests/merch-print-artifact-scan-qa.test.ts worker/tests/merch-qr-lifecycle.test.ts"
+    "worker:test:merch-funnel": "vitest run worker/tests/merch-funnel.test.ts worker/tests/merch-funnel-core.test.ts worker/tests/shop-customize-core.test.ts worker/tests/shop-config-personalize.test.ts worker/tests/shopify-orders-webhook.test.ts worker/tests/merch-funnel-paid-mint-path.test.ts worker/tests/wrangler-merch-routes.test.ts",
+    "worker:test:merch-print-qa": "vitest run worker/tests/merch-print-artifact-scan-qa.test.ts worker/tests/merch-qr-lifecycle.test.ts",
+    "merch-funnel:verify-config": "node worker/scripts/verify-merch-funnel-config.mjs",
+    "merch-funnel:verify-exit": "node worker/scripts/verify-merch-funnel-exit.mjs",
+    "merch-funnel:verify-exit:fast": "node worker/scripts/verify-merch-funnel-exit.mjs -- --skip-e2e",
+    "e2e:merch-funnel": "playwright test e2e/merch-funnel-customize.spec.ts e2e/merch-funnel-checkout.spec.ts"
   },
   "dependencies": {
     "@noble/ed25519": "^2.3.0",
