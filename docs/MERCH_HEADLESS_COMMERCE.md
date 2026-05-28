@@ -268,8 +268,11 @@ Mirrors [`hosted:rollout:step*`](HOSTED_TIER_G0_READINESS.md) for merch funnel c
 | 5 verify | `SITE_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step5 -- --verify` | Preflight + production Glitch PDP/API + config audit (digital gate) |
 | 6 preflight | `npm run merch-funnel:rollout:step6 -- --preflight` | Rollout unit tests + `verify:merch-funnel` (no Playwright) |
 | 6 | `npm run merch-funnel:rollout:step6 -- --verify` | Engineering close-out: preflight + `e2e:merch-funnel` + production Glitch PDP/API + `verify-config` |
+| **Complete** | `npm run merch-funnel:rollout:complete -- --verify` | Step 6 + scan merch test; prints operator-only next steps |
+| Post-deploy all | `npm run merch-funnel:rollout:post-deploy -- --all` | Steps 2 + 3 production verify (Pages + Worker) |
 
-**Vitest bundle:** `npm run verify:merch-funnel` (= merch funnel + print QA + shop-config rollout tests).
+**Vitest bundle:** `npm run verify:merch-funnel` (= merch funnel + print QA + shop-config rollout tests).  
+**Exit gate:** `npm run merch-funnel:verify-exit` delegates to step 6 + scan merch HTML test.
 
 ---
 

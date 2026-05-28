@@ -1,9 +1,16 @@
 #!/usr/bin/env node
 /**
  * Engineering exit gate for merch funnel (Priority 1 code path).
+ * Delegates Vitest/E2E to merch-funnel:rollout:step6; keeps wrangler route guard + scan merch test.
+ *
  * Operator checkout readiness is separate: npm run merch-funnel:verify-config
  *
+ * Usage:
+ *   npm run merch-funnel:verify-exit
+ *   npm run merch-funnel:verify-exit:fast   # --skip-e2e → step6 --preflight only
+ *
  * @see docs/MERCH_FUNNEL_MVP.md § Tests
+ * @see docs/MERCH_HEADLESS_COMMERCE.md
  */
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -12,8 +19,15 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
-function run(cmd, args) {
-  const result = spawnSync(cmd, args, { cwd: root, stdio: "inherit", shell: false });
+/**
+ * @param {string[]} args
+ */
+function run(args) {
+  const result = spawnSync("npm", args, {
+    cwd: root,
+    stdio: "inherit",
+    shell: false,
+  });
   if (result.status !== 0) {
     process.exit(result.status ?? 1);
   }
@@ -28,23 +42,21 @@ if (!/pattern\s*=\s*"humanity\.llc\/v1\/\*"/.test(toml)) {
   process.exit(1);
 }
 
-console.log("Merch funnel engineering exit gate\n");
-
-run("npm", ["run", "worker:test:merch-funnel"]);
-run("npm", ["run", "worker:test:merch-print-qa"]);
-run("npm", ["run", "worker:test", "--", "worker/tests/scan.test.ts", "-t", "merch"]);
-
 const skipE2e = process.argv.includes("--skip-e2e");
-if (!skipE2e) {
-  run("npm", ["run", "e2e:merch-funnel"]);
+
+console.log("Merch funnel engineering exit gate\n");
+console.log("Docs: docs/MERCH_FUNNEL_MVP.md § Tests · rollout step 6\n");
+
+if (skipE2e) {
+  run(["run", "merch-funnel:rollout:step6", "--", "--preflight"]);
 } else {
-  console.log("\n(skipped e2e — pass --skip-e2e only for fast CI subsets)\n");
+  run(["run", "merch-funnel:rollout:step6", "--", "--verify", "--skip-production-smoke"]);
 }
 
-run("npm", ["run", "merch-funnel:verify-config"]);
+run(["run", "worker:test", "--", "worker/tests/scan.test.ts", "-t", "merch"]);
 
 console.log("\n✅ Merch funnel engineering gate passed.");
-console.log("   Rollout close-out: npm run merch-funnel:rollout:step6 -- --verify");
-console.log("   Operator: paste Shopify variant URLs, then merch-funnel:verify-config -- --require-checkout");
+console.log("   Full close-out: npm run merch-funnel:rollout:complete -- --verify");
+console.log("   Production smoke: npm run merch-funnel:rollout:post-deploy -- --all");
+console.log("   Operator: merch-funnel:verify-config -- --require-checkout");
 console.log("   Glitch checkout: merch-funnel:verify-config -- --require-tier0=tier0_glitch_hoodie_v1");
-console.log("   Next: operator Tier 1 close-out (shop-config + live checkout) — docs/MERCH_FUNNEL_MVP.md Priority 1 operator");

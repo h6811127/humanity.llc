@@ -10,7 +10,8 @@ import {
 const repoRoot = join(import.meta.dirname, "../..");
 
 describe("merch-funnel-rollout-post-deploy", () => {
-  it("maps --pages and --worker to rollout steps", () => {
+  it("maps --pages, --worker, and --all to rollout steps", () => {
+    expect(postDeployMerchTarget(["node", "script", "--all"])).toBe("all");
     expect(postDeployMerchTarget(["node", "script", "--pages"])).toBe("pages");
     expect(postDeployMerchTarget(["node", "script", "--worker"])).toBe("worker");
     expect(postDeployMerchTarget(["node", "script"])).toBeNull();

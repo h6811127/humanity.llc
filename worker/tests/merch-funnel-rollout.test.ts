@@ -9,7 +9,23 @@ describe("merch-funnel rollout scripts", () => {
     const pkg = JSON.parse(readFileSync(join(repoRoot, "package.json"), "utf8"));
     expect(pkg.scripts["merch-funnel:rollout:step1"]).toContain("merch-funnel-rollout-step1.mjs");
     expect(pkg.scripts["merch-funnel:rollout:step6"]).toContain("merch-funnel-rollout-step6.mjs");
+    expect(pkg.scripts["merch-funnel:rollout:complete"]).toContain("merch-funnel-rollout-complete.mjs");
     expect(pkg.scripts["verify:merch-funnel"]).toContain("worker:test:merch-funnel");
+  });
+
+  it("complete script delegates to step 6 verify", () => {
+    const script = readFileSync(
+      join(repoRoot, "worker/scripts/merch-funnel-rollout-complete.mjs"),
+      "utf8"
+    );
+    expect(script).toContain("merch-funnel:rollout:step6");
+    expect(script).toContain("MERCH_PHYSICAL_QA_RUNBOOK");
+  });
+
+  it("verify-exit delegates to step 6", () => {
+    const script = readFileSync(join(repoRoot, "worker/scripts/verify-merch-funnel-exit.mjs"), "utf8");
+    expect(script).toContain("merch-funnel:rollout:step6");
+    expect(script).toContain("scan.test.ts");
   });
 
   it("step2 documents local preflight before deployed verify", () => {

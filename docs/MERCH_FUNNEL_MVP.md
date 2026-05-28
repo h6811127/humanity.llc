@@ -23,7 +23,7 @@ Ordered work after repo review. Update row status as steps complete. Cross-links
 
 ### Operator close-out (after engineering + M5)
 
-1. Run **`npm run merch-funnel:verify-exit`** locally (or CI `merch-funnel:verify-exit:fast` + separate E2E job).
+1. Run **`npm run merch-funnel:rollout:complete -- --verify`** (or `merch-funnel:verify-exit` / `verify-exit:fast` in CI).
 2. Operator: paste Shopify variant URLs into `site/data/shop-config.json`; **`npm run merch-funnel:verify-config -- --require-checkout`**.
 3. Prove one paid personalized order (intent → webhook → mint → Printify submit) per [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md).
 4. Complete physical ink QA — [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) (automated scan regression: `npm run worker:test:merch-print-qa`).
@@ -212,15 +212,17 @@ Aggregate metrics only — no PII. Allowed refs:
 
 ```bash
 npm run merch-funnel:rollout:step6 -- --preflight   # local Vitest gate before Playwright
-npm run merch-funnel:verify-exit          # engineering gate (Vitest + scan merch + E2E + config report)
-npm run merch-funnel:verify-exit:fast     # Vitest + config only (no Playwright)
+npm run merch-funnel:rollout:complete -- --verify # step 6 + scan merch (engineering done → operator QA)
+npm run merch-funnel:verify-exit          # same as step 6 --verify + scan merch (no production smoke)
+npm run merch-funnel:verify-exit:fast     # step 6 --preflight only (no Playwright)
 npm run merch-funnel:verify-config -- --require-checkout   # CI when Tier 1 goes live
 ```
 
 | Command | Covers |
 |---------|--------|
-| `merch-funnel:verify-exit` | Full engineering gate — Vitest bundle, scan merch HTML, E2E, config report, `wrangler.toml` `v1/*` route |
-| `merch-funnel:verify-exit:fast` | Same without E2E (quick CI subset) |
+| `merch-funnel:rollout:complete -- --verify` | Step 6 regression + scan merch HTML; prints operator-only next steps |
+| `merch-funnel:verify-exit` | Step 6 `--verify` (no production smoke) + scan merch; `wrangler.toml` `v1/*` route guard |
+| `merch-funnel:verify-exit:fast` | Step 6 `--preflight` only (no Playwright) |
 | `worker:test:merch-funnel` | Ref helpers, config validation, customize core, paid webhook → mint, production route guard |
 | `merch-funnel:verify-config` | Operator readiness of `site/data/shop-config.json` Tier 1 block |
 | `e2e:merch-funnel` | Create → customize; checkout handoff; **Glitch PDP** (`shop-product-detail`) — stubs `__HC_E2E_SHOP_CONFIG__` + store API on `:8787` |

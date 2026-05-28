@@ -4,6 +4,7 @@
  * Usage:
  *   npm run merch-funnel:rollout:post-deploy -- --pages
  *   npm run merch-funnel:rollout:post-deploy -- --worker
+ *   npm run merch-funnel:rollout:post-deploy -- --all
  *   SITE_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:post-deploy -- --pages
  *   API_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:post-deploy -- --worker
  *
@@ -21,9 +22,10 @@ const apiOrigin = (process.env.API_ORIGIN || "https://humanity.llc").replace(/\/
 
 /**
  * @param {string[]} argv
- * @returns {"pages" | "worker" | null}
+ * @returns {"pages" | "worker" | "all" | null}
  */
 export function postDeployMerchTarget(argv = process.argv) {
+  if (argv.includes("--all")) return "all";
   if (argv.includes("--pages")) return "pages";
   if (argv.includes("--worker")) return "worker";
   return null;
@@ -38,25 +40,28 @@ export function postDeployMerchScript(target) {
 }
 
 /**
- * @param {{ target?: "pages" | "worker"; extraEnv?: Record<string, string | undefined> }} [opts]
+ * @param {{ target?: "pages" | "worker" | "all"; extraEnv?: Record<string, string | undefined> }} [opts]
  */
 export function runPostDeployMerchVerify(opts = {}) {
   const target = opts.target ?? postDeployMerchTarget();
   if (!target) {
-    throw new Error("Specify --pages (step 2) or --worker (step 3)");
+    throw new Error("Specify --pages (step 2), --worker (step 3), or --all");
   }
-  const script = postDeployMerchScript(target);
-  const origin = target === "pages" ? siteOrigin : apiOrigin;
-  const envKey = target === "pages" ? "SITE_ORIGIN" : "API_ORIGIN";
-  console.log(`Post-deploy merch verify (${target}, ${script}) → ${origin}`);
-  const result = spawnSync("npm", ["run", script, "--", "--verify"], {
-    cwd: repoRoot,
-    stdio: "inherit",
-    shell: false,
-    env: { ...process.env, ...opts.extraEnv, [envKey]: origin },
-  });
-  if (result.status !== 0) {
-    process.exit(result.status ?? 1);
+  const targets = target === "all" ? ["pages", "worker"] : [target];
+  for (const t of targets) {
+    const script = postDeployMerchScript(t);
+    const origin = t === "pages" ? siteOrigin : apiOrigin;
+    const envKey = t === "pages" ? "SITE_ORIGIN" : "API_ORIGIN";
+    console.log(`Post-deploy merch verify (${t}, ${script}) → ${origin}`);
+    const result = spawnSync("npm", ["run", script, "--", "--verify"], {
+      cwd: repoRoot,
+      stdio: "inherit",
+      shell: false,
+      env: { ...process.env, ...opts.extraEnv, [envKey]: origin },
+    });
+    if (result.status !== 0) {
+      process.exit(result.status ?? 1);
+    }
   }
 }
 
@@ -68,6 +73,7 @@ function main() {
     console.error("Usage:");
     console.error("  npm run merch-funnel:rollout:post-deploy -- --pages");
     console.error("  npm run merch-funnel:rollout:post-deploy -- --worker");
+    console.error("  npm run merch-funnel:rollout:post-deploy -- --all");
     process.exit(1);
   }
   runPostDeployMerchVerify({ target });
