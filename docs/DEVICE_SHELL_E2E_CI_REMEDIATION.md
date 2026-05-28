@@ -10,7 +10,7 @@
 
 | Step | Spec / surface | Symptom | Root cause |
 |------|----------------|---------|------------|
-| **1** | Pages dev (`site/_redirects`) | `Infinite loop detected` for `/shop/products/*` | **Fixed 2026-05-28:** splat rewrite targets `detail.html` (not `index.html`) |
+| **1** | Pages dev (`site/_redirects`) | `Infinite loop detected` for `/shop/products/*` | **Fixed 2026-05-28:** splat rewrite targets `/shop/product-detail/` (shell outside splat; `.html` under splat strips and loops) |
 | **2** | `e2e/device-os-wallet.spec.ts` · `e2e/keys-custody-emphasis-webkit.spec.ts` | `detail` ↔ **Acknowledge** gap **66–68px** (limit **&lt; 56**) | **Fixed 2026-05-28:** wallet `.hc-notice-foot` moved below Acknowledge (`afterActionsHtml`) |
 | **3** | `e2e/merch-funnel-customize.spec.ts` | Stays on `/created/?…&hc_ref=scan_customize` | **Fixed 2026-05-28:** `created-merch-funnel.mjs` auto-redirects fresh customize handoffs when `hc_created` is readable |
 | — | Wrangler / workerd stderr | `Broken pipe` on Playwright teardown | Benign shutdown noise when Pages dev stops worker; not a product failure |
@@ -21,14 +21,14 @@
 
 ## Remediation plan (execute in order)
 
-### Step 1 — Fix `/shop/products/*` Pages rewrite (no `index.html` target)
+### Step 1 — Fix `/shop/products/*` Pages rewrite (shell outside splat)
 
 **Intent:** Silence the invalid redirect warning and avoid ambiguous SPA routing during `pages:dev` / CI.
 
 | Action | File |
 |--------|------|
-| Rename product detail shell `index.html` → `detail.html` | `site/shop/products/detail.html` |
-| Point splat rewrite at `detail.html` (does not re-match splat) | `site/_redirects` |
+| Product detail shell at `/shop/product-detail/index.html` (not under `/shop/products/*`) | `site/shop/product-detail/index.html` |
+| Point splat rewrite at `/shop/product-detail/` (200; URL stays `/shop/products/{id}/`) | `site/_redirects` |
 
 **Verify:**
 
@@ -106,7 +106,7 @@ Spec list: `worker/scripts/device-shell-e2e-specs.mjs` · Vitest guard: `npm run
 |------|------|
 | 2026-05-28 | Opened from CI Device shell E2E failures (3 Playwright specs + `_redirects` warning) |
 | 2026-05-28 | **Step 4 tooling:** `device-shell:e2e` / `device-shell:e2e:signoff` + shared spec list; CI uses `npm run device-shell:e2e` |
-| 2026-05-28 | **Step 1 shipped:** product detail shell → `detail.html`; `_redirects` splat target updated |
+| 2026-05-28 | **Step 1 shipped:** product detail shell → `/shop/product-detail/`; `_redirects` splat target outside `/shop/products/*` |
 | 2026-05-28 | **Step 2 shipped:** wallet keys custody foot below Acknowledge (`afterActionsHtml`) |
 | 2026-05-28 | **Step 3 shipped:** fresh customize handoff auto-redirect from `/created/` |
 | 2026-05-28 | **Step 4 shipped:** full Device shell E2E bundle — 87 passed, 1 skipped (WebKit touch profile); doc **Closed** |

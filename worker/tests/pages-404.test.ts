@@ -14,4 +14,12 @@ describe("Pages 404 shell", () => {
     const redirects = readFileSync(join(process.cwd(), "site/_redirects"), "utf8");
     expect(redirects).toMatch(/404\.html/i);
   });
+
+  it("rewrites /shop/products/* to a shell outside the splat (avoids Pages .html strip loop)", () => {
+    const redirects = readFileSync(join(process.cwd(), "site/_redirects"), "utf8");
+    expect(redirects).toMatch(/\/shop\/products\/\*\s+\/shop\/product-detail\/\s+200/);
+    expect(redirects).not.toMatch(/\/shop\/products\/\*\s+\/shop\/products\//);
+    const shell = join(process.cwd(), "site/shop/product-detail/index.html");
+    expect(readFileSync(shell, "utf8")).toMatch(/shop-product-detail\.mjs/);
+  });
 });
