@@ -198,11 +198,12 @@ function appendWalletGlanceRow(entry, revokedHint, list) {
   li.className = revokedHint
     ? "device-hub-glance-row device-hub-glance-row--revoked"
     : "device-hub-glance-row";
+  const title = entry.label || (entry.handle ? `@${entry.handle}` : "Saved card");
   const sub = walletEntrySubtitle(entry);
   const subLine = revokedHint ? `${sub} · ${CARD_DISABLED_SINCE_VISIT_GLANCE_SUFFIX}` : sub;
   li.innerHTML = `
     <button type="button" class="device-hub-glance-btn">
-      <span class="device-hub-glance-title">${escapeHtml(entry.label)}</span>
+      <span class="device-hub-glance-title">${escapeHtml(title)}</span>
       <span class="device-hub-glance-sub">${escapeHtml(subLine)} · Saved on device</span>
     </button>`;
   li.querySelector("button")?.addEventListener("click", () => {

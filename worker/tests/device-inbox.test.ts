@@ -334,7 +334,7 @@ describe("inboxBadgeAriaLabel", () => {
       crossTabEntries: [{ profile_id: "x", tabId: "t" }],
     });
     expect(inboxBadgeAriaLabel(items)).toBe(
-      "Needs attention (3 items): 2 live proofs, keys open in another tab (x…)"
+      "Needs attention (3 items): 2 live proofs, keys in another tab (x…)"
     );
   });
 
@@ -355,7 +355,7 @@ describe("inboxBadgeAriaLabel", () => {
         ],
       })
     ).toBe(
-      "Needs attention (2 items): keys open in another tab (@alice), keys open in another tab (Demo)"
+      "Needs attention (2 items): keys in another tab (@alice), keys in another tab (Demo)"
     );
   });
 

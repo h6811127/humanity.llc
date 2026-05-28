@@ -33,6 +33,14 @@ Minimize stored data so the network is not a surveillance honeypot. Publish what
 
 Saved card rows on `/wallet/` and the device hub may show **checked … ago**. That timestamp is **only** when **this browser** last successfully polled `GET …/cards/{profile_id}/status?q=…` for a saved card (`hc_wallet_network_cache` in session storage). It is **not** a log of who scanned the QR, and the operator does not receive or retain that client timestamp. Product copy MUST NOT use **seen** or **last scan** on saved rows in ways that imply stranger scan trails. Spec: [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md) § Recency wording and data policy.
 
+## Key custody and recovery limits
+
+- Owner signing keys are generated client-side. During create, the owner key is session-only unless the user saves a recovery key or encrypted backup.
+- Encrypted backup files are created client-side. The backup passphrase MUST NOT be sent to or stored by the reference operator.
+- Recovery private keys are shown to the user once. The resolver may store the recovery public key, but MUST NOT store the recovery private key or seed.
+- The reference operator cannot recover lost passphrases, restore lost private keys, or revoke on a user's behalf. Revocation requires a valid owner, recovery, or registered organizer signature.
+- If a user closes the tab and loses both backup/passphrase and recovery key, they cannot revoke from the web UI without creating a new card.
+
 ## Commerce firewall
 
 - QR payloads MUST NOT embed order IDs, emails, or shipping fields.

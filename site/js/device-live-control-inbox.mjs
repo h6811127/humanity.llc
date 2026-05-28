@@ -575,18 +575,21 @@ export function syncLiveControlInboxPolling() {
   if (!pollFeatureEnabled) return;
 
   syncStewardPushConnection();
+  const scopeActive = readPollScope();
+  const resolverHealth = getResolverHealthStatus();
+  const watchEnabled = isWatchLiveProofEnabled();
 
-  if (!readPollScope()) {
+  if (!scopeActive) {
     clearPollTimer();
     return;
   }
 
-  if (!liveControlPollAllowedByResolverHealth(getResolverHealthStatus())) {
+  if (!liveControlPollAllowedByResolverHealth(resolverHealth)) {
     clearPollTimer();
     return;
   }
 
-  if (isWatchLiveProofEnabled()) {
+  if (watchEnabled) {
     ensurePollLeaderClaim();
   }
 
@@ -602,17 +605,6 @@ export function syncLiveControlInboxPolling() {
   }
 
   if (!readPollLoopShouldRun()) {
-    return;
-  }
-
-  if (!stewardPushSuppressesAutoPoll()) {
-    clearPollTimer();
-    if (pollSyncInFlight) return;
-    pollSyncInFlight = true;
-    void refreshLiveControlInbox().finally(() => {
-      pollSyncInFlight = false;
-      if (pollFeatureEnabled && readPollLoopShouldRun()) armPollTimer();
-    });
     return;
   }
 

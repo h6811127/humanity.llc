@@ -12,6 +12,7 @@ import {
   listPollableWalletEntries,
   listWalletDisplayEntries,
   loadWallet,
+  resetWalletCachesForTests,
   saveWallet,
   WALLET_STORAGE_KEY,
 } from "../../site/js/device-wallet.mjs";
@@ -35,6 +36,7 @@ describe("device wallet metadata hot paths", () => {
 
   beforeEach(() => {
     localStore = new Map();
+    resetWalletCachesForTests();
     vi.stubGlobal("localStorage", {
       getItem: (key: string) => localStore.get(key) ?? null,
       setItem: (key: string, value: string) => {
@@ -51,6 +53,7 @@ describe("device wallet metadata hot paths", () => {
   afterEach(() => {
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
+    resetWalletCachesForTests();
   });
 
   it("serves repeated count reads from wallet metadata without reparsing or copying keys", () => {

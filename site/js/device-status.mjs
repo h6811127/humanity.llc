@@ -12,10 +12,9 @@ export const RESOLVER_HEALTH_CHANGED = "hc-resolver-health-changed";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import {
-  getWalletCount,
-  getWalletSigningKeyCount,
   isWalletSaved,
-  walletSomeSigningKey,
+  loadWallet,
+  loadWalletSummary,
 } from "./device-wallet.mjs";
 import {
   gatherInboxInput,
@@ -140,14 +139,24 @@ function hasUnsavedTabKeys() {
 function hasStewardReadyKeys() {
   const session = getTabSession();
   if (session?.owner_private_key_b58 && hasStewardVerification(session)) return true;
-  return walletSomeSigningKey((entry) => hasStewardVerification(entry));
+  return loadWalletSummary().stewardReady;
+}
+
+function savedCardsWithSigningKeys() {
+  return loadWallet().filter((entry) => Boolean(entry?.owner_private_key_b58));
 }
 
 function deviceState() {
+  const summary = loadWalletSummary();
   return deviceStateFromContext({
     unsavedTabKeys: hasUnsavedTabKeys(),
-    stewardReady: hasStewardReadyKeys(),
-    savedWalletCount: getWalletCount(),
+    stewardReady:
+      summary.stewardReady ||
+      (() => {
+        const session = getTabSession();
+        return Boolean(session?.owner_private_key_b58 && hasStewardVerification(session));
+      })(),
+    savedWalletCount: summary.count,
   });
 }
 
@@ -251,7 +260,7 @@ function applyDot() {
   if (!dot) return;
   const device = deviceState();
   const overlay = dotOverlayState();
-  const savedWalletCount = getWalletCount();
+  const savedWalletCount = loadWalletSummary().count;
   const shellNeutralEmpty = shellDotUsesNeutralEmptyWallet({
     network: networkStatus,
     device,
@@ -346,11 +355,12 @@ function renderDotExplainer(container, descriptor, compact = false) {
 }
 
 function renderDotExplainability(network, device, overlay) {
+  const summary = loadWalletSummary();
   const descriptor = describeDotState(network, device, overlay, {
     stewardReady: hasStewardReadyKeys(),
     queueUrl: getStewardQueueUrl(),
     pageKind: dotPageKind(),
-    singleSavedCardWithKeys: getWalletSigningKeyCount() === 1,
+    singleSavedCardWithKeys: summary.signingKeyCount === 1,
   });
   const keyRoot = document.getElementById("device-hub-status-key");
   if (keyRoot) {
@@ -396,7 +406,7 @@ function renderStatusKey() {
 
 function renderShellStatusLine(segments) {
   if (!shellStatusLine) return;
-  const savedWalletCount = getWalletCount();
+  const savedWalletCount = loadWalletSummary().count;
   const device = deviceState();
   const overlay = dotOverlayState();
   const show = shellStatusLinePrimaryInChrome({

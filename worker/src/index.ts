@@ -24,6 +24,11 @@ import {
 } from "./resolver/live-control";
 import { handlePostRevoke } from "./resolver/revoke";
 import { handlePostCardUpdate } from "./resolver/update-card";
+import {
+  handlePostChildObjectCreate,
+  handlePostChildObjectRevoke,
+  handlePostChildObjectUpdate,
+} from "./resolver/child-objects";
 import { handlePostIssuePrintArtifactQr } from "./resolver/issue-print-artifact-qr";
 import { handlePostRotateQr } from "./resolver/rotate-qr";
 import { handlePostExtendQr } from "./resolver/extend-qr";
@@ -63,6 +68,7 @@ import {
   handlePostPrintOrderMint,
   handlePostPrintOrders,
 } from "./print/print-orders-handler";
+import { handlePostPrintQuotes } from "./print/print-quotes-handler";
 import { handleGetOperatorFulfillmentLookup } from "./operator/fulfillment-lookup";
 import { handlePostAiExplainSnapshot } from "./resolver/ai-explain-snapshot";
 import { handlePostAiDraftManifesto } from "./resolver/ai-draft-manifesto";
@@ -491,6 +497,42 @@ export default {
       return withCors(request, res);
     }
 
+    const childObjectCreateMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/objects$/
+    );
+    if (childObjectCreateMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handlePostChildObjectCreate(
+        request,
+        env.DB,
+        childObjectCreateMatch[1]!
+      );
+      return withCors(request, res);
+    }
+
+    const childObjectActionMatch = path.match(
+      /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/objects\/([^/]+)\/(update|revoke)$/
+    );
+    if (childObjectActionMatch && request.method === "POST") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const [, profileId, objectId, action] = childObjectActionMatch;
+      const res =
+        action === "update"
+          ? await handlePostChildObjectUpdate(request, env.DB, profileId!, objectId!)
+          : await handlePostChildObjectRevoke(request, env.DB, profileId!, objectId!);
+      return withCors(request, res);
+    }
+
     const liveChallengeStatusMatch = path.match(
       /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/live-control\/challenges\/([^/]+)$/
     );
@@ -672,6 +714,11 @@ export default {
 
     if (path === "/v1/print/artifacts" && request.method === "POST") {
       const res = await handlePostPrintArtifacts(request);
+      return withCors(request, res);
+    }
+
+    if (path === "/v1/print/quotes" && request.method === "POST") {
+      const res = await handlePostPrintQuotes(request, env);
       return withCors(request, res);
     }
 

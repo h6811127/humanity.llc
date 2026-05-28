@@ -9,7 +9,7 @@ import {
 } from "./device-cross-tab-visibility.mjs";
 import { clearTabSessionKeys, getTabSession } from "./device-keys.mjs";
 import { loadRemovedProfileIds } from "./device-wallet-removed-profiles.mjs";
-import { forEachWalletEntry } from "./device-wallet.mjs";
+import { loadWalletSummary } from "./device-wallet.mjs";
 import {
   capPresenceMap,
   listOtherTabsWithKeys,
@@ -122,11 +122,7 @@ export function clearTabKeysPresence() {
 }
 
 function savedProfileIdsOnDevice() {
-  const ids = new Set();
-  forEachWalletEntry((entry) => {
-    if (entry.profile_id) ids.add(String(entry.profile_id));
-  });
-  return ids;
+  return new Set(loadWalletSummary().profileIds);
 }
 
 /**

@@ -30,6 +30,8 @@ describe("device-keys-custody-html", () => {
     expect(html).toContain("hc-emphasis-card--warn");
     expect(html).toContain("device-keys-custody--created");
     expect(html).toContain("device-keys-custody-dl");
+    expect(html).toContain("Save your root key on this device");
+    expect(html).toContain("object QRs");
   });
 
   it("compact variant uses warn emphasis card without legacy notice", () => {
@@ -43,6 +45,19 @@ describe("device-keys-custody-html", () => {
     const html = readFileSync(join(root, "site/created/index.html"), "utf8");
     expect(html).toContain('id="device-keys-custody-created-setup"');
     expect(html).toContain('id="created-setup-keys-mount"');
+    expect(html).toContain("Save root control on this device");
+    expect(html).toContain("control of this root card plus its object QRs");
+    expect(html).toContain("restore root and object control");
+    expect(html).toContain("Unlock root controls");
+  });
+
+  it("backup and recovery scripts explain root object control", () => {
+    const backup = readFileSync(join(root, "site/js/key-backup-ui.mjs"), "utf8");
+    const recovery = readFileSync(join(root, "site/js/recovery-key-ui.mjs"), "utf8");
+    expect(backup).toContain("root-card backup restores control");
+    expect(backup).toContain("Root-card controls are available below");
+    expect(recovery).toContain("restore root-card control");
+    expect(recovery).toContain("Root-card controls are available below");
   });
 
   it("status plate pilot exposes habit loop scorecard on created", () => {

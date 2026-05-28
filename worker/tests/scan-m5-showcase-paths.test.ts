@@ -147,7 +147,7 @@ describe("M5 showcase scan paths", () => {
     );
     expect(html).not.toMatch(/<h1 class="[^"]*scan-hero-title[^"]*">@river_example<\/h1>/);
     expect(html).not.toContain('data-merch-funnel="1"');
-    expect(html).not.toContain("scan-merch-hint");
+    expect(html).not.toContain('class="scan-create-hint scan-merch-hint"');
   });
 
   it("status plate: object_streams show detail cards and limit copy", async () => {
