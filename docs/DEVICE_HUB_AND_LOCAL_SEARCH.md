@@ -89,6 +89,8 @@ We kept the landing funnel (hero → device hub → long-form content) and **enr
 
 **Object identity visuals (Step 5):** Object type appears on the identity line; left accent bar per type from `classifyObjectType()` (Membership, Status plate, Live demo, …).
 
+**Child objects under a root (planned — not hub rows yet):** Network child objects (`object_type: status_plate | lost_item_relay`, `scope: child_object`) should appear **nested under the parent root row** in **My cards**, not as separate `hc_wallet` saved cards. Differentiation: object-first title (`public_label`), identity line `{type} · under @handle`, no human-trust shield on the child row, actions open parent `/created/` controls. Spec: [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) § My cards and hub presentation. Today: index only in `hc_child_objects_v1:{profile_id}` + Live panels on `/created/`.
+
 **Shell polish (Step 6):** Hub sheet and glance popover use stronger frosted materials (higher blur, softer layered shadows, 20px top sheet radius). Saved cards drop grey outline borders in favor of elevation fills; spacing in hub sections and card rows is slightly tighter. See `site/css/device-shell.css` tokens (`--shell-blur`, `--shell-shadow-sheet`, `--shell-radius-card`).
 
 **Keys vs verification:** See [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md). **Open controls** loads signing material into `hc_created`; verification on the identity line is read-only network state.
@@ -178,7 +180,8 @@ No backend required:
 | Layer | API | Scope | Used for |
 |-------|-----|--------|----------|
 | **This tab** | `sessionStorage` (`hc_created`) | Single tab | Create, revoke, vouch in that tab |
-| **This device** | `localStorage` (`hc_wallet`) | Whole origin | Saved cards, hub, search |
+| **This device** | `localStorage` (`hc_wallet`) | Whole origin | Saved **root** cards, hub, search |
+| **Child object index** | `localStorage` (`hc_child_objects_v1:{profile_id}`) | Whole origin, per root | Device UI cache reconciled from `GET …/objects` on `/created/` refresh; network is source of truth |
 | **Activity** | `localStorage` (`hc_device_activity`) | Whole origin | Hub recent list |
 | **Pins** | `localStorage` (`hc_device_pins`) | Whole origin | Public scan bookmarks only |
 

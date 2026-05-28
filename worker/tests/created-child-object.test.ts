@@ -8,7 +8,9 @@ import {
   appendChildObjectRow,
   childObjectsBucketKey,
   readChildObjectRows,
+  rowsFromNetworkChildObjects,
   updateChildObjectRow,
+  writeChildObjectRows,
 } from "../../site/js/child-object-store-core.mjs";
 import {
   CHILD_OBJECT_STATUS_DISABLED,
@@ -118,6 +120,68 @@ describe("child-object-store-core", () => {
     updateChildObjectRow(ls, PROFILE, "obj_testPlate001", { status: "disabled" });
     expect(readChildObjectRows(ls, PROFILE)[0].status).toBe("disabled");
   });
+
+  it("builds device rows from resolver list payload", () => {
+    const rows = rowsFromNetworkChildObjects(
+      PROFILE,
+      [
+        {
+          object_id: "obj_netPlate001",
+          object_type: CHILD_OBJECT_TYPE_STATUS_PLATE,
+          public_label: "Studio door",
+          public_state: "Open",
+          status: "active",
+          created_at: "2026-05-16T17:00:00.000Z",
+          active_qr_id: "qr_netPlateScan1",
+        },
+      ],
+      (profileId, qrId) => `https://humanity.llc/c/${profileId}?q=${qrId}`
+    );
+    expect(rows[0]).toMatchObject({
+      object_id: "obj_netPlate001",
+      qr_id: "qr_netPlateScan1",
+      scan_url: `https://humanity.llc/c/${PROFILE}?q=qr_netPlateScan1`,
+    });
+  });
+
+  it("replaces local index from network rows", () => {
+    const storage = new Map();
+    const ls = {
+      getItem(key: string) {
+        return storage.get(key) ?? null;
+      },
+      setItem(key: string, value: string) {
+        storage.set(key, value);
+      },
+    };
+    appendChildObjectRow(ls, PROFILE, {
+      object_id: "obj_staleLocal01",
+      object_type: CHILD_OBJECT_TYPE_STATUS_PLATE,
+      public_label: "Stale",
+      public_state: "Old",
+      created_at: "2026-05-15T17:00:00.000Z",
+    });
+    writeChildObjectRows(
+      ls,
+      PROFILE,
+      rowsFromNetworkChildObjects(
+        PROFILE,
+        [
+          {
+            object_id: "obj_netPlate001",
+            object_type: CHILD_OBJECT_TYPE_STATUS_PLATE,
+            public_label: "Studio door",
+            public_state: "Open",
+            created_at: "2026-05-16T17:00:00.000Z",
+            active_qr_id: null,
+          },
+        ],
+        () => "https://humanity.llc/c/x?q=y"
+      )
+    );
+    expect(readChildObjectRows(ls, PROFILE)).toHaveLength(1);
+    expect(readChildObjectRows(ls, PROFILE)[0].object_id).toBe("obj_netPlate001");
+  });
 });
 
 describe("child-object issue-qr client", () => {
@@ -154,6 +218,7 @@ describe("child-object issue-qr client", () => {
     expect(src).toContain("CHILD_OBJECT_TYPE_LOST_ITEM_RELAY");
     expect(src).toContain("signChildObjectIssueQr");
     expect(src).toContain("signChildObjectRevoke");
+    expect(src).toContain("refreshChildObjectsFromNetwork");
   });
 });
 

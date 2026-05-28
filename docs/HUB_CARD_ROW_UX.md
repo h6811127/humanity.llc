@@ -130,6 +130,18 @@ Implementation: `getCachedNetworkSeenAt()` → `entry.at` set in `refreshWalletN
 - [x] **Open controls** (`.hub-use-keys`) uses popover control surface — not brand red. See [`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md) § Red budget.
 - [x] **Open scan** remains tertiary / neutral beside Open controls.
 
+### Phase 6 - Nested child object rows (planned)
+
+Child objects under a root should **not** become separate `hc_wallet` entries. Under each root row:
+
+- [ ] **Title** = `public_label` (object name), not `@handle`
+- [ ] **Identity** = `{Status plate | Lost item | …} · under @handle` — no Steward/VH shield on child
+- [ ] **Status** = object state + steward publish recency — never **scanned** / **seen**
+- [ ] **Actions** = update state, open object scan, disable — **Open controls** on parent only
+- [ ] **Visual** = indent or nested list; reuse left accent tones (`status-plate`, `lost-item`)
+
+Spec: [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) § My cards and hub presentation. Depends on resolver child list + reconcile (same doc § Implementation sequence steps 12–13).
+
 ---
 
 ## Regression

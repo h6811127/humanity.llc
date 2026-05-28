@@ -67,6 +67,7 @@ Optional but high-leverage for v1.1 or a strong private alpha:
 | `POST /.well-known/hc/v1/cards/{profile_id}/revoke` | POST | Owner/recovery signature | Revokes card or QR credential. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/update` | POST | Owner/recovery signature | Updates `manifesto_line` and signed card document; handle and keys immutable. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/objects` | POST | Owner/recovery signature | Creates a child object under the root card. |
+| `GET /.well-known/hc/v1/cards/{profile_id}/objects` | GET | None | Returns read-only list of child objects under the root (public fields + active child-object `qr_id` when issued). No scan analytics. Steward UI reconciles device index from this route. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/objects/{object_id}/update` | POST | Owner/recovery signature | Updates child object public fields without a separate child key. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/objects/{object_id}/revoke` | POST | Owner/recovery signature | Disables a child object; root remains active. |
 | `POST /.well-known/hc/v1/cards/{profile_id}/objects/{object_id}/issue-qr` | POST | Owner/recovery signature | Issues one active child-object QR credential for the object. |

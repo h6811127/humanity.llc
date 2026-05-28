@@ -109,6 +109,115 @@ Status plates and lost-item relays currently use full card templates in the crea
 
 ---
 
+## Product UX maturity (May 2026)
+
+**Protocol and resolver:** Shipped and aligned with this doc — parent-signed `child_objects` rows, `scope: child_object` QRs, object-first scan HTML, per-object disable/revoke, no operator key custody, no scan analytics.
+
+**Steward shell:** Still a **bridge**. The network knows the tree; the device UI often does not yet *feel* like one tree. That mismatch is the main source of “this feels weird” feedback — not a surveillance or trust-model regression.
+
+| Layer | Maturity | Notes |
+|-------|----------|--------|
+| Trust / anti-surveillance | **Strong** | Same data-minimization posture; children inherit root control, not human verification |
+| Protocol simplicity | **Strong** | One root key; no child private keys by default |
+| Steward UX simplicity | **Partial** | Dual create paths, register-then-issue-QR ceremony, objects hidden in `/created/` Live panels |
+| Cross-context robustness | **Partial** | Device index is local-only; no server list API for children yet |
+
+### Bridge vs target (steward-facing)
+
+| Question | Flat pilot (`/create/?template=…`) | Child object (`/created/` → Add … under root) |
+|----------|--------------------------------------|--------------------------------------------------|
+| What gets a `profile_id`? | The plate/relay **is** the root card | Only the **general root**; children get `object_id` |
+| Private keys | New owner + recovery keypair | Reuses root keys |
+| First QR | Immediate at create | Register object, then **Issue scan link** |
+| Where it appears on device | **My cards** (`hc_wallet` row) | **`localStorage` child index only** — not hub rows yet |
+| Human trust on scan | Root card’s verification | Root relationship (“Controlled by @handle”); trust stays on root |
+
+**Product direction:** Converge new stewards on **general root first → add objects**. Keep flat pilots valid for strangers and legacy plates; do not mint a new keyed root for every door or tag when a general root already exists.
+
+### What “feels simple” when done
+
+1. **One visible tree** — root row in **My cards**, children nested underneath (not separate saved cards with keys).
+2. **One create story** — `/create/` emphasizes general Humanity Card; status plate / lost item are **Add object** actions, not parallel card types (flat templates remain as compatibility).
+3. **Network-backed list** — opening `/created/` or hub refreshes child rows from resolver truth, not only from a device-only index.
+4. **Shorter QR path** — register + issue first scan credential in one flow where possible.
+5. **Backup seatbelt** — harder to skip encrypted backup / recovery before N child objects or print checkout (copy exists; hard gate still tightening).
+
+---
+
+## Device storage (same phone, PWA, other devices)
+
+Child object **truth** lives on the resolver (D1). Child object **lists in the UI** today come from a device-only index:
+
+| Key | Storage | Scope | Contents |
+|-----|---------|--------|----------|
+| `hc_child_objects_v1:{profile_id}` | `localStorage` | Per origin, per root | `{ object_id, object_type, public_label, public_state, scan_url?, status? }[]` |
+| `hc_wallet` | `localStorage` | Per origin | **Root cards only** — saved keys, labels, `profile_id` |
+| `hc_created` | `sessionStorage` | Per tab | Active root keys for signing |
+
+**Shipped (first slice):** read-only `GET /.well-known/hc/v1/cards/{profile_id}/objects` returns public child rows + `active_qr_id`. `/created/` Live panels fetch this on refresh and rewrite `hc_child_objects_v1:{profile_id}` from network truth (offline: keep last local index). Hub nested rows (step 13) still pending.
+
+### Same iPhone — what to expect
+
+| Scenario | Child list in UI | Scans / network |
+|----------|------------------|-----------------|
+| Same Safari tab, reload `/created/` | Persists | Works |
+| Second Safari tab on same phone | **Same** `localStorage` — list persists | Works |
+| Safari tab + **Add to Home Screen** PWA | **Same origin storage** as Safari (not extra quota) — see [`PWA_INSTALL.md`](PWA_INSTALL.md) | Works |
+| Clear website data / private mode | Index **gone** on device; keys may be gone too | Network still has objects; re-manage only with keys + object ids |
+| Export backup on phone A, import on phone B | Index on B empty until fetch/reconcile ships | Network truth unchanged |
+
+**Clarification:** “Weirdness on a second device” meant **another browser or another physical device** (laptop, second phone, Chrome vs Safari), or **after clearing site data** — not “opening a second tab on the same iPhone.” Tabs on one phone share `localStorage` for `humanity.llc`.
+
+### PWA / home screen — extra storage?
+
+**No.** Install adds a home-screen launcher and standalone chrome; it does **not** allocate a separate storage bucket or larger quota. PWA and in-browser Safari on iOS share the same origin (`localStorage` ~5–10 MB total for the site). v1 intentionally ships **without** a service worker cache for shell JS ([`PWA_INSTALL.md`](PWA_INSTALL.md) § No service worker).
+
+Future options (same privacy posture, not shipped):
+
+- **Resolver list + reconcile (shipped, first slice)** — read-only `GET /.well-known/hc/v1/cards/{profile_id}/objects` rebuilds the device index from network truth. **This is the right fix; it is not “more PWA storage.”** PWA install does not enlarge the quota bucket — see above.
+- **`IndexedDB` child index** — only if row count or metadata exceeds comfortable `localStorage` JSON size; still same origin quota, not “PWA bonus space.”
+
+---
+
+## My cards and hub presentation (target)
+
+**Should child objects appear in My cards?** **Yes — as nested rows under their root, not as peer saved cards.**
+
+Saving a child as its own `hc_wallet` entry would imply a second key, duplicate polling, and false “human card” identity. That violates the one-root-many-objects model ([`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md)).
+
+### Row model (recommended)
+
+```text
+My cards on this device
+├─ @river_studio          Root card · Steward
+│    Reachable · checked 2m ago
+│    [ Open controls ] [ Open scan ↗ ]
+│    ├─ Studio door       Status plate · under this root
+│    │    Open · Thu–Sun until 9 PM · scan link issued
+│    │    [ Update status ] [ Open scan ↗ ]
+│    └─ House keys        Lost item · under this root
+│         [ Update message ] [ Open scan ↗ ]
+```
+
+### Differentiation rules
+
+| Field | Root row | Child row |
+|-------|----------|-----------|
+| **Title** | Custom label or `@handle` | **`public_label`** (object name — “Studio door”, “House keys”) |
+| **Identity line** | `{Object type} · {Registered \| Steward \| …}` | `{Status plate \| Lost item \| Printed item} · under @handle` — **no** separate verification label |
+| **Trust icon** | Green/blue shield when Steward / VH | **None** or neutral object glyph — children do not inherit human trust badges |
+| **Left accent** | `classifyObjectType()` tone | `status-plate`, `lost-item`, or `wearable` per [`object-taxonomy-core.mjs`](../site/js/object-taxonomy-core.mjs) |
+| **Status line** | `Reachable · checked …` from root `GET …/status?q=…` | Object state + optional recency — e.g. `Open · updated 1h ago` or `Scan link not issued` |
+| **Keys / Details** | Owner key preview in **Details** | **No keys** — “Signed with root key when you last opened controls” |
+| **Open controls** | Loads root into `hc_created` → `/created/` | Opens `/created/` on **parent** root, scrolls to object panel (same keys) |
+| **Saved in** | `hc_wallet` | Resolver + `hc_child_objects_v1:{profile_id}` until list API ships |
+
+**Search:** Hub local search should match child `public_label` and type under the parent root ([`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)).
+
+**Anti-surveillance copy:** Child rows use **updated** / **checked** (device poll or your publish action), never **scanned** or **seen by strangers** ([`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md)).
+
+---
+
 ## Public scan copy
 
 Scanners should see the object first and the root relationship second:
@@ -157,5 +266,11 @@ Delegated capabilities must be root-signed, scoped, expiring, revocable, and cle
 8. **Child object scan QR (shipped):** migration `0023_child_object_qr.sql`; `scope: child_object` + `object_id` on `qr_credentials`; `POST …/objects/{object_id}/issue-qr`; `/created/` **Issue scan link**; scan page shows object label/state from `child_objects` row (status plates use manifesto display). Tests: `issue-child-object-qr.test.ts` · `scan-context.test.ts`. **Production:** apply `0023` before deploy that selects `object_id` — [`SCAN_WORKER_1101_POSTMORTEM.md`](SCAN_WORKER_1101_POSTMORTEM.md); rollout scan smoke in `hosted-rollout-scan-smoke.mjs`.
 9. **Child object disable UI (shipped):** `/created/` Live → **Disable this plate** on registered status plates; signs `POST …/objects/{object_id}/revoke`; local index marks `status: disabled`; scan shows **Object unavailable** when child is disabled.
 10. **Lost-item relay child UI (shipped):** `/created/` Live → **Add lost-item relay** for general root cards; register, update return message, issue scan link, disable relay — mirrors status plate flow with `object_type: lost_item_relay` and `[relay]` scan layout via `childObjectManifestoLine()`.
-11. **Delegated capabilities:** add scoped, expiring, root-signed child keys only after real team/event use cases demand them.
+11. **Browser signing fix (shipped):** `hc-sign.mjs` `requireFields()` accepts `parent_profile_id` for `child_object` payloads (create/update/revoke were failing client-side before POST).
+12. **Resolver child list (first slice shipped):** read-only `GET /.well-known/hc/v1/cards/{profile_id}/objects`; `/created/` reconciles `hc_child_objects_v1` from network on Live panel refresh. **Next:** hub nested rows (step 13).
+13. **Hub tree rows (planned):** nested child rows under root in **My cards** / hub per § My cards and hub presentation; no child entries in `hc_wallet`.
+14. **Create flow convergence (planned):** `/create/` nudges general root; status plate / lost item primary path becomes **Add object** on `/created/`; flat templates remain compatibility.
+15. **Register + first QR (planned):** combine object create and first `issue-qr` in one steward action where product copy allows.
+16. **Backup gate (planned):** block or strongly warn before N active child objects without encrypted backup / recovery acknowledged.
+17. **Delegated capabilities:** add scoped, expiring, root-signed child keys only after real team/event use cases demand them.
 

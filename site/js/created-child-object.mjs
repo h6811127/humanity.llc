@@ -3,6 +3,7 @@ import {
   readChildObjectRows,
   updateChildObjectRow,
 } from "./child-object-store-core.mjs";
+import { refreshChildObjectsFromNetwork } from "./child-object-reconcile.mjs";
 import {
   CHILD_OBJECT_STATUS_DISABLED,
   CHILD_OBJECT_TYPE_STATUS_PLATE,
@@ -138,14 +139,15 @@ export function initCreatedChildObject(ctx) {
   const listEl = document.getElementById("child-object-status-plate-list");
   if (!panel || !form) return null;
 
-  function refreshList() {
+  async function refreshList() {
+    await refreshChildObjectsFromNetwork(localStorage, ctx.profileId);
     renderStatusPlateList(ctx.profileId, readChildObjectRows(localStorage, ctx.profileId));
   }
 
   function refreshVisibility() {
     const show = shouldOfferAddStatusPlate(ctx.getSession());
     panel.hidden = !show;
-    if (show) refreshList();
+    if (show) void refreshList();
   }
 
   refreshVisibility();

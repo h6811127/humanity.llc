@@ -25,6 +25,7 @@ import {
 import { handlePostRevoke } from "./resolver/revoke";
 import { handlePostCardUpdate } from "./resolver/update-card";
 import {
+  handleGetChildObjects,
   handlePostChildObjectCreate,
   handlePostChildObjectRevoke,
   handlePostChildObjectUpdate,
@@ -501,6 +502,16 @@ export default {
     const childObjectCreateMatch = path.match(
       /^\/\.well-known\/hc\/v1\/cards\/([^/]+)\/objects$/
     );
+    if (childObjectCreateMatch && request.method === "GET") {
+      if (!env.DB) {
+        return withCors(
+          request,
+          jsonResponse({ error: "database_unconfigured" }, 503)
+        );
+      }
+      const res = await handleGetChildObjects(env.DB, childObjectCreateMatch[1]!);
+      return withCors(request, res);
+    }
     if (childObjectCreateMatch && request.method === "POST") {
       if (!env.DB) {
         return withCors(

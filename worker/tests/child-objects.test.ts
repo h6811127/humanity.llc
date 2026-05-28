@@ -10,6 +10,7 @@ import {
 } from "../src/crypto";
 import type { ChildObjectStatus } from "../src/db/types";
 import {
+  handleGetChildObjects,
   handlePostChildObjectCreate,
   handlePostChildObjectRevoke,
   handlePostChildObjectUpdate,
@@ -44,6 +45,7 @@ class ChildObjectDb {
     status: "active",
   };
   objects = new Map<string, StoredObject>();
+  activeQrs: Array<{ qr_id: string; object_id: string; profile_id: string }> = [];
 
   prepare(sql: string) {
     const db = this;
@@ -52,10 +54,29 @@ class ChildObjectDb {
         return {
           async first<T>() {
             if (sql.includes("FROM cards")) return db.parent as T;
-            if (sql.includes("FROM child_objects")) {
+            if (sql.includes("FROM child_objects WHERE object_id")) {
               return (db.objects.get(String(args[0])) ?? null) as T | null;
             }
             return null as T | null;
+          },
+          async all<T>() {
+            if (sql.includes("FROM child_objects") && sql.includes("parent_profile_id")) {
+              const parentId = String(args[0]);
+              const rows = Array.from(db.objects.values())
+                .filter((row) => row.parent_profile_id === parentId)
+                .sort(
+                  (a, b) =>
+                    a.created_at.localeCompare(b.created_at) ||
+                    a.object_id.localeCompare(b.object_id)
+                );
+              return { results: rows as T[] };
+            }
+            if (sql.includes("FROM qr_credentials") && sql.includes("scope = 'child_object'")) {
+              const profileId = String(args[0]);
+              const rows = db.activeQrs.filter((row) => row.profile_id === profileId);
+              return { results: rows as T[] };
+            }
+            return { results: [] as T[] };
           },
           async run() {
             if (sql.startsWith("INSERT INTO child_objects")) {
@@ -217,6 +238,59 @@ describe("child object endpoints", () => {
     );
 
     expect(res.status).toBe(401);
+  });
+
+  it("lists child objects for a parent profile with active qr ids", async () => {
+    const keys = await getTestKeypair();
+    const db = new ChildObjectDb();
+    db.parent.public_key = keys.publicKeyBase58;
+    const created = await signedChildObject(keys);
+    await handlePostChildObjectCreate(
+      requestFor(`/.well-known/hc/v1/cards/${PROFILE}/objects`, created),
+      db as unknown as D1Database,
+      PROFILE
+    );
+    db.activeQrs.push({
+      qr_id: "qr_child_plate_01",
+      object_id: OBJECT_ID,
+      profile_id: PROFILE,
+    });
+
+    const res = await handleGetChildObjects(db as unknown as D1Database, PROFILE);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      profile_id: string;
+      objects: Array<{ object_id: string; active_qr_id: string | null; public_state: string }>;
+    };
+    expect(body.profile_id).toBe(PROFILE);
+    expect(body.objects).toHaveLength(1);
+    expect(body.objects[0]).toMatchObject({
+      object_id: OBJECT_ID,
+      active_qr_id: "qr_child_plate_01",
+      public_state: "Open",
+    });
+  });
+
+  it("returns 404 when parent card is missing", async () => {
+    const db = {
+      prepare(sql: string) {
+        return {
+          bind() {
+            return {
+              async first<T>() {
+                if (sql.includes("FROM cards")) return null as T | null;
+                return null as T | null;
+              },
+              async all<T>() {
+                return { results: [] as T[] };
+              },
+            };
+          },
+        };
+      },
+    };
+    const res = await handleGetChildObjects(db as unknown as D1Database, PROFILE);
+    expect(res.status).toBe(404);
   });
 });
 

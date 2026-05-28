@@ -45,6 +45,23 @@ export async function getChildObject(
     .first<ChildObjectRow>();
 }
 
+export async function listChildObjectsForParent(
+  db: D1Database,
+  parentProfileId: string
+): Promise<ChildObjectRow[]> {
+  const result = await db
+    .prepare(
+      `SELECT object_id, parent_profile_id, object_type, public_label, public_state,
+              status, child_object_document_json, created_at, updated_at
+       FROM child_objects
+       WHERE parent_profile_id = ?
+       ORDER BY created_at ASC, object_id ASC`
+    )
+    .bind(parentProfileId)
+    .all<ChildObjectRow>();
+  return result.results ?? [];
+}
+
 export async function insertChildObject(
   db: D1Database,
   input: ChildObjectWrite

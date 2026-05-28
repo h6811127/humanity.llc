@@ -73,10 +73,11 @@ Per **device**, storage:
 | Storage | Contents | Lifetime |
 |---------|----------|----------|
 | **`hc_created`** (session) | Active root card’s keys + metadata for **this tab** | Until tab closes / you clear site data |
-| **`hc_wallet`** (local) | Zero or more **saved root cards** with keys (labels, `profile_id`, …); child metadata may be displayed later without new keys | Until you remove or clear site data |
+| **`hc_wallet`** (local) | Zero or more **saved root cards** with keys (labels, `profile_id`, …) | Until you remove or clear site data |
+| **`hc_child_objects_v1:{profile_id}`** (local) | Device index of child objects under that root (labels, state, scan URL metadata) — reconciled from `GET …/objects` on `/created/` refresh | Until you remove or clear site data; network is source of truth |
 | **`hc_wallet_network_cache`** (session) | Cached resolver status + **verification label** per saved root/card row; `at` = when **this device** last polled `GET …/status?q=…` (used for **checked … ago** on hub rows - not scan logging) | ~5 minutes |
 
-**No sync between devices.** Chrome and iPhone are separate wallets unless you **export/import** a backup (`.hcbackup.json`) or create/save again on each device.
+**No sync between devices.** Chrome and iPhone are separate wallets unless you **export/import** a backup (`.hcbackup.json`) or create/save again on each device. **Same iPhone:** Safari tabs and the installed home-screen PWA share one origin’s `localStorage` (including `hc_wallet` and `hc_child_objects_v1:*`); they do **not** get a second storage quota. Child object lists are device-local until a resolver list + reconcile API ships — clearing site data on the phone removes the index even though the network still holds the objects.
 
 ---
 
@@ -120,7 +121,7 @@ Per **device**, storage:
 | Surface | What you see |
 |---------|----------------|
 | **`/created/` → On the network** | Row title = label (e.g. **Steward**). Icon: **green shield** for Steward, trust-blue shield for Vouched Human, purple people if vouches in progress, blue people for Registered. |
-| **`/wallet/` saved card row** | **Title** (label or `@handle`); **identity line** (`Object type · Steward / Vouched Human / Registered`); **one status line** (e.g. **Reachable · checked 2m ago**, **QR revoked**, **Disabled on network**). Today rows are root/card rows; target child rows inherit root control without extra keys. Technical fields in collapsed **Details**. See [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md). |
+| **`/wallet/` saved card row** | **Title** (label or `@handle`); **identity line** (`Object type · Steward / Vouched Human / Registered`); **one status line** (e.g. **Reachable · checked 2m ago**, **QR revoked**, **Disabled on network**). **Target:** nested child rows under the root (object title, `Status plate · under @handle`, no trust shield) — see [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) § My cards and hub presentation. Today hub rows are root-only; child objects live in `/created/` Live panels + `hc_child_objects_v1`. Technical fields in collapsed **Details**. See [`HUB_CARD_ROW_UX.md`](HUB_CARD_ROW_UX.md). |
 | **Scan page → Human trust** | **Scanned root card’s** label (not yours). Child objects may show the root relationship, but human trust stays on the root. Steward = green shield. |
 | **Scan page → Page chrome dot** | **Planned:** **Your device** at a glance (static brand for strangers). Spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md). Hero strip remains **object** state. |
 | **Scan page → Vouch** | **Your** ability to sign. If keys missing: explains network vs keys; if saved Steward exists, names the card. |

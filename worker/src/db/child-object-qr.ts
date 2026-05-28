@@ -19,6 +19,21 @@ export async function getActiveChildObjectQr(
     .first<ActiveChildObjectQrRow>();
 }
 
+export async function listActiveChildObjectQrsForParent(
+  db: D1Database,
+  profileId: string
+): Promise<ActiveChildObjectQrRow[]> {
+  const result = await db
+    .prepare(
+      `SELECT qr_id, object_id FROM qr_credentials
+       WHERE profile_id = ? AND scope = 'child_object' AND status = 'active'
+         AND object_id IS NOT NULL`
+    )
+    .bind(profileId)
+    .all<ActiveChildObjectQrRow>();
+  return result.results ?? [];
+}
+
 export interface InsertChildObjectQrParams {
   qrId: string;
   profileId: string;

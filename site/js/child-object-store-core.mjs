@@ -48,6 +48,63 @@ export function readChildObjectRows(storage, profileId) {
 }
 
 /**
+ * @param {unknown} entry
+ */
+function isNetworkChildObjectEntry(entry) {
+  if (!entry || typeof entry !== "object") return false;
+  const row = /** @type {Record<string, unknown>} */ (entry);
+  return (
+    typeof row.object_id === "string" &&
+    typeof row.object_type === "string" &&
+    typeof row.public_label === "string" &&
+    typeof row.public_state === "string"
+  );
+}
+
+/**
+ * Build device index rows from resolver list payload (network truth).
+ * @param {string} profileId
+ * @param {unknown[]} networkObjects
+ * @param {(profileId: string, qrId: string) => string} buildScanUrl
+ */
+export function rowsFromNetworkChildObjects(profileId, networkObjects, buildScanUrl) {
+  if (!Array.isArray(networkObjects)) return [];
+  return networkObjects
+    .filter(isNetworkChildObjectEntry)
+    .map((entry) => {
+      const row = /** @type {Record<string, unknown>} */ (entry);
+      /** @type {Record<string, unknown>} */
+      const out = {
+        object_id: row.object_id,
+        object_type: row.object_type,
+        public_label: row.public_label,
+        public_state: row.public_state,
+      };
+      if (typeof row.status === "string") out.status = row.status;
+      if (typeof row.created_at === "string") out.created_at = row.created_at;
+      const qrId =
+        typeof row.active_qr_id === "string" && row.active_qr_id ? row.active_qr_id : null;
+      if (qrId) {
+        out.qr_id = qrId;
+        out.scan_url = buildScanUrl(profileId, qrId);
+      }
+      return out;
+    })
+    .filter(isChildObjectRow);
+}
+
+/**
+ * @param {Pick<Storage, "setItem">} storage
+ * @param {string} profileId
+ * @param {Array<Record<string, unknown>>} rows
+ */
+export function writeChildObjectRows(storage, profileId, rows) {
+  const next = rows.filter(isChildObjectRow);
+  storage.setItem(childObjectsBucketKey(profileId), JSON.stringify(next));
+  return next;
+}
+
+/**
  * @param {Pick<Storage, "getItem" | "setItem">} storage
  * @param {string} profileId
  * @param {Record<string, unknown>} row

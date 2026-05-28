@@ -8,9 +8,11 @@ import {
   getChildObject,
   getChildObjectParent,
   insertChildObject,
+  listChildObjectsForParent,
   updateChildObject,
   type ChildObjectParentRow,
 } from "../db/child-objects";
+import { listActiveChildObjectQrsForParent } from "../db/child-object-qr";
 import type { ChildObjectStatus } from "../db/types";
 import { errorResponse, jsonResponse } from "../http/resolver";
 
@@ -351,5 +353,43 @@ export async function handlePostChildObjectRevoke(
     return errorResponse("RESOLVER_ERROR", msg, 500);
   }
   return responseForObject({ profileId: pathProfileId, ...parsed });
+}
+
+export async function handleGetChildObjects(
+  db: D1Database,
+  pathProfileId: string
+): Promise<Response> {
+  if (!PROFILE_ID_REGEX.test(pathProfileId)) {
+    return errorResponse(CRYPTO_ERROR.INVALID_PROFILE_ID, "Invalid profile_id.", 400);
+  }
+
+  const parent = await getChildObjectParent(db, pathProfileId);
+  if (!parent) {
+    return errorResponse("NOT_FOUND", "Parent card not found.", 404);
+  }
+
+  const [rows, activeQrs] = await Promise.all([
+    listChildObjectsForParent(db, pathProfileId),
+    listActiveChildObjectQrsForParent(db, pathProfileId),
+  ]);
+  const qrByObjectId = new Map(activeQrs.map((row) => [row.object_id, row.qr_id]));
+
+  return jsonResponse(
+    {
+      profile_id: pathProfileId,
+      objects: rows.map((row) => ({
+        object_id: row.object_id,
+        object_type: row.object_type,
+        public_label: row.public_label,
+        public_state: row.public_state,
+        status: row.status,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+        active_qr_id: qrByObjectId.get(row.object_id) ?? null,
+      })),
+    },
+    200,
+    { "Cache-Control": "no-store" }
+  );
 }
 

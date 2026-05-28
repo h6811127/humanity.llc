@@ -29,7 +29,9 @@ Not proof of ownership. Not a phone number printed in plain sight. Item name + r
    - **What should finders see?**  -  return message (e.g. `Lost  -  contact owner through relay`)
 4. Save recovery key on `/created/`, print QR, scan from another phone, revoke when recovered.
 
-**Target model:** From an existing root Humanity Card, choose **Add lost-item relay** on `/created/` Live. The root key signs the relay state; the tag gets its own object/QR lifecycle but no new private key or separate human verification.
+**Target model:** From an existing **general** root Humanity Card, choose **Add lost-item relay under this root** on `/created/` Live. The root key signs the relay state; the tag gets its own object/QR lifecycle but no new private key or separate human verification. Full UX target: [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) § Product UX maturity.
+
+**Same iPhone note:** Same device storage rules as status plates — local child index on `/created/` Live only until hub tree rows ship; PWA install does not add extra storage.
 
 Public showcase scan (homepage pilot): see `site/data/showcase-lost-item.json` - refresh with `npm run site:seed-showcase-lost-item`.
 
