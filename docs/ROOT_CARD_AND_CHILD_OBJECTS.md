@@ -148,7 +148,7 @@ Delegated capabilities must be root-signed, scoped, expiring, revocable, and cle
 ## Implementation sequence
 
 1. **Shared taxonomy (first slice):** centralize QR scope / child-object copy so scan pages describe `print_artifact` as a printed object controlled by a root card.
-2. **Device cache:** carry `scan.qr.scope` into wallet/network cache so hub rows can distinguish root cards from child objects.
+2. **Device cache (shipped):** carry `scan.qr.scope` into wallet/network cache and `hc_wallet_summary` rows so hub rows can distinguish root cards from child objects.
 3. **Backup gating copy (shipped):** make root backup/recovery harder to skip before many child objects, merch checkout, or steward operations.
 4. **Child object endpoints (first slice shipped):** parent-signed create/update/revoke routes and `child_objects` storage.
 5. **Delegated capabilities:** add scoped, expiring, root-signed child keys only after real team/event use cases demand them.

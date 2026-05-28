@@ -9,7 +9,7 @@ import { reconcileRemovedProfilesAfterWalletSave } from "./device-wallet-removed
 
 export const WALLET_STORAGE_KEY = "hc_wallet";
 export const WALLET_SUMMARY_STORAGE_KEY = "hc_wallet_summary";
-const WALLET_SUMMARY_VERSION = 2;
+const WALLET_SUMMARY_VERSION = 3;
 
 /** @type {string | null} */
 let walletCacheRaw = null;
@@ -87,6 +87,7 @@ export function normalizeWalletQrIds(entries) {
  *   handle?: string,
  *   qr_id?: string,
  *   scan_url?: string,
+ *   qr_scope?: string,
  * }} WalletSummaryRow
  */
 
@@ -164,6 +165,7 @@ function buildWalletSummary(entries, walletFingerprint) {
         handle: optionalString(entry.handle),
         qr_id: optionalString(walletEntryQrId(entry)),
         scan_url: optionalString(entry.scan_url),
+        qr_scope: optionalString(entry.qr_scope),
       });
     }
     if (entry.owner_private_key_b58) {

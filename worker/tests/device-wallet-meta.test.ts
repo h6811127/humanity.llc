@@ -12,6 +12,7 @@ import {
   listPollableWalletEntries,
   listWalletDisplayEntries,
   loadWallet,
+  loadWalletSummary,
   resetWalletCachesForTests,
   saveWallet,
   WALLET_STORAGE_KEY,
@@ -164,5 +165,28 @@ describe("device wallet metadata hot paths", () => {
       has_signing_key: true,
     });
     expect(pollable[0]).not.toHaveProperty("owner_private_key_b58");
+  });
+
+  it("loadWalletSummary rows carry qr_scope for collapsed hub object typing", () => {
+    localStore.set(
+      WALLET_STORAGE_KEY,
+      JSON.stringify([
+        {
+          ...entry("root", "profile-root", QR_A, true),
+          qr_scope: "card",
+        },
+        {
+          ...entry("print", "profile-print", QR_B, true),
+          qr_scope: "print_artifact",
+        },
+      ])
+    );
+
+    const summary = loadWalletSummary();
+    expect(summary.rows).toMatchObject([
+      { profile_id: "profile-root", qr_scope: "card" },
+      { profile_id: "profile-print", qr_scope: "print_artifact" },
+    ]);
+    expect(summary.rows[0]).not.toHaveProperty("owner_private_key_b58");
   });
 });
