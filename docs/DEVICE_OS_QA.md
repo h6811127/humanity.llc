@@ -128,7 +128,7 @@ Run on **production** (or staging with full Pages deploy) after `site/` ships. M
 
 **Fail signals:** Laggy landing scroll with hub closed; dot dead; full-page taps blocked (stuck backdrop — use unstick snippet in Safari investigation doc). If W1–W4 fail, consider Phase 3A/3B in that doc (do not ship without triage).
 
-**Automated gate:** device shell E2E in CI (`e2e/device-status-dot.spec.ts`, `device-inbox`, `device-os-wallet`) plus invariant-only WebKit smoke (`e2e/safari-shell-scroll.spec.ts`). **P0-W** sign-off is still manual on real WebKit devices.
+**Automated gate:** device shell E2E in CI (`e2e/device-status-dot.spec.ts`, `device-inbox`, `device-os-wallet`) plus invariant-only WebKit smoke (`e2e/safari-shell-scroll.spec.ts`). **P0-W** sign-off is still manual on real WebKit devices. CI failure triage: [`DEVICE_SHELL_E2E_CI_REMEDIATION.md`](DEVICE_SHELL_E2E_CI_REMEDIATION.md).
 
 ### P1-4 · Hub intro coachmark (first visit)
 

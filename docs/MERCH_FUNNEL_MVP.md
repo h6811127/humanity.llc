@@ -177,7 +177,7 @@ Aggregate metrics only — no PII. Allowed refs:
 | Step | Pass? |
 |------|-------|
 | Stranger scans campaign merch; profile loads with limits + customize CTA | ✅ scan hint · ☐ manual stranger QA |
-| Create card → `/shop/customize/` detects session | ✅ redirect + E2E `e2e/merch-funnel-customize.spec.ts` |
+| Create card → `/shop/customize/` detects session | ☐ auto-redirect on fresh `scan_customize` — [`DEVICE_SHELL_E2E_CI_REMEDIATION.md`](DEVICE_SHELL_E2E_CI_REMEDIATION.md) step 3 · E2E `e2e/merch-funnel-customize.spec.ts` |
 | Preview shows LIVE OBJECT branded QR on product mockup | ✅ UI |
 | Artifact intent created; attach returns Shopify line attributes | ✅ API tests |
 | Checkout URL includes `properties[artifact_intent_id]` | ✅ `shop-customize-core.test.ts` |
