@@ -147,7 +147,7 @@ Commerce never grants vouch. Bearer warning on scan + product copy. [`MERCH_QR_L
 | `hc-hoodie-live-object-v1` | `PERSONALIZE_HOODIE_PRINTIFY_PRODUCT_ID`, `PERSONALIZE_HOODIE_PRINTIFY_VARIANT_ID`, optional `PERSONALIZE_HOODIE_PRINTIFY_SHIPPING_METHOD` |
 | `hc-sticker-square-v1` | `PERSONALIZE_STICKER_PRINTIFY_PRODUCT_ID`, `PERSONALIZE_STICKER_PRINTIFY_VARIANT_ID`, optional `PERSONALIZE_STICKER_PRINTIFY_SHIPPING_METHOD` |
 
-Shared: `PRINTIFY_SUBMIT_ENABLED=1`, `PRINTIFY_API_TOKEN` (secret), `PRINTIFY_SHOP_ID`, `SHOPIFY_WEBHOOK_SECRET` (secret), `FULFILLMENT_PII_ENCRYPTION_KEY` (secret — 32-byte base64; captures Shopify shipping on paid webhook). Optional pre-checkout shipping estimate: `POST /v1/print/quotes` with `{ product_id, destination: { country, zip? } }` — wired on `/shop/customize/`. Operator submits via `POST /v1/print/orders` with `{ commerce_order_id, submit_to_printify: true }` after minting planned QRs — omit `shipping_address` to use encrypted store, or pass it to override. Same path as Tier 0 ([`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md)).
+Shared: `PRINTIFY_SUBMIT_ENABLED=1`, `PRINTIFY_API_TOKEN` (secret), `PRINTIFY_SHOP_ID`, `SHOPIFY_WEBHOOK_SECRET` (secret), `FULFILLMENT_PII_ENCRYPTION_KEY` (secret — 32-byte base64; captures Shopify shipping on paid webhook). Optional pre-checkout shipping estimate: `POST /v1/print/quotes` with `{ product_id, destination: { country, zip? } }` — wired on `/shop/customize/`. Operator submits via `POST /v1/print/orders` with `{ commerce_order_id, submit_to_printify: true }` after minting planned QRs — or pass `submit_to_printify: true` on `POST /v1/print/orders/{id}/mint` to chain both steps. Omit `shipping_address` to use encrypted store, or pass it to override. Same path as Tier 0 ([`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md)).
 
 8. Run [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) gates before live payments.
 9. **Apparel QA:** physical scan test on printed hoodie ([`V1_ASSUMPTION_REGISTER.md`](V1_ASSUMPTION_REGISTER.md) A-004) — runbook [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md); automated regression: `npm run worker:test:merch-print-qa`.
@@ -181,7 +181,7 @@ Aggregate metrics only — no PII. Allowed refs:
 | Preview shows LIVE OBJECT branded QR on product mockup | ✅ UI |
 | Artifact intent created; attach returns Shopify line attributes | ✅ API tests |
 | Checkout URL includes `properties[artifact_intent_id]` | ✅ `shop-customize-core.test.ts` |
-| Paid webhook → print queue → mint planned QRs | ✅ `shopify-orders-webhook` + `merch-funnel-paid-mint-path` · ☐ live Printify submit |
+| Paid webhook → print queue → mint planned QRs | ✅ `shopify-orders-webhook` + `merch-funnel-paid-mint-path` · ✅ mint+submit chain (`submit_to_printify` on mint) · ☐ live Printify submit (operator env) |
 | Paid webhook → Printify queue (operator env) | ✅ queue on paid webhook · Tier 1 template + Printify env mapping |
 | Per-order artwork upload to Printify on submit (PM-FR-13) | ✅ `printify-upload.ts` · `printify-line-items.ts` — requires `PERSONALIZE_*_PRINTIFY_BLUEPRINT_ID` + `PRINT_PROVIDER_ID` |
 | Buyer order status on `/shop/thanks/` (O-003) | ✅ `GET /v1/store/order-status` · email hash lookup · no shipping PII in response |

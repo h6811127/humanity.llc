@@ -2,7 +2,6 @@ import {
   allPlannedQrsMinted,
   mintPrintOrderFromCredentials,
 } from "../commerce/fulfillment-mint";
-import { resolvePrintifyShippingForSubmit } from "../commerce/resolve-printify-shipping";
 import { ensurePrintOrderForCommerceOrder } from "../commerce/fulfillment-queue";
 import type { PrintifyShippingSource } from "../commerce/resolve-printify-shipping";
 import {
@@ -11,13 +10,12 @@ import {
 } from "../db/commerce-orders";
 import {
   getPrintOrderById,
-  updatePrintOrderStatus,
   type PrintOrderRow,
 } from "../db/print-orders";
 import { operatorAuditAuthorized } from "../http/operator-auth";
 import { errorResponse, jsonResponse } from "../http/resolver";
 import type { Env } from "../env";
-import { submitPrintifyOrder } from "./printify-client";
+import { submitPrintOrderToPrintify } from "./print-order-printify-submit";
 
 interface CreatePrintOrderRequest {
   commerce_order_id?: unknown;
@@ -28,6 +26,9 @@ interface CreatePrintOrderRequest {
 
 interface MintPrintOrderRequest {
   qr_credentials?: unknown;
+  submit_to_printify?: unknown;
+  shipping_address?: unknown;
+  quantity?: unknown;
 }
 
 function printOrderTracking(row: PrintOrderRow) {
@@ -110,10 +111,6 @@ export async function handlePostPrintOrders(
   let shippingSource: PrintifyShippingSource | undefined;
 
   if (body.submit_to_printify === true) {
-    if (printOrder.status !== "awaiting_production_approval") {
-      return jsonResponse(printOrderResponse(printOrder), 200);
-    }
-
     const minted = await allPlannedQrsMinted(db, printOrder);
     if (!minted) {
       return errorResponse(
@@ -123,75 +120,15 @@ export async function handlePostPrintOrders(
       );
     }
 
-    const resolvedShipping = await resolvePrintifyShippingForSubmit(
-      env,
-      db,
-      commerceOrderId,
-      body.shipping_address
-    );
-    if (!resolvedShipping) {
-      return errorResponse(
-        "PRINTIFY_SHIPPING_REQUIRED",
-        "submit_to_printify requires shipping_address in the request body, or encrypted shipping captured from the Shopify paid webhook (set FULFILLMENT_PII_ENCRYPTION_KEY).",
-        422
-      );
-    }
-    const shippingAddress = resolvedShipping.address;
-    shippingSource = resolvedShipping.source;
-
-    let quantity = JSON.parse(printOrder.planned_item_qr_ids_json).length;
-    if (quantity < 1) quantity = 1;
-    if (body.quantity !== undefined && body.quantity !== null) {
-      if (typeof body.quantity !== "number" || !Number.isInteger(body.quantity) || body.quantity < 1) {
-        return errorResponse("INVALID_QUANTITY", "quantity must be a positive integer.", 422);
-      }
-      quantity = body.quantity;
-    }
-
-    const submit = await submitPrintifyOrder(env, {
-      print_order_id: printOrder.order_id,
-      template_id: printOrder.template_id,
-      profile_id: printOrder.profile_id,
-      planned_item_qr_ids: JSON.parse(printOrder.planned_item_qr_ids_json) as string[],
-      shipping_address: shippingAddress,
-      quantity,
-      scan_origin: new URL(request.url).origin,
+    const submitResult = await submitPrintOrderToPrintify(request, env, db, printOrder, {
+      shipping_address: body.shipping_address,
+      quantity: body.quantity,
     });
-
-    if (!submit.ok) {
-      const status =
-        submit.code === "PRINTIFY_RATE_LIMITED"
-          ? 429
-          : submit.code === "PRINTIFY_INVALID_ADDRESS" ||
-              submit.code === "PRINTIFY_TEMPLATE_UNCONFIGURED" ||
-              submit.code === "PRINTIFY_ARTWORK_UNCONFIGURED" ||
-              submit.code === "PRINTIFY_ARTWORK_GENERATION_FAILED" ||
-              submit.code === "PRINTIFY_PLANNED_QRS_REQUIRED" ||
-              submit.code === "PRINTIFY_UPLOAD_FAILED" ||
-              submit.code === "PRINTIFY_PRODUCT_CREATE_FAILED"
-            ? 422
-            : submit.code === "PRINTIFY_SUBMIT_DEFERRED" ||
-                submit.code === "PRINTIFY_UNCONFIGURED"
-              ? 503
-              : 502;
-      return errorResponse(submit.code, submit.message, status);
+    if (!submitResult.ok) {
+      return errorResponse(submitResult.code, submitResult.message, submitResult.httpStatus);
     }
-
-    await updatePrintOrderStatus(
-      db,
-      printOrder.order_id,
-      "submitted",
-      nowIso,
-      submit.printify_order_id,
-      submit.printify_shop_id
-    );
-    printOrder = {
-      ...printOrder,
-      status: "submitted",
-      printify_order_id: submit.printify_order_id,
-      printify_shop_id: submit.printify_shop_id,
-      updated_at: nowIso,
-    };
+    printOrder = submitResult.printOrder;
+    shippingSource = submitResult.shippingSource;
   }
 
   return jsonResponse(
@@ -275,6 +212,42 @@ export async function handlePostPrintOrderMint(
     return errorResponse(result.code, result.message, result.httpStatus);
   }
 
+  let printOrderAfterMint = printOrder;
+  let shippingSource: PrintifyShippingSource | undefined;
+  let printifySubmit: Record<string, unknown> | undefined;
+
+  if (body.submit_to_printify === true) {
+    if (!result.all_planned_minted) {
+      return errorResponse(
+        "PLANNED_QRS_NOT_MINTED",
+        "All planned print_artifact QRs must be minted before Printify submit.",
+        409
+      );
+    }
+
+    const submitResult = await submitPrintOrderToPrintify(
+      request,
+      env,
+      db,
+      printOrder,
+      {
+        shipping_address: body.shipping_address,
+        quantity: body.quantity,
+      }
+    );
+    if (!submitResult.ok) {
+      return errorResponse(submitResult.code, submitResult.message, submitResult.httpStatus);
+    }
+    printOrderAfterMint = submitResult.printOrder;
+    shippingSource = submitResult.shippingSource;
+    printifySubmit = {
+      status: submitResult.printOrder.status,
+      printify_order_id: submitResult.printOrder.printify_order_id,
+      skipped: submitResult.skipped ?? false,
+      ...(shippingSource ? { shipping_source: shippingSource } : {}),
+    };
+  }
+
   const status = result.all_planned_minted ? 200 : 422;
   return jsonResponse(
     {
@@ -287,6 +260,10 @@ export async function handlePostPrintOrderMint(
       })),
       failures: result.failures,
       all_planned_minted: result.all_planned_minted,
+      ...(printifySubmit ? { printify_submit: printifySubmit } : {}),
+      ...(printOrderAfterMint.status !== printOrder.status
+        ? { print_order_status: printOrderAfterMint.status }
+        : {}),
     },
     status
   );
