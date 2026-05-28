@@ -2,6 +2,11 @@
  * Table names and schema readiness checks for D1 (M1.2).
  */
 
+import {
+  QR_CREDENTIALS_MIGRATION_0023_COLUMNS,
+  tableColumnNamesReady,
+} from "./schema-core";
+
 export const TABLES = {
   cards: "cards",
   qr_credentials: "qr_credentials",
@@ -16,10 +21,7 @@ export const REQUIRED_TABLES = Object.values(TABLES);
 
 const REQUIRED_TABLES_SQL = REQUIRED_TABLES.map(() => "?").join(", ");
 
-/**
- * Verifies M1.2 migrations have been applied (all four tables exist).
- */
-export async function schemaReady(db: D1Database): Promise<boolean> {
+async function tablesReady(db: D1Database): Promise<boolean> {
   const row = await db
     .prepare(
       `SELECT COUNT(*) AS n FROM sqlite_master
@@ -29,4 +31,17 @@ export async function schemaReady(db: D1Database): Promise<boolean> {
     .first<{ n: number }>();
 
   return row?.n === REQUIRED_TABLES.length;
+}
+
+async function qrCredentialsHasObjectIdColumn(db: D1Database): Promise<boolean> {
+  const result = await db.prepare("PRAGMA table_info(qr_credentials)").all<{ name?: string }>();
+  return tableColumnNamesReady(result.results ?? [], QR_CREDENTIALS_MIGRATION_0023_COLUMNS);
+}
+
+/**
+ * Verifies M1.2 migrations and 0023 child-object QR column are applied.
+ */
+export async function schemaReady(db: D1Database): Promise<boolean> {
+  if (!(await tablesReady(db))) return false;
+  return qrCredentialsHasObjectIdColumn(db);
 }

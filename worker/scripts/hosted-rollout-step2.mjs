@@ -19,6 +19,8 @@ import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { smokeProductionScanPage } from "./hosted-rollout-scan-smoke.mjs";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
 const wranglerToml = path.join(repoRoot, "worker/wrangler.toml");
@@ -154,6 +156,7 @@ async function smokeHostedStewardGated() {
 
 async function smokeProduction() {
   await smokeProductionHealth();
+  await smokeProductionScanPage(apiOrigin);
   await smokeHostedStewardGated();
 }
 

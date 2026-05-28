@@ -3,7 +3,7 @@
  *
  * Per HOSTED_TIER_IMPLEMENTATION_EPICS.md § Production rollout (after G0):
  *   1. verify:hosted-g0 (G0 readiness — before / during rollout)
- *   2. Apply 0012_steward_hosted.sql + 0013_steward_billing.sql
+ *   2. Apply all pending D1 migrations (0012/0013 hosted + 0022/0023 child objects)
  *
  * Usage:
  *   npm run hosted:rollout:step1              # G0 tests + local D1 apply (dry-run prod SQL)
@@ -53,6 +53,9 @@ function assertMigrationFiles() {
     }
   }
   console.log(`Hosted migration files present: ${HOSTED_MIGRATIONS.join(", ")}`);
+  console.log(
+    "Full queue (incl. 0022/0023) via worker:migrate:* — docs/SCAN_WORKER_1101_POSTMORTEM.md"
+  );
 }
 
 function main() {

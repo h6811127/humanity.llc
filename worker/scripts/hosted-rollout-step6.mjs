@@ -6,9 +6,9 @@
  *
  * Usage:
  *   npm run hosted:rollout:step6
- *   npm run hosted:rollout:step6 -- --preflight   # local Vitest gate before full regression
+ *   npm run hosted:rollout:step6 -- --preflight   # rollout unit tests + verify:hosted-g0 (no Playwright)
  *   npm run hosted:rollout:step6 -- --verify       # vitest + e2e (full step 6)
- *   npm run hosted:rollout:step6 -- --vitest       # step 6a only (first)
+ *   npm run hosted:rollout:step6 -- --vitest       # step 6a only (verify:hosted-g0)
  *   npm run hosted:rollout:step6 -- --e2e          # step 6b only
  *
  * @see docs/HOSTED_TIER_G0_READINESS.md § Verification commands
@@ -42,19 +42,17 @@ function runNpm(label, args) {
 }
 
 export function runStep6PreflightVitest() {
-  runNpm("Rollout step 6 Vitest", [
+  runNpm("Step 6 rollout unit tests (preflight)", [
     "run",
     "worker:test",
     "--",
     "worker/tests/hosted-rollout-step6.test.ts",
-  ]);
-  runNpm("Rollout chain Vitest (steps 4b–5b)", [
-    "run",
-    "worker:test",
-    "--",
     "worker/tests/hosted-rollout-post-deploy-smoke.test.ts",
-    "worker/tests/hosted-rollout-step4b.test.ts",
     "worker/tests/hosted-rollout-step5b.test.ts",
+    "worker/tests/hosted-rollout-step4b.test.ts",
+    "worker/tests/hosted-rollout-scan-smoke.test.ts",
+    "worker/tests/schema-ready.test.ts",
+    "worker/tests/apply-child-object-qr-schema.test.ts",
   ]);
 }
 
@@ -64,13 +62,13 @@ export function runStep6VitestRegression() {
 
 function printRegressionChecklist() {
   console.log("Step 6 — Final regression before steward announcement\n");
-  console.log("Prerequisites: steps 4b + 5b production verify passed.\n");
-  console.log("Engineering preflight (local):");
+  console.log("Prerequisites: steps 4b–5b production verify passed.\n");
+  console.log("Engineering preflight (local, no Playwright):");
   console.log("   npm run hosted:rollout:step6 -- --preflight\n");
-  console.log("Step 6a — Vitest regression (free-tier + hosted bundles):");
-  console.log("   npm run hosted:rollout:step6 -- --vitest");
-  console.log("   (= verify:hosted-g0)\n");
-  console.log("Step 6b — Playwright hosted E2E:");
+  console.log("Step 6a — Vitest regression (free-tier + hosted bundles)\n");
+  console.log("   npm run verify:hosted-g0");
+  console.log("   (= worker:test:hosted-free-tier + worker:test:steward-hosted)\n");
+  console.log("Step 6b — Playwright hosted E2E\n");
   console.log("   npm run e2e:install   # once per machine");
   console.log("   npm run hosted:rollout:step6 -- --e2e");
   console.log("   (= e2e:hosted-tier + e2e:hosted-tier-push)\n");
@@ -80,13 +78,14 @@ function printRegressionChecklist() {
 }
 
 function runPreflight() {
-  console.log("Step 6 preflight — local gate before full regression\n");
+  console.log("Step 6 preflight — local gate before Playwright regression\n");
   runStep6PreflightVitest();
   runStep6VitestRegression();
   console.log("\n✅ Step 6 preflight OK.");
-  console.log("Run full regression before steward announcement:");
-  console.log("  npm run hosted:rollout:step6 -- --verify");
-  console.log("  npm run hosted:rollout:step6 -- --e2e   # Playwright only");
+  console.log("Next (Playwright, before steward announcement):");
+  console.log("  npm run e2e:install   # once per machine");
+  console.log("  npm run hosted:rollout:step6 -- --e2e");
+  console.log("  npm run hosted:rollout:step6 -- --verify   # preflight + e2e");
 }
 
 function main() {
@@ -100,6 +99,11 @@ function main() {
 
   if (!verify && !vitestOnly && !e2eOnly) {
     printRegressionChecklist();
+    console.log("⏭  Run full regression before announcing hosted steward to customers:");
+    console.log("   npm run hosted:rollout:step6 -- --preflight");
+    console.log("   npm run hosted:rollout:step6 -- --verify");
+    console.log("   npm run hosted:rollout:step6 -- --vitest   # step 6a only");
+    console.log("   npm run hosted:rollout:step6 -- --e2e      # step 6b only");
     return;
   }
 

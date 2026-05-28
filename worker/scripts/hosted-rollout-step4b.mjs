@@ -63,9 +63,8 @@ function printStep4bChecklist() {
   console.log("Production:");
   console.log("   npm run hosted:rollout:step4b -- --deploy");
   console.log("   npm run hosted:rollout:step4b -- --smoke");
-  console.log(
-    "   OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run hosted:rollout:step4b -- --verify\n"
-  );
+  console.log("   export OPERATOR_AUDIT_TOKEN='your-token-from-wrangler'");
+  console.log("   npm run hosted:rollout:step4b -- --verify\n");
   console.log("Next after 4b: step 5a CF dashboard · step 5b CI · step 6 regression.");
 }
 

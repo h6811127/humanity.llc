@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 const repoRoot = join(import.meta.dirname, "../..");
 
 describe("hosted-rollout-step6", () => {
-  it("rollout script documents Vitest and E2E regression", () => {
+  it("rollout script documents Vitest, preflight, and E2E regression", () => {
     const script = readFileSync(
       join(repoRoot, "worker/scripts/hosted-rollout-step6.mjs"),
       "utf8"
@@ -15,6 +15,9 @@ describe("hosted-rollout-step6", () => {
     expect(script).toContain("HOSTED_TIER_G0_READINESS.md");
     expect(script).toContain("--preflight");
     expect(script).toContain("runStep6PreflightVitest");
+    expect(script).toContain("hosted-rollout-post-deploy-smoke.test.ts");
+    expect(script).toContain("hosted-rollout-scan-smoke.test.ts");
+    expect(script).toContain("schema-ready.test.ts");
   });
 
   it("package.json exposes hosted:rollout:step6", () => {
