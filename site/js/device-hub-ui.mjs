@@ -32,7 +32,11 @@ import {
 } from "./device-keys.mjs";
 import { loadPins, pinHaystack } from "./device-pins.mjs";
 import {
+  findWalletEntryById,
+  findWalletEntryByProfileId,
+  forEachWalletEntry,
   getWalletCount,
+  listWalletDisplayEntries,
   loadWallet,
   normalizeWalletQrIds,
   saveWallet,
@@ -221,7 +225,7 @@ function bumpWalletNetworkApplyGen() {
 }
 
 function restoreHubCardSearchable(li, profileId) {
-  const entry = loadWallet().find((e) => e.profile_id === profileId);
+  const entry = findWalletEntryByProfileId(profileId);
   if (entry) {
     li.dataset.hubSearchable = walletHaystack(entry);
     return;
@@ -244,7 +248,7 @@ function setRevokedSinceVisitAlertVisible(li, profileId, show) {
   }
   if (show) {
     const base = li.dataset.hubSearchable || walletHaystack(
-      loadWallet().find((e) => e.profile_id === profileId) || {}
+      findWalletEntryByProfileId(profileId) || {}
     );
     if (!base.includes(CARD_DISABLED_SINCE_VISIT_SEARCH_SNIPPET)) {
       li.dataset.hubSearchable = `${base} ${CARD_DISABLED_SINCE_VISIT_SEARCH_SNIPPET}`.trim();
@@ -361,8 +365,13 @@ function hubCardStatusHtml(profileId, statusOverride, scanKindOverride) {
 function scanUrlForEntry(entry) {
   if (entry.scan_url) return entry.scan_url;
   const base = `${location.origin}/c/${encodeURIComponent(entry.profile_id)}`;
-  const qrId = walletEntryQrId(entry);
+  const qrId = entry.qr_id ?? walletEntryQrId(entry);
   return qrId ? `${base}?q=${encodeURIComponent(qrId)}` : base;
+}
+
+/** @param {Record<string, unknown>} entry Full row or {@link walletEntryPublicView}. */
+function entryHasSigningKeys(entry) {
+  return Boolean(entry.owner_private_key_b58 || entry.has_signing_key);
 }
 
 function hubCardIconHtml(profileId) {
@@ -506,7 +515,7 @@ function applyNetworkChipsToDom(
     }
     const identityEl = li.querySelector(".hub-card-identity");
     if (identityEl) {
-      const entry = loadWallet().find((e) => e.profile_id === pid);
+      const entry = findWalletEntryByProfileId(pid);
       const objectType = entry
         ? classifyObjectType(entry, getCachedNetworkQrScope(pid))
         : { label: "Object", tone: "general" };
@@ -700,17 +709,14 @@ if (typeof window !== "undefined") {
 
 function applyCachedNetworkChipsOnly() {
   if (!savedList) return;
-  const entries = loadWallet();
-  if (entries.length === 0) return;
-  applyNetworkChipsToDom(
-    Object.fromEntries(
-      entries.map((e) => [e.profile_id, getCachedNetworkStatus(e.profile_id) ?? "checking"])
-    ),
-    null,
-    {},
-    null,
-    { allowBannerShow: false }
-  );
+  if (getWalletCount() === 0) return;
+  /** @type {Record<string, string>} */
+  const statusMap = {};
+  forEachWalletEntry((entry) => {
+    if (!entry.profile_id) return;
+    statusMap[entry.profile_id] = getCachedNetworkStatus(entry.profile_id) ?? "checking";
+  });
+  applyNetworkChipsToDom(statusMap, null, {}, null, { allowBannerShow: false });
 }
 
 /**
@@ -885,8 +891,7 @@ async function fetchAndApplyNetworkChips(opts = {}) {
 /** Manual Shortcuts action: one leader check, then broadcast to open tabs. @see docs/DEVICE_TAB_RESOLVER_SYNC.md § Manual refresh */
 export async function refreshResolverChecksFromHub() {
   if (hubConfig.fetchNetworkStatus) {
-    const wallet = loadWallet();
-    if (wallet.length > 0) {
+    if (getWalletCount() > 0) {
       await fetchAndApplyNetworkChips({ manual: true });
     }
   }
@@ -981,7 +986,7 @@ function renderActivityRows() {
  */
 function renderSavedRows(opts = {}) {
   const initialChipChecking = opts.initialChipChecking === true;
-  const entries = loadWallet();
+  const entries = listWalletDisplayEntries();
   if (!savedList || !savedGroup) return;
 
   const labelEl =
@@ -1013,7 +1018,7 @@ function renderSavedRows(opts = {}) {
       (entry.manifesto_line ? inferPilotTemplate(String(entry.manifesto_line)) : "general");
     const cardControls = applyHubControlPlainLabels(
       buildHubCardControls({
-        hasKeys: !!entry.owner_private_key_b58,
+        hasKeys: entryHasSigningKeys(entry),
         pendingLiveProof: !!liveControlPendingForEntry(entry),
         scanKind: hubConfig.fetchNetworkStatus
           ? getCachedNetworkScanKind(entry.profile_id)
@@ -1095,7 +1100,7 @@ function renderSavedRows(opts = {}) {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-id");
       const focus = btn.getAttribute("data-focus");
-      const entry = loadWallet().find((e) => e.id === id);
+      const entry = findWalletEntryById(id);
       if (!entry || !focus) return;
       acknowledgeNetworkSeenForEntry(entry);
       if (focus === "live-proof") {
@@ -1105,7 +1110,7 @@ function renderSavedRows(opts = {}) {
           return;
         }
       }
-      if (!entry.owner_private_key_b58) {
+      if (!entryHasSigningKeys(entry)) {
         window.alert("This saved card has no signing keys on this device.");
         return;
       }
@@ -1122,7 +1127,7 @@ function renderSavedRows(opts = {}) {
   savedList.querySelectorAll(".hub-use-keys").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-id");
-      const entry = loadWallet().find((e) => e.id === id);
+      const entry = findWalletEntryById(id);
       if (!entry) return;
       acknowledgeNetworkSeenForEntry(entry);
       let returnUrl = null;
@@ -1138,7 +1143,7 @@ function renderSavedRows(opts = {}) {
   savedList.querySelectorAll(".hub-open-card").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-id");
-      const entry = loadWallet().find((e) => e.id === id);
+      const entry = findWalletEntryById(id);
       if (!entry) return;
       acknowledgeNetworkSeenForEntry(entry);
       let returnUrl = null;
@@ -1154,7 +1159,7 @@ function renderSavedRows(opts = {}) {
   savedList.querySelectorAll(".hub-sign-lock-pin").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const id = btn.getAttribute("data-id");
-      const entry = loadWallet().find((e) => e.id === id);
+      const entry = findWalletEntryById(id);
       if (!entry?.profile_id) return;
       const first = window.prompt("Choose a 4–32 character PIN for signing on this device:");
       if (first == null) return;
@@ -1180,7 +1185,7 @@ function renderSavedRows(opts = {}) {
   savedList.querySelectorAll(".hub-sign-lock-webauthn").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const id = btn.getAttribute("data-id");
-      const entry = loadWallet().find((e) => e.id === id);
+      const entry = findWalletEntryById(id);
       if (!entry?.profile_id) return;
       const result = await setWebAuthnSignLock(
         entry.profile_id,
@@ -1201,7 +1206,7 @@ function renderSavedRows(opts = {}) {
   savedList.querySelectorAll(".hub-sign-lock-clear").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-id");
-      const entry = loadWallet().find((e) => e.id === id);
+      const entry = findWalletEntryById(id);
       if (!entry?.profile_id) return;
       if (!window.confirm("Remove PIN/device unlock requirement for this card?")) return;
       clearSignLock(entry.profile_id);
@@ -1216,7 +1221,7 @@ function renderSavedRows(opts = {}) {
   savedList.querySelectorAll(".hub-default-vouch").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const id = btn.getAttribute("data-id");
-      const entry = loadWallet().find((e) => e.id === id);
+      const entry = findWalletEntryById(id);
       if (!entry?.profile_id) return;
 
       if (isDefaultVouchProfile(entry.profile_id)) {
@@ -1229,7 +1234,7 @@ function renderSavedRows(opts = {}) {
         return;
       }
 
-      if (!entry.owner_private_key_b58) {
+      if (!entryHasSigningKeys(entry)) {
         window.alert("This saved card has no signing keys on this device.");
         return;
       }
@@ -1269,7 +1274,7 @@ function renderSavedRows(opts = {}) {
   savedList.querySelectorAll(".hub-relabel").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-id");
-      const entry = loadWallet().find((e) => e.id === id);
+      const entry = findWalletEntryById(id);
       if (!entry) return;
       const next = window.prompt("Label for this card", entry.label);
       if (next == null || !next.trim()) return;
@@ -1286,7 +1291,7 @@ function renderSavedRows(opts = {}) {
   savedList.querySelectorAll(".hub-remove").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-id");
-      const entry = loadWallet().find((e) => e.id === id);
+      const entry = findWalletEntryById(id);
       if (!window.confirm("Remove this card from this device? Keys stay in any other tab until you close it.")) {
         return;
       }

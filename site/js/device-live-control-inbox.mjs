@@ -78,7 +78,7 @@ import {
 } from "./device-live-control-poll-scheduler.mjs";
 import {
   findWalletEntryByProfileId,
-  getPollableWalletEntries,
+  listPollableWalletEntries,
   walletEntryQrId,
 } from "./device-wallet.mjs";
 
@@ -466,7 +466,7 @@ export async function refreshLiveControlInbox(opts = {}) {
     }
   }
 
-  const allPollable = getPollableWalletEntries();
+  const allPollable = listPollableWalletEntries();
   const entries = resolvePollEntries(allPollable);
   pruneLiveControlPollSlots(pollSlots, allPollable);
 
@@ -537,7 +537,7 @@ export async function applyLiveProofPendingFromPush(hint) {
   if (!entry || !isPollableWalletEntry(entry)) return pending;
 
   const result = await fetchPendingForEntry(entry, { pushTriggered: true });
-  const allPollable = getPollableWalletEntries();
+  const allPollable = listPollableWalletEntries();
   updateLiveControlPollSlot(pollSlots, entry, result);
   const next = pendingItemsFromPollSlots(allPollable, pollSlots);
   const prevHealth = getLiveControlPollHealth();

@@ -289,10 +289,10 @@ export function getLatestResolvedScanKind(profileId) {
 
 /**
  * Maps for since-visit UI from resolver-confirmed reads this visit only (SSOT).
- * @param {Array<{ profile_id?: string }>} [entries] defaults to {@link loadWallet}
+ * @param {Array<{ profile_id?: string }>} [entries] omit to use truth poll profile ids only
  */
 export function buildResolverConfirmedWalletPollMaps(entries) {
-  return buildSinceVisitPollMapsFromTruth(entries ?? loadWallet());
+  return buildSinceVisitPollMapsFromTruth(entries);
 }
 
 /** @param {string} profileId */
@@ -592,8 +592,7 @@ export function snapshotNetworkSeenOnExit() {
   // DH-4: Only persist baselines from resolver-confirmed reads in this visit.
   if (!hasWalletNetworkTruthPoll()) return;
   const seen = loadLastSeen();
-  for (const entry of loadWallet()) {
-    const pid = entry.profile_id;
+  for (const pid of listWalletNetworkTruthPollProfileIds()) {
     const alertState = getWalletNetworkTruthPollAlertState(pid);
     if (!alertState) continue;
     seen[pid] = String(alertState).toLowerCase();

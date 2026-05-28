@@ -9,6 +9,8 @@ import {
   getWalletEntrySummariesByProfileIds,
   getWalletPollableCount,
   getWalletSigningKeyCount,
+  listPollableWalletEntries,
+  listWalletDisplayEntries,
   loadWallet,
   saveWallet,
   WALLET_STORAGE_KEY,
@@ -120,5 +122,44 @@ describe("device wallet metadata hot paths", () => {
       },
     ]);
     expect(loadWallet()[0].owner_private_key_b58).toBe("private-a");
+  });
+
+  it("listWalletDisplayEntries omits private keys for hub row render", () => {
+    localStore.set(
+      WALLET_STORAGE_KEY,
+      JSON.stringify([
+        entry("a", "profile-hub-a", QR_A, true),
+        entry("b", "profile-hub-b", null, false),
+      ])
+    );
+
+    const rows = listWalletDisplayEntries();
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toMatchObject({
+      id: "a",
+      profile_id: "profile-hub-a",
+      has_signing_key: true,
+    });
+    expect(rows[0]).not.toHaveProperty("owner_private_key_b58");
+    expect(rows[1].has_signing_key).toBe(false);
+  });
+
+  it("listPollableWalletEntries omits private keys", () => {
+    localStore.set(
+      WALLET_STORAGE_KEY,
+      JSON.stringify([
+        entry("a", "profile-poll-a", QR_A, true),
+        entry("b", "profile-poll-b", null, true),
+      ])
+    );
+
+    const pollable = listPollableWalletEntries();
+    expect(pollable).toHaveLength(1);
+    expect(pollable[0]).toMatchObject({
+      profile_id: "profile-poll-a",
+      qr_id: QR_A,
+      has_signing_key: true,
+    });
+    expect(pollable[0]).not.toHaveProperty("owner_private_key_b58");
   });
 });

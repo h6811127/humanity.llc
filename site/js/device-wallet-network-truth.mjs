@@ -147,7 +147,7 @@ export function shouldSuppressCardDisabledSinceVisitFromTruth(profileId) {
  *   resolverConfirmedMap: Record<string, boolean>,
  * } | null}
  */
-export function buildSinceVisitPollMapsFromTruth(entries = []) {
+export function buildSinceVisitPollMapsFromTruth(entries) {
   if (!hasWalletNetworkTruthPoll()) return null;
   /** @type {Record<string, string>} */
   const alertStateMap = {};
@@ -155,8 +155,11 @@ export function buildSinceVisitPollMapsFromTruth(entries = []) {
   const scanKindMap = {};
   /** @type {Record<string, boolean>} */
   const resolverConfirmedMap = {};
-  for (const entry of entries) {
-    const pid = entry.profile_id;
+  const profileIds =
+    entries === undefined
+      ? listWalletNetworkTruthPollProfileIds()
+      : entries.map((entry) => entry.profile_id).filter((pid) => typeof pid === "string" && pid);
+  for (const pid of profileIds) {
     if (!pid || !isWalletNetworkTruthPollConfirmed(pid)) continue;
     const alertState = getWalletNetworkTruthPollAlertState(pid);
     if (alertState == null) continue;
