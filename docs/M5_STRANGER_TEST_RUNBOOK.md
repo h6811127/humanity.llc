@@ -34,7 +34,9 @@ curl -sS "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status?q=QR" | jq
 
 9. **Minimal failure layout** (optional) - revoke card or expire QR; confirm **Card status** + **This QR** groups still appear below the compact panel (human trust hidden).
 
-10. **Live object scan** (recommended) - open a pilot or demo live-object scan URL on phone; confirm within ~30s they can state host trust, live status, what the **message** says, and that holding the sticker does not prove ownership. They should **not** need to reconcile multiple “Active” labels.
+10. **Key custody** — confirm create/created copy says: if you lose this tab without saving on device, a recovery key, or encrypted backup, you cannot revoke from the web UI; humanity.llc cannot recover or revoke for you.
+
+11. **Live object scan** (recommended) - open a pilot or demo live-object scan URL on phone; confirm within ~30s they can state host trust, live status, what the **message** says, and that holding the sticker does not prove ownership. They should **not** need to reconcile multiple “Active” labels.
 
     - Status plate + live object (streams): `npm run site:refresh-showcase` (or individual `site:seed-showcase` scripts)
     - Lost item relay: `site/data/showcase-lost-item.json` - `npm run site:seed-showcase-lost-item`
@@ -67,6 +69,7 @@ curl -sS "https://humanity.llc/.well-known/hc/v1/cards/PROFILE/status?q=QR" | jq
 > 2) What it **does not** prove  
 >  
 > Optional: revoke the QR from the “created” page and scan again.  
+> If you close the tab before saving a recovery key or encrypted backup, you will not be able to revoke from the web UI later.  
 > No account, no app  -  just Safari/Chrome.
 
 Do **not** send the data policy or research page unless they ask.
@@ -75,11 +78,11 @@ Do **not** send the data policy or research page unless they ask.
 
 ## Per-stranger scorecard
 
-| # | Name (optional) | Created unassisted? | Scan understandable &lt;30s? | Live object scan? | One-sentence proves | One-sentence does not prove | Revoked + re-scan OK? | Notes |
-|---|-----------------|--------------------|-----------------------------|-------------------|---------------------|----------------------------|------------------------|-------|
-| 1 | | ☐ | ☐ | ☐ | | | ☐ | |
-| 2 | | | ☐ | ☐ | | | ☐ | |
-| 3 | | | ☐ | ☐ | | | ☐ | |
+| # | Name (optional) | Created unassisted? | Scan understandable &lt;30s? | Live object scan? | One-sentence proves | One-sentence does not prove | Understands lost-tab backup rule? | Revoked + re-scan OK? | Notes |
+|---|-----------------|--------------------|-----------------------------|-------------------|---------------------|----------------------------|----------------------------------|------------------------|-------|
+| 1 | | ☐ | ☐ | ☐ | | | ☐ | ☐ | |
+| 2 | | | ☐ | ☐ | | | ☐ | ☐ | |
+| 3 | | | ☐ | ☐ | | | ☐ | ☐ | |
 
 **Optional (merch, no purchase):** On a **live object** scan with the customize CTA, stranger states that tapping “Customize live object merch” does **not** prove the wearer owns the card and is not required for the trust loop.
 
