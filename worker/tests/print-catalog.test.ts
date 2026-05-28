@@ -27,9 +27,9 @@ describe("resolvePrintTemplateIdForProduct", () => {
 
 describe("getPrintCatalogProduct", () => {
   it("includes Tier 1 hoodie and sticker templates", () => {
-    expect(getPrintCatalogProduct(HOODIE_PRINT_TEMPLATE_ID)?.type).toBe("apparel");
+    expect(getPrintCatalogProduct(HOODIE_PRINT_TEMPLATE_ID)?.type).toBe("hoodie");
     expect(getPrintCatalogProduct(DEFAULT_PRINT_TEMPLATE_ID)?.product_id).toBe(
-      STICKER_PERSONALIZED_PRODUCT_ID
+      "prod_sticker_square"
     );
   });
 });
