@@ -4,6 +4,7 @@
  */
 
 import { bindSameTabCheckoutAnchor } from "./shop-checkout-handoff.mjs";
+import { merchThanksPageUrl } from "./shop-config.mjs";
 import { SHOP_CHECKOUT_READY_LEAD, shopPriceLabelWhenCheckoutClosed } from "./shop-copy-core.mjs";
 import {
   canProceedToCheckout,
@@ -13,6 +14,7 @@ import {
 import {
   isTier0ProductCheckoutOpen,
   tier0ProductById,
+  tier0MerchRefForProductId,
   tier0ProductDisplay,
 } from "./shop-tier0-core.mjs";
 import { TIER0_FOUNDING_STORE_PRODUCT_ID } from "./shop-store-catalog-ids.mjs";
@@ -46,8 +48,13 @@ export function bindTier0ProductCheckout(options) {
     statusEl,
     actionBtn,
     proofConsentEl,
-    checkoutNoteEl,
-  } = options;
+  checkoutNoteEl,
+  afterPurchaseEl = null,
+  thanksLinkEl = null,
+  postPurchaseUrlEl = null,
+  postPurchaseLinkEl = null,
+  postPurchaseCodeEl = null,
+} = options;
 
   if (!shouldUseTier0ProductCheckout(productId)) return;
 
@@ -88,6 +95,23 @@ export function bindTier0ProductCheckout(options) {
     }
     if (proofConsentEl) proofConsentEl.hidden = !open;
     if (checkoutNoteEl) checkoutNoteEl.hidden = !open;
+
+    const thanksUrl = open
+      ? merchThanksPageUrl(
+          config,
+          tier0MerchRefForProductId(productId),
+          typeof location !== "undefined" ? location.origin : ""
+        )
+      : "";
+    if (thanksLinkEl instanceof HTMLAnchorElement) {
+      thanksLinkEl.href = thanksUrl || "/shop/thanks/";
+    }
+    if (postPurchaseLinkEl instanceof HTMLAnchorElement) {
+      postPurchaseLinkEl.href = thanksUrl || "/shop/thanks/";
+    }
+    if (postPurchaseCodeEl) postPurchaseCodeEl.textContent = thanksUrl;
+    if (afterPurchaseEl) afterPurchaseEl.hidden = !open;
+    if (postPurchaseUrlEl) postPurchaseUrlEl.hidden = !open;
 
     if (actionBtn) {
       if (open && checkoutUrl) {

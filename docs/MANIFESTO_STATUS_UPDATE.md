@@ -125,7 +125,12 @@ Deep link: `/created/?profile_id=…&qr_id=…`  -  hydrates handle/manifesto fr
 | Scan explain button + status `scan.ai` when snapshot present | ✅ `ai-explain-snapshot.test.ts` · `object-streams.test.ts` |
 | Draft manifesto API (no product UI) | ✅ `ai-draft-manifesto.test.ts` |
 
-**Owner UX:** **Update status** stays hidden for general cards until first in-session QR or card revoke. Status plate and lost-item relay pilots show it immediately so field testers can update live object copy before revoke (`site/js/created-first-revoke-gate.mjs`; `worker/tests/created-first-revoke-gate.test.ts`).
+**Owner UX:** **Update status** stays hidden for **generic** cards until first in-session QR or card revoke — except:
+
+- **Pilot templates** (`status_plate`, `lost_item_relay`) — immediate unlock for field tests.
+- **Tier 1 merch / ephemeral state** — unlock when the steward started personalized checkout or has `hc_merch_tier1_ephemeral` for their `profile_id` ([`EPHEMERAL_STATE_AND_MERCH.md`](EPHEMERAL_STATE_AND_MERCH.md)).
+
+Implementation: `site/js/created-first-revoke-gate.mjs` · `worker/tests/created-first-revoke-gate.test.ts`.
 
 ---
 

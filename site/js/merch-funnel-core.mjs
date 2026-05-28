@@ -10,6 +10,7 @@ export const MERCH_FUNNEL_BEACON_PREFIX = "hc_merch_beacon_";
 export const ALLOWED_MERCH_REFS = new Set([
   "tier0_sticker",
   "tier0_shop",
+  "tier0_glitch",
   "customize_shop",
   "customize_hoodie",
   "scan_customize",
@@ -21,6 +22,9 @@ export const CUSTOMIZE_HANDOFF_REFS = new Set([
   "customize_shop",
   "customize_hoodie",
 ]);
+
+/** localStorage map profile_id → true for Tier 1 ephemeral-state owners. */
+export const MERCH_TIER1_EPHEMERAL_KEY = "hc_merch_tier1_ephemeral";
 
 const REF_PATTERN = /^[a-z0-9_]{2,32}$/;
 
@@ -88,6 +92,56 @@ export function clearMerchCreateRef() {
 export function shouldHandoffToCustomize(ref) {
   const normalized = normalizeMerchRef(ref);
   return normalized != null && CUSTOMIZE_HANDOFF_REFS.has(normalized);
+}
+
+/**
+ * Tier 1 personalized merch — stewards need manifesto update without revoke-first gate.
+ * @param {unknown} ref
+ * @returns {boolean}
+ */
+export function isTier1MerchRef(ref) {
+  return shouldHandoffToCustomize(ref);
+}
+
+/** Tier 0 Glitch / company drop hoodie (shared campaign QR). */
+export function isTier0GlitchMerchRef(ref) {
+  return normalizeMerchRef(ref) === "tier0_glitch";
+}
+
+/**
+ * @param {string | null | undefined} profileId
+ */
+export function markTier1EphemeralOwner(profileId) {
+  if (!profileId || typeof profileId !== "string") return;
+  try {
+    const all = JSON.parse(localStorage.getItem(MERCH_TIER1_EPHEMERAL_KEY) || "{}");
+    all[profileId] = true;
+    localStorage.setItem(MERCH_TIER1_EPHEMERAL_KEY, JSON.stringify(all));
+  } catch {
+    /* localStorage unavailable */
+  }
+}
+
+/**
+ * @param {string | null | undefined} profileId
+ * @returns {boolean}
+ */
+export function hasTier1EphemeralOwner(profileId) {
+  if (!profileId) return false;
+  try {
+    const all = JSON.parse(localStorage.getItem(MERCH_TIER1_EPHEMERAL_KEY) || "{}");
+    return all[profileId] === true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Active Tier 1 funnel ref in session (customize handoff or create attribution).
+ * @returns {boolean}
+ */
+export function hasActiveTier1MerchRef() {
+  return isTier1MerchRef(peekMerchCustomizeRef());
 }
 
 /**

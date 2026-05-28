@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
   hasFirstRevokeDone,
+  isEphemeralStateUpdateUnlocked,
   isPilotUpdateUnlocked,
   markFirstRevokeDone,
   syncUpdateStatusTaskGate,
@@ -22,11 +23,20 @@ describe("created-first-revoke-gate", () => {
         },
       },
     });
+    Object.defineProperty(globalThis, "localStorage", {
+      configurable: true,
+      value: {
+        getItem: () => null,
+        setItem: () => {},
+      },
+    });
   });
 
   afterEach(() => {
     // @ts-expect-error restore
     delete globalThis.sessionStorage;
+    // @ts-expect-error restore
+    delete globalThis.localStorage;
     // @ts-expect-error restore
     delete globalThis.document;
   });
@@ -87,6 +97,47 @@ describe("created-first-revoke-gate", () => {
     });
 
     syncUpdateStatusTaskGate("profile_a", { pilot_template: "status_plate" });
+    expect(elements["created-live-scanners-see"].hidden).toBe(false);
+    expect(elements["created-scanners-see-gate-hint"].hidden).toBe(true);
+  });
+
+  it("unlocks Tier 1 ephemeral owner from localStorage before revoke", () => {
+    Object.defineProperty(globalThis, "localStorage", {
+      configurable: true,
+      value: {
+        getItem: () => JSON.stringify({ profile_tier1: true }),
+        setItem: () => {},
+      },
+    });
+    expect(
+      isEphemeralStateUpdateUnlocked("profile_tier1", { pilot_template: "general" })
+    ).toBe(true);
+    expect(isEphemeralStateUpdateUnlocked("profile_other", { pilot_template: "general" })).toBe(
+      false
+    );
+  });
+
+  it("unlocks update UI for Tier 1 merch session ref before revoke", () => {
+    Object.defineProperty(globalThis, "sessionStorage", {
+      configurable: true,
+      value: {
+        getItem: (key: string) =>
+          key === "hc_merch_customize_ref" ? "customize_hoodie" : null,
+        setItem: () => {},
+      },
+    });
+    const elements: Record<string, { hidden: boolean }> = {
+      "created-live-scanners-see": { hidden: true },
+      "created-scanners-see-gate-hint": { hidden: false },
+    };
+    Object.defineProperty(globalThis, "document", {
+      configurable: true,
+      value: {
+        getElementById: (id: string) => elements[id] ?? null,
+      },
+    });
+
+    syncUpdateStatusTaskGate("profile_a", { pilot_template: "general" });
     expect(elements["created-live-scanners-see"].hidden).toBe(false);
     expect(elements["created-scanners-see-gate-hint"].hidden).toBe(true);
   });

@@ -1,9 +1,14 @@
 import { inferPilotTemplate } from "./manifesto-display.mjs";
+import {
+  hasActiveTier1MerchRef,
+  hasTier1EphemeralOwner,
+} from "./merch-funnel-core.mjs";
 
 /**
  * Phase A: tuck generic manifesto update until owner has revoked once in-session.
- * Status plate and lost-item pilots need live line edits before revoke field tests.
+ * Pilots and Tier 1 merch owners need live line edits before revoke field tests.
  * @see docs/PHASE_A_STRANGER_PATH_PRIORITIES.md
+ * @see docs/EPHEMERAL_STATE_AND_MERCH.md
  */
 
 const STORAGE_KEY = "hc_created_first_qr_revoke";
@@ -52,13 +57,27 @@ export function isPilotUpdateUnlocked(session) {
 }
 
 /**
+ * Tier 1 merch / live wear — same ink, new meaning without revoke-first gate.
+ * @param {string | null | undefined} profileId
+ * @param {Record<string, unknown> | null | undefined} session
+ */
+export function isEphemeralStateUpdateUnlocked(profileId, session = null) {
+  return (
+    isPilotUpdateUnlocked(session) ||
+    hasActiveTier1MerchRef() ||
+    hasTier1EphemeralOwner(profileId)
+  );
+}
+
+/**
  * @param {string | null | undefined} profileId
  * @param {Record<string, unknown> | null | undefined} session
  */
 export function syncUpdateStatusTaskGate(profileId, session = null) {
   const scannersSee = document.getElementById("created-live-scanners-see");
   const hint = document.getElementById("created-scanners-see-gate-hint");
-  const unlocked = hasFirstRevokeDone(profileId) || isPilotUpdateUnlocked(session);
+  const unlocked =
+    hasFirstRevokeDone(profileId) || isEphemeralStateUpdateUnlocked(profileId, session);
   if (scannersSee) scannersSee.hidden = !unlocked;
   if (hint) hint.hidden = unlocked;
 }

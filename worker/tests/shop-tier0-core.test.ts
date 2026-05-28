@@ -3,11 +3,13 @@ import { describe, expect, it } from "vitest";
 import {
   isTier0StoreProductCheckoutOpen,
   tier0CatalogReadiness,
+  tier0MerchRefForProductId,
   tier0ProductCheckoutReadiness,
   tier0ProductById,
   tier0Products,
   tier0WorkerEnvVarForFulfillment,
 } from "../../site/js/shop-tier0-core.mjs";
+import { TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID } from "../../site/js/shop-store-catalog-ids.mjs";
 
 describe("shop-tier0-core", () => {
   it("reads tier0.products[] entries", () => {
@@ -49,6 +51,11 @@ describe("shop-tier0-core", () => {
     expect(tier0ProductById(config, "tier0_founding_sticker_v1")?.price_display).toBe(
       "$10 + shipping"
     );
+  });
+
+  it("maps Glitch product id to tier0_glitch merch ref", () => {
+    expect(tier0MerchRefForProductId(TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID)).toBe("tier0_glitch");
+    expect(tier0MerchRefForProductId("tier0_founding_sticker_v1")).toBe("tier0_sticker");
   });
 
   it("maps fulfillment mode to Worker env var names", () => {

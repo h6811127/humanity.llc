@@ -17,6 +17,7 @@ Ordered work after repo review. Update row status as steps complete. Cross-links
 | **3** | **Hosted steward production rollout** — `hosted:rollout:step*` through step 6 (secrets, flag, CF dashboard, regression) | Ops | **Nearly complete** — 5a ✅ · 5b preflight ✅ · 6 Vitest + E2E ✅ · 4b prod smoke ✅ · **remaining:** `OPERATOR_AUDIT_TOKEN=… npm run hosted:rollout:step5b -- --verify` |
 | **4** | **AI P1 product decision** — keep / rename / deterministic-only / remove scan reader (no new L3 user features until Phase A) | Product | ☐ |
 | **5** | **Large-wallet shell performance** — bound `hc_wallet_network_cache`, avoid full-wallet parse on hub/inbox hot paths | Engineering debt | **✅ Shipped** — S6–S12 + `hc_wallet_summary` (see `DEVICE_OS_REQUEST_BUDGET.md`) |
+| **6** | **Ephemeral state UX (Tier 1 WEAR)** — unlock owner update without revoke-first gate; Tier 1 `/shop/thanks/` → `/created/#update-status` | Engineering | **✅ Shipped** — [`EPHEMERAL_STATE_AND_MERCH.md`](EPHEMERAL_STATE_AND_MERCH.md) |
 
 **Rule:** Do not start new L3 user-facing AI surfaces until priority **2** passes. Commerce never grants vouch.
 
@@ -166,6 +167,7 @@ Aggregate metrics only — no PII. Allowed refs:
 | Ref | When set |
 |-----|----------|
 | `tier0_shop` | `/shop/` |
+| `tier0_glitch` | Glitch hoodie checkout · `/shop/products/tier0_glitch_hoodie_v1/` post-purchase |
 | `tier0_sticker` | Tier 0 campaign scan |
 | `customize_shop` | `/shop/customize/` |
 | `customize_hoodie` | Customizer with hoodie selected |
@@ -234,5 +236,6 @@ npm run merch-funnel:verify-config -- --require-checkout   # CI when Tier 1 goes
 | [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) | Shopify + Printify operator wiring |
 | [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) | Printed artifact scan QA |
 | [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) | Optional scan reader only |
+| [`EPHEMERAL_STATE_AND_MERCH.md`](EPHEMERAL_STATE_AND_MERCH.md) | Same ink / new meaning — Tier 1 owner UX |
 | [`V1_IMPLEMENTATION_BACKLOG.md`](V1_IMPLEMENTATION_BACKLOG.md) | O-002 Printify adapter |
 | [`features/Printify Fulfillment Middleware v1.0.md`](features/Printify%20Fulfillment%20Middleware%20v1.0.md) | Server-side fulfillment |

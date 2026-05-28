@@ -188,6 +188,17 @@ export function tier0ProductConfigIssues(product, index = 0) {
 }
 
 /**
+ * Merch funnel ref for Shopify post-purchase URL and create attribution.
+ * @param {string} productId
+ */
+export function tier0MerchRefForProductId(productId) {
+  const id = trimString(productId);
+  if (id === TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID) return "tier0_glitch";
+  if (id === TIER0_FOUNDING_STORE_PRODUCT_ID) return "tier0_sticker";
+  return "tier0_shop";
+}
+
+/**
  * Worker env list for paid-webhook Tier 0 routing (operator pastes variant id from config).
  * @param {Record<string, unknown>} product
  */

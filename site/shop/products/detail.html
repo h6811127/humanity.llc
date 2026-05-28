@@ -93,6 +93,21 @@
             <a class="btn-primary shop-buy-btn" id="product-action-btn" href="/shop/" hidden
               >Continue</a
             >
+            <p class="shop-lead shop-lead-muted shop-after-purchase" id="product-after-purchase" hidden>
+              After purchase:
+              <a href="/shop/thanks/" id="product-thanks-link">what happens next</a>
+            </p>
+            <div class="shop-post-purchase-url" id="product-post-purchase-url" hidden>
+              <p class="shop-post-purchase-url__label">Post-purchase page (paste into Shopify Admin)</p>
+              <p class="shop-post-purchase-url__value">
+                <a
+                  href="/shop/thanks/"
+                  id="product-post-purchase-link"
+                  class="shop-post-purchase-url__link"
+                  ><code class="shop-post-purchase-url__code"></code
+                ></a>
+              </p>
+            </div>
           </div>
         </section>
 
@@ -129,6 +144,6 @@
         </section>
       </main>
     </div>
-    <script src="/js/shop-product-detail.mjs?v=2" type="module"></script>
+    <script src="/js/shop-product-detail.mjs?v=3" type="module"></script>
   </body>
 </html>

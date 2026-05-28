@@ -22,7 +22,8 @@ import {
   productDetailUsesTier0InlineCheckout,
   readProductIdFromPath,
 } from "./shop-product-detail-core.mjs";
-import { TIER0_FOUNDING_STORE_PRODUCT_ID, TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID } from "./shop-store-catalog-ids.mjs";
+import { isTier0StoreProductId } from "./shop-store-catalog-ids.mjs";
+import { tier0MerchRefForProductId } from "./shop-tier0-core.mjs";
 import { bindTier0ProductCheckout } from "./shop-tier0-product-checkout.mjs";
 
 const rowLabelEl = document.getElementById("product-row-label");
@@ -107,12 +108,9 @@ async function initProductDetail() {
     return;
   }
 
-  const merchRef =
-    productId === TIER0_FOUNDING_STORE_PRODUCT_ID
-      ? "tier0_sticker"
-      : productId === TIER0_GLITCH_HOODIE_STORE_PRODUCT_ID
-        ? "tier0_shop"
-        : "customize_shop";
+  const merchRef = isTier0StoreProductId(productId)
+    ? tier0MerchRefForProductId(productId)
+    : "customize_shop";
   persistMerchCreateRef(merchRef);
   decorateShopCreateLinks();
 
@@ -134,6 +132,11 @@ async function initProductDetail() {
         actionBtn,
         proofConsentEl,
         checkoutNoteEl,
+        afterPurchaseEl: document.getElementById("product-after-purchase"),
+        thanksLinkEl: document.getElementById("product-thanks-link"),
+        postPurchaseUrlEl: document.getElementById("product-post-purchase-url"),
+        postPurchaseLinkEl: document.getElementById("product-post-purchase-link"),
+        postPurchaseCodeEl: document.querySelector("#product-post-purchase-url .shop-post-purchase-url__code"),
       });
     }
   } catch (error) {

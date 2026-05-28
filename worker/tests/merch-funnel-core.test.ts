@@ -9,6 +9,10 @@ import {
   appendMerchRefToCreateUrl,
   appendMerchRefToHref,
   handoffMerchRefAfterCreate,
+  hasTier1EphemeralOwner,
+  isTier0GlitchMerchRef,
+  isTier1MerchRef,
+  markTier1EphemeralOwner,
   merchCustomizeUrlFromRef,
   normalizeMerchRef,
   peekMerchCustomizeRef,
@@ -126,5 +130,26 @@ describe("merch-funnel-core (client)", () => {
         sessionHasSigningKeys: true,
       })
     ).toBe(false);
+  });
+
+  it("persists Tier 1 ephemeral owner flag per profile", () => {
+    const storage: Record<string, string> = {};
+    globalThis.localStorage = {
+      getItem(key: string) {
+        return storage[key] ?? null;
+      },
+      setItem(key: string, value: string) {
+        storage[key] = value;
+      },
+    };
+    expect(hasTier1EphemeralOwner("profile_a")).toBe(false);
+    markTier1EphemeralOwner("profile_a");
+    expect(hasTier1EphemeralOwner("profile_a")).toBe(true);
+    expect(hasTier1EphemeralOwner("profile_b")).toBe(false);
+    expect(isTier1MerchRef("customize_hoodie")).toBe(true);
+    expect(isTier1MerchRef("tier0_sticker")).toBe(false);
+    expect(isTier0GlitchMerchRef("tier0_glitch")).toBe(true);
+    expect(isTier0GlitchMerchRef("tier0_shop")).toBe(false);
+    expect(normalizeMerchRef("tier0_glitch")).toBe("tier0_glitch");
   });
 });

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   isTier0CheckoutOpen,
+  merchThanksPageUrl,
   tier0ThanksPageUrl,
 } from "../../site/js/shop-config.mjs";
 
@@ -25,6 +26,17 @@ describe("tier0ThanksPageUrl", () => {
     expect(tier0ThanksPageUrl({ site_origin: "https://humanity.llc" })).toBe(
       "https://humanity.llc/shop/thanks/"
     );
+  });
+});
+
+describe("merchThanksPageUrl", () => {
+  it("appends hc_ref for Tier 0 Glitch post-purchase", () => {
+    expect(
+      merchThanksPageUrl(
+        { site_origin: "https://humanity.llc", thanks_path: "/shop/thanks/" },
+        "tier0_glitch"
+      )
+    ).toBe("https://humanity.llc/shop/thanks/?hc_ref=tier0_glitch");
   });
 });
 

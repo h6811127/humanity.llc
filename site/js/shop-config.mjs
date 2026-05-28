@@ -3,6 +3,7 @@
  * See docs/SHOP_TIER0_IMPLEMENTATION.md.
  */
 
+import { normalizeMerchRef } from "./merch-funnel-core.mjs";
 import { TIER0_FOUNDING_STORE_PRODUCT_ID } from "./shop-store-catalog-ids.mjs";
 import {
   tier0Display,
@@ -75,4 +76,29 @@ export function tier0ThanksPageUrl(config, locationOrigin = "") {
   const origin = configuredOrigin || (typeof locationOrigin === "string" ? locationOrigin.trim().replace(/\/$/, "") : "");
   if (!origin) return thanksPath;
   return `${origin}${thanksPath}`;
+}
+
+/**
+ * Post-purchase URL with hc_ref for Shopify order-status redirect.
+ * @param {Record<string, unknown>} config
+ * @param {string} merchRef
+ * @param {string} [locationOrigin]
+ */
+export function merchThanksPageUrl(config, merchRef, locationOrigin = "") {
+  const base = tier0ThanksPageUrl(config, locationOrigin);
+  const ref = normalizeMerchRef(merchRef);
+  if (!ref) return base;
+  try {
+    const origin =
+      typeof locationOrigin === "string" && locationOrigin.trim()
+        ? locationOrigin.trim()
+        : typeof config?.site_origin === "string" && config.site_origin.trim()
+          ? config.site_origin.trim()
+          : "https://humanity.llc";
+    const url = new URL(base, origin);
+    url.searchParams.set("hc_ref", ref);
+    return url.href;
+  } catch {
+    return `${base}${base.includes("?") ? "&" : "?"}hc_ref=${encodeURIComponent(ref)}`;
+  }
 }

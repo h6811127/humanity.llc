@@ -135,6 +135,20 @@ Ordered plan from brand review (2026-05-27). Update this table as steps complete
 | **3** | **Rewrite doc hub** — this file splits object state vs external readers vs anti-synthetic abuse (this revision). Optionally rename file to `OBJECT_STATE_AND_READERS.md` in a follow-up. | ✅ Done | This doc |
 | **4** | **Re-align sequencing** with Phase A pilots — no new L3 user features until strangers complete create → scan → update → revoke without hand-holding. | ✅ Noted | [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md) |
 | **5** | **Marketing clarity** — public copy leads with accountable humans and signed state, not “we have AI.” Audit landing, create, scan limit strings. | ✅ Done — landing/create guard + scan limit copy avoids AI-as-product language | [`PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md`](PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md) · [`LAUNCH_LANGUAGE_KIT.md`](LAUNCH_LANGUAGE_KIT.md) |
+| **6** | **Ephemeral state UX for Tier 1 merch** — unlock `/created/` update without revoke-first gate; Tier 1 thanks path → `#update-status`. Product moat is L0–L2, not AI. | ✅ Shipped | [`EPHEMERAL_STATE_AND_MERCH.md`](EPHEMERAL_STATE_AND_MERCH.md) |
+
+---
+
+## Ephemeral state vs AI (product moat)
+
+Physical merch value is **mutable signed state on immutable ink** — not generative copy.
+
+| Layer | Owner | Stranger |
+|-------|-------|----------|
+| L0–L2 | Updates from `/created/` or hub | Reads signed snapshot on scan |
+| L3 P1 | N/A (stewards write copy) | Opt-in plain-language restatement only |
+
+See [`EPHEMERAL_STATE_AND_MERCH.md`](EPHEMERAL_STATE_AND_MERCH.md) for Tier 1 funnel step **WEAR**, accessibility without LLMs, and open Priority 4 (P1 keep / deterministic-only / remove).
 
 ---
 
@@ -181,4 +195,5 @@ npm run worker:bundle-scan     # after site/scan-pass.css changes
 | [`AI_L3_DRAFT_MANIFESTO.md`](AI_L3_DRAFT_MANIFESTO.md) | P2 API spec (UI retired) |
 | [`LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md`](LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md) | L0–L3 boundary |
 | [`MANIFESTO_STATUS_UPDATE.md`](MANIFESTO_STATUS_UPDATE.md) | L0–L1 owner updates |
+| [`EPHEMERAL_STATE_AND_MERCH.md`](EPHEMERAL_STATE_AND_MERCH.md) | Same ink / new meaning — Tier 1 UX |
 | [`VOUCH_THREAT_MODEL.md`](VOUCH_THREAT_MODEL.md) | AI-era adversaries |

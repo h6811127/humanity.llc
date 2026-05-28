@@ -155,7 +155,7 @@ A **line** is a sequence of **limited drops**, each with:
 | Democratic voting on scan text | **Not shipped** | |
 | `tier0.products[]` in `shop-config.json` | **Shipped** | `site/js/shop-tier0-core.mjs` · legacy `tier0` block still maps to founding sticker |
 
-**Engineering follow-ups** (when Glitch or Series B ships): see [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Operator setup; paste Shopify variant ids into Worker env (`TIER0_SHOPIFY_*`) and `shop-config.json`; run `npm run merch-funnel:verify-config -- --require-tier0=tier0_glitch_hoodie_v1` before `checkout_open: true`; physical QA per [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md).
+**Engineering follow-ups** (when Glitch or Series B ships): see [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Operator setup; paste Shopify variant ids into Worker env (`TIER0_SHOPIFY_*`) and `shop-config.json`; run `npm run merch-funnel:verify-config -- --require-tier0=tier0_glitch_hoodie_v1` before `checkout_open: true`; physical QA per [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md). **Post-purchase URL (Glitch):** `https://humanity.llc/shop/thanks/?hc_ref=tier0_glitch` — shown on `/shop/products/tier0_glitch_hoodie_v1/` when checkout is open.
 
 ---
 
