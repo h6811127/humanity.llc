@@ -227,21 +227,36 @@ async function recoverDuplicateProcessingOrder(
     return { row, autoMint: [], fulfillmentMode: null };
   }
 
-  const metadata = extractShopifyOrderMetadata(order);
-  if (!metadata) {
-    return { row, autoMint: [], fulfillmentMode: null };
+  const existingPrintOrderIds = JSON.parse(row.print_order_ids_json) as string[];
+  if (existingPrintOrderIds.length > 0) {
+    const intentIds = JSON.parse(row.artifact_intent_ids_json) as string[];
+    const fulfillmentMode: IntentValidation["fulfillment_mode"] =
+      intentIds.length > 0 ? "personalized" : "tier0_batch";
+    return { row, autoMint: [], fulfillmentMode };
   }
 
-  const validation = await resolvePaidOrderValidation(db, order, metadata, env, nowIso);
-  if (
-    validation.fulfillment_mode !== "personalized" &&
-    validation.fulfillment_mode !== "tier0_batch"
-  ) {
-    return { row, autoMint: [], fulfillmentMode: validation.fulfillment_mode };
+  const intentIds = JSON.parse(row.artifact_intent_ids_json) as string[];
+  let fulfillmentMode: IntentValidation["fulfillment_mode"] = null;
+  let shouldQueue = false;
+
+  if (intentIds.length > 0) {
+    fulfillmentMode = "personalized";
+    shouldQueue = true;
+  } else {
+    const metadata = extractShopifyOrderMetadata(order);
+    if (!metadata) {
+      return { row, autoMint: [], fulfillmentMode: null };
+    }
+    const validation = await resolvePaidOrderValidation(db, order, metadata, env, nowIso);
+    fulfillmentMode = validation.fulfillment_mode;
+    shouldQueue = validation.fulfillment_mode === "tier0_batch";
+  }
+
+  if (!shouldQueue) {
+    return { row, autoMint: [], fulfillmentMode };
   }
 
   const printOrderIds = await queuePrintOrderAfterPaidWebhook(db, row, nowIso);
-  const intentIds = JSON.parse(row.artifact_intent_ids_json) as string[];
   const autoMint = await tryAutoMintQueuedPrintOrders(
     request,
     env,
@@ -256,7 +271,7 @@ async function recoverDuplicateProcessingOrder(
       updated_at: printOrderIds.length > 0 ? nowIso : row.updated_at,
     },
     autoMint,
-    fulfillmentMode: validation.fulfillment_mode,
+    fulfillmentMode,
   };
 }
 

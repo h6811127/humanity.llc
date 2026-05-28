@@ -38,6 +38,12 @@ const SHARED_ENV_KEYS = [
   "PRINTIFY_SHOP_ID",
 ];
 
+const TIER0_ENV_KEYS = [
+  "TIER0_CAMPAIGN_PROFILE_ID",
+  "TIER0_SHOPIFY_VARIANT_IDS",
+  "TIER0_SHOPIFY_INVENTORY_VARIANT_IDS",
+];
+
 /**
  * @param {string} toml
  * @param {string} key
@@ -63,6 +69,21 @@ function main() {
 
   /** @type {string[]} */
   const missingActive = [];
+
+  console.log("\nTier 0 company drops (batch Printify vs Shopify inventory):");
+  for (const key of TIER0_ENV_KEYS) {
+    const { active, commented } = envKeyPresent(toml, key);
+    if (active) {
+      console.log(`✓ ${key} set in [vars]`);
+    } else if (commented) {
+      console.log(`⚠ ${key} commented out (set before live Tier 0 paid webhooks)`);
+      if (strict) missingActive.push(key);
+    } else {
+      console.log(`⚠ ${key} not found — Glitch hoodie uses TIER0_SHOPIFY_INVENTORY_VARIANT_IDS`);
+      if (strict) missingActive.push(key);
+    }
+  }
+  console.log("  Docs: docs/COMPANY_MERCH_AND_COMMUNITY_CAMPAIGN.md · npm run merch-funnel:verify-config\n");
 
   for (const key of [...SHARED_ENV_KEYS, ...STICKER_ENV_KEYS, ...HOODIE_ENV_KEYS]) {
     const { active, commented } = envKeyPresent(toml, key);

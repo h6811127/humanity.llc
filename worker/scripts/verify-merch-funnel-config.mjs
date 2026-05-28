@@ -5,17 +5,23 @@
  *
  * Usage:
  *   npm run merch-funnel:verify-config
- *   npm run merch-funnel:verify-config -- --require-checkout   # exit 1 when not ready
+ *   npm run merch-funnel:verify-config -- --require-checkout   # exit 1 when Tier 1 not ready
+ *   npm run merch-funnel:verify-config -- --require-tier0=tier0_glitch_hoodie_v1
  */
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { personalizeCatalogReadiness } from "../../site/js/shop-config-core.mjs";
+import { tier0CatalogReadiness, tier0Products } from "../../site/js/shop-tier0-core.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const configPath = join(root, "site/data/shop-config.json");
 const requireCheckout = process.argv.includes("--require-checkout");
+const requireTier0Arg = process.argv.find((arg) => arg.startsWith("--require-tier0="));
+const requireTier0ProductId = requireTier0Arg
+  ? requireTier0Arg.slice("--require-tier0=".length).trim()
+  : "";
 
 let config;
 try {
@@ -40,9 +46,41 @@ if (ready) {
   console.log("\nSee docs/MERCH_FUNNEL_MVP.md § Operator setup and site/data/shop-config.example.json");
 }
 
-const tier0Open = config?.tier0?.checkout_open === true;
-console.log(`\nTier 0 checkout_open: ${tier0Open ? "true" : "false"}`);
+const tier0Listed = tier0Products(config);
+console.log(`\nTier 0 products (${tier0Listed.length} in shop-config):`);
+for (const product of tier0Listed) {
+  const open = product.checkout_open === true;
+  console.log(
+    `  - ${product.product_id}: checkout_open=${open ? "true" : "false"} · fulfillment=${product.fulfillment}`
+  );
+}
+
+const tier0Check = tier0CatalogReadiness(config, {
+  product_id: requireTier0ProductId || undefined,
+});
+if (tier0Check.products.length > 0) {
+  console.log("\nTier 0 checkout-ready products:");
+  for (const row of tier0Check.products) {
+    const mark = row.ready ? "✅" : "☐";
+    console.log(`  ${mark} ${row.product_id} → Worker ${row.worker_env} + TIER0_CAMPAIGN_PROFILE_ID`);
+  }
+  if (!tier0Check.ready) {
+    console.log("\nTier 0 config gaps:\n");
+    for (const issue of tier0Check.issues) {
+      console.log(`  - ${issue}`);
+    }
+    console.log(
+      "\nSee docs/COMPANY_MERCH_AND_COMMUNITY_CAMPAIGN.md · docs/SHOP_TIER0_IMPLEMENTATION.md"
+    );
+  }
+} else {
+  console.log("\nTier 0: no checkout_open products to validate (interest-only OK).");
+}
 
 if (requireCheckout && !ready) {
+  process.exit(1);
+}
+
+if (requireTier0ProductId && !tier0Check.ready) {
   process.exit(1);
 }

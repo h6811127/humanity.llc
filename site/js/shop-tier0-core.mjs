@@ -186,3 +186,77 @@ export function tier0ProductConfigIssues(product, index = 0) {
 
   return issues;
 }
+
+/**
+ * Worker env list for paid-webhook Tier 0 routing (operator pastes variant id from config).
+ * @param {Record<string, unknown>} product
+ */
+export function tier0WorkerEnvVarForFulfillment(product) {
+  const mode = trimString(product?.fulfillment) || "printify_batch";
+  if (mode === "shopify_inventory") return "TIER0_SHOPIFY_INVENTORY_VARIANT_IDS";
+  return "TIER0_SHOPIFY_VARIANT_IDS";
+}
+
+/**
+ * @param {Record<string, unknown>} product
+ * @returns {{ ready: boolean; issues: string[]; worker_env: string }}
+ */
+export function tier0ProductCheckoutReadiness(product) {
+  const label = product?.product_id ? String(product.product_id) : "tier0 product";
+  /** @type {string[]} */
+  const issues = [];
+
+  if (product?.checkout_open !== true) {
+    issues.push(`${label}: checkout_open is not true`);
+  } else if (!isTier0ProductCheckoutOpen(product)) {
+    issues.push(`${label}: checkout_open without valid checkout_url`);
+  }
+
+  issues.push(...tier0ProductConfigIssues(product));
+
+  return {
+    ready: issues.length === 0,
+    issues,
+    worker_env: tier0WorkerEnvVarForFulfillment(product),
+  };
+}
+
+/**
+ * Operator readiness for Tier 0 products with checkout_open (e.g. Glitch hoodie).
+ * @param {Record<string, unknown>} config
+ * @param {{ product_id?: string }} [options]
+ * @returns {{ ready: boolean; issues: string[]; products: { product_id: string; ready: boolean; worker_env: string }[] }}
+ */
+export function tier0CatalogReadiness(config, options = {}) {
+  const productId = trimString(options.product_id);
+  const products = tier0Products(config).filter((product) => {
+    if (productId) return product.product_id === productId;
+    return product.checkout_open === true;
+  });
+
+  /** @type {string[]} */
+  const issues = [];
+  /** @type {{ product_id: string; ready: boolean; worker_env: string }[]} */
+  const summary = [];
+
+  if (products.length === 0) {
+    const msg = productId
+      ? `tier0: no product ${productId} with checkout_open`
+      : "tier0: no products with checkout_open";
+    issues.push(msg);
+    return { ready: false, issues, products: summary };
+  }
+
+  for (let i = 0; i < products.length; i++) {
+    const product = products[i];
+    const { ready, issues: productIssues, worker_env } = tier0ProductCheckoutReadiness(product);
+    summary.push({
+      product_id: product.product_id,
+      ready,
+      worker_env,
+    });
+    issues.push(...productIssues);
+  }
+
+  return { ready: issues.length === 0, issues, products: summary };
+}

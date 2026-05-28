@@ -24,7 +24,7 @@ export interface StoreOrderStatusTimelineStep {
 
 export interface StoreOrderStatusResponse {
   found: true;
-  fulfillment_mode: "personalized" | "tier0_batch" | null;
+  fulfillment_mode: "personalized" | "tier0_batch" | "tier0_inventory" | null;
   commerce_status: CommerceOrderRow["status"];
   hold_reason: string | null;
   product_id: string | null;
@@ -72,10 +72,11 @@ export function printStatusLabel(status: PrintOrderStatus | null): string | null
 
 function fulfillmentMode(commerce: CommerceOrderRow): StoreOrderStatusResponse["fulfillment_mode"] {
   const intentIds = JSON.parse(commerce.artifact_intent_ids_json) as string[];
-  if (commerce.status === "processing" && intentIds.length === 0 && commerce.profile_id) {
-    return "tier0_batch";
-  }
   if (intentIds.length > 0) return "personalized";
+  if (commerce.status === "processing" && commerce.profile_id) {
+    const printOrderIds = JSON.parse(commerce.print_order_ids_json) as string[];
+    return printOrderIds.length > 0 ? "tier0_batch" : "tier0_inventory";
+  }
   return null;
 }
 
@@ -126,6 +127,23 @@ export function buildOrderTimeline(
   }
 
   if (canceled) {
+    return steps;
+  }
+
+  const mode = fulfillmentMode(commerce);
+  if (mode === "tier0_inventory") {
+    steps.push({
+      id: "fulfillment",
+      label: "Preparing shipment",
+      detail: "Your item ships from our store inventory.",
+      state: "current",
+    });
+    steps.push({
+      id: "shipped",
+      label: "Shipped",
+      detail: "Carrier tracking may arrive in a separate email from Shopify.",
+      state: "pending",
+    });
     return steps;
   }
 

@@ -135,7 +135,7 @@ A **line** is a sequence of **limited drops**, each with:
 | Drop | Tier | Customizer | Example store id (when wired) |
 |------|------|------------|-------------------------------|
 | Founding signal sticker | Tier 0 | No | `tier0_founding_sticker_v1` (shipped in catalog) |
-| Glitch LIVE QR hoodie | Tier 0 | No | `tier0_glitch_hoodie_v1` (proposed — not in catalog yet) |
+| Glitch LIVE QR hoodie | Tier 0 | No | `tier0_glitch_hoodie_v1` (shipped in catalog) |
 | Personalized hoodie | Tier 1 | Yes | `hoodie_live_object_v1` |
 
 **Luxury / high price** on company merch is a **positioning** choice (FOUNDING_DROP_BRIEF), not a protocol feature.
@@ -148,12 +148,14 @@ A **line** is a sequence of **limited drops**, each with:
 |------------|--------|-------|
 | Tier 0 policy + runbook | Shipped (docs) | |
 | `/shop/` founding row + `/shop/founding/` | Shipped (sticker) | Glitch hoodie on **Founding objects** row → `/shop/products/tier0_glitch_hoodie_v1/` |
-| `TIER0_SHOPIFY_VARIANT_IDS` + `TIER0_CAMPAIGN_PROFILE_ID` | Operator env | All batch SKUs share **one** campaign profile unless code extended |
-| Paid webhook `tier0_batch` | Shipped | Queues batch Printify template — **wrong** for pre-printed-only Glitch unless variant excluded or manual fulfillment |
+| `TIER0_SHOPIFY_VARIANT_IDS` + `TIER0_CAMPAIGN_PROFILE_ID` | Operator env | Batch Printify SKUs (e.g. founding sticker) |
+| `TIER0_SHOPIFY_INVENTORY_VARIANT_IDS` | Operator env | Pre-printed inventory SKUs (e.g. Glitch hoodie) — webhook `tier0_inventory`, no Printify queue |
+| Paid webhook `tier0_batch` | Shipped | Queues batch Printify template |
+| Paid webhook `tier0_inventory` | Shipped | Processing commerce order only — Shopify fulfills from stock |
 | Democratic voting on scan text | **Not shipped** | |
 | `tier0.products[]` in `shop-config.json` | **Shipped** | `site/js/shop-tier0-core.mjs` · legacy `tier0` block still maps to founding sticker |
 
-**Engineering follow-ups** (when Glitch or Series B ships): see [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Operator setup; extend config for multiple Tier 0 SKUs; add `store-catalog` product; manual-fulfillment webhook branch if Shopify-only inventory.
+**Engineering follow-ups** (when Glitch or Series B ships): see [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) § Operator setup; paste Shopify variant ids into Worker env (`TIER0_SHOPIFY_*`) and `shop-config.json`; run `npm run merch-funnel:verify-config -- --require-tier0=tier0_glitch_hoodie_v1` before `checkout_open: true`; physical QA per [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md).
 
 ---
 

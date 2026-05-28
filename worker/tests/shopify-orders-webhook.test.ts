@@ -237,10 +237,16 @@ const piiEnv = { ...env, FULFILLMENT_PII_ENCRYPTION_KEY: FULFILLMENT_PII_KEY } a
 
 const TIER0_CAMPAIGN = "nSVXWPqgRFEhGPjxyRzidF6";
 const TIER0_VARIANT = "12345678";
+const TIER0_INVENTORY_VARIANT = "87654321";
 const tier0Env = {
   ...env,
   TIER0_CAMPAIGN_PROFILE_ID: TIER0_CAMPAIGN,
   TIER0_SHOPIFY_VARIANT_IDS: TIER0_VARIANT,
+} as Env;
+const tier0InventoryEnv = {
+  ...env,
+  TIER0_CAMPAIGN_PROFILE_ID: TIER0_CAMPAIGN,
+  TIER0_SHOPIFY_INVENTORY_VARIANT_IDS: TIER0_INVENTORY_VARIANT,
 } as Env;
 
 describe("Shopify orders webhook (O-001)", () => {
@@ -370,6 +376,78 @@ describe("Shopify orders webhook (O-001)", () => {
     const printOrder = [...state.printOrders.values()][0];
     expect(printOrder?.template_id).toBe("hc-tier0-sticker-batch-v1");
     expect(JSON.parse(printOrder!.planned_item_qr_ids_json)).toEqual([]);
+  });
+
+  it("accepts tier0 inventory orders without queuing print fulfillment", async () => {
+    const state: DbState = {
+      intents: new Map(),
+      orders: new Map(),
+      receipts: new Map(),
+      printOrders: new Map(),
+      fulfillmentPii: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(
+        paidOrderBody({
+          line_items: [{ variant_id: Number(TIER0_INVENTORY_VARIANT), quantity: 1 }],
+        })
+      ),
+      tier0InventoryEnv,
+      dbFor(state)
+    );
+    const json = (await res.json()) as {
+      status: string;
+      hold_reason: string | null;
+      fulfillment_mode: string;
+      profile_id: string;
+      print_order_ids: string[];
+    };
+
+    expect(res.status).toBe(200);
+    expect(json.status).toBe("processing");
+    expect(json.hold_reason).toBeNull();
+    expect(json.fulfillment_mode).toBe("tier0_inventory");
+    expect(json.profile_id).toBe(TIER0_CAMPAIGN);
+    expect(json.print_order_ids).toEqual([]);
+    expect(state.printOrders.size).toBe(0);
+  });
+
+  it("does not queue print on inventory webhook retry", async () => {
+    const existingOrder = commerceOrderRow({
+      artifact_intent_ids_json: "[]",
+      profile_id: TIER0_CAMPAIGN,
+      print_order_ids_json: "[]",
+    });
+    const state: DbState = {
+      intents: new Map(),
+      orders: new Map([[existingOrder.shopify_order_id, existingOrder]]),
+      receipts: new Map(),
+      printOrders: new Map(),
+      fulfillmentPii: new Map(),
+    };
+
+    const res = await handlePostShopifyOrdersWebhook(
+      await webhookRequest(
+        paidOrderBody({
+          line_items: [{ variant_id: Number(TIER0_INVENTORY_VARIANT), quantity: 1 }],
+        }),
+        { "X-Shopify-Webhook-Id": "wh_inventory_retry" }
+      ),
+      tier0InventoryEnv,
+      dbFor(state)
+    );
+    const json = (await res.json()) as {
+      duplicate: boolean;
+      fulfillment_mode: string;
+      print_order_ids: string[];
+    };
+
+    expect(res.status).toBe(200);
+    expect(json.duplicate).toBe(true);
+    expect(json.fulfillment_mode).toBe("tier0_inventory");
+    expect(json.print_order_ids).toEqual([]);
+    expect(state.printOrders.size).toBe(0);
   });
 
   it("is idempotent for duplicate paid webhooks", async () => {

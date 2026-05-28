@@ -77,4 +77,17 @@ describe("buildBuyerOrderStatus", () => {
     expect(status.tracking?.tracking_url).toContain("usps.com");
     expect(status.message).toContain("tracking link");
   });
+
+  it("uses inventory copy for tier0_inventory orders without print queue", () => {
+    const commerce: CommerceOrderRow = {
+      ...COMMERCE,
+      artifact_intent_ids_json: "[]",
+      print_order_ids_json: "[]",
+      profile_id: "nSVXWPqgRFEhGPjxyRzidF6",
+    };
+    const status = buildBuyerOrderStatus(commerce, []);
+    expect(status.fulfillment_mode).toBe("tier0_inventory");
+    expect(status.status).toBe("processing");
+    expect(status.message).toContain("store inventory");
+  });
 });

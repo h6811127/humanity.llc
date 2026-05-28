@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { hashBuyerEmail } from "../src/commerce/buyer-email-hash";
 import type { CommerceOrderRow } from "../src/db/commerce-orders";
 import type { PrintOrderRow } from "../src/db/print-orders";
+import { buildOrderTimeline } from "../src/store/store-order-status";
 import { handleGetStoreOrderStatus } from "../src/resolver/store-order-status";
 
 const EMAIL = "buyer@example.com";
@@ -36,6 +37,30 @@ function dbFor(commerce: CommerceOrderRow | null, printOrders: PrintOrderRow[] =
     }),
   } as unknown as D1Database;
 }
+
+describe("buildOrderTimeline", () => {
+  it("shows Shopify inventory steps for tier0_inventory commerce orders", () => {
+    const commerce: CommerceOrderRow = {
+      commerce_order_id: "co_tier0Inventory01",
+      shopify_order_id: SHOPIFY_ID,
+      shopify_checkout_id: null,
+      shopify_order_number: ORDER_NUMBER,
+      buyer_email_hash: "hash",
+      profile_id: "nSVXWPqgRFEhGPjxyRzidF6",
+      artifact_intent_ids_json: "[]",
+      print_order_ids_json: "[]",
+      status: "processing",
+      hold_reason: null,
+      created_at: "2026-05-16T17:00:00Z",
+      updated_at: "2026-05-16T17:00:00Z",
+    };
+
+    const steps = buildOrderTimeline(commerce, null, "tier0_glitch_hoodie_v1");
+    expect(steps.map((step) => step.id)).toEqual(["payment", "fulfillment", "shipped"]);
+    expect(steps[1]?.detail).toContain("store inventory");
+    expect(steps[1]?.state).toBe("current");
+  });
+});
 
 describe("GET /v1/store/order-status", () => {
   it("returns buyer-safe status when email and order number match", async () => {

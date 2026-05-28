@@ -1,3 +1,4 @@
+import type { BuyerMintStatus } from "./buyer-order-mint";
 import type { CommerceOrderRow } from "../db/commerce-orders";
 import type { PrintOrderRow, PrintOrderStatus } from "../db/print-orders";
 
@@ -20,15 +21,21 @@ export interface BuyerOrderStatusResponse {
   status: BuyerFacingStatus;
   status_label: string;
   message: string;
-  fulfillment_mode: "personalized" | "tier0_batch" | null;
+  fulfillment_mode: "personalized" | "tier0_batch" | "tier0_inventory" | null;
   tracking: BuyerOrderTracking | null;
+  mint?: BuyerMintStatus;
   updated_at: string;
 }
 
-function fulfillmentMode(row: CommerceOrderRow): "personalized" | "tier0_batch" | null {
+function fulfillmentMode(
+  row: CommerceOrderRow
+): "personalized" | "tier0_batch" | "tier0_inventory" | null {
   const intentIds = JSON.parse(row.artifact_intent_ids_json) as string[];
   if (intentIds.length > 0) return "personalized";
-  if (row.profile_id && row.status === "processing") return "tier0_batch";
+  if (row.profile_id && row.status === "processing") {
+    const printOrderIds = JSON.parse(row.print_order_ids_json) as string[];
+    return printOrderIds.length > 0 ? "tier0_batch" : "tier0_inventory";
+  }
   return null;
 }
 
@@ -134,7 +141,7 @@ function trackingFromPrintOrder(row: PrintOrderRow): BuyerOrderTracking | null {
   };
 }
 
-function pickDominantPrintOrder(printOrders: PrintOrderRow[]): PrintOrderRow | null {
+export function pickDominantPrintOrder(printOrders: PrintOrderRow[]): PrintOrderRow | null {
   const status = dominantPrintStatus(printOrders);
   if (!status) return null;
   return printOrders.find((row) => row.status === status) ?? printOrders[0] ?? null;
@@ -198,7 +205,13 @@ export function buildBuyerOrderStatus(
   if (printRow) {
     const buyerStatus = mapPrintToBuyer(printRow.status);
     const tracking = trackingFromPrintOrder(printRow);
-    const copy = messageForBuyerStatus(buyerStatus, tracking);
+    const copy =
+      mode === "tier0_inventory" && buyerStatus === "processing"
+        ? {
+            label: "Processing",
+            message: "Payment received. Your item ships from our store inventory.",
+          }
+        : messageForBuyerStatus(buyerStatus, tracking);
     return {
       order_number: orderNumber,
       status: buyerStatus,
@@ -210,7 +223,13 @@ export function buildBuyerOrderStatus(
     };
   }
 
-  const copy = STATUS_COPY.processing;
+  const copy =
+    mode === "tier0_inventory"
+      ? {
+          label: "Processing",
+          message: "Payment received. Your item ships from our store inventory.",
+        }
+      : STATUS_COPY.processing;
   return {
     order_number: orderNumber,
     status: "processing",
