@@ -16,7 +16,7 @@ Ordered work after repo review. Update row status as steps complete. Cross-links
 | **2** | **Phase A trust MVP** — run M5 stranger runbook (3 outsiders, unassisted create → scan → revoke) | Validation | **✅ Passed 2026-05-27** — [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) |
 | **3** | **Hosted steward production rollout** — `hosted:rollout:step*` through step 6 (secrets, flag, CF dashboard, regression) | Ops | ☐ |
 | **4** | **AI P1 product decision** — keep / rename / deterministic-only / remove scan reader (no new L3 user features until Phase A) | Product | ☐ |
-| **5** | **Large-wallet shell performance** — bound `hc_wallet_network_cache`, avoid full-wallet parse on hub/inbox hot paths | Engineering debt | **Partial ✅** — S6 cache bound (`WALLET_NETWORK_CACHE_MAX_ENTRIES`); shell/scan status counts, compact hub/inbox rows, collapsed hub previews, and large expanded hub summary rows now use lightweight `hc_wallet_summary`; full row hydration happens on action. Remaining: true DOM virtualization for very large expanded hubs |
+| **5** | **Large-wallet shell performance** — bound `hc_wallet_network_cache`, avoid full-wallet parse on hub/inbox hot paths | Engineering debt | **Partial ✅** — S6 cache bound (`WALLET_NETWORK_CACHE_MAX_ENTRIES`); shell/scan status counts, compact hub/inbox rows, collapsed hub previews, large expanded hub summary rows, action hydration, and incremental summary-row windowing now use lightweight `hc_wallet_summary`; remaining: viewport-based DOM virtualization for very large expanded hubs |
 
 **Rule:** Do not start new L3 user-facing AI surfaces until priority **2** passes. Commerce never grants vouch.
 

@@ -29,4 +29,10 @@ describe("device hub wallet summary hydration", () => {
     expect(src).toContain("walletEntryForActionButton");
     expect(src).toContain('data-profile-id="${escapeHtml(entry.profile_id ?? "")}"');
   });
+
+  it("windows very large summary rows and exposes incremental rendering", () => {
+    expect(src).toContain("LARGE_HUB_SUMMARY_ROW_INITIAL_LIMIT");
+    expect(src).toContain("visibleSummaryRowWindow");
+    expect(src).toContain("hub-show-more-summary");
+  });
 });

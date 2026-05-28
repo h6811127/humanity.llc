@@ -39,3 +39,20 @@ export function orderEntriesVisibleFirst(entries, visibleProfileIds) {
   if (inView.length === 0) return entries;
   return [...inView, ...rest];
 }
+
+/**
+ * Initial/incremental DOM window for very large expanded hub summary rows.
+ *
+ * @template T
+ * @param {T[]} entries
+ * @param {{ limit: number }} options
+ * @returns {{ rows: T[], remaining: number }}
+ */
+export function visibleSummaryRowWindow(entries, options) {
+  const limit = Math.max(0, Math.floor(options.limit || 0));
+  const rows = entries.slice(0, limit);
+  return {
+    rows,
+    remaining: Math.max(0, entries.length - rows.length),
+  };
+}

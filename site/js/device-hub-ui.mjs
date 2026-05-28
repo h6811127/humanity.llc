@@ -140,9 +140,12 @@ import {
 import {
   orderEntriesVisibleFirst,
   profileIdsWithVisibleRows,
+  visibleSummaryRowWindow,
 } from "./device-hub-visible-rows-core.mjs";
 
 const COLLAPSED_SAVED_ROW_PREVIEW_LIMIT = 3;
+const LARGE_HUB_SUMMARY_ROW_INITIAL_LIMIT = 8;
+const LARGE_HUB_SUMMARY_ROW_INCREMENT = 8;
 
 function escapeHtml(s) {
   return String(s)
@@ -228,6 +231,8 @@ let hubConfig = {
 
 /** Bumped when saved-card DOM is replaced or a new network fetch starts; stale fetches must not apply. */
 let walletNetworkApplyGen = 0;
+let expandedSummaryRowLimit = LARGE_HUB_SUMMARY_ROW_INITIAL_LIMIT;
+let expandedSummaryWalletFingerprint = null;
 
 /** Last chip status per profile from wallet poll (A1: re-apply must not rely on session cache alone). */
 let lastWalletNetworkStatusMap = {};
@@ -1026,13 +1031,26 @@ function renderActivityRows() {
 function renderSavedRows(opts = {}) {
   const initialChipChecking = opts.initialChipChecking === true;
   const summary = loadWalletSummary();
+  if (summary.walletFingerprint !== expandedSummaryWalletFingerprint) {
+    expandedSummaryWalletFingerprint = summary.walletFingerprint;
+    expandedSummaryRowLimit = LARGE_HUB_SUMMARY_ROW_INITIAL_LIMIT;
+  }
   const expandedRows = hubIsExpanded();
   const fullRows = shouldRenderFullSavedRows(summary);
   const allEntries = fullRows ? loadWallet() : summary.rows;
   const previewRows = !fullRows && !expandedRows;
+  const virtualizedSummaryRows =
+    !fullRows &&
+    expandedRows &&
+    isLargeWallet(summary.count, getStewardEntitlementsPolicy());
+  const windowed = virtualizedSummaryRows
+    ? visibleSummaryRowWindow(allEntries, { limit: expandedSummaryRowLimit })
+    : null;
   const entries = fullRows
     ? allEntries
-    : allEntries.slice(0, previewRows ? COLLAPSED_SAVED_ROW_PREVIEW_LIMIT : allEntries.length);
+    : previewRows
+      ? allEntries.slice(0, COLLAPSED_SAVED_ROW_PREVIEW_LIMIT)
+      : windowed?.rows ?? allEntries;
   if (!savedList || !savedGroup) return;
   savedList.dataset.walletRowsMode = fullRows ? "full" : "summary";
 
@@ -1164,12 +1182,38 @@ function renderSavedRows(opts = {}) {
     savedList.appendChild(li);
   }
 
+  if (virtualizedSummaryRows && windowed && windowed.remaining > 0) {
+    const li = document.createElement("li");
+    li.className = "hub-card-item hub-card-item--general hub-card-item--summary hub-card-item--more";
+    li.dataset.hubSearchable = "more saved cards";
+    const nextCount = Math.min(LARGE_HUB_SUMMARY_ROW_INCREMENT, windowed.remaining);
+    li.innerHTML = `
+      <div class="hub-card-head">
+        <span class="list-icon list-icon-tone-trust" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+        <span class="list-content">
+          <span class="list-title">${windowed.remaining} more saved on this device</span>
+          <span class="hub-card-identity hub-card-identity--muted">Summary rows stay lightweight until you open controls</span>
+        </span>
+        <div class="hub-card-head-meta">
+          <button type="button" class="hub-card-action hub-show-more-summary">Show ${nextCount} more</button>
+        </div>
+      </div>`;
+    savedList.appendChild(li);
+  }
+
   bindRevokedAlertHandlers();
 
   if (previewRows) {
     syncHubInboxAlertGroups();
     return;
   }
+
+  savedList.querySelector(".hub-show-more-summary")?.addEventListener("click", () => {
+    expandedSummaryRowLimit += LARGE_HUB_SUMMARY_ROW_INCREMENT;
+    renderSavedRows();
+    applySearchFilter();
+    refreshEmptyHint();
+  });
 
   savedList.querySelectorAll(".hub-card-control, .hub-card-menu-steward").forEach((btn) => {
     btn.addEventListener("click", () => {
