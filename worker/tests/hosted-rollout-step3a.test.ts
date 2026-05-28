@@ -37,6 +37,9 @@ describe("hosted-rollout-step3a", () => {
     expect(pkg.scripts["hosted:rollout:step3a"]).toContain("hosted-rollout-step3a.mjs");
     expect(pkg.scripts["hosted:rollout:step3"]).toContain("hosted-rollout-step3a.mjs");
     expect(pkg.scripts["hosted:rollout:step3b"]).toContain("hosted-rollout-step3b.mjs");
+    expect(pkg.scripts["hosted:rollout:verify-path"]).toContain(
+      "hosted-rollout-verify-path.mjs"
+    );
   });
 
   it("dev vars example documents wrangler secret put", () => {
