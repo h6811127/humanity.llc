@@ -96,4 +96,5 @@ When passed, update `docs/M7_LIVE_CONTROL_ALPHA.md` Step 2 comprehension line to
 | [`M7_LIVE_CONTROL_ALPHA.md`](M7_LIVE_CONTROL_ALPHA.md) | Step 2 candidates |
 | [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) | Live control vs identity |
 | [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) | General scan stranger path |
+| [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) | Printed QR camera path |
 | [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) | P1-LC manual spot check |

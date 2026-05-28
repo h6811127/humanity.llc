@@ -157,6 +157,10 @@ async function runLiveControlScriptWithStatus(body: Record<string, unknown>) {
       setAttribute: vi.fn(),
       getAttribute: vi.fn(() => null),
     },
+    "live-control-proof-countdown": {
+      hidden: true,
+      textContent: "",
+    },
     "live-control-row": { classList: { add: vi.fn(), remove: vi.fn() } },
     "live-control-owner-link": { hidden: true, href: "#" },
     "live-control-owner-view": { hidden: true },
@@ -573,8 +577,29 @@ describe("renderScanPage M3.2 trust blocks", () => {
 
     expect(result.elements["live-control-success"].hidden).toBe(false);
     expect(result.elements["live-control-interactive"].hidden).toBe(true);
+    expect(result.elements["live-control-proof-countdown"].hidden).toBe(false);
+    expect(result.elements["live-control-proof-countdown"].textContent).toMatch(
+      /^Proof display expires in \d:\d{2}\.$/
+    );
     expect(result.setTimeoutMock).toHaveBeenCalledTimes(1);
     expect(result.setTimeoutMock.mock.calls[0][1]).toBeGreaterThan(0);
+  });
+
+  it("renders proof display countdown markup on the success panel", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: summary(),
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+
+    expect(html).toContain('id="live-control-proof-countdown"');
+    expect(html).toContain("live-control-proof-countdown");
   });
 
   it("expires the live proof request when the challenge countdown reaches zero", async () => {

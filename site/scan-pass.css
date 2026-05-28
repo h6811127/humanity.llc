@@ -1167,6 +1167,19 @@ a {
   color: #248a3d;
 }
 
+.live-control-proof-countdown {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+  color: var(--grey);
+}
+
+.live-control-proof-countdown[hidden] {
+  display: none;
+}
+
 .live-control-cta-secondary {
   display: block;
   width: 100%;

@@ -78,7 +78,7 @@ Those become meaningful only after the base interaction is legible.
 ## Step 2 candidates
 
 - Better side-by-side scanner/owner layout for in-person use — **shipped (2026-05-28):** `live-control-in-person-layout` splits scanner and owner panes; at ≥640px when waiting, grid shows **Scanner** | **Owner** roles side by side (`scan-html.ts`, `scan-pass.css`).
-- Visible countdown for challenge expiry — **shipped (2026-05-28):** challenge wait uses `startCountdown()`; expiry calls `showRequestExpired()` (stops poll); proof display uses server `proof_expires_at` + client timer.
+- Visible countdown for challenge expiry — **shipped (2026-05-28):** challenge wait shows **Expires in M:SS**; proven success shows **Proof display expires in M:SS** until `proof_expires_at` (`scan-html.ts`, `scan-pass.css`).
 - Clear expired/failed state on the scanner page — **shipped (2026-05-28):** SSR stale-proof gate (`scan.ts`), client `showProofExpired` / `showRequestExpired` (`scan-html.ts`), regression tests in `worker/tests/scan.test.ts` and `worker/tests/live-control.test.ts`.
 - Copy comprehension test with the question: “What did live control prove?” — **runbook shipped (2026-05-28):** [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md); ≥5 strangers; automated copy guards in `worker/tests/scan.test.ts`.
-- Manual iPhone/Android camera scan of a printed QR.
+- Manual iPhone/Android camera scan of a printed QR — **runbook shipped (2026-05-28):** [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md); ≥3 phones; camera-app entry + full live proof loop on print.
