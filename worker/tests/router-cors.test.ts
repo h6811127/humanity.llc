@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import worker from "../src";
 import type { CardRow, QrCredentialRow, VerificationSummaryRow } from "../src/db/types";
+import { d1WithRateLimitBuckets } from "./rate-limit-db-mock";
 
 const PROFILE = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
 const QR = "qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
@@ -61,20 +62,19 @@ function dbFor(rows: {
   qr?: QrCredentialRow | null;
   verification?: VerificationSummaryRow | null;
 }): D1Database {
-  return {
-    prepare: (sql: string) => ({
-      bind: () => ({
-        first: async () => {
-          if (sql.includes("FROM cards")) return rows.card ?? null;
-          if (sql.includes("FROM qr_credentials")) return rows.qr ?? null;
-          if (sql.includes("FROM verification_summaries")) {
-            return rows.verification ?? null;
-          }
-          return null;
-        },
-      }),
+  return d1WithRateLimitBuckets((sql: string) => ({
+    bind: () => ({
+      first: async () => {
+        if (sql.includes("FROM cards")) return rows.card ?? null;
+        if (sql.includes("FROM qr_credentials")) return rows.qr ?? null;
+        if (sql.includes("FROM verification_summaries")) {
+          return rows.verification ?? null;
+        }
+        return null;
+      },
+      run: async () => ({ meta: { changes: 0 } }),
     }),
-  } as unknown as D1Database;
+  }));
 }
 
 describe("worker router CORS", () => {

@@ -196,7 +196,21 @@ body.device-hub-sheet-open .shell-status-cluster,
 }
 
 /* First-visit coachmark + load-error coach card — anchored to status dot */
-.device-hub-intro-coachmark,
+.device-hub-intro-coachmark {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 12px);
+  z-index: 69;
+  width: min(calc(100vw - 32px), 300px);
+  padding: 14px 16px 12px;
+  border-radius: calc(var(--shell-radius-sheet) - 2px);
+  background: var(--surface-popover-bg, #ffffff);
+  color: var(--surface-popover-fg, #1c1c1e);
+  border: 0.5px solid var(--surface-popover-border, rgba(60, 60, 67, 0.12));
+  box-shadow: var(--shell-shadow-md);
+  pointer-events: auto;
+}
+
 .device-status-load-error-coachmark {
   position: absolute;
   left: 0;
@@ -1615,26 +1629,6 @@ button.device-hub-notice-banner {
 .device-hub--stranger-empty [data-hub-stranger-empty-hide],
 #wallet-page.device-hub--stranger-empty [data-hub-stranger-empty-hide] {
   display: none !important;
-}
-
-/* Restore import always visible — docs/OWNERSHIP_RESTORE_UX_PLAN.md */
-.device-hub--stranger-empty [data-hub-restore-always],
-#wallet-page.device-hub--stranger-empty [data-hub-restore-always] {
-  display: block !important;
-}
-
-.created-restore-ownership-panel {
-  margin: 0 0 1rem;
-  padding: 1rem;
-  border-radius: var(--radius-md, 12px);
-  border: 0.5px solid var(--shell-separator, rgba(0, 0, 0, 0.12));
-  background: var(--surface-elevated, rgba(255, 255, 255, 0.6));
-}
-
-.created-restore-ownership-title {
-  margin: 0 0 0.5rem;
-  font-size: 1.125rem;
-  font-weight: 600;
 }
 
 .device-hub-status-key-label {
