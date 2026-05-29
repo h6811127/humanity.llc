@@ -226,7 +226,7 @@ Indicates **stale session cache / pre-fetch alert application**, not network tru
 ### Slice 5 - Doc hygiene (P2) ✅
 
 - [x] Sync `DEVICE_HUB_AND_LOCAL_SEARCH.md` with removed help pill / current landing layout.
-- [x] Update `site/features/scan-ui.html` (regenerate via `generate-feature-pages.mjs` if needed).
+- [x] Update `site/features/scan-ui.html` (regenerate via `npm run site:generate-features` per [`FEATURE_MAP_MAINTENANCE.md`](FEATURE_MAP_MAINTENANCE.md)).
 - [x] Note browser notifications as shipped in `DEVICE_OS.md`.
 
 ---

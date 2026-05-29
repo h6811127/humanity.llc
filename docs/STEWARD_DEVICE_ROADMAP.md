@@ -6,6 +6,8 @@
 
 Use this page when you need **one map** of steward-facing device work. Detailed rules stay in the linked docs; update those first, then adjust status rows here if the summary drifts.
 
+**Public / recruiter feature map:** [`FEATURE_MAP_MAINTENANCE.md`](FEATURE_MAP_MAINTENANCE.md) · live hub at `/features-available-now.html` (generated from `site/scripts/generate-feature-pages.mjs`).
+
 ---
 
 ## Current engineering steps (ordered)
@@ -115,7 +117,8 @@ flowchart LR
 | “We’re building an App Store app to replace the site” | **No.** Stewards may use **PWA** (same keys/inbox). Native clients are **hosted-tier future**, out of v1 web scope. |
 | “Browser alerts will be removed when push ships” | **No.** Push **reduces wallet round-robin**; tab + **SW stay fallback** ([`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md)). |
 | “Saving many cards turns on monitoring” | **No.** Watch and Browser alerts are **opt-in** ([`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Operating modes). |
-| “PWA install registers a shell service worker” | **No** for Phases 1–3 ([`PWA_INSTALL.md`](PWA_INSTALL.md)). **`/sw-live-proof.mjs`** is a **separate**, narrow SW for live proof only. |
+| “PWA install registers a shell service worker” | **No** for Phases 1–5 ([`PWA_INSTALL.md`](PWA_INSTALL.md)). **`/sw-live-proof.mjs`** is a **separate**, narrow SW for live proof only. |
+| “PWA on home screen auto-reloads every open” | **No.** **Soft refresh** on resume + optional pull — not `location.reload()` every time ([`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume). |
 | “Cross-tab keys should OS-notify me” | **Never** — inbox/chrome only ([`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md)). |
 
 ---
@@ -129,7 +132,7 @@ flowchart LR
 | **Inbox + custody panel** | Phases 1–14 inbox; custody plan 1–7 | Per-card watch flags (catalog L9+) | [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md`](KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md) |
 | **Browser alerts** | v2 A–D + `sw-live-proof.mjs` | Same UX; less polling when SSE healthy | [`DEVICE_INBOX.md`](DEVICE_INBOX.md) § Background alerts roadmap |
 | **Poll budget** | Phases 1–9 + 8c; 400 auto GET/day; leader tab | Entitlement-driven cap; push miss → poll | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Optimization catalog **L12–L15**, **B1–B3** |
-| **PWA install** | Phases 1–5 shipped (manifest scope locked; brand-dot icon) | Shell-caching SW only via RFC | [`PWA_INSTALL.md`](PWA_INSTALL.md) · **H-006 closed** |
+| **PWA install** | Phases 1–5 shipped (manifest scope locked; brand-dot icon) | **Phases 6–8:** standalone resume refresh, PTR, stale shell nudge · H-007 | [`PWA_INSTALL.md`](PWA_INSTALL.md) · **H-006 closed** |
 | **Hosted steward tier** | M8 code + **client session link** (checkout `?hc_account_id=`) | Production rollout + Stripe return URL | [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) |
 | **Server push** | — | SSE P1; DO P2; SW fallback | [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) |
 | **Native mobile app** | — | Planning only (webhook path C) | [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) § Server push options |
@@ -182,7 +185,7 @@ Product boundaries and build order — **do not re-spec here**.
 | Implement hosted push | [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) · [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § E4 |
 | Link billing account to device session | `device-steward-session.mjs` · `?hc_account_id=acc_…` after checkout |
 | Build Stripe success_url + metadata | `npm run hosted:stripe-return-url -- acc_…` · `device-steward-billing-return-core.mjs` |
-| QA steward flows | [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — P2 live proof, P3 background alerts, PWA |
+| QA steward flows | [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — P2 live proof, P3 background alerts, PWA, **P1-PWA-R** |
 
 ---
 

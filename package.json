@@ -5,6 +5,7 @@
   "scripts": {
     "build": "node -e \"const fs=require('fs'); fs.accessSync('site/index.html'); fs.accessSync('site/404.html'); console.log('Static site ready: site/')\"",
     "site:build-meta": "node worker/scripts/generate-build-meta.mjs",
+    "site:generate-features": "node site/scripts/generate-feature-pages.mjs",
     "site:generate-pwa-icons": "node worker/scripts/generate-pwa-icons.mjs",
     "worker:build-meta": "node worker/scripts/generate-worker-build-meta.mjs",
     "deploy": "npm run site:build-meta && wrangler pages deploy site --project-name=humanity-llc",

@@ -1,5 +1,6 @@
 **Version:** 1.0
 **Status:** Draft for Collective Ratification
+**Implementation status:** Tier 0 `/shop/` and Tier 1 `/shop/customize/` ship in repo; operator enables checkout and Printify per [`MERCH_FUNNEL_MVP.md`](../MERCH_FUNNEL_MVP.md). Public feature map: [`FEATURE_MAP_MAINTENANCE.md`](../FEATURE_MAP_MAINTENANCE.md).
 **Constitution Reference:** Humanity Commons Constitution (Articles I, II, III, VI)
 **Product Trust Reference:** V1 Product Trust Model
 **Dependencies:** Humanity Card v1.0, Printify Fulfillment Middleware v1.0

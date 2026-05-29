@@ -149,6 +149,8 @@ Signed card → HTTPS QR → trust-state UI → artifact intent → per-item QR 
 **Implementation (build step by step):**
 
 - `docs/V1_0_ARCHITECTURE_ROADMAP.md`  -  **canonical build sequence** (M0–M10)
+- `docs/FEATURE_MAP_MAINTENANCE.md`  -  public `/features/*` map vs product specs vs steward index
+- `docs/STEWARD_DEVICE_ROADMAP.md`  -  steward shell, inbox, hosted tier, PWA (engineering index)
 
 **V1 wedge and copy:**
 
@@ -181,6 +183,11 @@ Signed card → HTTPS QR → trust-state UI → artifact intent → per-item QR 
 
 - `docs/features/Storefront v1.0.md`
 - `docs/features/Printify Fulfillment Middleware v1.0.md`
+
+**Public feature pages (site):**
+
+- `/features-available-now.html`  -  hub (regenerate: `npm run site:generate-features`)
+- `/help/`  -  ownership, device shell, links to feature pages
 
 **Implementation planning:**
 

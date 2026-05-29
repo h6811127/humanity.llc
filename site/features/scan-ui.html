@@ -50,7 +50,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Flat status panel + iOS-style grouped lists (not a separate “flippable pass” product mode). Bearer warning on the pass card; revoked/suspended overrides hide positive verification badges. Humans: <code>GET /c/{profile_id}?q=…</code>. Machines: <code>GET …/cards/{id}/status?q=…</code> (same truth as HTML). Integrators needing only <code>qr_id</code>: <code>GET …/qr/{qr_id}</code>. Signed card document: <code>GET …/cards/{id}</code> (JSON, not the scan page).</p>
+    <p class="settings-panel-lead">Flat status panel + iOS-style grouped lists; bearer warning on scan hero; revoked/suspended overrides hide positive verification badges. Machine-readable twin at <code>GET …/cards/{id}/status</code> matches HTML truth.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -86,7 +86,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Activity stream merge rules on scan, role-specific templates for maintainers vs game operators. Offline disclosure on scan pages is shipped (banner when the browser is offline).</p>
+    <p class="settings-panel-lead">Activity stream merge rules on scan, offline/stale banners, role-specific templates for maintainers vs game operators.</p>
   </div>
 </details></div>
         </section>

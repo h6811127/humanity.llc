@@ -1,5 +1,7 @@
 /**
- * Generates /features/*.html from shared data. Run: node site/scripts/generate-feature-pages.mjs
+ * Generates /features/*.html from shared data.
+ * @see docs/FEATURE_MAP_MAINTENANCE.md
+ * Run: npm run site:generate-features
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -7,6 +9,9 @@ import { fileURLToPath } from "node:url";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const outDir = path.join(root, "features");
+
+/** Recruiter-facing round number — see docs/FEATURE_MAP_MAINTENANCE.md; exact: npm run worker:test */
+const WORKER_TEST_COUNT_LABEL = "1,400+";
 
 const ICONS = {
   status: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>`,
@@ -120,7 +125,7 @@ const FEATURES = [
       why: "The product is not “a membership card.” The same signed object model powers a studio door plate, a festival wristband, a keys sticker, and a mutual-aid flyer  -  each with different scan copy and credential scope.",
       design: "<strong>Status plate (shipped pilot)</strong>  -  object name + live status line for doors and booths; homepage <strong>One use</strong> section + <a href=\"/studio/\">Studio blog</a>. <strong>Lost item relay (shipped pilot)</strong>  -  item headline + return message on scan; create at <a href=\"/create/?template=lost_item\">/create/</a>; showcase via <code>npm run site:seed-showcase-lost-item</code>. <strong>Basic card</strong>  -  handle + manifesto + verification summary. <strong>Print artifact</strong>  -  unique <code>qr_id</code> per unit via artifact intent.",
       safety: "Relay patterns must not doxx owners. Per-item QR scope limits blast radius when one sticker is stolen. Template copy stays honest about what scan proves.",
-      limits: "Storefront → Printify personalization path still in build. Relay has no separate contact-routing API beyond signed manifesto updates.",
+      limits: "QR customizer at <a href=\"/shop/customize/\">/shop/customize/</a> ships in repo; operator enables live checkout. Child objects register on <a href=\"/created/\">/created/</a>. Relay has no separate contact-routing API beyond signed manifesto updates.",
       future: "Template library for organizers, commerce-backed unique QRs, city-game objects (<a href=\"/what-can-a-qr-do/physical-world-multiplayer/\">research</a>).",
     },
   },
@@ -131,11 +136,11 @@ const FEATURES = [
     icon: "qr",
     iconTone: "red",
     lead: "Mechanism-visible answers on every scan.",
-    subHtml: `<span class="ship-badge ship-badge-live">Live</span> flippable pass card + grouped trust blocks`,
+    subHtml: `<span class="ship-badge ship-badge-live">Live</span> flat status panel + grouped trust blocks`,
     badge: "live",
     aspects: {
       why: "Trust products fail when limits are buried. Scan separates card status, human trust, QR credential scope, live control, and vouch issuance  -  plus one “what this does not prove” panel.",
-      design: "iOS-style grouped lists; bearer warning on pass card; revoked/suspended overrides hide positive verification badges. Machine-readable twin at <code>GET …/cards/{id}/status</code> matches HTML truth.",
+      design: "Flat status panel + iOS-style grouped lists; bearer warning on scan hero; revoked/suspended overrides hide positive verification badges. Machine-readable twin at <code>GET …/cards/{id}/status</code> matches HTML truth.",
       safety: "<strong>No scan analytics</strong> on the public page  -  resolver returns object state, not who scanned. Cache-Control: no-store on live scans.",
       limits: "Scan UI is server-rendered; artifact-specific layouts are minimal in v1. Holding a printed QR still does not prove ownership.",
       future: "Activity stream merge rules on scan, offline/stale banners, role-specific templates for maintainers vs game operators.",
@@ -199,13 +204,13 @@ const FEATURES = [
     icon: "box",
     iconTone: "pink",
     lead: "Unique QR per physical unit before checkout.",
-    subHtml: `<span class="ship-badge ship-badge-partial">Partial</span> POST API live; Shopify → Printify path in build`,
+    subHtml: `<span class="ship-badge ship-badge-partial">Partial</span> API + middleware in repo; operator checkout + Printify QA gate live Tier 1`,
     badge: "partial",
     aspects: {
       why: "Personalized stickers need a planned <code>qr_id</code> per item so one stolen unit can be revoked without killing the whole card. Bridges digital create → physical print.",
-      design: "Artifact intent records planned credentials before payment; must survive Shopify checkout metadata. No private keys in intent payloads.",
+      design: "Artifact intent records planned credentials before payment; must survive Shopify checkout metadata. No private keys in intent payloads. Engineering rollout: <code>merch-funnel:rollout:step1</code>–<code>step6</code>.",
       safety: "Intent is pre-commit state  -  operator can hold orders if metadata is missing rather than auto-printing wrong QRs.",
-      limits: "End-to-end merch fulfillment not live for all users. Highest-risk handoff is checkout metadata survival (documented in flow audit).",
+      limits: "End-to-end paid personalized orders require operator <code>shop-config.json</code> + physical QA — not enabled for all visitors until close-out (<code>docs/MERCH_FUNNEL_MVP.md</code> operator steps).",
       future: "User-safe order timeline, Printify webhook reconciler, sample QA loop for launch templates.",
     },
   },
@@ -216,14 +221,14 @@ const FEATURES = [
     icon: "test",
     iconTone: "green",
     lead: "Documented threats backed by automated tests.",
-    subHtml: `<span class="ship-badge ship-badge-live">Live</span> 94 Vitest cases across crypto, revoke, vouch, live control, scan`,
+    subHtml: `<span class="ship-badge ship-badge-live">Live</span> ${WORKER_TEST_COUNT_LABEL} Vitest cases across crypto, revoke, vouch, live control, scan, device shell, hosted tier`,
     badge: "live",
     aspects: {
       why: "Recruiters and security reviewers should see boundaries enforced in CI  -  not only in markdown threat models.",
       design: "Shared crypto module for Worker + browser parity tests. Fake D1 layers for resolver handlers. Scan HTML regression tests for trust copy and live-control states.",
       safety: "Covers replay nonces, signature mismatch, vouch quotas, live-control expiry, verification display overrides. Adversarial review doc in repo for open questions.",
-      limits: "No production penetration test report yet. Browser E2E for create flow is manual / stranger-test driven.",
-      future: "Playwright smoke path, fuzzing on canonicalization, operator abuse simulation fixtures.",
+      limits: "No production penetration test report yet. Playwright E2E covers device shell, hosted tier, and merch paths; stranger create loop is runbook-driven.",
+      future: "Fuzzing on canonicalization, operator abuse simulation fixtures, periodic test-count refresh on hub.",
     },
   },
   {
@@ -233,11 +238,11 @@ const FEATURES = [
     icon: "device",
     iconTone: "trust",
     lead: "Returning users manage keys, pins, and shortcuts without accounts.",
-    subHtml: `<span class="ship-badge ship-badge-live">Live</span> homepage + <a href="/wallet/">/wallet/</a> + shared status header on <a href="/created/">/created/</a>`,
+    subHtml: `<span class="ship-badge ship-badge-live">Live</span> status dot + hub sheet on <a href="/">/</a>, <a href="/wallet/">/wallet/</a>, <a href="/created/">/created/</a>`,
     badge: "live",
     aspects: {
       why: "Create puts keys in one tab; strangers need the story, returners need a control center. The hub names the two storage layers and surfaces the next action (save, notice, revoke, vouch).",
-      design: "<strong>Status line</strong>  -  segmented counts (network, saved, pinned, notice); tap expands <strong>On this device</strong>. <strong>Saved cards</strong>  -  Use keys, Open scan, relabel/remove. <strong>Pinned scans</strong>  -  public bookmarks only (<code>hc_device_pins</code>). <strong>Search</strong>  -  inline in hub; filters local rows only (not resolver-wide). <strong>Backup import</strong>  -  decrypt <code>.hcbackup.json</code> into <code>hc_wallet</code>. <strong>Focus mode</strong>  -  hide intro sections; keep hub + documentation.",
+      design: "<strong>Status dot</strong>  -  floating trust indicator; tap opens <strong>On this device</strong> hub sheet. <strong>Inbox</strong>  -  action rows, badge, live-proof overlays. <strong>Saved cards</strong>  -  Use keys, Open controls, relabel/remove. <strong>Pinned scans</strong>  -  public bookmarks only (<code>hc_device_pins</code>). <strong>Search</strong>  -  inline in hub; filters local rows only. <strong>Backup import</strong>  -  decrypt <code>.hcbackup.json</code> into <code>hc_wallet</code>. <strong>Focus mode</strong>  -  hide intro sections. More shell detail: <a href=\"/help/\">/help/</a> · <code>docs/FEATURE_MAP_MAINTENANCE.md</code> in repo.",
       safety: "Private keys stay in browser storage; pins never hold signing material. Search is client-side over data you already saved. Labels are yours  -  rows show <code>@handle</code> + profile id so synced browser data cannot lie silently.",
       limits: "Not cloud sync or multi-device accounts. Browser profile sync (Safari/Chrome) may copy <code>localStorage</code> incompletely  -  prefer explicit save per machine. No directory search for other people’s cards.",
       future: "Optional activity log on device, clearer multi-tab key handoff, federated read  -  still no operator custody of owner keys.",
@@ -387,11 +392,11 @@ function renderHub() {
       </header>
       <main class="screen">
         <section class="hero">
-          <p class="hero-eyebrow">Building now</p>
+          <p class="hero-eyebrow">What ships today</p>
           <h1>All features available now</h1>
-          <p class="hero-line">Protocol features (signed objects on the Worker) plus the Pages shell returners use every day  -  hub, wallet, studio blog.</p>
+          <p class="hero-line">Phase A trust MVP (M5 passed) plus the Pages shell returners use every day — hub, wallet, studio blog.</p>
         </section>
-        <p class="insight"><strong>For recruiters:</strong> <strong>Cloudflare Workers + D1 + Pages</strong>  -  Ed25519-signed writes, replay-protected mutations, mechanism-visible scan UI, <strong>On this device</strong> hub (no accounts), status-plate pilot, and <strong>94 automated Worker tests</strong>.</p>
+        <p class="insight"><strong>For recruiters:</strong> <strong>Cloudflare Workers + D1 + Pages</strong>  -  Ed25519-signed writes, replay-protected mutations, mechanism-visible scan UI, <strong>On this device</strong> hub (no accounts), status-plate pilot, and <strong>${WORKER_TEST_COUNT_LABEL} automated Worker tests</strong>.</p>
         <section class="group">
           <h2 class="group-label">Site &amp; returning users</h2>
           <ul class="list">

@@ -25,7 +25,7 @@
         </section>
         <div class="feature">
           <p class="feature-lead">Unique QR per physical unit before checkout.</p>
-          <p class="feature-sub"><span class="ship-badge ship-badge-partial">Partial</span> POST API live; Shopify → Printify path in build</p>
+          <p class="feature-sub"><span class="ship-badge ship-badge-partial">Partial</span> API + middleware in repo; operator checkout + Printify QA gate live Tier 1</p>
         </div>
         <section class="group feature-aspects">
           <h2 class="group-label">About this feature</h2>
@@ -50,7 +50,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Artifact intent records planned credentials before payment; must survive Shopify checkout metadata. No private keys in intent payloads.</p>
+    <p class="settings-panel-lead">Artifact intent records planned credentials before payment; must survive Shopify checkout metadata. No private keys in intent payloads. Engineering rollout: <code>merch-funnel:rollout:step1</code>–<code>step6</code>.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -74,7 +74,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">End-to-end merch fulfillment not live for all users. Highest-risk handoff is checkout metadata survival (documented in flow audit).</p>
+    <p class="settings-panel-lead">End-to-end paid personalized orders require operator <code>shop-config.json</code> + physical QA — not enabled for all visitors until close-out (<code>docs/MERCH_FUNNEL_MVP.md</code> operator steps).</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
