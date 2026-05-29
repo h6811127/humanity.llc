@@ -9,6 +9,7 @@ import {
   readMerchRefFromUrl,
   shouldHandoffToCustomize,
 } from "./merch-funnel-core.mjs";
+import { setLastActiveProfileId } from "./device-quiet-tab-rehydrate-prefs.mjs";
 import { buildObjectStreamsFromFormRows } from "./object-streams-core.mjs";
 import {
   qrExpiryFromIssued,
@@ -326,6 +327,7 @@ export async function runCreateCard(input) {
       ...(sampleCard ? { sample_card: true } : {}),
     })
   );
+  setLastActiveProfileId(profileId);
 
   const created = new URL("/created/", location.origin);
   created.searchParams.set("profile_id", profileId);

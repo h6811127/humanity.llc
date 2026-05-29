@@ -409,7 +409,7 @@ Automated: `npm run worker:test -- worker/tests/device-hub-stranger-empty-core.t
 
 Automated: `npm run worker:test -- worker/tests/device-dot-state.test.ts worker/tests/device-hub-intro-coachmark.test.ts` · `e2e/device-status-dot.spec.ts` § shell S4
 
-### P1-QTR · Quiet tab rehydrate (D10 Tier 1)
+### P1-QTR · Quiet tab rehydrate (D10 Tier 1–2)
 
 **Spec:** [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md)
 
@@ -417,10 +417,12 @@ Automated: `npm run worker:test -- worker/tests/device-dot-state.test.ts worker/
 |------|--------|----------|
 | 1 | One saved card in `hc_wallet` → new tab → `/` | No cross-tab “managing elsewhere” notice; dot shows steward/keys state without **Open controls** tap |
 | 2 | Same → `/wallet/` | Saved list usable; active-control banner reflects rehydrated session |
-| 3 | Two saved cards → new tab → `/` | **No** silent rehydrate — existing take-control / hub picker UX |
-| 4 | One card + sign lock on → new tab | **No** silent rehydrate until unlock |
+| 3 | Two saved cards, last-active set, toggle on → new tab → `/` | Silent rehydrate of last-active object; no picker tap |
+| 4 | Two saved cards, hub toggle **Open last object in new tabs** off → new tab | **No** silent rehydrate — existing take-control / hub picker UX |
+| 5 | Two saved cards, no last-active → new tab | **No** silent rehydrate |
+| 6 | One card + sign lock on → new tab | **No** silent rehydrate until unlock |
 
-Automated: `npm run worker:test -- worker/tests/device-quiet-tab-rehydrate-core.test.ts`
+Automated: `npm run worker:test -- worker/tests/device-quiet-tab-rehydrate-core.test.ts worker/tests/device-quiet-tab-rehydrate.test.ts`
 
 ### P1-LDE · Status load-error coach card
 

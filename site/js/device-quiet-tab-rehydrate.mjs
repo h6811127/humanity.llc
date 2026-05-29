@@ -1,5 +1,5 @@
 /**
- * Shell bootstrap: rehydrate hc_created from hc_wallet when Tier 1 rules pass.
+ * Shell bootstrap: rehydrate hc_created from hc_wallet when D10 rules pass.
  * @see docs/QUIET_TAB_REHYDRATE.md
  */
 import { activateWalletEntryGated } from "./device-control-activation.mjs";
@@ -7,10 +7,14 @@ import { controlActivationRequiresUnlock } from "./device-control-activation-cor
 import { getTabSession } from "./device-keys.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import {
+  resolveQuietTabRehydrateTarget,
   shouldQuietTabRehydrate,
-  soleSigningWalletEntry,
   walletEntriesWithSigningKeys,
 } from "./device-quiet-tab-rehydrate-core.mjs";
+import {
+  getLastActiveProfileId,
+  isQuietTabRehydrateEnabled,
+} from "./device-quiet-tab-rehydrate-prefs.mjs";
 
 /**
  * @returns {Promise<{ ok: true, profileId: string } | { skipped: string }>}
@@ -20,19 +24,26 @@ export async function maybeQuietTabRehydrate() {
   const hasTabControl = Boolean(session?.owner_private_key_b58);
   const wallet = loadWallet();
   const signingEntries = walletEntriesWithSigningKeys(wallet);
-  const entry = soleSigningWalletEntry(wallet);
+  const quietRehydrateEnabled = isQuietTabRehydrateEnabled();
+  const lastActiveProfileId = getLastActiveProfileId();
+  const entry = resolveQuietTabRehydrateTarget(wallet, lastActiveProfileId);
   const profileId = typeof entry?.profile_id === "string" ? entry.profile_id : "";
 
   if (
     !shouldQuietTabRehydrate({
       hasTabControl,
       signingWalletCount: signingEntries.length,
+      targetEntry: entry,
       requiresUnlock: controlActivationRequiresUnlock(profileId),
+      quietRehydrateEnabled,
     })
   ) {
     if (hasTabControl) return { skipped: "has_tab_control" };
     if (signingEntries.length === 0) return { skipped: "no_saved" };
-    if (signingEntries.length > 1) return { skipped: "multi_card" };
+    if (signingEntries.length > 1 && !quietRehydrateEnabled) {
+      return { skipped: "multi_card_opt_out" };
+    }
+    if (signingEntries.length > 1 && !entry) return { skipped: "no_last_active" };
     if (controlActivationRequiresUnlock(profileId)) return { skipped: "requires_unlock" };
     return { skipped: "ineligible" };
   }

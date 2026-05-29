@@ -3,6 +3,7 @@
  */
 import "./device-steward-billing-return-bootstrap.mjs";
 import { initAutoSaveToggle } from "./device-auto-save.mjs";
+import { initQuietTabRehydrateToggle } from "./device-quiet-tab-rehydrate-prefs.mjs";
 import {
   initResolverRefreshAllTabsAction,
   initResolverSyncTabsToggle,
@@ -13,6 +14,7 @@ import "./device-help-fab.mjs";
 
 initDeviceHub({ noticeMode: "created-url", showLiveControlInbox: true });
 initAutoSaveToggle();
+initQuietTabRehydrateToggle();
 initResolverSyncTabsToggle();
 initResolverRefreshAllTabsAction();
 mountThemeToggles();

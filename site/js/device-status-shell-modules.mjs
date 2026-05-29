@@ -10,7 +10,7 @@
  * Bump on all shell HTML (`device-status-bootstrap.mjs?v=N`) and on every
  * `./peer.mjs?v=N` import between files in DEVICE_STATUS_SHELL_JS_FILES.
  */
-export const DEVICE_SHELL_ASSET_VERSION = 61;
+export const DEVICE_SHELL_ASSET_VERSION = 62;
 
 /** @deprecated Use DEVICE_SHELL_ASSET_VERSION */
 export const DEVICE_STATUS_BOOTSTRAP_CACHE_BUST = DEVICE_SHELL_ASSET_VERSION;
@@ -44,6 +44,7 @@ export const DEVICE_STATUS_SHELL_JS_FILES = [
   "device-hub-keys-custody.mjs",
   "device-presence-inbox-stability-core.mjs",
   "device-quiet-tab-rehydrate-core.mjs",
+  "device-quiet-tab-rehydrate-prefs.mjs",
   "device-quiet-tab-rehydrate.mjs",
   "device-inbox.mjs",
   "device-tab-presence-core.mjs",

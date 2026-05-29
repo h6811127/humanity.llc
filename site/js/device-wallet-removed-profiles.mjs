@@ -8,6 +8,7 @@ import {
   REMOVED_PROFILES_STORAGE_KEY,
 } from "./device-wallet-removed-profiles-core.mjs";
 import { clearDefaultVouchIfProfile } from "./vouch-ready-keys.mjs";
+import { clearLastActiveProfileIfProfile } from "./device-quiet-tab-rehydrate-prefs.mjs";
 
 /**
  * @returns {Set<string>}
@@ -36,6 +37,7 @@ export function markProfileRemovedFromDevice(profileId) {
   if (!pid) return;
   writeRemovedProfileIds(addRemovedProfileId([...loadRemovedProfileIds()], pid));
   clearDefaultVouchIfProfile(pid);
+  clearLastActiveProfileIfProfile(pid);
   window.dispatchEvent(new Event("hc-wallet-removed-profiles-changed"));
 }
 

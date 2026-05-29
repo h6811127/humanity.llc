@@ -1,5 +1,6 @@
 import { logDeviceActivity, walletEntryForActivity } from "./device-activity.mjs";
 import { navigateTo } from "./device-shell-motion.mjs";
+import { setLastActiveProfileId } from "./device-quiet-tab-rehydrate-prefs.mjs";
 import { clearSignUnlock } from "./vouch-sign-lock.mjs";
 import { loadWallet, walletEntryQrId } from "./device-wallet.mjs";
 
@@ -52,6 +53,7 @@ export function activateWalletEntry(entry) {
       wallet_label: entry.label,
     })
   );
+  setLastActiveProfileId(String(entry.profile_id || ""));
   logDeviceActivity("use_keys", entry.label || entry.handle || String(entry.profile_id).slice(0, 12), {
     profile_id: entry.profile_id,
     qr_id: qrId,

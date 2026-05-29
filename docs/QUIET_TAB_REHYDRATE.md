@@ -1,6 +1,6 @@
 # Quiet tab rehydrate (passkey-like control)
 
-**Status:** Tier 1 shipped · Tier 2 planned  
+**Status:** Tier 1–2 shipped · Tier 3 planned  
 **Audience:** Product, frontend, security review  
 **Companions:** [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)
 
@@ -41,7 +41,7 @@ Today, a **new tab** on `/`, `/wallet/`, or `/create/` can show cross-tab / “t
 | Tier | Behavior | Status |
 |------|----------|--------|
 | **1** | Exactly **one** saved card with signing keys + empty `hc_created` + no unlock gate → silent rehydrate on **shell bootstrap** (`/`, `/wallet/`, `/create/`, `/created/`) | **Shipped** |
-| **2** | Remember `hc_last_active_profile_id`; rehydrate that profile on new tabs (hub toggle, default on) when multi-card | Planned |
+| **2** | Remember `hc_last_active_profile_id`; rehydrate that profile on new tabs (hub toggle, default on) when multi-card | **Shipped** |
 | **3** | Demote cross-tab chrome when rehydrate succeeds; keep notices for unsaved-only-other-tab and unlock-pending | Planned |
 
 **Already shipped (related, narrower):**
@@ -79,25 +79,48 @@ Once per shell page load, **before** first chrome refresh (`device-status.mjs` i
 
 ---
 
-## Tier 2 (planned)
+## Tier 2 contract
+
+### Storage
 
 | Key | Storage | Meaning |
 |-----|---------|---------|
-| `hc_last_active_profile_id` | `localStorage` | Last profile activated into `hc_created` |
+| `hc_last_active_profile_id` | `localStorage` | Last profile activated into `hc_created` (create, open controls, auto-save) |
 | `hc_quiet_tab_rehydrate` | `localStorage` | `"0"` = off; unset / `"1"` = on (default on) |
 
-When enabled and last-active is valid: rehydrate that row on shell bootstrap even with multiple saved cards. Ambiguous or missing last-active → Tier 1 rules only.
+### When Tier 2 applies
+
+After Tier 1 preconditions (empty tab, no unlock gate), when **two or more** signing rows exist:
+
+1. `isQuietTabRehydrateEnabled()` is **true** (hub toggle **Open last object in new tabs**)
+2. `resolveQuietTabRehydrateTarget()` finds a row matching `hc_last_active_profile_id`
+3. `activateWalletEntryGated(entry)` succeeds
+
+### When Tier 2 is skipped
+
+| Condition | Result |
+|-----------|--------|
+| Toggle off (`hc_quiet_tab_rehydrate` = `"0"`) | Skip — existing take-control / hub picker UX |
+| No last-active or id not in wallet | Skip — no guess across multiple cards |
+| Last-active removed from wallet | Cleared on card remove; skip until user activates again |
+
+### Hub toggle
+
+`#device-quiet-tab-rehydrate-toggle` in device hub shortcuts (`site/index.html`); initialized from `landing-device-hub.mjs` via `initQuietTabRehydrateToggle()`.
 
 ---
 
-## Files (Tier 1)
+## Files
 
 | Area | Module |
 |------|--------|
 | Pure rules | `site/js/device-quiet-tab-rehydrate-core.mjs` |
+| Device prefs + hub toggle | `site/js/device-quiet-tab-rehydrate-prefs.mjs` |
 | Bootstrap hook | `site/js/device-quiet-tab-rehydrate.mjs` |
+| Last-active writes | `device-keys.mjs`, `device-wallet.mjs`, `create-card.mjs` |
+| Last-active clear on remove | `device-wallet-removed-profiles.mjs` |
 | Wire | `site/js/device-status.mjs` (await before `startTabKeysPresence` / chrome refresh) |
-| Tests | `worker/tests/device-quiet-tab-rehydrate-core.test.ts` |
+| Tests | `worker/tests/device-quiet-tab-rehydrate-core.test.ts`, `worker/tests/device-quiet-tab-rehydrate.test.ts` |
 
 ---
 

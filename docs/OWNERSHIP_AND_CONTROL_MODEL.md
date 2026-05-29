@@ -223,7 +223,7 @@ Priority surfaces to migrate to Layer 2 copy:
 |-----|-------|--------|
 | Session-first create | Keys land in `hc_created` before save; user may see warnings | Auto-save default **on** (shipped); deprecate scary session-only hero |
 | Recovery not automatic | Optional at create; user must confirm save | **Warn only when recovery impossible** — gate child objects / print checkout (partial: `child-object-backup-gate.mjs`) |
-| Multi-tab control | User must understand tab isolation | **Quiet tab rehydrate** (D10): copy saved ownership into new tabs silently when safe; cross-tab chrome only when rehydrate cannot run | **Tier 1 shipped** — see [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) |
+| Multi-tab control | User must understand tab isolation | **Quiet tab rehydrate** (D10): copy saved ownership into new tabs silently when safe; cross-tab chrome only when rehydrate cannot run | **Tier 1–2 shipped** — see [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) |
 | “My cards” naming | Protocol term | **My objects** or **What I control** when object tree is primary |
 | Advanced export | Mixed into primary `/created/` | Collapse under **Advanced → Export for developers** | **D8** ✅ |
 
@@ -265,7 +265,7 @@ These are **product defaults**; implementation can phase in without protocol cha
 
 ### 7. Quiet tab rehydrate (passkey-like)
 
-- **Tier 1 (shipped):** One saved object + empty tab → shell bootstrap copies wallet row into `hc_created` without key copy ([`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md)).
+- **Tier 1–2 (shipped):** One saved object, or last-active when multi-card + toggle on → shell bootstrap copies wallet row into `hc_created` without key copy ([`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md)).
 - **Tier 2 (planned):** Last-active profile for multi-card stewards.
 - Does **not** change protocol, server custody, or `hc_created` per-tab lifetime.
 
@@ -373,7 +373,7 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | **D9f** | Founding + steward surface copy — shop FAQ calendar expiry, wallet attestation help, feature pages, hub custody | Low — copy only | **Shipped** (2026-05-29) |
 | **D9h** | Founding copy comprehension runbook + expanded shop FAQ/guards | Low — docs + tests | **Shipped** (2026-05-29) |
 | **D9i** | Founding sticker FAQ gap close — full LAUNCH_LANGUAGE_KIT § Sticker FAQ on `/shop/founding/` | Low — copy + guards | **Shipped** (2026-05-29) |
-| **D10** | Quiet tab rehydrate — Tier 1: single saved card → silent `hc_created` on shell bootstrap | Medium — multi-tab UX | **Tier 1 shipped** — [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) |
+| **D10** | Quiet tab rehydrate — Tier 1: single saved card; Tier 2: last-active + hub toggle for multi-card | Medium — multi-tab UX | **Tier 1–2 shipped** — [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) |
 
 **Do not migrate:** resolver APIs, document types, storage key names, or test fixture terminology without a dedicated protocol PR.
 
@@ -442,4 +442,5 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | 2026-05-29 | **M7 comprehension passed** — 5/5 strangers per [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md) |
 | 2026-05-29 | **D9h shipped** — [`FOUNDING_COPY_COMPREHENSION_RUNBOOK.md`](FOUNDING_COPY_COMPREHENSION_RUNBOOK.md); shop FAQ F1–F3 guards |
 | 2026-05-29 | **D9i shipped** — full LAUNCH_LANGUAGE_KIT Sticker FAQ on `/shop/founding/` (revoke, campaign end, misprint) |
+| 2026-05-29 | **D10 Tier 2 shipped** — last-active profile + hub toggle for multi-card quiet rehydrate |
 | 2026-05-29 | **D10 Tier 1 shipped** — quiet tab rehydrate for single saved card; [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) |
