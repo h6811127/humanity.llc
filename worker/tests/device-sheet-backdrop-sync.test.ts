@@ -51,23 +51,14 @@ describe("syncInboxBackdropForOpenHub", () => {
     };
   }
 
-  function mockOpenHub() {
-    return {
-      classList: {
-        contains(cls) {
-          if (cls === "device-hub-collapsed") return false;
-          return cls === "device-hub--sheet";
-        },
-      },
-    };
-  }
-
-  it("clears stuck inbox backdrop when hub is open and inbox is closed", () => {
+  it("clears stuck inbox backdrop when inbox is closed", () => {
     const inboxBackdrop = mockBackdrop();
     const doc = {
       getElementById(id) {
-        if (id === "device-hub") return mockOpenHub();
         if (id === "device-inbox-backdrop") return inboxBackdrop;
+        if (id === "device-inbox-sheet") {
+          return { classList: { contains: (c) => c === "device-inbox-sheet--collapsed" } };
+        }
         return null;
       },
       body: { classList: { contains: () => false } },
@@ -83,11 +74,28 @@ describe("syncInboxBackdropForOpenHub", () => {
     const inboxBackdrop = mockBackdrop();
     const doc = {
       getElementById(id) {
-        if (id === "device-hub") return mockOpenHub();
         if (id === "device-inbox-backdrop") return inboxBackdrop;
         return null;
       },
       body: { classList: { contains: (c) => c === "device-inbox-sheet-open" } },
+    };
+
+    syncInboxBackdropForOpenHub(/** @type {Document} */ (doc));
+
+    expect(inboxBackdrop.hidden).toBe(false);
+  });
+
+  it("leaves inbox backdrop alone when inbox sheet DOM is expanded", () => {
+    const inboxBackdrop = mockBackdrop();
+    const doc = {
+      getElementById(id) {
+        if (id === "device-inbox-backdrop") return inboxBackdrop;
+        if (id === "device-inbox-sheet") {
+          return { classList: { contains: (c) => c !== "device-inbox-sheet--collapsed" } };
+        }
+        return null;
+      },
+      body: { classList: { contains: () => false } },
     };
 
     syncInboxBackdropForOpenHub(/** @type {Document} */ (doc));

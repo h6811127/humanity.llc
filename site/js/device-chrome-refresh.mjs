@@ -25,7 +25,7 @@ import {
   beginDeviceChromeRefreshTick,
   endDeviceChromeRefreshTick,
   resetPresenceInboxGatherCache,
-} from "./device-inbox.mjs?v=64";
+} from "./device-inbox.mjs?v=65";
 import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { primeCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import { refreshWalletContextFromChrome } from "./wallet-page-chrome.mjs";
