@@ -129,6 +129,10 @@ import { tabNoticeCount } from "./device-counts.mjs";
 import { mountHubBuildStamp } from "./device-hub-build-stamp.mjs";
 import { mountHubNetworkTools } from "./device-hub-network-tools.mjs";
 import {
+  HUB_STRANGER_EMPTY_CLASS,
+  isHubStrangerEmptyState,
+} from "./device-hub-stranger-empty-core.mjs";
+import {
   getLiveControlPending,
   openLiveControlProof,
   refreshLiveControlInbox,
@@ -1938,6 +1942,24 @@ function refreshEmptyHint() {
   emptyHint.hidden = hasData;
 }
 
+function applyHubStrangerEmptyChrome() {
+  const stranger = isHubStrangerEmptyState({
+    walletCount: getWalletCount(),
+    pinCount: loadPins().length,
+    inboxActionCount: notificationCount(),
+  });
+  const roots = new Set(
+    [deviceHub, document.getElementById("device-hub")].filter(
+      (el) => el instanceof HTMLElement
+    )
+  );
+  for (const root of roots) {
+    root.classList.toggle(HUB_STRANGER_EMPTY_CLASS, stranger);
+  }
+  const toolbar = document.getElementById("device-hub-network-tools");
+  if (toolbar) toolbar.hidden = stranger;
+}
+
 function notifyHubChanged() {
   window.dispatchEvent(new Event("hc-device-hub-changed"));
 }
@@ -2020,6 +2042,8 @@ export function refreshDeviceHub() {
   renderPinRows();
   applySearchFilter();
   refreshEmptyHint();
+  applyHubStrangerEmptyChrome();
+  renderHubKeysCustodyPanel();
 }
 
 export function focusHubSearch() {

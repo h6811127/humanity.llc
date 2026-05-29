@@ -24,7 +24,7 @@
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=4" />
     <link rel="stylesheet" href="/styles.css?v=129" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=59" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=63" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=29" />
   </head>
   <body class="page-flow has-shell-chrome has-device-hub-search flow-shell flow-shell-create">
@@ -179,13 +179,14 @@
             data-hub-group="pins"
           >
             <p class="device-hub-subgroup-label">Pinned scans</p>
+            <p class="wallet-section-hint">Bookmarks only — cannot manage objects</p>
             <ul class="list list-compact" id="device-hub-pins-list" hidden></ul>
             <p class="device-hub-section-empty" id="device-hub-pins-empty">
-              Bookmarks only  -  no scan history.
+              Your pinned scans will show here.
             </p>
           </div>
 
-          <div class="device-hub-group" data-hub-group="import">
+          <div class="device-hub-group" data-hub-group="import" data-hub-stranger-empty-hide>
             <p class="device-hub-subgroup-label">Backup</p>
             <details
               class="device-hub-import device-hub-import-block"
@@ -228,6 +229,7 @@
             class="device-hub-section device-hub-section--secondary"
             id="device-hub-actions-section"
             aria-labelledby="device-hub-actions-title"
+            data-hub-stranger-empty-hide
           >
             <h3 class="device-hub-section-title" id="device-hub-actions-title">Recent device actions</h3>
             <p class="device-hub-section-lead">
@@ -245,7 +247,7 @@
             </div>
           </section>
 
-          <div class="device-hub-status-key" id="device-hub-status-key" aria-label="Status dot reference"></div>
+          <div class="device-hub-status-key" id="device-hub-status-key" aria-label="Status dot reference" data-hub-stranger-empty-hide></div>
         </div>
       </section>
 

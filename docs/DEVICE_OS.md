@@ -82,6 +82,8 @@ Hides `[data-landing-tutorial]` (hero, **How it works**, One use, design choices
 
 **Default:** on when wallet or pins exist (`landing-focus.mjs`). Entering focus mode expands the hub once.
 
+**Stranger-empty hub (Slice 1):** With zero saved cards, pins, and inbox actions, opening the hub shows onboarding copy only (aligned with `/wallet/` empty state); steward chrome (monitoring, backup form, dot legend) stays hidden until first save. See [`HUB_STRANGER_ONBOARDING.md`](HUB_STRANGER_ONBOARDING.md).
+
 **Removed from landing:** bottom Create dock, floating “New here?” pill, “Tap to manage keys” hint.
 
 **Not the desktop:** a scroll of static documentation links. The desktop is **hub-first**; protocol links are secondary.

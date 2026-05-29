@@ -373,6 +373,19 @@ Automated: `npm run e2e:key-loss-sad-path` · `npm run worker:test:key-loss-copy
 
 Automated: `e2e/device-status-dot.spec.ts` § hub sheet header chrome (steps 4–5, Close); Vitest `device-hub-header-html.test.ts` (40px Home/Close).
 
+### P1-HE · Hub stranger-empty (onboarding)
+
+**Spec:** [`HUB_STRANGER_ONBOARDING.md`](HUB_STRANGER_ONBOARDING.md)
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Fresh browser (no `hc_wallet` / pins) → `/` → open hub | Empty hint: **No cards saved yet** + Create + import backup links; **no** Monitoring block, backup form, shortcuts, activity log, or status-dot legend |
+| 2 | Pinned scans subgroup | **Bookmarks only — cannot manage objects** |
+| 3 | Create + save a card (or import backup) | Hub shows full steward chrome; `device-hub--stranger-empty` removed |
+| 4 | Repeat on `/wallet/` empty | Same hide rules; wallet page hint matches landing |
+
+Automated: `npm run worker:test -- worker/tests/device-hub-stranger-empty-core.test.ts`
+
 ### P1-9 · Hub sheet visual refresh (May 2026)
 
 **Spec:** [`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md)

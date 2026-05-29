@@ -1607,6 +1607,12 @@ button.device-hub-notice-banner {
   box-shadow: none;
 }
 
+/* Stranger-empty hub — docs/HUB_STRANGER_ONBOARDING.md */
+.device-hub--stranger-empty [data-hub-stranger-empty-hide],
+#wallet-page.device-hub--stranger-empty [data-hub-stranger-empty-hide] {
+  display: none !important;
+}
+
 .device-hub-status-key-label {
   margin: 0 0 6px;
   font-size: 11px;

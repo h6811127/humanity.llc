@@ -66,6 +66,18 @@ describe("device hub sheet header", () => {
     }
   });
 
+  it("marks stranger-empty hide targets on shell hub pages", () => {
+    const pages = ["site/index.html", "site/create/index.html", "site/wallet/index.html"];
+    for (const path of pages) {
+      const html = readPage(path);
+      expect(html, path).toContain("data-hub-stranger-empty-hide");
+      expect(html, path).toContain("Bookmarks only — cannot manage objects");
+    }
+    const landing = readPage("site/index.html");
+    expect(landing).toContain("No cards saved yet.");
+    expect(landing).toContain('href="#hub-import-form">import a backup</a>');
+  });
+
   it("gives hub Home and Close at least 40px tap targets with stronger Close weight", () => {
     const css = readPage("site/css/device-shell.css");
     expect(css).toMatch(/\.device-hub-home-btn\s*\{[\s\S]*min-width:\s*40px/);

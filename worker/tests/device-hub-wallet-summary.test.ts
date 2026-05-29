@@ -41,4 +41,10 @@ describe("device hub wallet summary hydration", () => {
     expect(src).toContain("scheduleInitialSummaryViewportSync");
     expect(src).toContain("viewportSync: true");
   });
+
+  it("applies stranger-empty chrome on hub refresh", () => {
+    expect(src).toContain("applyHubStrangerEmptyChrome");
+    expect(src).toContain("isHubStrangerEmptyState");
+    expect(src).toContain("HUB_STRANGER_EMPTY_CLASS");
+  });
 });
