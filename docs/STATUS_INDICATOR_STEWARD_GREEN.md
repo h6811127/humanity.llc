@@ -266,7 +266,7 @@ Network refresh for dot coloring uses `device-status.mjs` (`fetchResolverHealth`
 
 ## Troubleshooting: dot tap appears dead
 
-**Red outline ring on the dot button:** that is `data-device-status-error` (module load failure), not custody red. See [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) for the 2026-05-25 regression (import without file), timeline, and prevention plan.
+**Red outline ring on the dot button:** that is `data-device-status-error` (module load failure), not custody red. Tap the dot for a short explainer popover (refresh guidance); the hub does not open until the status graph loads. See [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) for the 2026-05-25 regression, load-error explainer (2026-05-29), timeline, and prevention plan.
 
 **Safari / iPhone shell regression (scroll + intermittent dot):** See [`SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md`](SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md) for the 2026-05-26 cross-device matrix, hub-smooth vs landing-jank clue, and phased fix plan.
 
@@ -278,12 +278,13 @@ Use this when users report “the status dot does nothing” on every page. On c
 |------|-----------------------------|
 | `/`, `/create/`, `/created/` | Toggles hub bottom sheet (`#device-hub.device-hub--sheet`) — first tap opens, second closes |
 | `/wallet/` (`body.page-wallet`) | **Does not open a hub sheet** — scrolls to `#device-hub-saved-group` only (wallet has no `#device-hub` host) |
+| **Any shell page when `data-device-status-error` is set** | Toggles load-error explainer popover (`#device-status-load-error-popover`) — **does not** open hub; see [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) § Load-error dot explainer |
 
 Handler chain: `dotBtn` click → `openHubFromChrome()` → `setHubExpanded()` → `setHubSheetOpen()` when `device-hub--sheet` is present (`site/js/device-status.mjs`, `site/js/device-hub-sheet.mjs`). Glance-first-on-dot was removed in commit `77816d1`; `toggleGlancePopover()` is not wired to the dot.
 
 ### Diagnosis checklist (device under test)
 
-1. **Console on first load** — Red errors loading `device-status.mjs` or any import (`device-inbox-sheet.mjs`, `device-inbox-core.mjs`, `device-browser-notifications.mjs`, etc.) mean the module aborted and **no click listener was registered** (dot still renders from HTML).
+1. **Console on first load** — Red errors loading `device-status.mjs` or any import (`device-inbox-sheet.mjs`, `device-inbox-core.mjs`, `device-browser-notifications.mjs`, etc.) mean the module aborted and the **hub** click listener was not registered (dot still renders from HTML). If `#top-chrome` has `data-device-status-error`, tap the dot — you should see the load-error explainer, not a silent dead control.
 2. **Network** — Confirm `/js/device-status.mjs?v=…` and `/js/device-inbox-sheet.mjs` return **200** (partial deploy or CDN cache after inbox sheet landed in `2b5d105` is a common cause).
 3. **After one tap** — In console: `document.body.classList.contains('device-hub-sheet-open')` and `document.getElementById('device-hub')?.className`. If body says “open” but the sheet looks closed, the next tap only **closes** (toggle trap) — see fix direction 2 below.
 4. **Pointer hit-testing** — In DevTools, inspect `#brand-status-dot-btn`: another element on top, or `pointer-events: none` on `#top-chrome` / `.top-chrome-bar` without the `.shell-status-cluster` override (regression of `77816d1` CSS).
@@ -294,7 +295,7 @@ Handler chain: `dotBtn` click → `openHubFromChrome()` → `setHubExpanded()` �
 
 | Priority | Cause | Symptom |
 |----------|--------|---------|
-| 1 | **`device-status.mjs` module load failure** | Dead on all shell pages; console import/404 errors; no `dot_click` in diag log |
+| 1 | **`device-status.mjs` module load failure** | Dead hub on all shell pages; red outline + load-error explainer on dot tap; console import/404 errors; no `dot_click` in diag log |
 | 2 | **Hub state desync** | Tap seems dead; `device-hub-sheet-open` on `body` while `#device-hub` still has `device-hub-collapsed` |
 | 3 | **CSS hit-testing** | Dead when scrolled (`top-chrome--edge-hidden`) or when hub was open; works at page top after fresh load |
 | 4 | **Wallet UX** | “No hub” on `/wallet/` — only scroll; subtle if already at saved section |
@@ -311,8 +312,8 @@ Do not ship a blind “click fix” without matching the failure mode above. Pre
 Since `2b5d105`, `device-status.mjs` imports `device-inbox-sheet.mjs` at top level. Any missing file or throw in that graph prevents **all** dot behavior.
 
 - **Deploy:** Ensure Pages deploy includes every new `site/js/device-inbox*.mjs` (and `device-browser-notifications-core.mjs`) alongside HTML; bump cache-bust query on shell scripts when adding imports.
-- **Runtime (shipped):** `site/js/device-status-bootstrap.mjs` dynamically imports `device-status.mjs`; on failure sets `data-device-status-error` on `#top-chrome` (red outline on dot via `device-shell.css`) and logs to console. Shell pages load bootstrap (`?v=21`), not `device-status.mjs` directly.
-- **CI (shipped):** `e2e/device-status-dot.spec.ts` — `shell status modules are reachable` (import graph smoke), `status bootstrap loads and records dot_click in diagnostics`.
+- **Runtime (shipped):** `site/js/device-status-bootstrap.mjs` dynamically imports `device-status.mjs`; on failure sets `data-device-status-error` on `#top-chrome` (red outline on dot via `device-shell.css`), logs to console, and wires `site/js/device-status-load-error.mjs` so dot tap shows a refresh explainer. Shell pages load bootstrap (`?v=21`), not `device-status.mjs` directly.
+- **CI (shipped):** `e2e/device-status-dot.spec.ts` — `shell status modules are reachable`, `status bootstrap loads and records dot_click in diagnostics`, `status load error shows explainer on dot tap`.
 
 ### 2. Hub open-state single source of truth — ✅ shipped
 

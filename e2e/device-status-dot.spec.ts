@@ -42,6 +42,31 @@ test.describe("status dot module graph", () => {
       expect(type, `expected JavaScript for ${path}, got ${type}`).toMatch(/javascript/);
     }
   });
+
+  test("status load error shows explainer on dot tap", async ({ page }) => {
+    await page.route("**/device-status.mjs**", (route) => route.abort("failed"));
+
+    await page.goto("/");
+    await expect(page.locator("#top-chrome")).toHaveAttribute("data-device-status-error", "1");
+    await expect(page.locator("#brand-status-dot-btn")).toHaveAttribute(
+      "aria-label",
+      /failed to load/i
+    );
+
+    const popover = page.locator("#device-status-load-error-popover");
+    await expect(popover).toBeHidden();
+    await page.locator("#brand-status-dot-btn").click();
+    await expect(popover).toBeVisible();
+    await expect(popover).toContainText("Controls couldn't load");
+    await expect(popover).toContainText("Now:");
+    await expect(popover).toContainText("Why:");
+    await expect(popover).toContainText("Next:");
+    await expect(popover.getByRole("button", { name: "Refresh page" })).toBeVisible();
+    await expect(page.locator("body")).not.toHaveClass(/device-hub-sheet-open/);
+
+    await page.locator("#brand-status-dot-btn").click();
+    await expect(popover).toBeHidden();
+  });
 });
 
 test.describe("status dot steward green", () => {
@@ -353,7 +378,11 @@ test.describe("shell S4 empty-wallet chrome", () => {
     const line = page.locator("#shell-status-line");
     await expect(line).toBeVisible({ timeout: 15_000 });
     await expect(line).toContainText(/network reachable/i);
-    await expect(line).toContainText(/0 cards/i);
+    await expect(line).not.toContainText(/0 cards/i);
+
+    const mode = page.locator("#shell-status-mode");
+    await expect(mode).toBeVisible();
+    await expect(mode).toHaveText("On this device");
 
     const dot = page.locator("#brand-status-dot");
     await expect(dot).toHaveAttribute("data-dot-state", "ok:none");

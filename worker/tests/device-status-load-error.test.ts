@@ -1,0 +1,44 @@
+import { describe, expect, it } from "vitest";
+import {
+  STATUS_LOAD_ERROR_ARIA_LABEL,
+  STATUS_LOAD_ERROR_EXPLAINER,
+  STATUS_LOAD_ERROR_REFRESH_LABEL,
+  renderStatusLoadErrorExplainerHtml,
+} from "../../site/js/device-status-load-error.mjs";
+
+describe("device-status-load-error", () => {
+  it("uses Layer 2 outcome copy without protocol jargon", () => {
+    expect(STATUS_LOAD_ERROR_EXPLAINER.now).toMatch(/didn't finish loading/i);
+    expect(STATUS_LOAD_ERROR_EXPLAINER.why).toMatch(/download/i);
+    expect(STATUS_LOAD_ERROR_EXPLAINER.next).toMatch(/refresh/i);
+    expect(STATUS_LOAD_ERROR_EXPLAINER.now).not.toMatch(/device-status\.mjs/i);
+  });
+
+  it("renders Now / Why / Next explainer lines and refresh action", () => {
+    const html = renderStatusLoadErrorExplainerHtml();
+    expect(html).toContain("device-dot-explainer-kicker");
+    expect(html).toContain("<strong>Now:</strong>");
+    expect(html).toContain("<strong>Why:</strong>");
+    expect(html).toContain("<strong>Next:</strong>");
+    expect(html).toContain(STATUS_LOAD_ERROR_EXPLAINER.now);
+    expect(html).toContain(`data-status-load-error-action="refresh"`);
+    expect(html).toContain(STATUS_LOAD_ERROR_REFRESH_LABEL);
+  });
+
+  it("escapes HTML in explainer copy", () => {
+    const html = renderStatusLoadErrorExplainerHtml({
+      kicker: "<unsafe>",
+      now: "a & b",
+      why: "c",
+      next: "d",
+    });
+    expect(html).toContain("&lt;unsafe&gt;");
+    expect(html).toContain("a &amp; b");
+    expect(html).not.toContain("<unsafe>");
+  });
+
+  it("exposes an accessible dot label for load failure", () => {
+    expect(STATUS_LOAD_ERROR_ARIA_LABEL).toMatch(/failed to load/i);
+    expect(STATUS_LOAD_ERROR_ARIA_LABEL).toMatch(/tap for details/i);
+  });
+});

@@ -1,14 +1,14 @@
 # Status dot: red ring + dead on all pages (postmortem)
 
-**Date:** 2026-05-25 (missing file) · 2026-05-26 (stale `?v=` after new exports)  
-**Status:** Root causes identified; prevention plan below (code fix: bump `DEVICE_SHELL_ASSET_VERSION` per § 2026-05-26)  
+**Date:** 2026-05-25 (missing file) · 2026-05-26 (stale `?v=` after new exports) · 2026-05-29 (load-error dot explainer)  
+**Status:** Root causes identified; load-error click explainer shipped; prevention plan below (code fix: bump `DEVICE_SHELL_ASSET_VERSION` per § 2026-05-26)  
 **Related:** [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`AGENTS.md`](../AGENTS.md)
 
 ---
 
 ## Executive summary
 
-The **red ring** around the status dot is **not** the product’s “unsaved keys” pulsing-red state. It is an **intentional load-failure affordance** added on 2026-05-25: when `device-status.mjs` fails to import, `device-status-bootstrap.mjs` sets `data-device-status-error` on `#top-chrome`, and CSS draws a red **outline** on `#brand-status-dot-btn`. The dot is **nonfunctional** because the entire status module aborts before click listeners are registered.
+The **red ring** around the status dot is **not** the product’s “unsaved keys” pulsing-red state. It is an **intentional load-failure affordance** added on 2026-05-25: when `device-status.mjs` fails to import, `device-status-bootstrap.mjs` sets `data-device-status-error` on `#top-chrome`, and CSS draws a red **outline** on `#brand-status-dot-btn`. The hub, inbox badge, and normal dot state machine do **not** run — but the dot is **not** a silent dead control: bootstrap wires a minimal click handler that opens a Layer 2 explainer popover (`site/js/device-status-load-error.mjs`) with refresh guidance.
 
 The regression on `main` was caused by **shipping an ES module import without the target file** in the status dot’s dependency graph-not by removing hub behavior or rearchitecting the dot. A follow-up commit added the missing file and extended E2E to guard the import graph.
 
@@ -22,8 +22,9 @@ The regression on `main` was caused by **shipping an ES module import without th
 |-------------|-----------|
 | Red **ring** (outline) on dot | `#top-chrome[data-device-status-error] .shell-status-dot-btn { outline: 2px solid … }` in `site/css/device-shell.css` |
 | Dead on **every** shell page (`/`, `/create/`, `/created/`, `/wallet/`) | Same bootstrap script on all shell HTML; one shared import graph |
-| No hub toggle / no `dot_click` in diagnostics | `device-status.mjs` never evaluated; `dotBtn?.addEventListener` never runs |
-| Console | `[humanity] Device status module failed to load:` from `device-status-bootstrap.mjs` |
+| No hub toggle / no `dot_click` in diagnostics | `device-status.mjs` never evaluated; hub opener in `device-status.mjs` never runs |
+| Dot tap shows load-error explainer (2026-05-29+) | Bootstrap `wireStatusLoadErrorDot()` — popover `#device-status-load-error-popover` with Now / Why / Next + **Refresh page** |
+| Console | `[humanity] Device status module failed to load:` from `device-status-bootstrap.mjs` (technical message; not shown in UI) |
 | Network tab | Typically **404** on a static `/js/*.mjs` in the graph (e.g. missing `device-inbox-card-disabled.mjs`) |
 
 **Do not confuse with:**
@@ -158,7 +159,7 @@ Check these in order (module may be fixed in git but not in the environment you 
 | Signal | Meaning |
 |--------|---------|
 | `data-device-status-error` in Real User Monitoring (if added) | Load failure rate |
-| `hc_dot_diag_log` missing `dot_click` after tap (with `hc_dot_diagnostics=1`) | Handler not registered |
+| `hc_dot_diag_log` missing `dot_click` after tap (with `hc_dot_diagnostics=1`) | Expected in load-error mode — hub handler not registered; use explainer popover instead |
 | CI `test-site.yml` red on `device-status-dot.spec.ts` | Block merge |
 
 ---
@@ -172,12 +173,42 @@ Check these in order (module may be fixed in git but not in the environment you 
 
 ---
 
+## Load-error dot explainer (shipped 2026-05-29)
+
+When `import("./device-status.mjs")` fails, bootstrap calls `wireStatusLoadErrorDot()` in `site/js/device-status-load-error.mjs`:
+
+| Surface | Behavior |
+|---------|----------|
+| Red outline | Unchanged — `#top-chrome[data-device-status-error]` |
+| `#brand-status-dot-btn` `aria-label` | “Device controls failed to load. Tap for details.” |
+| Dot tap | Toggles `#device-status-load-error-popover` (anchored popover; reuses `device-hub-glance-popover` + `device-dot-explainer` styling) |
+| Copy (Layer 2) | **Now:** controls didn’t finish loading · **Why:** download/cache/network · **Next:** refresh / hard refresh |
+| Primary action | **Refresh page** — `location.reload()` |
+| Hub / inbox | Not opened — full status graph did not load |
+| Hub intro coachmark | Suppressed when `data-device-status-error` is set (existing guard) |
+
+**Product language:** Outcome copy only in the popover; technical import errors stay in `console.error` for engineers.
+
+**Tests:** `worker/tests/device-status-load-error.test.ts` · `e2e/device-status-dot.spec.ts` — `status load error shows explainer on dot tap`.
+
+**Gap (unchanged):** If bootstrap’s own **static** imports fail before the dynamic `device-status` catch, the red ring and explainer may not appear — see [`HUB_DOT_DEAD_INVESTIGATION_2026-05-27.md`](HUB_DOT_DEAD_INVESTIGATION_2026-05-27.md).
+
+---
+
 ## Verification checklist (manual, any environment)
+
+### Healthy graph
 
 1. Load `/` → DevTools → Network: all `/js/device-*.mjs` in graph return **200**.
 2. `#top-chrome` must **not** have `data-device-status-error`.
 3. `localStorage.setItem('hc_dot_diagnostics','1')`, reload, tap dot → `sessionStorage hc_dot_diag_log` contains `{ "type": "dot_click" }`.
 4. On `/`, body gains `device-hub-sheet-open` on first tap (not wallet).
+
+### Simulated load failure
+
+1. Block or 404 `device-status.mjs` in DevTools → `#top-chrome` has `data-device-status-error`; dot shows red outline.
+2. Tap dot → `#device-status-load-error-popover` visible with Now / Why / Next copy.
+3. **Refresh page** action reloads the tab; hub does not open on dot tap in error state.
 
 ---
 
@@ -185,6 +216,7 @@ Check these in order (module may be fixed in git but not in the environment you 
 
 - Red outline CSS: `site/css/device-shell.css` (`#top-chrome[data-device-status-error]`)
 - Bootstrap: `site/js/device-status-bootstrap.mjs`
+- Load-error explainer: `site/js/device-status-load-error.mjs`
 - Module manifest: `site/js/device-status-shell-modules.mjs` (E2E + Vitest)
 - Fix commit for missing file: `3c303c3` - *Ship missing inbox card-disabled module to restore status dot*
 - Introduced bad import: `8ec6a33` - *Add inbox diagnostics for device inbox phase 7*

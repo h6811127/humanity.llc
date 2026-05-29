@@ -56,11 +56,11 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 
 The floating **status dot** (`#brand-status-dot-btn`) is the hub opener on `/`, `/create/`, and `/created/`. On `/wallet/` it only scrolls to saved cards. Do not wire glance-first on dot tap.
 
-**Red outline ring + dead dot on all pages** = `device-status.mjs` import graph failed (`data-device-status-error`). See `docs/STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`. Never merge a new `./device-*.mjs` import on the status graph without the file in the same PR; add the filename to `DEVICE_STATUS_SHELL_JS_FILES` in `site/js/device-status-shell-modules.mjs`, bump `DEVICE_SHELL_ASSET_VERSION` on shell HTML bootstrap and on every `./peer.mjs?v=N` import between manifest peers. Run `npm run worker:test -- worker/tests/device-status-shell-modules.test.ts`. **Lazy subgraphs (Shell P2):** `device-inbox-sheet-loader.mjs` and `device-browser-notifications-loader.mjs` — do not static-import full sheet/notifications from `device-status.mjs` or `device-hub-ui.mjs`. Tests: `npm run worker:test:lazy-shell`.
+**Red outline ring on dot** = `device-status.mjs` import graph failed (`data-device-status-error`). Dot tap shows load-error explainer (`device-status-load-error.mjs`), not the hub. See `docs/STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`. Never merge a new `./device-*.mjs` import on the status graph without the file in the same PR; add the filename to `DEVICE_STATUS_SHELL_JS_FILES` in `site/js/device-status-shell-modules.mjs`, bump `DEVICE_SHELL_ASSET_VERSION` on shell HTML bootstrap and on every `./peer.mjs?v=N` import between manifest peers. Run `npm run worker:test -- worker/tests/device-status-shell-modules.test.ts`. **Lazy subgraphs (Shell P2):** `device-inbox-sheet-loader.mjs` and `device-browser-notifications-loader.mjs` — do not static-import full sheet/notifications from `device-status.mjs` or `device-hub-ui.mjs`. Tests: `npm run worker:test:lazy-shell` · load-error: `npm run worker:test -- worker/tests/device-status-load-error.test.ts` · E2E `status load error shows explainer on dot tap`.
 
 When you touch any of these, run the regression suite before finishing:
 
-- `site/js/device-status.mjs`, `device-status-bootstrap.mjs`, `device-dot-state-core.mjs`
+- `site/js/device-status.mjs`, `device-status-bootstrap.mjs`, `device-status-load-error.mjs`, `device-dot-state-core.mjs`
 - `site/js/device-hub-sheet.mjs`, `device-inbox-sheet.mjs`, `device-hub-glance.mjs`, `device-shell-chrome.mjs`, `device-hub-glance-popover.mjs`
 - `site/css/device-shell.css` (especially `pointer-events` on `.top-chrome--float` / `.shell-status-cluster`)
 
@@ -72,7 +72,7 @@ npm run e2e -- e2e/device-cross-tab-keys.spec.ts e2e/device-status-dot.spec.ts e
 
 **Contracts (do not break without updating docs + tests):**
 
-1. **Module graph** — `device-status-bootstrap.mjs` dynamically imports `device-status.mjs`; a failed import leaves the dot dead with no click handler. New imports must ship in the same deploy and stay listed in `site/js/device-status-shell-modules.mjs` (Vitest + `e2e/device-status-dot.spec.ts`).
+1. **Module graph** — `device-status-bootstrap.mjs` dynamically imports `device-status.mjs`; a failed import sets `data-device-status-error` and wires `device-status-load-error.mjs` (dot tap → refresh explainer; hub does not open). New imports must ship in the same deploy and stay listed in `site/js/device-status-shell-modules.mjs` (Vitest + `e2e/device-status-dot.spec.ts`).
 2. **Hub open state** — Open/close only through `setHubSheetOpen()` / `setHubExpanded()`. `hubSheetOpen()` treats a collapsed `#device-hub` as closed even if `body.device-hub-sheet-open` is stuck (toggle-trap fix).
 3. **Clickability CSS** — `.top-chrome--float { pointer-events: none }` with `.shell-status-cluster` (and dot/badge) at `pointer-events: auto` when `top-chrome--edge-hidden` or hub/inbox locked. See `docs/STATUS_INDICATOR_STEWARD_GREEN.md` troubleshooting.
 
