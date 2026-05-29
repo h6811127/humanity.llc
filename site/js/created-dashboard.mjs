@@ -9,6 +9,11 @@ import { syncUpdateStatusTaskGate } from "./created-first-revoke-gate.mjs?v=2";
 import { initCreatedLivePrimaryCta } from "./created-live-primary-cta.mjs";
 import { initCreatedLiveSetupMemory } from "./created-live-setup-memory.mjs";
 import { isSetupDone } from "./created-mode.mjs";
+import {
+  openStewardScanPreview,
+  stewardScanOpenedFeedback,
+} from "./pwa-scan-handoff-core.mjs";
+import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 
 const DONE_STORAGE_KEY = "hc_created_task_done";
 
@@ -94,11 +99,13 @@ export function initCreatedDashboard({
 
   function openScanUrl() {
     const scanUrl = getScanUrl?.() || openScan?.href;
-    if (scanUrl && scanUrl !== "#" && scanUrl.startsWith("http")) {
-      window.open(scanUrl, "_blank", "noopener,noreferrer");
-      return true;
+    if (!scanUrl || scanUrl === "#" || !scanUrl.startsWith("http")) return false;
+    const standalone = readStandaloneModeFromWindow(window);
+    if (!openStewardScanPreview(scanUrl, { standalone, navigation: location })) {
+      return false;
     }
-    return false;
+    showFeedback(stewardScanOpenedFeedback(standalone));
+    return true;
   }
 
   function scrollToQr() {
@@ -189,7 +196,6 @@ export function initCreatedDashboard({
       selectTab("now");
       if (openScanUrl()) {
         markDone("open-scan");
-        showFeedback("Opened scan page in a new tab.");
       } else {
         showFeedback("Scan link is not ready yet.", true);
       }

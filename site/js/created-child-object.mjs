@@ -23,6 +23,8 @@ import {
   assertChildObjectBackupGateAllowsCreate,
   syncChildObjectBackupGateUi,
 } from "./child-object-backup-gate.mjs";
+import { applyStewardScanLinkElement } from "./pwa-scan-handoff-core.mjs";
+import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 import {
   childObjectRegisterProgressLabel,
   childObjectRegisterSuccessMessage,
@@ -69,8 +71,7 @@ function renderStatusPlateList(profileId, rows) {
         const link = document.createElement("a");
         link.className = "btn-text";
         link.href = row.scan_url;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
+        applyStewardScanLinkElement(link, readStandaloneModeFromWindow(window));
         link.textContent = "Open scan page";
         const copyBtn = document.createElement("button");
         copyBtn.type = "button";

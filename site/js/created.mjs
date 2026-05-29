@@ -42,6 +42,11 @@ import { initCreatedChildObject } from "./created-child-object.mjs";
 import { initCreatedLostItemRelay } from "./created-child-object-lost-item.mjs";
 import { initCreatedSetup } from "./created-setup.mjs";
 import {
+  applyStewardScanLinkElement,
+  openStewardScanPreview,
+} from "./pwa-scan-handoff-core.mjs";
+import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
+import {
   applyCreatedWorkspaceMode,
   clearFreshUrlParam,
   restoreKeysStripToControlPanel,
@@ -999,10 +1004,17 @@ if (activeScanUrl) {
   if (openScanBtn) {
     openScanBtn.hidden = false;
     openScanBtn.href = activeScanUrl;
+    applyStewardScanLinkElement(openScanBtn, readStandaloneModeFromWindow(window));
     openScanBtn.addEventListener("click", (e) => {
       if (workspaceMode === "setup") return;
-      if (openScanBtn.getAttribute("target") === "_blank") return;
+      if (!activeScanUrl?.startsWith("http")) return;
       e.preventDefault();
+      const standalone = readStandaloneModeFromWindow(window);
+      if (standalone) {
+        openStewardScanPreview(activeScanUrl, { standalone, navigation: location });
+        return;
+      }
+      if (openScanBtn.getAttribute("target") === "_blank") return;
       createdTabs?.select("advanced");
       if (revokeDetails && !revokeDetails.open) {
         revokeDetails.open = true;

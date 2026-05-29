@@ -515,6 +515,25 @@ Automated (Phase 0+): `npm run worker:test:pwa-install` · Phase 3–4: `npm run
 
 Automated (when shipped): `npm run worker:test -- worker/tests/pwa-standalone-refresh-core.test.ts` · extend `npm run e2e:pwa-install`.
 
+### P1-PWA-N · Standalone scan handoff (P1 shipped)
+
+**Spec:** [`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) · **Module:** `site/js/pwa-scan-handoff-core.mjs`
+
+**Prerequisites:** Installed PWA (standalone) or Chromium `display-mode: standalone` emulation.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Installed PWA → `/create/` → complete create | Lands on `/created/?fresh=1` setup wizard **inside PWA** |
+| 2 | Advance to **Test scan** → tap test / continue | Scan opens **in PWA** (no Safari chrome switch) |
+| 3 | System back / swipe back | Returns to setup wizard; standalone does **not** auto-skip test step |
+| 4 | Complete setup → hub **Open scan** on saved card | Same-tab in standalone; new tab in Safari browser |
+| 5 | Browser tab (not installed) → repeat step 2 | Still opens **new tab** (regression guard) |
+| 6 | Wallet pin row | Same as step 4; subtitle omits “new tab” in standalone |
+
+**Fail signals:** Safari opens automatically; wizard advances to done before user previews scan; cross-tab keys notice during fresh setup.
+
+Automated: `npm run worker:test:pwa-install` (includes `pwa-scan-handoff-core.test.ts`).
+
 ### P1-8 · Hosted tier budget (Phase 10 — E2 staging)
 
 **Status:** E2 client probe staging; production enablement still waits on M4 sign-off and rollout gates. Spec: [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Phase 10 — hosted tier rows (M7) · build order: [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md).

@@ -11,6 +11,12 @@ import { clearFreshUrlParam } from "./created-workspace.mjs";
 import { markSetupDone } from "./created-mode.mjs";
 import { stewardFocusKeyFromHash } from "./created-tabs.mjs";
 import { SETUP_STEP_IDS, setupStepIndexFromHash } from "./created-setup-hash.mjs";
+import {
+  openStewardScanPreview,
+  shouldAutoAdvanceSetupTestScan,
+  stewardScanOpenedFeedback,
+} from "./pwa-scan-handoff-core.mjs";
+import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 
 const STEPS = SETUP_STEP_IDS;
 
@@ -215,9 +221,15 @@ export function initCreatedSetup(opts) {
         showFeedback("Scan link is not ready yet.", true);
         return;
       }
-      window.open(url, "_blank", "noopener,noreferrer");
-      showFeedback("Opened scan page - check it from another device, then continue.");
-      goToStep(stepIndex + 1, { pushHistory: true });
+      const standalone = readStandaloneModeFromWindow(window);
+      if (!openStewardScanPreview(url, { standalone, navigation: location })) {
+        showFeedback("Scan link is not ready yet.", true);
+        return;
+      }
+      showFeedback(stewardScanOpenedFeedback(standalone, { setupWizard: true }));
+      if (shouldAutoAdvanceSetupTestScan(standalone)) {
+        goToStep(stepIndex + 1, { pushHistory: true });
+      }
       return;
     }
   }
@@ -283,12 +295,16 @@ export function initCreatedSetup(opts) {
 
   root.querySelector("[data-setup-action=test-scan]")?.addEventListener("click", () => {
     const url = getScanUrl?.();
-    if (url && url.startsWith("http")) {
-      window.open(url, "_blank", "noopener,noreferrer");
-      showFeedback("Opened scan page in a new tab.");
-    } else {
+    if (!url || !url.startsWith("http")) {
       showFeedback("Scan link is not ready yet.", true);
+      return;
     }
+    const standalone = readStandaloneModeFromWindow(window);
+    if (!openStewardScanPreview(url, { standalone, navigation: location })) {
+      showFeedback("Scan link is not ready yet.", true);
+      return;
+    }
+    showFeedback(stewardScanOpenedFeedback(standalone, { setupWizard: true }));
   });
 
   window.addEventListener("hc-device-hub-changed", () => {

@@ -101,7 +101,7 @@ See `docs/CARD_WORKSPACE_PHASE0.md` - Open card loads keys, auto-save default on
 
 1. Create card → setup wizard, URL has `fresh=1`, hero says **Set up your live QR**.
 2. Cannot skip step 1 without save (auto-save may complete step 1 immediately).
-3. Download QR on step 2; step 3 copy reads "Preview what anyone scanning this QR will see," and test scan opens new tab.
+3. Download QR on step 2; step 3 copy reads "Preview what anyone scanning this QR will see." **Test scan:** browser tab → new tab; installed PWA (standalone) → same-tab preview with Back to return ([`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md)).
 4. **Open card controls** → tabs visible, `fresh` removed, hero **Live QR ready**.
 5. Revisit `/created/?profile_id&qr_id` (no fresh) → control mode directly.
 6. Hub **Open card** on saved row → control with revoke available.

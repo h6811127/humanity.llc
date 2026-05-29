@@ -79,7 +79,7 @@
     "worker:test:live-control-printed-qa": "vitest run worker/tests/live-control-printed-qa.test.ts",
     "worker:test:key-loss-copy": "vitest run worker/tests/key-loss-copy-guards.test.ts worker/tests/key-backup.test.ts worker/tests/key-backup-import.test.ts",
     "worker:test:hosted-billing-return": "vitest run worker/tests/export-e2e-test-keypair.test.ts worker/tests/device-steward-billing-return-core.test.ts worker/tests/device-steward-session.test.ts",
-    "worker:test:pwa-install": "vitest run worker/tests/pwa-install-metadata.test.ts worker/tests/pwa-install-ux.test.ts worker/tests/pwa-standalone-refresh-core.test.ts",
+    "worker:test:pwa-install": "vitest run worker/tests/pwa-install-metadata.test.ts worker/tests/pwa-install-ux.test.ts worker/tests/pwa-standalone-refresh-core.test.ts worker/tests/pwa-scan-handoff-core.test.ts",
     "e2e:pwa-install": "playwright test e2e/device-pwa-install.spec.ts",
     "worker:test:lazy-shell": "vitest run worker/tests/device-status-lazy-inbox.test.ts worker/tests/device-status-lazy-notifications.test.ts worker/tests/device-status-shell-modules.test.ts",
     "site:generate-scan-e2e-fixture": "tsx worker/scripts/generate-scan-e2e-fixture.ts",

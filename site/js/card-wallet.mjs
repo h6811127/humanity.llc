@@ -22,6 +22,8 @@ import {
   saveWallet,
   walletEntrySubtitle,
 } from "./device-wallet.mjs";
+import { stewardScanLinkHtmlAttrs, stewardScanPinListSub } from "./pwa-scan-handoff-core.mjs";
+import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 
 function escapeHtml(s) {
   return String(s)
@@ -86,17 +88,18 @@ function renderPinList() {
 
   if (pinsEmpty) pinsEmpty.hidden = true;
 
+  const standalone = readStandaloneModeFromWindow(window);
+  const scanLinkAttrs = stewardScanLinkHtmlAttrs(standalone);
+
   for (const pin of pins) {
     const li = document.createElement("li");
     li.className = "wallet-card-item device-pin-item";
     li.dataset.hubSearchable = pinHaystack(pin);
-    const sub = pin.qr_id ? "Scan · new tab" : "Card scan · new tab";
+    const sub = stewardScanPinListSub(standalone, { hasQrId: !!pin.qr_id });
     li.innerHTML = `
       <a
         class="wallet-card-main wallet-pin-open"
-        href="${escapeHtml(pin.scan_url)}"
-        target="_blank"
-        rel="noopener noreferrer"
+        href="${escapeHtml(pin.scan_url)}"${scanLinkAttrs}
       >
         <span class="list-icon list-icon-tone-gold" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
