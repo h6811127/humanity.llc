@@ -12,7 +12,7 @@
 |------|------|-----|
 | **setup** | Keys in tab and (`fresh=1` or setup not done or not saved to device) | Linear wizard - no tabs |
 | **control** | Keys in tab, setup complete, saved on device | **Live · Manage** ([`CREATED_TASKS_TAB_REDESIGN.md`](CREATED_TASKS_TAB_REDESIGN.md) T1 shipped) |
-| **view** | No signing keys in this tab | Read-only notice + unlock paths |
+| **view** | No signing keys in this tab | Read-only **Live · Manage** tabs + **Restore ownership** (planned — today Manage is hidden; see [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md)) |
 
 Resolver: `site/js/created-mode.mjs` · `modeFromPage()`.
 

@@ -2,7 +2,7 @@
 
 **Status:** Investigation (2026-05-29)  
 **Audience:** Product, engineering, QA  
-**Related:** [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · `site/js/key-backup-ui.mjs` · `site/js/key-backup.mjs`
+**Related:** [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) · `site/js/key-backup-ui.mjs` · `site/js/key-backup.mjs`
 
 ---
 

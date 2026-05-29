@@ -165,7 +165,7 @@ Canonical matrix: [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.m
 |----------|------|-------------|-------|
 | **P0** | Live proof scanner recovery | **H-09 + H-10** — sessionStorage resume + expiry retry UX | **Shipped** 2026-05-29 |
 | **P0** | Live proof comprehension | Execute H-11 / H-12 runbooks with ≥5 strangers | Product / QA |
-| **P1** | Key-loss paths | **Matrix + K1/K2/K5 E2E shipped** — human emotional QA open | Product copy |
+| **P1** | Key-loss paths | **Matrix + K1/K2/K5 E2E shipped** — view-mode restore UI gap tracked in [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) Phase 1 | Product + eng |
 | **P1** | Merch checkout | **Matrix shipped** — operator physical QA + live payment before `checkout_open: true` | Engineering + Ops |
 | **P2** | Large wallet guardrails | **Shipped** — `e2e/wallet-scale-guardrail.spec.ts` (W1–W3) | Shell |
 | **P2** | Scan URL hints | **Shipped** — `scan-malformed-hint.ts` + Vitest | Resolver |

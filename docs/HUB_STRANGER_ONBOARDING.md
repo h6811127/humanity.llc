@@ -25,7 +25,7 @@ The collapsed hub does not consume layout on `/` (hero stays above the fold). Op
 
 1. **Hook before dock** — hero + **How it works** teach strangers; hub waits until they have something to manage or an inbox item needs action.
 2. **One empty voice** — align shell hub empty hint with wallet; teach custody in one line + two CTAs.
-3. **Progressive disclosure** — monitoring, backup form, shortcuts (landing), activity log, and dot legend appear after first save or when inbox has actionable items.
+3. **Progressive disclosure** — monitoring, shortcuts (landing), activity log, and dot legend appear after first save or when inbox has actionable items. **Restore / import backup** stays visible even in stranger-empty mode ([`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md)).
 4. **Do not regress returning users** — `hc_landing_focus` still auto-enables when wallet or pins exist; stranger-empty mode turns off as soon as counts or inbox actions appear.
 
 ---
