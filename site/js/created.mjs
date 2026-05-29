@@ -1009,6 +1009,8 @@ if (workspaceMode === "setup" && profileId && activeQrId) {
       return deviceSaveCtl.runSave() === true;
     },
     refreshSave: () => deviceSaveCtl?.refresh?.(),
+    getSession: loadSession,
+    setSession: saveSession,
     getScanUrl: () => {
       const href = openScanBtn?.getAttribute("href");
       return href && href.startsWith("http") ? href : null;

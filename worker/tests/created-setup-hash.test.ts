@@ -7,7 +7,8 @@ describe("setupStepIndexFromHash", () => {
     expect(setupStepIndexFromHash("#setup")).toBe(0);
     expect(setupStepIndexFromHash("setup-qr")).toBe(1);
     expect(setupStepIndexFromHash("#setup-test")).toBe(2);
-    expect(setupStepIndexFromHash("setup-done")).toBe(3);
+    expect(setupStepIndexFromHash("setup-protect")).toBe(3);
+    expect(setupStepIndexFromHash("#setup-done")).toBe(4);
   });
 
   it("returns null for unknown hashes", () => {

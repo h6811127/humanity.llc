@@ -24,4 +24,27 @@ describe("UI/UX safe rebuild tripwires (post-plan)", () => {
       expect(src, file).not.toContain("top-chrome--edge-hidden");
     }
   });
+
+  it("stuck inbox backdrop is non-interactive when inbox sheet is closed (Step 1 CSS)", () => {
+    const shellCss = fs.readFileSync(
+      path.join(path.dirname(siteJsDir), "css/device-shell.css"),
+      "utf8"
+    );
+    expect(shellCss).toMatch(
+      /body:not\(\.device-inbox-sheet-open\)\s+\.device-inbox-backdrop\.is-visible[\s\S]*pointer-events:\s*none/
+    );
+  });
+
+  it("hub-open paths import syncInboxBackdropForOpenHub (Step 1 / Check network taps)", () => {
+    for (const file of [
+      "device-hub-sheet.mjs",
+      "device-inbox-sheet.mjs",
+      "device-hub-ui.mjs",
+      "device-status.mjs",
+    ]) {
+      const src = readSiteJs(file);
+      expect(src, file).toMatch(/import[\s\S]*syncInboxBackdropForOpenHub/);
+      expect(src, file).toContain("syncInboxBackdropForOpenHub(");
+    }
+  });
 });

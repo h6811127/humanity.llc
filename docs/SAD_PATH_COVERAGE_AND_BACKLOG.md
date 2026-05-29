@@ -32,6 +32,8 @@ Use it when prioritizing hardening before launch surfaces (live proof in person,
 | Large wallet / power user | **Guardrails shipped** (comfort + large hints; E2E W1–W3) | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Open issues |
 | Social / trust misunderstanding | **Copy exists**; comprehension not fully re-run | [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) |
 | Hosted ops (billing return) | **O1–O2 E2E shipped** (2026-05-29) | [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.md) |
+| Safari stuck inbox backdrop | **P5f shipped** — Check network taps after reconcile | [`UI_UX_SAFE_REBUILD_IMPLEMENTATION.md`](UI_UX_SAFE_REBUILD_IMPLEMENTATION.md) § Step 1 |
+| Key-loss setup protect gate (K7) | **Shipped** — recovery ack or backup before Live | [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) Phase 2 |
 
 ---
 
@@ -91,6 +93,7 @@ Agents are strong at **systematic enumeration** against docs and code. Humans an
 | Create in Tab B, hub in Tab A | Automated: `e2e/device-cross-tab-keys.spec.ts` |
 | Vouch from scan without keys in this tab | Explained in UI; high bounce risk |
 | Two phones both “active” | Cross-tab presence churn |
+| Stuck inbox backdrop blocks taps | **Shipped P5f** — `syncInboxBackdropForOpenHub` + CSS pass-through · `e2e/device-hub-check-network-backdrop.spec.ts` |
 | iPhone hub dot dead / scroll lag | [`SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md`](SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md) |
 
 ### 4. Large wallet / power user (~10+ root cards)
@@ -165,12 +168,13 @@ Canonical matrix: [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.m
 |----------|------|-------------|-------|
 | **P0** | Live proof scanner recovery | **H-09 + H-10** — sessionStorage resume + expiry retry UX | **Shipped** 2026-05-29 |
 | **P0** | Live proof comprehension | Execute H-11 / H-12 runbooks with ≥5 strangers | Product / QA |
-| **P1** | Key-loss paths | **Matrix + K1/K2/K5 E2E shipped** — view-mode restore UI gap tracked in [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) Phase 1 | Product + eng |
+| **P1** | Key-loss paths | **K1/K2/K5 E2E + K7 setup protect gate shipped** — Phase 3–4 in [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) | Product + eng |
 | **P1** | Merch checkout | **Matrix shipped** — operator physical QA + live payment before `checkout_open: true` | Engineering + Ops |
 | **P2** | Large wallet guardrails | **Shipped** — `e2e/wallet-scale-guardrail.spec.ts` (W1–W3) | Shell |
 | **P2** | Scan URL hints | **Shipped** — `scan-malformed-hint.ts` + Vitest | Resolver |
 | **P2** | H-13 full-loop E2E | `e2e/live-control-loop.spec.ts` | **Shipped** 2026-05-29 |
 | **P2** | Hosted billing return (O1–O2) | **Shipped** — `e2e/hosted-tier-billing-return.spec.ts` | Ops |
+| **P2** | Stuck inbox backdrop (P5f) | **Shipped** — `e2e/device-hub-check-network-backdrop.spec.ts` | Shell |
 
 ---
 
@@ -203,6 +207,8 @@ Canonical matrix: [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.m
 | **S23** | **Wallet label without signing keys (K5)** | `e2e/key-loss-sad-path.spec.ts` |
 | **S24** | **Hosted billing return without tab keys (O1)** | `e2e/hosted-tier-billing-return.spec.ts` |
 | **S25** | **Hosted billing return links after keys load (O2)** | Same |
+| **S26** | **Check network after stuck inbox backdrop (P5f)** | `e2e/device-hub-check-network-backdrop.spec.ts` |
+| **S27** | **Setup protect gate before Live (K7)** | `worker/tests/created-setup-seatbelt.test.ts` · `worker/tests/key-loss-copy-guards.test.ts` |
 
 Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) § Recommended test matrix.
 
@@ -222,6 +228,8 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 | **P1-LW-SCALE · Wallet scale guardrails (W1–W3)** | `npm run e2e:wallet-scale-guardrail` |
 | **P1-KL · Key-loss view-only + backup import (K1–K2)** | `npm run e2e:key-loss-sad-path` |
 | **P1-HOSTED-BR · Billing checkout return (O1–O2)** | `npm run e2e:hosted-tier-billing-return` |
+| **P5f · Stuck inbox backdrop vs Check network** | `npm run e2e:device-hub-check-network-backdrop` · [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P5f |
+| **P1-SETUP-PROTECT · Setup protect gate (K7)** | `npm run worker:test:setup-protect` |
 
 ---
 
@@ -229,6 +237,7 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 
 | Date | Notes |
 |------|-------|
+| 2026-05-29 | K7 setup protect gate + P5f stuck backdrop regression index (S26–S27) |
 | 2026-05-29 | Hosted ops sad-path matrix + O1–O2 E2E index (`HOSTED_OPS_SAD_PATH_MATRIX.md`) |
 | 2026-05-29 | Key-loss matrix + K1/K2/K5 E2E (`KEY_LOSS_SAD_PATH_MATRIX.md`) |
 | 2026-05-29 | P2 wallet scale guardrails E2E (W1–W3); scan URL hints marked shipped |

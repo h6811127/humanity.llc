@@ -15,7 +15,16 @@ const SAMPLE_WALLET_ENTRY = {
   status: "active",
 };
 
-test.describe("Check network after stuck inbox backdrop", () => {
+async function ensureInboxBackdrop(page) {
+  await page.evaluate(async () => {
+    const mod = await import("/js/device-inbox-sheet.mjs");
+    mod.setInboxSheetOpen(true);
+    mod.setInboxSheetOpen(false);
+  });
+  return page.locator("#device-inbox-backdrop");
+}
+
+test.describe("Check network after stuck inbox backdrop (P5f)", () => {
   test.beforeEach(async ({ page }) => {
     await page.route("**/.well-known/hc/v1/health**", (route) =>
       route.fulfill({
@@ -23,6 +32,9 @@ test.describe("Check network after stuck inbox backdrop", () => {
         contentType: "application/json",
         body: JSON.stringify({ status: "ok", database: { status: "ok" } }),
       })
+    );
+    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", (route) =>
+      route.fulfill({ status: 404, contentType: "application/json", body: "{}" })
     );
     await page.route("**/.well-known/hc/v1/cards/**/status**", (route) =>
       route.fulfill({
@@ -49,34 +61,28 @@ test.describe("Check network after stuck inbox backdrop", () => {
     }, SAMPLE_WALLET_ENTRY);
   });
 
-  test("check network works after stuck inbox backdrop is reconciled on tab focus", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    await page.getByRole("button", { name: "Status indicator" }).click();
+  test("check network works after stuck inbox backdrop on wallet page", async ({ page }) => {
+    const statusResponse = (resp) =>
+      resp.url().includes("/status") && resp.request().method() === "GET" && resp.ok();
+
+    await page.goto("/wallet/");
+    await page.waitForResponse(statusResponse, { timeout: 15_000 });
     await expect(page.getByRole("button", { name: "Check network" })).toBeVisible({
       timeout: 15_000,
     });
 
     await page.evaluate(() => {
-      let backdrop = document.getElementById("device-inbox-backdrop");
-      if (!backdrop) {
-        backdrop = document.createElement("button");
-        backdrop.id = "device-inbox-backdrop";
-        backdrop.className = "device-inbox-backdrop is-visible";
-        backdrop.hidden = false;
-        document.body.appendChild(backdrop);
-      } else {
-        backdrop.hidden = false;
-        backdrop.classList.add("is-visible");
+      sessionStorage.removeItem("hc_wallet_network_cache");
+      for (const key of Object.keys(sessionStorage)) {
+        if (key.startsWith("hc_resolver_etag:")) sessionStorage.removeItem(key);
       }
-      const hub = document.getElementById("device-hub");
-      hub?.classList.remove("device-hub-collapsed");
-      document.body.classList.add("device-hub-sheet-open");
     });
 
-    const statusResponse = (resp) =>
-      resp.url().includes("/status") && resp.request().method() === "GET" && resp.ok();
+    const backdrop = await ensureInboxBackdrop(page);
+    await backdrop.evaluate((el) => {
+      el.hidden = false;
+      el.classList.add("is-visible");
+    });
 
     const refreshStatus = page.waitForResponse(statusResponse, { timeout: 15_000 });
     await page.getByRole("button", { name: "Check network" }).click({ timeout: 15_000 });
@@ -86,5 +92,29 @@ test.describe("Check network after stuck inbox backdrop", () => {
       /Network checked/i,
       { timeout: 15_000 }
     );
+  });
+
+  test("visibilitychange reconcile clears stuck inbox backdrop", async ({ page }) => {
+    await page.goto("/wallet/");
+    await expect(page.getByRole("button", { name: "Check network" })).toBeVisible({
+      timeout: 15_000,
+    });
+
+    const backdrop = await ensureInboxBackdrop(page);
+    await backdrop.evaluate((el) => {
+      el.hidden = false;
+      el.classList.add("is-visible");
+    });
+
+    await page.evaluate(() => {
+      Object.defineProperty(document, "visibilityState", {
+        configurable: true,
+        get: () => "visible",
+      });
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+
+    await expect(backdrop).toBeHidden();
+    await expect(backdrop).not.toHaveClass(/is-visible/);
   });
 });
