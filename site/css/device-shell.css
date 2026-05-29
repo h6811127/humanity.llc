@@ -1617,6 +1617,26 @@ button.device-hub-notice-banner {
   display: none !important;
 }
 
+/* Restore import always visible — docs/OWNERSHIP_RESTORE_UX_PLAN.md */
+.device-hub--stranger-empty [data-hub-restore-always],
+#wallet-page.device-hub--stranger-empty [data-hub-restore-always] {
+  display: block !important;
+}
+
+.created-restore-ownership-panel {
+  margin: 0 0 1rem;
+  padding: 1rem;
+  border-radius: var(--radius-md, 12px);
+  border: 0.5px solid var(--shell-separator, rgba(0, 0, 0, 0.12));
+  background: var(--surface-elevated, rgba(255, 255, 255, 0.6));
+}
+
+.created-restore-ownership-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
 .device-hub-status-key-label {
   margin: 0 0 6px;
   font-size: 11px;

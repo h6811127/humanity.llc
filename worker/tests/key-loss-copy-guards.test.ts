@@ -25,9 +25,9 @@ describe("key-loss copy guards", () => {
     expect(createdHeroTitleForMode("view")).toBe(VIEW_ONLY_CARD_TITLE);
     const html = readFileSync(join(root, "site/created/index.html"), "utf8");
     expect(html).toContain("Ownership not loaded in this tab");
-    expect(html).toMatch(/recovery method|encrypted backup/i);
-    expect(VIEW_ONLY_NO_SESSION_DETAIL).toMatch(/recovery method/i);
-    expect(VIEW_ONLY_NO_SESSION_DETAIL).toMatch(/encrypted backup/i);
+    expect(html).toContain("created-view-restore-panel");
+    expect(VIEW_ONLY_NO_SESSION_DETAIL).toMatch(/Restore ownership/i);
+    expect(VIEW_ONLY_NO_SESSION_DETAIL).toMatch(/recovery code|encrypted backup/i);
   });
 
   it("K2: wrong passphrase copy is plain language", () => {

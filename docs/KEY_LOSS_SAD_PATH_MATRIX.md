@@ -3,7 +3,7 @@
 **Status:** Active — product copy + gates audit (no operator key recovery)  
 **Date:** 2026-05-29  
 **Audience:** Product, engineering, QA  
-**Related:** [`SAD_PATH_COVERAGE_AND_BACKLOG.md`](SAD_PATH_COVERAGE_AND_BACKLOG.md) § Key custody · [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) · [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md)
+**Related:** [`SAD_PATH_COVERAGE_AND_BACKLOG.md`](SAD_PATH_COVERAGE_AND_BACKLOG.md) § Key custody · [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md)
 
 ---
 
@@ -29,7 +29,7 @@ This matrix inventories unhappy custody paths, expected UX, and automated regres
 
 | ID | Sad path | User behavior | Expected UX / system | Automation | Manual |
 |----|----------|---------------|----------------------|------------|--------|
-| **K1** | Tab closed without save | Create → close tab → reopen URL | **View this card**; view-only banner; recovery/backup under Manage | `e2e/key-loss-sad-path.spec.ts` | Stranger emotional check |
+| **K1** | Tab closed without save | Create → close tab → reopen URL | **View this card**; Live · Manage tabs; **Restore ownership** on Manage (recovery + backup link) | `e2e/key-loss-sad-path.spec.ts` | Stranger emotional check |
 | **K2** | Wrong backup passphrase | Import `.hcbackup` with typo | Plain **Wrong passphrase** message; no silent fail | Same E2E · `worker/tests/key-backup.test.ts` | — |
 | **K3** | Corrupt / wrong backup file | Upload garbage JSON | Reject with Humanity Card backup error | `worker/tests/key-backup-import.test.ts` (S4) | — |
 | **K4** | Keys in another tab | Hub Tab A; create Tab B | Cross-tab banner; Open controls here | `e2e/device-cross-tab-keys.spec.ts` (S3) | — |

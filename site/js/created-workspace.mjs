@@ -1,7 +1,10 @@
 /**
  * Show setup wizard vs control tabs on /created/
  * @see docs/CARD_WORKSPACE_UX.md
+ * @see docs/OWNERSHIP_RESTORE_UX_PLAN.md
  */
+
+import { createdControlRootVisibleForMode } from "./created-view-mode-core.mjs";
 
 /** @typedef {"setup" | "control" | "view"} CreatedMode */
 
@@ -26,7 +29,7 @@ export function applyCreatedWorkspaceMode(mode) {
   const heroTitle = document.querySelector(".created-hero-title");
 
   if (setupRoot) setupRoot.hidden = mode !== "setup";
-  if (controlRoot) controlRoot.hidden = mode !== "control";
+  if (controlRoot) controlRoot.hidden = !createdControlRootVisibleForMode(mode);
 
   if (heroTitle) {
     heroTitle.textContent = createdHeroTitleForMode(mode);
