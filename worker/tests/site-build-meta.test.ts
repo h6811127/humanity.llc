@@ -77,8 +77,20 @@ describe("site build meta", () => {
     expect(src).not.toMatch(/from\s+["']node:/);
   });
 
-  it("device-status-bootstrap imports browser build-meta only", () => {
+  it("device-status-bootstrap entry only statically imports load-error helper", () => {
     const src = fs.readFileSync(path.join(siteJsDir, "device-status-bootstrap.mjs"), "utf8");
+    const staticImports = [
+      ...src.matchAll(/^import\s+.+\s+from\s+["'](\.\/[^"']+)["']/gm),
+    ].map((match) => match[1]);
+    expect(staticImports).toEqual(["./device-status-load-error.mjs"]);
+    expect(src).toContain("device-status-bootstrap-inner.mjs");
+  });
+
+  it("device-status-bootstrap-inner imports browser build-meta only", () => {
+    const src = fs.readFileSync(
+      path.join(siteJsDir, "device-status-bootstrap-inner.mjs"),
+      "utf8"
+    );
     expect(src).toContain("build-meta-browser.mjs");
     expect(src).not.toMatch(/build-meta-core\.mjs/);
   });

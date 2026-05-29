@@ -129,11 +129,19 @@ describe("PWA metadata on disk (Phase 1 gate)", () => {
       path.join(root, "site/js/device-status-bootstrap.mjs"),
       "utf8"
     );
-    expect(bootstrap).toContain("isPwaShellPagePath");
-    expect(bootstrap).toContain("pwa-install.mjs");
-    expect(bootstrap).toContain("pwa-standalone-refresh.mjs");
+    expect(bootstrap).toContain("device-status-bootstrap-inner.mjs");
+    expect(bootstrap).not.toContain("isPwaShellPagePath");
     expect(bootstrap).not.toContain('from "./pwa-install.mjs"');
-    expect(bootstrap).not.toContain('from "./pwa-standalone-refresh.mjs"');
+
+    const inner = fs.readFileSync(
+      path.join(root, "site/js/device-status-bootstrap-inner.mjs"),
+      "utf8"
+    );
+    expect(inner).toContain("isPwaShellPagePath");
+    expect(inner).toContain("pwa-install.mjs");
+    expect(inner).toContain("pwa-standalone-refresh.mjs");
+    expect(inner).not.toContain('from "./pwa-install.mjs"');
+    expect(inner).not.toContain('from "./pwa-standalone-refresh.mjs"');
   });
 
   it("create and scan HTML do not link manifest", async () => {

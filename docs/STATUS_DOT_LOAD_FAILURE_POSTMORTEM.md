@@ -175,23 +175,26 @@ Check these in order (module may be fixed in git but not in the environment you 
 
 ## Load-error dot explainer (shipped 2026-05-29)
 
-When `import("./device-status.mjs")` fails, bootstrap calls `wireStatusLoadErrorDot()` in `site/js/device-status-load-error.mjs`:
+When `import("./device-status.mjs")` fails, inner bootstrap calls `wireStatusLoadErrorDot()` in `site/js/device-status-load-error.mjs`. When **inner bootstrap** fails to load, the thin entry `device-status-bootstrap.mjs` calls the same helper.
 
 | Surface | Behavior |
 |---------|----------|
+| Entry | `device-status-bootstrap.mjs` — sole static import is `device-status-load-error.mjs` |
+| Inner | `device-status-bootstrap-inner.mjs` — build stamp, dynamic `device-status.mjs`, PWA lazy loads |
 | Red outline | Unchanged — `#top-chrome[data-device-status-error]` |
-| `#brand-status-dot-btn` `aria-label` | “Device controls failed to load. Tap for details.” |
-| Dot tap | Toggles `#device-status-load-error-popover` (anchored popover; reuses `device-hub-glance-popover` + `device-dot-explainer` styling) |
+| `#brand-status-dot-btn` `aria-label` | “Device controls failed to load. See details below the status dot.” |
+| Coach card | `#device-status-load-error-popover` (`.device-status-load-error-coachmark`) **auto-opens** ~500ms after failure; anchored like hub intro coachmark |
+| Dot tap | Toggles coach card visibility when dismissed |
 | Copy (Layer 2) | **Now:** controls didn’t finish loading · **Why:** download/cache/network · **Next:** refresh / hard refresh |
-| Primary action | **Refresh page** — `location.reload()` |
+| Actions | **Refresh page** — `location.reload()` · **Got it** — dismiss card (outline remains) |
 | Hub / inbox | Not opened — full status graph did not load |
 | Hub intro coachmark | Suppressed when `data-device-status-error` is set (existing guard) |
 
 **Product language:** Outcome copy only in the popover; technical import errors stay in `console.error` for engineers.
 
-**Tests:** `worker/tests/device-status-load-error.test.ts` · `e2e/device-status-dot.spec.ts` — `status load error shows explainer on dot tap`.
+**Tests:** `worker/tests/device-status-load-error.test.ts` · `e2e/device-status-dot.spec.ts` — `status load error shows coach card`.
 
-**Gap (unchanged):** If bootstrap’s own **static** imports fail before the dynamic `device-status` catch, the red ring and explainer may not appear — see [`HUB_DOT_DEAD_INVESTIGATION_2026-05-27.md`](HUB_DOT_DEAD_INVESTIGATION_2026-05-27.md).
+**Gap (shipped 2026-05-29):** `device-status-bootstrap.mjs` is a thin entry that only static-imports `device-status-load-error.mjs` and dynamically imports `device-status-bootstrap-inner.mjs`. Failures in the inner bootstrap graph (e.g. `build-meta-browser.mjs`) now hit the same red ring + explainer path as `device-status.mjs` load failures. See [`HUB_DOT_DEAD_INVESTIGATION_2026-05-27.md`](HUB_DOT_DEAD_INVESTIGATION_2026-05-27.md).
 
 ---
 
@@ -207,15 +210,17 @@ When `import("./device-status.mjs")` fails, bootstrap calls `wireStatusLoadError
 ### Simulated load failure
 
 1. Block or 404 `device-status.mjs` in DevTools → `#top-chrome` has `data-device-status-error`; dot shows red outline.
-2. Tap dot → `#device-status-load-error-popover` visible with Now / Why / Next copy.
-3. **Refresh page** action reloads the tab; hub does not open on dot tap in error state.
+2. Block or 404 `device-status-bootstrap-inner.mjs` (or `build-meta-browser.mjs`) → same error affordance via thin bootstrap entry.
+3. Without tapping the dot, `#device-status-load-error-popover` becomes visible with Now / Why / Next copy.
+4. **Refresh page** reloads the tab; **Got it** dismisses the card; hub does not open on dot tap in error state.
 
 ---
 
 ## References
 
 - Red outline CSS: `site/css/device-shell.css` (`#top-chrome[data-device-status-error]`)
-- Bootstrap: `site/js/device-status-bootstrap.mjs`
+- Bootstrap entry: `site/js/device-status-bootstrap.mjs`
+- Bootstrap inner: `site/js/device-status-bootstrap-inner.mjs`
 - Load-error explainer: `site/js/device-status-load-error.mjs`
 - Module manifest: `site/js/device-status-shell-modules.mjs` (E2E + Vitest)
 - Fix commit for missing file: `3c303c3` - *Ship missing inbox card-disabled module to restore status dot*

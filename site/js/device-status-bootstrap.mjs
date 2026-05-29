@@ -1,38 +1,18 @@
 /**
- * Loads device-status.mjs; surfaces load failures on #top-chrome.
- * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md - Fix directions §1
- * @see docs/STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md - Load-error dot explainer
- * @see docs/SITE_BUILD_VERSIONING.md - Phase 1 console build stamp
+ * Thin status bootstrap entry — only static import is load-error wiring.
+ * Inner bootstrap loads via dynamic import so static graph failures still
+ * surface the red ring + explainer popover.
+ * @see docs/STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md § Bootstrap static import gap
+ * @see docs/HUB_DOT_DEAD_INVESTIGATION_2026-05-27.md
  */
-import { formatSiteBuildConsoleLine } from "./build-meta-browser.mjs";
-import { SITE_BUILD_META } from "./build-meta.mjs";
-import { DEVICE_SHELL_ASSET_VERSION } from "./device-status-shell-modules.mjs";
 import { wireStatusLoadErrorDot } from "./device-status-load-error.mjs";
-import { isPwaShellPagePath } from "./pwa-install-metadata-core.mjs";
 
-console.info(formatSiteBuildConsoleLine(SITE_BUILD_META));
+const bootstrapVersion = new URL(import.meta.url).searchParams.get("v");
+const innerPath = bootstrapVersion
+  ? `./device-status-bootstrap-inner.mjs?v=${bootstrapVersion}`
+  : "./device-status-bootstrap-inner.mjs";
+const innerUrl = new URL(innerPath, import.meta.url);
 
-const statusModuleUrl = new URL(
-  `./device-status.mjs?v=${DEVICE_SHELL_ASSET_VERSION}`,
-  import.meta.url
-);
-
-import(statusModuleUrl.href)
-  .then(() => {
-    document.getElementById("top-chrome")?.removeAttribute("data-device-status-error");
-    if (isPwaShellPagePath(window.location.pathname)) {
-      const pwaUrl = new URL(
-        `./pwa-install.mjs?v=${DEVICE_SHELL_ASSET_VERSION}`,
-        import.meta.url
-      );
-      import(pwaUrl.href).catch(() => {});
-      const standaloneRefreshUrl = new URL(
-        `./pwa-standalone-refresh.mjs?v=${DEVICE_SHELL_ASSET_VERSION}`,
-        import.meta.url
-      );
-      import(standaloneRefreshUrl.href).catch(() => {});
-    }
-  })
-  .catch((err) => {
-    wireStatusLoadErrorDot(err?.message || String(err));
-  });
+import(innerUrl.href).catch((err) => {
+  wireStatusLoadErrorDot(err?.message || String(err));
+});

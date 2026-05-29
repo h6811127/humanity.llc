@@ -126,6 +126,8 @@ Uncommitted local work also bumped bootstrap to **54** without aligning peer `?v
 
 **Follow-up (shipped):** status-graph peer imports aligned to `DEVICE_SHELL_ASSET_VERSION` (55); Vitest guard in `device-status-shell-modules.test.ts`.
 
+**Follow-up (shipped 2026-05-29):** Thin `device-status-bootstrap.mjs` entry + `device-status-bootstrap-inner.mjs` — inner bootstrap static import failures now surface the load-error ring + explainer (see [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) § Load-error dot explainer).
+
 ---
 
 ## Changelog

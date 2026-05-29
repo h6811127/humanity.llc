@@ -43,7 +43,7 @@ test.describe("status dot module graph", () => {
     }
   });
 
-  test("status load error shows explainer on dot tap", async ({ page }) => {
+  test("status load error shows coach card", async ({ page }) => {
     await page.route("**/device-status.mjs**", (route) => route.abort("failed"));
 
     await page.goto("/");
@@ -53,19 +53,38 @@ test.describe("status dot module graph", () => {
       /failed to load/i
     );
 
-    const popover = page.locator("#device-status-load-error-popover");
-    await expect(popover).toBeHidden();
-    await page.locator("#brand-status-dot-btn").click();
-    await expect(popover).toBeVisible();
-    await expect(popover).toContainText("Controls couldn't load");
-    await expect(popover).toContainText("Now:");
-    await expect(popover).toContainText("Why:");
-    await expect(popover).toContainText("Next:");
-    await expect(popover.getByRole("button", { name: "Refresh page" })).toBeVisible();
+    const coachCard = page.locator("#device-status-load-error-popover");
+    await expect(coachCard).toBeVisible({ timeout: 5000 });
+    await expect(coachCard).toContainText("Controls couldn't load");
+    await expect(coachCard).toContainText("Now:");
+    await expect(coachCard).toContainText("Why:");
+    await expect(coachCard).toContainText("Next:");
+    await expect(coachCard.getByRole("button", { name: "Refresh page" })).toBeVisible();
+    await expect(coachCard.getByRole("button", { name: "Got it" })).toBeVisible();
     await expect(page.locator("body")).not.toHaveClass(/device-hub-sheet-open/);
 
+    await coachCard.getByRole("button", { name: "Got it" }).click();
+    await expect(coachCard).toBeHidden();
+
     await page.locator("#brand-status-dot-btn").click();
-    await expect(popover).toBeHidden();
+    await expect(coachCard).toBeVisible();
+    await page.locator("#brand-status-dot-btn").click();
+    await expect(coachCard).toBeHidden();
+  });
+
+  test("bootstrap inner failure shows load-error coach card", async ({ page }) => {
+    await page.route("**/device-status-bootstrap-inner.mjs**", (route) =>
+      route.abort("failed")
+    );
+
+    await page.goto("/");
+    await expect(page.locator("#top-chrome")).toHaveAttribute("data-device-status-error", "1");
+    await expect(page.locator("#device-status-load-error-popover")).toBeVisible({
+      timeout: 5000,
+    });
+    await expect(page.locator("#device-status-load-error-popover")).toContainText(
+      "Controls couldn't load"
+    );
   });
 });
 

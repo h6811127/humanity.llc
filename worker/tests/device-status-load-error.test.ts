@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   STATUS_LOAD_ERROR_ARIA_LABEL,
+  STATUS_LOAD_ERROR_DISMISS_LABEL,
   STATUS_LOAD_ERROR_EXPLAINER,
   STATUS_LOAD_ERROR_REFRESH_LABEL,
   renderStatusLoadErrorExplainerHtml,
@@ -25,6 +26,18 @@ describe("device-status-load-error", () => {
     expect(html).toContain(STATUS_LOAD_ERROR_REFRESH_LABEL);
   });
 
+  it("renders dismiss action for coach card", () => {
+    const fs = require("node:fs");
+    const path = require("node:path");
+    const src = fs.readFileSync(
+      path.join(process.cwd(), "site/js/device-status-load-error.mjs"),
+      "utf8"
+    );
+    expect(src).toContain(STATUS_LOAD_ERROR_DISMISS_LABEL);
+    expect(src).toContain("scheduleLoadErrorCoachCard");
+    expect(src).toContain("device-status-load-error-coachmark");
+  });
+
   it("escapes HTML in explainer copy", () => {
     const html = renderStatusLoadErrorExplainerHtml({
       kicker: "<unsafe>",
@@ -39,6 +52,6 @@ describe("device-status-load-error", () => {
 
   it("exposes an accessible dot label for load failure", () => {
     expect(STATUS_LOAD_ERROR_ARIA_LABEL).toMatch(/failed to load/i);
-    expect(STATUS_LOAD_ERROR_ARIA_LABEL).toMatch(/tap for details/i);
+    expect(STATUS_LOAD_ERROR_ARIA_LABEL).toMatch(/details below/i);
   });
 });

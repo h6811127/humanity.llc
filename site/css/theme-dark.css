@@ -874,7 +874,8 @@ html[data-theme="dark"] .device-hub-glance-popover {
   color: var(--surface-popover-fg);
 }
 
-html[data-theme="dark"] .device-hub-intro-coachmark {
+html[data-theme="dark"] .device-hub-intro-coachmark,
+html[data-theme="dark"] .device-status-load-error-coachmark {
   background: var(--surface-popover-bg);
   border-color: var(--surface-popover-border);
   color: var(--surface-popover-fg);

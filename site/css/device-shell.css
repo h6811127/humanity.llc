@@ -211,8 +211,9 @@ body.device-hub-sheet-open .shell-status-cluster,
   display: none !important;
 }
 
-/* First-visit coachmark - anchored to status dot */
-.device-hub-intro-coachmark {
+/* First-visit coachmark + load-error coach card — anchored to status dot */
+.device-hub-intro-coachmark,
+.device-status-load-error-coachmark {
   position: absolute;
   left: 0;
   top: calc(100% + 12px);
@@ -227,11 +228,13 @@ body.device-hub-sheet-open .shell-status-cluster,
   pointer-events: auto;
 }
 
-.device-hub-intro-coachmark[hidden] {
+.device-hub-intro-coachmark[hidden],
+.device-status-load-error-coachmark[hidden] {
   display: none !important;
 }
 
-body.device-hub-intro-visible .device-hub-intro-coachmark:not([hidden]) {
+body.device-hub-intro-visible .device-hub-intro-coachmark:not([hidden]),
+body.device-status-load-error-visible .device-status-load-error-coachmark:not([hidden]) {
   animation: device-hub-intro-in 0.32s var(--shell-spring, ease) both;
 }
 
@@ -347,7 +350,8 @@ body.device-hub-intro-visible .device-hub-intro-coachmark:not([hidden]) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body.device-hub-intro-visible .device-hub-intro-coachmark:not([hidden]) {
+  body.device-hub-intro-visible .device-hub-intro-coachmark:not([hidden]),
+  body.device-status-load-error-visible .device-status-load-error-coachmark:not([hidden]) {
     animation: none;
   }
 
