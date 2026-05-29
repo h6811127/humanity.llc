@@ -532,7 +532,7 @@ Automated (when shipped): `npm run worker:test -- worker/tests/pwa-standalone-re
 
 **Fail signals:** Safari opens automatically; wizard advances to done before user previews scan; cross-tab keys notice during fresh setup.
 
-Automated: `npm run worker:test:pwa-install` (includes `pwa-scan-handoff-core.test.ts`).
+Automated: `npm run worker:test:pwa-install` (includes `pwa-scan-handoff-core.test.ts`) · `npm run e2e:pwa-install` (`e2e/device-pwa-scan-handoff.spec.ts`).
 
 ### P1-8 · Hosted tier budget (Phase 10 — E2 staging)
 
