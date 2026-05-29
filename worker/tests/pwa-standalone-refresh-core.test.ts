@@ -1,11 +1,19 @@
 import { describe, expect, it, vi } from "vitest";
 
 import {
+  clampPullToRefreshDistance,
   isStandaloneMode,
+  isPullToRefreshPath,
+  pullToRefreshAllowed,
+  pullToRefreshAtScrollTop,
+  pullToRefreshIndicatorLabel,
+  pullToRefreshPullState,
+  pullToRefreshShouldCommit,
   readStandaloneModeFromWindow,
   runStandaloneSoftRefreshPipeline,
   shouldRefreshNetworkChipsOnResume,
   shouldTriggerStandaloneResumeRefresh,
+  PTR_THRESHOLD_PX,
   STANDALONE_SOFT_REFRESH_DEBOUNCE_MS,
   STANDALONE_SOFT_REFRESH_STEPS,
 } from "../../site/js/pwa-standalone-refresh-core.mjs";
@@ -165,5 +173,105 @@ describe("runStandaloneSoftRefreshPipeline", () => {
     expect(refreshDeviceChrome).toHaveBeenCalledWith({ immediate: true });
     expect(STANDALONE_SOFT_REFRESH_STEPS).toEqual(["wallet", "chrome"]);
     expect(STANDALONE_SOFT_REFRESH_DEBOUNCE_MS).toBeGreaterThan(0);
+  });
+});
+
+describe("pullToRefreshAllowed", () => {
+  it("allows standalone landing when sheets closed", () => {
+    expect(
+      pullToRefreshAllowed({
+        standalone: true,
+        pathname: "/",
+        hubSheetOpen: false,
+        inboxSheetOpen: false,
+      })
+    ).toBe(true);
+  });
+
+  it("allows standalone wallet", () => {
+    expect(
+      pullToRefreshAllowed({
+        standalone: true,
+        pathname: "/wallet/",
+        hubSheetOpen: false,
+        inboxSheetOpen: false,
+      })
+    ).toBe(true);
+  });
+
+  it("blocks browser tab", () => {
+    expect(
+      pullToRefreshAllowed({
+        standalone: false,
+        pathname: "/",
+        hubSheetOpen: false,
+        inboxSheetOpen: false,
+      })
+    ).toBe(false);
+  });
+
+  it("blocks created path", () => {
+    expect(
+      pullToRefreshAllowed({
+        standalone: true,
+        pathname: "/created/",
+        hubSheetOpen: false,
+        inboxSheetOpen: false,
+      })
+    ).toBe(false);
+  });
+
+  it("blocks when hub sheet open", () => {
+    expect(
+      pullToRefreshAllowed({
+        standalone: true,
+        pathname: "/",
+        hubSheetOpen: true,
+        inboxSheetOpen: false,
+      })
+    ).toBe(false);
+  });
+
+  it("blocks when inbox sheet open", () => {
+    expect(
+      pullToRefreshAllowed({
+        standalone: true,
+        pathname: "/",
+        hubSheetOpen: false,
+        inboxSheetOpen: true,
+      })
+    ).toBe(false);
+  });
+});
+
+describe("isPullToRefreshPath", () => {
+  it("matches landing and wallet only", () => {
+    expect(isPullToRefreshPath("/")).toBe(true);
+    expect(isPullToRefreshPath("/wallet/")).toBe(true);
+    expect(isPullToRefreshPath("/created/")).toBe(false);
+    expect(isPullToRefreshPath("/create/")).toBe(false);
+  });
+});
+
+describe("pull gesture helpers", () => {
+  it("requires scroll top to start", () => {
+    expect(pullToRefreshAtScrollTop(0)).toBe(true);
+    expect(pullToRefreshAtScrollTop(12)).toBe(false);
+  });
+
+  it("commits past threshold", () => {
+    expect(pullToRefreshShouldCommit(PTR_THRESHOLD_PX - 1)).toBe(false);
+    expect(pullToRefreshShouldCommit(PTR_THRESHOLD_PX)).toBe(true);
+  });
+
+  it("clamps pull distance", () => {
+    expect(clampPullToRefreshDistance(200)).toBeLessThanOrEqual(120);
+  });
+
+  it("labels pull states", () => {
+    expect(pullToRefreshPullState(10)).toBe("pulling");
+    expect(pullToRefreshPullState(PTR_THRESHOLD_PX)).toBe("ready");
+    expect(pullToRefreshIndicatorLabel("updated")).toBe("Updated");
+    expect(pullToRefreshIndicatorLabel("refreshing")).toMatch(/Refreshing/);
   });
 });

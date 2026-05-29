@@ -1,6 +1,6 @@
 # PWA install (device shell)
 
-**Status:** Spec + contract modules shipped · Phases 1–6 shipped · **Phases 7–8 planned** (PTR + stale shell nudge)  
+**Status:** Spec + contract modules shipped · Phases 1–7 shipped · **Phase 8 planned** (stale shell nudge)  
 **Audience:** Product, frontend, ops  
 **Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md) · [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md) · [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md) · [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md`](IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md) · [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) · [`features/QR Public Profile v1.0.md`](features/QR%20Public%20Profile%20v1.0.md)
 
@@ -88,8 +88,8 @@ flowchart TB
 | `site/js/pwa-install-ux-core.mjs` | Show/hide gating, dismiss snooze | **Contract shipped** |
 | `site/js/pwa-install.mjs` | `beforeinstallprompt`, DOM card, iOS copy; `isStandaloneMode()` helper | 2 |
 | `site/js/pwa-install-html.mjs` | Emphasis card markup helper | 2 |
-| `site/js/pwa-standalone-refresh-core.mjs` | Standalone detection, soft-refresh pipeline contract, PTR gesture rules | **6** ✅ · **7** (PTR) |
-| `site/js/pwa-standalone-refresh.mjs` | Resume hooks + pull-to-refresh DOM (lazy, not on status graph) | **6** ✅ · **7** (PTR) |
+| `site/js/pwa-standalone-refresh-core.mjs` | Standalone detection, soft-refresh pipeline contract, PTR gesture rules | **6–7** ✅ |
+| `site/js/pwa-standalone-refresh.mjs` | Resume hooks + pull-to-refresh DOM (lazy, not on status graph) | **6–7** ✅ |
 | Shell HTML (`index`, `wallet`, `created`) | `<link rel="manifest">`, apple-touch-icon | 1 |
 | `worker/tests/pwa-install-metadata.test.ts` | Metadata contract tests | **Contract shipped** |
 | `worker/tests/pwa-install-ux.test.ts` | UX gating tests | **Contract shipped** |
@@ -269,7 +269,7 @@ Standalone **soft refresh** (Phases 6–7) reuses existing debounced network pat
 
 ## Standalone refresh & resume
 
-**Status:** Spec locked · Phase 6 shipped · Phases 7–8 planned · **H-007** partial in [`V1_IMPLEMENTATION_BACKLOG.md`](V1_IMPLEMENTATION_BACKLOG.md)
+**Status:** Spec locked · Phases 6–7 shipped · Phase 8 planned · **H-007** partial in [`V1_IMPLEMENTATION_BACKLOG.md`](V1_IMPLEMENTATION_BACKLOG.md)
 
 ### Problem
 
@@ -482,7 +482,7 @@ Implementation checklist: [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMEN
 | **4.1** | Brand-dot home screen icons | ✅ |
 | **5** | Rollout decisions locked + manifest scope CI gate | ✅ |
 | **6** | Standalone soft refresh on resume (`visibilitychange` + bfcache `pageshow`) | ✅ |
-| **7** | Pull-to-refresh on `/` and `/wallet/` (standalone) | 📋 spec |
+| **7** | Pull-to-refresh on `/` and `/wallet/` (standalone) | ✅ |
 | **8** | Stale shell nudge (health `build` vs client stamp → reload CTA) | 📋 spec |
 
 ### Phase 4 rollout gate (after Phases 1–3)
@@ -534,6 +534,7 @@ Spec: § Standalone refresh & resume · Backlog **H-007**.
 
 | Date | Change |
 |------|--------|
+| 2026-05-29 | Phase 7 shipped — standalone pull-to-refresh on `/` and `/wallet/` |
 | 2026-05-29 | Phase 6 shipped — `pwa-standalone-refresh-*` resume soft refresh; Vitest contract |
 | 2026-05-29 | Phases 7–8 spec — pull-to-refresh, stale shell nudge; H-007 backlog |
 | 2026-05-28 | Phase 5 closure — rollout decisions locked; site-wide manifest link CI gate; H-006 closed |

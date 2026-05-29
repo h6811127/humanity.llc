@@ -629,7 +629,7 @@ Goal: make the vertical slice credible for public launch.
 **Must verify (after Phases 6–8 ship):**
 
 - Standalone resume runs **soft refresh** (chrome + scoped network chips) — not full `location.reload()` every open. **Phase 6 ✅** (wallet + chrome on resume; network chips via existing hub `visibilitychange` path).
-- Pull-to-refresh on `/` and `/wallet/` in standalone with visible feedback (Phase 7).
+- Pull-to-refresh on `/` and `/wallet/` in standalone with visible feedback (Phase 7). **✅**
 - PTR disabled or guarded when hub/inbox sheet open; no unscoped parallel status GET storm.
 - Live-control poll on pull/resume only when **Watch** on and scope active.
 - Stale shell banner when health `build` ≠ client stamp; tap reload fixes dead dot (Phase 8).

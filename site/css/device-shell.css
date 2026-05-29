@@ -2823,3 +2823,47 @@ body.device-shell-created .created-setup-nav .btn-secondary {
 body.device-shell-created #created-setup-back[hidden] {
   display: none !important;
 }
+
+/* Standalone pull-to-refresh (Phase 7) — landing + wallet only */
+.device-ptr-indicator {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 8px);
+  left: 50%;
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  transform: translateX(-50%) translateY(var(--device-ptr-pull, 0px));
+  background: var(--surface-popover-bg, #ffffff);
+  color: var(--surface-popover-fg, #1c1c1e);
+  border: 0.5px solid var(--surface-popover-border, rgba(60, 60, 67, 0.12));
+  box-shadow: var(--shell-shadow-md, 0 4px 16px rgba(0, 0, 0, 0.08));
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.device-ptr-indicator[hidden] {
+  display: none !important;
+}
+
+.device-ptr-indicator__label {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--surface-popover-fg-muted, rgba(60, 60, 67, 0.72));
+  white-space: nowrap;
+}
+
+.device-ptr-indicator[data-state="ready"] .device-ptr-indicator__label,
+.device-ptr-indicator[data-state="updated"] .device-ptr-indicator__label {
+  color: var(--surface-popover-accent, var(--red, #db1b43));
+}
+
+.device-ptr-indicator[data-state="refreshing"] .device-ptr-indicator__label {
+  color: var(--surface-popover-fg, #1c1c1e);
+}

@@ -322,4 +322,40 @@ test.describe("device PWA install (phase 4 rollout gate)", () => {
     });
     expect(registration).toBeNull();
   });
+
+  test("standalone pull-to-refresh shows Updated affordance (P1-PWA-R step 5)", async ({
+    page,
+  }) => {
+    await page.addInitScript(withStandaloneDisplayMode().content);
+    await seedPwaLandingStorage(page);
+    await wireShellRoutes(page);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await waitForShellReady(page);
+
+    await page.waitForFunction(() => typeof window.__hcPtrTestTrigger === "function", {
+      timeout: 20_000,
+    });
+    await page.evaluate(() => window.__hcPtrTestTrigger?.());
+
+    await expect(page.locator("#device-ptr-indicator")).toBeVisible();
+    await expect(page.locator("#device-ptr-indicator")).toContainText(/Updated/i);
+  });
+
+  test("pull-to-refresh blocked when hub sheet open (P1-PWA-R step 7)", async ({
+    page,
+  }) => {
+    await page.addInitScript(withStandaloneDisplayMode().content);
+    await seedPwaLandingStorage(page);
+    await wireShellRoutes(page);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await waitForShellReady(page);
+    await waitForStatusDotReady(page);
+
+    await page.locator("#brand-status-dot-btn").click();
+    await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/);
+
+    await page.waitForFunction(() => typeof window.__hcPtrTestTrigger === "function");
+    await page.evaluate(() => window.__hcPtrTestTrigger?.());
+    await expect(page.locator("#device-ptr-indicator")).toBeHidden();
+  });
 });

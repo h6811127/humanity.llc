@@ -19,6 +19,111 @@ export const STANDALONE_SOFT_REFRESH_DEBOUNCE_MS = 150;
 /** Soft refresh pipeline steps for Phase 6 (no PTR / no hard reload). */
 export const STANDALONE_SOFT_REFRESH_STEPS = ["wallet", "chrome"];
 
+/** Pathnames that support pull-to-refresh in standalone (Phase 7). */
+export const PWA_PTR_ALLOWED_PATHNAMES = ["/", "/wallet/"];
+
+/** Pull distance before commit (px). */
+export const PTR_THRESHOLD_PX = 64;
+
+/** Maximum rubber-band pull (px). */
+export const PTR_MAX_PULL_PX = 120;
+
+/** How long the “Updated” label stays visible (ms). */
+export const PTR_UPDATED_HIDE_MS = 1500;
+
+/**
+ * @param {string} pathname
+ */
+export function isPullToRefreshPath(pathname) {
+  if (pathname === "/" || pathname === "/index.html") return true;
+  if (
+    pathname === "/wallet" ||
+    pathname === "/wallet/" ||
+    pathname === "/wallet/index.html"
+  ) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * @param {{
+ *   standalone: boolean;
+ *   pathname: string;
+ *   hubSheetOpen?: boolean;
+ *   inboxSheetOpen?: boolean;
+ * }} input
+ */
+export function pullToRefreshAllowed(input) {
+  if (!input.standalone) return false;
+  if (!isPullToRefreshPath(input.pathname)) return false;
+  if (input.hubSheetOpen) return false;
+  if (input.inboxSheetOpen) return false;
+  return true;
+}
+
+/**
+ * @param {number} scrollTop
+ * @param {number} [epsilon]
+ */
+export function pullToRefreshAtScrollTop(scrollTop, epsilon = 1) {
+  return scrollTop <= epsilon;
+}
+
+/**
+ * @param {number} pullDistance
+ * @param {number} [threshold]
+ */
+export function pullToRefreshShouldCommit(
+  pullDistance,
+  threshold = PTR_THRESHOLD_PX
+) {
+  return pullDistance >= threshold;
+}
+
+/**
+ * @param {number} pullDistance
+ * @param {number} [threshold]
+ * @param {number} [maxPull]
+ */
+export function clampPullToRefreshDistance(
+  pullDistance,
+  threshold = PTR_THRESHOLD_PX,
+  maxPull = PTR_MAX_PULL_PX
+) {
+  const raw = Math.max(0, pullDistance);
+  return Math.min(raw, maxPull);
+}
+
+/**
+ * @param {number} pullDistance
+ * @param {number} [threshold]
+ * @returns {"idle" | "pulling" | "ready"}
+ */
+export function pullToRefreshPullState(pullDistance, threshold = PTR_THRESHOLD_PX) {
+  if (pullDistance <= 0) return "idle";
+  if (pullDistance >= threshold) return "ready";
+  return "pulling";
+}
+
+/**
+ * @param {"idle" | "pulling" | "ready" | "refreshing" | "updated"} state
+ */
+export function pullToRefreshIndicatorLabel(state) {
+  switch (state) {
+    case "pulling":
+      return "Pull to refresh";
+    case "ready":
+      return "Release to refresh";
+    case "refreshing":
+      return "Refreshing…";
+    case "updated":
+      return "Updated";
+    default:
+      return "";
+  }
+}
+
 /**
  * @param {{ displayModeStandalone?: boolean; legacyIosStandalone?: boolean }} env
  */

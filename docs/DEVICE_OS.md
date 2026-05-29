@@ -185,7 +185,7 @@ Manual regression: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) (**P1-1** — no duplica
 | 10 | Live-control inbox (`device-live-control-inbox.mjs`) | ✅ |
 | 11 | Cross-tab keys banner (`device-tab-presence.mjs`) | ✅ |
 | 12 | PWA install Phases 1–5 (`pwa-install-*`) | ✅ — [`PWA_INSTALL.md`](PWA_INSTALL.md) · H-006 closed |
-| 12b | PWA standalone refresh Phases 6–8 | **Phase 6 ✅** · Phases 7–8 📋 — H-007 |
+| 12b | PWA standalone refresh Phases 6–8 | **Phases 6–7 ✅** · Phase 8 📋 — H-007 |
 | 13 | Deferred: resolver-wide search / directory |  -  |
 |  -  | Deferred: per-card revoke on landing hub |  -  (use Manage) |
 
