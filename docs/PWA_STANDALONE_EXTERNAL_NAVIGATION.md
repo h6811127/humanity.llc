@@ -194,7 +194,7 @@ openStewardScanPreview(url, { navigation, standalone })
 1. **Ship P1** — standalone-aware scan handoff + setup step behavior tweak + Vitest contract tests (`pwa-scan-handoff-core.mjs` or extend `shop-checkout-handoff` pattern).
 2. **Add P1-PWA-N manual QA** (below) and one Playwright case with `display-mode: standalone` emulation opening test scan from `/created/?fresh=1`. **Shipped:** `e2e/device-pwa-scan-handoff.spec.ts` in `npm run e2e:pwa-install`.
 3. **Evaluate P2** after dogfood — if stewards still miss Back, add return banner on scan.
-4. **Optional P4** — soften install prompt until first setup complete (product call).
+4. **Optional P4** — soften install prompt until first setup complete (product call). **Shipped:** `shouldShowPwaInstallSurface` requires `anyWalletSetupDone`; deferral card copy on shell pages until setup completes.
 5. **Do not** pursue P3 unless stranger-path parity requires identical pixels in wizard.
 
 Update [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Manual QA step 3 when P1 ships: “standalone → same-tab preview; browser tab → new tab.”
@@ -253,3 +253,4 @@ Update [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Manual QA step 3 when P
 | 2026-05-29 | **P1 shipped** — `pwa-scan-handoff-core.mjs` wired at setup, dashboard, hub, wallet pins, child-object scan links |
 | 2026-05-29 | **P2 shipped** — `hc_return` param, sessionStorage fallback, scan return banner + `scan-steward-preview-return.mjs` |
 | 2026-05-29 | **P1-PWA-N E2E** — `e2e/device-pwa-scan-handoff.spec.ts` (standalone same-tab + browser popup regression) |
+| 2026-05-29 | **P4 shipped** — install card gated on `hc_setup_done` for wallet rows; deferral card until first setup complete |

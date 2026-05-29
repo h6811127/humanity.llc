@@ -182,10 +182,13 @@ All must pass:
 1. **Shell page** — `isPwaShellPagePath(pathname)`
 2. **Not standalone** — `display-mode: standalone` is false (already installed)
 3. **Returning steward** — `savedCardCount >= 1` (`PWA_INSTALL_MIN_SAVED_CARDS`)
-4. **Not snoozed** — dismiss younger than 7 days (`hc_pwa_install_dismissed_at`)
-5. **No urgent inbox** — kinds in `PWA_INSTALL_BLOCKED_INBOX_KINDS`: `orphan_keys_removed`, `cross_tab_keys`, `other_tabs_unsaved_keys`
-6. **Status graph healthy** — no `data-device-status-error` on `#top-chrome`
-7. **Platform signal** — `beforeinstallprompt` captured **or** iOS Safari manual path
+4. **Setup complete** — at least one saved wallet row has `localStorage.hc_setup_done[profile_id]` (`anyWalletSetupDone`; P4)
+5. **Not snoozed** — dismiss younger than 7 days (`hc_pwa_install_dismissed_at`)
+6. **No urgent inbox** — kinds in `PWA_INSTALL_BLOCKED_INBOX_KINDS`: `orphan_keys_removed`, `cross_tab_keys`, `other_tabs_unsaved_keys`
+7. **Status graph healthy** — no `data-device-status-error` on `#top-chrome`
+8. **Platform signal** — `beforeinstallprompt` captured **or** iOS Safari manual path
+
+When gates 1–3 and 5–7 pass but setup is incomplete, show the **deferral card** (`shouldShowPwaInstallDeferralHint`) instead: “Finish your first object in Safari…” — no native install CTA until setup completes.
 
 Never show when:
 

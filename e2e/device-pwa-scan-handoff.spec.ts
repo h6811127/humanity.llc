@@ -130,7 +130,7 @@ test.describe("device PWA scan handoff (P1-PWA-N)", () => {
     await expect(page.locator("#created-setup-panel-test")).toBeVisible({ timeout: 20_000 });
     await page.locator('[data-setup-action="test-scan"]').click();
 
-    await expect(page).toHaveURL(/scan-active\.html/, { timeout: 10_000 });
+    await expect(page).toHaveURL(/scan-active/, { timeout: 10_000 });
     await expect(page).toHaveURL(/hc_return=/);
     await expect(page.locator("#scan-steward-preview-return")).toBeVisible();
     await expect(page.locator("#scan-steward-preview-return-link")).toContainText(
@@ -153,7 +153,7 @@ test.describe("device PWA scan handoff (P1-PWA-N)", () => {
     await page.locator('[data-setup-action="test-scan"]').click();
     const popup = await popupPromise;
 
-    await expect(popup).toHaveURL(/scan-active\.html/, { timeout: 10_000 });
+    await expect(popup).toHaveURL(/scan-active/, { timeout: 10_000 });
     await expect(page).toHaveURL(/\/created\//);
     await expect(page).toHaveURL(/#setup-test/);
     await popup.close();

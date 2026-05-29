@@ -71,7 +71,7 @@ export function syncSetupDoneForSavedProfile(profileId) {
  * @param {() => Record<string, unknown> | null} getSession
  */
 export function modeFromPage(profileId, freshParam, getSession) {
-  if (profileId) syncSetupDoneForSavedProfile(profileId);
+  if (profileId && !freshParam) syncSetupDoneForSavedProfile(profileId);
 
   const session = getSession();
   const hasSigningKeys = !!(
