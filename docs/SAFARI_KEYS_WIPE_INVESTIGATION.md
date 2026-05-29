@@ -406,7 +406,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | # | Change | Rationale | Prod validated? |
 |---|--------|-----------|-----------------|
 | **P0-1** | **Wire `maybeQuietTabRehydrate()` on scan pages** before vouch/live-proof UI | R1 Camera QR path | **Shipped** — `scan-tab-keys.mjs?v=8` awaits rehydrate; script loads before `vouch-issue` |
-| **P0-2** | **Synchronous save** before leaving create success path | R3 race (less common on prod than assumed) | Flow A: microtask save succeeded |
+| **P0-2** | **Synchronous save** before leaving create success path | R3 race (less common on prod than assumed) | **Shipped** — `create-card.mjs` sync `saveSessionToWallet` before navigate; `created-device-save.mjs` no microtask |
 | **P0-3** | **try/catch on `saveWallet` / `saveSessionToWallet`** — visible error, `hc_auto_save_failed` | R3 quota | Not repro’d live |
 | **P0-4** | **First-session backup gate** before “done” | R4 true wipe | N/A |
 | **P0-5** | **Scan dot / “Keys on this device” = tab signing state**, not wallet count; **Restore control here** CTA | R9 — **prod** | Flow B — **Shipped** (`scan-page-dot.mjs?v=8`, actor band lead sync) |
@@ -484,7 +484,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | 2 | P0-5 Scan dot honesty | **Shipped** | `scanDeviceStateFromContext` (tab keys only); glance + aria `walletKeysNotInTab`; actor band lead; `scan-page-dot.mjs?v=8` |
 | 3 | P0-6 Keyless session fix | **Shipped** | `setTabSession` / `getTabSession` guard; `created.mjs` hydrate + gate merge use `applyCreatedSessionState`; view-mode strip |
 | 4 | P0-7 View-only copy branches | **Shipped** | `created-view-only-copy-core.mjs`; wallet-empty vs wallet-saved copy on `#no-session-detail` + view restore panel |
-| 5 | P0-2 Sync save on create | Pending | R3 |
+| 5 | P0-2 Sync save on create | **Shipped** | `created-device-save-core.mjs`; sync save in `create-card.mjs` before `location.replace`; `/created/` auto-save runs inline |
 | 6 | P0-3 saveWallet try/catch | Pending | R3 |
 | 7 | P0-4 Backup gate | Pending | R4 |
 | 8 | P0b-1 Card disabled FP | Pending | R10 |
@@ -620,13 +620,13 @@ These surfaces can simultaneously show “saved / OK” and block signing — us
 
 ## Auto-save mechanics (detail)
 
-**Path:** `created-device-save.mjs` → `initCreatedDeviceSave` → `queueMicrotask(() => runSave({ quiet: true }))`.
+**Path:** `create-card.mjs` sync `saveSessionToWallet` before `/created/` navigation (P0-2); `created-device-save.mjs` → `initCreatedDeviceSave` → inline `runSave({ quiet: true })` when auto-save is on (no microtask).
 
 **Success criteria (Flow A prod):** Within ~2s, `localStorage.hc_wallet` contains row with `owner_private_key_b58`; `sessionStorage` still has tab copy.
 
 **Failure modes (R3):**
 
-1. Navigation away before microtask (P0-2: sync save before leave).
+1. Navigation away before microtask — **fixed (P0-2)** via sync save on create + inline auto-save on `/created/`.
 2. `saveWallet()` → `localStorage.setItem` throws `QuotaExceededError` — **no try/catch** (P0-3).
 3. Private mode / storage disabled.
 
@@ -677,3 +677,4 @@ Sources: WebKit ITP blog; [`PWA_INSTALL.md`](PWA_INSTALL.md); [`SAFARI_PERFORMAN
 | 2026-05-29 | **P0-5 shipped:** scan dot uses tab signing state; wallet-only keys → hollow `none` + Restore control here |
 | 2026-05-29 | **P0-6 shipped:** `setTabSession` rejects keyless writes; `/created/` hydrate/gate no longer pollute `hc_created` |
 | 2026-05-29 | **P0-7 shipped:** view-only copy branches on wallet signing rows; `#no-session-detail` + restore panel leads |
+| 2026-05-29 | **P0-2 shipped:** sync wallet save before `/created/` navigation; inline auto-save on `/created/` (no microtask) |

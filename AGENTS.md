@@ -73,7 +73,7 @@ npm run e2e -- e2e/device-cross-tab-keys.spec.ts e2e/device-status-dot.spec.ts e
 
 **Contracts (do not break without updating docs + tests):**
 
-1. **Module graph** — `device-status-bootstrap.mjs` (thin entry) dynamically imports `device-status-bootstrap-inner.mjs`, which loads `device-status.mjs`. Either failure sets `data-device-status-error` and wires `device-status-load-error.mjs` (coach card auto-shows; hub does not open). New imports must ship in the same deploy and stay listed in `site/js/device-status-shell-modules.mjs` (Vitest + `e2e/device-status-dot.spec.ts`).
+1. **Module graph** — `device-status-bootstrap.mjs` → inner loads `device-status-core.mjs` then `device-status.mjs`. Full status failure still sets `data-device-status-error` and load-error coach card; **core** keeps dot/hub open. Core-only failure blocks hub. New imports must ship in the same deploy and stay listed in `site/js/device-status-shell-modules.mjs` (Vitest + `e2e/device-status-dot.spec.ts`).
 2. **Hub open state** — Open/close only through `setHubSheetOpen()` / `setHubExpanded()`. `hubSheetOpen()` treats a collapsed `#device-hub` as closed even if `body.device-hub-sheet-open` is stuck (toggle-trap fix).
 3. **Clickability CSS** — `.top-chrome--float { pointer-events: none }` with `.shell-status-cluster` (and dot/badge) at `pointer-events: auto` when `top-chrome--edge-hidden` or hub/inbox locked. See `docs/STATUS_INDICATOR_STEWARD_GREEN.md` troubleshooting.
 

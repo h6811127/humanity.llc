@@ -12,12 +12,17 @@ import { isPwaShellPagePath } from "./pwa-install-metadata-core.mjs";
 
 console.info(formatSiteBuildConsoleLine(SITE_BUILD_META));
 
+const statusCoreUrl = new URL(
+  `./device-status-core.mjs?v=${DEVICE_SHELL_ASSET_VERSION}`,
+  import.meta.url
+);
 const statusModuleUrl = new URL(
   `./device-status.mjs?v=${DEVICE_SHELL_ASSET_VERSION}`,
   import.meta.url
 );
 
-import(statusModuleUrl.href)
+import(statusCoreUrl.href)
+  .then(() => import(statusModuleUrl.href))
   .then(() => {
     document.getElementById("top-chrome")?.removeAttribute("data-device-status-error");
     if (isPwaShellPagePath(window.location.pathname)) {

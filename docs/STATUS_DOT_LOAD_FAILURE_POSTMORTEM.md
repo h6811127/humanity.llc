@@ -153,7 +153,7 @@ Check these in order (module may be fixed in git but not in the environment you 
 | **Vitest import-graph smoke** | ✅ Shipped: `site/js/device-status-shell-modules.mjs` + `worker/tests/device-status-shell-modules.test.ts`; Playwright uses the same manifest via `deviceStatusShellModulePaths()`. |
 | **Lazy inbox sheet import** | ✅ Shipped: `device-inbox-sheet-loader.mjs`; `device-status.mjs` and `device-chrome-refresh.mjs` use dynamic import for the sheet. |
 | **Lazy inbox module import (Step 1)** | ✅ Shipped: `device-inbox-loader.mjs`; `device-status.mjs` no longer static-imports `device-inbox.mjs`; badge/overlay use safe fallbacks until preload completes. `device-chrome-refresh.mjs` awaits `loadInboxModule()` for gather ticks. |
-| **Split `device-status-core.mjs`** | Step 2 (future): pure dot state + hub opener in a minimal module; hub sheet / chrome refresh as plugins. Larger refactor; only if graph keeps growing. |
+| **Split `device-status-core.mjs` (Step 2)** | ✅ Shipped: `device-status-core.mjs` wires dot tap + hub open with lazy `device-hub-sheet.mjs`; `device-status-bootstrap-inner.mjs` loads core before `device-status.mjs` so hub works if the full status graph fails. |
 
 ### P3 - Monitoring
 
