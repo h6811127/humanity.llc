@@ -9,7 +9,6 @@ import {
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 
 /**
- * @param {string} scanUrl
  * @param {{ returnUrl?: string | null; setupWizard?: boolean }} [opts]
  */
 export function stewardScanPreviewContext(opts = {}) {

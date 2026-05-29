@@ -114,9 +114,9 @@ export async function renderScanPage(
       ${renderFooter(vm, origin)}
     </main>
   </div>
+  ${renderScanTabKeysScript(vm, origin)}
   ${renderLiveControlScript(vm, origin)}
   ${renderVouchIssuanceScript(vm, origin)}
-  ${renderScanTabKeysScript(vm, origin)}
   ${renderQrFallbackScript(origin, vm.scanUrl)}
   ${renderScanOfflineBannerScript()}
   ${renderScanSafetyHeaderScript()}
@@ -1088,7 +1088,7 @@ function renderVouchIssuanceScript(vm: ScanViewModel, origin: string): string {
 function renderScanTabKeysScript(vm: ScanViewModel, origin: string): string {
   if (vm.kind !== "active" || !vm.profileId) return "";
   const assetOrigin = pagesJsOrigin(origin);
-  const mod = JSON.stringify(`${assetOrigin}/js/scan-tab-keys.mjs?v=7`);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-tab-keys.mjs?v=8`);
   return `<script type="module" src=${mod}></script>`;
 }
 

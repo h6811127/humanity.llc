@@ -37,6 +37,7 @@ This matrix inventories unhappy custody paths, expected UX, and automated regres
 | **K6** | Revoke / live proof without keys | Deep link `#revoke` or `live_challenge` | View-only; disabled prove; unlock copy | `e2e/production-sad-path-created.spec.ts` (S6–S7) | — |
 | **K7** | Setup skipped | `fresh=1` without save on device | Setup wizard step 1 custody warn | Copy guards · manual | P1 create QA |
 | **K8** | PWA vs Safari tab | Standalone vs browser session | [`PWA_INSTALL.md`](PWA_INSTALL.md) semantics | `e2e/device-pwa-install.spec.ts` | P1-PWA |
+| **K9** | Safari session / storage eviction | Camera QR new tab, ITP 7-day, auto-save race, PWA split | [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) — **P0-1 scan rehydrate shipped** | — | S1–S7 repro matrix |
 
 ---
 
@@ -75,3 +76,4 @@ Automated guards: `npm run worker:test:key-loss-copy`
 | Date | Notes |
 |------|-------|
 | 2026-05-29 | Initial matrix; K1/K2/K5 E2E; copy guards |
+| 2026-05-29 | K9 + link to Safari keys wipe investigation |

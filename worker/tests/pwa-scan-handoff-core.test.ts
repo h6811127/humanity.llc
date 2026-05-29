@@ -58,9 +58,7 @@ describe("pwa-scan-handoff-core", () => {
         storage: { setItem },
       })
     ).toBe(true);
-    expect(assign).toHaveBeenCalledWith(
-      expect.stringContaining("hc_return=")
-    );
+    expect(assign).toHaveBeenCalledWith(expect.stringContaining("hc_return="));
     expect(setItem).toHaveBeenCalled();
     expect(openWindow).not.toHaveBeenCalled();
   });
@@ -92,9 +90,9 @@ describe("pwa-scan-handoff-core", () => {
     expect(
       stewardPreviewReturnBannerLabel("https://humanity.llc/created/#setup-test")
     ).toBe("Back to setup");
-    expect(
-      stewardPreviewReturnBannerLabel("https://humanity.llc/wallet/")
-    ).toBe("Back to My objects");
+    expect(stewardPreviewReturnBannerLabel("https://humanity.llc/wallet/")).toBe(
+      "Back to My objects"
+    );
   });
 
   it("maps standalone to link attrs and feedback", () => {

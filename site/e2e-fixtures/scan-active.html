@@ -1456,6 +1456,35 @@ a {
   display: none;
 }
 
+.scan-steward-preview-return {
+  margin: 0 var(--pad) 12px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: var(--surface-popover-bg);
+  border: 1px solid var(--surface-popover-border);
+  box-shadow: var(--hc-emphasis-card-shadow, 0 1px 3px rgba(0, 0, 0, 0.06));
+}
+
+.scan-steward-preview-return[hidden] {
+  display: none;
+}
+
+.scan-steward-preview-return-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--surface-popover-accent, var(--red));
+  text-decoration: none;
+}
+
+.scan-steward-preview-return-link:hover,
+.scan-steward-preview-return-link:focus-visible {
+  text-decoration: underline;
+}
+
 /* Scanner safety header (docs/SCANNER_EXPERIENCE.md Phase B) */
 .scan-safety-header {
   margin: 0 var(--pad) 14px;
@@ -3466,6 +3495,9 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
   </div>
 </div>
     <div class="scan-cross-tab-banner" id="scan-cross-tab-banner" role="status" hidden></div>
+    <div class="scan-steward-preview-return" id="scan-steward-preview-return" hidden>
+      <a id="scan-steward-preview-return-link" class="scan-steward-preview-return-link" href="#">Back</a>
+    </div>
     <p class="scan-offline-banner" id="scan-offline-banner" role="status" hidden>Offline - status may be stale; refresh when connected.</p>
     <main class="screen scan-screen">
       <div class="scan-pass-layer">
@@ -3497,7 +3529,7 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
   
   <details class="scan-hero-qr-details">
   <summary class="scan-hero-qr-summary">This QR</summary>
-  <div class="scan-hero-qr pass-qr scan-status-qr" id="pass-qr-slot" data-scan-url="http://127.0.0.1:8788/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5"><div class="hc-qr-frame pass-qr-svg" role="img" aria-label="QR code for this Humanity live object scan link"><svg class="hc-qr-frame-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 91.5" role="presentation" aria-hidden="true"><rect width="60" height="91.5" rx="3" fill="#ffffff"/><rect x="1.275" y="1.275" width="57.45" height="88.95" rx="2.475" fill="none" stroke="#db1b43" stroke-width="1.5"/><g transform="translate(5.5 5.5)"><path fill="#ffffff" d="M0 0h49v49H0z"/><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/><defs><mask id="hc-qr-finder-logo-mask-0kkujf6e4px" maskUnits="userSpaceOnUse" mask-type="alpha"><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/></mask></defs><g class="hc-qr-finder-logo" aria-hidden="true" mask="url(#hc-qr-finder-logo-mask-0kkujf6e4px)"><circle class="hc-qr-finder-logo-outer" cx="5.5" cy="5.5" r="5.145" fill="#c9979f" opacity="0.52"/><circle class="hc-qr-finder-logo-inner" cx="5.5" cy="5.5" r="2.3667" fill="#141414" opacity="0.9"/></g></g><text class="hc-qr-frame-pill-text" x="30" y="62.98" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5.5" font-weight="600" letter-spacing="0.14em" fill="#db1b43">LIVE OBJECT</text><text class="hc-qr-frame-footer-text" x="30" y="75" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5" font-weight="500" fill="#8a8a8a">humanity.llc</text><text class="hc-qr-frame-code-text" x="30" y="85.26" text-anchor="middle" font-family="ui-monospace,monospace" font-size="5" font-weight="600" letter-spacing="0.08em" fill="#db1b43">HC-CWWX-HPK0</text></svg></div><p class="pass-credential-code mono" aria-label="Credential code for print verification">HC-CWWX-HPK0</p></div>
+  <div class="scan-hero-qr pass-qr scan-status-qr" id="pass-qr-slot" data-scan-url="http://127.0.0.1:8788/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5"><div class="hc-qr-frame pass-qr-svg" role="img" aria-label="QR code for this Humanity live object scan link"><svg class="hc-qr-frame-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 91.5" role="presentation" aria-hidden="true"><rect width="60" height="91.5" rx="3" fill="#ffffff"/><rect x="1.275" y="1.275" width="57.45" height="88.95" rx="2.475" fill="none" stroke="#db1b43" stroke-width="1.5"/><g transform="translate(5.5 5.5)"><path fill="#ffffff" d="M0 0h49v49H0z"/><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/><defs><mask id="hc-qr-finder-logo-mask-0isjym9eci8h" maskUnits="userSpaceOnUse" mask-type="alpha"><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/></mask></defs><g class="hc-qr-finder-logo" aria-hidden="true" mask="url(#hc-qr-finder-logo-mask-0isjym9eci8h)"><circle class="hc-qr-finder-logo-outer" cx="5.5" cy="5.5" r="5.145" fill="#c9979f" opacity="0.52"/><circle class="hc-qr-finder-logo-inner" cx="5.5" cy="5.5" r="2.3667" fill="#141414" opacity="0.9"/></g></g><text class="hc-qr-frame-pill-text" x="30" y="62.98" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5.5" font-weight="600" letter-spacing="0.14em" fill="#db1b43">LIVE OBJECT</text><text class="hc-qr-frame-footer-text" x="30" y="75" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5" font-weight="500" fill="#8a8a8a">humanity.llc</text><text class="hc-qr-frame-code-text" x="30" y="85.26" text-anchor="middle" font-family="ui-monospace,monospace" font-size="5" font-weight="600" letter-spacing="0.08em" fill="#db1b43">HC-CWWX-HPK0</text></svg></div><p class="pass-credential-code mono" aria-label="Credential code for print verification">HC-CWWX-HPK0</p></div>
 </details>
 </article>
 </div>
@@ -3917,6 +3949,9 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
   var profileId = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
   var qrId = "qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
   var challengeUrl = "http://127.0.0.1:8788/.well-known/hc/v1/cards/7Xk9mP2nQ4rT6vW8yZ1aB3cD5/live-control/challenges";
+  var COPY_ASK_LABEL = "Ask for live proof";
+  var COPY_REQUEST_EXPIRED = "The 2-minute window ended. You can ask again.";
+  var COPY_PROOF_EXPIRED = "Live proof expired. Ask again to prove control now.";
   var pollTimer = null;
   var countdownTimer = null;
   var proofDisplayCountdownTimer = null;
@@ -4110,7 +4145,7 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
     if (row) row.classList.remove("is-proven");
     if (btn) {
       btn.disabled = false;
-      btn.textContent = "Ask for live proof";
+      btn.textContent = COPY_ASK_LABEL;
     }
     if (status) setStatus("Ready when you are.", false);
     if (ownerPanel) ownerPanel.hidden = true;
@@ -4230,10 +4265,10 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
     if (row) row.classList.remove("is-proven");
     if (btn) {
       btn.disabled = false;
-      btn.textContent = "Ask for live proof";
+      btn.textContent = COPY_ASK_LABEL;
     }
     showRequestExpiredVisual();
-    setStatus("The 2-minute window ended. You can ask again.", false);
+    setStatus(COPY_REQUEST_EXPIRED, false);
     if (inPersonLayout) inPersonLayout.classList.remove("is-owner-waiting");
   }
   function showProofExpired() {
@@ -4253,9 +4288,9 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
     if (row) row.classList.remove("is-proven");
     if (btn) {
       btn.disabled = false;
-      btn.textContent = "Ask for live proof";
+      btn.textContent = COPY_ASK_LABEL;
     }
-    setStatus("Live proof expired. Ask again to prove control now.", false);
+    setStatus(COPY_PROOF_EXPIRED, false);
     if (inPersonLayout) inPersonLayout.classList.remove("is-owner-waiting");
   }
   function freshProofMs(body) {
@@ -4460,15 +4495,15 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
       .catch(function (err) {
         stopCountdown();
         btn.disabled = false;
-        btn.textContent = "Ask for live proof";
+        btn.textContent = COPY_ASK_LABEL;
         setStatus(err.message || "Could not create live proof request.", false);
       });
   });
   checkExistingProof();
 })();
 </script>
+  <script type="module" src="http://127.0.0.1:8788/js/scan-tab-keys.mjs?v=8"></script>
   <script type="module" src="http://127.0.0.1:8788/js/vouch-issue.mjs?v=13"></script>
-  <script type="module" src="http://127.0.0.1:8788/js/scan-tab-keys.mjs?v=7"></script>
   <script type="module">
 import { renderQrToImage } from "http://127.0.0.1:8788/js/qr-render.mjs?v=5";
 var slot = document.getElementById("pass-qr-slot");
@@ -4518,5 +4553,6 @@ if (slot && !slot.querySelector("svg") && slot.dataset.scanUrl) {
   <script type="module" src="http://127.0.0.1:8788/js/scan-actor-band.mjs?v=1"></script>
   
   <script type="module" src="http://127.0.0.1:8788/js/scan-merch-funnel.mjs?v=2"></script>
+  <script type="module" src="http://127.0.0.1:8788/js/scan-steward-preview-return.mjs?v=1"></script>
 </body>
 </html>
