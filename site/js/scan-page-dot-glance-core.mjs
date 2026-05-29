@@ -40,6 +40,9 @@ export function scanGlancePrimaryAction(descriptorAction, overlay) {
   if (descriptorAction.kind === "create_card") {
     return { kind: "scan_use_keys_here", label: "Take control here" };
   }
+  if (descriptorAction.kind === "scan_use_keys_here") {
+    return descriptorAction;
+  }
   return descriptorAction;
 }
 
@@ -73,27 +76,37 @@ export function renderScanDotExplainerHtml(descriptor, primaryAction) {
  *   network: "ok" | "degraded" | "offline",
  *   device: "none" | "keys" | "unsaved" | "steward",
  *   overlay: import("./device-dot-state-core.mjs").DotInboxOverlay,
+ *   walletKeysNotInTab?: boolean,
  * }} input
  */
 export function scanPageDotAriaLabel(input) {
   if (!input.networkResolved && input.online) {
     return "Your device: checking connection. Tap for details.";
   }
-  return `Your device: ${scanDeviceAriaPhrase(input.network, input.device, input.overlay)}. Tap for details.`;
+  return `Your device: ${scanDeviceAriaPhrase(
+    input.network,
+    input.device,
+    input.overlay,
+    input.walletKeysNotInTab
+  )}. Tap for details.`;
 }
 
 /**
  * @param {"ok" | "degraded" | "offline"} network
  * @param {"none" | "keys" | "unsaved" | "steward"} device
  * @param {import("./device-dot-state-core.mjs").DotInboxOverlay} overlay
+ * @param {boolean} [walletKeysNotInTab]
  */
-function scanDeviceAriaPhrase(network, device, overlay) {
+function scanDeviceAriaPhrase(network, device, overlay, walletKeysNotInTab = false) {
   if (network === "offline") return "offline";
   if (network === "degraded") return "resolver limited";
   if (overlay === "proof_waiting") return "live proof waiting";
   if (overlay === "cross_tab_keys") return "managing in another tab";
   if (device === "steward") return "steward control ready in this tab";
   if (device === "unsaved") return "ownership not saved on device";
-  if (device === "keys") return "ownership saved on this device";
+  if (device === "keys") return "ownership saved in this tab";
+  if (walletKeysNotInTab) {
+    return "ownership saved on device, not in this tab";
+  }
   return "ownership not loaded in this tab";
 }

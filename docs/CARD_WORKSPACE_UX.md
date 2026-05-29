@@ -12,7 +12,7 @@
 |------|------|-----|
 | **setup** | Keys in tab and (`fresh=1` or setup not done or not saved to device) | Linear wizard - no tabs |
 | **control** | Keys in tab, setup complete, saved on device | **Live · Manage** ([`CREATED_TASKS_TAB_REDESIGN.md`](CREATED_TASKS_TAB_REDESIGN.md) T1 shipped) |
-| **view** | No signing keys in this tab | Read-only notice + unlock paths |
+| **view** | No signing keys in this tab | Read-only **Live · Manage** + **Restore ownership** ([`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) Phase 1) |
 
 Resolver: `site/js/created-mode.mjs` · `modeFromPage()`.
 
@@ -101,7 +101,7 @@ See `docs/CARD_WORKSPACE_PHASE0.md` - Open card loads keys, auto-save default on
 
 1. Create card → setup wizard, URL has `fresh=1`, hero says **Set up your live QR**.
 2. Cannot skip step 1 without save (auto-save may complete step 1 immediately).
-3. Download QR on step 2; step 3 copy reads "Preview what anyone scanning this QR will see." **Test scan:** browser tab → new tab; installed PWA (standalone) → same-tab preview with Back to return ([`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md)).
+3. Download QR on step 2; step 3 **Test scan:** browser tab → new tab; installed PWA → same-tab preview with **← Back to setup** banner ([`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) P1–P2).
 4. **Open card controls** → tabs visible, `fresh` removed, hero **Live QR ready**.
 5. Revisit `/created/?profile_id&qr_id` (no fresh) → control mode directly.
 6. Hub **Open card** on saved row → control with revoke available.

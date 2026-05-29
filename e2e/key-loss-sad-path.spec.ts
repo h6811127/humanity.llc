@@ -85,12 +85,11 @@ test.describe("key-loss sad paths", () => {
     await expect(page.getByRole("heading", { name: "View this card" })).toBeVisible({
       timeout: 15_000,
     });
-    await expect(page.locator("#no-session")).toBeVisible();
-    await expect(page.locator("#no-session-detail")).toContainText(
-      /recovery method|encrypted backup/i
-    );
-    await expect(page.locator("#created-control-root")).toBeHidden();
+    await expect(page.locator("#created-control-root")).toBeVisible();
     await expect(page.locator("#created-setup-root")).toBeHidden();
+    await expect(page.locator("#created-view-restore-panel")).toBeVisible();
+    await expect(page.locator("#import-recovery-form")).toBeVisible();
+    await expect(page.locator("#no-session")).toBeHidden();
   });
 
   test("K5: wallet label without signing keys still view-only on /created/", async ({ page }) => {
@@ -118,7 +117,7 @@ test.describe("key-loss sad paths", () => {
     await expect(page.getByRole("heading", { name: "View this card" })).toBeVisible({
       timeout: 15_000,
     });
-    await expect(page.getByText("Ownership not loaded in this tab")).toBeVisible();
+    await expect(page.locator("#created-view-ownership-hint")).toBeVisible();
     await expect(page.locator("#revoke-qr-btn")).toBeHidden();
   });
 

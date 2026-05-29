@@ -29,7 +29,13 @@ export const BACKUP_WRONG_PASSPHRASE =
 export const VIEW_ONLY_CARD_TITLE = "View this card";
 
 export const VIEW_ONLY_NO_SESSION_DETAIL =
-  "Finish create in the tab where you clicked Create, then tap Save ownership on this device there. Later: recovery method or encrypted backup under Manage on this card page.";
+  "Open the Manage tab and use Restore ownership below — recovery code or encrypted backup file. Save ownership on this device only works in the browser where you created the card.";
+
+export const VIEW_ONLY_MANAGE_TAB_LEAD =
+  "Read-only network snapshot and restore paths. Signing controls appear after you restore ownership in this tab.";
+
+export const VIEW_ONLY_RESTORE_LEAD =
+  "Paste the recovery code you saved at create, or import an encrypted backup file. humanity.llc cannot restore your object for you.";
 
 export const DEFAULT_FOR_ATTESTATION = "Default for attestation";
 

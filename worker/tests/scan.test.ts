@@ -945,7 +945,7 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("showOwnerPanel(url, qrMarkup)");
   });
 
-  it("uses print_artifact scope copy when applicable", async () => {
+  it("merch funnel: print_artifact scan shows customize CTA", async () => {
     const vm = buildScanViewModel(
       PROFILE,
       QR,

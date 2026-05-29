@@ -206,6 +206,7 @@ export function buildStewardScanPreviewHref(scanUrl, opts = {}) {
 }
 
 /**
+ * Persist return path for scan page boot (standalone same-tab).
  * @param {string} returnUrl
  * @param {string} pageOrigin
  * @param {{ setItem?: (key: string, value: string) => void }} [storage]

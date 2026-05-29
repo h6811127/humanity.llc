@@ -136,9 +136,9 @@ openStewardScanPreview(url, { navigation, standalone })
 
 ---
 
-### P2 — Return URL banner on scan (steward preview mode)
+### P2 — Return URL banner on scan (steward preview mode) — **shipped**
 
-**Idea:** Before same-tab navigate, set `sessionStorage.hc_steward_preview_return` (or query `?hc_return=…` encoded path) to the current `/created/` URL including setup hash. Scan HTML (Worker template or client boot) shows a slim **“← Back to setup”** bar when return URL is present and user is not a stranger-only session.
+**Idea:** Before same-tab navigate, set `sessionStorage.hc_steward_preview_return` (or query `?hc_return=…` encoded path) to the current `/created/` URL including setup hash. Scan HTML shows a slim **“← Back to setup”** bar when return URL is present and validates as same-origin steward path.
 
 **Composes with P1** — does not replace it.
 
@@ -193,7 +193,7 @@ openStewardScanPreview(url, { navigation, standalone })
 
 1. **Ship P1** — standalone-aware scan handoff + setup step behavior tweak + Vitest contract tests (`pwa-scan-handoff-core.mjs` or extend `shop-checkout-handoff` pattern).
 2. **Add P1-PWA-N manual QA** (below) and one Playwright case with `display-mode: standalone` emulation opening test scan from `/created/?fresh=1`. **Shipped:** `e2e/device-pwa-scan-handoff.spec.ts` in `npm run e2e:pwa-install`.
-3. **Evaluate P2** after dogfood — if stewards still miss Back, add return banner on scan.
+3. **Evaluate P2** after dogfood — if stewards still miss Back, add return banner on scan. **Shipped 2026-05-29:** `hc_return` query + `scan-steward-preview-return.mjs` banner on scan pages.
 4. **Optional P4** — soften install prompt until first setup complete (product call). **Shipped:** `shouldShowPwaInstallSurface` requires `anyWalletSetupDone`; deferral card copy on shell pages until setup completes.
 5. **Do not** pursue P3 unless stranger-path parity requires identical pixels in wizard.
 

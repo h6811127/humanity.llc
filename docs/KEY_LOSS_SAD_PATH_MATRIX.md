@@ -29,7 +29,7 @@ This matrix inventories unhappy custody paths, expected UX, and automated regres
 
 | ID | Sad path | User behavior | Expected UX / system | Automation | Manual |
 |----|----------|---------------|----------------------|------------|--------|
-| **K1** | Tab closed without save | Create → close tab → reopen URL | **View this card**; view-only banner; recovery/backup under Manage | `e2e/key-loss-sad-path.spec.ts` | Stranger emotional check |
+| **K1** | Tab closed without save | Create → close tab → reopen URL | **View this card**; Live · Manage tabs; **Restore ownership** on Manage (recovery + backup link) | `e2e/key-loss-sad-path.spec.ts` | Stranger emotional check |
 | **K2** | Wrong backup passphrase | Import `.hcbackup` with typo | Plain **Wrong passphrase** message; no silent fail | Same E2E · `worker/tests/key-backup.test.ts` | — |
 | **K3** | Corrupt / wrong backup file | Upload garbage JSON | Reject with Humanity Card backup error | `worker/tests/key-backup-import.test.ts` (S4) | — |
 | **K4** | Keys in another tab | Hub Tab A; create Tab B | Cross-tab banner; Open controls here | `e2e/device-cross-tab-keys.spec.ts` (S3) | — |
