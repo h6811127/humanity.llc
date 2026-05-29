@@ -357,7 +357,7 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | **D2** | Demote crypto detail to Help Advanced; landing + trust chips | Low | **Shipped** (2026-05-29) |
 | **D3** | Rename nav labels (“My cards” → “My objects”) with redirects/aliases | Medium — bookmarks, tests | **Shipped** (2026-05-29) |
 | **D4** | Session-only warnings only when auto-save fails or user opted out | Medium — test matrix | **Shipped** (2026-05-29) |
-| **D5** | Stronger recovery gates before merch checkout / Nth child object | Product policy |
+| **D5** | Stronger recovery gates before merch checkout / Nth child object | Product policy | **Shipped** (2026-05-29) |
 | **D6** | Optional WebAuthn wrap around control activation (extends vouch-ready option E) | Engineering |
 
 **Do not migrate:** resolver APIs, document types, storage key names, or test fixture terminology without a dedicated protocol PR.

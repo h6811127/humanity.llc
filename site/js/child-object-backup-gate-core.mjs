@@ -70,14 +70,14 @@ export function childObjectBackupGateState(input) {
 export function childObjectBackupGateNoticeCopy(gate) {
   if (gate.blocked) {
     return {
-      title: "Save backup before adding another object",
-      body: "Your root key controls every status plate and lost-item relay on this card. Export encrypted backup or save your recovery key on Manage before adding more objects.",
+      title: "Save a recovery method before adding another object",
+      body: "Your ownership controls every status plate and lost-item relay on this card. Add a recovery method or export encrypted backup on Manage before adding more objects.",
     };
   }
   if (gate.warn) {
     return {
-      title: "Save backup before your tree grows",
-      body: "You already have one public object on this card. Export encrypted backup or save your recovery key on Manage so you keep control of the whole tree.",
+      title: "Save a recovery method before your tree grows",
+      body: "You already have one public object on this card. Save a recovery method or export encrypted backup on Manage once — you keep control of everything under this object.",
     };
   }
   return null;

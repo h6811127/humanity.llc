@@ -43,7 +43,7 @@ export function syncChildObjectBackupGateUi(ctx) {
           <p class="hc-notice-title">${escapeHtml(copy.title)}</p>
           <p class="hc-notice-body">${escapeHtml(copy.body)}</p>
           <div class="hc-notice-actions">
-            <a class="btn-secondary" href="#advanced">Open Manage backup</a>
+            <a class="btn-secondary" href="#advanced">Add recovery method</a>
           </div>
         </div>`;
     }

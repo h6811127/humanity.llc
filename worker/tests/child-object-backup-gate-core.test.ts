@@ -66,10 +66,10 @@ describe("childObjectBackupGateState", () => {
 describe("childObjectBackupGateNoticeCopy", () => {
   it("returns block and warn copy", () => {
     expect(childObjectBackupGateNoticeCopy({ blocked: true, warn: false })?.title).toMatch(
-      /before adding another/i
+      /recovery method/i
     );
     expect(childObjectBackupGateNoticeCopy({ blocked: false, warn: true })?.title).toMatch(
-      /before your tree grows/i
+      /recovery method/i
     );
     expect(childObjectBackupGateNoticeCopy({ blocked: false, warn: false })).toBeNull();
   });

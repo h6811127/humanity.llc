@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   loadRootSessionRecordForMerch,
   merchBackupNudgeCopy,
+  merchPreCheckoutRecoveryGateState,
   shouldShowMerchBackupNudge,
 } from "../../site/js/merch-backup-nudge-core.mjs";
 
@@ -23,8 +24,26 @@ describe("merch-backup-nudge-core", () => {
   });
 
   it("returns phase-specific copy", () => {
-    expect(merchBackupNudgeCopy("pre_checkout").title).toContain("before");
+    expect(merchBackupNudgeCopy("pre_checkout").title).toContain("recovery method");
+    expect(merchBackupNudgeCopy("pre_checkout", { blocked: true }).body).toContain(
+      "Checkout stays disabled"
+    );
     expect(merchBackupNudgeCopy("post_checkout").title).toContain("now");
+  });
+
+  it("blocks pre-checkout when seatbelt is missing", () => {
+    expect(
+      merchPreCheckoutRecoveryGateState({
+        profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+        owner_private_key_b58: "abc",
+      })
+    ).toEqual({ blocked: true, shown: true });
+    expect(
+      merchPreCheckoutRecoveryGateState({
+        profile_id: "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+        recovery_key_acknowledged: true,
+      })
+    ).toEqual({ blocked: false, shown: false });
   });
 
   it("loads hc_created session before wallet", () => {

@@ -36,6 +36,7 @@ const E2E_SESSION = {
   handle: "e2e_merch_checkout",
   owner_public_key_b58: "pubkeyfortestonlyxxxxxxxxxxxx",
   owner_private_key_b58: "privkeyfortestonlyxxxxxxxxx",
+  recovery_key_acknowledged: true,
   scan_url: `http://127.0.0.1:8787/c/${E2E_PROFILE}?q=${E2E_CARD_QR}`,
 };
 
@@ -132,5 +133,35 @@ test.describe("merch funnel checkout handoff", () => {
     ]);
     const checkoutUrl = new URL(page.url());
     expect(checkoutUrl.searchParams.get("properties[artifact_intent_id]")).toBe(E2E_INTENT);
+  });
+
+  test("blocks checkout until recovery seatbelt is satisfied", async ({ page }) => {
+    const sessionWithoutSeatbelt = { ...E2E_SESSION };
+    delete sessionWithoutSeatbelt.recovery_key_acknowledged;
+
+    await page.addInitScript((payload) => {
+      sessionStorage.clear();
+      localStorage.clear();
+      window.__HC_E2E_SHOP_CONFIG__ = payload.config;
+      sessionStorage.setItem("hc_created", JSON.stringify(payload.session));
+    }, { config: OPEN_SHOP_CONFIG, session: sessionWithoutSeatbelt });
+
+    await page.goto("/shop/customize/?hc_ref=customize_shop");
+
+    await expect(page.locator("#shop-customize-card-ready")).toBeVisible({
+      timeout: 15_000,
+    });
+
+    const consentBoxes = page.locator("#shop-proof-consent [data-proof-consent]");
+    await expect(consentBoxes).toHaveCount(3);
+    for (let i = 0; i < 3; i += 1) {
+      await consentBoxes.nth(i).check();
+    }
+
+    await expect(page.locator("#shop-customize-backup-nudge")).toBeVisible();
+    await expect(page.locator("#shop-customize-backup-nudge")).toContainText(
+      /Checkout stays disabled/i
+    );
+    await expect(page.locator("#shop-customize-checkout")).toBeDisabled();
   });
 });

@@ -58,17 +58,34 @@ export function shouldShowMerchBackupNudge(session) {
 }
 
 /**
- * @param {"pre_checkout" | "post_checkout"} phase
+ * Pre-checkout recovery gate — blocks Tier 1 checkout until seatbelt is satisfied.
+ * @param {Record<string, unknown> | null | undefined} session
  */
-export function merchBackupNudgeCopy(phase) {
+export function merchPreCheckoutRecoveryGateState(session) {
+  const blocked = shouldShowMerchBackupNudge(session);
+  return { blocked, shown: blocked };
+}
+
+/**
+ * @param {"pre_checkout" | "post_checkout"} phase
+ * @param {{ blocked?: boolean }} [opts]
+ */
+export function merchBackupNudgeCopy(phase, opts = {}) {
+  const blocked = opts.blocked === true;
   if (phase === "post_checkout") {
     return {
-      title: "Save backup now — your key controls this print",
-      body: "Your live object is tied to your Humanity Card key. Export encrypted backup or save your recovery key on Manage before you close this tab — we cannot recover your tree if you lose the key.",
+      title: "Save a recovery method now — your ownership controls this print",
+      body: "Your live object is tied to your Humanity Card ownership. Add a recovery method or export encrypted backup on Manage before you close this tab — we cannot restore lost control.",
+    };
+  }
+  if (blocked) {
+    return {
+      title: "Save a recovery method before you print",
+      body: "Checkout stays disabled until you add a recovery method or export encrypted backup on Manage. Your ownership will control this item on the scanner — we cannot restore lost control.",
     };
   }
   return {
-    title: "Save backup before you print",
-    body: "Your card key will control this hoodie or sticker on the scanner. Export encrypted backup or save your recovery key on Manage now — we cannot recover your tree if you lose the key.",
+    title: "Save a recovery method before you print",
+    body: "Your ownership will control this hoodie or sticker on the scanner. Add a recovery method or export encrypted backup on Manage — we cannot restore lost control.",
   };
 }

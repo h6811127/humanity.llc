@@ -34,7 +34,7 @@ import {
   readProofConsentState,
 } from "./shop-proof-consent-core.mjs";
 import { syncMerchBackupNudgeNotice } from "./merch-backup-nudge.mjs";
-import { loadRootSessionRecordForMerch } from "./merch-backup-nudge-core.mjs";
+import { loadRootSessionRecordForMerch, merchPreCheckoutRecoveryGateState } from "./merch-backup-nudge-core.mjs";
 
 const PERSONALIZE_PROOF_CONSENT_IDS = proofConsentRequiredIds("personalized");
 
@@ -237,7 +237,10 @@ function personalizeProofConsentComplete(product) {
 
 function syncCheckoutUi(product) {
   const checkoutOpen = isPersonalizeCheckoutReady(shopConfig, product);
-  const checkoutReady = personalizeProofConsentComplete(product);
+  const session = loadRootSessionRecordForMerch();
+  const recoveryGate = merchPreCheckoutRecoveryGateState(session);
+  const checkoutReady =
+    personalizeProofConsentComplete(product) && !recoveryGate.blocked;
   if (checkoutBtn) {
     checkoutBtn.disabled = !checkoutReady;
     checkoutBtn.hidden = !checkoutOpen;
@@ -252,7 +255,8 @@ function syncCheckoutUi(product) {
     noticeId: "shop-customize-backup-nudge",
     phase: "pre_checkout",
     enabled: checkoutOpen,
-    getSession: () => loadRootSessionRecordForMerch(),
+    blocked: recoveryGate.blocked,
+    getSession: () => session,
   });
 }
 
@@ -369,6 +373,15 @@ async function refreshPreview() {
 async function onCheckoutClick() {
   const product = selectedProduct();
   if (!product || !personalizeProofConsentComplete(product) || !signingSession) return;
+  const recoveryGate = merchPreCheckoutRecoveryGateState(loadRootSessionRecordForMerch());
+  if (recoveryGate.blocked) {
+    setStatus(
+      "Add a recovery method or export encrypted backup on Manage before checkout.",
+      true
+    );
+    syncCheckoutUi(product);
+    return;
+  }
   if (previewMode === "card_fallback") {
     setStatus("Print setup is still finishing. Try again in a moment.", true);
     activeIntent = null;
