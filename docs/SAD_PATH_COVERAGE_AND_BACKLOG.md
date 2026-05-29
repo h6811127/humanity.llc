@@ -213,6 +213,7 @@ Canonical matrix: [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.m
 | **S28** | **View-only Live tab read-only signage (Phase 3)** | `worker/tests/created-view-live-core.test.ts` · `e2e/key-loss-sad-path.spec.ts` (K1) |
 | **S29** | **Hub import visible in stranger-empty (Phase 4)** | `worker/tests/device-hub-restore-always.test.ts` · `e2e/key-loss-sad-path.spec.ts` (K2) |
 | **S30** | **Fresh create hub row no since-visit FP (P0b-1 / R10)** | `e2e/device-os-wallet.spec.ts` · `worker/tests/card-disabled-since-visit-regression.test.ts` |
+| **S31** | **Setup wizard test scan no auto-advance in browser (P0b-2 / R12)** | `e2e/device-pwa-scan-handoff.spec.ts` · `worker/tests/pwa-scan-handoff-core.test.ts` |
 
 Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) § Recommended test matrix.
 
@@ -243,8 +244,8 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 
 | Date | Notes |
 |------|-------|
+| 2026-05-29 | P0b-2 E2E — browser setup test scan waits for second Continue (S31) |
 | 2026-05-29 | P0b-1 step 1 — fresh create hub R10 E2E + baseline-null Vitest (S30) |
-| 2026-05-29 | Safari P0b-3 — scan sole-signing row auto-activate for vouch (stranger path) |
 | 2026-05-29 | Safari P0b-2 — setup wizard test scan no auto-advance in browser tab |
 | 2026-05-29 | P0-4 first-session backup gate + Phase 4 step 2 hub import copy convergence |
 | 2026-05-29 | Ownership restore Phase 4 step 1 — hub import always visible (S29) |

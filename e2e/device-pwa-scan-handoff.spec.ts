@@ -213,6 +213,32 @@ test.describe("device PWA scan handoff (P1-PWA-N)", () => {
     await popup.close();
   });
 
+  test("browser Continue on test scan waits for second Continue before Protect (P0b-2 / R12)", async ({
+    page,
+    context,
+  }) => {
+    await seedCreatedSetupTestStep(page, false);
+    await stubCreatedResolver(page);
+    await page.goto(createdSetupTestUrl(), { waitUntil: "domcontentloaded" });
+
+    await expect(page.locator("#created-setup-panel-test")).toBeVisible({ timeout: 20_000 });
+
+    const popupPromise = context.waitForEvent("page");
+    await page.locator("#created-setup-continue").click();
+    const popup = await popupPromise;
+
+    await expect(popup).toHaveURL(/scan-active/, { timeout: 10_000 });
+    await expect(page).toHaveURL(/#setup-test/);
+    await expect(page.locator("#created-setup-panel-test")).toBeVisible();
+    await expect(page.locator(".created-setup-feedback")).toContainText(/Continue again/i);
+
+    await popup.close();
+
+    await page.locator("#created-setup-continue").click();
+    await expect(page).toHaveURL(/#setup-protect/);
+    await expect(page.locator("#created-setup-panel-protect")).toBeVisible({ timeout: 10_000 });
+  });
+
   test("standalone hub Open scan stays in same tab (P1-PWA-N step 4)", async ({ page }) => {
     await seedShellHandoffWallet(page, true);
     await stubCreatedResolver(page);
