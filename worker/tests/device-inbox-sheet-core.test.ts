@@ -35,7 +35,7 @@ describe("inboxSheetMountAllowed", () => {
 });
 
 describe("inboxSheetReconcileAction", () => {
-  it("does nothing when inbox sheet is expanded", () => {
+  it("does nothing when inbox sheet is expanded and chrome agrees", () => {
     expect(
       inboxSheetReconcileAction({
         sheetCollapsed: false,
@@ -46,6 +46,19 @@ describe("inboxSheetReconcileAction", () => {
         backdropVisibleClass: true,
       })
     ).toBe("none");
+  });
+
+  it("closes sheet when DOM is expanded but chrome flags are closed", () => {
+    expect(
+      inboxSheetReconcileAction({
+        sheetCollapsed: false,
+        bodySheetOpen: false,
+        chromeInboxLocked: false,
+        sheetOpenFlag: false,
+        backdropHidden: false,
+        backdropVisibleClass: true,
+      })
+    ).toBe("close_sheet");
   });
 
   it("closes sheet when body, chrome, or in-memory flag still open", () => {

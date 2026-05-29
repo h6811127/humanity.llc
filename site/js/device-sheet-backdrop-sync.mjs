@@ -6,13 +6,39 @@
 
 /**
  * Force a sheet backdrop into the closed, non-interactive state.
- * @param {HTMLElement | null | undefined} backdrop
+ * @param {{ hidden?: boolean, classList?: { remove: (cls: string) => void }, setAttribute?: (name: string, value: string) => void } | null | undefined} backdrop
  */
 export function syncSheetBackdropClosed(backdrop) {
   if (!backdrop) return;
   backdrop.hidden = true;
-  backdrop.classList.remove("is-visible");
-  backdrop.setAttribute("aria-hidden", "true");
+  backdrop.classList?.remove("is-visible");
+  backdrop.setAttribute?.("aria-hidden", "true");
+}
+
+/**
+ * Inbox backdrop (z-index 56) sits above the hub sheet (55). When the hub is open
+ * but the inbox is closed, a stuck inbox backdrop swallows taps — including Check network.
+ * Safe to call synchronously before lazy inbox module load finishes closing the sheet.
+ *
+ * @param {Pick<Document, "getElementById"> & { body?: { classList?: { contains: (c: string) => boolean } } }} [doc]
+ */
+export function syncInboxBackdropForOpenHub(doc = document) {
+  if (!doc?.getElementById) return;
+  const hub = doc.getElementById("device-hub");
+  const inboxBackdrop = doc.getElementById("device-inbox-backdrop");
+  if (!inboxBackdrop) return;
+
+  const hubOpen =
+    hub &&
+    typeof hub.classList?.contains === "function" &&
+    hub.classList.contains("device-hub--sheet") &&
+    !hub.classList.contains("device-hub-collapsed");
+  if (!hubOpen) return;
+
+  const inboxOpen = doc.body?.classList?.contains("device-inbox-sheet-open") === true;
+  if (inboxOpen) return;
+
+  syncSheetBackdropClosed(inboxBackdrop);
 }
 
 /**
