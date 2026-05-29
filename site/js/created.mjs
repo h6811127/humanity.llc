@@ -57,6 +57,12 @@ import {
 } from "./created-view-mode.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
 import { verificationRecordFromStatusBody } from "./device-wallet-network-core.mjs";
+import {
+  clearKeylessTabSessionIfPresent,
+  getTabSession,
+  setTabSession,
+  tabSessionHasSigningKeys,
+} from "./device-keys.mjs";
 import { activateWalletEntryGated } from "./device-control-activation.mjs";
 import { isWalletSaved, loadWallet, saveSessionToWallet } from "./device-wallet.mjs";
 import { applyHumanTrustIconToElement } from "./human-trust-ui.mjs";
@@ -101,16 +107,25 @@ function setNoSessionNotice(html) {
 }
 
 function loadSession() {
-  try {
-    const raw = sessionStorage.getItem("hc_created");
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
+  return getTabSession();
 }
 
+/** @param {Record<string, unknown>} next */
 function saveSession(next) {
-  sessionStorage.setItem("hc_created", JSON.stringify(next));
+  setTabSession(next);
+}
+
+/**
+ * Update in-page session state; persist only when signing keys are present (P0-6).
+ * @param {Record<string, unknown>} next
+ */
+function applyCreatedSessionState(next) {
+  if (tabSessionHasSigningKeys(next)) {
+    saveSession(next);
+  } else {
+    clearKeylessTabSessionIfPresent();
+  }
+  data = next;
 }
 
 function initVouchReturnBanner() {
@@ -186,6 +201,9 @@ if (routeGate.action === "redirect_wallet") {
  * @param {{ profileId: string, qrId: string, card?: Record<string, unknown> }} gate
  */
 async function bootCreatedMain(gate) {
+clearKeylessTabSessionIfPresent();
+data = loadSession() ?? data;
+
 const apiOrigin = resolverApiOrigin();
 const scanOrigin =
   apiOrigin.includes("127.0.0.1") || apiOrigin.includes("localhost")
@@ -714,8 +732,7 @@ async function hydrateSessionFromNetwork() {
       existing.pilot_template || inferPilotTemplate(card.manifesto_line),
     ...(streams.length ? { object_streams: streams } : {}),
   };
-  saveSession(next);
-  data = next;
+  applyCreatedSessionState(next);
   if (handleEl) handleEl.textContent = `@${card.handle}`;
   if (manifestoEl) manifestoEl.textContent = card.manifesto_line;
 }
@@ -765,8 +782,7 @@ if (gate.card?.handle && gate.card?.manifesto_line) {
       pilot_template:
         existing.pilot_template || inferPilotTemplate(String(gate.card.manifesto_line)),
     };
-    saveSession(next);
-    data = next;
+    applyCreatedSessionState(next);
   }
 }
 
@@ -911,12 +927,16 @@ async function refreshNetworkStatus() {
         next.qr_expires_at !== data.qr_expires_at ||
         JSON.stringify(next.verification) !== JSON.stringify(data.verification)
       ) {
-        saveSession(next);
-        data = next;
-        if (profileId && isWalletSaved(profileId)) {
-          saveSessionToWallet(data, "");
+        if (tabSessionHasSigningKeys(next)) {
+          saveSession(next);
+          data = next;
+          if (profileId && isWalletSaved(profileId)) {
+            saveSessionToWallet(data, "");
+          }
+          deviceSaveCtl?.refresh?.();
+        } else {
+          data = next;
         }
-        deviceSaveCtl?.refresh?.();
       }
     }
   } catch {
@@ -961,6 +981,8 @@ workspaceMode = getWorkspaceMode();
 applyCreatedWorkspaceMode(workspaceMode);
 
 if (workspaceMode === "view" && profileId && activeQrId) {
+  clearKeylessTabSessionIfPresent();
+  data = loadSession();
   if (noSessionEl) noSessionEl.hidden = true;
   applyCreatedViewModeUi();
   createdTabs = initCreatedTabs();

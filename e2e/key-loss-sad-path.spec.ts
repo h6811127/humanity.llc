@@ -90,6 +90,14 @@ test.describe("key-loss sad paths", () => {
     await expect(page.locator("#created-view-restore-panel")).toBeVisible();
     await expect(page.locator("#import-recovery-form")).toBeVisible();
     await expect(page.locator("#no-session")).toBeHidden();
+
+    const sessionRaw = await page.evaluate(() =>
+      sessionStorage.getItem("hc_created")
+    );
+    if (sessionRaw) {
+      const parsed = JSON.parse(sessionRaw) as Record<string, unknown>;
+      expect(parsed.owner_private_key_b58).toBeTruthy();
+    }
   });
 
   test("K5: wallet label without signing keys still view-only on /created/", async ({ page }) => {
