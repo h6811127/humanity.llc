@@ -365,6 +365,7 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | **D9e** | Engineering prep: scan SSR + inbox aria Layer 2; device-hub feature advanced panel | Low — copy only | **Shipped** (2026-05-29) |
 | **D9g** | Comprehension copy guards — live-control strings in `device-ownership-copy-core.mjs`; `npm run worker:test:comprehension` | Low — tests only | **Shipped** (2026-05-29) |
 | **D9f** | Founding + steward surface copy — shop FAQ calendar expiry, wallet attestation help, feature pages, hub custody | Low — copy only | **Shipped** (2026-05-29) |
+| **D9h** | Founding copy comprehension runbook + expanded shop FAQ/guards | Low — docs + tests | **Shipped** (2026-05-29) |
 
 **Do not migrate:** resolver APIs, document types, storage key names, or test fixture terminology without a dedicated protocol PR.
 
@@ -429,3 +430,4 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | 2026-05-29 | **D9 engineering** — `device-ownership-copy-core.mjs` live-control comprehension strings; `worker:test:comprehension` copy guards |
 | 2026-05-29 | **D9f shipped** — founding sticker FAQ (no calendar expiry); wallet attestation help; device-hub feature Layer 2 + advanced panel |
 | 2026-05-29 | **M7 comprehension passed** — 5/5 strangers per [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md) |
+| 2026-05-29 | **D9h shipped** — [`FOUNDING_COPY_COMPREHENSION_RUNBOOK.md`](FOUNDING_COPY_COMPREHENSION_RUNBOOK.md); shop FAQ F1–F3 guards |

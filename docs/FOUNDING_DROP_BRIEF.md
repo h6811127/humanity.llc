@@ -36,7 +36,7 @@ Check every box before taking money.
 - [ ] Scan page: status + limits + bearer warning + dual CTAs (curiosity + belonging where applicable)
 - [ ] Forbidden claims list on internal launch checklist (`LAUNCH_LANGUAGE_KIT.md`)
 - [ ] Public labels locked: `Registered`, `Vouched Human`, `Founding Human`, etc.
-- [ ] Copy comprehension test passed (≥5 testers): merch ≠ vouched; sticker ≠ owner proof; **sticker QR does not calendar-expire** (URL always resolves)
+- [ ] Copy comprehension test passed (≥5 testers): merch ≠ vouched; sticker ≠ owner proof; **sticker QR does not calendar-expire** (URL always resolves) — **runbook:** [`FOUNDING_COPY_COMPREHENSION_RUNBOOK.md`](FOUNDING_COPY_COMPREHENSION_RUNBOOK.md); guards: `npm run worker:test:comprehension`
 
 ### Tier 0 (curiosity)
 

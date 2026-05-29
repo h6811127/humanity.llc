@@ -19,6 +19,7 @@ import {
   LIVE_CONTROL_SUCCESS_COPY,
   LIVE_CONTROL_SUCCESS_TITLE,
   FOUNDING_BUY_DOES_NOT_VERIFY,
+  FOUNDING_QR_NOT_OWNER_PROOF,
   FOUNDING_STICKER_NO_CALENDAR_EXPIRY,
   SCAN_LIMITS_DISCLOSURE_TITLE,
 } from "../../site/js/device-ownership-copy-core.mjs";
@@ -211,6 +212,21 @@ describe("D9 founding copy guards (FOUNDING_DROP_BRIEF)", () => {
     expect(html).toMatch(/holding the sticker does not prove/i);
     expect(html).toContain("Does buying this verify me?");
     expect(html).toContain("Will my sticker stop working after a year?");
+    expect(html).toContain("Does the QR prove I own the card?");
+    expect(html).toContain(FOUNDING_QR_NOT_OWNER_PROOF);
+  });
+
+  it("shop customize and thanks pages repeat commerce-not-verification", () => {
+    const customize = readFileSync(join(root, "site/shop/customize/index.html"), "utf8");
+    const thanks = readFileSync(join(root, "site/shop/thanks/index.html"), "utf8");
+    expect(customize).toMatch(/does not verify/i);
+    expect(thanks).toMatch(/did not verify/i);
+  });
+
+  it("shop hub does not promise verification from merch", () => {
+    const html = readFileSync(join(root, "site/shop/index.html"), "utf8");
+    expect(html.toLowerCase()).not.toContain("buying verifies");
+    expect(html.toLowerCase()).not.toMatch(/verified human.*checkout/);
   });
 
   it("wallet help uses attestation default wording (D7)", () => {

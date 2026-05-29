@@ -150,9 +150,9 @@ Do not rename storage keys, document types, or resolver fields in a copy-only PR
 
 Copy changes that affect trust claims should be validated with strangers **without** defining jargon first:
 
-- Live control: [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md)
-- Founding / launch: [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) copy gates
-- Stranger path: [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md)
+- Live control: [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md) — **passed** 2026-05-29
+- Founding / launch: [`FOUNDING_COPY_COMPREHENSION_RUNBOOK.md`](FOUNDING_COPY_COMPREHENSION_RUNBOOK.md) — **pending** (≥5 testers)
+- Stranger path: [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) — **passed** 2026-05-27
 
 **Pass signal:** testers paraphrase outcomes (“someone with control proved it recently”), not protocol nouns they were taught.
 
@@ -197,3 +197,4 @@ Copy changes that affect trust claims should be validated with strangers **witho
 | 2026-05-29 | D9 engineering: centralized live-control comprehension copy + `npm run worker:test:comprehension` |
 | 2026-05-29 | D9f: founding shop FAQ + steward help surfaces aligned to comprehension gates |
 | 2026-05-29 | M7 live-control comprehension passed (5/5 strangers) |
+| 2026-05-29 | D9h: founding copy comprehension runbook + shop FAQ guards |

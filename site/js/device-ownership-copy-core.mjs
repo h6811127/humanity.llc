@@ -85,6 +85,9 @@ export const FOUNDING_BUY_DOES_NOT_VERIFY =
 export const FOUNDING_STICKER_NO_CALENDAR_EXPIRY =
   "Founding artifact QRs do not calendar-expire";
 
+export const FOUNDING_QR_NOT_OWNER_PROOF =
+  "Anyone holding the item can be scanned";
+
 /**
  * @param {number} count
  * @param {string} [who]

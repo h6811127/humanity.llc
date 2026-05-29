@@ -99,7 +99,7 @@ Spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · Path 2 arrive [`SC
 | 3 | Scroll down, tap dot again | Hub still opens (desktop: edge-hidden chrome; touch: no edge-hidden) |
 | 4 | `/wallet/` tap dot | Scrolls to saved cards (no hub sheet) |
 
-**Fail signals:** Dot does nothing; console module 404; `#top-chrome[data-device-status-error]`. Full diagnosis: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) troubleshooting · Safari matrix: [`SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md`](SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md).
+**Fail signals:** Hub does not open (healthy graph); console module 404; `#top-chrome[data-device-status-error]` — tap dot for load-error explainer (red outline). Full diagnosis: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) troubleshooting · Safari matrix: [`SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md`](SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md).
 
 ### P1-CT · Cross-tab keys banner (Safari layout)
 
@@ -259,7 +259,7 @@ See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 
 ### P1-LC · Live control copy comprehension (M7 Step 2)
 
-**Runbook:** [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md) · automated copy guards: `npm run worker:test -- worker/tests/scan.test.ts` (H-002 assertion).
+**Runbook:** [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md) · **Passed 2026-05-29** · automated copy guards: `npm run worker:test:comprehension` (D9 · H-002).
 
 | Step | Action | Expected |
 |------|--------|----------|
@@ -267,6 +267,16 @@ See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 | 2 | Ask tester: “What did live control prove?” | Recent key control; not legal ID or vouch |
 | 3 | Proof window ends | Scanner returns to **Ask for live proof** with expired copy; success panel showed **Proof display expires in M:SS** while active |
 | 4 | Let challenge expire unsigned | **The 2-minute window ended. You can ask again.** — **Ask for live proof** enabled and visually primary |
+
+### P1-FC · Founding copy comprehension (D9)
+
+**Runbook:** [`FOUNDING_COPY_COMPREHENSION_RUNBOOK.md`](FOUNDING_COPY_COMPREHENSION_RUNBOOK.md) · automated copy guards: `npm run worker:test:comprehension`.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Tester reads `/shop/founding/` FAQ on own phone | Sees buy ≠ verify, QR ≠ owner proof, no calendar expiry |
+| 2 | Ask F1–F3 from runbook | Merch ≠ vouched; holding ≠ ownership; sticker does not year-expire |
+| 3 | Optional: scan a demo founding QR | Bearer limits visible without coaching |
 
 ### P1-LC-REF · Live control scan refresh resume (H-09)
 
