@@ -70,3 +70,9 @@ Setup wizard **hard gate** before step **You're live**:
 - PWA standalone may still advance after same-tab `location.assign`
 - Modules: `created-setup.mjs` · `pwa-scan-handoff-core.mjs`
 - Tests: `npm run worker:test:pwa-install` (handoff core)
+
+## Safari P0b-3 (shipped)
+
+- Scan vouch flow: after opt-in **default vouch** attempt, **sole signing row** auto-activate (network-gated, no default required) then D10 `trySoleSigningRowRehydrateForScan` fallback
+- Modules: `vouch-scan-sole-signing-activate-core.mjs` · `vouch-issue.mjs` · `device-quiet-tab-rehydrate.mjs`
+- Tests: `npm run worker:test:vouch-scan-sole-activate` · `npm run e2e:vouch-scan-sole-signing`
