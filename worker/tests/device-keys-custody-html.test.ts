@@ -48,6 +48,30 @@ describe("device-keys-custody-html", () => {
     expect(html).not.toContain("hc-notice--warning");
   });
 
+  it("help page leads with ownership and demotes signing keys to advanced", () => {
+    const html = readFileSync(join(root, "site/help/index.html"), "utf8");
+    expect(html).toContain('id="ownership"');
+    expect(html).toContain("Ownership &amp; control");
+    expect(html).toContain('id="advanced"');
+    expect(html).toContain("Advanced · for developers");
+    expect(html).toContain("Signing keys &amp; storage");
+    expect(html).not.toContain("Keys &amp; custody");
+  });
+
+  it("landing uses ownership trust chip not keys in browser", () => {
+    const html = readFileSync(join(root, "site/index.html"), "utf8");
+    expect(html).toContain("Control on your device");
+    expect(html).not.toContain("Keys in your browser");
+    expect(html).toContain("How ownership works");
+  });
+
+  it("card creation demotes keys-custody disclosure for developers", () => {
+    const html = readFileSync(join(root, "site/features/card-creation.html"), "utf8");
+    expect(html).toContain("Advanced: signing keys &amp; browser storage");
+    expect(html).toContain("Save ownership on this device");
+    expect(html).not.toContain("Where keys live (critical)");
+  });
+
   it("created setup page exposes custody mount slot", () => {
     const html = readFileSync(join(root, "site/created/index.html"), "utf8");
     expect(html).toContain('id="device-keys-custody-created-setup"');

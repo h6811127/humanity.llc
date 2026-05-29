@@ -25,7 +25,7 @@ function noticeFoot(importHref, learnHref) {
     <p class="hc-notice-foot">
       <a href="${escapeHtml(learnHref)}">How ownership works</a>
       <span aria-hidden="true"> · </span>
-      <a href="/help/#keys">All help</a>
+      <a href="/help/#ownership">All help</a>
       <span aria-hidden="true"> · </span>
       <a href="${escapeHtml(importHref)}">Import backup</a>
     </p>`;
@@ -60,7 +60,7 @@ function custodyInfoEmphasisCard(className, copy) {
  */
 export function keysCustodyHtml(variant, opts = {}) {
   const importHref = opts.importHref ?? "#hub-import-form";
-  const learnHref = "/help/#keys";
+  const learnHref = "/help/#ownership";
 
   const tiersDl = `
     <dl class="device-keys-custody-dl">

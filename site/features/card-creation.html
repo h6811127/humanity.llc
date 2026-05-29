@@ -69,14 +69,15 @@
   <summary class="settings-summary">
     <span class="list-icon list-icon-tone-orange" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span>
     <span class="settings-summary-text">
-      <span class="settings-summary-title">Where keys live (critical)</span>
+      <span class="settings-summary-title">Advanced: signing keys &amp; browser storage</span>
     </span>
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead"><strong>This tab only:</strong> right after create, keys sit in <code>sessionStorage</code> (<code>hc_created</code>). Close the tab and you lose revoke/update unless you saved or exported a backup.</p>
-    <p class="settings-panel-lead"><strong>Saved on this device:</strong> <a href="/created/">/created/</a> <strong>Save on this device</strong> copies keys to <code>localStorage</code> (<code>hc_wallet</code>). They stay in this browser until you clear site data. You can return months later and tap <strong>Use keys</strong> on <a href="/wallet/">/wallet/</a>.</p>
-    <p class="settings-panel-lead">Create does not auto-save. Auto-save (optional in the hub) writes to the device after each create. Operator cannot reset your key. Printed URL exposes <code>profile_id</code> and <code>qr_id</code> (v1 privacy lock).</p>
+    <p class="settings-panel-lead"><strong>Product layer:</strong> users save <em>ownership</em> on this device. Underneath, an Ed25519 owner keypair in the browser signs updates. The network never receives the private key.</p>
+    <p class="settings-panel-lead"><strong>This tab only (<code>sessionStorage</code> / <code>hc_created</code>):</strong> right after create, control is active in this tab. Close the tab without saving ownership and you lose manage access unless you exported a backup or saved a recovery code.</p>
+    <p class="settings-panel-lead"><strong>Saved on this device (<code>localStorage</code> / <code>hc_wallet</code>):</strong> <a href="/created/">/created/</a> <strong>Save ownership on this device</strong> (or auto-save, on by default) persists the key bundle. Return later and tap <strong>Open controls</strong> on <a href="/wallet/">/wallet/</a>.</p>
+    <p class="settings-panel-lead">Operator cannot reset your key. Printed URL exposes <code>profile_id</code> and <code>qr_id</code> (v1 privacy lock). See <a href="/help/#ownership">ownership help</a> for the user-facing model.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
