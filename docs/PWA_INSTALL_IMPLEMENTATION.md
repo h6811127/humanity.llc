@@ -1,6 +1,6 @@
 # PWA install — implementation plan
 
-**Status:** Phases 0–8 shipped · Phase 4.1 brand-dot icons · iOS Safari P1-PWA signed off 2026-05-28 · **H-006 closed** · **H-007 closed**  
+**Status:** Phases 0–9 shipped · Phase 4.1 brand-dot icons · iOS Safari P1-PWA signed off 2026-05-28 · **H-006 closed** · **H-007 closed**  
 **Audience:** Engineers implementing [`PWA_INSTALL.md`](PWA_INSTALL.md)  
 **Related:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) · [`AGENTS.md`](../AGENTS.md) · [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md)
 
@@ -298,6 +298,7 @@ window.addEventListener("pageshow", (e) => {
 ```bash
 npm run worker:test -- worker/tests/pwa-standalone-refresh-core.test.ts
 npm run worker:test:pwa-install
+npm run e2e:pwa-install   # resume + PTR smoke (P1-PWA-R steps 1, 3, 5+)
 ```
 
 Manual **P1-PWA-R** steps 1–4 ([`DEVICE_OS_QA.md`](DEVICE_OS_QA.md)).
@@ -432,6 +433,33 @@ Manual **P1-PWA-R** steps 11–12.
 
 ---
 
+## H-007 closure — resume E2E + doc sync
+
+### Intent
+
+Close the remaining automation gap for standalone resume soft refresh (**P1-PWA-R** steps 1–3) and sync Phases 6–9 across specs after Phase 9 shipped.
+
+### Scope
+
+| In scope | Out of scope |
+|----------|--------------|
+| `__hcResumeRefreshTestTrigger` test hook | PTR in browser tabs (PWA-R1 — resolved standalone-only) |
+| `e2e:pwa-install` resume + bfcache pageshow smoke | Manual iOS Safari P1-PWA-R sign-off |
+| Phase 9 row in delivery table; PWA-R1–R4 resolved | New refresh features |
+
+### Verification
+
+```bash
+npm run worker:test:pwa-install
+npm run e2e:pwa-install
+```
+
+### Status
+
+**Shipped 2026-05-29** — resume E2E smoke; H-007 fully closed in docs.
+
+---
+
 ## Rollback
 
 | Phase | Rollback |
@@ -470,6 +498,7 @@ See [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume for full s
 
 | Date | Change |
 |------|--------|
+| 2026-05-29 | H-007 closure — resume E2E smoke; Phases 6–9 doc sync |
 | 2026-05-29 | Phase 9 shipped — hub Refresh row, first PTR tip, install card copy |
 | 2026-05-29 | Phase 8 shipped — stale shell nudge; H-007 closed |
 | 2026-05-29 | Phase 7 shipped — standalone pull-to-refresh |

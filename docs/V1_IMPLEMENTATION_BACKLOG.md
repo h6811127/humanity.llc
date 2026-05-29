@@ -620,28 +620,30 @@ Goal: make the vertical slice credible for public launch.
 
 ### H-007: PWA standalone refresh (resume + pull-to-refresh)
 
-**Spec:** [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume · **Implementation:** [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md) Phases 6–8
+**Spec:** [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume · **Implementation:** [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md) Phases 6–9 · H-007 closure
 
-**Status (2026-05-29):** **Closed** — Phases 6–8 shipped.
+**Status (2026-05-29):** **Closed** — Phases 6–9 shipped.
 
 **Problem:** Installed stewards have no browser reload in `display-mode: standalone`. Warm resume can show stale hub/network state.
 
-**Must verify (after Phases 6–8 ship):**
+**Must verify (after Phases 6–9 ship):**
 
 - Standalone resume runs **soft refresh** (chrome + scoped network chips) — not full `location.reload()` every open. **Phase 6 ✅** (wallet + chrome on resume; network chips via existing hub `visibilitychange` path).
 - Pull-to-refresh on `/` and `/wallet/` in standalone with visible feedback (Phase 7). **✅**
 - PTR disabled or guarded when hub/inbox sheet open; no unscoped parallel status GET storm.
 - Live-control poll on pull/resume only when **Watch** on and scope active.
 - Stale shell banner when health `build` ≠ client stamp; tap reload fixes dead dot (Phase 8). **✅**
+- Hub Refresh row + first PTR tip in standalone (Phase 9). **✅**
 - Lazy-loaded off status graph — dot still passes **P0-3** if refresh module fails.
 - No shell-caching service worker added.
-- Vitest `pwa-standalone-refresh-core.test.ts` + **P1-PWA-R** pass.
+- Vitest `pwa-standalone-refresh-core.test.ts` + **P1-PWA-R** pass; `e2e:pwa-install` resume + PTR smoke. **✅**
 
 **Exit criteria:**
 
-- Phase table in `PWA_INSTALL.md` marks Phases 6–8 shipped. **✅**
-- `npm run worker:test -- worker/tests/pwa-standalone-refresh-core.test.ts` green. **✅**
-- Manual **P1-PWA-R** on iOS Safari standalone (HTTPS). **Pending** — Vitest + E2E automated gates shipped.
+- Phase table in `PWA_INSTALL.md` marks Phases 6–9 shipped. **✅**
+- `npm run worker:test:pwa-install` green. **✅**
+- `npm run e2e:pwa-install` green (resume steps 1 + 3, PTR, affordances). **✅**
+- Manual **P1-PWA-R** on iOS Safari standalone (HTTPS). **Pending** — automated gates shipped.
 
 ### H-005: Growth Loop Readiness
 

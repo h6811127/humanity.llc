@@ -496,6 +496,10 @@ if (typeof window !== "undefined") {
   window.__hcStaleShellSyncForTests = () => syncStaleShellNudge();
   /** Test hook — re-render Phase 9 affordances. */
   window.__hcStandaloneAffordancesSyncForTests = () => syncStandaloneAffordances();
+  /** Test hook — programmatic resume soft refresh (visibility / pageshow debounce path). */
+  window.__hcResumeRefreshTestTrigger = (reason = "visibility") => {
+    scheduleStandaloneSoftRefresh(reason);
+  };
 }
 
 export {

@@ -14,7 +14,7 @@ PWA install is **device-layer chrome only**: faster return to saved cards, hub, 
 
 **Product sentence:** *Install puts the device hub on your home screen — the same browser-held keys and inbox you already have, without a separate account or app store.*
 
-**Refresh gap (Phases 6–8):** Standalone mode hides the browser URL bar and native reload affordances. Stewards who add the shell to their home screen need **automatic soft refresh on resume** and **pull-to-refresh** as a manual override — without a shell-caching service worker or full `location.reload()` on every open. See § Standalone refresh & resume.
+**Refresh gap (Phases 6–9):** Standalone mode hides the browser URL bar and native reload affordances. Stewards who add the shell to their home screen need **automatic soft refresh on resume** and **pull-to-refresh** as a manual override — without a shell-caching service worker or full `location.reload()` on every open. See § Standalone refresh & resume.
 
 ---
 
@@ -397,23 +397,23 @@ Installed PWA and Safari tab on the same origin share `localStorage`. Resume sof
 
 Never block hub, dot, or inbox on refresh module load failure — same rule as `pwa-install.mjs` (lazy, off critical graph).
 
-### Regression tests (Phases 6–8)
+### Regression tests (Phases 6–9)
 
 ```bash
-npm run worker:test -- worker/tests/pwa-standalone-refresh-core.test.ts
-npm run e2e:pwa-install   # extend with standalone resume + PTR smoke
+npm run worker:test:pwa-install
+npm run e2e:pwa-install   # standalone resume + PTR + affordances smoke
 ```
 
 Manual: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-PWA-R**.
 
-### Open product questions (resolve before Phase 7)
+### Resolved product questions (Phases 6–9)
 
-| ID | Question | Default if unresolved |
-|----|----------|------------------------|
-| PWA-R1 | PTR on in-browser shell pages too, or standalone-only? | **Standalone-only** |
+| ID | Question | Resolution |
+|----|----------|------------|
+| PWA-R1 | PTR on in-browser shell pages too, or standalone-only? | **Standalone-only** — browser tabs keep native reload |
 | PWA-R2 | Does pull always trigger live-control inbox when watch is on? | **Yes** — same scope gates as visibility refresh |
-| PWA-R3 | Hub “Refresh” row in glance vs hub settings vs long-press dot? | **Hub glance row** (landing + wallet) |
-| PWA-R4 | `start_url` query `?source=pwa` for first-open tip attribution? | Omit in v1; use `isStandaloneMode()` only |
+| PWA-R3 | Hub “Refresh” row in glance vs hub settings vs long-press dot? | **Hub glance row** (landing + wallet) — Phase 9 |
+| PWA-R4 | `start_url` query `?source=pwa` for first-open tip attribution? | **Omit** — `isStandaloneMode()` only |
 
 ---
 
@@ -486,6 +486,7 @@ Implementation checklist: [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMEN
 | **6** | Standalone soft refresh on resume (`visibilitychange` + bfcache `pageshow`) | ✅ |
 | **7** | Pull-to-refresh on `/` and `/wallet/` (standalone) | ✅ |
 | **8** | Stale shell nudge (health `build` vs client stamp → reload CTA) | ✅ |
+| **9** | Hub Refresh row, first PTR tip, install-card copy | ✅ |
 
 ### Phase 4 rollout gate (after Phases 1–3)
 
@@ -524,11 +525,12 @@ Spec: § Standalone refresh & resume · Backlog **H-007**.
 
 | Phase | Gate |
 |-------|------|
-| **6** | Standalone resume soft refresh; **P1-PWA-R** steps 1–4; Vitest `pwa-standalone-refresh-core.test.ts` |
-| **7** | PTR on `/` + `/wallet/`; **P1-PWA-R** steps 5–8; extend `e2e:pwa-install` |
+| **6** | Standalone resume soft refresh; **P1-PWA-R** steps 1–4; Vitest + `e2e:pwa-install` resume smoke |
+| **7** | PTR on `/` + `/wallet/`; **P1-PWA-R** steps 5–8; `e2e:pwa-install` |
 | **8** | Stale `build` banner + tap reload; **P1-PWA-R** step 9; cross-check [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md) |
+| **9** | Hub Refresh row + PTR tip + install copy; **P1-PWA-R** steps 11–12 |
 
-**Do not** ship shell-caching service worker as a substitute for Phases 6–8.
+**Do not** ship shell-caching service worker as a substitute for Phases 6–9.
 
 ---
 
@@ -536,6 +538,7 @@ Spec: § Standalone refresh & resume · Backlog **H-007**.
 
 | Date | Change |
 |------|--------|
+| 2026-05-29 | H-007 closure — resume E2E smoke; Phases 6–9 doc sync; PWA-R1–R4 resolved |
 | 2026-05-29 | Phase 9 shipped — hub Refresh row, first PTR tip, install card copy |
 | 2026-05-29 | Phase 8 shipped — stale shell nudge; H-007 closed |
 | 2026-05-29 | Phase 7 shipped — standalone pull-to-refresh on `/` and `/wallet/` |

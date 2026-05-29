@@ -323,6 +323,56 @@ test.describe("device PWA install (phase 4 rollout gate)", () => {
     expect(registration).toBeNull();
   });
 
+  test("standalone resume soft refresh re-reads wallet (P1-PWA-R step 1)", async ({
+    page,
+  }) => {
+    await page.addInitScript(withStandaloneDisplayMode().content);
+    await seedPwaLandingStorage(page);
+    await wireShellRoutes(page);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await waitForShellReady(page);
+
+    await page.waitForFunction(() => typeof window.__hcResumeRefreshTestTrigger === "function", {
+      timeout: 20_000,
+    });
+
+    await page.evaluate(() => {
+      const wallet = JSON.parse(localStorage.getItem("hc_wallet") || "[]");
+      wallet[0] = { ...wallet[0], label: "Updated After Resume" };
+      localStorage.setItem("hc_wallet", JSON.stringify(wallet));
+    });
+
+    await page.evaluate(() => window.__hcResumeRefreshTestTrigger?.("visibility"));
+    await expect(page.locator("#device-hub-glance-list")).toContainText("Updated After Resume", {
+      timeout: 5_000,
+    });
+  });
+
+  test("standalone bfcache pageshow resume re-reads wallet (P1-PWA-R step 3)", async ({
+    page,
+  }) => {
+    await page.addInitScript(withStandaloneDisplayMode().content);
+    await seedPwaLandingStorage(page);
+    await wireShellRoutes(page);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await waitForShellReady(page);
+
+    await page.waitForFunction(() => typeof window.__hcResumeRefreshTestTrigger === "function", {
+      timeout: 20_000,
+    });
+
+    await page.evaluate(() => {
+      const wallet = JSON.parse(localStorage.getItem("hc_wallet") || "[]");
+      wallet[0] = { ...wallet[0], label: "Restored After Bfcache" };
+      localStorage.setItem("hc_wallet", JSON.stringify(wallet));
+    });
+
+    await page.evaluate(() => window.__hcResumeRefreshTestTrigger?.("pageshow"));
+    await expect(page.locator("#device-hub-glance-list")).toContainText("Restored After Bfcache", {
+      timeout: 5_000,
+    });
+  });
+
   test("standalone pull-to-refresh shows Updated affordance (P1-PWA-R step 5)", async ({
     page,
   }) => {
