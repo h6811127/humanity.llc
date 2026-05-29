@@ -1310,6 +1310,59 @@ ${scanLiveControlClientHelpersJs()}
   var pollFailureCount = 0;
   var waitingCountdownPrefix =
     "Waiting for the owner to tap Prove control on their key-holding device. If nothing happens, ask them to refresh this tab.";
+  function pendingStorageKey() {
+    return "hc_live_control_pending:" + profileId + ":" + qrId;
+  }
+  function readPendingFromStorage() {
+    try {
+      var raw = sessionStorage.getItem(pendingStorageKey());
+      if (!raw) return null;
+      var record = JSON.parse(raw);
+      if (!record || !record.challenge_id || !record.status_url) return null;
+      if (record.expires_at) {
+        var remaining = Date.parse(record.expires_at) - Date.now();
+        if (!Number.isFinite(remaining) || remaining <= 0) {
+          clearPendingStorage();
+          return null;
+        }
+      }
+      return record;
+    } catch (e) {
+      return null;
+    }
+  }
+  function writePendingToStorage(record) {
+    try {
+      sessionStorage.setItem(pendingStorageKey(), JSON.stringify(record));
+    } catch (e) {
+      /* private browsing / quota — degrade to in-memory poll only */
+    }
+  }
+  function clearPendingStorage() {
+    try {
+      sessionStorage.removeItem(pendingStorageKey());
+    } catch (e) {
+      /* ignore */
+    }
+  }
+  function clearRequestExpiredVisual() {
+    if (statusPanel) statusPanel.classList.remove("is-request-expired");
+    if (row) row.classList.remove("is-request-expired");
+  }
+  function showRequestExpiredVisual() {
+    if (statusPanel) {
+      statusPanel.classList.remove("is-waiting");
+      statusPanel.classList.add("is-request-expired");
+    }
+    if (row) row.classList.add("is-request-expired");
+  }
+  function enterWaitingState() {
+    clearRequestExpiredVisual();
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Waiting…";
+    }
+  }
   function isOwnerBrowser() {
     try {
       var raw = sessionStorage.getItem("hc_created");
@@ -1409,6 +1462,8 @@ ${scanLiveControlClientHelpersJs()}
     stopProofDisplayCountdown();
     pollFailureCount = 0;
     hidePollRetry();
+    clearPendingStorage();
+    clearRequestExpiredVisual();
     if (ownerPanel) ownerPanel.hidden = true;
     if (inPersonLayout) inPersonLayout.classList.remove("is-owner-waiting");
     if (interactive) interactive.hidden = true;
@@ -1431,6 +1486,8 @@ ${scanLiveControlClientHelpersJs()}
     activeChallengeExpiresAt = null;
     pollFailureCount = 0;
     hidePollRetry();
+    clearPendingStorage();
+    clearRequestExpiredVisual();
     if (interactive) interactive.hidden = false;
     if (success) success.hidden = true;
     if (row) row.classList.remove("is-proven");
@@ -1548,6 +1605,9 @@ ${scanLiveControlClientHelpersJs()}
     activeChallengeExpiresAt = null;
     pollFailureCount = 0;
     hidePollRetry();
+    clearPendingStorage();
+    if (ownerPanel) ownerPanel.hidden = true;
+    clearOwnerQr();
     if (interactive) interactive.hidden = false;
     if (success) success.hidden = true;
     if (row) row.classList.remove("is-proven");
@@ -1555,7 +1615,8 @@ ${scanLiveControlClientHelpersJs()}
       btn.disabled = false;
       btn.textContent = "Ask for live proof";
     }
-    setStatus("Control was not proven. The request expired.", false);
+    showRequestExpiredVisual();
+    setStatus("The 2-minute window ended. You can ask again.", false);
     if (inPersonLayout) inPersonLayout.classList.remove("is-owner-waiting");
   }
   function showProofExpired() {
@@ -1568,6 +1629,8 @@ ${scanLiveControlClientHelpersJs()}
     activeChallengeExpiresAt = null;
     pollFailureCount = 0;
     hidePollRetry();
+    clearPendingStorage();
+    clearRequestExpiredVisual();
     if (interactive) interactive.hidden = false;
     if (success) success.hidden = true;
     if (row) row.classList.remove("is-proven");
@@ -1648,21 +1711,52 @@ ${scanLiveControlClientHelpersJs()}
       encodeURIComponent(${JSON.stringify(vm.profileId)}) +
       "/live-control/challenges/" + encodeURIComponent(id);
   }
+  function handlePendingChallengeBody(body, statusUrl) {
+    if (body.status === "proven") {
+      showProven(body);
+      return;
+    }
+    if (body.status === "expired") {
+      showRequestExpired();
+      return;
+    }
+    enterWaitingState();
+    activeChallengeExpiresAt = body.expires_at || null;
+    if (body.expires_at) {
+      startCountdown(body.expires_at, waitingCountdownPrefix);
+    } else {
+      setStatus("Waiting for the owner to sign…", true);
+    }
+    if (body.owner_url) {
+      showOwnerPanel(body.owner_url, body.owner_qr_markup);
+    }
+    poll(statusUrl);
+  }
   function checkExistingProof() {
     var params = new URLSearchParams(location.search);
     var id = params.get("live_challenge");
-    if (!id) return;
+    var statusUrl = null;
+    var stored = null;
+    if (id) {
+      statusUrl = statusUrlForChallenge(id);
+    } else {
+      stored = readPendingFromStorage();
+      if (!stored) return;
+      id = stored.challenge_id;
+      statusUrl = stored.status_url || statusUrlForChallenge(id);
+    }
     setStatus("Checking live proof…", true);
-    fetch(statusUrlForChallenge(id), { cache: "no-store" })
+    fetch(statusUrl, { cache: "no-store" })
       .then(function (res) {
         return parseLiveControlJsonResponse(res);
       })
       .then(function (result) {
         if (!result.ok) {
+          if (stored) clearPendingStorage();
           setStatus(
             liveControlUserErrorMessage(result.body, {
               status: result.status,
-              requestUrl: statusUrlForChallenge(id),
+              requestUrl: statusUrl,
               fallback: "Could not check live proof.",
             }),
             false
@@ -1670,22 +1764,14 @@ ${scanLiveControlClientHelpersJs()}
           return;
         }
         var body = result.body;
-        if (body.status === "proven") {
-          showProven(body);
-        } else if (body.status === "expired") {
-          showRequestExpired();
-        } else {
-          activeChallengeExpiresAt = body.expires_at || null;
-          if (body.expires_at) {
-            startCountdown(body.expires_at, "Waiting for the owner to sign…");
-          } else {
-            setStatus("Waiting for the owner to sign…", true);
-          }
-          if (body.owner_url) showOwnerPanel(body.owner_url, body.owner_qr_markup);
-          poll(statusUrlForChallenge(id));
+        if (body.status === "pending" && stored && stored.owner_url && !body.owner_url) {
+          body.owner_url = stored.owner_url;
+          body.owner_qr_markup = stored.owner_qr_markup;
         }
+        handlePendingChallengeBody(body, statusUrl);
       })
       .catch(function () {
+        if (stored) clearPendingStorage();
         setStatus("Could not check live proof.", false);
       });
   }
@@ -1740,7 +1826,17 @@ ${scanLiveControlClientHelpersJs()}
         if (body.owner_url) {
           showOwnerPanel(body.owner_url, body.owner_qr_markup);
         }
+        if (body.challenge_id && body.status_url) {
+          writePendingToStorage({
+            challenge_id: body.challenge_id,
+            status_url: body.status_url,
+            expires_at: body.expires_at || null,
+            owner_url: body.owner_url || null,
+            owner_qr_markup: body.owner_qr_markup || null,
+          });
+        }
         activeChallengeExpiresAt = body.expires_at || null;
+        enterWaitingState();
         startCountdown(body.expires_at, waitingCountdownPrefix);
         poll(body.status_url);
       })

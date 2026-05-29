@@ -162,7 +162,9 @@ async function runLiveControlScriptWithStatus(body: Record<string, unknown>) {
       addEventListener: vi.fn(),
     },
     "live-control-status": { textContent: "Ready when you are." },
-    "live-control-status-panel": { classList: { toggle: vi.fn() } },
+    "live-control-status-panel": {
+      classList: { toggle: vi.fn(), add: vi.fn(), remove: vi.fn() },
+    },
     "live-control-interactive": { hidden: false },
     "live-control-success": {
       hidden: true,
@@ -216,6 +218,9 @@ async function runLiveControlScriptWithStatus(body: Record<string, unknown>) {
   await Promise.resolve();
   await Promise.resolve();
   await Promise.resolve();
+  for (let i = 0; i < 8; i++) {
+    await Promise.resolve();
+  }
 
   return {
     button: elements["live-control-request"],
@@ -653,7 +658,9 @@ describe("renderScanPage M3.2 trust blocks", () => {
         addEventListener: vi.fn(),
       },
       "live-control-status": { textContent: "" },
-      "live-control-status-panel": { classList: { toggle: vi.fn() } },
+      "live-control-status-panel": {
+        classList: { toggle: vi.fn(), add: vi.fn(), remove: vi.fn() },
+      },
       "live-control-interactive": { hidden: false },
       "live-control-success": {
         hidden: true,
@@ -718,10 +725,134 @@ describe("renderScanPage M3.2 trust blocks", () => {
     intervalCallbacks[0]();
 
     expect(elements["live-control-status"]?.textContent).toBe(
-      "Control was not proven. The request expired."
+      "The 2-minute window ended. You can ask again."
     );
     expect(elements["live-control-request"]?.disabled).toBe(false);
     expect(elements["live-control-request"]?.textContent).toBe("Ask for live proof");
+    expect(elements["live-control-status-panel"]?.classList?.add).toHaveBeenCalledWith(
+      "is-request-expired"
+    );
+    expect(elements["live-control-row"]?.classList?.add).toHaveBeenCalledWith(
+      "is-request-expired"
+    );
+  });
+
+  it("resumes live proof polling from sessionStorage after refresh (H-09)", async () => {
+    const pendingChallenge = "lc_refresh_resume";
+    const statusUrl = `https://humanity.llc/.well-known/hc/v1/cards/${PROFILE}/live-control/challenges/${pendingChallenge}`;
+    const expiresAt = new Date(Date.now() + 90_000).toISOString();
+    const storageKey = `hc_live_control_pending:${PROFILE}:${QR}`;
+    const sessionStore: Record<string, string> = {
+      [storageKey]: JSON.stringify({
+        challenge_id: pendingChallenge,
+        status_url: statusUrl,
+        expires_at: expiresAt,
+        owner_url: "https://humanity.llc/created/?live_challenge=lc_refresh_resume",
+      }),
+    };
+    const intervalCallbacks: Array<() => void> = [];
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: summary(),
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+    const script = extractLiveControlScript(html);
+    type FakeElement = {
+      disabled?: boolean;
+      textContent?: string;
+      hidden?: boolean;
+      href?: string;
+      classList?: { add?: ReturnType<typeof vi.fn>; remove?: ReturnType<typeof vi.fn> };
+    };
+    const elements: Record<string, FakeElement> = {
+      "live-control-request": {
+        disabled: false,
+        textContent: "Ask for live proof",
+        addEventListener: vi.fn(),
+      },
+      "live-control-status": { textContent: "" },
+      "live-control-status-panel": {
+        classList: { add: vi.fn(), remove: vi.fn(), toggle: vi.fn() },
+      },
+      "live-control-interactive": { hidden: false },
+      "live-control-success": {
+        hidden: true,
+        setAttribute: vi.fn(),
+        getAttribute: vi.fn(() => null),
+      },
+      "live-control-proven-at": { textContent: "" },
+      "live-control-proven-ago": {
+        textContent: "",
+        setAttribute: vi.fn(),
+        getAttribute: vi.fn(() => null),
+      },
+      "live-control-proof-countdown": { hidden: true, textContent: "" },
+      "live-control-row": { classList: { add: vi.fn(), remove: vi.fn() } },
+      "live-control-owner-panel": { hidden: true },
+      "live-control-owner-link": { href: "#" },
+      "live-control-poll-retry": { hidden: true, addEventListener: vi.fn() },
+      "live-control-in-person-layout": { classList: { add: vi.fn(), remove: vi.fn() } },
+      "live-control-owner-view": { hidden: true },
+      "live-control-owner-copy": { textContent: "" },
+      "live-control-owner-created-link": { href: "" },
+    };
+    const fetchMock = vi.fn(async () =>
+      jsonFetchResponse({
+        status: "pending",
+        expires_at: expiresAt,
+        owner_url: "https://humanity.llc/created/?live_challenge=lc_refresh_resume",
+      })
+    );
+    const setIntervalMock = vi.fn((cb: () => void) => {
+      intervalCallbacks.push(cb);
+      return intervalCallbacks.length;
+    });
+
+    runInNewContext(script, {
+      Date,
+      Error,
+      Number,
+      URLSearchParams,
+      encodeURIComponent,
+      sessionStorage: {
+        getItem: (key: string) => sessionStore[key] ?? null,
+        setItem: (key: string, value: string) => {
+          sessionStore[key] = value;
+        },
+        removeItem: (key: string) => {
+          delete sessionStore[key];
+        },
+      },
+      document: {
+        getElementById: (id: string) => elements[id] ?? null,
+      },
+      fetch: fetchMock,
+      location: {
+        origin: "https://humanity.llc",
+        search: `?q=${QR}`,
+      },
+      window: {
+        clearInterval: vi.fn(),
+        clearTimeout: vi.fn(),
+        setInterval: setIntervalMock,
+        setTimeout: vi.fn(() => 1),
+      },
+    });
+
+    for (let i = 0; i < 8; i++) {
+      await Promise.resolve();
+    }
+
+    expect(fetchMock).toHaveBeenCalledWith(statusUrl, { cache: "no-store" });
+    expect(elements["live-control-request"]?.disabled).toBe(true);
+    expect(elements["live-control-request"]?.textContent).toBe("Waiting…");
+    expect(intervalCallbacks.length).toBeGreaterThan(0);
   });
 
   it("clears stale owner proof link before a new live proof request resolves", async () => {
@@ -777,6 +908,10 @@ describe("renderScanPage M3.2 trust blocks", () => {
 
     expect(html).toContain('id="live-control-poll-retry"');
     expect(html).toContain("parseLiveControlJsonResponse");
+    expect(html).toContain("hc_live_control_pending:");
+    expect(html).toContain("writePendingToStorage");
+    expect(html).toContain("readPendingFromStorage");
+    expect(html).toContain("is-request-expired");
     expect(html).toContain("liveControlChallengeCreateError");
     expect(html).toContain("POLL_FAILURE_MAX");
     expect(html).toContain("Having trouble checking proof status. Tap to retry.");

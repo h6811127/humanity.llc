@@ -1169,6 +1169,15 @@ a {
   background: rgba(219, 27, 67, 0.06);
 }
 
+.live-control-status-panel.is-request-expired {
+  border-color: rgba(219, 27, 67, 0.35);
+  background: rgba(219, 27, 67, 0.1);
+}
+
+.live-control-row.is-request-expired .live-control-cta {
+  box-shadow: 0 0 0 2px rgba(219, 27, 67, 0.28);
+}
+
 .live-control-status {
   margin: 0;
   font-size: 14px;

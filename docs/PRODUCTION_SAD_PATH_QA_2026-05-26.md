@@ -6,6 +6,8 @@
 **Persona:** New / confused user deliberately breaking flows (not happy-path case study)  
 **Note:** The automation browser already had saved cards in `localStorage`; some flows (empty wallet, true incognito stranger) were inferred from code + API where storage could not be cleared via CDP.
 
+**Living backlog:** For coverage gaps, user mental-model risks, and agent vs human validation — [`SAD_PATH_COVERAGE_AND_BACKLOG.md`](SAD_PATH_COVERAGE_AND_BACKLOG.md).
+
 ---
 
 ## Executive summary

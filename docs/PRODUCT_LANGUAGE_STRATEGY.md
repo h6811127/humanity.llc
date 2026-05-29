@@ -91,6 +91,7 @@ The **terminology map** in [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONT
 ### Errors and sad paths
 
 - Map resolver and client errors to **plain-language user messages** ([`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md), `resolver-user-error-core.mjs`). Prefer “Couldn’t reach the network” over raw `INVALID_SIGNATURE` in default UI.
+- Inventory and prioritization: [`SAD_PATH_COVERAGE_AND_BACKLOG.md`](SAD_PATH_COVERAGE_AND_BACKLOG.md).
 
 ### Public launch and FAQ
 
@@ -141,6 +142,7 @@ Do not rename storage keys, document types, or resolver fields in a copy-only PR
 **Migrate to Layer 2 in default UI:**
 
 - Hero lines on `/create/`, landing trust chips, hub custody panel, inbox cross-tab strings, scan vouch explainer (see gap table in [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) § Where the UI still exposes Layer 1).
+- Shared string module: `site/js/device-ownership-copy-core.mjs` (D7); import for new steward/device copy instead of one-off strings.
 
 ---
 
@@ -190,3 +192,4 @@ Copy changes that affect trust claims should be validated with strangers **witho
 |------|----------|
 | 2026-05-29 | Adopt canonical product language strategy: progressive disclosure, plain default, precise on purpose |
 | 2026-05-29 | “Hide jargon” rejected as global policy; stratify by audience and surface instead |
+| 2026-05-29 | D7 shipped: `device-ownership-copy-core.mjs` + tests (`device-ownership-copy-core.test.ts`) |

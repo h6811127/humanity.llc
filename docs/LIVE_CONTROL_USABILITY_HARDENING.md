@@ -1,6 +1,6 @@
 # Live control usability hardening
 
-**Status:** In progress — Slice A shipped (H-01–H-03); Slice B shipped (H-04–H-06); Slice C shipped (H-07–H-08)  
+**Status:** In progress — Slice A shipped (H-01–H-03); Slice B shipped (H-04–H-06); Slice C shipped (H-07–H-08); Slice D shipped (H-09–H-10)  
 **Gate:** `docs/M7_LIVE_CONTROL_ALPHA.md` Step 2 · post–production FK repair (`docs/LIVE_PROOF_FAILURE_INVESTIGATION.md`)  
 **Related:** [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md) · [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) · [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) · [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) (plain-language errors)
 
@@ -236,6 +236,8 @@ This document is the **implementation backlog** for hardening live control **usa
 
 ### H-09 — Resume polling after scan page refresh
 
+**Status:** Shipped (2026-05-29)
+
 **Problem:** Scanner loses in-memory `status_url` on refresh mid-wait; user must tap **Ask for live proof** again even if challenge is still pending.
 
 **Proposed behavior:**
@@ -248,13 +250,15 @@ This document is the **implementation backlog** for hardening live control **usa
 
 **Acceptance:**
 
-- [ ] Refresh scanner tab during wait resumes countdown + poll without second `POST`.
-- [ ] Expired challenge clears storage and shows expired copy.
-- [ ] Private browsing / storage blocked degrades gracefully (re-ask path).
+- [x] Refresh scanner tab during wait resumes countdown + poll without second `POST`.
+- [x] Expired challenge clears storage and shows expired copy.
+- [x] Private browsing / storage blocked degrades gracefully (re-ask path).
 
 ---
 
 ### H-10 — Prominent “ask again” after expiry
+
+**Status:** Shipped (2026-05-29)
 
 **Problem:** `showRequestExpired()` resets status text but strangers may not notice they can retry.
 
@@ -268,8 +272,8 @@ This document is the **implementation backlog** for hardening live control **usa
 
 **Acceptance:**
 
-- [ ] Expired state shows retry copy + enabled button.
-- [ ] Second ask creates new challenge; owner panel updates to new `owner_url`.
+- [x] Expired state shows retry copy + enabled button.
+- [ ] Second ask creates new challenge; owner panel updates to new `owner_url` (manual two-device QA).
 
 ---
 
@@ -428,3 +432,4 @@ flowchart TD
 | 2026-05-29 | Slice A shipped: H-01 scan client helpers, H-02 insert error mapping, H-03 poll retry |
 | 2026-05-29 | Slice B shipped: H-04 handoff copy, H-05 same-device banner, H-06 owner QR in challenge JSON |
 | 2026-05-29 | Slice C shipped: H-07 inbox tap-to-sign copy + push schema/ops observability; H-08 owner visibility resume poll |
+| 2026-05-29 | Slice D shipped: H-09 sessionStorage resume + H-10 expiry retry UX (`scan-html.ts`, `scan-pass.css`) |
