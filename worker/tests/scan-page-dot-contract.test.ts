@@ -56,8 +56,18 @@ describe("scan page device dot contract", () => {
 
   it("loads versioned scan-tab-keys bundle", () => {
     const src = readFileSync(join(root, "worker/src/resolver/scan-html.ts"), "utf8");
-    expect(src).toContain("scan-tab-keys.mjs?v=7");
+    expect(src).toContain("scan-tab-keys.mjs?v=8");
     expect(src).toContain("scan-page-dot-glance");
+  });
+
+  it("loads scan-tab-keys before vouch-issue so rehydrate blocks vouch bootstrap", () => {
+    const src = readFileSync(join(root, "worker/src/resolver/scan-html.ts"), "utf8");
+    const tabKeysIdx = src.indexOf("renderScanTabKeysScript");
+    const vouchIdx = src.indexOf("renderVouchIssuanceScript");
+    const liveIdx = src.indexOf("renderLiveControlScript");
+    expect(tabKeysIdx).toBeGreaterThan(-1);
+    expect(vouchIdx).toBeGreaterThan(tabKeysIdx);
+    expect(liveIdx).toBeGreaterThan(tabKeysIdx);
   });
 
   it("scan-tab-keys imports scan-page-dot module", () => {
@@ -73,7 +83,7 @@ describe("scan page device dot contract", () => {
     expect(html).toContain('id="scan-page-dot"');
     expect(html).toContain('id="scan-page-dot-glance"');
     expect(html).toContain('class="scan-hero-host scan-hero-wordmark"');
-    expect(html).toContain("scan-tab-keys.mjs?v=7");
+    expect(html).toContain("scan-tab-keys.mjs?v=8");
     expect(html).toContain(`data-profile-id="${SHOWCASE_PROFILE}"`);
   });
 });

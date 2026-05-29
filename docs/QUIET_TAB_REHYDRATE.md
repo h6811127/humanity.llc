@@ -40,7 +40,7 @@ Today, a **new tab** on `/`, `/wallet/`, or `/create/` can show cross-tab / “t
 
 | Tier | Behavior | Status |
 |------|----------|--------|
-| **1** | Exactly **one** saved card with signing keys + empty `hc_created` + no unlock gate → silent rehydrate on **shell bootstrap** (`/`, `/wallet/`, `/create/`, `/created/`) | **Shipped** |
+| **1** | Exactly **one** saved card with signing keys + empty `hc_created` + no unlock gate → silent rehydrate on **shell bootstrap** (`/`, `/wallet/`, `/create/`, `/created/`) **and scan pages** (`scan-tab-keys.mjs`, P0-1) | **Shipped** |
 | **2** | Remember `hc_last_active_profile_id`; rehydrate that profile on new tabs (hub toggle, default on) when multi-card | **Shipped** |
 | **3** | Demote cross-tab chrome when rehydrate succeeds; keep notices for unsaved-only-other-tab and unlock-pending | **Shipped** |
 
@@ -56,7 +56,7 @@ Today, a **new tab** on `/`, `/wallet/`, or `/create/` can show cross-tab / “t
 
 ### When rehydrate runs
 
-Once per shell page load, **before** first chrome refresh (`device-status.mjs` init):
+Once per **shell or scan** page load, **before** first chrome refresh (`device-status.mjs` or `scan-tab-keys.mjs` init):
 
 1. `getTabSession()` has **no** `owner_private_key_b58`
 2. `loadWallet()` filtered to signing rows → **count === 1**
@@ -138,7 +138,7 @@ After successful bootstrap rehydrate (`activateWalletEntryGated` succeeds):
 | Last-active writes | `device-keys.mjs`, `device-wallet.mjs`, `create-card.mjs` |
 | Last-active clear on remove | `device-wallet-removed-profiles.mjs` |
 | Shell cross-tab filter | `device-tab-presence.mjs` (`getOtherTabsWithKeys`) |
-| Wire | `site/js/device-status.mjs` (await before `startTabKeysPresence` / chrome refresh) |
+| Wire | `site/js/device-status.mjs` (await before `startTabKeysPresence` / chrome refresh); **`site/js/scan-tab-keys.mjs`** (scan pages, P0-1 — [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md)) |
 | Tests | `worker/tests/device-quiet-tab-rehydrate-core.test.ts`, `worker/tests/device-quiet-tab-rehydrate.test.ts` |
 
 ---

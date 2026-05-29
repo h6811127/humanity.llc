@@ -3,6 +3,18 @@ import fs from "node:fs";
 import path from "node:path";
 
 describe("device-quiet-tab-rehydrate wiring", () => {
+  it("scan-tab-keys awaits quiet rehydrate before presence and chrome", () => {
+    const src = fs.readFileSync(
+      path.join(process.cwd(), "site/js/scan-tab-keys.mjs"),
+      "utf8"
+    );
+    expect(src).toContain("maybeQuietTabRehydrate");
+    expect(src).toContain("await maybeQuietTabRehydrate()");
+    const awaitIdx = src.indexOf("await maybeQuietTabRehydrate()");
+    const presenceIdx = src.indexOf("startTabKeysPresence()");
+    expect(presenceIdx).toBeGreaterThan(awaitIdx);
+  });
+
   it("device-status awaits quiet rehydrate before chrome refresh", () => {
     const src = fs.readFileSync(
       path.join(process.cwd(), "site/js/device-status.mjs"),
