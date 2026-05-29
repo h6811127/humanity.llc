@@ -22,6 +22,9 @@ export const CREATED_PANEL_FOCUS = {
   /** Create flow convergence — scroll to Add object panels on Live. */
   "add-status-plate": "child-object-add-status-plate",
   "add-lost-item": "child-object-add-lost-item",
+  /** Backup seatbelt nudges — scroll to recovery or encrypted backup on Manage. */
+  recovery: "created-recovery-details",
+  backup: "backup-details",
 };
 
 /** @param {string} [hash] location.hash or bare key */
@@ -85,6 +88,37 @@ function focusChildObjectRow(select, objectId) {
 }
 
 /**
+ * @param {(tabId: string) => void} select
+ * @param {string} [hash] location.hash or bare key
+ */
+export function applyCreatedHashRoute(select, hash = location.hash) {
+  const key = hash.replace(/^#/, "");
+  if (!key) {
+    select("now");
+    return;
+  }
+  if (key === "revoke-rules") {
+    select("advanced");
+    requestAnimationFrame(() => {
+      document.getElementById("revoke-rules")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    return;
+  }
+  if (CREATED_PANEL_FOCUS[key]) {
+    focusCreatedPanel(select, key);
+    return;
+  }
+  const childObjectId = childObjectIdFromHubFocusHash(key);
+  if (childObjectId) {
+    focusChildObjectRow(select, childObjectId);
+    return;
+  }
+  // Keep old #manage links working.
+  const normalized = key === "manage" ? "advanced" : key;
+  select(TAB_IDS.includes(normalized) ? normalized : "now");
+}
+
+/**
  * @returns {{ select: (tabId: string) => void, focusPanel: (focusKey: string) => void }}
  */
 export function initCreatedTabs() {
@@ -119,21 +153,10 @@ export function initCreatedTabs() {
     });
   });
 
-  const hash = location.hash.replace(/^#/, "");
-  if (hash === "revoke-rules") {
-    select("advanced");
-    requestAnimationFrame(() => {
-      document.getElementById("revoke-rules")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  } else if (hash && CREATED_PANEL_FOCUS[hash]) {
-    focusCreatedPanel(select, hash);
-  } else if (childObjectIdFromHubFocusHash(hash)) {
-    focusChildObjectRow(select, childObjectIdFromHubFocusHash(hash));
-  } else {
-    // Keep old #manage links working.
-    const normalized = hash === "manage" ? "advanced" : hash;
-    select(TAB_IDS.includes(normalized) ? normalized : "now");
-  }
+  applyCreatedHashRoute(select, location.hash);
+  window.addEventListener("hashchange", () => {
+    applyCreatedHashRoute(select, location.hash);
+  });
 
   return {
     select,

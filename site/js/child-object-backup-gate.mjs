@@ -43,9 +43,13 @@ export function syncChildObjectBackupGateUi(ctx) {
           <p class="hc-notice-title">${escapeHtml(copy.title)}</p>
           <p class="hc-notice-body">${escapeHtml(copy.body)}</p>
           <div class="hc-notice-actions">
-            <a class="btn-secondary" href="#advanced">Add recovery method</a>
+            <a class="btn-secondary child-object-backup-gate-manage-link" href="#advanced">Add recovery method</a>
           </div>
         </div>`;
+      noticeEl.querySelector(".child-object-backup-gate-manage-link")?.addEventListener(
+        "click",
+        onChildObjectBackupGateManageClick
+      );
     }
   }
 
@@ -74,6 +78,30 @@ export function assertChildObjectBackupGateAllowsCreate(ctx) {
     throw new Error(copy?.body ?? "Save backup or recovery key before adding another object.");
   }
   return gate;
+}
+
+/** @param {Event} event */
+function onChildObjectBackupGateManageClick(event) {
+  event.preventDefault();
+  document.getElementById("created-tab-btn-advanced")?.click();
+  window.requestAnimationFrame(() => {
+    const recovery = document.getElementById("created-recovery-details");
+    const backup = document.getElementById("backup-details");
+    const target =
+      recovery instanceof HTMLElement && !recovery.hidden ? recovery : backup;
+    if (target instanceof HTMLElement) {
+      if (target.tagName === "DETAILS") {
+        target.removeAttribute("hidden");
+        target.setAttribute("open", "");
+      }
+      target.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      return;
+    }
+    document.getElementById("created-tab-advanced")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  });
 }
 
 /** @param {string} value */
