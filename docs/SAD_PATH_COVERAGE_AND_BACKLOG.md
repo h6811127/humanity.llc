@@ -29,7 +29,7 @@ Use it when prioritizing hardening before launch surfaces (live proof in person,
 | Live proof infra errors (1101, poll retry) | **Shipped** H-01–H-03 | [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) |
 | Live proof in-person handoff | **H-04–H-10 shipped** (scanner recovery H-09/H-10: 2026-05-29); **H-13–H-15 engineering shipped** (2026-05-29); H-11–H-12 human QA open | [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) |
 | Merch checkout sad paths | **Matrix + automated M1–M8** (2026-05-29); live payment + physical QA open | [`MERCH_CHECKOUT_SAD_PATH_MATRIX.md`](MERCH_CHECKOUT_SAD_PATH_MATRIX.md) |
-| Large wallet / power user | **Mitigated** Phases 7–9; still out of spec at ~10+ roots | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Open issues |
+| Large wallet / power user | **Guardrails shipped** (comfort + large hints; E2E W1–W3) | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Open issues |
 | Social / trust misunderstanding | **Copy exists**; comprehension not fully re-run | [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) |
 
 ---
@@ -96,7 +96,7 @@ Agents are strong at **systematic enumeration** against docs and code. Humans an
 Documented out of spec in [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) § Realistic scale:
 
 - Watch for live proof + hub open for hours + multiple tabs → quota and lag
-- Mitigations shipped (Phases 7–9, S6–S12); **soft UX guardrail** (warn at scale) still open
+- Mitigations shipped (Phases 7–9, S6–S12); **soft UX guardrail** (comfort at 6+, large at 10+) — hub custody row + `/wallet/` monitoring hint · `npm run e2e:wallet-scale-guardrail`
 
 ### 5. Commerce / merch (pre–live checkout)
 
@@ -115,8 +115,8 @@ M5 passed **without** live Tier 1 checkout. Engineering matrix shipped — see [
 
 | Gap | Status |
 |-----|--------|
-| Same error page for missing `?q=` vs unknown profile | Partial — differentiated codes; copy hint still thin ([`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) P2-1) |
-| Shared `/c/{profile}` without QR param | Recipient sees Invalid link |
+| Same error page for missing `?q=` vs unknown profile | **Shipped** — `scan-malformed-hint.ts` · `worker/tests/scan-malformed-hint.test.ts` |
+| Shared `/c/{profile}` without QR param | Recipient sees differentiated **Add QR from your sticker** copy |
 | Photographed / damaged QR | Outside app; physical QA runbooks |
 
 ### 7. Social / trust misunderstandings (not code bugs)
@@ -163,8 +163,8 @@ No unit test fully catches **acting** on a misunderstanding.
 | **P0** | Live proof comprehension | Execute H-11 / H-12 runbooks with ≥5 strangers | Product / QA |
 | **P1** | Key-loss paths | Audit first-run gates; no new recovery without trust-model change | Product copy |
 | **P1** | Merch checkout | **Matrix shipped** — operator physical QA + live payment before `checkout_open: true` | Engineering + Ops |
-| **P2** | Large wallet guardrails | Soft cap UX when ≥10 saved roots | Shell |
-| **P2** | Scan URL hints | “Add `?q=qr_…`” vs “profile not found” | Resolver copy |
+| **P2** | Large wallet guardrails | **Shipped** — `e2e/wallet-scale-guardrail.spec.ts` (W1–W3) | Shell |
+| **P2** | Scan URL hints | **Shipped** — `scan-malformed-hint.ts` + Vitest | Resolver |
 | **P2** | H-13 full-loop E2E | `e2e/live-control-loop.spec.ts` | **Shipped** 2026-05-29 |
 
 ---
@@ -189,6 +189,10 @@ No unit test fully catches **acting** on a misunderstanding.
 | **S14** | **Checkout closed interest UX (M2)** | Same |
 | **S15** | **Proof consent + recovery gate (M3–M4)** | `e2e/merch-funnel-checkout.spec.ts` |
 | **S16** | **Webhook held without metadata (M6)** | `worker/tests/shopify-orders-webhook.test.ts` |
+| **S17** | **Comfortable wallet hint on /wallet/ (W1)** | `e2e/wallet-scale-guardrail.spec.ts` |
+| **S18** | **Large wallet hint on /wallet/ (W2)** | Same |
+| **S19** | **Hub custody scale row (W3)** | Same |
+| **S20** | **Malformed scan URL copy (P2-1)** | `worker/tests/scan-malformed-hint.test.ts` |
 
 Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) § Recommended test matrix.
 
@@ -205,6 +209,7 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 | **P1-LC-EX · Expiry retry (H-10)** | Same |
 | P1-LCP · Printed camera QA | Same |
 | P1-LC-E2E · Live control loop (H-13) | `npm run e2e:live-control-loop` |
+| **P1-LW-SCALE · Wallet scale guardrails (W1–W3)** | `npm run e2e:wallet-scale-guardrail` |
 
 ---
 
@@ -212,6 +217,7 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 
 | Date | Notes |
 |------|-------|
+| 2026-05-29 | P2 wallet scale guardrails E2E (W1–W3); scan URL hints marked shipped |
 | 2026-05-29 | Merch sad-path matrix + M1–M2 E2E (`MERCH_CHECKOUT_SAD_PATH_MATRIX.md`) |
 | 2026-05-29 | Slice E shipped: H-13 `e2e/live-control-loop.spec.ts` |
 | 2026-05-29 | Initial inventory from sad-path review; Slice D (H-09, H-10) shipped |

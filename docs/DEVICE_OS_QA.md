@@ -332,6 +332,18 @@ See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 
 Automated: `e2e/device-hub-large-wallet-summary.spec.ts` (steps 1–4); Vitest `device-hub-visible-rows-core.test.ts` · `device-hub-wallet-summary.test.ts`.
 
+### P1-LW-SCALE · Wallet scale guardrails (comfort + large)
+
+**Refs:** [`SAD_PATH_COVERAGE_AND_BACKLOG.md`](SAD_PATH_COVERAGE_AND_BACKLOG.md) § Large wallet · `device-wallet-scale-core.mjs`.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Save **7** cards; open `/wallet/` | Monitoring hint mentions **1–5** comfortable zone |
+| 2 | Save **≥10** cards; open `/wallet/` | **Large wallet** hint under Monitoring |
+| 3 | Expand hub on `/` with **8** saved | Custody panel **Many saved cards** row with same guidance |
+
+Automated: `npm run e2e:wallet-scale-guardrail` (W1–W3).
+
 ### P1-HH · Hub header simplification (Home / Close / Create)
 
 **Spec:** [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md) · visual refresh: [`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md)
