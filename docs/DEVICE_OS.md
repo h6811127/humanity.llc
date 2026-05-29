@@ -3,7 +3,7 @@
 **Status:** Phase 8 shipped (device hub) · Phase 1 refresh coordinator shipped · **Active vertical:** merch Tier 0 shop (`/shop/`) · **PWA install:** spec shipped ([`PWA_INSTALL.md`](PWA_INSTALL.md))  
 **Audience:** Product, frontend, and anyone extending Pages without accounts  
 **Roadmap index:** [`STEWARD_DEVICE_ROADMAP.md`](STEWARD_DEVICE_ROADMAP.md) — custody, inbox, Browser alerts, hosted push, PWA (links only)  
-**Product language:** [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) — Layer 2 user copy vs Layer 1 keys in this doc
+**Product language:** [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) (canonical plain-vs-precise policy) · [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) — Layer 2 user copy vs Layer 1 keys in this doc
 
 ---
 

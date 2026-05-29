@@ -3,7 +3,7 @@
 **Status:** Implemented (Phases 1–7, v1 complete)  
 **Owners:** Device shell + resolver trust UX  
 **Scope:** `site/js/device-status.mjs`, `site/js/device-dot-state-core.mjs`, `site/styles.css`, `site/css/device-shell.css`, status key copy in hub/wallet/created  
-**Related:** [`DEVICE_INBOX.md`](DEVICE_INBOX.md) — inbox badge, hub alerts, background alerts (separate from dot semantics)
+**Related:** [`DEVICE_INBOX.md`](DEVICE_INBOX.md) — inbox badge, hub alerts, background alerts (separate from dot semantics) · [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) — dot explain copy uses plain language
 
 ---
 

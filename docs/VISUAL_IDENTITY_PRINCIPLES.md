@@ -3,7 +3,8 @@
 **Status:** Design strategy draft (motion § updated for Path 2 `pass-v32`)  
 **Purpose:** Define the visual direction for Humanity Commons v1.0, especially the mobile web card and scan experience.  
 **Scanner product contract (safety header, external links, recognition):** [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md)  
-**Scan trust UI (layers, arrive sequence, dot sync):** [`docs/SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md)
+**Scan trust UI (layers, arrive sequence, dot sync):** [`docs/SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md)  
+**Product language (plain default, precise on purpose):** [`docs/PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md)
 
 ---
 
@@ -48,6 +49,8 @@ The mobile card page should answer:
 6. Where can I read more?
 
 For **live object** stickers, (2) is usually the manifesto or plate message-not the steward `@handle`. See [`docs/SCANNER_EXPERIENCE.md`](SCANNER_EXPERIENCE.md) § Scan type templates.
+
+**Language:** Scan UI uses outcome copy and honest limits — not crypto wallet jargon. Mechanism appears in depth panels and Help, not the hero. Policy: [`docs/PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md).
 
 **Design reference:** `assets/Nerd Mobile Post Scan Render.png` (single hero, status bar, proof/limit modules, QR secondary).
 

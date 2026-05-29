@@ -8,7 +8,8 @@
 **Merch-led tiers:** Tier 0 = proof of curiosity (open drop). Tier 1 = proof of belonging (personalized for card holders - not a protocol invite gate). See `docs/MERCH_LED_V1.md` and `docs/FOUNDING_DROP_BRIEF.md`.
 
 **Hosted steward (planning):** Optional paid steward infrastructure - not merch, not verification. Copy: § Hosted steward tier (planning copy) below; FAQ: [`SKEPTIC_FAQ.md`](SKEPTIC_FAQ.md) § Is There A Paid Tier?  
-**Merch stickers:** Lifecycle policy + Sticker FAQ — [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) · § Sticker FAQ in this doc.
+**Merch stickers:** Lifecycle policy + Sticker FAQ — [`MERCH_QR_LIFECYCLE_POLICY.md`](MERCH_QR_LIFECYCLE_POLICY.md) · § Sticker FAQ in this doc.  
+**Language policy:** [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) — plain by default on public surfaces; this kit’s approved lines are Layer 2–3; mechanism terms in FAQ answers must pair with limits.
 
 ---
 

@@ -2,6 +2,7 @@
 
 **Status:** Active — **L0–L2 shipped**; L3 P1 kept as opt-in plain-language reader; **L3 P2 UI retired** (2026-05-27)  
 **Parent:** [`LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md`](LOCALIZED_OBJECT_INTELLIGENCE_BOUNDARY.md) · [`PHASE_A_STRANGER_PATH_PRIORITIES.md`](PHASE_A_STRANGER_PATH_PRIORITIES.md)  
+**Language policy:** [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) § Rename, don’t erase (UI **Plain language**; stable `ai` API fields)  
 **Slices:** [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md) · [`AI_L3_DRAFT_MANIFESTO.md`](AI_L3_DRAFT_MANIFESTO.md) (API only, UI retired)
 
 > **Naming note:** This doc was titled “AI feature development.” The product is **not** an AI company. The core is **signed object state** (L0–L2). LLMs are optional **readers** on top of signed facts—or **adversaries** in the threat model—not ghostwriters for stewards.

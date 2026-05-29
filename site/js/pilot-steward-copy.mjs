@@ -2,6 +2,7 @@
  * Plain-language steward copy per pilot template (Step 5).
  * Precise protocol terms stay in Advanced / resolver panels.
  * @see docs/PRODUCT_POSITIONING_AND_LOOP_STRATEGY.md § Step 5
+ * @see docs/PRODUCT_LANGUAGE_STRATEGY.md
  */
 
 /** @typedef {"general" | "status_plate" | "lost_item_relay"} PilotTemplate */

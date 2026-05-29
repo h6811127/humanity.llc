@@ -2,7 +2,8 @@
 
 **Status:** Active  
 **Purpose:** Positioning synthesis, narrative sequencing, and phased implementation plan.  
-**Parent:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` · `docs/STATUS_PLATE_PILOT.md`
+**Parent:** `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` · `docs/STATUS_PLATE_PILOT.md`  
+**Language policy:** [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md)
 
 ---
 
@@ -89,6 +90,8 @@
 
 **Rule:** Precise terms (QR credential, card revoke) remain in Advanced panels and general cards.
 
+**Canonical policy:** [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) — plain by default, precise on purpose; scanner ≠ steward ≠ engineer. Step 5 is the steward/pilot implementation of that policy.
+
 ### Step 6 — Lost-item scan → create hint (optional) ✅
 
 Calm footer on lost-item relay scan template only — link to `/create/?template=lost_item`. Copy in `worker/src/resolver/scan-safety.ts`; render in `scan-html.ts` (`scan-create-hint`). Tests: `scan.test.ts`, `scan-m5-showcase-paths.test.ts`.
@@ -134,6 +137,7 @@ Calm footer on lost-item relay scan template only — link to `/create/?template
 
 | Doc | Role |
 |-----|------|
+| `docs/PRODUCT_LANGUAGE_STRATEGY.md` | Plain vs precise policy; audience layers; PR copy checklist |
 | `docs/PHASE_A_STRANGER_PATH_PRIORITIES.md` | Vertical priorities + narrative stack |
 | `docs/STATUS_PLATE_PILOT.md` | Vertical #1 |
 | `docs/M5_STRANGER_TEST_RUNBOOK.md` | Proof loop exit gate (**passed** 2026-05-27) |

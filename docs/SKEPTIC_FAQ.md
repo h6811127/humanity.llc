@@ -5,7 +5,8 @@
 
 **Architecture:** `docs/PROTOCOL_FEDERATION_AND_LAUNCH_STRATEGY.md`  
 **Direction:** `docs/DEMOCRATIC_INFRASTRUCTURE.md`  
-**Hosted tier (planning):** [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) · § Is There A Paid Tier? (this doc)
+**Hosted tier (planning):** [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) · § Is There A Paid Tier? (this doc)  
+**Language policy:** [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) — this FAQ may name mechanism (vouch, live control, revoke) when answering skeptics; each answer must state what the mechanism proves and does *not* prove.
 
 ---
 

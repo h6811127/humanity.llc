@@ -2,7 +2,7 @@
 
 **Status:** Phases 1–4 shipped (May 2026) — [`HUB_CARD_3D_AND_SHEET_GLASS.md`](HUB_CARD_3D_AND_SHEET_GLASS.md)  
 **Scope:** Saved card rows in the device hub (`/`, `/wallet/`, `/created/`) - `renderSavedRows()` in `site/js/device-hub-ui.mjs`  
-**Companions:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md), [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md)
+**Companions:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md), [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md), [`REFERENCE_OPERATOR_DATA_POLICY.md`](REFERENCE_OPERATOR_DATA_POLICY.md), [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md)
 
 ---
 
@@ -17,7 +17,7 @@ Saved card rows accumulated overlapping UI: handle repeated in title, sub-line, 
 1. **One glance** - identity, trust + object type, unified network status, primary actions.
 2. **Progressive depth** - keys, profile id, last saved, vouch default only in **Details** (collapsed by default).
 3. **Control-first** - steward actions grouped under ⋯ **QR & lifecycle**; **Prove live** stays inline when pending (Phase 2).
-4. **Semantic copy** - operational language, not cryptographic jargon.
+4. **Semantic copy** - operational language, not cryptographic jargon ([`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) § Steward hub).
 5. **Policy-aligned** - never imply operator scan logging or stranger scan trails.
 6. **Budget-aligned** - **Reachable · checked … ago** reflects the last **device-initiated** status fetch (hub expand, **Check network**, or cache TTL), not continuous operator monitoring. Multi-card auto-polling is opt-in (**Watch for live proof**); see [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 

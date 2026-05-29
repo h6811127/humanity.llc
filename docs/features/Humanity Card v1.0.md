@@ -5,6 +5,8 @@
 **Product Trust Reference:** V1 Product Trust Model
 **Dependencies:** Human Verification v1.0, QR Public Profile v1.0, Storefront v1.0, Printify Fulfillment Middleware v1.0
 
+**Language note:** This ratification spec uses Layer 1 protocol vocabulary by design. User-facing copy on shipped surfaces should follow [`PRODUCT_LANGUAGE_STRATEGY.md`](../PRODUCT_LANGUAGE_STRATEGY.md) and [`OWNERSHIP_AND_CONTROL_MODEL.md`](../OWNERSHIP_AND_CONTROL_MODEL.md) — translate for default UI; keep precision here and in Technical Standards.
+
 ---
 
 ## 1. Executive Summary

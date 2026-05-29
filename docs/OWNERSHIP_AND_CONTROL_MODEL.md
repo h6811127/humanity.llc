@@ -3,7 +3,7 @@
 **Status:** Product direction (documentation); implementation partially aligned  
 **Audience:** Product, design, engineering, support  
 **Opened:** 2026-05-29  
-**Related:** [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md`](KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`STEWARD_DEVICE_ROADMAP.md`](STEWARD_DEVICE_ROADMAP.md)
+**Related:** [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) (canonical plain-vs-precise policy) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) · [`KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md`](KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`STEWARD_DEVICE_ROADMAP.md`](STEWARD_DEVICE_ROADMAP.md)
 
 ---
 
@@ -53,7 +53,7 @@ This document defines the three-layer model, maps current code and storage to it
 | **2** | Can I change it, share it, kill it, get it back? | Which signed operations are allowed? |
 | **1** | (Should not need to ask) | Where are private keys, what signs what, what is on D1? |
 
-**Rule for new UI:** Default surfaces use Layer 2–3 language. Layer 1 appears only in Help, data policy, feature docs, and an optional **Advanced / for developers** disclosure.
+**Rule for new UI:** Default surfaces use Layer 2–3 language. Layer 1 appears only in Help, data policy, feature docs, and an optional **Advanced / for developers** disclosure. Cross-cutting policy: [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) — *plain by default, precise on purpose*.
 
 ---
 
@@ -82,7 +82,7 @@ Humanity equivalent:
 
 ## Terminology map (migration target)
 
-Use this table when rewriting copy or adding UI. **Engineering identifiers stay** (`hc_created`, `activateWalletEntry`, etc.); **user-visible strings** move right.
+Use this table when rewriting copy or adding UI. **Engineering identifiers stay** (`hc_created`, `activateWalletEntry`, etc.); **user-visible strings** move right. See also [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) § Rename, don’t erase and § Checklist for new copy.
 
 | Today (Layer 1 — avoid in default UI) | Target (Layer 2) | Notes |
 |--------------------------------------|-------------------|-------|
@@ -396,6 +396,7 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 
 | Doc | Role |
 |-----|------|
+| [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) | Canonical plain-vs-precise policy; audience layers; surface rules |
 | [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) | Layer 1 reference — keys, cards, verification (keep for engineers) |
 | [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) | One root, many objects; recovery as seatbelt |
 | [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) | Backup + recovery threat model |
@@ -413,3 +414,4 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | 2026-05-29 | Adopt three-layer ownership model; default UI targets Layer 2; Layer 1 docs remain canonical for engineering |
 | 2026-05-29 | Protocol and storage unchanged in D0–D2; copy and information architecture only |
 | 2026-05-29 | **D3 shipped** — “My objects” nav label; `/objects` → `/wallet/` alias; URL `/wallet/` unchanged |
+| 2026-05-29 | Terminology map linked to canonical [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) |

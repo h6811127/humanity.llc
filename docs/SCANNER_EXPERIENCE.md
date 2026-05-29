@@ -2,7 +2,7 @@
 
 **Status:** Product + UX contract (resolver and recognition)  
 **Audience:** Design, product, and implementation for anything a stranger sees after scanning a Humanity QR  
-**Related:** [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) (Worker HTML layout), [`docs/QR_BRANDING.md`](QR_BRANDING.md) (optical QR modules), [`docs/V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) (what scans prove), [`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) (tone and hierarchy), [`docs/M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) (validation)
+**Related:** [`docs/M3_SCAN_PAGE_UI.md`](M3_SCAN_PAGE_UI.md) (Worker HTML layout), [`docs/QR_BRANDING.md`](QR_BRANDING.md) (optical QR modules), [`docs/V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) (what scans prove), [`docs/VISUAL_IDENTITY_PRINCIPLES.md`](VISUAL_IDENTITY_PRINCIPLES.md) (tone and hierarchy), [`docs/M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) (validation), [`docs/PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) (stranger-facing language)
 
 ---
 
@@ -21,6 +21,22 @@ The scanner experience has three reinforcing layers:
 **Product sentence (scanner-facing):**
 
 > If it looks like a Humanity object and opens on `humanity.llc`, you get a live trust check—not a hidden redirect.
+
+---
+
+## Language (stranger-facing)
+
+Scanners are not stewards and not engineers. Default scan copy follows [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md):
+
+| Do on scan (default) | Defer to depth / Help |
+|----------------------|------------------------|
+| Live check · active / revoked / unknown | Resolver · credential · signed payload |
+| What this object says **right now** | Profile id · issued date as hero |
+| One honest **does not prove** line above the fold | Full trust-level essay |
+| **Vouched Human** with limits | Verified Human · legal identity |
+| Optional **Plain language** reader (not signed state) | Raw JSON snapshot as hero |
+
+**Comprehension bar:** strangers should paraphrase outcomes in runbooks ([`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md)) without being taught protocol nouns first.
 
 ---
 

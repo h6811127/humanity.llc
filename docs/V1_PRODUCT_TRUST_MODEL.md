@@ -9,7 +9,8 @@
 
 **Vouch positioning (AI era):** `docs/VOUCH_TRUST_POSITIONING.md`  -  accountability over global biometric uniqueness; what vouch proves for integrators.  
 **Vouch threat model:** `docs/VOUCH_THREAT_MODEL.md`  -  adversarial catalog and operator playbook.  
-**Scanner UX (recognition, safety chrome, redirects):** `docs/SCANNER_EXPERIENCE.md`
+**Scanner UX (recognition, safety chrome, redirects):** `docs/SCANNER_EXPERIENCE.md`  
+**Product language (plain default, honest limits):** `docs/PRODUCT_LANGUAGE_STRATEGY.md`
 
 ---
 
@@ -39,9 +40,9 @@ The product is trustworthy when a normal scanner can understand, in under five s
 
 The interface must never imply more trust than the system can actually prove.
 
-V1 should prefer mechanism-revealing labels over broad identity claims. Public UI should say **Vouched Human** instead of **Verified Human** unless and until governance approves stronger launch copy after user testing.
+V1 should prefer **mechanism-revealing labels** over broad identity claims — but mechanism must be **translated for the surface**, not dumped as crypto jargon in the hero. Public UI should say **Vouched Human** instead of **Verified Human** unless and until governance approves stronger launch copy after user testing. Say what was earned and what was *not* proven (see required copy under each trust level below).
 
-Protocol fields may continue to use `verified_human` where needed for compatibility, but user-facing labels should explain how the state was earned.
+Protocol fields may continue to use `verified_human` where needed for compatibility, but user-facing labels should explain how the state was earned. Full policy: [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) § Mechanism-revealing, not crypto-coded.
 
 ---
 

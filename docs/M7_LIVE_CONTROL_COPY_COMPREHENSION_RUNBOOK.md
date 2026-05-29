@@ -2,7 +2,8 @@
 
 **Status:** Runbook ready; execution pending (≥5 testers)  
 **Gate:** `docs/M7_LIVE_CONTROL_ALPHA.md` Step 2 · `docs/V1_IMPLEMENTATION_BACKLOG.md` H-002 · `docs/V1_ASSUMPTION_REGISTER.md` live control spike  
-**Prerequisite:** Step 1 shipped; side-by-side + expiry UI shipped on scan page.
+**Prerequisite:** Step 1 shipped; side-by-side + expiry UI shipped on scan page.  
+**Language policy:** [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) § Comprehension gates — testers should paraphrase outcomes without jargon coaching.
 
 ---
 
