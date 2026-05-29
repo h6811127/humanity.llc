@@ -2,7 +2,7 @@
  * Floating status dot, notification badge, hub sheet host.
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
-import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=60";
+import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=61";
 import { buildStatusSegments } from "./device-counts.mjs";
 import { loadPins } from "./device-pins.mjs";
 import {
@@ -15,6 +15,7 @@ import { fetchResolverHealth } from "./device-network-health.mjs";
 import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visit-gate.mjs";
 
 export const RESOLVER_HEALTH_CHANGED = "hc-resolver-health-changed";
+import { maybeQuietTabRehydrate } from "./device-quiet-tab-rehydrate.mjs?v=61";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import {
@@ -34,33 +35,33 @@ import {
   inboxBadgeCountText,
   inboxCountFromItems,
   notificationCount,
-} from "./device-inbox.mjs?v=60";
+} from "./device-inbox.mjs?v=61";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import {
   initHubIntroCoachmark,
   onHubOpenedFromIntro,
 } from "./device-hub-intro-coachmark.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=60";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=61";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import "./device-shell-motion.mjs";
-import "./device-shell-chrome.mjs?v=60";
+import "./device-shell-chrome.mjs?v=61";
 import "./device-theme.mjs";
-import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=60";
+import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=61";
 import {
   isHubSheet,
   reconcileHubSheetState,
   setHubSheetOpen,
-} from "./device-hub-sheet.mjs?v=60";
+} from "./device-hub-sheet.mjs?v=61";
 import { startCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import {
   refreshDeviceChrome,
   setRefreshStatusSurfaces,
   startDeviceChromeRefresh,
-} from "./device-chrome-refresh.mjs?v=60";
+} from "./device-chrome-refresh.mjs?v=61";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 import {
   broadcastHealthSnapshotIfEligible,
@@ -84,7 +85,7 @@ import {
   shellStatusLinePrimaryInChrome,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=60";
+} from "./device-dot-state-core.mjs?v=61";
 
 export const DOT_STATE_CHANGED = "hc-dot-state-changed";
 
@@ -645,16 +646,21 @@ window.addEventListener("hc-focus-hub-search", () => {
   document.getElementById("device-hub-search")?.focus({ preventScroll: true });
 });
 
-startTabKeysPresence();
-initBrowserNotifications();
-initResolverTabSync();
-startCrossTabNotificationState();
-setRefreshStatusSurfaces(() => {
-  refreshSummary();
-});
-startDeviceChromeRefresh();
-refreshDeviceChrome({ immediate: true });
-void refreshNetwork();
+async function bootDeviceStatusShell() {
+  await maybeQuietTabRehydrate();
+  startTabKeysPresence();
+  initBrowserNotifications();
+  initResolverTabSync();
+  startCrossTabNotificationState();
+  setRefreshStatusSurfaces(() => {
+    refreshSummary();
+  });
+  startDeviceChromeRefresh();
+  refreshDeviceChrome({ immediate: true });
+  void refreshNetwork();
+}
+
+void bootDeviceStatusShell();
 
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") void refreshNetwork();

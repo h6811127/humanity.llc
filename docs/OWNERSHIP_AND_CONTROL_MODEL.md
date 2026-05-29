@@ -223,7 +223,7 @@ Priority surfaces to migrate to Layer 2 copy:
 |-----|-------|--------|
 | Session-first create | Keys land in `hc_created` before save; user may see warnings | Auto-save default **on** (shipped); deprecate scary session-only hero |
 | Recovery not automatic | Optional at create; user must confirm save | **Warn only when recovery impossible** — gate child objects / print checkout (partial: `child-object-backup-gate.mjs`) |
-| Multi-tab control | User must understand tab isolation | Treat like passkey “signed in on another window” — focus tab or **take control here** |
+| Multi-tab control | User must understand tab isolation | **Quiet tab rehydrate** (D10): copy saved ownership into new tabs silently when safe; cross-tab chrome only when rehydrate cannot run | **Tier 1 shipped** — see [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) |
 | “My cards” naming | Protocol term | **My objects** or **What I control** when object tree is primary |
 | Advanced export | Mixed into primary `/created/` | Collapse under **Advanced → Export for developers** | **D8** ✅ |
 
@@ -262,6 +262,12 @@ These are **product defaults**; implementation can phase in without protocol cha
 
 - Vouch / live proof / revoke remain **explicit user actions** with confirmation.
 - Auto-activate control on scan is **opt-in** (vouch-ready) — same security floor, better Layer 2 copy.
+
+### 7. Quiet tab rehydrate (passkey-like)
+
+- **Tier 1 (shipped):** One saved object + empty tab → shell bootstrap copies wallet row into `hc_created` without key copy ([`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md)).
+- **Tier 2 (planned):** Last-active profile for multi-card stewards.
+- Does **not** change protocol, server custody, or `hc_created` per-tab lifetime.
 
 ---
 
@@ -366,6 +372,8 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | **D9g** | Comprehension copy guards — live-control strings in `device-ownership-copy-core.mjs`; `npm run worker:test:comprehension` | Low — tests only | **Shipped** (2026-05-29) |
 | **D9f** | Founding + steward surface copy — shop FAQ calendar expiry, wallet attestation help, feature pages, hub custody | Low — copy only | **Shipped** (2026-05-29) |
 | **D9h** | Founding copy comprehension runbook + expanded shop FAQ/guards | Low — docs + tests | **Shipped** (2026-05-29) |
+| **D9i** | Founding sticker FAQ gap close — full LAUNCH_LANGUAGE_KIT § Sticker FAQ on `/shop/founding/` | Low — copy + guards | **Shipped** (2026-05-29) |
+| **D10** | Quiet tab rehydrate — Tier 1: single saved card → silent `hc_created` on shell bootstrap | Medium — multi-tab UX | **Tier 1 shipped** — [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) |
 
 **Do not migrate:** resolver APIs, document types, storage key names, or test fixture terminology without a dedicated protocol PR.
 
@@ -375,7 +383,7 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 
 1. **Private keys never uploaded** to resolver by default.
 2. **Owner-signed mutations** for revoke, vouch, child updates, live proof.
-3. **`hc_created` per tab** — no fake “global session” without user choosing **take control here**.
+3. **`hc_created` per tab** — each tab holds its own signing session; **quiet rehydrate** (D10) may copy from `hc_wallet` on shell load when rules pass — not server-side or cross-origin session.
 4. **Recovery and backup** remain client-side optional paths.
 5. **Network truth** for verification labels; device truth for control.
 6. **Child objects** inherit root control; no default per-child keys.
@@ -392,6 +400,7 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | Create | `create-card.mjs`, `hc-sign.mjs` |
 | Auto-save | `device-auto-save.mjs`, `created-device-save.mjs` |
 | Custody UI | `device-keys-custody.mjs`, `device-hub-keys-custody*.mjs` |
+| Quiet tab rehydrate (D10) | `device-quiet-tab-rehydrate*.mjs` |
 | Cross-tab | `device-tab-presence.mjs`, `device-cross-tab-banner.mjs` |
 | Backup/recovery | `key-backup*.mjs`, `recovery-key-ui.mjs` |
 | Vouch / attestation | `vouch-issue.mjs`, `vouch-ready-keys.mjs`, `device-control-activation*.mjs` |
@@ -410,6 +419,7 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md) | Backup + recovery threat model |
 | [`KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md`](KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md) | Shipped custody panel + inbox semantics |
 | [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) | Attestation without wallet detour |
+| [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) | Passkey-like tab rehydrate from wallet |
 | [`DEVICE_OS.md`](DEVICE_OS.md) | Shell placement rules |
 | [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) | Trust labels vs ownership |
 
@@ -431,3 +441,5 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | 2026-05-29 | **D9f shipped** — founding sticker FAQ (no calendar expiry); wallet attestation help; device-hub feature Layer 2 + advanced panel |
 | 2026-05-29 | **M7 comprehension passed** — 5/5 strangers per [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md) |
 | 2026-05-29 | **D9h shipped** — [`FOUNDING_COPY_COMPREHENSION_RUNBOOK.md`](FOUNDING_COPY_COMPREHENSION_RUNBOOK.md); shop FAQ F1–F3 guards |
+| 2026-05-29 | **D9i shipped** — full LAUNCH_LANGUAGE_KIT Sticker FAQ on `/shop/founding/` (revoke, campaign end, misprint) |
+| 2026-05-29 | **D10 Tier 1 shipped** — quiet tab rehydrate for single saved card; [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) |

@@ -17,6 +17,8 @@
 
 **Product sentence:** *Cross-tab keys tell you that **another open, visible browser tab** on this device is holding signing keys you may care about - not that a card exists on the network, and not via OS push.*
 
+**Quiet rehydrate (D10):** When [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) Tier 1 applies (one saved card, empty tab), shell bootstrap copies wallet control into this tab **before** presence runs — cross-tab notices for that profile should not appear.
+
 ---
 
 ## Three layers (do not conflate)

@@ -1,0 +1,110 @@
+# Quiet tab rehydrate (passkey-like control)
+
+**Status:** Tier 1 shipped · Tier 2 planned  
+**Audience:** Product, frontend, security review  
+**Companions:** [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)
+
+---
+
+## Problem
+
+Users should not think about **keys** or **tabs**. After create, ownership is saved to `hc_wallet` (auto-save default on). Each tab still needs a working copy in `sessionStorage.hc_created` before signing works.
+
+Today, a **new tab** on `/`, `/wallet/`, or `/create/` can show cross-tab / “take control here” chrome even when the user has **one saved object** on the device. That feels like a key-management product, not passkey-like ownership.
+
+**This is not a missing crypto feature.** Keys already live in `localStorage.hc_wallet`. “Sync” means **quietly copy the saved row into this tab’s `hc_created`** — same as manual **Open controls**, without user-facing key vocabulary.
+
+---
+
+## Threat model alignment
+
+| Question | Answer |
+|----------|--------|
+| Does this upload keys? | **No** — same-origin `activateWalletEntry` copy only |
+| Does this contradict “no server custody”? | **No** — browser storage only |
+| Does this put private keys in `localStorage` presence map? | **No** — presence stays metadata-only |
+| Does this replace `hc_created` per tab? | **No** — each tab still holds its own session copy; tab close clears it |
+| Shared / borrowed device risk? | **Tier 1** limits blast radius (single saved card). **Tier 2** adds explicit setting. PIN/device unlock (D6) **blocks** silent rehydrate until unlocked |
+| Wrong-card signing? | **Fail closed** — never guess when 2+ saved roots have keys |
+
+**Do not:**
+
+- Store `hc_created` in `localStorage` (persists across browser restarts in all tabs)
+- BroadcastChannel private keys tab-to-tab (wallet is already the shared store)
+- Server-side session or cloud key sync
+- Remove cross-tab UI without a rehydrate policy (duplicate-tab confusion)
+
+---
+
+## Priority stack
+
+| Tier | Behavior | Status |
+|------|----------|--------|
+| **1** | Exactly **one** saved card with signing keys + empty `hc_created` + no unlock gate → silent rehydrate on **shell bootstrap** (`/`, `/wallet/`, `/create/`, `/created/`) | **Shipped** |
+| **2** | Remember `hc_last_active_profile_id`; rehydrate that profile on new tabs (hub toggle, default on) when multi-card | Planned |
+| **3** | Demote cross-tab chrome when rehydrate succeeds; keep notices for unsaved-only-other-tab and unlock-pending | Planned |
+
+**Already shipped (related, narrower):**
+
+- Auto-save to wallet after create (`device-auto-save.mjs`)
+- `/created/?profile_id=…` wallet activate (`created.mjs`)
+- Vouch-ready scan auto-activate (`vouch-ready-keys.mjs`, opt-in)
+
+---
+
+## Tier 1 contract
+
+### When rehydrate runs
+
+Once per shell page load, **before** first chrome refresh (`device-status.mjs` init):
+
+1. `getTabSession()` has **no** `owner_private_key_b58`
+2. `loadWallet()` filtered to signing rows → **count === 1**
+3. `controlActivationRequiresUnlock(profile_id)` is **false** (D6 PIN / device unlock not blocking)
+4. `activateWalletEntryGated(entry)` succeeds
+
+### When rehydrate is skipped (existing UX unchanged)
+
+| Condition | Result |
+|-----------|--------|
+| Tab already has control | Skip |
+| Zero saved cards | Skip |
+| Two or more saved signing rows | Skip — no guess |
+| Sign lock enabled and locked | Skip — user unlocks via existing take-control flow |
+| Activation error | Skip — no retry loop on bootstrap |
+
+### User-visible copy
+
+**None on success.** Layer 2: user simply “has their object” in the tab. No “keys synced” string.
+
+---
+
+## Tier 2 (planned)
+
+| Key | Storage | Meaning |
+|-----|---------|---------|
+| `hc_last_active_profile_id` | `localStorage` | Last profile activated into `hc_created` |
+| `hc_quiet_tab_rehydrate` | `localStorage` | `"0"` = off; unset / `"1"` = on (default on) |
+
+When enabled and last-active is valid: rehydrate that row on shell bootstrap even with multiple saved cards. Ambiguous or missing last-active → Tier 1 rules only.
+
+---
+
+## Files (Tier 1)
+
+| Area | Module |
+|------|--------|
+| Pure rules | `site/js/device-quiet-tab-rehydrate-core.mjs` |
+| Bootstrap hook | `site/js/device-quiet-tab-rehydrate.mjs` |
+| Wire | `site/js/device-status.mjs` (await before `startTabKeysPresence` / chrome refresh) |
+| Tests | `worker/tests/device-quiet-tab-rehydrate-core.test.ts` |
+
+---
+
+## Regression
+
+```bash
+npm run worker:test -- worker/tests/device-quiet-tab-rehydrate-core.test.ts worker/tests/device-status-shell-modules.test.ts
+```
+
+Manual: **P1-QTR** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md).

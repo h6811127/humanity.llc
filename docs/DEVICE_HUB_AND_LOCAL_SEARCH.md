@@ -189,7 +189,7 @@ No backend required:
 | **Activity** | `localStorage` (`hc_device_activity`) | Whole origin | Hub recent list |
 | **Pins** | `localStorage` (`hc_device_pins`) | Whole origin | Public scan bookmarks only |
 
-**Common confusion:** Create in tab B → open homepage in tab A → no keys until **Save on this device** in tab B.
+**Common confusion:** Create in tab B → open homepage in tab A → with **one saved object**, tab A **quiet-rehydrates** control on shell load (D10). With multiple saved objects or sign lock, use **Open controls** or focus the other tab.
 
 ---
 
