@@ -155,7 +155,9 @@ test.describe("device OS wallet flow", () => {
     );
 
     await page.goto("/wallet/");
-    await expect(page.getByText("Reachable")).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator(".hub-card-status-label")).toContainText("Reachable", {
+      timeout: 15_000,
+    });
 
     const cardRow = page.locator(".hub-card-item").first();
     await cardRow.locator(".hub-card-menu summary").click();
@@ -284,7 +286,9 @@ test.describe("device OS wallet flow", () => {
     }, SAMPLE_WALLET_ENTRY.profile_id);
     await stubCreatedResolver(page);
     await page.goto("/wallet/");
-    await expect(page.getByText("Reachable")).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator(".hub-card-status-label")).toContainText("Reachable", {
+      timeout: 15_000,
+    });
     const cardRow = page.locator(".hub-card-item").first();
     await cardRow.locator(".hub-card-menu summary").click();
     await cardRow.getByRole("button", { name: "Update status" }).click();
@@ -332,6 +336,46 @@ test.describe("device OS wallet flow", () => {
     await expect(
       page.getByText("Card disabled on the network since your last visit.")
     ).toBeHidden();
+  });
+
+  test("P0b-1: fresh saved card without device baseline hides since-visit banner", async ({
+    page,
+  }) => {
+    await page.addInitScript((entry) => {
+      localStorage.setItem("hc_wallet", JSON.stringify([entry]));
+      localStorage.removeItem("hc_wallet_last_seen_network");
+      sessionStorage.removeItem("hc_wallet_network_cache");
+    }, SAMPLE_WALLET_ENTRY);
+
+    await page.route("**/.well-known/hc/v1/cards/**/status**", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          version: "1.0",
+          resolver: { operator: "humanity.llc", version: "1.0" },
+          scan: {
+            kind: "active",
+            profile_id: SAMPLE_WALLET_ENTRY.profile_id,
+            qr_id: SAMPLE_WALLET_ENTRY.qr_id,
+            card: { status: "active", handle: "e2etest", manifesto_line: "Test line" },
+            verification: { state: "registered", label: "Registered" },
+            human_trust: { label: "Registered", subtitle: "", pill_active: false },
+          },
+        }),
+      });
+    });
+
+    await page.goto("/wallet/");
+    await expect(page.getByText("Reachable")).toBeVisible({ timeout: 15_000 });
+    await expect(
+      page.getByText("Card disabled on the network since your last visit.")
+    ).toBeHidden();
+    const baseline = await page.evaluate((profileId) => {
+      const raw = localStorage.getItem("hc_wallet_last_seen_network");
+      return raw ? JSON.parse(raw)[profileId] : undefined;
+    }, SAMPLE_WALLET_ENTRY.profile_id);
+    expect(baseline).toBeUndefined();
   });
 
   test("does not re-show since-visit banner after live-control tick once resolver reports active (G3/A5)", async ({
@@ -419,7 +463,9 @@ test.describe("device OS wallet flow", () => {
     const refreshStatus = page.waitForResponse(statusResponse, { timeout: 15_000 });
     await page.getByRole("button", { name: "Check network" }).click({ timeout: 15_000 });
     await refreshStatus;
-    await expect(page.getByText("Reachable")).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator(".hub-card-status-label")).toContainText("Reachable", {
+      timeout: 15_000,
+    });
     await expect(page.locator(".hub-card-status-alert:not([hidden])")).toHaveCount(0, {
       timeout: 15_000,
     });
@@ -760,5 +806,88 @@ test.describe("device OS wallet flow", () => {
     expect(metrics!.mainFlexGrow).toBe("0");
     expect(metrics!.gapPx).toBeGreaterThan(0);
     expect(metrics!.gapPx).toBeLessThan(56);
+  });
+});
+
+test.describe("P0b-1 fresh create hub row (R10)", () => {
+  async function stubFreshCreateHubNetwork(page: Page) {
+    await stubCreatedResolver(page);
+    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", (route) =>
+      route.fulfill({ status: 404, contentType: "application/json", body: "{}" })
+    );
+  }
+
+  async function seedFreshCreateWallet(
+    page: Page,
+    opts: { baseline?: "none" | "active" } = {}
+  ) {
+    await page.addInitScript(
+      ({ entry, baselineMode }) => {
+        localStorage.setItem("hc_device_hub_intro_dismissed", "1");
+        localStorage.setItem("hc_wallet", JSON.stringify([entry]));
+        if (baselineMode === "active") {
+          localStorage.setItem(
+            "hc_wallet_last_seen_network",
+            JSON.stringify({ [entry.profile_id]: "active" })
+          );
+        } else {
+          localStorage.removeItem("hc_wallet_last_seen_network");
+        }
+        sessionStorage.setItem(
+          "hc_wallet_network_cache",
+          JSON.stringify({
+            [entry.profile_id]: {
+              status: "active",
+              scanKind: "card_revoked",
+              verificationLabel: null,
+              verificationState: null,
+              at: Date.now(),
+            },
+          })
+        );
+      },
+      { entry: SAMPLE_WALLET_ENTRY, baselineMode: opts.baseline ?? "none" }
+    );
+  }
+
+  async function openLandingHub(page: Page) {
+    await page.goto("/");
+    await waitForStatusDotReady(page);
+    await page.locator("#brand-status-dot-btn").click({ timeout: 15_000 });
+    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/, {
+      timeout: 15_000,
+    });
+  }
+
+  test("does not show since-visit banner on landing hub after fresh create (no baseline)", async ({
+    page,
+  }) => {
+    await stubFreshCreateHubNetwork(page);
+    await seedFreshCreateWallet(page, { baseline: "none" });
+    await openLandingHub(page);
+
+    await expect(page.locator(".hub-card-status-label")).toContainText("Reachable", {
+      timeout: 15_000,
+    });
+    await expect(page.locator("#device-hub-card-disabled-group")).toBeHidden();
+    await expect(
+      page.getByText("Card disabled on the network since your last visit.")
+    ).toBeHidden();
+  });
+
+  test("does not show since-visit banner on landing hub when baseline is active and resolver is active", async ({
+    page,
+  }) => {
+    await stubFreshCreateHubNetwork(page);
+    await seedFreshCreateWallet(page, { baseline: "active" });
+    await openLandingHub(page);
+
+    await expect(page.locator(".hub-card-status-label")).toContainText("Reachable", {
+      timeout: 15_000,
+    });
+    await expect(page.locator("#device-hub-card-disabled-group")).toBeHidden();
+    await expect(
+      page.getByText("Card disabled on the network since your last visit.")
+    ).toBeHidden();
   });
 });

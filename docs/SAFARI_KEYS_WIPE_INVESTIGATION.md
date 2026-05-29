@@ -297,7 +297,7 @@ Cross-tab presence (`hc_tab_keys_presence`) does **not** delete keys, but stale 
 
 **User impact:** Reads as “network killed my card / keys” — same emotional bucket as key loss. Documented historically in [`CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md`](CARD_DISABLED_SINCE_VISIT_FALSE_POSITIVE_INVESTIGATION.md); **still observed on prod** 2026-05-29.
 
-**Fix:** Not a custody store bug — still blocks trust in the keys product. Must stay on the same release train as key fixes.
+**Fix:** Not a custody store bug — still blocks trust in the keys product. **Shipped (P0b-1):** in-visit network polls no longer seed `hc_wallet_last_seen_network` for profiles without a prior baseline; first baseline is written on exit snapshot (`snapshotNetworkSeenOnExit`) so fresh create cannot false-trigger “since your last visit” in the same session.
 
 ---
 
@@ -417,7 +417,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 
 | # | Change | Rationale |
 |---|--------|-----------|
-| **P0b-1** | Re-verify **card disabled since visit** on fresh create (hub row) | R10 — **prod** false positive |
+| **P0b-1** | Re-verify **card disabled since visit** on fresh create (hub row) | R10 — **prod** false positive; no in-visit baseline seed; first baseline on exit snapshot | **Step 1 shipped** — automated R10 guard on `/` hub; step 2: prod re-verify on WebKit after deploy |
 | **P0b-2** | Setup wizard: **no auto-advance** on test scan when `window.open` new tab | R12 |
 | **P0b-3** | On scan, **auto-activate wallet row for signing** when exactly one signing row (mirror D10), not only default-vouch path | Stranger vouch without prior “Default for vouching” setup |
 
@@ -487,7 +487,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | 5 | P0-2 Sync save on create | **Shipped** | `created-device-save-core.mjs`; sync save in `create-card.mjs` before `location.replace`; `/created/` auto-save runs inline |
 | 6 | P0-3 saveWallet try/catch | **Shipped** | `device-wallet-save-core.mjs`; quota-safe `saveWallet`; `hc_auto_save_failed` + visible save errors |
 | 7 | P0-4 Backup gate | **Shipped** | `created-first-session-gate-core.mjs`; setup required until seatbelt; wallet persists recovery markers; steward `#revoke` bypass gated |
-| 8 | P0b-1 Card disabled FP | Pending | R10 |
+| 8 | P0b-1 Card disabled FP | **Step 1 shipped** | R10 — `mergeLastSeenFromNetworkMap` skips in-visit baseline seed; `card-disabled-fresh-create.test.ts` · E2E `device-os-wallet.spec.ts` |
 | 9 | P0b-2 Setup wizard scan tab | Pending | R12 |
 | 10 | P0b-3 Scan single-row auto-activate (stranger vouch) | Pending | Overlaps P1-1 |
 
