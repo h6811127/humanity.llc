@@ -5,12 +5,18 @@ import {
   PWA_INSTALL_DISMISS_COOLDOWN_MS,
   PWA_INSTALL_MIN_SAVED_CARDS,
   canTriggerNativeInstallPrompt,
+  hasAnyWalletSetupDone,
   isInstallDismissSnoozed,
   isStandaloneDisplayMode,
+  parseSetupDoneMap,
   shouldShowIosAddToHomeInstructions,
+  shouldShowPwaInstallDeferralHint,
   shouldShowPwaInstallSurface,
 } from "../../site/js/pwa-install-ux-core.mjs";
-import { pwaInstallCardBodyHtml } from "../../site/js/pwa-install-html.mjs";
+import {
+  pwaInstallCardBodyHtml,
+  pwaInstallDeferralCardBodyHtml,
+} from "../../site/js/pwa-install-html.mjs";
 
 const baseInput = {
   pathname: "/",
@@ -19,6 +25,7 @@ const baseInput = {
   isIosSafari: false,
   dismissedAtIso: null,
   savedCardCount: 2,
+  anyWalletSetupDone: true,
   inboxKinds: [],
   deviceStatusLoadError: false,
 };
@@ -45,6 +52,26 @@ describe("shouldShowPwaInstallSurface", () => {
       shouldShowPwaInstallSurface({ ...baseInput, savedCardCount: 0 })
     ).toBe(false);
     expect(PWA_INSTALL_MIN_SAVED_CARDS).toBe(1);
+  });
+
+  it("hides until at least one wallet row finished setup (P4)", () => {
+    expect(
+      shouldShowPwaInstallSurface({ ...baseInput, anyWalletSetupDone: false })
+    ).toBe(false);
+    expect(
+      shouldShowPwaInstallDeferralHint({ ...baseInput, anyWalletSetupDone: false })
+    ).toBe(true);
+    expect(
+      shouldShowPwaInstallDeferralHint({ ...baseInput, anyWalletSetupDone: true })
+    ).toBe(false);
+  });
+
+  it("hasAnyWalletSetupDone checks wallet profile ids against setup map", () => {
+    const map = { abc: true, def: false };
+    expect(hasAnyWalletSetupDone(map, ["def", "ghi"])).toBe(false);
+    expect(hasAnyWalletSetupDone(map, ["ghi", "abc"])).toBe(true);
+    expect(parseSetupDoneMap(JSON.stringify(map))).toEqual(map);
+    expect(parseSetupDoneMap("not-json")).toEqual({});
   });
 
   it("hides when dismiss snooze active", () => {
@@ -154,5 +181,12 @@ describe("pwaInstallCardBodyHtml", () => {
     expect(ios).toContain("Add to Home Screen");
     expect(ios).toContain("Share");
     expect(ios).not.toContain("data-pwa-install-confirm");
+  });
+
+  it("renders setup deferral copy (P4)", () => {
+    const deferral = pwaInstallDeferralCardBodyHtml();
+    expect(deferral).toContain("Finish your first object in Safari");
+    expect(deferral).toContain("data-pwa-install-dismiss");
+    expect(deferral).not.toContain("data-pwa-install-confirm");
   });
 });

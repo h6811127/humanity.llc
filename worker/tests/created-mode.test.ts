@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   isSetupDone,
+  modeFromPage,
   resolveCreatedMode,
   SETUP_DONE_KEY,
   syncSetupDoneForSavedProfile,
@@ -86,6 +87,26 @@ describe("resolveCreatedMode", () => {
     syncSetupDoneForSavedProfile(profileId);
     expect(isSetupDone(profileId)).toBe(true);
     expect(JSON.parse(storage.get(SETUP_DONE_KEY) || "{}")[profileId]).toBe(true);
+  });
+
+  it("modeFromPage skips setup backfill during fresh post-create flow (P4)", () => {
+    const profileId = "profile-fresh-setup";
+    storage.set(
+      "hc_wallet",
+      JSON.stringify([
+        {
+          id: "w1",
+          profile_id: profileId,
+          owner_private_key_b58: "priv",
+          owner_public_key_b58: "pub",
+        },
+      ])
+    );
+    modeFromPage(profileId, true, () => ({
+      owner_private_key_b58: "priv",
+      owner_public_key_b58: "pub",
+    }));
+    expect(isSetupDone(profileId)).toBe(false);
   });
 
   it("returns control for returning steward (saved on device, not fresh)", () => {

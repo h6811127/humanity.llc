@@ -64,6 +64,10 @@ async function seedPwaLandingStorage(page: Page) {
   await page.addInitScript(({ entry, dismissKey }) => {
     localStorage.setItem("hc_device_hub_intro_dismissed", "1");
     localStorage.setItem("hc_wallet", JSON.stringify([entry]));
+    localStorage.setItem(
+      "hc_setup_done",
+      JSON.stringify({ [entry.profile_id]: true })
+    );
     localStorage.removeItem(dismissKey);
     localStorage.setItem("hc_watch_live_proof", "0");
   }, { entry: WALLET_ENTRY, dismissKey: PWA_DISMISS_KEY });
@@ -231,6 +235,25 @@ test.describe("device PWA install (phase 4 rollout gate)", () => {
     await waitForShellReady(page);
     await dispatchBeforeInstallPrompt(page);
     await expect(page.locator("#device-pwa-install-card")).toBeHidden();
+  });
+
+  test("install card deferred until setup wizard complete (P4)", async ({ page }) => {
+    await page.addInitScript(({ entry, dismissKey }) => {
+      localStorage.setItem("hc_device_hub_intro_dismissed", "1");
+      localStorage.setItem("hc_wallet", JSON.stringify([entry]));
+      localStorage.removeItem("hc_setup_done");
+      localStorage.removeItem(dismissKey);
+      localStorage.setItem("hc_watch_live_proof", "0");
+    }, { entry: WALLET_ENTRY, dismissKey: PWA_DISMISS_KEY });
+    await wireShellRoutes(page);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await waitForShellReady(page);
+    await dispatchBeforeInstallPrompt(page);
+
+    const card = page.locator("#device-pwa-install-card");
+    await expect(card).toBeVisible({ timeout: 20_000 });
+    await expect(card).toContainText(/Finish your first object in Safari/i);
+    await expect(page.locator("[data-pwa-install-confirm]")).toHaveCount(0);
   });
 
   test("install card hidden while cross_tab_keys inbox is active (P1-PWA step 8)", async ({

@@ -532,7 +532,21 @@ Automated (when shipped): `npm run worker:test -- worker/tests/pwa-standalone-re
 
 **Fail signals:** Safari opens automatically; wizard advances to done before user previews scan; cross-tab keys notice during fresh setup.
 
-Automated: `npm run worker:test:pwa-install` (includes `pwa-scan-handoff-core.test.ts`).
+Automated: `npm run worker:test:pwa-install` (includes `pwa-scan-handoff-core.test.ts`) · `npm run e2e:pwa-install` (`e2e/device-pwa-scan-handoff.spec.ts` — setup test scan, hub Open scan, wallet pin, browser popup regressions).
+
+### P1-PWA-P4 · Install deferral until setup complete (P4 shipped)
+
+**Spec:** [`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) § P4 · **Module:** `site/js/pwa-install-ux-core.mjs`
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Safari with saved card but `hc_setup_done` unset for that profile | Deferral card: “Finish your first object in Safari” — **no** Install button |
+| 2 | Complete setup wizard (step 4 **Open card controls**) | `hc_setup_done[profile_id]` set |
+| 3 | Return to `/` or `/wallet/` in browser tab | Install card may appear (Chromium `beforeinstallprompt` or iOS manual copy) |
+
+**Fail signals:** Install CTA before setup complete; deferral card in standalone; install card after dismiss snooze without setup done.
+
+Automated: `npm run worker:test:pwa-install` · `npm run e2e:pwa-install` (P4 deferral case).
 
 ### P1-8 · Hosted tier budget (Phase 10 — E2 staging)
 

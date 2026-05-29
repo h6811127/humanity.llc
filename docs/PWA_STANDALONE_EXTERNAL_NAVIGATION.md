@@ -1,6 +1,6 @@
 # PWA standalone — external navigation & new-tab gaps
 
-**Status:** P1 + **P2 shipped** (2026-05-29) — standalone scan handoff + return banner on scan  
+**Status:** **P1–P4 shipped** (2026-05-29) — standalone scan handoff, return banner, install deferral; P3 deferred  
 **Audience:** Product, frontend, QA  
 **Related:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) · [`shop-checkout-handoff.mjs`](../site/js/shop-checkout-handoff.mjs) · [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md)
 
@@ -192,10 +192,12 @@ openStewardScanPreview(url, { navigation, standalone })
 ## Recommended path
 
 1. **Ship P1** — standalone-aware scan handoff + setup step behavior tweak + Vitest contract tests (`pwa-scan-handoff-core.mjs` or extend `shop-checkout-handoff` pattern).
-2. **Add P1-PWA-N manual QA** (below) and one Playwright case with `display-mode: standalone` emulation opening test scan from `/created/?fresh=1`.
+2. **Add P1-PWA-N manual QA** (below) and one Playwright case with `display-mode: standalone` emulation opening test scan from `/created/?fresh=1`. **Shipped:** `e2e/device-pwa-scan-handoff.spec.ts` in `npm run e2e:pwa-install`.
 3. **Evaluate P2** after dogfood — if stewards still miss Back, add return banner on scan. **Shipped 2026-05-29:** `hc_return` query + `scan-steward-preview-return.mjs` banner on scan pages.
-4. **Optional P4** — soften install prompt until first setup complete (product call).
+4. **Optional P4** — soften install prompt until first setup complete (product call). **Shipped:** `shouldShowPwaInstallSurface` requires `anyWalletSetupDone`; deferral card copy on shell pages until setup completes.
 5. **Do not** pursue P3 unless stranger-path parity requires identical pixels in wizard.
+
+**Close-out (2026-05-29):** Engineering path complete. Remaining validation is manual **P1-PWA-N** on real installed PWAs (HTTPS). Automated coverage: setup test scan, hub Open scan, wallet pin (`e2e/device-pwa-scan-handoff.spec.ts`).
 
 Update [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Manual QA step 3 when P1 ships: “standalone → same-tab preview; browser tab → new tab.”
 
@@ -209,7 +211,7 @@ Update [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Manual QA step 3 when P
 |------|--------|---------------------|
 | 1 | Installed PWA → `/create/` → complete create | Lands on `/created/?fresh=1` setup wizard **inside PWA** |
 | 2 | Advance to **Test scan** → tap test / continue | Scan opens **in PWA** (no Safari chrome switch) |
-| 3 | System back / swipe back | Returns to setup wizard on test or next step per policy |
+| 3 | System back / swipe back **or tap return banner** | Returns to setup wizard; standalone shows **← Back to setup** when `hc_return` present |
 | 4 | Complete setup → hub **Open scan** on saved card | Same-tab in standalone; new tab in Safari browser |
 | 5 | Browser tab (not installed) → repeat step 2 | Still opens **new tab** (regression guard) |
 | 6 | Wallet pin row “Scan · …” | Same as step 4 |
@@ -252,3 +254,6 @@ Update [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Manual QA step 3 when P
 | 2026-05-29 | Initial investigation — inventory, impact matrix, proposals P1–P5 |
 | 2026-05-29 | **P1 shipped** — `pwa-scan-handoff-core.mjs` wired at setup, dashboard, hub, wallet pins, child-object scan links |
 | 2026-05-29 | **P2 shipped** — `hc_return` param, sessionStorage fallback, scan return banner + `scan-steward-preview-return.mjs` |
+| 2026-05-29 | **P1-PWA-N E2E** — `e2e/device-pwa-scan-handoff.spec.ts` (standalone same-tab + browser popup regression) |
+| 2026-05-29 | **P4 shipped** — install card gated on `hc_setup_done` for wallet rows; deferral card until first setup complete |
+| 2026-05-29 | **P1-PWA-N E2E extended** — hub Open scan + wallet pin + browser popup regressions in `e2e/device-pwa-scan-handoff.spec.ts` |

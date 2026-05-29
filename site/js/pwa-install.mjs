@@ -3,15 +3,19 @@
  * @see docs/PWA_INSTALL.md
  */
 
-import { getWalletCount } from "./device-wallet.mjs";
+import { getWalletCount, loadWalletSummary } from "./device-wallet.mjs";
 import { getInboxItems } from "./device-inbox.mjs";
 import {
   canTriggerNativeInstallPrompt,
+  hasAnyWalletSetupDone,
+  parseSetupDoneMap,
   PWA_INSTALL_DISMISS_KEY,
+  PWA_INSTALL_SETUP_DONE_KEY,
   shouldShowIosAddToHomeInstructions,
+  shouldShowPwaInstallDeferralHint,
   shouldShowPwaInstallSurface,
 } from "./pwa-install-ux-core.mjs";
-import { pwaInstallCardBodyHtml } from "./pwa-install-html.mjs";
+import { pwaInstallCardBodyHtml, pwaInstallDeferralCardBodyHtml } from "./pwa-install-html.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 
 /** @type {BeforeInstallPromptEvent | null} */
@@ -56,6 +60,17 @@ function activeInboxKinds() {
   return getInboxItems().map((item) => item.kind);
 }
 
+function readSetupDoneState() {
+  try {
+    const raw = localStorage.getItem(PWA_INSTALL_SETUP_DONE_KEY);
+    const map = parseSetupDoneMap(raw);
+    const profileIds = loadWalletSummary().profileIds;
+    return hasAnyWalletSetupDone(map, profileIds);
+  } catch {
+    return false;
+  }
+}
+
 function gatherSurfaceInput() {
   return {
     pathname: window.location.pathname,
@@ -64,6 +79,7 @@ function gatherSurfaceInput() {
     isIosSafari: isIosSafari(),
     dismissedAtIso: readDismissedAtIso(),
     savedCardCount: getWalletCount(),
+    anyWalletSetupDone: readSetupDoneState(),
     inboxKinds: activeInboxKinds(),
     deviceStatusLoadError: deviceStatusLoadError(),
   };
@@ -83,40 +99,54 @@ function renderInstallCard() {
   if (!card) return;
 
   const input = gatherSurfaceInput();
-  if (!shouldShowPwaInstallSurface(input)) {
-    hideInstallCard();
+  if (shouldShowPwaInstallSurface(input)) {
+    const iosManual = shouldShowIosAddToHomeInstructions({
+      isIosSafari: input.isIosSafari,
+      standalone: input.standalone,
+      deferredPromptAvailable: input.deferredPromptAvailable,
+    });
+
+    card.hidden = false;
+    card.className = "hc-emphasis-card hc-emphasis-card--info device-pwa-install-card";
+    card.setAttribute("role", "status");
+    card.innerHTML = pwaInstallCardBodyHtml({ iosManual });
+
+    card.querySelector("[data-pwa-install-dismiss]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      writeDismissedAtIso();
+      hideInstallCard();
+    });
+
+    const confirm = card.querySelector("[data-pwa-install-confirm]");
+    if (confirm && canTriggerNativeInstallPrompt(input)) {
+      confirm.addEventListener("click", async (e) => {
+        e.preventDefault();
+        if (!deferredPrompt) return;
+        try {
+          await deferredPrompt.prompt();
+        } catch (err) {
+          console.info("[humanity] PWA install prompt failed:", err?.message || err);
+        }
+      });
+    }
     return;
   }
 
-  const iosManual = shouldShowIosAddToHomeInstructions({
-    isIosSafari: input.isIosSafari,
-    standalone: input.standalone,
-    deferredPromptAvailable: input.deferredPromptAvailable,
-  });
+  if (shouldShowPwaInstallDeferralHint(input)) {
+    card.hidden = false;
+    card.className = "hc-emphasis-card hc-emphasis-card--info device-pwa-install-card";
+    card.setAttribute("role", "status");
+    card.innerHTML = pwaInstallDeferralCardBodyHtml();
 
-  card.hidden = false;
-  card.className = "hc-emphasis-card hc-emphasis-card--info device-pwa-install-card";
-  card.setAttribute("role", "status");
-  card.innerHTML = pwaInstallCardBodyHtml({ iosManual });
-
-  card.querySelector("[data-pwa-install-dismiss]")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    writeDismissedAtIso();
-    hideInstallCard();
-  });
-
-  const confirm = card.querySelector("[data-pwa-install-confirm]");
-  if (confirm && canTriggerNativeInstallPrompt(input)) {
-    confirm.addEventListener("click", async (e) => {
+    card.querySelector("[data-pwa-install-dismiss]")?.addEventListener("click", (e) => {
       e.preventDefault();
-      if (!deferredPrompt) return;
-      try {
-        await deferredPrompt.prompt();
-      } catch (err) {
-        console.info("[humanity] PWA install prompt failed:", err?.message || err);
-      }
+      writeDismissedAtIso();
+      hideInstallCard();
     });
+    return;
   }
+
+  hideInstallCard();
 }
 
 function scheduleRenderInstallCard() {
@@ -146,7 +176,11 @@ function bindListeners() {
   document.addEventListener("hc-cross-tab-custody-invalidated", scheduleRenderInstallCard);
   window.addEventListener("hc-live-control-inbox-changed", scheduleRenderInstallCard);
   window.addEventListener("storage", (e) => {
-    if (e.key === "hc_wallet" || e.key === PWA_INSTALL_DISMISS_KEY) {
+    if (
+      e.key === "hc_wallet" ||
+      e.key === PWA_INSTALL_DISMISS_KEY ||
+      e.key === PWA_INSTALL_SETUP_DONE_KEY
+    ) {
       scheduleRenderInstallCard();
     }
   });
