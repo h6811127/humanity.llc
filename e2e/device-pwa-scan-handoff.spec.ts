@@ -110,6 +110,60 @@ async function seedCreatedSetupTestStep(page: Page, standalone: boolean) {
   }, HANDOFF_ENTRY);
 }
 
+async function seedShellHandoffWallet(page: Page, standalone: boolean) {
+  if (standalone) {
+    await page.addInitScript(withStandaloneDisplayModeScript());
+  }
+  await page.addInitScript((entry) => {
+    localStorage.setItem("hc_device_hub_intro_dismissed", "1");
+    localStorage.setItem("hc_wallet", JSON.stringify([entry]));
+    localStorage.setItem(
+      "hc_setup_done",
+      JSON.stringify({ [entry.profile_id]: true })
+    );
+    localStorage.setItem("hc_watch_live_proof", "0");
+  }, HANDOFF_ENTRY);
+}
+
+async function seedWalletPin(page: Page) {
+  await page.addInitScript((entry) => {
+    localStorage.setItem(
+      "hc_device_pins",
+      JSON.stringify([
+        {
+          id: "pin_e2e_pwa_handoff",
+          label: "E2E PWA pin",
+          profile_id: entry.profile_id,
+          qr_id: entry.qr_id,
+          scan_url: entry.scan_url,
+          pinned_at: "2026-05-29T12:00:00.000Z",
+        },
+      ])
+    );
+  }, HANDOFF_ENTRY);
+}
+
+async function waitForShellReady(page: Page) {
+  await page.waitForFunction(() => {
+    const chrome = document.getElementById("top-chrome");
+    const dot = document.getElementById("brand-status-dot-btn");
+    return (
+      chrome instanceof HTMLElement &&
+      !chrome.dataset.deviceStatusError &&
+      dot instanceof HTMLButtonElement
+    );
+  }, { timeout: 20_000 });
+}
+
+async function openHubSheet(page: Page) {
+  await expect(page.locator("#brand-status-dot")).toHaveAttribute("data-dot-state", /.+/, {
+    timeout: 15_000,
+  });
+  await page.locator("#brand-status-dot-btn").click();
+  await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/);
+  await expect(page.locator(".hub-open-scan").first()).toBeVisible({ timeout: 15_000 });
+}
+
 function createdSetupTestUrl() {
   const params = new URLSearchParams({
     profile_id: HANDOFF_ENTRY.profile_id,
@@ -156,6 +210,49 @@ test.describe("device PWA scan handoff (P1-PWA-N)", () => {
     await expect(popup).toHaveURL(/scan-active/, { timeout: 10_000 });
     await expect(page).toHaveURL(/\/created\//);
     await expect(page).toHaveURL(/#setup-test/);
+    await popup.close();
+  });
+
+  test("standalone hub Open scan stays in same tab (P1-PWA-N step 4)", async ({ page }) => {
+    await seedShellHandoffWallet(page, true);
+    await stubCreatedResolver(page);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await waitForShellReady(page);
+    await openHubSheet(page);
+
+    await page.locator(".hub-open-scan").first().click();
+    await expect(page).toHaveURL(/scan-active/, { timeout: 10_000 });
+    await expect(page).toHaveURL(/hc_return=/);
+  });
+
+  test("standalone wallet pin opens scan in same tab (P1-PWA-N step 6)", async ({ page }) => {
+    await seedShellHandoffWallet(page, true);
+    await seedWalletPin(page);
+    await stubCreatedResolver(page);
+    await page.goto("/wallet/", { waitUntil: "domcontentloaded" });
+    await waitForShellReady(page);
+
+    await expect(page.getByRole("link", { name: /E2E PWA pin/i }).first()).toBeVisible({
+      timeout: 15_000,
+    });
+    await page.getByRole("link", { name: /E2E PWA pin/i }).first().click();
+    await expect(page).toHaveURL(/scan-active/, { timeout: 10_000 });
+    await expect(page).toHaveURL(/hc_return=/);
+  });
+
+  test("browser hub Open scan opens new window (regression)", async ({ page, context }) => {
+    await seedShellHandoffWallet(page, false);
+    await stubCreatedResolver(page);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await waitForShellReady(page);
+    await openHubSheet(page);
+
+    const popupPromise = context.waitForEvent("page");
+    await page.locator(".hub-open-scan").first().click();
+    const popup = await popupPromise;
+
+    await expect(popup).toHaveURL(/scan-active/, { timeout: 10_000 });
+    await expect(page).not.toHaveURL(/scan-active/);
     await popup.close();
   });
 });

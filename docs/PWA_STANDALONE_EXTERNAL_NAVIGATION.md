@@ -1,6 +1,6 @@
 # PWA standalone — external navigation & new-tab gaps
 
-**Status:** P1 + **P2 shipped** (2026-05-29) — standalone scan handoff + return banner on scan  
+**Status:** **P1–P4 shipped** (2026-05-29) — standalone scan handoff, return banner, install deferral; P3 deferred  
 **Audience:** Product, frontend, QA  
 **Related:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) · [`shop-checkout-handoff.mjs`](../site/js/shop-checkout-handoff.mjs) · [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md)
 
@@ -197,6 +197,8 @@ openStewardScanPreview(url, { navigation, standalone })
 4. **Optional P4** — soften install prompt until first setup complete (product call). **Shipped:** `shouldShowPwaInstallSurface` requires `anyWalletSetupDone`; deferral card copy on shell pages until setup completes.
 5. **Do not** pursue P3 unless stranger-path parity requires identical pixels in wizard.
 
+**Close-out (2026-05-29):** Engineering path complete. Remaining validation is manual **P1-PWA-N** on real installed PWAs (HTTPS). Automated coverage: setup test scan, hub Open scan, wallet pin (`e2e/device-pwa-scan-handoff.spec.ts`).
+
 Update [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Manual QA step 3 when P1 ships: “standalone → same-tab preview; browser tab → new tab.”
 
 ---
@@ -254,3 +256,4 @@ Update [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Manual QA step 3 when P
 | 2026-05-29 | **P2 shipped** — `hc_return` param, sessionStorage fallback, scan return banner + `scan-steward-preview-return.mjs` |
 | 2026-05-29 | **P1-PWA-N E2E** — `e2e/device-pwa-scan-handoff.spec.ts` (standalone same-tab + browser popup regression) |
 | 2026-05-29 | **P4 shipped** — install card gated on `hc_setup_done` for wallet rows; deferral card until first setup complete |
+| 2026-05-29 | **P1-PWA-N E2E extended** — hub Open scan + wallet pin + browser popup regressions in `e2e/device-pwa-scan-handoff.spec.ts` |
