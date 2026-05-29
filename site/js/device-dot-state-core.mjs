@@ -3,6 +3,12 @@
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
 
+import {
+  SHELL_STATUS_MODE_DEVICE_HUB,
+  SHELL_STATUS_MODE_LANDING,
+  SHELL_STATUS_MODE_WALLET,
+} from "./device-ownership-copy-core.mjs";
+
 /**
  * @param {{ verification?: { state?: string, label?: string } } | null | undefined} record
  */
@@ -341,6 +347,28 @@ export function shellChromeStatusLineFromSegments(segments, opts = {}) {
     .filter((seg) => ids.includes(seg.id))
     .map((seg) => seg.chipLabel)
     .join(" · ");
+}
+
+/**
+ * @param {string} pathname
+ * @param {{ isWalletPage?: boolean }} [opts]
+ */
+export function dotPageKindFromPathname(pathname, opts = {}) {
+  if (opts.isWalletPage) return "wallet";
+  const path = pathname || "/";
+  if (path.startsWith("/created")) return "created";
+  if (path.startsWith("/create")) return "create";
+  return "landing";
+}
+
+/**
+ * Visible subtitle under `#shell-status-line` when chrome line is primary.
+ * @param {string} pageKind
+ */
+export function shellStatusModeLabel(pageKind) {
+  if (pageKind === "wallet") return SHELL_STATUS_MODE_WALLET;
+  if (pageKind === "create" || pageKind === "created") return SHELL_STATUS_MODE_DEVICE_HUB;
+  return SHELL_STATUS_MODE_LANDING;
 }
 
 /**

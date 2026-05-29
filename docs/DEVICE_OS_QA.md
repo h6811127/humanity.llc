@@ -396,6 +396,32 @@ Automated: `e2e/device-status-dot.spec.ts` § hub sheet header chrome (steps 4�
 
 Automated: `npm run worker:test -- worker/tests/device-hub-stranger-empty-core.test.ts`
 
+### P2-SLC · Hub stranger landing chrome
+
+**Spec:** [`HUB_STRANGER_ONBOARDING.md`](HUB_STRANGER_ONBOARDING.md) § P2
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Fresh browser → `/` | Hub **collapsed** on load; hero + **How it works** visible (focus mode off) |
+| 2 | Top chrome status line | **Network reachable** only — no `· 0 cards` |
+| 3 | Hub intro coachmark (first visit) | Body: *Create a live object first. Later, tap the dot…* |
+| 4 | Save a card or add a pin | Status line shows card count; coachmark uses returning-user copy on next fresh profile |
+
+Automated: `npm run worker:test -- worker/tests/device-dot-state.test.ts worker/tests/device-hub-intro-coachmark.test.ts` · `e2e/device-status-dot.spec.ts` § shell S4
+
+### P3-SLM · Shell status mode labels
+
+**Spec:** [`HUB_STRANGER_ONBOARDING.md`](HUB_STRANGER_ONBOARDING.md) § P3
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Empty wallet → `/` | `#shell-status-mode` visible: **On this device** under status line |
+| 2 | Empty wallet → `/wallet/` | Mode label: **My objects ↓** |
+| 3 | Empty wallet → `/create/` or `/created/` | Mode label: **Device hub** |
+| 4 | Save a card → `/` | Status line + mode label **hidden**; steward dot returns |
+
+Automated: `npm run worker:test -- worker/tests/device-dot-state.test.ts worker/tests/device-emphasis-card-html.test.ts` · `e2e/device-status-dot.spec.ts` § shell S4
+
 ### P1-9 · Hub sheet visual refresh (May 2026)
 
 **Spec:** [`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md)

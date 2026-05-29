@@ -134,3 +134,8 @@ export const HUB_PINS_BOOKMARKS_ONLY = "Bookmarks only — cannot manage objects
 /** Hub intro coachmark — strangers with nothing saved yet (P2). */
 export const HUB_INTRO_BODY_STRANGER =
   "Create a live object first. Later, tap the dot to open what is saved on this device.";
+
+/** Shell status mode labels — page-aware subtitle (P3). @see docs/HUB_STRANGER_ONBOARDING.md */
+export const SHELL_STATUS_MODE_LANDING = "On this device";
+export const SHELL_STATUS_MODE_WALLET = "My objects ↓";
+export const SHELL_STATUS_MODE_DEVICE_HUB = "Device hub";

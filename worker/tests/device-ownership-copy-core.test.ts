@@ -19,6 +19,9 @@ import {
   LIVE_CONTROL_SCANNER_LEAD,
   LIVE_CONTROL_SUCCESS_COPY,
   SCAN_LIMITS_DISCLOSURE_TITLE,
+  SHELL_STATUS_MODE_DEVICE_HUB,
+  SHELL_STATUS_MODE_LANDING,
+  SHELL_STATUS_MODE_WALLET,
   LOAD_CONTROL_IN_TAB_FIRST,
   OWNERSHIP_NOT_LOADED_TAB,
   SET_DEFAULT_FOR_ATTESTATION,
@@ -70,6 +73,13 @@ describe("device-ownership-copy-core", () => {
     expect(DEVELOPER_EXPORT_SUBTITLE).toContain("Public key");
     expect(DEFAULT_ATTESTATION_ELIGIBILITY_ALERT).toContain("default for attestation");
   });
+
+  it("exports shell status mode labels (hub P3)", () => {
+    expect(SHELL_STATUS_MODE_LANDING).toBe("On this device");
+    expect(SHELL_STATUS_MODE_WALLET).toBe("My objects ↓");
+    expect(SHELL_STATUS_MODE_DEVICE_HUB).toBe("Device hub");
+  });
+
   it("formats inbox aria helpers in ownership terms", () => {
     expect(inboxAriaManagingInOtherTab(1, "Demo")).toBe("managing in 1 other tab (Demo)");
     expect(inboxAriaManagingInOtherTab(2)).toBe("managing in 2 other tabs");

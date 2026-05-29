@@ -4,7 +4,7 @@ import {
   HUB_INTRO_STORAGE_KEY,
   HUB_INTRO_SEEN_STORAGE_KEY,
   shouldShowHubIntro,
-} from "../../site/js/device-hub-intro-coachmark.mjs";
+} from "../../site/js/device-hub-intro-coachmark-core.mjs";
 
 describe("device hub intro coachmark", () => {
   it("shows only on hub shell pages for first-time visitors", () => {
