@@ -1,0 +1,18 @@
+{
+  "type": "humanity_card_key_backup",
+  "version": "1.0",
+  "created_at": "2026-05-29T15:55:34.034Z",
+  "profile_id": "7Xk9mP2nQ4rT6vW8yZ1aB3cD5",
+  "public_key": "AXBxsNjTx7KQXM5DJPFgKEFYZD6vt6TNDueNKrwyfPeT",
+  "kdf": {
+    "name": "PBKDF2",
+    "hash": "SHA-256",
+    "iterations": 310000,
+    "salt_b58": "PkLVRZHZj7KV6nvMFsF5qE"
+  },
+  "cipher": {
+    "name": "AES-GCM",
+    "iv_b58": "5MDUR6gBh1NScV9ck",
+    "ciphertext_b58": "7vtf8nNUHJ2UfRsiQ5oAsLsXpA4LhKNSmaqRnkUMdaZ6DdK45rUVdCRjHpgmguAini"
+  }
+}

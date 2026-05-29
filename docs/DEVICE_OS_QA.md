@@ -344,6 +344,18 @@ Automated: `e2e/device-hub-large-wallet-summary.spec.ts` (steps 1–4); Vitest `
 
 Automated: `npm run e2e:wallet-scale-guardrail` (W1–W3).
 
+### P1-KL · Key-loss view-only and backup import (K1–K2)
+
+**Refs:** [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) · [`M5_5_OWNER_KEY_PORTABILITY.md`](M5_5_OWNER_KEY_PORTABILITY.md).
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Open `/created/?profile_id=…` with **no** `hc_created` in tab | **View this card** hero; view-only banner mentions recovery / encrypted backup |
+| 2 | Wallet has label only (no private keys) | Same view-only; revoke controls hidden |
+| 3 | Import valid `.hcbackup` on `/wallet/` with wrong passphrase | **Wrong passphrase** error (not crypto jargon) |
+
+Automated: `npm run e2e:key-loss-sad-path` · `npm run worker:test:key-loss-copy`.
+
 ### P1-HH · Hub header simplification (Home / Close / Create)
 
 **Spec:** [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md) · visual refresh: [`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md)

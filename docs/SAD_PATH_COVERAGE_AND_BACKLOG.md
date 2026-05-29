@@ -80,7 +80,7 @@ Agents are strong at **systematic enumeration** against docs and code. Humans an
 | PWA vs Safari tab | Different session semantics | [`PWA_INSTALL.md`](PWA_INSTALL.md) |
 | “Saving to wallet = backed up” | Wallet is labels; signing needs keys in tab | Custody emphasis cards |
 
-**Product stance:** These are intentional trust boundaries. Sad-path work is **clearer gates and first-run copy**, not operator key recovery.
+**Product stance:** These are intentional trust boundaries. Sad-path work is **clearer gates and first-run copy**, not operator key recovery. Canonical matrix: [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md).
 
 ### 3. Multi-tab / multi-device orchestration
 
@@ -161,7 +161,7 @@ No unit test fully catches **acting** on a misunderstanding.
 |----------|------|-------------|-------|
 | **P0** | Live proof scanner recovery | **H-09 + H-10** — sessionStorage resume + expiry retry UX | **Shipped** 2026-05-29 |
 | **P0** | Live proof comprehension | Execute H-11 / H-12 runbooks with ≥5 strangers | Product / QA |
-| **P1** | Key-loss paths | Audit first-run gates; no new recovery without trust-model change | Product copy |
+| **P1** | Key-loss paths | **Matrix + K1/K2/K5 E2E shipped** — human emotional QA open | Product copy |
 | **P1** | Merch checkout | **Matrix shipped** — operator physical QA + live payment before `checkout_open: true` | Engineering + Ops |
 | **P2** | Large wallet guardrails | **Shipped** — `e2e/wallet-scale-guardrail.spec.ts` (W1–W3) | Shell |
 | **P2** | Scan URL hints | **Shipped** — `scan-malformed-hint.ts` + Vitest | Resolver |
@@ -193,6 +193,9 @@ No unit test fully catches **acting** on a misunderstanding.
 | **S18** | **Large wallet hint on /wallet/ (W2)** | Same |
 | **S19** | **Hub custody scale row (W3)** | Same |
 | **S20** | **Malformed scan URL copy (P2-1)** | `worker/tests/scan-malformed-hint.test.ts` |
+| **S21** | **View-only /created/ without tab keys (K1)** | `e2e/key-loss-sad-path.spec.ts` |
+| **S22** | **Wrong backup passphrase (K2)** | Same · `worker/tests/key-backup.test.ts` |
+| **S23** | **Wallet label without signing keys (K5)** | `e2e/key-loss-sad-path.spec.ts` |
 
 Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) § Recommended test matrix.
 
@@ -210,6 +213,7 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 | P1-LCP · Printed camera QA | Same |
 | P1-LC-E2E · Live control loop (H-13) | `npm run e2e:live-control-loop` |
 | **P1-LW-SCALE · Wallet scale guardrails (W1–W3)** | `npm run e2e:wallet-scale-guardrail` |
+| **P1-KL · Key-loss view-only + backup import (K1–K2)** | `npm run e2e:key-loss-sad-path` |
 
 ---
 
@@ -217,6 +221,7 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 
 | Date | Notes |
 |------|-------|
+| 2026-05-29 | Key-loss matrix + K1/K2/K5 E2E (`KEY_LOSS_SAD_PATH_MATRIX.md`) |
 | 2026-05-29 | P2 wallet scale guardrails E2E (W1–W3); scan URL hints marked shipped |
 | 2026-05-29 | Merch sad-path matrix + M1–M2 E2E (`MERCH_CHECKOUT_SAD_PATH_MATRIX.md`) |
 | 2026-05-29 | Slice E shipped: H-13 `e2e/live-control-loop.spec.ts` |

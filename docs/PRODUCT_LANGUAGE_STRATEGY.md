@@ -91,7 +91,7 @@ The **terminology map** in [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONT
 ### Errors and sad paths
 
 - Map resolver and client errors to **plain-language user messages** ([`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md), `resolver-user-error-core.mjs`). Prefer “Couldn’t reach the network” over raw `INVALID_SIGNATURE` in default UI.
-- Inventory and prioritization: [`SAD_PATH_COVERAGE_AND_BACKLOG.md`](SAD_PATH_COVERAGE_AND_BACKLOG.md).
+- Inventory and prioritization: [`SAD_PATH_COVERAGE_AND_BACKLOG.md`](SAD_PATH_COVERAGE_AND_BACKLOG.md) · key custody: [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md).
 
 ### Public launch and FAQ
 

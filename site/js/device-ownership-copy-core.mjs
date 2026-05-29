@@ -21,6 +21,16 @@ export const UNLOCK_CONTROL_FIRST = "Unlock control above first.";
 export const BACKUP_INVALID_OWNERSHIP =
   "This backup file does not contain valid ownership data. Re-download from /created/ after create.";
 
+/** Wrong passphrase on `.hcbackup` decrypt (K2 · M5.5). */
+export const BACKUP_WRONG_PASSPHRASE =
+  "Wrong passphrase. Type it by hand or re-pick the saved entry in your password manager (iPhone Passwords / Android).";
+
+/** `/created/` view mode when signing keys are not in this tab (K1 · K5). */
+export const VIEW_ONLY_CARD_TITLE = "View this card";
+
+export const VIEW_ONLY_NO_SESSION_DETAIL =
+  "Finish create in the tab where you clicked Create, then tap Save ownership on this device there. Later: recovery method or encrypted backup under Manage on this card page.";
+
 export const DEFAULT_FOR_ATTESTATION = "Default for attestation";
 
 export const DEFAULT_FOR_ATTESTATION_ON_SCAN = "Default for attestation on scan";
@@ -67,6 +77,13 @@ export const LIVE_CONTROL_PROOF_EXPIRED_STATUS =
 
 /** Scan limits disclosure title (M5 stranger path · V1 launch gates). */
 export const SCAN_LIMITS_DISCLOSURE_TITLE = "What this scan does not prove";
+
+/** Founding Tier 0 shop comprehension (FOUNDING_DROP_BRIEF · LAUNCH_LANGUAGE_KIT). */
+export const FOUNDING_BUY_DOES_NOT_VERIFY =
+  "Buying this sticker does not verify you.";
+
+export const FOUNDING_STICKER_NO_CALENDAR_EXPIRY =
+  "Founding artifact QRs do not calendar-expire";
 
 /**
  * @param {number} count

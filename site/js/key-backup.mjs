@@ -3,7 +3,7 @@
  * Crypto parity: worker/src/crypto/key-backup.ts (tests).
  * @see docs/M5_5_OWNER_KEY_PORTABILITY.md
  */
-import { BACKUP_INVALID_OWNERSHIP } from "./device-ownership-copy-core.mjs";
+import { BACKUP_INVALID_OWNERSHIP, BACKUP_WRONG_PASSPHRASE } from "./device-ownership-copy-core.mjs";
 import * as ed from "https://esm.sh/@noble/ed25519@2.3.0";
 import { decodeBase58, encodeBase58 } from "./hc-sign.mjs";
 import {
@@ -141,9 +141,7 @@ export async function decryptBackup(backup, passphrase) {
       ciphertext
     );
   } catch {
-    throw new Error(
-      "Wrong passphrase. Type it by hand or re-pick the saved entry in your password manager (iPhone Passwords / Android)."
-    );
+    throw new Error(BACKUP_WRONG_PASSPHRASE);
   }
 
   const privateKeyBase58 = bytesToB58(new Uint8Array(plain));
