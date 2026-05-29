@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Studio blog & door-plate pilot · Features · humanity.llc</title>
-    <meta name="description" content="Building the project in public  -  starting with a real studio door plate." />
+    <title>Merch funnel & QR customizer · Features · humanity.llc</title>
+    <meta name="description" content="Scan curiosity → branded QR on wear → Shopify checkout." />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="/styles.css?v=69" />
@@ -20,12 +20,12 @@
       </header>
       <main class="screen">
         <section class="hero">
-          <p class="hero-eyebrow">Feature <span class="phase">11</span></p>
-          <h1>Studio blog & door-plate pilot</h1>
+          <p class="hero-eyebrow">Feature <span class="phase">12</span></p>
+          <h1>Merch funnel & QR customizer</h1>
         </section>
         <div class="feature">
-          <p class="feature-lead">Building the project in public  -  starting with a real studio door plate.</p>
-          <p class="feature-sub"><span class="ship-badge ship-badge-live">Live</span> <a href="/studio/">/studio/</a> + homepage One use · live showcase scan when configured</p>
+          <p class="feature-lead">Scan curiosity → branded QR on wear → Shopify checkout.</p>
+          <p class="feature-sub"><span class="ship-badge ship-badge-partial">Partial</span> <a href="/shop/">/shop/</a> Tier 0 + <a href="/shop/customize/">/shop/customize/</a> Tier 1; operator gates live checkout</p>
         </div>
         <section class="group feature-aspects">
           <h2 class="group-label">About this feature</h2>
@@ -38,7 +38,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">The site should explain itself the same way the product explains physical objects: short, honest cards. The studio door plate is the first object we dogfood  -  hours, open/closed, and line updates without reprinting.</p>
+    <p class="settings-panel-lead">Physical merch is distribution for the live QR primitive — curiosity on a hoodie leads to create, customize, and wear your own signed object. Users never touch Printify; checkout stays branded on humanity.llc.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -50,7 +50,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead"><a href="/studio/">Studio blog</a>  -  card index + posts on the plate, device hub, stack, and framing. Homepage <strong>One use · status plate</strong> lists concrete scenarios (door scan, run state, special hours, revoke visibility). <strong>Try a live scan</strong> loads from <code>site/data/showcase-status-plate.json</code> when present.</p>
+    <p class="settings-panel-lead">Funnel: scan live wear → signed profile → create card → <a href="/shop/customize/">/shop/customize/</a> preview (<code>LIVE OBJECT</code> QR band) → <code>POST /v1/store/artifact-intents</code> → Shopify cart metadata → paid webhook → Printify middleware mints unique <code>print_artifact</code> QR. Tier 0 founding stickers at <a href="/shop/">/shop/</a> skip the customizer. Scan CTA uses <code>hc_ref=scan_customize</code>.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -62,7 +62,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Blog posts are static Pages content  -  no extra tracking. Showcase scan is a normal public resolver object; same limits as any card (no scan analytics by default).</p>
+    <p class="settings-panel-lead">Commerce <strong>never</strong> grants vouch or human verification. Scan bearer warning + product copy stay honest: holding printed wear does not prove ownership. Artifact intent holds no private keys.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -74,7 +74,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Blog is manual HTML, not a CMS feed. Only status-plate create template is fully productized; other card types remain research pages.</p>
+    <p class="settings-panel-lead">Engineering rollout ships in repo (<code>merch-funnel:rollout:step1</code>–<code>step6</code>). Live Tier 1 checkout requires operator <code>shop-config.json</code>, one paid order proof, and physical ink QA (<code>docs/MERCH_FUNNEL_MVP.md</code>).</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -86,14 +86,14 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">More pilot objects documented as cards, RSS/Atom for posts, organizer-facing build notes tied to artifact-intent launches.</p>
+    <p class="settings-panel-lead">Full story-row catalog (~50 SKUs), stranger wear funnel QA, order timeline UI for stewards.</p>
   </div>
 </details></div>
         </section>
         <section class="group">
   <div class="feature-nav">
-    <a href="/features/device-hub.html"><span class="feature-nav-label">Previous</span><span class="feature-nav-title"><span class="phase">10</span> On this device hub</span></a>
-    <a href="/features/merch-funnel.html"><span class="feature-nav-label">Next</span><span class="feature-nav-title"><span class="phase">12</span> Merch funnel & QR customizer</span></a>
+    <a href="/features/studio-blog.html"><span class="feature-nav-label">Previous</span><span class="feature-nav-title"><span class="phase">11</span> Studio blog & door-plate pilot</span></a>
+    
   </div>
 </section>
       </main>

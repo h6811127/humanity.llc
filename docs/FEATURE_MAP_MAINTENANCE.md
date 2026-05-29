@@ -101,11 +101,11 @@ Update status as steps complete.
 | Priority | Work | Status |
 |----------|------|--------|
 | **P0** | Generator staleness: test count label, scan-ui subline, device-hub copy (dot + hub + inbox), artifact-intent + card-types partial text, hub eyebrow (“What ships today”) | ✅ Done (2026-05-29) |
-| **P1** | Hub subsection **Device shell details** + `/help/` row; expand device-hub aspects for micro-features | ☐ |
-| **P1** | New feature page: **Merch funnel & QR customizer** (partial) | ☐ |
+| **P1** | Hub subsection **Device shell details** + `/help/` row; expand device-hub aspects for micro-features | ✅ Done (2026-05-29) |
+| **P1** | New feature page: **Merch funnel & QR customizer** (partial) | ✅ Done (2026-05-29) |
 | **P2** | New feature page: **Hosted steward tier** (partial, production-gated) | ☐ |
 | **P2** | README doc map + steward roadmap cross-links (this file, public hub URL) | ✅ Done (2026-05-29) |
-| **P2** | `/help/` link fix: status dot & inbox vs live-control protocol page | ☐ |
+| **P2** | `/help/` link fix: status dot & inbox vs live-control protocol page | ✅ Done (2026-05-29) |
 | **P2** | Optional: scan-ui aspect for L3 plain-language reader | ☐ |
 
 ---
@@ -121,6 +121,19 @@ What P0 changed in the generator:
 - [x] artifact-intent → engineering shipped in repo; operator gates live checkout
 - [x] card-types limits → customizer + child objects on `/created/`
 - [x] Hub hero eyebrow → “What ships today” (M5 / Phase A foundation shipped)
+
+---
+
+## P1 checklist (reference)
+
+What P1 changed:
+
+- [x] Hub **Device shell details** subsection with `MICRO_FEATURES` compact rows → `/help/#device-shell`
+- [x] Hub **Help center** row → `/help/`
+- [x] Hub **Commerce & belonging** section: phase 12 merch funnel + phase 8 artifact intent
+- [x] New `/features/merch-funnel.html` (phase 12, partial)
+- [x] Expanded device-hub aspects (micro-features, resolver-confirmed alerts, dot vs live control)
+- [x] `/help/#device-shell` section; split status dot from live-control protocol link
 
 ---
 

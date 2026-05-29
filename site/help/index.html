@@ -171,18 +171,54 @@
               </a>
             </li>
             <li class="list-row list-action">
-              <a href="/features/live-control.html">
+              <a href="/help/#device-shell">
                 <span class="list-icon list-icon-tone-blue" aria-hidden="true"
                   ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span
                 >
                 <span class="list-content">
-                  <span class="list-title">Status dot &amp; live proof</span>
-                  <span class="list-sub">Trust indicator, inbox, background checks</span>
+                  <span class="list-title">Status dot &amp; device shell</span>
+                  <span class="list-sub">Inbox, cross-tab keys, alerts, PWA</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>
+            <li class="list-row list-action">
+              <a href="/features/live-control.html">
+                <span class="list-icon list-icon-tone-red" aria-hidden="true"
+                  ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span
+                >
+                <span class="list-content">
+                  <span class="list-title">Live control protocol</span>
+                  <span class="list-sub">In-person key proof on scan (not the dot)</span>
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </a>
             </li>
           </ul>
+          <div class="help-device-shell settings-panel settings-panel-info" id="device-shell">
+            <p class="settings-panel-lead">
+              <strong>Status dot</strong> — floating trust indicator on steward pages (<code>/</code>,
+              <code>/wallet/</code>, <code>/created/</code>). Tap to open the <strong>On this device</strong> hub sheet.
+              This is shell chrome, not the <a href="/features/live-control.html">live control</a> protocol on scan pages.
+            </p>
+            <p class="settings-panel-lead">
+              <strong>Inbox</strong> — badge and action rows when this tab is visible: unsaved keys, live-proof requests,
+              card-disabled-since-visit (resolver-confirmed only), and cross-tab key notices.
+            </p>
+            <p class="settings-panel-lead">
+              <strong>Browser alerts</strong> — opt-in only, and only for <strong>live proof</strong> when the tab is hidden.
+              Cross-tab keys and custody nudges stay in-app — never OS notifications.
+            </p>
+            <p class="settings-panel-lead">
+              <strong>Share network checks</strong> on the homepage syncs resolver polls across tabs on this device
+              (you can turn it off). <strong>Add to Home Screen</strong> is available on steward shell pages — strangers scanning a QR are never prompted to install.
+            </p>
+            <p class="settings-panel-lead">
+              More: <a href="/features/device-hub.html">device hub feature page</a> ·
+              <a href="/features-available-now.html">all features</a> ·
+              <a href="/features/merch-funnel.html">merch funnel</a> (partial).
+            </p>
+          </div>
         </section>
 
         <section class="group" id="create">

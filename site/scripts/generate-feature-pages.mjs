@@ -32,6 +32,7 @@ const ICONS = {
   safety: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
   limits: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>`,
   future: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M18 12h4"/><path d="m19.07 4.93-2.83 2.83"/></svg>`,
+  shop: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`,
 };
 
 const ASPECT_META = [
@@ -242,9 +243,9 @@ const FEATURES = [
     badge: "live",
     aspects: {
       why: "Create puts keys in one tab; strangers need the story, returners need a control center. The hub names the two storage layers and surfaces the next action (save, notice, revoke, vouch).",
-      design: "<strong>Status dot</strong>  -  floating trust indicator; tap opens <strong>On this device</strong> hub sheet. <strong>Inbox</strong>  -  action rows, badge, live-proof overlays. <strong>Saved cards</strong>  -  Use keys, Open controls, relabel/remove. <strong>Pinned scans</strong>  -  public bookmarks only (<code>hc_device_pins</code>). <strong>Search</strong>  -  inline in hub; filters local rows only. <strong>Backup import</strong>  -  decrypt <code>.hcbackup.json</code> into <code>hc_wallet</code>. <strong>Focus mode</strong>  -  hide intro sections. More shell detail: <a href=\"/help/\">/help/</a> · <code>docs/FEATURE_MAP_MAINTENANCE.md</code> in repo.",
-      safety: "Private keys stay in browser storage; pins never hold signing material. Search is client-side over data you already saved. Labels are yours  -  rows show <code>@handle</code> + profile id so synced browser data cannot lie silently.",
-      limits: "Not cloud sync or multi-device accounts. Browser profile sync (Safari/Chrome) may copy <code>localStorage</code> incompletely  -  prefer explicit save per machine. No directory search for other people’s cards.",
+      design: "<strong>Status dot</strong>  -  floating trust indicator; tap opens <strong>On this device</strong> hub sheet. <strong>Inbox</strong>  -  action rows, badge, live-proof overlays when the tab is visible. <strong>Saved cards</strong>  -  Use keys, Open controls, relabel/remove. <strong>Pinned scans</strong>  -  public bookmarks only (<code>hc_device_pins</code>). <strong>Search</strong>  -  inline in hub; filters local rows only. <strong>Backup import</strong>  -  decrypt <code>.hcbackup.json</code> into <code>hc_wallet</code>. <strong>Focus mode</strong>  -  hide intro sections.<br><br><strong>Shell micro-features</strong> (compact list on <a href=\"/features-available-now.html\">features hub</a>): cross-tab keys banner, resolver tab sync toggle, opt-in browser alerts + <code>sw-live-proof.mjs</code> (live proof only), PWA install on steward pages, keys custody notices, child-object backup gate on <a href=\"/created/\">/created/</a>, ephemeral manifesto update at <code>#update-status</code>. User guides: <a href=\"/help/#device-shell\">/help/#device-shell</a>.",
+      safety: "Private keys stay in browser storage; pins never hold signing material. Search is client-side over data you already saved. Cross-tab keys and card-disabled alerts use <strong>resolver-confirmed</strong> polls — never wallet cache alone. Browser alerts and OS push (hosted tier) are <strong>live proof only</strong> — never for cross-tab keys or custody nudges.",
+      limits: "Not cloud sync or multi-device accounts. Browser profile sync (Safari/Chrome) may copy <code>localStorage</code> incompletely  -  prefer explicit save per machine. No directory search for other people’s cards. Status dot is shell chrome, not the live-control protocol — see <a href=\"/features/live-control.html\">live control</a> for in-person key proof.",
       future: "Optional activity log on device, clearer multi-tab key handoff, federated read  -  still no operator custody of owner keys.",
     },
   },
@@ -265,7 +266,74 @@ const FEATURES = [
       future: "More pilot objects documented as cards, RSS/Atom for posts, organizer-facing build notes tied to artifact-intent launches.",
     },
   },
+  {
+    slug: "merch-funnel",
+    phase: "12",
+    title: "Merch funnel & QR customizer",
+    icon: "shop",
+    iconTone: "pink",
+    lead: "Scan curiosity → branded QR on wear → Shopify checkout.",
+    subHtml: `<span class="ship-badge ship-badge-partial">Partial</span> <a href="/shop/">/shop/</a> Tier 0 + <a href="/shop/customize/">/shop/customize/</a> Tier 1; operator gates live checkout`,
+    badge: "partial",
+    aspects: {
+      why: "Physical merch is distribution for the live QR primitive — curiosity on a hoodie leads to create, customize, and wear your own signed object. Users never touch Printify; checkout stays branded on humanity.llc.",
+      design: "Funnel: scan live wear → signed profile → create card → <a href=\"/shop/customize/\">/shop/customize/</a> preview (<code>LIVE OBJECT</code> QR band) → <code>POST /v1/store/artifact-intents</code> → Shopify cart metadata → paid webhook → Printify middleware mints unique <code>print_artifact</code> QR. Tier 0 founding stickers at <a href=\"/shop/\">/shop/</a> skip the customizer. Scan CTA uses <code>hc_ref=scan_customize</code>.",
+      safety: "Commerce <strong>never</strong> grants vouch or human verification. Scan bearer warning + product copy stay honest: holding printed wear does not prove ownership. Artifact intent holds no private keys.",
+      limits: "Engineering rollout ships in repo (<code>merch-funnel:rollout:step1</code>–<code>step6</code>). Live Tier 1 checkout requires operator <code>shop-config.json</code>, one paid order proof, and physical ink QA (<code>docs/MERCH_FUNNEL_MVP.md</code>).",
+      future: "Full story-row catalog (~50 SKUs), stranger wear funnel QA, order timeline UI for stewards.",
+    },
+  },
 ];
+
+/** Compact hub rows — micro-features (no full feature page). @see docs/FEATURE_MAP_MAINTENANCE.md */
+const MICRO_FEATURES = [
+  {
+    title: "Device inbox & badge",
+    sub: "Action rows when this tab is visible",
+    href: "/help/#device-shell",
+    icon: "device",
+    iconTone: "trust",
+  },
+  {
+    title: "Status dot",
+    sub: "Trust indicator — tap opens hub",
+    href: "/help/#device-shell",
+    icon: "shield",
+    iconTone: "green",
+  },
+  {
+    title: "Cross-tab keys notice",
+    sub: "Signing keys open in another tab",
+    href: "/help/#device-shell",
+    icon: "key",
+    iconTone: "blue",
+  },
+  {
+    title: "Browser alerts",
+    sub: "Opt-in · live proof only when tab hidden",
+    href: "/help/#device-shell",
+    icon: "lock",
+    iconTone: "red",
+  },
+  {
+    title: "Resolver tab sync",
+    sub: "Share network checks on homepage",
+    href: "/help/#device-shell",
+    icon: "link",
+    iconTone: "blue",
+  },
+  {
+    title: "Add to Home Screen",
+    sub: "PWA for steward shell pages",
+    href: "/help/#device-shell",
+    icon: "device",
+    iconTone: "trust",
+  },
+];
+
+const PROTOCOL_PHASES = new Set(["0", "0.5", "1", "2", "3", "4", "5", "6", "7", "9"]);
+const SITE_SLUGS = ["device-hub", "studio-blog"];
+const COMMERCE_SLUGS = ["merch-funnel", "artifact-intent"];
 
 function esc(s) {
   return s;
@@ -348,6 +416,19 @@ function renderFeaturePage(f, i) {
 </html>`;
 }
 
+function hubLinkRow({ href, title, sub, icon, iconTone, badgeHtml = "" }) {
+  return `<li class="list-row list-action">
+              <a href="${href}">
+                <span class="list-icon list-icon-tone-${iconTone}" aria-hidden="true">${ICONS[icon]}</span>
+                <span class="list-content">
+                  <span class="list-title">${title}</span>
+                  <span class="list-sub">${badgeHtml}${sub}</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </a>
+            </li>`;
+}
+
 function hubRow(f) {
   const badge =
     f.badge === "partial"
@@ -366,9 +447,10 @@ function hubRow(f) {
 }
 
 function renderHub() {
-  const protocolPhases = new Set(["0", "0.5", "1", "2", "3", "4", "5", "6", "7", "8", "9"]);
-  const protocol = FEATURES.filter((f) => protocolPhases.has(f.phase));
-  const site = FEATURES.filter((f) => !protocolPhases.has(f.phase));
+  const protocol = FEATURES.filter((f) => PROTOCOL_PHASES.has(f.phase));
+  const site = FEATURES.filter((f) => SITE_SLUGS.includes(f.slug));
+  const commerce = FEATURES.filter((f) => COMMERCE_SLUGS.includes(f.slug));
+  const microRows = MICRO_FEATURES.map((m) => hubLinkRow(m)).join("\n");
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -401,6 +483,27 @@ function renderHub() {
           <h2 class="group-label">Site &amp; returning users</h2>
           <ul class="list">
             ${site.map(hubRow).join("\n")}
+            ${hubLinkRow({
+              href: "/help/",
+              title: "Help center",
+              sub: "Ownership, hub, wallet, device shell",
+              icon: "book",
+              iconTone: "blue",
+              badgeHtml: `<span class="ship-badge ship-badge-live">Live</span> `,
+            })}
+          </ul>
+        </section>
+        <section class="group">
+          <h2 class="group-label">Device shell details</h2>
+          <p class="hero-line">Shipped steward UX — summarized here; full guides on <a href="/help/#device-shell">/help/</a>.</p>
+          <ul class="list list-compact">
+            ${microRows}
+          </ul>
+        </section>
+        <section class="group">
+          <h2 class="group-label">Commerce &amp; belonging</h2>
+          <ul class="list">
+            ${commerce.map(hubRow).join("\n")}
           </ul>
         </section>
         <section class="group">
