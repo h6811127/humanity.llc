@@ -366,6 +366,17 @@ Automated: `npm run e2e:wallet-scale-guardrail` (W1–W3).
 
 Automated: `npm run e2e:key-loss-sad-path` · `npm run worker:test:key-loss-copy`.
 
+### P1-HOSTED-BR · Billing checkout return (O1–O2)
+
+**Refs:** [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.md) · [`HOSTED_TIER_G0_READINESS.md`](HOSTED_TIER_G0_READINESS.md).
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Land on `/wallet/?hc_account_id=acc_…` with **no** signing keys in tab | Hub shows billing-pending line; `hc_steward_pending_account_id` set |
+| 2 | Load keys (wallet entry / activate) | Session link retries; pending cleared; `hc_account_id` stripped from URL |
+
+Automated: `npm run e2e:hosted-tier-billing-return` · `npm run worker:test:hosted-billing-return`.
+
 ### P1-HH · Hub header simplification (Home / Close / Create)
 
 **Spec:** [`HUB_HEADER_SIMPLIFICATION.md`](HUB_HEADER_SIMPLIFICATION.md) · visual refresh: [`HUB_SHEET_VISUAL_REFRESH.md`](HUB_SHEET_VISUAL_REFRESH.md)
