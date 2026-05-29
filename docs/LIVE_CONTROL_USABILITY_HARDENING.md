@@ -1,6 +1,6 @@
 # Live control usability hardening
 
-**Status:** In progress — Slice A shipped (H-01–H-03); Slice B shipped (H-04–H-06); Slice C shipped (H-07–H-08); Slice D shipped (H-09–H-10)  
+**Status:** In progress — Slice A shipped (H-01–H-03); Slice B shipped (H-04–H-06); Slice C shipped (H-07–H-08); Slice D shipped (H-09–H-10); Slice E engineering shipped (H-13–H-15); H-11–H-12 human QA pending  
 **Gate:** `docs/M7_LIVE_CONTROL_ALPHA.md` Step 2 · post–production FK repair (`docs/LIVE_PROOF_FAILURE_INVESTIGATION.md`)  
 **Related:** [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md) · [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) · [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) · [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) (plain-language errors)
 
@@ -315,27 +315,33 @@ This document is the **implementation backlog** for hardening live control **usa
 
 ### H-13 — Playwright full-loop E2E
 
+**Status:** Shipped (2026-05-29)
+
 **Problem:** Rollout step 6 uses mocked challenge APIs; production smoke only `POST`s create — not poll-to-proven client behavior.
 
-**Proposed spec:** `e2e/live-control-loop.spec.ts` (name TBD)
+**Proposed spec:** `e2e/live-control-loop.spec.ts`
 
 1. Open scan fixture URL (active card).
 2. Mock or seed challenge `POST` → 201 with `status_url`.
 3. Assert scanner enters waiting state + countdown.
 4. Mock `GET status_url` → `proven` with fresh `proof_expires_at`.
 5. Assert success copy includes *does not prove legal identity*.
-6. Optional: expiry path without sign.
+6. Refresh mid-wait resumes without second ask (H-09).
+7. Expiry shows retry copy (H-10).
 
-**Wire into:** `hosted:rollout:step6` preflight or `e2e:merch-funnel`-style optional gate.
+**Wire into:** `npm run e2e:live-control-loop`
 
 **Acceptance:**
 
-- [ ] Spec runs in CI on Pages dev + local worker.
-- [ ] Fails if scan script removes poll or success markup.
+- [x] Spec runs on Pages dev + mocked challenge API (`npm run e2e:live-control-loop`).
+- [x] Fails if scan script removes poll or success markup.
+- [x] Covers refresh resume and expiry retry paths.
 
 ---
 
 ### H-14 — Refresh `scan-live-control-client.test.ts`
+
+**Status:** Shipped (2026-05-29)
 
 **Problem:** Test expects removed markup (`ownerLink.hidden`, `ownerHint`); diverges from `scan.test.ts`.
 
@@ -345,8 +351,8 @@ This document is the **implementation backlog** for hardening live control **usa
 
 **Acceptance:**
 
-- [ ] `npm run worker:test -- worker/tests/scan-live-control-client.test.ts` passes.
-- [ ] No duplicate coverage that fights `scan.test.ts` — prefer consolidating if redundant.
+- [x] `npm run worker:test -- worker/tests/scan-live-control-client.test.ts` passes.
+- [x] No duplicate coverage that fights `scan.test.ts` — thin HTML guards only.
 
 ---
 
@@ -357,7 +363,7 @@ This document is the **implementation backlog** for hardening live control **usa
 | `smokeProductionLiveControlChallenge` | Shipped | `hosted-rollout-scan-smoke.mjs` step 2/4 |
 | `worker:repair-live-control-challenges-fk` | Shipped | Run after child-object QR rebuild if needed |
 | Child-object rebuild includes `live_control_challenges` | Shipped | `child-object-qr-schema-rebuild.sql` |
-| `PRAGMA foreign_key_check` in health or ops script | **Planned** | Catches FK drift before users do |
+| `PRAGMA foreign_key_check` in health or ops script | **Shipped** | `GET /health` → `foreign_keys: ok \| violation` (503 when violation) |
 | H-01–H-03 in production | **Planned** | Client + server error hardening |
 
 ---
@@ -432,4 +438,6 @@ flowchart TD
 | 2026-05-29 | Slice A shipped: H-01 scan client helpers, H-02 insert error mapping, H-03 poll retry |
 | 2026-05-29 | Slice B shipped: H-04 handoff copy, H-05 same-device banner, H-06 owner QR in challenge JSON |
 | 2026-05-29 | Slice C shipped: H-07 inbox tap-to-sign copy + push schema/ops observability; H-08 owner visibility resume poll |
+| 2026-05-29 | Slice E shipped: H-13 `e2e/live-control-loop.spec.ts` (ask→proven, refresh resume, expiry retry) |
 | 2026-05-29 | Slice D shipped: H-09 sessionStorage resume + H-10 expiry retry UX (`scan-html.ts`, `scan-pass.css`) |
+| 2026-05-29 | Slice E engineering: H-13 `e2e/live-control-loop.spec.ts`, H-14 client test refresh, H-15 health `foreign_keys` gate |

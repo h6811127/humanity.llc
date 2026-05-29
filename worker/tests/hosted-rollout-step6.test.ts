@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -12,11 +12,14 @@ describe("hosted-rollout-step6", () => {
     );
     expect(script).toContain("verify:hosted-g0");
     expect(script).toContain("e2e:steward-hosted");
+    expect(script).toContain("e2e:hosted-tier-billing-return");
     expect(script).toContain("HOSTED_TIER_G0_READINESS.md");
     expect(script).toContain("--preflight");
     expect(script).toContain("runStep6PreflightVitest");
     expect(script).toContain("hosted-rollout-scan-smoke.test.ts");
     expect(script).toContain("schema-ready.test.ts");
+    expect(script).toContain("resolver-health-fk.test.ts");
+    expect(script).toContain("scan-live-control-client.test.ts");
   });
 
   it("package.json exposes hosted:rollout:step6", () => {
@@ -28,5 +31,16 @@ describe("hosted-rollout-step6", () => {
     const pkg = JSON.parse(readFileSync(join(repoRoot, "package.json"), "utf8"));
     expect(pkg.scripts["verify:hosted-g0"]).toContain("worker:test:hosted-free-tier");
     expect(pkg.scripts["e2e:steward-hosted"]).toContain("e2e:hosted-tier");
+    expect(pkg.scripts["e2e:steward-hosted"]).toContain("e2e:hosted-tier-billing-return");
+  });
+
+  it("billing checkout return E2E spec is present", () => {
+    expect(
+      existsSync(join(repoRoot, "e2e/hosted-tier-billing-return.spec.ts"))
+    ).toBe(true);
+  });
+
+  it("live control loop E2E spec is present", () => {
+    expect(existsSync(join(repoRoot, "e2e/live-control-loop.spec.ts"))).toBe(true);
   });
 });

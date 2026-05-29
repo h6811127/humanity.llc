@@ -27,7 +27,7 @@ Use it when prioritizing hardening before launch surfaces (live proof in person,
 | Automated matrix S1–S9 | **Wired** (e2e + vitest) | Same doc § Recommended test matrix |
 | Generic create → scan → revoke (strangers) | **Passed** 2026-05-27 | [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) |
 | Live proof infra errors (1101, poll retry) | **Shipped** H-01–H-03 | [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) |
-| Live proof in-person handoff | **H-04–H-10 shipped** (scanner recovery H-09/H-10: 2026-05-29); H-11–H-13 human QA + E2E open | [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) |
+| Live proof in-person handoff | **H-04–H-10 shipped** (scanner recovery H-09/H-10: 2026-05-29); **H-13–H-15 engineering shipped** (2026-05-29); H-11–H-12 human QA open | [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) |
 | Merch checkout sad paths | **Mostly untested** with real money | [`V1_ASSUMPTION_REGISTER.md`](V1_ASSUMPTION_REGISTER.md) A-001–A-004 |
 | Large wallet / power user | **Mitigated** Phases 7–9; still out of spec at ~10+ roots | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Open issues |
 | Social / trust misunderstanding | **Copy exists**; comprehension not fully re-run | [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) |
@@ -66,9 +66,9 @@ Agents are strong at **systematic enumeration** against docs and code. Humans an
 | **H-09** | **Scan refresh mid-wait** | Scanner refreshes during wait | Must re-ask even if challenge pending |
 | **H-10** | **Expiry retry affordance** | Challenge window ends | Stranger does not notice they can ask again |
 | H-11–H-12 | Comprehension + printed QA | Unscripted strangers | Copy guards pass; meaning unverified |
-| H-13 | Full-loop Playwright E2E | CI regression | Poll→proven client path not fully gated |
+| H-13 | Full-loop Playwright E2E | **Shipped** — `npm run e2e:live-control-loop` | Poll→proven + refresh resume + expiry retry |
 
-**Engineering next step (Slice E):** H-11 / H-12 human comprehension runbooks; H-13 full-loop Playwright E2E — see [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) § P2.
+**Engineering next step (Slice E):** H-11 / H-12 human comprehension + printed QA runbooks — see [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) § P2.
 
 ### 2. Key custody and continuity (by design, still sad)
 
@@ -163,7 +163,7 @@ No unit test fully catches **acting** on a misunderstanding.
 | **P1** | Merch checkout | Sad-path matrix before `checkout_open: true` | Engineering + Ops |
 | **P2** | Large wallet guardrails | Soft cap UX when ≥10 saved roots | Shell |
 | **P2** | Scan URL hints | “Add `?q=qr_…`” vs “profile not found” | Resolver copy |
-| **P2** | H-13 full-loop E2E | `e2e/live-control-loop.spec.ts` in rollout gate | Engineering |
+| **P2** | H-13 full-loop E2E | `e2e/live-control-loop.spec.ts` | **Shipped** 2026-05-29 |
 
 ---
 
@@ -180,8 +180,9 @@ No unit test fully catches **acting** on a misunderstanding.
 | S7 | Live proof without owner keys | Same + `worker/tests/created-live-primary-cta.test.ts` |
 | S8 | Hub vs resolver `scan.kind` | `e2e/device-os-wallet.spec.ts` · `worker:test:card-disabled-since-visit` |
 | S9 | Valid create → `/created/` with keys | `e2e/create-form-submit.spec.ts` |
-| **S10** | **Scan refresh resumes live proof wait (H-09)** | `worker/tests/scan.test.ts` |
-| **S11** | **Challenge expiry shows retry copy (H-10)** | `worker/tests/scan.test.ts` |
+| **S10** | **Scan refresh resumes live proof wait (H-09)** | `worker/tests/scan.test.ts` · `e2e/live-control-loop.spec.ts` |
+| **S11** | **Challenge expiry shows retry copy (H-10)** | `worker/tests/scan.test.ts` · `e2e/live-control-loop.spec.ts` |
+| **S12** | **Full live proof loop ask → proven (H-13)** | `e2e/live-control-loop.spec.ts` |
 
 Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) § Recommended test matrix.
 
@@ -197,6 +198,7 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 | **P1-LC-REF · Scan refresh resume (H-09)** | Same |
 | **P1-LC-EX · Expiry retry (H-10)** | Same |
 | P1-LCP · Printed camera QA | Same |
+| P1-LC-E2E · Live control loop (H-13) | `npm run e2e:live-control-loop` |
 
 ---
 
@@ -204,4 +206,5 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 
 | Date | Notes |
 |------|-------|
+| 2026-05-29 | Slice E shipped: H-13 `e2e/live-control-loop.spec.ts` |
 | 2026-05-29 | Initial inventory from sad-path review; Slice D (H-09, H-10) shipped |

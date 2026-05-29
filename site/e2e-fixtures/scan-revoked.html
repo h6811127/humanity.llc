@@ -986,6 +986,59 @@ a {
   color: var(--black);
 }
 
+.live-control-owner-handoff {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--black);
+}
+
+.live-control-same-device-banner {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(88, 86, 214, 0.28);
+  background: rgba(88, 86, 214, 0.08);
+}
+
+.live-control-same-device-copy {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--black);
+}
+
+.live-control-same-device-link {
+  color: var(--black);
+  font-weight: 600;
+}
+
+.live-control-owner-qr-wrap {
+  margin: 0 0 12px;
+  text-align: center;
+}
+
+.live-control-owner-qr-label {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--grey);
+}
+
+.live-control-owner-qr-slot svg {
+  display: block;
+  width: 132px;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+@media (max-width: 360px) {
+  .live-control-owner-qr-wrap {
+    display: none;
+  }
+}
+
 .live-control-owner-actions {
   display: flex;
   flex-direction: column;
@@ -1018,6 +1071,35 @@ a {
   display: block;
   width: 100%;
   padding: 0 !important;
+}
+
+.live-control-in-person-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.live-control-scanner-pane {
+  min-width: 0;
+}
+
+.live-control-in-person-layout.is-owner-waiting .live-control-owner-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 640px) {
+  .live-control-in-person-layout.is-owner-waiting {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 14px;
+    align-items: stretch;
+  }
+
+  .live-control-in-person-layout.is-owner-waiting .live-control-owner-panel {
+    margin-top: 0;
+    justify-content: space-between;
+  }
 }
 
 .list-row.live-control-row {
@@ -1109,6 +1191,15 @@ a {
   background: rgba(219, 27, 67, 0.06);
 }
 
+.live-control-status-panel.is-request-expired {
+  border-color: rgba(219, 27, 67, 0.35);
+  background: rgba(219, 27, 67, 0.1);
+}
+
+.live-control-row.is-request-expired .live-control-cta {
+  box-shadow: 0 0 0 2px rgba(219, 27, 67, 0.28);
+}
+
 .live-control-status {
   margin: 0;
   font-size: 14px;
@@ -1158,6 +1249,19 @@ a {
   line-height: 1.35;
   font-variant-numeric: tabular-nums;
   color: #248a3d;
+}
+
+.live-control-proof-countdown {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+  color: var(--grey);
+}
+
+.live-control-proof-countdown[hidden] {
+  display: none;
 }
 
 .live-control-cta-secondary {
@@ -1428,6 +1532,147 @@ a {
   color: var(--black);
 }
 
+.scan-object-streams {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.scan-object-stream {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(60, 60, 67, 0.06);
+  border: 0.5px solid rgba(60, 60, 67, 0.1);
+}
+
+.scan-object-stream-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(60, 60, 67, 0.62);
+}
+
+.scan-object-stream-value {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--black);
+}
+
+.scan-object-streams-limit {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(60, 60, 67, 0.62);
+}
+
+.scan-public-snapshot {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(60, 60, 67, 0.06);
+  border: 0.5px solid rgba(60, 60, 67, 0.1);
+}
+
+.scan-public-snapshot-label {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(60, 60, 67, 0.62);
+}
+
+.scan-public-snapshot-text {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--black);
+}
+
+.scan-public-snapshot-limit {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(60, 60, 67, 0.62);
+}
+
+.scan-ai-explain-btn {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 10px;
+  padding: 8px 14px;
+  border: 0.5px solid rgba(60, 60, 67, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--black);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.scan-ai-explain-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.scan-ai-explain-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.scan-ai-explain-panel {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 149, 0, 0.08);
+  border: 0.5px dashed rgba(255, 149, 0, 0.45);
+}
+
+.scan-ai-explain-panel--visible {
+  animation: scan-ai-explain-in 220ms ease-out;
+}
+
+.scan-ai-explain-label {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(180, 83, 9, 0.88);
+}
+
+.scan-ai-explain-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--black);
+}
+
+.scan-ai-explain-limit {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(60, 60, 67, 0.62);
+}
+
+@keyframes scan-ai-explain-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .scan-hero-steward {
   margin: 4px 0 0;
   font-size: 14px;
@@ -1450,6 +1695,25 @@ a {
   font-size: 12px;
   line-height: 1.4;
   color: rgba(60, 60, 67, 0.55);
+}
+
+.scan-create-hint,
+.scan-merch-hint {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(60, 60, 67, 0.55);
+}
+
+.scan-create-hint a,
+.scan-merch-hint a {
+  color: rgba(0, 122, 255, 0.92);
+  text-decoration: none;
+}
+
+.scan-create-hint a:hover,
+.scan-merch-hint a:hover {
+  text-decoration: underline;
 }
 
 .scan-hero-meta,
@@ -2908,6 +3172,8 @@ html[data-theme="dark"] .scan-hero .scan-hero-steward,
 html[data-theme="dark"] .scan-hero .scan-safety-resolver,
 html[data-theme="dark"] .scan-hero .scan-hero-limit,
 html[data-theme="dark"] .scan-hero .scan-hero-foot,
+html[data-theme="dark"] .scan-hero .scan-create-hint,
+html[data-theme="dark"] .scan-hero .scan-merch-hint,
 html[data-theme="dark"] .scan-hero .scan-safety-first-seen,
 html[data-theme="dark"] .scan-hero .scan-hero-meta,
 html[data-theme="dark"] .scan-hero .scan-hero-sub,
@@ -3225,6 +3491,8 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
   <p class="scan-safety-first-seen" id="scan-safety-first-seen" hidden></p>
   <p class="scan-hero-foot">This is network state for a QR, not proof of who is holding it.</p>
   
+  
+  
 </article>
 </div>
       
@@ -3245,6 +3513,7 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
       <li>That social vouches were honest or complete</li>
       <li>Permanent ownership of a physical item (lifecycle transitions can change state)</li>
       <li>Who scanned, when, or where  -  this page returns object state, not a people trail</li>
+      
       
     </ul>
     <p class="scan-limits-meta">No scan analytics on this page. <a href="http://127.0.0.1:8788/data-policy.html">Operator data policy</a> · <a href="http://127.0.0.1:8788/architecture.html">Architecture</a></p>
@@ -3296,7 +3565,7 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
   <span class="list-icon list-icon-tone-red" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M18 17h3v3h-3z"/><path d="M14 20h3"/></svg></span>
   <span class="list-content">
     <span class="list-title">QR revoked</span>
-    <span class="list-sub">Card-scoped credential</span>
+    <span class="list-sub">Root card-scoped credential</span>
   </span>
 </li>
 <li class="list-row">
@@ -3363,5 +3632,7 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
 </script>
   <script type="module" src="http://127.0.0.1:8788/js/scan-live-check-arrive.mjs?v=1"></script>
   
+  
+  <script type="module" src="http://127.0.0.1:8788/js/scan-merch-funnel.mjs?v=2"></script>
 </body>
 </html>

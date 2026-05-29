@@ -986,6 +986,59 @@ a {
   color: var(--black);
 }
 
+.live-control-owner-handoff {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--black);
+}
+
+.live-control-same-device-banner {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(88, 86, 214, 0.28);
+  background: rgba(88, 86, 214, 0.08);
+}
+
+.live-control-same-device-copy {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--black);
+}
+
+.live-control-same-device-link {
+  color: var(--black);
+  font-weight: 600;
+}
+
+.live-control-owner-qr-wrap {
+  margin: 0 0 12px;
+  text-align: center;
+}
+
+.live-control-owner-qr-label {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--grey);
+}
+
+.live-control-owner-qr-slot svg {
+  display: block;
+  width: 132px;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+@media (max-width: 360px) {
+  .live-control-owner-qr-wrap {
+    display: none;
+  }
+}
+
 .live-control-owner-actions {
   display: flex;
   flex-direction: column;
@@ -1018,6 +1071,35 @@ a {
   display: block;
   width: 100%;
   padding: 0 !important;
+}
+
+.live-control-in-person-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.live-control-scanner-pane {
+  min-width: 0;
+}
+
+.live-control-in-person-layout.is-owner-waiting .live-control-owner-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 640px) {
+  .live-control-in-person-layout.is-owner-waiting {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 14px;
+    align-items: stretch;
+  }
+
+  .live-control-in-person-layout.is-owner-waiting .live-control-owner-panel {
+    margin-top: 0;
+    justify-content: space-between;
+  }
 }
 
 .list-row.live-control-row {
@@ -1109,6 +1191,15 @@ a {
   background: rgba(219, 27, 67, 0.06);
 }
 
+.live-control-status-panel.is-request-expired {
+  border-color: rgba(219, 27, 67, 0.35);
+  background: rgba(219, 27, 67, 0.1);
+}
+
+.live-control-row.is-request-expired .live-control-cta {
+  box-shadow: 0 0 0 2px rgba(219, 27, 67, 0.28);
+}
+
 .live-control-status {
   margin: 0;
   font-size: 14px;
@@ -1158,6 +1249,19 @@ a {
   line-height: 1.35;
   font-variant-numeric: tabular-nums;
   color: #248a3d;
+}
+
+.live-control-proof-countdown {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+  color: var(--grey);
+}
+
+.live-control-proof-countdown[hidden] {
+  display: none;
 }
 
 .live-control-cta-secondary {
@@ -1428,6 +1532,147 @@ a {
   color: var(--black);
 }
 
+.scan-object-streams {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.scan-object-stream {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(60, 60, 67, 0.06);
+  border: 0.5px solid rgba(60, 60, 67, 0.1);
+}
+
+.scan-object-stream-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(60, 60, 67, 0.62);
+}
+
+.scan-object-stream-value {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--black);
+}
+
+.scan-object-streams-limit {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(60, 60, 67, 0.62);
+}
+
+.scan-public-snapshot {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(60, 60, 67, 0.06);
+  border: 0.5px solid rgba(60, 60, 67, 0.1);
+}
+
+.scan-public-snapshot-label {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(60, 60, 67, 0.62);
+}
+
+.scan-public-snapshot-text {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--black);
+}
+
+.scan-public-snapshot-limit {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(60, 60, 67, 0.62);
+}
+
+.scan-ai-explain-btn {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 10px;
+  padding: 8px 14px;
+  border: 0.5px solid rgba(60, 60, 67, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--black);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.scan-ai-explain-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.scan-ai-explain-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.scan-ai-explain-panel {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 149, 0, 0.08);
+  border: 0.5px dashed rgba(255, 149, 0, 0.45);
+}
+
+.scan-ai-explain-panel--visible {
+  animation: scan-ai-explain-in 220ms ease-out;
+}
+
+.scan-ai-explain-label {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(180, 83, 9, 0.88);
+}
+
+.scan-ai-explain-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--black);
+}
+
+.scan-ai-explain-limit {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(60, 60, 67, 0.62);
+}
+
+@keyframes scan-ai-explain-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .scan-hero-steward {
   margin: 4px 0 0;
   font-size: 14px;
@@ -1450,6 +1695,25 @@ a {
   font-size: 12px;
   line-height: 1.4;
   color: rgba(60, 60, 67, 0.55);
+}
+
+.scan-create-hint,
+.scan-merch-hint {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(60, 60, 67, 0.55);
+}
+
+.scan-create-hint a,
+.scan-merch-hint a {
+  color: rgba(0, 122, 255, 0.92);
+  text-decoration: none;
+}
+
+.scan-create-hint a:hover,
+.scan-merch-hint a:hover {
+  text-decoration: underline;
 }
 
 .scan-hero-meta,
@@ -2908,6 +3172,8 @@ html[data-theme="dark"] .scan-hero .scan-hero-steward,
 html[data-theme="dark"] .scan-hero .scan-safety-resolver,
 html[data-theme="dark"] .scan-hero .scan-hero-limit,
 html[data-theme="dark"] .scan-hero .scan-hero-foot,
+html[data-theme="dark"] .scan-hero .scan-create-hint,
+html[data-theme="dark"] .scan-hero .scan-merch-hint,
 html[data-theme="dark"] .scan-hero .scan-safety-first-seen,
 html[data-theme="dark"] .scan-hero .scan-hero-meta,
 html[data-theme="dark"] .scan-hero .scan-hero-sub,
@@ -3227,9 +3493,11 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
 </details>
   <p class="scan-safety-first-seen" id="scan-safety-first-seen" hidden></p>
   <p class="scan-hero-foot">Scan shows current card state at scan time.</p>
+  
+  
   <details class="scan-hero-qr-details">
   <summary class="scan-hero-qr-summary">This QR</summary>
-  <div class="scan-hero-qr pass-qr scan-status-qr" id="pass-qr-slot" data-scan-url="http://127.0.0.1:8788/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5"><div class="hc-qr-frame pass-qr-svg" role="img" aria-label="QR code for this Humanity live object scan link"><svg class="hc-qr-frame-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 91.5" role="presentation" aria-hidden="true"><rect width="60" height="91.5" rx="3" fill="#ffffff"/><rect x="1.275" y="1.275" width="57.45" height="88.95" rx="2.475" fill="none" stroke="#db1b43" stroke-width="1.5"/><g transform="translate(5.5 5.5)"><path fill="#ffffff" d="M0 0h49v49H0z"/><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/><defs><mask id="hc-qr-finder-logo-mask-bunxuo3bal" maskUnits="userSpaceOnUse" mask-type="alpha"><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/></mask></defs><g class="hc-qr-finder-logo" aria-hidden="true" mask="url(#hc-qr-finder-logo-mask-bunxuo3bal)"><circle class="hc-qr-finder-logo-outer" cx="5.5" cy="5.5" r="5.145" fill="#c9979f" opacity="0.52"/><circle class="hc-qr-finder-logo-inner" cx="5.5" cy="5.5" r="2.3667" fill="#141414" opacity="0.9"/></g></g><text class="hc-qr-frame-pill-text" x="30" y="62.98" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5.5" font-weight="600" letter-spacing="0.14em" fill="#db1b43">LIVE OBJECT</text><text class="hc-qr-frame-footer-text" x="30" y="75" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5" font-weight="500" fill="#8a8a8a">humanity.llc</text><text class="hc-qr-frame-code-text" x="30" y="85.26" text-anchor="middle" font-family="ui-monospace,monospace" font-size="5" font-weight="600" letter-spacing="0.08em" fill="#db1b43">HC-CWWX-HPK0</text></svg></div><p class="pass-credential-code mono" aria-label="Credential code for print verification">HC-CWWX-HPK0</p></div>
+  <div class="scan-hero-qr pass-qr scan-status-qr" id="pass-qr-slot" data-scan-url="http://127.0.0.1:8788/c/7Xk9mP2nQ4rT6vW8yZ1aB3cD5?q=qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5"><div class="hc-qr-frame pass-qr-svg" role="img" aria-label="QR code for this Humanity live object scan link"><svg class="hc-qr-frame-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 91.5" role="presentation" aria-hidden="true"><rect width="60" height="91.5" rx="3" fill="#ffffff"/><rect x="1.275" y="1.275" width="57.45" height="88.95" rx="2.475" fill="none" stroke="#db1b43" stroke-width="1.5"/><g transform="translate(5.5 5.5)"><path fill="#ffffff" d="M0 0h49v49H0z"/><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/><defs><mask id="hc-qr-finder-logo-mask-0kkujf6e4px" maskUnits="userSpaceOnUse" mask-type="alpha"><path stroke="#db1b43" d="M2 2.5h7m1 0h5m6 0h1m6 0h1m4 0h1m4 0h1m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h5m2 0h1m1 0h4m1 0h1m3 0h1m4 0h1m2 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h1m2 0h2m4 0h1m1 0h3m2 0h2m1 0h3m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m2 0h3m1 0h2m1 0h1m2 0h2m2 0h2m1 0h8m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m3 0h12m3 0h5m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h2m7 0h1m2 0h1m3 0h1m5 0h3m5 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M14 9.5h1m2 0h1m1 0h1m1 0h2m3 0h2m4 0h1m1 0h1m2 0h2M3 10.5h7m1 0h3m2 0h1m2 0h2m1 0h5m1 0h2m1 0h1m1 0h1m2 0h1m1 0h1m2 0h2m3 0h1M5 11.5h3m2 0h6m2 0h1m5 0h1m5 0h1m2 0h3m1 0h3m1 0h1m2 0h1m1 0h1M2 12.5h2m3 0h2m1 0h2m1 0h1m2 0h7m1 0h2m1 0h1m1 0h1m2 0h2m1 0h6m2 0h1M2 13.5h1m2 0h3m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m8 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3M3 14.5h3m1 0h2m1 0h3m3 0h3m3 0h3m2 0h2m1 0h3m2 0h1m3 0h1m1 0h1m1 0h1M3 15.5h1m3 0h1m2 0h2m1 0h2m3 0h1m1 0h2m2 0h1m3 0h4m1 0h3m4 0h7M2 16.5h1m3 0h1m1 0h2m5 0h4m2 0h3m2 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4M2 17.5h3m1 0h1m9 0h1m1 0h2m4 0h3m2 0h6m3 0h1m2 0h2m1 0h3M2 18.5h2m1 0h4m1 0h1m2 0h1m3 0h2m1 0h1m1 0h2m3 0h3m1 0h3m2 0h5m1 0h1m1 0h2M2 19.5h6m6 0h2m6 0h3m1 0h1m2 0h5m2 0h1m2 0h1m1 0h4m1 0h1M8 20.5h1m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m5 0h2M3 21.5h2m1 0h2m3 0h1m1 0h1m1 0h1m1 0h1m1 0h4m2 0h2m5 0h3m3 0h1m2 0h1m2 0h1M3 22.5h2m1 0h5m1 0h1m2 0h2m1 0h2m1 0h7m1 0h1m1 0h3m1 0h8m2 0h1M4 23.5h1m1 0h1m3 0h1m2 0h5m1 0h2m1 0h1m3 0h1m5 0h4m2 0h1m3 0h1m2 0h1M3 24.5h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m3 0h3m1 0h1m1 0h1m1 0h1M2 25.5h2m2 0h1m3 0h1m2 0h1m2 0h7m3 0h2m3 0h2m2 0h1m2 0h1m3 0h3m1 0h1M3 26.5h2m1 0h8m1 0h5m1 0h6m2 0h3m4 0h8m1 0h1M4 27.5h1m1 0h1m2 0h3m1 0h1m2 0h4m5 0h1m2 0h1m1 0h1m3 0h1m2 0h4m3 0h2M5 28.5h1m1 0h2m3 0h1m1 0h2m1 0h1m2 0h1m3 0h2m2 0h1m2 0h1m3 0h2m1 0h2m1 0h1m1 0h4M5 29.5h1m3 0h1m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m1 0h1m2 0h1m1 0h3m1 0h1m3 0h1m4 0h1m1 0h1M8 30.5h1m1 0h2m9 0h6m2 0h2m5 0h1m2 0h1m4 0h2M2 31.5h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h1m4 0h2m9 0h1m2 0h4m1 0h1m1 0h2m1 0h1M2 32.5h2m1 0h1m2 0h1m3 0h1m2 0h1m1 0h1m2 0h1m1 0h3m2 0h2m2 0h1M3 33.5h5m2 0h4m1 0h3m1 0h2m3 0h2m3 0h4m1 0h1m2 0h1m1 0h1m3 0h1M5 34.5h1m1 0h2m3 0h8m3 0h1m1 0h3m1 0h3m1 0h1m3 0h1m1 0h1m5 0h1M2 35.5h2m5 0h1m1 0h1m1 0h1m2 0h9m3 0h1m4 0h2m2 0h2m2 0h1m1 0h2M6 36.5h1m1 0h1m3 0h1m1 0h1m2 0h1m2 0h4m1 0h1m1 0h2m2 0h2m2 0h1m2 0h2m1 0h2M3 37.5h4m3 0h2m1 0h3m4 0h3m2 0h4m3 0h2m2 0h3m2 0h2m1 0h2M2 38.5h1m2 0h2m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h10m3 0h2m1 0h6m1 0h1M10 39.5h1m1 0h2m1 0h1m3 0h1m1 0h2m3 0h3m1 0h5m1 0h3m3 0h1m1 0h1M2 40.5h7m1 0h2m1 0h1m4 0h1m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h2M2 41.5h1m5 0h1m1 0h2m1 0h2m1 0h1m3 0h3m3 0h2m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1M2 42.5h1m1 0h3m1 0h1m1 0h4m1 0h1m3 0h9m3 0h1m1 0h1m2 0h1m1 0h5m2 0h2M2 43.5h1m1 0h3m1 0h1m1 0h1m3 0h2m5 0h3m1 0h1m7 0h2m1 0h1m1 0h1m3 0h1m1 0h1M2 44.5h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h2m4 0h1m2 0h5m2 0h2m2 0h3m4 0h1M2 45.5h1m5 0h1m1 0h1m5 0h1m3 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m3 0h1m2 0h1M2 46.5h7m2 0h1m3 0h1m1 0h2m2 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h4m1 0h1m1 0h1m2 0h1m1 0h1"/></mask></defs><g class="hc-qr-finder-logo" aria-hidden="true" mask="url(#hc-qr-finder-logo-mask-0kkujf6e4px)"><circle class="hc-qr-finder-logo-outer" cx="5.5" cy="5.5" r="5.145" fill="#c9979f" opacity="0.52"/><circle class="hc-qr-finder-logo-inner" cx="5.5" cy="5.5" r="2.3667" fill="#141414" opacity="0.9"/></g></g><text class="hc-qr-frame-pill-text" x="30" y="62.98" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5.5" font-weight="600" letter-spacing="0.14em" fill="#db1b43">LIVE OBJECT</text><text class="hc-qr-frame-footer-text" x="30" y="75" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5" font-weight="500" fill="#8a8a8a">humanity.llc</text><text class="hc-qr-frame-code-text" x="30" y="85.26" text-anchor="middle" font-family="ui-monospace,monospace" font-size="5" font-weight="600" letter-spacing="0.08em" fill="#db1b43">HC-CWWX-HPK0</text></svg></div><p class="pass-credential-code mono" aria-label="Credential code for print verification">HC-CWWX-HPK0</p></div>
 </details>
 </article>
 </div>
@@ -3261,6 +3529,7 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
       <li>That social vouches were honest or complete</li>
       <li>Permanent ownership of a physical item (lifecycle transitions can change state)</li>
       <li>Who scanned, when, or where  -  this page returns object state, not a people trail</li>
+      
       
     </ul>
     <p class="scan-limits-meta">No scan analytics on this page. <a href="http://127.0.0.1:8788/data-policy.html">Operator data policy</a> · <a href="http://127.0.0.1:8788/architecture.html">Architecture</a></p>
@@ -3331,7 +3600,7 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
   <span class="list-icon list-icon-tone-green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M18 17h3v3h-3z"/><path d="M14 20h3"/></svg></span>
   <span class="list-content">
     <span class="list-title">QR active</span>
-    <span class="list-sub">Card-scoped credential</span>
+    <span class="list-sub">Root card-scoped credential</span>
   </span>
 </li>
 <li class="list-row">
@@ -3362,27 +3631,53 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
   <ul class="list">
     <li class="list-row live-control-row" id="live-control-row">
   <span class="list-content live-control-card-wrap">
-    <div class="live-control-card" id="live-control-interactive">
-      <div class="live-control-card-head">
-        <span class="list-icon list-icon-tone-red" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-        <div class="live-control-card-head-text">
-          <span class="live-control-eyebrow">In-person check</span>
-          <span class="live-control-title">Ask owner to prove control</span>
+    <div class="live-control-in-person-layout" id="live-control-in-person-layout">
+      <div class="live-control-card live-control-scanner-pane" id="live-control-interactive">
+        <div class="live-control-card-head">
+          <span class="list-icon list-icon-tone-red" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+          <div class="live-control-card-head-text">
+            <span class="live-control-eyebrow">Scanner</span>
+            <span class="live-control-title">Ask owner to prove control</span>
+          </div>
         </div>
-      </div>
-      <p class="live-control-lead">
-        Ask the owner to prove they hold the signing key for this object  -  right now, on the spot.
-      </p>
-      <button type="button" class="live-control-cta" id="live-control-request">
-        Ask for live proof
-      </button>
-      <div class="live-control-status-panel" id="live-control-status-panel">
-        <p class="live-control-status" id="live-control-status" aria-live="polite">Ready when you are.</p>
+        <p class="live-control-lead">
+          Ask the owner to prove they can respond with control of this object—right now, on the spot.
+        </p>
+        <div class="live-control-same-device-banner" id="live-control-same-device-banner" hidden>
+          <p class="live-control-same-device-copy">
+            You're viewing your own QR on this device. For live proof, open
+            <a class="live-control-same-device-link" id="live-control-same-device-created-link" href="#">My card</a>
+            in another tab or use a second phone. Someone else should scan this code to ask for proof.
+          </p>
+        </div>
+        <button type="button" class="live-control-cta" id="live-control-request">
+          Ask for live proof
+        </button>
+        <div class="live-control-status-panel" id="live-control-status-panel">
+          <p class="live-control-status" id="live-control-status" aria-live="polite">Ready when you are.</p>
+        </div>
+        <button type="button" class="live-control-cta-secondary" id="live-control-poll-retry" hidden>
+          Retry check
+        </button>
       </div>
       <div class="live-control-owner-panel" id="live-control-owner-panel" hidden>
+        <div class="live-control-card-head">
+          <span class="list-icon list-icon-tone-blue" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/><path d="m21 2-9.6 9.6"/><circle cx="7.5" cy="15.5" r="5.5"/></svg></span>
+          <div class="live-control-card-head-text">
+            <span class="live-control-eyebrow">Owner</span>
+            <span class="live-control-title">Prove control on their device</span>
+          </div>
+        </div>
         <p class="live-control-owner-lead">
           Send this to the device that <strong>created the card</strong>. This page waits until they sign.
         </p>
+        <p class="live-control-owner-handoff" id="live-control-owner-handoff">
+          Show this to the card owner. They tap <strong>Prove control now</strong> on a device that has their keys.
+        </p>
+        <div class="live-control-owner-qr-wrap" id="live-control-owner-qr-wrap" hidden>
+          <p class="live-control-owner-qr-label">Owner: scan this to prove control</p>
+          <div class="live-control-owner-qr-slot" id="live-control-owner-qr-slot"></div>
+        </div>
         <div class="live-control-owner-actions">
           <a class="live-control-owner-btn" id="live-control-owner-link" href="#" target="_blank" rel="noopener noreferrer">
             Open on owner device
@@ -3405,8 +3700,9 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
     </div>
   </div>
   <p class="live-control-success-copy">
-    The owner signed with their key. This does not prove legal identity or physical ownership.
+    Control proven moments ago. This does not prove legal identity, vouching, or ownership of the physical object.
   </p>
+  <p class="live-control-proof-countdown" id="live-control-proof-countdown" hidden aria-live="polite"></p>
   <p class="live-control-proven-at" id="live-control-proven-at"></p>
   <button type="button" class="live-control-cta-secondary" id="live-control-request-again">
     Ask again
@@ -3435,12 +3731,10 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
     <div class="hc-emphasis-card__main">
       <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
       <div class="hc-emphasis-card__copy">
-        <p class="hc-emphasis-card__eyebrow">Device signing</p>
-        <p class="hc-emphasis-card__title">Signing key in this tab</p>
+        <p class="hc-emphasis-card__eyebrow">Your control</p>
+        <p class="hc-emphasis-card__title">Checking this tab</p>
         <p class="hc-emphasis-card__detail" id="vouch-explainer-copy">
-          Checking this tab for your card’s signing key. Steward and Vouched Human are network checks—separate from signing.
-          Use <strong>Sign as…</strong> or <a href="http://127.0.0.1:8788/wallet/">Saved cards</a>.
-          Only the signed vouch is sent; your private key stays here.
+          Checking whether you have control of your identity in this tab. Steward and Vouched Human are network checks—separate from attestation. Use <strong>Attest as…</strong> or <a href="http://127.0.0.1:8788/wallet/">My objects</a>. Only the signed attestation is sent; your control stays on this device.
         </p>
       </div>
     </div>
@@ -3503,6 +3797,7 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
   <p class="scan-credential-code">Credential code on print: <strong class="mono">HC-CWWX-HPK0</strong> — compare with the sticker or status JSON.</p>
 </details>
       <footer class="scan-footer">
+  <a class="dock-btn dock-btn-primary" href="http://127.0.0.1:8788/create/">Create a live object</a>
   <a class="dock-btn dock-btn-secondary" href="http://127.0.0.1:8788/">About humanity.llc</a>
   <a class="scan-footer-link" href="http://127.0.0.1:8788/.well-known/hc/v1/cards/7Xk9mP2nQ4rT6vW8yZ1aB3cD5">Public card JSON</a>
 </footer>
@@ -3510,7 +3805,93 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
   </div>
   <script>
 (function () {
+
+  function stripResolverUrlsFromMessage(raw) {
+    var stripped = String(raw || "")
+      .replace(/\s*\(https?:\/\/[^)]+\)/gi, "")
+      .replace(/\s*\([^)]*\.well-known\/[^)]*\)/gi, "")
+      .replace(/^\s*https?:\/\/\S+/gi, "")
+      .replace(/\s+https?:\/\/\S+/gi, "")
+      .trim();
+    if (/^https?:\/\/\S+$/i.test(stripped)) return "";
+    return stripped;
+  }
+  function logResolverRequestFailure(requestUrl, detail) {
+    if (typeof console !== "undefined" && console.warn) {
+      console.warn("[resolver]", requestUrl, detail || {});
+    }
+  }
+  function liveControlUserErrorMessage(payload, options) {
+    options = options || {};
+    var status = options.status;
+    var fallback = options.fallback;
+    var requestUrl = options.requestUrl;
+    var raw =
+      typeof payload === "string"
+        ? payload
+        : String((payload && (payload.message || payload.error)) || "").trim();
+    if (requestUrl) {
+      logResolverRequestFailure(requestUrl, {
+        status: status,
+        error: typeof payload === "object" ? payload && payload.error : undefined,
+        message: raw,
+      });
+    }
+    var stripped = stripResolverUrlsFromMessage(raw);
+    if (stripped) return stripped;
+    if (typeof status === "number" && status >= 500) {
+      return "Could not reach the resolver. Try again in a moment.";
+    }
+    return fallback || "Something went wrong. Try again.";
+  }
+  function parseLiveControlJsonResponse(res) {
+    return res.text().then(function (text) {
+      var body = {};
+      var trimmed = String(text || "").trim();
+      var contentType = (res.headers.get("content-type") || "").toLowerCase();
+      var looksJson =
+        contentType.indexOf("application/json") >= 0 ||
+        trimmed.charAt(0) === "{" ||
+        trimmed.charAt(0) === "[";
+      if (looksJson && trimmed) {
+        try {
+          body = JSON.parse(trimmed);
+        } catch (e) {
+          body = {};
+        }
+      }
+      return { ok: res.ok, status: res.status, body: body, text: text };
+    });
+  }
+  function liveControlChallengeCreateError(result, requestUrl) {
+    var body = result.body || {};
+    logResolverRequestFailure(requestUrl, {
+      status: result.status,
+      error: body.error,
+      message: body.message,
+    });
+    if (body.error === "RESOLVER_SCHEMA") {
+      return "Live proof is temporarily unavailable. Try again shortly.";
+    }
+    if (body.error === "LIVE_CONTROL_UNAVAILABLE") {
+      return (
+        liveControlUserErrorMessage(body, {
+          status: result.status,
+          fallback: "Live proof is not available for this scan right now.",
+        })
+      );
+    }
+    if (result.status >= 500 || /error code:\s*1101/i.test(result.text || "")) {
+      return "Could not create live proof request. Try again in a moment.";
+    }
+    return liveControlUserErrorMessage(body, {
+      status: result.status,
+      fallback: "Could not create live proof request.",
+    });
+  }
+
   var PROOF_TTL_MS = 5 * 60 * 1000;
+  var POLL_FAILURE_MAX = 3;
   var btn = document.getElementById("live-control-request");
   var status = document.getElementById("live-control-status");
   var ownerPanel = document.getElementById("live-control-owner-panel");
@@ -3520,17 +3901,85 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
   var success = document.getElementById("live-control-success");
   var provenAtEl = document.getElementById("live-control-proven-at");
   var provenAgoEl = document.getElementById("live-control-proven-ago");
+  var proofCountdownEl = document.getElementById("live-control-proof-countdown");
   var askAgainBtn = document.getElementById("live-control-request-again");
+  var pollRetryBtn = document.getElementById("live-control-poll-retry");
+  var sameDeviceBanner = document.getElementById("live-control-same-device-banner");
+  var sameDeviceCreatedLink = document.getElementById("live-control-same-device-created-link");
+  var ownerQrWrap = document.getElementById("live-control-owner-qr-wrap");
+  var ownerQrSlot = document.getElementById("live-control-owner-qr-slot");
   var row = document.getElementById("live-control-row");
   var statusPanel = document.getElementById("live-control-status-panel");
   var ownerView = document.getElementById("live-control-owner-view");
   var ownerCopy = document.getElementById("live-control-owner-copy");
   var ownerCreatedLink = document.getElementById("live-control-owner-created-link");
+  var inPersonLayout = document.getElementById("live-control-in-person-layout");
   var profileId = "7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
   var qrId = "qr_7Xk9mP2nQ4rT6vW8yZ1aB3cD5";
+  var challengeUrl = "http://127.0.0.1:8788/.well-known/hc/v1/cards/7Xk9mP2nQ4rT6vW8yZ1aB3cD5/live-control/challenges";
   var pollTimer = null;
   var countdownTimer = null;
+  var proofDisplayCountdownTimer = null;
+  var proofExpiryTimer = null;
   var relativeTimer = null;
+  var activePollUrl = null;
+  var activeChallengeExpiresAt = null;
+  var pollFailureCount = 0;
+  var waitingCountdownPrefix =
+    "Waiting for the owner to tap Prove control on their key-holding device. If nothing happens, ask them to refresh this tab.";
+  function pendingStorageKey() {
+    return "hc_live_control_pending:" + profileId + ":" + qrId;
+  }
+  function readPendingFromStorage() {
+    try {
+      var raw = sessionStorage.getItem(pendingStorageKey());
+      if (!raw) return null;
+      var record = JSON.parse(raw);
+      if (!record || !record.challenge_id || !record.status_url) return null;
+      if (record.expires_at) {
+        var remaining = Date.parse(record.expires_at) - Date.now();
+        if (!Number.isFinite(remaining) || remaining <= 0) {
+          clearPendingStorage();
+          return null;
+        }
+      }
+      return record;
+    } catch (e) {
+      return null;
+    }
+  }
+  function writePendingToStorage(record) {
+    try {
+      sessionStorage.setItem(pendingStorageKey(), JSON.stringify(record));
+    } catch (e) {
+      /* private browsing / quota — degrade to in-memory poll only */
+    }
+  }
+  function clearPendingStorage() {
+    try {
+      sessionStorage.removeItem(pendingStorageKey());
+    } catch (e) {
+      /* ignore */
+    }
+  }
+  function clearRequestExpiredVisual() {
+    if (statusPanel) statusPanel.classList.remove("is-request-expired");
+    if (row) row.classList.remove("is-request-expired");
+  }
+  function showRequestExpiredVisual() {
+    if (statusPanel) {
+      statusPanel.classList.remove("is-waiting");
+      statusPanel.classList.add("is-request-expired");
+    }
+    if (row) row.classList.add("is-request-expired");
+  }
+  function enterWaitingState() {
+    clearRequestExpiredVisual();
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Waiting…";
+    }
+  }
   function isOwnerBrowser() {
     try {
       var raw = sessionStorage.getItem("hc_created");
@@ -3593,9 +4042,47 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
     }
     return null;
   }
-  function showProvenSuccess(provenAt) {
+  function stopProofDisplayCountdown() {
+    if (proofDisplayCountdownTimer) window.clearInterval(proofDisplayCountdownTimer);
+    proofDisplayCountdownTimer = null;
+    if (proofCountdownEl) {
+      proofCountdownEl.hidden = true;
+      proofCountdownEl.textContent = "";
+    }
+  }
+  function startProofDisplayCountdown(proofExpiresAt) {
+    if (!proofCountdownEl || !proofExpiresAt) return;
+    stopProofDisplayCountdown();
+    function tick() {
+      var remaining = Date.parse(proofExpiresAt) - Date.now();
+      if (!Number.isFinite(remaining) || remaining <= 0) {
+        stopProofDisplayCountdown();
+        return;
+      }
+      proofCountdownEl.hidden = false;
+      proofCountdownEl.textContent =
+        "Proof display expires in " + formatRemaining(remaining) + ".";
+    }
+    tick();
+    proofDisplayCountdownTimer = window.setInterval(tick, 1000);
+  }
+  function proofExpiresAtFromProvenAt(provenAt) {
+    if (!provenAt) return null;
+    var provenMs = Date.parse(provenAt);
+    if (!Number.isFinite(provenMs)) return null;
+    return new Date(provenMs + PROOF_TTL_MS).toISOString();
+  }
+  function showProvenSuccess(provenAt, proofExpiresAt) {
     stopPolling();
     stopCountdown();
+    stopProofExpiryTimer();
+    stopProofDisplayCountdown();
+    pollFailureCount = 0;
+    hidePollRetry();
+    clearPendingStorage();
+    clearRequestExpiredVisual();
+    if (ownerPanel) ownerPanel.hidden = true;
+    if (inPersonLayout) inPersonLayout.classList.remove("is-owner-waiting");
     if (interactive) interactive.hidden = true;
     if (success) success.hidden = false;
     if (row) row.classList.add("is-proven");
@@ -3603,11 +4090,21 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
       provenAtEl.textContent = "Proven " + formatProvenAt(provenAt);
     }
     startRelativeTimer(provenAt);
+    var displayExpiresAt = proofExpiresAt || proofExpiresAtFromProvenAt(provenAt);
+    if (displayExpiresAt) startProofDisplayCountdown(displayExpiresAt);
   }
   function resetForNewRequest() {
     stopRelativeTimer();
+    stopProofDisplayCountdown();
+    stopProofExpiryTimer();
     stopPolling();
     stopCountdown();
+    activePollUrl = null;
+    activeChallengeExpiresAt = null;
+    pollFailureCount = 0;
+    hidePollRetry();
+    clearPendingStorage();
+    clearRequestExpiredVisual();
     if (interactive) interactive.hidden = false;
     if (success) success.hidden = true;
     if (row) row.classList.remove("is-proven");
@@ -3617,6 +4114,13 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
     }
     if (status) setStatus("Ready when you are.", false);
     if (ownerPanel) ownerPanel.hidden = true;
+    if (ownerLink) ownerLink.href = "#";
+    clearOwnerQr();
+    if (inPersonLayout) inPersonLayout.classList.remove("is-owner-waiting");
+  }
+  function clearOwnerQr() {
+    if (ownerQrWrap) ownerQrWrap.hidden = true;
+    if (ownerQrSlot) ownerQrSlot.innerHTML = "";
   }
   function wireAskAgain() {
     if (!askAgainBtn) return;
@@ -3624,32 +4128,27 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
       resetForNewRequest();
     });
   }
-  function applyOwnerBrowserLiveControl() {
-    if (!isOwnerBrowser()) return false;
-    stopRelativeTimer();
-    stopPolling();
-    stopCountdown();
-    if (interactive) interactive.hidden = true;
-    if (success) success.hidden = true;
-    if (ownerPanel) ownerPanel.hidden = true;
-    if (row) row.classList.remove("is-proven");
-    if (ownerView) ownerView.hidden = false;
-    if (ownerCreatedLink && profileId && qrId) {
-      ownerCreatedLink.href =
+  function showSameDeviceGuidanceIfNeeded() {
+    if (!isOwnerBrowser()) return;
+    if (sameDeviceBanner) sameDeviceBanner.hidden = false;
+    if (sameDeviceCreatedLink && profileId && qrId) {
+      sameDeviceCreatedLink.href =
         location.origin + "/created/?profile_id=" +
         encodeURIComponent(profileId) + "&qr_id=" + encodeURIComponent(qrId);
     }
-    if (ownerCopy) {
-      var proven = getProvenIso();
-      ownerCopy.textContent = proven
-        ? "Control proven from this device. The scanner should see success on their screen  -  you do not need to ask again here."
-        : "This section is for someone else scanning your QR. When they ask for live proof, open your card page to sign.";
-    }
-    return true;
   }
-  function showOwnerPanel(url) {
+  function showOwnerPanel(url, qrMarkup) {
     if (ownerPanel) ownerPanel.hidden = false;
+    if (inPersonLayout) inPersonLayout.classList.add("is-owner-waiting");
     if (ownerLink) ownerLink.href = url;
+    if (ownerQrWrap && ownerQrSlot) {
+      if (qrMarkup) {
+        ownerQrSlot.innerHTML = qrMarkup;
+        ownerQrWrap.hidden = false;
+      } else {
+        clearOwnerQr();
+      }
+    }
     if (copyOwnerLink) {
       copyOwnerLink.onclick = function () {
         navigator.clipboard.writeText(url).then(function () {
@@ -3670,6 +4169,37 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
       statusPanel.classList.toggle("is-waiting", !!waiting);
     }
   }
+  function hidePollRetry() {
+    if (pollRetryBtn) pollRetryBtn.hidden = true;
+  }
+  function showPollRetry() {
+    stopCountdown();
+    setStatus("Having trouble checking proof status. Tap to retry.", false);
+    if (pollRetryBtn) pollRetryBtn.hidden = false;
+  }
+  function recordPollFailure() {
+    pollFailureCount += 1;
+    if (pollFailureCount >= POLL_FAILURE_MAX) {
+      showPollRetry();
+    }
+  }
+  function resumePoll() {
+    pollFailureCount = 0;
+    hidePollRetry();
+    if (!activePollUrl) return;
+    if (activeChallengeExpiresAt) {
+      startCountdown(activeChallengeExpiresAt, waitingCountdownPrefix);
+    } else {
+      setStatus("Waiting for the owner to sign…", true);
+    }
+    poll(activePollUrl);
+  }
+  function wirePollRetry() {
+    if (!pollRetryBtn) return;
+    pollRetryBtn.addEventListener("click", function () {
+      resumePoll();
+    });
+  }
   function stopPolling() {
     if (pollTimer) window.clearInterval(pollTimer);
     pollTimer = null;
@@ -3677,6 +4207,73 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
   function stopCountdown() {
     if (countdownTimer) window.clearInterval(countdownTimer);
     countdownTimer = null;
+  }
+  function stopProofExpiryTimer() {
+    if (proofExpiryTimer) window.clearTimeout(proofExpiryTimer);
+    proofExpiryTimer = null;
+  }
+  function showRequestExpired() {
+    stopPolling();
+    stopCountdown();
+    stopProofDisplayCountdown();
+    stopProofExpiryTimer();
+    stopRelativeTimer();
+    activePollUrl = null;
+    activeChallengeExpiresAt = null;
+    pollFailureCount = 0;
+    hidePollRetry();
+    clearPendingStorage();
+    if (ownerPanel) ownerPanel.hidden = true;
+    clearOwnerQr();
+    if (interactive) interactive.hidden = false;
+    if (success) success.hidden = true;
+    if (row) row.classList.remove("is-proven");
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Ask for live proof";
+    }
+    showRequestExpiredVisual();
+    setStatus("The 2-minute window ended. You can ask again.", false);
+    if (inPersonLayout) inPersonLayout.classList.remove("is-owner-waiting");
+  }
+  function showProofExpired() {
+    stopPolling();
+    stopCountdown();
+    stopProofDisplayCountdown();
+    stopProofExpiryTimer();
+    stopRelativeTimer();
+    activePollUrl = null;
+    activeChallengeExpiresAt = null;
+    pollFailureCount = 0;
+    hidePollRetry();
+    clearPendingStorage();
+    clearRequestExpiredVisual();
+    if (interactive) interactive.hidden = false;
+    if (success) success.hidden = true;
+    if (row) row.classList.remove("is-proven");
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Ask for live proof";
+    }
+    setStatus("Live proof expired. Ask again to prove control now.", false);
+    if (inPersonLayout) inPersonLayout.classList.remove("is-owner-waiting");
+  }
+  function freshProofMs(body) {
+    if (body.status !== "proven" || !body.proof_expires_at) return null;
+    var proofExpiresAt = Date.parse(body.proof_expires_at);
+    if (!Number.isFinite(proofExpiresAt)) return null;
+    var remaining = proofExpiresAt - Date.now();
+    return remaining > 0 ? remaining : null;
+  }
+  function showProven(body) {
+    var remaining = freshProofMs(body);
+    if (remaining === null) {
+      showProofExpired();
+      return;
+    }
+    stopProofExpiryTimer();
+    showProvenSuccess(body.proven_at, body.proof_expires_at);
+    proofExpiryTimer = window.setTimeout(showProofExpired, remaining);
   }
   function formatRemaining(ms) {
     var total = Math.max(0, Math.ceil(ms / 1000));
@@ -3689,12 +4286,7 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
     function tick() {
       var remaining = Date.parse(expiresAt) - Date.now();
       if (!Number.isFinite(remaining) || remaining <= 0) {
-        stopCountdown();
-        setStatus("Control was not proven. The request expired.", false);
-        if (btn) {
-          btn.disabled = false;
-          btn.textContent = "Ask for live proof";
-        }
+        showRequestExpired();
         return;
       }
       setStatus(prefix + " Expires in " + formatRemaining(remaining) + ".", true);
@@ -3703,24 +4295,32 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
     countdownTimer = window.setInterval(tick, 1000);
   }
   function poll(url) {
+    activePollUrl = url;
+    pollFailureCount = 0;
+    hidePollRetry();
     stopPolling();
     pollTimer = window.setInterval(function () {
       fetch(url, { cache: "no-store" })
-        .then(function (res) { return res.json(); })
-        .then(function (body) {
+        .then(function (res) {
+          return parseLiveControlJsonResponse(res);
+        })
+        .then(function (result) {
+          if (!result.ok) {
+            recordPollFailure();
+            return;
+          }
+          pollFailureCount = 0;
+          hidePollRetry();
+          var body = result.body;
           if (body.status === "proven") {
-            showProvenSuccess(body.proven_at);
+            showProven(body);
           } else if (body.status === "expired") {
-            stopPolling();
-            stopCountdown();
-            if (btn) {
-              btn.disabled = false;
-              btn.textContent = "Ask for live proof";
-            }
-            setStatus("Control was not proven. The request expired.", false);
+            showRequestExpired();
           }
         })
-        .catch(function () {});
+        .catch(function () {
+          recordPollFailure();
+        });
     }, 2000);
   }
   function statusUrlForChallenge(id) {
@@ -3728,45 +4328,103 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
       encodeURIComponent("7Xk9mP2nQ4rT6vW8yZ1aB3cD5") +
       "/live-control/challenges/" + encodeURIComponent(id);
   }
+  function handlePendingChallengeBody(body, statusUrl) {
+    if (body.status === "proven") {
+      showProven(body);
+      return;
+    }
+    if (body.status === "expired") {
+      showRequestExpired();
+      return;
+    }
+    enterWaitingState();
+    activeChallengeExpiresAt = body.expires_at || null;
+    if (body.expires_at) {
+      startCountdown(body.expires_at, waitingCountdownPrefix);
+    } else {
+      setStatus("Waiting for the owner to sign…", true);
+    }
+    if (body.owner_url) {
+      showOwnerPanel(body.owner_url, body.owner_qr_markup);
+    }
+    poll(statusUrl);
+  }
   function checkExistingProof() {
     var params = new URLSearchParams(location.search);
     var id = params.get("live_challenge");
-    if (!id) return;
+    var statusUrl = null;
+    var stored = null;
+    if (id) {
+      statusUrl = statusUrlForChallenge(id);
+    } else {
+      stored = readPendingFromStorage();
+      if (!stored) return;
+      id = stored.challenge_id;
+      statusUrl = stored.status_url || statusUrlForChallenge(id);
+    }
     setStatus("Checking live proof…", true);
-    fetch(statusUrlForChallenge(id), { cache: "no-store" })
-      .then(function (res) { return res.json(); })
-      .then(function (body) {
-        if (body.status === "proven") {
-          showProvenSuccess(body.proven_at);
-        } else if (body.status === "expired") {
-          if (btn) btn.textContent = "Ask for live proof";
-          setStatus("Control was not proven. The request expired.", false);
-        } else {
-          if (body.expires_at) {
-            startCountdown(body.expires_at, "Waiting for the owner to sign…");
-          } else {
-            setStatus("Waiting for the owner to sign…", true);
-          }
-          if (body.owner_url) showOwnerPanel(body.owner_url);
-          poll(statusUrlForChallenge(id));
+    fetch(statusUrl, { cache: "no-store" })
+      .then(function (res) {
+        return parseLiveControlJsonResponse(res);
+      })
+      .then(function (result) {
+        if (!result.ok) {
+          if (stored) clearPendingStorage();
+          setStatus(
+            liveControlUserErrorMessage(result.body, {
+              status: result.status,
+              requestUrl: statusUrl,
+              fallback: "Could not check live proof.",
+            }),
+            false
+          );
+          return;
         }
+        var body = result.body;
+        if (body.status === "pending" && stored && stored.owner_url && !body.owner_url) {
+          body.owner_url = stored.owner_url;
+          body.owner_qr_markup = stored.owner_qr_markup;
+        }
+        handlePendingChallengeBody(body, statusUrl);
       })
       .catch(function () {
+        if (stored) clearPendingStorage();
         setStatus("Could not check live proof.", false);
       });
   }
-  if (applyOwnerBrowserLiveControl()) return;
+  showSameDeviceGuidanceIfNeeded();
   wireAskAgain();
+  wirePollRetry();
   var initialProven = getProvenIso();
   if (success && !success.hidden && initialProven) {
-    startRelativeTimer(initialProven);
+    var initialProofExpiresAt = proofExpiresAtFromProvenAt(initialProven);
+    var initialProofRemaining = initialProofExpiresAt
+      ? Date.parse(initialProofExpiresAt) - Date.now()
+      : null;
+    if (initialProofRemaining !== null && initialProofRemaining > 0) {
+      startRelativeTimer(initialProven);
+      startProofDisplayCountdown(initialProofExpiresAt);
+      proofExpiryTimer = window.setTimeout(showProofExpired, initialProofRemaining);
+    } else {
+      showProofExpired();
+    }
   }
   if (!btn || !status) return;
   btn.addEventListener("click", function () {
     btn.disabled = true;
     btn.textContent = "Waiting…";
+    stopPolling();
+    stopProofExpiryTimer();
+    stopProofDisplayCountdown();
+    activePollUrl = null;
+    activeChallengeExpiresAt = null;
+    pollFailureCount = 0;
+    hidePollRetry();
+    if (ownerPanel) ownerPanel.hidden = true;
+    if (ownerLink) ownerLink.href = "#";
+    if (inPersonLayout) inPersonLayout.classList.remove("is-owner-waiting");
     setStatus("Creating a live proof request…", true);
-    fetch("http://127.0.0.1:8788/.well-known/hc/v1/cards/7Xk9mP2nQ4rT6vW8yZ1aB3cD5/live-control/challenges", {
+    fetch(challengeUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -3774,17 +4432,30 @@ html[data-theme="dark"] .hc-emphasis-card__cta--secondary {
         client_origin: location.origin
       })
     })
-      .then(function (res) { return res.json().then(function (body) { return { ok: res.ok, body: body }; }); })
+      .then(function (res) {
+        return parseLiveControlJsonResponse(res);
+      })
       .then(function (result) {
-        if (!result.ok) throw new Error(result.body.message || result.body.error || "Could not create live proof request.");
-        if (result.body.owner_url) {
-          showOwnerPanel(result.body.owner_url);
+        if (!result.ok) {
+          throw new Error(liveControlChallengeCreateError(result, challengeUrl));
         }
-        startCountdown(
-          result.body.expires_at,
-          "Waiting for the owner to tap Prove control on their key-holding device. If nothing happens, ask them to refresh this tab."
-        );
-        poll(result.body.status_url);
+        var body = result.body;
+        if (body.owner_url) {
+          showOwnerPanel(body.owner_url, body.owner_qr_markup);
+        }
+        if (body.challenge_id && body.status_url) {
+          writePendingToStorage({
+            challenge_id: body.challenge_id,
+            status_url: body.status_url,
+            expires_at: body.expires_at || null,
+            owner_url: body.owner_url || null,
+            owner_qr_markup: body.owner_qr_markup || null,
+          });
+        }
+        activeChallengeExpiresAt = body.expires_at || null;
+        enterWaitingState();
+        startCountdown(body.expires_at, waitingCountdownPrefix);
+        poll(body.status_url);
       })
       .catch(function (err) {
         stopCountdown();
@@ -3845,5 +4516,7 @@ if (slot && !slot.querySelector("svg") && slot.dataset.scanUrl) {
 </script>
   <script type="module" src="http://127.0.0.1:8788/js/scan-live-check-arrive.mjs?v=1"></script>
   <script type="module" src="http://127.0.0.1:8788/js/scan-actor-band.mjs?v=1"></script>
+  
+  <script type="module" src="http://127.0.0.1:8788/js/scan-merch-funnel.mjs?v=2"></script>
 </body>
 </html>
