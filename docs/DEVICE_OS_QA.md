@@ -389,9 +389,9 @@ Automated: `e2e/device-status-dot.spec.ts` § hub sheet header chrome (steps 6�
 
 Automated (Phase 0+): `npm run worker:test:pwa-install` · Phase 3–4: `npm run e2e:pwa-install` (steps 2, 8–11 + no-SW policy in CI). **Manual HTTPS sign-off:** iOS Safari 2026-05-28 ✅ (steps 1–2, 5–6, 9–10, P0-W, standalone wallet). Re-verify icon after Phase 4.1 deploy (`site:generate-pwa-icons` + Pages).
 
-### P1-PWA-R · PWA standalone refresh (Phases 6–8)
+### P1-PWA-R · PWA standalone refresh (Phases 6–9)
 
-**Spec:** [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume · **Implementation:** [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md) Phases 6–8
+**Spec:** [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume · **Implementation:** [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md) Phases 6–9
 
 **Prerequisites:** Installed PWA (standalone) with ≥1 saved card. Phase 6+ refresh modules shipped.
 
@@ -407,6 +407,8 @@ Automated (Phase 0+): `npm run worker:test:pwa-install` · Phase 3–4: `npm run
 | 8 | **Watch for live proof** off · pull to refresh | Chrome + chips still update; live-control poll does not run |
 | 9 | Deploy newer Pages build · open old standalone session (Phase 8) | Stale shell banner appears; tap reload loads new shell; dot healthy (**P0-3**) |
 | 10 | `/create/` or scan URL in standalone (if navigated there) | **No** PTR chrome |
+| 11 | Standalone on `/` or `/wallet/` · hub glance **Refresh** row (Phase 9) | Tap runs soft refresh; “Updated” indicator; works even when hub sheet open |
+| 12 | First standalone session (Phase 9) | One-time PTR tip visible; **Got it** dismisses; does not return on next open |
 
 **Fail signals:** Standalone user must kill app to see card status change; pull triggers 10+ unscoped status GETs; PTR fires during hub sheet drag; auto `location.reload()` on every resume; refresh module on status graph breaks dot (**P0-3**).
 

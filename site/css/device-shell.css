@@ -2877,3 +2877,21 @@ body.device-shell-created #created-setup-back[hidden] {
 .device-pwa-stale-shell-banner.hc-emphasis-card {
   margin: 8px var(--pad) 0;
 }
+
+.device-pwa-ptr-tip.hc-emphasis-card {
+  margin: 8px var(--pad) 0;
+}
+
+.device-pwa-refresh-row-wrap {
+  margin: 0 var(--pad) 12px;
+}
+
+.device-pwa-refresh-row-wrap .device-hub-glance-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.device-hub-glance-row--refresh .device-hub-glance-title {
+  color: var(--surface-popover-accent, var(--red, #db1b43));
+}

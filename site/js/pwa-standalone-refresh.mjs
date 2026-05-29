@@ -1,12 +1,13 @@
 /**
  * Standalone PWA soft refresh on resume + pull-to-refresh + stale shell nudge.
- * @see docs/PWA_INSTALL.md § Standalone refresh & resume — Phases 6–8
+ * @see docs/PWA_INSTALL.md § Standalone refresh & resume — Phases 6–9
  */
 
 import { SITE_BUILD_META } from "./build-meta.mjs";
 import { refreshDeviceChrome } from "./device-chrome-refresh.mjs";
 import { fetchResolverHealthBuild } from "./device-network-health.mjs";
 import { refreshDeviceHub } from "./device-hub-ui.mjs";
+import { getWalletCount } from "./device-wallet.mjs";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import {
   clampPullToRefreshDistance,
@@ -17,14 +18,24 @@ import {
   pullToRefreshShouldCommit,
   PTR_THRESHOLD_PX,
   PTR_UPDATED_HIDE_MS,
+  PWA_PTR_TIP_ID,
+  PWA_REFRESH_ROW_ID,
+  readPtrTipDismissed,
   readStandaloneModeFromWindow,
   readStaleShellDismissedForSha,
   runStandaloneSoftRefreshPipeline,
+  shouldShowStandalonePtrTip,
+  shouldShowStandaloneRefreshRow,
   shouldShowStaleShellNudge,
   shouldTriggerStandaloneResumeRefresh,
   STANDALONE_SOFT_REFRESH_DEBOUNCE_MS,
+  writePtrTipDismissed,
   writeStaleShellDismissedForSha,
 } from "./pwa-standalone-refresh-core.mjs";
+import {
+  standalonePtrTipCardHtml,
+  standaloneRefreshRowHtml,
+} from "./pwa-standalone-affordances-html.mjs";
 import { pwaStaleShellBannerHtml } from "./pwa-stale-shell-banner-html.mjs";
 
 const PTR_INDICATOR_ID = "device-ptr-indicator";
@@ -171,21 +182,41 @@ function resetPtrPull() {
   if (!ptrRefreshing) renderPtrIndicator("idle");
 }
 
+function finishRefreshFeedback() {
+  ptrRefreshing = false;
+  renderPtrIndicator("updated");
+  if (ptrUpdatedTimer != null) clearTimeout(ptrUpdatedTimer);
+  ptrUpdatedTimer = window.setTimeout(() => {
+    ptrUpdatedTimer = null;
+    resetPtrPull();
+    void syncStaleShellNudge();
+    syncStandaloneAffordances();
+  }, PTR_UPDATED_HIDE_MS);
+}
+
+function executeManualStandaloneRefresh() {
+  if (ptrRefreshing) return;
+  if (
+    !shouldShowStandaloneRefreshRow({
+      standalone: readStandaloneModeFromWindow(window),
+      pathname: window.location.pathname,
+      savedCardCount: getWalletCount(),
+    })
+  ) {
+    return;
+  }
+  ptrRefreshing = true;
+  renderPtrIndicator("refreshing");
+  runStandaloneSoftRefresh("manual");
+  window.setTimeout(() => finishRefreshFeedback(), 180);
+}
+
 function executePullToRefresh() {
   if (ptrRefreshing || !pullToRefreshAllowed(readPtrContext())) return;
   ptrRefreshing = true;
   renderPtrIndicator("refreshing");
   runStandaloneSoftRefresh("pull");
-  window.setTimeout(() => {
-    ptrRefreshing = false;
-    renderPtrIndicator("updated");
-    if (ptrUpdatedTimer != null) clearTimeout(ptrUpdatedTimer);
-    ptrUpdatedTimer = window.setTimeout(() => {
-      ptrUpdatedTimer = null;
-      resetPtrPull();
-      void syncStaleShellNudge();
-    }, PTR_UPDATED_HIDE_MS);
-  }, 180);
+  window.setTimeout(() => finishRefreshFeedback(), 180);
 }
 
 /**
@@ -297,6 +328,125 @@ function showStaleShellBanner(healthBuild) {
   });
 }
 
+function removeStandaloneRefreshRow() {
+  document.getElementById(PWA_REFRESH_ROW_ID)?.remove();
+  document
+    .getElementById("device-hub-glance-list")
+    ?.querySelector(".device-pwa-refresh-row")
+    ?.remove();
+}
+
+function mountStandaloneRefreshRow(walletPage) {
+  if (
+    !shouldShowStandaloneRefreshRow({
+      standalone: readStandaloneModeFromWindow(window),
+      pathname: window.location.pathname,
+      savedCardCount: getWalletCount(),
+    })
+  ) {
+    removeStandaloneRefreshRow();
+    return;
+  }
+
+  if (walletPage) {
+    const anchor = document.getElementById("device-hub-search-block");
+    const page = document.getElementById("wallet-page");
+    if (!anchor || !page) return;
+    let row = document.getElementById(PWA_REFRESH_ROW_ID);
+    if (!row) {
+      row = document.createElement("div");
+      row.id = PWA_REFRESH_ROW_ID;
+      row.className = "device-pwa-refresh-row-wrap";
+      row.innerHTML = `<ul class="device-hub-glance-list">${standaloneRefreshRowHtml({ walletPage: true })}</ul>`;
+      page.insertBefore(row, anchor);
+      row.querySelector("[data-pwa-refresh-row]")?.addEventListener("click", (e) => {
+        e.preventDefault();
+        executeManualStandaloneRefresh();
+      });
+    }
+    return;
+  }
+
+  const list = document.getElementById("device-hub-glance-list");
+  if (!list) return;
+  let row = list.querySelector(".device-pwa-refresh-row");
+  if (!row) {
+    list.insertAdjacentHTML("afterbegin", standaloneRefreshRowHtml({ walletPage: false }));
+    row = list.querySelector(".device-pwa-refresh-row");
+    row?.querySelector("[data-pwa-refresh-row]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      executeManualStandaloneRefresh();
+    });
+  }
+}
+
+function hideStandalonePtrTip() {
+  const el = document.getElementById(PWA_PTR_TIP_ID);
+  if (!el) return;
+  el.hidden = true;
+  el.innerHTML = "";
+  el.classList.remove("hc-emphasis-card", "hc-emphasis-card--info");
+}
+
+function ensurePtrTipCard() {
+  let el = document.getElementById(PWA_PTR_TIP_ID);
+  if (el) return el;
+  const page = document.querySelector(".page");
+  if (!page) return null;
+  el = document.createElement("div");
+  el.id = PWA_PTR_TIP_ID;
+  el.hidden = true;
+  el.setAttribute("role", "status");
+  const staleBanner = document.getElementById(STALE_SHELL_BANNER_ID);
+  const installCard = document.getElementById("device-pwa-install-card");
+  if (staleBanner?.parentNode) {
+    staleBanner.parentNode.insertBefore(el, staleBanner);
+  } else if (installCard?.parentNode) {
+    installCard.parentNode.insertBefore(el, installCard.nextSibling);
+  } else {
+    page.insertBefore(el, page.firstChild);
+  }
+  return el;
+}
+
+function showStandalonePtrTip() {
+  const el = ensurePtrTipCard();
+  if (!el) return;
+  el.hidden = false;
+  el.className = "hc-emphasis-card hc-emphasis-card--info device-pwa-ptr-tip";
+  el.innerHTML = standalonePtrTipCardHtml();
+  el.querySelector("[data-pwa-ptr-tip-dismiss]")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    writePtrTipDismissed(localStorage);
+    hideStandalonePtrTip();
+  });
+}
+
+function syncStandalonePtrTip() {
+  const show = shouldShowStandalonePtrTip({
+    standalone: readStandaloneModeFromWindow(window),
+    pathname: window.location.pathname,
+    dismissed: readPtrTipDismissed(localStorage),
+    savedCardCount: getWalletCount(),
+  });
+  if (!show) {
+    hideStandalonePtrTip();
+    return;
+  }
+  showStandalonePtrTip();
+}
+
+function syncStandaloneAffordances() {
+  if (!readStandaloneModeFromWindow(window)) {
+    removeStandaloneRefreshRow();
+    hideStandalonePtrTip();
+    return;
+  }
+  const walletPage = document.body.classList.contains("page-wallet");
+  mountStandaloneRefreshRow(walletPage);
+  syncStandalonePtrTip();
+}
+
 async function syncStaleShellNudge() {
   if (!readStandaloneModeFromWindow(window)) {
     hideStaleShellBanner();
@@ -328,8 +478,14 @@ bindResumeListeners();
 bindPullToRefreshListeners();
 
 if (readStandaloneModeFromWindow(window)) {
+  syncStandaloneAffordances();
   void syncStaleShellNudge();
 }
+
+window.addEventListener("hc-device-hub-changed", syncStandaloneAffordances);
+window.addEventListener("storage", (e) => {
+  if (e.key === "hc_wallet") syncStandaloneAffordances();
+});
 
 if (typeof window !== "undefined") {
   /** Test hook — programmatic PTR without touch simulation. */
@@ -338,12 +494,16 @@ if (typeof window !== "undefined") {
   };
   /** Test hook — re-run stale shell health compare. */
   window.__hcStaleShellSyncForTests = () => syncStaleShellNudge();
+  /** Test hook — re-render Phase 9 affordances. */
+  window.__hcStandaloneAffordancesSyncForTests = () => syncStandaloneAffordances();
 }
 
 export {
   runStandaloneSoftRefresh as runStandaloneSoftRefreshForTests,
   scheduleStandaloneSoftRefresh as scheduleStandaloneSoftRefreshForTests,
   executePullToRefresh as executePullToRefreshForTests,
+  executeManualStandaloneRefresh as executeManualStandaloneRefreshForTests,
   renderPtrIndicator as renderPtrIndicatorForTests,
   syncStaleShellNudge as syncStaleShellNudgeForTests,
+  syncStandaloneAffordances as syncStandaloneAffordancesForTests,
 };

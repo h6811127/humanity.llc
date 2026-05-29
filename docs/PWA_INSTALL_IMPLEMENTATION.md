@@ -391,6 +391,47 @@ Manual **P1-PWA-R** step 9.
 
 ---
 
+## Phase 9 — Supplementary affordances
+
+### Intent
+
+Low-discoverability fallbacks for stewards who do not know pull-to-refresh: explicit hub **Refresh** row, one-time PTR tip, and install-card copy mentioning PTR.
+
+### Scope
+
+| In scope | Out of scope |
+|----------|--------------|
+| Hub glance **Refresh** row on `/` and `/wallet/` (standalone + ≥1 saved card) | Long-press dot refresh |
+| One-time dismissible PTR tip (`hc_pwa_ptr_tip_dismissed`) | Build-stamp tap debug affordance |
+| Install card detail copy mentions pull-to-refresh | PTR in browser tabs (PWA-R1) |
+
+### Files
+
+| File | Action |
+|------|--------|
+| `site/js/pwa-standalone-refresh-core.mjs` | `shouldShowStandaloneRefreshRow`, `shouldShowStandalonePtrTip`, dismiss keys |
+| `site/js/pwa-standalone-affordances-html.mjs` | Refresh row + PTR tip markup |
+| `site/js/pwa-standalone-refresh.mjs` | `syncStandaloneAffordances()`, manual refresh tap |
+| `site/js/pwa-install-html.mjs` | Install card detail copy |
+| `site/css/device-shell.css` | Refresh row + PTR tip spacing |
+| `worker/tests/pwa-standalone-refresh-core.test.ts` | Affordance gating unit tests |
+| `e2e/device-pwa-install.spec.ts` | Refresh row + PTR tip smoke |
+
+### Verification
+
+```bash
+npm run worker:test:pwa-install
+npm run e2e:pwa-install
+```
+
+Manual **P1-PWA-R** steps 11–12.
+
+### Status
+
+**Shipped 2026-05-29** — hub Refresh row, first standalone PTR tip, install card PTR copy.
+
+---
+
 ## Rollback
 
 | Phase | Rollback |
@@ -398,7 +439,7 @@ Manual **P1-PWA-R** step 9.
 | 1 | Remove manifest link tags + manifest file; redeploy Pages |
 | 2 | Remove lazy import + HTML placeholder; card absent |
 | 3 | Delete e2e spec only |
-| 6–8 | Remove lazy import of `pwa-standalone-refresh.mjs`; PTR indicator CSS; stale banner |
+| 6–9 | Remove lazy import of `pwa-standalone-refresh.mjs`; PTR indicator CSS; stale banner; affordance rows |
 
 No database or Worker migration rollback required.
 
@@ -429,6 +470,7 @@ See [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume for full s
 
 | Date | Change |
 |------|--------|
+| 2026-05-29 | Phase 9 shipped — hub Refresh row, first PTR tip, install card copy |
 | 2026-05-29 | Phase 8 shipped — stale shell nudge; H-007 closed |
 | 2026-05-29 | Phase 7 shipped — standalone pull-to-refresh |
 | 2026-05-29 | Phase 6 shipped — standalone resume soft refresh modules + Vitest |

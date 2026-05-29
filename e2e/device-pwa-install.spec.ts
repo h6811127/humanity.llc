@@ -394,4 +394,48 @@ test.describe("device PWA install (phase 4 rollout gate)", () => {
     );
     await expect(page.locator("[data-pwa-stale-shell-refresh]")).toBeVisible();
   });
+
+  test("standalone hub Refresh row triggers soft refresh (P1-PWA-R step 11)", async ({
+    page,
+  }) => {
+    await page.addInitScript(withStandaloneDisplayMode().content);
+    await seedPwaLandingStorage(page);
+    await wireShellRoutes(page);
+    await page.goto("/wallet/", { waitUntil: "domcontentloaded" });
+    await waitForShellReady(page);
+
+    await page.waitForFunction(
+      () => typeof window.__hcStandaloneAffordancesSyncForTests === "function",
+      { timeout: 20_000 }
+    );
+    await page.evaluate(() => window.__hcStandaloneAffordancesSyncForTests?.());
+
+    const refreshRow = page.locator("[data-pwa-refresh-row]");
+    await expect(refreshRow).toBeVisible();
+    await refreshRow.click();
+    await expect(page.locator("#device-ptr-indicator")).toContainText(/Updated/i);
+  });
+
+  test("first standalone PTR tip dismisses once (P1-PWA-R step 12)", async ({ page }) => {
+    await page.addInitScript(withStandaloneDisplayMode().content);
+    await seedPwaLandingStorage(page);
+    await wireShellRoutes(page);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await waitForShellReady(page);
+
+    await page.waitForFunction(
+      () => typeof window.__hcStandaloneAffordancesSyncForTests === "function",
+      { timeout: 20_000 }
+    );
+    await page.evaluate(() => window.__hcStandaloneAffordancesSyncForTests?.());
+
+    const tip = page.locator("#device-pwa-ptr-tip");
+    await expect(tip).toBeVisible();
+    await expect(tip).toContainText(/pull down to refresh/i);
+    await page.locator("[data-pwa-ptr-tip-dismiss]").click();
+    await expect(tip).toBeHidden();
+
+    await page.evaluate(() => window.__hcStandaloneAffordancesSyncForTests?.());
+    await expect(tip).toBeHidden();
+  });
 });

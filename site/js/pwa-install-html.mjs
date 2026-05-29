@@ -18,8 +18,8 @@ export function pwaInstallCardBodyHtml(opts) {
   const eyebrow = opts.iosManual ? "Add to Home Screen" : "Install on this device";
   const title = "Open your saved cards from the home screen";
   const detail = opts.iosManual
-    ? "Same keys and inbox — no account. Tap Share → Add to Home Screen."
-    : "Same keys and inbox — no account.";
+    ? "Same keys and inbox — no account. Tap Share → Add to Home Screen. After installing, pull down to refresh your cards."
+    : "Same keys and inbox — no account. Pull down anytime to refresh your cards.";
 
   const actions = opts.iosManual
     ? [emphasisCardCtaSecondary("Not now", "data-pwa-install-dismiss")]

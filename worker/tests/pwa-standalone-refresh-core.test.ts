@@ -11,12 +11,16 @@ import {
   pullToRefreshIndicatorLabel,
   pullToRefreshPullState,
   pullToRefreshShouldCommit,
+  readPtrTipDismissed,
   readStandaloneModeFromWindow,
   readStaleShellDismissedForSha,
   runStandaloneSoftRefreshPipeline,
   shouldRefreshNetworkChipsOnResume,
+  shouldShowStandalonePtrTip,
+  shouldShowStandaloneRefreshRow,
   shouldShowStaleShellNudge,
   shouldTriggerStandaloneResumeRefresh,
+  writePtrTipDismissed,
   writeStaleShellDismissedForSha,
   PTR_THRESHOLD_PX,
   STANDALONE_SOFT_REFRESH_DEBOUNCE_MS,
@@ -363,5 +367,86 @@ describe("shouldShowStaleShellNudge", () => {
     expect(readStaleShellDismissedForSha({ getItem: (k) => storage.get(k) ?? null })).toBe(
       "newera11"
     );
+  });
+});
+
+describe("shouldShowStandalonePtrTip", () => {
+  it("shows on standalone landing with saved cards when not dismissed", () => {
+    expect(
+      shouldShowStandalonePtrTip({
+        standalone: true,
+        pathname: "/",
+        dismissed: false,
+        savedCardCount: 1,
+      })
+    ).toBe(true);
+  });
+
+  it("hides when dismissed", () => {
+    expect(
+      shouldShowStandalonePtrTip({
+        standalone: true,
+        pathname: "/wallet/",
+        dismissed: true,
+        savedCardCount: 2,
+      })
+    ).toBe(false);
+  });
+
+  it("hides without saved cards", () => {
+    expect(
+      shouldShowStandalonePtrTip({
+        standalone: true,
+        pathname: "/",
+        dismissed: false,
+        savedCardCount: 0,
+      })
+    ).toBe(false);
+  });
+
+  it("hides in browser tab", () => {
+    expect(
+      shouldShowStandalonePtrTip({
+        standalone: false,
+        pathname: "/",
+        dismissed: false,
+        savedCardCount: 1,
+      })
+    ).toBe(false);
+  });
+});
+
+describe("shouldShowStandaloneRefreshRow", () => {
+  it("shows on standalone wallet with saved cards", () => {
+    expect(
+      shouldShowStandaloneRefreshRow({
+        standalone: true,
+        pathname: "/wallet/",
+        savedCardCount: 1,
+      })
+    ).toBe(true);
+  });
+
+  it("hides on created path", () => {
+    expect(
+      shouldShowStandaloneRefreshRow({
+        standalone: true,
+        pathname: "/created/",
+        savedCardCount: 1,
+      })
+    ).toBe(false);
+  });
+});
+
+describe("ptr tip dismiss storage", () => {
+  it("persists dismiss flag", () => {
+    const storage = new Map<string, string>();
+    const store = {
+      setItem: (k: string, v: string) => storage.set(k, v),
+      getItem: (k: string) => storage.get(k) ?? null,
+    };
+    expect(readPtrTipDismissed(store)).toBe(false);
+    writePtrTipDismissed(store);
+    expect(readPtrTipDismissed(store)).toBe(true);
   });
 });

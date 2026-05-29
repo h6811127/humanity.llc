@@ -1,6 +1,6 @@
 # PWA install (device shell)
 
-**Status:** Spec + contract modules shipped · **Phases 1–8 shipped** (standalone refresh complete)  
+**Status:** Spec + contract modules shipped · **Phases 1–9 shipped** (standalone refresh complete)  
 **Audience:** Product, frontend, ops  
 **Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md) · [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md) · [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md) · [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md`](IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md) · [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) · [`features/QR Public Profile v1.0.md`](features/QR%20Public%20Profile%20v1.0.md)
 
@@ -88,8 +88,9 @@ flowchart TB
 | `site/js/pwa-install-ux-core.mjs` | Show/hide gating, dismiss snooze | **Contract shipped** |
 | `site/js/pwa-install.mjs` | `beforeinstallprompt`, DOM card, iOS copy; `isStandaloneMode()` helper | 2 |
 | `site/js/pwa-install-html.mjs` | Emphasis card markup helper | 2 |
-| `site/js/pwa-standalone-refresh-core.mjs` | Standalone detection, soft-refresh pipeline contract, PTR + stale shell rules | **6–8** ✅ |
-| `site/js/pwa-standalone-refresh.mjs` | Resume hooks, PTR, stale shell banner (lazy, not on status graph) | **6–8** ✅ |
+| `site/js/pwa-standalone-refresh-core.mjs` | Standalone detection, soft-refresh pipeline contract, PTR + stale shell + affordance rules | **6–9** ✅ |
+| `site/js/pwa-standalone-refresh.mjs` | Resume listeners, PTR, stale banner, hub Refresh row + PTR tip | **6–9** ✅ |
+| `site/js/pwa-standalone-affordances-html.mjs` | Hub Refresh row + first PTR tip markup | **9** ✅ |
 | `site/js/pwa-stale-shell-banner-html.mjs` | Stale shell emphasis card markup | **8** ✅ |
 | Shell HTML (`index`, `wallet`, `created`) | `<link rel="manifest">`, apple-touch-icon | 1 |
 | `worker/tests/pwa-install-metadata.test.ts` | Metadata contract tests | **Contract shipped** |
@@ -270,7 +271,7 @@ Standalone **soft refresh** (Phases 6–7) reuses existing debounced network pat
 
 ## Standalone refresh & resume
 
-**Status:** Spec locked · **Phases 6–8 shipped** · **H-007 closed** in [`V1_IMPLEMENTATION_BACKLOG.md`](V1_IMPLEMENTATION_BACKLOG.md)
+**Status:** Spec locked · **Phases 6–9 shipped** · **H-007 closed** in [`V1_IMPLEMENTATION_BACKLOG.md`](V1_IMPLEMENTATION_BACKLOG.md)
 
 ### Problem
 
@@ -365,13 +366,13 @@ Manual override when stewards do not trust background refresh or want an explici
 
 **In-browser tabs:** Phase 7 may ship **standalone-only** first. Extending PTR to browser shell pages is an open product question (PWA-R3).
 
-### Supplementary affordances (low discoverability; ship with or after Phase 7)
+### Supplementary affordances (Phase 9 — shipped)
 
 | Affordance | Role |
 |------------|------|
-| **Hub “Refresh” row** | Accessibility + fallback when PTR is unknown; hub settings or glance area |
-| **Build stamp tap** (debug / power users) | Force `location.reload()` when health `build` ≠ client `SITE_BUILD_META` — see [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md) |
-| **Post-install one-liner** | On first standalone session after install: “Pull down to refresh your cards.” Dismissible; optional `localStorage` snooze |
+| **Hub “Refresh” row** | Accessibility + fallback when PTR is unknown; hub glance row on landing + wallet |
+| **First standalone PTR tip** | One-time dismissible card: “Pull down to refresh card status.” |
+| **Install card copy** | Mentions pull-to-refresh in install card detail |
 | **Stale shell banner (Phase 8)** | After health poll: if server `build.gitSha` ≠ client stamp, show “Update available — tap to refresh” (reload CTA) |
 
 ### Onboarding copy (draft)
@@ -517,7 +518,7 @@ npm run worker:test:pwa-install
 npm run e2e:pwa-install
 ```
 
-### Phases 6–8 — Standalone refresh (shipped)
+### Phases 6–9 — Standalone refresh (shipped)
 
 Spec: § Standalone refresh & resume · Backlog **H-007**.
 
@@ -535,6 +536,7 @@ Spec: § Standalone refresh & resume · Backlog **H-007**.
 
 | Date | Change |
 |------|--------|
+| 2026-05-29 | Phase 9 shipped — hub Refresh row, first PTR tip, install card copy |
 | 2026-05-29 | Phase 8 shipped — stale shell nudge; H-007 closed |
 | 2026-05-29 | Phase 7 shipped — standalone pull-to-refresh on `/` and `/wallet/` |
 | 2026-05-29 | Phase 6 shipped — `pwa-standalone-refresh-*` resume soft refresh; Vitest contract |

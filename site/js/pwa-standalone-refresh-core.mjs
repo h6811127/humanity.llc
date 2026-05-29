@@ -35,6 +35,15 @@ export const PTR_MAX_PULL_PX = 120;
 /** How long the “Updated” label stays visible (ms). */
 export const PTR_UPDATED_HIDE_MS = 1500;
 
+/** localStorage — user dismissed first standalone PTR tip. */
+export const PWA_PTR_TIP_DISMISS_KEY = "hc_pwa_ptr_tip_dismissed";
+
+/** DOM id for hub / wallet manual refresh row (Phase 9). */
+export const PWA_REFRESH_ROW_ID = "device-pwa-refresh-row";
+
+/** DOM id for first standalone PTR tip card (Phase 9). */
+export const PWA_PTR_TIP_ID = "device-pwa-ptr-tip";
+
 /**
  * @param {string} pathname
  */
@@ -196,6 +205,58 @@ export function shouldShowStaleShellNudge(input) {
   const dismissedFor = normalizeBuildGitSha(input.dismissedForSha);
   const healthSha = normalizeBuildGitSha(input.healthBuild?.gitSha);
   if (dismissedFor && dismissedFor === healthSha) return false;
+  return true;
+}
+
+/**
+ * @param {Pick<Storage, "getItem"> | null | undefined} storage
+ */
+export function readPtrTipDismissed(storage) {
+  try {
+    return storage?.getItem(PWA_PTR_TIP_DISMISS_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * @param {Pick<Storage, "setItem"> | null | undefined} storage
+ */
+export function writePtrTipDismissed(storage) {
+  try {
+    storage?.setItem(PWA_PTR_TIP_DISMISS_KEY, "1");
+  } catch {
+    /* private mode */
+  }
+}
+
+/**
+ * @param {{
+ *   standalone: boolean;
+ *   pathname: string;
+ *   dismissed?: boolean;
+ *   savedCardCount?: number;
+ * }} input
+ */
+export function shouldShowStandalonePtrTip(input) {
+  if (!input.standalone) return false;
+  if (!isPullToRefreshPath(input.pathname)) return false;
+  if (input.dismissed) return false;
+  if ((input.savedCardCount ?? 0) < 1) return false;
+  return true;
+}
+
+/**
+ * @param {{
+ *   standalone: boolean;
+ *   pathname: string;
+ *   savedCardCount?: number;
+ * }} input
+ */
+export function shouldShowStandaloneRefreshRow(input) {
+  if (!input.standalone) return false;
+  if (!isPullToRefreshPath(input.pathname)) return false;
+  if ((input.savedCardCount ?? 0) < 1) return false;
   return true;
 }
 
