@@ -42,6 +42,34 @@ export const PROOF_DISPLAY_TTL_MS = 5 * 60_000;
 export const LIVE_CONTROL_CHALLENGE_ID_REGEX =
   /^lc_[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{12,40}$/;
 
+function isLiveControlStorageError(message: string): boolean {
+  return (
+    message.includes("live_control_challenges") ||
+    message.includes("FOREIGN KEY") ||
+    message.includes("no such table") ||
+    message.includes("SQLITE") ||
+    message.includes("D1_ERROR") ||
+    message.includes("UNIQUE constraint failed")
+  );
+}
+
+function liveControlInsertFailureResponse(e: unknown): Response {
+  const detail = String(e);
+  console.error("challenge_insert_failed", detail.slice(0, 240));
+  if (isLiveControlStorageError(detail)) {
+    return errorResponse(
+      "RESOLVER_SCHEMA",
+      "Live proof is temporarily unavailable. Try again shortly.",
+      503
+    );
+  }
+  return errorResponse(
+    "LIVE_CONTROL_CREATE_FAILED",
+    "Could not create live proof request. Try again in a moment.",
+    503
+  );
+}
+
 async function enforceLiveControlGetRateLimit(
   request: Request,
   db: D1Database
@@ -126,14 +154,7 @@ export async function handlePostLiveControlChallenge(
       expiresAt: expiresAt.toISOString(),
     });
   } catch (e) {
-    if (String(e).includes("live_control_challenges")) {
-      return errorResponse(
-        "RESOLVER_SCHEMA",
-        "Resolver database is missing live control storage. Apply D1 migration 0006_live_control_challenges.sql and redeploy.",
-        503
-      );
-    }
-    throw e;
+    return liveControlInsertFailureResponse(e);
   }
 
   const issuedAtIso = issuedAt.toISOString();

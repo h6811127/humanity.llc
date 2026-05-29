@@ -1,6 +1,6 @@
 # Live control usability hardening
 
-**Status:** Planned (Step 2 backlog)  
+**Status:** In progress — Slice A shipped (H-01–H-03)  
 **Gate:** `docs/M7_LIVE_CONTROL_ALPHA.md` Step 2 · post–production FK repair (`docs/LIVE_PROOF_FAILURE_INVESTIGATION.md`)  
 **Related:** [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md) · [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) · [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md)
 
@@ -44,6 +44,8 @@ This document is the **implementation backlog** for hardening live control **usa
 
 ### H-01 — Safe fetch parsing on the scan page
 
+**Status:** Shipped (2026-05-29)
+
 **Problem:** The scanner inline script (`renderLiveControlScript()` in `worker/src/resolver/scan-html.ts`) calls `res.json()` without checking `res.ok` or content type. Non-JSON bodies (e.g. Cloudflare **Error 1101**) throw in Safari as *“The string did not match the expected pattern.”* The owner path on `/created/` already uses `resolverErrorMessage()` — the scan client does not.
 
 **Proposed behavior:**
@@ -65,13 +67,15 @@ This document is the **implementation backlog** for hardening live control **usa
 
 **Acceptance:**
 
-- [ ] Simulated 500 HTML body on challenge `POST` shows plain English, not Safari pattern error.
-- [ ] Challenge `POST` 503/409/422 show server message or fallback copy.
-- [ ] Vitest asserts error-handling strings in bundled scan script.
+- [x] Simulated 500 HTML body on challenge `POST` shows plain English, not Safari pattern error.
+- [x] Challenge `POST` 503/409/422 show server message or fallback copy.
+- [x] Vitest asserts error-handling strings in bundled scan script.
 
 ---
 
 ### H-02 — Never surface Error 1101 to users
+
+**Status:** Shipped (2026-05-29)
 
 **Problem:** Uncaught D1 exceptions in `handlePostLiveControlChallenge()` become Cloudflare **500 / error 1101** with no JSON body. Users cannot distinguish infra failure from “owner didn’t sign.”
 
@@ -86,13 +90,15 @@ This document is the **implementation backlog** for hardening live control **usa
 
 **Acceptance:**
 
-- [ ] Mock D1 FK failure returns JSON 503, not thrown exception.
-- [ ] Production tail shows no 1101 on challenge `POST` for schema-class errors.
-- [ ] `smokeProductionLiveControlChallenge` still passes after deploy.
+- [x] Mock D1 FK failure returns JSON 503, not thrown exception.
+- [x] Production tail shows no 1101 on challenge `POST` for schema-class errors (after FK repair + deploy).
+- [x] `smokeProductionLiveControlChallenge` still passes after deploy.
 
 ---
 
 ### H-03 — Visible poll and network errors (scanner)
+
+**Status:** Shipped (2026-05-29)
 
 **Problem:** The scanner poll loop uses `.catch(function () {})` — network blips leave the UI stuck on “Waiting…” with no recovery path.
 
@@ -107,9 +113,9 @@ This document is the **implementation backlog** for hardening live control **usa
 
 **Acceptance:**
 
-- [ ] Mock fetch reject ×3 shows retry copy; manual retry resumes polling.
-- [ ] Successful poll after failures clears error state.
-- [ ] No silent infinite wait in E2E or unit simulation.
+- [x] Mock fetch reject ×3 shows retry copy; manual retry resumes polling.
+- [x] Successful poll after failures clears error state.
+- [x] No silent infinite wait in E2E or unit simulation.
 
 ---
 
@@ -407,3 +413,4 @@ flowchart TD
 | Date | Notes |
 |------|-------|
 | 2026-05-29 | Initial backlog from production FK incident + Step 2 usability review (H-01–H-15) |
+| 2026-05-29 | Slice A shipped: H-01 scan client helpers, H-02 insert error mapping, H-03 poll retry |

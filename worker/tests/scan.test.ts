@@ -104,11 +104,28 @@ function scanDbFor(challenge: Record<string, unknown> | null = null): D1Database
 }
 
 function extractLiveControlScript(html: string): string {
-  const match = html.match(
-    /<script>\n\(function \(\) \{\n  var PROOF_TTL_MS = 5 \* 60 \* 1000;[\s\S]*?\n\}\)\(\);\n<\/script>/
-  );
-  expect(match).not.toBeNull();
-  return match![0].replace(/^<script>\n/, "").replace(/\n<\/script>$/, "");
+  const helperMarker = "function parseLiveControlJsonResponse(res)";
+  const helperIdx = html.indexOf(helperMarker);
+  expect(helperIdx).toBeGreaterThanOrEqual(0);
+  const scriptOpen = html.lastIndexOf("<script>\n(function () {", helperIdx);
+  const scriptClose = html.indexOf("\n})();\n</script>", helperIdx);
+  expect(scriptOpen).toBeGreaterThanOrEqual(0);
+  expect(scriptClose).toBeGreaterThan(scriptOpen);
+  return html.slice(scriptOpen + "<script>\n".length, scriptClose + "\n})();\n".length);
+}
+
+function jsonFetchResponse(body: Record<string, unknown>, ok = true, status = 200) {
+  const text = JSON.stringify(body);
+  return {
+    ok,
+    status,
+    headers: {
+      get: (name: string) =>
+        name.toLowerCase() === "content-type" ? "application/json" : null,
+    },
+    text: async () => text,
+    json: async () => body,
+  };
 }
 
 async function runLiveControlScriptWithStatus(body: Record<string, unknown>) {
@@ -164,11 +181,14 @@ async function runLiveControlScriptWithStatus(body: Record<string, unknown>) {
     },
     "live-control-row": { classList: { add: vi.fn(), remove: vi.fn() } },
     "live-control-owner-link": { hidden: true, href: "#" },
+    "live-control-owner-panel": { hidden: true },
+    "live-control-poll-retry": { hidden: true, addEventListener: vi.fn() },
+    "live-control-in-person-layout": { classList: { add: vi.fn(), remove: vi.fn() } },
     "live-control-owner-view": { hidden: true },
     "live-control-owner-copy": { textContent: "" },
     "live-control-owner-created-link": { href: "" },
   };
-  const fetchMock = vi.fn(async () => ({ json: async () => body }));
+  const fetchMock = vi.fn(async () => jsonFetchResponse(body));
   const setTimeoutMock = vi.fn(() => 1);
 
   runInNewContext(script, {
@@ -649,17 +669,19 @@ describe("renderScanPage M3.2 trust blocks", () => {
       "live-control-row": { classList: { add: vi.fn(), remove: vi.fn() } },
       "live-control-owner-panel": { hidden: false },
       "live-control-owner-link": { href: "https://humanity.llc/created/" },
+      "live-control-poll-retry": { hidden: true, addEventListener: vi.fn() },
+      "live-control-in-person-layout": { classList: { add: vi.fn(), remove: vi.fn() } },
       "live-control-owner-view": { hidden: true },
       "live-control-owner-copy": { textContent: "" },
       "live-control-owner-created-link": { href: "" },
     };
-    const fetchMock = vi.fn(async () => ({
-      json: async () => ({
+    const fetchMock = vi.fn(async () =>
+      jsonFetchResponse({
         status: "pending",
         expires_at: new Date(Date.now() - 1_000).toISOString(),
         owner_url: "https://humanity.llc/created/?live_challenge=lc_test",
-      }),
-    }));
+      })
+    );
     const setIntervalMock = vi.fn((cb: () => void) => {
       intervalCallbacks.push(cb);
       return intervalCallbacks.length;
@@ -738,6 +760,28 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain('live-control-eyebrow">Scanner</span>');
     expect(html).toContain('live-control-eyebrow">Owner</span>');
     expect(html).toContain('inPersonLayout.classList.add("is-owner-waiting")');
+  });
+
+  it("bundles safe live-control fetch helpers and poll retry UX", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: summary(),
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+
+    expect(html).toContain('id="live-control-poll-retry"');
+    expect(html).toContain("parseLiveControlJsonResponse");
+    expect(html).toContain("liveControlChallengeCreateError");
+    expect(html).toContain("POLL_FAILURE_MAX");
+    expect(html).toContain("Having trouble checking proof status. Tap to retry.");
+    expect(html).toContain("Could not create live proof request. Try again in a moment.");
+    expect(html).toContain("Live proof is temporarily unavailable. Try again shortly.");
   });
 
   it("uses print_artifact scope copy when applicable", async () => {

@@ -358,6 +358,66 @@ describe("live control proof alpha", () => {
     expect(json.error).toBe("LIVE_CONTROL_UNAVAILABLE");
   });
 
+  it("returns 503 JSON when challenge insert hits D1 storage error", async () => {
+    const owner = await getTestKeypair();
+    const base = dbFor({ card: card(owner.publicKeyBase58), qr: qr() });
+    const db = {
+      prepare: (sql: string) => ({
+        bind: (...params: unknown[]) => ({
+          first: async () => base.prepare(sql).bind(...params).first(),
+          run: async () => {
+            if (sql.includes("INSERT INTO live_control_challenges")) {
+              throw new Error(
+                "D1_ERROR: no such table: main.qr_credentials_v23_legacy: SQLITE_ERROR"
+              );
+            }
+            return base.prepare(sql).bind(...params).run();
+          },
+        }),
+      }),
+    } as unknown as D1Database;
+
+    const res = await handlePostLiveControlChallenge(
+      request({ qr_id: QR }),
+      db,
+      PROFILE
+    );
+    const json = (await res.json()) as { error: string; message: string };
+
+    expect(res.status).toBe(503);
+    expect(json.error).toBe("RESOLVER_SCHEMA");
+    expect(json.message).toContain("temporarily unavailable");
+  });
+
+  it("returns 503 JSON when challenge insert fails for unknown D1 reason", async () => {
+    const owner = await getTestKeypair();
+    const base = dbFor({ card: card(owner.publicKeyBase58), qr: qr() });
+    const db = {
+      prepare: (sql: string) => ({
+        bind: (...params: unknown[]) => ({
+          first: async () => base.prepare(sql).bind(...params).first(),
+          run: async () => {
+            if (sql.includes("INSERT INTO live_control_challenges")) {
+              throw new Error("unexpected_worker_fault");
+            }
+            return base.prepare(sql).bind(...params).run();
+          },
+        }),
+      }),
+    } as unknown as D1Database;
+
+    const res = await handlePostLiveControlChallenge(
+      request({ qr_id: QR }),
+      db,
+      PROFILE
+    );
+    const json = (await res.json()) as { error: string; message: string };
+
+    expect(res.status).toBe(503);
+    expect(json.error).toBe("LIVE_CONTROL_CREATE_FAILED");
+    expect(json.message).toContain("Could not create live proof request");
+  });
+
   it("accepts an owner-signed response and reports proven status", async () => {
     const owner = await getTestKeypair();
     const db = dbFor({ card: card(owner.publicKeyBase58), qr: qr() });

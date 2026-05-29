@@ -9,6 +9,7 @@ import { scanListIcon, type ScanIconId } from "./scan-icons";
 import { BEARER_WARNING, OBJECT_PUBLIC_SNAPSHOT_LIMIT, OBJECT_STREAMS_LIMIT, AI_EXPLAIN_LIMIT } from "./trust-copy";
 import { buildPublicObjectSnapshot } from "./object-snapshot";
 import { SCAN_PASS_CSS } from "./scan-pass-styles";
+import { scanLiveControlClientHelpersJs } from "./scan-live-control-client-helpers";
 import {
   humanTrustDisplay,
   humanTrustListIcon,
@@ -1157,6 +1158,9 @@ function liveControlInteractiveRow(provenAt: string | null): string {
         <div class="live-control-status-panel" id="live-control-status-panel">
           <p class="live-control-status" id="live-control-status" aria-live="polite">Ready when you are.</p>
         </div>
+        <button type="button" class="live-control-cta-secondary" id="live-control-poll-retry" hidden>
+          Retry check
+        </button>
       </div>
       <div class="live-control-owner-panel" id="live-control-owner-panel" hidden>
         <div class="live-control-card-head">
@@ -1254,7 +1258,9 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
   )}/live-control/challenges`;
   return `<script>
 (function () {
+${scanLiveControlClientHelpersJs()}
   var PROOF_TTL_MS = 5 * 60 * 1000;
+  var POLL_FAILURE_MAX = 3;
   var btn = document.getElementById("live-control-request");
   var status = document.getElementById("live-control-status");
   var ownerPanel = document.getElementById("live-control-owner-panel");
@@ -1266,6 +1272,7 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
   var provenAgoEl = document.getElementById("live-control-proven-ago");
   var proofCountdownEl = document.getElementById("live-control-proof-countdown");
   var askAgainBtn = document.getElementById("live-control-request-again");
+  var pollRetryBtn = document.getElementById("live-control-poll-retry");
   var row = document.getElementById("live-control-row");
   var statusPanel = document.getElementById("live-control-status-panel");
   var ownerView = document.getElementById("live-control-owner-view");
@@ -1274,11 +1281,17 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
   var inPersonLayout = document.getElementById("live-control-in-person-layout");
   var profileId = ${JSON.stringify(vm.profileId)};
   var qrId = ${JSON.stringify(vm.qrId)};
+  var challengeUrl = ${JSON.stringify(challengeUrl)};
   var pollTimer = null;
   var countdownTimer = null;
   var proofDisplayCountdownTimer = null;
   var proofExpiryTimer = null;
   var relativeTimer = null;
+  var activePollUrl = null;
+  var activeChallengeExpiresAt = null;
+  var pollFailureCount = 0;
+  var waitingCountdownPrefix =
+    "Waiting for the owner to tap Prove control on their key-holding device. If nothing happens, ask them to refresh this tab.";
   function isOwnerBrowser() {
     try {
       var raw = sessionStorage.getItem("hc_created");
@@ -1376,6 +1389,8 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
     stopCountdown();
     stopProofExpiryTimer();
     stopProofDisplayCountdown();
+    pollFailureCount = 0;
+    hidePollRetry();
     if (ownerPanel) ownerPanel.hidden = true;
     if (inPersonLayout) inPersonLayout.classList.remove("is-owner-waiting");
     if (interactive) interactive.hidden = true;
@@ -1394,6 +1409,10 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
     stopProofExpiryTimer();
     stopPolling();
     stopCountdown();
+    activePollUrl = null;
+    activeChallengeExpiresAt = null;
+    pollFailureCount = 0;
+    hidePollRetry();
     if (interactive) interactive.hidden = false;
     if (success) success.hidden = true;
     if (row) row.classList.remove("is-proven");
@@ -1462,6 +1481,37 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
       statusPanel.classList.toggle("is-waiting", !!waiting);
     }
   }
+  function hidePollRetry() {
+    if (pollRetryBtn) pollRetryBtn.hidden = true;
+  }
+  function showPollRetry() {
+    stopCountdown();
+    setStatus("Having trouble checking proof status. Tap to retry.", false);
+    if (pollRetryBtn) pollRetryBtn.hidden = false;
+  }
+  function recordPollFailure() {
+    pollFailureCount += 1;
+    if (pollFailureCount >= POLL_FAILURE_MAX) {
+      showPollRetry();
+    }
+  }
+  function resumePoll() {
+    pollFailureCount = 0;
+    hidePollRetry();
+    if (!activePollUrl) return;
+    if (activeChallengeExpiresAt) {
+      startCountdown(activeChallengeExpiresAt, waitingCountdownPrefix);
+    } else {
+      setStatus("Waiting for the owner to sign…", true);
+    }
+    poll(activePollUrl);
+  }
+  function wirePollRetry() {
+    if (!pollRetryBtn) return;
+    pollRetryBtn.addEventListener("click", function () {
+      resumePoll();
+    });
+  }
   function stopPolling() {
     if (pollTimer) window.clearInterval(pollTimer);
     pollTimer = null;
@@ -1480,6 +1530,10 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
     stopProofDisplayCountdown();
     stopProofExpiryTimer();
     stopRelativeTimer();
+    activePollUrl = null;
+    activeChallengeExpiresAt = null;
+    pollFailureCount = 0;
+    hidePollRetry();
     if (interactive) interactive.hidden = false;
     if (success) success.hidden = true;
     if (row) row.classList.remove("is-proven");
@@ -1496,6 +1550,10 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
     stopProofDisplayCountdown();
     stopProofExpiryTimer();
     stopRelativeTimer();
+    activePollUrl = null;
+    activeChallengeExpiresAt = null;
+    pollFailureCount = 0;
+    hidePollRetry();
     if (interactive) interactive.hidden = false;
     if (success) success.hidden = true;
     if (row) row.classList.remove("is-proven");
@@ -1543,18 +1601,32 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
     countdownTimer = window.setInterval(tick, 1000);
   }
   function poll(url) {
+    activePollUrl = url;
+    pollFailureCount = 0;
+    hidePollRetry();
     stopPolling();
     pollTimer = window.setInterval(function () {
       fetch(url, { cache: "no-store" })
-        .then(function (res) { return res.json(); })
-        .then(function (body) {
+        .then(function (res) {
+          return parseLiveControlJsonResponse(res);
+        })
+        .then(function (result) {
+          if (!result.ok) {
+            recordPollFailure();
+            return;
+          }
+          pollFailureCount = 0;
+          hidePollRetry();
+          var body = result.body;
           if (body.status === "proven") {
             showProven(body);
           } else if (body.status === "expired") {
             showRequestExpired();
           }
         })
-        .catch(function () {});
+        .catch(function () {
+          recordPollFailure();
+        });
     }, 2000);
   }
   function statusUrlForChallenge(id) {
@@ -1568,13 +1640,28 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
     if (!id) return;
     setStatus("Checking live proof…", true);
     fetch(statusUrlForChallenge(id), { cache: "no-store" })
-      .then(function (res) { return res.json(); })
-      .then(function (body) {
+      .then(function (res) {
+        return parseLiveControlJsonResponse(res);
+      })
+      .then(function (result) {
+        if (!result.ok) {
+          setStatus(
+            liveControlUserErrorMessage(result.body, {
+              status: result.status,
+              requestUrl: statusUrlForChallenge(id),
+              fallback: "Could not check live proof.",
+            }),
+            false
+          );
+          return;
+        }
+        var body = result.body;
         if (body.status === "proven") {
           showProven(body);
         } else if (body.status === "expired") {
           showRequestExpired();
         } else {
+          activeChallengeExpiresAt = body.expires_at || null;
           if (body.expires_at) {
             startCountdown(body.expires_at, "Waiting for the owner to sign…");
           } else {
@@ -1590,6 +1677,7 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
   }
   if (applyOwnerBrowserLiveControl()) return;
   wireAskAgain();
+  wirePollRetry();
   var initialProven = getProvenIso();
   if (success && !success.hidden && initialProven) {
     var initialProofExpiresAt = proofExpiresAtFromProvenAt(initialProven);
@@ -1611,11 +1699,15 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
     stopPolling();
     stopProofExpiryTimer();
     stopProofDisplayCountdown();
+    activePollUrl = null;
+    activeChallengeExpiresAt = null;
+    pollFailureCount = 0;
+    hidePollRetry();
     if (ownerPanel) ownerPanel.hidden = true;
     if (ownerLink) ownerLink.href = "#";
     if (inPersonLayout) inPersonLayout.classList.remove("is-owner-waiting");
     setStatus("Creating a live proof request…", true);
-    fetch(${JSON.stringify(challengeUrl)}, {
+    fetch(challengeUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -1623,17 +1715,20 @@ function renderLiveControlScript(vm: ScanViewModel, origin: string): string {
         client_origin: location.origin
       })
     })
-      .then(function (res) { return res.json().then(function (body) { return { ok: res.ok, body: body }; }); })
+      .then(function (res) {
+        return parseLiveControlJsonResponse(res);
+      })
       .then(function (result) {
-        if (!result.ok) throw new Error(result.body.message || result.body.error || "Could not create live proof request.");
-        if (result.body.owner_url) {
-          showOwnerPanel(result.body.owner_url);
+        if (!result.ok) {
+          throw new Error(liveControlChallengeCreateError(result, challengeUrl));
         }
-        startCountdown(
-          result.body.expires_at,
-          "Waiting for the owner to tap Prove control on their key-holding device. If nothing happens, ask them to refresh this tab."
-        );
-        poll(result.body.status_url);
+        var body = result.body;
+        if (body.owner_url) {
+          showOwnerPanel(body.owner_url);
+        }
+        activeChallengeExpiresAt = body.expires_at || null;
+        startCountdown(body.expires_at, waitingCountdownPrefix);
+        poll(body.status_url);
       })
       .catch(function (err) {
         stopCountdown();
