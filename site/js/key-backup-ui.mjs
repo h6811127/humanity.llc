@@ -142,7 +142,7 @@ export function initKeyBackupUi(opts) {
       });
       setStatus(
         importStatus,
-        "Unlocked locally. Root-card controls are available below for this card and its object QRs."
+        "Unlocked locally. Ownership restored for this card and its object QRs."
       );
       importForm.reset();
       refreshExportVisibility();

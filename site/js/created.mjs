@@ -9,6 +9,7 @@ import { initOwnerRevoke } from "./created-revoke.mjs";
 import { initVoucherRevoke } from "./vouch-revoke.mjs";
 import { initKeyBackupUi } from "./key-backup-ui.mjs";
 import { initRecoveryKeyUi } from "./recovery-key-ui.mjs";
+import { initCreatedDeveloperExportUi } from "./created-developer-export-ui.mjs";
 import { initManifestoUpdate } from "./created-manifesto-update.mjs";
 import { initQrRotate } from "./created-qr-rotate.mjs";
 import { initQrExtend } from "./created-qr-extend.mjs";
@@ -1205,12 +1206,16 @@ async function bootstrapOwnerTools() {
     setSession: saveSession,
     onKeysUnlocked: () => {
       backup?.refreshExportVisibility();
+      developerExport?.refreshPubkeyPreview();
       revoke?.refresh();
       voucherRevoke?.refresh();
       liveControl?.refresh();
       childObjectCtl?.refresh?.();
   lostItemRelayCtl?.refresh?.();
     },
+  });
+  const developerExport = initCreatedDeveloperExportUi({
+    getSession: loadSession,
   });
   deviceSaveCtl?.refresh();
   const recoveryUi = initRecoveryKeyUi({
@@ -1223,12 +1228,14 @@ async function bootstrapOwnerTools() {
       liveControl?.refresh();
       deviceSaveCtl?.refresh();
       recoveryUi?.refresh();
+      developerExport?.refreshPubkeyPreview();
       childObjectCtl?.refresh?.();
   lostItemRelayCtl?.refresh?.();
     },
   });
   deviceSaveCtl?.refresh();
   recoveryUi?.refresh();
+  developerExport?.refreshPubkeyPreview();
   window.addEventListener("hc-recovery-acknowledged", () => {
     deviceSaveCtl?.refresh();
     recoveryUi?.refresh();

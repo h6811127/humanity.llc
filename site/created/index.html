@@ -998,9 +998,9 @@
         <!--  -  -  -  Advanced: update, revoke, keys  -  -  -  -->
         <div class="created-tab-panel" data-created-panel="advanced" id="created-tab-advanced" role="tabpanel" aria-labelledby="created-tab-btn-advanced" hidden>
           <p class="created-tab-lead">
-            Rotate, revoke, backup, and unlock keys. This root key controls the card and its
-            object QRs; you change resolver state, not the sticker. Public copy publishes on <strong>Live</strong>. Open
-            <strong>Keys on this device</strong> on Live (or
+            Rotate, revoke, recovery, and backup. This root ownership controls the card and its
+            object QRs; you change resolver state, not the sticker. Public copy publishes on
+            <strong>Live</strong>. Activate control on Live (or
             <a href="/wallet/">My objects</a>) before switching tabs.
           </p>
 
@@ -1320,15 +1320,84 @@
                 </span>
                 <span class="settings-summary-text">
                   <span class="settings-summary-title">Encrypted backup</span>
-                  <span class="settings-summary-sub">Download · restore root and object control</span>
+                  <span class="settings-summary-sub">Restore from a saved backup file</span>
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </summary>
               <div class="settings-panel settings-panel-action">
-                <div id="backup-export-block" hidden>
+                <p class="form-hint">
+                  Use a <code>.hcbackup</code> file you downloaded earlier. Restores ownership of this
+                  card and its object QRs. Never uploaded to humanity.llc.
+                </p>
+                <form id="import-backup-form" class="compact-form" novalidate>
+                  <label class="form-label" for="import-backup-file">Backup file</label>
+                  <input
+                    class="form-input"
+                    id="import-backup-file"
+                    name="backup_file"
+                    type="file"
+                    accept=".json,.hcbackup,application/json"
+                    required
+                  />
+                  <label class="form-label" for="import-passphrase">Backup passphrase</label>
+                  <input
+                    class="form-input"
+                    id="import-passphrase"
+                    name="passphrase"
+                    type="password"
+                    autocomplete="off"
+                    minlength="12"
+                    required
+                    placeholder="Same passphrase used when downloading"
+                  />
+                  <button type="submit" class="btn-secondary">Restore ownership</button>
+                </form>
+                <p class="form-status" id="import-backup-status" hidden></p>
+                <p class="form-hint">
+                  To download a new encrypted backup, paste a raw recovery key, or inspect public key
+                  material, open <strong>Export for developers</strong> below.
+                </p>
+              </div>
+            </details>
+
+            <details
+              class="settings-disclosure settings-disclosure-info"
+              id="created-developer-export-details"
+            >
+              <summary class="settings-summary">
+                <span class="list-icon list-icon-tone-slate" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                </span>
+                <span class="settings-summary-text">
+                  <span class="settings-summary-title">Export for developers</span>
+                  <span class="settings-summary-sub">Signing keys · public key · raw recovery import</span>
+                </span>
+                <span class="list-chevron" aria-hidden="true">›</span>
+              </summary>
+              <div class="settings-panel settings-panel-info-body created-developer-export-panel">
+                <p class="settings-panel-lead">
+                  Layer 1 tools for integrators and power users. Most stewards only need recovery codes
+                  and encrypted backup above.
+                </p>
+
+                <section
+                  class="group created-developer-export-section"
+                  id="owner-pubkey-preview-block"
+                  hidden
+                  aria-label="Owner public key"
+                >
+                  <h3 class="form-label">Owner public key (Base58)</h3>
+                  <p class="mono recovery-key-display" id="owner-pubkey-display"></p>
+                  <button type="button" class="btn-secondary" id="copy-owner-pubkey">
+                    Copy public key
+                  </button>
+                </section>
+
+                <div id="backup-export-block" class="created-developer-export-section" hidden>
+                  <h3 class="form-label">Download encrypted backup</h3>
                   <p class="form-hint">
                     Available while this tab still has your root owner key. This backup restores
-                    control of this card and its object QRs. Never uploaded to humanity.llc.
+                    control of this card and its object QRs.
                   </p>
                   <form id="export-backup-form" class="compact-form" autocomplete="off" novalidate>
                     <label class="form-label" for="export-passphrase">New backup passphrase</label>
@@ -1356,86 +1425,69 @@
                   <p class="form-status" id="export-backup-status" hidden></p>
                 </div>
 
-                <p class="form-hint backup-divider-label">Lost this tab?</p>
-                <form id="import-recovery-form" class="compact-form" novalidate>
-                  <label class="form-label" for="import-recovery-key">Recovery private key</label>
-                  <textarea
-                    class="form-input form-textarea"
-                    id="import-recovery-key"
-                    name="recovery_key"
-                    rows="3"
-                    placeholder="Paste the recovery code you saved at create"
-                    autocomplete="off"
-                    required
-                  ></textarea>
-                  <button type="submit" class="btn-secondary">Restore with recovery code</button>
-                </form>
-                <p class="form-status" id="import-recovery-status" hidden></p>
+                <section class="group created-developer-export-section" aria-label="Import raw recovery key">
+                  <h3 class="form-label">Import raw recovery key</h3>
+                  <p class="form-hint">Lost this tab? Paste the recovery code you saved at create.</p>
+                  <form id="import-recovery-form" class="compact-form" novalidate>
+                    <label class="form-label" for="import-recovery-key">Recovery private key (Base58)</label>
+                    <textarea
+                      class="form-input form-textarea"
+                      id="import-recovery-key"
+                      name="recovery_key"
+                      rows="3"
+                      placeholder="Paste recovery code"
+                      autocomplete="off"
+                      required
+                    ></textarea>
+                    <button type="submit" class="btn-secondary">Restore with recovery code</button>
+                  </form>
+                  <p class="form-status" id="import-recovery-status" hidden></p>
+                </section>
 
-                <p class="form-hint backup-divider-label">Have encrypted backup?</p>
-                <form id="import-backup-form" class="compact-form" novalidate>
-                  <label class="form-label" for="import-backup-file">Backup file</label>
-                  <input
-                    class="form-input"
-                    id="import-backup-file"
-                    name="backup_file"
-                    type="file"
-                    accept=".json,.hcbackup,application/json"
-                    required
-                  />
-                  <label class="form-label" for="import-passphrase">Backup passphrase</label>
-                  <input
-                    class="form-input"
-                    id="import-passphrase"
-                    name="passphrase"
-                    type="password"
-                    autocomplete="off"
-                    minlength="12"
-                    required
-                    placeholder="Same passphrase used when downloading"
-                  />
-                  <button type="submit" class="btn-secondary">Unlock root controls</button>
-                </form>
-                <p class="form-status" id="import-backup-status" hidden></p>
-              </div>
-            </details>
+                <section class="group created-developer-export-section" id="network-details" aria-label="Inspect on network">
+                  <h3 class="form-label">Inspect on network</h3>
+                  <p class="form-hint">
+                    Status at a glance is on the <strong>Live</strong> tab. Each printed QR is its own
+                    credential — revoke one sticker without killing siblings.
+                  </p>
+                  <ul class="list list-compact">
+                    <li class="list-row list-action">
+                      <a href="/architecture.html">
+                        <span class="list-content">
+                          <span class="list-title">Architecture</span>
+                          <span class="list-sub">How revoke, keys, and resolver state work</span>
+                        </span>
+                        <span class="list-chevron" aria-hidden="true">›</span>
+                      </a>
+                    </li>
+                    <li class="list-row list-action">
+                      <a id="card-json-link" href="#" target="_blank" rel="noopener noreferrer">
+                        <span class="list-content">
+                          <span class="list-title">Public JSON</span>
+                          <span class="list-sub">Signed card document</span>
+                        </span>
+                        <span class="list-chevron" aria-hidden="true">›</span>
+                      </a>
+                    </li>
+                  </ul>
+                </section>
 
-            <details class="settings-disclosure settings-disclosure-info" id="network-details">
-              <summary class="settings-summary">
-                <span class="list-icon list-icon-tone-green" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
-                </span>
-                <span class="settings-summary-text">
-                  <span class="settings-summary-title">Inspect on network</span>
-                  <span class="settings-summary-sub">Architecture · public JSON</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </summary>
-              <div class="settings-panel settings-panel-info-body">
-                <p class="settings-panel-lead">
-                  Status at a glance is on the <strong>Now</strong> tab. Each printed QR is its own
-                  credential  -  revoke one sticker without killing siblings.
-                </p>
-                <ul class="list list-compact">
-                  <li class="list-row list-action">
-                    <a href="/architecture.html">
-                      <span class="list-content">
-                        <span class="list-title">Architecture</span>
-                        <span class="list-sub">How revoke, keys, and resolver state work</span>
-                      </span>
-                      <span class="list-chevron" aria-hidden="true">›</span>
-                    </a>
-                  </li>
-                  <li class="list-row list-action">
-                    <a id="card-json-link" href="#" target="_blank" rel="noopener noreferrer">
-                      <span class="list-content">
-                        <span class="list-title">Public JSON</span>
-                        <span class="list-sub">Signed card document</span>
-                      </span>
-                      <span class="list-chevron" aria-hidden="true">›</span>
-                    </a>
-                  </li>
-                </ul>
+                <section class="recovery-reveal-card created-developer-export-section" id="organizer-reveal" hidden>
+                  <div class="recovery-reveal-header">
+                    <span class="recovery-reveal-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </span>
+                    <div class="recovery-reveal-heading">
+                      <h2 class="recovery-reveal-title">Organizer revoke key</h2>
+                      <p class="recovery-reveal-sub">
+                        Hand off once for coalition revoke at
+                        <a id="organizer-revoke-link-inline" href="/organizer-revoke/">/organizer-revoke/</a>.
+                      </p>
+                    </div>
+                  </div>
+                  <p class="mono-link" id="organizer-key-display"></p>
+                  <button type="button" class="btn-secondary" id="copy-organizer-key">Copy organizer key</button>
+                </section>
               </div>
             </details>
 
@@ -1485,22 +1537,6 @@
             </details>
           </div>
 
-          <section class="recovery-reveal-card" id="organizer-reveal" hidden>
-            <div class="recovery-reveal-header">
-              <span class="recovery-reveal-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              </span>
-              <div class="recovery-reveal-heading">
-                <h2 class="recovery-reveal-title">Organizer revoke key</h2>
-                <p class="recovery-reveal-sub">
-                  Hand off once for coalition revoke at
-                  <a id="organizer-revoke-link-inline" href="/organizer-revoke/">/organizer-revoke/</a>.
-                </p>
-              </div>
-            </div>
-            <p class="mono-link" id="organizer-key-display"></p>
-            <button type="button" class="btn-secondary" id="copy-organizer-key">Copy organizer key</button>
-          </section>
         </div>
 
         </div><!-- /#created-control-root -->
@@ -1545,6 +1581,6 @@
     </div>
     <script src="/js/device-status-bootstrap.mjs?v=58" type="module"></script>
     <script src="/js/created-hub.mjs?v=3" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=63"></script>
+    <script type="module" src="/js/created.mjs?v=64"></script>
   </body>
 </html>

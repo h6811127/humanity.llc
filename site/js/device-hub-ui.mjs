@@ -22,6 +22,10 @@ import {
   partitionHubCardControls,
 } from "./device-hub-controls-core.mjs";
 import { applyHubControlPlainLabels } from "./pilot-steward-copy.mjs";
+import {
+  DEFAULT_FOR_ATTESTATION,
+  SET_DEFAULT_FOR_ATTESTATION,
+} from "./device-ownership-copy-core.mjs";
 import { inferPilotTemplate } from "./manifesto-display.mjs";
 import {
   activateWalletEntry,
@@ -532,7 +536,7 @@ function hubCardSubHtml(entry, lastUsed) {
   if (handle && !handleInTitle) detailParts.push(escapeHtml(handle));
   if (idPreview) detailParts.push(escapeHtml(idPreview));
   if (entry.profile_id && isDefaultVouchProfile(entry.profile_id)) {
-    detailParts.push("Default for vouching");
+    detailParts.push(DEFAULT_FOR_ATTESTATION);
   }
 
   if (detailParts.length === 0) {
@@ -741,8 +745,8 @@ function hubCardMenuHtml(entry, menuControls) {
               entry.owner_private_key_b58
                 ? `<button type="button" class="hub-card-menu-item hub-default-vouch" data-id="${escapeHtml(entry.id)}">${
                     isDefaultVouchProfile(entry.profile_id)
-                      ? "Default for vouching ✓"
-                      : "Set as default for vouching"
+                      ? `${DEFAULT_FOR_ATTESTATION} ✓`
+                      : SET_DEFAULT_FOR_ATTESTATION
                   }</button>`
                 : ""
             }
