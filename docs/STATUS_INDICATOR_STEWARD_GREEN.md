@@ -309,11 +309,11 @@ Do not ship a blind “click fix” without matching the failure mode above. Pre
 
 ### 1. Harden module load (inbox dependency) — ✅ shipped
 
-Since `2b5d105`, `device-status.mjs` imports `device-inbox-sheet.mjs` at top level. Any missing file or throw in that graph prevents **all** dot behavior.
+Since `2b5d105`, inbox dependencies lived on the status graph. **`device-inbox-sheet-loader.mjs`** and **`device-inbox-loader.mjs`** (P2 Step 1, 2026-05-29) shrink the static graph: sheet and gather modules load dynamically; dot/hub still work if inbox subgraph fails after boot.
 
 - **Deploy:** Ensure Pages deploy includes every new `site/js/device-inbox*.mjs` (and `device-browser-notifications-core.mjs`) alongside HTML; bump cache-bust query on shell scripts when adding imports.
-- **Runtime (shipped):** `site/js/device-status-bootstrap.mjs` is a thin entry (only static import: `device-status-load-error.mjs`) that dynamically imports `device-status-bootstrap-inner.mjs`. Inner loads `device-status.mjs`; either failure sets `data-device-status-error` and wires the load-error explainer. Shell pages load bootstrap (`?v=${DEVICE_SHELL_ASSET_VERSION}`), not `device-status.mjs` directly.
-- **CI (shipped):** `e2e/device-status-dot.spec.ts` — `shell status modules are reachable`, `status bootstrap loads and records dot_click in diagnostics`, `status load error shows coach card`, `bootstrap inner failure shows load-error coach card`.
+- **Runtime (shipped):** `site/js/device-status-bootstrap.mjs` is a thin entry (only static import: `device-status-load-error.mjs`) that dynamically imports `device-status-bootstrap-inner.mjs`. Inner loads `device-status.mjs`; either failure sets `data-device-status-error` and wires the load-error explainer. **`device-inbox-loader.mjs`** (P2 Step 1) dynamically loads `device-inbox.mjs` so inbox gather failures do not brick the dot; badge/overlay use safe fallbacks until preload completes. Shell pages load bootstrap (`?v=${DEVICE_SHELL_ASSET_VERSION}`), not `device-status.mjs` directly.
+- **CI (shipped):** `e2e/device-status-dot.spec.ts` — `shell status modules are reachable`, `status bootstrap loads and records dot_click in diagnostics`, `status load error shows coach card`, `bootstrap inner failure shows load-error coach card` · `worker/tests/device-status-lazy-inbox.test.ts` · `worker/tests/device-inbox-loader.test.ts`.
 
 ### 2. Hub open-state single source of truth — ✅ shipped
 

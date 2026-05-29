@@ -20,12 +20,11 @@ import {
 import { renderCrossTabKeysBanner } from "./device-cross-tab-banner.mjs";
 import { refreshHubGlance } from "./device-hub-glance.mjs";
 import { refreshHubInboxAlertsFromChrome } from "./device-hub-ui.mjs";
-import { renderInboxSheet, isInboxSheetOpen, setInboxSheetOpen } from "./device-inbox-sheet.mjs";
+import { loadInboxSheetModule } from "./device-inbox-sheet-loader.mjs";
 import {
-  beginDeviceChromeRefreshTick,
-  endDeviceChromeRefreshTick,
+  loadInboxModule,
   resetPresenceInboxGatherCache,
-} from "./device-inbox.mjs?v=65";
+} from "./device-inbox-loader.mjs?v=66";
 import { getOrphanRemovedTabsWithKeys, getOtherTabsWithKeys } from "./device-tab-presence.mjs";
 import { primeCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import { refreshWalletContextFromChrome } from "./wallet-page-chrome.mjs";
@@ -111,19 +110,25 @@ export function refreshDeviceChrome(opts = {}) {
 }
 
 function runChromeRefresh() {
-  beginDeviceChromeRefreshTick();
+  void runChromeRefreshAsync();
+}
+
+async function runChromeRefreshAsync() {
+  const inbox = await loadInboxModule();
+  inbox.beginDeviceChromeRefreshTick();
   try {
     refreshStatusSurfaces?.();
     renderCrossTabKeysBanner();
     refreshHubGlance();
     refreshHubInboxAlertsFromChrome();
-    if (isInboxSheetOpen()) {
-      renderInboxSheet();
+    const sheetMod = await loadInboxSheetModule();
+    if (sheetMod.isInboxSheetOpen()) {
+      sheetMod.renderInboxSheet();
     }
     refreshWalletContextFromChrome();
   } finally {
     lastPresenceChromeFingerprint = readPresenceChromeFingerprint();
-    endDeviceChromeRefreshTick();
+    inbox.endDeviceChromeRefreshTick();
   }
 }
 

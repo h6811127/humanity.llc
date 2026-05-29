@@ -6,7 +6,7 @@
 import {
   appendInboxDiagLog,
   countInboxOpensWithoutAction,
-} from "./device-inbox-diagnostics-core.mjs?v=65";
+} from "./device-inbox-diagnostics-core.mjs?v=66";
 
 export const INBOX_DIAG_LOG_KEY = "hc_inbox_diag_log";
 export const INBOX_DIAG_FLAG_KEY = "hc_inbox_diagnostics";
