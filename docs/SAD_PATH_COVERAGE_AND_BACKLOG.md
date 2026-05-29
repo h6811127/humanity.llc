@@ -34,6 +34,7 @@ Use it when prioritizing hardening before launch surfaces (live proof in person,
 | Hosted ops (billing return) | **O1–O2 E2E shipped** (2026-05-29) | [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.md) |
 | Safari stuck inbox backdrop | **P5f shipped** — Check network taps after reconcile | [`UI_UX_SAFE_REBUILD_IMPLEMENTATION.md`](UI_UX_SAFE_REBUILD_IMPLEMENTATION.md) § Step 1 |
 | Key-loss setup protect gate (K7) | **Shipped** — recovery ack or backup before Live | [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) Phase 2 |
+| Key-loss view-only Live tab (Phase 3) | **Shipped** — read-only QR/deploy; restore banner | Same doc Phase 3 |
 
 ---
 
@@ -168,7 +169,7 @@ Canonical matrix: [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.m
 |----------|------|-------------|-------|
 | **P0** | Live proof scanner recovery | **H-09 + H-10** — sessionStorage resume + expiry retry UX | **Shipped** 2026-05-29 |
 | **P0** | Live proof comprehension | Execute H-11 / H-12 runbooks with ≥5 strangers | Product / QA |
-| **P1** | Key-loss paths | **K1/K2/K5 E2E + K7 setup protect gate shipped** — Phase 3–4 in [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) | Product + eng |
+| **P1** | Key-loss paths | **K1/K2/K5 E2E + K7 protect gate + Phase 3 step 1 (view Live tab) shipped** — Phase 3 step 2: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-RESTORE** manual | Product + eng |
 | **P1** | Merch checkout | **Matrix shipped** — operator physical QA + live payment before `checkout_open: true` | Engineering + Ops |
 | **P2** | Large wallet guardrails | **Shipped** — `e2e/wallet-scale-guardrail.spec.ts` (W1–W3) | Shell |
 | **P2** | Scan URL hints | **Shipped** — `scan-malformed-hint.ts` + Vitest | Resolver |
@@ -209,6 +210,7 @@ Canonical matrix: [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.m
 | **S25** | **Hosted billing return links after keys load (O2)** | Same |
 | **S26** | **Check network after stuck inbox backdrop (P5f)** | `e2e/device-hub-check-network-backdrop.spec.ts` |
 | **S27** | **Setup protect gate before Live (K7)** | `worker/tests/created-setup-seatbelt.test.ts` · `worker/tests/key-loss-copy-guards.test.ts` |
+| **S28** | **View-only Live tab read-only signage (Phase 3)** | `worker/tests/created-view-live-core.test.ts` · `e2e/key-loss-sad-path.spec.ts` (K1) |
 
 Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) § Recommended test matrix.
 
@@ -230,6 +232,7 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 | **P1-HOSTED-BR · Billing checkout return (O1–O2)** | `npm run e2e:hosted-tier-billing-return` |
 | **P5f · Stuck inbox backdrop vs Check network** | `npm run e2e:device-hub-check-network-backdrop` · [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) § P5f |
 | **P1-SETUP-PROTECT · Setup protect gate (K7)** | `npm run worker:test:setup-protect` |
+| **P1-RESTORE · View-only Live + restore paths (K1 Phase 3)** | `npm run worker:test:view-only-restore` · `npm run e2e:key-loss-sad-path` |
 
 ---
 
@@ -237,6 +240,7 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 
 | Date | Notes |
 |------|-------|
+| 2026-05-29 | Ownership restore Phase 3 step 1 — view-only Live tab (S28) |
 | 2026-05-29 | K7 setup protect gate + P5f stuck backdrop regression index (S26–S27) |
 | 2026-05-29 | Hosted ops sad-path matrix + O1–O2 E2E index (`HOSTED_OPS_SAD_PATH_MATRIX.md`) |
 | 2026-05-29 | Key-loss matrix + K1/K2/K5 E2E (`KEY_LOSS_SAD_PATH_MATRIX.md`) |

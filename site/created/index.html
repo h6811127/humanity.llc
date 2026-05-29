@@ -22,7 +22,7 @@
     </script>
     <link rel="stylesheet" href="/css/hc-emphasis-card.css?v=4" />
     <link rel="stylesheet" href="/styles.css?v=129" />
-    <link rel="stylesheet" href="/css/device-shell.css?v=65" />
+    <link rel="stylesheet" href="/css/device-shell.css?v=66" />
     <link rel="stylesheet" href="/css/theme-dark.css?v=29" />
   </head>
   <body class="has-device-hub-search device-shell-created" data-created-route="pending">
@@ -428,6 +428,32 @@
         </nav>
 
         <div class="created-tab-panel" data-created-panel="now" id="created-tab-now" role="tabpanel" aria-labelledby="created-tab-btn-now">
+          <section
+            class="hc-emphasis-card hc-emphasis-card--info created-view-live-banner"
+            id="created-view-live-banner"
+            role="note"
+            hidden
+            aria-labelledby="created-view-live-title"
+          >
+            <div class="hc-emphasis-card__main">
+              <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
+              <div class="hc-emphasis-card__copy">
+                <p class="hc-emphasis-card__eyebrow" id="created-view-live-title">View only in this tab</p>
+                <p class="hc-emphasis-card__detail" id="created-view-live-lead"></p>
+              </div>
+            </div>
+            <div class="hc-emphasis-card__actions">
+              <button
+                type="button"
+                class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary"
+                id="created-view-live-restore-btn"
+                data-created-view-action="open-restore"
+              >
+                Restore ownership
+              </button>
+            </div>
+          </section>
+
           <section class="created-live-cockpit" aria-label="Live object">
             <div class="created-live-status-strip" id="created-live-status-strip" role="status">
               <span class="created-live-status-chip" id="created-live-network-chip" hidden>Live on network</span>
@@ -495,6 +521,7 @@
               class="created-live-scanners-see"
               id="created-live-scanners-see"
               aria-labelledby="created-live-scanners-see-title"
+              data-created-signing-only
             >
               <h3 class="created-live-scanners-see-title" id="created-live-scanners-see-title">
                 What scanners see
@@ -591,6 +618,7 @@
               id="created-scanners-see-gate-hint"
               role="note"
               hidden
+              data-created-signing-only
             >
               Revoke this QR once under <strong>Manage</strong> to unlock publishing scanner copy on
               Live.
@@ -1057,12 +1085,96 @@
 
         <!--  -  -  -  Advanced: update, revoke, keys  -  -  -  -->
         <div class="created-tab-panel" data-created-panel="advanced" id="created-tab-advanced" role="tabpanel" aria-labelledby="created-tab-btn-advanced" hidden>
-          <p class="created-tab-lead">
+          <div
+            class="hc-emphasis-card hc-emphasis-card--warn created-view-restore-panel"
+            id="created-view-restore-panel"
+            hidden
+            role="status"
+          >
+            <div class="hc-emphasis-card__main">
+              <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
+              <div class="hc-emphasis-card__copy">
+                <p class="hc-emphasis-card__eyebrow">View only</p>
+                <p class="hc-emphasis-card__title" id="created-view-ownership-hint">
+                  Ownership not loaded in this tab.
+                </p>
+                <p class="hc-emphasis-card__detail" id="created-view-restore-lead"></p>
+              </div>
+            </div>
+          </div>
+          <p class="created-tab-lead" id="created-control-manage-lead" data-created-signing-only>
             Rotate, revoke, recovery, and backup. This root ownership controls the card and its
             object QRs; you change resolver state, not the sticker. Public copy publishes on
             <strong>Live</strong>. Activate control on Live (or
             <a href="/wallet/">My objects</a>) before switching tabs.
           </p>
+          <p class="created-tab-lead" id="created-view-manage-lead" hidden></p>
+
+          <section class="created-view-restore-tools" aria-labelledby="created-view-restore-import-title">
+            <h3 class="form-label" id="created-view-restore-import-title">Restore ownership</h3>
+            <p class="form-hint">Paste the recovery code you saved at create.</p>
+            <form id="import-recovery-form" class="compact-form" novalidate>
+              <label class="form-label" for="import-recovery-key">Recovery private key (Base58)</label>
+              <textarea
+                class="form-input form-textarea"
+                id="import-recovery-key"
+                name="recovery_key"
+                rows="3"
+                placeholder="Paste recovery code"
+                autocomplete="off"
+                required
+              ></textarea>
+              <button type="submit" class="btn-secondary">Restore with recovery code</button>
+            </form>
+            <p class="form-status" id="import-recovery-status" hidden></p>
+          </section>
+
+          <details class="settings-disclosure settings-disclosure-action" id="backup-details">
+            <summary class="settings-summary">
+              <span class="list-icon list-icon-tone-purple" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+              </span>
+              <span class="settings-summary-text">
+                <span class="settings-summary-title">Encrypted backup</span>
+                <span class="settings-summary-sub">Restore from a saved backup file</span>
+              </span>
+              <span class="list-chevron" aria-hidden="true">›</span>
+            </summary>
+            <div class="settings-panel settings-panel-action">
+              <p class="form-hint">
+                Use a <code>.hcbackup</code> file you downloaded earlier. Restores ownership of this
+                card and its object QRs. Never uploaded to humanity.llc.
+              </p>
+              <form id="import-backup-form" class="compact-form" novalidate>
+                <label class="form-label" for="import-backup-file">Backup file</label>
+                <input
+                  class="form-input"
+                  id="import-backup-file"
+                  name="backup_file"
+                  type="file"
+                  accept=".json,.hcbackup,application/json"
+                  required
+                />
+                <label class="form-label" for="import-passphrase">Backup passphrase</label>
+                <input
+                  class="form-input"
+                  id="import-passphrase"
+                  name="passphrase"
+                  type="password"
+                  autocomplete="off"
+                  minlength="12"
+                  required
+                  placeholder="Same passphrase used when downloading"
+                />
+                <button type="submit" class="btn-secondary">Restore ownership</button>
+              </form>
+              <p class="form-status" id="import-backup-status" hidden></p>
+              <p class="form-hint">
+                To download a new encrypted backup, paste a raw recovery key, or inspect public key
+                material, open <strong>Export for developers</strong> below.
+              </p>
+            </div>
+          </details>
 
           <details
             class="settings-disclosure settings-disclosure-action"
@@ -1373,53 +1485,6 @@
               </div>
             </details>
 
-            <details class="settings-disclosure settings-disclosure-action" id="backup-details">
-              <summary class="settings-summary">
-                <span class="list-icon list-icon-tone-purple" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
-                </span>
-                <span class="settings-summary-text">
-                  <span class="settings-summary-title">Encrypted backup</span>
-                  <span class="settings-summary-sub">Restore from a saved backup file</span>
-                </span>
-                <span class="list-chevron" aria-hidden="true">›</span>
-              </summary>
-              <div class="settings-panel settings-panel-action">
-                <p class="form-hint">
-                  Use a <code>.hcbackup</code> file you downloaded earlier. Restores ownership of this
-                  card and its object QRs. Never uploaded to humanity.llc.
-                </p>
-                <form id="import-backup-form" class="compact-form" novalidate>
-                  <label class="form-label" for="import-backup-file">Backup file</label>
-                  <input
-                    class="form-input"
-                    id="import-backup-file"
-                    name="backup_file"
-                    type="file"
-                    accept=".json,.hcbackup,application/json"
-                    required
-                  />
-                  <label class="form-label" for="import-passphrase">Backup passphrase</label>
-                  <input
-                    class="form-input"
-                    id="import-passphrase"
-                    name="passphrase"
-                    type="password"
-                    autocomplete="off"
-                    minlength="12"
-                    required
-                    placeholder="Same passphrase used when downloading"
-                  />
-                  <button type="submit" class="btn-secondary">Restore ownership</button>
-                </form>
-                <p class="form-status" id="import-backup-status" hidden></p>
-                <p class="form-hint">
-                  To download a new encrypted backup, paste a raw recovery key, or inspect public key
-                  material, open <strong>Export for developers</strong> below.
-                </p>
-              </div>
-            </details>
-
             <details
               class="settings-disclosure settings-disclosure-info"
               id="created-developer-export-details"
@@ -1430,7 +1495,7 @@
                 </span>
                 <span class="settings-summary-text">
                   <span class="settings-summary-title">Export for developers</span>
-                  <span class="settings-summary-sub">Public key · encrypted backup · raw recovery import</span>
+                  <span class="settings-summary-sub">Public key · encrypted backup download</span>
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
               </summary>
@@ -1484,25 +1549,6 @@
                   </form>
                   <p class="form-status" id="export-backup-status" hidden></p>
                 </div>
-
-                <section class="group created-developer-export-section" aria-label="Import raw recovery key">
-                  <h3 class="form-label">Import raw recovery key</h3>
-                  <p class="form-hint">Lost this tab? Paste the recovery code you saved at create.</p>
-                  <form id="import-recovery-form" class="compact-form" novalidate>
-                    <label class="form-label" for="import-recovery-key">Recovery private key (Base58)</label>
-                    <textarea
-                      class="form-input form-textarea"
-                      id="import-recovery-key"
-                      name="recovery_key"
-                      rows="3"
-                      placeholder="Paste recovery code"
-                      autocomplete="off"
-                      required
-                    ></textarea>
-                    <button type="submit" class="btn-secondary">Restore with recovery code</button>
-                  </form>
-                  <p class="form-status" id="import-recovery-status" hidden></p>
-                </section>
 
                 <section class="group created-developer-export-section" id="network-details" aria-label="Inspect on network">
                   <h3 class="form-label">Inspect on network</h3>
@@ -1627,9 +1673,8 @@
               <p class="hc-emphasis-card__eyebrow">View only</p>
               <p class="hc-emphasis-card__title">Ownership not loaded in this tab</p>
               <p class="hc-emphasis-card__detail" id="no-session-detail">
-                Finish create in the tab where you clicked Create, then tap
-                <strong>Save ownership on this device</strong> there. Later: recovery method or encrypted backup
-                under <strong>Manage</strong> on this card page.
+                Import your recovery code or encrypted backup file in Manage below.
+                humanity.llc cannot restore your object without a backup you saved at create.
               </p>
             </div>
           </div>
@@ -1639,8 +1684,8 @@
         </div>
       </main>
     </div>
-    <script src="/js/device-status-bootstrap.mjs?v=65" type="module"></script>
+    <script src="/js/device-status-bootstrap.mjs?v=66" type="module"></script>
     <script src="/js/created-hub.mjs?v=3" type="module"></script>
-    <script type="module" src="/js/created.mjs?v=65"></script>
+    <script type="module" src="/js/created.mjs?v=66"></script>
   </body>
 </html>

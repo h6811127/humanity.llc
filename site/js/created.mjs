@@ -50,6 +50,7 @@ import {
   restoreKeysStripToControlPanel,
 } from "./created-workspace.mjs";
 import { createdViewRestoreHashKey } from "./created-view-mode-core.mjs";
+import { createdViewDefaultTabId } from "./created-view-live-core.mjs";
 import {
   applyCreatedViewModeUi,
   clearCreatedViewModeUi,
@@ -64,7 +65,7 @@ import {
   tabSessionHasSigningKeys,
 } from "./device-keys.mjs";
 import { activateWalletEntryGated } from "./device-control-activation.mjs";
-import { isWalletSaved, loadWallet, saveSessionToWallet } from "./device-wallet.mjs";
+import { isWalletSaved, loadWallet, getWalletSigningKeyCount, saveSessionToWallet } from "./device-wallet.mjs";
 import { applyHumanTrustIconToElement } from "./human-trust-ui.mjs";
 import {
   applyCreatedRoutePendingShell,
@@ -73,6 +74,7 @@ import {
 } from "./created-route-gate.mjs";
 import { getCardJsonUrl, getCardStatusUrl } from "./hc-sign.mjs";
 import { resolverErrorMessage } from "./resolver-user-error-core.mjs";
+import { viewOnlyNoSessionDetailHtml } from "./created-view-only-copy-core.mjs";
 
 const params = new URLSearchParams(location.search);
 const profileIdParam = params.get("profile_id")?.trim() || null;
@@ -104,6 +106,10 @@ function setNoSessionNotice(html) {
     return;
   }
   noSessionEl.innerHTML = `<p class="hc-notice-body">${html}</p>`;
+}
+
+function applyViewOnlyNoSessionCopy() {
+  setNoSessionNotice(viewOnlyNoSessionDetailHtml(getWalletSigningKeyCount()));
 }
 
 function loadSession() {
@@ -984,17 +990,21 @@ if (workspaceMode === "view" && profileId && activeQrId) {
   clearKeylessTabSessionIfPresent();
   data = loadSession();
   if (noSessionEl) noSessionEl.hidden = true;
-  applyCreatedViewModeUi();
+  applyCreatedViewModeUi({ signingKeyCount: getWalletSigningKeyCount() });
   createdTabs = initCreatedTabs();
   const restoreHash = createdViewRestoreHashKey(location.hash);
+  createdTabs.select(createdViewDefaultTabId(restoreHash));
   if (restoreHash) {
     focusCreatedViewRestore((id) => createdTabs.select(id));
-  } else {
-    createdTabs.select("advanced");
-    focusCreatedViewRestore((id) => createdTabs.select(id));
   }
+  setupCreatedDashboard();
+  dashboardWired = true;
+  document.getElementById("created-view-live-restore-btn")?.addEventListener("click", () => {
+    focusCreatedViewRestore((id) => createdTabs?.select(id));
+  });
 } else if (workspaceMode === "view" && noSessionEl) {
   noSessionEl.hidden = false;
+  applyViewOnlyNoSessionCopy();
 }
 
 if (profileId && activeQrId) {
@@ -1109,6 +1119,12 @@ if (activeScanUrl) {
 
 async function bootstrapViewRestoreTools() {
   if (!profileId || !activeQrId) return;
+
+  try {
+    await hydrateSessionFromNetwork();
+  } catch {
+    /* view mode still shows resolver status + QR from scan URL */
+  }
 
   const onRestored = () => {
     enterControlWorkspace();

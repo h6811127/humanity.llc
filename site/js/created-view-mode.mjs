@@ -1,18 +1,26 @@
 /**
  * Apply read-only /created/ workspace chrome when keys are not in this tab.
  * @see docs/OWNERSHIP_RESTORE_UX_PLAN.md
+ * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P0-7
  */
 
+import { OWNERSHIP_NOT_LOADED_TAB } from "./device-ownership-copy-core.mjs";
 import {
-  OWNERSHIP_NOT_LOADED_TAB,
-  VIEW_ONLY_MANAGE_TAB_LEAD,
-  VIEW_ONLY_RESTORE_LEAD,
-} from "./device-ownership-copy-core.mjs";
+  viewOnlyLiveTabLead,
+  viewOnlyManageTabLead,
+  viewOnlyRestoreLead,
+} from "./created-view-only-copy-core.mjs";
+import {
+  CREATED_VIEW_LIVE_PROOF_ID,
+  CREATED_VIEW_LIVE_SIGNING_ONLY_IDS,
+} from "./created-view-live-core.mjs";
 
 /**
  * Show restore panel and hide signing-only controls.
+ * @param {{ signingKeyCount?: number }} [opts]
  */
-export function applyCreatedViewModeUi() {
+export function applyCreatedViewModeUi(opts = {}) {
+  const signingKeyCount = opts.signingKeyCount ?? 0;
   if (typeof document === "undefined") return;
   document.body.dataset.createdMode = "view";
 
@@ -24,11 +32,11 @@ export function applyCreatedViewModeUi() {
   if (controlLead) controlLead.hidden = true;
   if (viewLead) {
     viewLead.hidden = false;
-    viewLead.textContent = VIEW_ONLY_MANAGE_TAB_LEAD;
+    viewLead.textContent = viewOnlyManageTabLead(signingKeyCount);
   }
 
   const restoreLead = document.getElementById("created-view-restore-lead");
-  if (restoreLead) restoreLead.textContent = VIEW_ONLY_RESTORE_LEAD;
+  if (restoreLead) restoreLead.textContent = viewOnlyRestoreLead(signingKeyCount);
 
   const ownershipHint = document.getElementById("created-view-ownership-hint");
   if (ownershipHint) ownershipHint.textContent = OWNERSHIP_NOT_LOADED_TAB;
@@ -36,6 +44,18 @@ export function applyCreatedViewModeUi() {
   for (const el of document.querySelectorAll("[data-created-signing-only]")) {
     el.hidden = true;
   }
+
+  const liveBanner = document.getElementById("created-view-live-banner");
+  const liveLead = document.getElementById("created-view-live-lead");
+  if (liveBanner) liveBanner.hidden = false;
+  if (liveLead) liveLead.textContent = viewOnlyLiveTabLead(signingKeyCount);
+
+  for (const id of CREATED_VIEW_LIVE_SIGNING_ONLY_IDS) {
+    const el = document.getElementById(id);
+    if (el) el.hidden = true;
+  }
+  const liveProof = document.getElementById(CREATED_VIEW_LIVE_PROOF_ID);
+  if (liveProof) liveProof.hidden = true;
 
   const networkDetails = document.getElementById("revoke-details");
   if (networkDetails instanceof HTMLDetailsElement) {
@@ -63,6 +83,14 @@ export function clearCreatedViewModeUi() {
 
   for (const el of document.querySelectorAll("[data-created-signing-only]")) {
     el.hidden = false;
+  }
+
+  const liveBanner = document.getElementById("created-view-live-banner");
+  if (liveBanner) liveBanner.hidden = true;
+
+  for (const id of CREATED_VIEW_LIVE_SIGNING_ONLY_IDS) {
+    const el = document.getElementById(id);
+    if (el) el.hidden = false;
   }
 }
 

@@ -366,6 +366,19 @@ Automated: `npm run e2e:wallet-scale-guardrail` (W1–W3).
 
 Automated: `npm run e2e:key-loss-sad-path` · `npm run worker:test:key-loss-copy`.
 
+### P1-RESTORE · View-only Live tab + restore (OWNERSHIP_RESTORE Phase 3)
+
+**Refs:** [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) · [`KEY_LOSS_SAD_PATH_MATRIX.md`](KEY_LOSS_SAD_PATH_MATRIX.md) (K1/K5).
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Open `/created/?profile_id=…&qr_id=…` with no signing keys in tab | **Live** tab active; `#created-view-live-banner` visible; deploy disclosures (print / test / download) usable |
+| 2 | Same visit | **What scanners see** / publish form hidden; live-proof strip hidden |
+| 3 | Tap **Restore ownership** on Live banner | **Manage** tab; restore panel + import visible |
+| 4 | Deep link `#recovery` or `#backup` | Lands **Manage** with restore panel in view |
+
+Automated: `npm run e2e:key-loss-sad-path` (K1) · `npm run worker:test -- worker/tests/created-view-live-core.test.ts`
+
 ### P1-HOSTED-BR · Billing checkout return (O1–O2)
 
 **Refs:** [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.md) · [`HOSTED_TIER_G0_READINESS.md`](HOSTED_TIER_G0_READINESS.md).

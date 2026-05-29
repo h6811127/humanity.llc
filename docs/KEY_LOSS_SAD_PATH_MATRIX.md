@@ -48,7 +48,9 @@ Central strings: `site/js/device-ownership-copy-core.mjs`
 |----------|-----|
 | `OWNERSHIP_NOT_LOADED_TAB` | Revoke / save / wallet errors |
 | `VIEW_ONLY_CARD_TITLE` | `/created/` view mode hero |
-| `VIEW_ONLY_NO_SESSION_DETAIL` | `#no-session-detail` guidance |
+| `VIEW_ONLY_NO_SESSION_WALLET_EMPTY` | `#no-session-detail` when wallet has no signing rows (Flow C) |
+| `VIEW_ONLY_NO_SESSION_WALLET_SAVED` | `#no-session-detail` when wallet has keys but tab does not |
+| `viewOnlyNoSessionDetailHtml(signingKeyCount)` | Runtime branch for `#no-session-detail` (P0-7) |
 | `BACKUP_WRONG_PASSPHRASE` | `.hcbackup` decrypt failure |
 | `BACKUP_INVALID_OWNERSHIP` | Invalid backup payload |
 | `IMPORT_OWNERSHIP_LOADED_TAB` | Successful hub import |

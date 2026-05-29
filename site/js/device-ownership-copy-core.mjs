@@ -28,15 +28,38 @@ export const BACKUP_WRONG_PASSPHRASE =
 /** `/created/` view mode when signing keys are not in this tab (K1 · K5). */
 export const VIEW_ONLY_CARD_TITLE = "View this card";
 
-export const VIEW_ONLY_NO_SESSION_DETAIL =
-  "Open the Manage tab and use Restore ownership below — recovery code or encrypted backup file. Save ownership on this device only works in the browser where you created the card.";
+/** Wallet empty — true wipe / never saved (Flow C · P0-7). */
+export const VIEW_ONLY_NO_SESSION_WALLET_EMPTY =
+  "Import your recovery code or encrypted backup file in Manage below. humanity.llc cannot restore your object without a backup you saved at create.";
 
+/** Wallet has signing rows but this tab cannot sign (P0-7). */
+export const VIEW_ONLY_NO_SESSION_WALLET_SAVED =
+  'Ownership is saved on this device but not in this tab. Open <a href="/wallet/">My objects</a> and tap <strong>Open controls</strong>, or use Restore ownership in Manage below.';
 
-export const VIEW_ONLY_MANAGE_TAB_LEAD =
+/** @deprecated Use `viewOnlyNoSessionDetailHtml(signingKeyCount)` — kept for copy guards. */
+export const VIEW_ONLY_NO_SESSION_DETAIL = VIEW_ONLY_NO_SESSION_WALLET_EMPTY;
+
+export const VIEW_ONLY_MANAGE_TAB_LEAD_EMPTY =
   "Read-only network snapshot and restore paths. Signing controls appear after you restore ownership in this tab.";
 
-export const VIEW_ONLY_RESTORE_LEAD =
+export const VIEW_ONLY_MANAGE_TAB_LEAD_SAVED =
+  "Read-only network snapshot. Your ownership is still saved on this device — restore control in this tab below or open My objects and tap Open controls.";
+
+/** @deprecated Use `viewOnlyManageTabLead(signingKeyCount)`. */
+export const VIEW_ONLY_MANAGE_TAB_LEAD = VIEW_ONLY_MANAGE_TAB_LEAD_EMPTY;
+
+export const VIEW_ONLY_RESTORE_LEAD_EMPTY =
   "Paste the recovery code you saved at create, or import an encrypted backup file. humanity.llc cannot restore your object for you.";
+
+export const VIEW_ONLY_RESTORE_LEAD_SAVED =
+  "Your ownership is still saved on this device. Use Restore ownership below or open My objects and tap Open controls to sign in this tab.";
+
+/** @deprecated Use `viewOnlyRestoreLead(signingKeyCount)`. */
+export const VIEW_ONLY_RESTORE_LEAD = VIEW_ONLY_RESTORE_LEAD_EMPTY;
+
+/** Live tab banner when viewing without signing keys (OWNERSHIP_RESTORE Phase 3). */
+export const VIEW_ONLY_LIVE_TAB_LEAD =
+  "Read-only view of your live object. Use the QR and deploy tasks below, or open Manage to restore ownership and update.";
 
 /** Setup wizard protect step (Phase 2 · K7). */
 export const SETUP_SEATBELT_PANEL_LEAD =

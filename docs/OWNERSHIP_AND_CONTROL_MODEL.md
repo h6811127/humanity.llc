@@ -404,6 +404,7 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | Quiet tab rehydrate (D10) | `device-quiet-tab-rehydrate*.mjs` |
 | Durable storage (D11) | `device-storage-persist-core.mjs`, `device-storage-persist.mjs` |
 | Setup save-step omit (D11b) | `created-setup-core.mjs`, `created-setup.mjs` |
+| View-only Live tab (restore Phase 3) | `created-view-live-core.mjs`, `created-view-mode.mjs` |
 | Cross-tab | `device-tab-presence.mjs`, `device-cross-tab-banner.mjs` |
 | Backup/recovery | `key-backup*.mjs`, `recovery-key-ui.mjs` |
 | Vouch / attestation | `vouch-issue.mjs`, `vouch-ready-keys.mjs`, `device-control-activation*.mjs` |

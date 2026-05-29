@@ -80,6 +80,7 @@
     "worker:test:live-control-printed-qa": "vitest run worker/tests/live-control-printed-qa.test.ts",
     "worker:test:key-loss-copy": "vitest run worker/tests/key-loss-copy-guards.test.ts worker/tests/key-backup.test.ts worker/tests/key-backup-import.test.ts",
     "worker:test:setup-protect": "vitest run worker/tests/created-setup-seatbelt.test.ts worker/tests/created-setup-hash.test.ts worker/tests/key-loss-copy-guards.test.ts -t \"K7|seatbelt|protect|Five steps\"",
+    "worker:test:view-only-restore": "vitest run worker/tests/created-view-only-copy-core.test.ts worker/tests/created-view-live-core.test.ts worker/tests/created-view-mode-core.test.ts worker/tests/key-loss-copy-guards.test.ts -t \"K1|view-only|Live tab|viewOnly|created-view|read-only\"",
     "worker:test:sheet-backdrop": "vitest run worker/tests/device-sheet-backdrop-sync.test.ts worker/tests/device-safe-rebuild-tripwires.test.ts",
     "worker:test:hosted-billing-return": "vitest run worker/tests/export-e2e-test-keypair.test.ts worker/tests/device-steward-billing-return-core.test.ts worker/tests/device-steward-session.test.ts",
     "worker:test:pwa-install": "vitest run worker/tests/pwa-install-metadata.test.ts worker/tests/pwa-install-ux.test.ts worker/tests/pwa-standalone-refresh-core.test.ts worker/tests/pwa-scan-handoff-core.test.ts",
