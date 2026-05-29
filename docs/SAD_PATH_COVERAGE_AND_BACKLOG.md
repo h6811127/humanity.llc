@@ -27,10 +27,11 @@ Use it when prioritizing hardening before launch surfaces (live proof in person,
 | Automated matrix S1–S9 | **Wired** (e2e + vitest) | Same doc § Recommended test matrix |
 | Generic create → scan → revoke (strangers) | **Passed** 2026-05-27 | [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) |
 | Live proof infra errors (1101, poll retry) | **Shipped** H-01–H-03 | [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) |
-| Live proof in-person handoff | **H-04–H-10 shipped** (scanner recovery H-09/H-10: 2026-05-29); **H-13–H-15 engineering shipped** (2026-05-29); H-11–H-12 human QA open | [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) |
+| Live proof in-person handoff | **H-04–H-10 shipped** (scanner recovery H-09/H-10: 2026-05-29); **H-13–H-15 engineering shipped** (2026-05-29); **H-11 passed** (2026-05-29); **H-12 desk gate shipped** — human printed QA pending | [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) |
 | Merch checkout sad paths | **Matrix + automated M1–M8** (2026-05-29); live payment + physical QA open | [`MERCH_CHECKOUT_SAD_PATH_MATRIX.md`](MERCH_CHECKOUT_SAD_PATH_MATRIX.md) |
 | Large wallet / power user | **Guardrails shipped** (comfort + large hints; E2E W1–W3) | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Open issues |
 | Social / trust misunderstanding | **Copy exists**; comprehension not fully re-run | [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) |
+| Hosted ops (billing return) | **O1–O2 E2E shipped** (2026-05-29) | [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.md) |
 
 ---
 
@@ -65,10 +66,11 @@ Agents are strong at **systematic enumeration** against docs and code. Humans an
 | H-08 | Tab backgrounding (code shipped) | Owner switches to Camera/Messages | Misses 2-minute window without resume poll |
 | **H-09** | **Scan refresh mid-wait** | Scanner refreshes during wait | Must re-ask even if challenge pending |
 | **H-10** | **Expiry retry affordance** | Challenge window ends | Stranger does not notice they can ask again |
-| H-11–H-12 | Comprehension + printed QA | Unscripted strangers | Copy guards pass; meaning unverified |
+| H-11 | Comprehension runbook | Unscripted strangers | **Passed** 2026-05-29 |
+| H-12 | Printed camera QA | ≥3 phones, camera scan | Desk gate: `npm run worker:test:live-control-printed-qa` |
 | H-13 | Full-loop Playwright E2E | **Shipped** — `npm run e2e:live-control-loop` | Poll→proven + refresh resume + expiry retry |
 
-**Engineering next step (Slice E):** H-11 / H-12 human comprehension + printed QA runbooks — see [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) § P2.
+**Human next step (Slice E):** H-12 printed camera QA runbook on ≥3 phones — see [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md).
 
 ### 2. Key custody and continuity (by design, still sad)
 
@@ -132,9 +134,11 @@ No unit test fully catches **acting** on a misunderstanding.
 
 ### 8. Adversarial / ops
 
+Canonical matrix: [`HOSTED_OPS_SAD_PATH_MATRIX.md`](HOSTED_OPS_SAD_PATH_MATRIX.md).
+
 - Public create rate limits (A-012F)
 - Impersonation handles
-- Hosted tier billing return — `e2e/hosted-tier-billing-return.spec.ts`
+- Hosted tier billing return — **Shipped** — `npm run e2e:hosted-tier-billing-return` (O1–O2)
 - Operator schema drift (live control FK — gated post-incident)
 
 ---
@@ -166,6 +170,7 @@ No unit test fully catches **acting** on a misunderstanding.
 | **P2** | Large wallet guardrails | **Shipped** — `e2e/wallet-scale-guardrail.spec.ts` (W1–W3) | Shell |
 | **P2** | Scan URL hints | **Shipped** — `scan-malformed-hint.ts` + Vitest | Resolver |
 | **P2** | H-13 full-loop E2E | `e2e/live-control-loop.spec.ts` | **Shipped** 2026-05-29 |
+| **P2** | Hosted billing return (O1–O2) | **Shipped** — `e2e/hosted-tier-billing-return.spec.ts` | Ops |
 
 ---
 
@@ -196,6 +201,8 @@ No unit test fully catches **acting** on a misunderstanding.
 | **S21** | **View-only /created/ without tab keys (K1)** | `e2e/key-loss-sad-path.spec.ts` |
 | **S22** | **Wrong backup passphrase (K2)** | Same · `worker/tests/key-backup.test.ts` |
 | **S23** | **Wallet label without signing keys (K5)** | `e2e/key-loss-sad-path.spec.ts` |
+| **S24** | **Hosted billing return without tab keys (O1)** | `e2e/hosted-tier-billing-return.spec.ts` |
+| **S25** | **Hosted billing return links after keys load (O2)** | Same |
 
 Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) § Recommended test matrix.
 
@@ -214,6 +221,7 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 | P1-LC-E2E · Live control loop (H-13) | `npm run e2e:live-control-loop` |
 | **P1-LW-SCALE · Wallet scale guardrails (W1–W3)** | `npm run e2e:wallet-scale-guardrail` |
 | **P1-KL · Key-loss view-only + backup import (K1–K2)** | `npm run e2e:key-loss-sad-path` |
+| **P1-HOSTED-BR · Billing checkout return (O1–O2)** | `npm run e2e:hosted-tier-billing-return` |
 
 ---
 
@@ -221,6 +229,7 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 
 | Date | Notes |
 |------|-------|
+| 2026-05-29 | Hosted ops sad-path matrix + O1–O2 E2E index (`HOSTED_OPS_SAD_PATH_MATRIX.md`) |
 | 2026-05-29 | Key-loss matrix + K1/K2/K5 E2E (`KEY_LOSS_SAD_PATH_MATRIX.md`) |
 | 2026-05-29 | P2 wallet scale guardrails E2E (W1–W3); scan URL hints marked shipped |
 | 2026-05-29 | Merch sad-path matrix + M1–M2 E2E (`MERCH_CHECKOUT_SAD_PATH_MATRIX.md`) |

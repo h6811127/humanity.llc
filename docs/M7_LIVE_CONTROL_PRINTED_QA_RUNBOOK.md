@@ -38,7 +38,8 @@ URL must be canonical HTTPS: `https://humanity.llc/c/{profile_id}?q={qr_id}` (no
 **Automated pre-check (operator desk):**
 
 ```bash
-npm run worker:test -- worker/tests/scan.test.ts worker/tests/live-control.test.ts
+npm run worker:test:live-control-printed-qa
+npm run e2e:live-control-loop
 ```
 
 ---
@@ -70,7 +71,7 @@ Scanner phone = camera scan from **§ A**. Owner phone = keys on `/created/`.
 | B3 | Owner opens proof link → **Prove control now** → scanner shows **Control proven** | ☐ |
 | B4 | Success copy includes **does not prove legal identity** (see comprehension runbook) | ☐ |
 | B5 | After proof display window, scanner returns to **Ask for live proof** (not stuck success) | ☐ |
-| B6 | Unsigned challenge past 120s → **Control was not proven. The request expired.** | ☐ |
+| B6 | Unsigned challenge past 120s → **The 2-minute window ended. You can ask again.** | ☐ |
 
 **Fail action:** Fix `scan-html.ts` client script or Worker live-control routes; re-run on all three phones.
 

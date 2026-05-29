@@ -320,7 +320,7 @@ See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 
 ### P1-LCP · Live control printed QR camera QA (M7 Step 2)
 
-**Runbook:** [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) · desk check: `npm run worker:test -- worker/tests/scan.test.ts worker/tests/live-control.test.ts`.
+**Runbook:** [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) · desk check: `npm run worker:test:live-control-printed-qa` · `npm run e2e:live-control-loop`.
 
 | Step | Action | Expected |
 |------|--------|----------|

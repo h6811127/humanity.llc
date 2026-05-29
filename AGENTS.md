@@ -34,7 +34,7 @@ source ~/.nvm/nvm.sh && nvm use 20.18.1
 - **Build check**: `npm run build` (validates static site exists)
 - **Build stamps (debug):** `docs/SITE_BUILD_VERSIONING.md` — Pages: `npm run site:build-meta` before `pages:deploy`; console + hub (`hc_debug`). Worker: `npm run worker:build-meta` before `worker:deploy`; `GET /.well-known/hc/v1/health` → `build`. Tests: `npm run worker:test -- worker/tests/site-build-meta.test.ts worker/tests/resolver-health-build.test.ts`.
 - **Public feature map:** `docs/FEATURE_MAP_MAINTENANCE.md` — hub `/features-available-now.html`; after `site/scripts/generate-feature-pages.mjs` changes run `npm run site:generate-features`.
-- **Sad-path coverage:** `docs/SAD_PATH_COVERAGE_AND_BACKLOG.md` — unhappy-path inventory, agent vs human validation, prioritized backlog; live proof E2E: `npm run e2e:live-control-loop`.
+- **Sad-path coverage:** `docs/SAD_PATH_COVERAGE_AND_BACKLOG.md` — unhappy-path inventory, agent vs human validation, prioritized backlog; live proof E2E: `npm run e2e:live-control-loop`; printed QR desk gate (H-12): `npm run worker:test:live-control-printed-qa`.
 - **Worker dev**: `npm run worker:dev`
 - **Pages dev**: `npm run pages:dev`
 - **Showcase scan URLs** (M5 / landing): `npm run site:refresh-showcase` (status plate + live object streams), or `site:seed-showcase` / `site:seed-showcase-live-object` / `site:seed-showcase-lost-item` individually (each needs `API_ORIGIN`)
