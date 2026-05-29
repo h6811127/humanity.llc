@@ -54,3 +54,23 @@ export function shouldQuietTabRehydrate(input) {
   if (signingWalletCount > 1) return quietRehydrateEnabled;
   return false;
 }
+
+/**
+ * Shell cross-tab entries to hide after quiet rehydrate (D10 Tier 3).
+ * Keeps unsaved-only-other-tab rows for other profiles.
+ *
+ * @param {Array<{ profile_id?: string }>} entries
+ * @param {{ quietRehydratedProfileId?: string | null, thisTabProfileId?: string | null }} ctx
+ */
+export function filterCrossTabEntriesAfterQuietRehydrate(entries, ctx = {}) {
+  const quietRehydratedProfileId = ctx.quietRehydratedProfileId ?? null;
+  const thisTabProfileId = ctx.thisTabProfileId ?? null;
+  if (!quietRehydratedProfileId && !thisTabProfileId) return entries;
+  return entries.filter((entry) => {
+    const pid = entry?.profile_id;
+    if (!pid) return false;
+    if (quietRehydratedProfileId && pid === quietRehydratedProfileId) return false;
+    if (thisTabProfileId && pid === thisTabProfileId) return false;
+    return true;
+  });
+}

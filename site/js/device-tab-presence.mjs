@@ -22,6 +22,8 @@ import {
   shouldSkipPresenceHeartbeat,
   shouldTouchPresenceRow,
 } from "./device-tab-presence-core.mjs";
+import { filterCrossTabEntriesAfterQuietRehydrate } from "./device-quiet-tab-rehydrate-core.mjs";
+import { getQuietTabRehydratedProfile } from "./device-quiet-tab-rehydrate-prefs.mjs";
 
 const PRESENCE_KEY = "hc_tab_keys_presence";
 const FOCUS_CHANNEL = "hc-tab-focus";
@@ -148,13 +150,18 @@ export function getOtherTabsWithKeys(opts = {}) {
   const savedProfileIds = opts.includeSavedProfiles
     ? []
     : savedProfileIdsOnDevice();
-  return listOtherTabsWithKeys({
+  const others = listOtherTabsWithKeys({
     map,
     tabId,
     thisProfile,
     savedProfileIds,
     removedProfileIds: loadRemovedProfileIds(),
   }).others;
+  if (opts.includeSavedProfiles) return others;
+  return filterCrossTabEntriesAfterQuietRehydrate(others, {
+    quietRehydratedProfileId: getQuietTabRehydratedProfile(),
+    thisTabProfileId: thisProfile,
+  });
 }
 
 /**

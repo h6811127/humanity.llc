@@ -5,6 +5,7 @@
 
 export const QUIET_TAB_REHYDRATE_KEY = "hc_quiet_tab_rehydrate";
 export const LAST_ACTIVE_PROFILE_KEY = "hc_last_active_profile_id";
+export const QUIET_TAB_REHYDRATED_PROFILE_KEY = "hc_quiet_tab_rehydrated_profile";
 export const QUIET_TAB_REHYDRATE_CHANGED = "hc-quiet-tab-rehydrate-changed";
 
 /**
@@ -51,6 +52,30 @@ export function setLastActiveProfileId(profileId) {
 export function clearLastActiveProfileIfProfile(profileId) {
   if (getLastActiveProfileId() === profileId) {
     setLastActiveProfileId(null);
+  }
+}
+
+/** @returns {string | null} Profile quietly rehydrated into this tab this load (Tier 3). */
+export function getQuietTabRehydratedProfile() {
+  try {
+    const id = sessionStorage.getItem(QUIET_TAB_REHYDRATED_PROFILE_KEY);
+    return id && id.trim() ? id.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
+/** @param {string} profileId */
+export function setQuietTabRehydratedProfile(profileId) {
+  try {
+    const pid = typeof profileId === "string" ? profileId.trim() : "";
+    if (!pid) {
+      sessionStorage.removeItem(QUIET_TAB_REHYDRATED_PROFILE_KEY);
+    } else {
+      sessionStorage.setItem(QUIET_TAB_REHYDRATED_PROFILE_KEY, pid);
+    }
+  } catch {
+    /* ignore */
   }
 }
 

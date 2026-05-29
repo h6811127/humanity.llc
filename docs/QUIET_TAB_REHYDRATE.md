@@ -1,6 +1,6 @@
 # Quiet tab rehydrate (passkey-like control)
 
-**Status:** Tier 1–2 shipped · Tier 3 planned  
+**Status:** Tier 1–3 shipped  
 **Audience:** Product, frontend, security review  
 **Companions:** [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) · [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERIFICATION.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`VOUCH_READY_KEYS_DESIGN.md`](VOUCH_READY_KEYS_DESIGN.md) · [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md)
 
@@ -42,7 +42,7 @@ Today, a **new tab** on `/`, `/wallet/`, or `/create/` can show cross-tab / “t
 |------|----------|--------|
 | **1** | Exactly **one** saved card with signing keys + empty `hc_created` + no unlock gate → silent rehydrate on **shell bootstrap** (`/`, `/wallet/`, `/create/`, `/created/`) | **Shipped** |
 | **2** | Remember `hc_last_active_profile_id`; rehydrate that profile on new tabs (hub toggle, default on) when multi-card | **Shipped** |
-| **3** | Demote cross-tab chrome when rehydrate succeeds; keep notices for unsaved-only-other-tab and unlock-pending | Planned |
+| **3** | Demote cross-tab chrome when rehydrate succeeds; keep notices for unsaved-only-other-tab and unlock-pending | **Shipped** |
 
 **Already shipped (related, narrower):**
 
@@ -110,15 +110,34 @@ After Tier 1 preconditions (empty tab, no unlock gate), when **two or more** sig
 
 ---
 
+## Tier 3 contract
+
+After successful bootstrap rehydrate (`activateWalletEntryGated` succeeds):
+
+1. Record `hc_quiet_tab_rehydrated_profile` in `sessionStorage` for this tab load
+2. Purge stale cross-tab presence for that profile (`notifyProfileSavedOnDevice`) and reset fingerprint streaks
+3. Filter shell cross-tab inbox/banner inputs via `filterCrossTabEntriesAfterQuietRehydrate()` — hides the rehydrated profile only; **other** unsaved-only tabs still qualify
+
+### When Tier 3 does not run
+
+| Condition | Cross-tab UX |
+|-----------|----------------|
+| Rehydrate skipped (unlock pending, multi-card opt-out, activation failed) | Unchanged — take-control / inbox notices remain |
+| Other tab holds **different** unsaved profile | Notice kept (`tab_keys_unsaved` / cross-tab row) |
+| Scan surfaces (`includeSavedProfiles: true`) | Unchanged — vouch scan may still show “keys in another tab” |
+
+---
+
 ## Files
 
 | Area | Module |
 |------|--------|
 | Pure rules | `site/js/device-quiet-tab-rehydrate-core.mjs` |
 | Device prefs + hub toggle | `site/js/device-quiet-tab-rehydrate-prefs.mjs` |
-| Bootstrap hook | `site/js/device-quiet-tab-rehydrate.mjs` |
+| Bootstrap hook + Tier 3 demotion | `site/js/device-quiet-tab-rehydrate.mjs` |
 | Last-active writes | `device-keys.mjs`, `device-wallet.mjs`, `create-card.mjs` |
 | Last-active clear on remove | `device-wallet-removed-profiles.mjs` |
+| Shell cross-tab filter | `device-tab-presence.mjs` (`getOtherTabsWithKeys`) |
 | Wire | `site/js/device-status.mjs` (await before `startTabKeysPresence` / chrome refresh) |
 | Tests | `worker/tests/device-quiet-tab-rehydrate-core.test.ts`, `worker/tests/device-quiet-tab-rehydrate.test.ts` |
 

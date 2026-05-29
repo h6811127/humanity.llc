@@ -14,7 +14,31 @@ import {
 import {
   getLastActiveProfileId,
   isQuietTabRehydrateEnabled,
+  setQuietTabRehydratedProfile,
 } from "./device-quiet-tab-rehydrate-prefs.mjs";
+import { invalidateCrossTabNotificationState } from "./device-cross-tab-state.mjs";
+import { resetPresenceInboxGatherCache } from "./device-inbox.mjs";
+import {
+  notifyProfileSavedOnDevice,
+  syncTabKeysPresence,
+} from "./device-tab-presence.mjs";
+
+/**
+ * Demote cross-tab chrome after bootstrap rehydrate (D10 Tier 3).
+ * @param {string} profileId
+ */
+export function applyQuietRehydrateCrossTabDemotion(profileId) {
+  const pid = typeof profileId === "string" ? profileId.trim() : "";
+  if (!pid) return;
+  setQuietTabRehydratedProfile(pid);
+  notifyProfileSavedOnDevice(pid);
+  syncTabKeysPresence();
+  invalidateCrossTabNotificationState();
+  resetPresenceInboxGatherCache();
+  window.dispatchEvent(
+    new CustomEvent("hc-quiet-tab-rehydrated", { detail: { profile_id: pid } })
+  );
+}
 
 /**
  * @returns {Promise<{ ok: true, profileId: string } | { skipped: string }>}
@@ -55,5 +79,6 @@ export async function maybeQuietTabRehydrate() {
     return { skipped: "activation_failed" };
   }
 
+  applyQuietRehydrateCrossTabDemotion(profileId);
   return { ok: true, profileId };
 }

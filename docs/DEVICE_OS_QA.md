@@ -409,7 +409,7 @@ Automated: `npm run worker:test -- worker/tests/device-hub-stranger-empty-core.t
 
 Automated: `npm run worker:test -- worker/tests/device-dot-state.test.ts worker/tests/device-hub-intro-coachmark.test.ts` · `e2e/device-status-dot.spec.ts` § shell S4
 
-### P1-QTR · Quiet tab rehydrate (D10 Tier 1–2)
+### P1-QTR · Quiet tab rehydrate (D10 Tier 1–3)
 
 **Spec:** [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md)
 
@@ -420,7 +420,8 @@ Automated: `npm run worker:test -- worker/tests/device-dot-state.test.ts worker/
 | 3 | Two saved cards, last-active set, toggle on → new tab → `/` | Silent rehydrate of last-active object; no picker tap |
 | 4 | Two saved cards, hub toggle **Open last object in new tabs** off → new tab | **No** silent rehydrate — existing take-control / hub picker UX |
 | 5 | Two saved cards, no last-active → new tab | **No** silent rehydrate |
-| 6 | One card + sign lock on → new tab | **No** silent rehydrate until unlock |
+| 6 | One card + sign lock on → new tab | **No** silent rehydrate until unlock; cross-tab / take-control notice **remains** |
+| 7 | Rehydrate succeeds with other tab on same saved profile | **No** cross-tab notice for that profile on new tab |
 
 Automated: `npm run worker:test -- worker/tests/device-quiet-tab-rehydrate-core.test.ts worker/tests/device-quiet-tab-rehydrate.test.ts`
 

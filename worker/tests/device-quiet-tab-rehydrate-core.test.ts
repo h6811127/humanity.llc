@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  filterCrossTabEntriesAfterQuietRehydrate,
   resolveQuietTabRehydrateTarget,
   shouldQuietTabRehydrate,
   soleSigningWalletEntry,
@@ -121,6 +122,24 @@ describe("device-quiet-tab-rehydrate-core", () => {
         requiresUnlock: true,
       })
     ).toBe(false);
+  });
+
+  it("filters cross-tab rows for quietly rehydrated profile only", () => {
+    const entries = [
+      { tabId: "t1", profile_id: "rehydrated" },
+      { tabId: "t2", profile_id: "unsaved-other" },
+    ];
+    expect(
+      filterCrossTabEntriesAfterQuietRehydrate(entries, {
+        quietRehydratedProfileId: "rehydrated",
+        thisTabProfileId: "rehydrated",
+      })
+    ).toEqual([{ tabId: "t2", profile_id: "unsaved-other" }]);
+  });
+
+  it("keeps all entries when no quiet rehydrate context", () => {
+    const entries = [{ tabId: "t1", profile_id: "a" }];
+    expect(filterCrossTabEntriesAfterQuietRehydrate(entries, {})).toEqual(entries);
   });
 });
 
