@@ -147,19 +147,23 @@ export function normalizeBuildGitSha(sha) {
 }
 
 /**
- * Compare resolver health `build` (Worker deploy) with client `SITE_BUILD_META` (Pages).
- * Mismatch signals deploy skew — common when a standalone session runs stale shell JS.
+ * Compare live Pages `build-meta.mjs` with the in-memory `SITE_BUILD_META` import.
+ * Mismatch signals a stale standalone shell (cached JS/HTML after a Pages deploy).
+ * Worker health `build` is intentionally excluded — Pages and Worker deploy separately.
  *
- * @param {{ gitSha?: string; source?: string } | null | undefined} healthBuild
- * @param {{ gitSha?: string; source?: string } | null | undefined} clientMeta
+ * @param {{ gitSha?: string; shellAssetVersion?: number; source?: string } | null | undefined} liveSiteMeta
+ * @param {{ gitSha?: string; shellAssetVersion?: number; source?: string } | null | undefined} clientMeta
  */
-export function isShellBuildStale(healthBuild, clientMeta) {
-  if (!healthBuild || !clientMeta) return false;
-  if (clientMeta.source === "dev" || healthBuild.source === "dev") return false;
-  const healthSha = normalizeBuildGitSha(healthBuild.gitSha);
+export function isShellBuildStale(liveSiteMeta, clientMeta) {
+  if (!liveSiteMeta || !clientMeta) return false;
+  if (clientMeta.source === "dev" || liveSiteMeta.source === "dev") return false;
+  const liveSha = normalizeBuildGitSha(liveSiteMeta.gitSha);
   const clientSha = normalizeBuildGitSha(clientMeta.gitSha);
-  if (!healthSha || !clientSha) return false;
-  return healthSha !== clientSha;
+  if (!liveSha || !clientSha) return false;
+  if (liveSha !== clientSha) return true;
+  const liveShell = Number(liveSiteMeta.shellAssetVersion) || 0;
+  const clientShell = Number(clientMeta.shellAssetVersion) || 0;
+  return liveShell !== clientShell;
 }
 
 /**
@@ -191,8 +195,8 @@ export function writeStaleShellDismissedForSha(storage, gitSha) {
  * @param {{
  *   standalone: boolean;
  *   pathname: string;
- *   healthBuild?: { gitSha?: string; source?: string } | null;
- *   clientMeta?: { gitSha?: string; source?: string } | null;
+ *   liveSiteMeta?: { gitSha?: string; shellAssetVersion?: number; source?: string } | null;
+ *   clientMeta?: { gitSha?: string; shellAssetVersion?: number; source?: string } | null;
  *   dismissedForSha?: string | null;
  *   deviceStatusLoadError?: boolean;
  * }} input
@@ -201,11 +205,23 @@ export function shouldShowStaleShellNudge(input) {
   if (!input.standalone) return false;
   if (!isPwaShellPagePath(input.pathname)) return false;
   if (input.deviceStatusLoadError) return false;
-  if (!isShellBuildStale(input.healthBuild, input.clientMeta)) return false;
+  if (!isShellBuildStale(input.liveSiteMeta, input.clientMeta)) return false;
   const dismissedFor = normalizeBuildGitSha(input.dismissedForSha);
-  const healthSha = normalizeBuildGitSha(input.healthBuild?.gitSha);
-  if (dismissedFor && dismissedFor === healthSha) return false;
+  const liveSha = normalizeBuildGitSha(input.liveSiteMeta?.gitSha);
+  if (dismissedFor && dismissedFor === liveSha) return false;
   return true;
+}
+
+/**
+ * Cache-busting navigation URL for stale-shell hard reload (Phase 8).
+ *
+ * @param {string} href
+ * @param {number} [nowMs]
+ */
+export function staleShellHardReloadHref(href, nowMs = Date.now()) {
+  const url = new URL(href);
+  url.searchParams.set("_hc_shell", nowMs.toString(36));
+  return url.href;
 }
 
 /**

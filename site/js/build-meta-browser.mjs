@@ -99,6 +99,69 @@ export function parseResolverHealthBuild(body) {
 }
 
 /**
+ * @param {unknown} raw
+ * @returns {SiteBuildMeta | null}
+ */
+export function normalizeSiteBuildMeta(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const record = /** @type {Record<string, unknown>} */ (raw);
+  const gitSha = typeof record.gitSha === "string" ? record.gitSha : "";
+  const builtAt = typeof record.builtAt === "string" ? record.builtAt : "";
+  const shellAssetVersion =
+    typeof record.shellAssetVersion === "number" ? record.shellAssetVersion : NaN;
+  const source = typeof record.source === "string" ? record.source : "";
+  if (!gitSha || !builtAt || !Number.isFinite(shellAssetVersion)) return null;
+  if (source !== "deploy" && source !== "dev" && source !== "ci") return null;
+  return { gitSha, builtAt, shellAssetVersion, source };
+}
+
+/**
+ * Parse generated `site/js/build-meta.mjs` text (network or fixture).
+ *
+ * @param {string} moduleText
+ * @returns {SiteBuildMeta | null}
+ */
+export function parseSiteBuildMetaFromModuleText(moduleText) {
+  const match = String(moduleText).match(
+    /export const SITE_BUILD_META\s*=\s*(\{[\s\S]*?\});/
+  );
+  if (!match?.[1]) return null;
+  try {
+    return normalizeSiteBuildMeta(JSON.parse(match[1]));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Fetch the live Pages build stamp (cache-busted). Used by PWA stale-shell nudge.
+ *
+ * @param {Pick<Window, "fetch" | "location" | "setTimeout" | "clearTimeout">} win
+ * @returns {Promise<SiteBuildMeta | null>}
+ */
+export async function fetchLiveSiteBuildMeta(win) {
+  if (!win?.fetch || !win?.location) return null;
+  const url = new URL("/js/build-meta.mjs", win.location.origin);
+  url.searchParams.set("_", String(Date.now()));
+  const controller = new AbortController();
+  const timer = win.setTimeout(() => controller.abort(), 5000);
+  try {
+    const res = await win.fetch(url.href, {
+      signal: controller.signal,
+      cache: "no-store",
+      headers: { Accept: "application/javascript,text/javascript,*/*" },
+    });
+    if (!res.ok) return null;
+    const text = await res.text();
+    return parseSiteBuildMetaFromModuleText(text);
+  } catch {
+    return null;
+  } finally {
+    win.clearTimeout(timer);
+  }
+}
+
+/**
  * @param {SiteBuildMeta} meta
  * @param {string} [pagePath]
  * @returns {string}

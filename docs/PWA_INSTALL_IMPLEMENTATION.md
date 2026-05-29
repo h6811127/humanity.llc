@@ -359,22 +359,24 @@ Manual **P1-PWA-R** steps 5–8.
 
 ### Intent
 
-After deploy, standalone users may run mixed shell JS. Compare `GET /.well-known/hc/v1/health` → `build` with client `SITE_BUILD_META` / `DEVICE_SHELL_ASSET_VERSION`; show dismissible “Update available — tap to refresh” that calls `location.reload()`.
+After deploy, standalone users may run mixed shell JS. Compare a cache-busted fetch of `/js/build-meta.mjs` (live Pages stamp) with the in-memory `SITE_BUILD_META` import; show dismissible “Update available — tap to refresh” that hard-reloads with `_hc_shell` cache bust.
 
 ### Scope
 
 | In scope | Out of scope |
 |----------|--------------|
-| Compare health `build.gitSha` vs `site/js/build-meta.mjs` on soft refresh complete | Auto-reload without user tap |
+| Compare live `build-meta.mjs` `gitSha` / `shellAssetVersion` vs in-memory import on init, resume, PTR | Auto-reload without user tap |
 | Emphasis card or slim hub banner in standalone only | Prominent version footer for all users |
-| Tap → `location.reload()` | Service worker update flow |
+| Tap → `location.replace(staleShellHardReloadHref(...))` | Service worker update flow |
+| Worker health `build` for debug hub only | Using Worker SHA as stale-shell signal (false positive — separate deploys) |
 
 ### Files
 
 | File | Action |
 |------|--------|
-| `site/js/pwa-standalone-refresh-core.mjs` | `isShellBuildStale(healthBuild, clientMeta)` |
-| `site/js/pwa-standalone-refresh.mjs` | Banner render after `refreshNetwork()` |
+| `site/js/build-meta-browser.mjs` | `fetchLiveSiteBuildMeta()`, `parseSiteBuildMetaFromModuleText()` |
+| `site/js/pwa-standalone-refresh-core.mjs` | `isShellBuildStale(liveSiteMeta, clientMeta)`, `staleShellHardReloadHref()` |
+| `site/js/pwa-standalone-refresh.mjs` | Banner render after resume / PTR / init |
 | `docs/SITE_BUILD_VERSIONING.md` | Cross-link stale nudge |
 | `worker/tests/pwa-standalone-refresh-core.test.ts` | Stale detection unit tests |
 
@@ -388,7 +390,9 @@ Manual **P1-PWA-R** step 9.
 
 ### Status
 
-**Shipped 2026-05-29** — `isShellBuildStale()` + dismissible `#device-pwa-stale-shell-banner`; health compare on standalone init/resume/PTR.
+**Shipped 2026-05-29** — `isShellBuildStale()` + dismissible `#device-pwa-stale-shell-banner`; live Pages compare on standalone init/resume/PTR.
+
+**Fixed 2026-05-29** — Replaced Worker health compare (card persisted after Refresh when Worker ≠ Pages SHA). See [`PWA_INSTALL.md`](PWA_INSTALL.md) § Stale shell nudge — detection fix.
 
 ---
 

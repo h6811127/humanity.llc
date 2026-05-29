@@ -99,7 +99,7 @@ Spec: [`SCAN_PAGE_DEVICE_DOT.md`](SCAN_PAGE_DEVICE_DOT.md) · Path 2 arrive [`SC
 | 3 | Scroll down, tap dot again | Hub still opens (desktop: edge-hidden chrome; touch: no edge-hidden) |
 | 4 | `/wallet/` tap dot | Scrolls to saved cards (no hub sheet) |
 
-**Fail signals:** Hub does not open (healthy graph); console module 404; `#top-chrome[data-device-status-error]` — tap dot for load-error explainer (red outline). Full diagnosis: [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) troubleshooting · Safari matrix: [`SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md`](SAFARI_WEBKIT_SHELL_REGRESSION_INVESTIGATION.md).
+**Fail signals:** Hub does not open (healthy graph); console module 404; `#top-chrome[data-device-status-error]` — red outline + **load-error coach card** auto-shows (`.device-status-load-error-coachmark`). Full diagnosis: [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) · [`STATUS_INDICATOR_STEWARD_GREEN.md`](STATUS_INDICATOR_STEWARD_GREEN.md) troubleshooting.
 
 ### P1-CT · Cross-tab keys banner (Safari layout)
 
@@ -409,18 +409,19 @@ Automated: `npm run worker:test -- worker/tests/device-hub-stranger-empty-core.t
 
 Automated: `npm run worker:test -- worker/tests/device-dot-state.test.ts worker/tests/device-hub-intro-coachmark.test.ts` · `e2e/device-status-dot.spec.ts` § shell S4
 
-### P3-SLM · Shell status mode labels
+### P1-LDE · Status load-error coach card
 
-**Spec:** [`HUB_STRANGER_ONBOARDING.md`](HUB_STRANGER_ONBOARDING.md) § P3
+**Spec:** [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) § Load-error dot explainer
 
 | Step | Action | Expected |
 |------|--------|----------|
-| 1 | Empty wallet → `/` | `#shell-status-mode` visible: **On this device** under status line |
-| 2 | Empty wallet → `/wallet/` | Mode label: **My objects ↓** |
-| 3 | Empty wallet → `/create/` or `/created/` | Mode label: **Device hub** |
-| 4 | Save a card → `/` | Status line + mode label **hidden**; steward dot returns |
+| 1 | DevTools → block `device-status.mjs` → reload `/` | Red outline on dot; `#top-chrome[data-device-status-error]` |
+| 2 | Wait ~1s (do not tap dot) | `#device-status-load-error-popover` visible — **Controls couldn't load** coach card with Now / Why / Next |
+| 3 | Tap **Refresh page** | Tab reloads (remove block to recover) |
+| 4 | Repeat with block on `device-status-bootstrap-inner.mjs` | Same coach card via thin bootstrap entry |
+| 5 | Tap **Got it** or dot again | Coach card hides; red outline remains until graph loads |
 
-Automated: `npm run worker:test -- worker/tests/device-dot-state.test.ts worker/tests/device-emphasis-card-html.test.ts` · `e2e/device-status-dot.spec.ts` § shell S4
+Automated: `npm run worker:test -- worker/tests/device-status-load-error.test.ts` · `e2e/device-status-dot.spec.ts` § status load error
 
 ### P1-9 · Hub sheet visual refresh (May 2026)
 
@@ -478,7 +479,7 @@ Automated (Phase 0+): `npm run worker:test:pwa-install` · Phase 3–4: `npm run
 | 6 | Pull down on `/wallet/` | Same as step 5; saved-row chips refresh when debounce allows |
 | 7 | Hub or inbox sheet **open** · attempt pull | No gesture fight; PTR disabled or scoped (no stuck spinner) |
 | 8 | **Watch for live proof** off · pull to refresh | Chrome + chips still update; live-control poll does not run |
-| 9 | Deploy newer Pages build · open old standalone session (Phase 8) | Stale shell banner appears; tap reload loads new shell; dot healthy (**P0-3**) |
+| 9 | Deploy newer Pages build · open old standalone session (Phase 8) | Stale shell banner appears when live `/js/build-meta.mjs` ≠ in-memory stamp; tap **Refresh** hard-reloads and banner clears; dot healthy (**P0-3**) |
 | 10 | `/create/` or scan URL in standalone (if navigated there) | **No** PTR chrome |
 | 11 | Standalone on `/` or `/wallet/` · hub glance **Refresh** row (Phase 9) | Tap runs soft refresh; “Updated” indicator; works even when hub sheet open |
 | 12 | First standalone session (Phase 9) | One-time PTR tip visible; **Got it** dismisses; does not return on next open |

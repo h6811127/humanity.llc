@@ -13,6 +13,7 @@ import {
   formatWorkerBuildHubLabel,
   isSiteDebugEnabled,
   parseResolverHealthBuild,
+  parseSiteBuildMetaFromModuleText,
   SITE_DEBUG_FLAG_KEY,
 } from "../../site/js/build-meta-browser.mjs";
 import {
@@ -40,6 +41,17 @@ describe("site build meta", () => {
     expect(src).toContain("docs/SITE_BUILD_VERSIONING.md");
     expect(src).toContain('"gitSha": "abc1234"');
     expect(src).toContain(`"shellAssetVersion": ${DEVICE_SHELL_ASSET_VERSION}`);
+  });
+
+  it("parseSiteBuildMetaFromModuleText round-trips renderBuildMetaModule", () => {
+    const meta = {
+      gitSha: "abc1234",
+      builtAt: "2026-05-27T00:00:00.000Z",
+      shellAssetVersion: DEVICE_SHELL_ASSET_VERSION,
+      source: "deploy" as const,
+    };
+    const parsed = parseSiteBuildMetaFromModuleText(renderBuildMetaModule(meta));
+    expect(parsed).toEqual(meta);
   });
 
   it("formatSiteBuildConsoleLine matches bootstrap log shape", () => {

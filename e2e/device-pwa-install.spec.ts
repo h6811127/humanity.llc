@@ -409,24 +409,25 @@ test.describe("device PWA install (phase 4 rollout gate)", () => {
     await expect(page.locator("#device-ptr-indicator")).toBeHidden();
   });
 
-  test("standalone stale shell banner when health build differs (P1-PWA-R step 9)", async ({
+  test("standalone stale shell banner when live Pages build differs (P1-PWA-R step 9)", async ({
     page,
   }) => {
     await page.addInitScript(withStandaloneDisplayMode().content);
     await seedPwaLandingStorage(page);
-    await page.route("**/.well-known/hc/v1/health**", async (route) => {
+    await page.route("**/js/build-meta.mjs**", async (route) => {
       await route.fulfill({
         status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          status: "ok",
-          database: "ok",
-          build: {
+        contentType: "application/javascript",
+        body: `export const SITE_BUILD_META = ${JSON.stringify(
+          {
             gitSha: "ffffffff",
             builtAt: "2026-05-29T12:00:00.000Z",
+            shellAssetVersion: 99,
             source: "deploy",
           },
-        }),
+          null,
+          2
+        )};`,
       });
     });
     await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", mockNoLiveProof);

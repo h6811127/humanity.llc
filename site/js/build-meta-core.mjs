@@ -9,13 +9,16 @@ import { execSync } from "node:child_process";
 export {
   DEFAULT_SITE_BUILD_META,
   DEFAULT_WORKER_BUILD_META,
+  fetchLiveSiteBuildMeta,
   formatCombinedBuildCopyText,
   formatSiteBuildConsoleLine,
   formatSiteBuildCopyText,
   formatSiteBuildHubLabel,
   formatWorkerBuildHubLabel,
   isSiteDebugEnabled,
+  normalizeSiteBuildMeta,
   parseResolverHealthBuild,
+  parseSiteBuildMetaFromModuleText,
   SITE_DEBUG_FLAG_KEY,
 } from "./build-meta-browser.mjs";
 

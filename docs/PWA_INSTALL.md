@@ -310,7 +310,7 @@ Browser-tab stewards still have reload in the browser menu. **Standalone-only as
 | **Default on open/resume (standalone)** | **Soft refresh** — re-read local state + refresh chrome + debounced network chips |
 | **Pull-to-refresh (standalone)** | Same soft refresh pipeline + brief “Updated” affordance |
 | **Every open** | **Do not** `location.reload()` — too slow on Safari; does not clear `localStorage` anyway |
-| **Post-deploy skew** | Optional **stale shell nudge** (Phase 8) — compare health `build` vs client stamp |
+| **Post-deploy skew** | Optional **stale shell nudge** (Phase 8) — compare live `/js/build-meta.mjs` vs in-memory `SITE_BUILD_META` |
 | **Service worker for auto-update** | **No** — amplifies iPhone stale-module skew ([`IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md`](IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md)) |
 | **Scan / create flows** | **No** PTR or standalone refresh UI — strangers and one-shot flows stay browser-native |
 
@@ -373,7 +373,25 @@ Manual override when stewards do not trust background refresh or want an explici
 | **Hub “Refresh” row** | Accessibility + fallback when PTR is unknown; hub glance row on landing + wallet |
 | **First standalone PTR tip** | One-time dismissible card: “Pull down to refresh card status.” |
 | **Install card copy** | Mentions pull-to-refresh in install card detail |
-| **Stale shell banner (Phase 8)** | After health poll: if server `build.gitSha` ≠ client stamp, show “Update available — tap to refresh” (reload CTA) |
+| **Stale shell banner (Phase 8)** | After cache-busted fetch of `/js/build-meta.mjs`: if live `gitSha` or `shellAssetVersion` ≠ in-memory `SITE_BUILD_META`, show “Update available — tap to refresh” (hard reload CTA) |
+
+### Stale shell nudge — detection fix (2026-05-29)
+
+**Symptom:** “A newer version is ready” card reappeared immediately after tapping **Refresh**, even when the PWA had already loaded the latest Pages shell.
+
+**Root cause:** Phase 8 initially compared Worker health `build.gitSha` to in-memory `SITE_BUILD_META.gitSha`. Pages and Worker deploy on **separate pipelines** ([`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md)), so those SHAs often differ at rest — the nudge fired on every standalone session and **Refresh** (`location.reload()`) could never clear it.
+
+**Fix:**
+
+| Before | After |
+|--------|-------|
+| `fetchResolverHealthBuild()` → compare Worker `build` vs client | `fetchLiveSiteBuildMeta()` → cache-busted `GET /js/build-meta.mjs` vs in-memory `SITE_BUILD_META` |
+| `location.reload()` | `location.replace(staleShellHardReloadHref(...))` — adds `_hc_shell` query for Safari cache bypass |
+| Dismiss keyed to Worker `gitSha` | Dismiss keyed to **live Pages** `gitSha` |
+
+**Not stale:** Worker-only deploy with unchanged Pages shell (SHAs differ in debug hub — expected). **Still stale:** live Pages stamp ahead of what this document imported (true post-deploy skew).
+
+**Code:** `isShellBuildStale(liveSiteMeta, clientMeta)` in [`pwa-standalone-refresh-core.mjs`](../site/js/pwa-standalone-refresh-core.mjs) · `fetchLiveSiteBuildMeta()` in [`build-meta-browser.mjs`](../site/js/build-meta-browser.mjs).
 
 ### Onboarding copy (draft)
 
@@ -392,6 +410,7 @@ Installed PWA and Safari tab on the same origin share `localStorage`. Resume sof
 |---------|--------------|------------|
 | Soft refresh while offline | Chrome updates from cache; network chips show last known / checking | Existing degraded banner |
 | Health GET fails | No stale-shell nudge; existing network degraded state | `refreshNetwork` abort / error path |
+| Live `build-meta.mjs` fetch fails | No stale-shell nudge | `fetchLiveSiteBuildMeta` abort / error path |
 | PTR during hub drag | No refresh; no stuck spinner | Gesture guard in PTR module |
 | Module load failure | No PTR; status dot error ring unchanged | `data-device-status-error` |
 

@@ -4,11 +4,10 @@
  */
 
 import { SITE_BUILD_META } from "./build-meta.mjs";
+import { fetchLiveSiteBuildMeta } from "./build-meta-browser.mjs";
 import { refreshDeviceChrome } from "./device-chrome-refresh.mjs";
-import { fetchResolverHealthBuild } from "./device-network-health.mjs";
 import { refreshDeviceHub } from "./device-hub-ui.mjs";
 import { getWalletCount } from "./device-wallet.mjs";
-import { resolverApiOrigin } from "./hc-sign.mjs";
 import {
   clampPullToRefreshDistance,
   pullToRefreshAllowed,
@@ -28,6 +27,7 @@ import {
   shouldShowStandaloneRefreshRow,
   shouldShowStaleShellNudge,
   shouldTriggerStandaloneResumeRefresh,
+  staleShellHardReloadHref,
   STANDALONE_SOFT_REFRESH_DEBOUNCE_MS,
   writePtrTipDismissed,
   writeStaleShellDismissedForSha,
@@ -308,7 +308,7 @@ function hideStaleShellBanner() {
   el.classList.remove("hc-emphasis-card", "hc-emphasis-card--info");
 }
 
-function showStaleShellBanner(healthBuild) {
+function showStaleShellBanner(liveSiteMeta) {
   const el = ensureStaleShellBanner();
   if (!el) return;
   el.hidden = false;
@@ -318,12 +318,12 @@ function showStaleShellBanner(healthBuild) {
 
   el.querySelector("[data-pwa-stale-shell-refresh]")?.addEventListener("click", (e) => {
     e.preventDefault();
-    window.location.reload();
+    window.location.replace(staleShellHardReloadHref(window.location.href));
   });
 
   el.querySelector("[data-pwa-stale-shell-dismiss]")?.addEventListener("click", (e) => {
     e.preventDefault();
-    writeStaleShellDismissedForSha(localStorage, healthBuild?.gitSha || "");
+    writeStaleShellDismissedForSha(localStorage, liveSiteMeta?.gitSha || "");
     hideStaleShellBanner();
   });
 }
@@ -455,11 +455,11 @@ async function syncStaleShellNudge() {
   if (staleShellSyncInFlight) return;
   staleShellSyncInFlight = true;
   try {
-    const healthBuild = await fetchResolverHealthBuild(resolverApiOrigin());
+    const liveSiteMeta = await fetchLiveSiteBuildMeta(window);
     const show = shouldShowStaleShellNudge({
       standalone: true,
       pathname: window.location.pathname,
-      healthBuild,
+      liveSiteMeta,
       clientMeta: SITE_BUILD_META,
       dismissedForSha: readStaleShellDismissedForSha(localStorage),
       deviceStatusLoadError: deviceStatusLoadError(),
@@ -468,7 +468,7 @@ async function syncStaleShellNudge() {
       hideStaleShellBanner();
       return;
     }
-    showStaleShellBanner(healthBuild);
+    showStaleShellBanner(liveSiteMeta);
   } finally {
     staleShellSyncInFlight = false;
   }

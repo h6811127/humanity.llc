@@ -20,6 +20,7 @@ import {
   shouldShowStandaloneRefreshRow,
   shouldShowStaleShellNudge,
   shouldTriggerStandaloneResumeRefresh,
+  staleShellHardReloadHref,
   writePtrTipDismissed,
   writeStaleShellDismissedForSha,
   PTR_THRESHOLD_PX,
@@ -286,24 +287,44 @@ describe("pull gesture helpers", () => {
 });
 
 describe("isShellBuildStale", () => {
-  const client = { gitSha: "abc1234", source: "deploy" };
+  const client = {
+    gitSha: "abc1234",
+    shellAssetVersion: 60,
+    source: "deploy",
+  };
 
-  it("detects mismatched deploy stamps", () => {
+  it("detects mismatched Pages deploy stamps", () => {
     expect(
-      isShellBuildStale({ gitSha: "def5678", source: "deploy" }, client)
+      isShellBuildStale(
+        { gitSha: "def5678", shellAssetVersion: 60, source: "deploy" },
+        client
+      )
     ).toBe(true);
   });
 
-  it("ignores matching stamps", () => {
-    expect(isShellBuildStale({ gitSha: "abc1234", source: "deploy" }, client)).toBe(
-      false
-    );
+  it("detects mismatched shell asset versions", () => {
+    expect(
+      isShellBuildStale(
+        { gitSha: "abc1234", shellAssetVersion: 61, source: "deploy" },
+        client
+      )
+    ).toBe(true);
+  });
+
+  it("ignores matching live and client stamps", () => {
+    expect(
+      isShellBuildStale(
+        { gitSha: "abc1234", shellAssetVersion: 60, source: "deploy" },
+        client
+      )
+    ).toBe(false);
   });
 
   it("ignores dev builds", () => {
     expect(
-      isShellBuildStale({ gitSha: "def5678", source: "deploy" }, {
+      isShellBuildStale({ gitSha: "def5678", shellAssetVersion: 61, source: "deploy" }, {
         gitSha: "dev",
+        shellAssetVersion: 0,
         source: "dev",
       })
     ).toBe(false);
@@ -316,15 +337,15 @@ describe("isShellBuildStale", () => {
 });
 
 describe("shouldShowStaleShellNudge", () => {
-  const healthBuild = { gitSha: "newera11", source: "deploy" };
-  const clientMeta = { gitSha: "oldera11", source: "deploy" };
+  const liveSiteMeta = { gitSha: "newera11", shellAssetVersion: 61, source: "deploy" };
+  const clientMeta = { gitSha: "oldera11", shellAssetVersion: 60, source: "deploy" };
 
-  it("shows in standalone on shell pages when builds differ", () => {
+  it("shows in standalone on shell pages when live Pages stamp differs", () => {
     expect(
       shouldShowStaleShellNudge({
         standalone: true,
         pathname: "/",
-        healthBuild,
+        liveSiteMeta,
         clientMeta,
         dismissedForSha: null,
         deviceStatusLoadError: false,
@@ -332,12 +353,12 @@ describe("shouldShowStaleShellNudge", () => {
     ).toBe(true);
   });
 
-  it("hides when dismissed for current health sha", () => {
+  it("hides when dismissed for current live site sha", () => {
     expect(
       shouldShowStaleShellNudge({
         standalone: true,
         pathname: "/wallet/",
-        healthBuild,
+        liveSiteMeta,
         clientMeta,
         dismissedForSha: "newera11",
         deviceStatusLoadError: false,
@@ -350,7 +371,7 @@ describe("shouldShowStaleShellNudge", () => {
       shouldShowStaleShellNudge({
         standalone: false,
         pathname: "/",
-        healthBuild,
+        liveSiteMeta,
         clientMeta,
         dismissedForSha: null,
         deviceStatusLoadError: false,
@@ -367,6 +388,14 @@ describe("shouldShowStaleShellNudge", () => {
     expect(readStaleShellDismissedForSha({ getItem: (k) => storage.get(k) ?? null })).toBe(
       "newera11"
     );
+  });
+});
+
+describe("staleShellHardReloadHref", () => {
+  it("adds cache-bust query param", () => {
+    const href = staleShellHardReloadHref("https://humanity.llc/wallet/", 1_700_000_000_000);
+    expect(href).toContain("_hc_shell=");
+    expect(href).toMatch(/^https:\/\/humanity\.llc\/wallet\/\?_hc_shell=/);
   });
 });
 

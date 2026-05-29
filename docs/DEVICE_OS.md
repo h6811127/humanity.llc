@@ -159,7 +159,7 @@ See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` for storage and search.
 
 Resolver health for the status dot is fetched in **`site/js/device-status.mjs`** (`fetchResolverHealth`). Wallet status polls and live-proof inbox refresh run from **`site/js/device-hub-ui.mjs`** when the hub is mounted. **`site/js/device-os-coordinator.mjs`** (300ms debounce) remains for tests and optional use but is not auto-started from the status bootstrap (see `docs/UI_UX_REVERT_PLAN.md` step 2).
 
-**PWA standalone (Phases 6–8):** Installed stewards lose browser reload affordances. **`pwa-standalone-refresh.mjs`** runs a **soft refresh pipeline** on standalone resume and pull-to-refresh, plus a stale-shell nudge when health `build.gitSha` ≠ `SITE_BUILD_META.gitSha` — without auto-starting the full coordinator or `location.reload()` on every open. See [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume.
+**PWA standalone (Phases 6–8):** Installed stewards lose browser reload affordances. **`pwa-standalone-refresh.mjs`** runs a **soft refresh pipeline** on standalone resume and pull-to-refresh, plus a stale-shell nudge when live `/js/build-meta.mjs` ≠ in-memory `SITE_BUILD_META` — without auto-starting the full coordinator or `location.reload()` on every open. See [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume.
 
 | Event | Role |
 |-------|------|
