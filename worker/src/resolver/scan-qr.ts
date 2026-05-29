@@ -72,3 +72,31 @@ export async function scanQrDataUrl(scanUrl: string): Promise<string> {
     color: { dark: QR_BRAND_RED, light: QR_BRANDED_RENDER_OPTIONS.color.light },
   });
 }
+
+/** Owner proof deeplink for in-person live control handoff (H-06). */
+export function isLiveControlOwnerUrl(ownerUrl: string): boolean {
+  try {
+    const url = new URL(ownerUrl);
+    if (!url.pathname.startsWith("/created")) return false;
+    if (url.protocol === "https:" && url.hostname.endsWith("humanity.llc")) return true;
+    if (url.hostname === "localhost" || url.hostname === "127.0.0.1") return true;
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+/** Compact branded SVG QR for owner proof deeplink (scan page owner pane). */
+export async function renderLiveControlOwnerQrSvg(ownerUrl: string): Promise<string> {
+  if (!isLiveControlOwnerUrl(ownerUrl)) {
+    throw new Error("invalid_live_control_owner_url");
+  }
+  const svg = await QRCode.toString(ownerUrl, {
+    type: "svg",
+    margin: 1,
+    width: 132,
+    ...QR_BRANDED_RENDER_OPTIONS,
+    color: { dark: QR_BRAND_RED, light: QR_BRANDED_RENDER_OPTIONS.color.light },
+  });
+  return `<div class="live-control-owner-qr" role="img" aria-label="QR code for owner to prove control">${svg}</div>`;
+}

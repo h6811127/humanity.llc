@@ -964,6 +964,59 @@ a {
   color: var(--black);
 }
 
+.live-control-owner-handoff {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--black);
+}
+
+.live-control-same-device-banner {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(88, 86, 214, 0.28);
+  background: rgba(88, 86, 214, 0.08);
+}
+
+.live-control-same-device-copy {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--black);
+}
+
+.live-control-same-device-link {
+  color: var(--black);
+  font-weight: 600;
+}
+
+.live-control-owner-qr-wrap {
+  margin: 0 0 12px;
+  text-align: center;
+}
+
+.live-control-owner-qr-label {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--grey);
+}
+
+.live-control-owner-qr-slot svg {
+  display: block;
+  width: 132px;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+@media (max-width: 360px) {
+  .live-control-owner-qr-wrap {
+    display: none;
+  }
+}
+
 .live-control-owner-actions {
   display: flex;
   flex-direction: column;

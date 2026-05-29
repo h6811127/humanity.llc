@@ -31,6 +31,7 @@ import {
 import type { Env } from "../env";
 import { notifyLiveProofPending } from "../steward/push";
 import { enforceStewardAutoPollQuota } from "../steward/quota";
+import { renderLiveControlOwnerQrSvg } from "./scan-qr";
 import {
   generateLiveControlChallengeId,
   generateVerifierSessionId,
@@ -174,27 +175,25 @@ export async function handlePostLiveControlChallenge(
     );
   }
 
-  return jsonResponse(
-    challengeBody(
-      {
-        challenge_id: challengeId,
-        profile_id: profileId,
-        qr_id: qrId,
-        nonce,
-        verifier_session_id: verifierSessionId,
-        status: "pending",
-        issued_at: issuedAtIso,
-        expires_at: expiresAtIso,
-        proven_at: null,
-        signer_public_key: null,
-        response_document_json: null,
-        created_at: issuedAt.toISOString(),
-        updated_at: issuedAt.toISOString(),
-      },
-      request,
-      localClientOrigin(body.client_origin)
-    ),
-    201
+  return await jsonChallengeResponse(
+    {
+      challenge_id: challengeId,
+      profile_id: profileId,
+      qr_id: qrId,
+      nonce,
+      verifier_session_id: verifierSessionId,
+      status: "pending",
+      issued_at: issuedAtIso,
+      expires_at: expiresAtIso,
+      proven_at: null,
+      signer_public_key: null,
+      response_document_json: null,
+      created_at: issuedAt.toISOString(),
+      updated_at: issuedAt.toISOString(),
+    },
+    request,
+    201,
+    localClientOrigin(body.client_origin)
   );
 }
 
@@ -226,7 +225,7 @@ export async function handleGetLiveControlChallenge(
   }
 
   const current = await expireIfNeeded(db, challenge);
-  return jsonResponse(challengeBody(current, request), 200, {
+  return await jsonChallengeResponse(current, request, 200, undefined, {
     "Cache-Control": "no-store",
   });
 }
@@ -279,7 +278,7 @@ export async function handleGetPendingLiveControlChallenge(
     );
   }
 
-  return jsonResponseWithWeakEtag(request, challengeBody(current, request), 200, {
+  return await jsonChallengeResponseWithWeakEtag(request, current, 200, undefined, {
     "Cache-Control": "private, max-age=15",
   });
 }
@@ -415,6 +414,49 @@ async function expireIfNeeded(
   const updatedAt = new Date(now).toISOString();
   await markLiveControlExpired(db, challenge.challenge_id, updatedAt);
   return { ...challenge, status: "expired", updated_at: updatedAt };
+}
+
+type ChallengeJsonBody = ReturnType<typeof challengeBody> & { owner_qr_markup?: string };
+
+async function withOwnerQrMarkup(
+  body: ReturnType<typeof challengeBody>,
+  status: string
+): Promise<ChallengeJsonBody> {
+  if (status !== "pending" || !body.owner_url) return body;
+  try {
+    const owner_qr_markup = await renderLiveControlOwnerQrSvg(body.owner_url);
+    return { ...body, owner_qr_markup };
+  } catch {
+    return body;
+  }
+}
+
+async function jsonChallengeResponse(
+  challenge: LiveControlChallengeRow,
+  request: Request,
+  status: number,
+  originOverride?: string | null,
+  headers?: Record<string, string>
+): Promise<Response> {
+  const body = await withOwnerQrMarkup(
+    challengeBody(challenge, request, originOverride),
+    challenge.status
+  );
+  return jsonResponse(body, status, headers);
+}
+
+async function jsonChallengeResponseWithWeakEtag(
+  request: Request,
+  challenge: LiveControlChallengeRow,
+  status: number,
+  originOverride?: string | null,
+  headers?: Record<string, string>
+): Promise<Response> {
+  const body = await withOwnerQrMarkup(
+    challengeBody(challenge, request, originOverride),
+    challenge.status
+  );
+  return jsonResponseWithWeakEtag(request, body, status, headers);
 }
 
 function challengeBody(

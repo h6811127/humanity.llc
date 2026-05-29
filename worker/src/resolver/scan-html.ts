@@ -1152,6 +1152,13 @@ function liveControlInteractiveRow(provenAt: string | null): string {
         <p class="live-control-lead">
           Ask the owner to prove they hold the signing key for this object  -  right now, on the spot.
         </p>
+        <div class="live-control-same-device-banner" id="live-control-same-device-banner" hidden>
+          <p class="live-control-same-device-copy">
+            You're viewing your own QR on this device. For live proof, open
+            <a class="live-control-same-device-link" id="live-control-same-device-created-link" href="#">My card</a>
+            in another tab or use a second phone. Someone else should scan this code to ask for proof.
+          </p>
+        </div>
         <button type="button" class="live-control-cta" id="live-control-request">
           Ask for live proof
         </button>
@@ -1173,6 +1180,13 @@ function liveControlInteractiveRow(provenAt: string | null): string {
         <p class="live-control-owner-lead">
           Send this to the device that <strong>created the card</strong>. This page waits until they sign.
         </p>
+        <p class="live-control-owner-handoff" id="live-control-owner-handoff">
+          Show this to the card owner. They tap <strong>Prove control now</strong> on a device that has their keys.
+        </p>
+        <div class="live-control-owner-qr-wrap" id="live-control-owner-qr-wrap" hidden>
+          <p class="live-control-owner-qr-label">Owner: scan this to prove control</p>
+          <div class="live-control-owner-qr-slot" id="live-control-owner-qr-slot"></div>
+        </div>
         <div class="live-control-owner-actions">
           <a class="live-control-owner-btn" id="live-control-owner-link" href="#" target="_blank" rel="noopener noreferrer">
             Open on owner device
@@ -1273,6 +1287,10 @@ ${scanLiveControlClientHelpersJs()}
   var proofCountdownEl = document.getElementById("live-control-proof-countdown");
   var askAgainBtn = document.getElementById("live-control-request-again");
   var pollRetryBtn = document.getElementById("live-control-poll-retry");
+  var sameDeviceBanner = document.getElementById("live-control-same-device-banner");
+  var sameDeviceCreatedLink = document.getElementById("live-control-same-device-created-link");
+  var ownerQrWrap = document.getElementById("live-control-owner-qr-wrap");
+  var ownerQrSlot = document.getElementById("live-control-owner-qr-slot");
   var row = document.getElementById("live-control-row");
   var statusPanel = document.getElementById("live-control-status-panel");
   var ownerView = document.getElementById("live-control-owner-view");
@@ -1423,7 +1441,12 @@ ${scanLiveControlClientHelpersJs()}
     if (status) setStatus("Ready when you are.", false);
     if (ownerPanel) ownerPanel.hidden = true;
     if (ownerLink) ownerLink.href = "#";
+    clearOwnerQr();
     if (inPersonLayout) inPersonLayout.classList.remove("is-owner-waiting");
+  }
+  function clearOwnerQr() {
+    if (ownerQrWrap) ownerQrWrap.hidden = true;
+    if (ownerQrSlot) ownerQrSlot.innerHTML = "";
   }
   function wireAskAgain() {
     if (!askAgainBtn) return;
@@ -1431,36 +1454,27 @@ ${scanLiveControlClientHelpersJs()}
       resetForNewRequest();
     });
   }
-  function applyOwnerBrowserLiveControl() {
-    if (!isOwnerBrowser()) return false;
-    stopRelativeTimer();
-    stopProofDisplayCountdown();
-    stopProofExpiryTimer();
-    stopPolling();
-    stopCountdown();
-    if (interactive) interactive.hidden = true;
-    if (success) success.hidden = true;
-    if (ownerPanel) ownerPanel.hidden = true;
-    if (inPersonLayout) inPersonLayout.classList.remove("is-owner-waiting");
-    if (row) row.classList.remove("is-proven");
-    if (ownerView) ownerView.hidden = false;
-    if (ownerCreatedLink && profileId && qrId) {
-      ownerCreatedLink.href =
+  function showSameDeviceGuidanceIfNeeded() {
+    if (!isOwnerBrowser()) return;
+    if (sameDeviceBanner) sameDeviceBanner.hidden = false;
+    if (sameDeviceCreatedLink && profileId && qrId) {
+      sameDeviceCreatedLink.href =
         location.origin + "/created/?profile_id=" +
         encodeURIComponent(profileId) + "&qr_id=" + encodeURIComponent(qrId);
     }
-    if (ownerCopy) {
-      var proven = getProvenIso();
-      ownerCopy.textContent = proven
-        ? "Control proven from this device. The scanner should see success on their screen  -  you do not need to ask again here."
-        : "This section is for someone else scanning your QR. When they ask for live proof, open your card page to sign.";
-    }
-    return true;
   }
-  function showOwnerPanel(url) {
+  function showOwnerPanel(url, qrMarkup) {
     if (ownerPanel) ownerPanel.hidden = false;
     if (inPersonLayout) inPersonLayout.classList.add("is-owner-waiting");
     if (ownerLink) ownerLink.href = url;
+    if (ownerQrWrap && ownerQrSlot) {
+      if (qrMarkup) {
+        ownerQrSlot.innerHTML = qrMarkup;
+        ownerQrWrap.hidden = false;
+      } else {
+        clearOwnerQr();
+      }
+    }
     if (copyOwnerLink) {
       copyOwnerLink.onclick = function () {
         navigator.clipboard.writeText(url).then(function () {
@@ -1667,7 +1681,7 @@ ${scanLiveControlClientHelpersJs()}
           } else {
             setStatus("Waiting for the owner to sign…", true);
           }
-          if (body.owner_url) showOwnerPanel(body.owner_url);
+          if (body.owner_url) showOwnerPanel(body.owner_url, body.owner_qr_markup);
           poll(statusUrlForChallenge(id));
         }
       })
@@ -1675,7 +1689,7 @@ ${scanLiveControlClientHelpersJs()}
         setStatus("Could not check live proof.", false);
       });
   }
-  if (applyOwnerBrowserLiveControl()) return;
+  showSameDeviceGuidanceIfNeeded();
   wireAskAgain();
   wirePollRetry();
   var initialProven = getProvenIso();
@@ -1724,7 +1738,7 @@ ${scanLiveControlClientHelpersJs()}
         }
         var body = result.body;
         if (body.owner_url) {
-          showOwnerPanel(body.owner_url);
+          showOwnerPanel(body.owner_url, body.owner_qr_markup);
         }
         activeChallengeExpiresAt = body.expires_at || null;
         startCountdown(body.expires_at, waitingCountdownPrefix);

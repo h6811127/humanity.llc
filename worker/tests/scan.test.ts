@@ -784,6 +784,30 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("Live proof is temporarily unavailable. Try again shortly.");
   });
 
+  it("bundles in-person owner handoff markup (H-04–H-06)", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: summary(),
+      },
+      "https://humanity.llc"
+    );
+    const html = await renderScanPage(vm, "https://humanity.llc");
+
+    expect(html).toContain('id="live-control-owner-handoff"');
+    expect(html).toContain("Show this to the card owner");
+    expect(html).toContain("Prove control now");
+    expect(html).toContain('id="live-control-same-device-banner"');
+    expect(html).toContain("live-control-same-device-created-link");
+    expect(html).toContain('id="live-control-owner-qr-wrap"');
+    expect(html).toContain("Owner: scan this to prove control");
+    expect(html).toContain("showSameDeviceGuidanceIfNeeded");
+    expect(html).toContain("showOwnerPanel(url, qrMarkup)");
+  });
+
   it("uses print_artifact scope copy when applicable", async () => {
     const vm = buildScanViewModel(
       PROFILE,

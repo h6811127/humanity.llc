@@ -268,6 +268,16 @@ See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 | 3 | Proof window ends | Scanner returns to **Ask for live proof** with expired copy; success panel showed **Proof display expires in M:SS** while active |
 | 4 | Let challenge expire unsigned | **Control was not proven. The request expired.** |
 
+### P1-LC-SD · Live control same-device scan guidance (H-05)
+
+**Ref:** [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) H-05.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | On a device with `hc_created` keys, open your own scan URL (`/c/…?q=…`) | Purple same-device banner visible; **Ask for live proof** still available |
+| 2 | Tap **Ask for live proof** on same device | Owner handoff pane + QR/copy link appear; scanner flow not replaced by owner-only view |
+| 3 | Second phone scans same URL (no keys) | No same-device banner; normal stranger scanner flow |
+
 ### P1-LCP · Live control printed QR camera QA (M7 Step 2)
 
 **Runbook:** [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) · desk check: `npm run worker:test -- worker/tests/scan.test.ts worker/tests/live-control.test.ts`.

@@ -1,6 +1,6 @@
 # Live control usability hardening
 
-**Status:** In progress — Slice A shipped (H-01–H-03)  
+**Status:** In progress — Slice A shipped (H-01–H-03); Slice B shipped (H-04–H-06)  
 **Gate:** `docs/M7_LIVE_CONTROL_ALPHA.md` Step 2 · post–production FK repair (`docs/LIVE_PROOF_FAILURE_INVESTIGATION.md`)  
 **Related:** [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md) · [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) · [`SCAN_PAGE_TRUST_UI.md`](SCAN_PAGE_TRUST_UI.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md)
 
@@ -123,6 +123,8 @@ This document is the **implementation backlog** for hardening live control **usa
 
 ### H-04 — Owner path copy at ask-time
 
+**Status:** Shipped (2026-05-29)
+
 **Problem:** When the scanner taps **Ask for live proof**, the owner pane appears but strangers may not know what to do with the link.
 
 **Proposed behavior:**
@@ -135,12 +137,14 @@ This document is the **implementation backlog** for hardening live control **usa
 
 **Acceptance:**
 
-- [ ] Copy visible when `ownerPanel` is shown after successful challenge `POST`.
+- [x] Copy visible when `ownerPanel` is shown after successful challenge `POST`.
 - [ ] Comprehension runbook L1–L2 still pass after change.
 
 ---
 
 ### H-05 — Same-device owner guidance
+
+**Status:** Shipped (2026-05-29)
 
 **Problem:** If the owner opens the **scan URL** in a tab that has `sessionStorage.hc_created` for the same `profile_id` + `qr_id`, `applyOwnerBrowserLiveControl()` replaces the scanner UI with the owner view. One-phone testing and confused stewards hit a dead end.
 
@@ -155,12 +159,14 @@ This document is the **implementation backlog** for hardening live control **usa
 
 **Acceptance:**
 
-- [ ] Same-device session shows banner; scanner **Ask for live proof** remains available or clearly explains next step.
-- [ ] Two-device flow unchanged.
+- [x] Same-device session shows banner; scanner **Ask for live proof** remains available or clearly explains next step.
+- [x] Two-device flow unchanged.
 
 ---
 
 ### H-06 — QR encode owner link (in-person)
+
+**Status:** Shipped (2026-05-29)
 
 **Problem:** Handing a URL verbally or via copy/paste is awkward in person (events, merch table, lost-item return).
 
@@ -175,7 +181,7 @@ This document is the **implementation backlog** for hardening live control **usa
 
 **Acceptance:**
 
-- [ ] Owner can scan QR from scanner screen; lands on `/created/` with `live_challenge` param.
+- [x] Owner can scan QR from scanner screen; lands on `/created/` with `live_challenge` param.
 - [ ] Printed QA runbook § B3 pass with QR handoff variant.
 
 ---
@@ -414,3 +420,4 @@ flowchart TD
 |------|-------|
 | 2026-05-29 | Initial backlog from production FK incident + Step 2 usability review (H-01–H-15) |
 | 2026-05-29 | Slice A shipped: H-01 scan client helpers, H-02 insert error mapping, H-03 poll retry |
+| 2026-05-29 | Slice B shipped: H-04 handoff copy, H-05 same-device banner, H-06 owner QR in challenge JSON |

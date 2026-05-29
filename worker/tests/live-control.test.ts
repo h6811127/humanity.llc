@@ -262,6 +262,7 @@ describe("live control proof alpha", () => {
       status: string;
       challenge_id: string;
       owner_url: string;
+      owner_qr_markup?: string;
     };
 
     expect(res.status).toBe(201);
@@ -271,6 +272,7 @@ describe("live control proof alpha", () => {
     expect(json.owner_url).toContain("profile_id=");
     expect(json.owner_url).toContain("qr_id=");
     expect(json.owner_url).toContain("return_url=");
+    expect(json.owner_qr_markup).toContain("live-control-owner-qr");
   });
 
   it("returns the latest pending challenge for a QR", async () => {
