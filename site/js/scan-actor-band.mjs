@@ -3,7 +3,7 @@
  * @see docs/SCAN_PAGE_TRUST_UI.md
  */
 import { getTabSession } from "./device-keys.mjs";
-import { getWalletCount } from "./device-wallet.mjs";
+import { getWalletCount, loadWalletSummary } from "./device-wallet.mjs";
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
 import {
   SCAN_ACTOR_BAND_REVEAL_MS,
@@ -40,9 +40,24 @@ function bandRoot() {
   return document.getElementById("scan-actor-band");
 }
 
+function syncActorBandLead() {
+  const lead = document.querySelector("#scan-actor-band .scan-actor-band-lead");
+  if (!lead) return;
+  const session = getTabSession();
+  const hasTabKeys = Boolean(session?.owner_private_key_b58);
+  const signingCount = loadWalletSummary().signingKeyCount;
+  if (!hasTabKeys && signingCount > 0) {
+    lead.textContent =
+      "Ownership is saved on this device. Restore control in this tab to vouch.";
+    return;
+  }
+  lead.textContent = "You can vouch or open your cards from here.";
+}
+
 function revealBand(reduced) {
   const root = bandRoot();
   if (!root) return;
+  syncActorBandLead();
   root.hidden = false;
   root.classList.remove("scan-actor-band--hidden");
   if (reduced) {

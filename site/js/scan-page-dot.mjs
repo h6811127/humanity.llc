@@ -5,7 +5,8 @@
 import { setRefreshStatusSurfaces } from "./device-chrome-refresh.mjs?v=56";
 import {
   describeDotState,
-  deviceStateFromContext,
+  scanDeviceStateFromContext,
+  scanWalletKeysNotInTab,
   dotClassList,
   dotStateKey,
   dotTransitionKey,
@@ -153,18 +154,23 @@ function dotOverlayState() {
   return scanDotOverlayFromCounts(counts, crossTabNotice);
 }
 
-function deviceState() {
+function scanDeviceContext() {
+  const session = getTabSession();
+  const hasTabSigningKeys = Boolean(session?.owner_private_key_b58);
   const summary = loadWalletSummary();
-  return deviceStateFromContext({
+  const stewardReady =
+    summary.stewardReady ||
+    Boolean(hasTabSigningKeys && hasStewardVerification(session));
+  const device = scanDeviceStateFromContext({
     unsavedTabKeys: hasUnsavedTabKeys(),
-    stewardReady:
-      summary.stewardReady ||
-      (() => {
-        const session = getTabSession();
-        return Boolean(session?.owner_private_key_b58 && hasStewardVerification(session));
-      })(),
-    savedWalletCount: summary.count,
+    stewardReady,
+    hasTabSigningKeys,
   });
+  const walletKeysNotInTab = scanWalletKeysNotInTab(
+    summary.signingKeyCount,
+    hasTabSigningKeys
+  );
+  return { device, walletKeysNotInTab, stewardReady, summary };
 }
 
 function isScanGlanceOpen() {
@@ -268,15 +274,15 @@ function focusOtherTabFromScan() {
   actOnOtherTabKeys(entry);
 }
 
-function renderScanGlanceContent(network, device, overlay) {
+function renderScanGlanceContent(network, device, overlay, ctx) {
   const explainer = scanGlanceExplainer();
   if (!explainer) return;
-  const summary = loadWalletSummary();
   const descriptor = describeDotState(network, device, overlay, {
-    stewardReady: hasStewardReadyKeys(),
+    stewardReady: ctx.stewardReady,
     queueUrl: null,
     pageKind: "scan",
-    singleSavedCardWithKeys: summary.signingKeyCount === 1,
+    singleSavedCardWithKeys: ctx.summary.signingKeyCount === 1,
+    walletKeysNotInTab: ctx.walletKeysNotInTab,
   });
   const primary = scanGlancePrimaryAction(descriptor.action, overlay);
   explainer.innerHTML = renderScanDotExplainerHtml(descriptor, primary);
@@ -425,7 +431,8 @@ export function refreshScanPageDot() {
   }
 
   const network = resolveNetworkForDot();
-  const device = deviceState();
+  const ctx = scanDeviceContext();
+  const { device, walletKeysNotInTab } = ctx;
   const dotDevice = scanDotMarkFirstDevice(device);
   const overlay = dotOverlayState();
 
@@ -464,10 +471,11 @@ export function refreshScanPageDot() {
       network,
       device,
       overlay,
+      walletKeysNotInTab,
     })
   );
 
-  renderScanGlanceContent(network, device, overlay);
+  renderScanGlanceContent(network, device, overlay, ctx);
 }
 
 async function refreshResolverHealth() {

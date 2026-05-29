@@ -409,7 +409,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | **P0-2** | **Synchronous save** before leaving create success path | R3 race (less common on prod than assumed) | Flow A: microtask save succeeded |
 | **P0-3** | **try/catch on `saveWallet` / `saveSessionToWallet`** — visible error, `hc_auto_save_failed` | R3 quota | Not repro’d live |
 | **P0-4** | **First-session backup gate** before “done” | R4 true wipe | N/A |
-| **P0-5** | **Scan dot / “Keys on this device” = tab signing state**, not wallet count; **Restore control here** CTA | R9 — **prod** | Flow B |
+| **P0-5** | **Scan dot / “Keys on this device” = tab signing state**, not wallet count; **Restore control here** CTA | R9 — **prod** | Flow B — **Shipped** (`scan-page-dot.mjs?v=8`, actor band lead sync) |
 | **P0-6** | **Never persist `hc_created` without `owner_private_key_b58`**; strip keyless session on view-only | R11 — **prod** | Flow C |
 | **P0-7** | **View-only copy** branches on wallet: empty → backup/import; saved → restore in this tab | R13 — **prod** | Flow C |
 
@@ -481,7 +481,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | Step | Item | Status | Notes |
 |------|------|--------|-------|
 | 1 | **P0-1** Scan quiet rehydrate + script order | **Shipped** | `scan-tab-keys.mjs` top-level `await maybeQuietTabRehydrate()`; `scan-html.ts` loads scan-tab-keys **before** live-control and vouch-issue |
-| 2 | P0-5 Scan dot honesty | Pending | R9 — dot still uses wallet count |
+| 2 | P0-5 Scan dot honesty | **Shipped** | `scanDeviceStateFromContext` (tab keys only); glance + aria `walletKeysNotInTab`; actor band lead; `scan-page-dot.mjs?v=8` |
 | 3 | P0-6 Keyless session fix | Pending | R11 — `created.mjs` hydrate paths |
 | 4 | P0-7 View-only copy branches | Pending | R13 |
 | 5 | P0-2 Sync save on create | Pending | R3 |
@@ -674,3 +674,4 @@ Sources: WebKit ITP blog; [`PWA_INSTALL.md`](PWA_INSTALL.md); [`SAFARI_PERFORMAN
 | 2026-05-29 | **Prod walkthrough** on humanity.llc — Flows A–D; R9–R13; P0 honesty table; expanded P0/P0b |
 | 2026-05-29 | **Appendix:** storage inventory, write paths, scan script order, gate table, UI catalog, test matrix, rollout tracker |
 | 2026-05-29 | **P0-1 shipped:** scan-tab-keys awaits `maybeQuietTabRehydrate()`; scan-html script order fixed |
+| 2026-05-29 | **P0-5 shipped:** scan dot uses tab signing state; wallet-only keys → hollow `none` + Restore control here |
