@@ -105,7 +105,11 @@ export function initHubBackupImport(form, statusEl) {
         savedEntry = walletEntryFromSession(session, unlocked.profileId.slice(0, 12));
         walletEntries = [savedEntry, ...entries];
       }
-      saveWallet(walletEntries);
+      const write = saveWallet(walletEntries);
+      if ("error" in write) {
+        setStatus(write.error, true);
+        return;
+      }
       activateWalletEntry(savedEntry);
       setStatus(IMPORT_OWNERSHIP_LOADED_TAB);
       showImportOpenControlsCta(statusEl, savedEntry);

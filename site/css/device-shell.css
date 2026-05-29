@@ -1631,6 +1631,12 @@ button.device-hub-notice-banner {
   display: none !important;
 }
 
+/* Restore path always visible — docs/OWNERSHIP_RESTORE_UX_PLAN.md Phase 4 */
+.device-hub--stranger-empty [data-hub-restore-always],
+#wallet-page.device-hub--stranger-empty [data-hub-restore-always] {
+  display: block !important;
+}
+
 .device-hub-status-key-label {
   margin: 0 0 6px;
   font-size: 11px;

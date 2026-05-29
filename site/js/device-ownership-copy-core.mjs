@@ -177,6 +177,10 @@ export function otherTabSwitchConfirmMessage(hereSnippet, thereSnippet) {
 /** Hub / wallet empty state — Layer 2 (D9). @see docs/HUB_STRANGER_ONBOARDING.md */
 export const HUB_PINS_BOOKMARKS_ONLY = "Bookmarks only — cannot manage objects";
 
+/** Hub backup import hint — aligns with view-only restore copy (Phase 4). */
+export const HUB_RESTORE_IMPORT_HINT =
+  "Encrypted backup restores root card and object controls in this tab. humanity.llc cannot restore without a file you saved at create.";
+
 /** Hub intro coachmark — strangers with nothing saved yet (P2). */
 export const HUB_INTRO_BODY_STRANGER =
   "Create a live object first. Later, tap the dot to open what is saved on this device.";

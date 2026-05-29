@@ -5,6 +5,9 @@
 
 export const HUB_STRANGER_EMPTY_CLASS = "device-hub--stranger-empty";
 
+/** Import/restore group stays visible in stranger-empty hub (Phase 4). */
+export const HUB_RESTORE_ALWAYS_ATTR = "data-hub-restore-always";
+
 export const LANDING_STRANGER_CHROME_CLASS = "landing-stranger-chrome";
 
 /**

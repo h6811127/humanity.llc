@@ -8,6 +8,7 @@ import { verificationRecordFromLabelState } from "./device-wallet-network-core.m
 import { reconcileRemovedProfilesAfterWalletSave } from "./device-wallet-removed-profiles.mjs";
 import { setLastActiveProfileId } from "./device-quiet-tab-rehydrate-prefs.mjs";
 import { scheduleStoragePersistRequest } from "./device-storage-persist.mjs";
+import { walletSaveErrorMessage } from "./device-wallet-save-core.mjs";
 
 export const WALLET_STORAGE_KEY = "hc_wallet";
 export const WALLET_SUMMARY_STORAGE_KEY = "hc_wallet_summary";
@@ -270,18 +271,25 @@ export function loadWalletSummary() {
 
 export function saveWallet(entries) {
   const serialized = JSON.stringify(entries);
-  walletCacheRaw = serialized;
-  walletCache = entries;
-  const summary = cacheWalletSummary(entries, serialized);
-  localStorage.setItem(WALLET_STORAGE_KEY, serialized);
+  const summary = buildWalletSummary(entries, walletRawFingerprint(serialized));
+  try {
+    localStorage.setItem(WALLET_STORAGE_KEY, serialized);
+  } catch (err) {
+    return { error: walletSaveErrorMessage(err) };
+  }
   try {
     localStorage.setItem(WALLET_SUMMARY_STORAGE_KEY, JSON.stringify(summary));
   } catch {
-    /* private mode */
+    /* private mode — wallet row still persisted */
   }
+  walletCacheRaw = serialized;
+  walletCache = entries;
+  walletSummaryCacheRaw = serialized;
+  walletSummaryCache = summary;
   if (entries.length > 0) markScanOperatorFamiliar();
   reconcileRemovedProfilesAfterWalletSave(entries);
   window.dispatchEvent(new Event("hc-device-hub-changed"));
+  return { ok: true };
 }
 
 /** @returns {Array<Record<string, unknown>>} */
@@ -579,14 +587,16 @@ export function saveSessionToWallet(session, label = "") {
       return { ok: true, already: true };
     }
     entries[idx] = merged;
-    saveWallet(entries);
+    const saved = saveWallet(entries);
+    if ("error" in saved) return saved;
     setLastActiveProfileId(session.profile_id);
     notifyWalletProfileSaved(session.profile_id);
     scheduleStoragePersistRequest({ reason: "ownership_save" });
     return { ok: true, updated: true };
   }
   entries.unshift(walletEntryFromSession(session, label));
-  saveWallet(entries);
+  const saved = saveWallet(entries);
+  if ("error" in saved) return saved;
   setLastActiveProfileId(session.profile_id);
   notifyWalletProfileSaved(session.profile_id);
   scheduleStoragePersistRequest({ reason: "ownership_save" });
