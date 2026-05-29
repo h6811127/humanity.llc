@@ -5,6 +5,8 @@
 
 export const HUB_STRANGER_EMPTY_CLASS = "device-hub--stranger-empty";
 
+export const LANDING_STRANGER_CHROME_CLASS = "landing-stranger-chrome";
+
 /**
  * @param {{ walletCount?: number, pinCount?: number, inboxActionCount?: number }} input
  */
@@ -15,4 +17,25 @@ export function isHubStrangerEmptyState(input) {
   if (walletCount > 0 || pinCount > 0) return false;
   if (inboxActionCount > 0) return false;
   return true;
+}
+
+/**
+ * @param {string} [pathname]
+ */
+export function isLandingHomePath(pathname) {
+  const path = pathname || (typeof location !== "undefined" ? location.pathname : "");
+  return path === "/" || path === "/index.html";
+}
+
+/**
+ * @param {{
+ *   pathname?: string,
+ *   walletCount?: number,
+ *   pinCount?: number,
+ *   inboxActionCount?: number,
+ * }} input
+ */
+export function isLandingStrangerChrome(input) {
+  if (!isLandingHomePath(input.pathname)) return false;
+  return isHubStrangerEmptyState(input);
 }

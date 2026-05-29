@@ -1,7 +1,14 @@
 /**
  * First-visit coachmark: points new users at the status dot to open the device hub.
  * @see docs/DEVICE_HUB_INTRO_COACHMARK.md
+ * @see docs/HUB_STRANGER_ONBOARDING.md
  */
+import { isAutoSaveEnabled, isAutoSaveFailed } from "./device-auto-save.mjs";
+import { tabNoticeCountFromState } from "./device-counts-core.mjs";
+import { isHubStrangerEmptyState } from "./device-hub-stranger-empty-core.mjs";
+import { HUB_INTRO_BODY_STRANGER } from "./device-ownership-copy-core.mjs";
+import { loadPins } from "./device-pins.mjs";
+import { getWalletCount, isWalletSaved } from "./device-wallet.mjs";
 
 export const HUB_INTRO_STORAGE_KEY = "hc_device_hub_intro_dismissed";
 export const HUB_INTRO_SEEN_STORAGE_KEY = "hc_device_hub_intro_seen";
@@ -9,6 +16,8 @@ export const HUB_INTRO_SEEN_STORAGE_KEY = "hc_device_hub_intro_seen";
 const INTRO_ID = "device-hub-intro-coachmark";
 const DISMISS_ID = "device-hub-intro-dismiss";
 const SHOW_DELAY_MS = 700;
+const INTRO_BODY_DEFAULT =
+  "One tap on the status dot opens everything saved on this device-cards, keys, and notices.";
 
 /** @type {HTMLElement | null} */
 let root = null;
@@ -82,6 +91,36 @@ function readVisibilityContext() {
   };
 }
 
+function tabNoticeCountForCoachmark() {
+  try {
+    const raw = sessionStorage.getItem("hc_created");
+    const session = raw ? JSON.parse(raw) : null;
+    if (!session?.profile_id) return 0;
+    return tabNoticeCountFromState(session, isWalletSaved(session.profile_id), {
+      autoSaveEnabled: isAutoSaveEnabled(),
+      autoSaveFailed: isAutoSaveFailed(session.profile_id),
+    });
+  } catch {
+    return 0;
+  }
+}
+
+function hubIntroUsesStrangerCopy() {
+  return isHubStrangerEmptyState({
+    walletCount: getWalletCount(),
+    pinCount: loadPins().length,
+    inboxActionCount: tabNoticeCountForCoachmark(),
+  });
+}
+
+function syncHubIntroCopy(rootEl) {
+  const bodyEl = rootEl.querySelector(".device-hub-intro-body");
+  if (!bodyEl) return;
+  bodyEl.textContent = hubIntroUsesStrangerCopy()
+    ? HUB_INTRO_BODY_STRANGER
+    : INTRO_BODY_DEFAULT;
+}
+
 function ensureCoachmarkMarkup() {
   const cluster = document.querySelector(".shell-status-cluster");
   if (!cluster || document.getElementById(INTRO_ID)) return;
@@ -97,7 +136,7 @@ function ensureCoachmarkMarkup() {
     <p class="device-hub-intro-eyebrow">Welcome</p>
     <p class="device-hub-intro-title" id="device-hub-intro-title">Meet your device hub</p>
     <p class="device-hub-intro-body">
-      One tap on the status dot opens everything saved on this device-cards, keys, and notices.
+      ${INTRO_BODY_DEFAULT}
     </p>
     <p class="device-hub-intro-cta" aria-hidden="true">Tap the dot above</p>
     <button type="button" class="device-hub-intro-dismiss" id="${DISMISS_ID}">
@@ -128,6 +167,7 @@ export function hideHubIntroCoachmark() {
 export function showHubIntroCoachmark() {
   root = document.getElementById(INTRO_ID);
   if (!root || !shouldShowHubIntro(readVisibilityContext())) return;
+  syncHubIntroCopy(root);
   // First-visit means show once even if user does not tap "Got it".
   markHubIntroSeen();
   root.hidden = false;

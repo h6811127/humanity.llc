@@ -4,6 +4,12 @@
  */
 import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=58";
 import { buildStatusSegments } from "./device-counts.mjs";
+import { loadPins } from "./device-pins.mjs";
+import {
+  isHubStrangerEmptyState,
+  isLandingStrangerChrome,
+  LANDING_STRANGER_CHROME_CLASS,
+} from "./device-hub-stranger-empty-core.mjs";
 import { shouldSkipCrossTabOverlayViewTransition } from "./device-presence-inbox-stability-core.mjs";
 import { fetchResolverHealth } from "./device-network-health.mjs";
 import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visit-gate.mjs";
@@ -404,6 +410,22 @@ function renderStatusKey() {
     </ul>`;
 }
 
+function strangerChromeInput() {
+  return {
+    pathname: location.pathname,
+    walletCount: loadWalletSummary().count,
+    pinCount: loadPins().length,
+    inboxActionCount: notificationCount(),
+  };
+}
+
+function applyLandingStrangerChrome() {
+  document.body.classList.toggle(
+    LANDING_STRANGER_CHROME_CLASS,
+    isLandingStrangerChrome(strangerChromeInput())
+  );
+}
+
 function renderShellStatusLine(segments) {
   if (!shellStatusLine) return;
   const savedWalletCount = loadWalletSummary().count;
@@ -417,10 +439,15 @@ function renderShellStatusLine(segments) {
   if (!show) {
     shellStatusLine.hidden = true;
     shellStatusLine.textContent = "";
+    applyLandingStrangerChrome();
     return;
   }
+  const strangerLanding = isLandingStrangerChrome(strangerChromeInput());
   shellStatusLine.hidden = false;
-  shellStatusLine.textContent = shellChromeStatusLineFromSegments(segments);
+  shellStatusLine.textContent = shellChromeStatusLineFromSegments(segments, {
+    strangerLanding,
+  });
+  applyLandingStrangerChrome();
 }
 
 function renderHubStatusPanel(segments) {

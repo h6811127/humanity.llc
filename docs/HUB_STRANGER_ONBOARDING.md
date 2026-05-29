@@ -1,6 +1,6 @@
 # Hub stranger onboarding (prod walkthrough follow-up)
 
-**Status:** Slice 1 shipped · Slice 2–3 planned  
+**Status:** Slice 1–2 shipped · Slice 3 planned  
 **Scope:** Device hub on `/`, `/create/`, `/created/`, and `/wallet/` when **no saved cards, pins, or inbox action items**  
 **Source:** Production walkthrough May 2026 — combined landing/home + hub-as-OS validated; empty hub read as admin panel before mental model landed  
 **Companions:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md)
@@ -35,7 +35,7 @@ The collapsed hub does not consume layout on `/` (hero stays above the fold). Op
 | P | Change | Status |
 |---|--------|--------|
 | **P1** | **Stranger-empty hub** — match wallet empty copy; hide steward chrome until first save | Slice 1 shipped |
-| **P2** | **Stranger landing chrome** — keep hub collapsed; optional auto focus after hero scroll or first save only | Planned |
+| **P2** | **Stranger landing chrome** — keep hub collapsed; network-only status line; stranger coachmark copy | Slice 2 shipped |
 | **P3** | **Status line mode labels** — page-aware subtitle under segmented line (e.g. wallet: scroll hint; landing: “On this device”) | Planned |
 
 ---
@@ -100,11 +100,40 @@ Manual: **P1-HE** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — stranger hub on `/
 
 ---
 
-## P2 — Stranger landing chrome (planned)
+## P2 — Stranger landing chrome (Slice 2)
 
-- Do **not** auto-expand hub on first visit (coachmark only).
-- Consider enabling **focus mode** only after `hc_wallet` or pins exist (already shipped) — no change to stranger intro scroll.
-- Optional follow-up: hide segmented **0 cards** subcopy on status line for strangers (P3 overlap).
+### Contract
+
+- Hub sheet **stays collapsed** on first visit; coachmark is the only onboarding overlay (no auto-expand). Enforced in `device-status.mjs` init (`setHubExpanded(false)` + `sessionStorage.hc_hub_open = "0"`).
+- **Focus mode** enables only when `hc_wallet` or pins exist (`landing-focus.mjs`); strangers always see hero + **How it works** until first save.
+- On **`/`** with stranger-empty counts, top chrome uses **network-only** status line (hide `0 cards` subcopy).
+- Hub intro coachmark uses **stranger copy** when wallet, pins, and inbox actions are all zero.
+
+### Visible changes (stranger on `/`)
+
+| Element | Behavior |
+|---------|----------|
+| `body.landing-stranger-chrome` | Set while stranger-empty on landing (hook-before-dock styling hook) |
+| `#shell-status-line` | `Network reachable` only — no `· 0 cards` |
+| Hub intro body | *Create a live object first. Later, tap the dot…* (`HUB_INTRO_BODY_STRANGER`) |
+
+### Files
+
+| Area | Files |
+|------|--------|
+| Core | `site/js/device-hub-stranger-empty-core.mjs` (`isLandingHomePath`, `isLandingStrangerChrome`, `LANDING_STRANGER_CHROME_CLASS`) |
+| Status line | `site/js/device-dot-state-core.mjs` (`shellChromeStatusLineFromSegments` `strangerLanding` opt) |
+| Apply | `site/js/device-status.mjs` (`applyLandingStrangerChrome`, `renderShellStatusLine`) |
+| Coachmark | `site/js/device-hub-intro-coachmark.mjs` |
+| Copy | `site/js/device-ownership-copy-core.mjs` (`HUB_INTRO_BODY_STRANGER`) |
+
+### Regression
+
+```bash
+npm run worker:test -- worker/tests/device-hub-stranger-empty-core.test.ts worker/tests/device-dot-state.test.ts worker/tests/device-hub-intro-coachmark.test.ts
+```
+
+Manual: **P2-SLC** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md).
 
 ---
 

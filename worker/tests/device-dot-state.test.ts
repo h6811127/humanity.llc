@@ -385,6 +385,31 @@ describe("shell S4 neutral dot and chrome status line", () => {
     expect(line).toBe("Network reachable · 0 cards");
   });
 
+  it("omits zero saved subcopy on stranger landing", () => {
+    const segments = [
+      {
+        id: "network",
+        chipLabel: "Network reachable",
+        label: "Resolver Online",
+        detail: "",
+        zero: false,
+        highlight: false,
+      },
+      {
+        id: "saved",
+        chipLabel: "0 cards",
+        label: "No Cards on Device",
+        detail: "",
+        zero: true,
+        highlight: false,
+      },
+    ];
+    expect(shellChromeStatusLineFromSegments(segments, { strangerLanding: true })).toBe(
+      "Network reachable"
+    );
+    expect(shellChromeStatusLineFromSegments(segments)).toBe("Network reachable · 0 cards");
+  });
+
   it("maps hub status segments to one calm inline status line", () => {
     const items = hubStatusLineItemsFromSegments([
       {

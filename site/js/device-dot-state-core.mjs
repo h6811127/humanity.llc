@@ -333,10 +333,12 @@ export function shellStatusLinePrimaryInChrome({ device, overlay, savedWalletCou
 
 /**
  * @param {Array<{ id: string, chipLabel: string }>} segments
+ * @param {{ strangerLanding?: boolean }} [opts]
  */
-export function shellChromeStatusLineFromSegments(segments) {
+export function shellChromeStatusLineFromSegments(segments, opts = {}) {
+  const ids = opts.strangerLanding ? ["network"] : ["network", "saved"];
   return segments
-    .filter((seg) => seg.id === "network" || seg.id === "saved")
+    .filter((seg) => ids.includes(seg.id))
     .map((seg) => seg.chipLabel)
     .join(" · ");
 }

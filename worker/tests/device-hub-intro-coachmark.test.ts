@@ -68,4 +68,21 @@ describe("device hub intro coachmark", () => {
     expect(HUB_INTRO_STORAGE_KEY).toBe("hc_device_hub_intro_dismissed");
     expect(HUB_INTRO_SEEN_STORAGE_KEY).toBe("hc_device_hub_intro_seen");
   });
+
+  it("ships stranger-first coachmark copy constant", () => {
+    const fs = require("node:fs");
+    const path = require("node:path");
+    const copySrc = fs.readFileSync(
+      path.join(process.cwd(), "site/js/device-ownership-copy-core.mjs"),
+      "utf8"
+    );
+    const coachmarkSrc = fs.readFileSync(
+      path.join(process.cwd(), "site/js/device-hub-intro-coachmark.mjs"),
+      "utf8"
+    );
+    expect(copySrc).toContain("HUB_INTRO_BODY_STRANGER");
+    expect(copySrc).toContain("Create a live object first");
+    expect(coachmarkSrc).toContain("HUB_INTRO_BODY_STRANGER");
+    expect(coachmarkSrc).toContain("hubIntroUsesStrangerCopy");
+  });
 });

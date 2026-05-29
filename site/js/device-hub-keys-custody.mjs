@@ -16,7 +16,6 @@ import {
 import { isKeysCustodyNoticeDismissed, dismissKeysCustodyNotice } from "./device-keys-custody-core.mjs";
 import { keysCustodyHtml } from "./device-keys-custody.mjs";
 import { isHubStrangerEmptyState } from "./device-hub-stranger-empty-core.mjs";
-import { getWalletCount } from "./device-wallet.mjs";
 import { loadPins } from "./device-pins.mjs";
 import { notificationCount } from "./device-inbox.mjs";
 import { actOnOtherTabKeys, openSaveKeysForThisTab, walletEntryForProfile } from "./device-notice-nav.mjs";

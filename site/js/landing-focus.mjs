@@ -52,4 +52,5 @@ window.addEventListener("hc-device-hub-changed", () => {
   applyFocus();
 });
 
+// Strangers stay in intro mode until they save a card or pin (P2).
 applyFocus();
