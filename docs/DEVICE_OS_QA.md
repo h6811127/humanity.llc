@@ -266,7 +266,27 @@ See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 | 1 | Complete live proof loop (two phones) | Success panel includes **Control proven moments ago** + **does not prove legal identity** |
 | 2 | Ask tester: “What did live control prove?” | Recent key control; not legal ID or vouch |
 | 3 | Proof window ends | Scanner returns to **Ask for live proof** with expired copy; success panel showed **Proof display expires in M:SS** while active |
-| 4 | Let challenge expire unsigned | **Control was not proven. The request expired.** |
+| 4 | Let challenge expire unsigned | **The 2-minute window ended. You can ask again.** — **Ask for live proof** enabled and visually primary |
+
+### P1-LC-REF · Live control scan refresh resume (H-09)
+
+**Ref:** [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) H-09 · [`SAD_PATH_COVERAGE_AND_BACKLOG.md`](SAD_PATH_COVERAGE_AND_BACKLOG.md).
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Stranger taps **Ask for live proof**; owner pane + countdown appear | Pending challenge stored in `sessionStorage` |
+| 2 | Refresh scanner tab before owner signs | Countdown + poll resume without second **Ask** |
+| 3 | Let challenge expire or owner proves | Storage cleared; expired or success UI |
+
+### P1-LC-EX · Live control expiry retry (H-10)
+
+**Ref:** [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) H-10.
+
+| Step | Action | Expected |
+|------|--------|----------|
+| 1 | Ask for live proof; wait for 2-minute window without owner sign | Status: **The 2-minute window ended. You can ask again.** |
+| 2 | Observe **Ask for live proof** button | Enabled; status panel shows expired emphasis (not disabled/waiting) |
+| 3 | Tap **Ask for live proof** again | New challenge; owner pane updates |
 
 ### P1-LC-SD · Live control same-device scan guidance (H-05)
 

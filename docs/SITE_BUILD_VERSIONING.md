@@ -18,6 +18,7 @@ Typical failure modes:
 1. **Pages deployed, Worker not** (or the reverse) — UI and API behavior diverge.
 2. **Safari cached an old module** while HTML updated — mixed `?v=` on the status graph (see [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md)).
 3. **“I pushed but don’t see the fix”** — need to confirm new deploy vs stale tab.
+4. **PWA standalone after deploy** — no browser reload; user may run old shell until Phase 8 stale nudge or manual kill — see [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume.
 
 ## Principles
 
@@ -26,6 +27,7 @@ Typical failure modes:
 3. **Prefer git SHA + timestamp** — not `package.json` semver unless you adopt real releases.
 4. **Keep cache bust separate** — `DEVICE_SHELL_ASSET_VERSION` stays for shell graph cache bust only; copy its value into `SITE_BUILD_META.shellAssetVersion` for debugging, do not replace it.
 5. **Low noise in UI** — stewards should not see a marketing “v2.3.1” footer; use console, debug gate, or health JSON.
+6. **PWA stale shell (Phase 8)** — compare health `build.gitSha` to `SITE_BUILD_META.gitSha` in standalone; show dismissible reload CTA when they differ ([`PWA_INSTALL.md`](PWA_INSTALL.md)).
 
 ## Target shape
 
@@ -145,6 +147,7 @@ npm run worker:test -- worker/tests/site-build-meta.test.ts worker/tests/resolve
 ## Related docs
 
 - [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) — mixed `?v=` / shell graph
+- [`PWA_INSTALL.md`](PWA_INSTALL.md) — standalone refresh Phases 6–8
 - [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) — manual shell smoke
 - [`site/README.md`](../site/README.md) — Pages vs Worker deploy
 - [`AGENTS.md`](../AGENTS.md) — agent commands

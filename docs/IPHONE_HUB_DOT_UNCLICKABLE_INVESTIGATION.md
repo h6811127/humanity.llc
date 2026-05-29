@@ -89,6 +89,8 @@ Shell pages load `device-status-bootstrap.mjs?v=21`, which dynamic-imports `devi
 | Cache behavior | Aggressive HTTP cache for CSS; PWA / “Add to Home Screen” amplifies skew | Often hard-refreshed during dev; desktop cache easier to clear |
 | Automated tests | **Not covered** in default CI | Pixel 5 Chromium only (`playwright.config.ts`) |
 
+**Planned mitigation (standalone PWA):** [`PWA_INSTALL.md`](PWA_INSTALL.md) Phases 6–8 — soft refresh on resume, pull-to-refresh, stale `build` nudge with tap-to-reload (H-007). Does not replace cache-bust discipline (`DEVICE_SHELL_ASSET_VERSION`).
+
 Same URL does **not** guarantee same cached asset versions on each device.
 
 ---

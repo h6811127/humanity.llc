@@ -36,6 +36,11 @@ import(statusModuleUrl.href)
         import.meta.url
       );
       import(pwaUrl.href).catch(() => {});
+      const standaloneRefreshUrl = new URL(
+        `./pwa-standalone-refresh.mjs?v=${DEVICE_SHELL_ASSET_VERSION}`,
+        import.meta.url
+      );
+      import(standaloneRefreshUrl.href).catch(() => {});
     }
   })
   .catch((err) => {

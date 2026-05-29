@@ -618,6 +618,31 @@ Goal: make the vertical slice credible for public launch.
 - `npm run worker:test:pwa-install` green. ✅
 - `npm run e2e -- e2e/device-pwa-install.spec.ts` green. ✅
 
+### H-007: PWA standalone refresh (resume + pull-to-refresh)
+
+**Spec:** [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume · **Implementation:** [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md) Phases 6–8
+
+**Status (2026-05-29):** **Partial** — Phase 6 shipped; Phases 7–8 pending.
+
+**Problem:** Installed stewards have no browser reload in `display-mode: standalone`. Warm resume can show stale hub/network state.
+
+**Must verify (after Phases 6–8 ship):**
+
+- Standalone resume runs **soft refresh** (chrome + scoped network chips) — not full `location.reload()` every open. **Phase 6 ✅** (wallet + chrome on resume; network chips via existing hub `visibilitychange` path).
+- Pull-to-refresh on `/` and `/wallet/` in standalone with visible feedback (Phase 7).
+- PTR disabled or guarded when hub/inbox sheet open; no unscoped parallel status GET storm.
+- Live-control poll on pull/resume only when **Watch** on and scope active.
+- Stale shell banner when health `build` ≠ client stamp; tap reload fixes dead dot (Phase 8).
+- Lazy-loaded off status graph — dot still passes **P0-3** if refresh module fails.
+- No shell-caching service worker added.
+- Vitest `pwa-standalone-refresh-core.test.ts` + **P1-PWA-R** pass.
+
+**Exit criteria:**
+
+- Phase table in `PWA_INSTALL.md` marks Phases 6–8 shipped.
+- `npm run worker:test -- worker/tests/pwa-standalone-refresh-core.test.ts` green.
+- Manual **P1-PWA-R** on iOS Safari standalone (HTTPS).
+
 ### H-005: Growth Loop Readiness
 
 **Must verify:**

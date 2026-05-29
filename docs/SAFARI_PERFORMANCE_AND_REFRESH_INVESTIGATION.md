@@ -253,6 +253,7 @@ document.getElementById("top-chrome")?.dataset?.deviceStatusError
 | **P1** | Wallet page always in live-control poll scope | Auto poll on `/wallet/` only when **Watch for live proof** is on; manual **Check for live proof** when off | **Shipped 2026-05-26** - `device-live-control-poll-scheduler.mjs`, `device-live-control-inbox.mjs` |
 | **P2** | Heavy module graph and wallet hydration on every shell page | Lazy-load inbox sheet / notifications; status/count, compact hub/inbox, cross-tab saved-profile, card-disabled inbox, collapsed hub preview, large expanded hub summary, and incremental summary-window paths read `hc_wallet_summary`; full row data hydrates on action; S12 viewport window for expanded summary rows | **Partial 2026-05-28** — inbox + browser notification loaders shipped; S12 viewport summary-row window shipped; full DOM virtualization remains |
 | **P2** | Safari cache / version drift | Enforce `DEVICE_SHELL_ASSET_VERSION` on all peer imports in CI | **Partial 2026-05-27** — Vitest shell HTML bootstrap + manifest peer imports |
+| **P2** | PWA standalone stale data on resume | Soft refresh on standalone resume + PTR; stale `build` nudge | **Spec 2026-05-29** — [`PWA_INSTALL.md`](PWA_INSTALL.md) Phases 6–8 · H-007 |
 | **P3** | Week-long `/created/` session | Stop 3s live-proof poll when tab hidden or on `pagehide`; resume on visible + keys | **Shipped 2026-05-26** - `created.mjs`, `created-live-proof-poll-core.mjs` |
 
 **Shell cache bust:** `DEVICE_SHELL_ASSET_VERSION` **57** (S12 viewport summary-row window).
@@ -276,6 +277,9 @@ Yes. The device shell is doing **continuous cross-tab synchronization** and, on 
 
 **Hard refresh every refresh?**  
 **No** - only when caches are stale or the shell module failed to load. Hard refresh does **not** clear wallet/presence data.
+
+**PWA standalone — no reload button?**  
+**Yes — product gap.** Installed stewards (`display-mode: standalone`) cannot use browser reload. Warm resume today runs **health GET only** on `visibilitychange`; bfcache restore resets partial wallet truth but not full hub chrome. **Phases 6–8** ([`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume) add soft refresh on resume, pull-to-refresh, and optional stale-shell nudge — **without** auto `location.reload()` every open or a shell-caching service worker.
 
 **Week straight without extreme lag?**  
 **Possible** for light use (one tab, few cards, minimal polling). **Unlikely** for heavy steward use without closing tabs and tightening poll/network settings.
@@ -301,6 +305,7 @@ Yes. The device shell is doing **continuous cross-tab synchronization** and, on 
 
 | Date | Note |
 |------|------|
+| 2026-05-29 | Cross-link PWA standalone refresh spec (Phases 6–8) — resume gap vs browser reload |
 | 2026-05-26 | Initial investigation - Safari refresh slowness, accumulation, long-session expectations |
 | 2026-05-26 | **P0 shipped:** presence storage debounce + heartbeat keep-alive spacing; shell `?v=38` |
 | 2026-05-26 | **P1 shipped:** hub wallet network fetch debounced + hub-expand/wallet scope only |

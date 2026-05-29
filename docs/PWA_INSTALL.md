@@ -1,8 +1,8 @@
 # PWA install (device shell)
 
-**Status:** Spec + contract modules shipped · Phases 1–4.1 shipped · **Phase 5 closure** (rollout decisions locked + CI gate)  
+**Status:** Spec + contract modules shipped · Phases 1–6 shipped · **Phases 7–8 planned** (PTR + stale shell nudge)  
 **Audience:** Product, frontend, ops  
-**Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md) · [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md) · [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md`](IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md) · [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) · [`features/QR Public Profile v1.0.md`](features/QR%20Public%20Profile%20v1.0.md)
+**Related:** [`DEVICE_OS.md`](DEVICE_OS.md) · [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMENTATION.md) · [`VISUAL_DEVICE_SHELL.md`](VISUAL_DEVICE_SHELL.md) · [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md) · [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md) · [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md`](IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md) · [`STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md`](STATUS_DOT_LOAD_FAILURE_POSTMORTEM.md) · [`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md) · [`features/QR Public Profile v1.0.md`](features/QR%20Public%20Profile%20v1.0.md)
 
 ---
 
@@ -13,6 +13,8 @@ Returning **stewards** (users with saved cards on this device) may install the *
 PWA install is **device-layer chrome only**: faster return to saved cards, hub, and inbox — not a new custody or network channel. Keys remain in `sessionStorage` / `localStorage` per browser profile; install does **not** sync keys to the server or across devices. **Storage:** Add to Home Screen does **not** allocate extra quota or a separate database — the PWA and in-browser tabs on the same origin share `localStorage` (~5–10 MB site-wide). Child object indexes (`hc_child_objects_v1:{profile_id}`) live there too; see [`ROOT_CARD_AND_CHILD_OBJECTS.md`](ROOT_CARD_AND_CHILD_OBJECTS.md) § Device storage.
 
 **Product sentence:** *Install puts the device hub on your home screen — the same browser-held keys and inbox you already have, without a separate account or app store.*
+
+**Refresh gap (Phases 6–8):** Standalone mode hides the browser URL bar and native reload affordances. Stewards who add the shell to their home screen need **automatic soft refresh on resume** and **pull-to-refresh** as a manual override — without a shell-caching service worker or full `location.reload()` on every open. See § Standalone refresh & resume.
 
 ---
 
@@ -84,8 +86,10 @@ flowchart TB
 | `site/icons/pwa-apple-touch.png` | iOS home screen 180×180 | 1 |
 | `site/js/pwa-install-metadata-core.mjs` | Path rules, manifest validation | **Contract shipped** |
 | `site/js/pwa-install-ux-core.mjs` | Show/hide gating, dismiss snooze | **Contract shipped** |
-| `site/js/pwa-install.mjs` | `beforeinstallprompt`, DOM card, iOS copy | 2 |
+| `site/js/pwa-install.mjs` | `beforeinstallprompt`, DOM card, iOS copy; `isStandaloneMode()` helper | 2 |
 | `site/js/pwa-install-html.mjs` | Emphasis card markup helper | 2 |
+| `site/js/pwa-standalone-refresh-core.mjs` | Standalone detection, soft-refresh pipeline contract, PTR gesture rules | **6** ✅ · **7** (PTR) |
+| `site/js/pwa-standalone-refresh.mjs` | Resume hooks + pull-to-refresh DOM (lazy, not on status graph) | **6** ✅ · **7** (PTR) |
 | Shell HTML (`index`, `wallet`, `created`) | `<link rel="manifest">`, apple-touch-icon | 1 |
 | `worker/tests/pwa-install-metadata.test.ts` | Metadata contract tests | **Contract shipped** |
 | `worker/tests/pwa-install-ux.test.ts` | UX gating tests | **Contract shipped** |
@@ -247,7 +251,7 @@ Install does **not** replace `DEVICE_SHELL_ASSET_VERSION` or `?v=` on the status
 
 | Risk | Mitigation |
 |------|------------|
-| Stale shell in standalone PWA | Same as browser: bump `DEVICE_SHELL_ASSET_VERSION`; document hard-close PWA after deploy in ops notes |
+| Stale shell in standalone PWA | Same as browser: bump `DEVICE_SHELL_ASSET_VERSION`; document hard-close PWA after deploy in ops notes | **Phases 6–8:** soft refresh on resume + PTR; Phase 8 stale `build` nudge → tap reload |
 | `beforeinstallprompt` never fires | Gate on iOS manual path; do not show broken Install button |
 | Install card competes with inbox | Block on urgent inbox kinds |
 | Lazy module load race | Render install card only after status bootstrap success event or idle callback |
@@ -258,6 +262,156 @@ Install does **not** replace `DEVICE_SHELL_ASSET_VERSION` or `?v=` on the status
 ### Request budget
 
 Install module adds **zero** Worker API calls. Do not phone home install events in v1.
+
+Standalone **soft refresh** (Phases 6–7) reuses existing debounced network paths — see § Soft refresh pipeline and [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md). Do not fan out unscoped per-card status GETs on every resume or pull.
+
+---
+
+## Standalone refresh & resume
+
+**Status:** Spec locked · Phase 6 shipped · Phases 7–8 planned · **H-007** partial in [`V1_IMPLEMENTATION_BACKLOG.md`](V1_IMPLEMENTATION_BACKLOG.md)
+
+### Problem
+
+`display: standalone` removes browser chrome. Stewards in an installed PWA cannot:
+
+- Pull the browser’s native reload gesture (iOS standalone often disables overscroll refresh)
+- Open the URL bar or browser menu to hard-refresh
+- Easily recover from stale hub/network state after switching away and back
+
+Phases 1–5 shipped install metadata and the install card but **no deliberate refresh affordance** for users already in standalone mode.
+
+### Two refresh needs (do not conflate)
+
+| Need | What it fixes | User phrase |
+|------|----------------|-------------|
+| **Data refresh (soft)** | Card status chips, inbox badge, dot, cross-tab banners, resolver health | “Are my cards up to date?” |
+| **Shell reload (hard)** | Stale JS/CSS after deploy, dead status dot, mixed `?v=` peers | “The app looks broken after an update” |
+
+Cold launch from the home-screen icon already performs a **full navigation** to `start_url` (`/`) — new HTML and the status module graph. The primary gap is **warm resume**: app switcher return, bfcache restore, or background tab where data can be stale but the document is not reloaded.
+
+### Current behavior (gap)
+
+| Event | Today | Gap for standalone |
+|-------|--------|-------------------|
+| Cold open (icon tap, process killed) | Full page load | Acceptable |
+| `visibilitychange` → visible | `refreshNetwork()` (health GET only) in `device-status.mjs` | Dot/hub/chips may stay stale |
+| `pageshow` + `persisted` (bfcache) | Wallet network truth reset; tab presence sync; sheet reconcile | No full chrome refresh or network chips |
+| `device-os-coordinator` on visible | Full debounced refresh pipeline | **Not auto-started** (request-budget / Safari revert — see [`SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md`](SAFARI_PERFORMANCE_AND_REFRESH_INVESTIGATION.md)) |
+
+Browser-tab stewards still have reload in the browser menu. **Standalone-only asymmetry is intentional** — PWA users need extra affordances; in-browser tabs do not require Phase 6–7 by default.
+
+### Product stance
+
+| Action | Policy |
+|--------|--------|
+| **Default on open/resume (standalone)** | **Soft refresh** — re-read local state + refresh chrome + debounced network chips |
+| **Pull-to-refresh (standalone)** | Same soft refresh pipeline + brief “Updated” affordance |
+| **Every open** | **Do not** `location.reload()` — too slow on Safari; does not clear `localStorage` anyway |
+| **Post-deploy skew** | Optional **stale shell nudge** (Phase 8) — compare health `build` vs client stamp |
+| **Service worker for auto-update** | **No** — amplifies iPhone stale-module skew ([`IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md`](IPHONE_HUB_DOT_UNCLICKABLE_INVESTIGATION.md)) |
+| **Scan / create flows** | **No** PTR or standalone refresh UI — strangers and one-shot flows stay browser-native |
+
+### Soft refresh pipeline (canonical)
+
+Triggered on standalone resume (Phase 6) and on pull-to-refresh (Phase 7). **Not** a full page reload.
+
+1. **Re-read wallet** from `localStorage` (`loadWallet` / existing hub paths) — catches changes from another tab or context on the same origin.
+2. **`refreshDeviceChrome()`** — dot, inbox badge, cross-tab banners, hub glance, inbox sheet if open (`device-chrome-refresh.mjs`).
+3. **`refreshNetwork()`** — resolver health GET (already cheap; 5s abort).
+4. **Network chips** — only when hub is expanded or user is on `/wallet/`, via existing debounced `fetchAndApplyNetworkChips` / `walletNetworkVisibilityRefreshAllowed` gates ([`DEVICE_OS.md`](DEVICE_OS.md) § Refresh coordinator).
+5. **Live-control inbox** — only when **Watch for live proof** is on (`hc_watch_live_proof === "1"`) and poll scope is active — same gates as today. A pull with watch off should still feel useful (chrome + chips), not silently no-op.
+
+**Event matrix (standalone only):**
+
+| Event | Run soft refresh |
+|-------|------------------|
+| `visibilitychange` → `visible` | Yes |
+| `pageshow` + `persisted: true` | Yes |
+| `window` `focus` | No (duplicate of visibility on most platforms) |
+| Cold `load` (first paint) | No — bootstrap already runs `refreshDeviceChrome({ immediate: true })` + `refreshNetwork()` |
+
+**Detection:** Reuse `isStandaloneMode()` from `pwa-install.mjs` (`display-mode: standalone` + legacy `navigator.standalone`). Extract to `pwa-standalone-refresh-core.mjs` if both install and refresh modules need it.
+
+**Coordinator note:** Do **not** auto-start `initDeviceOsCoordinator()` globally to fix PWA resume — that reintroduces the pre-revert visibility storm. Standalone soft refresh calls the **same underlying functions** with standalone-specific triggers and existing debounce/TTL guards.
+
+### Pull-to-refresh (Phase 7)
+
+Manual override when stewards do not trust background refresh or want an explicit “check now” moment.
+
+| Gesture tier | Action | Ship in |
+|--------------|--------|---------|
+| **Normal pull** | Soft refresh pipeline + brief “Updated” (or spinner) at top | Phase 7 |
+| **Hard pull / hold** (optional) | `location.reload()` with cache discipline | **Defer** — surprise full reload is jarring on Safari |
+
+**Surfaces:**
+
+| Path | PTR |
+|------|-----|
+| `/` (landing) | Yes |
+| `/wallet/` | Yes |
+| `/created/` | No (owner flow; no install metadata) |
+| Scan `/c/…` | No (stranger trust surface) |
+| `/create/` | No |
+
+**UX constraints:**
+
+- Use a **custom** top indicator — do not rely on browser-native PTR in standalone WebKit.
+- When hub sheet or inbox sheet is **open**, disable PTR or scope refresh to sheet content only — avoid gesture conflict with sheet drag.
+- Respect **nested scroll**: landing hub sheet and wallet saved rows need a single scroll root or PTR fights hub expand/collapse.
+- Show **in-progress state** (slim top bar or dot pulse) — standalone has no URL-bar loading spinner.
+- Use `--surface-popover-*` if the indicator floats ([`UI_COLOR_SCHEME_STANDARD.md`](UI_COLOR_SCHEME_STANDARD.md)).
+
+**In-browser tabs:** Phase 7 may ship **standalone-only** first. Extending PTR to browser shell pages is an open product question (PWA-R3).
+
+### Supplementary affordances (low discoverability; ship with or after Phase 7)
+
+| Affordance | Role |
+|------------|------|
+| **Hub “Refresh” row** | Accessibility + fallback when PTR is unknown; hub settings or glance area |
+| **Build stamp tap** (debug / power users) | Force `location.reload()` when health `build` ≠ client `SITE_BUILD_META` — see [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md) |
+| **Post-install one-liner** | On first standalone session after install: “Pull down to refresh your cards.” Dismissible; optional `localStorage` snooze |
+| **Stale shell banner (Phase 8)** | After health poll: if server `build.gitSha` ≠ client stamp, show “Update available — tap to refresh” (reload CTA) |
+
+### Onboarding copy (draft)
+
+| Moment | Copy |
+|--------|------|
+| Install card detail (optional addition) | `Pull down anytime to refresh your cards.` |
+| First standalone open (one-time tip) | `Tip: pull down to refresh card status.` |
+
+### Cross-tab
+
+Installed PWA and Safari tab on the same origin share `localStorage`. Resume soft refresh re-reads wallet; `storage` events still drive chrome refresh when another context writes. Explicit pull gives stewards confidence when they are unsure which context is authoritative ([`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md)).
+
+### Error handling (refresh)
+
+| Failure | User-visible | Dev signal |
+|---------|--------------|------------|
+| Soft refresh while offline | Chrome updates from cache; network chips show last known / checking | Existing degraded banner |
+| Health GET fails | No stale-shell nudge; existing network degraded state | `refreshNetwork` abort / error path |
+| PTR during hub drag | No refresh; no stuck spinner | Gesture guard in PTR module |
+| Module load failure | No PTR; status dot error ring unchanged | `data-device-status-error` |
+
+Never block hub, dot, or inbox on refresh module load failure — same rule as `pwa-install.mjs` (lazy, off critical graph).
+
+### Regression tests (Phases 6–8)
+
+```bash
+npm run worker:test -- worker/tests/pwa-standalone-refresh-core.test.ts
+npm run e2e:pwa-install   # extend with standalone resume + PTR smoke
+```
+
+Manual: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-PWA-R**.
+
+### Open product questions (resolve before Phase 7)
+
+| ID | Question | Default if unresolved |
+|----|----------|------------------------|
+| PWA-R1 | PTR on in-browser shell pages too, or standalone-only? | **Standalone-only** |
+| PWA-R2 | Does pull always trigger live-control inbox when watch is on? | **Yes** — same scope gates as visibility refresh |
+| PWA-R3 | Hub “Refresh” row in glance vs hub settings vs long-press dot? | **Hub glance row** (landing + wallet) |
+| PWA-R4 | `start_url` query `?source=pwa` for first-open tip attribution? | Omit in v1; use `isStandaloneMode()` only |
 
 ---
 
@@ -327,6 +481,9 @@ Implementation checklist: [`PWA_INSTALL_IMPLEMENTATION.md`](PWA_INSTALL_IMPLEMEN
 | **4** | Real-device rollout gate + extended CI smoke | ✅ iOS Safari 2026-05-28 · Android Chrome optional |
 | **4.1** | Brand-dot home screen icons | ✅ |
 | **5** | Rollout decisions locked + manifest scope CI gate | ✅ |
+| **6** | Standalone soft refresh on resume (`visibilitychange` + bfcache `pageshow`) | ✅ |
+| **7** | Pull-to-refresh on `/` and `/wallet/` (standalone) | 📋 spec |
+| **8** | Stale shell nudge (health `build` vs client stamp → reload CTA) | 📋 spec |
 
 ### Phase 4 rollout gate (after Phases 1–3)
 
@@ -359,12 +516,26 @@ npm run worker:test:pwa-install
 npm run e2e:pwa-install
 ```
 
+### Phases 6–8 — Standalone refresh (planned)
+
+Spec: § Standalone refresh & resume · Backlog **H-007**.
+
+| Phase | Gate |
+|-------|------|
+| **6** | Standalone resume soft refresh; **P1-PWA-R** steps 1–4; Vitest `pwa-standalone-refresh-core.test.ts` |
+| **7** | PTR on `/` + `/wallet/`; **P1-PWA-R** steps 5–8; extend `e2e:pwa-install` |
+| **8** | Stale `build` banner + tap reload; **P1-PWA-R** step 9; cross-check [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md) |
+
+**Do not** ship shell-caching service worker as a substitute for Phases 6–8.
+
 ---
 
 ## Changelog
 
 | Date | Change |
 |------|--------|
+| 2026-05-29 | Phase 6 shipped — `pwa-standalone-refresh-*` resume soft refresh; Vitest contract |
+| 2026-05-29 | Phases 7–8 spec — pull-to-refresh, stale shell nudge; H-007 backlog |
 | 2026-05-28 | Phase 5 closure — rollout decisions locked; site-wide manifest link CI gate; H-006 closed |
 | 2026-05-28 | Phase 4.1 — brand-dot icons replace QR; manual iOS Safari P1-PWA sign-off |
 | 2026-05-28 | Phase 4 automated CI gate — `test-site.yml` runs `e2e:pwa-install` |

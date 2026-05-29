@@ -1,6 +1,6 @@
 # PWA install — implementation plan
 
-**Status:** Phases 0–5 shipped · Phase 4.1 brand-dot icons · iOS Safari P1-PWA signed off 2026-05-28 · **H-006 closed**  
+**Status:** Phases 0–6 shipped · **Phases 7–8 planned** (PTR + stale shell) · Phase 4.1 brand-dot icons · iOS Safari P1-PWA signed off 2026-05-28 · **H-006 closed** · **H-007 partial**  
 **Audience:** Engineers implementing [`PWA_INSTALL.md`](PWA_INSTALL.md)  
 **Related:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) · [`AGENTS.md`](../AGENTS.md) · [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md)
 
@@ -239,6 +239,150 @@ npm run e2e:pwa-install
 
 ---
 
+## Phase 6 — Standalone soft refresh on resume
+
+### Intent
+
+When `display-mode: standalone`, run the **soft refresh pipeline** on warm resume so hub/network state catches up without browser reload. Highest ROI for the “no way to refresh on home screen” gap.
+
+### Scope
+
+| In scope | Out of scope |
+|----------|--------------|
+| `pwa-standalone-refresh-core.mjs` — `isStandaloneMode()`, `shouldRunStandaloneSoftRefresh()`, pipeline steps contract | Pull-to-refresh UI |
+| `pwa-standalone-refresh.mjs` — `visibilitychange` + `pageshow` (`persisted`) hooks | `location.reload()` on every open |
+| Lazy load after status bootstrap (same pattern as `pwa-install.mjs`) | Auto-start `initDeviceOsCoordinator()` |
+| Vitest contract tests | Service worker |
+| Call existing `refreshDeviceChrome`, `refreshNetwork`, debounced `fetchAndApplyNetworkChips` | Scan / create / `/created/` surfaces |
+
+### Files
+
+| File | Action |
+|------|--------|
+| `site/js/pwa-standalone-refresh-core.mjs` | Create — standalone detection + soft refresh contract |
+| `site/js/pwa-standalone-refresh.mjs` | Create — resume listeners, debounce coalesce |
+| `site/js/pwa-install.mjs` | Optional — extract shared `isStandaloneMode()` to core |
+| `device-status-bootstrap.mjs` or `device-chrome-refresh.mjs` | Lazy `import("./pwa-standalone-refresh.mjs?v=…")` after status load |
+| `worker/tests/pwa-standalone-refresh-core.test.ts` | Event matrix + pipeline step contract |
+
+### Wiring sketch
+
+```javascript
+// pwa-standalone-refresh.mjs — standalone only
+import { isStandaloneMode, runStandaloneSoftRefresh } from "./pwa-standalone-refresh-core.mjs";
+
+function onResume() {
+  if (!isStandaloneMode()) return;
+  void runStandaloneSoftRefresh({ reason: "resume" });
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") onResume();
+});
+window.addEventListener("pageshow", (e) => {
+  if (e.persisted) onResume();
+});
+```
+
+`runStandaloneSoftRefresh` orchestrates existing modules — do not duplicate poll logic.
+
+### Forbidden
+
+- Static import from `device-status.mjs`
+- Full page reload on resume
+- Unscoped parallel status GET per saved card
+- PTR DOM in Phase 6
+
+### Verification
+
+```bash
+npm run worker:test -- worker/tests/pwa-standalone-refresh-core.test.ts
+npm run worker:test:pwa-install
+```
+
+Manual **P1-PWA-R** steps 1–4 ([`DEVICE_OS_QA.md`](DEVICE_OS_QA.md)).
+
+### Status
+
+**Shipped 2026-05-29** — `pwa-standalone-refresh-core.mjs`, `pwa-standalone-refresh.mjs`, lazy bootstrap load, Vitest `pwa-standalone-refresh-core.test.ts`.
+
+---
+
+## Phase 7 — Pull-to-refresh
+
+### Intent
+
+Explicit steward control: pull down on `/` and `/wallet/` in standalone to run the same soft refresh pipeline with visible feedback.
+
+### Scope
+
+| In scope | Out of scope |
+|----------|--------------|
+| Custom PTR indicator (top of page content or hub scroll root) | Browser-native PTR assumption |
+| “Updated” / in-progress affordance | Hard pull → `location.reload()` (defer) |
+| Gesture guards when hub/inbox sheet open | PTR on `/created/` |
+| Standalone-only (unless PWA-R1 resolves to browser too) | New Worker endpoints |
+
+### Files
+
+| File | Action |
+|------|--------|
+| `site/js/pwa-standalone-refresh.mjs` | PTR touch/pointer handlers, indicator DOM |
+| `site/css/device-shell.css` | PTR indicator styles (`--surface-popover-*` if floating) |
+| `pwa-standalone-refresh-core.mjs` | `pullToRefreshAllowed({ sheetOpen, pathname })` |
+| `e2e/device-pwa-install.spec.ts` or `e2e/device-pwa-refresh.spec.ts` | Mock standalone + pull smoke |
+| `site/index.html`, `site/wallet/index.html` | Optional `#device-ptr-indicator` placeholder |
+
+### Forbidden
+
+- PTR on scan or create
+- PTR that triggers live-control poll when watch is off **and** no chrome/chip update occurs (must still run steps 1–4 of soft pipeline)
+- Competing scroll handlers on hub sheet without gesture guard
+
+### Verification
+
+```bash
+npm run worker:test -- worker/tests/pwa-standalone-refresh-core.test.ts
+npm run e2e:pwa-install   # or dedicated refresh spec
+```
+
+Manual **P1-PWA-R** steps 5–8.
+
+---
+
+## Phase 8 — Stale shell nudge
+
+### Intent
+
+After deploy, standalone users may run mixed shell JS. Compare `GET /.well-known/hc/v1/health` → `build` with client `SITE_BUILD_META` / `DEVICE_SHELL_ASSET_VERSION`; show dismissible “Update available — tap to refresh” that calls `location.reload()`.
+
+### Scope
+
+| In scope | Out of scope |
+|----------|--------------|
+| Compare health `build.gitSha` vs `site/js/build-meta.mjs` on soft refresh complete | Auto-reload without user tap |
+| Emphasis card or slim hub banner in standalone only | Prominent version footer for all users |
+| Tap → `location.reload()` | Service worker update flow |
+
+### Files
+
+| File | Action |
+|------|--------|
+| `site/js/pwa-standalone-refresh-core.mjs` | `isShellBuildStale(healthBuild, clientMeta)` |
+| `site/js/pwa-standalone-refresh.mjs` | Banner render after `refreshNetwork()` |
+| `docs/SITE_BUILD_VERSIONING.md` | Cross-link stale nudge |
+| `worker/tests/pwa-standalone-refresh-core.test.ts` | Stale detection unit tests |
+
+### Verification
+
+```bash
+npm run worker:test -- worker/tests/pwa-standalone-refresh-core.test.ts worker/tests/site-build-meta.test.ts
+```
+
+Manual **P1-PWA-R** step 9.
+
+---
+
 ## Rollback
 
 | Phase | Rollback |
@@ -246,6 +390,7 @@ npm run e2e:pwa-install
 | 1 | Remove manifest link tags + manifest file; redeploy Pages |
 | 2 | Remove lazy import + HTML placeholder; card absent |
 | 3 | Delete e2e spec only |
+| 6–8 | Remove lazy import of `pwa-standalone-refresh.mjs`; PTR indicator CSS; stale banner |
 
 No database or Worker migration rollback required.
 
@@ -259,12 +404,25 @@ No database or Worker migration rollback required.
 | PWA-Q2 | `start_url` query `?source=pwa` | Omit in v1 |
 | PWA-Q3 | Hub collapsed glance vs hero placement on landing | Below hero, above hub sheet |
 
+## Open questions (resolve before Phase 7)
+
+| ID | Question | Default if unresolved |
+|----|----------|------------------------|
+| PWA-R1 | PTR on in-browser shell pages too? | Standalone-only |
+| PWA-R2 | Pull triggers live-control when watch on? | Yes — same scope gates |
+| PWA-R3 | Hub “Refresh” row placement? | Hub glance row |
+| PWA-R4 | `?source=pwa` for first-open tip? | Omit; use `isStandaloneMode()` |
+
+See [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume for full spec.
+
 ---
 
 ## Changelog
 
 | Date | Change |
 |------|--------|
+| 2026-05-29 | Phase 6 shipped — standalone resume soft refresh modules + Vitest |
+| 2026-05-29 | Phases 7–8 defined — PTR, stale shell nudge |
 | 2026-05-28 | Phase 5 closure — rollout decisions + site-wide manifest CI gate; H-006 closed |
 | 2026-05-28 | Phase 4.1 — brand-dot home screen icons; `site:generate-pwa-icons`; iOS Safari P1-PWA sign-off |
 | 2026-05-28 | Phase 4 automated CI gate — `e2e:pwa-install` in `test-site.yml`; standalone hub E2E waits for status dot |

@@ -12,6 +12,7 @@ import {
   shouldShowPwaInstallSurface,
 } from "./pwa-install-ux-core.mjs";
 import { pwaInstallCardBodyHtml } from "./pwa-install-html.mjs";
+import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 
 /** @type {BeforeInstallPromptEvent | null} */
 let deferredPrompt = null;
@@ -22,13 +23,6 @@ let listenersBound = false;
 /**
  * @typedef {Event & { prompt: () => Promise<{ outcome: string }> }} BeforeInstallPromptEvent
  */
-
-function isStandaloneMode() {
-  if (window.matchMedia("(display-mode: standalone)").matches) return true;
-  // @ts-expect-error legacy iOS
-  if (window.navigator.standalone === true) return true;
-  return false;
-}
 
 function isIosSafari() {
   const ua = navigator.userAgent;
@@ -65,7 +59,7 @@ function activeInboxKinds() {
 function gatherSurfaceInput() {
   return {
     pathname: window.location.pathname,
-    standalone: isStandaloneMode(),
+    standalone: readStandaloneModeFromWindow(window),
     deferredPromptAvailable: Boolean(deferredPrompt),
     isIosSafari: isIosSafari(),
     dismissedAtIso: readDismissedAtIso(),

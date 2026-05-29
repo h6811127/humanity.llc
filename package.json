@@ -74,7 +74,7 @@
     "e2e:keys-custody": "playwright test e2e/device-os-wallet.spec.ts -g \"keys custody\" e2e/keys-custody-emphasis-webkit.spec.ts",
     "e2e:keys-custody:webkit": "playwright test e2e/keys-custody-emphasis-webkit.spec.ts --project=webkit --project=iphone-13-pro",
     "worker:test:keys-custody": "vitest run worker/tests/device-keys-custody-html.test.ts worker/tests/device-keys-custody-core.test.ts worker/tests/device-emphasis-card-html.test.ts",
-    "worker:test:pwa-install": "vitest run worker/tests/pwa-install-metadata.test.ts worker/tests/pwa-install-ux.test.ts",
+    "worker:test:pwa-install": "vitest run worker/tests/pwa-install-metadata.test.ts worker/tests/pwa-install-ux.test.ts worker/tests/pwa-standalone-refresh-core.test.ts",
     "e2e:pwa-install": "playwright test e2e/device-pwa-install.spec.ts",
     "worker:test:lazy-shell": "vitest run worker/tests/device-status-lazy-inbox.test.ts worker/tests/device-status-lazy-notifications.test.ts worker/tests/device-status-shell-modules.test.ts",
     "site:generate-scan-e2e-fixture": "tsx worker/scripts/generate-scan-e2e-fixture.ts",
