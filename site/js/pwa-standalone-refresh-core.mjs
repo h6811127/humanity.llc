@@ -10,8 +10,12 @@ import {
   walletNetworkVisibilityRefreshAllowed,
   WALLET_NETWORK_VISIBILITY_REFRESH_MS,
 } from "./device-live-control-poll-scheduler.mjs";
+import { isPwaShellPagePath } from "./pwa-install-metadata-core.mjs";
 
 export const PWA_STANDALONE_REFRESH_DOC = "docs/PWA_INSTALL.md";
+
+/** localStorage key — gitSha user dismissed stale-shell nudge for. */
+export const PWA_STALE_SHELL_DISMISS_KEY = "hc_pwa_stale_shell_dismissed_for";
 
 /** Coalesce visibility + pageshow resume signals in standalone. */
 export const STANDALONE_SOFT_REFRESH_DEBOUNCE_MS = 150;
@@ -122,6 +126,77 @@ export function pullToRefreshIndicatorLabel(state) {
     default:
       return "";
   }
+}
+
+/**
+ * @param {string | null | undefined} sha
+ */
+export function normalizeBuildGitSha(sha) {
+  const value = String(sha || "").trim().toLowerCase();
+  if (!value || value === "dev" || value === "unknown") return "";
+  return value.slice(0, 12);
+}
+
+/**
+ * Compare resolver health `build` (Worker deploy) with client `SITE_BUILD_META` (Pages).
+ * Mismatch signals deploy skew — common when a standalone session runs stale shell JS.
+ *
+ * @param {{ gitSha?: string; source?: string } | null | undefined} healthBuild
+ * @param {{ gitSha?: string; source?: string } | null | undefined} clientMeta
+ */
+export function isShellBuildStale(healthBuild, clientMeta) {
+  if (!healthBuild || !clientMeta) return false;
+  if (clientMeta.source === "dev" || healthBuild.source === "dev") return false;
+  const healthSha = normalizeBuildGitSha(healthBuild.gitSha);
+  const clientSha = normalizeBuildGitSha(clientMeta.gitSha);
+  if (!healthSha || !clientSha) return false;
+  return healthSha !== clientSha;
+}
+
+/**
+ * @param {Pick<Storage, "getItem"> | null | undefined} storage
+ */
+export function readStaleShellDismissedForSha(storage) {
+  try {
+    return storage?.getItem(PWA_STALE_SHELL_DISMISS_KEY) || "";
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * @param {Pick<Storage, "setItem"> | null | undefined} storage
+ * @param {string} gitSha
+ */
+export function writeStaleShellDismissedForSha(storage, gitSha) {
+  const normalized = normalizeBuildGitSha(gitSha);
+  if (!normalized) return;
+  try {
+    storage?.setItem(PWA_STALE_SHELL_DISMISS_KEY, normalized);
+  } catch {
+    /* private mode */
+  }
+}
+
+/**
+ * @param {{
+ *   standalone: boolean;
+ *   pathname: string;
+ *   healthBuild?: { gitSha?: string; source?: string } | null;
+ *   clientMeta?: { gitSha?: string; source?: string } | null;
+ *   dismissedForSha?: string | null;
+ *   deviceStatusLoadError?: boolean;
+ * }} input
+ */
+export function shouldShowStaleShellNudge(input) {
+  if (!input.standalone) return false;
+  if (!isPwaShellPagePath(input.pathname)) return false;
+  if (input.deviceStatusLoadError) return false;
+  if (!isShellBuildStale(input.healthBuild, input.clientMeta)) return false;
+  const dismissedFor = normalizeBuildGitSha(input.dismissedForSha);
+  const healthSha = normalizeBuildGitSha(input.healthBuild?.gitSha);
+  if (dismissedFor && dismissedFor === healthSha) return false;
+  return true;
 }
 
 /**

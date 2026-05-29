@@ -132,7 +132,7 @@ flowchart LR
 | **Inbox + custody panel** | Phases 1–14 inbox; custody plan 1–7 | Per-card watch flags (catalog L9+) | [`DEVICE_INBOX.md`](DEVICE_INBOX.md) · [`KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md`](KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md) |
 | **Browser alerts** | v2 A–D + `sw-live-proof.mjs` | Same UX; less polling when SSE healthy | [`DEVICE_INBOX.md`](DEVICE_INBOX.md) § Background alerts roadmap |
 | **Poll budget** | Phases 1–9 + 8c; 400 auto GET/day; leader tab | Entitlement-driven cap; push miss → poll | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Optimization catalog **L12–L15**, **B1–B3** |
-| **PWA install** | Phases 1–7 shipped (resume + PTR) | **Phase 8:** stale shell nudge · H-007 | [`PWA_INSTALL.md`](PWA_INSTALL.md) · **H-006 closed** |
+| **PWA install** | Phases 1–8 shipped (resume + PTR + stale shell nudge) | — | [`PWA_INSTALL.md`](PWA_INSTALL.md) · **H-006** · **H-007 closed** |
 | **Hosted steward tier** | M8 code + **client session link** (checkout `?hc_account_id=`) | Production rollout + Stripe return URL | [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) |
 | **Server push** | — | SSE P1; DO P2; SW fallback | [`HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md`](HOSTED_TIER_PUSH_ARCHITECTURE_RFC.md) |
 | **Native mobile app** | — | Planning only (webhook path C) | [`PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md`](PAID_TIER_AND_HOSTED_OPERATOR_PLAN.md) § Server push options |

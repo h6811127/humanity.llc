@@ -358,4 +358,40 @@ test.describe("device PWA install (phase 4 rollout gate)", () => {
     await page.evaluate(() => window.__hcPtrTestTrigger?.());
     await expect(page.locator("#device-ptr-indicator")).toBeHidden();
   });
+
+  test("standalone stale shell banner when health build differs (P1-PWA-R step 9)", async ({
+    page,
+  }) => {
+    await page.addInitScript(withStandaloneDisplayMode().content);
+    await seedPwaLandingStorage(page);
+    await page.route("**/.well-known/hc/v1/health**", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          status: "ok",
+          database: "ok",
+          build: {
+            gitSha: "ffffffff",
+            builtAt: "2026-05-29T12:00:00.000Z",
+            source: "deploy",
+          },
+        }),
+      });
+    });
+    await page.route("**/.well-known/hc/v1/cards/**/live-control/challenges**", mockNoLiveProof);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await waitForShellReady(page);
+
+    await page.waitForFunction(() => typeof window.__hcStaleShellSyncForTests === "function", {
+      timeout: 20_000,
+    });
+    await page.evaluate(() => window.__hcStaleShellSyncForTests?.());
+
+    await expect(page.locator("#device-pwa-stale-shell-banner")).toBeVisible();
+    await expect(page.locator("#device-pwa-stale-shell-banner")).toContainText(
+      /Update available/i
+    );
+    await expect(page.locator("[data-pwa-stale-shell-refresh]")).toBeVisible();
+  });
 });

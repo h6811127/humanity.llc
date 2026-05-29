@@ -27,7 +27,7 @@ Typical failure modes:
 3. **Prefer git SHA + timestamp** — not `package.json` semver unless you adopt real releases.
 4. **Keep cache bust separate** — `DEVICE_SHELL_ASSET_VERSION` stays for shell graph cache bust only; copy its value into `SITE_BUILD_META.shellAssetVersion` for debugging, do not replace it.
 5. **Low noise in UI** — stewards should not see a marketing “v2.3.1” footer; use console, debug gate, or health JSON.
-6. **PWA stale shell (Phase 8)** — compare health `build.gitSha` to `SITE_BUILD_META.gitSha` in standalone; show dismissible reload CTA when they differ ([`PWA_INSTALL.md`](PWA_INSTALL.md)).
+6. **PWA stale shell (Phase 8)** — compare health `build.gitSha` to `SITE_BUILD_META.gitSha` in standalone; show dismissible reload CTA when they differ ([`PWA_INSTALL.md`](PWA_INSTALL.md)). **Shipped** — `pwa-standalone-refresh.mjs` + `#device-pwa-stale-shell-banner`.
 
 ## Target shape
 

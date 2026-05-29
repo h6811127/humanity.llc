@@ -1,6 +1,6 @@
 # Device OS  -  browser shell + physical network
 
-**Status:** Phase 8 shipped (device hub) · Phase 1 refresh coordinator shipped · **Active vertical:** merch Tier 0 shop (`/shop/`) · **PWA install:** Phases 1–5 shipped · **PWA standalone refresh:** Phases 6–8 spec ([`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume)  
+**Status:** Phase 8 shipped (device hub) · Phase 1 refresh coordinator shipped · **Active vertical:** merch Tier 0 shop (`/shop/`) · **PWA install:** Phases 1–5 shipped · **PWA standalone refresh:** Phases 6–8 shipped ([`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume)  
 **Audience:** Product, frontend, and anyone extending Pages without accounts  
 **Roadmap index:** [`STEWARD_DEVICE_ROADMAP.md`](STEWARD_DEVICE_ROADMAP.md) — custody, inbox, Browser alerts, hosted push, PWA (links only)  
 **Product language:** [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) (canonical plain-vs-precise policy) · [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md) — Layer 2 user copy vs Layer 1 keys in this doc
@@ -117,7 +117,7 @@ Same chrome on **landing**, **`/created/`**, and **`/wallet/`**:
 | Hub body | `device-hub-ui.mjs` | Saved, pins, notice, activity, search, import |
 | Hub glance | `device-hub-glance.mjs` | Landing only; visible when hub collapsed |
 | PWA install (Add to Home Screen) | `pwa-install.mjs` (lazy) | Returning stewards on shell pages only — [`PWA_INSTALL.md`](PWA_INSTALL.md) |
-| PWA standalone refresh (resume + PTR) | `pwa-standalone-refresh.mjs` (lazy, planned) | Standalone only — [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume |
+| PWA standalone refresh (resume + PTR + stale nudge) | `pwa-standalone-refresh.mjs` (lazy) | Standalone only — [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume |
 | Wallet / activity / keys | `device-wallet.mjs`, `device-activity.mjs`, `device-keys.mjs` | |
 
 ### `/wallet/` (saved page)
@@ -155,15 +155,15 @@ See `docs/DEVICE_HUB_AND_LOCAL_SEARCH.md` for storage and search.
 
 Resolver health for the status dot is fetched in **`site/js/device-status.mjs`** (`fetchResolverHealth`). Wallet status polls and live-proof inbox refresh run from **`site/js/device-hub-ui.mjs`** when the hub is mounted. **`site/js/device-os-coordinator.mjs`** (300ms debounce) remains for tests and optional use but is not auto-started from the status bootstrap (see `docs/UI_UX_REVERT_PLAN.md` step 2).
 
-**PWA standalone (Phases 6–8):** Installed stewards lose browser reload affordances. Planned **`pwa-standalone-refresh.mjs`** runs a **soft refresh pipeline** on standalone resume (`visibilitychange` visible, bfcache `pageshow`) and on pull-to-refresh — reusing `refreshDeviceChrome`, `refreshNetwork`, and debounced `fetchAndApplyNetworkChips` without auto-starting the full coordinator or `location.reload()` on every open. See [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume.
+**PWA standalone (Phases 6–8):** Installed stewards lose browser reload affordances. **`pwa-standalone-refresh.mjs`** runs a **soft refresh pipeline** on standalone resume and pull-to-refresh, plus a stale-shell nudge when health `build.gitSha` ≠ `SITE_BUILD_META.gitSha` — without auto-starting the full coordinator or `location.reload()` on every open. See [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume.
 
 | Event | Role |
 |-------|------|
 | `hc-device-os-refreshed` | Health + inbox cycle finished; status chrome updates |
 | `hc-wallet-network-refreshed` | Saved-row chips / alerts after wallet poll (`device-wallet-network.mjs`) |
-| Standalone resume / PTR (planned) | Soft refresh — chrome + scoped network chips; optional stale shell nudge (Phase 8) |
+| Standalone resume / PTR / stale shell nudge | Soft refresh — chrome + scoped network chips; health `build` compare → reload CTA |
 
-Manual regression: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) (**P1-1** — no duplicate fetches on tab focus; **P1-PWA-R** — standalone refresh when Phases 6–8 ship).
+Manual regression: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) (**P1-1** — no duplicate fetches on tab focus; **P1-PWA-R** — standalone refresh).
 
 **Glance:** Landing uses `#device-hub-glance-popover` only. `/wallet/` scrolls to saved cards from the status dot; there is no separate wallet glance popover in HTML.
 
@@ -185,7 +185,7 @@ Manual regression: [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) (**P1-1** — no duplica
 | 10 | Live-control inbox (`device-live-control-inbox.mjs`) | ✅ |
 | 11 | Cross-tab keys banner (`device-tab-presence.mjs`) | ✅ |
 | 12 | PWA install Phases 1–5 (`pwa-install-*`) | ✅ — [`PWA_INSTALL.md`](PWA_INSTALL.md) · H-006 closed |
-| 12b | PWA standalone refresh Phases 6–8 | **Phases 6–7 ✅** · Phase 8 📋 — H-007 |
+| 12b | PWA standalone refresh Phases 6–8 | ✅ — H-007 closed |
 | 13 | Deferred: resolver-wide search / directory |  -  |
 |  -  | Deferred: per-card revoke on landing hub |  -  (use Manage) |
 

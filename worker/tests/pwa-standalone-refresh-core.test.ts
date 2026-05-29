@@ -2,17 +2,22 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   clampPullToRefreshDistance,
-  isStandaloneMode,
   isPullToRefreshPath,
+  isShellBuildStale,
+  isStandaloneMode,
+  normalizeBuildGitSha,
   pullToRefreshAllowed,
   pullToRefreshAtScrollTop,
   pullToRefreshIndicatorLabel,
   pullToRefreshPullState,
   pullToRefreshShouldCommit,
   readStandaloneModeFromWindow,
+  readStaleShellDismissedForSha,
   runStandaloneSoftRefreshPipeline,
   shouldRefreshNetworkChipsOnResume,
+  shouldShowStaleShellNudge,
   shouldTriggerStandaloneResumeRefresh,
+  writeStaleShellDismissedForSha,
   PTR_THRESHOLD_PX,
   STANDALONE_SOFT_REFRESH_DEBOUNCE_MS,
   STANDALONE_SOFT_REFRESH_STEPS,
@@ -273,5 +278,90 @@ describe("pull gesture helpers", () => {
     expect(pullToRefreshPullState(PTR_THRESHOLD_PX)).toBe("ready");
     expect(pullToRefreshIndicatorLabel("updated")).toBe("Updated");
     expect(pullToRefreshIndicatorLabel("refreshing")).toMatch(/Refreshing/);
+  });
+});
+
+describe("isShellBuildStale", () => {
+  const client = { gitSha: "abc1234", source: "deploy" };
+
+  it("detects mismatched deploy stamps", () => {
+    expect(
+      isShellBuildStale({ gitSha: "def5678", source: "deploy" }, client)
+    ).toBe(true);
+  });
+
+  it("ignores matching stamps", () => {
+    expect(isShellBuildStale({ gitSha: "abc1234", source: "deploy" }, client)).toBe(
+      false
+    );
+  });
+
+  it("ignores dev builds", () => {
+    expect(
+      isShellBuildStale({ gitSha: "def5678", source: "deploy" }, {
+        gitSha: "dev",
+        source: "dev",
+      })
+    ).toBe(false);
+  });
+
+  it("normalizes short shas", () => {
+    expect(normalizeBuildGitSha("AbC1234")).toBe("abc1234");
+    expect(normalizeBuildGitSha("dev")).toBe("");
+  });
+});
+
+describe("shouldShowStaleShellNudge", () => {
+  const healthBuild = { gitSha: "newera11", source: "deploy" };
+  const clientMeta = { gitSha: "oldera11", source: "deploy" };
+
+  it("shows in standalone on shell pages when builds differ", () => {
+    expect(
+      shouldShowStaleShellNudge({
+        standalone: true,
+        pathname: "/",
+        healthBuild,
+        clientMeta,
+        dismissedForSha: null,
+        deviceStatusLoadError: false,
+      })
+    ).toBe(true);
+  });
+
+  it("hides when dismissed for current health sha", () => {
+    expect(
+      shouldShowStaleShellNudge({
+        standalone: true,
+        pathname: "/wallet/",
+        healthBuild,
+        clientMeta,
+        dismissedForSha: "newera11",
+        deviceStatusLoadError: false,
+      })
+    ).toBe(false);
+  });
+
+  it("hides outside standalone", () => {
+    expect(
+      shouldShowStaleShellNudge({
+        standalone: false,
+        pathname: "/",
+        healthBuild,
+        clientMeta,
+        dismissedForSha: null,
+        deviceStatusLoadError: false,
+      })
+    ).toBe(false);
+  });
+
+  it("persists dismiss sha", () => {
+    const storage = new Map<string, string>();
+    writeStaleShellDismissedForSha(
+      { setItem: (k, v) => storage.set(k, v), getItem: (k) => storage.get(k) ?? null },
+      "newera11"
+    );
+    expect(readStaleShellDismissedForSha({ getItem: (k) => storage.get(k) ?? null })).toBe(
+      "newera11"
+    );
   });
 });

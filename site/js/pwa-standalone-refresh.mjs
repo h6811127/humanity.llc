@@ -1,10 +1,13 @@
 /**
- * Standalone PWA soft refresh on resume + pull-to-refresh (lazy-loaded).
- * @see docs/PWA_INSTALL.md § Standalone refresh & resume — Phases 6–7
+ * Standalone PWA soft refresh on resume + pull-to-refresh + stale shell nudge.
+ * @see docs/PWA_INSTALL.md § Standalone refresh & resume — Phases 6–8
  */
 
+import { SITE_BUILD_META } from "./build-meta.mjs";
 import { refreshDeviceChrome } from "./device-chrome-refresh.mjs";
+import { fetchResolverHealthBuild } from "./device-network-health.mjs";
 import { refreshDeviceHub } from "./device-hub-ui.mjs";
+import { resolverApiOrigin } from "./hc-sign.mjs";
 import {
   clampPullToRefreshDistance,
   pullToRefreshAllowed,
@@ -15,12 +18,17 @@ import {
   PTR_THRESHOLD_PX,
   PTR_UPDATED_HIDE_MS,
   readStandaloneModeFromWindow,
+  readStaleShellDismissedForSha,
   runStandaloneSoftRefreshPipeline,
+  shouldShowStaleShellNudge,
   shouldTriggerStandaloneResumeRefresh,
   STANDALONE_SOFT_REFRESH_DEBOUNCE_MS,
+  writeStaleShellDismissedForSha,
 } from "./pwa-standalone-refresh-core.mjs";
+import { pwaStaleShellBannerHtml } from "./pwa-stale-shell-banner-html.mjs";
 
 const PTR_INDICATOR_ID = "device-ptr-indicator";
+const STALE_SHELL_BANNER_ID = "device-pwa-stale-shell-banner";
 
 let debounceTimer = null;
 let resumeListenersBound = false;
@@ -32,6 +40,11 @@ let ptrUpdatedTimer = null;
 let ptrTouchStartY = null;
 let ptrPullDistance = 0;
 let ptrPulling = false;
+let staleShellSyncInFlight = false;
+
+function deviceStatusLoadError() {
+  return document.getElementById("top-chrome")?.dataset.deviceStatusError === "1";
+}
 
 /**
  * @param {string} reason
@@ -57,6 +70,7 @@ function scheduleStandaloneSoftRefresh(reason) {
   debounceTimer = window.setTimeout(() => {
     debounceTimer = null;
     runStandaloneSoftRefresh(reason);
+    void syncStaleShellNudge();
   }, STANDALONE_SOFT_REFRESH_DEBOUNCE_MS);
 }
 
@@ -169,6 +183,7 @@ function executePullToRefresh() {
     ptrUpdatedTimer = window.setTimeout(() => {
       ptrUpdatedTimer = null;
       resetPtrPull();
+      void syncStaleShellNudge();
     }, PTR_UPDATED_HIDE_MS);
   }, 180);
 }
@@ -234,14 +249,95 @@ function bindPullToRefreshListeners() {
   window.addEventListener("touchcancel", onPtrTouchEnd);
 }
 
+function ensureStaleShellBanner() {
+  let el = document.getElementById(STALE_SHELL_BANNER_ID);
+  if (el) return el;
+  const page = document.querySelector(".page");
+  if (!page) return null;
+  el = document.createElement("div");
+  el.id = STALE_SHELL_BANNER_ID;
+  el.className = "device-pwa-stale-shell-banner";
+  el.hidden = true;
+  el.setAttribute("role", "status");
+  el.setAttribute("aria-live", "polite");
+  const installCard = document.getElementById("device-pwa-install-card");
+  if (installCard?.parentNode) {
+    installCard.parentNode.insertBefore(el, installCard.nextSibling);
+  } else {
+    page.insertBefore(el, page.firstChild);
+  }
+  return el;
+}
+
+function hideStaleShellBanner() {
+  const el = document.getElementById(STALE_SHELL_BANNER_ID);
+  if (!el) return;
+  el.hidden = true;
+  el.innerHTML = "";
+  el.classList.remove("hc-emphasis-card", "hc-emphasis-card--info");
+}
+
+function showStaleShellBanner(healthBuild) {
+  const el = ensureStaleShellBanner();
+  if (!el) return;
+  el.hidden = false;
+  el.className =
+    "hc-emphasis-card hc-emphasis-card--info device-pwa-stale-shell-banner";
+  el.innerHTML = pwaStaleShellBannerHtml();
+
+  el.querySelector("[data-pwa-stale-shell-refresh]")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    window.location.reload();
+  });
+
+  el.querySelector("[data-pwa-stale-shell-dismiss]")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    writeStaleShellDismissedForSha(localStorage, healthBuild?.gitSha || "");
+    hideStaleShellBanner();
+  });
+}
+
+async function syncStaleShellNudge() {
+  if (!readStandaloneModeFromWindow(window)) {
+    hideStaleShellBanner();
+    return;
+  }
+  if (staleShellSyncInFlight) return;
+  staleShellSyncInFlight = true;
+  try {
+    const healthBuild = await fetchResolverHealthBuild(resolverApiOrigin());
+    const show = shouldShowStaleShellNudge({
+      standalone: true,
+      pathname: window.location.pathname,
+      healthBuild,
+      clientMeta: SITE_BUILD_META,
+      dismissedForSha: readStaleShellDismissedForSha(localStorage),
+      deviceStatusLoadError: deviceStatusLoadError(),
+    });
+    if (!show) {
+      hideStaleShellBanner();
+      return;
+    }
+    showStaleShellBanner(healthBuild);
+  } finally {
+    staleShellSyncInFlight = false;
+  }
+}
+
 bindResumeListeners();
 bindPullToRefreshListeners();
+
+if (readStandaloneModeFromWindow(window)) {
+  void syncStaleShellNudge();
+}
 
 if (typeof window !== "undefined") {
   /** Test hook — programmatic PTR without touch simulation. */
   window.__hcPtrTestTrigger = () => {
     executePullToRefresh();
   };
+  /** Test hook — re-run stale shell health compare. */
+  window.__hcStaleShellSyncForTests = () => syncStaleShellNudge();
 }
 
 export {
@@ -249,4 +345,5 @@ export {
   scheduleStandaloneSoftRefresh as scheduleStandaloneSoftRefreshForTests,
   executePullToRefresh as executePullToRefreshForTests,
   renderPtrIndicator as renderPtrIndicatorForTests,
+  syncStaleShellNudge as syncStaleShellNudgeForTests,
 };

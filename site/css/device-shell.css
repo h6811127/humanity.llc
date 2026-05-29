@@ -2867,3 +2867,13 @@ body.device-shell-created #created-setup-back[hidden] {
 .device-ptr-indicator[data-state="refreshing"] .device-ptr-indicator__label {
   color: var(--surface-popover-fg, #1c1c1e);
 }
+
+/* Standalone stale shell nudge (Phase 8) */
+.device-pwa-stale-shell-banner[hidden],
+.device-pwa-stale-shell-banner:empty {
+  display: none !important;
+}
+
+.device-pwa-stale-shell-banner.hc-emphasis-card {
+  margin: 8px var(--pad) 0;
+}

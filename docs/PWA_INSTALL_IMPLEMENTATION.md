@@ -1,6 +1,6 @@
 # PWA install — implementation plan
 
-**Status:** Phases 0–7 shipped · **Phase 8 planned** (stale shell nudge) · Phase 4.1 brand-dot icons · iOS Safari P1-PWA signed off 2026-05-28 · **H-006 closed** · **H-007 partial**  
+**Status:** Phases 0–8 shipped · Phase 4.1 brand-dot icons · iOS Safari P1-PWA signed off 2026-05-28 · **H-006 closed** · **H-007 closed**  
 **Audience:** Engineers implementing [`PWA_INSTALL.md`](PWA_INSTALL.md)  
 **Related:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`HC_EMPHASIS_CARD_ROLLOUT.md`](HC_EMPHASIS_CARD_ROLLOUT.md) · [`AGENTS.md`](../AGENTS.md) · [`SITE_BUILD_VERSIONING.md`](SITE_BUILD_VERSIONING.md)
 
@@ -385,6 +385,10 @@ npm run worker:test -- worker/tests/pwa-standalone-refresh-core.test.ts worker/t
 
 Manual **P1-PWA-R** step 9.
 
+### Status
+
+**Shipped 2026-05-29** — `isShellBuildStale()` + dismissible `#device-pwa-stale-shell-banner`; health compare on standalone init/resume/PTR.
+
 ---
 
 ## Rollback
@@ -425,6 +429,7 @@ See [`PWA_INSTALL.md`](PWA_INSTALL.md) § Standalone refresh & resume for full s
 
 | Date | Change |
 |------|--------|
+| 2026-05-29 | Phase 8 shipped — stale shell nudge; H-007 closed |
 | 2026-05-29 | Phase 7 shipped — standalone pull-to-refresh |
 | 2026-05-29 | Phase 6 shipped — standalone resume soft refresh modules + Vitest |
 | 2026-05-29 | Phases 7–8 defined — PTR, stale shell nudge |
