@@ -4,17 +4,17 @@ import { describe, expect, it } from "vitest";
 
 const repoRoot = join(import.meta.dirname, "../..");
 
-describe("apply-child-object-qr-schema", () => {
-  it("exports npm script and rebuild SQL", () => {
+describe("repair-live-control-challenges-fk", () => {
+  it("exports npm script and repair SQL", () => {
     const pkg = JSON.parse(readFileSync(join(repoRoot, "package.json"), "utf8"));
-    expect(pkg.scripts["worker:apply-child-object-qr-schema"]).toContain(
-      "apply-child-object-qr-schema.mjs"
+    expect(pkg.scripts["worker:repair-live-control-challenges-fk"]).toContain(
+      "apply-repair-live-control-challenges-fk.mjs"
     );
     const sql = readFileSync(
-      join(repoRoot, "worker/scripts/child-object-qr-schema-rebuild.sql"),
+      join(repoRoot, "worker/scripts/repair-live-control-challenges-fk.sql"),
       "utf8"
     );
-    expect(sql).toContain("child_object");
+    expect(sql).toContain("REFERENCES qr_credentials (qr_id)");
     expect(sql).toContain("live_control_challenges_repair");
   });
 });
