@@ -56,8 +56,8 @@ function summary(): VerificationSummaryRow {
   };
 }
 
-describe("scan live-control client script", () => {
-  it("clears the previous owner proof link before Ask again fetch resolves", async () => {
+describe("scan live-control client script (H-14 guards)", () => {
+  it("clears owner panel and link before a new live proof request", async () => {
     const vm = buildScanViewModel(
       PROFILE,
       QR,
@@ -71,8 +71,30 @@ describe("scan live-control client script", () => {
 
     const html = await renderScanPage(vm, "http://127.0.0.1:8787");
 
-    expect(html).toContain('ownerLink.hidden = true;');
-    expect(html).toContain('ownerLink.href = "#";');
-    expect(html).toContain("if (ownerHint) ownerHint.hidden = true;");
+    expect(html).toContain("if (ownerPanel) ownerPanel.hidden = true;");
+    expect(html).toContain('if (ownerLink) ownerLink.href = "#";');
+    expect(html).not.toContain("ownerHint");
+  });
+
+  it("bundles in-person owner panel and sessionStorage resume helpers", async () => {
+    const vm = buildScanViewModel(
+      PROFILE,
+      QR,
+      {
+        card: card(),
+        qr: qr(),
+        verification: summary(),
+      },
+      "http://127.0.0.1:8787"
+    );
+
+    const html = await renderScanPage(vm, "http://127.0.0.1:8787");
+
+    expect(html).toContain('id="live-control-owner-panel"');
+    expect(html).toContain('id="live-control-in-person-layout"');
+    expect(html).toContain("showOwnerPanel(body.owner_url");
+    expect(html).toContain("hc_live_control_pending:");
+    expect(html).toContain("readPendingFromStorage");
+    expect(html).toContain("The 2-minute window ended. You can ask again.");
   });
 });

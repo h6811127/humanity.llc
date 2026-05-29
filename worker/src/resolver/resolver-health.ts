@@ -1,4 +1,4 @@
-import { schemaReady } from "../db";
+import { foreignKeyIntegrityOk, schemaReady } from "../db";
 import {
   checkResolverHealthRateLimit,
   hashIp,
@@ -40,6 +40,7 @@ export async function handleGetResolverHealth(
     operator: string;
     status: string;
     database: string;
+    foreign_keys?: string;
     build: ReturnType<typeof resolverHealthBuildField>;
   } = {
     version: PROTOCOL_VERSION,
@@ -59,6 +60,12 @@ export async function handleGetResolverHealth(
     const ready = await schemaReady(env.DB);
     body.database = ready ? "ok" : "schema_missing";
     if (!ready) {
+      body.status = "degraded";
+      return jsonResponse(body, 503);
+    }
+    const fkOk = await foreignKeyIntegrityOk(env.DB);
+    body.foreign_keys = fkOk ? "ok" : "violation";
+    if (!fkOk) {
       body.status = "degraded";
       return jsonResponse(body, 503);
     }

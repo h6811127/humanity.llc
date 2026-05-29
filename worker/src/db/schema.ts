@@ -45,3 +45,13 @@ export async function schemaReady(db: D1Database): Promise<boolean> {
   if (!(await tablesReady(db))) return false;
   return qrCredentialsHasObjectIdColumn(db);
 }
+
+/** Returns false when PRAGMA foreign_key_check reports violations (H-15). */
+export async function foreignKeyIntegrityOk(db: D1Database): Promise<boolean> {
+  try {
+    const { results } = await db.prepare("PRAGMA foreign_key_check").all();
+    return !results || results.length === 0;
+  } catch {
+    return false;
+  }
+}

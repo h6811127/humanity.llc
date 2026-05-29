@@ -28,4 +28,4 @@ export {
   vouchAuditFlagKey,
 } from "./vouch-audit-review";
 export type { VouchAuditDismissalRow } from "./vouch-audit-review";
-export { REQUIRED_TABLES, TABLES, schemaReady } from "./schema";
+export { REQUIRED_TABLES, TABLES, foreignKeyIntegrityOk, schemaReady } from "./schema";

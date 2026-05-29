@@ -51,6 +51,8 @@ export function runStep6PreflightVitest() {
     "worker/tests/hosted-rollout-step4b.test.ts",
     "worker/tests/hosted-rollout-scan-smoke.test.ts",
     "worker/tests/schema-ready.test.ts",
+    "worker/tests/resolver-health-fk.test.ts",
+    "worker/tests/scan-live-control-client.test.ts",
     "worker/tests/apply-child-object-qr-schema.test.ts",
   ]);
 }
@@ -65,7 +67,7 @@ function printRegressionChecklist() {
   console.log("Step 6b — Playwright hosted E2E\n");
   console.log("   npm run e2e:install   # once per machine");
   console.log("   npm run e2e:steward-hosted");
-  console.log("   (= e2e:hosted-tier + e2e:hosted-tier-push)\n");
+  console.log("   (= e2e:hosted-tier + e2e:hosted-tier-push + e2e:hosted-tier-billing-return)\n");
   console.log("Exit tests: docs/HOSTED_TIER_G0_READINESS.md § Exit tests mapped\n");
 }
 
