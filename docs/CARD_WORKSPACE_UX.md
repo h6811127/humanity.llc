@@ -30,7 +30,7 @@ Kicker copy in setup: **"Four steps · keys stay in this browser"** to reinforce
 |------|-------------|------|
 | 1 Save | Save control key to this device | Cannot continue until `isWalletSaved(profile_id)` |
 | 2 Print | Download QR PNG | - |
-| 3 Test scan | Preview what anyone scanning the QR sees (another device) | - |
+| 3 Test scan | Preview scan page (new tab in browser; tap Continue again before Protect) | - |
 | 4 Live | **Open card controls** | Marks setup done, clears `fresh` from URL, enters **control** |
 
 Modules: `created-setup.mjs`, `created-workspace.mjs`.

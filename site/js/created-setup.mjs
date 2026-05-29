@@ -21,7 +21,10 @@ import { SETUP_STEP_IDS, setupStepIndexFromHash } from "./created-setup-hash.mjs
 import {
   initCreatedSetupSeatbelt,
 } from "./created-setup-seatbelt.mjs";
-import { stewardScanOpenedFeedback } from "./pwa-scan-handoff-core.mjs";
+import {
+  shouldAutoAdvanceSetupTestScan,
+  stewardScanOpenedFeedback,
+} from "./pwa-scan-handoff-core.mjs";
 import { openStewardScanPreviewFromWindow } from "./pwa-scan-handoff.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 
@@ -174,6 +177,8 @@ export function initCreatedSetup(opts) {
   let stepIndex = 0;
   let feedbackTimer = null;
   let liveTransitionTimer = null;
+  /** Browser test-scan opens `_blank`; second Continue advances without re-opening (P0b-2). */
+  let testScanPreviewOpened = false;
 
   function showFeedback(message, isError = false) {
     if (!feedbackEl) return;
@@ -241,6 +246,12 @@ export function initCreatedSetup(opts) {
   function goToStep(index, { pushHistory = false } = {}) {
     const prevStep = currentStep();
     stepIndex = Math.max(minStepIndexNow(), Math.min(index, STEPS.length - 1));
+    if (currentStep() === "test" && prevStep !== "test") {
+      testScanPreviewOpened = false;
+    }
+    if (prevStep === "test" && currentStep() !== "test") {
+      testScanPreviewOpened = false;
+    }
     syncIndicators();
     if (currentStep() === "save" && keysStrip) {
       keysStrip.hidden = false;
@@ -302,12 +313,19 @@ export function initCreatedSetup(opts) {
         return;
       }
       const standalone = readStandaloneModeFromWindow(window);
+      if (testScanPreviewOpened && !shouldAutoAdvanceSetupTestScan(standalone)) {
+        goToStep(stepIndex + 1, { pushHistory: true });
+        return;
+      }
       if (!openStewardScanPreviewFromWindow(url, { setupWizard: true })) {
         showFeedback("Scan link is not ready yet.", true);
         return;
       }
+      testScanPreviewOpened = true;
       showFeedback(stewardScanOpenedFeedback(standalone, { setupWizard: true }));
-      goToStep(stepIndex + 1, { pushHistory: true });
+      if (shouldAutoAdvanceSetupTestScan(standalone)) {
+        goToStep(stepIndex + 1, { pushHistory: true });
+      }
       return;
     }
     if (step === "protect") {

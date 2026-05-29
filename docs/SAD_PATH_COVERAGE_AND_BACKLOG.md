@@ -244,6 +244,7 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 | Date | Notes |
 |------|-------|
 | 2026-05-29 | P0b-1 step 1 — fresh create hub R10 E2E + baseline-null Vitest (S30) |
+| 2026-05-29 | Safari P0b-2 — setup wizard test scan no auto-advance in browser tab |
 | 2026-05-29 | P0-4 first-session backup gate + Phase 4 step 2 hub import copy convergence |
 | 2026-05-29 | Ownership restore Phase 4 step 1 — hub import always visible (S29) |
 | 2026-05-29 | Ownership restore Phase 3 step 1 — view-only Live tab (S28) |

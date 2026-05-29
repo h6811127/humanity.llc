@@ -63,3 +63,10 @@ Setup wizard **hard gate** before step **You're live**:
 - Legacy `hc_setup_done` backfill only when wallet row already has seatbelt
 - Tests: `npm run worker:test:first-session-gate` · `npm run worker:test:setup-protect`
 - Tracker: [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) rollout step 7
+
+## Safari P0b-2 (shipped)
+
+- Setup wizard **test scan** no longer auto-advances when preview opens in a **new browser tab** (`shouldAutoAdvanceSetupTestScan`); steward taps **Continue** again on `/created/` before Protect
+- PWA standalone may still advance after same-tab `location.assign`
+- Modules: `created-setup.mjs` · `pwa-scan-handoff-core.mjs`
+- Tests: `npm run worker:test:pwa-install` (handoff core)
