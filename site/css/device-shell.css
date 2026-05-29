@@ -173,6 +173,11 @@ body.device-hub-sheet-open .shell-status-cluster,
   outline-offset: 2px;
 }
 
+#top-chrome[data-device-status-partial] .shell-status-dot-btn {
+  outline: 2px solid var(--amber, #f59e0b);
+  outline-offset: 2px;
+}
+
 /* Glance menu anchored to status dot */
 .device-hub-glance-popover {
   position: absolute;

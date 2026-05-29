@@ -16,6 +16,7 @@ describe("device-status-core", () => {
     expect(coreIdx).toBeGreaterThan(-1);
     expect(statusIdx).toBeGreaterThan(coreIdx);
     expect(src).toMatch(/import\(statusCoreUrl\.href\)[\s\S]*import\(statusModuleUrl\.href\)/);
+    expect(src).toMatch(/wireStatusPartialLoadDot/);
   });
 
   it("device-status.mjs does not register dot click (core owns it)", () => {

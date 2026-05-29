@@ -43,11 +43,30 @@ test.describe("status dot module graph", () => {
     }
   });
 
-  test("status load error shows coach card", async ({ page }) => {
+  test("status partial load opens hub without error coach hijack", async ({ page }) => {
+    await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
     await page.route("**/device-status.mjs**", (route) => route.abort("failed"));
 
     await page.goto("/");
+    await expect(page.locator("#top-chrome")).toHaveAttribute("data-device-status-partial", "1");
+    await expect(page.locator("#top-chrome")).not.toHaveAttribute("data-device-status-error", "1");
+    await expect(page.locator("#brand-status-dot-btn")).toHaveAttribute(
+      "aria-label",
+      /basic hub available/i
+    );
+    await expect(page.locator("#device-status-load-error-popover")).toBeHidden();
+
+    await page.locator("#brand-status-dot-btn").click();
+    await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/, { timeout: 8000 });
+    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
+  });
+
+  test("total status load error shows coach card", async ({ page }) => {
+    await page.route("**/device-status-core.mjs**", (route) => route.abort("failed"));
+
+    await page.goto("/");
     await expect(page.locator("#top-chrome")).toHaveAttribute("data-device-status-error", "1");
+    await expect(page.locator("#top-chrome")).not.toHaveAttribute("data-device-status-partial", "1");
     await expect(page.locator("#brand-status-dot-btn")).toHaveAttribute(
       "aria-label",
       /failed to load/i
@@ -70,17 +89,6 @@ test.describe("status dot module graph", () => {
     await expect(coachCard).toBeVisible();
     await page.locator("#brand-status-dot-btn").click();
     await expect(coachCard).toBeHidden();
-  });
-
-  test("status module failure still opens hub when core loaded", async ({ page }) => {
-    await page.route("**/.well-known/hc/v1/health**", (route) => mockHealth(route, "ok"));
-    await page.route("**/device-status.mjs**", (route) => route.abort("failed"));
-
-    await page.goto("/");
-    await expect(page.locator("#top-chrome")).toHaveAttribute("data-device-status-error", "1");
-    await page.locator("#brand-status-dot-btn").click();
-    await expect(page.locator("body")).toHaveClass(/device-hub-sheet-open/, { timeout: 8000 });
-    await expect(page.locator("#device-hub")).not.toHaveClass(/device-hub-collapsed/);
   });
 
   test("bootstrap inner failure shows load-error coach card", async ({ page }) => {

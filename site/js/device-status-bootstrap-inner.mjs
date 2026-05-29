@@ -7,7 +7,10 @@
 import { formatSiteBuildConsoleLine } from "./build-meta-browser.mjs";
 import { SITE_BUILD_META } from "./build-meta.mjs";
 import { DEVICE_SHELL_ASSET_VERSION } from "./device-status-shell-modules.mjs";
-import { wireStatusLoadErrorDot } from "./device-status-load-error.mjs";
+import {
+  wireStatusLoadErrorDot,
+  wireStatusPartialLoadDot,
+} from "./device-status-load-error.mjs";
 import { isPwaShellPagePath } from "./pwa-install-metadata-core.mjs";
 
 console.info(formatSiteBuildConsoleLine(SITE_BUILD_META));
@@ -21,10 +24,17 @@ const statusModuleUrl = new URL(
   import.meta.url
 );
 
+let statusCoreLoaded = false;
+
 import(statusCoreUrl.href)
-  .then(() => import(statusModuleUrl.href))
   .then(() => {
-    document.getElementById("top-chrome")?.removeAttribute("data-device-status-error");
+    statusCoreLoaded = true;
+    return import(statusModuleUrl.href);
+  })
+  .then(() => {
+    const chrome = document.getElementById("top-chrome");
+    chrome?.removeAttribute("data-device-status-error");
+    chrome?.removeAttribute("data-device-status-partial");
     if (isPwaShellPagePath(window.location.pathname)) {
       const pwaUrl = new URL(
         `./pwa-install.mjs?v=${DEVICE_SHELL_ASSET_VERSION}`,
@@ -39,5 +49,9 @@ import(statusCoreUrl.href)
     }
   })
   .catch((err) => {
+    if (statusCoreLoaded) {
+      wireStatusPartialLoadDot(err?.message || String(err));
+      return;
+    }
     wireStatusLoadErrorDot(err?.message || String(err));
   });
