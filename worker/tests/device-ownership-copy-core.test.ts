@@ -10,7 +10,12 @@ import {
   DEVELOPER_EXPORT_SUBTITLE,
   EXPORT_FOR_DEVELOPERS,
   IMPORT_OWNERSHIP_LOADED_TAB,
+  LIVE_CONTROL_ASK_LABEL,
+  LIVE_CONTROL_PROOF_EXPIRED_STATUS,
+  LIVE_CONTROL_REQUEST_EXPIRED_STATUS,
   LIVE_CONTROL_SCANNER_LEAD,
+  LIVE_CONTROL_SUCCESS_COPY,
+  SCAN_LIMITS_DISCLOSURE_TITLE,
   LOAD_CONTROL_IN_TAB_FIRST,
   OWNERSHIP_NOT_LOADED_TAB,
   SET_DEFAULT_FOR_ATTESTATION,
@@ -62,6 +67,33 @@ describe("device-ownership-copy-core", () => {
     expect(DEVELOPER_EXPORT_SUBTITLE).toContain("Public key");
     expect(DEFAULT_ATTESTATION_ELIGIBILITY_ALERT).toContain("default for attestation");
   });
+  it("formats inbox aria helpers in ownership terms", () => {
+    expect(inboxAriaManagingInOtherTab(1, "Demo")).toBe("managing in 1 other tab (Demo)");
+    expect(inboxAriaManagingInOtherTab(2)).toBe("managing in 2 other tabs");
+    expect(inboxAriaOwnershipNotSaved("This tab")).toBe(
+      "ownership not saved on device (This tab)"
+    );
+    expect(inboxAriaOrphanManagingOtherTab("Demo")).toBe(
+      "still managing in another tab (Demo)"
+    );
+  });
+
+  it("exports scan comprehension strings without signing-key jargon", () => {
+    for (const line of [
+      LIVE_CONTROL_SCANNER_LEAD,
+      LIVE_CONTROL_SUCCESS_COPY,
+      LIVE_CONTROL_ASK_LABEL,
+      LIVE_CONTROL_REQUEST_EXPIRED_STATUS,
+      LIVE_CONTROL_PROOF_EXPIRED_STATUS,
+      SCAN_LIMITS_DISCLOSURE_TITLE,
+      VOUCH_EXPLAINER_INITIAL_COPY,
+    ]) {
+      expect(line.toLowerCase()).not.toContain("signing key");
+      expect(line.toLowerCase()).not.toContain("private key");
+    }
+    expect(LIVE_CONTROL_SCANNER_LEAD).toContain("control");
+    expect(LIVE_CONTROL_SUCCESS_COPY).toContain("does not prove legal identity");
+  });
 });
 
 describe("D7 default UI modules avoid Layer 1 hero copy", () => {
@@ -72,6 +104,7 @@ describe("D7 default UI modules avoid Layer 1 hero copy", () => {
     "site/js/vouch-revoke.mjs",
     "site/js/device-dot-state-core.mjs",
     "site/js/device-hub-keys-custody-core.mjs",
+    "worker/src/resolver/scan-html.ts",
   ];
 
   for (const rel of modules) {

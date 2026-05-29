@@ -478,8 +478,8 @@ describe("renderScanPage M3.2 trust blocks", () => {
     expect(html).toContain("hc-emphasis-card--warn vouch-ineligible");
     expect(html).toContain('id="vouch-success"');
     expect(html).toContain("hc-emphasis-card--active vouch-success");
-    expect(html).toContain("Signing key in this tab");
-    expect(html).toContain("Saved cards");
+    expect(html).toContain("Checking this tab");
+    expect(html).toContain("My objects");
     expect(html).toContain("Issue vouch");
     expect(html).toContain("vouch-explainer-actions");
     expect(html).toContain('id="scan-cross-tab-banner"');

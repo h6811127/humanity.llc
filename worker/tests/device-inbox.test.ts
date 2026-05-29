@@ -84,7 +84,7 @@ describe("buildInboxItems", () => {
     expect(items.map((i) => i.kind)).toEqual(["orphan_keys_removed"]);
     expect(items[0].title).toBe("Still managing in another tab");
     expect(inboxDotOverlayFromItems(items)).toBe("cross_tab_keys");
-    expect(inboxBadgeAriaLabel(items)).toContain("removed card");
+    expect(inboxBadgeAriaLabel(items)).toContain("still managing in another tab");
   });
 
   it("suppresses cross-tab when tab keys notice is active", () => {
@@ -335,7 +335,7 @@ describe("inboxBadgeAriaLabel", () => {
       crossTabEntries: [{ profile_id: "x", tabId: "t" }],
     });
     expect(inboxBadgeAriaLabel(items)).toBe(
-      "Needs attention (3 items): 2 live proofs, keys in another tab (x…)"
+      "Needs attention (3 items): 2 live proofs, managing in 1 other tab (x…)"
     );
   });
 
@@ -356,7 +356,7 @@ describe("inboxBadgeAriaLabel", () => {
         ],
       })
     ).toBe(
-      "Needs attention (2 items): keys in another tab (@alice), keys in another tab (Demo)"
+      "Needs attention (2 items): managing in 1 other tab (@alice), managing in 1 other tab (Demo)"
     );
   });
 

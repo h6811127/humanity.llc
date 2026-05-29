@@ -1,7 +1,7 @@
 /**
  * Layer 2 ownership copy shared across device shell modules.
  * @see docs/PRODUCT_LANGUAGE_STRATEGY.md
- * @see docs/OWNERSHIP_AND_CONTROL_MODEL.md § Terminology map · D7
+ * @see docs/OWNERSHIP_AND_CONTROL_MODEL.md § Terminology map · D7 · D9g
  */
 
 export const OWNERSHIP_NOT_LOADED_TAB = "Ownership not loaded in this tab.";
@@ -48,6 +48,25 @@ export const VOUCH_EXPLAINER_INITIAL_COPY =
 /** Live control scanner lead (M7 comprehension). */
 export const LIVE_CONTROL_SCANNER_LEAD =
   "Ask the owner to prove they can respond with control of this object—right now, on the spot.";
+
+/** Live control success panel (M7 L1–L2 · H-002). */
+export const LIVE_CONTROL_SUCCESS_TITLE = "Control proven";
+
+export const LIVE_CONTROL_SUCCESS_COPY =
+  "Control proven moments ago. This does not prove legal identity, vouching, or ownership of the physical object.";
+
+export const LIVE_CONTROL_ASK_LABEL = "Ask for live proof";
+
+/** Challenge window ended without owner sign (M7 pre-flight step 6). */
+export const LIVE_CONTROL_REQUEST_EXPIRED_STATUS =
+  "The 2-minute window ended. You can ask again.";
+
+/** Proof display window ended after success (M7 pre-flight step 5). */
+export const LIVE_CONTROL_PROOF_EXPIRED_STATUS =
+  "Live proof expired. Ask again to prove control now.";
+
+/** Scan limits disclosure title (M5 stranger path · V1 launch gates). */
+export const SCAN_LIMITS_DISCLOSURE_TITLE = "What this scan does not prove";
 
 /**
  * @param {number} count

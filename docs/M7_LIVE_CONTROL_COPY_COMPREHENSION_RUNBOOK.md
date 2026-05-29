@@ -42,7 +42,7 @@ Run once yourself before inviting strangers:
 5. **Expiry** — wait for proof display window to end (or use stale `proof_expires_at` in dev); scanner returns to **Ask for live proof** with plain expired message.
 6. **Challenge timeout** — start a new request; let 120s challenge expire without signing; scanner shows **Control was not proven. The request expired.**
 
-Automated copy guardrails: `npm run worker:test -- worker/tests/scan.test.ts` (comprehension copy assertions).
+Automated copy guardrails: `npm run worker:test:comprehension` (D9 · H-002 · M7 L1–L6 markup checks).
 
 ---
 

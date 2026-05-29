@@ -27,7 +27,13 @@ import {
   qrTrustGroupScopeSubtitle,
 } from "../../../site/js/object-taxonomy-core.mjs";
 import {
+  LIVE_CONTROL_ASK_LABEL,
+  LIVE_CONTROL_PROOF_EXPIRED_STATUS,
+  LIVE_CONTROL_REQUEST_EXPIRED_STATUS,
   LIVE_CONTROL_SCANNER_LEAD,
+  LIVE_CONTROL_SUCCESS_COPY,
+  LIVE_CONTROL_SUCCESS_TITLE,
+  SCAN_LIMITS_DISCLOSURE_TITLE,
   VOUCH_EXPLAINER_EYEBROW,
   VOUCH_EXPLAINER_INITIAL_COPY,
   VOUCH_EXPLAINER_TITLE,
@@ -1167,7 +1173,7 @@ function liveControlInteractiveRow(provenAt: string | null): string {
           </p>
         </div>
         <button type="button" class="live-control-cta" id="live-control-request">
-          Ask for live proof
+          ${escapeHtml(LIVE_CONTROL_ASK_LABEL)}
         </button>
         <div class="live-control-status-panel" id="live-control-status-panel">
           <p class="live-control-status" id="live-control-status" aria-live="polite">Ready when you are.</p>
@@ -1241,13 +1247,13 @@ function renderLiveControlSuccessPanel(provenAt: string, visible: boolean): stri
     <div class="live-control-card-head-text">
       <span class="live-control-eyebrow">Live control</span>
       <div class="live-control-title-row">
-        <span class="live-control-title">Control proven</span>
+        <span class="live-control-title">${escapeHtml(LIVE_CONTROL_SUCCESS_TITLE)}</span>
         <span class="live-control-proven-ago" id="live-control-proven-ago"${provenIsoAttr}>${escapeHtml(agoInitial)}</span>
       </div>
     </div>
   </div>
   <p class="live-control-success-copy">
-    Control proven moments ago. This does not prove legal identity, vouching, or ownership of the physical object.
+    ${escapeHtml(LIVE_CONTROL_SUCCESS_COPY)}
   </p>
   <p class="live-control-proof-countdown" id="live-control-proof-countdown" hidden aria-live="polite"></p>
   <p class="live-control-proven-at" id="live-control-proven-at">${escapeHtml(provenLabel)}</p>
@@ -1307,6 +1313,9 @@ ${scanLiveControlClientHelpersJs()}
   var profileId = ${JSON.stringify(vm.profileId)};
   var qrId = ${JSON.stringify(vm.qrId)};
   var challengeUrl = ${JSON.stringify(challengeUrl)};
+  var COPY_ASK_LABEL = ${JSON.stringify(LIVE_CONTROL_ASK_LABEL)};
+  var COPY_REQUEST_EXPIRED = ${JSON.stringify(LIVE_CONTROL_REQUEST_EXPIRED_STATUS)};
+  var COPY_PROOF_EXPIRED = ${JSON.stringify(LIVE_CONTROL_PROOF_EXPIRED_STATUS)};
   var pollTimer = null;
   var countdownTimer = null;
   var proofDisplayCountdownTimer = null;
@@ -1500,7 +1509,7 @@ ${scanLiveControlClientHelpersJs()}
     if (row) row.classList.remove("is-proven");
     if (btn) {
       btn.disabled = false;
-      btn.textContent = "Ask for live proof";
+      btn.textContent = COPY_ASK_LABEL;
     }
     if (status) setStatus("Ready when you are.", false);
     if (ownerPanel) ownerPanel.hidden = true;
@@ -1620,10 +1629,10 @@ ${scanLiveControlClientHelpersJs()}
     if (row) row.classList.remove("is-proven");
     if (btn) {
       btn.disabled = false;
-      btn.textContent = "Ask for live proof";
+      btn.textContent = COPY_ASK_LABEL;
     }
     showRequestExpiredVisual();
-    setStatus("The 2-minute window ended. You can ask again.", false);
+    setStatus(COPY_REQUEST_EXPIRED, false);
     if (inPersonLayout) inPersonLayout.classList.remove("is-owner-waiting");
   }
   function showProofExpired() {
@@ -1643,9 +1652,9 @@ ${scanLiveControlClientHelpersJs()}
     if (row) row.classList.remove("is-proven");
     if (btn) {
       btn.disabled = false;
-      btn.textContent = "Ask for live proof";
+      btn.textContent = COPY_ASK_LABEL;
     }
-    setStatus("Live proof expired. Ask again to prove control now.", false);
+    setStatus(COPY_PROOF_EXPIRED, false);
     if (inPersonLayout) inPersonLayout.classList.remove("is-owner-waiting");
   }
   function freshProofMs(body) {
@@ -1850,7 +1859,7 @@ ${scanLiveControlClientHelpersJs()}
       .catch(function (err) {
         stopCountdown();
         btn.disabled = false;
-        btn.textContent = "Ask for live proof";
+        btn.textContent = COPY_ASK_LABEL;
         setStatus(err.message || "Could not create live proof request.", false);
       });
   });
@@ -1889,7 +1898,7 @@ function renderLimitsSettings(vm: ScanViewModel, origin: string): string {
   <summary class="scan-limits-summary">
     ${scanListIcon("orange", "shield")}
     <span class="scan-limits-summary-text">
-      <span class="scan-limits-summary-title">What this scan does not prove</span>
+      <span class="scan-limits-summary-title">${escapeHtml(SCAN_LIMITS_DISCLOSURE_TITLE)}</span>
       <span class="scan-limits-summary-sub">Tap for ownership, ID, KYC, employment, and age</span>
     </span>
     <span class="list-chevron" aria-hidden="true">›</span>
