@@ -1,6 +1,6 @@
 # PWA standalone — external navigation & new-tab gaps
 
-**Status:** P1 shipped (2026-05-29) — standalone scan handoff · P2 return banner open  
+**Status:** P1 + **P2 shipped** (2026-05-29) — standalone scan handoff + return banner on scan  
 **Audience:** Product, frontend, QA  
 **Related:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) · [`shop-checkout-handoff.mjs`](../site/js/shop-checkout-handoff.mjs) · [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md)
 
@@ -251,3 +251,4 @@ Update [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Manual QA step 3 when P
 |------|--------|
 | 2026-05-29 | Initial investigation — inventory, impact matrix, proposals P1–P5 |
 | 2026-05-29 | **P1 shipped** — `pwa-scan-handoff-core.mjs` wired at setup, dashboard, hub, wallet pins, child-object scan links |
+| 2026-05-29 | **P2 shipped** — `hc_return` param, sessionStorage fallback, scan return banner + `scan-steward-preview-return.mjs` |

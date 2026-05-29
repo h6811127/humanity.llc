@@ -9,10 +9,8 @@ import { syncUpdateStatusTaskGate } from "./created-first-revoke-gate.mjs?v=2";
 import { initCreatedLivePrimaryCta } from "./created-live-primary-cta.mjs";
 import { initCreatedLiveSetupMemory } from "./created-live-setup-memory.mjs";
 import { isSetupDone } from "./created-mode.mjs";
-import {
-  openStewardScanPreview,
-  stewardScanOpenedFeedback,
-} from "./pwa-scan-handoff-core.mjs";
+import { openStewardScanPreviewFromWindow } from "./pwa-scan-handoff.mjs";
+import { stewardScanOpenedFeedback } from "./pwa-scan-handoff-core.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 
 const DONE_STORAGE_KEY = "hc_created_task_done";
@@ -101,7 +99,7 @@ export function initCreatedDashboard({
     const scanUrl = getScanUrl?.() || openScan?.href;
     if (!scanUrl || scanUrl === "#" || !scanUrl.startsWith("http")) return false;
     const standalone = readStandaloneModeFromWindow(window);
-    if (!openStewardScanPreview(scanUrl, { standalone, navigation: location })) {
+    if (!openStewardScanPreviewFromWindow(scanUrl)) {
       return false;
     }
     showFeedback(stewardScanOpenedFeedback(standalone));

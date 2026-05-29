@@ -24,6 +24,7 @@ import {
   syncChildObjectBackupGateUi,
 } from "./child-object-backup-gate.mjs";
 import { applyStewardScanLinkElement } from "./pwa-scan-handoff-core.mjs";
+import { buildStewardScanPreviewHrefFromWindow } from "./pwa-scan-handoff.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 import {
   childObjectRegisterProgressLabel,
@@ -70,7 +71,7 @@ function renderStatusPlateList(profileId, rows) {
       if (typeof row.scan_url === "string" && row.scan_url) {
         const link = document.createElement("a");
         link.className = "btn-text";
-        link.href = row.scan_url;
+        link.href = buildStewardScanPreviewHrefFromWindow(row.scan_url);
         applyStewardScanLinkElement(link, readStandaloneModeFromWindow(window));
         link.textContent = "Open scan page";
         const copyBtn = document.createElement("button");

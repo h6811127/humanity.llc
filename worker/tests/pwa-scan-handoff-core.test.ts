@@ -1,10 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 
 import {
+  appendStewardPreviewReturnToScanUrl,
   applyStewardScanLinkElement,
   isAllowedScanPreviewUrl,
+  isAllowedStewardPreviewReturnUrl,
   openStewardScanPreview,
   shouldAutoAdvanceSetupTestScan,
+  stewardPreviewReturnBannerLabel,
   stewardScanLinkHtmlAttrs,
   stewardScanOpenedFeedback,
   stewardScanOpensInNewTab,
@@ -41,18 +44,55 @@ describe("pwa-scan-handoff-core", () => {
     expect(assign).not.toHaveBeenCalled();
   });
 
-  it("assigns same tab in standalone mode", () => {
+  it("assigns same tab in standalone mode with return param", () => {
     const openWindow = vi.fn();
     const assign = vi.fn();
+    const setItem = vi.fn();
     expect(
-      openStewardScanPreview("https://humanity.llc/c/abc", {
+      openStewardScanPreview("https://humanity.llc/c/abc?q=1", {
         standalone: true,
+        returnUrl: "https://humanity.llc/created/?profile_id=p#setup-test",
+        pageOrigin: "https://humanity.llc",
         openWindow,
         navigation: { assign },
+        storage: { setItem },
       })
     ).toBe(true);
-    expect(assign).toHaveBeenCalledWith("https://humanity.llc/c/abc");
+    expect(assign).toHaveBeenCalledWith(expect.stringContaining("hc_return="));
+    expect(setItem).toHaveBeenCalled();
     expect(openWindow).not.toHaveBeenCalled();
+  });
+
+  it("rejects off-origin steward preview return URLs", () => {
+    expect(
+      isAllowedStewardPreviewReturnUrl("https://evil.example/created/", "https://humanity.llc")
+    ).toBe(false);
+    expect(
+      isAllowedStewardPreviewReturnUrl(
+        "https://humanity.llc/created/?profile_id=x",
+        "https://humanity.llc"
+      )
+    ).toBe(true);
+  });
+
+  it("appends hc_return to scan URL", () => {
+    const out = appendStewardPreviewReturnToScanUrl(
+      "https://humanity.llc/c/p?q=1",
+      "https://humanity.llc/created/?profile_id=p#setup-test",
+      "https://humanity.llc"
+    );
+    expect(out).toContain("hc_return=");
+    const parsed = new URL(out);
+    expect(parsed.searchParams.get("hc_return")).toContain("/created/");
+  });
+
+  it("labels setup return banner", () => {
+    expect(
+      stewardPreviewReturnBannerLabel("https://humanity.llc/created/#setup-test")
+    ).toBe("Back to setup");
+    expect(stewardPreviewReturnBannerLabel("https://humanity.llc/wallet/")).toBe(
+      "Back to My objects"
+    );
   });
 
   it("maps standalone to link attrs and feedback", () => {
