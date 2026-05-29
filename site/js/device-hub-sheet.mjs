@@ -2,11 +2,11 @@
  * Bottom sheet host for #device-hub on shell pages.
  */
 import { prefersReducedMotion } from "./device-shell-motion.mjs";
-import { hubSheetReconcileAction } from "./device-hub-sheet-core.mjs?v=63";
+import { hubSheetReconcileAction } from "./device-hub-sheet-core.mjs?v=64";
 import {
   bindSheetLifecycleReconcile,
   syncSheetBackdropClosed,
-} from "./device-sheet-backdrop-sync.mjs?v=63";
+} from "./device-sheet-backdrop-sync.mjs?v=64";
 import { LIVE_CONTROL_POLL_SCOPE_CHANGED } from "./device-live-control-inbox.mjs";
 
 const HUB_OPEN_KEY = "hc_hub_open";
@@ -55,6 +55,7 @@ export function setHubSheetOpen(open) {
   chrome?.classList.toggle("top-chrome--hub-locked", open);
   hub.setAttribute("aria-hidden", open ? "false" : "true");
   if (open) {
+    syncInboxBackdropForOpenHub();
     hub.removeAttribute("inert");
   } else {
     hub.setAttribute("inert", "");

@@ -1079,6 +1079,7 @@ function scheduleWalletNetworkFetch() {
  * @param {{ manual?: boolean }} [opts]
  */
 async function fetchAndApplyNetworkChips(opts = {}) {
+  syncInboxBackdropForOpenHub();
   if (!hubConfig.fetchNetworkStatus || !savedList) return;
   persistNetworkCheckedAt(Date.now());
   const stored = loadWallet();
