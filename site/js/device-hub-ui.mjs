@@ -750,8 +750,8 @@ function hubCardMenuHtml(entry, menuControls) {
               entry.owner_private_key_b58
                 ? `<button type="button" class="hub-card-menu-item hub-sign-lock-pin" data-id="${escapeHtml(entry.id)}">${
                     getSignLock(entry.profile_id)?.mode === "pin"
-                      ? "Change PIN before sign"
-                      : "Require PIN before sign"
+                      ? "Change PIN to take control"
+                      : "Require PIN to take control"
                   }</button>`
                 : ""
             }
@@ -759,14 +759,14 @@ function hubCardMenuHtml(entry, menuControls) {
               entry.owner_private_key_b58 && isWebAuthnUnlockAvailable()
                 ? `<button type="button" class="hub-card-menu-item hub-sign-lock-webauthn" data-id="${escapeHtml(entry.id)}">${
                     getSignLock(entry.profile_id)?.mode === "webauthn"
-                      ? "Change device unlock before sign"
-                      : "Require device unlock before sign"
+                      ? "Change device unlock to take control"
+                      : "Require device unlock to take control"
                   }</button>`
                 : ""
             }
             ${
               entry.owner_private_key_b58 && isSignLockEnabled(entry.profile_id)
-                ? `<button type="button" class="hub-card-menu-item hub-sign-lock-clear" data-id="${escapeHtml(entry.id)}">Remove sign unlock requirement</button>`
+                ? `<button type="button" class="hub-card-menu-item hub-sign-lock-clear" data-id="${escapeHtml(entry.id)}">Remove control unlock requirement</button>`
                 : ""
             }
             <button type="button" class="hub-card-menu-item hub-remove" data-id="${escapeHtml(entry.id)}">Remove from device</button>

@@ -358,7 +358,7 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | **D3** | Rename nav labels (“My cards” → “My objects”) with redirects/aliases | Medium — bookmarks, tests | **Shipped** (2026-05-29) |
 | **D4** | Session-only warnings only when auto-save fails or user opted out | Medium — test matrix | **Shipped** (2026-05-29) |
 | **D5** | Stronger recovery gates before merch checkout / Nth child object | Product policy | **Shipped** (2026-05-29) |
-| **D6** | Optional WebAuthn wrap around control activation (extends vouch-ready option E) | Engineering |
+| **D6** | Optional WebAuthn wrap around control activation (extends vouch-ready option E) | Engineering | **Shipped** (2026-05-29) |
 
 **Do not migrate:** resolver APIs, document types, storage key names, or test fixture terminology without a dedicated protocol PR.
 
@@ -386,7 +386,7 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | Custody UI | `device-keys-custody.mjs`, `device-hub-keys-custody*.mjs` |
 | Cross-tab | `device-tab-presence.mjs`, `device-cross-tab-banner.mjs` |
 | Backup/recovery | `key-backup*.mjs`, `recovery-key-ui.mjs` |
-| Vouch / attestation | `vouch-issue.mjs`, `vouch-ready-keys.mjs` |
+| Vouch / attestation | `vouch-issue.mjs`, `vouch-ready-keys.mjs`, `device-control-activation*.mjs` |
 | Child backup gate | `child-object-backup-gate*.mjs` |
 | Worker crypto | `worker/src/crypto/key-backup.ts` |
 

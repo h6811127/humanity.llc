@@ -142,8 +142,8 @@ export function buildHubKeysCustodyPanel(input) {
       kind: "sign_lock",
       title:
         signLockMode === "webauthn"
-          ? "Device unlock required before sign"
-          : "PIN required before sign",
+          ? "Device unlock required to take control"
+          : "PIN required to take control",
       subtitle: signLockLabel || tabSessionLabel,
     });
   }

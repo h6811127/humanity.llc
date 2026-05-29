@@ -1,5 +1,6 @@
 import { logDeviceActivity, walletEntryForActivity } from "./device-activity.mjs";
 import { navigateTo } from "./device-shell-motion.mjs";
+import { clearSignUnlock } from "./vouch-sign-lock.mjs";
 import { loadWallet, walletEntryQrId } from "./device-wallet.mjs";
 
 /**
@@ -17,6 +18,11 @@ export function getTabSession() {
 /** Clear signing keys from this tab only (saved wallet rows unchanged). */
 export function clearTabSessionKeys() {
   try {
+    const raw = sessionStorage.getItem("hc_created");
+    const session = raw ? JSON.parse(raw) : null;
+    if (session?.profile_id) {
+      clearSignUnlock(session.profile_id);
+    }
     sessionStorage.removeItem("hc_created");
   } catch {
     /* ignore */
@@ -65,21 +71,10 @@ export function createdUrlForEntry(entry) {
 /**
  * @param {Record<string, unknown>} entry
  * @param {{ returnUrl?: string | null }} [opts]
- * @returns {URL | null}
  */
-function createdPageUrlForEntry(entry, opts = {}) {
+export function buildCreatedPageUrl(entry, opts = {}) {
   if (!entry?.profile_id) return null;
-
-  const saved =
-    entry.owner_private_key_b58 != null
-      ? entry
-      : loadWallet().find((w) => w.profile_id === entry.profile_id) ?? null;
-
-  const target = saved ?? entry;
-  if (saved?.owner_private_key_b58) {
-    activateWalletEntry(saved);
-  }
-  const url = new URL(createdUrlForEntry(target));
+  const url = new URL(createdUrlForEntry(entry));
   let returnUrl = opts.returnUrl ?? null;
   if (!returnUrl) {
     try {
@@ -96,14 +91,43 @@ function createdPageUrlForEntry(entry, opts = {}) {
 }
 
 /**
+ * @param {Record<string, unknown>} entry
+ * @param {{ returnUrl?: string | null, skipActivate?: boolean }} [opts]
+ * @returns {URL | null}
+ */
+function createdPageUrlForEntry(entry, opts = {}) {
+  if (!entry?.profile_id) return null;
+
+  const saved =
+    entry.owner_private_key_b58 != null
+      ? entry
+      : loadWallet().find((w) => w.profile_id === entry.profile_id) ?? null;
+
+  const target = saved ?? entry;
+  if (saved?.owner_private_key_b58 && !opts.skipActivate) {
+    activateWalletEntry(saved);
+  }
+  return buildCreatedPageUrl(target, opts);
+}
+
+/**
  * Load saved keys when available and open /created/ (Now tab by default).
  * @param {Record<string, unknown>} entry
  * @param {{ returnUrl?: string | null }} [opts]
  */
 export function openCardNowPage(entry, opts = {}) {
-  const url = createdPageUrlForEntry(entry, opts);
-  if (!url) return false;
-  navigateTo(url.href);
+  void import("./device-control-activation.mjs").then(async ({ openCardNowPageGated }) => {
+    let result = await openCardNowPageGated(entry, opts);
+    if (!result.ok && result.needsPin) {
+      const pin = window.prompt("Enter PIN to open controls in this tab:");
+      if (pin != null && pin.trim()) {
+        result = await openCardNowPageGated(entry, { ...opts, pin });
+      }
+    }
+    if (!result.ok && result.error) {
+      window.alert(result.error);
+    }
+  });
   return true;
 }
 

@@ -51,7 +51,7 @@ import {
 } from "./device-browser-notifications-sw.mjs";
 import { getPendingLiveControlChallengeUrl } from "./hc-sign.mjs";
 import { fetchResolverJson } from "./resolver-conditional-fetch-core.mjs";
-import { activateWalletEntry } from "./device-keys.mjs";
+import { activateWalletEntryGated } from "./device-control-activation.mjs";
 import {
   buildLiveControlProofHref,
   classifyChallengeHttpStatus,
@@ -694,7 +694,20 @@ export function stopLiveControlInboxPolling() {
  *   owner_url?: string | null,
  * }} item
  */
-export function openLiveControlProof(item) {
-  activateWalletEntry(item.entry);
+export async function openLiveControlProof(item) {
+  const result = await activateWalletEntryGated(item.entry);
+  if (!result.ok) {
+    if (result.needsPin) {
+      const pin = window.prompt("Enter PIN to take control in this tab:");
+      if (pin != null && pin.trim()) {
+        const retry = await activateWalletEntryGated(item.entry, { pin });
+        if (!retry.ok) return;
+      } else {
+        return;
+      }
+    } else {
+      return;
+    }
+  }
   location.href = buildLiveControlProofHref(item, location.origin);
 }

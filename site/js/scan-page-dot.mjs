@@ -12,7 +12,8 @@ import {
   hasStewardVerification,
 } from "./device-dot-state-core.mjs?v=56";
 import { fetchResolverHealth } from "./device-network-health.mjs";
-import { activateWalletEntry, getTabSession } from "./device-keys.mjs";
+import { getTabSession } from "./device-keys.mjs";
+import { activateWalletEntryGated } from "./device-control-activation.mjs";
 import { isWalletSaved, loadWallet, loadWalletSummary } from "./device-wallet.mjs";
 import { getInboxOverlayCounts } from "./device-inbox.mjs?v=56";
 import { resolverApiOrigin } from "./hc-sign.mjs";
@@ -237,10 +238,19 @@ function useKeysOnScan() {
   }
   const entry = walletEntryForUseKeysHere();
   if (!entry) return;
-  activateWalletEntry(entry);
-  window.dispatchEvent(new Event("hc-device-hub-changed"));
-  refreshScanPageDot();
-  scrollToVouchOrLiveProof();
+  void (async () => {
+    let result = await activateWalletEntryGated(entry);
+    if (!result.ok && result.needsPin) {
+      const pin = window.prompt("Enter PIN to take control in this tab:");
+      if (pin != null && pin.trim()) {
+        result = await activateWalletEntryGated(entry, { pin });
+      }
+    }
+    if (!result.ok) return;
+    window.dispatchEvent(new Event("hc-device-hub-changed"));
+    refreshScanPageDot();
+    scrollToVouchOrLiveProof();
+  })();
 }
 
 function focusOtherTabFromScan() {

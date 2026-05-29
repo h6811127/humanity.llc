@@ -8,6 +8,8 @@ import {
 } from "./device-emphasis-card-html.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
 import { activateWalletEntry, clearTabSessionKeys } from "./device-keys.mjs";
+import { activateWalletEntryGated } from "./device-control-activation.mjs";
+import { controlActivationRequiresUnlock } from "./device-control-activation-core.mjs";
 import {
   DEFAULT_VOUCH_STATEMENT,
   getCardStatusUrl,
@@ -144,8 +146,8 @@ function mountVouchSignLockUi(profileId) {
   lead.className = "vouch-lead";
   lead.textContent =
     lock?.mode === "webauthn"
-      ? "Device unlock is required before signing in this tab."
-      : "PIN required before signing in this tab.";
+      ? "Device unlock is required before you take control or sign in this tab."
+      : "PIN is required before you take control or sign in this tab.";
   box.appendChild(lead);
 
   if (isSignUnlocked(profileId)) {
@@ -170,7 +172,7 @@ function mountVouchSignLockUi(profileId) {
     const unlockBtn = document.createElement("button");
     unlockBtn.type = "button";
     unlockBtn.className = "vouch-cta vouch-unlock-btn";
-    unlockBtn.textContent = "Unlock signing";
+    unlockBtn.textContent = "Unlock to take control";
     unlockBtn.addEventListener("click", async () => {
       const pin = input.value;
       if (!pin.trim()) {
@@ -356,6 +358,17 @@ function hideExplainer() {
   clearVouchSwitchDefault();
 }
 
+async function activateVouchKeysGated(entry, opts = {}) {
+  let result = await activateWalletEntryGated(entry, opts);
+  if (!result.ok && result.needsPin) {
+    const pin = window.prompt("Enter PIN to take control in this tab:");
+    if (pin != null && pin.trim()) {
+      result = await activateWalletEntryGated(entry, { pin });
+    }
+  }
+  return result;
+}
+
 /**
  * @param {Array<{ entry: Record<string, unknown>, label: string, verificationLabel: string }>} eligible
  */
@@ -380,8 +393,13 @@ function mountUseKeysHereButtons(eligible) {
     btn.textContent = `Sign as ${item.label} · ${item.verificationLabel}`;
     btn.addEventListener("click", async () => {
       btn.disabled = true;
-      setStatus("Loading signing key…", "waiting");
-      activateWalletEntry(item.entry);
+      setStatus("Loading ownership…", "waiting");
+      const result = await activateVouchKeysGated(item.entry);
+      if (!result.ok) {
+        setStatus(result.error || "Could not take control in this tab.", "error");
+        btn.disabled = false;
+        return;
+      }
       await runVouchFlow();
     });
     explainerActions.appendChild(btn);
@@ -483,6 +501,15 @@ async function tryAutoActivateDefaultVouchKeys(voucheeProfileId, opts = {}) {
     if (body?.scan?.card?.status !== "active") return false;
   } catch {
     return false;
+  }
+
+  if (controlActivationRequiresUnlock(defaultId)) {
+    const lock = getSignLock(defaultId);
+    if (lock?.mode === "pin") {
+      return false;
+    }
+    const unlock = await unlockSignLock(defaultId);
+    if (!unlock.ok) return false;
   }
 
   activateWalletEntry(entry);
@@ -622,13 +649,17 @@ async function mountVouchSwitchDefault(session) {
   const box = tpl.content.firstElementChild;
   if (!box) return;
 
-  box.querySelector("[data-vouch-switch-default]")?.addEventListener("click", () => {
+  box.querySelector("[data-vouch-switch-default]")?.addEventListener("click", async () => {
     try {
       sessionStorage.removeItem(VOUCH_SKIP_AUTO_KEY);
     } catch {
       /* ignore */
     }
-    activateWalletEntry(defaultEntry);
+    const result = await activateVouchKeysGated(defaultEntry);
+    if (!result.ok) {
+      setStatus(result.error || "Could not switch signing card.", "error");
+      return;
+    }
     runVouchFlow({ autoActivateAttempted: true });
   });
 

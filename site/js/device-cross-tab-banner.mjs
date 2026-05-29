@@ -1,7 +1,8 @@
 /**
  * Banner when signing keys are active in another tab on this device.
  */
-import { activateWalletEntry, getTabSession, openCardNowPage } from "./device-keys.mjs";
+import { getTabSession, openCardNowPage } from "./device-keys.mjs";
+import { activateWalletEntryGated } from "./device-control-activation.mjs";
 import {
   ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX,
   ORPHAN_KEYS_INBOX_TITLE,
@@ -165,12 +166,19 @@ function bindUseKeysHere(root, profileId, opts = {}) {
     return;
   }
   useBtn.hidden = false;
-  useBtn.addEventListener("click", (e) => {
+  useBtn.addEventListener("click", async (e) => {
     e.preventDefault();
     e.stopPropagation();
     window.dispatchEvent(new CustomEvent("hc-hub-sheet-close"));
     if (opts.stayOnPage) {
-      activateWalletEntry(walletEntry);
+      let result = await activateWalletEntryGated(walletEntry);
+      if (!result.ok && result.needsPin) {
+        const pin = window.prompt("Enter PIN to take control in this tab:");
+        if (pin != null && pin.trim()) {
+          result = await activateWalletEntryGated(walletEntry, { pin });
+        }
+      }
+      if (!result.ok) return;
       window.dispatchEvent(new Event("hc-device-hub-changed"));
       return;
     }

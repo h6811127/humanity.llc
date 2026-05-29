@@ -89,7 +89,7 @@ Auto-loading keys into the tab is **not a new trust claim**. It is the same oper
 
 **Recommendation for v1:** ship **B** quickly, then **C** behind a wallet toggle **“Default card for vouching”** (stores `profile_id` in `localStorage`, e.g. `hc_default_vouch_profile_id`).
 
-**E** shipped as opt-in per saved card: PIN or device WebAuthn unlock required before `Sign and submit` (not before auto-activate).
+**E** shipped as opt-in per saved card: PIN or device WebAuthn unlock required before taking control in a tab and before `Sign and submit` (`device-control-activation.mjs`, `vouch-sign-lock.mjs`).
 
 ---
 

@@ -4,7 +4,8 @@
  */
 
 import { gatherInboxInput } from "./device-inbox.mjs?v=58";
-import { activateWalletEntry, createdUrlForEntry, getTabSession } from "./device-keys.mjs";
+import { createdUrlForEntry, getTabSession, openCardNowPage } from "./device-keys.mjs";
+import { activateWalletEntryGated } from "./device-control-activation.mjs";
 import { loadWallet } from "./device-wallet.mjs";
 import {
   ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX,
@@ -162,13 +163,20 @@ function ensureTabHintListeners() {
     }
   });
 
-  document.getElementById("wallet-tab-hint-use-keys")?.addEventListener("click", (e) => {
+  document.getElementById("wallet-tab-hint-use-keys")?.addEventListener("click", async (e) => {
     e.preventDefault();
     const entry = gatherInboxInput().crossTabEntries[0];
     if (!entry) return;
     const walletEntry = walletEntryForProfile(entry.profile_id);
-    if (walletEntry?.owner_private_key_b58) {
-      activateWalletEntry(walletEntry);
+    if (!walletEntry?.owner_private_key_b58) return;
+    let result = await activateWalletEntryGated(walletEntry);
+    if (!result.ok && result.needsPin) {
+      const pin = window.prompt("Enter PIN to take control in this tab:");
+      if (pin != null && pin.trim()) {
+        result = await activateWalletEntryGated(walletEntry, { pin });
+      }
+    }
+    if (result.ok) {
       window.dispatchEvent(new Event("hc-device-hub-changed"));
     }
   });
