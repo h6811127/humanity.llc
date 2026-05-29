@@ -532,7 +532,23 @@ Automated (when shipped): `npm run worker:test -- worker/tests/pwa-standalone-re
 
 **Fail signals:** Safari opens automatically; wizard advances to done before user previews scan; cross-tab keys notice during fresh setup.
 
-Automated: `npm run worker:test:pwa-install` (includes `pwa-scan-handoff-core.test.ts`) · `npm run e2e:pwa-install` (`e2e/device-pwa-scan-handoff.spec.ts` — setup test scan, hub Open scan, wallet pin, browser popup regressions).
+Automated: `npm run worker:test:pwa-install` (includes `pwa-scan-handoff-core.test.ts`) · `npm run e2e:pwa-install` (`e2e/device-pwa-scan-handoff.spec.ts` — setup test scan, history back, hub Open scan, wallet pin, browser popup regressions).
+
+**Manual sign-off (HTTPS, real installed PWA — required for close-out):**
+
+| Step | Requires | Status |
+|------|----------|--------|
+| 1 | Create flow entirely inside installed PWA | Pending |
+| 3 | System swipe-back (not return banner link) | Pending |
+
+Record platform + date when signed off (mirror **P1-PWA** iOS Safari 2026-05-28 pattern).
+
+**P5 support playbook (if steward is stuck):**
+
+1. Complete first create and setup in **Safari** (not Home Screen app) when scan preview or install timing is confusing.
+2. After setup, use **Share → Add to Home Screen** when install card appears ([**P1-PWA-P4**](DEVICE_OS_QA.md#p1-pwa-p4--install-deferral-until-setup-complete-p4-shipped)).
+3. If scan opened in Safari while the PWA was running, use the **app switcher** to return — or tap **← Back to setup** / **← Back** on the scan page when shown.
+4. Do not rely on browser tabs inside the installed PWA — there is no tab bar; use **Back** or in-app return links.
 
 ### P1-PWA-P4 · Install deferral until setup complete (P4 shipped)
 

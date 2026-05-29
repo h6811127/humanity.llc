@@ -197,7 +197,7 @@ openStewardScanPreview(url, { navigation, standalone })
 4. **Optional P4** — soften install prompt until first setup complete (product call). **Shipped:** `shouldShowPwaInstallSurface` requires `anyWalletSetupDone`; deferral card copy on shell pages until setup completes.
 5. **Do not** pursue P3 unless stranger-path parity requires identical pixels in wizard.
 
-**Close-out (2026-05-29):** Engineering path complete. Remaining validation is manual **P1-PWA-N** on real installed PWAs (HTTPS). Automated coverage: setup test scan, hub Open scan, wallet pin (`e2e/device-pwa-scan-handoff.spec.ts`).
+**Close-out (2026-05-29):** Engineering path complete. Remaining validation is manual **P1-PWA-N** on real installed PWAs (HTTPS) — see [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md) **P1-PWA-N** § Manual sign-off. Automated coverage: setup test scan (return banner + history back), hub Open scan, wallet pin (`e2e/device-pwa-scan-handoff.spec.ts`). **P5** support playbook added to QA doc for stewards stuck between Safari and PWA contexts.
 
 Update [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Manual QA step 3 when P1 ships: “standalone → same-tab preview; browser tab → new tab.”
 
@@ -240,10 +240,16 @@ Update [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Manual QA step 3 when P
 
 ## Open questions (product)
 
-1. **Auto-advance on test scan** — always wait for Continue in standalone, or only when `window.open` would have been used?
-2. **Hub open scan** — same-tab for all standalone pages, or only during `fresh=1` setup?
-3. **Child object scan links** — same policy as root scan preview?
-4. **Return banner (P2)** — steward-only chrome on scan: acceptable on stranger trust surface with dismiss + no install prompt?
+**Shipped defaults (2026-05-29):**
+
+1. **Auto-advance on test scan** — **Standalone only:** wait for Continue (`shouldAutoAdvanceSetupTestScan` returns false). Browser tabs still auto-advance after `window.open` (regression guard in E2E).
+2. **Hub open scan** — **Same-tab for all standalone shell pages** (hub, wallet, `/created/` control mode) — not limited to `fresh=1` setup.
+3. **Child object scan links** — **Same policy as root** via `applyStewardScanLinkElement` / `buildStewardScanPreviewHrefFromWindow`.
+4. **Return banner (P2)** — **Shipped:** steward-only chrome when `hc_return` present; no install prompt on scan; dismiss via return link (no stranger-facing install CTA).
+
+Unresolved (defer to product if dogfood fails manual sign-off):
+
+- Whether browser tabs should also stop auto-advancing on test scan ([`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) P0b-2 — separate track).
 
 ---
 
@@ -257,3 +263,4 @@ Update [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Manual QA step 3 when P
 | 2026-05-29 | **P1-PWA-N E2E** — `e2e/device-pwa-scan-handoff.spec.ts` (standalone same-tab + browser popup regression) |
 | 2026-05-29 | **P4 shipped** — install card gated on `hc_setup_done` for wallet rows; deferral card until first setup complete |
 | 2026-05-29 | **P1-PWA-N E2E extended** — hub Open scan + wallet pin + browser popup regressions in `e2e/device-pwa-scan-handoff.spec.ts` |
+| 2026-05-29 | **P1-PWA-N E2E** — history back from scan + pin copy guard; open questions closed with shipped defaults; P5 playbook in QA |
