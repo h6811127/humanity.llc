@@ -29,15 +29,14 @@ This matrix inventories unhappy custody paths, expected UX, and automated regres
 
 | ID | Sad path | User behavior | Expected UX / system | Automation | Manual |
 |----|----------|---------------|----------------------|------------|--------|
-| **K1** | Tab closed without save | Create → close tab → reopen URL | **View this card**; Live · Manage tabs; **Restore ownership** on Manage (recovery + backup link) | `e2e/key-loss-sad-path.spec.ts` | Stranger emotional check |
+| **K1** | Tab closed without save | Create → close tab → reopen URL | **View this card**; view-only banner; recovery/backup under Manage | `e2e/key-loss-sad-path.spec.ts` | Stranger emotional check |
 | **K2** | Wrong backup passphrase | Import `.hcbackup` with typo | Plain **Wrong passphrase** message; no silent fail | Same E2E · `worker/tests/key-backup.test.ts` | — |
 | **K3** | Corrupt / wrong backup file | Upload garbage JSON | Reject with Humanity Card backup error | `worker/tests/key-backup-import.test.ts` (S4) | — |
 | **K4** | Keys in another tab | Hub Tab A; create Tab B | Cross-tab banner; Open controls here | `e2e/device-cross-tab-keys.spec.ts` (S3) | — |
 | **K5** | Wallet label ≠ control | Saved name only; no keys in tab | View-only; **Ownership not loaded**; My objects CTA | `e2e/key-loss-sad-path.spec.ts` | — |
 | **K6** | Revoke / live proof without keys | Deep link `#revoke` or `live_challenge` | View-only; disabled prove; unlock copy | `e2e/production-sad-path-created.spec.ts` (S6–S7) | — |
-| **K7** | Setup skipped | `fresh=1` without save on device | Setup wizard step 1 custody warn | Copy guards · manual | P1 create QA |
+| **K7** | Setup protect skipped | `fresh=1` without recovery ack or backup export | Step 4 **Protect** hard gate; block Live / **Open card controls** | `worker/tests/created-setup-seatbelt.test.ts` · `key-loss-copy-guards` | P1 create QA |
 | **K8** | PWA vs Safari tab | Standalone vs browser session | [`PWA_INSTALL.md`](PWA_INSTALL.md) semantics | `e2e/device-pwa-install.spec.ts` | P1-PWA |
-| **K9** | Safari session / storage eviction | Camera QR new tab, ITP 7-day, auto-save race, PWA split | [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) — **P0-1 scan rehydrate shipped** | — | S1–S7 repro matrix |
 
 ---
 
@@ -76,4 +75,3 @@ Automated guards: `npm run worker:test:key-loss-copy`
 | Date | Notes |
 |------|-------|
 | 2026-05-29 | Initial matrix; K1/K2/K5 E2E; copy guards |
-| 2026-05-29 | K9 + link to Safari keys wipe investigation |

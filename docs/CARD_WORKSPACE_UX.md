@@ -12,7 +12,7 @@
 |------|------|-----|
 | **setup** | Keys in tab and (`fresh=1` or setup not done or not saved to device) | Linear wizard - no tabs |
 | **control** | Keys in tab, setup complete, saved on device | **Live · Manage** ([`CREATED_TASKS_TAB_REDESIGN.md`](CREATED_TASKS_TAB_REDESIGN.md) T1 shipped) |
-| **view** | No signing keys in this tab | Read-only **Live · Manage** + **Restore ownership** ([`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) Phase 1) |
+| **view** | No signing keys in this tab | Read-only notice + unlock paths |
 
 Resolver: `site/js/created-mode.mjs` · `modeFromPage()`.
 
@@ -90,7 +90,9 @@ See `docs/CARD_WORKSPACE_PHASE0.md` - Open card loads keys, auto-save default on
 |------|------|
 | `site/js/created-mode.mjs` | Mode resolution + setup done |
 | `site/js/created-workspace.mjs` | Apply mode to DOM |
-| `site/js/created-setup.mjs` | Wizard steps |
+| `site/js/created-setup.mjs` | Wizard steps + protect gate |
+| `site/js/created-setup-seatbelt.mjs` | Protect step recovery ack + backup export |
+| `site/js/created-setup-hash.mjs` | Wizard hash → step index |
 | `site/js/created-tabs.mjs` | Control tabs only |
 | `site/js/created-dashboard.mjs` | Control task actions |
 | `site/js/created.mjs` | Bootstrap + mode wiring |

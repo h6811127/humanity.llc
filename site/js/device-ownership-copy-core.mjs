@@ -31,11 +31,28 @@ export const VIEW_ONLY_CARD_TITLE = "View this card";
 export const VIEW_ONLY_NO_SESSION_DETAIL =
   "Open the Manage tab and use Restore ownership below — recovery code or encrypted backup file. Save ownership on this device only works in the browser where you created the card.";
 
+
 export const VIEW_ONLY_MANAGE_TAB_LEAD =
   "Read-only network snapshot and restore paths. Signing controls appear after you restore ownership in this tab.";
 
 export const VIEW_ONLY_RESTORE_LEAD =
   "Paste the recovery code you saved at create, or import an encrypted backup file. humanity.llc cannot restore your object for you.";
+
+/** Setup wizard protect step (Phase 2 · K7). */
+export const SETUP_SEATBELT_PANEL_LEAD =
+  "Before your object goes live, save a recovery path. humanity.llc cannot restore your card if you lose this browser tab.";
+
+export const SETUP_SEATBELT_RECOVERY_HINT =
+  "Copy your recovery code and check the box when you have saved it somewhere safe (password manager or paper).";
+
+export const SETUP_SEATBELT_BACKUP_HINT =
+  "Or download an encrypted backup file with a passphrase you will remember.";
+
+export const SETUP_SEATBELT_BLOCK_CONTINUE =
+  "Save a recovery code or download an encrypted backup before continuing.";
+
+export const SETUP_SEATBELT_RECOVERY_SAVED_STATUS =
+  "Recovery code marked saved. You can also download an encrypted backup below.";
 
 export const DEFAULT_FOR_ATTESTATION = "Default for attestation";
 

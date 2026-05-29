@@ -49,12 +49,6 @@ import {
   clearFreshUrlParam,
   restoreKeysStripToControlPanel,
 } from "./created-workspace.mjs";
-import { createdViewRestoreHashKey } from "./created-view-mode-core.mjs";
-import {
-  applyCreatedViewModeUi,
-  clearCreatedViewModeUi,
-  focusCreatedViewRestore,
-} from "./created-view-mode.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
 import { verificationRecordFromStatusBody } from "./device-wallet-network-core.mjs";
 import { activateWalletEntryGated } from "./device-control-activation.mjs";
@@ -356,7 +350,6 @@ function enterControlWorkspace() {
   workspaceMode = "control";
   if (profileId) markSetupDone(profileId);
   clearFreshUrlParam();
-  clearCreatedViewModeUi();
   applyCreatedWorkspaceMode("control");
   restoreKeysStripToControlPanel();
   if (!createdTabs) {
@@ -960,18 +953,7 @@ initVouchReturnBanner();
 workspaceMode = getWorkspaceMode();
 applyCreatedWorkspaceMode(workspaceMode);
 
-if (workspaceMode === "view" && profileId && activeQrId) {
-  if (noSessionEl) noSessionEl.hidden = true;
-  applyCreatedViewModeUi();
-  createdTabs = initCreatedTabs();
-  const restoreHash = createdViewRestoreHashKey(location.hash);
-  if (restoreHash) {
-    focusCreatedViewRestore((id) => createdTabs.select(id));
-  } else {
-    createdTabs.select("advanced");
-    focusCreatedViewRestore((id) => createdTabs.select(id));
-  }
-} else if (workspaceMode === "view" && noSessionEl) {
+if (workspaceMode === "view" && profileId && activeQrId && noSessionEl) {
   noSessionEl.hidden = false;
 }
 
@@ -987,6 +969,8 @@ if (workspaceMode === "setup" && profileId && activeQrId) {
       return deviceSaveCtl.runSave() === true;
     },
     refreshSave: () => deviceSaveCtl?.refresh?.(),
+    getSession: loadSession,
+    setSession: saveSession,
     getScanUrl: () => {
       const href = openScanBtn?.getAttribute("href");
       return href && href.startsWith("http") ? href : null;
@@ -1081,42 +1065,6 @@ if (activeScanUrl) {
   copyBtn.disabled = true;
   if (downloadQrBtn) downloadQrBtn.disabled = true;
   scanUrlEl.textContent = "Scan link unavailable.";
-}
-
-async function bootstrapViewRestoreTools() {
-  if (!profileId || !activeQrId) return;
-
-  const onRestored = () => {
-    enterControlWorkspace();
-    void bootstrapOwnerTools();
-  };
-
-  const backup = initKeyBackupUi({
-    profileId,
-    getSession: loadSession,
-    setSession: saveSession,
-    onKeysUnlocked: onRestored,
-  });
-
-  const recoveryUi = initRecoveryKeyUi({
-    profileId,
-    getSession: loadSession,
-    setSession: saveSession,
-    onKeysUnlocked: onRestored,
-  });
-  recoveryUi?.refresh();
-  backup?.refreshExportVisibility();
-
-  const revoke = initOwnerRevoke({
-    profileId,
-    qrId: activeQrId,
-    scanUrl: activeScanUrl,
-    getSession: loadSession,
-    setSession: saveSession,
-    showError,
-  });
-  revoke?.refresh();
-  void refreshNetworkStatus();
 }
 
 async function bootstrapOwnerTools() {
@@ -1321,10 +1269,6 @@ async function bootstrapOwnerTools() {
 }
 
 if (profileId && activeQrId) {
-  if (workspaceMode === "view") {
-    void bootstrapViewRestoreTools();
-  } else if (workspaceMode === "control") {
-    void bootstrapOwnerTools();
-  }
+  void bootstrapOwnerTools();
 }
 }

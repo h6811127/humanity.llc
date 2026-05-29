@@ -3,14 +3,15 @@
  * @see docs/CARD_WORKSPACE_UX.md · docs/LANDING_PROGRESS_STRIP.md
  */
 
-export const SETUP_STEP_IDS = ["save", "qr", "test", "done"];
+export const SETUP_STEP_IDS = ["save", "qr", "test", "protect", "done"];
 
 /** @type {Record<string, number>} */
 export const SETUP_HASH_TO_INDEX = {
   setup: 0,
   "setup-qr": 1,
   "setup-test": 2,
-  "setup-done": 3,
+  "setup-protect": 3,
+  "setup-done": 4,
 };
 
 /**

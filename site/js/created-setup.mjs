@@ -1,6 +1,6 @@
 /**
- * Post-create setup wizard (Phase 1).
- * @see docs/CARD_WORKSPACE_UX.md
+ * Post-create setup wizard (Phase 1–2 protect gate).
+ * @see docs/CARD_WORKSPACE_UX.md · docs/OWNERSHIP_RESTORE_UX_PLAN.md
  */
 
 import { mountKeysCustody } from "./device-keys-custody.mjs";
@@ -12,9 +12,10 @@ import { markSetupDone } from "./created-mode.mjs";
 import { stewardFocusKeyFromHash } from "./created-tabs.mjs";
 import { SETUP_STEP_IDS, setupStepIndexFromHash } from "./created-setup-hash.mjs";
 import {
-  shouldAutoAdvanceSetupTestScan,
-  stewardScanOpenedFeedback,
-} from "./pwa-scan-handoff-core.mjs";
+  initCreatedSetupSeatbelt,
+  setupOwnershipSeatbeltSatisfied,
+} from "./created-setup-seatbelt.mjs";
+import { stewardScanOpenedFeedback } from "./pwa-scan-handoff-core.mjs";
 import { openStewardScanPreviewFromWindow } from "./pwa-scan-handoff.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 
@@ -26,6 +27,8 @@ const STEPS = SETUP_STEP_IDS;
  *   runSave?: () => boolean | null,
  *   refreshSave?: () => void,
  *   getScanUrl?: () => string | null,
+ *   getSession?: () => Record<string, unknown> | null,
+ *   setSession?: (next: Record<string, unknown>) => void,
  *   onComplete: () => void,
  *   onStewardDeepLink?: () => void,
  *   triggerDownloadQr?: () => void,
@@ -37,6 +40,8 @@ export function initCreatedSetup(opts) {
     runSave,
     refreshSave,
     getScanUrl,
+    getSession = () => null,
+    setSession = () => {},
     onComplete,
     onStewardDeepLink,
     triggerDownloadQr,
@@ -62,6 +67,20 @@ export function initCreatedSetup(opts) {
   const qrPreviewWrap = document.getElementById("created-setup-qr-preview");
   const setupQrImg = document.getElementById("created-setup-qr-img");
   const doneBtn = document.getElementById("created-setup-finish");
+
+  const seatbeltCtl = initCreatedSetupSeatbelt({
+    profileId,
+    getSession,
+    setSession,
+    onSeatbeltChange: () => syncSeatbeltContinue(),
+  });
+
+  function syncSeatbeltContinue() {
+    if (!continueBtn || currentStep() !== "protect") return;
+    const ok = setupOwnershipSeatbeltSatisfied(getSession());
+    continueBtn.disabled = !ok;
+    continueBtn.setAttribute("aria-disabled", ok ? "false" : "true");
+  }
 
   function syncSetupKeysCustody() {
     if (!custodyMount) return;
@@ -154,8 +173,16 @@ export function initCreatedSetup(opts) {
       backBtn.hidden = stepIndex === 0;
       backBtn.disabled = stepIndex === 0;
     }
-    if (continueBtn) continueBtn.hidden = step === "done";
+    if (continueBtn) {
+      continueBtn.hidden = step === "done";
+      if (step === "protect") syncSeatbeltContinue();
+      else {
+        continueBtn.disabled = false;
+        continueBtn.removeAttribute("aria-disabled");
+      }
+    }
     if (doneBtn) doneBtn.hidden = step !== "done";
+    if (step === "protect") seatbeltCtl?.refresh?.();
   }
 
   function canLeaveSaveStep() {
@@ -170,6 +197,10 @@ export function initCreatedSetup(opts) {
       keysStrip.hidden = false;
     }
     if (currentStep() === "qr") syncSetupQrPreview();
+    if (currentStep() === "protect") {
+      seatbeltCtl?.refresh?.();
+      syncSeatbeltContinue();
+    }
     if (currentStep() === "done" && prevStep !== "done") {
       const donePanel = root.querySelector('[data-setup-panel="done"]');
       if (donePanel) {
@@ -227,14 +258,26 @@ export function initCreatedSetup(opts) {
         return;
       }
       showFeedback(stewardScanOpenedFeedback(standalone, { setupWizard: true }));
-      if (shouldAutoAdvanceSetupTestScan(standalone)) {
-        goToStep(stepIndex + 1, { pushHistory: true });
-      }
+      goToStep(stepIndex + 1, { pushHistory: true });
       return;
+    }
+    if (step === "protect") {
+      if (!setupOwnershipSeatbeltSatisfied(getSession())) {
+        showFeedback(seatbeltCtl?.blockMessage?.() ?? "Save a recovery path first.", true);
+        syncSeatbeltContinue();
+        return;
+      }
+      goToStep(stepIndex + 1, { pushHistory: true });
     }
   }
 
   function complete() {
+    if (!setupOwnershipSeatbeltSatisfied(getSession())) {
+      showFeedback(seatbeltCtl?.blockMessage?.() ?? "Save a recovery path first.", true);
+      const protectIdx = STEPS.indexOf("protect");
+      if (protectIdx >= 0) goToStep(protectIdx);
+      return;
+    }
     markSetupDone(profileId);
     clearFreshUrlParam();
     onComplete();
@@ -256,7 +299,11 @@ export function initCreatedSetup(opts) {
     if (root.hidden) return;
     const nextStep = event.state?.setupStep;
     if (typeof nextStep === "number" && event.state?.setup) {
-      stepIndex = Math.max(0, Math.min(nextStep, STEPS.length - 1));
+      let idx = Math.max(0, Math.min(nextStep, STEPS.length - 1));
+      if (idx > STEPS.indexOf("protect") && !setupOwnershipSeatbeltSatisfied(getSession())) {
+        idx = STEPS.indexOf("protect");
+      }
+      stepIndex = idx;
       syncIndicators();
       if (currentStep() === "qr") syncSetupQrPreview();
       scrollToCurrentPanel();
@@ -315,7 +362,11 @@ export function initCreatedSetup(opts) {
 
   const hashStep = setupStepIndexFromHash(location.hash);
   if (hashStep != null) {
-    stepIndex = hashStep > 0 && !canLeaveSaveStep() ? 0 : hashStep;
+    let idx = hashStep > 0 && !canLeaveSaveStep() ? 0 : hashStep;
+    if (idx > STEPS.indexOf("protect") && !setupOwnershipSeatbeltSatisfied(getSession())) {
+      idx = STEPS.indexOf("protect");
+    }
+    stepIndex = idx;
   } else if (canLeaveSaveStep()) {
     stepIndex = 1;
   }
