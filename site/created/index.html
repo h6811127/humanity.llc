@@ -182,7 +182,6 @@
           hidden
           aria-live="polite"
           role="status"
-          data-created-signing-only
         >
           <div class="hc-emphasis-card__main">
             <span class="hc-emphasis-card__dot hc-emphasis-card__dot--urgent" aria-hidden="true"></span>
@@ -261,7 +260,7 @@
           hidden
           aria-labelledby="created-setup-title"
         >
-          <p class="created-setup-kicker">Four steps · keys stay in this browser</p>
+          <p class="created-setup-kicker">Five steps · keys stay in this browser</p>
           <ol class="created-setup-progress" aria-label="Setup progress">
             <li class="created-setup-progress-item" data-setup-step="save">
               <span class="created-setup-progress-num" aria-hidden="true">1</span>
@@ -275,8 +274,12 @@
               <span class="created-setup-progress-num" aria-hidden="true">3</span>
               <span class="created-setup-progress-label">Test scan</span>
             </li>
-            <li class="created-setup-progress-item" data-setup-step="done">
+            <li class="created-setup-progress-item" data-setup-step="protect">
               <span class="created-setup-progress-num" aria-hidden="true">4</span>
+              <span class="created-setup-progress-label">Protect</span>
+            </li>
+            <li class="created-setup-progress-item" data-setup-step="done">
+              <span class="created-setup-progress-num" aria-hidden="true">5</span>
               <span class="created-setup-progress-label">Live</span>
             </li>
           </ol>
@@ -320,6 +323,62 @@
             <button type="button" class="btn-secondary created-setup-inline-action" data-setup-action="test-scan">
               Open scan page
             </button>
+          </div>
+
+
+          <div
+            class="created-setup-panel created-setup-seatbelt"
+            data-setup-panel="protect"
+            id="created-setup-panel-protect"
+            hidden
+          >
+            <h2 class="created-setup-panel-title">Protect your control</h2>
+            <p class="created-setup-panel-lead" id="created-setup-seatbelt-lead"></p>
+            <div class="created-setup-seatbelt-recovery" id="created-setup-seatbelt-recovery" hidden>
+              <p class="form-hint" id="created-setup-seatbelt-recovery-hint"></p>
+              <p class="mono recovery-key-display" id="created-setup-recovery-key-display"></p>
+              <button type="button" class="btn-secondary" id="created-setup-copy-recovery">
+                Copy recovery code
+              </button>
+              <label class="revoke-confirm revoke-confirm-spaced">
+                <input type="checkbox" id="created-setup-recovery-reveal-confirm" />
+                <span>I saved this recovery code</span>
+              </label>
+              <button type="button" class="btn-secondary" id="created-setup-recovery-reveal-dismiss">
+                Mark saved
+              </button>
+              <p class="form-status" id="created-setup-recovery-status" hidden role="status"></p>
+            </div>
+            <p class="form-hint" id="created-setup-seatbelt-backup-hint"></p>
+            <form
+              id="created-setup-export-backup-form"
+              class="compact-form created-setup-seatbelt-export"
+              autocomplete="off"
+              novalidate
+            >
+              <label class="form-label" for="created-setup-export-passphrase">Backup passphrase</label>
+              <input
+                class="form-input"
+                id="created-setup-export-passphrase"
+                name="passphrase"
+                type="password"
+                autocomplete="new-password"
+                minlength="12"
+                required
+              />
+              <label class="form-label" for="created-setup-export-passphrase-confirm">Confirm</label>
+              <input
+                class="form-input"
+                id="created-setup-export-passphrase-confirm"
+                name="passphrase_confirm"
+                type="password"
+                autocomplete="new-password"
+                minlength="12"
+                required
+              />
+              <button type="submit" class="btn-secondary">Download encrypted backup</button>
+            </form>
+            <p class="form-status" id="created-setup-export-backup-status" hidden></p>
           </div>
 
           <div class="created-setup-panel" data-setup-panel="done" id="created-setup-panel-done" hidden>
@@ -620,7 +679,6 @@
             <details
               class="settings-disclosure settings-disclosure-action"
               id="created-custody-disclosure"
-              data-created-signing-only
             >
               <summary class="settings-summary">
                 <span class="list-icon list-icon-tone-slate" aria-hidden="true">
@@ -999,49 +1057,17 @@
 
         <!--  -  -  -  Advanced: update, revoke, keys  -  -  -  -->
         <div class="created-tab-panel" data-created-panel="advanced" id="created-tab-advanced" role="tabpanel" aria-labelledby="created-tab-btn-advanced" hidden>
-          <section
-            id="created-view-restore-panel"
-            class="created-restore-ownership-panel"
-            aria-label="Restore ownership"
-            hidden
-          >
-            <h2 class="created-restore-ownership-title">Restore ownership</h2>
-            <p class="form-hint created-view-ownership-hint" id="created-view-ownership-hint"></p>
-            <p class="form-hint created-restore-ownership-lead" id="created-view-restore-lead"></p>
-            <form id="import-recovery-form" class="compact-form created-restore-recovery-form" novalidate>
-              <label class="form-label" for="import-recovery-key">Recovery code</label>
-              <textarea
-                class="form-input form-textarea"
-                id="import-recovery-key"
-                name="recovery_key"
-                rows="3"
-                placeholder="Paste recovery code you saved at create"
-                autocomplete="off"
-                required
-              ></textarea>
-              <button type="submit" class="btn-primary">Restore with recovery code</button>
-            </form>
-            <p class="form-status" id="import-recovery-status" hidden></p>
-            <p class="form-hint">
-              Prefer a file?
-              <a href="#backup-details">Import encrypted backup</a>
-              below.
-            </p>
-          </section>
-
-          <p class="created-tab-lead" id="created-control-manage-lead" data-created-signing-only>
+          <p class="created-tab-lead">
             Rotate, revoke, recovery, and backup. This root ownership controls the card and its
             object QRs; you change resolver state, not the sticker. Public copy publishes on
             <strong>Live</strong>. Activate control on Live (or
             <a href="/wallet/">My objects</a>) before switching tabs.
           </p>
-          <p class="created-tab-lead" id="created-view-manage-lead" hidden></p>
 
           <details
             class="settings-disclosure settings-disclosure-action"
             id="qr-rotate-panel"
             hidden
-            data-created-signing-only
           >
             <summary class="settings-summary">
               <span class="list-icon list-icon-tone-blue" aria-hidden="true">
@@ -1076,7 +1102,6 @@
             class="settings-disclosure settings-disclosure-action"
             id="qr-extend-panel"
             hidden
-            data-created-signing-only
           >
             <summary class="settings-summary">
               <span class="list-icon list-icon-tone-green" aria-hidden="true">
@@ -1183,7 +1208,7 @@
                 root-object control for you.
               </p>
 
-              <div id="revoke-actions" hidden data-created-signing-only>
+              <div id="revoke-actions" hidden>
                 <div id="revoke-qr-block">
                   <div class="hc-emphasis-card hc-emphasis-card--warn revoke-id-warning" role="note">
                     <div class="hc-emphasis-card__main">
@@ -1317,7 +1342,6 @@
               class="settings-disclosure settings-disclosure-action created-recovery-details"
               id="created-recovery-details"
               hidden
-              data-created-signing-only
             >
               <summary class="settings-summary">
                 <span class="list-icon list-icon-tone-slate" aria-hidden="true">
@@ -1399,7 +1423,6 @@
             <details
               class="settings-disclosure settings-disclosure-info"
               id="created-developer-export-details"
-              data-created-signing-only
             >
               <summary class="settings-summary">
                 <span class="list-icon list-icon-tone-slate" aria-hidden="true">
@@ -1461,6 +1484,25 @@
                   </form>
                   <p class="form-status" id="export-backup-status" hidden></p>
                 </div>
+
+                <section class="group created-developer-export-section" aria-label="Import raw recovery key">
+                  <h3 class="form-label">Import raw recovery key</h3>
+                  <p class="form-hint">Lost this tab? Paste the recovery code you saved at create.</p>
+                  <form id="import-recovery-form" class="compact-form" novalidate>
+                    <label class="form-label" for="import-recovery-key">Recovery private key (Base58)</label>
+                    <textarea
+                      class="form-input form-textarea"
+                      id="import-recovery-key"
+                      name="recovery_key"
+                      rows="3"
+                      placeholder="Paste recovery code"
+                      autocomplete="off"
+                      required
+                    ></textarea>
+                    <button type="submit" class="btn-secondary">Restore with recovery code</button>
+                  </form>
+                  <p class="form-status" id="import-recovery-status" hidden></p>
+                </section>
 
                 <section class="group created-developer-export-section" id="network-details" aria-label="Inspect on network">
                   <h3 class="form-label">Inspect on network</h3>
@@ -1584,7 +1626,11 @@
             <div class="hc-emphasis-card__copy">
               <p class="hc-emphasis-card__eyebrow">View only</p>
               <p class="hc-emphasis-card__title">Ownership not loaded in this tab</p>
-              <p class="hc-emphasis-card__detail" id="no-session-detail"></p>
+              <p class="hc-emphasis-card__detail" id="no-session-detail">
+                Finish create in the tab where you clicked Create, then tap
+                <strong>Save ownership on this device</strong> there. Later: recovery method or encrypted backup
+                under <strong>Manage</strong> on this card page.
+              </p>
             </div>
           </div>
           <div class="hc-emphasis-card__actions">

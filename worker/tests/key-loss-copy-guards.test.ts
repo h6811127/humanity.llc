@@ -13,6 +13,7 @@ import { describe, expect, it } from "vitest";
 import {
   BACKUP_WRONG_PASSPHRASE,
   OWNERSHIP_NOT_LOADED_TAB,
+  SETUP_SEATBELT_BLOCK_CONTINUE,
   VIEW_ONLY_CARD_TITLE,
   VIEW_ONLY_NO_SESSION_DETAIL,
 } from "../../site/js/device-ownership-copy-core.mjs";
@@ -25,7 +26,7 @@ describe("key-loss copy guards", () => {
     expect(createdHeroTitleForMode("view")).toBe(VIEW_ONLY_CARD_TITLE);
     const html = readFileSync(join(root, "site/created/index.html"), "utf8");
     expect(html).toContain("Ownership not loaded in this tab");
-    expect(html).toContain("created-view-restore-panel");
+    expect(html).toMatch(/recovery code|encrypted backup/i);
     expect(VIEW_ONLY_NO_SESSION_DETAIL).toMatch(/Restore ownership/i);
     expect(VIEW_ONLY_NO_SESSION_DETAIL).toMatch(/recovery code|encrypted backup/i);
   });
@@ -39,5 +40,12 @@ describe("key-loss copy guards", () => {
   it("K6: ownership-not-loaded string is plain language", () => {
     expect(OWNERSHIP_NOT_LOADED_TAB).toMatch(/Ownership not loaded/i);
     expect(OWNERSHIP_NOT_LOADED_TAB).not.toMatch(/sessionStorage|private_key/i);
+  });
+
+  it("K7: setup protect gate copy is plain language", () => {
+    expect(SETUP_SEATBELT_BLOCK_CONTINUE).toMatch(/recovery code|encrypted backup/i);
+    expect(SETUP_SEATBELT_BLOCK_CONTINUE).not.toMatch(/sessionStorage|private_key/i);
+    const html = readFileSync(join(root, "site/created/index.html"), "utf8");
+    expect(html).toContain('data-setup-step="protect"');
   });
 });
