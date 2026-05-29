@@ -180,8 +180,8 @@ function bindUseKeysHere(root, profileId, opts = {}) {
 
 function vouchCrossTabSubtext() {
   return getDefaultVouchProfileId()
-    ? " - open that tab to vouch, or load keys here"
-    : " - open that tab to sign, or load keys from My cards";
+    ? " — open that tab to vouch, or take control here"
+    : " — open that tab to sign, or open controls from My cards";
 }
 
 function walletEntryForVouchHere(primaryProfileId) {
@@ -236,7 +236,7 @@ function renderHubOrphanRemovedNotice() {
 
   const actions = [
     emphasisCardCtaButton("Open that tab", "data-orphan-focus-tab"),
-    emphasisCardCtaSecondary("Clear keys on this device", "data-orphan-clear-keys"),
+    emphasisCardCtaSecondary("Stop managing on this device", "data-orphan-clear-keys"),
   ];
 
   hubSlot.hidden = false;
@@ -245,7 +245,7 @@ function renderHubOrphanRemovedNotice() {
   hubSlot.innerHTML = emphasisCardBodyHtml({
     eyebrow: ORPHAN_KEYS_INBOX_TITLE,
     title: escapeHtml(msg.detail),
-    detail: `${ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX} Open that tab to close it, or clear keys on this device.`,
+    detail: `${ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX} Open that tab to close it, or stop managing on this device.`,
     dot: "warn",
     actionsHtml: emphasisCardActionsHtml(actions),
   });

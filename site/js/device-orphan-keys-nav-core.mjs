@@ -9,11 +9,11 @@
 export function orphanKeysClearConfirmMessage(label) {
   const who = label?.trim() ? label.trim() : "this card";
   return (
-    `Clear signing keys for ${who} in all open Humanity tabs on this browser? ` +
+    `Stop managing ${who} in all open Humanity tabs on this browser? ` +
     "Other saved cards are unchanged."
   );
 }
 
-export const ORPHAN_KEYS_INBOX_TITLE = "Keys still open in another tab";
+export const ORPHAN_KEYS_INBOX_TITLE = "Still managing in another tab";
 export const ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX =
   "For a card you removed from this device";

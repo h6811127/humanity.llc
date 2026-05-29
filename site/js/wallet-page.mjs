@@ -83,7 +83,7 @@ function initTabSave() {
     e.preventDefault();
     const current = getTabSession();
     if (!current?.profile_id || !current?.owner_private_key_b58) {
-      setStatus(saveStatus, "No signing keys in this tab.", true);
+      setStatus(saveStatus, "Ownership not loaded in this tab.", true);
       return;
     }
     const label = saveLabel?.value?.trim() || "";

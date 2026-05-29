@@ -152,7 +152,7 @@ export function initCreatedDashboard({
 
       if (!runSave) {
         showFeedback(
-          "No signing keys in this tab. Finish create in this tab, or tap Open controls on My cards.",
+          "Ownership not loaded in this tab. Finish create in this tab, or tap Open controls on My cards.",
           true
         );
         return;
@@ -163,7 +163,7 @@ export function initCreatedDashboard({
 
       if (saved === null) {
         showFeedback(
-          "No signing keys in this tab. Finish create in this tab, or tap Open controls on My cards.",
+          "Ownership not loaded in this tab. Finish create in this tab, or tap Open controls on My cards.",
           true
         );
         return;
@@ -237,7 +237,7 @@ export function initCreatedDashboard({
         proveBtn.click();
         return;
       }
-      showFeedback("Live proof is not ready yet. Keep this tab open with your signing key.");
+      showFeedback("Live proof is not ready yet. Keep this tab open with your ownership loaded.");
     },
     "check-network": () => {
       document.getElementById("brand-status-dot-btn")?.click();

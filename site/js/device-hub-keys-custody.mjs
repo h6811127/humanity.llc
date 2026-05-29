@@ -120,7 +120,7 @@ function rowIconTone(row) {
 
 function rowActionsHtml(row) {
   if (row.kind === "this_tab_unsaved") {
-    return `<button type="button" class="device-hub-keys-custody-action" data-hub-custody-save>Save on this device</button>`;
+    return `<button type="button" class="device-hub-keys-custody-action" data-hub-custody-save>Save ownership on this device</button>`;
   }
   if (row.kind === "sign_lock") {
     return `<button type="button" class="device-hub-keys-custody-action" data-hub-custody-open-card>Open card</button>`;
@@ -151,7 +151,7 @@ function rowActionsHtml(row) {
   if (row.kind === "orphan" && row.entry) {
     return `
       <button type="button" class="device-hub-keys-custody-action" data-hub-custody-orphan-focus>Open tab</button>
-      <button type="button" class="device-hub-keys-custody-action device-hub-keys-custody-action--secondary" data-hub-custody-orphan-clear>Clear keys on this device</button>`;
+      <button type="button" class="device-hub-keys-custody-action device-hub-keys-custody-action--secondary" data-hub-custody-orphan-clear>Stop managing on this device</button>`;
   }
   return "";
 }
@@ -183,7 +183,7 @@ function renderPanelHtml(state) {
     : "";
 
   return `
-    <p class="device-hub-group-label" id="device-hub-keys-custody-title">Keys custody</p>
+    <p class="device-hub-group-label" id="device-hub-keys-custody-title">Ownership on this device</p>
     ${rowItems ? `<ul class="list list-compact device-hub-keys-custody-list">${rowItems}</ul>` : ""}
     ${education}`;
 }

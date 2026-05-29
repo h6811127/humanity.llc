@@ -1,5 +1,6 @@
 /**
- * Shared copy for where signing keys live (tab vs saved on device).
+ * Shared copy for where ownership control lives (tab vs saved on device).
+ * @see docs/OWNERSHIP_AND_CONTROL_MODEL.md D1
  */
 
 import {
@@ -22,7 +23,7 @@ function escapeHtml(s) {
 function noticeFoot(importHref, learnHref) {
   return `
     <p class="hc-notice-foot">
-      <a href="${escapeHtml(learnHref)}">How keys work</a>
+      <a href="${escapeHtml(learnHref)}">How ownership works</a>
       <span aria-hidden="true"> · </span>
       <a href="/help/#keys">All help</a>
       <span aria-hidden="true"> · </span>
@@ -64,11 +65,11 @@ export function keysCustodyHtml(variant, opts = {}) {
   const tiersDl = `
     <dl class="device-keys-custody-dl">
       <div class="device-keys-custody-dl-row">
-        <dt>This tab only</dt>
+        <dt>Active in this tab only</dt>
         <dd>Gone when you close this tab or clear site data for humanity.llc.</dd>
       </div>
       <div class="device-keys-custody-dl-row device-keys-custody-dl-row--saved">
-        <dt>Saved on this device</dt>
+        <dt>Ownership saved on this device</dt>
         <dd>Stays in this browser until you remove the root card or clear site data.</dd>
       </div>
     </dl>`;
@@ -76,11 +77,11 @@ export function keysCustodyHtml(variant, opts = {}) {
   const foot = noticeFoot(importHref, learnHref);
 
   const networkNote =
-    '<p class="device-keys-custody-note">Your root card is already on the network. Save only stores the signing key in this browser.</p>';
+    '<p class="device-keys-custody-note">Your root card is already on the network. Saving only keeps control in this browser.</p>';
 
   const privateKeyCopy = {
-    eyebrow: "Keys custody",
-    title: "Your browser holds the private key",
+    eyebrow: "Your ownership",
+    title: "Your browser holds control",
     detail:
       "That is what lets you update, revoke, prove control, and manage child object QRs. The network never receives it.",
   };
@@ -95,10 +96,10 @@ export function keysCustodyHtml(variant, opts = {}) {
       className: "device-keys-custody device-keys-custody--created",
       role: "note",
       dot: "warn",
-      eyebrow: "Keys on this device",
-      title: "Save your root key on this device",
+      eyebrow: "Control on this device",
+      title: "Save ownership on this device",
       detail:
-        "You can sign from this tab now. Tap <strong>Save on this device</strong> below to keep control of this root card and its object QRs after you close the tab.",
+        "You can manage from this tab now. Tap <strong>Save ownership on this device</strong> below to keep control of this root card and its object QRs after you close the tab.",
       extraCopyHtml: `${tiersDl}${networkNote}${foot}`,
       actionsHtml: emphasisCardActionsHtml([custodyAckButton()]),
     });
@@ -124,9 +125,9 @@ export function keysCustodyHtml(variant, opts = {}) {
     role: "note",
     dot: "warn",
     eyebrow: "Before you save",
-    title: "Keys are critical",
+    title: "Ownership matters",
     detail:
-      "Tab only until you save · saved root cards persist in this browser until you clear site data. <a href=\"${escapeHtml(learnHref)}\">Learn more</a>",
+      "Active in this tab only until you save ownership · saved root cards persist in this browser until you clear site data. <a href=\"${escapeHtml(learnHref)}\">Learn more</a>",
   });
 }
 

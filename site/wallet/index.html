@@ -202,7 +202,7 @@
               id="wallet-tab-hint-clear"
               hidden
             >
-              Clear keys on this device
+              Stop managing on this device
             </button>
           </div>
         </div>
@@ -251,7 +251,7 @@
           hidden
           data-hub-group="save-tab"
         >
-          <p class="device-hub-subgroup-label">Keys in this tab</p>
+          <p class="device-hub-subgroup-label">Control active in this tab</p>
           <form id="wallet-save-form" class="wallet-inline-form" autocomplete="off" novalidate>
             <input
               class="form-input wallet-inline-input"
@@ -272,7 +272,7 @@
           data-hub-group="pins"
         >
           <p class="device-hub-subgroup-label">Pinned scans</p>
-          <p class="wallet-section-hint">Bookmarks only, no signing keys</p>
+          <p class="wallet-section-hint">Bookmarks only — cannot manage objects</p>
           <ul class="list list-compact" id="device-hub-pins-list" hidden></ul>
           <p class="device-hub-section-empty" id="device-hub-pins-empty">
             Your pinned scans will show here.
@@ -382,7 +382,7 @@
           <div class="settings-panel settings-panel-info wallet-help-panel">
             <ul class="wallet-help-list">
               <li><strong>Saved here</strong> means keys stay in this browser until you clear site data. Not tied to an account or the network.</li>
-              <li><strong>Open controls</strong> and <strong>Open card</strong> (⋯ menu) both load signing keys when saved, then open your card page. <strong>Open scan</strong> opens the public scan link only.</li>
+              <li><strong>Open controls</strong> and <strong>Open card</strong> (⋯ menu) both load saved ownership when available, then open your card page. <strong>Open scan</strong> opens the public scan link only.</li>
               <li><strong>Default for vouching</strong> (⋯ on a saved card) auto-loads that card’s keys when you open someone’s scan in this browser - you stay on the scan page to submit the vouch.</li>
               <li><strong>Network</strong> chip is live from the resolver (<strong>Card disabled</strong> vs <strong>QR revoked</strong> vs active). <strong>Card disabled since last visit</strong> compares to your last session - whole card off the network, not QR-only revoke.</li>
               <li><strong>Pin</strong> is a scan bookmark only (↗), no keys.</li>

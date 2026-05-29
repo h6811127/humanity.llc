@@ -17,7 +17,7 @@ describe("buildHubKeysCustodyPanel", () => {
     expect(state.rows.filter((r) => r.kind === "cross_tab")).toHaveLength(2);
     expect(state.rows.some((r) => r.kind === "cross_tab_summary")).toBe(true);
     expect(state.rows.find((r) => r.kind === "cross_tab_summary")?.title).toBe(
-      "Keys open in 2 other tabs"
+      "Managing in 2 other tabs"
     );
     expect(state.rows.filter((r) => r.kind === "cross_tab")[0].title).toBe("@alice");
     expect(state.visible).toBe(true);
@@ -44,7 +44,7 @@ describe("buildHubKeysCustodyPanel", () => {
     expect(state.rows).toEqual([
       {
         kind: "this_tab_active",
-        title: "Keys active in this tab",
+        title: "You can manage objects here",
         subtitle: "@steward",
       },
     ]);
@@ -132,10 +132,10 @@ describe("buildHubKeysCustodyPanel", () => {
       "cross_tab",
       "cross_tab",
     ]);
-    expect(state.rows[0].title).toBe("Keys open in 2 other tabs");
+    expect(state.rows[0].title).toBe("Managing in 2 other tabs");
     expect(state.rows[0].subtitle).toContain("@alice");
     expect(state.rows[1].title).toBe("@alice");
-    expect(state.rows[1].subtitle).toBe("Other tab with signing keys");
+    expect(state.rows[1].subtitle).toBe("Managing in another tab");
   });
 
   it("shows wallet scale row when above comfortable card count", () => {

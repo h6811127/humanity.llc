@@ -101,7 +101,7 @@ test.describe("production sad-path — /created/ route gate", () => {
 
     await page.goto(`/created/?profile_id=${profileId}&qr_id=${qrId}#revoke`);
 
-    await expect(page.getByText("No signing keys in this tab")).toBeVisible({
+    await expect(page.getByText("Ownership not loaded in this tab")).toBeVisible({
       timeout: 15_000,
     });
     await expect(page.getByRole("heading", { name: "View this card" })).toBeVisible();

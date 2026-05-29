@@ -25,7 +25,7 @@ describe("buildInboxItems", () => {
       crossTabEntries: [{ profile_id: "abc", tabId: "t1", handle: "alice" }],
     });
     expect(items.map((i) => i.kind)).toEqual(["cross_tab_keys"]);
-    expect(items[0].title).toBe("Keys open in 1 other tab");
+    expect(items[0].title).toBe("Managing in 1 other tab");
   });
 
   it("uses other_tabs_unsaved_keys when two or more other tabs hold keys", () => {
@@ -38,7 +38,7 @@ describe("buildInboxItems", () => {
       ],
     });
     expect(items.map((i) => i.kind)).toEqual(["other_tabs_unsaved_keys"]);
-    expect(items[0].title).toBe("Keys open in 2 other tabs");
+    expect(items[0].title).toBe("Managing in 2 other tabs");
     expect(items[0].subtitle).toBe("@alice · def…");
     expect(topInboxKind(items)).toBe("cross_tab_keys");
     expect(inboxDotOverlayFromItems(items)).toBe("cross_tab_keys");
@@ -55,7 +55,7 @@ describe("buildInboxItems", () => {
     });
     expect(items.map((i) => i.kind)).toEqual(["live_proof", "other_tabs_unsaved_keys"]);
     expect(items[0].count).toBe(2);
-    expect(items[1].title).toBe("Keys open in 2 other tabs");
+    expect(items[1].title).toBe("Managing in 2 other tabs");
     expect(items[1].subtitle).toBe("@alice · def…");
   });
 
@@ -81,7 +81,7 @@ describe("buildInboxItems", () => {
       ],
     });
     expect(items.map((i) => i.kind)).toEqual(["orphan_keys_removed"]);
-    expect(items[0].title).toContain("still open");
+    expect(items[0].title).toBe("Still managing in another tab");
     expect(inboxDotOverlayFromItems(items)).toBe("cross_tab_keys");
     expect(inboxBadgeAriaLabel(items)).toContain("removed card");
   });

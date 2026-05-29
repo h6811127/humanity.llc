@@ -1,6 +1,7 @@
 /**
  * Pure hub Keys custody panel model.
  * @see docs/KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md Phases 1 + 4
+ * @see docs/OWNERSHIP_AND_CONTROL_MODEL.md D1 — Layer 2 custody copy
  */
 import {
   shouldShowCrossTabKeysNotice,
@@ -93,13 +94,13 @@ export function buildHubKeysCustodyPanel(input) {
   if (tabNoticeCount > 0 && hasActiveKeys) {
     rows.push({
       kind: "this_tab_unsaved",
-      title: "Keys in this tab · Save on this device",
-      subtitle: `${tabSessionLabel} · tab only until you save`,
+      title: "Control active · Save ownership on this device",
+      subtitle: `${tabSessionLabel} · this tab only until you save ownership`,
     });
   } else if (hasActiveKeys) {
     rows.push({
       kind: "this_tab_active",
-      title: "Keys active in this tab",
+      title: "You can manage objects here",
       subtitle: tabSessionLabel,
     });
   }
@@ -130,7 +131,7 @@ export function buildHubKeysCustodyPanel(input) {
         kind: "cross_tab",
         title: crossTabEntries.length >= 2 ? label : crossTabAggregateTitle(1),
         subtitle:
-          crossTabEntries.length >= 2 ? "Other tab with signing keys" : label,
+          crossTabEntries.length >= 2 ? "Managing in another tab" : label,
         entry,
       });
     }

@@ -115,7 +115,7 @@
             hidden
           ></section>
           <p class="form-hint device-hub-lead-sub" id="device-hub-empty-hint" hidden>
-            Tap <strong>Save control key</strong> during setup to keep keys after you close this tab.
+            Tap <strong>Save ownership on this device</strong> during setup to keep control after you close this tab.
           </p>
 
           <div class="device-hub-search-block" id="device-hub-search-block" role="search">
@@ -281,15 +281,15 @@
           </ol>
 
           <div class="created-setup-panel" data-setup-panel="save" id="created-setup-panel-save">
-            <h2 class="created-setup-panel-title" id="created-setup-title">Save root control on this device</h2>
+            <h2 class="created-setup-panel-title" id="created-setup-title">Save ownership on this device</h2>
             <p class="created-setup-panel-lead">
-              Your root signing key stays in this browser until you save it here. Without save,
+              Control stays in this browser until you save ownership here. Without save,
               closing this tab means you cannot update, revoke, or manage object QRs later.
             </p>
             <div id="device-keys-custody-created-setup"></div>
             <div id="created-setup-keys-mount"></div>
             <button type="button" class="btn-secondary created-setup-inline-action" data-setup-action="save">
-              Save control key
+              Save ownership on this device
             </button>
           </div>
 
@@ -625,9 +625,9 @@
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 </span>
                 <span class="settings-summary-text">
-                  <span class="settings-summary-title">Keys on this device</span>
+                  <span class="settings-summary-title">Ownership on this device</span>
                   <span class="settings-summary-sub" id="created-custody-summary-sub"
-                    >Save to update and revoke later</span
+                    >Save to manage and revoke later</span
                   >
                 </span>
                 <span class="list-chevron" aria-hidden="true">›</span>
@@ -636,7 +636,7 @@
                 <section
                   class="group flow-keys-group created-keys-strip"
                   id="created-keys-strip"
-                  aria-label="Save control key"
+                  aria-label="Save ownership on this device"
                 >
             <div class="flow-keys-panel">
               <form
@@ -661,18 +661,18 @@
                 class="btn-primary created-keys-save-btn"
                 id="created-device-save-btn"
               >
-                Save control key
+                Save ownership on this device
               </button>
               <p id="created-device-save-status" class="form-status" hidden role="status"></p>
               <p class="created-keys-saved" id="created-device-save-done" hidden>
-                Saved on this device.
+                Saved ownership on this device.
                 <a href="/wallet/">My cards home</a> ·
                 <a href="/create/">Create another card</a>
               </p>
             </div>
 
             <p class="created-keys-foot form-hint">
-              Recovery key and encrypted backup live under <strong>Manage</strong> and restore
+              Recovery method and encrypted backup live under <strong>Manage</strong> and restore
               control of this root card plus its object QRs.
             </p>
                 </section>
@@ -803,7 +803,7 @@
               Add status plate under this root
             </h2>
             <p class="created-what-now-body">
-              One root signing key controls additional public objects. Register a
+              One root card controls additional public objects. Register a
               <strong>status plate</strong> and issue its first scan link in one step (no new private
               key).
             </p>
@@ -859,7 +859,7 @@
               Add lost-item relay under this root
             </h2>
             <p class="created-what-now-body">
-              One root signing key controls additional public objects. Register a
+              One root card controls additional public objects. Register a
               <strong>lost-item relay</strong> and issue its first scan link in one step (no new
               private key).
             </p>
@@ -1022,7 +1022,7 @@
             <div class="settings-panel settings-panel-action">
               <p class="form-hint">
                 Rotates the card-scoped QR credential (A.6). Your printed sticker still points at the
-                previous URL until you print or share a new code. Requires owner or recovery key.
+                previous URL until you print or share a new code. Requires owner control or recovery method.
               </p>
               <label class="form-label" for="qr-rotate-validity">New QR validity</label>
               <select class="form-input" id="qr-rotate-validity">
@@ -1143,7 +1143,7 @@
                 </div>
               </div>
               <p class="form-hint" id="owner-no-key">
-                Unlock a saved backup or recovery key below, or create again on
+                Restore ownership from a saved backup or recovery method below, or create again on
                 <a href="/create/">/create/</a>. humanity.llc cannot revoke or recover
                 root-object control for you.
               </p>
@@ -1270,7 +1270,7 @@
                   Vouches are public and revocable. Re-vouching still counts toward your yearly quota.
                 </p>
                 <p class="form-hint" id="vouch-revoke-no-key" hidden>
-                  Unlock your signing key below to revoke a vouch from this session.
+                  Load ownership below to revoke a vouch from this session.
                 </p>
                 <p class="form-hint" id="issued-vouch-empty" hidden></p>
                 <ul class="issued-vouch-list" id="issued-vouch-list"></ul>
@@ -1300,11 +1300,11 @@
                 </p>
                 <p class="mono recovery-key-display" id="recovery-key-display"></p>
                 <button type="button" class="btn-secondary" id="copy-recovery-key">
-                  Copy recovery key
+                  Copy recovery code
                 </button>
                 <label class="revoke-confirm revoke-confirm-spaced">
                   <input type="checkbox" id="recovery-reveal-confirm" />
-                  <span>I saved this recovery key</span>
+                  <span>I saved this recovery code</span>
                 </label>
                 <button type="button" class="btn-secondary" id="recovery-reveal-dismiss">
                   Mark saved &amp; close
@@ -1364,11 +1364,11 @@
                     id="import-recovery-key"
                     name="recovery_key"
                     rows="3"
-                    placeholder="Paste the recovery key you saved at create"
+                    placeholder="Paste the recovery code you saved at create"
                     autocomplete="off"
                     required
                   ></textarea>
-                  <button type="submit" class="btn-secondary">Unlock with recovery key</button>
+                  <button type="submit" class="btn-secondary">Restore with recovery code</button>
                 </form>
                 <p class="form-status" id="import-recovery-status" hidden></p>
 
@@ -1529,10 +1529,10 @@
             <span class="hc-emphasis-card__dot hc-emphasis-card__dot--warn" aria-hidden="true"></span>
             <div class="hc-emphasis-card__copy">
               <p class="hc-emphasis-card__eyebrow">View only</p>
-              <p class="hc-emphasis-card__title">No signing keys in this tab</p>
+              <p class="hc-emphasis-card__title">Ownership not loaded in this tab</p>
               <p class="hc-emphasis-card__detail" id="no-session-detail">
                 Finish create in the tab where you clicked Create, then tap
-                <strong>Save on this device</strong> there. Later: recovery key or encrypted backup
+                <strong>Save ownership on this device</strong> there. Later: recovery method or encrypted backup
                 under <strong>Manage</strong> on this card page.
               </p>
             </div>

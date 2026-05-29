@@ -27,8 +27,8 @@ export function resolveCreatedLivePrimaryCta(input) {
   if (input.hasSigningKeys && !input.walletSaved) {
     return {
       mode: "save-keys",
-      label: "Save control key",
-      subtitle: "Required to update and revoke later",
+      label: "Save ownership on this device",
+      subtitle: "Required to manage and revoke later",
     };
   }
   if (!input.resolverReachable) {

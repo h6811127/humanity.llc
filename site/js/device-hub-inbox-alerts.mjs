@@ -259,7 +259,7 @@ function renderTabKeysHubNotice(noticeGroup, show, noticeMode) {
   if (noticeMode === "keys-strip") {
     noticeGroup.innerHTML = `
     <button type="button" class="device-hub-notice-banner" data-hub-go-now-tab data-hub-searchable="notice save tab keys strip">
-      <span class="device-hub-notice-title">Keys in this tab · Save on this device</span>
+      <span class="device-hub-notice-title">Control active · Save ownership on this device</span>
       <span class="device-hub-notice-sub">${escapeHtml(label)} · open the Now tab to save</span>
       <span class="device-hub-notice-chevron" aria-hidden="true">›</span>
     </button>`;
@@ -275,8 +275,8 @@ function renderTabKeysHubNotice(noticeGroup, show, noticeMode) {
 
   noticeGroup.innerHTML = `
     <a class="device-hub-notice-banner" href="${escapeHtml(url.href)}" data-hub-searchable="notice save tab keys">
-      <span class="device-hub-notice-title">Keys in this tab · Save on this device</span>
-      <span class="device-hub-notice-sub">${escapeHtml(label)} · tab only until you save on this device</span>
+      <span class="device-hub-notice-title">Control active · Save ownership on this device</span>
+      <span class="device-hub-notice-sub">${escapeHtml(label)} · this tab only until you save ownership</span>
       <span class="device-hub-notice-chevron" aria-hidden="true">›</span>
     </a>`;
 }

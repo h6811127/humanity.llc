@@ -98,7 +98,7 @@ export function offerClearOtherTabKeysOnRemove(profileId) {
   if (others.length === 0) return;
   if (
     !window.confirm(
-      "Other open tabs still have signing keys for this card. Clear keys in those tabs too?"
+      "Other open tabs are still managing this object. Stop managing in those tabs too?"
     )
   ) {
     return;

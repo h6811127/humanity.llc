@@ -245,7 +245,7 @@ export function initCreatedSetup(opts) {
     if (keysStrip) keysStrip.hidden = false;
     if (!runSave) {
       showFeedback(
-        "No signing keys in this tab. Finish create in this tab first.",
+        "Ownership not loaded in this tab. Finish create in this tab first.",
         true
       );
       return;

@@ -37,7 +37,7 @@ describe("device-keys-custody-html", () => {
     expect(html).toContain("hc-emphasis-card--warn");
     expect(html).toContain("device-keys-custody--created");
     expect(html).toContain("device-keys-custody-dl");
-    expect(html).toContain("Save your root key on this device");
+    expect(html).toContain("Save ownership on this device");
     expect(html).toContain("object QRs");
   });
 
@@ -52,7 +52,7 @@ describe("device-keys-custody-html", () => {
     const html = readFileSync(join(root, "site/created/index.html"), "utf8");
     expect(html).toContain('id="device-keys-custody-created-setup"');
     expect(html).toContain('id="created-setup-keys-mount"');
-    expect(html).toContain("Save root control on this device");
+    expect(html).toContain("Save ownership on this device");
     expect(html).toContain("control of this root card plus its object QRs");
     expect(html).toContain("restore root and object control");
     expect(html).toContain("Unlock root controls");

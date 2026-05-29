@@ -152,7 +152,7 @@ export function buildInboxItems(input) {
       kind: "tab_keys_unsaved",
       urgency: "medium",
       count: tabNoticeCount,
-      title: "Keys in this tab · save",
+      title: "Control active · save ownership",
       subtitle: tabSessionLabel,
       hubScrollTarget: "device-hub-keys-custody",
     });

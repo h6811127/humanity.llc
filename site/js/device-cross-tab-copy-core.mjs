@@ -1,6 +1,7 @@
 /**
  * Shared cross-tab presence copy (Phase 5).
  * @see docs/KEYS_CUSTODY_AND_NOTIFICATION_IMPROVEMENT_PLAN.md Phase 5
+ * @see docs/OWNERSHIP_AND_CONTROL_MODEL.md D1 — Layer 2 custody copy
  */
 
 /**
@@ -18,8 +19,8 @@ export function crossTabPresenceLabel(entry) {
  */
 export function crossTabAggregateTitle(count) {
   if (count <= 0) return "";
-  if (count === 1) return "Keys open in 1 other tab";
-  return `Keys open in ${count} other tabs`;
+  if (count === 1) return "Managing in 1 other tab";
+  return `Managing in ${count} other tabs`;
 }
 
 /**

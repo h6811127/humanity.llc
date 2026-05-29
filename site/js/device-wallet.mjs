@@ -565,7 +565,7 @@ export function mergeWalletEntryFromSession(existing, session, label = "") {
  */
 export function saveSessionToWallet(session, label = "") {
   if (!session?.profile_id || !session?.owner_private_key_b58) {
-    return { error: "No signing keys in this tab." };
+    return { error: "Ownership not loaded in this tab." };
   }
   const entries = loadWallet();
   const idx = entries.findIndex((e) => e.profile_id === session.profile_id);

@@ -15,8 +15,8 @@ describe("device-cross-tab-copy-core", () => {
   });
 
   it("crossTabAggregateTitle uses open-in-tab wording", () => {
-    expect(crossTabAggregateTitle(1)).toBe("Keys open in 1 other tab");
-    expect(crossTabAggregateTitle(2)).toBe("Keys open in 2 other tabs");
+    expect(crossTabAggregateTitle(1)).toBe("Managing in 1 other tab");
+    expect(crossTabAggregateTitle(2)).toBe("Managing in 2 other tabs");
   });
 
   it("crossTabAggregateSubtitle joins stable per-tab labels", () => {
