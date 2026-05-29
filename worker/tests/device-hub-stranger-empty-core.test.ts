@@ -71,7 +71,5 @@ describe("device-status landing stranger chrome wiring", () => {
     expect(src).toContain('sessionStorage.setItem(HUB_OPEN_KEY, "0")');
     expect(src).toContain("setHubExpanded(false, { persist: false })");
     expect(src).toContain("strangerLanding");
-    expect(src).toContain("shell-status-mode");
-    expect(src).toContain("shellStatusModeLabel");
   });
 });

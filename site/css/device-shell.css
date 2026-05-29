@@ -128,22 +128,6 @@ body.has-shell-chrome .page {
   display: none !important;
 }
 
-.shell-status-mode {
-  flex: 1 1 100%;
-  min-width: 0;
-  margin: 0;
-  padding: 0 2px;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  color: var(--shell-label-muted, rgba(0, 0, 0, 0.55));
-}
-
-.shell-status-mode[hidden] {
-  display: none !important;
-}
-
 .top-chrome-bar--wallet {
   justify-content: space-between;
   width: 100%;

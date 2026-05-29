@@ -82,7 +82,6 @@ import {
   shellChromeStatusLineFromSegments,
   shellDotUsesNeutralEmptyWallet,
   shellStatusLinePrimaryInChrome,
-  shellStatusModeLabel,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
 } from "./device-dot-state-core.mjs?v=60";
@@ -115,7 +114,6 @@ const notifBtn = document.getElementById("shell-notif-badge");
 const notifCountEl = document.getElementById("shell-notif-badge-count");
 const hubStatusPanel = document.getElementById("device-hub-status-panel");
 const shellStatusLine = document.getElementById("shell-status-line");
-const shellStatusMode = document.getElementById("shell-status-mode");
 const hub = document.getElementById("device-hub");
 const walletPage = document.getElementById("wallet-page");
 const systemBanner = document.getElementById("device-system-banner");
@@ -438,10 +436,6 @@ function renderShellStatusLine(segments) {
   if (!show) {
     shellStatusLine.hidden = true;
     shellStatusLine.textContent = "";
-    if (shellStatusMode) {
-      shellStatusMode.hidden = true;
-      shellStatusMode.textContent = "";
-    }
     applyLandingStrangerChrome();
     return;
   }
@@ -450,10 +444,6 @@ function renderShellStatusLine(segments) {
   shellStatusLine.textContent = shellChromeStatusLineFromSegments(segments, {
     strangerLanding,
   });
-  if (shellStatusMode) {
-    shellStatusMode.hidden = false;
-    shellStatusMode.textContent = shellStatusModeLabel(dotPageKind());
-  }
   applyLandingStrangerChrome();
 }
 

@@ -1,6 +1,6 @@
 # Hub stranger onboarding (prod walkthrough follow-up)
 
-**Status:** Slice 1–3 shipped  
+**Status:** Slice 1–2 shipped · P3 mode labels **removed** (May 2026)  
 **Scope:** Device hub on `/`, `/create/`, `/created/`, and `/wallet/` when **no saved cards, pins, or inbox action items**  
 **Source:** Production walkthrough May 2026 — combined landing/home + hub-as-OS validated; empty hub read as admin panel before mental model landed  
 **Companions:** [`DEVICE_HUB_AND_LOCAL_SEARCH.md`](DEVICE_HUB_AND_LOCAL_SEARCH.md) · [`DEVICE_OS.md`](DEVICE_OS.md) · [`OWNERSHIP_AND_CONTROL_MODEL.md`](OWNERSHIP_AND_CONTROL_MODEL.md)
@@ -36,7 +36,8 @@ The collapsed hub does not consume layout on `/` (hero stays above the fold). Op
 |---|--------|--------|
 | **P1** | **Stranger-empty hub** — match wallet empty copy; hide steward chrome until first save | Slice 1 shipped |
 | **P2** | **Stranger landing chrome** — keep hub collapsed; network-only status line; stranger coachmark copy | Slice 2 shipped |
-| **P3** | **Status line mode labels** — page-aware subtitle under segmented line (e.g. wallet: scroll hint; landing: “On this device”) | Slice 3 shipped |
+
+**Removed (May 2026):** P3 page-aware subtitles under `#shell-status-line` (`On this device`, etc.) — sighted users rely on page context; aria labels per `dotPageKind()` remain. Load failures use the red-ring **load-error coach card** instead (`device-status-load-error.mjs`).
 
 ---
 
@@ -134,39 +135,6 @@ npm run worker:test -- worker/tests/device-hub-stranger-empty-core.test.ts worke
 ```
 
 Manual: **P2-SLC** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md).
-
----
-
-## P3 — Status line mode labels (Slice 3)
-
-Page-aware subtitle under `#shell-status-line` when the chrome status line is primary (empty wallet, calm dot):
-
-| Page | Subtitle |
-|------|----------|
-| `/` | On this device |
-| `/wallet/` | My objects ↓ |
-| `/create/`, `/created/` | Device hub |
-
-Aria labels already differ per `dotPageKind()` in `device-dot-state-core.mjs`; P3 adds the visible affordance for sighted users.
-
-### Files
-
-| Area | Files |
-|------|--------|
-| Copy | `site/js/device-ownership-copy-core.mjs` (`SHELL_STATUS_MODE_*`) |
-| Core | `site/js/device-dot-state-core.mjs` (`dotPageKindFromPathname`, `shellStatusModeLabel`) |
-| Apply | `site/js/device-status.mjs` (`renderShellStatusLine` → `#shell-status-mode`) |
-| HTML | `site/index.html`, `site/create/index.html`, `site/created/index.html`, `site/wallet/index.html` |
-| CSS | `site/css/device-shell.css` (`.shell-status-mode`) · `site/css/theme-dark.css` |
-
-### Regression
-
-```bash
-npm run worker:test -- worker/tests/device-dot-state.test.ts worker/tests/device-emphasis-card-html.test.ts
-npm run e2e -- e2e/device-status-dot.spec.ts -g "shell S4"
-```
-
-Manual: **P3-SLM** in [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md).
 
 ---
 

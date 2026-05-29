@@ -22,9 +22,6 @@ import {
   FOUNDING_QR_NOT_OWNER_PROOF,
   FOUNDING_STICKER_NO_CALENDAR_EXPIRY,
   SCAN_LIMITS_DISCLOSURE_TITLE,
-  SHELL_STATUS_MODE_DEVICE_HUB,
-  SHELL_STATUS_MODE_LANDING,
-  SHELL_STATUS_MODE_WALLET,
 } from "../../site/js/device-ownership-copy-core.mjs";
 import { renderScanPage } from "../src/resolver/scan-html";
 import { buildScanViewModel } from "../src/resolver/scan-state";
@@ -118,17 +115,6 @@ function expectNoLayer1Jargon(text: string) {
 }
 
 describe("D9 comprehension copy core (device-ownership-copy-core)", () => {
-  it("exports shell status mode labels without Layer 1 jargon (Hub P3)", () => {
-    for (const line of [
-      SHELL_STATUS_MODE_LANDING,
-      SHELL_STATUS_MODE_WALLET,
-      SHELL_STATUS_MODE_DEVICE_HUB,
-    ]) {
-      expectNoLayer1Jargon(line);
-    }
-    expect(SHELL_STATUS_MODE_WALLET).toContain("My objects");
-  });
-
   it("exports live-control strings in Layer 2 terms", () => {
     for (const line of [
       LIVE_CONTROL_SCANNER_LEAD,

@@ -399,10 +399,6 @@ test.describe("shell S4 empty-wallet chrome", () => {
     await expect(line).toContainText(/network reachable/i);
     await expect(line).not.toContainText(/0 cards/i);
 
-    const mode = page.locator("#shell-status-mode");
-    await expect(mode).toBeVisible();
-    await expect(mode).toHaveText("On this device");
-
     const dot = page.locator("#brand-status-dot");
     await expect(dot).toHaveAttribute("data-dot-state", "ok:none");
     await expect(dot).toHaveClass(/shell-status-dot--neutral-empty/);

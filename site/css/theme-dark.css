@@ -292,10 +292,6 @@ html[data-theme="dark"] .shell-status-line {
   color: var(--shell-label-strong, rgba(255, 255, 255, 0.92));
 }
 
-html[data-theme="dark"] .shell-status-mode {
-  color: var(--shell-label-muted, rgba(255, 255, 255, 0.58));
-}
-
 html[data-theme="dark"] .shell-notif-badge-ring {
   background: transparent;
   border-color: var(--red);

@@ -16,7 +16,6 @@ import {
   shellChromeStatusLineFromSegments,
   shellDotUsesNeutralEmptyWallet,
   shellStatusLinePrimaryInChrome,
-  shellStatusModeLabel,
   SHELL_DOT_NEUTRAL_EMPTY_CLASS,
   shouldCelebrateStewardTransition,
   dotTransitionKey,
@@ -486,19 +485,12 @@ describe("dotClassList and primaryDotTone", () => {
   });
 });
 
-describe("shell status mode labels (P3)", () => {
+describe("dotPageKindFromPathname", () => {
   it("maps pathname to page kind", () => {
     expect(dotPageKindFromPathname("/")).toBe("landing");
     expect(dotPageKindFromPathname("/wallet/")).toBe("landing");
     expect(dotPageKindFromPathname("/wallet/", { isWalletPage: true })).toBe("wallet");
     expect(dotPageKindFromPathname("/create/")).toBe("create");
     expect(dotPageKindFromPathname("/created/abc")).toBe("created");
-  });
-
-  it("returns page-aware visible subtitle copy", () => {
-    expect(shellStatusModeLabel("landing")).toBe("On this device");
-    expect(shellStatusModeLabel("wallet")).toBe("My objects ↓");
-    expect(shellStatusModeLabel("create")).toBe("Device hub");
-    expect(shellStatusModeLabel("created")).toBe("Device hub");
   });
 });
