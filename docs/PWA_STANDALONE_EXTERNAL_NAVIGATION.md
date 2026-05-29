@@ -122,7 +122,7 @@ openStewardScanPreview(url, { navigation, standalone })
 - `created-dashboard.mjs` (`openScanUrl`)
 - Hub / wallet / child-object link builders (remove `target="_blank"` when standalone, or bind click handler)
 
-**Setup wizard tweak (standalone only):** Do **not** auto-advance past the test step until the user taps **Continue** — so app-switching back does not skip the step. Browser tabs can keep today’s auto-advance if desired.
+**Setup wizard tweak:** Do **not** auto-advance past the test step until the user taps **Continue** — browser and standalone (P0b-2).
 
 **Copy:** Standalone feedback → “Opened scan preview — use Back to return here.” Browser → keep “new tab” wording.
 
@@ -242,14 +242,14 @@ Update [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Manual QA step 3 when P
 
 **Shipped defaults (2026-05-29):**
 
-1. **Auto-advance on test scan** — **Standalone only:** wait for Continue (`shouldAutoAdvanceSetupTestScan` returns false). Browser tabs still auto-advance after `window.open` (regression guard in E2E).
+1. **Auto-advance on test scan** — **Never auto-advance** — steward taps **Continue** after preview (`shouldAutoAdvanceSetupTestScan` always false; P0b-2 / R12). Browser still opens scan in **new tab**; standalone uses same-tab preview.
 2. **Hub open scan** — **Same-tab for all standalone shell pages** (hub, wallet, `/created/` control mode) — not limited to `fresh=1` setup.
 3. **Child object scan links** — **Same policy as root** via `applyStewardScanLinkElement` / `buildStewardScanPreviewHrefFromWindow`.
 4. **Return banner (P2)** — **Shipped:** steward-only chrome when `hc_return` present; no install prompt on scan; dismiss via return link (no stranger-facing install CTA).
 
 Unresolved (defer to product if dogfood fails manual sign-off):
 
-- Whether browser tabs should also stop auto-advancing on test scan ([`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) P0b-2 — separate track).
+- None — P0b-2 (browser auto-advance) **shipped** 2026-05-29.
 
 ---
 
@@ -264,3 +264,4 @@ Unresolved (defer to product if dogfood fails manual sign-off):
 | 2026-05-29 | **P4 shipped** — install card gated on `hc_setup_done` for wallet rows; deferral card until first setup complete |
 | 2026-05-29 | **P1-PWA-N E2E extended** — hub Open scan + wallet pin + browser popup regressions in `e2e/device-pwa-scan-handoff.spec.ts` |
 | 2026-05-29 | **P1-PWA-N E2E** — history back from scan + pin copy guard; open questions closed with shipped defaults; P5 playbook in QA |
+| 2026-05-29 | **P0b-2 shipped** — setup wizard never auto-advances on test scan (browser + standalone); [`SAFARI_KEYS_WIPE_INVESTIGATION.md`](SAFARI_KEYS_WIPE_INVESTIGATION.md) step 9 |

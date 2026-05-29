@@ -103,7 +103,7 @@ describe("pwa-scan-handoff-core", () => {
     expect(stewardScanOpenedFeedback(true)).toMatch(/Back to return/i);
     expect(stewardScanOpenedFeedback(false)).toMatch(/new tab/i);
     expect(shouldAutoAdvanceSetupTestScan(true)).toBe(false);
-    expect(shouldAutoAdvanceSetupTestScan(false)).toBe(true);
+    expect(shouldAutoAdvanceSetupTestScan(false)).toBe(false);
   });
 
   it("applyStewardScanLinkElement toggles target", () => {

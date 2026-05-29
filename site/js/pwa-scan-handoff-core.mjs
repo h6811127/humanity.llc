@@ -293,9 +293,10 @@ export function openStewardScanPreview(url, options = {}) {
 }
 
 /**
- * Setup wizard: auto-advance past test scan only in browser tabs.
- * @param {boolean} standalone
+ * Setup wizard: never auto-advance past test scan — steward confirms with Continue (P0b-2 / R12).
+ * Applies in browser (`window.open`) and standalone (same-tab preview).
+ * @param {boolean} [_standalone]
  */
-export function shouldAutoAdvanceSetupTestScan(standalone) {
-  return !standalone;
+export function shouldAutoAdvanceSetupTestScan(_standalone) {
+  return false;
 }

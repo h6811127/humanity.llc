@@ -532,7 +532,7 @@ Automated (when shipped): `npm run worker:test -- worker/tests/pwa-standalone-re
 
 **Fail signals:** Safari opens automatically; wizard advances to done before user previews scan; cross-tab keys notice during fresh setup.
 
-Automated: `npm run worker:test:pwa-install` (includes `pwa-scan-handoff-core.test.ts`) · `npm run e2e:pwa-install` (`e2e/device-pwa-scan-handoff.spec.ts` — setup test scan, history back, hub Open scan, wallet pin, browser popup regressions).
+Automated: `npm run worker:test:pwa-install` (includes `pwa-scan-handoff-core.test.ts`) · `npm run e2e:pwa-install` (`e2e/device-pwa-scan-handoff.spec.ts` — setup test scan, history back, hub Open scan, wallet pin, browser popup + P0b-2 Continue regressions).
 
 **Manual sign-off (HTTPS, real installed PWA — required for close-out):**
 

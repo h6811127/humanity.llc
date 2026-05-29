@@ -212,6 +212,27 @@ test.describe("device PWA scan handoff (P1-PWA-N)", () => {
     await expect(page.locator("#created-setup-panel-done")).toBeHidden();
   });
 
+  test("browser Continue on test scan opens popup without advancing wizard (P0b-2)", async ({
+    page,
+    context,
+  }) => {
+    await seedCreatedSetupTestStep(page, false);
+    await stubCreatedResolver(page);
+    await page.goto(createdSetupTestUrl(), { waitUntil: "domcontentloaded" });
+
+    await expect(page.locator("#created-setup-panel-test")).toBeVisible({ timeout: 20_000 });
+
+    const popupPromise = context.waitForEvent("page");
+    await page.locator("#created-setup-continue").click();
+    const popup = await popupPromise;
+
+    await expect(popup).toHaveURL(/scan-active/, { timeout: 10_000 });
+    await expect(page).toHaveURL(/#setup-test/);
+    await expect(page.locator("#created-setup-panel-test")).toBeVisible();
+    await expect(page.locator("#created-setup-panel-done")).toBeHidden();
+    await popup.close();
+  });
+
   test("browser tab test scan opens new window (regression)", async ({ page, context }) => {
     await seedCreatedSetupTestStep(page, false);
     await stubCreatedResolver(page);

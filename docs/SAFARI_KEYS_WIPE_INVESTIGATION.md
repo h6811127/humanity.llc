@@ -488,7 +488,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | 6 | P0-3 saveWallet try/catch | Pending | R3 |
 | 7 | P0-4 Backup gate | Pending | R4 |
 | 8 | P0b-1 Card disabled FP | Pending | R10 |
-| 9 | P0b-2 Setup wizard scan tab | Pending | R12 |
+| 9 | P0b-2 Setup wizard scan tab | **Shipped** | R12 — `shouldAutoAdvanceSetupTestScan` always false; E2E Continue on test step |
 | 10 | P0b-3 Scan single-row auto-activate (stranger vouch) | Pending | Overlaps P1-1 |
 
 **P0-1 spec (reference for reviewers):**
