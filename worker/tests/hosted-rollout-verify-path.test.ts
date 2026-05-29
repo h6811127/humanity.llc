@@ -12,6 +12,8 @@ describe("hosted-rollout-verify-path", () => {
     );
     expect(script).toContain("verify:hosted-g0");
     expect(script).toContain("device-steward-session-core.test.ts");
+    expect(script).toContain("device-steward-session.test.ts");
+    expect(script).toContain("export-e2e-test-keypair.test.ts");
     expect(script).toContain("device-steward-billing-return-core.test.ts");
     expect(script).toContain("created-child-object.test.ts");
     expect(script).toContain("issue-child-object-qr.test.ts");
@@ -30,6 +32,16 @@ describe("hosted-rollout-verify-path", () => {
     );
     expect(pkg.scripts["hosted:stripe-return-url"]).toContain(
       "hosted-stripe-checkout-return.mjs"
+    );
+    expect(pkg.scripts["e2e:hosted-tier-billing-return"]).toContain(
+      "hosted-tier-billing-return.spec.ts"
+    );
+  });
+
+  it("billing checkout return Playwright spec exists", () => {
+    expect(existsSync(join(repoRoot, "e2e/hosted-tier-billing-return.spec.ts"))).toBe(true);
+    expect(existsSync(join(repoRoot, "worker/tests/export-e2e-test-keypair.test.ts"))).toBe(
+      true
     );
   });
 

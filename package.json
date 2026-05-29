@@ -77,6 +77,7 @@
     "worker:test:keys-custody": "vitest run worker/tests/device-keys-custody-html.test.ts worker/tests/device-keys-custody-core.test.ts worker/tests/device-emphasis-card-html.test.ts",
     "worker:test:comprehension": "vitest run worker/tests/comprehension-copy-guards.test.ts worker/tests/device-ownership-copy-core.test.ts worker/tests/scan.test.ts -t \"comprehension|H-002|does not prove\"",
     "worker:test:key-loss-copy": "vitest run worker/tests/key-loss-copy-guards.test.ts worker/tests/key-backup.test.ts worker/tests/key-backup-import.test.ts",
+    "worker:test:hosted-billing-return": "vitest run worker/tests/export-e2e-test-keypair.test.ts worker/tests/device-steward-billing-return-core.test.ts worker/tests/device-steward-session.test.ts",
     "worker:test:pwa-install": "vitest run worker/tests/pwa-install-metadata.test.ts worker/tests/pwa-install-ux.test.ts worker/tests/pwa-standalone-refresh-core.test.ts",
     "e2e:pwa-install": "playwright test e2e/device-pwa-install.spec.ts",
     "worker:test:lazy-shell": "vitest run worker/tests/device-status-lazy-inbox.test.ts worker/tests/device-status-lazy-notifications.test.ts worker/tests/device-status-shell-modules.test.ts",

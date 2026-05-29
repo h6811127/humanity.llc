@@ -1,6 +1,7 @@
 /**
  * Landing device hub init.
  */
+import "./device-steward-billing-return-bootstrap.mjs";
 import { initAutoSaveToggle } from "./device-auto-save.mjs";
 import {
   initResolverRefreshAllTabsAction,

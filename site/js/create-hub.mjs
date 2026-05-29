@@ -1,6 +1,7 @@
 /**
  * /create/ device hub init.
  */
+import "./device-steward-billing-return-bootstrap.mjs";
 import { initDeviceHub } from "./device-hub-ui.mjs";
 import "./device-help-fab.mjs";
 

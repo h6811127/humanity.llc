@@ -1,6 +1,7 @@
 /**
  * /wallet/ - dedicated saved-cards page (not the hub bottom sheet).
  */
+import "./device-steward-billing-return-bootstrap.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
 import { isAutoSaveEnabled, initAutoSaveToggle, isAutoSaveFailed } from "./device-auto-save.mjs";
 import { initDeviceHub, refreshDeviceHub } from "./device-hub-ui.mjs";

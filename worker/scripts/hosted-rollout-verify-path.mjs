@@ -2,7 +2,7 @@
  * Steward roadmap step 3 — verify hosted path (Vitest + optional E2E).
  *
  * Per docs/STEWARD_DEVICE_ROADMAP.md § Current engineering steps #3:
- *   Entitlements probe, session link, push policy, free-tier regression (H1–H6).
+ *   Entitlements probe, session link, billing return E2E, free-tier regression (H1–H6).
  *
  * Usage:
  *   npm run hosted:rollout:verify-path
@@ -47,6 +47,7 @@ function main() {
     "--",
     "worker/tests/device-steward-session-core.test.ts",
     "worker/tests/device-steward-session.test.ts",
+    "worker/tests/export-e2e-test-keypair.test.ts",
   ]);
   runNpm("Stripe checkout return URL (device-steward-billing-return-core)", [
     "run",

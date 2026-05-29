@@ -60,6 +60,7 @@ OPERATOR_AUDIT_TOKEN=... API_ORIGIN=https://humanity.llc npm run worker:check-st
 | Test | Coverage |
 |------|----------|
 | H1–H3, H5 | `e2e/hosted-tier-budget.spec.ts` |
+| Billing checkout return → session link | `e2e/hosted-tier-billing-return.spec.ts` |
 | H4 + E4 fallback | `e2e/hosted-tier-push.spec.ts` |
 | H6 commerce firewall | `worker/tests/billing-webhook.test.ts` |
 | E6 tabletop (expired → free) | `billing-webhook.test.ts` + E2E H3 |
@@ -168,7 +169,7 @@ npm run hosted:rollout:step6 -- --vitest   # step 6a (Vitest) only
 npm run hosted:rollout:step6 -- --e2e      # step 6b (Playwright) only
 ```
 
-**Status:** preflight ✅ · E2E (`--e2e`) ✅ 8/8 Playwright · production post-deploy smoke ✅ (health, scan 200, hosted routes).
+**Status:** preflight ✅ · E2E (`--e2e`) ✅ 10/10 Playwright · production post-deploy smoke ✅ (health, scan 200, hosted routes).
 
 Rollout steps: [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) § Production rollout (after G0).
 
