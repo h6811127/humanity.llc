@@ -12,7 +12,7 @@ Ordered work after repo review. Update row status as steps complete. Cross-links
 
 | Priority | Work | Type | Status |
 |----------|------|------|--------|
-| **1** | **Merch funnel close-out** — scan → `/shop/customize/` (`scan_customize` ref + CTA); enable Tier 1 in `shop-config.json`; prove one paid personalized order (intent → webhook → mint → Printify submit) | Engineering + operator | **Engineering ✅** (`merch-funnel:rollout:step1`–`step6`, post-deploy CI on steps 2/3) · **operator next:** paste variant URLs · `step2 -- --verify --strict` · live payment + Printify · physical QA [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) |
+| **1** | **Merch funnel close-out** — scan → `/shop/customize/` (`scan_customize` ref + CTA); enable Tier 1 in `shop-config.json`; prove one paid personalized order (intent → webhook → mint → Printify submit) | Engineering + operator | **Engineering ✅** (2026-05-29: `verify-exit:fast`, `e2e:merch-funnel` 8/8, scan merch regression) · **Operator phase active:** paste variant URLs · `step2 -- --verify --strict` · live payment + Printify · physical QA [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) |
 | **2** | **Phase A trust MVP** — run M5 stranger runbook (3 outsiders, unassisted create → scan → revoke) | Validation | **✅ Passed 2026-05-27** — [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) |
 | **3** | **Hosted steward production rollout** — `hosted:rollout:step*` through step 6 (secrets, flag, CF dashboard, regression) | Ops | **Nearly complete** — 5a ✅ · 5b preflight ✅ · 6 Vitest + E2E ✅ · 4b prod smoke ✅ · **remaining:** `OPERATOR_AUDIT_TOKEN=… npm run hosted:rollout:step5b -- --verify` |
 | **4** | **AI P1 product decision** — keep / rename / deterministic-only / remove scan reader (no new L3 user features until Phase A) | Product | ☐ |
@@ -23,12 +23,27 @@ Ordered work after repo review. Update row status as steps complete. Cross-links
 
 ### Operator close-out (after engineering + M5)
 
-1. Run **`npm run merch-funnel:rollout:complete -- --verify`** (or `merch-funnel:verify-exit` / `verify-exit:fast` in CI).
-2. Operator: paste Shopify variant URLs into `site/data/shop-config.json`; **`npm run merch-funnel:verify-config -- --require-checkout`**.
-3. Prove one paid personalized order (intent → webhook → mint → Printify submit) per [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md).
-4. Complete physical ink QA — [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) (automated scan regression: `npm run worker:test:merch-print-qa`).
-5. Enable live Tier 1 checkout (`personalize.checkout_open: true`) only after steps 3–4 pass.
-6. Optional stranger row: scan live wear → customize CTA → understands scan does not prove ownership (no purchase required).
+**Engineering sign-off (2026-05-29):** `merch-funnel:rollout:complete -- --preflight` · `e2e:merch-funnel` (M1–M2 sad paths + checkout handoff + customize + Glitch PDP) · scan merch HTML regression (`worker/tests/scan.test.ts` `-t merch`).
+
+**Blocking live Tier 1 checkout today** (`npm run merch-funnel:verify-config`):
+
+| Blocker | Status |
+|---------|--------|
+| `personalize.checkout_open` | `false` (correct until QA) |
+| `hoodie_live_object_v1` `checkout_url` + `shopify_variant_id` | empty — paste from Shopify |
+| `sticker_personalized_v1` `checkout_url` + `shopify_variant_id` | empty — paste from Shopify |
+| Physical ink QA | not signed — [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) |
+| Live paid order → Printify submit | not proven — [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) |
+
+**Operator sequence:**
+
+1. Paste Shopify cart permalinks into `site/data/shop-config.json` (template: `site/data/shop-config.example.json`).
+2. `npm run pages:deploy` then `SITE_ORIGIN=https://humanity.llc npm run merch-funnel:rollout:step2 -- --verify --strict`.
+3. `npm run merch-funnel:verify-config -- --require-checkout` (must pass before enabling checkout).
+4. Prove one paid personalized order (intent → webhook → mint → Printify submit).
+5. Complete physical ink QA — [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md).
+6. Set `personalize.checkout_open: true`, redeploy Pages, re-run step 2 verify.
+7. Optional stranger row: scan live wear → customize CTA → understands scan does not prove ownership.
 
 **M5 (Priority 2):** passed 2026-05-27 — digital stranger path per [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md). Preflight: `npm run site:verify-positioning-exit`.
 

@@ -29,7 +29,7 @@ export function buildStewardScanPreviewHrefFromWindow(scanUrl, opts = {}) {
 
 /**
  * @param {string} scanUrl
- * @param {{ returnUrl?: string | null; navigation?: { assign?: (href: string) => void } }} [opts]
+ * @param {{ returnUrl?: string | null; setupWizard?: boolean; navigation?: { assign?: (href: string) => void } }} [opts]
  */
 export function openStewardScanPreviewFromWindow(scanUrl, opts = {}) {
   const ctx = stewardScanPreviewContext(opts);

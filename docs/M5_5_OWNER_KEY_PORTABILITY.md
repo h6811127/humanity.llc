@@ -4,7 +4,7 @@
 **Blocks:** Revoke anytime / any device after create session ends  
 **Does not block:** M5 stranger tests, public create announce, or commerce milestones  
 
-**Related:** `docs/ROOT_CARD_AND_CHILD_OBJECTS.md`, `docs/V1_0_ARCHITECTURE_ROADMAP.md` §M5.5, `docs/Technical Standards v1.0.md` §10.1 (recovery key), §12.1 (encrypted export), `docs/M4_CREATED_REVOKE_UI.md` (current session-only revoke)
+**Related:** `docs/ROOT_CARD_AND_CHILD_OBJECTS.md`, `docs/V1_0_ARCHITECTURE_ROADMAP.md` §M5.5, `docs/Technical Standards v1.0.md` §10.1 (recovery key), §12.1 (encrypted export), `docs/M4_CREATED_REVOKE_UI.md` (current session-only revoke), [`OWNERSHIP_RESTORE_UX_PLAN.md`](OWNERSHIP_RESTORE_UX_PLAN.md) (view-mode restore + recovery-first UX)
 
 ---
 
