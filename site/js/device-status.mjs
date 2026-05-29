@@ -16,6 +16,7 @@ import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visi
 
 export const RESOLVER_HEALTH_CHANGED = "hc-resolver-health-changed";
 import { maybeQuietTabRehydrate } from "./device-quiet-tab-rehydrate.mjs?v=65";
+import { scheduleStoragePersistRequest } from "./device-storage-persist.mjs";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
 import {
@@ -650,6 +651,7 @@ window.addEventListener("hc-focus-hub-search", () => {
 
 async function bootDeviceStatusShell() {
   await maybeQuietTabRehydrate();
+  scheduleStoragePersistRequest({ reason: "shell_bootstrap" });
   startTabKeysPresence();
   initBrowserNotifications();
   initResolverTabSync();

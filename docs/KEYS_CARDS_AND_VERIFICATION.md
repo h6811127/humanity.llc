@@ -75,7 +75,7 @@ Per **device**, storage:
 | Storage | Contents | Lifetime |
 |---------|----------|----------|
 | **`hc_created`** (session) | Active root card’s keys + metadata for **this tab** | Until tab closes / you clear site data |
-| **`hc_wallet`** (local) | Zero or more **saved root cards** with keys (labels, `profile_id`, …) | Until you remove or clear site data |
+| **`hc_wallet`** (local) | Zero or more **saved root cards** with keys (labels, `profile_id`, …) | Until you remove or clear site data. After save, the shell may call **`navigator.storage.persist()`** (D11) so the browser is less likely to evict origin storage under disk pressure — not a guarantee against “clear website data.” |
 | **`hc_child_objects_v1:{profile_id}`** (local) | Device index of child objects under that root (labels, state, scan URL metadata) — reconciled from `GET …/objects` on `/created/` refresh | Until you remove or clear site data; network is source of truth |
 | **`hc_wallet_network_cache`** (session) | Cached resolver status + **verification label** per saved root/card row; `at` = when **this device** last polled `GET …/status?q=…` (used for **checked … ago** on hub rows - not scan logging) | ~5 minutes |
 

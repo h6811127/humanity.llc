@@ -7,6 +7,7 @@ import { markScanOperatorFamiliar } from "./scan-operator-familiar.mjs";
 import { verificationRecordFromLabelState } from "./device-wallet-network-core.mjs";
 import { reconcileRemovedProfilesAfterWalletSave } from "./device-wallet-removed-profiles.mjs";
 import { setLastActiveProfileId } from "./device-quiet-tab-rehydrate-prefs.mjs";
+import { scheduleStoragePersistRequest } from "./device-storage-persist.mjs";
 
 export const WALLET_STORAGE_KEY = "hc_wallet";
 export const WALLET_SUMMARY_STORAGE_KEY = "hc_wallet_summary";
@@ -574,18 +575,21 @@ export function saveSessionToWallet(session, label = "") {
     const before = walletEntrySyncSignature(entries[idx]);
     const merged = mergeWalletEntryFromSession(entries[idx], session, label);
     if (walletEntrySyncSignature(merged) === before) {
+      scheduleStoragePersistRequest({ reason: "ownership_save" });
       return { ok: true, already: true };
     }
     entries[idx] = merged;
     saveWallet(entries);
     setLastActiveProfileId(session.profile_id);
     notifyWalletProfileSaved(session.profile_id);
+    scheduleStoragePersistRequest({ reason: "ownership_save" });
     return { ok: true, updated: true };
   }
   entries.unshift(walletEntryFromSession(session, label));
   saveWallet(entries);
   setLastActiveProfileId(session.profile_id);
   notifyWalletProfileSaved(session.profile_id);
+  scheduleStoragePersistRequest({ reason: "ownership_save" });
   return { ok: true };
 }
 

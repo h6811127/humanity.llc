@@ -373,6 +373,8 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | **D9h** | Founding copy comprehension runbook + expanded shop FAQ/guards | Low — docs + tests | **Shipped** (2026-05-29) |
 | **D9i** | Founding sticker FAQ gap close — full LAUNCH_LANGUAGE_KIT § Sticker FAQ on `/shop/founding/` | Low — copy + guards | **Shipped** (2026-05-29) |
 | **D10** | Quiet tab rehydrate — Tier 1–3: single/last-active rehydrate + cross-tab demotion | Medium — multi-tab UX | **Shipped** — [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) |
+| **D11** | Durable origin storage — `navigator.storage.persist()` after wallet save + shell bootstrap when signing keys exist | Low — browser may deny; no UI | **Shipped** — `device-storage-persist*.mjs` |
+| **D11b** | Setup wizard — omit Save progress step when auto-save already saved ownership (`created-setup-core.mjs`) | Low — `fresh=1` only | **Shipped** — [`CREATED_TASKS_TAB_REDESIGN.md`](CREATED_TASKS_TAB_REDESIGN.md) § Wizard hangover |
 
 **Do not migrate:** resolver APIs, document types, storage key names, or test fixture terminology without a dedicated protocol PR.
 
@@ -400,6 +402,8 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | Auto-save | `device-auto-save.mjs`, `created-device-save.mjs` |
 | Custody UI | `device-keys-custody.mjs`, `device-hub-keys-custody*.mjs` |
 | Quiet tab rehydrate (D10) | `device-quiet-tab-rehydrate*.mjs` |
+| Durable storage (D11) | `device-storage-persist-core.mjs`, `device-storage-persist.mjs` |
+| Setup save-step omit (D11b) | `created-setup-core.mjs`, `created-setup.mjs` |
 | Cross-tab | `device-tab-presence.mjs`, `device-cross-tab-banner.mjs` |
 | Backup/recovery | `key-backup*.mjs`, `recovery-key-ui.mjs` |
 | Vouch / attestation | `vouch-issue.mjs`, `vouch-ready-keys.mjs`, `device-control-activation*.mjs` |
@@ -444,3 +448,5 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | 2026-05-29 | **D10 Tier 3 shipped** — demote cross-tab chrome after quiet rehydrate |
 | 2026-05-29 | **D10 Tier 2 shipped** — last-active profile + hub toggle for multi-card quiet rehydrate |
 | 2026-05-29 | **D10 Tier 1 shipped** — quiet tab rehydrate for single saved card; [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) |
+| 2026-05-29 | **D11 shipped** — request `navigator.storage.persist()` after `hc_wallet` save and on shell bootstrap when signing keys exist; flag `hc_storage_persist_requested_v1` |
+| 2026-05-29 | **D11b shipped** — post-create setup wizard skips Save step UI when auto-save already persisted ownership |

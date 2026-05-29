@@ -7,6 +7,11 @@ import { mountKeysCustody } from "./device-keys-custody.mjs";
 import { isAutoSaveEnabled, isAutoSaveFailed } from "./device-auto-save.mjs";
 import { shouldShowSessionOnlyOwnershipWarning } from "./device-ownership-notice-core.mjs";
 import { isWalletSaved } from "./device-wallet.mjs";
+import {
+  setupMinStepIndex,
+  setupProgressKicker,
+  shouldOmitSetupSaveStep,
+} from "./created-setup-core.mjs";
 import { clearFreshUrlParam } from "./created-workspace.mjs";
 import { markSetupDone } from "./created-mode.mjs";
 import { stewardFocusKeyFromHash } from "./created-tabs.mjs";
@@ -67,6 +72,33 @@ export function initCreatedSetup(opts) {
   const qrPreviewWrap = document.getElementById("created-setup-qr-preview");
   const setupQrImg = document.getElementById("created-setup-qr-img");
   const doneBtn = document.getElementById("created-setup-finish");
+  const progressKicker = root.querySelector(".created-setup-kicker");
+  const saveProgressItem = root.querySelector('[data-setup-step="save"]');
+
+  function omitSaveStepNow() {
+    return shouldOmitSetupSaveStep({
+      savedOnDevice: isWalletSaved(profileId),
+      autoSaveEnabled: isAutoSaveEnabled(),
+      autoSaveFailed: isAutoSaveFailed(profileId),
+    });
+  }
+
+  function minStepIndexNow() {
+    return setupMinStepIndex(omitSaveStepNow());
+  }
+
+  function syncSetupProgressChrome() {
+    const omit = omitSaveStepNow();
+    if (progressKicker) {
+      progressKicker.textContent = setupProgressKicker(omit);
+    }
+    if (saveProgressItem) {
+      saveProgressItem.hidden = omit;
+      saveProgressItem.setAttribute("aria-hidden", omit ? "true" : "false");
+    }
+  }
+
+  syncSetupProgressChrome();
 
   const seatbeltCtl = initCreatedSetupSeatbelt({
     profileId,
@@ -170,8 +202,8 @@ export function initCreatedSetup(opts) {
       panel.hidden = panel.dataset.setupPanel !== step;
     });
     if (backBtn) {
-      backBtn.hidden = stepIndex === 0;
-      backBtn.disabled = stepIndex === 0;
+      backBtn.hidden = stepIndex <= minStepIndexNow();
+      backBtn.disabled = stepIndex <= minStepIndexNow();
     }
     if (continueBtn) {
       continueBtn.hidden = step === "done";
@@ -191,7 +223,7 @@ export function initCreatedSetup(opts) {
 
   function goToStep(index, { pushHistory = false } = {}) {
     const prevStep = currentStep();
-    stepIndex = Math.max(0, Math.min(index, STEPS.length - 1));
+    stepIndex = Math.max(minStepIndexNow(), Math.min(index, STEPS.length - 1));
     syncIndicators();
     if (currentStep() === "save" && keysStrip) {
       keysStrip.hidden = false;
@@ -291,7 +323,7 @@ export function initCreatedSetup(opts) {
   backBtn?.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (stepIndex <= 0) return;
+    if (stepIndex <= minStepIndexNow()) return;
     goToStep(stepIndex - 1);
   });
 
@@ -299,7 +331,7 @@ export function initCreatedSetup(opts) {
     if (root.hidden) return;
     const nextStep = event.state?.setupStep;
     if (typeof nextStep === "number" && event.state?.setup) {
-      let idx = Math.max(0, Math.min(nextStep, STEPS.length - 1));
+      let idx = Math.max(minStepIndexNow(), Math.min(nextStep, STEPS.length - 1));
       if (idx > STEPS.indexOf("protect") && !setupOwnershipSeatbeltSatisfied(getSession())) {
         idx = STEPS.indexOf("protect");
       }
@@ -356,7 +388,11 @@ export function initCreatedSetup(opts) {
 
   window.addEventListener("hc-device-hub-changed", () => {
     syncSetupKeysCustody();
+    syncSetupProgressChrome();
     if (currentStep() === "save") syncIndicators();
+    if (omitSaveStepNow() && stepIndex < minStepIndexNow()) {
+      goToStep(minStepIndexNow());
+    }
   });
   window.addEventListener("hc-created-qr-ready", syncSetupQrPreview);
 
@@ -366,9 +402,9 @@ export function initCreatedSetup(opts) {
     if (idx > STEPS.indexOf("protect") && !setupOwnershipSeatbeltSatisfied(getSession())) {
       idx = STEPS.indexOf("protect");
     }
-    stepIndex = idx;
-  } else if (canLeaveSaveStep()) {
-    stepIndex = 1;
+    stepIndex = Math.max(minStepIndexNow(), idx);
+  } else if (canLeaveSaveStep() || omitSaveStepNow()) {
+    stepIndex = Math.max(1, minStepIndexNow());
   }
   syncIndicators();
   if (currentStep() === "qr") syncSetupQrPreview();
