@@ -266,7 +266,6 @@ These are **product defaults**; implementation can phase in without protocol cha
 ### 7. Quiet tab rehydrate (passkey-like)
 
 - **Tier 1–3 (shipped):** One saved object, or last-active when multi-card + toggle on → shell bootstrap copies wallet row into `hc_created` without key copy; cross-tab chrome demoted for rehydrated profile ([`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md)).
-- **Tier 2 (planned):** Last-active profile for multi-card stewards.
 - Does **not** change protocol, server custody, or `hc_created` per-tab lifetime.
 
 ---

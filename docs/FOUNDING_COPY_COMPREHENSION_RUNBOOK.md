@@ -2,7 +2,7 @@
 
 **Status:** Runbook ready; execution pending (≥5 testers)  
 **Gate:** [`FOUNDING_DROP_BRIEF.md`](FOUNDING_DROP_BRIEF.md) § Product/trust · [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) § Comprehension gates · [`LAUNCH_LANGUAGE_KIT.md`](LAUNCH_LANGUAGE_KIT.md) § Sticker FAQ  
-**Prerequisite:** Tier 0 founding sticker page live at `/shop/founding/`; automated guards pass.  
+**Prerequisite:** Tier 0 founding sticker page live at `/shop/founding/` with full [`LAUNCH_LANGUAGE_KIT.md`](LAUNCH_LANGUAGE_KIT.md) § Sticker FAQ; automated guards pass (`npm run worker:test:comprehension`).  
 **Companion:** M7 passed 2026-05-29 · M5 stranger path passed 2026-05-27.
 
 ---
@@ -34,7 +34,7 @@ Minimum **5** testers before marking founding copy comprehension passed (same ba
 Run once before inviting strangers:
 
 1. Open `https://humanity.llc/shop/founding/` — hero + **Before you buy** checkboxes + FAQ visible.
-2. Confirm FAQ includes calendar expiry, buy ≠ verify, and QR ≠ owner proof.
+2. Confirm FAQ includes calendar expiry, buy ≠ verify, QR ≠ owner proof, revoke, campaign end, and misprint/reprint.
 3. Automated copy guardrails: `npm run worker:test:comprehension` (founding + live-control guards).
 
 ---

@@ -216,6 +216,20 @@ describe("D9 founding copy guards (FOUNDING_DROP_BRIEF)", () => {
     expect(html).toContain(FOUNDING_QR_NOT_OWNER_PROOF);
   });
 
+  it("D9i: founding FAQ includes LAUNCH_LANGUAGE_KIT sticker gap items", () => {
+    const html = readFileSync(join(root, "site/shop/founding/index.html"), "utf8");
+    expect(html).toContain("Can you turn off my sticker?");
+    expect(html).toContain("revoke this QR");
+    expect(html).toContain("What if Humanity ends the drop?");
+    expect(html).toMatch(/replaced|campaign-ended/i);
+    expect(html).toContain("Misprint or bad QR in the mail?");
+    expect(html).toMatch(/reprint or refund/i);
+    const expiryBlock = html.match(
+      /<summary>Will my sticker stop working after a year\?<\/summary>\s*<p>([\s\S]*?)<\/p>/i
+    );
+    expect(expiryBlock?.[1] ?? "").not.toContain("revoke this QR");
+  });
+
   it("shop customize and thanks pages repeat commerce-not-verification", () => {
     const customize = readFileSync(join(root, "site/shop/customize/index.html"), "utf8");
     const thanks = readFileSync(join(root, "site/shop/thanks/index.html"), "utf8");

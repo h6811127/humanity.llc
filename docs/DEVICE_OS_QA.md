@@ -274,7 +274,7 @@ See [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md).
 
 | Step | Action | Expected |
 |------|--------|----------|
-| 1 | Tester reads `/shop/founding/` FAQ on own phone | Sees buy ≠ verify, QR ≠ owner proof, no calendar expiry |
+| 1 | Tester reads `/shop/founding/` FAQ on own phone | Sees buy ≠ verify, QR ≠ owner proof, no calendar expiry, revoke, campaign end, misprint |
 | 2 | Ask F1–F3 from runbook | Merch ≠ vouched; holding ≠ ownership; sticker does not year-expire |
 | 3 | Optional: scan a demo founding QR | Bearer limits visible without coaching |
 
