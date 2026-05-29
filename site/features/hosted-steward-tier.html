@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Merch funnel & QR customizer · Features · humanity.llc</title>
-    <meta name="description" content="Scan curiosity → branded QR on wear → Shopify checkout." />
+    <title>Hosted steward tier · Features · humanity.llc</title>
+    <meta name="description" content="Optional paid upgrade for stewards who want higher availability — not a paywalled identity product." />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" href="/assets/red_qr_transparent_bg.png" type="image/png" />
     <link rel="stylesheet" href="/styles.css?v=69" />
@@ -20,12 +20,12 @@
       </header>
       <main class="screen">
         <section class="hero">
-          <p class="hero-eyebrow">Feature <span class="phase">12</span></p>
-          <h1>Merch funnel & QR customizer</h1>
+          <p class="hero-eyebrow">Feature <span class="phase">13</span></p>
+          <h1>Hosted steward tier</h1>
         </section>
         <div class="feature">
-          <p class="feature-lead">Scan curiosity → branded QR on wear → Shopify checkout.</p>
-          <p class="feature-sub"><span class="ship-badge ship-badge-partial">Partial</span> <a href="/shop/">/shop/</a> Tier 0 + <a href="/shop/customize/">/shop/customize/</a> Tier 1; operator gates live checkout</p>
+          <p class="feature-lead">Optional paid upgrade for stewards who want higher availability — not a paywalled identity product.</p>
+          <p class="feature-sub"><span class="ship-badge ship-badge-partial">Partial</span> M8 code in repo; <code>HOSTED_STEWARD_ENABLED</code> gates production routes</p>
         </div>
         <section class="group feature-aspects">
           <h2 class="group-label">About this feature</h2>
@@ -38,7 +38,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Physical merch is distribution for the live QR primitive — curiosity on a hoodie leads to create, customize, and wear your own signed object. Users never touch Printify; checkout stays branded on humanity.llc.</p>
+    <p class="settings-panel-lead">The free reference tier caps automatic resolver polling (400 GET/day/device) so the public operator stays honest infrastructure. Stewards who choose hosted get server-mediated live-proof delivery, higher caps, and published SLAs — without scan analytics or purchased trust labels.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -50,7 +50,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Funnel: scan live wear → signed profile → create card → <a href="/shop/customize/">/shop/customize/</a> preview (<code>LIVE OBJECT</code> QR band) → <code>POST /v1/store/artifact-intents</code> → Shopify cart metadata → paid webhook → Printify middleware mints unique <code>print_artifact</code> QR. Tier 0 founding stickers at <a href="/shop/">/shop/</a> skip the customizer. Scan CTA uses <code>hc_ref=scan_customize</code>.</p>
+    <p class="settings-panel-lead">Client signs <code>steward_account_link_v1</code> → <code>POST …/steward/session</code> → <code>hc_steward_session</code>; entitlements probe raises poll caps; SSE <code>live_proof.pending</code> with <code>sw-live-proof.mjs</code> + tab polling fallback. Billing checkout returns <code>?hc_account_id=acc_…</code> to link account on device. Rollout: <code>hosted:rollout:step1</code>–<code>step6</code> · verify <code>npm run verify:hosted-g0</code>.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -62,7 +62,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Commerce <strong>never</strong> grants vouch or human verification. Scan bearer warning + product copy stay honest: holding printed wear does not prove ownership. Artifact intent holds no private keys.</p>
+    <p class="settings-panel-lead">Free tier unchanged when the flag is off — strangers create, scan, and revoke without accounts. Merch and commerce never grant <code>steward.hosted</code>. Metering counts infrastructure events, not who scanned. OS notifications remain <strong>live proof only</strong>.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -74,7 +74,7 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Engineering rollout ships in repo (<code>merch-funnel:rollout:step1</code>–<code>step6</code>). Live Tier 1 checkout requires operator <code>shop-config.json</code>, one paid order proof, and physical ink QA (<code>docs/MERCH_FUNNEL_MVP.md</code>).</p>
+    <p class="settings-panel-lead">Production gated: G0 signed (Governance + Ops, 2026-05-27); Legal (G7) pending. Enable <code>HOSTED_STEWARD_ENABLED</code> only after secrets + regression per <code>docs/HOSTED_TIER_G0_READINESS.md</code>. Durable Object push fan-out (E4e) deferred.</p>
   </div>
 </details>
 <details class="settings-disclosure settings-disclosure-info feature-aspect">
@@ -86,14 +86,14 @@
     <span class="list-chevron" aria-hidden="true">›</span>
   </summary>
   <div class="settings-panel settings-panel-info-body">
-    <p class="settings-panel-lead">Full story-row catalog (~50 SKUs), stranger wear funnel QA, order timeline UI for stewards.</p>
+    <p class="settings-panel-lead">Federation-ready entitlements per <code>operator_id</code>; org plans; native webhook relay reserved in push RFC.</p>
   </div>
 </details></div>
         </section>
         <section class="group">
   <div class="feature-nav">
-    <a href="/features/studio-blog.html"><span class="feature-nav-label">Previous</span><span class="feature-nav-title"><span class="phase">11</span> Studio blog & door-plate pilot</span></a>
-    <a href="/features/hosted-steward-tier.html"><span class="feature-nav-label">Next</span><span class="feature-nav-title"><span class="phase">13</span> Hosted steward tier</span></a>
+    <a href="/features/merch-funnel.html"><span class="feature-nav-label">Previous</span><span class="feature-nav-title"><span class="phase">12</span> Merch funnel & QR customizer</span></a>
+    
   </div>
 </section>
       </main>

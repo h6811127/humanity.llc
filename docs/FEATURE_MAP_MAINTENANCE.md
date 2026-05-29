@@ -37,6 +37,7 @@ What ships today
 │   ├── On this device hub (phase 10)
 │   ├── Device shell details (P1 — compact list, links to /help/)
 │   ├── Studio blog (phase 11)
+│   ├── Hosted steward tier (phase 13 — partial, production-gated)
 │   └── Help center → /help/ (P1)
 ├── Commerce & belonging (P1)
 │   ├── Merch funnel & QR customizer (partial)
@@ -74,8 +75,8 @@ These deserve **full feature pages** (phases ~12–13), not micro-feature rows:
 | Feature | Status | Phase (planned) | Canonical doc |
 |---------|--------|-----------------|---------------|
 | Merch funnel & storefront | Engineering ✅; operator checkout / Printify QA gates live Tier 1 | ~12 Partial | [`MERCH_FUNNEL_MVP.md`](MERCH_FUNNEL_MVP.md) |
-| Hosted steward tier | M8 code complete; production rollout nearly done | ~13 Partial | [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) |
-| Scan plain-language reader (L3 P1) | Shipped opt-in on scan | Fold into **scan-ui** or hub row | [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md) |
+| Hosted steward tier | M8 code complete; production rollout nearly done | ~13 Partial ✅ on feature map | [`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMPLEMENTATION_EPICS.md) |
+| Scan plain-language reader (L3 P1) | Shipped opt-in on scan | Folded into **scan-ui** limits | [`AI_L3_EXPLAIN_SNAPSHOT.md`](AI_L3_EXPLAIN_SNAPSHOT.md) |
 
 **Product spec note:** [`features/Storefront v1.0.md`](features/Storefront%20v1.0.md) header still says “Draft for Collective Ratification”; implementation status is ahead — see [`SHOP_TIER0_IMPLEMENTATION.md`](SHOP_TIER0_IMPLEMENTATION.md) and merch funnel doc.
 
@@ -103,10 +104,10 @@ Update status as steps complete.
 | **P0** | Generator staleness: test count label, scan-ui subline, device-hub copy (dot + hub + inbox), artifact-intent + card-types partial text, hub eyebrow (“What ships today”) | ✅ Done (2026-05-29) |
 | **P1** | Hub subsection **Device shell details** + `/help/` row; expand device-hub aspects for micro-features | ✅ Done (2026-05-29) |
 | **P1** | New feature page: **Merch funnel & QR customizer** (partial) | ✅ Done (2026-05-29) |
-| **P2** | New feature page: **Hosted steward tier** (partial, production-gated) | ☐ |
+| **P2** | New feature page: **Hosted steward tier** (partial, production-gated) | ✅ Done (2026-05-29) |
 | **P2** | README doc map + steward roadmap cross-links (this file, public hub URL) | ✅ Done (2026-05-29) |
 | **P2** | `/help/` link fix: status dot & inbox vs live-control protocol page | ✅ Done (2026-05-29) |
-| **P2** | Optional: scan-ui aspect for L3 plain-language reader | ☐ |
+| **P2** | Optional: scan-ui aspect for L3 plain-language reader | ✅ Done (2026-05-29) |
 
 ---
 
@@ -134,6 +135,16 @@ What P1 changed:
 - [x] New `/features/merch-funnel.html` (phase 12, partial)
 - [x] Expanded device-hub aspects (micro-features, resolver-confirmed alerts, dot vs live control)
 - [x] `/help/#device-shell` section; split status dot from live-control protocol link
+
+---
+
+## P2 checklist (reference)
+
+What P2 changed:
+
+- [x] New `/features/hosted-steward-tier.html` (phase 13, partial, production-gated)
+- [x] Hub **Site & returning users** row for hosted steward tier (ordered after studio blog)
+- [x] scan-ui limits aspect — opt-in **Plain language** reader (L3 P1), not signed truth
 
 ---
 

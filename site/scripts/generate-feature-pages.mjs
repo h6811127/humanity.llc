@@ -143,7 +143,7 @@ const FEATURES = [
       why: "Trust products fail when limits are buried. Scan separates card status, human trust, QR credential scope, live control, and vouch issuance  -  plus one “what this does not prove” panel.",
       design: "Flat status panel + iOS-style grouped lists; bearer warning on scan hero; revoked/suspended overrides hide positive verification badges. Machine-readable twin at <code>GET …/cards/{id}/status</code> matches HTML truth.",
       safety: "<strong>No scan analytics</strong> on the public page  -  resolver returns object state, not who scanned. Cache-Control: no-store on live scans.",
-      limits: "Scan UI is server-rendered; artifact-specific layouts are minimal in v1. Holding a printed QR still does not prove ownership.",
+      limits: "Scan UI is server-rendered; artifact-specific layouts are minimal in v1. Holding a printed QR still does not prove ownership. Optional <strong>Plain language</strong> reader (L3 P1): opt-in on scans with <code>public_snapshot</code> via <code>POST …/ai/explain-snapshot</code> — summary is not signed resolver truth.",
       future: "Activity stream merge rules on scan, offline/stale banners, role-specific templates for maintainers vs game operators.",
     },
   },
@@ -283,6 +283,23 @@ const FEATURES = [
       future: "Full story-row catalog (~50 SKUs), stranger wear funnel QA, order timeline UI for stewards.",
     },
   },
+  {
+    slug: "hosted-steward-tier",
+    phase: "13",
+    title: "Hosted steward tier",
+    icon: "shield",
+    iconTone: "blue",
+    lead: "Optional paid upgrade for stewards who want higher availability — not a paywalled identity product.",
+    subHtml: `<span class="ship-badge ship-badge-partial">Partial</span> M8 code in repo; <code>HOSTED_STEWARD_ENABLED</code> gates production routes`,
+    badge: "partial",
+    aspects: {
+      why: "The free reference tier caps automatic resolver polling (400 GET/day/device) so the public operator stays honest infrastructure. Stewards who choose hosted get server-mediated live-proof delivery, higher caps, and published SLAs — without scan analytics or purchased trust labels.",
+      design: "Client signs <code>steward_account_link_v1</code> → <code>POST …/steward/session</code> → <code>hc_steward_session</code>; entitlements probe raises poll caps; SSE <code>live_proof.pending</code> with <code>sw-live-proof.mjs</code> + tab polling fallback. Billing checkout returns <code>?hc_account_id=acc_…</code> to link account on device. Rollout: <code>hosted:rollout:step1</code>–<code>step6</code> · verify <code>npm run verify:hosted-g0</code>.",
+      safety: "Free tier unchanged when the flag is off — strangers create, scan, and revoke without accounts. Merch and commerce never grant <code>steward.hosted</code>. Metering counts infrastructure events, not who scanned. OS notifications remain <strong>live proof only</strong>.",
+      limits: "Production gated: G0 signed (Governance + Ops, 2026-05-27); Legal (G7) pending. Enable <code>HOSTED_STEWARD_ENABLED</code> only after secrets + regression per <code>docs/HOSTED_TIER_G0_READINESS.md</code>. Durable Object push fan-out (E4e) deferred.",
+      future: "Federation-ready entitlements per <code>operator_id</code>; org plans; native webhook relay reserved in push RFC.",
+    },
+  },
 ];
 
 /** Compact hub rows — micro-features (no full feature page). @see docs/FEATURE_MAP_MAINTENANCE.md */
@@ -332,7 +349,7 @@ const MICRO_FEATURES = [
 ];
 
 const PROTOCOL_PHASES = new Set(["0", "0.5", "1", "2", "3", "4", "5", "6", "7", "9"]);
-const SITE_SLUGS = ["device-hub", "studio-blog"];
+const SITE_SLUGS = ["device-hub", "studio-blog", "hosted-steward-tier"];
 const COMMERCE_SLUGS = ["merch-funnel", "artifact-intent"];
 
 function esc(s) {
@@ -448,7 +465,7 @@ function hubRow(f) {
 
 function renderHub() {
   const protocol = FEATURES.filter((f) => PROTOCOL_PHASES.has(f.phase));
-  const site = FEATURES.filter((f) => SITE_SLUGS.includes(f.slug));
+  const site = SITE_SLUGS.map((slug) => FEATURES.find((f) => f.slug === slug)).filter(Boolean);
   const commerce = FEATURES.filter((f) => COMMERCE_SLUGS.includes(f.slug));
   const microRows = MICRO_FEATURES.map((m) => hubLinkRow(m)).join("\n");
 
