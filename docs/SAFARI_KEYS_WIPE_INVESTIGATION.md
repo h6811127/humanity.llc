@@ -419,7 +419,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 |---|--------|-----------|
 | **P0b-1** | Re-verify **card disabled since visit** on fresh create (hub row) | R10 — **prod** false positive; no in-visit baseline seed; first baseline on exit snapshot | **Step 1 shipped** — automated R10 guard on `/` hub; step 2: prod re-verify on WebKit after deploy |
 | **P0b-2** | Setup wizard: **no auto-advance** on test scan when `window.open` new tab | R12 | **Shipped** — `created-setup.mjs` · `shouldAutoAdvanceSetupTestScan`; browser needs second Continue |
-| **P0b-3** | On scan, **auto-activate wallet row for signing** when exactly one signing row (mirror D10), not only default-vouch path | Stranger vouch without prior “Default for vouching” setup |
+| **P0b-3** | On scan, **auto-activate wallet row for signing** when exactly one signing row (mirror D10), not only default-vouch path | Stranger vouch without prior “Default for vouching” setup | **Shipped** — `vouch-scan-sole-signing-activate-core.mjs` · `e2e:vouch-scan-sole-signing` |
 
 ### P1 — Safari-native UX
 
@@ -489,7 +489,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | 7 | P0-4 Backup gate | **Shipped** | `created-first-session-gate-core.mjs`; setup required until seatbelt; wallet persists recovery markers; steward `#revoke` bypass gated |
 | 8 | P0b-1 Card disabled FP | **Step 1 shipped** | R10 — `mergeLastSeenFromNetworkMap` skips in-visit baseline seed; `card-disabled-fresh-create.test.ts` · E2E `device-os-wallet.spec.ts` |
 | 9 | P0b-2 Setup wizard scan tab | **Shipped** | R12 — `created-setup.mjs` · `pwa-scan-handoff-core.mjs` · `e2e/device-pwa-scan-handoff.spec.ts` |
-| 10 | P0b-3 Scan single-row auto-activate (stranger vouch) | Pending | Overlaps P1-1 |
+| 10 | P0b-3 Scan single-row auto-activate (stranger vouch) | **Shipped** | `vouch-scan-sole-signing-activate-core.mjs` · `e2e:vouch-scan-sole-signing` |
 
 **P0-1 spec (reference for reviewers):**
 

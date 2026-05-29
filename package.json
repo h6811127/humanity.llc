@@ -70,6 +70,7 @@
     "live-control:printed-qa:preflight": "node worker/scripts/live-control-printed-qa-preflight.mjs",
     "e2e:install": "playwright install chromium webkit",
     "e2e:safari": "playwright test e2e/safari-shell-scroll.spec.ts e2e/scan-cross-tab-banner-webkit.spec.ts",
+    "e2e:vouch-scan-sole-signing": "playwright test e2e/vouch-scan-sole-signing.spec.ts",
     "e2e:scan-page-dot": "playwright test e2e/scan-page-dot.spec.ts",
     "e2e:scan-hero-visual": "playwright test e2e/scan-hero-visual.spec.ts",
     "e2e:scan-hero-visual:webkit": "playwright test e2e/scan-hero-visual.spec.ts --project=webkit --project=iphone-13-pro",

@@ -48,7 +48,8 @@ Today, a **new tab** on `/`, `/wallet/`, or `/create/` can show cross-tab / “t
 
 - Auto-save to wallet after create (`device-auto-save.mjs`)
 - `/created/?profile_id=…` wallet activate (`created.mjs`)
-- Vouch-ready scan auto-activate (`vouch-ready-keys.mjs`, opt-in)
+- Vouch-ready scan auto-activate (`vouch-ready-keys.mjs`, opt-in default only)
+- Scan vouch sole-row path (P0b-3): `tryAutoActivateSoleSigningWalletForVouch` + `trySoleSigningRowRehydrateForScan` when tab has no keys
 
 ---
 
