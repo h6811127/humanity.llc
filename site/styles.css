@@ -5310,6 +5310,10 @@ a.shop-hub-cta[aria-disabled="true"] {
   margin: 0 0 16px;
 }
 
+.shop-customize-checkout[hidden] {
+  display: none !important;
+}
+
 .shop-customize-interest {
   margin-top: 8px;
   padding-top: 16px;

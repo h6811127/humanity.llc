@@ -438,6 +438,8 @@ function showCardReady(session) {
     handleEl.textContent = session.handle ? `@${session.handle}` : session.profile_id.slice(0, 12);
   }
   renderProductPicker();
+  const product = selectedProduct();
+  if (product) syncCheckoutUi(product);
   void refreshPreview();
 }
 

@@ -75,6 +75,7 @@
     "e2e:keys-custody": "playwright test e2e/device-os-wallet.spec.ts -g \"keys custody\" e2e/keys-custody-emphasis-webkit.spec.ts",
     "e2e:keys-custody:webkit": "playwright test e2e/keys-custody-emphasis-webkit.spec.ts --project=webkit --project=iphone-13-pro",
     "worker:test:keys-custody": "vitest run worker/tests/device-keys-custody-html.test.ts worker/tests/device-keys-custody-core.test.ts worker/tests/device-emphasis-card-html.test.ts",
+    "worker:test:comprehension": "vitest run worker/tests/comprehension-copy-guards.test.ts worker/tests/device-ownership-copy-core.test.ts worker/tests/scan.test.ts -t \"comprehension|H-002|does not prove\"",
     "worker:test:pwa-install": "vitest run worker/tests/pwa-install-metadata.test.ts worker/tests/pwa-install-ux.test.ts worker/tests/pwa-standalone-refresh-core.test.ts",
     "e2e:pwa-install": "playwright test e2e/device-pwa-install.spec.ts",
     "worker:test:lazy-shell": "vitest run worker/tests/device-status-lazy-inbox.test.ts worker/tests/device-status-lazy-notifications.test.ts worker/tests/device-status-shell-modules.test.ts",
@@ -103,7 +104,8 @@
     "merch-funnel:rollout:step6": "node worker/scripts/merch-funnel-rollout-step6.mjs",
     "merch-funnel:rollout:complete": "node worker/scripts/merch-funnel-rollout-complete.mjs",
     "merch-funnel:rollout:post-deploy": "node worker/scripts/merch-funnel-rollout-post-deploy.mjs",
-    "e2e:merch-funnel": "playwright test e2e/merch-funnel-customize.spec.ts e2e/merch-funnel-checkout.spec.ts e2e/shop-product-detail.spec.ts"
+    "e2e:merch-checkout-sad-path": "playwright test e2e/merch-checkout-sad-path.spec.ts",
+    "e2e:merch-funnel": "playwright test e2e/merch-funnel-customize.spec.ts e2e/merch-funnel-checkout.spec.ts e2e/merch-checkout-sad-path.spec.ts e2e/shop-product-detail.spec.ts"
   },
   "dependencies": {
     "@noble/ed25519": "^2.3.0",

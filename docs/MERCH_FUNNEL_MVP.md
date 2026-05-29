@@ -225,7 +225,8 @@ npm run merch-funnel:verify-config -- --require-checkout   # CI when Tier 1 goes
 | `merch-funnel:verify-exit:fast` | Step 6 `--preflight` only (no Playwright) |
 | `worker:test:merch-funnel` | Ref helpers, config validation, customize core, paid webhook → mint, production route guard |
 | `merch-funnel:verify-config` | Operator readiness of `site/data/shop-config.json` Tier 1 block |
-| `e2e:merch-funnel` | Create → customize; checkout handoff; **Glitch PDP** (`shop-product-detail`) — stubs `__HC_E2E_SHOP_CONFIG__` + store API on `:8787` |
+| `e2e:merch-funnel` | Create → customize; checkout handoff; sad-path gate (M1–M2); **Glitch PDP** (`shop-product-detail`) — stubs `__HC_E2E_SHOP_CONFIG__` + store API on `:8787` |
+| `e2e:merch-checkout-sad-path` | Card gate + checkout-closed UX only — [`MERCH_CHECKOUT_SAD_PATH_MATRIX.md`](MERCH_CHECKOUT_SAD_PATH_MATRIX.md) |
 
 **E2E notes:** Customizer preview requires protocol-valid `profile_id` / `qr_id` (see `qr-scan-url-lock.mjs`). Playwright `page.route('**/v1/...')` does not match `http://127.0.0.1:8787/...` — use `/artifact-intents/` or start `worker:dev`. Cross-origin Shopify popups: assert `window.__HC_E2E_LAST_CHECKOUT_URL` (see `merch-funnel-checkout.spec.ts`).
 
@@ -238,6 +239,7 @@ npm run merch-funnel:verify-config -- --require-checkout   # CI when Tier 1 goes
 | [`MERCH_LED_V1.md`](MERCH_LED_V1.md) | Curiosity + belonging strategy |
 | [`MERCH_HEADLESS_COMMERCE.md`](MERCH_HEADLESS_COMMERCE.md) | Shopify + Printify operator wiring |
 | [`MERCH_PHYSICAL_QA_RUNBOOK.md`](MERCH_PHYSICAL_QA_RUNBOOK.md) | Printed artifact scan QA |
+| [`MERCH_CHECKOUT_SAD_PATH_MATRIX.md`](MERCH_CHECKOUT_SAD_PATH_MATRIX.md) | Sad-path inventory before live Tier 1 checkout |
 | [`AI_FEATURE_DEVELOPMENT.md`](AI_FEATURE_DEVELOPMENT.md) | Optional scan reader only |
 | [`EPHEMERAL_STATE_AND_MERCH.md`](EPHEMERAL_STATE_AND_MERCH.md) | Same ink / new meaning — Tier 1 owner UX |
 | [`V1_IMPLEMENTATION_BACKLOG.md`](V1_IMPLEMENTATION_BACKLOG.md) | O-002 Printify adapter |

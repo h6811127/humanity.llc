@@ -40,6 +40,7 @@ function printRegressionChecklist() {
   console.log("\nE2E includes:");
   console.log("  • e2e/merch-funnel-customize.spec.ts");
   console.log("  • e2e/merch-funnel-checkout.spec.ts");
+  console.log("  • e2e/merch-checkout-sad-path.spec.ts (M1–M2 gate + checkout closed)");
   console.log("  • e2e/shop-product-detail.spec.ts (Glitch drop + hub CTA)");
   console.log("\nOperator-only (not replaced by step 6):");
   console.log("  npm run merch-funnel:rollout:step5 -- --verify   # digital production gate");

@@ -28,7 +28,7 @@ Use it when prioritizing hardening before launch surfaces (live proof in person,
 | Generic create → scan → revoke (strangers) | **Passed** 2026-05-27 | [`M5_STRANGER_TEST_RUNBOOK.md`](M5_STRANGER_TEST_RUNBOOK.md) |
 | Live proof infra errors (1101, poll retry) | **Shipped** H-01–H-03 | [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) |
 | Live proof in-person handoff | **H-04–H-10 shipped** (scanner recovery H-09/H-10: 2026-05-29); **H-13–H-15 engineering shipped** (2026-05-29); H-11–H-12 human QA open | [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) |
-| Merch checkout sad paths | **Mostly untested** with real money | [`V1_ASSUMPTION_REGISTER.md`](V1_ASSUMPTION_REGISTER.md) A-001–A-004 |
+| Merch checkout sad paths | **Matrix + automated M1–M8** (2026-05-29); live payment + physical QA open | [`MERCH_CHECKOUT_SAD_PATH_MATRIX.md`](MERCH_CHECKOUT_SAD_PATH_MATRIX.md) |
 | Large wallet / power user | **Mitigated** Phases 7–9; still out of spec at ~10+ roots | [`DEVICE_OS_REQUEST_BUDGET.md`](DEVICE_OS_REQUEST_BUDGET.md) § Open issues |
 | Social / trust misunderstanding | **Copy exists**; comprehension not fully re-run | [`V1_PRODUCT_TRUST_MODEL.md`](V1_PRODUCT_TRUST_MODEL.md) |
 
@@ -100,6 +100,8 @@ Documented out of spec in [`KEYS_CARDS_AND_VERIFICATION.md`](KEYS_CARDS_AND_VERI
 
 ### 5. Commerce / merch (pre–live checkout)
 
+Canonical matrix: [`MERCH_CHECKOUT_SAD_PATH_MATRIX.md`](MERCH_CHECKOUT_SAD_PATH_MATRIX.md).
+
 From [`V1_ASSUMPTION_REGISTER.md`](V1_ASSUMPTION_REGISTER.md) and merch docs:
 
 - Checkout without `/shop/customize/` → missing metadata → held for review
@@ -107,7 +109,7 @@ From [`V1_ASSUMPTION_REGISTER.md`](V1_ASSUMPTION_REGISTER.md) and merch docs:
 - Buyer expects calendar expiry vs **revoke** (comprehension)
 - Physical QR scan reliability after Printify (A-004 — physical QA)
 
-M5 passed **without** live Tier 1 checkout. Do not enable `checkout_open` until merch sad-path matrix exists.
+M5 passed **without** live Tier 1 checkout. Engineering matrix shipped — see [`MERCH_CHECKOUT_SAD_PATH_MATRIX.md`](MERCH_CHECKOUT_SAD_PATH_MATRIX.md). Do not enable `checkout_open` until operator physical QA + `merch-funnel:verify-config -- --require-checkout`.
 
 ### 6. Scan / link sharing
 
@@ -160,7 +162,7 @@ No unit test fully catches **acting** on a misunderstanding.
 | **P0** | Live proof scanner recovery | **H-09 + H-10** — sessionStorage resume + expiry retry UX | **Shipped** 2026-05-29 |
 | **P0** | Live proof comprehension | Execute H-11 / H-12 runbooks with ≥5 strangers | Product / QA |
 | **P1** | Key-loss paths | Audit first-run gates; no new recovery without trust-model change | Product copy |
-| **P1** | Merch checkout | Sad-path matrix before `checkout_open: true` | Engineering + Ops |
+| **P1** | Merch checkout | **Matrix shipped** — operator physical QA + live payment before `checkout_open: true` | Engineering + Ops |
 | **P2** | Large wallet guardrails | Soft cap UX when ≥10 saved roots | Shell |
 | **P2** | Scan URL hints | “Add `?q=qr_…`” vs “profile not found” | Resolver copy |
 | **P2** | H-13 full-loop E2E | `e2e/live-control-loop.spec.ts` | **Shipped** 2026-05-29 |
@@ -183,6 +185,10 @@ No unit test fully catches **acting** on a misunderstanding.
 | **S10** | **Scan refresh resumes live proof wait (H-09)** | `worker/tests/scan.test.ts` · `e2e/live-control-loop.spec.ts` |
 | **S11** | **Challenge expiry shows retry copy (H-10)** | `worker/tests/scan.test.ts` · `e2e/live-control-loop.spec.ts` |
 | **S12** | **Full live proof loop ask → proven (H-13)** | `e2e/live-control-loop.spec.ts` |
+| **S13** | **Customize without card session (M1)** | `e2e/merch-checkout-sad-path.spec.ts` |
+| **S14** | **Checkout closed interest UX (M2)** | Same |
+| **S15** | **Proof consent + recovery gate (M3–M4)** | `e2e/merch-funnel-checkout.spec.ts` |
+| **S16** | **Webhook held without metadata (M6)** | `worker/tests/shopify-orders-webhook.test.ts` |
 
 Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH_QA_2026-05-26.md) § Recommended test matrix.
 
@@ -206,5 +212,6 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 
 | Date | Notes |
 |------|-------|
+| 2026-05-29 | Merch sad-path matrix + M1–M2 E2E (`MERCH_CHECKOUT_SAD_PATH_MATRIX.md`) |
 | 2026-05-29 | Slice E shipped: H-13 `e2e/live-control-loop.spec.ts` |
 | 2026-05-29 | Initial inventory from sad-path review; Slice D (H-09, H-10) shipped |
