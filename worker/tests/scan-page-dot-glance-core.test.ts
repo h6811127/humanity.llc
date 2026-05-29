@@ -78,4 +78,28 @@ describe("scanPageDotAriaLabel", () => {
       })
     ).toBe("Your device: steward control ready in this tab. Tap for details.");
   });
+
+  it("distinguishes wallet saved from tab signing (P0-5)", () => {
+    expect(
+      scanPageDotAriaLabel({
+        networkResolved: true,
+        online: true,
+        network: "ok",
+        device: "none",
+        overlay: "none",
+        walletKeysNotInTab: true,
+      })
+    ).toBe(
+      "Your device: ownership saved on device, not in this tab. Tap for details."
+    );
+    expect(
+      scanPageDotAriaLabel({
+        networkResolved: true,
+        online: true,
+        network: "ok",
+        device: "keys",
+        overlay: "none",
+      })
+    ).toBe("Your device: ownership saved in this tab. Tap for details.");
+  });
 });

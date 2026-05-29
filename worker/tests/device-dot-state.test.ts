@@ -20,7 +20,9 @@ import {
   shouldCelebrateStewardTransition,
   dotTransitionKey,
   statusAriaLabel,
+  scanDeviceStateFromContext,
   scanOverlayQuickAction,
+  scanWalletKeysNotInTab,
 } from "../../site/js/device-dot-state-core.mjs";
 
 describe("hasStewardVerification", () => {
@@ -64,6 +66,40 @@ describe("deviceStateFromContext", () => {
         savedWalletCount: 0,
       })
     ).toBe("none");
+  });
+});
+
+describe("scanDeviceStateFromContext", () => {
+  it("uses tab signing keys, not wallet row count (P0-5)", () => {
+    expect(
+      scanDeviceStateFromContext({
+        unsavedTabKeys: false,
+        stewardReady: true,
+        hasTabSigningKeys: false,
+      })
+    ).toBe("none");
+    expect(
+      scanDeviceStateFromContext({
+        unsavedTabKeys: false,
+        stewardReady: true,
+        hasTabSigningKeys: true,
+      })
+    ).toBe("steward");
+    expect(
+      scanDeviceStateFromContext({
+        unsavedTabKeys: false,
+        stewardReady: false,
+        hasTabSigningKeys: true,
+      })
+    ).toBe("keys");
+  });
+});
+
+describe("scanWalletKeysNotInTab", () => {
+  it("is true when wallet has signing rows but tab does not", () => {
+    expect(scanWalletKeysNotInTab(1, false)).toBe(true);
+    expect(scanWalletKeysNotInTab(1, true)).toBe(false);
+    expect(scanWalletKeysNotInTab(0, false)).toBe(false);
   });
 });
 
@@ -228,6 +264,19 @@ describe("describeDotState", () => {
       stewardReady: true,
     });
     expect(steward.next).toContain("Scroll to vouch");
+  });
+
+  it("honest scan copy when wallet has keys but tab cannot sign (P0-5)", () => {
+    const savedNotInTab = describeDotState("ok", "none", "none", {
+      pageKind: "scan",
+      walletKeysNotInTab: true,
+    });
+    expect(savedNotInTab.now).toBe("Ownership not in this tab.");
+    expect(savedNotInTab.why).toContain("saved on this device");
+    expect(savedNotInTab.action).toEqual({
+      kind: "scan_use_keys_here",
+      label: "Restore control here",
+    });
   });
 });
 
