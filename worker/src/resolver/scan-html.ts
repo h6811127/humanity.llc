@@ -100,6 +100,9 @@ export async function renderScanPage(
   <div class="page scan-page">
     ${renderScanPageChrome(origin)}
     <div class="scan-cross-tab-banner" id="scan-cross-tab-banner" role="status" hidden></div>
+    <div class="scan-steward-preview-return" id="scan-steward-preview-return" hidden>
+      <a id="scan-steward-preview-return-link" class="scan-steward-preview-return-link" href="#">Back</a>
+    </div>
     <p class="scan-offline-banner" id="scan-offline-banner" role="status" hidden>${escapeHtml(SCAN_OFFLINE_BANNER_TEXT)}</p>
     <main class="screen scan-screen">
       ${renderScanHeroSection(vm, safety, origin, qrMarkup)}
@@ -121,6 +124,7 @@ export async function renderScanPage(
   ${renderScanActorBandScript(vm, origin)}
   ${renderScanAiExplainScript(vm, origin)}
   ${renderScanMerchFunnelScript(origin)}
+  ${renderScanStewardPreviewReturnScript(origin)}
 </body>
 </html>`;
 }
@@ -1097,6 +1101,12 @@ function renderScanLiveCheckArriveScript(origin: string): string {
 function renderScanMerchFunnelScript(origin: string): string {
   const assetOrigin = pagesJsOrigin(origin);
   const mod = JSON.stringify(`${assetOrigin}/js/scan-merch-funnel.mjs?v=2`);
+  return `<script type="module" src=${mod}></script>`;
+}
+
+function renderScanStewardPreviewReturnScript(origin: string): string {
+  const assetOrigin = pagesJsOrigin(origin);
+  const mod = JSON.stringify(`${assetOrigin}/js/scan-steward-preview-return.mjs?v=1`);
   return `<script type="module" src=${mod}></script>`;
 }
 

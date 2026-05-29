@@ -12,10 +12,10 @@ import { markSetupDone } from "./created-mode.mjs";
 import { stewardFocusKeyFromHash } from "./created-tabs.mjs";
 import { SETUP_STEP_IDS, setupStepIndexFromHash } from "./created-setup-hash.mjs";
 import {
-  openStewardScanPreview,
   shouldAutoAdvanceSetupTestScan,
   stewardScanOpenedFeedback,
 } from "./pwa-scan-handoff-core.mjs";
+import { openStewardScanPreviewFromWindow } from "./pwa-scan-handoff.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 
 const STEPS = SETUP_STEP_IDS;
@@ -222,7 +222,7 @@ export function initCreatedSetup(opts) {
         return;
       }
       const standalone = readStandaloneModeFromWindow(window);
-      if (!openStewardScanPreview(url, { standalone, navigation: location })) {
+      if (!openStewardScanPreviewFromWindow(url, { setupWizard: true })) {
         showFeedback("Scan link is not ready yet.", true);
         return;
       }
@@ -300,7 +300,7 @@ export function initCreatedSetup(opts) {
       return;
     }
     const standalone = readStandaloneModeFromWindow(window);
-    if (!openStewardScanPreview(url, { standalone, navigation: location })) {
+    if (!openStewardScanPreviewFromWindow(url, { setupWizard: true })) {
       showFeedback("Scan link is not ready yet.", true);
       return;
     }

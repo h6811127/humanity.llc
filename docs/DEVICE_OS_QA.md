@@ -525,7 +525,7 @@ Automated (when shipped): `npm run worker:test -- worker/tests/pwa-standalone-re
 |------|--------|----------|
 | 1 | Installed PWA → `/create/` → complete create | Lands on `/created/?fresh=1` setup wizard **inside PWA** |
 | 2 | Advance to **Test scan** → tap test / continue | Scan opens **in PWA** (no Safari chrome switch) |
-| 3 | System back / swipe back | Returns to setup wizard; standalone does **not** auto-skip test step |
+| 3 | System back / swipe back **or tap return banner** | Returns to setup wizard; standalone shows **← Back to setup** when `hc_return` present |
 | 4 | Complete setup → hub **Open scan** on saved card | Same-tab in standalone; new tab in Safari browser |
 | 5 | Browser tab (not installed) → repeat step 2 | Still opens **new tab** (regression guard) |
 | 6 | Wallet pin row | Same as step 4; subtitle omits “new tab” in standalone |

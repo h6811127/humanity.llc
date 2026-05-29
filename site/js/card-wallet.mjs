@@ -23,6 +23,7 @@ import {
   walletEntrySubtitle,
 } from "./device-wallet.mjs";
 import { stewardScanLinkHtmlAttrs, stewardScanPinListSub } from "./pwa-scan-handoff-core.mjs";
+import { buildStewardScanPreviewHrefFromWindow } from "./pwa-scan-handoff.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 
 function escapeHtml(s) {
@@ -99,7 +100,7 @@ function renderPinList() {
     li.innerHTML = `
       <a
         class="wallet-card-main wallet-pin-open"
-        href="${escapeHtml(pin.scan_url)}"${scanLinkAttrs}
+        href="${escapeHtml(buildStewardScanPreviewHrefFromWindow(pin.scan_url))}"${scanLinkAttrs}
       >
         <span class="list-icon list-icon-tone-gold" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>

@@ -179,6 +179,7 @@ import {
   visibleSummaryRowWindow,
 } from "./device-hub-visible-rows-core.mjs";
 import { stewardScanLinkHtmlAttrs } from "./pwa-scan-handoff-core.mjs";
+import { buildStewardScanPreviewHrefFromWindow } from "./pwa-scan-handoff.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 
 const COLLAPSED_SAVED_ROW_PREVIEW_LIMIT = 3;
@@ -196,6 +197,10 @@ function escapeHtml(s) {
 
 function stewardScanAnchorAttrs() {
   return stewardScanLinkHtmlAttrs(readStandaloneModeFromWindow(window));
+}
+
+function stewardScanHref(scanUrl) {
+  return buildStewardScanPreviewHrefFromWindow(scanUrl);
 }
 
 function walletHaystack(entry) {
@@ -1330,7 +1335,7 @@ function buildHubChildObjectRowElement(parentEntry, childRow, ctx) {
 
   const actionData = `data-profile-id="${escapeHtml(String(parentEntry.profile_id ?? ""))}" data-child-object-id="${escapeHtml(String(childRow.object_id ?? ""))}"`;
   const scanAction = scanUrl
-    ? `<a class="hub-card-action hub-open-scan" href="${escapeHtml(scanUrl)}"${stewardScanAnchorAttrs()}>Open scan</a>`
+    ? `<a class="hub-card-action hub-open-scan" href="${escapeHtml(stewardScanHref(scanUrl))}"${stewardScanAnchorAttrs()}>Open scan</a>`
     : "";
   const actionsHtml =
     ctx.fullRows || ctx.expandedRows
@@ -1545,7 +1550,7 @@ function renderSavedRows(opts = {}) {
           </div>
           <div class="hc-emphasis-card__actions hub-card-status-alert-actions">
             <button type="button" class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary hub-card-alert-dismiss">Got it</button>
-            <a class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary hub-card-alert-view-scan" href="${escapeHtml(scan)}"${stewardScanAnchorAttrs()}>View scan</a>
+            <a class="hc-emphasis-card__cta hc-emphasis-card__cta--secondary hub-card-alert-view-scan" href="${escapeHtml(stewardScanHref(scan))}"${stewardScanAnchorAttrs()}>View scan</a>
           </div>
         </div>`
       : "";
@@ -1557,7 +1562,7 @@ function renderSavedRows(opts = {}) {
       ? `<div class="hub-card-actions">
         <div class="hub-card-actions-primary">
           <button type="button" class="hub-card-action hub-use-keys" ${actionData} title="Load saved ownership into this tab, then open your card page">Open controls</button>
-          <a class="hub-card-action hub-open-scan" href="${escapeHtml(scan)}"${stewardScanAnchorAttrs()}>Open scan</a>
+          <a class="hub-card-action hub-open-scan" href="${escapeHtml(stewardScanHref(scan))}"${stewardScanAnchorAttrs()}>Open scan</a>
         </div>
       </div>`
       : "";
@@ -1925,7 +1930,7 @@ function renderPinRows() {
       ? `${pin.profile_id.slice(0, 10)}… · opens scan`
       : `${pin.profile_id.slice(0, 14)}… · card scan`;
     li.innerHTML = `
-      <a href="${escapeHtml(pin.scan_url)}"${scanLinkAttrs}>
+      <a href="${escapeHtml(stewardScanHref(pin.scan_url))}"${scanLinkAttrs}>
         <span class="list-icon list-icon-tone-gold" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
         </span>

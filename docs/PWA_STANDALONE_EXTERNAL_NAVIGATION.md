@@ -1,6 +1,6 @@
 # PWA standalone — external navigation & new-tab gaps
 
-**Status:** P1 shipped (2026-05-29) — standalone scan handoff · P2 return banner open  
+**Status:** P1 + **P2 shipped** (2026-05-29) — standalone scan handoff + return banner on scan  
 **Audience:** Product, frontend, QA  
 **Related:** [`PWA_INSTALL.md`](PWA_INSTALL.md) · [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) · [`CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md`](CROSS_TAB_KEYS_NOTIFICATION_SYSTEM.md) · [`QUIET_TAB_REHYDRATE.md`](QUIET_TAB_REHYDRATE.md) · [`shop-checkout-handoff.mjs`](../site/js/shop-checkout-handoff.mjs) · [`DEVICE_OS_QA.md`](DEVICE_OS_QA.md)
 
@@ -136,9 +136,9 @@ openStewardScanPreview(url, { navigation, standalone })
 
 ---
 
-### P2 — Return URL banner on scan (steward preview mode)
+### P2 — Return URL banner on scan (steward preview mode) — **shipped**
 
-**Idea:** Before same-tab navigate, set `sessionStorage.hc_steward_preview_return` (or query `?hc_return=…` encoded path) to the current `/created/` URL including setup hash. Scan HTML (Worker template or client boot) shows a slim **“← Back to setup”** bar when return URL is present and user is not a stranger-only session.
+**Idea:** Before same-tab navigate, set `sessionStorage.hc_steward_preview_return` (or query `?hc_return=…` encoded path) to the current `/created/` URL including setup hash. Scan HTML shows a slim **“← Back to setup”** bar when return URL is present and validates as same-origin steward path.
 
 **Composes with P1** — does not replace it.
 
@@ -193,7 +193,7 @@ openStewardScanPreview(url, { navigation, standalone })
 
 1. **Ship P1** — standalone-aware scan handoff + setup step behavior tweak + Vitest contract tests (`pwa-scan-handoff-core.mjs` or extend `shop-checkout-handoff` pattern).
 2. **Add P1-PWA-N manual QA** (below) and one Playwright case with `display-mode: standalone` emulation opening test scan from `/created/?fresh=1`.
-3. **Evaluate P2** after dogfood — if stewards still miss Back, add return banner on scan.
+3. **Evaluate P2** after dogfood — if stewards still miss Back, add return banner on scan. **Shipped 2026-05-29:** `hc_return` query + `scan-steward-preview-return.mjs` banner on scan pages.
 4. **Optional P4** — soften install prompt until first setup complete (product call).
 5. **Do not** pursue P3 unless stranger-path parity requires identical pixels in wizard.
 
@@ -251,3 +251,4 @@ Update [`CARD_WORKSPACE_UX.md`](CARD_WORKSPACE_UX.md) § Manual QA step 3 when P
 |------|--------|
 | 2026-05-29 | Initial investigation — inventory, impact matrix, proposals P1–P5 |
 | 2026-05-29 | **P1 shipped** — `pwa-scan-handoff-core.mjs` wired at setup, dashboard, hub, wallet pins, child-object scan links |
+| 2026-05-29 | **P2 shipped** — `hc_return` param, sessionStorage fallback, scan return banner + `scan-steward-preview-return.mjs` |

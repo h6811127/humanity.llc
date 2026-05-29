@@ -41,10 +41,8 @@ import { initCreatedMerchFunnel } from "./created-merch-funnel.mjs";
 import { initCreatedChildObject } from "./created-child-object.mjs";
 import { initCreatedLostItemRelay } from "./created-child-object-lost-item.mjs";
 import { initCreatedSetup } from "./created-setup.mjs";
-import {
-  applyStewardScanLinkElement,
-  openStewardScanPreview,
-} from "./pwa-scan-handoff-core.mjs";
+import { applyStewardScanLinkElement } from "./pwa-scan-handoff-core.mjs";
+import { openStewardScanPreviewFromWindow } from "./pwa-scan-handoff.mjs";
 import { readStandaloneModeFromWindow } from "./pwa-standalone-refresh-core.mjs";
 import {
   applyCreatedWorkspaceMode,
@@ -1011,7 +1009,7 @@ if (activeScanUrl) {
       e.preventDefault();
       const standalone = readStandaloneModeFromWindow(window);
       if (standalone) {
-        openStewardScanPreview(activeScanUrl, { standalone, navigation: location });
+        openStewardScanPreviewFromWindow(activeScanUrl);
         return;
       }
       if (openScanBtn.getAttribute("target") === "_blank") return;
