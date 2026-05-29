@@ -85,6 +85,7 @@
     "worker:test:first-session-gate": "vitest run worker/tests/created-first-session-gate-core.test.ts worker/tests/created-mode.test.ts",
     "worker:test:view-only-restore": "vitest run worker/tests/created-view-only-copy-core.test.ts worker/tests/created-view-live-core.test.ts worker/tests/created-view-mode-core.test.ts worker/tests/key-loss-copy-guards.test.ts -t \"K1|view-only|Live tab|viewOnly|created-view|read-only\"",
     "worker:test:hub-restore-always": "vitest run worker/tests/device-hub-restore-always.test.ts worker/tests/device-hub-header-html.test.ts worker/tests/device-hub-stranger-empty-core.test.ts",
+    "worker:test:ownership-not-in-tab": "vitest run worker/tests/device-ownership-not-in-tab-core.test.ts worker/tests/device-ownership-restore-in-tab-core.test.ts worker/tests/device-hub-keys-custody-core.test.ts worker/tests/wallet-tab-hint-chrome.test.ts worker/tests/created-view-only-copy-core.test.ts worker/tests/device-dot-state.test.ts -t \"P1-2|wallet-not-in-tab|walletOwnershipNotInTab|restoreInTab|viewOnlyLive\"",
     "worker:test:vouch-scan-sole-activate": "vitest run worker/tests/vouch-scan-sole-signing-activate-core.test.ts worker/tests/device-quiet-tab-rehydrate.test.ts",
     "worker:test:sheet-backdrop": "vitest run worker/tests/device-sheet-backdrop-sync.test.ts worker/tests/device-safe-rebuild-tripwires.test.ts",
     "worker:test:hosted-billing-return": "vitest run worker/tests/export-e2e-test-keypair.test.ts worker/tests/device-steward-billing-return-core.test.ts worker/tests/device-steward-session.test.ts",

@@ -6,12 +6,18 @@ import { describe, expect, it } from "vitest";
 
 import {
   viewOnlyLiveTabLead,
+  viewOnlyLiveTabRestoreLabel,
+  viewOnlyLiveTabTitle,
   viewOnlyManageTabLead,
   viewOnlyNoSessionDetailHtml,
   viewOnlyRestoreLead,
   viewOnlyWalletBranch,
 } from "../../site/js/created-view-only-copy-core.mjs";
-import { VIEW_ONLY_LIVE_TAB_LEAD } from "../../site/js/device-ownership-copy-core.mjs";
+import {
+  OWNERSHIP_NOT_IN_TAB_PROMPT,
+  RESTORE_CONTROL_IN_THIS_TAB,
+  VIEW_ONLY_LIVE_TAB_LEAD,
+} from "../../site/js/device-ownership-copy-core.mjs";
 
 describe("created-view-only-copy-core", () => {
   it("branches on wallet signing row count", () => {
@@ -32,6 +38,14 @@ describe("created-view-only-copy-core", () => {
     expect(viewOnlyLiveTabLead(0)).toBe(VIEW_ONLY_LIVE_TAB_LEAD);
     expect(VIEW_ONLY_LIVE_TAB_LEAD).toMatch(/read-only|Read-only/i);
     expect(VIEW_ONLY_LIVE_TAB_LEAD).toMatch(/Manage|restore/i);
+  });
+
+  it("Live tab banner uses P1-2 restore prompt when wallet saved (step 2)", () => {
+    expect(viewOnlyLiveTabTitle(1)).toBe(OWNERSHIP_NOT_IN_TAB_PROMPT);
+    expect(viewOnlyLiveTabLead(1)).toMatch(/saved on this device/i);
+    expect(viewOnlyLiveTabRestoreLabel(1)).toBe(RESTORE_CONTROL_IN_THIS_TAB);
+    expect(viewOnlyLiveTabTitle(0)).toBe("View only in this tab");
+    expect(viewOnlyLiveTabRestoreLabel(0)).toBe("Restore ownership");
   });
 
   it("wallet saved copy points to Open controls / restore in this tab", () => {

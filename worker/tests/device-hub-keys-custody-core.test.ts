@@ -50,6 +50,18 @@ describe("buildHubKeysCustodyPanel", () => {
     ]);
   });
 
+  it("shows wallet-not-in-tab restore row when saved keys exist but tab is empty (P1-2)", () => {
+    const state = buildHubKeysCustodyPanel({
+      tabNoticeCount: 0,
+      hasActiveKeys: false,
+      walletEntriesWithKeys: 1,
+      educationDismissed: true,
+    });
+    expect(state.rows.map((r) => r.kind)).toEqual(["wallet_not_in_tab"]);
+    expect(state.rows[0].title).toBe("Ownership not in this tab — tap to restore");
+    expect(state.visible).toBe(true);
+  });
+
   it("shows orphan rows per tab and suppresses cross-tab when tab unsaved", () => {
     const state = buildHubKeysCustodyPanel({
       tabNoticeCount: 1,
@@ -103,13 +115,13 @@ describe("buildHubKeysCustodyPanel", () => {
     expect(state.rows[1].title).toContain("PIN");
   });
 
-  it("nudges default vouch when multiple saved cards and idle", () => {
+  it("prefers wallet-not-in-tab over vouch nudge when tab empty (P1-2)", () => {
     const state = buildHubKeysCustodyPanel({
       walletEntriesWithKeys: 3,
       educationDismissed: true,
     });
-    expect(state.rows.map((r) => r.kind)).toEqual(["vouch_nudge"]);
-    expect(state.rows[0].subtitle).toContain("3 saved objects");
+    expect(state.rows.map((r) => r.kind)).toEqual(["wallet_not_in_tab"]);
+    expect(state.rows.some((r) => r.kind === "vouch_nudge")).toBe(false);
   });
 
   it("suppresses vouch nudge when cross-tab notice is active", () => {

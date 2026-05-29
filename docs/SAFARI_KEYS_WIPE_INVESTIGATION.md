@@ -425,8 +425,8 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 
 | # | Change | Rationale |
 |---|--------|-----------|
-| **P1-1** | Scan: if exactly one wallet signing row, auto-activate like quiet rehydrate (same gates as D10) | Passkey-like scan flow |
-| **P1-2** | Prominent **Keys not in this tab — tap to restore** when wallet has keys but session empty (all surfaces) | Replace protocol jargon |
+| **P1-1** | Scan: if exactly one wallet signing row, auto-activate like quiet rehydrate (same gates as D10) | Passkey-like scan flow | **Shipped** — P0-1 `scan-tab-keys.mjs` + P0b-3 vouch sole-row path |
+| **P1-2** | Prominent **Ownership not in this tab — tap to restore** when wallet has keys but session empty (all surfaces) | **Shipped** — hub · landing dot · `/wallet/` tab hint · view-only `/created/` Live banner · scan actor band |
 | **P1-3** | PWA scan handoff: ensure all scan entry points use same-tab in standalone ([`PWA_STANDALONE_EXTERNAL_NAVIGATION.md`](PWA_STANDALONE_EXTERNAL_NAVIGATION.md) P1) | Fixes R5 |
 | **P1-4** | On `loadWallet` parse failure, show **corrupt wallet** coach card with export/import links — not empty hub | Fixes R7 |
 
@@ -490,6 +490,7 @@ Enable inbox diagnostics: `localStorage.hc_inbox_diagnostics = "1"` → read `se
 | 8 | P0b-1 Card disabled FP | **Step 1 shipped** | R10 — `mergeLastSeenFromNetworkMap` skips in-visit baseline seed; `card-disabled-fresh-create.test.ts` · E2E `device-os-wallet.spec.ts` |
 | 9 | P0b-2 Setup wizard scan tab | **Shipped** | R12 — `created-setup.mjs` · `pwa-scan-handoff-core.mjs` · `e2e/device-pwa-scan-handoff.spec.ts` |
 | 10 | P0b-3 Scan single-row auto-activate (stranger vouch) | **Shipped** | `vouch-scan-sole-signing-activate-core.mjs` · `e2e:vouch-scan-sole-signing` |
+| 11 | P1-2 Ownership not in this tab — restore CTA (all surfaces) | **Shipped** | Hub custody · landing dot · `/wallet/` tab hint · view-only Live banner · scan actor band · `device-ownership-restore-in-tab.mjs` |
 
 **P0-1 spec (reference for reviewers):**
 
@@ -678,4 +679,6 @@ Sources: WebKit ITP blog; [`PWA_INSTALL.md`](PWA_INSTALL.md); [`SAFARI_PERFORMAN
 | 2026-05-29 | **P0-6 shipped:** `setTabSession` rejects keyless writes; `/created/` hydrate/gate no longer pollute `hc_created` |
 | 2026-05-29 | **P0-7 shipped:** view-only copy branches on wallet signing rows; `#no-session-detail` + restore panel leads |
 | 2026-05-29 | **P0-2 shipped:** sync wallet save before `/created/` navigation; inline auto-save on `/created/` (no microtask) |
-| 2026-05-29 | **P0-3 shipped:** `saveWallet` try/catch + plain-language errors; `hc_auto_save_failed` on quota failures |
+| 2026-05-29 | **P0b-3 shipped:** sole signing row scan vouch auto-activate |
+| 2026-05-29 | **P1-2 shipped:** hub · landing dot · `/wallet/` tab hint · view-only Live banner · scan actor band restore CTA |
+| 2026-05-29 | **P1-2 step 1 shipped:** shell tab-honest dot + hub `wallet_not_in_tab` restore row |

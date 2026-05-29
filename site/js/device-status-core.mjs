@@ -13,10 +13,10 @@ import {
   statusAriaLabel,
   SHELL_DOT_NEUTRAL_EMPTY_CLASS,
   shellDotUsesNeutralEmptyWallet,
-} from "./device-dot-state-core.mjs?v=69";
+} from "./device-dot-state-core.mjs?v=70";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { closeInboxSheet } from "./device-inbox-sheet-loader.mjs?v=69";
-import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=69";
+import { closeInboxSheet } from "./device-inbox-sheet-loader.mjs?v=70";
+import { syncInboxBackdropForOpenHub } from "./device-sheet-backdrop-sync.mjs?v=70";
 
 export const DOT_STATE_CHANGED = "hc-dot-state-changed";
 

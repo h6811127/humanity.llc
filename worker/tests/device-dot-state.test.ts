@@ -278,6 +278,20 @@ describe("describeDotState", () => {
       label: "Restore control here",
     });
   });
+
+  it("honest shell copy when wallet has keys but tab cannot sign (P1-2)", () => {
+    const savedNotInTab = describeDotState("ok", "none", "none", {
+      pageKind: "landing",
+      walletKeysNotInTab: true,
+    });
+    expect(savedNotInTab.now).toBe(
+      "Ownership not in this tab — tap to restore."
+    );
+    expect(savedNotInTab.action).toEqual({
+      kind: "open_controls",
+      label: "Restore control in this tab",
+    });
+  });
 });
 
 describe("dotExplainerKicker", () => {

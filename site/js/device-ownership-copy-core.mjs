@@ -6,10 +6,30 @@
 
 export const OWNERSHIP_NOT_LOADED_TAB = "Ownership not loaded in this tab.";
 
+/** Hub / shell prominence when wallet has control but tab is empty (Safari P1-2 step 1). */
+export const OWNERSHIP_NOT_IN_TAB_PROMPT =
+  "Ownership not in this tab — tap to restore";
+
+export const OWNERSHIP_NOT_IN_TAB_SUBTITLE =
+  "Your ownership is saved on this device. Load control here to manage or attest.";
+
+export const RESTORE_CONTROL_ACTION = "Restore control";
+
+export const RESTORE_CONTROL_HERE = "Restore control here";
+
 export const TAKE_CONTROL_HERE = "Take control here";
 
 export const TAKE_CONTROL_HERE_ATTEST =
   "Take control here to attest, or create a card.";
+
+/** @deprecated Use `OWNERSHIP_NOT_IN_TAB_PROMPT` (Layer 2). */
+export const KEYS_NOT_IN_THIS_TAB_TITLE = "Keys not in this tab";
+
+/** @deprecated Use `OWNERSHIP_NOT_IN_TAB_SUBTITLE`. */
+export const KEYS_NOT_IN_THIS_TAB_RESTORE_SUBTITLE =
+  "Tap to restore control in this tab";
+
+export const RESTORE_CONTROL_IN_THIS_TAB = "Restore control in this tab";
 
 export const LOAD_CONTROL_IN_TAB_FIRST = "Take control in this tab first.";
 

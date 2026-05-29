@@ -5,6 +5,9 @@
  */
 
 import {
+  OWNERSHIP_NOT_IN_TAB_PROMPT,
+  OWNERSHIP_NOT_IN_TAB_SUBTITLE,
+  RESTORE_CONTROL_IN_THIS_TAB,
   VIEW_ONLY_MANAGE_TAB_LEAD_EMPTY,
   VIEW_ONLY_MANAGE_TAB_LEAD_SAVED,
   VIEW_ONLY_NO_SESSION_WALLET_EMPTY,
@@ -54,7 +57,23 @@ export function viewOnlyManageTabLead(signingKeyCount) {
     : VIEW_ONLY_MANAGE_TAB_LEAD_EMPTY;
 }
 
-/** Live tab read-only banner (Phase 3 — same branches as manage lead). */
-export function viewOnlyLiveTabLead(_signingKeyCount = 0) {
-  return VIEW_ONLY_LIVE_TAB_LEAD;
+/** Live tab banner title (P1-2 step 2). */
+export function viewOnlyLiveTabTitle(signingKeyCount) {
+  return viewOnlyWalletBranch(signingKeyCount) === "wallet_saved"
+    ? OWNERSHIP_NOT_IN_TAB_PROMPT
+    : "View only in this tab";
+}
+
+/** Live tab read-only banner detail. */
+export function viewOnlyLiveTabLead(signingKeyCount = 0) {
+  return viewOnlyWalletBranch(signingKeyCount) === "wallet_saved"
+    ? OWNERSHIP_NOT_IN_TAB_SUBTITLE
+    : VIEW_ONLY_LIVE_TAB_LEAD;
+}
+
+/** Live tab restore CTA label. */
+export function viewOnlyLiveTabRestoreLabel(signingKeyCount) {
+  return viewOnlyWalletBranch(signingKeyCount) === "wallet_saved"
+    ? RESTORE_CONTROL_IN_THIS_TAB
+    : "Restore ownership";
 }

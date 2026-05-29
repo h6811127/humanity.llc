@@ -2,7 +2,7 @@
  * Floating status dot, notification badge, hub sheet host.
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
-import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=69";
+import { closeInboxSheet, openInboxFromChrome } from "./device-inbox-sheet-loader.mjs?v=70";
 import { buildStatusSegments } from "./device-counts.mjs";
 import { loadPins } from "./device-pins.mjs";
 import {
@@ -15,7 +15,7 @@ import { fetchResolverHealth } from "./device-network-health.mjs";
 import { setResolverHealthStatusForSinceVisit } from "./device-wallet-since-visit-gate.mjs";
 
 export const RESOLVER_HEALTH_CHANGED = "hc-resolver-health-changed";
-import { maybeQuietTabRehydrate } from "./device-quiet-tab-rehydrate.mjs?v=69";
+import { maybeQuietTabRehydrate } from "./device-quiet-tab-rehydrate.mjs?v=70";
 import { scheduleStoragePersistRequest } from "./device-storage-persist.mjs";
 import { resolverApiOrigin } from "./hc-sign.mjs";
 import { getTabSession, openCardNowPage } from "./device-keys.mjs";
@@ -30,7 +30,7 @@ import {
   getInboxDotOverlay,
   notificationCount,
   preloadInboxModule,
-} from "./device-inbox-loader.mjs?v=69";
+} from "./device-inbox-loader.mjs?v=70";
 import {
   inboxBadgeAriaLabel,
   inboxBadgeTitle,
@@ -39,29 +39,29 @@ import {
   inboxBadgeChromaKind,
   inboxBadgeCountText,
   inboxCountFromItems,
-} from "./device-inbox-core.mjs?v=69";
+} from "./device-inbox-core.mjs?v=70";
 import { closeGlancePopover, isGlancePopoverOpen } from "./device-hub-glance-popover.mjs";
 import {
   initHubIntroCoachmark,
   onHubOpenedFromIntro,
 } from "./device-hub-intro-coachmark.mjs";
 import { logDotDiagnostic } from "./device-dot-diagnostics.mjs";
-import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=69";
+import { logInboxDiagnostic } from "./device-inbox-diagnostics.mjs?v=70";
 import {
   NETWORK_BASELINE_CHANGED,
   NETWORK_REFRESHED,
 } from "./device-wallet-network.mjs";
 import "./device-shell-motion.mjs";
-import "./device-shell-chrome.mjs?v=69";
+import "./device-shell-chrome.mjs?v=70";
 import "./device-theme.mjs";
-import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=69";
-import { reconcileHubSheetState } from "./device-hub-sheet-loader.mjs?v=69";
+import { initBrowserNotifications } from "./device-browser-notifications-loader.mjs?v=70";
+import { reconcileHubSheetState } from "./device-hub-sheet-loader.mjs?v=70";
 import { startCrossTabNotificationState } from "./device-cross-tab-state.mjs";
 import {
   refreshDeviceChrome,
   setRefreshStatusSurfaces,
   startDeviceChromeRefresh,
-} from "./device-chrome-refresh.mjs?v=69";
+} from "./device-chrome-refresh.mjs?v=70";
 import { startTabKeysPresence } from "./device-tab-presence.mjs";
 import {
   broadcastHealthSnapshotIfEligible,
@@ -79,13 +79,14 @@ import {
   dotTransitionKey,
   hasStewardVerification,
   hubStatusLineItemsFromSegments,
+  scanWalletKeysNotInTab,
   SHELL_DOT_NEUTRAL_EMPTY_CLASS,
   shellChromeStatusLineFromSegments,
   shellDotUsesNeutralEmptyWallet,
   shellStatusLinePrimaryInChrome,
   shouldCelebrateStewardTransition,
   statusAriaLabel,
-} from "./device-dot-state-core.mjs?v=69";
+} from "./device-dot-state-core.mjs?v=70";
 import {
   DOT_STATE_CHANGED,
   getNetworkStatus,
@@ -94,7 +95,7 @@ import {
   setHubExpandedHook,
   setHubExpanded as setHubExpandedCore,
   setNetworkStatus,
-} from "./device-status-core.mjs?v=69";
+} from "./device-status-core.mjs?v=70";
 
 export { DOT_STATE_CHANGED };
 
@@ -182,6 +183,19 @@ function deviceState() {
       })(),
     savedWalletCount: summary.count,
   });
+}
+
+function shellDotSigningContext() {
+  const session = getTabSession();
+  const hasTabSigningKeys = Boolean(session?.owner_private_key_b58);
+  const summary = loadWalletSummary();
+  return {
+    walletKeysNotInTab: scanWalletKeysNotInTab(
+      summary.signingKeyCount,
+      hasTabSigningKeys
+    ),
+    signingKeyCount: summary.signingKeyCount,
+  };
 }
 
 function dotOverlayState() {
@@ -272,9 +286,13 @@ function applyDot() {
     dot.dataset.dotOverlay = overlay;
     dotBtn?.setAttribute("data-dot-state", dotState);
     dotBtn?.setAttribute("data-dot-overlay", overlay);
+    const signing = shellDotSigningContext();
     dotBtn?.setAttribute(
       "aria-label",
-      statusAriaLabel(networkStatus, device, overlay, { pageKind: dotPageKind() })
+      statusAriaLabel(networkStatus, device, overlay, {
+        pageKind: dotPageKind(),
+        walletKeysNotInTab: signing.walletKeysNotInTab,
+      })
     );
     renderDotExplainability(networkStatus, device, overlay);
     applyStewardCelebrate(previousDevice, device);
@@ -337,11 +355,13 @@ function renderDotExplainer(container, descriptor, compact = false) {
 
 function renderDotExplainability(network, device, overlay) {
   const summary = loadWalletSummary();
+  const signing = shellDotSigningContext();
   const descriptor = describeDotState(network, device, overlay, {
     stewardReady: hasStewardReadyKeys(),
     queueUrl: getStewardQueueUrl(),
     pageKind: dotPageKind(),
-    singleSavedCardWithKeys: summary.signingKeyCount === 1,
+    singleSavedCardWithKeys: signing.signingKeyCount === 1,
+    walletKeysNotInTab: signing.walletKeysNotInTab,
   });
   const keyRoot = document.getElementById("device-hub-status-key");
   if (keyRoot) {

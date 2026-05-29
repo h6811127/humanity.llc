@@ -18,11 +18,14 @@ import {
 } from "./device-orphan-keys-nav-core.mjs";
 import {
   DEFAULT_FOR_ATTESTATION_ON_SCAN,
+  OWNERSHIP_NOT_IN_TAB_PROMPT,
+  OWNERSHIP_NOT_IN_TAB_SUBTITLE,
   SET_DEFAULT_FOR_ATTESTATION,
   savedObjectsAttestationNudge,
 } from "./device-ownership-copy-core.mjs";
+import { walletOwnershipNotInTab } from "./device-ownership-not-in-tab-core.mjs";
 
-/** @typedef {'this_tab_active' | 'this_tab_unsaved' | 'cross_tab' | 'cross_tab_summary' | 'orphan' | 'vouch_default' | 'sign_lock' | 'vouch_nudge' | 'wallet_scale'} HubKeysCustodyRowKind */
+/** @typedef {'this_tab_active' | 'this_tab_unsaved' | 'cross_tab' | 'cross_tab_summary' | 'orphan' | 'vouch_default' | 'sign_lock' | 'vouch_nudge' | 'wallet_scale' | 'wallet_not_in_tab'} HubKeysCustodyRowKind */
 
 /**
  * @typedef {object} HubKeysCustodyPresenceEntry
@@ -110,6 +113,24 @@ export function buildHubKeysCustodyPanel(input) {
     });
   }
 
+  const walletNotInTab = walletOwnershipNotInTab(
+    walletEntriesWithKeys,
+    hasActiveKeys
+  );
+
+  if (
+    walletNotInTab &&
+    tabNoticeCount === 0 &&
+    crossTabEntries.length === 0 &&
+    orphanRemovedEntries.length === 0
+  ) {
+    rows.push({
+      kind: "wallet_not_in_tab",
+      title: OWNERSHIP_NOT_IN_TAB_PROMPT,
+      subtitle: OWNERSHIP_NOT_IN_TAB_SUBTITLE,
+    });
+  }
+
   if (shouldShowOrphanRemovedKeysNotice(orphanRemovedEntries.length, tabNoticeCount)) {
     for (const entry of orphanRemovedEntries) {
       const label = labelForHubKeysCustodyEntry(entry);
@@ -168,6 +189,7 @@ export function buildHubKeysCustodyPanel(input) {
     !defaultVouchProfileId &&
     tabNoticeCount === 0 &&
     !hasActiveKeys &&
+    !walletNotInTab &&
     crossTabEntries.length === 0 &&
     orphanRemovedEntries.length === 0
   ) {

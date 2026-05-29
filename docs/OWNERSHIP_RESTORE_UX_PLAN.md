@@ -76,3 +76,13 @@ Setup wizard **hard gate** before step **You're live**:
 - Scan vouch flow: after opt-in **default vouch** attempt, **sole signing row** auto-activate (network-gated, no default required) then D10 `trySoleSigningRowRehydrateForScan` fallback
 - Modules: `vouch-scan-sole-signing-activate-core.mjs` · `vouch-issue.mjs` · `device-quiet-tab-rehydrate.mjs`
 - Tests: `npm run worker:test:vouch-scan-sole-activate` · `npm run e2e:vouch-scan-sole-signing`
+
+## Safari P1-2 (shipped)
+
+- **Hub** custody panel: prominent `wallet_not_in_tab` row — `OWNERSHIP_NOT_IN_TAB_PROMPT` + **Restore control in this tab**
+- **Landing** status dot glance: same Layer 2 headline (Flow B)
+- **Wallet** (`/wallet/`): `#wallet-tab-hint` emphasis card with restore CTA (shown even when shell badge is present)
+- **View-only `/created/`**: Live tab banner uses prompt + amber emphasis when wallet saved; CTA **Restore control in this tab**
+- **Scan** actor band: primary **Restore control here** when wallet saved but tab empty (`scan-actor-band.mjs?v=2`)
+- Shared restore: `device-ownership-restore-in-tab.mjs` (hub/wallet open card · scan activate)
+- Tests: `npm run worker:test:ownership-not-in-tab`

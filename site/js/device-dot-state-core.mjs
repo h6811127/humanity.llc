@@ -3,6 +3,14 @@
  * @see docs/STATUS_INDICATOR_STEWARD_GREEN.md
  */
 
+import {
+  OWNERSHIP_NOT_IN_TAB_PROMPT,
+  OWNERSHIP_NOT_IN_TAB_SUBTITLE,
+  RESTORE_CONTROL_HERE,
+  RESTORE_CONTROL_IN_THIS_TAB,
+} from "./device-ownership-copy-core.mjs";
+import { walletOwnershipNotInTab } from "./device-ownership-not-in-tab-core.mjs";
+
 /**
  * @param {{ verification?: { state?: string, label?: string } } | null | undefined} record
  */
@@ -44,7 +52,7 @@ export function scanDeviceStateFromContext({
  * @param {boolean} hasTabSigningKeys
  */
 export function scanWalletKeysNotInTab(walletSigningKeyCount, hasTabSigningKeys) {
-  return walletSigningKeyCount > 0 && !hasTabSigningKeys;
+  return walletOwnershipNotInTab(walletSigningKeyCount, hasTabSigningKeys);
 }
 
 /**
@@ -113,6 +121,7 @@ function overlayQuickActionForPage(overlay, pageKind) {
  */
 export function statusAriaLabel(network, device, overlay, opts = {}) {
   const pageKind = opts.pageKind || "landing";
+  const walletKeysNotInTab = opts.walletKeysNotInTab === true;
   const networkText =
     network === "ok"
       ? "resolver online"
@@ -128,6 +137,21 @@ export function statusAriaLabel(network, device, overlay, opts = {}) {
           ? "ownership saved on device"
           : "no ownership saved on device";
   const overlayText = overlayAriaText(overlay);
+  if (walletKeysNotInTab && device === "none") {
+    const tabDeviceText = "ownership saved on device, not in this tab";
+    const honestBase = overlayText
+      ? `Status: ${networkText}, ${tabDeviceText}, ${overlayText}.`
+      : `Status: ${networkText}, ${tabDeviceText}.`;
+    if (pageKind === "wallet") {
+      return `${honestBase} Tap to scroll to saved cards and restore control.`;
+    }
+    if (pageKind === "scan") {
+      return overlayText
+        ? `Your device: ${networkText}, ${tabDeviceText}, ${overlayText}.`
+        : `Your device: ${networkText}, ${tabDeviceText}.`;
+    }
+    return honestBase;
+  }
   const base = overlayText
     ? `Status: ${networkText}, ${deviceText}, ${overlayText}.`
     : `Status: ${networkText}, ${deviceText}.`;
@@ -289,15 +313,25 @@ export function describeDotState(network, device, overlay, opts = {}) {
       action: overlayQuickActionForPage(overlay, pageKind) ?? openControlsAction,
     };
   }
-  if (device === "none" && pageKind === "scan" && walletKeysNotInTab) {
+  if (device === "none" && walletKeysNotInTab) {
+    const restoreLabel =
+      pageKind === "scan" ? RESTORE_CONTROL_HERE : RESTORE_CONTROL_IN_THIS_TAB;
+    const actionKind = pageKind === "scan" ? "scan_use_keys_here" : "open_controls";
     return {
       id: "none",
-      now: "Ownership not in this tab.",
+      now:
+        pageKind === "scan"
+          ? "Ownership not in this tab."
+          : `${OWNERSHIP_NOT_IN_TAB_PROMPT}.`,
       why: "Your ownership is saved on this device, but this tab cannot sign yet.",
-      next: overlayText || "Restore control here to attest on this scan.",
+      next:
+        overlayText ||
+        (pageKind === "scan"
+          ? `${RESTORE_CONTROL_HERE} to attest on this scan.`
+          : `${OWNERSHIP_NOT_IN_TAB_SUBTITLE}.`),
       action: overlayQuickActionForPage(overlay, pageKind) ?? {
-        kind: "scan_use_keys_here",
-        label: "Restore control here",
+        kind: actionKind,
+        label: restoreLabel,
       },
     };
   }

@@ -7,8 +7,11 @@
 import { OWNERSHIP_NOT_LOADED_TAB } from "./device-ownership-copy-core.mjs";
 import {
   viewOnlyLiveTabLead,
+  viewOnlyLiveTabRestoreLabel,
+  viewOnlyLiveTabTitle,
   viewOnlyManageTabLead,
   viewOnlyRestoreLead,
+  viewOnlyWalletBranch,
 } from "./created-view-only-copy-core.mjs";
 import {
   CREATED_VIEW_LIVE_PROOF_ID,
@@ -46,9 +49,30 @@ export function applyCreatedViewModeUi(opts = {}) {
   }
 
   const liveBanner = document.getElementById("created-view-live-banner");
+  const liveTitle = document.getElementById("created-view-live-title");
   const liveLead = document.getElementById("created-view-live-lead");
-  if (liveBanner) liveBanner.hidden = false;
+  const liveRestoreBtn = document.getElementById("created-view-live-restore-btn");
+  if (liveBanner) {
+    liveBanner.hidden = false;
+    liveBanner.classList.remove("hc-emphasis-card--info", "hc-emphasis-card--warn");
+    liveBanner.classList.add(
+      viewOnlyWalletBranch(signingKeyCount) === "wallet_saved"
+        ? "hc-emphasis-card--warn"
+        : "hc-emphasis-card--info"
+    );
+    const dot = liveBanner.querySelector(".hc-emphasis-card__dot");
+    if (dot) {
+      dot.className =
+        viewOnlyWalletBranch(signingKeyCount) === "wallet_saved"
+          ? "hc-emphasis-card__dot hc-emphasis-card__dot--warn"
+          : "hc-emphasis-card__dot hc-emphasis-card__dot--info";
+    }
+  }
+  if (liveTitle) liveTitle.textContent = viewOnlyLiveTabTitle(signingKeyCount);
   if (liveLead) liveLead.textContent = viewOnlyLiveTabLead(signingKeyCount);
+  if (liveRestoreBtn) {
+    liveRestoreBtn.textContent = viewOnlyLiveTabRestoreLabel(signingKeyCount);
+  }
 
   for (const id of CREATED_VIEW_LIVE_SIGNING_ONLY_IDS) {
     const el = document.getElementById(id);
@@ -86,7 +110,11 @@ export function clearCreatedViewModeUi() {
   }
 
   const liveBanner = document.getElementById("created-view-live-banner");
-  if (liveBanner) liveBanner.hidden = true;
+  if (liveBanner) {
+    liveBanner.hidden = true;
+    liveBanner.classList.remove("hc-emphasis-card--warn");
+    liveBanner.classList.add("hc-emphasis-card--info");
+  }
 
   for (const id of CREATED_VIEW_LIVE_SIGNING_ONLY_IDS) {
     const el = document.getElementById(id);

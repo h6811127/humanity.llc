@@ -10,7 +10,7 @@
  * Bump on all shell HTML (`device-status-bootstrap.mjs?v=N`) and on every
  * `./peer.mjs?v=N` import between files in DEVICE_STATUS_SHELL_JS_FILES.
  */
-export const DEVICE_SHELL_ASSET_VERSION = 69;
+export const DEVICE_SHELL_ASSET_VERSION = 70;
 
 /** @deprecated Use DEVICE_SHELL_ASSET_VERSION */
 export const DEVICE_STATUS_BOOTSTRAP_CACHE_BUST = DEVICE_SHELL_ASSET_VERSION;
@@ -28,6 +28,7 @@ export const DEVICE_STATUS_SHELL_JS_FILES = [
   "device-status.mjs",
   "device-hub-intro-coachmark.mjs",
   "device-dot-state-core.mjs",
+  "device-ownership-not-in-tab-core.mjs",
   "device-chrome-refresh-core.mjs",
   "device-chrome-refresh.mjs",
   "device-inbox-sheet-loader.mjs",

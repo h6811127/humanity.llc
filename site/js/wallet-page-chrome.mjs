@@ -3,10 +3,16 @@
  * Click handler for Open controls: `bindWalletActiveOpenControls()` from wallet-page.mjs.
  */
 
-import { gatherInboxInput } from "./device-inbox.mjs?v=69";
+import { gatherInboxInput } from "./device-inbox.mjs?v=70";
 import { createdUrlForEntry, getTabSession, openCardNowPage } from "./device-keys.mjs";
 import { activateWalletEntryGated } from "./device-control-activation.mjs";
-import { loadWallet } from "./device-wallet.mjs";
+import {
+  OWNERSHIP_NOT_IN_TAB_PROMPT,
+  OWNERSHIP_NOT_IN_TAB_SUBTITLE,
+  RESTORE_CONTROL_IN_THIS_TAB,
+} from "./device-ownership-copy-core.mjs";
+import { openRestoreControlInThisTab } from "./device-ownership-restore-in-tab.mjs";
+import { getWalletSigningKeyCount, loadWallet } from "./device-wallet.mjs";
 import {
   ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX,
   ORPHAN_KEYS_INBOX_TITLE,
@@ -17,9 +23,15 @@ import {
 } from "./device-orphan-keys-nav.mjs";
 import { actOnOtherTabKeys, walletEntryForProfile } from "./device-notice-nav.mjs";
 import { escapeEmphasisHtml } from "./device-emphasis-card-html.mjs";
-import { shouldShowWalletTabHintCrossTabChrome } from "./wallet-tab-hint-chrome-core.mjs";
+import {
+  shouldShowWalletOwnershipNotInTabHint,
+  shouldShowWalletTabHintCrossTabChrome,
+} from "./wallet-tab-hint-chrome-core.mjs";
 
-export { shouldShowWalletTabHintCrossTabChrome } from "./wallet-tab-hint-chrome-core.mjs";
+export {
+  shouldShowWalletOwnershipNotInTabHint,
+  shouldShowWalletTabHintCrossTabChrome,
+} from "./wallet-tab-hint-chrome-core.mjs";
 
 /** @param {Record<string, unknown> | null} session */
 export function walletEntryForSession(session) {
@@ -83,6 +95,33 @@ function setTabHint(tabHint, input) {
   const clearBtn = document.getElementById("wallet-tab-hint-clear");
 
   hideTabHintActions();
+
+  const session = getTabSession();
+  const hasTabSigningKeys = Boolean(session?.owner_private_key_b58);
+  const walletSigningKeyCount = getWalletSigningKeyCount();
+
+  if (
+    shouldShowWalletOwnershipNotInTabHint(
+      walletSigningKeyCount,
+      hasTabSigningKeys,
+      orphanCount,
+      crossTabCount
+    )
+  ) {
+    setTabHintModifier(tabHint, "warn");
+    if (eyebrow) eyebrow.textContent = "This tab";
+    if (title) {
+      title.hidden = false;
+      title.textContent = OWNERSHIP_NOT_IN_TAB_PROMPT;
+    }
+    if (detail) detail.textContent = OWNERSHIP_NOT_IN_TAB_SUBTITLE;
+    if (useKeysBtn) {
+      useKeysBtn.hidden = false;
+      useKeysBtn.textContent = RESTORE_CONTROL_IN_THIS_TAB;
+    }
+    tabHint.hidden = false;
+    return;
+  }
 
   if (
     !shouldShowWalletTabHintCrossTabChrome(hasShellBadge, orphanCount, crossTabCount)
@@ -165,7 +204,19 @@ function ensureTabHintListeners() {
 
   document.getElementById("wallet-tab-hint-use-keys")?.addEventListener("click", async (e) => {
     e.preventDefault();
-    const entry = gatherInboxInput().crossTabEntries[0];
+    const input = gatherInboxInput();
+    if (
+      shouldShowWalletOwnershipNotInTabHint(
+        getWalletSigningKeyCount(),
+        Boolean(getTabSession()?.owner_private_key_b58),
+        input.orphanRemovedEntries.length,
+        input.crossTabEntries.length
+      )
+    ) {
+      openRestoreControlInThisTab();
+      return;
+    }
+    const entry = input.crossTabEntries[0];
     if (!entry) return;
     const walletEntry = walletEntryForProfile(entry.profile_id);
     if (!walletEntry?.owner_private_key_b58) return;

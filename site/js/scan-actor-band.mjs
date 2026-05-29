@@ -1,8 +1,15 @@
 /**
  * L3 actor band on scan — appears after live check settles (Path 2 S3).
  * @see docs/SCAN_PAGE_TRUST_UI.md
+ * @see docs/SAFARI_KEYS_WIPE_INVESTIGATION.md P1-2 step 2
  */
 import { getTabSession } from "./device-keys.mjs";
+import {
+  OWNERSHIP_NOT_IN_TAB_PROMPT,
+  RESTORE_CONTROL_HERE,
+} from "./device-ownership-copy-core.mjs";
+import { walletOwnershipNotInTab } from "./device-ownership-not-in-tab-core.mjs";
+import { activateRestoreControlInThisTab } from "./device-ownership-restore-in-tab.mjs";
 import { getWalletCount, loadWalletSummary } from "./device-wallet.mjs";
 import { getDefaultVouchProfileId } from "./vouch-ready-keys.mjs";
 import {
@@ -40,24 +47,51 @@ function bandRoot() {
   return document.getElementById("scan-actor-band");
 }
 
-function syncActorBandLead() {
-  const lead = document.querySelector("#scan-actor-band .scan-actor-band-lead");
-  if (!lead) return;
+function scrollToVouch() {
+  const target =
+    document.querySelector(".scan-group-vouch") ||
+    document.getElementById("vouch-ready") ||
+    document.getElementById("vouch-submit");
+  target?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function syncActorBandCopy() {
+  const root = bandRoot();
+  if (!root) return;
+
+  const title = root.querySelector(".scan-actor-band-title");
+  const lead = root.querySelector(".scan-actor-band-lead");
+  const restoreBtn = document.getElementById("scan-actor-band-restore");
+  const vouchBtn = document.getElementById("scan-actor-band-vouch");
+
   const session = getTabSession();
   const hasTabKeys = Boolean(session?.owner_private_key_b58);
   const signingCount = loadWalletSummary().signingKeyCount;
-  if (!hasTabKeys && signingCount > 0) {
-    lead.textContent =
-      "Ownership is saved on this device. Restore control in this tab to vouch.";
+  const walletNotInTab = walletOwnershipNotInTab(signingCount, hasTabKeys);
+
+  if (walletNotInTab) {
+    root.classList.add("scan-actor-band--restore-prompt");
+    if (title) title.textContent = "Ownership on this device";
+    if (lead) lead.textContent = OWNERSHIP_NOT_IN_TAB_PROMPT;
+    if (restoreBtn) {
+      restoreBtn.hidden = false;
+      restoreBtn.textContent = RESTORE_CONTROL_HERE;
+    }
+    if (vouchBtn) vouchBtn.hidden = true;
     return;
   }
-  lead.textContent = "You can vouch or open your cards from here.";
+
+  root.classList.remove("scan-actor-band--restore-prompt");
+  if (title) title.textContent = "Ownership on this device";
+  if (lead) lead.textContent = "You can vouch or open your cards from here.";
+  if (restoreBtn) restoreBtn.hidden = true;
+  if (vouchBtn) vouchBtn.hidden = false;
 }
 
 function revealBand(reduced) {
   const root = bandRoot();
   if (!root) return;
-  syncActorBandLead();
+  syncActorBandCopy();
   root.hidden = false;
   root.classList.remove("scan-actor-band--hidden");
   if (reduced) {
@@ -69,20 +103,15 @@ function revealBand(reduced) {
   }, SCAN_ACTOR_BAND_REVEAL_MS);
 }
 
-function scrollToVouch() {
-  const target =
-    document.querySelector(".scan-group-vouch") ||
-    document.getElementById("vouch-ready") ||
-    document.getElementById("vouch-submit");
-  target?.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
 function bindActions() {
   const root = bandRoot();
   if (!root || root.dataset.bound === "1") return;
   root.dataset.bound = "1";
   root.querySelector("#scan-actor-band-vouch")?.addEventListener("click", () => {
     scrollToVouch();
+  });
+  root.querySelector("#scan-actor-band-restore")?.addEventListener("click", () => {
+    void activateRestoreControlInThisTab({ afterActivate: scrollToVouch });
   });
 }
 
@@ -94,3 +123,7 @@ function onLiveCheckSettled(event) {
 
 bindActions();
 window.addEventListener("hc-scan-live-check-settled", onLiveCheckSettled);
+window.addEventListener("hc-device-hub-changed", () => {
+  if (!bandRoot() || bandRoot().hidden) return;
+  syncActorBandCopy();
+});

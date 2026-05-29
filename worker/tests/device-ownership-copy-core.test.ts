@@ -20,6 +20,7 @@ import {
   LIVE_CONTROL_SUCCESS_COPY,
   SCAN_LIMITS_DISCLOSURE_TITLE,
   LOAD_CONTROL_IN_TAB_FIRST,
+  OWNERSHIP_NOT_IN_TAB_PROMPT,
   OWNERSHIP_NOT_LOADED_TAB,
   SET_DEFAULT_FOR_ATTESTATION,
   TAKE_CONTROL_HERE,
@@ -37,6 +38,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 describe("device-ownership-copy-core", () => {
   it("exports Layer 2 custody strings without signing-key jargon", () => {
     for (const line of [
+      OWNERSHIP_NOT_IN_TAB_PROMPT,
       OWNERSHIP_NOT_LOADED_TAB,
       LOAD_CONTROL_IN_TAB_FIRST,
       IMPORT_OWNERSHIP_LOADED_TAB,
