@@ -1,6 +1,6 @@
 # M7 — Live control printed QR camera QA
 
-**Status:** Runbook ready; execution pending (≥3 phones)  
+**Status:** Runbook ready; step 1 desk preflight shipped — human camera QA pending (≥3 phones)  
 **Gate:** `docs/M7_LIVE_CONTROL_ALPHA.md` Step 2 · `docs/V1_IMPLEMENTATION_BACKLOG.md` H-003 · `docs/V1_ASSUMPTION_REGISTER.md` A-005  
 **Prerequisite:** Step 1 shipped; in-person layout + expiry UI shipped; comprehension runbook ready.
 
@@ -35,7 +35,27 @@ URL must be canonical HTTPS: `https://humanity.llc/c/{profile_id}?q={qr_id}` (no
 - [ ] **≥3 phones:** iOS Safari (Camera app), Android Chrome (Camera or Google Lens), one older device if available
 - [ ] Printed QR at **normal arm's length** readable under indoor light
 
-**Automated pre-check (operator desk):**
+---
+
+## Pre-flight (operator, ~15 minutes)
+
+Run once before printing and camera testing on **≥3 phones**. Mirrors comprehension pre-flight in [`M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md`](M7_LIVE_CONTROL_COPY_COMPREHENSION_RUNBOOK.md).
+
+1. **Desk regression** — `npm run live-control:printed-qa:preflight` (Vitest desk gate + Playwright full loop).
+2. **Production smoke** (recommended before print) — `npm run live-control:printed-qa:preflight -- --production-smoke` (scan HTML + live-control challenge POST on showcase card).
+3. **Two-device loop** — paste scan URL in a second browser; **Ask for live proof** → owner **Prove control now** → scanner **Control proven** (confirms keys + resolver without camera).
+4. **Print artifact** — download QR PNG from `/created/`; verify printed URL is `https://humanity.llc/c/{profile_id}?q={qr_id}` (≥2 cm module; see [`QR_BRANDING.md`](QR_BRANDING.md)).
+5. **Phones ready** — stock Camera app on iOS Safari path, Android Chrome path, third device if available.
+
+Fast desk-only (skip Playwright): `npm run live-control:printed-qa:preflight -- --skip-e2e`
+
+**Automated pre-check (included in step 1):**
+
+```bash
+npm run live-control:printed-qa:preflight
+```
+
+Or run gates individually:
 
 ```bash
 npm run worker:test:live-control-printed-qa

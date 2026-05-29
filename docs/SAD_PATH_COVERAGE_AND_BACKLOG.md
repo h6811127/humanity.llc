@@ -70,10 +70,10 @@ Agents are strong at **systematic enumeration** against docs and code. Humans an
 | **H-09** | **Scan refresh mid-wait** | Scanner refreshes during wait | Must re-ask even if challenge pending |
 | **H-10** | **Expiry retry affordance** | Challenge window ends | Stranger does not notice they can ask again |
 | H-11 | Comprehension runbook | Unscripted strangers | **Passed** 2026-05-29 |
-| H-12 | Printed camera QA | ≥3 phones, camera scan | Desk gate: `npm run worker:test:live-control-printed-qa` |
+| H-12 | Printed camera QA | ≥3 phones, camera scan | Step 1: `npm run live-control:printed-qa:preflight` |
 | H-13 | Full-loop Playwright E2E | **Shipped** — `npm run e2e:live-control-loop` | Poll→proven + refresh resume + expiry retry |
 
-**Human next step (Slice E):** H-12 printed camera QA runbook on ≥3 phones — see [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md).
+**Human next step (Slice E):** H-12 § A–C on ≥3 phones after `npm run live-control:printed-qa:preflight -- --production-smoke` — see [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md).
 
 ### 2. Key custody and continuity (by design, still sad)
 
@@ -244,6 +244,7 @@ Full matrix origin: [`PRODUCTION_SAD_PATH_QA_2026-05-26.md`](PRODUCTION_SAD_PATH
 | Date | Notes |
 |------|-------|
 | 2026-05-29 | P0b-1 step 1 — fresh create hub R10 E2E + baseline-null Vitest (S30) |
+| 2026-05-29 | Safari P0b-3 — scan sole-signing row auto-activate for vouch (stranger path) |
 | 2026-05-29 | Safari P0b-2 — setup wizard test scan no auto-advance in browser tab |
 | 2026-05-29 | P0-4 first-session backup gate + Phase 4 step 2 hub import copy convergence |
 | 2026-05-29 | Ownership restore Phase 4 step 1 — hub import always visible (S29) |

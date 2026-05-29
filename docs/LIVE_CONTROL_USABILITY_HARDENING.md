@@ -302,7 +302,7 @@ This document is the **implementation backlog** for hardening live control **usa
 
 **Action:** Execute [`M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md`](M7_LIVE_CONTROL_PRINTED_QA_RUNBOOK.md) on ≥3 phones.
 
-**Engineering desk gate (before phones):** `npm run worker:test:live-control-printed-qa` · `npm run e2e:live-control-loop`
+**Engineering desk gate (before phones):** `npm run live-control:printed-qa:preflight` · `--production-smoke` before print · `--skip-e2e` for Vitest-only
 
 **Exit artifact:** Completed § A–C scorecards; failures mapped to H-04–H-10.
 
@@ -311,6 +311,7 @@ This document is the **implementation backlog** for hardening live control **usa
 - [ ] B1–B6 pass on all three phones.
 - [ ] Any layout/copy failures tracked against items in this doc.
 - [x] Desk regression passes (`worker/tests/live-control-printed-qa.test.ts`).
+- [x] Step 1 operator preflight script ships (`npm run live-control:printed-qa:preflight`).
 
 ---
 
@@ -444,4 +445,4 @@ flowchart TD
 | 2026-05-29 | Slice E shipped: H-13 `e2e/live-control-loop.spec.ts` (ask→proven, refresh resume, expiry retry) |
 | 2026-05-29 | Slice D shipped: H-09 sessionStorage resume + H-10 expiry retry UX (`scan-html.ts`, `scan-pass.css`) |
 | 2026-05-29 | Slice E engineering: H-13 `e2e/live-control-loop.spec.ts`, H-14 client test refresh, H-15 health `foreign_keys` gate |
-| 2026-05-29 | H-12 engineering gate: `worker:test:live-control-printed-qa` desk regression before ≥3-phone runbook |
+| 2026-05-29 | H-12 step 1 preflight: `live-control:printed-qa:preflight` (desk Vitest + loop E2E + optional production smoke) |
