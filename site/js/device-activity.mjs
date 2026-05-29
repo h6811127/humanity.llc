@@ -91,13 +91,13 @@ export function walletEntryForActivity(entry) {
 export function activityTypeLabel(type) {
   const labels = {
     saved: "Saved on device",
-    use_keys: "Loaded keys",
+    use_keys: "Took control in tab",
     remove_card: "Removed from wallet",
     pin_added: "Pinned scan link",
     backup_import: "Imported backup",
     live_control: "Signed live proof",
-    auto_activate_vouch_keys: "Auto-loaded vouch keys",
-    default_vouch_set: "Default for vouching",
+    auto_activate_vouch_keys: "Auto-activated control for attestation",
+    default_vouch_set: "Default for attestation",
     default_vouch_clear: "Cleared vouch default",
   };
   return labels[type] ?? "Action on device";

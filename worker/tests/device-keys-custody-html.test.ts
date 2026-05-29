@@ -73,7 +73,7 @@ describe("device-keys-custody-html", () => {
 
   it("card creation demotes keys-custody disclosure for developers", () => {
     const html = readFileSync(join(root, "site/features/card-creation.html"), "utf8");
-    expect(html).toContain("Advanced: signing keys &amp; browser storage");
+    expect(html).toMatch(/Advanced: signing keys (&amp;|&) browser storage/);
     expect(html).toContain("Save ownership on this device");
     expect(html).not.toContain("Where keys live (critical)");
   });
@@ -84,15 +84,15 @@ describe("device-keys-custody-html", () => {
     expect(html).toContain('id="created-setup-keys-mount"');
     expect(html).toContain("Save ownership on this device");
     expect(html).toContain("control of this root card plus its object QRs");
-    expect(html).toContain("restore root and object control");
-    expect(html).toContain("Unlock root controls");
+    expect(html).toContain("restores root and object QR control");
+    expect(html).toContain("Restore ownership");
   });
 
   it("backup and recovery scripts explain root object control", () => {
     const backup = readFileSync(join(root, "site/js/key-backup-ui.mjs"), "utf8");
     const recovery = readFileSync(join(root, "site/js/recovery-key-ui.mjs"), "utf8");
     expect(backup).toContain("root-card backup restores control");
-    expect(backup).toContain("Root-card controls are available below");
+    expect(backup).toContain("Ownership restored for this card");
     expect(recovery).toContain("restore root-card control");
     expect(recovery).toContain("Root-card controls are available below");
   });
@@ -111,6 +111,27 @@ describe("device-keys-custody-html", () => {
     expect(html).toContain('id="lost-item-loop-scorecard"');
     expect(html).toContain('id="lost-item-loop-export"');
     expect(html).toContain("Printed QR and tagged the item");
+  });
+
+  it("created Manage tab collapses developer export under Export for developers (D8)", () => {
+    const html = readFileSync(join(root, "site/created/index.html"), "utf8");
+    expect(html).toContain('id="created-developer-export-details"');
+    expect(html).toContain("Export for developers");
+    expect(html).toContain('id="owner-pubkey-preview-block"');
+    expect(html).toContain('id="owner-pubkey-display"');
+    expect(html).not.toContain("Unlock root controls");
+    expect(html).toContain("Restore ownership");
+    const devIdx = html.indexOf("created-developer-export-details");
+    const exportBlockIdx = html.indexOf('id="backup-export-block"');
+    const importRecoveryIdx = html.indexOf('id="import-recovery-form"');
+    expect(devIdx).toBeGreaterThan(-1);
+    expect(exportBlockIdx).toBeGreaterThan(devIdx);
+    expect(importRecoveryIdx).toBeGreaterThan(devIdx);
+    const backupPanelIdx = html.indexOf('id="backup-details"');
+    expect(backupPanelIdx).toBeGreaterThan(-1);
+    expect(backupPanelIdx).toBeLessThan(devIdx);
+    expect(html.indexOf('id="import-backup-form"')).toBeGreaterThan(backupPanelIdx);
+    expect(html.indexOf('id="import-backup-form"')).toBeLessThan(devIdx);
   });
 
   it("styles use compact stacked emphasis layout for custody cards", () => {

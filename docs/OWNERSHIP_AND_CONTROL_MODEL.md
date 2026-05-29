@@ -207,15 +207,15 @@ Priority surfaces to migrate to Layer 2 copy:
 
 | Surface | Current exposure | Target |
 |---------|------------------|--------|
-| `/create/` hero | “signing key starts session-only” | “Control stays in this tab until you save ownership” |
-| Landing trust chips | “Keys in your browser” | “You own it · control stays on your device” |
-| `/created/` save strip | “Save control key”, “root signing key” | “Save ownership on this device” |
-| Hub custody panel | “Keys active”, “Keys in this tab” | “Managing here”, “Save ownership” |
-| `/wallet/` actions | “Use keys” | “Open controls” (align with hub) |
+| `/create/` hero | “signing key starts session-only” | “Control stays in this tab until you save ownership” | **D1** ✅ |
+| Landing trust chips | “Keys in your browser” | “You own it · control stays on your device” | **D2** ✅ |
+| `/created/` save strip | “Save control key”, “root signing key” | “Save ownership on this device” | **D1** ✅ |
+| Hub custody panel | “Keys active”, “Keys in this tab” | “Managing here”, “Save ownership” | **D1** ✅ |
+| `/wallet/` actions | “Use keys” | “Open controls” (align with hub) | **D1** ✅ |
 | Scan vouch explainer | “Ed25519 signing key in this tab” | “You need control of your identity in this tab to attest” | **D7** ✅ |
-| Inbox / cross-tab | “Keys open in N tabs” | “Managing in N other tabs” |
-| Help / features | Deep `sessionStorage` exposition | Move to Advanced; lead with ownership |
-| `device-keys-custody.mjs` | “Your browser holds the private key” | “Your browser holds control — the network never does” |
+| Inbox / cross-tab | “Keys open in N tabs” | “Managing in N other tabs” | **D1** ✅ |
+| Help / features | Deep `sessionStorage` exposition | Move to Advanced; lead with ownership | **D2** ✅ |
+| `device-keys-custody.mjs` | “Your browser holds the private key” | “Your browser holds control — the network never does” | **D1** ✅ |
 
 **Structural gaps (not just copy):**
 
@@ -361,6 +361,7 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | **D6** | Optional WebAuthn wrap around control activation (extends vouch-ready option E) | Engineering | **Shipped** (2026-05-29) |
 | **D7** | Gap close-out: vouch explainer, status dot, hub segment copy | Low — copy only | **Shipped** (2026-05-29) |
 | **D8** | Collapse `/created/` developer export (backup download, raw recovery import, pubkey preview) under **Export for developers** | Low — IA only | **Shipped** (2026-05-29) |
+| **D9** | Comprehension gates — M7 live control, M5 stranger path, founding copy (human runbooks; see [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) § Comprehension gates) | Process | **Next** |
 
 **Do not migrate:** resolver APIs, document types, storage key names, or test fixture terminology without a dedicated protocol PR.
 
@@ -420,3 +421,4 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | 2026-05-29 | Terminology map linked to canonical [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) |
 | 2026-05-29 | **D7 shipped** — `site/js/device-ownership-copy-core.mjs`; hub attestation rows, import, steward link, cross-tab confirm |
 | 2026-05-29 | **D8 shipped** — `/created/` Manage **Export for developers** panel; encrypted backup restore stays primary; hub default-for-attestation menu copy |
+| 2026-05-29 | Gap table marked complete for D1–D2 default UI surfaces |

@@ -10,6 +10,7 @@ import {
   HUB_RECENT_DISPLAY_LIMIT,
   logDeviceActivity,
 } from "./device-activity.mjs";
+import { DEFAULT_ATTESTATION_ELIGIBILITY_ALERT } from "./device-ownership-copy-core.mjs";
 import { applyDeviceHubSearch } from "./device-hub-search.mjs";
 import { initHubBackupImport } from "./device-hub-import.mjs";
 import { mountThemeToggles } from "./device-theme.mjs";
@@ -1805,9 +1806,7 @@ function renderSavedRows(opts = {}) {
       }
 
       if (!isEligibleVoucherState(state)) {
-        window.alert(
-          "Only Steward or Vouched Human cards can be set as default for vouching."
-        );
+        window.alert(DEFAULT_ATTESTATION_ELIGIBILITY_ALERT);
         return;
       }
 
@@ -1841,7 +1840,11 @@ function renderSavedRows(opts = {}) {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-id");
       const entry = findWalletEntryById(id);
-      if (!window.confirm("Remove this card from this device? Keys stay in any other tab until you close it.")) {
+      if (
+        !window.confirm(
+          "Remove this object from this device? Control may still be active in another tab until you close it."
+        )
+      ) {
         return;
       }
       if (entry?.profile_id) {

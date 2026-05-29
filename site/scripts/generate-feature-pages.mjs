@@ -40,6 +40,12 @@ const ASPECT_META = [
   { key: "design", title: "Design decisions", tone: "blue", icon: "design" },
   { key: "safety", title: "Safety · privacy · security", tone: "green", icon: "safety" },
   { key: "limits", title: "Limits", tone: "orange", icon: "limits" },
+  {
+    key: "advanced",
+    title: "Advanced: signing keys & browser storage",
+    tone: "slate",
+    icon: "link",
+  },
   { key: "future", title: "Future directions", tone: "purple", icon: "future" },
 ];
 
@@ -58,7 +64,10 @@ const FEATURES = [
       why: "Proves the core thesis: a printed QR is a <strong>live software endpoint</strong>, not a frozen link. No app install, no account gate for scanning  -  any camera can read current public state.",
       design: "Ed25519 keys generated in-browser; signed card + QR credential POSTed to <code>/.well-known/hc/v1/cards</code>. JCS canonicalization for cross-client parity. Profile and QR ids are base58  -  stable in the printed URL forever; meaning changes via resolver status, not reprinting.",
       safety: "Private signing keys never leave the owner device unless the user exports an encrypted backup. Resolver verifies signatures on ingest and stores only public documents and status flags  -  not a people trail.",
-      limits: "Keys start in <code>sessionStorage</code> (this tab only). <strong>Save on this device</strong> on <a href=\"/created/\">/created/</a> copies them to <code>localStorage</code> (<code>hc_wallet</code>) for other tabs  -  not automatic on create. Operator cannot reset your key. Printed URL exposes <code>profile_id</code> and <code>qr_id</code> (v1 privacy lock).",
+      limits:
+        "Control stays in this tab until you <strong>save ownership on this device</strong> on <a href=\"/created/\">/created/</a> (auto-save is on by default). Operator cannot restore lost ownership. Printed URL exposes <code>profile_id</code> and <code>qr_id</code>.",
+      advanced:
+        "Owner signing material starts in <code>sessionStorage</code> (<code>hc_created</code>) per tab. <strong>Save ownership on this device</strong> copies control to <code>localStorage</code> (<code>hc_wallet</code>) for other tabs on this browser.",
       future: "Federated resolvers implementing the same <code>hc/v1</code> API; NFC/mesh carriers pointing at the same truth; optional multi-device sync without central key custody.",
     },
   },
@@ -238,12 +247,12 @@ const FEATURES = [
     title: "On this device hub",
     icon: "device",
     iconTone: "trust",
-    lead: "Returning users manage keys, pins, and shortcuts without accounts.",
+    lead: "Returning stewards manage ownership, pins, and shortcuts—no accounts.",
     subHtml: `<span class="ship-badge ship-badge-live">Live</span> status dot + hub sheet on <a href="/">/</a>, <a href="/wallet/">/wallet/</a>, <a href="/created/">/created/</a>`,
     badge: "live",
     aspects: {
-      why: "Create puts keys in one tab; strangers need the story, returners need a control center. The hub names the two storage layers and surfaces the next action (save, notice, revoke, vouch).",
-      design: "<strong>Status dot</strong>  -  floating trust indicator; tap opens <strong>On this device</strong> hub sheet. <strong>Inbox</strong>  -  action rows, badge, live-proof overlays when the tab is visible. <strong>Saved cards</strong>  -  Use keys, Open controls, relabel/remove. <strong>Pinned scans</strong>  -  public bookmarks only (<code>hc_device_pins</code>). <strong>Search</strong>  -  inline in hub; filters local rows only. <strong>Backup import</strong>  -  decrypt <code>.hcbackup.json</code> into <code>hc_wallet</code>. <strong>Focus mode</strong>  -  hide intro sections.<br><br><strong>Shell micro-features</strong> (compact list on <a href=\"/features-available-now.html\">features hub</a>): cross-tab keys banner, resolver tab sync toggle, opt-in browser alerts + <code>sw-live-proof.mjs</code> (live proof only), PWA install on steward pages, keys custody notices, child-object backup gate on <a href=\"/created/\">/created/</a>, ephemeral manifesto update at <code>#update-status</code>. User guides: <a href=\"/help/#device-shell\">/help/#device-shell</a>.",
+      why: "After create, stewards need a control center for what they own on this device—not a lecture on key storage. The hub surfaces the next action (save ownership, attest, revoke, live proof).",
+      design: "<strong>Status dot</strong>  -  floating trust indicator; tap opens <strong>On this device</strong> hub sheet. <strong>Inbox</strong>  -  action rows, badge, live-proof overlays when the tab is visible. <strong>Saved cards</strong>  -  Open controls, Open scan, relabel/remove. <strong>Pinned scans</strong>  -  public bookmarks only (<code>hc_device_pins</code>). <strong>Search</strong>  -  inline in hub; filters local rows only. <strong>Backup import</strong>  -  decrypt <code>.hcbackup.json</code> into <code>hc_wallet</code>. <strong>Focus mode</strong>  -  hide intro sections.<br><br><strong>Shell micro-features</strong> (compact list on <a href=\"/features-available-now.html\">features hub</a>): cross-tab keys banner, resolver tab sync toggle, opt-in browser alerts + <code>sw-live-proof.mjs</code> (live proof only), PWA install on steward pages, keys custody notices, child-object backup gate on <a href=\"/created/\">/created/</a>, ephemeral manifesto update at <code>#update-status</code>. User guides: <a href=\"/help/#device-shell\">/help/#device-shell</a>.",
       safety: "Private keys stay in browser storage; pins never hold signing material. Search is client-side over data you already saved. Cross-tab keys and card-disabled alerts use <strong>resolver-confirmed</strong> polls — never wallet cache alone. Browser alerts and OS push (hosted tier) are <strong>live proof only</strong> — never for cross-tab keys or custody nudges.",
       limits: "Not cloud sync or multi-device accounts. Browser profile sync (Safari/Chrome) may copy <code>localStorage</code> incompletely  -  prefer explicit save per machine. No directory search for other people’s cards. Status dot is shell chrome, not the live-control protocol — see <a href=\"/features/live-control.html\">live control</a> for in-person key proof.",
       future: "Optional activity log on device, clearer multi-tab key handoff, federated read  -  still no operator custody of owner keys.",
@@ -374,9 +383,9 @@ function aspectBlock(aspect, body, open) {
 function renderFeaturePage(f, i) {
   const prev = FEATURES[i - 1];
   const next = FEATURES[i + 1];
-  const aspectsHtml = ASPECT_META.map((a, j) =>
-    aspectBlock(a, esc(f.aspects[a.key]), j === 0)
-  ).join("\n");
+  const aspectsHtml = ASPECT_META.filter((a) => a.key !== "advanced" || f.aspects.advanced)
+    .map((a, j) => aspectBlock(a, esc(f.aspects[a.key]), j === 0))
+    .join("\n");
 
   const nav = `<section class="group">
   <div class="feature-nav">

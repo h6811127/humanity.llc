@@ -29,6 +29,48 @@ export const SET_DEFAULT_FOR_ATTESTATION = "Set as default for attestation";
 
 export const EXPORT_FOR_DEVELOPERS = "Export for developers";
 
+export const DEVELOPER_EXPORT_SUBTITLE =
+  "Public key · encrypted backup · raw recovery import";
+
+export const DEFAULT_ATTESTATION_ELIGIBILITY_ALERT =
+  "Only Steward or Vouched Human cards can be set as default for attestation.";
+
+/** Scan SSR vouch explainer (vouch-issue.mjs replaces at runtime). */
+export const VOUCH_EXPLAINER_EYEBROW = "Your control";
+
+export const VOUCH_EXPLAINER_TITLE = "Checking this tab";
+
+export const VOUCH_EXPLAINER_INITIAL_COPY =
+  "Checking whether you have control of your identity in this tab. Steward and Vouched Human are network checks—separate from attestation. " +
+  "Use <strong>Attest as…</strong> or <a href=\"WALLET_HREF\">My objects</a>. " +
+  "Only the signed attestation is sent; your control stays on this device.";
+
+/** Live control scanner lead (M7 comprehension). */
+export const LIVE_CONTROL_SCANNER_LEAD =
+  "Ask the owner to prove they can respond with control of this object—right now, on the spot.";
+
+/**
+ * @param {number} count
+ * @param {string} [who]
+ */
+export function inboxAriaManagingInOtherTab(count, who = "") {
+  const suffix = who ? ` (${who})` : "";
+  if (count > 1) return `managing in ${count} other tabs${suffix}`;
+  return `managing in 1 other tab${suffix}`;
+}
+
+/** @param {string} [who] */
+export function inboxAriaOwnershipNotSaved(who = "") {
+  const suffix = who ? ` (${who})` : "";
+  return `ownership not saved on device${suffix}`;
+}
+
+/** @param {string} [who] */
+export function inboxAriaOrphanManagingOtherTab(who = "") {
+  const suffix = who ? ` (${who})` : "";
+  return `still managing in another tab${suffix}`;
+}
+
 /**
  * @param {number} count
  */

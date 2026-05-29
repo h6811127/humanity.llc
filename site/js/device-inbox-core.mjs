@@ -15,6 +15,11 @@ import {
   crossTabAggregateTitle,
   crossTabPresenceLabel,
 } from "./device-cross-tab-copy-core.mjs";
+import {
+  inboxAriaManagingInOtherTab,
+  inboxAriaOrphanManagingOtherTab,
+  inboxAriaOwnershipNotSaved,
+} from "./device-ownership-copy-core.mjs";
 import { dotOverlayFromCounts } from "./device-dot-state-core.mjs?v=58";
 import { liveProofInboxAggregateTitle, liveProofInboxRowSubtitle } from "./device-live-control-inbox-core.mjs";
 
@@ -432,24 +437,19 @@ function describeItemForAria(item) {
     return `${item.count} live proof${item.count === 1 ? "" : "s"}`;
   }
   if (item.kind === "tab_keys_unsaved") {
-    const who = item.subtitle ? ` (${item.subtitle})` : "";
-    return `unsaved tab keys${who}`;
+    return inboxAriaOwnershipNotSaved(item.subtitle ?? "");
   }
   if (item.kind === "cross_tab_keys") {
-    const who = item.subtitle ? ` (${item.subtitle})` : "";
-    return `keys in another tab${who}`;
+    return inboxAriaManagingInOtherTab(1, item.subtitle ?? "");
   }
   if (item.kind === "other_tabs_unsaved_keys") {
-    const who = item.subtitle ? ` (${item.subtitle})` : "";
-    return item.count > 1
-      ? `keys in ${item.count} other tabs${who}`
-      : `keys in another tab${who}`;
+    return inboxAriaManagingInOtherTab(item.count, item.subtitle ?? "");
   }
   if (item.kind === "orphan_keys_removed") {
     const who = item.subtitle
-      ? ` (${item.subtitle.replace(`${ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX} · `, "")})`
+      ? item.subtitle.replace(`${ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX} · `, "")
       : "";
-    return `keys for a removed card in another tab${who}`;
+    return inboxAriaOrphanManagingOtherTab(who);
   }
   if (item.kind === "card_disabled_since_visit") {
     return item.count === 1

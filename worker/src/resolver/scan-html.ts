@@ -26,6 +26,12 @@ import {
   qrScopeRelationshipCopy,
   qrTrustGroupScopeSubtitle,
 } from "../../../site/js/object-taxonomy-core.mjs";
+import {
+  LIVE_CONTROL_SCANNER_LEAD,
+  VOUCH_EXPLAINER_EYEBROW,
+  VOUCH_EXPLAINER_INITIAL_COPY,
+  VOUCH_EXPLAINER_TITLE,
+} from "../../../site/js/device-ownership-copy-core.mjs";
 import { renderScanQrMarkup } from "./scan-qr";
 import {
   EMPTY_SCAN_SAFETY,
@@ -943,19 +949,20 @@ function humanGroupRows(vm: ScanViewModel): string {
 
 function renderVouchSection(vm: ScanViewModel, origin: string): string {
   const walletUrl = `${origin.replace(/\/$/, "")}/wallet/`;
-  const createUrl = `${origin.replace(/\/$/, "")}/create/`;
+  const explainerCopy = VOUCH_EXPLAINER_INITIAL_COPY.replace(
+    "WALLET_HREF",
+    escapeHtml(walletUrl)
+  );
   return `<section class="group scan-group scan-group-vouch scan-trust-layer" aria-label="Issue vouch">
   <h2 class="group-label">Vouch</h2>
   <div id="vouch-explainer" class="hc-emphasis-card hc-emphasis-card--info vouch-explainer">
     <div class="hc-emphasis-card__main">
       <span class="hc-emphasis-card__dot hc-emphasis-card__dot--info" aria-hidden="true"></span>
       <div class="hc-emphasis-card__copy">
-        <p class="hc-emphasis-card__eyebrow">Device signing</p>
-        <p class="hc-emphasis-card__title">Signing key in this tab</p>
+        <p class="hc-emphasis-card__eyebrow">${escapeHtml(VOUCH_EXPLAINER_EYEBROW)}</p>
+        <p class="hc-emphasis-card__title">${escapeHtml(VOUCH_EXPLAINER_TITLE)}</p>
         <p class="hc-emphasis-card__detail" id="vouch-explainer-copy">
-          Checking this tab for your card’s signing key. Steward and Vouched Human are network checks—separate from signing.
-          Use <strong>Sign as…</strong> or <a href="${escapeHtml(walletUrl)}">Saved cards</a>.
-          Only the signed vouch is sent; your private key stays here.
+          ${explainerCopy}
         </p>
       </div>
     </div>
@@ -1150,7 +1157,7 @@ function liveControlInteractiveRow(provenAt: string | null): string {
           </div>
         </div>
         <p class="live-control-lead">
-          Ask the owner to prove they hold the signing key for this object  -  right now, on the spot.
+          ${escapeHtml(LIVE_CONTROL_SCANNER_LEAD)}
         </p>
         <div class="live-control-same-device-banner" id="live-control-same-device-banner" hidden>
           <p class="live-control-same-device-copy">

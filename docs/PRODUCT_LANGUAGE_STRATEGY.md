@@ -193,3 +193,4 @@ Copy changes that affect trust claims should be validated with strangers **witho
 | 2026-05-29 | Adopt canonical product language strategy: progressive disclosure, plain default, precise on purpose |
 | 2026-05-29 | “Hide jargon” rejected as global policy; stratify by audience and surface instead |
 | 2026-05-29 | D7 shipped: `device-ownership-copy-core.mjs` + tests (`device-ownership-copy-core.test.ts`) |
+| 2026-05-29 | D8 shipped: `/created/` **Export for developers** disclosure; primary restore path stays Layer 2 |

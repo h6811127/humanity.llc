@@ -5,13 +5,21 @@ import { describe, expect, it } from "vitest";
 
 import {
   BACKUP_INVALID_OWNERSHIP,
+  DEFAULT_ATTESTATION_ELIGIBILITY_ALERT,
   DEFAULT_FOR_ATTESTATION_ON_SCAN,
+  DEVELOPER_EXPORT_SUBTITLE,
+  EXPORT_FOR_DEVELOPERS,
   IMPORT_OWNERSHIP_LOADED_TAB,
+  LIVE_CONTROL_SCANNER_LEAD,
   LOAD_CONTROL_IN_TAB_FIRST,
   OWNERSHIP_NOT_LOADED_TAB,
   SET_DEFAULT_FOR_ATTESTATION,
   TAKE_CONTROL_HERE,
   UNLOCK_CONTROL_FIRST,
+  VOUCH_EXPLAINER_INITIAL_COPY,
+  inboxAriaManagingInOtherTab,
+  inboxAriaOrphanManagingOtherTab,
+  inboxAriaOwnershipNotSaved,
   otherTabSwitchConfirmMessage,
   savedObjectsAttestationNudge,
 } from "../../site/js/device-ownership-copy-core.mjs";
@@ -47,6 +55,12 @@ describe("device-ownership-copy-core", () => {
     expect(savedObjectsAttestationNudge(3)).toBe(
       "3 saved objects · pick one for scan auto-load"
     );
+  });
+
+  it("exports developer export and attestation menu strings", () => {
+    expect(EXPORT_FOR_DEVELOPERS).toBe("Export for developers");
+    expect(DEVELOPER_EXPORT_SUBTITLE).toContain("Public key");
+    expect(DEFAULT_ATTESTATION_ELIGIBILITY_ALERT).toContain("default for attestation");
   });
 });
 

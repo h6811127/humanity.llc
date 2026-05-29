@@ -1,5 +1,6 @@
 /**
  * Developer export panel on /created/ Manage: owner pubkey preview (D8).
+ * @see docs/OWNERSHIP_AND_CONTROL_MODEL.md § D8
  */
 import { ownerPubkeyPreviewState } from "./created-developer-export-core.mjs";
 
