@@ -275,6 +275,8 @@ Verified: `qr_id` FK → `qr_credentials`; showcase `POST …/live-control/chall
 
 Rebuild SQL lives in `worker/scripts/repair-live-control-challenges-fk.sql`. Future `worker:apply-child-object-qr-schema` runs also rebuild `live_control_challenges` (see `child-object-qr-schema-rebuild.sql`).
 
+**Usability follow-up:** [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) (H-01–H-15).
+
 ## Operator next steps (investigation closure)
 
 1. ~~Tail production logs~~ — done; `qr_credentials_v23_legacy` missing table.
@@ -284,13 +286,14 @@ Rebuild SQL lives in `worker/scripts/repair-live-control-challenges-fk.sql`. Fut
 
 ---
 
-## Suggested fix directions (documentation only — not implemented)
+## Suggested fix directions
 
-1. **Harden `insertLiveControlChallenge` errors** — map FK / constraint failures to `409` or `503` with actionable copy instead of rethrowing → 1101.
-2. **Production smoke for M7** — `POST` challenge in rollout step 2/4/6 smoke scripts.
-3. **Align `stewardSchemaReady`** with tables used by `notifyLiveProofPending` (`steward_account_profiles`, `steward_usage_counters`).
-4. **Refresh `scan-live-control-client.test.ts`** to match side-by-side owner panel assertions in `scan.test.ts`.
-5. **Optional:** feature-flag push `waitUntil` on challenge create until smoke green, to bisect hosted-tier interaction (only if logs implicate push path).
+Superseded by [`LIVE_CONTROL_USABILITY_HARDENING.md`](LIVE_CONTROL_USABILITY_HARDENING.md) (H-01–H-15). Key items from this incident:
+
+1. **H-02** — map D1 insert failures to JSON 503/409 instead of 1101.
+2. **H-01, H-03** — safe JSON + visible poll errors on scan page.
+3. **H-15** — production smoke for `POST` challenge (shipped in rollout step 2/4).
+4. **H-14** — refresh `scan-live-control-client.test.ts`.
 
 ---
 
