@@ -28,6 +28,7 @@ import {
   resolveStewardAccountLinkTarget,
   stewardAccountLinkTimestamps,
 } from "./device-steward-session-core.mjs";
+import { LOAD_CONTROL_IN_TAB_FIRST } from "./device-ownership-copy-core.mjs";
 
 export {
   STEWARD_ACCOUNT_URL_PARAM,
@@ -119,7 +120,7 @@ export async function linkStewardAccountWithActiveKeys(accountId) {
 
   const session = getTabSession();
   if (!session?.profile_id || !session.owner_private_key_b58) {
-    return { ok: false, message: "Load signing keys in this tab first." };
+    return { ok: false, message: LOAD_CONTROL_IN_TAB_FIRST };
   }
 
   const profileId = String(session.profile_id);

@@ -212,7 +212,7 @@ Priority surfaces to migrate to Layer 2 copy:
 | `/created/` save strip | “Save control key”, “root signing key” | “Save ownership on this device” |
 | Hub custody panel | “Keys active”, “Keys in this tab” | “Managing here”, “Save ownership” |
 | `/wallet/` actions | “Use keys” | “Open controls” (align with hub) |
-| Scan vouch explainer | “Ed25519 signing key in this tab” | “You need control of your identity in this tab to attest” | **D7** |
+| Scan vouch explainer | “Ed25519 signing key in this tab” | “You need control of your identity in this tab to attest” | **D7** ✅ |
 | Inbox / cross-tab | “Keys open in N tabs” | “Managing in N other tabs” |
 | Help / features | Deep `sessionStorage` exposition | Move to Advanced; lead with ownership |
 | `device-keys-custody.mjs` | “Your browser holds the private key” | “Your browser holds control — the network never does” |
@@ -225,7 +225,7 @@ Priority surfaces to migrate to Layer 2 copy:
 | Recovery not automatic | Optional at create; user must confirm save | **Warn only when recovery impossible** — gate child objects / print checkout (partial: `child-object-backup-gate.mjs`) |
 | Multi-tab control | User must understand tab isolation | Treat like passkey “signed in on another window” — focus tab or **take control here** |
 | “My cards” naming | Protocol term | **My objects** or **What I control** when object tree is primary |
-| Advanced export | Mixed into primary `/created/` | Collapse under **Advanced → Export for developers** |
+| Advanced export | Mixed into primary `/created/` | Collapse under **Advanced → Export for developers** | **D8** ✅ |
 
 ---
 
@@ -360,6 +360,7 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | **D5** | Stronger recovery gates before merch checkout / Nth child object | Product policy | **Shipped** (2026-05-29) |
 | **D6** | Optional WebAuthn wrap around control activation (extends vouch-ready option E) | Engineering | **Shipped** (2026-05-29) |
 | **D7** | Gap close-out: vouch explainer, status dot, hub segment copy | Low — copy only | **Shipped** (2026-05-29) |
+| **D8** | Collapse `/created/` developer export (backup download, raw recovery import, pubkey preview) under **Export for developers** | Low — IA only | **Shipped** (2026-05-29) |
 
 **Do not migrate:** resolver APIs, document types, storage key names, or test fixture terminology without a dedicated protocol PR.
 
@@ -380,6 +381,7 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 
 | Concern | Primary modules |
 |---------|-----------------|
+| Layer 2 copy (D7) | `device-ownership-copy-core.mjs` |
 | Tab session | `device-keys.mjs` |
 | Saved ownership | `device-wallet.mjs` |
 | Create | `create-card.mjs`, `hc-sign.mjs` |
@@ -416,3 +418,5 @@ Hosted steward accounts ([`HOSTED_TIER_IMPLEMENTATION_EPICS.md`](HOSTED_TIER_IMP
 | 2026-05-29 | Protocol and storage unchanged in D0–D2; copy and information architecture only |
 | 2026-05-29 | **D3 shipped** — “My objects” nav label; `/objects` → `/wallet/` alias; URL `/wallet/` unchanged |
 | 2026-05-29 | Terminology map linked to canonical [`PRODUCT_LANGUAGE_STRATEGY.md`](PRODUCT_LANGUAGE_STRATEGY.md) |
+| 2026-05-29 | **D7 shipped** — `site/js/device-ownership-copy-core.mjs`; hub attestation rows, import, steward link, cross-tab confirm |
+| 2026-05-29 | **D8 shipped** — `/created/` Manage **Export for developers** panel; encrypted backup restore stays primary; hub default-for-attestation menu copy |

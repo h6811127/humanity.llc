@@ -288,12 +288,14 @@ describe("presence map hardening", () => {
 });
 
 describe("otherTabSwitchConfirmMessage", () => {
-  it("mentions both profile ids", () => {
+  it("mentions both profile ids in ownership terms", () => {
     const msg = otherTabSwitchConfirmMessage(
       { profile_id: "aaaaaaaaaaaa" },
       { profile_id: "bbbbbbbbbbbb" }
     );
     expect(msg).toContain("aaaaaaaaaaaa");
     expect(msg).toContain("bbbbbbbbbbbb");
+    expect(msg).toContain("control active");
+    expect(msg).not.toContain("signing keys");
   });
 });

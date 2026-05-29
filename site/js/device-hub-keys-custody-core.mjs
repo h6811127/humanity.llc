@@ -16,6 +16,11 @@ import {
   ORPHAN_KEYS_INBOX_SUBTITLE_PREFIX,
   ORPHAN_KEYS_INBOX_TITLE,
 } from "./device-orphan-keys-nav-core.mjs";
+import {
+  DEFAULT_FOR_ATTESTATION_ON_SCAN,
+  SET_DEFAULT_FOR_ATTESTATION,
+  savedObjectsAttestationNudge,
+} from "./device-ownership-copy-core.mjs";
 
 /** @typedef {'this_tab_active' | 'this_tab_unsaved' | 'cross_tab' | 'cross_tab_summary' | 'orphan' | 'vouch_default' | 'sign_lock' | 'vouch_nudge' | 'wallet_scale'} HubKeysCustodyRowKind */
 
@@ -151,7 +156,7 @@ export function buildHubKeysCustodyPanel(input) {
   if (defaultVouchProfileId && vouchAutoActivate) {
     rows.push({
       kind: "vouch_default",
-      title: "Default for vouching on scan",
+      title: DEFAULT_FOR_ATTESTATION_ON_SCAN,
       subtitle:
         defaultVouchLabel ||
         `${String(defaultVouchProfileId).slice(0, 12)}… · auto-loads on scan open`,
@@ -168,8 +173,8 @@ export function buildHubKeysCustodyPanel(input) {
   ) {
     rows.push({
       kind: "vouch_nudge",
-      title: "Set a default for vouching",
-      subtitle: `${walletEntriesWithKeys} saved cards · pick one for scan auto-load`,
+      title: SET_DEFAULT_FOR_ATTESTATION,
+      subtitle: savedObjectsAttestationNudge(walletEntriesWithKeys),
     });
   }
 

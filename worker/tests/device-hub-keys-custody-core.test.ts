@@ -87,6 +87,7 @@ describe("buildHubKeysCustodyPanel", () => {
       vouchAutoActivate: true,
     });
     expect(state.rows.map((r) => r.kind)).toEqual(["vouch_default"]);
+    expect(state.rows[0].title).toBe("Default for attestation on scan");
     expect(state.rows[0].subtitle).toBe("@steward");
     expect(state.visible).toBe(true);
   });
@@ -108,7 +109,7 @@ describe("buildHubKeysCustodyPanel", () => {
       educationDismissed: true,
     });
     expect(state.rows.map((r) => r.kind)).toEqual(["vouch_nudge"]);
-    expect(state.rows[0].subtitle).toContain("3 saved cards");
+    expect(state.rows[0].subtitle).toContain("3 saved objects");
   });
 
   it("suppresses vouch nudge when cross-tab notice is active", () => {

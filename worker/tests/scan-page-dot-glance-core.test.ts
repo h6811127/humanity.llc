@@ -41,14 +41,14 @@ describe("renderScanDotExplainerHtml", () => {
   it("renders lead copy and a primary button without duplicating next", () => {
     const html = renderScanDotExplainerHtml(
       {
-        now: "No signing keys in this tab.",
+        now: "Ownership not loaded in this tab.",
         why: "Resolver is online.",
-        next: "Use keys here to vouch.",
+        next: "Take control here to attest.",
       },
-      { kind: "scan_use_keys_here", label: "Use keys here" }
+      { kind: "scan_use_keys_here", label: "Take control here" }
     );
     expect(html).toContain("scan-page-dot-glance-now");
-    expect(html).toContain("No signing keys in this tab.");
+    expect(html).toContain("Ownership not loaded in this tab.");
     expect(html).toContain('data-scan-dot-action="scan_use_keys_here"');
     expect(html).not.toContain("scan-page-dot-glance-next");
   });

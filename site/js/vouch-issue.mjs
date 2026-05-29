@@ -1,6 +1,7 @@
 /**
  * V-002  -  vouch issuance on scan page when viewer has hc_created keys.
  */
+import { OWNERSHIP_NOT_LOADED_TAB } from "./device-ownership-copy-core.mjs";
 import {
   emphasisCardActionsHtml,
   emphasisCardCtaButton,
@@ -677,7 +678,7 @@ function bindSubmitHandler(voucheeProfileId) {
       !session.owner_private_key_b58 ||
       !session.owner_public_key_b58
     ) {
-      setStatus("Ownership not loaded in this tab.", "error");
+      setStatus(OWNERSHIP_NOT_LOADED_TAB, "error");
       return;
     }
     const voucherProfileId = session.profile_id;

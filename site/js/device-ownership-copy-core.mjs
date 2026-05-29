@@ -25,7 +25,9 @@ export const DEFAULT_FOR_ATTESTATION = "Default for attestation";
 
 export const DEFAULT_FOR_ATTESTATION_ON_SCAN = "Default for attestation on scan";
 
-export const SET_DEFAULT_FOR_ATTESTATION = "Set a default for attestation";
+export const SET_DEFAULT_FOR_ATTESTATION = "Set as default for attestation";
+
+export const EXPORT_FOR_DEVELOPERS = "Export for developers";
 
 /**
  * @param {number} count

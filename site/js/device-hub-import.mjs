@@ -10,6 +10,7 @@ import {
   readBackupFile,
 } from "./key-backup.mjs";
 import { logDeviceActivity } from "./device-activity.mjs";
+import { IMPORT_OWNERSHIP_LOADED_TAB } from "./device-ownership-copy-core.mjs";
 import { activateWalletEntry, openCardNowPage } from "./device-keys.mjs";
 import { mergeBackupIntoWallet } from "./device-hub-import-core.mjs";
 import { loadWallet, saveWallet, walletEntryFromSession } from "./device-wallet.mjs";
@@ -106,9 +107,7 @@ export function initHubBackupImport(form, statusEl) {
       }
       saveWallet(walletEntries);
       activateWalletEntry(savedEntry);
-      setStatus(
-        "Imported and loaded signing keys in this tab. Open card controls to revoke, update status plates, or manage object QRs."
-      );
+      setStatus(IMPORT_OWNERSHIP_LOADED_TAB);
       showImportOpenControlsCta(statusEl, savedEntry);
       logDeviceActivity("backup_import", savedEntry.label || "Imported backup", {
         profile_id: unlocked.profileId,
